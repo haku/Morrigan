@@ -21,8 +21,10 @@ public class ViewMain extends ViewPart {
 	 */
 	public void createPartControl(Composite parent) {
 		viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
+		
 		viewer.setContentProvider(new ViewMainContentProvider());
 		viewer.setLabelProvider(new ViewMainLabelProvider());
+		
 		viewer.setInput(getViewSite()); // use content provider.
 		
 		getSite().setSelectionProvider(viewer);
