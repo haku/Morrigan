@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.model;
+package net.sparktank.morrigan.model.media;
 
 import java.util.ArrayList;
 import java.util.List;

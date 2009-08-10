@@ -1,12 +1,15 @@
-package net.sparktank.morrigan.model;
+package net.sparktank.morrigan.model.ui;
 
 public class MenuItem {
 	
-	public String name;
+	public String identifier;
 	public String title;
 	
+	public MenuItem () {
+	}
+	
 	public MenuItem (String name, String title) {
-		this.name = name;
+		this.identifier = name;
 		this.title = title;
 	}
 	

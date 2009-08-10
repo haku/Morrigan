@@ -1,0 +1,19 @@
+package net.sparktank.morrigan.model.ui;
+
+public class MediaExplorerItem extends MenuItem {
+	
+	public enum ItemType {DISPLAY, LIBRARY, PLAYLIST}
+	
+	public ItemType type = null;
+	
+	public MediaExplorerItem(ItemType type) {
+		this.type = type;
+	}
+	
+	public MediaExplorerItem(String name, String title, ItemType type) {
+		this.identifier = name;
+		this.title = title;
+		this.type = type;
+	}
+	
+}

@@ -1,5 +1,11 @@
 package net.sparktank.morrigan.handler;
 
+import net.sparktank.morrigan.ViewMediaExplorer;
+import net.sparktank.morrigan.editors.MediaListEditor;
+import net.sparktank.morrigan.editors.MediaListEditorInput;
+import net.sparktank.morrigan.model.media.MediaPlaylist;
+import net.sparktank.morrigan.model.ui.MediaExplorerItem;
+
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -11,10 +17,6 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-import net.sparktank.morrigan.ViewMain;
-import net.sparktank.morrigan.editors.*;
-import net.sparktank.morrigan.model.*;
-
 public class CallMediaListEditor extends AbstractHandler implements IHandler {
 
 	@Override
@@ -22,7 +24,7 @@ public class CallMediaListEditor extends AbstractHandler implements IHandler {
 		// Get the view
 		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindow(event);
 		IWorkbenchPage page = window.getActivePage();
-		ViewMain view = (ViewMain) page.findView(ViewMain.ID);
+		ViewMediaExplorer view = (ViewMediaExplorer) page.findView(ViewMediaExplorer.ID);
 		
 		// Get the selection
 		ISelection selection = view.getSite().getSelectionProvider().getSelection();
@@ -34,9 +36,22 @@ public class CallMediaListEditor extends AbstractHandler implements IHandler {
 			// If we had a selection lets open the editor.
 			if (obj != null) {
 				
-				System.out.println(obj.toString());
+				MediaExplorerItem item = (MediaExplorerItem) obj;
 				
-				// TODO convert ViewMain objects to something more useful than string.
+				if (item.type == MediaExplorerItem.ItemType.PLAYLIST) {
+					MediaPlaylist playList = new MediaPlaylist(item.identifier);
+					MediaListEditorInput input = new MediaListEditorInput(playList);
+					try {
+						page.openEditor(input, MediaListEditor.ID);
+					} catch (PartInitException e) {
+						System.out.println(e.getStackTrace());
+					}
+					
+				} else {
+					System.out.println("TODO: show " + item.identifier);
+				}
+				
+				// TODO convert MediaExplorer objects to something more useful than string.
 				// TODO look up what was double clicked on.
 				// TODO display the appropriate editor.
 				

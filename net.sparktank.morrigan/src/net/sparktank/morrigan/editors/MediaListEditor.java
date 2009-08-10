@@ -12,6 +12,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
 
 import net.sparktank.morrigan.model.*;
+import net.sparktank.morrigan.model.media.MediaList;
 
 public class MediaListEditor extends EditorPart {
 	public static final String ID = "net.sparktank.morrigan.editors.MediaListEditor";
@@ -36,7 +37,7 @@ public class MediaListEditor extends EditorPart {
 	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
 		setSite(site);
 		setInput(input);
-		editedMediaList = ((MediaList) input);
+		editedMediaList = ((MediaListEditorInput) input).getEditedMediaList();
 		setPartName(editedMediaList.getListName());
 	}
 	
