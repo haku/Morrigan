@@ -1,6 +1,7 @@
 package net.sparktank.morrigan.model.media;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class MediaList {
@@ -24,6 +25,21 @@ public class MediaList {
 		MediaTrack mt = new MediaTrack(mediaFilePath);
 		mediaTracks.add(mt);
 		return mt;
+	}
+	
+	@Override
+	public String toString () {
+		StringBuilder ret = new StringBuilder();
+		ret.append(listName + ":");
+		
+		Iterator<MediaTrack> itr = mediaTracks.iterator();
+	    while (itr.hasNext()) {
+	    	MediaTrack item = itr.next();
+	    	ret.append("\n");
+	    	ret.append(item.getFilepath());
+	    }
+		
+		return ret.toString();
 	}
 	
 }

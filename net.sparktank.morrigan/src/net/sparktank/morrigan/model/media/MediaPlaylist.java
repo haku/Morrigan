@@ -33,5 +33,32 @@ public class MediaPlaylist extends MediaList {
 			return filePath;
 		}
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		
+		MediaPlaylist other = (MediaPlaylist) obj;
+		if (filePath == null) {
+			if (other.filePath != null) {
+				return false;
+			}
+		} else if (!filePath.equals(other.filePath)) {
+			return false;
+		}
+		
+		return true;
+	}
+	
+//	@Override
+//	public int hashCode() {
+//		return super.hashCode();
+//	}
+
 
 }

@@ -1,23 +1,19 @@
 package net.sparktank.morrigan.editors;
 
+import net.sparktank.morrigan.model.media.MediaList;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
 
-import net.sparktank.morrigan.model.*;
-import net.sparktank.morrigan.model.media.MediaList;
-
 public class MediaListEditor extends EditorPart {
 	public static final String ID = "net.sparktank.morrigan.editors.MediaListEditor";
 	private MediaList editedMediaList;
-	private Text text2;
 	
 	public MediaListEditor() {
 	}
@@ -59,7 +55,7 @@ public class MediaListEditor extends EditorPart {
 		
 		// TODO display this as a list.
 		
-		Text text = new Text(parent, SWT.BORDER);
+		Text text = new Text(parent, SWT.BORDER + SWT.MULTI + SWT.H_SCROLL + SWT.V_SCROLL);
 		text.setText(editedMediaList.toString());
 	}
 	
