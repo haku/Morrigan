@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         id="application"
+         point="org.eclipse.core.runtime.applications">
+      <application>
+         <run
+               class="net.sparktank.morrigan.Application">
+         </run>
+      </application>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            name="PerspectiveMain"
+            class="net.sparktank.morrigan.PerspectiveMain"
+            id="net.sparktank.morrigan.perspectiveMain">
+      </perspective>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            name="ViewMain"
+            class="net.sparktank.morrigan.ViewMain"
+            id="net.sparktank.morrigan.ViewMain">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="net.sparktank.morrigan.editors.MediaListEditor"
+            default="false"
+            icon="icons/alt_window_16.gif"
+            id="net.sparktank.morrigan.editors.MediaListEditor"
+            name="MediaListEditor">
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="net.sparktank.morrigan.handler.CallMediaListEditor"
+            id="net.sparktank.morrigan.handler.CallMediaListEditor"
+            name="CallMediaListEditor">
+      </command>
+   </extension>
+
+</plugin>
