@@ -29,8 +29,6 @@ public class ViewMediaExplorer extends ViewPart {
 	 * This is a callback that will allow us to create the viewer and initialise it.
 	 */
 	public void createPartControl(Composite parent) {
-		this.setPartName("Media Explorer");
-		
 		viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 		viewer.setContentProvider(new IStructuredContentProvider() {
 			@Override
