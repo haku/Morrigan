@@ -1,5 +1,7 @@
 package net.sparktank.morrigan;
 
+import net.sparktank.morrigan.views.ViewMediaExplorer;
+
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
 
