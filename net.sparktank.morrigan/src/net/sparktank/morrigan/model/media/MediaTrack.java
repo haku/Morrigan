@@ -23,4 +23,9 @@ public class MediaTrack {
 		}
 	}
 	
+	@Override
+	public String toString () {
+		return trackFilePath;
+	}
+	
 }
