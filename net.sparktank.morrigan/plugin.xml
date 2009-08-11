@@ -23,8 +23,8 @@
          point="org.eclipse.ui.views">
       <view
             name="Media Explorer"
-            class="net.sparktank.morrigan.ViewMediaExplorer"
-            id="net.sparktank.morrigan.ViewMediaExplorer">
+            class="net.sparktank.morrigan.views.ViewMediaExplorer"
+            id="net.sparktank.morrigan.views.ViewMediaExplorer">
       </view>
    </extension>
    <extension

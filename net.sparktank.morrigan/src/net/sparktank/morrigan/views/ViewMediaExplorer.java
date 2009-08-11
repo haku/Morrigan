@@ -1,10 +1,9 @@
-package net.sparktank.morrigan;
+package net.sparktank.morrigan.views;
 
 import java.util.ArrayList;
 
 import net.sparktank.morrigan.helpers.PlaylistHelper;
 import net.sparktank.morrigan.model.ui.MediaExplorerItem;
-import net.sparktank.morrigan.model.ui.MenuItem;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.NotEnabledException;
@@ -21,7 +20,7 @@ import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.part.ViewPart;
 
 public class ViewMediaExplorer extends ViewPart {
-	public static final String ID = "net.sparktank.morrigan.ViewMediaExplorer";
+	public static final String ID = "net.sparktank.morrigan.views.ViewMediaExplorer";
 	
 	private TableViewer viewer;
 	
