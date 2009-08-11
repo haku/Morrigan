@@ -1,10 +1,10 @@
 package net.sparktank.morrigan.handler;
 
-import net.sparktank.morrigan.ViewMediaExplorer;
 import net.sparktank.morrigan.editors.MediaListEditor;
 import net.sparktank.morrigan.editors.MediaListEditorInput;
 import net.sparktank.morrigan.model.media.MediaPlaylist;
 import net.sparktank.morrigan.model.ui.MediaExplorerItem;
+import net.sparktank.morrigan.views.ViewMediaExplorer;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
