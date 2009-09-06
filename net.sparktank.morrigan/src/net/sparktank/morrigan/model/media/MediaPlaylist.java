@@ -1,6 +1,10 @@
 package net.sparktank.morrigan.model.media;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 
 public class MediaPlaylist extends MediaList {
 	
@@ -13,11 +17,23 @@ public class MediaPlaylist extends MediaList {
 	}
 	
 	public void ReloadFromFile () {
-		// TODO write this.
-		// FIXME temp test data.
+		File file = new File(filePath);
+        BufferedReader reader = null;
+        
+		try {
+			reader = new BufferedReader(new FileReader(file));
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e); // FIXME
+		}
 		
-		for (int i = 0; i < 10; i++) {
-			addTrack("/path/media/track" + i);
+		// repeat until all lines is read
+		String text = null;
+		try {
+			while ((text = reader.readLine()) != null) {
+				addTrack(text);
+			}
+		} catch (IOException e) {
+			throw new RuntimeException(e); // FIXME
 		}
 	}
 	
