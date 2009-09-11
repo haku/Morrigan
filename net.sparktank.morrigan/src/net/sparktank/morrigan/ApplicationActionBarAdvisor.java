@@ -5,11 +5,13 @@ import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.events.HelpListener;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.actions.ActionFactory;
@@ -109,7 +111,13 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 			
 			@Override
 			public void runWithEvent(Event event) {
-				System.out.println("TODO: new playlist."); //TODO
+				InputDialog dlg = new InputDialog(
+						Display.getCurrent().getActiveShell(),
+						"", "Enter playlist name.", "newPl", null);
+				if (dlg.open() == Window.OK) {
+					String plName = dlg.getValue();
+					System.out.println("TODO: new playlist with name = '"+plName+"'."); //TODO
+				}
 			}
 			
 			@Override
