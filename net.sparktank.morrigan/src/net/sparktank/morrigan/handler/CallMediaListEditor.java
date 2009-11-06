@@ -1,6 +1,7 @@
 package net.sparktank.morrigan.handler;
 
 import net.sparktank.morrigan.dialogs.MorriganErrDlg;
+import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.editors.MediaListEditor;
 import net.sparktank.morrigan.editors.MediaListEditorInput;
 import net.sparktank.morrigan.exceptions.MorriganException;
@@ -56,7 +57,7 @@ public class CallMediaListEditor extends AbstractHandler implements IHandler {
 					}
 					
 				} else {
-					System.out.println("TODO: show " + item.identifier);
+					new MorriganMsgDlg("TODO: show " + item.identifier).open();
 				}
 				
 				// TODO convert MediaExplorer objects to something more useful than string.
