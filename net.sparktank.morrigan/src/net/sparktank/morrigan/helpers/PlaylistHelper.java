@@ -44,8 +44,6 @@ public class PlaylistHelper {
 		
 		for (File file : plFiles) {
 			if (isPlFile(file.getAbsolutePath())) {
-				System.out.println("found pl = " + file);
-				
 				MediaExplorerItem newItem = new MediaExplorerItem(MediaExplorerItem.ItemType.PLAYLIST);
 				newItem.identifier = file.getAbsolutePath();
 				
