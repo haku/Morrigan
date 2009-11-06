@@ -1,10 +1,10 @@
 package net.sparktank.morrigan.editors;
 
+import net.sparktank.morrigan.model.media.MediaList;
+
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
-
-import net.sparktank.morrigan.model.media.MediaList;
 
 public class MediaListEditorInput implements IEditorInput {
 

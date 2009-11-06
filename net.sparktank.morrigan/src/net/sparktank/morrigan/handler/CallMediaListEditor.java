@@ -2,6 +2,7 @@ package net.sparktank.morrigan.handler;
 
 import net.sparktank.morrigan.editors.MediaListEditor;
 import net.sparktank.morrigan.editors.MediaListEditorInput;
+import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.MediaPlaylist;
 import net.sparktank.morrigan.model.ui.MediaExplorerItem;
 import net.sparktank.morrigan.views.ViewMediaExplorer;
@@ -39,7 +40,12 @@ public class CallMediaListEditor extends AbstractHandler implements IHandler {
 				MediaExplorerItem item = (MediaExplorerItem) obj;
 				
 				if (item.type == MediaExplorerItem.ItemType.PLAYLIST) {
-					MediaPlaylist playList = new MediaPlaylist(item.identifier);
+					MediaPlaylist playList;
+					try {
+						playList = new MediaPlaylist(item.identifier);
+					} catch (MorriganException e) {
+						throw new RuntimeException(e); // FIXME show nice error message.
+					}
 					MediaListEditorInput input = new MediaListEditorInput(playList);
 					try {
 						page.openEditor(input, MediaListEditor.ID);

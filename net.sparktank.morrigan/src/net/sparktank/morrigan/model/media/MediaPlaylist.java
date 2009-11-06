@@ -1,29 +1,47 @@
 package net.sparktank.morrigan.model.media;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
+
+import net.sparktank.morrigan.exceptions.MorriganException;
 
 public class MediaPlaylist extends MediaList {
 	
 	private String filePath = null;
 	
-	public MediaPlaylist(String filePath) {
+	public MediaPlaylist(String filePath) throws MorriganException {
 		super(getFilenameFromPath(filePath));
 		this.filePath = filePath;
 		ReloadFromFile();
 	}
 	
-	public void ReloadFromFile () {
+	public MediaPlaylist(String filePath, boolean newPl) throws MorriganException {
+		super(getFilenameFromPath(filePath));
+		this.filePath = filePath;
+		if (newPl) {
+			if (new File(filePath).exists()) {
+				throw new MorriganException("Play list already exists.");
+			}
+			WriteToFile();
+		} else {
+			ReloadFromFile();
+		}
+	}
+	
+	public void ReloadFromFile () throws MorriganException {
 		File file = new File(filePath);
         BufferedReader reader = null;
         
 		try {
 			reader = new BufferedReader(new FileReader(file));
 		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e); // FIXME
+			throw new MorriganException("Failed to open play list file for reading.", e);
 		}
 		
 		// repeat until all lines is read
@@ -33,11 +51,40 @@ public class MediaPlaylist extends MediaList {
 				addTrack(text);
 			}
 		} catch (IOException e) {
-			throw new RuntimeException(e); // FIXME
+			throw new MorriganException("Error while reading play list.", e);
+		} finally {
+			try {
+				reader.close();
+			} catch (IOException e) {
+				throw new MorriganException("Failed to close file handle.", e);
+			}
 		}
 	}
 	
-	public void WriteToFile () {
+	public void WriteToFile () throws MorriganException {
+		File file = new File(filePath);
+        Writer writer = null;
+        
+        try {
+        	writer = new BufferedWriter(new FileWriter(file));
+		} catch (IOException e) {
+			throw new MorriganException("Failed to open file to write to.", e);
+		}
+        
+		try {
+			for (MediaTrack mt : getMediaTracks()) {
+				writer.write(mt.getFilepath());
+			}
+		} catch (IOException e) {
+			throw new MorriganException("Error while write play list to file.", e);
+		} finally {
+			try {
+				writer.close();
+			} catch (IOException e) {
+				throw new MorriganException("Failed to close file handle.", e);
+			}
+		}
+		
 		// TODO write this.
 	}
 	

@@ -1,8 +1,5 @@
 package net.sparktank.morrigan;
 
-import net.sparktank.morrigan.model.media.MediaList;
-import net.sparktank.morrigan.model.media.MediaModel;
-
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.swt.widgets.Display;

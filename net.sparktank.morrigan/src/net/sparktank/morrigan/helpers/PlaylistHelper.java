@@ -4,22 +4,30 @@ import java.io.File;
 import java.util.ArrayList;
 
 import net.sparktank.morrigan.config.Config;
+import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.MediaPlaylist;
 import net.sparktank.morrigan.model.ui.MediaExplorerItem;
 
 public class PlaylistHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public static PlaylistHelper instance = new PlaylistHelper();
+	public static final PlaylistHelper instance = new PlaylistHelper();
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public String getPathForNewPlaylist () {
-		// TODO
-		return null;
+	private String getPathForNewPlaylist (String plName) {
+		File plDir = Config.getPlDir();
+		String plFile = plDir.getPath() + File.separator + plName + Config.PL_FILE_EXT;
+		return plFile;
 	}
 	
-	public boolean isPlFile (String filePath) {
+	public MediaPlaylist createPl (String plName) throws MorriganException {
+		String plFile = getPathForNewPlaylist(plName);
+		MediaPlaylist pl = new MediaPlaylist(plFile, true);
+		return pl;
+	}
+	
+	private boolean isPlFile (String filePath) {
 		return (filePath.toLowerCase().endsWith(Config.PL_FILE_EXT));
 	}
 	

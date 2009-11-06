@@ -85,4 +85,8 @@ public class ViewMediaExplorer extends ViewPart {
 	public void setFocus() {
 		viewer.getControl().setFocus();
 	}
+	
+	public void refresh () {
+		viewer.refresh();
+	}
 }
