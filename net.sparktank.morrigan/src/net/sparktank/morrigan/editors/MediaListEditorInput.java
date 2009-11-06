@@ -43,6 +43,7 @@ public class MediaListEditorInput implements IEditorInput {
 		return editedMediaList.toString();
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public Object getAdapter(Class adapter) {
 		return null;
