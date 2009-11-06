@@ -1,5 +1,6 @@
 package net.sparktank.morrigan;
 
+import net.sparktank.morrigan.dialogs.MorriganErrDlg;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.PlaylistHelper;
 import net.sparktank.morrigan.views.ViewMediaExplorer;
@@ -91,7 +92,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 					try {
 						PlaylistHelper.instance.createPl(plName);
 					} catch (MorriganException e) {
-						throw new RuntimeException(e); // FIXME show nice error message.
+						new MorriganErrDlg(e).open();
+						return;
 					}
 					
 					// refresh explorer.

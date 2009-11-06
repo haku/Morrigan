@@ -1,5 +1,6 @@
 package net.sparktank.morrigan.handler;
 
+import net.sparktank.morrigan.dialogs.MorriganErrDlg;
 import net.sparktank.morrigan.editors.MediaListEditor;
 import net.sparktank.morrigan.editors.MediaListEditorInput;
 import net.sparktank.morrigan.exceptions.MorriganException;
@@ -44,7 +45,8 @@ public class CallMediaListEditor extends AbstractHandler implements IHandler {
 					try {
 						playList = new MediaPlaylist(item.identifier);
 					} catch (MorriganException e) {
-						throw new RuntimeException(e); // FIXME show nice error message.
+						new MorriganErrDlg(e).open();
+						return null;
 					}
 					MediaListEditorInput input = new MediaListEditorInput(playList);
 					try {
