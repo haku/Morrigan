@@ -84,8 +84,6 @@ public class MediaPlaylist extends MediaList {
 				throw new MorriganException("Failed to close file handle.", e);
 			}
 		}
-		
-		// TODO write this.
 	}
 	
 	private static String getFilenameFromPath (String filePath) {
