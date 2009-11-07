@@ -32,6 +32,10 @@ public class ViewMediaExplorer extends ViewPart {
 	 * This is a callback that will allow us to create the viewer and initialise it.
 	 */
 	public void createPartControl(Composite parent) {
+		// Setup the view.
+		// TODO add toolbar.
+		
+		// Setup the viewer control.
 		viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 		viewer.setContentProvider(new IStructuredContentProvider() {
 			@Override
@@ -51,11 +55,9 @@ public class ViewMediaExplorer extends ViewPart {
 				return items.toArray();
 			}
 		});
-		
 		viewer.setInput(getViewSite()); // use content provider.
-		
 		getSite().setSelectionProvider(viewer);
-		hookDoubleClickCommand();
+		hookDoubleClickCommand(); // setup the actions for the viewer.
 	}
 	
 	private void hookDoubleClickCommand() {
