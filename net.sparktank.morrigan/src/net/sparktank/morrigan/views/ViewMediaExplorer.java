@@ -22,7 +22,11 @@ import org.eclipse.ui.part.ViewPart;
 public class ViewMediaExplorer extends ViewPart {
 	public static final String ID = "net.sparktank.morrigan.views.ViewMediaExplorer";
 	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
 	private TableViewer viewer;
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	/**
 	 * This is a callback that will allow us to create the viewer and initialise it.
@@ -79,6 +83,8 @@ public class ViewMediaExplorer extends ViewPart {
 		});
 	}
 	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
 	/**
 	 * Passing the focus request to the viewer's control.
 	 */
@@ -89,4 +95,6 @@ public class ViewMediaExplorer extends ViewPart {
 	public void refresh () {
 		viewer.refresh();
 	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
