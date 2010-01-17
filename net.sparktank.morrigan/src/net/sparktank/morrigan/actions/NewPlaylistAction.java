@@ -1,5 +1,6 @@
 package net.sparktank.morrigan.actions;
 
+import net.sparktank.morrigan.Activator;
 import net.sparktank.morrigan.dialogs.MorriganErrDlg;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.PlaylistHelper;
@@ -30,6 +31,12 @@ public class NewPlaylistAction extends MorriganAction {
 	
 	@Override
 	public String getId() { return "newpl"; }
+	
+	@Override
+	public org.eclipse.jface.resource.ImageDescriptor getImageDescriptor() {
+		// TODO choose icon.
+		return Activator.getImageDescriptor("icons/alt_window_16.gif");
+	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
