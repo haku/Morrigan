@@ -63,6 +63,7 @@ public class MediaListEditor extends EditorPart {
 	
 	@Override
 	public void createPartControl(Composite parent) {
+		// Create table control.
 		editTable = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 		
 		// add columns.
