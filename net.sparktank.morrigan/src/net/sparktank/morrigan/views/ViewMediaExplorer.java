@@ -10,6 +10,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.NotEnabledException;
 import org.eclipse.core.commands.NotHandledException;
 import org.eclipse.core.commands.common.NotDefinedException;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -60,6 +61,7 @@ public class ViewMediaExplorer extends ViewPart {
 		
 		hookDoubleClickCommand(); // setup the actions for the viewer.
 		addToolbar();
+		addMenu();
 	}
 	
 	private void hookDoubleClickCommand() {
@@ -89,6 +91,12 @@ public class ViewMediaExplorer extends ViewPart {
 	
 	private void addToolbar () {
 		getViewSite().getActionBars().getToolBarManager().add(new NewPlaylistAction(getViewSite().getWorkbenchWindow()));
+	}
+	
+	private void addMenu () {
+		getViewSite().getActionBars().getMenuManager().add(new NewPlaylistAction(getViewSite().getWorkbenchWindow()));
+		getViewSite().getActionBars().getMenuManager().add(new Separator());
+		getViewSite().getActionBars().getMenuManager().add(new NewPlaylistAction(getViewSite().getWorkbenchWindow()));
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
