@@ -2,6 +2,7 @@ package net.sparktank.morrigan.views;
 
 import java.util.ArrayList;
 
+import net.sparktank.morrigan.actions.NewPlaylistAction;
 import net.sparktank.morrigan.helpers.PlaylistHelper;
 import net.sparktank.morrigan.model.ui.MediaExplorerItem;
 
@@ -33,7 +34,6 @@ public class ViewMediaExplorer extends ViewPart {
 	 */
 	public void createPartControl(Composite parent) {
 		// Setup the view.
-		// TODO add toolbar.
 		
 		// Setup the viewer control.
 		viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
@@ -57,7 +57,9 @@ public class ViewMediaExplorer extends ViewPart {
 		});
 		viewer.setInput(getViewSite()); // use content provider.
 		getSite().setSelectionProvider(viewer);
+		
 		hookDoubleClickCommand(); // setup the actions for the viewer.
+		addToolbar();
 	}
 	
 	private void hookDoubleClickCommand() {
@@ -83,6 +85,10 @@ public class ViewMediaExplorer extends ViewPart {
 				
 			}
 		});
+	}
+	
+	private void addToolbar () {
+		getViewSite().getActionBars().getToolBarManager().add(new NewPlaylistAction(getViewSite().getWorkbenchWindow()));
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
