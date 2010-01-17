@@ -26,6 +26,7 @@ public class MediaListEditor extends EditorPart {
 	private TableViewer editTable;
 	
 	public MediaListEditor() {
+		super();
 	}
 	
 	@Override
