@@ -69,6 +69,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		addAction.setImageDescriptor(Activator.getImageDescriptor("icons/alt_window_16.gif"));
 		getActionBarConfigurer().registerGlobalAction(addAction);
 		register(addAction);
+		window.getPartService().addPartListener(addAction);
 	}
 	
 	@Override
