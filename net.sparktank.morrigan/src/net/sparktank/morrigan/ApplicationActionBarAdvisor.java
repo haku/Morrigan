@@ -4,12 +4,17 @@ import net.sparktank.morrigan.actions.NewPlaylistAction;
 
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionItem;
+import org.eclipse.jface.action.ICoolBarManager;
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.ToolBarContributionItem;
+import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.actions.ContributionItemFactory;
+import org.eclipse.ui.actions.RetargetAction;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
 import org.eclipse.ui.application.ActionBarAdvisor;
 import org.eclipse.ui.application.IActionBarConfigurer;
@@ -30,10 +35,17 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	private IContributionItem showViewItemShortList;
 	private IAction newPlayListAction;
 
+	// Editor actions.
+	IWorkbenchAction saveAction;
+	private RetargetAction addAction;
+	
+	public static final String ADDACTIONID = "morrigan.add";
+	
 	public ApplicationActionBarAdvisor(IActionBarConfigurer configurer) {
 		super(configurer);
 	}
 
+	@Override
 	protected void makeActions(final IWorkbenchWindow window) {
 		// Creates the actions and registers them.
 		// Registering is needed to ensure that key bindings work.
@@ -48,8 +60,18 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		
 		showViewMenuMgr = new MenuManager("Show view", "showView");
 		showViewItemShortList = ContributionItemFactory.VIEWS_SHORTLIST.create(window);
+		
+		// Editor actions.
+		saveAction = ActionFactory.SAVE.create(window);
+		register(saveAction);
+		
+		addAction = new RetargetAction(ADDACTIONID, "&add");
+		addAction.setImageDescriptor(Activator.getImageDescriptor("icons/alt_window_16.gif"));
+		getActionBarConfigurer().registerGlobalAction(addAction);
+		register(addAction);
 	}
 	
+	@Override
 	protected void fillMenuBar(IMenuManager menuBar) {
 		MenuManager fileMenu = new MenuManager("&File", IWorkbenchActionConstants.M_FILE);
 		menuBar.add(fileMenu);
@@ -60,6 +82,15 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		menuBar.add(windowMenu);
 		showViewMenuMgr.add(showViewItemShortList);
 		windowMenu.add(showViewMenuMgr);
+	}
+	
+	@Override
+	protected void fillCoolBar(ICoolBarManager coolBar) {
+//		coolBar.add(new GroupMarker("group.list"));
+		IToolBarManager fileToolBar = new ToolBarManager(coolBar.getStyle());
+		fileToolBar.add(saveAction);
+		fileToolBar.add(addAction);
+		coolBar.add(new ToolBarContributionItem(fileToolBar));
 	}
 
 }

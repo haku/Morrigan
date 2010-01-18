@@ -1,9 +1,13 @@
 package net.sparktank.morrigan.editors;
 
+import net.sparktank.morrigan.ApplicationActionBarAdvisor;
+import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.model.media.MediaList;
 import net.sparktank.morrigan.model.media.MediaTrack;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
@@ -30,35 +34,11 @@ public class MediaListEditor extends EditorPart {
 	}
 	
 	@Override
-	public void doSave(IProgressMonitor monitor) {
-		// TODO save changes.
-		
-//		person.getAddress().setCountry(text2.getText());
-	}
-	
-	@Override
-	public void doSaveAs() {
-	}
-	
-	@Override
 	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
 		setSite(site);
 		setInput(input);
 		editedMediaList = ((MediaListEditorInput) input).getEditedMediaList();
 		setPartName(editedMediaList.getListName());
-	}
-	
-	@Override
-	public boolean isDirty() {
-		
-		// TODO isDirty
-		
-		return false;
-	}
-	
-	@Override
-	public boolean isSaveAsAllowed() {
-		return false;
 	}
 	
 	@Override
@@ -134,6 +114,36 @@ public class MediaListEditor extends EditorPart {
 		// finishing off.
 		editTable.setInput(getEditorSite());
 		
+		// Actions.
+		IAction addAction = new Action("add") {
+			public void run () {
+				new MorriganMsgDlg("TODO: process 'add' action on list '"+getTitle()+"'.").open();
+			}
+		};
+		addAction.setEnabled(true);
+		getEditorSite().getActionBars().setGlobalActionHandler(ApplicationActionBarAdvisor.ADDACTIONID, addAction);
+		
+	}
+	
+	@Override
+	public boolean isDirty() {
+		// TODO isDirty
+		return false;
+	}
+	
+	@Override
+	public boolean isSaveAsAllowed() {
+		return false;
+	}
+	
+	@Override
+	public void doSaveAs() {
+	}
+	
+	@Override
+	public void doSave(IProgressMonitor monitor) {
+		// TODO save changes.
+//		person.getAddress().setCountry(text2.getText());
 	}
 	
 	@Override
