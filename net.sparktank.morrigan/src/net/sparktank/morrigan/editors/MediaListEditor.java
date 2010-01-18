@@ -113,16 +113,17 @@ public class MediaListEditor extends EditorPart {
 		
 		// finishing off.
 		editTable.setInput(getEditorSite());
-		
-		// Actions.
-		IAction addAction = new Action("add") {
-			public void run () {
-				new MorriganMsgDlg("TODO: process 'add' action on list '"+getTitle()+"'.").open();
-			}
-		};
-		addAction.setEnabled(true);
+	}
+	
+	IAction addAction = new Action("add") {
+		public void run () {
+			new MorriganMsgDlg("TODO: process 'add' action on list '"+getTitle()+"'.").open();
+		}
+	};
+	
+	@Override
+	public void setFocus() {
 		getEditorSite().getActionBars().setGlobalActionHandler(ApplicationActionBarAdvisor.ADDACTIONID, addAction);
-		
 	}
 	
 	@Override
@@ -144,10 +145,6 @@ public class MediaListEditor extends EditorPart {
 	public void doSave(IProgressMonitor monitor) {
 		// TODO save changes.
 //		person.getAddress().setCountry(text2.getText());
-	}
-	
-	@Override
-	public void setFocus() {
 	}
 	
 }
