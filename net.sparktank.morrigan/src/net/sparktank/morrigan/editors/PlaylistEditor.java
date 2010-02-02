@@ -1,6 +1,7 @@
 package net.sparktank.morrigan.editors;
 
 import java.io.File;
+import java.util.logging.Logger;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
@@ -22,6 +23,8 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 	public static final String ID = "net.sparktank.morrigan.editors.PlaylistEditor";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	private Logger logger = Logger.getLogger(this.getClass().getName());
 	
 	private boolean m_isDirty = false;
 	
@@ -99,12 +102,14 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 				String baseDir = firstSelFile.getAbsoluteFile().getParentFile().getAbsolutePath();
 				
 				String[] files = dialog.getFileNames();
+				int n = 0;
 				for (String file : files) {
 					String toAdd = baseDir + File.separatorChar + file;
 					addTrack(toAdd);
+					n++;
 				}
+				logger.fine("Added " + n + " file to '" + getTitle() + "'.");
 			}
-			
 		}
 	};
 	

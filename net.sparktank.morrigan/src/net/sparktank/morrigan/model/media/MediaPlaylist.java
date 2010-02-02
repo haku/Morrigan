@@ -8,11 +8,14 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.logging.Logger;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 
 public class MediaPlaylist extends MediaList {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	private Logger logger = Logger.getLogger(this.getClass().getName());
 	
 	private String filePath = null;
 	
@@ -40,6 +43,8 @@ public class MediaPlaylist extends MediaList {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public void loadFromFile () throws MorriganException {
+		logger.fine("Reading PlayList from '" + filePath + "'...");
+		
 		File file = new File(filePath);
         BufferedReader reader = null;
         
@@ -52,9 +57,13 @@ public class MediaPlaylist extends MediaList {
 		// repeat until all lines is read
 		String text = null;
 		try {
+			int n = 0;
 			while ((text = reader.readLine()) != null) {
 				addTrack(text);
+				n++;
 			}
+			logger.fine("Read " + n + " lines from '" + filePath + "'.");
+			
 		} catch (IOException e) {
 			throw new MorriganException("Error while reading play list.", e);
 		} finally {
@@ -67,6 +76,8 @@ public class MediaPlaylist extends MediaList {
 	}
 	
 	public void writeToFile () throws MorriganException {
+		logger.fine("Writing PlayList to '" + filePath + "'...");
+		
 		File file = new File(filePath);
         Writer writer = null;
         
@@ -77,9 +88,13 @@ public class MediaPlaylist extends MediaList {
 		}
         
 		try {
+			int n = 0;
 			for (MediaTrack mt : getMediaTracks()) {
 				writer.write(mt.getFilepath() + "\n");
+				n ++;
 			}
+			logger.fine("Wrote " + n + " lines to '" + filePath + "'.");
+			
 		} catch (IOException e) {
 			throw new MorriganException("Error while write play list to file.", e);
 		} finally {
