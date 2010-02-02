@@ -3,9 +3,11 @@ package net.sparktank.morrigan.editors;
 import java.util.ArrayList;
 
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
+import net.sparktank.morrigan.handler.CallPlayMedia;
 import net.sparktank.morrigan.model.media.MediaList;
 import net.sparktank.morrigan.model.media.MediaTrack;
 
+import org.eclipse.core.commands.common.CommandException;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ILabelProviderListener;
@@ -23,9 +25,10 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.part.EditorPart;
 
-abstract class MediaListEditor<T extends MediaList> extends EditorPart {
+public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static final String ID = "net.sparktank.morrigan.editors.MediaListEditor";
@@ -152,7 +155,12 @@ abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 	IDoubleClickListener doubleClickListener = new IDoubleClickListener() {
 		@Override
 		public void doubleClick(DoubleClickEvent event) {
-			new MorriganMsgDlg("TODO: play track!").open();
+			IHandlerService handlerService = (IHandlerService) getSite().getService(IHandlerService.class);
+			try {
+				handlerService.executeCommand(CallPlayMedia.ID, null);
+			} catch (CommandException e) {
+				new MorriganMsgDlg(e).open();
+			}
 		}
 	};
 	
@@ -181,7 +189,27 @@ abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		if (refresh) editTable.refresh();
 	}
 	
-	protected ArrayList<MediaTrack> getSelectedTracks () {
+	public MediaTrack getSelectedTrack () {
+		ISelection selection = editTable.getSelection();
+		
+		if (selection==null) return null;
+		if (selection.isEmpty()) return null;
+		
+		if (selection instanceof IStructuredSelection) {
+			IStructuredSelection iSel = (IStructuredSelection) selection;
+			Object selectedObject = iSel.getFirstElement();
+			if (selectedObject != null) {
+				if (selectedObject instanceof MediaTrack) {
+					MediaTrack track = (MediaTrack) selectedObject;
+					return track;
+				}
+			}
+		}
+		
+		return null;
+	}
+	
+	public ArrayList<MediaTrack> getSelectedTracks () {
 		ISelection selection = editTable.getSelection();
 		
 		if (selection==null) return null;
