@@ -1,6 +1,7 @@
 package net.sparktank.morrigan;
 
 import net.sparktank.morrigan.views.ViewMediaExplorer;
+import net.sparktank.morrigan.views.ViewPlayer;
 
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
@@ -16,6 +17,8 @@ public class PerspectiveMain implements IPerspectiveFactory {
 		
 //		layout.addStandaloneView(ViewMediaExplorer.ID,  true, IPageLayout.LEFT, 0.3f, editorArea);
 		layout.addView(ViewMediaExplorer.ID, IPageLayout.LEFT, 0.3f, editorArea);
+		
+		layout.addView(ViewPlayer.ID, IPageLayout.BOTTOM, 0.8f, editorArea);
 	}
 
 }

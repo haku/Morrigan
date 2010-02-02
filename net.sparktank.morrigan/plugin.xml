@@ -24,12 +24,21 @@
    </extension>
    
    <extension point="org.eclipse.ui.views">
+   
       <view
             name="Media Explorer"
             class="net.sparktank.morrigan.views.ViewMediaExplorer"
             id="net.sparktank.morrigan.views.ViewMediaExplorer"
             icon="icons/library.gif" >
       </view>
+      
+      <view
+            name="Player"
+            class="net.sparktank.morrigan.views.ViewPlayer"
+            id="net.sparktank.morrigan.views.ViewPlayer"
+            icon="icons/cue.gif" > <!-- TODO fix icon. -->
+      </view>
+      
    </extension>
    
    <extension point="org.eclipse.ui.editors">
