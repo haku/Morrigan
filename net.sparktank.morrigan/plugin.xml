@@ -16,8 +16,7 @@
       </application>
    </extension>
    
-   <extension
-         point="org.eclipse.ui.perspectives">
+   <extension point="org.eclipse.ui.perspectives">
       <perspective
             name="PerspectiveMain"
             class="net.sparktank.morrigan.PerspectiveMain"
@@ -25,8 +24,7 @@
       </perspective>
    </extension>
    
-   <extension
-         point="org.eclipse.ui.views">
+   <extension point="org.eclipse.ui.views">
       <view
             name="Media Explorer"
             class="net.sparktank.morrigan.views.ViewMediaExplorer"
@@ -35,19 +33,17 @@
       </view>
    </extension>
    
-   <extension
-         point="org.eclipse.ui.editors">
+   <extension point="org.eclipse.ui.editors">
       <editor
-            class="net.sparktank.morrigan.editors.MediaListEditor"
+            class="net.sparktank.morrigan.editors.PlaylistEditor"
             default="false"
             icon="icons/playlist.gif"
-            id="net.sparktank.morrigan.editors.MediaListEditor"
+            id="net.sparktank.morrigan.editors.PlaylistEditor"
             name="MediaListEditor" >
       </editor>
    </extension>
    
-   <extension
-         point="org.eclipse.ui.commands">
+   <extension point="org.eclipse.ui.commands">
       <command
             defaultHandler="net.sparktank.morrigan.handler.CallMediaListEditor"
             id="net.sparktank.morrigan.handler.CallMediaListEditor"

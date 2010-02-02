@@ -6,15 +6,15 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 
-public class MediaListEditorInput implements IEditorInput {
+public class MediaListEditorInput<T extends MediaList> implements IEditorInput {
 
-	private final MediaList editedMediaList;
+	private final T editedMediaList;
 
-	public MediaListEditorInput (MediaList mediaList) {
+	public MediaListEditorInput (T mediaList) {
 		editedMediaList = mediaList;
 	}
 	
-	public MediaList getEditedMediaList() {
+	public T getEditedMediaList() {
 		return editedMediaList;
 	}
 	
@@ -55,8 +55,8 @@ public class MediaListEditorInput implements IEditorInput {
 		if (super.equals(obj)) {
 			return true;
 		}
-		if (obj instanceof MediaListEditorInput) {
-			return editedMediaList.equals(((MediaListEditorInput) obj).getEditedMediaList());
+		if (obj instanceof MediaListEditorInput<?>) {
+			return editedMediaList.equals(((MediaListEditorInput<?>) obj).getEditedMediaList());
 		}
 		return false;
 	}
