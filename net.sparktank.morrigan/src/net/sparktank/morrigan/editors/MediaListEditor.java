@@ -2,9 +2,12 @@ package net.sparktank.morrigan.editors;
 
 import java.util.ArrayList;
 
+import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.model.media.MediaList;
 import net.sparktank.morrigan.model.media.MediaTrack;
 
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -81,6 +84,9 @@ abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		editTable.setContentProvider(contentProvider);
 		editTable.setLabelProvider(labelProvider);
 		
+		// event handelers.
+		editTable.addDoubleClickListener(doubleClickListener);
+		
 		// finishing off.
 		editTable.setInput(getEditorSite());
 	}
@@ -138,6 +144,16 @@ abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		@Override
 		public void removeListener(ILabelProviderListener listener) {}
 		
+	};
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Event handelers.
+	
+	IDoubleClickListener doubleClickListener = new IDoubleClickListener() {
+		@Override
+		public void doubleClick(DoubleClickEvent event) {
+			new MorriganMsgDlg("TODO: play track!").open();
+		}
 	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
