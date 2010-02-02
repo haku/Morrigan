@@ -36,13 +36,11 @@ public class CallMediaListEditor extends AbstractHandler implements IHandler {
 		// Get the selection
 		ISelection selection = view.getSite().getSelectionProvider().getSelection();
 		if (selection != null && selection instanceof IStructuredSelection) {
-			
 			// since we are not dealing with multi-select yet...
 			Object obj = ((IStructuredSelection) selection).getFirstElement();
 			
 			// If we had a selection lets open the editor.
 			if (obj != null) {
-				
 				MediaExplorerItem item = (MediaExplorerItem) obj;
 				
 				if (item.type == MediaExplorerItem.ItemType.PLAYLIST) {
@@ -63,21 +61,6 @@ public class CallMediaListEditor extends AbstractHandler implements IHandler {
 				} else {
 					new MorriganMsgDlg("TODO: show " + item.identifier).open();
 				}
-				
-				// TODO convert MediaExplorer objects to something more useful than string.
-				// TODO look up what was double clicked on.
-				// TODO display the appropriate editor.
-				
-				// CODE from example.
-				
-//				MediaList mediaList = (MediaList) obj;
-//				MediaListEditorInput input = new MediaListEditorInput(mediaList);
-//				try {
-//					page.openEditor(input, MediaListEditor.ID);
-//					
-//				} catch (PartInitException e) {
-//					System.out.println(e.getStackTrace());
-//				}
 			}
 		}
 		return null;
