@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-
+	
 	<extension id="product" point="org.eclipse.core.runtime.products" >
-		<product name="[name=morrigan]" application="net.sparktank.morrigan.application" >
+		<product application="net.sparktank.morrigan.application" name="morrigan" >
+			<property name="appName" value="morrigan" />
 			<property name="windowImages" value="icons/copepod-16.png,icons/copepod-32.png" />
-			<property name="aboutText" value="[aboutText]" /> 
-			<property name="appName" value="[appName=morrigan]" /> 
 		</product>
 	</extension>
-   
+	
    <extension id="application" point="org.eclipse.core.runtime.applications" >
       <application>
          <run class="net.sparktank.morrigan.Application"></run>
