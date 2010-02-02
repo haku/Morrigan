@@ -1,10 +1,14 @@
 package net.sparktank.morrigan.editors;
 
+import java.util.ArrayList;
+
 import net.sparktank.morrigan.model.media.MediaList;
 import net.sparktank.morrigan.model.media.MediaTrack;
 
 import org.eclipse.jface.viewers.ILabelProviderListener;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
@@ -26,8 +30,8 @@ abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private T editedMediaList;
-	private TableViewer editTable;
 	
+	private TableViewer editTable;
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructor.
 	
@@ -139,14 +143,52 @@ abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Methods for editing editedMediaList.
 	
-	protected void addTrack (String file) {
-		editedMediaList.addTrack(file);
+	protected void refreshUi () {
 		editTable.refresh();
 	}
 	
 	protected T getEditedMediaList () {
 		return editedMediaList;
 	}
+	
+	protected void addTrack (String file) {
+		editedMediaList.addTrack(file);
+		editTable.refresh();
+	}
+	
+	protected void removeTrack (MediaTrack track) {
+		removeTrack(track, true);
+	}
+	
+	protected void removeTrack (MediaTrack track, boolean refresh) {
+		editedMediaList.removeMediaTrack(track);
+		if (refresh) editTable.refresh();
+	}
+	
+	protected ArrayList<MediaTrack> getSelectedTracks () {
+		ISelection selection = editTable.getSelection();
+		
+		if (selection==null) return null;
+		if (selection.isEmpty()) return null;
+		
+		if (selection instanceof IStructuredSelection) {
+			IStructuredSelection iSel = (IStructuredSelection) selection;
+			
+			ArrayList<MediaTrack> ret = new ArrayList<MediaTrack>();
+			for (Object selectedObject : iSel.toList()) {
+				if (selectedObject != null) {
+					if (selectedObject instanceof MediaTrack) {
+						MediaTrack track = (MediaTrack) selectedObject;
+						ret.add(track);
+					}
+				}
+			}
+			return ret;
+		}
+		
+		return null;
+	}
+	
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

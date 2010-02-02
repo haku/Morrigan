@@ -7,6 +7,7 @@ import net.sparktank.morrigan.ApplicationActionBarAdvisor;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.MediaPlaylist;
+import net.sparktank.morrigan.model.media.MediaTrack;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
@@ -85,7 +86,11 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 	}
 	
 	protected void removeSelectedTracks () {
-		new MorriganMsgDlg("TODO: remove!").open();
+		for (MediaTrack track : super.getSelectedTracks()) {
+			super.removeTrack(track, false);
+		}
+		super.refreshUi();
+		setIsDirty(true);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
