@@ -40,7 +40,7 @@ public class PlaylistHelper {
 		File [] plFiles = plDir.listFiles();
 		
 		// empty dir?
-		if (plFiles == null ) return ret;
+		if (plFiles == null || plFiles.length < 1 ) return ret;
 		
 		for (File file : plFiles) {
 			if (isPlFile(file.getAbsolutePath())) {
