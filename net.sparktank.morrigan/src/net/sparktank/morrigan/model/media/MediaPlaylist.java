@@ -12,13 +12,16 @@ import java.io.Writer;
 import net.sparktank.morrigan.exceptions.MorriganException;
 
 public class MediaPlaylist extends MediaList {
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private String filePath = null;
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public MediaPlaylist(String filePath) throws MorriganException {
 		super(getFilenameFromPath(filePath));
 		this.filePath = filePath;
-		ReloadFromFile();
+		reloadFromFile();
 	}
 	
 	public MediaPlaylist(String filePath, boolean newPl) throws MorriganException {
@@ -28,13 +31,15 @@ public class MediaPlaylist extends MediaList {
 			if (new File(filePath).exists()) {
 				throw new MorriganException("Play list already exists.");
 			}
-			WriteToFile();
+			writeToFile();
 		} else {
-			ReloadFromFile();
+			reloadFromFile();
 		}
 	}
 	
-	public void ReloadFromFile () throws MorriganException {
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	public void reloadFromFile () throws MorriganException {
 		File file = new File(filePath);
         BufferedReader reader = null;
         
@@ -61,7 +66,7 @@ public class MediaPlaylist extends MediaList {
 		}
 	}
 	
-	public void WriteToFile () throws MorriganException {
+	public void writeToFile () throws MorriganException {
 		File file = new File(filePath);
         Writer writer = null;
         
@@ -86,6 +91,8 @@ public class MediaPlaylist extends MediaList {
 		}
 	}
 	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
 	private static String getFilenameFromPath (String filePath) {
 		int x = filePath.lastIndexOf(File.separator);
 		if (x>0) {
@@ -94,6 +101,8 @@ public class MediaPlaylist extends MediaList {
 			return filePath;
 		}
 	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
 	public boolean equals(Object obj) {
@@ -120,6 +129,6 @@ public class MediaPlaylist extends MediaList {
 //	public int hashCode() {
 //		return super.hashCode();
 //	}
-
-
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
