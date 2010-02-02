@@ -1,6 +1,7 @@
 package net.sparktank.morrigan.model.media;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -17,14 +18,22 @@ public class MediaList {
 		return listName;
 	}
 	
+	/**
+	 * Returns an unmodifiable list of the playlist items.
+	 * @return
+	 */
 	public List<MediaTrack> getMediaTracks() {
-		return mediaTracks;
+		return Collections.unmodifiableList(mediaTracks);
 	}
 	
 	public MediaTrack addTrack (String mediaFilePath) {
 		MediaTrack mt = new MediaTrack(mediaFilePath);
 		mediaTracks.add(mt);
 		return mt;
+	}
+	
+	public void removeMediaTrack (MediaTrack track) {
+		mediaTracks.remove(track);
 	}
 	
 	@Override
