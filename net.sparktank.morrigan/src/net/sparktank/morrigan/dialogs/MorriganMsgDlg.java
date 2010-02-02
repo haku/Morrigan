@@ -4,13 +4,23 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 
 public class MorriganMsgDlg extends MessageDialog {
-
+	
+	public static final String[] YESNO = {"yes", "no"};
+	
 	public MorriganMsgDlg(String dialogMessage) {
 		super(
 				Display.getCurrent().getActiveShell(), 
 				"Morrigan", null, 
 				dialogMessage, 
 				MessageDialog.INFORMATION, new String[] {"Continue"}, 0);
+	}
+	
+	public MorriganMsgDlg(String dialogMessage, String[] answers) {
+		super(
+				Display.getCurrent().getActiveShell(), 
+				"Morrigan", null, 
+				dialogMessage, 
+				MessageDialog.INFORMATION, answers, 0);
 	}
 	
 	public MorriganMsgDlg(Exception e) {
