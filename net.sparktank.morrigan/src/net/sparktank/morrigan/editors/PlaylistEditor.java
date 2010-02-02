@@ -39,7 +39,8 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 	
 	@Override
 	public void setFocus() {
-		getEditorSite().getActionBars().setGlobalActionHandler(ApplicationActionBarAdvisor.ADDACTIONID, addAction);
+		getEditorSite().getActionBars().setGlobalActionHandler(ApplicationActionBarAdvisor.ADD_ACTIONID, addAction);
+		getEditorSite().getActionBars().setGlobalActionHandler(ApplicationActionBarAdvisor.REMOVE_ACTIONID, removeAction);
 	}
 	
 	@Override
@@ -110,6 +111,12 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 				}
 				logger.fine("Added " + n + " file to '" + getTitle() + "'.");
 			}
+		}
+	};
+	
+	IAction removeAction = new Action("add") {
+		public void run () {
+			new MorriganMsgDlg("TODO: remove selected from " + getTitle()).open();
 		}
 	};
 	
