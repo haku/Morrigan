@@ -21,6 +21,11 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 public class CallMediaListEditor extends AbstractHandler implements IHandler {
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	public static final String ID = "net.sparktank.morrigan.handler.CallMediaListEditor";
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {

@@ -3,6 +3,7 @@ package net.sparktank.morrigan.views;
 import java.util.ArrayList;
 
 import net.sparktank.morrigan.actions.NewPlaylistAction;
+import net.sparktank.morrigan.handler.CallMediaListEditor;
 import net.sparktank.morrigan.helpers.PlaylistHelper;
 import net.sparktank.morrigan.model.ui.MediaExplorerItem;
 
@@ -74,7 +75,7 @@ public class ViewMediaExplorer extends ViewPart {
 				
 				IHandlerService handlerService = (IHandlerService) getSite().getService(IHandlerService.class);
 				try {
-					handlerService.executeCommand("net.sparktank.morrigan.handler.CallMediaListEditor", null);
+					handlerService.executeCommand(CallMediaListEditor.ID, null);
 				} catch (ExecutionException e) {
 					e.printStackTrace();
 				} catch (NotDefinedException e) {
