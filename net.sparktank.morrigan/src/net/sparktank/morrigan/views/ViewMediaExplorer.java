@@ -21,6 +21,8 @@ import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.part.ViewPart;
 
 public class ViewMediaExplorer extends ViewPart {
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
 	public static final String ID = "net.sparktank.morrigan.views.ViewMediaExplorer";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -33,50 +35,43 @@ public class ViewMediaExplorer extends ViewPart {
 	 * This is a callback that will allow us to create the viewer and initialise it.
 	 */
 	public void createPartControl(Composite parent) {
-		// Setup the view.
-		
-		// Setup the viewer control.
 		viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
-		viewer.setContentProvider(new IStructuredContentProvider() {
-			@Override
-			public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-			}
-			@Override
-			public void dispose() {
-			}
-			@Override
-			public Object[] getElements(Object inputElement) {
-				ArrayList<MediaExplorerItem> items = new ArrayList<MediaExplorerItem>();
-				
-				items.add(new MediaExplorerItem("dis", "Display", MediaExplorerItem.ItemType.DISPLAY));
-				items.add(new MediaExplorerItem("lib", "Library", MediaExplorerItem.ItemType.LIBRARY));
-				items.addAll(PlaylistHelper.instance.getAllPlaylists());
-				
-				return items.toArray();
-			}
-		});
+		viewer.setContentProvider(contentProvider);
 		viewer.setInput(getViewSite()); // use content provider.
 		getSite().setSelectionProvider(viewer);
+		viewer.addDoubleClickListener(doubleClickListener);
 		
-		hookDoubleClickCommand(); // setup the actions for the viewer.
 		addToolbar();
 		addMenu();
 	}
 	
-	private void hookDoubleClickCommand() {
-		viewer.addDoubleClickListener(new IDoubleClickListener() {
-			public void doubleClick(DoubleClickEvent event) {
-				
-				IHandlerService handlerService = (IHandlerService) getSite().getService(IHandlerService.class);
-				try {
-					handlerService.executeCommand(CallMediaListEditor.ID, null);
-				} catch (CommandException e) {
-					new MorriganMsgDlg(e).open();
-				}
-				
+	IStructuredContentProvider contentProvider = new IStructuredContentProvider() {
+		@Override
+		public Object[] getElements(Object inputElement) {
+			ArrayList<MediaExplorerItem> items = new ArrayList<MediaExplorerItem>();
+			
+			items.add(new MediaExplorerItem("dis", "Display", MediaExplorerItem.ItemType.DISPLAY));
+			items.add(new MediaExplorerItem("lib", "Library", MediaExplorerItem.ItemType.LIBRARY));
+			items.addAll(PlaylistHelper.instance.getAllPlaylists());
+			
+			return items.toArray();
+		}
+		@Override
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
+		@Override
+		public void dispose() {}
+	};
+	
+	IDoubleClickListener doubleClickListener = new IDoubleClickListener() {
+		public void doubleClick(DoubleClickEvent event) {
+			IHandlerService handlerService = (IHandlerService) getSite().getService(IHandlerService.class);
+			try {
+				handlerService.executeCommand(CallMediaListEditor.ID, null);
+			} catch (CommandException e) {
+				new MorriganMsgDlg(e).open();
 			}
-		});
-	}
+		}
+	};
 	
 	private void addToolbar () {
 		getViewSite().getActionBars().getToolBarManager().add(new NewPlaylistAction(getViewSite().getWorkbenchWindow()));
