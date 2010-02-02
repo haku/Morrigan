@@ -3,6 +3,11 @@ package net.sparktank.morrigan.editors;
 import java.io.File;
 import java.util.logging.Logger;
 
+import net.sparktank.morrigan.ApplicationActionBarAdvisor;
+import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
+import net.sparktank.morrigan.exceptions.MorriganException;
+import net.sparktank.morrigan.model.media.MediaPlaylist;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -10,12 +15,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
-
-import net.sparktank.morrigan.ApplicationActionBarAdvisor;
-import net.sparktank.morrigan.dialogs.MorriganErrDlg;
-import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
-import net.sparktank.morrigan.exceptions.MorriganException;
-import net.sparktank.morrigan.model.media.MediaPlaylist;
 
 public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -63,7 +62,7 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 		try {
 			getEditedMediaList().writeToFile();
 		} catch (MorriganException e) {
-			new MorriganErrDlg(e);
+			new MorriganMsgDlg(e);
 		}
 		setIsDirty(false);
 	}
@@ -117,6 +116,9 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 	IAction removeAction = new Action("add") {
 		public void run () {
 			new MorriganMsgDlg("TODO: remove selected from " + getTitle()).open();
+			
+			
+			
 		}
 	};
 	

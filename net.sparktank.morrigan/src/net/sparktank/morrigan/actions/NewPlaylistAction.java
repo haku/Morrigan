@@ -1,7 +1,7 @@
 package net.sparktank.morrigan.actions;
 
 import net.sparktank.morrigan.Activator;
-import net.sparktank.morrigan.dialogs.MorriganErrDlg;
+import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.PlaylistHelper;
 import net.sparktank.morrigan.views.ViewMediaExplorer;
@@ -52,7 +52,7 @@ public class NewPlaylistAction extends MorriganAction {
 			try {
 				PlaylistHelper.instance.createPl(plName);
 			} catch (MorriganException e) {
-				new MorriganErrDlg(e).open();
+				new MorriganMsgDlg(e).open();
 				return;
 			}
 			
