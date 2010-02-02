@@ -2,15 +2,20 @@
 <?eclipse version="3.4"?>
 <plugin>
 
-   <extension
-         id="application"
-         point="org.eclipse.core.runtime.applications">
+	<extension id="product" point="org.eclipse.core.runtime.products" >
+		<product name="[name=morrigan]" application="net.sparktank.morrigan.application" >
+			<property name="windowImages" value="icons/copepod-16.png,icons/copepod-32.png" />
+			<property name="aboutText" value="[aboutText]" /> 
+			<property name="appName" value="[appName=morrigan]" /> 
+		</product>
+	</extension>
+   
+   <extension id="application" point="org.eclipse.core.runtime.applications" >
       <application>
-         <run
-               class="net.sparktank.morrigan.Application">
-         </run>
+         <run class="net.sparktank.morrigan.Application"></run>
       </application>
    </extension>
+   
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
@@ -19,24 +24,28 @@
             id="net.sparktank.morrigan.perspectiveMain">
       </perspective>
    </extension>
+   
    <extension
          point="org.eclipse.ui.views">
       <view
             name="Media Explorer"
             class="net.sparktank.morrigan.views.ViewMediaExplorer"
-            id="net.sparktank.morrigan.views.ViewMediaExplorer">
+            id="net.sparktank.morrigan.views.ViewMediaExplorer"
+            icon="icons/library.gif" >
       </view>
    </extension>
+   
    <extension
          point="org.eclipse.ui.editors">
       <editor
             class="net.sparktank.morrigan.editors.MediaListEditor"
             default="false"
-            icon="icons/alt_window_16.gif"
+            icon="icons/playlist.gif"
             id="net.sparktank.morrigan.editors.MediaListEditor"
-            name="MediaListEditor">
+            name="MediaListEditor" >
       </editor>
    </extension>
+   
    <extension
          point="org.eclipse.ui.commands">
       <command

@@ -35,7 +35,7 @@ public class NewPlaylistAction extends MorriganAction {
 	@Override
 	public org.eclipse.jface.resource.ImageDescriptor getImageDescriptor() {
 		// TODO choose icon.
-		return Activator.getImageDescriptor("icons/alt_window_16.gif");
+		return Activator.getImageDescriptor("icons/playlist.gif");
 	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -8,6 +8,7 @@ import org.eclipse.jface.action.ICoolBarManager;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarContributionItem;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.ui.IWorkbenchActionConstants;
@@ -66,7 +67,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		register(saveAction);
 		
 		addAction = new RetargetAction(ADDACTIONID, "&add");
-		addAction.setImageDescriptor(Activator.getImageDescriptor("icons/alt_window_16.gif"));
+		addAction.setImageDescriptor(Activator.getImageDescriptor("icons/plus.gif"));
 		getActionBarConfigurer().registerGlobalAction(addAction);
 		register(addAction);
 		window.getPartService().addPartListener(addAction);
@@ -77,6 +78,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		MenuManager fileMenu = new MenuManager("&File", IWorkbenchActionConstants.M_FILE);
 		menuBar.add(fileMenu);
 		fileMenu.add(newPlayListAction);
+		fileMenu.add(new Separator());
 		fileMenu.add(exitAction);
 		
 		MenuManager windowMenu = new MenuManager("&Window", IWorkbenchActionConstants.M_WINDOW);
