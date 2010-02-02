@@ -49,6 +49,7 @@ public class MediaListEditorInput implements IEditorInput {
 		return null;
 	}
 	
+	// FIXME
 	@Override
 	public boolean equals(Object obj) {
 		if (super.equals(obj)) {
