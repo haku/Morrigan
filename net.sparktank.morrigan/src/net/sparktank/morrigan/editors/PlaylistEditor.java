@@ -84,6 +84,10 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 		setIsDirty(true);
 	}
 	
+	protected void removeSelectedTracks () {
+		new MorriganMsgDlg("TODO: remove!").open();
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Actions.
 	
@@ -115,10 +119,11 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 	
 	IAction removeAction = new Action("add") {
 		public void run () {
-			new MorriganMsgDlg("TODO: remove selected from " + getTitle()).open();
-			
-			
-			
+			MorriganMsgDlg dlg = new MorriganMsgDlg("Remove selected from " + getTitle() + "?", MorriganMsgDlg.YESNO);
+			dlg.open();
+			if (dlg.getReturnCode() == MorriganMsgDlg.OK) {
+				removeSelectedTracks();
+			}
 		}
 	};
 	
