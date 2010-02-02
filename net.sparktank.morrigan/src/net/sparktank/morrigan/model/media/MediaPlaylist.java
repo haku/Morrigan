@@ -21,7 +21,7 @@ public class MediaPlaylist extends MediaList {
 	public MediaPlaylist(String filePath) throws MorriganException {
 		super(getFilenameFromPath(filePath));
 		this.filePath = filePath;
-		reloadFromFile();
+		loadFromFile();
 	}
 	
 	public MediaPlaylist(String filePath, boolean newPl) throws MorriganException {
@@ -33,13 +33,13 @@ public class MediaPlaylist extends MediaList {
 			}
 			writeToFile();
 		} else {
-			reloadFromFile();
+			loadFromFile();
 		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public void reloadFromFile () throws MorriganException {
+	public void loadFromFile () throws MorriganException {
 		File file = new File(filePath);
         BufferedReader reader = null;
         
@@ -78,7 +78,7 @@ public class MediaPlaylist extends MediaList {
         
 		try {
 			for (MediaTrack mt : getMediaTracks()) {
-				writer.write(mt.getFilepath());
+				writer.write(mt.getFilepath() + "\n");
 			}
 		} catch (IOException e) {
 			throw new MorriganException("Error while write play list to file.", e);
@@ -125,6 +125,7 @@ public class MediaPlaylist extends MediaList {
 		return true;
 	}
 	
+	// TODO
 //	@Override
 //	public int hashCode() {
 //		return super.hashCode();
