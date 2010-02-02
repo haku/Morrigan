@@ -3,14 +3,12 @@ package net.sparktank.morrigan.views;
 import java.util.ArrayList;
 
 import net.sparktank.morrigan.actions.NewPlaylistAction;
+import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.handler.CallMediaListEditor;
 import net.sparktank.morrigan.helpers.PlaylistHelper;
 import net.sparktank.morrigan.model.ui.MediaExplorerItem;
 
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.NotEnabledException;
-import org.eclipse.core.commands.NotHandledException;
-import org.eclipse.core.commands.common.NotDefinedException;
+import org.eclipse.core.commands.common.CommandException;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -69,21 +67,11 @@ public class ViewMediaExplorer extends ViewPart {
 		viewer.addDoubleClickListener(new IDoubleClickListener() {
 			public void doubleClick(DoubleClickEvent event) {
 				
-//				IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-//				MenuItem i = (MenuItem) selection.getFirstElement();
-//				System.out.println(i.name);
-				
 				IHandlerService handlerService = (IHandlerService) getSite().getService(IHandlerService.class);
 				try {
 					handlerService.executeCommand(CallMediaListEditor.ID, null);
-				} catch (ExecutionException e) {
-					e.printStackTrace();
-				} catch (NotDefinedException e) {
-					e.printStackTrace();
-				} catch (NotEnabledException e) {
-					e.printStackTrace();
-				} catch (NotHandledException e) {
-					e.printStackTrace();
+				} catch (CommandException e) {
+					new MorriganMsgDlg(e).open();
 				}
 				
 			}
