@@ -11,7 +11,9 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
 import net.sparktank.morrigan.ApplicationActionBarAdvisor;
+import net.sparktank.morrigan.dialogs.MorriganErrDlg;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
+import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.MediaPlaylist;
 
 public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
@@ -54,8 +56,12 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 	
 	@Override
 	public void doSave(IProgressMonitor monitor) {
-		// TODO save changes.
-		new MorriganMsgDlg("TODO: do save " + getTitle()).open();
+		try {
+			getEditedMediaList().writeToFile();
+		} catch (MorriganException e) {
+			new MorriganErrDlg(e);
+		}
+		setIsDirty(false);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
