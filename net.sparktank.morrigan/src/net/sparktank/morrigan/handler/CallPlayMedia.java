@@ -2,6 +2,7 @@ package net.sparktank.morrigan.handler;
 
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.editors.MediaListEditor;
+import net.sparktank.morrigan.views.ViewPlayer;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -29,8 +30,8 @@ public class CallPlayMedia  extends AbstractHandler implements IHandler {
 		
 		if (activeEditor instanceof MediaListEditor<?>) {
 			MediaListEditor<?> mediaListEditor = (MediaListEditor<?>) activeEditor;
-			
-			new MorriganMsgDlg("TODO: play track: " + mediaListEditor.getSelectedTrack()).open();
+			ViewPlayer viewPlayer = (ViewPlayer) page.findView(ViewPlayer.ID);
+			viewPlayer.startPlaying(mediaListEditor.getSelectedTrack());
 			
 		} else {
 			new MorriganMsgDlg("Error: invalid active editor.").open();
