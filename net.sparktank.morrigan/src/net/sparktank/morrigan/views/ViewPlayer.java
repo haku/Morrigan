@@ -1,6 +1,11 @@
 package net.sparktank.morrigan.views;
 
+import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.model.media.MediaTrack;
+import net.sparktank.morrigan.playback.IPlaybackEngine;
+import net.sparktank.morrigan.playback.ImplException;
+import net.sparktank.morrigan.playback.PlaybackException;
+import net.sparktank.morrigan.var.Const;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
@@ -31,16 +36,79 @@ public class ViewPlayer extends ViewPart {
 	public void setFocus() {}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Playback engine.
 	
-	public void startPlaying (MediaTrack track) {
+	IPlaybackEngine playbackEngine = null;
+	
+	private IPlaybackEngine getPlaybackEngine () throws ImplException {
+		if (playbackEngine == null) {
+			
+			Class<?> [] classParm = null;
+			Object [] objectParm = null;
+			
+			try {
+				Class<?> cl = Class.forName(Const.PLAYBACK_ENGINE);
+				java.lang.reflect.Constructor<?> co = cl.getConstructor(classParm);
+				playbackEngine = (IPlaybackEngine) co.newInstance(objectParm);
+				
+			} catch (Exception e) {
+				throw new ImplException(e);
+			}
+			
+		}
+		
+		return playbackEngine;
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Playback management.
+	
+	public void loadAndStartPlaying (MediaTrack track) {
 		currentTrack = track;
 		
-		// TODO start playing track.
+		try {
+			getPlaybackEngine().stopPlaying();
+			getPlaybackEngine().unloadFile();
+			
+			getPlaybackEngine().setFile(currentTrack.getFilepath());
+			getPlaybackEngine().setOnfinishHandler(atEndOfTrack);
+			
+			getPlaybackEngine().startPlaying();
+			
+		} catch (PlaybackException e) {
+			currentTrack = null;
+			e.printStackTrace();
+			new MorriganMsgDlg(e).open();
+		}
 		
 		updateStatus();
 	}
 	
+	public void startPlaying () {
+		try {
+			getPlaybackEngine().startPlaying();
+		} catch (PlaybackException e) {
+			new MorriganMsgDlg(e).open();
+		}
+	}
+	
+	public void stopPlaying () {
+		try {
+			getPlaybackEngine().stopPlaying();
+		} catch (PlaybackException e) {
+			new MorriganMsgDlg(e).open();
+		}
+	}
+	
+	private Runnable atEndOfTrack = new Runnable() {
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+		}
+	};
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Local helper methods.
 	
 	public void updateStatus () {
 		if (currentTrack != null) {
