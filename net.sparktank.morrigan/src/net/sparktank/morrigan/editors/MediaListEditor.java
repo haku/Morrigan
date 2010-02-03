@@ -63,12 +63,15 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		
 		setPartName(editedMediaList.getListName());
 		
-		editedMediaList.setDirtyChangeEvent(new Runnable() {
-			@Override
-			public void run() {
-				firePropertyChange(PROP_DIRTY);
-			}
-		});
+		editedMediaList.addDirtyChangeEvent(dirtyChange);
+		editedMediaList.addChangeEvent(listChange);
+	}
+	
+	@Override
+	public void dispose() {
+		editedMediaList.removeChangeEvent(listChange);
+		editedMediaList.removeDirtyChangeEvent(dirtyChange);
+		super.dispose();
 	}
 	
 	@Override
@@ -110,7 +113,7 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Providers.
 	
-	IStructuredContentProvider contentProvider = new IStructuredContentProvider() {
+	private IStructuredContentProvider contentProvider = new IStructuredContentProvider() {
 		
 		@Override
 		public Object[] getElements(Object inputElement) {
@@ -124,7 +127,7 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		
 	};
 	
-	ITableLabelProvider labelProvider = new ITableLabelProvider() {
+	private ITableLabelProvider labelProvider = new ITableLabelProvider() {
 		
 		@Override
 		public Image getColumnImage(Object element, int columnIndex) {
@@ -165,7 +168,21 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Event handelers.
 	
-	IDoubleClickListener doubleClickListener = new IDoubleClickListener() {
+	private Runnable dirtyChange = new Runnable() {
+		@Override
+		public void run() {
+			firePropertyChange(PROP_DIRTY);
+		}
+	};
+	
+	private Runnable listChange = new Runnable() {
+		@Override
+		public void run() {
+			refreshUi();
+		}
+	};
+	
+	private IDoubleClickListener doubleClickListener = new IDoubleClickListener() {
 		@Override
 		public void doubleClick(DoubleClickEvent event) {
 			IHandlerService handlerService = (IHandlerService) getSite().getService(IHandlerService.class);
@@ -190,7 +207,7 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 	
 	protected void addTrack (String file) {
 		editedMediaList.addTrack(file);
-		refreshUi();
+//		refreshUi();
 	}
 	
 	protected void removeTrack (MediaTrack track) {
@@ -199,7 +216,7 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 	
 	protected void removeTrack (MediaTrack track, boolean refresh) {
 		editedMediaList.removeMediaTrack(track);
-		if (refresh) refreshUi();
+//		if (refresh) refreshUi();
 	}
 	
 	public MediaTrack getSelectedTrack () {
