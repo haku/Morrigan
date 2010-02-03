@@ -27,29 +27,29 @@ public interface IPlaybackEngine {
 	/**
 	 * Begin playback.
 	 */
-	public void startPlaying ();
+	public void startPlaying () throws PlaybackException;
 	
 	/**
 	 * Stop playback.
 	 */
-	public void stopPlaying ();
+	public void stopPlaying () throws PlaybackException;
 	
 	/**
 	 * Pause playback.
 	 */
-	public void pausePlaying ();
+	public void pausePlaying () throws PlaybackException;
 	
 	/**
 	 * Returns the duration of the current file.
-	 * @return Duration in seconds.
+	 * @return Duration in seconds.  Returns -1 if not implmented.
 	 */
-	public int getDuration ();
+	public int getDuration () throws PlaybackException;
 	
 	/**
 	 * The progress playing the current file.
-	 * @return Percentage progress p where 0 <= p <= 100.
+	 * @return Percentage progress p where 0 <= p <= 100.  Returns -1 if not implmented.
 	 */
-	public int getPlaybackProgress ();
+	public int getPlaybackProgress () throws PlaybackException;
 	
 	/**
 	 * This runnable will be executed when the end of the file is reached.
