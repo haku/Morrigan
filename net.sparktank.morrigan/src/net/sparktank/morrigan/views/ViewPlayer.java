@@ -35,13 +35,23 @@ public class ViewPlayer extends ViewPart {
 	@Override
 	public void setFocus() {}
 	
+	@Override
+	public void dispose() {
+		finalisePlaybackEngine();
+		super.dispose();
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Playback engine.
 	
 	IPlaybackEngine playbackEngine = null;
 	
 	private IPlaybackEngine getPlaybackEngine () throws ImplException {
-		if (playbackEngine == null) {
+		return getPlaybackEngine(true);
+	}
+	
+	private IPlaybackEngine getPlaybackEngine (boolean create) throws ImplException {
+		if (playbackEngine == null && create) {
 			
 			Class<?> [] classParm = null;
 			Object [] objectParm = null;
@@ -58,6 +68,26 @@ public class ViewPlayer extends ViewPart {
 		}
 		
 		return playbackEngine;
+	}
+	
+	private void finalisePlaybackEngine () {
+		IPlaybackEngine eng = null;
+		
+		try {
+			eng = getPlaybackEngine(false);
+		} catch (ImplException e) {
+			e.printStackTrace();
+		}
+		
+		if (eng!=null) {
+			try {
+				eng.stopPlaying();
+			} catch (PlaybackException e) {
+				e.printStackTrace();
+			}
+			eng.unloadFile();
+			eng.finalise();
+		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
