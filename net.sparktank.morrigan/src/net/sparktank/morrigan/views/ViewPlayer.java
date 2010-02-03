@@ -35,18 +35,7 @@ public class ViewPlayer extends ViewPart {
 		addToolbar();
 		addMenu();
 		
-		updateStatus();
-	}
-	
-	private void addToolbar () {
-		getViewSite().getActionBars().getToolBarManager().add(pauseAction);
-		getViewSite().getActionBars().getToolBarManager().add(stopAction);
-		getViewSite().getActionBars().getToolBarManager().add(prevAction);
-		getViewSite().getActionBars().getToolBarManager().add(nextAction);
-	}
-	
-	private void addMenu () {
-		getViewSite().getActionBars().getMenuManager().add(copyPathAction);
+		updateGui();
 	}
 	
 	@Override
@@ -113,8 +102,7 @@ public class ViewPlayer extends ViewPart {
 	 */
 	public void loadAndStartPlaying (MediaTrack track) {
 		try {
-			getPlaybackEngine().stopPlaying();
-			getPlaybackEngine().unloadFile();
+			stopPlaying();
 			
 			currentTrack = track;
 			
@@ -129,35 +117,37 @@ public class ViewPlayer extends ViewPart {
 			new MorriganMsgDlg(e).open();
 		}
 		
-		updateStatus();
+		updateGui();
 	}
 	
 	/**
 	 * For UI handlers to call.
 	 */
-	public void startPlaying () {
-		try {
-			getPlaybackEngine().startPlaying();
-			updateStatus();
-		} catch (PlaybackException e) {
-			new MorriganMsgDlg(e).open();
-		}
-	}
-	
-	/**
-	 * For UI handlers to call.
-	 */
-	public void stopPlaying () {
+	public void ui_stopPlaying () {
 		try {
 			/* Don't go and make a player engine instnace
 			 * just to call stop on it.
 			 */
-			IPlaybackEngine eng = getPlaybackEngine(false);
-			if (eng!=null) eng.stopPlaying();
-			updateStatus();
+			stopPlaying();
+			updateGui();
 		} catch (PlaybackException e) {
 			new MorriganMsgDlg(e).open();
 		}
+	}
+	
+	/**
+	 * For internal use.  Does not update GUI.
+	 * @throws ImplException
+	 * @throws PlaybackException
+	 */
+	private void stopPlaying () throws ImplException, PlaybackException {
+		IPlaybackEngine eng = getPlaybackEngine(false);
+		if (eng!=null) {
+			eng.stopPlaying();
+			eng.unloadFile();
+		}
+		
+		currentTrack = null;
 	}
 	
 	private Runnable atEndOfTrack = new Runnable() {
@@ -170,47 +160,25 @@ public class ViewPlayer extends ViewPart {
 	
 	private Runnable updateStatusRunable = new Runnable() {
 		public void run() {
-			updateStatus();
+			updateGui();
 		}
 	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Actions.
+//	GUI stuff.
 	
-	private IAction pauseAction = new Action("pause", Activator.getImageDescriptor("icons/pause.gif")) {
-		public void run() {
-			new MorriganMsgDlg("TODO: implement pause.").open();
-		};
-	};
+	private void addToolbar () {
+		getViewSite().getActionBars().getToolBarManager().add(pauseAction);
+		getViewSite().getActionBars().getToolBarManager().add(stopAction);
+		getViewSite().getActionBars().getToolBarManager().add(prevAction);
+		getViewSite().getActionBars().getToolBarManager().add(nextAction);
+	}
 	
-	private IAction stopAction = new Action("stop", Activator.getImageDescriptor("icons/stop.gif")) {
-		public void run() {
-			stopPlaying();
-		};
-	};
+	private void addMenu () {
+		getViewSite().getActionBars().getMenuManager().add(copyPathAction);
+	}
 	
-	private IAction nextAction = new Action("next", Activator.getImageDescriptor("icons/next.gif")) {
-		public void run() {
-			new MorriganMsgDlg("TODO: implement next.").open();
-		};
-	};
-	
-	private IAction prevAction = new Action("previous", Activator.getImageDescriptor("icons/prev.gif")) {
-		public void run() {
-			new MorriganMsgDlg("TODO: implement prev.").open();
-		};
-	};
-	
-	private IAction copyPathAction = new Action("copy file path") {
-		public void run() {
-			new MorriganMsgDlg("TODO: implement copy file path.").open();
-		};
-	};
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Local helper methods.
-	
-	public void updateStatus () {
+	private void updateGui () {
 		if (currentTrack != null) {
 			mainLabel.setText("Now playing: " + currentTrack.toString());
 			
@@ -218,6 +186,39 @@ public class ViewPlayer extends ViewPart {
 			mainLabel.setText("Idle.");
 		}
 	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Actions.
+	
+	private IAction pauseAction = new Action("pause", Activator.getImageDescriptor("icons/pause.gif")) {
+		public void run() {
+			new MorriganMsgDlg("TODO: implement pause desu~.").open();
+		};
+	};
+	
+	private IAction stopAction = new Action("stop", Activator.getImageDescriptor("icons/stop.gif")) {
+		public void run() {
+			ui_stopPlaying();
+		};
+	};
+	
+	private IAction nextAction = new Action("next", Activator.getImageDescriptor("icons/next.gif")) {
+		public void run() {
+			new MorriganMsgDlg("TODO: implement next desu~.").open();
+		};
+	};
+	
+	private IAction prevAction = new Action("previous", Activator.getImageDescriptor("icons/prev.gif")) {
+		public void run() {
+			new MorriganMsgDlg("TODO: implement prev desu~.").open();
+		};
+	};
+	
+	private IAction copyPathAction = new Action("copy file path") {
+		public void run() {
+			new MorriganMsgDlg("TODO: implement copy file path desu~.").open();
+		};
+	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
