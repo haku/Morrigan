@@ -1,5 +1,6 @@
 package net.sparktank.morrigan.views;
 
+import net.sparktank.morrigan.Activator;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.model.media.MediaTrack;
 import net.sparktank.morrigan.playback.IPlaybackEngine;
@@ -7,6 +8,8 @@ import net.sparktank.morrigan.playback.ImplException;
 import net.sparktank.morrigan.playback.PlaybackException;
 import net.sparktank.morrigan.var.Const;
 
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -29,7 +32,21 @@ public class ViewPlayer extends ViewPart {
 		parent.setLayout(new FillLayout ());
 		mainLabel = new Label(parent, SWT.WRAP);
 		
+		addToolbar();
+		addMenu();
+		
 		updateStatus();
+	}
+	
+	private void addToolbar () {
+		getViewSite().getActionBars().getToolBarManager().add(pauseAction);
+		getViewSite().getActionBars().getToolBarManager().add(stopAction);
+		getViewSite().getActionBars().getToolBarManager().add(prevAction);
+		getViewSite().getActionBars().getToolBarManager().add(nextAction);
+	}
+	
+	private void addMenu () {
+		getViewSite().getActionBars().getMenuManager().add(copyPathAction);
 	}
 	
 	@Override
@@ -91,6 +108,9 @@ public class ViewPlayer extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Playback management.
 	
+	/**
+	 * For UI handlers to call.
+	 */
 	public void loadAndStartPlaying (MediaTrack track) {
 		try {
 			getPlaybackEngine().stopPlaying();
@@ -112,17 +132,29 @@ public class ViewPlayer extends ViewPart {
 		updateStatus();
 	}
 	
+	/**
+	 * For UI handlers to call.
+	 */
 	public void startPlaying () {
 		try {
 			getPlaybackEngine().startPlaying();
+			updateStatus();
 		} catch (PlaybackException e) {
 			new MorriganMsgDlg(e).open();
 		}
 	}
 	
+	/**
+	 * For UI handlers to call.
+	 */
 	public void stopPlaying () {
 		try {
-			getPlaybackEngine().stopPlaying();
+			/* Don't go and make a player engine instnace
+			 * just to call stop on it.
+			 */
+			IPlaybackEngine eng = getPlaybackEngine(false);
+			if (eng!=null) eng.stopPlaying();
+			updateStatus();
 		} catch (PlaybackException e) {
 			new MorriganMsgDlg(e).open();
 		}
@@ -140,6 +172,39 @@ public class ViewPlayer extends ViewPart {
 		public void run() {
 			updateStatus();
 		}
+	};
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Actions.
+	
+	private IAction pauseAction = new Action("pause", Activator.getImageDescriptor("icons/pause.gif")) {
+		public void run() {
+			new MorriganMsgDlg("TODO: implement pause.").open();
+		};
+	};
+	
+	private IAction stopAction = new Action("stop", Activator.getImageDescriptor("icons/stop.gif")) {
+		public void run() {
+			stopPlaying();
+		};
+	};
+	
+	private IAction nextAction = new Action("next", Activator.getImageDescriptor("icons/next.gif")) {
+		public void run() {
+			new MorriganMsgDlg("TODO: implement next.").open();
+		};
+	};
+	
+	private IAction prevAction = new Action("previous", Activator.getImageDescriptor("icons/prev.gif")) {
+		public void run() {
+			new MorriganMsgDlg("TODO: implement prev.").open();
+		};
+	};
+	
+	private IAction copyPathAction = new Action("copy file path") {
+		public void run() {
+			new MorriganMsgDlg("TODO: implement copy file path.").open();
+		};
 	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
