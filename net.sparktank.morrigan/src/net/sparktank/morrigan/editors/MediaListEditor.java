@@ -207,16 +207,10 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 	
 	protected void addTrack (String file) {
 		editedMediaList.addTrack(file);
-//		refreshUi();
 	}
 	
 	protected void removeTrack (MediaTrack track) {
-		removeTrack(track, true);
-	}
-	
-	protected void removeTrack (MediaTrack track, boolean refresh) {
 		editedMediaList.removeMediaTrack(track);
-//		if (refresh) refreshUi();
 	}
 	
 	public MediaTrack getSelectedTrack () {

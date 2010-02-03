@@ -61,21 +61,6 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Methods for editing editedMediaList.
-	
-	@Override
-	protected void addTrack (String file) {
-		super.addTrack(file);
-	}
-	
-	protected void removeSelectedTracks () {
-		for (MediaTrack track : super.getSelectedTracks()) {
-			super.removeTrack(track, false);
-		}
-		super.refreshUi();
-	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Actions.
 	
 	IAction addAction = new Action("add") {
@@ -109,7 +94,9 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 			MorriganMsgDlg dlg = new MorriganMsgDlg("Remove selected from " + getTitle() + "?", MorriganMsgDlg.YESNO);
 			dlg.open();
 			if (dlg.getReturnCode() == MorriganMsgDlg.OK) {
-				removeSelectedTracks();
+				for (MediaTrack track : getSelectedTracks()) {
+					removeTrack(track);
+				}
 			}
 		}
 	};
