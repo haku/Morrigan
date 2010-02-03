@@ -26,8 +26,6 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 	
 	private Logger logger = Logger.getLogger(this.getClass().getName());
 	
-	private boolean m_isDirty = false;
-	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public PlaylistEditor () {
@@ -41,11 +39,6 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 	public void setFocus() {
 		getEditorSite().getActionBars().setGlobalActionHandler(ApplicationActionBarAdvisor.ADD_ACTIONID, addAction);
 		getEditorSite().getActionBars().setGlobalActionHandler(ApplicationActionBarAdvisor.REMOVE_ACTIONID, removeAction);
-	}
-	
-	@Override
-	public boolean isDirty() {
-		return m_isDirty;
 	}
 	
 	@Override
@@ -65,15 +58,6 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 		} catch (MorriganException e) {
 			new MorriganMsgDlg(e);
 		}
-		setIsDirty(false);
-	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Editor helper methods.
-	
-	private void setIsDirty (boolean dirty) {
-		m_isDirty = dirty;
-		firePropertyChange(PROP_DIRTY);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -82,7 +66,6 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 	@Override
 	protected void addTrack (String file) {
 		super.addTrack(file);
-		setIsDirty(true);
 	}
 	
 	protected void removeSelectedTracks () {
@@ -90,7 +73,6 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 			super.removeTrack(track, false);
 		}
 		super.refreshUi();
-		setIsDirty(true);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

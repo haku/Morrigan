@@ -62,6 +62,13 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		}
 		
 		setPartName(editedMediaList.getListName());
+		
+		editedMediaList.setDirtyChangeEvent(new Runnable() {
+			@Override
+			public void run() {
+				firePropertyChange(PROP_DIRTY);
+			}
+		});
 	}
 	
 	@Override
@@ -93,6 +100,11 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		
 		// finishing off.
 		editTable.setInput(getEditorSite());
+	}
+	
+	@Override
+	public boolean isDirty() {
+		return editedMediaList.isDirty();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -178,7 +190,7 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 	
 	protected void addTrack (String file) {
 		editedMediaList.addTrack(file);
-		editTable.refresh();
+		refreshUi();
 	}
 	
 	protected void removeTrack (MediaTrack track) {
@@ -187,7 +199,7 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 	
 	protected void removeTrack (MediaTrack track, boolean refresh) {
 		editedMediaList.removeMediaTrack(track);
-		if (refresh) editTable.refresh();
+		if (refresh) refreshUi();
 	}
 	
 	public MediaTrack getSelectedTrack () {
