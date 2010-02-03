@@ -31,7 +31,11 @@ public class CallPlayMedia  extends AbstractHandler implements IHandler {
 		if (activeEditor instanceof MediaListEditor<?>) {
 			MediaListEditor<?> mediaListEditor = (MediaListEditor<?>) activeEditor;
 			ViewPlayer viewPlayer = (ViewPlayer) page.findView(ViewPlayer.ID);
-			viewPlayer.loadAndStartPlaying(mediaListEditor.getSelectedTrack());
+			if (viewPlayer!=null) {
+				viewPlayer.loadAndStartPlaying(mediaListEditor.getSelectedTrack());
+			} else {
+				new MorriganMsgDlg("Player view not found.").open();
+			}
 			
 		} else {
 			new MorriganMsgDlg("Error: invalid active editor.").open();
