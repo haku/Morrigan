@@ -8,3 +8,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ClassPath: .,
+ lib/jl1.0.1.jar,
+ lib/mp3spi1.9.4.jar,
+ lib/tritonus_mp3-0.3.6.jar,
+ lib/tritonus_share-0.3.6.jar
