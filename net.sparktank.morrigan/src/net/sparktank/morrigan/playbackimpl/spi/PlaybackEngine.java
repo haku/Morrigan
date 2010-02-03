@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.playbackimpl.mp3spi;
+package net.sparktank.morrigan.playbackimpl.spi;
 
 import java.io.File;
 import java.io.IOException;
