@@ -73,6 +73,8 @@ public class MediaPlaylist extends MediaList {
 				throw new MorriganException("Failed to close file handle.", e);
 			}
 		}
+		
+		setDirty(false);
 	}
 	
 	public void writeToFile () throws MorriganException {
@@ -104,6 +106,8 @@ public class MediaPlaylist extends MediaList {
 				throw new MorriganException("Failed to close file handle.", e);
 			}
 		}
+		
+		setDirty(false);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
