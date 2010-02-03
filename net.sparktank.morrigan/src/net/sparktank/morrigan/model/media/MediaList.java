@@ -18,25 +18,44 @@ public class MediaList {
 	}
 	
 	private boolean isDirty = false;
-	private Runnable dirtyChangeEvent = null;
+	private ArrayList<Runnable> changeEvents = new ArrayList<Runnable>();
+	private ArrayList<Runnable> dirtyChangeEvents = new ArrayList<Runnable>();
 	
 	public void setDirty (boolean dirty) {
 		boolean change = false;
-		if (dirtyChangeEvent!=null) {
-			if (isDirty != dirty) {
-				change = true;
+		if (isDirty != dirty) change = true;
+		
+		isDirty = dirty;
+		
+		if (change) {
+			for (Runnable r : dirtyChangeEvents) {
+				r.run();
 			}
 		}
-		isDirty = dirty;
-		if (change) dirtyChangeEvent.run();
+		
+		for (Runnable r : changeEvents) {
+			r.run();
+		}
 	}
 	
 	public boolean isDirty () {
 		return isDirty;
 	}
 	
-	public void setDirtyChangeEvent (Runnable r) {
-		this.dirtyChangeEvent = r;
+	public void addDirtyChangeEvent (Runnable r) {
+		dirtyChangeEvents.add(r);
+	}
+	
+	public void removeDirtyChangeEvent (Runnable r) {
+		dirtyChangeEvents.remove(r);
+	}
+	
+	public void addChangeEvent (Runnable r) {
+		changeEvents.add(r);
+	}
+	
+	public void removeChangeEvent (Runnable r) {
+		changeEvents.remove(r);
 	}
 	
 	/**
