@@ -103,7 +103,14 @@ public class ViewPlayer extends ViewPart {
 	private Runnable atEndOfTrack = new Runnable() {
 		@Override
 		public void run() {
-			// TODO Auto-generated method stub
+			currentTrack = null;
+			getSite().getShell().getDisplay().asyncExec(updateStatusRunable);
+		}
+	};
+	
+	private Runnable updateStatusRunable = new Runnable() {
+		public void run() {
+			updateStatus();
 		}
 	};
 	
