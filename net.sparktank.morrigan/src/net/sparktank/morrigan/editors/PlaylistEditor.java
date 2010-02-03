@@ -63,7 +63,7 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Actions.
 	
-	IAction addAction = new Action("add") {
+	private IAction addAction = new Action("add") {
 		public void run () {
 			Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 			
@@ -89,7 +89,7 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 		}
 	};
 	
-	IAction removeAction = new Action("add") {
+	private IAction removeAction = new Action("remove") {
 		public void run () {
 			MorriganMsgDlg dlg = new MorriganMsgDlg("Remove selected from " + getTitle() + "?", MorriganMsgDlg.YESNO);
 			dlg.open();
