@@ -18,7 +18,7 @@ import net.sparktank.morrigan.playback.PlaybackException;
 public class PlaybackEngine implements IPlaybackEngine {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private boolean m_stopPlaying;
+	private volatile boolean m_stopPlaying;
 	private Runnable onFinishHandler;
 	private String filepath;
 	
@@ -58,7 +58,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 	
 	@Override
 	public void stopPlaying() throws PlaybackException {
-		m_stopPlaying = true;
+		stopPlaybackThread();
 	}
 	
 	@Override
@@ -84,8 +84,10 @@ public class PlaybackEngine implements IPlaybackEngine {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Thread stuff.
 	
+	Thread playThread = null;
+	
 	private void startPlaybackThread () {
-		Thread t = new Thread() {
+		playThread = new Thread() {
 			@Override
 			public void run() {
 				super.run();
@@ -99,8 +101,18 @@ public class PlaybackEngine implements IPlaybackEngine {
 		        }
 			}
 		};
-		t.setDaemon(true);
-		t.start();
+		
+		playThread.setDaemon(true);
+		playThread.start();
+	}
+	
+	private void stopPlaybackThread () {
+		m_stopPlaying = true;
+		try {
+			if (playThread!=null && playThread.isAlive()) playThread.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -144,10 +156,7 @@ public class PlaybackEngine implements IPlaybackEngine {
         rawplay(decodedFormat, din); // Blocks during playback.
         in.close();
         
-        // If stopPlaying is true, something has requested the stop and we'll
-        // leave it up to that to decide what to do (e.g. next, prev, pause).
-        // If we've reached here and stopPlaying is false, we naturally got
-        // to the end of the song, so fire a next.
+        // If not a requested stop, triger next event.
         if (!m_stopPlaying) {
         	callOnFinishHandler();
         }
