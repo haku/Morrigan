@@ -72,7 +72,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		saveAction = ActionFactory.SAVE.create(window);
 		register(saveAction);
 		
-		addAction = new RetargetAction(ADD_ACTIONID, "&add");
+		addAction = new RetargetAction(ADD_ACTIONID, "&add files...");
 		addAction.setImageDescriptor(Activator.getImageDescriptor("icons/plus.gif"));
 		getActionBarConfigurer().registerGlobalAction(addAction);
 		register(addAction);
