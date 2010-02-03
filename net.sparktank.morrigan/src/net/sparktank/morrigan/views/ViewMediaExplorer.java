@@ -144,6 +144,7 @@ public class ViewMediaExplorer extends ViewPart {
 	}
 	
 	private void makeContent () {
+		items.clear();
 		items.add(new MediaExplorerItem("dis", "Display", MediaExplorerItem.ItemType.DISPLAY));
 		items.add(new MediaExplorerItem("lib", "Library", MediaExplorerItem.ItemType.LIBRARY));
 		items.addAll(PlaylistHelper.instance.getAllPlaylists());
@@ -174,6 +175,7 @@ public class ViewMediaExplorer extends ViewPart {
 	}
 	
 	public void refresh () {
+		makeContent();
 		viewer.refresh();
 	}
 	
