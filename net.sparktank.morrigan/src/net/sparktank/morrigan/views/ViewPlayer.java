@@ -52,7 +52,6 @@ public class ViewPlayer extends ViewPart {
 	
 	private IPlaybackEngine getPlaybackEngine (boolean create) throws ImplException {
 		if (playbackEngine == null && create) {
-			
 			Class<?> [] classParm = null;
 			Object [] objectParm = null;
 			
@@ -64,7 +63,6 @@ public class ViewPlayer extends ViewPart {
 			} catch (Exception e) {
 				throw new ImplException(e);
 			}
-			
 		}
 		
 		return playbackEngine;
@@ -94,11 +92,11 @@ public class ViewPlayer extends ViewPart {
 //	Playback management.
 	
 	public void loadAndStartPlaying (MediaTrack track) {
-		currentTrack = track;
-		
 		try {
 			getPlaybackEngine().stopPlaying();
 			getPlaybackEngine().unloadFile();
+			
+			currentTrack = track;
 			
 			getPlaybackEngine().setFile(currentTrack.getFilepath());
 			getPlaybackEngine().setOnfinishHandler(atEndOfTrack);
