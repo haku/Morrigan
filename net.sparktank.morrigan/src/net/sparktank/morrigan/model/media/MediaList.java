@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class MediaList {
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private String listName = null;
 	private List<MediaTrack> mediaTracks = new ArrayList<MediaTrack>();
@@ -13,17 +14,20 @@ public class MediaList {
 		this.listName = listName;
 	}
 	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
 	public String getListName () {
 		return listName;
 	}
 	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
 	private boolean isDirty = false;
-	private ArrayList<Runnable> changeEvents = new ArrayList<Runnable>();
 	private ArrayList<Runnable> dirtyChangeEvents = new ArrayList<Runnable>();
+	private ArrayList<Runnable> changeEvents = new ArrayList<Runnable>();
 	
 	public void setDirty (boolean dirty) {
-		boolean change = false;
-		if (isDirty != dirty) change = true;
+		boolean change = (isDirty != dirty);
 		
 		isDirty = dirty;
 		
@@ -58,6 +62,8 @@ public class MediaList {
 		changeEvents.remove(r);
 	}
 	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
 	/**
 	 * Returns an unmodifiable list of the playlist items.
 	 * @return
@@ -83,4 +89,5 @@ public class MediaList {
 		return listName + " ("+mediaTracks.size()+" items)";
 	}
 	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
