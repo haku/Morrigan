@@ -27,9 +27,12 @@ public class LibraryUpdateTask extends Job {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	/**
+	 * TODO use monitor.worked(1);
+	 */
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
-		monitor.beginTask("Updating library...", 100);
+		monitor.beginTask("Updating library...", IProgressMonitor.UNKNOWN);
 		
 		monitor.subTask("Scanning sources...");
 		
@@ -42,6 +45,8 @@ public class LibraryUpdateTask extends Job {
 		
 		if (sources!=null) {
 			for (String source : sources) {
+				monitor.subTask("Scanning "+source+"...");
+				
 				Stack<File> dirStack = new Stack<File>();
 				dirStack.push(new File(source));
 				
@@ -54,27 +59,28 @@ public class LibraryUpdateTask extends Job {
 							dirStack.push(file);
 							
 						} else if (file.isFile()) {
-							// TODO now add this file to the library.
+							try {
+								// TODO check file type.
+								library.addFile(file);
+							} catch (DbException e) {
+								// FIXME log this somewhere useful.
+								e.printStackTrace();
+							}
 							
 						}
+						
+						if (monitor.isCanceled()) break;
+					}
+					
+					if (monitor.isCanceled()) {
+						System.out.println("Task was canceled desu~.");
+						break;
 					}
 				}
 			}
 		}
 		
-		for (int i = 0; i<100; i++) {
-			monitor.worked(1);
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			
-			if (monitor.isCanceled()) {
-				System.out.println("Task was canceled desu~.");
-				break;
-			}
-		}
+//		TODO refresh library view. (mark dirty / event trigger in editor?)
 		
 		monitor.done();
 		return Status.OK_STATUS;
