@@ -2,6 +2,7 @@ package net.sparktank.morrigan.views;
 
 import net.sparktank.morrigan.Activator;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
+import net.sparktank.morrigan.helpers.ClipboardHelper;
 import net.sparktank.morrigan.model.media.MediaTrack;
 import net.sparktank.morrigan.playback.IPlaybackEngine;
 import net.sparktank.morrigan.playback.ImplException;
@@ -14,6 +15,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.part.ViewPart;
 
@@ -34,10 +36,8 @@ public class ViewPlayer extends ViewPart {
 		mainLabel = new Label(parent, SWT.WRAP);
 		
 		makeIcons();
-		
 		addToolbar();
 		addMenu();
-		
 		updateGui();
 	}
 	
@@ -117,12 +117,12 @@ public class ViewPlayer extends ViewPart {
 	/**
 	 * For UI handlers to call.
 	 */
-	public void ui_stopPlaying () {
+	public void stopPlaying () {
 		try {
-			/* Don't go and make a player engine instnace
+			/* Don't go and make a player engine instance
 			 * just to call stop on it.
 			 */
-			stopPlaying();
+			internal_stopPlaying();
 			updateGui();
 		} catch (PlaybackException e) {
 			new MorriganMsgDlg(e).open();
@@ -134,7 +134,7 @@ public class ViewPlayer extends ViewPart {
 	 * @throws ImplException
 	 * @throws PlaybackException
 	 */
-	private void stopPlaying () throws ImplException, PlaybackException {
+	private void internal_stopPlaying () throws ImplException, PlaybackException {
 		IPlaybackEngine eng = getPlaybackEngine(false);
 		if (eng!=null) {
 			eng.stopPlaying();
@@ -207,7 +207,7 @@ public class ViewPlayer extends ViewPart {
 	
 	private IAction stopAction = new Action("stop", Activator.getImageDescriptor("icons/stop.gif")) {
 		public void run() {
-			ui_stopPlaying();
+			stopPlaying();
 		};
 	};
 	
@@ -225,7 +225,12 @@ public class ViewPlayer extends ViewPart {
 	
 	private IAction copyPathAction = new Action("copy file path") {
 		public void run() {
-			new MorriganMsgDlg("TODO: implement copy file path desu~.").open();
+			if (currentTrack!=null) {
+				ClipboardHelper.setText(currentTrack.getFilepath(), Display.getCurrent());
+			
+			} else {
+				new MorriganMsgDlg("No track loaded desu~.").open();
+			}
 		};
 	};
 	
