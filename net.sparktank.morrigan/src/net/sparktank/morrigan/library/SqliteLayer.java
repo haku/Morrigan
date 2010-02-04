@@ -85,7 +85,6 @@ public class SqliteLayer {
 		if (dbConnection==null) {
 			Class.forName("org.sqlite.JDBC");
 			String url = "jdbc:sqlite:/" + dbFilePath;
-			System.out.println("url=" + url);
 			dbConnection = DriverManager.getConnection(url); // FIXME is this always safe?
 		}
 		
