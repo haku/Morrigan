@@ -4,10 +4,9 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 
+import net.sparktank.morrigan.helpers.ClipboardHelper;
+
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.swt.dnd.Clipboard;
-import org.eclipse.swt.dnd.TextTransfer;
-import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.widgets.Display;
 
 public class MorriganMsgDlg extends MessageDialog {
@@ -48,10 +47,7 @@ public class MorriganMsgDlg extends MessageDialog {
 		int open = super.open();
 		
 		if (exception!=null && open==OK) {
-			Clipboard clipboard = new Clipboard(Display.getCurrent());
-			TextTransfer textTransfer = TextTransfer.getInstance();
-			clipboard.setContents(new String[]{getStackTrace(exception)}, new Transfer[]{textTransfer});
-	        clipboard.dispose();
+			ClipboardHelper.setText(getStackTrace(exception), Display.getCurrent());
 		}
 		
 		return open;
