@@ -1,8 +1,11 @@
 package net.sparktank.morrigan.views;
 
+import java.util.List;
+
 import net.sparktank.morrigan.Activator;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.helpers.ClipboardHelper;
+import net.sparktank.morrigan.model.media.MediaList;
 import net.sparktank.morrigan.model.media.MediaTrack;
 import net.sparktank.morrigan.playback.IPlaybackEngine;
 import net.sparktank.morrigan.playback.IPlaybackStatusListener;
@@ -28,6 +31,7 @@ public class ViewPlayer extends ViewPart {
 	
 	private Label mainLabel;
 	
+	private MediaList currentList = null;
 	private MediaTrack currentTrack = null;
 	
 	private long currentPosition = -1;
@@ -67,6 +71,8 @@ public class ViewPlayer extends ViewPart {
 	private IPlaybackEngine getPlaybackEngine (boolean create) throws ImplException {
 		if (playbackEngine == null && create) {
 			playbackEngine = PlaybackEngineFactory.makePlaybackEngine();
+			playbackEngine.setStatusListener(playbackStatusListener);
+			playbackEngine.setOnfinishHandler(atEndOfTrack);
 		}
 		
 		return playbackEngine;
@@ -98,16 +104,12 @@ public class ViewPlayer extends ViewPart {
 	/**
 	 * For UI handlers to call.
 	 */
-	public void loadAndStartPlaying (MediaTrack track) {
+	public void loadAndStartPlaying (MediaList list, MediaTrack track) {
 		try {
-			stopPlaying();
-			
+			internal_stopPlaying();
+			currentList = list;
 			currentTrack = track;
-			
 			getPlaybackEngine().setFile(currentTrack.getFilepath());
-			getPlaybackEngine().setStatusListener(playbackStatusListener);
-			getPlaybackEngine().setOnfinishHandler(atEndOfTrack);
-			
 			getPlaybackEngine().startPlaying();
 			
 		} catch (PlaybackException e) {
@@ -147,6 +149,7 @@ public class ViewPlayer extends ViewPart {
 		}
 		
 		currentTrack = null;
+		
 	}
 	
 	private IPlaybackStatusListener playbackStatusListener = new IPlaybackStatusListener () {
@@ -167,7 +170,17 @@ public class ViewPlayer extends ViewPart {
 	private Runnable atEndOfTrack = new Runnable() {
 		@Override
 		public void run() {
-			currentTrack = null;
+			List<MediaTrack> mediaTracks = currentList.getMediaTracks();
+			if (mediaTracks.contains(currentTrack)) {
+				int i = mediaTracks.indexOf(currentTrack) + 1;
+				if (i >= mediaTracks.size()) i = 0;
+				
+				loadAndStartPlaying(currentList, mediaTracks.get(i));
+				
+			} else {
+				currentTrack = null;
+			}
+			
 			getSite().getShell().getDisplay().asyncExec(updateStatusRunable);
 		}
 	};

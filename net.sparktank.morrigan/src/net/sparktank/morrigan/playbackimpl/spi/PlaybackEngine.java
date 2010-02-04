@@ -25,10 +25,11 @@ public class PlaybackEngine implements IPlaybackEngine {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private volatile boolean m_stopPlaying;
-	private Runnable onFinishHandler;
-	private String filepath;
-
-	private IPlaybackStatusListener listener;
+	
+	private String filepath = null;
+	private Runnable onFinishHandler = null;
+	private IPlaybackStatusListener listener = null;
+	private PlayState playbackState = PlayState.Stopped;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructor.
@@ -80,10 +81,15 @@ public class PlaybackEngine implements IPlaybackEngine {
 	}
 	
 	@Override
+	public PlayState getPlaybackState() {
+		return playbackState;
+	}
+	
+	@Override
 	public int getDuration() throws PlaybackException {
 		return -1;
 	}
-
+	
 	@Override
 	public long getPlaybackProgress() throws PlaybackException {
 		return -1;
@@ -127,7 +133,12 @@ public class PlaybackEngine implements IPlaybackEngine {
 	private void stopPlaybackThread () {
 		m_stopPlaying = true;
 		try {
-			if (playThread!=null && playThread.isAlive()) playThread.join();
+			if (playThread!=null
+					&& playThread.isAlive()
+					&& !Thread.currentThread().equals(playThread)) {
+				playThread.join();
+			}
+			
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -139,7 +150,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 	AudioInputStream in = null;
 	AudioInputStream din = null;
 	AudioFormat decodedFormat = null;
-	
+
 	private void finalisePlayback () {
 		try {
 			if (in!=null) in.close();
@@ -176,11 +187,12 @@ public class PlaybackEngine implements IPlaybackEngine {
         rawplay(decodedFormat, din); // Blocks during playback.
         in.close();
         
+        callStateListener(PlayState.Stopped);
+        
         // If not a requested stop, triger next event.
         if (!m_stopPlaying) {
         	callOnFinishHandler();
         }
-        callStateListener(PlayState.Stopped);
 	}
 	
 	private void rawplay(AudioFormat targetFormat, AudioInputStream din) throws IOException, LineUnavailableException {
@@ -230,6 +242,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 	}
 	
 	private void callStateListener (PlayState state) {
+		this.playbackState = state;
 		if (listener!=null) listener.statusChanged(state);
 	
 	}

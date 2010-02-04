@@ -49,6 +49,12 @@ public interface IPlaybackEngine {
 	public void pausePlaying () throws PlaybackException;
 	
 	/**
+	 * Returns the current play state.
+	 * @return
+	 */
+	public PlayState getPlaybackState ();
+	
+	/**
 	 * Returns the duration of the current file.
 	 * @return Duration in seconds.  Returns -1 if not implmented.
 	 */
