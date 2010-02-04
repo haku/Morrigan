@@ -84,7 +84,7 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 	@Override
 	public void createPartControl(Composite parent) {
 		// Create table control.
-		editTable = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
+		editTable = new TableViewer(parent, SWT.MULTI | SWT.V_SCROLL | SWT.FULL_SELECTION );
 		
 		// add and configure columns.
 		String[] titles = { "file", "size" };
