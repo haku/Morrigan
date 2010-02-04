@@ -16,4 +16,5 @@ Bundle-ClassPath: .,
  lib/jogg-0.0.7.jar,
  lib/jorbis-0.0.15.jar,
  lib/vorbisspi1.0.3.jar,
- lib/j-ogg-all.jar
+ lib/j-ogg-all.jar,
+ lib/sqlitejdbc-v056.jar
