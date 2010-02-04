@@ -8,6 +8,7 @@ import net.sparktank.morrigan.editors.PlaylistEditor;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.library.DbException;
 import net.sparktank.morrigan.model.media.MediaLibrary;
+import net.sparktank.morrigan.model.media.MediaListFactory;
 import net.sparktank.morrigan.model.media.MediaPlaylist;
 import net.sparktank.morrigan.model.ui.MediaExplorerItem;
 import net.sparktank.morrigan.views.ViewMediaExplorer;
@@ -52,7 +53,7 @@ public class CallMediaListEditor extends AbstractHandler implements IHandler {
 				if (item.type == MediaExplorerItem.ItemType.PLAYLIST) {
 					MediaPlaylist playList;
 					try {
-						playList = new MediaPlaylist(item.identifier);
+						playList = MediaListFactory.makeMediaPlaylist(item.identifier);
 					} catch (MorriganException e) {
 						new MorriganMsgDlg(e, view.getSite().getShell().getDisplay()).open();
 						return null;
@@ -69,7 +70,7 @@ public class CallMediaListEditor extends AbstractHandler implements IHandler {
 				} else if (item.type == MediaExplorerItem.ItemType.LIBRARY) {
 					MediaLibrary ml;
 					try {
-						ml = new MediaLibrary(Config.SQLITE_DBNAME_TITLE, Config.getLocalDbFile());
+						ml = MediaListFactory.makeMediaLibrary(Config.SQLITE_DBNAME_TITLE, Config.getLocalDbFile());
 					} catch (DbException e) {
 						new MorriganMsgDlg(e, view.getSite().getShell().getDisplay()).open();
 						return null;

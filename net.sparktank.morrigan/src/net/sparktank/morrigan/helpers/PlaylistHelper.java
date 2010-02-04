@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import net.sparktank.morrigan.config.Config;
 import net.sparktank.morrigan.exceptions.MorriganException;
+import net.sparktank.morrigan.model.media.MediaListFactory;
 import net.sparktank.morrigan.model.media.MediaPlaylist;
 import net.sparktank.morrigan.model.ui.MediaExplorerItem;
 
@@ -23,7 +24,7 @@ public class PlaylistHelper {
 	
 	public MediaPlaylist createPl (String plName) throws MorriganException {
 		String plFile = getPathForNewPlaylist(plName);
-		MediaPlaylist pl = new MediaPlaylist(plFile, true);
+		MediaPlaylist pl = MediaListFactory.makeMediaPlaylist(plFile, true);
 		pl.read();
 		return pl;
 	}
