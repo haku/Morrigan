@@ -36,7 +36,7 @@
             name="Player"
             class="net.sparktank.morrigan.views.ViewPlayer"
             id="net.sparktank.morrigan.views.ViewPlayer"
-            icon="icons/play.gif" > <!-- TODO fix icon. -->
+            icon="icons/stop.gif" > <!-- TODO fix icon. -->
       </view>
       
       <view

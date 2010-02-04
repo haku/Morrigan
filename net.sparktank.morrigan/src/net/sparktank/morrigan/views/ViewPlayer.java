@@ -11,6 +11,7 @@ import net.sparktank.morrigan.playback.PlaybackException;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
@@ -32,6 +33,8 @@ public class ViewPlayer extends ViewPart {
 		parent.setLayout(new FillLayout ());
 		mainLabel = new Label(parent, SWT.WRAP);
 		
+		makeIcons();
+		
 		addToolbar();
 		addMenu();
 		
@@ -44,6 +47,7 @@ public class ViewPlayer extends ViewPart {
 	@Override
 	public void dispose() {
 		finalisePlaybackEngine();
+		disposeIcons();
 		super.dispose();
 	}
 	
@@ -157,6 +161,19 @@ public class ViewPlayer extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	GUI stuff.
 	
+	private Image iconPlay;
+	private Image iconStop;
+	
+	private void makeIcons () {
+		iconPlay = Activator.getImageDescriptor("icons/play.gif").createImage();
+		iconStop = Activator.getImageDescriptor("icons/stop.gif").createImage();
+	}
+	
+	private void disposeIcons () {
+		iconPlay.dispose();
+		iconStop.dispose();
+	}
+	
 	private void addToolbar () {
 		getViewSite().getActionBars().getToolBarManager().add(pauseAction);
 		getViewSite().getActionBars().getToolBarManager().add(stopAction);
@@ -170,9 +187,11 @@ public class ViewPlayer extends ViewPart {
 	
 	private void updateGui () {
 		if (currentTrack != null) {
+			setTitleImage(iconPlay);
 			mainLabel.setText("Now playing: " + currentTrack.toString());
 			
 		} else {
+			setTitleImage(iconStop);
 			mainLabel.setText("Idle.");
 		}
 	}
