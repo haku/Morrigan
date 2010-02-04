@@ -39,6 +39,13 @@
             icon="icons/play.gif" > <!-- TODO fix icon. -->
       </view>
       
+      <view
+            name="Library Properties"
+            class="net.sparktank.morrigan.views.ViewLibraryProperties"
+            id="net.sparktank.morrigan.views.ViewLibraryProperties"
+            icon="icons/pref.gif" > <!-- TODO fix icon. -->
+      </view>
+      
    </extension>
    
    <extension point="org.eclipse.ui.editors">
