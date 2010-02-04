@@ -19,7 +19,7 @@ public abstract class MediaList {
 	 * @param listId a unique ID.
 	 * @param listName a human-readable title for this list.
 	 */
-	public MediaList (String listId, String listName) {
+	protected MediaList (String listId, String listName) {
 		this.listId = listId;
 		this.listName = listName;
 	}
