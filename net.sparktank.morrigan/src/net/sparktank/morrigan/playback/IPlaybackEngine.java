@@ -2,6 +2,8 @@ package net.sparktank.morrigan.playback;
 
 public interface IPlaybackEngine {
 	
+	public enum PlayState { Stopped, Playing, Paused, Loading };
+	
 	/**
 	 * Returns a list of the file extensions that can be played
 	 * when this engine is loaded.
@@ -53,10 +55,16 @@ public interface IPlaybackEngine {
 	public int getDuration () throws PlaybackException;
 	
 	/**
-	 * The progress playing the current file.
-	 * @return Percentage progress p where 0 <= p <= 100.  Returns -1 if not implmented.
+	 * The position the current file.
+	 * @return Position in seconds.
 	 */
-	public int getPlaybackProgress () throws PlaybackException;
+	public long getPlaybackProgress () throws PlaybackException;
+	
+	/**
+	 * The methods in this class will be called when their event occures.
+	 * @param listener
+	 */
+	public void setStatusListener (IPlaybackStatusListener listener);
 	
 	/**
 	 * This runnable will be executed when the end of the file is reached.

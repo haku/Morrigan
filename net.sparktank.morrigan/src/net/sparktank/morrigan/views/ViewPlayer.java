@@ -5,9 +5,11 @@ import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.helpers.ClipboardHelper;
 import net.sparktank.morrigan.model.media.MediaTrack;
 import net.sparktank.morrigan.playback.IPlaybackEngine;
+import net.sparktank.morrigan.playback.IPlaybackStatusListener;
 import net.sparktank.morrigan.playback.ImplException;
 import net.sparktank.morrigan.playback.PlaybackEngineFactory;
 import net.sparktank.morrigan.playback.PlaybackException;
+import net.sparktank.morrigan.playback.IPlaybackEngine.PlayState;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -26,7 +28,9 @@ public class ViewPlayer extends ViewPart {
 	
 	private Label mainLabel;
 	
-	private MediaTrack currentTrack = null; 
+	private MediaTrack currentTrack = null;
+	
+	private long currentPosition = -1;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	ViewPart methods.
@@ -38,7 +42,7 @@ public class ViewPlayer extends ViewPart {
 		makeIcons();
 		addToolbar();
 		addMenu();
-		updateGui();
+		getSite().getShell().getDisplay().asyncExec(updateStatusRunable);
 	}
 	
 	@Override
@@ -101,6 +105,7 @@ public class ViewPlayer extends ViewPart {
 			currentTrack = track;
 			
 			getPlaybackEngine().setFile(currentTrack.getFilepath());
+			getPlaybackEngine().setStatusListener(playbackStatusListener);
 			getPlaybackEngine().setOnfinishHandler(atEndOfTrack);
 			
 			getPlaybackEngine().startPlaying();
@@ -111,7 +116,7 @@ public class ViewPlayer extends ViewPart {
 			new MorriganMsgDlg(e).open();
 		}
 		
-		updateGui();
+		getSite().getShell().getDisplay().asyncExec(updateStatusRunable);
 	}
 	
 	/**
@@ -123,7 +128,7 @@ public class ViewPlayer extends ViewPart {
 			 * just to call stop on it.
 			 */
 			internal_stopPlaying();
-			updateGui();
+			getSite().getShell().getDisplay().asyncExec(updateStatusRunable);
 		} catch (PlaybackException e) {
 			new MorriganMsgDlg(e).open();
 		}
@@ -144,17 +149,26 @@ public class ViewPlayer extends ViewPart {
 		currentTrack = null;
 	}
 	
+	private IPlaybackStatusListener playbackStatusListener = new IPlaybackStatusListener () {
+		
+		@Override
+		public void positionChanged(long position) {
+			currentPosition = position;
+			getSite().getShell().getDisplay().asyncExec(updateStatusRunable);
+		}
+		
+		@Override
+		public void statusChanged(PlayState state) {
+			
+		}
+		
+	};
+	
 	private Runnable atEndOfTrack = new Runnable() {
 		@Override
 		public void run() {
 			currentTrack = null;
 			getSite().getShell().getDisplay().asyncExec(updateStatusRunable);
-		}
-	};
-	
-	private Runnable updateStatusRunable = new Runnable() {
-		public void run() {
-			updateGui();
 		}
 	};
 	
@@ -185,16 +199,26 @@ public class ViewPlayer extends ViewPart {
 		getViewSite().getActionBars().getMenuManager().add(copyPathAction);
 	}
 	
-	private void updateGui () {
-		if (currentTrack != null) {
-			setTitleImage(iconPlay);
-			mainLabel.setText("Now playing: " + currentTrack.toString());
+	/**
+	 * This way, it can only ever be called by the right thread.
+	 */
+	private Runnable updateStatusRunable = new Runnable() {
+		public void run() {
+			if (getSite().getShell().getDisplay().isDisposed()) return;
 			
-		} else {
-			setTitleImage(iconStop);
-			mainLabel.setText("Idle.");
+			if (currentTrack != null) {
+				setTitleImage(iconPlay);
+				mainLabel.setText(
+						"Now playing: " + currentTrack.toString() +
+						"\n   Position: " + currentPosition
+						);
+				
+			} else {
+				setTitleImage(iconStop);
+				mainLabel.setText("Idle.");
+			};
 		}
-	}
+	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Actions.

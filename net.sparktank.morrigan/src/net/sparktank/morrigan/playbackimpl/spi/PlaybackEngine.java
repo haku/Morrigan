@@ -12,6 +12,7 @@ import javax.sound.sampled.SourceDataLine;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 import net.sparktank.morrigan.playback.IPlaybackEngine;
+import net.sparktank.morrigan.playback.IPlaybackStatusListener;
 import net.sparktank.morrigan.playback.NotImplementedException;
 import net.sparktank.morrigan.playback.PlaybackException;
 
@@ -26,6 +27,8 @@ public class PlaybackEngine implements IPlaybackEngine {
 	private volatile boolean m_stopPlaying;
 	private Runnable onFinishHandler;
 	private String filepath;
+
+	private IPlaybackStatusListener listener;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructor.
@@ -82,10 +85,15 @@ public class PlaybackEngine implements IPlaybackEngine {
 	}
 
 	@Override
-	public int getPlaybackProgress() throws PlaybackException {
+	public long getPlaybackProgress() throws PlaybackException {
 		return -1;
 	}
-
+	
+	@Override
+	public void setStatusListener(IPlaybackStatusListener listener) {
+		this.listener = listener;
+	}
+	
 	@Override
 	public void setOnfinishHandler(Runnable runnable) {
 		this.onFinishHandler = runnable;
@@ -163,6 +171,8 @@ public class PlaybackEngine implements IPlaybackEngine {
 	
 	private void playTrack () throws IOException, LineUnavailableException {
 		// Play now.
+		callStateListener(PlayState.Playing);
+		
         rawplay(decodedFormat, din); // Blocks during playback.
         in.close();
         
@@ -170,6 +180,7 @@ public class PlaybackEngine implements IPlaybackEngine {
         if (!m_stopPlaying) {
         	callOnFinishHandler();
         }
+        callStateListener(PlayState.Stopped);
 	}
 	
 	private void rawplay(AudioFormat targetFormat, AudioInputStream din) throws IOException, LineUnavailableException {
@@ -188,6 +199,8 @@ public class PlaybackEngine implements IPlaybackEngine {
 					if (nBytesRead != -1) {
 						nBytesWritten = line.write(data, 0, nBytesRead);
 					}
+					
+					callPositionListener(line.getMicrosecondPosition()/1000000);
 				}
 			}
 			
@@ -216,6 +229,21 @@ public class PlaybackEngine implements IPlaybackEngine {
 		if (onFinishHandler!=null) onFinishHandler.run();
 	}
 	
+	private void callStateListener (PlayState state) {
+		if (listener!=null) listener.statusChanged(state);
+	
+	}
+	
+	private long lastPosition = -1;
+	
+	private void callPositionListener (long position) {
+		if (listener!=null) {
+			if (position != lastPosition) {
+				listener.positionChanged(position);
+			}
+			lastPosition = position;
+		}
+	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
