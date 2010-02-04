@@ -157,11 +157,11 @@ public class MediaPlaylist extends MediaList {
 		return true;
 	}
 	
-	// TODO
-//	@Override
-//	public int hashCode() {
-//		return super.hashCode();
-//	}
+	@Override
+	public int hashCode() {
+		// Since equals() only uses filePath, we can do this.
+		return filePath.hashCode();
+	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
