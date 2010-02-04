@@ -36,8 +36,6 @@ public class PlaylistHelper {
 	public ArrayList<MediaExplorerItem> getAllPlaylists () {
 		ArrayList<MediaExplorerItem> ret = new ArrayList<MediaExplorerItem>();
 		
-		// TODO better display name / show icons for PLs?
-		
 		File plDir = Config.getPlDir();
 		File [] plFiles = plDir.listFiles();
 		
@@ -61,10 +59,6 @@ public class PlaylistHelper {
 		}
 		
 		return ret;
-	}
-	
-	public void showEditorForPlaylist (MediaPlaylist mPlaylist) {
-		// TODO showEditorForPlaylist
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
