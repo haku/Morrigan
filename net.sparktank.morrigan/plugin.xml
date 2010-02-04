@@ -36,14 +36,14 @@
             name="Player"
             class="net.sparktank.morrigan.views.ViewPlayer"
             id="net.sparktank.morrigan.views.ViewPlayer"
-            icon="icons/stop.gif" > <!-- TODO fix icon. -->
+            icon="icons/stop.gif" >
       </view>
       
       <view
             name="Library Properties"
             class="net.sparktank.morrigan.views.ViewLibraryProperties"
             id="net.sparktank.morrigan.views.ViewLibraryProperties"
-            icon="icons/pref.gif" > <!-- TODO fix icon. -->
+            icon="icons/pref.gif" >
       </view>
       
       <view
