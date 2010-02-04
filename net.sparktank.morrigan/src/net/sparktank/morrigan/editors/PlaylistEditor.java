@@ -8,6 +8,8 @@ import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.MediaPlaylist;
 import net.sparktank.morrigan.model.media.MediaTrack;
+import net.sparktank.morrigan.playback.ImplException;
+import net.sparktank.morrigan.playback.PlaybackEngineFactory;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
@@ -65,12 +67,31 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 	
 	private IAction addAction = new Action("add") {
 		public void run () {
+			String[] supportedFormats;
+			try {
+				supportedFormats = PlaybackEngineFactory.getSupportedFormats();
+			} catch (ImplException e) {
+				new MorriganMsgDlg(e).open();
+				return;
+			}
+			
+			String[] filterList = new String[supportedFormats.length+2];
+			StringBuilder allTypes = new StringBuilder();
+			for (int i = 0; i < supportedFormats.length; i++) {
+				filterList[i+1] = "*." + supportedFormats[i];
+				
+				if (i>0) allTypes.append(";");
+				allTypes.append(filterList[i+1]);
+			}
+			filterList[0] = allTypes.toString();
+			filterList[filterList.length-1] = "*.*";
+			
 			Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 			
 			FileDialog dialog = new FileDialog(shell, SWT.MULTI);
 			dialog.setText("Add to " + getTitle());
-			dialog.setFilterExtensions(new String[] {"*.mp3", "*.*"}); // TODO refine file type list.
-			dialog.setFilterNames(new String[] {"mp3 Files", "All Files"});
+			dialog.setFilterNames(filterList);
+			dialog.setFilterExtensions(filterList);
 			
 			String firstSel = dialog.open();
 			if (firstSel != null) {
