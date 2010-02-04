@@ -56,14 +56,14 @@ public class LibraryUpdateTask extends Job {
 		
 		if (sources!=null) {
 			for (String source : sources) {
-				monitor.subTask("Scanning "+source);
-				
 				Stack<File> dirStack = new Stack<File>();
 				dirStack.push(new File(source));
 				
 				while (!dirStack.isEmpty()) {
 					File dirItem = dirStack.pop();
 					File[] listFiles = dirItem.listFiles();
+					
+					monitor.subTask("Scanning "+dirItem.getAbsolutePath());
 					
 					for (File file : listFiles) {
 						if (file.isDirectory()) {
