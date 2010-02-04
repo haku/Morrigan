@@ -2,7 +2,10 @@ package net.sparktank.morrigan.editors;
 
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
 
+import net.sparktank.morrigan.ApplicationActionBarAdvisor;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.model.media.MediaLibrary;
 
@@ -21,7 +24,9 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 //	EditorPart methods.
 	
 	@Override
-	public void setFocus() {}
+	public void setFocus() {
+		getEditorSite().getActionBars().setGlobalActionHandler(ApplicationActionBarAdvisor.ACTIONID_SHOWPROPERTIES, showPropertiesAction);
+	}
 	
 	@Override
 	public boolean isSaveAsAllowed() {
@@ -44,6 +49,15 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 	public boolean isDirty() {
 		return false;
 	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Actions.
+	
+	private IAction showPropertiesAction = new Action("showProperties") {
+		public void run () {
+			new MorriganMsgDlg("TODO: show properties.").open();
+		}
+	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

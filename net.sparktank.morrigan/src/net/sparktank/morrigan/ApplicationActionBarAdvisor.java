@@ -32,6 +32,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	
 	public static final String ACTIONID_ADD = "morrigan.add";
 	public static final String ACTIONID_REMOVE = "morrigan.remove";
+	public static final String ACTIONID_SHOWPROPERTIES = "morrigan.showproperties";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Action instances.
@@ -53,6 +54,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	IWorkbenchAction saveAction;
 	private RetargetAction addAction;
 	private RetargetAction removeAction;
+	private RetargetAction showPropertiesAction;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -104,6 +106,12 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		getActionBarConfigurer().registerGlobalAction(removeAction);
 		register(removeAction);
 		window.getPartService().addPartListener(removeAction);
+		
+		showPropertiesAction = new RetargetAction(ACTIONID_SHOWPROPERTIES, "&properties...");
+		showPropertiesAction.setImageDescriptor(Activator.getImageDescriptor("icons/pref.gif"));
+		getActionBarConfigurer().registerGlobalAction(showPropertiesAction);
+		register(showPropertiesAction);
+		window.getPartService().addPartListener(showPropertiesAction);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -115,13 +123,15 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		menuBar.add(fileMenu);
 		fileMenu.add(exitAction);
 		
-		MenuManager playlistMenu = new MenuManager("&Playlist", "playlist");
+		MenuManager playlistMenu = new MenuManager("&Collections", "collections");
 		menuBar.add(playlistMenu);
 		playlistMenu.add(newPlayListAction);
 		playlistMenu.add(new Separator());
 		playlistMenu.add(saveAction);
 		playlistMenu.add(addAction);
 		playlistMenu.add(removeAction);
+		playlistMenu.add(new Separator());
+		playlistMenu.add(showPropertiesAction);
 		
 		MenuManager windowMenu = new MenuManager("&Window", IWorkbenchActionConstants.M_WINDOW);
 		menuBar.add(windowMenu);
@@ -137,6 +147,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		fileToolBar.add(saveAction);
 		fileToolBar.add(addAction);
 		fileToolBar.add(removeAction);
+		fileToolBar.add(showPropertiesAction);
 		coolBar.add(new ToolBarContributionItem(fileToolBar));
 	}
 	
