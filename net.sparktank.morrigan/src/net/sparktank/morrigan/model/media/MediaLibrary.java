@@ -26,4 +26,8 @@ public class MediaLibrary extends MediaList {
 		}
 	}
 	
+	public List<String> getSources () throws DbException {
+		return dbLayer.getSources();
+	}
+	
 }
