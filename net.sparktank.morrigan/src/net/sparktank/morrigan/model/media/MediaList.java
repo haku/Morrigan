@@ -36,18 +36,29 @@ public abstract class MediaList {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	private boolean canBeDirty = true;
 	private boolean isDirty = false;
 	private ArrayList<Runnable> dirtyChangeEvents = new ArrayList<Runnable>();
 	private ArrayList<Runnable> changeEvents = new ArrayList<Runnable>();
 	
+	protected boolean isCanBeDirty () {
+		return canBeDirty;
+	}
+	
+	protected void setCanBeDirty (boolean value) {
+		canBeDirty = value;
+	}
+	
 	public void setDirty (boolean dirty) {
-		boolean change = (isDirty != dirty);
-		
-		isDirty = dirty;
-		
-		if (change) {
-			for (Runnable r : dirtyChangeEvents) {
-				r.run();
+		if (canBeDirty) {
+			boolean change = (isDirty != dirty);
+			
+			isDirty = dirty;
+			
+			if (change) {
+				for (Runnable r : dirtyChangeEvents) {
+					r.run();
+				}
 			}
 		}
 		

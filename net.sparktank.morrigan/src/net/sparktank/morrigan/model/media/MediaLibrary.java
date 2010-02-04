@@ -16,6 +16,8 @@ public class MediaLibrary extends MediaList {
 	
 	MediaLibrary (String libraryName, String dbFilePath) throws DbException {
 		super(dbFilePath, libraryName);
+		setCanBeDirty(false);
+		
 		this.dbFilePath = dbFilePath;
 		
 		dbLayer = DbConFactory.getDbLayer(dbFilePath);
@@ -27,13 +29,18 @@ public class MediaLibrary extends MediaList {
 	
 	@Override
 	public void read () throws MorriganException {
-		if (!isDirty() && !firstRead) return;
+		if (!firstRead) return;
 		firstRead = false;
 		
 		List<MediaTrack> allMedia = dbLayer.getAllMedia();
 		for (MediaTrack mt : allMedia) {
 			addTrack(mt);
 		}
+	}
+	
+	@Override
+	public void addTrack(MediaTrack track) {
+		super.addTrack(track);
 		setDirty(false);
 	}
 	
@@ -55,8 +62,11 @@ public class MediaLibrary extends MediaList {
 		dbLayer.removeSource(source);
 	}
 	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
 	public void addFile (File file) throws DbException {
 		dbLayer.addFile(file);
+		addTrack(new MediaTrack(file.getAbsolutePath()));
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
