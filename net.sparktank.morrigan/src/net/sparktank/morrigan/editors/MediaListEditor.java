@@ -9,6 +9,10 @@ import net.sparktank.morrigan.model.media.MediaList;
 import net.sparktank.morrigan.model.media.MediaTrack;
 
 import org.eclipse.core.commands.common.CommandException;
+import org.eclipse.jface.layout.TableColumnLayout;
+import org.eclipse.jface.viewers.ColumnLayoutData;
+import org.eclipse.jface.viewers.ColumnPixelData;
+import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ILabelProviderListener;
@@ -84,19 +88,23 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 	@Override
 	public void createPartControl(Composite parent) {
 		// Create table control.
-		editTable = new TableViewer(parent, SWT.MULTI | SWT.V_SCROLL | SWT.FULL_SELECTION );
+		Composite comp = new Composite(parent, SWT.NONE);
+		editTable = new TableViewer(comp, SWT.MULTI | SWT.V_SCROLL | SWT.FULL_SELECTION );
+		TableColumnLayout layout = new TableColumnLayout();
+		comp.setLayout(layout);
 		
 		// add and configure columns.
 		String[] titles = { "file", "size" };
-		int[] bounds = { 400, 100 };
+		ColumnLayoutData[] bounds = {new ColumnWeightData(80), new ColumnPixelData(100)};
 		
 		for (int i = 0; i < titles.length; i++) {
 			TableViewerColumn column = new TableViewerColumn(editTable, SWT.NONE);
+			layout.setColumnData(column.getColumn(), bounds[i]);
 			column.getColumn().setText(titles[i]);
-			column.getColumn().setWidth(bounds[i]);
 			column.getColumn().setResizable(true);
 			column.getColumn().setMoveable(true);
 		}
+		
 		Table table = editTable.getTable();
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
