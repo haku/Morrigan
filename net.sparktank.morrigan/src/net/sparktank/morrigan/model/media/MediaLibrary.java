@@ -1,5 +1,6 @@
 package net.sparktank.morrigan.model.media;
 
+import java.io.File;
 import java.util.List;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
@@ -52,6 +53,10 @@ public class MediaLibrary extends MediaList {
 	
 	public void removeSource (String source) throws DbException {
 		dbLayer.removeSource(source);
+	}
+	
+	public void addFile (File file) throws DbException {
+		dbLayer.addFile(file);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
