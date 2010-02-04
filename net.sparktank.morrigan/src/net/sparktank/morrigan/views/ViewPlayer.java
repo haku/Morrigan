@@ -152,6 +152,19 @@ public class ViewPlayer extends ViewPart {
 		
 	}
 	
+	private MediaTrack getNextTrackToPlay () {
+		List<MediaTrack> mediaTracks = currentList.getMediaTracks();
+		if (mediaTracks.contains(currentTrack)) {
+			int i = mediaTracks.indexOf(currentTrack) + 1;
+			if (i >= mediaTracks.size()) i = 0;
+			
+			return mediaTracks.get(i);
+			
+		} else {
+			return null;
+		}
+	}
+	
 	private IPlaybackStatusListener playbackStatusListener = new IPlaybackStatusListener () {
 		
 		@Override
@@ -170,18 +183,14 @@ public class ViewPlayer extends ViewPart {
 	private Runnable atEndOfTrack = new Runnable() {
 		@Override
 		public void run() {
-			List<MediaTrack> mediaTracks = currentList.getMediaTracks();
-			if (mediaTracks.contains(currentTrack)) {
-				int i = mediaTracks.indexOf(currentTrack) + 1;
-				if (i >= mediaTracks.size()) i = 0;
-				
-				loadAndStartPlaying(currentList, mediaTracks.get(i));
+			MediaTrack nextTrackToPlay = getNextTrackToPlay();
+			if (nextTrackToPlay != null) {
+				loadAndStartPlaying(currentList, nextTrackToPlay);
 				
 			} else {
 				currentTrack = null;
+				getSite().getShell().getDisplay().asyncExec(updateStatusRunable);
 			}
-			
-			getSite().getShell().getDisplay().asyncExec(updateStatusRunable);
 		}
 	};
 	
@@ -250,13 +259,16 @@ public class ViewPlayer extends ViewPart {
 	
 	private IAction nextAction = new Action("next", Activator.getImageDescriptor("icons/next.gif")) {
 		public void run() {
-			new MorriganMsgDlg("TODO: implement next desu~.").open();
+			MediaTrack nextTrackToPlay = getNextTrackToPlay();
+			if (nextTrackToPlay != null) {
+				loadAndStartPlaying(currentList, nextTrackToPlay);
+			}
 		};
 	};
 	
 	private IAction prevAction = new Action("previous", Activator.getImageDescriptor("icons/prev.gif")) {
 		public void run() {
-			new MorriganMsgDlg("TODO: implement prev desu~.").open();
+			new MorriganMsgDlg("TODO: implement previous desu~.").open();
 		};
 	};
 	
