@@ -16,7 +16,6 @@ public class MorriganMsgDlg extends MessageDialog {
 	public static final String[] COPYCONTINUE = {"Copy", "Continue"};
 	
 	private Exception exception = null;
-	private Display display;
 	
 	public MorriganMsgDlg(String dialogMessage) {
 		super(
@@ -34,7 +33,7 @@ public class MorriganMsgDlg extends MessageDialog {
 				MessageDialog.INFORMATION, answers, 0);
 	}
 	
-	public MorriganMsgDlg(Exception e, Display display) {
+	public MorriganMsgDlg(Exception e) {
 		super(
 				Display.getCurrent().getActiveShell(), 
 				"Morrigan", null, 
@@ -49,7 +48,7 @@ public class MorriganMsgDlg extends MessageDialog {
 		int open = super.open();
 		
 		if (exception!=null && open==OK) {
-			Clipboard clipboard = new Clipboard(display);
+			Clipboard clipboard = new Clipboard(Display.getCurrent());
 			TextTransfer textTransfer = TextTransfer.getInstance();
 			clipboard.setContents(new String[]{getStackTrace(exception)}, new Transfer[]{textTransfer});
 	        clipboard.dispose();

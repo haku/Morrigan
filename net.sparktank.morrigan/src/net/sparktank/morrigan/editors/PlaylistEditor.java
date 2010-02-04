@@ -56,7 +56,7 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 		try {
 			getEditedMediaList().writeToFile();
 		} catch (MorriganException e) {
-			new MorriganMsgDlg(e, getSite().getShell().getDisplay());
+			new MorriganMsgDlg(e);
 		}
 	}
 	

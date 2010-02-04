@@ -114,7 +114,7 @@ public class ViewPlayer extends ViewPart {
 		} catch (PlaybackException e) {
 			currentTrack = null;
 			e.printStackTrace();
-			new MorriganMsgDlg(e, getSite().getShell().getDisplay()).open();
+			new MorriganMsgDlg(e).open();
 		}
 		
 		updateGui();
@@ -131,7 +131,7 @@ public class ViewPlayer extends ViewPart {
 			stopPlaying();
 			updateGui();
 		} catch (PlaybackException e) {
-			new MorriganMsgDlg(e, getSite().getShell().getDisplay()).open();
+			new MorriganMsgDlg(e).open();
 		}
 	}
 	

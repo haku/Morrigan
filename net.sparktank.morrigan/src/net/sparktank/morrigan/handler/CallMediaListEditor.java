@@ -55,7 +55,7 @@ public class CallMediaListEditor extends AbstractHandler implements IHandler {
 					try {
 						playList = MediaListFactory.makeMediaPlaylist(item.identifier);
 					} catch (MorriganException e) {
-						new MorriganMsgDlg(e, view.getSite().getShell().getDisplay()).open();
+						new MorriganMsgDlg(e).open();
 						return null;
 					}
 					
@@ -63,7 +63,7 @@ public class CallMediaListEditor extends AbstractHandler implements IHandler {
 					try {
 						page.openEditor(input, PlaylistEditor.ID);
 					} catch (PartInitException e) {
-						new MorriganMsgDlg(e, view.getSite().getShell().getDisplay()).open();
+						new MorriganMsgDlg(e).open();
 						return null;
 					}
 					
@@ -72,7 +72,7 @@ public class CallMediaListEditor extends AbstractHandler implements IHandler {
 					try {
 						ml = MediaListFactory.makeMediaLibrary(Config.SQLITE_DBNAME_TITLE, Config.getLocalDbFile());
 					} catch (DbException e) {
-						new MorriganMsgDlg(e, view.getSite().getShell().getDisplay()).open();
+						new MorriganMsgDlg(e).open();
 						return null;
 					}
 					
@@ -80,7 +80,7 @@ public class CallMediaListEditor extends AbstractHandler implements IHandler {
 					try {
 						page.openEditor(input, LibraryEditor.ID);
 					} catch (PartInitException e) {
-						new MorriganMsgDlg(e, view.getSite().getShell().getDisplay()).open();
+						new MorriganMsgDlg(e).open();
 						return null;
 					}
 					

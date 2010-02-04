@@ -6,6 +6,7 @@ import java.util.List;
 import net.sparktank.morrigan.Activator;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.library.DbException;
+import net.sparktank.morrigan.library.LibraryUpdateTask;
 import net.sparktank.morrigan.model.media.MediaLibrary;
 
 import org.eclipse.jface.action.Action;
@@ -79,6 +80,7 @@ public class ViewLibraryProperties extends ViewPart {
 	private void addToolbar () {
 		getViewSite().getActionBars().getToolBarManager().add(addAction);
 		getViewSite().getActionBars().getToolBarManager().add(removeAction);
+		getViewSite().getActionBars().getToolBarManager().add(new LibraryUpdateTask());
 	}
 	
 	private void updateGui () {
@@ -104,7 +106,7 @@ public class ViewLibraryProperties extends ViewPart {
 				try {
 					sources = library.getSources();
 				} catch (DbException e) {
-					new MorriganMsgDlg(e, getSite().getShell().getDisplay());
+					new MorriganMsgDlg(e);
 				}
 				
 				return sources.toArray();
@@ -163,7 +165,7 @@ public class ViewLibraryProperties extends ViewPart {
 				try {
 					library.addSource(dir);
 				} catch (DbException e) {
-					new MorriganMsgDlg(e, getSite().getShell().getDisplay()).open();
+					new MorriganMsgDlg(e).open();
 				}
 				updateGui();
 			}
@@ -190,7 +192,7 @@ public class ViewLibraryProperties extends ViewPart {
 					try {
 						library.removeSource(item);
 					} catch (DbException e) {
-						new MorriganMsgDlg(e, getSite().getShell().getDisplay()).open();
+						new MorriganMsgDlg(e).open();
 					}
 					updateGui();
 				}

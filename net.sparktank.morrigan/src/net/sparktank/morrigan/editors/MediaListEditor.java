@@ -196,7 +196,7 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 			try {
 				handlerService.executeCommand(CallPlayMedia.ID, null);
 			} catch (CommandException e) {
-				new MorriganMsgDlg(e, getSite().getShell().getDisplay()).open();
+				new MorriganMsgDlg(e).open();
 			}
 		}
 	};

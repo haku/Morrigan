@@ -128,7 +128,7 @@ public class ViewMediaExplorer extends ViewPart {
 			try {
 				handlerService.executeCommand(CallMediaListEditor.ID, null);
 			} catch (CommandException e) {
-				new MorriganMsgDlg(e, getSite().getShell().getDisplay()).open();
+				new MorriganMsgDlg(e).open();
 			}
 		}
 	};

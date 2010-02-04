@@ -64,7 +64,7 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 				viewProp.setContent(getEditedMediaList());
 				
 			} catch (Exception e) {
-				new MorriganMsgDlg(e, getSite().getShell().getDisplay());
+				new MorriganMsgDlg(e);
 			}
 			
 		}
