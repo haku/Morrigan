@@ -1,11 +1,11 @@
 package net.sparktank.morrigan.views;
 
 import net.sparktank.morrigan.Activator;
-import net.sparktank.morrigan.config.Config;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.model.media.MediaTrack;
 import net.sparktank.morrigan.playback.IPlaybackEngine;
 import net.sparktank.morrigan.playback.ImplException;
+import net.sparktank.morrigan.playback.PlaybackEngineFactory;
 import net.sparktank.morrigan.playback.PlaybackException;
 
 import org.eclipse.jface.action.Action;
@@ -58,17 +58,7 @@ public class ViewPlayer extends ViewPart {
 	
 	private IPlaybackEngine getPlaybackEngine (boolean create) throws ImplException {
 		if (playbackEngine == null && create) {
-			Class<?> [] classParm = null;
-			Object [] objectParm = null;
-			
-			try {
-				Class<?> cl = Class.forName(Config.PLAYBACK_ENGINE);
-				java.lang.reflect.Constructor<?> co = cl.getConstructor(classParm);
-				playbackEngine = (IPlaybackEngine) co.newInstance(objectParm);
-				
-			} catch (Exception e) {
-				throw new ImplException(e);
-			}
+			playbackEngine = PlaybackEngineFactory.makePlaybackEngine();
 		}
 		
 		return playbackEngine;

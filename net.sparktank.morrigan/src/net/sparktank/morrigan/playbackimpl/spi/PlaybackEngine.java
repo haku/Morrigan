@@ -18,6 +18,11 @@ import net.sparktank.morrigan.playback.PlaybackException;
 public class PlaybackEngine implements IPlaybackEngine {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	// TODO Any more?
+	private final static String[] SUPPORTED_FORMATS = {"wav", "mp3", "ogg"};
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
 	private volatile boolean m_stopPlaying;
 	private Runnable onFinishHandler;
 	private String filepath;
@@ -29,6 +34,11 @@ public class PlaybackEngine implements IPlaybackEngine {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	IPlaybackEngine methods.
+	
+	@Override
+	public String[] getSupportedFormats() {
+		return SUPPORTED_FORMATS;
+	}
 	
 	@Override
 	public void setFile(String filepath) {

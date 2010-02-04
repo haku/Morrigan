@@ -1,10 +1,13 @@
 package net.sparktank.morrigan.library;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
 
 import net.sparktank.morrigan.model.media.MediaLibrary;
+import net.sparktank.morrigan.playback.ImplException;
+import net.sparktank.morrigan.playback.PlaybackEngineFactory;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -36,6 +39,14 @@ public class LibraryUpdateTask extends Job {
 		
 		monitor.subTask("Scanning sources");
 		
+		List<String> supportedFormats;
+		try {
+			supportedFormats = Arrays.asList(PlaybackEngineFactory.getSupportedFormats());
+		} catch (ImplException e) {
+			monitor.done();
+			return new FailStatus("Failed to retrieve list of supported formats.", e);
+		}
+		
 		List<String> sources = null;
 		try {
 			sources = library.getSources();
@@ -59,14 +70,16 @@ public class LibraryUpdateTask extends Job {
 							dirStack.push(file);
 							
 						} else if (file.isFile()) {
-							try {
-								// TODO check file type.
-								library.addFile(file);
-							} catch (DbException e) {
-								// FIXME log this somewhere useful.
-								e.printStackTrace();
+							String ext = file.getName();
+							ext = ext.substring(ext.lastIndexOf(".")+1).toLowerCase();
+							if (supportedFormats.contains(ext)) {
+								try {
+									library.addFile(file);
+								} catch (DbException e) {
+									// FIXME log this somewhere useful.
+									e.printStackTrace();
+								}
 							}
-							
 						}
 						
 						if (monitor.isCanceled()) break;
@@ -84,6 +97,65 @@ public class LibraryUpdateTask extends Job {
 		
 		monitor.done();
 		return Status.OK_STATUS;
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	public class FailStatus implements IStatus {
+		
+		private final String message;
+		private final Exception e;
+
+		public FailStatus (String message, Exception e) {
+			this.message = message;
+			this.e = e;
+		}
+		
+		@Override
+		public IStatus[] getChildren() {
+			return null;
+		}
+		
+		@Override
+		public int getCode() {
+			return 0;
+		}
+		
+		@Override
+		public Throwable getException() {
+			return e;
+		}
+		
+		@Override
+		public String getMessage() {
+			return message;
+		}
+		
+		@Override
+		public String getPlugin() {
+			return null;
+		}
+		
+		@Override
+		public int getSeverity() {
+			return 0;
+		}
+		
+		@Override
+		public boolean isMultiStatus() {
+			return false;
+		}
+		
+		@Override
+		public boolean isOK() {
+			return false;
+		}
+		
+		@Override
+		public boolean matches(int severityMask) {
+			return false;
+		}
+		
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

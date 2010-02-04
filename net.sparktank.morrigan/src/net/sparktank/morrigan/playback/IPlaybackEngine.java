@@ -3,6 +3,13 @@ package net.sparktank.morrigan.playback;
 public interface IPlaybackEngine {
 	
 	/**
+	 * Returns a list of the file extensions that can be played
+	 * when this engine is loaded.
+	 * @return Array of lower-case strings without dots.  e.g. "mp3", "ogg".
+	 */
+	public String[] getSupportedFormats ();
+	
+	/**
 	 * Set the file to play.  Weather it is actually
 	 * loaded here or when needed is implementation specific.
 	 * Will stop playback if needed.
