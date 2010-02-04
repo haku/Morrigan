@@ -22,12 +22,12 @@ public class MediaPlaylist extends MediaList {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public MediaPlaylist(String filePath) throws MorriganException {
+	private MediaPlaylist(String filePath) throws MorriganException {
 		super(filePath, getFilenameFromPath(filePath));
 		this.filePath = filePath;
 	}
 	
-	public MediaPlaylist(String filePath, boolean newPl) throws MorriganException {
+	MediaPlaylist(String filePath, boolean newPl) throws MorriganException {
 		super(filePath, getFilenameFromPath(filePath));
 		this.filePath = filePath;
 		this.newPl = newPl;
@@ -45,6 +45,12 @@ public class MediaPlaylist extends MediaList {
 		} else {
 			loadFromFile();
 		}
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	public String getFilePath () {
+		return filePath;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
