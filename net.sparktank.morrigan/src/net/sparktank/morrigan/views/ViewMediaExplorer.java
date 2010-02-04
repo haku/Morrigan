@@ -6,13 +6,13 @@ import java.util.Map;
 
 import net.sparktank.morrigan.Activator;
 import net.sparktank.morrigan.actions.NewPlaylistAction;
+import net.sparktank.morrigan.config.Config;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.handler.CallMediaListEditor;
 import net.sparktank.morrigan.helpers.PlaylistHelper;
 import net.sparktank.morrigan.model.ui.MediaExplorerItem;
 
 import org.eclipse.core.commands.common.CommandException;
-import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -138,15 +138,15 @@ public class ViewMediaExplorer extends ViewPart {
 	}
 	
 	private void addMenu () {
-		getViewSite().getActionBars().getMenuManager().add(new NewPlaylistAction(getViewSite().getWorkbenchWindow()));
-		getViewSite().getActionBars().getMenuManager().add(new Separator());
-		getViewSite().getActionBars().getMenuManager().add(new NewPlaylistAction(getViewSite().getWorkbenchWindow()));
+//		getViewSite().getActionBars().getMenuManager().add(new NewPlaylistAction(getViewSite().getWorkbenchWindow()));
+//		getViewSite().getActionBars().getMenuManager().add(new Separator());
+//		getViewSite().getActionBars().getMenuManager().add(new NewPlaylistAction(getViewSite().getWorkbenchWindow()));
 	}
 	
 	private void makeContent () {
 		items.clear();
-		items.add(new MediaExplorerItem("dis", "Display", MediaExplorerItem.ItemType.DISPLAY));
-		items.add(new MediaExplorerItem("lib", "Library", MediaExplorerItem.ItemType.LIBRARY));
+//		items.add(new MediaExplorerItem("dis", "Display", MediaExplorerItem.ItemType.DISPLAY));
+		items.add(new MediaExplorerItem("lib", Config.SQLITE_DBNAME_TITLE, MediaExplorerItem.ItemType.LIBRARY));
 		items.addAll(PlaylistHelper.instance.getAllPlaylists());
 	}
 	
