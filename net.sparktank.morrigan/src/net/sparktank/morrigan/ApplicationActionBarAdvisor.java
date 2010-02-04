@@ -27,15 +27,25 @@ import org.eclipse.ui.application.IActionBarConfigurer;
  * new actions.
  */
 public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
-
-	// Actions - important to allocate these only in makeActions, and then use them
-	// in the fill methods. This ensures that the actions aren't recreated
-	// when fillActionBars is called with FILL_PROXY.
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	IDs for RetargetAction.
+	
+	public static final String ACTIONID_ADD = "morrigan.add";
+	public static final String ACTIONID_REMOVE = "morrigan.remove";
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Action instances.
+/*
+ * 	Actions - important to allocate these only in makeActions, and then use them
+ *  in the fill methods. This ensures that the actions aren't recreated
+ *  when fillActionBars is called with FILL_PROXY.
+ */
+	
+	// Global actions.
 	private IWorkbenchAction exitAction;
 	
-	// Window.
+	// Window management actions.
 	private IWorkbenchAction resetPerspectiveAction;
-	private MenuManager showViewMenuMgr;
 	private IContributionItem showViewItemShortList;
 	
 	// List actions.
@@ -44,19 +54,27 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	private RetargetAction addAction;
 	private RetargetAction removeAction;
 	
-	public static final String ADD_ACTIONID = "morrigan.add";
-	public static final String REMOVE_ACTIONID = "morrigan.remove";
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	private MenuManager showViewMenuMgr;
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Constructor.
 	
 	public ApplicationActionBarAdvisor(IActionBarConfigurer configurer) {
 		super(configurer);
 	}
-
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Action creation.
+	
 	@Override
 	protected void makeActions(final IWorkbenchWindow window) {
-		// Creates the actions and registers them.
-		// Registering is needed to ensure that key bindings work.
-		// The corresponding commands keybindings are defined in the plugin.xml file.
-		// Registering also provides automatic disposal of the actions when the window is closed.
+		/* Creates the actions and registers them.
+		 * Registering is needed to ensure that key bindings work.
+		 * The corresponding commands keybindings are defined in the plugin.xml file.
+		 * Registering also provides automatic disposal of the actions when the window is closed.
+		 */
 		
 		newPlayListAction = new NewPlaylistAction(window);
 		register(newPlayListAction);
@@ -65,25 +83,31 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		register(exitAction);
 		
 		resetPerspectiveAction = ActionFactory.RESET_PERSPECTIVE.create(window);
+		register(resetPerspectiveAction);
+		
 		showViewMenuMgr = new MenuManager("Show view", "showView");
+		
 		showViewItemShortList = ContributionItemFactory.VIEWS_SHORTLIST.create(window);
 		
 		// Editor actions.
 		saveAction = ActionFactory.SAVE.create(window);
 		register(saveAction);
 		
-		addAction = new RetargetAction(ADD_ACTIONID, "&add files...");
+		addAction = new RetargetAction(ACTIONID_ADD, "&add files...");
 		addAction.setImageDescriptor(Activator.getImageDescriptor("icons/plus.gif"));
 		getActionBarConfigurer().registerGlobalAction(addAction);
 		register(addAction);
 		window.getPartService().addPartListener(addAction);
 		
-		removeAction = new RetargetAction(REMOVE_ACTIONID, "&remove selected...");
+		removeAction = new RetargetAction(ACTIONID_REMOVE, "&remove selected...");
 		removeAction.setImageDescriptor(Activator.getImageDescriptor("icons/minus.gif"));
 		getActionBarConfigurer().registerGlobalAction(removeAction);
 		register(removeAction);
 		window.getPartService().addPartListener(removeAction);
 	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Action asignment.
 	
 	@Override
 	protected void fillMenuBar(IMenuManager menuBar) {
@@ -115,5 +139,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		fileToolBar.add(removeAction);
 		coolBar.add(new ToolBarContributionItem(fileToolBar));
 	}
-
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

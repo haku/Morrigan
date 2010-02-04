@@ -37,8 +37,8 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 	
 	@Override
 	public void setFocus() {
-		getEditorSite().getActionBars().setGlobalActionHandler(ApplicationActionBarAdvisor.ADD_ACTIONID, addAction);
-		getEditorSite().getActionBars().setGlobalActionHandler(ApplicationActionBarAdvisor.REMOVE_ACTIONID, removeAction);
+		getEditorSite().getActionBars().setGlobalActionHandler(ApplicationActionBarAdvisor.ACTIONID_ADD, addAction);
+		getEditorSite().getActionBars().setGlobalActionHandler(ApplicationActionBarAdvisor.ACTIONID_REMOVE, removeAction);
 	}
 	
 	@Override
