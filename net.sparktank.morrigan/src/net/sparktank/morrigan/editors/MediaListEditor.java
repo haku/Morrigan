@@ -230,7 +230,7 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		editTable.refresh();
 	}
 	
-	protected T getEditedMediaList () {
+	public T getEditedMediaList () {
 		return editedMediaList;
 	}
 	
