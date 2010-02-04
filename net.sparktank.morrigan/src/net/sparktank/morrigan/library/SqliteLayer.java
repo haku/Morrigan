@@ -1,5 +1,6 @@
 package net.sparktank.morrigan.library;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -71,6 +72,14 @@ public class SqliteLayer {
 		}
 	}
 	
+	public void addFile (File file) throws DbException {
+		try {
+			local_addTrack(file);
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Schema.
 	
@@ -116,6 +125,13 @@ public class SqliteLayer {
 		"SELECT sfile, dadded, lstartcnt, lendcnt, dlastplay, " +
 	    "lmd5, lduration, benabled, bmissing FROM tbl_mediafiles " +
 	    "ORDER BY sfile COLLATE NOCASE ASC;";
+	
+	private static final String SQL_TBL_MEDIAFILES_Q_EXISTS =
+		"SELECT * FROM tbl_mediafiles WHERE sfile=? COLLATE NOCASE;";
+	
+	private static final String SQL_TBL_MEDIAFILES_ADD =
+		"INSERT INTO tbl_mediafiles (sfile,dadded,lstartcnt,lendcnt,lduration,benabled) VALUES " +
+		"(?,date('now'),0,0,0,1);";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	DB connection.
@@ -184,6 +200,7 @@ public class SqliteLayer {
 		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_SOURCES_ADD);
 		ps.setString(1, source);
 		int n = ps.executeUpdate();
+		ps.close();
 		if (n<1) throw new DbException("No update occured.");
 	}
 	
@@ -191,11 +208,12 @@ public class SqliteLayer {
 		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_SOURCES_REMOVE);
 		ps.setString(1, source);
 		int n = ps.executeUpdate();
+		ps.close();
 		if (n<1) throw new DbException("No update occured.");
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Query.
+//	Media.
 	
 	private List<MediaTrack> local_getAllMedia () throws SQLException, ClassNotFoundException {
 		Statement stat = getDbCon().createStatement();
@@ -215,6 +233,31 @@ public class SqliteLayer {
 		stat.close();
 		
 		return ret;
+	}
+	
+	private void local_addTrack (File file) throws SQLException, ClassNotFoundException, DbException {
+		PreparedStatement ps;
+		ResultSet rs;
+		
+		String filePath = file.getAbsolutePath();
+		
+		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_Q_EXISTS);
+		ps.setString(1, filePath);
+		rs = ps.executeQuery();
+		int n = 0;
+		if (rs.next()) {
+			rs.getInt(1);
+		}
+		rs.close();
+		ps.close();
+		
+		if (n == 0) {
+			ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_ADD);
+			ps.setString(1, filePath);
+			n = ps.executeUpdate();
+			ps.close();
+			if (n<1) throw new DbException("No update occured.");
+		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
