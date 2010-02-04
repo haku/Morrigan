@@ -46,5 +46,13 @@ public class MediaLibrary extends MediaList {
 		return dbLayer.getSources();
 	}
 	
+	public void addSource (String source) throws DbException {
+		dbLayer.addSource(source);
+	}
+	
+	public void removeSource (String source) throws DbException {
+		dbLayer.removeSource(source);
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
