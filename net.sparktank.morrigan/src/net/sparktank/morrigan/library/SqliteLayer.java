@@ -2,6 +2,7 @@ package net.sparktank.morrigan.library;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -25,9 +26,7 @@ public class SqliteLayer {
 		
 		try {
 			initDatabaseTables();
-		} catch (SQLException e) {
-			throw new DbException(e);
-		} catch (ClassNotFoundException e) {
+		} catch (Exception e) {
 			throw new DbException(e);
 		}
 	}
@@ -35,17 +34,39 @@ public class SqliteLayer {
 	public void dispose () throws DbException {
 		try {
 			disposeDbCon();
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			throw new DbException(e);
 		}
 	}
 	
 	public List<MediaTrack> getAllMedia () throws DbException {
 		try {
-			return query_getAllMedia();
-		} catch (SQLException e) {
+			return local_getAllMedia();
+		} catch (Exception e) {
 			throw new DbException(e);
-		} catch (ClassNotFoundException e) {
+		}
+	}
+	
+	public List<String> getSources () throws DbException {
+		try {
+			return local_getSources();
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+	
+	public void addSource (String source) throws DbException {
+		try {
+			local_addSource(source);
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+	
+	public void removeSource (String source) throws DbException {
+		try {
+			local_removeSource(source);
+		} catch (Exception e) {
 			throw new DbException(e);
 		}
 	}
@@ -54,7 +75,7 @@ public class SqliteLayer {
 //	Schema.
 	
 	private static final String SQL_TBL_MEDIAFILES_EXISTS = 
-		"SELECT name FROM sqlite_master WHERE name='tbl_mediafiles'";
+		"SELECT name FROM sqlite_master WHERE name='tbl_mediafiles';";
 	
 	private static final String SQL_TBL_MEDIAFILES_CREATE = 
 		"create table tbl_mediafiles(" +
@@ -68,8 +89,28 @@ public class SqliteLayer {
 	    "benabled INT(1)," +
 	    "bmissing INT(1));";
 	
+	private static final String SQL_TBL_SOURCES_EXISTS =
+		"SELECT name FROM sqlite_master WHERE name='tbl_sources';";
+	
+	private static final String SQL_TBL_SOURCES_CREATE = 
+		"CREATE TABLE tbl_sources (" +
+		"path VARCHAR(1000) NOT NULL  collate nocase primary key" +
+		");";
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Queries.
+//	Sources.
+	
+	private static final String SQL_TBL_SOURCES_Q_ALL =
+		"SELECT path FROM tbl_sources;";
+	
+	private static final String SQL_TBL_SOURCES_ADD =
+		"INSERT INTO tbl_sources (path) VALUES (?)";
+	
+	private static final String SQL_TBL_SOURCES_REMOVE =
+		"DELETE FROM tbl_sources WHERE path=?";
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Library queries.
 	
 	private static final String SQL_TBL_MEDIAFILES_Q_ALL = 
 		"SELECT sfile, dadded, lstartcnt, lendcnt, dlastplay, " +
@@ -103,19 +144,60 @@ public class SqliteLayer {
 	private void initDatabaseTables () throws SQLException, ClassNotFoundException {
 		Statement stat = getDbCon().createStatement();
 		
-		ResultSet rs = stat.executeQuery(SQL_TBL_MEDIAFILES_EXISTS);
+		ResultSet rs;
+		
+		rs = stat.executeQuery(SQL_TBL_MEDIAFILES_EXISTS);
 		if (!rs.next()) { // True if there are rows in the result.
 			stat.executeUpdate(SQL_TBL_MEDIAFILES_CREATE);
+		}
+		rs.close();
+		
+		rs = stat.executeQuery(SQL_TBL_SOURCES_EXISTS);
+		if (!rs.next()) { // True if there are rows in the result.
+			stat.executeUpdate(SQL_TBL_SOURCES_CREATE);
+		}
+		rs.close();
+		
+		stat.close();
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Sources.
+	
+	private List<String> local_getSources () throws SQLException, ClassNotFoundException {
+		Statement stat = getDbCon().createStatement();
+		ResultSet rs = stat.executeQuery(SQL_TBL_SOURCES_Q_ALL);
+		
+		List<String> ret = new ArrayList<String>();
+		
+		while (rs.next()) {
+			ret.add(rs.getString("path"));
 		}
 		
 		rs.close();
 		stat.close();
+		
+		return ret;
+	}
+	
+	private void local_addSource (String source) throws SQLException, ClassNotFoundException, DbException {
+		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_SOURCES_ADD);
+		ps.setString(1, source);
+		int n = ps.executeUpdate();
+		if (n<1) throw new DbException("No update occured.");
+	}
+	
+	private void local_removeSource (String source) throws SQLException, ClassNotFoundException, DbException {
+		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_SOURCES_REMOVE);
+		ps.setString(1, source);
+		int n = ps.executeUpdate();
+		if (n<1) throw new DbException("No update occured.");
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Query.
 	
-	private List<MediaTrack> query_getAllMedia () throws SQLException, ClassNotFoundException {
+	private List<MediaTrack> local_getAllMedia () throws SQLException, ClassNotFoundException {
 		Statement stat = getDbCon().createStatement();
 		ResultSet rs = stat.executeQuery(SQL_TBL_MEDIAFILES_Q_ALL);
 		
