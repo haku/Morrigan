@@ -1,13 +1,15 @@
 package net.sparktank.morrigan.editors;
 
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IAction;
-
 import net.sparktank.morrigan.ApplicationActionBarAdvisor;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.model.media.MediaLibrary;
+import net.sparktank.morrigan.views.ViewLibraryProperties;
+
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.ui.IViewPart;
 
 public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -55,7 +57,16 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 	
 	private IAction showPropertiesAction = new Action("showProperties") {
 		public void run () {
-			new MorriganMsgDlg("TODO: show properties.").open();
+			
+			try {
+				IViewPart showView = getSite().getPage().showView(ViewLibraryProperties.ID);
+				ViewLibraryProperties viewProp = (ViewLibraryProperties) showView;
+				viewProp.setContent(getEditedMediaList());
+				
+			} catch (Exception e) {
+				new MorriganMsgDlg(e, getSite().getShell().getDisplay());
+			}
+			
 		}
 	};
 	
