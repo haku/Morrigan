@@ -80,7 +80,7 @@ public class ViewLibraryProperties extends ViewPart {
 	private void addToolbar () {
 		getViewSite().getActionBars().getToolBarManager().add(addAction);
 		getViewSite().getActionBars().getToolBarManager().add(removeAction);
-		getViewSite().getActionBars().getToolBarManager().add(new LibraryUpdateTask());
+		getViewSite().getActionBars().getToolBarManager().add(updateAction);
 	}
 	
 	private void updateGui () {
@@ -200,6 +200,18 @@ public class ViewLibraryProperties extends ViewPart {
 			
 			
 		};
+	};
+	
+	private IAction updateAction = new Action("update", Activator.getImageDescriptor("icons/play.gif")) {
+		public void run() {
+			if (library==null) {
+				new MorriganMsgDlg("No library selected desu~.").open();
+				return;
+			}
+			
+			LibraryUpdateTask job = new LibraryUpdateTask(library);
+			job.schedule();
+		}
 	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
