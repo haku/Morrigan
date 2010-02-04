@@ -178,11 +178,25 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 	private Runnable dirtyChange = new Runnable() {
 		@Override
 		public void run() {
-			firePropertyChange(PROP_DIRTY);
+			getSite().getShell().getDisplay().asyncExec(dirtyChangedRunable);
 		}
 	};
 	
 	private Runnable listChange = new Runnable() {
+		@Override
+		public void run() {
+			getSite().getShell().getDisplay().asyncExec(updateGuiRunable);
+		}
+	};
+	
+	private Runnable dirtyChangedRunable = new Runnable() {
+		@Override
+		public void run() {
+			firePropertyChange(PROP_DIRTY);
+		}
+	};
+	
+	private Runnable updateGuiRunable = new Runnable() {
 		@Override
 		public void run() {
 			refreshUi();
