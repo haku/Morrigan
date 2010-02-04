@@ -127,7 +127,7 @@ public class SqliteLayer {
 	    "ORDER BY sfile COLLATE NOCASE ASC;";
 	
 	private static final String SQL_TBL_MEDIAFILES_Q_EXISTS =
-		"SELECT * FROM tbl_mediafiles WHERE sfile=? COLLATE NOCASE;";
+		"SELECT count(*) FROM tbl_mediafiles WHERE sfile=? COLLATE NOCASE;";
 	
 	private static final String SQL_TBL_MEDIAFILES_ADD =
 		"INSERT INTO tbl_mediafiles (sfile,dadded,lstartcnt,lendcnt,lduration,benabled) VALUES " +
@@ -246,7 +246,7 @@ public class SqliteLayer {
 		rs = ps.executeQuery();
 		int n = 0;
 		if (rs.next()) {
-			rs.getInt(1);
+			n = rs.getInt(1);
 		}
 		rs.close();
 		ps.close();
