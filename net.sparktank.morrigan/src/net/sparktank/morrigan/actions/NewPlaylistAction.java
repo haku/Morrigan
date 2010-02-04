@@ -52,7 +52,7 @@ public class NewPlaylistAction extends MorriganAction {
 			try {
 				PlaylistHelper.instance.createPl(plName);
 			} catch (MorriganException e) {
-				new MorriganMsgDlg(e).open();
+				new MorriganMsgDlg(e, window.getShell().getDisplay()).open();
 				return;
 			}
 			

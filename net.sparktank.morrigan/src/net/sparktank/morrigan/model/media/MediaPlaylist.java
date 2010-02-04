@@ -17,19 +17,26 @@ public class MediaPlaylist extends MediaList {
 	
 	private Logger logger = Logger.getLogger(this.getClass().getName());
 	
+	private boolean newPl = false;
 	private String filePath = null;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public MediaPlaylist(String filePath) throws MorriganException {
-		super(getFilenameFromPath(filePath));
+		super(filePath, getFilenameFromPath(filePath));
 		this.filePath = filePath;
-		loadFromFile();
 	}
 	
 	public MediaPlaylist(String filePath, boolean newPl) throws MorriganException {
-		super(getFilenameFromPath(filePath));
+		super(filePath, getFilenameFromPath(filePath));
 		this.filePath = filePath;
+		this.newPl = newPl;
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	@Override
+	public void read () throws MorriganException {
 		if (newPl) {
 			if (new File(filePath).exists()) {
 				throw new MorriganException("Play list already exists.");
@@ -59,7 +66,7 @@ public class MediaPlaylist extends MediaList {
 		try {
 			int n = 0;
 			while ((text = reader.readLine()) != null) {
-				addTrack(text);
+				addTrack(new MediaTrack(text));
 				n++;
 			}
 			logger.fine("Read " + n + " lines from '" + filePath + "'.");

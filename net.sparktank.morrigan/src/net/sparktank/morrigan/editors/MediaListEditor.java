@@ -3,6 +3,7 @@ package net.sparktank.morrigan.editors;
 import java.util.ArrayList;
 
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
+import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.handler.CallPlayMedia;
 import net.sparktank.morrigan.model.media.MediaList;
 import net.sparktank.morrigan.model.media.MediaTrack;
@@ -59,6 +60,12 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 			editedMediaList = ((MediaListEditorInput<T>) input).getEditedMediaList();
 		} else {
 			throw new IllegalArgumentException("input is not instanceof MediaListEditorInput<?>.");
+		}
+		
+		try {
+			editedMediaList.read();
+		} catch (MorriganException e) {
+			throw new PartInitException("Exception while calling read().", e);
 		}
 		
 		setPartName(editedMediaList.getListName());
@@ -189,7 +196,7 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 			try {
 				handlerService.executeCommand(CallPlayMedia.ID, null);
 			} catch (CommandException e) {
-				new MorriganMsgDlg(e).open();
+				new MorriganMsgDlg(e, getSite().getShell().getDisplay()).open();
 			}
 		}
 	};
@@ -206,7 +213,7 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 	}
 	
 	protected void addTrack (String file) {
-		editedMediaList.addTrack(file);
+		editedMediaList.addTrack(new MediaTrack(file));
 	}
 	
 	protected void removeTrack (MediaTrack track) {

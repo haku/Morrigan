@@ -1,12 +1,12 @@
 package net.sparktank.morrigan.views;
 
 import net.sparktank.morrigan.Activator;
+import net.sparktank.morrigan.config.Config;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.model.media.MediaTrack;
 import net.sparktank.morrigan.playback.IPlaybackEngine;
 import net.sparktank.morrigan.playback.ImplException;
 import net.sparktank.morrigan.playback.PlaybackException;
-import net.sparktank.morrigan.var.Const;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -62,7 +62,7 @@ public class ViewPlayer extends ViewPart {
 			Object [] objectParm = null;
 			
 			try {
-				Class<?> cl = Class.forName(Const.PLAYBACK_ENGINE);
+				Class<?> cl = Class.forName(Config.PLAYBACK_ENGINE);
 				java.lang.reflect.Constructor<?> co = cl.getConstructor(classParm);
 				playbackEngine = (IPlaybackEngine) co.newInstance(objectParm);
 				
@@ -114,7 +114,7 @@ public class ViewPlayer extends ViewPart {
 		} catch (PlaybackException e) {
 			currentTrack = null;
 			e.printStackTrace();
-			new MorriganMsgDlg(e).open();
+			new MorriganMsgDlg(e, getSite().getShell().getDisplay()).open();
 		}
 		
 		updateGui();
@@ -131,7 +131,7 @@ public class ViewPlayer extends ViewPart {
 			stopPlaying();
 			updateGui();
 		} catch (PlaybackException e) {
-			new MorriganMsgDlg(e).open();
+			new MorriganMsgDlg(e, getSite().getShell().getDisplay()).open();
 		}
 	}
 	

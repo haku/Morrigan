@@ -42,6 +42,7 @@
    </extension>
    
    <extension point="org.eclipse.ui.editors">
+   
       <editor
             class="net.sparktank.morrigan.editors.PlaylistEditor"
             default="false"
@@ -49,6 +50,15 @@
             id="net.sparktank.morrigan.editors.PlaylistEditor"
             name="MediaListEditor" >
       </editor>
+      
+      <editor
+            class="net.sparktank.morrigan.editors.LibraryEditor"
+            default="false"
+            icon="icons/library.gif"
+            id="net.sparktank.morrigan.editors.LibraryEditor"
+            name="LibraryEditor" >
+      </editor>
+      
    </extension>
    
    <extension point="org.eclipse.ui.commands">

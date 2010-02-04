@@ -1,25 +1,28 @@
 package net.sparktank.morrigan.model.media;
 
+import java.util.List;
+
+import net.sparktank.morrigan.exceptions.MorriganException;
+import net.sparktank.morrigan.library.DbConFactory;
+import net.sparktank.morrigan.library.DbException;
+import net.sparktank.morrigan.library.SqliteLayer;
+
 public class MediaLibrary extends MediaList {
 	
-	private String mediaDbFilePath = null;
+	private SqliteLayer dbLayer;
 	
-	public MediaLibrary (String libraryName, String dbFilePath) {
-		super(libraryName);
-		mediaDbFilePath = dbFilePath;
+	public MediaLibrary (String libraryName, String dbFilePath) throws DbException {
+		super(dbFilePath, libraryName);
+		
+		dbLayer = DbConFactory.getDbLayer(dbFilePath);
 	}
 	
-	public int updateLibrary () {
+	@Override
+	public void read () throws MorriganException {
+		List<MediaTrack> allMedia = dbLayer.getAllMedia();
 		
-		// TODO load DB content and return status code.
-		
-		genTestContent();
-		return 1;
-	}
-	
-	private void genTestContent () {
-		for (int i=0; i<10; i++) {
-			addTrack("/media/track" + i);
+		for (MediaTrack mt : allMedia) {
+			addTrack(mt);
 		}
 	}
 	

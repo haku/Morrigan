@@ -4,17 +4,31 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class MediaList {
+import net.sparktank.morrigan.exceptions.MorriganException;
+
+public abstract class MediaList {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private String listName = null;
+	private final String listId;
+	private final String listName;
 	private List<MediaTrack> mediaTracks = new ArrayList<MediaTrack>();
 	
-	public MediaList (String listName) {
+	/**
+	 * listId must be unique.  It will be used to identify
+	 * the matching editor.
+	 * @param listId a unique ID.
+	 * @param listName a human-readable title for this list.
+	 */
+	public MediaList (String listId, String listName) {
+		this.listId = listId;
 		this.listName = listName;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	public String getListId () {
+		return listId;
+	}
 	
 	public String getListName () {
 		return listName;
@@ -65,6 +79,13 @@ public class MediaList {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	/**
+	 * This is the signal to read any source data needed.
+	 * This will be called soon after the constructor and before
+	 * any content is read.
+	 */
+	abstract public void read () throws MorriganException;
+	
+	/**
 	 * Returns an unmodifiable list of the playlist items.
 	 * @return
 	 */
@@ -72,11 +93,9 @@ public class MediaList {
 		return Collections.unmodifiableList(mediaTracks);
 	}
 	
-	public MediaTrack addTrack (String mediaFilePath) {
-		MediaTrack mt = new MediaTrack(mediaFilePath);
-		mediaTracks.add(mt);
+	public void addTrack (MediaTrack track) {
+		mediaTracks.add(track);
 		setDirty(true);
-		return mt;
 	}
 	
 	public void removeMediaTrack (MediaTrack track) {

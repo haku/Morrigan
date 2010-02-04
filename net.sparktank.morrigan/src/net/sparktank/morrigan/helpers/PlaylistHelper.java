@@ -24,6 +24,7 @@ public class PlaylistHelper {
 	public MediaPlaylist createPl (String plName) throws MorriganException {
 		String plFile = getPathForNewPlaylist(plName);
 		MediaPlaylist pl = new MediaPlaylist(plFile, true);
+		pl.read();
 		return pl;
 	}
 	

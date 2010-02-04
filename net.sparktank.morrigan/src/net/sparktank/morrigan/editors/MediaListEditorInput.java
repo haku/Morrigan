@@ -1,5 +1,6 @@
 package net.sparktank.morrigan.editors;
 
+import net.sparktank.morrigan.helpers.EqualHelper;
 import net.sparktank.morrigan.model.media.MediaList;
 
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -49,16 +50,14 @@ public class MediaListEditorInput<T extends MediaList> implements IEditorInput {
 		return null;
 	}
 	
-	// FIXME
 	@Override
-	public boolean equals(Object obj) {
-		if (super.equals(obj)) {
-			return true;
-		}
-		if (obj instanceof MediaListEditorInput<?>) {
-			return editedMediaList.equals(((MediaListEditorInput<?>) obj).getEditedMediaList());
-		}
-		return false;
+	public boolean equals(Object aThat) {
+		if ( aThat == null ) return false;
+		if ( this == aThat ) return true;
+		if ( !(aThat instanceof MediaListEditorInput<?>) ) return false;
+		MediaListEditorInput<?> that = (MediaListEditorInput<?>)aThat;
+		
+		return EqualHelper.areEqual(editedMediaList.getListId(), that.getEditedMediaList().getListId());
 	}
 	
 	@Override
