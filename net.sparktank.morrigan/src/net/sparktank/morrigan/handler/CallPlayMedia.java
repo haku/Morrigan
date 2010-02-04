@@ -11,6 +11,7 @@ import org.eclipse.core.commands.IHandler;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 public class CallPlayMedia  extends AbstractHandler implements IHandler {
@@ -30,12 +31,14 @@ public class CallPlayMedia  extends AbstractHandler implements IHandler {
 		
 		if (activeEditor instanceof MediaListEditor<?>) {
 			MediaListEditor<?> mediaListEditor = (MediaListEditor<?>) activeEditor;
-			ViewPlayer viewPlayer = (ViewPlayer) page.findView(ViewPlayer.ID);
-			if (viewPlayer!=null) {
-				viewPlayer.loadAndStartPlaying(mediaListEditor.getEditedMediaList(), mediaListEditor.getSelectedTrack());
-			} else {
-				new MorriganMsgDlg("Player view not found.").open();
+			ViewPlayer viewPlayer;
+			try {
+				viewPlayer = (ViewPlayer) page.showView(ViewPlayer.ID);
+			} catch (PartInitException e) {
+				new MorriganMsgDlg(e).open();
+				return null;
 			}
+			viewPlayer.loadAndStartPlaying(mediaListEditor.getEditedMediaList(), mediaListEditor.getSelectedTrack());
 			
 		} else {
 			new MorriganMsgDlg("Error: invalid active editor.").open();
