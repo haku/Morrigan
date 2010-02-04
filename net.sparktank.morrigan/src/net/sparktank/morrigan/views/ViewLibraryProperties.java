@@ -83,7 +83,7 @@ public class ViewLibraryProperties extends ViewPart {
 	
 	private void updateStatus () {
 		if (library!=null) {
-			mainLabel.setText("Sources for " + library.getListName());
+			mainLabel.setText("Sources for " + library.getListName() + ".");
 			
 		} else {
 			mainLabel.setText("No library selected.");
