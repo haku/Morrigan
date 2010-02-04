@@ -62,6 +62,6 @@ public class MediaListEditorInput<T extends MediaList> implements IEditorInput {
 	
 	@Override
 	public int hashCode() {
-		return editedMediaList.hashCode();
+		return editedMediaList.getListId().hashCode();
 	}
 }
