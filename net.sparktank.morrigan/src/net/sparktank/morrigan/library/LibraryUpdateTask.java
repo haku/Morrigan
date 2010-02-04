@@ -93,8 +93,6 @@ public class LibraryUpdateTask extends Job {
 			}
 		}
 		
-//		TODO refresh library view. (mark dirty / event trigger in editor?)
-		
 		monitor.done();
 		return Status.OK_STATUS;
 	}
