@@ -202,7 +202,7 @@ public class ViewLibraryProperties extends ViewPart {
 		};
 	};
 	
-	private IAction updateAction = new Action("update", Activator.getImageDescriptor("icons/play.gif")) {
+	private IAction updateAction = new Action("update", Activator.getImageDescriptor("icons/search.gif")) {
 		public void run() {
 			if (library==null) {
 				new MorriganMsgDlg("No library selected desu~.").open();
