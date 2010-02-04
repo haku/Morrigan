@@ -32,9 +32,9 @@ public class LibraryUpdateTask extends Job {
 	 */
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
-		monitor.beginTask("Updating library...", IProgressMonitor.UNKNOWN);
+		monitor.beginTask("Updating library", IProgressMonitor.UNKNOWN);
 		
-		monitor.subTask("Scanning sources...");
+		monitor.subTask("Scanning sources");
 		
 		List<String> sources = null;
 		try {
@@ -45,7 +45,7 @@ public class LibraryUpdateTask extends Job {
 		
 		if (sources!=null) {
 			for (String source : sources) {
-				monitor.subTask("Scanning "+source+"...");
+				monitor.subTask("Scanning "+source);
 				
 				Stack<File> dirStack = new Stack<File>();
 				dirStack.push(new File(source));
