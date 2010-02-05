@@ -8,6 +8,7 @@ import net.sparktank.morrigan.library.DbConFactory;
 import net.sparktank.morrigan.library.DbException;
 import net.sparktank.morrigan.library.SqliteLayer;
 import net.sparktank.morrigan.library.SqliteLayer.LibrarySort;
+import net.sparktank.morrigan.library.SqliteLayer.LibrarySortDirection;
 
 public class MediaLibrary extends MediaList {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -15,13 +16,15 @@ public class MediaLibrary extends MediaList {
 	private SqliteLayer dbLayer;
 	private final String dbFilePath;
 	LibrarySort librarySort;
+	LibrarySortDirection librarySortDirection;
 	
 	MediaLibrary (String libraryName, String dbFilePath) throws DbException {
 		super(dbFilePath, libraryName);
 		setCanBeDirty(false);
 		
 		this.dbFilePath = dbFilePath;
-		this.librarySort = LibrarySort.file;
+		this.librarySort = LibrarySort.FILE;
+		this.librarySortDirection = LibrarySortDirection.ASC;
 		
 		dbLayer = DbConFactory.getDbLayer(dbFilePath);
 	}
@@ -39,10 +42,8 @@ public class MediaLibrary extends MediaList {
 		if (!firstRead) return;
 		firstRead = false;
 		
-		List<MediaTrack> allMedia = dbLayer.getAllMedia(librarySort);
-		for (MediaTrack mt : allMedia) {
-			addTrack(mt);
-		}
+		List<MediaTrack> allMedia = dbLayer.getAllMedia(librarySort, librarySortDirection);
+		replaceList(allMedia);
 	}
 	
 	/**
@@ -57,9 +58,20 @@ public class MediaLibrary extends MediaList {
 		read();
 	}
 	
-	public void setSort (LibrarySort sort) throws MorriganException {
+	public LibrarySort getSort () {
+		return librarySort;
+	}
+	
+	public void setSort (LibrarySort sort, LibrarySortDirection direction) throws MorriganException {
 		librarySort = sort;
+		librarySortDirection = direction;
 		reRead();
+	}
+	
+	@Override
+	protected void replaceList(List<MediaTrack> mediaTracks) {
+		super.replaceList(mediaTracks);
+		setDirty(false);
 	}
 	
 	@Override

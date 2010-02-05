@@ -23,6 +23,8 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
@@ -36,6 +38,8 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static final String ID = "net.sparktank.morrigan.editors.MediaListEditor";
+	
+	public enum MediaColumn { file }
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -93,39 +97,28 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		comp.setLayout(layout);
 		
 		// add and configure columns.
-		String[] titles = { "file" };
+		MediaColumn[] titles = MediaColumn.values();
 		ColumnLayoutData[] bounds = {new ColumnWeightData(100) }; // new ColumnPixelData(100)
 		
-		MediaSorter sorter = null;
-		if (isSortable()) {
-			sorter = new MediaSorter();
-		}
-		
 		for (int i = 0; i < titles.length; i++) {
-			final int index = i;
-			
 			final TableViewerColumn column = new TableViewerColumn(editTable, SWT.NONE);
 			layout.setColumnData(column.getColumn(), bounds[i]);
-			column.getColumn().setText(titles[i]);
+			column.getColumn().setText(titles[i].toString());
 			column.getColumn().setResizable(true);
 			column.getColumn().setMoveable(true);
 			
 			if (isSortable()) {
-				column.getColumn().addSelectionListener(sorter.getSelectionAdapter(editTable, index, column));
+				column.getColumn().addSelectionListener(getSelectionAdapter(editTable, column));
 			}
 		}
 		
 		Table table = editTable.getTable();
 		table.setHeaderVisible(true);
-		table.setLinesVisible(true);
+		table.setLinesVisible(false);
 		
 		// where the data and lables are coming from.
 		editTable.setContentProvider(contentProvider);
 		editTable.setLabelProvider(labelProvider);
-		
-		if (isSortable()) {
-			editTable.setSorter(sorter);
-		}
 		
 		// event handelers.
 		editTable.addDoubleClickListener(doubleClickListener);
@@ -248,11 +241,31 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Methods for editing editedMediaList.
+//	Sorting.
 	
-	protected boolean isSortable () {
-		return false;
+	abstract protected boolean isSortable ();
+	
+	abstract protected void onSort (final TableViewer table, final TableViewerColumn column, int direction);
+	
+	private SelectionAdapter getSelectionAdapter (final TableViewer table, final TableViewerColumn column) {
+		return new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				int dir = table.getTable().getSortDirection();
+				if (table.getTable().getSortColumn() == column.getColumn()) {
+					dir = dir == SWT.UP ? SWT.DOWN : SWT.UP;
+				} else {
+					dir = SWT.DOWN;
+				}
+				onSort(table, column, dir);
+				table.getTable().setSortDirection(dir);
+				table.getTable().setSortColumn(column.getColumn());
+			}
+		};
 	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Methods for editing editedMediaList.
 	
 	public T getEditedMediaList () {
 		return editedMediaList;

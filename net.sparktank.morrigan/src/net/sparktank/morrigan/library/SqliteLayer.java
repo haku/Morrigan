@@ -38,9 +38,9 @@ public class SqliteLayer {
 		}
 	}
 	
-	public List<MediaTrack> getAllMedia (LibrarySort sort) throws DbException {
+	public List<MediaTrack> getAllMedia (LibrarySort sort, LibrarySortDirection direction) throws DbException {
 		try {
-			return local_getAllMedia(sort);
+			return local_getAllMedia(sort, direction);
 		} catch (Exception e) {
 			throw new DbException(e);
 		}
@@ -131,7 +131,7 @@ public class SqliteLayer {
 	private static final String SQL_TBL_MEDIAFILES_Q_ALL = 
 		"SELECT sfile, dadded, lstartcnt, lendcnt, dlastplay, " +
 	    "lmd5, lduration, benabled, bmissing FROM tbl_mediafiles " +
-	    "ORDER BY ? COLLATE NOCASE ASC;";
+	    "ORDER BY {COL} {DIR};";
 	
 	private static final String SQL_TBL_MEDIAFILES_Q_EXISTS =
 		"SELECT count(*) FROM tbl_mediafiles WHERE sfile=? COLLATE NOCASE;";
@@ -140,7 +140,9 @@ public class SqliteLayer {
 		"INSERT INTO tbl_mediafiles (sfile,dadded,lstartcnt,lendcnt,lduration,benabled) VALUES " +
 		"(?,date('now'),0,0,0,1);";
 	
-	public enum LibrarySort { file, dadded };
+	public enum LibrarySort { FILE, DADDED };
+	
+	public enum LibrarySortDirection { ASC, DESC };
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	DB connection.
@@ -224,22 +226,35 @@ public class SqliteLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Media.
 	
-	private List<MediaTrack> local_getAllMedia (LibrarySort sort) throws SQLException, ClassNotFoundException {
+	private List<MediaTrack> local_getAllMedia (LibrarySort sort, LibrarySortDirection direction) throws SQLException, ClassNotFoundException {
 		PreparedStatement ps;
 		ResultSet rs;
 		
-		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_Q_ALL);
+		String sql = SQL_TBL_MEDIAFILES_Q_ALL;
 		
-		switch (sort) {
-			case file:
-				ps.setString(1, SQL_TBL_MEDIAFILES_COL_FILE);
+		switch (direction) {
+			case ASC:
+				sql = sql.replace("{DIR}", "ASC");
 				break;
-			
-			case dadded:
-				ps.setString(1, SQL_TBL_MEDIAFILES_COL_DADDED);
+				
+			case DESC:
+				sql = sql.replace("{DIR}", "DESC");
 				break;
+				
 		}
 		
+		switch (sort) {
+			case FILE:
+				sql = sql.replace("{COL}", SQL_TBL_MEDIAFILES_COL_FILE + " COLLATE NOCASE");
+				break;
+			
+			case DADDED:
+				sql = sql.replace("{COL}", SQL_TBL_MEDIAFILES_COL_DADDED);
+				break;
+			
+		}
+		
+		ps = getDbCon().prepareStatement(sql);
 		rs = ps.executeQuery();
 		
 		List<MediaTrack> ret = new ArrayList<MediaTrack>();

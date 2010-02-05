@@ -14,6 +14,8 @@ import net.sparktank.morrigan.playback.PlaybackEngineFactory;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
@@ -61,6 +63,14 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 			new MorriganMsgDlg(e);
 		}
 	}
+	
+	@Override
+	protected boolean isSortable() {
+		return false;
+	}
+	
+	@Override
+	protected void onSort(TableViewer table, TableViewerColumn column, int direction) {}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Actions.

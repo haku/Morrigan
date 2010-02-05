@@ -3,12 +3,18 @@ package net.sparktank.morrigan.editors;
 
 import net.sparktank.morrigan.ApplicationActionBarAdvisor;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
+import net.sparktank.morrigan.exceptions.MorriganException;
+import net.sparktank.morrigan.library.SqliteLayer.LibrarySort;
+import net.sparktank.morrigan.library.SqliteLayer.LibrarySortDirection;
 import net.sparktank.morrigan.model.media.MediaLibrary;
 import net.sparktank.morrigan.views.ViewLibraryProperties;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TableViewerColumn;
+import org.eclipse.swt.SWT;
 import org.eclipse.ui.IViewPart;
 
 public class LibraryEditor extends MediaListEditor<MediaLibrary> {
@@ -60,6 +66,31 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 		return true;
 	}
 	
+	@Override
+	protected void onSort(TableViewer table, TableViewerColumn column, int direction) {
+		LibrarySort sort = getEditedMediaList().getSort();
+		MediaColumn mCol = MediaColumn.valueOf(column.getColumn().getText());
+		switch (mCol) {
+			case file:
+				sort = LibrarySort.FILE;
+				break;
+			
+		}
+		
+		LibrarySortDirection sortDir;
+		if (direction==SWT.UP) {
+			sortDir = LibrarySortDirection.ASC;
+		} else {
+			sortDir = LibrarySortDirection.DESC;
+		}
+		
+		try {
+			getEditedMediaList().setSort(sort, sortDir);
+		} catch (MorriganException e) {
+			new MorriganMsgDlg(e).open();
+		}
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Actions.
 	
@@ -88,7 +119,7 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 			return viewProp;
 			
 		} catch (Exception e) {
-			new MorriganMsgDlg(e);
+			new MorriganMsgDlg(e).open();
 			return null;
 		}
 	}
