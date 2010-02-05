@@ -5,7 +5,6 @@ import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.model.media.MediaLibrary;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
 
 public class LibraryUpdateAction extends Action implements IWorkbenchAction{
@@ -41,13 +40,11 @@ public class LibraryUpdateAction extends Action implements IWorkbenchAction{
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
-	public void runWithEvent(Event event) {
+	public void run() {
 		if (library==null) {
 			new MorriganMsgDlg("No library selected desu~.").open();
 			return;
 		}
-		
-		// TODO check if task is already running.
 		
 		LibraryUpdateTask job = LibraryUpdateTask.factory(library);
 		if (job != null) {
