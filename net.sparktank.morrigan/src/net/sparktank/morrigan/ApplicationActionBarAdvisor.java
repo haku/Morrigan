@@ -52,6 +52,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	private IWorkbenchAction resetPerspectiveAction;
 	private IContributionItem showViewItemShortList;
 	private IAction showMediaExplorer;
+	private IWorkbenchAction showPrefAction;
 	
 	// List actions.
 	private IAction newLibraryAction;
@@ -97,7 +98,12 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		
 		showViewMenuMgr = new MenuManager("Show view", "showView");
 		showViewItemShortList = ContributionItemFactory.VIEWS_SHORTLIST.create(window);
+		
 		showMediaExplorer = new ShowViewAction(ViewMediaExplorer.ID, "Media Explorer", Activator.getImageDescriptor("icons/library.gif"));
+		register(showMediaExplorer);
+		
+		showPrefAction = ActionFactory.PREFERENCES.create(window);
+		register(showPrefAction);
 		
 		// Editor actions.
 		saveAction = ActionFactory.SAVE.create(window);
@@ -149,6 +155,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		showViewMenuMgr.add(new Separator());
 		showViewMenuMgr.add(showViewItemShortList);
 		windowMenu.add(showViewMenuMgr);
+		windowMenu.add(new Separator());
+		windowMenu.add(showPrefAction);
 	}
 	
 	@Override

@@ -8,26 +8,24 @@ import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.handler.CallPlayMedia;
 import net.sparktank.morrigan.model.media.MediaList;
 import net.sparktank.morrigan.model.media.MediaTrack;
+import net.sparktank.morrigan.preferences.MediaListPref;
 
 import org.eclipse.core.commands.common.CommandException;
 import org.eclipse.jface.layout.TableColumnLayout;
-import org.eclipse.jface.viewers.ColumnLayoutData;
+import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
-import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IEditorInput;
@@ -41,7 +39,13 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 	
 	public static final String ID = "net.sparktank.morrigan.editors.MediaListEditor";
 	
-	public enum MediaColumn { FILE, DADDED, STARTCOUNT, ENDCOUNT, DLASTPLAY }
+	public enum MediaColumn { 
+		FILE       {@Override public String toString() { return "file"; } }, 
+		DADDED     {@Override public String toString() { return "added"; } },
+		STARTCOUNT {@Override public String toString() { return "starts"; } },
+		ENDCOUNT   {@Override public String toString() { return "ends"; } },
+		DLASTPLAY  {@Override public String toString() { return "last played"; } }
+		}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -100,23 +104,49 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		
 		// add and configure columns.
 		MediaColumn[] titles = MediaColumn.values();
-		ColumnLayoutData[] bounds = {
-				new ColumnWeightData(100),
-				new ColumnPixelData(140, true, true),
-				new ColumnPixelData(60, true, true),
-				new ColumnPixelData(60, true, true),
-				new ColumnPixelData(140, true, true)
-				};
 		
 		for (int i = 0; i < titles.length; i++) {
-			final TableViewerColumn column = new TableViewerColumn(editTable, SWT.NONE);
-			layout.setColumnData(column.getColumn(), bounds[i]);
-			column.getColumn().setText(titles[i].toString());
-			column.getColumn().setResizable(true);
-			column.getColumn().setMoveable(true);
-			
-			if (isSortable()) {
-				column.getColumn().addSelectionListener(getSelectionAdapter(editTable, column));
+			if (MediaListPref.getColPref(titles[i])) {
+				final TableViewerColumn column = new TableViewerColumn(editTable, SWT.NONE);
+				
+				switch (titles[i]) {
+					case FILE:
+						layout.setColumnData(column.getColumn(), new ColumnWeightData(100));
+						column.setLabelProvider(new FileLblProv());
+						break;
+					
+					case DADDED:
+						layout.setColumnData(column.getColumn(), new ColumnPixelData(140, true, true));
+						column.setLabelProvider(new DateAddedLblProv());
+						break;
+						
+					case STARTCOUNT:
+						layout.setColumnData(column.getColumn(), new ColumnPixelData(60, true, true));
+						column.setLabelProvider(new StartCountLblProv());
+						break;
+						
+					case ENDCOUNT:
+						layout.setColumnData(column.getColumn(), new ColumnPixelData(60, true, true));
+						column.setLabelProvider(new EndCountLblProv());
+						break;
+					
+					case DLASTPLAY:
+						layout.setColumnData(column.getColumn(), new ColumnPixelData(140, true, true));
+						column.setLabelProvider(new DateLastPlayerLblProv());
+						break;
+					
+					default:
+						throw new IllegalArgumentException();
+					
+				}
+				
+				column.getColumn().setText(titles[i].toString());
+				column.getColumn().setResizable(true);
+				column.getColumn().setMoveable(true);
+				
+				if (isSortable()) {
+					column.getColumn().addSelectionListener(getSelectionAdapter(editTable, column));
+				}
 			}
 		}
 		
@@ -124,14 +154,9 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		table.setHeaderVisible(true);
 		table.setLinesVisible(false);
 		
-		// where the data and lables are coming from.
 		editTable.setContentProvider(contentProvider);
-		editTable.setLabelProvider(labelProvider);
 		
-		// event handelers.
 		editTable.addDoubleClickListener(doubleClickListener);
-		
-		// finishing off.
 		editTable.setInput(getEditorSite());
 	}
 	
@@ -157,54 +182,47 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		
 	};
 	
-	private ITableLabelProvider labelProvider = new ITableLabelProvider() {
-		
-		private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-		
+	private class FileLblProv extends ColumnLabelProvider {
 		@Override
-		public Image getColumnImage(Object element, int columnIndex) {
-			return null;
-		}
-		
-		@Override
-		public String getColumnText(Object element, int columnIndex) {
+		public String getText(Object element) {
 			MediaTrack elm = (MediaTrack) element;
-			
-			switch (columnIndex) {
-				case 0:
-					return elm.getTitle();
-				
-				case 1:
-					return elm.getDateAdded() == null ? null : sdf.format(elm.getDateAdded());
-					
-				case 2:
-					return elm.getStartCount() < 0 ? null : String.valueOf(elm.getStartCount());
-					
-				case 3:
-					return elm.getEndCount() < 0 ? null : String.valueOf(elm.getEndCount());
-					
-				case 4:
-					return elm.getDateLastPlayed() == null ? null : sdf.format(elm.getDateLastPlayed());
-					
-				default:
-					throw new IllegalArgumentException("Invalid column; '" + columnIndex + "'.");
-				
-			}
+			return elm.getDateAdded() == null ? null : elm.getTitle();
 		}
-		
+	}
+	
+	private class DateAddedLblProv extends ColumnLabelProvider {
+		private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 		@Override
-		public boolean isLabelProperty(Object element, String property) {
-			return false;
+		public String getText(Object element) {
+			MediaTrack elm = (MediaTrack) element;
+			return elm.getDateAdded() == null ? null : sdf.format(elm.getDateAdded());
 		}
-		
+	}
+	
+	private class StartCountLblProv extends ColumnLabelProvider {
 		@Override
-		public void addListener(ILabelProviderListener listener) {}
+		public String getText(Object element) {
+			MediaTrack elm = (MediaTrack) element;
+			return elm.getStartCount() <= 0 ? null : String.valueOf(elm.getStartCount());
+		}
+	}
+	
+	private class EndCountLblProv extends ColumnLabelProvider {
 		@Override
-		public void dispose() {}
+		public String getText(Object element) {
+			MediaTrack elm = (MediaTrack) element;
+			return elm.getEndCount() <= 0 ? null : String.valueOf(elm.getEndCount());
+		}
+	}
+	
+	private class DateLastPlayerLblProv extends ColumnLabelProvider {
+		private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 		@Override
-		public void removeListener(ILabelProviderListener listener) {}
-		
-	};
+		public String getText(Object element) {
+			MediaTrack elm = (MediaTrack) element;
+			return elm.getDateLastPlayed() == null ? null : sdf.format(elm.getDateLastPlayed());
+		}
+	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Event handelers.

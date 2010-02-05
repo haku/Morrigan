@@ -89,5 +89,19 @@
             name="CallPlayMedia" />
       
    </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="net.sparktank.morrigan.preferences.MediaListPref"
+            id="net.sparktank.morrigan.preferences.MediaListPref"
+            name="Media lists">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="net.sparktank.morrigan.preferences.PreferenceInitializer">
+      </initializer>
+   </extension>
 
 </plugin>
