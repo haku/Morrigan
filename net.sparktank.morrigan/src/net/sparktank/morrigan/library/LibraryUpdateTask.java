@@ -54,6 +54,8 @@ public class LibraryUpdateTask extends Job {
 			e.printStackTrace();
 		}
 		
+		int filesAdded = 0;
+		
 		if (sources!=null) {
 			for (String source : sources) {
 				Stack<File> dirStack = new Stack<File>();
@@ -74,7 +76,9 @@ public class LibraryUpdateTask extends Job {
 							ext = ext.substring(ext.lastIndexOf(".")+1).toLowerCase();
 							if (supportedFormats.contains(ext)) {
 								try {
-									library.addFile(file);
+									if (library.addFile(file)) {
+										filesAdded++;
+									}
 								} catch (DbException e) {
 									// FIXME log this somewhere useful.
 									e.printStackTrace();
@@ -94,6 +98,8 @@ public class LibraryUpdateTask extends Job {
 				}
 			}
 		}
+		
+		System.out.println("Added " + filesAdded + " files.");
 		
 		monitor.done();
 		return Status.OK_STATUS;
