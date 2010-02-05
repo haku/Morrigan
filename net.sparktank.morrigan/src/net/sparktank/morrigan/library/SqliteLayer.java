@@ -106,6 +106,9 @@ public class SqliteLayer {
 	
 	private static final String SQL_TBL_MEDIAFILES_COL_FILE = "sfile";
 	private static final String SQL_TBL_MEDIAFILES_COL_DADDED = "dadded";
+	private static final String SQL_TBL_MEDIAFILES_COL_STARTCNT = "lstartcnt";
+	private static final String SQL_TBL_MEDIAFILES_COL_ENDCNT = "lendcnt";
+	private static final String SQL_TBL_MEDIAFILES_COL_DLASTPLAY = "dlastplay";
 	
 	private static final String SQL_TBL_SOURCES_EXISTS =
 		"SELECT name FROM sqlite_master WHERE name='tbl_sources';";
@@ -267,20 +270,10 @@ public class SqliteLayer {
 			MediaTrack mt = new MediaTrack();
 			
 			mt.setfilepath(rs.getString(SQL_TBL_MEDIAFILES_COL_FILE));
-			
-			java.sql.Date dadded = rs.getDate(SQL_TBL_MEDIAFILES_COL_DADDED);
-			if (dadded!=null) {
-				long time = dadded.getTime();
-				if (time > 100000) { // If the date was stored old-style, we get back the year :S.
-					mt.setDateAdded(new Date(time));
-				} else {
-					String s = rs.getString(SQL_TBL_MEDIAFILES_COL_DADDED);
-					try {
-						Date d = SQL_DATE.parse(s);
-						mt.setDateAdded(d);
-					} catch (Exception e) {}
-				}
-			}
+			mt.setDateAdded(readDate(rs, SQL_TBL_MEDIAFILES_COL_DADDED));
+			mt.setStartCount(rs.getLong(SQL_TBL_MEDIAFILES_COL_STARTCNT));
+			mt.setEndCount(rs.getLong(SQL_TBL_MEDIAFILES_COL_ENDCNT));
+			mt.setDateLastPlayed(readDate(rs, SQL_TBL_MEDIAFILES_COL_DLASTPLAY));
 			
 			ret.add(mt);
 		}
@@ -319,6 +312,32 @@ public class SqliteLayer {
 		}
 		
 		return false;
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	/**
+	 * This method will read the date from the DB
+	 * weather it was stored as a number or a string.
+	 * Morrigan uses the number method, but terra used strings.
+	 * Using this method allows for backward compatability.
+	 */
+	private Date readDate (ResultSet rs, String column) throws SQLException {
+		java.sql.Date date = rs.getDate(column);
+		if (date!=null) {
+			long time = date.getTime();
+			if (time > 100000) { // If the date was stored old-style, we get back the year :S.
+				return new Date(time);
+			} else {
+				String s = rs.getString(column);
+				try {
+					Date d = SQL_DATE.parse(s);
+					return d;
+				} catch (Exception e) {}
+			}
+		}
+		
+		return null;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
