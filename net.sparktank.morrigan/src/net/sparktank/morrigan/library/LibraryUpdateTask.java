@@ -52,7 +52,8 @@ public class LibraryUpdateTask extends Job {
 		try {
 			sources = library.getSources();
 		} catch (DbException e) {
-			e.printStackTrace();
+			monitor.done();
+			return new FailStatus("Failed to retrieve list of media sources.", e);
 		}
 		
 		int filesAdded = 0;
@@ -98,6 +99,13 @@ public class LibraryUpdateTask extends Job {
 					break;
 				}
 			}
+		}
+		
+		try {
+			library.reRead();
+		} catch (MorriganException e) {
+			monitor.done();
+			return new FailStatus("Failed to refresh the library.", e);
 		}
 		
 		System.out.println("Added " + filesAdded + " files.");
