@@ -10,8 +10,8 @@ public class MediaExplorerItem extends MenuItem {
 		this.type = type;
 	}
 	
-	public MediaExplorerItem(String name, String title, ItemType type) {
-		this.identifier = name;
+	public MediaExplorerItem(String identifier, String title, ItemType type) {
+		this.identifier = identifier;
 		this.title = title;
 		this.type = type;
 	}
