@@ -102,6 +102,8 @@ public abstract class MediaList {
 	 * This is the signal to read any source data needed.
 	 * This will be called soon after the constructor and before
 	 * any content is read.
+	 * It may be called when no work needs doing and its
+	 * up to the implemented to track this.
 	 */
 	abstract public void read () throws MorriganException;
 	
