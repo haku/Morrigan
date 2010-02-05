@@ -70,9 +70,15 @@ public class SqliteLayer {
 		}
 	}
 	
-	public void addFile (File file) throws DbException {
+	/**
+	 * 
+	 * @param file
+	 * @return true if the file needed to be added.
+	 * @throws DbException
+	 */
+	public boolean addFile (File file) throws DbException {
 		try {
-			local_addTrack(file);
+			return local_addTrack(file);
 		} catch (Exception e) {
 			throw new DbException(e);
 		}
@@ -233,7 +239,7 @@ public class SqliteLayer {
 		return ret;
 	}
 	
-	private void local_addTrack (File file) throws SQLException, ClassNotFoundException, DbException {
+	private boolean local_addTrack (File file) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps;
 		ResultSet rs;
 		
@@ -255,7 +261,11 @@ public class SqliteLayer {
 			n = ps.executeUpdate();
 			ps.close();
 			if (n<1) throw new DbException("No update occured.");
+			
+			return true;
 		}
+		
+		return false;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
