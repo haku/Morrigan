@@ -71,7 +71,7 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 		LibrarySort sort = getEditedMediaList().getSort();
 		MediaColumn mCol = MediaColumn.valueOf(column.getColumn().getText());
 		switch (mCol) {
-			case file:
+			case FILE:
 				sort = LibrarySort.FILE;
 				break;
 			

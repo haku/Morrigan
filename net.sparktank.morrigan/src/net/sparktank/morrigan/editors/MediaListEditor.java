@@ -1,5 +1,6 @@
 package net.sparktank.morrigan.editors;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
@@ -11,6 +12,7 @@ import net.sparktank.morrigan.model.media.MediaTrack;
 import org.eclipse.core.commands.common.CommandException;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.viewers.ColumnLayoutData;
+import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -39,7 +41,7 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 	
 	public static final String ID = "net.sparktank.morrigan.editors.MediaListEditor";
 	
-	public enum MediaColumn { file }
+	public enum MediaColumn { FILE, DADDED }
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -98,7 +100,7 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		
 		// add and configure columns.
 		MediaColumn[] titles = MediaColumn.values();
-		ColumnLayoutData[] bounds = {new ColumnWeightData(100) }; // new ColumnPixelData(100)
+		ColumnLayoutData[] bounds = {new ColumnWeightData(100), new ColumnPixelData(140, true, true) };
 		
 		for (int i = 0; i < titles.length; i++) {
 			final TableViewerColumn column = new TableViewerColumn(editTable, SWT.NONE);
@@ -151,6 +153,8 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 	
 	private ITableLabelProvider labelProvider = new ITableLabelProvider() {
 		
+		private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+		
 		@Override
 		public Image getColumnImage(Object element, int columnIndex) {
 			return null;
@@ -164,6 +168,9 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 				case 0:
 					return elm.getTitle();
 				
+				case 1:
+					return elm.getDateAdded() == null ? null : sdf.format(elm.getDateAdded());
+					
 				default:
 					throw new IllegalArgumentException("Invalid column; '" + columnIndex + "'.");
 				
