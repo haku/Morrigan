@@ -197,27 +197,39 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 	private Runnable dirtyChange = new Runnable() {
 		@Override
 		public void run() {
-			getSite().getShell().getDisplay().asyncExec(dirtyChangedRunable);
+			if (!dirtyChangedRunableScheduled) {
+				dirtyChangedRunableScheduled = true;
+				getSite().getShell().getDisplay().asyncExec(dirtyChangedRunable);
+			}
 		}
 	};
 	
 	private Runnable listChange = new Runnable() {
 		@Override
 		public void run() {
-			getSite().getShell().getDisplay().asyncExec(updateGuiRunable);
+			if (!updateGuiRunableScheduled) {
+				updateGuiRunableScheduled = true;
+				getSite().getShell().getDisplay().asyncExec(updateGuiRunable);
+			}
 		}
 	};
+	
+	private volatile boolean dirtyChangedRunableScheduled = false;
 	
 	private Runnable dirtyChangedRunable = new Runnable() {
 		@Override
 		public void run() {
+			dirtyChangedRunableScheduled = false;
 			firePropertyChange(PROP_DIRTY);
 		}
 	};
 	
+	private volatile boolean updateGuiRunableScheduled = false;
+	
 	private Runnable updateGuiRunable = new Runnable() {
 		@Override
 		public void run() {
+			updateGuiRunableScheduled = false;
 			if (editTable.getTable().isDisposed()) return;
 			editTable.refresh();
 		}
