@@ -19,6 +19,8 @@ import org.eclipse.jface.action.ControlContribution;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Combo;
@@ -217,6 +219,7 @@ public class ViewPlayer extends ViewPart {
 	class OrderSelecter extends ControlContribution {
 		
 		private Combo c;
+		String selected = playbackOrder.toString();
 		
 		protected OrderSelecter(String id) {
 			super(id);
@@ -228,12 +231,25 @@ public class ViewPlayer extends ViewPart {
 			for (PlaybackOrder o : PlaybackOrder.values()) {
 				c.add(o.toString());
 			}
+			
+			c.addSelectionListener(new SelectionListener() {
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					selected = c.getText();
+				}
+				@Override
+				public void widgetDefaultSelected(SelectionEvent e) {
+					selected = c.getText();
+				}
+			});
+			
 			c.setText(playbackOrder.toString());
+			
 			return c;
 		}
 		
 		public PlaybackOrder getSelectedOrder () {
-			return PlaybackOrder.valueOf(c.getText());
+			return PlaybackOrder.valueOf(selected);
 		}
 		
 	}
@@ -259,10 +275,11 @@ public class ViewPlayer extends ViewPart {
 		public void run() {
 			if (mainLabel.isDisposed()) return;
 			
-			if (currentTrack != null) {
+			if (currentTrack != null && currentList != null) {
 				setTitleImage(iconPlay);
 				mainLabel.setText(
 						"Now playing: " + currentTrack.toString() +
+						"\n   From: " + currentList.getListName() +
 						"\n   Position: " + currentPosition
 						);
 				
