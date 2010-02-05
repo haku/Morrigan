@@ -38,9 +38,9 @@ public class SqliteLayer {
 		}
 	}
 	
-	public List<MediaTrack> getAllMedia () throws DbException {
+	public List<MediaTrack> getAllMedia (LibrarySort sort) throws DbException {
 		try {
-			return local_getAllMedia();
+			return local_getAllMedia(sort);
 		} catch (Exception e) {
 			throw new DbException(e);
 		}
@@ -102,6 +102,9 @@ public class SqliteLayer {
 	    "benabled INT(1)," +
 	    "bmissing INT(1));";
 	
+	private static final String SQL_TBL_MEDIAFILES_COL_FILE = "sfile";
+	private static final String SQL_TBL_MEDIAFILES_COL_DADDED = "dadded";
+	
 	private static final String SQL_TBL_SOURCES_EXISTS =
 		"SELECT name FROM sqlite_master WHERE name='tbl_sources';";
 	
@@ -128,7 +131,7 @@ public class SqliteLayer {
 	private static final String SQL_TBL_MEDIAFILES_Q_ALL = 
 		"SELECT sfile, dadded, lstartcnt, lendcnt, dlastplay, " +
 	    "lmd5, lduration, benabled, bmissing FROM tbl_mediafiles " +
-	    "ORDER BY sfile COLLATE NOCASE ASC;";
+	    "ORDER BY ? COLLATE NOCASE ASC;";
 	
 	private static final String SQL_TBL_MEDIAFILES_Q_EXISTS =
 		"SELECT count(*) FROM tbl_mediafiles WHERE sfile=? COLLATE NOCASE;";
@@ -136,6 +139,8 @@ public class SqliteLayer {
 	private static final String SQL_TBL_MEDIAFILES_ADD =
 		"INSERT INTO tbl_mediafiles (sfile,dadded,lstartcnt,lendcnt,lduration,benabled) VALUES " +
 		"(?,date('now'),0,0,0,1);";
+	
+	public enum LibrarySort { file, dadded };
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	DB connection.
@@ -219,9 +224,23 @@ public class SqliteLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Media.
 	
-	private List<MediaTrack> local_getAllMedia () throws SQLException, ClassNotFoundException {
-		Statement stat = getDbCon().createStatement();
-		ResultSet rs = stat.executeQuery(SQL_TBL_MEDIAFILES_Q_ALL);
+	private List<MediaTrack> local_getAllMedia (LibrarySort sort) throws SQLException, ClassNotFoundException {
+		PreparedStatement ps;
+		ResultSet rs;
+		
+		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_Q_ALL);
+		
+		switch (sort) {
+			case file:
+				ps.setString(1, SQL_TBL_MEDIAFILES_COL_FILE);
+				break;
+			
+			case dadded:
+				ps.setString(1, SQL_TBL_MEDIAFILES_COL_DADDED);
+				break;
+		}
+		
+		rs = ps.executeQuery();
 		
 		List<MediaTrack> ret = new ArrayList<MediaTrack>();
 		
@@ -234,7 +253,7 @@ public class SqliteLayer {
 		}
 		
 		rs.close();
-		stat.close();
+		ps.close();
 		
 		return ret;
 	}

@@ -7,18 +7,21 @@ import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.library.DbConFactory;
 import net.sparktank.morrigan.library.DbException;
 import net.sparktank.morrigan.library.SqliteLayer;
+import net.sparktank.morrigan.library.SqliteLayer.LibrarySort;
 
 public class MediaLibrary extends MediaList {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private SqliteLayer dbLayer;
 	private final String dbFilePath;
+	LibrarySort librarySort;
 	
 	MediaLibrary (String libraryName, String dbFilePath) throws DbException {
 		super(dbFilePath, libraryName);
 		setCanBeDirty(false);
 		
 		this.dbFilePath = dbFilePath;
+		this.librarySort = LibrarySort.file;
 		
 		dbLayer = DbConFactory.getDbLayer(dbFilePath);
 	}
@@ -36,7 +39,7 @@ public class MediaLibrary extends MediaList {
 		if (!firstRead) return;
 		firstRead = false;
 		
-		List<MediaTrack> allMedia = dbLayer.getAllMedia();
+		List<MediaTrack> allMedia = dbLayer.getAllMedia(librarySort);
 		for (MediaTrack mt : allMedia) {
 			addTrack(mt);
 		}
