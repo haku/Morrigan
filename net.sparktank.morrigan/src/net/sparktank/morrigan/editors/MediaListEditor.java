@@ -193,7 +193,7 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		@Override
 		public String getText(Object element) {
 			MediaTrack elm = (MediaTrack) element;
-			return elm.getDateAdded() == null ? null : elm.getTitle();
+			return elm.getTitle() == null ? null : elm.getTitle();
 		}
 	}
 	
