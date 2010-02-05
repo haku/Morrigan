@@ -53,6 +53,13 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	@Override
+	protected boolean isSortable() {
+		return true;
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Actions.
 	
 	private IAction showPropertiesAction = new Action("showProperties") {

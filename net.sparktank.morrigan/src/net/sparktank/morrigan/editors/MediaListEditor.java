@@ -11,7 +11,6 @@ import net.sparktank.morrigan.model.media.MediaTrack;
 import org.eclipse.core.commands.common.CommandException;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.viewers.ColumnLayoutData;
-import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -94,15 +93,26 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		comp.setLayout(layout);
 		
 		// add and configure columns.
-		String[] titles = { "file", "size" };
-		ColumnLayoutData[] bounds = {new ColumnWeightData(80), new ColumnPixelData(100)};
+		String[] titles = { "file" };
+		ColumnLayoutData[] bounds = {new ColumnWeightData(100) }; // new ColumnPixelData(100)
+		
+		MediaSorter sorter = null;
+		if (isSortable()) {
+			sorter = new MediaSorter();
+		}
 		
 		for (int i = 0; i < titles.length; i++) {
-			TableViewerColumn column = new TableViewerColumn(editTable, SWT.NONE);
+			final int index = i;
+			
+			final TableViewerColumn column = new TableViewerColumn(editTable, SWT.NONE);
 			layout.setColumnData(column.getColumn(), bounds[i]);
 			column.getColumn().setText(titles[i]);
 			column.getColumn().setResizable(true);
 			column.getColumn().setMoveable(true);
+			
+			if (isSortable()) {
+				column.getColumn().addSelectionListener(sorter.getSelectionAdapter(editTable, index, column));
+			}
 		}
 		
 		Table table = editTable.getTable();
@@ -112,6 +122,10 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		// where the data and lables are coming from.
 		editTable.setContentProvider(contentProvider);
 		editTable.setLabelProvider(labelProvider);
+		
+		if (isSortable()) {
+			editTable.setSorter(sorter);
+		}
 		
 		// event handelers.
 		editTable.addDoubleClickListener(doubleClickListener);
@@ -155,10 +169,7 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 			
 			switch (columnIndex) {
 				case 0:
-					return elm.getFilepath();
-				
-				case 1:
-					return "0";
+					return elm.getTitle();
 				
 				default:
 					throw new IllegalArgumentException("Invalid column; '" + columnIndex + "'.");
@@ -225,6 +236,10 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Methods for editing editedMediaList.
+	
+	protected boolean isSortable () {
+		return false;
+	}
 	
 	protected void refreshUi () {
 		editTable.refresh();
