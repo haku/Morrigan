@@ -2,6 +2,7 @@ package net.sparktank.morrigan.views;
 
 import net.sparktank.morrigan.Activator;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
+import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.ClipboardHelper;
 import net.sparktank.morrigan.helpers.OrderHelper;
 import net.sparktank.morrigan.helpers.OrderHelper.PlaybackOrder;
@@ -114,9 +115,10 @@ public class ViewPlayer extends ViewPart {
 			getPlaybackEngine().setFile(currentTrack.getFilepath());
 			getPlaybackEngine().startPlaying();
 			
-		} catch (PlaybackException e) {
+			currentList.incTrackStartCnt(currentTrack);
+			
+		} catch (MorriganException e) {
 			currentTrack = null;
-			e.printStackTrace();
 			new MorriganMsgDlg(e).open();
 		}
 		
@@ -177,6 +179,14 @@ public class ViewPlayer extends ViewPart {
 	private Runnable atEndOfTrack = new Runnable() {
 		@Override
 		public void run() {
+			// Inc. stats.
+			try {
+				currentList.incTrackEndCnt(currentTrack);
+			} catch (MorriganException e) {
+				e.printStackTrace();
+			}
+			
+			// Play next track?
 			MediaTrack nextTrackToPlay = getNextTrackToPlay();
 			if (nextTrackToPlay != null) {
 				loadAndStartPlaying(currentList, nextTrackToPlay);
