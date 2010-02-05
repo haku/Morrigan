@@ -20,7 +20,7 @@ public class PlaylistHelper {
 	
 	public static MediaPlaylist createPl (String plName) throws MorriganException {
 		String plFile = getPathForNewPlaylist(plName);
-		MediaPlaylist pl = MediaListFactory.makeMediaPlaylist(plFile, true);
+		MediaPlaylist pl = MediaListFactory.makeMediaPlaylist(PlaylistHelper.getPlaylistTitle(plFile), plFile, true);
 		pl.read();
 		return pl;
 	}
@@ -42,16 +42,26 @@ public class PlaylistHelper {
 			if (isPlFile(file.getAbsolutePath())) {
 				MediaExplorerItem newItem = new MediaExplorerItem(MediaExplorerItem.ItemType.PLAYLIST);
 				newItem.identifier = file.getAbsolutePath();
-				
-				int x = newItem.identifier.lastIndexOf(File.separator);
-				if (x > 0) {
-					newItem.title = newItem.identifier.substring(x+1);
-				} else {
-					newItem.title = newItem.identifier;
-				}
-				
+				newItem.title = getPlaylistTitle(newItem.identifier);
 				ret.add(newItem);
 			}
+		}
+		
+		return ret;
+	}
+	
+	public static String getPlaylistTitle (String filePath) {
+		String ret = filePath;
+		int x;
+		
+		x = ret.lastIndexOf(File.separator);
+		if (x > 0) {
+			ret = ret.substring(x+1);
+		}
+		
+		x = ret.lastIndexOf(Config.PL_FILE_EXT);
+		if (x > 0) {
+			ret = ret.substring(0, x);
 		}
 		
 		return ret;
