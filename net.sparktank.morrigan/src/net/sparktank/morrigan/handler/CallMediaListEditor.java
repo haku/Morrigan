@@ -52,7 +52,7 @@ public class CallMediaListEditor extends AbstractHandler implements IHandler {
 				if (item.type == MediaExplorerItem.ItemType.PLAYLIST) {
 					MediaPlaylist playList;
 					try {
-						playList = MediaListFactory.makeMediaPlaylist(item.identifier);
+						playList = MediaListFactory.makeMediaPlaylist(item.title, item.identifier);
 					} catch (MorriganException e) {
 						new MorriganMsgDlg(e).open();
 						return null;

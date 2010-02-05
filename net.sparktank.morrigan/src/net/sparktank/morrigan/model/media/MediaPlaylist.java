@@ -22,13 +22,13 @@ public class MediaPlaylist extends MediaList {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private MediaPlaylist(String filePath) throws MorriganException {
-		super(filePath, getFilenameFromPath(filePath));
+	private MediaPlaylist(String title, String filePath) throws MorriganException {
+		super(filePath, title);
 		this.filePath = filePath;
 	}
 	
-	MediaPlaylist(String filePath, boolean newPl) throws MorriganException {
-		super(filePath, getFilenameFromPath(filePath));
+	MediaPlaylist(String title, String filePath, boolean newPl) throws MorriganException {
+		super(filePath, title);
 		this.filePath = filePath;
 		this.newPl = newPl;
 	}
@@ -125,17 +125,6 @@ public class MediaPlaylist extends MediaList {
 		}
 		
 		setDirty(false);
-	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	private static String getFilenameFromPath (String filePath) {
-		int x = filePath.lastIndexOf(File.separator);
-		if (x>0) {
-			return filePath.substring(x+1);
-		} else {
-			return filePath;
-		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -33,11 +33,11 @@ public class MediaListFactory {
 	
 	private static WeakHashMap<MediaPlaylist, String> mediaPlaylistCache = new WeakHashMap<MediaPlaylist, String>();
 	
-	public static synchronized MediaPlaylist makeMediaPlaylist (String filePath) throws MorriganException {
-		return makeMediaPlaylist(filePath, false);
+	public static synchronized MediaPlaylist makeMediaPlaylist (String title, String filePath) throws MorriganException {
+		return makeMediaPlaylist(title, filePath, false);
 	}
 	
-	public static MediaPlaylist makeMediaPlaylist (String filePath, boolean newPl) throws MorriganException {
+	public static MediaPlaylist makeMediaPlaylist (String title, String filePath, boolean newPl) throws MorriganException {
 		MediaPlaylist ret = null;
 		
 		if (mediaPlaylistCache.containsValue(filePath)) {
@@ -49,7 +49,7 @@ public class MediaListFactory {
 		}
 		
 		if (ret == null) {
-			ret = new MediaPlaylist(filePath, newPl);
+			ret = new MediaPlaylist(title, filePath, newPl);
 			mediaPlaylistCache.put(ret, ret.getListId());
 		}
 		
