@@ -1,6 +1,5 @@
 package net.sparktank.morrigan.handler;
 
-import net.sparktank.morrigan.config.Config;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.editors.LibraryEditor;
 import net.sparktank.morrigan.editors.MediaListEditorInput;
@@ -70,7 +69,7 @@ public class CallMediaListEditor extends AbstractHandler implements IHandler {
 				} else if (item.type == MediaExplorerItem.ItemType.LIBRARY) {
 					MediaLibrary ml;
 					try {
-						ml = MediaListFactory.makeMediaLibrary(Config.SQLITE_DBNAME_TITLE, Config.getLocalDbFile());
+						ml = MediaListFactory.makeMediaLibrary(item.title, item.identifier);
 					} catch (DbException e) {
 						new MorriganMsgDlg(e).open();
 						return null;

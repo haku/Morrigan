@@ -145,8 +145,7 @@ public class ViewMediaExplorer extends ViewPart {
 	
 	private void makeContent () {
 		items.clear();
-//		items.add(new MediaExplorerItem("dis", "Display", MediaExplorerItem.ItemType.DISPLAY));
-		items.add(new MediaExplorerItem("lib", Config.SQLITE_DBNAME_TITLE, MediaExplorerItem.ItemType.LIBRARY));
+		items.add(new MediaExplorerItem(Config.getLocalDbFile(), Config.SQLITE_DBNAME_TITLE, MediaExplorerItem.ItemType.LIBRARY));
 		items.addAll(PlaylistHelper.instance.getAllPlaylists());
 	}
 	
