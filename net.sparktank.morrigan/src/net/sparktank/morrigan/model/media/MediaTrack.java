@@ -20,8 +20,8 @@ public class MediaTrack {
 	
 	private String trackFilePath = null;
 	private Date dateAdded = null;
-	private long startCount = -1;
-	private long endCount = -1;
+	private long startCount = 0;
+	private long endCount = 0;
 	private Date dateLastPlayed = null;
 	
 	public String getFilepath () {
