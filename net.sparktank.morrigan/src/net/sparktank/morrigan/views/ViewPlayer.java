@@ -1,10 +1,10 @@
 package net.sparktank.morrigan.views;
 
-import java.util.List;
-
 import net.sparktank.morrigan.Activator;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.helpers.ClipboardHelper;
+import net.sparktank.morrigan.helpers.OrderHelper;
+import net.sparktank.morrigan.helpers.OrderHelper.PlaybackOrder;
 import net.sparktank.morrigan.model.media.MediaList;
 import net.sparktank.morrigan.model.media.MediaTrack;
 import net.sparktank.morrigan.playback.IPlaybackEngine;
@@ -15,11 +15,15 @@ import net.sparktank.morrigan.playback.PlaybackException;
 import net.sparktank.morrigan.playback.IPlaybackEngine.PlayState;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.ControlContribution;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.part.ViewPart;
@@ -29,21 +33,17 @@ public class ViewPlayer extends ViewPart {
 	
 	public static final String ID = "net.sparktank.morrigan.views.ViewPlayer";
 	
-	private Label mainLabel;
-	
 	private MediaList currentList = null;
 	private MediaTrack currentTrack = null;
+	private long currentPosition = -1; // In seconds.
+	private PlaybackOrder playbackOrder = PlaybackOrder.sequential;
 	
-	private long currentPosition = -1;
-
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	ViewPart methods.
 	
 	public void createPartControl(Composite parent) {
-		parent.setLayout(new FillLayout ());
-		mainLabel = new Label(parent, SWT.WRAP);
-		
 		makeIcons();
+		makeControls(parent);
 		addToolbar();
 		addMenu();
 		getSite().getShell().getDisplay().asyncExec(updateStatusRunable);
@@ -153,16 +153,8 @@ public class ViewPlayer extends ViewPart {
 	}
 	
 	private MediaTrack getNextTrackToPlay () {
-		List<MediaTrack> mediaTracks = currentList.getMediaTracks();
-		if (mediaTracks.contains(currentTrack)) {
-			int i = mediaTracks.indexOf(currentTrack) + 1;
-			if (i >= mediaTracks.size()) i = 0;
-			
-			return mediaTracks.get(i);
-			
-		} else {
-			return null;
-		}
+		if (currentList==null || currentTrack==null) return null;
+		return OrderHelper.getNextTrack(currentList, currentTrack, orderSelecter.getSelectedOrder());
 	}
 	
 	private IPlaybackStatusListener playbackStatusListener = new IPlaybackStatusListener () {
@@ -210,11 +202,50 @@ public class ViewPlayer extends ViewPart {
 		iconStop.dispose();
 	}
 	
+	private Label mainLabel;
+	private OrderSelecter orderSelecter;
+	
+	private void makeControls (Composite parent) {
+		// Main label.
+		parent.setLayout(new FillLayout ());
+		mainLabel = new Label(parent, SWT.WRAP);
+		
+		// Order drop-down box.
+		orderSelecter = new OrderSelecter("orderSelecter");
+	}
+	
+	class OrderSelecter extends ControlContribution {
+		
+		private Combo c;
+		
+		protected OrderSelecter(String id) {
+			super(id);
+		}
+		
+		@Override
+		protected Control createControl(Composite parent) {
+			c = new Combo(parent, SWT.READ_ONLY);
+			for (PlaybackOrder o : PlaybackOrder.values()) {
+				c.add(o.toString());
+			}
+			c.setText(playbackOrder.toString());
+			return c;
+		}
+		
+		public PlaybackOrder getSelectedOrder () {
+			return PlaybackOrder.valueOf(c.getText());
+		}
+		
+	}
+	
 	private void addToolbar () {
 		getViewSite().getActionBars().getToolBarManager().add(pauseAction);
 		getViewSite().getActionBars().getToolBarManager().add(stopAction);
 		getViewSite().getActionBars().getToolBarManager().add(prevAction);
 		getViewSite().getActionBars().getToolBarManager().add(nextAction);
+		
+		getViewSite().getActionBars().getToolBarManager().add(new Separator());
+		getViewSite().getActionBars().getToolBarManager().add(orderSelecter);
 	}
 	
 	private void addMenu () {
