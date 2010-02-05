@@ -20,6 +20,9 @@ public class MediaTrack {
 	
 	private String trackFilePath = null;
 	private Date dateAdded = null;
+	private long startCount = -1;
+	private long endCount = -1;
+	private Date dateLastPlayed = null;
 	
 	public String getFilepath () {
 		return trackFilePath;
@@ -33,6 +36,27 @@ public class MediaTrack {
 	}
 	public void setDateAdded(Date dateAdded) {
 		this.dateAdded = dateAdded;
+	}
+	
+	public long getStartCount() {
+		return startCount;
+	}
+	public void setStartCount(long startCount) {
+		this.startCount = startCount;
+	}
+
+	public long getEndCount() {
+		return endCount;
+	}
+	public void setEndCount(long endCount) {
+		this.endCount = endCount;
+	}
+
+	public Date getDateLastPlayed() {
+		return dateLastPlayed;
+	}
+	public void setDateLastPlayed(Date dateLastPlayed) {
+		this.dateLastPlayed = dateLastPlayed;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
