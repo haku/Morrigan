@@ -1,6 +1,6 @@
 package net.sparktank.morrigan;
 
-import net.sparktank.morrigan.actions.NewPlaylistAction;
+import net.sparktank.morrigan.playlist.NewPlaylistAction;
 import net.sparktank.morrigan.views.ShowViewAction;
 import net.sparktank.morrigan.views.ViewMediaExplorer;
 

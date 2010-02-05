@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.helpers;
+package net.sparktank.morrigan.playlist;
 
 import java.io.File;
 import java.util.ArrayList;

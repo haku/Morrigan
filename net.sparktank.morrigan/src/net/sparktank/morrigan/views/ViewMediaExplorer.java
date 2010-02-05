@@ -5,12 +5,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.sparktank.morrigan.Activator;
-import net.sparktank.morrigan.actions.NewPlaylistAction;
 import net.sparktank.morrigan.config.Config;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.handler.CallMediaListEditor;
-import net.sparktank.morrigan.helpers.PlaylistHelper;
 import net.sparktank.morrigan.model.ui.MediaExplorerItem;
+import net.sparktank.morrigan.playlist.NewPlaylistAction;
+import net.sparktank.morrigan.playlist.PlaylistHelper;
 
 import org.eclipse.core.commands.common.CommandException;
 import org.eclipse.jface.resource.ImageDescriptor;

@@ -1,9 +1,9 @@
-package net.sparktank.morrigan.actions;
+package net.sparktank.morrigan.playlist;
 
 import net.sparktank.morrigan.Activator;
+import net.sparktank.morrigan.actions.MorriganAction;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.exceptions.MorriganException;
-import net.sparktank.morrigan.helpers.PlaylistHelper;
 import net.sparktank.morrigan.views.ViewMediaExplorer;
 
 import org.eclipse.jface.dialogs.InputDialog;
