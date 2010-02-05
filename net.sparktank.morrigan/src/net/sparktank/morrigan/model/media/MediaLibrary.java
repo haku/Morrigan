@@ -64,9 +64,10 @@ public class MediaLibrary extends MediaList {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public void addFile (File file) throws DbException {
-		dbLayer.addFile(file);
-		addTrack(new MediaTrack(file.getAbsolutePath()));
+	public boolean addFile (File file) throws DbException {
+		boolean added = dbLayer.addFile(file);
+		if (added) addTrack(new MediaTrack(file.getAbsolutePath()));
+		return added;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
