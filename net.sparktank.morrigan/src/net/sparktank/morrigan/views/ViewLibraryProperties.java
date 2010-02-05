@@ -79,8 +79,6 @@ public class ViewLibraryProperties extends ViewPart {
 		
 		@Override
 		public Object[] getElements(Object inputElement) {
-			System.out.println("getElements.");
-			
 			List<String> sources = null;
 			
 			if (library!=null) {
