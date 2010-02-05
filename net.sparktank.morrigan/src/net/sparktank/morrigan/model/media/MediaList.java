@@ -119,6 +119,11 @@ public abstract class MediaList {
 		return Collections.unmodifiableList(mediaTracks);
 	}
 	
+	protected void replaceList (List<MediaTrack> mediaTracks) {
+		this.mediaTracks = mediaTracks;
+		setDirty(true);
+	}
+	
 	public void addTrack (MediaTrack track) {
 		if (allowDuplicateEntries() || !mediaTracks.contains(track)) {
 			mediaTracks.add(track);
