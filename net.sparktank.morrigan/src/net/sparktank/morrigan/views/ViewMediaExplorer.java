@@ -5,9 +5,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.sparktank.morrigan.Activator;
-import net.sparktank.morrigan.config.Config;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.handler.CallMediaListEditor;
+import net.sparktank.morrigan.library.LibraryHelper;
 import net.sparktank.morrigan.model.ui.MediaExplorerItem;
 import net.sparktank.morrigan.playlist.NewPlaylistAction;
 import net.sparktank.morrigan.playlist.PlaylistHelper;
@@ -145,7 +145,7 @@ public class ViewMediaExplorer extends ViewPart {
 	
 	private void makeContent () {
 		items.clear();
-		items.add(new MediaExplorerItem(Config.getLocalDbFile(), Config.SQLITE_DBNAME_TITLE, MediaExplorerItem.ItemType.LIBRARY));
+		items.addAll(LibraryHelper.INSTANCE.getAllLibraries());
 		items.addAll(PlaylistHelper.instance.getAllPlaylists());
 	}
 	
