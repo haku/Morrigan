@@ -1,7 +1,7 @@
 package net.sparktank.morrigan;
 
 import net.sparktank.morrigan.actions.NewPlaylistAction;
-import net.sparktank.morrigan.actions.ShowViewAction;
+import net.sparktank.morrigan.views.ShowViewAction;
 import net.sparktank.morrigan.views.ViewMediaExplorer;
 
 import org.eclipse.jface.action.GroupMarker;

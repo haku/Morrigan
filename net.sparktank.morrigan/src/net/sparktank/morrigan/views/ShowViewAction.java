@@ -1,5 +1,6 @@
-package net.sparktank.morrigan.actions;
+package net.sparktank.morrigan.views;
 
+import net.sparktank.morrigan.actions.MorriganAction;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 
 import org.eclipse.jface.resource.ImageDescriptor;
