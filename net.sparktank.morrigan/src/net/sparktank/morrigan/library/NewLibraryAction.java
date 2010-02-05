@@ -51,7 +51,7 @@ public class NewLibraryAction extends Action implements IWorkbenchAction {
 			// create library.
 			String libName = dlg.getValue();
 			try {
-				LibraryHelper.INSTANCE.createLib(libName);
+				LibraryHelper.createLib(libName);
 			} catch (MorriganException e) {
 				new MorriganMsgDlg(e).open();
 				return;

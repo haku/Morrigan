@@ -12,28 +12,24 @@ import net.sparktank.morrigan.model.ui.MediaExplorerItem;
 public class LibraryHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public static final LibraryHelper INSTANCE = new LibraryHelper();
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	private String getPathForNewLibrary (String libName) {
+	private static String getPathForNewLibrary (String libName) {
 		File libDir = Config.getLibDir();
 		String libFile = libDir.getPath() + File.separator + libName + Config.LIB_FILE_EXT;
 		return libFile;
 	}
 	
-	public MediaLibrary createLib (String libName) throws MorriganException {
+	public static MediaLibrary createLib (String libName) throws MorriganException {
 		String plFile = getPathForNewLibrary(libName);
 		MediaLibrary lib = MediaListFactory.makeMediaLibrary(getLibraryTitle(plFile), plFile);
 //		lib.read();
 		return lib;
 	}
 	
-	private boolean isLibFile (String filePath) {
+	private static boolean isLibFile (String filePath) {
 		return (filePath.toLowerCase().endsWith(Config.LIB_FILE_EXT));
 	}
 	
-	public ArrayList<MediaExplorerItem> getAllLibraries () {
+	public static ArrayList<MediaExplorerItem> getAllLibraries () {
 		ArrayList<MediaExplorerItem> ret = new ArrayList<MediaExplorerItem>();
 		
 		File libDir = Config.getLibDir();

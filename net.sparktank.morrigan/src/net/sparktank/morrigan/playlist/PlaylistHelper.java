@@ -12,28 +12,24 @@ import net.sparktank.morrigan.model.ui.MediaExplorerItem;
 public class PlaylistHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public static final PlaylistHelper INSTANCE = new PlaylistHelper();
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	private String getPathForNewPlaylist (String plName) {
+	private static String getPathForNewPlaylist (String plName) {
 		File plDir = Config.getPlDir();
 		String plFile = plDir.getPath() + File.separator + plName + Config.PL_FILE_EXT;
 		return plFile;
 	}
 	
-	public MediaPlaylist createPl (String plName) throws MorriganException {
+	public static MediaPlaylist createPl (String plName) throws MorriganException {
 		String plFile = getPathForNewPlaylist(plName);
 		MediaPlaylist pl = MediaListFactory.makeMediaPlaylist(plFile, true);
 		pl.read();
 		return pl;
 	}
 	
-	private boolean isPlFile (String filePath) {
+	private static boolean isPlFile (String filePath) {
 		return (filePath.toLowerCase().endsWith(Config.PL_FILE_EXT));
 	}
 	
-	public ArrayList<MediaExplorerItem> getAllPlaylists () {
+	public static ArrayList<MediaExplorerItem> getAllPlaylists () {
 		ArrayList<MediaExplorerItem> ret = new ArrayList<MediaExplorerItem>();
 		
 		File plDir = Config.getPlDir();
