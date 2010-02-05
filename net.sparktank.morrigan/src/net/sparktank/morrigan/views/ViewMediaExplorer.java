@@ -8,6 +8,7 @@ import net.sparktank.morrigan.Activator;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.handler.CallMediaListEditor;
 import net.sparktank.morrigan.library.LibraryHelper;
+import net.sparktank.morrigan.library.NewLibraryAction;
 import net.sparktank.morrigan.model.ui.MediaExplorerItem;
 import net.sparktank.morrigan.playlist.NewPlaylistAction;
 import net.sparktank.morrigan.playlist.PlaylistHelper;
@@ -134,6 +135,7 @@ public class ViewMediaExplorer extends ViewPart {
 	};
 	
 	private void addToolbar () {
+		getViewSite().getActionBars().getToolBarManager().add(new NewLibraryAction(getViewSite().getWorkbenchWindow()));
 		getViewSite().getActionBars().getToolBarManager().add(new NewPlaylistAction(getViewSite().getWorkbenchWindow()));
 	}
 	
