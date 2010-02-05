@@ -1,6 +1,8 @@
 package net.sparktank.morrigan;
 
 import net.sparktank.morrigan.actions.NewPlaylistAction;
+import net.sparktank.morrigan.actions.ShowViewAction;
+import net.sparktank.morrigan.views.ViewMediaExplorer;
 
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IAction;
@@ -48,6 +50,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	// Window management actions.
 	private IWorkbenchAction resetPerspectiveAction;
 	private IContributionItem showViewItemShortList;
+	private IAction showMediaExplorer;
 	
 	// List actions.
 	private IAction newPlayListAction;
@@ -88,8 +91,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		register(resetPerspectiveAction);
 		
 		showViewMenuMgr = new MenuManager("Show view", "showView");
-		
 		showViewItemShortList = ContributionItemFactory.VIEWS_SHORTLIST.create(window);
+		showMediaExplorer = new ShowViewAction(ViewMediaExplorer.ID, "Media Explorer", Activator.getImageDescriptor("icons/library.gif"));
 		
 		// Editor actions.
 		saveAction = ActionFactory.SAVE.create(window);
@@ -136,6 +139,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		MenuManager windowMenu = new MenuManager("&Window", IWorkbenchActionConstants.M_WINDOW);
 		menuBar.add(windowMenu);
 		windowMenu.add(resetPerspectiveAction);
+		showViewMenuMgr.add(showMediaExplorer);
+		showViewMenuMgr.add(new Separator());
 		showViewMenuMgr.add(showViewItemShortList);
 		windowMenu.add(showViewMenuMgr);
 	}
