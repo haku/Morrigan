@@ -49,8 +49,13 @@ public class LibraryUpdateAction extends Action implements IWorkbenchAction{
 		
 		// TODO check if task is already running.
 		
-		LibraryUpdateTask job = new LibraryUpdateTask(library);
-		job.schedule();
+		LibraryUpdateTask job = LibraryUpdateTask.factory(library);
+		if (job != null) {
+			job.schedule();
+		
+		} else {
+			new MorriganMsgDlg("An update is already running for this library.").open();
+		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

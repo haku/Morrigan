@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
+import java.util.WeakHashMap;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.MediaLibrary;
@@ -21,12 +22,53 @@ import org.eclipse.core.runtime.jobs.Job;
 public class LibraryUpdateTask extends Job {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private final MediaLibrary library;
+	private static WeakHashMap<LibraryUpdateTask, String> jobCache = new WeakHashMap<LibraryUpdateTask, String>();
 	
-	public LibraryUpdateTask (MediaLibrary library) {
+	public static synchronized LibraryUpdateTask factory (MediaLibrary library) {
+		LibraryUpdateTask ret = null;
+		
+		if (jobCache.containsValue(library.getListId())) {
+			for (LibraryUpdateTask job : jobCache.keySet()) {
+				if (job.getLibrary().getListId().equals(library.getListId())) {
+					ret = job;
+				}
+			}
+		}
+		
+		// if its finished it does not count.
+		if (ret != null && ret.isFinished()) {
+			jobCache.remove(ret);
+			ret = null;
+		}
+		
+		if (ret == null) {
+			ret = new LibraryUpdateTask(library);
+			jobCache.put(ret, library.getListId());
+			
+		} else {
+			ret = null;
+		}
+		
+		return ret;
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	private final MediaLibrary library;
+	private boolean isFinished = false;
+	
+	private LibraryUpdateTask (MediaLibrary library) {
 		super("Update " + library.getListName());
 		this.library = library;
 		setUser(true);
+	}
+	
+	public MediaLibrary getLibrary () {
+		return library;
+	}
+	
+	public boolean isFinished () {
+		return isFinished;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -110,6 +152,7 @@ public class LibraryUpdateTask extends Job {
 		
 		System.out.println("Added " + filesAdded + " files.");
 		
+		isFinished = true;
 		monitor.done();
 		return Status.OK_STATUS;
 	}
