@@ -32,19 +32,39 @@ public class ViewLibraryProperties extends ViewPart {
 	public void createPartControl(Composite parent) {
 		createLayout(parent);
 		addToolbar();
-		updateGui();
+		listChange.run();
 	}
 	
 	@Override
 	public void setFocus() {}
+	
+	@Override
+	public void dispose() {
+		setContent(null, false);
+		super.dispose();
+	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private MediaLibrary library;
 	
 	public void setContent (MediaLibrary library) {
+		setContent(library, true);
+	}
+	
+	public void setContent (MediaLibrary library, boolean updateGui) {
+		
+		if (this.library!=null) {
+			this.library.removeChangeEvent(listChange);
+		}
+		
 		this.library = library;
-		updateGui();
+		
+		if (this.library!=null) {
+			this.library.addChangeEvent(listChange);
+		}
+		
+		if (updateGui) listChange.run();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -64,17 +84,6 @@ public class ViewLibraryProperties extends ViewPart {
 		getViewSite().getActionBars().getToolBarManager().add(updateAction);
 	}
 	
-	private void updateGui () {
-		if (library!=null) {
-			setContentDescription( "Sources for " + library.getListName() + ".");
-			
-		} else {
-			setContentDescription("No library selected.");
-		}
-		
-		tableViewer.refresh();
-	}
-	
 	private IStructuredContentProvider sourcesProvider = new IStructuredContentProvider() {
 		
 		@Override
@@ -85,7 +94,7 @@ public class ViewLibraryProperties extends ViewPart {
 				try {
 					sources = library.getSources();
 				} catch (DbException e) {
-					new MorriganMsgDlg(e);
+					new MorriganMsgDlg(e).open();
 				}
 				
 				return sources.toArray();
@@ -127,6 +136,49 @@ public class ViewLibraryProperties extends ViewPart {
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Events.
+	
+	private volatile boolean updateGuiRunableScheduled = false;
+	
+	private Runnable listChange = new Runnable() {
+		@Override
+		public void run() {
+			if (!updateGuiRunableScheduled) {
+				updateGuiRunableScheduled = true;
+				getSite().getShell().getDisplay().asyncExec(updateGuiRunable);
+			}
+		}
+	};
+	
+	private Runnable updateGuiRunable = new Runnable() {
+		@Override
+		public void run() {
+			updateGuiRunableScheduled = false;
+			if (tableViewer.getTable().isDisposed()) return;
+			
+			if (library!=null) {
+				
+				int numSources = -1;
+				try {
+					numSources = library.getSources().size();
+				} catch (DbException e) {
+					new MorriganMsgDlg(e).open();
+				}
+				
+				setContentDescription(
+						library.getListName() + " contains " + library.getCount()
+						+ " items from " + numSources + " sources."
+				);
+				
+			} else {
+				setContentDescription("No library selected.");
+			}
+			
+			tableViewer.refresh();
+		}
+	};
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Actions.
 	
 	private IAction addAction = new Action("add", Activator.getImageDescriptor("icons/plus.gif")) {
@@ -146,7 +198,7 @@ public class ViewLibraryProperties extends ViewPart {
 				} catch (DbException e) {
 					new MorriganMsgDlg(e).open();
 				}
-				updateGui();
+				listChange.run();
 			}
 		};
 	};
@@ -173,7 +225,7 @@ public class ViewLibraryProperties extends ViewPart {
 					} catch (DbException e) {
 						new MorriganMsgDlg(e).open();
 					}
-					updateGui();
+					listChange.run();
 				}
 			}
 			
