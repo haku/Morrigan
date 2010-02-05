@@ -27,6 +27,7 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 	
 	@Override
 	public void setFocus() {
+		getEditorSite().getActionBars().setGlobalActionHandler(ApplicationActionBarAdvisor.ACTIONID_ADD, addAction);
 		getEditorSite().getActionBars().setGlobalActionHandler(ApplicationActionBarAdvisor.ACTIONID_SHOWPROPERTIES, showPropertiesAction);
 	}
 	
@@ -62,20 +63,35 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Actions.
 	
-	private IAction showPropertiesAction = new Action("showProperties") {
+	private IAction addAction = new Action("add") {
 		public void run () {
-			
-			try {
-				IViewPart showView = getSite().getPage().showView(ViewLibraryProperties.ID);
-				ViewLibraryProperties viewProp = (ViewLibraryProperties) showView;
-				viewProp.setContent(getEditedMediaList());
-				
-			} catch (Exception e) {
-				new MorriganMsgDlg(e);
+			ViewLibraryProperties propView = showLibPropView();
+			if (propView!=null) {
+				propView.showAddDlg(true);
 			}
-			
 		}
 	};
+	
+	private IAction showPropertiesAction = new Action("showProperties") {
+		public void run () {
+			showLibPropView();
+		}
+	};
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	protected ViewLibraryProperties showLibPropView () {
+		try {
+			IViewPart showView = getSite().getPage().showView(ViewLibraryProperties.ID);
+			ViewLibraryProperties viewProp = (ViewLibraryProperties) showView;
+			viewProp.setContent(getEditedMediaList());
+			return viewProp;
+			
+		} catch (Exception e) {
+			new MorriganMsgDlg(e);
+			return null;
+		}
+	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
