@@ -96,6 +96,10 @@ public abstract class MediaList {
 	 */
 	abstract public void read () throws MorriganException;
 	
+	public int getCount () {
+		return mediaTracks.size();
+	}
+	
 	/**
 	 * Returns an unmodifiable list of the playlist items.
 	 * @return
