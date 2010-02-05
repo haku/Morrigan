@@ -86,6 +86,22 @@ public class SqliteLayer {
 		}
 	}
 	
+	public void incTrackStartCnt (String sfile) throws DbException {
+		try {
+			local_incTrackStartCnt(sfile);
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+	
+	public void incTrackEndCnt (String sfile) throws DbException {
+		try {
+			local_incTrackEndCnt(sfile);
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Schema.
 	
@@ -134,16 +150,24 @@ public class SqliteLayer {
 //	Library queries.
 	
 	private static final String SQL_TBL_MEDIAFILES_Q_ALL = 
-		"SELECT sfile, dadded, lstartcnt, lendcnt, dlastplay, " +
-	    "lmd5, lduration, benabled, bmissing FROM tbl_mediafiles " +
-	    "ORDER BY {COL} {DIR};";
+		"SELECT sfile, dadded, lstartcnt, lendcnt, dlastplay," +
+	    "lmd5, lduration, benabled, bmissing FROM tbl_mediafiles" +
+	    " ORDER BY {COL} {DIR};";
 	
 	private static final String SQL_TBL_MEDIAFILES_Q_EXISTS =
 		"SELECT count(*) FROM tbl_mediafiles WHERE sfile=? COLLATE NOCASE;";
 	
 	private static final String SQL_TBL_MEDIAFILES_ADD =
-		"INSERT INTO tbl_mediafiles (sfile,dadded,lstartcnt,lendcnt,lduration,benabled) VALUES " +
-		"(?,?,0,0,0,1);";
+		"INSERT INTO tbl_mediafiles (sfile,dadded,lstartcnt,lendcnt,lduration,benabled) VALUES" +
+		" (?,?,0,0,0,1);";
+	
+	private static final String SQL_TBL_MEDIAFILES_INCSTART =
+		"UPDATE tbl_mediafiles SET lstartcnt=lstartcnt+1,dlastplay=?" +
+        " WHERE sfile=?;";
+	
+	private static final String SQL_TBL_MEDIAFILES_INCEND =
+		"UPDATE tbl_mediafiles SET lendcnt=lendcnt+1" +
+		" WHERE sfile=?;";
 	
 	public enum LibrarySort { FILE, DADDED, STARTCNT, ENDCNT, DLASTPLAY };
 	
@@ -326,6 +350,27 @@ public class SqliteLayer {
 		}
 		
 		return false;
+	}
+	
+	private void local_incTrackStartCnt (String sfile) throws SQLException, ClassNotFoundException {
+		PreparedStatement ps;
+		
+		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_INCSTART);
+		ps.setDate(1, new java.sql.Date(new Date().getTime()));
+		ps.setString(2, sfile);
+		ps.executeUpdate();
+		
+		ps.close();
+	}
+	
+	private void local_incTrackEndCnt (String sfile) throws SQLException, ClassNotFoundException {
+		PreparedStatement ps;
+		
+		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_INCEND);
+		ps.setString(1, sfile);
+		ps.executeUpdate();
+		
+		ps.close();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
