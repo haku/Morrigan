@@ -1,15 +1,13 @@
 package net.sparktank.morrigan.model.media;
 
 import java.io.File;
+import java.util.Date;
 
 import net.sparktank.morrigan.helpers.EqualHelper;
 
 public class MediaTrack {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	private String trackFilePath = null;
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Constructors.
 	
 	public MediaTrack () {}
 	
@@ -18,14 +16,27 @@ public class MediaTrack {
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Attributes.
+	
+	private String trackFilePath = null;
+	private Date dateAdded = null;
 	
 	public String getFilepath () {
 		return trackFilePath;
 	}
-	
 	public void setfilepath (String filePath) {
 		trackFilePath = filePath;
 	}
+	
+	public Date getDateAdded() {
+		return dateAdded;
+	}
+	public void setDateAdded(Date dateAdded) {
+		this.dateAdded = dateAdded;
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Secondary attributes.
 	
 	public String getTitle () {
 		int x = trackFilePath.lastIndexOf(File.separator);
