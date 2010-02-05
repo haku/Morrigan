@@ -7,7 +7,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import net.sparktank.morrigan.model.media.MediaTrack;
@@ -138,7 +140,7 @@ public class SqliteLayer {
 	
 	private static final String SQL_TBL_MEDIAFILES_ADD =
 		"INSERT INTO tbl_mediafiles (sfile,dadded,lstartcnt,lendcnt,lduration,benabled) VALUES " +
-		"(?,date('now'),0,0,0,1);";
+		"(?,?,0,0,0,1);";
 	
 	public enum LibrarySort { FILE, DADDED };
 	
@@ -226,6 +228,8 @@ public class SqliteLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Media.
 	
+	private SimpleDateFormat SQL_DATE = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	
 	private List<MediaTrack> local_getAllMedia (LibrarySort sort, LibrarySortDirection direction) throws SQLException, ClassNotFoundException {
 		PreparedStatement ps;
 		ResultSet rs;
@@ -262,7 +266,21 @@ public class SqliteLayer {
 		while (rs.next()) {
 			MediaTrack mt = new MediaTrack();
 			
-			mt.setfilepath(rs.getString("sfile"));
+			mt.setfilepath(rs.getString(SQL_TBL_MEDIAFILES_COL_FILE));
+			
+			java.sql.Date dadded = rs.getDate(SQL_TBL_MEDIAFILES_COL_DADDED);
+			if (dadded!=null) {
+				long time = dadded.getTime();
+				if (time > 100000) { // If the date was stored old-style, we get back the year :S.
+					mt.setDateAdded(new Date(time));
+				} else {
+					String s = rs.getString(SQL_TBL_MEDIAFILES_COL_DADDED);
+					try {
+						Date d = SQL_DATE.parse(s);
+						mt.setDateAdded(d);
+					} catch (Exception e) {}
+				}
+			}
 			
 			ret.add(mt);
 		}
@@ -292,6 +310,7 @@ public class SqliteLayer {
 		if (n == 0) {
 			ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_ADD);
 			ps.setString(1, filePath);
+			ps.setDate(2, new java.sql.Date(new Date().getTime()));
 			n = ps.executeUpdate();
 			ps.close();
 			if (n<1) throw new DbException("No update occured.");
