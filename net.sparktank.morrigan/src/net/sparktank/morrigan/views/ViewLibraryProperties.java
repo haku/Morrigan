@@ -215,13 +215,13 @@ public class ViewLibraryProperties extends ViewPart {
 					new MorriganMsgDlg(e).open();
 				}
 				listChange.run();
-			}
-			
-			if (promptScan) {
-				MorriganMsgDlg dlg2 = new MorriganMsgDlg("Run scan on " + library.getListName() + " now?", MorriganMsgDlg.YESNO);
-				dlg2.open();
-				if (dlg2.getReturnCode() == MorriganMsgDlg.OK) {
-					libraryUpdateAction.run();
+				
+				if (promptScan) {
+					MorriganMsgDlg dlg2 = new MorriganMsgDlg("Run scan on " + library.getListName() + " now?", MorriganMsgDlg.YESNO);
+					dlg2.open();
+					if (dlg2.getReturnCode() == MorriganMsgDlg.OK) {
+						libraryUpdateAction.run();
+					}
 				}
 			}
 		}
