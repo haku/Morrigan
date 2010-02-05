@@ -38,7 +38,7 @@ public class ViewPlayer extends ViewPart {
 	private MediaList currentList = null;
 	private MediaTrack currentTrack = null;
 	private long currentPosition = -1; // In seconds.
-	private PlaybackOrder playbackOrder = PlaybackOrder.sequential;
+	private PlaybackOrder playbackOrder = PlaybackOrder.SEQUENTIAL;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	ViewPart methods.
@@ -249,7 +249,7 @@ public class ViewPlayer extends ViewPart {
 		}
 		
 		public PlaybackOrder getSelectedOrder () {
-			return PlaybackOrder.valueOf(selected);
+			return OrderHelper.parsePlaybackOrder(selected);
 		}
 		
 	}

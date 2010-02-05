@@ -11,14 +11,14 @@ public class OrderHelper {
 	
 	public static enum PlaybackOrder {
 		
-		sequential {
+		SEQUENTIAL {
 			@Override
 			public String toString() {
 				return "sequential";
 			}
 		},
 		
-		random {
+		RANDOM {
 			@Override
 			public String toString() {
 				return "random";
@@ -43,12 +43,21 @@ public class OrderHelper {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	public static PlaybackOrder parsePlaybackOrder (String s) {
+		for (PlaybackOrder o : PlaybackOrder.values()) {
+			if (s.equals(o.toString())) return o;
+		}
+		return null;
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
 	public static MediaTrack getNextTrack (MediaList list, MediaTrack track, PlaybackOrder mode) {
 		switch (mode) {
-			case sequential:
+			case SEQUENTIAL:
 				return getNextTrackSequencial(list, track);
 			
-			case random:
+			case RANDOM:
 				return getNextTrackRandom(list, track);
 			
 			default:
