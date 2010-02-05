@@ -257,7 +257,7 @@ public class ViewPlayer extends ViewPart {
 	 */
 	private Runnable updateStatusRunable = new Runnable() {
 		public void run() {
-			if (getSite().getShell().getDisplay().isDisposed()) return;
+			if (mainLabel.isDisposed()) return;
 			
 			if (currentTrack != null) {
 				setTitleImage(iconPlay);
