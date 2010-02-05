@@ -145,7 +145,7 @@ public class SqliteLayer {
 		"INSERT INTO tbl_mediafiles (sfile,dadded,lstartcnt,lendcnt,lduration,benabled) VALUES " +
 		"(?,?,0,0,0,1);";
 	
-	public enum LibrarySort { FILE, DADDED };
+	public enum LibrarySort { FILE, DADDED, STARTCNT, ENDCNT, DLASTPLAY };
 	
 	public enum LibrarySortDirection { ASC, DESC };
 	
@@ -259,6 +259,20 @@ public class SqliteLayer {
 				sql = sql.replace("{COL}", SQL_TBL_MEDIAFILES_COL_DADDED);
 				break;
 			
+			case STARTCNT:
+				sql = sql.replace("{COL}", SQL_TBL_MEDIAFILES_COL_STARTCNT);
+				break;
+				
+			case ENDCNT:
+				sql = sql.replace("{COL}", SQL_TBL_MEDIAFILES_COL_ENDCNT);
+				break;
+				
+			case DLASTPLAY:
+				sql = sql.replace("{COL}", SQL_TBL_MEDIAFILES_COL_DLASTPLAY);
+				break;
+				
+			default:
+				throw new IllegalArgumentException();
 		}
 		
 		ps = getDbCon().prepareStatement(sql);

@@ -69,12 +69,30 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 	@Override
 	protected void onSort(TableViewer table, TableViewerColumn column, int direction) {
 		LibrarySort sort = getEditedMediaList().getSort();
-		MediaColumn mCol = MediaColumn.valueOf(column.getColumn().getText());
+		MediaColumn mCol = parseMediaColumn(column.getColumn().getText());
 		switch (mCol) {
 			case FILE:
 				sort = LibrarySort.FILE;
 				break;
 			
+			case DADDED:
+				sort = LibrarySort.DADDED;
+				break;
+				
+			case STARTCOUNT:
+				sort = LibrarySort.STARTCNT;
+				break;
+				
+			case ENDCOUNT:
+				sort = LibrarySort.ENDCNT;
+				break;
+				
+			case DLASTPLAY:
+				sort = LibrarySort.DLASTPLAY;
+				break;
+				
+			default:
+				throw new IllegalArgumentException();
 		}
 		
 		LibrarySortDirection sortDir;

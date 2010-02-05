@@ -47,7 +47,7 @@ public class OrderHelper {
 		for (PlaybackOrder o : PlaybackOrder.values()) {
 			if (s.equals(o.toString())) return o;
 		}
-		return null;
+		throw new IllegalArgumentException();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

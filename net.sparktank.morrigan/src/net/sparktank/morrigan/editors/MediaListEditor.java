@@ -47,6 +47,13 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		DLASTPLAY  {@Override public String toString() { return "last played"; } }
 		}
 	
+	public static MediaColumn parseMediaColumn (String s) {
+		for (MediaColumn o : MediaColumn.values()) {
+			if (s.equals(o.toString())) return o;
+		}
+		throw new IllegalArgumentException();
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private T editedMediaList;
