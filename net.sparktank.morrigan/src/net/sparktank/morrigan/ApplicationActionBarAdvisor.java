@@ -1,5 +1,6 @@
 package net.sparktank.morrigan;
 
+import net.sparktank.morrigan.library.NewLibraryAction;
 import net.sparktank.morrigan.playlist.NewPlaylistAction;
 import net.sparktank.morrigan.views.ShowViewAction;
 import net.sparktank.morrigan.views.ViewMediaExplorer;
@@ -53,6 +54,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	private IAction showMediaExplorer;
 	
 	// List actions.
+	private IAction newLibraryAction;
 	private IAction newPlayListAction;
 	IWorkbenchAction saveAction;
 	private RetargetAction addAction;
@@ -80,6 +82,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		 * The corresponding commands keybindings are defined in the plugin.xml file.
 		 * Registering also provides automatic disposal of the actions when the window is closed.
 		 */
+		
+		newLibraryAction = new NewLibraryAction(window);
+		register(newLibraryAction);
 		
 		newPlayListAction = new NewPlaylistAction(window);
 		register(newPlayListAction);
@@ -128,6 +133,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		
 		MenuManager playlistMenu = new MenuManager("&Collections", "collections");
 		menuBar.add(playlistMenu);
+		playlistMenu.add(newLibraryAction);
 		playlistMenu.add(newPlayListAction);
 		playlistMenu.add(new Separator());
 		playlistMenu.add(saveAction);
