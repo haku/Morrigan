@@ -41,7 +41,7 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 	
 	public static final String ID = "net.sparktank.morrigan.editors.MediaListEditor";
 	
-	public enum MediaColumn { FILE, DADDED }
+	public enum MediaColumn { FILE, DADDED, STARTCOUNT, ENDCOUNT, DLASTPLAY }
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -100,7 +100,13 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		
 		// add and configure columns.
 		MediaColumn[] titles = MediaColumn.values();
-		ColumnLayoutData[] bounds = {new ColumnWeightData(100), new ColumnPixelData(140, true, true) };
+		ColumnLayoutData[] bounds = {
+				new ColumnWeightData(100),
+				new ColumnPixelData(140, true, true),
+				new ColumnPixelData(60, true, true),
+				new ColumnPixelData(60, true, true),
+				new ColumnPixelData(140, true, true)
+				};
 		
 		for (int i = 0; i < titles.length; i++) {
 			final TableViewerColumn column = new TableViewerColumn(editTable, SWT.NONE);
@@ -170,6 +176,15 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 				
 				case 1:
 					return elm.getDateAdded() == null ? null : sdf.format(elm.getDateAdded());
+					
+				case 2:
+					return elm.getStartCount() < 0 ? null : String.valueOf(elm.getStartCount());
+					
+				case 3:
+					return elm.getEndCount() < 0 ? null : String.valueOf(elm.getEndCount());
+					
+				case 4:
+					return elm.getDateLastPlayed() == null ? null : sdf.format(elm.getDateLastPlayed());
 					
 				default:
 					throw new IllegalArgumentException("Invalid column; '" + columnIndex + "'.");
