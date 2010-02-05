@@ -42,6 +42,18 @@ public class MediaLibrary extends MediaList {
 		}
 	}
 	
+	/**
+	 * FIXME Sort library list according to DB query.
+	 * Clear then reload?
+	 * How about loading into a new list, then replacing?
+	 * Would need to be thread-safe.
+	 * @throws MorriganException
+	 */
+	public void reRead () throws MorriganException {
+		firstRead = true;
+		read();
+	}
+	
 	@Override
 	public void addTrack(MediaTrack track) {
 		super.addTrack(track);
