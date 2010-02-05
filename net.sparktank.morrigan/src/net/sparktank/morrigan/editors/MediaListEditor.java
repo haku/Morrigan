@@ -218,7 +218,8 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 	private Runnable updateGuiRunable = new Runnable() {
 		@Override
 		public void run() {
-			refreshUi();
+			if (editTable.getTable().isDisposed()) return;
+			editTable.refresh();
 		}
 	};
 	
@@ -239,10 +240,6 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 	
 	protected boolean isSortable () {
 		return false;
-	}
-	
-	protected void refreshUi () {
-		editTable.refresh();
 	}
 	
 	public T getEditedMediaList () {
