@@ -51,13 +51,21 @@ public class LibraryHelper {
 		
 	}
 	
-	public static String getLibraryTitle (String libFilePath) {
-		int x = libFilePath.lastIndexOf(File.separator);
+	public static String getLibraryTitle (String filePath) {
+		String ret = filePath;
+		int x;
+		
+		x = ret.lastIndexOf(File.separator);
 		if (x > 0) {
-			return libFilePath.substring(x+1);
-		} else {
-			return libFilePath;
+			ret = ret.substring(x+1);
 		}
+		
+		x = ret.lastIndexOf(Config.LIB_FILE_EXT);
+		if (x > 0) {
+			ret = ret.substring(0, x);
+		}
+		
+		return ret;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
