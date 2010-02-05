@@ -57,6 +57,11 @@ public class MediaLibrary extends MediaList {
 		read();
 	}
 	
+	public void setSort (LibrarySort sort) throws MorriganException {
+		librarySort = sort;
+		reRead();
+	}
+	
 	@Override
 	public void addTrack(MediaTrack track) {
 		super.addTrack(track);
