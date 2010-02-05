@@ -21,7 +21,6 @@ public class LibraryHelper {
 	public static MediaLibrary createLib (String libName) throws MorriganException {
 		String plFile = getPathForNewLibrary(libName);
 		MediaLibrary lib = MediaListFactory.makeMediaLibrary(getLibraryTitle(plFile), plFile);
-//		lib.read();
 		return lib;
 	}
 	
