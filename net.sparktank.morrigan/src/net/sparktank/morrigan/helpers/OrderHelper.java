@@ -25,19 +25,19 @@ public class OrderHelper {
 			}
 		},
 		
-		bystartcount {
-			@Override
-			public String toString() {
-				return "by start-count";
-			}
-		},
+//		bystartcount {
+//			@Override
+//			public String toString() {
+//				return "by start-count";
+//			}
+//		},
 		
-		bylastplayed {
-			@Override
-			public String toString() {
-				return "by last-played";
-			}
-		} 
+//		bylastplayed {
+//			@Override
+//			public String toString() {
+//				return "by last-played";
+//			}
+//		} 
 		
 	};
 	
@@ -49,12 +49,6 @@ public class OrderHelper {
 				return getNextTrackSequencial(list, track);
 			
 			case random:
-				return getNextTrackRandom(list, track);
-			
-			case bystartcount: // TODO implement bystartcount.
-				return getNextTrackRandom(list, track);
-			
-			case bylastplayed: // TODO implement bylastplayed.
 				return getNextTrackRandom(list, track);
 			
 			default:
