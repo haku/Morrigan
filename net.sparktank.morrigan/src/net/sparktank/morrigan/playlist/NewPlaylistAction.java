@@ -1,20 +1,21 @@
 package net.sparktank.morrigan.playlist;
 
 import net.sparktank.morrigan.Activator;
-import net.sparktank.morrigan.actions.MorriganAction;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.views.ViewMediaExplorer;
 
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
 
 
-public class NewPlaylistAction extends MorriganAction {
+public class NewPlaylistAction extends Action implements IWorkbenchAction {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private IWorkbenchWindow window;
@@ -62,6 +63,11 @@ public class NewPlaylistAction extends MorriganAction {
 			view.refresh();
 		}
 	}
-
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	@Override
+	public void dispose() {}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

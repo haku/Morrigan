@@ -1,14 +1,15 @@
 package net.sparktank.morrigan.views;
 
-import net.sparktank.morrigan.actions.MorriganAction;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
 
-public class ShowViewAction extends MorriganAction {
+public class ShowViewAction extends Action implements IWorkbenchAction {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private final String viewId;
@@ -46,6 +47,11 @@ public class ShowViewAction extends MorriganAction {
 		}
 
 	}
-
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	@Override
+	public void dispose() {}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
