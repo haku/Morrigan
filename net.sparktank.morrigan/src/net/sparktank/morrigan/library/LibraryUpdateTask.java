@@ -85,10 +85,12 @@ public class LibraryUpdateTask extends Job {
 						if (monitor.isCanceled()) break;
 					}
 					
-					if (monitor.isCanceled()) {
-						System.out.println("Task was canceled desu~.");
-						break;
-					}
+					if (monitor.isCanceled()) break;
+				}
+				
+				if (monitor.isCanceled()) {
+					System.out.println("Task was canceled desu~.");
+					break;
 				}
 			}
 		}
