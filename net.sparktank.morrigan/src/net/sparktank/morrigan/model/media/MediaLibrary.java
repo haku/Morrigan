@@ -25,6 +25,10 @@ public class MediaLibrary extends MediaList {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	public boolean allowDuplicateEntries () {
+		return false;
+	}
+	
 	private boolean firstRead = true;
 	
 	@Override
@@ -64,7 +68,11 @@ public class MediaLibrary extends MediaList {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public boolean addFile (File file) throws DbException {
+	/**
+	 * Returns true if the file was added.
+	 * (i.e. it was not already in the library)
+	 */
+	public boolean addFile (File file) throws MorriganException {
 		boolean added = dbLayer.addFile(file);
 		if (added) addTrack(new MediaTrack(file.getAbsolutePath()));
 		return added;

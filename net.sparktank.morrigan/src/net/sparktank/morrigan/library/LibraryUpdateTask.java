@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
 
+import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.MediaLibrary;
 import net.sparktank.morrigan.playback.ImplException;
 import net.sparktank.morrigan.playback.PlaybackEngineFactory;
@@ -79,7 +80,7 @@ public class LibraryUpdateTask extends Job {
 									if (library.addFile(file)) {
 										filesAdded++;
 									}
-								} catch (DbException e) {
+								} catch (MorriganException e) {
 									// FIXME log this somewhere useful.
 									e.printStackTrace();
 								}

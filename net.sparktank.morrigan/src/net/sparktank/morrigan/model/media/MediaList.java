@@ -89,6 +89,8 @@ public abstract class MediaList {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	abstract public boolean allowDuplicateEntries ();
+	
 	/**
 	 * This is the signal to read any source data needed.
 	 * This will be called soon after the constructor and before
@@ -109,8 +111,10 @@ public abstract class MediaList {
 	}
 	
 	public void addTrack (MediaTrack track) {
-		mediaTracks.add(track);
-		setDirty(true);
+		if (allowDuplicateEntries() || !mediaTracks.contains(track)) {
+			mediaTracks.add(track);
+			setDirty(true);
+		}
 	}
 	
 	public void removeMediaTrack (MediaTrack track) {

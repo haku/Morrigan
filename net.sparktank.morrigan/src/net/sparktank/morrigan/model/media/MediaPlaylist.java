@@ -35,6 +35,10 @@ public class MediaPlaylist extends MediaList {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	public boolean allowDuplicateEntries () {
+		return true;
+	}
+	
 	@Override
 	public void read () throws MorriganException {
 		if (newPl) {
