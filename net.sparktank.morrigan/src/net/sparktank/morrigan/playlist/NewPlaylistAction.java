@@ -51,7 +51,7 @@ public class NewPlaylistAction extends Action implements IWorkbenchAction {
 			// create playlist.
 			String plName = dlg.getValue();
 			try {
-				PlaylistHelper.instance.createPl(plName);
+				PlaylistHelper.INSTANCE.createPl(plName);
 			} catch (MorriganException e) {
 				new MorriganMsgDlg(e).open();
 				return;

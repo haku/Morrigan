@@ -12,7 +12,7 @@ import net.sparktank.morrigan.model.ui.MediaExplorerItem;
 public class PlaylistHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public static final PlaylistHelper instance = new PlaylistHelper();
+	public static final PlaylistHelper INSTANCE = new PlaylistHelper();
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	

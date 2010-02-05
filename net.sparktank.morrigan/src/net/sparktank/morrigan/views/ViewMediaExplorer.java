@@ -146,7 +146,7 @@ public class ViewMediaExplorer extends ViewPart {
 	private void makeContent () {
 		items.clear();
 		items.addAll(LibraryHelper.INSTANCE.getAllLibraries());
-		items.addAll(PlaylistHelper.instance.getAllPlaylists());
+		items.addAll(PlaylistHelper.INSTANCE.getAllPlaylists());
 	}
 	
 	private Map<ImageDescriptor, Image> imageCache = new HashMap<ImageDescriptor, Image>();
