@@ -6,7 +6,7 @@ import java.util.List;
 import net.sparktank.morrigan.Activator;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.library.DbException;
-import net.sparktank.morrigan.library.LibraryUpdateTask;
+import net.sparktank.morrigan.library.LibraryUpdateAction;
 import net.sparktank.morrigan.model.media.MediaLibrary;
 
 import org.eclipse.jface.action.Action;
@@ -47,6 +47,7 @@ public class ViewLibraryProperties extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private MediaLibrary library;
+	private LibraryUpdateAction libraryUpdateAction = new LibraryUpdateAction();
 	
 	public void setContent (MediaLibrary library) {
 		setContent(library, true);
@@ -63,6 +64,8 @@ public class ViewLibraryProperties extends ViewPart {
 		if (this.library!=null) {
 			this.library.addChangeEvent(listChange);
 		}
+		
+		libraryUpdateAction.setMediaLibrary(this.library);
 		
 		if (updateGui) listChange.run();
 	}
@@ -81,7 +84,7 @@ public class ViewLibraryProperties extends ViewPart {
 	private void addToolbar () {
 		getViewSite().getActionBars().getToolBarManager().add(addAction);
 		getViewSite().getActionBars().getToolBarManager().add(removeAction);
-		getViewSite().getActionBars().getToolBarManager().add(updateAction);
+		getViewSite().getActionBars().getToolBarManager().add(libraryUpdateAction);
 	}
 	
 	private IStructuredContentProvider sourcesProvider = new IStructuredContentProvider() {
@@ -231,18 +234,6 @@ public class ViewLibraryProperties extends ViewPart {
 			
 			
 		};
-	};
-	
-	private IAction updateAction = new Action("update", Activator.getImageDescriptor("icons/search.gif")) {
-		public void run() {
-			if (library==null) {
-				new MorriganMsgDlg("No library selected desu~.").open();
-				return;
-			}
-			
-			LibraryUpdateTask job = new LibraryUpdateTask(library);
-			job.schedule();
-		}
 	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
