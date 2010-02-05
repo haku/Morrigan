@@ -70,6 +70,10 @@ public class ViewLibraryProperties extends ViewPart {
 		if (updateGui) listChange.run();
 	}
 	
+	public void showAddDlg (boolean promptScan) {
+		new AddAction().run(promptScan);
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	GUI stuff.
 	
@@ -82,7 +86,7 @@ public class ViewLibraryProperties extends ViewPart {
 	}
 	
 	private void addToolbar () {
-		getViewSite().getActionBars().getToolBarManager().add(addAction);
+		getViewSite().getActionBars().getToolBarManager().add(new AddAction());
 		getViewSite().getActionBars().getToolBarManager().add(removeAction);
 		getViewSite().getActionBars().getToolBarManager().add(libraryUpdateAction);
 	}
@@ -184,8 +188,17 @@ public class ViewLibraryProperties extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Actions.
 	
-	private IAction addAction = new Action("add", Activator.getImageDescriptor("icons/plus.gif")) {
+	private class AddAction extends Action {
+		
+		public AddAction () {
+			super("add", Activator.getImageDescriptor("icons/plus.gif"));
+		}
+		
 		public void run() {
+			run(false);
+		}
+		
+		public void run(boolean promptScan) {
 			if (library==null) {
 				new MorriganMsgDlg("No library selected desu~.").open();
 				return;
@@ -203,8 +216,17 @@ public class ViewLibraryProperties extends ViewPart {
 				}
 				listChange.run();
 			}
-		};
-	};
+			
+			if (promptScan) {
+				MorriganMsgDlg dlg2 = new MorriganMsgDlg("Run scan on " + library.getListName() + " now?", MorriganMsgDlg.YESNO);
+				dlg2.open();
+				if (dlg2.getReturnCode() == MorriganMsgDlg.OK) {
+					libraryUpdateAction.run();
+				}
+			}
+		}
+		
+	}
 	
 	private IAction removeAction = new Action("remove", Activator.getImageDescriptor("icons/minus.gif")) {
 		public void run() {
@@ -232,8 +254,7 @@ public class ViewLibraryProperties extends ViewPart {
 				}
 			}
 			
-			
-		};
+		}
 	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
