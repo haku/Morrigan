@@ -26,10 +26,17 @@ public abstract class MediaList {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	/**
+	 * A unique identifier.
+	 */
 	public String getListId () {
 		return listId;
 	}
 	
+	/**
+	 * A human readable name for the GUI.
+	 * @return
+	 */
 	public String getListName () {
 		return listName;
 	}
