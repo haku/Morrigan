@@ -4,7 +4,7 @@
 <project default="jar" name="Create jar for plugin stub.">
 
 	<target name="jar">
-		<jar destfile="pluginstub.jar">
+		<jar destfile="morrigan.pe.stub.jar">
 			<fileset dir="bin" includes="net/sparktank/morrigan/playback/**/*.class" />
 			<fileset dir="bin" includes="net/sparktank/morrigan/exceptions/**/*.class" />
 		</jar>
