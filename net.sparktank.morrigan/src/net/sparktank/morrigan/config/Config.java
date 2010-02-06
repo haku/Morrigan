@@ -35,6 +35,10 @@ public class Config {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	/*
+	 * TODO move these vars to a user-config somewhere.
+	 */
+	
 	public static final String PLAYBACK_ENGINE_JAR = "D:/haku/development/eclipseWorkspace-java/net.sparktank.morrigan.playbackimpl.spi/morrigan.playbackimpl.spi.jar";
 	public static final String PLAYBACK_ENGINE = "net.sparktank.morrigan.playbackimpl.spi.PlaybackEngine";
 	
