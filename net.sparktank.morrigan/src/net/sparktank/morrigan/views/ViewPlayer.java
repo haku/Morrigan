@@ -119,7 +119,11 @@ public class ViewPlayer extends ViewPart {
 			
 		} catch (MorriganException e) {
 			currentTrack = null;
-			new MorriganMsgDlg(e).open();
+			try {
+				new MorriganMsgDlg(e).open();
+			} catch (Exception e1) {
+				e.printStackTrace();
+			}
 		}
 		
 		getSite().getShell().getDisplay().asyncExec(updateStatusRunable);

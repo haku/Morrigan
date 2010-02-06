@@ -1,17 +1,21 @@
 package net.sparktank.morrigan.playback;
 
+import java.io.File;
+import java.net.URL;
+import java.net.URLClassLoader;
+
 import net.sparktank.morrigan.config.Config;
 
 public class PlaybackEngineFactory {
 	
 	public static IPlaybackEngine makePlaybackEngine () throws ImplException {
-		Class<?> [] classParm = null;
-		Object [] objectParm = null;
-		
 		try {
-			Class<?> cl = Class.forName(Config.PLAYBACK_ENGINE);
-			java.lang.reflect.Constructor<?> co = cl.getConstructor(classParm);
-			IPlaybackEngine playbackEngine = (IPlaybackEngine) co.newInstance(objectParm);
+			File file = new File(Config.PLAYBACK_ENGINE_JAR);
+			System.out.println(file.getAbsolutePath());
+			URL jarfile = new URL("jar", "", "file:" + file.getAbsolutePath() + "!/");
+			URLClassLoader classLoader = URLClassLoader.newInstance(new URL[] { jarfile }, IPlaybackEngine.class.getClassLoader());
+			Class<?> c = classLoader.loadClass(Config.PLAYBACK_ENGINE);
+			IPlaybackEngine playbackEngine = (IPlaybackEngine) c.newInstance();
 			
 			return playbackEngine;
 			
