@@ -1,6 +1,14 @@
 package net.sparktank.morrigan.config;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Properties;
+
+import net.sparktank.morrigan.exceptions.MorriganException;
+import net.sparktank.morrigan.helpers.FileExtFilter;
 
 public class Config {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -35,12 +43,52 @@ public class Config {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	/*
-	 * TODO move these vars to a user-config somewhere.
-	 */
+	private static final String PROP_FILE = "morrigan.properties";
 	
-	public static final String PLAYBACK_ENGINE_JAR = "D:/haku/development/eclipseWorkspace-java/net.sparktank.morrigan.playbackimpl.spi/morrigan.playbackimpl.spi.jar";
-	public static final String PLAYBACK_ENGINE = "net.sparktank.morrigan.playbackimpl.spi.PlaybackEngine";
+	private static final String PROP_PE_CLASS = "playbackengine.class";
+	private static final String PROP_PE_JARDIRS = "playbackengine.jardirs";
+	
+	/**
+	 * Returns list of file objects.
+	 * @return
+	 * @throws MorriganException
+	 */
+	public static File[] getPlaybackEngineJars () throws MorriganException {
+		File file = new File(PROP_FILE);
+		System.out.println(file.getAbsolutePath());
+		Properties props = new Properties();
+		try {
+			props.load(new FileInputStream(file));
+		} catch (Exception e) {
+			throw new MorriganException(e);
+		}
+		
+		List<File> ret = new ArrayList<File>();
+		
+		String data = props.getProperty(PROP_PE_JARDIRS);
+		String[] dirs = data.split("\\|");
+		for (String dir : dirs) {
+			File dirFile = new File(dir);
+			File[] listFiles = dirFile.listFiles(new FileExtFilter("jar"));
+			if (listFiles!=null && listFiles.length>0) {
+				ret.addAll(Arrays.asList(listFiles));
+			}
+		}
+		
+		return ret.toArray( new File[] {} );
+	}
+	
+	public static String getPlaybackEngineClass () throws MorriganException {
+		File file = new File(PROP_FILE);
+		Properties props = new Properties();
+		try {
+			props.load(new FileInputStream(file));
+		} catch (Exception e) {
+			throw new MorriganException(e);
+		}
+		
+		return props.getProperty(PROP_PE_CLASS);
+	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

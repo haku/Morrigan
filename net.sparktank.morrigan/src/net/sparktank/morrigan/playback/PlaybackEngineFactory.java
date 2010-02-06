@@ -10,11 +10,16 @@ public class PlaybackEngineFactory {
 	
 	public static IPlaybackEngine makePlaybackEngine () throws ImplException {
 		try {
-			File file = new File(Config.PLAYBACK_ENGINE_JAR);
-			System.out.println(file.getAbsolutePath());
-			URL jarfile = new URL("jar", "", "file:" + file.getAbsolutePath() + "!/");
-			URLClassLoader classLoader = URLClassLoader.newInstance(new URL[] { jarfile }, IPlaybackEngine.class.getClassLoader());
-			Class<?> c = classLoader.loadClass(Config.PLAYBACK_ENGINE);
+			File[] files = Config.getPlaybackEngineJars();
+			
+			URL jarUrls[] = new URL [files.length];
+			for (int i = 0; i < files.length; i++) {
+				System.out.println(files[i].getAbsolutePath());
+				jarUrls[i] = new URL("jar", "", "file:" + files[i].getAbsolutePath() + "!/");
+			}
+			
+			URLClassLoader classLoader = URLClassLoader.newInstance(jarUrls, IPlaybackEngine.class.getClassLoader());
+			Class<?> c = classLoader.loadClass(Config.getPlaybackEngineClass());
 			IPlaybackEngine playbackEngine = (IPlaybackEngine) c.newInstance();
 			
 			return playbackEngine;
