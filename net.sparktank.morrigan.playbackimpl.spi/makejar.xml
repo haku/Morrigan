@@ -2,11 +2,10 @@
 <?eclipse.ant.import?>
 
 <project default="jar" name="Create plugin jar.">
-
+	
 	<target name="jar">
 		<jar destfile="morrigan.playbackimpl.spi.jar">
 			<fileset dir="bin" includes="net/sparktank/morrigan/playbackimpl/spi/**/*.class" />
-			<!-- <zipfileset src="../net.sparktank.morrigan/pluginstub.jar" includes="**/*.class"/> -->
 			<zipfileset src="lib/jl1.0.1.jar" includes="**/*.class"/>
 			<zipfileset src="lib/jogg-0.0.7.jar" includes="**/*.class"/>
 			<zipfileset src="lib/jorbis-0.0.15.jar" includes="**/*.class"/>
@@ -14,6 +13,11 @@
 			<zipfileset src="lib/tritonus_mp3-0.3.6.jar" includes="**/*.class"/>
 			<zipfileset src="lib/tritonus_share-0.3.6.jar" includes="**/*.class"/>
 			<zipfileset src="lib/vorbisspi1.0.3.jar" includes="**/*.class"/>
+			
+			<manifest>
+				<attribute name="Class-Path" value="lib/jl1.0.1.jar lib/jogg-0.0.7.jar lib/jorbis-0.0.15.jar lib/mp3spi1.9.4.jar lib/tritonus_mp3-0.3.6.jar lib/tritonus_share-0.3.6.jar lib/vorbisspi1.0.3.jar" />
+			</manifest>
+			
 		</jar>
     </target>
     
