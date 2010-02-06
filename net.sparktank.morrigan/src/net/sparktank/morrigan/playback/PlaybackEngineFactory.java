@@ -14,7 +14,7 @@ public class PlaybackEngineFactory {
 			
 			URL jarUrls[] = new URL [files.length];
 			for (int i = 0; i < files.length; i++) {
-				System.out.println(files[i].getAbsolutePath());
+//				System.out.println(files[i].getAbsolutePath());
 				jarUrls[i] = new URL("jar", "", "file:" + files[i].getAbsolutePath() + "!/");
 			}
 			
