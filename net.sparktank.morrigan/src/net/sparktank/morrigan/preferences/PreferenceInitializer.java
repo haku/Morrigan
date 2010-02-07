@@ -12,8 +12,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 	public void initializeDefaultPreferences() {
 		IEclipsePreferences defaults = new DefaultScope().getNode(Activator.PLUGIN_ID);
 		defaults.putBoolean(MediaListPref.PREF_COL_DADDED, false);
-		defaults.putBoolean(MediaListPref.PREF_COL_STARTCNT, true);
-		defaults.putBoolean(MediaListPref.PREF_COL_ENDCNT, true);
+		defaults.putBoolean(MediaListPref.PREF_COL_COUNTS, true);
 		defaults.putBoolean(MediaListPref.PREF_COL_DLASTPLAY, false);
 	}
 	

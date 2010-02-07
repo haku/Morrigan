@@ -79,12 +79,8 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 				sort = LibrarySort.DADDED;
 				break;
 				
-			case STARTCOUNT:
+			case COUNTS:
 				sort = LibrarySort.STARTCNT;
-				break;
-				
-			case ENDCOUNT:
-				sort = LibrarySort.ENDCNT;
 				break;
 				
 			case DLASTPLAY:

@@ -12,16 +12,14 @@ public class MediaListPref extends FieldEditorPreferencePage implements IWorkben
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static final String PREF_COL_DADDED = "PREF_COL_DADDED";
-	public static final String PREF_COL_STARTCNT = "PREF_COL_STARTCNT";
-	public static final String PREF_COL_ENDCNT = "PREF_COL_ENDCNT";
+	public static final String PREF_COL_COUNTS = "PREF_COL_COUNTS";
 	public static final String PREF_COL_DLASTPLAY = "PREF_COL_DLASTPLAY";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public void createFieldEditors() {
 		addField(new BooleanFieldEditor(PREF_COL_DADDED, "Show date added column", getFieldEditorParent()));
-		addField(new BooleanFieldEditor(PREF_COL_STARTCNT, "Show start count column", getFieldEditorParent()));
-		addField(new BooleanFieldEditor(PREF_COL_ENDCNT, "Show end count column", getFieldEditorParent()));
+		addField(new BooleanFieldEditor(PREF_COL_COUNTS, "Show counts column", getFieldEditorParent()));
 		addField(new BooleanFieldEditor(PREF_COL_DLASTPLAY, "Show date last played column", getFieldEditorParent()));
 	}
 	
@@ -38,11 +36,8 @@ public class MediaListPref extends FieldEditorPreferencePage implements IWorkben
 			case DADDED:
 				return Activator.getDefault().getPreferenceStore().getBoolean(PREF_COL_DADDED);
 				
-			case STARTCOUNT:
-				return Activator.getDefault().getPreferenceStore().getBoolean(PREF_COL_STARTCNT);
-			
-			case ENDCOUNT:
-				return Activator.getDefault().getPreferenceStore().getBoolean(PREF_COL_ENDCNT);
+			case COUNTS:
+				return Activator.getDefault().getPreferenceStore().getBoolean(PREF_COL_COUNTS);
 			
 			case DLASTPLAY:
 				return Activator.getDefault().getPreferenceStore().getBoolean(PREF_COL_DLASTPLAY);

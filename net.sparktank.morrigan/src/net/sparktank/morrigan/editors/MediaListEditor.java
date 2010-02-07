@@ -43,8 +43,7 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 	public enum MediaColumn { 
 		FILE       {@Override public String toString() { return "file"; } }, 
 		DADDED     {@Override public String toString() { return "added"; } },
-		STARTCOUNT {@Override public String toString() { return "starts"; } },
-		ENDCOUNT   {@Override public String toString() { return "ends"; } },
+		COUNTS     {@Override public String toString() { return "counts"; } },
 		DLASTPLAY  {@Override public String toString() { return "last played"; } }
 		}
 	
@@ -128,16 +127,12 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 						column.setLabelProvider(new DateAddedLblProv());
 						break;
 						
-					case STARTCOUNT:
-						layout.setColumnData(column.getColumn(), new ColumnPixelData(60, true, true));
-						column.setLabelProvider(new StartCountLblProv());
+					case COUNTS:
+						layout.setColumnData(column.getColumn(), new ColumnPixelData(70, true, true));
+						column.setLabelProvider(new CountsLblProv());
+						column.getColumn().setAlignment(SWT.CENTER);
 						break;
 						
-					case ENDCOUNT:
-						layout.setColumnData(column.getColumn(), new ColumnPixelData(60, true, true));
-						column.setLabelProvider(new EndCountLblProv());
-						break;
-					
 					case DLASTPLAY:
 						layout.setColumnData(column.getColumn(), new ColumnPixelData(140, true, true));
 						column.setLabelProvider(new DateLastPlayerLblProv());
@@ -207,19 +202,15 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		}
 	}
 	
-	private class StartCountLblProv extends ColumnLabelProvider {
+	private class CountsLblProv extends ColumnLabelProvider {
 		@Override
 		public String getText(Object element) {
 			MediaItem elm = (MediaItem) element;
-			return elm.getStartCount() <= 0 ? null : String.valueOf(elm.getStartCount());
-		}
-	}
-	
-	private class EndCountLblProv extends ColumnLabelProvider {
-		@Override
-		public String getText(Object element) {
-			MediaItem elm = (MediaItem) element;
-			return elm.getEndCount() <= 0 ? null : String.valueOf(elm.getEndCount());
+			if (elm.getStartCount() <= 0 && elm.getStartCount() <= 0) {
+				return null;
+			} else {
+				return String.valueOf(elm.getStartCount()) + "/" + String.valueOf(elm.getEndCount());
+			}
 		}
 	}
 	
