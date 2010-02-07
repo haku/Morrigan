@@ -3,6 +3,16 @@
 
 <product name="morrigan" uid="net.sparktank.morrigan.product" id="net.sparktank.morrigan.product" application="net.sparktank.morrigan.application" useFeatures="false" includeLaunchers="true">
 
+   <aboutInfo>
+      <image path="/net.sparktank.morrigan/graphics/copepod.png"/>
+      <text>
+         This alpha build of morrigan is released as free software and is provided &quot;as is&quot; for testing pourpouses only.
+
+For more information, please refer to related blog entries at http://vaguehope.com or email haku@vaguehope.com
+
+This build of morrigan is (c) copyright Alex Hutter 2010.  All rights reserved.
+      </text>
+   </aboutInfo>
 
    <configIni use="default">
    </configIni>

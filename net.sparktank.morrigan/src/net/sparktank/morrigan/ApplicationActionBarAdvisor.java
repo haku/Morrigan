@@ -62,6 +62,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	private RetargetAction removeAction;
 	private RetargetAction showPropertiesAction;
 	
+	// Help.
+	private IWorkbenchAction showAbout;
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private MenuManager showViewMenuMgr;
@@ -126,6 +129,10 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		getActionBarConfigurer().registerGlobalAction(showPropertiesAction);
 		register(showPropertiesAction);
 		window.getPartService().addPartListener(showPropertiesAction);
+		
+		// Help actions.
+		showAbout = ActionFactory.ABOUT.create(window);
+		register(showAbout);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -157,6 +164,10 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		windowMenu.add(showViewMenuMgr);
 		windowMenu.add(new Separator());
 		windowMenu.add(showPrefAction);
+		
+		MenuManager helpMenu = new MenuManager("&Help", IWorkbenchActionConstants.M_HELP);
+		menuBar.add(helpMenu);
+		helpMenu.add(showAbout);
 	}
 	
 	@Override
