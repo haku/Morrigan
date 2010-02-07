@@ -55,7 +55,6 @@ public class Config {
 	 */
 	public static File[] getPlaybackEngineJars () throws MorriganException {
 		File file = new File(PROP_FILE);
-		System.out.println(file.getAbsolutePath());
 		Properties props = new Properties();
 		try {
 			props.load(new FileInputStream(file));
