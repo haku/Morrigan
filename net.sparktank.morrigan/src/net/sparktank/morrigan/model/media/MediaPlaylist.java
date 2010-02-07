@@ -35,6 +35,10 @@ public class MediaPlaylist extends MediaList {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	public boolean isCanBeDirty () {
+		return true;
+	}
+	
 	public boolean allowDuplicateEntries () {
 		return true;
 	}

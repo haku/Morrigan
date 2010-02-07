@@ -20,7 +20,6 @@ public class MediaLibrary extends MediaList {
 	
 	MediaLibrary (String libraryName, String dbFilePath) throws DbException {
 		super(dbFilePath, libraryName);
-		setCanBeDirty(false);
 		
 		this.dbFilePath = dbFilePath;
 		this.librarySort = LibrarySort.FILE;
@@ -30,6 +29,10 @@ public class MediaLibrary extends MediaList {
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	public boolean isCanBeDirty () {
+		return false;
+	}
 	
 	public boolean allowDuplicateEntries () {
 		return false;

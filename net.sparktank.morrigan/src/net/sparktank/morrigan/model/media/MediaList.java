@@ -44,21 +44,14 @@ public abstract class MediaList {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private boolean canBeDirty = true;
 	private boolean isDirty = false;
 	private ArrayList<Runnable> dirtyChangeEvents = new ArrayList<Runnable>();
 	private ArrayList<Runnable> changeEvents = new ArrayList<Runnable>();
 	
-	protected boolean isCanBeDirty () {
-		return canBeDirty;
-	}
-	
-	protected void setCanBeDirty (boolean value) {
-		canBeDirty = value;
-	}
+	abstract public boolean isCanBeDirty (); 
 	
 	public void setDirty (boolean dirty) {
-		if (canBeDirty) {
+		if (isCanBeDirty()) {
 			boolean change = (isDirty != dirty);
 			
 			isDirty = dirty;
