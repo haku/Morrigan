@@ -12,7 +12,7 @@ public abstract class MediaList {
 	
 	private final String listId;
 	private final String listName;
-	private List<MediaTrack> mediaTracks = new ArrayList<MediaTrack>();
+	private List<MediaItem> mediaTracks = new ArrayList<MediaItem>();
 	
 	/**
 	 * listId must be unique.  It will be used to identify
@@ -116,36 +116,36 @@ public abstract class MediaList {
 	 * Returns an unmodifiable list of the playlist items.
 	 * @return
 	 */
-	public List<MediaTrack> getMediaTracks() {
+	public List<MediaItem> getMediaTracks() {
 		return Collections.unmodifiableList(mediaTracks);
 	}
 	
-	protected void replaceList (List<MediaTrack> mediaTracks) {
+	protected void replaceList (List<MediaItem> mediaTracks) {
 		this.mediaTracks = mediaTracks;
 		setDirty(true);
 	}
 	
-	public void addTrack (MediaTrack track) {
+	public void addTrack (MediaItem track) {
 		if (allowDuplicateEntries() || !mediaTracks.contains(track)) {
 			mediaTracks.add(track);
 			setDirty(true);
 		}
 	}
 	
-	public void removeMediaTrack (MediaTrack track) {
+	public void removeMediaTrack (MediaItem track) {
 		mediaTracks.remove(track);
 		setDirty(true);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public void incTrackStartCnt (MediaTrack track) throws MorriganException {
+	public void incTrackStartCnt (MediaItem track) throws MorriganException {
 		track.setStartCount(track.getStartCount()+1);
 		track.setDateLastPlayed(new Date());
 		setDirty(true);
 	}
 	
-	public void incTrackEndCnt (MediaTrack track) throws MorriganException {
+	public void incTrackEndCnt (MediaItem track) throws MorriganException {
 		track.setEndCount(track.getEndCount()+1);
 		setDirty(true);
 	}

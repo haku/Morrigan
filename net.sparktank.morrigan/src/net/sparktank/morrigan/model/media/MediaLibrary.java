@@ -42,7 +42,7 @@ public class MediaLibrary extends MediaList {
 		if (!firstRead) return;
 		firstRead = false;
 		
-		List<MediaTrack> allMedia = dbLayer.getAllMedia(librarySort, librarySortDirection);
+		List<MediaItem> allMedia = dbLayer.getAllMedia(librarySort, librarySortDirection);
 		replaceList(allMedia);
 	}
 	
@@ -69,23 +69,23 @@ public class MediaLibrary extends MediaList {
 	}
 	
 	@Override
-	protected void replaceList(List<MediaTrack> mediaTracks) {
+	protected void replaceList(List<MediaItem> mediaTracks) {
 		super.replaceList(mediaTracks);
 	}
 	
 	@Override
-	public void addTrack(MediaTrack track) {
+	public void addTrack(MediaItem track) {
 		super.addTrack(track);
 	}
 	
 	@Override
-	public void incTrackStartCnt(MediaTrack track) throws MorriganException {
+	public void incTrackStartCnt(MediaItem track) throws MorriganException {
 		super.incTrackStartCnt(track);
 		dbLayer.incTrackStartCnt(track.getFilepath());
 	}
 	
 	@Override
-	public void incTrackEndCnt(MediaTrack track) throws MorriganException {
+	public void incTrackEndCnt(MediaItem track) throws MorriganException {
 		super.incTrackEndCnt(track);
 		dbLayer.incTrackEndCnt(track.getFilepath());
 	}
@@ -116,7 +116,7 @@ public class MediaLibrary extends MediaList {
 	 */
 	public boolean addFile (File file) throws MorriganException {
 		boolean added = dbLayer.addFile(file);
-		if (added) addTrack(new MediaTrack(file.getAbsolutePath()));
+		if (added) addTrack(new MediaItem(file.getAbsolutePath()));
 		return added;
 	}
 	

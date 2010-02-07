@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Random;
 
 import net.sparktank.morrigan.model.media.MediaList;
-import net.sparktank.morrigan.model.media.MediaTrack;
+import net.sparktank.morrigan.model.media.MediaItem;
 
 public class OrderHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -52,7 +52,7 @@ public class OrderHelper {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public static MediaTrack getNextTrack (MediaList list, MediaTrack track, PlaybackOrder mode) {
+	public static MediaItem getNextTrack (MediaList list, MediaItem track, PlaybackOrder mode) {
 		switch (mode) {
 			case SEQUENTIAL:
 				return getNextTrackSequencial(list, track);
@@ -68,8 +68,8 @@ public class OrderHelper {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private static MediaTrack getNextTrackSequencial (MediaList list, MediaTrack track) {
-		List<MediaTrack> mediaTracks = list.getMediaTracks();
+	private static MediaItem getNextTrackSequencial (MediaList list, MediaItem track) {
+		List<MediaItem> mediaTracks = list.getMediaTracks();
 		if (mediaTracks.contains(track)) {
 			int i = mediaTracks.indexOf(track) + 1;
 			if (i >= mediaTracks.size()) i = 0;
@@ -81,9 +81,9 @@ public class OrderHelper {
 		}
 	}
 	
-	private static MediaTrack getNextTrackRandom (MediaList list, MediaTrack track) {
+	private static MediaItem getNextTrackRandom (MediaList list, MediaItem track) {
 		Random generator = new Random();
-		List<MediaTrack> mediaTracks = list.getMediaTracks();
+		List<MediaItem> mediaTracks = list.getMediaTracks();
 		int i = generator.nextInt(mediaTracks.size());
 		return mediaTracks.get(i);
 	}

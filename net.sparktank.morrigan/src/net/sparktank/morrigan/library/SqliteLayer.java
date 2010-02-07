@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import net.sparktank.morrigan.model.media.MediaTrack;
+import net.sparktank.morrigan.model.media.MediaItem;
 
 public class SqliteLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -40,7 +40,7 @@ public class SqliteLayer {
 		}
 	}
 	
-	public List<MediaTrack> getAllMedia (LibrarySort sort, LibrarySortDirection direction) throws DbException {
+	public List<MediaItem> getAllMedia (LibrarySort sort, LibrarySortDirection direction) throws DbException {
 		try {
 			return local_getAllMedia(sort, direction);
 		} catch (Exception e) {
@@ -257,7 +257,7 @@ public class SqliteLayer {
 	
 	private SimpleDateFormat SQL_DATE = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
-	private List<MediaTrack> local_getAllMedia (LibrarySort sort, LibrarySortDirection direction) throws SQLException, ClassNotFoundException {
+	private List<MediaItem> local_getAllMedia (LibrarySort sort, LibrarySortDirection direction) throws SQLException, ClassNotFoundException {
 		PreparedStatement ps;
 		ResultSet rs;
 		
@@ -302,10 +302,10 @@ public class SqliteLayer {
 		ps = getDbCon().prepareStatement(sql);
 		rs = ps.executeQuery();
 		
-		List<MediaTrack> ret = new ArrayList<MediaTrack>();
+		List<MediaItem> ret = new ArrayList<MediaItem>();
 		
 		while (rs.next()) {
-			MediaTrack mt = new MediaTrack();
+			MediaItem mt = new MediaItem();
 			
 			mt.setfilepath(rs.getString(SQL_TBL_MEDIAFILES_COL_FILE));
 			mt.setDateAdded(readDate(rs, SQL_TBL_MEDIAFILES_COL_DADDED));

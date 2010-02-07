@@ -76,7 +76,7 @@ public class MediaPlaylist extends MediaList {
 		try {
 			int n = 0;
 			while ((text = reader.readLine()) != null) {
-				addTrack(new MediaTrack(text));
+				addTrack(new MediaItem(text));
 				n++;
 			}
 			logger.fine("Read " + n + " lines from '" + filePath + "'.");
@@ -108,7 +108,7 @@ public class MediaPlaylist extends MediaList {
         
 		try {
 			int n = 0;
-			for (MediaTrack mt : getMediaTracks()) {
+			for (MediaItem mt : getMediaTracks()) {
 				writer.write(mt.getFilepath() + "\n");
 				n ++;
 			}

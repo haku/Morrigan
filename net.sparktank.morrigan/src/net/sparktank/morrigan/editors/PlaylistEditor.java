@@ -7,7 +7,7 @@ import net.sparktank.morrigan.ApplicationActionBarAdvisor;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.MediaPlaylist;
-import net.sparktank.morrigan.model.media.MediaTrack;
+import net.sparktank.morrigan.model.media.MediaItem;
 import net.sparktank.morrigan.playback.ImplException;
 import net.sparktank.morrigan.playback.PlaybackEngineFactory;
 
@@ -125,7 +125,7 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 			MorriganMsgDlg dlg = new MorriganMsgDlg("Remove selected from " + getTitle() + "?", MorriganMsgDlg.YESNO);
 			dlg.open();
 			if (dlg.getReturnCode() == MorriganMsgDlg.OK) {
-				for (MediaTrack track : getSelectedTracks()) {
+				for (MediaItem track : getSelectedTracks()) {
 					removeTrack(track);
 				}
 			}

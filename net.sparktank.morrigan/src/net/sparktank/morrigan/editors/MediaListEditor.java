@@ -7,7 +7,7 @@ import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.handler.CallPlayMedia;
 import net.sparktank.morrigan.model.media.MediaList;
-import net.sparktank.morrigan.model.media.MediaTrack;
+import net.sparktank.morrigan.model.media.MediaItem;
 import net.sparktank.morrigan.preferences.MediaListPref;
 
 import org.eclipse.core.commands.common.CommandException;
@@ -192,7 +192,7 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 	private class FileLblProv extends ColumnLabelProvider {
 		@Override
 		public String getText(Object element) {
-			MediaTrack elm = (MediaTrack) element;
+			MediaItem elm = (MediaItem) element;
 			return elm.getTitle() == null ? null : elm.getTitle();
 		}
 	}
@@ -201,7 +201,7 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 		@Override
 		public String getText(Object element) {
-			MediaTrack elm = (MediaTrack) element;
+			MediaItem elm = (MediaItem) element;
 			return elm.getDateAdded() == null ? null : sdf.format(elm.getDateAdded());
 		}
 	}
@@ -209,7 +209,7 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 	private class StartCountLblProv extends ColumnLabelProvider {
 		@Override
 		public String getText(Object element) {
-			MediaTrack elm = (MediaTrack) element;
+			MediaItem elm = (MediaItem) element;
 			return elm.getStartCount() <= 0 ? null : String.valueOf(elm.getStartCount());
 		}
 	}
@@ -217,7 +217,7 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 	private class EndCountLblProv extends ColumnLabelProvider {
 		@Override
 		public String getText(Object element) {
-			MediaTrack elm = (MediaTrack) element;
+			MediaItem elm = (MediaItem) element;
 			return elm.getEndCount() <= 0 ? null : String.valueOf(elm.getEndCount());
 		}
 	}
@@ -226,7 +226,7 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 		@Override
 		public String getText(Object element) {
-			MediaTrack elm = (MediaTrack) element;
+			MediaItem elm = (MediaItem) element;
 			return elm.getDateLastPlayed() == null ? null : sdf.format(elm.getDateLastPlayed());
 		}
 	}
@@ -319,14 +319,14 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 	}
 	
 	protected void addTrack (String file) {
-		editedMediaList.addTrack(new MediaTrack(file));
+		editedMediaList.addTrack(new MediaItem(file));
 	}
 	
-	protected void removeTrack (MediaTrack track) {
+	protected void removeTrack (MediaItem track) {
 		editedMediaList.removeMediaTrack(track);
 	}
 	
-	public MediaTrack getSelectedTrack () {
+	public MediaItem getSelectedTrack () {
 		ISelection selection = editTable.getSelection();
 		
 		if (selection==null) return null;
@@ -336,8 +336,8 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 			IStructuredSelection iSel = (IStructuredSelection) selection;
 			Object selectedObject = iSel.getFirstElement();
 			if (selectedObject != null) {
-				if (selectedObject instanceof MediaTrack) {
-					MediaTrack track = (MediaTrack) selectedObject;
+				if (selectedObject instanceof MediaItem) {
+					MediaItem track = (MediaItem) selectedObject;
 					return track;
 				}
 			}
@@ -346,7 +346,7 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		return null;
 	}
 	
-	public ArrayList<MediaTrack> getSelectedTracks () {
+	public ArrayList<MediaItem> getSelectedTracks () {
 		ISelection selection = editTable.getSelection();
 		
 		if (selection==null) return null;
@@ -355,11 +355,11 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		if (selection instanceof IStructuredSelection) {
 			IStructuredSelection iSel = (IStructuredSelection) selection;
 			
-			ArrayList<MediaTrack> ret = new ArrayList<MediaTrack>();
+			ArrayList<MediaItem> ret = new ArrayList<MediaItem>();
 			for (Object selectedObject : iSel.toList()) {
 				if (selectedObject != null) {
-					if (selectedObject instanceof MediaTrack) {
-						MediaTrack track = (MediaTrack) selectedObject;
+					if (selectedObject instanceof MediaItem) {
+						MediaItem track = (MediaItem) selectedObject;
 						ret.add(track);
 					}
 				}

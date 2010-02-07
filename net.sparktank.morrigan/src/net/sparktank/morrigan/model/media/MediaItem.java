@@ -5,13 +5,13 @@ import java.util.Date;
 
 import net.sparktank.morrigan.helpers.EqualHelper;
 
-public class MediaTrack {
+public class MediaItem {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors.
 	
-	public MediaTrack () {}
+	public MediaItem () {}
 	
-	public MediaTrack (String filePath) {
+	public MediaItem (String filePath) {
 		trackFilePath = filePath;
 	}
 	
@@ -77,8 +77,8 @@ public class MediaTrack {
 	public boolean equals(Object aThat) {
 		if ( aThat == null ) return false;
 		if ( this == aThat ) return true;
-		if ( !(aThat instanceof MediaTrack) ) return false;
-		MediaTrack that = (MediaTrack)aThat;
+		if ( !(aThat instanceof MediaItem) ) return false;
+		MediaItem that = (MediaItem)aThat;
 		
 		return EqualHelper.areEqual(getFilepath(), that.getFilepath());
 	}

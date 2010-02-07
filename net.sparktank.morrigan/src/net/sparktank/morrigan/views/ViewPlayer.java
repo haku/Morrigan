@@ -7,7 +7,7 @@ import net.sparktank.morrigan.helpers.ClipboardHelper;
 import net.sparktank.morrigan.helpers.OrderHelper;
 import net.sparktank.morrigan.helpers.OrderHelper.PlaybackOrder;
 import net.sparktank.morrigan.model.media.MediaList;
-import net.sparktank.morrigan.model.media.MediaTrack;
+import net.sparktank.morrigan.model.media.MediaItem;
 import net.sparktank.morrigan.playback.IPlaybackEngine;
 import net.sparktank.morrigan.playback.IPlaybackStatusListener;
 import net.sparktank.morrigan.playback.ImplException;
@@ -37,7 +37,7 @@ public class ViewPlayer extends ViewPart {
 	public static final String ID = "net.sparktank.morrigan.views.ViewPlayer";
 	
 	private MediaList currentList = null;
-	private MediaTrack currentTrack = null;
+	private MediaItem currentTrack = null;
 	private long currentPosition = -1; // In seconds.
 	private PlaybackOrder playbackOrder = PlaybackOrder.SEQUENTIAL;
 	
@@ -107,7 +107,7 @@ public class ViewPlayer extends ViewPart {
 	/**
 	 * For UI handlers to call.
 	 */
-	public void loadAndStartPlaying (MediaList list, MediaTrack track) {
+	public void loadAndStartPlaying (MediaList list, MediaItem track) {
 		try {
 			internal_stopPlaying();
 			currentList = list;
@@ -160,7 +160,7 @@ public class ViewPlayer extends ViewPart {
 		
 	}
 	
-	private MediaTrack getNextTrackToPlay () {
+	private MediaItem getNextTrackToPlay () {
 		if (currentList==null || currentTrack==null) return null;
 		return OrderHelper.getNextTrack(currentList, currentTrack, orderSelecter.getSelectedOrder());
 	}
@@ -191,7 +191,7 @@ public class ViewPlayer extends ViewPart {
 			}
 			
 			// Play next track?
-			MediaTrack nextTrackToPlay = getNextTrackToPlay();
+			MediaItem nextTrackToPlay = getNextTrackToPlay();
 			if (nextTrackToPlay != null) {
 				loadAndStartPlaying(currentList, nextTrackToPlay);
 				
@@ -321,7 +321,7 @@ public class ViewPlayer extends ViewPart {
 	
 	private IAction nextAction = new Action("next", Activator.getImageDescriptor("icons/next.gif")) {
 		public void run() {
-			MediaTrack nextTrackToPlay = getNextTrackToPlay();
+			MediaItem nextTrackToPlay = getNextTrackToPlay();
 			if (nextTrackToPlay != null) {
 				loadAndStartPlaying(currentList, nextTrackToPlay);
 			}
