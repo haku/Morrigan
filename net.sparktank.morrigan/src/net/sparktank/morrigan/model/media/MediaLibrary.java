@@ -49,6 +49,8 @@ public class MediaLibrary extends MediaList {
 		replaceList(allMedia);
 	}
 	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
 	/**
 	 * FIXME Sort library list according to DB query.
 	 * Clear then reload?
