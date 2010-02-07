@@ -6,6 +6,14 @@
 		<product application="net.sparktank.morrigan.application" name="morrigan" >
 			<property name="appName" value="morrigan" />
 			<property name="windowImages" value="icons/copepod-16.png,icons/copepod-32.png" />
+   <property
+         name="aboutImage"
+         value="graphics/copepod.png">
+   </property>
+   <property
+         name="aboutText"
+         value="This alpha build of morrigan is released as free software and is provided &quot;as is&quot; for testing pourpouses only.&#x0A;&#x0A;For more information, please refer to related blog entries at http://vaguehope.com or email haku@vaguehope.com&#x0A;&#x0A;This build of morrigan is (c) copyright Fae Hutter 2010.  All rights reserved.">
+   </property>
 		</product>
 	</extension>
 	
