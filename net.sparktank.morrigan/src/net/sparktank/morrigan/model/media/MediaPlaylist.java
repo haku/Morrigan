@@ -8,6 +8,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.logging.Logger;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
@@ -35,6 +38,28 @@ public class MediaPlaylist extends MediaList {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	@Override
+	protected void finalize() throws Throwable {
+		try {
+			clean();
+			
+		} finally {
+			super.finalize();
+		}
+	}
+	
+	/**
+	 * If there is only metadata to save, go ahead and save it.
+	 * @throws MorriganException 
+	 */
+	public void clean () throws MorriganException {
+		if (getDirtyState()==DirtyState.METADATA) {
+			writeToFile();
+		}
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
 	public boolean isCanBeDirty () {
 		return true;
 	}
@@ -50,6 +75,7 @@ public class MediaPlaylist extends MediaList {
 				throw new MorriganException("Play list already exists.");
 			}
 			writeToFile();
+			newPl = false;
 		} else {
 			loadFromFile();
 		}
@@ -62,6 +88,17 @@ public class MediaPlaylist extends MediaList {
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	The playlist file format.
+	
+	/*
+	 * #file=<path>|<hash>|<starts>|<ends>|<duration>|<date last played>
+	 * <durtion> = seconds.
+	 * <date last played> = yyyy-mm-dd-hh-mm-ss.
+	 */
+	
+	private static final String PL_ITEM_IDENTIFIER = "#file=";
+	
+	private SimpleDateFormat PL_DATE = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
 	
 	public void loadFromFile () throws MorriganException {
 		logger.fine("Reading PlayList from '" + filePath + "'...");
@@ -80,8 +117,40 @@ public class MediaPlaylist extends MediaList {
 		try {
 			int n = 0;
 			while ((text = reader.readLine()) != null) {
-				addTrack(new MediaItem(text));
-				n++;
+				
+				if (text.startsWith(PL_ITEM_IDENTIFIER)) {
+					String[] line = text.substring(PL_ITEM_IDENTIFIER.length()).split("\\|");
+					MediaItem item = new MediaItem(line[0]);
+					
+					if (line.length>=2 && line[1].length()>0) {
+						// TODO set hash for item = item[1].
+					}
+					
+					if (line.length>=3 && line[2].length()>0) {
+						item.setStartCount(Long.parseLong(line[2]));
+					}
+					
+					if (line.length>=4 && line[3].length()>0) {
+						item.setEndCount(Long.parseLong(line[3]));
+					}
+					
+					if (line.length>=5 && line[4].length()>0) {
+						// TODO set duration for item.
+					}
+					
+					if (line.length>=6 && line[5].length()>0) {
+						try {
+							Date date = PL_DATE.parse(line[5]);
+							item.setDateLastPlayed(date);
+						} catch (ParseException e) {
+							e.printStackTrace();
+						}
+					}
+					
+					addTrack(item);
+					n++;
+				}
+				
 			}
 			logger.fine("Read " + n + " lines from '" + filePath + "'.");
 			
@@ -95,7 +164,7 @@ public class MediaPlaylist extends MediaList {
 			}
 		}
 		
-		setDirty(false);
+		setDirtyState(DirtyState.CLEAN);
 	}
 	
 	public void writeToFile () throws MorriganException {
@@ -113,6 +182,16 @@ public class MediaPlaylist extends MediaList {
 		try {
 			int n = 0;
 			for (MediaItem mt : getMediaTracks()) {
+				
+				writer.write(
+						PL_ITEM_IDENTIFIER + mt.getFilepath()
+						+ "|0" // TODO hashcode.
+						+ "|" + mt.getStartCount()
+						+ "|" + mt.getEndCount()
+						+ "|0" // TODO duration.
+						+ "|" + (mt.getDateLastPlayed()==null ? "" : PL_DATE.format(mt.getDateLastPlayed()))
+						+ "\n");
+				
 				writer.write(mt.getFilepath() + "\n");
 				n ++;
 			}
@@ -128,7 +207,7 @@ public class MediaPlaylist extends MediaList {
 			}
 		}
 		
-		setDirty(false);
+		setDirtyState(DirtyState.CLEAN);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

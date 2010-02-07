@@ -10,6 +10,10 @@ import net.sparktank.morrigan.exceptions.MorriganException;
 public abstract class MediaList {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	public enum DirtyState { CLEAN, DIRTY, METADATA };
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
 	private final String listId;
 	private final String listName;
 	private List<MediaItem> mediaTracks = new ArrayList<MediaItem>();
@@ -44,17 +48,17 @@ public abstract class MediaList {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private boolean isDirty = false;
+	private DirtyState dirtyState = DirtyState.CLEAN;
 	private ArrayList<Runnable> dirtyChangeEvents = new ArrayList<Runnable>();
 	private ArrayList<Runnable> changeEvents = new ArrayList<Runnable>();
 	
 	abstract public boolean isCanBeDirty (); 
 	
-	public void setDirty (boolean dirty) {
+	public void setDirtyState (DirtyState state) {
 		if (isCanBeDirty()) {
-			boolean change = (isDirty != dirty);
+			boolean change = (dirtyState != state);
 			
-			isDirty = dirty;
+			dirtyState = state;
 			
 			if (change) {
 				for (Runnable r : dirtyChangeEvents) {
@@ -68,8 +72,8 @@ public abstract class MediaList {
 		}
 	}
 	
-	public boolean isDirty () {
-		return isDirty;
+	public DirtyState getDirtyState () {
+		return dirtyState;
 	}
 	
 	public void addDirtyChangeEvent (Runnable r) {
@@ -115,19 +119,19 @@ public abstract class MediaList {
 	
 	protected void replaceList (List<MediaItem> mediaTracks) {
 		this.mediaTracks = mediaTracks;
-		setDirty(true);
+		setDirtyState(DirtyState.DIRTY);
 	}
 	
 	public void addTrack (MediaItem track) {
 		if (allowDuplicateEntries() || !mediaTracks.contains(track)) {
 			mediaTracks.add(track);
-			setDirty(true);
+			setDirtyState(DirtyState.DIRTY);
 		}
 	}
 	
 	public void removeMediaTrack (MediaItem track) {
 		mediaTracks.remove(track);
-		setDirty(true);
+		setDirtyState(DirtyState.DIRTY);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -135,12 +139,12 @@ public abstract class MediaList {
 	public void incTrackStartCnt (MediaItem track) throws MorriganException {
 		track.setStartCount(track.getStartCount()+1);
 		track.setDateLastPlayed(new Date());
-		setDirty(true);
+		setDirtyState(DirtyState.METADATA);
 	}
 	
 	public void incTrackEndCnt (MediaItem track) throws MorriganException {
 		track.setEndCount(track.getEndCount()+1);
-		setDirty(true);
+		setDirtyState(DirtyState.METADATA);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

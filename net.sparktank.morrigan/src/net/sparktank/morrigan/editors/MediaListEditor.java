@@ -8,6 +8,7 @@ import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.handler.CallPlayMedia;
 import net.sparktank.morrigan.model.media.MediaList;
 import net.sparktank.morrigan.model.media.MediaItem;
+import net.sparktank.morrigan.model.media.MediaList.DirtyState;
 import net.sparktank.morrigan.preferences.MediaListPref;
 
 import org.eclipse.core.commands.common.CommandException;
@@ -169,7 +170,7 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 	
 	@Override
 	public boolean isDirty() {
-		return editedMediaList.isDirty();
+		return editedMediaList.getDirtyState() == DirtyState.DIRTY;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -41,9 +41,9 @@ public class MediaListFactory {
 		MediaPlaylist ret = null;
 		
 		if (mediaPlaylistCache.containsValue(filePath)) {
-			for (MediaPlaylist lib : mediaPlaylistCache.keySet()) {
-				if (lib.getFilePath().equals(filePath)) {
-					ret = lib;
+			for (MediaPlaylist lst : mediaPlaylistCache.keySet()) {
+				if (lst.getFilePath().equals(filePath)) {
+					ret = lst;
 				}
 			}
 		}
@@ -54,6 +54,16 @@ public class MediaListFactory {
 		}
 		
 		return ret;
+	}
+	
+	public static void finalisePlaylists () {
+		for (MediaPlaylist lst : mediaPlaylistCache.keySet()) {
+			try {
+				lst.clean();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
