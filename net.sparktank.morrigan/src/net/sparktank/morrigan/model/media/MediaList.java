@@ -54,13 +54,21 @@ public abstract class MediaList {
 	
 	abstract public boolean isCanBeDirty (); 
 	
-	public void setDirtyState (DirtyState state) {
+	protected void setDirtyState (DirtyState state) {
 		if (isCanBeDirty()) {
-			boolean change = (dirtyState != state);
+			// Changed?  Priority order - don't drop back down.
+			boolean changed = false;
+			if (state!=dirtyState) {
+				if (dirtyState==DirtyState.DIRTY && state==DirtyState.METADATA) {
+					// Its too late to figure this out the other way round.
+				} else {
+					changed = true;
+				}
+			}
 			
-			dirtyState = state;
-			
-			if (change) {
+			if (changed) {
+				dirtyState = state;
+				
 				for (Runnable r : dirtyChangeEvents) {
 					r.run();
 				}
