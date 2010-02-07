@@ -6,8 +6,8 @@ import java.util.logging.Logger;
 import net.sparktank.morrigan.ApplicationActionBarAdvisor;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.exceptions.MorriganException;
-import net.sparktank.morrigan.model.media.MediaPlaylist;
 import net.sparktank.morrigan.model.media.MediaItem;
+import net.sparktank.morrigan.model.media.MediaPlaylist;
 import net.sparktank.morrigan.playback.ImplException;
 import net.sparktank.morrigan.playback.PlaybackEngineFactory;
 
