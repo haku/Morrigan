@@ -72,10 +72,4 @@ public interface IPlaybackEngine {
 	 */
 	public void setStatusListener (IPlaybackStatusListener listener);
 	
-	/**
-	 * This runnable will be executed when the end of the file is reached.
-	 * @param runnable
-	 */
-	public void setOnfinishHandler (Runnable runnable);
-	
 }

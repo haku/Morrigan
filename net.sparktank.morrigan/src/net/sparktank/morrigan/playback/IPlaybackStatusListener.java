@@ -8,4 +8,8 @@ public interface IPlaybackStatusListener {
 	
 	public void positionChanged (long position);
 	
+	public void onEndOfTrack ();
+	
+	public void onError (Exception e);
+	
 }
