@@ -18,9 +18,13 @@ public class PlaybackEngineFactory {
 				jarUrls[i] = new URL("jar", "", "file:" + files[i].getAbsolutePath() + "!/");
 			}
 			
+			String playbackEngineClass = Config.getPlaybackEngineClass();
+			
 			URLClassLoader classLoader = URLClassLoader.newInstance(jarUrls, IPlaybackEngine.class.getClassLoader());
-			Class<?> c = classLoader.loadClass(Config.getPlaybackEngineClass());
+			Class<?> c = classLoader.loadClass(playbackEngineClass);
 			IPlaybackEngine playbackEngine = (IPlaybackEngine) c.newInstance();
+			
+			System.out.println("About " + playbackEngineClass + ":\n" + playbackEngine.getAbout());
 			
 			return playbackEngine;
 			
