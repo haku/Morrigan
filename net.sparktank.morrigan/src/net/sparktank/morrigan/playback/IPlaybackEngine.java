@@ -5,6 +5,11 @@ public interface IPlaybackEngine {
 	public enum PlayState { Stopped, Playing, Paused, Loading };
 	
 	/**
+	 * Returns the description of this playback engine.
+	 */
+	public String getAbout ();
+	
+	/**
 	 * Returns a list of the file extensions that can be played
 	 * when this engine is loaded.
 	 * @return Array of lower-case strings without dots.  e.g. "mp3", "ogg".
