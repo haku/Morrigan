@@ -23,7 +23,6 @@ This build of morrigan is (c) copyright Alex Hutter 2010.  All rights reserved.
 
    <windowImages i16="/net.sparktank.morrigan/icons/copepod-16.png" i32="/net.sparktank.morrigan/icons/copepod-32.png"/>
 
-
    <launcher name="morrigan">
       <solaris/>
       <win useIco="true">
@@ -31,7 +30,6 @@ This build of morrigan is (c) copyright Alex Hutter 2010.  All rights reserved.
          <bmp/>
       </win>
    </launcher>
-
 
    <vm>
    </vm>
@@ -82,5 +80,8 @@ This build of morrigan is (c) copyright Alex Hutter 2010.  All rights reserved.
       <plugin id="org.eclipse.ui.workbench"/>
    </plugins>
 
+   <configurations>
+      <plugin id="net.sparktank.morrigan" autoStart="false" startLevel="0" />
+   </configurations>
 
 </product>
