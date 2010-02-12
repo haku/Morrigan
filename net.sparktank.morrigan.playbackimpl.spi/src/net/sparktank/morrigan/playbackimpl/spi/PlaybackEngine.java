@@ -27,7 +27,6 @@ public class PlaybackEngine implements IPlaybackEngine {
 	private volatile boolean m_stopPlaying;
 	
 	private String filepath = null;
-	private Runnable onFinishHandler = null;
 	private IPlaybackStatusListener listener = null;
 	private PlayState playbackState = PlayState.Stopped;
 	
@@ -100,35 +99,13 @@ public class PlaybackEngine implements IPlaybackEngine {
 		this.listener = listener;
 	}
 	
-	@Override
-	public void setOnfinishHandler(Runnable runnable) {
-		this.onFinishHandler = runnable;
-	}
-
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Thread stuff.
 	
 	Thread playThread = null;
 	
 	private void startPlaybackThread () {
-		playThread = new Thread() {
-			@Override
-			public void run() {
-				super.run();
-				
-				try {
-					playTrack();
-		        } catch (Exception ex) {
-		            ex.printStackTrace();
-		        }
-		        
-			     // If not a requested stop, triger next event.
-		        if (!m_stopPlaying) {
-		        	callOnFinishHandler();
-		        }
-			}
-		};
-		
+		playThread = new PlaybackThread();
 		playThread.setDaemon(true);
 		playThread.start();
 	}
@@ -145,6 +122,27 @@ public class PlaybackEngine implements IPlaybackEngine {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private class PlaybackThread extends Thread {
+		
+		@Override
+		public void run() {
+			super.run();
+			
+			try {
+				playTrack();
+				
+				// If not a requested stop, triger next event.
+				if (!m_stopPlaying) {
+					callOnEndOfTrackHandler();
+				}
+				
+	        } catch (Exception e) {
+	            callOnErrorHandler(e);
+	        }
+		}
+		
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -235,16 +233,21 @@ public class PlaybackEngine implements IPlaybackEngine {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Local helper methods.
 	
-	private void callOnFinishHandler () {
-		System.out.println("callOnFinishHandler >>");
-		if (onFinishHandler!=null) onFinishHandler.run();
-		System.out.println("callOnFinishHandler <<");
+	private void callOnErrorHandler (Exception e) {
+		if (listener!=null) {
+			listener.onError(e);
+		}
+	}
+	
+	private void callOnEndOfTrackHandler () {
+		if (listener!=null) {
+			listener.onEndOfTrack();
+		}
 	}
 	
 	private void callStateListener (PlayState state) {
 		this.playbackState = state;
 		if (listener!=null) listener.statusChanged(state);
-	
 	}
 	
 	private long lastPosition = -1;
