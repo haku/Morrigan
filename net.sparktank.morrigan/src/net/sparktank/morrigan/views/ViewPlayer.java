@@ -2,6 +2,7 @@ package net.sparktank.morrigan.views;
 
 import net.sparktank.morrigan.Activator;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
+import net.sparktank.morrigan.dialogs.RunnableDialog;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.ClipboardHelper;
 import net.sparktank.morrigan.helpers.OrderHelper;
@@ -75,7 +76,6 @@ public class ViewPlayer extends ViewPart {
 		if (playbackEngine == null && create) {
 			playbackEngine = PlaybackEngineFactory.makePlaybackEngine();
 			playbackEngine.setStatusListener(playbackStatusListener);
-			playbackEngine.setOnfinishHandler(atEndOfTrack);
 		}
 		
 		return playbackEngine;
@@ -119,11 +119,7 @@ public class ViewPlayer extends ViewPart {
 			
 		} catch (MorriganException e) {
 			currentTrack = null;
-			try {
-				new MorriganMsgDlg(e).open();
-			} catch (Exception e1) {
-				e.printStackTrace();
-			}
+			getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));
 		}
 		
 		getSite().getShell().getDisplay().asyncExec(updateStatusRunable);
@@ -178,16 +174,13 @@ public class ViewPlayer extends ViewPart {
 			
 		}
 		
-	};
-	
-	private Runnable atEndOfTrack = new Runnable() {
 		@Override
-		public void run() {
+		public void onEndOfTrack() {
 			// Inc. stats.
 			try {
 				currentList.incTrackEndCnt(currentTrack);
 			} catch (MorriganException e) {
-				e.printStackTrace();
+				getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));
 			}
 			
 			// Play next track?
@@ -199,7 +192,13 @@ public class ViewPlayer extends ViewPart {
 				currentTrack = null;
 				getSite().getShell().getDisplay().asyncExec(updateStatusRunable);
 			}
+		};
+		
+		@Override
+		public void onError(Exception e) {
+			getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));
 		}
+		
 	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
