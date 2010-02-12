@@ -44,7 +44,13 @@ public class MorriganMsgDlg extends MessageDialog {
 	
 	@Override
 	public int open() {
-		int open = super.open();
+		int open;
+		try {
+			open = super.open();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return -1;
+		}
 		
 		if (exception!=null && open==OK) {
 			ClipboardHelper.setText(getStackTrace(exception), Display.getCurrent());
