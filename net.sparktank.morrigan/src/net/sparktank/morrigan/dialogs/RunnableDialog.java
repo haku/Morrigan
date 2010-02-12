@@ -10,7 +10,7 @@ public class RunnableDialog implements Runnable {
 
 	@Override
 	public void run() {
-		new MorriganMsgDlg(e);
+		new MorriganMsgDlg(e).open();
 	}
 	
 }
