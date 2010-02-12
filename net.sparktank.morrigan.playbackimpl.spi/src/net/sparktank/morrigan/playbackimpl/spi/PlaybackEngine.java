@@ -39,6 +39,11 @@ public class PlaybackEngine implements IPlaybackEngine {
 //	IPlaybackEngine methods.
 	
 	@Override
+	public String getAbout () {
+		return "net.sparktank.morrigan.playbackimpl.spi version 0.02.";
+	}
+	
+	@Override
 	public String[] getSupportedFormats() {
 		return SUPPORTED_FORMATS;
 	}
