@@ -135,15 +135,42 @@ public class ViewPlayer extends ViewPart {
 	/**
 	 * For UI handlers to call.
 	 */
+	public void pausePlaying () {
+		try {
+			internal_pausePlaying();
+			getSite().getShell().getDisplay().asyncExec(updateStatusRunable);
+		} catch (PlaybackException e) {
+			new MorriganMsgDlg(e).open();
+		}
+	}
+	
+	/**
+	 * For UI handlers to call.
+	 */
 	public void stopPlaying () {
 		try {
-			/* Don't go and make a player engine instance
-			 * just to call stop on it.
-			 */
 			internal_stopPlaying();
 			getSite().getShell().getDisplay().asyncExec(updateStatusRunable);
 		} catch (PlaybackException e) {
 			new MorriganMsgDlg(e).open();
+		}
+	}
+	
+	private void internal_pausePlaying () throws PlaybackException {
+		// Don't go and make a player engine instance.
+		IPlaybackEngine eng = getPlaybackEngine(false);
+		if (eng!=null) {
+			PlayState playbackState = eng.getPlaybackState();
+			
+			if (playbackState == PlayState.Paused) {
+				eng.resumePlaying();
+				
+			} else if (playbackState == PlayState.Playing) {
+				eng.pausePlaying();
+				
+			} else {
+				new MorriganMsgDlg("Don't know what to do.  Playstate=" + playbackState + ".").open();
+			}
 		}
 	}
 	
@@ -153,6 +180,9 @@ public class ViewPlayer extends ViewPart {
 	 * @throws PlaybackException
 	 */
 	private void internal_stopPlaying () throws ImplException, PlaybackException {
+		/* Don't go and make a player engine instance
+		 * just to call stop on it.
+		 */
 		IPlaybackEngine eng = getPlaybackEngine(false);
 		if (eng!=null) {
 			eng.stopPlaying();
@@ -160,7 +190,6 @@ public class ViewPlayer extends ViewPart {
 		}
 		
 		currentTrack = null;
-		
 	}
 	
 	private MediaItem getNextTrackToPlay () {
@@ -324,7 +353,7 @@ public class ViewPlayer extends ViewPart {
 	
 	private IAction pauseAction = new Action("pause", Activator.getImageDescriptor("icons/pause.gif")) {
 		public void run() {
-			new MorriganMsgDlg("TODO: implement pause desu~.").open();
+			pausePlaying();
 		};
 	};
 	
