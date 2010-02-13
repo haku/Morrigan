@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse.ant.import?>
+
+<project default="jar" name="Create jmf plugin jar.">
+	
+	<target name="jar">
+		<jar destfile="morrigan.playbackimpl.jmf.jar">
+			<fileset dir="bin" includes="net/sparktank/morrigan/playbackimpl/jmf/**/*.class" />
+		</jar>
+    </target>
+    
+</project>
