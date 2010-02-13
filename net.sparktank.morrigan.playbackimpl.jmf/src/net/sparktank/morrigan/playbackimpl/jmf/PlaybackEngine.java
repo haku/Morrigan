@@ -156,7 +156,7 @@ public class PlaybackEngine  implements IPlaybackEngine {
 			if (videoComponent!=null) {
 				videoFrame.remove(videoComponent);
 				videoFrame.removeComponentListener(videoResizeListener);
-				videoComponent.validate();
+				videoComponent.invalidate();
 			}
 		}
 	}
@@ -214,7 +214,7 @@ public class PlaybackEngine  implements IPlaybackEngine {
 	            }
 	            
 	            videoComponent.setBounds (rectVideo);
-	            videoFrame.validate();
+	            videoFrame.invalidate();
 			}
 		}
 		
