@@ -1,8 +1,11 @@
 package net.sparktank.morrigan.playbackimpl.jmf;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Frame;
+import java.awt.Rectangle;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -19,7 +22,10 @@ import javax.media.Player;
 import javax.media.StartEvent;
 import javax.media.StopEvent;
 import javax.media.Time;
+import javax.media.bean.playerbean.MediaPlayer;
+import javax.media.format.FormatChangeEvent;
 
+import jmapps.ui.VideoPanel;
 import net.sparktank.morrigan.playback.IPlaybackEngine;
 import net.sparktank.morrigan.playback.IPlaybackStatusListener;
 import net.sparktank.morrigan.playback.NotImplementedException;
@@ -135,8 +141,9 @@ public class PlaybackEngine  implements IPlaybackEngine {
 //	Local playback methods.
 
 	File mediaFile = null;
-	Player mediaPlayer = null;
+	MediaPlayer mediaPlayer = null;
 	Component videoComponent = null;
+	VideoResizeListener videoResizeListener = null;
 	
 	private void finalisePlayback () {
 		if (mediaPlayer!=null) {
@@ -148,6 +155,7 @@ public class PlaybackEngine  implements IPlaybackEngine {
 			
 			if (videoComponent!=null) {
 				videoFrame.remove(videoComponent);
+				videoFrame.removeComponentListener(videoResizeListener);
 				videoComponent.validate();
 			}
 		}
@@ -157,20 +165,66 @@ public class PlaybackEngine  implements IPlaybackEngine {
 		if (mediaPlayer!=null) finalisePlayback();
 		
 		mediaFile = new File(filepath);
-		mediaPlayer = Manager.createRealizedPlayer(mediaFile.toURI().toURL());
+		Player player = Manager.createRealizedPlayer(mediaFile.toURI().toURL());
 		
-//		mediaPlayer = new MediaPlayer();
-//		mediaPlayer.setPlayer(player);
-//		mediaPlayer.setFixedAspectRatio(true);
+		mediaPlayer = new MediaPlayer();
+		mediaPlayer.setFixedAspectRatio(true);
+		mediaPlayer.setPlayer(player);
+		mediaPlayer.setControlPanelVisible(false);
 		
 		mediaPlayer.addControllerListener(mediaListener);
 		
 		videoComponent = mediaPlayer.getVisualComponent();
+		Dimension preferredSize = null;
+		
 		if (videoComponent!=null) {
-			videoFrame.add(videoComponent, BorderLayout.CENTER);
+			VideoPanel panelVideo = new VideoPanel ( mediaPlayer );
+			panelVideo.resizeVisualComponent();
+			preferredSize = panelVideo.getPreferredSize();
+			
+			videoFrame.setLayout(null);
+			videoFrame.add(videoComponent);
 		}
-		videoFrame.validate();
+		
+		videoResizeListener = new VideoResizeListener(preferredSize);
+		videoFrame.addComponentListener(videoResizeListener);
+		videoResizeListener.componentResized(null);
 	}
+	
+	private class VideoResizeListener implements ComponentListener {
+		
+		private final Dimension preferredSize;
+		
+		public VideoResizeListener (Dimension preferredSize) {
+			this.preferredSize = preferredSize;
+		}
+		
+		@Override
+		public void componentResized(ComponentEvent arg0) {
+			if (videoFrame!=null && videoComponent!=null && preferredSize!=null) {
+				Dimension dimVideoFrame = videoFrame.getSize();
+				Rectangle rectVideo = new Rectangle (0, 0, dimVideoFrame.width, dimVideoFrame.height);
+				
+	            if ((float)preferredSize.width/preferredSize.height >= (float)dimVideoFrame.width/dimVideoFrame.height) {
+	                rectVideo.height = (preferredSize.height * dimVideoFrame.width) / preferredSize.width;
+	                rectVideo.y = (dimVideoFrame.height - rectVideo.height) / 2;
+	            } else {
+	                rectVideo.width = (preferredSize.width * dimVideoFrame.height) / preferredSize.height;
+	                rectVideo.x = (dimVideoFrame.width - rectVideo.width) / 2;
+	            }
+	            
+	            videoComponent.setBounds (rectVideo);
+	            videoFrame.validate();
+			}
+		}
+		
+		@Override
+		public void componentShown(ComponentEvent arg0) {}
+		@Override
+		public void componentMoved(ComponentEvent arg0) {}
+		@Override
+		public void componentHidden(ComponentEvent arg0) {}
+	};
 	
 	private void playTrack () {
 		if (mediaPlayer!=null) {
@@ -202,6 +256,10 @@ public class PlaybackEngine  implements IPlaybackEngine {
 				
 			} else if (event instanceof StopEvent) {
 				callStateListener(PlayState.Stopped);
+				
+			} else if (event instanceof FormatChangeEvent) {
+				FormatChangeEvent ev = (FormatChangeEvent) event;
+				System.out.println(ev.getNewFormat().getEncoding());
 				
 			} else if (event instanceof ControllerErrorEvent) {
 				String message = ((ControllerErrorEvent)event).getMessage();
