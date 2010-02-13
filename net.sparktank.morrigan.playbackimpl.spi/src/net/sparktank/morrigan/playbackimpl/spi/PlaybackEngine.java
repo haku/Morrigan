@@ -91,6 +91,11 @@ public class PlaybackEngine implements IPlaybackEngine {
 	}
 	
 	@Override
+	public void resumePlaying() throws PlaybackException {
+		throw new NotImplementedException();
+	}
+	
+	@Override
 	public PlayState getPlaybackState() {
 		return playbackState;
 	}
