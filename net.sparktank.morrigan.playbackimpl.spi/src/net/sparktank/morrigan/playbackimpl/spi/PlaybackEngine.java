@@ -1,5 +1,6 @@
 package net.sparktank.morrigan.playbackimpl.spi;
 
+import java.awt.Frame;
 import java.io.File;
 import java.io.IOException;
 
@@ -51,6 +52,11 @@ public class PlaybackEngine implements IPlaybackEngine {
 	@Override
 	public void setFile(String filepath) {
 		this.filepath = filepath;
+	}
+	
+	@Override
+	public void setVideoFrame(Frame frame) {
+		// Not implemented.
 	}
 	
 	@Override
