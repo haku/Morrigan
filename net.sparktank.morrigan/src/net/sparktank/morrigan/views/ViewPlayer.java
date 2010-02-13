@@ -1,5 +1,8 @@
 package net.sparktank.morrigan.views;
 
+import java.awt.Color;
+import java.awt.Frame;
+
 import net.sparktank.morrigan.Activator;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.dialogs.RunnableDialog;
@@ -7,8 +10,8 @@ import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.ClipboardHelper;
 import net.sparktank.morrigan.helpers.OrderHelper;
 import net.sparktank.morrigan.helpers.OrderHelper.PlaybackOrder;
-import net.sparktank.morrigan.model.media.MediaList;
 import net.sparktank.morrigan.model.media.MediaItem;
+import net.sparktank.morrigan.model.media.MediaList;
 import net.sparktank.morrigan.playback.IPlaybackEngine;
 import net.sparktank.morrigan.playback.IPlaybackStatusListener;
 import net.sparktank.morrigan.playback.ImplException;
@@ -21,6 +24,7 @@ import org.eclipse.jface.action.ControlContribution;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
@@ -29,7 +33,6 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.part.ViewPart;
 
 public class ViewPlayer extends ViewPart {
@@ -41,6 +44,8 @@ public class ViewPlayer extends ViewPart {
 	private MediaItem currentTrack = null;
 	private long currentPosition = -1; // In seconds.
 	private PlaybackOrder playbackOrder = PlaybackOrder.SEQUENTIAL;
+	
+	private volatile boolean isDisposed = false;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	ViewPart methods.
@@ -58,6 +63,7 @@ public class ViewPlayer extends ViewPart {
 	
 	@Override
 	public void dispose() {
+		isDisposed = true;
 		finalisePlaybackEngine();
 		disposeIcons();
 		super.dispose();
@@ -113,6 +119,7 @@ public class ViewPlayer extends ViewPart {
 			currentList = list;
 			currentTrack = track;
 			getPlaybackEngine().setFile(currentTrack.getFilepath());
+			getPlaybackEngine().setVideoFrame(mediaFrame);
 			getPlaybackEngine().startPlaying();
 			
 			currentList.incTrackStartCnt(currentTrack);
@@ -217,14 +224,21 @@ public class ViewPlayer extends ViewPart {
 		iconStop.dispose();
 	}
 	
-	private Label mainLabel;
+//	private Label mainLabel;
+	private Frame mediaFrame;
 	private OrderSelecter orderSelecter;
 	
 	private void makeControls (Composite parent) {
 		// Main label.
 		parent.setLayout(new FillLayout ());
-		mainLabel = new Label(parent, SWT.WRAP);
+//		mainLabel = new Label(parent, SWT.WRAP);
 		
+		Composite composite = new Composite(parent, SWT.EMBEDDED);
+        composite.setLayout(new FillLayout( ));
+		
+        mediaFrame = SWT_AWT.new_Frame(composite);
+        mediaFrame.setBackground(Color.ORANGE);
+        
 		// Order drop-down box.
 		orderSelecter = new OrderSelecter("orderSelecter");
 	}
@@ -286,19 +300,21 @@ public class ViewPlayer extends ViewPart {
 	 */
 	private Runnable updateStatusRunable = new Runnable() {
 		public void run() {
-			if (mainLabel.isDisposed()) return;
+			if (isDisposed) return;
 			
 			if (currentTrack != null && currentList != null) {
 				setTitleImage(iconPlay);
-				mainLabel.setText(
-						"Now playing: " + currentTrack.toString() +
-						"\n   From: " + currentList.getListName() +
-						"\n   Position: " + currentPosition
+				setContentDescription(
+//						"Now playing: " + currentTrack.toString() +
+//						"\n   From: " + currentList.getListName() +
+//						"\n   Position: " + currentPosition
+						
+						"Playing: " + currentPosition + " : " + currentTrack.toString()
 						);
 				
 			} else {
 				setTitleImage(iconStop);
-				mainLabel.setText("Idle.");
+				setContentDescription("Idle.");
 			};
 		}
 	};
