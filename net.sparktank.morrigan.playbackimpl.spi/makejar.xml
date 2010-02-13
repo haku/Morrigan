@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse.ant.import?>
 
-<project default="jar" name="Create plugin jar.">
+<project default="jar" name="Create spi plugin jar.">
 	
 	<target name="jar">
 		<jar destfile="morrigan.playbackimpl.spi.jar">
