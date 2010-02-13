@@ -57,9 +57,16 @@ public interface IPlaybackEngine {
 	public void stopPlaying () throws PlaybackException;
 	
 	/**
-	 * Pause playback.
+	 * Pause playback.  It should be safe to call this even
+	 * if the track is already paused.
 	 */
 	public void pausePlaying () throws PlaybackException;
+	
+	/**
+	 * Resume paused playback.  It should be safe to call this
+	 * even if the track is not paused. 
+	 */
+	public void resumePlaying () throws PlaybackException;
 	
 	/**
 	 * Returns the current play state.
