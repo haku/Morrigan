@@ -16,7 +16,14 @@ import de.humatic.dsj.DSFiltergraph;
 import de.humatic.dsj.DSJUtils;
 import de.humatic.dsj.DSMovie;
 
-public class PlaybackEngine  implements IPlaybackEngine {
+/* Main playback class:
+ * http://www.humatic.de/htools/dsj/javadoc/de/humatic/dsj/DSFiltergraph.html
+ * 
+ * Event constants:
+ * http://www.humatic.de/htools/dsj/javadoc/constant-values.html
+ */
+
+public class PlaybackEngine implements IPlaybackEngine {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	// TODO Any more?
