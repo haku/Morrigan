@@ -12,6 +12,7 @@ import net.sparktank.morrigan.playback.IPlaybackStatusListener;
 import net.sparktank.morrigan.playback.PlaybackException;
 import de.humatic.dsj.DSFiltergraph;
 import de.humatic.dsj.DSJUtils;
+import de.humatic.dsj.DSMediaType;
 import de.humatic.dsj.DSMovie;
 
 /* Main playback class:
@@ -160,9 +161,11 @@ public class PlaybackEngine implements IPlaybackEngine {
 		
 		dsFiltergraph.setVolume(1.0f);
 		
-		videoComponent = dsFiltergraph.asComponent();
-		videoFrame.add(videoComponent, BorderLayout.CENTER);
-		videoFrame.doLayout();
+		if (dsFiltergraph.hasMediaOfType(DSMediaType.WMMEDIATYPE_Video)) {
+			videoComponent = dsFiltergraph.asComponent();
+			videoFrame.add(videoComponent, BorderLayout.CENTER);
+			videoFrame.doLayout();
+		}
 	}
 	
 	private PropertyChangeListener propertyChangeLlistener = new PropertyChangeListener() {
