@@ -237,7 +237,7 @@ public class ViewPlayer extends ViewPart {
         composite.setLayout(new FillLayout( ));
 		
         mediaFrame = SWT_AWT.new_Frame(composite);
-        mediaFrame.setBackground(Color.ORANGE);
+        mediaFrame.setBackground(Color.BLACK);
         
 		// Order drop-down box.
 		orderSelecter = new OrderSelecter("orderSelecter");
