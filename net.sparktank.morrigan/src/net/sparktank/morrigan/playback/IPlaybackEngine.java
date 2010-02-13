@@ -1,5 +1,7 @@
 package net.sparktank.morrigan.playback;
 
+import java.awt.Frame;
+
 public interface IPlaybackEngine {
 	
 	public enum PlayState { Stopped, Playing, Paused, Loading };
@@ -23,6 +25,12 @@ public interface IPlaybackEngine {
 	 * @param filepath
 	 */
 	public void setFile (String filepath);
+	
+	/**
+	 * Set the control where the output video will be shown.
+	 * @param frame a java.awt.Frame object.
+	 */
+	public void setVideoFrame (Frame frame);
 	
 	/**
 	 * Completly free the current file.
