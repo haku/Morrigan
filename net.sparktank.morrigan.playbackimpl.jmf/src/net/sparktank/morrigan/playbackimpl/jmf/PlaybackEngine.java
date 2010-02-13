@@ -1,5 +1,8 @@
 package net.sparktank.morrigan.playbackimpl.jmf;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Frame;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -10,6 +13,7 @@ import javax.media.ControllerEvent;
 import javax.media.ControllerListener;
 import javax.media.EndOfMediaEvent;
 import javax.media.Manager;
+import javax.media.NoDataSourceException;
 import javax.media.NoPlayerException;
 import javax.media.Player;
 import javax.media.StartEvent;
@@ -33,6 +37,7 @@ public class PlaybackEngine  implements IPlaybackEngine {
 	private volatile boolean m_stopPlaying;
 	
 	private String filepath = null;
+	private Frame videoFrame = null;
 	private IPlaybackStatusListener listener = null;
 	private PlayState playbackState = PlayState.Stopped;
 	
@@ -57,6 +62,11 @@ public class PlaybackEngine  implements IPlaybackEngine {
 	@Override
 	public void setFile(String filepath) {
 		this.filepath = filepath;
+	}
+	
+	@Override
+	public void setVideoFrame(Frame frame) {
+		this.videoFrame = frame;
 	}
 	
 	@Override
@@ -126,6 +136,7 @@ public class PlaybackEngine  implements IPlaybackEngine {
 
 	File mediaFile = null;
 	Player mediaPlayer = null;
+	Component videoComponent = null;
 	
 	private void finalisePlayback () {
 		if (mediaPlayer!=null) {
@@ -134,13 +145,31 @@ public class PlaybackEngine  implements IPlaybackEngine {
 			mediaPlayer.close();
 			mediaPlayer.deallocate();
 			mediaPlayer = null;
+			
+			if (videoComponent!=null) {
+				videoFrame.remove(videoComponent);
+				videoComponent.validate();
+			}
 		}
 	}
 	
-	private void loadTrack () throws NoPlayerException, CannotRealizeException, MalformedURLException, IOException {
+	private void loadTrack () throws NoPlayerException, CannotRealizeException, MalformedURLException, IOException, NoDataSourceException {
+		if (mediaPlayer!=null) finalisePlayback();
+		
 		mediaFile = new File(filepath);
 		mediaPlayer = Manager.createRealizedPlayer(mediaFile.toURI().toURL());
+		
+//		mediaPlayer = new MediaPlayer();
+//		mediaPlayer.setPlayer(player);
+//		mediaPlayer.setFixedAspectRatio(true);
+		
 		mediaPlayer.addControllerListener(mediaListener);
+		
+		videoComponent = mediaPlayer.getVisualComponent();
+		if (videoComponent!=null) {
+			videoFrame.add(videoComponent, BorderLayout.CENTER);
+		}
+		videoFrame.validate();
 	}
 	
 	private void playTrack () {
