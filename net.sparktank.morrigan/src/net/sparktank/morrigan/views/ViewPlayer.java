@@ -237,19 +237,35 @@ public class ViewPlayer extends ViewPart {
 		
 	};
 	
+	private PlayState internal_getPlayState () {
+		try {
+			IPlaybackEngine eng = getPlaybackEngine(false);
+			if (eng!=null) {
+				return eng.getPlaybackState();
+			} else {
+				return PlayState.Stopped;
+			}
+		} catch (ImplException e) {
+			return PlayState.Stopped;
+		}
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	GUI stuff.
 	
 	private Image iconPlay;
+	private Image iconPause;
 	private Image iconStop;
 	
 	private void makeIcons () {
 		iconPlay = Activator.getImageDescriptor("icons/play.gif").createImage();
+		iconPause = Activator.getImageDescriptor("icons/pause.gif").createImage();
 		iconStop = Activator.getImageDescriptor("icons/stop.gif").createImage();
 	}
 	
 	private void disposeIcons () {
 		iconPlay.dispose();
+		iconPause.dispose();
 		iconStop.dispose();
 	}
 	
@@ -332,7 +348,26 @@ public class ViewPlayer extends ViewPart {
 			if (isDisposed) return;
 			
 			if (currentTrack != null && currentList != null) {
-				setTitleImage(iconPlay);
+				
+				switch (internal_getPlayState()) {
+					case Playing:
+						setTitleImage(iconPlay);
+						break;
+					
+					case Paused:
+						setTitleImage(iconPause);
+						break;
+					
+					case Loading:
+						setTitleImage(iconPlay); // FIXME new icon?
+						break;
+					
+					case Stopped:
+						setTitleImage(iconStop);
+						break;
+					
+				}
+				
 				setContentDescription(
 //						"Now playing: " + currentTrack.toString() +
 //						"\n   From: " + currentList.getListName() +
