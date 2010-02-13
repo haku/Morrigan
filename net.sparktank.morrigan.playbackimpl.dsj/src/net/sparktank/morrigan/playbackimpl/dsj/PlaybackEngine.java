@@ -9,9 +9,7 @@ import java.lang.reflect.Field;
 
 import net.sparktank.morrigan.playback.IPlaybackEngine;
 import net.sparktank.morrigan.playback.IPlaybackStatusListener;
-import net.sparktank.morrigan.playback.NotImplementedException;
 import net.sparktank.morrigan.playback.PlaybackException;
-import de.humatic.dsj.AVCDevice;
 import de.humatic.dsj.DSFiltergraph;
 import de.humatic.dsj.DSJUtils;
 import de.humatic.dsj.DSMovie;
@@ -83,6 +81,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 		try {
 			loadTrack();
 		} catch (Exception e) {
+			callStateListener(PlayState.Stopped);
 			throw new PlaybackException("Failed to load '"+filepath+"'.", e);
 		}
 		
@@ -97,7 +96,12 @@ public class PlaybackEngine implements IPlaybackEngine {
 	
 	@Override
 	public void pausePlaying() throws PlaybackException {
-		throw new NotImplementedException();
+		pauseTrack();
+	}
+	
+	@Override
+	public void resumePlaying() throws PlaybackException {
+		resumeTrack();
 	}
 	
 	@Override
@@ -141,13 +145,19 @@ public class PlaybackEngine implements IPlaybackEngine {
 			
 			if (videoComponent!=null) {
 				videoFrame.remove(videoComponent);
-				videoComponent.invalidate();
+				videoComponent = null;
+				videoFrame.invalidate();
 			}
 		}
 	}
 	
 	private void loadTrack () {
-		dsFiltergraph = new DSMovie(filepath, DSFiltergraph.RENDER_NATIVE, propertyChangeLlistener);
+		callStateListener(PlayState.Loading);
+		
+		dsFiltergraph = new DSMovie(filepath,
+				DSFiltergraph.RENDER_NATIVE, // | DSFiltergraph.INIT_PAUSED,
+				propertyChangeLlistener);
+		
 		dsFiltergraph.setVolume(1.0f);
 		
 		videoComponent = dsFiltergraph.asComponent();
@@ -160,14 +170,14 @@ public class PlaybackEngine implements IPlaybackEngine {
 		public void propertyChange(PropertyChangeEvent pce) {
 			switch (DSJUtils.getEventType(pce)) {
 				
-				case (AVCDevice.ED_MODE_PLAY):
-					callStateListener(PlayState.Playing);
-					break;
+//				case (AVCDevice.ED_MODE_PLAY):
+//					callStateListener(PlayState.Playing);
+//					break;
 				
-				case (AVCDevice.ED_MODE_STOP):
-					callStateListener(PlayState.Stopped);
-					break;
-				
+//				case (AVCDevice.ED_MODE_STOP):
+//					callStateListener(PlayState.Stopped);
+//					break;
+					
 				case (DSFiltergraph.DONE):
 					if (!m_stopPlaying) {
 						callOnEndOfTrackHandler();
@@ -187,6 +197,21 @@ public class PlaybackEngine implements IPlaybackEngine {
 		if (dsFiltergraph!=null) {
 			dsFiltergraph.play();
 			startWatcherThread();
+			callStateListener(PlayState.Playing);
+		}
+	}
+	
+	private void pauseTrack () {
+		if (dsFiltergraph!=null) {
+			dsFiltergraph.pause();
+			callStateListener(PlayState.Paused);
+		}
+	}
+	
+	private void resumeTrack () {
+		if (dsFiltergraph!=null) {
+			dsFiltergraph.play();
+			callStateListener(PlayState.Playing);
 		}
 	}
 	
@@ -194,6 +219,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 		stopWatcherThread();
 		if (dsFiltergraph!=null) {
 			dsFiltergraph.stop();
+			callStateListener(PlayState.Stopped);
 		}
 	}
 	
@@ -246,6 +272,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 //	}
 	
 	private void callOnEndOfTrackHandler () {
+		callStateListener(PlayState.Stopped);
 		if (listener!=null) {
 			listener.onEndOfTrack();
 		}
