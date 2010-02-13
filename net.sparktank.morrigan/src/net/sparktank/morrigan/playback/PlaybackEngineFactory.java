@@ -47,7 +47,11 @@ public class PlaybackEngineFactory {
 		 * all to build one big list.
 		 */
 		
-		String[] supportedFormats = makePlaybackEngine().getSupportedFormats();
+//		String[] supportedFormats = makePlaybackEngine().getSupportedFormats();
+		
+		// FIXME need to re-use existing engine, or put this list somewhere else.
+		String formats = "mp3|ogg|wma|wmv|avi|mpg|mpeg|ac3|mp4|wav|ra|mpga|mkv|ogm|mpc|m4a|flv|rmvb";
+		String[] supportedFormats = formats.split("\\|");
 		
 		for (int i = 0; i < supportedFormats.length; i++) {
 			supportedFormats[i] = supportedFormats[i].toLowerCase();
