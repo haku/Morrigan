@@ -315,6 +315,12 @@ public class PlaybackEngine implements IPlaybackEngine {
 			e.printStackTrace();
 		}
 		System.setProperty("java.library.path", "D:\\haku\\development\\eclipseWorkspace-java\\dsjtest\\lib");
+		
+		/* FIXME
+		 * This next line fails with
+		 * java.lang.UnsatisfiedLinkError: Native Library D:\haku\development\eclipseWorkspace-java\dsjtest\lib\dsj.dll already loaded in another classloader
+		 * if it is already loaded.
+		 */
 		System.load("D:\\haku\\development\\eclipseWorkspace-java\\dsjtest\\lib\\dsj.dll");
 	}
 	
