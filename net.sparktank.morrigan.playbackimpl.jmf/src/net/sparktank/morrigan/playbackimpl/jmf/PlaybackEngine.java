@@ -26,7 +26,7 @@ public class PlaybackEngine  implements IPlaybackEngine {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	// TODO Any more?
-	private final static String[] SUPPORTED_FORMATS = {"wav", "mp3", "ogg"};
+	private final static String[] SUPPORTED_FORMATS = {"wav", "mp3"};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -195,6 +195,7 @@ public class PlaybackEngine  implements IPlaybackEngine {
 	private Thread watcherThread = null;
 	
 	private void startWatcherThread () {
+		m_stopWatching = false;
 		watcherThread = new WatcherThread();
 		watcherThread.setDaemon(true);
 		watcherThread.start();
