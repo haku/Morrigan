@@ -1,27 +1,21 @@
 package net.sparktank.morrigan.playbackimpl.dsj;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Frame;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Field;
-import java.net.MalformedURLException;
-
-import javax.media.CannotRealizeException;
-import javax.media.NoDataSourceException;
-import javax.media.NoPlayerException;
-import javax.media.Time;
 
 import net.sparktank.morrigan.playback.IPlaybackEngine;
 import net.sparktank.morrigan.playback.IPlaybackStatusListener;
 import net.sparktank.morrigan.playback.NotImplementedException;
 import net.sparktank.morrigan.playback.PlaybackException;
+import de.humatic.dsj.AVCDevice;
 import de.humatic.dsj.DSFiltergraph;
+import de.humatic.dsj.DSJUtils;
 import de.humatic.dsj.DSMovie;
 
-@SuppressWarnings("restriction")
 public class PlaybackEngine  implements IPlaybackEngine {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -40,7 +34,9 @@ public class PlaybackEngine  implements IPlaybackEngine {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructor.
 
-	public PlaybackEngine () {}
+	public PlaybackEngine () {
+		shoeHorn();
+	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	IPlaybackEngine methods.
@@ -104,9 +100,8 @@ public class PlaybackEngine  implements IPlaybackEngine {
 	
 	@Override
 	public int getDuration() throws PlaybackException {
-		if (mediaPlayer!=null) {
-			Time mediaTime = mediaPlayer.getDuration();
-			return (int) Math.round(mediaTime.getSeconds()); // FIXME return long.
+		if (dsFiltergraph!=null) {
+			return dsFiltergraph.getDuration() / 1000;
 		} else {
 			return -1;
 		}
@@ -114,9 +109,8 @@ public class PlaybackEngine  implements IPlaybackEngine {
 	
 	@Override
 	public long getPlaybackProgress() throws PlaybackException {
-		if (mediaPlayer!=null) {
-			Time mediaTime = mediaPlayer.getMediaTime();
-			return Math.round(mediaTime.getSeconds());
+		if (dsFiltergraph!=null) {
+			return dsFiltergraph.getTime() / 1000;
 		} else {
 			return -1;
 		}
@@ -131,10 +125,17 @@ public class PlaybackEngine  implements IPlaybackEngine {
 //	Local playback methods.
 	
 	private DSFiltergraph dsFiltergraph = null;
+	Component videoComponent = null;
 	
 	private void finalisePlayback () {
 		if (dsFiltergraph!=null) {
+			dsFiltergraph.dispose();
+			dsFiltergraph = null;
 			
+			if (videoComponent!=null) {
+				videoFrame.remove(videoComponent);
+				videoComponent.invalidate();
+			}
 		}
 	}
 	
@@ -142,13 +143,36 @@ public class PlaybackEngine  implements IPlaybackEngine {
 		dsFiltergraph = new DSMovie(filepath, DSFiltergraph.RENDER_NATIVE, propertyChangeLlistener);
 		dsFiltergraph.setVolume(1.0f);
 		
-		videoFrame.add(dsFiltergraph.asComponent());
+		videoComponent = dsFiltergraph.asComponent();
+		videoFrame.add(videoComponent, BorderLayout.CENTER);
+		videoFrame.doLayout();
 	}
 	
-	private static PropertyChangeListener propertyChangeLlistener = new PropertyChangeListener() {
+	private PropertyChangeListener propertyChangeLlistener = new PropertyChangeListener() {
 		@Override
-		public void propertyChange(PropertyChangeEvent evt) {
-			System.out.println("received event or callback from "+evt.getPropagationId());
+		public void propertyChange(PropertyChangeEvent pce) {
+			switch (DSJUtils.getEventType(pce)) {
+				
+				case (AVCDevice.ED_MODE_PLAY):
+					callStateListener(PlayState.Playing);
+					break;
+				
+				case (AVCDevice.ED_MODE_STOP):
+					callStateListener(PlayState.Stopped);
+					break;
+				
+				case (DSFiltergraph.DONE):
+					if (!m_stopPlaying) {
+						callOnEndOfTrackHandler();
+					}
+					break;
+				
+//				case (DSFiltergraph.GRAPH_ERROR):
+//					String message = "Graph error: " + String.valueOf(pce.getNewValue());
+//					callOnErrorHandler(new PlaybackException(message));
+//					break;
+				
+			}
 		}
 	};
 	
@@ -194,9 +218,8 @@ public class PlaybackEngine  implements IPlaybackEngine {
 		public void run() {
 			while (!m_stopWatching) {
 				
-				if (mediaPlayer!=null) {
-					Time mediaTime = mediaPlayer.getMediaTime();
-					callPositionListener(Math.round(mediaTime.getSeconds()));
+				if (dsFiltergraph!=null) {
+					callPositionListener(dsFiltergraph.getTime() / 1000);
 				}
 				
 				try {
@@ -209,11 +232,11 @@ public class PlaybackEngine  implements IPlaybackEngine {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Local helper methods.
 	
-	private void callOnErrorHandler (Exception e) {
-		if (listener!=null) {
-			listener.onError(e);
-		}
-	}
+//	private void callOnErrorHandler (Exception e) {
+//		if (listener!=null) {
+//			listener.onError(e);
+//		}
+//	}
 	
 	private void callOnEndOfTrackHandler () {
 		if (listener!=null) {
@@ -226,14 +249,21 @@ public class PlaybackEngine  implements IPlaybackEngine {
 		if (listener!=null) listener.statusChanged(state);
 	}
 	
+	private long lastPosition = -1;
+	
 	private void callPositionListener (long position) {
 		if (listener!=null) {
-			listener.positionChanged(position);
+			if (position != lastPosition) {
+				listener.positionChanged(position);
+			}
+			lastPosition = position;
 		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	// FIXME this is all REALLY nasty.
+	@SuppressWarnings("unchecked")
 	private void shoeHorn () {
 		try {
 			Class clazz = ClassLoader.class;
@@ -241,6 +271,7 @@ public class PlaybackEngine  implements IPlaybackEngine {
 			boolean accessible = field.isAccessible();
 			if (!accessible)
 			field.setAccessible(true);
+			@SuppressWarnings("unused")
 			Object original = field.get(clazz);
 			field.set(clazz, null);
 		} catch (Exception e) {
