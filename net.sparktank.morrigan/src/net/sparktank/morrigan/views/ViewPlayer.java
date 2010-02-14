@@ -218,9 +218,12 @@ public class ViewPlayer extends ViewPart {
 			// Play next track?
 			MediaItem nextTrackToPlay = getNextTrackToPlay();
 			if (nextTrackToPlay != null) {
+				System.out.println("About to start playing " + nextTrackToPlay.getTitle());
 				loadAndStartPlaying(currentList, nextTrackToPlay);
 				
 			} else {
+				System.out.println("No more tracks to play.");
+				
 				currentTrack = null;
 				getSite().getShell().getDisplay().asyncExec(updateStatusRunable);
 			}
