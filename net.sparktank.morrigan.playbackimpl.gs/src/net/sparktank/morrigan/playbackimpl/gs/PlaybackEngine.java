@@ -3,7 +3,6 @@ package net.sparktank.morrigan.playbackimpl.gs;
 import java.awt.BorderLayout;
 import java.awt.Frame;
 import java.io.File;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import net.sparktank.morrigan.playback.IPlaybackEngine;
@@ -14,7 +13,6 @@ import org.gstreamer.Bus;
 import org.gstreamer.Gst;
 import org.gstreamer.GstObject;
 import org.gstreamer.State;
-import org.gstreamer.StreamInfo;
 import org.gstreamer.elements.PlayBin;
 import org.gstreamer.swing.VideoComponent;
 
@@ -179,11 +177,13 @@ public class PlaybackEngine implements IPlaybackEngine {
             }
         });
         
-        List<StreamInfo> streamInfo = playbin.getStreamInfo();
-        for (StreamInfo si : streamInfo) {
-        	System.out.println("type=" + si.get("type"));
-		}
+        // This does not work.
+//        List<StreamInfo> streamInfo = playbin.getStreamInfo();
+//        for (StreamInfo si : streamInfo) {
+//        	System.out.println("type=" + si.get("type"));
+//		}
         
+        // FIXME only do this if video is present.
         videoComponent = new VideoComponent();
         playbin.setVideoSink(videoComponent.getElement());
         videoFrame.add(videoComponent, BorderLayout.CENTER);
