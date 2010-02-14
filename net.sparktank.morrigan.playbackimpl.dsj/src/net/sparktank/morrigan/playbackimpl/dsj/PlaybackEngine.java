@@ -157,6 +157,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 				videoFrame.dispose();
 				videoFrame = null;
 				
+				videoComponent.invalidate();
 				videoComponent = null;
 				
 				videoComposite.dispose();
