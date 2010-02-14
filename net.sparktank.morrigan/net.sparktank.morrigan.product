@@ -80,8 +80,5 @@ This build of morrigan is (c) copyright Alex Hutter 2010.  All rights reserved.
       <plugin id="org.eclipse.ui.workbench"/>
    </plugins>
 
-   <configurations>
-      <plugin id="net.sparktank.morrigan" autoStart="false" startLevel="0" />
-   </configurations>
 
 </product>
