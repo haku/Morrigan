@@ -296,7 +296,6 @@ public class PlaybackEngine implements IPlaybackEngine {
 	private void callOnEndOfTrackHandler () {
 		callStateListener(PlayState.Stopped);
 		if (listener!=null) {
-			System.out.println("calling onEndOfTrack.");
 			listener.onEndOfTrack();
 		}
 	}
