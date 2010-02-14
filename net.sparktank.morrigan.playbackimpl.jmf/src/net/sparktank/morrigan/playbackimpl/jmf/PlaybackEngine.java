@@ -1,5 +1,6 @@
 package net.sparktank.morrigan.playbackimpl.jmf;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Frame;
@@ -31,6 +32,11 @@ import net.sparktank.morrigan.playback.IPlaybackStatusListener;
 import net.sparktank.morrigan.playback.NotImplementedException;
 import net.sparktank.morrigan.playback.PlaybackException;
 
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.awt.SWT_AWT;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Composite;
+
 @SuppressWarnings("restriction")
 public class PlaybackEngine  implements IPlaybackEngine {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -43,7 +49,7 @@ public class PlaybackEngine  implements IPlaybackEngine {
 	private volatile boolean m_stopPlaying;
 	
 	private String filepath = null;
-	private Frame videoFrame = null;
+	private Composite videoFrameParent = null;
 	private IPlaybackStatusListener listener = null;
 	private PlayState playbackState = PlayState.Stopped;
 	
@@ -71,8 +77,8 @@ public class PlaybackEngine  implements IPlaybackEngine {
 	}
 	
 	@Override
-	public void setVideoFrame(Frame frame) {
-		this.videoFrame = frame;
+	public void setVideoFrameParent(Composite frame) {
+		this.videoFrameParent = frame;
 	}
 	
 	@Override
@@ -147,6 +153,8 @@ public class PlaybackEngine  implements IPlaybackEngine {
 
 	File mediaFile = null;
 	MediaPlayer mediaPlayer = null;
+	Composite videoComposite = null;
+	Frame videoFrame = null;
 	Component videoComponent = null;
 	VideoResizeListener videoResizeListener = null;
 	
@@ -161,7 +169,14 @@ public class PlaybackEngine  implements IPlaybackEngine {
 			if (videoComponent!=null) {
 				videoFrame.remove(videoComponent);
 				videoFrame.removeComponentListener(videoResizeListener);
+				videoFrame.dispose();
+				videoFrame = null;
+				
 				videoComponent.invalidate();
+				videoComponent = null;
+				
+				videoComposite.dispose();
+				videoComposite = null;
 			}
 		}
 	}
@@ -187,8 +202,17 @@ public class PlaybackEngine  implements IPlaybackEngine {
 			panelVideo.resizeVisualComponent();
 			preferredSize = panelVideo.getPreferredSize();
 			
+			videoComposite = new Composite(videoFrameParent, SWT.EMBEDDED);
+			videoComposite.setLayout(new FillLayout( ));
+	        
+			videoFrame = SWT_AWT.new_Frame(videoComposite);
+			videoFrame.setBackground(Color.BLACK);
+			
 			videoFrame.setLayout(null);
 			videoFrame.add(videoComponent);
+			videoFrame.doLayout();
+			
+			videoFrameParent.layout();
 		}
 		
 		videoResizeListener = new VideoResizeListener(preferredSize);
