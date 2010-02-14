@@ -172,7 +172,24 @@ public class PlaybackEngine implements IPlaybackEngine {
         playbin.getBus().connect(new Bus.STATE_CHANGED() {
             public void stateChanged(GstObject source, State old, State current, State pending) {
                 if (source == playbin) {
-                    System.out.println("Pipeline state changed from " + old + " to " + current);
+                    switch (current) {
+                    	case NULL:
+                    		callStateListener(PlayState.Stopped);
+                    		break;
+                    		
+                    	case PLAYING:
+                    		callStateListener(PlayState.Playing);
+                    		break;
+                    		
+                    	case PAUSED:
+                    		callStateListener(PlayState.Paused);
+                    		break;
+                    		
+                    	case READY:
+                    		callStateListener(PlayState.Stopped); // FIXME add "Loaded" to enum?
+                    		break;
+                    		
+                    }
                 }
             }
         });
