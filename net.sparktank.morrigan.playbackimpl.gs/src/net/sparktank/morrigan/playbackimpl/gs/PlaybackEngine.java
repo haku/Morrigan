@@ -3,16 +3,18 @@ package net.sparktank.morrigan.playbackimpl.gs;
 import java.awt.BorderLayout;
 import java.awt.Frame;
 import java.io.File;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import net.sparktank.morrigan.playback.IPlaybackEngine;
 import net.sparktank.morrigan.playback.IPlaybackStatusListener;
 import net.sparktank.morrigan.playback.PlaybackException;
 
 import org.gstreamer.Bus;
-import org.gstreamer.Format;
 import org.gstreamer.Gst;
 import org.gstreamer.GstObject;
 import org.gstreamer.State;
+import org.gstreamer.StreamInfo;
 import org.gstreamer.elements.PlayBin;
 import org.gstreamer.swing.VideoComponent;
 
@@ -111,12 +113,12 @@ public class PlaybackEngine implements IPlaybackEngine {
 	
 	@Override
 	public int getDuration() throws PlaybackException {
-		return -1;
+		return (int) playbin.queryDuration(TimeUnit.SECONDS);
 	}
 	
 	@Override
 	public long getPlaybackProgress() throws PlaybackException {
-		return -1;
+		return playbin.queryPosition(TimeUnit.SECONDS);
 	}
 	
 	@Override
@@ -161,14 +163,13 @@ public class PlaybackEngine implements IPlaybackEngine {
         	}
         });
         
-        playbin.getBus().connect(new Bus.DURATION() {
-			@Override
-			public void durationChanged(GstObject source, Format format, long duration) {
-				if (source == playbin) {
-					callPositionListener(duration);
-				}
-			}
-		});
+//        playbin.getBus().connect(new Bus.DURATION() {
+//			@Override
+//			public void durationChanged(GstObject source, Format format, long duration) {
+//				if (source == playbin) {
+//				}
+//			}
+//		});
         
         playbin.getBus().connect(new Bus.STATE_CHANGED() {
             public void stateChanged(GstObject source, State old, State current, State pending) {
@@ -177,6 +178,11 @@ public class PlaybackEngine implements IPlaybackEngine {
                 }
             }
         });
+        
+        List<StreamInfo> streamInfo = playbin.getStreamInfo();
+        for (StreamInfo si : streamInfo) {
+        	System.out.println("type=" + si.get("type"));
+		}
         
         videoComponent = new VideoComponent();
         playbin.setVideoSink(videoComponent.getElement());
@@ -243,7 +249,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 			while (!m_stopWatching) {
 				
 				if (playbin!=null) {
-//					callPositionListener(dsFiltergraph.getTime() / 1000);
+					callPositionListener(playbin.queryPosition(TimeUnit.SECONDS));
 				}
 				
 				try {
