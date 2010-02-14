@@ -1,6 +1,6 @@
 package net.sparktank.morrigan.playback;
 
-import java.awt.Frame;
+import org.eclipse.swt.widgets.Composite;
 
 public interface IPlaybackEngine {
 	
@@ -30,7 +30,7 @@ public interface IPlaybackEngine {
 	 * Set the control where the output video will be shown.
 	 * @param frame a java.awt.Frame object.
 	 */
-	public void setVideoFrame (Frame frame);
+	public void setVideoFrameParent (Composite frame);
 	
 	/**
 	 * Completly free the current file.

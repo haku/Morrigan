@@ -1,8 +1,5 @@
 package net.sparktank.morrigan.views;
 
-import java.awt.Color;
-import java.awt.Frame;
-
 import net.sparktank.morrigan.Activator;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.dialogs.RunnableDialog;
@@ -24,7 +21,6 @@ import org.eclipse.jface.action.ControlContribution;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
@@ -119,7 +115,7 @@ public class ViewPlayer extends ViewPart {
 			currentList = list;
 			currentTrack = track;
 			getPlaybackEngine().setFile(currentTrack.getFilepath());
-			getPlaybackEngine().setVideoFrame(mediaFrame);
+			getPlaybackEngine().setVideoFrameParent(mediaFrameParent);
 			getPlaybackEngine().startPlaying();
 			
 			currentList.incTrackStartCnt(currentTrack);
@@ -270,20 +266,14 @@ public class ViewPlayer extends ViewPart {
 	}
 	
 //	private Label mainLabel;
-	private Frame mediaFrame;
+	private Composite mediaFrameParent;
 	private OrderSelecter orderSelecter;
 	
 	private void makeControls (Composite parent) {
 		// Main label.
 		parent.setLayout(new FillLayout ());
-//		mainLabel = new Label(parent, SWT.WRAP);
+		mediaFrameParent = parent;
 		
-		Composite composite = new Composite(parent, SWT.EMBEDDED);
-        composite.setLayout(new FillLayout( ));
-		
-        mediaFrame = SWT_AWT.new_Frame(composite);
-        mediaFrame.setBackground(Color.BLACK);
-        
 		// Order drop-down box.
 		orderSelecter = new OrderSelecter("orderSelecter");
 	}
