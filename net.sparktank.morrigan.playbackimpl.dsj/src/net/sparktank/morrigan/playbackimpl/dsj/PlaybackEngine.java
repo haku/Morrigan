@@ -329,10 +329,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 			Class clazz = ClassLoader.class;
 			Field field = clazz.getDeclaredField("sys_paths");
 			boolean accessible = field.isAccessible();
-			if (!accessible)
-			field.setAccessible(true);
-			@SuppressWarnings("unused")
-			Object original = field.get(clazz);
+			if (!accessible) field.setAccessible(true);
 			field.set(clazz, null);
 		} catch (Exception e) {
 			e.printStackTrace();
