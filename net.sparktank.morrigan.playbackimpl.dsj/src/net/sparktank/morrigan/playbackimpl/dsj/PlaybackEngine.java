@@ -167,7 +167,13 @@ public class PlaybackEngine implements IPlaybackEngine {
 	}
 	
 	private void loadTrack () {
+		boolean firstLoad = (dsFiltergraph==null);
+		
 		callStateListener(PlayState.Loading);
+		
+		if (!firstLoad) {
+			dsFiltergraph.dispose();
+		}
 		
 		dsFiltergraph = new DSMovie(filepath,
 				DSFiltergraph.RENDER_NATIVE, // | DSFiltergraph.INIT_PAUSED,
@@ -175,7 +181,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 		
 		dsFiltergraph.setVolume(1.0f);
 		
-		if (dsFiltergraph.hasMediaOfType(DSMediaType.WMMEDIATYPE_Video)) {
+		if (firstLoad && dsFiltergraph.hasMediaOfType(DSMediaType.WMMEDIATYPE_Video)) {
 			videoComponent = dsFiltergraph.asComponent();
 			
 			videoComposite = new Composite(videoFrameParent, SWT.EMBEDDED);
