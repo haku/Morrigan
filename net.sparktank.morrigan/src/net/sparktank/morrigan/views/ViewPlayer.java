@@ -117,6 +117,7 @@ public class ViewPlayer extends ViewPart {
 			getPlaybackEngine().setFile(currentTrack.getFilepath());
 			getPlaybackEngine().setVideoFrameParent(mediaFrameParent);
 			getPlaybackEngine().startPlaying();
+			System.out.println("Started to play " + currentTrack.getTitle());
 			
 			currentList.incTrackStartCnt(currentTrack);
 			
@@ -218,8 +219,8 @@ public class ViewPlayer extends ViewPart {
 			// Play next track?
 			MediaItem nextTrackToPlay = getNextTrackToPlay();
 			if (nextTrackToPlay != null) {
-				System.out.println("About to start playing " + nextTrackToPlay.getTitle());
-				loadAndStartPlaying(currentList, nextTrackToPlay);
+//				loadAndStartPlaying(currentList, nextTrackToPlay);
+				getSite().getShell().getDisplay().asyncExec(new NextTrackRunner(currentList, nextTrackToPlay));
 				
 			} else {
 				System.out.println("No more tracks to play.");
@@ -235,6 +236,23 @@ public class ViewPlayer extends ViewPart {
 		}
 		
 	};
+	
+	private class NextTrackRunner implements Runnable {
+		
+		private final MediaList list;
+		private final MediaItem track;
+		
+		public NextTrackRunner (MediaList list, MediaItem track) {
+			this.list = list;
+			this.track = track;
+		}
+		
+		@Override
+		public void run() {
+			loadAndStartPlaying(list, track);
+		}
+		
+	}
 	
 	private PlayState internal_getPlayState () {
 		try {
