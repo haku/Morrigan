@@ -9,6 +9,7 @@ import net.sparktank.morrigan.playback.IPlaybackStatusListener;
 import net.sparktank.morrigan.playback.PlaybackException;
 
 import org.gstreamer.Bus;
+import org.gstreamer.Format;
 import org.gstreamer.Gst;
 import org.gstreamer.GstObject;
 import org.gstreamer.State;
@@ -152,12 +153,22 @@ public class PlaybackEngine implements IPlaybackEngine {
 		
         playbin.getBus().connect(new Bus.EOS() {
         	public void endOfStream(GstObject source) {
-        		if (!m_stopPlaying) {
-					callOnEndOfTrackHandler();
-				}
-        		Gst.quit();
+        		if (source == playbin) {
+	        		if (!m_stopPlaying) {
+						callOnEndOfTrackHandler();
+					}
+        		}
         	}
         });
+        
+        playbin.getBus().connect(new Bus.DURATION() {
+			@Override
+			public void durationChanged(GstObject source, Format format, long duration) {
+				if (source == playbin) {
+					callPositionListener(duration);
+				}
+			}
+		});
         
         playbin.getBus().connect(new Bus.STATE_CHANGED() {
             public void stateChanged(GstObject source, State old, State current, State pending) {
