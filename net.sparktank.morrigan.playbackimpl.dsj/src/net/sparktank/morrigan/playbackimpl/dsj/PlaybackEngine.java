@@ -172,7 +172,8 @@ public class PlaybackEngine implements IPlaybackEngine {
 		callStateListener(PlayState.Loading);
 		
 		if (!firstLoad) {
-			dsFiltergraph.dispose();
+			finalisePlayback();
+			dsFiltergraph = null;
 		}
 		
 		dsFiltergraph = new DSMovie(filepath,
