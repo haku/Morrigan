@@ -1,7 +1,5 @@
 package net.sparktank.morrigan.playbackimpl.gs;
 
-import java.awt.BorderLayout;
-import java.awt.Frame;
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 
@@ -9,12 +7,14 @@ import net.sparktank.morrigan.playback.IPlaybackEngine;
 import net.sparktank.morrigan.playback.IPlaybackStatusListener;
 import net.sparktank.morrigan.playback.PlaybackException;
 
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Composite;
 import org.gstreamer.Bus;
 import org.gstreamer.Gst;
 import org.gstreamer.GstObject;
 import org.gstreamer.State;
 import org.gstreamer.elements.PlayBin;
-import org.gstreamer.swing.VideoComponent;
+import org.gstreamer.swt.VideoComponent;
 
 /* Main playback class:
  * http://www.humatic.de/htools/dsj/javadoc/de/humatic/dsj/DSFiltergraph.html
@@ -34,7 +34,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 	private volatile boolean m_stopPlaying;
 	
 	private String filepath = null;
-	private Frame videoFrame = null;
+	private Composite videoFrameParent = null;
 	private IPlaybackStatusListener listener = null;
 	private PlayState playbackState = PlayState.Stopped;
 	
@@ -62,8 +62,8 @@ public class PlaybackEngine implements IPlaybackEngine {
 	}
 	
 	@Override
-	public void setVideoFrame(Frame frame) {
-		this.videoFrame = frame;
+	public void setVideoFrameParent (Composite frame) {
+		this.videoFrameParent = frame;
 	}
 	
 	@Override
@@ -137,9 +137,9 @@ public class PlaybackEngine implements IPlaybackEngine {
 			playbin = null;
 			
 			if (videoComponent!=null) {
-				videoFrame.remove(videoComponent);
+				videoComponent.dispose();
 				videoComponent = null;
-				videoFrame.invalidate();
+				videoFrameParent.redraw();
 			}
 		}
 	}
@@ -184,10 +184,9 @@ public class PlaybackEngine implements IPlaybackEngine {
 //		}
         
         // FIXME only do this if video is present.
-        videoComponent = new VideoComponent();
+        videoComponent = new VideoComponent(videoFrameParent, SWT.NO_BACKGROUND | SWT.EMBEDDED);
         playbin.setVideoSink(videoComponent.getElement());
-        videoFrame.add(videoComponent, BorderLayout.CENTER);
-        videoFrame.doLayout();
+        videoFrameParent.redraw();
 	}
 	
 	private void playTrack () {

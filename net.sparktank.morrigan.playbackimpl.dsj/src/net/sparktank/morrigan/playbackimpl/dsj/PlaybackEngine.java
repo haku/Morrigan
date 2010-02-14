@@ -1,11 +1,17 @@
 package net.sparktank.morrigan.playbackimpl.dsj;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Frame;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.reflect.Field;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.awt.SWT_AWT;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Composite;
 
 import net.sparktank.morrigan.playback.IPlaybackEngine;
 import net.sparktank.morrigan.playback.IPlaybackStatusListener;
@@ -33,7 +39,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 	private volatile boolean m_stopPlaying;
 	
 	private String filepath = null;
-	private Frame videoFrame = null;
+	private Composite videoFrameParent = null;
 	private IPlaybackStatusListener listener = null;
 	private PlayState playbackState = PlayState.Stopped;
 	
@@ -63,8 +69,8 @@ public class PlaybackEngine implements IPlaybackEngine {
 	}
 	
 	@Override
-	public void setVideoFrame(Frame frame) {
-		this.videoFrame = frame;
+	public void setVideoFrameParent(Composite frame) {
+		this.videoFrameParent = frame;
 	}
 	
 	@Override
@@ -137,6 +143,8 @@ public class PlaybackEngine implements IPlaybackEngine {
 //	Local playback methods.
 	
 	private DSFiltergraph dsFiltergraph = null;
+	Composite videoComposite = null;
+	Frame videoFrame = null;
 	Component videoComponent = null;
 	
 	private void finalisePlayback () {
@@ -146,8 +154,13 @@ public class PlaybackEngine implements IPlaybackEngine {
 			
 			if (videoComponent!=null) {
 				videoFrame.remove(videoComponent);
+				videoFrame.dispose();
+				videoFrame = null;
+				
 				videoComponent = null;
-				videoFrame.invalidate();
+				
+				videoComposite.dispose();
+				videoComposite = null;
 			}
 		}
 	}
@@ -163,8 +176,17 @@ public class PlaybackEngine implements IPlaybackEngine {
 		
 		if (dsFiltergraph.hasMediaOfType(DSMediaType.WMMEDIATYPE_Video)) {
 			videoComponent = dsFiltergraph.asComponent();
+			
+			videoComposite = new Composite(videoFrameParent, SWT.EMBEDDED);
+			videoComposite.setLayout(new FillLayout( ));
+	        
+			videoFrame = SWT_AWT.new_Frame(videoComposite);
+			videoFrame.setBackground(Color.BLACK);
+			
 			videoFrame.add(videoComponent, BorderLayout.CENTER);
 			videoFrame.doLayout();
+			
+			videoFrameParent.layout();
 		}
 	}
 	
