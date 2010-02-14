@@ -187,7 +187,7 @@ public class PlaybackEngine implements IPlaybackEngine {
         videoComponent = new VideoComponent();
         playbin.setVideoSink(videoComponent.getElement());
         videoFrame.add(videoComponent, BorderLayout.CENTER);
-        videoComponent.doLayout();
+        videoFrame.doLayout();
 	}
 	
 	private void playTrack () {
