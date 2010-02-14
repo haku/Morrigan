@@ -11,5 +11,6 @@
 	<classpathentry kind="lib" path="lib/tritonus_share-0.3.6.jar"/>
 	<classpathentry kind="lib" path="lib/vorbisspi1.0.3.jar"/>
 	<classpathentry kind="lib" path="/net.sparktank.morrigan/morrigan.pe.stub.jar"/>
+	<classpathentry kind="lib" path="lib/swt.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

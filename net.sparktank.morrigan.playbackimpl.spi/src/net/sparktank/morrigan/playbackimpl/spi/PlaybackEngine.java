@@ -1,6 +1,5 @@
 package net.sparktank.morrigan.playbackimpl.spi;
 
-import java.awt.Frame;
 import java.io.File;
 import java.io.IOException;
 
@@ -16,6 +15,8 @@ import net.sparktank.morrigan.playback.IPlaybackEngine;
 import net.sparktank.morrigan.playback.IPlaybackStatusListener;
 import net.sparktank.morrigan.playback.NotImplementedException;
 import net.sparktank.morrigan.playback.PlaybackException;
+
+import org.eclipse.swt.widgets.Composite;
 
 public class PlaybackEngine implements IPlaybackEngine {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -55,7 +56,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 	}
 	
 	@Override
-	public void setVideoFrame(Frame frame) {
+	public void setVideoFrameParent (Composite frame) {
 		// Not implemented.
 	}
 	
