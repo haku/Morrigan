@@ -185,6 +185,7 @@ public class PlaybackEngine implements IPlaybackEngine {
         
         // FIXME only do this if video is present.
         videoComponent = new VideoComponent(videoFrameParent, SWT.NO_BACKGROUND);
+        videoComponent.setKeepAspect(true);
         playbin.setVideoSink(videoComponent.getElement());
         videoFrameParent.layout();
 	}
