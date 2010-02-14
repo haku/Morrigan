@@ -14,7 +14,7 @@ import org.gstreamer.Gst;
 import org.gstreamer.GstObject;
 import org.gstreamer.State;
 import org.gstreamer.elements.PlayBin;
-import org.gstreamer.swt.VideoComponent;
+import org.gstreamer.swt.overlay.VideoComponent;
 
 /* Main playback class:
  * http://www.humatic.de/htools/dsj/javadoc/de/humatic/dsj/DSFiltergraph.html
@@ -184,9 +184,9 @@ public class PlaybackEngine implements IPlaybackEngine {
 //		}
         
         // FIXME only do this if video is present.
-        videoComponent = new VideoComponent(videoFrameParent, SWT.NO_BACKGROUND | SWT.EMBEDDED);
+        videoComponent = new VideoComponent(videoFrameParent, SWT.NO_BACKGROUND);
         playbin.setVideoSink(videoComponent.getElement());
-        videoFrameParent.redraw();
+        videoFrameParent.layout();
 	}
 	
 	private void playTrack () {
