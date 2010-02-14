@@ -145,22 +145,55 @@ public class PlaybackEngine implements IPlaybackEngine {
 	}
 	
 	private void loadTrack () {
+		boolean firstLoad = (playbin==null);
+		
 		callStateListener(PlayState.Loading);
 		
-		Gst.init("VideoPlayer", new String[] {});
-        playbin = new PlayBin("VideoPlayer");
-        playbin.setInputFile(new File(filepath));
-		
-        playbin.getBus().connect(new Bus.EOS() {
-        	public void endOfStream(GstObject source) {
-        		if (source == playbin) {
-	        		if (!m_stopPlaying) {
-						callOnEndOfTrackHandler();
+		if (firstLoad) {
+			Gst.init("VideoPlayer", new String[] {});
+			playbin = new PlayBin("VideoPlayer");
+			
+			playbin.getBus().connect(new Bus.EOS() {
+				public void endOfStream(GstObject source) {
+					if (source == playbin) {
+						if (!m_stopPlaying) {
+							callOnEndOfTrackHandler();
+						}
 					}
-        		}
-        	}
-        });
-        
+				}
+			});
+			
+			playbin.getBus().connect(new Bus.STATE_CHANGED() {
+				public void stateChanged(GstObject source, State old, State current, State pending) {
+					if (source == playbin) {
+						switch (current) {
+						case NULL:
+							callStateListener(PlayState.Stopped);
+							break;
+							
+						case PLAYING:
+							callStateListener(PlayState.Playing);
+							break;
+							
+						case PAUSED:
+							callStateListener(PlayState.Paused);
+							break;
+							
+						case READY:
+							callStateListener(PlayState.Stopped); // FIXME add "Loaded" to enum?
+							break;
+							
+						}
+					}
+				}
+			});
+			
+			// FIXME only do this if video is present.
+			videoComponent = new VideoComponent(videoFrameParent, SWT.NO_BACKGROUND);
+			videoComponent.setKeepAspect(true);
+			playbin.setVideoSink(videoComponent.getElement());
+			videoFrameParent.layout();
+			
 //        playbin.getBus().connect(new Bus.DURATION() {
 //			@Override
 //			public void durationChanged(GstObject source, Format format, long duration) {
@@ -168,43 +201,18 @@ public class PlaybackEngine implements IPlaybackEngine {
 //				}
 //			}
 //		});
-        
-        playbin.getBus().connect(new Bus.STATE_CHANGED() {
-            public void stateChanged(GstObject source, State old, State current, State pending) {
-                if (source == playbin) {
-                    switch (current) {
-                    	case NULL:
-                    		callStateListener(PlayState.Stopped);
-                    		break;
-                    		
-                    	case PLAYING:
-                    		callStateListener(PlayState.Playing);
-                    		break;
-                    		
-                    	case PAUSED:
-                    		callStateListener(PlayState.Paused);
-                    		break;
-                    		
-                    	case READY:
-                    		callStateListener(PlayState.Stopped); // FIXME add "Loaded" to enum?
-                    		break;
-                    		
-                    }
-                }
-            }
-        });
+			
+		} else {
+			playbin.setState(State.NULL);
+		}
+		
+        playbin.setInputFile(new File(filepath));
         
         // This does not work.
 //        List<StreamInfo> streamInfo = playbin.getStreamInfo();
 //        for (StreamInfo si : streamInfo) {
 //        	System.out.println("type=" + si.get("type"));
 //		}
-        
-        // FIXME only do this if video is present.
-        videoComponent = new VideoComponent(videoFrameParent, SWT.NO_BACKGROUND);
-        videoComponent.setKeepAspect(true);
-        playbin.setVideoSink(videoComponent.getElement());
-        videoFrameParent.layout();
 	}
 	
 	private void playTrack () {
@@ -288,6 +296,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 	private void callOnEndOfTrackHandler () {
 		callStateListener(PlayState.Stopped);
 		if (listener!=null) {
+			System.out.println("calling onEndOfTrack.");
 			listener.onEndOfTrack();
 		}
 	}
