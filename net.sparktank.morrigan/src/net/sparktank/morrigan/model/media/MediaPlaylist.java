@@ -18,6 +18,8 @@ import net.sparktank.morrigan.exceptions.MorriganException;
 public class MediaPlaylist extends MediaList {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	public static final String TYPE = "PLAYLIST";
+	
 	private Logger logger = Logger.getLogger(this.getClass().getName());
 	
 	private boolean newPl = false;
@@ -56,6 +58,18 @@ public class MediaPlaylist extends MediaList {
 		if (getDirtyState()==DirtyState.METADATA) {
 			writeToFile();
 		}
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	@Override
+	public String getType() {
+		return TYPE;
+	}
+	
+	@Override
+	public String getSerial() {
+		return filePath;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
