@@ -8,8 +8,13 @@ import net.sparktank.morrigan.playback.IPlaybackStatusListener;
 import net.sparktank.morrigan.playback.PlaybackException;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.widgets.Composite;
 import org.gstreamer.Bus;
+import org.gstreamer.Format;
 import org.gstreamer.Gst;
 import org.gstreamer.GstObject;
 import org.gstreamer.State;
@@ -66,7 +71,9 @@ public class PlaybackEngine implements IPlaybackEngine {
 	
 	@Override
 	public void setVideoFrameParent (Composite frame) {
+		if (frame==videoFrameParent) return;
 		this.videoFrameParent = frame;
+		reparentVideo();
 	}
 	
 	@Override
@@ -148,75 +155,111 @@ public class PlaybackEngine implements IPlaybackEngine {
 	}
 	
 	private void loadTrack () {
+		callStateListener(PlayState.Loading);
 		boolean firstLoad = (playbin==null);
 		
-		callStateListener(PlayState.Loading);
+		System.out.println("firstLoad=" + firstLoad);
 		
 		if (firstLoad) {
 			Gst.init("VideoPlayer", new String[] {});
 			playbin = new PlayBin("VideoPlayer");
 			
-			playbin.getBus().connect(new Bus.EOS() {
-				public void endOfStream(GstObject source) {
-					if (source == playbin) {
-						if (!m_stopPlaying) {
-							callOnEndOfTrackHandler();
-						}
-					}
-				}
-			});
+			playbin.getBus().connect(eosBus);
+			playbin.getBus().connect(stateChangedBus);
+			playbin.getBus().connect(durationBus);
 			
-			playbin.getBus().connect(new Bus.STATE_CHANGED() {
-				public void stateChanged(GstObject source, State old, State current, State pending) {
-					if (source == playbin) {
-						switch (current) {
-						case NULL:
-							callStateListener(PlayState.Stopped);
-							break;
-							
-						case PLAYING:
-							callStateListener(PlayState.Playing);
-							break;
-							
-						case PAUSED:
-							callStateListener(PlayState.Paused);
-							break;
-							
-						case READY:
-							callStateListener(PlayState.Stopped); // FIXME add "Loaded" to enum?
-							break;
-							
-						}
-					}
-				}
-			});
-			
-			// FIXME only do this if video is present.
-			videoComponent = new VideoComponent(videoFrameParent, SWT.NO_BACKGROUND);
-			videoComponent.setKeepAspect(true);
-			playbin.setVideoSink(videoComponent.getElement());
-			videoFrameParent.layout();
-			
-//        playbin.getBus().connect(new Bus.DURATION() {
-//			@Override
-//			public void durationChanged(GstObject source, Format format, long duration) {
-//				if (source == playbin) {
-//				}
-//			}
-//		});
-			
+			reparentVideo();
+		
 		} else {
 			playbin.setState(State.NULL);
 		}
 		
         playbin.setInputFile(new File(filepath));
-        
-        // This does not work.
-//        List<StreamInfo> streamInfo = playbin.getStreamInfo();
-//        for (StreamInfo si : streamInfo) {
-//        	System.out.println("type=" + si.get("type"));
-//		}
 	}
+	
+	private void reparentVideo () {
+		VideoComponent old_videoComponent = videoComponent;
+		if (videoComponent!=null) {
+			videoComponent.removeKeyListener(keyListener);
+		}
+		
+		// FIXME only do this if video is present.
+		videoComponent = new VideoComponent(videoFrameParent, SWT.NO_BACKGROUND);
+		videoComponent.setKeepAspect(true);
+		playbin.setVideoSink(videoComponent.getElement());
+		videoFrameParent.layout();
+		
+		videoComponent.addKeyListener(keyListener);
+		videoComponent.addMouseListener(mouseListener);
+		
+		if (old_videoComponent!=null) {
+			old_videoComponent.dispose();
+		}
+	}
+	
+	private Bus.EOS eosBus = new Bus.EOS() {
+		public void endOfStream(GstObject source) {
+			if (source == playbin) {
+				if (!m_stopPlaying) {
+					callOnEndOfTrackHandler();
+				}
+			}
+		}
+	};
+	
+	private Bus.STATE_CHANGED stateChangedBus = new Bus.STATE_CHANGED() {
+		public void stateChanged(GstObject source, State old, State current, State pending) {
+			if (source == playbin) {
+				switch (current) {
+				case NULL:
+					callStateListener(PlayState.Stopped);
+					break;
+					
+				case PLAYING:
+					callStateListener(PlayState.Playing);
+					break;
+					
+				case PAUSED:
+					callStateListener(PlayState.Paused);
+					break;
+					
+				case READY:
+					callStateListener(PlayState.Stopped); // FIXME add "Loaded" to enum?
+					break;
+					
+				}
+			}
+		}
+	};
+	
+	private Bus.DURATION durationBus = new Bus.DURATION() {
+		@Override
+		public void durationChanged(GstObject source, Format format, long duration) {
+			if (source == playbin) {
+				System.out.println("durationBus: duration=" + duration);
+			}
+		}
+	};
+	
+	private KeyListener keyListener = new KeyListener() {
+		@Override
+		public void keyReleased(KeyEvent key) {
+			callOnKeyPressListener(key.keyCode);
+		}
+		@Override
+		public void keyPressed(KeyEvent arg0) {}
+	};
+	
+	private MouseListener mouseListener = new MouseListener() {
+		@Override
+		public void mouseDoubleClick(MouseEvent e) {
+			callOnClickListener(e.button, e.count);
+		}
+		@Override
+		public void mouseUp(MouseEvent arg0) {}
+		@Override
+		public void mouseDown(MouseEvent arg0) {}
+	};
 	
 	private void playTrack () {
 		if (playbin!=null) {
@@ -316,6 +359,18 @@ public class PlaybackEngine implements IPlaybackEngine {
 				listener.positionChanged(position);
 			}
 			lastPosition = position;
+		}
+	}
+	
+	private void callOnKeyPressListener (int keyCode) {
+		if (listener!=null) {
+			listener.onKeyPress(keyCode);
+		}
+	}
+	
+	private void callOnClickListener (int button, int clickCount) {
+		if (listener!=null) {
+			listener.onMouseClick(button, clickCount);
 		}
 	}
 	
