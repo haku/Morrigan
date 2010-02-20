@@ -48,6 +48,12 @@ public abstract class MediaList {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	abstract public String getType ();
+	
+	abstract public String getSerial ();
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
 	private DirtyState dirtyState = DirtyState.CLEAN;
 	private ArrayList<Runnable> dirtyChangeEvents = new ArrayList<Runnable>();
 	private ArrayList<Runnable> changeEvents = new ArrayList<Runnable>();

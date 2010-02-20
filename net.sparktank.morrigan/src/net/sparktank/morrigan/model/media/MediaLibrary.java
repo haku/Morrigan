@@ -13,10 +13,14 @@ import net.sparktank.morrigan.library.SqliteLayer.LibrarySortDirection;
 public class MediaLibrary extends MediaList {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	public static final String TYPE = "LIBRARY";
+	
 	private SqliteLayer dbLayer;
 	private final String dbFilePath;
 	LibrarySort librarySort;
 	LibrarySortDirection librarySortDirection;
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	MediaLibrary (String libraryName, String dbFilePath) throws DbException {
 		super(dbFilePath, libraryName);
@@ -26,6 +30,18 @@ public class MediaLibrary extends MediaList {
 		this.librarySortDirection = LibrarySortDirection.ASC;
 		
 		dbLayer = DbConFactory.getDbLayer(dbFilePath);
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	@Override
+	public String getType() {
+		return TYPE;
+	}
+	
+	@Override
+	public String getSerial() {
+		return dbFilePath;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
