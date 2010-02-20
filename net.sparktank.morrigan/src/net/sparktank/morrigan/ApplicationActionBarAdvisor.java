@@ -49,6 +49,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	private IWorkbenchAction exitAction;
 	
 	// Window management actions.
+	private IWorkbenchAction newWindowAction;
 	private IWorkbenchAction resetPerspectiveAction;
 	private IContributionItem showViewItemShortList;
 	private IAction showMediaExplorer;
@@ -96,6 +97,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		
 		exitAction = ActionFactory.QUIT.create(window);
 		register(exitAction);
+		
+		newWindowAction = ActionFactory.OPEN_NEW_WINDOW.create(window);
+		register(newWindowAction);
 		
 		resetPerspectiveAction = ActionFactory.RESET_PERSPECTIVE.create(window);
 		register(resetPerspectiveAction);
@@ -163,11 +167,12 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		
 		MenuManager windowMenu = new MenuManager("&Window", IWorkbenchActionConstants.M_WINDOW);
 		menuBar.add(windowMenu);
-		windowMenu.add(resetPerspectiveAction);
+		windowMenu.add(newWindowAction);
 		showViewMenuMgr.add(showMediaExplorer);
 		showViewMenuMgr.add(new Separator());
 		showViewMenuMgr.add(showViewItemShortList);
 		windowMenu.add(showViewMenuMgr);
+		windowMenu.add(resetPerspectiveAction);
 		windowMenu.add(new Separator());
 		windowMenu.add(showPrefAction);
 		
