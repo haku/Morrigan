@@ -56,6 +56,9 @@ public class PlaybackEngine implements IPlaybackEngine {
 	}
 	
 	@Override
+	public void setClassPath(File[] arg0) {}
+	
+	@Override
 	public void setVideoFrameParent (Composite frame) {
 		// Not implemented.
 	}
