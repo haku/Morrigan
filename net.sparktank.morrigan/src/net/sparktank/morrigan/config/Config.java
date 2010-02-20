@@ -48,12 +48,7 @@ public class Config {
 	private static final String PROP_PE_CLASS = "playbackengine.class";
 	private static final String PROP_PE_JARDIRS = "playbackengine.jardirs";
 	
-	/**
-	 * Returns list of file objects.
-	 * @return
-	 * @throws MorriganException
-	 */
-	public static File[] getPlaybackEngineJars () throws MorriganException {
+	public static File[] getPlaybackEngineJarPaths () throws MorriganException {
 		File file = new File(PROP_FILE);
 		Properties props = new Properties();
 		try {
@@ -68,7 +63,23 @@ public class Config {
 		String[] dirs = data.split("\\|");
 		for (String dir : dirs) {
 			File dirFile = new File(dir);
-			File[] listFiles = dirFile.listFiles(new FileExtFilter("jar"));
+			ret.add(dirFile);
+		}
+		
+		return ret.toArray( new File[] {} );
+	}
+	
+	/**
+	 * Returns list of file objects.
+	 * @return
+	 * @throws MorriganException
+	 */
+	public static File[] getPlaybackEngineJars () throws MorriganException {
+		List<File> ret = new ArrayList<File>();
+		File[] paths = getPlaybackEngineJarPaths();
+		
+		for (File dir : paths) {
+			File[] listFiles = dir.listFiles(new FileExtFilter("jar"));
 			if (listFiles!=null && listFiles.length>0) {
 				ret.addAll(Arrays.asList(listFiles));
 			}
