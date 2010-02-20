@@ -177,7 +177,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 		}
 		
 		dsFiltergraph = new DSMovie(filepath,
-				DSFiltergraph.RENDER_NATIVE, // | DSFiltergraph.INIT_PAUSED,
+				DSFiltergraph.OVERLAY, // | DSFiltergraph.INIT_PAUSED,
 				propertyChangeLlistener);
 		
 		dsFiltergraph.setVolume(1.0f);
