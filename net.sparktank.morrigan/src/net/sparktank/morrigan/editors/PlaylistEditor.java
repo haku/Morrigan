@@ -19,6 +19,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.actions.ActionFactory;
 
 public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -40,6 +41,7 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 	
 	@Override
 	public void setFocus() {
+		getEditorSite().getActionBars().setGlobalActionHandler(ActionFactory.REVERT.getId(), revertAction);
 		getEditorSite().getActionBars().setGlobalActionHandler(ApplicationActionBarAdvisor.ACTIONID_ADD, addAction);
 		getEditorSite().getActionBars().setGlobalActionHandler(ApplicationActionBarAdvisor.ACTIONID_REMOVE, removeAction);
 	}
@@ -73,6 +75,12 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Actions.
+	
+	private IAction revertAction = new Action("revert") {
+		public void run () {
+			new MorriganMsgDlg("TODO: figure out how to implement revert desu~.").open();
+		}
+	};
 	
 	private IAction addAction = new Action("add") {
 		public void run () {
