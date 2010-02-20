@@ -1,13 +1,11 @@
 package net.sparktank.morrigan.handler;
 
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
+import net.sparktank.morrigan.editors.EditorFactory;
 import net.sparktank.morrigan.editors.LibraryEditor;
 import net.sparktank.morrigan.editors.MediaListEditorInput;
 import net.sparktank.morrigan.editors.PlaylistEditor;
-import net.sparktank.morrigan.exceptions.MorriganException;
-import net.sparktank.morrigan.library.DbException;
 import net.sparktank.morrigan.model.media.MediaLibrary;
-import net.sparktank.morrigan.model.media.MediaListFactory;
 import net.sparktank.morrigan.model.media.MediaPlaylist;
 import net.sparktank.morrigan.model.ui.MediaExplorerItem;
 import net.sparktank.morrigan.views.ViewMediaExplorer;
@@ -20,7 +18,6 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 public class CallMediaListEditor extends AbstractHandler implements IHandler {
@@ -50,35 +47,19 @@ public class CallMediaListEditor extends AbstractHandler implements IHandler {
 				MediaExplorerItem item = (MediaExplorerItem) obj;
 				
 				if (item.type == MediaExplorerItem.ItemType.PLAYLIST) {
-					MediaPlaylist playList;
 					try {
-						playList = MediaListFactory.makeMediaPlaylist(item.title, item.identifier);
-					} catch (MorriganException e) {
-						new MorriganMsgDlg(e).open();
-						return null;
-					}
-					
-					MediaListEditorInput<MediaPlaylist> input = new MediaListEditorInput<MediaPlaylist>(playList);
-					try {
+						MediaListEditorInput<MediaPlaylist> input = EditorFactory.getMediaPlaylistInput(item.identifier);
 						page.openEditor(input, PlaylistEditor.ID);
-					} catch (PartInitException e) {
+					} catch (Exception e) {
 						new MorriganMsgDlg(e).open();
 						return null;
 					}
 					
 				} else if (item.type == MediaExplorerItem.ItemType.LIBRARY) {
-					MediaLibrary ml;
 					try {
-						ml = MediaListFactory.makeMediaLibrary(item.title, item.identifier);
-					} catch (DbException e) {
-						new MorriganMsgDlg(e).open();
-						return null;
-					}
-					
-					MediaListEditorInput<MediaLibrary> input = new MediaListEditorInput<MediaLibrary>(ml);
-					try {
+						MediaListEditorInput<MediaLibrary> input = EditorFactory.getMediaLibraryInput(item.identifier);
 						page.openEditor(input, LibraryEditor.ID);
-					} catch (PartInitException e) {
+					} catch (Exception e) {
 						new MorriganMsgDlg(e).open();
 						return null;
 					}

@@ -5,12 +5,16 @@ import net.sparktank.morrigan.model.media.MediaList;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPersistableElement;
 
-public class MediaListEditorInput<T extends MediaList> implements IEditorInput {
-
+public class MediaListEditorInput<T extends MediaList> implements IEditorInput, IPersistableElement {
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
 	private final T editedMediaList;
 
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
 	public MediaListEditorInput (T mediaList) {
 		editedMediaList = mediaList;
 	}
@@ -19,24 +23,11 @@ public class MediaListEditorInput<T extends MediaList> implements IEditorInput {
 		return editedMediaList;
 	}
 	
-	@Override
-	public boolean exists() {
-		return false;
-	}
-	
-	@Override
-	public ImageDescriptor getImageDescriptor() {
-		return null;
-	}
-	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 	@Override
 	public String getName() {
 		return editedMediaList.toString();
-	}
-	
-	@Override
-	public IPersistableElement getPersistable() {
-		return null;
 	}
 	
 	@Override
@@ -44,11 +35,43 @@ public class MediaListEditorInput<T extends MediaList> implements IEditorInput {
 		return editedMediaList.toString();
 	}
 	
+	@Override
+	public ImageDescriptor getImageDescriptor() {
+		return null;
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	@Override
+	public IPersistableElement getPersistable() {
+		return this;
+	}
+	
+	@Override
+	public boolean exists() {
+		return true;
+	}
+	
+	@Override
+	public String getFactoryId() {
+		return EditorFactory.ID;
+	}
+	
+	@Override
+	public void saveState(IMemento memento) {
+		memento.putString(EditorFactory.KEY_TYPE, editedMediaList.getType());
+		memento.putString(EditorFactory.KEY_SERIAL, editedMediaList.getSerial());
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public Object getAdapter(Class adapter) {
 		return null;
 	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
 	public boolean equals(Object aThat) {
@@ -64,4 +87,6 @@ public class MediaListEditorInput<T extends MediaList> implements IEditorInput {
 	public int hashCode() {
 		return editedMediaList.getListId().hashCode();
 	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

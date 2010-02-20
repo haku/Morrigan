@@ -111,5 +111,12 @@
             class="net.sparktank.morrigan.preferences.PreferenceInitializer">
       </initializer>
    </extension>
+   <extension
+         point="org.eclipse.ui.elementFactories">
+      <factory
+            class="net.sparktank.morrigan.editors.EditorFactory"
+            id="net.sparktank.morrigan.editors.EditorFactory">
+      </factory>
+   </extension>
 
 </plugin>
