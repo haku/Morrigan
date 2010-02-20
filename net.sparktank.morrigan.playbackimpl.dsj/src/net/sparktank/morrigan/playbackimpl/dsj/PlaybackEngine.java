@@ -6,16 +6,18 @@ import java.awt.Component;
 import java.awt.Frame;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.lang.reflect.Field;
+
+import net.sparktank.morrigan.playback.IPlaybackEngine;
+import net.sparktank.morrigan.playback.IPlaybackStatusListener;
+import net.sparktank.morrigan.playback.PlaybackException;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 
-import net.sparktank.morrigan.playback.IPlaybackEngine;
-import net.sparktank.morrigan.playback.IPlaybackStatusListener;
-import net.sparktank.morrigan.playback.PlaybackException;
 import de.humatic.dsj.DSFiltergraph;
 import de.humatic.dsj.DSJUtils;
 import de.humatic.dsj.DSMediaType;
@@ -42,13 +44,13 @@ public class PlaybackEngine implements IPlaybackEngine {
 	private Composite videoFrameParent = null;
 	private IPlaybackStatusListener listener = null;
 	private PlayState playbackState = PlayState.Stopped;
+
+	private File[] classPath = null;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructor.
 
-	public PlaybackEngine () {
-		shoeHorn();
-	}
+	public PlaybackEngine () {}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	IPlaybackEngine methods.
@@ -61,6 +63,11 @@ public class PlaybackEngine implements IPlaybackEngine {
 	@Override
 	public String[] getSupportedFormats() {
 		return SUPPORTED_FORMATS;
+	}
+	
+	@Override
+	public void setClassPath(File[] classPath) {
+		this.classPath = classPath;
 	}
 	
 	@Override
@@ -167,6 +174,8 @@ public class PlaybackEngine implements IPlaybackEngine {
 	}
 	
 	private void loadTrack () {
+		shoeHorn();
+		
 		boolean firstLoad = (dsFiltergraph==null);
 		
 		callStateListener(PlayState.Loading);
@@ -329,9 +338,36 @@ public class PlaybackEngine implements IPlaybackEngine {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	private static final String dsjDll = "dsj.dll";
+	
+	private boolean haveShoeHorned = false;
+	
 	// FIXME this is all REALLY nasty.
 	@SuppressWarnings("unchecked")
 	private void shoeHorn () {
+		if (haveShoeHorned) return;
+		
+		File dsjDllFile = null;
+		
+		for (File classPathFile : classPath) {
+			if (classPathFile.isDirectory()) {
+				File[] listFiles = classPathFile.listFiles();
+				if (listFiles!=null && listFiles.length>0) {
+					for (File file : listFiles) {
+						if (file.isFile()) {
+							if (file.getName().equals(dsjDll)) {
+								dsjDllFile = file;
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		if (dsjDllFile==null) return;
+		System.out.println(dsjDll + "=" + dsjDllFile.getAbsolutePath());
+		
 		try {
 			Class clazz = ClassLoader.class;
 			Field field = clazz.getDeclaredField("sys_paths");
@@ -341,14 +377,20 @@ public class PlaybackEngine implements IPlaybackEngine {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		System.setProperty("java.library.path", "D:\\haku\\development\\eclipseWorkspace-java\\dsjtest\\lib");
+		System.setProperty("java.library.path", dsjDllFile.getParentFile().getAbsolutePath());
 		
 		/* FIXME
 		 * This next line fails with
 		 * java.lang.UnsatisfiedLinkError: Native Library D:\haku\development\eclipseWorkspace-java\dsjtest\lib\dsj.dll already loaded in another classloader
 		 * if it is already loaded.
 		 */
-		System.load("D:\\haku\\development\\eclipseWorkspace-java\\dsjtest\\lib\\dsj.dll");
+		try {
+			System.load(dsjDllFile.getAbsolutePath());
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}
+		
+		haveShoeHorned = true;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
