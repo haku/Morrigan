@@ -72,6 +72,9 @@ public class PlaybackEngine  implements IPlaybackEngine {
 	}
 	
 	@Override
+	public void setClassPath(File[] arg0) {}
+	
+	@Override
 	public void setFile(String filepath) {
 		this.filepath = filepath;
 	}
