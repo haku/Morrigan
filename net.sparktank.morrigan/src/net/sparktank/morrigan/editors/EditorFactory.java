@@ -25,8 +25,6 @@ public class EditorFactory implements IElementFactory {
 		String type = memento.getString(KEY_TYPE);
 		String serial = memento.getString(KEY_SERIAL);
 		
-		System.out.println("restore=" + type + ":" + serial);
-		
 		try {
 			if (type.equals(MediaLibrary.TYPE)) {
 				return getMediaLibraryInput(serial);
