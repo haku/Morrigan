@@ -1,25 +1,19 @@
 package net.sparktank.morrigan.playback;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.HashMap;
-import java.util.Map;
 
 import net.sparktank.morrigan.config.Config;
+import net.sparktank.morrigan.exceptions.MorriganException;
 
 public class PlaybackEngineFactory {
 	
-	private static Map<String, IPlaybackEngine> engineCache = new HashMap<String, IPlaybackEngine>();
+	private static URLClassLoader classLoader = null;
 	
-	public static IPlaybackEngine makePlaybackEngine () throws ImplException {
-		try {
-			String playbackEngineClass = Config.getPlaybackEngineClass();
-			
-			if (engineCache.containsKey(playbackEngineClass)) {
-				return engineCache.get(playbackEngineClass);
-			}
-			
+	private static URLClassLoader getClassLoader () throws MorriganException, MalformedURLException {
+		if (classLoader == null) {
 			File[] files = Config.getPlaybackEngineJars();
 			
 			URL jarUrls[] = new URL [files.length];
@@ -28,14 +22,20 @@ public class PlaybackEngineFactory {
 				System.out.println("loaded jarUrl=" + files[i].getAbsolutePath());
 			}
 			
-			URLClassLoader classLoader = URLClassLoader.newInstance(jarUrls, IPlaybackEngine.class.getClassLoader());
-			Class<?> c = classLoader.loadClass(playbackEngineClass);
+			classLoader = URLClassLoader.newInstance(jarUrls, IPlaybackEngine.class.getClassLoader());
+		}
+		return classLoader;
+	}
+	
+	public static IPlaybackEngine makePlaybackEngine () throws ImplException {
+		try {
+			String playbackEngineClass = Config.getPlaybackEngineClass();
+			Class<?> c = getClassLoader().loadClass(playbackEngineClass);
 			IPlaybackEngine playbackEngine = (IPlaybackEngine) c.newInstance();
 			
 			playbackEngine.setClassPath(Config.getPlaybackEngineJarPaths());
 			System.out.println("About " + playbackEngineClass + ":\n" + playbackEngine.getAbout());
 			
-			engineCache.put(playbackEngineClass, playbackEngine);
 			return playbackEngine;
 			
 		} catch (Exception e) {
