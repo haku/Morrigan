@@ -9,6 +9,7 @@ import java.util.Properties;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.FileExtFilter;
+import net.sparktank.morrigan.playback.ImplException;
 
 public class Config {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -47,19 +48,29 @@ public class Config {
 	
 	private static final String PROP_PE_CLASS = "playbackengine.class";
 	private static final String PROP_PE_JARDIRS = "playbackengine.jardirs";
+	private static final String PROP_MEDIA_TYPES = "media.types";
 	
-	public static File[] getPlaybackEngineJarPaths () throws MorriganException {
-		File file = new File(PROP_FILE);
-		Properties props = new Properties();
-		try {
-			props.load(new FileInputStream(file));
-		} catch (Exception e) {
-			throw new MorriganException(e);
+	private static Properties properties = null;
+	
+	private static Properties getProperties () throws MorriganException {
+		if (properties==null) {
+			File file = new File(PROP_FILE);
+			Properties props = new Properties();
+			try {
+				props.load(new FileInputStream(file));
+			} catch (Exception e) {
+				throw new MorriganException(e);
+			}
+			properties = props;
 		}
 		
+		return properties;
+	}
+	
+	public static File[] getPlaybackEngineJarPaths () throws MorriganException {
 		List<File> ret = new ArrayList<File>();
 		
-		String data = props.getProperty(PROP_PE_JARDIRS);
+		String data = getProperties().getProperty(PROP_PE_JARDIRS);
 		String[] dirs = data.split("\\|");
 		for (String dir : dirs) {
 			File dirFile = new File(dir);
@@ -89,15 +100,22 @@ public class Config {
 	}
 	
 	public static String getPlaybackEngineClass () throws MorriganException {
-		File file = new File(PROP_FILE);
-		Properties props = new Properties();
-		try {
-			props.load(new FileInputStream(file));
-		} catch (Exception e) {
-			throw new MorriganException(e);
+		return getProperties().getProperty(PROP_PE_CLASS);
+	}
+	
+	/**
+	 * @return Array of lower-case strings without dots.  e.g. "mp3", "ogg".
+	 * @throws ImplException 
+	 */
+	public static String[] getMediaFileTypes () throws MorriganException {
+		String types = getProperties().getProperty(PROP_MEDIA_TYPES);
+		String[] arrTypes = types.split("\\|");
+		
+		for (int i = 0; i < arrTypes.length; i++) {
+			arrTypes[i] = arrTypes[i].toLowerCase();
 		}
 		
-		return props.getProperty(PROP_PE_CLASS);
+		return arrTypes;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
