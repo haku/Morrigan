@@ -17,18 +17,24 @@ import net.sparktank.morrigan.playback.PlaybackException;
 import net.sparktank.morrigan.playback.IPlaybackEngine.PlayState;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.ControlContribution;
+import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.part.ViewPart;
 
 public class ViewPlayer extends ViewPart {
@@ -299,36 +305,54 @@ public class ViewPlayer extends ViewPart {
 		orderSelecter = new OrderSelecter("orderSelecter");
 	}
 	
-	class OrderSelecter extends ControlContribution {
+	class OrderSelecter extends ContributionItem  {
 		
-		private Combo c;
-		String selected = playbackOrder.toString();
+		private ToolItem item;
+		private String selected = playbackOrder.toString();
 		
 		protected OrderSelecter(String id) {
 			super(id);
 		}
 		
-		@Override
-		protected Control createControl(Composite parent) {
-			c = new Combo(parent, SWT.READ_ONLY);
+		public void fill(ToolBar parent, int index) {
+			item = new ToolItem(parent, SWT.DROP_DOWN);
+			
+			final Menu menu = new Menu(parent.getShell(), SWT.POP_UP);
 			for (PlaybackOrder o : PlaybackOrder.values()) {
-				c.add(o.toString());
+				MenuItem menuItem = new MenuItem(menu, SWT.PUSH);
+				menuItem.setText(o.toString());
+				menuItem.addSelectionListener(new SelectionAdapter () {
+					@Override
+					public void widgetSelected(SelectionEvent e) {
+						selected = ((MenuItem) e.widget).getText();
+						item.setText(selected);
+					}
+				});
+			}
+			item.addListener(SWT.Selection, new DropDownListener(parent, menu));
+			
+			item.setText(selected);
+		}
+		
+		class DropDownListener implements Listener {
+			
+			private final ToolBar parent;
+			private final Menu menu;
+
+			DropDownListener (ToolBar parent, Menu menu) {
+				this.parent = parent;
+				this.menu = menu;
 			}
 			
-			c.addSelectionListener(new SelectionListener() {
-				@Override
-				public void widgetSelected(SelectionEvent e) {
-					selected = c.getText();
-				}
-				@Override
-				public void widgetDefaultSelected(SelectionEvent e) {
-					selected = c.getText();
-				}
-			});
+			public void handleEvent(Event event) {
+//				if (event.detail == SWT.ARROW) {}
+				Rectangle rect = item.getBounds();
+				Point pt = new Point(rect.x, rect.y + rect.height);
+				pt = parent.toDisplay(pt);
+				menu.setLocation(pt);
+				menu.setVisible(true);
+			}
 			
-			c.setText(playbackOrder.toString());
-			
-			return c;
 		}
 		
 		public PlaybackOrder getSelectedOrder () {
