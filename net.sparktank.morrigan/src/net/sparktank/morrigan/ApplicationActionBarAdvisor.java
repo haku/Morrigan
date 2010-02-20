@@ -57,7 +57,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	// List actions.
 	private IAction newLibraryAction;
 	private IAction newPlayListAction;
-	IWorkbenchAction saveAction;
+	private IWorkbenchAction saveAction;
+	private IWorkbenchAction revertAction;
 	private RetargetAction addAction;
 	private RetargetAction removeAction;
 	private RetargetAction showPropertiesAction;
@@ -109,8 +110,12 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		register(showPrefAction);
 		
 		// Editor actions.
+		
 		saveAction = ActionFactory.SAVE.create(window);
 		register(saveAction);
+		
+		revertAction = ActionFactory.REVERT.create(window);
+		register(revertAction);
 		
 		addAction = new RetargetAction(ACTIONID_ADD, "&add files...");
 		addAction.setImageDescriptor(Activator.getImageDescriptor("icons/plus.gif"));
@@ -150,6 +155,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		playlistMenu.add(newPlayListAction);
 		playlistMenu.add(new Separator());
 		playlistMenu.add(saveAction);
+		playlistMenu.add(revertAction);
 		playlistMenu.add(addAction);
 		playlistMenu.add(removeAction);
 		playlistMenu.add(new Separator());
