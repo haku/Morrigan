@@ -43,31 +43,4 @@ public class PlaybackEngineFactory {
 		}
 	}
 	
-	/**
-	 * Returns a list of the file extensions that can be played
-	 * when this engine is loaded.
-	 * This method may need to load instances of each playback engine,
-	 * so use it sparingly.
-	 * @return Array of lower-case strings without dots.  e.g. "mp3", "ogg".
-	 * @throws ImplException 
-	 */
-	public static String[] getSupportedFormats () throws ImplException {
-		/*
-		 * TODO: when we support multiple playback engines, scan them
-		 * all to build one big list.
-		 */
-		
-//		String[] supportedFormats = makePlaybackEngine().getSupportedFormats();
-		
-		// FIXME need to re-use existing engine, or put this list somewhere else.
-		String formats = "mp3|ogg|wma|wmv|avi|mpg|mpeg|ac3|mp4|wav|ra|mpga|mkv|ogm|mpc|m4a|flv|rmvb";
-		String[] supportedFormats = formats.split("\\|");
-		
-		for (int i = 0; i < supportedFormats.length; i++) {
-			supportedFormats[i] = supportedFormats[i].toLowerCase();
-		}
-		
-		return supportedFormats;
-	}
-	
 }

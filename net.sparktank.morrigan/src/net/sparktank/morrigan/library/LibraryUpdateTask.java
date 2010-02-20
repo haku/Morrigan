@@ -6,10 +6,9 @@ import java.util.List;
 import java.util.Stack;
 import java.util.WeakHashMap;
 
+import net.sparktank.morrigan.config.Config;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.MediaLibrary;
-import net.sparktank.morrigan.playback.ImplException;
-import net.sparktank.morrigan.playback.PlaybackEngineFactory;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -84,8 +83,8 @@ public class LibraryUpdateTask extends Job {
 		
 		List<String> supportedFormats;
 		try {
-			supportedFormats = Arrays.asList(PlaybackEngineFactory.getSupportedFormats());
-		} catch (ImplException e) {
+			supportedFormats = Arrays.asList(Config.getMediaFileTypes());
+		} catch (MorriganException e) {
 			monitor.done();
 			return new FailStatus("Failed to retrieve list of supported formats.", e);
 		}

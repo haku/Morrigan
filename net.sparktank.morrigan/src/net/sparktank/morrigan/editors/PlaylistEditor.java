@@ -4,12 +4,11 @@ import java.io.File;
 import java.util.logging.Logger;
 
 import net.sparktank.morrigan.ApplicationActionBarAdvisor;
+import net.sparktank.morrigan.config.Config;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.MediaItem;
 import net.sparktank.morrigan.model.media.MediaPlaylist;
-import net.sparktank.morrigan.playback.ImplException;
-import net.sparktank.morrigan.playback.PlaybackEngineFactory;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
@@ -79,8 +78,8 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 		public void run () {
 			String[] supportedFormats;
 			try {
-				supportedFormats = PlaybackEngineFactory.getSupportedFormats();
-			} catch (ImplException e) {
+				supportedFormats = Config.getMediaFileTypes();
+			} catch (MorriganException e) {
 				new MorriganMsgDlg(e).open();
 				return;
 			}
