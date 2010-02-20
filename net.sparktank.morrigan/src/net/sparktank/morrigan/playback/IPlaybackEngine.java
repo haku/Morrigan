@@ -1,5 +1,7 @@
 package net.sparktank.morrigan.playback;
 
+import java.io.File;
+
 import org.eclipse.swt.widgets.Composite;
 
 public interface IPlaybackEngine {
@@ -17,6 +19,14 @@ public interface IPlaybackEngine {
 	 * @return Array of lower-case strings without dots.  e.g. "mp3", "ogg".
 	 */
 	public String[] getSupportedFormats ();
+	
+	/**
+	 * This method will be called by the plugin loader shortly after
+	 * the instance of the plugin is created.
+	 * @param classPath The array of File objects used by the
+	 * classloader to load the plugin.
+	 */
+	public void setClassPath (File[] classPath);
 	
 	/**
 	 * Set the file to play.  Weather it is actually

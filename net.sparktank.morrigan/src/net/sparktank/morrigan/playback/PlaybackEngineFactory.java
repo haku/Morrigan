@@ -3,29 +3,39 @@ package net.sparktank.morrigan.playback;
 import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.HashMap;
+import java.util.Map;
 
 import net.sparktank.morrigan.config.Config;
 
 public class PlaybackEngineFactory {
 	
+	private static Map<String, IPlaybackEngine> engineCache = new HashMap<String, IPlaybackEngine>();
+	
 	public static IPlaybackEngine makePlaybackEngine () throws ImplException {
 		try {
+			String playbackEngineClass = Config.getPlaybackEngineClass();
+			
+			if (engineCache.containsKey(playbackEngineClass)) {
+				return engineCache.get(playbackEngineClass);
+			}
+			
 			File[] files = Config.getPlaybackEngineJars();
 			
 			URL jarUrls[] = new URL [files.length];
 			for (int i = 0; i < files.length; i++) {
-				System.out.println(files[i].getAbsolutePath());
 				jarUrls[i] = new URL("jar", "", "file:" + files[i].getAbsolutePath() + "!/");
+				System.out.println("loaded jarUrl=" + files[i].getAbsolutePath());
 			}
-			
-			String playbackEngineClass = Config.getPlaybackEngineClass();
 			
 			URLClassLoader classLoader = URLClassLoader.newInstance(jarUrls, IPlaybackEngine.class.getClassLoader());
 			Class<?> c = classLoader.loadClass(playbackEngineClass);
 			IPlaybackEngine playbackEngine = (IPlaybackEngine) c.newInstance();
 			
+			playbackEngine.setClassPath(Config.getPlaybackEngineJarPaths());
 			System.out.println("About " + playbackEngineClass + ":\n" + playbackEngine.getAbout());
 			
+			engineCache.put(playbackEngineClass, playbackEngine);
 			return playbackEngine;
 			
 		} catch (Exception e) {
