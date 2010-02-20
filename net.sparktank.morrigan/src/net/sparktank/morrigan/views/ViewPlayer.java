@@ -12,6 +12,7 @@ import net.sparktank.morrigan.helpers.OrderHelper;
 import net.sparktank.morrigan.helpers.OrderHelper.PlaybackOrder;
 import net.sparktank.morrigan.model.media.MediaItem;
 import net.sparktank.morrigan.model.media.MediaList;
+import net.sparktank.morrigan.playback.FullscreenShell;
 import net.sparktank.morrigan.playback.IPlaybackEngine;
 import net.sparktank.morrigan.playback.IPlaybackStatusListener;
 import net.sparktank.morrigan.playback.ImplException;
@@ -22,10 +23,12 @@ import net.sparktank.morrigan.playback.IPlaybackEngine.PlayState;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.part.ViewPart;
 
 public class ViewPlayer extends ViewPart {
@@ -104,15 +107,30 @@ public class ViewPlayer extends ViewPart {
 //	Playback management.
 	
 	/**
+	 * Go full screen.
+	 */
+	public void goFullscreen () {
+		try {
+			if (isFullScreen()) {
+				removeFullScreen(true);
+			} else {
+				internal_startFullScreen();
+			}
+			
+		} catch (MorriganException e) {
+			getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));
+		}
+	}
+	
+	/**
 	 * For UI handlers to call.
 	 */
 	public void loadAndStartPlaying (MediaList list, MediaItem track) {
 		try {
-			internal_stopPlaying();
 			currentList = list;
 			currentTrack = track;
 			getPlaybackEngine().setFile(currentTrack.getFilepath());
-			getPlaybackEngine().setVideoFrameParent(mediaFrameParent);
+			getPlaybackEngine().setVideoFrameParent(getCurrentMediaFrameParent());
 			getPlaybackEngine().startPlaying();
 			System.out.println("Started to play " + currentTrack.getTitle());
 			
@@ -186,6 +204,43 @@ public class ViewPlayer extends ViewPart {
 		currentTrack = null;
 	}
 	
+	private Shell fullscreenShell = null;
+	
+	private Composite getCurrentMediaFrameParent () {
+		if (fullscreenShell!=null) {
+			return fullscreenShell;
+		} else {
+			return mediaFrameParent;
+		}
+	}
+	
+	private boolean isFullScreen () {
+		return !(fullscreenShell==null);
+	}
+	
+	private void internal_startFullScreen () throws ImplException {
+		fullscreenShell = new FullscreenShell(getSite().getShell().getDisplay(), new Runnable() {
+			@Override
+			public void run() {
+				removeFullScreen(false);
+			}
+		}).getShell();
+		
+		IPlaybackEngine engine = getPlaybackEngine(false);
+		if (engine!=null) {
+			engine.setVideoFrameParent(fullscreenShell);
+		}
+		fullscreenShell.open();
+	}
+	
+	/**
+	 * This method is to be called from the full screen shell close event.
+	 * @throws ImplException
+	 */
+	private void removeFullScreen (boolean closeShell) {
+		getSite().getShell().getDisplay().asyncExec(new RemoveFullScreenRunner(closeShell));
+	}
+	
 	private MediaItem getNextTrackToPlay () {
 		if (currentList==null || currentTrack==null) return null;
 		return OrderHelper.getNextTrack(currentList, currentTrack, playbackOrder);
@@ -216,7 +271,6 @@ public class ViewPlayer extends ViewPart {
 			// Play next track?
 			MediaItem nextTrackToPlay = getNextTrackToPlay();
 			if (nextTrackToPlay != null) {
-//				loadAndStartPlaying(currentList, nextTrackToPlay);
 				getSite().getShell().getDisplay().asyncExec(new NextTrackRunner(currentList, nextTrackToPlay));
 				
 			} else {
@@ -232,7 +286,56 @@ public class ViewPlayer extends ViewPart {
 			getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));
 		}
 		
+		@Override
+		public void onKeyPress(int keyCode) {
+			System.out.println("key released: " + keyCode);
+			if (keyCode == SWT.ESC) {
+				if (isFullScreen()) {
+					removeFullScreen(true);
+				}
+			}
+		}
+		
+		@Override
+		public void onMouseClick(int button, int clickCount) {
+			System.out.println("Mouse click "+button+"*"+clickCount);
+			if (clickCount > 1) {
+				if (isFullScreen()) {
+					removeFullScreen(true);
+				}
+			}
+		}
+		
 	};
+	
+	private class RemoveFullScreenRunner implements Runnable {
+		
+		private final boolean closeShell;
+
+		public RemoveFullScreenRunner (boolean closeShell) {
+			this.closeShell = closeShell;
+		}
+		
+		@Override
+		public void run() {
+			if (!isFullScreen()) return;
+			
+			try {
+				if (closeShell) fullscreenShell.close();
+				
+				IPlaybackEngine engine = getPlaybackEngine(false);
+				if (engine!=null) {
+					engine.setVideoFrameParent(mediaFrameParent);
+				}
+				
+				fullscreenShell = null;
+				
+			} catch (Exception e) {
+				getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));
+			}
+		}
+		
+	}
 	
 	private class NextTrackRunner implements Runnable {
 		
@@ -303,6 +406,8 @@ public class ViewPlayer extends ViewPart {
 		getViewSite().getActionBars().getToolBarManager().add(pauseAction);
 		getViewSite().getActionBars().getToolBarManager().add(stopAction);
 		getViewSite().getActionBars().getToolBarManager().add(nextAction);
+		getViewSite().getActionBars().getToolBarManager().add(new Separator());
+		getViewSite().getActionBars().getToolBarManager().add(fullScreenAction);
 	}
 	
 	private void addMenu () {
@@ -316,6 +421,10 @@ public class ViewPlayer extends ViewPart {
 		getViewSite().getActionBars().getMenuManager().add(stopAction);
 		getViewSite().getActionBars().getMenuManager().add(prevAction);
 		getViewSite().getActionBars().getMenuManager().add(nextAction);
+		
+		getViewSite().getActionBars().getMenuManager().add(new Separator());
+		
+		getViewSite().getActionBars().getMenuManager().add(fullScreenAction);
 		
 		getViewSite().getActionBars().getMenuManager().add(new Separator());
 		
@@ -412,6 +521,12 @@ public class ViewPlayer extends ViewPart {
 	private IAction prevAction = new Action("Previous", Activator.getImageDescriptor("icons/prev.gif")) {
 		public void run() {
 			new MorriganMsgDlg("TODO: implement previous desu~.").open();
+		};
+	};
+	
+	private IAction fullScreenAction = new Action("Full screen", Activator.getImageDescriptor("icons/display.gif")) {
+		public void run() {
+			goFullscreen();
 		};
 	};
 	

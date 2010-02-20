@@ -10,6 +10,10 @@ public interface IPlaybackStatusListener {
 	
 	public void onEndOfTrack ();
 	
+	public void onKeyPress (int keyCode);
+	
+	public void onMouseClick (int button, int clickCount);
+	
 	public void onError (Exception e);
 	
 }

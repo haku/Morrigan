@@ -4,6 +4,10 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Frame;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -77,7 +81,9 @@ public class PlaybackEngine implements IPlaybackEngine {
 	
 	@Override
 	public void setVideoFrameParent(Composite frame) {
+		if (frame==videoFrameParent) return;
 		this.videoFrameParent = frame;
+		reparentVideo();
 	}
 	
 	@Override
@@ -156,6 +162,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 	
 	private void finalisePlayback () {
 		if (dsFiltergraph!=null) {
+			stopTrack();
 			dsFiltergraph.dispose();
 			dsFiltergraph = null;
 			
@@ -174,38 +181,93 @@ public class PlaybackEngine implements IPlaybackEngine {
 	}
 	
 	private void loadTrack () {
-		shoeHorn();
-		
+		callStateListener(PlayState.Loading);
 		boolean firstLoad = (dsFiltergraph==null);
 		
-		callStateListener(PlayState.Loading);
+		System.out.println("firstLoad=" + firstLoad);
 		
-		if (!firstLoad) {
+		if (firstLoad) {
+			shoeHorn();
+			
+		} else {
 			finalisePlayback();
-			dsFiltergraph = null;
 		}
 		
 		dsFiltergraph = new DSMovie(filepath,
-				DSFiltergraph.OVERLAY, // | DSFiltergraph.INIT_PAUSED,
+				DSFiltergraph.OVERLAY | DSFiltergraph.MOUSE_ENABLED, // | DSFiltergraph.INIT_PAUSED,
 				propertyChangeLlistener);
-		
 		dsFiltergraph.setVolume(1.0f);
 		
-		if (firstLoad && dsFiltergraph.hasMediaOfType(DSMediaType.WMMEDIATYPE_Video)) {
-			videoComponent = dsFiltergraph.asComponent();
-			
-			videoComposite = new Composite(videoFrameParent, SWT.EMBEDDED);
-			videoComposite.setLayout(new FillLayout( ));
-	        
-			videoFrame = SWT_AWT.new_Frame(videoComposite);
-			videoFrame.setBackground(Color.BLACK);
-			
-			videoFrame.add(videoComponent, BorderLayout.CENTER);
-			videoFrame.doLayout();
-			
-			videoFrameParent.layout();
-		}
+		reparentVideo();
 	}
+	
+	private void reparentVideo () {
+		System.out.println("reparentVideo()");
+		
+//		if (videoComponent!=null) {
+//			System.out.println("remove listeners");
+//			videoComponent.removeMouseListener(mouseListener);
+//			videoComponent.removeKeyListener(keyListener);
+//		}
+		
+		if (videoFrame!=null) {
+			videoFrame.remove(videoComponent);
+			videoFrame.dispose();
+		}
+		
+		if (videoComposite!=null) {
+			videoComposite.dispose();
+		}
+		
+		if (videoFrameParent==null) return;
+		if (dsFiltergraph==null) return;
+		if (!dsFiltergraph.hasMediaOfType(DSMediaType.WMMEDIATYPE_Video)) return;
+		
+		if (videoComponent==null) {
+			videoComponent = dsFiltergraph.asComponent();
+		}
+//		System.out.println("add listeners");
+//		videoComponent.addMouseListener(mouseListener);
+//		videoComponent.addKeyListener(keyListener);
+		
+		videoComposite = new Composite(videoFrameParent, SWT.EMBEDDED);
+		videoComposite.setLayout(new FillLayout( ));
+        
+		videoFrame = SWT_AWT.new_Frame(videoComposite);
+		videoFrame.setBackground(Color.BLACK);
+		
+		videoFrame.add(videoComponent, BorderLayout.CENTER);
+		videoFrame.doLayout();
+		
+		videoFrameParent.layout();
+	}
+	
+	private MouseListener mouseListener = new MouseListener() {
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			callOnClickListener(e.getButton(), e.getClickCount());
+		}
+		
+		@Override
+		public void mouseReleased(MouseEvent e) {}
+		@Override
+		public void mousePressed(MouseEvent e) {}
+		@Override
+		public void mouseExited(MouseEvent e) {}
+		@Override
+		public void mouseEntered(MouseEvent e) {}
+	};
+	
+	private KeyListener keyListener = new KeyListener() {
+		@Override
+		public void keyReleased(KeyEvent key) {
+			callOnKeyPressListener(key.getKeyCode());
+		}
+		@Override
+		public void keyTyped(KeyEvent arg0) {}
+		@Override
+		public void keyPressed(KeyEvent arg0) {}
+	};
 	
 	private PropertyChangeListener propertyChangeLlistener = new PropertyChangeListener() {
 		@Override
@@ -333,6 +395,18 @@ public class PlaybackEngine implements IPlaybackEngine {
 				listener.positionChanged(position);
 			}
 			lastPosition = position;
+		}
+	}
+	
+	private void callOnKeyPressListener (int keyCode) {
+		if (listener!=null) {
+			listener.onKeyPress(keyCode);
+		}
+	}
+	
+	private void callOnClickListener (int button, int clickCount) {
+		if (listener!=null) {
+			listener.onMouseClick(button, clickCount);
 		}
 	}
 	
