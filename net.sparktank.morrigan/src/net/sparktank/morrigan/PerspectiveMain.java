@@ -17,11 +17,12 @@ public class PerspectiveMain implements IPerspectiveFactory {
 		layout.setEditorAreaVisible(true);
 		layout.setFixed(false);
 		
-		layout.addView(ViewMediaExplorer.ID, IPageLayout.LEFT, 0.3f, editorArea);
+		layout.addView(ViewPlayer.ID, IPageLayout.LEFT, 0.3f, editorArea);
 		
-		IFolderLayout bottom = layout.createFolder("bottom", IPageLayout.BOTTOM, 0.8f, editorArea);
-		bottom.addView(ViewPlayer.ID);
-		bottom.addPlaceholder(ViewLibraryProperties.ID);
+		IFolderLayout bottomleft = layout.createFolder("bottomleft", IPageLayout.BOTTOM, 0.5f, ViewPlayer.ID);
+		bottomleft.addView(ViewMediaExplorer.ID);
+		bottomleft.addPlaceholder(ViewLibraryProperties.ID);
+		bottomleft.addPlaceholder("org.eclipse.ui.views.ProgressView");
 		
 	}
 
