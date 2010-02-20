@@ -51,6 +51,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	// Window management actions.
 	private IWorkbenchAction newWindowAction;
 	private IWorkbenchAction resetPerspectiveAction;
+	private IWorkbenchAction toggleCoolbarAction;
 	private IContributionItem showViewItemShortList;
 	private IAction showMediaExplorer;
 	private IWorkbenchAction showPrefAction;
@@ -103,6 +104,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		
 		resetPerspectiveAction = ActionFactory.RESET_PERSPECTIVE.create(window);
 		register(resetPerspectiveAction);
+		
+		toggleCoolbarAction = ActionFactory.TOGGLE_COOLBAR.create(window);
+		register(toggleCoolbarAction);
 		
 		showViewMenuMgr = new MenuManager("Show view", "showView");
 		showViewItemShortList = ContributionItemFactory.VIEWS_SHORTLIST.create(window);
@@ -168,6 +172,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		MenuManager windowMenu = new MenuManager("&Window", IWorkbenchActionConstants.M_WINDOW);
 		menuBar.add(windowMenu);
 		windowMenu.add(newWindowAction);
+		windowMenu.add(toggleCoolbarAction);
 		showViewMenuMgr.add(showMediaExplorer);
 		showViewMenuMgr.add(new Separator());
 		showViewMenuMgr.add(showViewItemShortList);
