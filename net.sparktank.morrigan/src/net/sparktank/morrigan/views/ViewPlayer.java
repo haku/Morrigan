@@ -302,7 +302,6 @@ public class ViewPlayer extends ViewPart {
 	private void addToolbar () {
 		getViewSite().getActionBars().getToolBarManager().add(pauseAction);
 		getViewSite().getActionBars().getToolBarManager().add(stopAction);
-		getViewSite().getActionBars().getToolBarManager().add(prevAction);
 		getViewSite().getActionBars().getToolBarManager().add(nextAction);
 	}
 	
