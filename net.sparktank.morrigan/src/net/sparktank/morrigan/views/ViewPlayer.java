@@ -1,5 +1,8 @@
 package net.sparktank.morrigan.views;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.sparktank.morrigan.Activator;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.dialogs.RunnableDialog;
@@ -17,24 +20,12 @@ import net.sparktank.morrigan.playback.PlaybackException;
 import net.sparktank.morrigan.playback.IPlaybackEngine.PlayState;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.ToolBar;
-import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.part.ViewPart;
 
 public class ViewPlayer extends ViewPart {
@@ -197,7 +188,7 @@ public class ViewPlayer extends ViewPart {
 	
 	private MediaItem getNextTrackToPlay () {
 		if (currentList==null || currentTrack==null) return null;
-		return OrderHelper.getNextTrack(currentList, currentTrack, orderSelecter.getSelectedOrder());
+		return OrderHelper.getNextTrack(currentList, currentTrack, playbackOrder);
 	}
 	
 	private IPlaybackStatusListener playbackStatusListener = new IPlaybackStatusListener () {
@@ -292,73 +283,20 @@ public class ViewPlayer extends ViewPart {
 		iconStop.dispose();
 	}
 	
-//	private Label mainLabel;
 	private Composite mediaFrameParent;
-	private OrderSelecter orderSelecter;
+	private List<OrderSelectAction> orderMenuActions = new ArrayList<OrderSelectAction>();
 	
 	private void makeControls (Composite parent) {
 		// Main label.
 		parent.setLayout(new FillLayout ());
 		mediaFrameParent = parent;
 		
-		// Order drop-down box.
-		orderSelecter = new OrderSelecter("orderSelecter");
-	}
-	
-	class OrderSelecter extends ContributionItem  {
-		
-		private ToolItem item;
-		private String selected = playbackOrder.toString();
-		
-		protected OrderSelecter(String id) {
-			super(id);
+		// Order menu.
+		for (PlaybackOrder o : PlaybackOrder.values()) {
+			OrderSelectAction a = new OrderSelectAction(o);
+			if (playbackOrder == o) a.setChecked(true);
+			orderMenuActions.add(a);
 		}
-		
-		public void fill(ToolBar parent, int index) {
-			item = new ToolItem(parent, SWT.DROP_DOWN);
-			
-			final Menu menu = new Menu(parent.getShell(), SWT.POP_UP);
-			for (PlaybackOrder o : PlaybackOrder.values()) {
-				MenuItem menuItem = new MenuItem(menu, SWT.PUSH);
-				menuItem.setText(o.toString());
-				menuItem.addSelectionListener(new SelectionAdapter () {
-					@Override
-					public void widgetSelected(SelectionEvent e) {
-						selected = ((MenuItem) e.widget).getText();
-						item.setText(selected);
-					}
-				});
-			}
-			item.addListener(SWT.Selection, new DropDownListener(parent, menu));
-			
-			item.setText(selected);
-		}
-		
-		class DropDownListener implements Listener {
-			
-			private final ToolBar parent;
-			private final Menu menu;
-
-			DropDownListener (ToolBar parent, Menu menu) {
-				this.parent = parent;
-				this.menu = menu;
-			}
-			
-			public void handleEvent(Event event) {
-//				if (event.detail == SWT.ARROW) {}
-				Rectangle rect = item.getBounds();
-				Point pt = new Point(rect.x, rect.y + rect.height);
-				pt = parent.toDisplay(pt);
-				menu.setLocation(pt);
-				menu.setVisible(true);
-			}
-			
-		}
-		
-		public PlaybackOrder getSelectedOrder () {
-			return OrderHelper.parsePlaybackOrder(selected);
-		}
-		
 	}
 	
 	private void addToolbar () {
@@ -366,12 +304,22 @@ public class ViewPlayer extends ViewPart {
 		getViewSite().getActionBars().getToolBarManager().add(stopAction);
 		getViewSite().getActionBars().getToolBarManager().add(prevAction);
 		getViewSite().getActionBars().getToolBarManager().add(nextAction);
-		
-		getViewSite().getActionBars().getToolBarManager().add(new Separator());
-		getViewSite().getActionBars().getToolBarManager().add(orderSelecter);
 	}
 	
 	private void addMenu () {
+		for (OrderSelectAction a : orderMenuActions) {
+			getViewSite().getActionBars().getMenuManager().add(a);
+		}
+		
+		getViewSite().getActionBars().getMenuManager().add(new Separator());
+		
+		getViewSite().getActionBars().getMenuManager().add(pauseAction);
+		getViewSite().getActionBars().getMenuManager().add(stopAction);
+		getViewSite().getActionBars().getMenuManager().add(prevAction);
+		getViewSite().getActionBars().getMenuManager().add(nextAction);
+		
+		getViewSite().getActionBars().getMenuManager().add(new Separator());
+		
 		getViewSite().getActionBars().getMenuManager().add(copyPathAction);
 	}
 	
@@ -419,21 +367,41 @@ public class ViewPlayer extends ViewPart {
 	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	private class OrderSelectAction extends Action {
+		
+		private final PlaybackOrder mode;
+		
+		public OrderSelectAction (PlaybackOrder mode) {
+			super(mode.toString(), AS_RADIO_BUTTON);
+			this.mode = mode;
+		}
+		
+		@Override
+		public void run() {
+			if (isChecked()) {
+				playbackOrder = mode;
+			}
+		}
+		
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Actions.
 	
-	private IAction pauseAction = new Action("pause", Activator.getImageDescriptor("icons/pause.gif")) {
+	private IAction pauseAction = new Action("Pause", Activator.getImageDescriptor("icons/pause.gif")) {
 		public void run() {
 			pausePlaying();
 		};
 	};
 	
-	private IAction stopAction = new Action("stop", Activator.getImageDescriptor("icons/stop.gif")) {
+	private IAction stopAction = new Action("Stop", Activator.getImageDescriptor("icons/stop.gif")) {
 		public void run() {
 			stopPlaying();
 		};
 	};
 	
-	private IAction nextAction = new Action("next", Activator.getImageDescriptor("icons/next.gif")) {
+	private IAction nextAction = new Action("Next", Activator.getImageDescriptor("icons/next.gif")) {
 		public void run() {
 			MediaItem nextTrackToPlay = getNextTrackToPlay();
 			if (nextTrackToPlay != null) {
@@ -442,13 +410,13 @@ public class ViewPlayer extends ViewPart {
 		};
 	};
 	
-	private IAction prevAction = new Action("previous", Activator.getImageDescriptor("icons/prev.gif")) {
+	private IAction prevAction = new Action("Previous", Activator.getImageDescriptor("icons/prev.gif")) {
 		public void run() {
 			new MorriganMsgDlg("TODO: implement previous desu~.").open();
 		};
 	};
 	
-	private IAction copyPathAction = new Action("copy file path") {
+	private IAction copyPathAction = new Action("Copy file path") {
 		public void run() {
 			if (currentTrack!=null) {
 				ClipboardHelper.setText(currentTrack.getFilepath(), Display.getCurrent());
