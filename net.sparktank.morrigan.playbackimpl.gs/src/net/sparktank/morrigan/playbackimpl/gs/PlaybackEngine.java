@@ -196,6 +196,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 			// FIXME only do this if video is present.
 			
 			ClockTime position = playbin.queryPosition();
+			System.out.println("position=" + position.toSeconds());
 			playbin.setState(State.NULL);
 			
 			videoComponent = new VideoComponent(videoFrameParent, SWT.NO_BACKGROUND);
