@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.playback;
+package net.sparktank.morrigan.display;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
