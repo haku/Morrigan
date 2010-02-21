@@ -29,7 +29,6 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Monitor;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.part.ViewPart;
 
 public class ViewPlayer extends ViewPart {
@@ -106,24 +105,6 @@ public class ViewPlayer extends ViewPart {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Playback management.
-	
-	/**
-	 * Go full screen.
-	 */
-	public void goFullscreen (Monitor mon, FullScreenAction action) {
-		try {
-			if (isFullScreen()) {
-				removeFullScreen(true);
-				action.setChecked(false);
-				
-			} else {
-				internal_startFullScreen(mon, action);
-			}
-			
-		} catch (MorriganException e) {
-			getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));
-		}
-	}
 	
 	/**
 	 * For UI handlers to call.
@@ -207,46 +188,6 @@ public class ViewPlayer extends ViewPart {
 		currentTrack = null;
 	}
 	
-	private Shell fullscreenShell = null;
-	
-	private Composite getCurrentMediaFrameParent () {
-		if (fullscreenShell!=null) {
-			return fullscreenShell;
-		} else {
-			return mediaFrameParent;
-		}
-	}
-	
-	private boolean isFullScreen () {
-		return !(fullscreenShell==null);
-	}
-	
-	private void internal_startFullScreen (Monitor mon, final FullScreenAction action) throws ImplException {
-		fullscreenShell = new FullscreenShell(getSite().getShell().getDisplay(), mon, new Runnable() {
-			@Override
-			public void run() {
-				removeFullScreen(false);
-				action.setChecked(false);
-			}
-		}).getShell();
-		
-		IPlaybackEngine engine = getPlaybackEngine(false);
-		if (engine!=null) {
-			engine.setVideoFrameParent(fullscreenShell);
-		}
-		
-		fullscreenShell.open();
-		action.setChecked(true);
-	}
-	
-	/**
-	 * This method is to be called from the full screen shell close event.
-	 * @throws ImplException
-	 */
-	private void removeFullScreen (boolean closeShell) {
-		getSite().getShell().getDisplay().asyncExec(new RemoveFullScreenRunner(closeShell));
-	}
-	
 	private MediaItem getNextTrackToPlay () {
 		if (currentList==null || currentTrack==null) return null;
 		return OrderHelper.getNextTrack(currentList, currentTrack, playbackOrder);
@@ -297,7 +238,7 @@ public class ViewPlayer extends ViewPart {
 			System.out.println("key released: " + keyCode);
 			if (keyCode == SWT.ESC) {
 				if (isFullScreen()) {
-					removeFullScreen(true);
+					removeFullScreenSafe(true);
 				}
 			}
 		}
@@ -306,42 +247,15 @@ public class ViewPlayer extends ViewPart {
 		public void onMouseClick(int button, int clickCount) {
 			System.out.println("Mouse click "+button+"*"+clickCount);
 			if (clickCount > 1) {
-				if (isFullScreen()) {
-					removeFullScreen(true);
+				if (!isFullScreen()) {
+					goFullScreenSafe();
+				} else {
+					removeFullScreenSafe(true);
 				}
 			}
 		}
 		
 	};
-	
-	private class RemoveFullScreenRunner implements Runnable {
-		
-		private final boolean closeShell;
-
-		public RemoveFullScreenRunner (boolean closeShell) {
-			this.closeShell = closeShell;
-		}
-		
-		@Override
-		public void run() {
-			if (!isFullScreen()) return;
-			
-			try {
-				if (closeShell) fullscreenShell.close();
-				
-				IPlaybackEngine engine = getPlaybackEngine(false);
-				if (engine!=null) {
-					engine.setVideoFrameParent(mediaFrameParent);
-				}
-				
-				fullscreenShell = null;
-				
-			} catch (Exception e) {
-				getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));
-			}
-		}
-		
-	}
 	
 	private class NextTrackRunner implements Runnable {
 		
@@ -374,6 +288,151 @@ public class ViewPlayer extends ViewPart {
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Full screen stuff.
+	
+	private FullscreenShell fullscreenShell = null;
+	
+	private Composite getCurrentMediaFrameParent () {
+		if (fullscreenShell!=null) {
+			return fullscreenShell.getShell();
+		} else {
+			return mediaFrameParent;
+		}
+	}
+	
+	private boolean isFullScreen () {
+		return !(fullscreenShell==null);
+	}
+	
+	private void goFullScreenSafe () {
+		goFullScreenSafe(null, null);
+	}
+	
+	private void goFullScreenSafe (Monitor mon, FullScreenAction action) {
+		GoFullScreenRunner runner = new GoFullScreenRunner(mon, action);
+		if (Thread.currentThread().equals(getSite().getShell().getDisplay().getThread())) {
+			runner.run();
+		} else {
+			getSite().getShell().getDisplay().asyncExec(runner);
+		}
+	}
+	
+	private void removeFullScreenSafe (boolean closeShell) {
+		RemoveFullScreenRunner runner = new RemoveFullScreenRunner(closeShell);
+		if (Thread.currentThread().equals(getSite().getShell().getDisplay().getThread())) {
+			runner.run();
+		} else {
+			getSite().getShell().getDisplay().asyncExec(runner);
+		}
+	}
+	
+	private class GoFullScreenRunner implements Runnable {
+		
+		private final Monitor mon;
+		private final FullScreenAction action;
+
+//		public GoFullScreenRunner () {
+//			this.mon = null;
+//			this.action = null;
+//		}
+		
+		public GoFullScreenRunner (Monitor mon, FullScreenAction action) {
+			this.mon = mon;
+			this.action = action;
+		}
+		
+		@Override
+		public void run() {
+			if (mon==null || action == null) {
+				Monitor currentMon = null;
+				for (Monitor mon : getSite().getShell().getDisplay().getMonitors()) {
+					if (mon.getBounds().contains(getSite().getShell().getDisplay().getCursorLocation())) {
+						currentMon = mon;
+						break;
+					}
+				}
+				if (currentMon!=null) {
+					for (FullScreenAction a : fullScreenActions) {
+						if (a.getMonitor().equals(currentMon)) {
+							goFullscreen(currentMon, a);
+						}
+					}
+				}
+				
+			} else {
+				goFullscreen(mon, action);
+			}
+		}
+		
+		private void goFullscreen (Monitor mon, FullScreenAction action) {
+			try {
+				if (isFullScreen()) {
+					new RemoveFullScreenRunner(true).run();
+					action.setChecked(false);
+					
+				} else {
+					startFullScreen(mon, action);
+				}
+				
+			} catch (MorriganException e) {
+				getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));
+			}
+		}
+		
+		private void startFullScreen (Monitor mon, final FullScreenAction action) throws ImplException {
+			fullscreenShell = new FullscreenShell(getSite().getShell().getDisplay(), mon, new Runnable() {
+				@Override
+				public void run() {
+					removeFullScreenSafe(false);
+					action.setChecked(false);
+				}
+			});
+			
+			IPlaybackEngine engine = getPlaybackEngine(false);
+			if (engine!=null) {
+				engine.setVideoFrameParent(fullscreenShell.getShell());
+			}
+			
+			action.setChecked(true);
+			fullscreenShell.getShell().open();
+		}
+		
+	}
+	
+	private class RemoveFullScreenRunner implements Runnable {
+		
+		private final boolean closeShell;
+
+		public RemoveFullScreenRunner (boolean closeShell) {
+			this.closeShell = closeShell;
+		}
+		
+		@Override
+		public void run() {
+			if (!isFullScreen()) return;
+			
+			try {
+				if (closeShell) fullscreenShell.getShell().close();
+				
+				IPlaybackEngine engine = getPlaybackEngine(false);
+				if (engine!=null) {
+					engine.setVideoFrameParent(mediaFrameParent);
+				}
+				
+				if (fullscreenShell!=null) {
+					if (!fullscreenShell.getShell().isDisposed()) fullscreenShell.getShell().dispose();
+					fullscreenShell = null;
+				}
+				
+			} catch (Exception e) {
+				getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));
+			}
+		}
+		
+	}
+	
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	GUI stuff.
 	
 	private Image iconPlay;
@@ -398,7 +457,7 @@ public class ViewPlayer extends ViewPart {
 	
 	private void makeControls (Composite parent) {
 		// Main label.
-		parent.setLayout(new FillLayout ());
+		parent.setLayout(new FillLayout());
 		mediaFrameParent = parent;
 		
 		// Order menu.
@@ -520,10 +579,15 @@ public class ViewPlayer extends ViewPart {
 			this.mon = mon;
 		}
 		
+		public Monitor getMonitor () {
+			return mon;
+		}
+		
 		@Override
 		public void run() {
-			goFullscreen(mon, this);
+			goFullScreenSafe(mon, this);
 		}
+		
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
