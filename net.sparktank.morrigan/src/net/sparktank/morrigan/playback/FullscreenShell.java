@@ -7,8 +7,10 @@ import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 
 public class FullscreenShell {
@@ -16,13 +18,16 @@ public class FullscreenShell {
 	private Shell shell;
 	private final Runnable onCloseRunnable;
 	
-	public FullscreenShell(Display display, Runnable onCloseRunnable) {
+	public FullscreenShell(Display display, Monitor mon, Runnable onCloseRunnable) {
 		shell = new Shell(display);
 		this.onCloseRunnable = onCloseRunnable;
 		
-		shell.setLayout(new FillLayout ());
+		Point pt = new Point(mon.getClientArea().x + 1, mon.getClientArea().y + 1);
+		shell.setLocation(pt);
 		shell.setMaximized(true);
 		shell.setFullScreen(true);
+		
+		shell.setLayout(new FillLayout ());
 		
 		shell.addTraverseListener(traverseListener);
 		shell.addMouseListener(mouseListener);

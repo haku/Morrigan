@@ -28,6 +28,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.part.ViewPart;
 
@@ -109,12 +110,14 @@ public class ViewPlayer extends ViewPart {
 	/**
 	 * Go full screen.
 	 */
-	public void goFullscreen () {
+	public void goFullscreen (Monitor mon, FullScreenAction action) {
 		try {
 			if (isFullScreen()) {
 				removeFullScreen(true);
+				action.setChecked(false);
+				
 			} else {
-				internal_startFullScreen();
+				internal_startFullScreen(mon, action);
 			}
 			
 		} catch (MorriganException e) {
@@ -218,11 +221,12 @@ public class ViewPlayer extends ViewPart {
 		return !(fullscreenShell==null);
 	}
 	
-	private void internal_startFullScreen () throws ImplException {
-		fullscreenShell = new FullscreenShell(getSite().getShell().getDisplay(), new Runnable() {
+	private void internal_startFullScreen (Monitor mon, final FullScreenAction action) throws ImplException {
+		fullscreenShell = new FullscreenShell(getSite().getShell().getDisplay(), mon, new Runnable() {
 			@Override
 			public void run() {
 				removeFullScreen(false);
+				action.setChecked(false);
 			}
 		}).getShell();
 		
@@ -230,7 +234,9 @@ public class ViewPlayer extends ViewPart {
 		if (engine!=null) {
 			engine.setVideoFrameParent(fullscreenShell);
 		}
+		
 		fullscreenShell.open();
+		action.setChecked(true);
 	}
 	
 	/**
@@ -388,6 +394,7 @@ public class ViewPlayer extends ViewPart {
 	
 	private Composite mediaFrameParent;
 	private List<OrderSelectAction> orderMenuActions = new ArrayList<OrderSelectAction>();
+	private List<FullScreenAction> fullScreenActions = new ArrayList<FullScreenAction>();
 	
 	private void makeControls (Composite parent) {
 		// Main label.
@@ -400,6 +407,13 @@ public class ViewPlayer extends ViewPart {
 			if (playbackOrder == o) a.setChecked(true);
 			orderMenuActions.add(a);
 		}
+		
+		// Full screen menu.
+		for (int i = 0; i < parent.getShell().getDisplay().getMonitors().length; i++) {
+			Monitor mon = parent.getShell().getDisplay().getMonitors()[i];
+			FullScreenAction a = new FullScreenAction(i, mon);
+			fullScreenActions.add(a);
+		}
 	}
 	
 	private void addToolbar () {
@@ -407,7 +421,6 @@ public class ViewPlayer extends ViewPart {
 		getViewSite().getActionBars().getToolBarManager().add(stopAction);
 		getViewSite().getActionBars().getToolBarManager().add(nextAction);
 		getViewSite().getActionBars().getToolBarManager().add(new Separator());
-		getViewSite().getActionBars().getToolBarManager().add(fullScreenAction);
 	}
 	
 	private void addMenu () {
@@ -424,7 +437,9 @@ public class ViewPlayer extends ViewPart {
 		
 		getViewSite().getActionBars().getMenuManager().add(new Separator());
 		
-		getViewSite().getActionBars().getMenuManager().add(fullScreenAction);
+		for (FullScreenAction a : fullScreenActions) {
+			getViewSite().getActionBars().getMenuManager().add(a);
+		}
 		
 		getViewSite().getActionBars().getMenuManager().add(new Separator());
 		
@@ -475,6 +490,7 @@ public class ViewPlayer extends ViewPart {
 	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Complex actions.
 	
 	private class OrderSelectAction extends Action {
 		
@@ -492,6 +508,22 @@ public class ViewPlayer extends ViewPart {
 			}
 		}
 		
+	}
+	
+	private class FullScreenAction extends Action {
+		
+		private final Monitor mon;
+		
+		public FullScreenAction (int i, Monitor mon) {
+			super("Full screen on " + i, AS_CHECK_BOX);
+			this.setImageDescriptor(Activator.getImageDescriptor("icons/display.gif"));
+			this.mon = mon;
+		}
+		
+		@Override
+		public void run() {
+			goFullscreen(mon, this);
+		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -521,12 +553,6 @@ public class ViewPlayer extends ViewPart {
 	private IAction prevAction = new Action("Previous", Activator.getImageDescriptor("icons/prev.gif")) {
 		public void run() {
 			new MorriganMsgDlg("TODO: implement previous desu~.").open();
-		};
-	};
-	
-	private IAction fullScreenAction = new Action("Full screen", Activator.getImageDescriptor("icons/display.gif")) {
-		public void run() {
-			goFullscreen();
 		};
 	};
 	
