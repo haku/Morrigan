@@ -55,7 +55,9 @@ public class ViewPlayer extends ViewPart {
 	}
 	
 	@Override
-	public void setFocus() {}
+	public void setFocus() {
+		mediaFrameParent.setFocus();
+	}
 	
 	@Override
 	public void dispose() {
