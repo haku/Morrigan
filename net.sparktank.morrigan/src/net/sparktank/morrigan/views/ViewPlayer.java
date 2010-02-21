@@ -386,7 +386,7 @@ public class ViewPlayer extends ViewPart {
 		}
 		
 		private void startFullScreen (Monitor mon, final FullScreenAction action) throws ImplException {
-			fullscreenShell = new FullscreenShell(getSite().getShell().getDisplay(), mon, new Runnable() {
+			fullscreenShell = new FullscreenShell(getSite().getShell(), mon, new Runnable() {
 				@Override
 				public void run() {
 					removeFullScreenSafe(false);
