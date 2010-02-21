@@ -14,6 +14,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.widgets.Composite;
 import org.gstreamer.Bus;
+import org.gstreamer.ClockTime;
 import org.gstreamer.Format;
 import org.gstreamer.Gst;
 import org.gstreamer.GstObject;
@@ -169,7 +170,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 			playbin.getBus().connect(durationBus);
 			
 			reparentVideo();
-		
+			
 		} else {
 			playbin.setState(State.NULL);
 		}
@@ -181,8 +182,10 @@ public class PlaybackEngine implements IPlaybackEngine {
 		System.out.println("reparentVideo()");
 		
 		if (videoComponent!=null) {
-			videoComponent.removeKeyListener(keyListener);
-			videoComponent.removeMouseListener(mouseListener);
+			if (!videoComponent.isDisposed()) {
+				videoComponent.removeKeyListener(keyListener);
+				videoComponent.removeMouseListener(mouseListener);
+			}
 		}
 		
 		VideoComponent old_videoComponent = videoComponent;
@@ -192,6 +195,9 @@ public class PlaybackEngine implements IPlaybackEngine {
 			
 			// FIXME only do this if video is present.
 			
+			ClockTime position = playbin.queryPosition();
+			playbin.setState(State.NULL);
+			
 			videoComponent = new VideoComponent(videoFrameParent, SWT.NO_BACKGROUND);
 			videoComponent.setKeepAspect(true);
 			playbin.setVideoSink(videoComponent.getElement());
@@ -200,11 +206,16 @@ public class PlaybackEngine implements IPlaybackEngine {
 			videoComponent.addKeyListener(keyListener);
 			videoComponent.addMouseListener(mouseListener);
 			
+			playbin.setState(State.PLAYING);
+			System.out.println("seek=" + playbin.seek(position) );
+			
 		}
 		
 		if (old_videoComponent!=null) {
 			old_videoComponent.dispose();
 		}
+		
+		System.out.println("leaving reparentVideo()");
 	}
 	
 	private Bus.EOS eosBus = new Bus.EOS() {
