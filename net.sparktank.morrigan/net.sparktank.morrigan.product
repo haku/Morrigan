@@ -10,7 +10,7 @@
 
 For more information, please refer to related blog entries at http://vaguehope.com or email haku@vaguehope.com
 
-This build of morrigan is (c) copyright Fae Hutter 2010.  All rights reserved.
+This build of morrigan is copyright Fae Hutter 2010.  All rights reserved.
       </text>
    </aboutInfo>
 
@@ -23,6 +23,7 @@ This build of morrigan is (c) copyright Fae Hutter 2010.  All rights reserved.
 
    <windowImages i16="/net.sparktank.morrigan/icons/copepod-16.png" i32="/net.sparktank.morrigan/icons/copepod-32.png"/>
 
+
    <launcher name="morrigan">
       <solaris/>
       <win useIco="true">
@@ -30,6 +31,7 @@ This build of morrigan is (c) copyright Fae Hutter 2010.  All rights reserved.
          <bmp/>
       </win>
    </launcher>
+
 
    <vm>
    </vm>
