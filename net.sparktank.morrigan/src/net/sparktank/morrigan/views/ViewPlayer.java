@@ -7,6 +7,7 @@ import net.sparktank.morrigan.Activator;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.dialogs.RunnableDialog;
 import net.sparktank.morrigan.display.FullscreenShell;
+import net.sparktank.morrigan.display.ScreenPainter;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.ClipboardHelper;
 import net.sparktank.morrigan.helpers.OrderHelper;
@@ -24,8 +25,11 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Monitor;
@@ -453,14 +457,25 @@ public class ViewPlayer extends ViewPart {
 		iconStop.dispose();
 	}
 	
-	private Composite mediaFrameParent;
+	private Canvas mediaFrameParent;
 	private List<OrderSelectAction> orderMenuActions = new ArrayList<OrderSelectAction>();
 	private List<FullScreenAction> fullScreenActions = new ArrayList<FullScreenAction>();
 	
 	private void makeControls (Composite parent) {
 		// Main label.
 		parent.setLayout(new FillLayout());
-		mediaFrameParent = parent;
+		parent.addFocusListener(new FocusListener() {
+			@Override
+			public void focusGained(FocusEvent e) {
+				mediaFrameParent.setFocus();
+			}
+			@Override
+			public void focusLost(FocusEvent e) {}
+		});
+		
+		mediaFrameParent = new Canvas(parent, SWT.NONE);
+		mediaFrameParent.setLayout(new FillLayout());
+		mediaFrameParent.addPaintListener(new ScreenPainter(mediaFrameParent));
 		
 		// Order menu.
 		for (PlaybackOrder o : PlaybackOrder.values()) {
