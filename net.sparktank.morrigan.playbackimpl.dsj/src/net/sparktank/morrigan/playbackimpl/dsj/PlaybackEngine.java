@@ -105,13 +105,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 			throw new PlaybackException("Failed to load '"+filepath+"'.", e);
 		}
 		
-		videoFrameParent.getDisplay().asyncExec(new Runnable() {
-			@Override
-			public void run() {
-				playTrack();
-			}
-		});
-		
+		playTrack();
 	}
 	
 	@Override
@@ -137,8 +131,8 @@ public class PlaybackEngine implements IPlaybackEngine {
 	
 	@Override
 	public int getDuration() throws PlaybackException {
-		if (dsFiltergraph!=null) {
-			return dsFiltergraph.getDuration() / 1000;
+		if (dsMovie!=null) {
+			return dsMovie.getDuration() / 1000;
 		} else {
 			return -1;
 		}
@@ -146,8 +140,8 @@ public class PlaybackEngine implements IPlaybackEngine {
 	
 	@Override
 	public long getPlaybackProgress() throws PlaybackException {
-		if (dsFiltergraph!=null) {
-			return dsFiltergraph.getTime() / 1000;
+		if (dsMovie!=null) {
+			return dsMovie.getTime() / 1000;
 		} else {
 			return -1;
 		}
@@ -161,13 +155,13 @@ public class PlaybackEngine implements IPlaybackEngine {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Local playback methods.
 	
-	private DSFiltergraph dsFiltergraph = null;
+	private DSMovie dsMovie = null;
 	Composite videoComposite = null;
 	Frame videoFrame = null;
 	Component videoComponent = null;
 	
 	private void finalisePlayback () {
-		if (dsFiltergraph!=null) {
+		if (dsMovie!=null) {
 			stopTrack();
 			
 			if (videoComponent!=null) {
@@ -182,14 +176,14 @@ public class PlaybackEngine implements IPlaybackEngine {
 				videoComposite = null;
 			}
 			
-			dsFiltergraph.dispose();
-			dsFiltergraph = null;
+			dsMovie.dispose();
+			dsMovie = null;
 		}
 	}
 	
 	private void loadTrack () {
 		callStateListener(PlayState.Loading);
-		boolean firstLoad = (dsFiltergraph==null);
+		boolean firstLoad = (dsMovie==null);
 		
 		System.out.println("firstLoad=" + firstLoad);
 		
@@ -200,12 +194,12 @@ public class PlaybackEngine implements IPlaybackEngine {
 			finalisePlayback();
 		}
 		
-		dsFiltergraph = new DSMovie(filepath,
+		dsMovie = new DSMovie(filepath,
 				DSFiltergraph.OVERLAY | DSFiltergraph.MOUSE_ENABLED | DSFiltergraph.INIT_PAUSED,
 				propertyChangeLlistener);
-		dsFiltergraph.setVolume(1.0f);
-		
+		dsMovie.setVolume(1.0f);
 		reparentVideo();
+		dsMovie.pause(); // Is this is not here, then sometimes playback does not start when play() is called.
 	}
 	
 	private void reparentVideo () {
@@ -229,11 +223,11 @@ public class PlaybackEngine implements IPlaybackEngine {
 //		}
 		
 		if (videoFrameParent==null) return;
-		if (dsFiltergraph==null) return;
-		if (!dsFiltergraph.hasMediaOfType(DSMediaType.WMMEDIATYPE_Video)) return;
+		if (dsMovie==null) return;
+		if (!dsMovie.hasMediaOfType(DSMediaType.WMMEDIATYPE_Video)) return;
 		
 		if (videoComponent==null) {
-			videoComponent = dsFiltergraph.asComponent();
+			videoComponent = dsMovie.asComponent();
 			videoComponent.setBackground(Color.BLACK);
 			
 			System.out.println("adding listeners to videoComponent...");
@@ -309,6 +303,26 @@ public class PlaybackEngine implements IPlaybackEngine {
 					}
 					break;
 				
+				case (DSFiltergraph.BUFFERING):
+					System.out.println("BUFFERING"); 
+					break;
+				
+				case (DSFiltergraph.BUFFER_COMPLETE):
+					System.out.println("BUFFER_COMPLETE");
+					break;
+					
+				case (DSFiltergraph.INITIALIZED):
+					System.out.println("INITIALIZED");
+					break;
+					
+				case (DSFiltergraph.IP_READY):
+					System.out.println("IP_READY");
+					break;
+					
+				case (DSFiltergraph.OVERLAY_BUFFER_REQUEST):
+					System.out.println("OVERLAY_BUFFER_REQUEST");
+					break;
+					
 //				case (DSFiltergraph.GRAPH_ERROR):
 //					String message = "Graph error: " + String.valueOf(pce.getNewValue());
 //					callOnErrorHandler(new PlaybackException(message));
@@ -319,31 +333,32 @@ public class PlaybackEngine implements IPlaybackEngine {
 	};
 	
 	private void playTrack () {
-		if (dsFiltergraph!=null) {
-			dsFiltergraph.play();
+		System.out.println("playTrack()");
+		if (dsMovie!=null) {
+			dsMovie.play();
 			startWatcherThread();
 			callStateListener(PlayState.Playing);
 		}
 	}
 	
 	private void pauseTrack () {
-		if (dsFiltergraph!=null) {
-			dsFiltergraph.pause();
+		if (dsMovie!=null) {
+			dsMovie.pause();
 			callStateListener(PlayState.Paused);
 		}
 	}
 	
 	private void resumeTrack () {
-		if (dsFiltergraph!=null) {
-			dsFiltergraph.play();
+		if (dsMovie!=null) {
+			dsMovie.play();
 			callStateListener(PlayState.Playing);
 		}
 	}
 	
 	private void stopTrack () {
 		stopWatcherThread();
-		if (dsFiltergraph!=null) {
-			dsFiltergraph.stop();
+		if (dsMovie!=null) {
+			dsMovie.stop();
 			callStateListener(PlayState.Stopped);
 		}
 	}
@@ -376,8 +391,8 @@ public class PlaybackEngine implements IPlaybackEngine {
 		public void run() {
 			while (!m_stopWatching) {
 				
-				if (dsFiltergraph!=null) {
-					callPositionListener(dsFiltergraph.getTime() / 1000);
+				if (dsMovie!=null) {
+					callPositionListener(dsMovie.getTime() / 1000);
 				}
 				
 				try {
