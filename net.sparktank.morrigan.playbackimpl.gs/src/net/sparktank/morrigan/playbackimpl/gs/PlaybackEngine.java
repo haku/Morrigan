@@ -17,6 +17,8 @@ import org.gstreamer.Bus;
 import org.gstreamer.Format;
 import org.gstreamer.Gst;
 import org.gstreamer.GstObject;
+import org.gstreamer.SeekFlags;
+import org.gstreamer.SeekType;
 import org.gstreamer.State;
 import org.gstreamer.elements.PlayBin;
 import org.gstreamer.swt.overlay.VideoComponent;
@@ -198,9 +200,13 @@ public class PlaybackEngine implements IPlaybackEngine {
 			
 			// FIXME only do this if video is present.
 			
-			long position = playbin.queryPosition(TimeUnit.MICROSECONDS);
-			System.out.println("position=" + position);
-			playbin.setState(State.NULL);
+			long position = -1;
+			State state = playbin.getState();
+			if (state==State.PLAYING || state==State.PAUSED) {
+				position = playbin.queryPosition(TimeUnit.NANOSECONDS);
+				System.out.println("position=" + position);
+				playbin.setState(State.NULL);
+			}
 			
 			videoComponent = new VideoComponent(videoFrameParent, SWT.NO_BACKGROUND);
 			videoComponent.setKeepAspect(true);
@@ -210,8 +216,10 @@ public class PlaybackEngine implements IPlaybackEngine {
 			videoComponent.addKeyListener(keyListener);
 			videoComponent.addMouseListener(mouseListener);
 			
-			playbin.setState(State.PLAYING);
-			System.out.println("seek=" + playbin.seek(position, TimeUnit.MICROSECONDS) );
+			if (position>=0) {
+				playbin.setState(state);
+				System.out.println("seek=" + playbin.seek(1.0d, Format.TIME, SeekFlags.FLUSH, SeekType.SET, position, SeekType.NONE, -1) );
+			}
 			
 		}
 		
