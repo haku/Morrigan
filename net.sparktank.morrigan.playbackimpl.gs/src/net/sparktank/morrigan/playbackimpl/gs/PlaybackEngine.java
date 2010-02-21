@@ -14,7 +14,6 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.widgets.Composite;
 import org.gstreamer.Bus;
-import org.gstreamer.ClockTime;
 import org.gstreamer.Format;
 import org.gstreamer.Gst;
 import org.gstreamer.GstObject;
@@ -148,7 +147,11 @@ public class PlaybackEngine implements IPlaybackEngine {
 			playbin = null;
 			
 			if (videoComponent!=null) {
-				videoComponent.dispose();
+				if (!videoComponent.isDisposed()) {
+					videoComponent.removeKeyListener(keyListener);
+					videoComponent.removeMouseListener(mouseListener);
+					videoComponent.dispose();
+				}
 				videoComponent = null;
 				videoFrameParent.redraw();
 			}
@@ -195,8 +198,8 @@ public class PlaybackEngine implements IPlaybackEngine {
 			
 			// FIXME only do this if video is present.
 			
-			ClockTime position = playbin.queryPosition();
-			System.out.println("position=" + position.toSeconds());
+			long position = playbin.queryPosition(TimeUnit.MICROSECONDS);
+			System.out.println("position=" + position);
 			playbin.setState(State.NULL);
 			
 			videoComponent = new VideoComponent(videoFrameParent, SWT.NO_BACKGROUND);
@@ -208,7 +211,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 			videoComponent.addMouseListener(mouseListener);
 			
 			playbin.setState(State.PLAYING);
-			System.out.println("seek=" + playbin.seek(position) );
+			System.out.println("seek=" + playbin.seek(position, TimeUnit.MICROSECONDS) );
 			
 		}
 		
