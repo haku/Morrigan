@@ -12,7 +12,7 @@
    </property>
    <property
          name="aboutText"
-         value="This alpha build of morrigan is released as free software and is provided &quot;as is&quot; for testing pourpouses only.&#x0A;&#x0A;For more information, please refer to related blog entries at http://vaguehope.com or email haku@vaguehope.com&#x0A;&#x0A;This build of morrigan is (c) copyright Alex Hutter 2010.  All rights reserved.">
+         value="This alpha build of morrigan is released as free software and is provided &quot;as is&quot; for testing pourpouses only.&#x0D;&#x0A;&#x0D;&#x0A;For more information, please refer to related blog entries at http://vaguehope.com or email haku@vaguehope.com&#x0D;&#x0A;&#x0D;&#x0A;This build of morrigan is copyright Alex Hutter 2010.  All rights reserved.">
    </property>
 		</product>
 	</extension>
