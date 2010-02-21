@@ -178,19 +178,29 @@ public class PlaybackEngine implements IPlaybackEngine {
 	}
 	
 	private void reparentVideo () {
-		VideoComponent old_videoComponent = videoComponent;
+		System.out.println("reparentVideo()");
+		
 		if (videoComponent!=null) {
 			videoComponent.removeKeyListener(keyListener);
+			videoComponent.removeMouseListener(mouseListener);
 		}
 		
-		// FIXME only do this if video is present.
-		videoComponent = new VideoComponent(videoFrameParent, SWT.NO_BACKGROUND);
-		videoComponent.setKeepAspect(true);
-		playbin.setVideoSink(videoComponent.getElement());
-		videoFrameParent.layout();
+		VideoComponent old_videoComponent = videoComponent;
+		videoComponent = null;
 		
-		videoComponent.addKeyListener(keyListener);
-		videoComponent.addMouseListener(mouseListener);
+		if (playbin!=null) {
+			
+			// FIXME only do this if video is present.
+			
+			videoComponent = new VideoComponent(videoFrameParent, SWT.NO_BACKGROUND);
+			videoComponent.setKeepAspect(true);
+			playbin.setVideoSink(videoComponent.getElement());
+			videoFrameParent.layout();
+			
+			videoComponent.addKeyListener(keyListener);
+			videoComponent.addMouseListener(mouseListener);
+			
+		}
 		
 		if (old_videoComponent!=null) {
 			old_videoComponent.dispose();
