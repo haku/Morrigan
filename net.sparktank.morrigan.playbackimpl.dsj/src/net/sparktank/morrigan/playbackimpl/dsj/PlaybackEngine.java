@@ -163,8 +163,6 @@ public class PlaybackEngine implements IPlaybackEngine {
 	private void finalisePlayback () {
 		if (dsFiltergraph!=null) {
 			stopTrack();
-			dsFiltergraph.dispose();
-			dsFiltergraph = null;
 			
 			if (videoComponent!=null) {
 				videoFrame.remove(videoComponent);
@@ -177,6 +175,9 @@ public class PlaybackEngine implements IPlaybackEngine {
 				videoComposite.dispose();
 				videoComposite = null;
 			}
+			
+			dsFiltergraph.dispose();
+			dsFiltergraph = null;
 		}
 	}
 	
@@ -210,14 +211,16 @@ public class PlaybackEngine implements IPlaybackEngine {
 //			videoComponent.removeKeyListener(keyListener);
 //		}
 		
-		if (videoFrame!=null) {
-			videoFrame.remove(videoComponent);
-			videoFrame.dispose();
-		}
+//		if (videoFrame!=null) {
+//			if (videoComponent!=null) videoFrame.remove(videoComponent);
+//			videoFrame.dispose();
+//			videoFrame = null;
+//		}
 		
-		if (videoComposite!=null) {
-			videoComposite.dispose();
-		}
+//		if (videoComposite!=null) {
+//			videoComposite.dispose();
+//			videoComposite = null;
+//		}
 		
 		if (videoFrameParent==null) return;
 		if (dsFiltergraph==null) return;
@@ -225,21 +228,34 @@ public class PlaybackEngine implements IPlaybackEngine {
 		
 		if (videoComponent==null) {
 			videoComponent = dsFiltergraph.asComponent();
+			videoComponent.setBackground(Color.ORANGE);
+			
+			System.out.println("adding listeners to videoComponent...");
+			videoComponent.addMouseListener(mouseListener);
+			videoComponent.addKeyListener(keyListener);
 		}
-//		System.out.println("add listeners");
-//		videoComponent.addMouseListener(mouseListener);
-//		videoComponent.addKeyListener(keyListener);
 		
-		videoComposite = new Composite(videoFrameParent, SWT.EMBEDDED);
-		videoComposite.setLayout(new FillLayout( ));
-        
-		videoFrame = SWT_AWT.new_Frame(videoComposite);
-		videoFrame.setBackground(Color.BLACK);
 		
-		videoFrame.add(videoComponent, BorderLayout.CENTER);
-		videoFrame.doLayout();
+		if (videoComposite == null || videoComposite.isDisposed()) {
+			System.out.println("Making videoComposite...");
+			
+			videoComposite = new Composite(videoFrameParent, SWT.EMBEDDED);
+			videoComposite.setLayout(new FillLayout());
+	        
+			videoFrame = SWT_AWT.new_Frame(videoComposite);
+			videoFrame.setBackground(Color.BLACK);
+			
+			videoFrame.add(videoComponent, BorderLayout.CENTER);
+			videoFrame.doLayout();
+			
+		} else {
+			System.out.println("Moveing videoComposite...");
+			videoComposite.setParent(videoFrameParent);
+		}
 		
 		videoFrameParent.layout();
+		
+		System.out.println("leaving reparentVideo()");
 	}
 	
 	private MouseListener mouseListener = new MouseListener() {
