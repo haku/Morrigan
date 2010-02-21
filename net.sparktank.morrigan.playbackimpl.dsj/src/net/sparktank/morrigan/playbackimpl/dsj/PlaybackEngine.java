@@ -105,7 +105,13 @@ public class PlaybackEngine implements IPlaybackEngine {
 			throw new PlaybackException("Failed to load '"+filepath+"'.", e);
 		}
 		
-		playTrack();
+		videoFrameParent.getDisplay().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				playTrack();
+			}
+		});
+		
 	}
 	
 	@Override
@@ -195,7 +201,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 		}
 		
 		dsFiltergraph = new DSMovie(filepath,
-				DSFiltergraph.OVERLAY | DSFiltergraph.MOUSE_ENABLED, // | DSFiltergraph.INIT_PAUSED,
+				DSFiltergraph.OVERLAY | DSFiltergraph.MOUSE_ENABLED | DSFiltergraph.INIT_PAUSED,
 				propertyChangeLlistener);
 		dsFiltergraph.setVolume(1.0f);
 		
@@ -228,13 +234,12 @@ public class PlaybackEngine implements IPlaybackEngine {
 		
 		if (videoComponent==null) {
 			videoComponent = dsFiltergraph.asComponent();
-			videoComponent.setBackground(Color.ORANGE);
+			videoComponent.setBackground(Color.BLACK);
 			
 			System.out.println("adding listeners to videoComponent...");
 			videoComponent.addMouseListener(mouseListener);
 			videoComponent.addKeyListener(keyListener);
 		}
-		
 		
 		if (videoComposite == null || videoComposite.isDisposed()) {
 			System.out.println("Making videoComposite...");
