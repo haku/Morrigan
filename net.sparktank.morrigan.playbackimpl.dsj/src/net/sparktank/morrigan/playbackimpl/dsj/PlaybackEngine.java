@@ -179,6 +179,8 @@ public class PlaybackEngine implements IPlaybackEngine {
 			dsMovie.dispose();
 			dsMovie = null;
 		}
+		
+		setScreenSaverActive(true);
 	}
 	
 	private void loadTrack () {
@@ -338,6 +340,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 			dsMovie.play();
 			startWatcherThread();
 			callStateListener(PlayState.Playing);
+			setScreenSaverActive(false);
 		}
 	}
 	
@@ -345,6 +348,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 		if (dsMovie!=null) {
 			dsMovie.pause();
 			callStateListener(PlayState.Paused);
+			setScreenSaverActive(true);
 		}
 	}
 	
@@ -352,6 +356,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 		if (dsMovie!=null) {
 			dsMovie.play();
 			callStateListener(PlayState.Playing);
+			setScreenSaverActive(false);
 		}
 	}
 	
@@ -360,6 +365,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 		if (dsMovie!=null) {
 			dsMovie.stop();
 			callStateListener(PlayState.Stopped);
+			setScreenSaverActive(true);
 		}
 	}
 	
@@ -444,6 +450,27 @@ public class PlaybackEngine implements IPlaybackEngine {
 		if (listener!=null) {
 			listener.onMouseClick(button, clickCount);
 		}
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Screen saver.
+	
+	private Boolean lastScreenSaverState = null;
+	
+	private void setScreenSaverActive (boolean active) {
+		if (lastScreenSaverState!=null) {
+			if (lastScreenSaverState==active) return;
+		}
+		
+		if (!active
+				|| (dsMovie!=null && dsMovie.hasMediaOfType(DSMediaType.WMMEDIATYPE_Video))
+				) {
+			
+			DSJUtils.setScreenSaverActive(active);
+			System.out.println("set screenSaver=" + active);
+		}
+		
+		lastScreenSaverState = active;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
