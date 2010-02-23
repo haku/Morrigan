@@ -455,22 +455,22 @@ public class PlaybackEngine implements IPlaybackEngine {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Screen saver.
 	
-	private Boolean lastScreenSaverState = null;
-	
 	private void setScreenSaverActive (boolean active) {
-		if (lastScreenSaverState!=null) {
-			if (lastScreenSaverState==active) return;
+		if (DSJUtils.getScreenSaverActive()!=active) {
+			if (active
+					|| (dsMovie!=null && dsMovie.hasMediaOfType(DSMediaType.WMMEDIATYPE_Video))
+					) {
+				
+				DSJUtils.setScreenSaverActive(active);
+				
+				boolean a = DSJUtils.getScreenSaverActive();
+				if (active == a) {
+					System.out.println("Set screenSaverActive=" + active + ".");
+				} else {
+					System.out.println("Failed to set screenSaverActive=" + active + ".");
+				}
+			}
 		}
-		
-		if (!active
-				|| (dsMovie!=null && dsMovie.hasMediaOfType(DSMediaType.WMMEDIATYPE_Video))
-				) {
-			
-			DSJUtils.setScreenSaverActive(active);
-			System.out.println("set screenSaver=" + active);
-		}
-		
-		lastScreenSaverState = active;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
