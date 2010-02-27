@@ -104,6 +104,11 @@
             id="net.sparktank.morrigan.preferences.MediaListPref"
             name="Media lists">
       </page>
+      <page
+            class="net.sparktank.morrigan.preferences.GeneralPref"
+            id="net.sparktank.morrigan.preferences.GeneralPref"
+            name="General">
+      </page>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">

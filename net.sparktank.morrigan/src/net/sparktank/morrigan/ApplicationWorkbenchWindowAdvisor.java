@@ -1,6 +1,11 @@
 package net.sparktank.morrigan;
 
+import net.sparktank.morrigan.display.TrayHelper;
+
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.application.ActionBarAdvisor;
 import org.eclipse.ui.application.IActionBarConfigurer;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
@@ -22,6 +27,23 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		configurer.setShowCoolBar(true);
 		configurer.setShowStatusLine(false);
 		configurer.setShowProgressIndicator(true);
+	}
+	
+	@Override
+	public void postWindowOpen() {
+		super.postWindowOpen();
+		
+		getWindowConfigurer().getWindow().getShell().addListener(SWT.Iconify, new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				TrayHelper.minToTray(getWindowConfigurer().getWindow(), false);
+			}
+		});
+	}
+	
+	@Override
+	public boolean preWindowShellClose() {
+		return !TrayHelper.minToTray(getWindowConfigurer().getWindow(), false);
 	}
 	
 }
