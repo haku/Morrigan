@@ -3,9 +3,9 @@ package net.sparktank.morrigan.playbackimpl.gs;
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 
-import net.sparktank.morrigan.playback.IPlaybackEngine;
-import net.sparktank.morrigan.playback.IPlaybackStatusListener;
-import net.sparktank.morrigan.playback.PlaybackException;
+import net.sparktank.morrigan.engines.playback.IPlaybackEngine;
+import net.sparktank.morrigan.engines.playback.IPlaybackStatusListener;
+import net.sparktank.morrigan.engines.playback.PlaybackException;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
