@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse.ant.import?>
+
+<project default="all" name="Create jars for engine stubs.">
+	
+	<target name="all">
+		<antcall target="morrigan.engines.playback.stub.jar" />
+		<antcall target="morrigan.engines.hotkey.stub.jar" />
+	</target>
+	
+	<target name="morrigan.engines.playback.stub.jar">
+		<jar destfile="morrigan.engines.playback.stub.jar">
+			<fileset dir="bin" includes="net/sparktank/morrigan/engines/playback/**/*.class" />
+			<fileset dir="bin" includes="net/sparktank/morrigan/engines/exceptions/**/*.class" />
+		</jar>
+    </target>
+	
+	<target name="morrigan.engines.hotkey.stub.jar">
+		<jar destfile="morrigan.engines.hotkey.stub.jar">
+			<fileset dir="bin" includes="net/sparktank/morrigan/engines/hotkey/**/*.class" />
+			<fileset dir="bin" includes="net/sparktank/morrigan/engines/exceptions/**/*.class" />
+		</jar>
+    </target>
+    
+</project>

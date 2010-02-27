@@ -1,6 +1,6 @@
-package net.sparktank.morrigan.playback;
+package net.sparktank.morrigan.engines.playback;
 
-import net.sparktank.morrigan.playback.IPlaybackEngine.PlayState;
+import net.sparktank.morrigan.engines.playback.IPlaybackEngine.PlayState;
 
 public interface IPlaybackStatusListener {
 	
