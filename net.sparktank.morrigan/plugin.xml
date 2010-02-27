@@ -100,6 +100,7 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
+            category="net.sparktank.morrigan.preferences.GeneralPref"
             class="net.sparktank.morrigan.preferences.MediaListPref"
             id="net.sparktank.morrigan.preferences.MediaListPref"
             name="Media lists">
@@ -108,6 +109,35 @@
             class="net.sparktank.morrigan.preferences.GeneralPref"
             id="net.sparktank.morrigan.preferences.GeneralPref"
             name="General">
+      </page>
+      <page
+            category="org.eclipse.ui.internal.dialogs.WorkbenchPreferencePage"
+            class="org.eclipse.ui.internal.keys.KeysPreferencePage"
+            id="org.eclipse.ui.internal.keys.KeysPreferencePage"
+            name="Keys">
+      </page>
+      <page
+            category="org.eclipse.ui.internal.dialogs.WorkbenchPreferencePage"
+            class="org.eclipse.ui.internal.themes.ColorsAndFontsPreferencePage"
+            id="org.eclipse.ui.internal.themes.ColorsAndFontsPreferencePage"
+            name="Colors and Fonts">
+      </page>
+      <page
+            category="org.eclipse.ui.internal.dialogs.WorkbenchPreferencePage"
+            class="org.eclipse.ui.internal.dialogs.ViewsPreferencePage"
+            id="org.eclipse.ui.internal.dialogs.ViewsPreferencePage"
+            name="Views">
+      </page>
+      <page
+            category="org.eclipse.ui.internal.dialogs.WorkbenchPreferencePage"
+            class="org.eclipse.ui.internal.dialogs.EditorsPreferencePage"
+            id="org.eclipse.ui.internal.dialogs.EditorsPreferencePage"
+            name="Editors">
+      </page>
+      <page
+            class="org.eclipse.ui.internal.dialogs.WorkbenchPreferencePage"
+            id="org.eclipse.ui.internal.dialogs.WorkbenchPreferencePage"
+            name="Workbench">
       </page>
    </extension>
    <extension
