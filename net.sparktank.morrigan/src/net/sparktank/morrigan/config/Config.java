@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
-import net.sparktank.morrigan.engines.playback.ImplException;
+import net.sparktank.morrigan.engines.common.ImplException;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.FileExtFilter;
 
