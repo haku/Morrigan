@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.playback;
+package net.sparktank.morrigan.engines;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -7,14 +7,16 @@ import java.net.URLClassLoader;
 
 import net.sparktank.morrigan.config.Config;
 import net.sparktank.morrigan.exceptions.MorriganException;
+import net.sparktank.morrigan.playback.IPlaybackEngine;
+import net.sparktank.morrigan.playback.ImplException;
 
-public class PlaybackEngineFactory {
+public class EngineFactory {
 	
-	private static URLClassLoader classLoader = null;
+private static URLClassLoader classLoader = null;
 	
 	private static URLClassLoader getClassLoader () throws MorriganException, MalformedURLException {
 		if (classLoader == null) {
-			File[] files = Config.getPlaybackEngineJars();
+			File[] files = Config.getPluginJars();
 			
 			URL jarUrls[] = new URL [files.length];
 			for (int i = 0; i < files.length; i++) {
@@ -33,7 +35,7 @@ public class PlaybackEngineFactory {
 			Class<?> c = getClassLoader().loadClass(playbackEngineClass);
 			IPlaybackEngine playbackEngine = (IPlaybackEngine) c.newInstance();
 			
-			playbackEngine.setClassPath(Config.getPlaybackEngineJarPaths());
+			playbackEngine.setClassPath(Config.getPluginJarPaths());
 			System.out.println("About " + playbackEngineClass + ":\n" + playbackEngine.getAbout());
 			
 			return playbackEngine;

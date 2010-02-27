@@ -8,6 +8,7 @@ import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.dialogs.RunnableDialog;
 import net.sparktank.morrigan.display.FullscreenShell;
 import net.sparktank.morrigan.display.ScreenPainter;
+import net.sparktank.morrigan.engines.EngineFactory;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.ClipboardHelper;
 import net.sparktank.morrigan.helpers.OrderHelper;
@@ -17,7 +18,6 @@ import net.sparktank.morrigan.model.media.MediaList;
 import net.sparktank.morrigan.playback.IPlaybackEngine;
 import net.sparktank.morrigan.playback.IPlaybackStatusListener;
 import net.sparktank.morrigan.playback.ImplException;
-import net.sparktank.morrigan.playback.PlaybackEngineFactory;
 import net.sparktank.morrigan.playback.PlaybackException;
 import net.sparktank.morrigan.playback.IPlaybackEngine.PlayState;
 
@@ -82,7 +82,7 @@ public class ViewPlayer extends ViewPart {
 	
 	private IPlaybackEngine getPlaybackEngine (boolean create) throws ImplException {
 		if (playbackEngine == null && create) {
-			playbackEngine = PlaybackEngineFactory.makePlaybackEngine();
+			playbackEngine = EngineFactory.makePlaybackEngine();
 			playbackEngine.setStatusListener(playbackStatusListener);
 		}
 		
