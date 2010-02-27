@@ -46,8 +46,10 @@ public class Config {
 	
 	private static final String PROP_FILE = "morrigan.properties";
 	
-	private static final String PROP_PE_CLASS = "playbackengine.class";
-	private static final String PROP_PE_JARDIRS = "playbackengine.jardirs";
+	private static final String PROP_ENG_PE_CLASS = "engines.playback.class";
+	private static final String PROP_ENG_HK_CLASS = "engines.hotkey.class";
+	private static final String PROP_ENG_JARDIRS = "engines.jardirs";
+	
 	private static final String PROP_MEDIA_TYPES = "media.types";
 	
 	private static Properties properties = null;
@@ -67,10 +69,10 @@ public class Config {
 		return properties;
 	}
 	
-	public static File[] getPlaybackEngineJarPaths () throws MorriganException {
+	public static File[] getPluginJarPaths () throws MorriganException {
 		List<File> ret = new ArrayList<File>();
 		
-		String data = getProperties().getProperty(PROP_PE_JARDIRS);
+		String data = getProperties().getProperty(PROP_ENG_JARDIRS);
 		String[] dirs = data.split("\\|");
 		for (String dir : dirs) {
 			File dirFile = new File(dir);
@@ -85,9 +87,9 @@ public class Config {
 	 * @return
 	 * @throws MorriganException
 	 */
-	public static File[] getPlaybackEngineJars () throws MorriganException {
+	public static File[] getPluginJars () throws MorriganException {
 		List<File> ret = new ArrayList<File>();
-		File[] paths = getPlaybackEngineJarPaths();
+		File[] paths = getPluginJarPaths();
 		
 		for (File dir : paths) {
 			File[] listFiles = dir.listFiles(new FileExtFilter("jar"));
@@ -100,7 +102,11 @@ public class Config {
 	}
 	
 	public static String getPlaybackEngineClass () throws MorriganException {
-		return getProperties().getProperty(PROP_PE_CLASS);
+		return getProperties().getProperty(PROP_ENG_PE_CLASS);
+	}
+	
+	public static String getHotKeyEngineClass () throws MorriganException {
+		return getProperties().getProperty(PROP_ENG_HK_CLASS);
 	}
 	
 	/**
