@@ -1,5 +1,6 @@
 package net.sparktank.morrigan;
 
+import net.sparktank.morrigan.display.MinToTrayAction;
 import net.sparktank.morrigan.library.NewLibraryAction;
 import net.sparktank.morrigan.playlist.NewPlaylistAction;
 import net.sparktank.morrigan.views.ShowViewAction;
@@ -50,6 +51,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	
 	// Window management actions.
 	private IWorkbenchAction newWindowAction;
+	private IWorkbenchAction minToTrayAction;
 	private IWorkbenchAction resetPerspectiveAction;
 	private IWorkbenchAction toggleCoolbarAction;
 	private IContributionItem showViewItemShortList;
@@ -59,7 +61,10 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	// List actions.
 	private IAction newLibraryAction;
 	private IAction newPlayListAction;
+	private IWorkbenchAction closeAction;
+	private IWorkbenchAction closeAllAction;
 	private IWorkbenchAction saveAction;
+	private IWorkbenchAction saveAllAction;
 	private IWorkbenchAction revertAction;
 	private RetargetAction addAction;
 	private RetargetAction removeAction;
@@ -102,6 +107,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		newWindowAction = ActionFactory.OPEN_NEW_WINDOW.create(window);
 		register(newWindowAction);
 		
+		minToTrayAction = new MinToTrayAction(window);
+		register(minToTrayAction);
+		
 		resetPerspectiveAction = ActionFactory.RESET_PERSPECTIVE.create(window);
 		register(resetPerspectiveAction);
 		
@@ -119,8 +127,17 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		
 		// Editor actions.
 		
+		closeAction = ActionFactory.CLOSE.create(window);
+		register(closeAction);
+		
+		closeAllAction = ActionFactory.CLOSE_ALL.create(window);
+		register(closeAllAction);
+		
 		saveAction = ActionFactory.SAVE.create(window);
 		register(saveAction);
+		
+		saveAllAction = ActionFactory.SAVE_ALL.create(window);
+		register(saveAllAction);
 		
 		revertAction = ActionFactory.REVERT.create(window);
 		register(revertAction);
@@ -149,7 +166,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Action asignment.
+//	Action assignment.
 	
 	@Override
 	protected void fillMenuBar(IMenuManager menuBar) {
@@ -157,21 +174,27 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		menuBar.add(fileMenu);
 		fileMenu.add(exitAction);
 		
-		MenuManager playlistMenu = new MenuManager("&Collections", "collections");
-		menuBar.add(playlistMenu);
-		playlistMenu.add(newLibraryAction);
-		playlistMenu.add(newPlayListAction);
-		playlistMenu.add(new Separator());
-		playlistMenu.add(saveAction);
-		playlistMenu.add(revertAction);
-		playlistMenu.add(addAction);
-		playlistMenu.add(removeAction);
-		playlistMenu.add(new Separator());
-		playlistMenu.add(showPropertiesAction);
+		MenuManager collectionsMenu = new MenuManager("&Collections", "collections");
+		menuBar.add(collectionsMenu);
+		collectionsMenu.add(newLibraryAction);
+		collectionsMenu.add(newPlayListAction);
+		collectionsMenu.add(new Separator());
+		collectionsMenu.add(closeAction);
+		collectionsMenu.add(closeAllAction);
+		collectionsMenu.add(new Separator());
+		collectionsMenu.add(saveAction);
+		collectionsMenu.add(saveAllAction);
+		collectionsMenu.add(revertAction);
+		collectionsMenu.add(addAction);
+		collectionsMenu.add(removeAction);
+		collectionsMenu.add(new Separator());
+		collectionsMenu.add(showPropertiesAction);
 		
 		MenuManager windowMenu = new MenuManager("&Window", IWorkbenchActionConstants.M_WINDOW);
 		menuBar.add(windowMenu);
 		windowMenu.add(newWindowAction);
+		windowMenu.add(minToTrayAction);
+		windowMenu.add(new Separator());
 		windowMenu.add(toggleCoolbarAction);
 		showViewMenuMgr.add(showMediaExplorer);
 		showViewMenuMgr.add(new Separator());
