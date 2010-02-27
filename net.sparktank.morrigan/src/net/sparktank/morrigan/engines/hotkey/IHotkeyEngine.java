@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.engines;
+package net.sparktank.morrigan.engines.hotkey;
 
 public interface IHotkeyEngine {
 	

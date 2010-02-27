@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.playback;
+package net.sparktank.morrigan.engines.playback;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 
