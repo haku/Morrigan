@@ -10,15 +10,17 @@
 	
 	<target name="morrigan.engines.playback.stub.jar">
 		<jar destfile="morrigan.engines.playback.stub.jar">
+			<fileset dir="bin" includes="net/sparktank/morrigan/exceptions/**/*.class" />
+			<fileset dir="bin" includes="net/sparktank/morrigan/engines/common/**/*.class" />
 			<fileset dir="bin" includes="net/sparktank/morrigan/engines/playback/**/*.class" />
-			<fileset dir="bin" includes="net/sparktank/morrigan/engines/exceptions/**/*.class" />
 		</jar>
     </target>
 	
 	<target name="morrigan.engines.hotkey.stub.jar">
 		<jar destfile="morrigan.engines.hotkey.stub.jar">
+			<fileset dir="bin" includes="net/sparktank/morrigan/exceptions/**/*.class" />
+			<fileset dir="bin" includes="net/sparktank/morrigan/engines/common/**/*.class" />
 			<fileset dir="bin" includes="net/sparktank/morrigan/engines/hotkey/**/*.class" />
-			<fileset dir="bin" includes="net/sparktank/morrigan/engines/exceptions/**/*.class" />
 		</jar>
     </target>
     

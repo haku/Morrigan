@@ -1,4 +1,6 @@
-package net.sparktank.morrigan.engines.playback;
+package net.sparktank.morrigan.engines.common;
+
+import net.sparktank.morrigan.engines.playback.PlaybackException;
 
 public class ImplException extends PlaybackException {
 	
