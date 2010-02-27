@@ -3,6 +3,9 @@ package net.sparktank.morrigan.hotkeyimpl.jintellitype;
 import java.io.File;
 import java.lang.reflect.Field;
 
+import com.melloware.jintellitype.HotkeyListener;
+import com.melloware.jintellitype.JIntellitype;
+
 import net.sparktank.morrigan.engines.hotkey.HotkeyException;
 import net.sparktank.morrigan.engines.hotkey.IHotkeyEngine;
 import net.sparktank.morrigan.engines.hotkey.IHotkeyListener;
@@ -35,15 +38,28 @@ public class HotkeyEngine implements IHotkeyEngine {
 	public void registerHotkey(int id, int key, boolean ctrl, boolean shift, boolean alt, boolean supr) throws HotkeyException {
 		shoeHorn();
 		
-		// TODO
+		if (!JIntellitype.isJIntellitypeSupported()) {
+			throw new HotkeyException("JIntellitype is not available.");
+		}
 		
+		setup();
+		
+		int mask = 0;
+		if (ctrl) mask += JIntellitype.MOD_CONTROL;
+		if (shift) mask += JIntellitype.MOD_SHIFT;
+		if (alt) mask += JIntellitype.MOD_ALT;
+		if (supr) mask += JIntellitype.MOD_WIN;
+		
+		try {
+			JIntellitype.getInstance().registerHotKey(id, mask, key);
+		} catch (Throwable t) {
+			throw new HotkeyException("Failed to register hotkey " + mask + "+" +key, t);
+		}
 	}
 	
 	@Override
 	public void unregisterHotkey(int id) throws HotkeyException {
-		
-		// TODO
-		
+		JIntellitype.getInstance().unregisterHotKey(id);
 	}
 	
 	@Override
@@ -51,7 +67,32 @@ public class HotkeyEngine implements IHotkeyEngine {
 		this.listener = listener;
 	}
 	
+	@Override
+	public void finalise() {
+		teardown();
+		JIntellitype.getInstance().cleanUp();
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	boolean haveSetup = false;
+	
+	private void setup () {
+		if (haveSetup) return;
+		JIntellitype.getInstance().addHotKeyListener(hotkeyListener);
+	}
+	
+	private void teardown () {
+		if (!haveSetup) return;
+		JIntellitype.getInstance().removeHotKeyListener(hotkeyListener);
+	}
+	
+	private HotkeyListener hotkeyListener = new HotkeyListener() {
+		@Override
+		public void onHotKey(int identifier) {
+			callListener(identifier);
+		}
+	};
 	
 	private void callListener(int id) {
 		if (listener!=null) {
