@@ -23,4 +23,10 @@ public interface IHotkeyEngine {
 	
 	public void setListener (IHotkeyListener listener);
 	
+	/**
+	 * This should be called before discarding
+	 * the reference to this implementation.
+	 */
+	public void finalise ();
+	
 }
