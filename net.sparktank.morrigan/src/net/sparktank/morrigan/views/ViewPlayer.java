@@ -10,6 +10,8 @@ import net.sparktank.morrigan.display.FullscreenShell;
 import net.sparktank.morrigan.display.ScreenPainter;
 import net.sparktank.morrigan.engines.EngineFactory;
 import net.sparktank.morrigan.engines.common.ImplException;
+import net.sparktank.morrigan.engines.hotkey.IHotkeyEngine;
+import net.sparktank.morrigan.engines.hotkey.IHotkeyListener;
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine;
 import net.sparktank.morrigan.engines.playback.IPlaybackStatusListener;
 import net.sparktank.morrigan.engines.playback.PlaybackException;
@@ -55,6 +57,7 @@ public class ViewPlayer extends ViewPart {
 		makeControls(parent);
 		addToolbar();
 		addMenu();
+		setupHotkeys();
 		getSite().getShell().getDisplay().asyncExec(updateStatusRunable);
 	}
 	
@@ -67,6 +70,7 @@ public class ViewPlayer extends ViewPart {
 	public void dispose() {
 		isDisposed = true;
 		finalisePlaybackEngine();
+		finaliseHotkeys();
 		disposeIcons();
 		super.dispose();
 	}
@@ -646,6 +650,49 @@ public class ViewPlayer extends ViewPart {
 				new MorriganMsgDlg("No track loaded desu~.").open();
 			}
 		};
+	};
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Hotkeys.
+	
+	private void setupHotkeys () {
+		try {
+			IHotkeyEngine engine = getHotkeyEngine(true);
+			
+			engine.registerHotkey(100, (int)' ', true, true, true, false);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void finaliseHotkeys () {
+		try {
+			IHotkeyEngine engine = getHotkeyEngine(false);
+			if (engine!=null) {
+				engine.finalise();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private IHotkeyEngine hotkeyEngine = null;
+	
+	private IHotkeyEngine getHotkeyEngine (boolean create) throws ImplException {
+		if (hotkeyEngine == null && create) {
+			hotkeyEngine = EngineFactory.makeHotkeyEngine();
+			hotkeyEngine.setListener(hotkeyListener);
+		}
+		
+		return hotkeyEngine;
+	}
+	
+	private IHotkeyListener hotkeyListener = new IHotkeyListener() {
+		@Override
+		public void onKeyPress(int id) {
+			getSite().getShell().getDisplay().asyncExec(new RunnableDialog("id="+id));
+		}
 	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
