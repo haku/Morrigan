@@ -502,8 +502,11 @@ public class PlaybackEngine implements IPlaybackEngine {
 			}
 		}
 		
-		if (dsjDllFile==null) return;
-		System.out.println(dsjDll + "=" + dsjDllFile.getAbsolutePath());
+		if (dsjDllFile==null) {
+			System.out.println("Did not find '" + dsjDll + "'.");
+			return;
+		}
+		System.out.println("dll " + dsjDll + "=" + dsjDllFile.getAbsolutePath());
 		
 		try {
 			Class clazz = ClassLoader.class;
@@ -526,6 +529,8 @@ public class PlaybackEngine implements IPlaybackEngine {
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}
+		
+		System.out.println("loaded dll=" + dsjDllFile.getAbsolutePath());
 		
 		haveShoeHorned = true;
 	}
