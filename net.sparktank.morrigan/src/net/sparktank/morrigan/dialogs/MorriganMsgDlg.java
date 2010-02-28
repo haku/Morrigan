@@ -14,7 +14,7 @@ public class MorriganMsgDlg extends MessageDialog {
 	public static final String[] YESNO = {"Yes", "No"};
 	public static final String[] COPYCONTINUE = {"Copy", "Continue"};
 	
-	private Exception exception = null;
+	private Throwable throwable = null;
 	
 	public MorriganMsgDlg(String dialogMessage) {
 		super(
@@ -32,14 +32,14 @@ public class MorriganMsgDlg extends MessageDialog {
 				MessageDialog.INFORMATION, answers, 0);
 	}
 	
-	public MorriganMsgDlg(Exception e) {
+	public MorriganMsgDlg(Throwable t) {
 		super(
 				Display.getCurrent().getActiveShell(), 
 				"Morrigan", null, 
-				getErrMsg(e), 
+				getErrMsg(t), 
 				MessageDialog.ERROR, COPYCONTINUE, 0);
 		
-		exception = e;
+		throwable = t;
 	}
 	
 	@Override
@@ -52,18 +52,18 @@ public class MorriganMsgDlg extends MessageDialog {
 			return -1;
 		}
 		
-		if (exception!=null && open==OK) {
-			ClipboardHelper.setText(getStackTrace(exception), Display.getCurrent());
+		if (throwable!=null && open==OK) {
+			ClipboardHelper.setText(getStackTrace(throwable), Display.getCurrent());
 		}
 		
 		return open;
 	}
 	
-	private static String getErrMsg (Exception e) {
+	private static String getErrMsg (Throwable t) {
 		StringBuilder sb = new StringBuilder();
 		
 		boolean first = true;
-		Throwable c = e;
+		Throwable c = t;
 		while (true) {
 			if (!first) sb.append("\n   caused by ");
 			first = false;
