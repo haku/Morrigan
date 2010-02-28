@@ -62,6 +62,7 @@ public class HotkeyEngine implements IHotkeyEngine {
 	
 	@Override
 	public void unregisterHotkey(int id) throws HotkeyException {
+		if (!soLoaded || !haveSetup) return;
 		JXGrabKey.getInstance().unregisterHotKey(id);
 	}
 	
