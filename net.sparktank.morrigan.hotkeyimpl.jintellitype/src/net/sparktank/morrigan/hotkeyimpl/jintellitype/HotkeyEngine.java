@@ -83,11 +83,13 @@ public class HotkeyEngine implements IHotkeyEngine {
 	private void setup () {
 		if (haveSetup) return;
 		JIntellitype.getInstance().addHotKeyListener(hotkeyListener);
+		haveSetup = true;
 	}
 	
 	private void teardown () {
 		if (!haveSetup) return;
 		JIntellitype.getInstance().removeHotKeyListener(hotkeyListener);
+		haveSetup = false;
 	}
 	
 	private HotkeyListener hotkeyListener = new HotkeyListener() {
