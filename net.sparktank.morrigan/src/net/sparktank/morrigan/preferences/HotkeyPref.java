@@ -120,6 +120,12 @@ public class HotkeyPref extends PreferencePage implements IWorkbenchPreferencePa
 		public HotkeyValue getValue () {
 			if (textKey.getText().length() != 1) return null;
 			
+			if (!chkCtrl.getSelection()
+				&& !chkShift.getSelection()
+				&& !chkAlt.getSelection()
+				&& !chkSupr.getSelection()
+				) return null;
+			
 			return new HotkeyValue(
 					(int)textKey.getText().toCharArray()[0],
 					chkCtrl.getSelection(),
