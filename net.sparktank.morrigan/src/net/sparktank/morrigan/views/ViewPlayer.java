@@ -9,9 +9,8 @@ import net.sparktank.morrigan.dialogs.RunnableDialog;
 import net.sparktank.morrigan.display.FullscreenShell;
 import net.sparktank.morrigan.display.ScreenPainter;
 import net.sparktank.morrigan.engines.EngineFactory;
+import net.sparktank.morrigan.engines.HotkeyRegister;
 import net.sparktank.morrigan.engines.common.ImplException;
-import net.sparktank.morrigan.engines.hotkey.HotkeyValue;
-import net.sparktank.morrigan.engines.hotkey.IHotkeyEngine;
 import net.sparktank.morrigan.engines.hotkey.IHotkeyListener;
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine;
 import net.sparktank.morrigan.engines.playback.IPlaybackStatusListener;
@@ -658,8 +657,7 @@ public class ViewPlayer extends ViewPart {
 	
 	private void setupHotkeys () {
 		try {
-			IHotkeyEngine engine = getHotkeyEngine(true);
-			engine.registerHotkey(100, new HotkeyValue((int)' ', true, true, true, false));
+			HotkeyRegister.addHotkeyListener(hotkeyListener);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -668,24 +666,11 @@ public class ViewPlayer extends ViewPart {
 	
 	private void finaliseHotkeys () {
 		try {
-			IHotkeyEngine engine = getHotkeyEngine(false);
-			if (engine!=null) {
-				engine.finalise();
-			}
+			HotkeyRegister.removeHotkeyListener(hotkeyListener);
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-	
-	private IHotkeyEngine hotkeyEngine = null;
-	
-	private IHotkeyEngine getHotkeyEngine (boolean create) throws ImplException {
-		if (hotkeyEngine == null && create) {
-			hotkeyEngine = EngineFactory.makeHotkeyEngine();
-			hotkeyEngine.setListener(hotkeyListener);
-		}
-		
-		return hotkeyEngine;
 	}
 	
 	private IHotkeyListener hotkeyListener = new IHotkeyListener() {
