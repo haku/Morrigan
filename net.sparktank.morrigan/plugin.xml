@@ -61,6 +61,13 @@
             class="org.eclipse.ui.ExtensionFactory:progressView"
             id="org.eclipse.ui.views.ProgressView">
       </view>
+      <view
+            class="net.sparktank.morrigan.views.ViewControls"
+            icon="icons/play.gif"
+            id="net.sparktank.morrigan.views.ViewControls"
+            name="Controls"
+            restorable="true">
+      </view>
       
    </extension>
    

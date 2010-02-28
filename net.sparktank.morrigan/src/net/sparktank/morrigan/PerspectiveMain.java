@@ -1,5 +1,6 @@
 package net.sparktank.morrigan;
 
+import net.sparktank.morrigan.views.ViewControls;
 import net.sparktank.morrigan.views.ViewLibraryProperties;
 import net.sparktank.morrigan.views.ViewMediaExplorer;
 import net.sparktank.morrigan.views.ViewPlayer;
@@ -16,6 +17,8 @@ public class PerspectiveMain implements IPerspectiveFactory {
 		String editorArea = layout.getEditorArea();
 		layout.setEditorAreaVisible(true);
 		layout.setFixed(false);
+		
+		layout.addStandaloneView(ViewControls.ID, false, IPageLayout.TOP, 0.2f, editorArea);
 		
 		layout.addView(ViewPlayer.ID, IPageLayout.LEFT, 0.3f, editorArea);
 		
