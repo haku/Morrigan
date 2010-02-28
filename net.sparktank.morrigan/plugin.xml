@@ -139,6 +139,12 @@
             id="org.eclipse.ui.internal.dialogs.WorkbenchPreferencePage"
             name="Workbench">
       </page>
+      <page
+            category="net.sparktank.morrigan.preferences.GeneralPref"
+            class="net.sparktank.morrigan.preferences.HotkeyPref"
+            id="net.sparktank.morrigan.preferences.HotkeyPref"
+            name="Hotkeys">
+      </page>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
