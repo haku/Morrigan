@@ -25,7 +25,7 @@
    
    <extension point="org.eclipse.ui.perspectives">
       <perspective
-            name="PerspectiveMain"
+            name="Main"
             class="net.sparktank.morrigan.PerspectiveMain"
             id="net.sparktank.morrigan.perspectiveMain">
       </perspective>
