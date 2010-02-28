@@ -187,7 +187,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 		callStateListener(PlayState.Loading);
 		boolean firstLoad = (dsMovie==null);
 		
-		System.out.println("firstLoad=" + firstLoad);
+		System.out.println("dsj.PlaybackEngine.firstLoad=" + firstLoad);
 		
 		if (firstLoad) {
 			shoeHorn();
@@ -205,7 +205,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 	}
 	
 	private void reparentVideo () {
-		System.out.println("reparentVideo()");
+		System.out.println("dsj.PlaybackEngine.reparentVideo()");
 		
 //		if (videoComponent!=null) {
 //			System.out.println("remove listeners");
@@ -232,13 +232,13 @@ public class PlaybackEngine implements IPlaybackEngine {
 			videoComponent = dsMovie.asComponent();
 			videoComponent.setBackground(Color.BLACK);
 			
-			System.out.println("adding listeners to videoComponent...");
+			System.out.println("dsj.PlaybackEngine adding listeners to videoComponent...");
 			videoComponent.addMouseListener(mouseListener);
 			videoComponent.addKeyListener(keyListener);
 		}
 		
 		if (videoComposite == null || videoComposite.isDisposed()) {
-			System.out.println("Making videoComposite...");
+			System.out.println("dsj.PlaybackEngine Making videoComposite...");
 			
 			videoComposite = new Composite(videoFrameParent, SWT.EMBEDDED);
 			videoComposite.setLayout(new FillLayout());
@@ -250,13 +250,13 @@ public class PlaybackEngine implements IPlaybackEngine {
 			videoFrame.doLayout();
 			
 		} else {
-			System.out.println("Moveing videoComposite...");
+			System.out.println("dsj.PlaybackEngine Moveing videoComposite...");
 			videoComposite.setParent(videoFrameParent);
 		}
 		
 		videoFrameParent.layout();
 		
-		System.out.println("leaving reparentVideo()");
+		System.out.println("dsj.PlaybackEngine leaving reparentVideo()");
 	}
 	
 	private MouseListener mouseListener = new MouseListener() {
@@ -305,25 +305,25 @@ public class PlaybackEngine implements IPlaybackEngine {
 					}
 					break;
 				
-				case (DSFiltergraph.BUFFERING):
-					System.out.println("BUFFERING"); 
-					break;
+//				case (DSFiltergraph.BUFFERING):
+//					System.out.println("dsj.PlaybackEngine DSFiltergraph.BUFFERING"); 
+//					break;
 				
-				case (DSFiltergraph.BUFFER_COMPLETE):
-					System.out.println("BUFFER_COMPLETE");
-					break;
+//				case (DSFiltergraph.BUFFER_COMPLETE):
+//					System.out.println("dsj.PlaybackEngine DSFiltergraph.BUFFER_COMPLETE");
+//					break;
 					
-				case (DSFiltergraph.INITIALIZED):
-					System.out.println("INITIALIZED");
-					break;
+//				case (DSFiltergraph.INITIALIZED):
+//					System.out.println("dsj.PlaybackEngine DSFiltergraph.INITIALIZED");
+//					break;
 					
-				case (DSFiltergraph.IP_READY):
-					System.out.println("IP_READY");
-					break;
+//				case (DSFiltergraph.IP_READY):
+//					System.out.println("dsj.PlaybackEngine DSFiltergraph.IP_READY");
+//					break;
 					
-				case (DSFiltergraph.OVERLAY_BUFFER_REQUEST):
-					System.out.println("OVERLAY_BUFFER_REQUEST");
-					break;
+//				case (DSFiltergraph.OVERLAY_BUFFER_REQUEST):
+//					System.out.println("dsj.PlaybackEngine DSFiltergraph.OVERLAY_BUFFER_REQUEST");
+//					break;
 					
 //				case (DSFiltergraph.GRAPH_ERROR):
 //					String message = "Graph error: " + String.valueOf(pce.getNewValue());
@@ -335,7 +335,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 	};
 	
 	private void playTrack () {
-		System.out.println("playTrack()");
+		System.out.println("dsj.PlaybackEngine playTrack()");
 		if (dsMovie!=null) {
 			dsMovie.play();
 			startWatcherThread();
@@ -465,9 +465,9 @@ public class PlaybackEngine implements IPlaybackEngine {
 				
 				boolean a = DSJUtils.getScreenSaverActive();
 				if (active == a) {
-					System.out.println("Set screenSaverActive=" + active + ".");
+					System.out.println("dsj.PlaybackEngine Set screenSaverActive=" + active + ".");
 				} else {
-					System.out.println("Failed to set screenSaverActive=" + active + ".");
+					System.out.println("dsj.PlaybackEngine Failed to set screenSaverActive=" + active + ".");
 				}
 			}
 		}
@@ -503,10 +503,10 @@ public class PlaybackEngine implements IPlaybackEngine {
 		}
 		
 		if (dsjDllFile==null) {
-			System.out.println("Did not find '" + dsjDll + "'.");
+			System.out.println("dsj.PlaybackEngine Did not find '" + dsjDll + "'.");
 			return;
 		}
-		System.out.println("dll " + dsjDll + "=" + dsjDllFile.getAbsolutePath());
+		System.out.println("dsj.PlaybackEngine dll " + dsjDll + "=" + dsjDllFile.getAbsolutePath());
 		
 		try {
 			Class clazz = ClassLoader.class;
@@ -530,7 +530,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 			t.printStackTrace();
 		}
 		
-		System.out.println("loaded dll=" + dsjDllFile.getAbsolutePath());
+		System.out.println("dsj.PlaybackEngine loaded dll=" + dsjDllFile.getAbsolutePath());
 		
 		haveShoeHorned = true;
 	}
