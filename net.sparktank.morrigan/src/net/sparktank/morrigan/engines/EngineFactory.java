@@ -7,6 +7,7 @@ import java.net.URLClassLoader;
 
 import net.sparktank.morrigan.config.Config;
 import net.sparktank.morrigan.engines.common.ImplException;
+import net.sparktank.morrigan.engines.hotkey.IHotkeyEngine;
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine;
 import net.sparktank.morrigan.exceptions.MorriganException;
 
@@ -39,6 +40,22 @@ private static URLClassLoader classLoader = null;
 			System.out.println("About " + playbackEngineClass + ":\n" + playbackEngine.getAbout());
 			
 			return playbackEngine;
+			
+		} catch (Exception e) {
+			throw new ImplException(e);
+		}
+	}
+	
+	public static IHotkeyEngine makeHotkeyEngine () throws ImplException {
+		try {
+			String engineClass = Config.getHotKeyEngineClass();
+			Class<?> c = getClassLoader().loadClass(engineClass);
+			IHotkeyEngine engine = (IHotkeyEngine) c.newInstance();
+			
+			engine.setClassPath(Config.getPluginJarPaths());
+			System.out.println("About " + engineClass + ":\n" + engine.getAbout());
+			
+			return engine;
 			
 		} catch (Exception e) {
 			throw new ImplException(e);
