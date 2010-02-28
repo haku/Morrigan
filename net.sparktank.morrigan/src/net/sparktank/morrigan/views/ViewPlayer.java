@@ -245,7 +245,7 @@ public class ViewPlayer extends ViewPart {
 		
 		@Override
 		public void onKeyPress(int keyCode) {
-			System.out.println("key released: " + keyCode);
+//			System.out.println("key released: " + keyCode);
 			if (keyCode == SWT.ESC) {
 				if (isFullScreen()) {
 					removeFullScreenSafe(true);
