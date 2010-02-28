@@ -26,7 +26,7 @@ public class HotkeyEngine implements IHotkeyEngine {
 	
 	@Override
 	public String getAbout () {
-		return "net.sparktank.morrigan.playbackimpl.dsj version 0.01.";
+		return "net.sparktank.morrigan.hotkeyimpl.jintellitype version 0.01.";
 	}
 	
 	@Override
@@ -70,7 +70,9 @@ public class HotkeyEngine implements IHotkeyEngine {
 	@Override
 	public void finalise() {
 		teardown();
-		JIntellitype.getInstance().cleanUp();
+		if (haveShoeHorned) {
+			JIntellitype.getInstance().cleanUp();
+		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -111,7 +113,7 @@ public class HotkeyEngine implements IHotkeyEngine {
 	private void shoeHorn () {
 		if (haveShoeHorned) return;
 		
-		File dsjDllFile = null;
+		File dllFile = null;
 		
 		for (File classPathFile : classPath) {
 			if (classPathFile.isDirectory()) {
@@ -120,7 +122,7 @@ public class HotkeyEngine implements IHotkeyEngine {
 					for (File file : listFiles) {
 						if (file.isFile()) {
 							if (file.getName().equals(dllName)) {
-								dsjDllFile = file;
+								dllFile = file;
 								break;
 							}
 						}
@@ -129,8 +131,11 @@ public class HotkeyEngine implements IHotkeyEngine {
 			}
 		}
 		
-		if (dsjDllFile==null) return;
-		System.out.println(dllName + "=" + dsjDllFile.getAbsolutePath());
+		if (dllFile==null) {
+			System.out.println("Did not find '" + dllName + "'.");
+			return;
+		}
+		System.out.println("dll " + dllName + "=" + dllFile.getAbsolutePath());
 		
 		try {
 			Class clazz = ClassLoader.class;
@@ -141,7 +146,7 @@ public class HotkeyEngine implements IHotkeyEngine {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		System.setProperty("java.library.path", dsjDllFile.getParentFile().getAbsolutePath());
+		System.setProperty("java.library.path", dllFile.getParentFile().getAbsolutePath());
 		
 		/* FIXME
 		 * This next line fails with
@@ -149,10 +154,12 @@ public class HotkeyEngine implements IHotkeyEngine {
 		 * if it is already loaded.
 		 */
 		try {
-			System.load(dsjDllFile.getAbsolutePath());
+			System.load(dllFile.getAbsolutePath());
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}
+		
+		System.out.println("loaded dll=" + dllFile.getAbsolutePath());
 		
 		haveShoeHorned = true;
 	}
