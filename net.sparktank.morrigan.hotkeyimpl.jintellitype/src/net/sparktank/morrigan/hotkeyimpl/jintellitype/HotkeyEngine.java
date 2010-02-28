@@ -7,6 +7,7 @@ import com.melloware.jintellitype.HotkeyListener;
 import com.melloware.jintellitype.JIntellitype;
 
 import net.sparktank.morrigan.engines.hotkey.HotkeyException;
+import net.sparktank.morrigan.engines.hotkey.HotkeyValue;
 import net.sparktank.morrigan.engines.hotkey.IHotkeyEngine;
 import net.sparktank.morrigan.engines.hotkey.IHotkeyListener;
 
@@ -35,7 +36,7 @@ public class HotkeyEngine implements IHotkeyEngine {
 	}
 	
 	@Override
-	public void registerHotkey(int id, int key, boolean ctrl, boolean shift, boolean alt, boolean supr) throws HotkeyException {
+	public void registerHotkey(int id, HotkeyValue value) throws HotkeyException {
 		shoeHorn();
 		
 		if (!JIntellitype.isJIntellitypeSupported()) {
@@ -45,15 +46,15 @@ public class HotkeyEngine implements IHotkeyEngine {
 		setup();
 		
 		int mask = 0;
-		if (ctrl) mask += JIntellitype.MOD_CONTROL;
-		if (shift) mask += JIntellitype.MOD_SHIFT;
-		if (alt) mask += JIntellitype.MOD_ALT;
-		if (supr) mask += JIntellitype.MOD_WIN;
+		if (value.getCtrl()) mask += JIntellitype.MOD_CONTROL;
+		if (value.getShift()) mask += JIntellitype.MOD_SHIFT;
+		if (value.getAlt()) mask += JIntellitype.MOD_ALT;
+		if (value.getSupr()) mask += JIntellitype.MOD_WIN;
 		
 		try {
-			JIntellitype.getInstance().registerHotKey(id, mask, key);
+			JIntellitype.getInstance().registerHotKey(id, mask, value.getKey());
 		} catch (Throwable t) {
-			throw new HotkeyException("Failed to register hotkey " + mask + "+" +key, t);
+			throw new HotkeyException("Failed to register hotkey " + mask + "+" + value.getKey(), t);
 		}
 	}
 	

@@ -17,7 +17,7 @@ public interface IHotkeyEngine {
 	 */
 	public void setClassPath (File[] classPath);
 	
-	public void registerHotkey (int id, int key, boolean ctrl, boolean shift, boolean alt, boolean supr) throws HotkeyException;
+	public void registerHotkey (int id, HotkeyValue value) throws HotkeyException;
 	
 	public void unregisterHotkey (int id) throws HotkeyException;
 	

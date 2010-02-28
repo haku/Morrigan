@@ -10,6 +10,7 @@ import net.sparktank.morrigan.display.FullscreenShell;
 import net.sparktank.morrigan.display.ScreenPainter;
 import net.sparktank.morrigan.engines.EngineFactory;
 import net.sparktank.morrigan.engines.common.ImplException;
+import net.sparktank.morrigan.engines.hotkey.HotkeyValue;
 import net.sparktank.morrigan.engines.hotkey.IHotkeyEngine;
 import net.sparktank.morrigan.engines.hotkey.IHotkeyListener;
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine;
@@ -658,8 +659,7 @@ public class ViewPlayer extends ViewPart {
 	private void setupHotkeys () {
 		try {
 			IHotkeyEngine engine = getHotkeyEngine(true);
-			
-			engine.registerHotkey(100, (int)' ', true, true, true, false);
+			engine.registerHotkey(100, new HotkeyValue((int)' ', true, true, true, false));
 			
 		} catch (Exception e) {
 			e.printStackTrace();
