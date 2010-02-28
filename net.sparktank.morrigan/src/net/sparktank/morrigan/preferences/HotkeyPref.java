@@ -2,6 +2,7 @@ package net.sparktank.morrigan.preferences;
 
 import net.sparktank.morrigan.Activator;
 import net.sparktank.morrigan.dialogs.RunnableDialog;
+import net.sparktank.morrigan.engines.HotkeyRegister;
 import net.sparktank.morrigan.engines.hotkey.HotkeyValue;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -19,9 +20,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
-
-import net.sparktank.morrigan.engines.*;
-import net.sparktank.morrigan.exceptions.MorriganException;
 
 public class HotkeyPref extends PreferencePage implements IWorkbenchPreferencePage {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -59,8 +57,8 @@ public class HotkeyPref extends PreferencePage implements IWorkbenchPreferencePa
 		
 		try {
 			HotkeyRegister.readConfig(true);
-		} catch (MorriganException e) {
-			getShell().getDisplay().asyncExec(new RunnableDialog(e));
+		} catch (Throwable t) {
+			getShell().getDisplay().asyncExec(new RunnableDialog(t));
 			return false;
 		}
 		
