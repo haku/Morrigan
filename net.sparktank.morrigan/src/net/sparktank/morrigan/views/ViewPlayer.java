@@ -144,7 +144,6 @@ public class ViewPlayer extends ViewPart {
 	public void pausePlaying () {
 		try {
 			internal_pausePlaying();
-			getSite().getShell().getDisplay().asyncExec(updateStatusRunable);
 		} catch (PlaybackException e) {
 			new MorriganMsgDlg(e).open();
 		}
@@ -175,8 +174,9 @@ public class ViewPlayer extends ViewPart {
 				eng.pausePlaying();
 				
 			} else {
-				new MorriganMsgDlg("Don't know what to do.  Playstate=" + playbackState + ".").open();
+				getSite().getShell().getDisplay().asyncExec(new RunnableDialog("Don't know what to do.  Playstate=" + playbackState + "."));
 			}
+			getSite().getShell().getDisplay().asyncExec(updateStatusRunable);
 		}
 	}
 	
@@ -676,7 +676,31 @@ public class ViewPlayer extends ViewPart {
 	private IHotkeyListener hotkeyListener = new IHotkeyListener() {
 		@Override
 		public void onKeyPress(int id) {
-			getSite().getShell().getDisplay().asyncExec(new RunnableDialog("id="+id));
+			switch (id) {
+				
+				case HotkeyRegister.HK_PLAYPAUSE:
+					/* Calling a JNI method in one DLL
+					 * from JNI thread in a different DLL
+					 * seems to cause Bad Things to happen.
+					 * Call via the GUI thread just to be safe.
+					 */
+					getSite().getShell().getDisplay().asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							try {
+								internal_pausePlaying();
+							} catch (PlaybackException e) {
+								e.printStackTrace();
+							}
+						}
+					});
+					break;
+				
+				default:
+					getSite().getShell().getDisplay().asyncExec(new RunnableDialog("id="+id));
+					break;
+				
+			}
 		}
 	};
 	
