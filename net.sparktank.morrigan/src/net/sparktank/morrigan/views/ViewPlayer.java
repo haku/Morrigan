@@ -659,8 +659,8 @@ public class ViewPlayer extends ViewPart {
 		try {
 			HotkeyRegister.addHotkeyListener(hotkeyListener);
 			
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Throwable t) {
+			t.printStackTrace();
 		}
 	}
 	
@@ -668,8 +668,8 @@ public class ViewPlayer extends ViewPart {
 		try {
 			HotkeyRegister.removeHotkeyListener(hotkeyListener);
 			
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Throwable t) {
+			t.printStackTrace();
 		}
 	}
 	
