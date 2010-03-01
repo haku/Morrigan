@@ -53,6 +53,10 @@ public class ViewControls extends ViewPart implements ISizeProvider {
 	private Image iconNext;
 	private int preferedHeight = -1;
 	
+	private Composite parentComposite;
+	private Menu orderModeMenu;
+	private Button btnOrderMode;
+	
 	private void makeIcons () {
 		iconPlay = Activator.getImageDescriptor("icons/play.gif").createImage();
 		iconPause = Activator.getImageDescriptor("icons/pause.gif").createImage();
@@ -67,11 +71,19 @@ public class ViewControls extends ViewPart implements ISizeProvider {
 		iconStop.dispose();
 	}
 	
-	private void makeControls (final Composite parent) {
-//		RowLayout layout = new RowLayout(SWT.HORIZONTAL);
-//		layout.center = true;
-//		layout.spacing = layout.spacing * 2;
-//		parent.setLayout(layout);
+	private void makeControls (Composite parent) {
+		parentComposite = parent;
+		
+		// Off-screen controls.
+		
+		orderModeMenu = new Menu(parent.getShell(), SWT.POP_UP);
+		for (PlaybackOrder o : PlaybackOrder.values()) {
+			MenuItem menuItem = new MenuItem(orderModeMenu, SWT.PUSH);
+			menuItem.setText(o.toString());
+			menuItem.addSelectionListener(menuOrderModeListener);
+		}
+		
+		// On-screen controls.
 		
 		FormLayout layout = new FormLayout();
 		parent.setLayout(layout);
@@ -114,36 +126,13 @@ public class ViewControls extends ViewPart implements ISizeProvider {
 		formData.left = new FormAttachment(btnNext, sep*2);
 		label.setLayoutData(formData);
 		
-		final Button btnOrderMode = new Button(parent, SWT.PUSH);
-		btnOrderMode.setText("Sequencial");
+		btnOrderMode = new Button(parent, SWT.PUSH);
+		btnOrderMode.setText(PlaybackOrder.SEQUENTIAL.toString());
 		formData = new FormData();
 		formData.top = new FormAttachment(0, sep);
 		formData.right = new FormAttachment(100, -sep);
 		btnOrderMode.setLayoutData(formData);
-		
-		btnOrderMode.addSelectionListener(new SelectionListener() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				final Menu menu = new Menu(parent.getShell(), SWT.POP_UP);
-				for (PlaybackOrder o : PlaybackOrder.values()) {
-					MenuItem menuItem = new MenuItem(menu, SWT.PUSH);
-					menuItem.setText(o.toString());
-					menuItem.addSelectionListener(new SelectionAdapter () {
-						@Override
-						public void widgetSelected(SelectionEvent e) {
-							btnOrderMode.setText(((MenuItem) e.widget).getText());
-						}
-					});
-				}
-				Rectangle rect = btnOrderMode.getBounds();
-				Point pt = new Point(rect.x, rect.y + rect.height);
-				pt = parent.toDisplay(pt);
-				menu.setLocation(pt);
-				menu.setVisible(true);
-			}
-			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {}
-		});
+		btnOrderMode.addSelectionListener(btnOrderModeListener);
 		
 		preferedHeight = sep + btnStop.computeSize(SWT.DEFAULT, SWT.DEFAULT).y + sep;
 	}
@@ -161,6 +150,30 @@ public class ViewControls extends ViewPart implements ISizeProvider {
 	public int getSizeFlags(boolean width) {
 		return SWT.MAX;
 	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Control events.
+	
+	private SelectionAdapter menuOrderModeListener = new SelectionAdapter () {
+		@Override
+		public void widgetSelected(SelectionEvent e) {
+			btnOrderMode.setText(((MenuItem) e.widget).getText());
+		}
+	};
+	
+	private SelectionListener btnOrderModeListener = new SelectionListener() {
+		@Override
+		public void widgetSelected(SelectionEvent e) {
+			Rectangle rect = ((Button)e.widget).getBounds();
+			Point pt = new Point(rect.x, rect.y + rect.height);
+			pt = parentComposite.toDisplay(pt);
+			orderModeMenu.setLocation(pt);
+			orderModeMenu.setVisible(true);
+		}
+		@Override
+		public void widgetDefaultSelected(SelectionEvent e) {}
+	};
+	
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
