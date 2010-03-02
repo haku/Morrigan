@@ -195,27 +195,33 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		if (isDisposed()) return;
 		
 		if (getCurrentItem() != null && getCurrentList() != null) {
+			String verb;
+			
 			switch (internal_getPlayState()) {
 				case Playing:
-//					setTitleImage(iconPlay);
+					verb = "Playing";
 					break;
 					
 				case Paused:
-//					setTitleImage(iconPause);
+					verb = "Paused";
 					break;
 					
 				case Loading:
-//					setTitleImage(iconPlay); // FIXME new icon?
+					verb = "Loading";
 					break;
 					
 				case Stopped:
-//					setTitleImage(iconStop);
+					verb = "Stopped";
 					break;
 					
+				default:
+					verb = "Unknown";
+					break;
+				
 			}
 			
 			lblStatus.setText(
-					"Playing: " + getCurrentPosition() + " : " + getCurrentItem().toString()
+					verb + ": " + getCurrentPosition() + " : " + getCurrentItem().toString()
 			);
 			
 		} else {
