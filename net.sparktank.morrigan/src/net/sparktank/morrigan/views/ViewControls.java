@@ -146,7 +146,7 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		formData.right = new FormAttachment(btnOrderMode, -sep);
 		lblStatus.setLayoutData(formData);
 		
-		btnOrderMode.setText(PlaybackOrder.SEQUENTIAL.toString());
+		btnOrderMode.setText(getPlaybackOrder().toString());
 		formData = new FormData();
 		formData.top = new FormAttachment(0, sep);
 		formData.right = new FormAttachment(canvas, -sep);
@@ -229,6 +229,11 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 			lblStatus.setText("Idle.");
 		};
 	}
+	
+	@Override
+		protected void orderModeChanged(PlaybackOrder order) {
+			btnOrderMode.setText(order.toString());
+		}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

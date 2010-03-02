@@ -2,6 +2,7 @@ package net.sparktank.morrigan.views;
 
 import net.sparktank.morrigan.Activator;
 import net.sparktank.morrigan.display.ScreenPainter;
+import net.sparktank.morrigan.helpers.OrderHelper.PlaybackOrder;
 
 import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.SWT;
@@ -147,6 +148,9 @@ public class ViewPlayer extends AbstractPlayerView {
 			setContentDescription("Idle.");
 		};
 	}
+	
+	@Override
+	protected void orderModeChanged(PlaybackOrder order) {}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
