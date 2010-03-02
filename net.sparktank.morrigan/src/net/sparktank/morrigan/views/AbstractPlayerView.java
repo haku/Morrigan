@@ -44,6 +44,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 	private volatile boolean isDisposed = false;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Constructors.
 	
 	@Override
 	public void createPartControl(Composite parent) {
@@ -63,6 +64,16 @@ public abstract class AbstractPlayerView extends ViewPart {
 	protected boolean isDisposed () {
 		return isDisposed;
 	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Abstract methods.
+	
+	/**
+	 * This will only ever be called on the UI thread.
+	 */
+	abstract protected void updateStatus ();
+	
+	abstract protected void orderModeChanged (PlaybackOrder order);
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Playback engine.
@@ -104,11 +115,6 @@ public abstract class AbstractPlayerView extends ViewPart {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Playback management.
-	
-	/**
-	 * This will only ever be called on the UI thread.
-	 */
-	abstract protected void updateStatus ();
 	
 	private Runnable updateStatusRunable = new Runnable() {
 		@Override
@@ -209,6 +215,10 @@ public abstract class AbstractPlayerView extends ViewPart {
 	private MediaItem getNextTrackToPlay () {
 		if (currentList==null || currentItem==null) return null;
 		return OrderHelper.getNextTrack(currentList, currentItem, playbackOrder);
+	}
+	
+	protected PlaybackOrder getPlaybackOrder () {
+		return playbackOrder;
 	}
 	
 	protected MediaList getCurrentList () {
@@ -475,7 +485,12 @@ public abstract class AbstractPlayerView extends ViewPart {
 	private void makeActions (Composite parent) {
 		// Order menu.
 		for (PlaybackOrder o : PlaybackOrder.values()) {
-			OrderSelectAction a = new OrderSelectAction(o);
+			OrderSelectAction a = new OrderSelectAction(o, new OrderChangedListener() {
+				@Override
+				public void orderChanged(PlaybackOrder newOrder) {
+					orderModeChanged(newOrder);
+				}
+			});
 			if (playbackOrder == o) a.setChecked(true);
 			orderMenuActions.add(a);
 		}
@@ -499,19 +514,26 @@ public abstract class AbstractPlayerView extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Complex actions.
 	
+	public interface OrderChangedListener {
+		public void orderChanged (PlaybackOrder newOrder);
+	}
+	
 	protected class OrderSelectAction extends Action {
 		
 		private final PlaybackOrder mode;
+		private final OrderChangedListener orderChangedListener;
 		
-		public OrderSelectAction (PlaybackOrder mode) {
+		public OrderSelectAction (PlaybackOrder mode, OrderChangedListener orderChangedListener) {
 			super(mode.toString(), AS_RADIO_BUTTON);
 			this.mode = mode;
+			this.orderChangedListener = orderChangedListener;
 		}
 		
 		@Override
 		public void run() {
 			if (isChecked()) {
 				playbackOrder = mode;
+				orderChangedListener.orderChanged(mode);
 			}
 		}
 		
