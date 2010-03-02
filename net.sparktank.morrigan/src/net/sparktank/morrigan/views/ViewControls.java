@@ -2,15 +2,14 @@ package net.sparktank.morrigan.views;
 
 
 import net.sparktank.morrigan.Activator;
+import net.sparktank.morrigan.display.ActionListener;
+import net.sparktank.morrigan.display.DropMenuListener;
 import net.sparktank.morrigan.display.ScreenPainter;
 import net.sparktank.morrigan.helpers.OrderHelper.PlaybackOrder;
 
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -20,7 +19,6 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.ISizeProvider;
 
 public class ViewControls extends AbstractPlayerView implements ISizeProvider {
@@ -59,7 +57,6 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 	private Image iconScreen;
 	private int preferedHeight = -1;
 	
-	private Composite parentComposite;
 	private Menu orderModeMenu;
 	private Menu fullscreenMenu;
 	private Button btnOrderMode;
@@ -84,41 +81,19 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 	}
 	
 	private void makeControls (Composite parent) {
-		parentComposite = parent;
-		
 		// Off-screen controls.
 		
-		orderModeMenu = new Menu(parent.getShell(), SWT.POP_UP);
+		MenuManager orderModeMenuMgr = new MenuManager();
 		for (final OrderSelectAction a : getOrderMenuActions()) {
-			MenuItem menuItem = new MenuItem(orderModeMenu, SWT.PUSH);
-			menuItem.setText(a.getText());
-			// TODO read-back checked state of action.
-			menuItem.addSelectionListener(new SelectionListener() {
-				@Override
-				public void widgetSelected(SelectionEvent e) {
-					a.run();
-				}
-				@Override
-				public void widgetDefaultSelected(SelectionEvent e) {}
-			});
+			orderModeMenuMgr.add(a);
 		}
+		orderModeMenu = orderModeMenuMgr.createContextMenu(parent);
 		
-		fullscreenMenu = new Menu(parent.getShell(), SWT.POP_UP);
+		MenuManager fullscreenMenuMgr = new MenuManager();
 		for (final FullScreenAction a : getFullScreenActions()) {
-			MenuItem menuItem = new MenuItem(fullscreenMenu, SWT.PUSH);
-			menuItem.setText(a.getText());
-			// TODO read-back checked state of action.
-			menuItem.addSelectionListener(new SelectionListener() {
-				@Override
-				public void widgetSelected(SelectionEvent e) {
-					a.run();
-				}
-				@Override
-				public void widgetDefaultSelected(SelectionEvent e) {}
-			});
+			fullscreenMenuMgr.add(a);
 		}
-		
-		
+		fullscreenMenu = fullscreenMenuMgr.createContextMenu(parent);
 		
 		// On-screen controls.
 		
@@ -142,28 +117,28 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		formData.top = new FormAttachment(0, sep);
 		formData.left = new FormAttachment(0, sep);
 		btnStop.setLayoutData(formData);
-		btnStop.addSelectionListener(btnStopListener);
+		btnStop.addSelectionListener(new ActionListener(stopAction));
 		
 		btnPlayPause.setImage(iconPause);
 		formData = new FormData();
 		formData.top = new FormAttachment(0, sep);
 		formData.left = new FormAttachment(btnStop, sep);
 		btnPlayPause.setLayoutData(formData);
-		btnPlayPause.addSelectionListener(btnPlayPauseListener);
+		btnPlayPause.addSelectionListener(new ActionListener(pauseAction));
 		
 		btnPrev.setImage(iconPrev);
 		formData = new FormData();
 		formData.top = new FormAttachment(0, sep);
 		formData.left = new FormAttachment(btnPlayPause, sep);
 		btnPrev.setLayoutData(formData);
-		btnPrev.addSelectionListener(btnPrevListener);
+		btnPrev.addSelectionListener(new ActionListener(prevAction));
 		
 		btnNext.setImage(iconNext);
 		formData = new FormData();
 		formData.top = new FormAttachment(0, sep);
 		formData.left = new FormAttachment(btnPrev, sep);
 		btnNext.setLayoutData(formData);
-		btnNext.addSelectionListener(btnNextListener);
+		btnNext.addSelectionListener(new ActionListener(nextAction));
 		
 		formData = new FormData();
 		formData.top = new FormAttachment(50, -(lblStatus.computeSize(SWT.DEFAULT, SWT.DEFAULT).y)/2);
@@ -176,7 +151,7 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		formData.top = new FormAttachment(0, sep);
 		formData.right = new FormAttachment(canvas, -sep);
 		btnOrderMode.setLayoutData(formData);
-		btnOrderMode.addSelectionListener(btnOrderModeListener);
+		btnOrderMode.addSelectionListener(new DropMenuListener(btnOrderMode, orderModeMenu));
 		
 		formData = new FormData();
 		formData.top = new FormAttachment(0, sep);
@@ -193,7 +168,7 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		formData.top = new FormAttachment(0, sep);
 		formData.right = new FormAttachment(100, -sep);
 		btnFullscreen.setLayoutData(formData);
-		btnFullscreen.addSelectionListener(btnFullscreenListener);
+		btnFullscreen.addSelectionListener(new DropMenuListener(btnFullscreen, fullscreenMenu));
 		
 		preferedHeight = sep + btnStop.computeSize(SWT.DEFAULT, SWT.DEFAULT).y + sep;
 	}
@@ -248,73 +223,6 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 			lblStatus.setText("Idle.");
 		};
 	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Control events.
-	
-	private SelectionListener btnStopListener = new SelectionListener() {
-		@Override
-		public void widgetSelected(SelectionEvent e) {
-			stopAction.run(); // FIXME don't call this like this!
-		}
-		@Override
-		public void widgetDefaultSelected(SelectionEvent e) {}
-	};
-	
-	private SelectionListener btnPlayPauseListener = new SelectionListener() {
-		@Override
-		public void widgetSelected(SelectionEvent e) {
-			pauseAction.run(); // FIXME don't call this like this!
-		}
-		@Override
-		public void widgetDefaultSelected(SelectionEvent e) {}
-	};
-	
-	private SelectionListener btnPrevListener = new SelectionListener() {
-		@Override
-		public void widgetSelected(SelectionEvent e) {
-			prevAction.run(); // FIXME don't call this like this!
-		}
-		@Override
-		public void widgetDefaultSelected(SelectionEvent e) {}
-	};
-	
-	private SelectionListener btnNextListener = new SelectionListener() {
-		@Override
-		public void widgetSelected(SelectionEvent e) {
-			nextAction.run(); // FIXME don't call this like this!
-		}
-		@Override
-		public void widgetDefaultSelected(SelectionEvent e) {}
-	};
-	
-	// TODO extract common code from these following two methods.
-	
-	private SelectionListener btnOrderModeListener = new SelectionListener() {
-		@Override
-		public void widgetSelected(SelectionEvent e) {
-			Rectangle rect = ((Button)e.widget).getBounds();
-			Point pt = new Point(rect.x, rect.y + rect.height);
-			pt = parentComposite.toDisplay(pt);
-			orderModeMenu.setLocation(pt);
-			orderModeMenu.setVisible(true);
-		}
-		@Override
-		public void widgetDefaultSelected(SelectionEvent e) {}
-	};
-	
-	private SelectionListener btnFullscreenListener = new SelectionListener() {
-		@Override
-		public void widgetSelected(SelectionEvent e) {
-			Rectangle rect = ((Button)e.widget).getBounds();
-			Point pt = new Point(rect.x, rect.y + rect.height);
-			pt = parentComposite.toDisplay(pt);
-			fullscreenMenu.setLocation(pt);
-			fullscreenMenu.setVisible(true);
-		}
-		@Override
-		public void widgetDefaultSelected(SelectionEvent e) {}
-	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
