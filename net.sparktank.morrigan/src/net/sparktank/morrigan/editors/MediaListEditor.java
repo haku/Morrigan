@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.handler.CallPlayMedia;
-import net.sparktank.morrigan.model.media.MediaList;
 import net.sparktank.morrigan.model.media.MediaItem;
+import net.sparktank.morrigan.model.media.MediaList;
 import net.sparktank.morrigan.model.media.MediaList.DirtyState;
 import net.sparktank.morrigan.preferences.MediaListPref;
 
@@ -27,7 +27,12 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.FormAttachment;
+import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
@@ -37,6 +42,7 @@ import org.eclipse.ui.part.EditorPart;
 
 public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Constants and Enums.
 	
 	public static final String ID = "net.sparktank.morrigan.editors.MediaListEditor";
 	
@@ -103,11 +109,80 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 	
 	@Override
 	public void createPartControl(Composite parent) {
-		// Create table control.
-		Composite comp = new Composite(parent, SWT.NONE);
-		editTable = new TableViewer(comp, SWT.MULTI | SWT.V_SCROLL | SWT.FULL_SELECTION );
+		final int sep = 3;
+		FormData formData;
+		
+		Composite parent2 = new Composite(parent, SWT.NONE);
+		parent2.setLayout(new FormLayout());
+		
+		// Create toolbar.
+		
+		/* TODO make toolbar?
+		 * TODO add icons.
+		 * TODO wire-up.
+		 * TODO match enabled state with actions / dirty state.
+		 * TODO use toolbar instead?
+		 * TODO allow subclasses to control which buttons are shown.
+		 */
+		
+		Composite toolbarComposite = new Composite(parent2, SWT.NONE);
+		Button btnSave = new Button(toolbarComposite, SWT.PUSH);
+		Label lblStatus = new Label(toolbarComposite, SWT.NONE);
+		Button btnAdd = new Button(toolbarComposite, SWT.PUSH);
+		Button btnRemove = new Button(toolbarComposite, SWT.PUSH);
+		Button btnProperties = new Button(toolbarComposite, SWT.PUSH);
+		
+		formData = new FormData();
+		formData.top = new FormAttachment(0, 0);
+		formData.left = new FormAttachment(0, 0);
+		formData.right = new FormAttachment(100, 0);
+		formData.height = sep + btnSave.computeSize(SWT.DEFAULT, SWT.DEFAULT).y + sep; // FIXME
+		toolbarComposite.setLayoutData(formData);
+		toolbarComposite.setLayout(new FormLayout());
+		
+		formData = new FormData();
+		formData.top = new FormAttachment(0, sep);
+		formData.left = new FormAttachment(0, sep);
+		btnSave.setText("Save");
+		btnSave.setLayoutData(formData);
+		
+		formData = new FormData();
+		formData.top = new FormAttachment(50, -(lblStatus.computeSize(SWT.DEFAULT, SWT.DEFAULT).y)/2);
+		formData.left = new FormAttachment(btnSave, sep*2);
+		formData.right = new FormAttachment(btnAdd, -sep);
+		lblStatus.setLayoutData(formData);
+		lblStatus.setText("n items.");
+		
+		formData = new FormData();
+		formData.top = new FormAttachment(0, sep);
+		formData.right = new FormAttachment(btnRemove, -sep);
+		btnAdd.setText("Add");
+		btnAdd.setLayoutData(formData);
+		
+		formData = new FormData();
+		formData.top = new FormAttachment(0, sep);
+		formData.right = new FormAttachment(btnProperties, -sep);
+		btnRemove.setText("Remove");
+		btnRemove.setLayoutData(formData);
+		
+		formData = new FormData();
+		formData.top = new FormAttachment(0, sep);
+		formData.right = new FormAttachment(100, -sep);
+		btnProperties.setText("Properties");
+		btnProperties.setLayoutData(formData);
+		
+		// Create table.
+		
+		Composite tableComposite = new Composite(parent2, SWT.NONE); // Because of the way table column layouts work.
+		formData = new FormData();
+		formData.top = new FormAttachment(toolbarComposite, 0);
+		formData.left = new FormAttachment(0, 0);
+		formData.right = new FormAttachment(100, 0);
+		formData.bottom = new FormAttachment(100, 0);
+		tableComposite.setLayoutData(formData);
+		editTable = new TableViewer(tableComposite, SWT.MULTI | SWT.V_SCROLL | SWT.FULL_SELECTION );
 		TableColumnLayout layout = new TableColumnLayout();
-		comp.setLayout(layout);
+		tableComposite.setLayout(layout);
 		
 		// add and configure columns.
 		MediaColumn[] titles = MediaColumn.values();
