@@ -97,8 +97,7 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		
 		// On-screen controls.
 		
-		FormLayout layout = new FormLayout();
-		parent.setLayout(layout);
+		parent.setLayout(new FormLayout());
 		
 		final int sep = 3;
 		FormData formData;
