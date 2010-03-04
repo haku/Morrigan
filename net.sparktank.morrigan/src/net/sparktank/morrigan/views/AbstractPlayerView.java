@@ -334,6 +334,8 @@ public abstract class AbstractPlayerView extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Video frame parent stuff.
 	
+	abstract protected void videoParentChanged (Composite newParent);
+	
 	private Composite currentMediaFrameParent;
 	private Composite localMediaFrameParent;
 	
@@ -348,6 +350,8 @@ public abstract class AbstractPlayerView extends ViewPart {
 	
 	protected void setCurrentMediaFrameParent (Composite frame) throws ImplException {
 		currentMediaFrameParent = frame;
+		
+		videoParentChanged(frame);
 		
 		IPlaybackEngine engine = getPlaybackEngine(false);
 		if (engine!=null) {
