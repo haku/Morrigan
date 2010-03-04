@@ -44,6 +44,10 @@ public class ViewDisplay extends ViewPart {
 	
 	@Override
 	public void dispose() {
+		if (onCloseRunnable!=null) {
+			onCloseRunnable.run();
+			onCloseRunnable = null;
+		}
 		getSite().getWorkbenchWindow().removePerspectiveListener(perspectiveListener);
 		super.dispose();
 	}
@@ -60,7 +64,10 @@ public class ViewDisplay extends ViewPart {
 		@Override
 		public void perspectiveChanged(IWorkbenchPage page, IPerspectiveDescriptor perspective, IWorkbenchPartReference partRef, String changeId) {
 			if (partRef.getId().equals(ID) && changeId.equals(IWorkbenchPage.CHANGE_VIEW_HIDE)) {
-				if (onCloseRunnable!=null) onCloseRunnable.run();
+				if (onCloseRunnable!=null) {
+					onCloseRunnable.run();
+					onCloseRunnable = null;
+				}
 			}
 		}
 		
