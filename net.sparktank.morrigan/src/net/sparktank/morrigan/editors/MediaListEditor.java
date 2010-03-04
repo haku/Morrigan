@@ -30,9 +30,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
@@ -109,7 +107,7 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 	
 	@Override
 	public void createPartControl(Composite parent) {
-		final int sep = 3;
+//		final int sep = 3;
 		FormData formData;
 		
 		Composite parent2 = new Composite(parent, SWT.NONE);
@@ -117,59 +115,14 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		
 		// Create toolbar.
 		
-		/* TODO make toolbar?
-		 * TODO add icons.
-		 * TODO wire-up.
-		 * TODO match enabled state with actions / dirty state.
-		 * TODO use toolbar instead?
-		 * TODO allow subclasses to control which buttons are shown.
-		 */
-		
 		Composite toolbarComposite = new Composite(parent2, SWT.NONE);
-		Button btnSave = new Button(toolbarComposite, SWT.PUSH);
-		Label lblStatus = new Label(toolbarComposite, SWT.NONE);
-		Button btnAdd = new Button(toolbarComposite, SWT.PUSH);
-		Button btnRemove = new Button(toolbarComposite, SWT.PUSH);
-		Button btnProperties = new Button(toolbarComposite, SWT.PUSH);
-		
 		formData = new FormData();
 		formData.top = new FormAttachment(0, 0);
 		formData.left = new FormAttachment(0, 0);
 		formData.right = new FormAttachment(100, 0);
-		formData.height = sep + btnSave.computeSize(SWT.DEFAULT, SWT.DEFAULT).y + sep; // FIXME
 		toolbarComposite.setLayoutData(formData);
 		toolbarComposite.setLayout(new FormLayout());
-		
-		formData = new FormData();
-		formData.top = new FormAttachment(0, sep);
-		formData.left = new FormAttachment(0, sep);
-		btnSave.setText("Save");
-		btnSave.setLayoutData(formData);
-		
-		formData = new FormData();
-		formData.top = new FormAttachment(50, -(lblStatus.computeSize(SWT.DEFAULT, SWT.DEFAULT).y)/2);
-		formData.left = new FormAttachment(btnSave, sep*2);
-		formData.right = new FormAttachment(btnAdd, -sep);
-		lblStatus.setLayoutData(formData);
-		lblStatus.setText("n items.");
-		
-		formData = new FormData();
-		formData.top = new FormAttachment(0, sep);
-		formData.right = new FormAttachment(btnRemove, -sep);
-		btnAdd.setText("Add");
-		btnAdd.setLayoutData(formData);
-		
-		formData = new FormData();
-		formData.top = new FormAttachment(0, sep);
-		formData.right = new FormAttachment(btnProperties, -sep);
-		btnRemove.setText("Remove");
-		btnRemove.setLayoutData(formData);
-		
-		formData = new FormData();
-		formData.top = new FormAttachment(0, sep);
-		formData.right = new FormAttachment(100, -sep);
-		btnProperties.setText("Properties");
-		btnProperties.setLayoutData(formData);
+		populateToolbar(toolbarComposite);
 		
 		// Create table.
 		
@@ -242,6 +195,11 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 	public boolean isDirty() {
 		return editedMediaList.getDirtyState() == DirtyState.DIRTY;
 	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Controls.
+	
+	abstract protected void populateToolbar (Composite parent);
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Providers.

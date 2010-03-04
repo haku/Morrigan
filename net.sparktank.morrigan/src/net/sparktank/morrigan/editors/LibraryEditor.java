@@ -1,8 +1,10 @@
 package net.sparktank.morrigan.editors;
 
 
+import net.sparktank.morrigan.Activator;
 import net.sparktank.morrigan.ApplicationActionBarAdvisor;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
+import net.sparktank.morrigan.display.ActionListener;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.library.SqliteLayer.LibrarySort;
 import net.sparktank.morrigan.library.SqliteLayer.LibrarySortDirection;
@@ -15,6 +17,12 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.FormAttachment;
+import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IViewPart;
 
 public class LibraryEditor extends MediaListEditor<MediaLibrary> {
@@ -26,6 +34,12 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 	
 	public LibraryEditor () {
 		super();
+	}
+	
+	@Override
+	public void dispose() {
+		disposeIcons();
+		super.dispose();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -60,6 +74,59 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	GUI components.
+	
+	private Image iconAdd;
+	private Image iconProperties;
+	
+	private void makeIcons () {
+		iconAdd = Activator.getImageDescriptor("icons/plus.gif").createImage();
+		iconProperties = Activator.getImageDescriptor("icons/pref.gif").createImage();
+	}
+	
+	private void disposeIcons () {
+		iconAdd.dispose();
+		iconProperties.dispose();
+	}
+	
+	@Override
+	protected void populateToolbar(Composite parent) {
+		makeIcons();
+		
+		final int sep = 3;
+		FormData formData;
+		
+		Label lblStatus = new Label(parent, SWT.NONE);
+		Button btnAdd = new Button(parent, SWT.PUSH);
+		Button btnProperties = new Button(parent, SWT.PUSH);
+		
+		formData = new FormData();
+		formData.top = new FormAttachment(50, -(lblStatus.computeSize(SWT.DEFAULT, SWT.DEFAULT).y)/2);
+		formData.left = new FormAttachment(0, sep);
+		formData.right = new FormAttachment(btnAdd, -sep);
+		lblStatus.setLayoutData(formData);
+		lblStatus.setText("n items.");
+		
+		formData = new FormData();
+		formData.top = new FormAttachment(0, sep);
+		formData.bottom = new FormAttachment(100, -sep);
+		formData.right = new FormAttachment(btnProperties, -sep);
+		btnAdd.setImage(iconAdd);
+		btnAdd.setLayoutData(formData);
+		
+		formData = new FormData();
+		formData.top = new FormAttachment(0, sep);
+		formData.bottom = new FormAttachment(100, -sep);
+		formData.right = new FormAttachment(100, -sep);
+		btnProperties.setImage(iconProperties);
+		btnProperties.setLayoutData(formData);
+		
+		btnAdd.addSelectionListener(new ActionListener(addAction));
+		btnProperties.addSelectionListener(new ActionListener(showPropertiesAction));
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Sorting.
 	
 	@Override
 	protected boolean isSortable() {
