@@ -53,7 +53,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	private IWorkbenchAction newWindowAction;
 	private IWorkbenchAction minToTrayAction;
 	private IWorkbenchAction resetPerspectiveAction;
-	private IWorkbenchAction toggleCoolbarAction;
 	private IContributionItem showViewItemShortList;
 	private IAction showMediaExplorer;
 	private IWorkbenchAction showPrefAction;
@@ -61,11 +60,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	// List actions.
 	private IAction newLibraryAction;
 	private IAction newPlayListAction;
-	private IWorkbenchAction closeAction;
-	private IWorkbenchAction closeAllAction;
 	private IWorkbenchAction saveAction;
 	private IWorkbenchAction saveAllAction;
-	private IWorkbenchAction revertAction;
 	private RetargetAction addAction;
 	private RetargetAction removeAction;
 	private RetargetAction showPropertiesAction;
@@ -113,9 +109,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		resetPerspectiveAction = ActionFactory.RESET_PERSPECTIVE.create(window);
 		register(resetPerspectiveAction);
 		
-		toggleCoolbarAction = ActionFactory.TOGGLE_COOLBAR.create(window);
-		register(toggleCoolbarAction);
-		
 		showViewMenuMgr = new MenuManager("Show view", "showView");
 		showViewItemShortList = ContributionItemFactory.VIEWS_SHORTLIST.create(window);
 		
@@ -127,20 +120,11 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		
 		// Editor actions.
 		
-		closeAction = ActionFactory.CLOSE.create(window);
-		register(closeAction);
-		
-		closeAllAction = ActionFactory.CLOSE_ALL.create(window);
-		register(closeAllAction);
-		
 		saveAction = ActionFactory.SAVE.create(window);
 		register(saveAction);
 		
 		saveAllAction = ActionFactory.SAVE_ALL.create(window);
 		register(saveAllAction);
-		
-		revertAction = ActionFactory.REVERT.create(window);
-		register(revertAction);
 		
 		addAction = new RetargetAction(ACTIONID_ADD, "&add files...");
 		addAction.setImageDescriptor(Activator.getImageDescriptor("icons/plus.gif"));
@@ -179,12 +163,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		collectionsMenu.add(newLibraryAction);
 		collectionsMenu.add(newPlayListAction);
 		collectionsMenu.add(new Separator());
-		collectionsMenu.add(closeAction);
-		collectionsMenu.add(closeAllAction);
-		collectionsMenu.add(new Separator());
 		collectionsMenu.add(saveAction);
 		collectionsMenu.add(saveAllAction);
-		collectionsMenu.add(revertAction);
 		collectionsMenu.add(addAction);
 		collectionsMenu.add(removeAction);
 		collectionsMenu.add(new Separator());
@@ -195,7 +175,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		windowMenu.add(newWindowAction);
 		windowMenu.add(minToTrayAction);
 		windowMenu.add(new Separator());
-		windowMenu.add(toggleCoolbarAction);
 		showViewMenuMgr.add(showMediaExplorer);
 		showViewMenuMgr.add(new Separator());
 		showViewMenuMgr.add(showViewItemShortList);
