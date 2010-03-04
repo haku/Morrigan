@@ -2,14 +2,19 @@ package net.sparktank.morrigan.views;
 
 
 import net.sparktank.morrigan.Activator;
+import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
+import net.sparktank.morrigan.dialogs.RunnableDialog;
 import net.sparktank.morrigan.display.ActionListener;
 import net.sparktank.morrigan.display.DropMenuListener;
 import net.sparktank.morrigan.display.MinToTrayAction;
 import net.sparktank.morrigan.display.ScreenPainter;
 import net.sparktank.morrigan.display.ScreenPainter.ScreenType;
+import net.sparktank.morrigan.engines.common.ImplException;
 import net.sparktank.morrigan.helpers.TimeHelper;
 import net.sparktank.morrigan.helpers.OrderHelper.PlaybackOrder;
 
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.SWT;
@@ -24,6 +29,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.ISizeProvider;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.actions.ContributionItemFactory;
 
@@ -105,6 +112,7 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		for (final FullScreenAction a : getFullScreenActions()) {
 			fullscreenMenuMgr.add(a);
 		}
+		fullscreenMenuMgr.add(showDisplayViewAction);
 		menuFullscreen = fullscreenMenuMgr.createContextMenu(parent);
 		
 		MenuManager prefMenuMgr = new MenuManager();
@@ -189,7 +197,7 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		canvas.setLayoutData(formData);
 		canvas.setLayout(new FillLayout());
 		canvas.addPaintListener(new ScreenPainter(canvas, ScreenType.TINY));
-		setMediaFrameParent(canvas);
+		setLocalMediaFrameParent(canvas);
 		
 		btnFullscreen.setImage(iconScreen);
 		formData = new FormData();
@@ -271,6 +279,96 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		protected void orderModeChanged(PlaybackOrder order) {
 			btnOrderMode.setText(order.toString());
 		}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Display view.
+	
+	protected IAction showDisplayViewAction = new Action("Show video view", Activator.getImageDescriptor("icons/display.gif")) {
+		public void run() {
+			try {
+				goDisplayViewSafe(this);
+				
+			} catch (Exception e) {
+				new MorriganMsgDlg(e).open();
+			}
+		};
+	};
+	
+//	TODO factor out common code with fullscreen code.
+//	TODO hide local display when not needed.
+	
+	private void goDisplayViewSafe (Action action) {
+		GoDisplayViewRunner runner = new GoDisplayViewRunner(action);
+		if (Thread.currentThread().equals(getSite().getShell().getDisplay().getThread())) {
+			runner.run();
+		} else {
+			getSite().getShell().getDisplay().asyncExec(runner);
+		}
+	}
+	
+	private void removeDisplayViewSafe () {
+		RemoveDisplayViewRunner runner = new RemoveDisplayViewRunner();
+		if (Thread.currentThread().equals(getSite().getShell().getDisplay().getThread())) {
+			runner.run();
+		} else {
+			getSite().getShell().getDisplay().asyncExec(runner);
+		}
+	}
+	
+	private ViewDisplay viewDisplay = null;
+	
+	private class GoDisplayViewRunner implements Runnable {
+		
+		protected final Action action;
+		
+		public GoDisplayViewRunner (Action action) {
+			this.action = action;
+		}
+		
+		@Override
+		public void run() {
+			try {
+				jumpScreen();
+			} catch (Exception e) {
+				getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));
+			}
+		}
+		
+		private void jumpScreen () throws ImplException, PartInitException {
+			IViewPart showView = getSite().getPage().showView(ViewDisplay.ID);
+			viewDisplay = (ViewDisplay) showView;
+			
+			viewDisplay.setCloseRunnable(new Runnable() {
+				@Override
+				public void run() {
+					removeDisplayViewSafe();
+					action.setChecked(false);
+				}
+			});
+			
+			setCurrentMediaFrameParent(viewDisplay.getMediaFrameParent());
+			
+			action.setChecked(true);
+		}
+		
+	}
+	
+	private class RemoveDisplayViewRunner implements Runnable {
+		
+		@Override
+		public void run() {
+			if (viewDisplay == null) return;
+			
+			try {
+				setCurrentMediaFrameParent(null);
+				viewDisplay = null;
+				
+			} catch (Exception e) {
+				getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));
+			}
+		}
+		
+	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
