@@ -68,6 +68,13 @@
             name="Controls"
             restorable="true">
       </view>
+      <view
+            class="net.sparktank.morrigan.views.ViewDisplay"
+            icon="icons/display.gif"
+            id="net.sparktank.morrigan.views.ViewDisplay"
+            name="Display"
+            restorable="true">
+      </view>
       
    </extension>
    
