@@ -132,7 +132,7 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 		
 		formData = new FormData();
 		formData.top = new FormAttachment(50, -(lblStatus.computeSize(SWT.DEFAULT, SWT.DEFAULT).y)/2);
-		formData.left = new FormAttachment(0, sep);
+		formData.left = new FormAttachment(0, sep*2);
 		formData.right = new FormAttachment(btnSave, -sep);
 		lblStatus.setLayoutData(formData);
 		
