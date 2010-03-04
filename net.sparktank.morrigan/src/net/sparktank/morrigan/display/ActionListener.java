@@ -10,6 +10,7 @@ public class ActionListener implements SelectionListener {
 	private final IAction action;
 
 	public ActionListener (IAction action) {
+		if (action == null) throw new IllegalArgumentException("action can't be null.");
 		this.action = action;
 	}
 
