@@ -7,6 +7,7 @@ import net.sparktank.morrigan.display.DropMenuListener;
 import net.sparktank.morrigan.display.MinToTrayAction;
 import net.sparktank.morrigan.display.ScreenPainter;
 import net.sparktank.morrigan.display.ScreenPainter.ScreenType;
+import net.sparktank.morrigan.helpers.TimeHelper;
 import net.sparktank.morrigan.helpers.OrderHelper.PlaybackOrder;
 
 import org.eclipse.jface.action.MenuManager;
@@ -255,8 +256,10 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 			}
 			
 			lblStatus.setText(
-					verb + ": " + getCurrentPosition() + " : " + getCurrentItem().toString()
+					verb + " " + TimeHelper.formatTime(getCurrentPosition()) + "."
 			);
+			
+			getSite().getShell().setText(getCurrentItem().toString());
 			
 		} else {
 //			setTitleImage(iconStop);
