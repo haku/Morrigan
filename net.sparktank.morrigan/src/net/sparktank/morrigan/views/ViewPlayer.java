@@ -35,7 +35,7 @@ public class ViewPlayer extends AbstractPlayerView {
 	
 	@Override
 	public void setFocus() {
-		getMediaFrameParent().setFocus();
+		getLocalMediaFrameParent().setFocus();
 	}
 	
 	@Override
@@ -69,7 +69,7 @@ public class ViewPlayer extends AbstractPlayerView {
 		parent.addFocusListener(new FocusListener() {
 			@Override
 			public void focusGained(FocusEvent e) {
-				getMediaFrameParent().setFocus();
+				getLocalMediaFrameParent().setFocus();
 			}
 			@Override
 			public void focusLost(FocusEvent e) {}
@@ -78,7 +78,7 @@ public class ViewPlayer extends AbstractPlayerView {
 		Canvas canvas = new Canvas(parent, SWT.NONE);
 		canvas.setLayout(new FillLayout());
 		canvas.addPaintListener(new ScreenPainter(canvas, ScreenType.MEDIUM));
-		setMediaFrameParent(canvas);
+		setLocalMediaFrameParent(canvas);
 	}
 	
 	private void addToolbar () {
