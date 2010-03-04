@@ -23,6 +23,7 @@ public class MediaPlaylist extends MediaList {
 	private Logger logger = Logger.getLogger(this.getClass().getName());
 	
 	private boolean newPl = false;
+	private boolean alreadyRead = false;
 	private String filePath = null;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -90,8 +91,9 @@ public class MediaPlaylist extends MediaList {
 			}
 			writeToFile();
 			newPl = false;
-		} else {
+		} else if (!alreadyRead) {
 			loadFromFile();
+			alreadyRead = true;
 		}
 	}
 	
