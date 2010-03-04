@@ -1,5 +1,7 @@
 package net.sparktank.morrigan.display;
 
+import net.sparktank.morrigan.display.ScreenPainter.ScreenType;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
@@ -31,7 +33,7 @@ public class FullscreenShell {
 		shell.setMaximized(true);
 		shell.setFullScreen(true);
 		
-		shell.addPaintListener(new ScreenPainter(shell));
+		shell.addPaintListener(new ScreenPainter(shell, ScreenType.LARGE));
 		
 		shell.addTraverseListener(traverseListener);
 		shell.addMouseListener(mouseListener);

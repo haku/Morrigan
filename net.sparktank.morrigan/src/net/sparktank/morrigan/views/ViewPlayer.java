@@ -2,6 +2,7 @@ package net.sparktank.morrigan.views;
 
 import net.sparktank.morrigan.Activator;
 import net.sparktank.morrigan.display.ScreenPainter;
+import net.sparktank.morrigan.display.ScreenPainter.ScreenType;
 import net.sparktank.morrigan.helpers.OrderHelper.PlaybackOrder;
 
 import org.eclipse.jface.action.Separator;
@@ -76,7 +77,7 @@ public class ViewPlayer extends AbstractPlayerView {
 		
 		Canvas canvas = new Canvas(parent, SWT.NONE);
 		canvas.setLayout(new FillLayout());
-		canvas.addPaintListener(new ScreenPainter(canvas));
+		canvas.addPaintListener(new ScreenPainter(canvas, ScreenType.MEDIUM));
 		setMediaFrameParent(canvas);
 	}
 	

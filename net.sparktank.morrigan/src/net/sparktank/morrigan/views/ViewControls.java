@@ -5,6 +5,7 @@ import net.sparktank.morrigan.Activator;
 import net.sparktank.morrigan.display.ActionListener;
 import net.sparktank.morrigan.display.DropMenuListener;
 import net.sparktank.morrigan.display.ScreenPainter;
+import net.sparktank.morrigan.display.ScreenPainter.ScreenType;
 import net.sparktank.morrigan.helpers.OrderHelper.PlaybackOrder;
 
 import org.eclipse.jface.action.MenuManager;
@@ -159,7 +160,7 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		formData.width = 80;
 		canvas.setLayoutData(formData);
 		canvas.setLayout(new FillLayout());
-		canvas.addPaintListener(new ScreenPainter(canvas)); // FIXME do we really want this?  Better to hide video space when not needed.
+		canvas.addPaintListener(new ScreenPainter(canvas, ScreenType.TINY));
 		setMediaFrameParent(canvas);
 		
 		btnFullscreen.setImage(iconScreen);
