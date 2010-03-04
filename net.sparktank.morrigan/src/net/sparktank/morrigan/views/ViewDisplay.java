@@ -83,7 +83,7 @@ public class ViewDisplay extends ViewPart {
 	
 	private Runnable onCloseRunnable;
 	
-	public void setInput (Runnable onCloseRunnable) {
+	public void setCloseRunnable (Runnable onCloseRunnable) {
 		this.onCloseRunnable = onCloseRunnable;
 		
 	}
