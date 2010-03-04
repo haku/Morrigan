@@ -11,10 +11,16 @@ import org.eclipse.swt.widgets.Canvas;
 public class ScreenPainter implements PaintListener {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private final Canvas canvas;
+	public enum ScreenType {TINY, MEDIUM, LARGE};
 	
-	public ScreenPainter(Canvas canvas) {
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	private final Canvas canvas;
+	private final ScreenType type;
+	
+	public ScreenPainter(Canvas canvas, ScreenType type) {
 		this.canvas = canvas;
+		this.type = type;
 		
 		canvas.setBackground(canvas.getDisplay().getSystemColor(SWT.COLOR_BLACK));
 		canvas.setForeground(canvas.getDisplay().getSystemColor(SWT.COLOR_WHITE));
@@ -26,8 +32,10 @@ public class ScreenPainter implements PaintListener {
 	public void paintControl(PaintEvent e) {
 		Rectangle clientArea = canvas.getClientArea();
 		
-		Point centre = new Point(clientArea.width/2, clientArea.height/2);
-		drawTextCen(e, centre.x, centre.y, "Morrigan");
+		if (type != ScreenType.TINY) {
+			Point centre = new Point(clientArea.width/2, clientArea.height/2);
+			drawTextCen(e, centre.x, centre.y, "Morrigan");
+		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
