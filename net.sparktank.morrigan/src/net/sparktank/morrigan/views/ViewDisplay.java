@@ -1,7 +1,9 @@
 package net.sparktank.morrigan.views;
 
+import net.sparktank.morrigan.dialogs.RunnableDialog;
 import net.sparktank.morrigan.display.ScreenPainter;
 import net.sparktank.morrigan.display.ScreenPainter.ScreenType;
+import net.sparktank.morrigan.engines.common.ImplException;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
@@ -11,6 +13,7 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IPerspectiveListener2;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
@@ -27,6 +30,16 @@ public class ViewDisplay extends ViewPart {
 	public void createPartControl(Composite parent) {
 		makeControls(parent);
 		getSite().getWorkbenchWindow().addPerspectiveListener(perspectiveListener);
+		
+		IViewPart findView = getSite().getPage().findView(ViewControls.ID);
+		if (findView!=null) {
+			ViewControls viewControls = (ViewControls) findView;
+			try {
+				viewControls.attachViewDisplay(this);
+			} catch (ImplException e) {
+				getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));
+			}
+		}
 	}
 	
 	@Override
