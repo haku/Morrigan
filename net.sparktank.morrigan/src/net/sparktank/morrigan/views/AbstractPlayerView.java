@@ -332,27 +332,41 @@ public abstract class AbstractPlayerView extends ViewPart {
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Full screen stuff.
+//	Video frame parent stuff.
 	
-	private Composite mediaFrameParent;
-	private FullscreenShell fullscreenShell = null;
+	private Composite currentMediaFrameParent;
+	private Composite localMediaFrameParent;
 	
-	protected void setMediaFrameParent (Composite parent) {
-		mediaFrameParent = parent;
+	protected void setLocalMediaFrameParent (Composite parent) {
+		localMediaFrameParent = parent;
 	}
 	
-	protected Composite getMediaFrameParent () {
-		if (mediaFrameParent==null) throw new IllegalAccessError("setMediaFrameParent() has not yet been called.");
-		return mediaFrameParent;
+	protected Composite getLocalMediaFrameParent () {
+		if (localMediaFrameParent==null) throw new IllegalAccessError("setMediaFrameParent() has not yet been called.");
+		return localMediaFrameParent;
+	}
+	
+	protected void setCurrentMediaFrameParent (Composite frame) throws ImplException {
+		currentMediaFrameParent = frame;
+		
+		IPlaybackEngine engine = getPlaybackEngine(false);
+		if (engine!=null) {
+			engine.setVideoFrameParent(getCurrentMediaFrameParent());
+		}
 	}
 	
 	private Composite getCurrentMediaFrameParent () {
-		if (fullscreenShell!=null) {
-			return fullscreenShell.getShell();
+		if (currentMediaFrameParent == null) {
+			return localMediaFrameParent;
 		} else {
-			return mediaFrameParent;
+			return currentMediaFrameParent;
 		}
 	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Full screen stuff.
+	
+	private FullscreenShell fullscreenShell = null;
 	
 	private boolean isFullScreen () {
 		return !(fullscreenShell==null);
@@ -383,9 +397,9 @@ public abstract class AbstractPlayerView extends ViewPart {
 	private class GoFullScreenRunner implements Runnable {
 		
 		private final Monitor mon;
-		private final FullScreenAction action;
+		private final Action action;
 		
-		public GoFullScreenRunner (Monitor mon, FullScreenAction action) {
+		public GoFullScreenRunner (Monitor mon, Action action) {
 			this.mon = mon;
 			this.action = action;
 		}
@@ -413,7 +427,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 			}
 		}
 		
-		private void goFullscreen (Monitor mon, FullScreenAction action) {
+		private void goFullscreen (Monitor mon, Action action) {
 			try {
 				if (isFullScreen()) {
 					new RemoveFullScreenRunner(true).run();
@@ -428,7 +442,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 			}
 		}
 		
-		private void startFullScreen (Monitor mon, final FullScreenAction action) throws ImplException {
+		private void startFullScreen (Monitor mon, final Action action) throws ImplException {
 			fullscreenShell = new FullscreenShell(getSite().getShell(), mon, new Runnable() {
 				@Override
 				public void run() {
@@ -437,10 +451,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 				}
 			});
 			
-			IPlaybackEngine engine = getPlaybackEngine(false);
-			if (engine!=null) {
-				engine.setVideoFrameParent(fullscreenShell.getShell());
-			}
+			setCurrentMediaFrameParent(fullscreenShell.getShell());
 			
 			action.setChecked(true);
 			fullscreenShell.getShell().open();
@@ -463,10 +474,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 			try {
 				if (closeShell) fullscreenShell.getShell().close();
 				
-				IPlaybackEngine engine = getPlaybackEngine(false);
-				if (engine!=null) {
-					engine.setVideoFrameParent(mediaFrameParent);
-				}
+				setCurrentMediaFrameParent(null);
 				
 				if (fullscreenShell!=null) {
 					if (!fullscreenShell.getShell().isDisposed()) fullscreenShell.getShell().dispose();
