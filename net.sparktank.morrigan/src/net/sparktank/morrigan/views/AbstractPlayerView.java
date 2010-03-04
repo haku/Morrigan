@@ -134,6 +134,10 @@ public abstract class AbstractPlayerView extends ViewPart {
 	 * For UI handlers to call.
 	 */
 	public void loadAndStartPlaying (MediaList list, MediaItem track) {
+		if (getSite().getShell().getDisplay().getThread().getId() != Thread.currentThread().getId()) {
+			System.out.println("Starting playback not on UI thread!");
+		}
+		
 		try {
 			currentList = list;
 			currentItem = track;
