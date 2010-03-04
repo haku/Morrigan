@@ -89,14 +89,16 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 		iconProperties.dispose();
 	}
 	
+	private Label lblStatus;
+	
 	@Override
-	protected void populateToolbar(Composite parent) {
+	protected void populateToolbar (Composite parent) {
 		makeIcons();
 		
 		final int sep = 3;
 		FormData formData;
 		
-		Label lblStatus = new Label(parent, SWT.NONE);
+		lblStatus = new Label(parent, SWT.NONE);
 		Button btnAdd = new Button(parent, SWT.PUSH);
 		Button btnProperties = new Button(parent, SWT.PUSH);
 		
@@ -105,7 +107,6 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 		formData.left = new FormAttachment(0, sep);
 		formData.right = new FormAttachment(btnAdd, -sep);
 		lblStatus.setLayoutData(formData);
-		lblStatus.setText("n items.");
 		
 		formData = new FormData();
 		formData.top = new FormAttachment(0, sep);
@@ -126,15 +127,27 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Events.
+	
+	@Override
+	protected void listChanged () {
+		if (lblStatus.isDisposed()) return;
+		
+		lblStatus.setText(
+				getEditedMediaList().getCount() + " items."
+				);
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Sorting.
 	
 	@Override
-	protected boolean isSortable() {
+	protected boolean isSortable () {
 		return true;
 	}
 	
 	@Override
-	protected void onSort(TableViewer table, TableViewerColumn column, int direction) {
+	protected void onSort (TableViewer table, TableViewerColumn column, int direction) {
 		LibrarySort sort = getEditedMediaList().getSort();
 		MediaColumn mCol = parseMediaColumn(column.getColumn().getText());
 		switch (mCol) {

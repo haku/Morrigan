@@ -189,6 +189,8 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		
 		editTable.addDoubleClickListener(doubleClickListener);
 		editTable.setInput(getEditorSite());
+		
+		listChanged();
 	}
 	
 	@Override
@@ -259,6 +261,11 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Event handelers.
 	
+	/**
+	 * This will be called on the GUI thread.
+	 */
+	abstract protected void listChanged ();
+	
 	private Runnable dirtyChange = new Runnable() {
 		@Override
 		public void run() {
@@ -297,6 +304,7 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 			updateGuiRunableScheduled = false;
 			if (editTable.getTable().isDisposed()) return;
 			editTable.refresh();
+			listChanged();
 		}
 	};
 	
