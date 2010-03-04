@@ -3,7 +3,6 @@ package net.sparktank.morrigan.views;
 
 import net.sparktank.morrigan.Activator;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
-import net.sparktank.morrigan.dialogs.RunnableDialog;
 import net.sparktank.morrigan.display.ActionListener;
 import net.sparktank.morrigan.display.DropMenuListener;
 import net.sparktank.morrigan.display.MinToTrayAction;
@@ -29,7 +28,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.ISizeProvider;
 import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.actions.ContributionItemFactory;
 
@@ -114,7 +112,7 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		for (final FullScreenAction a : getFullScreenActions()) {
 			fullscreenMenuMgr.add(a);
 		}
-		fullscreenMenuMgr.add(new ShowDisplayViewAction());
+		fullscreenMenuMgr.add(showDisplayViewAction);
 		menuFullscreen = fullscreenMenuMgr.createContextMenu(parent);
 		
 		MenuManager prefMenuMgr = new MenuManager();
@@ -297,107 +295,41 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Display view.
 	
+	private ShowDisplayViewAction showDisplayViewAction = new ShowDisplayViewAction();
+	private IViewPart viewDisplay = null;
+	
+	public void attachViewDisplay (ViewDisplay viewDisplay) throws ImplException {
+		this.viewDisplay = viewDisplay;
+		viewDisplay.setCloseRunnable(onCloseRunnable);
+		setCurrentMediaFrameParent(viewDisplay.getMediaFrameParent());
+		showDisplayViewAction.setChecked(true);
+	}
+	
+	public Runnable onCloseRunnable = new Runnable() {
+		@Override
+		public void run() {
+			setCurrentMediaFrameParent(null);
+			showDisplayViewAction.setChecked(false);
+		}
+	};
+	
 	protected class ShowDisplayViewAction extends Action {
 		
 		public ShowDisplayViewAction () {
 			super("Video view", AS_CHECK_BOX);
-			this.setChecked(false);
 			this.setImageDescriptor(Activator.getImageDescriptor("icons/display.gif"));
 		}
 		
 		public void run() {
 			try {
 				if (isChecked()) {
-					goDisplayViewSafe(this);
+					getSite().getPage().showView(ViewDisplay.ID);
 				} else {
-					removeDisplayViewSafe(true);
+					getSite().getPage().hideView(viewDisplay);
 				}
 				
 			} catch (Exception e) {
 				new MorriganMsgDlg(e).open();
-			}
-		}
-		
-	}
-	
-//	TODO factor out common code with fullscreen code.
-//	TODO hide local display when not needed.
-	
-	private void goDisplayViewSafe (Action action) {
-		GoDisplayViewRunner runner = new GoDisplayViewRunner(action);
-		if (Thread.currentThread().equals(getSite().getShell().getDisplay().getThread())) {
-			runner.run();
-		} else {
-			getSite().getShell().getDisplay().asyncExec(runner);
-		}
-	}
-	
-	private void removeDisplayViewSafe (boolean hideView) {
-		RemoveDisplayViewRunner runner = new RemoveDisplayViewRunner(hideView);
-		if (Thread.currentThread().equals(getSite().getShell().getDisplay().getThread())) {
-			runner.run();
-		} else {
-			getSite().getShell().getDisplay().asyncExec(runner);
-		}
-	}
-	
-	private ViewDisplay viewDisplay = null;
-	
-	private class GoDisplayViewRunner implements Runnable {
-		
-		protected final Action action;
-		
-		public GoDisplayViewRunner (Action action) {
-			this.action = action;
-		}
-		
-		@Override
-		public void run() {
-			try {
-				jumpScreen();
-			} catch (Exception e) {
-				getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));
-			}
-		}
-		
-		private void jumpScreen () throws ImplException, PartInitException {
-			IViewPart showView = getSite().getPage().showView(ViewDisplay.ID);
-			viewDisplay = (ViewDisplay) showView;
-			
-			viewDisplay.setCloseRunnable(new Runnable() {
-				@Override
-				public void run() {
-					removeDisplayViewSafe(false);
-					action.setChecked(false);
-				}
-			});
-			
-			setCurrentMediaFrameParent(viewDisplay.getMediaFrameParent());
-			
-			action.setChecked(true);
-		}
-		
-	}
-	
-	private class RemoveDisplayViewRunner implements Runnable {
-		
-		private final boolean hideView;
-
-		public RemoveDisplayViewRunner (boolean hideView) {
-			this.hideView = hideView;
-			
-		}
-		
-		@Override
-		public void run() {
-			if (viewDisplay == null) return;
-			
-			try {
-				setCurrentMediaFrameParent(null);
-				if (hideView) getSite().getPage().hideView(viewDisplay);
-				
-			} catch (Exception e) {
-				getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));
 			}
 		}
 		
