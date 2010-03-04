@@ -348,12 +348,17 @@ public abstract class AbstractPlayerView extends ViewPart {
 		return localMediaFrameParent;
 	}
 	
-	protected void setCurrentMediaFrameParent (Composite frame) throws ImplException {
+	protected void setCurrentMediaFrameParent (Composite frame) {
 		currentMediaFrameParent = frame;
 		
 		videoParentChanged(frame);
 		
-		IPlaybackEngine engine = getPlaybackEngine(false);
+		IPlaybackEngine engine;
+		try {
+			engine = getPlaybackEngine(false);
+		} catch (ImplException e) {
+			throw new RuntimeException(e);
+		}
 		if (engine!=null) {
 			engine.setVideoFrameParent(getCurrentMediaFrameParent());
 		}
