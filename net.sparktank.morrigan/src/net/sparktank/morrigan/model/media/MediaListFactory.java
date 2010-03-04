@@ -23,6 +23,7 @@ public class MediaListFactory {
 			for (MediaLibrary lib : mediaLibraryCache.keySet()) {
 				if (lib.getDbPath().equals(dbFilePath)) {
 					ret = lib;
+					System.out.println("Found '" + dbFilePath + "' in cache.");
 				}
 			}
 		}
@@ -54,6 +55,7 @@ public class MediaListFactory {
 			for (MediaPlaylist lst : mediaPlaylistCache.keySet()) {
 				if (lst.getFilePath().equals(filePath)) {
 					ret = lst;
+					System.out.println("Found '" + filePath + "' in cache.");
 				}
 			}
 		}
