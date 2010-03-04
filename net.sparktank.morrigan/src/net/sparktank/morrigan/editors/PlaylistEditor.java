@@ -109,6 +109,8 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 		iconProperties.dispose();
 	}
 	
+	private Label lblStatus;
+	
 	@Override
 	protected void populateToolbar(Composite parent) {
 		makeIcons();
@@ -124,23 +126,22 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 		 */
 		
 		Button btnSave = new Button(parent, SWT.PUSH);
-		Label lblStatus = new Label(parent, SWT.NONE);
+		lblStatus = new Label(parent, SWT.NONE);
 		Button btnAdd = new Button(parent, SWT.PUSH);
 		Button btnRemove = new Button(parent, SWT.PUSH);
 		
 		formData = new FormData();
-		formData.top = new FormAttachment(0, sep);
-		formData.bottom = new FormAttachment(100, -sep);
+		formData.top = new FormAttachment(50, -(lblStatus.computeSize(SWT.DEFAULT, SWT.DEFAULT).y)/2);
 		formData.left = new FormAttachment(0, sep);
-		btnSave.setImage(iconSave);
-		btnSave.setLayoutData(formData);
+		formData.right = new FormAttachment(btnSave, -sep);
+		lblStatus.setLayoutData(formData);
 		
 		formData = new FormData();
-		formData.top = new FormAttachment(50, -(lblStatus.computeSize(SWT.DEFAULT, SWT.DEFAULT).y)/2);
-		formData.left = new FormAttachment(btnSave, sep*2);
+		formData.top = new FormAttachment(0, sep);
+		formData.bottom = new FormAttachment(100, -sep);
 		formData.right = new FormAttachment(btnAdd, -sep);
-		lblStatus.setLayoutData(formData);
-		lblStatus.setText("n items.");
+		btnSave.setImage(iconSave);
+		btnSave.setLayoutData(formData);
 		
 		formData = new FormData();
 		formData.top = new FormAttachment(0, sep);
@@ -159,6 +160,18 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 		btnSave.addSelectionListener(new ActionListener(new SaveEditorAction(this)));
 		btnAdd.addSelectionListener(new ActionListener(addAction));
 		btnRemove.addSelectionListener(new ActionListener(removeAction));
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Events.
+	
+	@Override
+	protected void listChanged () {
+		if (lblStatus.isDisposed()) return;
+		
+		lblStatus.setText(
+				getEditedMediaList().getCount() + " items."
+				);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
