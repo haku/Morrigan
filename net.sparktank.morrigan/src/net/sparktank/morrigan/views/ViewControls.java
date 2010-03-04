@@ -281,6 +281,8 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 	
 	@Override
 	protected void videoParentChanged(Composite newParent) {
+		if (videoParent.isDisposed()) return;
+		
 		FormData formData = (FormData) videoParent.getLayoutData();
 		if (newParent != null) {
 			formData.width = 0;
