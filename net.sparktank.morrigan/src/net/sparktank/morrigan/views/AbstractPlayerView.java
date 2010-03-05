@@ -17,6 +17,7 @@ import net.sparktank.morrigan.engines.playback.PlaybackException;
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.ClipboardHelper;
+import net.sparktank.morrigan.helpers.EqualHelper;
 import net.sparktank.morrigan.helpers.OrderHelper;
 import net.sparktank.morrigan.helpers.OrderHelper.PlaybackOrder;
 import net.sparktank.morrigan.model.media.MediaItem;
@@ -24,6 +25,7 @@ import net.sparktank.morrigan.model.media.MediaList;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -35,12 +37,6 @@ import org.eclipse.ui.part.ViewPart;
  */
 public abstract class AbstractPlayerView extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	private MediaList currentList = null;
-	private MediaItem currentItem = null;
-	private long currentPosition = -1; // In seconds.
-	private int currentTrackDuration = -1; // In seconds.
-	private PlaybackOrder playbackOrder = PlaybackOrder.SEQUENTIAL;
 	
 	private volatile boolean isDisposed = false;
 	
@@ -58,6 +54,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 		isDisposed = true;
 		finalisePlaybackEngine();
 		finaliseHotkeys();
+		setCurrentItem(null, null);
 		
 		super.dispose();
 	}
@@ -75,6 +72,165 @@ public abstract class AbstractPlayerView extends ViewPart {
 	abstract protected void updateStatus ();
 	
 	abstract protected void orderModeChanged (PlaybackOrder order);
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Current selection.
+	
+	private MediaList _currentList = null;
+	private MediaItem _currentItem = null;
+	
+	/**
+	 * This is called at the start of each track.
+	 * Must call this with list a null before this
+	 * object is disposed so as to remove listener.
+	 */
+	private void setCurrentItem (MediaList list, MediaItem item) {
+		if (_currentList != null) {
+			_currentList.removeChangeEvent(listChangedRunnable);
+		}
+		
+		_currentList = list;
+		_currentItem = item;
+		
+		if (_currentList != null) {
+			_currentList.addChangeEvent(listChangedRunnable);
+			
+			if (_currentItem != null) {
+				addToHistory(_currentList, _currentItem);
+			}
+		}
+	}
+	
+	private Runnable listChangedRunnable = new Runnable() {
+		@Override
+		public void run() {
+			validateHistory();
+		}
+	};
+	
+	protected MediaList getCurrentList () {
+		// TODO check list is still valid.
+		return _currentList;
+	}
+	
+	protected MediaItem getCurrentItem () {
+		// TODO check item is still valid.
+		return _currentItem;
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Track order methods.
+	
+	private PlaybackOrder _playbackOrder = PlaybackOrder.SEQUENTIAL;
+	
+	protected PlaybackOrder getPlaybackOrder () {
+		return _playbackOrder;
+	}
+	
+	protected void setPlaybackOrder (PlaybackOrder order) {
+		_playbackOrder = order;
+	}
+	
+	private MediaItem getNextTrackToPlay () {
+		if (getCurrentList() == null || getCurrentItem() == null) return null;
+		return OrderHelper.getNextTrack(getCurrentList(), getCurrentItem(), _playbackOrder);
+	}
+	
+	private class NextTrackRunner implements Runnable {
+		
+		private final MediaList list;
+		private final MediaItem track;
+		
+		public NextTrackRunner (MediaList list, MediaItem track) {
+			this.list = list;
+			this.track = track;
+		}
+		
+		@Override
+		public void run() {
+			loadAndStartPlaying(list, track);
+		}
+		
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	History.
+	
+	static private final int HISTORY_LENGTH = 10;
+	
+	private class HistoryItem {
+		
+		MediaList list;
+		MediaItem item;
+		
+		public HistoryItem (MediaList list, MediaItem item) {
+			this.list = list;
+			this.item = item;
+		}
+		
+		@Override
+		public boolean equals (Object obj) {
+			if ( obj == null ) return false;
+			if ( this == obj ) return true;
+			if ( !(obj instanceof HistoryItem) ) return false;
+			HistoryItem that = (HistoryItem)obj;
+			
+			return EqualHelper.areEqual(list, that.list)
+				&& EqualHelper.areEqual(item, that.item);
+		}
+		
+	}
+	
+	private List<HistoryItem> _history = new ArrayList<HistoryItem>();
+	private MenuManager _historyMenuMgr = new MenuManager();
+	
+	private void addToHistory (MediaList list, MediaItem item) {
+		HistoryItem hitem = new HistoryItem(list, item);
+		if (_history.contains(hitem)) {
+			_history.remove(hitem);
+		}
+		_history.add(0, hitem);
+		if (_history.size() > HISTORY_LENGTH) {
+			_history.remove(_history.size()-1);
+		}
+		refreshHistoryMenuMgr();
+	}
+	
+	private void validateHistory () {
+		for (HistoryItem item : _history) {
+			if (!item.list.getMediaTracks().contains(item.item)) {
+				_history.remove(item);
+			}
+		}
+		refreshHistoryMenuMgr();
+	}
+	
+	private class HistoryAction extends Action {
+		
+		private final HistoryItem item;
+
+		public HistoryAction (HistoryItem item) {
+			this.item = item;
+			setText(item.item.getTitle());
+		}
+		
+		@Override
+		public void run() {
+			loadAndStartPlaying(item.list, item.item);
+		}
+		
+	}
+	
+	private void refreshHistoryMenuMgr () {
+		_historyMenuMgr.removeAll();
+		for (HistoryItem item : _history) {
+			_historyMenuMgr.add(new HistoryAction(item));
+		}
+	}
+	
+	protected MenuManager getHistoryMenuMgr () {
+		return _historyMenuMgr;
+	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Playback engine.
@@ -117,6 +273,10 @@ public abstract class AbstractPlayerView extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Playback management.
 	
+	
+	private long _currentPosition = -1; // In seconds.
+	private int _currentTrackDuration = -1; // In seconds.
+	
 	/**
 	 * For UI handlers to call.
 	 */
@@ -126,23 +286,22 @@ public abstract class AbstractPlayerView extends ViewPart {
 		}
 		
 		try {
-			currentList = list;
-			currentItem = track;
-			getPlaybackEngine().setFile(currentItem.getFilepath());
+			setCurrentItem(list, track);
+			
+			getPlaybackEngine().setFile(track.getFilepath());
 			getPlaybackEngine().setVideoFrameParent(getCurrentMediaFrameParent());
 			getPlaybackEngine().startPlaying();
-			currentTrackDuration = getPlaybackEngine().getDuration();
-			System.out.println("Started to play " + currentItem.getTitle());
+			_currentTrackDuration = getPlaybackEngine().getDuration();
+			System.out.println("Started to play " + track.getTitle());
 			
-			currentList.incTrackStartCnt(currentItem);
-			if (currentItem.getDuration() <= 0) {
-				if (currentTrackDuration > 0) {
-					currentList.setTrackDuration(currentItem, currentTrackDuration);
+			list.incTrackStartCnt(track);
+			if (track.getDuration() <= 0) {
+				if (_currentTrackDuration > 0) {
+					list.setTrackDuration(track, _currentTrackDuration);
 				}
 			}
 			
 		} catch (MorriganException e) {
-			currentItem = null;
 			getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));
 		}
 		
@@ -184,6 +343,9 @@ public abstract class AbstractPlayerView extends ViewPart {
 			} else if (playbackState == PlayState.Playing) {
 				eng.pausePlaying();
 				
+			} else if (playbackState == PlayState.Stopped) {
+				loadAndStartPlaying(getCurrentList(), getCurrentItem());
+				
 			} else {
 				getSite().getShell().getDisplay().asyncExec(new RunnableDialog("Don't know what to do.  Playstate=" + playbackState + "."));
 			}
@@ -205,8 +367,6 @@ public abstract class AbstractPlayerView extends ViewPart {
 			eng.stopPlaying();
 			eng.unloadFile();
 		}
-		
-		currentItem = null;
 	}
 	
 	private Runnable updateStatusRunable = new Runnable() {
@@ -223,16 +383,11 @@ public abstract class AbstractPlayerView extends ViewPart {
 		getSite().getShell().getDisplay().asyncExec(updateStatusRunable);
 	}
 	
-	private MediaItem getNextTrackToPlay () {
-		if (currentList==null || currentItem==null) return null;
-		return OrderHelper.getNextTrack(currentList, currentItem, playbackOrder);
-	}
-	
 	private IPlaybackStatusListener playbackStatusListener = new IPlaybackStatusListener () {
 		
 		@Override
 		public void positionChanged(long position) {
-			currentPosition = position;
+			_currentPosition = position;
 			callUpdateStatus();
 		}
 		
@@ -245,7 +400,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 		public void onEndOfTrack() {
 			// Inc. stats.
 			try {
-				currentList.incTrackEndCnt(currentItem);
+				getCurrentList().incTrackEndCnt(getCurrentItem());
 			} catch (MorriganException e) {
 				getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));
 			}
@@ -253,12 +408,10 @@ public abstract class AbstractPlayerView extends ViewPart {
 			// Play next track?
 			MediaItem nextTrackToPlay = getNextTrackToPlay();
 			if (nextTrackToPlay != null) {
-				getSite().getShell().getDisplay().asyncExec(new NextTrackRunner(currentList, nextTrackToPlay));
+				getSite().getShell().getDisplay().asyncExec(new NextTrackRunner(getCurrentList(), nextTrackToPlay));
 				
 			} else {
 				System.out.println("No more tracks to play.");
-				
-				currentItem = null;
 				callUpdateStatus();
 			}
 		};
@@ -292,23 +445,6 @@ public abstract class AbstractPlayerView extends ViewPart {
 		
 	};
 	
-	private class NextTrackRunner implements Runnable {
-		
-		private final MediaList list;
-		private final MediaItem track;
-		
-		public NextTrackRunner (MediaList list, MediaItem track) {
-			this.list = list;
-			this.track = track;
-		}
-		
-		@Override
-		public void run() {
-			loadAndStartPlaying(list, track);
-		}
-		
-	}
-	
 	protected PlayState getPlayState () {
 		try {
 			IPlaybackEngine eng = getPlaybackEngine(false);
@@ -322,24 +458,12 @@ public abstract class AbstractPlayerView extends ViewPart {
 		}
 	}
 	
-	protected PlaybackOrder getPlaybackOrder () {
-		return playbackOrder;
-	}
-	
-	protected MediaList getCurrentList () {
-		return currentList;
-	}
-	
-	protected MediaItem getCurrentItem () {
-		return currentItem;
-	}
-	
 	protected long getCurrentPosition () {
-		return currentPosition;
+		return _currentPosition;
 	}
 	
 	protected int getCurrentTrackDuration () {
-		return currentTrackDuration;
+		return _currentTrackDuration;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -536,7 +660,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 					orderModeChanged(newOrder);
 				}
 			});
-			if (playbackOrder == o) a.setChecked(true);
+			if (getPlaybackOrder() == o) a.setChecked(true);
 			orderMenuActions.add(a);
 		}
 		
@@ -577,7 +701,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 		@Override
 		public void run() {
 			if (isChecked()) {
-				playbackOrder = mode;
+				setPlaybackOrder(mode);
 				orderChangedListener.orderChanged(mode);
 			}
 		}
@@ -624,20 +748,15 @@ public abstract class AbstractPlayerView extends ViewPart {
 		public void run() {
 			MediaItem nextTrackToPlay = getNextTrackToPlay();
 			if (nextTrackToPlay != null) {
-				loadAndStartPlaying(currentList, nextTrackToPlay);
+				loadAndStartPlaying(getCurrentList(), nextTrackToPlay);
 			}
-		};
-	};
-	
-	protected IAction prevAction = new Action("Previous", Activator.getImageDescriptor("icons/prev.gif")) {
-		public void run() {
-			new MorriganMsgDlg("TODO: implement previous desu~.").open();
 		};
 	};
 	
 	protected IAction copyPathAction = new Action("Copy file path") {
 		public void run() {
-			if (currentItem!=null) {
+			MediaItem currentItem = getCurrentItem();
+			if (currentItem != null) {
 				ClipboardHelper.setText(currentItem.getFilepath(), Display.getCurrent());
 			
 			} else {
