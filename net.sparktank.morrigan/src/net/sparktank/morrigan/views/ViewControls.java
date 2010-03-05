@@ -278,6 +278,7 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 	@Override
 	protected void orderModeChanged(PlaybackOrder order) {
 		btnOrderMode.setText(order.toString());
+		btnOrderMode.getParent().layout();
 	}
 	
 	@Override
