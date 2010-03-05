@@ -70,6 +70,14 @@ public class PlaybackEngine implements IPlaybackEngine {
 	}
 	
 	@Override
+	public int readFileDuration(String filepath) throws PlaybackException {
+		shoeHorn();
+		
+		int[] stats = DSJUtils.getBasicFileStats(filepath);
+		return stats[0] / 1000;
+	}
+	
+	@Override
 	public void setClassPath(File[] classPath) {
 		this.classPath = classPath;
 	}
@@ -455,13 +463,13 @@ public class PlaybackEngine implements IPlaybackEngine {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Screen saver.
 	
-	private void setScreenSaverActive (boolean active) {
+	synchronized private void setScreenSaverActive (boolean active) {
 		if (DSJUtils.getScreenSaverActive()!=active) {
 			if (active
 					|| (dsMovie!=null && dsMovie.hasMediaOfType(DSMediaType.WMMEDIATYPE_Video))
 					) {
 				
-				DSJUtils.setScreenSaverActive(active);
+				DSJUtils.setScreenSaverActive(active); // FIXME crashes JVM ???
 				
 				boolean a = DSJUtils.getScreenSaverActive();
 				if (active == a) {
