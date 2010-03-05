@@ -152,9 +152,12 @@ public class ViewPlayer extends AbstractPlayerView {
 	
 	@Override
 	protected void orderModeChanged(PlaybackOrder order) {}
-	
 	@Override
 	protected void videoParentChanged(Composite newParent) {}
+	@Override
+	protected Composite getSecondaryVideoParent() {
+		return null;
+	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

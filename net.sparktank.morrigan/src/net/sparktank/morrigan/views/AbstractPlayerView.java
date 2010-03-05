@@ -335,8 +335,8 @@ public abstract class AbstractPlayerView extends ViewPart {
 //	Video frame parent stuff.
 	
 	abstract protected void videoParentChanged (Composite newParent);
+	abstract protected Composite getSecondaryVideoParent ();
 	
-	private Composite currentMediaFrameParent;
 	private Composite localMediaFrameParent;
 	
 	protected void setLocalMediaFrameParent (Composite parent) {
@@ -348,10 +348,9 @@ public abstract class AbstractPlayerView extends ViewPart {
 		return localMediaFrameParent;
 	}
 	
-	protected void setCurrentMediaFrameParent (Composite frame) {
-		currentMediaFrameParent = frame;
-		
-		videoParentChanged(frame);
+	protected void updateCurrentMediaFrameParent () {
+		Composite cmfp = getCurrentMediaFrameParent();
+		videoParentChanged(cmfp);
 		
 		IPlaybackEngine engine;
 		try {
@@ -360,15 +359,23 @@ public abstract class AbstractPlayerView extends ViewPart {
 			throw new RuntimeException(e);
 		}
 		if (engine!=null) {
-			engine.setVideoFrameParent(getCurrentMediaFrameParent());
+			engine.setVideoFrameParent(cmfp);
 		}
 	}
 	
-	private Composite getCurrentMediaFrameParent () {
-		if (currentMediaFrameParent == null) {
-			return localMediaFrameParent;
+	protected Composite getCurrentMediaFrameParent () {
+		Composite fullScreenVideoParent = getFullScreenVideoParent();
+		if (fullScreenVideoParent != null) {
+			return fullScreenVideoParent;
+			
 		} else {
-			return currentMediaFrameParent;
+			Composite secondaryVideoParent = getSecondaryVideoParent();
+			if (secondaryVideoParent != null) {
+				return secondaryVideoParent;
+				
+			} else {
+				return localMediaFrameParent;
+			}
 		}
 	}
 	
@@ -378,7 +385,12 @@ public abstract class AbstractPlayerView extends ViewPart {
 	private FullscreenShell fullscreenShell = null;
 	
 	private boolean isFullScreen () {
-		return !(fullscreenShell==null);
+		return !(fullscreenShell == null);
+	}
+	
+	private Composite getFullScreenVideoParent () {
+		if (!isFullScreen()) return null;
+		return fullscreenShell.getShell();
 	}
 	
 	private void goFullScreenSafe () {
@@ -460,7 +472,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 				}
 			});
 			
-			setCurrentMediaFrameParent(fullscreenShell.getShell());
+			updateCurrentMediaFrameParent();
 			
 			action.setChecked(true);
 			fullscreenShell.getShell().open();
@@ -483,11 +495,12 @@ public abstract class AbstractPlayerView extends ViewPart {
 			try {
 				if (closeShell) fullscreenShell.getShell().close();
 				
-				setCurrentMediaFrameParent(null);
+				FullscreenShell fs = fullscreenShell;
+				fullscreenShell = null;
+				updateCurrentMediaFrameParent();
 				
-				if (fullscreenShell!=null) {
-					if (!fullscreenShell.getShell().isDisposed()) fullscreenShell.getShell().dispose();
-					fullscreenShell = null;
+				if (fs!=null && !fs.getShell().isDisposed()) {
+					fs.getShell().dispose();
 				}
 				
 			} catch (Exception e) {
