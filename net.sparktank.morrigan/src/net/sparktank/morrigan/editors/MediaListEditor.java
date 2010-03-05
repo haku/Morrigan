@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.handler.CallPlayMedia;
+import net.sparktank.morrigan.helpers.TimeHelper;
 import net.sparktank.morrigan.model.media.MediaItem;
 import net.sparktank.morrigan.model.media.MediaList;
 import net.sparktank.morrigan.model.media.MediaList.DirtyState;
@@ -45,10 +46,11 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 	public static final String ID = "net.sparktank.morrigan.editors.MediaListEditor";
 	
 	public enum MediaColumn { 
-		FILE       {@Override public String toString() { return "file"; } }, 
-		DADDED     {@Override public String toString() { return "added"; } },
-		COUNTS     {@Override public String toString() { return "counts"; } },
-		DLASTPLAY  {@Override public String toString() { return "last played"; } }
+		FILE       {@Override public String toString() { return "file";        } }, 
+		DADDED     {@Override public String toString() { return "added";       } },
+		COUNTS     {@Override public String toString() { return "counts";      } },
+		DLASTPLAY  {@Override public String toString() { return "last played"; } },
+		DURATION   {@Override public String toString() { return "duration";    } }
 		}
 	
 	public static MediaColumn parseMediaColumn (String s) {
@@ -165,6 +167,12 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 						layout.setColumnData(column.getColumn(), new ColumnPixelData(140, true, true));
 						column.setLabelProvider(new DateLastPlayerLblProv());
 						break;
+						
+					case DURATION:
+						layout.setColumnData(column.getColumn(), new ColumnPixelData(70, true, true));
+						column.setLabelProvider(new DurationLblProv());
+						column.getColumn().setAlignment(SWT.RIGHT);
+						break;
 					
 					default:
 						throw new IllegalArgumentException();
@@ -255,6 +263,18 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		public String getText(Object element) {
 			MediaItem elm = (MediaItem) element;
 			return elm.getDateLastPlayed() == null ? null : sdf.format(elm.getDateLastPlayed());
+		}
+	}
+	
+	private class DurationLblProv extends ColumnLabelProvider {
+		@Override
+		public String getText(Object element) {
+			MediaItem elm = (MediaItem) element;
+			if (elm.getDuration() <= 0) {
+				return null;
+			} else {
+				return TimeHelper.formatTime(elm.getDuration());
+			}
 		}
 	}
 	
@@ -355,7 +375,7 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		editedMediaList.addTrack(new MediaItem(file));
 	}
 	
-	protected void removeTrack (MediaItem track) {
+	protected void removeTrack (MediaItem track) throws MorriganException {
 		editedMediaList.removeMediaTrack(track);
 	}
 	

@@ -135,6 +135,11 @@ public abstract class AbstractPlayerView extends ViewPart {
 			System.out.println("Started to play " + currentItem.getTitle());
 			
 			currentList.incTrackStartCnt(currentItem);
+			if (currentItem.getDuration() <= 0) {
+				if (currentTrackDuration > 0) {
+					currentList.setTrackDuration(currentItem, currentTrackDuration);
+				}
+			}
 			
 		} catch (MorriganException e) {
 			currentItem = null;

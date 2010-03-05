@@ -14,6 +14,7 @@ public class MediaListPref extends FieldEditorPreferencePage implements IWorkben
 	public static final String PREF_COL_DADDED = "PREF_COL_DADDED";
 	public static final String PREF_COL_COUNTS = "PREF_COL_COUNTS";
 	public static final String PREF_COL_DLASTPLAY = "PREF_COL_DLASTPLAY";
+	public static final String PREF_COL_DURATION = "PREF_COL_DURATION";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -21,6 +22,7 @@ public class MediaListPref extends FieldEditorPreferencePage implements IWorkben
 		addField(new BooleanFieldEditor(PREF_COL_DADDED, "Show date added column", getFieldEditorParent()));
 		addField(new BooleanFieldEditor(PREF_COL_COUNTS, "Show counts column", getFieldEditorParent()));
 		addField(new BooleanFieldEditor(PREF_COL_DLASTPLAY, "Show date last played column", getFieldEditorParent()));
+		addField(new BooleanFieldEditor(PREF_COL_DURATION, "Show duration column", getFieldEditorParent()));
 	}
 	
 	@Override
@@ -41,6 +43,9 @@ public class MediaListPref extends FieldEditorPreferencePage implements IWorkben
 			
 			case DLASTPLAY:
 				return Activator.getDefault().getPreferenceStore().getBoolean(PREF_COL_DLASTPLAY);
+				
+			case DURATION:
+				return Activator.getDefault().getPreferenceStore().getBoolean(PREF_COL_DURATION);
 				
 			default:
 				return true;

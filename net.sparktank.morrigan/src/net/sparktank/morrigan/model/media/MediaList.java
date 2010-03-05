@@ -143,12 +143,14 @@ public abstract class MediaList {
 		}
 	}
 	
-	public void removeMediaTrack (MediaItem track) {
+	public void removeMediaTrack (MediaItem track) throws MorriganException {
 		mediaTracks.remove(track);
 		setDirtyState(DirtyState.DIRTY);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Update methods.  Use these for data that is to be persisted.
+//	These methods are sub-classed where persistance is needed.
 	
 	public void incTrackStartCnt (MediaItem track) throws MorriganException {
 		track.setStartCount(track.getStartCount()+1);
@@ -158,6 +160,11 @@ public abstract class MediaList {
 	
 	public void incTrackEndCnt (MediaItem track) throws MorriganException {
 		track.setEndCount(track.getEndCount()+1);
+		setDirtyState(DirtyState.METADATA);
+	}
+	
+	public void setTrackDuration (MediaItem track, int duration) throws MorriganException {
+		track.setDuration(duration);
 		setDirtyState(DirtyState.METADATA);
 	}
 	

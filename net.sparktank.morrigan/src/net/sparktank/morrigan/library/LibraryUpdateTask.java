@@ -7,7 +7,10 @@ import java.util.Stack;
 import java.util.WeakHashMap;
 
 import net.sparktank.morrigan.config.Config;
+import net.sparktank.morrigan.engines.EngineFactory;
+import net.sparktank.morrigan.engines.playback.IPlaybackEngine;
 import net.sparktank.morrigan.exceptions.MorriganException;
+import net.sparktank.morrigan.model.media.MediaItem;
 import net.sparktank.morrigan.model.media.MediaLibrary;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -141,6 +144,44 @@ public class LibraryUpdateTask extends Job {
 				}
 			}
 		}
+		
+		IPlaybackEngine playbackEngine = null;
+		
+		monitor.subTask("Reading metadata");
+		for (MediaItem mi : library.getMediaTracks()) {
+			if (mi.getDuration()<=0) {
+				
+				monitor.subTask("Reading metadata: " + mi.getTitle());
+				
+				if (playbackEngine == null) {
+					try {
+						playbackEngine = EngineFactory.makePlaybackEngine();
+					} catch (Exception e) {
+						monitor.done();
+						return new FailStatus("Failed to create playback engine instance.", e);
+					}
+				}
+				
+				try {
+					int d = playbackEngine.readFileDuration(mi.getFilepath());
+					if (d>0) library.setTrackDuration(mi, d);
+				} catch (Throwable t) {
+					// FIXME log this somewhere useful.
+					System.err.println("Throwable while reading metadata for '"+mi.getFilepath()+"': " + t.getMessage());
+				}
+				
+			}
+			
+			if (monitor.isCanceled()) {
+				System.out.println("Task was canceled desu~.");
+				break;
+			}
+		}
+		
+		if (playbackEngine != null) {
+			playbackEngine.finalise();
+		}
+		
 		
 		try {
 			library.reRead();
