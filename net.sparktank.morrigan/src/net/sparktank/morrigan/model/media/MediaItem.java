@@ -23,6 +23,7 @@ public class MediaItem {
 	private long startCount = 0;
 	private long endCount = 0;
 	private Date dateLastPlayed = null;
+	private int duration = -1;
 	
 	public String getFilepath () {
 		return trackFilePath;
@@ -57,6 +58,13 @@ public class MediaItem {
 	}
 	public void setDateLastPlayed(Date dateLastPlayed) {
 		this.dateLastPlayed = dateLastPlayed;
+	}
+	
+	public int getDuration() {
+		return duration;
+	}
+	public void setDuration(int duration) {
+		this.duration = duration;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

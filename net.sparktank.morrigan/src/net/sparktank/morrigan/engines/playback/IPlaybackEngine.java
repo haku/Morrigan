@@ -21,6 +21,13 @@ public interface IPlaybackEngine {
 	public String[] getSupportedFormats ();
 	
 	/**
+	 * Helper method for quickly reading duration from a file.
+	 * @param filepath Media file to interegate.
+	 * @return duration of file in seconds.
+	 */
+	public int readFileDuration (String filepath) throws PlaybackException;
+	
+	/**
 	 * This method will be called by the plugin loader shortly after
 	 * the instance of the plugin is created.
 	 * @param classPath The array of File objects used by the

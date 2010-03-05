@@ -234,7 +234,12 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 			dlg.open();
 			if (dlg.getReturnCode() == MorriganMsgDlg.OK) {
 				for (MediaItem track : getSelectedTracks()) {
-					removeTrack(track);
+					try {
+						removeTrack(track);
+					} catch (MorriganException e) {
+						// TODO something more meaningful here.
+						e.printStackTrace();
+					}
 				}
 			}
 		}

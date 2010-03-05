@@ -90,13 +90,14 @@ public class MediaLibrary extends MediaList {
 	}
 	
 	@Override
-	protected void replaceList(List<MediaItem> mediaTracks) {
-		super.replaceList(mediaTracks);
+	public void removeMediaTrack (MediaItem track) throws MorriganException {
+		super.removeMediaTrack(track);
+		dbLayer.removeFile(track.getFilepath());
 	}
 	
 	@Override
-	public void addTrack(MediaItem track) {
-		super.addTrack(track);
+	protected void replaceList(List<MediaItem> mediaTracks) {
+		super.replaceList(mediaTracks);
 	}
 	
 	@Override
@@ -109,6 +110,12 @@ public class MediaLibrary extends MediaList {
 	public void incTrackEndCnt(MediaItem track) throws MorriganException {
 		super.incTrackEndCnt(track);
 		dbLayer.incTrackEndCnt(track.getFilepath());
+	}
+	
+	@Override
+	public void setTrackDuration(MediaItem track, int duration) throws MorriganException {
+		super.setTrackDuration(track, duration);
+		dbLayer.setTrackDuration(track.getFilepath(), duration);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
