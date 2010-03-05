@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.handler.CallPlayMedia;
+import net.sparktank.morrigan.helpers.ImageCache;
 import net.sparktank.morrigan.helpers.TimeHelper;
 import net.sparktank.morrigan.model.media.MediaItem;
 import net.sparktank.morrigan.model.media.MediaList;
@@ -28,6 +29,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -104,6 +106,7 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 	public void dispose() {
 		editedMediaList.removeChangeEvent(listChange);
 		editedMediaList.removeDirtyChangeEvent(dirtyChange);
+		imageCache.clearCache();
 		super.dispose();
 	}
 	
@@ -211,6 +214,8 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 	
 	abstract protected void populateToolbar (Composite parent);
 	
+	private ImageCache imageCache = new ImageCache();
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Providers.
 	
@@ -233,6 +238,20 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		public String getText(Object element) {
 			MediaItem elm = (MediaItem) element;
 			return elm.getTitle() == null ? null : elm.getTitle();
+		}
+		@Override
+		public Image getImage(Object element) {
+			if (element instanceof MediaItem) {
+				MediaItem item = (MediaItem) element;
+				if (item.isMissing()) {
+					return null; // TODO find icon for missing.
+				} else if (!item.isEnabled()) {
+					return null; // TODO find icon for disabled.
+				} else {
+					return imageCache.readImage("icons/playlist.gif"); // TODO find icon for items.
+				}
+			}
+			return super.getImage(element);
 		}
 	}
 	

@@ -118,6 +118,30 @@ public class SqliteLayer {
 		}
 	}
 	
+	public void setHashcode (String sfile, long hashcode) throws DbException {
+		try {
+			local_setHashCode(sfile, hashcode);
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+	
+	public void setEnabled (String sfile, boolean value) throws DbException {
+		try {
+			local_setEnabled(sfile, value);
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+	
+	public void setMissing (String sfile, boolean value) throws DbException {
+		try {
+			local_setMissing(sfile, value);
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Schema.
 	
@@ -142,6 +166,9 @@ public class SqliteLayer {
 	private static final String SQL_TBL_MEDIAFILES_COL_ENDCNT = "lendcnt";
 	private static final String SQL_TBL_MEDIAFILES_COL_DLASTPLAY = "dlastplay";
 	private static final String SQL_TBL_MEDIAFILES_COL_DURATION = "lduration";
+	private static final String SQL_TBL_MEDIAFILES_COL_HASHCODE = "lmd5";
+	private static final String SQL_TBL_MEDIAFILES_COL_ENABLED = "benabled";
+	private static final String SQL_TBL_MEDIAFILES_COL_MISSING = "bmissing";
 	
 	private static final String SQL_TBL_SOURCES_EXISTS =
 		"SELECT name FROM sqlite_master WHERE name='tbl_sources';";
@@ -175,8 +202,8 @@ public class SqliteLayer {
 		"SELECT count(*) FROM tbl_mediafiles WHERE sfile=? COLLATE NOCASE;";
 	
 	private static final String SQL_TBL_MEDIAFILES_ADD =
-		"INSERT INTO tbl_mediafiles (sfile,dadded,lstartcnt,lendcnt,lduration,benabled) VALUES" +
-		" (?,?,0,0,-1,1);";
+		"INSERT INTO tbl_mediafiles (sfile,dadded,lstartcnt,lendcnt,lduration,benabled,bmissing) VALUES" +
+		" (?,?,0,0,-1,1,0);";
 	
 	private static final String SQL_TBL_MEDIAFILES_REMOVE =
 		"DELETE FROM tbl_mediafiles WHERE sfile=?";
@@ -191,6 +218,18 @@ public class SqliteLayer {
 	
 	private static final String SQL_TBL_MEDIAFILES_SETDURATION =
 		"UPDATE tbl_mediafiles SET lduration=?" +
+		" WHERE sfile=?;";
+	
+	private static final String SQL_TBL_MEDIAFILES_SETHASHCODE =
+		"UPDATE tbl_mediafiles SET lmd5=?" +
+		" WHERE sfile=?;";
+	
+	private static final String SQL_TBL_MEDIAFILES_SETENABLED =
+		"UPDATE tbl_mediafiles SET benabled=?" +
+		" WHERE sfile=?;";
+	
+	private static final String SQL_TBL_MEDIAFILES_SETMISSING =
+		"UPDATE tbl_mediafiles SET bmissing=?" +
 		" WHERE sfile=?;";
 	
 	public enum LibrarySort { FILE, DADDED, STARTCNT, ENDCNT, DLASTPLAY, DURATION };
@@ -341,6 +380,9 @@ public class SqliteLayer {
 			mt.setEndCount(rs.getLong(SQL_TBL_MEDIAFILES_COL_ENDCNT));
 			mt.setDateLastPlayed(readDate(rs, SQL_TBL_MEDIAFILES_COL_DLASTPLAY));
 			mt.setDuration(rs.getInt(SQL_TBL_MEDIAFILES_COL_DURATION));
+			mt.setHashcode(rs.getLong(SQL_TBL_MEDIAFILES_COL_HASHCODE));
+			mt.setEnabled(rs.getInt(SQL_TBL_MEDIAFILES_COL_ENABLED) != 0); // default to true.
+			mt.setMissing(rs.getInt(SQL_TBL_MEDIAFILES_COL_MISSING) == 1); // default to false.
 			
 			ret.add(mt);
 		}
@@ -419,6 +461,39 @@ public class SqliteLayer {
 		
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETDURATION);
 		ps.setInt(1, duration);
+		ps.setString(2, sfile);
+		ps.executeUpdate();
+		
+		ps.close();
+	}
+	
+	private void local_setHashCode (String sfile, long hashcode) throws SQLException, ClassNotFoundException {
+		PreparedStatement ps;
+		
+		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETHASHCODE);
+		ps.setLong(1, hashcode);
+		ps.setString(2, sfile);
+		ps.executeUpdate();
+		
+		ps.close();
+	}
+	
+	private void local_setEnabled (String sfile, boolean value) throws SQLException, ClassNotFoundException {
+		PreparedStatement ps;
+		
+		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETENABLED);
+		ps.setInt(1, value ? 1 : 0);
+		ps.setString(2, sfile);
+		ps.executeUpdate();
+		
+		ps.close();
+	}
+	
+	private void local_setMissing (String sfile, boolean value) throws SQLException, ClassNotFoundException {
+		PreparedStatement ps;
+		
+		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETMISSING);
+		ps.setInt(1, value ? 1 : 0);
 		ps.setString(2, sfile);
 		ps.executeUpdate();
 		
