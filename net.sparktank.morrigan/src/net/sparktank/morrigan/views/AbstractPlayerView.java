@@ -1,5 +1,7 @@
 package net.sparktank.morrigan.views;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -304,6 +306,9 @@ public abstract class AbstractPlayerView extends ViewPart {
 		try {
 			setCurrentItem(item);
 			
+			File file = new File(item.item.getFilepath());
+			if (!file.exists()) throw new FileNotFoundException(item.item.getFilepath());
+			
 			getPlaybackEngine().setFile(item.item.getFilepath());
 			getPlaybackEngine().setVideoFrameParent(getCurrentMediaFrameParent());
 			getPlaybackEngine().startPlaying();
@@ -317,7 +322,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 				}
 			}
 			
-		} catch (MorriganException e) {
+		} catch (Exception e) {
 			getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));
 		}
 		
