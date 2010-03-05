@@ -97,7 +97,6 @@ public class ViewPlayer extends AbstractPlayerView {
 		
 		getViewSite().getActionBars().getMenuManager().add(pauseAction);
 		getViewSite().getActionBars().getMenuManager().add(stopAction);
-		getViewSite().getActionBars().getMenuManager().add(prevAction);
 		getViewSite().getActionBars().getMenuManager().add(nextAction);
 		
 		getViewSite().getActionBars().getMenuManager().add(new Separator());
