@@ -1,10 +1,11 @@
 package net.sparktank.morrigan.helpers;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
-import net.sparktank.morrigan.model.media.MediaList;
 import net.sparktank.morrigan.model.media.MediaItem;
+import net.sparktank.morrigan.model.media.MediaList;
 
 public class OrderHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -32,12 +33,12 @@ public class OrderHelper {
 			}
 		},
 		
-//		bylastplayed {
-//			@Override
-//			public String toString() {
-//				return "by last-played";
-//			}
-//		} 
+		BYLASTPLAYED {
+			@Override
+			public String toString() {
+				return "by last-played";
+			}
+		} 
 		
 	};
 	
@@ -64,6 +65,9 @@ public class OrderHelper {
 			
 			case BYSTARTCOUNT:
 				return getNextTrackByStartCount(list);
+				
+			case BYLASTPLAYED:
+				return getNextTrackByLastPlayedDate(list);
 				
 			default:
 				throw new IllegalArgumentException();
@@ -109,14 +113,14 @@ public class OrderHelper {
 		}
 		
 		// Find sum of all selection indicies.
-		long selIndixSum = 0;
+		long selIndexSum = 0;
 		for (MediaItem i : tracks) {
-			selIndixSum = selIndixSum + maxPlayCount - i.getStartCount();
+			selIndexSum = selIndexSum + maxPlayCount - i.getStartCount();
 		}
 		
 		// Generate target selection index.
 		Random generator = new Random();
-		long targetIndex = (long) (generator.nextDouble() * selIndixSum);
+		long targetIndex = (long) (generator.nextDouble() * selIndexSum);
 		
 		// Find the target item.
 		for (MediaItem i : tracks) {
@@ -132,6 +136,60 @@ public class OrderHelper {
 		}
 		
 		return ret;
+	}
+	
+	private static MediaItem getNextTrackByLastPlayedDate (MediaList list) {
+		MediaItem ret = null;
+		List<MediaItem> tracks = list.getMediaTracks();
+		Date now = new Date();
+		
+		// Find oldest date.
+		Date maxAge = new Date();
+		for (MediaItem i : tracks) {
+			if (i.getDateLastPlayed() != null && i.getDateLastPlayed().before(maxAge)) {
+				maxAge = i.getDateLastPlayed();
+			}
+		}
+		long maxAgeDays = dateDiffDays(maxAge, now);
+		
+		// Build sum of all selection-indicies in units of days.
+		long sumAgeDays = 0;
+		for (MediaItem i : tracks) {
+			if (i.getDateLastPlayed() != null) {
+				sumAgeDays = sumAgeDays + dateDiffDays(i.getDateLastPlayed(), now);
+			} else {
+				sumAgeDays = sumAgeDays + maxAgeDays;
+			}
+		}
+		
+		// Generate target selection index.
+		Random generator = new Random();
+		long targetIndex = (long) (generator.nextDouble() * sumAgeDays);
+		
+		// Find the target item.
+		for (MediaItem i : tracks) {
+			if (i.getDateLastPlayed() != null) {
+				targetIndex = targetIndex - (maxAgeDays - dateDiffDays(i.getDateLastPlayed(), now));
+			} else {
+				targetIndex = targetIndex - maxAgeDays;
+			}
+			if (targetIndex <= 0) {
+				ret = i;
+				break;
+			}
+		}
+		
+		if (ret == null) {
+			throw new RuntimeException("Failed to find next track.  This should not happen.  targetIndex=" + targetIndex);
+		}
+		
+		return ret;
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	static private long dateDiffDays (Date olderDate, Date newerDate) {
+		return (newerDate.getTime() - olderDate.getTime()) / 86400000;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
