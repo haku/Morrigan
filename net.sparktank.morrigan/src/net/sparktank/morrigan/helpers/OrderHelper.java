@@ -25,12 +25,12 @@ public class OrderHelper {
 			}
 		},
 		
-//		bystartcount {
-//			@Override
-//			public String toString() {
-//				return "by start-count";
-//			}
-//		},
+		BYSTARTCOUNT {
+			@Override
+			public String toString() {
+				return "by start-count";
+			}
+		},
 		
 //		bylastplayed {
 //			@Override
@@ -53,13 +53,18 @@ public class OrderHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static MediaItem getNextTrack (MediaList list, MediaItem track, PlaybackOrder mode) {
+		if (list.getCount() <= 0) return null;
+		
 		switch (mode) {
 			case SEQUENTIAL:
 				return getNextTrackSequencial(list, track);
 			
 			case RANDOM:
-				return getNextTrackRandom(list, track);
+				return getNextTrackRandom(list);
 			
+			case BYSTARTCOUNT:
+				return getNextTrackByStartCount(list);
+				
 			default:
 				throw new IllegalArgumentException();
 			
@@ -69,23 +74,64 @@ public class OrderHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private static MediaItem getNextTrackSequencial (MediaList list, MediaItem track) {
+		MediaItem ret = null;
 		List<MediaItem> mediaTracks = list.getMediaTracks();
-		if (mediaTracks.contains(track)) {
+		
+		if (track != null && mediaTracks.contains(track)) {
 			int i = mediaTracks.indexOf(track) + 1;
 			if (i >= mediaTracks.size()) i = 0;
+			ret = mediaTracks.get(i);
 			
-			return mediaTracks.get(i);
-			
-		} else {
-			return null;
+		} else { // With no other info, might as well start at the beginning.
+			ret = list.getMediaTracks().get(0);
 		}
+		
+		return ret;
 	}
 	
-	private static MediaItem getNextTrackRandom (MediaList list, MediaItem track) {
+	private static MediaItem getNextTrackRandom (MediaList list) {
 		Random generator = new Random();
 		List<MediaItem> mediaTracks = list.getMediaTracks();
 		int i = generator.nextInt(mediaTracks.size());
 		return mediaTracks.get(i);
+	}
+	
+	private static MediaItem getNextTrackByStartCount (MediaList list) {
+		MediaItem ret = null;
+		List<MediaItem> tracks = list.getMediaTracks();
+		
+		// Find highest play count.
+		long maxPlayCount = 0;
+		for (MediaItem i : tracks) {
+			if (i.getStartCount() > maxPlayCount) {
+				maxPlayCount = i.getStartCount();
+			}
+		}
+		
+		// Find sum of all selection indicies.
+		long selIndixSum = 0;
+		for (MediaItem i : tracks) {
+			selIndixSum = selIndixSum + maxPlayCount - i.getStartCount();
+		}
+		
+		// Generate target selection index.
+		Random generator = new Random();
+		long targetIndex = (long) (generator.nextDouble() * selIndixSum);
+		
+		// Find the target item.
+		for (MediaItem i : tracks) {
+			targetIndex = targetIndex - (maxPlayCount - i.getStartCount());
+			if (targetIndex <= 0) {
+				ret = i;
+				break;
+			}
+		}
+		
+		if (ret == null) {
+			throw new RuntimeException("Failed to find next track.  This should not happen.");
+		}
+		
+		return ret;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
