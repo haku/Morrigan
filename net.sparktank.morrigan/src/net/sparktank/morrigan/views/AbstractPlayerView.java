@@ -7,6 +7,7 @@ import net.sparktank.morrigan.Activator;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.dialogs.RunnableDialog;
 import net.sparktank.morrigan.display.FullscreenShell;
+import net.sparktank.morrigan.editors.MediaListEditor;
 import net.sparktank.morrigan.engines.EngineFactory;
 import net.sparktank.morrigan.engines.HotkeyRegister;
 import net.sparktank.morrigan.engines.common.ImplException;
@@ -30,6 +31,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Monitor;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.part.ViewPart;
 
 /**
@@ -54,7 +56,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 		isDisposed = true;
 		finalisePlaybackEngine();
 		finaliseHotkeys();
-		setCurrentItem(null, null);
+		setCurrentItem(null);
 		
 		super.dispose();
 	}
@@ -76,27 +78,48 @@ public abstract class AbstractPlayerView extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Current selection.
 	
-	private MediaList _currentList = null;
-	private MediaItem _currentItem = null;
+	protected class PlayItem {
+		
+		MediaList list;
+		MediaItem item;
+		
+		public PlayItem (MediaList list, MediaItem item) {
+			this.list = list;
+			this.item = item;
+		}
+		
+		@Override
+		public boolean equals (Object obj) {
+			if ( obj == null ) return false;
+			if ( this == obj ) return true;
+			if ( !(obj instanceof PlayItem) ) return false;
+			PlayItem that = (PlayItem)obj;
+			
+			return EqualHelper.areEqual(list, that.list)
+				&& EqualHelper.areEqual(item, that.item);
+		}
+		
+	}
+	
+	private PlayItem _currentItem = null;
 	
 	/**
 	 * This is called at the start of each track.
 	 * Must call this with list a null before this
 	 * object is disposed so as to remove listener.
 	 */
-	private void setCurrentItem (MediaList list, MediaItem item) {
-		if (_currentList != null) {
-			_currentList.removeChangeEvent(listChangedRunnable);
+	private void setCurrentItem (PlayItem item) {
+		if (_currentItem != null && _currentItem.list != null) {
+			_currentItem.list.removeChangeEvent(listChangedRunnable);
 		}
 		
-		_currentList = list;
 		_currentItem = item;
 		
-		if (_currentList != null) {
-			_currentList.addChangeEvent(listChangedRunnable);
+		if (_currentItem != null && _currentItem.list != null) {
+			_currentItem.list.addChangeEvent(listChangedRunnable);
 			
-			if (_currentItem != null) {
-				addToHistory(_currentList, _currentItem);
+			if (_currentItem.item != null) {
+				addToHistory(_currentItem);
 			}
 		}
 	}
@@ -108,12 +131,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 		}
 	};
 	
-	protected MediaList getCurrentList () {
-		// TODO check list is still valid.
-		return _currentList;
-	}
-	
-	protected MediaItem getCurrentItem () {
+	protected PlayItem getCurrentItem () {
 		// TODO check item is still valid.
 		return _currentItem;
 	}
@@ -131,24 +149,39 @@ public abstract class AbstractPlayerView extends ViewPart {
 		_playbackOrder = order;
 	}
 	
-	private MediaItem getNextTrackToPlay () {
-		if (getCurrentList() == null || getCurrentItem() == null) return null;
-		return OrderHelper.getNextTrack(getCurrentList(), getCurrentItem(), _playbackOrder);
+	private PlayItem getNextItemToPlay () {
+		PlayItem nextItem = null;
+		
+		if (getCurrentItem().list != null) {
+			if (getCurrentItem().item != null) {
+				MediaItem nextTrack = OrderHelper.getNextTrack(getCurrentItem().list, getCurrentItem().item, _playbackOrder);
+				nextItem = new PlayItem(getCurrentItem().list, nextTrack);
+			}
+			
+		} else {
+			IEditorPart activeEditor = getViewSite().getPage().getActiveEditor();
+			if (activeEditor != null && activeEditor instanceof MediaListEditor<?>) {
+				MediaListEditor<?> mediaListEditor = (MediaListEditor<?>) activeEditor;
+				MediaList editedMediaList = mediaListEditor.getEditedMediaList();
+				MediaItem nextTrack = OrderHelper.getNextTrack(editedMediaList, null, _playbackOrder);
+				nextItem = new PlayItem(editedMediaList, nextTrack);
+			}
+		}
+		
+		return nextItem;
 	}
 	
 	private class NextTrackRunner implements Runnable {
 		
-		private final MediaList list;
-		private final MediaItem track;
+		private final PlayItem item;
 		
-		public NextTrackRunner (MediaList list, MediaItem track) {
-			this.list = list;
-			this.track = track;
+		public NextTrackRunner (PlayItem item) {
+			this.item = item;
 		}
 		
 		@Override
 		public void run() {
-			loadAndStartPlaying(list, track);
+			loadAndStartPlaying(item);
 		}
 		
 	}
@@ -158,38 +191,14 @@ public abstract class AbstractPlayerView extends ViewPart {
 	
 	static private final int HISTORY_LENGTH = 10;
 	
-	private class HistoryItem {
-		
-		MediaList list;
-		MediaItem item;
-		
-		public HistoryItem (MediaList list, MediaItem item) {
-			this.list = list;
-			this.item = item;
-		}
-		
-		@Override
-		public boolean equals (Object obj) {
-			if ( obj == null ) return false;
-			if ( this == obj ) return true;
-			if ( !(obj instanceof HistoryItem) ) return false;
-			HistoryItem that = (HistoryItem)obj;
-			
-			return EqualHelper.areEqual(list, that.list)
-				&& EqualHelper.areEqual(item, that.item);
-		}
-		
-	}
-	
-	private List<HistoryItem> _history = new ArrayList<HistoryItem>();
+	private List<PlayItem> _history = new ArrayList<PlayItem>();
 	private MenuManager _historyMenuMgr = new MenuManager();
 	
-	private void addToHistory (MediaList list, MediaItem item) {
-		HistoryItem hitem = new HistoryItem(list, item);
-		if (_history.contains(hitem)) {
-			_history.remove(hitem);
+	private void addToHistory (PlayItem item) {
+		if (_history.contains(item)) {
+			_history.remove(item);
 		}
-		_history.add(0, hitem);
+		_history.add(0, item);
 		if (_history.size() > HISTORY_LENGTH) {
 			_history.remove(_history.size()-1);
 		}
@@ -197,7 +206,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 	}
 	
 	private void validateHistory () {
-		for (HistoryItem item : _history) {
+		for (PlayItem item : _history) {
 			if (!item.list.getMediaTracks().contains(item.item)) {
 				_history.remove(item);
 			}
@@ -207,9 +216,9 @@ public abstract class AbstractPlayerView extends ViewPart {
 	
 	private class HistoryAction extends Action {
 		
-		private final HistoryItem item;
+		private final PlayItem item;
 
-		public HistoryAction (HistoryItem item) {
+		public HistoryAction (PlayItem item) {
 			this.item = item;
 			setText(item.item.getTitle());
 		}
@@ -223,7 +232,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 	
 	private void refreshHistoryMenuMgr () {
 		_historyMenuMgr.removeAll();
-		for (HistoryItem item : _history) {
+		for (PlayItem item : _history) {
 			_historyMenuMgr.add(new HistoryAction(item));
 		}
 	}
@@ -281,23 +290,30 @@ public abstract class AbstractPlayerView extends ViewPart {
 	 * For UI handlers to call.
 	 */
 	public void loadAndStartPlaying (MediaList list, MediaItem track) {
+		loadAndStartPlaying(new PlayItem(list, track));
+	}
+	
+	/**
+	 * For UI handlers to call.
+	 */
+	public void loadAndStartPlaying (PlayItem item) {
 		if (getSite().getShell().getDisplay().getThread().getId() != Thread.currentThread().getId()) {
 			System.out.println("Starting playback not on UI thread!");
 		}
 		
 		try {
-			setCurrentItem(list, track);
+			setCurrentItem(item);
 			
-			getPlaybackEngine().setFile(track.getFilepath());
+			getPlaybackEngine().setFile(item.item.getFilepath());
 			getPlaybackEngine().setVideoFrameParent(getCurrentMediaFrameParent());
 			getPlaybackEngine().startPlaying();
 			_currentTrackDuration = getPlaybackEngine().getDuration();
-			System.out.println("Started to play " + track.getTitle());
+			System.out.println("Started to play " + item.item.getTitle());
 			
-			list.incTrackStartCnt(track);
-			if (track.getDuration() <= 0) {
+			item.list.incTrackStartCnt(item.item);
+			if (item.item.getDuration() <= 0) {
 				if (_currentTrackDuration > 0) {
-					list.setTrackDuration(track, _currentTrackDuration);
+					item.list.setTrackDuration(item.item, _currentTrackDuration);
 				}
 			}
 			
@@ -331,6 +347,13 @@ public abstract class AbstractPlayerView extends ViewPart {
 		}
 	}
 	
+	public void nextTrack () {
+		PlayItem nextItemToPlay = getNextItemToPlay();
+		if (nextItemToPlay != null) {
+			loadAndStartPlaying(nextItemToPlay);
+		}
+	}
+	
 	private void internal_pausePlaying () throws PlaybackException {
 		// Don't go and make a player engine instance.
 		IPlaybackEngine eng = getPlaybackEngine(false);
@@ -344,7 +367,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 				eng.pausePlaying();
 				
 			} else if (playbackState == PlayState.Stopped) {
-				loadAndStartPlaying(getCurrentList(), getCurrentItem());
+				loadAndStartPlaying(getCurrentItem());
 				
 			} else {
 				getSite().getShell().getDisplay().asyncExec(new RunnableDialog("Don't know what to do.  Playstate=" + playbackState + "."));
@@ -400,15 +423,15 @@ public abstract class AbstractPlayerView extends ViewPart {
 		public void onEndOfTrack() {
 			// Inc. stats.
 			try {
-				getCurrentList().incTrackEndCnt(getCurrentItem());
+				getCurrentItem().list.incTrackEndCnt(getCurrentItem().item);
 			} catch (MorriganException e) {
 				getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));
 			}
 			
 			// Play next track?
-			MediaItem nextTrackToPlay = getNextTrackToPlay();
-			if (nextTrackToPlay != null) {
-				getSite().getShell().getDisplay().asyncExec(new NextTrackRunner(getCurrentList(), nextTrackToPlay));
+			PlayItem nextItemToPlay = getNextItemToPlay();
+			if (nextItemToPlay != null) {
+				getSite().getShell().getDisplay().asyncExec(new NextTrackRunner(nextItemToPlay));
 				
 			} else {
 				System.out.println("No more tracks to play.");
@@ -746,18 +769,15 @@ public abstract class AbstractPlayerView extends ViewPart {
 	
 	protected IAction nextAction = new Action("Next", Activator.getImageDescriptor("icons/next.gif")) {
 		public void run() {
-			MediaItem nextTrackToPlay = getNextTrackToPlay();
-			if (nextTrackToPlay != null) {
-				loadAndStartPlaying(getCurrentList(), nextTrackToPlay);
-			}
+			nextTrack();
 		};
 	};
 	
 	protected IAction copyPathAction = new Action("Copy file path") {
 		public void run() {
-			MediaItem currentItem = getCurrentItem();
+			PlayItem currentItem = getCurrentItem();
 			if (currentItem != null) {
-				ClipboardHelper.setText(currentItem.getFilepath(), Display.getCurrent());
+				ClipboardHelper.setText(currentItem.item.getFilepath(), Display.getCurrent());
 			
 			} else {
 				new MorriganMsgDlg("No track loaded desu~.").open();

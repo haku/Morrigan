@@ -235,41 +235,43 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 	protected void updateStatus() {
 		if (isDisposed()) return;
 		
-		if (getCurrentItem() != null && getCurrentList() != null) {
-			String verb;
-			
-			switch (getPlayState()) {
-				case Playing:
-					verb = "Playing";
-					break;
-					
-				case Paused:
-					verb = "Paused";
-					break;
-					
-				case Loading:
-					verb = "Loading";
-					break;
-					
-				case Stopped:
-					verb = "Stopped";
-					break;
-					
-				default:
-					verb = "Unknown";
-					break;
+		String verb;
+		
+		switch (getPlayState()) {
+			case Playing:
+				verb = "Playing";
+				break;
 				
+			case Paused:
+				verb = "Paused";
+				break;
+				
+			case Loading:
+				verb = "Loading";
+				break;
+				
+			case Stopped:
+				verb = "Stopped";
+				break;
+				
+			default:
+				verb = "Unknown";
+				break;
+				
+		}
+		
+		if (getCurrentPosition() >= 0) {
+			verb = verb + " " + TimeHelper.formatTime(getCurrentPosition());
+			if (getCurrentTrackDuration() > 0) {
+				verb = verb + " of " + TimeHelper.formatTime(getCurrentTrackDuration());
 			}
-			
-			lblStatus.setText(
-					verb + " " + TimeHelper.formatTime(getCurrentPosition())
-					+ " of " + TimeHelper.formatTime(getCurrentTrackDuration()) + "."
-			);
-			
-			getSite().getShell().setText(getCurrentItem().toString());
-			
+		}
+		lblStatus.setText(verb + ".");
+		
+		if (getCurrentItem() != null && getCurrentItem().item != null) {
+			getSite().getShell().setText(getCurrentItem().item.toString());
 		} else {
-			lblStatus.setText("Idle.");
+			getSite().getShell().setText("Morrigan");
 		};
 	}
 	

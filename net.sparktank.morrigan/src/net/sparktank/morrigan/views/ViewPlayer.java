@@ -114,37 +114,28 @@ public class ViewPlayer extends AbstractPlayerView {
 	protected void updateStatus () {
 		if (isDisposed()) return;
 		
-		if (getCurrentItem() != null && getCurrentList() != null) {
-			
-			switch (getPlayState()) {
-				case Playing:
-					setTitleImage(iconPlay);
-					break;
-					
-				case Paused:
-					setTitleImage(iconPause);
-					break;
-					
-				case Loading:
-					setTitleImage(iconPlay); // FIXME new icon?
-					break;
-					
-				case Stopped:
-					setTitleImage(iconStop);
-					break;
-					
-			}
-			
-			setContentDescription(
-					// "Now playing: " + currentTrack.toString() +
-					// "\n   From: " + currentList.getListName() +
-					// "\n   Position: " + currentPosition
-					
-					"Playing: " + getCurrentPosition() + " : " + getCurrentItem().toString()
-			);
-			
+		switch (getPlayState()) {
+			case Playing:
+				setTitleImage(iconPlay);
+				break;
+				
+			case Paused:
+				setTitleImage(iconPause);
+				break;
+				
+			case Loading:
+				setTitleImage(iconPlay); // FIXME new icon?
+				break;
+				
+			case Stopped:
+				setTitleImage(iconStop);
+				break;
+				
+		}
+		
+		if (getCurrentItem() != null && getCurrentItem().item != null) {
+			setContentDescription("Playing: " + getCurrentPosition() + " : " + getCurrentItem().toString());
 		} else {
-			setTitleImage(iconStop);
 			setContentDescription("Idle.");
 		};
 	}
