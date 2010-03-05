@@ -117,7 +117,7 @@ public class ViewPlayer extends AbstractPlayerView {
 		
 		if (getCurrentItem() != null && getCurrentList() != null) {
 			
-			switch (internal_getPlayState()) {
+			switch (getPlayState()) {
 				case Playing:
 					setTitleImage(iconPlay);
 					break;
