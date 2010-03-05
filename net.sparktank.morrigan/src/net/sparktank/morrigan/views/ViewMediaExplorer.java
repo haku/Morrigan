@@ -1,12 +1,10 @@
 package net.sparktank.morrigan.views;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
-import net.sparktank.morrigan.Activator;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.handler.CallMediaListEditor;
+import net.sparktank.morrigan.helpers.ImageCache;
 import net.sparktank.morrigan.library.LibraryHelper;
 import net.sparktank.morrigan.library.NewLibraryAction;
 import net.sparktank.morrigan.model.ui.MediaExplorerItem;
@@ -14,7 +12,6 @@ import net.sparktank.morrigan.playlist.NewPlaylistAction;
 import net.sparktank.morrigan.playlist.PlaylistHelper;
 
 import org.eclipse.core.commands.common.CommandException;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ILabelProvider;
@@ -55,12 +52,11 @@ public class ViewMediaExplorer extends ViewPart {
 		viewer.addDoubleClickListener(doubleClickListener);
 		
 		addToolbar();
-		addMenu();
 	}
 	
 	@Override
 	public void dispose() {
-		clearImageCache();
+		imageCache.clearCache();
 		super.dispose();
 	}
 	
@@ -97,13 +93,13 @@ public class ViewMediaExplorer extends ViewPart {
 				switch (item.type) {
 					
 					case PLAYLIST:
-						return readFromImageCache(Activator.getImageDescriptor("icons/playlist.gif"));
+						return imageCache.readImage("icons/playlist.gif");
 						
 					case LIBRARY:
-						return readFromImageCache(Activator.getImageDescriptor("icons/library.gif"));
+						return imageCache.readImage("icons/library.gif");
 						
 					case DISPLAY:
-						return readFromImageCache(Activator.getImageDescriptor("icons/display.gif"));
+						return imageCache.readImage("icons/display.gif");
 					
 				}
 			}
@@ -139,32 +135,13 @@ public class ViewMediaExplorer extends ViewPart {
 		getViewSite().getActionBars().getToolBarManager().add(new NewPlaylistAction(getViewSite().getWorkbenchWindow()));
 	}
 	
-	private void addMenu () {
-//		getViewSite().getActionBars().getMenuManager().add(new NewPlaylistAction(getViewSite().getWorkbenchWindow()));
-//		getViewSite().getActionBars().getMenuManager().add(new Separator());
-//		getViewSite().getActionBars().getMenuManager().add(new NewPlaylistAction(getViewSite().getWorkbenchWindow()));
-	}
-	
 	private void makeContent () {
 		items.clear();
 		items.addAll(LibraryHelper.getAllLibraries());
 		items.addAll(PlaylistHelper.getAllPlaylists());
 	}
 	
-	private Map<ImageDescriptor, Image> imageCache = new HashMap<ImageDescriptor, Image>();
-	
-	private void clearImageCache () {
-		for (ImageDescriptor i : imageCache.keySet()) {
-			imageCache.get(i).dispose();
-		}
-	}
-	
-	private Image readFromImageCache (ImageDescriptor id) {
-		if (!imageCache.containsKey(id)) {
-			imageCache.put(id, id.createImage());
-		}
-		return imageCache.get(id);
-	}
+	private ImageCache imageCache = new ImageCache();
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	

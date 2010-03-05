@@ -24,6 +24,9 @@ public class MediaItem {
 	private long endCount = 0;
 	private Date dateLastPlayed = null;
 	private int duration = -1;
+	private long hashcode = 0;
+	private boolean enabled = true;
+	private boolean missing = false;
 	
 	public String getFilepath () {
 		return trackFilePath;
@@ -65,6 +68,27 @@ public class MediaItem {
 	}
 	public void setDuration(int duration) {
 		this.duration = duration;
+	}
+	
+	public long getHashcode() {
+		return hashcode;
+	}
+	public void setHashcode(long hashcode) {
+		this.hashcode = hashcode;
+	}
+	
+	public boolean isEnabled() {
+		return enabled;
+	}
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+	
+	public boolean isMissing() {
+		return missing;
+	}
+	public void setMissing(boolean missing) {
+		this.missing = missing;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
