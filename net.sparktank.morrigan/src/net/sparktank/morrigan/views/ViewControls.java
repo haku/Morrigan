@@ -238,7 +238,7 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		if (getCurrentItem() != null && getCurrentList() != null) {
 			String verb;
 			
-			switch (internal_getPlayState()) {
+			switch (getPlayState()) {
 				case Playing:
 					verb = "Playing";
 					break;

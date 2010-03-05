@@ -116,20 +116,6 @@ public abstract class AbstractPlayerView extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Playback management.
 	
-	private Runnable updateStatusRunable = new Runnable() {
-		@Override
-		public void run() {
-			updateStatus();
-		}
-	};
-	
-	/**
-	 * This way, it can only ever be called by the right thread.
-	 */
-	protected void callUpdateStatus () {
-		getSite().getShell().getDisplay().asyncExec(updateStatusRunable);
-	}
-	
 	/**
 	 * For UI handlers to call.
 	 */
@@ -216,25 +202,23 @@ public abstract class AbstractPlayerView extends ViewPart {
 		currentItem = null;
 	}
 	
+	private Runnable updateStatusRunable = new Runnable() {
+		@Override
+		public void run() {
+			updateStatus();
+		}
+	};
+	
+	/**
+	 * This way, it can only ever be called by the right thread.
+	 */
+	protected void callUpdateStatus () {
+		getSite().getShell().getDisplay().asyncExec(updateStatusRunable);
+	}
+	
 	private MediaItem getNextTrackToPlay () {
 		if (currentList==null || currentItem==null) return null;
 		return OrderHelper.getNextTrack(currentList, currentItem, playbackOrder);
-	}
-	
-	protected PlaybackOrder getPlaybackOrder () {
-		return playbackOrder;
-	}
-	
-	protected MediaList getCurrentList () {
-		return currentList;
-	}
-	
-	protected MediaItem getCurrentItem () {
-		return currentItem;
-	}
-	
-	protected long getCurrentPosition () {
-		return currentPosition;
 	}
 	
 	private IPlaybackStatusListener playbackStatusListener = new IPlaybackStatusListener () {
@@ -318,7 +302,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 		
 	}
 	
-	protected PlayState internal_getPlayState () {
+	protected PlayState getPlayState () {
 		try {
 			IPlaybackEngine eng = getPlaybackEngine(false);
 			if (eng!=null) {
@@ -329,6 +313,22 @@ public abstract class AbstractPlayerView extends ViewPart {
 		} catch (ImplException e) {
 			return PlayState.Stopped;
 		}
+	}
+	
+	protected PlaybackOrder getPlaybackOrder () {
+		return playbackOrder;
+	}
+	
+	protected MediaList getCurrentList () {
+		return currentList;
+	}
+	
+	protected MediaItem getCurrentItem () {
+		return currentItem;
+	}
+	
+	protected long getCurrentPosition () {
+		return currentPosition;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
