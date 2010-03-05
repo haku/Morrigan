@@ -53,6 +53,7 @@ public class OrderHelper {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	// TODO take into account disabled and missing tracks.
 	public static MediaItem getNextTrack (MediaList list, MediaItem track, PlaybackOrder mode) {
 		if (list.getCount() <= 0) return null;
 		
