@@ -39,6 +39,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 	private MediaList currentList = null;
 	private MediaItem currentItem = null;
 	private long currentPosition = -1; // In seconds.
+	private int currentTrackDuration = -1; // In seconds.
 	private PlaybackOrder playbackOrder = PlaybackOrder.SEQUENTIAL;
 	
 	private volatile boolean isDisposed = false;
@@ -130,6 +131,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 			getPlaybackEngine().setFile(currentItem.getFilepath());
 			getPlaybackEngine().setVideoFrameParent(getCurrentMediaFrameParent());
 			getPlaybackEngine().startPlaying();
+			currentTrackDuration = getPlaybackEngine().getDuration();
 			System.out.println("Started to play " + currentItem.getTitle());
 			
 			currentList.incTrackStartCnt(currentItem);
@@ -329,6 +331,10 @@ public abstract class AbstractPlayerView extends ViewPart {
 	
 	protected long getCurrentPosition () {
 		return currentPosition;
+	}
+	
+	protected int getCurrentTrackDuration () {
+		return currentTrackDuration;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -262,13 +262,13 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 			}
 			
 			lblStatus.setText(
-					verb + " " + TimeHelper.formatTime(getCurrentPosition()) + "."
+					verb + " " + TimeHelper.formatTime(getCurrentPosition())
+					+ " of " + TimeHelper.formatTime(getCurrentTrackDuration()) + "."
 			);
 			
 			getSite().getShell().setText(getCurrentItem().toString());
 			
 		} else {
-//			setTitleImage(iconStop);
 			lblStatus.setText("Idle.");
 		};
 	}
