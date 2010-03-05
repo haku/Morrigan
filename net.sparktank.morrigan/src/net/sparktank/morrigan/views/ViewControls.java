@@ -165,7 +165,7 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		formData.top = new FormAttachment(0, SEP);
 		formData.left = new FormAttachment(btnPlayPause, SEP);
 		btnPrev.setLayoutData(formData);
-		btnPrev.addSelectionListener(new ActionListener(prevAction));
+		btnPrev.addSelectionListener(new DropMenuListener(btnPrev, getHistoryMenuMgr()));
 		
 		btnNext.setImage(iconNext);
 		formData = new FormData();
