@@ -152,7 +152,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 	private PlayItem getNextItemToPlay () {
 		PlayItem nextItem = null;
 		
-		if (getCurrentItem().list != null) {
+		if (getCurrentItem() != null && getCurrentItem().list != null) {
 			if (getCurrentItem().item != null) {
 				MediaItem nextTrack = OrderHelper.getNextTrack(getCurrentItem().list, getCurrentItem().item, _playbackOrder);
 				nextItem = new PlayItem(getCurrentItem().list, nextTrack);
