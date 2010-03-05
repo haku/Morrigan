@@ -72,6 +72,11 @@ public class PlaybackEngine  implements IPlaybackEngine {
 	}
 	
 	@Override
+	public int readFileDuration(String filepath) throws PlaybackException {
+		return -1;
+	}
+	
+	@Override
 	public void setClassPath(File[] arg0) {}
 	
 	@Override
