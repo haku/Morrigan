@@ -27,7 +27,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.ISizeProvider;
-import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.actions.ContributionItemFactory;
 
@@ -284,13 +283,13 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		if (videoParent.isDisposed()) return;
 		
 		FormData formData = (FormData) videoParent.getLayoutData();
-		if (newParent != null) {
-			formData.width = 0;
-		} else {
+		if (newParent == videoParent) {
 			formData.width = 80;
+		} else {
+			formData.width = 0;
 		}
 		videoParent.setLayoutData(formData);
-		videoParent.setVisible(newParent==null);
+		videoParent.setVisible(newParent == videoParent);
 		videoParent.getParent().layout();
 	}
 	
@@ -298,19 +297,20 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 //	Display view.
 	
 	private ShowDisplayViewAction showDisplayViewAction = new ShowDisplayViewAction();
-	private IViewPart viewDisplay = null;
+	private ViewDisplay viewDisplay = null;
 	
 	public void attachViewDisplay (ViewDisplay viewDisplay) throws ImplException {
 		this.viewDisplay = viewDisplay;
 		viewDisplay.setCloseRunnable(onCloseRunnable);
-		setCurrentMediaFrameParent(viewDisplay.getMediaFrameParent());
+		updateCurrentMediaFrameParent();
 		showDisplayViewAction.setChecked(true);
 	}
 	
 	public Runnable onCloseRunnable = new Runnable() {
 		@Override
 		public void run() {
-			setCurrentMediaFrameParent(null);
+			viewDisplay = null;
+			updateCurrentMediaFrameParent();
 			showDisplayViewAction.setChecked(false);
 		}
 	};
@@ -335,6 +335,15 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 			}
 		}
 		
+	}
+	
+	@Override
+	protected Composite getSecondaryVideoParent() {
+		if (viewDisplay != null) {
+			return viewDisplay.getMediaFrameParent();
+		} else {
+			return null;
+		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
