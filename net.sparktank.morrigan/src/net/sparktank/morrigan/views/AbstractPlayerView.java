@@ -561,7 +561,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 	}
 	
 	protected Composite getLocalMediaFrameParent () {
-		if (localMediaFrameParent==null) throw new IllegalAccessError("setMediaFrameParent() has not yet been called.");
+		if (localMediaFrameParent==null) throw new IllegalStateException("setMediaFrameParent() has not yet been called.");
 		return localMediaFrameParent;
 	}
 	
