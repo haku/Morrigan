@@ -155,6 +155,18 @@ public class LibraryUpdateTask extends Job {
 			// Existance test.
 			File file = new File(mi.getFilepath());
 			if (file.exists()) {
+				// If was missing, mark as found.
+				if (mi.isMissing()) {
+					try {
+						library.setTrackMissing(mi, false);
+						// The file has gone and come back again.  We need to check the CRC32 is up to date.
+						library.setTrackHashCode(mi, 0);
+					} catch (Throwable t) {
+						// FIXME log this somewhere useful.
+						System.err.println("Throwable while marking track as found '"+mi.getFilepath()+"': " + t.getMessage());
+					}
+				}
+				
 				// Hash code.
 				if (mi.getHashcode() == 0) {
 					try {
@@ -186,12 +198,14 @@ public class LibraryUpdateTask extends Job {
 					}
 				}
 				
-			} else {
-				try {
-					library.setTrackMissing(mi, true);
-				} catch (Throwable t) {
-					// FIXME log this somewhere useful.
-					System.err.println("Throwable while marking track as missing '"+mi.getFilepath()+"': " + t.getMessage());
+			} else { // The file is missing.
+				if (!mi.isMissing()) {
+					try {
+						library.setTrackMissing(mi, true);
+					} catch (Throwable t) {
+						// FIXME log this somewhere useful.
+						System.err.println("Throwable while marking track as missing '"+mi.getFilepath()+"': " + t.getMessage());
+					}
 				}
 			}
 			
@@ -202,13 +216,11 @@ public class LibraryUpdateTask extends Job {
 		}
 		
 		// TODO : duplicate and missing files (and metadata merging).
-		// TODO : anything special on re-finding of missing files?
 		// TODO : vacuume DB?
 		
 		if (playbackEngine != null) {
 			playbackEngine.finalise();
 		}
-		
 		
 		try {
 			library.reRead();
