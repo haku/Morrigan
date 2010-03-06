@@ -188,6 +188,7 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		formData = new FormData();
 		formData.top = new FormAttachment(0, SEP);
 		formData.right = new FormAttachment(videoParent, -SEP);
+		formData.bottom = new FormAttachment(100, -SEP);
 		btnOrderMode.setLayoutData(formData);
 		btnOrderMode.addSelectionListener(new DropMenuListener(btnOrderMode, menuOrderMode));
 		
