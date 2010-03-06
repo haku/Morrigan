@@ -185,22 +185,28 @@ public abstract class AbstractPlayerView extends ViewPart {
 		if (_history.size() > HISTORY_LENGTH) {
 			_history.remove(_history.size()-1);
 		}
-		refreshHistoryMenuMgr();
+		callRefreshHistoryMenuMgr();
 	}
 	
 	private void validateHistory () {
+		boolean changed = false;
+		
 		for (PlayItem item : _history) {
 			if (!item.list.getMediaTracks().contains(item.item)) {
 				_history.remove(item);
+				changed = true;
 			}
 		}
-		refreshHistoryMenuMgr();
+		
+		if (changed) {
+			callRefreshHistoryMenuMgr();
+		}
 	}
 	
 	private class HistoryAction extends Action {
 		
 		private final PlayItem item;
-
+		
 		public HistoryAction (PlayItem item) {
 			this.item = item;
 			setText(item.item.getTitle());
@@ -213,12 +219,25 @@ public abstract class AbstractPlayerView extends ViewPart {
 		
 	}
 	
-	private void refreshHistoryMenuMgr () {
-		_historyMenuMgr.removeAll();
-		for (PlayItem item : _history) {
-			_historyMenuMgr.add(new HistoryAction(item));
+	private volatile boolean refreshHistoryMenuMgrScheduled = false;
+	
+	private synchronized void callRefreshHistoryMenuMgr () {
+		if (!refreshHistoryMenuMgrScheduled) {
+			refreshHistoryMenuMgrScheduled = true;
+			getSite().getShell().getDisplay().asyncExec(refreshHistoryMenuMgr);
 		}
 	}
+	
+	private Runnable refreshHistoryMenuMgr = new Runnable() {
+		@Override
+		public synchronized void run() {
+			_historyMenuMgr.removeAll();
+			for (PlayItem item : _history) {
+				_historyMenuMgr.add(new HistoryAction(item));
+			}
+			refreshHistoryMenuMgrScheduled = false;
+		}
+	};
 	
 	protected MenuManager getHistoryMenuMgr () {
 		return _historyMenuMgr;
