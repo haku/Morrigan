@@ -75,6 +75,13 @@
             name="Display"
             restorable="true">
       </view>
+      <view
+            class="net.sparktank.morrigan.views.ViewQueue"
+            icon="icons/queue.gif"
+            id="net.sparktank.morrigan.views.ViewQueue"
+            name="Queue"
+            restorable="true">
+      </view>
       
    </extension>
    
