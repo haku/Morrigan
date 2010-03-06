@@ -232,7 +232,7 @@ public class SqliteLayer {
 		"UPDATE tbl_mediafiles SET bmissing=?" +
 		" WHERE sfile=?;";
 	
-	public enum LibrarySort { FILE, DADDED, STARTCNT, ENDCNT, DLASTPLAY, DURATION };
+	public enum LibrarySort { FILE, DADDED, STARTCNT, ENDCNT, DLASTPLAY, HASHCODE, DURATION };
 	
 	public enum LibrarySortDirection { ASC, DESC };
 	
@@ -356,6 +356,10 @@ public class SqliteLayer {
 				
 			case DLASTPLAY:
 				sql = sql.replace("{COL}", SQL_TBL_MEDIAFILES_COL_DLASTPLAY);
+				break;
+				
+			case HASHCODE:
+				sql = sql.replace("{COL}", SQL_TBL_MEDIAFILES_COL_HASHCODE);
 				break;
 				
 			case DURATION:

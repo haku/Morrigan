@@ -180,6 +180,10 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 				sort = LibrarySort.DLASTPLAY;
 				break;
 				
+			case HASHCODE:
+				sort = LibrarySort.HASHCODE;
+				break;
+				
 			case DURATION:
 				sort = LibrarySort.DURATION;
 				break;

@@ -49,9 +49,10 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 	
 	public enum MediaColumn { 
 		FILE       {@Override public String toString() { return "file";        } }, 
-		DADDED     {@Override public String toString() { return "added";       } },
 		COUNTS     {@Override public String toString() { return "counts";      } },
+		DADDED     {@Override public String toString() { return "added";       } },
 		DLASTPLAY  {@Override public String toString() { return "last played"; } },
+		HASHCODE   {@Override public String toString() { return "hash";        } },
 		DURATION   {@Override public String toString() { return "duration";    } }
 		}
 	
@@ -171,8 +172,14 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 						column.setLabelProvider(new DateLastPlayerLblProv());
 						break;
 						
+					case HASHCODE:
+						layout.setColumnData(column.getColumn(), new ColumnPixelData(90, true, true));
+						column.setLabelProvider(new HashcodeLblProv());
+						column.getColumn().setAlignment(SWT.CENTER);
+						break;
+						
 					case DURATION:
-						layout.setColumnData(column.getColumn(), new ColumnPixelData(70, true, true));
+						layout.setColumnData(column.getColumn(), new ColumnPixelData(60, true, true));
 						column.setLabelProvider(new DurationLblProv());
 						column.getColumn().setAlignment(SWT.RIGHT);
 						break;
@@ -282,6 +289,18 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		public String getText(Object element) {
 			MediaItem elm = (MediaItem) element;
 			return elm.getDateLastPlayed() == null ? null : sdf.format(elm.getDateLastPlayed());
+		}
+	}
+	
+	private class HashcodeLblProv extends ColumnLabelProvider {
+		@Override
+		public String getText(Object element) {
+			MediaItem elm = (MediaItem) element;
+			if (elm.getHashcode() == 0) {
+				return null;
+			} else {
+				return Long.toHexString(elm.getHashcode());
+			}
 		}
 	}
 	
