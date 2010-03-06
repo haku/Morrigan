@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.exceptions.MorriganException;
+import net.sparktank.morrigan.handler.AddToQueue;
 import net.sparktank.morrigan.handler.CallPlayMedia;
 import net.sparktank.morrigan.helpers.ImageCache;
 import net.sparktank.morrigan.helpers.TimeHelper;
@@ -14,6 +15,8 @@ import net.sparktank.morrigan.model.media.MediaList.DirtyState;
 import net.sparktank.morrigan.preferences.MediaListPref;
 
 import org.eclipse.core.commands.common.CommandException;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ColumnPixelData;
@@ -461,6 +464,39 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		return null;
 	}
 	
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Actions.
+	
+	protected IAction addToQueueAction = new Action("enqueue") {
+		@Override
+		public void run() {
+			IHandlerService handlerService = (IHandlerService) getSite().getService(IHandlerService.class);
+			try {
+				handlerService.executeCommand(AddToQueue.ID, null);
+			} catch (CommandException e) {
+				new MorriganMsgDlg(e).open();
+			}
+		};
+	};
+	
+	protected IAction removeAction = new Action("remove") {
+		@Override
+		public void run () {
+			MorriganMsgDlg dlg = new MorriganMsgDlg("Remove selected from " + getTitle() + "?", MorriganMsgDlg.YESNO);
+			dlg.open();
+			if (dlg.getReturnCode() == MorriganMsgDlg.OK) {
+				for (MediaItem track : getSelectedTracks()) {
+					try {
+						removeTrack(track);
+					} catch (MorriganException e) {
+						// TODO something more useful here.
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

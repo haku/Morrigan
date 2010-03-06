@@ -116,6 +116,11 @@
             defaultHandler="net.sparktank.morrigan.handler.CallPlayMedia"
             id="net.sparktank.morrigan.handler.CallPlayMedia"
             name="CallPlayMedia" />
+      <command
+            defaultHandler="net.sparktank.morrigan.handler.AddToQueue"
+            id="net.sparktank.morrigan.handler.AddToQueue"
+            name="AddToQueue">
+      </command>
       
    </extension>
    <extension

@@ -8,7 +8,6 @@ import net.sparktank.morrigan.display.ActionListener;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.library.SqliteLayer.LibrarySort;
 import net.sparktank.morrigan.library.SqliteLayer.LibrarySortDirection;
-import net.sparktank.morrigan.model.media.MediaItem;
 import net.sparktank.morrigan.model.media.MediaLibrary;
 import net.sparktank.morrigan.views.ViewLibraryProperties;
 
@@ -77,17 +76,20 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	GUI components.
 	
+	private Image iconQueueAdd;
 	private Image iconAdd;
 	private Image iconRemove;
 	private Image iconProperties;
 	
 	private void makeIcons () {
+		iconQueueAdd = Activator.getImageDescriptor("icons/queue-add.gif").createImage();
 		iconAdd = Activator.getImageDescriptor("icons/plus.gif").createImage();
 		iconRemove = Activator.getImageDescriptor("icons/minus.gif").createImage();
 		iconProperties = Activator.getImageDescriptor("icons/pref.gif").createImage();
 	}
 	
 	private void disposeIcons () {
+		iconQueueAdd.dispose();
 		iconAdd.dispose();
 		iconRemove.dispose();
 		iconProperties.dispose();
@@ -103,6 +105,7 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 		FormData formData;
 		
 		lblStatus = new Label(parent, SWT.NONE);
+		Button btnAddToQueue = new Button(parent, SWT.PUSH);
 		Button btnAdd = new Button(parent, SWT.PUSH);
 		Button btnRemove = new Button(parent, SWT.PUSH);
 		Button btnProperties = new Button(parent, SWT.PUSH);
@@ -110,8 +113,15 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 		formData = new FormData();
 		formData.top = new FormAttachment(50, -(lblStatus.computeSize(SWT.DEFAULT, SWT.DEFAULT).y)/2);
 		formData.left = new FormAttachment(0, sep*2);
-		formData.right = new FormAttachment(btnAdd, -sep);
+		formData.right = new FormAttachment(btnAddToQueue, -sep);
 		lblStatus.setLayoutData(formData);
+		
+		formData = new FormData();
+		formData.top = new FormAttachment(0, sep);
+		formData.bottom = new FormAttachment(100, -sep);
+		formData.right = new FormAttachment(btnAdd, -sep);
+		btnAddToQueue.setImage(iconQueueAdd);
+		btnAddToQueue.setLayoutData(formData);
 		
 		formData = new FormData();
 		formData.top = new FormAttachment(0, sep);
@@ -134,6 +144,7 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 		btnProperties.setImage(iconProperties);
 		btnProperties.setLayoutData(formData);
 		
+		btnAddToQueue.addSelectionListener(new ActionListener(addToQueueAction));
 		btnAdd.addSelectionListener(new ActionListener(addAction));
 		btnRemove.addSelectionListener(new ActionListener(removeAction));
 		btnProperties.addSelectionListener(new ActionListener(showPropertiesAction));
@@ -214,23 +225,6 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 			ViewLibraryProperties propView = showLibPropView();
 			if (propView!=null) {
 				propView.showAddDlg(true);
-			}
-		}
-	};
-	
-	private IAction removeAction = new Action("remove") {
-		public void run () {
-			MorriganMsgDlg dlg = new MorriganMsgDlg("Remove selected from " + getTitle() + "?", MorriganMsgDlg.YESNO);
-			dlg.open();
-			if (dlg.getReturnCode() == MorriganMsgDlg.OK) {
-				for (MediaItem track : getSelectedTracks()) {
-					try {
-						removeTrack(track);
-					} catch (MorriganException e) {
-						// TODO something more useful here.
-						e.printStackTrace();
-					}
-				}
 			}
 		}
 	};

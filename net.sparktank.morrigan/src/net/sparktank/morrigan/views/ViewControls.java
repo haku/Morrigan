@@ -66,6 +66,7 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 	private Image iconPrev;
 	private Image iconNext;
 	private Image iconScreen;
+	private Image iconQueue;
 	private Image iconPref;
 	
 	private int preferedHeight = -1;
@@ -85,6 +86,7 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		iconPrev = Activator.getImageDescriptor("icons/prev.gif").createImage();
 		iconNext = Activator.getImageDescriptor("icons/next.gif").createImage();
 		iconScreen = Activator.getImageDescriptor("icons/display.gif").createImage();
+		iconQueue = Activator.getImageDescriptor("icons/queue.gif").createImage();
 		iconPref = Activator.getImageDescriptor("icons/pref.gif").createImage();
 	}
 	
@@ -95,6 +97,7 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		iconPrev.dispose();
 		iconNext.dispose();
 		iconScreen.dispose();
+		iconQueue.dispose();
 		iconPref.dispose();
 	}
 	
@@ -145,6 +148,7 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		btnOrderMode = new Button(parent, SWT.PUSH);
 		Button btnFullscreen = new Button(parent, SWT.PUSH);
 		Button btnPref = new Button(parent, SWT.PUSH);
+		Button btnQueue = new Button(parent, SWT.PUSH);
 		
 		btnStop.setImage(iconStop);
 		formData = new FormData();
@@ -200,9 +204,16 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		btnFullscreen.setImage(iconScreen);
 		formData = new FormData();
 		formData.top = new FormAttachment(0, SEP);
-		formData.right = new FormAttachment(btnPref, -SEP);
+		formData.right = new FormAttachment(btnQueue, -SEP);
 		btnFullscreen.setLayoutData(formData);
 		btnFullscreen.addSelectionListener(new DropMenuListener(btnFullscreen, menuFullscreen));
+		
+		btnQueue.setImage(iconQueue);
+		formData = new FormData();
+		formData.top = new FormAttachment(0, SEP);
+		formData.right = new FormAttachment(btnPref, -SEP);
+		btnQueue.setLayoutData(formData);
+		btnQueue.addSelectionListener(new ActionListener(showQueueAction));
 		
 		btnPref.setImage(iconPref);
 		formData = new FormData();
