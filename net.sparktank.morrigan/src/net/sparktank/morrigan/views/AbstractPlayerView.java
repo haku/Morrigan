@@ -20,11 +20,11 @@ import net.sparktank.morrigan.engines.playback.PlaybackException;
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.ClipboardHelper;
-import net.sparktank.morrigan.helpers.EqualHelper;
 import net.sparktank.morrigan.helpers.OrderHelper;
 import net.sparktank.morrigan.helpers.OrderHelper.PlaybackOrder;
 import net.sparktank.morrigan.model.media.MediaItem;
 import net.sparktank.morrigan.model.media.MediaList;
+import net.sparktank.morrigan.model.media.PlayItem;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -79,29 +79,6 @@ public abstract class AbstractPlayerView extends ViewPart {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Current selection.
-	
-	protected class PlayItem {
-		
-		MediaList list;
-		MediaItem item;
-		
-		public PlayItem (MediaList list, MediaItem item) {
-			this.list = list;
-			this.item = item;
-		}
-		
-		@Override
-		public boolean equals (Object obj) {
-			if ( obj == null ) return false;
-			if ( this == obj ) return true;
-			if ( !(obj instanceof PlayItem) ) return false;
-			PlayItem that = (PlayItem)obj;
-			
-			return EqualHelper.areEqual(list, that.list)
-				&& EqualHelper.areEqual(item, that.item);
-		}
-		
-	}
 	
 	private PlayItem _currentItem = null;
 	
