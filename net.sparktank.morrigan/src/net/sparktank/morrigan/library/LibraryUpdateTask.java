@@ -175,7 +175,6 @@ public class LibraryUpdateTask extends Job {
 					try {
 						long hash = ChecksumHelper.generateCrc32Checksum(mi.getFilepath());
 						library.setTrackHashCode(mi, hash);
-						System.out.println(Long.toHexString(hash) + " " + mi.getFilepath());
 					} catch (Throwable t) {
 						// FIXME log this somewhere useful.
 						System.err.println("Throwable while marking track as missing '"+mi.getFilepath()+"': " + t.getMessage());
