@@ -81,7 +81,8 @@ public class LibraryUpdateTask extends Job {
 	 */
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
-		monitor.beginTask("Updating library", IProgressMonitor.UNKNOWN);
+		int progress = 0;
+		monitor.beginTask("Updating library", 100);
 		
 		monitor.subTask("Scanning sources");
 		
@@ -149,6 +150,8 @@ public class LibraryUpdateTask extends Job {
 		IPlaybackEngine playbackEngine = null;
 		
 		monitor.subTask("Reading metadata");
+		int n = 0;
+		int N = library.getCount();
 		for (MediaItem mi : library.getMediaTracks()) {
 			monitor.subTask("Reading metadata: " + mi.getTitle());
 			
@@ -212,6 +215,13 @@ public class LibraryUpdateTask extends Job {
 			if (monitor.isCanceled()) {
 				System.out.println("Task was canceled desu~.");
 				break;
+			}
+			
+			n++;
+			int p = (n * 100) / N;
+			if (p > progress) {
+				monitor.worked(p - progress);
+				progress = p;
 			}
 		}
 		
