@@ -15,6 +15,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 public class AddToQueue  extends AbstractHandler implements IHandler {
@@ -36,6 +37,14 @@ public class AddToQueue  extends AbstractHandler implements IHandler {
 			MediaListEditor<?> mediaListEditor = (MediaListEditor<?>) activeEditor;
 			AbstractPlayerView playerView;
 			IViewPart findView = page.findView(ViewControls.ID);
+			
+			if (findView == null) {
+				try {
+					findView = page.showView(ViewControls.ID);
+				} catch (PartInitException e) {
+					new MorriganMsgDlg(e).open();
+				}
+			}
 			
 			if (findView != null) {
 				playerView = (AbstractPlayerView) findView;
