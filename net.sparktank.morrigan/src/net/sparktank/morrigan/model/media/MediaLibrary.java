@@ -118,6 +118,24 @@ public class MediaLibrary extends MediaList {
 		dbLayer.setTrackDuration(track.getFilepath(), duration);
 	}
 	
+	@Override
+	public void setTrackHashCode(MediaItem track, long hashcode) throws MorriganException {
+		super.setTrackHashCode(track, hashcode);
+		dbLayer.setHashcode(track.getFilepath(), hashcode);
+	}
+	
+	@Override
+	public void setTrackEnabled(MediaItem track, boolean value) throws MorriganException {
+		super.setTrackEnabled(track, value);
+		dbLayer.setEnabled(track.getFilepath(), value);
+	}
+	
+	@Override
+	public void setTrackMissing(MediaItem track, boolean value) throws MorriganException {
+		super.setTrackMissing(track, value);
+		dbLayer.setMissing(track.getFilepath(), value);
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public String getDbPath () {
