@@ -148,6 +148,8 @@ public class PlaybackEngine implements IPlaybackEngine {
 	private VideoComponent videoComponent = null;
 	
 	private void finalisePlayback () {
+		System.out.println("finalisePlayback()");
+		
 		if (playbin!=null) {
 			playbin.setState(State.NULL);
 			playbin.dispose();
@@ -183,6 +185,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 			
 		} else {
 			playbin.setState(State.NULL);
+			reparentVideo();
 		}
 		
         playbin.setInputFile(new File(filepath));
@@ -230,6 +233,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 		
 		if (old_videoComponent!=null) {
 			old_videoComponent.dispose();
+			videoFrameParent.layout();
 		}
 		
 		System.out.println("leaving reparentVideo()");
