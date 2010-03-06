@@ -168,6 +168,21 @@ public abstract class MediaList {
 		setDirtyState(DirtyState.METADATA);
 	}
 	
+	public void setTrackHashCode (MediaItem track, long hashcode) throws MorriganException {
+		track.setHashcode(hashcode);
+		setDirtyState(DirtyState.METADATA);
+	}
+	
+	public void setTrackEnabled (MediaItem track, boolean value) throws MorriganException {
+		track.setEnabled(value);
+		setDirtyState(DirtyState.METADATA);
+	}
+	
+	public void setTrackMissing (MediaItem track, boolean value) throws MorriganException {
+		track.setMissing(value);
+		setDirtyState(DirtyState.METADATA);
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override

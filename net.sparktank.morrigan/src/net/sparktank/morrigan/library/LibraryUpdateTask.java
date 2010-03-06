@@ -10,6 +10,7 @@ import net.sparktank.morrigan.config.Config;
 import net.sparktank.morrigan.engines.EngineFactory;
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine;
 import net.sparktank.morrigan.exceptions.MorriganException;
+import net.sparktank.morrigan.helpers.ChecksumHelper;
 import net.sparktank.morrigan.model.media.MediaItem;
 import net.sparktank.morrigan.model.media.MediaLibrary;
 
@@ -149,27 +150,49 @@ public class LibraryUpdateTask extends Job {
 		
 		monitor.subTask("Reading metadata");
 		for (MediaItem mi : library.getMediaTracks()) {
-			if (mi.getDuration()<=0) {
-				
-				monitor.subTask("Reading metadata: " + mi.getTitle());
-				
-				if (playbackEngine == null) {
+			monitor.subTask("Reading metadata: " + mi.getTitle());
+			
+			// Existance test.
+			File file = new File(mi.getFilepath());
+			if (file.exists()) {
+				// Hash code.
+				if (mi.getHashcode() == 0) {
 					try {
-						playbackEngine = EngineFactory.makePlaybackEngine();
-					} catch (Exception e) {
-						monitor.done();
-						return new FailStatus("Failed to create playback engine instance.", e);
+						long hash = ChecksumHelper.generateCrc32Checksum(mi.getFilepath());
+						library.setTrackHashCode(mi, hash);
+						System.out.println(Long.toHexString(hash) + " " + mi.getFilepath());
+					} catch (Throwable t) {
+						// FIXME log this somewhere useful.
+						System.err.println("Throwable while marking track as missing '"+mi.getFilepath()+"': " + t.getMessage());
 					}
 				}
 				
-				try {
-					int d = playbackEngine.readFileDuration(mi.getFilepath());
-					if (d>0) library.setTrackDuration(mi, d);
-				} catch (Throwable t) {
-					// FIXME log this somewhere useful.
-					System.err.println("Throwable while reading metadata for '"+mi.getFilepath()+"': " + t.getMessage());
+				// Duration.
+				if (mi.getDuration()<=0) {
+					if (playbackEngine == null) {
+						try {
+							playbackEngine = EngineFactory.makePlaybackEngine();
+						} catch (Exception e) {
+							monitor.done();
+							return new FailStatus("Failed to create playback engine instance.", e);
+						}
+					}
+					try {
+						int d = playbackEngine.readFileDuration(mi.getFilepath());
+						if (d>0) library.setTrackDuration(mi, d);
+					} catch (Throwable t) {
+						// FIXME log this somewhere useful.
+						System.err.println("Throwable while reading metadata for '"+mi.getFilepath()+"': " + t.getMessage());
+					}
 				}
 				
+			} else {
+				try {
+					library.setTrackMissing(mi, true);
+				} catch (Throwable t) {
+					// FIXME log this somewhere useful.
+					System.err.println("Throwable while marking track as missing '"+mi.getFilepath()+"': " + t.getMessage());
+				}
 			}
 			
 			if (monitor.isCanceled()) {
@@ -177,6 +200,10 @@ public class LibraryUpdateTask extends Job {
 				break;
 			}
 		}
+		
+		// TODO : duplicate and missing files (and metadata merging).
+		// TODO : anything special on re-finding of missing files?
+		// TODO : vacuume DB?
 		
 		if (playbackEngine != null) {
 			playbackEngine.finalise();
