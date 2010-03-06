@@ -9,7 +9,6 @@ import net.sparktank.morrigan.config.Config;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.display.ActionListener;
 import net.sparktank.morrigan.exceptions.MorriganException;
-import net.sparktank.morrigan.model.media.MediaItem;
 import net.sparktank.morrigan.model.media.MediaPlaylist;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -90,23 +89,26 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	GUI components.
 	
-	private Image iconSave;
+	private Image iconQueueAdd;
 	private Image iconAdd;
 	private Image iconRemove;
 	private Image iconProperties;
+	private Image iconSave;
 	
 	private void makeIcons () {
-		iconSave = Activator.getImageDescriptor("icons/save.gif").createImage();
+		iconQueueAdd = Activator.getImageDescriptor("icons/queue-add.gif").createImage();
 		iconAdd = Activator.getImageDescriptor("icons/plus.gif").createImage();
 		iconRemove = Activator.getImageDescriptor("icons/minus.gif").createImage();
 		iconProperties = Activator.getImageDescriptor("icons/pref.gif").createImage();
+		iconSave = Activator.getImageDescriptor("icons/save.gif").createImage();
 	}
 	
 	private void disposeIcons () {
-		iconSave.dispose();
+		iconQueueAdd.dispose();
 		iconAdd.dispose();
 		iconRemove.dispose();
 		iconProperties.dispose();
+		iconSave.dispose();
 	}
 	
 	private Label lblStatus;
@@ -118,30 +120,24 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 		final int sep = 3;
 		FormData formData;
 		
-		/* TODO make toolbar?
-		 * TODO wire-up.
-		 * TODO match enabled state with actions / dirty state.
-		 * TODO use toolbar instead?
-		 * TODO allow subclasses to control which buttons are shown.
-		 */
-		
-		Button btnSave = new Button(parent, SWT.PUSH);
+		Button btnAddToQueue = new Button(parent, SWT.PUSH);
 		lblStatus = new Label(parent, SWT.NONE);
 		Button btnAdd = new Button(parent, SWT.PUSH);
 		Button btnRemove = new Button(parent, SWT.PUSH);
+		Button btnSave = new Button(parent, SWT.PUSH);
 		
 		formData = new FormData();
 		formData.top = new FormAttachment(50, -(lblStatus.computeSize(SWT.DEFAULT, SWT.DEFAULT).y)/2);
 		formData.left = new FormAttachment(0, sep*2);
-		formData.right = new FormAttachment(btnSave, -sep);
+		formData.right = new FormAttachment(btnAddToQueue, -sep);
 		lblStatus.setLayoutData(formData);
 		
 		formData = new FormData();
 		formData.top = new FormAttachment(0, sep);
 		formData.bottom = new FormAttachment(100, -sep);
 		formData.right = new FormAttachment(btnAdd, -sep);
-		btnSave.setImage(iconSave);
-		btnSave.setLayoutData(formData);
+		btnAddToQueue.setImage(iconQueueAdd);
+		btnAddToQueue.setLayoutData(formData);
 		
 		formData = new FormData();
 		formData.top = new FormAttachment(0, sep);
@@ -153,13 +149,21 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 		formData = new FormData();
 		formData.top = new FormAttachment(0, sep);
 		formData.bottom = new FormAttachment(100, -sep);
-		formData.right = new FormAttachment(100, -sep);
+		formData.right = new FormAttachment(btnSave, -sep);
 		btnRemove.setImage(iconRemove);
 		btnRemove.setLayoutData(formData);
 		
-		btnSave.addSelectionListener(new ActionListener(new SaveEditorAction(this)));
+		formData = new FormData();
+		formData.top = new FormAttachment(0, sep);
+		formData.bottom = new FormAttachment(100, -sep);
+		formData.right = new FormAttachment(100, -sep);
+		btnSave.setImage(iconSave);
+		btnSave.setLayoutData(formData);
+		
+		btnAddToQueue.addSelectionListener(new ActionListener(addToQueueAction));
 		btnAdd.addSelectionListener(new ActionListener(addAction));
 		btnRemove.addSelectionListener(new ActionListener(removeAction));
+		btnSave.addSelectionListener(new ActionListener(new SaveEditorAction(this)));
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -224,23 +228,6 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 					n++;
 				}
 				logger.fine("Added " + n + " file to '" + getTitle() + "'.");
-			}
-		}
-	};
-	
-	private IAction removeAction = new Action("remove") {
-		public void run () {
-			MorriganMsgDlg dlg = new MorriganMsgDlg("Remove selected from " + getTitle() + "?", MorriganMsgDlg.YESNO);
-			dlg.open();
-			if (dlg.getReturnCode() == MorriganMsgDlg.OK) {
-				for (MediaItem track : getSelectedTracks()) {
-					try {
-						removeTrack(track);
-					} catch (MorriganException e) {
-						// TODO something more meaningful here.
-						e.printStackTrace();
-					}
-				}
 			}
 		}
 	};

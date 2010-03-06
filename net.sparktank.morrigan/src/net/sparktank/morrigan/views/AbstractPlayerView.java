@@ -34,6 +34,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
 
 /**
@@ -131,7 +132,10 @@ public abstract class AbstractPlayerView extends ViewPart {
 	private PlayItem getNextItemToPlay () {
 		PlayItem nextItem = null;
 		
-		if (getCurrentItem() != null && getCurrentItem().list != null) {
+		if (isQueueHasItem()) {
+			nextItem = readFromQueue();
+			
+		} else if (getCurrentItem() != null && getCurrentItem().list != null) {
 			if (getCurrentItem().item != null) {
 				MediaItem nextTrack = OrderHelper.getNextTrack(getCurrentItem().list, getCurrentItem().item, _playbackOrder);
 				nextItem = new PlayItem(getCurrentItem().list, nextTrack);
@@ -219,6 +223,60 @@ public abstract class AbstractPlayerView extends ViewPart {
 	protected MenuManager getHistoryMenuMgr () {
 		return _historyMenuMgr;
 	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Queue.
+	
+	private List<PlayItem> _queue = new ArrayList<PlayItem>();
+	private List<Runnable> _queueChangeListeners = new ArrayList<Runnable>();
+	
+	public void addToQueue (PlayItem item) {
+		_queue.add(item);
+		callQueueChangedListeners();
+	}
+	
+	private boolean isQueueHasItem () {
+		return !_queue.isEmpty();
+	}
+	
+	private PlayItem readFromQueue () {
+		if (!_queue.isEmpty()) {
+			PlayItem item = _queue.remove(0);
+			callQueueChangedListeners();
+			return item;
+		} else {
+			return null;
+		}
+	}
+	
+	private void callQueueChangedListeners () {
+		for (Runnable r : _queueChangeListeners) {
+			r.run();
+		}
+	}
+	
+	public List<PlayItem> getQueueList () {
+		return _queue;
+	}
+	
+	public void addQueueChangeListener (Runnable listener) {
+		_queueChangeListeners.add(listener);
+	}
+	
+	public void removeQueueChangeListener (Runnable listener) {
+		_queueChangeListeners.remove(listener);
+	}
+	
+	protected Action showQueueAction = new Action ("Queue", Activator.getImageDescriptor("icons/queue.gif")) {
+		@Override
+		public void run() {
+			try {
+				getSite().getPage().showView(ViewQueue.ID);
+			} catch (PartInitException e) {
+				new MorriganMsgDlg(e).open();
+			}
+		};
+	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Playback engine.
@@ -738,24 +796,28 @@ public abstract class AbstractPlayerView extends ViewPart {
 //	Actions.
 	
 	protected IAction pauseAction = new Action("Pause", Activator.getImageDescriptor("icons/pause.gif")) {
+		@Override
 		public void run() {
 			pausePlaying();
 		};
 	};
 	
 	protected IAction stopAction = new Action("Stop", Activator.getImageDescriptor("icons/stop.gif")) {
+		@Override
 		public void run() {
 			stopPlaying();
 		};
 	};
 	
 	protected IAction nextAction = new Action("Next", Activator.getImageDescriptor("icons/next.gif")) {
+		@Override
 		public void run() {
 			nextTrack();
 		};
 	};
 	
 	protected IAction copyPathAction = new Action("Copy file path") {
+		@Override
 		public void run() {
 			PlayItem currentItem = getCurrentItem();
 			if (currentItem != null) {
