@@ -77,7 +77,7 @@ public class ViewLibraryProperties extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	GUI stuff.
 	
-	TableViewer tableViewer;
+	private TableViewer tableViewer;
 	
 	private void createLayout (Composite parent) {
 		tableViewer = new TableViewer(parent, SWT.MULTI | SWT.V_SCROLL);
