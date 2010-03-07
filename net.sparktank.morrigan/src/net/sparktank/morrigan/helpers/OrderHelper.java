@@ -48,7 +48,14 @@ public class OrderHelper {
 		for (PlaybackOrder o : PlaybackOrder.values()) {
 			if (s.equals(o.toString())) return o;
 		}
-		throw new IllegalArgumentException();
+		throw new IllegalArgumentException("Unknown order mode toString: " + s);
+	}
+	
+	public static PlaybackOrder parsePlaybackOrderByName (String s) {
+		for (PlaybackOrder o : PlaybackOrder.values()) {
+			if (s.equals(o.name())) return o;
+		}
+		throw new IllegalArgumentException("Unknown order mode name: " + s);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
