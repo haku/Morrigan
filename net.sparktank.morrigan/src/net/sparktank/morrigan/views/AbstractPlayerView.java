@@ -515,6 +515,12 @@ public abstract class AbstractPlayerView extends ViewPart {
 		}
 		
 		@Override
+		public void durationChanged(int duration) {
+			_currentTrackDuration = duration;
+			callUpdateStatus();
+		};
+		
+		@Override
 		public void statusChanged(PlayState state) {
 			
 		}

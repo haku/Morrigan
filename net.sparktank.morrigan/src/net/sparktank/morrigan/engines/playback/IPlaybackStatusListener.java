@@ -8,6 +8,8 @@ public interface IPlaybackStatusListener {
 	
 	public void positionChanged (long position);
 	
+	public void durationChanged (int duration);
+	
 	public void onEndOfTrack ();
 	
 	public void onKeyPress (int keyCode);
