@@ -112,16 +112,22 @@ public class LibraryUpdateTask extends Job {
 		
 		if (sources!=null) {
 			for (String source : sources) {
+				if (monitor.isCanceled()) break;
+				
 				Stack<File> dirStack = new Stack<File>();
 				dirStack.push(new File(source));
 				
 				while (!dirStack.isEmpty()) {
+					if (monitor.isCanceled()) break;
+					
 					File dirItem = dirStack.pop();
 					File[] listFiles = dirItem.listFiles();
 					
 					monitor.subTask("Scanning "+dirItem.getAbsolutePath());
 					
 					for (File file : listFiles) {
+						if (monitor.isCanceled()) break;
+						
 						if (file.isDirectory()) {
 							dirStack.push(file);
 							
@@ -139,16 +145,7 @@ public class LibraryUpdateTask extends Job {
 								}
 							}
 						}
-						
-						if (monitor.isCanceled()) break;
 					}
-					
-					if (monitor.isCanceled()) break;
-				}
-				
-				if (monitor.isCanceled()) {
-					System.out.println("Task was canceled desu~.");
-					break;
 				}
 			}
 		}
@@ -159,6 +156,7 @@ public class LibraryUpdateTask extends Job {
 		int n = 0;
 		int N = library.getCount();
 		for (MediaItem mi : library.getMediaTracks()) {
+			if (monitor.isCanceled()) break;
 			monitor.subTask("Reading metadata: " + mi.getTitle());
 			
 			// Existance test.
@@ -217,11 +215,6 @@ public class LibraryUpdateTask extends Job {
 				}
 			}
 			
-			if (monitor.isCanceled()) {
-				System.out.println("Task was canceled desu~.");
-				break;
-			}
-			
 			n++;
 			int p = (n * 100) / N;
 			if (p > progress) {
@@ -235,9 +228,13 @@ public class LibraryUpdateTask extends Job {
 		
 		List<MediaItem> tracks = library.getMediaTracks();
 		for (int i = 0; i < tracks.size(); i++) {
+			if (monitor.isCanceled()) break;
+			
 			if (tracks.get(i).getHashcode() != 0) {
 				boolean a = new File(tracks.get(i).getFilepath()).exists();
-				for (int j = 0; j < tracks.size(); j++) {
+				for (int j = i + 1; j < tracks.size(); j++) {
+					if (monitor.isCanceled()) break;
+					
 					if (tracks.get(j).getHashcode() != 0) {
 						if (tracks.get(i).getHashcode() == tracks.get(j).getHashcode()) {
 							
@@ -296,6 +293,10 @@ public class LibraryUpdateTask extends Job {
 		}
 		
 		System.out.println("Added " + filesAdded + " files.");
+		
+		if (monitor.isCanceled()) {
+			System.out.println("Task was canceled desu~.");
+		}
 		
 		isFinished = true;
 		monitor.done();
