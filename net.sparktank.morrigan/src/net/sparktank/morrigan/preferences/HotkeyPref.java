@@ -2,29 +2,31 @@ package net.sparktank.morrigan.preferences;
 
 import net.sparktank.morrigan.Activator;
 import net.sparktank.morrigan.dialogs.RunnableDialog;
+import net.sparktank.morrigan.engines.HotkeyKeys;
 import net.sparktank.morrigan.engines.HotkeyRegister;
 import net.sparktank.morrigan.engines.hotkey.HotkeyValue;
-
+import net.sparktank.morrigan.dialogs.*;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class HotkeyPref extends PreferencePage implements IWorkbenchPreferencePage {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	public static final String PREF_HK_STOP = "PREF_HK_STOP";
 	public static final String PREF_HK_PLAYPAUSE = "PREF_HK_PLAYPAUSE";
+	public static final String PREF_HK_NEXT = "PREF_HK_NEXT";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -43,16 +45,37 @@ public class HotkeyPref extends PreferencePage implements IWorkbenchPreferencePa
 	
 	// Read data.
 	private void initialize () {
-		hkPlaypause.setValue(getHkPlaypause());
+		try {
+			hkStop.setValue(getHkStop());
+			hkPlaypause.setValue(getHkPlaypause());
+			hkNext.setValue(getHkNext());
+			
+		} catch (Exception e) {
+			new MorriganMsgDlg(e).open();
+		}
 	}
 	
 	@Override
 	public boolean performOk () {
+		HotkeyValue hkStopValue = hkStop.getValue();
+		if (hkStopValue!=null) {
+			getPreferenceStore().setValue(PREF_HK_STOP, hkStopValue.serialise());
+		} else {
+			getPreferenceStore().setValue(PREF_HK_STOP, "");
+		}
+		
 		HotkeyValue hkPlaypauseValue = hkPlaypause.getValue();
 		if (hkPlaypauseValue!=null) {
 			getPreferenceStore().setValue(PREF_HK_PLAYPAUSE, hkPlaypauseValue.serialise());
 		} else {
 			getPreferenceStore().setValue(PREF_HK_PLAYPAUSE, "");
+		}
+		
+		HotkeyValue hkNextValue = hkNext.getValue();
+		if (hkNextValue!=null) {
+			getPreferenceStore().setValue(PREF_HK_NEXT, hkNextValue.serialise());
+		} else {
+			getPreferenceStore().setValue(PREF_HK_NEXT, "");
 		}
 		
 		try {
@@ -67,7 +90,9 @@ public class HotkeyPref extends PreferencePage implements IWorkbenchPreferencePa
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	private HotkeyChooser hkStop;
 	private HotkeyChooser hkPlaypause;
+	private HotkeyChooser hkNext;
 	
 	protected Control makeContents(Composite parent) {
 		initializeDialogUnits(parent);
@@ -81,15 +106,19 @@ public class HotkeyPref extends PreferencePage implements IWorkbenchPreferencePa
 		layout.verticalSpacing = convertVerticalDLUsToPixels(IDialogConstants.VERTICAL_SPACING);
 		composite.setLayout(layout);
 		
+		hkStop = new HotkeyChooser(composite, "stop");
 		hkPlaypause = new HotkeyChooser(composite, "play / pause");
+		hkNext = new HotkeyChooser(composite, "next");
 		
 		applyDialogFont(composite);
 		return composite;
 	}
 	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
 	private class HotkeyChooser {
 		
-		private final Text textKey;
+		private Combo cmbKey;
 		private Button chkCtrl;
 		private Button chkShift;
 		private Button chkAlt;
@@ -105,9 +134,8 @@ public class HotkeyPref extends PreferencePage implements IWorkbenchPreferencePa
 			Label label = new Label (group, SWT.NONE);
 			label.setText("key");
 			
-			textKey = new Text (group, SWT.BORDER | SWT.SINGLE);
-			textKey.setTextLimit(1);
-			textKey.setLayoutData(new RowData(convertHorizontalDLUsToPixels(10), SWT.DEFAULT));
+			cmbKey = new Combo (group, SWT.READ_ONLY);
+			cmbKey.setItems(HotkeyKeys.HkKeys.values().toArray(new String[HotkeyKeys.HkKeys.values().size()]));
 			
 			chkCtrl  = makeCheckBox(group, "ctrl",  false);
 			chkShift = makeCheckBox(group, "shift", false);
@@ -116,7 +144,7 @@ public class HotkeyPref extends PreferencePage implements IWorkbenchPreferencePa
 		}
 		
 		public HotkeyValue getValue () {
-			if (textKey.getText().length() != 1) return null;
+			if (cmbKey.getSelectionIndex() < 0) return null;
 			
 			if (!chkCtrl.getSelection()
 				&& !chkShift.getSelection()
@@ -124,8 +152,19 @@ public class HotkeyPref extends PreferencePage implements IWorkbenchPreferencePa
 				&& !chkSupr.getSelection()
 				) return null;
 			
+			Integer selKey = -1;
+			String selKeyName = cmbKey.getItem(cmbKey.getSelectionIndex());
+			for (Integer i : HotkeyKeys.HkKeys.keySet()) {
+				if (HotkeyKeys.HkKeys.get(i).equals(selKeyName)) {
+					selKey = i;
+					break;
+				}
+			}
+			
+			if (selKey < 0) return null;
+			
 			return new HotkeyValue(
-					(int)textKey.getText().toCharArray()[0],
+					selKey,
 					chkCtrl.getSelection(),
 					chkShift.getSelection(),
 					chkAlt.getSelection(),
@@ -135,14 +174,14 @@ public class HotkeyPref extends PreferencePage implements IWorkbenchPreferencePa
 		
 		public void setValue (HotkeyValue value) {
 			if (value == null) {
-				textKey.setText("");
+				cmbKey.setText("");
 				chkCtrl.setSelection(false);
 				chkShift.setSelection(false);
 				chkAlt.setSelection(false);
 				chkSupr.setSelection(false);
 				
 			} else {
-				textKey.setText( String.valueOf((char) value.getKey()) );
+				cmbKey.setText(HotkeyKeys.HkKeys.get(value.getKey()));
 				chkCtrl.setSelection(value.getCtrl());
 				chkShift.setSelection(value.getShift());
 				chkAlt.setSelection(value.getAlt());
@@ -161,13 +200,25 @@ public class HotkeyPref extends PreferencePage implements IWorkbenchPreferencePa
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public static HotkeyValue getHkPlaypause () {
-		String s = Activator.getDefault().getPreferenceStore().getString(PREF_HK_PLAYPAUSE);
+	static private HotkeyValue getHk (String key) {
+		String s = Activator.getDefault().getPreferenceStore().getString(key);
 		if (s != null && s.length() > 0) {
 			return new HotkeyValue(s);
 		} else {
 			return null;
 		}
+	}
+	
+	static public HotkeyValue getHkStop () {
+		return getHk(PREF_HK_STOP);
+	}
+	
+	static public HotkeyValue getHkPlaypause () {
+		return getHk(PREF_HK_PLAYPAUSE);
+	}
+	
+	static public HotkeyValue getHkNext () {
+		return getHk(PREF_HK_NEXT);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

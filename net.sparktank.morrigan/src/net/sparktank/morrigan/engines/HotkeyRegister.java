@@ -14,10 +14,6 @@ import net.sparktank.morrigan.preferences.HotkeyPref;
 public class HotkeyRegister {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public static final int HK_PLAYPAUSE = 100;
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
 	synchronized public static void addHotkeyListener (IHotkeyListener listener) throws MorriganException {
 		readConfig(false);
 		if (!hotkeyListeners.contains(listener)) {
@@ -44,11 +40,22 @@ public class HotkeyRegister {
 		
 		clearConfig();
 		
+		HotkeyValue hkStop = HotkeyPref.getHkStop();
+		if (hkStop!=null) {
+			getHotkeyEngine(true).registerHotkey(IHotkeyEngine.MORRIGAN_HK_STOP, hkStop);
+			System.out.println("registered MORRIGAN_HK_STOP: " + hkStop.toString());
+		}
+		
 		HotkeyValue hkPlaypause = HotkeyPref.getHkPlaypause();
 		if (hkPlaypause!=null) {
-			IHotkeyEngine engine = getHotkeyEngine(true);
-			engine.registerHotkey(HK_PLAYPAUSE, hkPlaypause);
-			System.out.println("registered HK_PLAYPAUSE: " + hkPlaypause.toString());
+			getHotkeyEngine(true).registerHotkey(IHotkeyEngine.MORRIGAN_HK_PLAYPAUSE, hkPlaypause);
+			System.out.println("registered MORRIGAN_HK_PLAYPAUSE: " + hkPlaypause.toString());
+		}
+		
+		HotkeyValue hkNext = HotkeyPref.getHkNext();
+		if (hkNext!=null) {
+			getHotkeyEngine(true).registerHotkey(IHotkeyEngine.MORRIGAN_HK_NEXT, hkNext);
+			System.out.println("registered MORRIGAN_HK_NEXT: " + hkNext.toString());
 		}
 		
 		configRead = true;
@@ -56,10 +63,18 @@ public class HotkeyRegister {
 	
 	private static void clearConfig () throws HotkeyException, ImplException {
 		IHotkeyEngine engine = getHotkeyEngine(false);
+		
 		if (engine!=null) {
-			engine.unregisterHotkey(HK_PLAYPAUSE);
-			System.out.println("unregistered HK_PLAYPAUSE.");
+			engine.unregisterHotkey(IHotkeyEngine.MORRIGAN_HK_STOP);
+			System.out.println("unregistered MORRIGAN_HK_STOP.");
+			
+			engine.unregisterHotkey(IHotkeyEngine.MORRIGAN_HK_PLAYPAUSE);
+			System.out.println("unregistered MORRIGAN_HK_PLAYPAUSE.");
+			
+			engine.unregisterHotkey(IHotkeyEngine.MORRIGAN_HK_NEXT);
+			System.out.println("unregistered MORRIGAN_HK_NEXT.");
 		}
+		
 		configRead = false;
 	}
 	

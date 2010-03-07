@@ -3,13 +3,14 @@ package net.sparktank.morrigan.hotkeyimpl.jintellitype;
 import java.io.File;
 import java.lang.reflect.Field;
 
-import com.melloware.jintellitype.HotkeyListener;
-import com.melloware.jintellitype.JIntellitype;
-
 import net.sparktank.morrigan.engines.hotkey.HotkeyException;
 import net.sparktank.morrigan.engines.hotkey.HotkeyValue;
 import net.sparktank.morrigan.engines.hotkey.IHotkeyEngine;
 import net.sparktank.morrigan.engines.hotkey.IHotkeyListener;
+
+import com.melloware.jintellitype.HotkeyListener;
+import com.melloware.jintellitype.IntellitypeListener;
+import com.melloware.jintellitype.JIntellitype;
 
 public class HotkeyEngine implements IHotkeyEngine {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -83,12 +84,14 @@ public class HotkeyEngine implements IHotkeyEngine {
 	private void setup () {
 		if (haveSetup) return;
 		JIntellitype.getInstance().addHotKeyListener(hotkeyListener);
+		JIntellitype.getInstance().addIntellitypeListener(intellitypeListener);
 		haveSetup = true;
 	}
 	
 	private void teardown () {
 		if (!haveSetup) return;
 		JIntellitype.getInstance().removeHotKeyListener(hotkeyListener);
+		JIntellitype.getInstance().removeIntellitypeListener(intellitypeListener);
 		haveSetup = false;
 	}
 	
@@ -98,6 +101,27 @@ public class HotkeyEngine implements IHotkeyEngine {
 			callListener(identifier);
 		}
 	};
+	
+	private IntellitypeListener intellitypeListener = new IntellitypeListener() {
+		@Override
+		public void onIntellitype(int aCommand) {
+			switch (aCommand) {
+				
+				case JIntellitype.APPCOMMAND_MEDIA_STOP:
+					callListener(MORRIGAN_HK_STOP);
+					break;
+					
+				case JIntellitype.APPCOMMAND_MEDIA_PLAY_PAUSE:
+					callListener(MORRIGAN_HK_PLAYPAUSE);
+					break;
+					
+				case JIntellitype.APPCOMMAND_MEDIA_NEXTTRACK:
+					callListener(MORRIGAN_HK_NEXT);
+					break;
+				
+			}
+		}
+	}; 
 	
 	private void callListener(int id) {
 		if (listener!=null) {
