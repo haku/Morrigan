@@ -2,7 +2,9 @@ package net.sparktank.morrigan.library;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 import java.util.WeakHashMap;
 
@@ -73,6 +75,10 @@ public class LibraryUpdateTask extends Job {
 	public boolean isFinished () {
 		return isFinished;
 	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	private enum ScanOption {KEEP, DELREF, MOVEFILE};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -222,6 +228,57 @@ public class LibraryUpdateTask extends Job {
 				monitor.worked(p - progress);
 				progress = p;
 			}
+		}
+		
+		// Check for duplicates.
+		Map<MediaItem, ScanOption> dupicateItems = new HashMap<MediaItem, ScanOption>();
+		
+		List<MediaItem> tracks = library.getMediaTracks();
+		for (int i = 0; i < tracks.size(); i++) {
+			if (tracks.get(i).getHashcode() != 0) {
+				boolean a = new File(tracks.get(i).getFilepath()).exists();
+				for (int j = 0; j < tracks.size(); j++) {
+					if (tracks.get(j).getHashcode() != 0) {
+						if (tracks.get(i).getHashcode() == tracks.get(j).getHashcode()) {
+							
+							boolean b = new File(tracks.get(j).getFilepath()).exists();
+							
+							if (a && b) { // Both exist.
+								if (!dupicateItems.containsKey(tracks.get(i))) {
+									dupicateItems.put(tracks.get(i), ScanOption.KEEP);
+								}
+								if (!dupicateItems.containsKey(tracks.get(j))) {
+									dupicateItems.put(tracks.get(j), ScanOption.DELREF);
+								}
+								
+							} else if (a != b) { // Only one exists.
+								if (!dupicateItems.containsKey(tracks.get(i))) {
+									dupicateItems.put(tracks.get(i),
+											a ? ScanOption.KEEP : ScanOption.DELREF);
+								}
+								if (!dupicateItems.containsKey(tracks.get(j))) {
+									dupicateItems.put(tracks.get(j),
+											b ? ScanOption.KEEP : ScanOption.DELREF);
+								}
+								
+							} else { // Neither exist.
+								// They are both missing.  Don't worry about it.
+							}
+							
+						}
+					}
+				}
+			}
+		}
+		
+		if (dupicateItems.size() > 0) {
+			System.out.println("Duplicate items (count=" + dupicateItems.size() + "):");
+			for (MediaItem mi : dupicateItems.keySet()) {
+				System.out.println(dupicateItems.get(mi) + " : " + mi.getTitle());
+			}
+			
+		} else {
+			System.out.println("No duplicates found.");
 		}
 		
 		// TODO : duplicate and missing files (and metadata merging).
