@@ -45,11 +45,14 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		makeIcons();
 		makeControls(parent);
 		
+		addQueueChangeListener(queueChangedListener);
+		
 		callUpdateStatus();
 	}
 	
 	@Override
 	public void dispose() {
+		removeQueueChangeListener(queueChangedListener);
 		disposeIcons();
 		super.dispose();
 	}
@@ -77,7 +80,8 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 	
 	private Label lblStatus;
 	private Button btnOrderMode;
-	Canvas videoParent;
+	private Button btnQueue;
+	private Canvas videoParent;
 	
 	private void makeIcons () {
 		iconPlay = Activator.getImageDescriptor("icons/play.gif").createImage();
@@ -148,7 +152,7 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		btnOrderMode = new Button(parent, SWT.PUSH);
 		Button btnFullscreen = new Button(parent, SWT.PUSH);
 		Button btnPref = new Button(parent, SWT.PUSH);
-		Button btnQueue = new Button(parent, SWT.PUSH);
+		btnQueue = new Button(parent, SWT.PUSH);
 		
 		btnStop.setImage(iconStop);
 		formData = new FormData();
@@ -307,6 +311,33 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		videoParent.setVisible(newParent == videoParent);
 		videoParent.getParent().layout();
 	}
+	
+	private volatile boolean queueChangedRunnerScheduled = false;
+	
+	private Runnable queueChangedListener = new Runnable() {
+		@Override
+		public void run() {
+			if (!queueChangedRunnerScheduled) {
+				queueChangedRunnerScheduled = true;
+				getSite().getShell().getDisplay().asyncExec(queueChangedRunner);
+			}
+		}
+	};
+	
+	protected Runnable queueChangedRunner = new Runnable() {
+		@Override
+		public void run() {
+			queueChangedRunnerScheduled = false;
+			int size = getQueueList().size();
+			if (size > 0) {
+				btnQueue.setText("(" + size + ")");
+				
+			} else {
+				btnQueue.setText("");
+			}
+			btnQueue.getParent().layout();
+		}
+	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Display view.
