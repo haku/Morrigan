@@ -1,6 +1,5 @@
 package net.sparktank.morrigan.views;
 
-
 import net.sparktank.morrigan.Activator;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.display.ActionListener;
@@ -16,7 +15,12 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -138,9 +142,9 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		menuPref = prefMenuMgr.createContextMenu(parent);
 		
 		// On-screen controls.
+		final int seekBarHeight = 10;
 		
 		parent.setLayout(new FormLayout());
-		
 		FormData formData;
 		
 		Button btnStop = new Button(parent, SWT.PUSH);
@@ -153,6 +157,7 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		Button btnFullscreen = new Button(parent, SWT.PUSH);
 		Button btnPref = new Button(parent, SWT.PUSH);
 		btnQueue = new Button(parent, SWT.PUSH);
+		Canvas seekbar = new Canvas(parent, SWT.NONE);
 		
 		btnStop.setImage(iconStop);
 		formData = new FormData();
@@ -183,7 +188,8 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		btnNext.addSelectionListener(new ActionListener(nextAction));
 		
 		formData = new FormData();
-		formData.top = new FormAttachment(50, -(lblStatus.computeSize(SWT.DEFAULT, SWT.DEFAULT).y)/2);
+		formData.top = new FormAttachment(50, -(lblStatus.computeSize(SWT.DEFAULT, SWT.DEFAULT).y)/2 - seekBarHeight/2 - SEP);
+		formData.bottom = new FormAttachment(seekbar, -SEP);
 		formData.left = new FormAttachment(btnNext, SEP*2);
 		formData.right = new FormAttachment(btnOrderMode, -SEP);
 		lblStatus.setLayoutData(formData);
@@ -192,7 +198,7 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		formData = new FormData();
 		formData.top = new FormAttachment(0, SEP);
 		formData.right = new FormAttachment(videoParent, -SEP);
-		formData.bottom = new FormAttachment(100, -SEP);
+		formData.bottom = new FormAttachment(seekbar, -SEP);
 		btnOrderMode.setLayoutData(formData);
 		btnOrderMode.addSelectionListener(new DropMenuListener(btnOrderMode, menuOrderMode));
 		
@@ -227,7 +233,18 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		btnPref.setLayoutData(formData);
 		btnPref.addSelectionListener(new DropMenuListener(btnPref, menuPref));
 		
-		preferedHeight = SEP + btnStop.computeSize(SWT.DEFAULT, SWT.DEFAULT).y + SEP;
+		formData = new FormData();
+		formData.top = new FormAttachment(btnStop, SEP);
+		formData.left = new FormAttachment(0, SEP);
+		formData.right = new FormAttachment(100, -SEP);
+		formData.height = seekBarHeight;
+		seekbar.setLayoutData(formData);
+		seekbarPainter = new SeekbarPainter((seekbar));
+		seekbar.addPaintListener(seekbarPainter);
+		seekbar.addMouseListener(new SeekbarMouseListener(seekbar));
+		
+		preferedHeight = SEP + btnStop.computeSize(SWT.DEFAULT, SWT.DEFAULT).y + SEP
+				+ seekBarHeight + SEP;
 	}
 	
 	@Override
@@ -243,6 +260,63 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 	public int getSizeFlags(boolean width) {
 		return SWT.MAX;
 	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Seekbar.
+	
+	private SeekbarPainter seekbarPainter = null;
+	
+	private class SeekbarPainter implements PaintListener {
+		
+		private final Canvas canvas;
+		private int n = 0;
+		private int N = 0;
+
+		public SeekbarPainter (Canvas canvas) {
+			this.canvas = canvas;
+		}
+		
+		public void setProgress (int n, int N) {
+			this.n = n;
+			this.N = N;
+			canvas.redraw();
+		}
+		
+		@Override
+		public void paintControl(PaintEvent e) {
+			Rectangle clientArea = canvas.getClientArea();
+			
+			e.gc.setBackground(e.gc.getForeground());
+			e.gc.fillRectangle(0, clientArea.height/2 - 1, clientArea.width, 2);
+			
+			if (N > 0) {
+				e.gc.fillRectangle(0, 0, (int) ((n / (double)N) * clientArea.width), clientArea.height - 1);
+			}
+		}
+		
+	};
+	
+	private class SeekbarMouseListener implements MouseListener {
+		
+		private Canvas canvas;
+
+		public SeekbarMouseListener (Canvas canvas) {
+			this.canvas = canvas;
+		}
+		
+		@Override
+		public void mouseUp(MouseEvent e) {
+			double s = e.x / (double) canvas.getClientArea().width;
+			if (s >= 0 && s <= 1) {
+				seekTo(s);
+			}
+		}
+		
+		@Override
+		public void mouseDown(MouseEvent e) {}
+		@Override
+		public void mouseDoubleClick(MouseEvent e) {}
+	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Events.
@@ -280,6 +354,8 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 			verb = verb + " " + TimeHelper.formatTime(getCurrentPosition());
 			if (getCurrentTrackDuration() > 0) {
 				verb = verb + " of " + TimeHelper.formatTime(getCurrentTrackDuration());
+				
+				seekbarPainter.setProgress((int) getCurrentPosition(), getCurrentTrackDuration());
 			}
 		}
 		lblStatus.setText(verb + ".");

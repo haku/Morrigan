@@ -151,6 +151,10 @@ public class PlaybackEngine  implements IPlaybackEngine {
 		}
 	}
 	
+	public void seekTo(double d) throws PlaybackException {
+		throw new NotImplementedException();
+	}
+	
 	@Override
 	public void setStatusListener(IPlaybackStatusListener listener) {
 		this.listener = listener;

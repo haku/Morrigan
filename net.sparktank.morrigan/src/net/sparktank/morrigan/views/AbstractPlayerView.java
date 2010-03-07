@@ -437,6 +437,14 @@ public abstract class AbstractPlayerView extends ViewPart {
 		}
 	}
 	
+	public void seekTo (double d) {
+		try {
+			internal_seekTo(d);
+		} catch (PlaybackException e) {
+			new MorriganMsgDlg(e).open();
+		}
+	}
+	
 	private void internal_pausePlaying () throws PlaybackException {
 		// Don't go and make a player engine instance.
 		IPlaybackEngine eng = getPlaybackEngine(false);
@@ -474,6 +482,13 @@ public abstract class AbstractPlayerView extends ViewPart {
 			eng.unloadFile();
 			
 			callUpdateStatus();
+		}
+	}
+	
+	protected void internal_seekTo (double d) throws PlaybackException {
+		IPlaybackEngine eng = getPlaybackEngine(false);
+		if (eng!=null) {
+			eng.seekTo(d);
 		}
 	}
 	
