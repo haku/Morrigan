@@ -1,11 +1,14 @@
 package net.sparktank.morrigan.preferences;
 
+import java.util.Arrays;
+
 import net.sparktank.morrigan.Activator;
+import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.dialogs.RunnableDialog;
 import net.sparktank.morrigan.engines.HotkeyKeys;
 import net.sparktank.morrigan.engines.HotkeyRegister;
 import net.sparktank.morrigan.engines.hotkey.HotkeyValue;
-import net.sparktank.morrigan.dialogs.*;
+
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
@@ -135,7 +138,9 @@ public class HotkeyPref extends PreferencePage implements IWorkbenchPreferencePa
 			label.setText("key");
 			
 			cmbKey = new Combo (group, SWT.READ_ONLY);
-			cmbKey.setItems(HotkeyKeys.HkKeys.values().toArray(new String[HotkeyKeys.HkKeys.values().size()]));
+			String[] keys = HotkeyKeys.HkKeys.values().toArray(new String[HotkeyKeys.HkKeys.values().size()]);
+			Arrays.sort(keys);
+			cmbKey.setItems(keys);
 			
 			chkCtrl  = makeCheckBox(group, "ctrl",  false);
 			chkShift = makeCheckBox(group, "shift", false);
