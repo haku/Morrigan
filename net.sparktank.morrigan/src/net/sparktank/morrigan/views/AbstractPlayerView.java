@@ -13,6 +13,7 @@ import net.sparktank.morrigan.editors.MediaListEditor;
 import net.sparktank.morrigan.engines.EngineFactory;
 import net.sparktank.morrigan.engines.HotkeyRegister;
 import net.sparktank.morrigan.engines.common.ImplException;
+import net.sparktank.morrigan.engines.hotkey.IHotkeyEngine;
 import net.sparktank.morrigan.engines.hotkey.IHotkeyListener;
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine;
 import net.sparktank.morrigan.engines.playback.IPlaybackStatusListener;
@@ -424,7 +425,6 @@ public abstract class AbstractPlayerView extends ViewPart {
 	public void stopPlaying () {
 		try {
 			internal_stopPlaying();
-			callUpdateStatus();
 		} catch (PlaybackException e) {
 			new MorriganMsgDlg(e).open();
 		}
@@ -472,6 +472,8 @@ public abstract class AbstractPlayerView extends ViewPart {
 		if (eng!=null) {
 			eng.stopPlaying();
 			eng.unloadFile();
+			
+			callUpdateStatus();
 		}
 	}
 	
@@ -898,7 +900,20 @@ public abstract class AbstractPlayerView extends ViewPart {
 		public void onKeyPress(int id) {
 			switch (id) {
 				
-				case HotkeyRegister.HK_PLAYPAUSE:
+				case IHotkeyEngine.MORRIGAN_HK_STOP:
+					getSite().getShell().getDisplay().asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							try {
+								internal_stopPlaying();
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+						}
+					});
+					break;
+					
+				case IHotkeyEngine.MORRIGAN_HK_PLAYPAUSE:
 					/* Calling a JNI method in one DLL
 					 * from JNI thread in a different DLL
 					 * seems to cause Bad Things to happen.
@@ -909,13 +924,26 @@ public abstract class AbstractPlayerView extends ViewPart {
 						public void run() {
 							try {
 								internal_pausePlaying();
-							} catch (PlaybackException e) {
+							} catch (Exception e) {
 								e.printStackTrace();
 							}
 						}
 					});
 					break;
 				
+				case IHotkeyEngine.MORRIGAN_HK_NEXT:
+					getSite().getShell().getDisplay().asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							try {
+								nextTrack();
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+						}
+					});
+					break;
+					
 				default:
 					getSite().getShell().getDisplay().asyncExec(new RunnableDialog("id="+id));
 					break;
