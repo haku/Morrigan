@@ -364,12 +364,32 @@ public class PlaybackEngine implements IPlaybackEngine {
 		}
 	}
 	
+	private long lastPosition = -1;
+	private int lastDuration = -1;
+	
 	private class WatcherThread extends Thread {
 		public void run() {
 			while (!m_stopWatching) {
 				
 				if (playbin!=null) {
-					callPositionListener(playbin.queryPosition(TimeUnit.SECONDS));
+					long position = playbin.queryPosition(TimeUnit.SECONDS);
+					if (position != lastPosition) {
+						callPositionListener(position);
+						
+						if (lastPosition > position) {
+							lastDuration = -1;
+						}
+						
+						if (lastDuration < 1) {
+							long duration = playbin.queryDuration(TimeUnit.SECONDS);
+							if (duration > 0) {
+								lastDuration = (int) duration;
+								callDurationListener(lastDuration);
+							}
+						}
+						
+						lastPosition = position;
+					}
 				}
 				
 				try {
@@ -400,14 +420,15 @@ public class PlaybackEngine implements IPlaybackEngine {
 		if (listener!=null) listener.statusChanged(state);
 	}
 	
-	private long lastPosition = -1;
-	
 	private void callPositionListener (long position) {
 		if (listener!=null) {
-			if (position != lastPosition) {
-				listener.positionChanged(position);
-			}
-			lastPosition = position;
+			listener.positionChanged(position);
+		}
+	}
+	
+	private void callDurationListener (int duration) {
+		if (listener!=null) {
+			listener.durationChanged(duration);
 		}
 	}
 	
