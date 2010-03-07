@@ -197,27 +197,10 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		btnOrderMode.setText(getPlaybackOrder().toString());
 		formData = new FormData();
 		formData.top = new FormAttachment(0, SEP);
-		formData.right = new FormAttachment(videoParent, -SEP);
+		formData.right = new FormAttachment(btnQueue, -SEP);
 		formData.bottom = new FormAttachment(seekbar, -SEP);
 		btnOrderMode.setLayoutData(formData);
 		btnOrderMode.addSelectionListener(new DropMenuListener(btnOrderMode, menuOrderMode));
-		
-		formData = new FormData();
-		formData.top = new FormAttachment(0, SEP);
-		formData.right = new FormAttachment(btnFullscreen, -SEP);
-		formData.bottom = new FormAttachment(100, -SEP);
-		formData.width = 80;
-		videoParent.setLayoutData(formData);
-		videoParent.setLayout(new FillLayout());
-		videoParent.addPaintListener(new ScreenPainter(videoParent, ScreenType.TINY));
-		setLocalMediaFrameParent(videoParent);
-		
-		btnFullscreen.setImage(iconScreen);
-		formData = new FormData();
-		formData.top = new FormAttachment(0, SEP);
-		formData.right = new FormAttachment(btnQueue, -SEP);
-		btnFullscreen.setLayoutData(formData);
-		btnFullscreen.addSelectionListener(new DropMenuListener(btnFullscreen, menuFullscreen));
 		
 		btnQueue.setImage(iconQueue);
 		formData = new FormData();
@@ -229,14 +212,31 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		btnPref.setImage(iconPref);
 		formData = new FormData();
 		formData.top = new FormAttachment(0, SEP);
-		formData.right = new FormAttachment(100, -SEP);
+		formData.right = new FormAttachment(btnFullscreen, -SEP);
 		btnPref.setLayoutData(formData);
 		btnPref.addSelectionListener(new DropMenuListener(btnPref, menuPref));
+		
+		btnFullscreen.setImage(iconScreen);
+		formData = new FormData();
+		formData.top = new FormAttachment(0, SEP);
+		formData.right = new FormAttachment(videoParent, -SEP);
+		btnFullscreen.setLayoutData(formData);
+		btnFullscreen.addSelectionListener(new DropMenuListener(btnFullscreen, menuFullscreen));
+		
+		formData = new FormData();
+		formData.top = new FormAttachment(0, SEP);
+		formData.right = new FormAttachment(100, -SEP);
+		formData.bottom = new FormAttachment(100, -SEP);
+		formData.width = 80;
+		videoParent.setLayoutData(formData);
+		videoParent.setLayout(new FillLayout());
+		videoParent.addPaintListener(new ScreenPainter(videoParent, ScreenType.TINY));
+		setLocalMediaFrameParent(videoParent);
 		
 		formData = new FormData();
 		formData.top = new FormAttachment(btnStop, SEP);
 		formData.left = new FormAttachment(0, SEP);
-		formData.right = new FormAttachment(100, -SEP);
+		formData.right = new FormAttachment(videoParent, -SEP);
 		formData.height = seekBarHeight;
 		seekbar.setLayoutData(formData);
 		seekbarPainter = new SeekbarPainter((seekbar));
