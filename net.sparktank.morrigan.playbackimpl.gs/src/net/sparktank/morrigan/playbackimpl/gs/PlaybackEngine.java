@@ -136,6 +136,13 @@ public class PlaybackEngine implements IPlaybackEngine {
 		return playbin.queryPosition(TimeUnit.SECONDS);
 	}
 	
+	public void seekTo(double d) throws PlaybackException {
+		if (playbin!=null) {
+			long duration = playbin.queryDuration(TimeUnit.NANOSECONDS);
+			playbin.seek(1.0d, Format.TIME, SeekFlags.FLUSH, SeekType.SET, (long) (d * duration), SeekType.NONE, -1);
+		}
+	}
+	
 	@Override
 	public void setStatusListener(IPlaybackStatusListener listener) {
 		this.listener = listener;

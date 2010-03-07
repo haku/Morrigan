@@ -156,6 +156,16 @@ public class PlaybackEngine implements IPlaybackEngine {
 	}
 	
 	@Override
+	public void seekTo(double d) throws PlaybackException {
+		if (dsMovie!=null) {
+			int duration = dsMovie.getDuration();
+			if (duration > 0) {
+				dsMovie.setTimeValue((int) (d * duration));
+			}
+		}
+	}
+	
+	@Override
 	public void setStatusListener(IPlaybackStatusListener listener) {
 		this.listener = listener;
 	}
@@ -469,7 +479,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 					|| (dsMovie!=null && dsMovie.hasMediaOfType(DSMediaType.WMMEDIATYPE_Video))
 					) {
 				
-				DSJUtils.setScreenSaverActive(active); // FIXME crashes JVM ???
+//				DSJUtils.setScreenSaverActive(active); // FIXME crashes JVM ???
 				
 				boolean a = DSJUtils.getScreenSaverActive();
 				if (active == a) {

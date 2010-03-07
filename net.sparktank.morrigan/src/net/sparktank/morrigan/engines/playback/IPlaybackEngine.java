@@ -104,6 +104,13 @@ public interface IPlaybackEngine {
 	public long getPlaybackProgress () throws PlaybackException;
 	
 	/**
+	 * Seek to a specific position in the track.
+	 * @param d a double where 0 <= d <= 1.
+	 * @throws PlaybackException
+	 */
+	public void seekTo (double d) throws PlaybackException;
+	
+	/**
 	 * The methods in this class will be called when their event occures.
 	 * @param listener
 	 */
