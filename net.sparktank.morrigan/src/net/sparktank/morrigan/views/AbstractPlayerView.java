@@ -34,6 +34,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IMemento;
+import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
 
@@ -66,6 +68,28 @@ public abstract class AbstractPlayerView extends ViewPart {
 	
 	protected boolean isDisposed () {
 		return isDisposed;
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	State.
+	
+	private static final String KEY_ORDERMODE = "KEY_ORDERMODE";
+	
+	@Override
+	public void init(IViewSite site, IMemento memento) throws PartInitException {
+		super.init(site, memento);
+		
+		String modeName = memento.getString(KEY_ORDERMODE);
+		if (modeName != null) {
+			setPlaybackOrder(OrderHelper.parsePlaybackOrderByName(modeName));
+		}
+	}
+	
+	@Override
+	public void saveState(IMemento memento) {
+		memento.putString(KEY_ORDERMODE, getPlaybackOrder().name());
+		
+		super.saveState(memento);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
