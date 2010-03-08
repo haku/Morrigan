@@ -1,6 +1,8 @@
 package net.sparktank.morrigan.playbackimpl.gs;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine;
@@ -14,12 +16,15 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.widgets.Composite;
 import org.gstreamer.Bus;
+import org.gstreamer.ElementFactory;
 import org.gstreamer.Format;
 import org.gstreamer.Gst;
 import org.gstreamer.GstObject;
 import org.gstreamer.SeekFlags;
 import org.gstreamer.SeekType;
 import org.gstreamer.State;
+import org.gstreamer.TagList;
+import org.gstreamer.Bus.TAG;
 import org.gstreamer.elements.PlayBin;
 import org.gstreamer.swt.overlay.VideoComponent;
 
@@ -65,7 +70,40 @@ public class PlaybackEngine implements IPlaybackEngine {
 	
 	@Override
 	public int readFileDuration(String filepath) throws PlaybackException {
-		return -1;
+		initGst();
+		
+		final List<TagList> tagList = new ArrayList<TagList>();
+		
+		PlayBin playb = new PlayBin("Metadata");
+		playb.setVideoSink(ElementFactory.make("fakesink", "videosink"));
+		playb.setInputFile(new File(filepath));
+		
+		TAG tagBus = new Bus.TAG() {
+			@Override
+			public void tagsFound(GstObject arg0, TagList fileTags) {
+				tagList.add(fileTags);
+			}
+		};
+		
+		playb.getBus().connect(tagBus);
+		playb.setState(State.PAUSED);
+		
+		while (true) {
+			if (tagList.size() > 0) {
+				break;
+			}
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {}
+		}
+		
+		playb.setState(State.NULL);
+		playb.getBus().disconnect(tagBus);
+		playb.dispose();
+		
+		int d = Integer.parseInt((String) tagList.get(0).getValues("totalduration").get(0));
+		
+		return d;
 	}
 	
 	@Override
@@ -154,6 +192,14 @@ public class PlaybackEngine implements IPlaybackEngine {
 	private PlayBin playbin = null;
 	private VideoComponent videoComponent = null;
 	
+	private boolean inited = false;
+	
+	private void initGst () {
+		if (inited) return;
+		Gst.init("VideoPlayer", new String[] {});
+		inited = true;
+	}
+	
 	private void finalisePlayback () {
 		System.out.println("finalisePlayback()");
 		
@@ -181,7 +227,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 		System.out.println("firstLoad=" + firstLoad);
 		
 		if (firstLoad) {
-			Gst.init("VideoPlayer", new String[] {});
+			initGst();
 			playbin = new PlayBin("VideoPlayer");
 			
 			playbin.getBus().connect(eosBus);
