@@ -214,6 +214,8 @@ public class PlaybackEngine implements IPlaybackEngine {
 			finalisePlayback();
 		}
 		
+		setScreenSaverActive(false); // FIXME THIS IS A WORKAROUND!
+		
 		dsMovie = new DSMovie(filepath,
 				DSFiltergraph.OVERLAY | DSFiltergraph.MOUSE_ENABLED | DSFiltergraph.INIT_PAUSED,
 				propertyChangeLlistener);
@@ -358,7 +360,6 @@ public class PlaybackEngine implements IPlaybackEngine {
 			dsMovie.play();
 			startWatcherThread();
 			callStateListener(PlayState.Playing);
-			setScreenSaverActive(false);
 		}
 	}
 	
@@ -372,9 +373,9 @@ public class PlaybackEngine implements IPlaybackEngine {
 	
 	private void resumeTrack () {
 		if (dsMovie!=null) {
+			setScreenSaverActive(false);
 			dsMovie.play();
 			callStateListener(PlayState.Playing);
-			setScreenSaverActive(false);
 		}
 	}
 	
@@ -473,13 +474,11 @@ public class PlaybackEngine implements IPlaybackEngine {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Screen saver.
 	
-	synchronized private void setScreenSaverActive (boolean active) {
+	private void setScreenSaverActive (boolean active) {
 		if (DSJUtils.getScreenSaverActive()!=active) {
-			if (active
-					|| (dsMovie!=null && dsMovie.hasMediaOfType(DSMediaType.WMMEDIATYPE_Video))
-					) {
+			if (active || (dsMovie!=null && dsMovie.hasMediaOfType(DSMediaType.WMMEDIATYPE_Video)) ) {
 				
-//				DSJUtils.setScreenSaverActive(active); // FIXME crashes JVM ???
+				DSJUtils.setScreenSaverActive(active); // FIXME crashes JVM ???
 				
 				boolean a = DSJUtils.getScreenSaverActive();
 				if (active == a) {
