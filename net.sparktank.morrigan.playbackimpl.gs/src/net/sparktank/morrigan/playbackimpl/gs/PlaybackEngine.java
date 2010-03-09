@@ -85,6 +85,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 			} catch (InterruptedException e) {}
 		}
 		playb.setState(State.NULL);
+		playb.dispose();
 		
 		return (int) queryDuration;
 	}
