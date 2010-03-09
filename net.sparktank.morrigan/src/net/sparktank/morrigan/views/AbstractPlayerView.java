@@ -80,9 +80,11 @@ public abstract class AbstractPlayerView extends ViewPart {
 	public void init(IViewSite site, IMemento memento) throws PartInitException {
 		super.init(site, memento);
 		
-		String modeName = memento.getString(KEY_ORDERMODE);
-		if (modeName != null) {
-			setPlaybackOrder(OrderHelper.parsePlaybackOrderByName(modeName));
+		if (memento != null) {
+			String modeName = memento.getString(KEY_ORDERMODE);
+			if (modeName != null) {
+				setPlaybackOrder(OrderHelper.parsePlaybackOrderByName(modeName));
+			}
 		}
 	}
 	
