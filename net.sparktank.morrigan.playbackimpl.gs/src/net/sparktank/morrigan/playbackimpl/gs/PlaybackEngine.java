@@ -1,8 +1,6 @@
 package net.sparktank.morrigan.playbackimpl.gs;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine;
@@ -23,8 +21,6 @@ import org.gstreamer.GstObject;
 import org.gstreamer.SeekFlags;
 import org.gstreamer.SeekType;
 import org.gstreamer.State;
-import org.gstreamer.TagList;
-import org.gstreamer.Bus.TAG;
 import org.gstreamer.elements.PlayBin;
 import org.gstreamer.swt.overlay.VideoComponent;
 
@@ -69,41 +65,28 @@ public class PlaybackEngine implements IPlaybackEngine {
 	}
 	
 	@Override
-	public int readFileDuration(String filepath) throws PlaybackException {
+	public int readFileDuration(final String filepath) throws PlaybackException {
 		initGst();
-		
-		final List<TagList> tagList = new ArrayList<TagList>();
 		
 		PlayBin playb = new PlayBin("Metadata");
 		playb.setVideoSink(ElementFactory.make("fakesink", "videosink"));
 		playb.setInputFile(new File(filepath));
-		
-		TAG tagBus = new Bus.TAG() {
-			@Override
-			public void tagsFound(GstObject arg0, TagList fileTags) {
-				tagList.add(fileTags);
-			}
-		};
-		
-		playb.getBus().connect(tagBus);
 		playb.setState(State.PAUSED);
 		
+		long queryDuration = -1;
+		long startTime = System.currentTimeMillis();
 		while (true) {
-			if (tagList.size() > 0) {
+			queryDuration = playb.queryDuration(TimeUnit.SECONDS);
+			if (queryDuration > 0 || System.currentTimeMillis() - startTime > 5000) {
 				break;
 			}
 			try {
-				Thread.sleep(100);
+				Thread.sleep(200);
 			} catch (InterruptedException e) {}
 		}
-		
 		playb.setState(State.NULL);
-		playb.getBus().disconnect(tagBus);
-		playb.dispose();
 		
-		int d = Integer.parseInt((String) tagList.get(0).getValues("totalduration").get(0));
-		
-		return d;
+		return (int) queryDuration;
 	}
 	
 	@Override
