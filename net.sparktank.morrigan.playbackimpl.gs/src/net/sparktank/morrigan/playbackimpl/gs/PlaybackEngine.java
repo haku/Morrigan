@@ -115,6 +115,8 @@ public class PlaybackEngine implements IPlaybackEngine {
 
 	@Override
 	public void startPlaying() throws PlaybackException {
+		System.out.println("gs.startPlaying() called on thread " + Thread.currentThread().getId() + " : " + Thread.currentThread().getName());
+		
 		m_stopPlaying = false;
 		
 		try {
