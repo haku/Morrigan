@@ -218,7 +218,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 			
 			playbin.getBus().connect(eosBus);
 			playbin.getBus().connect(stateChangedBus);
-			playbin.getBus().connect(durationBus);
+//			playbin.getBus().connect(durationBus);
 			
 			reparentVideo();
 			
@@ -315,14 +315,14 @@ public class PlaybackEngine implements IPlaybackEngine {
 		}
 	};
 	
-	private Bus.DURATION durationBus = new Bus.DURATION() {
-		@Override
-		public void durationChanged(GstObject source, Format format, long duration) {
-			if (source == playbin) {
-				System.out.println("durationBus: duration=" + duration);
-			}
-		}
-	};
+//	private Bus.DURATION durationBus = new Bus.DURATION() {
+//		@Override
+//		public void durationChanged(GstObject source, Format format, long duration) {
+//			if (source == playbin) {
+//				System.out.println("durationBus: duration=" + duration);
+//			}
+//		}
+//	};
 	
 	private KeyListener keyListener = new KeyListener() {
 		@Override
