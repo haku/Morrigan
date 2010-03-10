@@ -122,29 +122,32 @@ public class LibraryUpdateTask extends Job {
 					
 					File dirItem = dirStack.pop();
 					File[] listFiles = dirItem.listFiles();
-					
-					monitor.subTask("Scanning "+dirItem.getAbsolutePath());
-					
-					for (File file : listFiles) {
-						if (monitor.isCanceled()) break;
+					if (listFiles != null) {
+						monitor.subTask("Scanning " + dirItem.getAbsolutePath());
 						
-						if (file.isDirectory()) {
-							dirStack.push(file);
+						for (File file : listFiles) {
+							if (monitor.isCanceled()) break;
 							
-						} else if (file.isFile()) {
-							String ext = file.getName();
-							ext = ext.substring(ext.lastIndexOf(".")+1).toLowerCase();
-							if (supportedFormats.contains(ext)) {
-								try {
-									if (library.addFile(file)) {
-										filesAdded++;
+							if (file.isDirectory()) {
+								dirStack.push(file);
+								
+							} else if (file.isFile()) {
+								String ext = file.getName();
+								ext = ext.substring(ext.lastIndexOf(".") + 1).toLowerCase();
+								if (supportedFormats.contains(ext)) {
+									try {
+										if (library.addFile(file)) {
+											filesAdded++;
+										}
+									} catch (MorriganException e) {
+										// FIXME log this somewhere useful.
+										e.printStackTrace();
 									}
-								} catch (MorriganException e) {
-									// FIXME log this somewhere useful.
-									e.printStackTrace();
 								}
 							}
 						}
+					} else {
+						System.err.println("Failed to read directory: " + dirItem.getAbsolutePath());
 					}
 				}
 			}
