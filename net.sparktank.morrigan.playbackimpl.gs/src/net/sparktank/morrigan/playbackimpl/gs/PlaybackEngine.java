@@ -227,7 +227,9 @@ public class PlaybackEngine implements IPlaybackEngine {
 			reparentVideo();
 		}
 		
+		System.out.println("About to set input file to '"+filepath+"'...");
         playbin.setInputFile(new File(filepath));
+        System.out.println("Set file input file.");
 	}
 	
 	private void reparentVideo () {
@@ -343,11 +345,15 @@ public class PlaybackEngine implements IPlaybackEngine {
 	};
 	
 	private void playTrack () {
+		System.out.println("Entering playTrack().");
+		
 		if (playbin!=null) {
 			playbin.setState(State.PLAYING);
-			startWatcherThread();
 			callStateListener(PlayState.Playing);
+			startWatcherThread();
 		}
+		
+		System.out.println("Leaving playTrack().");
 	}
 	
 	private void pauseTrack () {
@@ -376,10 +382,14 @@ public class PlaybackEngine implements IPlaybackEngine {
 	private Thread watcherThread = null;
 	
 	private void startWatcherThread () {
+		System.out.println("Entering startWatcherThread().");
+		
 		m_stopWatching = false;
 		watcherThread = new WatcherThread();
 		watcherThread.setDaemon(true);
 		watcherThread.start();
+		
+		System.out.println("Leaving startWatcherThread().");
 	}
 	
 	private void stopWatcherThread () {
@@ -448,8 +458,12 @@ public class PlaybackEngine implements IPlaybackEngine {
 	}
 	
 	private void callStateListener (PlayState state) {
+		System.out.println("Entering callStateListener().");
+		
 		this.playbackState = state;
 		if (listener!=null) listener.statusChanged(state);
+		
+		System.out.println("Leaving callStateListener().");
 	}
 	
 	private void callPositionListener (long position) {
