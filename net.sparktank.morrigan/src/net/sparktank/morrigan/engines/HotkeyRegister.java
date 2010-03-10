@@ -34,6 +34,7 @@ public class HotkeyRegister {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private static boolean configRead = false;
+	private static List<Integer> registeredHotkeys = new ArrayList<Integer>();
 	
 	synchronized public static void readConfig (boolean force) throws MorriganException {
 		if (configRead && !force) return;
@@ -43,18 +44,21 @@ public class HotkeyRegister {
 		HotkeyValue hkStop = HotkeyPref.getHkStop();
 		if (hkStop!=null) {
 			getHotkeyEngine(true).registerHotkey(IHotkeyEngine.MORRIGAN_HK_STOP, hkStop);
+			registeredHotkeys.add(IHotkeyEngine.MORRIGAN_HK_STOP);
 			System.out.println("registered MORRIGAN_HK_STOP: " + hkStop.toString());
 		}
 		
 		HotkeyValue hkPlaypause = HotkeyPref.getHkPlaypause();
 		if (hkPlaypause!=null) {
 			getHotkeyEngine(true).registerHotkey(IHotkeyEngine.MORRIGAN_HK_PLAYPAUSE, hkPlaypause);
+			registeredHotkeys.add(IHotkeyEngine.MORRIGAN_HK_PLAYPAUSE);
 			System.out.println("registered MORRIGAN_HK_PLAYPAUSE: " + hkPlaypause.toString());
 		}
 		
 		HotkeyValue hkNext = HotkeyPref.getHkNext();
 		if (hkNext!=null) {
 			getHotkeyEngine(true).registerHotkey(IHotkeyEngine.MORRIGAN_HK_NEXT, hkNext);
+			registeredHotkeys.add(IHotkeyEngine.MORRIGAN_HK_NEXT);
 			System.out.println("registered MORRIGAN_HK_NEXT: " + hkNext.toString());
 		}
 		
@@ -65,14 +69,25 @@ public class HotkeyRegister {
 		IHotkeyEngine engine = getHotkeyEngine(false);
 		
 		if (engine!=null) {
-			engine.unregisterHotkey(IHotkeyEngine.MORRIGAN_HK_STOP);
-			System.out.println("unregistered MORRIGAN_HK_STOP.");
+			System.out.println("Going to unregister hotkeys...");
 			
-			engine.unregisterHotkey(IHotkeyEngine.MORRIGAN_HK_PLAYPAUSE);
-			System.out.println("unregistered MORRIGAN_HK_PLAYPAUSE.");
+			if (registeredHotkeys.contains(IHotkeyEngine.MORRIGAN_HK_STOP)) {
+				engine.unregisterHotkey(IHotkeyEngine.MORRIGAN_HK_STOP);
+				registeredHotkeys.remove(new Integer(IHotkeyEngine.MORRIGAN_HK_STOP));
+				System.out.println("unregistered MORRIGAN_HK_STOP.");
+			}
 			
-			engine.unregisterHotkey(IHotkeyEngine.MORRIGAN_HK_NEXT);
-			System.out.println("unregistered MORRIGAN_HK_NEXT.");
+			if (registeredHotkeys.contains(IHotkeyEngine.MORRIGAN_HK_PLAYPAUSE)) {
+				engine.unregisterHotkey(IHotkeyEngine.MORRIGAN_HK_PLAYPAUSE);
+				registeredHotkeys.remove(new Integer(IHotkeyEngine.MORRIGAN_HK_PLAYPAUSE));
+				System.out.println("unregistered MORRIGAN_HK_PLAYPAUSE.");
+			}
+			
+			if (registeredHotkeys.contains(IHotkeyEngine.MORRIGAN_HK_NEXT)) {
+				engine.unregisterHotkey(IHotkeyEngine.MORRIGAN_HK_NEXT);
+				registeredHotkeys.remove(new Integer(IHotkeyEngine.MORRIGAN_HK_NEXT));
+				System.out.println("unregistered MORRIGAN_HK_NEXT.");
+			}
 		}
 		
 		configRead = false;
