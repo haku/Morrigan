@@ -93,6 +93,7 @@ public class HotkeyEngine implements IHotkeyEngine {
 		if (!haveSetup) return;
 		
 		JXGrabKey.getInstance().removeHotkeyListener(hotkeyListener);
+		JXGrabKey.getInstance().cleanUp();
 		
 		haveSetup = false;
 	}
