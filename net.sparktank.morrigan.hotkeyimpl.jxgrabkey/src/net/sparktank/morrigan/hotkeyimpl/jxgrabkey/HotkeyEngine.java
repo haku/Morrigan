@@ -147,6 +147,8 @@ public class HotkeyEngine implements IHotkeyEngine {
 		System.out.println("loaded so=" + soFile.getAbsolutePath());
 		
 		soLoaded = true;
+		
+		JXGrabKey.setDebugOutput(true);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
