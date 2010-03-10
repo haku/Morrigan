@@ -15,8 +15,8 @@ public class HotkeyRegister {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	synchronized public static void addHotkeyListener (IHotkeyListener listener) throws MorriganException {
-		readConfig(false);
 		if (!hotkeyListeners.contains(listener)) {
+			readConfig(false);
 			hotkeyListeners.add(listener);
 		}
 	}
@@ -72,18 +72,21 @@ public class HotkeyRegister {
 			System.out.println("Going to unregister hotkeys...");
 			
 			if (registeredHotkeys.contains(IHotkeyEngine.MORRIGAN_HK_STOP)) {
+				System.out.println("Going to unregister MORRIGAN_HK_STOP...");
 				engine.unregisterHotkey(IHotkeyEngine.MORRIGAN_HK_STOP);
 				registeredHotkeys.remove(new Integer(IHotkeyEngine.MORRIGAN_HK_STOP));
 				System.out.println("unregistered MORRIGAN_HK_STOP.");
 			}
 			
 			if (registeredHotkeys.contains(IHotkeyEngine.MORRIGAN_HK_PLAYPAUSE)) {
+				System.out.println("Going to unregister MORRIGAN_HK_PLAYPAUSE...");
 				engine.unregisterHotkey(IHotkeyEngine.MORRIGAN_HK_PLAYPAUSE);
 				registeredHotkeys.remove(new Integer(IHotkeyEngine.MORRIGAN_HK_PLAYPAUSE));
 				System.out.println("unregistered MORRIGAN_HK_PLAYPAUSE.");
 			}
 			
 			if (registeredHotkeys.contains(IHotkeyEngine.MORRIGAN_HK_NEXT)) {
+				System.out.println("Going to unregister MORRIGAN_HK_NEXT...");
 				engine.unregisterHotkey(IHotkeyEngine.MORRIGAN_HK_NEXT);
 				registeredHotkeys.remove(new Integer(IHotkeyEngine.MORRIGAN_HK_NEXT));
 				System.out.println("unregistered MORRIGAN_HK_NEXT.");
