@@ -16,6 +16,8 @@ public class MediaLibrary extends MediaList {
 	
 	public static final String TYPE = "LIBRARY";
 	
+	public static final boolean HIDEMISSING = true; // TODO like this to GUI?
+	
 	private SqliteLayer dbLayer;
 	private final String dbFilePath;
 	LibrarySort librarySort;
@@ -62,7 +64,7 @@ public class MediaLibrary extends MediaList {
 		if (!firstRead) return;
 		firstRead = false;
 		
-		List<MediaItem> allMedia = dbLayer.getAllMedia(librarySort, librarySortDirection);
+		List<MediaItem> allMedia = dbLayer.getAllMedia(librarySort, librarySortDirection, HIDEMISSING);
 		replaceList(allMedia);
 	}
 	
