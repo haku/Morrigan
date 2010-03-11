@@ -1,6 +1,7 @@
 package net.sparktank.morrigan.library;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -151,7 +152,9 @@ public class LibraryUpdateTask extends Job {
 					}
 				}
 			}
-		}
+		} // End directory scanning.
+		
+		System.out.println("Added " + filesAdded + " files.");
 		
 		IPlaybackEngine playbackEngine = null;
 		
@@ -224,9 +227,17 @@ public class LibraryUpdateTask extends Job {
 				monitor.worked(p - progress);
 				progress = p;
 			}
+		} // End metadata scanning.
+		
+		if (playbackEngine != null) {
+			playbackEngine.finalise();
 		}
 		
-		// Check for duplicates.
+		/*
+		 * Check for duplicates.
+		 */
+		monitor.subTask("Scanning for duplicates");
+		
 		Map<MediaItem, ScanOption> dupicateItems = new HashMap<MediaItem, ScanOption>();
 		
 		List<MediaItem> tracks = library.getMediaTracks();
@@ -269,9 +280,91 @@ public class LibraryUpdateTask extends Job {
 					}
 				}
 			}
-		}
+		} // End duplicate item scanning.
 		
 		if (dupicateItems.size() > 0) {
+			monitor.subTask("Merging duplicate items");
+			
+			/*
+			 * Print out what we are starting with.
+			 */
+			System.out.println("Duplicate items (count=" + dupicateItems.size() + "):");
+			for (MediaItem mi : dupicateItems.keySet()) {
+				System.out.println(dupicateItems.get(mi) + " : " + mi.getTitle());
+			}
+			
+			/*
+			 * Make a list of all the unique hashcodes we know.
+			 */
+			List<Long> hashcodes = new ArrayList<Long>();
+			for (MediaItem mi : dupicateItems.keySet()) {
+				Long l = new Long(mi.getHashcode());
+				if (!hashcodes.contains(l)) {
+					hashcodes.add(l);
+				}
+			}
+			
+			/*
+			 * Resolve each unique hashcode.
+			 */
+			for (Long l : hashcodes) {
+				if (monitor.isCanceled()) break;
+				
+				/*
+				 * Find all the entries for this hashcode.
+				 */
+				Map<MediaItem, ScanOption> items = new HashMap<MediaItem, ScanOption>();
+				for (MediaItem mi : dupicateItems.keySet()) {
+					if (mi.getHashcode() == l.longValue()) {
+						items.put(mi, dupicateItems.get(mi));
+					}
+				}
+				
+				/*
+				 * If there is only one entry that still exists,
+				 * merge metadata and remove bad references.
+				 * This is the only supported merge case at the
+				 * moment.
+				 */
+				if (countEntriesInMap(items, ScanOption.KEEP) == 1
+						&& countEntriesInMap(items, ScanOption.DELREF) == items.size()-1) {
+					
+					MediaItem keep = null;
+					for (MediaItem i : items.keySet()) {
+						if (items.get(i) == ScanOption.KEEP) keep = i;
+					}
+					items.remove(keep);
+					
+					if (keep == null) throw new NullPointerException("Something very bad happened.");
+					
+					/* Now merge:
+					 * start count, end count,
+					 * added data, last played data.
+					 * Then remove missing tracks from library.
+					 */
+					for (MediaItem i : items.keySet()) {
+						// TODO add more setters to DB layer.
+						// TODO add start count to keep.
+						// TODO add end count to keep.
+						// TODO resolve oldest added date.
+						// TODO resolve newest last played date.
+					}
+					
+					/*
+					 * Removed processed entries from duplicate
+					 * items list.
+					 */
+					dupicateItems.remove(keep);
+					for (MediaItem i : items.keySet()) {
+						dupicateItems.remove(i);
+					}
+				}
+				
+			} // End metadata merging.
+			
+			/*
+			 * Print out what are left with.
+			 */
 			System.out.println("Duplicate items (count=" + dupicateItems.size() + "):");
 			for (MediaItem mi : dupicateItems.keySet()) {
 				System.out.println(dupicateItems.get(mi) + " : " + mi.getTitle());
@@ -281,12 +374,7 @@ public class LibraryUpdateTask extends Job {
 			System.out.println("No duplicates found.");
 		}
 		
-		// TODO : duplicate and missing files (and metadata merging).
 		// TODO : vacuume DB?
-		
-		if (playbackEngine != null) {
-			playbackEngine.finalise();
-		}
 		
 		try {
 			library.reRead();
@@ -295,8 +383,6 @@ public class LibraryUpdateTask extends Job {
 			return new FailStatus("Failed to refresh the library.", e);
 		}
 		
-		System.out.println("Added " + filesAdded + " files.");
-		
 		if (monitor.isCanceled()) {
 			System.out.println("Task was canceled desu~.");
 		}
@@ -304,6 +390,16 @@ public class LibraryUpdateTask extends Job {
 		isFinished = true;
 		monitor.done();
 		return Status.OK_STATUS;
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	private int countEntriesInMap (Map<?, ?> map, Object value) {
+		int n = 0;
+		for (Object k : map.keySet()) {
+			if (map.get(k).equals(value)) n++;
+		}
+		return n;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
