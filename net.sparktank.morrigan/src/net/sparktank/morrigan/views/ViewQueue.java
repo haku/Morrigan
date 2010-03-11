@@ -1,12 +1,18 @@
 package net.sparktank.morrigan.views;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import net.sparktank.morrigan.Activator;
 import net.sparktank.morrigan.model.media.PlayItem;
 
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
@@ -82,6 +88,8 @@ public class ViewQueue extends ViewPart {
 		tableViewer.setContentProvider(contentProvider);
 		tableViewer.setLabelProvider(labelProvider);
 		tableViewer.setInput(getViewSite()); // use content provider.
+		
+		getViewSite().getActionBars().getToolBarManager().add(removeAction);
 	}
 	
 	private IStructuredContentProvider contentProvider = new IStructuredContentProvider() {
@@ -129,6 +137,47 @@ public class ViewQueue extends ViewPart {
 		public void dispose() {}
 		@Override
 		public void addListener(ILabelProviderListener listener) {}
+	};
+	
+	private ArrayList<PlayItem> getSelectedSources () {
+		ISelection selection = tableViewer.getSelection();
+		
+		if (selection==null) return null;
+		if (selection.isEmpty()) return null;
+		
+		if (selection instanceof IStructuredSelection) {
+			IStructuredSelection iSel = (IStructuredSelection) selection;
+			
+			ArrayList<PlayItem> ret = new ArrayList<PlayItem>();
+			for (Object selectedObject : iSel.toList()) {
+				if (selectedObject != null) {
+					if (selectedObject instanceof PlayItem) {
+						PlayItem item = (PlayItem) selectedObject;
+						ret.add(item);
+					}
+				}
+			}
+			return ret;
+		}
+		
+		return null;
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Actions.
+	
+	protected IAction removeAction = new Action("Remove", Activator.getImageDescriptor("icons/minus.gif")) {
+		@Override
+		public void run() {
+			ArrayList<PlayItem> selectedSources = getSelectedSources();
+			if (selectedSources==null || selectedSources.isEmpty()) {
+//				new MorriganMsgDlg("No items selected desu~.").open();
+				return;
+			}
+			for (PlayItem item : selectedSources) {
+				abstractPlayerView.removeFromQueue(item);
+			}
+		};
 	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
