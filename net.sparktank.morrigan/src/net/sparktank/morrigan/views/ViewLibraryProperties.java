@@ -190,6 +190,8 @@ public class ViewLibraryProperties extends ViewPart {
 	
 	private class AddAction extends Action {
 		
+		private String lastDir = null;
+		
 		public AddAction () {
 			super("add", Activator.getImageDescriptor("icons/plus.gif"));
 		}
@@ -207,8 +209,15 @@ public class ViewLibraryProperties extends ViewPart {
 			DirectoryDialog dlg = new DirectoryDialog(getSite().getShell());
 			dlg.setText("Add Source");
 			dlg.setMessage("Select a directory containing media.");
+			if (lastDir != null) {
+				dlg.setFilterPath(lastDir);
+			}
+			
 			String dir = dlg.open();
+			
 			if (dir != null) {
+				lastDir = dir;
+				
 				try {
 					library.addSource(dir);
 				} catch (DbException e) {
