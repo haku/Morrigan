@@ -26,6 +26,7 @@ import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
@@ -403,6 +404,14 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 				table.getTable().setSortColumn(column.getColumn());
 			}
 		};
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Showing.
+	
+	public void revealTrack (Object element) {
+		editTable.setSelection(new StructuredSelection(element), true);
+		editTable.getTable().setFocus();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

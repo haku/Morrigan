@@ -81,6 +81,7 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 	private Image iconStop;
 	private Image iconPrev;
 	private Image iconNext;
+	private Image iconFindInList;
 	private Image iconScreen;
 	private Image iconQueue;
 	private Image iconPref;
@@ -102,6 +103,7 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		iconStop = Activator.getImageDescriptor("icons/stop.gif").createImage();
 		iconPrev = Activator.getImageDescriptor("icons/prev.gif").createImage();
 		iconNext = Activator.getImageDescriptor("icons/next.gif").createImage();
+		iconFindInList = Activator.getImageDescriptor("icons/jumptolist.active.gif").createImage();
 		iconScreen = Activator.getImageDescriptor("icons/display.gif").createImage();
 		iconQueue = Activator.getImageDescriptor("icons/queue.gif").createImage();
 		iconPref = Activator.getImageDescriptor("icons/pref.gif").createImage();
@@ -161,6 +163,7 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		Button btnPrev = new Button(parent, SWT.PUSH);
 		Button btnNext = new Button(parent, SWT.PUSH);
 		lblStatus = new Label(parent, SWT.NONE);
+		Button btnFindInList = new Button(parent, SWT.PUSH);
 		videoParent = new Canvas(parent, SWT.NONE);
 		btnOrderMode = new Button(parent, SWT.PUSH);
 		Button btnFullscreen = new Button(parent, SWT.PUSH);
@@ -200,8 +203,16 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		formData.top = new FormAttachment(50, -(lblStatus.computeSize(SWT.DEFAULT, SWT.DEFAULT).y)/2 - seekBarHeight/2 - SEP);
 		formData.bottom = new FormAttachment(seekbar, -SEP);
 		formData.left = new FormAttachment(btnNext, SEP*2);
-		formData.right = new FormAttachment(btnOrderMode, -SEP);
+		formData.right = new FormAttachment(btnFindInList, -SEP);
 		lblStatus.setLayoutData(formData);
+		
+		btnFindInList.setImage(iconFindInList);
+		formData = new FormData();
+		formData.top = new FormAttachment(0, SEP);
+		formData.right = new FormAttachment(btnOrderMode, -SEP);
+		formData.bottom = new FormAttachment(seekbar, -SEP);
+		btnFindInList.setLayoutData(formData);
+		btnFindInList.addSelectionListener(new ActionListener(findInListAction));
 		
 		btnOrderMode.setText(getPlaybackOrder().toString());
 		formData = new FormData();

@@ -9,7 +9,11 @@ import net.sparktank.morrigan.Activator;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.dialogs.RunnableDialog;
 import net.sparktank.morrigan.display.FullscreenShell;
+import net.sparktank.morrigan.editors.EditorFactory;
+import net.sparktank.morrigan.editors.LibraryEditor;
 import net.sparktank.morrigan.editors.MediaListEditor;
+import net.sparktank.morrigan.editors.MediaListEditorInput;
+import net.sparktank.morrigan.editors.PlaylistEditor;
 import net.sparktank.morrigan.engines.EngineFactory;
 import net.sparktank.morrigan.engines.HotkeyRegister;
 import net.sparktank.morrigan.engines.common.ImplException;
@@ -24,7 +28,9 @@ import net.sparktank.morrigan.helpers.ClipboardHelper;
 import net.sparktank.morrigan.helpers.OrderHelper;
 import net.sparktank.morrigan.helpers.OrderHelper.PlaybackOrder;
 import net.sparktank.morrigan.model.media.MediaItem;
+import net.sparktank.morrigan.model.media.MediaLibrary;
 import net.sparktank.morrigan.model.media.MediaList;
+import net.sparktank.morrigan.model.media.MediaPlaylist;
 import net.sparktank.morrigan.model.media.PlayItem;
 
 import org.eclipse.jface.action.Action;
@@ -900,6 +906,41 @@ public abstract class AbstractPlayerView extends ViewPart {
 				new MorriganMsgDlg("No track loaded desu~.").open();
 			}
 		};
+	};
+	
+	/*
+	 * TODO merge this with normal editor open code?
+	 */
+	protected IAction findInListAction = new Action("Find in list") {
+		@Override
+		public void run() {
+			if (getCurrentItem() != null
+					&& getCurrentItem().list != null
+					&& getCurrentItem().item != null) {
+				
+				try {
+					if (getCurrentItem().list.getType() == MediaLibrary.TYPE) {
+						MediaListEditorInput<MediaLibrary> input = EditorFactory.getMediaLibraryInput(getCurrentItem().list.getListId());
+						getViewSite().getWorkbenchWindow().getActivePage().openEditor(input, LibraryEditor.ID);
+						
+					} else if (getCurrentItem().list.getType() == MediaPlaylist.TYPE) {
+						MediaListEditorInput<MediaPlaylist> input = EditorFactory.getMediaPlaylistInput(getCurrentItem().list.getListId());
+						getViewSite().getWorkbenchWindow().getActivePage().openEditor(input, PlaylistEditor.ID);
+						
+					}
+					
+					IEditorPart activeEditor = getViewSite().getWorkbenchWindow().getActivePage().getActiveEditor();
+					if (activeEditor instanceof MediaListEditor<?>) {
+						MediaListEditor<?> mediaListEditor = (MediaListEditor<?>) activeEditor;
+						mediaListEditor.revealTrack(getCurrentItem().item);
+					}
+					
+				} catch (Exception e) {
+					getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));
+				}
+				
+			}
+		}
 	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
