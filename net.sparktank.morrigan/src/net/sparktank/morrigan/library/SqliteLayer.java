@@ -40,9 +40,9 @@ public class SqliteLayer {
 		}
 	}
 	
-	public List<MediaItem> getAllMedia (LibrarySort sort, LibrarySortDirection direction) throws DbException {
+	public List<MediaItem> getAllMedia (LibrarySort sort, LibrarySortDirection direction, boolean hideMissing) throws DbException {
 		try {
-			return local_getAllMedia(sort, direction);
+			return local_getAllMedia(sort, direction, hideMissing);
 		} catch (Exception e) {
 			throw new DbException(e);
 		}
@@ -236,6 +236,12 @@ public class SqliteLayer {
 	    "lmd5, lduration, benabled, bmissing FROM tbl_mediafiles" +
 	    " ORDER BY {COL} {DIR};";
 	
+	private static final String SQL_TBL_MEDIAFILES_Q_NOTMISSING = 
+		"SELECT sfile, dadded, lstartcnt, lendcnt, dlastplay," +
+		"lmd5, lduration, benabled, bmissing FROM tbl_mediafiles" +
+		" WHERE (bmissing<>1 OR bmissing is NULL)" +
+		" ORDER BY {COL} {DIR};";
+	
 	private static final String SQL_TBL_MEDIAFILES_Q_EXISTS =
 		"SELECT count(*) FROM tbl_mediafiles WHERE sfile=? COLLATE NOCASE;";
 	
@@ -366,11 +372,17 @@ public class SqliteLayer {
 	
 	private SimpleDateFormat SQL_DATE = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
-	private List<MediaItem> local_getAllMedia (LibrarySort sort, LibrarySortDirection direction) throws SQLException, ClassNotFoundException {
+	private List<MediaItem> local_getAllMedia (LibrarySort sort, LibrarySortDirection direction, boolean hideMissing) throws SQLException, ClassNotFoundException {
 		PreparedStatement ps;
 		ResultSet rs;
 		
-		String sql = SQL_TBL_MEDIAFILES_Q_ALL;
+		String sql;
+		
+		if (hideMissing) {
+			sql = SQL_TBL_MEDIAFILES_Q_NOTMISSING;
+		} else {
+			sql = SQL_TBL_MEDIAFILES_Q_ALL;
+		}
 		
 		switch (direction) {
 			case ASC:
