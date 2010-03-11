@@ -94,17 +94,55 @@ public class SqliteLayer {
 		}
 	}
 	
-	public void incTrackStartCnt (String sfile) throws DbException {
+	/**
+	 * Inc start count by one and set last played date.
+	 * @param sfile
+	 * @throws DbException
+	 */
+	public void incTrackPlayed (String sfile) throws DbException {
 		try {
-			local_incTrackStartCnt(sfile);
+			local_incTrackStartCnt(sfile, 1);
+			local_setDateLastPlayed(sfile, new Date());
 		} catch (Exception e) {
 			throw new DbException(e);
 		}
 	}
 	
-	public void incTrackEndCnt (String sfile) throws DbException {
+	public void incTrackFinished (String sfile) throws DbException {
 		try {
-			local_incTrackEndCnt(sfile);
+			local_incTrackEndCnt(sfile, 1);
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+	
+	public void incTrackStartCnt (String sfile, long n) throws DbException {
+		try {
+			local_incTrackStartCnt(sfile, n);
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+	
+	public void incTrackEndCnt (String sfile, long n) throws DbException {
+		try {
+			local_incTrackEndCnt(sfile, n);
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+	
+	public void setDateLastPlayed (String sfile, Date date) throws DbException {
+		try {
+			local_setDateLastPlayed(sfile, date);
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+	
+	public void setDateAdded (String sfile, Date date) throws DbException {
+		try {
+			local_setDateAdded(sfile, date);
 		} catch (Exception e) {
 			throw new DbException(e);
 		}
@@ -182,7 +220,7 @@ public class SqliteLayer {
 //	Sources.
 	
 	private static final String SQL_TBL_SOURCES_Q_ALL =
-		"SELECT path FROM tbl_sources;";
+		"SELECT path FROM tbl_sources ORDER BY path ASC;";
 	
 	private static final String SQL_TBL_SOURCES_ADD =
 		"INSERT INTO tbl_sources (path) VALUES (?)";
@@ -209,11 +247,19 @@ public class SqliteLayer {
 		"DELETE FROM tbl_mediafiles WHERE sfile=?";
 	
 	private static final String SQL_TBL_MEDIAFILES_INCSTART =
-		"UPDATE tbl_mediafiles SET lstartcnt=lstartcnt+1,dlastplay=?" +
+		"UPDATE tbl_mediafiles SET lstartcnt=lstartcnt+?" +
         " WHERE sfile=?;";
 	
 	private static final String SQL_TBL_MEDIAFILES_INCEND =
-		"UPDATE tbl_mediafiles SET lendcnt=lendcnt+1" +
+		"UPDATE tbl_mediafiles SET lendcnt=lendcnt+?" +
+		" WHERE sfile=?;";
+	
+	private static final String SQL_TBL_MEDIAFILES_SETDATELASTPLAYED =
+		"UPDATE tbl_mediafiles SET dlastplay=?" +
+		" WHERE sfile=?;";
+	
+	private static final String SQL_TBL_MEDIAFILES_SETDATEADDED =
+		"UPDATE tbl_mediafiles SET dadded=?" +
 		" WHERE sfile=?;";
 	
 	private static final String SQL_TBL_MEDIAFILES_SETDURATION =
@@ -439,22 +485,45 @@ public class SqliteLayer {
 		return (ret > 0);
 	}
 	
-	private void local_incTrackStartCnt (String sfile) throws SQLException, ClassNotFoundException {
+	private void local_setDateAdded (String sfile, Date date) throws Exception, ClassNotFoundException {
 		PreparedStatement ps;
 		
-		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_INCSTART);
-		ps.setDate(1, new java.sql.Date(new Date().getTime()));
+		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETDATEADDED);
+		ps.setDate(1, new java.sql.Date(date.getTime()));
 		ps.setString(2, sfile);
 		ps.executeUpdate();
 		
 		ps.close();
 	}
 	
-	private void local_incTrackEndCnt (String sfile) throws SQLException, ClassNotFoundException {
+	private void local_incTrackStartCnt (String sfile, long n) throws SQLException, ClassNotFoundException {
+		PreparedStatement ps;
+		
+		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_INCSTART);
+		ps.setLong(1, n);
+		ps.setString(2, sfile);
+		ps.executeUpdate();
+		
+		ps.close();
+	}
+	
+	private void local_setDateLastPlayed (String sfile, Date date) throws SQLException, ClassNotFoundException {
+		PreparedStatement ps;
+		
+		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETDATELASTPLAYED);
+		ps.setDate(1, new java.sql.Date(date.getTime()));
+		ps.setString(2, sfile);
+		ps.executeUpdate();
+		
+		ps.close();
+	}
+	
+	private void local_incTrackEndCnt (String sfile, long n) throws SQLException, ClassNotFoundException {
 		PreparedStatement ps;
 		
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_INCEND);
-		ps.setString(1, sfile);
+		ps.setLong(1, n);
+		ps.setString(2, sfile);
 		ps.executeUpdate();
 		
 		ps.close();

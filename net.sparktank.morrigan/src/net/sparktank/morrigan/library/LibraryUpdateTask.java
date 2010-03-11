@@ -255,11 +255,12 @@ public class LibraryUpdateTask extends Job {
 							boolean b = new File(tracks.get(j).getFilepath()).exists();
 							
 							if (a && b) { // Both exist.
+								// TODO prompt to move the newer one?
 								if (!dupicateItems.containsKey(tracks.get(i))) {
 									dupicateItems.put(tracks.get(i), ScanOption.KEEP);
 								}
 								if (!dupicateItems.containsKey(tracks.get(j))) {
-									dupicateItems.put(tracks.get(j), ScanOption.DELREF);
+									dupicateItems.put(tracks.get(j), ScanOption.MOVEFILE);
 								}
 								
 							} else if (a != b) { // Only one exists.
@@ -284,14 +285,6 @@ public class LibraryUpdateTask extends Job {
 		
 		if (dupicateItems.size() > 0) {
 			monitor.subTask("Merging duplicate items");
-			
-			/*
-			 * Print out what we are starting with.
-			 */
-			System.out.println("Duplicate items (count=" + dupicateItems.size() + "):");
-			for (MediaItem mi : dupicateItems.keySet()) {
-				System.out.println(dupicateItems.get(mi) + " : " + mi.getTitle());
-			}
 			
 			/*
 			 * Make a list of all the unique hashcodes we know.
@@ -343,11 +336,32 @@ public class LibraryUpdateTask extends Job {
 					 * Then remove missing tracks from library.
 					 */
 					for (MediaItem i : items.keySet()) {
-						// TODO add more setters to DB layer.
-						// TODO add start count to keep.
-						// TODO add end count to keep.
-						// TODO resolve oldest added date.
-						// TODO resolve newest last played date.
+						try {
+							library.incTrackStartCnt(keep, i.getStartCount());
+							library.incTrackEndCnt(keep, i.getEndCount());
+							
+							if (i.getDateAdded() != null) {
+								if (keep.getDateAdded() == null
+										|| keep.getDateAdded().getTime() > i.getDateAdded().getTime()) {
+									library.setDateAdded(keep, i.getDateAdded());
+								}
+							}
+							
+							if (i.getDateLastPlayed() != null) {
+								if (keep.getDateLastPlayed() == null
+										|| keep.getDateLastPlayed().getTime() < i.getDateLastPlayed().getTime()) {
+									library.setDateLastPlayed(keep, i.getDateLastPlayed());
+								}
+							}
+							
+							library.removeMediaTrack(i);
+							
+						} catch (Throwable t) {
+							// FIXME log this somewhere useful.
+							System.err.println("Throwable while setting merged metadate for '"+i.getFilepath()+"': " + t.getMessage());
+							t.printStackTrace();
+						}
+						
 					}
 					
 					/*
@@ -365,7 +379,7 @@ public class LibraryUpdateTask extends Job {
 			/*
 			 * Print out what are left with.
 			 */
-			System.out.println("Duplicate items (count=" + dupicateItems.size() + "):");
+			System.out.println("Found " + dupicateItems.size() + " duplicate items:");
 			for (MediaItem mi : dupicateItems.keySet()) {
 				System.out.println(dupicateItems.get(mi) + " : " + mi.getTitle());
 			}

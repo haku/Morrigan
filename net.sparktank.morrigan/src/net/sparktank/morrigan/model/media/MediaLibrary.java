@@ -1,6 +1,7 @@
 package net.sparktank.morrigan.model.media;
 
 import java.io.File;
+import java.util.Date;
 import java.util.List;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
@@ -89,6 +90,22 @@ public class MediaLibrary extends MediaList {
 		reRead();
 	}
 	
+	public void incTrackStartCnt (MediaItem track, long n) throws MorriganException {
+		dbLayer.incTrackStartCnt(track.getFilepath(), n);
+	}
+	
+	public void incTrackEndCnt (MediaItem track, long n) throws MorriganException {
+		dbLayer.incTrackEndCnt(track.getFilepath(), n);
+	}
+	
+	public void setDateAdded (MediaItem track, Date date) throws MorriganException {
+		dbLayer.setDateAdded(track.getFilepath(), date);
+	}
+	
+	public void setDateLastPlayed (MediaItem track, Date date) throws MorriganException {
+		dbLayer.setDateLastPlayed(track.getFilepath(), date);
+	}
+	
 	@Override
 	public void removeMediaTrack (MediaItem track) throws MorriganException {
 		super.removeMediaTrack(track);
@@ -103,13 +120,13 @@ public class MediaLibrary extends MediaList {
 	@Override
 	public void incTrackStartCnt(MediaItem track) throws MorriganException {
 		super.incTrackStartCnt(track);
-		dbLayer.incTrackStartCnt(track.getFilepath());
+		dbLayer.incTrackPlayed(track.getFilepath());
 	}
 	
 	@Override
 	public void incTrackEndCnt(MediaItem track) throws MorriganException {
 		super.incTrackEndCnt(track);
-		dbLayer.incTrackEndCnt(track.getFilepath());
+		dbLayer.incTrackFinished(track.getFilepath());
 	}
 	
 	@Override
