@@ -281,6 +281,11 @@ public abstract class AbstractPlayerView extends ViewPart {
 		callQueueChangedListeners();
 	}
 	
+	public void removeFromQueue (PlayItem item) {
+		_queue.remove(item);
+		callQueueChangedListeners();
+	}
+	
 	private boolean isQueueHasItem () {
 		return !_queue.isEmpty();
 	}
