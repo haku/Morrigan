@@ -1,5 +1,7 @@
 package net.sparktank.morrigan.views;
 
+import java.util.List;
+
 import net.sparktank.morrigan.Activator;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.display.ActionListener;
@@ -61,8 +63,15 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		super.dispose();
 	}
 	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
 	@Override
 	public void setFocus() {}
+	
+	@Override
+	public List<FullScreenAction> getFullScreenActions() {
+		return super.getFullScreenActions();
+	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	GUI stuff.

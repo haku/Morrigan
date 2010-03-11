@@ -1,9 +1,12 @@
 package net.sparktank.morrigan.views;
 
+import java.util.List;
+
 import net.sparktank.morrigan.dialogs.RunnableDialog;
 import net.sparktank.morrigan.display.ScreenPainter;
 import net.sparktank.morrigan.display.ScreenPainter.ScreenType;
 import net.sparktank.morrigan.engines.common.ImplException;
+import net.sparktank.morrigan.views.AbstractPlayerView.FullScreenAction;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
@@ -36,6 +39,12 @@ public class ViewDisplay extends ViewPart {
 			ViewControls viewControls = (ViewControls) findView;
 			try {
 				viewControls.attachViewDisplay(this);
+				
+				List<FullScreenAction> fullScreenActions = viewControls.getFullScreenActions();
+				for (FullScreenAction a : fullScreenActions) {
+					getViewSite().getActionBars().getToolBarManager().add(a);
+				}
+				
 			} catch (ImplException e) {
 				getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));
 			}
