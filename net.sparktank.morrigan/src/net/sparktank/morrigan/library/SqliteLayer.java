@@ -20,7 +20,7 @@ public class SqliteLayer {
 	private final String dbFilePath;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Public.
+//	Constructors.
 	
 	public SqliteLayer (String dbFilePath) throws DbException {
 		this.dbFilePath = dbFilePath;
@@ -40,9 +40,15 @@ public class SqliteLayer {
 		}
 	}
 	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Propeties.
+	
 	public String getDbFilePath() {
 		return dbFilePath;
 	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	DB readers.
 	
 	public List<MediaItem> getAllMedia (LibrarySort sort, LibrarySortDirection direction, boolean hideMissing) throws DbException {
 		try {
@@ -59,6 +65,9 @@ public class SqliteLayer {
 			throw new DbException(e);
 		}
 	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	DB writers.
 	
 	public void addSource (String source) throws DbException {
 		try {
