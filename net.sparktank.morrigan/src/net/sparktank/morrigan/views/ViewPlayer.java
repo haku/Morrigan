@@ -20,6 +20,10 @@ public class ViewPlayer extends AbstractPlayerView {
 	public static final String ID = "net.sparktank.morrigan.views.ViewPlayer";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	ScreenPainter screenPainter = null;
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	ViewPart methods.
 	
 	public void createPartControl(Composite parent) {
@@ -29,6 +33,8 @@ public class ViewPlayer extends AbstractPlayerView {
 		makeControls(parent);
 		addToolbar();
 		addMenu();
+		
+		registerScreenPainter(screenPainter);
 		
 		callUpdateStatus();
 	}
@@ -40,6 +46,10 @@ public class ViewPlayer extends AbstractPlayerView {
 	
 	@Override
 	public void dispose() {
+		if (screenPainter != null) {
+			unregisterScreenPainter(screenPainter);
+		}
+		
 		disposeIcons();
 		super.dispose();
 	}
@@ -77,7 +87,8 @@ public class ViewPlayer extends AbstractPlayerView {
 		
 		Canvas canvas = new Canvas(parent, SWT.NONE);
 		canvas.setLayout(new FillLayout());
-		canvas.addPaintListener(new ScreenPainter(canvas, ScreenType.MEDIUM));
+		screenPainter = new ScreenPainter(canvas, ScreenType.MEDIUM);
+		canvas.addPaintListener(screenPainter);
 		setLocalMediaFrameParent(canvas);
 	}
 	
