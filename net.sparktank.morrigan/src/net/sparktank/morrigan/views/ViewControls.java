@@ -153,6 +153,7 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		menuPref = prefMenuMgr.createContextMenu(parent);
 		
 		// On-screen controls.
+		
 		final int seekBarHeight = 10;
 		
 		parent.setLayout(new FormLayout());
