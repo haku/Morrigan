@@ -3,6 +3,7 @@ package net.sparktank.morrigan.model.media;
 import java.util.WeakHashMap;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
+import net.sparktank.morrigan.library.DbConFactory;
 import net.sparktank.morrigan.library.DbException;
 import net.sparktank.morrigan.library.LibraryHelper;
 import net.sparktank.morrigan.playlist.PlaylistHelper;
@@ -29,7 +30,7 @@ public class MediaListFactory {
 		}
 		
 		if (ret == null) {
-			ret = new MediaLibrary(libraryName, dbFilePath);
+			ret = new MediaLibrary(libraryName, DbConFactory.getDbLayer(dbFilePath));
 			mediaLibraryCache.put(ret, dbFilePath);
 		}
 		

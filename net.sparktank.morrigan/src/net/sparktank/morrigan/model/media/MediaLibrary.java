@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.List;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
-import net.sparktank.morrigan.library.DbConFactory;
 import net.sparktank.morrigan.library.DbException;
 import net.sparktank.morrigan.library.SqliteLayer;
 import net.sparktank.morrigan.library.SqliteLayer.LibrarySort;
@@ -19,20 +18,17 @@ public class MediaLibrary extends MediaList {
 	public static final boolean HIDEMISSING = true; // TODO like this to GUI?
 	
 	private SqliteLayer dbLayer;
-	private final String dbFilePath;
 	LibrarySort librarySort;
 	LibrarySortDirection librarySortDirection;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	MediaLibrary (String libraryName, String dbFilePath) throws DbException {
-		super(dbFilePath, libraryName);
+	MediaLibrary (String libraryName, SqliteLayer dbLayer) throws DbException {
+		super(dbLayer.getDbFilePath(), libraryName);
+		this.dbLayer = dbLayer;
 		
-		this.dbFilePath = dbFilePath;
 		this.librarySort = LibrarySort.FILE;
 		this.librarySortDirection = LibrarySortDirection.ASC;
-		
-		dbLayer = DbConFactory.getDbLayer(dbFilePath);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -44,7 +40,7 @@ public class MediaLibrary extends MediaList {
 	
 	@Override
 	public String getSerial() {
-		return dbFilePath;
+		return dbLayer.getDbFilePath();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -158,7 +154,7 @@ public class MediaLibrary extends MediaList {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public String getDbPath () {
-		return dbFilePath;
+		return dbLayer.getDbFilePath();
 	}
 	
 	public List<String> getSources () throws DbException {
