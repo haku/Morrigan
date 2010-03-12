@@ -635,13 +635,10 @@ public abstract class AbstractPlayerView extends ViewPart {
 	
 	private TitleProvider titleProvider = new TitleProvider() {
 		@Override
-		public String getTitle() {
-			if (getCurrentItem() != null && getCurrentItem().item != null) {
-				return getCurrentItem().item.getTitle();
-			} else {
-				return "[ Morrigan ]";
-			}
+		public PlayItem getItem () {
+			return getCurrentItem();
 		}
+
 	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
