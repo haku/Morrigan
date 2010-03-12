@@ -117,7 +117,6 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 	
 	@Override
 	public void createPartControl(Composite parent) {
-//		final int sep = 3;
 		FormData formData;
 		
 		Composite parent2 = new Composite(parent, SWT.NONE);
@@ -404,6 +403,11 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 				table.getTable().setSortColumn(column.getColumn());
 			}
 		};
+	}
+	
+	protected void resetSortMarker () {
+		editTable.getTable().setSortDirection(SWT.NONE);
+		editTable.getTable().setSortColumn(null);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
