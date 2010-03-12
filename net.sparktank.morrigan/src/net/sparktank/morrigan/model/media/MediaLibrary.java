@@ -88,19 +88,27 @@ public class MediaLibrary extends MediaList {
 		reRead();
 	}
 	
+	@Override
 	public void incTrackStartCnt (MediaItem track, long n) throws MorriganException {
+		super.incTrackStartCnt(track, n);
 		dbLayer.incTrackStartCnt(track.getFilepath(), n);
 	}
 	
+	@Override
 	public void incTrackEndCnt (MediaItem track, long n) throws MorriganException {
+		super.incTrackEndCnt(track, n);
 		dbLayer.incTrackEndCnt(track.getFilepath(), n);
 	}
 	
+	@Override
 	public void setDateAdded (MediaItem track, Date date) throws MorriganException {
+		super.setDateAdded(track, date);
 		dbLayer.setDateAdded(track.getFilepath(), date);
 	}
 	
+	@Override
 	public void setDateLastPlayed (MediaItem track, Date date) throws MorriganException {
+		super.setDateLastPlayed(track, date);
 		dbLayer.setDateLastPlayed(track.getFilepath(), date);
 	}
 	

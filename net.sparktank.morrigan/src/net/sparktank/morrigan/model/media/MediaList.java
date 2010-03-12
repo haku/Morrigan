@@ -152,6 +152,26 @@ public abstract class MediaList {
 //	Update methods.  Use these for data that is to be persisted.
 //	These methods are sub-classed where persistance is needed.
 	
+	public void incTrackStartCnt (MediaItem track, long n) throws MorriganException {
+		track.setStartCount(track.getStartCount() + n);
+		setDirtyState(DirtyState.METADATA);
+	}
+	
+	public void incTrackEndCnt (MediaItem track, long n) throws MorriganException {
+		track.setEndCount(track.getEndCount() + n);
+		setDirtyState(DirtyState.METADATA);
+	}
+	
+	public void setDateAdded (MediaItem track, Date date) throws MorriganException {
+		track.setDateAdded(date);
+		setDirtyState(DirtyState.METADATA);
+	}
+	
+	public void setDateLastPlayed (MediaItem track, Date date) throws MorriganException {
+		track.setDateLastPlayed(date);
+		setDirtyState(DirtyState.METADATA);
+	}
+	
 	public void incTrackStartCnt (MediaItem track) throws MorriganException {
 		track.setStartCount(track.getStartCount()+1);
 		track.setDateLastPlayed(new Date());
