@@ -284,7 +284,15 @@ public class SqliteLayer {
 		"UPDATE tbl_mediafiles SET bmissing=?" +
 		" WHERE sfile=?;";
 	
-	public enum LibrarySort { FILE, DADDED, STARTCNT, ENDCNT, DLASTPLAY, HASHCODE, DURATION };
+	public enum LibrarySort { 
+		FILE      {@Override public String toString() { return "file path";   } },
+		STARTCNT  {@Override public String toString() { return "start count"; } },
+		ENDCNT    {@Override public String toString() { return "end count";   } },
+		DADDED    {@Override public String toString() { return "date added";  } },
+		DLASTPLAY {@Override public String toString() { return "last played"; } },
+		HASHCODE  {@Override public String toString() { return "hashcode";    } },
+		DURATION  {@Override public String toString() { return "duration";    } }
+		};
 	
 	public enum LibrarySortDirection { ASC, DESC };
 	
