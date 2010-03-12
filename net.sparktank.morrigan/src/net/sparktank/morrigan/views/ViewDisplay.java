@@ -29,6 +29,8 @@ public class ViewDisplay extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	ViewPart methods.
 	
+	private ViewControls viewControls = null;
+	
 	@Override
 	public void createPartControl(Composite parent) {
 		makeControls(parent);
@@ -36,9 +38,10 @@ public class ViewDisplay extends ViewPart {
 		
 		IViewPart findView = getSite().getPage().findView(ViewControls.ID);
 		if (findView!=null) {
-			ViewControls viewControls = (ViewControls) findView;
+			viewControls = (ViewControls) findView;
 			try {
 				viewControls.attachViewDisplay(this);
+				viewControls.registerScreenPainter(screenPainter);
 				
 				List<FullScreenAction> fullScreenActions = viewControls.getFullScreenActions();
 				for (FullScreenAction a : fullScreenActions) {
@@ -53,11 +56,17 @@ public class ViewDisplay extends ViewPart {
 	
 	@Override
 	public void dispose() {
+		if (viewControls != null) {
+			viewControls.unregisterScreenPainter(screenPainter);
+		}
+		
 		if (onCloseRunnable!=null) {
 			onCloseRunnable.run();
 			onCloseRunnable = null;
 		}
+		
 		getSite().getWorkbenchWindow().removePerspectiveListener(perspectiveListener);
+		
 		super.dispose();
 	}
 	
@@ -89,6 +98,7 @@ public class ViewDisplay extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private Composite mediaFrameParent;
+	private ScreenPainter screenPainter;
 	
 	private void makeControls (Composite parent) {
 		parent.setLayout(new FillLayout());
@@ -103,7 +113,8 @@ public class ViewDisplay extends ViewPart {
 		
 		Canvas canvas = new Canvas(parent, SWT.NONE);
 		canvas.setLayout(new FillLayout());
-		canvas.addPaintListener(new ScreenPainter(canvas, ScreenType.MEDIUM));
+		screenPainter = new ScreenPainter(canvas, ScreenType.MEDIUM);
+		canvas.addPaintListener(screenPainter);
 		mediaFrameParent = canvas;
 	}
 	

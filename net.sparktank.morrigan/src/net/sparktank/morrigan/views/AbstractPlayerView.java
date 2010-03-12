@@ -9,6 +9,8 @@ import net.sparktank.morrigan.Activator;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.dialogs.RunnableDialog;
 import net.sparktank.morrigan.display.FullscreenShell;
+import net.sparktank.morrigan.display.ScreenPainter;
+import net.sparktank.morrigan.display.ScreenPainter.TitleProvider;
 import net.sparktank.morrigan.editors.EditorFactory;
 import net.sparktank.morrigan.editors.LibraryEditor;
 import net.sparktank.morrigan.editors.MediaListEditor;
@@ -135,6 +137,8 @@ public abstract class AbstractPlayerView extends ViewPart {
 				addToHistory(_currentItem);
 			}
 		}
+		
+		updateTitle();
 	}
 	
 	private Runnable listChangedRunnable = new Runnable() {
@@ -376,7 +380,6 @@ public abstract class AbstractPlayerView extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Playback management.
 	
-	
 	private long _currentPosition = -1; // In seconds.
 	private int _currentTrackDuration = -1; // In seconds.
 	
@@ -609,6 +612,39 @@ public abstract class AbstractPlayerView extends ViewPart {
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Title provider.
+	
+	private List<ScreenPainter> _titlePainters = new ArrayList<ScreenPainter>();
+	
+	private void updateTitle () {
+		for (ScreenPainter sp : _titlePainters){
+			sp.redrawTitle();
+		}
+	}
+	
+	public void registerScreenPainter (ScreenPainter p) {
+		if (p == null) throw new NullPointerException();
+		
+		p.setTitleProvider(titleProvider);
+		_titlePainters.add(p);
+	}
+	
+	public void unregisterScreenPainter (ScreenPainter p) {
+		_titlePainters.remove(p);
+	}
+	
+	private TitleProvider titleProvider = new TitleProvider() {
+		@Override
+		public String getTitle() {
+			if (getCurrentItem() != null && getCurrentItem().item != null) {
+				return getCurrentItem().item.getTitle();
+			} else {
+				return "[ Morrigan ]";
+			}
+		}
+	};
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Video frame parent stuff.
 	
 	abstract protected void videoParentChanged (Composite newParent);
@@ -749,10 +785,10 @@ public abstract class AbstractPlayerView extends ViewPart {
 				}
 			});
 			
-			updateCurrentMediaFrameParent();
-			
-			action.setChecked(true);
+			registerScreenPainter(fullscreenShell.getScreenPainter());
 			fullscreenShell.getShell().open();
+			updateCurrentMediaFrameParent();
+			action.setChecked(true);
 		}
 		
 	}
@@ -770,6 +806,8 @@ public abstract class AbstractPlayerView extends ViewPart {
 			if (!isFullScreen()) return;
 			
 			try {
+				unregisterScreenPainter(fullscreenShell.getScreenPainter());
+				
 				if (closeShell) fullscreenShell.getShell().close();
 				
 				FullscreenShell fs = fullscreenShell;

@@ -18,6 +18,7 @@ public class FullscreenShell {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private final Shell shell;
+	private final ScreenPainter screenPainter;
 	private final Runnable onCloseRunnable;
 	
 	public FullscreenShell(Shell parent, Monitor mon, Runnable onCloseRunnable) {
@@ -33,7 +34,8 @@ public class FullscreenShell {
 		shell.setMaximized(true);
 		shell.setFullScreen(true);
 		
-		shell.addPaintListener(new ScreenPainter(shell, ScreenType.LARGE));
+		screenPainter = new ScreenPainter(shell, ScreenType.LARGE);
+		shell.addPaintListener(screenPainter);
 		
 		shell.addTraverseListener(traverseListener);
 		shell.addMouseListener(mouseListener);
@@ -42,6 +44,10 @@ public class FullscreenShell {
 	
 	public Shell getShell () {
 		return shell;
+	}
+	
+	public ScreenPainter getScreenPainter() {
+		return screenPainter;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
