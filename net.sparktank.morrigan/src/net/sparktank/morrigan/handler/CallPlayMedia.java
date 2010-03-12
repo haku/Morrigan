@@ -46,7 +46,7 @@ public class CallPlayMedia  extends AbstractHandler implements IHandler {
 			
 			if (findView != null) {
 				playerView = (AbstractPlayerView) findView;
-				playerView.loadAndStartPlaying(mediaListEditor.getEditedMediaList(), mediaListEditor.getSelectedTrack());
+				playerView.loadAndStartPlaying(mediaListEditor.getMediaList(), mediaListEditor.getSelectedTrack());
 			
 			} else {
 				new MorriganMsgDlg("Error: failed to find an AbstractPlayerView.").open();

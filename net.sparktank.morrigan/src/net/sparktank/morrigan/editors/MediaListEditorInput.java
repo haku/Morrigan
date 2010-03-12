@@ -19,7 +19,7 @@ public class MediaListEditorInput<T extends MediaList> implements IEditorInput, 
 		editedMediaList = mediaList;
 	}
 	
-	public T getEditedMediaList() {
+	public T getMediaList() {
 		return editedMediaList;
 	}
 	
@@ -80,7 +80,7 @@ public class MediaListEditorInput<T extends MediaList> implements IEditorInput, 
 		if ( !(aThat instanceof MediaListEditorInput<?>) ) return false;
 		MediaListEditorInput<?> that = (MediaListEditorInput<?>)aThat;
 		
-		return EqualHelper.areEqual(editedMediaList.getListId(), that.getEditedMediaList().getListId());
+		return EqualHelper.areEqual(editedMediaList.getListId(), that.getMediaList().getListId());
 	}
 	
 	@Override

@@ -182,7 +182,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 			IEditorPart activeEditor = getViewSite().getPage().getActiveEditor();
 			if (activeEditor != null && activeEditor instanceof MediaListEditor<?>) {
 				MediaListEditor<?> mediaListEditor = (MediaListEditor<?>) activeEditor;
-				MediaList editedMediaList = mediaListEditor.getEditedMediaList();
+				MediaList editedMediaList = mediaListEditor.getMediaList();
 				MediaItem nextTrack = OrderHelper.getNextTrack(editedMediaList, null, _playbackOrder);
 				nextItem = new PlayItem(editedMediaList, nextTrack);
 			}
