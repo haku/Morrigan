@@ -115,7 +115,11 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 	
 	@Override
 	protected void populateToolbar(Composite parent) {
+		// Dependencies.
+		
 		makeIcons();
+		
+		// On-screen controls.
 		
 		final int sep = 3;
 		FormData formData;
