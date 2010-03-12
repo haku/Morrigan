@@ -1,10 +1,14 @@
 package net.sparktank.morrigan.editors;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.sparktank.morrigan.Activator;
 import net.sparktank.morrigan.ApplicationActionBarAdvisor;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.display.ActionListener;
+import net.sparktank.morrigan.display.DropMenuListener;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.library.SqliteLayer.LibrarySort;
 import net.sparktank.morrigan.library.SqliteLayer.LibrarySortDirection;
@@ -14,6 +18,8 @@ import net.sparktank.morrigan.views.ViewLibraryProperties;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
@@ -95,11 +101,31 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 		iconProperties.dispose();
 	}
 	
+	private List<SortAction> sortActions = new ArrayList<SortAction>();
+	
 	private Label lblStatus;
 	
 	@Override
 	protected void populateToolbar (Composite parent) {
+		// Dependencies.
+		
 		makeIcons();
+		
+		for (LibrarySort s : LibrarySort.values()) {
+			SortAction a = new SortAction(s, LibrarySortDirection.ASC);
+			a.setChecked(s == getEditedMediaList().getSort());
+			sortActions.add(a);
+		}
+		
+		// Off-screen controls.
+		MenuManager prefMenuMgr = new MenuManager();
+		for (SortAction a : sortActions) {
+			prefMenuMgr.add(a);
+		}
+		prefMenuMgr.add(new Separator());
+		prefMenuMgr.add(showPropertiesAction);
+		
+		// On-screen controls.
 		
 		final int sep = 3;
 		FormData formData;
@@ -147,7 +173,7 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 		btnAddToQueue.addSelectionListener(new ActionListener(addToQueueAction));
 		btnAdd.addSelectionListener(new ActionListener(addAction));
 		btnRemove.addSelectionListener(new ActionListener(removeAction));
-		btnProperties.addSelectionListener(new ActionListener(showPropertiesAction));
+		btnProperties.addSelectionListener(new DropMenuListener(btnProperties, prefMenuMgr));
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -210,17 +236,54 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 			sortDir = LibrarySortDirection.DESC;
 		}
 		
+		setSort(sort, sortDir, true);
+	}
+	
+	protected void setSort (LibrarySort sort, LibrarySortDirection sortDir, boolean updateAction) {
 		try {
 			getEditedMediaList().setSort(sort, sortDir);
 		} catch (MorriganException e) {
 			new MorriganMsgDlg(e).open();
 		}
+		
+		if (updateAction) {
+			for (SortAction a : sortActions) {
+				a.setChecked(sort == a.getSort());
+			}
+		}
+	}
+	
+	protected class SortAction extends Action {
+		
+		private final LibrarySort sort;
+		private final LibrarySortDirection sortDir;
+
+		public SortAction (LibrarySort sort, LibrarySortDirection sortDir) {
+			super("Sort by " + sort.toString(), AS_RADIO_BUTTON);
+			this.sort = sort;
+			this.sortDir = sortDir;
+		}
+		
+		public LibrarySort getSort() {
+			return sort;
+		}
+		
+		@Override
+		public void run() {
+			super.run();
+			if (isChecked()) {
+				resetSortMarker();
+				setSort(sort, sortDir, false);
+				System.out.println("sort by " + sort.toString());
+			}
+		}
+		
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Actions.
 	
-	private IAction addAction = new Action("add") {
+	private IAction addAction = new Action("Add") {
 		public void run () {
 			ViewLibraryProperties propView = showLibPropView();
 			if (propView!=null) {
@@ -229,7 +292,7 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 		}
 	};
 	
-	private IAction showPropertiesAction = new Action("showProperties") {
+	private IAction showPropertiesAction = new Action("Properties") {
 		public void run () {
 			showLibPropView();
 		}
