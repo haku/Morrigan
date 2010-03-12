@@ -72,7 +72,7 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 	@Override
 	public void doSave(IProgressMonitor monitor) {
 		try {
-			getEditedMediaList().writeToFile();
+			getMediaList().writeToFile();
 		} catch (MorriganException e) {
 			new MorriganMsgDlg(e);
 		}
@@ -178,7 +178,7 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 		if (lblStatus.isDisposed()) return;
 		
 		lblStatus.setText(
-				getEditedMediaList().getCount() + " items."
+				getMediaList().getCount() + " items."
 				);
 	}
 	

@@ -113,7 +113,7 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 		
 		for (LibrarySort s : LibrarySort.values()) {
 			SortAction a = new SortAction(s, LibrarySortDirection.ASC);
-			a.setChecked(s == getEditedMediaList().getSort());
+			a.setChecked(s == getMediaList().getSort());
 			sortActions.add(a);
 		}
 		
@@ -184,7 +184,7 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 		if (lblStatus.isDisposed()) return;
 		
 		lblStatus.setText(
-				getEditedMediaList().getCount() + " items."
+				getMediaList().getCount() + " items."
 				);
 	}
 	
@@ -198,7 +198,7 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 	
 	@Override
 	protected void onSort (TableViewer table, TableViewerColumn column, int direction) {
-		LibrarySort sort = getEditedMediaList().getSort();
+		LibrarySort sort = getMediaList().getSort();
 		MediaColumn mCol = parseMediaColumn(column.getColumn().getText());
 		switch (mCol) {
 			case FILE:
@@ -241,7 +241,7 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 	
 	protected void setSort (LibrarySort sort, LibrarySortDirection sortDir, boolean updateAction) {
 		try {
-			getEditedMediaList().setSort(sort, sortDir);
+			getMediaList().setSort(sort, sortDir);
 		} catch (MorriganException e) {
 			new MorriganMsgDlg(e).open();
 		}
@@ -304,7 +304,7 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 		try {
 			IViewPart showView = getSite().getPage().showView(ViewLibraryProperties.ID);
 			ViewLibraryProperties viewProp = (ViewLibraryProperties) showView;
-			viewProp.setContent(getEditedMediaList());
+			viewProp.setContent(getMediaList());
 			return viewProp;
 			
 		} catch (Exception e) {

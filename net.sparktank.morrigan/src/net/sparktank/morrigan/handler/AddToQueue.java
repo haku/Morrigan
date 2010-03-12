@@ -50,7 +50,7 @@ public class AddToQueue  extends AbstractHandler implements IHandler {
 				playerView = (AbstractPlayerView) findView;
 				
 				for (MediaItem track : mediaListEditor.getSelectedTracks()) {
-					PlayItem item = new PlayItem(mediaListEditor.getEditedMediaList(), track);
+					PlayItem item = new PlayItem(mediaListEditor.getMediaList(), track);
 					playerView.addToQueue(item);
 				}
 				

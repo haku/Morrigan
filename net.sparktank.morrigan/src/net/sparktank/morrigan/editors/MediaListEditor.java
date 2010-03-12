@@ -69,7 +69,7 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private T editedMediaList;
+	MediaListEditorInput<T> editorInput;
 	
 	private TableViewer editTable;
 	
@@ -90,27 +90,27 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		setInput(input);
 		
 		if (input instanceof MediaListEditorInput<?>) {
-			editedMediaList = ((MediaListEditorInput<T>) input).getEditedMediaList();
+			editorInput = (MediaListEditorInput<T>) input;
 		} else {
 			throw new IllegalArgumentException("input is not instanceof MediaListEditorInput<?>.");
 		}
 		
 		try {
-			editedMediaList.read();
+			editorInput.getMediaList().read();
 		} catch (MorriganException e) {
 			throw new PartInitException("Exception while calling read().", e);
 		}
 		
-		setPartName(editedMediaList.getListName());
+		setPartName(editorInput.getMediaList().getListName());
 		
-		editedMediaList.addDirtyChangeEvent(dirtyChange);
-		editedMediaList.addChangeEvent(listChange);
+		editorInput.getMediaList().addDirtyChangeEvent(dirtyChange);
+		editorInput.getMediaList().addChangeEvent(listChange);
 	}
 	
 	@Override
 	public void dispose() {
-		editedMediaList.removeChangeEvent(listChange);
-		editedMediaList.removeDirtyChangeEvent(dirtyChange);
+		editorInput.getMediaList().removeChangeEvent(listChange);
+		editorInput.getMediaList().removeDirtyChangeEvent(dirtyChange);
 		imageCache.clearCache();
 		super.dispose();
 	}
@@ -216,7 +216,7 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 	
 	@Override
 	public boolean isDirty() {
-		return editedMediaList.getDirtyState() == DirtyState.DIRTY;
+		return editorInput.getMediaList().getDirtyState() == DirtyState.DIRTY;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -233,7 +233,7 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		
 		@Override
 		public Object[] getElements(Object inputElement) {
-			return editedMediaList.getMediaTracks().toArray();
+			return editorInput.getMediaList().getMediaTracks().toArray();
 		}
 		
 		@Override
@@ -421,16 +421,16 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Methods for editing editedMediaList.
 	
-	public T getEditedMediaList () {
-		return editedMediaList;
+	public T getMediaList () {
+		return editorInput.getMediaList();
 	}
 	
 	protected void addTrack (String file) {
-		editedMediaList.addTrack(new MediaItem(file));
+		editorInput.getMediaList().addTrack(new MediaItem(file));
 	}
 	
 	protected void removeTrack (MediaItem track) throws MorriganException {
-		editedMediaList.removeMediaTrack(track);
+		editorInput.getMediaList().removeMediaTrack(track);
 	}
 	
 	public MediaItem getSelectedTrack () {
