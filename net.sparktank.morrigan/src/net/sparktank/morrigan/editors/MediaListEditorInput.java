@@ -12,12 +12,15 @@ public class MediaListEditorInput<T extends MediaList> implements IEditorInput, 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private final T editedMediaList;
-
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Constructor.
 	
 	public MediaListEditorInput (T mediaList) {
 		editedMediaList = mediaList;
 	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public T getMediaList() {
 		return editedMediaList;
