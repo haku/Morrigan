@@ -40,6 +40,10 @@ public class SqliteLayer {
 		}
 	}
 	
+	public String getDbFilePath() {
+		return dbFilePath;
+	}
+	
 	public List<MediaItem> getAllMedia (LibrarySort sort, LibrarySortDirection direction, boolean hideMissing) throws DbException {
 		try {
 			return local_getAllMedia(sort, direction, hideMissing);
