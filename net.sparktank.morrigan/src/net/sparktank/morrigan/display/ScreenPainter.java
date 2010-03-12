@@ -1,6 +1,9 @@
 package net.sparktank.morrigan.display;
 
 
+import net.sparktank.morrigan.helpers.TimeHelper;
+import net.sparktank.morrigan.model.media.PlayItem;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
@@ -15,7 +18,7 @@ public class ScreenPainter implements PaintListener {
 	
 	public interface TitleProvider {
 		
-		abstract public String getTitle ();
+		abstract public PlayItem getItem ();
 		
 	}
 	
@@ -28,11 +31,6 @@ public class ScreenPainter implements PaintListener {
 	public ScreenPainter(Canvas canvas, ScreenType type) {
 		this.canvas = canvas;
 		this.type = type;
-		
-		this.titleProvider = new TitleProvider() {
-			@Override
-			public String getTitle() { return "..."; }
-		};
 		
 		canvas.setBackground(canvas.getDisplay().getSystemColor(SWT.COLOR_BLACK));
 		canvas.setForeground(canvas.getDisplay().getSystemColor(SWT.COLOR_WHITE));
@@ -60,8 +58,31 @@ public class ScreenPainter implements PaintListener {
 		Rectangle clientArea = canvas.getClientArea();
 		
 		if (type != ScreenType.TINY) {
+			PlayItem item = titleProvider.getItem();
 			Point centre = new Point(clientArea.width/2, clientArea.height/2);
-			drawTextCen(e, centre.x, centre.y, titleProvider.getTitle());
+			
+			String text;
+			
+			if (item != null && item.item != null) {
+				text = item.item.getTitle();
+				text = text.substring(0, text.lastIndexOf("."));
+				text = text.replace(" - ", "\n");
+				
+				text = text + "\n\n" + item.item.getStartCount() + " / " + item.item.getEndCount();
+				if (item.item.getDuration() > 0) {
+					text = text + "   " + TimeHelper.formatTime(item.item.getDuration());
+				}
+				
+				if (item.list != null) {
+					text = "(" + item.list.getListName() + ")\n\n" + text;
+				}
+				
+			} else {
+				text = "[ Morrigan ]";
+			}
+			
+			drawTextCen(e, centre.x, centre.y, text);
+			
 		}
 	}
 	
@@ -75,6 +96,11 @@ public class ScreenPainter implements PaintListener {
 					y + (textSize.y) * i - (textSize.y * text.length)/2, 
 					SWT.TRANSPARENT);
 		}
+	}
+	
+	private void drawTextCen (PaintEvent e, int x, int y, String text) {
+		String[] split = text.split("\n");
+		drawTextCen(e, x, y, split);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
