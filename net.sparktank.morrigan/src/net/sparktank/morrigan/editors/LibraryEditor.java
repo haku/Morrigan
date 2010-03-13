@@ -7,12 +7,14 @@ import java.util.List;
 import net.sparktank.morrigan.Activator;
 import net.sparktank.morrigan.ApplicationActionBarAdvisor;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
+import net.sparktank.morrigan.dialogs.RunnableDialog;
 import net.sparktank.morrigan.display.ActionListener;
 import net.sparktank.morrigan.display.DropMenuListener;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.library.SqliteLayer.LibrarySort;
 import net.sparktank.morrigan.library.SqliteLayer.LibrarySortDirection;
 import net.sparktank.morrigan.model.media.MediaLibrary;
+import net.sparktank.morrigan.model.media.MediaLibrary.SortChangeListener;
 import net.sparktank.morrigan.views.ViewLibraryProperties;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -44,6 +46,7 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 	
 	@Override
 	public void dispose() {
+		getMediaList().unregisterSortChangeListener(sortChangeListener);
 		disposeIcons();
 		super.dispose();
 	}
@@ -116,6 +119,7 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 			a.setChecked(s == getMediaList().getSort());
 			sortActions.add(a);
 		}
+		getMediaList().registerSortChangeListener(sortChangeListener);
 		
 		// Off-screen controls.
 		MenuManager prefMenuMgr = new MenuManager();
@@ -236,22 +240,28 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 			sortDir = LibrarySortDirection.DESC;
 		}
 		
-		setSort(sort, sortDir, true);
+		setSort(sort, sortDir);
 	}
 	
-	protected void setSort (LibrarySort sort, LibrarySortDirection sortDir, boolean updateAction) {
+	protected void setSort (LibrarySort sort, LibrarySortDirection sortDir) {
 		try {
 			getMediaList().setSort(sort, sortDir);
 		} catch (MorriganException e) {
-			new MorriganMsgDlg(e).open();
-		}
-		
-		if (updateAction) {
-			for (SortAction a : sortActions) {
-				a.setChecked(sort == a.getSort());
-			}
+			getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));
 		}
 	}
+	
+	private SortChangeListener sortChangeListener = new SortChangeListener () {
+		@Override
+		public void sortChanged(LibrarySort sort, LibrarySortDirection direction) {
+			for (SortAction a : sortActions) {
+				boolean c = sort == a.getSort();
+				if (a.isChecked() != c) {
+					a.setChecked(c);
+				}
+			}
+		}
+	};
 	
 	protected class SortAction extends Action {
 		
@@ -272,8 +282,8 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 		public void run() {
 			super.run();
 			if (isChecked()) {
-				resetSortMarker();
-				setSort(sort, sortDir, false);
+				setSortMarker(null, SWT.NONE); // FIXME send actual column / direction.
+				setSort(sort, sortDir);
 				System.out.println("sort by " + sort.toString());
 			}
 		}

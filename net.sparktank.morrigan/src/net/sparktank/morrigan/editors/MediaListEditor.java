@@ -405,9 +405,13 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		};
 	}
 	
-	protected void resetSortMarker () {
-		editTable.getTable().setSortDirection(SWT.NONE);
-		editTable.getTable().setSortColumn(null);
+	protected void setSortMarker (TableViewerColumn column, int swtDirection) {
+		editTable.getTable().setSortDirection(swtDirection);
+		if (column != null) {
+			editTable.getTable().setSortColumn(column.getColumn());
+		} else {
+			editTable.getTable().setSortColumn(null);
+		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
