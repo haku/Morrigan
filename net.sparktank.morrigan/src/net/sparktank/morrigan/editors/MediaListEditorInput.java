@@ -4,6 +4,7 @@ import net.sparktank.morrigan.helpers.EqualHelper;
 import net.sparktank.morrigan.model.media.MediaList;
 
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPersistableElement;
@@ -12,6 +13,8 @@ public class MediaListEditorInput<T extends MediaList> implements IEditorInput, 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private final T editedMediaList;
+	private int topIndex = -1;
+	private Table table;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructor.
@@ -24,6 +27,18 @@ public class MediaListEditorInput<T extends MediaList> implements IEditorInput, 
 	
 	public T getMediaList() {
 		return editedMediaList;
+	}
+	
+	public void setTable (Table table) {
+		this.table = table;
+	}
+	
+	public int getTopIndex () {
+		return topIndex;
+	}
+	
+	public void setTopIndex (int i) {
+		this.topIndex = i;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -64,6 +79,9 @@ public class MediaListEditorInput<T extends MediaList> implements IEditorInput, 
 	public void saveState(IMemento memento) {
 		memento.putString(EditorFactory.KEY_TYPE, editedMediaList.getType());
 		memento.putString(EditorFactory.KEY_SERIAL, editedMediaList.getSerial());
+		if (table != null) {
+			memento.putString(EditorFactory.KEY_TOPINDEX, String.valueOf(table.getTopIndex()));
+		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
