@@ -86,6 +86,10 @@ public class MediaLibrary extends MediaList {
 		return librarySort;
 	}
 	
+	public LibrarySortDirection getSortDirection() {
+		return librarySortDirection;
+	}
+	
 	public void setSort (LibrarySort sort, LibrarySortDirection direction) throws MorriganException {
 		librarySort = sort;
 		librarySortDirection = direction;
