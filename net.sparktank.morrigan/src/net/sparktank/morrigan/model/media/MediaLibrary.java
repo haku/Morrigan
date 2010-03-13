@@ -1,6 +1,7 @@
 package net.sparktank.morrigan.model.media;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -53,6 +54,8 @@ public class MediaLibrary extends MediaList {
 		return false;
 	}
 	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
 	private boolean firstRead = true;
 	
 	@Override
@@ -63,8 +66,6 @@ public class MediaLibrary extends MediaList {
 		List<MediaItem> allMedia = dbLayer.getAllMedia(librarySort, librarySortDirection, HIDEMISSING);
 		replaceList(allMedia);
 	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	/**
 	 * FIXME Sort library list according to DB query.
@@ -78,6 +79,9 @@ public class MediaLibrary extends MediaList {
 		read();
 	}
 	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Sorting.
+	
 	public LibrarySort getSort () {
 		return librarySort;
 	}
@@ -86,7 +90,30 @@ public class MediaLibrary extends MediaList {
 		librarySort = sort;
 		librarySortDirection = direction;
 		reRead();
+		callSortChangedListeners(sort, direction);
 	}
+	
+	private List<SortChangeListener> _sortChangeListeners = new ArrayList<SortChangeListener>();
+	
+	private void callSortChangedListeners (LibrarySort sort, LibrarySortDirection direction) {
+		for (SortChangeListener l : _sortChangeListeners) {
+			l.sortChanged(sort, direction);
+		}
+	}
+	
+	public void registerSortChangeListener (SortChangeListener scl) {
+		_sortChangeListeners.add(scl);
+	}
+	
+	public void unregisterSortChangeListener (SortChangeListener scl) {
+		_sortChangeListeners.remove(scl);
+	}
+	
+	public interface SortChangeListener {
+		public void sortChanged (LibrarySort sort, LibrarySortDirection direction);
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
 	public void incTrackStartCnt (MediaItem track, long n) throws MorriganException {
