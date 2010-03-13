@@ -38,6 +38,7 @@ import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
@@ -122,7 +123,7 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		Composite parent2 = new Composite(parent, SWT.NONE);
 		parent2.setLayout(new FormLayout());
 		
-		// Create toolbar.
+		// Create toolbar area.
 		
 		Composite toolbarComposite = new Composite(parent2, SWT.NONE);
 		formData = new FormData();
@@ -131,7 +132,6 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		formData.right = new FormAttachment(100, 0);
 		toolbarComposite.setLayoutData(formData);
 		toolbarComposite.setLayout(new FormLayout());
-		populateToolbar(toolbarComposite);
 		
 		// Create table.
 		
@@ -207,7 +207,6 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		table.setLinesVisible(false);
 		
 		editTable.setContentProvider(contentProvider);
-		
 		editTable.addDoubleClickListener(doubleClickListener);
 		editTable.setInput(getEditorSite());
 		
@@ -215,9 +214,12 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		if (topIndex > 0) {
 			editTable.getTable().setTopIndex(topIndex);
 		}
-		
 		editorInput.setTable(editTable.getTable());
 		
+		// Populate toolbar.
+		populateToolbar(toolbarComposite);
+		
+		// Call update events.
 		listChanged();
 	}
 	
@@ -232,6 +234,15 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 	abstract protected void populateToolbar (Composite parent);
 	
 	private ImageCache imageCache = new ImageCache();
+	
+	protected void setTableMenu (Menu menu) {
+		editTable.getTable().setMenu(menu);
+	}
+	
+	public void revealTrack (Object element) {
+		editTable.setSelection(new StructuredSelection(element), true);
+		editTable.getTable().setFocus();
+	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Providers.
@@ -422,14 +433,6 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Showing.
-	
-	public void revealTrack (Object element) {
-		editTable.setSelection(new StructuredSelection(element), true);
-		editTable.getTable().setFocus();
-	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Methods for editing editedMediaList.
 	
 	public T getMediaList () {
@@ -492,7 +495,7 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Actions.
 	
-	protected IAction addToQueueAction = new Action("enqueue") {
+	protected IAction addToQueueAction = new Action("Enqueue") {
 		@Override
 		public void run() {
 			IHandlerService handlerService = (IHandlerService) getSite().getService(IHandlerService.class);
@@ -504,7 +507,7 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		};
 	};
 	
-	protected IAction removeAction = new Action("remove") {
+	protected IAction removeAction = new Action("Remove") {
 		@Override
 		public void run () {
 			MorriganMsgDlg dlg = new MorriganMsgDlg("Remove selected from " + getTitle() + "?", MorriganMsgDlg.YESNO);

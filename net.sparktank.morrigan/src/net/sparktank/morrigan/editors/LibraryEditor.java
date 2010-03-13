@@ -123,12 +123,21 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 		getMediaList().registerSortChangeListener(sortChangeListener);
 		
 		// Off-screen controls.
+		
+		// Pref menu.
 		MenuManager prefMenuMgr = new MenuManager();
 		for (SortAction a : sortActions) {
 			prefMenuMgr.add(a);
 		}
 		prefMenuMgr.add(new Separator());
 		prefMenuMgr.add(showPropertiesAction);
+		
+		// Context menu.
+		MenuManager contextMenuMgr = new MenuManager();
+		contextMenuMgr.add(addToQueueAction);
+		contextMenuMgr.add(new Separator());
+		contextMenuMgr.add(removeAction);
+		setTableMenu(contextMenuMgr.createContextMenu(parent));
 		
 		// On-screen controls.
 		

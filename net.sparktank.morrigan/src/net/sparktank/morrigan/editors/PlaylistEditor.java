@@ -16,6 +16,8 @@ import net.sparktank.morrigan.model.media.MediaList.DurationData;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
@@ -120,6 +122,15 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 		// Dependencies.
 		
 		makeIcons();
+		
+		// Off-screen controls.
+		
+		// Context menu.
+		MenuManager contextMenuMgr = new MenuManager();
+		contextMenuMgr.add(addToQueueAction);
+		contextMenuMgr.add(new Separator());
+		contextMenuMgr.add(removeAction);
+		setTableMenu(contextMenuMgr.createContextMenu(parent));
 		
 		// On-screen controls.
 		
