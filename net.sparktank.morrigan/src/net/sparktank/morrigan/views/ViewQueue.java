@@ -89,6 +89,8 @@ public class ViewQueue extends ViewPart {
 		tableViewer.setLabelProvider(labelProvider);
 		tableViewer.setInput(getViewSite()); // use content provider.
 		
+		getViewSite().getActionBars().getToolBarManager().add(moveUpAction);
+		getViewSite().getActionBars().getToolBarManager().add(moveDownAction);
 		getViewSite().getActionBars().getToolBarManager().add(removeAction);
 	}
 	
@@ -166,12 +168,23 @@ public class ViewQueue extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Actions.
 	
+	protected IAction moveUpAction = new Action("Move up", Activator.getImageDescriptor("icons/arrow-up.gif")) {
+		public void run() {
+			abstractPlayerView.moveInQueue(getSelectedSources(), false);
+		};
+	};
+	
+	protected IAction moveDownAction = new Action("Move down", Activator.getImageDescriptor("icons/arrow-down.gif")) {
+		public void run() {
+			abstractPlayerView.moveInQueue(getSelectedSources(), true);
+		};
+	};
+	
 	protected IAction removeAction = new Action("Remove", Activator.getImageDescriptor("icons/minus.gif")) {
 		@Override
 		public void run() {
 			ArrayList<PlayItem> selectedSources = getSelectedSources();
 			if (selectedSources==null || selectedSources.isEmpty()) {
-//				new MorriganMsgDlg("No items selected desu~.").open();
 				return;
 			}
 			for (PlayItem item : selectedSources) {

@@ -296,6 +296,40 @@ public abstract class AbstractPlayerView extends ViewPart {
 		callQueueChangedListeners();
 	}
 	
+	public void moveInQueue (List<PlayItem> items, boolean moveDown) {
+		if (items == null || items.isEmpty()) return;
+		
+		for (	int i = (moveDown ? _queue.size() - 1 : 0);
+				(moveDown ? i >= 0 : i < _queue.size());
+				i = i + (moveDown ? -1 : 1)
+			) {
+			if (items.contains(_queue.get(i))) {
+				int j;
+				if (moveDown) {
+					if (i == _queue.size() - 1 ) {
+						j = -1;
+					} else {
+						j = i + 1;
+					}
+				} else {
+					if (i == 0) {
+						j = -1;
+					} else {
+						j = i - 1;
+					}
+				}
+				if (j != -1 && !items.contains(_queue.get(j))) {
+					PlayItem a = _queue.get(i);
+					PlayItem b = _queue.get(j);
+					_queue.set(i, b);
+					_queue.set(j, a);
+				}
+			}
+		}
+		
+		callQueueChangedListeners();
+	}
+	
 	private boolean isQueueHasItem () {
 		return !_queue.isEmpty();
 	}
