@@ -31,8 +31,6 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -149,6 +147,11 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		// add and configure columns.
 		MediaColumn[] titles = MediaColumn.values();
 		
+		MediaSorter sorter = null;
+		if (isSortable()) {
+			sorter = new MediaSorter();
+		}
+		
 		for (int i = 0; i < titles.length; i++) {
 			if (MediaListPref.getColPref(titles[i])) {
 				final TableViewerColumn column = new TableViewerColumn(editTable, SWT.NONE);
@@ -197,7 +200,7 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 				column.getColumn().setMoveable(true);
 				
 				if (isSortable()) {
-					column.getColumn().addSelectionListener(getSelectionAdapter(editTable, column));
+					column.getColumn().addSelectionListener(sorter.getSelectionAdapter(editTable, titles[i], column));
 				}
 			}
 		}
@@ -207,6 +210,10 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		table.setLinesVisible(false);
 		
 		editTable.setContentProvider(contentProvider);
+		
+		if (isSortable()) {
+			editTable.setSorter(sorter);
+		}
 		
 		editTable.addDoubleClickListener(doubleClickListener);
 		editTable.setInput(getEditorSite());
@@ -387,23 +394,6 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 	abstract protected boolean isSortable ();
 	
 	abstract protected void onSort (final TableViewer table, final TableViewerColumn column, int direction);
-	
-	private SelectionAdapter getSelectionAdapter (final TableViewer table, final TableViewerColumn column) {
-		return new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				int dir = table.getTable().getSortDirection();
-				if (table.getTable().getSortColumn() == column.getColumn()) {
-					dir = dir == SWT.UP ? SWT.DOWN : SWT.UP;
-				} else {
-					dir = SWT.DOWN;
-				}
-				onSort(table, column, dir);
-				table.getTable().setSortDirection(dir);
-				table.getTable().setSortColumn(column.getColumn());
-			}
-		};
-	}
 	
 	protected void resetSortMarker () {
 		editTable.getTable().setSortDirection(SWT.NONE);
