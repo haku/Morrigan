@@ -98,10 +98,10 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 	}
 	
 	private void disposeIcons () {
-		iconQueueAdd.dispose();
-		iconAdd.dispose();
-		iconRemove.dispose();
-		iconProperties.dispose();
+		if (iconQueueAdd != null) iconQueueAdd.dispose();
+		if (iconAdd != null) iconAdd.dispose();
+		if (iconRemove != null) iconRemove.dispose();
+		if (iconProperties != null) iconProperties.dispose();
 	}
 	
 	private List<SortAction> sortActions = new ArrayList<SortAction>();
