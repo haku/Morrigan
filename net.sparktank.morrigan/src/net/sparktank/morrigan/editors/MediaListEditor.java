@@ -209,7 +209,7 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		}
 		
 		Table table = editTable.getTable();
-		table.setHeaderVisible(true);
+		table.setHeaderVisible(MediaListPref.getShowHeadersPref());
 		table.setLinesVisible(false);
 		
 		editTable.setContentProvider(contentProvider);

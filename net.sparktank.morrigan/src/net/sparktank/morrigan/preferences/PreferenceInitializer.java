@@ -14,6 +14,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		
 		defaults.putBoolean(GeneralPref.PREF_WINDOW_MINTOTRAY, false);
 		
+		defaults.putBoolean(MediaListPref.PREF_SHOWHEADER, true);
+		
 		defaults.putBoolean(MediaListPref.PREF_COL_DADDED, false);
 		defaults.putBoolean(MediaListPref.PREF_COL_COUNTS, true);
 		defaults.putBoolean(MediaListPref.PREF_COL_DLASTPLAY, false);
