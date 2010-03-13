@@ -3,6 +3,7 @@ package net.sparktank.morrigan.editors;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
+import net.sparktank.morrigan.Activator;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.handler.AddToQueue;
@@ -17,6 +18,9 @@ import net.sparktank.morrigan.preferences.MediaListPref;
 import org.eclipse.core.commands.common.CommandException;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ColumnPixelData;
@@ -41,7 +45,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.part.EditorPart;
@@ -493,7 +499,55 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 	
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Actions.
+//	Menus and Actions.
+	
+	protected MenuManager getAddToMenu () {
+		final MenuManager menu = new MenuManager("Add to playlist...");
+		
+		menu.addMenuListener(new IMenuListener () {
+			public void menuAboutToShow(IMenuManager manager) {
+				IEditorReference[] editors = getEditorSite().getPage().getEditorReferences();
+				for (final IEditorReference e : editors) {
+					if (e.getId().equals(PlaylistEditor.ID)) {
+						menu.add(new AddToPlaylistAction(e));
+					}
+				}
+				if (menu.getItems().length < 1) {
+					Action a = new Action("(No playlists open)") {};
+					a.setEnabled(false);
+					menu.add(a);
+				}
+			}
+		});
+		
+		menu.setRemoveAllWhenShown(true);
+		
+		return menu;
+	}
+	
+	protected class AddToPlaylistAction extends Action {
+		
+		private final IEditorReference editor;
+		
+		public AddToPlaylistAction (IEditorReference editor) {
+			super(editor.getName(), Activator.getImageDescriptor("icons/playlist.gif"));
+			editor.getTitleImage();
+			this.editor = editor;
+		}
+		
+		@Override
+		public void run() {
+			super.run();
+			IWorkbenchPart part = editor.getPart(false);
+			if (part != null && part instanceof PlaylistEditor) {
+				PlaylistEditor plPart = (PlaylistEditor) part;
+				for (MediaItem track : getSelectedTracks()) {
+					plPart.addTrack(track.getFilepath());
+				}
+			}
+		}
+		
+	}
 	
 	protected IAction addToQueueAction = new Action("Enqueue") {
 		@Override

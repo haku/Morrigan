@@ -3,7 +3,7 @@ package net.sparktank.morrigan.editors;
 
 import java.util.ArrayList;
 import java.util.List;
-import net.sparktank.morrigan.helpers.*;
+
 import net.sparktank.morrigan.Activator;
 import net.sparktank.morrigan.ApplicationActionBarAdvisor;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
@@ -11,6 +11,7 @@ import net.sparktank.morrigan.dialogs.RunnableDialog;
 import net.sparktank.morrigan.display.ActionListener;
 import net.sparktank.morrigan.display.DropMenuListener;
 import net.sparktank.morrigan.exceptions.MorriganException;
+import net.sparktank.morrigan.helpers.TimeHelper;
 import net.sparktank.morrigan.library.SqliteLayer.LibrarySort;
 import net.sparktank.morrigan.library.SqliteLayer.LibrarySortDirection;
 import net.sparktank.morrigan.model.media.MediaLibrary;
@@ -135,6 +136,7 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 		// Context menu.
 		MenuManager contextMenuMgr = new MenuManager();
 		contextMenuMgr.add(addToQueueAction);
+		contextMenuMgr.add(getAddToMenu());
 		contextMenuMgr.add(new Separator());
 		contextMenuMgr.add(removeAction);
 		setTableMenu(contextMenuMgr.createContextMenu(parent));
