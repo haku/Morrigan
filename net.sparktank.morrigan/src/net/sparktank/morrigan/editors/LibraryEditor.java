@@ -3,7 +3,7 @@ package net.sparktank.morrigan.editors;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import net.sparktank.morrigan.helpers.*;
 import net.sparktank.morrigan.Activator;
 import net.sparktank.morrigan.ApplicationActionBarAdvisor;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
@@ -15,6 +15,7 @@ import net.sparktank.morrigan.library.SqliteLayer.LibrarySort;
 import net.sparktank.morrigan.library.SqliteLayer.LibrarySortDirection;
 import net.sparktank.morrigan.model.media.MediaLibrary;
 import net.sparktank.morrigan.model.media.MediaLibrary.SortChangeListener;
+import net.sparktank.morrigan.model.media.MediaList.DurationData;
 import net.sparktank.morrigan.views.ViewLibraryProperties;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -187,8 +188,12 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 	protected void listChanged () {
 		if (lblStatus.isDisposed()) return;
 		
+		DurationData d = getMediaList().getTotalDuration();
+		
 		lblStatus.setText(
-				getMediaList().getCount() + " items."
+				getMediaList().getCount() + " items"
+				+ " totaling " + (d.complete ? "" : "more than ") +
+				TimeHelper.formatTime(d.duration) + "."
 				);
 	}
 	

@@ -9,7 +9,9 @@ import net.sparktank.morrigan.config.Config;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.display.ActionListener;
 import net.sparktank.morrigan.exceptions.MorriganException;
+import net.sparktank.morrigan.helpers.TimeHelper;
 import net.sparktank.morrigan.model.media.MediaPlaylist;
+import net.sparktank.morrigan.model.media.MediaList.DurationData;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
@@ -177,8 +179,12 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 	protected void listChanged () {
 		if (lblStatus.isDisposed()) return;
 		
+		DurationData d = getMediaList().getTotalDuration();
+		
 		lblStatus.setText(
-				getMediaList().getCount() + " items."
+				getMediaList().getCount() + " items"
+				+ " totaling " + (d.complete ? "" : "more than ") +
+				TimeHelper.formatTime(d.duration) + "."
 				);
 	}
 	
