@@ -204,6 +204,28 @@ public abstract class MediaList {
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Metadata readers.
+	
+	public class DurationData {
+		public long duration;
+		public boolean complete;
+	}
+	
+	public DurationData getTotalDuration () {
+		DurationData ret = new DurationData();
+		ret.complete = true;
+		for (MediaItem mt : mediaTracks) {
+			if (mt.getDuration() > 0) {
+				ret.duration = ret.duration + mt.getDuration();
+			} else {
+				ret.complete = false;
+			}
+		}
+		return ret;
+	}
+	
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
 	public String toString () {
