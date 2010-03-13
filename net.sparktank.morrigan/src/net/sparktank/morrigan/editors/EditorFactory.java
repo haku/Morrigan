@@ -17,6 +17,7 @@ public class EditorFactory implements IElementFactory {
 	
 	public static final String KEY_TYPE = "TYPE";
 	public static final String KEY_SERIAL = "SERIAL";
+	public static final String KEY_TOPINDEX = "TOPINDEX";
 	
 	public static final String KEY_LIB_SORTCOL = "LIB_SORTCOL";
 	public static final String KEY_LIB_SORTDIR = "LIB_SORTDIR";
@@ -25,23 +26,30 @@ public class EditorFactory implements IElementFactory {
 	
 	@Override
 	public IAdaptable createElement(IMemento memento) {
+		MediaListEditorInput<?> input = null;
+		
 		String type = memento.getString(KEY_TYPE);
 		
 		try {
 			if (type.equals(MediaLibrary.TYPE)) {
-				return getMediaLibraryInput(memento);
+				input = getMediaLibraryInput(memento);
 				
 			} else if (type.equals(MediaPlaylist.TYPE)) {
 				String serial = memento.getString(KEY_SERIAL);
-				return getMediaPlaylistInput(serial);
+				input = getMediaPlaylistInput(serial);
 			}
 			
 		} catch (MorriganException e) {
 			e.printStackTrace();
-			return null;
 		}
 		
-		return null;
+		String topIndex = memento.getString(KEY_TOPINDEX);
+		if (topIndex != null) {
+			int i = Integer.parseInt(topIndex);
+			input.setTopIndex(i);
+		}
+		
+		return input;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

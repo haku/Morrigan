@@ -211,6 +211,13 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		editTable.addDoubleClickListener(doubleClickListener);
 		editTable.setInput(getEditorSite());
 		
+		int topIndex = editorInput.getTopIndex();
+		if (topIndex > 0) {
+			editTable.getTable().setTopIndex(topIndex);
+		}
+		
+		editorInput.setTable(editTable.getTable());
+		
 		listChanged();
 	}
 	
@@ -353,7 +360,7 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		@Override
 		public void run() {
 			dirtyChangedRunableScheduled = false;
-			firePropertyChange(PROP_DIRTY);
+			firePropertyChange(EditorPart.PROP_DIRTY);
 		}
 	};
 	
