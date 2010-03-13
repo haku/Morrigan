@@ -55,7 +55,7 @@ public class EditorFactory implements IElementFactory {
 			throw new MorriganException(e);
 		}
 		
-		MediaLibraryEditorInput input = new MediaLibraryEditorInput(ml);
+		LibraryEditorInput input = new LibraryEditorInput(ml);
 		return input;
 	}
 	

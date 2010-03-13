@@ -6,10 +6,10 @@ import net.sparktank.morrigan.library.SqliteLayer.LibrarySort;
 import net.sparktank.morrigan.library.SqliteLayer.LibrarySortDirection;
 import net.sparktank.morrigan.model.media.*;
 
-public class MediaLibraryEditorInput extends MediaListEditorInput<MediaLibrary> {
+public class LibraryEditorInput extends MediaListEditorInput<MediaLibrary> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public MediaLibraryEditorInput(MediaLibrary mediaList) {
+	public LibraryEditorInput(MediaLibrary mediaList) {
 		super(mediaList);
 	}
 	
