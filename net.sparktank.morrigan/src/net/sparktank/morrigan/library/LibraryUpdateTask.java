@@ -390,13 +390,6 @@ public class LibraryUpdateTask extends Job {
 		
 		// TODO : vacuume DB?
 		
-		try {
-			library.reRead();
-		} catch (MorriganException e) {
-			monitor.done();
-			return new FailStatus("Failed to refresh the library.", e);
-		}
-		
 		if (monitor.isCanceled()) {
 			System.out.println("Task was canceled desu~.");
 		}
