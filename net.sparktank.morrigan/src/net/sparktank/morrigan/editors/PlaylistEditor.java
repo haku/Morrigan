@@ -128,6 +128,7 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 		// Context menu.
 		MenuManager contextMenuMgr = new MenuManager();
 		contextMenuMgr.add(addToQueueAction);
+		contextMenuMgr.add(getAddToMenu());
 		contextMenuMgr.add(new Separator());
 		contextMenuMgr.add(removeAction);
 		setTableMenu(contextMenuMgr.createContextMenu(parent));
