@@ -79,7 +79,7 @@ public class MediaListEditorInput<T extends MediaList> implements IEditorInput, 
 	public void saveState(IMemento memento) {
 		memento.putString(EditorFactory.KEY_TYPE, editedMediaList.getType());
 		memento.putString(EditorFactory.KEY_SERIAL, editedMediaList.getSerial());
-		if (table != null) {
+		if (table != null && !table.isDisposed()) {
 			memento.putString(EditorFactory.KEY_TOPINDEX, String.valueOf(table.getTopIndex()));
 		}
 	}
