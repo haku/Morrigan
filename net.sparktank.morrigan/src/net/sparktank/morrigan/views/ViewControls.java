@@ -82,6 +82,7 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 	private Image iconPrev;
 	private Image iconNext;
 	private Image iconFindInList;
+	private Image iconSearch;
 	private Image iconScreen;
 	private Image iconQueue;
 	private Image iconPref;
@@ -104,6 +105,7 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		iconPrev = Activator.getImageDescriptor("icons/prev.gif").createImage();
 		iconNext = Activator.getImageDescriptor("icons/next.gif").createImage();
 		iconFindInList = Activator.getImageDescriptor("icons/jumptolist.active.gif").createImage();
+		iconSearch = Activator.getImageDescriptor("icons/search.gif").createImage();
 		iconScreen = Activator.getImageDescriptor("icons/display.gif").createImage();
 		iconQueue = Activator.getImageDescriptor("icons/queue.gif").createImage();
 		iconPref = Activator.getImageDescriptor("icons/pref.gif").createImage();
@@ -118,6 +120,8 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		iconScreen.dispose();
 		iconQueue.dispose();
 		iconPref.dispose();
+		iconFindInList.dispose();
+		iconSearch.dispose();
 	}
 	
 	private void makeControls (Composite parent) {
@@ -165,6 +169,7 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		Button btnNext = new Button(parent, SWT.PUSH);
 		lblStatus = new Label(parent, SWT.NONE);
 		Button btnFindInList = new Button(parent, SWT.PUSH);
+		Button btnJumpTo = new Button(parent, SWT.PUSH);
 		videoParent = new Canvas(parent, SWT.NONE);
 		btnOrderMode = new Button(parent, SWT.PUSH);
 		Button btnFullscreen = new Button(parent, SWT.PUSH);
@@ -210,10 +215,18 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		btnFindInList.setImage(iconFindInList);
 		formData = new FormData();
 		formData.top = new FormAttachment(0, SEP);
-		formData.right = new FormAttachment(btnOrderMode, -SEP);
+		formData.right = new FormAttachment(btnJumpTo, -SEP);
 		formData.bottom = new FormAttachment(seekbar, -SEP);
 		btnFindInList.setLayoutData(formData);
 		btnFindInList.addSelectionListener(new ActionListener(findInListAction));
+		
+		btnJumpTo.setImage(iconSearch);
+		formData = new FormData();
+		formData.top = new FormAttachment(0, SEP);
+		formData.right = new FormAttachment(btnOrderMode, -SEP);
+		formData.bottom = new FormAttachment(seekbar, -SEP);
+		btnJumpTo.setLayoutData(formData);
+		btnJumpTo.addSelectionListener(new ActionListener(jumpToAction));
 		
 		btnOrderMode.setText(getPlaybackOrder().toString());
 		formData = new FormData();
