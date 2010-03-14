@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sparktank.morrigan.Activator;
+import net.sparktank.morrigan.dialogs.JumpToDlg;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.dialogs.RunnableDialog;
 import net.sparktank.morrigan.display.FullscreenShell;
@@ -153,6 +154,25 @@ public abstract class AbstractPlayerView extends ViewPart {
 		return _currentItem;
 	}
 	
+	protected MediaList getCurrentList () {
+		MediaList ret = null;
+		
+		PlayItem currentItem = getCurrentItem();
+		if (currentItem != null && currentItem.list != null) {
+			ret = currentItem.list;
+			
+		} else {
+			IEditorPart activeEditor = getViewSite().getPage().getActiveEditor();
+			if (activeEditor != null && activeEditor instanceof MediaListEditor<?>) {
+				MediaListEditor<?> mediaListEditor = (MediaListEditor<?>) activeEditor;
+				MediaList editedMediaList = mediaListEditor.getMediaList();
+				ret = editedMediaList;
+			}
+		}
+		
+		return ret;
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Track order methods.
 	
@@ -179,12 +199,10 @@ public abstract class AbstractPlayerView extends ViewPart {
 			}
 			
 		} else {
-			IEditorPart activeEditor = getViewSite().getPage().getActiveEditor();
-			if (activeEditor != null && activeEditor instanceof MediaListEditor<?>) {
-				MediaListEditor<?> mediaListEditor = (MediaListEditor<?>) activeEditor;
-				MediaList editedMediaList = mediaListEditor.getMediaList();
-				MediaItem nextTrack = OrderHelper.getNextTrack(editedMediaList, null, _playbackOrder);
-				nextItem = new PlayItem(editedMediaList, nextTrack);
+			MediaList currentList = getCurrentList();
+			if (currentList != null) {
+				MediaItem nextTrack = OrderHelper.getNextTrack(currentList, null, _playbackOrder);
+				nextItem = new PlayItem(currentList, nextTrack);
 			}
 		}
 		
@@ -1010,6 +1028,21 @@ public abstract class AbstractPlayerView extends ViewPart {
 				
 			}
 		}
+	};
+	
+	protected IAction jumpToAction = new Action ("Jump to...") {
+		@Override
+		public void run() {
+			MediaList currentList = getCurrentList();
+			if (currentList == null) return;
+			if (!(currentList instanceof MediaLibrary)) return;
+			
+			JumpToDlg dlg = new JumpToDlg(getViewSite().getShell(), (MediaLibrary) currentList);
+			PlayItem item = dlg.open();
+			if (item != null) {
+				loadAndStartPlaying(item);
+			}
+		};
 	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
