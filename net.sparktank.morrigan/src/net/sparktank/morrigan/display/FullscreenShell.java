@@ -29,8 +29,9 @@ public class FullscreenShell {
 		shell.setImage(parent.getImage());
 		shell.setLayout(new FillLayout());
 		
-		Point pt = new Point(mon.getClientArea().x + 1, mon.getClientArea().y + 1);
+		Point pt = new Point(mon.getBounds().x, mon.getBounds().y);
 		shell.setLocation(pt);
+		shell.setSize(mon.getBounds().width, mon.getBounds().height);
 		shell.setMaximized(true);
 		shell.setFullScreen(true);
 		
