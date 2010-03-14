@@ -117,23 +117,19 @@ public class JumpToDlg extends Dialog {
 	}
 	
 	private IStructuredContentProvider contentProvider = new IStructuredContentProvider() {
-		
 		@Override
 		public Object[] getElements(Object inputElement) {
 			
 			// TODO.
 			return new String[]{};
 		}
-		
 		@Override
 		public void dispose() {}
 		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
-		
 	};
 	
 	private SelectionListener buttonListener = new SelectionAdapter() {
-		
 		@Override
 		public void widgetSelected(SelectionEvent e) {
 			Button b = (Button) e.widget;
@@ -147,7 +143,6 @@ public class JumpToDlg extends Dialog {
 			}
 			b.getShell().close();
 		}
-		
 	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -188,7 +183,9 @@ public class JumpToDlg extends Dialog {
 	private Runnable updateSearchResults = new Runnable() {
 		@Override
 		public void run() {
-			updateSearchResults(text.getText());
+			if (!text.isDisposed()) {
+				updateSearchResults(text.getText());
+			}
 		}
 	};
 	
