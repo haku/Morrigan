@@ -156,24 +156,35 @@ public class JumpToDlg extends Dialog {
 	private volatile boolean searchRunning = false;
 	private volatile boolean searchDirty = false;
 	
+	/**
+	 * Text changed event handler.
+	 */
 	private VerifyListener textChangeListener = new VerifyListener() {
 		@Override
 		public void verifyText(VerifyEvent e) {
-			synchronized (searchLock) {
-				if (!searchRunning) {
-					updateSearchResults();
-					searchRunning = true;
-				} else {
-					searchDirty = true;
-				}
-			}
+			updateSearchResults();
 		}
 	};
 	
 	private void updateSearchResults () {
-		getParent().getDisplay().asyncExec(updateSearchResults);
+		updateSearchResults(false);
 	}
 	
+	private void updateSearchResults (boolean force) {
+		synchronized (searchLock) {
+			if (!searchRunning || force) {
+				getParent().getDisplay().asyncExec(updateSearchResults);
+				searchRunning = true;
+			} else {
+				searchDirty = true;
+			}
+		}
+	}
+	
+	/**
+	 * Async task so we can read the complete text from the
+	 * input box.
+	 */
 	private Runnable updateSearchResults = new Runnable() {
 		@Override
 		public void run() {
@@ -181,17 +192,35 @@ public class JumpToDlg extends Dialog {
 		}
 	};
 	
+	/**
+	 * Run the search in a daemon thread.  Call query again if
+	 * input has changed while the search was running.
+	 * @param query
+	 */
 	private void updateSearchResults (final String query) {
 		Thread t = new Thread() {
 			@Override
 			public void run() {
 				doSearch(query);
+				
+				synchronized (searchLock) {
+					if (searchDirty) {
+						updateSearchResults(true);
+						searchDirty = false;
+					} else {
+						searchRunning = false;
+					}
+				}
 			}
 		};
 		t.setDaemon(true);
 		t.start();
 	}
 	
+	/**
+	 * Do the actual searching.
+	 * @param query
+	 */
 	private void doSearch (String query) {
 		System.out.println("Searching for '" + query + "'...");
 		
@@ -202,15 +231,6 @@ public class JumpToDlg extends Dialog {
 		}
 		
 		System.out.println("Finished searching for '" + query + "'.");
-		
-		synchronized (searchLock) {
-			if (searchDirty) {
-				updateSearchResults();
-				searchDirty = false;
-			} else {
-				searchRunning = false;
-			}
-		}
 	}
 	
 
