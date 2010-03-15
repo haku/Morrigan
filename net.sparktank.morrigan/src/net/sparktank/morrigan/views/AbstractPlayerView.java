@@ -1091,14 +1091,6 @@ public abstract class AbstractPlayerView extends ViewPart {
 			switch (id) {
 				
 				case IHotkeyEngine.MORRIGAN_HK_STOP:
-					if (isPlaying) {
-						return CanDo.YES;
-					} else if (isPaused) {
-						return CanDo.MAYBE;
-					} else {
-						return CanDo.NO;
-					}
-					
 				case IHotkeyEngine.MORRIGAN_HK_PLAYPAUSE:
 					if (isPlaying) {
 						return CanDo.YES;
@@ -1108,6 +1100,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 						return CanDo.NO;
 					}
 					
+				case IHotkeyEngine.MORRIGAN_HK_JUMPTO:
 				case IHotkeyEngine.MORRIGAN_HK_NEXT:
 					if (isPlaying) {
 						return CanDo.YES;
@@ -1116,7 +1109,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 					} else {
 						return CanDo.NO;
 					}
-					
+				
 			}
 			
 			return CanDo.NO;
@@ -1125,6 +1118,15 @@ public abstract class AbstractPlayerView extends ViewPart {
 		@Override
 		public void onKeyPress(int id) {
 			switch (id) {
+				
+				case IHotkeyEngine.MORRIGAN_HK_JUMPTO:
+					getSite().getShell().getDisplay().asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							jumpToAction.run();
+						}
+					});
+					break;
 				
 				case IHotkeyEngine.MORRIGAN_HK_STOP:
 					getSite().getShell().getDisplay().asyncExec(new Runnable() {
