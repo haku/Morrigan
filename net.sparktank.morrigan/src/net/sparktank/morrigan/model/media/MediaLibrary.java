@@ -119,6 +119,12 @@ public class MediaLibrary extends MediaList {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	public List<MediaItem> simpleSearch (String term, String esc, int maxResults) throws DbException {
+		return dbLayer.simpleSearch(term, esc, maxResults);
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
 	@Override
 	public void incTrackStartCnt (MediaItem track, long n) throws MorriganException {
 		super.incTrackStartCnt(track, n);

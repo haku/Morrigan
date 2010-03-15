@@ -58,6 +58,14 @@ public class SqliteLayer {
 		}
 	}
 	
+	public List<MediaItem> simpleSearch (String term, String esc, int maxResults) throws DbException {
+		try {
+			return local_simpleSearch(term, esc, maxResults);
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+	
 	public List<String> getSources () throws DbException {
 		try {
 			return local_getSources();
@@ -254,6 +262,13 @@ public class SqliteLayer {
 		"lmd5, lduration, benabled, bmissing FROM tbl_mediafiles" +
 		" WHERE (bmissing<>1 OR bmissing is NULL)" +
 		" ORDER BY {COL} {DIR};";
+	
+	private static final String SQL_TBL_MEDIAFILES_Q_SIMPLESEARCH = 
+		"SELECT sfile, dadded, lstartcnt, lendcnt, dlastplay, lmd5, lduration, benabled, bmissing" +
+	    " FROM tbl_mediafiles" +
+	    " WHERE sfile LIKE ? ESCAPE ?" +
+	    " AND (bmissing<>1 OR bmissing is NULL) AND (benabled<>0 OR benabled is NULL)" +
+	    " ORDER BY sfile COLLATE NOCASE ASC;";
 	
 	private static final String SQL_TBL_MEDIAFILES_Q_EXISTS =
 		"SELECT count(*) FROM tbl_mediafiles WHERE sfile=? COLLATE NOCASE;";
@@ -452,6 +467,36 @@ public class SqliteLayer {
 		ps = getDbCon().prepareStatement(sql);
 		rs = ps.executeQuery();
 		
+		List<MediaItem> ret = local_parseRecordSet(rs);
+		
+		rs.close();
+		ps.close();
+		
+		return ret;
+	}
+	
+	private List<MediaItem> local_simpleSearch (String term, String esc, int maxResults) throws SQLException, ClassNotFoundException {
+		PreparedStatement ps;
+		ResultSet rs;
+		
+		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_Q_SIMPLESEARCH);
+		ps.setString(1, "%" + term + "%");
+		ps.setString(2, esc);
+		
+		if (maxResults > 0) {
+			ps.setMaxRows(maxResults);
+		}
+		
+		rs = ps.executeQuery();
+		List<MediaItem> ret = local_parseRecordSet(rs);
+		rs.close();
+		ps.close();
+		
+		return ret;
+		
+	}
+	
+	private List<MediaItem> local_parseRecordSet (ResultSet rs) throws SQLException {
 		List<MediaItem> ret = new ArrayList<MediaItem>();
 		
 		while (rs.next()) {
@@ -469,9 +514,6 @@ public class SqliteLayer {
 			
 			ret.add(mt);
 		}
-		
-		rs.close();
-		ps.close();
 		
 		return ret;
 	}

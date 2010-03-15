@@ -1,9 +1,19 @@
 package net.sparktank.morrigan.dialogs;
 
+import java.awt.MouseInfo;
+import java.awt.Point;
+import java.util.List;
+
+import net.sparktank.morrigan.library.DbException;
+import net.sparktank.morrigan.model.media.MediaItem;
 import net.sparktank.morrigan.model.media.MediaLibrary;
 import net.sparktank.morrigan.model.media.PlayItem;
 
+import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
@@ -12,6 +22,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -20,6 +31,7 @@ import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
@@ -36,6 +48,10 @@ public class JumpToDlg extends Dialog {
 	
 	public JumpToDlg (Shell parent, MediaLibrary mediaLibrary) {
 		super(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.RESIZE);
+		
+		if (parent == null) throw new IllegalArgumentException("parent can not be null.");
+		if (mediaLibrary == null) throw new IllegalArgumentException("mediaLibrary can not be null.");
+		
 		this.mediaLibrary = mediaLibrary;
 		setText("Jump to track");
 	}
@@ -44,17 +60,18 @@ public class JumpToDlg extends Dialog {
 	
 	private final static int SEP = 3;
 	
+	public TableViewer tableViewer;
 	private Text text;
 	private PlayItem returnValue = null;
 	
 	public PlayItem open () {
-		FormData formData;
-		
 		final Shell shell = new Shell(getParent(), getStyle());
+		
+		FormData formData;
 		shell.setLayout(new FormLayout());
 		
 		text = new Text(shell, SWT.SINGLE | SWT.BORDER);
-		TableViewer tableViewer =  new TableViewer(shell, SWT.V_SCROLL);
+		tableViewer =  new TableViewer(shell, SWT.V_SCROLL);
 		Button btnOk = new Button(shell, SWT.PUSH);
 		Button btnCancel = new Button(shell, SWT.PUSH);
 		
@@ -83,11 +100,11 @@ public class JumpToDlg extends Dialog {
 		formData.top = new FormAttachment(text, SEP);
 		formData.right = new FormAttachment(100, -SEP);
 		formData.bottom = new FormAttachment(btnOk, -SEP);
-		formData.width = 300;
+		formData.width = 500;
 		formData.height = 300;
 		tableViewer.getTable().setLayoutData(formData);
 		
-		btnOk.setText("Ok");
+		btnOk.setText("Play");
 		formData = new FormData();
 		formData.right = new FormAttachment(100, -SEP);
 		formData.bottom = new FormAttachment(100, -SEP);
@@ -100,11 +117,32 @@ public class JumpToDlg extends Dialog {
 		btnCancel.setLayoutData(formData);
 		
 		text.addVerifyListener(textChangeListener);
+		
 		tableViewer.setContentProvider(contentProvider);
+		tableViewer.setLabelProvider(labelProvider);
+		tableViewer.setInput(shell);
+		
 		btnOk.addSelectionListener(buttonListener);
 		btnCancel.addSelectionListener(buttonListener);
 		
 		shell.pack();
+		
+		Point mouse = MouseInfo.getPointerInfo().getLocation();
+		for (Monitor m : getParent().getDisplay().getMonitors()) {
+			Rectangle b = m.getBounds();
+			if (mouse.x >= b.x && mouse.x <= b.x + b.width
+					&& mouse.y >= b.y && mouse.y <= b.y + b.width) {
+				
+				Rectangle bounds = m.getBounds ();
+				Rectangle rect = shell.getBounds ();
+				int x = bounds.x + (bounds.width - rect.width) / 2;
+				int y = bounds.y + (bounds.height - rect.height) / 2;
+				shell.setLocation (x, y);
+				
+				break;
+			}
+		}
+		
 		shell.open();
 		Display display = getParent().getDisplay();
 		while (!shell.isDisposed()) {
@@ -116,12 +154,49 @@ public class JumpToDlg extends Dialog {
 		return returnValue;
 	}
 	
+	private SelectionListener buttonListener = new SelectionAdapter() {
+		@Override
+		public void widgetSelected(SelectionEvent e) {
+			Button b = (Button) e.widget;
+			if (b.getShell().getDefaultButton() == b) {
+				MediaItem item = getSelectedItem();
+				if (item == null) return;
+				returnValue = new PlayItem(mediaLibrary, item);
+			}
+			b.getShell().close();
+		}
+	};
+	
+	private MediaItem getSelectedItem () {
+		ISelection selection = tableViewer.getSelection();
+		if (selection==null) return null;
+		if (selection.isEmpty()) return null;
+		
+		if (selection instanceof IStructuredSelection) {
+			IStructuredSelection iSel = (IStructuredSelection) selection;
+			Object o = iSel.toList().get(0);
+			if (o instanceof MediaItem) {
+				MediaItem i = (MediaItem) o;
+				return i;
+			}
+		}
+		
+		return null;
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	private List<MediaItem> searchResults = null;
+	
 	private IStructuredContentProvider contentProvider = new IStructuredContentProvider() {
 		@Override
 		public Object[] getElements(Object inputElement) {
-			
-			// TODO.
-			return new String[]{};
+			if (searchResults != null) {
+				return searchResults.toArray();
+				
+			} else {
+				return new String[]{};
+			}
 		}
 		@Override
 		public void dispose() {}
@@ -129,19 +204,14 @@ public class JumpToDlg extends Dialog {
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
 	};
 	
-	private SelectionListener buttonListener = new SelectionAdapter() {
+	private ILabelProvider labelProvider = new LabelProvider() {
 		@Override
-		public void widgetSelected(SelectionEvent e) {
-			Button b = (Button) e.widget;
-			if (b.getShell().getDefaultButton() == b) {
-				System.out.println("ok desu~");
-				
-				returnValue = null; // TODO fill in selected value.
-				
-			} else {
-				System.out.println("cancel desu~");
+		public String getText(Object element) {
+			if (element instanceof MediaItem) {
+				MediaItem item = (MediaItem) element;
+				return item.toString();
 			}
-			b.getShell().close();
+			return null;
 		}
 	};
 	
@@ -221,15 +291,29 @@ public class JumpToDlg extends Dialog {
 	private void doSearch (String query) {
 		System.out.println("Searching for '" + query + "'...");
 		
+		String q = query.replace("'", "''");
+//		q = q.replace("\\", "\\\\");
+//		q = q.replace("%", "\\%");
+//		q = q.replace("_", "\\_");
+		q = q.replace("*", "%");
+		
 		try {
-			Thread.sleep(5000);
-		} catch (InterruptedException e) {
+			searchResults = mediaLibrary.simpleSearch(q, "\\", 50);
+			
+			getParent().getDisplay().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					if (tableViewer.getTable().isDisposed()) return;
+					tableViewer.refresh();
+				}
+			});
+			
+		} catch (DbException e) {
 			e.printStackTrace();
 		}
 		
-		System.out.println("Finished searching for '" + query + "'.");
+		System.out.println(searchResults.size() + " results for '" + query + "'.");
 	}
 	
-
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
