@@ -1040,7 +1040,11 @@ public abstract class AbstractPlayerView extends ViewPart {
 			JumpToDlg dlg = new JumpToDlg(getViewSite().getShell(), (MediaLibrary) currentList);
 			PlayItem item = dlg.open();
 			if (item != null) {
-				loadAndStartPlaying(item);
+				if ((dlg.getKeyMask() & SWT.SHIFT) != 0 || (dlg.getKeyMask() & SWT.CONTROL) != 0) {
+					addToQueue(item);
+				} else {
+					loadAndStartPlaying(item);
+				}
 			}
 		};
 	};
