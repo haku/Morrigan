@@ -2,6 +2,7 @@ package net.sparktank.morrigan.dialogs;
 
 import java.awt.MouseInfo;
 import java.awt.Point;
+import java.lang.ref.WeakReference;
 import java.util.List;
 
 import net.sparktank.morrigan.library.DbException;
@@ -43,14 +44,17 @@ public class JumpToDlg extends Dialog {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	private static volatile WeakReference<JumpToDlg> openDlg = null;
 	private static volatile Boolean dlgOpen = false;
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private final MediaLibrary mediaLibrary;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public JumpToDlg (Shell parent, MediaLibrary mediaLibrary) {
-		super(parent, SWT.TITLE | SWT.CLOSE | SWT.APPLICATION_MODAL | SWT.RESIZE);
+		super(parent, SWT.TITLE | SWT.CLOSE | SWT.APPLICATION_MODAL | SWT.RESIZE | SWT.ON_TOP);
 		
 		if (mediaLibrary == null) throw new IllegalArgumentException("mediaLibrary can not be null.");
 		
@@ -59,16 +63,36 @@ public class JumpToDlg extends Dialog {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	public int getKeyMask() {
+		return keyMask;
+	}
+	
+	public void setKeyMask(int keyMask) {
+		this.keyMask = keyMask;
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
 	private final static int SEP = 3;
 	
+	private Shell shell;
 	private Label label;
 	private Text text;
 	private TableViewer tableViewer;
+	private Button btnOk;
+	private Button btnCancel;
+	
 	private PlayItem returnValue = null;
+	private int keyMask = 0;
 	
 	public PlayItem open () {
 		synchronized (dlgOpen) {
-			if (dlgOpen) return null;
+			if (dlgOpen) {
+				if (openDlg != null && openDlg.get() != null) {
+					openDlg.get().remoteClose();
+				}
+				return null;
+			}
 			dlgOpen = true;
 		}
 		
@@ -76,7 +100,7 @@ public class JumpToDlg extends Dialog {
 		setText("Jump to track");
 		
 		// Create window.
-		final Shell shell = new Shell(getParent().getDisplay(), getStyle());
+		shell = new Shell(getParent().getDisplay(), getStyle());
 		shell.setImage(getParent().getImage());
 		shell.setText(getText());
 		
@@ -87,22 +111,11 @@ public class JumpToDlg extends Dialog {
 		label = new Label(shell, SWT.CENTER);
 		text = new Text(shell, SWT.SINGLE | SWT.BORDER);
 		tableViewer =  new TableViewer(shell, SWT.V_SCROLL);
-		Button btnOk = new Button(shell, SWT.PUSH);
-		Button btnCancel = new Button(shell, SWT.PUSH);
+		btnOk = new Button(shell, SWT.PUSH);
+		btnCancel = new Button(shell, SWT.PUSH);
 		
 		shell.setDefaultButton(btnOk);
-		shell.addListener(SWT.Traverse, new Listener() {
-			public void handleEvent(Event event) {
-				switch (event.detail) {
-					case SWT.TRAVERSE_ESCAPE:
-						shell.close();
-						event.detail = SWT.TRAVERSE_NONE;
-						event.doit = false;
-						break;
-					
-				}
-			}
-		});
+		shell.addListener(SWT.Traverse, traverseListener);
 		
 		formData = new FormData();
 		formData.left = new FormAttachment(0, SEP);
@@ -166,6 +179,8 @@ public class JumpToDlg extends Dialog {
 			}
 		}
 		
+		openDlg = new WeakReference<JumpToDlg>(this);
+		
 		// Show the dlg.
 		shell.open();
 		Display display = getParent().getDisplay();
@@ -182,18 +197,51 @@ public class JumpToDlg extends Dialog {
 		return returnValue;
 	}
 	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	public void remoteClose () {
+		leaveDlg(false, 0);
+	}
+	
+	private void leaveDlg (boolean ok, int mask) {
+		if (ok) {
+			MediaItem item = getSelectedItem();
+			if (item == null) return;
+			returnValue = new PlayItem(mediaLibrary, item);
+		}
+		setKeyMask(mask);
+		shell.close();
+	}
+	
+	private Listener traverseListener = new Listener() {
+		public void handleEvent(Event e) {
+			switch (e.detail) {
+				
+				case SWT.TRAVERSE_RETURN:
+					e.detail = SWT.TRAVERSE_NONE;
+					e.doit = false;
+					leaveDlg(true, e.stateMask);
+					break;
+					
+				case SWT.TRAVERSE_ESCAPE:
+					e.detail = SWT.TRAVERSE_NONE;
+					e.doit = false;
+					leaveDlg(false, e.stateMask);
+					break;
+				
+			}
+		}
+	};
+	
 	private SelectionListener buttonListener = new SelectionAdapter() {
 		@Override
 		public void widgetSelected(SelectionEvent e) {
 			Button b = (Button) e.widget;
-			if (b.getShell().getDefaultButton() == b) {
-				MediaItem item = getSelectedItem();
-				if (item == null) return;
-				returnValue = new PlayItem(mediaLibrary, item);
-			}
-			b.getShell().close();
+			leaveDlg(btnOk == b, e.stateMask);
 		}
 	};
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private MediaItem getSelectedItem () {
 		ISelection selection = tableViewer.getSelection();
