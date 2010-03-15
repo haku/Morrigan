@@ -30,6 +30,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
@@ -42,34 +43,48 @@ public class JumpToDlg extends Dialog {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	private static volatile Boolean dlgOpen = false;
+	
 	private final MediaLibrary mediaLibrary;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public JumpToDlg (Shell parent, MediaLibrary mediaLibrary) {
-		super(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.RESIZE);
+		super(parent, SWT.TITLE | SWT.CLOSE | SWT.APPLICATION_MODAL | SWT.RESIZE);
 		
-		if (parent == null) throw new IllegalArgumentException("parent can not be null.");
 		if (mediaLibrary == null) throw new IllegalArgumentException("mediaLibrary can not be null.");
 		
 		this.mediaLibrary = mediaLibrary;
-		setText("Jump to track");
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private final static int SEP = 3;
 	
-	public TableViewer tableViewer;
+	private Label label;
 	private Text text;
+	private TableViewer tableViewer;
 	private PlayItem returnValue = null;
 	
 	public PlayItem open () {
-		final Shell shell = new Shell(getParent(), getStyle());
+		synchronized (dlgOpen) {
+			if (dlgOpen) return null;
+			dlgOpen = true;
+		}
 		
+		// Set dlg text.
+		setText("Jump to track");
+		
+		// Create window.
+		final Shell shell = new Shell(getParent().getDisplay(), getStyle());
+		shell.setImage(getParent().getImage());
+		shell.setText(getText());
+		
+		// Create form layout.
 		FormData formData;
 		shell.setLayout(new FormLayout());
 		
+		label = new Label(shell, SWT.CENTER);
 		text = new Text(shell, SWT.SINGLE | SWT.BORDER);
 		tableViewer =  new TableViewer(shell, SWT.V_SCROLL);
 		Button btnOk = new Button(shell, SWT.PUSH);
@@ -92,6 +107,12 @@ public class JumpToDlg extends Dialog {
 		formData = new FormData();
 		formData.left = new FormAttachment(0, SEP);
 		formData.top = new FormAttachment(0, SEP);
+		formData.right = new FormAttachment(100, -SEP);
+		label.setLayoutData(formData);
+		
+		formData = new FormData();
+		formData.left = new FormAttachment(0, SEP);
+		formData.top = new FormAttachment(label, SEP);
 		formData.right = new FormAttachment(100, -SEP);
 		text.setLayoutData(formData);
 		
@@ -116,6 +137,7 @@ public class JumpToDlg extends Dialog {
 		formData.bottom = new FormAttachment(100, -SEP);
 		btnCancel.setLayoutData(formData);
 		
+		label.setText("Search:");
 		text.addVerifyListener(textChangeListener);
 		
 		tableViewer.setContentProvider(contentProvider);
@@ -127,6 +149,7 @@ public class JumpToDlg extends Dialog {
 		
 		shell.pack();
 		
+		// Work out which screen to show the dlg on.
 		Point mouse = MouseInfo.getPointerInfo().getLocation();
 		for (Monitor m : getParent().getDisplay().getMonitors()) {
 			Rectangle b = m.getBounds();
@@ -143,12 +166,17 @@ public class JumpToDlg extends Dialog {
 			}
 		}
 		
+		// Show the dlg.
 		shell.open();
 		Display display = getParent().getDisplay();
 		while (!shell.isDisposed()) {
 			if (!display.readAndDispatch()) {
 				display.sleep();
 			}
+		}
+		
+		synchronized (dlgOpen) {
+			dlgOpen = false;
 		}
 		
 		return returnValue;
@@ -249,6 +277,7 @@ public class JumpToDlg extends Dialog {
 	/**
 	 * Async task so we can read the complete text from the
 	 * input box.
+	 * Run on UI thread.
 	 */
 	private Runnable updateSearchResults = new Runnable() {
 		@Override
@@ -268,7 +297,16 @@ public class JumpToDlg extends Dialog {
 		Thread t = new Thread() {
 			@Override
 			public void run() {
-				doSearch(query);
+				if (doSearch(query)) {
+					getParent().getDisplay().asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							if (label.isDisposed() || tableViewer.getTable().isDisposed()) return;
+							label.setText(searchResults.size() + " results.");
+							tableViewer.refresh();
+						}
+					});
+				}
 				
 				synchronized (searchLock) {
 					if (searchDirty) {
@@ -288,31 +326,27 @@ public class JumpToDlg extends Dialog {
 	 * Do the actual searching.
 	 * @param query
 	 */
-	private void doSearch (String query) {
-		System.out.println("Searching for '" + query + "'...");
+	private boolean doSearch (String query) {
+		if (query == null || query.length() < 1) return false;
 		
 		String q = query.replace("'", "''");
-//		q = q.replace("\\", "\\\\");
-//		q = q.replace("%", "\\%");
-//		q = q.replace("_", "\\_");
+		q = q.replace("\\", "\\\\");
+		q = q.replace("%", "\\%");
+		q = q.replace("_", "\\_");
 		q = q.replace("*", "%");
 		
 		try {
-			searchResults = mediaLibrary.simpleSearch(q, "\\", 50);
-			
-			getParent().getDisplay().asyncExec(new Runnable() {
-				@Override
-				public void run() {
-					if (tableViewer.getTable().isDisposed()) return;
-					tableViewer.refresh();
-				}
-			});
+			List<MediaItem> res = mediaLibrary.simpleSearch(q, "\\", 50);
+			if (res != null && res.size() > 0) {
+				searchResults = res;
+				return true;
+			}
 			
 		} catch (DbException e) {
 			e.printStackTrace();
 		}
 		
-		System.out.println(searchResults.size() + " results for '" + query + "'.");
+		return false;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
