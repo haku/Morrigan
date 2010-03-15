@@ -1,5 +1,6 @@
 package net.sparktank.morrigan.engines;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -117,12 +118,44 @@ public class HotkeyRegister {
 		}
 	}
 	
+	private static WeakReference<IHotkeyListener> lastIHotkeyListenerUsed = null;
+	
 	private static IHotkeyListener mainHotkeyListener = new IHotkeyListener () {
+		
 		@Override
 		public void onKeyPress(int id) {
-			for (IHotkeyListener l : hotkeyListeners) {
-				l.onKeyPress(id);
+			IHotkeyListener answer = null;
+			
+			IHotkeyListener last = null;
+			if (lastIHotkeyListenerUsed != null) {
+				last = lastIHotkeyListenerUsed.get();
 			}
+			
+			for (IHotkeyListener l : hotkeyListeners) {
+				CanDo canDo = l.canDoKeyPress(id);
+				
+				if (canDo == CanDo.YES) {
+					answer = l;
+					break;
+					
+				} else if (canDo == CanDo.MAYBE) {
+					if (l == last) {
+						answer = l;
+					} else if (answer == null) {
+						answer = l;
+					}
+				}
+			}
+			
+			if (answer != null) {
+				answer.onKeyPress(id);
+				lastIHotkeyListenerUsed = new WeakReference<IHotkeyListener>(answer);
+			}
+		}
+		
+		@Override
+		public CanDo canDoKeyPress(int id) {
+			return CanDo.NO;
 		}
 		
 	};

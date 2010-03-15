@@ -1067,6 +1067,61 @@ public abstract class AbstractPlayerView extends ViewPart {
 	}
 	
 	private IHotkeyListener hotkeyListener = new IHotkeyListener() {
+		
+		@Override
+		public CanDo canDoKeyPress(int id) {
+			IPlaybackEngine eng = null;
+			try {
+				eng = getPlaybackEngine(false);
+			} catch (ImplException e) {
+				e.printStackTrace();
+			}
+			
+			boolean isPlaying = false;
+			boolean isPaused = false;
+			if (eng != null) {
+				PlayState playbackState = eng.getPlaybackState();
+				if (playbackState == PlayState.Playing) {
+					isPlaying = true;
+				}else if (playbackState == PlayState.Paused) {
+					isPaused = true;
+				}
+			}
+			
+			switch (id) {
+				
+				case IHotkeyEngine.MORRIGAN_HK_STOP:
+					if (isPlaying) {
+						return CanDo.YES;
+					} else if (isPaused) {
+						return CanDo.MAYBE;
+					} else {
+						return CanDo.NO;
+					}
+					
+				case IHotkeyEngine.MORRIGAN_HK_PLAYPAUSE:
+					if (isPlaying) {
+						return CanDo.YES;
+					} else if (isPaused) {
+						return CanDo.MAYBE;
+					} else {
+						return CanDo.NO;
+					}
+					
+				case IHotkeyEngine.MORRIGAN_HK_NEXT:
+					if (isPlaying) {
+						return CanDo.YES;
+					} else if (isPaused || getCurrentList() != null) {
+						return CanDo.MAYBE;
+					} else {
+						return CanDo.NO;
+					}
+					
+			}
+			
+			return CanDo.NO;
+		}
+		
 		@Override
 		public void onKeyPress(int id) {
 			switch (id) {
@@ -1101,7 +1156,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 						}
 					});
 					break;
-				
+					
 				case IHotkeyEngine.MORRIGAN_HK_NEXT:
 					getSite().getShell().getDisplay().asyncExec(new Runnable() {
 						@Override
@@ -1115,12 +1170,10 @@ public abstract class AbstractPlayerView extends ViewPart {
 					});
 					break;
 					
-				default:
-					getSite().getShell().getDisplay().asyncExec(new RunnableDialog("id="+id));
-					break;
-				
 			}
+			
 		}
+		
 	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
