@@ -63,6 +63,13 @@ public class HotkeyRegister {
 			System.out.println("registered MORRIGAN_HK_NEXT: " + hkNext.toString());
 		}
 		
+		HotkeyValue hkJumpto = HotkeyPref.getHkJumpto();
+		if (hkJumpto!=null) {
+			getHotkeyEngine(true).registerHotkey(IHotkeyEngine.MORRIGAN_HK_JUMPTO, hkJumpto);
+			registeredHotkeys.add(IHotkeyEngine.MORRIGAN_HK_JUMPTO);
+			System.out.println("registered MORRIGAN_HK_JUMPTO: " + hkJumpto.toString());
+		}
+		
 		configRead = true;
 	}
 	
@@ -91,6 +98,13 @@ public class HotkeyRegister {
 				engine.unregisterHotkey(IHotkeyEngine.MORRIGAN_HK_NEXT);
 				registeredHotkeys.remove(new Integer(IHotkeyEngine.MORRIGAN_HK_NEXT));
 				System.out.println("unregistered MORRIGAN_HK_NEXT.");
+			}
+			
+			if (registeredHotkeys.contains(IHotkeyEngine.MORRIGAN_HK_JUMPTO)) {
+				System.out.println("Going to unregister MORRIGAN_HK_JUMPTO...");
+				engine.unregisterHotkey(IHotkeyEngine.MORRIGAN_HK_JUMPTO);
+				registeredHotkeys.remove(new Integer(IHotkeyEngine.MORRIGAN_HK_JUMPTO));
+				System.out.println("unregistered MORRIGAN_HK_JUMPTO.");
 			}
 		}
 		

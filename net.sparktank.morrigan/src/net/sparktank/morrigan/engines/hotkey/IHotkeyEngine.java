@@ -7,6 +7,7 @@ public interface IHotkeyEngine {
 	public static final int MORRIGAN_HK_STOP = 100;
 	public static final int MORRIGAN_HK_PLAYPAUSE = 101;
 	public static final int MORRIGAN_HK_NEXT = 102;
+	public static final int MORRIGAN_HK_JUMPTO = 103;
 	
 	/**
 	 * Returns the description of this engine.

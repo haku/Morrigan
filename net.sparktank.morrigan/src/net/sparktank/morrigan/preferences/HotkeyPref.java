@@ -30,6 +30,7 @@ public class HotkeyPref extends PreferencePage implements IWorkbenchPreferencePa
 	public static final String PREF_HK_STOP = "PREF_HK_STOP";
 	public static final String PREF_HK_PLAYPAUSE = "PREF_HK_PLAYPAUSE";
 	public static final String PREF_HK_NEXT = "PREF_HK_NEXT";
+	public static final String PREF_HK_JUMPTO = "PREF_HK_JUMPTO";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -52,6 +53,7 @@ public class HotkeyPref extends PreferencePage implements IWorkbenchPreferencePa
 			hkStop.setValue(getHkStop());
 			hkPlaypause.setValue(getHkPlaypause());
 			hkNext.setValue(getHkNext());
+			hkJumpto.setValue(getHkJumpto());
 			
 		} catch (Exception e) {
 			new MorriganMsgDlg(e).open();
@@ -81,6 +83,13 @@ public class HotkeyPref extends PreferencePage implements IWorkbenchPreferencePa
 			getPreferenceStore().setValue(PREF_HK_NEXT, "");
 		}
 		
+		HotkeyValue hkJumptoValue = hkJumpto.getValue();
+		if (hkJumptoValue!=null) {
+			getPreferenceStore().setValue(PREF_HK_JUMPTO, hkJumptoValue.serialise());
+		} else {
+			getPreferenceStore().setValue(PREF_HK_JUMPTO, "");
+		}
+		
 		try {
 			HotkeyRegister.readConfig(true);
 		} catch (Throwable t) {
@@ -96,6 +105,7 @@ public class HotkeyPref extends PreferencePage implements IWorkbenchPreferencePa
 	private HotkeyChooser hkStop;
 	private HotkeyChooser hkPlaypause;
 	private HotkeyChooser hkNext;
+	private HotkeyChooser hkJumpto;
 	
 	protected Control makeContents(Composite parent) {
 		initializeDialogUnits(parent);
@@ -112,6 +122,7 @@ public class HotkeyPref extends PreferencePage implements IWorkbenchPreferencePa
 		hkStop = new HotkeyChooser(composite, "stop");
 		hkPlaypause = new HotkeyChooser(composite, "play / pause");
 		hkNext = new HotkeyChooser(composite, "next");
+		hkJumpto = new HotkeyChooser(composite, "jump to");
 		
 		applyDialogFont(composite);
 		return composite;
@@ -224,6 +235,10 @@ public class HotkeyPref extends PreferencePage implements IWorkbenchPreferencePa
 	
 	static public HotkeyValue getHkNext () {
 		return getHk(PREF_HK_NEXT);
+	}
+	
+	static public HotkeyValue getHkJumpto () {
+		return getHk(PREF_HK_JUMPTO);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
