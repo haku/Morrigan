@@ -147,6 +147,7 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 		contextMenuMgr.add(addToQueueAction);
 		contextMenuMgr.add(getAddToMenu());
 		contextMenuMgr.add(new Separator());
+		contextMenuMgr.add(toggleEnabledAction);
 		contextMenuMgr.add(removeAction);
 		setTableMenu(contextMenuMgr.createContextMenu(parent));
 		
