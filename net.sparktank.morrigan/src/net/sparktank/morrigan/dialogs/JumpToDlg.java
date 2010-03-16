@@ -81,7 +81,8 @@ public class JumpToDlg extends Dialog {
 	private Label label;
 	private Text text;
 	private TableViewer tableViewer;
-	private Button btnOk;
+	private Button btnPlay;
+	private Button btnEnqueue;
 	private Button btnCancel;
 	
 	private PlayItem returnValue = null;
@@ -113,10 +114,11 @@ public class JumpToDlg extends Dialog {
 		label = new Label(shell, SWT.CENTER);
 		text = new Text(shell, SWT.SINGLE | SWT.CENTER | SWT.BORDER);
 		tableViewer =  new TableViewer(shell, SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION);
-		btnOk = new Button(shell, SWT.PUSH);
+		btnPlay = new Button(shell, SWT.PUSH);
+		btnEnqueue = new Button(shell, SWT.PUSH);
 		btnCancel = new Button(shell, SWT.PUSH);
 		
-		shell.setDefaultButton(btnOk);
+		shell.setDefaultButton(btnPlay);
 		shell.addListener(SWT.Traverse, traverseListener);
 		
 		formData = new FormData();
@@ -135,20 +137,26 @@ public class JumpToDlg extends Dialog {
 		formData.left = new FormAttachment(0, SEP);
 		formData.top = new FormAttachment(text, SEP);
 		formData.right = new FormAttachment(100, -SEP);
-		formData.bottom = new FormAttachment(btnOk, -SEP);
+		formData.bottom = new FormAttachment(btnPlay, -SEP);
 		formData.width = 500;
 		formData.height = 300;
 		tableViewer.getTable().setLayoutData(formData);
 		
-		btnOk.setText("Play");
+		btnPlay.setText("Play");
 		formData = new FormData();
 		formData.right = new FormAttachment(100, -SEP);
 		formData.bottom = new FormAttachment(100, -SEP);
-		btnOk.setLayoutData(formData);
+		btnPlay.setLayoutData(formData);
+		
+		btnEnqueue.setText("Enqueue");
+		formData = new FormData();
+		formData.right = new FormAttachment(btnPlay, -SEP);
+		formData.bottom = new FormAttachment(100, -SEP);
+		btnEnqueue.setLayoutData(formData);
 		
 		btnCancel.setText("Cancel");
 		formData = new FormData();
-		formData.right = new FormAttachment(btnOk, -SEP);
+		formData.left = new FormAttachment(0, SEP);
 		formData.bottom = new FormAttachment(100, -SEP);
 		btnCancel.setLayoutData(formData);
 		
@@ -162,7 +170,8 @@ public class JumpToDlg extends Dialog {
 		tableViewer.setInput(shell);
 		tableViewer.getTable().addTraverseListener(listTraverseListener);
 		
-		btnOk.addSelectionListener(buttonListener);
+		btnPlay.addSelectionListener(buttonListener);
+		btnEnqueue.addSelectionListener(buttonListener);
 		btnCancel.addSelectionListener(buttonListener);
 		
 		shell.pack();
@@ -271,8 +280,16 @@ public class JumpToDlg extends Dialog {
 	private SelectionListener buttonListener = new SelectionAdapter() {
 		@Override
 		public void widgetSelected(SelectionEvent e) {
-			Button b = (Button) e.widget;
-			leaveDlg(btnOk == b, e.stateMask);
+			if (e.widget == btnPlay) {
+				leaveDlg(true, 0);
+				
+			} else if (e.widget == btnEnqueue) {
+				leaveDlg(true, SWT.CONTROL);
+				
+			} else {
+				leaveDlg(false, 0);
+				
+			}
 		}
 	};
 	
