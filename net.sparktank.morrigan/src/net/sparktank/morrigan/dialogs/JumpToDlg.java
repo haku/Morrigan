@@ -21,6 +21,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Rectangle;
@@ -109,8 +111,8 @@ public class JumpToDlg extends Dialog {
 		shell.setLayout(new FormLayout());
 		
 		label = new Label(shell, SWT.CENTER);
-		text = new Text(shell, SWT.SINGLE | SWT.BORDER);
-		tableViewer =  new TableViewer(shell, SWT.V_SCROLL);
+		text = new Text(shell, SWT.SINGLE | SWT.CENTER | SWT.BORDER);
+		tableViewer =  new TableViewer(shell, SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION);
 		btnOk = new Button(shell, SWT.PUSH);
 		btnCancel = new Button(shell, SWT.PUSH);
 		
@@ -151,11 +153,14 @@ public class JumpToDlg extends Dialog {
 		btnCancel.setLayoutData(formData);
 		
 		label.setText("Search:");
+		
 		text.addVerifyListener(textChangeListener);
+		text.addTraverseListener(textTraverseListener);
 		
 		tableViewer.setContentProvider(contentProvider);
 		tableViewer.setLabelProvider(labelProvider);
 		tableViewer.setInput(shell);
+		tableViewer.getTable().addTraverseListener(listTraverseListener);
 		
 		btnOk.addSelectionListener(buttonListener);
 		btnCancel.addSelectionListener(buttonListener);
@@ -183,6 +188,7 @@ public class JumpToDlg extends Dialog {
 		
 		// Show the dlg.
 		shell.open();
+		shell.setFocus();
 		Display display = getParent().getDisplay();
 		while (!shell.isDisposed()) {
 			if (!display.readAndDispatch()) {
@@ -229,6 +235,35 @@ public class JumpToDlg extends Dialog {
 					leaveDlg(false, e.stateMask);
 					break;
 				
+			}
+		}
+	};
+	
+	private TraverseListener textTraverseListener = new TraverseListener() {
+		@Override
+		public void keyTraversed(TraverseEvent e) {
+			switch (e.detail) {
+				case SWT.TRAVERSE_ARROW_NEXT:
+					if (e.keyCode == SWT.ARROW_DOWN && tableViewer.getTable().getItemCount() > 0) {
+						e.detail = SWT.TRAVERSE_NONE;
+						e.doit = false;
+						tableViewer.getTable().setSelection(0);
+						tableViewer.getTable().setFocus();
+					}
+			}
+		}
+	};
+	
+	private TraverseListener listTraverseListener = new TraverseListener() {
+		@Override
+		public void keyTraversed(TraverseEvent e) {
+			switch (e.detail) {
+				case SWT.TRAVERSE_ARROW_PREVIOUS:
+					if (tableViewer.getTable().getSelectionIndex() == 0) {
+						e.detail = SWT.TRAVERSE_NONE;
+						e.doit = false;
+						text.setFocus();
+					}
 			}
 		}
 	};
@@ -352,6 +387,10 @@ public class JumpToDlg extends Dialog {
 							if (label.isDisposed() || tableViewer.getTable().isDisposed()) return;
 							label.setText(searchResults.size() + " results.");
 							tableViewer.refresh();
+							
+							if (tableViewer.getTable().getItemCount() > 0) {
+								tableViewer.getTable().setSelection(0);
+							}
 						}
 					});
 				}
