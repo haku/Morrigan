@@ -31,14 +31,18 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.StyledCellLabelProvider;
+import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.TextStyle;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -276,25 +280,57 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		
 	};
 	
-	private class FileLblProv extends ColumnLabelProvider {
-		@Override
-		public String getText(Object element) {
-			MediaItem elm = (MediaItem) element;
-			return elm.getTitle() == null ? null : elm.getTitle();
+	private Styler strikeoutItemStyle = new Styler() {
+		public void applyStyles(TextStyle textStyle) {
+			textStyle.strikeout = true;
 		}
+	};
+	
+	private static final String MSG_DEC_MISSING = " (missing)";
+	private static final String MSG_DEC_DISABLED = " (disabled)";
+	
+	private class FileLblProv extends StyledCellLabelProvider {
 		@Override
-		public Image getImage(Object element) {
+		public void update(ViewerCell cell) {
+			Object element = cell.getElement();
 			if (element instanceof MediaItem) {
-				MediaItem item = (MediaItem) element;
-				if (item.isMissing()) {
-					return null; // TODO find icon for missing.
-				} else if (!item.isEnabled()) {
-					return null; // TODO find icon for disabled.
+				MediaItem mi = (MediaItem) element;
+				
+				if (mi.getTitle() != null) {
+					Styler styler = null;
+					if (mi.isMissing() || !mi.isEnabled()) {
+						styler = strikeoutItemStyle;
+					}
+					StyledString styledString = new StyledString(mi.getTitle(), styler);
+					
+					String dec = null;
+					if (mi.isMissing()) {
+						dec = MSG_DEC_MISSING;
+					} else if (!mi.isEnabled()) {
+						dec = MSG_DEC_DISABLED;
+					}
+					
+					if (dec != null) {
+						styledString.append(dec, StyledString.DECORATIONS_STYLER);
+					}
+					
+					cell.setText(styledString.toString());
+					cell.setStyleRanges(styledString.getStyleRanges());
+					
 				} else {
-					return imageCache.readImage("icons/playlist.gif"); // TODO find icon for items.
+					cell.setText(null);
 				}
+				
+				if (mi.isMissing()) {
+					cell.setImage(null); // TODO find icon for missing?
+				} else if (!mi.isEnabled()) {
+					cell.setImage(null); // TODO find icon for disabled?
+				} else {
+					cell.setImage(imageCache.readImage("icons/playlist.gif")); // TODO find icon for items?
+				}
+				
 			}
-			return super.getImage(element);
+			super.update(cell);
 		}
 	}
 	
@@ -609,6 +645,20 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 				}
 			}
 		}
+	};
+	
+	protected IAction toggleEnabledAction = new Action("Toggle enabled") {
+		@Override
+		public void run() {
+			for (MediaItem track : getSelectedTracks()) {
+				try {
+					editorInput.getMediaList().setTrackEnabled(track, !track.isEnabled());
+				} catch (MorriganException e) {
+					// TODO something more useful here.
+					e.printStackTrace();
+				}
+			}
+		};
 	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
