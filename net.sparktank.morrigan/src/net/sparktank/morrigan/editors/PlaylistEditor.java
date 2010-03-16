@@ -21,6 +21,10 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -29,6 +33,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
 
@@ -93,6 +98,7 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	GUI components.
 	
+	private Image iconX;
 	private Image iconQueueAdd;
 	private Image iconAdd;
 	private Image iconRemove;
@@ -100,6 +106,7 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 	private Image iconSave;
 	
 	private void makeIcons () {
+		iconX = Activator.getImageDescriptor("icons/x.gif").createImage();
 		iconQueueAdd = Activator.getImageDescriptor("icons/queue-add.gif").createImage();
 		iconAdd = Activator.getImageDescriptor("icons/plus.gif").createImage();
 		iconRemove = Activator.getImageDescriptor("icons/minus.gif").createImage();
@@ -108,6 +115,7 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 	}
 	
 	private void disposeIcons () {
+		iconX.dispose();
 		iconQueueAdd.dispose();
 		iconAdd.dispose();
 		iconRemove.dispose();
@@ -116,6 +124,7 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 	}
 	
 	private Label lblStatus;
+	private Text txtFilter;
 	
 	@Override
 	protected void populateToolbar(Composite parent) {
@@ -138,8 +147,10 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 		final int sep = 3;
 		FormData formData;
 		
-		Button btnAddToQueue = new Button(parent, SWT.PUSH);
 		lblStatus = new Label(parent, SWT.NONE);
+		txtFilter = new Text(parent, SWT.SINGLE | SWT.BORDER);
+		Button btnClearFilter = new Button(parent, SWT.PUSH);
+		Button btnAddToQueue = new Button(parent, SWT.PUSH);
 		Button btnAdd = new Button(parent, SWT.PUSH);
 		Button btnRemove = new Button(parent, SWT.PUSH);
 		Button btnSave = new Button(parent, SWT.PUSH);
@@ -147,8 +158,21 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 		formData = new FormData();
 		formData.top = new FormAttachment(50, -(lblStatus.computeSize(SWT.DEFAULT, SWT.DEFAULT).y)/2);
 		formData.left = new FormAttachment(0, sep*2);
-		formData.right = new FormAttachment(btnAddToQueue, -sep);
+		formData.right = new FormAttachment(txtFilter, -sep);
 		lblStatus.setLayoutData(formData);
+		
+		formData = new FormData();
+		formData.top = new FormAttachment(0, sep);
+		formData.bottom = new FormAttachment(100, -sep);
+		formData.right = new FormAttachment(btnClearFilter, -sep);
+		txtFilter.setLayoutData(formData);
+		
+		formData = new FormData();
+		formData.top = new FormAttachment(0, sep);
+		formData.bottom = new FormAttachment(100, -sep);
+		formData.right = new FormAttachment(btnAddToQueue, -sep * 3);
+		btnClearFilter.setImage(iconX);
+		btnClearFilter.setLayoutData(formData);
 		
 		formData = new FormData();
 		formData.top = new FormAttachment(0, sep);
@@ -178,6 +202,8 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 		btnSave.setImage(iconSave);
 		btnSave.setLayoutData(formData);
 		
+		txtFilter.addKeyListener(filterListener);
+		btnClearFilter.addSelectionListener(clearFilterListener);
 		btnAddToQueue.addSelectionListener(new ActionListener(addToQueueAction));
 		btnAdd.addSelectionListener(new ActionListener(addAction));
 		btnRemove.addSelectionListener(new ActionListener(removeAction));
@@ -199,6 +225,20 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 				TimeHelper.formatTime(d.duration) + "."
 				);
 	}
+	
+	private KeyAdapter filterListener = new KeyAdapter() {
+		public void keyReleased(KeyEvent ke) {
+			setFilterString(txtFilter.getText());
+		}
+	};
+	
+	SelectionAdapter clearFilterListener = new SelectionAdapter() {
+		@Override
+		public void widgetSelected(SelectionEvent e) {
+			txtFilter.setText("");
+			setFilterString("");
+		}
+	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Actions.
