@@ -34,6 +34,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -79,6 +80,7 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 	MediaListEditorInput<T> editorInput;
 	
 	private TableViewer editTable;
+	private MediaFilter mediaFilter;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructor.
@@ -121,6 +123,9 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		imageCache.clearCache();
 		super.dispose();
 	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Controls.
 	
 	@Override
 	public void createPartControl(Composite parent) {
@@ -215,6 +220,8 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		editTable.setContentProvider(contentProvider);
 		editTable.addDoubleClickListener(doubleClickListener);
 		editTable.setInput(getEditorSite());
+		mediaFilter = new MediaFilter();
+		editTable.addFilter(mediaFilter);
 		
 		int topIndex = editorInput.getTopIndex();
 		if (topIndex > 0) {
@@ -234,9 +241,6 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		return editorInput.getMediaList().getDirtyState() == DirtyState.DIRTY;
 	}
 	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Controls.
-	
 	abstract protected void populateToolbar (Composite parent);
 	
 	private ImageCache imageCache = new ImageCache();
@@ -248,6 +252,11 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 	public void revealTrack (Object element) {
 		editTable.setSelection(new StructuredSelection(element), true);
 		editTable.getTable().setFocus();
+	}
+	
+	protected void setFilterString (String s) {
+		mediaFilter.setFilterString(s);
+		editTable.refresh();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -341,6 +350,29 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 				return TimeHelper.formatTime(elm.getDuration());
 			}
 		}
+	}
+	
+	public class MediaFilter extends ViewerFilter {
+		
+		private String searchTerm;
+
+		public void setFilterString (String s) {
+			this.searchTerm = ".*(?i)" + s + ".*";
+			
+		}
+		
+		@Override
+		public boolean select(Viewer viewer, Object parentElement, Object element) {
+			if (searchTerm == null || searchTerm.length() == 0) {
+				return true;
+			}
+			MediaItem mi = (MediaItem) element;
+			if (mi.getFilepath().matches(searchTerm)) {
+				return true;
+			}
+			return false;
+		}
+		
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
