@@ -3,6 +3,7 @@ package net.sparktank.morrigan.library;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -180,14 +181,28 @@ public class LibraryUpdateTask extends Job {
 					}
 				}
 				
+				// Last modified date and hash code.
+				long lastModified = file.lastModified();
+				boolean fileModified = false;
+				if (mi.getDateLastModified() == null || mi.getDateLastModified().getTime() != lastModified ) {
+					fileModified = true;
+					System.out.println("[CHANGED] " + mi.getTitle());
+					try {
+						library.setTrackDateLastModified(mi, new Date(lastModified));
+					} catch (Throwable t) {
+						// FIXME log this somewhere useful.
+						System.err.println("Throwable while writing track last modified date '"+mi.getFilepath()+"': " + t.getMessage());
+					}
+				}
+				
 				// Hash code.
-				if (mi.getHashcode() == 0) {
+				if (fileModified || mi.getHashcode() == 0) {
 					try {
 						long hash = ChecksumHelper.generateCrc32Checksum(mi.getFilepath());
 						library.setTrackHashCode(mi, hash);
 					} catch (Throwable t) {
 						// FIXME log this somewhere useful.
-						System.err.println("Throwable while marking track as missing '"+mi.getFilepath()+"': " + t.getMessage());
+						System.err.println("Throwable while setting track hash code '"+mi.getFilepath()+"': " + t.getMessage());
 					}
 				}
 				
