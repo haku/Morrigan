@@ -131,8 +131,21 @@ public abstract class MediaList {
 		return Collections.unmodifiableList(mediaTracks);
 	}
 	
-	protected void replaceList (List<MediaItem> mediaTracks) {
-		this.mediaTracks = mediaTracks;
+	protected void replaceList (List<MediaItem> newTracks) {
+		List<MediaItem> tempList = new ArrayList<MediaItem>();
+		
+		for (MediaItem newItem : newTracks) {
+			int indexOfOldItem = this.mediaTracks.indexOf(newItem);
+			if (indexOfOldItem >= 0) {
+				MediaItem oldItem = this.mediaTracks.get(indexOfOldItem);
+				oldItem.setFromMediaItem(newItem);
+				tempList.add(oldItem);
+			} else {
+				tempList.add(newItem);
+			}
+		}
+		
+		this.mediaTracks = tempList;
 		setDirtyState(DirtyState.DIRTY);
 	}
 	
@@ -190,6 +203,11 @@ public abstract class MediaList {
 	
 	public void setTrackHashCode (MediaItem track, long hashcode) throws MorriganException {
 		track.setHashcode(hashcode);
+		setDirtyState(DirtyState.METADATA);
+	}
+	
+	public void setTrackDateLastModified (MediaItem track, Date date) throws MorriganException {
+		track.setDateLastModified(date);
 		setDirtyState(DirtyState.METADATA);
 	}
 	
