@@ -585,6 +585,19 @@ public abstract class AbstractPlayerView extends ViewPart {
 		@Override
 		public void durationChanged(int duration) {
 			_currentTrackDuration = duration;
+			
+			if (duration > 0) {
+				PlayItem c = getCurrentItem();
+				if (c != null && c.list != null && c.item != null) {
+					try {
+						System.out.println("duration=" + duration);
+						c.list.setTrackDuration(c.item, duration);
+					} catch (Throwable t) {
+						t.printStackTrace();
+					}
+				}
+			}
+			
 			callUpdateStatus();
 		};
 		
