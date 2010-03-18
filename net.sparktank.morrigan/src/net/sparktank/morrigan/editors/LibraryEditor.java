@@ -95,14 +95,12 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 	private Image iconX;
 	private Image iconQueueAdd;
 	private Image iconAdd;
-	private Image iconRemove;
 	private Image iconProperties;
 	
 	private void makeIcons () {
 		iconX = Activator.getImageDescriptor("icons/x.gif").createImage();
 		iconQueueAdd = Activator.getImageDescriptor("icons/queue-add.gif").createImage();
 		iconAdd = Activator.getImageDescriptor("icons/plus.gif").createImage();
-		iconRemove = Activator.getImageDescriptor("icons/minus.gif").createImage();
 		iconProperties = Activator.getImageDescriptor("icons/pref.gif").createImage();
 	}
 	
@@ -110,7 +108,6 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 		if (iconX != null) iconX.dispose();
 		if (iconQueueAdd != null) iconQueueAdd.dispose();
 		if (iconAdd != null) iconAdd.dispose();
-		if (iconRemove != null) iconRemove.dispose();
 		if (iconProperties != null) iconProperties.dispose();
 	}
 	
@@ -161,7 +158,6 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 		Button btnClearFilter = new Button(parent, SWT.PUSH);
 		Button btnAddToQueue = new Button(parent, SWT.PUSH);
 		Button btnAdd = new Button(parent, SWT.PUSH);
-		Button btnRemove = new Button(parent, SWT.PUSH);
 		Button btnProperties = new Button(parent, SWT.PUSH);
 		
 		formData = new FormData();
@@ -193,16 +189,9 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 		formData = new FormData();
 		formData.top = new FormAttachment(0, sep);
 		formData.bottom = new FormAttachment(100, -sep);
-		formData.right = new FormAttachment(btnRemove, -sep);
+		formData.right = new FormAttachment(btnProperties, -sep);
 		btnAdd.setImage(iconAdd);
 		btnAdd.setLayoutData(formData);
-		
-		formData = new FormData();
-		formData.top = new FormAttachment(0, sep);
-		formData.bottom = new FormAttachment(100, -sep);
-		formData.right = new FormAttachment(btnProperties, -sep);
-		btnRemove.setImage(iconRemove);
-		btnRemove.setLayoutData(formData);
 		
 		formData = new FormData();
 		formData.top = new FormAttachment(0, sep);
@@ -215,7 +204,6 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 		btnClearFilter.addSelectionListener(clearFilterListener);
 		btnAddToQueue.addSelectionListener(new ActionListener(addToQueueAction));
 		btnAdd.addSelectionListener(new ActionListener(addAction));
-		btnRemove.addSelectionListener(new ActionListener(removeAction));
 		btnProperties.addSelectionListener(new DropMenuListener(btnProperties, prefMenuMgr));
 	}
 	
