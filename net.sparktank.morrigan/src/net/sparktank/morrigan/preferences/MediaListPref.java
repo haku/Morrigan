@@ -17,6 +17,7 @@ public class MediaListPref extends FieldEditorPreferencePage implements IWorkben
 	public static final String PREF_COL_COUNTS    = "PREF_COL_COUNTS";
 	public static final String PREF_COL_DLASTPLAY = "PREF_COL_DLASTPLAY";
 	public static final String PREF_COL_HASHCODE  = "PREF_COL_HASHCODE";
+	public static final String PREF_COL_DMODIFIED = "PREF_COL_DMODIFIED";
 	public static final String PREF_COL_DURATION  = "PREF_COL_DURATION";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -27,6 +28,7 @@ public class MediaListPref extends FieldEditorPreferencePage implements IWorkben
 		addField(new BooleanFieldEditor(PREF_COL_DADDED, "Show date added column", getFieldEditorParent()));
 		addField(new BooleanFieldEditor(PREF_COL_DLASTPLAY, "Show date last played column", getFieldEditorParent()));
 		addField(new BooleanFieldEditor(PREF_COL_HASHCODE, "Show hashcode column", getFieldEditorParent()));
+		addField(new BooleanFieldEditor(PREF_COL_DMODIFIED, "Show date last modified column", getFieldEditorParent()));
 		addField(new BooleanFieldEditor(PREF_COL_DURATION, "Show duration column", getFieldEditorParent()));
 	}
 	
@@ -55,6 +57,9 @@ public class MediaListPref extends FieldEditorPreferencePage implements IWorkben
 				
 			case HASHCODE:
 				return Activator.getDefault().getPreferenceStore().getBoolean(PREF_COL_HASHCODE);
+				
+			case DMODIFIED:
+				return Activator.getDefault().getPreferenceStore().getBoolean(PREF_COL_DMODIFIED);
 				
 			case DURATION:
 				return Activator.getDefault().getPreferenceStore().getBoolean(PREF_COL_DURATION);
