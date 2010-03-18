@@ -5,7 +5,8 @@ Bundle-SymbolicName: net.sparktank.morrigan;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: net.sparktank.morrigan.Activator
 Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime
+ org.eclipse.core.runtime,
+ org.eclipse.ui.console;bundle-version="3.4.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: .,

@@ -5,11 +5,13 @@ import net.sparktank.morrigan.views.ViewDisplay;
 import net.sparktank.morrigan.views.ViewLibraryProperties;
 import net.sparktank.morrigan.views.ViewMediaExplorer;
 import net.sparktank.morrigan.views.ViewPlayer;
-import net.sparktank.morrigan.views.*;
+import net.sparktank.morrigan.views.ViewQueue;
+
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
 import org.eclipse.ui.IPlaceholderFolderLayout;
+import org.eclipse.ui.console.IConsoleConstants;
 
 public class PerspectiveMain implements IPerspectiveFactory {
 
@@ -33,6 +35,7 @@ public class PerspectiveMain implements IPerspectiveFactory {
 		bottom.addPlaceholder(ViewQueue.ID);
 		bottom.addPlaceholder(ViewLibraryProperties.ID);
 		bottom.addPlaceholder("org.eclipse.ui.views.ProgressView");
+		bottom.addPlaceholder(IConsoleConstants.ID_CONSOLE_VIEW);
 		
 	}
 
