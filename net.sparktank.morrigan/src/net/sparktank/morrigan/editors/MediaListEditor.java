@@ -69,6 +69,7 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		DADDED     {@Override public String toString() { return "added";       } },
 		DLASTPLAY  {@Override public String toString() { return "last played"; } },
 		HASHCODE   {@Override public String toString() { return "hash";        } },
+		DMODIFIED  {@Override public String toString() { return "modified";    } },
 		DURATION   {@Override public String toString() { return "duration";    } }
 		}
 	
@@ -194,6 +195,11 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 						layout.setColumnData(column.getColumn(), new ColumnPixelData(90, true, true));
 						column.setLabelProvider(new HashcodeLblProv());
 						column.getColumn().setAlignment(SWT.CENTER);
+						break;
+						
+					case DMODIFIED:
+						layout.setColumnData(column.getColumn(), new ColumnPixelData(140, true, true));
+						column.setLabelProvider(new DateLastModifiedLblProv());
 						break;
 						
 					case DURATION:
@@ -373,6 +379,15 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 			} else {
 				return Long.toHexString(elm.getHashcode());
 			}
+		}
+	}
+	
+	private class DateLastModifiedLblProv extends ColumnLabelProvider {
+		private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+		@Override
+		public String getText(Object element) {
+			MediaItem elm = (MediaItem) element;
+			return elm.getDateLastModified() == null ? null : sdf.format(elm.getDateLastModified());
 		}
 	}
 	

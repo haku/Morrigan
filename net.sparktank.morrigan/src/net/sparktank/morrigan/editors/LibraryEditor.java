@@ -270,6 +270,10 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 				sort = LibrarySort.HASHCODE;
 				break;
 				
+			case DMODIFIED:
+				sort = LibrarySort.DMODIFIED;
+				break;
+				
 			case DURATION:
 				sort = LibrarySort.DURATION;
 				break;
