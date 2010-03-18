@@ -25,6 +25,7 @@ public class MediaItem {
 	private Date dateLastPlayed = null;
 	private int duration = -1;
 	private long hashcode = 0;
+	private Date dateLastModified = null;
 	private boolean enabled = true;
 	private boolean missing = false;
 	
@@ -77,6 +78,13 @@ public class MediaItem {
 		this.hashcode = hashcode;
 	}
 	
+	public Date getDateLastModified() {
+		return dateLastModified;
+	}
+	public void setDateLastModified(Date lastModified) {
+		this.dateLastModified = lastModified;
+	}
+	
 	public boolean isEnabled() {
 		return enabled;
 	}
@@ -89,6 +97,22 @@ public class MediaItem {
 	}
 	public void setMissing(boolean missing) {
 		this.missing = missing;
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Mass setter.
+	
+	public void setFromMediaItem (MediaItem mi) {
+		this.setfilepath(mi.getFilepath());
+		this.setDateAdded(mi.getDateAdded());
+		this.setStartCount(mi.getStartCount());
+		this.setEndCount(mi.getEndCount());
+		this.setDateLastPlayed(mi.getDateLastPlayed());
+		this.setDuration(mi.getDuration());
+		this.setHashcode(mi.getHashcode());
+		this.setDateLastModified(mi.getDateLastModified());
+		this.setEnabled(mi.isEnabled());
+		this.setMissing(mi.isMissing());
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

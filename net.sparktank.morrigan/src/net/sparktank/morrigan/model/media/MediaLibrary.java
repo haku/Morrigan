@@ -185,6 +185,12 @@ public class MediaLibrary extends MediaList {
 	}
 	
 	@Override
+	public void setTrackDateLastModified(MediaItem track, Date date) throws MorriganException {
+		super.setTrackDateLastModified(track, date);
+		dbLayer.setDateLastModified(track.getFilepath(), date);
+	}
+	
+	@Override
 	public void setTrackEnabled(MediaItem track, boolean value) throws MorriganException {
 		super.setTrackEnabled(track, value);
 		dbLayer.setEnabled(track.getFilepath(), value);
