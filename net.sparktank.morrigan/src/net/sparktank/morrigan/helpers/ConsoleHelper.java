@@ -12,8 +12,11 @@ public class ConsoleHelper {
 		ConsolePlugin.getDefault().getConsoleManager().showConsoleView(getMessageConsole());
 	}
 	
+	static private boolean firstAppend = true;
+	
 	static public void appendToConsole (String s) {
-		getMessageConsoleStream().println(s);  
+		getMessageConsoleStream().print(firstAppend ? s :"\n" + s);
+		firstAppend = false;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
