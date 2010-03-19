@@ -153,7 +153,7 @@ public class LibraryUpdateTask extends Job {
 							}
 						}
 					} else {
-						System.err.println("Failed to read directory: " + dirItem.getAbsolutePath());
+						ConsoleHelper.appendToConsole("Failed to read directory: " + dirItem.getAbsolutePath());
 					}
 				}
 			}
@@ -225,7 +225,7 @@ public class LibraryUpdateTask extends Job {
 						if (d>0) library.setTrackDuration(mi, d);
 					} catch (Throwable t) {
 						// FIXME log this somewhere useful.
-						System.err.println("Throwable while reading metadata for '"+mi.getFilepath()+"': " + t.getMessage());
+						ConsoleHelper.appendToConsole("Throwable while reading metadata for '"+mi.getFilepath()+"': " + t.getMessage());
 					}
 				}
 				
