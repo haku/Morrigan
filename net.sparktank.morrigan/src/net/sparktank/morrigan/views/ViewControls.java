@@ -35,6 +35,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.ISizeProvider;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.actions.ContributionItemFactory;
+import org.eclipse.ui.console.IConsoleConstants;
 
 public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -146,6 +147,9 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		prefMenuMgr.add(new Separator());
 		MenuManager showViewMenuMgr =  new MenuManager("Show view", "showView");
 		showViewMenuMgr.add(new ShowViewAction(ViewMediaExplorer.ID, "Media Explorer", Activator.getImageDescriptor("icons/library.gif")));
+		showViewMenuMgr.add(new ShowViewAction(viewDisplay.ID, "Display", Activator.getImageDescriptor("icons/display.gif")));
+		showViewMenuMgr.add(new ShowViewAction(ViewQueue.ID, "Queue", Activator.getImageDescriptor("icons/queue.gif")));
+		showViewMenuMgr.add(new ShowViewAction(IConsoleConstants.ID_CONSOLE_VIEW, "Console", null));
 		showViewMenuMgr.add(new Separator());
 		showViewMenuMgr.add(ContributionItemFactory.VIEWS_SHORTLIST.create(getSite().getWorkbenchWindow()));
 		prefMenuMgr.add(showViewMenuMgr);
