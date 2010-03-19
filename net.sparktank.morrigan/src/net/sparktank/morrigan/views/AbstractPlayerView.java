@@ -1144,7 +1144,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 					getSite().getShell().getDisplay().asyncExec(new Runnable() {
 						@Override
 						public void run() {
-							TrayHelper.activateHideShowWindow(getViewSite().getWorkbenchWindow());
+							TrayHelper.hideShowWindow(getViewSite().getWorkbenchWindow());
 						}
 					});
 					break;
