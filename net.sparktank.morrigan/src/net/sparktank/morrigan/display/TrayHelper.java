@@ -105,8 +105,9 @@ public class TrayHelper {
 	/**
 	 * This method must be called on the UI thread.
 	 */
-	static public void activateHideShowWindow (final IWorkbenchWindow window) {
-		if (window.getShell().getDisplay().getActiveShell() == window.getShell()) {
+	static public void hideShowWindow (final IWorkbenchWindow window) {
+//		if (window.getShell().getDisplay().getActiveShell() != null) { // This does not work with multiple windows.
+		if (window.getShell().isVisible()) {
 			minToTray(window, true);
 		} else {
 			window.getShell().setMinimized(false);
