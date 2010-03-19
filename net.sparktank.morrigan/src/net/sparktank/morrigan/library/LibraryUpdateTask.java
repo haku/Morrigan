@@ -15,6 +15,7 @@ import net.sparktank.morrigan.engines.EngineFactory;
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.ChecksumHelper;
+import net.sparktank.morrigan.helpers.Tracer;
 import net.sparktank.morrigan.model.media.MediaItem;
 import net.sparktank.morrigan.model.media.MediaLibrary;
 
@@ -89,6 +90,9 @@ public class LibraryUpdateTask extends Job {
 	 */
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
+		Tracer.showConsole();
+		Tracer.appendToConsole("Starting library scan...");
+		
 		int progress = 0;
 		monitor.beginTask("Updating library", 100);
 		
@@ -155,7 +159,7 @@ public class LibraryUpdateTask extends Job {
 			}
 		} // End directory scanning.
 		
-		System.out.println("Added " + filesAdded + " files.");
+		Tracer.appendToConsole("Added " + filesAdded + " files.");
 		
 		IPlaybackEngine playbackEngine = null;
 		
@@ -186,7 +190,7 @@ public class LibraryUpdateTask extends Job {
 				boolean fileModified = false;
 				if (mi.getDateLastModified() == null || mi.getDateLastModified().getTime() != lastModified ) {
 					fileModified = true;
-					System.out.println("[CHANGED] " + mi.getTitle());
+					Tracer.appendToConsole("[CHANGED] " + mi.getTitle());
 					try {
 						library.setTrackDateLastModified(mi, new Date(lastModified));
 					} catch (Throwable t) {
@@ -394,19 +398,19 @@ public class LibraryUpdateTask extends Job {
 			/*
 			 * Print out what are left with.
 			 */
-			System.out.println("Found " + dupicateItems.size() + " duplicate items:");
+			Tracer.appendToConsole("Found " + dupicateItems.size() + " duplicate items:");
 			for (MediaItem mi : dupicateItems.keySet()) {
-				System.out.println(dupicateItems.get(mi) + " : " + mi.getTitle());
+				Tracer.appendToConsole(dupicateItems.get(mi) + " : " + mi.getTitle());
 			}
 			
 		} else {
-			System.out.println("No duplicates found.");
+			Tracer.appendToConsole("No duplicates found.");
 		}
 		
 		// TODO : vacuume DB?
 		
 		if (monitor.isCanceled()) {
-			System.out.println("Task was canceled desu~.");
+			Tracer.appendToConsole("Task was canceled desu~.");
 		}
 		
 		isFinished = true;
