@@ -5,6 +5,7 @@ import java.util.List;
 
 import net.sparktank.morrigan.Activator;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
+import net.sparktank.morrigan.editors.LibraryEditor;
 import net.sparktank.morrigan.library.DbException;
 import net.sparktank.morrigan.library.LibraryUpdateAction;
 import net.sparktank.morrigan.model.media.MediaLibrary;
@@ -19,6 +20,8 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DirectoryDialog;
+import org.eclipse.ui.IPartListener;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.ViewPart;
 
 public class ViewLibraryProperties extends ViewPart {
@@ -32,6 +35,9 @@ public class ViewLibraryProperties extends ViewPart {
 	public void createPartControl(Composite parent) {
 		createLayout(parent);
 		addToolbar();
+		
+		getViewSite().getPage().addPartListener(partListener);
+		
 		listChange.run();
 	}
 	
@@ -40,9 +46,31 @@ public class ViewLibraryProperties extends ViewPart {
 	
 	@Override
 	public void dispose() {
+		getViewSite().getPage().removePartListener(partListener);
 		setContent(null, false);
 		super.dispose();
 	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	private IPartListener partListener = new IPartListener() {
+		@Override
+		public void partActivated(IWorkbenchPart part) {
+			if (part instanceof LibraryEditor) {
+				LibraryEditor libEditor = (LibraryEditor) part;
+				setContent(libEditor.getMediaList());
+			}
+		}
+		
+		@Override
+		public void partOpened(IWorkbenchPart part) {}
+		@Override
+		public void partDeactivated(IWorkbenchPart part) {}
+		@Override
+		public void partClosed(IWorkbenchPart part) {}
+		@Override
+		public void partBroughtToTop(IWorkbenchPart part) {}
+	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -54,6 +82,7 @@ public class ViewLibraryProperties extends ViewPart {
 	}
 	
 	public void setContent (MediaLibrary library, boolean updateGui) {
+		if (this.library == library) return;
 		
 		if (this.library!=null) {
 			this.library.removeChangeEvent(listChange);
