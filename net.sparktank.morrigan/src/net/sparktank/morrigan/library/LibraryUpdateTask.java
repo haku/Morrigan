@@ -15,7 +15,7 @@ import net.sparktank.morrigan.engines.EngineFactory;
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.ChecksumHelper;
-import net.sparktank.morrigan.helpers.Tracer;
+import net.sparktank.morrigan.helpers.ConsoleHelper;
 import net.sparktank.morrigan.model.media.MediaItem;
 import net.sparktank.morrigan.model.media.MediaLibrary;
 
@@ -90,8 +90,8 @@ public class LibraryUpdateTask extends Job {
 	 */
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
-		Tracer.showConsole();
-		Tracer.appendToConsole("Starting library scan...");
+		ConsoleHelper.showConsole();
+		ConsoleHelper.appendToConsole("Starting library scan...");
 		
 		int progress = 0;
 		monitor.beginTask("Updating library", 100);
@@ -159,7 +159,7 @@ public class LibraryUpdateTask extends Job {
 			}
 		} // End directory scanning.
 		
-		Tracer.appendToConsole("Added " + filesAdded + " files.");
+		ConsoleHelper.appendToConsole("Added " + filesAdded + " files.");
 		
 		IPlaybackEngine playbackEngine = null;
 		
@@ -190,7 +190,7 @@ public class LibraryUpdateTask extends Job {
 				boolean fileModified = false;
 				if (mi.getDateLastModified() == null || mi.getDateLastModified().getTime() != lastModified ) {
 					fileModified = true;
-					Tracer.appendToConsole("[CHANGED] " + mi.getTitle());
+					ConsoleHelper.appendToConsole("[CHANGED] " + mi.getTitle());
 					try {
 						library.setTrackDateLastModified(mi, new Date(lastModified));
 					} catch (Throwable t) {
@@ -398,19 +398,19 @@ public class LibraryUpdateTask extends Job {
 			/*
 			 * Print out what are left with.
 			 */
-			Tracer.appendToConsole("Found " + dupicateItems.size() + " duplicate items:");
+			ConsoleHelper.appendToConsole("Found " + dupicateItems.size() + " duplicate items:");
 			for (MediaItem mi : dupicateItems.keySet()) {
-				Tracer.appendToConsole(dupicateItems.get(mi) + " : " + mi.getTitle());
+				ConsoleHelper.appendToConsole(dupicateItems.get(mi) + " : " + mi.getTitle());
 			}
 			
 		} else {
-			Tracer.appendToConsole("No duplicates found.");
+			ConsoleHelper.appendToConsole("No duplicates found.");
 		}
 		
 		// TODO : vacuume DB?
 		
 		if (monitor.isCanceled()) {
-			Tracer.appendToConsole("Task was canceled desu~.");
+			ConsoleHelper.appendToConsole("Task was canceled desu~.");
 		}
 		
 		isFinished = true;
