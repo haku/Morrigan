@@ -1,4 +1,4 @@
 UPDATE tbl_mediafiles SET dadded = strftime('%s',dadded)*1000;
 UPDATE tbl_mediafiles SET dlastplay = strftime('%s',dlastplay)*1000;
-UPDATE tbl_mediafiles SET lmd5 = 0;
+UPDATE tbl_mediafiles SET lmd5 = lmd5 + 4294967296 WHERE lmd5 < 0;
 ALTER TABLE tbl_mediafiles ADD COLUMN dmodified DATETIME;
