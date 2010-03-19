@@ -47,7 +47,9 @@ public class ViewQueue extends ViewPart {
 	}
 	
 	@Override
-	public void setFocus() {}
+	public void setFocus() {
+		tableViewer.getTable().setFocus();
+	}
 	
 	@Override
 	public void dispose() {
