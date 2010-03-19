@@ -137,32 +137,32 @@
             name="General">
       </page>
       <page
-            category="org.eclipse.ui.internal.dialogs.WorkbenchPreferencePage"
-            class="org.eclipse.ui.internal.keys.KeysPreferencePage"
-            id="org.eclipse.ui.internal.keys.KeysPreferencePage"
+            category="org.eclipse.ui.preferencePages.Workbench"
+            class="org.eclipse.ui.ExtensionFactory:keysPreferencePage"
+            id="org.eclipse.ui.preferencePages.Keys"
             name="Keys">
       </page>
       <page
-            category="org.eclipse.ui.internal.dialogs.WorkbenchPreferencePage"
-            class="org.eclipse.ui.internal.themes.ColorsAndFontsPreferencePage"
-            id="org.eclipse.ui.internal.themes.ColorsAndFontsPreferencePage"
+            category="org.eclipse.ui.preferencePages.Workbench"
+            class="org.eclipse.ui.ExtensionFactory:colorsAndFontsPreferencePage"
+            id="org.eclipse.ui.preferencePages.ColorsAndFonts"
             name="Colors and Fonts">
       </page>
       <page
-            category="org.eclipse.ui.internal.dialogs.WorkbenchPreferencePage"
-            class="org.eclipse.ui.internal.dialogs.ViewsPreferencePage"
-            id="org.eclipse.ui.internal.dialogs.ViewsPreferencePage"
-            name="Views">
+            category="org.eclipse.ui.preferencePages.Workbench"
+            class="org.eclipse.ui.ExtensionFactory:appearancePreferencePage"
+            id="org.eclipse.ui.preferencePages.Appearance"
+            name="Appearance">
       </page>
       <page
-            category="org.eclipse.ui.internal.dialogs.WorkbenchPreferencePage"
-            class="org.eclipse.ui.internal.dialogs.EditorsPreferencePage"
-            id="org.eclipse.ui.internal.dialogs.EditorsPreferencePage"
+            category="org.eclipse.ui.preferencePages.Workbench"
+            class="org.eclipse.ui.ExtensionFactory:editorsPreferencePage"
+            id="org.eclipse.ui.preferencePages.Editors"
             name="Editors">
       </page>
       <page
-            class="org.eclipse.ui.internal.dialogs.WorkbenchPreferencePage"
-            id="org.eclipse.ui.internal.dialogs.WorkbenchPreferencePage"
+            class="org.eclipse.ui.ExtensionFactory:workbenchPreferencePage"
+            id="org.eclipse.ui.preferencePages.Workbench"
             name="Workbench">
       </page>
       <page
