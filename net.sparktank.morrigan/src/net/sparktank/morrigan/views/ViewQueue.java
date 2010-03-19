@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sparktank.morrigan.Activator;
+import net.sparktank.morrigan.helpers.TimeHelper;
 import net.sparktank.morrigan.model.media.PlayItem;
+import net.sparktank.morrigan.views.AbstractPlayerView.DurationData;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -25,9 +27,10 @@ public class ViewQueue extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static final String ID = "net.sparktank.morrigan.views.ViewQueue";
-
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	private volatile boolean isDisposed = false;
 	AbstractPlayerView abstractPlayerView = null;
 	
 	@Override
@@ -48,11 +51,17 @@ public class ViewQueue extends ViewPart {
 	
 	@Override
 	public void dispose() {
+		isDisposed = true;
+		
 		if (abstractPlayerView != null ) {
 			abstractPlayerView.removeQueueChangeListener(queueChangedListener);
 		}
 		
 		super.dispose();
+	}
+	
+	protected boolean isDisposed () {
+		return isDisposed;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -66,14 +75,21 @@ public class ViewQueue extends ViewPart {
 	private Runnable queueChangedListener = new Runnable() {
 		@Override
 		public void run() {
-			getSite().getShell().getDisplay().asyncExec(updateGuiRunable);
+			if (!updateGuiRunableScheduled) {
+				updateGuiRunableScheduled = true;
+				getSite().getShell().getDisplay().asyncExec(updateGuiRunable);
+			}
 		}
 	};
+	
+	private volatile boolean updateGuiRunableScheduled = false;
 	
 	private Runnable updateGuiRunable = new Runnable() {
 		@Override
 		public void run() {
+			updateGuiRunableScheduled = false;
 			if (tableViewer.getTable().isDisposed()) return;
+			updateStatus();
 			tableViewer.refresh();
 		}
 	};
@@ -92,6 +108,22 @@ public class ViewQueue extends ViewPart {
 		getViewSite().getActionBars().getToolBarManager().add(moveUpAction);
 		getViewSite().getActionBars().getToolBarManager().add(moveDownAction);
 		getViewSite().getActionBars().getToolBarManager().add(removeAction);
+	}
+	
+	private void updateStatus () {
+		if (isDisposed()) return ;
+		
+		if (queue.size() == 0) {
+			setContentDescription("Queue is empty.");
+			
+		} else {
+			DurationData d = abstractPlayerView.getQueueTotalDuration();
+			setContentDescription(
+					queue.size() + " items"
+					+ " totaling " + (d.complete ? "" : "more than ") +
+					TimeHelper.formatTime(d.duration) + "."
+			);
+		}
 	}
 	
 	private IStructuredContentProvider contentProvider = new IStructuredContentProvider() {
