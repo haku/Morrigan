@@ -42,6 +42,13 @@ public class HotkeyRegister {
 		
 		clearConfig();
 		
+		HotkeyValue hkShowHide = HotkeyPref.getHkShowHide();
+		if (hkShowHide!=null) {
+			getHotkeyEngine(true).registerHotkey(IHotkeyEngine.MORRIGAN_HK_SHOWHIDE, hkShowHide);
+			registeredHotkeys.add(IHotkeyEngine.MORRIGAN_HK_SHOWHIDE);
+			System.out.println("registered MORRIGAN_HK_SHOWHIDE: " + hkShowHide.toString());
+		}
+		
 		HotkeyValue hkStop = HotkeyPref.getHkStop();
 		if (hkStop!=null) {
 			getHotkeyEngine(true).registerHotkey(IHotkeyEngine.MORRIGAN_HK_STOP, hkStop);
@@ -78,6 +85,13 @@ public class HotkeyRegister {
 		
 		if (engine!=null) {
 			System.out.println("Going to unregister hotkeys...");
+			
+			if (registeredHotkeys.contains(IHotkeyEngine.MORRIGAN_HK_SHOWHIDE)) {
+				System.out.println("Going to unregister MORRIGAN_HK_SHOWHIDE...");
+				engine.unregisterHotkey(IHotkeyEngine.MORRIGAN_HK_SHOWHIDE);
+				registeredHotkeys.remove(new Integer(IHotkeyEngine.MORRIGAN_HK_SHOWHIDE));
+				System.out.println("unregistered MORRIGAN_HK_SHOWHIDE.");
+			}
 			
 			if (registeredHotkeys.contains(IHotkeyEngine.MORRIGAN_HK_STOP)) {
 				System.out.println("Going to unregister MORRIGAN_HK_STOP...");
@@ -138,7 +152,7 @@ public class HotkeyRegister {
 		
 		@Override
 		public void onKeyPress(int id) {
-			IHotkeyListener answer = null;
+			List<IHotkeyListener> answers = new ArrayList<IHotkeyListener>();
 			
 			IHotkeyListener last = null;
 			if (lastIHotkeyListenerUsed != null) {
@@ -148,22 +162,33 @@ public class HotkeyRegister {
 			for (IHotkeyListener l : hotkeyListeners) {
 				CanDo canDo = l.canDoKeyPress(id);
 				
-				if (canDo == CanDo.YES) {
-					answer = l;
+				if (canDo == CanDo.YESANDFRIENDS) {
+					answers.add(l);
+					
+				} else if (canDo == CanDo.YES) {
+					answers.add(l);
 					break;
 					
 				} else if (canDo == CanDo.MAYBE) {
 					if (l == last) {
-						answer = l;
-					} else if (answer == null) {
-						answer = l;
+						answers.add(l);
+					} else if (answers.isEmpty()) {
+						answers.add(l);
 					}
 				}
 			}
 			
-			if (answer != null) {
-				answer.onKeyPress(id);
-				lastIHotkeyListenerUsed = new WeakReference<IHotkeyListener>(answer);
+			if (!answers.isEmpty()) {
+				for (IHotkeyListener l : answers) {
+					l.onKeyPress(id);
+				}
+				
+				if (answers.size() == 1) {
+					lastIHotkeyListenerUsed = new WeakReference<IHotkeyListener>(answers.get(0));
+				}
+				
+			} else {
+				System.err.println("Failed to find handler for hotkey cmd '"+id+"'.");
 			}
 		}
 		

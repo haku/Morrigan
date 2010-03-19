@@ -11,6 +11,7 @@ import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.dialogs.RunnableDialog;
 import net.sparktank.morrigan.display.FullscreenShell;
 import net.sparktank.morrigan.display.ScreenPainter;
+import net.sparktank.morrigan.display.TrayHelper;
 import net.sparktank.morrigan.display.ScreenPainter.TitleProvider;
 import net.sparktank.morrigan.editors.EditorFactory;
 import net.sparktank.morrigan.editors.LibraryEditor;
@@ -1107,6 +1108,9 @@ public abstract class AbstractPlayerView extends ViewPart {
 			
 			switch (id) {
 				
+				case IHotkeyEngine.MORRIGAN_HK_SHOWHIDE:
+					return CanDo.YESANDFRIENDS;
+					
 				case IHotkeyEngine.MORRIGAN_HK_STOP:
 				case IHotkeyEngine.MORRIGAN_HK_PLAYPAUSE:
 					if (isPlaying) {
@@ -1136,6 +1140,15 @@ public abstract class AbstractPlayerView extends ViewPart {
 		public void onKeyPress(int id) {
 			switch (id) {
 				
+				case IHotkeyEngine.MORRIGAN_HK_SHOWHIDE:
+					getSite().getShell().getDisplay().asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							TrayHelper.activateHideShowWindow(getViewSite().getWorkbenchWindow());
+						}
+					});
+					break;
+					
 				case IHotkeyEngine.MORRIGAN_HK_JUMPTO:
 					getSite().getShell().getDisplay().asyncExec(new Runnable() {
 						@Override

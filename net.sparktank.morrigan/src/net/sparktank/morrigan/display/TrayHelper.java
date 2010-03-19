@@ -4,12 +4,13 @@ import net.sparktank.morrigan.Activator;
 import net.sparktank.morrigan.preferences.GeneralPref;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tray;
 import org.eclipse.swt.widgets.TrayItem;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -17,7 +18,10 @@ import org.eclipse.ui.IWorkbenchWindow;
 public class TrayHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public static boolean minToTray (final IWorkbenchWindow window, boolean force) {
+	/**
+	 * This method must be called on the UI thread.
+	 */
+	static public boolean minToTray (final IWorkbenchWindow window, boolean force) {
 		if (!GeneralPref.getMinToTray() && !force) {
 			return false;
 		}
@@ -40,13 +44,9 @@ public class TrayHelper {
 		final MenuItem exit = new MenuItem(menu, SWT.PUSH);
 		exit.setText("E&xit");
 		
-		Listener showEventListener = new Listener() {
-			public void handleEvent(Event event) {
-				Shell workbenchWindowShell = window.getShell();
-				workbenchWindowShell.setMinimized(false);
-				workbenchWindowShell.setVisible(true);
-				workbenchWindowShell.setActive();
-				workbenchWindowShell.setFocus();
+		final Runnable cleanup = new Runnable() {
+			@Override
+			public void run() {
 				trayItem.dispose();
 				image.dispose();
 				open.dispose();
@@ -55,13 +55,14 @@ public class TrayHelper {
 			}
 		};
 		
+		Listener showEventListener = new Listener() {
+			public void handleEvent(Event event) {
+				window.getShell().open();
+			}
+		};
+		
 		Listener exitEventListener = new Listener() {
 			public void handleEvent(Event event) {
-				trayItem.dispose();
-				image.dispose();
-				open.dispose();
-				exit.dispose();
-				menu.dispose();
 				window.getWorkbench().close();
 			}
 		};
@@ -76,7 +77,42 @@ public class TrayHelper {
 		});
 		trayItem.addListener(SWT.Selection, showEventListener);
 		
+		window.getShell().addShellListener(new ShellListener() {
+			@Override
+			public void shellActivated(ShellEvent e) {
+				window.getShell().removeShellListener(this);
+				cleanup.run();
+			}
+			@Override
+			public void shellDeiconified(ShellEvent e) {
+				window.getShell().removeShellListener(this);
+				cleanup.run();
+			}
+			@Override
+			public void shellClosed(ShellEvent e) {
+				window.getShell().removeShellListener(this);
+				cleanup.run();
+			}
+			@Override
+			public void shellDeactivated(ShellEvent e) {}
+			@Override
+			public void shellIconified(ShellEvent e) {}
+		});
+		
 		return true;
+	}
+	
+	/**
+	 * This method must be called on the UI thread.
+	 */
+	static public void activateHideShowWindow (final IWorkbenchWindow window) {
+		if (window.getShell().getDisplay().getActiveShell() == window.getShell()) {
+			minToTray(window, true);
+		} else {
+			window.getShell().setMinimized(false);
+			window.getShell().open();
+			window.getShell().setFocus();
+		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

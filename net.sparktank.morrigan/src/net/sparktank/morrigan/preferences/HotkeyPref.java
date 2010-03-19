@@ -27,6 +27,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 public class HotkeyPref extends PreferencePage implements IWorkbenchPreferencePage {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	public static final String PREF_HK_SHOWHIDE = "PREF_HK_SHOWHIDE";
 	public static final String PREF_HK_STOP = "PREF_HK_STOP";
 	public static final String PREF_HK_PLAYPAUSE = "PREF_HK_PLAYPAUSE";
 	public static final String PREF_HK_NEXT = "PREF_HK_NEXT";
@@ -50,6 +51,7 @@ public class HotkeyPref extends PreferencePage implements IWorkbenchPreferencePa
 	// Read data.
 	private void initialize () {
 		try {
+			hkShowhide.setValue(getHkShowHide());
 			hkStop.setValue(getHkStop());
 			hkPlaypause.setValue(getHkPlaypause());
 			hkNext.setValue(getHkNext());
@@ -62,6 +64,13 @@ public class HotkeyPref extends PreferencePage implements IWorkbenchPreferencePa
 	
 	@Override
 	public boolean performOk () {
+		HotkeyValue hkShowhideValue = hkShowhide.getValue();
+		if (hkShowhideValue!=null) {
+			getPreferenceStore().setValue(PREF_HK_SHOWHIDE, hkShowhideValue.serialise());
+		} else {
+			getPreferenceStore().setValue(PREF_HK_SHOWHIDE, "");
+		}
+		
 		HotkeyValue hkStopValue = hkStop.getValue();
 		if (hkStopValue!=null) {
 			getPreferenceStore().setValue(PREF_HK_STOP, hkStopValue.serialise());
@@ -102,6 +111,7 @@ public class HotkeyPref extends PreferencePage implements IWorkbenchPreferencePa
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	private HotkeyChooser hkShowhide;
 	private HotkeyChooser hkStop;
 	private HotkeyChooser hkPlaypause;
 	private HotkeyChooser hkNext;
@@ -119,6 +129,7 @@ public class HotkeyPref extends PreferencePage implements IWorkbenchPreferencePa
 		layout.verticalSpacing = convertVerticalDLUsToPixels(IDialogConstants.VERTICAL_SPACING);
 		composite.setLayout(layout);
 		
+		hkShowhide = new HotkeyChooser(composite, "Show / hide windows");
 		hkStop = new HotkeyChooser(composite, "stop");
 		hkPlaypause = new HotkeyChooser(composite, "play / pause");
 		hkNext = new HotkeyChooser(composite, "next");
@@ -223,6 +234,10 @@ public class HotkeyPref extends PreferencePage implements IWorkbenchPreferencePa
 		} else {
 			return null;
 		}
+	}
+	
+	static public HotkeyValue getHkShowHide () {
+		return getHk(PREF_HK_SHOWHIDE);
 	}
 	
 	static public HotkeyValue getHkStop () {
