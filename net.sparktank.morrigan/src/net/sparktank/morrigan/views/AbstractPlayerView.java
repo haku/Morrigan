@@ -373,6 +373,24 @@ public abstract class AbstractPlayerView extends ViewPart {
 		return _queue;
 	}
 	
+	public class DurationData {
+		public long duration = 0;
+		public boolean complete;
+	}
+	
+	public DurationData getQueueTotalDuration () {
+		DurationData ret = new DurationData();
+		ret.complete = true;
+		for (PlayItem pi : _queue) {
+			if (pi.item.getDuration() > 0) {
+				ret.duration = ret.duration + pi.item.getDuration();
+			} else {
+				ret.complete = false;
+			}
+		}
+		return ret;
+	}
+	
 	public void addQueueChangeListener (Runnable listener) {
 		_queueChangeListeners.add(listener);
 	}
