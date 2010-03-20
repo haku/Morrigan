@@ -57,6 +57,7 @@ public class TrayHelper {
 		
 		Listener showEventListener = new Listener() {
 			public void handleEvent(Event event) {
+				window.getShell().setMinimized(false);
 				window.getShell().open();
 			}
 		};
