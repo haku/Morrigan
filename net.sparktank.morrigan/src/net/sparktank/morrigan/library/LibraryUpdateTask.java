@@ -423,8 +423,8 @@ public class LibraryUpdateTask extends Job {
 	
 	private int countEntriesInMap (Map<?, ?> map, Object value) {
 		int n = 0;
-		for (Object o : map.entrySet()) {
-			if (o.equals(value)) n++;
+		for ( Entry<?, ?> e : map.entrySet()) {
+			if (e.getValue().equals(value)) n++;
 		}
 		return n;
 	}
