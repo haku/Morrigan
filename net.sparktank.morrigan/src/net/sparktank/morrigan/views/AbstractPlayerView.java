@@ -373,7 +373,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 		return _queue;
 	}
 	
-	public class DurationData {
+	static public class DurationData {
 		public long duration = 0;
 		public boolean complete;
 	}
