@@ -287,7 +287,7 @@ public class SqliteLayer {
 	    " FROM tbl_mediafiles" +
 	    " WHERE sfile LIKE ? ESCAPE ?" +
 	    " AND (bmissing<>1 OR bmissing is NULL) AND (benabled<>0 OR benabled is NULL)" +
-	    " ORDER BY sfile COLLATE NOCASE ASC;";
+	    " ORDER BY dlastplay DESC, lendcnt DESC, lstartcnt DESC, sfile COLLATE NOCASE ASC;";
 	
 	private static final String SQL_TBL_MEDIAFILES_Q_EXISTS =
 		"SELECT count(*) FROM tbl_mediafiles WHERE sfile=? COLLATE NOCASE;";
