@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 import java.util.WeakHashMap;
+import java.util.Map.Entry;
 
 import net.sparktank.morrigan.config.Config;
 import net.sparktank.morrigan.engines.EngineFactory;
@@ -310,7 +311,7 @@ public class LibraryUpdateTask extends Job {
 			 */
 			List<Long> hashcodes = new ArrayList<Long>();
 			for (MediaItem mi : dupicateItems.keySet()) {
-				Long l = new Long(mi.getHashcode());
+				Long l = Long.valueOf(mi.getHashcode());
 				if (!hashcodes.contains(l)) {
 					hashcodes.add(l);
 				}
@@ -399,15 +400,15 @@ public class LibraryUpdateTask extends Job {
 			 * Print out what are left with.
 			 */
 			ConsoleHelper.appendToConsole("Found " + dupicateItems.size() + " duplicate items:");
-			for (MediaItem mi : dupicateItems.keySet()) {
-				ConsoleHelper.appendToConsole(dupicateItems.get(mi) + " : " + mi.getTitle());
+			for (Entry<MediaItem, ScanOption> e : dupicateItems.entrySet()) {
+				ConsoleHelper.appendToConsole(e.getValue() + " : " + e.getKey().getTitle());
 			}
 			
 		} else {
 			ConsoleHelper.appendToConsole("No duplicates found.");
 		}
 		
-		// TODO : vacuume DB?
+		// TODO : vacuum DB?
 		
 		if (monitor.isCanceled()) {
 			ConsoleHelper.appendToConsole("Task was canceled desu~.");
@@ -422,15 +423,15 @@ public class LibraryUpdateTask extends Job {
 	
 	private int countEntriesInMap (Map<?, ?> map, Object value) {
 		int n = 0;
-		for (Object k : map.keySet()) {
-			if (map.get(k).equals(value)) n++;
+		for (Object o : map.entrySet()) {
+			if (o.equals(value)) n++;
 		}
 		return n;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public class FailStatus implements IStatus {
+	static public class FailStatus implements IStatus {
 		
 		private final String message;
 		private final Exception e;
