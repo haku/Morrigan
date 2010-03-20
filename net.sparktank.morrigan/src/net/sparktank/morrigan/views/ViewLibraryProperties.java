@@ -135,7 +135,11 @@ public class ViewLibraryProperties extends ViewPart {
 					new MorriganMsgDlg(e).open();
 				}
 				
-				return sources.toArray();
+				if (sources != null) {
+					return sources.toArray();
+				} else {
+					return new String[]{};
+				}
 				
 			} else {
 				return new String[]{};
