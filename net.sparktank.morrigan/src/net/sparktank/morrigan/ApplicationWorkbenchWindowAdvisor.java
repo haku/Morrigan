@@ -42,9 +42,4 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		});
 	}
 	
-	@Override
-	public boolean preWindowShellClose() {
-		return !TrayHelper.minToTray(getWindowConfigurer().getWindow(), false);
-	}
-	
 }
