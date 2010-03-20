@@ -49,7 +49,8 @@ public class JumpToDlg extends Dialog {
 	private static final int MAX_RESULTS = 50;
 	
 	private static volatile WeakReference<JumpToDlg> openDlg = null;
-	private static volatile Boolean dlgOpen = false;
+	private static volatile Object dlgOpenLock = new Object();
+	private static volatile boolean dlgOpen = false;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -91,10 +92,13 @@ public class JumpToDlg extends Dialog {
 	private int keyMask = 0;
 	
 	public PlayItem open () {
-		synchronized (dlgOpen) {
+		synchronized (dlgOpenLock) {
 			if (dlgOpen) {
-				if (openDlg != null && openDlg.get() != null) {
-					openDlg.get().remoteClose();
+				if (openDlg != null) {
+					JumpToDlg j = openDlg.get();
+					if (j != null) {
+						j.remoteClose();
+					}
 				}
 				return null;
 			}
@@ -207,7 +211,7 @@ public class JumpToDlg extends Dialog {
 			}
 		}
 		
-		synchronized (dlgOpen) {
+		synchronized (dlgOpenLock) {
 			dlgOpen = false;
 		}
 		
