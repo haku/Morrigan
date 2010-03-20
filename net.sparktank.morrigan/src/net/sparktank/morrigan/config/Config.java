@@ -27,7 +27,11 @@ public class Config {
 	
 	public static File getPlDir () {
 		File f = new File(getConfigDir() + PL_DIR);
-		if (!f.exists()) f.mkdirs();
+		if (!f.exists()) {
+			if (!f.mkdirs()) {
+				throw new RuntimeException("Failed to create direactory '"+f.getAbsolutePath()+"'.");
+			}
+		}
 		return f;
 	}
 	
@@ -38,7 +42,11 @@ public class Config {
 	
 	public static File getLibDir () {
 		File f = new File(getConfigDir() + LIB_DIR);
-		if (!f.exists()) f.mkdirs();
+		if (!f.exists()) {
+			if (!f.mkdirs()) {
+				throw new RuntimeException("Failed to create direactory '"+f.getAbsolutePath()+"'.");
+			}
+		}
 		return f;
 	}
 	
@@ -59,7 +67,9 @@ public class Config {
 			File file = new File(PROP_FILE);
 			Properties props = new Properties();
 			try {
-				props.load(new FileInputStream(file));
+				FileInputStream fis = new FileInputStream(file);
+				props.load(fis);
+				fis.close();
 			} catch (Exception e) {
 				throw new MorriganException(e);
 			}
