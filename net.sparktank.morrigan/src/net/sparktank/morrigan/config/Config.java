@@ -2,6 +2,7 @@ package net.sparktank.morrigan.config;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -66,12 +67,18 @@ public class Config {
 		if (properties==null) {
 			File file = new File(PROP_FILE);
 			Properties props = new Properties();
+			FileInputStream fis = null;
 			try {
-				FileInputStream fis = new FileInputStream(file);
+				fis = new FileInputStream(file);
 				props.load(fis);
-				fis.close();
 			} catch (Exception e) {
 				throw new MorriganException(e);
+			} finally {
+				try {
+					if (fis!=null) fis.close();
+				} catch (IOException e) {
+					throw new MorriganException(e);
+				}
 			}
 			properties = props;
 		}
