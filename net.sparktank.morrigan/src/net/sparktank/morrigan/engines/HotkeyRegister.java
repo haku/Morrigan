@@ -89,35 +89,35 @@ public class HotkeyRegister {
 			if (registeredHotkeys.contains(IHotkeyEngine.MORRIGAN_HK_SHOWHIDE)) {
 				System.out.println("Going to unregister MORRIGAN_HK_SHOWHIDE...");
 				engine.unregisterHotkey(IHotkeyEngine.MORRIGAN_HK_SHOWHIDE);
-				registeredHotkeys.remove(new Integer(IHotkeyEngine.MORRIGAN_HK_SHOWHIDE));
+				registeredHotkeys.remove(Integer.valueOf(IHotkeyEngine.MORRIGAN_HK_SHOWHIDE));
 				System.out.println("unregistered MORRIGAN_HK_SHOWHIDE.");
 			}
 			
 			if (registeredHotkeys.contains(IHotkeyEngine.MORRIGAN_HK_STOP)) {
 				System.out.println("Going to unregister MORRIGAN_HK_STOP...");
 				engine.unregisterHotkey(IHotkeyEngine.MORRIGAN_HK_STOP);
-				registeredHotkeys.remove(new Integer(IHotkeyEngine.MORRIGAN_HK_STOP));
+				registeredHotkeys.remove(Integer.valueOf(IHotkeyEngine.MORRIGAN_HK_STOP));
 				System.out.println("unregistered MORRIGAN_HK_STOP.");
 			}
 			
 			if (registeredHotkeys.contains(IHotkeyEngine.MORRIGAN_HK_PLAYPAUSE)) {
 				System.out.println("Going to unregister MORRIGAN_HK_PLAYPAUSE...");
 				engine.unregisterHotkey(IHotkeyEngine.MORRIGAN_HK_PLAYPAUSE);
-				registeredHotkeys.remove(new Integer(IHotkeyEngine.MORRIGAN_HK_PLAYPAUSE));
+				registeredHotkeys.remove(Integer.valueOf(IHotkeyEngine.MORRIGAN_HK_PLAYPAUSE));
 				System.out.println("unregistered MORRIGAN_HK_PLAYPAUSE.");
 			}
 			
 			if (registeredHotkeys.contains(IHotkeyEngine.MORRIGAN_HK_NEXT)) {
 				System.out.println("Going to unregister MORRIGAN_HK_NEXT...");
 				engine.unregisterHotkey(IHotkeyEngine.MORRIGAN_HK_NEXT);
-				registeredHotkeys.remove(new Integer(IHotkeyEngine.MORRIGAN_HK_NEXT));
+				registeredHotkeys.remove(Integer.valueOf(IHotkeyEngine.MORRIGAN_HK_NEXT));
 				System.out.println("unregistered MORRIGAN_HK_NEXT.");
 			}
 			
 			if (registeredHotkeys.contains(IHotkeyEngine.MORRIGAN_HK_JUMPTO)) {
 				System.out.println("Going to unregister MORRIGAN_HK_JUMPTO...");
 				engine.unregisterHotkey(IHotkeyEngine.MORRIGAN_HK_JUMPTO);
-				registeredHotkeys.remove(new Integer(IHotkeyEngine.MORRIGAN_HK_JUMPTO));
+				registeredHotkeys.remove(Integer.valueOf(IHotkeyEngine.MORRIGAN_HK_JUMPTO));
 				System.out.println("unregistered MORRIGAN_HK_JUMPTO.");
 			}
 		}
