@@ -1038,11 +1038,11 @@ public abstract class AbstractPlayerView extends ViewPart {
 					&& getCurrentItem().item != null) {
 				
 				try {
-					if (getCurrentItem().list.getType() == MediaLibrary.TYPE) {
+					if (getCurrentItem().list.getType().equals(MediaLibrary.TYPE)) {
 						MediaListEditorInput<MediaLibrary> input = EditorFactory.getMediaLibraryInput(getCurrentItem().list.getListId());
 						getViewSite().getWorkbenchWindow().getActivePage().openEditor(input, LibraryEditor.ID);
 						
-					} else if (getCurrentItem().list.getType() == MediaPlaylist.TYPE) {
+					} else if (getCurrentItem().list.getType().equals(MediaPlaylist.TYPE)) {
 						MediaListEditorInput<MediaPlaylist> input = EditorFactory.getMediaPlaylistInput(getCurrentItem().list.getListId());
 						getViewSite().getWorkbenchWindow().getActivePage().openEditor(input, PlaylistEditor.ID);
 						
