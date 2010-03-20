@@ -80,7 +80,7 @@ public class ScreenPainter implements PaintListener {
 				} else {
 					font2 = new Font(e.gc.getDevice(), fontData);
 					font3 = new Font(e.gc.getDevice(), fontData.getName(),
-							fontData.getHeight() * 2, fontData.getStyle());
+							(int)(fontData.getHeight() * 1.5f), fontData.getStyle());
 				}
 				
 				text = item.item.getTitle();
