@@ -46,6 +46,8 @@ public class JumpToDlg extends Dialog {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	private static final int MAX_RESULTS = 50;
+	
 	private static volatile WeakReference<JumpToDlg> openDlg = null;
 	private static volatile Boolean dlgOpen = false;
 	
@@ -440,7 +442,7 @@ public class JumpToDlg extends Dialog {
 		q = q.replace("*", "%");
 		
 		try {
-			List<MediaItem> res = mediaLibrary.simpleSearch(q, "\\", 50);
+			List<MediaItem> res = mediaLibrary.simpleSearch(q, "\\", MAX_RESULTS);
 			if (res != null && res.size() > 0) {
 				searchResults = res;
 				return true;
