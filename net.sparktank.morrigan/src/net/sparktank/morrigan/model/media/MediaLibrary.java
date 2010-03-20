@@ -156,11 +156,6 @@ public class MediaLibrary extends MediaList {
 	}
 	
 	@Override
-	protected void replaceList(List<MediaItem> mediaTracks) {
-		super.replaceList(mediaTracks);
-	}
-	
-	@Override
 	public void incTrackStartCnt(MediaItem track) throws MorriganException {
 		super.incTrackStartCnt(track);
 		dbLayer.incTrackPlayed(track.getFilepath());
