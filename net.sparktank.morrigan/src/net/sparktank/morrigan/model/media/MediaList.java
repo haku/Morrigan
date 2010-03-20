@@ -224,7 +224,7 @@ public abstract class MediaList {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Metadata readers.
 	
-	public class DurationData {
+	static public class DurationData {
 		public long duration;
 		public boolean complete;
 	}
