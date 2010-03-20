@@ -20,7 +20,15 @@ public class PlayItem {
 		PlayItem that = (PlayItem)obj;
 		
 		return EqualHelper.areEqual(list, that.list)
-		&& EqualHelper.areEqual(item, that.item);
+			&& EqualHelper.areEqual(item, that.item);
+	}
+	
+	@Override
+	public int hashCode() {
+		int hash = 1;
+	    hash = hash * 31 + (list == null ? 0 : list.hashCode());
+	    hash = hash * 31 + (item == null ? 0 : item.hashCode());
+	    return hash;
 	}
 	
 }
