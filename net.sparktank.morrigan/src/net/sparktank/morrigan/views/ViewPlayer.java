@@ -142,6 +142,9 @@ public class ViewPlayer extends AbstractPlayerView {
 				setTitleImage(iconStop);
 				break;
 				
+			default:
+				throw new IllegalArgumentException();
+			
 		}
 		
 		if (getCurrentItem() != null && getCurrentItem().item != null) {
