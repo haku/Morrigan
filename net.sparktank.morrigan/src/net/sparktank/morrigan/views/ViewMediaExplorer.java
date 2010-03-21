@@ -32,7 +32,7 @@ public class ViewMediaExplorer extends ViewPart {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private TableViewer viewer;
+	private TableViewer viewer = null;
 	
 	ArrayList<MediaExplorerItem> items = new ArrayList<MediaExplorerItem>();
 	
