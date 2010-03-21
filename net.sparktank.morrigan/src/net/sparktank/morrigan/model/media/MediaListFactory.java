@@ -30,6 +30,7 @@ public class MediaListFactory {
 		}
 		
 		if (ret == null) {
+			System.out.println("Making object instance '" + dbFilePath + "'...");
 			ret = new MediaLibrary(libraryName, DbConFactory.getDbLayer(dbFilePath));
 			mediaLibraryCache.put(ret, dbFilePath);
 		}
@@ -62,6 +63,7 @@ public class MediaListFactory {
 		}
 		
 		if (ret == null) {
+			System.out.println("Making object instance '" + filePath + "'...");
 			ret = new MediaPlaylist(title, filePath, newPl);
 			mediaPlaylistCache.put(ret, ret.getListId());
 		}
