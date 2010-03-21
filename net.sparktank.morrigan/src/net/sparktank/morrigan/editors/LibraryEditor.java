@@ -113,8 +113,8 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 	
 	private List<SortAction> sortActions = new ArrayList<SortAction>();
 	
-	private Label lblStatus;
-	private Text txtFilter;
+	private Label lblStatus = null;
+	private Text txtFilter = null;
 	
 	@Override
 	protected void populateToolbar (Composite parent) {
