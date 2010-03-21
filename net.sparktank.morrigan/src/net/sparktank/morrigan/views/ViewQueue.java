@@ -66,6 +66,10 @@ public class ViewQueue extends ViewPart {
 		return isDisposed;
 	}
 	
+	private ViewQueue getThis () {
+		return this;
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private List<PlayItem> queue = null;
@@ -93,6 +97,7 @@ public class ViewQueue extends ViewPart {
 			if (tableViewer.getTable().isDisposed()) return;
 			updateStatus();
 			tableViewer.refresh();
+			bringToTopIfChanged();
 		}
 	};
 	
@@ -110,6 +115,21 @@ public class ViewQueue extends ViewPart {
 		getViewSite().getActionBars().getToolBarManager().add(moveUpAction);
 		getViewSite().getActionBars().getToolBarManager().add(moveDownAction);
 		getViewSite().getActionBars().getToolBarManager().add(removeAction);
+	}
+	
+	private int lastQueueSize = 0;
+	
+	private void bringToTopIfChanged () {
+		int size = queue.size();
+		if (size > lastQueueSize) {
+			getSite().getShell().getDisplay().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					getSite().getPage().bringToTop(getThis());
+				}
+			});
+		}
+		lastQueueSize = size;
 	}
 	
 	private void updateStatus () {
