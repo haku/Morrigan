@@ -138,9 +138,9 @@ public class MediaPlaylist extends MediaList {
 					String[] line = text.substring(PL_ITEM_IDENTIFIER.length()).split("\\|");
 					MediaItem item = new MediaItem(line[0]);
 					
-					if (line.length>=2 && line[1].length()>0) {
-						// TODO set hash for item = item[1].
-					}
+//					if (line.length>=2 && line[1].length()>0) {
+//						// TODO set hash for item = item[1].
+//					}
 					
 					if (line.length>=3 && line[2].length()>0) {
 						item.setStartCount(Long.parseLong(line[2]));
@@ -150,9 +150,9 @@ public class MediaPlaylist extends MediaList {
 						item.setEndCount(Long.parseLong(line[3]));
 					}
 					
-					if (line.length>=5 && line[4].length()>0) {
-						// TODO set duration for item.
-					}
+//					if (line.length>=5 && line[4].length()>0) {
+//						// TODO set duration for item.
+//					}
 					
 					if (line.length>=6 && line[5].length()>0) {
 						try {
