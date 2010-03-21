@@ -33,7 +33,7 @@ public class TrayHelper {
 		
 		final TrayItem trayItem = new TrayItem(systemTray, SWT.NONE);
 		trayItem.setToolTipText(window.getShell().getText());
-		final Image image = Activator.getImageDescriptor("icons/copipod.ico").createImage();
+		final Image image = Activator.getImageDescriptor("icons/crow-16.png").createImage();
 		trayItem.setImage(image);
 		
 		window.getShell().setVisible(false);
