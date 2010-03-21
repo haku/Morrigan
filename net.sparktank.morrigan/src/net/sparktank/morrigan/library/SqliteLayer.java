@@ -563,7 +563,7 @@ public class SqliteLayer {
 		while (rs.next()) {
 			MediaItem mt = new MediaItem();
 			
-			mt.setfilepath(rs.getString(SQL_TBL_MEDIAFILES_COL_FILE));
+			mt.setFilepath(rs.getString(SQL_TBL_MEDIAFILES_COL_FILE));
 			mt.setDateAdded(readDate(rs, SQL_TBL_MEDIAFILES_COL_DADDED));
 			mt.setStartCount(rs.getLong(SQL_TBL_MEDIAFILES_COL_STARTCNT));
 			mt.setEndCount(rs.getLong(SQL_TBL_MEDIAFILES_COL_ENDCNT));

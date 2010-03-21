@@ -12,13 +12,13 @@ public class MediaItem {
 	public MediaItem () {}
 	
 	public MediaItem (String filePath) {
-		trackFilepath = filePath;
+		filepath = filePath;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Attributes.
 	
-	private String trackFilepath = null;
+	private String filepath = null;
 	private Date dateAdded = null;
 	private long startCount = 0;
 	private long endCount = 0;
@@ -30,10 +30,10 @@ public class MediaItem {
 	private boolean missing = false;
 	
 	public String getFilepath () {
-		return trackFilepath;
+		return filepath;
 	}
-	public void setfilepath (String filePath) {
-		trackFilepath = filePath;
+	public void setFilepath (String filePath) {
+		filepath = filePath;
 	}
 	
 	public Date getDateAdded() {
@@ -103,7 +103,7 @@ public class MediaItem {
 //	Mass setter.
 	
 	public void setFromMediaItem (MediaItem mi) {
-		this.setfilepath(mi.getFilepath());
+		this.setFilepath(mi.getFilepath());
 		this.setDateAdded(mi.getDateAdded());
 		this.setStartCount(mi.getStartCount());
 		this.setEndCount(mi.getEndCount());
@@ -119,11 +119,11 @@ public class MediaItem {
 //	Secondary attributes.
 	
 	public String getTitle () {
-		int x = trackFilepath.lastIndexOf(File.separator);
+		int x = filepath.lastIndexOf(File.separator);
 		if (x>0) {
-			return trackFilepath.substring(x+1);
+			return filepath.substring(x+1);
 		} else {
-			return trackFilepath;
+			return filepath;
 		}
 	}
 	
