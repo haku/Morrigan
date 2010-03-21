@@ -25,7 +25,7 @@ Image &quot;The Morrígan&quot; by Louis le Brocquy used under the Creative Comm
       <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
    </launcherArgs>
 
-   <windowImages i16="/net.sparktank.morrigan/icons/crow-16.png" i32="/net.sparktank.morrigan/icons/crow-32.png"/>
+   <windowImages i16="/net.sparktank.morrigan/icons/crow-16.png" i32="/net.sparktank.morrigan/icons/crow-32.png" i48="/net.sparktank.morrigan/icons/crow-48.png"/>
 
    <launcher name="morrigan">
       <solaris/>

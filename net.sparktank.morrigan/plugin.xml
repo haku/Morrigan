@@ -5,14 +5,14 @@
 	<extension id="product" point="org.eclipse.core.runtime.products" >
 		<product application="net.sparktank.morrigan.application" name="morrigan" >
 			<property name="appName" value="morrigan" />
-			<property name="windowImages" value="icons/crow-16.png,icons/crow-32.png" />
+			<property name="windowImages" value="icons/crow-16.png,icons/crow-32.png,icons/crow-48.png" />
    <property
          name="aboutImage"
          value="graphics/crow-full.png">
    </property>
    <property
          name="aboutText"
-         value="This alpha build of morrigan is released as free software and is provided &quot;as is&quot; for testing pourpouses only.  For more information, please see this wiki page:&#x0D;&#x0A;&#x0D;&#x0A;http://sparktank.net/w/index.php?title=Project_Morrigan&#x0D;&#x0A;&#x0D;&#x0A;You can email the developer at haku@vaguehope.com&#x0D;&#x0A;&#x0D;&#x0A;This build of morrigan is copyright Fae Hutter 2010.  All rights reserved.&#x0D;&#x0A;&#x0D;&#x0A;Image &quot;The Morrígan&quot; by Louis le Brocquy used under the Creative Commons Attribution 2.5 Generic license.">
+         value="This alpha build of morrigan is released as free software and is provided &quot;as is&quot; for testing pourpouses only.  For more information, please see this wiki page:&#x0A;&#x0A;http://sparktank.net/w/index.php?title=Project_Morrigan&#x0A;&#x0A;You can email the developer at haku@vaguehope.com&#x0A;&#x0A;This build of morrigan is copyright Fae Hutter 2010.  All rights reserved.&#x0A;&#x0A;Image &quot;The Morrígan&quot; by Louis le Brocquy used under the Creative Commons Attribution 2.5 Generic license.">
    </property>
 		</product>
 	</extension>
