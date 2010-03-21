@@ -84,8 +84,8 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 	
 	MediaListEditorInput<T> editorInput;
 	
-	private TableViewer editTable;
-	private MediaFilter mediaFilter;
+	private TableViewer editTable = null;
+	private MediaFilter mediaFilter = null;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructor.
