@@ -1,7 +1,14 @@
 package net.sparktank.morrigan;
 
+import java.io.IOException;
+import java.net.URL;
+
+import net.sparktank.morrigan.config.Config;
+
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
+import org.eclipse.osgi.service.datalocation.Location;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
@@ -17,11 +24,25 @@ public class Application implements IApplication {
 	public Object start(IApplicationContext context) {
 		Display display = PlatformUI.createDisplay();
 		try {
+			// Set workspace location.
+			Location instanceLoc = Platform.getInstanceLocation();
+			if (!instanceLoc.isSet()) {
+				String configDir = Config.getConfigDir();
+				try {
+					instanceLoc.set(new URL("file", null, configDir), false);
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+			}
+			System.out.println("instanceLoc=" + instanceLoc.getURL().toExternalForm());
+			
+			// Run workbench.
 			int returnCode = PlatformUI.createAndRunWorkbench(display, new ApplicationWorkbenchAdvisor());
 			if (returnCode == PlatformUI.RETURN_RESTART) {
 				return IApplication.EXIT_RESTART;
 			}
 			return IApplication.EXIT_OK;
+			
 		} finally {
 			display.dispose();
 		}
