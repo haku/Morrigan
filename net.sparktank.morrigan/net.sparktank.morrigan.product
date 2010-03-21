@@ -4,13 +4,17 @@
 <product name="morrigan" uid="net.sparktank.morrigan.product" id="net.sparktank.morrigan.product" application="net.sparktank.morrigan.application" useFeatures="false" includeLaunchers="true">
 
    <aboutInfo>
-      <image path="/net.sparktank.morrigan/graphics/copepod.png"/>
+      <image path="/net.sparktank.morrigan/graphics/crow-full.png"/>
       <text>
-         This alpha build of morrigan is released as free software and is provided &quot;as is&quot; for testing pourpouses only.
+         This alpha build of morrigan is released as free software and is provided &quot;as is&quot; for testing pourpouses only.  For more information, please see this wiki page:
 
-For more information, please refer to related blog entries at http://vaguehope.com or email haku@vaguehope.com
+http://sparktank.net/w/index.php?title=Project_Morrigan
+
+You can email the developer at haku@vaguehope.com
 
 This build of morrigan is copyright Alex Hutter 2010.  All rights reserved.
+
+Image &quot;The Morrígan&quot; by Louis le Brocquy used under the Creative Commons Attribution 2.5 Generic license.
       </text>
    </aboutInfo>
 
@@ -21,15 +25,16 @@ This build of morrigan is copyright Alex Hutter 2010.  All rights reserved.
       <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
    </launcherArgs>
 
-   <windowImages i16="/net.sparktank.morrigan/icons/copepod-16.png" i32="/net.sparktank.morrigan/icons/copepod-32.png"/>
+   <windowImages i16="/net.sparktank.morrigan/icons/crow-16.png" i32="/net.sparktank.morrigan/icons/crow-32.png"/>
 
    <launcher name="morrigan">
       <solaris/>
       <win useIco="true">
-         <ico path="/net.sparktank.morrigan/icons/copipod.ico"/>
+         <ico path="/net.sparktank.morrigan/icons/crow.ico"/>
          <bmp/>
       </win>
    </launcher>
+
 
    <vm>
    </vm>
