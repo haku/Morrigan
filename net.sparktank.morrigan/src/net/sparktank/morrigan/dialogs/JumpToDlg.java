@@ -80,13 +80,13 @@ public class JumpToDlg extends Dialog {
 	
 	private final static int SEP = 3;
 	
-	private Shell shell;
-	private Label label;
-	private Text text;
-	private TableViewer tableViewer;
-	private Button btnPlay;
-	private Button btnEnqueue;
-	private Button btnCancel;
+	private Shell shell = null;
+	private Label label = null;
+	private Text text = null;
+	private TableViewer tableViewer = null;
+	private Button btnPlay = null;
+	private Button btnEnqueue = null;
+	private Button btnCancel = null;
 	
 	private PlayItem returnValue = null;
 	private int keyMask = 0;
@@ -250,6 +250,9 @@ public class JumpToDlg extends Dialog {
 					leaveDlg(false, e.stateMask);
 					break;
 				
+				default:
+					throw new IllegalArgumentException();
+					
 			}
 		}
 	};
@@ -257,14 +260,13 @@ public class JumpToDlg extends Dialog {
 	private TraverseListener textTraverseListener = new TraverseListener() {
 		@Override
 		public void keyTraversed(TraverseEvent e) {
-			switch (e.detail) {
-				case SWT.TRAVERSE_ARROW_NEXT:
-					if (e.keyCode == SWT.ARROW_DOWN && tableViewer.getTable().getItemCount() > 0) {
-						e.detail = SWT.TRAVERSE_NONE;
-						e.doit = false;
-						tableViewer.getTable().setSelection(0);
-						tableViewer.getTable().setFocus();
-					}
+			if (e.detail == SWT.TRAVERSE_ARROW_NEXT) {
+				if (e.keyCode == SWT.ARROW_DOWN && tableViewer.getTable().getItemCount() > 0) {
+					e.detail = SWT.TRAVERSE_NONE;
+					e.doit = false;
+					tableViewer.getTable().setSelection(0);
+					tableViewer.getTable().setFocus();
+				}
 			}
 		}
 	};
@@ -272,13 +274,12 @@ public class JumpToDlg extends Dialog {
 	private TraverseListener listTraverseListener = new TraverseListener() {
 		@Override
 		public void keyTraversed(TraverseEvent e) {
-			switch (e.detail) {
-				case SWT.TRAVERSE_ARROW_PREVIOUS:
-					if (tableViewer.getTable().getSelectionIndex() == 0) {
-						e.detail = SWT.TRAVERSE_NONE;
-						e.doit = false;
-						text.setFocus();
-					}
+			if (e.detail == SWT.TRAVERSE_ARROW_PREVIOUS) {
+				if (tableViewer.getTable().getSelectionIndex() == 0) {
+					e.detail = SWT.TRAVERSE_NONE;
+					e.doit = false;
+					text.setFocus();
+				}
 			}
 		}
 	};
