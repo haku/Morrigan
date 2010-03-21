@@ -28,7 +28,7 @@ public class ScreenPainter implements PaintListener {
 	
 	private final Canvas canvas;
 	private final ScreenType screenType;
-	private TitleProvider titleProvider;
+	private TitleProvider titleProvider = null;
 	
 	public ScreenPainter(Canvas canvas, ScreenType type) {
 		this.canvas = canvas;
