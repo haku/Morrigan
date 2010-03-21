@@ -374,56 +374,75 @@ public class SqliteLayer {
 	
 	private void initDatabaseTables () throws SQLException, ClassNotFoundException {
 		Statement stat = getDbCon().createStatement();
-		
-		ResultSet rs;
-		
-		rs = stat.executeQuery(SQL_TBL_MEDIAFILES_EXISTS);
-		if (!rs.next()) { // True if there are rows in the result.
-			stat.executeUpdate(SQL_TBL_MEDIAFILES_CREATE);
+		try {
+			ResultSet rs;
+			
+			rs = stat.executeQuery(SQL_TBL_MEDIAFILES_EXISTS);
+			try {
+				if (!rs.next()) { // True if there are rows in the result.
+					stat.executeUpdate(SQL_TBL_MEDIAFILES_CREATE);
+				}
+			} finally {
+				rs.close();
+			}
+			
+			rs = stat.executeQuery(SQL_TBL_SOURCES_EXISTS);
+			try {
+				if (!rs.next()) { // True if there are rows in the result.
+					stat.executeUpdate(SQL_TBL_SOURCES_CREATE);
+				}
+			} finally {
+				rs.close();
+			}
+			
+		} finally {
+			stat.close();
 		}
-		rs.close();
-		
-		rs = stat.executeQuery(SQL_TBL_SOURCES_EXISTS);
-		if (!rs.next()) { // True if there are rows in the result.
-			stat.executeUpdate(SQL_TBL_SOURCES_CREATE);
-		}
-		rs.close();
-		
-		stat.close();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Sources.
 	
 	private List<String> local_getSources () throws SQLException, ClassNotFoundException {
+		List<String> ret;
 		Statement stat = getDbCon().createStatement();
-		ResultSet rs = stat.executeQuery(SQL_TBL_SOURCES_Q_ALL);
-		
-		List<String> ret = new ArrayList<String>();
-		
-		while (rs.next()) {
-			ret.add(rs.getString("path"));
+		try {
+			ResultSet rs = stat.executeQuery(SQL_TBL_SOURCES_Q_ALL);
+			try {
+				ret = new ArrayList<String>();
+				while (rs.next()) {
+					ret.add(rs.getString("path"));
+				}
+			} finally {
+				rs.close();
+			}
+		} finally {
+			stat.close();
 		}
-		
-		rs.close();
-		stat.close();
-		
 		return ret;
 	}
 	
 	private void local_addSource (String source) throws SQLException, ClassNotFoundException, DbException {
+		int n;
 		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_SOURCES_ADD);
-		ps.setString(1, source);
-		int n = ps.executeUpdate();
-		ps.close();
+		try {
+			ps.setString(1, source);
+			n = ps.executeUpdate();
+		} finally {
+			ps.close();
+		}
 		if (n<1) throw new DbException("No update occured.");
 	}
 	
 	private void local_removeSource (String source) throws SQLException, ClassNotFoundException, DbException {
+		int n;
 		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_SOURCES_REMOVE);
-		ps.setString(1, source);
-		int n = ps.executeUpdate();
-		ps.close();
+		try {
+			ps.setString(1, source);
+			n = ps.executeUpdate();
+		} finally {
+			ps.close();
+		}
 		if (n<1) throw new DbException("No update occured.");
 	}
 	
@@ -452,6 +471,9 @@ public class SqliteLayer {
 			case DESC:
 				sql = sql.replace("{DIR}", "DESC");
 				break;
+				
+			default:
+				throw new IllegalArgumentException();
 				
 		}
 		
@@ -492,13 +514,18 @@ public class SqliteLayer {
 				throw new IllegalArgumentException();
 		}
 		
+		List<MediaItem> ret;
 		ps = getDbCon().prepareStatement(sql);
-		rs = ps.executeQuery();
-		
-		List<MediaItem> ret = local_parseRecordSet(rs);
-		
-		rs.close();
-		ps.close();
+		try {
+			rs = ps.executeQuery();
+			try {
+				ret = local_parseRecordSet(rs);
+			} finally {
+				rs.close();
+			}
+		} finally {
+			ps.close();
+		}
 		
 		return ret;
 	}
@@ -506,19 +533,26 @@ public class SqliteLayer {
 	private List<MediaItem> local_simpleSearch (String term, String esc, int maxResults) throws SQLException, ClassNotFoundException {
 		PreparedStatement ps;
 		ResultSet rs;
+		List<MediaItem> ret;
 		
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_Q_SIMPLESEARCH);
-		ps.setString(1, "%" + term + "%");
-		ps.setString(2, esc);
-		
-		if (maxResults > 0) {
-			ps.setMaxRows(maxResults);
+		try {
+			ps.setString(1, "%" + term + "%");
+			ps.setString(2, esc);
+			
+			if (maxResults > 0) {
+				ps.setMaxRows(maxResults);
+			}
+			
+			rs = ps.executeQuery();
+			try {
+				ret = local_parseRecordSet(rs);
+			} finally {
+				rs.close();
+			}
+		} finally {
+			ps.close();
 		}
-		
-		rs = ps.executeQuery();
-		List<MediaItem> ret = local_parseRecordSet(rs);
-		rs.close();
-		ps.close();
 		
 		return ret;
 	}
@@ -553,23 +587,33 @@ public class SqliteLayer {
 		String filePath = file.getAbsolutePath();
 		long lastModified = file.lastModified();
 		
+		int n;
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_Q_EXISTS);
-		ps.setString(1, filePath);
-		rs = ps.executeQuery();
-		int n = 0;
-		if (rs.next()) {
-			n = rs.getInt(1);
+		try {
+			ps.setString(1, filePath);
+			rs = ps.executeQuery();
+			try {
+				n = 0;
+				if (rs.next()) {
+					n = rs.getInt(1);
+				}
+			} finally {
+				rs.close();
+			}
+		} finally {
+			ps.close();
 		}
-		rs.close();
-		ps.close();
 		
 		if (n == 0) {
 			ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_ADD);
-			ps.setString(1, filePath);
-			ps.setDate(2, new java.sql.Date(new Date().getTime()));
-			ps.setDate(3, new java.sql.Date(lastModified));
-			n = ps.executeUpdate();
-			ps.close();
+			try {
+				ps.setString(1, filePath);
+				ps.setDate(2, new java.sql.Date(new Date().getTime()));
+				ps.setDate(3, new java.sql.Date(lastModified));
+				n = ps.executeUpdate();
+			} finally {
+				ps.close();
+			}
 			if (n<1) throw new DbException("No update occured.");
 			
 			return true;
@@ -581,11 +625,14 @@ public class SqliteLayer {
 	private boolean local_removeTrack (String sfile) throws SQLException, ClassNotFoundException {
 		PreparedStatement ps;
 		
+		int ret;
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_REMOVE);
-		ps.setString(1, sfile);
-		int ret = ps.executeUpdate();
-		
-		ps.close();
+		try {
+			ps.setString(1, sfile);
+			ret = ps.executeUpdate();
+		} finally {
+			ps.close();
+		}
 		
 		return (ret > 0);
 	}
@@ -594,99 +641,112 @@ public class SqliteLayer {
 		PreparedStatement ps;
 		
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETDATEADDED);
-		ps.setDate(1, new java.sql.Date(date.getTime()));
-		ps.setString(2, sfile);
-		ps.executeUpdate();
-		
-		ps.close();
+		try {
+			ps.setDate(1, new java.sql.Date(date.getTime()));
+			ps.setString(2, sfile);
+			ps.executeUpdate();
+		} finally {
+			ps.close();
+		}
 	}
 	
 	private void local_incTrackStartCnt (String sfile, long n) throws SQLException, ClassNotFoundException {
 		PreparedStatement ps;
 		
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_INCSTART);
-		ps.setLong(1, n);
-		ps.setString(2, sfile);
-		ps.executeUpdate();
-		
-		ps.close();
+		try {
+			ps.setLong(1, n);
+			ps.setString(2, sfile);
+			ps.executeUpdate();
+		} finally {
+			ps.close();
+		}
 	}
 	
 	private void local_setDateLastPlayed (String sfile, Date date) throws SQLException, ClassNotFoundException {
 		PreparedStatement ps;
 		
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETDATELASTPLAYED);
-		ps.setDate(1, new java.sql.Date(date.getTime()));
-		ps.setString(2, sfile);
-		ps.executeUpdate();
-		
-		ps.close();
+		try {
+			ps.setDate(1, new java.sql.Date(date.getTime()));
+			ps.setString(2, sfile);
+			ps.executeUpdate();
+		} finally {
+			ps.close();
+		}
 	}
 	
 	private void local_incTrackEndCnt (String sfile, long n) throws SQLException, ClassNotFoundException {
 		PreparedStatement ps;
 		
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_INCEND);
-		ps.setLong(1, n);
-		ps.setString(2, sfile);
-		ps.executeUpdate();
-		
-		ps.close();
+		try {
+			ps.setLong(1, n);
+			ps.setString(2, sfile);
+			ps.executeUpdate();
+		} finally {
+			ps.close();
+		}
 	}
 	
 	private void local_setTrackDuration (String sfile, int duration) throws SQLException, ClassNotFoundException {
 		PreparedStatement ps;
-		
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETDURATION);
-		ps.setInt(1, duration);
-		ps.setString(2, sfile);
-		ps.executeUpdate();
-		
-		ps.close();
+		try {
+			ps.setInt(1, duration);
+			ps.setString(2, sfile);
+			ps.executeUpdate();
+		} finally {
+			ps.close();
+		}
 	}
 	
 	private void local_setHashCode (String sfile, long hashcode) throws SQLException, ClassNotFoundException {
 		PreparedStatement ps;
-		
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETHASHCODE);
-		ps.setLong(1, hashcode);
-		ps.setString(2, sfile);
-		ps.executeUpdate();
-		
-		ps.close();
+		try {
+			ps.setLong(1, hashcode);
+			ps.setString(2, sfile);
+			ps.executeUpdate();
+		} finally {
+			ps.close();
+		}
 	}
 	
 	private void local_setDateLastModified (String sfile, Date date) throws SQLException, ClassNotFoundException {
 		PreparedStatement ps;
-		
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETDMODIFIED);
-		ps.setDate(1, new java.sql.Date(date.getTime()));
-		ps.setString(2, sfile);
-		ps.executeUpdate();
-		
-		ps.close();
+		try {
+			ps.setDate(1, new java.sql.Date(date.getTime()));
+			ps.setString(2, sfile);
+			ps.executeUpdate();
+		} finally {
+			ps.close();
+		}
 	}
 	
 	private void local_setEnabled (String sfile, boolean value) throws SQLException, ClassNotFoundException {
 		PreparedStatement ps;
-		
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETENABLED);
-		ps.setInt(1, value ? 1 : 0);
-		ps.setString(2, sfile);
-		ps.executeUpdate();
-		
-		ps.close();
+		try {
+			ps.setInt(1, value ? 1 : 0);
+			ps.setString(2, sfile);
+			ps.executeUpdate();
+		} finally {
+			ps.close();
+		}
 	}
 	
 	private void local_setMissing (String sfile, boolean value) throws SQLException, ClassNotFoundException {
 		PreparedStatement ps;
-		
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETMISSING);
-		ps.setInt(1, value ? 1 : 0);
-		ps.setString(2, sfile);
-		ps.executeUpdate();
-		
-		ps.close();
+		try {
+			ps.setInt(1, value ? 1 : 0);
+			ps.setString(2, sfile);
+			ps.executeUpdate();
+		} finally {
+			ps.close();
+		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
