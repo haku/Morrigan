@@ -21,22 +21,28 @@ public class ConsoleHelper {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	static private Object messageConsoleStreamLock = new Object();
 	static private MessageConsoleStream messageConsoleStream = null;
 	
 	static private MessageConsoleStream getMessageConsoleStream () {
-		if (messageConsoleStream == null) {
-			messageConsole = getMessageConsole();
-			messageConsoleStream = messageConsole.newMessageStream();
+		synchronized (messageConsoleStreamLock) {
+			if (messageConsoleStream == null) {
+				messageConsole = getMessageConsole();
+				messageConsoleStream = messageConsole.newMessageStream();
+			}
 		}
 		return messageConsoleStream;
 	}
 	
+	static private Object messageConsoleLock = new Object();
 	static private MessageConsole messageConsole;
 	
 	static private MessageConsole getMessageConsole () {
-		if (messageConsole == null) {
-			messageConsole = new MessageConsole("Morrigan", null);
-			ConsolePlugin.getDefault().getConsoleManager().addConsoles(new IConsole[] { messageConsole });
+		synchronized (messageConsoleLock) {
+			if (messageConsole == null) {
+				messageConsole = new MessageConsole("Morrigan", null);
+				ConsolePlugin.getDefault().getConsoleManager().addConsoles(new IConsole[] { messageConsole });
+			}
 		}
 		return messageConsole;
 	}
