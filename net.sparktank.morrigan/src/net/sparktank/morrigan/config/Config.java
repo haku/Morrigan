@@ -61,28 +61,30 @@ public class Config {
 	
 	private static final String PROP_MEDIA_TYPES = "media.types";
 	
+	private static Object propertiesLock = new Object();
 	private static Properties properties = null;
 	
 	private static Properties getProperties () throws MorriganException {
-		if (properties==null) {
-			File file = new File(PROP_FILE);
-			Properties props = new Properties();
-			FileInputStream fis = null;
-			try {
-				fis = new FileInputStream(file);
-				props.load(fis);
-			} catch (Exception e) {
-				throw new MorriganException(e);
-			} finally {
+		synchronized (propertiesLock) {
+			if (properties == null) {
+				File file = new File(PROP_FILE);
+				Properties props = new Properties();
+				FileInputStream fis = null;
 				try {
-					if (fis!=null) fis.close();
-				} catch (IOException e) {
+					fis = new FileInputStream(file);
+					props.load(fis);
+				} catch (Exception e) {
 					throw new MorriganException(e);
+				} finally {
+					try {
+						if (fis!=null) fis.close();
+					} catch (IOException e) {
+						throw new MorriganException(e);
+					}
 				}
+				properties = props;
 			}
-			properties = props;
 		}
-		
 		return properties;
 	}
 	
@@ -96,7 +98,8 @@ public class Config {
 			ret.add(dirFile);
 		}
 		
-		return ret.toArray( new File[] {} );
+		File[] files = new File[] {};
+		return ret.toArray( files );
 	}
 	
 	/**
@@ -115,7 +118,8 @@ public class Config {
 			}
 		}
 		
-		return ret.toArray( new File[] {} );
+		File[] files = new File[] {};
+		return ret.toArray( files );
 	}
 	
 	public static String getPlaybackEngineClass () throws MorriganException {
