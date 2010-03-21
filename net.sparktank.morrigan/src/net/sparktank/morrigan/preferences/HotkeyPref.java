@@ -111,11 +111,11 @@ public class HotkeyPref extends PreferencePage implements IWorkbenchPreferencePa
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private HotkeyChooser hkShowhide;
-	private HotkeyChooser hkStop;
-	private HotkeyChooser hkPlaypause;
-	private HotkeyChooser hkNext;
-	private HotkeyChooser hkJumpto;
+	private HotkeyChooser hkShowhide = null;
+	private HotkeyChooser hkStop = null;
+	private HotkeyChooser hkPlaypause = null;
+	private HotkeyChooser hkNext = null;
+	private HotkeyChooser hkJumpto = null;
 	
 	protected Control makeContents(Composite parent) {
 		initializeDialogUnits(parent);
