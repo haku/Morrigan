@@ -244,6 +244,7 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		formData = new FormData();
 		formData.top = new FormAttachment(0, SEP);
 		formData.right = new FormAttachment(btnPref, -SEP);
+		formData.bottom = new FormAttachment(seekbar, -SEP);
 		btnQueue.setLayoutData(formData);
 		btnQueue.addSelectionListener(new ActionListener(showQueueAction));
 		
