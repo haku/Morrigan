@@ -239,6 +239,9 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 	};
 	
 	private IAction addAction = new Action("add") {
+		
+		private String lastDir = null;
+		
 		public void run () {
 			String[] supportedFormats;
 			try {
@@ -265,11 +268,13 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 			dialog.setText("Add to " + getTitle());
 			dialog.setFilterNames(filterList);
 			dialog.setFilterExtensions(filterList);
+			dialog.setFilterPath(lastDir);
 			
 			String firstSel = dialog.open();
 			if (firstSel != null) {
 				File firstSelFile = new File(firstSel);
 				String baseDir = firstSelFile.getAbsoluteFile().getParentFile().getAbsolutePath();
+				lastDir = baseDir;
 				
 				String[] files = dialog.getFileNames();
 				int n = 0;
@@ -281,6 +286,7 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 				logger.fine("Added " + n + " file to '" + getTitle() + "'.");
 			}
 		}
+		
 	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
