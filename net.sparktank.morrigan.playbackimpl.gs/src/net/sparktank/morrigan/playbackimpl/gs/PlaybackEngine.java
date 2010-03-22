@@ -267,7 +267,15 @@ public class PlaybackEngine implements IPlaybackEngine {
 			
 			if (position>=0) {
 				playbin.setState(state);
-				System.out.println("seek=" + playbin.seek(1.0d, Format.TIME, SeekFlags.FLUSH, SeekType.SET, position, SeekType.NONE, -1) );
+				
+				/*
+				 * Don't ask.
+				 */
+				playbin.seek(1.0d, Format.TIME, SeekFlags.FLUSH, SeekType.SET, position, SeekType.NONE, -1);
+				try {
+					Thread.sleep(200);
+				} catch (InterruptedException e) {}
+				playbin.seek(1.0d, Format.TIME, SeekFlags.FLUSH, SeekType.SET, position, SeekType.NONE, -1);
 			}
 			
 		}
