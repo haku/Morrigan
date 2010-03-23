@@ -14,6 +14,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.widgets.Composite;
 import org.gstreamer.Bus;
+import org.gstreamer.Element;
 import org.gstreamer.ElementFactory;
 import org.gstreamer.Format;
 import org.gstreamer.Gst;
@@ -111,7 +112,9 @@ public class PlaybackEngine implements IPlaybackEngine {
 	}
 	
 	@Override
-	public void finalise() {}
+	public void finalise() {
+		finalisePlayback();
+	}
 
 	@Override
 	public void startPlaying() throws PlaybackException {
@@ -121,9 +124,9 @@ public class PlaybackEngine implements IPlaybackEngine {
 		
 		try {
 			loadTrack();
-		} catch (Exception e) {
+		} catch (Throwable t) {
 			callStateListener(PlayState.Stopped);
-			throw new PlaybackException("Failed to load '"+filepath+"'.", e);
+			throw new PlaybackException("Failed to load '"+filepath+"'.", t);
 		}
 		
 		playTrack();
@@ -177,6 +180,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 	
 	private PlayBin playbin = null;
 	private VideoComponent videoComponent = null;
+	private Element videoElement = null;
 	
 	private boolean inited = false;
 	
@@ -193,6 +197,10 @@ public class PlaybackEngine implements IPlaybackEngine {
 			playbin.setState(State.NULL);
 			playbin.dispose();
 			playbin = null;
+			
+			if (videoElement != null) {
+				videoElement.dispose();
+			}
 			
 			if (videoComponent!=null) {
 				if (!videoComponent.isDisposed()) {
@@ -224,16 +232,15 @@ public class PlaybackEngine implements IPlaybackEngine {
 			playbin.getBus().connect(stateChangedBus);
 //			playbin.getBus().connect(durationBus);
 			
-			reparentVideo();
-			
 		} else {
 			playbin.setState(State.NULL);
-			reparentVideo();
 		}
 		
 		System.out.println("About to set input file to '"+filepath+"'...");
         playbin.setInputFile(new File(filepath));
         System.out.println("Set file input file.");
+        
+        reparentVideo();
 	}
 	
 	private void reparentVideo () {
@@ -249,6 +256,9 @@ public class PlaybackEngine implements IPlaybackEngine {
 		VideoComponent old_videoComponent = videoComponent;
 		videoComponent = null;
 		
+		Element old_videoElement = videoElement;
+		videoElement = null;
+		
 		if (playbin!=null) {
 			
 			// FIXME only do this if video is present.
@@ -263,7 +273,8 @@ public class PlaybackEngine implements IPlaybackEngine {
 			
 			videoComponent = new VideoComponent(videoFrameParent, SWT.NO_BACKGROUND);
 			videoComponent.setKeepAspect(true);
-			playbin.setVideoSink(videoComponent.getElement());
+			videoElement = videoComponent.getElement();
+			playbin.setVideoSink(videoElement);
 			videoFrameParent.layout();
 			
 			videoComponent.addKeyListener(keyListener);
@@ -284,9 +295,14 @@ public class PlaybackEngine implements IPlaybackEngine {
 			
 		}
 		
-		if (old_videoComponent!=null) {
+		if (old_videoElement!=null) {
+			old_videoElement.dispose();
+		}
+		
+		if (old_videoComponent!=null && !old_videoComponent.isDisposed()) {
+			Composite parent = old_videoComponent.getParent();
 			old_videoComponent.dispose();
-			videoFrameParent.layout();
+			parent.layout();
 		}
 		
 		System.out.println("leaving reparentVideo()");
@@ -450,7 +466,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 					Thread.sleep(500);
 				} catch (InterruptedException e) {}
 			}
-		};
+		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -485,9 +501,13 @@ public class PlaybackEngine implements IPlaybackEngine {
 	}
 	
 	private void callDurationListener (int duration) {
+		System.out.println("Entering callDurationListener().");
+		
 		if (listener!=null) {
 			listener.durationChanged(duration);
 		}
+		
+		System.out.println("Entering callDurationListener().");
 	}
 	
 	private void callOnKeyPressListener (int keyCode) {
