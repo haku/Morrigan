@@ -234,28 +234,32 @@ public abstract class AbstractPlayerView extends ViewPart {
 	private MenuManager _historyMenuMgr = new MenuManager();
 	
 	private void addToHistory (PlayItem item) {
-		if (_history.contains(item)) {
-			_history.remove(item);
+		synchronized (_history) {
+			if (_history.contains(item)) {
+				_history.remove(item);
+			}
+			_history.add(0, item);
+			if (_history.size() > HISTORY_LENGTH) {
+				_history.remove(_history.size()-1);
+			}
+			callRefreshHistoryMenuMgr();
 		}
-		_history.add(0, item);
-		if (_history.size() > HISTORY_LENGTH) {
-			_history.remove(_history.size()-1);
-		}
-		callRefreshHistoryMenuMgr();
 	}
 	
 	private void validateHistory () {
-		boolean changed = false;
-		
-		for (PlayItem item : _history) {
-			if (!item.list.getMediaTracks().contains(item.item)) {
-				_history.remove(item);
-				changed = true;
+		synchronized (_history) {
+			boolean changed = false;
+			
+			for (int i = _history.size() - 1; i >= 0; i--) {
+				if (!_history.get(i).list.getMediaTracks().contains(_history.get(i).item)) {
+					_history.remove(_history.get(i));
+					changed = true;
+				}
 			}
-		}
-		
-		if (changed) {
-			callRefreshHistoryMenuMgr();
+			
+			if (changed) {
+				callRefreshHistoryMenuMgr();
+			}
 		}
 	}
 	
@@ -277,21 +281,25 @@ public abstract class AbstractPlayerView extends ViewPart {
 	
 	private volatile boolean refreshHistoryMenuMgrScheduled = false;
 	
-	private synchronized void callRefreshHistoryMenuMgr () {
-		if (!refreshHistoryMenuMgrScheduled) {
-			refreshHistoryMenuMgrScheduled = true;
-			getSite().getShell().getDisplay().asyncExec(refreshHistoryMenuMgr);
+	private void callRefreshHistoryMenuMgr () {
+		synchronized (refreshHistoryMenuMgr) {
+			if (!refreshHistoryMenuMgrScheduled) {
+				refreshHistoryMenuMgrScheduled = true;
+				getSite().getShell().getDisplay().asyncExec(refreshHistoryMenuMgr);
+			}
 		}
 	}
 	
 	private Runnable refreshHistoryMenuMgr = new Runnable() {
 		@Override
-		public synchronized void run() {
-			_historyMenuMgr.removeAll();
-			for (PlayItem item : _history) {
-				_historyMenuMgr.add(new HistoryAction(item));
+		public void run() {
+			synchronized (refreshHistoryMenuMgr) {
+				_historyMenuMgr.removeAll();
+				for (PlayItem item : _history) {
+					_historyMenuMgr.add(new HistoryAction(item));
+				}
+				refreshHistoryMenuMgrScheduled = false;
 			}
-			refreshHistoryMenuMgrScheduled = false;
 		}
 	};
 	
