@@ -213,10 +213,14 @@ public class PlaybackEngine implements IPlaybackEngine {
 		System.out.println("firstLoad=" + firstLoad);
 		
 		if (firstLoad) {
+			System.out.println("initGst()...");
 			initGst();
+			System.out.println("About to create PlayBin object...");
 			playbin = new PlayBin("VideoPlayer");
 			
+			System.out.println("Connecting eosBus...");
 			playbin.getBus().connect(eosBus);
+			System.out.println("Connecting stateChangedBus...");
 			playbin.getBus().connect(stateChangedBus);
 //			playbin.getBus().connect(durationBus);
 			
