@@ -119,16 +119,17 @@ public class OrderHelper {
 				maxPlayCount = i.getStartCount();
 			}
 		}
+		maxPlayCount = maxPlayCount + 1;
 		
 		// Find sum of all selection indicies.
 		long selIndexSum = 0;
 		for (MediaItem i : tracks) {
-			selIndexSum = selIndexSum + maxPlayCount - i.getStartCount();
+			selIndexSum = selIndexSum + (maxPlayCount - i.getStartCount());
 		}
 		
 		// Generate target selection index.
 		Random generator = new Random();
-		long targetIndex = (long) (generator.nextDouble() * selIndexSum);
+		long targetIndex = Math.round(generator.nextDouble() * selIndexSum);
 		
 		// Find the target item.
 		for (MediaItem i : tracks) {
@@ -172,12 +173,12 @@ public class OrderHelper {
 		
 		// Generate target selection index.
 		Random generator = new Random();
-		long targetIndex = (long) (generator.nextDouble() * sumAgeDays);
+		long targetIndex = Math.round(generator.nextDouble() * sumAgeDays);
 		
 		// Find the target item.
 		for (MediaItem i : tracks) {
 			if (i.getDateLastPlayed() != null) {
-				targetIndex = targetIndex - (maxAgeDays - dateDiffDays(i.getDateLastPlayed(), now));
+				targetIndex = targetIndex - dateDiffDays(i.getDateLastPlayed(), now);
 			} else {
 				targetIndex = targetIndex - maxAgeDays;
 			}
@@ -197,7 +198,9 @@ public class OrderHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	static private long dateDiffDays (Date olderDate, Date newerDate) {
-		return (newerDate.getTime() - olderDate.getTime()) / 86400000;
+		long l = (newerDate.getTime() - olderDate.getTime()) / 86400000;
+		if (l < 1) l = 1;
+		return l;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
