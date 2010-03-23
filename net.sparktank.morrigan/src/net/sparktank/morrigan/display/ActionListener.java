@@ -1,6 +1,8 @@
 package net.sparktank.morrigan.display;
 
 
+import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
+
 import org.eclipse.jface.action.IAction;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -18,7 +20,11 @@ public class ActionListener implements SelectionListener {
 	public void widgetSelected(SelectionEvent e) {
 		e.widget.getDisplay().asyncExec(new Runnable() {
 			public void run() {
-				action.run();
+				try {
+					action.run();
+				} catch (Throwable t) {
+					new MorriganMsgDlg(t).open();
+				}
 			}
 		});
 	}
