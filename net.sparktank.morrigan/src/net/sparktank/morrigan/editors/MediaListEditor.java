@@ -638,8 +638,8 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 			IHandlerService handlerService = (IHandlerService) getSite().getService(IHandlerService.class);
 			try {
 				handlerService.executeCommand(AddToQueue.ID, null);
-			} catch (CommandException e) {
-				new MorriganMsgDlg(e).open();
+			} catch (Throwable t) {
+				new MorriganMsgDlg(t).open();
 			}
 		};
 	};
@@ -653,9 +653,9 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 				for (MediaItem track : getSelectedTracks()) {
 					try {
 						removeTrack(track);
-					} catch (MorriganException e) {
+					} catch (Throwable t) {
 						// TODO something more useful here.
-						e.printStackTrace();
+						t.printStackTrace();
 					}
 				}
 			}
@@ -668,9 +668,9 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 			for (MediaItem track : getSelectedTracks()) {
 				try {
 					editorInput.getMediaList().setTrackEnabled(track, !track.isEnabled());
-				} catch (MorriganException e) {
+				} catch (Throwable t) {
 					// TODO something more useful here.
-					e.printStackTrace();
+					t.printStackTrace();
 				}
 			}
 		};
