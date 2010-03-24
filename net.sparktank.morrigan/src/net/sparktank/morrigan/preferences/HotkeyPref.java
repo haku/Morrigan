@@ -5,6 +5,7 @@ import java.util.Arrays;
 import net.sparktank.morrigan.Activator;
 import net.sparktank.morrigan.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.dialogs.RunnableDialog;
+import net.sparktank.morrigan.engines.EngineFactory;
 import net.sparktank.morrigan.engines.HotkeyKeys;
 import net.sparktank.morrigan.engines.HotkeyRegister;
 import net.sparktank.morrigan.engines.hotkey.HotkeyValue;
@@ -38,7 +39,12 @@ public class HotkeyPref extends PreferencePage implements IWorkbenchPreferencePa
 	@Override
 	public void init(IWorkbench workbench) {
 		setPreferenceStore(Activator.getDefault().getPreferenceStore());
-		setDescription("Hotkey preferences.");
+		if (EngineFactory.canMakeHotkeyEngine()) {
+			setDescription("Hotkey preferences.");
+		} else {
+			setDescription("No hotkey engine is available.  Configured hotkeys will not function.");
+		}
+		
 	}
 	
 	@Override
@@ -51,6 +57,7 @@ public class HotkeyPref extends PreferencePage implements IWorkbenchPreferencePa
 	// Read data.
 	private void initialize () {
 		try {
+			
 			hkShowhide.setValue(getHkShowHide());
 			hkStop.setValue(getHkStop());
 			hkPlaypause.setValue(getHkPlaypause());
