@@ -18,6 +18,8 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IViewPart;
@@ -111,6 +113,7 @@ public class ViewQueue extends ViewPart {
 		tableViewer.setContentProvider(contentProvider);
 		tableViewer.setLabelProvider(labelProvider);
 		tableViewer.setInput(getViewSite()); // use content provider.
+		tableViewer.getTable().addKeyListener(keyListener);
 		
 		getViewSite().getActionBars().getToolBarManager().add(moveUpAction);
 		getViewSite().getActionBars().getToolBarManager().add(moveDownAction);
@@ -193,6 +196,19 @@ public class ViewQueue extends ViewPart {
 		public void dispose() {}
 		@Override
 		public void addListener(ILabelProviderListener listener) {}
+	};
+	
+	private KeyListener keyListener = new KeyListener() {
+		
+		@Override
+		public void keyReleased(KeyEvent e) {
+			if (e.keyCode == SWT.DEL) {
+				removeAction.run();
+			}
+		}
+		
+		@Override
+		public void keyPressed(KeyEvent e) {}
 	};
 	
 	private ArrayList<PlayItem> getSelectedSources () {
