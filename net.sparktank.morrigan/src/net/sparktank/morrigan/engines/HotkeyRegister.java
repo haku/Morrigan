@@ -42,39 +42,41 @@ public class HotkeyRegister {
 		
 		clearConfig();
 		
-		HotkeyValue hkShowHide = HotkeyPref.getHkShowHide();
-		if (hkShowHide!=null) {
-			getHotkeyEngine(true).registerHotkey(IHotkeyEngine.MORRIGAN_HK_SHOWHIDE, hkShowHide);
-			registeredHotkeys.add(IHotkeyEngine.MORRIGAN_HK_SHOWHIDE);
-			System.out.println("registered MORRIGAN_HK_SHOWHIDE: " + hkShowHide.toString());
-		}
-		
-		HotkeyValue hkStop = HotkeyPref.getHkStop();
-		if (hkStop!=null) {
-			getHotkeyEngine(true).registerHotkey(IHotkeyEngine.MORRIGAN_HK_STOP, hkStop);
-			registeredHotkeys.add(IHotkeyEngine.MORRIGAN_HK_STOP);
-			System.out.println("registered MORRIGAN_HK_STOP: " + hkStop.toString());
-		}
-		
-		HotkeyValue hkPlaypause = HotkeyPref.getHkPlaypause();
-		if (hkPlaypause!=null) {
-			getHotkeyEngine(true).registerHotkey(IHotkeyEngine.MORRIGAN_HK_PLAYPAUSE, hkPlaypause);
-			registeredHotkeys.add(IHotkeyEngine.MORRIGAN_HK_PLAYPAUSE);
-			System.out.println("registered MORRIGAN_HK_PLAYPAUSE: " + hkPlaypause.toString());
-		}
-		
-		HotkeyValue hkNext = HotkeyPref.getHkNext();
-		if (hkNext!=null) {
-			getHotkeyEngine(true).registerHotkey(IHotkeyEngine.MORRIGAN_HK_NEXT, hkNext);
-			registeredHotkeys.add(IHotkeyEngine.MORRIGAN_HK_NEXT);
-			System.out.println("registered MORRIGAN_HK_NEXT: " + hkNext.toString());
-		}
-		
-		HotkeyValue hkJumpto = HotkeyPref.getHkJumpto();
-		if (hkJumpto!=null) {
-			getHotkeyEngine(true).registerHotkey(IHotkeyEngine.MORRIGAN_HK_JUMPTO, hkJumpto);
-			registeredHotkeys.add(IHotkeyEngine.MORRIGAN_HK_JUMPTO);
-			System.out.println("registered MORRIGAN_HK_JUMPTO: " + hkJumpto.toString());
+		if (EngineFactory.canMakeHotkeyEngine()) {
+			HotkeyValue hkShowHide = HotkeyPref.getHkShowHide();
+			if (hkShowHide!=null) {
+				getHotkeyEngine(true).registerHotkey(IHotkeyEngine.MORRIGAN_HK_SHOWHIDE, hkShowHide);
+				registeredHotkeys.add(IHotkeyEngine.MORRIGAN_HK_SHOWHIDE);
+				System.out.println("registered MORRIGAN_HK_SHOWHIDE: " + hkShowHide.toString());
+			}
+			
+			HotkeyValue hkStop = HotkeyPref.getHkStop();
+			if (hkStop!=null) {
+				getHotkeyEngine(true).registerHotkey(IHotkeyEngine.MORRIGAN_HK_STOP, hkStop);
+				registeredHotkeys.add(IHotkeyEngine.MORRIGAN_HK_STOP);
+				System.out.println("registered MORRIGAN_HK_STOP: " + hkStop.toString());
+			}
+			
+			HotkeyValue hkPlaypause = HotkeyPref.getHkPlaypause();
+			if (hkPlaypause!=null) {
+				getHotkeyEngine(true).registerHotkey(IHotkeyEngine.MORRIGAN_HK_PLAYPAUSE, hkPlaypause);
+				registeredHotkeys.add(IHotkeyEngine.MORRIGAN_HK_PLAYPAUSE);
+				System.out.println("registered MORRIGAN_HK_PLAYPAUSE: " + hkPlaypause.toString());
+			}
+			
+			HotkeyValue hkNext = HotkeyPref.getHkNext();
+			if (hkNext!=null) {
+				getHotkeyEngine(true).registerHotkey(IHotkeyEngine.MORRIGAN_HK_NEXT, hkNext);
+				registeredHotkeys.add(IHotkeyEngine.MORRIGAN_HK_NEXT);
+				System.out.println("registered MORRIGAN_HK_NEXT: " + hkNext.toString());
+			}
+			
+			HotkeyValue hkJumpto = HotkeyPref.getHkJumpto();
+			if (hkJumpto!=null) {
+				getHotkeyEngine(true).registerHotkey(IHotkeyEngine.MORRIGAN_HK_JUMPTO, hkJumpto);
+				registeredHotkeys.add(IHotkeyEngine.MORRIGAN_HK_JUMPTO);
+				System.out.println("registered MORRIGAN_HK_JUMPTO: " + hkJumpto.toString());
+			}
 		}
 		
 		configRead = true;
@@ -133,7 +135,9 @@ public class HotkeyRegister {
 	private static IHotkeyEngine getHotkeyEngine (boolean create) throws ImplException {
 		if (hotkeyEngine == null && create) {
 			hotkeyEngine = EngineFactory.makeHotkeyEngine();
-			hotkeyEngine.setListener(mainHotkeyListener);
+			if (hotkeyEngine != null) {
+				hotkeyEngine.setListener(mainHotkeyListener);
+			}
 		}
 		
 		return hotkeyEngine;
