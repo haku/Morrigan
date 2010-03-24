@@ -144,6 +144,7 @@ public class LibraryUpdateTask extends Job {
 								if (supportedFormats.contains(ext)) {
 									try {
 										if (library.addFile(file)) {
+											ConsoleHelper.appendToConsole("[ADDED] " + file.getAbsolutePath());
 											filesAdded++;
 										}
 									} catch (MorriganException e) {
@@ -177,6 +178,7 @@ public class LibraryUpdateTask extends Job {
 				// If was missing, mark as found.
 				if (mi.isMissing()) {
 					try {
+						ConsoleHelper.appendToConsole("[FOUND] " + mi.getFilepath());
 						library.setTrackMissing(mi, false);
 						// The file has gone and come back again.  We need to check the CRC32 is up to date.
 						library.setTrackHashCode(mi, 0);
@@ -233,6 +235,7 @@ public class LibraryUpdateTask extends Job {
 			} else { // The file is missing.
 				if (!mi.isMissing()) {
 					try {
+						ConsoleHelper.appendToConsole("[FOUND] " + mi.getFilepath());
 						library.setTrackMissing(mi, true);
 					} catch (Throwable t) {
 						// FIXME log this somewhere useful.
@@ -375,6 +378,7 @@ public class LibraryUpdateTask extends Job {
 							}
 							
 							library.removeMediaTrack(i);
+							ConsoleHelper.appendToConsole("[REMOVED] " + i.getFilepath());
 							
 						} catch (Throwable t) {
 							// FIXME log this somewhere useful.
