@@ -152,7 +152,19 @@ public class MediaLibrary extends MediaList {
 	@Override
 	public void removeMediaTrack (MediaItem track) throws MorriganException {
 		super.removeMediaTrack(track);
-		dbLayer.removeFile(track.getFilepath());
+		int n = dbLayer.removeFile(track.getFilepath());
+		if (n != 1) {
+			if (track instanceof MediaLibraryItem) {
+				MediaLibraryItem mli = (MediaLibraryItem) track;
+				n = dbLayer.removeFile(mli.getDbRowId());
+				if (n != 1) {
+					throw new MorriganException("Failed to remove entry from DB by ROWID '"+mli.getDbRowId()+"' '"+track.getFilepath()+"'.");
+				}
+				
+			} else {
+				throw new MorriganException("Failed to remove entry from DB '"+track.getFilepath()+"'.");
+			}
+		}
 	}
 	
 	@Override
