@@ -196,14 +196,18 @@ public abstract class AbstractPlayerView extends ViewPart {
 		} else if (getCurrentItem() != null && getCurrentItem().list != null) {
 			if (getCurrentItem().item != null) {
 				MediaItem nextTrack = OrderHelper.getNextTrack(getCurrentItem().list, getCurrentItem().item, _playbackOrder);
-				nextItem = new PlayItem(getCurrentItem().list, nextTrack);
+				if (nextTrack != null) {
+					nextItem = new PlayItem(getCurrentItem().list, nextTrack);
+				}
 			}
 			
 		} else {
 			MediaList currentList = getCurrentList();
 			if (currentList != null) {
 				MediaItem nextTrack = OrderHelper.getNextTrack(currentList, null, _playbackOrder);
-				nextItem = new PlayItem(currentList, nextTrack);
+				if (nextTrack != null) {
+					nextItem = new PlayItem(currentList, nextTrack);
+				}
 			}
 		}
 		
