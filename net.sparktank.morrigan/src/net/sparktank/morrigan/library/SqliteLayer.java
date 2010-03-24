@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.List;
 
 import net.sparktank.morrigan.model.media.MediaItem;
+import net.sparktank.morrigan.model.media.MediaLibraryItem;
 
 public class SqliteLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -107,9 +108,17 @@ public class SqliteLayer {
 		}
 	}
 	
-	public boolean removeFile (String sfile) throws DbException {
+	public int removeFile (String sfile) throws DbException {
 		try {
 			return local_removeTrack(sfile);
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+	
+	public int removeFile (long rowId) throws DbException {
+		try {
+			return local_removeTrack(rowId);
 		} catch (Exception e) {
 			throw new DbException(e);
 		}
@@ -234,6 +243,7 @@ public class SqliteLayer {
 	    "benabled INT(1)," +
 	    "bmissing INT(1));";
 	
+	private static final String SQL_TBL_MEDIAFILES_COL_ROWID = "ROWID"; // sqlite automatically creates this.
 	private static final String SQL_TBL_MEDIAFILES_COL_FILE = "sfile";
 	private static final String SQL_TBL_MEDIAFILES_COL_DADDED = "dadded";
 	private static final String SQL_TBL_MEDIAFILES_COL_STARTCNT = "lstartcnt";
@@ -269,20 +279,20 @@ public class SqliteLayer {
 //	Library queries.
 	
 	private static final String SQL_TBL_MEDIAFILES_Q_ALL = 
-		"SELECT sfile, dadded, lstartcnt, lendcnt, dlastplay," +
+		"SELECT ROWID, sfile, dadded, lstartcnt, lendcnt, dlastplay," +
 	    " lmd5, dmodified, lduration, benabled, bmissing" +
 	    " FROM tbl_mediafiles" +
 	    " ORDER BY {COL} {DIR};";
 	
 	private static final String SQL_TBL_MEDIAFILES_Q_NOTMISSING = 
-		"SELECT sfile, dadded, lstartcnt, lendcnt, dlastplay," +
+		"SELECT ROWID, sfile, dadded, lstartcnt, lendcnt, dlastplay," +
 		" lmd5, dmodified, lduration, benabled, bmissing" +
 		" FROM tbl_mediafiles" +
 		" WHERE (bmissing<>1 OR bmissing is NULL)" +
 		" ORDER BY {COL} {DIR};";
 	
 	private static final String SQL_TBL_MEDIAFILES_Q_SIMPLESEARCH = 
-		"SELECT sfile, dadded, lstartcnt, lendcnt, dlastplay," +
+		"SELECT ROWID, sfile, dadded, lstartcnt, lendcnt, dlastplay," +
 		" lmd5, dmodified, lduration, benabled, bmissing" +
 	    " FROM tbl_mediafiles" +
 	    " WHERE sfile LIKE ? ESCAPE ?" +
@@ -298,6 +308,9 @@ public class SqliteLayer {
 	
 	private static final String SQL_TBL_MEDIAFILES_REMOVE =
 		"DELETE FROM tbl_mediafiles WHERE sfile=?";
+	
+	private static final String SQL_TBL_MEDIAFILES_REMOVE_BYROWID =
+		"DELETE FROM tbl_mediafiles WHERE ROWID=?";
 	
 	private static final String SQL_TBL_MEDIAFILES_INCSTART =
 		"UPDATE tbl_mediafiles SET lstartcnt=lstartcnt+?" +
@@ -561,7 +574,9 @@ public class SqliteLayer {
 		List<MediaItem> ret = new ArrayList<MediaItem>();
 		
 		while (rs.next()) {
-			MediaItem mt = new MediaItem();
+			MediaLibraryItem mt = new MediaLibraryItem();
+			
+			mt.setDbRowId(rs.getLong(SQL_TBL_MEDIAFILES_COL_ROWID));
 			
 			mt.setFilepath(rs.getString(SQL_TBL_MEDIAFILES_COL_FILE));
 			mt.setDateAdded(readDate(rs, SQL_TBL_MEDIAFILES_COL_DADDED));
@@ -622,7 +637,7 @@ public class SqliteLayer {
 		return false;
 	}
 	
-	private boolean local_removeTrack (String sfile) throws SQLException, ClassNotFoundException {
+	private int local_removeTrack (String sfile) throws SQLException, ClassNotFoundException {
 		PreparedStatement ps;
 		
 		int ret;
@@ -634,7 +649,22 @@ public class SqliteLayer {
 			ps.close();
 		}
 		
-		return (ret > 0);
+		return ret;
+	}
+	
+	private int local_removeTrack (long rowId) throws SQLException, ClassNotFoundException {
+		PreparedStatement ps;
+		
+		int ret;
+		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_REMOVE_BYROWID);
+		try {
+			ps.setLong(1, rowId);
+			ret = ps.executeUpdate();
+		} finally {
+			ps.close();
+		}
+		
+		return ret;
 	}
 	
 	private void local_setDateAdded (String sfile, Date date) throws Exception, ClassNotFoundException {
