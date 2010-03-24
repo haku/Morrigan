@@ -205,7 +205,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 		callStateListener(PlayState.Loading);
 		boolean firstLoad = (dsMovie==null);
 		
-		System.out.println("dsj.PlaybackEngine.firstLoad=" + firstLoad);
+		System.out.println("dsj.PlaybackEngine firstLoad=" + firstLoad);
 		
 		if (firstLoad) {
 			shoeHorn();
@@ -225,7 +225,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 	}
 	
 	private void reparentVideo () {
-		System.out.println("dsj.PlaybackEngine.reparentVideo()");
+		System.out.println("dsj.PlaybackEngine reparentVideo()");
 		
 //		if (videoComponent!=null) {
 //			System.out.println("remove listeners");
@@ -252,7 +252,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 			videoComponent = dsMovie.asComponent();
 			videoComponent.setBackground(Color.BLACK);
 			
-			System.out.println("dsj.PlaybackEngine adding listeners to videoComponent...");
+			System.out.println("dsj.PlaybackEngine Adding listeners to videoComponent...");
 			videoComponent.addMouseListener(mouseListener);
 			videoComponent.addKeyListener(keyListener);
 		}
@@ -276,7 +276,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 		
 		videoFrameParent.layout();
 		
-		System.out.println("dsj.PlaybackEngine leaving reparentVideo()");
+		System.out.println("dsj.PlaybackEngine Leaving reparentVideo()");
 	}
 	
 	private MouseListener mouseListener = new MouseListener() {
@@ -413,18 +413,33 @@ public class PlaybackEngine implements IPlaybackEngine {
 	}
 	
 	private class WatcherThread extends Thread {
+		
+		private int lastMeasuredPosition = -1;
+		private int lastSentPosition = -1;
+		
 		public void run() {
 			while (!m_stopWatching) {
-				
-				if (dsMovie!=null) {
-					callPositionListener(dsMovie.getTime() / 1000);
-				}
-				
 				try {
 					Thread.sleep(500);
 				} catch (InterruptedException e) {}
+				
+				if (dsMovie!=null) {
+					int measuredPosition = dsMovie.getTime();
+					if (getPlaybackState() == PlayState.Playing && measuredPosition == lastMeasuredPosition) {
+						System.out.println("dsj.PlaybackEngine Prompting playback...");
+						dsMovie.play();
+					}
+					lastMeasuredPosition = measuredPosition;
+					
+					int position = measuredPosition / 1000;
+					if (position != lastSentPosition) {
+						callPositionListener(position);
+						lastSentPosition = position;
+					}
+				}
 			}
-		};
+		}
+		
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -448,14 +463,9 @@ public class PlaybackEngine implements IPlaybackEngine {
 		if (listener!=null) listener.statusChanged(state);
 	}
 	
-	private long lastPosition = -1;
-	
 	private void callPositionListener (long position) {
 		if (listener!=null) {
-			if (position != lastPosition) {
-				listener.positionChanged(position);
-			}
-			lastPosition = position;
+			listener.positionChanged(position);
 		}
 	}
 	
@@ -547,7 +557,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 			t.printStackTrace();
 		}
 		
-		System.out.println("dsj.PlaybackEngine loaded dll=" + dsjDllFile.getAbsolutePath());
+		System.out.println("dsj.PlaybackEngine Loaded dll=" + dsjDllFile.getAbsolutePath());
 		
 		haveShoeHorned = true;
 	}
