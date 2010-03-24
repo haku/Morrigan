@@ -69,13 +69,13 @@ public class OrderHelper {
 				return getNextTrackSequencial(list, track);
 			
 			case RANDOM:
-				return getNextTrackRandom(list);
+				return getNextTrackRandom(list, track);
 			
 			case BYSTARTCOUNT:
-				return getNextTrackByStartCount(list);
+				return getNextTrackByStartCount(list, track);
 				
 			case BYLASTPLAYED:
-				return getNextTrackByLastPlayedDate(list);
+				return getNextTrackByLastPlayedDate(list, track);
 				
 			default:
 				throw new IllegalArgumentException();
@@ -89,42 +89,86 @@ public class OrderHelper {
 		MediaItem ret = null;
 		List<MediaItem> mediaTracks = list.getMediaTracks();
 		
+		int i;
 		if (track != null && mediaTracks.contains(track)) {
-			int i = mediaTracks.indexOf(track) + 1;
-			if (i >= mediaTracks.size()) i = 0;
-			ret = mediaTracks.get(i);
+			i = mediaTracks.indexOf(track) + 1;
 			
-		} else { // With no other info, might as well start at the beginning.
-			ret = list.getMediaTracks().get(0);
+		} else {
+			// With no other info, might as well start at the beginning.
+			i = 0;
+		}
+		
+		int tracksTried = 0;
+		while (true) {
+			if (i >= mediaTracks.size()) i = 0;
+			
+			if (mediaTracks.get(i).isEnabled() && !mediaTracks.get(i).isMissing()) {
+				break;
+			}
+			
+			tracksTried++;
+			if (tracksTried >= list.getCount()) {
+				i = -1;
+				break;
+			}
+			
+			i++;
+		}
+		
+		if (i > 0) {
+			ret = mediaTracks.get(i);
 		}
 		
 		return ret;
 	}
 	
-	private static MediaItem getNextTrackRandom (MediaList list) {
+	private static MediaItem getNextTrackRandom (MediaList list, MediaItem current) {
 		Random generator = new Random();
 		List<MediaItem> mediaTracks = list.getMediaTracks();
-		int i = generator.nextInt(mediaTracks.size());
-		return mediaTracks.get(i);
+		
+		int n = 0;
+		for (MediaItem mi : mediaTracks) {
+			if (mi.isEnabled() && !mi.isMissing() && mi != current) {
+				n++;
+			}
+		}
+		if (n == 0) return null;
+		
+		long x = Math.round(generator.nextDouble() * n);
+		for (MediaItem mi : mediaTracks) {
+			if (mi.isEnabled() && !mi.isMissing() && mi != current) {
+				x--;
+				if (x<=0) {
+					return mi;
+				}
+			}
+		}
+		
+		throw new RuntimeException("Failed to find next track.  This should not happen.");
 	}
 	
-	private static MediaItem getNextTrackByStartCount (MediaList list) {
+	private static MediaItem getNextTrackByStartCount (MediaList list, MediaItem current) {
 		MediaItem ret = null;
 		List<MediaItem> tracks = list.getMediaTracks();
 		
 		// Find highest play count.
-		long maxPlayCount = 0;
+		long maxPlayCount = -1;
 		for (MediaItem i : tracks) {
-			if (i.getStartCount() > maxPlayCount) {
+			if (i.getStartCount() > maxPlayCount && i.isEnabled() && !i.isMissing() && i != current) {
 				maxPlayCount = i.getStartCount();
 			}
+		}
+		if (maxPlayCount < 0) { // No playable items.
+			return null;
 		}
 		maxPlayCount = maxPlayCount + 1;
 		
 		// Find sum of all selection indicies.
 		long selIndexSum = 0;
 		for (MediaItem i : tracks) {
-			selIndexSum = selIndexSum + (maxPlayCount - i.getStartCount());
+			if (i.isEnabled() && !i.isMissing() && i != current) {
+				selIndexSum = selIndexSum + (maxPlayCount - i.getStartCount());
+			}
 		}
 		
 		// Generate target selection index.
@@ -133,10 +177,12 @@ public class OrderHelper {
 		
 		// Find the target item.
 		for (MediaItem i : tracks) {
-			targetIndex = targetIndex - (maxPlayCount - i.getStartCount());
-			if (targetIndex <= 0) {
-				ret = i;
-				break;
+			if (i.isEnabled() && !i.isMissing() && i != current) {
+				targetIndex = targetIndex - (maxPlayCount - i.getStartCount());
+				if (targetIndex <= 0) {
+					ret = i;
+					break;
+				}
 			}
 		}
 		
@@ -147,27 +193,36 @@ public class OrderHelper {
 		return ret;
 	}
 	
-	private static MediaItem getNextTrackByLastPlayedDate (MediaList list) {
+	private static MediaItem getNextTrackByLastPlayedDate (MediaList list, MediaItem current) {
 		MediaItem ret = null;
 		List<MediaItem> tracks = list.getMediaTracks();
 		Date now = new Date();
 		
 		// Find oldest date.
 		Date maxAge = new Date();
+		int n = 0;
 		for (MediaItem i : tracks) {
-			if (i.getDateLastPlayed() != null && i.getDateLastPlayed().before(maxAge)) {
-				maxAge = i.getDateLastPlayed();
+			if (i.isEnabled() && !i.isMissing() && i != current) {
+				if (i.getDateLastPlayed() != null && i.getDateLastPlayed().before(maxAge)) {
+					maxAge = i.getDateLastPlayed();
+				}
+				n++;
 			}
+		}
+		if (n == 0) { // No playable items.
+			return null;
 		}
 		long maxAgeDays = dateDiffDays(maxAge, now);
 		
 		// Build sum of all selection-indicies in units of days.
 		long sumAgeDays = 0;
 		for (MediaItem i : tracks) {
-			if (i.getDateLastPlayed() != null) {
-				sumAgeDays = sumAgeDays + dateDiffDays(i.getDateLastPlayed(), now);
-			} else {
-				sumAgeDays = sumAgeDays + maxAgeDays;
+			if (i.isEnabled() && !i.isMissing() && i != current) {
+				if (i.getDateLastPlayed() != null) {
+					sumAgeDays = sumAgeDays + dateDiffDays(i.getDateLastPlayed(), now);
+				} else {
+					sumAgeDays = sumAgeDays + maxAgeDays;
+				}
 			}
 		}
 		
@@ -177,14 +232,16 @@ public class OrderHelper {
 		
 		// Find the target item.
 		for (MediaItem i : tracks) {
-			if (i.getDateLastPlayed() != null) {
-				targetIndex = targetIndex - dateDiffDays(i.getDateLastPlayed(), now);
-			} else {
-				targetIndex = targetIndex - maxAgeDays;
-			}
-			if (targetIndex <= 0) {
-				ret = i;
-				break;
+			if (i.isEnabled() && !i.isMissing() && i != current) {
+				if (i.getDateLastPlayed() != null) {
+					targetIndex = targetIndex - dateDiffDays(i.getDateLastPlayed(), now);
+				} else {
+					targetIndex = targetIndex - maxAgeDays;
+				}
+				if (targetIndex <= 0) {
+					ret = i;
+					break;
+				}
 			}
 		}
 		
