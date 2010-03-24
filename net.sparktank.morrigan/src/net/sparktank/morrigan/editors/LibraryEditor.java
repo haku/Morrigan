@@ -12,6 +12,7 @@ import net.sparktank.morrigan.display.ActionListener;
 import net.sparktank.morrigan.display.DropMenuListener;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.TimeHelper;
+import net.sparktank.morrigan.library.LibraryUpdateAction;
 import net.sparktank.morrigan.library.SqliteLayer.LibrarySort;
 import net.sparktank.morrigan.library.SqliteLayer.LibrarySortDirection;
 import net.sparktank.morrigan.model.media.MediaLibrary;
@@ -137,6 +138,7 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 			prefMenuMgr.add(a);
 		}
 		prefMenuMgr.add(new Separator());
+		prefMenuMgr.add(new LibraryUpdateAction(getMediaList()));
 		prefMenuMgr.add(showPropertiesAction);
 		
 		// Context menu.

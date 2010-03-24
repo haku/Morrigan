@@ -14,7 +14,11 @@ public class LibraryUpdateAction extends Action implements IWorkbenchAction{
 	
 	public LibraryUpdateAction () {
 		super();
-		
+	}
+	
+	public LibraryUpdateAction (MediaLibrary library) {
+		super();
+		this.library = library;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -26,7 +30,13 @@ public class LibraryUpdateAction extends Action implements IWorkbenchAction{
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
-	public String getText() { return "Update library"; }
+	public String getText() { 
+		if (library != null) {
+			return "Update " + library.getListName();
+		} else {
+			return "Update library";
+		}
+	}
 	
 	@Override
 	public String getId() { return "updatelibrary"; }
