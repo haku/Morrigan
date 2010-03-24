@@ -12,8 +12,9 @@ import net.sparktank.morrigan.engines.playback.IPlaybackEngine;
 import net.sparktank.morrigan.exceptions.MorriganException;
 
 public class EngineFactory {
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-private static URLClassLoader classLoader = null;
+	private static URLClassLoader classLoader = null;
 	
 	private static URLClassLoader getClassLoader () throws MorriganException, MalformedURLException {
 		if (classLoader == null) {
@@ -29,6 +30,8 @@ private static URLClassLoader classLoader = null;
 		}
 		return classLoader;
 	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static IPlaybackEngine makePlaybackEngine () throws ImplException {
 		try {
@@ -46,9 +49,19 @@ private static URLClassLoader classLoader = null;
 		}
 	}
 	
+	public static boolean canMakeHotkeyEngine () {
+		try {
+			return (Config.getHotKeyEngineClass() != null);
+		} catch (MorriganException e) {
+			return false;
+		}
+	}
+	
 	public static IHotkeyEngine makeHotkeyEngine () throws ImplException {
 		try {
 			String engineClass = Config.getHotKeyEngineClass();
+			if (engineClass == null) return null;
+			
 			Class<?> c = getClassLoader().loadClass(engineClass);
 			IHotkeyEngine engine = (IHotkeyEngine) c.newInstance();
 			
@@ -62,4 +75,5 @@ private static URLClassLoader classLoader = null;
 		}
 	}
 	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
