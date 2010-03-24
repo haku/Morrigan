@@ -360,6 +360,8 @@ public class LibraryUpdateTask extends Job {
 					 */
 					for (MediaItem i : items.keySet()) {
 						try {
+							// TODO this should be done in a tranasaction!
+							
 							library.incTrackStartCnt(keep, i.getStartCount());
 							library.incTrackEndCnt(keep, i.getEndCount());
 							
