@@ -28,7 +28,7 @@ public class ConsoleHelper {
 		synchronized (messageConsoleStreamLock) {
 			if (messageConsoleStream == null) {
 				messageConsole = getMessageConsole();
-				messageConsole.setWaterMarks(2500, 3000);
+				messageConsole.setWaterMarks(9000, 10000);
 				messageConsoleStream = messageConsole.newMessageStream();
 			}
 		}
