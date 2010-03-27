@@ -281,16 +281,33 @@ public class PlaybackEngine implements IPlaybackEngine {
 			videoComponent.addMouseListener(mouseListener);
 			
 			if (position>=0) {
-				playbin.setState(state);
+				playbin.setState(State.PAUSED);
 				
-				/*
-				 * Don't ask.
-				 */
-				playbin.seek(1.0d, Format.TIME, SeekFlags.FLUSH, SeekType.SET, position, SeekType.NONE, -1);
-				try {
-					Thread.sleep(200);
-				} catch (InterruptedException e) {}
-				playbin.seek(1.0d, Format.TIME, SeekFlags.FLUSH, SeekType.SET, position, SeekType.NONE, -1);
+				if (position > 0) {
+					long startTime = System.currentTimeMillis();
+					
+					while (true) {
+						playbin.seek(1.0d, Format.TIME, SeekFlags.FLUSH, SeekType.SET, position, SeekType.NONE, -1);
+
+						if (playbin.queryPosition(TimeUnit.NANOSECONDS) > 0) {
+							break;
+						}
+						
+						try {
+							Thread.sleep(200);
+						} catch (InterruptedException e) {}
+
+						if (playbin.queryPosition(TimeUnit.NANOSECONDS) > 0) {
+							break;
+						}
+					}
+					
+					System.out.println("Seek took " + (System.currentTimeMillis() - startTime) + " ms.");
+				}
+				
+				if (state != State.PAUSED) {
+					playbin.setState(state);
+				}
 			}
 			
 		}
