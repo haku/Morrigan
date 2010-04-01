@@ -1,8 +1,11 @@
-<project default="main">
+<project name="net.sparktank.morrigan.build" default="main">
 
-	<property file="build.properties" />
+	<target name="setup">
+		<!-- Main props file. -->
+		<property file="build.properties" />
 
-	<target name="main">
+		<!-- Configure build process. -->
+		<property name="outputDirectory" value="${basedir}/builds" />
 
 		<!-- Locate deltapack. -->
 		<property name="deltapack" value="${eclipse.home}/../eclipse-3.5.2-delta-pack" />
@@ -16,19 +19,26 @@
 		<property name="buildDirectory" value="${basedir}/buildDirectory" />
 		<property name="pluginPath" value="${basedir}/..${path.separator}${deltapack}" />
 		<property name="buildTempFolder" value="${buildDirectory}" />
+	</target>
 
+	<target name="main" depends="setup,clean">
 		<!-- Call RCP build process. -->
 		<ant antfile="${eclipse.pdebuild.scripts}/productBuild/productBuild.xml" />
 
 		<!-- Move output. -->
-		<move todir="${basedir}">
+		<mkdir dir="${outputDirectory}" />
+		<move todir="${outputDirectory}">
 			<fileset dir="${buildDirectory}/${buildLabel}" includes="*.zip" />
 		</move>
 
 		<!-- Refresh eclipse workspace -->
 		<eclipse.convertPath fileSystemPath="${basedir}" property="resourcePath" />
 		<eclipse.refreshLocal resource="${resourcePath}" depth="infinite" />
+	</target>
 
+	<target name="clean" depends="setup">
+		<delete dir="${buildDirectory}" failonerror="false" />
+		<delete dir="${outputDirectory}" failonerror="false" />
 	</target>
 
 </project>
