@@ -68,6 +68,7 @@ public class Config {
 		synchronized (propertiesLock) {
 			if (properties == null) {
 				File file = new File(PROP_FILE);
+				System.out.println("PROP_FILE=" + file.getAbsolutePath());
 				Properties props = new Properties();
 				FileInputStream fis = null;
 				try {
