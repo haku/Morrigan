@@ -31,14 +31,20 @@
 			<fileset dir="${buildDirectory}/${buildLabel}" includes="*.zip" />
 		</move>
 
-		<!-- Refresh eclipse workspace -->
-		<eclipse.convertPath fileSystemPath="${basedir}" property="resourcePath" />
-		<eclipse.refreshLocal resource="${resourcePath}" depth="infinite" />
+		<antcall target="refreshWorkspace" />
 	</target>
 
 	<target name="clean" depends="setup">
 		<delete dir="${buildDirectory}" failonerror="false" />
 		<delete dir="${outputDirectory}" failonerror="false" />
+
+		<antcall target="refreshWorkspace" />
+	</target>
+
+	<target name="refreshWorkspace">
+		<!-- Refresh eclipse workspace -->
+		<eclipse.convertPath fileSystemPath="${basedir}" property="resourcePath" />
+		<eclipse.refreshLocal resource="${resourcePath}" depth="infinite" />
 	</target>
 
 </project>
