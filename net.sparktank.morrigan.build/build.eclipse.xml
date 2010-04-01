@@ -19,6 +19,12 @@
 		<property name="buildDirectory" value="${basedir}/buildDirectory" />
 		<property name="pluginPath" value="${basedir}/..${path.separator}${deltapack}" />
 		<property name="buildTempFolder" value="${buildDirectory}" />
+		
+		<echo message="baseLocation=${baseLocation}" />
+		<echo message="builder=${builder}" />
+		<echo message="buildDirectory=${buildDirectory}" />
+		<echo message="pluginPath=${pluginPath}" />
+		<echo message="buildTempFolder=${buildTempFolder}" />
 	</target>
 
 	<target name="main" depends="setup,clean">
@@ -41,7 +47,7 @@
 		<antcall target="refreshWorkspace" />
 	</target>
 
-	<target name="refreshWorkspace">
+	<target name="refreshWorkspace" >
 		<!-- Refresh eclipse workspace -->
 		<eclipse.convertPath fileSystemPath="${basedir}" property="resourcePath" />
 		<eclipse.refreshLocal resource="${resourcePath}" depth="infinite" />
