@@ -7,6 +7,10 @@ import java.awt.Frame;
 import java.awt.Rectangle;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -73,7 +77,7 @@ public class PlaybackEngine  implements IPlaybackEngine {
 	
 	@Override
 	public int readFileDuration(String filepath) throws PlaybackException {
-		return -1;
+		return -1; // FIXME not implemented.
 	}
 	
 	@Override
@@ -86,7 +90,9 @@ public class PlaybackEngine  implements IPlaybackEngine {
 	
 	@Override
 	public void setVideoFrameParent(Composite frame) {
+		if (frame==videoFrameParent) return;
 		this.videoFrameParent = frame;
+		reparentVideo();
 	}
 	
 	@Override
@@ -194,11 +200,15 @@ public class PlaybackEngine  implements IPlaybackEngine {
 	}
 	
 	private void loadTrack () throws NoPlayerException, CannotRealizeException, MalformedURLException, IOException, NoDataSourceException {
-		if (mediaPlayer!=null) finalisePlayback();
+		callStateListener(PlayState.Loading);
+		
+		if (mediaPlayer != null) finalisePlayback();
 		
 		mediaFile = new File(filepath);
+		System.err.println("jmf.PlaybackEngine Creating realized Player...");
 		Player player = Manager.createRealizedPlayer(mediaFile.toURI().toURL());
 		
+		System.err.println("jmf.PlaybackEngine Creating MediaPlayer...");
 		mediaPlayer = new MediaPlayer();
 		mediaPlayer.setFixedAspectRatio(true);
 		mediaPlayer.setPlayer(player);
@@ -206,31 +216,80 @@ public class PlaybackEngine  implements IPlaybackEngine {
 		
 		mediaPlayer.addControllerListener(mediaListener);
 		
-		videoComponent = mediaPlayer.getVisualComponent();
-		Dimension preferredSize = null;
+		reparentVideo();
+	}
+	
+	private void reparentVideo() {
+		System.err.println("jmf.PlaybackEngine >>> reparentVideo()");
 		
-		if (videoComponent!=null) {
-			VideoPanel panelVideo = new VideoPanel ( mediaPlayer );
-			panelVideo.resizeVisualComponent();
-			preferredSize = panelVideo.getPreferredSize();
+		if (videoFrameParent != null && mediaPlayer != null) {
+			videoComponent = mediaPlayer.getVisualComponent();
 			
-			videoComposite = new Composite(videoFrameParent, SWT.EMBEDDED);
-			videoComposite.setLayout(new FillLayout( ));
-	        
-			videoFrame = SWT_AWT.new_Frame(videoComposite);
-			videoFrame.setBackground(Color.BLACK);
-			
-			videoFrame.setLayout(null);
-			videoFrame.add(videoComponent);
-			videoFrame.doLayout();
-			
-			videoFrameParent.layout();
+			if (videoComponent != null) {
+				if (videoComposite == null) {
+					videoComposite = new Composite(videoFrameParent, SWT.EMBEDDED);
+					videoComposite.setLayout(new FillLayout());
+					
+					videoFrame = SWT_AWT.new_Frame(videoComposite);
+					videoFrame.setBackground(Color.BLACK);
+					
+					videoFrame.setLayout(null);
+					videoFrame.add(videoComponent);
+					videoFrame.doLayout();
+					
+					videoFrameParent.layout();
+					
+					VideoPanel panelVideo = new VideoPanel(mediaPlayer);
+					panelVideo.resizeVisualComponent();
+					Dimension preferredSize = panelVideo.getPreferredSize();
+					videoResizeListener = new VideoResizeListener(preferredSize);
+					videoFrame.addComponentListener(videoResizeListener);
+					videoResizeListener.componentResized(null);
+					
+					System.err.println("jmf.PlaybackEngine Adding listeners to videoComponent...");
+					videoComponent.addMouseListener(mouseListener);
+					videoComponent.addKeyListener(keyListener);
+					
+				} else {
+					System.err.println("jmf.PlaybackEngine Moveing videoComposite...");
+					videoComposite.setParent(videoFrameParent);
+					videoFrameParent.layout();
+				}
+				
+			} else {
+				System.err.println("jmf.PlaybackEngine videoComponent == null.");
+			}
 		}
 		
-		videoResizeListener = new VideoResizeListener(preferredSize);
-		videoFrame.addComponentListener(videoResizeListener);
-		videoResizeListener.componentResized(null);
+		System.err.println("jmf.PlaybackEngine <<< reparentVideo()");
 	}
+	
+	private MouseListener mouseListener = new MouseListener() {
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			callOnClickListener(e.getButton(), e.getClickCount());
+		}
+		
+		@Override
+		public void mouseReleased(MouseEvent e) {}
+		@Override
+		public void mousePressed(MouseEvent e) {}
+		@Override
+		public void mouseExited(MouseEvent e) {}
+		@Override
+		public void mouseEntered(MouseEvent e) {}
+	};
+	
+	private KeyListener keyListener = new KeyListener() {
+		@Override
+		public void keyReleased(KeyEvent key) {
+			callOnKeyPressListener(key.getKeyCode());
+		}
+		@Override
+		public void keyTyped(KeyEvent arg0) {}
+		@Override
+		public void keyPressed(KeyEvent arg0) {}
+	};
 	
 	private class VideoResizeListener implements ComponentListener {
 		
@@ -300,7 +359,7 @@ public class PlaybackEngine  implements IPlaybackEngine {
 				
 			} else if (event instanceof FormatChangeEvent) {
 				FormatChangeEvent ev = (FormatChangeEvent) event;
-				System.out.println(ev.getNewFormat().getEncoding());
+				System.err.println(ev.getNewFormat().getEncoding());
 				
 			} else if (event instanceof ControllerErrorEvent) {
 				String message = ((ControllerErrorEvent)event).getMessage();
@@ -382,6 +441,20 @@ public class PlaybackEngine  implements IPlaybackEngine {
 	private void callPositionListener (long position) {
 		if (listener!=null) {
 			listener.positionChanged(position);
+		}
+	}
+	
+	// TODO use callOnKeyPressListener
+	private void callOnKeyPressListener (int keyCode) {
+		if (listener!=null) {
+			listener.onKeyPress(keyCode);
+		}
+	}
+	
+	// TODO use callOnClickListener
+	private void callOnClickListener (int button, int clickCount) {
+		if (listener!=null) {
+			listener.onMouseClick(button, clickCount);
 		}
 	}
 	
