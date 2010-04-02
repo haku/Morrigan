@@ -235,7 +235,7 @@ public class LibraryUpdateTask extends Job {
 			} else { // The file is missing.
 				if (!mi.isMissing()) {
 					try {
-						ConsoleHelper.appendToConsole("[FOUND] " + mi.getFilepath());
+						ConsoleHelper.appendToConsole("[MISSING] " + mi.getFilepath());
 						library.setTrackMissing(mi, true);
 					} catch (Throwable t) {
 						// FIXME log this somewhere useful.
