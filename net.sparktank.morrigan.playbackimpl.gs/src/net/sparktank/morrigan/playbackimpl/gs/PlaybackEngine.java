@@ -14,14 +14,18 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.widgets.Composite;
 import org.gstreamer.Bus;
+import org.gstreamer.Caps;
 import org.gstreamer.Element;
 import org.gstreamer.ElementFactory;
 import org.gstreamer.Format;
 import org.gstreamer.Gst;
 import org.gstreamer.GstObject;
+import org.gstreamer.Pad;
 import org.gstreamer.SeekFlags;
 import org.gstreamer.SeekType;
 import org.gstreamer.State;
+import org.gstreamer.Structure;
+import org.gstreamer.elements.DecodeBin;
 import org.gstreamer.elements.PlayBin;
 import org.gstreamer.swt.overlay.VideoComponent;
 
@@ -231,6 +235,20 @@ public class PlaybackEngine implements IPlaybackEngine {
 			System.out.println("Connecting stateChangedBus...");
 			playbin.getBus().connect(stateChangedBus);
 //			playbin.getBus().connect(durationBus);
+			
+			DecodeBin d = playbin.getElementByInterface(DecodeBin.class);
+			d.connect(new DecodeBin.NEW_DECODED_PAD() {
+				@Override
+				public void newDecodedPad(Element elem, Pad pad, boolean last) {
+					if (pad.isLinked()) return; // only link once.
+					
+					Caps caps = pad.getCaps();
+					Structure struct = caps.getStructure(0);
+					if (struct.getName().startsWith("video/")) {
+						System.err.println("HAS VIDEO!");
+					}
+				}
+			});
 			
 		} else {
 			playbin.setState(State.NULL);
