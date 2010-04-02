@@ -56,8 +56,10 @@
 
 		<zip destfile="${zipfile}" update="true" whenempty="fail">
 			<zipfileset dir="../net.sparktank.morrigan.playbackimpl.dsj" includes="*.jar" prefix="morrigan/engines" />
+			<zipfileset dir="../net.sparktank.morrigan.playbackimpl.dsj/lib" includes="*" excludes="swt.jar" prefix="morrigan/engines" />
 			<zipfileset dir="../net.sparktank.morrigan.hotkeyimpl.jintellitype" includes="*.jar" prefix="morrigan/engines" />
-			<!-- TODO Include properties file. -->
+			<zipfileset dir="../net.sparktank.morrigan.hotkeyimpl.jintellitype/lib" includes="*" prefix="morrigan/engines" />
+			<zipfileset dir="propfiles" includes="win32.properties" fullpath="morrigan/morrigan.properties" />
 		</zip>
 	</target>
 
@@ -73,8 +75,10 @@
 
 		<zip destfile="${zipfile}" update="true" whenempty="fail">
 			<zipfileset dir="../net.sparktank.morrigan.playbackimpl.gs" includes="*.jar" prefix="morrigan/engines" />
+			<zipfileset dir="../net.sparktank.morrigan.playbackimpl.gs/lib" includes="*" excludes="swt.jar" prefix="morrigan/engines" />
 			<zipfileset dir="../net.sparktank.morrigan.hotkeyimpl.jxgrabkey" includes="*.jar" prefix="morrigan/engines" />
-			<!-- TODO Include properties file. -->
+			<zipfileset dir="../net.sparktank.morrigan.hotkeyimpl.jxgrabkey/lib" includes="*" prefix="morrigan/engines" />
+			<zipfileset dir="propfiles" includes="linux.properties" fullpath="morrigan/morrigan.properties" />
 		</zip>
 	</target>
 
@@ -89,7 +93,8 @@
 
 		<zip destfile="${zipfile}" update="true" whenempty="fail">
 			<zipfileset dir="../net.sparktank.morrigan.playbackimpl.jmf" includes="*.jar" prefix="morrigan/engines" />
-			<!-- TODO Include properties file. -->
+			<zipfileset dir="../net.sparktank.morrigan.playbackimpl.jmf/lib" includes="*" excludes="swt.jar" prefix="morrigan/engines" />
+			<zipfileset dir="propfiles" includes="mac.properties" fullpath="morrigan/morrigan.properties" />
 		</zip>
 	</target>
 
