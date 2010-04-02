@@ -159,10 +159,10 @@ public class HotkeyEngine implements IHotkeyEngine {
 		}
 		
 		if (dllFile==null) {
-			System.out.println("Did not find '" + dllName + "'.");
+			System.err.println("Did not find '" + dllName + "'.");
 			return;
 		}
-		System.out.println("dll " + dllName + "=" + dllFile.getAbsolutePath());
+		System.err.println("dll " + dllName + "=" + dllFile.getAbsolutePath());
 		
 		try {
 			Class clazz = ClassLoader.class;
@@ -173,7 +173,10 @@ public class HotkeyEngine implements IHotkeyEngine {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		System.setProperty("java.library.path", dllFile.getParentFile().getAbsolutePath());
+		
+		String newLibPath = System.getProperty("java.library.path") + File.pathSeparator + dllFile.getParentFile().getAbsolutePath();
+		System.err.println("Setting java.library.path=" + newLibPath);
+		System.setProperty("java.library.path", newLibPath);
 		
 		/* FIXME
 		 * This next line fails with
@@ -186,7 +189,7 @@ public class HotkeyEngine implements IHotkeyEngine {
 			t.printStackTrace();
 		}
 		
-		System.out.println("loaded dll=" + dllFile.getAbsolutePath());
+		System.err.println("loaded dll=" + dllFile.getAbsolutePath());
 		
 		haveShoeHorned = true;
 	}
