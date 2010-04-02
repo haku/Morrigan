@@ -544,7 +544,9 @@ public class PlaybackEngine implements IPlaybackEngine {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		System.setProperty("java.library.path", dsjDllFile.getParentFile().getAbsolutePath());
+		String newLibPath = System.getProperty("java.library.path") + File.pathSeparator + dsjDllFile.getParentFile().getAbsolutePath();
+		System.err.println("Setting java.library.path=" + newLibPath);
+		System.setProperty("java.library.path", newLibPath);
 		
 		/* FIXME
 		 * This next line fails with
