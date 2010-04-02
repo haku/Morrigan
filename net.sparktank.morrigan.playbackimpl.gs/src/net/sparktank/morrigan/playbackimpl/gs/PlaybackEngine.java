@@ -13,19 +13,16 @@ import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.widgets.Composite;
+import org.gstreamer.Bin;
 import org.gstreamer.Bus;
-import org.gstreamer.Caps;
 import org.gstreamer.Element;
 import org.gstreamer.ElementFactory;
 import org.gstreamer.Format;
 import org.gstreamer.Gst;
 import org.gstreamer.GstObject;
-import org.gstreamer.Pad;
 import org.gstreamer.SeekFlags;
 import org.gstreamer.SeekType;
 import org.gstreamer.State;
-import org.gstreamer.Structure;
-import org.gstreamer.elements.DecodeBin;
 import org.gstreamer.elements.PlayBin;
 import org.gstreamer.swt.overlay.VideoComponent;
 
@@ -185,6 +182,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 	private PlayBin playbin = null;
 	private VideoComponent videoComponent = null;
 	private Element videoElement = null;
+	private volatile boolean hasVideo = false;
 	
 	private boolean inited = false;
 	
@@ -236,16 +234,17 @@ public class PlaybackEngine implements IPlaybackEngine {
 			playbin.getBus().connect(stateChangedBus);
 //			playbin.getBus().connect(durationBus);
 			
-			DecodeBin d = playbin.getElementByInterface(DecodeBin.class);
-			d.connect(new DecodeBin.NEW_DECODED_PAD() {
+			playbin.connect(new Bin.ELEMENT_ADDED() {
 				@Override
-				public void newDecodedPad(Element elem, Pad pad, boolean last) {
-					if (pad.isLinked()) return; // only link once.
-					
-					Caps caps = pad.getCaps();
-					Structure struct = caps.getStructure(0);
-					if (struct.getName().startsWith("video/")) {
-						System.err.println("HAS VIDEO!");
+				public void elementAdded(Bin b, Element e) {
+					if (hasVideo == false && e.getName().equals("vbin")) {
+						hasVideo = true;
+						videoFrameParent.getDisplay().asyncExec(new Runnable() {
+							@Override
+							public void run() {
+								reparentVideo();
+							}
+						});
 					}
 				}
 			});
@@ -253,6 +252,8 @@ public class PlaybackEngine implements IPlaybackEngine {
 		} else {
 			playbin.setState(State.NULL);
 		}
+		
+		hasVideo = true; // FIXME set this to false.
 		
 		System.out.println("About to set input file to '"+filepath+"'...");
         playbin.setInputFile(new File(filepath));
@@ -277,10 +278,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 		Element old_videoElement = videoElement;
 		videoElement = null;
 		
-		if (playbin!=null) {
-			
-			// FIXME only do this if video is present.
-			
+		if (playbin!=null && hasVideo) {
 			long position = -1;
 			State state = playbin.getState();
 			if (state==State.PLAYING || state==State.PAUSED) {
