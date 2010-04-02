@@ -33,7 +33,6 @@ import javax.media.format.FormatChangeEvent;
 import jmapps.ui.VideoPanel;
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine;
 import net.sparktank.morrigan.engines.playback.IPlaybackStatusListener;
-import net.sparktank.morrigan.engines.playback.NotImplementedException;
 import net.sparktank.morrigan.engines.playback.PlaybackException;
 
 import org.eclipse.swt.SWT;
@@ -77,7 +76,18 @@ public class PlaybackEngine  implements IPlaybackEngine {
 	
 	@Override
 	public int readFileDuration(String filepath) throws PlaybackException {
-		return -1; // FIXME not implemented.
+		mediaFile = new File(filepath);
+		try {
+			Player player = Manager.createRealizedPlayer(mediaFile.toURI().toURL());
+			Time duration = player.getDuration();
+			double seconds = duration.getSeconds();
+			player.close();
+			
+			return (int) seconds;
+			
+		} catch (Throwable t) {
+			throw new PlaybackException(t);
+		}
 	}
 	
 	@Override
@@ -113,23 +123,34 @@ public class PlaybackEngine  implements IPlaybackEngine {
 			throw new PlaybackException("Failed to load '"+filepath+"'.", e);
 		}
 		
-		playTrack();
+		if (mediaPlayer!=null) {
+			mediaPlayer.start();
+			startWatcherThread();
+		}
 	}
 	
 	@Override
 	public void stopPlaying() throws PlaybackException {
 		m_stopPlaying = true;
-		stopTrack();
+		
+		stopWatcherThread();
+		if (mediaPlayer!=null) {
+			mediaPlayer.stop();
+		}
 	}
 	
 	@Override
 	public void pausePlaying() throws PlaybackException {
-		throw new NotImplementedException();
+		if (mediaPlayer!=null) {
+			mediaPlayer.stop();
+		}
 	}
 	
 	@Override
 	public void resumePlaying() throws PlaybackException {
-		throw new NotImplementedException();
+		if (mediaPlayer!=null) {
+			mediaPlayer.start();
+		}
 	}
 	
 	@Override
@@ -158,7 +179,11 @@ public class PlaybackEngine  implements IPlaybackEngine {
 	}
 	
 	public void seekTo(double d) throws PlaybackException {
-		throw new NotImplementedException();
+		if (mediaPlayer!=null) {
+			Time duration = mediaPlayer.getDuration();
+			Time target = new Time(duration.getSeconds() * d);
+			mediaPlayer.setMediaTime(target);
+		}
 	}
 	
 	@Override
@@ -181,7 +206,6 @@ public class PlaybackEngine  implements IPlaybackEngine {
 			mediaPlayer.removeControllerListener(mediaListener);
 			mediaPlayer.stop();
 			mediaPlayer.close();
-			mediaPlayer.deallocate();
 			mediaPlayer = null;
 			
 			if (videoComponent!=null) {
@@ -325,20 +349,6 @@ public class PlaybackEngine  implements IPlaybackEngine {
 		@Override
 		public void componentHidden(ComponentEvent arg0) {}
 	};
-	
-	private void playTrack () {
-		if (mediaPlayer!=null) {
-			mediaPlayer.start();
-			startWatcherThread();
-		}
-	}
-	
-	private void stopTrack () {
-		stopWatcherThread();
-		if (mediaPlayer!=null) {
-			mediaPlayer.stop();
-		}
-	}
 	
 	private ControllerListener mediaListener = new ControllerListener () {
 		@Override
