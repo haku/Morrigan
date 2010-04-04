@@ -1,8 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ====================================================================== 
+      
+     ====================================================================== -->
+
 <project name="net.sparktank.morrigan.build" default="main">
 
 	<target name="setup">
 		<!-- Main props file. -->
 		<property file="build.properties" />
+
+		<!-- Generated properties. -->
+		<tstamp>
+			<format property="timestamp" pattern="yyyyMMdd_HHmm" timezone="UTC" />
+		</tstamp>
+		<property name="buildId" value="${archivePrefix}-${releaseName}-${timestamp}" />
+		<property name="buildLabel" value="${buildType}.${buildId}" />
 
 		<!-- Configure build process. -->
 		<property name="outputDirectory" value="${basedir}/builds" />
@@ -40,15 +53,19 @@
 		<!-- build engines. -->
 		<antcall target="eng_win32" />
 		<antcall target="eng_linux" />
+		<antcall target="eng_mac" />
 
+		<!-- Clean up. -->
 		<antcall target="refreshWorkspace" />
 	</target>
 
 	<target name="eng_win32" depends="setup">
 		<ant antfile="../net.sparktank.morrigan.playbackimpl.dsj/makejar.xml"
-			dir="../net.sparktank.morrigan.playbackimpl.dsj" />
+		     dir="../net.sparktank.morrigan.playbackimpl.dsj"
+		/>
 		<ant antfile="../net.sparktank.morrigan.hotkeyimpl.jintellitype/makejar.xml"
-			dir="../net.sparktank.morrigan.hotkeyimpl.jintellitype" />
+		     dir="../net.sparktank.morrigan.hotkeyimpl.jintellitype"
+		/>
 
 		<fileset dir="${outputDirectory}" id="zipfiles">
 			<include name="*win32*.zip" />
@@ -58,23 +75,36 @@
 
 		<zip destfile="${zipfile}" update="true" whenempty="fail">
 			<zipfileset dir="../net.sparktank.morrigan.playbackimpl.dsj"
-				includes="*.jar" prefix="morrigan/engines" />
+			            includes="*.jar"
+			            prefix="morrigan/engines"
+			/>
 			<zipfileset dir="../net.sparktank.morrigan.playbackimpl.dsj/lib"
-				includes="*" excludes="swt.jar" prefix="morrigan/engines" />
+			            includes="*"
+			            excludes="swt.jar"
+			            prefix="morrigan/engines"
+			/>
 			<zipfileset dir="../net.sparktank.morrigan.hotkeyimpl.jintellitype"
-				includes="*.jar" prefix="morrigan/engines" />
+			            includes="*.jar"
+			            prefix="morrigan/engines"
+			/>
 			<zipfileset dir="../net.sparktank.morrigan.hotkeyimpl.jintellitype/lib"
-				includes="*" prefix="morrigan/engines" />
-			<zipfileset dir="propfiles" includes="win32.properties"
-				fullpath="morrigan/morrigan.properties" />
+			            includes="*"
+			            prefix="morrigan/engines"
+			/>
+			<zipfileset dir="propfiles"
+			            includes="win32.properties"
+			            fullpath="morrigan/morrigan.properties"
+			/>
 		</zip>
 	</target>
 
 	<target name="eng_linux" depends="setup">
 		<ant antfile="../net.sparktank.morrigan.playbackimpl.gs/makejar.xml"
-			dir="../net.sparktank.morrigan.playbackimpl.gs" />
+		     dir="../net.sparktank.morrigan.playbackimpl.gs"
+		/>
 		<ant antfile="../net.sparktank.morrigan.hotkeyimpl.jxgrabkey/makejar.xml"
-			dir="../net.sparktank.morrigan.hotkeyimpl.jxgrabkey" />
+		     dir="../net.sparktank.morrigan.hotkeyimpl.jxgrabkey"
+		/>
 
 		<fileset dir="${outputDirectory}" id="zipfiles">
 			<include name="*linux*.zip" />
@@ -84,21 +114,33 @@
 
 		<zip destfile="${zipfile}" update="true" whenempty="fail">
 			<zipfileset dir="../net.sparktank.morrigan.playbackimpl.gs"
-				includes="*.jar" prefix="morrigan/engines" />
+			            includes="*.jar"
+			            prefix="morrigan/engines"
+			/>
 			<zipfileset dir="../net.sparktank.morrigan.playbackimpl.gs/lib"
-				includes="*" excludes="swt.jar" prefix="morrigan/engines" />
+			            includes="*"
+			            excludes="swt.jar"
+			            prefix="morrigan/engines"
+			/>
 			<zipfileset dir="../net.sparktank.morrigan.hotkeyimpl.jxgrabkey"
-				includes="*.jar" prefix="morrigan/engines" />
+			            includes="*.jar"
+			            prefix="morrigan/engines"
+			/>
 			<zipfileset dir="../net.sparktank.morrigan.hotkeyimpl.jxgrabkey/lib"
-				includes="*" prefix="morrigan/engines" />
-			<zipfileset dir="propfiles" includes="linux.properties"
-				fullpath="morrigan/morrigan.properties" />
+			            includes="*"
+			            prefix="morrigan/engines"
+			/>
+			<zipfileset dir="propfiles"
+			            includes="linux.properties"
+			            fullpath="morrigan/morrigan.properties"
+			/>
 		</zip>
 	</target>
 
 	<target name="eng_mac" depends="setup">
 		<ant antfile="../net.sparktank.morrigan.playbackimpl.jmf/makejar.xml"
-			dir="../net.sparktank.morrigan.playbackimpl.jmf" />
+		     dir="../net.sparktank.morrigan.playbackimpl.jmf"
+		/>
 
 		<fileset dir="${outputDirectory}" id="zipfiles">
 			<include name="*macosx*.zip" />
@@ -108,11 +150,18 @@
 
 		<zip destfile="${zipfile}" update="true" whenempty="fail">
 			<zipfileset dir="../net.sparktank.morrigan.playbackimpl.jmf"
-				includes="*.jar" prefix="morrigan/engines" />
+			            includes="*.jar"
+			            prefix="morrigan/engines"
+			/>
 			<zipfileset dir="../net.sparktank.morrigan.playbackimpl.jmf/lib"
-				includes="*" excludes="swt.jar" prefix="morrigan/engines" />
-			<zipfileset dir="propfiles" includes="mac.properties"
-				fullpath="morrigan/morrigan.properties" />
+			            includes="*"
+			            excludes="swt.jar"
+			            prefix="morrigan/engines"
+			/>
+			<zipfileset dir="propfiles"
+			            includes="mac.properties"
+			            fullpath="morrigan/morrigan.properties"
+			/>
 		</zip>
 	</target>
 
