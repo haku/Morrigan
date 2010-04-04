@@ -180,8 +180,6 @@ public class LibraryUpdateTask extends Job {
 					try {
 						ConsoleHelper.appendToConsole("[FOUND] " + mi.getFilepath());
 						library.setTrackMissing(mi, false);
-						// The file has gone and come back again.  We need to check the CRC32 is up to date.
-						library.setTrackHashCode(mi, 0);
 					} catch (Throwable t) {
 						// FIXME log this somewhere useful.
 						System.err.println("Throwable while marking track as found '"+mi.getFilepath()+"': " + t.getMessage());
