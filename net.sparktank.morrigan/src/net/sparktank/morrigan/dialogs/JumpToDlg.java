@@ -9,6 +9,7 @@ import net.sparktank.morrigan.library.DbException;
 import net.sparktank.morrigan.model.media.MediaItem;
 import net.sparktank.morrigan.model.media.MediaLibrary;
 import net.sparktank.morrigan.model.media.PlayItem;
+import net.sparktank.morrigan.preferences.PreferenceHelper;
 
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelection;
@@ -197,6 +198,15 @@ public class JumpToDlg extends Dialog {
 			}
 		}
 		
+		// Read saved query string.
+		String s = PreferenceHelper.getLastJumpToDlgQuery();
+		if (s != null && s.length() > 0) {
+			text.setText(s);
+			text.setSelection(text.getText().length());
+			textChangeListener.verifyText(null);
+		}
+		
+		// Save dlg object for next time.
 		openDlg = new WeakReference<JumpToDlg>(this);
 		
 		// Show the dlg.
@@ -230,6 +240,10 @@ public class JumpToDlg extends Dialog {
 			returnValue = new PlayItem(mediaLibrary, item);
 		}
 		setKeyMask(mask);
+		
+		// Save query string.
+		PreferenceHelper.setLastJumpToDlgQuery(text.getText());
+		
 		shell.close();
 	}
 	
@@ -440,6 +454,14 @@ public class JumpToDlg extends Dialog {
 							if (tableViewer.getTable().getItemCount() > 0) {
 								tableViewer.getTable().setSelection(0);
 							}
+						}
+					});
+				
+				} else {
+					getParent().getDisplay().asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							label.setText("No results for query.");
 						}
 					});
 				}
