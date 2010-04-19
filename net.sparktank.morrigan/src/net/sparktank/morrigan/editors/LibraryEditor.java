@@ -28,8 +28,6 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.KeyAdapter;
-import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -156,7 +154,7 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 		FormData formData;
 		
 		lblStatus = new Label(parent, SWT.NONE);
-		txtFilter = new Text(parent, SWT.SINGLE | SWT.BORDER);
+		txtFilter = new Text(parent, SWT.SINGLE | SWT.BORDER | SWT.SEARCH);
 		Button btnClearFilter = new Button(parent, SWT.PUSH);
 		Button btnAddToQueue = new Button(parent, SWT.PUSH);
 		Button btnAdd = new Button(parent, SWT.PUSH);
@@ -173,6 +171,7 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 		formData.bottom = new FormAttachment(100, -sep);
 		formData.right = new FormAttachment(btnClearFilter, -sep);
 		txtFilter.setLayoutData(formData);
+		txtFilter.setMessage("Filter");
 		
 		formData = new FormData();
 		formData.top = new FormAttachment(0, sep);
@@ -202,7 +201,7 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 		btnProperties.setImage(iconProperties);
 		btnProperties.setLayoutData(formData);
 		
-		txtFilter.addKeyListener(filterListener);
+		txtFilter.addSelectionListener(filterListener);
 		btnClearFilter.addSelectionListener(clearFilterListener);
 		btnAddToQueue.addSelectionListener(new ActionListener(addToQueueAction));
 		btnAdd.addSelectionListener(new ActionListener(addAction));
@@ -225,9 +224,13 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 				);
 	}
 	
-	private KeyAdapter filterListener = new KeyAdapter() {
-		public void keyReleased(KeyEvent ke) {
-			setFilterString(txtFilter.getText());
+	private SelectionAdapter filterListener = new SelectionAdapter() {
+		public void widgetDefaultSelected(SelectionEvent e) {
+			if (e.detail == SWT.CANCEL) {
+				clearFilterListener.widgetSelected(null);
+			} else {
+				setFilterString(txtFilter.getText());
+			}
 		}
 	};
 	
