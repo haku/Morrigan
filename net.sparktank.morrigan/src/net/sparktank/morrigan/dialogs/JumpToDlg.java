@@ -461,7 +461,11 @@ public class JumpToDlg extends Dialog {
 					getParent().getDisplay().asyncExec(new Runnable() {
 						@Override
 						public void run() {
-							label.setText("No results for query.");
+							if (text.getText().length() > 0) {
+								label.setText("No results for query.");
+							} else {
+								label.setText("Search:");
+							}
 						}
 					});
 				}
