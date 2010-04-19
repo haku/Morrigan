@@ -249,6 +249,13 @@ public class PlaybackEngine implements IPlaybackEngine {
 				}
 			});
 			
+			playbin.connect( new Element.NO_MORE_PADS() {
+				@Override
+				public void noMorePads(Element arg0) {
+					System.err.println("No more pads!");
+				}
+			});
+			
 		} else {
 			playbin.setState(State.NULL);
 		}
