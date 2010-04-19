@@ -20,6 +20,8 @@ public class ChecksumHelper {
 				cis = new CheckedInputStream(bis, new CRC32());
 				try {
 					while (cis.read() != -1) {}
+					return cis.getChecksum().getValue();
+					
 				} finally {
 					cis.close();
 				}
@@ -30,7 +32,6 @@ public class ChecksumHelper {
 			fis.close();
 		}
 		
-		return cis.getChecksum().getValue();
 	}
 	
 }
