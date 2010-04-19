@@ -1,6 +1,7 @@
 package net.sparktank.morrigan.playbackimpl.gs;
 
 import java.io.File;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine;
@@ -13,13 +14,13 @@ import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.widgets.Composite;
-import org.gstreamer.Bin;
 import org.gstreamer.Bus;
 import org.gstreamer.Element;
 import org.gstreamer.ElementFactory;
 import org.gstreamer.Format;
 import org.gstreamer.Gst;
 import org.gstreamer.GstObject;
+import org.gstreamer.Pad;
 import org.gstreamer.SeekFlags;
 import org.gstreamer.SeekType;
 import org.gstreamer.State;
@@ -119,7 +120,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 
 	@Override
 	public void startPlaying() throws PlaybackException {
-		System.out.println("gs.startPlaying() called on thread " + Thread.currentThread().getId() + " : " + Thread.currentThread().getName());
+		System.err.println("gs.startPlaying() called on thread " + Thread.currentThread().getId() + " : " + Thread.currentThread().getName());
 		
 		m_stopPlaying = false;
 		
@@ -193,7 +194,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 	}
 	
 	private void finalisePlayback () {
-		System.out.println("finalisePlayback()");
+		System.err.println("finalisePlayback()");
 		
 		if (playbin!=null) {
 			playbin.setState(State.NULL);
@@ -220,57 +221,39 @@ public class PlaybackEngine implements IPlaybackEngine {
 		callStateListener(PlayState.Loading);
 		boolean firstLoad = (playbin==null);
 		
-		System.out.println("firstLoad=" + firstLoad);
+		System.err.println("firstLoad=" + firstLoad);
 		
 		if (firstLoad) {
-			System.out.println("initGst()...");
+			System.err.println("initGst()...");
 			initGst();
-			System.out.println("About to create PlayBin object...");
+			System.err.println("About to create PlayBin object...");
 			playbin = new PlayBin("VideoPlayer");
 			
-			System.out.println("Connecting eosBus...");
+			System.err.println("Connecting eosBus...");
 			playbin.getBus().connect(eosBus);
-			System.out.println("Connecting stateChangedBus...");
+			System.err.println("Connecting stateChangedBus...");
 			playbin.getBus().connect(stateChangedBus);
 //			playbin.getBus().connect(durationBus);
-			
-			playbin.connect(new Bin.ELEMENT_ADDED() {
-				@Override
-				public void elementAdded(Bin b, Element e) {
-					if (hasVideo == false && e.getName().equals("vbin")) {
-						hasVideo = true;
-						videoFrameParent.getDisplay().asyncExec(new Runnable() {
-							@Override
-							public void run() {
-								reparentVideo();
-							}
-						});
-					}
-				}
-			});
-			
-			playbin.connect( new Element.NO_MORE_PADS() {
-				@Override
-				public void noMorePads(Element arg0) {
-					System.err.println("No more pads!");
-				}
-			});
 			
 		} else {
 			playbin.setState(State.NULL);
 		}
 		
-		hasVideo = true; // FIXME set this to false.
+		hasVideo = false; // FIXME set this to false.
 		
-		System.out.println("About to set input file to '"+filepath+"'...");
+		System.err.println("About to set input file to '"+filepath+"'...");
         playbin.setInputFile(new File(filepath));
-        System.out.println("Set file input file.");
+        System.err.println("Set file input file.");
         
         reparentVideo();
 	}
 	
 	private void reparentVideo () {
-		System.out.println("reparentVideo()");
+		reparentVideo(true);
+	}
+	
+	private void reparentVideo (boolean seek) {
+		System.err.println("Entering reparentVideo()");
 		
 		if (videoComponent!=null) {
 			if (!videoComponent.isDisposed()) {
@@ -290,7 +273,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 			State state = playbin.getState();
 			if (state==State.PLAYING || state==State.PAUSED) {
 				position = playbin.queryPosition(TimeUnit.NANOSECONDS);
-				System.out.println("position=" + position);
+				System.err.println("position=" + position);
 				playbin.setState(State.NULL);
 			}
 			
@@ -303,7 +286,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 			videoComponent.addKeyListener(keyListener);
 			videoComponent.addMouseListener(mouseListener);
 			
-			if (position>=0) {
+			if (seek && position>=0) {
 				playbin.setState(State.PAUSED);
 				
 				if (position > 0) {
@@ -325,7 +308,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 						}
 					}
 					
-					System.out.println("Seek took " + (System.currentTimeMillis() - startTime) + " ms.");
+					System.err.println("Seek took " + (System.currentTimeMillis() - startTime) + " ms.");
 				}
 				
 				if (state != State.PAUSED) {
@@ -345,7 +328,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 			parent.layout();
 		}
 		
-		System.out.println("leaving reparentVideo()");
+		System.err.println("leaving reparentVideo()");
 	}
 	
 	private Bus.EOS eosBus = new Bus.EOS() {
@@ -387,7 +370,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 //		@Override
 //		public void durationChanged(GstObject source, Format format, long duration) {
 //			if (source == playbin) {
-//				System.out.println("durationBus: duration=" + duration);
+//				System.err.println("durationBus: duration=" + duration);
 //			}
 //		}
 //	};
@@ -413,15 +396,116 @@ public class PlaybackEngine implements IPlaybackEngine {
 	};
 	
 	private void playTrack () {
-		System.out.println("Entering playTrack().");
+		System.err.println("Entering playTrack().");
 		
 		if (playbin!=null) {
-			playbin.setState(State.PLAYING);
-			callStateListener(PlayState.Playing);
-			startWatcherThread();
+			
+			actuallyStartedPlaying = false;
+			
+			playbin.setVideoSink(null);
+			playbin.setState(State.PAUSED);
+	        
+			String decodeElementName = null;
+			
+	        List<Element> elements = playbin.getElements();
+			for (Element element : elements) {
+				if (element.getName().contains("decodebin")) {
+					decodeElementName = element.getName();
+				}
+			}
+			
+			if (decodeElementName == null) {
+				throw new NullPointerException("decodeElement==null");
+			}
+			
+			final Element decodeElement = playbin.getElementByName(decodeElementName);
+			
+			decodeElement.connect(new Element.PAD_ADDED() {
+				@Override
+				public void padAdded(Element source, Pad pad) {
+					if (pad.isLinked()) return;
+					
+					if (pad.getCaps().getStructure(0).getName().startsWith("video/")) {
+						System.err.println("Track has video stream.");
+						hasVideo = true;
+					}
+				}
+			});
+			
+			decodeElement.connect(noMOREPADS);
+			
+			// FIXME this timeout is very ugly.
+			videoFrameParent.getDisplay().timerExec(5000, new Runnable() {
+				@Override
+				public void run() {
+					System.err.println("WARNING! using timout to prod playback start because NO_MORE_PADS did not fire.");
+					if (!actuallyStartedPlaying) {
+						noMOREPADS.noMorePads(decodeElement);
+					}
+				}
+			});
+			
 		}
 		
-		System.out.println("Leaving playTrack().");
+		System.err.println("Leaving playTrack().");
+	}
+	
+	private Element.NO_MORE_PADS noMOREPADS = new Element.NO_MORE_PADS() {
+		@Override
+		public void noMorePads(Element element) {
+			System.err.println("[debug] no more pads!");
+			
+			if (hasVideo == false) {
+				List<Pad> pads = element.getPads();
+				for (Pad pad : pads) {
+					System.err.println("pad: " + pad.getName());
+
+					try {
+						if (pad.getCaps().getStructure(0).getName().startsWith("video/")) {
+							System.err.println("Track has video stream.");
+							hasVideo = true;
+						}
+					} catch (NullPointerException e) {
+						System.err.println("NPE.");
+					}
+				}
+			}
+			
+			if (hasVideo) {
+				videoFrameParent.getDisplay().asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						reparentVideo(false);
+						_actuallyStartPlaying();
+					}
+				});
+				
+			} else {
+				_actuallyStartPlaying();
+			}
+			
+		}
+	};
+	
+	private Object actuallyStartedPlayingLock = new Object();
+	private volatile boolean actuallyStartedPlaying;
+	
+	private void _actuallyStartPlaying () {
+		System.err.println("Entering _actuallyStartPlaying().");
+		
+		synchronized (actuallyStartedPlayingLock) {
+			if (actuallyStartedPlaying) {
+				System.err.println("_actuallyStartPlaying() has already been called.");
+				return;
+			}
+			actuallyStartedPlaying = true;
+		}
+		
+		playbin.setState(State.PLAYING);
+		callStateListener(PlayState.Playing);
+		startWatcherThread();
+		
+		System.err.println("Leaving _actuallyStartPlaying().");
 	}
 	
 	private void pauseTrack () {
@@ -450,14 +534,14 @@ public class PlaybackEngine implements IPlaybackEngine {
 	private Thread watcherThread = null;
 	
 	private void startWatcherThread () {
-		System.out.println("Entering startWatcherThread().");
+		System.err.println("Entering startWatcherThread().");
 		
 		m_stopWatching = false;
 		watcherThread = new WatcherThread();
 		watcherThread.setDaemon(true);
 		watcherThread.start();
 		
-		System.out.println("Leaving startWatcherThread().");
+		System.err.println("Leaving startWatcherThread().");
 	}
 	
 	private void stopWatcherThread () {
@@ -526,12 +610,12 @@ public class PlaybackEngine implements IPlaybackEngine {
 	}
 	
 	private void callStateListener (PlayState state) {
-		System.out.println("Entering callStateListener().");
+		System.err.println("Entering callStateListener("+state.name()+").");
 		
 		this.playbackState = state;
 		if (listener!=null) listener.statusChanged(state);
 		
-		System.out.println("Leaving callStateListener().");
+		System.err.println("Leaving callStateListener().");
 	}
 	
 	private void callPositionListener (long position) {
@@ -541,13 +625,13 @@ public class PlaybackEngine implements IPlaybackEngine {
 	}
 	
 	private void callDurationListener (int duration) {
-		System.out.println("Entering callDurationListener().");
+		System.err.println("Entering callDurationListener("+duration+").");
 		
 		if (listener!=null) {
 			listener.durationChanged(duration);
 		}
 		
-		System.out.println("Entering callDurationListener().");
+		System.err.println("Entering callDurationListener().");
 	}
 	
 	private void callOnKeyPressListener (int keyCode) {
