@@ -202,7 +202,7 @@ public class JumpToDlg extends Dialog {
 		String s = PreferenceHelper.getLastJumpToDlgQuery();
 		if (s != null && s.length() > 0) {
 			text.setText(s);
-			text.setSelection(text.getText().length());
+			text.setSelection(0, text.getText().length());
 			textChangeListener.verifyText(null);
 		}
 		
