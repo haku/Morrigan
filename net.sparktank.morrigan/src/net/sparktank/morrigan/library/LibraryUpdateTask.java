@@ -92,7 +92,7 @@ public class LibraryUpdateTask extends Job {
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
 		ConsoleHelper.showConsole();
-		ConsoleHelper.appendToConsole("Starting library scan...");
+		ConsoleHelper.appendToConsole(library.getListName(), "Starting scan...");
 		
 		int progress = 0;
 		monitor.beginTask("Updating library", 100);
@@ -144,7 +144,7 @@ public class LibraryUpdateTask extends Job {
 								if (supportedFormats.contains(ext)) {
 									try {
 										if (library.addFile(file)) {
-											ConsoleHelper.appendToConsole("[ADDED] " + file.getAbsolutePath());
+											ConsoleHelper.appendToConsole(library.getListName(), "[ADDED] " + file.getAbsolutePath());
 											filesAdded++;
 										}
 									} catch (MorriganException e) {
@@ -155,13 +155,13 @@ public class LibraryUpdateTask extends Job {
 							}
 						}
 					} else {
-						ConsoleHelper.appendToConsole("Failed to read directory: " + dirItem.getAbsolutePath());
+						ConsoleHelper.appendToConsole(library.getListName(), "Failed to read directory: " + dirItem.getAbsolutePath());
 					}
 				}
 			}
 		} // End directory scanning.
 		
-		ConsoleHelper.appendToConsole("Added " + filesAdded + " files.");
+		ConsoleHelper.appendToConsole(library.getListName(), "Added " + filesAdded + " files.");
 		
 		IPlaybackEngine playbackEngine = null;
 		
@@ -178,7 +178,7 @@ public class LibraryUpdateTask extends Job {
 				// If was missing, mark as found.
 				if (mi.isMissing()) {
 					try {
-						ConsoleHelper.appendToConsole("[FOUND] " + mi.getFilepath());
+						ConsoleHelper.appendToConsole(library.getListName(), "[FOUND] " + mi.getFilepath());
 						library.setTrackMissing(mi, false);
 					} catch (Throwable t) {
 						// FIXME log this somewhere useful.
@@ -191,24 +191,39 @@ public class LibraryUpdateTask extends Job {
 				boolean fileModified = false;
 				if (mi.getDateLastModified() == null || mi.getDateLastModified().getTime() != lastModified ) {
 					fileModified = true;
-					ConsoleHelper.appendToConsole("[CHANGED] " + mi.getTitle());
+					ConsoleHelper.appendToConsole(library.getListName(), "[CHANGED] " + mi.getTitle());
 					try {
 						library.setTrackDateLastModified(mi, new Date(lastModified));
 					} catch (Throwable t) {
 						// FIXME log this somewhere useful.
 						System.err.println("Throwable while writing track last modified date '"+mi.getFilepath()+"': " + t.getMessage());
+						t.printStackTrace();
 					}
 				}
 				
 				// Hash code.
 				if (fileModified || mi.getHashcode() == 0) {
+					long hash = 0;
+					
 					try {
-						long hash = ChecksumHelper.generateCrc32Checksum(mi.getFilepath());
-						library.setTrackHashCode(mi, hash);
+						hash = ChecksumHelper.generateCrc32Checksum(mi.getFilepath());
+						
 					} catch (Throwable t) {
 						// FIXME log this somewhere useful.
-						System.err.println("Throwable while setting track hash code '"+mi.getFilepath()+"': " + t.getMessage());
+						System.err.println("Throwable while generating checksum for '"+mi.getFilepath()+": " + t.getMessage());
+						t.printStackTrace();
 					}
+					
+					if (hash != 0) {
+						try {
+							library.setTrackHashCode(mi, hash);
+						} catch (Throwable t) {
+							// FIXME log this somewhere useful.
+							System.err.println("Throwable while setting hash code for '"+mi.getFilepath()+"' to '"+hash+"': " + t.getMessage());
+							t.printStackTrace();
+						}
+					}
+					
 				}
 				
 				// Duration.
@@ -226,14 +241,14 @@ public class LibraryUpdateTask extends Job {
 						if (d>0) library.setTrackDuration(mi, d);
 					} catch (Throwable t) {
 						// FIXME log this somewhere useful.
-						ConsoleHelper.appendToConsole("Throwable while reading metadata for '"+mi.getFilepath()+"': " + t.getMessage());
+						ConsoleHelper.appendToConsole(library.getListName(), "Throwable while reading metadata for '"+mi.getFilepath()+"': " + t.getMessage());
 					}
 				}
 				
 			} else { // The file is missing.
 				if (!mi.isMissing()) {
 					try {
-						ConsoleHelper.appendToConsole("[MISSING] " + mi.getFilepath());
+						ConsoleHelper.appendToConsole(library.getListName(), "[MISSING] " + mi.getFilepath());
 						library.setTrackMissing(mi, true);
 					} catch (Throwable t) {
 						// FIXME log this somewhere useful.
@@ -378,7 +393,7 @@ public class LibraryUpdateTask extends Job {
 							}
 							
 							library.removeMediaTrack(i);
-							ConsoleHelper.appendToConsole("[REMOVED] " + i.getFilepath());
+							ConsoleHelper.appendToConsole(library.getListName(), "[REMOVED] " + i.getFilepath());
 							
 						} catch (Throwable t) {
 							// FIXME log this somewhere useful.
@@ -403,19 +418,19 @@ public class LibraryUpdateTask extends Job {
 			/*
 			 * Print out what are left with.
 			 */
-			ConsoleHelper.appendToConsole("Found " + dupicateItems.size() + " duplicate items:");
+			ConsoleHelper.appendToConsole(library.getListName(), "Found " + dupicateItems.size() + " duplicate items:");
 			for (Entry<MediaItem, ScanOption> e : dupicateItems.entrySet()) {
-				ConsoleHelper.appendToConsole(e.getValue() + " : " + e.getKey().getTitle());
+				ConsoleHelper.appendToConsole(library.getListName(), e.getValue() + " : " + e.getKey().getTitle());
 			}
 			
 		} else {
-			ConsoleHelper.appendToConsole("No duplicates found.");
+			ConsoleHelper.appendToConsole(library.getListName(), "No duplicates found.");
 		}
 		
 		// TODO : vacuum DB?
 		
 		if (monitor.isCanceled()) {
-			ConsoleHelper.appendToConsole("Task was canceled desu~.");
+			ConsoleHelper.appendToConsole(library.getListName(), "Task was canceled desu~.");
 		}
 		
 		isFinished = true;

@@ -14,8 +14,16 @@ public class ConsoleHelper {
 	
 	static private boolean firstAppend = true;
 	
-	static public void appendToConsole (String s) {
-		getMessageConsoleStream().print(firstAppend ? s :"\n" + s);
+	static public void appendToConsole (String topic, String s) {
+		// TODO create separate consoles for each topic?
+		
+		StringBuilder sb = new StringBuilder();
+		sb.append("[");
+		sb.append(topic);
+		sb.append("] ");
+		sb.append(s);
+		
+		getMessageConsoleStream().print(firstAppend ? sb.toString() :"\n".concat(sb.toString()));
 		firstAppend = false;
 	}
 	
