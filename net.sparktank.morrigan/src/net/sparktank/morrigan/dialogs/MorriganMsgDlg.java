@@ -53,6 +53,7 @@ public class MorriganMsgDlg extends MessageDialog {
 		}
 		
 		if (throwable!=null && open==OK) {
+			throwable.printStackTrace();
 			ClipboardHelper.setText(getStackTrace(throwable), Display.getCurrent());
 		}
 		
