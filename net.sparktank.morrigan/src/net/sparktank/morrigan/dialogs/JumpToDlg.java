@@ -32,9 +32,7 @@ import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
@@ -125,7 +123,7 @@ public class JumpToDlg extends Dialog {
 		btnCancel = new Button(shell, SWT.PUSH);
 		
 		shell.setDefaultButton(btnPlay);
-		shell.addListener(SWT.Traverse, traverseListener);
+		shell.addTraverseListener(traverseListener);
 		
 		formData = new FormData();
 		formData.left = new FormAttachment(0, SEP);
@@ -204,6 +202,7 @@ public class JumpToDlg extends Dialog {
 		// Show the dlg.
 		shell.open();
 		shell.setFocus();
+		shell.forceActive();
 		Display display = getParent().getDisplay();
 		while (!shell.isDisposed()) {
 			if (!display.readAndDispatch()) {
@@ -234,8 +233,8 @@ public class JumpToDlg extends Dialog {
 		shell.close();
 	}
 	
-	private Listener traverseListener = new Listener() {
-		public void handleEvent(Event e) {
+	private TraverseListener traverseListener = new TraverseListener() {
+		public void keyTraversed(TraverseEvent e) {
 			switch (e.detail) {
 				
 				case SWT.TRAVERSE_RETURN:
@@ -260,13 +259,26 @@ public class JumpToDlg extends Dialog {
 	private TraverseListener textTraverseListener = new TraverseListener() {
 		@Override
 		public void keyTraversed(TraverseEvent e) {
-			if (e.detail == SWT.TRAVERSE_ARROW_NEXT) {
-				if (e.keyCode == SWT.ARROW_DOWN && tableViewer.getTable().getItemCount() > 0) {
+			switch (e.detail) {
+
+				case SWT.TRAVERSE_ARROW_NEXT:
+					if (e.keyCode == SWT.ARROW_DOWN && tableViewer.getTable().getItemCount() > 0) {
+						e.detail = SWT.TRAVERSE_NONE;
+						e.doit = false;
+						tableViewer.getTable().setSelection(0);
+						tableViewer.getTable().setFocus();
+					}
+					break;
+				
+				case SWT.TRAVERSE_ESCAPE:
 					e.detail = SWT.TRAVERSE_NONE;
 					e.doit = false;
-					tableViewer.getTable().setSelection(0);
-					tableViewer.getTable().setFocus();
-				}
+					leaveDlg(false, e.stateMask);
+					break;
+				
+				default:
+					break;
+					
 			}
 		}
 	};
@@ -274,12 +286,25 @@ public class JumpToDlg extends Dialog {
 	private TraverseListener listTraverseListener = new TraverseListener() {
 		@Override
 		public void keyTraversed(TraverseEvent e) {
-			if (e.detail == SWT.TRAVERSE_ARROW_PREVIOUS) {
-				if (tableViewer.getTable().getSelectionIndex() == 0) {
+			switch (e.detail) {
+				
+				case SWT.TRAVERSE_ARROW_PREVIOUS:
+					if (tableViewer.getTable().getSelectionIndex() == 0) {
+						e.detail = SWT.TRAVERSE_NONE;
+						e.doit = false;
+						text.setFocus();
+					}
+					break;
+				
+				case SWT.TRAVERSE_ESCAPE:
 					e.detail = SWT.TRAVERSE_NONE;
 					e.doit = false;
-					text.setFocus();
-				}
+					leaveDlg(false, e.stateMask);
+					break;
+				
+				default:
+					break;
+				
 			}
 		}
 	};
