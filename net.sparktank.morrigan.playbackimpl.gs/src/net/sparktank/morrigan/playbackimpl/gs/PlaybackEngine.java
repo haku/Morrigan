@@ -434,6 +434,8 @@ public class PlaybackEngine implements IPlaybackEngine {
 			
 			decodeElement.connect(noMOREPADS);
 			
+			// TODO poll by counting number of pads???
+			
 			// FIXME this timeout is very ugly.
 			videoFrameParent.getDisplay().timerExec(5000, new Runnable() {
 				@Override
