@@ -191,7 +191,13 @@ public class LibraryUpdateTask extends Job {
 				boolean fileModified = false;
 				if (mi.getDateLastModified() == null || mi.getDateLastModified().getTime() != lastModified ) {
 					fileModified = true;
-					ConsoleHelper.appendToConsole(library.getListName(), "[CHANGED] " + mi.getTitle());
+					
+					if (mi.getDateLastModified() == null) {
+						ConsoleHelper.appendToConsole(library.getListName(), "[NEW] " + mi.getTitle());
+					} else {
+						ConsoleHelper.appendToConsole(library.getListName(), "[CHANGED] " + mi.getTitle());
+					}
+					
 					try {
 						library.setTrackDateLastModified(mi, new Date(lastModified));
 					} catch (Throwable t) {
