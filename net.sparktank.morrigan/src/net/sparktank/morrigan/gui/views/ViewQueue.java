@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sparktank.morrigan.gui.Activator;
-import net.sparktank.morrigan.gui.views.AbstractPlayerView.DurationData;
 import net.sparktank.morrigan.helpers.TimeHelper;
 import net.sparktank.morrigan.model.playlist.PlayItem;
+import net.sparktank.morrigan.player.Player.DurationData;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -42,8 +42,8 @@ public class ViewQueue extends ViewPart {
 		IViewPart findView = getSite().getPage().findView(ViewControls.ID); // FIXME can i find AbstractPlayerView?
 		if (findView != null && findView instanceof AbstractPlayerView) {
 			abstractPlayerView = (AbstractPlayerView) findView;
-			setContent(abstractPlayerView.getQueueList());
-			abstractPlayerView.addQueueChangeListener(queueChangedListener);
+			setContent(abstractPlayerView.getPlayer().getQueueList());
+			abstractPlayerView.getPlayer().addQueueChangeListener(queueChangedListener);
 			queueChangedListener.run();
 		}
 	}
@@ -58,7 +58,7 @@ public class ViewQueue extends ViewPart {
 		isDisposed = true;
 		
 		if (abstractPlayerView != null ) {
-			abstractPlayerView.removeQueueChangeListener(queueChangedListener);
+			abstractPlayerView.getPlayer().removeQueueChangeListener(queueChangedListener);
 		}
 		
 		super.dispose();
@@ -142,7 +142,7 @@ public class ViewQueue extends ViewPart {
 			setContentDescription("Queue is empty.");
 			
 		} else {
-			DurationData d = abstractPlayerView.getQueueTotalDuration();
+			DurationData d = abstractPlayerView.getPlayer().getQueueTotalDuration();
 			setContentDescription(
 					queue.size() + " items"
 					+ " totaling " + (d.complete ? "" : "more than ") +
@@ -240,13 +240,13 @@ public class ViewQueue extends ViewPart {
 	
 	protected IAction moveUpAction = new Action("Move up", Activator.getImageDescriptor("icons/arrow-up.gif")) {
 		public void run() {
-			abstractPlayerView.moveInQueue(getSelectedSources(), false);
+			abstractPlayerView.getPlayer().moveInQueue(getSelectedSources(), false);
 		};
 	};
 	
 	protected IAction moveDownAction = new Action("Move down", Activator.getImageDescriptor("icons/arrow-down.gif")) {
 		public void run() {
-			abstractPlayerView.moveInQueue(getSelectedSources(), true);
+			abstractPlayerView.getPlayer().moveInQueue(getSelectedSources(), true);
 		};
 	};
 	
@@ -258,7 +258,7 @@ public class ViewQueue extends ViewPart {
 				return;
 			}
 			for (PlayItem item : selectedSources) {
-				abstractPlayerView.removeFromQueue(item);
+				abstractPlayerView.getPlayer().removeFromQueue(item);
 			}
 		};
 	};
