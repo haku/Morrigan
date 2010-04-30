@@ -36,7 +36,7 @@ public class ViewPlayer extends AbstractPlayerView {
 		
 		registerScreenPainter(screenPainter);
 		
-		callUpdateStatus();
+		getEventHandler().updateStatus();
 	}
 	
 	@Override
@@ -125,7 +125,7 @@ public class ViewPlayer extends AbstractPlayerView {
 	protected void updateStatus () {
 		if (isDisposed()) return;
 		
-		switch (getPlayState()) {
+		switch (getPlayer().getPlayState()) {
 			case Playing:
 				setTitleImage(iconPlay);
 				break;
@@ -147,8 +147,8 @@ public class ViewPlayer extends AbstractPlayerView {
 			
 		}
 		
-		if (getCurrentItem() != null && getCurrentItem().item != null) {
-			setContentDescription("Playing: " + getCurrentPosition() + " : " + getCurrentItem().toString());
+		if (getPlayer().getCurrentItem() != null && getPlayer().getCurrentItem().item != null) {
+			setContentDescription("Playing: " + getPlayer().getCurrentPosition() + " : " + getPlayer().getCurrentItem().toString());
 		} else {
 			setContentDescription("Idle.");
 		};

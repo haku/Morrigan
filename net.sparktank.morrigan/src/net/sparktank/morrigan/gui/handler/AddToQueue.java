@@ -50,7 +50,7 @@ public class AddToQueue  extends AbstractHandler {
 				
 				for (MediaItem track : mediaListEditor.getSelectedTracks()) {
 					PlayItem item = new PlayItem(mediaListEditor.getMediaList(), track);
-					playerView.addToQueue(item);
+					playerView.getPlayer().addToQueue(item);
 				}
 				
 			} else {

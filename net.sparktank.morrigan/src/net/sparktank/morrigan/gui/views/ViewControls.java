@@ -52,14 +52,14 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		makeIcons();
 		makeControls(parent);
 		
-		addQueueChangeListener(queueChangedListener);
+		getPlayer().addQueueChangeListener(queueChangedListener);
 		
-		callUpdateStatus();
+		getEventHandler().updateStatus();
 	}
 	
 	@Override
 	public void dispose() {
-		removeQueueChangeListener(queueChangedListener);
+		getPlayer().removeQueueChangeListener(queueChangedListener);
 		disposeIcons();
 		super.dispose();
 	}
@@ -232,7 +232,7 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		btnJumpTo.setLayoutData(formData);
 		btnJumpTo.addSelectionListener(new ActionListener(jumpToAction));
 		
-		btnOrderMode.setText(getPlaybackOrder().toString());
+		btnOrderMode.setText(getPlayer().getPlaybackOrder().toString());
 		formData = new FormData();
 		formData.top = new FormAttachment(0, SEP);
 		formData.right = new FormAttachment(btnQueue, -SEP);
@@ -347,7 +347,7 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		public void mouseUp(MouseEvent e) {
 			double s = e.x / (double) canvas.getClientArea().width;
 			if (s >= 0 && s <= 1) {
-				seekTo(s);
+				getPlayer().seekTo(s);
 			}
 		}
 		
@@ -366,7 +366,7 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		
 		String verb;
 		
-		switch (getPlayState()) {
+		switch (getPlayer().getPlayState()) {
 			case Playing:
 				verb = "Playing";
 				break;
@@ -389,18 +389,18 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 				
 		}
 		
-		if (getCurrentPosition() >= 0) {
-			verb = verb + " " + TimeHelper.formatTime(getCurrentPosition());
-			if (getCurrentTrackDuration() > 0) {
-				verb = verb + " of " + TimeHelper.formatTime(getCurrentTrackDuration());
+		if (getPlayer().getCurrentPosition() >= 0) {
+			verb = verb + " " + TimeHelper.formatTime(getPlayer().getCurrentPosition());
+			if (getPlayer().getCurrentTrackDuration() > 0) {
+				verb = verb + " of " + TimeHelper.formatTime(getPlayer().getCurrentTrackDuration());
 				
-				seekbarPainter.setProgress((int) getCurrentPosition(), getCurrentTrackDuration());
+				seekbarPainter.setProgress((int) getPlayer().getCurrentPosition(), getPlayer().getCurrentTrackDuration());
 			}
 		}
 		lblStatus.setText(verb + ".");
 		
-		if (getCurrentItem() != null && getCurrentItem().item != null) {
-			getSite().getShell().setText(getCurrentItem().item.toString());
+		if (getPlayer().getCurrentItem() != null && getPlayer().getCurrentItem().item != null) {
+			getSite().getShell().setText(getPlayer().getCurrentItem().item.toString());
 		} else {
 			getSite().getShell().setText("Morrigan");
 		};
@@ -443,7 +443,7 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		@Override
 		public void run() {
 			queueChangedRunnerScheduled = false;
-			int size = getQueueList().size();
+			int size = getPlayer().getQueueList().size();
 			if (size > 0) {
 				btnQueue.setText("(" + size + ")");
 				
