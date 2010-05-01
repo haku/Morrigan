@@ -76,6 +76,7 @@ public class PlayersHandler extends AbstractHandler {
 	private StringBuilder getPlayer (int n) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("<h2><a href=\"/players/"+n+"\">Player "+n+"</a></h2>");
+		sb.append("<p style=\"font-size:1.5em;text-align:center;\"><a href=\"/players/"+n+"/playpause\">play / pause</a> | <a href=\"/players/"+n+"/next\">next</a></p>");
 		
 		Player player = PlayerRegister.getPlayer(n);
 		sb.append("<ul>");
@@ -89,8 +90,6 @@ public class PlayersHandler extends AbstractHandler {
 		}
 		sb.append("<li>item="+item+"</li>");
 		sb.append("<li>list="+player.getCurrentList()+"</li>");
-		sb.append("<li><a href=\"/players/"+n+"/playpause\">play | pause</a></li>");
-		sb.append("<li><a href=\"/players/"+n+"/next\">next</a></li>");
 		sb.append("</ul>");
 		
 		return sb;
