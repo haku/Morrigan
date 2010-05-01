@@ -33,8 +33,14 @@ public class MorriganServer {
 		conMedia.setClassLoader(Thread.currentThread().getContextClassLoader());
 		conMedia.setHandler(new MediaHandler());
 		
+		ContextHandler conPlayers = new ContextHandler();
+		conPlayers.setContextPath("/players");
+		conPlayers.setResourceBase(".");
+		conPlayers.setClassLoader(Thread.currentThread().getContextClassLoader());
+		conPlayers.setHandler(new PlayersHandler());
+		
 		ContextHandlerCollection contexts = new ContextHandlerCollection();
-        contexts.setHandlers(new Handler[] { conHome, conMedia });
+        contexts.setHandlers(new Handler[] { conHome, conMedia, conPlayers });
 		server.setHandler(contexts);
 	}
 	

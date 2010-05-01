@@ -34,8 +34,22 @@ public class Player {
 	}
 	
 	public void dispose () {
+		PlayerRegister.removePlayer(this);
 		setCurrentItem(null);
 		finalisePlaybackEngine();
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	ID.
+	
+	private int id = -1;
+	
+	public int getId() {
+		return id;
+	}
+	
+	public void setId(int id) {
+		this.id = id;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -355,8 +369,23 @@ public class Player {
 			if (!file.exists()) throw new FileNotFoundException(item.item.getFilepath());
 			
 			getPlaybackEngine().setFile(item.item.getFilepath());
-			getPlaybackEngine().setVideoFrameParent(eventHandler.getCurrentMediaFrameParent());
-			getPlaybackEngine().startPlaying();
+			Composite currentMediaFrameParent = eventHandler.getCurrentMediaFrameParent();
+			getPlaybackEngine().setVideoFrameParent(currentMediaFrameParent);
+			// FIXME there must be a tidier way to do this.
+			if (currentMediaFrameParent != null) {
+				currentMediaFrameParent.getDisplay().syncExec(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							getPlaybackEngine().startPlaying();
+						} catch (Exception e) {
+							eventHandler.asyncThrowable(e);
+						}
+					}
+				});
+			} else {
+				getPlaybackEngine().startPlaying();
+			}
 			_currentTrackDuration = getPlaybackEngine().getDuration();
 			System.out.println("Started to play " + item.item.getTitle());
 			

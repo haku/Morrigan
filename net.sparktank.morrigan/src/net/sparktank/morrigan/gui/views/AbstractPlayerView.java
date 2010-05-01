@@ -30,6 +30,7 @@ import net.sparktank.morrigan.model.playlist.PlayItem;
 import net.sparktank.morrigan.player.IPlayerEventHandler;
 import net.sparktank.morrigan.player.OrderHelper;
 import net.sparktank.morrigan.player.Player;
+import net.sparktank.morrigan.player.PlayerRegister;
 import net.sparktank.morrigan.player.OrderHelper.PlaybackOrder;
 
 import org.eclipse.jface.action.Action;
@@ -65,11 +66,8 @@ public abstract class AbstractPlayerView extends ViewPart {
 	@Override
 	public void dispose() {
 		isDisposed = true;
-		
-		getPlayer().dispose();
-		
+		disposePlayer();
 		finaliseHotkeys();
-		
 		super.dispose();
 	}
 	
@@ -109,9 +107,15 @@ public abstract class AbstractPlayerView extends ViewPart {
 	public Player getPlayer () {
 		// FIXME not thread safe?
 		if (_player == null) {
-			_player = new Player(eventHandler);
+			_player = PlayerRegister.makePlayer(eventHandler);
 		}
 		return _player;
+	}
+	
+	private void disposePlayer () {
+		if (_player != null) {
+			_player.dispose();
+		}
 	}
 	
 	protected IPlayerEventHandler getEventHandler () {
@@ -136,8 +140,13 @@ public abstract class AbstractPlayerView extends ViewPart {
 		}
 		
 		public void currentItemChanged() {
-			updateTitle();
-		};
+			getSite().getShell().getDisplay().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					updateTitle();
+				}
+			});
+		}
 		
 		public void asyncThrowable(Throwable t) {
 			getSite().getShell().getDisplay().asyncExec(new RunnableDialog(t));
