@@ -43,7 +43,7 @@ public class ScreenPainter implements PaintListener {
 	}
 	
 	public void redrawTitle () {
-		canvas.getShell().getDisplay().asyncExec(new Runnable() {
+		if (!canvas.isDisposed()) canvas.getShell().getDisplay().asyncExec(new Runnable() {
 			@Override
 			public void run() {
 				if (!canvas.isDisposed()) {
