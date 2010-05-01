@@ -25,9 +25,9 @@ public class PlayersHandler extends AbstractHandler {
 		response.setStatus(HttpServletResponse.SC_OK);
 		baseRequest.setHandled(true);
 		response.getWriter().println("<h1>Players desu~</h1>");
+		response.getWriter().println("<p><a href=\"/\">home</a></p>");
 		
 		StringBuilder sb = new StringBuilder();
-		
 		try {
 			if (target.equals("/")) {
 				sb = getPlayers();
@@ -75,7 +75,7 @@ public class PlayersHandler extends AbstractHandler {
 	
 	private StringBuilder getPlayer (int n) {
 		StringBuilder sb = new StringBuilder();
-		sb.append("<h2>Player "+n+"</h2>");
+		sb.append("<h2><a href=\"/players/"+n+"\">Player "+n+"</a></h2>");
 		
 		Player player = PlayerRegister.getPlayer(n);
 		sb.append("<ul>");
