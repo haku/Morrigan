@@ -56,6 +56,7 @@ public class ServerAction extends Action implements IWorkbenchAction {
 		} else {
 			try {
 				getServer().getServer().stop();
+				// TODO now save reference in a WeakReference so it can be GCed? 
 			} catch (Exception e) {
 				new MorriganMsgDlg(e).open();
 				return;
