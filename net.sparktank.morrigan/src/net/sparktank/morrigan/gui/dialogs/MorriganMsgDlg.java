@@ -1,10 +1,7 @@
 package net.sparktank.morrigan.gui.dialogs;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.Writer;
-
 import net.sparktank.morrigan.gui.helpers.ClipboardHelper;
+import net.sparktank.morrigan.gui.helpers.ErrorHelper;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
@@ -54,7 +51,7 @@ public class MorriganMsgDlg extends MessageDialog {
 		
 		if (throwable!=null && open==OK) {
 			throwable.printStackTrace();
-			ClipboardHelper.setText(getStackTrace(throwable), Display.getCurrent());
+			ClipboardHelper.setText(ErrorHelper.getStackTrace(throwable), Display.getCurrent());
 		}
 		
 		return open;
@@ -75,13 +72,5 @@ public class MorriganMsgDlg extends MessageDialog {
 		
 		return sb.toString();
 	}
-	
-	public static String getStackTrace (Throwable t) {
-		final Writer writer = new StringWriter();
-		final PrintWriter printWriter = new PrintWriter(writer);
-		t.printStackTrace(printWriter);
-		return writer.toString();
-	}
-	
 	
 }
