@@ -1,29 +1,43 @@
 package net.sparktank.morrigan.server;
 
-import java.io.IOException;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.eclipse.jetty.server.handler.ContextHandler;
+import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 
-public class ServerMain extends AbstractHandler {
+public class ServerMain {
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-		response.setContentType("text/html;charset=utf-8");
-		response.setStatus(HttpServletResponse.SC_OK);
-		baseRequest.setHandled(true);
-		response.getWriter().println("<h1>Morrigan desu~</h1>");
+	public Server makeServer () throws Exception {
+		Server server = new Server(8080);
+		
+		ContextHandler conHome = new ContextHandler();
+		conHome.setContextPath("/");
+		conHome.setResourceBase(".");
+		conHome.setClassLoader(Thread.currentThread().getContextClassLoader());
+		conHome.setHandler(new HomeHandler());
+		
+		ContextHandler conMedia = new ContextHandler();
+		conMedia.setContextPath("/media");
+		conMedia.setResourceBase(".");
+		conMedia.setClassLoader(Thread.currentThread().getContextClassLoader());
+		conMedia.setHandler(new MediaHandler());
+		
+		ContextHandlerCollection contexts = new ContextHandlerCollection();
+        contexts.setHandlers(new Handler[] { conHome, conMedia });
+		server.setHandler(contexts);
+		
+		server.start();
+		return server;
 	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	static public void main(String[] args) throws Exception {
-		Server server = new Server(8080);
-		server.setHandler(new ServerMain());
-		server.start();
-		server.join(); // Like Thread.join().
+		ServerMain m = new ServerMain();
+		Server s = m.makeServer();
+		s.join(); // Like Thread.join().
 	}
-	
+
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
