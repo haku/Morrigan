@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse.ant.import?>
+
+<project default="serverjar" name="Create server jar.">
+
+	<target name="serverjar">
+		<jar destfile="morrigan.server.jar">
+			<fileset dir="bin" includes="net/sparktank/morrigan/**/*.class" />
+			<manifest>
+				<attribute name="Class-Path"
+				           value="lib/jetty-continuation-7.0.2.v20100331.jar lib/jetty-http-7.0.2.v20100331.jar lib/jetty-io-7.0.2.v20100331.jar lib/jetty-server-7.0.2.v20100331.jar lib/jetty-util-7.0.2.v20100331.jar lib/servlet-api-2.5.jar lib/sqlitejdbc-v056.jar"
+				/>
+				<attribute name="Main-Class" value="net.sparktank.morrigan.server.ServerMain" />
+			</manifest>
+		</jar>
+	</target>
+
+</project>
