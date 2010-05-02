@@ -18,12 +18,14 @@ import net.sparktank.morrigan.model.MediaList;
 import net.sparktank.morrigan.model.MediaListFactory;
 import net.sparktank.morrigan.model.library.DbException;
 import net.sparktank.morrigan.model.library.LibraryHelper;
+import net.sparktank.morrigan.model.library.LibraryUpdateTask;
 import net.sparktank.morrigan.model.library.MediaLibrary;
 import net.sparktank.morrigan.model.playlist.MediaPlaylist;
 import net.sparktank.morrigan.model.playlist.PlaylistHelper;
 import net.sparktank.morrigan.player.Player;
 import net.sparktank.morrigan.player.PlayerRegister;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 
@@ -58,6 +60,11 @@ public class MediaHandler extends AbstractHandler {
 									if (m.containsKey("dir")) {
 										String[] v = (String[]) m.get("dir");
 										addLibSrc(id, v[0]);
+									} else if (m.containsKey("cmd")) {
+										String[] v = (String[]) m.get("cmd");
+										if (v[0].equals("scan")) {
+											scheduleLibScan(id);
+										}
 									}
 								}
 								
@@ -192,9 +199,14 @@ public class MediaHandler extends AbstractHandler {
 	
 	private void printLibSrc (String id, MediaLibrary ml, StringBuilder sb) throws MorriganException {
 		sb.append("<h2>" + ml.getListName() + " src</h2>");
+		
 		sb.append("<form action=\"\" method=\"POST\">");
 		sb.append("<input type=\"text\" name=\"dir\" >");
-		sb.append("<input type=\"submit\" name=\"submit\" value=\"add\">");
+		sb.append("<input type=\"submit\" name=\"cmd\" value=\"add\">");
+		sb.append("</form>");
+		
+		sb.append("<form action=\"\" method=\"POST\">");
+		sb.append("<input type=\"submit\" name=\"cmd\" value=\"scan\">");
 		sb.append("</form>");
 		
 		List<String> src = ml.getSources();
@@ -205,6 +217,88 @@ public class MediaHandler extends AbstractHandler {
 			sb.append("</li>");
 		}
 		sb.append("</ul>");
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	private void scheduleLibScan (String id) throws DbException {
+		String f = LibraryHelper.getFullPathToLib(id);
+		final MediaLibrary ml = MediaListFactory.makeMediaLibrary(f);
+		
+		final LibraryUpdateTask job = LibraryUpdateTask.factory(ml);
+		if (job != null) {
+			job.setInRcp(false);
+			
+			Thread t = new Thread () {
+				@Override
+				public void run() {
+					job.run(new LibScanMon(ml.getListName()));
+				}
+			};
+			t.start();
+			System.err.println("Scan of " + id + " scheduled on thread " + t.getId() + ".");
+			
+		} else {
+			System.err.println("Failed to get job object from factory method.");
+		}
+	}
+	
+	static class LibScanMon implements IProgressMonitor {
+		
+		private final String logPrefix;
+		private int totalWork = 0;
+		private int workDone = 0;
+		private String taskName;
+		private boolean canceled;
+		private String subTaskName;
+
+		public LibScanMon (String logPrefix) {
+			this.logPrefix = logPrefix;
+		}
+		
+		@Override
+		public void beginTask(String name, int totalWork) {
+			this.totalWork = totalWork;
+			System.out.println("[" + logPrefix + "] starting task: " + name + ".");
+		}
+
+		@Override
+		public void done() {
+			System.out.println("[" + logPrefix + "] done.");
+		}
+
+		@Override
+		public void setTaskName(String name) {
+			this.taskName = name;
+			System.out.println("[" + logPrefix + "] task: "+name+".");
+		}
+		
+		@Override
+		public void subTask(String name) {
+			this.subTaskName = name;
+			System.out.println("[" + logPrefix + "] sub task: "+name+".");
+		}
+
+		@Override
+		public void setCanceled(boolean value) {
+			System.out.println("[" + logPrefix + "] canceled = "+value+".");
+			this.canceled = value;
+		}
+		
+		@Override
+		public boolean isCanceled() {
+			return canceled;
+		}
+
+		@Override
+		public void worked(int work) {
+			workDone = workDone + work;
+			System.out.println("[" + logPrefix + "] worked " + workDone + " of " + totalWork + ".");
+		}
+		
+		@Override
+		public void internalWorked(double work) {}
+		
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
