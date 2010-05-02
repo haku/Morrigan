@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="morrigan" uid="net.sparktank.morrigan.gui.product" id="net.sparktank.morrigan.gui.product" application="net.sparktank.morrigan.application" useFeatures="false" includeLaunchers="true">
+<product name="morrigan" uid="net.sparktank.morrigan.gui.product" id="net.sparktank.morrigan.gui.product" application="net.sparktank.morrigan.gui.application" useFeatures="false" includeLaunchers="true">
 
    <aboutInfo>
       <image path="/net.sparktank.morrigan/graphics/crow-full.png"/>
