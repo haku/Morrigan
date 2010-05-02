@@ -354,7 +354,16 @@ public class Player {
 	/**
 	 * For UI handlers to call.
 	 */
+	public void loadAndStartPlaying (MediaList list) {
+		MediaItem nextTrack = OrderHelper.getNextTrack(list, null, _playbackOrder);
+		loadAndStartPlaying(list, nextTrack);
+	}
+	
+	/**
+	 * For UI handlers to call.
+	 */
 	public void loadAndStartPlaying (MediaList list, MediaItem track) {
+		if (track == null) throw new NullPointerException();
 		loadAndStartPlaying(new PlayItem(list, track));
 	}
 	
