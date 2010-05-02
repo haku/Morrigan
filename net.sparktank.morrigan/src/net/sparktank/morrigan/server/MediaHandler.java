@@ -13,10 +13,14 @@ import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.gui.helpers.ErrorHelper;
 import net.sparktank.morrigan.gui.model.MediaExplorerItem;
 import net.sparktank.morrigan.model.MediaItem;
+import net.sparktank.morrigan.model.MediaList;
 import net.sparktank.morrigan.model.MediaListFactory;
 import net.sparktank.morrigan.model.library.LibraryHelper;
 import net.sparktank.morrigan.model.library.MediaLibrary;
+import net.sparktank.morrigan.model.playlist.MediaPlaylist;
 import net.sparktank.morrigan.model.playlist.PlaylistHelper;
+import net.sparktank.morrigan.player.Player;
+import net.sparktank.morrigan.player.PlayerRegister;
 
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
@@ -42,7 +46,7 @@ public class MediaHandler extends AbstractHandler {
 					sb = getLibrary(id);
 					
 				} else if (d.equals("playlist")) {
-					
+					sb = getPlaylist(id);
 				}
 			}
 			
@@ -63,43 +67,86 @@ public class MediaHandler extends AbstractHandler {
 	
 	private StringBuilder getMediaLists () {
 		StringBuilder sb = new StringBuilder();
-		ArrayList<MediaExplorerItem> items = new ArrayList<MediaExplorerItem>();
 		
-		sb.append("<h2>Libraries</h2>");
-		items.addAll(LibraryHelper.getAllLibraries());
-		sb.append("<ul>");
-		for (MediaExplorerItem i : items) {
-			sb.append("<li><a href=\"/media/library/" + i.identifier.substring(i.identifier.lastIndexOf(File.separator)+1) + "\">" + i.title + "</a></li>");
+		for (int n = 0; n < 2; n++) {
+			ArrayList<MediaExplorerItem> items = new ArrayList<MediaExplorerItem>();
+			String type = null;
+			
+			switch (n) {
+				case 0:
+					sb.append("<h2>Libraries</h2>");
+					type="library";
+					items.addAll(LibraryHelper.getAllLibraries());
+					break;
+				
+				case 1:
+					sb.append("<h2>Playlists</h2>");
+					type="playlist";
+					items.addAll(PlaylistHelper.getAllPlaylists());
+					break;
+				
+			}
+			
+			List<Player> players = PlayerRegister.getPlayers();
+			
+			sb.append("<ul>");
+			for (MediaExplorerItem i : items) {
+				sb.append("<li><a href=\"/media/");
+				sb.append(type);
+				sb.append("/");
+				String fileName = i.identifier.substring(i.identifier.lastIndexOf(File.separator) + 1);
+				sb.append(fileName);
+				sb.append("\">");
+				sb.append(i.title);
+				sb.append("</a> ");
+				for (Player p : players) {
+					sb.append("[<a href=\"/player/");
+					sb.append(p.getId());
+					sb.append("/play/");
+					sb.append(fileName);
+					sb.append("\">play with p");
+					sb.append(p.getId());
+					sb.append("</a>]");
+				}
+				sb.append("</li>");
+			}
+			sb.append("</ul>");
+			
 		}
-		sb.append("</ul>");
-		
-		sb.append("<h2>Playlists</h2>");
-		items.addAll(PlaylistHelper.getAllPlaylists());
-		sb.append("<ul>");
-		for (MediaExplorerItem i : items) {
-			sb.append("<li><a href=\"/media/playlist/" + i.identifier.substring(i.identifier.lastIndexOf(File.separator)+1) + "\">" + i.title + "</a></li>");
-		}
-		sb.append("</ul>");
 		
 		return sb;
 	}
 	
 	private StringBuilder getLibrary (String id) throws MorriganException {
 		StringBuilder sb = new StringBuilder();
-		sb.append("<h2>"+id+"</h2>");
-		
 		String f = LibraryHelper.getFullPathToLib(id);
 		MediaLibrary ml = MediaListFactory.makeMediaLibrary(f);
+		printMediaList(id, ml, sb);
+		return sb;
+	}
+	
+	private StringBuilder getPlaylist (String id) throws MorriganException {
+		StringBuilder sb = new StringBuilder();
+		String f = PlaylistHelper.getFullPathToPlaylist(id);
+		MediaPlaylist ml = MediaListFactory.makeMediaPlaylist(f);
+		printMediaList(id, ml, sb);
+		return sb;
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	private void printMediaList (String id, MediaList ml, StringBuilder sb) throws MorriganException {
 		ml.read();
 		List<MediaItem> mediaTracks = ml.getMediaTracks();
 		
+		sb.append("<h2>" + ml.getListName() + "</h2>");
+		
 		sb.append("<ul>");
 		for (MediaItem i : mediaTracks) {
+			// FIXME put actual track ID here.
 			sb.append("<li><a href=\"/media/library/" + id + "/00000\">" + i.getTitle() + "</a></li>");
 		}
 		sb.append("</ul>");
-		
-		return sb;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
