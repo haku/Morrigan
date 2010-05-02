@@ -40,6 +40,19 @@
 		<echo message="buildTempFolder=${buildTempFolder}" />
 	</target>
 
+	<target name="clean" depends="setup">
+		<delete dir="${buildDirectory}" failonerror="false" />
+		<delete dir="${outputDirectory}" failonerror="false" />
+
+		<antcall target="refreshWorkspace" />
+	</target>
+
+	<target name="refreshWorkspace">
+		<!-- Refresh eclipse workspace -->
+		<eclipse.convertPath fileSystemPath="${basedir}" property="resourcePath" />
+		<eclipse.refreshLocal resource="${resourcePath}" depth="infinite" />
+	</target>
+
 	<target name="main" depends="setup,clean">
 		<!-- Call RCP build process. -->
 		<ant antfile="${eclipse.pdebuild.scripts}/productBuild/productBuild.xml" />
@@ -50,16 +63,25 @@
 			<fileset dir="${buildDirectory}/${buildLabel}" includes="*.zip" />
 		</move>
 
-		<!-- build engines. -->
-		<antcall target="eng_win32" />
-		<antcall target="eng_linux" />
-		<antcall target="eng_mac" />
+		<!-- Package headless server. -->
+		<antcall target="buildserver" />
+
+		<!-- Build engines. -->
+		<antcall target="zip_win32" />
+		<antcall target="zip_linux" />
+		<antcall target="zip_mac" />
 
 		<!-- Clean up. -->
 		<antcall target="refreshWorkspace" />
 	</target>
 
-	<target name="eng_win32" depends="setup">
+	<target name="buildserver" depends="setup">
+		<ant antfile="../net.sparktank.morrigan/build_serverjar.xml"
+		     dir="../net.sparktank.morrigan"
+		/>
+	</target>
+
+	<target name="zip_win32" depends="setup">
 		<ant antfile="../net.sparktank.morrigan.playbackimpl.dsj/makejar.xml"
 		     dir="../net.sparktank.morrigan.playbackimpl.dsj"
 		/>
@@ -95,10 +117,15 @@
 			            includes="win32.properties"
 			            fullpath="morrigan/morrigan.properties"
 			/>
+			<zipfileset dir="../net.sparktank.morrigan"
+			            includes="morrigan.server.jar"
+			            fullpath="morrigan/morrigan.server.jar"
+			/>
+			<zipfileset dir="../net.sparktank.morrigan/lib" prefix="morrigan/lib" />
 		</zip>
 	</target>
 
-	<target name="eng_linux" depends="setup">
+	<target name="zip_linux" depends="setup">
 		<ant antfile="../net.sparktank.morrigan.playbackimpl.gs/makejar.xml"
 		     dir="../net.sparktank.morrigan.playbackimpl.gs"
 		/>
@@ -134,10 +161,15 @@
 			            includes="linux.properties"
 			            fullpath="morrigan/morrigan.properties"
 			/>
+			<zipfileset dir="../net.sparktank.morrigan"
+			            includes="morrigan.server.jar"
+			            fullpath="morrigan/morrigan.server.jar"
+			/>
+			<zipfileset dir="../net.sparktank.morrigan/lib" prefix="morrigan/lib" />
 		</zip>
 	</target>
 
-	<target name="eng_mac" depends="setup">
+	<target name="zip_mac" depends="setup">
 		<ant antfile="../net.sparktank.morrigan.playbackimpl.jmf/makejar.xml"
 		     dir="../net.sparktank.morrigan.playbackimpl.jmf"
 		/>
@@ -162,20 +194,12 @@
 			            includes="mac.properties"
 			            fullpath="morrigan/morrigan.properties"
 			/>
+			<zipfileset dir="../net.sparktank.morrigan"
+			            includes="morrigan.server.jar"
+			            fullpath="morrigan/morrigan.server.jar"
+			/>
+			<zipfileset dir="../net.sparktank.morrigan/lib" prefix="morrigan/lib" />
 		</zip>
-	</target>
-
-	<target name="clean" depends="setup">
-		<delete dir="${buildDirectory}" failonerror="false" />
-		<delete dir="${outputDirectory}" failonerror="false" />
-
-		<antcall target="refreshWorkspace" />
-	</target>
-
-	<target name="refreshWorkspace">
-		<!-- Refresh eclipse workspace -->
-		<eclipse.convertPath fileSystemPath="${basedir}" property="resourcePath" />
-		<eclipse.refreshLocal resource="${resourcePath}" depth="infinite" />
 	</target>
 
 </project>
