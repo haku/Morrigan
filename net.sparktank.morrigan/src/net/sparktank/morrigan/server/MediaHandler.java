@@ -40,14 +40,29 @@ public class MediaHandler extends AbstractHandler {
 				sb = getMediaLists();
 				
 			} else {
-				String d = target.substring(1,target.indexOf("/", 2));
-				String id = target.substring(d.length() + 2);
-				if (d.equals("library")) {
-					sb = getLibrary(id);
+				String r = target.substring(1);
+				
+				if (r.contains("/")) {
+					String[] split = r.split("/");
+					String type = split[0];
+					String id = split[1];
 					
-				} else if (d.equals("playlist")) {
-					sb = getPlaylist(id);
+					if (split.length > 2) {
+						String param = split[2];
+						if (param.equals("src")) {
+							sb = getLibSrc(id);
+						}
+						
+					} else {
+						if (type.equals("library")) {
+							sb = getLibrary(id);
+							
+						} else if (type.equals("playlist")) {
+							sb = getPlaylist(id);
+						}
+					}
 				}
+				
 			}
 			
 		} catch (Throwable t) {
@@ -133,6 +148,14 @@ public class MediaHandler extends AbstractHandler {
 		return sb;
 	}
 	
+	private StringBuilder getLibSrc (String id) throws MorriganException {
+		StringBuilder sb = new StringBuilder();
+		String f = LibraryHelper.getFullPathToLib(id);
+		MediaLibrary ml = MediaListFactory.makeMediaLibrary(f);
+		printLibSrc(id, ml, sb);
+		return sb;
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private void printMediaList (String id, MediaList ml, StringBuilder sb) throws MorriganException {
@@ -141,10 +164,25 @@ public class MediaHandler extends AbstractHandler {
 		
 		sb.append("<h2>" + ml.getListName() + "</h2>");
 		
+		sb.append("<p><a href=\"/media/library/" + id + "/src\">src</a></p>");
+		
 		sb.append("<ul>");
 		for (MediaItem i : mediaTracks) {
 			// FIXME put actual track ID here.
 			sb.append("<li><a href=\"/media/library/" + id + "/00000\">" + i.getTitle() + "</a></li>");
+		}
+		sb.append("</ul>");
+	}
+	
+	private void printLibSrc (String id, MediaLibrary ml, StringBuilder sb) throws MorriganException {
+		sb.append("<h2>" + ml.getListName() + " src</h2>");
+		
+		List<String> src = ml.getSources();
+		sb.append("<ul>");
+		for (String s : src) {
+			sb.append("<li>");
+			sb.append(s);
+			sb.append("</li>");
 		}
 		sb.append("</ul>");
 	}
