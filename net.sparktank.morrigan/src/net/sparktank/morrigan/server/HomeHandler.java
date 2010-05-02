@@ -18,7 +18,7 @@ public class HomeHandler extends AbstractHandler {
 		baseRequest.setHandled(true);
 		response.getWriter().println(
 				"<h1>Morrigan desu~</h1>" +
-				"<p><a href=\"/players\">players</a></p>" +
+				"<p><a href=\"/player\">players</a></p>" +
 				"<p><a href=\"/media\">media</a></p>"
 				);
 	}
