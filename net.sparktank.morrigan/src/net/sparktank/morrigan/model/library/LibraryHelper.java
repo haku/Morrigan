@@ -28,7 +28,7 @@ public class LibraryHelper {
 		return lib;
 	}
 	
-	private static boolean isLibFile (String filePath) {
+	public static boolean isLibFile (String filePath) {
 		return (filePath.toLowerCase().endsWith(Config.LIB_FILE_EXT));
 	}
 	
