@@ -85,13 +85,35 @@ public class LibraryUpdateTask extends Job {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	private boolean inRcp = true;
+	
+	public void setInRcp(boolean inRcp) {
+		this.inRcp = inRcp;
+	}
+	
+	private void showConsole () {
+		if (inRcp) {
+			ConsoleHelper.showConsole();
+		}
+	}
+	
+	private void appendToConsole (String topic, String s) {
+		if (inRcp) {
+			ConsoleHelper.appendToConsole(topic, s);
+		} else {
+			
+		}
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
 	/**
 	 * TODO use monitor.worked(1);
 	 */
 	@Override
-	protected IStatus run(IProgressMonitor monitor) {
-		ConsoleHelper.showConsole();
-		ConsoleHelper.appendToConsole(library.getListName(), "Starting scan...");
+	public IStatus run(IProgressMonitor monitor) {
+		showConsole();
+		appendToConsole(library.getListName(), "Starting scan...");
 		
 		int progress = 0;
 		monitor.beginTask("Updating library", 100);
@@ -143,7 +165,7 @@ public class LibraryUpdateTask extends Job {
 								if (supportedFormats.contains(ext)) {
 									try {
 										if (library.addFile(file)) {
-											ConsoleHelper.appendToConsole(library.getListName(), "[ADDED] " + file.getAbsolutePath());
+											appendToConsole(library.getListName(), "[ADDED] " + file.getAbsolutePath());
 											filesAdded++;
 										}
 									} catch (MorriganException e) {
@@ -154,13 +176,13 @@ public class LibraryUpdateTask extends Job {
 							}
 						}
 					} else {
-						ConsoleHelper.appendToConsole(library.getListName(), "Failed to read directory: " + dirItem.getAbsolutePath());
+						appendToConsole(library.getListName(), "Failed to read directory: " + dirItem.getAbsolutePath());
 					}
 				}
 			}
 		} // End directory scanning.
 		
-		ConsoleHelper.appendToConsole(library.getListName(), "Added " + filesAdded + " files.");
+		appendToConsole(library.getListName(), "Added " + filesAdded + " files.");
 		
 		IPlaybackEngine playbackEngine = null;
 		
@@ -177,7 +199,7 @@ public class LibraryUpdateTask extends Job {
 				// If was missing, mark as found.
 				if (mi.isMissing()) {
 					try {
-						ConsoleHelper.appendToConsole(library.getListName(), "[FOUND] " + mi.getFilepath());
+						appendToConsole(library.getListName(), "[FOUND] " + mi.getFilepath());
 						library.setTrackMissing(mi, false);
 					} catch (Throwable t) {
 						// FIXME log this somewhere useful.
@@ -192,9 +214,9 @@ public class LibraryUpdateTask extends Job {
 					fileModified = true;
 					
 					if (mi.getDateLastModified() == null) {
-						ConsoleHelper.appendToConsole(library.getListName(), "[NEW] " + mi.getTitle());
+						appendToConsole(library.getListName(), "[NEW] " + mi.getTitle());
 					} else {
-						ConsoleHelper.appendToConsole(library.getListName(), "[CHANGED] " + mi.getTitle());
+						appendToConsole(library.getListName(), "[CHANGED] " + mi.getTitle());
 					}
 					
 					try {
@@ -246,14 +268,14 @@ public class LibraryUpdateTask extends Job {
 						if (d>0) library.setTrackDuration(mi, d);
 					} catch (Throwable t) {
 						// FIXME log this somewhere useful.
-						ConsoleHelper.appendToConsole(library.getListName(), "Throwable while reading metadata for '"+mi.getFilepath()+"': " + t.getMessage());
+						appendToConsole(library.getListName(), "Throwable while reading metadata for '"+mi.getFilepath()+"': " + t.getMessage());
 					}
 				}
 				
 			} else { // The file is missing.
 				if (!mi.isMissing()) {
 					try {
-						ConsoleHelper.appendToConsole(library.getListName(), "[MISSING] " + mi.getFilepath());
+						appendToConsole(library.getListName(), "[MISSING] " + mi.getFilepath());
 						library.setTrackMissing(mi, true);
 					} catch (Throwable t) {
 						// FIXME log this somewhere useful.
@@ -398,7 +420,7 @@ public class LibraryUpdateTask extends Job {
 							}
 							
 							library.removeMediaTrack(i);
-							ConsoleHelper.appendToConsole(library.getListName(), "[REMOVED] " + i.getFilepath());
+							appendToConsole(library.getListName(), "[REMOVED] " + i.getFilepath());
 							
 						} catch (Throwable t) {
 							// FIXME log this somewhere useful.
@@ -423,19 +445,19 @@ public class LibraryUpdateTask extends Job {
 			/*
 			 * Print out what are left with.
 			 */
-			ConsoleHelper.appendToConsole(library.getListName(), "Found " + dupicateItems.size() + " duplicate items:");
+			appendToConsole(library.getListName(), "Found " + dupicateItems.size() + " duplicate items:");
 			for (Entry<MediaItem, ScanOption> e : dupicateItems.entrySet()) {
-				ConsoleHelper.appendToConsole(library.getListName(), e.getValue() + " : " + e.getKey().getTitle());
+				appendToConsole(library.getListName(), e.getValue() + " : " + e.getKey().getTitle());
 			}
 			
 		} else {
-			ConsoleHelper.appendToConsole(library.getListName(), "No duplicates found.");
+			appendToConsole(library.getListName(), "No duplicates found.");
 		}
 		
 		// TODO : vacuum DB?
 		
 		if (monitor.isCanceled()) {
-			ConsoleHelper.appendToConsole(library.getListName(), "Task was canceled desu~.");
+			appendToConsole(library.getListName(), "Task was canceled desu~.");
 		}
 		
 		isFinished = true;
