@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -15,6 +16,7 @@ import net.sparktank.morrigan.gui.model.MediaExplorerItem;
 import net.sparktank.morrigan.model.MediaItem;
 import net.sparktank.morrigan.model.MediaList;
 import net.sparktank.morrigan.model.MediaListFactory;
+import net.sparktank.morrigan.model.library.DbException;
 import net.sparktank.morrigan.model.library.LibraryHelper;
 import net.sparktank.morrigan.model.library.MediaLibrary;
 import net.sparktank.morrigan.model.playlist.MediaPlaylist;
@@ -29,7 +31,7 @@ public class MediaHandler extends AbstractHandler {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-		System.err.println("request:t=" + target);
+		System.err.println("request:t=" + target + ", m=" + request.getMethod());
 		
 		response.getWriter().println("<h1>Media desu~</h1>");
 		response.getWriter().println("<p><a href=\"/\">home</a></p>");
@@ -47,19 +49,26 @@ public class MediaHandler extends AbstractHandler {
 					String type = split[0];
 					String id = split[1];
 					
-					if (split.length > 2) {
-						String param = split[2];
-						if (param.equals("src")) {
-							sb = getLibSrc(id);
+					if (type.equals("library")) {
+						if (split.length > 2) {
+							String param = split[2];
+							if (param.equals("src")) {
+								if (request.getMethod().equals("POST")) {
+									Map<?,?> m = request.getParameterMap();
+									if (m.containsKey("dir")) {
+										String[] v = (String[]) m.get("dir");
+										addLibSrc(id, v[0]);
+									}
+								}
+								
+								sb = getLibSrc(id);
+							}
+						} else {
+							sb = getLibrary(id);
 						}
 						
-					} else {
-						if (type.equals("library")) {
-							sb = getLibrary(id);
-							
-						} else if (type.equals("playlist")) {
-							sb = getPlaylist(id);
-						}
+					} else if (type.equals("playlist")) {
+						sb = getPlaylist(id);
 					}
 				}
 				
@@ -156,6 +165,13 @@ public class MediaHandler extends AbstractHandler {
 		return sb;
 	}
 	
+	private void addLibSrc (String id, String dir) throws DbException {
+		String f = LibraryHelper.getFullPathToLib(id);
+		MediaLibrary ml = MediaListFactory.makeMediaLibrary(f);
+		ml.addSource(dir);
+		System.err.println("Added src '"+dir+"'.");
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private void printMediaList (String id, MediaList ml, StringBuilder sb) throws MorriganException {
@@ -176,6 +192,10 @@ public class MediaHandler extends AbstractHandler {
 	
 	private void printLibSrc (String id, MediaLibrary ml, StringBuilder sb) throws MorriganException {
 		sb.append("<h2>" + ml.getListName() + " src</h2>");
+		sb.append("<form action=\"\" method=\"POST\">");
+		sb.append("<input type=\"text\" name=\"dir\" >");
+		sb.append("<input type=\"submit\" name=\"submit\" value=\"add\">");
+		sb.append("</form>");
 		
 		List<String> src = ml.getSources();
 		sb.append("<ul>");
