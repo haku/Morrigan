@@ -7,6 +7,7 @@ import net.sparktank.morrigan.model.library.MediaLibrary;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
+import net.sparktank.morrigan.gui.jobs.*;
 
 public class LibraryUpdateAction extends Action implements IWorkbenchAction{
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -57,8 +58,9 @@ public class LibraryUpdateAction extends Action implements IWorkbenchAction{
 			return;
 		}
 		
-		LibraryUpdateTask job = LibraryUpdateTask.factory(library);
-		if (job != null) {
+		LibraryUpdateTask task = LibraryUpdateTask.factory(library);
+		if (task != null) {
+			LibraryUpdateJob job = new LibraryUpdateJob(task);
 			job.schedule();
 		
 		} else {

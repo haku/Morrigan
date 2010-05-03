@@ -15,19 +15,11 @@ import net.sparktank.morrigan.config.Config;
 import net.sparktank.morrigan.engines.EngineFactory;
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine;
 import net.sparktank.morrigan.exceptions.MorriganException;
-import net.sparktank.morrigan.gui.helpers.ConsoleHelper;
 import net.sparktank.morrigan.helpers.ChecksumHelper;
 import net.sparktank.morrigan.model.MediaItem;
+import net.sparktank.morrigan.model.library.LibraryUpdateTask.TaskResult.TaskOutcome;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
-
-/**
- * FIXME prevent concurrent executions of this task.
- */
-public class LibraryUpdateTask extends Job {
+public class LibraryUpdateTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private static WeakHashMap<LibraryUpdateTask, String> jobCache = new WeakHashMap<LibraryUpdateTask, String>();
@@ -62,13 +54,66 @@ public class LibraryUpdateTask extends Job {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	static public class TaskResult {
+		
+		static public enum TaskOutcome {SUCCESS, FAILED, CANCELED};
+		
+		private TaskOutcome outcome;
+		private String errMsg;
+		private Throwable errThr;
+		
+		public TaskResult (TaskOutcome outcome) {
+			this.outcome = outcome;
+		}
+		
+		public TaskResult (TaskOutcome outcome, String errMsg, Throwable errThr) {
+			this.outcome = outcome;
+			this.errMsg = errMsg;
+			this.errThr = errThr;
+		}
+		
+		public void setOutcome(TaskOutcome outcome) {
+			this.outcome = outcome;
+		}
+		public TaskOutcome getOutcome() {
+			return outcome;
+		}
+		
+		public void setErrMsg(String errMsg) {
+			this.errMsg = errMsg;
+		}
+		public String getErrMsg() {
+			return errMsg;
+		}
+		
+		public void setErrThr(Throwable errThr) {
+			this.errThr = errThr;
+		}
+		public Throwable getErrThr() {
+			return errThr;
+		}
+		
+	}
+	
+	static public interface TaskEventListener {
+		public void onStart ();
+		public void logMsg (String topic, String s);
+		
+		public void beginTask(String name, int totalWork);
+		public void subTask(String name);
+		public void done();
+		public boolean isCanceled();
+		public void worked(int work);
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
 	private final MediaLibrary library;
+	
 	private boolean isFinished = false;
 	
 	private LibraryUpdateTask (MediaLibrary library) {
-		super("Update " + library.getListName());
 		this.library = library;
-		setUser(true);
 	}
 	
 	public MediaLibrary getLibrary () {
@@ -85,76 +130,53 @@ public class LibraryUpdateTask extends Job {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private boolean inRcp = true;
-	
-	public void setInRcp(boolean inRcp) {
-		this.inRcp = inRcp;
-	}
-	
-	private void showConsole () {
-		if (inRcp) {
-			ConsoleHelper.showConsole();
-		}
-	}
-	
-	private void appendToConsole (String topic, String s) {
-		if (inRcp) {
-			ConsoleHelper.appendToConsole(topic, s);
-		} else {
-			
-		}
-	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
 	/**
 	 * TODO use monitor.worked(1);
 	 */
-	@Override
-	public IStatus run(IProgressMonitor monitor) {
-		showConsole();
-		appendToConsole(library.getListName(), "Starting scan...");
+	public TaskResult run(TaskEventListener taskEventListener) {
+		taskEventListener.onStart();
+		taskEventListener.logMsg(library.getListName(), "Starting scan...");
 		
 		int progress = 0;
-		monitor.beginTask("Updating library", 100);
+		taskEventListener.beginTask("Updating library", 100);
 		
-		monitor.subTask("Scanning sources");
+		taskEventListener.subTask("Scanning sources");
 		
 		List<String> supportedFormats;
 		try {
 			supportedFormats = Arrays.asList(Config.getMediaFileTypes());
 		} catch (MorriganException e) {
-			monitor.done();
-			return new FailStatus("Failed to retrieve list of supported formats.", e);
+			taskEventListener.done();
+			return new TaskResult(TaskOutcome.FAILED, "Failed to retrieve list of supported formats.", e);
 		}
 		
 		List<String> sources = null;
 		try {
 			sources = library.getSources();
 		} catch (DbException e) {
-			monitor.done();
-			return new FailStatus("Failed to retrieve list of media sources.", e);
+			taskEventListener.done();
+			return new TaskResult(TaskOutcome.FAILED, "Failed to retrieve list of media sources.", e);
 		}
 		
 		int filesAdded = 0;
 		
 		if (sources!=null) {
 			for (String source : sources) {
-				if (monitor.isCanceled()) break;
+				if (taskEventListener.isCanceled()) break;
 				
 				Stack<File> dirStack = new Stack<File>();
 				dirStack.push(new File(source));
 				
 				while (!dirStack.isEmpty()) {
-					if (monitor.isCanceled()) break;
+					if (taskEventListener.isCanceled()) break;
 					
 					File dirItem = dirStack.pop();
 					File[] listFiles = dirItem.listFiles();
 					if (listFiles != null) {
-						monitor.subTask("Scanning " + dirItem.getAbsolutePath());
+						taskEventListener.subTask("Scanning " + dirItem.getAbsolutePath());
 						
 						for (File file : listFiles) {
-							if (monitor.isCanceled()) break;
+							if (taskEventListener.isCanceled()) break;
 							
 							if (file.isDirectory()) {
 								dirStack.push(file);
@@ -165,7 +187,7 @@ public class LibraryUpdateTask extends Job {
 								if (supportedFormats.contains(ext)) {
 									try {
 										if (library.addFile(file)) {
-											appendToConsole(library.getListName(), "[ADDED] " + file.getAbsolutePath());
+											taskEventListener.logMsg(library.getListName(), "[ADDED] " + file.getAbsolutePath());
 											filesAdded++;
 										}
 									} catch (MorriganException e) {
@@ -176,22 +198,22 @@ public class LibraryUpdateTask extends Job {
 							}
 						}
 					} else {
-						appendToConsole(library.getListName(), "Failed to read directory: " + dirItem.getAbsolutePath());
+						taskEventListener.logMsg(library.getListName(), "Failed to read directory: " + dirItem.getAbsolutePath());
 					}
 				}
 			}
 		} // End directory scanning.
 		
-		appendToConsole(library.getListName(), "Added " + filesAdded + " files.");
+		taskEventListener.logMsg(library.getListName(), "Added " + filesAdded + " files.");
 		
 		IPlaybackEngine playbackEngine = null;
 		
-		monitor.subTask("Reading metadata");
+		taskEventListener.subTask("Reading metadata");
 		int n = 0;
 		int N = library.getCount();
 		for (MediaItem mi : library.getMediaTracks()) {
-			if (monitor.isCanceled()) break;
-			monitor.subTask("Reading metadata: " + mi.getTitle());
+			if (taskEventListener.isCanceled()) break;
+			taskEventListener.subTask("Reading metadata: " + mi.getTitle());
 			
 			// Existance test.
 			File file = new File(mi.getFilepath());
@@ -199,7 +221,7 @@ public class LibraryUpdateTask extends Job {
 				// If was missing, mark as found.
 				if (mi.isMissing()) {
 					try {
-						appendToConsole(library.getListName(), "[FOUND] " + mi.getFilepath());
+						taskEventListener.logMsg(library.getListName(), "[FOUND] " + mi.getFilepath());
 						library.setTrackMissing(mi, false);
 					} catch (Throwable t) {
 						// FIXME log this somewhere useful.
@@ -214,9 +236,9 @@ public class LibraryUpdateTask extends Job {
 					fileModified = true;
 					
 					if (mi.getDateLastModified() == null) {
-						appendToConsole(library.getListName(), "[NEW] " + mi.getTitle());
+						taskEventListener.logMsg(library.getListName(), "[NEW] " + mi.getTitle());
 					} else {
-						appendToConsole(library.getListName(), "[CHANGED] " + mi.getTitle());
+						taskEventListener.logMsg(library.getListName(), "[CHANGED] " + mi.getTitle());
 					}
 					
 					try {
@@ -259,8 +281,8 @@ public class LibraryUpdateTask extends Job {
 						try {
 							playbackEngine = EngineFactory.makePlaybackEngine();
 						} catch (Exception e) {
-							monitor.done();
-							return new FailStatus("Failed to create playback engine instance.", e);
+							taskEventListener.done();
+							return new TaskResult(TaskOutcome.FAILED, "Failed to create playback engine instance.", e);
 						}
 					}
 					try {
@@ -268,14 +290,14 @@ public class LibraryUpdateTask extends Job {
 						if (d>0) library.setTrackDuration(mi, d);
 					} catch (Throwable t) {
 						// FIXME log this somewhere useful.
-						appendToConsole(library.getListName(), "Throwable while reading metadata for '"+mi.getFilepath()+"': " + t.getMessage());
+						taskEventListener.logMsg(library.getListName(), "Throwable while reading metadata for '"+mi.getFilepath()+"': " + t.getMessage());
 					}
 				}
 				
 			} else { // The file is missing.
 				if (!mi.isMissing()) {
 					try {
-						appendToConsole(library.getListName(), "[MISSING] " + mi.getFilepath());
+						taskEventListener.logMsg(library.getListName(), "[MISSING] " + mi.getFilepath());
 						library.setTrackMissing(mi, true);
 					} catch (Throwable t) {
 						// FIXME log this somewhere useful.
@@ -287,7 +309,7 @@ public class LibraryUpdateTask extends Job {
 			n++;
 			int p = (n * 100) / N;
 			if (p > progress) {
-				monitor.worked(p - progress);
+				taskEventListener.worked(p - progress);
 				progress = p;
 			}
 		} // End metadata scanning.
@@ -299,18 +321,18 @@ public class LibraryUpdateTask extends Job {
 		/*
 		 * Check for duplicates.
 		 */
-		monitor.subTask("Scanning for duplicates");
+		taskEventListener.subTask("Scanning for duplicates");
 		
 		Map<MediaItem, ScanOption> dupicateItems = new HashMap<MediaItem, ScanOption>();
 		
 		List<MediaItem> tracks = library.getMediaTracks();
 		for (int i = 0; i < tracks.size(); i++) {
-			if (monitor.isCanceled()) break;
+			if (taskEventListener.isCanceled()) break;
 			
 			if (tracks.get(i).getHashcode() != 0) {
 				boolean a = new File(tracks.get(i).getFilepath()).exists();
 				for (int j = i + 1; j < tracks.size(); j++) {
-					if (monitor.isCanceled()) break;
+					if (taskEventListener.isCanceled()) break;
 					
 					if (tracks.get(j).getHashcode() != 0) {
 						if (tracks.get(i).getHashcode() == tracks.get(j).getHashcode()) {
@@ -347,7 +369,7 @@ public class LibraryUpdateTask extends Job {
 		} // End duplicate item scanning.
 		
 		if (dupicateItems.size() > 0) {
-			monitor.subTask("Merging duplicate items");
+			taskEventListener.subTask("Merging duplicate items");
 			
 			/*
 			 * Make a list of all the unique hashcodes we know.
@@ -364,7 +386,7 @@ public class LibraryUpdateTask extends Job {
 			 * Resolve each unique hashcode.
 			 */
 			for (Long l : hashcodes) {
-				if (monitor.isCanceled()) break;
+				if (taskEventListener.isCanceled()) break;
 				
 				/*
 				 * Find all the entries for this hashcode.
@@ -420,7 +442,7 @@ public class LibraryUpdateTask extends Job {
 							}
 							
 							library.removeMediaTrack(i);
-							appendToConsole(library.getListName(), "[REMOVED] " + i.getFilepath());
+							taskEventListener.logMsg(library.getListName(), "[REMOVED] " + i.getFilepath());
 							
 						} catch (Throwable t) {
 							// FIXME log this somewhere useful.
@@ -445,24 +467,24 @@ public class LibraryUpdateTask extends Job {
 			/*
 			 * Print out what are left with.
 			 */
-			appendToConsole(library.getListName(), "Found " + dupicateItems.size() + " duplicate items:");
+			taskEventListener.logMsg(library.getListName(), "Found " + dupicateItems.size() + " duplicate items:");
 			for (Entry<MediaItem, ScanOption> e : dupicateItems.entrySet()) {
-				appendToConsole(library.getListName(), e.getValue() + " : " + e.getKey().getTitle());
+				taskEventListener.logMsg(library.getListName(), e.getValue() + " : " + e.getKey().getTitle());
 			}
 			
 		} else {
-			appendToConsole(library.getListName(), "No duplicates found.");
+			taskEventListener.logMsg(library.getListName(), "No duplicates found.");
 		}
 		
 		// TODO : vacuum DB?
 		
-		if (monitor.isCanceled()) {
-			appendToConsole(library.getListName(), "Task was canceled desu~.");
+		if (taskEventListener.isCanceled()) {
+			taskEventListener.logMsg(library.getListName(), "Task was canceled desu~.");
 		}
 		
 		isFinished = true;
-		monitor.done();
-		return Status.OK_STATUS;
+		taskEventListener.done();
+		return new TaskResult(TaskOutcome.SUCCESS);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -473,65 +495,6 @@ public class LibraryUpdateTask extends Job {
 			if (e.getValue().equals(value)) n++;
 		}
 		return n;
-	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	static public class FailStatus implements IStatus {
-		
-		private final String message;
-		private final Exception e;
-
-		public FailStatus (String message, Exception e) {
-			this.message = message;
-			this.e = e;
-		}
-		
-		@Override
-		public IStatus[] getChildren() {
-			return null;
-		}
-		
-		@Override
-		public int getCode() {
-			return 0;
-		}
-		
-		@Override
-		public Throwable getException() {
-			return e;
-		}
-		
-		@Override
-		public String getMessage() {
-			return message;
-		}
-		
-		@Override
-		public String getPlugin() {
-			return null;
-		}
-		
-		@Override
-		public int getSeverity() {
-			return 0;
-		}
-		
-		@Override
-		public boolean isMultiStatus() {
-			return false;
-		}
-		
-		@Override
-		public boolean isOK() {
-			return false;
-		}
-		
-		@Override
-		public boolean matches(int severityMask) {
-			return false;
-		}
-		
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
