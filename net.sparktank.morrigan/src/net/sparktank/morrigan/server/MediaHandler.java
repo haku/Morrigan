@@ -20,12 +20,12 @@ import net.sparktank.morrigan.model.library.DbException;
 import net.sparktank.morrigan.model.library.LibraryHelper;
 import net.sparktank.morrigan.model.library.LibraryUpdateTask;
 import net.sparktank.morrigan.model.library.MediaLibrary;
+import net.sparktank.morrigan.model.library.LibraryUpdateTask.TaskEventListener;
 import net.sparktank.morrigan.model.playlist.MediaPlaylist;
 import net.sparktank.morrigan.model.playlist.PlaylistHelper;
 import net.sparktank.morrigan.player.Player;
 import net.sparktank.morrigan.player.PlayerRegister;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 
@@ -187,7 +187,10 @@ public class MediaHandler extends AbstractHandler {
 		
 		sb.append("<h2>" + ml.getListName() + "</h2>");
 		
-		sb.append("<p><a href=\"/media/library/" + id + "/src\">src</a></p>");
+		sb.append("<form action=\"\" method=\"POST\">");
+		sb.append("<input type=\"submit\" name=\"cmd\" value=\"scan\">");
+		sb.append("</form>");
+		sb.append("<p><a href=\"/media/library/" + id + "/src\">edit src</a></p>");
 		
 		sb.append("<ul>");
 		for (MediaItem i : mediaTracks) {
@@ -225,36 +228,47 @@ public class MediaHandler extends AbstractHandler {
 		String f = LibraryHelper.getFullPathToLib(id);
 		final MediaLibrary ml = MediaListFactory.makeMediaLibrary(f);
 		
-		final LibraryUpdateTask job = LibraryUpdateTask.factory(ml);
-		if (job != null) {
-			job.setInRcp(false);
+		final LibraryUpdateTask task = LibraryUpdateTask.factory(ml);
+		if (task != null) {
 			
 			Thread t = new Thread () {
 				@Override
 				public void run() {
-					job.run(new LibScanMon(ml.getListName()));
+					task.run(new LibScanMon(ml.getListName()));
 				}
 			};
 			t.start();
 			System.err.println("Scan of " + id + " scheduled on thread " + t.getId() + ".");
 			
 		} else {
-			System.err.println("Failed to get job object from factory method.");
+			System.err.println("Failed to get task object from factory method.");
 		}
 	}
 	
-	static class LibScanMon implements IProgressMonitor {
+	static class LibScanMon implements TaskEventListener {
 		
 		private final String logPrefix;
 		private int totalWork = 0;
 		private int workDone = 0;
-		private String taskName;
 		private boolean canceled;
-		private String subTaskName;
-
+		
 		public LibScanMon (String logPrefix) {
 			this.logPrefix = logPrefix;
 		}
+		
+		@Override
+		public void logMsg(String topic, String s) {
+			StringBuilder sb = new StringBuilder();
+			sb.append("[");
+			sb.append(topic);
+			sb.append("] ");
+			sb.append(s);
+			
+			System.out.println(sb.toString());
+		}
+
+		@Override
+		public void onStart() {}
 		
 		@Override
 		public void beginTask(String name, int totalWork) {
@@ -268,21 +282,8 @@ public class MediaHandler extends AbstractHandler {
 		}
 
 		@Override
-		public void setTaskName(String name) {
-			this.taskName = name;
-			System.out.println("[" + logPrefix + "] task: "+name+".");
-		}
-		
-		@Override
 		public void subTask(String name) {
-			this.subTaskName = name;
 			System.out.println("[" + logPrefix + "] sub task: "+name+".");
-		}
-
-		@Override
-		public void setCanceled(boolean value) {
-			System.out.println("[" + logPrefix + "] canceled = "+value+".");
-			this.canceled = value;
 		}
 		
 		@Override
@@ -295,9 +296,6 @@ public class MediaHandler extends AbstractHandler {
 			workDone = workDone + work;
 			System.out.println("[" + logPrefix + "] worked " + workDone + " of " + totalWork + ".");
 		}
-		
-		@Override
-		public void internalWorked(double work) {}
 		
 	}
 	
