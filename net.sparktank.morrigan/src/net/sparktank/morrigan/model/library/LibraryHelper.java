@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 import net.sparktank.morrigan.config.Config;
 import net.sparktank.morrigan.exceptions.MorriganException;
-import net.sparktank.morrigan.gui.model.MediaExplorerItem;
+import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
 import net.sparktank.morrigan.model.MediaListFactory;
 
 public class LibraryHelper {

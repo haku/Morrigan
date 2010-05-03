@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.gui.helpers;
+package net.sparktank.morrigan.helpers;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
