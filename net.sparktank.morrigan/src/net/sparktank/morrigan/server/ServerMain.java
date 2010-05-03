@@ -1,7 +1,7 @@
 package net.sparktank.morrigan.server;
 
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine.PlayState;
-import net.sparktank.morrigan.gui.helpers.ErrorHelper;
+import net.sparktank.morrigan.helpers.ErrorHelper;
 import net.sparktank.morrigan.model.MediaList;
 import net.sparktank.morrigan.model.playlist.PlayItem;
 import net.sparktank.morrigan.player.IPlayerEventHandler;

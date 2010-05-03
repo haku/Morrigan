@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.gui.model;
+package net.sparktank.morrigan.model.explorer;
 
 public class MediaExplorerItem extends MenuItem {
 	
