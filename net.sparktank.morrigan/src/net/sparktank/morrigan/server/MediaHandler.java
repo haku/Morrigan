@@ -12,10 +12,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.ErrorHelper;
-import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
+import net.sparktank.morrigan.helpers.TimeHelper;
 import net.sparktank.morrigan.model.MediaItem;
 import net.sparktank.morrigan.model.MediaList;
 import net.sparktank.morrigan.model.MediaListFactory;
+import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
 import net.sparktank.morrigan.model.library.DbException;
 import net.sparktank.morrigan.model.library.LibraryHelper;
 import net.sparktank.morrigan.model.library.LibraryUpdateTask;
@@ -214,12 +215,37 @@ public class MediaHandler extends AbstractHandler {
 		sb.append("</form>");
 		sb.append("<p><a href=\"/media/library/" + id + "/src\">edit src</a></p>");
 		
-		sb.append("<ul>");
+		sb.append("<table>");
 		for (MediaItem i : mediaTracks) {
 			// FIXME put actual track ID here.
-			sb.append("<li><a href=\"/media/library/" + id + "/00000\">" + i.getTitle() + "</a></li>");
+			
+			sb.append("<tr>");
+			
+			sb.append("<td><a href=\"/media/library/");
+			sb.append(id);
+			sb.append("/00000\">");
+			sb.append(i.getTitle());
+			sb.append("</a></td>");
+			
+			sb.append("<td>");
+			if (i.getStartCount() > 0 || i.getStartCount() > 0) {
+				sb.append(String.valueOf(i.getStartCount()) + "/" + String.valueOf(i.getEndCount()));
+			}
+			sb.append("</td>");
+			
+			sb.append("<td>");
+			sb.append(TimeHelper.formatTime(i.getDuration()));
+			sb.append("</td>");
+			
+			sb.append("<td>");
+			sb.append(Long.toHexString(i.getHashcode()));
+			sb.append("</td>");
+			
+			sb.append("");
+			
+			sb.append("</tr>");
 		}
-		sb.append("</ul>");
+		sb.append("</table>");
 	}
 	
 	private void printLibSrc (String id, MediaLibrary ml, StringBuilder sb) throws MorriganException {
