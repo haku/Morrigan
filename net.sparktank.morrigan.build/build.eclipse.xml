@@ -63,10 +63,10 @@
 			<fileset dir="${buildDirectory}/${buildLabel}" includes="*.zip" />
 		</move>
 
-		<!-- Package headless server. -->
+		<!-- Build server jar. -->
 		<antcall target="buildserver" />
-
-		<!-- Build engines. -->
+		
+		<!-- Build outputs. -->
 		<antcall target="zip_win32" />
 		<antcall target="zip_linux" />
 		<antcall target="zip_mac" />
