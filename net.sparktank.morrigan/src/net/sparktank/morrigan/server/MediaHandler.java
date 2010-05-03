@@ -11,8 +11,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
-import net.sparktank.morrigan.gui.helpers.ErrorHelper;
-import net.sparktank.morrigan.gui.model.MediaExplorerItem;
+import net.sparktank.morrigan.helpers.ErrorHelper;
+import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
 import net.sparktank.morrigan.model.MediaItem;
 import net.sparktank.morrigan.model.MediaList;
 import net.sparktank.morrigan.model.MediaListFactory;
@@ -70,7 +70,18 @@ public class MediaHandler extends AbstractHandler {
 								
 								sb = getLibSrc(id);
 							}
+							
 						} else {
+							if (request.getMethod().equals("POST")) {
+								Map<?,?> m = request.getParameterMap();
+								if (m.containsKey("cmd")) {
+									String[] v = (String[]) m.get("cmd");
+									if (v[0].equals("scan")) {
+										scheduleLibScan(id);
+									}
+								}
+							}
+							
 							sb = getLibrary(id);
 						}
 						
