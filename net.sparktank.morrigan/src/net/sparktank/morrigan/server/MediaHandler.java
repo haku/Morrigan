@@ -36,11 +36,18 @@ public class MediaHandler extends AbstractHandler {
 		System.err.println("request:t=" + target + ", m=" + request.getMethod());
 		
 		response.getWriter().println("<h1>Media desu~</h1>");
-		response.getWriter().println("<p><a href=\"/\">home</a></p>");
+		response.getWriter().println("<p><a href=\"/\">home</a> / <a href=\"/media\">media</a></p>");
 		
 		StringBuilder sb = null;
 		try {
 			if (target.equals("/")) {
+				if (request.getMethod().equals("POST")) {
+					Map<?,?> m = request.getParameterMap();
+					if (m.containsKey("name")) {
+						String[] v = (String[]) m.get("name");
+						LibraryHelper.createLib(v[0]);
+					}
+				}
 				sb = getMediaLists();
 				
 			} else {
@@ -117,6 +124,10 @@ public class MediaHandler extends AbstractHandler {
 			switch (n) {
 				case 0:
 					sb.append("<h2>Libraries</h2>");
+					sb.append("<form action=\"\" method=\"POST\">");
+					sb.append("<input type=\"text\" name=\"name\" >");
+					sb.append("<input type=\"submit\" name=\"cmd\" value=\"newlib\">");
+					sb.append("</form>");
 					type="library";
 					items.addAll(LibraryHelper.getAllLibraries());
 					break;
