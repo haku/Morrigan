@@ -43,7 +43,7 @@ public class MediaListFeed extends GenericFeed {
 			
 			String file;
 			try {
-				file = URLEncoder.encode(filenameFromPath(mi.getFilepath()), "UTF-8");
+				file = URLEncoder.encode(mi.getFilepath(), "UTF-8");
 			} catch (UnsupportedEncodingException e) {
 				throw new RuntimeException(e);
 			}
