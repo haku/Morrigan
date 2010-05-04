@@ -1,14 +1,12 @@
 package net.sparktank.morrigan.server;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.ErrorHelper;
 import net.sparktank.morrigan.model.MediaListFactory;
 import net.sparktank.morrigan.model.library.DbException;
@@ -18,6 +16,7 @@ import net.sparktank.morrigan.model.library.MediaLibrary;
 import net.sparktank.morrigan.model.library.LibraryUpdateTask.TaskEventListener;
 import net.sparktank.morrigan.model.playlist.MediaPlaylist;
 import net.sparktank.morrigan.model.playlist.PlaylistHelper;
+import net.sparktank.morrigan.server.helpers.LibrarySrcFeed;
 import net.sparktank.morrigan.server.helpers.MediaFeed;
 import net.sparktank.morrigan.server.helpers.MediaListFeed;
 
@@ -30,72 +29,46 @@ public class MediaHandler extends AbstractHandler {
 	public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 		System.err.println("request:t=" + target + ", m=" + request.getMethod());
 		
-//		response.getWriter().println("<h1>Media desu~</h1>");
-//		response.getWriter().println("<p><a href=\"/\">home</a> / <a href=\"/media\">media</a></p>");
-		
-		StringBuilder sb = null;
+		StringBuilder sb = new StringBuilder();
 		try {
 			if (target.equals("/")) {
-				if (request.getMethod().equals("POST")) {
-					Map<?,?> m = request.getParameterMap();
-					if (m.containsKey("name")) {
-						String[] v = (String[]) m.get("name");
-						LibraryHelper.createLib(v[0]);
-					}
-				}
-				sb = getMediaLists();
+				sb.append(new MediaFeed().getXmlString());
 				
 			} else {
 				String r = target.substring(1);
 				
 				if (r.contains("/")) {
 					String[] split = r.split("/");
-					String type = split[0];
+					String type = split[0].toLowerCase();
 					String id = split[1];
 					
 					if (type.equals("library")) {
 						if (split.length > 2) {
 							String param = split[2];
 							if (param.equals("src")) {
-								if (request.getMethod().equals("POST")) {
-									Map<?,?> m = request.getParameterMap();
-									if (m.containsKey("dir")) {
-										String[] v = (String[]) m.get("dir");
-										addLibSrc(id, v[0]);
-									} else if (m.containsKey("cmd")) {
-										String[] v = (String[]) m.get("cmd");
-										if (v[0].equals("scan")) {
-											scheduleLibScan(id);
-										}
-									}
-								}
-								
-								sb = getLibSrc(id);
+								String f = LibraryHelper.getFullPathToLib(id);
+								MediaLibrary ml = MediaListFactory.makeMediaLibrary(f);
+								sb.append(new LibrarySrcFeed(ml).getXmlString());
 							}
 							
 						} else {
-							if (request.getMethod().equals("POST")) {
-								Map<?,?> m = request.getParameterMap();
-								if (m.containsKey("cmd")) {
-									String[] v = (String[]) m.get("cmd");
-									if (v[0].equals("scan")) {
-										scheduleLibScan(id);
-									}
-								}
-							}
-							
-							sb = getLibrary(id);
+							String f = LibraryHelper.getFullPathToLib(id);
+							MediaLibrary ml = MediaListFactory.makeMediaLibrary(f);
+							MediaListFeed libraryFeed = new MediaListFeed(ml);
+							sb.append(libraryFeed.getXmlString());
 						}
 						
 					} else if (type.equals("playlist")) {
-						sb = getPlaylist(id);
+						String f = PlaylistHelper.getFullPathToPlaylist(id);
+						MediaPlaylist ml = MediaListFactory.makeMediaPlaylist(f);
+						MediaListFeed libraryFeed = new MediaListFeed(ml);
+						sb.append(libraryFeed.getXmlString());
 					}
 				}
 				
 			}
 			
 		} catch (Throwable t) {
-			sb = new StringBuilder();
 			sb.append(ErrorHelper.getStackTrace(t));
 		}
 		
@@ -109,72 +82,11 @@ public class MediaHandler extends AbstractHandler {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private StringBuilder getMediaLists () {
-		StringBuilder sb = new StringBuilder();
-		MediaFeed mediaFeed = new MediaFeed();
-		sb.append(mediaFeed.getXmlString());
-		return sb;
-	}
-	
-	private StringBuilder getLibrary (String id) throws MorriganException {
-		StringBuilder sb = new StringBuilder();
-		String f = LibraryHelper.getFullPathToLib(id);
-		MediaLibrary ml = MediaListFactory.makeMediaLibrary(f);
-		
-		MediaListFeed libraryFeed = new MediaListFeed(ml);
-		sb.append(libraryFeed.getXmlString());
-		
-		return sb;
-	}
-	
-	private StringBuilder getPlaylist (String id) throws MorriganException {
-		StringBuilder sb = new StringBuilder();
-		String f = PlaylistHelper.getFullPathToPlaylist(id);
-		MediaPlaylist ml = MediaListFactory.makeMediaPlaylist(f);
-		
-		MediaListFeed libraryFeed = new MediaListFeed(ml);
-		sb.append(libraryFeed.getXmlString());
-		
-		return sb;
-	}
-	
-	private StringBuilder getLibSrc (String id) throws MorriganException {
-		StringBuilder sb = new StringBuilder();
-		String f = LibraryHelper.getFullPathToLib(id);
-		MediaLibrary ml = MediaListFactory.makeMediaLibrary(f);
-		printLibSrc(id, ml, sb);
-		return sb;
-	}
-	
 	private void addLibSrc (String id, String dir) throws DbException {
 		String f = LibraryHelper.getFullPathToLib(id);
 		MediaLibrary ml = MediaListFactory.makeMediaLibrary(f);
 		ml.addSource(dir);
 		System.err.println("Added src '"+dir+"'.");
-	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	private void printLibSrc (String id, MediaLibrary ml, StringBuilder sb) throws MorriganException {
-		sb.append("<h2>" + ml.getListName() + " src</h2>");
-		
-		sb.append("<form action=\"\" method=\"POST\">");
-		sb.append("<input type=\"text\" name=\"dir\" >");
-		sb.append("<input type=\"submit\" name=\"cmd\" value=\"add\">");
-		sb.append("</form>");
-		
-		sb.append("<form action=\"\" method=\"POST\">");
-		sb.append("<input type=\"submit\" name=\"cmd\" value=\"scan\">");
-		sb.append("</form>");
-		
-		List<String> src = ml.getSources();
-		sb.append("<ul>");
-		for (String s : src) {
-			sb.append("<li>");
-			sb.append(s);
-			sb.append("</li>");
-		}
-		sb.append("</ul>");
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
