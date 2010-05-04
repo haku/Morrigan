@@ -26,6 +26,7 @@ import net.sparktank.morrigan.model.playlist.MediaPlaylist;
 import net.sparktank.morrigan.model.playlist.PlaylistHelper;
 import net.sparktank.morrigan.player.Player;
 import net.sparktank.morrigan.player.PlayerRegister;
+import net.sparktank.morrigan.server.helpers.*;
 
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
@@ -175,7 +176,11 @@ public class MediaHandler extends AbstractHandler {
 		StringBuilder sb = new StringBuilder();
 		String f = LibraryHelper.getFullPathToLib(id);
 		MediaLibrary ml = MediaListFactory.makeMediaLibrary(f);
-		printMediaList(id, ml, sb);
+//		printMediaList(id, ml, sb);
+		
+		LibraryFeed libraryFeed = new LibraryFeed(ml);
+		sb.append(libraryFeed.getXmlString());
+		
 		return sb;
 	}
 	
