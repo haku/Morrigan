@@ -47,14 +47,15 @@ public class MediaListFeed extends GenericFeed {
 			} catch (UnsupportedEncodingException e) {
 				throw new RuntimeException(e);
 			}
-				
-				addElement(doc, entry, "title", mi.getTitle());
-				addLink(doc, entry, "/media/" + ml.getType() + "/" + filenameFromPath(ml.getListId()) + "/" + file);
-				addLink(doc, entry, "/player/0/play/" + listFile + "/" + file, "play"); // FIXME list all players here.
-				addElement(doc, entry, "duration", mi.getDuration());
-				addElement(doc, entry, "hash", mi.getHashcode());
-				addElement(doc, entry, "startcount", mi.getStartCount());
-				addElement(doc, entry, "endcount", mi.getEndCount());
+			
+			addElement(doc, entry, "title", mi.getTitle());
+			addLink(doc, entry, "/media/" + ml.getType() + "/" + filenameFromPath(ml.getListId()) + "/" + file);
+			addLink(doc, entry, "/player/0/play/" + listFile + "/" + file, "play"); // FIXME list all players here.
+			addElement(doc, entry, "duration", mi.getDuration());
+			addElement(doc, entry, "hash", mi.getHashcode());
+			addElement(doc, entry, "startcount", mi.getStartCount());
+			addElement(doc, entry, "endcount", mi.getEndCount());
+			
 			feed.appendChild(entry);
 		}
 	}

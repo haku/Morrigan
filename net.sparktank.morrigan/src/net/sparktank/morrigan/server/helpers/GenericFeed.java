@@ -26,7 +26,6 @@ public class GenericFeed {
 	
 	public GenericFeed () {
 		doc = XmlHelper.getDocumentBuilder().newDocument();
-		
 		Element e = doc.createElement("feed");
 		doc.appendChild(e);
 	}
@@ -49,6 +48,7 @@ public class GenericFeed {
 			throw new RuntimeException(e);
 		}
 		transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+		transformer.setOutputProperty(OutputKeys.STANDALONE, "yes");
 		
 		StreamResult result = new StreamResult(new StringWriter());
 		DOMSource source = new DOMSource(getDoc());
