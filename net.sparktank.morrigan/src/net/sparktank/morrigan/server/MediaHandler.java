@@ -36,6 +36,7 @@ public class MediaHandler extends AbstractHandler {
 				
 			} else {
 				String r = target.substring(1);
+				Map<?,?> paramMap = request.getParameterMap();
 				
 				if (r.contains("/")) {
 					String[] split = r.split("/");
@@ -43,17 +44,42 @@ public class MediaHandler extends AbstractHandler {
 					String id = split[1];
 					
 					if (type.equals("library")) {
+						String f = LibraryHelper.getFullPathToLib(id);
+						MediaLibrary ml = MediaListFactory.makeMediaLibrary(f);
+						
 						if (split.length > 2) {
 							String param = split[2];
 							if (param.equals("src")) {
-								String f = LibraryHelper.getFullPathToLib(id);
-								MediaLibrary ml = MediaListFactory.makeMediaLibrary(f);
-								sb.append(new LibrarySrcFeed(ml).getXmlString());
+								if (split.length > 3) {
+									String cmd = split[3];
+									if (cmd.equals("add")) {
+										if (paramMap.containsKey("dir")) {
+											String[] v = (String[]) paramMap.get("dir");
+											ml.addSource(v[0]);
+											sb.append("Added src '"+v[0]+"'.");
+										}
+									} else if (cmd.equals("remove")) {
+										if (paramMap.containsKey("dir")) {
+											String[] v = (String[]) paramMap.get("dir");
+											ml.removeSource(v[0]);
+											sb.append("Removed src '"+v[0]+"'.");
+										}
+									}
+									
+								} else {
+									sb.append(new LibrarySrcFeed(ml).getXmlString());
+								}
+								
+							} else if (param.equals("scan")) {
+								if (scheduleLibScan(ml)) {
+									sb.append("Scan scheduled.");
+								} else {
+									sb.append("Failed to schedule scan.");
+								}
+								
 							}
 							
 						} else {
-							String f = LibraryHelper.getFullPathToLib(id);
-							MediaLibrary ml = MediaListFactory.makeMediaLibrary(f);
 							MediaListFeed libraryFeed = new MediaListFeed(ml);
 							sb.append(libraryFeed.getXmlString());
 						}
@@ -82,19 +108,7 @@ public class MediaHandler extends AbstractHandler {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private void addLibSrc (String id, String dir) throws DbException {
-		String f = LibraryHelper.getFullPathToLib(id);
-		MediaLibrary ml = MediaListFactory.makeMediaLibrary(f);
-		ml.addSource(dir);
-		System.err.println("Added src '"+dir+"'.");
-	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	private void scheduleLibScan (String id) throws DbException {
-		String f = LibraryHelper.getFullPathToLib(id);
-		final MediaLibrary ml = MediaListFactory.makeMediaLibrary(f);
-		
+	private boolean scheduleLibScan (final MediaLibrary ml) throws DbException {
 		final LibraryUpdateTask task = LibraryUpdateTask.factory(ml);
 		if (task != null) {
 			
@@ -105,10 +119,12 @@ public class MediaHandler extends AbstractHandler {
 				}
 			};
 			t.start();
-			System.err.println("Scan of " + id + " scheduled on thread " + t.getId() + ".");
+			System.err.println("Scan of " + ml.getListId() + " scheduled on thread " + t.getId() + ".");
+			return true;
 			
 		} else {
 			System.err.println("Failed to get task object from factory method.");
+			return false;
 		}
 	}
 	
