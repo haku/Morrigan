@@ -12,9 +12,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.ErrorHelper;
-import net.sparktank.morrigan.helpers.TimeHelper;
-import net.sparktank.morrigan.model.MediaItem;
-import net.sparktank.morrigan.model.MediaList;
 import net.sparktank.morrigan.model.MediaListFactory;
 import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
 import net.sparktank.morrigan.model.library.DbException;
@@ -26,7 +23,7 @@ import net.sparktank.morrigan.model.playlist.MediaPlaylist;
 import net.sparktank.morrigan.model.playlist.PlaylistHelper;
 import net.sparktank.morrigan.player.Player;
 import net.sparktank.morrigan.player.PlayerRegister;
-import net.sparktank.morrigan.server.helpers.*;
+import net.sparktank.morrigan.server.helpers.MediaListFeed;
 
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
@@ -176,9 +173,8 @@ public class MediaHandler extends AbstractHandler {
 		StringBuilder sb = new StringBuilder();
 		String f = LibraryHelper.getFullPathToLib(id);
 		MediaLibrary ml = MediaListFactory.makeMediaLibrary(f);
-//		printMediaList(id, ml, sb);
 		
-		LibraryFeed libraryFeed = new LibraryFeed(ml);
+		MediaListFeed libraryFeed = new MediaListFeed(ml);
 		sb.append(libraryFeed.getXmlString());
 		
 		return sb;
@@ -188,7 +184,10 @@ public class MediaHandler extends AbstractHandler {
 		StringBuilder sb = new StringBuilder();
 		String f = PlaylistHelper.getFullPathToPlaylist(id);
 		MediaPlaylist ml = MediaListFactory.makeMediaPlaylist(f);
-		printMediaList(id, ml, sb);
+		
+		MediaListFeed libraryFeed = new MediaListFeed(ml);
+		sb.append(libraryFeed.getXmlString());
+		
 		return sb;
 	}
 	
@@ -208,50 +207,6 @@ public class MediaHandler extends AbstractHandler {
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	private void printMediaList (String id, MediaList ml, StringBuilder sb) throws MorriganException {
-		ml.read();
-		List<MediaItem> mediaTracks = ml.getMediaTracks();
-		
-		sb.append("<h2>" + ml.getListName() + "</h2>");
-		
-		sb.append("<form action=\"\" method=\"POST\">");
-		sb.append("<input type=\"submit\" name=\"cmd\" value=\"scan\">");
-		sb.append("</form>");
-		sb.append("<p><a href=\"/media/library/" + id + "/src\">edit src</a></p>");
-		
-		sb.append("<table>");
-		for (MediaItem i : mediaTracks) {
-			// FIXME put actual track ID here.
-			
-			sb.append("<tr>");
-			
-			sb.append("<td><a href=\"/media/library/");
-			sb.append(id);
-			sb.append("/00000\">");
-			sb.append(i.getTitle());
-			sb.append("</a></td>");
-			
-			sb.append("<td>");
-			if (i.getStartCount() > 0 || i.getStartCount() > 0) {
-				sb.append(String.valueOf(i.getStartCount()) + "/" + String.valueOf(i.getEndCount()));
-			}
-			sb.append("</td>");
-			
-			sb.append("<td>");
-			sb.append(TimeHelper.formatTime(i.getDuration()));
-			sb.append("</td>");
-			
-			sb.append("<td>");
-			sb.append(Long.toHexString(i.getHashcode()));
-			sb.append("</td>");
-			
-			sb.append("");
-			
-			sb.append("</tr>");
-		}
-		sb.append("</table>");
-	}
 	
 	private void printLibSrc (String id, MediaLibrary ml, StringBuilder sb) throws MorriganException {
 		sb.append("<h2>" + ml.getListName() + " src</h2>");
