@@ -1,6 +1,5 @@
 package net.sparktank.morrigan.server.helpers;
 
-import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
@@ -8,7 +7,6 @@ import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.MediaItem;
 import net.sparktank.morrigan.model.MediaList;
 
-import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -59,46 +57,6 @@ public class MediaListFeed extends GenericFeed {
 				addElement(doc, entry, "endcount", mi.getEndCount());
 			feed.appendChild(entry);
 		}
-	}
-	
-	static private void addElement (Document doc, Node element, String newElement, int i) {
-		addElement(doc, element, newElement, String.valueOf(i));
-	}
-	
-	static private void addElement (Document doc, Node element, String newElement, long l) {
-		addElement(doc, element, newElement, String.valueOf(l));
-	}
-	
-	static private void addElement (Document doc, Node element, String newElement, String textContent) {
-		Element e = doc.createElement(newElement);
-		e.setTextContent(textContent);
-		element.appendChild(e);
-	}
-	
-	static private void addLink (Document doc, Node element, String href) {
-		addLink(doc, element, href, null);
-	}
-	
-	static private void addLink (Document doc, Node element, String href, String rel) {
-		Element link = doc.createElement("link");
-		
-		if (rel != null) {
-			Attr attRel = doc.createAttribute("rel");
-			attRel.setValue(rel);
-			link.getAttributes().setNamedItem(attRel);
-		}
-		
-		Attr attHref = doc.createAttribute("href");
-		attHref.setValue(href);
-		link.getAttributes().setNamedItem(attHref);
-		
-		element.appendChild(link);
-	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	static private String filenameFromPath (String path) {
-		return path.substring(path.lastIndexOf(File.separator) + 1);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

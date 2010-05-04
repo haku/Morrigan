@@ -1,8 +1,6 @@
 package net.sparktank.morrigan.server;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -13,7 +11,6 @@ import javax.servlet.http.HttpServletResponse;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.ErrorHelper;
 import net.sparktank.morrigan.model.MediaListFactory;
-import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
 import net.sparktank.morrigan.model.library.DbException;
 import net.sparktank.morrigan.model.library.LibraryHelper;
 import net.sparktank.morrigan.model.library.LibraryUpdateTask;
@@ -21,8 +18,7 @@ import net.sparktank.morrigan.model.library.MediaLibrary;
 import net.sparktank.morrigan.model.library.LibraryUpdateTask.TaskEventListener;
 import net.sparktank.morrigan.model.playlist.MediaPlaylist;
 import net.sparktank.morrigan.model.playlist.PlaylistHelper;
-import net.sparktank.morrigan.player.Player;
-import net.sparktank.morrigan.player.PlayerRegister;
+import net.sparktank.morrigan.server.helpers.MediaFeed;
 import net.sparktank.morrigan.server.helpers.MediaListFeed;
 
 import org.eclipse.jetty.server.Request;
@@ -34,8 +30,8 @@ public class MediaHandler extends AbstractHandler {
 	public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 		System.err.println("request:t=" + target + ", m=" + request.getMethod());
 		
-		response.getWriter().println("<h1>Media desu~</h1>");
-		response.getWriter().println("<p><a href=\"/\">home</a> / <a href=\"/media\">media</a></p>");
+//		response.getWriter().println("<h1>Media desu~</h1>");
+//		response.getWriter().println("<p><a href=\"/\">home</a> / <a href=\"/media\">media</a></p>");
 		
 		StringBuilder sb = null;
 		try {
@@ -115,57 +111,8 @@ public class MediaHandler extends AbstractHandler {
 	
 	private StringBuilder getMediaLists () {
 		StringBuilder sb = new StringBuilder();
-		
-		for (int n = 0; n < 2; n++) {
-			ArrayList<MediaExplorerItem> items = new ArrayList<MediaExplorerItem>();
-			String type = null;
-			
-			switch (n) {
-				case 0:
-					sb.append("<h2>Libraries</h2>");
-					sb.append("<form action=\"\" method=\"POST\">");
-					sb.append("<input type=\"text\" name=\"name\" >");
-					sb.append("<input type=\"submit\" name=\"cmd\" value=\"newlib\">");
-					sb.append("</form>");
-					type="library";
-					items.addAll(LibraryHelper.getAllLibraries());
-					break;
-				
-				case 1:
-					sb.append("<h2>Playlists</h2>");
-					type="playlist";
-					items.addAll(PlaylistHelper.getAllPlaylists());
-					break;
-				
-			}
-			
-			List<Player> players = PlayerRegister.getPlayers();
-			
-			sb.append("<ul>");
-			for (MediaExplorerItem i : items) {
-				sb.append("<li><a href=\"/media/");
-				sb.append(type);
-				sb.append("/");
-				String fileName = i.identifier.substring(i.identifier.lastIndexOf(File.separator) + 1);
-				sb.append(fileName);
-				sb.append("\">");
-				sb.append(i.title);
-				sb.append("</a> ");
-				for (Player p : players) {
-					sb.append("[<a href=\"/player/");
-					sb.append(p.getId());
-					sb.append("/play/");
-					sb.append(fileName);
-					sb.append("\">play with p");
-					sb.append(p.getId());
-					sb.append("</a>]");
-				}
-				sb.append("</li>");
-			}
-			sb.append("</ul>");
-			
-		}
-		
+		MediaFeed mediaFeed = new MediaFeed();
+		sb.append(mediaFeed.getXmlString());
 		return sb;
 	}
 	
