@@ -24,7 +24,7 @@ import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 
 public class MediaHandler extends AbstractHandler {
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 		System.err.println("request:t=" + target + ", m=" + request.getMethod());
@@ -38,11 +38,11 @@ public class MediaHandler extends AbstractHandler {
 				String r = target.substring(1);
 				Map<?,?> paramMap = request.getParameterMap();
 				
-				if (r.contains("/")) {
-					String[] split = r.split("/");
-					String type = split[0].toLowerCase();
+				String[] split = r.split("/");
+				String type = split[0].toLowerCase();
+				
+				if (split.length > 1) {
 					String id = split[1];
-					
 					if (type.equals("library")) {
 						String f = LibraryHelper.getFullPathToLib(id);
 						MediaLibrary ml = MediaListFactory.makeMediaLibrary(f);
@@ -57,12 +57,16 @@ public class MediaHandler extends AbstractHandler {
 											String[] v = (String[]) paramMap.get("dir");
 											ml.addSource(v[0]);
 											sb.append("Added src '"+v[0]+"'.");
+										} else {
+											sb.append("To add a src, POST with param 'dir' set.");
 										}
 									} else if (cmd.equals("remove")) {
 										if (paramMap.containsKey("dir")) {
 											String[] v = (String[]) paramMap.get("dir");
 											ml.removeSource(v[0]);
 											sb.append("Removed src '"+v[0]+"'.");
+										} else {
+											sb.append("To remove a src, POST with param 'dir' set.");
 										}
 									}
 									
@@ -90,9 +94,16 @@ public class MediaHandler extends AbstractHandler {
 						MediaListFeed libraryFeed = new MediaListFeed(ml);
 						sb.append(libraryFeed.getXmlString());
 					}
+					
+				} else if (type.equals("newlib")) {
+					if (paramMap.containsKey("name")) {
+						String[] v = (String[]) paramMap.get("name");
+						LibraryHelper.createLib(v[0]);
+					} else {
+						sb.append("To create a library, POST with param 'name' set.");
+					}
 				}
-				
-			}
+			} 
 			
 		} catch (Throwable t) {
 			sb.append(ErrorHelper.getStackTrace(t));
@@ -106,7 +117,7 @@ public class MediaHandler extends AbstractHandler {
 		}
 	}
 	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private boolean scheduleLibScan (final MediaLibrary ml) throws DbException {
 		final LibraryUpdateTask task = LibraryUpdateTask.factory(ml);
@@ -149,7 +160,7 @@ public class MediaHandler extends AbstractHandler {
 			
 			System.out.println(sb.toString());
 		}
-
+		
 		@Override
 		public void onStart() {}
 		
@@ -158,12 +169,12 @@ public class MediaHandler extends AbstractHandler {
 			this.totalWork = totalWork;
 			System.out.println("[" + logPrefix + "] starting task: " + name + ".");
 		}
-
+		
 		@Override
 		public void done() {
 			System.out.println("[" + logPrefix + "] done.");
 		}
-
+		
 		@Override
 		public void subTask(String name) {
 			System.out.println("[" + logPrefix + "] sub task: "+name+".");
@@ -173,7 +184,7 @@ public class MediaHandler extends AbstractHandler {
 		public boolean isCanceled() {
 			return canceled;
 		}
-
+		
 		@Override
 		public void worked(int work) {
 			workDone = workDone + work;
@@ -182,5 +193,5 @@ public class MediaHandler extends AbstractHandler {
 		
 	}
 	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
