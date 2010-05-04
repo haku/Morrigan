@@ -36,6 +36,7 @@ public class LibrarySrcFeed extends GenericFeed {
 		addLink(doc, feed, "/media/" + ml.getType() + "/" + listFile + "/src", "self");
 		addLink(doc, feed, "/media/" + ml.getType() + "/" + listFile, "library");
 		addLink(doc, feed, "/media/" + ml.getType() + "/" + listFile + "/src/add", "add");
+		addLink(doc, feed, "/media/" + ml.getType() + "/" + listFile + "/src/remove", "remove");
 		
 		List<String> src = ml.getSources();
 		for (String s : src) {
