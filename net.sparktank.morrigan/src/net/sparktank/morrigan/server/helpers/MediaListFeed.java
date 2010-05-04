@@ -6,66 +6,80 @@ import java.net.URLEncoder;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.MediaItem;
-import net.sparktank.morrigan.model.library.MediaLibrary;
+import net.sparktank.morrigan.model.MediaList;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-public class LibraryFeed extends GenericFeed {
+public class MediaListFeed extends GenericFeed {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public LibraryFeed (MediaLibrary ml) throws MorriganException {
+	public MediaListFeed (MediaList ml) throws MorriganException {
 		super();
 		mediaLibraryToFeed(ml, getDoc());
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	static private void mediaLibraryToFeed (MediaLibrary ml, Document doc) throws MorriganException {
+	static private void mediaLibraryToFeed (MediaList ml, Document doc) throws MorriganException {
 		ml.read();
 		
-		Node firstChild = doc.getFirstChild(); // This should get the "feed" element.
+		String listFile;
+		try {
+			listFile = URLEncoder.encode(filenameFromPath(ml.getListId()), "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		}
+		
+		Node feed = doc.getFirstChild(); // This should get the "feed" element.
+		addElement(doc, feed, "title", ml.getListName());
+		addLink(doc, feed, "/media/" + ml.getType() + "/" + listFile, "self");
+		addLink(doc, feed, "/media/" + ml.getType() + "/" + listFile + "/src", "src");
+		addLink(doc, feed, "/media/" + ml.getType() + "/" + listFile + "/scan", "scan");
+		addLink(doc, feed, "/player/0/play/" + listFile, "play"); // FIXME list all players here.
 		
 		for (MediaItem mi : ml.getMediaTracks()) {
 			Element entry = doc.createElement("entry");
+			
+			String file;
 			try {
-				String file = URLEncoder.encode(filenameFromPath(mi.getFilepath()),"UTF-8");
+				file = URLEncoder.encode(filenameFromPath(mi.getFilepath()), "UTF-8");
+			} catch (UnsupportedEncodingException e) {
+				throw new RuntimeException(e);
+			}
 				
 				addElement(doc, entry, "title", mi.getTitle());
-				addLink(doc, entry, "/media/library/" + filenameFromPath(ml.getListId()) + "/" + file);
-				addLink(doc, entry, "/player/0/play/" + file, "play"); // FIXME list all players here.
+				addLink(doc, entry, "/media/" + ml.getType() + "/" + filenameFromPath(ml.getListId()) + "/" + file);
+				addLink(doc, entry, "/player/0/play/" + listFile + "/" + file, "play"); // FIXME list all players here.
 				addElement(doc, entry, "duration", mi.getDuration());
 				addElement(doc, entry, "hash", mi.getHashcode());
 				addElement(doc, entry, "startcount", mi.getStartCount());
 				addElement(doc, entry, "endcount", mi.getEndCount());
-			} catch (UnsupportedEncodingException e) {
-				throw new RuntimeException(e);
-			}
-			firstChild.appendChild(entry);
+			feed.appendChild(entry);
 		}
 	}
 	
-	static private void addElement (Document doc,Element element, String newElement, int i) {
+	static private void addElement (Document doc, Node element, String newElement, int i) {
 		addElement(doc, element, newElement, String.valueOf(i));
 	}
 	
-	static private void addElement (Document doc,Element element, String newElement, long l) {
+	static private void addElement (Document doc, Node element, String newElement, long l) {
 		addElement(doc, element, newElement, String.valueOf(l));
 	}
 	
-	static private void addElement (Document doc,Element element, String newElement, String textContent) {
+	static private void addElement (Document doc, Node element, String newElement, String textContent) {
 		Element e = doc.createElement(newElement);
 		e.setTextContent(textContent);
 		element.appendChild(e);
 	}
 	
-	static private void addLink (Document doc, Element element, String href) {
+	static private void addLink (Document doc, Node element, String href) {
 		addLink(doc, element, href, null);
 	}
 	
-	static private void addLink (Document doc, Element element, String href, String rel) {
+	static private void addLink (Document doc, Node element, String href, String rel) {
 		Element link = doc.createElement("link");
 		
 		if (rel != null) {
