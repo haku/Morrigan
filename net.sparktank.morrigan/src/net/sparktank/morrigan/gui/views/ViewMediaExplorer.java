@@ -4,11 +4,13 @@ import java.util.ArrayList;
 
 import net.sparktank.morrigan.gui.actions.NewLibraryAction;
 import net.sparktank.morrigan.gui.actions.NewPlaylistAction;
+import net.sparktank.morrigan.gui.actions.NewRemoteLibraryAction;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.handler.CallMediaListEditor;
 import net.sparktank.morrigan.gui.helpers.ImageCache;
 import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
 import net.sparktank.morrigan.model.library.LibraryHelper;
+import net.sparktank.morrigan.model.library.RemoteLibraryHelper;
 import net.sparktank.morrigan.model.playlist.PlaylistHelper;
 
 import org.eclipse.core.commands.common.CommandException;
@@ -132,12 +134,14 @@ public class ViewMediaExplorer extends ViewPart {
 	
 	private void addToolbar () {
 		getViewSite().getActionBars().getToolBarManager().add(new NewLibraryAction(getViewSite().getWorkbenchWindow()));
+		getViewSite().getActionBars().getToolBarManager().add(new NewRemoteLibraryAction(getViewSite().getWorkbenchWindow()));
 		getViewSite().getActionBars().getToolBarManager().add(new NewPlaylistAction(getViewSite().getWorkbenchWindow()));
 	}
 	
 	private void makeContent () {
 		items.clear();
 		items.addAll(LibraryHelper.getAllLibraries());
+		items.addAll(RemoteLibraryHelper.getAllRemoteLibraries());
 		items.addAll(PlaylistHelper.getAllPlaylists());
 	}
 	

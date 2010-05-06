@@ -2,7 +2,7 @@ package net.sparktank.morrigan.model.explorer;
 
 public class MediaExplorerItem extends MenuItem {
 	
-	public enum ItemType {DISPLAY, LIBRARY, PLAYLIST}
+	public enum ItemType {DISPLAY, LIBRARY, PLAYLIST, REMOTELIBRARY}
 	
 	public ItemType type = null;
 	
