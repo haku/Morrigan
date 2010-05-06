@@ -1,5 +1,4 @@
 package net.sparktank.morrigan.server;
-
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,8 +14,8 @@ import javax.servlet.http.HttpServletResponse;
 import net.sparktank.morrigan.helpers.ErrorHelper;
 import net.sparktank.morrigan.model.MediaListFactory;
 import net.sparktank.morrigan.model.library.DbException;
-import net.sparktank.morrigan.model.library.LibraryHelper;
 import net.sparktank.morrigan.model.library.LibraryUpdateTask;
+import net.sparktank.morrigan.model.library.LocalLibraryHelper;
 import net.sparktank.morrigan.model.library.MediaLibrary;
 import net.sparktank.morrigan.model.library.LibraryUpdateTask.TaskEventListener;
 import net.sparktank.morrigan.model.playlist.MediaPlaylist;
@@ -49,7 +48,7 @@ public class MediaHandler extends AbstractHandler {
 				if (split.length > 1) {
 					String id = split[1];
 					if (type.equals("library")) {
-						String f = LibraryHelper.getFullPathToLib(id);
+						String f = LocalLibraryHelper.getFullPathToLib(id);
 						MediaLibrary ml = MediaListFactory.makeMediaLibrary(f);
 						
 						if (split.length > 2) {
@@ -110,7 +109,7 @@ public class MediaHandler extends AbstractHandler {
 				} else if (type.equals("newlib")) {
 					if (paramMap.containsKey("name")) {
 						String[] v = (String[]) paramMap.get("name");
-						LibraryHelper.createLib(v[0]);
+						LocalLibraryHelper.createLib(v[0]);
 					} else {
 						sb.append("To create a library, POST with param 'name' set.");
 					}

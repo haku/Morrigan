@@ -8,7 +8,7 @@ import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
 import net.sparktank.morrigan.model.MediaListFactory;
 
-public class LibraryHelper {
+public class LocalLibraryHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	public static String getFullPathToLib (String fileName) {
