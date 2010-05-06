@@ -20,9 +20,9 @@ import net.sparktank.morrigan.model.library.LocalMediaLibrary;
 import net.sparktank.morrigan.model.library.LocalLibraryUpdateTask.TaskEventListener;
 import net.sparktank.morrigan.model.playlist.MediaPlaylist;
 import net.sparktank.morrigan.model.playlist.PlaylistHelper;
-import net.sparktank.morrigan.server.helpers.LibrarySrcFeed;
-import net.sparktank.morrigan.server.helpers.MediaFeed;
-import net.sparktank.morrigan.server.helpers.MediaListFeed;
+import net.sparktank.morrigan.server.feedwriters.LibrarySrcFeed;
+import net.sparktank.morrigan.server.feedwriters.MediaFeed;
+import net.sparktank.morrigan.server.feedwriters.MediaListFeed;
 
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
