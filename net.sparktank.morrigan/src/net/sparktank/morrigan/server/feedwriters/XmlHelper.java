@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.server.helpers;
+package net.sparktank.morrigan.server.feedwriters;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
