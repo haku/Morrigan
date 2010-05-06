@@ -11,7 +11,7 @@ import net.sparktank.morrigan.model.MediaList;
 import net.sparktank.morrigan.model.library.SqliteLayer.LibrarySort;
 import net.sparktank.morrigan.model.library.SqliteLayer.LibrarySortDirection;
 
-public abstract class AbstractLibrary extends MediaList {
+public abstract class AbstractMediaLibrary extends MediaList {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static final boolean HIDEMISSING = true; // TODO like this to GUI?
@@ -22,7 +22,7 @@ public abstract class AbstractLibrary extends MediaList {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	protected AbstractLibrary (String libraryName, SqliteLayer dbLayer) {
+	protected AbstractMediaLibrary (String libraryName, SqliteLayer dbLayer) {
 		super(dbLayer.getDbFilePath(), libraryName);
 		this.dbLayer = dbLayer;
 		

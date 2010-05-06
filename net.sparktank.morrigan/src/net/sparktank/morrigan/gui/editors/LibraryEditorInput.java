@@ -1,15 +1,15 @@
 package net.sparktank.morrigan.gui.editors;
 
-import net.sparktank.morrigan.model.library.AbstractLibrary;
+import net.sparktank.morrigan.model.library.AbstractMediaLibrary;
 import net.sparktank.morrigan.model.library.SqliteLayer.LibrarySort;
 import net.sparktank.morrigan.model.library.SqliteLayer.LibrarySortDirection;
 
 import org.eclipse.ui.IMemento;
 
-public class LibraryEditorInput extends MediaListEditorInput<AbstractLibrary> {
+public class LibraryEditorInput extends MediaListEditorInput<AbstractMediaLibrary> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public LibraryEditorInput(AbstractLibrary mediaList) {
+	public LibraryEditorInput(AbstractMediaLibrary mediaList) {
 		super(mediaList);
 	}
 	

@@ -1,7 +1,7 @@
 package net.sparktank.morrigan.model.library;
 
 
-public class MediaLibrary extends AbstractLibrary {
+public class MediaLibrary extends AbstractMediaLibrary {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static final String TYPE = "LIBRARY";
