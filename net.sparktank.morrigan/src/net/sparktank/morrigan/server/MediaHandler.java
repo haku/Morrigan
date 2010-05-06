@@ -14,10 +14,10 @@ import javax.servlet.http.HttpServletResponse;
 import net.sparktank.morrigan.helpers.ErrorHelper;
 import net.sparktank.morrigan.model.MediaListFactory;
 import net.sparktank.morrigan.model.library.DbException;
-import net.sparktank.morrigan.model.library.LibraryUpdateTask;
+import net.sparktank.morrigan.model.library.LocalLibraryUpdateTask;
 import net.sparktank.morrigan.model.library.LocalLibraryHelper;
-import net.sparktank.morrigan.model.library.MediaLibrary;
-import net.sparktank.morrigan.model.library.LibraryUpdateTask.TaskEventListener;
+import net.sparktank.morrigan.model.library.LocalMediaLibrary;
+import net.sparktank.morrigan.model.library.LocalLibraryUpdateTask.TaskEventListener;
 import net.sparktank.morrigan.model.playlist.MediaPlaylist;
 import net.sparktank.morrigan.model.playlist.PlaylistHelper;
 import net.sparktank.morrigan.server.helpers.LibrarySrcFeed;
@@ -49,7 +49,7 @@ public class MediaHandler extends AbstractHandler {
 					String id = split[1];
 					if (type.equals("library")) {
 						String f = LocalLibraryHelper.getFullPathToLib(id);
-						MediaLibrary ml = MediaListFactory.makeMediaLibrary(f);
+						LocalMediaLibrary ml = MediaListFactory.makeMediaLibrary(f);
 						
 						if (split.length > 2) {
 							String param = split[2];
@@ -169,8 +169,8 @@ public class MediaHandler extends AbstractHandler {
 	
 	//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private boolean scheduleLibScan (final MediaLibrary ml) throws DbException {
-		final LibraryUpdateTask task = LibraryUpdateTask.factory(ml);
+	private boolean scheduleLibScan (final LocalMediaLibrary ml) throws DbException {
+		final LocalLibraryUpdateTask task = LocalLibraryUpdateTask.factory(ml);
 		if (task != null) {
 			
 			Thread t = new Thread () {

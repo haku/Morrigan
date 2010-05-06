@@ -5,7 +5,7 @@ import java.net.URLEncoder;
 import java.util.List;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
-import net.sparktank.morrigan.model.library.MediaLibrary;
+import net.sparktank.morrigan.model.library.LocalMediaLibrary;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -14,14 +14,14 @@ import org.w3c.dom.Node;
 public class LibrarySrcFeed extends GenericFeed {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public LibrarySrcFeed (MediaLibrary ml) throws MorriganException {
+	public LibrarySrcFeed (LocalMediaLibrary ml) throws MorriganException {
 		super();
 		mediaLibrarySrcToFeed(ml, getDoc());
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private void mediaLibrarySrcToFeed(MediaLibrary ml, Document doc) throws MorriganException {
+	private void mediaLibrarySrcToFeed(LocalMediaLibrary ml, Document doc) throws MorriganException {
 		ml.read();
 		
 		String listFile;

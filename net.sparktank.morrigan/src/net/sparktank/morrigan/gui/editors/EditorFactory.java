@@ -3,7 +3,7 @@ package net.sparktank.morrigan.gui.editors;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.MediaListFactory;
 import net.sparktank.morrigan.model.library.DbException;
-import net.sparktank.morrigan.model.library.MediaLibrary;
+import net.sparktank.morrigan.model.library.LocalMediaLibrary;
 import net.sparktank.morrigan.model.library.RemoteMediaLibrary;
 import net.sparktank.morrigan.model.library.SqliteLayer.LibrarySort;
 import net.sparktank.morrigan.model.library.SqliteLayer.LibrarySortDirection;
@@ -34,7 +34,7 @@ public class EditorFactory implements IElementFactory {
 		String type = memento.getString(KEY_TYPE);
 		
 		try {
-			if (type.equals(MediaLibrary.TYPE)) {
+			if (type.equals(LocalMediaLibrary.TYPE)) {
 				input = getMediaLibraryInput(memento);
 				
 			} else if (type.equals(MediaPlaylist.TYPE)) {
@@ -64,7 +64,7 @@ public class EditorFactory implements IElementFactory {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static LibraryEditorInput getMediaLibraryInput (String dbFilePath) throws MorriganException {
-		MediaLibrary ml;
+		LocalMediaLibrary ml;
 		
 		try {
 			ml = MediaListFactory.makeMediaLibrary(dbFilePath);

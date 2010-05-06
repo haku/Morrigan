@@ -17,18 +17,18 @@ import net.sparktank.morrigan.engines.playback.IPlaybackEngine;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.ChecksumHelper;
 import net.sparktank.morrigan.model.MediaItem;
-import net.sparktank.morrigan.model.library.LibraryUpdateTask.TaskResult.TaskOutcome;
+import net.sparktank.morrigan.model.library.LocalLibraryUpdateTask.TaskResult.TaskOutcome;
 
-public class LibraryUpdateTask {
+public class LocalLibraryUpdateTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private static WeakHashMap<LibraryUpdateTask, String> jobCache = new WeakHashMap<LibraryUpdateTask, String>();
+	private static WeakHashMap<LocalLibraryUpdateTask, String> jobCache = new WeakHashMap<LocalLibraryUpdateTask, String>();
 	
-	public static synchronized LibraryUpdateTask factory (MediaLibrary library) {
-		LibraryUpdateTask ret = null;
+	public static synchronized LocalLibraryUpdateTask factory (LocalMediaLibrary library) {
+		LocalLibraryUpdateTask ret = null;
 		
 		if (jobCache.containsValue(library.getListId())) {
-			for (LibraryUpdateTask job : jobCache.keySet()) {
+			for (LocalLibraryUpdateTask job : jobCache.keySet()) {
 				if (job.getLibrary().getListId().equals(library.getListId())) {
 					ret = job;
 				}
@@ -42,7 +42,7 @@ public class LibraryUpdateTask {
 		}
 		
 		if (ret == null) {
-			ret = new LibraryUpdateTask(library);
+			ret = new LocalLibraryUpdateTask(library);
 			jobCache.put(ret, library.getListId());
 			
 		} else {
@@ -108,15 +108,15 @@ public class LibraryUpdateTask {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private final MediaLibrary library;
+	private final LocalMediaLibrary library;
 	
 	private boolean isFinished = false;
 	
-	private LibraryUpdateTask (MediaLibrary library) {
+	private LocalLibraryUpdateTask (LocalMediaLibrary library) {
 		this.library = library;
 	}
 	
-	public MediaLibrary getLibrary () {
+	public LocalMediaLibrary getLibrary () {
 		return library;
 	}
 	
