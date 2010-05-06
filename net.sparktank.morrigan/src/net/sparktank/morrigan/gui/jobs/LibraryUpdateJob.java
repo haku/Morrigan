@@ -1,10 +1,10 @@
 package net.sparktank.morrigan.gui.jobs;
 
 import net.sparktank.morrigan.gui.helpers.ConsoleHelper;
-import net.sparktank.morrigan.model.library.LibraryUpdateTask;
-import net.sparktank.morrigan.model.library.LibraryUpdateTask.TaskEventListener;
-import net.sparktank.morrigan.model.library.LibraryUpdateTask.TaskResult;
-import net.sparktank.morrigan.model.library.LibraryUpdateTask.TaskResult.TaskOutcome;
+import net.sparktank.morrigan.model.library.LocalLibraryUpdateTask;
+import net.sparktank.morrigan.model.library.LocalLibraryUpdateTask.TaskEventListener;
+import net.sparktank.morrigan.model.library.LocalLibraryUpdateTask.TaskResult;
+import net.sparktank.morrigan.model.library.LocalLibraryUpdateTask.TaskResult.TaskOutcome;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -14,9 +14,9 @@ import org.eclipse.core.runtime.jobs.Job;
 public class LibraryUpdateJob extends Job {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private final LibraryUpdateTask libraryUpdateTask;
+	private final LocalLibraryUpdateTask libraryUpdateTask;
 
-	public LibraryUpdateJob (LibraryUpdateTask libraryUpdateTask) {
+	public LibraryUpdateJob (LocalLibraryUpdateTask libraryUpdateTask) {
 		super("Update " + libraryUpdateTask.getLibrary().getListName());
 		this.libraryUpdateTask = libraryUpdateTask;
 		setUser(true);

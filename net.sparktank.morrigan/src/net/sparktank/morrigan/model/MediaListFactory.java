@@ -5,7 +5,7 @@ import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.library.DbConFactory;
 import net.sparktank.morrigan.model.library.DbException;
 import net.sparktank.morrigan.model.library.LocalLibraryHelper;
-import net.sparktank.morrigan.model.library.MediaLibrary;
+import net.sparktank.morrigan.model.library.LocalMediaLibrary;
 import net.sparktank.morrigan.model.library.RemoteMediaLibrary;
 import net.sparktank.morrigan.model.playlist.MediaPlaylist;
 import net.sparktank.morrigan.model.playlist.PlaylistHelper;
@@ -13,17 +13,17 @@ import net.sparktank.morrigan.model.playlist.PlaylistHelper;
 public class MediaListFactory {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private static WeakHashMap<MediaLibrary, String> mediaLibraryCache = new WeakHashMap<MediaLibrary, String>();
+	private static WeakHashMap<LocalMediaLibrary, String> mediaLibraryCache = new WeakHashMap<LocalMediaLibrary, String>();
 	
-	public static synchronized MediaLibrary makeMediaLibrary (String dbFilePath) throws DbException {
+	public static synchronized LocalMediaLibrary makeMediaLibrary (String dbFilePath) throws DbException {
 		return makeMediaLibrary(LocalLibraryHelper.getLibraryTitle(dbFilePath), dbFilePath);
 	}
 	
-	public static synchronized MediaLibrary makeMediaLibrary (String libraryName, String dbFilePath) throws DbException {
-		MediaLibrary ret = null;
+	public static synchronized LocalMediaLibrary makeMediaLibrary (String libraryName, String dbFilePath) throws DbException {
+		LocalMediaLibrary ret = null;
 		
 		if (mediaLibraryCache.containsValue(dbFilePath)) {
-			for (MediaLibrary lib : mediaLibraryCache.keySet()) {
+			for (LocalMediaLibrary lib : mediaLibraryCache.keySet()) {
 				if (lib.getDbPath().equals(dbFilePath)) {
 					ret = lib;
 					System.out.println("Found '" + dbFilePath + "' in cache.");
@@ -33,7 +33,7 @@ public class MediaListFactory {
 		
 		if (ret == null) {
 			System.out.println("Making object instance '" + dbFilePath + "'...");
-			ret = new MediaLibrary(libraryName, DbConFactory.getDbLayer(dbFilePath));
+			ret = new LocalMediaLibrary(libraryName, DbConFactory.getDbLayer(dbFilePath));
 			mediaLibraryCache.put(ret, dbFilePath);
 		}
 		

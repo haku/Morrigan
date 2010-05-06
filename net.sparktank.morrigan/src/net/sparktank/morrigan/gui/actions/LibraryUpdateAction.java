@@ -2,8 +2,8 @@ package net.sparktank.morrigan.gui.actions;
 
 import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
-import net.sparktank.morrigan.model.library.LibraryUpdateTask;
-import net.sparktank.morrigan.model.library.MediaLibrary;
+import net.sparktank.morrigan.model.library.LocalLibraryUpdateTask;
+import net.sparktank.morrigan.model.library.LocalMediaLibrary;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
@@ -12,20 +12,20 @@ import net.sparktank.morrigan.gui.jobs.*;
 public class LibraryUpdateAction extends Action implements IWorkbenchAction{
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private MediaLibrary library = null;
+	private LocalMediaLibrary library = null;
 	
 	public LibraryUpdateAction () {
 		super();
 	}
 	
-	public LibraryUpdateAction (MediaLibrary library) {
+	public LibraryUpdateAction (LocalMediaLibrary library) {
 		super();
 		this.library = library;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public void setMediaLibrary (MediaLibrary library) {
+	public void setMediaLibrary (LocalMediaLibrary library) {
 		this.library = library;
 	}
 	
@@ -58,7 +58,7 @@ public class LibraryUpdateAction extends Action implements IWorkbenchAction{
 			return;
 		}
 		
-		LibraryUpdateTask task = LibraryUpdateTask.factory(library);
+		LocalLibraryUpdateTask task = LocalLibraryUpdateTask.factory(library);
 		if (task != null) {
 			LibraryUpdateJob job = new LibraryUpdateJob(task);
 			job.schedule();

@@ -8,7 +8,7 @@ import java.util.List;
 import net.sparktank.morrigan.gui.preferences.PreferenceHelper;
 import net.sparktank.morrigan.model.MediaItem;
 import net.sparktank.morrigan.model.library.DbException;
-import net.sparktank.morrigan.model.library.MediaLibrary;
+import net.sparktank.morrigan.model.library.LocalMediaLibrary;
 import net.sparktank.morrigan.model.playlist.PlayItem;
 
 import org.eclipse.jface.viewers.ILabelProvider;
@@ -53,11 +53,11 @@ public class JumpToDlg extends Dialog {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private final MediaLibrary mediaLibrary;
+	private final LocalMediaLibrary mediaLibrary;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public JumpToDlg (Shell parent, MediaLibrary mediaLibrary) {
+	public JumpToDlg (Shell parent, LocalMediaLibrary mediaLibrary) {
 		super(parent, SWT.TITLE | SWT.CLOSE | SWT.APPLICATION_MODAL | SWT.RESIZE | SWT.ON_TOP);
 		
 		if (mediaLibrary == null) throw new IllegalArgumentException("mediaLibrary can not be null.");

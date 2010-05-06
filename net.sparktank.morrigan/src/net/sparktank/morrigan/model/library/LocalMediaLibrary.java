@@ -1,7 +1,7 @@
 package net.sparktank.morrigan.model.library;
 
 
-public class MediaLibrary extends AbstractMediaLibrary {
+public class LocalMediaLibrary extends AbstractMediaLibrary {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static final String TYPE = "LIBRARY";
@@ -9,7 +9,7 @@ public class MediaLibrary extends AbstractMediaLibrary {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	//TODO rename to "LocalLibrary".
-	public MediaLibrary (String libraryName, SqliteLayer dbLayer) throws DbException {
+	public LocalMediaLibrary (String libraryName, SqliteLayer dbLayer) throws DbException {
 		super(libraryName, dbLayer);
 	}
 	

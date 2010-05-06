@@ -15,7 +15,7 @@ import net.sparktank.morrigan.gui.views.ViewLibraryProperties;
 import net.sparktank.morrigan.helpers.TimeHelper;
 import net.sparktank.morrigan.model.MediaList.DurationData;
 import net.sparktank.morrigan.model.library.AbstractMediaLibrary;
-import net.sparktank.morrigan.model.library.MediaLibrary;
+import net.sparktank.morrigan.model.library.LocalMediaLibrary;
 import net.sparktank.morrigan.model.library.AbstractMediaLibrary.SortChangeListener;
 import net.sparktank.morrigan.model.library.SqliteLayer.LibrarySort;
 import net.sparktank.morrigan.model.library.SqliteLayer.LibrarySortDirection;
@@ -139,8 +139,8 @@ public class LibraryEditor extends MediaListEditor<AbstractMediaLibrary> {
 		 * Instead of checking the type, create separate editors
 		 * for remote and local libraries? 
 		 */
-		if (getMediaList() instanceof MediaLibrary) {
-			MediaLibrary ml = (MediaLibrary) getMediaList();
+		if (getMediaList() instanceof LocalMediaLibrary) {
+			LocalMediaLibrary ml = (LocalMediaLibrary) getMediaList();
 			
 			prefMenuMgr.add(new Separator());
 			prefMenuMgr.add(new LibraryUpdateAction(ml));
@@ -380,8 +380,8 @@ public class LibraryEditor extends MediaListEditor<AbstractMediaLibrary> {
 			 * Instead of checking the type, create separate editors
 			 * for remote and local libraries? 
 			 */
-			if (getMediaList() instanceof MediaLibrary) {
-				MediaLibrary ml = (MediaLibrary) getMediaList();
+			if (getMediaList() instanceof LocalMediaLibrary) {
+				LocalMediaLibrary ml = (LocalMediaLibrary) getMediaList();
 				viewProp.setContent(ml);
 			}
 			return viewProp;

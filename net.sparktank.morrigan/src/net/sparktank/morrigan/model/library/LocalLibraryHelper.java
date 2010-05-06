@@ -22,9 +22,9 @@ public class LocalLibraryHelper {
 		return libFile;
 	}
 	
-	public static MediaLibrary createLib (String libName) throws MorriganException {
+	public static LocalMediaLibrary createLib (String libName) throws MorriganException {
 		String plFile = getFullPathToLib(libName);
-		MediaLibrary lib = MediaListFactory.makeMediaLibrary(getLibraryTitle(plFile), plFile);
+		LocalMediaLibrary lib = MediaListFactory.makeMediaLibrary(getLibraryTitle(plFile), plFile);
 		return lib;
 	}
 	

@@ -25,7 +25,7 @@ import net.sparktank.morrigan.gui.editors.MediaListEditorInput;
 import net.sparktank.morrigan.gui.editors.PlaylistEditor;
 import net.sparktank.morrigan.gui.helpers.ClipboardHelper;
 import net.sparktank.morrigan.model.MediaList;
-import net.sparktank.morrigan.model.library.MediaLibrary;
+import net.sparktank.morrigan.model.library.LocalMediaLibrary;
 import net.sparktank.morrigan.model.playlist.MediaPlaylist;
 import net.sparktank.morrigan.model.playlist.PlayItem;
 import net.sparktank.morrigan.player.IPlayerEventHandler;
@@ -605,7 +605,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 					&& getPlayer().getCurrentItem().item != null) {
 				
 				try {
-					if (getPlayer().getCurrentItem().list.getType().equals(MediaLibrary.TYPE)) {
+					if (getPlayer().getCurrentItem().list.getType().equals(LocalMediaLibrary.TYPE)) {
 						LibraryEditorInput input = EditorFactory.getMediaLibraryInput(getPlayer().getCurrentItem().list.getListId());
 						getViewSite().getWorkbenchWindow().getActivePage().openEditor(input, LibraryEditor.ID);
 						
@@ -634,9 +634,9 @@ public abstract class AbstractPlayerView extends ViewPart {
 		public void run() {
 			MediaList currentList = getPlayer().getCurrentList();
 			if (currentList == null) return;
-			if (!(currentList instanceof MediaLibrary)) return;
+			if (!(currentList instanceof LocalMediaLibrary)) return;
 			
-			JumpToDlg dlg = new JumpToDlg(getViewSite().getShell(), (MediaLibrary) currentList);
+			JumpToDlg dlg = new JumpToDlg(getViewSite().getShell(), (LocalMediaLibrary) currentList);
 			PlayItem item = dlg.open();
 			if (item != null) {
 				if ((dlg.getKeyMask() & SWT.SHIFT) != 0 || (dlg.getKeyMask() & SWT.CONTROL) != 0) {

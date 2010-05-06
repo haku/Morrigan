@@ -8,7 +8,7 @@ import net.sparktank.morrigan.gui.actions.LibraryUpdateAction;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.editors.LibraryEditor;
 import net.sparktank.morrigan.model.library.DbException;
-import net.sparktank.morrigan.model.library.MediaLibrary;
+import net.sparktank.morrigan.model.library.LocalMediaLibrary;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -61,8 +61,8 @@ public class ViewLibraryProperties extends ViewPart {
 			if (part instanceof LibraryEditor) {
 				LibraryEditor libEditor = (LibraryEditor) part;
 				// FIXME don't do this like this?
-				if (libEditor.getMediaList() instanceof MediaLibrary) {
-					MediaLibrary ml = (MediaLibrary) libEditor.getMediaList();
+				if (libEditor.getMediaList() instanceof LocalMediaLibrary) {
+					LocalMediaLibrary ml = (LocalMediaLibrary) libEditor.getMediaList();
 					setContent(ml);
 				}
 			}
@@ -80,14 +80,14 @@ public class ViewLibraryProperties extends ViewPart {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private MediaLibrary library;
+	private LocalMediaLibrary library;
 	private LibraryUpdateAction libraryUpdateAction = new LibraryUpdateAction();
 	
-	public void setContent (MediaLibrary library) {
+	public void setContent (LocalMediaLibrary library) {
 		setContent(library, true);
 	}
 	
-	public void setContent (MediaLibrary library, boolean updateGui) {
+	public void setContent (LocalMediaLibrary library, boolean updateGui) {
 		if (this.library == library) return;
 		
 		if (this.library!=null) {
