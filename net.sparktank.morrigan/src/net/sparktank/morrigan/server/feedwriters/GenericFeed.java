@@ -77,10 +77,6 @@ public class GenericFeed {
 		element.appendChild(e);
 	}
 	
-	static public void addLink (Document doc, Node element, String href) {
-		addLink(doc, element, href, null);
-	}
-	
 	static public void addLink (Document doc, Node element, String href, String rel) {
 		Element link = doc.createElement("link");
 		
