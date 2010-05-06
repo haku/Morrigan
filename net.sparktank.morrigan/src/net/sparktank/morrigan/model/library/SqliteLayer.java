@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.MediaItem;
 
 public class SqliteLayer {
@@ -122,7 +123,22 @@ public class SqliteLayer {
 	 */
 	public boolean addFile (File file) throws DbException {
 		try {
-			return local_addTrack(file);
+			return local_addTrack(file.getAbsolutePath(), file.lastModified());
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+	
+	/**
+	 * 
+	 * @param filepath
+	 * @param lastModified
+	 * @return true if the file needed to be added.
+	 * @throws DbException
+	 */
+	public boolean addFile (String filepath, long lastModified) throws DbException {
+		try {
+			return local_addTrack(filepath, lastModified);
 		} catch (Exception e) {
 			throw new DbException(e);
 		}
@@ -425,6 +441,22 @@ public class SqliteLayer {
 		}
 	}
 	
+	public void setAutoCommit (boolean b) throws MorriganException {
+		try {
+			getDbCon().setAutoCommit(b);
+		} catch (Exception e) {
+			throw new MorriganException(e);
+		}
+	}
+	
+	public void commit () throws MorriganException {
+		try {
+			getDbCon().commit();
+		} catch (Exception e) {
+			throw new MorriganException(e);
+		}
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Init.
 	
@@ -697,12 +729,9 @@ public class SqliteLayer {
 		return ret;
 	}
 	
-	private boolean local_addTrack (File file) throws SQLException, ClassNotFoundException, DbException {
+	private boolean local_addTrack (String filePath, long lastModified) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps;
 		ResultSet rs;
-		
-		String filePath = file.getAbsolutePath();
-		long lastModified = file.lastModified();
 		
 		int n;
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_Q_EXISTS);
@@ -722,6 +751,7 @@ public class SqliteLayer {
 		}
 		
 		if (n == 0) {
+			System.err.println("Adding file '" + filePath + "' to '"+getDbFilePath()+"'.");
 			ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_ADD);
 			try {
 				ps.setString(1, filePath);
