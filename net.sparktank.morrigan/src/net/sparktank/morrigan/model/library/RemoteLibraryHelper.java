@@ -29,7 +29,7 @@ public class RemoteLibraryHelper {
 		// FIXME better naming?
 		String name = libUrl.substring(libUrl.lastIndexOf("/")+1).replace(Config.LIB_REMOTE_FILE_EXT, "").replace(Config.LIB_LOCAL_FILE_EXT, "");
 		String file = getFullPathToLib(url.getHost() + "_" + url.getPort() + "_" + name);
-		RemoteMediaLibrary lib = MediaListFactory.makeRemoteMediaLibrary(getLibraryTitle(file), libUrl, file);
+		RemoteMediaLibrary lib = MediaListFactory.makeRemoteMediaLibrary(getLibraryTitle(file), url, file);
 		return lib;
 	}
 	

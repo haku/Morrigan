@@ -1,4 +1,6 @@
 package net.sparktank.morrigan.model;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.WeakHashMap;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
@@ -46,10 +48,14 @@ public class MediaListFactory {
 	private static WeakHashMap<RemoteMediaLibrary, String> remoteMediaLibraryCache = new WeakHashMap<RemoteMediaLibrary, String>();
 	
 	public static RemoteMediaLibrary makeRemoteMediaLibrary(String dbFilePath) throws DbException {
-		return makeRemoteMediaLibrary(RemoteLibraryHelper.getLibraryTitle(dbFilePath), null, dbFilePath);
+		try {
+			return makeRemoteMediaLibrary(RemoteLibraryHelper.getLibraryTitle(dbFilePath), null, dbFilePath);
+		} catch (MalformedURLException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
-	public static RemoteMediaLibrary makeRemoteMediaLibrary(String libraryName, String serverUrl, String dbFilePath) throws DbException {
+	public static RemoteMediaLibrary makeRemoteMediaLibrary(String libraryName, URL serverUrl, String dbFilePath) throws DbException, MalformedURLException {
 		RemoteMediaLibrary ret = null;
 		
 		if (remoteMediaLibraryCache.containsValue(dbFilePath)) {

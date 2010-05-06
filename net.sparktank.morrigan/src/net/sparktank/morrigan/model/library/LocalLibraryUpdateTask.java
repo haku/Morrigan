@@ -186,7 +186,7 @@ public class LocalLibraryUpdateTask {
 								ext = ext.substring(ext.lastIndexOf(".") + 1).toLowerCase();
 								if (supportedFormats.contains(ext)) {
 									try {
-										if (library.addFile(file)) {
+										if (library.addFile(file) != null) {
 											taskEventListener.logMsg(library.getListName(), "[ADDED] " + file.getAbsolutePath());
 											filesAdded++;
 										}

@@ -1,10 +1,7 @@
 package net.sparktank.morrigan.server.feedreader;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
-import net.sparktank.morrigan.model.MediaItem;
 import net.sparktank.morrigan.server.feedwriters.XmlHelper;
 
 import org.w3c.dom.Document;
@@ -17,12 +14,15 @@ public abstract class GenericFeedReader {
 	
 	private final Document doc;
 	
-	private List<MediaItem> mediaItemList = new ArrayList<MediaItem>();
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	public GenericFeedReader (String xmlString) throws SAXException, IOException {
+		doc = XmlHelper.xmlStringToDocument(xmlString);
+	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public GenericFeedReader (String xmlString) throws SAXException, IOException, FeedParseException {
-		doc = XmlHelper.xmlStringToDocument(xmlString);
+	protected void parse() throws FeedParseException {
 		Node feed = doc.getFirstChild(); // This should get the "feed" element.
 		if (feed.getNodeName().equals("feed")) {
 			NodeList entries = feed.getChildNodes();
@@ -46,18 +46,10 @@ public abstract class GenericFeedReader {
 	
 	protected abstract void parseEntry (Node entry) throws FeedParseException;
 	
-	protected void addMediaItem (MediaItem mi) {
-		mediaItemList.add(mi);
-	}
-	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	protected Document getDoc () {
 		return doc;
-	}
-	
-	public List<MediaItem> getMediaItemList() {
-		return mediaItemList;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
