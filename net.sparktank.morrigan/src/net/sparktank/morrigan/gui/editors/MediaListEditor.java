@@ -111,8 +111,10 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		
 		try {
 			editorInput.getMediaList().read();
-		} catch (MorriganException e) {
-			throw new PartInitException("Exception while calling read().", e);
+		} catch (Exception e) {
+			if (!handleReadError(e)) {
+				throw new PartInitException("Exception while calling read().", e);
+			}
 		}
 		
 		setPartName(editorInput.getMediaList().getListName());
@@ -128,6 +130,8 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		imageCache.clearCache();
 		super.dispose();
 	}
+	
+	protected abstract boolean handleReadError (Exception e);
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Controls.
