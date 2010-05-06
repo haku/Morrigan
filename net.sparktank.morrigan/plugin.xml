@@ -96,11 +96,18 @@
       </editor>
       
       <editor
-            class="net.sparktank.morrigan.gui.editors.LibraryEditor"
+            class="net.sparktank.morrigan.gui.editors.LocalLibraryEditor"
             default="false"
             icon="icons/library.gif"
-            id="net.sparktank.morrigan.gui.editors.LibraryEditor"
-            name="LibraryEditor" >
+            id="net.sparktank.morrigan.gui.editors.LocalLibraryEditor"
+            name="LocalLibraryEditor" >
+      </editor>
+      <editor
+            class="net.sparktank.morrigan.gui.editors.RemoteLibraryEditor"
+            default="false"
+            icon="icons/library-remote.gif"
+            id="net.sparktank.morrigan.gui.editors.RemoteLibraryEditor"
+            name="RemoteLibraryEditor">
       </editor>
       
    </extension>

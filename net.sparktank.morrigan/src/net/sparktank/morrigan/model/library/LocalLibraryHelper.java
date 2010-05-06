@@ -63,7 +63,7 @@ public class LocalLibraryHelper {
 			ret = ret.substring(x+1);
 		}
 		
-		x = ret.lastIndexOf(Config.LIB_ABS_FILE_EXT);
+		x = ret.lastIndexOf(Config.LIB_LOCAL_FILE_EXT);
 		if (x > 0) {
 			ret = ret.substring(0, x);
 		}
