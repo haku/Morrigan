@@ -4,7 +4,7 @@ import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.views.ViewMediaExplorer;
-import net.sparktank.morrigan.model.library.LibraryHelper;
+import net.sparktank.morrigan.model.library.LocalLibraryHelper;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.InputDialog;
@@ -13,7 +13,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
-
 
 public class NewLibraryAction extends Action implements IWorkbenchAction {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -51,7 +50,7 @@ public class NewLibraryAction extends Action implements IWorkbenchAction {
 			// create library.
 			String libName = dlg.getValue();
 			try {
-				LibraryHelper.createLib(libName);
+				LocalLibraryHelper.createLib(libName);
 			} catch (MorriganException e) {
 				new MorriganMsgDlg(e).open();
 				return;

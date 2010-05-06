@@ -27,7 +27,7 @@ public class RemoteLibraryHelper {
 	public static RemoteMediaLibrary createRemoteLib (String libUrl) throws MorriganException, MalformedURLException {
 		URL url = new URL(libUrl);
 		String file = getFullPathToLib(url.getHost() + "_" + url.getPort());
-		RemoteMediaLibrary lib = MediaListFactory.makeRemoteMediaLibrary(LibraryHelper.getLibraryTitle(file), libUrl, file);
+		RemoteMediaLibrary lib = MediaListFactory.makeRemoteMediaLibrary(LocalLibraryHelper.getLibraryTitle(file), libUrl, file);
 		return lib;
 	}
 	
@@ -48,7 +48,7 @@ public class RemoteLibraryHelper {
 			if (isLibFile(file.getAbsolutePath())) {
 				MediaExplorerItem newItem = new MediaExplorerItem(MediaExplorerItem.ItemType.REMOTELIBRARY);
 				newItem.identifier = file.getAbsolutePath();
-				newItem.title = LibraryHelper.getLibraryTitle(newItem.identifier);
+				newItem.title = LocalLibraryHelper.getLibraryTitle(newItem.identifier);
 				ret.add(newItem);
 			}
 		}

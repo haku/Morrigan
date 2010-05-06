@@ -1,11 +1,10 @@
 package net.sparktank.morrigan.server.helpers;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
-import net.sparktank.morrigan.model.library.LibraryHelper;
+import net.sparktank.morrigan.model.library.LocalLibraryHelper;
 import net.sparktank.morrigan.model.playlist.PlaylistHelper;
 import net.sparktank.morrigan.player.Player;
 import net.sparktank.morrigan.player.PlayerRegister;
@@ -39,7 +38,7 @@ public class MediaFeed extends GenericFeed {
 			switch (n) {
 				case 0:
 					type="library";
-					items.addAll(LibraryHelper.getAllLibraries());
+					items.addAll(LocalLibraryHelper.getAllLibraries());
 					break;
 				
 				case 1:

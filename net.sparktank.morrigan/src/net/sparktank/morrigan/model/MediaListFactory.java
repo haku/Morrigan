@@ -1,11 +1,10 @@
 package net.sparktank.morrigan.model;
-
 import java.util.WeakHashMap;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.library.DbConFactory;
 import net.sparktank.morrigan.model.library.DbException;
-import net.sparktank.morrigan.model.library.LibraryHelper;
+import net.sparktank.morrigan.model.library.LocalLibraryHelper;
 import net.sparktank.morrigan.model.library.MediaLibrary;
 import net.sparktank.morrigan.model.library.RemoteMediaLibrary;
 import net.sparktank.morrigan.model.playlist.MediaPlaylist;
@@ -17,7 +16,7 @@ public class MediaListFactory {
 	private static WeakHashMap<MediaLibrary, String> mediaLibraryCache = new WeakHashMap<MediaLibrary, String>();
 	
 	public static synchronized MediaLibrary makeMediaLibrary (String dbFilePath) throws DbException {
-		return makeMediaLibrary(LibraryHelper.getLibraryTitle(dbFilePath), dbFilePath);
+		return makeMediaLibrary(LocalLibraryHelper.getLibraryTitle(dbFilePath), dbFilePath);
 	}
 	
 	public static synchronized MediaLibrary makeMediaLibrary (String libraryName, String dbFilePath) throws DbException {
@@ -46,7 +45,7 @@ public class MediaListFactory {
 	private static WeakHashMap<RemoteMediaLibrary, String> remoteMediaLibraryCache = new WeakHashMap<RemoteMediaLibrary, String>();
 	
 	public static RemoteMediaLibrary makeRemoteMediaLibrary(String dbFilePath) throws DbException {
-		return makeRemoteMediaLibrary(LibraryHelper.getLibraryTitle(dbFilePath), null, dbFilePath);
+		return makeRemoteMediaLibrary(LocalLibraryHelper.getLibraryTitle(dbFilePath), null, dbFilePath);
 	}
 	
 	public static RemoteMediaLibrary makeRemoteMediaLibrary(String libraryName, String serverUrl, String dbFilePath) throws DbException {

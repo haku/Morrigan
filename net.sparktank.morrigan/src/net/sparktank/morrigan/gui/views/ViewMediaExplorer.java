@@ -9,7 +9,7 @@ import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.handler.CallMediaListEditor;
 import net.sparktank.morrigan.gui.helpers.ImageCache;
 import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
-import net.sparktank.morrigan.model.library.LibraryHelper;
+import net.sparktank.morrigan.model.library.LocalLibraryHelper;
 import net.sparktank.morrigan.model.library.RemoteLibraryHelper;
 import net.sparktank.morrigan.model.playlist.PlaylistHelper;
 
@@ -142,7 +142,7 @@ public class ViewMediaExplorer extends ViewPart {
 	
 	private void makeContent () {
 		items.clear();
-		items.addAll(LibraryHelper.getAllLibraries());
+		items.addAll(LocalLibraryHelper.getAllLibraries());
 		items.addAll(RemoteLibraryHelper.getAllRemoteLibraries());
 		items.addAll(PlaylistHelper.getAllPlaylists());
 	}
