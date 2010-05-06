@@ -44,32 +44,49 @@ public class MorriganServer {
 		server.setHandler(contexts);
 	}
 	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	public void start () throws Exception {
+		server.start();
+	}
+	
+	public void stop () throws Exception {
+		server.stop();
+	}
+	
+	public void join () throws InterruptedException {
+		server.join();
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
 	private Listener listener = new Listener() {
 		
 		@Override
-		public void lifeCycleStarting(LifeCycle arg0) {
+		public void lifeCycleStarting(LifeCycle lc) {
 			System.err.println("Server starting...");
 		}
 		
 		@Override
-		public void lifeCycleStarted(LifeCycle arg0) {
+		public void lifeCycleStarted(LifeCycle lc) {
 			System.err.println("Server started.");
 		}
 		
 		@Override
-		public void lifeCycleStopping(LifeCycle arg0) {
+		public void lifeCycleStopping(LifeCycle lc) {
 			System.err.println("Server stopping...");
 		}
 		
 		@Override
-		public void lifeCycleStopped(LifeCycle arg0) {
+		public void lifeCycleStopped(LifeCycle lc) {
 			System.err.println("Server stopped.");
 			callOnStopRunnable();
 		}
 		
 		@Override
-		public void lifeCycleFailure(LifeCycle arg0, Throwable arg1) {
+		public void lifeCycleFailure(LifeCycle lc, Throwable t) {
 			System.err.println("Server failed.");
+			t.printStackTrace();
 			callOnStopRunnable();
 		}
 	};
@@ -83,10 +100,6 @@ public class MorriganServer {
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	public Server getServer () {
-		return server;
-	}
 	
 	public void setOnStopRunnable (Runnable r) {
 		this.onStopRunnable = r;
