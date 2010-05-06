@@ -27,8 +27,8 @@ public class ServerMain {
 		
 		// Start server.
 		MorriganServer s = makeServer();
-		s.getServer().start();
-		s.getServer().join(); // Like Thread.join().
+		s.start();
+		s.join(); // Like Thread.join().
 		
 		// Clean up.
 		cleanupPlayer();
