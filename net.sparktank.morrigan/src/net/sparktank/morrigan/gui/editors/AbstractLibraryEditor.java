@@ -6,7 +6,6 @@ import java.util.List;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.ApplicationActionBarAdvisor;
-import net.sparktank.morrigan.gui.actions.LibraryUpdateAction;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.dialogs.RunnableDialog;
 import net.sparktank.morrigan.gui.display.ActionListener;
@@ -39,14 +38,10 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IViewPart;
 
-public class LibraryEditor extends MediaListEditor<AbstractMediaLibrary> {
+public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> extends MediaListEditor<AbstractMediaLibrary> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public static final String ID = "net.sparktank.morrigan.gui.editors.LibraryEditor";
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	public LibraryEditor () {
+	public AbstractLibraryEditor () {
 		super();
 	}
 	
@@ -89,12 +84,28 @@ public class LibraryEditor extends MediaListEditor<AbstractMediaLibrary> {
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	// FIXME how to remote the suppress warnings?
+	@SuppressWarnings("unchecked")
+	@Override
+	public T getMediaList () {
+		if (editorInput.getMediaList() instanceof AbstractMediaLibrary) {
+			return (T) editorInput.getMediaList();
+			
+		} else {
+			throw new IllegalArgumentException();
+		}
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	GUI components.
 	
-	private Image iconX;
-	private Image iconQueueAdd;
-	private Image iconAdd;
-	private Image iconProperties;
+	protected final int sep = 3;
+	
+	protected Image iconX;
+	protected Image iconQueueAdd;
+	protected Image iconAdd;
+	protected Image iconProperties;
 	
 	private void makeIcons () {
 		iconX = Activator.getImageDescriptor("icons/x.gif").createImage();
@@ -114,6 +125,12 @@ public class LibraryEditor extends MediaListEditor<AbstractMediaLibrary> {
 	
 	private Label lblStatus = null;
 	private Text txtFilter = null;
+	protected Button btnClearFilter = null;
+	protected Button btnAddToQueue = null;
+	protected Button btnAdd = null;
+	protected Button btnProperties = null;
+	
+	protected MenuManager prefMenuMgr = null;
 	
 	@Override
 	protected void populateToolbar (Composite parent) {
@@ -131,20 +148,9 @@ public class LibraryEditor extends MediaListEditor<AbstractMediaLibrary> {
 		// Off-screen controls.
 		
 		// Pref menu.
-		MenuManager prefMenuMgr = new MenuManager();
+		prefMenuMgr = new MenuManager();
 		for (SortAction a : sortActions) {
 			prefMenuMgr.add(a);
-		}
-		/* FIXME
-		 * Instead of checking the type, create separate editors
-		 * for remote and local libraries? 
-		 */
-		if (getMediaList() instanceof LocalMediaLibrary) {
-			LocalMediaLibrary ml = (LocalMediaLibrary) getMediaList();
-			
-			prefMenuMgr.add(new Separator());
-			prefMenuMgr.add(new LibraryUpdateAction(ml));
-			prefMenuMgr.add(showPropertiesAction);
 		}
 		
 		// Context menu.
@@ -158,15 +164,14 @@ public class LibraryEditor extends MediaListEditor<AbstractMediaLibrary> {
 		
 		// On-screen controls.
 		
-		final int sep = 3;
 		FormData formData;
 		
 		lblStatus = new Label(parent, SWT.NONE);
 		txtFilter = new Text(parent, SWT.SINGLE | SWT.BORDER | SWT.SEARCH);
-		Button btnClearFilter = new Button(parent, SWT.PUSH);
-		Button btnAddToQueue = new Button(parent, SWT.PUSH);
-		Button btnAdd = new Button(parent, SWT.PUSH);
-		Button btnProperties = new Button(parent, SWT.PUSH);
+		btnClearFilter = new Button(parent, SWT.PUSH);
+		btnAddToQueue = new Button(parent, SWT.PUSH);
+		btnAdd = new Button(parent, SWT.PUSH);
+		btnProperties = new Button(parent, SWT.PUSH);
 		
 		formData = new FormData();
 		formData.top = new FormAttachment(50, -(lblStatus.computeSize(SWT.DEFAULT, SWT.DEFAULT).y)/2);
@@ -355,7 +360,7 @@ public class LibraryEditor extends MediaListEditor<AbstractMediaLibrary> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Actions.
 	
-	private IAction addAction = new Action("Add") {
+	protected IAction addAction = new Action("Add") {
 		public void run () {
 			ViewLibraryProperties propView = showLibPropView();
 			if (propView!=null) {
@@ -364,7 +369,7 @@ public class LibraryEditor extends MediaListEditor<AbstractMediaLibrary> {
 		}
 	};
 	
-	private IAction showPropertiesAction = new Action("Properties") {
+	protected IAction showPropertiesAction = new Action("Properties") {
 		public void run () {
 			showLibPropView();
 		}

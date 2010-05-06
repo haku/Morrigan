@@ -6,7 +6,7 @@ import java.util.List;
 import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.actions.LibraryUpdateAction;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
-import net.sparktank.morrigan.gui.editors.LibraryEditor;
+import net.sparktank.morrigan.gui.editors.AbstractLibraryEditor;
 import net.sparktank.morrigan.model.library.DbException;
 import net.sparktank.morrigan.model.library.LocalMediaLibrary;
 
@@ -58,8 +58,8 @@ public class ViewLibraryProperties extends ViewPart {
 	private IPartListener partListener = new IPartListener() {
 		@Override
 		public void partActivated(IWorkbenchPart part) {
-			if (part instanceof LibraryEditor) {
-				LibraryEditor libEditor = (LibraryEditor) part;
+			if (part instanceof AbstractLibraryEditor) {
+				AbstractLibraryEditor libEditor = (AbstractLibraryEditor) part;
 				// FIXME don't do this like this?
 				if (libEditor.getMediaList() instanceof LocalMediaLibrary) {
 					LocalMediaLibrary ml = (LocalMediaLibrary) libEditor.getMediaList();
