@@ -26,7 +26,9 @@ public class RemoteLibraryHelper {
 	
 	public static RemoteMediaLibrary createRemoteLib (String libUrl) throws MorriganException, MalformedURLException {
 		URL url = new URL(libUrl);
-		String file = getFullPathToLib(url.getHost() + "_" + url.getPort());
+		// FIXME better naming?
+		String name = libUrl.substring(libUrl.lastIndexOf("/")+1).replace(Config.LIB_REMOTE_FILE_EXT, "").replace(Config.LIB_LOCAL_FILE_EXT, "");
+		String file = getFullPathToLib(url.getHost() + "_" + url.getPort() + "_" + name);
 		RemoteMediaLibrary lib = MediaListFactory.makeRemoteMediaLibrary(getLibraryTitle(file), libUrl, file);
 		return lib;
 	}
