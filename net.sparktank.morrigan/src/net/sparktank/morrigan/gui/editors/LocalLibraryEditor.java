@@ -15,6 +15,13 @@ public class LocalLibraryEditor extends AbstractLibraryEditor<LocalMediaLibrary>
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
+	protected boolean handleReadError(Exception e) {
+		return false;
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	@Override
 	protected void populateToolbar(Composite parent) {
 		super.populateToolbar(parent);
 		

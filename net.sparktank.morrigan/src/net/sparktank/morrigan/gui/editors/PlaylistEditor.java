@@ -56,6 +56,11 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist> {
 		super.dispose();
 	}
 	
+	@Override
+	protected boolean handleReadError(Exception e) {
+		return false;
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	EditorPart methods.
 	
