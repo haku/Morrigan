@@ -1,11 +1,13 @@
 package net.sparktank.morrigan.model.library;
 
 import java.io.File;
+import java.net.URL;
 import java.util.Date;
 
 import net.sparktank.morrigan.engines.playback.NotImplementedException;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.MediaItem;
+import net.sparktank.morrigan.server.feedreader.MediaListFeedReader;
 
 public class RemoteMediaLibrary extends AbstractMediaLibrary {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -56,8 +58,15 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 	
 	@Override
 	protected void doRead() throws MorriganException {
-		// TODO implement server reading.
-		System.err.println("TODO: read data from " + serverUrl);
+		System.err.println("Reading data from " + serverUrl + " ...");
+		try {
+			MediaListFeedReader reader = new MediaListFeedReader(new URL(serverUrl));
+			replaceList(reader.getMediaItemList());
+			
+		} catch (Exception e) {
+			throw new MorriganException(e);
+		}
+		
 	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

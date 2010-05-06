@@ -1,6 +1,7 @@
 package net.sparktank.morrigan.server.feedreader;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import net.sparktank.morrigan.model.MediaItem;
@@ -16,7 +17,7 @@ public abstract class GenericFeedReader {
 	
 	private final Document doc;
 	
-	private List<MediaItem> mediaItemList = null;
+	private List<MediaItem> mediaItemList = new ArrayList<MediaItem>();
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
