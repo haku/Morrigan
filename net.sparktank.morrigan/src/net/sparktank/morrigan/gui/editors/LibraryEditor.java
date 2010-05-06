@@ -2,7 +2,7 @@ package net.sparktank.morrigan.gui.editors;
 
 import java.util.ArrayList;
 import java.util.List;
-import net.sparktank.morrigan.model.library.*;
+
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.ApplicationActionBarAdvisor;
@@ -14,8 +14,9 @@ import net.sparktank.morrigan.gui.display.DropMenuListener;
 import net.sparktank.morrigan.gui.views.ViewLibraryProperties;
 import net.sparktank.morrigan.helpers.TimeHelper;
 import net.sparktank.morrigan.model.MediaList.DurationData;
-import net.sparktank.morrigan.model.library.AbstractLibrary;
-import net.sparktank.morrigan.model.library.AbstractLibrary.SortChangeListener;
+import net.sparktank.morrigan.model.library.AbstractMediaLibrary;
+import net.sparktank.morrigan.model.library.MediaLibrary;
+import net.sparktank.morrigan.model.library.AbstractMediaLibrary.SortChangeListener;
 import net.sparktank.morrigan.model.library.SqliteLayer.LibrarySort;
 import net.sparktank.morrigan.model.library.SqliteLayer.LibrarySortDirection;
 
@@ -38,7 +39,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IViewPart;
 
-public class LibraryEditor extends MediaListEditor<AbstractLibrary> {
+public class LibraryEditor extends MediaListEditor<AbstractMediaLibrary> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static final String ID = "net.sparktank.morrigan.gui.editors.LibraryEditor";
