@@ -39,7 +39,9 @@ public class Config {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private static final String LIB_DIR = "/libs";
-	public static final String LIB_FILE_EXT = ".db3";
+	public static final String LIB_ABS_FILE_EXT = ".db3";
+	public static final String LIB_LOCAL_FILE_EXT = ".local.db3";
+	public static final String LIB_REMOTE_FILE_EXT = ".remote.db3";
 	
 	public static File getLibDir () {
 		File f = new File(getConfigDir() + LIB_DIR);

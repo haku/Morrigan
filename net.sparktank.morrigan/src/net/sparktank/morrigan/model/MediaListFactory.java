@@ -7,6 +7,7 @@ import net.sparktank.morrigan.model.library.DbConFactory;
 import net.sparktank.morrigan.model.library.DbException;
 import net.sparktank.morrigan.model.library.LibraryHelper;
 import net.sparktank.morrigan.model.library.MediaLibrary;
+import net.sparktank.morrigan.model.library.RemoteMediaLibrary;
 import net.sparktank.morrigan.model.playlist.MediaPlaylist;
 import net.sparktank.morrigan.model.playlist.PlaylistHelper;
 
@@ -35,6 +36,39 @@ public class MediaListFactory {
 			System.out.println("Making object instance '" + dbFilePath + "'...");
 			ret = new MediaLibrary(libraryName, DbConFactory.getDbLayer(dbFilePath));
 			mediaLibraryCache.put(ret, dbFilePath);
+		}
+		
+		return ret;
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	private static WeakHashMap<RemoteMediaLibrary, String> remoteMediaLibraryCache = new WeakHashMap<RemoteMediaLibrary, String>();
+	
+	public static RemoteMediaLibrary makeRemoteMediaLibrary(String dbFilePath) throws DbException {
+		return makeRemoteMediaLibrary(LibraryHelper.getLibraryTitle(dbFilePath), null, dbFilePath);
+	}
+	
+	public static RemoteMediaLibrary makeRemoteMediaLibrary(String libraryName, String serverUrl, String dbFilePath) throws DbException {
+		RemoteMediaLibrary ret = null;
+		
+		if (remoteMediaLibraryCache.containsValue(dbFilePath)) {
+			for (RemoteMediaLibrary lib : remoteMediaLibraryCache.keySet()) {
+				if (lib.getDbPath().equals(dbFilePath)) {
+					ret = lib;
+					System.out.println("Found '" + dbFilePath + "' in cache.");
+				}
+			}
+		}
+		
+		if (ret == null) {
+			System.out.println("Making object instance '" + dbFilePath + "'...");
+			if (serverUrl != null) {
+				ret = new RemoteMediaLibrary(libraryName, serverUrl, DbConFactory.getDbLayer(dbFilePath));
+			} else {
+				ret = new RemoteMediaLibrary(libraryName, DbConFactory.getDbLayer(dbFilePath));
+			}
+			remoteMediaLibraryCache.put(ret, dbFilePath);
 		}
 		
 		return ret;
@@ -82,6 +116,6 @@ public class MediaListFactory {
 			}
 		}
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

@@ -1,9 +1,8 @@
 package net.sparktank.morrigan.gui.editors;
 
-
 import java.util.ArrayList;
 import java.util.List;
-
+import net.sparktank.morrigan.model.library.*;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.ApplicationActionBarAdvisor;
@@ -15,8 +14,8 @@ import net.sparktank.morrigan.gui.display.DropMenuListener;
 import net.sparktank.morrigan.gui.views.ViewLibraryProperties;
 import net.sparktank.morrigan.helpers.TimeHelper;
 import net.sparktank.morrigan.model.MediaList.DurationData;
-import net.sparktank.morrigan.model.library.MediaLibrary;
-import net.sparktank.morrigan.model.library.MediaLibrary.SortChangeListener;
+import net.sparktank.morrigan.model.library.AbstractLibrary;
+import net.sparktank.morrigan.model.library.AbstractLibrary.SortChangeListener;
 import net.sparktank.morrigan.model.library.SqliteLayer.LibrarySort;
 import net.sparktank.morrigan.model.library.SqliteLayer.LibrarySortDirection;
 
@@ -39,7 +38,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IViewPart;
 
-public class LibraryEditor extends MediaListEditor<MediaLibrary> {
+public class LibraryEditor extends MediaListEditor<AbstractLibrary> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static final String ID = "net.sparktank.morrigan.gui.editors.LibraryEditor";
@@ -135,9 +134,17 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 		for (SortAction a : sortActions) {
 			prefMenuMgr.add(a);
 		}
-		prefMenuMgr.add(new Separator());
-		prefMenuMgr.add(new LibraryUpdateAction(getMediaList()));
-		prefMenuMgr.add(showPropertiesAction);
+		/* FIXME
+		 * Instead of checking the type, create separate editors
+		 * for remote and local libraries? 
+		 */
+		if (getMediaList() instanceof MediaLibrary) {
+			MediaLibrary ml = (MediaLibrary) getMediaList();
+			
+			prefMenuMgr.add(new Separator());
+			prefMenuMgr.add(new LibraryUpdateAction(ml));
+			prefMenuMgr.add(showPropertiesAction);
+		}
 		
 		// Context menu.
 		MenuManager contextMenuMgr = new MenuManager();
@@ -368,7 +375,14 @@ public class LibraryEditor extends MediaListEditor<MediaLibrary> {
 		try {
 			IViewPart showView = getSite().getPage().showView(ViewLibraryProperties.ID);
 			ViewLibraryProperties viewProp = (ViewLibraryProperties) showView;
-			viewProp.setContent(getMediaList());
+			/* FIXME
+			 * Instead of checking the type, create separate editors
+			 * for remote and local libraries? 
+			 */
+			if (getMediaList() instanceof MediaLibrary) {
+				MediaLibrary ml = (MediaLibrary) getMediaList();
+				viewProp.setContent(ml);
+			}
 			return viewProp;
 			
 		} catch (Exception e) {

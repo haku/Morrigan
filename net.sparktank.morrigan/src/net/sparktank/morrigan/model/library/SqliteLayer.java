@@ -48,6 +48,27 @@ public class SqliteLayer {
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Persisted params.
+	
+	public void setProp (String key, String value) throws DbException {
+		try {
+			local_setProp(key, value);
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+	
+	public String getProp (String key) throws DbException {
+		try {
+			return local_getProp(key);
+		} catch (IllegalArgumentException e) {
+			return null;
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	DB readers.
 	
 	public List<MediaItem> getAllMedia (LibrarySort sort, LibrarySortDirection direction, boolean hideMissing) throws DbException {
@@ -226,6 +247,17 @@ public class SqliteLayer {
 	 * .schema tbl_mediafiles
 	 */
 	
+	private static final String SQL_TBL_PROP_EXISTS = 
+		"SELECT name FROM sqlite_master WHERE name='tbl_prop';";
+	
+	private static final String SQL_TBL_PROP_CREATE = 
+		"CREATE TABLE tbl_prop (" +
+		"key VARCHAR(100) NOT NULL collate nocase primary key," +
+		"value VARCHAR(1000)" +
+		");";
+	
+	private static final String SQL_TBL_PROP_COL_VALUE = "value";
+	
 	private static final String SQL_TBL_MEDIAFILES_EXISTS = 
 		"SELECT name FROM sqlite_master WHERE name='tbl_mediafiles';";
 	
@@ -263,10 +295,22 @@ public class SqliteLayer {
 		");";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Properties.
+	
+	private static final String SQL_TBL_PROP_Q_GET =
+		"SELECT value FROM tbl_prop WHERE key=?";
+	
+	private static final String SQL_TBL_PROP_Q_INSERT =
+		"INSERT INTO tbl_prop (key,value) VALUES (?,?)";
+	
+	private static final String SQL_TBL_PROP_Q_UPDATE =
+		"UPDATE tbl_prop SET value=? WHERE key=?";
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Sources.
 	
 	private static final String SQL_TBL_SOURCES_Q_ALL =
-		"SELECT path FROM tbl_sources ORDER BY path ASC;";
+		"SELECT path FROM tbl_sources ORDER BY path ASC";
 	
 	private static final String SQL_TBL_SOURCES_ADD =
 		"INSERT INTO tbl_sources (path) VALUES (?)";
@@ -389,6 +433,15 @@ public class SqliteLayer {
 		try {
 			ResultSet rs;
 			
+			rs = stat.executeQuery(SQL_TBL_PROP_EXISTS);
+			try {
+				if (!rs.next()) { // True if there are rows in the result.
+					stat.executeUpdate(SQL_TBL_PROP_CREATE);
+				}
+			} finally {
+				rs.close();
+			}
+			
 			rs = stat.executeQuery(SQL_TBL_MEDIAFILES_EXISTS);
 			try {
 				if (!rs.next()) { // True if there are rows in the result.
@@ -409,6 +462,56 @@ public class SqliteLayer {
 			
 		} finally {
 			stat.close();
+		}
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Properties.
+	
+	private void local_setProp (String key, String value) throws SQLException, ClassNotFoundException, DbException {
+		PreparedStatement ps = null;
+		int n;
+		
+		try {
+			try {
+				local_getProp(key);
+				ps = getDbCon().prepareStatement(SQL_TBL_PROP_Q_UPDATE);
+				ps.setString(1, value);
+				ps.setString(2, key);
+				
+			} catch (IllegalArgumentException e) {
+				ps = getDbCon().prepareStatement(SQL_TBL_PROP_Q_INSERT);
+				ps.setString(1, key);
+				ps.setString(2, value);
+			}
+			
+			n = ps.executeUpdate();
+			if (n<1) throw new DbException("No update occured.");
+			
+		} finally {
+			ps.close();
+		}
+	}
+	
+	private String local_getProp (String key) throws SQLException, ClassNotFoundException {
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		
+		try {
+			ps = getDbCon().prepareStatement(SQL_TBL_PROP_Q_GET);
+			ps.setString(1, key);
+			rs = ps.executeQuery();
+			
+			if (!rs.next()) { // True if there are rows in the result.
+				throw new IllegalArgumentException("Did not find key '"+key+"'.");
+			}
+			
+			String value = rs.getString(SQL_TBL_PROP_COL_VALUE);
+			return value;
+			
+		} finally {
+			if (rs != null) rs.close();
+			if (ps != null) ps.close();
 		}
 	}
 	

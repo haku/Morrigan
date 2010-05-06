@@ -3,11 +3,11 @@ package net.sparktank.morrigan.gui.handler;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.editors.EditorFactory;
 import net.sparktank.morrigan.gui.editors.LibraryEditor;
+import net.sparktank.morrigan.gui.editors.LibraryEditorInput;
 import net.sparktank.morrigan.gui.editors.MediaListEditorInput;
 import net.sparktank.morrigan.gui.editors.PlaylistEditor;
-import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
 import net.sparktank.morrigan.gui.views.ViewMediaExplorer;
-import net.sparktank.morrigan.model.library.MediaLibrary;
+import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
 import net.sparktank.morrigan.model.playlist.MediaPlaylist;
 
 import org.eclipse.core.commands.AbstractHandler;
@@ -56,7 +56,16 @@ public class CallMediaListEditor extends AbstractHandler {
 					
 				} else if (item.type == MediaExplorerItem.ItemType.LIBRARY) {
 					try {
-						MediaListEditorInput<MediaLibrary> input = EditorFactory.getMediaLibraryInput(item.identifier);
+						LibraryEditorInput input = EditorFactory.getMediaLibraryInput(item.identifier);
+						page.openEditor(input, LibraryEditor.ID);
+					} catch (Exception e) {
+						new MorriganMsgDlg(e).open();
+						return null;
+					}
+					
+				} else if (item.type == MediaExplorerItem.ItemType.REMOTELIBRARY) {
+					try {
+						LibraryEditorInput input = EditorFactory.getRemoteMediaLibraryInput(item.identifier);
 						page.openEditor(input, LibraryEditor.ID);
 					} catch (Exception e) {
 						new MorriganMsgDlg(e).open();
