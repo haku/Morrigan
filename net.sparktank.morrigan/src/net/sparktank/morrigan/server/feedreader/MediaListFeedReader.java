@@ -90,6 +90,8 @@ public class MediaListFeedReader extends GenericFeedReader {
 				mi.setEndCount(v);
 			}
 			
+			// TODO parse the rest of the metadata.
+			
 		}
 		
 		try {

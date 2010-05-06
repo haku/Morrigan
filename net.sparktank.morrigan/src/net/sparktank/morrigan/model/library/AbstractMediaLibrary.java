@@ -256,6 +256,7 @@ public abstract class AbstractMediaLibrary extends MediaList {
 		if (added) {
 			track = mi;
 			addTrack(track);
+			// TODO store metadata in DB, including DisplayTitle!
 			
 		} else {
 			// Update item.
@@ -266,8 +267,9 @@ public abstract class AbstractMediaLibrary extends MediaList {
 			} else {
 				throw new MorriganException("Failed to find item '"+mi.getFilepath()+"' in list '"+this+"'.");
 			}
+			// TODO update metadata in DB.
+			track.setFromMediaItem(mi);
 		}
-		track.setFromMediaItem(mi);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

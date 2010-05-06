@@ -56,6 +56,8 @@ public class MediaListFeed extends GenericFeed {
 			addElement(doc, entry, "startcount", mi.getStartCount());
 			addElement(doc, entry, "endcount", mi.getEndCount());
 			
+			// TODO include the rest of metadata.
+			
 			feed.appendChild(entry);
 		}
 	}
