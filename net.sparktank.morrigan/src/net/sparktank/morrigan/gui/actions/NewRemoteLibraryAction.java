@@ -1,6 +1,5 @@
 package net.sparktank.morrigan.gui.actions;
 
-import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.views.ViewMediaExplorer;
@@ -45,13 +44,13 @@ public class NewRemoteLibraryAction extends Action implements IWorkbenchAction {
 	public void run () {
 		InputDialog dlg = new InputDialog(
 				Display.getCurrent().getActiveShell(),
-				"", "Enter library URL.", "http://", null);
+				"", "Enter library URL.", "http://localhost:8080/media/library/mylibrary.local.db3", null);
 		if (dlg.open() == Window.OK) {
 			
 			String libUrl = dlg.getValue();
 			try {
 				RemoteLibraryHelper.createRemoteLib(libUrl);
-			} catch (MorriganException e) {
+			} catch (Exception e) {
 				new MorriganMsgDlg(e).open();
 				return;
 			}

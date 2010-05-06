@@ -60,7 +60,11 @@ public class ViewLibraryProperties extends ViewPart {
 		public void partActivated(IWorkbenchPart part) {
 			if (part instanceof LibraryEditor) {
 				LibraryEditor libEditor = (LibraryEditor) part;
-				setContent(libEditor.getMediaList());
+				// FIXME don't do this like this?
+				if (libEditor.getMediaList() instanceof MediaLibrary) {
+					MediaLibrary ml = (MediaLibrary) libEditor.getMediaList();
+					setContent(ml);
+				}
 			}
 		}
 		

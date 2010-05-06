@@ -15,8 +15,8 @@ public class LibraryHelper {
 		File libDir = Config.getLibDir();
 		String libFile = libDir.getPath() + File.separator + fileName;
 		
-		if (!libFile.toLowerCase().endsWith(Config.LIB_FILE_EXT)) {
-			libFile = libFile.concat(Config.LIB_FILE_EXT);
+		if (!libFile.toLowerCase().endsWith(Config.LIB_LOCAL_FILE_EXT)) {
+			libFile = libFile.concat(Config.LIB_LOCAL_FILE_EXT);
 		}
 		
 		return libFile;
@@ -29,7 +29,7 @@ public class LibraryHelper {
 	}
 	
 	public static boolean isLibFile (String filePath) {
-		return (filePath.toLowerCase().endsWith(Config.LIB_FILE_EXT));
+		return (filePath.toLowerCase().endsWith(Config.LIB_LOCAL_FILE_EXT));
 	}
 	
 	public static ArrayList<MediaExplorerItem> getAllLibraries () {
@@ -63,7 +63,7 @@ public class LibraryHelper {
 			ret = ret.substring(x+1);
 		}
 		
-		x = ret.lastIndexOf(Config.LIB_FILE_EXT);
+		x = ret.lastIndexOf(Config.LIB_ABS_FILE_EXT);
 		if (x > 0) {
 			ret = ret.substring(0, x);
 		}

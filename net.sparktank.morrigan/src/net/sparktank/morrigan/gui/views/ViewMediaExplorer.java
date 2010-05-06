@@ -103,6 +103,8 @@ public class ViewMediaExplorer extends ViewPart {
 					case DISPLAY:
 						return imageCache.readImage("icons/display.gif");
 					
+					case REMOTELIBRARY:
+						return imageCache.readImage("icons/library-remote.gif");
 				}
 			}
 			return null;

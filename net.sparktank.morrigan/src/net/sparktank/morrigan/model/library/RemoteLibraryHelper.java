@@ -1,24 +1,57 @@
 package net.sparktank.morrigan.model.library;
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 
+import net.sparktank.morrigan.config.Config;
 import net.sparktank.morrigan.exceptions.MorriganException;
-import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
+import net.sparktank.morrigan.model.MediaListFactory;
 import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
 
 public class RemoteLibraryHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public static MediaLibrary createRemoteLib (String libUrl) throws MorriganException {
-		new MorriganMsgDlg("TODO: link to " + libUrl).open();
+	public static String getFullPathToLib (String fileName) {
+		File libDir = Config.getLibDir();
+		String libFile = libDir.getPath() + File.separator + fileName;
 		
-		return null;
+		if (!libFile.toLowerCase().endsWith(Config.LIB_REMOTE_FILE_EXT)) {
+			libFile = libFile.concat(Config.LIB_REMOTE_FILE_EXT);
+		}
+		
+		return libFile;
+	}
+	
+	public static RemoteMediaLibrary createRemoteLib (String libUrl) throws MorriganException, MalformedURLException {
+		URL url = new URL(libUrl);
+		String file = getFullPathToLib(url.getHost() + "_" + url.getPort());
+		RemoteMediaLibrary lib = MediaListFactory.makeRemoteMediaLibrary(LibraryHelper.getLibraryTitle(file), libUrl, file);
+		return lib;
+	}
+	
+	public static boolean isLibFile (String filePath) {
+		return (filePath.toLowerCase().endsWith(Config.LIB_REMOTE_FILE_EXT));
 	}
 	
 	public static ArrayList<MediaExplorerItem> getAllRemoteLibraries () {
 		ArrayList<MediaExplorerItem> ret = new ArrayList<MediaExplorerItem>();
 		
+		File libDir = Config.getLibDir();
+		File [] libFiles = libDir.listFiles();
 		
+		// empty dir?
+		if (libFiles == null || libFiles.length < 1 ) return ret;
+		
+		for (File file : libFiles) {
+			if (isLibFile(file.getAbsolutePath())) {
+				MediaExplorerItem newItem = new MediaExplorerItem(MediaExplorerItem.ItemType.REMOTELIBRARY);
+				newItem.identifier = file.getAbsolutePath();
+				newItem.title = LibraryHelper.getLibraryTitle(newItem.identifier);
+				ret.add(newItem);
+			}
+		}
 		
 		return ret;
 	}
