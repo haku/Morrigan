@@ -18,6 +18,7 @@ public class MediaItem {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Attributes.
 	
+	private String displayTitle = null;
 	private String filepath = null;
 	private Date dateAdded = null;
 	private long startCount = 0;
@@ -28,6 +29,13 @@ public class MediaItem {
 	private Date dateLastModified = null;
 	private boolean enabled = true;
 	private boolean missing = false;
+	
+	public String getDisplayTitle() {
+		return displayTitle;
+	}
+	public void setDisplayTitle(String displayTitle) {
+		this.displayTitle = displayTitle;
+	}
 	
 	public String getFilepath () {
 		return filepath;
@@ -100,9 +108,27 @@ public class MediaItem {
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Secondary attributes.
+	
+	public String getTitle () {
+		if (getDisplayTitle() != null) {
+			return getDisplayTitle();
+			
+		} else {
+			int x = filepath.lastIndexOf(File.separator);
+			if (x>0) {
+				return filepath.substring(x+1);
+			} else {
+				return filepath;
+			}
+		}
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Mass setter.
 	
 	public void setFromMediaItem (MediaItem mi) {
+		this.setDisplayTitle(mi.getDisplayTitle());
 		this.setFilepath(mi.getFilepath());
 		this.setDateAdded(mi.getDateAdded());
 		this.setStartCount(mi.getStartCount());
@@ -113,18 +139,6 @@ public class MediaItem {
 		this.setDateLastModified(mi.getDateLastModified());
 		this.setEnabled(mi.isEnabled());
 		this.setMissing(mi.isMissing());
-	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Secondary attributes.
-	
-	public String getTitle () {
-		int x = filepath.lastIndexOf(File.separator);
-		if (x>0) {
-			return filepath.substring(x+1);
-		} else {
-			return filepath;
-		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
