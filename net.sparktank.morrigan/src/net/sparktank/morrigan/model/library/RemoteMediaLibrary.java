@@ -1,7 +1,9 @@
 package net.sparktank.morrigan.model.library;
 
 import java.io.File;
+import java.net.SocketException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.Date;
 
 import net.sparktank.morrigan.engines.playback.NotImplementedException;
@@ -59,14 +61,22 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 	@Override
 	protected void doRead() throws MorriganException {
 		System.err.println("Reading data from " + serverUrl + " ...");
+		
+		MediaListFeedReader reader = null;
 		try {
-			MediaListFeedReader reader = new MediaListFeedReader(new URL(serverUrl));
-			replaceList(reader.getMediaItemList());
+			reader = new MediaListFeedReader(new URL(serverUrl));
+			
+		} catch (UnknownHostException e) {
+			throw new MorriganException("Host unknown.", e);
+			
+		} catch (SocketException e) {
+			throw new MorriganException("Host unreachable.", e);
 			
 		} catch (Exception e) {
 			throw new MorriganException(e);
 		}
 		
+		replaceList(reader.getMediaItemList());
 	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
