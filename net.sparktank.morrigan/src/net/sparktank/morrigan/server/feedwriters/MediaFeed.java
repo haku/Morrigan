@@ -53,7 +53,7 @@ public class MediaFeed extends GenericFeed {
 				
 				Element entry = doc.createElement("entry");
 				addElement(doc, entry, "title", i.title);
-				addLink(doc, entry, "/media/" + type + "/" + fileName);
+				addLink(doc, entry, "/media/" + type + "/" + fileName, "self");
 				
 				for (Player p : players) {
 					addLink(doc, entry, "/player/" + p.getId() + "/play/" + fileName, "play");

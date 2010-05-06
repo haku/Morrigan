@@ -49,7 +49,7 @@ public class MediaListFeed extends GenericFeed {
 			}
 			
 			addElement(doc, entry, "title", mi.getTitle());
-			addLink(doc, entry, "/media/" + ml.getType() + "/" + filenameFromPath(ml.getListId()) + "/" + file);
+			addLink(doc, entry, "/media/" + ml.getType() + "/" + filenameFromPath(ml.getListId()) + "/" + file, "self");
 			addLink(doc, entry, "/player/0/play/" + listFile + "/" + file, "play"); // FIXME list all players here.
 			addElement(doc, entry, "duration", mi.getDuration());
 			addElement(doc, entry, "hash", mi.getHashcode());
