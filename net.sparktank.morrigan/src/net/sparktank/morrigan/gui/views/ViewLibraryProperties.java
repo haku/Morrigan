@@ -58,8 +58,8 @@ public class ViewLibraryProperties extends ViewPart {
 	private IPartListener partListener = new IPartListener() {
 		@Override
 		public void partActivated(IWorkbenchPart part) {
-			if (part instanceof AbstractLibraryEditor) {
-				AbstractLibraryEditor libEditor = (AbstractLibraryEditor) part;
+			if (part instanceof AbstractLibraryEditor<?>) {
+				AbstractLibraryEditor<?> libEditor = (AbstractLibraryEditor<?>) part;
 				// FIXME don't do this like this?
 				if (libEditor.getMediaList() instanceof LocalMediaLibrary) {
 					LocalMediaLibrary ml = (LocalMediaLibrary) libEditor.getMediaList();
