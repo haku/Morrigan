@@ -1,9 +1,10 @@
 package net.sparktank.morrigan.server.feedreader;
 
 import java.io.IOException;
-import java.net.URL;
 
+import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.MediaItem;
+import net.sparktank.morrigan.model.library.RemoteMediaLibrary;
 import net.sparktank.morrigan.server.HttpClient;
 
 import org.w3c.dom.NamedNodeMap;
@@ -14,12 +15,24 @@ import org.xml.sax.SAXException;
 public class MediaListFeedReader extends GenericFeedReader {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public MediaListFeedReader(URL url) throws SAXException, IOException, FeedParseException {
-		super(HttpClient.getHttpClient().doHttpRequest(url).getBody());
-	}
+	private final RemoteMediaLibrary library;
+
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public MediaListFeedReader(String xmlString) throws SAXException, IOException, FeedParseException {
-		super(xmlString);
+	public MediaListFeedReader(RemoteMediaLibrary library) throws SAXException, IOException, MorriganException {
+		super(HttpClient.getHttpClient().doHttpRequest(library.getUrl()).getBody());
+		this.library = library;
+		
+		try {
+			library.setAutoCommit(false);
+			parse();
+		} finally {
+			try {
+				library.commit();
+			} finally {
+				library.setAutoCommit(true);
+			}
+		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -38,11 +51,6 @@ public class MediaListFeedReader extends GenericFeedReader {
 			
 			if (item.getNodeName().equals("link")) {
 				NamedNodeMap att = item.getAttributes();
-				
-				System.err.println("node '" + item.getNodeName() + "' has att:");
-				for (int j = 0; j < att.getLength(); j++) {
-					System.err.println("   " + att.item(j).getNodeName() + "=" + att.item(j).getNodeValue());
-				}
 				
 				Node relNode = att.getNamedItem("rel");
 				if (relNode != null) {
@@ -84,7 +92,11 @@ public class MediaListFeedReader extends GenericFeedReader {
 			
 		}
 		
-		addMediaItem(mi);
+		try {
+			library.updateItem(mi);
+		} catch (MorriganException e) {
+			throw new FeedParseException(e);
+		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

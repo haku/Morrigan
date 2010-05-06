@@ -56,9 +56,8 @@ public abstract class AbstractMediaLibrary extends MediaList {
 	@Override
 	public void read () throws MorriganException {
 		if (!firstRead) return;
-		firstRead = false;
-		
 		doRead();
+		firstRead = false;
 	}
 	
 	protected void doRead () throws MorriganException {
@@ -76,6 +75,14 @@ public abstract class AbstractMediaLibrary extends MediaList {
 	public void reRead () throws MorriganException {
 		firstRead = true;
 		read();
+	}
+	
+	public void setAutoCommit (boolean b) throws MorriganException {
+		dbLayer.setAutoCommit(b);
+	}
+	
+	public void commit () throws MorriganException {
+		dbLayer.commit();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -232,10 +239,35 @@ public abstract class AbstractMediaLibrary extends MediaList {
 	 * Returns true if the file was added.
 	 * (i.e. it was not already in the library)
 	 */
-	public boolean addFile (File file) throws MorriganException {
+	public MediaItem addFile (File file) throws MorriganException {
+		MediaItem track = null;
 		boolean added = dbLayer.addFile(file);
-		if (added) addTrack(new MediaItem(file.getAbsolutePath()));
-		return added;
+		if (added) {
+			track = new MediaItem(file.getAbsolutePath());
+			addTrack(track);
+		}
+		return track;
+	}
+	
+	public void updateItem (MediaItem mi) throws MorriganException {
+		MediaItem track = null;
+		
+		boolean added = dbLayer.addFile(mi.getFilepath(), -1);
+		if (added) {
+			track = mi;
+			addTrack(track);
+			
+		} else {
+			// Update item.
+			List<MediaItem> mediaTracks = getMediaTracks();
+			int index = mediaTracks.indexOf(mi);
+			if (index >= 0) {
+				track = mediaTracks.get(index);
+			} else {
+				throw new MorriganException("Failed to find item '"+mi.getFilepath()+"' in list '"+this+"'.");
+			}
+		}
+		track.setFromMediaItem(mi);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

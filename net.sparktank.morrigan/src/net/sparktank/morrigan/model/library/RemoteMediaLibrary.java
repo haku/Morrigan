@@ -1,6 +1,6 @@
 package net.sparktank.morrigan.model.library;
 
-import java.io.File;
+import java.net.MalformedURLException;
 import java.net.SocketException;
 import java.net.URL;
 import java.net.UnknownHostException;
@@ -18,33 +18,33 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 	
 	public static final String DBKEY_SERVERURL = "SERVERURL";
 
-	private final String serverUrl;
+	private final URL url;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public RemoteMediaLibrary (String libraryName, SqliteLayer localDbLayer) throws DbException {
+	public RemoteMediaLibrary (String libraryName, SqliteLayer localDbLayer) throws DbException, MalformedURLException {
 		super(libraryName, localDbLayer);
 		
 		String s = localDbLayer.getProp(DBKEY_SERVERURL);
 		if (s != null) {
-			this.serverUrl = s;
+			url = new URL(s);
 			
 		} else {
 			throw new IllegalArgumentException("serverUrl not found in localDbLayer ('"+localDbLayer.getDbFilePath()+"').");
 		}
 	}
 	
-	public RemoteMediaLibrary (String libraryName, String serverUrl, SqliteLayer localDbLayer) throws DbException {
+	public RemoteMediaLibrary (String libraryName, URL url, SqliteLayer localDbLayer) throws DbException {
 		super(libraryName, localDbLayer);
-		this.serverUrl = serverUrl;
+		this.url = url;
 		
 		String s = localDbLayer.getProp(DBKEY_SERVERURL);
 		if (s == null) {
-			localDbLayer.setProp(DBKEY_SERVERURL, serverUrl);
-			System.err.println("Set DBKEY_SERVERURL=" + serverUrl + " in " + localDbLayer.getDbFilePath());
+			localDbLayer.setProp(DBKEY_SERVERURL, url.toExternalForm());
+			System.err.println("Set DBKEY_SERVERURL=" + url.toExternalForm() + " in " + localDbLayer.getDbFilePath());
 			
-		} else if (!s.equals(serverUrl)) {
-			throw new IllegalArgumentException("serverUrl does not match localDbLayer ('"+serverUrl+"' != '"+s+"' in '"+localDbLayer.getDbFilePath()+"').");
+		} else if (!s.equals(url.toExternalForm())) {
+			throw new IllegalArgumentException("serverUrl does not match localDbLayer ('"+url.toExternalForm()+"' != '"+s+"' in '"+localDbLayer.getDbFilePath()+"').");
 		}
 		
 	}
@@ -56,15 +56,21 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 		return TYPE;
 	}
 	
+	public URL getUrl() {
+		return url;
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
 	protected void doRead() throws MorriganException {
-		System.err.println("Reading data from " + serverUrl + " ...");
+		super.doRead();
 		
-		MediaListFeedReader reader = null;
+		System.err.println("Reading data from " + url.toExternalForm() + " ...");
+		
+		// TODO do this in bg thread?
 		try {
-			reader = new MediaListFeedReader(new URL(serverUrl));
+			new MediaListFeedReader(this);
 			
 		} catch (UnknownHostException e) {
 			throw new MorriganException("Host unknown.", e);
@@ -75,9 +81,7 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 		} catch (Exception e) {
 			throw new MorriganException(e);
 		}
-		
-		replaceList(reader.getMediaItemList());
-	};
+	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -151,12 +155,6 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 	@Override
 	public void removeSource (String source) throws DbException {
 		throw new DbException("Not implemented.");
-	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	public boolean addFile (File file) throws MorriganException {
-		throw new NotImplementedException();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
