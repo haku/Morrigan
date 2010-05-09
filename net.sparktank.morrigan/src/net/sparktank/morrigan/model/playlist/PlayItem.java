@@ -6,10 +6,10 @@ import net.sparktank.morrigan.model.MediaList;
 
 public class PlayItem {
 	
-	public MediaList list;
+	public MediaList<? extends MediaItem> list;
 	public MediaItem item;
 	
-	public PlayItem (MediaList list, MediaItem item) {
+	public PlayItem (MediaList<? extends MediaItem> list, MediaItem item) {
 		this.list = list;
 		this.item = item;
 	}

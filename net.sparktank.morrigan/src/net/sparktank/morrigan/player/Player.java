@@ -92,8 +92,8 @@ public class Player {
 		return _currentItem;
 	}
 	
-	public MediaList getCurrentList () {
-		MediaList ret = null;
+	public MediaList<? extends MediaItem> getCurrentList () {
+		MediaList<? extends MediaItem> ret = null;
 		
 		PlayItem currentItem = getCurrentItem();
 		if (currentItem != null && currentItem.list != null) {
@@ -134,7 +134,7 @@ public class Player {
 			}
 			
 		} else {
-			MediaList currentList = getCurrentList();
+			MediaList<? extends MediaItem> currentList = getCurrentList();
 			if (currentList != null) {
 				MediaItem nextTrack = OrderHelper.getNextTrack(currentList, null, _playbackOrder);
 				if (nextTrack != null) {
@@ -354,7 +354,7 @@ public class Player {
 	/**
 	 * For UI handlers to call.
 	 */
-	public void loadAndStartPlaying (MediaList list) {
+	public void loadAndStartPlaying (MediaList<? extends MediaItem> list) {
 		MediaItem nextTrack = OrderHelper.getNextTrack(list, null, _playbackOrder);
 		loadAndStartPlaying(list, nextTrack);
 	}
@@ -362,7 +362,7 @@ public class Player {
 	/**
 	 * For UI handlers to call.
 	 */
-	public void loadAndStartPlaying (MediaList list, MediaItem track) {
+	public void loadAndStartPlaying (MediaList<? extends MediaItem> list, MediaItem track) {
 		if (track == null) throw new NullPointerException();
 		loadAndStartPlaying(new PlayItem(list, track));
 	}

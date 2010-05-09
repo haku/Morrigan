@@ -11,17 +11,17 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-public class MediaListFeed extends GenericFeed {
+public class MediaListFeed<T extends MediaList<? extends MediaItem>> extends GenericFeed {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public MediaListFeed (MediaList ml) throws MorriganException {
+	public MediaListFeed (T ml) throws MorriganException {
 		super();
 		mediaLibraryToFeed(ml, getDoc());
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	static private void mediaLibraryToFeed (MediaList ml, Document doc) throws MorriganException {
+	private void mediaLibraryToFeed (T ml, Document doc) throws MorriganException {
 		ml.read();
 		
 		String listFile;
@@ -55,8 +55,15 @@ public class MediaListFeed extends GenericFeed {
 			addElement(doc, entry, "hash", mi.getHashcode());
 			addElement(doc, entry, "startcount", mi.getStartCount());
 			addElement(doc, entry, "endcount", mi.getEndCount());
-			
-			// TODO include the rest of metadata.
+			if (mi.getDateAdded() != null) {
+				addElement(doc, entry, "dateadded", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateAdded()));
+			}
+			if (mi.getDateLastModified() != null) {
+				addElement(doc, entry, "datelastmodified", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateLastModified()));
+			}
+			if (mi.getDateLastPlayed() != null) {
+				addElement(doc, entry, "datelastplayed", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateLastPlayed()));
+			}
 			
 			feed.appendChild(entry);
 		}

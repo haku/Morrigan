@@ -124,13 +124,13 @@ public class PlayersHandler extends AbstractHandler {
 	private void doPlay (Player player, String param) throws MorriganException {
 		if (LocalLibraryHelper.isLibFile(param)) {
 			String f = LocalLibraryHelper.getFullPathToLib(param);
-			MediaList ml = MediaListFactory.makeMediaLibrary(f);
+			MediaList<?> ml = MediaListFactory.makeMediaLibrary(f);
 			ml.read();
 			player.loadAndStartPlaying(ml);
 			
 		} else if (PlaylistHelper.isPlFile(param)) {
 			String f = PlaylistHelper.getFullPathToPlaylist(param);
-			MediaList ml = MediaListFactory.makeMediaPlaylist(f);
+			MediaList<?> ml = MediaListFactory.makeMediaPlaylist(f);
 			ml.read();
 			player.loadAndStartPlaying(ml);
 			

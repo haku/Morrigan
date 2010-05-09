@@ -7,7 +7,7 @@ import java.util.List;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 
-public abstract class MediaList {
+public abstract class MediaList<T extends MediaItem> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public enum DirtyState { CLEAN, DIRTY, METADATA };
@@ -16,7 +16,7 @@ public abstract class MediaList {
 	
 	private final String listId;
 	private final String listName;
-	private List<MediaItem> mediaTracks = new ArrayList<MediaItem>();
+	private List<T> mediaTracks = new ArrayList<T>();
 	
 	/**
 	 * listId must be unique.  It will be used to identify
@@ -127,17 +127,23 @@ public abstract class MediaList {
 	 * Returns an unmodifiable list of the playlist items.
 	 * @return
 	 */
-	public List<MediaItem> getMediaTracks() {
+	public List<T> getMediaTracks() {
 		return Collections.unmodifiableList(mediaTracks);
 	}
 	
-	protected void replaceList (List<MediaItem> newTracks) {
-		List<MediaItem> tempList = new ArrayList<MediaItem>();
+	/**
+	 * 
+	 * @param newTracks
+	 * @return items that are removed.
+	 */
+	protected List<T> replaceList (List<T> newTracks) {
+		List<T> tempList = new ArrayList<T>();
+		List<T> ret;
 		
-		for (MediaItem newItem : newTracks) {
+		for (T newItem : newTracks) {
 			int indexOfOldItem = this.mediaTracks.indexOf(newItem);
 			if (indexOfOldItem >= 0) {
-				MediaItem oldItem = this.mediaTracks.get(indexOfOldItem);
+				T oldItem = this.mediaTracks.get(indexOfOldItem);
 				oldItem.setFromMediaItem(newItem);
 				tempList.add(oldItem);
 			} else {
@@ -145,11 +151,16 @@ public abstract class MediaList {
 			}
 		}
 		
+		System.err.println("Replacing " + this.mediaTracks.size() + " items with " + tempList.size() + " items.");
+		ret = this.mediaTracks;
 		this.mediaTracks = tempList;
 		setDirtyState(DirtyState.DIRTY);
+		
+		ret.removeAll(tempList);
+		return ret;
 	}
 	
-	public void addTrack (MediaItem track) {
+	public void addTrack (T track) {
 		if (allowDuplicateEntries() || !mediaTracks.contains(track)) {
 			mediaTracks.add(track);
 			setDirtyState(DirtyState.DIRTY);

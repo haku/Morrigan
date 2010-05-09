@@ -9,6 +9,7 @@ import java.util.Date;
 import net.sparktank.morrigan.engines.playback.NotImplementedException;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.MediaItem;
+import net.sparktank.morrigan.model.TaskEventListener;
 import net.sparktank.morrigan.server.feedreader.MediaListFeedReader;
 
 public class RemoteMediaLibrary extends AbstractMediaLibrary {
@@ -19,6 +20,8 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 	public static final String DBKEY_SERVERURL = "SERVERURL";
 
 	private final URL url;
+
+	private TaskEventListener taskEventListener;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -60,27 +63,58 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 		return url;
 	}
 	
+	public TaskEventListener getTaskEventListener() {
+		return taskEventListener;
+	}
+	public void setTaskEventListener(TaskEventListener taskEventListener) {
+		this.taskEventListener = taskEventListener;
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	private long cacheDate = -1;
+	
+	/**
+	 * TODO this will be useful when I start pushing data back to the server.
+	 */
+	public void invalidateCache () {
+		cacheDate = -1;
+	}
 	
 	@Override
 	protected void doRead() throws MorriganException {
 		super.doRead();
 		
-		System.err.println("Reading data from " + url.toExternalForm() + " ...");
-		
-		// TODO do this in bg thread?
-		try {
-			new MediaListFeedReader(this);
+		long age = new Date().getTime() - cacheDate;
+		if (age > 60 * 60 * 1000) { // 1 hour.  TODO extract this as config.
+			if (cacheDate > 0) {
+				System.err.println("Cache for '" + getListName() + "' is " + age + " old, reading data from " + url.toExternalForm() + " ...");
+			} else {
+				System.err.println("Cache invalidated, reading data from " + url.toExternalForm() + " ...");
+			}
 			
-		} catch (UnknownHostException e) {
-			throw new MorriganException("Host unknown.", e);
+			try {
+				// This does the actual HTTP fetch.
+				new MediaListFeedReader(this, taskEventListener);
+				
+			} catch (UnknownHostException e) {
+				throw new MorriganException("Host unknown.", e);
+				
+			} catch (SocketException e) {
+				throw new MorriganException("Host unreachable.", e);
+				
+			} catch (Exception e) {
+				throw new MorriganException(e);
+			}
 			
-		} catch (SocketException e) {
-			throw new MorriganException("Host unreachable.", e);
+			super.doRead(); // This forces a DB query - sorts entries.
 			
-		} catch (Exception e) {
-			throw new MorriganException(e);
+			cacheDate = new Date().getTime();
+			
+		} else {
+			System.err.println("Not refreshing as '" + getListName() + "' cache is only " + age + " old.");
 		}
+		
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

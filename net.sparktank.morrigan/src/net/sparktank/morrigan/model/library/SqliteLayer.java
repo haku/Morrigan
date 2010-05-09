@@ -13,7 +13,6 @@ import java.util.Date;
 import java.util.List;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
-import net.sparktank.morrigan.model.MediaItem;
 
 public class SqliteLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -72,7 +71,7 @@ public class SqliteLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	DB readers.
 	
-	public List<MediaItem> getAllMedia (LibrarySort sort, LibrarySortDirection direction, boolean hideMissing) throws DbException {
+	public List<MediaLibraryItem> getAllMedia (LibrarySort sort, LibrarySortDirection direction, boolean hideMissing) throws DbException {
 		try {
 			return local_getAllMedia(sort, direction, hideMissing);
 		} catch (Exception e) {
@@ -80,7 +79,7 @@ public class SqliteLayer {
 		}
 	}
 	
-	public List<MediaItem> simpleSearch (String term, String esc, int maxResults) throws DbException {
+	public List<MediaLibraryItem> simpleSearch (String term, String esc, int maxResults) throws DbException {
 		try {
 			return local_simpleSearch(term, esc, maxResults);
 		} catch (Exception e) {
@@ -190,9 +189,25 @@ public class SqliteLayer {
 		}
 	}
 	
+	public void setTrackStartCnt (String sfile, long n) throws DbException {
+		try {
+			local_setTrackStartCnt(sfile, n);
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+	
 	public void incTrackEndCnt (String sfile, long n) throws DbException {
 		try {
 			local_incTrackEndCnt(sfile, n);
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+	
+	public void setTrackEndCnt (String sfile, long n) throws DbException {
+		try {
+			local_setTrackEndCnt(sfile, n);
 		} catch (Exception e) {
 			throw new DbException(e);
 		}
@@ -254,12 +269,21 @@ public class SqliteLayer {
 		}
 	}
 	
+	public void setRemoteLocation (String sfile, String remoteLocation) throws DbException {
+		try {
+			local_setRemoteLocation(sfile, remoteLocation);
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Schema.
 	
 	/* sqlite notes:
 	 * Add dmodified column:
 	 * ALTER TABLE tbl_mediafiles ADD COLUMN dmodified DATETIME;
+	 * ALTER TABLE tbl_mediafiles ADD COLUMN sremloc VARCHAR(1000);
 	 * .schema tbl_mediafiles
 	 */
 	
@@ -288,7 +312,9 @@ public class SqliteLayer {
 	    "dmodified DATETIME," +
 	    "lduration INT(6)," +
 	    "benabled INT(1)," +
-	    "bmissing INT(1));";
+	    "bmissing INT(1)," +
+	    "sremloc VARCHAR(1000) NOT NULL" +
+	    ");";
 	
 	private static final String SQL_TBL_MEDIAFILES_COL_ROWID = "ROWID"; // sqlite automatically creates this.
 	private static final String SQL_TBL_MEDIAFILES_COL_FILE = "sfile";
@@ -301,6 +327,7 @@ public class SqliteLayer {
 	private static final String SQL_TBL_MEDIAFILES_COL_DMODIFIED = "dmodified";
 	private static final String SQL_TBL_MEDIAFILES_COL_ENABLED = "benabled";
 	private static final String SQL_TBL_MEDIAFILES_COL_MISSING = "bmissing";
+	private static final String SQL_TBL_MEDIAFILES_COL_REMLOC = "sremloc";
 	
 	private static final String SQL_TBL_SOURCES_EXISTS =
 		"SELECT name FROM sqlite_master WHERE name='tbl_sources';";
@@ -339,20 +366,20 @@ public class SqliteLayer {
 	
 	private static final String SQL_TBL_MEDIAFILES_Q_ALL = 
 		"SELECT ROWID, sfile, dadded, lstartcnt, lendcnt, dlastplay," +
-	    " lmd5, dmodified, lduration, benabled, bmissing" +
+	    " lmd5, dmodified, lduration, benabled, bmissing, sremloc" +
 	    " FROM tbl_mediafiles" +
 	    " ORDER BY {COL} {DIR};";
 	
 	private static final String SQL_TBL_MEDIAFILES_Q_NOTMISSING = 
 		"SELECT ROWID, sfile, dadded, lstartcnt, lendcnt, dlastplay," +
-		" lmd5, dmodified, lduration, benabled, bmissing" +
+		" lmd5, dmodified, lduration, benabled, bmissing, sremloc" +
 		" FROM tbl_mediafiles" +
 		" WHERE (bmissing<>1 OR bmissing is NULL)" +
 		" ORDER BY {COL} {DIR};";
 	
 	private static final String SQL_TBL_MEDIAFILES_Q_SIMPLESEARCH = 
 		"SELECT ROWID, sfile, dadded, lstartcnt, lendcnt, dlastplay," +
-		" lmd5, dmodified, lduration, benabled, bmissing" +
+		" lmd5, dmodified, lduration, benabled, bmissing, sremloc" +
 	    " FROM tbl_mediafiles" +
 	    " WHERE sfile LIKE ? ESCAPE ?" +
 	    " AND (bmissing<>1 OR bmissing is NULL) AND (benabled<>0 OR benabled is NULL)" +
@@ -362,8 +389,8 @@ public class SqliteLayer {
 		"SELECT count(*) FROM tbl_mediafiles WHERE sfile=? COLLATE NOCASE;";
 	
 	private static final String SQL_TBL_MEDIAFILES_ADD =
-		"INSERT INTO tbl_mediafiles (sfile,dadded,lstartcnt,lendcnt,dmodified,lduration,benabled,bmissing) VALUES" +
-		" (?,?,0,0,?,-1,1,0);";
+		"INSERT INTO tbl_mediafiles (sfile,dadded,lstartcnt,lendcnt,dmodified,lduration,benabled,bmissing,sremloc) VALUES" +
+		" (?,?,0,0,?,-1,1,0,'');";
 	
 	private static final String SQL_TBL_MEDIAFILES_REMOVE =
 		"DELETE FROM tbl_mediafiles WHERE sfile=?";
@@ -375,9 +402,15 @@ public class SqliteLayer {
 		"UPDATE tbl_mediafiles SET lstartcnt=lstartcnt+?" +
         " WHERE sfile=?;";
 	
+	private static final String SQL_TBL_MEDIAFILES_SETSTART =
+		"UPDATE tbl_mediafiles SET lstartcnt=? WHERE sfile=?;";
+	
 	private static final String SQL_TBL_MEDIAFILES_INCEND =
 		"UPDATE tbl_mediafiles SET lendcnt=lendcnt+?" +
 		" WHERE sfile=?;";
+	
+	private static final String SQL_TBL_MEDIAFILES_SETEND =
+		"UPDATE tbl_mediafiles SET lendcnt=? WHERE sfile=?;";
 	
 	private static final String SQL_TBL_MEDIAFILES_SETDATELASTPLAYED =
 		"UPDATE tbl_mediafiles SET dlastplay=?" +
@@ -405,6 +438,10 @@ public class SqliteLayer {
 	
 	private static final String SQL_TBL_MEDIAFILES_SETMISSING =
 		"UPDATE tbl_mediafiles SET bmissing=?" +
+		" WHERE sfile=?;";
+	
+	private static final String SQL_TBL_MEDIAFILES_SETREMLOC =
+		"UPDATE tbl_mediafiles SET sremloc=?" +
 		" WHERE sfile=?;";
 	
 	public enum LibrarySort { 
@@ -598,7 +635,7 @@ public class SqliteLayer {
 	
 	private SimpleDateFormat SQL_DATE = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
-	private List<MediaItem> local_getAllMedia (LibrarySort sort, LibrarySortDirection direction, boolean hideMissing) throws SQLException, ClassNotFoundException {
+	private List<MediaLibraryItem> local_getAllMedia (LibrarySort sort, LibrarySortDirection direction, boolean hideMissing) throws SQLException, ClassNotFoundException {
 		PreparedStatement ps;
 		ResultSet rs;
 		
@@ -661,7 +698,7 @@ public class SqliteLayer {
 				throw new IllegalArgumentException();
 		}
 		
-		List<MediaItem> ret;
+		List<MediaLibraryItem> ret;
 		ps = getDbCon().prepareStatement(sql);
 		try {
 			rs = ps.executeQuery();
@@ -677,10 +714,10 @@ public class SqliteLayer {
 		return ret;
 	}
 	
-	private List<MediaItem> local_simpleSearch (String term, String esc, int maxResults) throws SQLException, ClassNotFoundException {
+	private List<MediaLibraryItem> local_simpleSearch (String term, String esc, int maxResults) throws SQLException, ClassNotFoundException {
 		PreparedStatement ps;
 		ResultSet rs;
-		List<MediaItem> ret;
+		List<MediaLibraryItem> ret;
 		
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_Q_SIMPLESEARCH);
 		try {
@@ -704,8 +741,8 @@ public class SqliteLayer {
 		return ret;
 	}
 	
-	private List<MediaItem> local_parseRecordSet (ResultSet rs) throws SQLException {
-		List<MediaItem> ret = new ArrayList<MediaItem>();
+	private List<MediaLibraryItem> local_parseRecordSet (ResultSet rs) throws SQLException {
+		List<MediaLibraryItem> ret = new ArrayList<MediaLibraryItem>();
 		
 		while (rs.next()) {
 			MediaLibraryItem mt = new MediaLibraryItem();
@@ -722,6 +759,7 @@ public class SqliteLayer {
 			mt.setDateLastModified(readDate(rs, SQL_TBL_MEDIAFILES_COL_DMODIFIED));
 			mt.setEnabled(rs.getInt(SQL_TBL_MEDIAFILES_COL_ENABLED) != 0); // default to true.
 			mt.setMissing(rs.getInt(SQL_TBL_MEDIAFILES_COL_MISSING) == 1); // default to false.
+			mt.setRemoteLocation(rs.getString(SQL_TBL_MEDIAFILES_COL_REMLOC));
 			
 			ret.add(mt);
 		}
@@ -825,6 +863,19 @@ public class SqliteLayer {
 		}
 	}
 	
+	private void local_setTrackStartCnt (String sfile, long n) throws SQLException, ClassNotFoundException {
+		PreparedStatement ps;
+		
+		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETSTART);
+		try {
+			ps.setLong(1, n);
+			ps.setString(2, sfile);
+			ps.executeUpdate();
+		} finally {
+			ps.close();
+		}
+	}
+	
 	private void local_setDateLastPlayed (String sfile, Date date) throws SQLException, ClassNotFoundException {
 		PreparedStatement ps;
 		
@@ -842,6 +893,19 @@ public class SqliteLayer {
 		PreparedStatement ps;
 		
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_INCEND);
+		try {
+			ps.setLong(1, n);
+			ps.setString(2, sfile);
+			ps.executeUpdate();
+		} finally {
+			ps.close();
+		}
+	}
+	
+	private void local_setTrackEndCnt (String sfile, long n) throws SQLException, ClassNotFoundException {
+		PreparedStatement ps;
+		
+		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETEND);
 		try {
 			ps.setLong(1, n);
 			ps.setString(2, sfile);
@@ -904,6 +968,18 @@ public class SqliteLayer {
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETMISSING);
 		try {
 			ps.setInt(1, value ? 1 : 0);
+			ps.setString(2, sfile);
+			ps.executeUpdate();
+		} finally {
+			ps.close();
+		}
+	}
+	
+	private void local_setRemoteLocation(String sfile, String remoteLocation) throws SQLException, ClassNotFoundException {
+		PreparedStatement ps;
+		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETREMLOC);
+		try {
+			ps.setString(1, remoteLocation);
 			ps.setString(2, sfile);
 			ps.executeUpdate();
 		} finally {

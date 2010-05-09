@@ -1,11 +1,14 @@
 package net.sparktank.morrigan.server.feedreader;
 
 import java.io.IOException;
+import java.util.Date;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
-import net.sparktank.morrigan.model.MediaItem;
+import net.sparktank.morrigan.model.TaskEventListener;
+import net.sparktank.morrigan.model.library.MediaLibraryItem;
 import net.sparktank.morrigan.model.library.RemoteMediaLibrary;
 import net.sparktank.morrigan.server.HttpClient;
+import net.sparktank.morrigan.server.feedwriters.XmlHelper;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -19,18 +22,23 @@ public class MediaListFeedReader extends GenericFeedReader {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public MediaListFeedReader(RemoteMediaLibrary library) throws SAXException, IOException, MorriganException {
-		super(HttpClient.getHttpClient().doHttpRequest(library.getUrl()).getBody());
+	public MediaListFeedReader(RemoteMediaLibrary library, TaskEventListener taskEventListener) throws SAXException, IOException, MorriganException {
+		super(HttpClient.getHttpClient().doHttpRequest(library.getUrl()).getBody(), taskEventListener);
 		this.library = library;
 		
 		try {
 			library.setAutoCommit(false);
+			library.beginBulkUpdate();
 			parse();
 		} finally {
 			try {
-				library.commit();
+				library.completeBulkUpdate();
 			} finally {
-				library.setAutoCommit(true);
+				try {
+					library.commit();
+				} finally {
+					library.setAutoCommit(true);
+				}
 			}
 		}
 	}
@@ -44,7 +52,7 @@ public class MediaListFeedReader extends GenericFeedReader {
 			throw new FeedParseException("Entry contains no elements.");
 		}
 		
-		MediaItem mi = new MediaItem();
+		MediaLibraryItem mi = new MediaLibraryItem();
 		
 		for (int i = 0; i < childNodes.getLength(); i++) {
 			Node item = childNodes.item(i);
@@ -60,7 +68,7 @@ public class MediaListFeedReader extends GenericFeedReader {
 						if (hrefNode != null) {
 							String hrefVal = hrefNode.getNodeValue();
 							if (hrefVal != null) {
-								mi.setFilepath(hrefVal);
+								mi.setRemoteLocation(hrefVal);
 							}
 						} else {
 							throw new FeedParseException("Link missing 'href' att.");
@@ -71,7 +79,7 @@ public class MediaListFeedReader extends GenericFeedReader {
 				}
 				
 			} else if (item.getNodeName().equals("title")) {
-				mi.setDisplayTitle(item.getTextContent());
+				mi.setFilepath(item.getTextContent());
 				
 			} else if (item.getNodeName().equals("duration")) {
 				int v = Integer.parseInt(item.getTextContent());
@@ -88,9 +96,34 @@ public class MediaListFeedReader extends GenericFeedReader {
 			} else if (item.getNodeName().equals("endcount")) {
 				long v = Long.parseLong(item.getTextContent());
 				mi.setEndCount(v);
+				
+			} else if (item.getNodeName().equals("dateadded")) {
+				try {
+					Date d = XmlHelper.getIso8601UtcDateFormatter().parse(item.getTextContent());
+					mi.setDateAdded(d);
+					
+				} catch (Exception e) {
+					throw new FeedParseException("Exception parsing date '"+item.getTextContent()+"'.", e);
+				}
+				
+			} else if (item.getNodeName().equals("datelastmodified")) {
+				try {
+					Date d = XmlHelper.getIso8601UtcDateFormatter().parse(item.getTextContent());
+					mi.setDateLastModified(d);
+					
+				} catch (Exception e) {
+					throw new FeedParseException("Exception parsing date '"+item.getTextContent()+"'.", e);
+				}
+				
+			} else if (item.getNodeName().equals("datelastplayed")) {
+				try {
+					Date d = XmlHelper.getIso8601UtcDateFormatter().parse(item.getTextContent());
+					mi.setDateLastPlayed(d);
+					
+				} catch (Exception e) {
+					throw new FeedParseException("Exception parsing date '"+item.getTextContent()+"'.", e);
+				}
 			}
-			
-			// TODO parse the rest of the metadata.
 			
 		}
 		

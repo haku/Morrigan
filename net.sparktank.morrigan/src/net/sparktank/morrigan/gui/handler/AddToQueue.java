@@ -34,8 +34,8 @@ public class AddToQueue  extends AbstractHandler {
 		IWorkbenchPage page = window.getActivePage();
 		IEditorPart activeEditor = page.getActiveEditor();
 		
-		if (activeEditor instanceof MediaListEditor<?>) {
-			MediaListEditor<?> mediaListEditor = (MediaListEditor<?>) activeEditor;
+		if (activeEditor instanceof MediaListEditor<?,?>) {
+			MediaListEditor<?,?> mediaListEditor = (MediaListEditor<?,?>) activeEditor;
 			AbstractPlayerView playerView;
 			IViewPart findView = page.findView(ViewControls.ID);
 			
