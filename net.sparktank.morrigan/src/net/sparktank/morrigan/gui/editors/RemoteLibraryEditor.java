@@ -2,6 +2,7 @@ package net.sparktank.morrigan.gui.editors;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
+import net.sparktank.morrigan.gui.jobs.RefreshLibraryJob;
 import net.sparktank.morrigan.model.library.RemoteMediaLibrary;
 
 import org.eclipse.swt.SWT;
@@ -24,6 +25,12 @@ public class RemoteLibraryEditor extends AbstractLibraryEditor<RemoteMediaLibrar
 	protected boolean handleReadError(Exception e) {
 		new MorriganMsgDlg(e).open();
 		return true;
+	}
+	
+	@Override
+	protected void readInputData() throws MorriganException {
+		RefreshLibraryJob job = new RefreshLibraryJob(getMediaList());
+		job.schedule();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -55,10 +62,10 @@ public class RemoteLibraryEditor extends AbstractLibraryEditor<RemoteMediaLibrar
 	private SelectionAdapter refreshListener = new SelectionAdapter() {
 		@Override
 		public void widgetSelected(SelectionEvent event) {
-			// TODO do this in bg thread?
 			try {
-				getMediaList().reRead();
-			} catch (MorriganException e) {
+				readInputData();
+				
+			} catch (Exception e) {
 				new MorriganMsgDlg(e).open();
 			}
 		}

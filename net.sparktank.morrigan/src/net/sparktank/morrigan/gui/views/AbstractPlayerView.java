@@ -24,6 +24,7 @@ import net.sparktank.morrigan.gui.editors.MediaListEditor;
 import net.sparktank.morrigan.gui.editors.MediaListEditorInput;
 import net.sparktank.morrigan.gui.editors.PlaylistEditor;
 import net.sparktank.morrigan.gui.helpers.ClipboardHelper;
+import net.sparktank.morrigan.model.MediaItem;
 import net.sparktank.morrigan.model.MediaList;
 import net.sparktank.morrigan.model.library.LocalMediaLibrary;
 import net.sparktank.morrigan.model.playlist.MediaPlaylist;
@@ -153,14 +154,15 @@ public abstract class AbstractPlayerView extends ViewPart {
 			getSite().getShell().getDisplay().asyncExec(new RunnableDialog(t));
 		};
 		
+		@SuppressWarnings("unchecked") // FIXME ???
 		@Override
-		public MediaList getCurrentList() {
-			MediaList ret = null;
+		public MediaList<? extends MediaItem> getCurrentList() {
+			MediaList<? extends MediaItem> ret = null;
 			
 			IEditorPart activeEditor = getViewSite().getPage().getActiveEditor();
-			if (activeEditor != null && activeEditor instanceof MediaListEditor<?>) {
-				MediaListEditor<?> mediaListEditor = (MediaListEditor<?>) activeEditor;
-				MediaList editedMediaList = mediaListEditor.getMediaList();
+			if (activeEditor != null && activeEditor instanceof MediaListEditor<?,?>) {
+				MediaListEditor<? extends MediaList<MediaItem>,MediaItem> mediaListEditor = (MediaListEditor<? extends MediaList<MediaItem>,MediaItem>) activeEditor;
+				MediaList<? extends MediaItem> editedMediaList = mediaListEditor.getMediaList();
 				ret = editedMediaList;
 			}
 			return ret;
@@ -616,8 +618,8 @@ public abstract class AbstractPlayerView extends ViewPart {
 					}
 					
 					IEditorPart activeEditor = getViewSite().getWorkbenchWindow().getActivePage().getActiveEditor();
-					if (activeEditor instanceof MediaListEditor<?>) {
-						MediaListEditor<?> mediaListEditor = (MediaListEditor<?>) activeEditor;
+					if (activeEditor instanceof MediaListEditor<?,?>) {
+						MediaListEditor<?,?> mediaListEditor = (MediaListEditor<?,?>) activeEditor;
 						mediaListEditor.revealTrack(getPlayer().getCurrentItem().item);
 					}
 					
@@ -632,7 +634,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 	protected IAction jumpToAction = new Action ("Jump to...") {
 		@Override
 		public void run() {
-			MediaList currentList = getPlayer().getCurrentList();
+			MediaList<? extends MediaItem> currentList = getPlayer().getCurrentList();
 			if (currentList == null) return;
 			if (!(currentList instanceof LocalMediaLibrary)) return;
 			

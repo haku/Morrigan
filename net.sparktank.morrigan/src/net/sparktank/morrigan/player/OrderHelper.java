@@ -61,7 +61,7 @@ public class OrderHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	// TODO take into account disabled and missing tracks.
-	public static MediaItem getNextTrack (MediaList list, MediaItem track, PlaybackOrder mode) {
+	public static MediaItem getNextTrack (MediaList<? extends MediaItem> list, MediaItem track, PlaybackOrder mode) {
 		if (list.getCount() <= 0) return null;
 		
 		switch (mode) {
@@ -85,9 +85,9 @@ public class OrderHelper {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private static MediaItem getNextTrackSequencial (MediaList list, MediaItem track) {
+	private static MediaItem getNextTrackSequencial (MediaList<? extends MediaItem> list, MediaItem track) {
 		MediaItem ret = null;
-		List<MediaItem> mediaTracks = list.getMediaTracks();
+		List<? extends MediaItem> mediaTracks = list.getMediaTracks();
 		
 		int i;
 		if (track != null && mediaTracks.contains(track)) {
@@ -122,9 +122,9 @@ public class OrderHelper {
 		return ret;
 	}
 	
-	private static MediaItem getNextTrackRandom (MediaList list, MediaItem current) {
+	private static MediaItem getNextTrackRandom (MediaList<? extends MediaItem> list, MediaItem current) {
 		Random generator = new Random();
-		List<MediaItem> mediaTracks = list.getMediaTracks();
+		List<? extends MediaItem> mediaTracks = list.getMediaTracks();
 		
 		int n = 0;
 		for (MediaItem mi : mediaTracks) {
@@ -147,9 +147,9 @@ public class OrderHelper {
 		throw new RuntimeException("Failed to find next track.  This should not happen.");
 	}
 	
-	private static MediaItem getNextTrackByStartCount (MediaList list, MediaItem current) {
+	private static MediaItem getNextTrackByStartCount (MediaList<? extends MediaItem> list, MediaItem current) {
 		MediaItem ret = null;
-		List<MediaItem> tracks = list.getMediaTracks();
+		List<? extends MediaItem> tracks = list.getMediaTracks();
 		
 		// Find highest play count.
 		long maxPlayCount = -1;
@@ -193,9 +193,9 @@ public class OrderHelper {
 		return ret;
 	}
 	
-	private static MediaItem getNextTrackByLastPlayedDate (MediaList list, MediaItem current) {
+	private static MediaItem getNextTrackByLastPlayedDate (MediaList<? extends MediaItem> list, MediaItem current) {
 		MediaItem ret = null;
-		List<MediaItem> tracks = list.getMediaTracks();
+		List<? extends MediaItem> tracks = list.getMediaTracks();
 		Date now = new Date();
 		
 		// Find oldest date.

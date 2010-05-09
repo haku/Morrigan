@@ -57,7 +57,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.part.EditorPart;
 
-public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
+public abstract class MediaListEditor<T extends MediaList<S>, S extends MediaItem> extends EditorPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constants and Enums.
 	
@@ -109,18 +109,18 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 			throw new IllegalArgumentException("input is not instanceof MediaListEditorInput<?>.");
 		}
 		
+		setPartName(editorInput.getMediaList().getListName());
+		
+		editorInput.getMediaList().addDirtyChangeEvent(dirtyChange);
+		editorInput.getMediaList().addChangeEvent(listChange);
+		
 		try {
-			editorInput.getMediaList().read();
+			readInputData();
 		} catch (Exception e) {
 			if (!handleReadError(e)) {
 				throw new PartInitException("Exception while calling read().", e);
 			}
 		}
-		
-		setPartName(editorInput.getMediaList().getListName());
-		
-		editorInput.getMediaList().addDirtyChangeEvent(dirtyChange);
-		editorInput.getMediaList().addChangeEvent(listChange);
 	}
 	
 	@Override
@@ -129,6 +129,10 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		editorInput.getMediaList().removeDirtyChangeEvent(dirtyChange);
 		imageCache.clearCache();
 		super.dispose();
+	}
+	
+	protected void readInputData () throws MorriganException {
+		editorInput.getMediaList().read();
 	}
 	
 	protected abstract boolean handleReadError (Exception e);
@@ -532,8 +536,10 @@ public abstract class MediaListEditor<T extends MediaList> extends EditorPart {
 		return editorInput.getMediaList();
 	}
 	
+	@SuppressWarnings("unchecked")
 	protected void addTrack (String file) {
-		editorInput.getMediaList().addTrack(new MediaItem(file));
+		MediaItem mediaItem = new MediaItem(file);
+		editorInput.getMediaList().addTrack((S) mediaItem);
 	}
 	
 	protected void removeTrack (MediaItem track) throws MorriganException {

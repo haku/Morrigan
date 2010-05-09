@@ -68,7 +68,7 @@ public class ServerMain {
 			return null;
 		}
 		@Override
-		public MediaList getCurrentList() {
+		public MediaList<?> getCurrentList() {
 			return null;
 		}
 		@Override

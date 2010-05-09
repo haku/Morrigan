@@ -2,6 +2,7 @@ package net.sparktank.morrigan.player;
 
 import org.eclipse.swt.widgets.Composite;
 
+import net.sparktank.morrigan.model.MediaItem;
 import net.sparktank.morrigan.model.MediaList;
 
 public interface IPlayerEventHandler {
@@ -30,7 +31,7 @@ public interface IPlayerEventHandler {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public MediaList getCurrentList () ;
+	public MediaList<? extends MediaItem> getCurrentList () ;
 	
 	public Composite getCurrentMediaFrameParent () ;
 	

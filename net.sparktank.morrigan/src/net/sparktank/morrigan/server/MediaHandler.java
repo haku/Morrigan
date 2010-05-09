@@ -13,11 +13,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.sparktank.morrigan.helpers.ErrorHelper;
 import net.sparktank.morrigan.model.MediaListFactory;
+import net.sparktank.morrigan.model.TaskEventListener;
 import net.sparktank.morrigan.model.library.DbException;
-import net.sparktank.morrigan.model.library.LocalLibraryUpdateTask;
 import net.sparktank.morrigan.model.library.LocalLibraryHelper;
+import net.sparktank.morrigan.model.library.LocalLibraryUpdateTask;
 import net.sparktank.morrigan.model.library.LocalMediaLibrary;
-import net.sparktank.morrigan.model.library.LocalLibraryUpdateTask.TaskEventListener;
 import net.sparktank.morrigan.model.playlist.MediaPlaylist;
 import net.sparktank.morrigan.model.playlist.PlaylistHelper;
 import net.sparktank.morrigan.server.feedwriters.LibrarySrcFeed;
@@ -95,14 +95,14 @@ public class MediaHandler extends AbstractHandler {
 							}
 							
 						} else {
-							MediaListFeed libraryFeed = new MediaListFeed(ml);
+							MediaListFeed<LocalMediaLibrary> libraryFeed = new MediaListFeed<LocalMediaLibrary>(ml);
 							sb.append(libraryFeed.getXmlString());
 						}
 						
 					} else if (type.equals("playlist")) {
 						String f = PlaylistHelper.getFullPathToPlaylist(id);
 						MediaPlaylist ml = MediaListFactory.makeMediaPlaylist(f);
-						MediaListFeed libraryFeed = new MediaListFeed(ml);
+						MediaListFeed<MediaPlaylist> libraryFeed = new MediaListFeed<MediaPlaylist>(ml);
 						sb.append(libraryFeed.getXmlString());
 					}
 					

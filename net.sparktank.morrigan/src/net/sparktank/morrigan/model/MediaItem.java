@@ -18,7 +18,6 @@ public class MediaItem {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Attributes.
 	
-	private String displayTitle = null;
 	private String filepath = null;
 	private Date dateAdded = null;
 	private long startCount = 0;
@@ -30,115 +29,143 @@ public class MediaItem {
 	private boolean enabled = true;
 	private boolean missing = false;
 	
-	public String getDisplayTitle() {
-		return displayTitle;
-	}
-	public void setDisplayTitle(String displayTitle) {
-		this.displayTitle = displayTitle;
-	}
-	
 	public String getFilepath () {
 		return filepath;
 	}
-	public void setFilepath (String filePath) {
-		filepath = filePath;
+	public boolean setFilepath (String filePath) {
+		if (this.filepath == null || !this.filepath.equals(filePath)) {
+			filepath = filePath;
+			return true;
+		}
+		return false;
 	}
 	
 	public Date getDateAdded() {
 		return dateAdded;
 	}
-	public void setDateAdded(Date dateAdded) {
-		this.dateAdded = dateAdded;
+	public boolean setDateAdded(Date dateAdded) {
+		if (this.dateAdded == null || !this.dateAdded.equals(dateAdded)) {
+			this.dateAdded = dateAdded;
+			return true;
+		}
+		return false;
 	}
 	
 	public long getStartCount() {
 		return startCount;
 	}
-	public void setStartCount(long startCount) {
-		this.startCount = startCount;
+	public boolean setStartCount(long startCount) {
+		if (this.startCount != startCount) {
+			this.startCount = startCount;
+			return true;
+		}
+		return false;
 	}
 
 	public long getEndCount() {
 		return endCount;
 	}
-	public void setEndCount(long endCount) {
-		this.endCount = endCount;
+	public boolean setEndCount(long endCount) {
+		if (this.endCount != endCount) {
+			this.endCount = endCount;
+			return true;
+		}
+		return false;
 	}
 
 	public Date getDateLastPlayed() {
 		return dateLastPlayed;
 	}
-	public void setDateLastPlayed(Date dateLastPlayed) {
-		this.dateLastPlayed = dateLastPlayed;
+	public boolean setDateLastPlayed(Date dateLastPlayed) {
+		if (this.dateLastPlayed == null || !this.dateLastPlayed.equals(dateLastPlayed)) {
+			this.dateLastPlayed = dateLastPlayed;
+			return true;
+		}
+		return false;
 	}
 	
 	public int getDuration() {
 		return duration;
 	}
-	public void setDuration(int duration) {
-		this.duration = duration;
+	public boolean setDuration(int duration) {
+		if (this.duration != duration) {
+			this.duration = duration;
+			return true;
+		}
+		return false;
 	}
 	
 	public long getHashcode() {
 		return hashcode;
 	}
-	public void setHashcode(long hashcode) {
-		this.hashcode = hashcode;
+	public boolean setHashcode(long hashcode) {
+		if (this.hashcode != hashcode) {
+			this.hashcode = hashcode;
+			return true;
+		}
+		return false;
 	}
 	
 	public Date getDateLastModified() {
 		return dateLastModified;
 	}
-	public void setDateLastModified(Date lastModified) {
-		this.dateLastModified = lastModified;
+	public boolean setDateLastModified(Date lastModified) {
+		if (this.dateLastModified == null || !this.dateLastModified.equals(dateLastModified)) {
+			this.dateLastModified = lastModified;
+			return true;
+		}
+		return false;
 	}
 	
 	public boolean isEnabled() {
 		return enabled;
 	}
-	public void setEnabled(boolean enabled) {
-		this.enabled = enabled;
+	public boolean setEnabled(boolean enabled) {
+		if (this.enabled != enabled) {
+			this.enabled = enabled;
+			return true;
+		}
+		return false;
 	}
 	
 	public boolean isMissing() {
 		return missing;
 	}
-	public void setMissing(boolean missing) {
-		this.missing = missing;
+	public boolean setMissing(boolean missing) {
+		if (this.missing != missing) {
+			this.missing = missing;
+			return true;
+		}
+		return false;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Secondary attributes.
 	
 	public String getTitle () {
-		if (getDisplayTitle() != null) {
-			return getDisplayTitle();
-			
+		int x = filepath.lastIndexOf(File.separator);
+		if (x>0) {
+			return filepath.substring(x+1);
 		} else {
-			int x = filepath.lastIndexOf(File.separator);
-			if (x>0) {
-				return filepath.substring(x+1);
-			} else {
-				return filepath;
-			}
+			return filepath;
 		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Mass setter.
 	
-	public void setFromMediaItem (MediaItem mi) {
-		this.setDisplayTitle(mi.getDisplayTitle());
-		this.setFilepath(mi.getFilepath());
-		this.setDateAdded(mi.getDateAdded());
-		this.setStartCount(mi.getStartCount());
-		this.setEndCount(mi.getEndCount());
-		this.setDateLastPlayed(mi.getDateLastPlayed());
-		this.setDuration(mi.getDuration());
-		this.setHashcode(mi.getHashcode());
-		this.setDateLastModified(mi.getDateLastModified());
-		this.setEnabled(mi.isEnabled());
-		this.setMissing(mi.isMissing());
+	public boolean setFromMediaItem (MediaItem mi) {
+		boolean b = this.setFilepath(mi.getFilepath())
+			|| this.setDateAdded(mi.getDateAdded())
+			|| this.setStartCount(mi.getStartCount())
+			|| this.setEndCount(mi.getEndCount())
+			|| this.setDateLastPlayed(mi.getDateLastPlayed())
+			|| this.setDuration(mi.getDuration())
+			|| this.setHashcode(mi.getHashcode())
+			|| this.setDateLastModified(mi.getDateLastModified())
+			|| this.setEnabled(mi.isEnabled())
+			|| this.setMissing(mi.isMissing());
+		return b;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

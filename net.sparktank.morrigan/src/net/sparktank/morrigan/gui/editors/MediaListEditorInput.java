@@ -1,6 +1,7 @@
 package net.sparktank.morrigan.gui.editors;
 
 import net.sparktank.morrigan.helpers.EqualHelper;
+import net.sparktank.morrigan.model.MediaItem;
 import net.sparktank.morrigan.model.MediaList;
 
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -9,7 +10,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPersistableElement;
 
-public class MediaListEditorInput<T extends MediaList> implements IEditorInput, IPersistableElement {
+public class MediaListEditorInput<T extends MediaList<? extends MediaItem>> implements IEditorInput, IPersistableElement {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private final T editedMediaList;

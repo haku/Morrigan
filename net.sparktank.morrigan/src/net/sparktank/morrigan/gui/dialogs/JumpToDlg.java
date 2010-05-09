@@ -9,6 +9,7 @@ import net.sparktank.morrigan.gui.preferences.PreferenceHelper;
 import net.sparktank.morrigan.model.MediaItem;
 import net.sparktank.morrigan.model.library.DbException;
 import net.sparktank.morrigan.model.library.LocalMediaLibrary;
+import net.sparktank.morrigan.model.library.MediaLibraryItem;
 import net.sparktank.morrigan.model.playlist.PlayItem;
 
 import org.eclipse.jface.viewers.ILabelProvider;
@@ -360,7 +361,7 @@ public class JumpToDlg extends Dialog {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private List<MediaItem> searchResults = null;
+	private List<MediaLibraryItem> searchResults = null;
 	
 	private IStructuredContentProvider contentProvider = new IStructuredContentProvider() {
 		@Override
@@ -498,7 +499,7 @@ public class JumpToDlg extends Dialog {
 		q = q.replace("*", "%");
 		
 		try {
-			List<MediaItem> res = mediaLibrary.simpleSearch(q, "\\", MAX_RESULTS);
+			List<MediaLibraryItem> res = mediaLibrary.simpleSearch(q, "\\", MAX_RESULTS);
 			if (res != null && res.size() > 0) {
 				searchResults = res;
 				return true;

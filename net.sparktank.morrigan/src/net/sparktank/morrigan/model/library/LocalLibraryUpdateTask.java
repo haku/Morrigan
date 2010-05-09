@@ -17,6 +17,7 @@ import net.sparktank.morrigan.engines.playback.IPlaybackEngine;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.ChecksumHelper;
 import net.sparktank.morrigan.model.MediaItem;
+import net.sparktank.morrigan.model.TaskEventListener;
 import net.sparktank.morrigan.model.library.LocalLibraryUpdateTask.TaskResult.TaskOutcome;
 
 public class LocalLibraryUpdateTask {
@@ -93,17 +94,6 @@ public class LocalLibraryUpdateTask {
 			return errThr;
 		}
 		
-	}
-	
-	static public interface TaskEventListener {
-		public void onStart ();
-		public void logMsg (String topic, String s);
-		
-		public void beginTask(String name, int totalWork);
-		public void subTask(String name);
-		public void done();
-		public boolean isCanceled();
-		public void worked(int work);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -211,11 +201,11 @@ public class LocalLibraryUpdateTask {
 		taskEventListener.subTask("Reading metadata");
 		int n = 0;
 		int N = library.getCount();
-		for (MediaItem mi : library.getMediaTracks()) {
+		for (MediaLibraryItem mi : library.getMediaTracks()) {
 			if (taskEventListener.isCanceled()) break;
 			taskEventListener.subTask("Reading metadata: " + mi.getTitle());
 			
-			// Existance test.
+			// Existence test.
 			File file = new File(mi.getFilepath());
 			if (file.exists()) {
 				// If was missing, mark as found.
@@ -325,7 +315,7 @@ public class LocalLibraryUpdateTask {
 		
 		Map<MediaItem, ScanOption> dupicateItems = new HashMap<MediaItem, ScanOption>();
 		
-		List<MediaItem> tracks = library.getMediaTracks();
+		List<MediaLibraryItem> tracks = library.getMediaTracks();
 		for (int i = 0; i < tracks.size(); i++) {
 			if (taskEventListener.isCanceled()) break;
 			
