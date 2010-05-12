@@ -352,12 +352,12 @@ public class LocalLibraryUpdateTask {
 		return null;
 	}
 	
-	private void checkForDuplicates(TaskEventListener taskEventListener) {
+	private void checkForDuplicates(TaskEventListener taskEventListener) throws MorriganException {
 		taskEventListener.subTask("Scanning for duplicates");
 		
 		Map<MediaItem, ScanOption> dupicateItems = new HashMap<MediaItem, ScanOption>();
 		
-		List<MediaLibraryItem> tracks = library.getMediaTracks();
+		List<MediaLibraryItem> tracks = library.getAllLibraryEntries();
 		for (int i = 0; i < tracks.size(); i++) {
 			if (taskEventListener.isCanceled()) break;
 			
@@ -413,6 +413,8 @@ public class LocalLibraryUpdateTask {
 					hashcodes.add(l);
 				}
 			}
+			
+			int countMerges = 0;
 			
 			/*
 			 * Resolve each unique hashcode.
@@ -475,6 +477,7 @@ public class LocalLibraryUpdateTask {
 							
 							library.removeMediaTrack(i);
 							taskEventListener.logMsg(library.getListName(), "[REMOVED] " + i.getFilepath());
+							countMerges++;
 							
 						} catch (Throwable t) {
 							// FIXME log this somewhere useful.
@@ -499,6 +502,7 @@ public class LocalLibraryUpdateTask {
 			/*
 			 * Print out what are left with.
 			 */
+			taskEventListener.logMsg(library.getListName(), "Performed " + countMerges + " mergers.");
 			taskEventListener.logMsg(library.getListName(), "Found " + dupicateItems.size() + " duplicate items:");
 			for (Entry<MediaItem, ScanOption> e : dupicateItems.entrySet()) {
 				taskEventListener.logMsg(library.getListName(), e.getValue() + " : " + e.getKey().getTitle());
