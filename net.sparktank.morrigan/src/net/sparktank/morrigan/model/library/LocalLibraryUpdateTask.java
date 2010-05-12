@@ -124,31 +124,42 @@ public class LocalLibraryUpdateTask {
 	 * TODO use monitor.worked(1);
 	 */
 	public TaskResult run(TaskEventListener taskEventListener) {
-		taskEventListener.onStart();
-		taskEventListener.logMsg(library.getListName(), "Starting scan...");
-		
-		taskEventListener.beginTask("Updating library", 100);
-		
-		// Scan directories for new files.
-		TaskResult scanResult = scanLibraryDirectories(taskEventListener);
-		if (scanResult != null) return scanResult;
-		
-		// Check known files exist and update metadata.
-		TaskResult updateResult = updateLibraryMetadata(taskEventListener);
-		if (updateResult != null) return updateResult;
-		
-		// Check for duplicate items and merge matching items.
-		checkForDuplicates(taskEventListener);
-		
-		// TODO : vacuum DB?
-		
-		if (taskEventListener.isCanceled()) {
-			taskEventListener.logMsg(library.getListName(), "Task was canceled desu~.");
+		TaskResult ret = null;
+		try {
+			taskEventListener.onStart();
+			taskEventListener.logMsg(library.getListName(), "Starting scan...");
+			
+			taskEventListener.beginTask("Updating library", 100);
+			
+			// Scan directories for new files.
+			ret = scanLibraryDirectories(taskEventListener);
+			if (ret == null) {
+				// Check known files exist and update metadata.
+				ret = updateLibraryMetadata(taskEventListener);
+				if (ret == null) {
+					// Check for duplicate items and merge matching items.
+					checkForDuplicates(taskEventListener);
+					
+					// TODO : vacuum DB?
+					
+					if (taskEventListener.isCanceled()) {
+						taskEventListener.logMsg(library.getListName(), "Task was canceled desu~.");
+						ret = new TaskResult(TaskOutcome.CANCELED);
+						
+					} else {
+						ret = new TaskResult(TaskOutcome.SUCCESS);
+					}
+				}
+			}
+			
+		} catch (Throwable t) {
+			ret = new TaskResult(TaskOutcome.FAILED, "Throwable while updating library.", t);
 		}
 		
 		isFinished = true;
 		taskEventListener.done();
-		return new TaskResult(TaskOutcome.SUCCESS);
+		
+		return ret;
 	}
 	
 	private TaskResult scanLibraryDirectories(TaskEventListener taskEventListener) {
@@ -221,7 +232,7 @@ public class LocalLibraryUpdateTask {
 		return null;
 	}
 	
-	private TaskResult updateLibraryMetadata(TaskEventListener taskEventListener) {
+	private TaskResult updateLibraryMetadata(TaskEventListener taskEventListener) throws MorriganException {
 		taskEventListener.subTask("Reading metadata");
 		
 		IPlaybackEngine playbackEngine = null;
@@ -230,7 +241,8 @@ public class LocalLibraryUpdateTask {
 		int n = 0;
 		int N = library.getCount();
 		
-		for (MediaLibraryItem mi : library.getMediaTracks()) {
+		List<MediaLibraryItem> allLibraryEntries = library.getAllLibraryEntries();
+		for (MediaLibraryItem mi : allLibraryEntries) {
 			if (taskEventListener.isCanceled()) break;
 			taskEventListener.subTask("Reading metadata: " + mi.getTitle());
 			
