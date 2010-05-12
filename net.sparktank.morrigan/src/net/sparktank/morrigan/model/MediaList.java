@@ -137,26 +137,8 @@ public abstract class MediaList<T extends MediaItem> {
 	 * @return items that are removed.
 	 */
 	protected List<T> replaceList (List<T> newTracks) {
-		List<T> tempList = new ArrayList<T>();
-		List<T> ret;
-		
-		for (T newItem : newTracks) {
-			int indexOfOldItem = this.mediaTracks.indexOf(newItem);
-			if (indexOfOldItem >= 0) {
-				T oldItem = this.mediaTracks.get(indexOfOldItem);
-				oldItem.setFromMediaItem(newItem);
-				tempList.add(oldItem);
-			} else {
-				tempList.add(newItem);
-			}
-		}
-		
-		System.err.println("Replacing " + this.mediaTracks.size() + " items with " + tempList.size() + " items.");
-		ret = this.mediaTracks;
-		this.mediaTracks = tempList;
+		List<T> ret = updateList(this.mediaTracks, newTracks);
 		setDirtyState(DirtyState.DIRTY);
-		
-		ret.removeAll(tempList);
 		return ret;
 	}
 	
@@ -259,6 +241,53 @@ public abstract class MediaList<T extends MediaItem> {
 	@Override
 	public String toString () {
 		return listName + " ("+mediaTracks.size()+" items)";
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Typed helper methods.
+	
+	/**
+	 * Update keepList without replacing any equivalent
+	 * objects.  Instead copy the data from the new
+	 * object the old one.  This is to work around how
+	 * a GUI list uses a data provider.
+	 * 
+	 * @param keepList
+	 * @param freshList
+	 * @return items that were removed from keepList.
+	 */
+	public List<T> updateList (List<T> keepList, List<T> freshList) {
+		List<T> finalList = new ArrayList<T>();
+		
+		synchronized (keepList) {
+			synchronized (freshList) {
+				
+				for (T newItem : freshList) {
+					int indexOfOldItem = keepList.indexOf(newItem);
+					if (indexOfOldItem >= 0) {
+						T oldItem = keepList.get(indexOfOldItem);
+						oldItem.setFromMediaItem(newItem);
+						finalList.add(oldItem);
+					} else {
+						finalList.add(newItem);
+					}
+				}
+				
+				System.err.println("Replacing " + keepList.size() + " items with " + finalList.size() + " items.");
+				
+				// The return list is a list of all the items we removed.
+				List<T> ret = new ArrayList<T>(keepList);
+				ret.removeAll(finalList);
+				
+				/* Update the keep list.  We need to modify
+				 * the passed in list, not return a new one.
+				 */
+				keepList.clear();
+				keepList.addAll(finalList);
+				
+				return ret;
+			}
+		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

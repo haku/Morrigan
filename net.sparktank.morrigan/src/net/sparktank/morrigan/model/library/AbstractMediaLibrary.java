@@ -85,6 +85,19 @@ public abstract class AbstractMediaLibrary extends MediaList<MediaLibraryItem> {
 		dbLayer.commit();
 	}
 	
+	/**
+	 * Returns a copy of the main list updated with all items from the DB.
+	 * 
+	 * @return
+	 * @throws MorriganException
+	 */
+	public List<MediaLibraryItem> getAllLibraryEntries () throws MorriganException {
+		ArrayList<MediaLibraryItem> copyOfMainList = new ArrayList<MediaLibraryItem>(getMediaTracks());
+		List<MediaLibraryItem> allList = dbLayer.getAllMedia(LibrarySort.FILE, LibrarySortDirection.ASC, false);
+		updateList(copyOfMainList, allList);
+		return copyOfMainList;
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Sorting.
 	
