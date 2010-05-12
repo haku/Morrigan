@@ -127,9 +127,31 @@ public class LocalLibraryUpdateTask {
 		taskEventListener.onStart();
 		taskEventListener.logMsg(library.getListName(), "Starting scan...");
 		
-		int progress = 0;
 		taskEventListener.beginTask("Updating library", 100);
 		
+		// Scan directories for new files.
+		TaskResult scanResult = scanLibraryDirectories(taskEventListener);
+		if (scanResult != null) return scanResult;
+		
+		// Check known files exist and update metadata.
+		TaskResult updateResult = updateLibraryMetadata(taskEventListener);
+		if (updateResult != null) return updateResult;
+		
+		// Check for duplicate items and merge matching items.
+		checkForDuplicates(taskEventListener);
+		
+		// TODO : vacuum DB?
+		
+		if (taskEventListener.isCanceled()) {
+			taskEventListener.logMsg(library.getListName(), "Task was canceled desu~.");
+		}
+		
+		isFinished = true;
+		taskEventListener.done();
+		return new TaskResult(TaskOutcome.SUCCESS);
+	}
+	
+	private TaskResult scanLibraryDirectories(TaskEventListener taskEventListener) {
 		taskEventListener.subTask("Scanning sources");
 		
 		List<String> supportedFormats;
@@ -196,11 +218,18 @@ public class LocalLibraryUpdateTask {
 		
 		taskEventListener.logMsg(library.getListName(), "Added " + filesAdded + " files.");
 		
+		return null;
+	}
+	
+	private TaskResult updateLibraryMetadata(TaskEventListener taskEventListener) {
+		taskEventListener.subTask("Reading metadata");
+		
 		IPlaybackEngine playbackEngine = null;
 		
-		taskEventListener.subTask("Reading metadata");
+		int progress = 0;
 		int n = 0;
 		int N = library.getCount();
+		
 		for (MediaLibraryItem mi : library.getMediaTracks()) {
 			if (taskEventListener.isCanceled()) break;
 			taskEventListener.subTask("Reading metadata: " + mi.getTitle());
@@ -308,9 +337,10 @@ public class LocalLibraryUpdateTask {
 			playbackEngine.finalise();
 		}
 		
-		/*
-		 * Check for duplicates.
-		 */
+		return null;
+	}
+	
+	private void checkForDuplicates(TaskEventListener taskEventListener) {
 		taskEventListener.subTask("Scanning for duplicates");
 		
 		Map<MediaItem, ScanOption> dupicateItems = new HashMap<MediaItem, ScanOption>();
@@ -465,21 +495,12 @@ public class LocalLibraryUpdateTask {
 		} else {
 			taskEventListener.logMsg(library.getListName(), "No duplicates found.");
 		}
-		
-		// TODO : vacuum DB?
-		
-		if (taskEventListener.isCanceled()) {
-			taskEventListener.logMsg(library.getListName(), "Task was canceled desu~.");
-		}
-		
-		isFinished = true;
-		taskEventListener.done();
-		return new TaskResult(TaskOutcome.SUCCESS);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Helper methods.
 	
-	private int countEntriesInMap (Map<?, ?> map, Object value) {
+	static private int countEntriesInMap (Map<?, ?> map, Object value) {
 		int n = 0;
 		for ( Entry<?, ?> e : map.entrySet()) {
 			if (e.getValue().equals(value)) n++;
