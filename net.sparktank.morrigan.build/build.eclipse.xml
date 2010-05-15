@@ -64,8 +64,8 @@
 		</move>
 
 		<!-- Build server jar. -->
-		<antcall target="buildserver" />
-		
+		<antcall target="buildbits" />
+
 		<!-- Build outputs. -->
 		<antcall target="zip_win32" />
 		<antcall target="zip_linux" />
@@ -75,7 +75,10 @@
 		<antcall target="refreshWorkspace" />
 	</target>
 
-	<target name="buildserver" depends="setup">
+	<target name="buildbits" depends="setup">
+		<ant antfile="../net.sparktank.morrigan.wui/build.xml"
+		     dir="../net.sparktank.morrigan.wui"
+		/>
 		<ant antfile="../net.sparktank.morrigan/build_serverjar.xml"
 		     dir="../net.sparktank.morrigan"
 		/>
@@ -122,6 +125,7 @@
 			            fullpath="morrigan/morrigan.server.jar"
 			/>
 			<zipfileset dir="../net.sparktank.morrigan/lib" prefix="morrigan/lib" />
+			<zipfileset dir="../net.sparktank.morrigan.wui" includes="morrigan.wui.war" prefix="morrigan/" />
 		</zip>
 	</target>
 
@@ -166,6 +170,7 @@
 			            fullpath="morrigan/morrigan.server.jar"
 			/>
 			<zipfileset dir="../net.sparktank.morrigan/lib" prefix="morrigan/lib" />
+			<zipfileset dir="../net.sparktank.morrigan.wui" includes="morrigan.wui.war" prefix="morrigan/" />
 		</zip>
 	</target>
 
@@ -199,6 +204,7 @@
 			            fullpath="morrigan/morrigan.server.jar"
 			/>
 			<zipfileset dir="../net.sparktank.morrigan/lib" prefix="morrigan/lib" />
+			<zipfileset dir="../net.sparktank.morrigan.wui" includes="morrigan.wui.war" prefix="morrigan/" />
 		</zip>
 	</target>
 
