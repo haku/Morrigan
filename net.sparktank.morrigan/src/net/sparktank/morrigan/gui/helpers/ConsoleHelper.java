@@ -12,8 +12,6 @@ public class ConsoleHelper {
 		ConsolePlugin.getDefault().getConsoleManager().showConsoleView(getMessageConsole());
 	}
 	
-	static private boolean firstAppend = true;
-	
 	static public void appendToConsole (String topic, String s) {
 		// TODO create separate consoles for each topic?
 		
@@ -23,8 +21,7 @@ public class ConsoleHelper {
 		sb.append("] ");
 		sb.append(s);
 		
-		getMessageConsoleStream().print(firstAppend ? sb.toString() :"\n".concat(sb.toString()));
-		firstAppend = false;
+		getMessageConsoleStream().println(sb.toString());
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
