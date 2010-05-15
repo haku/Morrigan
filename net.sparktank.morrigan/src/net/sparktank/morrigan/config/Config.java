@@ -149,4 +149,19 @@ public class Config {
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	static private String WAR_FILE = "morrigan.wui.war";
+	static private String WAR_PROP = "wui.war";
+	
+	static public String getWuiWarLocation () throws MorriganException {
+		File f = new File(WAR_FILE);
+		if (f.exists()) return f.getAbsolutePath();
+		
+		String p = getProperties().getProperty(WAR_PROP);
+		if (p != null) return p;
+		
+		throw new MorriganException("Failed to find " + WAR_FILE);
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

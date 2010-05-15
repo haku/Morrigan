@@ -16,5 +16,10 @@ Bundle-ClassPath: .,
  lib/jetty-server-7.0.2.v20100331.jar,
  lib/jetty-util-7.0.2.v20100331.jar,
  lib/servlet-api-2.5.jar,
- lib/sqlitejdbc-v056.jar
+ lib/sqlitejdbc-v056.jar,
+ lib/jetty-webapp-7.0.2.v20100331.jar,
+ lib/jetty-servlet-7.0.2.v20100331.jar,
+ lib/jetty-servlets-7.0.2.v20100331.jar,
+ lib/jetty-security-7.0.2.v20100331.jar,
+ lib/jetty-xml-7.0.2.v20100331.jar
 Bundle-Vendor: sparktank.net
