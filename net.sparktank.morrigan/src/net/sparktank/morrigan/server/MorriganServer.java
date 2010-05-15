@@ -26,11 +26,9 @@ public class MorriganServer {
 			
 			server.addLifeCycleListener(listener);
 			
-			ContextHandler conHome = new ContextHandler();
-			conHome.setContextPath("/");
-			conHome.setResourceBase(".");
-			conHome.setClassLoader(Thread.currentThread().getContextClassLoader());
-			conHome.setHandler(new HomeHandler());
+			WebAppContext webapp = new WebAppContext();
+			webapp.setContextPath("/");
+			webapp.setWar(Config.getWuiWarLocation());
 			
 			ContextHandler conMedia = new ContextHandler();
 			conMedia.setContextPath("/media");
@@ -44,12 +42,8 @@ public class MorriganServer {
 			conPlayers.setClassLoader(Thread.currentThread().getContextClassLoader());
 			conPlayers.setHandler(new PlayersHandler());
 			
-			WebAppContext webapp = new WebAppContext();
-	        webapp.setContextPath("/wui");
-	        webapp.setWar(Config.getWuiWarLocation());
-			
 			ContextHandlerCollection contexts = new ContextHandlerCollection();
-	        contexts.setHandlers(new Handler[] { conHome, conMedia, conPlayers, webapp });
+	        contexts.setHandlers(new Handler[] { webapp, conMedia, conPlayers });
 			server.setHandler(contexts);
 			
 		} catch (Exception e) {
