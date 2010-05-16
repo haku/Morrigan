@@ -35,7 +35,9 @@ import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IViewPart;
 
@@ -215,7 +217,7 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> exte
 		btnProperties.setImage(iconProperties);
 		btnProperties.setLayoutData(formData);
 		
-		txtFilter.addSelectionListener(filterListener);
+		txtFilter.addListener(SWT.Modify, filterListener);
 		btnClearFilter.addSelectionListener(clearFilterListener);
 		btnAddToQueue.addSelectionListener(new ActionListener(addToQueueAction));
 		btnAdd.addSelectionListener(new ActionListener(addAction));
@@ -238,13 +240,9 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> exte
 				);
 	}
 	
-	private SelectionAdapter filterListener = new SelectionAdapter() {
-		public void widgetDefaultSelected(SelectionEvent e) {
-			if (e.detail == SWT.CANCEL) {
-				clearFilterListener.widgetSelected(null);
-			} else {
-				setFilterString(txtFilter.getText());
-			}
+	private Listener filterListener = new Listener() {
+		public void handleEvent(Event event) {
+			setFilterString(txtFilter.getText());
 		}
 	};
 	
