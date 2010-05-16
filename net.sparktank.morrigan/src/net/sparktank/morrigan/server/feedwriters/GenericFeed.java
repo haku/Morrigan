@@ -27,6 +27,7 @@ public class GenericFeed {
 	public GenericFeed () {
 		doc = XmlHelper.getDocumentBuilder().newDocument();
 		Element e = doc.createElement("feed");
+		e.setAttribute("xmlns", "http://www.w3.org/2005/Atom");
 		doc.appendChild(e);
 	}
 	
@@ -77,13 +78,19 @@ public class GenericFeed {
 		element.appendChild(e);
 	}
 	
-	static public void addLink (Document doc, Node element, String href, String rel) {
+	static public void addLink (Document doc, Node element, String href, String rel, String type) {
 		Element link = doc.createElement("link");
 		
 		if (rel != null) {
 			Attr attRel = doc.createAttribute("rel");
 			attRel.setValue(rel);
 			link.getAttributes().setNamedItem(attRel);
+		}
+		
+		if (type != null) {
+			Attr attType = doc.createAttribute("type");
+			attType.setValue(type);
+			link.getAttributes().setNamedItem(attType);
 		}
 		
 		Attr attHref = doc.createAttribute("href");

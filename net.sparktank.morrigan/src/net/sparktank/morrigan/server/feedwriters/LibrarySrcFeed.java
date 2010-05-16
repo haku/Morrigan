@@ -33,10 +33,10 @@ public class LibrarySrcFeed extends GenericFeed {
 		
 		Node feed = doc.getFirstChild(); // This should get the "feed" element.
 		addElement(doc, feed, "title", ml.getListName() + " src");
-		addLink(doc, feed, "/media/" + ml.getType() + "/" + listFile + "/src", "self");
-		addLink(doc, feed, "/media/" + ml.getType() + "/" + listFile, "library");
-		addLink(doc, feed, "/media/" + ml.getType() + "/" + listFile + "/src/add", "add");
-		addLink(doc, feed, "/media/" + ml.getType() + "/" + listFile + "/src/remove", "remove");
+		addLink(doc, feed, "/media/" + ml.getType() + "/" + listFile + "/src", "self", "text/xml");
+		addLink(doc, feed, "/media/" + ml.getType() + "/" + listFile, "library", "text/xml");
+		addLink(doc, feed, "/media/" + ml.getType() + "/" + listFile + "/src/add", "add", "cmd");
+		addLink(doc, feed, "/media/" + ml.getType() + "/" + listFile + "/src/remove", "remove", "cmd");
 		
 		List<String> src = ml.getSources();
 		for (String s : src) {
