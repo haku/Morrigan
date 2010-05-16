@@ -26,8 +26,8 @@ public class MediaFeed extends GenericFeed {
 	private void mediaListsToFeed(Document doc) {
 		Node feed = doc.getFirstChild(); // This should get the "feed" element.
 		addElement(doc, feed, "title", "Morrigan media desu~");
-		addLink(doc, feed, "/media" , "self");
-		addLink(doc, feed, "/media/newlib", "newlib");
+		addLink(doc, feed, "/media" , "self", "text/xml");
+		addLink(doc, feed, "/media/newlib", "newlib", "cmd");
 			
 		List<Player> players = PlayerRegister.getPlayers();
 		
@@ -53,10 +53,10 @@ public class MediaFeed extends GenericFeed {
 				
 				Element entry = doc.createElement("entry");
 				addElement(doc, entry, "title", i.title);
-				addLink(doc, entry, "/media/" + type + "/" + fileName, "self");
+				addLink(doc, entry, "/media/" + type + "/" + fileName, "self", "text/xml");
 				
 				for (Player p : players) {
-					addLink(doc, entry, "/player/" + p.getId() + "/play/" + fileName, "play");
+					addLink(doc, entry, "/player/" + p.getId() + "/play/" + fileName, "play", "cmd");
 				}
 				
 				feed.appendChild(entry);

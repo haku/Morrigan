@@ -33,10 +33,10 @@ public class MediaListFeed<T extends MediaList<? extends MediaItem>> extends Gen
 		
 		Node feed = doc.getFirstChild(); // This should get the "feed" element.
 		addElement(doc, feed, "title", ml.getListName());
-		addLink(doc, feed, "/media/" + ml.getType() + "/" + listFile, "self");
-		addLink(doc, feed, "/media/" + ml.getType() + "/" + listFile + "/src", "src");
-		addLink(doc, feed, "/media/" + ml.getType() + "/" + listFile + "/scan", "scan");
-		addLink(doc, feed, "/player/0/play/" + listFile, "play"); // FIXME list all players here.
+		addLink(doc, feed, "/media/" + ml.getType() + "/" + listFile, "self", "text/xml");
+		addLink(doc, feed, "/media/" + ml.getType() + "/" + listFile + "/src", "src", "text/xml");
+		addLink(doc, feed, "/media/" + ml.getType() + "/" + listFile + "/scan", "scan", "cmd");
+		addLink(doc, feed, "/player/0/play/" + listFile, "play", "cmd"); // FIXME list all players here.
 		
 		for (MediaItem mi : ml.getMediaTracks()) {
 			Element entry = doc.createElement("entry");
@@ -49,8 +49,8 @@ public class MediaListFeed<T extends MediaList<? extends MediaItem>> extends Gen
 			}
 			
 			addElement(doc, entry, "title", mi.getTitle());
-			addLink(doc, entry, "/media/" + ml.getType() + "/" + filenameFromPath(ml.getListId()) + "/" + file, "self");
-			addLink(doc, entry, "/player/0/play/" + listFile + "/" + file, "play"); // FIXME list all players here.
+			addLink(doc, entry, "/media/" + ml.getType() + "/" + filenameFromPath(ml.getListId()) + "/" + file, "self", "text/xml");
+			addLink(doc, entry, "/player/0/play/" + listFile + "/" + file, "play", "cmd"); // FIXME list all players here.
 			addElement(doc, entry, "duration", mi.getDuration());
 			addElement(doc, entry, "hash", mi.getHashcode());
 			addElement(doc, entry, "startcount", mi.getStartCount());
