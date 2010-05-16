@@ -297,13 +297,13 @@ public class PlaybackEngine implements IPlaybackEngine {
 	
 	private KeyListener keyListener = new KeyListener() {
 		@Override
-		public void keyReleased(KeyEvent key) {
+		public void keyTyped(KeyEvent key) {
 			callOnKeyPressListener(key.getKeyCode());
 		}
 		@Override
-		public void keyTyped(KeyEvent arg0) {}
+		public void keyReleased(KeyEvent key) {}
 		@Override
-		public void keyPressed(KeyEvent arg0) {}
+		public void keyPressed(KeyEvent key) {}
 	};
 	
 	private PropertyChangeListener propertyChangeLlistener = new PropertyChangeListener() {
