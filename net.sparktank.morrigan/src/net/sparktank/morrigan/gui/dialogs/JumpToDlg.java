@@ -493,6 +493,7 @@ public class JumpToDlg extends Dialog {
 		if (query == null || query.length() < 1) return false;
 		
 		String q = query.replace("'", "''");
+		q = q.replace(" ", "*");
 		q = q.replace("\\", "\\\\");
 		q = q.replace("%", "\\%");
 		q = q.replace("_", "\\_");
