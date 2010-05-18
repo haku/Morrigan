@@ -377,6 +377,7 @@ public class Player {
 			File file = new File(item.item.getFilepath());
 			if (!file.exists()) throw new FileNotFoundException(item.item.getFilepath());
 			
+			System.out.println("Loading '" + item.item.getTitle() + "'...");
 			getPlaybackEngine().setFile(item.item.getFilepath());
 			Composite currentMediaFrameParent = eventHandler.getCurrentMediaFrameParent();
 			getPlaybackEngine().setVideoFrameParent(currentMediaFrameParent);
@@ -396,7 +397,7 @@ public class Player {
 				getPlaybackEngine().startPlaying();
 			}
 			_currentTrackDuration = getPlaybackEngine().getDuration();
-			System.out.println("Started to play " + item.item.getTitle());
+			System.out.println("Started to play '" + item.item.getTitle() + "'...");
 			
 			item.list.incTrackStartCnt(item.item);
 			if (item.item.getDuration() <= 0) {
