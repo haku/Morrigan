@@ -2,14 +2,12 @@ package net.sparktank.morrigan.gui.handler;
 
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.editors.EditorFactory;
-import net.sparktank.morrigan.gui.editors.LibraryEditorInput;
 import net.sparktank.morrigan.gui.editors.LocalLibraryEditor;
 import net.sparktank.morrigan.gui.editors.MediaListEditorInput;
 import net.sparktank.morrigan.gui.editors.PlaylistEditor;
 import net.sparktank.morrigan.gui.editors.RemoteLibraryEditor;
 import net.sparktank.morrigan.gui.views.ViewMediaExplorer;
 import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
-import net.sparktank.morrigan.model.playlist.MediaPlaylist;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -46,10 +44,13 @@ public class CallMediaListEditor extends AbstractHandler {
 			if (obj != null) {
 				MediaExplorerItem item = (MediaExplorerItem) obj;
 				
+				MediaListEditorInput<?> input;
+				String editorId;
+				
 				if (item.type == MediaExplorerItem.ItemType.PLAYLIST) {
 					try {
-						MediaListEditorInput<MediaPlaylist> input = EditorFactory.getMediaPlaylistInput(item.identifier);
-						page.openEditor(input, PlaylistEditor.ID);
+						input = EditorFactory.getMediaPlaylistInput(item.identifier);
+						editorId = PlaylistEditor.ID;
 					} catch (Exception e) {
 						new MorriganMsgDlg(e).open();
 						return null;
@@ -57,8 +58,8 @@ public class CallMediaListEditor extends AbstractHandler {
 					
 				} else if (item.type == MediaExplorerItem.ItemType.LIBRARY) {
 					try {
-						LibraryEditorInput input = EditorFactory.getMediaLibraryInput(item.identifier);
-						page.openEditor(input, LocalLibraryEditor.ID);
+						input = EditorFactory.getMediaLibraryInput(item.identifier);
+						editorId = LocalLibraryEditor.ID;
 					} catch (Exception e) {
 						new MorriganMsgDlg(e).open();
 						return null;
@@ -66,8 +67,8 @@ public class CallMediaListEditor extends AbstractHandler {
 					
 				} else if (item.type == MediaExplorerItem.ItemType.REMOTELIBRARY) {
 					try {
-						LibraryEditorInput input = EditorFactory.getRemoteMediaLibraryInput(item.identifier);
-						page.openEditor(input, RemoteLibraryEditor.ID);
+						input = EditorFactory.getRemoteMediaLibraryInput(item.identifier);
+						editorId = RemoteLibraryEditor.ID;
 					} catch (Exception e) {
 						new MorriganMsgDlg(e).open();
 						return null;
@@ -75,6 +76,15 @@ public class CallMediaListEditor extends AbstractHandler {
 					
 				} else {
 					new MorriganMsgDlg("TODO: show " + item.identifier).open();
+					return null;
+				}
+				
+				try {
+					page.openEditor(input, editorId);
+					
+				} catch (Exception e) {
+					new MorriganMsgDlg(e).open();
+					return null;
 				}
 			}
 		}
