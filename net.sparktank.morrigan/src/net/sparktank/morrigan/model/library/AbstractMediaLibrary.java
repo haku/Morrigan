@@ -52,6 +52,7 @@ public abstract class AbstractMediaLibrary extends MediaList<MediaLibraryItem> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private boolean firstRead = true;
+	private long durationOfLastRead = -1;
 	
 	@Override
 	public void read () throws MorriganException {
@@ -61,13 +62,18 @@ public abstract class AbstractMediaLibrary extends MediaList<MediaLibraryItem> {
 	}
 	
 	protected void doRead () throws MorriganException {
-		System.err.println("[?] Reading " + getType() + " " + getListName() + "...");
-		long t = System.currentTimeMillis();
+		System.err.println("[?] reading... " + getType() + " " + getListName() + "...");
 		
+		long t0 = System.currentTimeMillis();
 		List<MediaLibraryItem> allMedia = dbLayer.getAllMedia(librarySort, librarySortDirection, HIDEMISSING);
-		replaceList(allMedia);
+		long l0 = System.currentTimeMillis() - t0;
 		
-		System.err.println("[" + (System.currentTimeMillis() - t) + "ms] Read " + getType() + " " + getListName());
+		long t1 = System.currentTimeMillis();
+		replaceList(allMedia);
+		long l1 = System.currentTimeMillis() - t1;
+		
+		System.err.println("[" + l0 + "," + l1 + " ms] " + getType() + " " + getListName());
+		durationOfLastRead = l0+l1;
 	}
 	
 	/**
@@ -112,6 +118,10 @@ public abstract class AbstractMediaLibrary extends MediaList<MediaLibraryItem> {
 		List<MediaLibraryItem> allList = dbLayer.getAllMedia(LibrarySort.FILE, LibrarySortDirection.ASC, false);
 		updateList(copyOfMainList, allList);
 		return copyOfMainList;
+	}
+	
+	public long getDurationOfLastRead() {
+		return durationOfLastRead;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

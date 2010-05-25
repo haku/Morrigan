@@ -146,7 +146,7 @@ public class ViewQueue extends ViewPart {
 			setContentDescription(
 					queue.size() + " items"
 					+ " totaling " + (d.complete ? "" : "more than ") +
-					TimeHelper.formatTime(d.duration) + "."
+					TimeHelper.formatTimeSeconds(d.duration) + "."
 			);
 		}
 	}

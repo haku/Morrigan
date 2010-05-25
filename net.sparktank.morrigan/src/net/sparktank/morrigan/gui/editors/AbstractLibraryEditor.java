@@ -235,8 +235,9 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> exte
 		
 		lblStatus.setText(
 				getMediaList().getCount() + " items"
-				+ " totaling " + (d.complete ? "" : "more than ") +
-				TimeHelper.formatTime(d.duration) + "."
+				+ " totaling " + (d.complete ? "" : "more than ")
+				+ TimeHelper.formatTimeSeconds(d.duration)
+				+ ".  Query took " + TimeHelper.formatTimeMiliseconds(getMediaList().getDurationOfLastRead()) + " seconds."
 				);
 	}
 	
