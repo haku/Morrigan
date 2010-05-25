@@ -220,6 +220,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 				DSFiltergraph.OVERLAY | DSFiltergraph.MOUSE_ENABLED | DSFiltergraph.INIT_PAUSED,
 				propertyChangeLlistener);
 		dsMovie.setVolume(1.0f);
+		dsMovie.setRecueOnStop(false);
 		reparentVideo();
 		dsMovie.pause(); // Is this is not here, then sometimes playback does not start when play() is called.
 	}
