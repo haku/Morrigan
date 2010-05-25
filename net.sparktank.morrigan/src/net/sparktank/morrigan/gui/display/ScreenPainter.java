@@ -91,7 +91,7 @@ public class ScreenPainter implements PaintListener {
 				
 				text = item.item.getStartCount() + " / " + item.item.getEndCount();
 				if (item.item.getDuration() > 0) {
-					text = text + "   " + TimeHelper.formatTime(item.item.getDuration());
+					text = text + "   " + TimeHelper.formatTimeSeconds(item.item.getDuration());
 				}
 				e.gc.setFont(font2);
 				Rectangle rect2 = drawTextHCen(e, centre.x, rect.y + rect.height, text);

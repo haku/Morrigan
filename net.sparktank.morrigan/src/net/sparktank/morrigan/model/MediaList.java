@@ -262,10 +262,11 @@ public abstract class MediaList<T extends MediaItem> {
 		synchronized (keepList) {
 			synchronized (freshList) {
 				
+				List<T> keepList2 = new ArrayList<T>(keepList);
 				for (T newItem : freshList) {
-					int indexOfOldItem = keepList.indexOf(newItem);
+					int indexOfOldItem = keepList2.indexOf(newItem);
 					if (indexOfOldItem >= 0) {
-						T oldItem = keepList.get(indexOfOldItem);
+						T oldItem = keepList2.remove(indexOfOldItem);
 						oldItem.setFromMediaItem(newItem);
 						finalList.add(oldItem);
 					} else {

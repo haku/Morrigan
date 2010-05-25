@@ -118,7 +118,7 @@ public abstract class MediaListEditor<T extends MediaList<S>, S extends MediaIte
 			readInputData();
 		} catch (Exception e) {
 			if (!handleReadError(e)) {
-				throw new PartInitException("Exception while calling read().", e);
+				throw new PartInitException("Exception while calling readInputData().", e);
 			}
 		}
 	}
@@ -406,7 +406,7 @@ public abstract class MediaListEditor<T extends MediaList<S>, S extends MediaIte
 			if (elm.getDuration() <= 0) {
 				return null;
 			} else {
-				return TimeHelper.formatTime(elm.getDuration());
+				return TimeHelper.formatTimeSeconds(elm.getDuration());
 			}
 		}
 	}

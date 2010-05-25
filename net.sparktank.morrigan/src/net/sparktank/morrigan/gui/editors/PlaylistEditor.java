@@ -216,7 +216,7 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist,MediaItem> {
 		lblStatus.setText(
 				getMediaList().getCount() + " items"
 				+ " totaling " + (d.complete ? "" : "more than ") +
-				TimeHelper.formatTime(d.duration) + "."
+				TimeHelper.formatTimeSeconds(d.duration) + "."
 				);
 	}
 	

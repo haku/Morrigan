@@ -27,6 +27,11 @@ public class EditorFactory implements IElementFactory {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	/**
+	 * TODO work around an eclipse bug by making it safe
+	 * for this method to be called multiple times.
+	 * (issues with restoring navigation history)
+	 */
 	@Override
 	public IAdaptable createElement(IMemento memento) {
 		MediaListEditorInput<?> input = null;

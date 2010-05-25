@@ -392,9 +392,9 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		}
 		
 		if (getPlayer().getCurrentPosition() >= 0) {
-			verb = verb + " " + TimeHelper.formatTime(getPlayer().getCurrentPosition());
+			verb = verb + " " + TimeHelper.formatTimeSeconds(getPlayer().getCurrentPosition());
 			if (getPlayer().getCurrentTrackDuration() > 0) {
-				verb = verb + " of " + TimeHelper.formatTime(getPlayer().getCurrentTrackDuration());
+				verb = verb + " of " + TimeHelper.formatTimeSeconds(getPlayer().getCurrentTrackDuration());
 				
 				seekbarPainter.setProgress((int) getPlayer().getCurrentPosition(), getPlayer().getCurrentTrackDuration());
 			}
