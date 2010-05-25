@@ -61,8 +61,13 @@ public abstract class AbstractMediaLibrary extends MediaList<MediaLibraryItem> {
 	}
 	
 	protected void doRead () throws MorriganException {
+		System.err.println("[?] Reading " + getType() + " " + getListName() + "...");
+		long t = System.currentTimeMillis();
+		
 		List<MediaLibraryItem> allMedia = dbLayer.getAllMedia(librarySort, librarySortDirection, HIDEMISSING);
 		replaceList(allMedia);
+		
+		System.err.println("[" + (System.currentTimeMillis() - t) + "ms] Read " + getType() + " " + getListName());
 	}
 	
 	/**
@@ -75,6 +80,17 @@ public abstract class AbstractMediaLibrary extends MediaList<MediaLibraryItem> {
 	public void reRead () throws MorriganException {
 		firstRead = true;
 		read();
+	}
+	
+	/**
+	 * Only read if already read.
+	 * No point re-reading if no one is expecting it
+	 * to already be read.
+	 */
+	public void updateRead () throws MorriganException {
+		if (!firstRead) {
+			reRead();
+		}
 	}
 	
 	public void setAutoCommit (boolean b) throws MorriganException {
@@ -112,7 +128,7 @@ public abstract class AbstractMediaLibrary extends MediaList<MediaLibraryItem> {
 	public void setSort (LibrarySort sort, LibrarySortDirection direction) throws MorriganException {
 		librarySort = sort;
 		librarySortDirection = direction;
-		reRead();
+		updateRead();
 		callSortChangedListeners(librarySort, librarySortDirection);
 	}
 	
