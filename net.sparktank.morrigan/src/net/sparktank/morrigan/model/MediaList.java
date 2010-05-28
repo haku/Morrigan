@@ -3,7 +3,9 @@ package net.sparktank.morrigan.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 
@@ -262,11 +264,16 @@ public abstract class MediaList<T extends MediaItem> {
 		synchronized (keepList) {
 			synchronized (freshList) {
 				
-				List<T> keepList2 = new ArrayList<T>(keepList);
+				// This block takes no time.
+				Map<String,T> keepMap = new HashMap<String,T>(keepList.size());
+				for (T e : keepList) {
+					keepMap.put(e.getFilepath(), e);
+				}
+				
+				// This block is very quick.
 				for (T newItem : freshList) {
-					int indexOfOldItem = keepList2.indexOf(newItem);
-					if (indexOfOldItem >= 0) {
-						T oldItem = keepList2.remove(indexOfOldItem);
+					T oldItem = keepMap.get(newItem.getFilepath());
+					if (oldItem != null) {
 						oldItem.setFromMediaItem(newItem);
 						finalList.add(oldItem);
 					} else {
@@ -276,12 +283,20 @@ public abstract class MediaList<T extends MediaItem> {
 				
 				System.err.println("Replacing " + keepList.size() + " items with " + finalList.size() + " items.");
 				
-				// The return list is a list of all the items we removed.
-				List<T> ret = new ArrayList<T>(keepList);
-				ret.removeAll(finalList);
+				/* Create a new list and populate it with the
+				 * items removed.
+				 * This is very quick.
+				 */
+				List<T> ret = new ArrayList<T>();
+				for (T e : finalList) {
+					if (!keepMap.containsKey(e.getFilepath())) {
+						ret.add(e);
+					}
+				}
 				
 				/* Update the keep list.  We need to modify
 				 * the passed in list, not return a new one.
+				 * This block takes no time.
 				 */
 				keepList.clear();
 				keepList.addAll(finalList);
