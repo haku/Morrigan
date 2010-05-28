@@ -231,14 +231,26 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> exte
 	protected void listChanged () {
 		if (lblStatus.isDisposed()) return;
 		
+		StringBuilder sb = new StringBuilder();
+		
 		DurationData d = getMediaList().getTotalDuration();
 		
-		lblStatus.setText(
-				getMediaList().getCount() + " items"
-				+ " totaling " + (d.complete ? "" : "more than ")
-				+ TimeHelper.formatTimeSeconds(d.duration)
-				+ ".  Query took " + TimeHelper.formatTimeMiliseconds(getMediaList().getDurationOfLastRead()) + " seconds."
-				);
+		sb.append(getMediaList().getCount());
+		sb.append(" items totaling ");
+		if (!d.complete) {
+			sb.append("more than ");
+		}
+		sb.append(TimeHelper.formatTimeSeconds(d.duration));
+		sb.append(".");
+		
+		long queryTime = getMediaList().getDurationOfLastRead();
+		if (queryTime > 0) {
+			sb.append("  Query took ");
+			sb.append(TimeHelper.formatTimeMiliseconds(queryTime));
+			sb.append(" seconds.");
+		}
+		
+		lblStatus.setText(sb.toString());
 	}
 	
 	private Listener filterListener = new Listener() {
