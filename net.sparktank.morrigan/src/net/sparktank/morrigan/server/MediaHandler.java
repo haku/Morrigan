@@ -3,6 +3,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URLDecoder;
 import java.util.Map;
 
@@ -33,10 +34,14 @@ public class MediaHandler extends AbstractHandler {
 	public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 		System.err.println("request:t=" + target + ", m=" + request.getMethod());
 		
-		StringBuilder sb = new StringBuilder();
+		response.setContentType("text/html;charset=utf-8");
+		response.setStatus(HttpServletResponse.SC_OK);
+		baseRequest.setHandled(true);
+		PrintWriter out = response.getWriter();
+		
 		try {
 			if (target.equals("/")) {
-				sb.append(new MediaFeed().getXmlString());
+				new MediaFeed().process(out);
 				
 			} else {
 				String r = target.substring(1);
@@ -60,29 +65,29 @@ public class MediaHandler extends AbstractHandler {
 										if (paramMap.containsKey("dir")) {
 											String[] v = (String[]) paramMap.get("dir");
 											ml.addSource(v[0]);
-											sb.append("Added src '"+v[0]+"'.");
+											out.print("Added src '"+v[0]+"'.");
 										} else {
-											sb.append("To add a src, POST with param 'dir' set.");
+											out.print("To add a src, POST with param 'dir' set.");
 										}
 									} else if (cmd.equals("remove")) {
 										if (paramMap.containsKey("dir")) {
 											String[] v = (String[]) paramMap.get("dir");
 											ml.removeSource(v[0]);
-											sb.append("Removed src '"+v[0]+"'.");
+											out.print("Removed src '"+v[0]+"'.");
 										} else {
-											sb.append("To remove a src, POST with param 'dir' set.");
+											out.print("To remove a src, POST with param 'dir' set.");
 										}
 									}
 									
 								} else {
-									sb.append(new LibrarySrcFeed(ml).getXmlString());
+									new LibrarySrcFeed(ml).process(out);
 								}
 								
 							} else if (param.equals("scan")) {
 								if (scheduleLibScan(ml)) {
-									sb.append("Scan scheduled.");
+									out.print("Scan scheduled.");
 								} else {
-									sb.append("Failed to schedule scan.");
+									out.print("Failed to schedule scan.");
 								}
 								
 							} else {
@@ -96,14 +101,14 @@ public class MediaHandler extends AbstractHandler {
 							
 						} else {
 							MediaListFeed<LocalMediaLibrary> libraryFeed = new MediaListFeed<LocalMediaLibrary>(ml);
-							sb.append(libraryFeed.getXmlString());
+							libraryFeed.process(out);
 						}
 						
 					} else if (type.equals("playlist")) {
 						String f = PlaylistHelper.getFullPathToPlaylist(id);
 						MediaPlaylist ml = MediaListFactory.makeMediaPlaylist(f);
 						MediaListFeed<MediaPlaylist> libraryFeed = new MediaListFeed<MediaPlaylist>(ml);
-						sb.append(libraryFeed.getXmlString());
+						libraryFeed.process(out);
 					}
 					
 				} else if (type.equals("newlib")) {
@@ -111,23 +116,13 @@ public class MediaHandler extends AbstractHandler {
 						String[] v = (String[]) paramMap.get("name");
 						LocalLibraryHelper.createLib(v[0]);
 					} else {
-						sb.append("To create a library, POST with param 'name' set.");
+						out.print("To create a library, POST with param 'name' set.");
 					}
 				}
 			} 
 			
 		} catch (Throwable t) {
-			sb.append(ErrorHelper.getStackTrace(t));
-		}
-		
-		if (sb != null) {
-			response.setContentType("text/html;charset=utf-8");
-			response.setStatus(HttpServletResponse.SC_OK);
-			baseRequest.setHandled(true);
-			response.getWriter().println(sb.toString());
-			
-		} else {
-			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			out.print(ErrorHelper.getStackTrace(t));
 		}
 	}
 	

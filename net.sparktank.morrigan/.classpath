@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="lib" path="lib/xml-writer.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jetty-security-7.0.2.v20100331.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jetty-xml-7.0.2.v20100331.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jetty-servlets-7.0.2.v20100331.jar"/>

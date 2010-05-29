@@ -7,21 +7,25 @@ import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.MediaItem;
 import net.sparktank.morrigan.model.MediaList;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
-public class MediaListFeed<T extends MediaList<? extends MediaItem>> extends GenericFeed {
+import com.megginson.sax.DataWriter;
+
+public class MediaListFeed<T extends MediaList<? extends MediaItem>> extends Feed {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public MediaListFeed (T ml) throws MorriganException {
+	private final T ml;
+
+	public MediaListFeed (T ml) throws MorriganException, SAXException {
 		super();
-		mediaLibraryToFeed(ml, getDoc());
+		if (ml==null) throw new IllegalArgumentException("MediaList paramater can not be null.");
+		this.ml = ml;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private void mediaLibraryToFeed (T ml, Document doc) throws MorriganException {
+	@Override
+	protected void populateFeed(DataWriter dw) throws SAXException, MorriganException {
 		ml.read();
 		
 		String listFile;
@@ -31,15 +35,15 @@ public class MediaListFeed<T extends MediaList<? extends MediaItem>> extends Gen
 			throw new RuntimeException(e);
 		}
 		
-		Node feed = doc.getFirstChild(); // This should get the "feed" element.
-		addElement(doc, feed, "title", ml.getListName());
-		addLink(doc, feed, "/media/" + ml.getType() + "/" + listFile, "self", "text/xml");
-		addLink(doc, feed, "/media/" + ml.getType() + "/" + listFile + "/src", "src", "text/xml");
-		addLink(doc, feed, "/media/" + ml.getType() + "/" + listFile + "/scan", "scan", "cmd");
-		addLink(doc, feed, "/player/0/play/" + listFile, "play", "cmd"); // FIXME list all players here.
+		dw.dataElement("title", ml.getListName());
+		
+		addLink(dw, "/media/" + ml.getType() + "/" + listFile, "self", "text/xml");
+		addLink(dw, "/media/" + ml.getType() + "/" + listFile + "/src", "src", "text/xml");
+		addLink(dw, "/media/" + ml.getType() + "/" + listFile + "/scan", "scan", "cmd");
+		addLink(dw, "/player/0/play/" + listFile, "play", "cmd"); // FIXME list all players here.
 		
 		for (MediaItem mi : ml.getMediaTracks()) {
-			Element entry = doc.createElement("entry");
+			dw.startElement("entry");
 			
 			String file;
 			try {
@@ -48,24 +52,24 @@ public class MediaListFeed<T extends MediaList<? extends MediaItem>> extends Gen
 				throw new RuntimeException(e);
 			}
 			
-			addElement(doc, entry, "title", mi.getTitle());
-			addLink(doc, entry, "/media/" + ml.getType() + "/" + filenameFromPath(ml.getListId()) + "/" + file, "self", "text/xml");
-			addLink(doc, entry, "/player/0/play/" + listFile + "/" + file, "play", "cmd"); // FIXME list all players here.
-			addElement(doc, entry, "duration", mi.getDuration());
-			addElement(doc, entry, "hash", mi.getHashcode());
-			addElement(doc, entry, "startcount", mi.getStartCount());
-			addElement(doc, entry, "endcount", mi.getEndCount());
+			addElement(dw, "title", mi.getTitle());
+			addLink(dw, "/media/" + ml.getType() + "/" + filenameFromPath(ml.getListId()) + "/" + file, "self", "text/xml");
+			addLink(dw, "/player/0/play/" + listFile + "/" + file, "play", "cmd"); // FIXME list all players here.
+			addElement(dw, "duration", mi.getDuration());
+			addElement(dw, "hash", mi.getHashcode());
+			addElement(dw, "startcount", mi.getStartCount());
+			addElement(dw, "endcount", mi.getEndCount());
 			if (mi.getDateAdded() != null) {
-				addElement(doc, entry, "dateadded", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateAdded()));
+				addElement(dw, "dateadded", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateAdded()));
 			}
 			if (mi.getDateLastModified() != null) {
-				addElement(doc, entry, "datelastmodified", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateLastModified()));
+				addElement(dw, "datelastmodified", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateLastModified()));
 			}
 			if (mi.getDateLastPlayed() != null) {
-				addElement(doc, entry, "datelastplayed", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateLastPlayed()));
+				addElement(dw, "datelastplayed", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateLastPlayed()));
 			}
 			
-			feed.appendChild(entry);
+			dw.endElement("entry");
 		}
 	}
 	

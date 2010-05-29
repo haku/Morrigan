@@ -7,21 +7,24 @@ import java.util.List;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.library.LocalMediaLibrary;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
-public class LibrarySrcFeed extends GenericFeed {
+import com.megginson.sax.DataWriter;
+
+public class LibrarySrcFeed extends Feed {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	private LocalMediaLibrary ml;
 	
 	public LibrarySrcFeed (LocalMediaLibrary ml) throws MorriganException {
 		super();
-		mediaLibrarySrcToFeed(ml, getDoc());
+		if (ml==null) throw new IllegalArgumentException("MediaList paramater can not be null.");
+		this.ml = ml;
 	}
-
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private void mediaLibrarySrcToFeed(LocalMediaLibrary ml, Document doc) throws MorriganException {
+	protected void populateFeed(DataWriter dw) throws SAXException, MorriganException {
 		ml.read();
 		
 		String listFile;
@@ -31,20 +34,19 @@ public class LibrarySrcFeed extends GenericFeed {
 			throw new RuntimeException(e);
 		}
 		
-		Node feed = doc.getFirstChild(); // This should get the "feed" element.
-		addElement(doc, feed, "title", ml.getListName() + " src");
-		addLink(doc, feed, "/media/" + ml.getType() + "/" + listFile + "/src", "self", "text/xml");
-		addLink(doc, feed, "/media/" + ml.getType() + "/" + listFile, "library", "text/xml");
-		addLink(doc, feed, "/media/" + ml.getType() + "/" + listFile + "/src/add", "add", "cmd");
-		addLink(doc, feed, "/media/" + ml.getType() + "/" + listFile + "/src/remove", "remove", "cmd");
+		addElement(dw, "title", ml.getListName() + " src");
+		addLink(dw, "/media/" + ml.getType() + "/" + listFile + "/src", "self", "text/xml");
+		addLink(dw, "/media/" + ml.getType() + "/" + listFile, "library", "text/xml");
+		addLink(dw, "/media/" + ml.getType() + "/" + listFile + "/src/add", "add", "cmd");
+		addLink(dw, "/media/" + ml.getType() + "/" + listFile + "/src/remove", "remove", "cmd");
 		
 		List<String> src = ml.getSources();
 		for (String s : src) {
-			Element entry = doc.createElement("entry");
+			dw.startElement("entry");
 			
-			addElement(doc, entry, "dir", s);
-			
-			feed.appendChild(entry);
+			addElement(dw, "dir", s);
+
+			dw.endElement("entry");
 		}
 	}
 	
