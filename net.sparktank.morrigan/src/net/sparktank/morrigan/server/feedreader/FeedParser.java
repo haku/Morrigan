@@ -10,24 +10,21 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-public abstract class GenericFeedReader {
+public class FeedParser {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private final Document doc;
-	private final TaskEventListener taskEventListener;
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	public GenericFeedReader (String xmlString, TaskEventListener taskEventListener) throws SAXException, IOException {
-		this.taskEventListener = taskEventListener;
-		doc = XmlHelper.xmlStringToDocument(xmlString);
-	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	protected void parse() throws FeedParseException {
+	static public void parseFeed (String xmlString, TaskEventListener taskEventListener, IEntryHandler entryHandler) throws FeedParseException {
 //		if (taskEventListener!=null) taskEventListener.onStart(); // TODO do this?
 		if (taskEventListener!=null) taskEventListener.beginTask("Reading feed...", 100);
+		
+		Document doc;
+		try {
+			doc = XmlHelper.xmlStringToDocument(xmlString);
+		} catch (SAXException e) {
+			throw new FeedParseException(e);
+		} catch (IOException e) {
+			throw new FeedParseException(e);
+		}
 		
 		Node feed = doc.getFirstChild(); // This should get the "feed" element.
 		if (feed.getNodeName().equals("feed")) {
@@ -42,7 +39,7 @@ public abstract class GenericFeedReader {
 			for (int i = 0; i < entries.getLength(); i++) {
 				Node entry = entries.item(i);
 				if (entry.getNodeName().equals("entry")) {
-					parseEntry(entry);
+					entryHandler.parseEntry(entry);
 				}
 				
 				if (taskEventListener!=null) {
@@ -60,16 +57,6 @@ public abstract class GenericFeedReader {
 		} else {
 			throw new IllegalArgumentException("First node '"+feed.getNodeName()+"' != feed.");
 		}
-	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	protected abstract void parseEntry (Node entry) throws FeedParseException;
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	protected Document getDoc () {
-		return doc;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

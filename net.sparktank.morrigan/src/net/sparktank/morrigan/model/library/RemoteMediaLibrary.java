@@ -10,7 +10,7 @@ import net.sparktank.morrigan.engines.playback.NotImplementedException;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.MediaItem;
 import net.sparktank.morrigan.model.TaskEventListener;
-import net.sparktank.morrigan.server.feedreader.MediaListFeedReader;
+import net.sparktank.morrigan.server.feedreader.MediaListFeedParser;
 
 public class RemoteMediaLibrary extends AbstractMediaLibrary {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -95,16 +95,18 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 			
 			try {
 				// This does the actual HTTP fetch.
-				new MediaListFeedReader(this, taskEventListener);
-				
-			} catch (UnknownHostException e) {
-				throw new MorriganException("Host unknown.", e);
-				
-			} catch (SocketException e) {
-				throw new MorriganException("Host unreachable.", e);
+				MediaListFeedParser.parseFeed(this, taskEventListener);
 				
 			} catch (Exception e) {
-				throw new MorriganException(e);
+				if (e.getCause() instanceof UnknownHostException) {
+					throw new MorriganException("Host unknown.", e);
+					
+				} else if (e.getCause() instanceof SocketException) {
+					throw new MorriganException("Host unreachable.", e);
+					
+				} else {
+					throw new MorriganException(e);
+				}
 			}
 			
 			super.doRead(); // This forces a DB query - sorts entries.
