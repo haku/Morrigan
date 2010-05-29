@@ -3,32 +3,31 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
 import net.sparktank.morrigan.model.library.LocalLibraryHelper;
 import net.sparktank.morrigan.model.playlist.PlaylistHelper;
 import net.sparktank.morrigan.player.Player;
 import net.sparktank.morrigan.player.PlayerRegister;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
-public class MediaFeed extends GenericFeed {
+import com.megginson.sax.DataWriter;
+
+public class MediaFeed extends Feed {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public MediaFeed () {
 		super();
-		mediaListsToFeed(getDoc());
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private void mediaListsToFeed(Document doc) {
-		Node feed = doc.getFirstChild(); // This should get the "feed" element.
-		addElement(doc, feed, "title", "Morrigan media desu~");
-		addLink(doc, feed, "/media" , "self", "text/xml");
-		addLink(doc, feed, "/media/newlib", "newlib", "cmd");
-			
+	protected void populateFeed(DataWriter dw) throws SAXException, MorriganException {
+		addElement(dw, "title", "Morrigan media desu~");
+		addLink(dw, "/media" , "self", "text/xml");
+		addLink(dw, "/media/newlib", "newlib", "cmd");
+		
 		List<Player> players = PlayerRegister.getPlayers();
 		
 		for (int n = 0; n < 2; n++) {
@@ -50,16 +49,16 @@ public class MediaFeed extends GenericFeed {
 			
 			for (MediaExplorerItem i : items) {
 				String fileName = i.identifier.substring(i.identifier.lastIndexOf(File.separator) + 1);
-				
-				Element entry = doc.createElement("entry");
-				addElement(doc, entry, "title", i.title);
-				addLink(doc, entry, "/media/" + type + "/" + fileName, "self", "text/xml");
+				dw.startElement("entry");
+
+				addElement(dw, "title", i.title);
+				addLink(dw, "/media/" + type + "/" + fileName, "self", "text/xml");
 				
 				for (Player p : players) {
-					addLink(doc, entry, "/player/" + p.getId() + "/play/" + fileName, "play", "cmd");
+					addLink(dw, "/player/" + p.getId() + "/play/" + fileName, "play", "cmd");
 				}
 				
-				feed.appendChild(entry);
+				dw.endElement("entry");
 			}
 			
 		}

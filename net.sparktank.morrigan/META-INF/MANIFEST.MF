@@ -21,5 +21,6 @@ Bundle-ClassPath: .,
  lib/jetty-servlet-7.0.2.v20100331.jar,
  lib/jetty-servlets-7.0.2.v20100331.jar,
  lib/jetty-security-7.0.2.v20100331.jar,
- lib/jetty-xml-7.0.2.v20100331.jar
+ lib/jetty-xml-7.0.2.v20100331.jar,
+ lib/xml-writer.jar
 Bundle-Vendor: sparktank.net
