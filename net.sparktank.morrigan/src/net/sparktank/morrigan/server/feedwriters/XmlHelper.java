@@ -36,8 +36,15 @@ public class XmlHelper {
 	}
 	
 	static public Document xmlStringToDocument (String xmlString) throws SAXException, IOException {
-		ByteArrayInputStream is = new ByteArrayInputStream(xmlString.getBytes());
-		return getDocumentBuilder().parse(is);
+		Document document;
+		try {
+			ByteArrayInputStream is = new ByteArrayInputStream(xmlString.getBytes());
+			document = getDocumentBuilder().parse(is);
+		} catch (SAXException e) {
+			System.err.println("SAXException parsing xml:\n" + xmlString);
+			throw e;
+		}
+		return document;
 	}
 	
 	static private SimpleDateFormat Iso8601Utc = null;
