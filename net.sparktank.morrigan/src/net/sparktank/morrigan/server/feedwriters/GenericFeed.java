@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.StringWriter;
 
 import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Result;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -51,15 +52,16 @@ public class GenericFeed {
 		transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 		transformer.setOutputProperty(OutputKeys.STANDALONE, "yes");
 		
-		StreamResult result = new StreamResult(new StringWriter());
+		StringWriter stringWriter = new StringWriter();
+		Result streamResult = new StreamResult(stringWriter);
 		DOMSource source = new DOMSource(getDoc());
 		try {
-			transformer.transform(source, result);
+			transformer.transform(source, streamResult);
 		} catch (TransformerException e) {
 			throw new RuntimeException(e);
 		}
 		
-		return result.getWriter().toString();
+		return stringWriter.getBuffer().toString();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
