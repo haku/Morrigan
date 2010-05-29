@@ -10,7 +10,19 @@ import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
 public class ServerAction extends Action implements IWorkbenchAction {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public ServerAction () {
+	// We only want 1 instance, as there is only 1 server.
+	private static ServerAction instance;
+	
+	public static synchronized ServerAction getInstance () {
+		if (instance == null) {
+			instance = new ServerAction();
+		}
+		return instance;
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	private ServerAction () {
 		super("Server", AS_CHECK_BOX);
 	}
 	

@@ -156,7 +156,7 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		prefMenuMgr.add(showViewMenuMgr);
 		prefMenuMgr.add(ActionFactory.RESET_PERSPECTIVE.create(getSite().getWorkbenchWindow()));
 		prefMenuMgr.add(new Separator());
-		prefMenuMgr.add(new ServerAction());
+		prefMenuMgr.add(ServerAction.getInstance());
 		prefMenuMgr.add(ActionFactory.PREFERENCES.create(getSite().getWorkbenchWindow()));
 		prefMenuMgr.add(new Separator());
 		prefMenuMgr.add(ActionFactory.ABOUT.create(getSite().getWorkbenchWindow()));
