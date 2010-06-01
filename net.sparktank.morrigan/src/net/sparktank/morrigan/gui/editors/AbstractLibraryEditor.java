@@ -1,11 +1,11 @@
 package net.sparktank.morrigan.gui.editors;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.gui.Activator;
-import net.sparktank.morrigan.gui.ApplicationActionBarAdvisor;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.dialogs.RunnableDialog;
 import net.sparktank.morrigan.gui.display.ActionListener;
@@ -22,7 +22,6 @@ import net.sparktank.morrigan.model.library.SqliteLayer.LibrarySortDirection;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.TableViewer;
@@ -31,12 +30,10 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.layout.FormAttachment;
-import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IViewPart;
@@ -59,10 +56,7 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> exte
 //	EditorPart methods.
 	
 	@Override
-	public void setFocus() {
-		getEditorSite().getActionBars().setGlobalActionHandler(ApplicationActionBarAdvisor.ACTIONID_ADD, addAction);
-		getEditorSite().getActionBars().setGlobalActionHandler(ApplicationActionBarAdvisor.ACTIONID_SHOWPROPERTIES, showPropertiesAction);
-	}
+	public void setFocus() {}
 	
 	@Override
 	public boolean isSaveAsAllowed() {
@@ -126,17 +120,15 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> exte
 	
 	private List<SortAction> sortActions = new ArrayList<SortAction>();
 	
-	private Label lblStatus = null;
 	private Text txtFilter = null;
 	protected Button btnClearFilter = null;
 	protected Button btnAddToQueue = null;
-	protected Button btnAdd = null;
 	protected Button btnProperties = null;
 	
 	protected MenuManager prefMenuMgr = null;
 	
 	@Override
-	protected void populateToolbar (Composite parent) {
+	protected void createControls(Composite parent) {
 		// Dependencies.
 		
 		makeIcons();
@@ -147,8 +139,6 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> exte
 			sortActions.add(a);
 		}
 		getMediaList().registerSortChangeListener(sortChangeListener);
-		
-		// Off-screen controls.
 		
 		// Pref menu.
 		prefMenuMgr = new MenuManager();
@@ -164,64 +154,33 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> exte
 		contextMenuMgr.add(toggleEnabledAction);
 		contextMenuMgr.add(removeAction);
 		setTableMenu(contextMenuMgr.createContextMenu(parent));
+	}
+	
+	@Override
+	protected List<Control> populateToolbar (Composite parent) {
+		List<Control> ret = new LinkedList<Control>();
 		
-		// On-screen controls.
-		
-		FormData formData;
-		
-		lblStatus = new Label(parent, SWT.NONE);
 		txtFilter = new Text(parent, SWT.SINGLE | SWT.BORDER | SWT.SEARCH);
-		btnClearFilter = new Button(parent, SWT.PUSH);
-		btnAddToQueue = new Button(parent, SWT.PUSH);
-		btnAdd = new Button(parent, SWT.PUSH);
-		btnProperties = new Button(parent, SWT.PUSH);
-		
-		formData = new FormData();
-		formData.top = new FormAttachment(50, -(lblStatus.computeSize(SWT.DEFAULT, SWT.DEFAULT).y)/2);
-		formData.left = new FormAttachment(0, sep*2);
-		formData.right = new FormAttachment(txtFilter, -sep);
-		lblStatus.setLayoutData(formData);
-		
-		formData = new FormData();
-		formData.top = new FormAttachment(0, sep);
-		formData.bottom = new FormAttachment(100, -sep);
-		formData.right = new FormAttachment(btnClearFilter, -sep);
-		txtFilter.setLayoutData(formData);
 		txtFilter.setMessage("Filter");
-		
-		formData = new FormData();
-		formData.top = new FormAttachment(0, sep);
-		formData.bottom = new FormAttachment(100, -sep);
-		formData.right = new FormAttachment(btnAddToQueue, -sep * 3);
-		btnClearFilter.setImage(iconX);
-		btnClearFilter.setLayoutData(formData);
-		
-		formData = new FormData();
-		formData.top = new FormAttachment(0, sep);
-		formData.bottom = new FormAttachment(100, -sep);
-		formData.right = new FormAttachment(btnAdd, -sep);
-		btnAddToQueue.setImage(iconQueueAdd);
-		btnAddToQueue.setLayoutData(formData);
-		
-		formData = new FormData();
-		formData.top = new FormAttachment(0, sep);
-		formData.bottom = new FormAttachment(100, -sep);
-		formData.right = new FormAttachment(btnProperties, -sep);
-		btnAdd.setImage(iconAdd);
-		btnAdd.setLayoutData(formData);
-		
-		formData = new FormData();
-		formData.top = new FormAttachment(0, sep);
-		formData.bottom = new FormAttachment(100, -sep);
-		formData.right = new FormAttachment(100, -sep);
-		btnProperties.setImage(iconProperties);
-		btnProperties.setLayoutData(formData);
-		
 		txtFilter.addListener(SWT.Modify, filterListener);
+		ret.add(txtFilter);
+		
+		btnClearFilter = new Button(parent, SWT.PUSH);
+		btnClearFilter.setImage(iconX);
 		btnClearFilter.addSelectionListener(clearFilterListener);
+		ret.add(btnClearFilter);
+		
+		btnAddToQueue = new Button(parent, SWT.PUSH);
+		btnAddToQueue.setImage(iconQueueAdd);
 		btnAddToQueue.addSelectionListener(new ActionListener(addToQueueAction));
-		btnAdd.addSelectionListener(new ActionListener(addAction));
+		ret.add(btnAddToQueue);
+		
+		btnProperties = new Button(parent, SWT.PUSH);
+		btnProperties.setImage(iconProperties);
 		btnProperties.addSelectionListener(new DropMenuListener(btnProperties, prefMenuMgr));
+		ret.add(btnProperties);
+		
+		return ret;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -368,24 +327,6 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> exte
 		}
 		
 	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Actions.
-	
-	protected IAction addAction = new Action("Add") {
-		public void run () {
-			ViewLibraryProperties propView = showLibPropView();
-			if (propView!=null) {
-				propView.showAddDlg(true);
-			}
-		}
-	};
-	
-	protected IAction showPropertiesAction = new Action("Properties") {
-		public void run () {
-			showLibPropView();
-		}
-	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
