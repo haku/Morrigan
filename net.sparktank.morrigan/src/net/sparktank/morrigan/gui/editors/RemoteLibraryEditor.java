@@ -45,8 +45,9 @@ public class RemoteLibraryEditor extends AbstractLibraryEditor<RemoteMediaLibrar
 	
 	@Override
 	protected void readInputData() throws MorriganException {
+		getMediaList().readFromCache();
 		RefreshLibraryJob job = new RefreshLibraryJob(getMediaList());
-		job.schedule();
+		job.schedule(3000);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -56,7 +57,8 @@ public class RemoteLibraryEditor extends AbstractLibraryEditor<RemoteMediaLibrar
 		@Override
 		public void widgetSelected(SelectionEvent event) {
 			try {
-				readInputData();
+				RefreshLibraryJob job = new RefreshLibraryJob(getMediaList());
+				job.schedule();
 				
 			} catch (Exception e) {
 				new MorriganMsgDlg(e).open();

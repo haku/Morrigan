@@ -81,10 +81,12 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 		cacheDate = -1;
 	}
 	
+	public void readFromCache () throws MorriganException {
+		super.doRead();
+	}
+	
 	@Override
 	protected void doRead() throws MorriganException {
-		super.doRead();
-		
 		long age = new Date().getTime() - cacheDate;
 		if (age > 60 * 60 * 1000) { // 1 hour.  TODO extract this as config.
 			if (cacheDate > 0) {
