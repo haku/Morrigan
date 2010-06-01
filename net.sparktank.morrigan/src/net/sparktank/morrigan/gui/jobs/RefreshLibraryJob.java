@@ -7,15 +7,23 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
+/**
+ * FIXME prevent multiple instances.
+ */
 public class RefreshLibraryJob extends Job {
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private final RemoteMediaLibrary mediaLibrary;
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public RefreshLibraryJob(RemoteMediaLibrary mediaLibrary) {
 		super("Refresh ".concat(mediaLibrary.getListName()));
 		this.mediaLibrary = mediaLibrary;
 		setUser(true);
 	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
@@ -36,4 +44,5 @@ public class RefreshLibraryJob extends Job {
 		}
 	}
 	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
