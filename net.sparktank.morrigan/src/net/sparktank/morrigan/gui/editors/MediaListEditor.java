@@ -2,6 +2,7 @@ package net.sparktank.morrigan.gui.editors;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.List;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.gui.Activator;
@@ -47,6 +48,8 @@ import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IEditorInput;
@@ -139,6 +142,15 @@ public abstract class MediaListEditor<T extends MediaList<S>, S extends MediaIte
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Controls.
+	
+	protected final int sep = 3;
+	
+	abstract protected void createControls (Composite parent);
+	abstract protected List<Control> populateToolbar (Composite parent);
+	
+	private ImageCache imageCache = new ImageCache();
+	
+	protected Label lblStatus = null;
 	
 	@Override
 	public void createPartControl(Composite parent) {
@@ -247,8 +259,8 @@ public abstract class MediaListEditor<T extends MediaList<S>, S extends MediaIte
 		}
 		editorInput.setTable(editTable.getTable());
 		
-		// Populate toolbar.
-		populateToolbar(toolbarComposite);
+		createControls(parent);
+		createToolbar(toolbarComposite);
 		
 		// Call update events.
 		listChanged();
@@ -259,9 +271,33 @@ public abstract class MediaListEditor<T extends MediaList<S>, S extends MediaIte
 		return editorInput.getMediaList().getDirtyState() == DirtyState.DIRTY;
 	}
 	
-	abstract protected void populateToolbar (Composite parent);
-	
-	private ImageCache imageCache = new ImageCache();
+	private void createToolbar (Composite toolbarParent) {
+		FormData formData;
+		
+		List<Control> controls = populateToolbar(toolbarParent);
+		
+		lblStatus = new Label(toolbarParent, SWT.NONE);
+		formData = new FormData();
+		formData.top = new FormAttachment(50, -(lblStatus.computeSize(SWT.DEFAULT, SWT.DEFAULT).y)/2);
+		formData.left = new FormAttachment(0, sep*2);
+		formData.right = new FormAttachment(controls.get(0), -sep);
+		lblStatus.setLayoutData(formData);
+		
+		for (int i = 0; i < controls.size(); i++) {
+			formData = new FormData();
+			
+			formData.top = new FormAttachment(0, sep);
+			formData.bottom = new FormAttachment(100, -sep);
+			
+			if (i == controls.size() - 1) {
+				formData.right = new FormAttachment(100, -sep);
+			} else {
+				formData.right = new FormAttachment(controls.get(i+1), -sep);
+			}
+			
+			controls.get(i).setLayoutData(formData);
+		}
+	}
 	
 	protected void setTableMenu (Menu menu) {
 		editTable.getTable().setMenu(menu);

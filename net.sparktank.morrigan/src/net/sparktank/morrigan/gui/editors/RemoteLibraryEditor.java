@@ -1,5 +1,7 @@
 package net.sparktank.morrigan.gui.editors;
 
+import java.util.List;
+
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.jobs.RefreshLibraryJob;
@@ -8,10 +10,9 @@ import net.sparktank.morrigan.model.library.RemoteMediaLibrary;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.FormAttachment;
-import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 
 
 public class RemoteLibraryEditor extends AbstractLibraryEditor<RemoteMediaLibrary> {
@@ -20,6 +21,21 @@ public class RemoteLibraryEditor extends AbstractLibraryEditor<RemoteMediaLibrar
 	public static final String ID = "net.sparktank.morrigan.gui.editors.RemoteLibraryEditor";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Create GUI.
+	
+	protected List<Control> populateToolbar(Composite parent) {
+		List<Control> ret = super.populateToolbar(parent);
+		
+		Button btnRefresh = new Button(parent, SWT.PUSH);
+		btnRefresh.setText("Refresh");
+		btnRefresh.addSelectionListener(refreshListener);
+		ret.add(ret.size() - 1, btnRefresh);
+		
+		return ret;
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Events.
 	
 	@Override
 	protected boolean handleReadError(Exception e) {
@@ -34,30 +50,7 @@ public class RemoteLibraryEditor extends AbstractLibraryEditor<RemoteMediaLibrar
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	protected void populateToolbar(Composite parent) {
-		super.populateToolbar(parent);
-		
-		Button btnRefresh = new Button(parent, SWT.PUSH);
-		
-		btnAdd.setVisible(false);
-		FormData formData = new FormData();
-		formData.top = new FormAttachment(0, sep);
-		formData.bottom = new FormAttachment(100, -sep);
-		formData.right = new FormAttachment(btnRefresh, -sep);
-		btnAddToQueue.setImage(iconQueueAdd);
-		btnAddToQueue.setLayoutData(formData);
-		
-		formData = new FormData();
-		formData.top = new FormAttachment(0, sep);
-		formData.bottom = new FormAttachment(100, -sep);
-		formData.right = new FormAttachment(btnProperties, -sep);
-		btnRefresh.setText("Refresh");
-		btnRefresh.setLayoutData(formData);
-		btnRefresh.addSelectionListener(refreshListener);
-	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Actions and listeners.
 	
 	private SelectionAdapter refreshListener = new SelectionAdapter() {
 		@Override

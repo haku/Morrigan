@@ -1,6 +1,8 @@
 package net.sparktank.morrigan.gui.editors;
 
 import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import net.sparktank.morrigan.config.Config;
@@ -25,12 +27,10 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.layout.FormAttachment;
-import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
@@ -124,16 +124,12 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist,MediaItem> {
 		iconSave.dispose();
 	}
 	
-	private Label lblStatus;
 	private Text txtFilter;
 	
 	@Override
-	protected void populateToolbar(Composite parent) {
-		// Dependencies.
-		
+	protected void createControls(Composite parent) {
+		//	Dependencies.
 		makeIcons();
-		
-		// Off-screen controls.
 		
 		// Context menu.
 		MenuManager contextMenuMgr = new MenuManager();
@@ -143,65 +139,38 @@ public class PlaylistEditor extends MediaListEditor<MediaPlaylist,MediaItem> {
 		contextMenuMgr.add(toggleEnabledAction);
 		contextMenuMgr.add(removeAction);
 		setTableMenu(contextMenuMgr.createContextMenu(parent));
+	}
+	
+	@Override
+	protected List<Control> populateToolbar(Composite parent) {
+		List<Control> ret = new LinkedList<Control>();
 		
-		// On-screen controls.
-		
-		final int sep = 3;
-		FormData formData;
-		
-		lblStatus = new Label(parent, SWT.NONE);
 		txtFilter = new Text(parent, SWT.SINGLE | SWT.BORDER | SWT.SEARCH);
-		Button btnClearFilter = new Button(parent, SWT.PUSH);
-		Button btnAddToQueue = new Button(parent, SWT.PUSH);
-		Button btnAdd = new Button(parent, SWT.PUSH);
-		Button btnSave = new Button(parent, SWT.PUSH);
-		
-		formData = new FormData();
-		formData.top = new FormAttachment(50, -(lblStatus.computeSize(SWT.DEFAULT, SWT.DEFAULT).y)/2);
-		formData.left = new FormAttachment(0, sep*2);
-		formData.right = new FormAttachment(txtFilter, -sep);
-		lblStatus.setLayoutData(formData);
-		
-		formData = new FormData();
-		formData.top = new FormAttachment(0, sep);
-		formData.bottom = new FormAttachment(100, -sep);
-		formData.right = new FormAttachment(btnClearFilter, -sep);
-		txtFilter.setLayoutData(formData);
 		txtFilter.setMessage("Filter");
-		
-		formData = new FormData();
-		formData.top = new FormAttachment(0, sep);
-		formData.bottom = new FormAttachment(100, -sep);
-		formData.right = new FormAttachment(btnAddToQueue, -sep * 3);
-		btnClearFilter.setImage(iconX);
-		btnClearFilter.setLayoutData(formData);
-		
-		formData = new FormData();
-		formData.top = new FormAttachment(0, sep);
-		formData.bottom = new FormAttachment(100, -sep);
-		formData.right = new FormAttachment(btnAdd, -sep);
-		btnAddToQueue.setImage(iconQueueAdd);
-		btnAddToQueue.setLayoutData(formData);
-		
-		formData = new FormData();
-		formData.top = new FormAttachment(0, sep);
-		formData.bottom = new FormAttachment(100, -sep);
-		formData.right = new FormAttachment(btnSave, -sep);
-		btnAdd.setImage(iconAdd);
-		btnAdd.setLayoutData(formData);
-		
-		formData = new FormData();
-		formData.top = new FormAttachment(0, sep);
-		formData.bottom = new FormAttachment(100, -sep);
-		formData.right = new FormAttachment(100, -sep);
-		btnSave.setImage(iconSave);
-		btnSave.setLayoutData(formData);
-		
 		txtFilter.addSelectionListener(filterListener);
+		ret.add(txtFilter);
+		
+		Button btnClearFilter = new Button(parent, SWT.PUSH);
+		btnClearFilter.setImage(iconX);
 		btnClearFilter.addSelectionListener(clearFilterListener);
+		ret.add(btnClearFilter);
+		
+		Button btnAddToQueue = new Button(parent, SWT.PUSH);
+		btnAddToQueue.setImage(iconQueueAdd);
 		btnAddToQueue.addSelectionListener(new ActionListener(addToQueueAction));
+		ret.add(btnAddToQueue);
+		
+		Button btnAdd = new Button(parent, SWT.PUSH);
+		btnAdd.setImage(iconAdd);
 		btnAdd.addSelectionListener(new ActionListener(addAction));
+		ret.add(btnAdd);
+		
+		Button btnSave = new Button(parent, SWT.PUSH);
+		btnSave.setImage(iconSave);
 		btnSave.addSelectionListener(new ActionListener(new SaveEditorAction(this)));
+		ret.add(btnSave);
+		
+		return ret;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
