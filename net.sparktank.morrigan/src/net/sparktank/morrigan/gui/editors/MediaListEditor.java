@@ -313,6 +313,10 @@ public abstract class MediaListEditor<T extends MediaList<S>, S extends MediaIte
 		editTable.refresh();
 	}
 	
+	protected ImageCache getImageCache() {
+		return imageCache;
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Providers.
 	
