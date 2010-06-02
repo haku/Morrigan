@@ -110,6 +110,7 @@ public class HttpClient {
 //		disableSSLCertificateChecking(hsuc);
 		hsuc.setConnectTimeout(HTTP_CONNECT_TIMEOUT_SECONDS * 1000);
 		hsuc.setReadTimeout(HTTP_READ_TIMEOUT_SECONDS * 1000);
+//		hsuc.setChunkedStreamingMode(0);
 		
 		if (httpRequestMethod!=null) {
 			hsuc.setDoOutput(true);
