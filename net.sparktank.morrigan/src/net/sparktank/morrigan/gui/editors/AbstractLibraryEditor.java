@@ -5,16 +5,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
-import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.dialogs.RunnableDialog;
-import net.sparktank.morrigan.gui.display.ActionListener;
 import net.sparktank.morrigan.gui.display.DropMenuListener;
-import net.sparktank.morrigan.gui.views.ViewLibraryProperties;
 import net.sparktank.morrigan.helpers.TimeHelper;
 import net.sparktank.morrigan.model.MediaList.DurationData;
 import net.sparktank.morrigan.model.library.AbstractMediaLibrary;
-import net.sparktank.morrigan.model.library.LocalMediaLibrary;
 import net.sparktank.morrigan.model.library.MediaLibraryItem;
 import net.sparktank.morrigan.model.library.AbstractMediaLibrary.SortChangeListener;
 import net.sparktank.morrigan.model.library.SqliteLayer.LibrarySort;
@@ -23,20 +19,17 @@ import net.sparktank.morrigan.model.library.SqliteLayer.LibrarySortDirection;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.IViewPart;
 
 public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> extends MediaListEditor<AbstractMediaLibrary, MediaLibraryItem> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -48,7 +41,6 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> exte
 	@Override
 	public void dispose() {
 		getMediaList().unregisterSortChangeListener(sortChangeListener);
-		disposeIcons();
 		super.dispose();
 	}
 	
@@ -97,41 +89,17 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> exte
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	GUI components.
 	
-	protected final int sep = 3;
-	
-	protected Image iconX;
-	protected Image iconQueueAdd;
-	protected Image iconAdd;
-	protected Image iconProperties;
-	
-	private void makeIcons () {
-		iconX = Activator.getImageDescriptor("icons/x.gif").createImage();
-		iconQueueAdd = Activator.getImageDescriptor("icons/queue-add.gif").createImage();
-		iconAdd = Activator.getImageDescriptor("icons/plus.gif").createImage();
-		iconProperties = Activator.getImageDescriptor("icons/pref.gif").createImage();
-	}
-	
-	private void disposeIcons () {
-		if (iconX != null) iconX.dispose();
-		if (iconQueueAdd != null) iconQueueAdd.dispose();
-		if (iconAdd != null) iconAdd.dispose();
-		if (iconProperties != null) iconProperties.dispose();
-	}
-	
 	private List<SortAction> sortActions = new ArrayList<SortAction>();
 	
 	private Text txtFilter = null;
-	protected Button btnClearFilter = null;
-	protected Button btnAddToQueue = null;
-	protected Button btnProperties = null;
+	private Button btnClearFilter = null;
+	private Button btnProperties = null;
 	
-	protected MenuManager prefMenuMgr = null;
+	protected MenuManager prefMenuMgr = null; // FIXME make private.
 	
 	@Override
 	protected void createControls(Composite parent) {
 		// Dependencies.
-		
-		makeIcons();
 		
 		for (LibrarySort s : LibrarySort.values()) {
 			SortAction a = new SortAction(s, LibrarySortDirection.ASC);
@@ -145,15 +113,6 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> exte
 		for (SortAction a : sortActions) {
 			prefMenuMgr.add(a);
 		}
-		
-		// Context menu.
-		MenuManager contextMenuMgr = new MenuManager();
-		contextMenuMgr.add(addToQueueAction);
-		contextMenuMgr.add(getAddToMenu());
-		contextMenuMgr.add(new Separator());
-		contextMenuMgr.add(toggleEnabledAction);
-		contextMenuMgr.add(removeAction);
-		setTableMenu(contextMenuMgr.createContextMenu(parent));
 	}
 	
 	@Override
@@ -166,17 +125,12 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> exte
 		ret.add(txtFilter);
 		
 		btnClearFilter = new Button(parent, SWT.PUSH);
-		btnClearFilter.setImage(iconX);
+		btnClearFilter.setImage(getImageCache().readImage("icons/x.gif"));
 		btnClearFilter.addSelectionListener(clearFilterListener);
 		ret.add(btnClearFilter);
 		
-		btnAddToQueue = new Button(parent, SWT.PUSH);
-		btnAddToQueue.setImage(iconQueueAdd);
-		btnAddToQueue.addSelectionListener(new ActionListener(addToQueueAction));
-		ret.add(btnAddToQueue);
-		
 		btnProperties = new Button(parent, SWT.PUSH);
-		btnProperties.setImage(iconProperties);
+		btnProperties.setImage(getImageCache().readImage("icons/pref.gif"));
 		btnProperties.addSelectionListener(new DropMenuListener(btnProperties, prefMenuMgr));
 		ret.add(btnProperties);
 		
@@ -281,7 +235,7 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> exte
 		setSort(sort, sortDir);
 	}
 	
-	protected void setSort (LibrarySort sort, LibrarySortDirection sortDir) {
+	private void setSort (LibrarySort sort, LibrarySortDirection sortDir) {
 		try {
 			getMediaList().setSort(sort, sortDir);
 		} catch (MorriganException e) {
@@ -301,7 +255,7 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> exte
 		}
 	};
 	
-	protected class SortAction extends Action {
+	private class SortAction extends Action {
 		
 		private final LibrarySort sort;
 		private final LibrarySortDirection sortDir;
@@ -326,28 +280,6 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> exte
 			}
 		}
 		
-	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	protected ViewLibraryProperties showLibPropView () {
-		try {
-			IViewPart showView = getSite().getPage().showView(ViewLibraryProperties.ID);
-			ViewLibraryProperties viewProp = (ViewLibraryProperties) showView;
-			/* FIXME
-			 * Instead of checking the type, create separate editors
-			 * for remote and local libraries? 
-			 */
-			if (getMediaList() instanceof LocalMediaLibrary) {
-				LocalMediaLibrary ml = (LocalMediaLibrary) getMediaList();
-				viewProp.setContent(ml);
-			}
-			return viewProp;
-			
-		} catch (Exception e) {
-			new MorriganMsgDlg(e).open();
-			return null;
-		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
