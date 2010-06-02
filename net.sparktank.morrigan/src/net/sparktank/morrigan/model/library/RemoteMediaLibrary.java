@@ -10,7 +10,7 @@ import net.sparktank.morrigan.engines.playback.NotImplementedException;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.MediaItem;
 import net.sparktank.morrigan.model.TaskEventListener;
-import net.sparktank.morrigan.server.feedreader.MediaListFeedParser;
+import net.sparktank.morrigan.server.feedreader.MediaListFeedParser2;
 
 public class RemoteMediaLibrary extends AbstractMediaLibrary {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -97,7 +97,7 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 			
 			try {
 				// This does the actual HTTP fetch.
-				MediaListFeedParser.parseFeed(this, taskEventListener);
+				MediaListFeedParser2.parseFeed(this, taskEventListener);
 				
 			} catch (Exception e) {
 				if (e.getCause() instanceof UnknownHostException) {
