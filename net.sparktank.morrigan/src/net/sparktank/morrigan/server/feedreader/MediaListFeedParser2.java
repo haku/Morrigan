@@ -2,6 +2,8 @@ package net.sparktank.morrigan.server.feedreader;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.Date;
 import java.util.Stack;
 
@@ -99,7 +101,13 @@ public class MediaListFeedParser2 extends DefaultHandler {
 			if (relVal != null && relVal.equals("self")) {
 				String hrefVal = attributes.getValue("href");
 				if (hrefVal != null && hrefVal.length() > 0) {
-					currentItem.setRemoteLocation(hrefVal);
+					try {
+						String remotePath = URLDecoder.decode(hrefVal, "UTF-8");
+						currentItem.setFilepath(remotePath);
+						currentItem.setRemoteLocation(remotePath); // FIXME is remoteLocation being used anywhere?
+					} catch (UnsupportedEncodingException e) {
+						throw new SAXException(e);
+					}
 				}
 			}
 		}
@@ -120,7 +128,7 @@ public class MediaListFeedParser2 extends DefaultHandler {
 			}
 		}
 		else if (stack.size() == 3 && localName.equals("title")) {
-			currentItem.setFilepath(currentText.toString());
+//			currentItem.setFilepath(currentText.toString());
 		}
 		else if (stack.size() == 3 && localName.equals("duration")) {
 			int v = Integer.parseInt(currentText.toString());
