@@ -111,14 +111,13 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 				}
 			}
 			
-			super.doRead(); // This forces a DB query - sorts entries.
-			
 			cacheDate = new Date().getTime();
 			
 		} else {
 			System.err.println("Not refreshing as '" + getListName() + "' cache is only " + age + " old.");
 		}
 		
+		super.doRead(); // This forces a DB query - sorts entries.
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
