@@ -13,6 +13,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import net.sparktank.morrigan.exceptions.MorriganException;
 
 public class HttpClient {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -37,6 +38,10 @@ public class HttpClient {
 	private static final int HTTP_READ_TIMEOUT_SECONDS = 600;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	public static interface IHttpStreamHandler {
+		public void handleStream (InputStream is) throws MorriganException;
+	}
 	
 	/**
 	 * Handy class for returning all the bits of a HTTP request.
@@ -89,8 +94,12 @@ public class HttpClient {
 	/**
 	 * Do a simple GET request.
 	 */
-	public HttpResponse doHttpRequest(URL url) throws IOException {
-		return doHttpRequest(url, null, null, null, null);
+	public HttpResponse doHttpRequest(URL url) throws IOException, MorriganException {
+		return doHttpRequest(url, null, null, null, null, null);
+	}
+	
+	public HttpResponse doHttpRequest(URL url, IHttpStreamHandler httpStreamHandler) throws IOException, MorriganException {
+		return doHttpRequest(url, null, null, null, null, httpStreamHandler);
 	}
 	
 	/**
@@ -102,47 +111,60 @@ public class HttpClient {
 	 * @param headers e.g. pass in the Etag.
 	 * @return
 	 * @throws IOException
+	 * @throws MorriganException 
 	 */
-	public HttpResponse doHttpRequest(URL url, String httpRequestMethod, String encodedData, String contentType, Map<String, String> headers) throws IOException {
+	public HttpResponse doHttpRequest(URL url, String httpRequestMethod, String encodedData, String contentType, Map<String, String> headers, IHttpStreamHandler httpStreamHandler) throws IOException, MorriganException {
 		logger.finest("doHttpRequest(" + (httpRequestMethod==null ? "GET" : httpRequestMethod) + " " + url + "):");
 		
-		HttpURLConnection hsuc = (HttpURLConnection) url.openConnection();
-//		disableSSLCertificateChecking(hsuc);
-		hsuc.setConnectTimeout(HTTP_CONNECT_TIMEOUT_SECONDS * 1000);
-		hsuc.setReadTimeout(HTTP_READ_TIMEOUT_SECONDS * 1000);
-//		hsuc.setChunkedStreamingMode(0);
+		HttpURLConnection huc = (HttpURLConnection) url.openConnection();
+//		disableSSLCertificateChecking(huc);
+		huc.setConnectTimeout(HTTP_CONNECT_TIMEOUT_SECONDS * 1000);
+		huc.setReadTimeout(HTTP_READ_TIMEOUT_SECONDS * 1000);
+//		huc.setChunkedStreamingMode(0);
 		
 		if (httpRequestMethod!=null) {
-			hsuc.setDoOutput(true);
-			hsuc.setRequestMethod(httpRequestMethod);
-			if (contentType!=null) hsuc.setRequestProperty("Content-Type", contentType);
+			huc.setDoOutput(true);
+			huc.setRequestMethod(httpRequestMethod);
+			if (contentType!=null) huc.setRequestProperty("Content-Type", contentType);
 			
 			if (headers!=null) {
 				for (String header : headers.keySet()) {
-					hsuc.setRequestProperty(header, headers.get(header));
+					huc.setRequestProperty(header, headers.get(header));
 				}
 			}
 			
-			OutputStreamWriter out = new OutputStreamWriter(hsuc.getOutputStream());
+			OutputStreamWriter out = new OutputStreamWriter(huc.getOutputStream());
 			out.write(encodedData);
 			out.flush();
 			out.close();
 		}
 		
-		Map<String, List<String>> headerFields = hsuc.getHeaderFields();
-		String etag = hsuc.getHeaderField("Etag");
-		int responseCode = hsuc.getResponseCode();
+		Map<String, List<String>> headerFields = huc.getHeaderFields();
+		String etag = huc.getHeaderField("Etag");
+		int responseCode = huc.getResponseCode();
 		
-		InputStream is = hsuc.getInputStream();
-        int v;
-        StringBuilder sb = new StringBuilder();
-        while( (v = is.read()) != -1){
-                sb.append((char)v);
-        }
+		StringBuilder sb = null;
+		InputStream is = huc.getInputStream();
+		if (httpStreamHandler != null) {
+			httpStreamHandler.handleStream(is);
+		}
+		else {
+			int v;
+			sb = new StringBuilder();
+			while( (v = is.read()) != -1){
+				sb.append((char)v);
+			}
+		}
         is.close();
-        hsuc.disconnect();
         
-        HttpResponse hr = new HttpResponse(responseCode, sb.toString(), etag, headerFields);
+        huc.disconnect();
+        
+        HttpResponse hr;
+        if (sb == null) {
+        	hr = new HttpResponse(responseCode, null, etag, headerFields);
+        } else {
+        	hr = new HttpResponse(responseCode, sb.toString(), etag, headerFields);
+        }
         return hr;
 	}
 	

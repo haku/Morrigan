@@ -1,7 +1,7 @@
 package net.sparktank.morrigan.server.feedreader;
 
 import java.io.IOException;
-import java.io.StringReader;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Date;
@@ -16,10 +16,11 @@ import net.sparktank.morrigan.model.TaskEventListener;
 import net.sparktank.morrigan.model.library.MediaLibraryItem;
 import net.sparktank.morrigan.model.library.RemoteMediaLibrary;
 import net.sparktank.morrigan.server.HttpClient;
+import net.sparktank.morrigan.server.HttpClient.HttpResponse;
+import net.sparktank.morrigan.server.HttpClient.IHttpStreamHandler;
 import net.sparktank.morrigan.server.feedwriters.XmlHelper;
 
 import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -30,46 +31,50 @@ public class MediaListFeedParser2 extends DefaultHandler {
 	 * TODO report progress to taskEventListener.
 	 * TODO support event cancellation.
 	 */
-	public static void parseFeed (RemoteMediaLibrary library, TaskEventListener taskEventListener) throws MorriganException {
+	public static void parseFeed (final RemoteMediaLibrary library, TaskEventListener taskEventListener) throws MorriganException {
 //		if (taskEventListener!=null) taskEventListener.onStart(); // TODO do this?
 		if (taskEventListener!=null) taskEventListener.beginTask("Reading feed...", 100);
 		
-		// FIXME parse stream directly.
-		String xmlString;
-		try {
-			xmlString = HttpClient.getHttpClient().doHttpRequest(library.getUrl()).getBody();
-		} catch (IOException e) {
-			throw new MorriganException(e);
-		}
-		
-		try {
-			library.setAutoCommit(false);
-			library.beginBulkUpdate();
-			
-	        try {
-	        	SAXParserFactory factory = SAXParserFactory.newInstance();
-	        	factory.setNamespaceAware(true);
-	        	factory.setValidating(true);
-	        	SAXParser parser = factory.newSAXParser();
-	        	parser.parse(new InputSource(new StringReader(xmlString)), new MediaListFeedParser2(library));
-			}
-	        catch (SAXException e) {
-				throw new MorriganException(e);
-			} catch (IOException e) {
-				throw new MorriganException(e);
-			} catch (ParserConfigurationException e) {
-				throw new MorriganException(e);
-			}
-		} finally {
-			try {
-				library.completeBulkUpdate();
-			} finally {
+		IHttpStreamHandler httpStreamHandler = new IHttpStreamHandler () {
+			@Override
+			public void handleStream(InputStream is) throws MorriganException {
 				try {
-					library.commit();
+					library.setAutoCommit(false);
+					library.beginBulkUpdate();
+			        try {
+			        	SAXParserFactory factory = SAXParserFactory.newInstance();
+			        	factory.setNamespaceAware(true);
+			        	factory.setValidating(true);
+			        	SAXParser parser = factory.newSAXParser();
+			        	parser.parse(is, new MediaListFeedParser2(library));
+					}
+			        catch (SAXException e) {
+						throw new MorriganException(e);
+					} catch (IOException e) {
+						throw new MorriganException(e);
+					} catch (ParserConfigurationException e) {
+						throw new MorriganException(e);
+					}
 				} finally {
-					library.setAutoCommit(true);
+					try {
+						library.completeBulkUpdate();
+					} finally {
+						try {
+							library.commit();
+						} finally {
+							library.setAutoCommit(true);
+						}
+					}
 				}
 			}
+		};
+		
+		try {
+			HttpResponse response = HttpClient.getHttpClient().doHttpRequest(library.getUrl(), httpStreamHandler);
+			// TODO check return code?
+			
+		} catch (IOException e) {
+			throw new MorriganException(e);
 		}
 		
 		if (taskEventListener!=null) taskEventListener.done();
