@@ -36,6 +36,7 @@ public class MediaListFeed<T extends MediaList<? extends MediaItem>> extends Fee
 		}
 		
 		dw.dataElement("title", ml.getListName());
+		dw.dataElement("count", String.valueOf(ml.getCount()));
 		
 		addLink(dw, "/media/" + ml.getType() + "/" + listFile, "self", "text/xml");
 		addLink(dw, "/media/" + ml.getType() + "/" + listFile + "/src", "src", "text/xml");

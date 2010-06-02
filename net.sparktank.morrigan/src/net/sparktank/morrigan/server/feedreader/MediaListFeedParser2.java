@@ -31,7 +31,7 @@ public class MediaListFeedParser2 extends DefaultHandler {
 	 * TODO report progress to taskEventListener.
 	 * TODO support event cancellation.
 	 */
-	public static void parseFeed (final RemoteMediaLibrary library, TaskEventListener taskEventListener) throws MorriganException {
+	public static void parseFeed (final RemoteMediaLibrary library, final TaskEventListener taskEventListener) throws MorriganException {
 //		if (taskEventListener!=null) taskEventListener.onStart(); // TODO do this?
 		if (taskEventListener!=null) taskEventListener.beginTask("Reading feed...", 100);
 		
@@ -46,7 +46,7 @@ public class MediaListFeedParser2 extends DefaultHandler {
 			        	factory.setNamespaceAware(true);
 			        	factory.setValidating(true);
 			        	SAXParser parser = factory.newSAXParser();
-			        	parser.parse(is, new MediaListFeedParser2(library));
+			        	parser.parse(is, new MediaListFeedParser2(library, taskEventListener));
 					}
 			        catch (SAXException e) {
 						throw new MorriganException(e);
@@ -71,7 +71,9 @@ public class MediaListFeedParser2 extends DefaultHandler {
 		
 		try {
 			HttpResponse response = HttpClient.getHttpClient().doHttpRequest(library.getUrl(), httpStreamHandler);
-			// TODO check return code?
+			if (response.getCode() != 200) {
+				throw new MorriganException("After fetching remote library response code was " + response.getCode() + " (expected 200).");
+			}
 			
 		} catch (IOException e) {
 			throw new MorriganException(e);
@@ -83,16 +85,20 @@ public class MediaListFeedParser2 extends DefaultHandler {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private final RemoteMediaLibrary library;
-	
+	private final TaskEventListener taskEventListener;
 	private final Stack<String> stack;
 	
-	public MediaListFeedParser2(RemoteMediaLibrary library) {
+	public MediaListFeedParser2(RemoteMediaLibrary library, TaskEventListener taskEventListener) {
+		this.taskEventListener = taskEventListener;
 		stack = new Stack<String>();
 		this.library = library; 
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	private long entryCount = 0;
+	private long entriesProcessed = 0;
+	private int progress = 0;
 	private MediaLibraryItem currentItem;
 	private StringBuilder currentText;
 	
@@ -124,17 +130,29 @@ public class MediaListFeedParser2 extends DefaultHandler {
 	
 	@Override
 	public void endElement(String uri, String localName, String qName) throws SAXException {
-		if (stack.size() == 2 && localName.equals("entry")) {
+		if (stack.size() == 2 && localName.equals("count")) {
+			entryCount = Long.parseLong(currentText.toString());
+		}
+		else if (stack.size() == 2 && localName.equals("entry")) {
 			try {
 				library.updateItem(currentItem);
 			}
 			catch (MorriganException e) {
 				throw new SAXException(e);
 			}
+			
+			if (taskEventListener!=null) {
+				entriesProcessed++;
+				int p = (int) ((entriesProcessed * 100) / entryCount);
+				if (p > progress) {
+					taskEventListener.worked(p - progress);
+					progress = p;
+				}
+			}
 		}
-		else if (stack.size() == 3 && localName.equals("title")) {
+//		else if (stack.size() == 3 && localName.equals("title")) {
 //			currentItem.setFilepath(currentText.toString());
-		}
+//		}
 		else if (stack.size() == 3 && localName.equals("duration")) {
 			int v = Integer.parseInt(currentText.toString());
 			currentItem.setDuration(v);
