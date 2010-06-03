@@ -1,5 +1,7 @@
 package net.sparktank.morrigan.gui.jobs;
 
+import net.sparktank.morrigan.helpers.RecycliableProduct;
+import net.sparktank.morrigan.helpers.RecyclingFactory;
 import net.sparktank.morrigan.model.library.RemoteMediaLibrary;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -10,24 +12,59 @@ import org.eclipse.core.runtime.jobs.Job;
 /**
  * FIXME prevent multiple instances.
  */
-public class RefreshLibraryJob extends Job {
+public class RefreshLibraryJob extends Job implements RecycliableProduct<RemoteMediaLibrary> {
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Factory stuff.
+	
+public static class Factory extends RecyclingFactory<RefreshLibraryJob, RemoteMediaLibrary> {
+		
+		protected Factory() {
+			super(false);
+		}
+		
+		@Override
+		protected boolean isValidProduct(RefreshLibraryJob product) {
+			return !product.isFinished();
+		}
+		
+		@Override
+		protected RefreshLibraryJob makeNewProduct(RemoteMediaLibrary material) {
+			return new RefreshLibraryJob(material);
+		}
+		
+	}
+	
+	public static final Factory FACTORY = new Factory();
+	
+	@Override
+	public boolean isMadeWithThisMaterial(RemoteMediaLibrary material) {
+		return this.getLibrary().getListId().equals(material.getListId());
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private final RemoteMediaLibrary mediaLibrary;
 	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	private volatile boolean isFinished = false;
 	
-	public RefreshLibraryJob(RemoteMediaLibrary mediaLibrary) {
+	private RefreshLibraryJob(RemoteMediaLibrary mediaLibrary) {
 		super("Refresh ".concat(mediaLibrary.getListName()));
 		this.mediaLibrary = mediaLibrary;
 		setUser(true);
+	}
+	
+	public RemoteMediaLibrary getLibrary () {
+		return mediaLibrary;
+	}
+	
+	public boolean isFinished () {
+		return isFinished;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
-		
 		try {
 			mediaLibrary.setTaskEventListener(new PrgListener(monitor));
 			mediaLibrary.invalidateCache();
@@ -40,6 +77,7 @@ public class RefreshLibraryJob extends Job {
 			return new FailStatus("Failed to refresh library.", e);
 			
 		} finally {
+			isFinished = true;
 			mediaLibrary.setTaskEventListener(null);
 		}
 	}
