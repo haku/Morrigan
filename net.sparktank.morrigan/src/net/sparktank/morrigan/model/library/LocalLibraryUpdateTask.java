@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
-import java.util.WeakHashMap;
 import java.util.Map.Entry;
 
 import net.sparktank.morrigan.config.Config;
@@ -16,41 +15,39 @@ import net.sparktank.morrigan.engines.EngineFactory;
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.ChecksumHelper;
+import net.sparktank.morrigan.helpers.RecycliableProduct;
+import net.sparktank.morrigan.helpers.RecyclingFactory;
 import net.sparktank.morrigan.model.MediaItem;
 import net.sparktank.morrigan.model.TaskEventListener;
 import net.sparktank.morrigan.model.library.LocalLibraryUpdateTask.TaskResult.TaskOutcome;
 
-public class LocalLibraryUpdateTask {
+public class LocalLibraryUpdateTask implements RecycliableProduct<LocalMediaLibrary> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Factory stuff.
 	
-	private static WeakHashMap<LocalLibraryUpdateTask, String> jobCache = new WeakHashMap<LocalLibraryUpdateTask, String>();
+	public static class Factory extends RecyclingFactory<LocalLibraryUpdateTask, LocalMediaLibrary> {
+		
+		protected Factory() {
+			super(false);
+		}
+		
+		@Override
+		protected boolean isValidProduct(LocalLibraryUpdateTask product) {
+			return !product.isFinished();
+		}
+		
+		@Override
+		protected LocalLibraryUpdateTask makeNewProduct(LocalMediaLibrary material) {
+			return new LocalLibraryUpdateTask(material);
+		}
+		
+	}
 	
-	public static synchronized LocalLibraryUpdateTask factory (LocalMediaLibrary library) {
-		LocalLibraryUpdateTask ret = null;
-		
-		if (jobCache.containsValue(library.getListId())) {
-			for (LocalLibraryUpdateTask job : jobCache.keySet()) {
-				if (job.getLibrary().getListId().equals(library.getListId())) {
-					ret = job;
-				}
-			}
-		}
-		
-		// if its finished it does not count.
-		if (ret != null && ret.isFinished()) {
-			jobCache.remove(ret);
-			ret = null;
-		}
-		
-		if (ret == null) {
-			ret = new LocalLibraryUpdateTask(library);
-			jobCache.put(ret, library.getListId());
-			
-		} else {
-			ret = null;
-		}
-		
-		return ret;
+	public static final Factory FACTORY = new Factory();
+	
+	@Override
+	public boolean isMadeWithThisMaterial(LocalMediaLibrary material) {
+		return this.getLibrary().getListId().equals(material.getListId());
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -100,7 +97,7 @@ public class LocalLibraryUpdateTask {
 	
 	private final LocalMediaLibrary library;
 	
-	private boolean isFinished = false;
+	private volatile boolean isFinished = false;
 	
 	private LocalLibraryUpdateTask (LocalMediaLibrary library) {
 		this.library = library;

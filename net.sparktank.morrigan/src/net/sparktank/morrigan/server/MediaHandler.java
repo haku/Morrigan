@@ -165,7 +165,7 @@ public class MediaHandler extends AbstractHandler {
 	//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private boolean scheduleLibScan (final LocalMediaLibrary ml) throws DbException {
-		final LocalLibraryUpdateTask task = LocalLibraryUpdateTask.factory(ml);
+		final LocalLibraryUpdateTask task = LocalLibraryUpdateTask.FACTORY.manufacture(ml);
 		if (task != null) {
 			
 			Thread t = new Thread () {
