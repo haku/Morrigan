@@ -58,7 +58,7 @@ public class LibraryUpdateAction extends Action implements IWorkbenchAction{
 			return;
 		}
 		
-		LocalLibraryUpdateTask task = LocalLibraryUpdateTask.factory(library);
+		LocalLibraryUpdateTask task = LocalLibraryUpdateTask.FACTORY.manufacture(library);
 		if (task != null) {
 			LibraryUpdateJob job = new LibraryUpdateJob(task);
 			job.schedule();
