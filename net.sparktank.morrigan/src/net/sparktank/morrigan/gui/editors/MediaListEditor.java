@@ -64,8 +64,6 @@ public abstract class MediaListEditor<T extends MediaList<S>, S extends MediaIte
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constants and Enums.
 	
-	public static final String ID = "net.sparktank.morrigan.gui.editors.MediaListEditor";
-	
 	public enum MediaColumn { 
 		FILE       {@Override public String toString() { return "file";        } }, 
 		COUNTS     {@Override public String toString() { return "counts";      } },

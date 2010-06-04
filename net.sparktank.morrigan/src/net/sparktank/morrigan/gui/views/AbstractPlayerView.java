@@ -18,8 +18,8 @@ import net.sparktank.morrigan.gui.display.ScreenPainter;
 import net.sparktank.morrigan.gui.display.TrayHelper;
 import net.sparktank.morrigan.gui.display.ScreenPainter.TitleProvider;
 import net.sparktank.morrigan.gui.editors.EditorFactory;
-import net.sparktank.morrigan.gui.editors.AbstractLibraryEditor;
 import net.sparktank.morrigan.gui.editors.LibraryEditorInput;
+import net.sparktank.morrigan.gui.editors.LocalLibraryEditor;
 import net.sparktank.morrigan.gui.editors.MediaListEditor;
 import net.sparktank.morrigan.gui.editors.MediaListEditorInput;
 import net.sparktank.morrigan.gui.editors.PlaylistEditor;
@@ -609,7 +609,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 				try {
 					if (getPlayer().getCurrentItem().list.getType().equals(LocalMediaLibrary.TYPE)) {
 						LibraryEditorInput input = EditorFactory.getMediaLibraryInput(getPlayer().getCurrentItem().list.getListId());
-						getViewSite().getWorkbenchWindow().getActivePage().openEditor(input, AbstractLibraryEditor.ID);
+						getViewSite().getWorkbenchWindow().getActivePage().openEditor(input, LocalLibraryEditor.ID);
 						
 					} else if (getPlayer().getCurrentItem().list.getType().equals(MediaPlaylist.TYPE)) {
 						MediaListEditorInput<MediaPlaylist> input = EditorFactory.getMediaPlaylistInput(getPlayer().getCurrentItem().list.getListId());
