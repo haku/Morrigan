@@ -24,6 +24,9 @@ public abstract class RecyclingFactory<T extends RecycliableProduct<K>, K extend
 		WeakReference<T> wr = cache.get(material);
 		if (wr != null) {
 			ret = wr.get();
+			if (ret == null) {
+				cache.remove(material);
+			}
 		}
 		
 		// If an object is found, check it is still valid.
