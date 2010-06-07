@@ -95,7 +95,7 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> exte
 	private Button btnClearFilter = null;
 	private Button btnProperties = null;
 	
-	protected MenuManager prefMenuMgr = null; // FIXME make private.
+	private MenuManager prefMenuMgr = null;
 	
 	@Override
 	protected void createControls(Composite parent) {
@@ -135,6 +135,10 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> exte
 		ret.add(btnProperties);
 		
 		return ret;
+	}
+	
+	protected MenuManager getPrefMenuMgr () {
+		return prefMenuMgr;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

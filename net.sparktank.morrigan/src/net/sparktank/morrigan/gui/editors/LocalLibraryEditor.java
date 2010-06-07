@@ -34,9 +34,9 @@ public class LocalLibraryEditor extends AbstractLibraryEditor<LocalMediaLibrary>
 		protected void createControls(Composite parent) {
 			super.createControls(parent);
 			
-			prefMenuMgr.add(new Separator());
-			prefMenuMgr.add(new LibraryUpdateAction(getMediaList()));
-			prefMenuMgr.add(showPropertiesAction);
+			getPrefMenuMgr().add(new Separator());
+			getPrefMenuMgr().add(new LibraryUpdateAction(getMediaList()));
+			getPrefMenuMgr().add(showPropertiesAction);
 			
 			// Context menu.
 			MenuManager contextMenuMgr = new MenuManager();
@@ -98,10 +98,7 @@ public class LocalLibraryEditor extends AbstractLibraryEditor<LocalMediaLibrary>
 		try {
 			IViewPart showView = getSite().getPage().showView(ViewLibraryProperties.ID);
 			ViewLibraryProperties viewProp = (ViewLibraryProperties) showView;
-			/* FIXME
-			 * Instead of checking the type, create separate editors
-			 * for remote and local libraries? 
-			 */
+			// TODO Show props for other view types?
 			if (getMediaList() instanceof LocalMediaLibrary) {
 				LocalMediaLibrary ml = (LocalMediaLibrary) getMediaList();
 				viewProp.setContent(ml);
