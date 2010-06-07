@@ -106,8 +106,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 	
 	private Player _player = null;
 	
-	public Player getPlayer () {
-		// FIXME not thread safe?
+	public synchronized Player getPlayer () {
 		if (_player == null) {
 			_player = PlayerRegister.makePlayer(eventHandler);
 		}
