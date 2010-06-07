@@ -15,13 +15,12 @@ import net.sparktank.morrigan.engines.EngineFactory;
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.ChecksumHelper;
-import net.sparktank.morrigan.helpers.RecycliableProduct;
 import net.sparktank.morrigan.helpers.RecyclingFactory;
 import net.sparktank.morrigan.model.MediaItem;
 import net.sparktank.morrigan.model.TaskEventListener;
 import net.sparktank.morrigan.model.library.LocalLibraryUpdateTask.TaskResult.TaskOutcome;
 
-public class LocalLibraryUpdateTask implements RecycliableProduct<LocalMediaLibrary> {
+public class LocalLibraryUpdateTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Factory stuff.
 	
@@ -44,11 +43,6 @@ public class LocalLibraryUpdateTask implements RecycliableProduct<LocalMediaLibr
 	}
 	
 	public static final Factory FACTORY = new Factory();
-	
-	@Override
-	public boolean isMadeWithThisMaterial(LocalMediaLibrary material) {
-		return this.getLibrary().getListId().equals(material.getListId());
-	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	

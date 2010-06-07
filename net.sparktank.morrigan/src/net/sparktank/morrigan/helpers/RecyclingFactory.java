@@ -7,7 +7,7 @@ import java.util.Map;
 /* T = what to make (product).
  * K = what to make it from (material).
  */
-public abstract class RecyclingFactory<T extends RecycliableProduct<K>, K extends Object> {
+public abstract class RecyclingFactory<T extends Object, K extends Object> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private Map<K, WeakReference<T>> cache = new HashMap<K, WeakReference<T>>();
