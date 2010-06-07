@@ -465,7 +465,7 @@ public class SqliteLayer {
 	private Connection getDbCon () throws ClassNotFoundException, SQLException {
 		if (dbConnection==null) {
 			Class.forName("org.sqlite.JDBC");
-			String url = "jdbc:sqlite:/" + dbFilePath; // FIXME is this always safe?
+			String url = "jdbc:sqlite:/" + dbFilePath;
 			dbConnection = DriverManager.getConnection(url);
 		}
 		
