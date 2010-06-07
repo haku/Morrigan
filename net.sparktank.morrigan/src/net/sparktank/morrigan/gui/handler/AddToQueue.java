@@ -28,7 +28,7 @@ public class AddToQueue  extends AbstractHandler {
 	
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		// FIXME work out how to pass paramaters correctly.
+		// FIXME work out how to pass parameters correctly.
 		
 		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindow(event);
 		IWorkbenchPage page = window.getActivePage();
