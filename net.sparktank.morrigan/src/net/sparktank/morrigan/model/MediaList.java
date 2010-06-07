@@ -15,6 +15,7 @@ public abstract class MediaList<T extends MediaItem> {
 	public enum DirtyState { CLEAN, DIRTY, METADATA };
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Constructors and parameters.
 	
 	private final String listId;
 	private final String listName;
@@ -27,6 +28,9 @@ public abstract class MediaList<T extends MediaItem> {
 	 * @param listName a human-readable title for this list.
 	 */
 	protected MediaList (String listId, String listName) {
+		if (listId == null) throw new IllegalArgumentException("listId can not be null.");
+		if (listName == null) throw new IllegalArgumentException("listName can not be null.");
+		
 		this.listId = listId;
 		this.listName = listName;
 	}
