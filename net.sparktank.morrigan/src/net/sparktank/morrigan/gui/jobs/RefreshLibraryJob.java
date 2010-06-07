@@ -15,7 +15,7 @@ public class RefreshLibraryJob extends Job {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Factory stuff.
 	
-	public static class Factory extends RecyclingFactory<RefreshLibraryJob, RemoteMediaLibrary> {
+	public static class Factory extends RecyclingFactory<RefreshLibraryJob, RemoteMediaLibrary, Void, RuntimeException> {
 		
 		protected Factory() {
 			super(false);

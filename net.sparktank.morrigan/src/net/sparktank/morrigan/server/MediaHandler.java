@@ -54,7 +54,7 @@ public class MediaHandler extends AbstractHandler {
 					String id = split[1];
 					if (type.equals("library")) {
 						String f = LocalLibraryHelper.getFullPathToLib(id);
-						LocalMediaLibrary ml = MediaListFactory.makeMediaLibrary(f);
+						LocalMediaLibrary ml = MediaListFactory.LOCAL_MEDIA_LIBRARY_FACTORY.manufacture(f);
 						
 						if (split.length > 2) {
 							String param = split[2];
@@ -106,7 +106,7 @@ public class MediaHandler extends AbstractHandler {
 						
 					} else if (type.equals("playlist")) {
 						String f = PlaylistHelper.getFullPathToPlaylist(id);
-						MediaPlaylist ml = MediaListFactory.makeMediaPlaylist(f);
+						MediaPlaylist ml = MediaListFactory.PLAYLIST_FACTORY.manufacture(f);
 						MediaListFeed<MediaPlaylist> libraryFeed = new MediaListFeed<MediaPlaylist>(ml);
 						libraryFeed.process(out);
 					}

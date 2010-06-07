@@ -72,7 +72,7 @@ public class EditorFactory implements IElementFactory {
 		LocalMediaLibrary ml;
 		
 		try {
-			ml = MediaListFactory.makeMediaLibrary(dbFilePath);
+			ml = MediaListFactory.LOCAL_MEDIA_LIBRARY_FACTORY.manufacture(dbFilePath);
 		} catch (DbException e) {
 			throw new MorriganException(e);
 		}
@@ -123,7 +123,7 @@ public class EditorFactory implements IElementFactory {
 		RemoteMediaLibrary ml;
 		
 		try {
-			ml = MediaListFactory.makeRemoteMediaLibrary(dbFilePath);
+			ml = MediaListFactory.REMOTE_MEDIA_LIBRARY_FACTORY.manufacture(dbFilePath);
 		} catch (DbException e) {
 			throw new MorriganException(e);
 		}
@@ -135,7 +135,7 @@ public class EditorFactory implements IElementFactory {
 	public static MediaListEditorInput<MediaPlaylist> getMediaPlaylistInput (String filePath) throws MorriganException {
 		MediaPlaylist playList;
 		try {
-			playList = MediaListFactory.makeMediaPlaylist(filePath);
+			playList = MediaListFactory.PLAYLIST_FACTORY.manufacture(filePath);
 		} catch (MorriganException e) {
 			throw new MorriganException(e);
 		}

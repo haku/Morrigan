@@ -1,9 +1,9 @@
 package net.sparktank.morrigan.model;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.WeakHashMap;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
+import net.sparktank.morrigan.helpers.RecyclingFactory;
 import net.sparktank.morrigan.model.library.DbConFactory;
 import net.sparktank.morrigan.model.library.DbException;
 import net.sparktank.morrigan.model.library.LocalLibraryHelper;
@@ -17,112 +17,110 @@ import net.sparktank.morrigan.model.playlist.PlaylistHelper;
 public class MediaListFactory {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private static WeakHashMap<LocalMediaLibrary, String> mediaLibraryCache = new WeakHashMap<LocalMediaLibrary, String>();
-	
-	public static synchronized LocalMediaLibrary makeMediaLibrary (String dbFilePath) throws DbException {
-		return makeMediaLibrary(LocalLibraryHelper.getLibraryTitle(dbFilePath), dbFilePath);
-	}
-	
-	public static synchronized LocalMediaLibrary makeMediaLibrary (String libraryName, String dbFilePath) throws DbException {
-		LocalMediaLibrary ret = null;
+	public static class LocalMediaLibraryFactory extends RecyclingFactory<LocalMediaLibrary, String, Void, DbException> {
 		
-		if (mediaLibraryCache.containsValue(dbFilePath)) {
-			for (LocalMediaLibrary lib : mediaLibraryCache.keySet()) {
-				if (lib.getDbPath().equals(dbFilePath)) {
-					ret = lib;
-					System.out.println("Found '" + dbFilePath + "' in cache.");
-				}
-			}
+		protected LocalMediaLibraryFactory() {
+			super(true);
 		}
 		
-		if (ret == null) {
-			System.out.println("Making object instance '" + dbFilePath + "'...");
-			ret = new LocalMediaLibrary(libraryName, DbConFactory.getDbLayer(dbFilePath));
-			mediaLibraryCache.put(ret, dbFilePath);
+		@Override
+		protected boolean isValidProduct(LocalMediaLibrary product) {
+			System.out.println("Found '" + product.getDbPath() + "' in cache.");
+			return true;
 		}
 		
-		return ret;
+		@Override
+		protected LocalMediaLibrary makeNewProduct(String material) throws DbException {
+			System.out.println("Making object instance '" + material + "'...");
+			return new LocalMediaLibrary(LocalLibraryHelper.getLibraryTitle(material), DbConFactory.getDbLayer(material));
+		}
+		
 	}
+	
+	public static final LocalMediaLibraryFactory LOCAL_MEDIA_LIBRARY_FACTORY = new LocalMediaLibraryFactory();
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private static WeakHashMap<RemoteMediaLibrary, String> remoteMediaLibraryCache = new WeakHashMap<RemoteMediaLibrary, String>();
-	
-	public static RemoteMediaLibrary makeRemoteMediaLibrary(String dbFilePath) throws DbException {
-		try {
-			return makeRemoteMediaLibrary(RemoteLibraryHelper.getLibraryTitle(dbFilePath), null, dbFilePath);
-		} catch (MalformedURLException e) {
-			throw new RuntimeException(e);
-		}
-	}
-	
-	public static RemoteMediaLibrary makeRemoteMediaLibrary(String libraryName, URL serverUrl, String dbFilePath) throws DbException, MalformedURLException {
-		RemoteMediaLibrary ret = null;
+	public static class RemoteMediaLibraryFactory extends RecyclingFactory<RemoteMediaLibrary, String, URL, MorriganException> {
 		
-		if (remoteMediaLibraryCache.containsValue(dbFilePath)) {
-			for (RemoteMediaLibrary lib : remoteMediaLibraryCache.keySet()) {
-				if (lib.getDbPath().equals(dbFilePath)) {
-					ret = lib;
-					System.out.println("Found '" + dbFilePath + "' in cache.");
-				}
-			}
+		protected RemoteMediaLibraryFactory() {
+			super(true);
 		}
 		
-		if (ret == null) {
-			System.out.println("Making object instance '" + dbFilePath + "'...");
-			if (serverUrl != null) {
-				ret = new RemoteMediaLibrary(libraryName, serverUrl, DbConFactory.getDbLayer(dbFilePath));
+		@Override
+		protected boolean isValidProduct(RemoteMediaLibrary product) {
+			System.out.println("Found '" + product.getDbPath() + "' in cache.");
+			return true;
+		}
+		
+		@Override
+		protected RemoteMediaLibrary makeNewProduct(String material) throws MorriganException {
+			return makeNewProduct(material, null);
+		}
+		
+		@Override
+		protected RemoteMediaLibrary makeNewProduct(String material, URL config) throws MorriganException {
+			RemoteMediaLibrary ret = null;
+			
+			System.out.println("Making object instance '" + material + "'...");
+			if (config != null) {
+				ret = new RemoteMediaLibrary(RemoteLibraryHelper.getLibraryTitle(material), config, DbConFactory.getDbLayer(material));
 			} else {
-				ret = new RemoteMediaLibrary(libraryName, DbConFactory.getDbLayer(dbFilePath));
+				try {
+					ret = new RemoteMediaLibrary(RemoteLibraryHelper.getLibraryTitle(material), DbConFactory.getDbLayer(material));
+				} catch (MalformedURLException e) {
+					throw new MorriganException(e);
+				}
 			}
-			remoteMediaLibraryCache.put(ret, dbFilePath);
+			
+			return ret;
 		}
 		
-		return ret;
 	}
+	
+	public static final RemoteMediaLibraryFactory REMOTE_MEDIA_LIBRARY_FACTORY = new RemoteMediaLibraryFactory();
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private static WeakHashMap<MediaPlaylist, String> mediaPlaylistCache = new WeakHashMap<MediaPlaylist, String>();
-	
-	public static synchronized MediaPlaylist makeMediaPlaylist (String filePath) throws MorriganException {
-		return makeMediaPlaylist(PlaylistHelper.getPlaylistTitle(filePath), filePath, false);
-	}
-	
-	public static synchronized MediaPlaylist makeMediaPlaylist (String title, String filePath) throws MorriganException {
-		return makeMediaPlaylist(title, filePath, false);
-	}
-	
-	public static MediaPlaylist makeMediaPlaylist (String title, String filePath, boolean newPl) throws MorriganException {
-		MediaPlaylist ret = null;
+	public static class PlaylistFactory extends RecyclingFactory<MediaPlaylist, String, Boolean, MorriganException> {
 		
-		if (mediaPlaylistCache.containsValue(filePath)) {
-			for (MediaPlaylist lst : mediaPlaylistCache.keySet()) {
-				if (lst.getFilePath().equals(filePath)) {
-					ret = lst;
-					System.out.println("Found '" + filePath + "' in cache.");
-				}
-			}
+		protected PlaylistFactory() {
+			super(true);
 		}
 		
-		if (ret == null) {
-			System.out.println("Making object instance '" + filePath + "'...");
-			ret = new MediaPlaylist(title, filePath, newPl);
-			mediaPlaylistCache.put(ret, ret.getListId());
+		@Override
+		protected boolean isValidProduct(MediaPlaylist product) {
+			System.out.println("Found '" + product.getFilePath() + "' in cache.");
+			return true;
 		}
 		
-		return ret;
-	}
-	
-	public static void finalisePlaylists () {
-		for (MediaPlaylist lst : mediaPlaylistCache.keySet()) {
+		@Override
+		protected MediaPlaylist makeNewProduct(String material) throws MorriganException {
+			return makeNewProduct(material, false);
+		}
+		
+		@Override
+		protected MediaPlaylist makeNewProduct(String material, Boolean config) throws MorriganException {
+			MediaPlaylist ret = null;
+			
+			System.out.println("Making object instance '" + material + "'...");
+			ret = new MediaPlaylist(PlaylistHelper.getPlaylistTitle(material), material, config);
+			
+			return ret;
+		}
+		
+		@Override
+		protected void disposeProduct(MediaPlaylist product) {
 			try {
-				lst.clean();
+				product.clean();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
+		
 	}
-
+	
+	public static final PlaylistFactory PLAYLIST_FACTORY = new PlaylistFactory();
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
