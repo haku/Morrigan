@@ -1,6 +1,5 @@
 package net.sparktank.morrigan.gui.jobs;
 
-import net.sparktank.morrigan.helpers.RecycliableProduct;
 import net.sparktank.morrigan.helpers.RecyclingFactory;
 import net.sparktank.morrigan.model.library.RemoteMediaLibrary;
 
@@ -12,11 +11,11 @@ import org.eclipse.core.runtime.jobs.Job;
 /**
  * FIXME prevent multiple instances.
  */
-public class RefreshLibraryJob extends Job implements RecycliableProduct<RemoteMediaLibrary> {
+public class RefreshLibraryJob extends Job {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Factory stuff.
 	
-public static class Factory extends RecyclingFactory<RefreshLibraryJob, RemoteMediaLibrary> {
+	public static class Factory extends RecyclingFactory<RefreshLibraryJob, RemoteMediaLibrary> {
 		
 		protected Factory() {
 			super(false);
@@ -35,11 +34,6 @@ public static class Factory extends RecyclingFactory<RefreshLibraryJob, RemoteMe
 	}
 	
 	public static final Factory FACTORY = new Factory();
-	
-	@Override
-	public boolean isMadeWithThisMaterial(RemoteMediaLibrary material) {
-		return this.getLibrary().getListId().equals(material.getListId());
-	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
