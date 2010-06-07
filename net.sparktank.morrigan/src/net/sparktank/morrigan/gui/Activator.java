@@ -40,7 +40,7 @@ public class Activator extends AbstractUIPlugin {
 		plugin = null;
 		
 		try {
-			MediaListFactory.finalisePlaylists();
+			MediaListFactory.PLAYLIST_FACTORY.disposeAll();
 		} finally {
 			super.stop(context);
 		}

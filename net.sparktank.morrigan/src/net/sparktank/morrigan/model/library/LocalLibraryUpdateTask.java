@@ -24,7 +24,7 @@ public class LocalLibraryUpdateTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Factory stuff.
 	
-	public static class Factory extends RecyclingFactory<LocalLibraryUpdateTask, LocalMediaLibrary> {
+	public static class Factory extends RecyclingFactory<LocalLibraryUpdateTask, LocalMediaLibrary, Void, RuntimeException> {
 		
 		protected Factory() {
 			super(false);
