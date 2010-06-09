@@ -15,6 +15,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.widgets.Composite;
 import org.gstreamer.Bus;
+import org.gstreamer.Caps;
 import org.gstreamer.Element;
 import org.gstreamer.ElementFactory;
 import org.gstreamer.Format;
@@ -24,6 +25,7 @@ import org.gstreamer.Pad;
 import org.gstreamer.SeekFlags;
 import org.gstreamer.SeekType;
 import org.gstreamer.State;
+import org.gstreamer.Structure;
 import org.gstreamer.elements.PlayBin;
 import org.gstreamer.swt.overlay.VideoComponent;
 
@@ -168,7 +170,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 	public void seekTo(double d) throws PlaybackException {
 		if (playbin!=null) {
 			long duration = playbin.queryDuration(TimeUnit.NANOSECONDS);
-			playbin.seek(1.0d, Format.TIME, SeekFlags.FLUSH, SeekType.SET, (long) (d * duration), SeekType.NONE, -1);
+			playbin.seek(1.0d, Format.TIME, SeekFlags.FLUSH | SeekFlags.SEGMENT, SeekType.SET, (long) (d * duration), SeekType.NONE, -1);
 		}
 	}
 	
@@ -233,19 +235,18 @@ public class PlaybackEngine implements IPlaybackEngine {
 			playbin.getBus().connect(eosBus);
 			System.err.println("Connecting stateChangedBus...");
 			playbin.getBus().connect(stateChangedBus);
-//			playbin.getBus().connect(durationBus);
 			
 		} else {
 			playbin.setState(State.NULL);
 		}
 		
-		hasVideo = false; // FIXME set this to false.
+		hasVideo = true;
 		
 		System.err.println("About to set input file to '"+filepath+"'...");
         playbin.setInputFile(new File(filepath));
         System.err.println("Set file input file.");
         
-        reparentVideo();
+        reparentVideo(false);
 	}
 	
 	private void reparentVideo () {
@@ -253,12 +254,13 @@ public class PlaybackEngine implements IPlaybackEngine {
 	}
 	
 	private void reparentVideo (boolean seek) {
-		System.err.println("Entering reparentVideo()");
+		System.err.println("reparentVideo() >>>");
 		
 		if (videoComponent!=null) {
 			if (!videoComponent.isDisposed()) {
 				videoComponent.removeKeyListener(keyListener);
 				videoComponent.removeMouseListener(mouseListener);
+				System.err.println("reparentVideo() : removed listeners.");
 			}
 		}
 		
@@ -268,54 +270,61 @@ public class PlaybackEngine implements IPlaybackEngine {
 		Element old_videoElement = videoElement;
 		videoElement = null;
 		
-		if (playbin!=null && hasVideo) {
-			long position = -1;
-			State state = playbin.getState();
-			if (state==State.PLAYING || state==State.PAUSED) {
-				position = playbin.queryPosition(TimeUnit.NANOSECONDS);
-				System.err.println("position=" + position);
-				playbin.setState(State.NULL);
-			}
-			
-			videoComponent = new VideoComponent(videoFrameParent, SWT.NO_BACKGROUND);
-			videoComponent.setKeepAspect(true);
-			videoElement = videoComponent.getElement();
-			playbin.setVideoSink(videoElement);
-			videoFrameParent.layout();
-			
-			videoComponent.addKeyListener(keyListener);
-			videoComponent.addMouseListener(mouseListener);
-			
-			if (seek && position>=0) {
-				playbin.setState(State.PAUSED);
+		if (playbin!=null) {
+			if (hasVideo) {
+				long position = -1;
+				State state = playbin.getState();
+				if (state==State.PLAYING || state==State.PAUSED) {
+					position = playbin.queryPosition(TimeUnit.NANOSECONDS);
+					System.err.println("position=" + position);
+					playbin.setState(State.NULL);
+				}
+
+				System.err.println("reparentVideo() : creating new VideoComponent.");
 				
-				if (position > 0) {
-					long startTime = System.currentTimeMillis();
-					
-					while (true) {
-						playbin.seek(1.0d, Format.TIME, SeekFlags.FLUSH, SeekType.SET, position, SeekType.NONE, -1);
+				videoComponent = new VideoComponent(videoFrameParent, SWT.NO_BACKGROUND);
+				videoComponent.setKeepAspect(true);
+				videoElement = videoComponent.getElement();
+				playbin.setVideoSink(videoElement);
+				videoFrameParent.layout();
 
-						if (playbin.queryPosition(TimeUnit.NANOSECONDS) > 0) {
-							break;
-						}
-						
-						try {
-							Thread.sleep(200);
-						} catch (InterruptedException e) {}
+				videoComponent.addKeyListener(keyListener);
+				videoComponent.addMouseListener(mouseListener);
 
-						if (playbin.queryPosition(TimeUnit.NANOSECONDS) > 0) {
-							break;
+				if (seek && position>=0) {
+					playbin.setState(State.PAUSED);
+
+					if (position > 0) {
+						long startTime = System.currentTimeMillis();
+
+						while (true) {
+							playbin.seek(1.0d, Format.TIME, SeekFlags.FLUSH | SeekFlags.SEGMENT, SeekType.SET, position, SeekType.NONE, -1);
+
+							if (playbin.queryPosition(TimeUnit.NANOSECONDS) > 0) {
+								break;
+							}
+
+							try {
+								Thread.sleep(200);
+							} catch (InterruptedException e) {}
+
+							if (playbin.queryPosition(TimeUnit.NANOSECONDS) > 0) {
+								break;
+							}
 						}
+
+						System.err.println("Seek took " + (System.currentTimeMillis() - startTime) + " ms.");
 					}
-					
-					System.err.println("Seek took " + (System.currentTimeMillis() - startTime) + " ms.");
+
+					if (state != State.PAUSED) {
+						playbin.setState(state);
+					}
 				}
-				
-				if (state != State.PAUSED) {
-					playbin.setState(state);
-				}
+
+			} else {
+				System.err.println("reparentVideo() : setVideoSink(null).");
+				playbin.setVideoSink(null); // If we had video and now don't, remove it.
 			}
-			
 		}
 		
 		if (old_videoElement!=null) {
@@ -328,7 +337,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 			parent.layout();
 		}
 		
-		System.err.println("leaving reparentVideo()");
+		System.err.println("reparentVideo() <<<");
 	}
 	
 	private Bus.EOS eosBus = new Bus.EOS() {
@@ -366,15 +375,6 @@ public class PlaybackEngine implements IPlaybackEngine {
 		}
 	};
 	
-//	private Bus.DURATION durationBus = new Bus.DURATION() {
-//		@Override
-//		public void durationChanged(GstObject source, Format format, long duration) {
-//			if (source == playbin) {
-//				System.err.println("durationBus: duration=" + duration);
-//			}
-//		}
-//	};
-	
 	private KeyListener keyListener = new KeyListener() {
 		@Override
 		public void keyReleased(KeyEvent key) {
@@ -395,120 +395,123 @@ public class PlaybackEngine implements IPlaybackEngine {
 		public void mouseDown(MouseEvent arg0) {}
 	};
 	
+	
+	
+	
 	private void playTrack () {
 		System.err.println("Entering playTrack().");
 		
 		if (playbin!=null) {
-			
-			actuallyStartedPlaying = false;
-			
-			playbin.setVideoSink(null);
-			playbin.setState(State.PAUSED);
-	        
-			String decodeElementName = null;
-			
-	        List<Element> elements = playbin.getElements();
-			for (Element element : elements) {
-				if (element.getName().contains("decodebin")) {
-					decodeElementName = element.getName();
-				}
-			}
-			
-			if (decodeElementName == null) {
-				throw new NullPointerException("decodeElement==null");
-			}
-			
-			final Element decodeElement = playbin.getElementByName(decodeElementName);
-			
-			decodeElement.connect(new Element.PAD_ADDED() {
-				@Override
-				public void padAdded(Element source, Pad pad) {
-					if (pad.isLinked()) return;
-					
-					if (pad.getCaps().getStructure(0).getName().startsWith("video/")) {
-						System.err.println("Track has video stream.");
-						hasVideo = true;
-					}
-				}
-			});
-			
-			decodeElement.connect(noMOREPADS);
-			
-			// TODO poll by counting number of pads???
-			
-			// FIXME this timeout is very ugly.
-			videoFrameParent.getDisplay().timerExec(5000, new Runnable() {
-				@Override
-				public void run() {
-					System.err.println("WARNING! using timout to prod playback start because NO_MORE_PADS did not fire.");
-					if (!actuallyStartedPlaying) {
-						noMOREPADS.noMorePads(decodeElement);
-					}
-				}
-			});
-			
+			playbin.setState(State.PLAYING);
+			callStateListener(PlayState.Playing);
+			startWatcherThread();
+			new WaitForVideoThread().start();
 		}
 		
 		System.err.println("Leaving playTrack().");
 	}
 	
-	private Element.NO_MORE_PADS noMOREPADS = new Element.NO_MORE_PADS() {
-		@Override
-		public void noMorePads(Element element) {
-			System.err.println("[debug] no more pads!");
-			
-			if (hasVideo == false) {
-				List<Pad> pads = element.getPads();
-				for (Pad pad : pads) {
-					System.err.println("pad: " + pad.getName());
-
-					try {
-						if (pad.getCaps().getStructure(0).getName().startsWith("video/")) {
-							System.err.println("Track has video stream.");
-							hasVideo = true;
-						}
-					} catch (NullPointerException e) {
-						System.err.println("NPE.");
+	
+	
+	private class WaitForVideoThread extends Thread {
+		
+		public WaitForVideoThread() {
+			setDaemon(true);
+		}
+		
+		public void run() {
+			Element decodeElement = null;
+			long startTime = System.currentTimeMillis();
+			while (decodeElement == null) {
+				if (System.currentTimeMillis() - startTime > 10000) {
+					System.err.println("Timed out waiting for decodeElement to be available.");
+				}
+				try {
+					Thread.sleep(200);
+				} catch (InterruptedException e) {}
+				
+				List<Element> elements = playbin.getElements();
+				for (Element element : elements) {
+					if (element.getName().contains("decodebin")) {
+						decodeElement = element;
 					}
 				}
 			}
 			
-			if (hasVideo) {
-				videoFrameParent.getDisplay().asyncExec(new Runnable() {
-					@Override
-					public void run() {
-						reparentVideo(false);
-						_actuallyStartPlaying();
-					}
-				});
+			while (true) {
+				boolean check = checkIfVideoFound(decodeElement);
+				if (check) break;
 				
-			} else {
-				_actuallyStartPlaying();
+				if (System.currentTimeMillis() - startTime > 10000) {
+					System.err.println("Timed out waiting for checkIfVideoFound to return true.");
+				}
+				try {
+					Thread.sleep(200);
+				} catch (InterruptedException e) {}
+			}
+		}
+		
+	}
+	
+	private boolean checkIfVideoFound (Element decodeElement) {
+		if (!hasVideo) {
+			System.err.println("Already concluded no video, aborting checkIfVideoFound.");
+			return true;
+		}
+		
+		int srcCount = 0;
+		boolean foundVideo = false;
+		boolean noMorePads = false;
+		
+		List<Pad> pads = decodeElement.getPads();
+		for (int i = 0; i < pads.size(); i++) {
+			Pad pad = pads.get(i);
+			System.err.println("pad["+i+" of "+pads.size()+"]: " + pad.getName());
+			
+			Caps caps = pad.getCaps();
+			if (caps != null) {
+				if (caps.size() > 0) {
+					Structure structure = caps.getStructure(0);
+					if (structure != null) {
+						if (structure.getName().startsWith("video/")) {
+							foundVideo = true;
+						}
+					}
+				}
 			}
 			
-		}
-	};
-	
-	private Object actuallyStartedPlayingLock = new Object();
-	private volatile boolean actuallyStartedPlaying;
-	
-	private void _actuallyStartPlaying () {
-		System.err.println("Entering _actuallyStartPlaying().");
-		
-		synchronized (actuallyStartedPlayingLock) {
-			if (actuallyStartedPlaying) {
-				System.err.println("_actuallyStartPlaying() has already been called.");
-				return;
+			if (pad.getName().contains("src")) {
+				srcCount++;
+				
+			} else if (pad.getName().contains("sink")) {
+				System.err.println("Found sink pad, assuming noMorePads.");
+				noMorePads = true;
+				break;
 			}
-			actuallyStartedPlaying = true;
 		}
 		
-		playbin.setState(State.PLAYING);
-		callStateListener(PlayState.Playing);
-		startWatcherThread();
-		
-		System.err.println("Leaving _actuallyStartPlaying().");
+		if (noMorePads) {
+//			if (srcCount < 2 && hasVideo) {
+			if (!foundVideo && hasVideo) {
+				System.err.println("Remove video area...");
+
+				hasVideo = false;
+				videoFrameParent.getDisplay().syncExec(new Runnable() {
+					@Override
+					public void run() {
+						reparentVideo();
+					}
+				});
+
+				System.err.println("Removed video area.");
+			}
+			return true;
+		} else {
+			return false;
+		}
 	}
+	
+	
 	
 	private void pauseTrack () {
 		if (playbin!=null) {
