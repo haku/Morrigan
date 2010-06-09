@@ -122,7 +122,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 
 	@Override
 	public void startPlaying() throws PlaybackException {
-		System.err.println("gs.startPlaying() called on thread " + Thread.currentThread().getId() + " : " + Thread.currentThread().getName());
+		System.err.println("startPlaying() : gs.startPlaying() called on thread " + Thread.currentThread().getId() + " : " + Thread.currentThread().getName());
 		
 		m_stopPlaying = false;
 		
@@ -196,7 +196,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 	}
 	
 	private void finalisePlayback () {
-		System.err.println("finalisePlayback()");
+		System.err.println("finalisePlayback() >>>");
 		
 		if (playbin!=null) {
 			playbin.setState(State.NULL);
@@ -217,23 +217,25 @@ public class PlaybackEngine implements IPlaybackEngine {
 				videoFrameParent.redraw();
 			}
 		}
+		
+		System.err.println("finalisePlayback() <<<");
 	}
 	
 	private void loadTrack () {
 		callStateListener(PlayState.Loading);
 		boolean firstLoad = (playbin==null);
 		
-		System.err.println("firstLoad=" + firstLoad);
+		System.err.println("loadTrack() : firstLoad=" + firstLoad);
 		
 		if (firstLoad) {
-			System.err.println("initGst()...");
+			System.err.println("loadTrack() : initGst()...");
 			initGst();
-			System.err.println("About to create PlayBin object...");
+			System.err.println("loadTrack() : About to create PlayBin object...");
 			playbin = new PlayBin("VideoPlayer");
 			
-			System.err.println("Connecting eosBus...");
+			System.err.println("loadTrack() : Connecting eosBus...");
 			playbin.getBus().connect(eosBus);
-			System.err.println("Connecting stateChangedBus...");
+			System.err.println("loadTrack() : Connecting stateChangedBus...");
 			playbin.getBus().connect(stateChangedBus);
 			
 		} else {
@@ -242,9 +244,9 @@ public class PlaybackEngine implements IPlaybackEngine {
 		
 		hasVideo = true;
 		
-		System.err.println("About to set input file to '"+filepath+"'...");
+		System.err.println("loadTrack() : About to set input file to '"+filepath+"'...");
         playbin.setInputFile(new File(filepath));
-        System.err.println("Set file input file.");
+        System.err.println("loadTrack() : Set file input file.");
         
         reparentVideo(false);
 	}
@@ -276,7 +278,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 				State state = playbin.getState();
 				if (state==State.PLAYING || state==State.PAUSED) {
 					position = playbin.queryPosition(TimeUnit.NANOSECONDS);
-					System.err.println("position=" + position);
+					System.err.println("reparentVideo() : position=" + position);
 					playbin.setState(State.NULL);
 				}
 
@@ -313,7 +315,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 							}
 						}
 
-						System.err.println("Seek took " + (System.currentTimeMillis() - startTime) + " ms.");
+						System.err.println("reparentVideo() : Seek took " + (System.currentTimeMillis() - startTime) + " ms.");
 					}
 
 					if (state != State.PAUSED) {
@@ -399,7 +401,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 	
 	
 	private void playTrack () {
-		System.err.println("Entering playTrack().");
+		System.err.println("playTrack() >>>");
 		
 		if (playbin!=null) {
 			playbin.setState(State.PLAYING);
@@ -408,7 +410,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 			new WaitForVideoThread().start();
 		}
 		
-		System.err.println("Leaving playTrack().");
+		System.err.println("playTrack() <<<");
 	}
 	
 	
@@ -423,8 +425,8 @@ public class PlaybackEngine implements IPlaybackEngine {
 			Element decodeElement = null;
 			long startTime = System.currentTimeMillis();
 			while (decodeElement == null) {
-				if (System.currentTimeMillis() - startTime > 10000) {
-					System.err.println("Timed out waiting for decodeElement to be available.");
+				if (System.currentTimeMillis() - startTime > 30000) {
+					System.err.println("WaitForVideoThread : Timed out waiting for decodeElement to be available.");
 				}
 				try {
 					Thread.sleep(200);
@@ -440,10 +442,13 @@ public class PlaybackEngine implements IPlaybackEngine {
 			
 			while (true) {
 				boolean check = checkIfVideoFound(decodeElement);
-				if (check) break;
+				if (check) {
+					System.err.println("WaitForVideoThread : Found all pads in " + (System.currentTimeMillis() - startTime) + ".");
+					break;
+				}
 				
-				if (System.currentTimeMillis() - startTime > 10000) {
-					System.err.println("Timed out waiting for checkIfVideoFound to return true.");
+				if (System.currentTimeMillis() - startTime > 30000) {
+					System.err.println("WaitForVideoThread : Timed out waiting for checkIfVideoFound to return true.");
 				}
 				try {
 					Thread.sleep(200);
@@ -455,7 +460,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 	
 	private boolean checkIfVideoFound (Element decodeElement) {
 		if (!hasVideo) {
-			System.err.println("Already concluded no video, aborting checkIfVideoFound.");
+			System.err.println("checkIfVideoFound() : Already concluded no video, aborting checkIfVideoFound.");
 			return true;
 		}
 		
@@ -466,7 +471,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 		List<Pad> pads = decodeElement.getPads();
 		for (int i = 0; i < pads.size(); i++) {
 			Pad pad = pads.get(i);
-			System.err.println("pad["+i+" of "+pads.size()+"]: " + pad.getName());
+			System.err.println("checkIfVideoFound() : pad["+i+" of "+pads.size()+"]: " + pad.getName());
 			
 			Caps caps = pad.getCaps();
 			if (caps != null) {
@@ -483,8 +488,8 @@ public class PlaybackEngine implements IPlaybackEngine {
 			if (pad.getName().contains("src")) {
 				srcCount++;
 				
-			} else if (pad.getName().contains("sink")) {
-				System.err.println("Found sink pad, assuming noMorePads.");
+			} else if (pad.getName().contains("sink") && srcCount > 0) {
+				System.err.println("checkIfVideoFound() : Found sink pad and at least 1 src pad, assuming noMorePads.");
 				noMorePads = true;
 				break;
 			}
@@ -493,7 +498,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 		if (noMorePads) {
 //			if (srcCount < 2 && hasVideo) {
 			if (!foundVideo && hasVideo) {
-				System.err.println("Remove video area...");
+				System.err.println("checkIfVideoFound() : Remove video area...");
 
 				hasVideo = false;
 				videoFrameParent.getDisplay().syncExec(new Runnable() {
@@ -503,7 +508,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 					}
 				});
 
-				System.err.println("Removed video area.");
+				System.err.println("checkIfVideoFound() : Removed video area.");
 			}
 			return true;
 		} else {
@@ -539,14 +544,14 @@ public class PlaybackEngine implements IPlaybackEngine {
 	private Thread watcherThread = null;
 	
 	private void startWatcherThread () {
-		System.err.println("Entering startWatcherThread().");
+		System.err.println("startWatcherThread() >>>");
 		
 		m_stopWatching = false;
 		watcherThread = new WatcherThread();
 		watcherThread.setDaemon(true);
 		watcherThread.start();
 		
-		System.err.println("Leaving startWatcherThread().");
+		System.err.println("startWatcherThread() <<<");
 	}
 	
 	private void stopWatcherThread () {
@@ -615,12 +620,12 @@ public class PlaybackEngine implements IPlaybackEngine {
 	}
 	
 	private void callStateListener (PlayState state) {
-		System.err.println("Entering callStateListener("+state.name()+").");
+		System.err.println("callStateListener("+state.name()+") >>>");
 		
 		this.playbackState = state;
 		if (listener!=null) listener.statusChanged(state);
 		
-		System.err.println("Leaving callStateListener().");
+		System.err.println("callStateListener() <<<");
 	}
 	
 	private void callPositionListener (long position) {
@@ -630,13 +635,13 @@ public class PlaybackEngine implements IPlaybackEngine {
 	}
 	
 	private void callDurationListener (int duration) {
-		System.err.println("Entering callDurationListener("+duration+").");
+		System.err.println("callDurationListener("+duration+") >>>");
 		
 		if (listener!=null) {
 			listener.durationChanged(duration);
 		}
 		
-		System.err.println("Entering callDurationListener().");
+		System.err.println("callDurationListener() <<<");
 	}
 	
 	private void callOnKeyPressListener (int keyCode) {
