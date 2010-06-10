@@ -242,7 +242,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 			playbin.setState(State.NULL);
 		}
 		
-		hasVideo = true;
+		hasVideo = mightFileHaveVideo(filepath);
 		
 		System.err.println("loadTrack() : About to set input file to '"+filepath+"'...");
         playbin.setInputFile(new File(filepath));
@@ -407,13 +407,14 @@ public class PlaybackEngine implements IPlaybackEngine {
 			playbin.setState(State.PLAYING);
 			callStateListener(PlayState.Playing);
 			startWatcherThread();
-			new WaitForVideoThread().start();
+			
+			if (hasVideo) {
+				new WaitForVideoThread().start();
+			}
 		}
 		
 		System.err.println("playTrack() <<<");
 	}
-	
-	
 	
 	private class WaitForVideoThread extends Thread {
 		
@@ -654,6 +655,22 @@ public class PlaybackEngine implements IPlaybackEngine {
 		if (listener!=null) {
 			listener.onMouseClick(button, clickCount);
 		}
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	private final static String[] AUDIO_ONLY_FORMATS = {"mp3", "ogg", "wav", "wma", "m4a", "aac", "ra", "mpc", "ac3"};
+	
+	private boolean mightFileHaveVideo (String f) {
+		String ext = f.substring(f.lastIndexOf('.') + 1).toLowerCase();
+		for (String e : AUDIO_ONLY_FORMATS) {
+			if (e.equals(ext)) {
+				System.err.println("mightFileHaveVideo() : No video in '"+f+"'.");
+				return false;
+			}
+		}
+		System.err.println("mightFileHaveVideo() : Might be video in '"+f+"'.");
+		return true;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
