@@ -498,7 +498,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 		if (noMorePads) {
 //			if (srcCount < 2 && hasVideo) {
 			if (!foundVideo && hasVideo) {
-				System.err.println("checkIfVideoFound() : Remove video area...");
+				System.err.println("checkIfVideoFound() : Removing video area...");
 
 				hasVideo = false;
 				videoFrameParent.getDisplay().syncExec(new Runnable() {
