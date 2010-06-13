@@ -10,7 +10,9 @@ import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 
@@ -41,7 +43,7 @@ public class SqliteLayer {
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Propeties.
+//	Properties.
 	
 	public String getDbFilePath() {
 		return dbFilePath;
@@ -70,6 +72,14 @@ public class SqliteLayer {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	DB readers.
+	
+	public List<MediaLibraryItem> updateListOfAllMedia (List<MediaLibraryItem> list, LibrarySort sort, LibrarySortDirection direction, boolean hideMissing) throws DbException {
+		try {
+			return local_updateListOfAllMedia(list, sort, direction, hideMissing);
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
 	
 	public List<MediaLibraryItem> getAllMedia (LibrarySort sort, LibrarySortDirection direction, boolean hideMissing) throws DbException {
 		try {
@@ -635,10 +645,47 @@ public class SqliteLayer {
 	
 	private SimpleDateFormat SQL_DATE = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
-	private List<MediaLibraryItem> local_getAllMedia (LibrarySort sort, LibrarySortDirection direction, boolean hideMissing) throws SQLException, ClassNotFoundException {
-		PreparedStatement ps;
+	private List<MediaLibraryItem> local_updateListOfAllMedia (List<MediaLibraryItem> list, LibrarySort sort, LibrarySortDirection direction, boolean hideMissing) throws SQLException, ClassNotFoundException {
+		String sql = local_getAllMediaSql(sort, direction, hideMissing);
 		ResultSet rs;
 		
+		List<MediaLibraryItem> ret;
+		PreparedStatement ps = getDbCon().prepareStatement(sql);
+		try {
+			rs = ps.executeQuery();
+			try {
+				ret = local_parseAndUpdateFromRecordSet(list, rs);
+			} finally {
+				rs.close();
+			}
+		} finally {
+			ps.close();
+		}
+		
+		return ret;
+	}
+	
+	private List<MediaLibraryItem> local_getAllMedia (LibrarySort sort, LibrarySortDirection direction, boolean hideMissing) throws SQLException, ClassNotFoundException {
+		String sql = local_getAllMediaSql(sort, direction, hideMissing);
+		ResultSet rs;
+		
+		List<MediaLibraryItem> ret;
+		PreparedStatement ps = getDbCon().prepareStatement(sql);
+		try {
+			rs = ps.executeQuery();
+			try {
+				ret = local_parseRecordSet(rs);
+			} finally {
+				rs.close();
+			}
+		} finally {
+			ps.close();
+		}
+		
+		return ret;
+	}
+	
+	private String local_getAllMediaSql (LibrarySort sort, LibrarySortDirection direction, boolean hideMissing) throws SQLException, ClassNotFoundException {
 		String sql;
 		
 		if (hideMissing) {
@@ -698,20 +745,7 @@ public class SqliteLayer {
 				throw new IllegalArgumentException();
 		}
 		
-		List<MediaLibraryItem> ret;
-		ps = getDbCon().prepareStatement(sql);
-		try {
-			rs = ps.executeQuery();
-			try {
-				ret = local_parseRecordSet(rs);
-			} finally {
-				rs.close();
-			}
-		} finally {
-			ps.close();
-		}
-		
-		return ret;
+		return sql;
 	}
 	
 	private List<MediaLibraryItem> local_simpleSearch (String term, String esc, int maxResults) throws SQLException, ClassNotFoundException {
@@ -741,14 +775,51 @@ public class SqliteLayer {
 		return ret;
 	}
 	
+	private List<MediaLibraryItem> local_parseAndUpdateFromRecordSet (List<MediaLibraryItem> list, ResultSet rs) throws SQLException {
+		List<MediaLibraryItem> finalList = new ArrayList<MediaLibraryItem>();
+		
+		// Build a HashMap of existing items to make lookup a lot faster.
+		Map<String, MediaLibraryItem> keepMap = new HashMap<String, MediaLibraryItem>(list.size());
+		for (MediaLibraryItem e : list) {
+			keepMap.put(e.getFilepath(), e);
+		}
+		
+		/* Extract entry from DB.  Compare it to existing entries and
+		 * create new list as we go. 
+		 */
+		while (rs.next()) {
+			MediaLibraryItem newItem = new MediaLibraryItem();
+			newItem.setDbRowId(rs.getLong(SQL_TBL_MEDIAFILES_COL_ROWID));
+			newItem.setFilepath(rs.getString(SQL_TBL_MEDIAFILES_COL_FILE));
+			newItem.setDateAdded(readDate(rs, SQL_TBL_MEDIAFILES_COL_DADDED));
+			newItem.setStartCount(rs.getLong(SQL_TBL_MEDIAFILES_COL_STARTCNT));
+			newItem.setEndCount(rs.getLong(SQL_TBL_MEDIAFILES_COL_ENDCNT));
+			newItem.setDateLastPlayed(readDate(rs, SQL_TBL_MEDIAFILES_COL_DLASTPLAY));
+			newItem.setDuration(rs.getInt(SQL_TBL_MEDIAFILES_COL_DURATION));
+			newItem.setHashcode(rs.getLong(SQL_TBL_MEDIAFILES_COL_HASHCODE));
+			newItem.setDateLastModified(readDate(rs, SQL_TBL_MEDIAFILES_COL_DMODIFIED));
+			newItem.setEnabled(rs.getInt(SQL_TBL_MEDIAFILES_COL_ENABLED) != 0); // default to true.
+			newItem.setMissing(rs.getInt(SQL_TBL_MEDIAFILES_COL_MISSING) == 1); // default to false.
+			newItem.setRemoteLocation(rs.getString(SQL_TBL_MEDIAFILES_COL_REMLOC));
+			
+			MediaLibraryItem oldItem = keepMap.get(newItem.getFilepath());
+			if (oldItem != null) {
+				oldItem.setFromMediaItem(newItem);
+				finalList.add(oldItem);
+			} else {
+				finalList.add(newItem);
+			}
+		}
+		
+		return finalList;
+	}
+	
 	private List<MediaLibraryItem> local_parseRecordSet (ResultSet rs) throws SQLException {
 		List<MediaLibraryItem> ret = new ArrayList<MediaLibraryItem>();
 		
 		while (rs.next()) {
 			MediaLibraryItem mt = new MediaLibraryItem();
-			
 			mt.setDbRowId(rs.getLong(SQL_TBL_MEDIAFILES_COL_ROWID));
-			
 			mt.setFilepath(rs.getString(SQL_TBL_MEDIAFILES_COL_FILE));
 			mt.setDateAdded(readDate(rs, SQL_TBL_MEDIAFILES_COL_DADDED));
 			mt.setStartCount(rs.getLong(SQL_TBL_MEDIAFILES_COL_STARTCNT));
