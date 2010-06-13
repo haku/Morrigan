@@ -137,8 +137,12 @@ public abstract class MediaList<T extends MediaItem> {
 		return Collections.unmodifiableList(mediaTracks);
 	}
 	
-	protected List<T> getModifiableMediaTracks () {
-		return mediaTracks;
+	protected void setMediaTracks (List<T> newMediaTracks) {
+		synchronized (mediaTracks) {
+			mediaTracks.clear();
+			mediaTracks.addAll(newMediaTracks);
+		}
+		setDirtyState(DirtyState.DIRTY);
 	}
 	
 	/**
