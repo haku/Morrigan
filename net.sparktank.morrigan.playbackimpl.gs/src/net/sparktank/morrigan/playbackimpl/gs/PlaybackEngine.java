@@ -3,6 +3,7 @@ package net.sparktank.morrigan.playbackimpl.gs;
 import java.io.File;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine;
 import net.sparktank.morrigan.engines.playback.IPlaybackStatusListener;
@@ -44,7 +45,8 @@ public class PlaybackEngine implements IPlaybackEngine {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private volatile boolean m_stopPlaying;
+	private final AtomicBoolean m_atEos = new AtomicBoolean();
+	private final AtomicBoolean m_stopPlaying = new AtomicBoolean();
 	
 	private String filepath = null;
 	private Composite videoFrameParent = null;
@@ -124,7 +126,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 	public void startPlaying() throws PlaybackException {
 		System.err.println("startPlaying() : gs.startPlaying() called on thread " + Thread.currentThread().getId() + " : " + Thread.currentThread().getName());
 		
-		m_stopPlaying = false;
+		m_stopPlaying.set(false);
 		
 		try {
 			loadTrack();
@@ -133,12 +135,14 @@ public class PlaybackEngine implements IPlaybackEngine {
 			throw new PlaybackException("Failed to load '"+filepath+"'.", t);
 		}
 		
+		m_atEos.set(false);
+		
 		playTrack();
 	}
 	
 	@Override
 	public void stopPlaying() throws PlaybackException {
-		m_stopPlaying = true;
+		m_stopPlaying.set(true);
 		stopTrack();
 	}
 	
@@ -347,9 +351,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 			System.err.println("endOfStream("+source+") >>>");
 			
 			if (source == playbin) {
-				if (!m_stopPlaying) {
-					callOnEndOfTrackHandler();
-				}
+				handleEosEvent();
 			}
 			
 			System.err.println("endOfStream() >>>");
@@ -588,6 +590,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 						if (lastPosition > position) {
 							lastDuration = -1;
 						}
+						lastPosition = position;
 						
 						if (lastDuration < 1) {
 							long duration = playbin.queryDuration(TimeUnit.SECONDS);
@@ -597,7 +600,9 @@ public class PlaybackEngine implements IPlaybackEngine {
 							}
 						}
 						
-						lastPosition = position;
+						if (lastDuration > 0 && position >= lastDuration) {
+							handleEosEvent();
+						}
 					}
 				}
 				
@@ -606,6 +611,18 @@ public class PlaybackEngine implements IPlaybackEngine {
 				} catch (InterruptedException e) {}
 			}
 		}
+	}
+	
+	private void handleEosEvent () {
+		System.err.println("handleEosEvent("+m_stopPlaying.get()+","+m_atEos.get()+") >>>");
+		
+		if (!m_stopPlaying.get()) {
+			if (m_atEos.compareAndSet(false, true)) {
+				callOnEndOfTrackHandler();
+			}
+		}
+		
+		System.err.println("handleEosEvent() <<<");
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
