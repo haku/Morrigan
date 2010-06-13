@@ -64,12 +64,17 @@ public abstract class AbstractMediaLibrary extends MediaList<MediaLibraryItem> {
 	protected void doRead () throws MorriganException {
 		System.err.println("[?] reading... " + getType() + " " + getListName() + "...");
 		
+		List<MediaLibraryItem> mediaList = getModifiableMediaTracks();
+		
 		long t0 = System.currentTimeMillis();
-		List<MediaLibraryItem> allMedia = dbLayer.getAllMedia(librarySort, librarySortDirection, HIDEMISSING);
+		List<MediaLibraryItem> allMedia = dbLayer.updateListOfAllMedia(mediaList, librarySort, librarySortDirection, HIDEMISSING);
 		long l0 = System.currentTimeMillis() - t0;
 		
 		long t1 = System.currentTimeMillis();
-		replaceList(allMedia);
+		synchronized (mediaList) {
+			mediaList.clear();
+			mediaList.addAll(allMedia);
+		}
 		long l1 = System.currentTimeMillis() - t1;
 		
 		System.err.println("[" + l0 + "," + l1 + " ms] " + getType() + " " + getListName());
