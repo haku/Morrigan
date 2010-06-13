@@ -344,11 +344,15 @@ public class PlaybackEngine implements IPlaybackEngine {
 	
 	private Bus.EOS eosBus = new Bus.EOS() {
 		public void endOfStream(GstObject source) {
+			System.err.println("endOfStream("+source+") >>>");
+			
 			if (source == playbin) {
 				if (!m_stopPlaying) {
 					callOnEndOfTrackHandler();
 				}
 			}
+			
+			System.err.println("endOfStream() >>>");
 		}
 	};
 	
@@ -614,10 +618,14 @@ public class PlaybackEngine implements IPlaybackEngine {
 //	}
 	
 	private void callOnEndOfTrackHandler () {
+		System.err.println("callOnEndOfTrackHandler() >>>");
+		
 		callStateListener(PlayState.Stopped);
 		if (listener!=null) {
 			listener.onEndOfTrack();
 		}
+		
+		System.err.println("callOnEndOfTrackHandler() <<<");
 	}
 	
 	private void callStateListener (PlayState state) {
