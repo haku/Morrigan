@@ -19,7 +19,7 @@ public abstract class MediaList<T extends MediaItem> {
 	
 	private final String listId;
 	private final String listName;
-	private List<T> mediaTracks = new ArrayList<T>();
+	private final List<T> mediaTracks = new ArrayList<T>();
 	
 	/**
 	 * listId must be unique.  It will be used to identify
@@ -135,6 +135,10 @@ public abstract class MediaList<T extends MediaItem> {
 	 */
 	public List<T> getMediaTracks() {
 		return Collections.unmodifiableList(mediaTracks);
+	}
+	
+	protected List<T> getModifiableMediaTracks () {
+		return mediaTracks;
 	}
 	
 	/**
