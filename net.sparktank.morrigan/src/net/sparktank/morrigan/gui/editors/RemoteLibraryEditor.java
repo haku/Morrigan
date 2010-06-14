@@ -4,7 +4,8 @@ import java.util.List;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
-import net.sparktank.morrigan.gui.jobs.RefreshLibraryJob;
+import net.sparktank.morrigan.gui.jobs.RefreshRemoteLibraryJob;
+import net.sparktank.morrigan.model.library.remote.RemoteLibraryUpdateTask;
 import net.sparktank.morrigan.model.library.remote.RemoteMediaLibrary;
 
 import org.eclipse.swt.SWT;
@@ -13,7 +14,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-
 
 public class RemoteLibraryEditor extends AbstractLibraryEditor<RemoteMediaLibrary> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -46,8 +46,15 @@ public class RemoteLibraryEditor extends AbstractLibraryEditor<RemoteMediaLibrar
 	@Override
 	protected void readInputData() throws MorriganException {
 		getMediaList().readFromCache();
-		RefreshLibraryJob job = RefreshLibraryJob.FACTORY.manufacture(getMediaList());
-		if (job != null) job.schedule(3000);
+		
+		RemoteLibraryUpdateTask task = RemoteLibraryUpdateTask.FACTORY.manufacture(getMediaList());
+		if (task != null) {
+			RefreshRemoteLibraryJob job = new RefreshRemoteLibraryJob(task);
+			job.schedule(3000);
+		}
+		else {
+			new MorriganMsgDlg("An update is already running for this library.").open();
+		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -57,10 +64,12 @@ public class RemoteLibraryEditor extends AbstractLibraryEditor<RemoteMediaLibrar
 		@Override
 		public void widgetSelected(SelectionEvent event) {
 			try {
-				RefreshLibraryJob job = RefreshLibraryJob.FACTORY.manufacture(getMediaList());
-				if (job != null) {
+				RemoteLibraryUpdateTask task = RemoteLibraryUpdateTask.FACTORY.manufacture(getMediaList());
+				if (task != null) {
+					RefreshRemoteLibraryJob job = new RefreshRemoteLibraryJob(task);
 					job.schedule();
-				} else {
+				}
+				else {
 					new MorriganMsgDlg("Refresh for '"+getMediaList().getListName()+"' already running.").open();
 				}
 				
