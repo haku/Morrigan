@@ -58,19 +58,28 @@ public class MorriganMsgDlg extends MessageDialog {
 	}
 	
 	private static String getErrMsg (Throwable t) {
-		StringBuilder sb = new StringBuilder();
-		
-		boolean first = true;
-		Throwable c = t;
-		while (true) {
-			if (!first) sb.append("\n   caused by ");
-			first = false;
-			sb.append(c.getClass().getName() + ": " + c.getMessage());
-			c = c.getCause();
-			if (c==null) break;
+		if (t != null) {
+			StringBuilder sb = new StringBuilder();
+			
+			boolean first = true;
+			Throwable c = t;
+			while (true) {
+				if (!first) sb.append("\n\ncaused by:\n   ");
+				first = false;
+				
+				sb.append(c.getClass().getName());
+				sb.append(": ");
+				sb.append(c.getMessage());
+				
+				c = c.getCause();
+				if (c==null) break;
+			}
+			
+			return sb.toString();
 		}
-		
-		return sb.toString();
+		else {
+			return "Unable to display error message as Throwable object is null.";
+		}
 	}
 	
 }
