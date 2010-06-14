@@ -19,7 +19,7 @@ public class FailStatus implements IStatus {
 	
 	@Override
 	public int getCode() {
-		return 0;
+		return -1;
 	}
 	
 	@Override
@@ -34,7 +34,7 @@ public class FailStatus implements IStatus {
 	
 	@Override
 	public String getPlugin() {
-		return null;
+		return "net.sparktank.morrigan";
 	}
 	
 	@Override
