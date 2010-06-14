@@ -1,9 +1,7 @@
 package net.sparktank.morrigan.model.library.remote;
 
 import java.net.MalformedURLException;
-import java.net.SocketException;
 import java.net.URL;
-import java.net.UnknownHostException;
 import java.util.Date;
 
 import net.sparktank.morrigan.engines.playback.NotImplementedException;
@@ -98,21 +96,8 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 				System.err.println("Cache invalidated, reading data from " + url.toExternalForm() + " ...");
 			}
 			
-			try {
-				// This does the actual HTTP fetch.
-				MediaListFeedParser2.parseFeed(this, taskEventListener);
-				
-			} catch (Exception e) {
-				if (e.getCause() instanceof UnknownHostException) {
-					throw new MorriganException("Host unknown.", e);
-					
-				} else if (e.getCause() instanceof SocketException) {
-					throw new MorriganException("Host unreachable.", e);
-					
-				} else {
-					throw new MorriganException(e);
-				}
-			}
+			// This does the actual HTTP fetch.
+			MediaListFeedParser2.parseFeed(this, taskEventListener);
 			
 			cacheDate = new Date().getTime();
 			

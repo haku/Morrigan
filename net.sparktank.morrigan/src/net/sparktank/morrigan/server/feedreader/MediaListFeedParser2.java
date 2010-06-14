@@ -3,7 +3,9 @@ package net.sparktank.morrigan.server.feedreader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.SocketException;
 import java.net.URLDecoder;
+import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.Stack;
 
@@ -50,9 +52,9 @@ public class MediaListFeedParser2 extends DefaultHandler {
 					}
 			        catch (SAXException e) {
 						throw new MorriganException(e);
-					} catch (IOException e) {
-						throw new MorriganException(e);
 					} catch (ParserConfigurationException e) {
+						throw new MorriganException(e);
+					} catch (IOException e) {
 						throw new MorriganException(e);
 					}
 				} finally {
@@ -76,7 +78,13 @@ public class MediaListFeedParser2 extends DefaultHandler {
 			}
 			
 		} catch (IOException e) {
-			throw new MorriganException(e);
+			if (e instanceof UnknownHostException) {
+				throw new MorriganException("Host unknown.", e);
+			} else if (e instanceof SocketException) {
+				throw new MorriganException("Host unreachable.", e);
+			} else {
+				throw new MorriganException(e);
+			}
 		}
 		
 		if (taskEventListener!=null) taskEventListener.done();

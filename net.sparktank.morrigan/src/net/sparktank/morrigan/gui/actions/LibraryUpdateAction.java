@@ -6,6 +6,7 @@ import net.sparktank.morrigan.model.library.local.LocalLibraryUpdateTask;
 import net.sparktank.morrigan.model.library.local.LocalMediaLibrary;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
 import net.sparktank.morrigan.gui.jobs.*;
 
@@ -60,7 +61,7 @@ public class LibraryUpdateAction extends Action implements IWorkbenchAction{
 		
 		LocalLibraryUpdateTask task = LocalLibraryUpdateTask.FACTORY.manufacture(library);
 		if (task != null) {
-			LibraryUpdateJob job = new LibraryUpdateJob(task);
+			TaskJob job = new TaskJob(task, Display.getCurrent());
 			job.schedule();
 		
 		} else {

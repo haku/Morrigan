@@ -16,6 +16,7 @@ import net.sparktank.morrigan.engines.playback.IPlaybackEngine;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.ChecksumHelper;
 import net.sparktank.morrigan.helpers.RecyclingFactory;
+import net.sparktank.morrigan.model.IMorriganTask;
 import net.sparktank.morrigan.model.MediaItem;
 import net.sparktank.morrigan.model.TaskEventListener;
 import net.sparktank.morrigan.model.TaskResult;
@@ -23,7 +24,7 @@ import net.sparktank.morrigan.model.TaskResult.TaskOutcome;
 import net.sparktank.morrigan.model.library.DbException;
 import net.sparktank.morrigan.model.library.MediaLibraryItem;
 
-public class LocalLibraryUpdateTask {
+public class LocalLibraryUpdateTask implements IMorriganTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Factory stuff.
 	
@@ -55,6 +56,11 @@ public class LocalLibraryUpdateTask {
 	
 	private LocalLibraryUpdateTask (LocalMediaLibrary library) {
 		this.library = library;
+	}
+	
+	@Override
+	public String getTitle() {
+		return "Update " + getLibrary().getListName();
 	}
 	
 	public LocalMediaLibrary getLibrary () {
@@ -474,6 +480,6 @@ public class LocalLibraryUpdateTask {
 		}
 		return n;
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
