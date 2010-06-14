@@ -1,8 +1,8 @@
 package net.sparktank.morrigan.gui.jobs;
 
-import net.sparktank.morrigan.model.library.LocalLibraryUpdateTask;
-import net.sparktank.morrigan.model.library.LocalLibraryUpdateTask.TaskResult;
-import net.sparktank.morrigan.model.library.LocalLibraryUpdateTask.TaskResult.TaskOutcome;
+import net.sparktank.morrigan.model.library.local.LocalLibraryUpdateTask;
+import net.sparktank.morrigan.model.library.local.LocalLibraryUpdateTask.TaskResult;
+import net.sparktank.morrigan.model.library.local.LocalLibraryUpdateTask.TaskResult.TaskOutcome;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;

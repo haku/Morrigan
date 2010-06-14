@@ -26,7 +26,7 @@ import net.sparktank.morrigan.gui.editors.PlaylistEditor;
 import net.sparktank.morrigan.gui.helpers.ClipboardHelper;
 import net.sparktank.morrigan.model.MediaItem;
 import net.sparktank.morrigan.model.MediaList;
-import net.sparktank.morrigan.model.library.LocalMediaLibrary;
+import net.sparktank.morrigan.model.library.local.LocalMediaLibrary;
 import net.sparktank.morrigan.model.playlist.MediaPlaylist;
 import net.sparktank.morrigan.model.playlist.PlayItem;
 import net.sparktank.morrigan.player.IPlayerEventHandler;

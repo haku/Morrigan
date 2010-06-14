@@ -5,7 +5,7 @@ import java.util.List;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.jobs.RefreshLibraryJob;
-import net.sparktank.morrigan.model.library.RemoteMediaLibrary;
+import net.sparktank.morrigan.model.library.remote.RemoteMediaLibrary;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;

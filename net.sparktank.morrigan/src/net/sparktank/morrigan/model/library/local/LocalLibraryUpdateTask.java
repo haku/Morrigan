@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.model.library;
+package net.sparktank.morrigan.model.library.local;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -18,7 +18,9 @@ import net.sparktank.morrigan.helpers.ChecksumHelper;
 import net.sparktank.morrigan.helpers.RecyclingFactory;
 import net.sparktank.morrigan.model.MediaItem;
 import net.sparktank.morrigan.model.TaskEventListener;
-import net.sparktank.morrigan.model.library.LocalLibraryUpdateTask.TaskResult.TaskOutcome;
+import net.sparktank.morrigan.model.library.DbException;
+import net.sparktank.morrigan.model.library.MediaLibraryItem;
+import net.sparktank.morrigan.model.library.local.LocalLibraryUpdateTask.TaskResult.TaskOutcome;
 
 public class LocalLibraryUpdateTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

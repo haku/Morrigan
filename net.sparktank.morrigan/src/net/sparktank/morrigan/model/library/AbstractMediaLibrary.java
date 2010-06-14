@@ -30,6 +30,12 @@ public abstract class AbstractMediaLibrary extends MediaList<MediaLibraryItem> {
 		this.librarySortDirection = LibrarySortDirection.ASC;
 	}
 	
+	@Override
+		protected void finalize() throws Throwable {
+			dbLayer.dispose();
+			super.finalize();
+		}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	abstract public String getType();

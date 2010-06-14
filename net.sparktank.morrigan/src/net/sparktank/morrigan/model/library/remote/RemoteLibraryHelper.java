@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.model.library;
+package net.sparktank.morrigan.model.library.remote;
 
 import java.io.File;
 import java.net.MalformedURLException;

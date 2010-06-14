@@ -15,16 +15,40 @@ import java.util.List;
 import java.util.Map;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
+import net.sparktank.morrigan.helpers.RecyclingFactory;
 
 public class SqliteLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Factory.
+	
+	public static final DbConFactory FACTORY = new DbConFactory();
+	
+	public static class DbConFactory extends RecyclingFactory<SqliteLayer, String, Void, DbException> {
+		
+		private DbConFactory() {
+			super(true);
+		}
+		
+		@Override
+		protected boolean isValidProduct(SqliteLayer product) {
+			return true;
+		}
+		
+		protected SqliteLayer makeNewProduct(String material) throws DbException {
+			return new SqliteLayer(material);
+		}
+		
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Instance properties.
 	
 	private final String dbFilePath;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors.
 	
-	public SqliteLayer (String dbFilePath) throws DbException {
+	private SqliteLayer (String dbFilePath) throws DbException {
 		this.dbFilePath = dbFilePath;
 		
 		try {
@@ -32,6 +56,12 @@ public class SqliteLayer {
 		} catch (Exception e) {
 			throw new DbException(e);
 		}
+	}
+	
+	@Override
+	protected void finalize() throws Throwable {
+		dispose();
+		super.finalize();
 	}
 	
 	public void dispose () throws DbException {
