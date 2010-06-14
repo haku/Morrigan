@@ -1,11 +1,12 @@
 package net.sparktank.morrigan.model.library.remote;
 
 import net.sparktank.morrigan.helpers.RecyclingFactory;
+import net.sparktank.morrigan.model.IMorriganTask;
 import net.sparktank.morrigan.model.TaskEventListener;
 import net.sparktank.morrigan.model.TaskResult;
 import net.sparktank.morrigan.model.TaskResult.TaskOutcome;
 
-public class RemoteLibraryUpdateTask {
+public class RemoteLibraryUpdateTask implements IMorriganTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Factory stuff.
 	
@@ -39,6 +40,11 @@ public class RemoteLibraryUpdateTask {
 		this.mediaLibrary = mediaLibrary;
 	}
 	
+	@Override
+	public String getTitle() {
+		return "Update " + getLibrary().getListName();
+	}
+	
 	public RemoteMediaLibrary getLibrary () {
 		return mediaLibrary;
 	}
@@ -59,8 +65,6 @@ public class RemoteLibraryUpdateTask {
 			ret = new TaskResult(TaskOutcome.SUCCESS);
 			
 		} catch (Exception e) {
-			// TODO show error msg?
-			e.printStackTrace();
 			ret = new TaskResult(TaskOutcome.FAILED, "Failed to refresh library.", e);
 			
 		} finally {

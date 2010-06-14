@@ -4,7 +4,7 @@ import java.util.List;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
-import net.sparktank.morrigan.gui.jobs.RefreshRemoteLibraryJob;
+import net.sparktank.morrigan.gui.jobs.TaskJob;
 import net.sparktank.morrigan.model.library.remote.RemoteLibraryUpdateTask;
 import net.sparktank.morrigan.model.library.remote.RemoteMediaLibrary;
 
@@ -49,7 +49,7 @@ public class RemoteLibraryEditor extends AbstractLibraryEditor<RemoteMediaLibrar
 		
 		RemoteLibraryUpdateTask task = RemoteLibraryUpdateTask.FACTORY.manufacture(getMediaList());
 		if (task != null) {
-			RefreshRemoteLibraryJob job = new RefreshRemoteLibraryJob(task);
+			TaskJob job = new TaskJob(task, getSite().getShell().getDisplay());
 			job.schedule(3000);
 		}
 		else {
@@ -66,7 +66,7 @@ public class RemoteLibraryEditor extends AbstractLibraryEditor<RemoteMediaLibrar
 			try {
 				RemoteLibraryUpdateTask task = RemoteLibraryUpdateTask.FACTORY.manufacture(getMediaList());
 				if (task != null) {
-					RefreshRemoteLibraryJob job = new RefreshRemoteLibraryJob(task);
+					TaskJob job = new TaskJob(task, getSite().getShell().getDisplay());
 					job.schedule();
 				}
 				else {
