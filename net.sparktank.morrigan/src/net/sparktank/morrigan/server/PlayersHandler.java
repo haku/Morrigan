@@ -11,7 +11,7 @@ import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.ErrorHelper;
 import net.sparktank.morrigan.model.MediaList;
 import net.sparktank.morrigan.model.MediaListFactory;
-import net.sparktank.morrigan.model.library.LocalLibraryHelper;
+import net.sparktank.morrigan.model.library.local.LocalLibraryHelper;
 import net.sparktank.morrigan.model.playlist.PlayItem;
 import net.sparktank.morrigan.model.playlist.PlaylistHelper;
 import net.sparktank.morrigan.player.Player;

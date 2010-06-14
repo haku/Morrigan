@@ -8,8 +8,8 @@ import java.util.List;
 import net.sparktank.morrigan.gui.preferences.PreferenceHelper;
 import net.sparktank.morrigan.model.MediaItem;
 import net.sparktank.morrigan.model.library.DbException;
-import net.sparktank.morrigan.model.library.LocalMediaLibrary;
 import net.sparktank.morrigan.model.library.MediaLibraryItem;
+import net.sparktank.morrigan.model.library.local.LocalMediaLibrary;
 import net.sparktank.morrigan.model.playlist.PlayItem;
 
 import org.eclipse.jface.viewers.ILabelProvider;

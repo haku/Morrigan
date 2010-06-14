@@ -5,7 +5,7 @@ import java.net.URLEncoder;
 import java.util.List;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
-import net.sparktank.morrigan.model.library.LocalMediaLibrary;
+import net.sparktank.morrigan.model.library.local.LocalMediaLibrary;
 
 import org.xml.sax.SAXException;
 

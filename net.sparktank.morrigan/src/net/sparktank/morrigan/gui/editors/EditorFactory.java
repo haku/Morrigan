@@ -3,10 +3,10 @@ package net.sparktank.morrigan.gui.editors;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.MediaListFactory;
 import net.sparktank.morrigan.model.library.DbException;
-import net.sparktank.morrigan.model.library.LocalMediaLibrary;
-import net.sparktank.morrigan.model.library.RemoteMediaLibrary;
 import net.sparktank.morrigan.model.library.SqliteLayer.LibrarySort;
 import net.sparktank.morrigan.model.library.SqliteLayer.LibrarySortDirection;
+import net.sparktank.morrigan.model.library.local.LocalMediaLibrary;
+import net.sparktank.morrigan.model.library.remote.RemoteMediaLibrary;
 import net.sparktank.morrigan.model.playlist.MediaPlaylist;
 
 import org.eclipse.core.runtime.IAdaptable;

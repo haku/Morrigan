@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.model.library;
+package net.sparktank.morrigan.model.library.remote;
 
 import java.net.MalformedURLException;
 import java.net.SocketException;
@@ -10,6 +10,9 @@ import net.sparktank.morrigan.engines.playback.NotImplementedException;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.MediaItem;
 import net.sparktank.morrigan.model.TaskEventListener;
+import net.sparktank.morrigan.model.library.AbstractMediaLibrary;
+import net.sparktank.morrigan.model.library.DbException;
+import net.sparktank.morrigan.model.library.SqliteLayer;
 import net.sparktank.morrigan.server.feedreader.MediaListFeedParser2;
 
 public class RemoteMediaLibrary extends AbstractMediaLibrary {

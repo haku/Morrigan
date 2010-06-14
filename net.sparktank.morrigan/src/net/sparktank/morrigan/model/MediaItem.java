@@ -33,7 +33,7 @@ public class MediaItem {
 		return filepath;
 	}
 	public boolean setFilepath (String filePath) {
-		if (this.filepath == null || !this.filepath.equals(filePath)) {
+		if (!EqualHelper.areEqual(this.filepath, filePath)) {
 			filepath = filePath;
 			return true;
 		}
@@ -44,7 +44,7 @@ public class MediaItem {
 		return dateAdded;
 	}
 	public boolean setDateAdded(Date dateAdded) {
-		if (this.dateAdded == null || !this.dateAdded.equals(dateAdded)) {
+		if (!EqualHelper.areEqual(this.dateAdded, dateAdded)) {
 			this.dateAdded = dateAdded;
 			return true;
 		}
@@ -77,7 +77,7 @@ public class MediaItem {
 		return dateLastPlayed;
 	}
 	public boolean setDateLastPlayed(Date dateLastPlayed) {
-		if (this.dateLastPlayed == null || !this.dateLastPlayed.equals(dateLastPlayed)) {
+		if (!EqualHelper.areEqual(this.dateLastPlayed, dateLastPlayed)) {
 			this.dateLastPlayed = dateLastPlayed;
 			return true;
 		}
@@ -110,7 +110,7 @@ public class MediaItem {
 		return dateLastModified;
 	}
 	public boolean setDateLastModified(Date lastModified) {
-		if (this.dateLastModified == null || !this.dateLastModified.equals(dateLastModified)) {
+		if (!EqualHelper.areEqual(this.dateLastModified, lastModified)) {
 			this.dateLastModified = lastModified;
 			return true;
 		}

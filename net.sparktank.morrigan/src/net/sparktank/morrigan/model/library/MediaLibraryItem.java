@@ -1,5 +1,6 @@
 package net.sparktank.morrigan.model.library;
 
+import net.sparktank.morrigan.helpers.EqualHelper;
 import net.sparktank.morrigan.model.MediaItem;
 
 public class MediaLibraryItem extends MediaItem {
@@ -35,7 +36,7 @@ public class MediaLibraryItem extends MediaItem {
 		return remoteLocation;
 	}
 	public boolean setRemoteLocation(String remoteLocation) {
-		if (this.remoteLocation == null || !this.remoteLocation.equals(remoteLocation)) {
+		if (!EqualHelper.areEqual(this.remoteLocation, remoteLocation)) {
 			this.remoteLocation = remoteLocation;
 			return true;
 		}
@@ -46,14 +47,18 @@ public class MediaLibraryItem extends MediaItem {
 	
 	@Override
 	public boolean setFromMediaItem(MediaItem mi) {
+		boolean setFromMediaItem = super.setFromMediaItem(mi);
+		
 		if (mi instanceof MediaLibraryItem) {
 			MediaLibraryItem mli = (MediaLibraryItem) mi;
+			
 			boolean b = this.setDbRowId(mli.getDbRowId())
 				|| this.setRemoteLocation(mli.getRemoteLocation());
-			return b || super.setFromMediaItem(mi);
 			
-		} else {
-			return super.setFromMediaItem(mi);
+			return b || setFromMediaItem;
+		}
+		else {
+			return setFromMediaItem;
 		}
 	}
 	

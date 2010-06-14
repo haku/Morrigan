@@ -1,7 +1,7 @@
 package net.sparktank.morrigan.gui.jobs;
 
 import net.sparktank.morrigan.helpers.RecyclingFactory;
-import net.sparktank.morrigan.model.library.RemoteMediaLibrary;
+import net.sparktank.morrigan.model.library.remote.RemoteMediaLibrary;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
