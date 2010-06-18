@@ -14,10 +14,10 @@ import java.util.Date;
 import java.util.logging.Logger;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
-import net.sparktank.morrigan.model.MediaItem;
-import net.sparktank.morrigan.model.MediaList;
+import net.sparktank.morrigan.model.MediaTrack;
+import net.sparktank.morrigan.model.MediaTrackList;
 
-public class MediaPlaylist extends MediaList<MediaItem> {
+public class MediaPlaylist extends MediaTrackList<MediaTrack> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static final String TYPE = "PLAYLIST";
@@ -138,7 +138,7 @@ public class MediaPlaylist extends MediaList<MediaItem> {
 				
 				if (text.startsWith(PL_ITEM_IDENTIFIER)) {
 					String[] line = text.substring(PL_ITEM_IDENTIFIER.length()).split("\\|");
-					MediaItem item = new MediaItem(line[0]);
+					MediaTrack item = new MediaTrack(line[0]);
 					
 //					if (line.length>=2 && line[1].length()>0) {
 //						// TODO set hash for item = item[1].
@@ -199,7 +199,7 @@ public class MediaPlaylist extends MediaList<MediaItem> {
         
 		try {
 			int n = 0;
-			for (MediaItem mt : getMediaTracks()) {
+			for (MediaTrack mt : getMediaTracks()) {
 				
 				writer.write(
 						PL_ITEM_IDENTIFIER + mt.getFilepath()

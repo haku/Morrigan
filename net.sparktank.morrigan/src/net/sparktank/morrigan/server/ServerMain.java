@@ -2,7 +2,8 @@ package net.sparktank.morrigan.server;
 
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import net.sparktank.morrigan.helpers.ErrorHelper;
-import net.sparktank.morrigan.model.MediaList;
+import net.sparktank.morrigan.model.MediaTrack;
+import net.sparktank.morrigan.model.MediaTrackList;
 import net.sparktank.morrigan.model.playlist.PlayItem;
 import net.sparktank.morrigan.player.IPlayerEventHandler;
 import net.sparktank.morrigan.player.Player;
@@ -68,7 +69,7 @@ public class ServerMain {
 			return null;
 		}
 		@Override
-		public MediaList<?> getCurrentList() {
+		public MediaTrackList<MediaTrack> getCurrentList() {
 			return null;
 		}
 		@Override

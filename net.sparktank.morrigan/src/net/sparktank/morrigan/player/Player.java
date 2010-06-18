@@ -13,8 +13,8 @@ import net.sparktank.morrigan.engines.playback.IPlaybackStatusListener;
 import net.sparktank.morrigan.engines.playback.PlaybackException;
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import net.sparktank.morrigan.exceptions.MorriganException;
-import net.sparktank.morrigan.model.MediaItem;
-import net.sparktank.morrigan.model.MediaList;
+import net.sparktank.morrigan.model.MediaTrack;
+import net.sparktank.morrigan.model.MediaTrackList;
 import net.sparktank.morrigan.model.playlist.PlayItem;
 import net.sparktank.morrigan.player.OrderHelper.PlaybackOrder;
 
@@ -92,8 +92,8 @@ public class Player {
 		return _currentItem;
 	}
 	
-	public MediaList<? extends MediaItem> getCurrentList () {
-		MediaList<? extends MediaItem> ret = null;
+	public MediaTrackList<? extends MediaTrack> getCurrentList () {
+		MediaTrackList<? extends MediaTrack> ret = null;
 		
 		PlayItem currentItem = getCurrentItem();
 		if (currentItem != null && currentItem.list != null) {
@@ -127,16 +127,16 @@ public class Player {
 			
 		} else if (getCurrentItem() != null && getCurrentItem().list != null) {
 			if (getCurrentItem().item != null) {
-				MediaItem nextTrack = OrderHelper.getNextTrack(getCurrentItem().list, getCurrentItem().item, _playbackOrder);
+				MediaTrack nextTrack = OrderHelper.getNextTrack(getCurrentItem().list, getCurrentItem().item, _playbackOrder);
 				if (nextTrack != null) {
 					nextItem = new PlayItem(getCurrentItem().list, nextTrack);
 				}
 			}
 			
 		} else {
-			MediaList<? extends MediaItem> currentList = getCurrentList();
+			MediaTrackList<? extends MediaTrack> currentList = getCurrentList();
 			if (currentList != null) {
-				MediaItem nextTrack = OrderHelper.getNextTrack(currentList, null, _playbackOrder);
+				MediaTrack nextTrack = OrderHelper.getNextTrack(currentList, null, _playbackOrder);
 				if (nextTrack != null) {
 					nextItem = new PlayItem(currentList, nextTrack);
 				}
@@ -354,15 +354,15 @@ public class Player {
 	/**
 	 * For UI handlers to call.
 	 */
-	public void loadAndStartPlaying (MediaList<? extends MediaItem> list) {
-		MediaItem nextTrack = OrderHelper.getNextTrack(list, null, _playbackOrder);
+	public void loadAndStartPlaying (MediaTrackList<? extends MediaTrack> list) {
+		MediaTrack nextTrack = OrderHelper.getNextTrack(list, null, _playbackOrder);
 		loadAndStartPlaying(list, nextTrack);
 	}
 	
 	/**
 	 * For UI handlers to call.
 	 */
-	public void loadAndStartPlaying (MediaList<? extends MediaItem> list, MediaItem track) {
+	public void loadAndStartPlaying (MediaTrackList<? extends MediaTrack> list, MediaTrack track) {
 		if (track == null) throw new NullPointerException();
 		loadAndStartPlaying(new PlayItem(list, track));
 	}

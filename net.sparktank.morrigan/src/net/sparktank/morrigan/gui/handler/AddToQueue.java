@@ -6,7 +6,7 @@ import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.editors.MediaListEditor;
 import net.sparktank.morrigan.gui.views.AbstractPlayerView;
 import net.sparktank.morrigan.gui.views.ViewControls;
-import net.sparktank.morrigan.model.MediaItem;
+import net.sparktank.morrigan.model.MediaTrack;
 import net.sparktank.morrigan.model.playlist.PlayItem;
 
 import org.eclipse.core.commands.AbstractHandler;
@@ -50,9 +50,9 @@ public class AddToQueue  extends AbstractHandler {
 			if (findView != null) {
 				playerView = (AbstractPlayerView) findView;
 				
-				ArrayList<MediaItem> selectedTracks = mediaListEditor.getSelectedTracks();
+				ArrayList<MediaTrack> selectedTracks = mediaListEditor.getSelectedTracks();
 				if (selectedTracks != null) {
-					for (MediaItem track : selectedTracks) {
+					for (MediaTrack track : selectedTracks) {
 						PlayItem item = new PlayItem(mediaListEditor.getMediaList(), track);
 						playerView.getPlayer().addToQueue(item);
 					}

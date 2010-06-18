@@ -5,13 +5,14 @@ import java.net.URLEncoder;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.MediaItem;
-import net.sparktank.morrigan.model.MediaList;
+import net.sparktank.morrigan.model.MediaTrack;
+import net.sparktank.morrigan.model.MediaTrackList;
 
 import org.xml.sax.SAXException;
 
 import com.megginson.sax.DataWriter;
 
-public class MediaListFeed<T extends MediaList<? extends MediaItem>> extends Feed {
+public class MediaListFeed<T extends MediaTrackList<? extends MediaItem>> extends Feed {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private final T ml;
@@ -43,7 +44,7 @@ public class MediaListFeed<T extends MediaList<? extends MediaItem>> extends Fee
 		addLink(dw, "/media/" + ml.getType() + "/" + listFile + "/scan", "scan", "cmd");
 		addLink(dw, "/player/0/play/" + listFile, "play", "cmd"); // FIXME list all players here.
 		
-		for (MediaItem mi : ml.getMediaTracks()) {
+		for (MediaTrack mi : ml.getMediaTracks()) {
 			dw.startElement("entry");
 			
 			String file;

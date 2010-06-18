@@ -7,6 +7,7 @@ import java.util.Date;
 import net.sparktank.morrigan.engines.playback.NotImplementedException;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.MediaItem;
+import net.sparktank.morrigan.model.MediaTrack;
 import net.sparktank.morrigan.model.TaskEventListener;
 import net.sparktank.morrigan.model.library.AbstractMediaLibrary;
 import net.sparktank.morrigan.model.library.DbException;
@@ -111,12 +112,12 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
-	public void incTrackStartCnt (MediaItem track, long n) throws MorriganException {
+	public void incTrackStartCnt (MediaTrack track, long n) throws MorriganException {
 		throw new NotImplementedException();
 	}
 	
 	@Override
-	public void incTrackEndCnt (MediaItem track, long n) throws MorriganException {
+	public void incTrackEndCnt (MediaTrack track, long n) throws MorriganException {
 		throw new NotImplementedException();
 	}
 	
@@ -136,17 +137,17 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 	}
 	
 	@Override
-	public void incTrackStartCnt(MediaItem track) throws MorriganException {
+	public void incTrackStartCnt(MediaTrack track) throws MorriganException {
 		throw new NotImplementedException();
 	}
 	
 	@Override
-	public void incTrackEndCnt(MediaItem track) throws MorriganException {
+	public void incTrackEndCnt(MediaTrack track) throws MorriganException {
 		throw new NotImplementedException();
 	}
 	
 	@Override
-	public void setTrackDuration(MediaItem track, int duration) throws MorriganException {
+	public void setTrackDuration(MediaTrack track, int duration) throws MorriganException {
 		throw new NotImplementedException();
 	}
 	

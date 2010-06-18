@@ -12,8 +12,8 @@ import net.sparktank.morrigan.gui.ApplicationActionBarAdvisor;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.display.ActionListener;
 import net.sparktank.morrigan.helpers.TimeHelper;
-import net.sparktank.morrigan.model.MediaItem;
-import net.sparktank.morrigan.model.MediaList.DurationData;
+import net.sparktank.morrigan.model.MediaTrack;
+import net.sparktank.morrigan.model.MediaTrackList.DurationData;
 import net.sparktank.morrigan.model.playlist.MediaPlaylist;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -36,7 +36,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
 
-public class PlaylistEditor extends MediaListEditor<MediaPlaylist,MediaItem> {
+public class PlaylistEditor extends MediaListEditor<MediaPlaylist,MediaTrack> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static final String ID = "net.sparktank.morrigan.gui.editors.PlaylistEditor";

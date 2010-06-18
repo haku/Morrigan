@@ -26,6 +26,8 @@ import net.sparktank.morrigan.gui.editors.PlaylistEditor;
 import net.sparktank.morrigan.gui.helpers.ClipboardHelper;
 import net.sparktank.morrigan.model.MediaItem;
 import net.sparktank.morrigan.model.MediaList;
+import net.sparktank.morrigan.model.MediaTrack;
+import net.sparktank.morrigan.model.MediaTrackList;
 import net.sparktank.morrigan.model.library.local.LocalMediaLibrary;
 import net.sparktank.morrigan.model.playlist.MediaPlaylist;
 import net.sparktank.morrigan.model.playlist.PlayItem;
@@ -155,13 +157,13 @@ public abstract class AbstractPlayerView extends ViewPart {
 		
 		@SuppressWarnings("unchecked") // FIXME ???
 		@Override
-		public MediaList<? extends MediaItem> getCurrentList() {
-			MediaList<? extends MediaItem> ret = null;
+		public MediaTrackList<MediaTrack> getCurrentList() {
+			MediaTrackList<MediaTrack> ret = null;
 			
 			IEditorPart activeEditor = getViewSite().getPage().getActiveEditor();
 			if (activeEditor != null && activeEditor instanceof MediaListEditor<?,?>) {
-				MediaListEditor<? extends MediaList<MediaItem>,MediaItem> mediaListEditor = (MediaListEditor<? extends MediaList<MediaItem>,MediaItem>) activeEditor;
-				MediaList<? extends MediaItem> editedMediaList = mediaListEditor.getMediaList();
+				MediaListEditor<? extends MediaTrackList<MediaTrack>,MediaTrack> mediaListEditor = (MediaListEditor<? extends MediaList<MediaTrack>,MediaTrack>) activeEditor;
+				MediaTrackList<MediaTrack> editedMediaList = mediaListEditor.getMediaList();
 				ret = editedMediaList;
 			}
 			return ret;

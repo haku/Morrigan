@@ -18,6 +18,7 @@ import net.sparktank.morrigan.helpers.ChecksumHelper;
 import net.sparktank.morrigan.helpers.RecyclingFactory;
 import net.sparktank.morrigan.model.IMorriganTask;
 import net.sparktank.morrigan.model.MediaItem;
+import net.sparktank.morrigan.model.MediaTrack;
 import net.sparktank.morrigan.model.TaskEventListener;
 import net.sparktank.morrigan.model.TaskResult;
 import net.sparktank.morrigan.model.TaskResult.TaskOutcome;
@@ -312,7 +313,7 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 	private void checkForDuplicates(TaskEventListener taskEventListener) throws MorriganException {
 		taskEventListener.subTask("Scanning for duplicates");
 		
-		Map<MediaItem, ScanOption> dupicateItems = new HashMap<MediaItem, ScanOption>();
+		Map<MediaLibraryItem, ScanOption> dupicateItems = new HashMap<MediaLibraryItem, ScanOption>();
 		
 		List<MediaLibraryItem> tracks = library.getAllLibraryEntries();
 		for (int i = 0; i < tracks.size(); i++) {
@@ -382,8 +383,8 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 				/*
 				 * Find all the entries for this hashcode.
 				 */
-				Map<MediaItem, ScanOption> items = new HashMap<MediaItem, ScanOption>();
-				for (MediaItem mi : dupicateItems.keySet()) {
+				Map<MediaLibraryItem, ScanOption> items = new HashMap<MediaLibraryItem, ScanOption>();
+				for (MediaLibraryItem mi : dupicateItems.keySet()) {
 					if (mi.getHashcode() == l.longValue()) {
 						items.put(mi, dupicateItems.get(mi));
 					}
@@ -398,8 +399,8 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 				if (countEntriesInMap(items, ScanOption.KEEP) == 1
 						&& countEntriesInMap(items, ScanOption.DELREF) == items.size()-1) {
 					
-					MediaItem keep = null;
-					for (MediaItem i : items.keySet()) {
+					MediaLibraryItem keep = null;
+					for (MediaLibraryItem i : items.keySet()) {
 						if (items.get(i) == ScanOption.KEEP) keep = i;
 					}
 					items.remove(keep);
@@ -411,7 +412,7 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 					 * added data, last played data.
 					 * Then remove missing tracks from library.
 					 */
-					for (MediaItem i : items.keySet()) {
+					for (MediaTrack i : items.keySet()) {
 						try {
 							// TODO this should be done in a tranasaction!
 							
@@ -461,7 +462,7 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 			 */
 			taskEventListener.logMsg(library.getListName(), "Performed " + countMerges + " mergers.");
 			taskEventListener.logMsg(library.getListName(), "Found " + dupicateItems.size() + " duplicate items:");
-			for (Entry<MediaItem, ScanOption> e : dupicateItems.entrySet()) {
+			for (Entry<MediaLibraryItem, ScanOption> e : dupicateItems.entrySet()) {
 				taskEventListener.logMsg(library.getListName(), e.getValue() + " : " + e.getKey().getTitle());
 			}
 			

@@ -13,7 +13,8 @@ import net.sparktank.morrigan.gui.helpers.ImageCache;
 import net.sparktank.morrigan.gui.preferences.MediaListPref;
 import net.sparktank.morrigan.helpers.TimeHelper;
 import net.sparktank.morrigan.model.MediaItem;
-import net.sparktank.morrigan.model.MediaList;
+import net.sparktank.morrigan.model.MediaTrack;
+import net.sparktank.morrigan.model.MediaTrackList;
 import net.sparktank.morrigan.model.MediaList.DirtyState;
 
 import org.eclipse.core.commands.common.CommandException;
@@ -60,7 +61,8 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.part.EditorPart;
 
-public abstract class MediaListEditor<T extends MediaList<S>, S extends MediaItem> extends EditorPart {
+// FIXME rename to MediaTrackListEditor
+public abstract class MediaListEditor<T extends MediaTrackList<S>, S extends MediaTrack> extends EditorPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constants and Enums.
 	
@@ -398,7 +400,7 @@ public abstract class MediaListEditor<T extends MediaList<S>, S extends MediaIte
 	private class CountsLblProv extends ColumnLabelProvider {
 		@Override
 		public String getText(Object element) {
-			MediaItem elm = (MediaItem) element;
+			MediaTrack elm = (MediaTrack) element;
 			if (elm.getStartCount() <= 0 && elm.getStartCount() <= 0) {
 				return null;
 			} else {
@@ -440,7 +442,7 @@ public abstract class MediaListEditor<T extends MediaList<S>, S extends MediaIte
 	private class DurationLblProv extends ColumnLabelProvider {
 		@Override
 		public String getText(Object element) {
-			MediaItem elm = (MediaItem) element;
+			MediaTrack elm = (MediaTrack) element;
 			if (elm.getDuration() <= 0) {
 				return null;
 			} else {
@@ -584,7 +586,7 @@ public abstract class MediaListEditor<T extends MediaList<S>, S extends MediaIte
 		editorInput.getMediaList().removeMediaTrack(track);
 	}
 	
-	public MediaItem getSelectedTrack () {
+	public MediaTrack getSelectedTrack () {
 		ISelection selection = editTable.getSelection();
 		
 		if (selection==null) return null;
@@ -594,8 +596,8 @@ public abstract class MediaListEditor<T extends MediaList<S>, S extends MediaIte
 			IStructuredSelection iSel = (IStructuredSelection) selection;
 			Object selectedObject = iSel.getFirstElement();
 			if (selectedObject != null) {
-				if (selectedObject instanceof MediaItem) {
-					MediaItem track = (MediaItem) selectedObject;
+				if (selectedObject instanceof MediaTrack) {
+					MediaTrack track = (MediaTrack) selectedObject;
 					return track;
 				}
 			}
@@ -604,7 +606,7 @@ public abstract class MediaListEditor<T extends MediaList<S>, S extends MediaIte
 		return null;
 	}
 	
-	public ArrayList<MediaItem> getSelectedTracks () {
+	public ArrayList<MediaTrack> getSelectedTracks () {
 		ISelection selection = editTable.getSelection();
 		
 		if (selection==null) return null;
@@ -613,11 +615,11 @@ public abstract class MediaListEditor<T extends MediaList<S>, S extends MediaIte
 		if (selection instanceof IStructuredSelection) {
 			IStructuredSelection iSel = (IStructuredSelection) selection;
 			
-			ArrayList<MediaItem> ret = new ArrayList<MediaItem>();
+			ArrayList<MediaTrack> ret = new ArrayList<MediaTrack>();
 			for (Object selectedObject : iSel.toList()) {
 				if (selectedObject != null) {
-					if (selectedObject instanceof MediaItem) {
-						MediaItem track = (MediaItem) selectedObject;
+					if (selectedObject instanceof MediaTrack) {
+						MediaTrack track = (MediaTrack) selectedObject;
 						ret.add(track);
 					}
 				}

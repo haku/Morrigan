@@ -1,15 +1,15 @@
 package net.sparktank.morrigan.model.playlist;
 
 import net.sparktank.morrigan.helpers.EqualHelper;
-import net.sparktank.morrigan.model.MediaItem;
-import net.sparktank.morrigan.model.MediaList;
+import net.sparktank.morrigan.model.MediaTrack;
+import net.sparktank.morrigan.model.MediaTrackList;
 
 public class PlayItem {
 	
-	public MediaList<? extends MediaItem> list;
-	public MediaItem item;
+	public MediaTrackList<? extends MediaTrack> list;
+	public MediaTrack item;
 	
-	public PlayItem (MediaList<? extends MediaItem> list, MediaItem item) {
+	public PlayItem (MediaTrackList<? extends MediaTrack> list, MediaTrack item) {
 		this.list = list;
 		this.item = item;
 	}
