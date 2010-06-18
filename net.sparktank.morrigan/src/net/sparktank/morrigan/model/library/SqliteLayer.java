@@ -103,7 +103,7 @@ public class SqliteLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	DB readers.
 	
-	public List<MediaLibraryItem> updateListOfAllMedia (List<MediaLibraryItem> list, LibrarySort sort, LibrarySortDirection direction, boolean hideMissing) throws DbException {
+	public List<MediaLibraryTrack> updateListOfAllMedia (List<MediaLibraryTrack> list, LibrarySort sort, LibrarySortDirection direction, boolean hideMissing) throws DbException {
 		try {
 			return local_updateListOfAllMedia(list, sort, direction, hideMissing);
 		} catch (Exception e) {
@@ -111,7 +111,7 @@ public class SqliteLayer {
 		}
 	}
 	
-	public List<MediaLibraryItem> getAllMedia (LibrarySort sort, LibrarySortDirection direction, boolean hideMissing) throws DbException {
+	public List<MediaLibraryTrack> getAllMedia (LibrarySort sort, LibrarySortDirection direction, boolean hideMissing) throws DbException {
 		try {
 			return local_getAllMedia(sort, direction, hideMissing);
 		} catch (Exception e) {
@@ -119,7 +119,7 @@ public class SqliteLayer {
 		}
 	}
 	
-	public List<MediaLibraryItem> simpleSearch (String term, String esc, int maxResults) throws DbException {
+	public List<MediaLibraryTrack> simpleSearch (String term, String esc, int maxResults) throws DbException {
 		try {
 			return local_simpleSearch(term, esc, maxResults);
 		} catch (Exception e) {
@@ -675,11 +675,11 @@ public class SqliteLayer {
 	
 	private SimpleDateFormat SQL_DATE = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
-	private List<MediaLibraryItem> local_updateListOfAllMedia (List<MediaLibraryItem> list, LibrarySort sort, LibrarySortDirection direction, boolean hideMissing) throws SQLException, ClassNotFoundException {
+	private List<MediaLibraryTrack> local_updateListOfAllMedia (List<MediaLibraryTrack> list, LibrarySort sort, LibrarySortDirection direction, boolean hideMissing) throws SQLException, ClassNotFoundException {
 		String sql = local_getAllMediaSql(sort, direction, hideMissing);
 		ResultSet rs;
 		
-		List<MediaLibraryItem> ret;
+		List<MediaLibraryTrack> ret;
 		PreparedStatement ps = getDbCon().prepareStatement(sql);
 		try {
 			rs = ps.executeQuery();
@@ -695,11 +695,11 @@ public class SqliteLayer {
 		return ret;
 	}
 	
-	private List<MediaLibraryItem> local_getAllMedia (LibrarySort sort, LibrarySortDirection direction, boolean hideMissing) throws SQLException, ClassNotFoundException {
+	private List<MediaLibraryTrack> local_getAllMedia (LibrarySort sort, LibrarySortDirection direction, boolean hideMissing) throws SQLException, ClassNotFoundException {
 		String sql = local_getAllMediaSql(sort, direction, hideMissing);
 		ResultSet rs;
 		
-		List<MediaLibraryItem> ret;
+		List<MediaLibraryTrack> ret;
 		PreparedStatement ps = getDbCon().prepareStatement(sql);
 		try {
 			rs = ps.executeQuery();
@@ -778,10 +778,10 @@ public class SqliteLayer {
 		return sql;
 	}
 	
-	private List<MediaLibraryItem> local_simpleSearch (String term, String esc, int maxResults) throws SQLException, ClassNotFoundException {
+	private List<MediaLibraryTrack> local_simpleSearch (String term, String esc, int maxResults) throws SQLException, ClassNotFoundException {
 		PreparedStatement ps;
 		ResultSet rs;
-		List<MediaLibraryItem> ret;
+		List<MediaLibraryTrack> ret;
 		
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_Q_SIMPLESEARCH);
 		try {
@@ -805,12 +805,12 @@ public class SqliteLayer {
 		return ret;
 	}
 	
-	private List<MediaLibraryItem> local_parseAndUpdateFromRecordSet (List<MediaLibraryItem> list, ResultSet rs) throws SQLException {
-		List<MediaLibraryItem> finalList = new ArrayList<MediaLibraryItem>();
+	private List<MediaLibraryTrack> local_parseAndUpdateFromRecordSet (List<MediaLibraryTrack> list, ResultSet rs) throws SQLException {
+		List<MediaLibraryTrack> finalList = new ArrayList<MediaLibraryTrack>();
 		
 		// Build a HashMap of existing items to make lookup a lot faster.
-		Map<String, MediaLibraryItem> keepMap = new HashMap<String, MediaLibraryItem>(list.size());
-		for (MediaLibraryItem e : list) {
+		Map<String, MediaLibraryTrack> keepMap = new HashMap<String, MediaLibraryTrack>(list.size());
+		for (MediaLibraryTrack e : list) {
 			keepMap.put(e.getFilepath(), e);
 		}
 		
@@ -818,7 +818,7 @@ public class SqliteLayer {
 		 * create new list as we go. 
 		 */
 		while (rs.next()) {
-			MediaLibraryItem newItem = new MediaLibraryItem();
+			MediaLibraryTrack newItem = new MediaLibraryTrack();
 			newItem.setDbRowId(rs.getLong(SQL_TBL_MEDIAFILES_COL_ROWID));
 			newItem.setFilepath(rs.getString(SQL_TBL_MEDIAFILES_COL_FILE));
 			newItem.setDateAdded(readDate(rs, SQL_TBL_MEDIAFILES_COL_DADDED));
@@ -832,7 +832,7 @@ public class SqliteLayer {
 			newItem.setMissing(rs.getInt(SQL_TBL_MEDIAFILES_COL_MISSING) == 1); // default to false.
 			newItem.setRemoteLocation(rs.getString(SQL_TBL_MEDIAFILES_COL_REMLOC));
 			
-			MediaLibraryItem oldItem = keepMap.get(newItem.getFilepath());
+			MediaLibraryTrack oldItem = keepMap.get(newItem.getFilepath());
 			if (oldItem != null) {
 				oldItem.setFromMediaItem(newItem);
 				finalList.add(oldItem);
@@ -844,11 +844,11 @@ public class SqliteLayer {
 		return finalList;
 	}
 	
-	private List<MediaLibraryItem> local_parseRecordSet (ResultSet rs) throws SQLException {
-		List<MediaLibraryItem> ret = new ArrayList<MediaLibraryItem>();
+	private List<MediaLibraryTrack> local_parseRecordSet (ResultSet rs) throws SQLException {
+		List<MediaLibraryTrack> ret = new ArrayList<MediaLibraryTrack>();
 		
 		while (rs.next()) {
-			MediaLibraryItem mt = new MediaLibraryItem();
+			MediaLibraryTrack mt = new MediaLibraryTrack();
 			mt.setDbRowId(rs.getLong(SQL_TBL_MEDIAFILES_COL_ROWID));
 			mt.setFilepath(rs.getString(SQL_TBL_MEDIAFILES_COL_FILE));
 			mt.setDateAdded(readDate(rs, SQL_TBL_MEDIAFILES_COL_DADDED));

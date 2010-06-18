@@ -23,7 +23,7 @@ import net.sparktank.morrigan.model.TaskEventListener;
 import net.sparktank.morrigan.model.TaskResult;
 import net.sparktank.morrigan.model.TaskResult.TaskOutcome;
 import net.sparktank.morrigan.model.library.DbException;
-import net.sparktank.morrigan.model.library.MediaLibraryItem;
+import net.sparktank.morrigan.model.library.MediaLibraryTrack;
 
 public class LocalLibraryUpdateTask implements IMorriganTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -199,8 +199,8 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 		int n = 0;
 		int N = library.getCount();
 		
-		List<MediaLibraryItem> allLibraryEntries = library.getAllLibraryEntries();
-		for (MediaLibraryItem mi : allLibraryEntries) {
+		List<MediaLibraryTrack> allLibraryEntries = library.getAllLibraryEntries();
+		for (MediaLibraryTrack mi : allLibraryEntries) {
 			if (taskEventListener.isCanceled()) break;
 			taskEventListener.subTask("Reading metadata: " + mi.getTitle());
 			
@@ -313,9 +313,9 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 	private void checkForDuplicates(TaskEventListener taskEventListener) throws MorriganException {
 		taskEventListener.subTask("Scanning for duplicates");
 		
-		Map<MediaLibraryItem, ScanOption> dupicateItems = new HashMap<MediaLibraryItem, ScanOption>();
+		Map<MediaLibraryTrack, ScanOption> dupicateItems = new HashMap<MediaLibraryTrack, ScanOption>();
 		
-		List<MediaLibraryItem> tracks = library.getAllLibraryEntries();
+		List<MediaLibraryTrack> tracks = library.getAllLibraryEntries();
 		for (int i = 0; i < tracks.size(); i++) {
 			if (taskEventListener.isCanceled()) break;
 			
@@ -383,8 +383,8 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 				/*
 				 * Find all the entries for this hashcode.
 				 */
-				Map<MediaLibraryItem, ScanOption> items = new HashMap<MediaLibraryItem, ScanOption>();
-				for (MediaLibraryItem mi : dupicateItems.keySet()) {
+				Map<MediaLibraryTrack, ScanOption> items = new HashMap<MediaLibraryTrack, ScanOption>();
+				for (MediaLibraryTrack mi : dupicateItems.keySet()) {
 					if (mi.getHashcode() == l.longValue()) {
 						items.put(mi, dupicateItems.get(mi));
 					}
@@ -399,8 +399,8 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 				if (countEntriesInMap(items, ScanOption.KEEP) == 1
 						&& countEntriesInMap(items, ScanOption.DELREF) == items.size()-1) {
 					
-					MediaLibraryItem keep = null;
-					for (MediaLibraryItem i : items.keySet()) {
+					MediaLibraryTrack keep = null;
+					for (MediaLibraryTrack i : items.keySet()) {
 						if (items.get(i) == ScanOption.KEEP) keep = i;
 					}
 					items.remove(keep);
@@ -462,7 +462,7 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 			 */
 			taskEventListener.logMsg(library.getListName(), "Performed " + countMerges + " mergers.");
 			taskEventListener.logMsg(library.getListName(), "Found " + dupicateItems.size() + " duplicate items:");
-			for (Entry<MediaLibraryItem, ScanOption> e : dupicateItems.entrySet()) {
+			for (Entry<MediaLibraryTrack, ScanOption> e : dupicateItems.entrySet()) {
 				taskEventListener.logMsg(library.getListName(), e.getValue() + " : " + e.getKey().getTitle());
 			}
 			

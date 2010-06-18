@@ -9,7 +9,7 @@ import net.sparktank.morrigan.gui.preferences.PreferenceHelper;
 import net.sparktank.morrigan.model.MediaItem;
 import net.sparktank.morrigan.model.MediaTrack;
 import net.sparktank.morrigan.model.library.DbException;
-import net.sparktank.morrigan.model.library.MediaLibraryItem;
+import net.sparktank.morrigan.model.library.MediaLibraryTrack;
 import net.sparktank.morrigan.model.library.local.LocalMediaLibrary;
 import net.sparktank.morrigan.model.playlist.PlayItem;
 
@@ -362,7 +362,7 @@ public class JumpToDlg extends Dialog {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private List<MediaLibraryItem> searchResults = null;
+	private List<MediaLibraryTrack> searchResults = null;
 	
 	private IStructuredContentProvider contentProvider = new IStructuredContentProvider() {
 		@Override
@@ -501,7 +501,7 @@ public class JumpToDlg extends Dialog {
 		q = q.replace("*", "%");
 		
 		try {
-			List<MediaLibraryItem> res = mediaLibrary.simpleSearch(q, "\\", MAX_RESULTS);
+			List<MediaLibraryTrack> res = mediaLibrary.simpleSearch(q, "\\", MAX_RESULTS);
 			if (res != null && res.size() > 0) {
 				searchResults = res;
 				return true;

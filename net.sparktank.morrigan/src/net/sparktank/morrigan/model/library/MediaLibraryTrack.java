@@ -4,16 +4,15 @@ import net.sparktank.morrigan.helpers.EqualHelper;
 import net.sparktank.morrigan.model.MediaItem;
 import net.sparktank.morrigan.model.MediaTrack;
 
-// FIXME rename to MediaLibraryTrack
-public class MediaLibraryItem extends MediaTrack {
+public class MediaLibraryTrack extends MediaTrack {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors.
 	
-	public MediaLibraryItem() {
+	public MediaLibraryTrack() {
 		super();
 	}
 	
-	public MediaLibraryItem(String filepath) {
+	public MediaLibraryTrack(String filepath) {
 		super(filepath);
 	}
 	
@@ -52,8 +51,8 @@ public class MediaLibraryItem extends MediaTrack {
 	public boolean setFromMediaItem(MediaItem mi) {
 		boolean setFromMediaItem = super.setFromMediaItem(mi);
 		
-		if (mi instanceof MediaLibraryItem) {
-			MediaLibraryItem mli = (MediaLibraryItem) mi;
+		if (mi instanceof MediaLibraryTrack) {
+			MediaLibraryTrack mli = (MediaLibraryTrack) mi;
 			
 			boolean b = this.setDbRowId(mli.getDbRowId())
 				|| this.setRemoteLocation(mli.getRemoteLocation());
