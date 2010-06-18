@@ -206,7 +206,11 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTr
 		_removeMediaTrack(track);
 	}
 	
-	public void _removeMediaTrack (MediaItem track) throws MorriganException {
+	/**
+	 * This is so that this class can always call this method, even when this
+	 * class is sub-classed and removeMediaTrack() overridden.
+	 */
+	private void _removeMediaTrack (MediaItem track) throws MorriganException {
 		super.removeMediaTrack(track);
 		int n = dbLayer.removeFile(track.getFilepath());
 		if (n != 1) {
