@@ -9,8 +9,7 @@ import java.util.Map;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 
-// FIXME rename to MediaItemList
-public abstract class MediaList<T extends MediaItem> {
+public abstract class MediaItemList<T extends MediaItem> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public enum DirtyState { CLEAN, DIRTY, METADATA };
@@ -28,7 +27,7 @@ public abstract class MediaList<T extends MediaItem> {
 	 * @param listId a unique ID.
 	 * @param listName a human-readable title for this list.
 	 */
-	protected MediaList (String listId, String listName) {
+	protected MediaItemList (String listId, String listName) {
 		if (listId == null) throw new IllegalArgumentException("listId can not be null.");
 		if (listName == null) throw new IllegalArgumentException("listName can not be null.");
 		

@@ -6,7 +6,7 @@ import net.sparktank.morrigan.model.library.SqliteLayer.LibrarySortDirection;
 
 import org.eclipse.ui.IMemento;
 
-public class LibraryEditorInput extends MediaListEditorInput<AbstractMediaLibrary> {
+public class LibraryEditorInput extends MediaTrackListEditorInput<AbstractMediaLibrary> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public LibraryEditorInput(AbstractMediaLibrary mediaList) {

@@ -2,7 +2,7 @@ package net.sparktank.morrigan.gui.editors;
 
 import java.util.Date;
 
-import net.sparktank.morrigan.gui.editors.MediaListEditor.MediaColumn;
+import net.sparktank.morrigan.gui.editors.MediaTrackListEditor.MediaColumn;
 import net.sparktank.morrigan.model.MediaTrack;
 
 import org.eclipse.jface.viewers.TableViewer;

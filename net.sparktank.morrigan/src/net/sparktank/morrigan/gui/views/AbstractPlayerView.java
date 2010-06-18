@@ -20,12 +20,12 @@ import net.sparktank.morrigan.gui.display.ScreenPainter.TitleProvider;
 import net.sparktank.morrigan.gui.editors.EditorFactory;
 import net.sparktank.morrigan.gui.editors.LibraryEditorInput;
 import net.sparktank.morrigan.gui.editors.LocalLibraryEditor;
-import net.sparktank.morrigan.gui.editors.MediaListEditor;
-import net.sparktank.morrigan.gui.editors.MediaListEditorInput;
+import net.sparktank.morrigan.gui.editors.MediaTrackListEditor;
+import net.sparktank.morrigan.gui.editors.MediaTrackListEditorInput;
 import net.sparktank.morrigan.gui.editors.PlaylistEditor;
 import net.sparktank.morrigan.gui.helpers.ClipboardHelper;
 import net.sparktank.morrigan.model.MediaItem;
-import net.sparktank.morrigan.model.MediaList;
+import net.sparktank.morrigan.model.MediaItemList;
 import net.sparktank.morrigan.model.MediaTrack;
 import net.sparktank.morrigan.model.MediaTrackList;
 import net.sparktank.morrigan.model.library.local.LocalMediaLibrary;
@@ -161,8 +161,8 @@ public abstract class AbstractPlayerView extends ViewPart {
 			MediaTrackList<MediaTrack> ret = null;
 			
 			IEditorPart activeEditor = getViewSite().getPage().getActiveEditor();
-			if (activeEditor != null && activeEditor instanceof MediaListEditor<?,?>) {
-				MediaListEditor<? extends MediaTrackList<MediaTrack>,MediaTrack> mediaListEditor = (MediaListEditor<? extends MediaList<MediaTrack>,MediaTrack>) activeEditor;
+			if (activeEditor != null && activeEditor instanceof MediaTrackListEditor<?,?>) {
+				MediaTrackListEditor<? extends MediaTrackList<MediaTrack>,MediaTrack> mediaListEditor = (MediaTrackListEditor<? extends MediaItemList<MediaTrack>,MediaTrack>) activeEditor;
 				MediaTrackList<MediaTrack> editedMediaList = mediaListEditor.getMediaList();
 				ret = editedMediaList;
 			}
@@ -613,14 +613,14 @@ public abstract class AbstractPlayerView extends ViewPart {
 						getViewSite().getWorkbenchWindow().getActivePage().openEditor(input, LocalLibraryEditor.ID);
 						
 					} else if (getPlayer().getCurrentItem().list.getType().equals(MediaPlaylist.TYPE)) {
-						MediaListEditorInput<MediaPlaylist> input = EditorFactory.getMediaPlaylistInput(getPlayer().getCurrentItem().list.getListId());
+						MediaTrackListEditorInput<MediaPlaylist> input = EditorFactory.getMediaPlaylistInput(getPlayer().getCurrentItem().list.getListId());
 						getViewSite().getWorkbenchWindow().getActivePage().openEditor(input, PlaylistEditor.ID);
 						
 					}
 					
 					IEditorPart activeEditor = getViewSite().getWorkbenchWindow().getActivePage().getActiveEditor();
-					if (activeEditor instanceof MediaListEditor<?,?>) {
-						MediaListEditor<?,?> mediaListEditor = (MediaListEditor<?,?>) activeEditor;
+					if (activeEditor instanceof MediaTrackListEditor<?,?>) {
+						MediaTrackListEditor<?,?> mediaListEditor = (MediaTrackListEditor<?,?>) activeEditor;
 						mediaListEditor.revealTrack(getPlayer().getCurrentItem().item);
 					}
 					
@@ -635,7 +635,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 	protected IAction jumpToAction = new Action ("Jump to...") {
 		@Override
 		public void run() {
-			MediaList<? extends MediaItem> currentList = getPlayer().getCurrentList();
+			MediaItemList<? extends MediaItem> currentList = getPlayer().getCurrentList();
 			if (currentList == null) return;
 			if (!(currentList instanceof LocalMediaLibrary)) return;
 			
