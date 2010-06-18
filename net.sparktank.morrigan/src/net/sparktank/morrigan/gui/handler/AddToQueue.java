@@ -3,7 +3,7 @@ package net.sparktank.morrigan.gui.handler;
 import java.util.ArrayList;
 
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
-import net.sparktank.morrigan.gui.editors.MediaListEditor;
+import net.sparktank.morrigan.gui.editors.MediaTrackListEditor;
 import net.sparktank.morrigan.gui.views.AbstractPlayerView;
 import net.sparktank.morrigan.gui.views.ViewControls;
 import net.sparktank.morrigan.model.MediaTrack;
@@ -34,8 +34,8 @@ public class AddToQueue  extends AbstractHandler {
 		IWorkbenchPage page = window.getActivePage();
 		IEditorPart activeEditor = page.getActiveEditor();
 		
-		if (activeEditor instanceof MediaListEditor<?,?>) {
-			MediaListEditor<?,?> mediaListEditor = (MediaListEditor<?,?>) activeEditor;
+		if (activeEditor instanceof MediaTrackListEditor<?,?>) {
+			MediaTrackListEditor<?,?> mediaListEditor = (MediaTrackListEditor<?,?>) activeEditor;
 			AbstractPlayerView playerView;
 			IViewPart findView = page.findView(ViewControls.ID);
 			

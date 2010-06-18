@@ -3,7 +3,7 @@ package net.sparktank.morrigan.gui.handler;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.editors.EditorFactory;
 import net.sparktank.morrigan.gui.editors.LocalLibraryEditor;
-import net.sparktank.morrigan.gui.editors.MediaListEditorInput;
+import net.sparktank.morrigan.gui.editors.MediaTrackListEditorInput;
 import net.sparktank.morrigan.gui.editors.PlaylistEditor;
 import net.sparktank.morrigan.gui.editors.RemoteLibraryEditor;
 import net.sparktank.morrigan.gui.views.ViewMediaExplorer;
@@ -44,7 +44,7 @@ public class CallMediaListEditor extends AbstractHandler {
 			if (obj != null) {
 				MediaExplorerItem item = (MediaExplorerItem) obj;
 				
-				MediaListEditorInput<?> input;
+				MediaTrackListEditorInput<?> input;
 				String editorId;
 				
 				if (item.type == MediaExplorerItem.ItemType.PLAYLIST) {

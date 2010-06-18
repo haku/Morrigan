@@ -15,7 +15,7 @@ import net.sparktank.morrigan.helpers.TimeHelper;
 import net.sparktank.morrigan.model.MediaItem;
 import net.sparktank.morrigan.model.MediaTrack;
 import net.sparktank.morrigan.model.MediaTrackList;
-import net.sparktank.morrigan.model.MediaList.DirtyState;
+import net.sparktank.morrigan.model.MediaItemList.DirtyState;
 
 import org.eclipse.core.commands.common.CommandException;
 import org.eclipse.jface.action.Action;
@@ -61,8 +61,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.part.EditorPart;
 
-// FIXME rename to MediaTrackListEditor
-public abstract class MediaListEditor<T extends MediaTrackList<S>, S extends MediaTrack> extends EditorPart {
+public abstract class MediaTrackListEditor<T extends MediaTrackList<S>, S extends MediaTrack> extends EditorPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constants and Enums.
 	
@@ -85,7 +84,7 @@ public abstract class MediaListEditor<T extends MediaTrackList<S>, S extends Med
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	MediaListEditorInput<T> editorInput;
+	MediaTrackListEditorInput<T> editorInput;
 	
 	private TableViewer editTable = null;
 	private MediaFilter mediaFilter = null;
@@ -93,7 +92,7 @@ public abstract class MediaListEditor<T extends MediaTrackList<S>, S extends Med
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructor.
 	
-	public MediaListEditor() {
+	public MediaTrackListEditor() {
 		super();
 	}
 	
@@ -106,8 +105,8 @@ public abstract class MediaListEditor<T extends MediaTrackList<S>, S extends Med
 		setSite(site);
 		setInput(input);
 		
-		if (input instanceof MediaListEditorInput<?>) {
-			editorInput = (MediaListEditorInput<T>) input;
+		if (input instanceof MediaTrackListEditorInput<?>) {
+			editorInput = (MediaTrackListEditorInput<T>) input;
 		} else {
 			throw new IllegalArgumentException("input is not instanceof MediaListEditorInput<?>.");
 		}

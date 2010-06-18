@@ -4,7 +4,7 @@ import java.util.Date;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 
-public abstract class MediaTrackList<T extends MediaTrack> extends MediaList<T> {
+public abstract class MediaTrackList<T extends MediaTrack> extends MediaItemList<T> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	protected MediaTrackList(String listId, String listName) {

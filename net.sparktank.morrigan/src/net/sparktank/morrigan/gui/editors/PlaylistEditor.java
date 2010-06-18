@@ -36,7 +36,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
 
-public class PlaylistEditor extends MediaListEditor<MediaPlaylist,MediaTrack> {
+public class PlaylistEditor extends MediaTrackListEditor<MediaPlaylist,MediaTrack> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static final String ID = "net.sparktank.morrigan.gui.editors.PlaylistEditor";

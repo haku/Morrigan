@@ -2,7 +2,7 @@ package net.sparktank.morrigan.gui.handler;
 
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.editors.LocalLibraryEditor;
-import net.sparktank.morrigan.gui.editors.MediaListEditor;
+import net.sparktank.morrigan.gui.editors.MediaTrackListEditor;
 import net.sparktank.morrigan.gui.editors.PlaylistEditor;
 import net.sparktank.morrigan.gui.views.AbstractPlayerView;
 import net.sparktank.morrigan.gui.views.ViewControls;
@@ -33,7 +33,7 @@ public class CallPlayMedia  extends AbstractHandler {
 		IEditorPart activeEditor = page.getActiveEditor();
 		
 		if (activeEditor instanceof PlaylistEditor || activeEditor instanceof LocalLibraryEditor) {
-			MediaListEditor<?,?> mediaListEditor = (MediaListEditor<?,?>) activeEditor;
+			MediaTrackListEditor<?,?> mediaListEditor = (MediaTrackListEditor<?,?>) activeEditor;
 			AbstractPlayerView playerView;
 			IViewPart findView = page.findView(ViewControls.ID);
 			
