@@ -249,14 +249,19 @@ public abstract class MediaItemList<T extends MediaItem> {
 				
 				/* Create a new list and populate it with the
 				 * items removed.
-				 * This is very quick.
 				 */
-				List<T> ret = new ArrayList<T>();
+				List<T> removedItems = new ArrayList<T>();
+				keepMap = new HashMap<String,T>(keepList.size());
 				for (T e : finalList) {
+					keepMap.put(e.getFilepath(), e);
+				}
+				for (T e : keepList) {
 					if (!keepMap.containsKey(e.getFilepath())) {
-						ret.add(e);
+						removedItems.add(e);
 					}
 				}
+				
+				System.err.println("Removed " + removedItems.size() + " items.");
 				
 				/* Update the keep list.  We need to modify
 				 * the passed in list, not return a new one.
@@ -265,7 +270,7 @@ public abstract class MediaItemList<T extends MediaItem> {
 				keepList.clear();
 				keepList.addAll(finalList);
 				
-				return ret;
+				return removedItems;
 			}
 		}
 	}
