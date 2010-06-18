@@ -2,8 +2,10 @@ package net.sparktank.morrigan.model.library;
 
 import net.sparktank.morrigan.helpers.EqualHelper;
 import net.sparktank.morrigan.model.MediaItem;
+import net.sparktank.morrigan.model.MediaTrack;
 
-public class MediaLibraryItem extends MediaItem {
+// FIXME rename to MediaLibraryTrack
+public class MediaLibraryItem extends MediaTrack {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors.
 	
@@ -44,6 +46,7 @@ public class MediaLibraryItem extends MediaItem {
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Mass setter.
 	
 	@Override
 	public boolean setFromMediaItem(MediaItem mi) {

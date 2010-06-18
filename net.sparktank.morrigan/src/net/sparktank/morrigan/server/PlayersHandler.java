@@ -9,9 +9,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.ErrorHelper;
-import net.sparktank.morrigan.model.MediaList;
 import net.sparktank.morrigan.model.MediaListFactory;
+import net.sparktank.morrigan.model.MediaTrack;
+import net.sparktank.morrigan.model.MediaTrackList;
 import net.sparktank.morrigan.model.library.local.LocalLibraryHelper;
+import net.sparktank.morrigan.model.library.local.LocalMediaLibrary;
 import net.sparktank.morrigan.model.playlist.PlayItem;
 import net.sparktank.morrigan.model.playlist.PlaylistHelper;
 import net.sparktank.morrigan.player.Player;
@@ -124,13 +126,13 @@ public class PlayersHandler extends AbstractHandler {
 	private void doPlay (Player player, String param) throws MorriganException {
 		if (LocalLibraryHelper.isLibFile(param)) {
 			String f = LocalLibraryHelper.getFullPathToLib(param);
-			MediaList<?> ml = MediaListFactory.LOCAL_MEDIA_LIBRARY_FACTORY.manufacture(f);
+			LocalMediaLibrary ml = MediaListFactory.LOCAL_MEDIA_LIBRARY_FACTORY.manufacture(f);
 			ml.read();
 			player.loadAndStartPlaying(ml);
 			
 		} else if (PlaylistHelper.isPlFile(param)) {
 			String f = PlaylistHelper.getFullPathToPlaylist(param);
-			MediaList<?> ml = MediaListFactory.PLAYLIST_FACTORY.manufacture(f);
+			MediaTrackList<MediaTrack> ml = MediaListFactory.PLAYLIST_FACTORY.manufacture(f);
 			ml.read();
 			player.loadAndStartPlaying(ml);
 			

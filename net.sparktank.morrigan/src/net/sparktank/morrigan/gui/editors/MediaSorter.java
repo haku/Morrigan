@@ -3,7 +3,7 @@ package net.sparktank.morrigan.gui.editors;
 import java.util.Date;
 
 import net.sparktank.morrigan.gui.editors.MediaListEditor.MediaColumn;
-import net.sparktank.morrigan.model.MediaItem;
+import net.sparktank.morrigan.model.MediaTrack;
 
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
@@ -41,8 +41,8 @@ public class MediaSorter extends ViewerSorter {
 	
 	@Override
 	public int compare(Viewer viewer, Object e1, Object e2) {
-		MediaItem t1 = (MediaItem) e1;
-		MediaItem t2 = (MediaItem) e2;
+		MediaTrack t1 = (MediaTrack) e1;
+		MediaTrack t2 = (MediaTrack) e2;
 		
 		int rc = 0;
 		

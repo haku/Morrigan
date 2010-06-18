@@ -7,6 +7,7 @@ import java.util.List;
 
 import net.sparktank.morrigan.gui.preferences.PreferenceHelper;
 import net.sparktank.morrigan.model.MediaItem;
+import net.sparktank.morrigan.model.MediaTrack;
 import net.sparktank.morrigan.model.library.DbException;
 import net.sparktank.morrigan.model.library.MediaLibraryItem;
 import net.sparktank.morrigan.model.library.local.LocalMediaLibrary;
@@ -236,7 +237,7 @@ public class JumpToDlg extends Dialog {
 	
 	private void leaveDlg (boolean ok, int mask) {
 		if (ok) {
-			MediaItem item = getSelectedItem();
+			MediaTrack item = getSelectedItem();
 			if (item == null) return;
 			returnValue = new PlayItem(mediaLibrary, item);
 		}
@@ -342,7 +343,7 @@ public class JumpToDlg extends Dialog {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private MediaItem getSelectedItem () {
+	private MediaTrack getSelectedItem () {
 		ISelection selection = tableViewer.getSelection();
 		if (selection==null) return null;
 		if (selection.isEmpty()) return null;
@@ -351,7 +352,7 @@ public class JumpToDlg extends Dialog {
 			IStructuredSelection iSel = (IStructuredSelection) selection;
 			Object o = iSel.toList().get(0);
 			if (o instanceof MediaItem) {
-				MediaItem i = (MediaItem) o;
+				MediaTrack i = (MediaTrack) o;
 				return i;
 			}
 		}

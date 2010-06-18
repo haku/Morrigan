@@ -9,6 +9,7 @@ import java.util.Map;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 
+// FIXME rename to MediaItemList
 public abstract class MediaList<T extends MediaItem> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -172,16 +173,6 @@ public abstract class MediaList<T extends MediaItem> {
 //	Update methods.  Use these for data that is to be persisted.
 //	These methods are sub-classed where persistance is needed.
 	
-	public void incTrackStartCnt (MediaItem track, long n) throws MorriganException {
-		track.setStartCount(track.getStartCount() + n);
-		setDirtyState(DirtyState.METADATA);
-	}
-	
-	public void incTrackEndCnt (MediaItem track, long n) throws MorriganException {
-		track.setEndCount(track.getEndCount() + n);
-		setDirtyState(DirtyState.METADATA);
-	}
-	
 	public void setDateAdded (MediaItem track, Date date) throws MorriganException {
 		track.setDateAdded(date);
 		setDirtyState(DirtyState.METADATA);
@@ -189,22 +180,6 @@ public abstract class MediaList<T extends MediaItem> {
 	
 	public void setDateLastPlayed (MediaItem track, Date date) throws MorriganException {
 		track.setDateLastPlayed(date);
-		setDirtyState(DirtyState.METADATA);
-	}
-	
-	public void incTrackStartCnt (MediaItem track) throws MorriganException {
-		track.setStartCount(track.getStartCount()+1);
-		track.setDateLastPlayed(new Date());
-		setDirtyState(DirtyState.METADATA);
-	}
-	
-	public void incTrackEndCnt (MediaItem track) throws MorriganException {
-		track.setEndCount(track.getEndCount()+1);
-		setDirtyState(DirtyState.METADATA);
-	}
-	
-	public void setTrackDuration (MediaItem track, int duration) throws MorriganException {
-		track.setDuration(duration);
 		setDirtyState(DirtyState.METADATA);
 	}
 	
@@ -227,28 +202,6 @@ public abstract class MediaList<T extends MediaItem> {
 		track.setMissing(value);
 		setDirtyState(DirtyState.METADATA);
 	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Metadata readers.
-	
-	static public class DurationData {
-		public long duration;
-		public boolean complete;
-	}
-	
-	public DurationData getTotalDuration () {
-		DurationData ret = new DurationData();
-		ret.complete = true;
-		for (MediaItem mt : mediaTracks) {
-			if (mt.getDuration() > 0) {
-				ret.duration = ret.duration + mt.getDuration();
-			} else {
-				ret.complete = false;
-			}
-		}
-		return ret;
-	}
-	
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	

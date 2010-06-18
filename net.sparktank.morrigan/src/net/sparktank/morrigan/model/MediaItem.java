@@ -5,6 +5,9 @@ import java.util.Date;
 
 import net.sparktank.morrigan.helpers.EqualHelper;
 
+/**
+ * Generic media item, be it music, video, image, etc...
+ */
 public class MediaItem {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors.
@@ -20,10 +23,7 @@ public class MediaItem {
 	
 	private String filepath = null;
 	private Date dateAdded = null;
-	private long startCount = 0;
-	private long endCount = 0;
 	private Date dateLastPlayed = null;
-	private int duration = -1;
 	private long hashcode = 0;
 	private Date dateLastModified = null;
 	private boolean enabled = true;
@@ -51,45 +51,12 @@ public class MediaItem {
 		return false;
 	}
 	
-	public long getStartCount() {
-		return startCount;
-	}
-	public boolean setStartCount(long startCount) {
-		if (this.startCount != startCount) {
-			this.startCount = startCount;
-			return true;
-		}
-		return false;
-	}
-
-	public long getEndCount() {
-		return endCount;
-	}
-	public boolean setEndCount(long endCount) {
-		if (this.endCount != endCount) {
-			this.endCount = endCount;
-			return true;
-		}
-		return false;
-	}
-
 	public Date getDateLastPlayed() {
 		return dateLastPlayed;
 	}
 	public boolean setDateLastPlayed(Date dateLastPlayed) {
 		if (!EqualHelper.areEqual(this.dateLastPlayed, dateLastPlayed)) {
 			this.dateLastPlayed = dateLastPlayed;
-			return true;
-		}
-		return false;
-	}
-	
-	public int getDuration() {
-		return duration;
-	}
-	public boolean setDuration(int duration) {
-		if (this.duration != duration) {
-			this.duration = duration;
 			return true;
 		}
 		return false;
@@ -157,10 +124,7 @@ public class MediaItem {
 	public boolean setFromMediaItem (MediaItem mi) {
 		boolean b = this.setFilepath(mi.getFilepath())
 			|| this.setDateAdded(mi.getDateAdded())
-			|| this.setStartCount(mi.getStartCount())
-			|| this.setEndCount(mi.getEndCount())
 			|| this.setDateLastPlayed(mi.getDateLastPlayed())
-			|| this.setDuration(mi.getDuration())
 			|| this.setHashcode(mi.getHashcode())
 			|| this.setDateLastModified(mi.getDateLastModified())
 			|| this.setEnabled(mi.isEnabled())

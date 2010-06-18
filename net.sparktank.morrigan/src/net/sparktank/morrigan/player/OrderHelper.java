@@ -5,7 +5,8 @@ import java.util.List;
 import java.util.Random;
 
 import net.sparktank.morrigan.model.MediaItem;
-import net.sparktank.morrigan.model.MediaList;
+import net.sparktank.morrigan.model.MediaTrack;
+import net.sparktank.morrigan.model.MediaTrackList;
 
 public class OrderHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -61,7 +62,7 @@ public class OrderHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	// TODO take into account disabled and missing tracks.
-	public static MediaItem getNextTrack (MediaList<? extends MediaItem> list, MediaItem track, PlaybackOrder mode) {
+	public static MediaTrack getNextTrack (MediaTrackList<? extends MediaItem> list, MediaItem track, PlaybackOrder mode) {
 		if (list.getCount() <= 0) return null;
 		
 		switch (mode) {
@@ -85,9 +86,9 @@ public class OrderHelper {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private static MediaItem getNextTrackSequencial (MediaList<? extends MediaItem> list, MediaItem track) {
-		MediaItem ret = null;
-		List<? extends MediaItem> mediaTracks = list.getMediaTracks();
+	private static MediaTrack getNextTrackSequencial (MediaTrackList<? extends MediaItem> list, MediaItem track) {
+		MediaTrack ret = null;
+		List<? extends MediaTrack> mediaTracks = list.getMediaTracks();
 		
 		int i;
 		if (track != null && mediaTracks.contains(track)) {
@@ -122,9 +123,9 @@ public class OrderHelper {
 		return ret;
 	}
 	
-	private static MediaItem getNextTrackRandom (MediaList<? extends MediaItem> list, MediaItem current) {
+	private static MediaTrack getNextTrackRandom (MediaTrackList<? extends MediaItem> list, MediaItem current) {
 		Random generator = new Random();
-		List<? extends MediaItem> mediaTracks = list.getMediaTracks();
+		List<? extends MediaTrack> mediaTracks = list.getMediaTracks();
 		
 		int n = 0;
 		for (MediaItem mi : mediaTracks) {
@@ -135,7 +136,7 @@ public class OrderHelper {
 		if (n == 0) return null;
 		
 		long x = Math.round(generator.nextDouble() * n);
-		for (MediaItem mi : mediaTracks) {
+		for (MediaTrack mi : mediaTracks) {
 			if (mi.isEnabled() && !mi.isMissing() && mi != current) {
 				x--;
 				if (x<=0) {
@@ -147,13 +148,13 @@ public class OrderHelper {
 		throw new RuntimeException("Failed to find next track.  This should not happen.");
 	}
 	
-	private static MediaItem getNextTrackByStartCount (MediaList<? extends MediaItem> list, MediaItem current) {
-		MediaItem ret = null;
-		List<? extends MediaItem> tracks = list.getMediaTracks();
+	private static MediaTrack getNextTrackByStartCount (MediaTrackList<? extends MediaItem> list, MediaItem current) {
+		MediaTrack ret = null;
+		List<? extends MediaTrack> tracks = list.getMediaTracks();
 		
 		// Find highest play count.
 		long maxPlayCount = -1;
-		for (MediaItem i : tracks) {
+		for (MediaTrack i : tracks) {
 			if (i.getStartCount() > maxPlayCount && i.isEnabled() && !i.isMissing() && i != current) {
 				maxPlayCount = i.getStartCount();
 			}
@@ -165,7 +166,7 @@ public class OrderHelper {
 		
 		// Find sum of all selection indicies.
 		long selIndexSum = 0;
-		for (MediaItem i : tracks) {
+		for (MediaTrack i : tracks) {
 			if (i.isEnabled() && !i.isMissing() && i != current) {
 				selIndexSum = selIndexSum + (maxPlayCount - i.getStartCount());
 			}
@@ -176,7 +177,7 @@ public class OrderHelper {
 		long targetIndex = Math.round(generator.nextDouble() * selIndexSum);
 		
 		// Find the target item.
-		for (MediaItem i : tracks) {
+		for (MediaTrack i : tracks) {
 			if (i.isEnabled() && !i.isMissing() && i != current) {
 				targetIndex = targetIndex - (maxPlayCount - i.getStartCount());
 				if (targetIndex <= 0) {
@@ -193,9 +194,9 @@ public class OrderHelper {
 		return ret;
 	}
 	
-	private static MediaItem getNextTrackByLastPlayedDate (MediaList<? extends MediaItem> list, MediaItem current) {
-		MediaItem ret = null;
-		List<? extends MediaItem> tracks = list.getMediaTracks();
+	private static MediaTrack getNextTrackByLastPlayedDate (MediaTrackList<? extends MediaItem> list, MediaItem current) {
+		MediaTrack ret = null;
+		List<? extends MediaTrack> tracks = list.getMediaTracks();
 		Date now = new Date();
 		
 		// Find oldest date.
@@ -231,7 +232,7 @@ public class OrderHelper {
 		long targetIndex = Math.round(generator.nextDouble() * sumAgeDays);
 		
 		// Find the target item.
-		for (MediaItem i : tracks) {
+		for (MediaTrack i : tracks) {
 			if (i.isEnabled() && !i.isMissing() && i != current) {
 				if (i.getDateLastPlayed() != null) {
 					targetIndex = targetIndex - dateDiffDays(i.getDateLastPlayed(), now);

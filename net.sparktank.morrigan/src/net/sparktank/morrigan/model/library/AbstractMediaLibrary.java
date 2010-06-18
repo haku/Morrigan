@@ -7,11 +7,12 @@ import java.util.List;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.MediaItem;
-import net.sparktank.morrigan.model.MediaList;
+import net.sparktank.morrigan.model.MediaTrack;
+import net.sparktank.morrigan.model.MediaTrackList;
 import net.sparktank.morrigan.model.library.SqliteLayer.LibrarySort;
 import net.sparktank.morrigan.model.library.SqliteLayer.LibrarySortDirection;
 
-public abstract class AbstractMediaLibrary extends MediaList<MediaLibraryItem> {
+public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryItem> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static final boolean HIDEMISSING = true; // TODO link this to GUI?
@@ -177,13 +178,13 @@ public abstract class AbstractMediaLibrary extends MediaList<MediaLibraryItem> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
-	public void incTrackStartCnt (MediaItem track, long n) throws MorriganException {
+	public void incTrackStartCnt (MediaTrack track, long n) throws MorriganException {
 		super.incTrackStartCnt(track, n);
 		dbLayer.incTrackStartCnt(track.getFilepath(), n);
 	}
 	
 	@Override
-	public void incTrackEndCnt (MediaItem track, long n) throws MorriganException {
+	public void incTrackEndCnt (MediaTrack track, long n) throws MorriganException {
 		super.incTrackEndCnt(track, n);
 		dbLayer.incTrackEndCnt(track.getFilepath(), n);
 	}
@@ -223,19 +224,19 @@ public abstract class AbstractMediaLibrary extends MediaList<MediaLibraryItem> {
 	}
 	
 	@Override
-	public void incTrackStartCnt(MediaItem track) throws MorriganException {
+	public void incTrackStartCnt(MediaTrack track) throws MorriganException {
 		super.incTrackStartCnt(track);
 		dbLayer.incTrackPlayed(track.getFilepath());
 	}
 	
 	@Override
-	public void incTrackEndCnt(MediaItem track) throws MorriganException {
+	public void incTrackEndCnt(MediaTrack track) throws MorriganException {
 		super.incTrackEndCnt(track);
 		dbLayer.incTrackFinished(track.getFilepath());
 	}
 	
 	@Override
-	public void setTrackDuration(MediaItem track, int duration) throws MorriganException {
+	public void setTrackDuration(MediaTrack track, int duration) throws MorriganException {
 		super.setTrackDuration(track, duration);
 		dbLayer.setTrackDuration(track.getFilepath(), duration);
 	}

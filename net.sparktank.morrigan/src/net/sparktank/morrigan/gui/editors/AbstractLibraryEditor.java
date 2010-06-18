@@ -9,7 +9,7 @@ import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.dialogs.RunnableDialog;
 import net.sparktank.morrigan.gui.display.DropMenuListener;
 import net.sparktank.morrigan.helpers.TimeHelper;
-import net.sparktank.morrigan.model.MediaList.DurationData;
+import net.sparktank.morrigan.model.MediaTrackList.DurationData;
 import net.sparktank.morrigan.model.library.AbstractMediaLibrary;
 import net.sparktank.morrigan.model.library.MediaLibraryItem;
 import net.sparktank.morrigan.model.library.AbstractMediaLibrary.SortChangeListener;
