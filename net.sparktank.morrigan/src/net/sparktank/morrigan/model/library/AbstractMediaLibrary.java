@@ -12,7 +12,7 @@ import net.sparktank.morrigan.model.MediaTrackList;
 import net.sparktank.morrigan.model.library.SqliteLayer.LibrarySort;
 import net.sparktank.morrigan.model.library.SqliteLayer.LibrarySortDirection;
 
-public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryItem> {
+public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTrack> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static final boolean HIDEMISSING = true; // TODO link this to GUI?
@@ -72,7 +72,7 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryIt
 		System.err.println("[?] reading... " + getType() + " " + getListName() + "...");
 		
 		long t0 = System.currentTimeMillis();
-		List<MediaLibraryItem> allMedia = dbLayer.updateListOfAllMedia(getMediaTracks(), librarySort, librarySortDirection, HIDEMISSING);
+		List<MediaLibraryTrack> allMedia = dbLayer.updateListOfAllMedia(getMediaTracks(), librarySort, librarySortDirection, HIDEMISSING);
 		long l0 = System.currentTimeMillis() - t0;
 		
 		long t1 = System.currentTimeMillis();
@@ -120,9 +120,9 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryIt
 	 * @return
 	 * @throws MorriganException
 	 */
-	public List<MediaLibraryItem> getAllLibraryEntries () throws MorriganException {
-		ArrayList<MediaLibraryItem> copyOfMainList = new ArrayList<MediaLibraryItem>(getMediaTracks());
-		List<MediaLibraryItem> allList = dbLayer.getAllMedia(LibrarySort.FILE, LibrarySortDirection.ASC, false);
+	public List<MediaLibraryTrack> getAllLibraryEntries () throws MorriganException {
+		ArrayList<MediaLibraryTrack> copyOfMainList = new ArrayList<MediaLibraryTrack>(getMediaTracks());
+		List<MediaLibraryTrack> allList = dbLayer.getAllMedia(LibrarySort.FILE, LibrarySortDirection.ASC, false);
 		updateList(copyOfMainList, allList);
 		return copyOfMainList;
 	}
@@ -171,7 +171,7 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryIt
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public List<MediaLibraryItem> simpleSearch (String term, String esc, int maxResults) throws DbException {
+	public List<MediaLibraryTrack> simpleSearch (String term, String esc, int maxResults) throws DbException {
 		return dbLayer.simpleSearch(term, esc, maxResults);
 	}
 	
@@ -210,8 +210,8 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryIt
 		super.removeMediaTrack(track);
 		int n = dbLayer.removeFile(track.getFilepath());
 		if (n != 1) {
-			if (track instanceof MediaLibraryItem) {
-				MediaLibraryItem mli = (MediaLibraryItem) track;
+			if (track instanceof MediaLibraryTrack) {
+				MediaLibraryTrack mli = (MediaLibraryTrack) track;
 				n = dbLayer.removeFile(mli.getDbRowId());
 				if (n != 1) {
 					throw new MorriganException("Failed to remove entry from DB by ROWID '"+mli.getDbRowId()+"' '"+track.getFilepath()+"'.");
@@ -265,12 +265,12 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryIt
 		dbLayer.setMissing(track.getFilepath(), value);
 	}
 	
-	public void setRemoteLocation (MediaLibraryItem track, String remoteLocation) throws DbException {
+	public void setRemoteLocation (MediaLibraryTrack track, String remoteLocation) throws DbException {
 		track.setRemoteLocation(remoteLocation);
 		dbLayer.setRemoteLocation(track.getFilepath(), remoteLocation);
 	}
 	
-	public void persistTrackData (MediaLibraryItem track) throws DbException {
+	public void persistTrackData (MediaLibraryTrack track) throws DbException {
 		dbLayer.setTrackDuration(track.getFilepath(), track.getDuration());
 		dbLayer.setHashcode(track.getFilepath(), track.getHashcode());
 		dbLayer.setTrackStartCnt(track.getFilepath(), track.getStartCount());
@@ -305,27 +305,27 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryIt
 	 * Returns true if the file was added.
 	 * (i.e. it was not already in the library)
 	 */
-	public MediaLibraryItem addFile (File file) throws MorriganException {
-		MediaLibraryItem track = null;
+	public MediaLibraryTrack addFile (File file) throws MorriganException {
+		MediaLibraryTrack track = null;
 		boolean added = dbLayer.addFile(file);
 		if (added) {
-			track = new MediaLibraryItem(file.getAbsolutePath());
+			track = new MediaLibraryTrack(file.getAbsolutePath());
 			addTrack(track);
 		}
 		return track;
 	}
 	
-	private List<MediaLibraryItem> _changedItems = null;
+	private List<MediaLibraryTrack> _changedItems = null;
 	
 	public void beginBulkUpdate () {
-		_changedItems = new ArrayList<MediaLibraryItem>();
+		_changedItems = new ArrayList<MediaLibraryTrack>();
 	}
 	
 	public void completeBulkUpdate () throws MorriganException {
 		try {
-			List<MediaLibraryItem> removed = replaceList(_changedItems);
+			List<MediaLibraryTrack> removed = replaceList(_changedItems);
 			System.err.println("About to clean " + removed.size() + " items...");
-			for (MediaLibraryItem i : removed) {
+			for (MediaLibraryTrack i : removed) {
 				_removeMediaTrack(i);
 			}
 		} finally {
@@ -333,8 +333,8 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryIt
 		}
 	}
 	
-	public void updateItem (MediaLibraryItem mi) throws MorriganException {
-		MediaLibraryItem track = null;
+	public void updateItem (MediaLibraryTrack mi) throws MorriganException {
+		MediaLibraryTrack track = null;
 		
 		boolean added = dbLayer.addFile(mi.getFilepath(), -1);
 		if (added) {
@@ -344,7 +344,7 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryIt
 			
 		} else {
 			// Update item.
-			List<MediaLibraryItem> mediaTracks = getMediaTracks();
+			List<MediaLibraryTrack> mediaTracks = getMediaTracks();
 			int index = mediaTracks.indexOf(mi);
 			if (index >= 0) {
 				track = mediaTracks.get(index);

@@ -11,7 +11,7 @@ import net.sparktank.morrigan.gui.display.DropMenuListener;
 import net.sparktank.morrigan.helpers.TimeHelper;
 import net.sparktank.morrigan.model.MediaTrackList.DurationData;
 import net.sparktank.morrigan.model.library.AbstractMediaLibrary;
-import net.sparktank.morrigan.model.library.MediaLibraryItem;
+import net.sparktank.morrigan.model.library.MediaLibraryTrack;
 import net.sparktank.morrigan.model.library.AbstractMediaLibrary.SortChangeListener;
 import net.sparktank.morrigan.model.library.SqliteLayer.LibrarySort;
 import net.sparktank.morrigan.model.library.SqliteLayer.LibrarySortDirection;
@@ -31,7 +31,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 
-public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> extends MediaTrackListEditor<AbstractMediaLibrary, MediaLibraryItem> {
+public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> extends MediaTrackListEditor<AbstractMediaLibrary, MediaLibraryTrack> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public AbstractLibraryEditor () {

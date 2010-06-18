@@ -5,7 +5,7 @@ import java.util.Date;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.TaskEventListener;
-import net.sparktank.morrigan.model.library.MediaLibraryItem;
+import net.sparktank.morrigan.model.library.MediaLibraryTrack;
 import net.sparktank.morrigan.model.library.remote.RemoteMediaLibrary;
 import net.sparktank.morrigan.server.HttpClient;
 import net.sparktank.morrigan.server.feedwriters.XmlHelper;
@@ -61,7 +61,7 @@ public class MediaListFeedParser {
 				throw new FeedParseException("Entry contains no elements.");
 			}
 			
-			MediaLibraryItem mi = new MediaLibraryItem();
+			MediaLibraryTrack mi = new MediaLibraryTrack();
 			
 			for (int i = 0; i < childNodes.getLength(); i++) {
 				Node item = childNodes.item(i);
