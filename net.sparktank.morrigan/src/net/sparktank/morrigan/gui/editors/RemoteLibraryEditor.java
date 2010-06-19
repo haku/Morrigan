@@ -47,13 +47,15 @@ public class RemoteLibraryEditor extends AbstractLibraryEditor<RemoteMediaLibrar
 	protected void readInputData() throws MorriganException {
 		getMediaList().readFromCache();
 		
-		RemoteLibraryUpdateTask task = RemoteLibraryUpdateTask.FACTORY.manufacture(getMediaList());
-		if (task != null) {
-			TaskJob job = new TaskJob(task, getSite().getShell().getDisplay());
-			job.schedule(3000);
-		}
-		else {
-			new MorriganMsgDlg("An update is already running for this library.").open();
+		if (getMediaList().isCacheExpired()) {
+			RemoteLibraryUpdateTask task = RemoteLibraryUpdateTask.FACTORY.manufacture(getMediaList());
+			if (task != null) {
+				TaskJob job = new TaskJob(task, getSite().getShell().getDisplay());
+				job.schedule(3000);
+			}
+			else {
+				new MorriganMsgDlg("An update is already running for this library.").open();
+			}
 		}
 	}
 	
