@@ -819,8 +819,8 @@ public class SqliteLayer {
 		 */
 		while (rs.next()) {
 			MediaLibraryTrack newItem = new MediaLibraryTrack();
-			newItem.setDbRowId(rs.getLong(SQL_TBL_MEDIAFILES_COL_ROWID));
 			newItem.setFilepath(rs.getString(SQL_TBL_MEDIAFILES_COL_FILE));
+			newItem.setDbRowId(rs.getLong(SQL_TBL_MEDIAFILES_COL_ROWID));
 			newItem.setDateAdded(readDate(rs, SQL_TBL_MEDIAFILES_COL_DADDED));
 			newItem.setStartCount(rs.getLong(SQL_TBL_MEDIAFILES_COL_STARTCNT));
 			newItem.setEndCount(rs.getLong(SQL_TBL_MEDIAFILES_COL_ENDCNT));
@@ -849,8 +849,8 @@ public class SqliteLayer {
 		
 		while (rs.next()) {
 			MediaLibraryTrack mt = new MediaLibraryTrack();
-			mt.setDbRowId(rs.getLong(SQL_TBL_MEDIAFILES_COL_ROWID));
 			mt.setFilepath(rs.getString(SQL_TBL_MEDIAFILES_COL_FILE));
+			mt.setDbRowId(rs.getLong(SQL_TBL_MEDIAFILES_COL_ROWID));
 			mt.setDateAdded(readDate(rs, SQL_TBL_MEDIAFILES_COL_DADDED));
 			mt.setStartCount(rs.getLong(SQL_TBL_MEDIAFILES_COL_STARTCNT));
 			mt.setEndCount(rs.getLong(SQL_TBL_MEDIAFILES_COL_ENDCNT));
