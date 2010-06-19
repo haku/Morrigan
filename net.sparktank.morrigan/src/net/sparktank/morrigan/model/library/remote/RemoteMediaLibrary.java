@@ -20,6 +20,7 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 	public static final String TYPE = "REMOTELIBRARY";
 	
 	public static final String DBKEY_SERVERURL = "SERVERURL";
+	public static final String DBKEY_CACHEDATE = "CACHEDATE";
 
 	private final URL url;
 
@@ -37,6 +38,8 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 		} else {
 			throw new IllegalArgumentException("serverUrl not found in localDbLayer ('"+localDbLayer.getDbFilePath()+"').");
 		}
+		
+		readCacheDate();
 	}
 	
 	public RemoteMediaLibrary (String libraryName, URL url, SqliteLayer localDbLayer) throws DbException {
@@ -52,6 +55,26 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 			throw new IllegalArgumentException("serverUrl does not match localDbLayer ('"+url.toExternalForm()+"' != '"+s+"' in '"+localDbLayer.getDbFilePath()+"').");
 		}
 		
+		readCacheDate();
+	}
+	
+	private void readCacheDate () throws DbException {
+		String dateString = getDbLayer().getProp(DBKEY_CACHEDATE);
+		if (dateString != null) {
+			long date = Long.parseLong(dateString);
+			if (date > 0) {
+				cacheDate = date;
+				System.err.println("Read cachedate=" + cacheDate + ".");
+			}
+		}
+		else {
+			cacheDate = -1;
+		}
+	}
+	
+	private void writeCacheDate () throws DbException {
+		getDbLayer().setProp(DBKEY_CACHEDATE, String.valueOf(cacheDate));
+		System.err.println("Wrote cachedate=" + cacheDate + ".");
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -74,13 +97,16 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	public static long MAX_CACHE_AGE = 60 * 60 * 1000;
+	
 	private long cacheDate = -1;
 	
-	/**
-	 * TODO this will be useful when I start pushing data back to the server.
-	 */
-	public void invalidateCache () {
-		cacheDate = -1;
+	public long getCacheAge () {
+		return new Date().getTime() - cacheDate;
+	}
+	
+	public boolean isCacheExpired () {
+		return (getCacheAge() > MAX_CACHE_AGE); // 1 hour.  TODO extract this as config.
 	}
 	
 	public void readFromCache () throws MorriganException {
@@ -89,24 +115,27 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 	
 	@Override
 	protected void doRead() throws MorriganException {
-		long age = new Date().getTime() - cacheDate;
-		if (age > 60 * 60 * 1000) { // 1 hour.  TODO extract this as config.
-			if (cacheDate > 0) {
-				System.err.println("Cache for '" + getListName() + "' is " + age + " old, reading data from " + url.toExternalForm() + " ...");
-			} else {
-				System.err.println("Cache invalidated, reading data from " + url.toExternalForm() + " ...");
-			}
-			
+		if (isCacheExpired()) {
+			System.err.println("Cache for '" + getListName() + "' is " + getCacheAge() + " old, reading data from " + url.toExternalForm() + " ...");
+			forceDoRead();
+		}
+		else {
+			System.err.println("Not refreshing as '" + getListName() + "' cache is only " + getCacheAge() + " old.");
+			super.doRead(); // This forces a DB query - sorts entries.)
+		}
+	}
+	
+	public void forceDoRead () throws MorriganException {
+		try {
 			// This does the actual HTTP fetch.
 			MediaListFeedParser2.parseFeed(this, taskEventListener);
 			
 			cacheDate = new Date().getTime();
+			writeCacheDate();
 			
-		} else {
-			System.err.println("Not refreshing as '" + getListName() + "' cache is only " + age + " old.");
+		} finally {
+			super.doRead(); // This forces a DB query - sorts entries.)
 		}
-		
-		super.doRead(); // This forces a DB query - sorts entries.
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
