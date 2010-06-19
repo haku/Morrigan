@@ -32,10 +32,10 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTr
 	}
 	
 	@Override
-		protected void finalize() throws Throwable {
-			dbLayer.dispose();
-			super.finalize();
-		}
+	protected void finalize() throws Throwable {
+		dbLayer.dispose();
+		super.finalize();
+	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -44,6 +44,10 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTr
 	@Override
 	public String getSerial() {
 		return dbLayer.getDbFilePath();
+	}
+	
+	protected SqliteLayer getDbLayer() {
+		return dbLayer;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -65,7 +69,6 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTr
 	public void read () throws MorriganException {
 		if (!firstRead) return;
 		doRead();
-		firstRead = false;
 	}
 	
 	protected void doRead () throws MorriganException {
@@ -81,6 +84,8 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTr
 		
 		System.err.println("[" + l0 + "," + l1 + " ms] " + getType() + " " + getListName());
 		durationOfLastRead = l0+l1;
+		
+		firstRead = false;
 	}
 	
 	/**
@@ -103,6 +108,8 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTr
 	public void updateRead () throws MorriganException {
 		if (!firstRead) {
 			reRead();
+		} else {
+			System.err.println("updateRead() : Skipping reRead() because its un-needed.");
 		}
 	}
 	
@@ -325,12 +332,17 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTr
 		_changedItems = new ArrayList<MediaLibraryTrack>();
 	}
 	
-	public void completeBulkUpdate () throws MorriganException {
+	public void completeBulkUpdate (boolean thereWereErrors) throws MorriganException {
 		try {
 			List<MediaLibraryTrack> removed = replaceList(_changedItems);
-			System.err.println("About to clean " + removed.size() + " items...");
-			for (MediaLibraryTrack i : removed) {
-				_removeMediaTrack(i);
+			if (!thereWereErrors) {
+				System.err.println("About to clean " + removed.size() + " items...");
+				for (MediaLibraryTrack i : removed) {
+					_removeMediaTrack(i);
+				}
+			}
+			else {
+				System.err.println("Errors occured, skipping delete.");
 			}
 		} finally {
 			_changedItems = null;
