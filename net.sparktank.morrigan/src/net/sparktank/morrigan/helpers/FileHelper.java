@@ -45,10 +45,10 @@ public class FileHelper {
 				catch (IOException e) {
 					if (e.getMessage().contains("Insufficient system resources exist to complete the requested service")) {
 						chunkSizeMb--;
-						System.err.println("Reduced chunk size to " + chunkSizeMb + " mb.");
-						if (chunkSizeMb == 0) {
-							transferDone = true;
+						if (chunkSizeMb <= 0) {
+							throw e; // We have run out of options.
 						}
+						System.err.println("Reduced chunk size to " + chunkSizeMb + " mb.");
 						if (srcChannel != null) {
 							srcChannel.close();
 						}
