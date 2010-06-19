@@ -26,13 +26,15 @@ public class MediaListFeedParser {
 			throw new MorriganException(e);
 		}
 		
+		boolean thereWereErrors = true;
 		try {
 			library.setAutoCommit(false);
 			library.beginBulkUpdate();
 			FeedParser.parseFeed(xmlString, taskEventListener, new EntryHandler(library));
+			thereWereErrors = false;
 		} finally {
 			try {
-				library.completeBulkUpdate();
+				library.completeBulkUpdate(thereWereErrors);
 			} finally {
 				try {
 					library.commit();
