@@ -26,7 +26,11 @@ public class MediaLibraryTrack extends MediaTrack {
 		return dbRowId;
 	}
 	public boolean setDbRowId(long dbRowId) {
-		if (this.dbRowId != dbRowId) {
+		/* Sqlite ROWID starts at 1, so if something tries to set it
+		 * less than this, don't let them clear it.
+		 * This is most likely when fetching a remote list over HTTP.
+		 */
+		if (dbRowId > 0 && this.dbRowId != dbRowId) {
 			this.dbRowId = dbRowId;
 			return true;
 		}
