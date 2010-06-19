@@ -28,7 +28,7 @@ public class MediaFileCopyTask implements IMorriganTask {
 	
 	@Override
 	public String getTitle() {
-		return "Copying files";
+		return "Copying " + mediaSelection.size() + " files";
 	}
 
 	@Override
@@ -36,7 +36,7 @@ public class MediaFileCopyTask implements IMorriganTask {
 		TaskResult ret;
 		
 		try {
-			taskEventListener.beginTask("Copying " + mediaSelection.size() + " files", mediaSelection.size());
+			taskEventListener.beginTask("Copying", mediaSelection.size());
 			
 			for (MediaItem mi : mediaSelection) {
 				taskEventListener.subTask(mi.getTitle());
