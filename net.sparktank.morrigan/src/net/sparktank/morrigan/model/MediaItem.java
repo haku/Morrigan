@@ -34,7 +34,7 @@ public class MediaItem {
 	}
 	public boolean setFilepath (String filePath) {
 		if (!EqualHelper.areEqual(this.filepath, filePath)) {
-			filepath = filePath;
+			this.filepath = filePath;
 			return true;
 		}
 		return false;
