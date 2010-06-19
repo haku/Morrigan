@@ -40,6 +40,7 @@ public class MediaListFeedParser2 extends DefaultHandler {
 		IHttpStreamHandler httpStreamHandler = new IHttpStreamHandler () {
 			@Override
 			public void handleStream(InputStream is) throws MorriganException {
+				boolean thereWereErrors = true;
 				try {
 					library.setAutoCommit(false);
 					library.beginBulkUpdate();
@@ -57,9 +58,10 @@ public class MediaListFeedParser2 extends DefaultHandler {
 					} catch (IOException e) {
 						throw new MorriganException(e);
 					}
+					thereWereErrors = false;
 				} finally {
 					try {
-						library.completeBulkUpdate();
+						library.completeBulkUpdate(thereWereErrors);
 					} finally {
 						try {
 							library.commit();
