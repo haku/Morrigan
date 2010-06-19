@@ -13,29 +13,61 @@ public class FileHelper {
 		copyFile(sourceFile, destFile, false);
 	}
 	
-	static public void copyFile(File sourceFile, File destFile, boolean overWrite) throws IOException {
-		if (destFile.exists()) {
+	static public void copyFile(File srcFile, File dstFile, boolean overWrite) throws IOException {
+		if (dstFile.exists()) {
 			if (!overWrite) {
 				throw new IllegalArgumentException("Target file already exists.");
 			}
 		} else {
-			destFile.createNewFile();
+			dstFile.createNewFile();
 		}
 		
-		FileChannel source = null;
-		FileChannel destination = null;
+		FileChannel srcChannel = null;
+		FileChannel dstChannel = null;
 		
 		try {
-			source = new FileInputStream(sourceFile).getChannel();
-			destination = new FileOutputStream(destFile).getChannel();
-			destination.transferFrom(source, 0, source.size());
+			boolean transferDone = false;
+			int chunkSizeMb = 64;
+			
+			while (!transferDone) {
+				srcChannel = new FileInputStream(srcFile).getChannel();
+				dstChannel = new FileOutputStream(dstFile).getChannel();
+				
+				try {
+					int maxCount = (chunkSizeMb * 1024 * 1024) - (32 * 1024);
+					long size = srcChannel.size();
+					long position = 0;
+					while (position < size) {
+						position += srcChannel.transferTo(position, maxCount, dstChannel);
+					}
+					transferDone = true;
+				}
+				catch (IOException e) {
+					if (e.getMessage().contains("Insufficient system resources exist to complete the requested service")) {
+						chunkSizeMb--;
+						System.err.println("Reduced chunk size to " + chunkSizeMb + " mb.");
+						if (chunkSizeMb == 0) {
+							transferDone = true;
+						}
+						if (srcChannel != null) {
+							srcChannel.close();
+						}
+						if (dstChannel != null) {
+							dstChannel.close();
+						}
+					} else {
+						throw e;
+					}
+					
+				}
+			}
 		}
 		finally {
-			if (source != null) {
-				source.close();
+			if (srcChannel != null) {
+				srcChannel.close();
 			}
-			if (destination != null) {
-				destination.close();
+			if (dstChannel != null) {
+				dstChannel.close();
 			}
 		}
 	}
