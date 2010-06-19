@@ -329,6 +329,7 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTr
 	private List<MediaLibraryTrack> _changedItems = null;
 	
 	public void beginBulkUpdate () {
+		if (_changedItems != null) throw new IllegalArgumentException("beginBulkUpdate() : Build update alredy in progress.");
 		_changedItems = new ArrayList<MediaLibraryTrack>();
 	}
 	
@@ -336,13 +337,13 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTr
 		try {
 			List<MediaLibraryTrack> removed = replaceList(_changedItems);
 			if (!thereWereErrors) {
-				System.err.println("About to clean " + removed.size() + " items...");
+				System.err.println("completeBulkUpdate() : About to clean " + removed.size() + " items...");
 				for (MediaLibraryTrack i : removed) {
 					_removeMediaTrack(i);
 				}
 			}
 			else {
-				System.err.println("Errors occured, skipping delete.");
+				System.err.println("completeBulkUpdate() : Errors occured, skipping delete.");
 			}
 		} finally {
 			_changedItems = null;
@@ -365,7 +366,7 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTr
 			if (index >= 0) {
 				track = mediaTracks.get(index);
 			} else {
-				throw new MorriganException("Failed to find item '"+mi.getFilepath()+"' in list '"+this+"'.");
+				throw new MorriganException("updateItem() : Failed to find item '"+mi.getFilepath()+"' in list '"+this+"'.");
 			}
 			if (track.setFromMediaItem(mi)) {
 				setDirtyState(DirtyState.DIRTY); // just to trigger change events.
