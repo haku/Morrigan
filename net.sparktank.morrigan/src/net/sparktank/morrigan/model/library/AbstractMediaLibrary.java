@@ -333,14 +333,17 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTr
 		_changedItems = new ArrayList<MediaLibraryTrack>();
 	}
 	
+	/**
+	 * This method does NOT update the in-memory model or the UI,
+	 * but instead assume you are about to re-query the DB.
+	 * You will want to do this to get fresh data that is sorted
+	 * in the correct order.
+	 * @param thereWereErrors
+	 * @throws MorriganException
+	 */
 	public void completeBulkUpdate (boolean thereWereErrors) throws MorriganException {
 		try {
-			/* FIXME stop replaceList() triggering a GUI refresh?
-			 * After a remote update, this causes it temp. to sort wrong
-			 * as we will be showing the remote sort order, not the
-			 * local sort order.
-			 */
-			List<MediaLibraryTrack> removed = replaceList(_changedItems);
+			List<MediaLibraryTrack> removed = replaceListWithoutSetDirty(_changedItems);
 			if (!thereWereErrors) {
 				System.err.println("completeBulkUpdate() : About to clean " + removed.size() + " items...");
 				for (MediaLibraryTrack i : removed) {
@@ -356,6 +359,10 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTr
 	}
 	
 	public void updateItem (MediaLibraryTrack mi) throws MorriganException {
+		if (_changedItems == null) {
+			throw new IllegalArgumentException("updateItem() can only be called after beginBulkUpdate() and before completeBulkUpdate().");
+		}
+		
 		MediaLibraryTrack track = null;
 		
 		boolean added = dbLayer.addFile(mi.getFilepath(), -1);

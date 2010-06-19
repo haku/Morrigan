@@ -156,6 +156,16 @@ public abstract class MediaItemList<T extends MediaItem> {
 		return ret;
 	}
 	
+	/**
+	 * Use this variant when you are about to to re-query the DB anyway
+	 * and don't want to do two successive updates. 
+	 * @param newTracks
+	 * @return items that are removed.
+	 */
+	protected List<T> replaceListWithoutSetDirty (List<T> newTracks) {
+		return updateList(this.mediaTracks, newTracks, false);
+	}
+	
 	public void addTrack (T track) {
 		if (allowDuplicateEntries() || !mediaTracks.contains(track)) {
 			mediaTracks.add(track);
@@ -212,6 +222,10 @@ public abstract class MediaItemList<T extends MediaItem> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Typed helper methods.
 	
+	public List<T> updateList (List<T> keepList, List<T> freshList) {
+		return updateList(keepList, freshList, true);
+	}
+	
 	/**
 	 * Update keepList without replacing any equivalent
 	 * objects.  Instead copy the data from the new
@@ -222,7 +236,7 @@ public abstract class MediaItemList<T extends MediaItem> {
 	 * @param freshList
 	 * @return items that were removed from keepList.
 	 */
-	public List<T> updateList (List<T> keepList, List<T> freshList) {
+	public List<T> updateList (List<T> keepList, List<T> freshList, boolean UpdateKeepList) {
 		List<T> finalList = new ArrayList<T>();
 		
 		synchronized (keepList) {
@@ -267,8 +281,10 @@ public abstract class MediaItemList<T extends MediaItem> {
 				 * the passed in list, not return a new one.
 				 * This block takes no time.
 				 */
-				keepList.clear();
-				keepList.addAll(finalList);
+				if (UpdateKeepList) {
+					keepList.clear();
+					keepList.addAll(finalList);
+				}
 				
 				return removedItems;
 			}
