@@ -18,9 +18,9 @@ import net.sparktank.morrigan.model.playlist.MediaPlaylist;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
@@ -130,15 +130,6 @@ public class PlaylistEditor extends MediaTrackListEditor<MediaPlaylist,MediaTrac
 	protected void createControls(Composite parent) {
 		//	Dependencies.
 		makeIcons();
-		
-		// Context menu.
-		MenuManager contextMenuMgr = new MenuManager();
-		contextMenuMgr.add(addToQueueAction);
-		contextMenuMgr.add(getAddToMenu());
-		contextMenuMgr.add(new Separator());
-		contextMenuMgr.add(toggleEnabledAction);
-		contextMenuMgr.add(removeAction);
-		setTableMenu(contextMenuMgr.createContextMenu(parent));
 	}
 	
 	@Override
@@ -171,6 +162,15 @@ public class PlaylistEditor extends MediaTrackListEditor<MediaPlaylist,MediaTrac
 		ret.add(btnSave);
 		
 		return ret;
+	}
+	
+	@Override
+	protected void populateContextMenu(List<IContributionItem> menu0, List<IContributionItem> menu1) {
+		menu0.add(new ActionContributionItem(addToQueueAction));
+		menu0.add(getAddToMenu());
+		
+		menu1.add(new ActionContributionItem(toggleEnabledAction));
+		menu1.add(new ActionContributionItem(removeAction));
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

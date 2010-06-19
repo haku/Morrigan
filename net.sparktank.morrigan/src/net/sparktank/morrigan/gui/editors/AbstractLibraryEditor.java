@@ -9,6 +9,7 @@ import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.dialogs.RunnableDialog;
 import net.sparktank.morrigan.gui.display.DropMenuListener;
 import net.sparktank.morrigan.helpers.TimeHelper;
+import net.sparktank.morrigan.model.MediaItem;
 import net.sparktank.morrigan.model.MediaTrackList.DurationData;
 import net.sparktank.morrigan.model.library.AbstractMediaLibrary;
 import net.sparktank.morrigan.model.library.MediaLibraryTrack;
@@ -18,6 +19,9 @@ import net.sparktank.morrigan.model.library.SqliteLayer.LibrarySortDirection;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.ActionContributionItem;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
@@ -135,6 +139,11 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> exte
 		ret.add(btnProperties);
 		
 		return ret;
+	}
+	
+	@Override
+	protected void populateContextMenu(List<IContributionItem> menu0, List<IContributionItem> menu1) {
+		menu0.add(new ActionContributionItem(copyToAction));
 	}
 	
 	protected MenuManager getPrefMenuMgr () {
@@ -285,6 +294,18 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> exte
 		}
 		
 	}
+	
+	protected IAction copyToAction = new Action("Copy file to ...") {
+		public void run () {
+			StringBuilder sb = new StringBuilder();
+			sb.append("TODO: copy files:\n");
+			for (MediaItem track : getSelectedTracks()) {
+				sb.append(track.getFilepath());
+				sb.append("\n");
+			}
+			new MorriganMsgDlg(sb.toString()).open();
+		}
+	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
