@@ -193,13 +193,15 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 						BufferedInputStream bis = new BufferedInputStream(is);
 						BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(targetFile));
 						
-						// FIXME this is ubertastically slow.
+						// FIXME this could probably be done better.
 						try {
-							int i;
-							while ((i = bis.read()) != -1) {
-								bos.write(i);
+							byte[] buffer = new byte[4096];
+							int bytesRead;
+							while ((bytesRead = bis.read(buffer)) != -1) {
+							  bos.write(buffer, 0, bytesRead);
 							}
-						} finally {
+						}
+						finally {
 							bos.close();
 						}
 
