@@ -147,9 +147,11 @@ public class MediaHandler extends AbstractHandler {
 			outputStream = response.getOutputStream();
 			
 			BufferedInputStream buf = new BufferedInputStream(fileInputStream);
-			int readBytes = 0;
-			while ((readBytes = buf.read()) != -1) {
-				outputStream.write(readBytes);
+			// FIXME this could be done better?
+			byte[] buffer = new byte[4096];
+			int bytesRead;
+			while ((bytesRead = buf.read(buffer)) != -1) {
+				outputStream.write(buffer, 0, bytesRead);
 			}
 			outputStream.flush();
 			
