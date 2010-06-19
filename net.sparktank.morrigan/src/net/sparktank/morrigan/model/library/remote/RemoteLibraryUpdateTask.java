@@ -60,8 +60,7 @@ public class RemoteLibraryUpdateTask implements IMorriganTask {
 		
 		try {
 			mediaLibrary.setTaskEventListener(taskEventListener);
-			mediaLibrary.invalidateCache();
-			mediaLibrary.reRead();
+			mediaLibrary.forceDoRead();
 			ret = new TaskResult(TaskOutcome.SUCCESS);
 			
 		} catch (Exception e) {
