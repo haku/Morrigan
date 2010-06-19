@@ -2,6 +2,7 @@ package net.sparktank.morrigan.gui.editors;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
@@ -20,9 +21,11 @@ import net.sparktank.morrigan.model.MediaItemList.DirtyState;
 import org.eclipse.core.commands.common.CommandException;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ColumnPixelData;
@@ -146,6 +149,7 @@ public abstract class MediaTrackListEditor<T extends MediaTrackList<S>, S extend
 	
 	abstract protected void createControls (Composite parent);
 	abstract protected List<Control> populateToolbar (Composite parent);
+	abstract protected void populateContextMenu (List<IContributionItem> menu0, List<IContributionItem> menu1);
 	
 	private ImageCache imageCache = new ImageCache();
 	
@@ -258,8 +262,9 @@ public abstract class MediaTrackListEditor<T extends MediaTrackList<S>, S extend
 		}
 		editorInput.setTable(editTable.getTable());
 		
-		createControls(parent);
+		createControls(parent2);
 		createToolbar(toolbarComposite);
+		createContextMenu(parent2);
 		
 		// Call update events.
 		listChanged();
@@ -296,6 +301,22 @@ public abstract class MediaTrackListEditor<T extends MediaTrackList<S>, S extend
 			
 			controls.get(i).setLayoutData(formData);
 		}
+	}
+	
+	private void createContextMenu (Composite parent) {
+		List<IContributionItem> menu0 = new LinkedList<IContributionItem>();
+		List<IContributionItem> menu1 = new LinkedList<IContributionItem>();
+		populateContextMenu(menu0, menu1);
+		
+		MenuManager contextMenuMgr = new MenuManager();
+		for (IContributionItem a : menu0) {
+			contextMenuMgr.add(a);
+		}
+		contextMenuMgr.add(new Separator());
+		for (IContributionItem a : menu1) {
+			contextMenuMgr.add(a);
+		}
+		setTableMenu(contextMenuMgr.createContextMenu(parent));
 	}
 	
 	protected void setTableMenu (Menu menu) {

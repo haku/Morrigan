@@ -9,8 +9,9 @@ import net.sparktank.morrigan.gui.views.ViewLibraryProperties;
 import net.sparktank.morrigan.model.library.local.LocalMediaLibrary;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
@@ -37,15 +38,6 @@ public class LocalLibraryEditor extends AbstractLibraryEditor<LocalMediaLibrary>
 			getPrefMenuMgr().add(new Separator());
 			getPrefMenuMgr().add(new LibraryUpdateAction(getMediaList()));
 			getPrefMenuMgr().add(showPropertiesAction);
-			
-			// Context menu.
-			MenuManager contextMenuMgr = new MenuManager();
-			contextMenuMgr.add(addToQueueAction);
-			contextMenuMgr.add(getAddToMenu());
-			contextMenuMgr.add(new Separator());
-			contextMenuMgr.add(toggleEnabledAction);
-			contextMenuMgr.add(removeAction);
-			setTableMenu(contextMenuMgr.createContextMenu(parent));
 		}
 	
 	@Override
@@ -63,6 +55,17 @@ public class LocalLibraryEditor extends AbstractLibraryEditor<LocalMediaLibrary>
 		ret.add(ret.size() - 1, btnAdd);
 		
 		return ret;
+	}
+	
+	@Override
+	protected void populateContextMenu(List<IContributionItem> menu0, List<IContributionItem> menu1) {
+		menu0.add(new ActionContributionItem(addToQueueAction));
+		menu0.add(getAddToMenu());
+		
+		menu1.add(new ActionContributionItem(toggleEnabledAction));
+		menu1.add(new ActionContributionItem(removeAction));
+		
+		super.populateContextMenu(menu0, menu1);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
