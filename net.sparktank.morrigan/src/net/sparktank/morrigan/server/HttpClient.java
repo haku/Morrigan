@@ -20,8 +20,7 @@ public class HttpClient {
 	
 	static private HttpClient _httpClient;
 	
-	// TODO make thread safe?
-	static public HttpClient getHttpClient () {
+	static synchronized public HttpClient getHttpClient () {
 		if (_httpClient == null) {
 			_httpClient = new HttpClient();
 		}
@@ -40,7 +39,7 @@ public class HttpClient {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static interface IHttpStreamHandler {
-		public void handleStream (InputStream is) throws MorriganException;
+		public void handleStream (InputStream is) throws IOException, MorriganException;
 	}
 	
 	/**
@@ -134,9 +133,12 @@ public class HttpClient {
 			}
 			
 			OutputStreamWriter out = new OutputStreamWriter(huc.getOutputStream());
-			out.write(encodedData);
-			out.flush();
-			out.close();
+			try {
+				out.write(encodedData);
+				out.flush();
+			} finally {
+				out.close();
+			}
 		}
 		
 		Map<String, List<String>> headerFields = huc.getHeaderFields();
@@ -145,17 +147,20 @@ public class HttpClient {
 		
 		StringBuilder sb = null;
 		InputStream is = huc.getInputStream();
-		if (httpStreamHandler != null) {
-			httpStreamHandler.handleStream(is);
-		}
-		else {
-			int v;
-			sb = new StringBuilder();
-			while( (v = is.read()) != -1){
-				sb.append((char)v);
+		try {
+			if (httpStreamHandler != null) {
+				httpStreamHandler.handleStream(is);
 			}
+			else {
+				int v;
+				sb = new StringBuilder();
+				while( (v = is.read()) != -1){
+					sb.append((char)v);
+				}
+			}
+		} finally {
+			is.close();
 		}
-        is.close();
         
         huc.disconnect();
         
