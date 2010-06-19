@@ -335,6 +335,11 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTr
 	
 	public void completeBulkUpdate (boolean thereWereErrors) throws MorriganException {
 		try {
+			/* FIXME stop replaceList() triggering a GUI refresh?
+			 * After a remote update, this causes it temp. to sort wrong
+			 * as we will be showing the remote sort order, not the
+			 * local sort order.
+			 */
 			List<MediaLibraryTrack> removed = replaceList(_changedItems);
 			if (!thereWereErrors) {
 				System.err.println("completeBulkUpdate() : About to clean " + removed.size() + " items...");
