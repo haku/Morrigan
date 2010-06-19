@@ -2,6 +2,8 @@ package net.sparktank.morrigan.model.gallery;
 
 import net.sparktank.morrigan.model.MediaItem;
 
+/* Prototype that may not be used.
+ */
 public class MediaImage extends MediaItem {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors.
