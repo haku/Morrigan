@@ -1,5 +1,6 @@
 package net.sparktank.morrigan.model.library.remote;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Date;
@@ -96,6 +97,7 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Reading and refreshing.
 	
 	public static long MAX_CACHE_AGE = 60 * 60 * 1000;
 	
@@ -139,6 +141,15 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Actions.
+	
+	@Override
+	public void copyMediaItemFile(MediaItem item, File targetFile) throws MorriganException {
+		throw new NotImplementedException();
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Item metadata modifiers.
 	
 	@Override
 	public void incTrackStartCnt (MediaTrack track, long n) throws MorriganException {
@@ -201,6 +212,7 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Library property modifiers.
 	
 	@Override
 	public void addSource (String source) throws DbException {

@@ -1,5 +1,6 @@
 package net.sparktank.morrigan.gui.editors;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -8,14 +9,16 @@ import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.dialogs.RunnableDialog;
 import net.sparktank.morrigan.gui.display.DropMenuListener;
+import net.sparktank.morrigan.gui.jobs.TaskJob;
 import net.sparktank.morrigan.helpers.TimeHelper;
-import net.sparktank.morrigan.model.MediaItem;
+import net.sparktank.morrigan.model.MediaTrack;
 import net.sparktank.morrigan.model.MediaTrackList.DurationData;
 import net.sparktank.morrigan.model.library.AbstractMediaLibrary;
 import net.sparktank.morrigan.model.library.MediaLibraryTrack;
 import net.sparktank.morrigan.model.library.AbstractMediaLibrary.SortChangeListener;
 import net.sparktank.morrigan.model.library.SqliteLayer.LibrarySort;
 import net.sparktank.morrigan.model.library.SqliteLayer.LibrarySortDirection;
+import net.sparktank.morrigan.model.tasks.MediaFileCopyTask;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
@@ -31,6 +34,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
@@ -295,15 +299,27 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> exte
 		
 	}
 	
-	protected IAction copyToAction = new Action("Copy file to ...") {
+	private String lastFileCopyTargetDir = null;
+	
+	protected IAction copyToAction = new Action("Copy to...") {
 		public void run () {
-			StringBuilder sb = new StringBuilder();
-			sb.append("TODO: copy files:\n");
-			for (MediaItem track : getSelectedTracks()) {
-				sb.append(track.getFilepath());
-				sb.append("\n");
+			List<MediaTrack> selectedTracks = getSelectedTracks();
+			
+			DirectoryDialog dlg = new DirectoryDialog(getSite().getShell());
+			dlg.setText("Copy Files...");
+			dlg.setMessage("Select a directory to copy files to.");
+			if (lastFileCopyTargetDir != null) {
+				dlg.setFilterPath(lastFileCopyTargetDir);
 			}
-			new MorriganMsgDlg(sb.toString()).open();
+			String dir = dlg.open();
+			
+			if (dir != null) {
+				lastFileCopyTargetDir = dir;
+				
+				MediaFileCopyTask task = new MediaFileCopyTask(getMediaList(), selectedTracks, new File(dir));
+				TaskJob job = new TaskJob(task, getSite().getShell().getDisplay());
+				job.schedule();
+			}
 		}
 	};
 	

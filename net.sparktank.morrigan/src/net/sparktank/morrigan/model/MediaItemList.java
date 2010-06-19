@@ -1,5 +1,7 @@
 package net.sparktank.morrigan.model;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -8,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
+import net.sparktank.morrigan.helpers.FileHelper;
 
 public abstract class MediaItemList<T extends MediaItem> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -59,6 +62,7 @@ public abstract class MediaItemList<T extends MediaItem> {
 	abstract public String getSerial ();
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Dirty state and event listeners.
 	
 	private DirtyState dirtyState = DirtyState.CLEAN;
 	private ArrayList<Runnable> dirtyChangeEvents = new ArrayList<Runnable>();
@@ -180,7 +184,7 @@ public abstract class MediaItemList<T extends MediaItem> {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Update methods.  Use these for data that is to be persisted.
-//	These methods are sub-classed where persistance is needed.
+//	These methods are sub-classed where persistence is needed.
 	
 	public void setDateAdded (MediaItem track, Date date) throws MorriganException {
 		track.setDateAdded(date);
@@ -210,6 +214,30 @@ public abstract class MediaItemList<T extends MediaItem> {
 	public void setTrackMissing (MediaItem track, boolean value) throws MorriganException {
 		track.setMissing(value);
 		setDirtyState(DirtyState.METADATA);
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Actions.
+	
+	public void copyMediaItemFile (MediaItem mi, File targetDirectory) throws MorriganException {
+		if (!targetDirectory.isDirectory()) {
+			throw new IllegalArgumentException("targetDirectory must be a directory.");
+		}
+		
+		File targetFile = new File(targetDirectory.getAbsolutePath() + File.separatorChar
+				+ mi.getFilepath().substring(mi.getFilepath().lastIndexOf(File.separatorChar) + 1));
+		
+		if (!targetFile.exists()) {
+			System.err.println("Copying '"+mi.getFilepath()+"' to '"+targetFile.getAbsolutePath()+"'...");
+			try {
+				FileHelper.copyFile(new File(mi.getFilepath()), targetFile);
+			} catch (IOException e) {
+				throw new MorriganException(e);
+			}
+		}
+		else {
+			System.err.println("Skipping '"+targetFile.getAbsolutePath()+"' as it already exists.");
+		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
