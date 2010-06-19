@@ -36,15 +36,25 @@ public class MediaFileCopyTask implements IMorriganTask {
 		TaskResult ret;
 		
 		try {
-			System.err.println("Copying " + mediaSelection.size() + " files...");
+			taskEventListener.beginTask("Copying " + mediaSelection.size() + " files", mediaSelection.size());
 			
 			for (MediaItem mi : mediaSelection) {
+				taskEventListener.subTask(mi.getTitle());
 				mediaItemList.copyMediaItemFile(mi, targetDirectory);
+				taskEventListener.worked(1);
+				
+				if (taskEventListener.isCanceled()) {
+					break;
+				}
 			}
 			
-			System.err.println("Finished copying " + mediaSelection.size() + " files.");
+			if (taskEventListener.isCanceled()) {
+				ret = new TaskResult(TaskOutcome.CANCELED);
+			} else {
+				ret = new TaskResult(TaskOutcome.SUCCESS);
+			}
 			
-			ret = new TaskResult(TaskOutcome.SUCCESS);
+			taskEventListener.done();
 		}
 		catch (Exception e) {
 			ret = new TaskResult(TaskOutcome.FAILED, "Failed to copy all files.", e);
