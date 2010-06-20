@@ -11,11 +11,13 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.RecyclingFactory;
+import net.sparktank.morrigan.model.MediaTag;
 
 public class SqliteLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -130,6 +132,22 @@ public class SqliteLayer {
 	public List<String> getSources () throws DbException {
 		try {
 			return local_getSources();
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+	
+	public List<MediaTag> getTags (long rowId) throws DbException {
+		try {
+			return local_getTags(rowId);
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+	
+	public List<String> getTagOntologies () throws DbException {
+		try {
+			return local_getTagOntologies();
 		} catch (Exception e) {
 			throw new DbException(e);
 		}
@@ -317,14 +335,51 @@ public class SqliteLayer {
 		}
 	}
 	
+	public void addTag (long rowId, String tag, int type, int ontology) throws DbException {
+		try {
+			local_addTag(rowId, tag, type, ontology);
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+	
+	public void removeTag (long rowId, String tag) throws DbException {
+		try {
+			local_removeTag(rowId, tag);
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+	
+	public void clearTags (long rowId) throws DbException {
+		try {
+			local_clearTags(rowId);
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+	
+	public void addTagOntology (String ontology) throws DbException {
+		try {
+			local_addTagOntology(ontology);
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Schema.
 	
-	/* sqlite notes:
-	 * Add dmodified column:
+	/* sqlite change notes:
+	 * 
 	 * ALTER TABLE tbl_mediafiles ADD COLUMN dmodified DATETIME;
 	 * ALTER TABLE tbl_mediafiles ADD COLUMN sremloc VARCHAR(1000);
 	 * .schema tbl_mediafiles
+	 * 
+	 */
+	
+	/* - - - - - - - - - - - - - - - -
+	 * tbl_prop
 	 */
 	
 	private static final String SQL_TBL_PROP_EXISTS = 
@@ -338,12 +393,16 @@ public class SqliteLayer {
 	
 	private static final String SQL_TBL_PROP_COL_VALUE = "value";
 	
+	/* - - - - - - - - - - - - - - - -
+	 * tbl_mediafiles
+	 */
+	
 	private static final String SQL_TBL_MEDIAFILES_EXISTS = 
 		"SELECT name FROM sqlite_master WHERE name='tbl_mediafiles';";
 	
 	private static final String SQL_TBL_MEDIAFILES_CREATE = 
 		"create table tbl_mediafiles(" +
-	    "sfile VARCHAR(10000) not null collate nocase primary key," +
+	    "sfile VARCHAR(1000) not null collate nocase primary key," +
 	    "dadded DATETIME," +
 	    "lstartcnt INT(6)," +
 	    "lendcnt INT(6)," +
@@ -374,8 +433,41 @@ public class SqliteLayer {
 	
 	private static final String SQL_TBL_SOURCES_CREATE = 
 		"CREATE TABLE tbl_sources (" +
-		"path VARCHAR(1000) NOT NULL  collate nocase primary key" +
+		"path VARCHAR(1000) NOT NULL collate nocase primary key" +
 		");";
+	
+	/* - - - - - - - - - - - - - - - -
+	 * tbl_tags
+	 */
+	
+	private static final String SQL_TBL_TAGS_EXISTS = 
+		"SELECT name FROM sqlite_master WHERE name='tbl_tags';";
+	
+	private static final String SQL_TBL_TAGS_CREATE = 
+		"CREATE TABLE tbl_tags (" +
+		"mf_rowid INT," +
+		"tag VARCHAR(100)," +
+		"type INT," +
+		"ont_rowid INT" +
+		");";
+	
+//	private static final String SQL_TBL_TAGS_COL_MEDIAFILEROWID = "mf_rowid";
+	private static final String SQL_TBL_TAGS_COL_TAG = "tag";
+	private static final String SQL_TBL_TAGS_COL_TYPE = "type";
+	
+	/* - - - - - - - - - - - - - - - -
+	 * tbl_tag_ont
+	 */
+	
+	private static final String SQL_TBL_TAGONT_EXISTS = 
+		"SELECT name FROM sqlite_master WHERE name='tbl_tag_ont';";
+	
+	private static final String SQL_TBL_TAGONT_CREATE = 
+		"CREATE TABLE tbl_tag_ont (" +
+		"ont VARCHAR(100)" +
+		");";
+	
+	private static final String SQL_TBL_TAGONT_COL_ONT = "ont";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Properties.
@@ -498,6 +590,28 @@ public class SqliteLayer {
 	public enum LibrarySortDirection { ASC, DESC };
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Tag queries.
+	
+	private static final String SQL_TBL_TAGS_ADD =
+		"INSERT INTO tbl_tags (mf_rowid,tag,type,ont) VALUES (?,?,?,?);";
+	
+	private static final String SQL_TBL_TAGS_REMOVE =
+		"DELETE FROM mf_rowid WHERE mf_rowid=? AND tag=?;";
+	
+	private static final String SQL_TBL_TAGS_CLEAR =
+		"DELETE FROM mf_rowid WHERE mf_rowid=?;";
+	
+	private static final String SQL_TBL_TAGS_Q_ALL =
+		"SELECT tag,type,ont FROM tbl_tags WHERE mf_rowid=?;";
+	
+	
+	private static final String SQL_TBL_TAGONT_ADD =
+		"INSERT INTO tbl_tag_ont (ont) VALUES (?);";
+	
+	private static final String SQL_TBL_TAGONT_Q_ALL =
+		"SELECT ont FROM tbl_tag_ont;";
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	DB connection.
 	
 	private Connection dbConnection = null;
@@ -564,6 +678,24 @@ public class SqliteLayer {
 			try {
 				if (!rs.next()) { // True if there are rows in the result.
 					stat.executeUpdate(SQL_TBL_SOURCES_CREATE);
+				}
+			} finally {
+				rs.close();
+			}
+			
+			rs = stat.executeQuery(SQL_TBL_TAGS_EXISTS);
+			try {
+				if (!rs.next()) { // True if there are rows in the result.
+					stat.executeUpdate(SQL_TBL_TAGS_CREATE);
+				}
+			} finally {
+				rs.close();
+			}
+			
+			rs = stat.executeQuery(SQL_TBL_TAGONT_EXISTS);
+			try {
+				if (!rs.next()) { // True if there are rows in the result.
+					stat.executeUpdate(SQL_TBL_TAGONT_CREATE);
 				}
 			} finally {
 				rs.close();
@@ -1086,6 +1218,109 @@ public class SqliteLayer {
 		} finally {
 			ps.close();
 		}
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Tags.
+	
+	private void local_addTag (long rowId, String tag, int type, int ontology) throws SQLException, ClassNotFoundException, DbException {
+		PreparedStatement ps;
+		ps = getDbCon().prepareStatement(SQL_TBL_TAGS_ADD);
+		int n;
+		try {
+			ps.setLong(1, rowId);
+			ps.setString(2, tag);
+			ps.setInt(3, type);
+			ps.setInt(4, ontology);
+			n = ps.executeUpdate();
+		} finally {
+			ps.close();
+		}
+		if (n<1) throw new DbException("No update occured.");
+	}
+	
+	private void local_removeTag(long rowId, String tag) throws SQLException, ClassNotFoundException, DbException {
+		PreparedStatement ps;
+		ps = getDbCon().prepareStatement(SQL_TBL_TAGS_REMOVE);
+		int n;
+		try {
+			ps.setLong(1, rowId);
+			ps.setString(2, tag);
+			n = ps.executeUpdate();
+		} finally {
+			ps.close();
+		}
+		if (n<1) throw new DbException("No update occured.");
+	}
+	
+	private void local_clearTags(long rowId) throws SQLException, ClassNotFoundException, DbException {
+		PreparedStatement ps;
+		ps = getDbCon().prepareStatement(SQL_TBL_TAGS_CLEAR);
+		int n;
+		try {
+			ps.setLong(1, rowId);
+			n = ps.executeUpdate();
+		} finally {
+			ps.close();
+		}
+		if (n<1) throw new DbException("No update occured.");
+	}
+	
+	private List<MediaTag> local_getTags(long rowId) throws SQLException, ClassNotFoundException {
+		List<MediaTag> ret = new LinkedList<MediaTag>();
+		ResultSet rs;
+		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_TAGS_Q_ALL);
+		
+		try {
+			rs = ps.executeQuery();
+			try {
+				while (rs.next()) {
+					String tag = rs.getString(SQL_TBL_TAGS_COL_TAG);
+					int type = rs.getInt(SQL_TBL_TAGS_COL_TYPE);
+					
+					MediaTag mt = new MediaTag(tag, type);
+					ret.add(mt);
+				}
+			} finally {
+				rs.close();
+			}
+		} finally {
+			ps.close();
+		}
+		
+		return ret;
+	}
+	
+	private void local_addTagOntology (String ontology) throws SQLException, ClassNotFoundException, DbException {
+		PreparedStatement ps;
+		ps = getDbCon().prepareStatement(SQL_TBL_TAGONT_ADD);
+		int n;
+		try {
+			ps.setString(1, ontology);
+			n = ps.executeUpdate();
+		} finally {
+			ps.close();
+		}
+		if (n<1) throw new DbException("No update occured.");
+	}
+	
+	private List<String> local_getTagOntologies () throws SQLException, ClassNotFoundException {
+		List<String> ret;
+		Statement stat = getDbCon().createStatement();
+		try {
+			ResultSet rs = stat.executeQuery(SQL_TBL_TAGONT_Q_ALL);
+			try {
+				ret = new ArrayList<String>();
+				while (rs.next()) {
+					ret.add(rs.getString(SQL_TBL_TAGONT_COL_ONT));
+				}
+			} finally {
+				rs.close();
+			}
+		} finally {
+			stat.close();
+		}
+		return ret;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
