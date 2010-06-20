@@ -15,6 +15,7 @@ import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Widget;
 import org.gstreamer.Bus;
 import org.gstreamer.Caps;
 import org.gstreamer.Element;
@@ -211,9 +212,14 @@ public class PlaybackEngine implements IPlaybackEngine {
 			
 			if (videoComponent!=null) {
 				if (!videoComponent.isDisposed()) {
-					videoComponent.removeKeyListener(keyListener);
-					videoComponent.removeMouseListener(mouseListener);
-					videoComponent.dispose();
+					_runInUiThread(videoComponent, new Runnable() {
+						@Override
+						public void run() {
+							videoComponent.removeKeyListener(keyListener);
+							videoComponent.removeMouseListener(mouseListener);
+							videoComponent.dispose();
+						}
+					});
 				}
 				videoComponent = null;
 				videoFrameParent.redraw();
@@ -268,13 +274,18 @@ public class PlaybackEngine implements IPlaybackEngine {
 		
 		if (videoComponent!=null) {
 			if (!videoComponent.isDisposed()) {
-				videoComponent.removeKeyListener(keyListener);
-				videoComponent.removeMouseListener(mouseListener);
+				_runInUiThread(videoComponent, new Runnable() {
+					@Override
+					public void run() {
+						videoComponent.removeKeyListener(keyListener);
+						videoComponent.removeMouseListener(mouseListener);
+					}
+				});
 				System.err.println("reparentVideo() : removed listeners.");
 			}
 		}
 		
-		VideoComponent old_videoComponent = videoComponent;
+		final VideoComponent old_videoComponent = videoComponent;
 		videoComponent = null;
 		
 		Element old_videoElement = videoElement;
@@ -292,14 +303,19 @@ public class PlaybackEngine implements IPlaybackEngine {
 
 				System.err.println("reparentVideo() : creating new VideoComponent.");
 				
-				videoComponent = new VideoComponent(videoFrameParent, SWT.NO_BACKGROUND);
-				videoComponent.setKeepAspect(true);
-				videoElement = videoComponent.getElement();
-				playbin.setVideoSink(videoElement);
-				videoFrameParent.layout();
-
-				videoComponent.addKeyListener(keyListener);
-				videoComponent.addMouseListener(mouseListener);
+				_runInUiThread(videoFrameParent, new Runnable() {
+					@Override
+					public void run() {
+						videoComponent = new VideoComponent(videoFrameParent, SWT.NO_BACKGROUND);
+						videoComponent.setKeepAspect(true);
+						videoElement = videoComponent.getElement();
+						playbin.setVideoSink(videoElement);
+						videoFrameParent.layout();
+						
+						videoComponent.addKeyListener(keyListener);
+						videoComponent.addMouseListener(mouseListener);
+					}
+				});
 
 				if (seek && position>=0) {
 					playbin.setState(State.PAUSED);
@@ -342,9 +358,14 @@ public class PlaybackEngine implements IPlaybackEngine {
 		}
 		
 		if (old_videoComponent!=null && !old_videoComponent.isDisposed()) {
-			Composite parent = old_videoComponent.getParent();
-			old_videoComponent.dispose();
-			parent.layout();
+			_runInUiThread(old_videoComponent, new Runnable() {
+				@Override
+				public void run() {
+					Composite parent = old_videoComponent.getParent();
+					old_videoComponent.dispose();
+					parent.layout();
+				}
+			});
 		}
 		
 		System.err.println("reparentVideo() <<<");
@@ -686,6 +707,18 @@ public class PlaybackEngine implements IPlaybackEngine {
 	private void callOnClickListener (int button, int clickCount) {
 		if (listener!=null) {
 			listener.onMouseClick(button, clickCount);
+		}
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	UI Threading.
+	
+	private void _runInUiThread (Widget w, Runnable r) {
+		if (w.getDisplay().getThread().equals(Thread.currentThread())) {
+			r.run();
+		}
+		else {
+			w.getDisplay().syncExec(r);
 		}
 	}
 	
