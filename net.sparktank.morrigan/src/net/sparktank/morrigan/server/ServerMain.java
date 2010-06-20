@@ -61,10 +61,6 @@ public class ServerMain {
 		}
 		
 		@Override
-		public boolean doOnForegroudThread(Runnable r) {
-			return false;
-		}
-		@Override
 		public Composite getCurrentMediaFrameParent() {
 			return null;
 		}

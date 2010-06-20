@@ -8,8 +8,6 @@ import org.eclipse.swt.widgets.Composite;
 public interface IPlayerEventHandler {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public boolean doOnForegroudThread (Runnable r) ;
-		
 	/**
 	 * Called when:
 	 * - position changed.

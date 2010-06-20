@@ -64,7 +64,17 @@ public interface IPlaybackEngine {
 	public void finalise ();
 	
 	/**
+	 * Load track.  Must be called before startPlaying().
+	 * This may be called by a non-UI thread.
+	 */
+	public void loadTrack () throws PlaybackException;
+	
+	/**
 	 * Begin playback.
+	 * This may be called by a non-UI thread.
+	 * If videoFrameParent is set then this method may
+	 * use the Display from videoFrameParent to run
+	 * work on the UI thread.
 	 */
 	public void startPlaying () throws PlaybackException;
 	
