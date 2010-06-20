@@ -12,17 +12,12 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
 
-import javax.media.CannotRealizeException;
 import javax.media.ControllerErrorEvent;
 import javax.media.ControllerEvent;
 import javax.media.ControllerListener;
 import javax.media.EndOfMediaEvent;
 import javax.media.Manager;
-import javax.media.NoDataSourceException;
-import javax.media.NoPlayerException;
 import javax.media.Player;
 import javax.media.StartEvent;
 import javax.media.StopEvent;
@@ -112,21 +107,28 @@ public class PlaybackEngine  implements IPlaybackEngine {
 	
 	@Override
 	public void finalise() {}
-
+	
+	@Override
+	public void loadTrack() throws PlaybackException {
+		long t0 = System.currentTimeMillis();
+		_loadTrack();
+		long l0 = System.currentTimeMillis() - t0;
+		System.err.println("Track load time: "+l0+" ms.");
+	}
+	
 	@Override
 	public void startPlaying() throws PlaybackException {
-		m_stopPlaying = false;
+		long t0 = System.currentTimeMillis();
 		
-		try {
-			loadTrack();
-		} catch (Exception e) {
-			throw new PlaybackException("Failed to load '"+filepath+"'.", e);
-		}
+		m_stopPlaying = false;
 		
 		if (mediaPlayer!=null) {
 			mediaPlayer.start();
 			startWatcherThread();
 		}
+		
+		long l0 = System.currentTimeMillis() - t0;
+		System.err.println("Track start time: "+l0+" ms.");
 	}
 	
 	@Override
@@ -217,30 +219,46 @@ public class PlaybackEngine  implements IPlaybackEngine {
 				videoComponent.invalidate();
 				videoComponent = null;
 				
-				videoComposite.dispose();
+				if (!videoComposite.isDisposed()) {
+					if (videoComposite.getDisplay().getThread().equals(Thread.currentThread())) {
+						videoComposite.dispose();
+					} else {
+						videoComposite.getDisplay().syncExec(new Runnable() {
+							@Override
+							public void run() {
+								videoComposite.dispose();
+							}
+						});
+					}
+				}
 				videoComposite = null;
 			}
 		}
 	}
 	
-	private void loadTrack () throws NoPlayerException, CannotRealizeException, MalformedURLException, IOException, NoDataSourceException {
+	private void _loadTrack () throws PlaybackException {
 		callStateListener(PlayState.Loading);
 		
-		if (mediaPlayer != null) finalisePlayback();
-		
-		mediaFile = new File(filepath);
-		System.err.println("jmf.PlaybackEngine Creating realized Player...");
-		Player player = Manager.createRealizedPlayer(mediaFile.toURI().toURL());
-		
-		System.err.println("jmf.PlaybackEngine Creating MediaPlayer...");
-		mediaPlayer = new MediaPlayer();
-		mediaPlayer.setFixedAspectRatio(true);
-		mediaPlayer.setPlayer(player);
-		mediaPlayer.setControlPanelVisible(false);
-		
-		mediaPlayer.addControllerListener(mediaListener);
-		
-		reparentVideo();
+		try {
+			if (mediaPlayer != null) finalisePlayback();
+			
+			mediaFile = new File(filepath);
+			System.err.println("jmf.PlaybackEngine Creating realized Player...");
+			Player player = Manager.createRealizedPlayer(mediaFile.toURI().toURL());
+			
+			System.err.println("jmf.PlaybackEngine Creating MediaPlayer...");
+			mediaPlayer = new MediaPlayer();
+			mediaPlayer.setFixedAspectRatio(true);
+			mediaPlayer.setPlayer(player);
+			mediaPlayer.setControlPanelVisible(false);
+			
+			mediaPlayer.addControllerListener(mediaListener);
+			
+			reparentVideo();
+		}
+		catch (Exception e) {
+			throw new PlaybackException("Failed to load '"+filepath+"'.", e);
+		}
 	}
 	
 	private void reparentVideo() {
@@ -249,44 +267,58 @@ public class PlaybackEngine  implements IPlaybackEngine {
 		if (videoFrameParent != null && mediaPlayer != null) {
 			videoComponent = mediaPlayer.getVisualComponent();
 			
-			if (videoComponent != null) {
-				if (videoComposite == null) {
-					videoComposite = new Composite(videoFrameParent, SWT.EMBEDDED);
-					videoComposite.setLayout(new FillLayout());
-					
-					videoFrame = SWT_AWT.new_Frame(videoComposite);
-					videoFrame.setBackground(Color.BLACK);
-					
-					videoFrame.setLayout(null);
-					videoFrame.add(videoComponent);
-					videoFrame.doLayout();
-					
-					videoFrameParent.layout();
-					
-					VideoPanel panelVideo = new VideoPanel(mediaPlayer);
-					panelVideo.resizeVisualComponent();
-					Dimension preferredSize = panelVideo.getPreferredSize();
-					videoResizeListener = new VideoResizeListener(preferredSize);
-					videoFrame.addComponentListener(videoResizeListener);
-					videoResizeListener.componentResized(null);
-					
-					System.err.println("jmf.PlaybackEngine Adding listeners to videoComponent...");
-					videoComponent.addMouseListener(mouseListener);
-					videoComponent.addKeyListener(keyListener);
-					
-				} else {
-					System.err.println("jmf.PlaybackEngine Moveing videoComposite...");
-					videoComposite.setParent(videoFrameParent);
-					videoFrameParent.layout();
+			videoFrameParent.getDisplay().syncExec(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						if (videoComponent != null) {
+							if (videoComposite == null) {
+								videoComposite = new Composite(videoFrameParent, SWT.EMBEDDED);
+								videoComposite.setLayout(new FillLayout());
+								
+								videoFrame = SWT_AWT.new_Frame(videoComposite);
+								videoFrame.setBackground(Color.BLACK);
+								
+								videoFrame.setLayout(null);
+								videoFrame.add(videoComponent);
+								videoFrame.doLayout();
+								
+								videoFrameParent.layout();
+								
+								VideoPanel panelVideo = new VideoPanel(mediaPlayer);
+								panelVideo.resizeVisualComponent();
+								Dimension preferredSize = panelVideo.getPreferredSize();
+								videoResizeListener = new VideoResizeListener(preferredSize);
+								videoFrame.addComponentListener(videoResizeListener);
+								videoResizeListener.componentResized(null);
+								
+								System.err.println("jmf.PlaybackEngine Adding listeners to videoComponent...");
+								videoComponent.addMouseListener(mouseListener);
+								videoComponent.addKeyListener(keyListener);
+								
+							} else {
+								System.err.println("jmf.PlaybackEngine Moveing videoComposite...");
+								videoComposite.setParent(videoFrameParent);
+								videoFrameParent.layout();
+							}
+							
+						} else {
+							System.err.println("jmf.PlaybackEngine videoComponent == null.");
+						}
+					}
+					catch (Exception e) {
+						callOnErrorHandler(e);
+					}
 				}
+			});
 				
-			} else {
-				System.err.println("jmf.PlaybackEngine videoComponent == null.");
-			}
 		}
 		
 		System.err.println("jmf.PlaybackEngine <<< reparentVideo()");
 	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Listeners.
 	
 	private MouseListener mouseListener = new MouseListener() {
 		@Override
@@ -387,6 +419,9 @@ public class PlaybackEngine  implements IPlaybackEngine {
 			
 		}
 	};
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Watcher thread.
 	
 	private volatile boolean m_stopWatching = false;
 	private Thread watcherThread = null;
