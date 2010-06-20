@@ -77,15 +77,17 @@ public class PlaybackEngine implements IPlaybackEngine {
 	public void finalise() {}
 
 	@Override
-	public void startPlaying() throws PlaybackException {
-		m_stopPlaying = false;
-		
+	public void loadTrack() throws PlaybackException {
 		try {
-			loadTrack();
+			_loadTrack();
 		} catch (Exception e) {
 			throw new PlaybackException(e);
 		}
-		
+	}
+	
+	@Override
+	public void startPlaying() throws PlaybackException {
+		m_stopPlaying = false;
 		startPlaybackThread();
 	}
 	
@@ -195,7 +197,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 		}
 	}
 	
-	private void loadTrack () throws UnsupportedAudioFileException, IOException {
+	private void _loadTrack () throws UnsupportedAudioFileException, IOException {
 		File file = new File(filepath);
 		in = AudioSystem.getAudioInputStream(file);
         din = null;
