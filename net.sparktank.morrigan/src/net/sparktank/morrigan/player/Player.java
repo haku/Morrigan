@@ -146,21 +146,6 @@ public class Player {
 		return nextItem;
 	}
 	
-	private class NextTrackRunner implements Runnable {
-		
-		private final PlayItem item;
-		
-		public NextTrackRunner (PlayItem item) {
-			this.item = item;
-		}
-		
-		@Override
-		public void run() {
-			loadAndStartPlaying(item);
-		}
-		
-	}
-	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	History.
 	
@@ -377,27 +362,16 @@ public class Player {
 			File file = new File(item.item.getFilepath());
 			if (!file.exists()) throw new FileNotFoundException(item.item.getFilepath());
 			
-			System.out.println("Loading '" + item.item.getTitle() + "'...");
+			System.err.println("Loading '" + item.item.getTitle() + "'...");
 			getPlaybackEngine().setFile(item.item.getFilepath());
 			Composite currentMediaFrameParent = eventHandler.getCurrentMediaFrameParent();
 			getPlaybackEngine().setVideoFrameParent(currentMediaFrameParent);
-			// FIXME there must be a tidier way to do this.
-			if (currentMediaFrameParent != null) {
-				currentMediaFrameParent.getDisplay().syncExec(new Runnable() {
-					@Override
-					public void run() {
-						try {
-							getPlaybackEngine().startPlaying();
-						} catch (Exception e) {
-							eventHandler.asyncThrowable(e);
-						}
-					}
-				});
-			} else {
-				getPlaybackEngine().startPlaying();
-			}
+			
+			getPlaybackEngine().loadTrack();
+			getPlaybackEngine().startPlaying();
+			
 			_currentTrackDuration = getPlaybackEngine().getDuration();
-			System.out.println("Started to play '" + item.item.getTitle() + "'...");
+			System.err.println("Started to play '" + item.item.getTitle() + "'...");
 			
 			item.list.incTrackStartCnt(item.item);
 			if (item.item.getDuration() <= 0) {
@@ -534,7 +508,7 @@ public class Player {
 				PlayItem c = getCurrentItem();
 				if (c != null && c.list != null && c.item != null) {
 					try {
-						System.out.println("duration=" + duration);
+						System.err.println("duration=" + duration);
 						c.list.setTrackDuration(c.item, duration);
 					} catch (Throwable t) {
 						t.printStackTrace();
@@ -552,6 +526,7 @@ public class Player {
 		
 		@Override
 		public void onEndOfTrack() {
+			System.err.println("Player received endOfTrack event.");
 			// Inc. stats.
 			try {
 				getCurrentItem().list.incTrackEndCnt(getCurrentItem().item);
@@ -562,13 +537,10 @@ public class Player {
 			// Play next track?
 			PlayItem nextItemToPlay = getNextItemToPlay();
 			if (nextItemToPlay != null) {
-				NextTrackRunner r = new NextTrackRunner(nextItemToPlay);
-				if (!eventHandler.doOnForegroudThread(r)) {
-					r.run();
-				}
-				
-			} else {
-				System.out.println("No more tracks to play.");
+				loadAndStartPlaying(nextItemToPlay);
+			}
+			else {
+				System.err.println("No more tracks to play.");
 				eventHandler.updateStatus();
 			}
 		};
@@ -587,7 +559,7 @@ public class Player {
 		
 		@Override
 		public void onMouseClick(int button, int clickCount) {
-			System.out.println("Mouse click "+button+"*"+clickCount);
+			System.err.println("Mouse click "+button+"*"+clickCount);
 			if (clickCount > 1) {
 				eventHandler.videoAreaSelected();
 			}

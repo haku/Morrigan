@@ -127,11 +127,6 @@ public abstract class AbstractPlayerView extends ViewPart {
 	
 	private final IPlayerEventHandler eventHandler = new IPlayerEventHandler() {
 		
-		public boolean doOnForegroudThread(Runnable r) {
-			getSite().getShell().getDisplay().asyncExec(r);
-			return true;
-		};
-		
 		@Override
 		public void updateStatus() {
 			getSite().getShell().getDisplay().asyncExec(updateStatusRunable);
@@ -152,6 +147,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 		}
 		
 		public void asyncThrowable(Throwable t) {
+			System.err.println("Async Throwable: " + t.getMessage());
 			getSite().getShell().getDisplay().asyncExec(new RunnableDialog(t));
 		};
 		
