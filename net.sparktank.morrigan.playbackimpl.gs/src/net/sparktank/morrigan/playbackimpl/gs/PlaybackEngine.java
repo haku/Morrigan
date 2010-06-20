@@ -123,21 +123,19 @@ public class PlaybackEngine implements IPlaybackEngine {
 	}
 
 	@Override
+	public void loadTrack() throws PlaybackException {
+		long t0 = System.currentTimeMillis();
+		_loadTrack();
+		long l0 = System.currentTimeMillis() - t0;
+		System.err.println("Track load time: "+l0+" ms.");
+	}
+	
+	@Override
 	public void startPlaying() throws PlaybackException {
-		System.err.println("startPlaying() : gs.startPlaying() called on thread " + Thread.currentThread().getId() + " : " + Thread.currentThread().getName());
-		
-		m_stopPlaying.set(false);
-		
-		try {
-			loadTrack();
-		} catch (Throwable t) {
-			callStateListener(PlayState.Stopped);
-			throw new PlaybackException("Failed to load '"+filepath+"'.", t);
-		}
-		
-		m_atEos.set(false);
-		
-		playTrack();
+		long t0 = System.currentTimeMillis();
+		_startTrack();
+		long l0 = System.currentTimeMillis() - t0;
+		System.err.println("Track start time: "+l0+" ms.");
 	}
 	
 	@Override
@@ -187,8 +185,8 @@ public class PlaybackEngine implements IPlaybackEngine {
 //	Local playback methods.
 	
 	private PlayBin playbin = null;
-	private VideoComponent videoComponent = null;
-	private Element videoElement = null;
+	private VideoComponent videoComponent = null;   // SWT / GStreamer.
+	private Element videoElement = null;            // GStreamer.
 	private volatile boolean hasVideo = false;
 	
 	private boolean inited = false;
@@ -225,34 +223,40 @@ public class PlaybackEngine implements IPlaybackEngine {
 		System.err.println("finalisePlayback() <<<");
 	}
 	
-	private void loadTrack () {
-		callStateListener(PlayState.Loading);
-		boolean firstLoad = (playbin==null);
-		
-		System.err.println("loadTrack() : firstLoad=" + firstLoad);
-		
-		if (firstLoad) {
-			System.err.println("loadTrack() : initGst()...");
-			initGst();
-			System.err.println("loadTrack() : About to create PlayBin object...");
-			playbin = new PlayBin("VideoPlayer");
+	private void _loadTrack () throws PlaybackException {
+		try {
+			callStateListener(PlayState.Loading);
+			boolean firstLoad = (playbin==null);
 			
-			System.err.println("loadTrack() : Connecting eosBus...");
-			playbin.getBus().connect(eosBus);
-			System.err.println("loadTrack() : Connecting stateChangedBus...");
-			playbin.getBus().connect(stateChangedBus);
+			System.err.println("loadTrack() : firstLoad=" + firstLoad);
 			
-		} else {
-			playbin.setState(State.NULL);
+			if (firstLoad) {
+				System.err.println("loadTrack() : initGst()...");
+				initGst();
+				System.err.println("loadTrack() : About to create PlayBin object...");
+				playbin = new PlayBin("VideoPlayer");
+				
+				System.err.println("loadTrack() : Connecting eosBus...");
+				playbin.getBus().connect(eosBus);
+				System.err.println("loadTrack() : Connecting stateChangedBus...");
+				playbin.getBus().connect(stateChangedBus);
+				
+			} else {
+				playbin.setState(State.NULL);
+			}
+			
+			hasVideo = mightFileHaveVideo(filepath);
+			
+			System.err.println("loadTrack() : About to set input file to '"+filepath+"'...");
+	        playbin.setInputFile(new File(filepath));
+	        System.err.println("loadTrack() : Set file input file.");
+	        
+	        reparentVideo(false);
 		}
-		
-		hasVideo = mightFileHaveVideo(filepath);
-		
-		System.err.println("loadTrack() : About to set input file to '"+filepath+"'...");
-        playbin.setInputFile(new File(filepath));
-        System.err.println("loadTrack() : Set file input file.");
-        
-        reparentVideo(false);
+		catch (Throwable t) {
+			callStateListener(PlayState.Stopped);
+			throw new PlaybackException("Failed to load '"+filepath+"'.", t);
+		}
 	}
 	
 	private void reparentVideo () {
@@ -406,8 +410,11 @@ public class PlaybackEngine implements IPlaybackEngine {
 	
 	
 	
-	private void playTrack () {
+	private void _startTrack () {
 		System.err.println("playTrack() >>>");
+		
+		m_stopPlaying.set(false);
+		m_atEos.set(false);
 		
 		if (playbin!=null) {
 			playbin.setState(State.PLAYING);
