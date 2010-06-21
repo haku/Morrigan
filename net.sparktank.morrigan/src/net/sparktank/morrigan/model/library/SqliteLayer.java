@@ -453,7 +453,7 @@ public class SqliteLayer {
 		"cls_rowid INT" +
 		");";
 	
-	private static final String SQL_TBL_TAGS_COL_MEDIAFILEROWID = "mf_rowid";
+//	private static final String SQL_TBL_TAGS_COL_MEDIAFILEROWID = "mf_rowid";
 	private static final String SQL_TBL_TAGS_COL_TAG = "tag";
 	private static final String SQL_TBL_TAGS_COL_TYPE = "type";
 	private static final String SQL_TBL_TAGS_COL_CLSROWID = "cls_rowid";
@@ -608,12 +608,17 @@ public class SqliteLayer {
 	private static final String SQL_TBL_TAGS_Q_ALL =
 		"SELECT tag,type,cls_rowid FROM tbl_tags WHERE mf_rowid=?;";
 	
-	
 	private static final String SQL_TBL_TAGCLS_ADD =
 		"INSERT INTO tbl_tag_cls (cls) VALUES (?);";
 	
 	private static final String SQL_TBL_TAGCLS_Q_ALL =
 		"SELECT ROWID,cls FROM tbl_tag_cls;";
+	
+	private static final String SQL_TBL_TAGCLS_Q_CLS =
+		"SELECT ROWID,cls FROM tbl_tag_cls WHERE cls=?;";
+	
+	private static final String SQL_TBL_TAGCLS_Q_ROWID =
+		"SELECT ROWID,cls FROM tbl_tag_cls WHERE ROWID=?;";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	DB connection.
@@ -1227,12 +1232,12 @@ public class SqliteLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Tags.
 	
-	private void local_addTag (long rowId, String tag, int type, int ontology) throws SQLException, ClassNotFoundException, DbException {
+	private void local_addTag (long mf_rowId, String tag, int type, int ontology) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps;
 		ps = getDbCon().prepareStatement(SQL_TBL_TAGS_ADD);
 		int n;
 		try {
-			ps.setLong(1, rowId);
+			ps.setLong(1, mf_rowId);
 			ps.setString(2, tag);
 			ps.setInt(3, type);
 			ps.setInt(4, ontology);
@@ -1243,12 +1248,12 @@ public class SqliteLayer {
 		if (n<1) throw new DbException("No update occured.");
 	}
 	
-	private void local_removeTag(long rowId, String tag) throws SQLException, ClassNotFoundException, DbException {
+	private void local_removeTag(long mf_rowId, String tag) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps;
 		ps = getDbCon().prepareStatement(SQL_TBL_TAGS_REMOVE);
 		int n;
 		try {
-			ps.setLong(1, rowId);
+			ps.setLong(1, mf_rowId);
 			ps.setString(2, tag);
 			n = ps.executeUpdate();
 		} finally {
@@ -1257,12 +1262,12 @@ public class SqliteLayer {
 		if (n<1) throw new DbException("No update occured.");
 	}
 	
-	private void local_clearTags(long rowId) throws SQLException, ClassNotFoundException, DbException {
+	private void local_clearTags(long mf_rowId) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps;
 		ps = getDbCon().prepareStatement(SQL_TBL_TAGS_CLEAR);
 		int n;
 		try {
-			ps.setLong(1, rowId);
+			ps.setLong(1, mf_rowId);
 			n = ps.executeUpdate();
 		} finally {
 			ps.close();
@@ -1270,7 +1275,7 @@ public class SqliteLayer {
 		if (n<1) throw new DbException("No update occured.");
 	}
 	
-	private List<MediaTag> local_getTags(long mf_rowId) throws SQLException, ClassNotFoundException {
+	private List<MediaTag> local_getTags(long mf_rowId) throws SQLException, ClassNotFoundException, DbException {
 		List<MediaTag> ret = new LinkedList<MediaTag>();
 		ResultSet rs;
 		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_TAGS_Q_ALL);
@@ -1322,13 +1327,7 @@ public class SqliteLayer {
 		try {
 			ResultSet rs = stat.executeQuery(SQL_TBL_TAGCLS_Q_ALL);
 			try {
-				ret = new ArrayList<MediaTagClassification>();
-				while (rs.next()) {
-					long rowId = rs.getLong(SQL_TBL_TAGCLS_COL_ROWID);
-					String clsName = rs.getString(SQL_TBL_TAGCLS_COL_CLS);
-					MediaTagClassification mtc = new MediaTagClassification(rowId, clsName);
-					ret.add(mtc);
-				}
+				ret = local_getTagClassification_parseRecordSet(rs);
 			} finally {
 				rs.close();
 			}
@@ -1338,14 +1337,68 @@ public class SqliteLayer {
 		return ret;
 	}
 	
-	private MediaTagClassification local_getTagClassification (long clsRowId) {
-		// TODO write me.
-		throw new NullPointerException("Not implemented.");
+	private MediaTagClassification local_getTagClassification (long clsRowId) throws DbException, SQLException, ClassNotFoundException {
+		PreparedStatement ps;
+		ResultSet rs;
+		List<MediaTagClassification> ret;
+		
+		ps = getDbCon().prepareStatement(SQL_TBL_TAGCLS_Q_ROWID);
+		try {
+			ps.setLong(1, clsRowId);
+			rs = ps.executeQuery();
+			try {
+				ret = local_getTagClassification_parseRecordSet(rs);
+			} finally {
+				rs.close();
+			}
+		} finally {
+			ps.close();
+		}
+		
+		if (ret.size() == 1) {
+			return ret.get(0);
+		} else {
+			throw new DbException("Query returned more than one result.");
+		}
 	}
 	
-	private MediaTagClassification local_getTagClassification (String classificationName) {
-		// TODO write me.
-		throw new NullPointerException("Not implemented.");
+	private MediaTagClassification local_getTagClassification (String classificationName) throws SQLException, ClassNotFoundException, DbException {
+		PreparedStatement ps;
+		ResultSet rs;
+		List<MediaTagClassification> ret;
+		
+		ps = getDbCon().prepareStatement(SQL_TBL_TAGCLS_Q_CLS);
+		try {
+			ps.setString(1, classificationName);
+			rs = ps.executeQuery();
+			try {
+				ret = local_getTagClassification_parseRecordSet(rs);
+			} finally {
+				rs.close();
+			}
+		} finally {
+			ps.close();
+		}
+		
+		if (ret.size() == 1) {
+			return ret.get(0);
+		} else {
+			throw new DbException("Query returned more than one result.");
+		}
+	}
+	
+	private List<MediaTagClassification> local_getTagClassification_parseRecordSet (ResultSet rs) throws SQLException {
+		List<MediaTagClassification> ret = new LinkedList<MediaTagClassification>();
+		
+		while (rs.next()) {
+			long rowId = rs.getLong(SQL_TBL_TAGCLS_COL_ROWID);
+			String clsName = rs.getString(SQL_TBL_TAGCLS_COL_CLS);
+			
+			MediaTagClassification mtc = new MediaTagClassification(rowId, clsName);
+			ret.add(mtc);
+		}
+		
+		return ret;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
