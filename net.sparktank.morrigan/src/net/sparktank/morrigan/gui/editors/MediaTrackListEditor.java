@@ -256,6 +256,8 @@ public abstract class MediaTrackListEditor<T extends MediaTrackList<S>, S extend
 		mediaFilter = new MediaFilter();
 		editTable.addFilter(mediaFilter);
 		
+		getSite().setSelectionProvider(editTable);
+		
 		int topIndex = editorInput.getTopIndex();
 		if (topIndex > 0) {
 			editTable.getTable().setTopIndex(topIndex);

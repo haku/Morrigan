@@ -118,6 +118,7 @@ public class ViewLibraryProperties extends ViewPart {
 		tableViewer = new TableViewer(parent, SWT.MULTI | SWT.V_SCROLL);
 		tableViewer.setContentProvider(sourcesProvider);
 		tableViewer.setInput(getViewSite()); // use content provider.
+		getSite().setSelectionProvider(tableViewer);
 	}
 	
 	private void addToolbar () {
