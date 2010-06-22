@@ -82,6 +82,13 @@
             name="Queue"
             restorable="true">
       </view>
+      <view
+            class="net.sparktank.morrigan.gui.views.ViewTagEditor"
+            icon="icons/pref.gif"
+            id="net.sparktank.morrigan.gui.views.ViewTagEditor"
+            name="Tags"
+            restorable="true">
+      </view>
       
    </extension>
    
