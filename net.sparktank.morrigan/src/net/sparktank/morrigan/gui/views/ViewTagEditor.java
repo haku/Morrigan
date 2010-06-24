@@ -26,6 +26,8 @@ import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.ISelectionService;
@@ -162,7 +164,7 @@ public class ViewTagEditor extends ViewPart {
 	
 	protected final int sep = 3;
 	
-	private Text txtFilter;
+	private Text txtNewTag;
 	private Button btnAddTag;
 	private Button btnRemoveTag;
 	private TableViewer tableViewer;
@@ -173,7 +175,7 @@ public class ViewTagEditor extends ViewPart {
 		parent.setLayout(new FormLayout());
 		
 		Composite tbCom = new Composite(parent, SWT.NONE);
-		txtFilter = new Text(tbCom, SWT.SINGLE | SWT.BORDER);
+		txtNewTag = new Text(tbCom, SWT.SINGLE | SWT.BORDER);
 		btnAddTag = new Button(tbCom, SWT.PUSH);
 		btnRemoveTag = new Button(tbCom, SWT.PUSH);
 		
@@ -184,13 +186,13 @@ public class ViewTagEditor extends ViewPart {
 		formData.right = new FormAttachment(100, 0);
 		tbCom.setLayoutData(formData);
 		
-		txtFilter.setMessage("New tag");
+		txtNewTag.setMessage("New tag");
 		formData = new FormData();
 		formData.left = new FormAttachment(0, sep);
 		formData.right = new FormAttachment(btnAddTag, -sep);
 		formData.top = new FormAttachment(0, sep);
 		formData.bottom = new FormAttachment(100, -sep);
-		txtFilter.setLayoutData(formData);
+		txtNewTag.setLayoutData(formData);
 		
 		btnAddTag.setImage(imageCache.readImage("icons/plus.gif"));
 		formData = new FormData();
@@ -218,6 +220,44 @@ public class ViewTagEditor extends ViewPart {
 		tableViewer.getTable().setLayoutData(formData);
 		
 		btnAddTag.addSelectionListener(btnAddTagListener);
+		btnRemoveTag.addSelectionListener(btnRemoteTagListener);
+		txtNewTag.addListener (SWT.DefaultSelection, new Listener () {
+			public void handleEvent (Event e) {
+				procAddTag();
+			}
+		});
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	private void procAddTag() {
+		if (editedMediaList != null && editedMediaItem != null) {
+			String text = txtNewTag.getText();
+			if (text.length() > 0) {
+				try {
+					editedMediaList.addTag(editedMediaItem, text, MediaTagType.MANUAL, null);
+					tableViewer.refresh();
+					txtNewTag.setSelection(0, text.length());
+					txtNewTag.setFocus();
+				}
+				catch (DbException e) {
+					getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));
+				}
+			}
+			
+		}
+		else {
+			new MorriganMsgDlg("No item selected to add tag to.").open();
+		}
+	}
+	
+	private void procRemoveTag() {
+		/* TODO
+		 * Get selection from list.
+		 * Confirm with user?  Undo option??
+		 * Iterate over, removing tags.
+		 */
+		new MorriganMsgDlg("TODO: remote tags.").open();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -225,22 +265,16 @@ public class ViewTagEditor extends ViewPart {
 	private SelectionListener btnAddTagListener = new SelectionListener() {
 		@Override
 		public void widgetSelected(SelectionEvent event) {
-			if (editedMediaList != null && editedMediaItem != null) {
-				String text = txtFilter.getText();
-				if (text.length() > 0) {
-					try {
-						editedMediaList.addTag(editedMediaItem, text, MediaTagType.MANUAL, null);
-						tableViewer.refresh();
-					}
-					catch (DbException e) {
-						getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));
-					}
-				}
-				
-			}
-			else {
-				new MorriganMsgDlg("No item selected to add tag to.").open();
-			}
+			procAddTag();
+		}
+		@Override
+		public void widgetDefaultSelected(SelectionEvent e) {}
+	};
+	
+	private SelectionListener btnRemoteTagListener = new SelectionListener() {
+		@Override
+		public void widgetSelected(SelectionEvent event) {
+			procRemoveTag();
 		}
 		@Override
 		public void widgetDefaultSelected(SelectionEvent e) {}
