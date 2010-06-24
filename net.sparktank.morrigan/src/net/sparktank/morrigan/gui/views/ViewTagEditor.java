@@ -3,9 +3,15 @@ package net.sparktank.morrigan.gui.views;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
+import net.sparktank.morrigan.gui.dialogs.RunnableDialog;
 import net.sparktank.morrigan.gui.editors.AbstractLibraryEditor;
 import net.sparktank.morrigan.gui.helpers.ImageCache;
-import net.sparktank.morrigan.model.MediaTrack;
+import net.sparktank.morrigan.model.library.AbstractMediaLibrary;
+import net.sparktank.morrigan.model.library.DbException;
+import net.sparktank.morrigan.model.library.MediaLibraryTrack;
+import net.sparktank.morrigan.model.tags.MediaTag;
+import net.sparktank.morrigan.model.tags.MediaTagType;
 
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -13,6 +19,8 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -52,6 +60,102 @@ public class ViewTagEditor extends ViewPart {
 		imageCache.clearCache();
 		super.dispose();
 	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	External events.
+	
+	private void initSelectionListener () {
+		ISelectionService service = getSite().getWorkbenchWindow().getSelectionService();
+		service.addSelectionListener(selectionListener);
+	}
+	
+	private void removeSelectionListener () {
+		ISelectionService service = getSite().getWorkbenchWindow().getSelectionService();
+		service.removeSelectionListener(selectionListener);
+	}
+	
+	private ISelectionListener selectionListener = new ISelectionListener() {
+		@Override
+		public void selectionChanged(IWorkbenchPart part, ISelection selection) {
+			if (selection==null) return;
+			if (selection.isEmpty()) return;
+			
+//			System.err.println("selectionChanged("+part.getTitle()+","+selection.toString()+").");
+			
+			if (part instanceof AbstractLibraryEditor<?>) {
+				@SuppressWarnings("unchecked") // FIXME avoid need for this?
+				AbstractLibraryEditor<? extends AbstractMediaLibrary> libEditor = (AbstractLibraryEditor<? extends AbstractMediaLibrary>) part;
+				AbstractMediaLibrary mediaList = libEditor.getMediaList();
+				
+				if (selection instanceof IStructuredSelection) {
+					IStructuredSelection iSel = (IStructuredSelection) selection;
+					ArrayList<MediaLibraryTrack> sel = new ArrayList<MediaLibraryTrack>();
+					for (Object selectedObject : iSel.toList()) {
+						if (selectedObject != null) {
+							if (selectedObject instanceof MediaLibraryTrack) {
+								MediaLibraryTrack track = (MediaLibraryTrack) selectedObject;
+								sel.add(track);
+							}
+						}
+					}
+					
+					inputSelectionChanged(mediaList, sel);
+				}
+			}
+		}
+	};
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Data links.
+	
+	private AbstractMediaLibrary editedMediaList = null;
+	private MediaLibraryTrack editedMediaItem = null;
+	
+	private void inputSelectionChanged (AbstractMediaLibrary editedMediaList, List<MediaLibraryTrack> selection) {
+		this.editedMediaList = editedMediaList;
+		
+		if (selection.size() == 1) {
+			setContentDescription(selection.get(0).getTitle());
+			editedMediaItem = selection.get(0);
+		}
+		else if (selection.size() > 1) {
+			setContentDescription(selection.size() + " items selected.");
+			editedMediaItem = null;
+		}
+		else {
+			setContentDescription("No items selected.");
+			editedMediaItem = null;
+		}
+		
+		tableViewer.refresh();
+	}
+	
+	private IStructuredContentProvider sourcesProvider = new IStructuredContentProvider() {
+		
+		@Override
+		public Object[] getElements(Object inputElement) {
+			if (editedMediaList != null && editedMediaItem != null) {
+				try {
+					List<MediaTag> tags = editedMediaList.getTags(editedMediaItem);
+					return tags.toArray();
+				}
+				catch (DbException e) {
+					getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));
+					// TODO disable stuff 'cos we are broken?
+					return new String[]{};
+				}
+			}
+			else {
+				return new String[]{};
+			}
+		}
+		
+		@Override
+		public void dispose() {}
+		@Override
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
+		
+	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	GUI stuff.
@@ -112,73 +216,34 @@ public class ViewTagEditor extends ViewPart {
 		formData.top = new FormAttachment(tbCom, 0);
 		formData.bottom = new FormAttachment(100, -sep);
 		tableViewer.getTable().setLayoutData(formData);
-	}
-	
-	private IStructuredContentProvider sourcesProvider = new IStructuredContentProvider() {
 		
-		@Override
-		public Object[] getElements(Object inputElement) {
-			return new String[]{"tag0", "tag1", "tag2"};
-		}
-		
-		@Override
-		public void dispose() {}
-		@Override
-		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
-		
-	};
-	
-	private void inputSelectionChanged (List<MediaTrack> selection) {
-		if (selection.size() == 1) {
-			setContentDescription(selection.get(0).getTitle());
-		}
-		else if (selection.size() > 1) {
-			setContentDescription(selection.size() + " items selected.");
-		}
-		else {
-			setContentDescription("No items selected.");
-		}
+		btnAddTag.addSelectionListener(btnAddTagListener);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Events.
 	
-	private void initSelectionListener () {
-		ISelectionService service = getSite().getWorkbenchWindow().getSelectionService();
-		service.addSelectionListener(selectionListener);
-	}
-	
-	private void removeSelectionListener () {
-		ISelectionService service = getSite().getWorkbenchWindow().getSelectionService();
-		service.removeSelectionListener(selectionListener);
-	}
-	
-	private ISelectionListener selectionListener = new ISelectionListener() {
+	private SelectionListener btnAddTagListener = new SelectionListener() {
 		@Override
-		public void selectionChanged(IWorkbenchPart part, ISelection selection) {
-			if (selection==null) return;
-			if (selection.isEmpty()) return;
-			
-			System.err.println("selectionChanged("+part.getTitle()+","+selection.toString()+").");
-			
-			if (part instanceof AbstractLibraryEditor<?>) {
-//				AbstractLibraryEditor<?> libEditor = (AbstractLibraryEditor<?>) part;
-				if (selection instanceof IStructuredSelection) {
-					IStructuredSelection iSel = (IStructuredSelection) selection;
-					
-					ArrayList<MediaTrack> sel = new ArrayList<MediaTrack>();
-					for (Object selectedObject : iSel.toList()) {
-						if (selectedObject != null) {
-							if (selectedObject instanceof MediaTrack) {
-								MediaTrack track = (MediaTrack) selectedObject;
-								sel.add(track);
-							}
-						}
+		public void widgetSelected(SelectionEvent event) {
+			if (editedMediaList != null && editedMediaItem != null) {
+				String text = txtFilter.getText();
+				if (text.length() > 0) {
+					try {
+						editedMediaList.addTag(editedMediaItem, text, MediaTagType.MANUAL, null);
+						tableViewer.refresh();
 					}
-					inputSelectionChanged(sel);
+					catch (DbException e) {
+						getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));
+					}
 				}
+				
+			}
+			else {
+				new MorriganMsgDlg("No item selected to add tag to.").open();
 			}
 		}
+		@Override
+		public void widgetDefaultSelected(SelectionEvent e) {}
 	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
