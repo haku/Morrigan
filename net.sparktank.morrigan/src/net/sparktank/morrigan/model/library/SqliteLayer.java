@@ -337,25 +337,25 @@ public class SqliteLayer {
 		}
 	}
 	
-	public void addTag (long rowId, String tag, int type, int ontology) throws DbException {
+	public void addTag (long mf_rowId, String tag, MediaTagType type, MediaTagClassification mtc) throws DbException {
 		try {
-			local_addTag(rowId, tag, type, ontology);
+			local_addTag(mf_rowId, tag, type, mtc);
 		} catch (Exception e) {
 			throw new DbException(e);
 		}
 	}
 	
-	public void removeTag (long rowId, String tag) throws DbException {
+	public void removeTag (long mf_rowId, String tag) throws DbException {
 		try {
-			local_removeTag(rowId, tag);
+			local_removeTag(mf_rowId, tag);
 		} catch (Exception e) {
 			throw new DbException(e);
 		}
 	}
 	
-	public void clearTags (long rowId) throws DbException {
+	public void clearTags (long mf_rowId) throws DbException {
 		try {
-			local_clearTags(rowId);
+			local_clearTags(mf_rowId);
 		} catch (Exception e) {
 			throw new DbException(e);
 		}
@@ -597,7 +597,7 @@ public class SqliteLayer {
 //	Tag queries.
 	
 	private static final String SQL_TBL_TAGS_ADD =
-		"INSERT INTO tbl_tags (mf_rowid,tag,type,ont) VALUES (?,?,?,?);";
+		"INSERT INTO tbl_tags (mf_rowid,tag,type,cls_rowid) VALUES (?,?,?,?);";
 	
 	private static final String SQL_TBL_TAGS_REMOVE =
 		"DELETE FROM mf_rowid WHERE mf_rowid=? AND tag=?;";
@@ -1232,15 +1232,32 @@ public class SqliteLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Tags.
 	
-	private void local_addTag (long mf_rowId, String tag, int type, int ontology) throws SQLException, ClassNotFoundException, DbException {
+	private void local_addTag (long mf_rowId, String tag, MediaTagType type, String cls_name) throws SQLException, ClassNotFoundException, DbException {
+		MediaTagClassification mtc = local_getTagClassification(cls_name);
+		local_addTag(mf_rowId, tag, type, mtc);
+	}
+	
+	private void local_addTag (long mf_rowId, String tag, MediaTagType type, MediaTagClassification mtc) throws SQLException, ClassNotFoundException, DbException {
+		if (mtc != null) {
+			local_addTag(mf_rowId, tag, type, mtc.getRowId());
+		} else {
+			local_addTag(mf_rowId, tag, type, 0);
+		}
+	}
+	
+	private void local_addTag (long mf_rowId, String tag, MediaTagType type, long cls_rowid) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps;
 		ps = getDbCon().prepareStatement(SQL_TBL_TAGS_ADD);
 		int n;
 		try {
 			ps.setLong(1, mf_rowId);
 			ps.setString(2, tag);
-			ps.setInt(3, type);
-			ps.setInt(4, ontology);
+			ps.setInt(3, type.getIndex());
+			if (cls_rowid > 0 ) {
+				ps.setLong(4, cls_rowid);
+			} else {
+				ps.setNull(4, java.sql.Types.INTEGER);
+			}
 			n = ps.executeUpdate();
 		} finally {
 			ps.close();
@@ -1355,7 +1372,9 @@ public class SqliteLayer {
 			ps.close();
 		}
 		
-		if (ret.size() == 1) {
+		if (ret.size() < 1) {
+			return null;
+		} else if (ret.size() == 1) {
 			return ret.get(0);
 		} else {
 			throw new DbException("Query returned more than one result.");
