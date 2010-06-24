@@ -11,6 +11,9 @@ import net.sparktank.morrigan.model.MediaTrack;
 import net.sparktank.morrigan.model.MediaTrackList;
 import net.sparktank.morrigan.model.library.SqliteLayer.LibrarySort;
 import net.sparktank.morrigan.model.library.SqliteLayer.LibrarySortDirection;
+import net.sparktank.morrigan.model.tags.MediaTag;
+import net.sparktank.morrigan.model.tags.MediaTagClassification;
+import net.sparktank.morrigan.model.tags.MediaTagType;
 
 public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTrack> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -308,6 +311,17 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTr
 	
 	public void removeSource (String source) throws DbException {
 		dbLayer.removeSource(source);
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Tags.
+	
+	public List<MediaTag> getTags (MediaLibraryTrack mlt) throws DbException {
+		return dbLayer.getTags(mlt.getDbRowId());
+	}
+	
+	public void addTag (MediaLibraryTrack mlt, String tag, MediaTagType type, MediaTagClassification mtc) throws DbException {
+		dbLayer.addTag(mlt.getDbRowId(), tag, type, mtc);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
