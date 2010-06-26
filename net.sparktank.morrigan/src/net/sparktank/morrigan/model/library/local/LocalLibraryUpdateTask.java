@@ -7,8 +7,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 import java.util.Map.Entry;
+import java.util.Stack;
 
 import net.sparktank.morrigan.config.Config;
 import net.sparktank.morrigan.engines.EngineFactory;
@@ -18,7 +18,6 @@ import net.sparktank.morrigan.helpers.ChecksumHelper;
 import net.sparktank.morrigan.helpers.RecyclingFactory;
 import net.sparktank.morrigan.model.IMorriganTask;
 import net.sparktank.morrigan.model.MediaItem;
-import net.sparktank.morrigan.model.MediaTrack;
 import net.sparktank.morrigan.model.TaskEventListener;
 import net.sparktank.morrigan.model.TaskResult;
 import net.sparktank.morrigan.model.TaskResult.TaskOutcome;
@@ -412,9 +411,14 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 					 * added data, last played data.
 					 * Then remove missing tracks from library.
 					 */
-					for (MediaTrack i : items.keySet()) {
+					for (MediaLibraryTrack i : items.keySet()) {
+						boolean success = false;
 						try {
-							// TODO this should be done in a tranasaction!
+							/*
+							 * FIXME TODO get some form of lock for this transaction?
+							 * What if the user changes something while we do this?
+							 */
+							library.setAutoCommit(false);
 							
 							library.incTrackStartCnt(keep, i.getStartCount());
 							library.incTrackEndCnt(keep, i.getEndCount());
@@ -433,16 +437,23 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 								}
 							}
 							
+							if (library.hasTags(i)) {
+								library.moveTags(i, keep);
+							}
+							
 							library.removeMediaTrack(i);
 							taskEventListener.logMsg(library.getListName(), "[REMOVED] " + i.getFilepath());
 							countMerges++;
 							
-						} catch (Throwable t) {
-							// FIXME log this somewhere useful.
-							System.err.println("Throwable while setting merged metadate for '"+i.getFilepath()+"': " + t.getMessage());
-							t.printStackTrace();
+							library.commit();
+							success = true;
 						}
-						
+						finally {
+							if (!success) {
+								library.rollback();
+							}
+							library.setAutoCommit(true);
+						}
 					}
 					
 					/*
@@ -458,7 +469,7 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 			} // End metadata merging.
 			
 			/*
-			 * Print out what are left with.
+			 * Print out what we are left with.
 			 */
 			taskEventListener.logMsg(library.getListName(), "Performed " + countMerges + " mergers.");
 			taskEventListener.logMsg(library.getListName(), "Found " + dupicateItems.size() + " duplicate items:");

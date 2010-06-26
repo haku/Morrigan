@@ -139,6 +139,14 @@ public class SqliteLayer {
 		}
 	}
 	
+	public boolean hasTags (long rowId) throws DbException {
+		try {
+			return local_hasTags(rowId);
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+	
 	public List<MediaTag> getTags (long rowId) throws DbException {
 		try {
 			return local_getTags(rowId);
@@ -340,6 +348,14 @@ public class SqliteLayer {
 	public void addTag (long mf_rowId, String tag, MediaTagType type, MediaTagClassification mtc) throws DbException {
 		try {
 			local_addTag(mf_rowId, tag, type, mtc);
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+	
+	public void moveTags (long from_mf_rowId, long to_mf_rowId) throws DbException {
+		try {
+			local_moveTags(from_mf_rowId, to_mf_rowId);
 		} catch (Exception e) {
 			throw new DbException(e);
 		}
@@ -599,11 +615,17 @@ public class SqliteLayer {
 	private static final String SQL_TBL_TAGS_ADD =
 		"INSERT INTO tbl_tags (mf_rowid,tag,type,cls_rowid) VALUES (?,?,?,?);";
 	
+	private static final String SQL_TBL_TAGS_MOVE =
+		"UPDATE tbl_tags SET mf_rowid=? WHERE mf_rowid=?;";
+	
 	private static final String SQL_TBL_TAGS_REMOVE =
 		"DELETE FROM mf_rowid WHERE mf_rowid=? AND tag=?;";
 	
 	private static final String SQL_TBL_TAGS_CLEAR =
 		"DELETE FROM mf_rowid WHERE mf_rowid=?;";
+	
+	private static final String SQL_TBL_TAGS_Q_HAS =
+		"SELECT cls_rowid FROM tbl_tags WHERE mf_rowid=?;";
 	
 	private static final String SQL_TBL_TAGS_Q_ALL =
 		"SELECT tag,type,cls_rowid FROM tbl_tags WHERE mf_rowid=?;";
@@ -652,6 +674,14 @@ public class SqliteLayer {
 	public void commit () throws MorriganException {
 		try {
 			getDbCon().commit();
+		} catch (Exception e) {
+			throw new MorriganException(e);
+		}
+	}
+	
+	public void rollback () throws MorriganException {
+		try {
+			getDbCon().rollback();
 		} catch (Exception e) {
 			throw new MorriganException(e);
 		}
@@ -1083,150 +1113,174 @@ public class SqliteLayer {
 		PreparedStatement ps;
 		
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETDATEADDED);
+		int n;
 		try {
 			ps.setDate(1, new java.sql.Date(date.getTime()));
 			ps.setString(2, sfile);
-			ps.executeUpdate();
+			n = ps.executeUpdate();
 		} finally {
 			ps.close();
 		}
+		if (n<1) throw new DbException("No update occured.");
 	}
 	
-	private void local_incTrackStartCnt (String sfile, long n) throws SQLException, ClassNotFoundException {
+	private void local_incTrackStartCnt (String sfile, long x) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps;
 		
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_INCSTART);
+		int n;
 		try {
-			ps.setLong(1, n);
+			ps.setLong(1, x);
 			ps.setString(2, sfile);
-			ps.executeUpdate();
+			n = ps.executeUpdate();
 		} finally {
 			ps.close();
 		}
+		if (n<1) throw new DbException("No update occured.");
 	}
 	
-	private void local_setTrackStartCnt (String sfile, long n) throws SQLException, ClassNotFoundException {
+	private void local_setTrackStartCnt (String sfile, long x) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps;
 		
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETSTART);
+		int n;
 		try {
-			ps.setLong(1, n);
+			ps.setLong(1, x);
 			ps.setString(2, sfile);
-			ps.executeUpdate();
+			n = ps.executeUpdate();
 		} finally {
 			ps.close();
 		}
+		if (n<1) throw new DbException("No update occured.");
 	}
 	
-	private void local_setDateLastPlayed (String sfile, Date date) throws SQLException, ClassNotFoundException {
+	private void local_setDateLastPlayed (String sfile, Date date) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps;
 		
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETDATELASTPLAYED);
+		int n;
 		try {
 			ps.setDate(1, new java.sql.Date(date.getTime()));
 			ps.setString(2, sfile);
-			ps.executeUpdate();
+			n = ps.executeUpdate();
 		} finally {
 			ps.close();
 		}
+		if (n<1) throw new DbException("No update occured.");
 	}
 	
-	private void local_incTrackEndCnt (String sfile, long n) throws SQLException, ClassNotFoundException {
+	private void local_incTrackEndCnt (String sfile, long x) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps;
 		
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_INCEND);
+		int n;
 		try {
-			ps.setLong(1, n);
+			ps.setLong(1, x);
 			ps.setString(2, sfile);
-			ps.executeUpdate();
+			n = ps.executeUpdate();
 		} finally {
 			ps.close();
 		}
+		if (n<1) throw new DbException("No update occured.");
 	}
 	
-	private void local_setTrackEndCnt (String sfile, long n) throws SQLException, ClassNotFoundException {
+	private void local_setTrackEndCnt (String sfile, long x) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps;
 		
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETEND);
+		int n;
 		try {
-			ps.setLong(1, n);
+			ps.setLong(1, x);
 			ps.setString(2, sfile);
-			ps.executeUpdate();
+			n = ps.executeUpdate();
 		} finally {
 			ps.close();
 		}
+		if (n<1) throw new DbException("No update occured.");
 	}
 	
-	private void local_setTrackDuration (String sfile, int duration) throws SQLException, ClassNotFoundException {
+	private void local_setTrackDuration (String sfile, int duration) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps;
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETDURATION);
+		int n;
 		try {
 			ps.setInt(1, duration);
 			ps.setString(2, sfile);
-			ps.executeUpdate();
+			n = ps.executeUpdate();
 		} finally {
 			ps.close();
 		}
+		if (n<1) throw new DbException("No update occured.");
 	}
 	
-	private void local_setHashCode (String sfile, long hashcode) throws SQLException, ClassNotFoundException {
+	private void local_setHashCode (String sfile, long hashcode) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps;
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETHASHCODE);
+		int n;
 		try {
 			ps.setLong(1, hashcode);
 			ps.setString(2, sfile);
-			ps.executeUpdate();
+			n = ps.executeUpdate();
 		} finally {
 			ps.close();
 		}
+		if (n<1) throw new DbException("No update occured.");
 	}
 	
-	private void local_setDateLastModified (String sfile, Date date) throws SQLException, ClassNotFoundException {
+	private void local_setDateLastModified (String sfile, Date date) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps;
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETDMODIFIED);
+		int n;
 		try {
 			ps.setDate(1, new java.sql.Date(date.getTime()));
 			ps.setString(2, sfile);
-			ps.executeUpdate();
+			n = ps.executeUpdate();
 		} finally {
 			ps.close();
 		}
+		if (n<1) throw new DbException("No update occured.");
 	}
 	
-	private void local_setEnabled (String sfile, boolean value) throws SQLException, ClassNotFoundException {
+	private void local_setEnabled (String sfile, boolean value) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps;
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETENABLED);
+		int n;
 		try {
 			ps.setInt(1, value ? 1 : 0);
 			ps.setString(2, sfile);
-			ps.executeUpdate();
+			n = ps.executeUpdate();
 		} finally {
 			ps.close();
 		}
+		if (n<1) throw new DbException("No update occured.");
 	}
 	
-	private void local_setMissing (String sfile, boolean value) throws SQLException, ClassNotFoundException {
+	private void local_setMissing (String sfile, boolean value) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps;
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETMISSING);
+		int n;
 		try {
 			ps.setInt(1, value ? 1 : 0);
 			ps.setString(2, sfile);
-			ps.executeUpdate();
+			n = ps.executeUpdate();
 		} finally {
 			ps.close();
 		}
+		if (n<1) throw new DbException("No update occured.");
 	}
 	
-	private void local_setRemoteLocation(String sfile, String remoteLocation) throws SQLException, ClassNotFoundException {
+	private void local_setRemoteLocation(String sfile, String remoteLocation) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps;
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETREMLOC);
+		int n;
 		try {
 			ps.setString(1, remoteLocation);
 			ps.setString(2, sfile);
-			ps.executeUpdate();
+			n = ps.executeUpdate();
 		} finally {
 			ps.close();
 		}
+		if (n<1) throw new DbException("No update occured.");
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1265,6 +1319,20 @@ public class SqliteLayer {
 		if (n<1) throw new DbException("No update occured.");
 	}
 	
+	private void local_moveTags (long from_mf_rowId, long to_mf_rowId) throws SQLException, ClassNotFoundException, DbException {
+		PreparedStatement ps;
+		ps = getDbCon().prepareStatement(SQL_TBL_TAGS_MOVE);
+		int n;
+		try {
+			ps.setLong(1, to_mf_rowId);
+			ps.setLong(2, from_mf_rowId);
+			n = ps.executeUpdate();
+		} finally {
+			ps.close();
+		}
+		if (n<1) throw new DbException("No update occured when setting '"+from_mf_rowId+"' to '"+to_mf_rowId+"'.");
+	}
+	
 	private void local_removeTag(long mf_rowId, String tag) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps;
 		ps = getDbCon().prepareStatement(SQL_TBL_TAGS_REMOVE);
@@ -1290,6 +1358,27 @@ public class SqliteLayer {
 			ps.close();
 		}
 		if (n<1) throw new DbException("No update occured.");
+	}
+	
+	private boolean local_hasTags (long mf_rowId) throws SQLException, ClassNotFoundException {
+		ResultSet rs;
+		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_TAGS_Q_HAS);
+		
+		try {
+			ps.setLong(1, mf_rowId);
+			rs = ps.executeQuery();
+			try {
+				if (rs.next()) {
+					return true;
+				} else {
+					return false;
+				}
+			} finally {
+				rs.close();
+			}
+		} finally {
+			ps.close();
+		}
 	}
 	
 	private List<MediaTag> local_getTags(long mf_rowId) throws SQLException, ClassNotFoundException, DbException {

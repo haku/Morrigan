@@ -124,6 +124,10 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTr
 		dbLayer.commit();
 	}
 	
+	public void rollback () throws MorriganException {
+		dbLayer.rollback();
+	}
+	
 	/**
 	 * Returns a copy of the main list updated with all items from the DB.
 	 * 
@@ -316,12 +320,20 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTr
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Tags.
 	
+	public boolean hasTags (MediaLibraryTrack mlt) throws DbException {
+		return dbLayer.hasTags(mlt.getDbRowId());
+	}
+	
 	public List<MediaTag> getTags (MediaLibraryTrack mlt) throws DbException {
 		return dbLayer.getTags(mlt.getDbRowId());
 	}
 	
 	public void addTag (MediaLibraryTrack mlt, String tag, MediaTagType type, MediaTagClassification mtc) throws DbException {
 		dbLayer.addTag(mlt.getDbRowId(), tag, type, mtc);
+	}
+	
+	public void moveTags (MediaLibraryTrack from_mlt, MediaLibraryTrack to_mlt) throws DbException {
+		dbLayer.moveTags(from_mlt.getDbRowId(), to_mlt.getDbRowId());
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
