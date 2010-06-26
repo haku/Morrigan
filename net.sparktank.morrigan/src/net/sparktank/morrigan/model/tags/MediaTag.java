@@ -51,7 +51,19 @@ public class MediaTag {
 	
 	@Override
 	public String toString() {
-		return getTag();
+		StringBuilder sb = new StringBuilder(getTag());
+		
+		if (getClassification() != null && getClassification().getClassification().length() > 0) {
+			sb.append(" (");
+			sb.append(getClassification());
+			sb.append(")");
+		}
+		
+		sb.append(" [");
+		sb.append(getType().getShortName());
+		sb.append("]");
+		
+		return sb.toString();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

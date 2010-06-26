@@ -14,15 +14,19 @@ public class MediaTagClassification {
 	public long getRowId() {
 		return rowId;
 	}
-	public void setRowId(long rowId) {
-		this.rowId = rowId;
-	}
 	
 	public String getClassification() {
 		return classification;
 	}
 	public void setClassification(String classification) {
 		this.classification = classification;
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	@Override
+	public String toString() {
+		return getClassification();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
