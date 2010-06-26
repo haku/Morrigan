@@ -54,7 +54,7 @@ public class ViewTagEditor extends ViewPart {
 	
 	@Override
 	public void setFocus() {
-		tableViewer.getTable().setFocus();
+		txtNewTag.setFocus();
 	}
 	
 	@Override
@@ -81,7 +81,7 @@ public class ViewTagEditor extends ViewPart {
 		@Override
 		public void selectionChanged(IWorkbenchPart part, ISelection selection) {
 			if (selection==null || selection.isEmpty()) {
-				inputSelectionChanged(null, null);
+				setInput(null, null);
 				return;
 			}
 			
@@ -104,7 +104,7 @@ public class ViewTagEditor extends ViewPart {
 						}
 					}
 					
-					inputSelectionChanged(mediaList, sel);
+					setInput(mediaList, sel);
 				}
 			}
 		}
@@ -116,7 +116,7 @@ public class ViewTagEditor extends ViewPart {
 	private AbstractMediaLibrary editedMediaList = null;
 	private MediaLibraryTrack editedMediaItem = null;
 	
-	private void inputSelectionChanged (AbstractMediaLibrary editedMediaList, List<MediaLibraryTrack> selection) {
+	public void setInput (AbstractMediaLibrary editedMediaList, List<MediaLibraryTrack> selection) {
 		if (selection != null && selection.size() > 0) {
 			if (selection.size() == 1) {
 				setContentDescription(selection.get(0).getTitle());
