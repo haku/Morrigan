@@ -30,6 +30,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.ISelectionService;
 import org.eclipse.ui.IWorkbenchPart;
@@ -49,6 +50,7 @@ public class ViewTagEditor extends ViewPart {
 	@Override
 	public void createPartControl(Composite parent) {
 		createLayout(parent);
+		addPartListener();
 		initSelectionListener();
 	}
 	
@@ -60,6 +62,7 @@ public class ViewTagEditor extends ViewPart {
 	@Override
 	public void dispose() {
 		removeSelectionListener();
+		removePartListener();
 		imageCache.clearCache();
 		super.dispose();
 	}
@@ -77,17 +80,44 @@ public class ViewTagEditor extends ViewPart {
 		service.removeSelectionListener(selectionListener);
 	}
 	
+	private void addPartListener () {
+		getViewSite().getPage().addPartListener(partListener);
+	}
+	
+	private void removePartListener () {
+		getViewSite().getPage().removePartListener(partListener);
+	}
+	
+	private IPartListener partListener = new IPartListener() {
+		@Override
+		public void partClosed(IWorkbenchPart part) {
+			if (part instanceof AbstractLibraryEditor<?>) {
+				AbstractLibraryEditor<?> libEditor = (AbstractLibraryEditor<?>) part;
+				if (libEditor.getMediaList().equals(editedMediaList)) {
+					setInput(null, null);
+				}
+			}
+		}
+		
+		@Override
+		public void partActivated(IWorkbenchPart part) {}
+		@Override
+		public void partOpened(IWorkbenchPart part) {}
+		@Override
+		public void partDeactivated(IWorkbenchPart part) {}
+		@Override
+		public void partBroughtToTop(IWorkbenchPart part) {}
+	};
+	
 	private ISelectionListener selectionListener = new ISelectionListener() {
 		@Override
 		public void selectionChanged(IWorkbenchPart part, ISelection selection) {
-			if (selection==null || selection.isEmpty()) {
-				setInput(null, null);
-				return;
-			}
-			
-//			System.err.println("selectionChanged("+part.getTitle()+","+selection.toString()+").");
-			
 			if (part instanceof AbstractLibraryEditor<?>) {
+				if (selection==null || selection.isEmpty()) {
+					setInput(null, null);
+					return;
+				}
+				
 				@SuppressWarnings("unchecked") // FIXME avoid need for this?
 				AbstractLibraryEditor<? extends AbstractMediaLibrary> libEditor = (AbstractLibraryEditor<? extends AbstractMediaLibrary>) part;
 				AbstractMediaLibrary mediaList = libEditor.getMediaList();
