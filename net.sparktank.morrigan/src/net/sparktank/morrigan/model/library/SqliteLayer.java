@@ -361,9 +361,9 @@ public class SqliteLayer {
 		}
 	}
 	
-	public void removeTag (long mf_rowId, String tag) throws DbException {
+	public void removeTag (MediaTag tag) throws DbException {
 		try {
-			local_removeTag(mf_rowId, tag);
+			local_removeTag(tag);
 		} catch (Exception e) {
 			throw new DbException(e);
 		}
@@ -469,6 +469,7 @@ public class SqliteLayer {
 		"cls_rowid INT" +
 		");";
 	
+	private static final String SQL_TBL_TAGS_COL_ROWID = "ROWID";
 //	private static final String SQL_TBL_TAGS_COL_MEDIAFILEROWID = "mf_rowid";
 	private static final String SQL_TBL_TAGS_COL_TAG = "tag";
 	private static final String SQL_TBL_TAGS_COL_TYPE = "type";
@@ -619,16 +620,16 @@ public class SqliteLayer {
 		"UPDATE tbl_tags SET mf_rowid=? WHERE mf_rowid=?;";
 	
 	private static final String SQL_TBL_TAGS_REMOVE =
-		"DELETE FROM mf_rowid WHERE mf_rowid=? AND tag=?;";
+		"DELETE FROM tbl_tags WHERE ROWID=?;";
 	
 	private static final String SQL_TBL_TAGS_CLEAR =
-		"DELETE FROM mf_rowid WHERE mf_rowid=?;";
+		"DELETE FROM tbl_tags WHERE mf_rowid=?;";
 	
 	private static final String SQL_TBL_TAGS_Q_HAS =
-		"SELECT cls_rowid FROM tbl_tags WHERE mf_rowid=?;";
+		"SELECT ROWID FROM tbl_tags WHERE mf_rowid=?;";
 	
 	private static final String SQL_TBL_TAGS_Q_ALL =
-		"SELECT tag,type,cls_rowid FROM tbl_tags WHERE mf_rowid=?;";
+		"SELECT ROWID,tag,type,cls_rowid FROM tbl_tags WHERE mf_rowid=?;";
 	
 	private static final String SQL_TBL_TAGCLS_ADD =
 		"INSERT INTO tbl_tag_cls (cls) VALUES (?);";
@@ -1333,13 +1334,12 @@ public class SqliteLayer {
 		if (n<1) throw new DbException("No update occured when setting '"+from_mf_rowId+"' to '"+to_mf_rowId+"'.");
 	}
 	
-	private void local_removeTag(long mf_rowId, String tag) throws SQLException, ClassNotFoundException, DbException {
+	private void local_removeTag(MediaTag tag) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps;
 		ps = getDbCon().prepareStatement(SQL_TBL_TAGS_REMOVE);
 		int n;
 		try {
-			ps.setLong(1, mf_rowId);
-			ps.setString(2, tag);
+			ps.setLong(1, tag.getDbRowId());
 			n = ps.executeUpdate();
 		} finally {
 			ps.close();
@@ -1391,6 +1391,7 @@ public class SqliteLayer {
 			rs = ps.executeQuery();
 			try {
 				while (rs.next()) {
+					long rowId = rs.getLong(SQL_TBL_TAGS_COL_ROWID);
 					String tag = rs.getString(SQL_TBL_TAGS_COL_TAG);
 					int type = rs.getInt(SQL_TBL_TAGS_COL_TYPE);
 					long clsRowId = rs.getLong(SQL_TBL_TAGS_COL_CLSROWID);
@@ -1398,7 +1399,7 @@ public class SqliteLayer {
 					MediaTagType mtt = MediaTagType.getFromIndex(type);
 					MediaTagClassification mtc = local_getTagClassification(clsRowId);
 					
-					MediaTag mt = new MediaTag(tag, mtt, mtc);
+					MediaTag mt = new MediaTag(rowId, tag, mtt, mtc);
 					ret.add(mt);
 				}
 			} finally {

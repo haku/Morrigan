@@ -336,6 +336,10 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTr
 		dbLayer.moveTags(from_mlt.getDbRowId(), to_mlt.getDbRowId());
 	}
 	
+	public void removeTag (MediaTag mt) throws DbException {
+		dbLayer.removeTag(mt);
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	/**
