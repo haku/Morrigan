@@ -109,7 +109,7 @@ public class ViewQueue extends ViewPart {
 	private TableViewer tableViewer;
 	
 	private void createLayout (Composite parent) {
-		tableViewer = new TableViewer(parent, SWT.MULTI | SWT.V_SCROLL);
+		tableViewer = new TableViewer(parent, SWT.MULTI | SWT.V_SCROLL | SWT.FULL_SELECTION);
 		tableViewer.setContentProvider(contentProvider);
 		tableViewer.setLabelProvider(labelProvider);
 		tableViewer.setInput(getViewSite()); // use content provider.

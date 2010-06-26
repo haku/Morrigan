@@ -115,7 +115,7 @@ public class ViewLibraryProperties extends ViewPart {
 	private TableViewer tableViewer;
 	
 	private void createLayout (Composite parent) {
-		tableViewer = new TableViewer(parent, SWT.MULTI | SWT.V_SCROLL);
+		tableViewer = new TableViewer(parent, SWT.MULTI | SWT.V_SCROLL | SWT.FULL_SELECTION);
 		tableViewer.setContentProvider(sourcesProvider);
 		tableViewer.setInput(getViewSite()); // use content provider.
 		getSite().setSelectionProvider(tableViewer);
