@@ -46,7 +46,7 @@ public class ViewMediaExplorer extends ViewPart {
 	public void createPartControl(Composite parent) {
 		makeContent();
 		
-		viewer = new TableViewer(parent, SWT.MULTI | SWT.V_SCROLL);
+		viewer = new TableViewer(parent, SWT.MULTI | SWT.V_SCROLL | SWT.FULL_SELECTION);
 		viewer.setContentProvider(contentProvider);
 		viewer.setLabelProvider(labelProvider);
 		viewer.setInput(getViewSite()); // use content provider.

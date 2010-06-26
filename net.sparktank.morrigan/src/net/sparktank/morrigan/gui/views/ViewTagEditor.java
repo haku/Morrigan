@@ -179,6 +179,7 @@ public class ViewTagEditor extends ViewPart {
 		txtNewTag = new Text(tbCom, SWT.SINGLE | SWT.BORDER);
 		btnAddTag = new Button(tbCom, SWT.PUSH);
 		btnRemoveTag = new Button(tbCom, SWT.PUSH);
+		tableViewer = new TableViewer(parent, SWT.MULTI | SWT.V_SCROLL | SWT.FULL_SELECTION);
 		
 		tbCom.setLayout(new FormLayout());
 		formData = new FormData();
@@ -209,7 +210,6 @@ public class ViewTagEditor extends ViewPart {
 		formData.bottom = new FormAttachment(100, -sep);
 		btnRemoveTag.setLayoutData(formData);
 		
-		tableViewer = new TableViewer(parent, SWT.MULTI | SWT.V_SCROLL);
 		tableViewer.setContentProvider(sourcesProvider);
 		tableViewer.setInput(getViewSite()); // use content provider.
 		getSite().setSelectionProvider(tableViewer);
