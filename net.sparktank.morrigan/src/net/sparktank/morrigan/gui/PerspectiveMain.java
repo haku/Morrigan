@@ -6,6 +6,7 @@ import net.sparktank.morrigan.gui.views.ViewLibraryProperties;
 import net.sparktank.morrigan.gui.views.ViewMediaExplorer;
 import net.sparktank.morrigan.gui.views.ViewPlayer;
 import net.sparktank.morrigan.gui.views.ViewQueue;
+import net.sparktank.morrigan.gui.views.ViewTagEditor;
 
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
@@ -34,6 +35,7 @@ public class PerspectiveMain implements IPerspectiveFactory {
 		IPlaceholderFolderLayout bottom = layout.createPlaceholderFolder("bottom", IPageLayout.BOTTOM, 0.7f, editorArea);
 		bottom.addPlaceholder(ViewQueue.ID);
 		bottom.addPlaceholder(ViewLibraryProperties.ID);
+		bottom.addPlaceholder(ViewTagEditor.ID);
 		bottom.addPlaceholder("org.eclipse.ui.views.ProgressView");
 		bottom.addPlaceholder(IConsoleConstants.ID_CONSOLE_VIEW);
 		
