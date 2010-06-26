@@ -1,6 +1,7 @@
 package net.sparktank.morrigan.gui.views;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
@@ -252,12 +253,37 @@ public class ViewTagEditor extends ViewPart {
 	}
 	
 	private void procRemoveTag() {
-		/* TODO
-		 * Get selection from list.
-		 * Confirm with user?  Undo option??
-		 * Iterate over, removing tags.
-		 */
-		new MorriganMsgDlg("TODO: remote tags.").open();
+		List<MediaTag> selMts = new LinkedList<MediaTag>();
+		
+		ISelection selection = tableViewer.getSelection();
+		if (selection instanceof IStructuredSelection) {
+			IStructuredSelection iSel = (IStructuredSelection) selection;
+			
+			if (iSel.size() < 1) {
+				return;
+			}
+			
+			for (Object selObj : iSel.toList()) {
+				if (selObj instanceof MediaTag) {
+					MediaTag selMt = (MediaTag) selObj;
+					selMts.add(selMt);
+				}
+			}
+		}
+		
+		MorriganMsgDlg dlg = new MorriganMsgDlg("Remove "+selMts.size()+" selected tags?", MorriganMsgDlg.YESNO);
+		dlg.open();
+		if (dlg.getReturnCode() == MorriganMsgDlg.OK) {
+			try {
+				for (MediaTag mt : selMts) {
+					editedMediaList.removeTag(mt);
+				}
+			}
+			catch (DbException e) {
+				getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));
+			}
+			tableViewer.refresh();
+		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

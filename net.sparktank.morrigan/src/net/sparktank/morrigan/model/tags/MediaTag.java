@@ -3,20 +3,27 @@ package net.sparktank.morrigan.model.tags;
 public class MediaTag {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	private long dbRowId;
 	private String tag;
 	private MediaTagType type;
 	private MediaTagClassification classification;
 	
-	public MediaTag (String tag, MediaTagType type) {
+	public MediaTag (long dbRowId, String tag, MediaTagType type) {
+		this.dbRowId = dbRowId;
 		this.tag = tag;
 		this.type = type;
 		this.classification = null;
 	}
 	
-	public MediaTag (String tag, MediaTagType type, MediaTagClassification classification) {
+	public MediaTag (long dbRowId, String tag, MediaTagType type, MediaTagClassification classification) {
+		this.dbRowId = dbRowId;
 		this.tag = tag;
 		this.type = type;
 		this.classification = classification;
+	}
+	
+	public long getDbRowId() {
+		return dbRowId;
 	}
 	
 	public String getTag() {
