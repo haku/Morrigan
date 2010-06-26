@@ -608,7 +608,7 @@ public abstract class MediaTrackListEditor<T extends MediaTrackList<S>, S extend
 		editorInput.getMediaList().removeMediaTrack(track);
 	}
 	
-	public MediaTrack getSelectedTrack () {
+	public S getSelectedTrack () {
 		ISelection selection = editTable.getSelection();
 		
 		if (selection==null) return null;
@@ -619,7 +619,7 @@ public abstract class MediaTrackListEditor<T extends MediaTrackList<S>, S extend
 			Object selectedObject = iSel.getFirstElement();
 			if (selectedObject != null) {
 				if (selectedObject instanceof MediaTrack) {
-					MediaTrack track = (MediaTrack) selectedObject;
+					S track = (S) selectedObject;
 					return track;
 				}
 			}
@@ -628,7 +628,7 @@ public abstract class MediaTrackListEditor<T extends MediaTrackList<S>, S extend
 		return null;
 	}
 	
-	public ArrayList<MediaTrack> getSelectedTracks () {
+	public ArrayList<S> getSelectedTracks () {
 		ISelection selection = editTable.getSelection();
 		
 		if (selection==null) return null;
@@ -637,11 +637,11 @@ public abstract class MediaTrackListEditor<T extends MediaTrackList<S>, S extend
 		if (selection instanceof IStructuredSelection) {
 			IStructuredSelection iSel = (IStructuredSelection) selection;
 			
-			ArrayList<MediaTrack> ret = new ArrayList<MediaTrack>();
+			ArrayList<S> ret = new ArrayList<S>();
 			for (Object selectedObject : iSel.toList()) {
 				if (selectedObject != null) {
 					if (selectedObject instanceof MediaTrack) {
-						MediaTrack track = (MediaTrack) selectedObject;
+						S track = (S) selectedObject;
 						ret.add(track);
 					}
 				}
