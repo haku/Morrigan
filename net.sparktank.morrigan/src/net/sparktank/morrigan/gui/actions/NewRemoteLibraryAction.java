@@ -1,9 +1,14 @@
 package net.sparktank.morrigan.gui.actions;
 
+import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
+import net.sparktank.morrigan.gui.editors.EditorFactory;
+import net.sparktank.morrigan.gui.editors.LibraryEditorInput;
+import net.sparktank.morrigan.gui.editors.RemoteLibraryEditor;
 import net.sparktank.morrigan.gui.views.ViewMediaExplorer;
 import net.sparktank.morrigan.model.library.remote.RemoteLibraryHelper;
+import net.sparktank.morrigan.model.library.remote.RemoteMediaLibrary;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.InputDialog;
@@ -11,6 +16,7 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
 
 
@@ -48,8 +54,9 @@ public class NewRemoteLibraryAction extends Action implements IWorkbenchAction {
 		if (dlg.open() == Window.OK) {
 			
 			String libUrl = dlg.getValue();
+			RemoteMediaLibrary createdRemoteLib;
 			try {
-				RemoteLibraryHelper.createRemoteLib(libUrl);
+				createdRemoteLib = RemoteLibraryHelper.createRemoteLib(libUrl);
 			} catch (Exception e) {
 				new MorriganMsgDlg(e).open();
 				return;
@@ -59,6 +66,18 @@ public class NewRemoteLibraryAction extends Action implements IWorkbenchAction {
 			IWorkbenchPage page = window.getActivePage();
 			ViewMediaExplorer view = (ViewMediaExplorer) page.findView(ViewMediaExplorer.ID);
 			view.refresh();
+			
+			// Open new item.
+			try {
+				LibraryEditorInput input = EditorFactory.getRemoteMediaLibraryInput(createdRemoteLib.getDbPath());
+				page.openEditor(input, RemoteLibraryEditor.ID);
+			}
+			catch (PartInitException e) {
+				new MorriganMsgDlg(e).open();
+			} catch (MorriganException e) {
+				new MorriganMsgDlg(e).open();
+			}
+			
 		}
 	}
 	

@@ -3,8 +3,12 @@ package net.sparktank.morrigan.gui.actions;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
+import net.sparktank.morrigan.gui.editors.EditorFactory;
+import net.sparktank.morrigan.gui.editors.LibraryEditorInput;
+import net.sparktank.morrigan.gui.editors.LocalLibraryEditor;
 import net.sparktank.morrigan.gui.views.ViewMediaExplorer;
 import net.sparktank.morrigan.model.library.local.LocalLibraryHelper;
+import net.sparktank.morrigan.model.library.local.LocalMediaLibrary;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.InputDialog;
@@ -12,6 +16,7 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
 
 public class NewLibraryAction extends Action implements IWorkbenchAction {
@@ -49,8 +54,9 @@ public class NewLibraryAction extends Action implements IWorkbenchAction {
 			
 			// create library.
 			String libName = dlg.getValue();
+			LocalMediaLibrary createdLib;
 			try {
-				LocalLibraryHelper.createLib(libName);
+				createdLib = LocalLibraryHelper.createLib(libName);
 			} catch (MorriganException e) {
 				new MorriganMsgDlg(e).open();
 				return;
@@ -60,6 +66,18 @@ public class NewLibraryAction extends Action implements IWorkbenchAction {
 			IWorkbenchPage page = window.getActivePage();
 			ViewMediaExplorer view = (ViewMediaExplorer) page.findView(ViewMediaExplorer.ID);
 			view.refresh();
+			
+			// Open new item.
+			try {
+				LibraryEditorInput input = EditorFactory.getMediaLibraryInput(createdLib.getDbPath());
+				page.openEditor(input, LocalLibraryEditor.ID);
+			}
+			catch (PartInitException e) {
+				new MorriganMsgDlg(e).open();
+			} catch (MorriganException e) {
+				new MorriganMsgDlg(e).open();
+			}
+			
 		}
 	}
 	
