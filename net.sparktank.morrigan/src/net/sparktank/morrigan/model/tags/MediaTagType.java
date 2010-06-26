@@ -6,6 +6,8 @@ public enum MediaTagType {
 	MANUAL(0),
 	AUTOMATIC(1);
 	
+	String [] shortNames = {"M", "A"};
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static MediaTagType getFromIndex (int index) {
@@ -26,6 +28,10 @@ public enum MediaTagType {
 	
 	public int getIndex () {
 		return index;
+	}
+	
+	public String getShortName () {
+		return shortNames[index];
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
