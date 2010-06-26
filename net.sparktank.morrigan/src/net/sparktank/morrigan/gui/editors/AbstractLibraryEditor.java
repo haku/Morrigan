@@ -10,12 +10,12 @@ import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.dialogs.RunnableDialog;
 import net.sparktank.morrigan.gui.display.DropMenuListener;
 import net.sparktank.morrigan.gui.jobs.TaskJob;
+import net.sparktank.morrigan.gui.views.ViewTagEditor;
 import net.sparktank.morrigan.helpers.TimeHelper;
-import net.sparktank.morrigan.model.MediaTrack;
 import net.sparktank.morrigan.model.MediaTrackList.DurationData;
 import net.sparktank.morrigan.model.library.AbstractMediaLibrary;
-import net.sparktank.morrigan.model.library.MediaLibraryTrack;
 import net.sparktank.morrigan.model.library.AbstractMediaLibrary.SortChangeListener;
+import net.sparktank.morrigan.model.library.MediaLibraryTrack;
 import net.sparktank.morrigan.model.library.SqliteLayer.LibrarySort;
 import net.sparktank.morrigan.model.library.SqliteLayer.LibrarySortDirection;
 import net.sparktank.morrigan.model.tasks.MediaFileCopyTask;
@@ -38,6 +38,7 @@ import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IViewPart;
 
 public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> extends MediaTrackListEditor<AbstractMediaLibrary, MediaLibraryTrack> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -147,6 +148,7 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> exte
 	
 	@Override
 	protected void populateContextMenu(List<IContributionItem> menu0, List<IContributionItem> menu1) {
+		menu0.add(new ActionContributionItem(showTagsAction));
 		menu0.add(new ActionContributionItem(copyToAction));
 	}
 	
@@ -299,11 +301,24 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> exte
 		
 	}
 	
+	protected IAction showTagsAction = new Action("Tags...") {
+		public void run () {
+			try {
+				IViewPart showView = getSite().getPage().showView(ViewTagEditor.ID);
+				ViewTagEditor viewTagEd = (ViewTagEditor) showView;
+				viewTagEd.setInput(getMediaList(), getSelectedTracks());
+			}
+			catch (Exception e) {
+				new MorriganMsgDlg(e).open();
+			}
+		}
+	};
+	
 	private String lastFileCopyTargetDir = null;
 	
 	protected IAction copyToAction = new Action("Copy to...") {
 		public void run () {
-			List<MediaTrack> selectedTracks = getSelectedTracks();
+			ArrayList<MediaLibraryTrack> selectedTracks = getSelectedTracks();
 			
 			DirectoryDialog dlg = new DirectoryDialog(getSite().getShell());
 			dlg.setText("Copy Files...");
