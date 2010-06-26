@@ -80,8 +80,10 @@ public class ViewTagEditor extends ViewPart {
 	private ISelectionListener selectionListener = new ISelectionListener() {
 		@Override
 		public void selectionChanged(IWorkbenchPart part, ISelection selection) {
-			if (selection==null) return;
-			if (selection.isEmpty()) return;
+			if (selection==null || selection.isEmpty()) {
+				inputSelectionChanged(null, null);
+				return;
+			}
 			
 //			System.err.println("selectionChanged("+part.getTitle()+","+selection.toString()+").");
 			
@@ -115,21 +117,25 @@ public class ViewTagEditor extends ViewPart {
 	private MediaLibraryTrack editedMediaItem = null;
 	
 	private void inputSelectionChanged (AbstractMediaLibrary editedMediaList, List<MediaLibraryTrack> selection) {
-		this.editedMediaList = editedMediaList;
-		
-		if (selection.size() == 1) {
-			setContentDescription(selection.get(0).getTitle());
-			editedMediaItem = selection.get(0);
-		}
-		else if (selection.size() > 1) {
-			setContentDescription(selection.size() + " items selected.");
-			editedMediaItem = null;
+		if (selection != null && selection.size() > 0) {
+			if (selection.size() == 1) {
+				setContentDescription(selection.get(0).getTitle());
+				editedMediaItem = selection.get(0);
+			}
+			else {
+				setContentDescription(selection.size() + " items selected.");
+				editedMediaItem = null;
+			}
 		}
 		else {
 			setContentDescription("No items selected.");
 			editedMediaItem = null;
 		}
 		
+		btnAddTag.setEnabled(editedMediaItem != null);
+		btnRemoveTag.setEnabled(editedMediaItem != null);
+		
+		this.editedMediaList = editedMediaList;
 		tableViewer.refresh();
 	}
 	
