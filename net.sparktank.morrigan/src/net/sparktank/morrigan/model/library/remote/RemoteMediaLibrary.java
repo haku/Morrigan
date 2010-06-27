@@ -11,6 +11,7 @@ import java.net.SocketException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.Date;
+import java.util.List;
 
 import net.sparktank.morrigan.engines.playback.NotImplementedException;
 import net.sparktank.morrigan.exceptions.MorriganException;
@@ -20,6 +21,9 @@ import net.sparktank.morrigan.model.library.AbstractMediaLibrary;
 import net.sparktank.morrigan.model.library.DbException;
 import net.sparktank.morrigan.model.library.MediaLibraryTrack;
 import net.sparktank.morrigan.model.library.SqliteLayer;
+import net.sparktank.morrigan.model.tags.MediaTag;
+import net.sparktank.morrigan.model.tags.MediaTagClassification;
+import net.sparktank.morrigan.model.tags.MediaTagType;
 import net.sparktank.morrigan.model.tasks.TaskEventListener;
 import net.sparktank.morrigan.server.HttpClient;
 import net.sparktank.morrigan.server.HttpClient.IHttpStreamHandler;
@@ -303,6 +307,34 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 	@Override
 	public void removeSource (String source) throws DbException {
 		throw new DbException("Not implemented.");
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Tags.
+	
+	@Override
+	public boolean hasTags (MediaLibraryTrack mlt) throws MorriganException {
+		throw new NotImplementedException();
+	}
+	
+	@Override
+	public List<MediaTag> getTags (MediaLibraryTrack mlt) throws MorriganException {
+		throw new NotImplementedException();
+	}
+	
+	@Override
+	public void addTag (MediaLibraryTrack mlt, String tag, MediaTagType type, MediaTagClassification mtc) throws MorriganException {
+		throw new NotImplementedException();
+	}
+	
+	@Override
+	public void moveTags (MediaLibraryTrack from_mlt, MediaLibraryTrack to_mlt) throws MorriganException {
+		throw new NotImplementedException();
+	}
+	
+	@Override
+	public void removeTag (MediaTag mt) throws MorriganException {
+		throw new NotImplementedException();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
