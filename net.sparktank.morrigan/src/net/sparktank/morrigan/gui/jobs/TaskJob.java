@@ -1,9 +1,9 @@
 package net.sparktank.morrigan.gui.jobs;
 
 import net.sparktank.morrigan.gui.dialogs.RunnableDialog;
-import net.sparktank.morrigan.model.IMorriganTask;
-import net.sparktank.morrigan.model.TaskResult;
-import net.sparktank.morrigan.model.TaskResult.TaskOutcome;
+import net.sparktank.morrigan.model.tasks.IMorriganTask;
+import net.sparktank.morrigan.model.tasks.TaskResult;
+import net.sparktank.morrigan.model.tasks.TaskResult.TaskOutcome;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;

@@ -16,13 +16,13 @@ import net.sparktank.morrigan.engines.playback.IPlaybackEngine;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.ChecksumHelper;
 import net.sparktank.morrigan.helpers.RecyclingFactory;
-import net.sparktank.morrigan.model.IMorriganTask;
 import net.sparktank.morrigan.model.MediaItem;
-import net.sparktank.morrigan.model.TaskEventListener;
-import net.sparktank.morrigan.model.TaskResult;
-import net.sparktank.morrigan.model.TaskResult.TaskOutcome;
 import net.sparktank.morrigan.model.library.DbException;
 import net.sparktank.morrigan.model.library.MediaLibraryTrack;
+import net.sparktank.morrigan.model.tasks.IMorriganTask;
+import net.sparktank.morrigan.model.tasks.TaskEventListener;
+import net.sparktank.morrigan.model.tasks.TaskResult;
+import net.sparktank.morrigan.model.tasks.TaskResult.TaskOutcome;
 
 public class LocalLibraryUpdateTask implements IMorriganTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

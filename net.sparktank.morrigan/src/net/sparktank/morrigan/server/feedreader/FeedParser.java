@@ -2,7 +2,7 @@ package net.sparktank.morrigan.server.feedreader;
 
 import java.io.IOException;
 
-import net.sparktank.morrigan.model.TaskEventListener;
+import net.sparktank.morrigan.model.tasks.TaskEventListener;
 import net.sparktank.morrigan.server.feedwriters.XmlHelper;
 
 import org.w3c.dom.Document;
