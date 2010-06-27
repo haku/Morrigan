@@ -6,6 +6,7 @@ import net.sparktank.morrigan.gui.actions.LibraryUpdateAction;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.display.ActionListener;
 import net.sparktank.morrigan.gui.views.ViewLibraryProperties;
+import net.sparktank.morrigan.gui.views.ViewTagEditor;
 import net.sparktank.morrigan.model.library.local.LocalMediaLibrary;
 
 import org.eclipse.jface.action.Action;
@@ -60,6 +61,7 @@ public class LocalLibraryEditor extends AbstractLibraryEditor<LocalMediaLibrary>
 	@Override
 	protected void populateContextMenu(List<IContributionItem> menu0, List<IContributionItem> menu1) {
 		menu0.add(new ActionContributionItem(addToQueueAction));
+		menu0.add(new ActionContributionItem(showTagsAction));
 		menu0.add(getAddToMenu());
 		
 		menu1.add(new ActionContributionItem(toggleEnabledAction));
@@ -91,6 +93,19 @@ public class LocalLibraryEditor extends AbstractLibraryEditor<LocalMediaLibrary>
 	protected IAction showPropertiesAction = new Action("Properties") {
 		public void run () {
 			showLibPropView();
+		}
+	};
+	
+	protected IAction showTagsAction = new Action("Tags") {
+		public void run () {
+			try {
+				IViewPart showView = getSite().getPage().showView(ViewTagEditor.ID);
+				ViewTagEditor viewTagEd = (ViewTagEditor) showView;
+				viewTagEd.setInput(getMediaList(), getSelectedTracks());
+			}
+			catch (Exception e) {
+				new MorriganMsgDlg(e).open();
+			}
 		}
 	};
 	
