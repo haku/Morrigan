@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.model;
+package net.sparktank.morrigan.model.tasks;
 
 public class TaskResult {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -1,7 +1,7 @@
 package net.sparktank.morrigan.gui.jobs;
 
 import net.sparktank.morrigan.gui.helpers.ConsoleHelper;
-import net.sparktank.morrigan.model.TaskEventListener;
+import net.sparktank.morrigan.model.tasks.TaskEventListener;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
