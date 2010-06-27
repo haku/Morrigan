@@ -14,9 +14,9 @@ import net.sparktank.morrigan.gui.helpers.ImageCache;
 import net.sparktank.morrigan.gui.preferences.MediaListPref;
 import net.sparktank.morrigan.helpers.TimeHelper;
 import net.sparktank.morrigan.model.MediaItem;
+import net.sparktank.morrigan.model.MediaItemList.DirtyState;
 import net.sparktank.morrigan.model.MediaTrack;
 import net.sparktank.morrigan.model.MediaTrackList;
-import net.sparktank.morrigan.model.MediaItemList.DirtyState;
 
 import org.eclipse.core.commands.common.CommandException;
 import org.eclipse.jface.action.Action;
@@ -38,12 +38,12 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
+import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerFilter;
-import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -337,6 +337,11 @@ public abstract class MediaTrackListEditor<T extends MediaTrackList<S>, S extend
 	
 	protected ImageCache getImageCache() {
 		return imageCache;
+	}
+	
+	@Override
+	public void setFocus() {
+		editTable.getTable().setFocus();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

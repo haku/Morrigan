@@ -55,9 +55,6 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> exte
 //	EditorPart methods.
 	
 	@Override
-	public void setFocus() {}
-	
-	@Override
 	public boolean isSaveAsAllowed() {
 		return false;
 	}
