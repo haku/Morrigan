@@ -6,7 +6,7 @@ import java.util.List;
 
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.dialogs.RunnableDialog;
-import net.sparktank.morrigan.gui.editors.AbstractLibraryEditor;
+import net.sparktank.morrigan.gui.editors.LocalLibraryEditor;
 import net.sparktank.morrigan.gui.helpers.ImageCache;
 import net.sparktank.morrigan.model.library.AbstractMediaLibrary;
 import net.sparktank.morrigan.model.library.DbException;
@@ -91,8 +91,8 @@ public class ViewTagEditor extends ViewPart {
 	private IPartListener partListener = new IPartListener() {
 		@Override
 		public void partClosed(IWorkbenchPart part) {
-			if (part instanceof AbstractLibraryEditor<?>) {
-				AbstractLibraryEditor<?> libEditor = (AbstractLibraryEditor<?>) part;
+			if (part instanceof LocalLibraryEditor) {
+				LocalLibraryEditor libEditor = (LocalLibraryEditor) part;
 				if (libEditor.getMediaList().equals(editedMediaList)) {
 					setInput(null, null);
 				}
@@ -112,14 +112,13 @@ public class ViewTagEditor extends ViewPart {
 	private ISelectionListener selectionListener = new ISelectionListener() {
 		@Override
 		public void selectionChanged(IWorkbenchPart part, ISelection selection) {
-			if (part instanceof AbstractLibraryEditor<?>) {
+			if (part instanceof LocalLibraryEditor) {
 				if (selection==null || selection.isEmpty()) {
 					setInput(null, null);
 					return;
 				}
 				
-				@SuppressWarnings("unchecked") // FIXME avoid need for this?
-				AbstractLibraryEditor<? extends AbstractMediaLibrary> libEditor = (AbstractLibraryEditor<? extends AbstractMediaLibrary>) part;
+				LocalLibraryEditor libEditor = (LocalLibraryEditor) part;
 				AbstractMediaLibrary mediaList = libEditor.getMediaList();
 				
 				if (selection instanceof IStructuredSelection) {
