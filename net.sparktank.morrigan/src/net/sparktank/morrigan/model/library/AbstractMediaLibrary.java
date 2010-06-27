@@ -320,23 +320,23 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTr
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Tags.
 	
-	public boolean hasTags (MediaLibraryTrack mlt) throws DbException {
+	public boolean hasTags (MediaLibraryTrack mlt) throws MorriganException {
 		return dbLayer.hasTags(mlt.getDbRowId());
 	}
 	
-	public List<MediaTag> getTags (MediaLibraryTrack mlt) throws DbException {
+	public List<MediaTag> getTags (MediaLibraryTrack mlt) throws MorriganException {
 		return dbLayer.getTags(mlt.getDbRowId());
 	}
 	
-	public void addTag (MediaLibraryTrack mlt, String tag, MediaTagType type, MediaTagClassification mtc) throws DbException {
+	public void addTag (MediaLibraryTrack mlt, String tag, MediaTagType type, MediaTagClassification mtc) throws MorriganException {
 		dbLayer.addTag(mlt.getDbRowId(), tag, type, mtc);
 	}
 	
-	public void moveTags (MediaLibraryTrack from_mlt, MediaLibraryTrack to_mlt) throws DbException {
+	public void moveTags (MediaLibraryTrack from_mlt, MediaLibraryTrack to_mlt) throws MorriganException {
 		dbLayer.moveTags(from_mlt.getDbRowId(), to_mlt.getDbRowId());
 	}
 	
-	public void removeTag (MediaTag mt) throws DbException {
+	public void removeTag (MediaTag mt) throws MorriganException {
 		dbLayer.removeTag(mt);
 	}
 	

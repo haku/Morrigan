@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.dialogs.RunnableDialog;
 import net.sparktank.morrigan.gui.editors.LocalLibraryEditor;
 import net.sparktank.morrigan.gui.helpers.ImageCache;
 import net.sparktank.morrigan.model.library.AbstractMediaLibrary;
-import net.sparktank.morrigan.model.library.DbException;
 import net.sparktank.morrigan.model.library.MediaLibraryTrack;
 import net.sparktank.morrigan.model.tags.MediaTag;
 import net.sparktank.morrigan.model.tags.MediaTagType;
@@ -177,7 +177,7 @@ public class ViewTagEditor extends ViewPart {
 					List<MediaTag> tags = editedMediaList.getTags(editedMediaItem);
 					return tags.toArray();
 				}
-				catch (DbException e) {
+				catch (MorriganException e) {
 					getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));
 					// TODO disable stuff 'cos we are broken?
 					return new String[]{};
@@ -276,7 +276,7 @@ public class ViewTagEditor extends ViewPart {
 					txtNewTag.setSelection(0, text.length());
 					txtNewTag.setFocus();
 				}
-				catch (DbException e) {
+				catch (MorriganException e) {
 					getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));
 				}
 			}
@@ -314,7 +314,7 @@ public class ViewTagEditor extends ViewPart {
 					editedMediaList.removeTag(mt);
 				}
 			}
-			catch (DbException e) {
+			catch (MorriganException e) {
 				getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));
 			}
 			tableViewer.refresh();
