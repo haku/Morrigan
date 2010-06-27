@@ -13,7 +13,7 @@ public abstract class MediaTrackList<T extends MediaTrack> extends MediaItemList
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Update methods.  Use these for data that is to be persisted.
-//	These methods are sub-classed where persistance is needed.
+//	These methods are sub-classed where persistence is needed.
 	
 	public void incTrackStartCnt (MediaTrack track, long n) throws MorriganException {
 		track.setStartCount(track.getStartCount() + n);
