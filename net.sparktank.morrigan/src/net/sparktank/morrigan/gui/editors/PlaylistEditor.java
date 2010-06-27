@@ -8,7 +8,6 @@ import java.util.logging.Logger;
 import net.sparktank.morrigan.config.Config;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.gui.Activator;
-import net.sparktank.morrigan.gui.ApplicationActionBarAdvisor;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.display.ActionListener;
 import net.sparktank.morrigan.helpers.TimeHelper;
@@ -34,7 +33,6 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.actions.ActionFactory;
 
 public class PlaylistEditor extends MediaTrackListEditor<MediaPlaylist,MediaTrack> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -65,12 +63,12 @@ public class PlaylistEditor extends MediaTrackListEditor<MediaPlaylist,MediaTrac
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	EditorPart methods.
 	
-	@Override
-	public void setFocus() {
-		getEditorSite().getActionBars().setGlobalActionHandler(ActionFactory.REVERT.getId(), revertAction);
-		getEditorSite().getActionBars().setGlobalActionHandler(ApplicationActionBarAdvisor.ACTIONID_ADD, addAction);
-		getEditorSite().getActionBars().setGlobalActionHandler(ApplicationActionBarAdvisor.ACTIONID_REMOVE, removeAction);
-	}
+//	@Override
+//	public void setFocus() {
+//		getEditorSite().getActionBars().setGlobalActionHandler(ActionFactory.REVERT.getId(), revertAction);
+//		getEditorSite().getActionBars().setGlobalActionHandler(ApplicationActionBarAdvisor.ACTIONID_ADD, addAction);
+//		getEditorSite().getActionBars().setGlobalActionHandler(ApplicationActionBarAdvisor.ACTIONID_REMOVE, removeAction);
+//	}
 	
 	@Override
 	public boolean isSaveAsAllowed() {
@@ -210,11 +208,11 @@ public class PlaylistEditor extends MediaTrackListEditor<MediaPlaylist,MediaTrac
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Actions.
 	
-	private IAction revertAction = new Action("revert") {
-		public void run () {
-			new MorriganMsgDlg("TODO: figure out how to implement revert desu~.").open();
-		}
-	};
+//	private IAction revertAction = new Action("revert") {
+//		public void run () {
+//			new MorriganMsgDlg("TODO: figure out how to implement revert desu~.").open();
+//		}
+//	};
 	
 	private IAction addAction = new Action("add") {
 		
