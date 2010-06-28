@@ -19,7 +19,6 @@ import net.sparktank.morrigan.helpers.RecyclingFactory;
 import net.sparktank.morrigan.model.MediaItem;
 import net.sparktank.morrigan.model.library.DbException;
 import net.sparktank.morrigan.model.library.MediaLibraryTrack;
-import net.sparktank.morrigan.model.tags.MediaTagType;
 import net.sparktank.morrigan.model.tasks.IMorriganTask;
 import net.sparktank.morrigan.model.tasks.TaskEventListener;
 import net.sparktank.morrigan.model.tasks.TaskResult;
@@ -473,8 +472,6 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Track specific scanning.
 	
-	private static final String TAG_UNREADABLE = "UNREADABLE";
-	
 	private TaskResult updateTrackMetadata (TaskEventListener taskEventListener, int prgTotal) throws MorriganException {
 		taskEventListener.subTask("Reading track metadata");
 		
@@ -491,7 +488,7 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 			
 			File file = new File(mi.getFilepath());
 			if (mi.getDuration()<=0) {
-				if (!library.hasTag(mi, TAG_UNREADABLE, MediaTagType.AUTOMATIC, null)) {
+				if (!library.isMarkedAsUnreadable(mi)) {
 					if (file.exists()) {
 						if (playbackEngine == null) {
 							try {
@@ -511,8 +508,7 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 							taskEventListener.logMsg(library.getListName(), "Error while reading metadata for '"+mi.getFilepath()+"': " + t.getMessage());
 							
 							// Tag track as unreadable.
-							library.setTrackEnabled(mi, false);
-							library.addTag(mi, TAG_UNREADABLE, MediaTagType.AUTOMATIC, null);
+							library.markAsUnreadabled(mi);
 						}
 					} // End exists test.
 				} else { // If tagged as unreadable.
