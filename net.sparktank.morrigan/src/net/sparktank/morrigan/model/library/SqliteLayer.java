@@ -147,6 +147,14 @@ public class SqliteLayer {
 		}
 	}
 	
+	public boolean hasTag (long rowId, String tag, MediaTagType type, MediaTagClassification mtc) throws DbException {
+		try {
+			return local_hasTag(rowId, tag, type, mtc);
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+	
 	public List<MediaTag> getTags (long rowId) throws DbException {
 		try {
 			return local_getTags(rowId);
@@ -345,9 +353,9 @@ public class SqliteLayer {
 		}
 	}
 	
-	public void addTag (long mf_rowId, String tag, MediaTagType type, MediaTagClassification mtc) throws DbException {
+	public boolean addTag (long mf_rowId, String tag, MediaTagType type, MediaTagClassification mtc) throws DbException {
 		try {
-			local_addTag(mf_rowId, tag, type, mtc);
+			return local_addTag(mf_rowId, tag, type, mtc);
 		} catch (Exception e) {
 			throw new DbException(e);
 		}
@@ -625,11 +633,17 @@ public class SqliteLayer {
 	private static final String SQL_TBL_TAGS_CLEAR =
 		"DELETE FROM tbl_tags WHERE mf_rowid=?;";
 	
-	private static final String SQL_TBL_TAGS_Q_HAS =
+	private static final String SQL_TBL_TAGS_Q_HASANY =
 		"SELECT ROWID FROM tbl_tags WHERE mf_rowid=?;";
 	
 	private static final String SQL_TBL_TAGS_Q_ALL =
 		"SELECT ROWID,tag,type,cls_rowid FROM tbl_tags WHERE mf_rowid=?;";
+	
+	private static final String SQL_TBL_TAGS_Q_HASTAG =
+		"SELECT ROWID FROM tbl_tags WHERE mf_rowid=? AND tag=? AND type=? AND cls_rowid=?;";
+	
+	private static final String SQL_TBL_TAGS_Q_HASTAG_CLSNULL =
+		"SELECT ROWID FROM tbl_tags WHERE mf_rowid=? AND tag=? AND type=? AND cls_rowid IS NULL;";
 	
 	private static final String SQL_TBL_TAGCLS_ADD =
 		"INSERT INTO tbl_tag_cls (cls) VALUES (?);";
@@ -1287,16 +1301,22 @@ public class SqliteLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Tags.
 	
-	private void local_addTag (long mf_rowId, String tag, MediaTagType type, String cls_name) throws SQLException, ClassNotFoundException, DbException {
-		MediaTagClassification mtc = local_getTagClassification(cls_name);
-		local_addTag(mf_rowId, tag, type, mtc);
-	}
+//	private boolean local_addTag (long mf_rowId, String tag, MediaTagType type, String cls_name) throws SQLException, ClassNotFoundException, DbException {
+//		MediaTagClassification mtc = local_getTagClassification(cls_name);
+//		return local_addTag(mf_rowId, tag, type, mtc);
+//	}
 	
-	private void local_addTag (long mf_rowId, String tag, MediaTagType type, MediaTagClassification mtc) throws SQLException, ClassNotFoundException, DbException {
-		if (mtc != null) {
-			local_addTag(mf_rowId, tag, type, mtc.getRowId());
-		} else {
-			local_addTag(mf_rowId, tag, type, 0);
+	private boolean local_addTag (long mf_rowId, String tag, MediaTagType type, MediaTagClassification mtc) throws SQLException, ClassNotFoundException, DbException {
+		if (local_hasTag(mf_rowId, tag, type, mtc)) {
+			return false;
+		}
+		else {
+			if (mtc != null) {
+				local_addTag(mf_rowId, tag, type, mtc.getRowId());
+			} else {
+				local_addTag(mf_rowId, tag, type, 0);
+			}
+			return true;
 		}
 	}
 	
@@ -1362,10 +1382,50 @@ public class SqliteLayer {
 	
 	private boolean local_hasTags (long mf_rowId) throws SQLException, ClassNotFoundException {
 		ResultSet rs;
-		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_TAGS_Q_HAS);
+		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_TAGS_Q_HASANY);
 		
 		try {
 			ps.setLong(1, mf_rowId);
+			rs = ps.executeQuery();
+			try {
+				if (rs.next()) {
+					return true;
+				} else {
+					return false;
+				}
+			} finally {
+				rs.close();
+			}
+		} finally {
+			ps.close();
+		}
+	}
+	
+	private boolean local_hasTag (long mf_rowId, String tag, MediaTagType type, MediaTagClassification mtc) throws SQLException, ClassNotFoundException {
+		if (mtc != null) {
+			return local_hasTag(mf_rowId, tag, type, mtc.getRowId());
+		} else {
+			return local_hasTag(mf_rowId, tag, type, 0);
+		}
+	}
+	
+	private boolean local_hasTag (long mf_rowId, String tag, MediaTagType type, long cls_rowid) throws SQLException, ClassNotFoundException {
+		String sql;
+		if (cls_rowid > 0 ) {
+			sql = SQL_TBL_TAGS_Q_HASTAG;
+		} else {
+			sql = SQL_TBL_TAGS_Q_HASTAG_CLSNULL;
+		}
+		
+		ResultSet rs;
+		PreparedStatement ps = getDbCon().prepareStatement(sql);
+		try {
+			ps.setLong(1, mf_rowId);
+			ps.setString(2, tag);
+			ps.setInt(3, type.getIndex());
+			if (cls_rowid > 0 ) {
+				ps.setLong(4, cls_rowid);
+			}
 			rs = ps.executeQuery();
 			try {
 				if (rs.next()) {
