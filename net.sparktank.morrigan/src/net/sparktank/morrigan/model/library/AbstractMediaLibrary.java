@@ -324,6 +324,10 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTr
 		return dbLayer.hasTags(mlt.getDbRowId());
 	}
 	
+	public boolean hasTag (MediaLibraryTrack mlt, String tag, MediaTagType type, MediaTagClassification mtc) throws MorriganException {
+		return dbLayer.hasTag(mlt.getDbRowId(), tag, type, mtc);
+	}
+	
 	public List<MediaTag> getTags (MediaLibraryTrack mlt) throws MorriganException {
 		return dbLayer.getTags(mlt.getDbRowId());
 	}
