@@ -19,6 +19,7 @@ import net.sparktank.morrigan.helpers.RecyclingFactory;
 import net.sparktank.morrigan.model.MediaItem;
 import net.sparktank.morrigan.model.library.DbException;
 import net.sparktank.morrigan.model.library.MediaLibraryTrack;
+import net.sparktank.morrigan.model.tags.MediaTagType;
 import net.sparktank.morrigan.model.tasks.IMorriganTask;
 import net.sparktank.morrigan.model.tasks.TaskEventListener;
 import net.sparktank.morrigan.model.tasks.TaskResult;
@@ -85,31 +86,41 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 		try {
 			taskEventListener.onStart();
 			taskEventListener.logMsg(library.getListName(), "Starting scan...");
-			
 			taskEventListener.beginTask("Updating library", 100);
 			
 			// Scan directories for new files.
 			ret = scanLibraryDirectories(taskEventListener);
+			
 			if (ret == null) {
 				// Check known files exist and update metadata.
-				ret = updateLibraryMetadata(taskEventListener);
-				if (ret == null) {
-					// Check for duplicate items and merge matching items.
-					checkForDuplicates(taskEventListener);
-					
-					// TODO : vacuum DB?
-					
-					if (taskEventListener.isCanceled()) {
-						taskEventListener.logMsg(library.getListName(), "Task was canceled desu~.");
-						ret = new TaskResult(TaskOutcome.CANCELED);
-						
-					} else {
-						ret = new TaskResult(TaskOutcome.SUCCESS);
-					}
-				}
+				ret = updateLibraryMetadata(taskEventListener, 50);
 			}
 			
-		} catch (Throwable t) {
+			if (ret == null) {
+				// Check for duplicate items and merge matching items.
+				checkForDuplicates(taskEventListener);
+			}
+			
+			if (ret == null) {
+				// Read track duration.
+				ret = updateTrackMetadata(taskEventListener, 50);
+			}
+			
+//			if (ret == null) {
+//				 TODO : vacuum DB?
+//			}
+			
+			if (ret == null) {
+				if (taskEventListener.isCanceled()) {
+					taskEventListener.logMsg(library.getListName(), "Task was canceled desu~.");
+					ret = new TaskResult(TaskOutcome.CANCELED);
+				}
+				else {
+					ret = new TaskResult(TaskOutcome.SUCCESS);
+				}
+			}
+		}
+		catch (Throwable t) {
 			ret = new TaskResult(TaskOutcome.FAILED, "Throwable while updating library.", t);
 		}
 		
@@ -118,6 +129,9 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 		
 		return ret;
 	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Generic scanning.
 	
 	private TaskResult scanLibraryDirectories(TaskEventListener taskEventListener) {
 		taskEventListener.subTask("Scanning sources");
@@ -160,8 +174,8 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 							
 							if (file.isDirectory()) {
 								dirStack.push(file);
-								
-							} else if (file.isFile()) {
+							}
+							else if (file.isFile()) {
 								String ext = file.getName();
 								ext = ext.substring(ext.lastIndexOf(".") + 1).toLowerCase();
 								if (supportedFormats.contains(ext)) {
@@ -177,7 +191,8 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 								}
 							}
 						}
-					} else {
+					}
+					else {
 						taskEventListener.logMsg(library.getListName(), "Failed to read directory: " + dirItem.getAbsolutePath());
 					}
 				}
@@ -189,10 +204,8 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 		return null;
 	}
 	
-	private TaskResult updateLibraryMetadata(TaskEventListener taskEventListener) throws MorriganException {
-		taskEventListener.subTask("Reading metadata");
-		
-		IPlaybackEngine playbackEngine = null;
+	private TaskResult updateLibraryMetadata(TaskEventListener taskEventListener, int prgTotal) throws MorriganException {
+		taskEventListener.subTask("Reading file metadata");
 		
 		int progress = 0;
 		int n = 0;
@@ -201,7 +214,7 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 		List<MediaLibraryTrack> allLibraryEntries = library.getAllLibraryEntries();
 		for (MediaLibraryTrack mi : allLibraryEntries) {
 			if (taskEventListener.isCanceled()) break;
-			taskEventListener.subTask("Reading metadata: " + mi.getTitle());
+			taskEventListener.subTask("Reading file metadata: " + mi.getTitle());
 			
 			// Existence test.
 			File file = new File(mi.getFilepath());
@@ -262,27 +275,8 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 					}
 					
 				}
-				
-				// Duration.
-				if (mi.getDuration()<=0) {
-					if (playbackEngine == null) {
-						try {
-							playbackEngine = EngineFactory.makePlaybackEngine();
-						} catch (Exception e) {
-							taskEventListener.done();
-							return new TaskResult(TaskOutcome.FAILED, "Failed to create playback engine instance.", e);
-						}
-					}
-					try {
-						int d = playbackEngine.readFileDuration(mi.getFilepath());
-						if (d>0) library.setTrackDuration(mi, d);
-					} catch (Throwable t) {
-						// FIXME log this somewhere useful.
-						taskEventListener.logMsg(library.getListName(), "Throwable while reading metadata for '"+mi.getFilepath()+"': " + t.getMessage());
-					}
-				}
-				
-			} else { // The file is missing.
+			}
+			else { // The file is missing.
 				if (!mi.isMissing()) {
 					try {
 						taskEventListener.logMsg(library.getListName(), "[MISSING] " + mi.getFilepath());
@@ -295,23 +289,18 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 			}
 			
 			n++;
-			int p = (n * 100) / N;
+			int p = (n * prgTotal) / N;
 			if (p > progress) {
 				taskEventListener.worked(p - progress);
 				progress = p;
 			}
 		} // End metadata scanning.
 		
-		if (playbackEngine != null) {
-			playbackEngine.finalise();
-		}
-		
 		return null;
 	}
 	
 	private void checkForDuplicates(TaskEventListener taskEventListener) throws MorriganException {
 		taskEventListener.subTask("Scanning for duplicates");
-		
 		Map<MediaLibraryTrack, ScanOption> dupicateItems = new HashMap<MediaLibraryTrack, ScanOption>();
 		
 		List<MediaLibraryTrack> tracks = library.getAllLibraryEntries();
@@ -325,7 +314,6 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 					
 					if (tracks.get(j).getHashcode() != 0) {
 						if (tracks.get(i).getHashcode() == tracks.get(j).getHashcode()) {
-							
 							boolean b = new File(tracks.get(j).getFilepath()).exists();
 							
 							if (a && b) { // Both exist.
@@ -336,8 +324,8 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 								if (!dupicateItems.containsKey(tracks.get(j))) {
 									dupicateItems.put(tracks.get(j), ScanOption.MOVEFILE);
 								}
-								
-							} else if (a != b) { // Only one exists.
+							}
+							else if (a != b) { // Only one exists.
 								if (!dupicateItems.containsKey(tracks.get(i))) {
 									dupicateItems.put(tracks.get(i),
 											a ? ScanOption.KEEP : ScanOption.DELREF);
@@ -346,8 +334,8 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 									dupicateItems.put(tracks.get(j),
 											b ? ScanOption.KEEP : ScanOption.DELREF);
 								}
-								
-							} else { // Neither exist.
+							}
+							else { // Neither exist.
 								// They are both missing.  Don't worry about it.
 							}
 							
@@ -476,10 +464,75 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 			for (Entry<MediaLibraryTrack, ScanOption> e : dupicateItems.entrySet()) {
 				taskEventListener.logMsg(library.getListName(), e.getValue() + " : " + e.getKey().getTitle());
 			}
-			
-		} else {
+		}
+		else {
 			taskEventListener.logMsg(library.getListName(), "No duplicates found.");
 		}
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Track specific scanning.
+	
+	private static final String TAG_UNREADABLE = "UNREADABLE";
+	
+	private TaskResult updateTrackMetadata (TaskEventListener taskEventListener, int prgTotal) throws MorriganException {
+		taskEventListener.subTask("Reading track metadata");
+		
+		IPlaybackEngine playbackEngine = null;
+		
+		int progress = 0;
+		int n = 0;
+		int N = library.getCount();
+		
+		List<MediaLibraryTrack> allLibraryEntries = library.getAllLibraryEntries();
+		for (MediaLibraryTrack mi : allLibraryEntries) {
+			if (taskEventListener.isCanceled()) break;
+			taskEventListener.subTask("Reading track metadata: " + mi.getTitle());
+			
+			File file = new File(mi.getFilepath());
+			if (mi.getDuration()<=0) {
+				if (!library.hasTag(mi, TAG_UNREADABLE, MediaTagType.AUTOMATIC, null)) {
+					if (file.exists()) {
+						if (playbackEngine == null) {
+							try {
+								playbackEngine = EngineFactory.makePlaybackEngine();
+							} catch (Exception e) {
+								taskEventListener.done();
+								return new TaskResult(TaskOutcome.FAILED, "Failed to create playback engine instance.", e);
+							}
+						}
+						
+						try {
+							int d = playbackEngine.readFileDuration(mi.getFilepath());
+							if (d>0) library.setTrackDuration(mi, d);
+						}
+						catch (Throwable t) {
+							// FIXME log this somewhere useful.
+							taskEventListener.logMsg(library.getListName(), "Error while reading metadata for '"+mi.getFilepath()+"': " + t.getMessage());
+							
+							// Tag track as unreadable.
+							library.setTrackEnabled(mi, false);
+							library.addTag(mi, TAG_UNREADABLE, MediaTagType.AUTOMATIC, null);
+						}
+					} // End exists test.
+				} else { // If tagged as unreadable.
+					taskEventListener.logMsg(library.getListName(), "Ignoring unreadable file '"+mi.getFilepath()+"'.");
+				}
+			}// End duration > 0 test.
+			
+			n++;
+			int p = (n * prgTotal) / N;
+			if (p > progress) {
+				taskEventListener.worked(p - progress);
+				progress = p;
+			}
+		} // End metadata scanning.
+		
+		if (playbackEngine != null) {
+			playbackEngine.finalise();
+		}
+		
+		return null;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
