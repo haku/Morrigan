@@ -345,6 +345,20 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTr
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Meta tagging.
+	
+	private static final String TAG_UNREADABLE = "UNREADABLE";
+	
+	public boolean isMarkedAsUnreadable (MediaLibraryTrack mi) throws MorriganException {
+		return hasTag(mi, TAG_UNREADABLE, MediaTagType.AUTOMATIC, null);
+	}
+	
+	public void markAsUnreadabled (MediaLibraryTrack mi) throws MorriganException {
+		setTrackEnabled(mi, false);
+		addTag(mi, TAG_UNREADABLE, MediaTagType.AUTOMATIC, null);
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	/**
 	 * Returns true if the file was added.
