@@ -55,6 +55,7 @@ public class Player {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Current selection.
 	
+	private Object _currentItemLock = new Object();
 	private PlayItem _currentItem = null;
 	
 	/**
@@ -63,21 +64,23 @@ public class Player {
 	 * object is disposed so as to remove listener.
 	 */
 	private void setCurrentItem (PlayItem item) {
-		if (_currentItem != null && _currentItem.list != null) {
-			_currentItem.list.removeChangeEvent(listChangedRunnable);
-		}
-		
-		_currentItem = item;
-		
-		if (_currentItem != null && _currentItem.list != null) {
-			_currentItem.list.addChangeEvent(listChangedRunnable);
-			
-			if (_currentItem.item != null) {
-				addToHistory(_currentItem);
+		synchronized (_currentItemLock) {
+			if (_currentItem != null && _currentItem.list != null) {
+				_currentItem.list.removeChangeEvent(listChangedRunnable);
 			}
+			
+			_currentItem = item;
+			
+			if (_currentItem != null && _currentItem.list != null) {
+				_currentItem.list.addChangeEvent(listChangedRunnable);
+				
+				if (_currentItem.item != null) {
+					addToHistory(_currentItem);
+				}
+			}
+			
+			eventHandler.currentItemChanged();
 		}
-		
-		eventHandler.currentItemChanged();
 	}
 	
 	private Runnable listChangedRunnable = new Runnable() {
@@ -204,50 +207,56 @@ public class Player {
 	}
 	
 	public void moveInQueue (List<PlayItem> items, boolean moveDown) {
-		if (items == null || items.isEmpty()) return;
-		
-		for (	int i = (moveDown ? _queue.size() - 1 : 0);
-				(moveDown ? i >= 0 : i < _queue.size());
-				i = i + (moveDown ? -1 : 1)
+		synchronized (_queue) {
+			if (items == null || items.isEmpty()) return;
+			
+			for (int i = (moveDown ? _queue.size() - 1 : 0);
+			(moveDown ? i >= 0 : i < _queue.size());
+			i = i + (moveDown ? -1 : 1)
 			) {
-			if (items.contains(_queue.get(i))) {
-				int j;
-				if (moveDown) {
-					if (i == _queue.size() - 1 ) {
-						j = -1;
+				if (items.contains(_queue.get(i))) {
+					int j;
+					if (moveDown) {
+						if (i == _queue.size() - 1 ) {
+							j = -1;
+						} else {
+							j = i + 1;
+						}
 					} else {
-						j = i + 1;
+						if (i == 0) {
+							j = -1;
+						} else {
+							j = i - 1;
+						}
 					}
-				} else {
-					if (i == 0) {
-						j = -1;
-					} else {
-						j = i - 1;
+					if (j != -1 && !items.contains(_queue.get(j))) {
+						PlayItem a = _queue.get(i);
+						PlayItem b = _queue.get(j);
+						_queue.set(i, b);
+						_queue.set(j, a);
 					}
-				}
-				if (j != -1 && !items.contains(_queue.get(j))) {
-					PlayItem a = _queue.get(i);
-					PlayItem b = _queue.get(j);
-					_queue.set(i, b);
-					_queue.set(j, a);
 				}
 			}
+			
+			callQueueChangedListeners();
 		}
-		
-		callQueueChangedListeners();
 	}
 	
 	private boolean isQueueHasItem () {
-		return !_queue.isEmpty();
+		synchronized (_queue) {
+			return !_queue.isEmpty();
+		}
 	}
 	
 	private PlayItem readFromQueue () {
-		if (!_queue.isEmpty()) {
-			PlayItem item = _queue.remove(0);
-			callQueueChangedListeners();
-			return item;
-		} else {
-			return null;
+		synchronized (_queue) {
+			if (!_queue.isEmpty()) {
+				PlayItem item = _queue.remove(0);
+				callQueueChangedListeners();
+				return item;
+			} else {
+				return null;
+			}
 		}
 	}
 	
@@ -258,7 +267,7 @@ public class Player {
 	}
 	
 	public List<PlayItem> getQueueList () {
-		return _queue;
+		return Collections.unmodifiableList(_queue);
 	}
 	
 	static public class DurationData {
@@ -296,11 +305,7 @@ public class Player {
 		return (playbackEngine != null);
 	}
 	
-	private IPlaybackEngine getPlaybackEngine () throws ImplException {
-		return getPlaybackEngine(true);
-	}
-	
-	private IPlaybackEngine getPlaybackEngine (boolean create) throws ImplException {
+	synchronized private IPlaybackEngine getPlaybackEngine (boolean create) throws ImplException {
 		if (playbackEngine == null && create) {
 			playbackEngine = EngineFactory.makePlaybackEngine();
 			playbackEngine.setStatusListener(playbackStatusListener);
@@ -357,28 +362,30 @@ public class Player {
 	 */
 	public void loadAndStartPlaying (PlayItem item) {
 		try {
-			setCurrentItem(item);
-			
 			File file = new File(item.item.getFilepath());
 			if (!file.exists()) throw new FileNotFoundException(item.item.getFilepath());
 			
-			System.err.println("Loading '" + item.item.getTitle() + "'...");
-			getPlaybackEngine().setFile(item.item.getFilepath());
-			Composite currentMediaFrameParent = eventHandler.getCurrentMediaFrameParent();
-			getPlaybackEngine().setVideoFrameParent(currentMediaFrameParent);
-			
-			getPlaybackEngine().loadTrack();
-			getPlaybackEngine().startPlaying();
-			
-			_currentTrackDuration = getPlaybackEngine().getDuration();
-			System.err.println("Started to play '" + item.item.getTitle() + "'...");
-			
-			item.list.incTrackStartCnt(item.item);
-			if (item.item.getDuration() <= 0) {
-				if (_currentTrackDuration > 0) {
-					item.list.setTrackDuration(item.item, _currentTrackDuration);
+			IPlaybackEngine engine = getPlaybackEngine(true);
+			synchronized (engine) {
+				System.err.println("Loading '" + item.item.getTitle() + "'...");
+				setCurrentItem(item);
+				engine.setFile(item.item.getFilepath());
+				Composite currentMediaFrameParent = eventHandler.getCurrentMediaFrameParent();
+				engine.setVideoFrameParent(currentMediaFrameParent);
+				
+				engine.loadTrack();
+				engine.startPlaying();
+				
+				_currentTrackDuration = engine.getDuration();
+				System.err.println("Started to play '" + item.item.getTitle() + "'...");
+				
+				item.list.incTrackStartCnt(item.item);
+				if (item.item.getDuration() <= 0) {
+					if (_currentTrackDuration > 0) {
+						item.list.setTrackDuration(item.item, _currentTrackDuration);
+					}
 				}
-			}
+			} // END synchronized.
 			
 		} catch (Exception e) {
 			eventHandler.asyncThrowable(e);
@@ -449,20 +456,21 @@ public class Player {
 		// Don't go and make a player engine instance.
 		IPlaybackEngine eng = getPlaybackEngine(false);
 		if (eng!=null) {
-			PlayState playbackState = eng.getPlaybackState();
-			
-			if (playbackState == PlayState.Paused) {
-				eng.resumePlaying();
-				
-			} else if (playbackState == PlayState.Playing) {
-				eng.pausePlaying();
-				
-			} else if (playbackState == PlayState.Stopped) {
-				loadAndStartPlaying(getCurrentItem());
-				
-			} else {
-				eventHandler.asyncThrowable(new PlaybackException("Don't know what to do.  Playstate=" + playbackState + "."));
-			}
+			synchronized (eng) {
+				PlayState playbackState = eng.getPlaybackState();
+				if (playbackState == PlayState.Paused) {
+					eng.resumePlaying();
+				}
+				else if (playbackState == PlayState.Playing) {
+					eng.pausePlaying();
+				}
+				else if (playbackState == PlayState.Stopped) {
+					loadAndStartPlaying(getCurrentItem());
+				}
+				else {
+					eventHandler.asyncThrowable(new PlaybackException("Don't know what to do.  Playstate=" + playbackState + "."));
+				}
+			} // END synchronized.
 			eventHandler.updateStatus();
 		}
 	}
@@ -478,9 +486,10 @@ public class Player {
 		 */
 		IPlaybackEngine eng = getPlaybackEngine(false);
 		if (eng!=null) {
-			eng.stopPlaying();
-			eng.unloadFile();
-			
+			synchronized (eng) {
+				eng.stopPlaying();
+				eng.unloadFile();
+			}
 			eventHandler.updateStatus();
 		}
 	}
@@ -488,7 +497,9 @@ public class Player {
 	protected void internal_seekTo (double d) throws PlaybackException {
 		IPlaybackEngine eng = getPlaybackEngine(false);
 		if (eng!=null) {
-			eng.seekTo(d);
+			synchronized (eng) {
+				eng.seekTo(d);
+			}
 		}
 	}
 	
@@ -569,8 +580,12 @@ public class Player {
 	
 	public void setVideoFrameParent(Composite cmfp) {
 		try {
-			getPlaybackEngine(false).setVideoFrameParent(cmfp);
-		} catch (ImplException e) {
+			IPlaybackEngine engine = getPlaybackEngine(false);
+			synchronized (engine) {
+				engine.setVideoFrameParent(cmfp);
+			}
+		}
+		catch (ImplException e) {
 			throw new RuntimeException(e);
 		}
 	}
