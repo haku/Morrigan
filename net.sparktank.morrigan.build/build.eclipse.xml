@@ -21,7 +21,7 @@
 		<property name="outputDirectory" value="${basedir}/builds" />
 
 		<!-- Locate deltapack. -->
-		<property name="deltapack" value="${eclipse.home}/../eclipse-3.5.2-delta-pack" />
+		<property name="deltapack" value="${eclipse.home}/../eclipse-3.6-delta-pack" />
 		<echo message="deltapack=${deltapack}" />
 		<available property="haveDeltaPack" file="${deltapack}" />
 		<fail unless="haveDeltaPack" message="Deltapack not found." />
