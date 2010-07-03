@@ -92,12 +92,12 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 			
 			if (ret == null) {
 				// Check known files exist and update metadata.
-				ret = updateLibraryMetadata(taskEventListener, 50);
+				ret = updateLibraryMetadata(taskEventListener, 25);
 			}
 			
 			if (ret == null) {
 				// Check for duplicate items and merge matching items.
-				checkForDuplicates(taskEventListener);
+				checkForDuplicates(taskEventListener, 25);
 			}
 			
 			if (ret == null) {
@@ -298,11 +298,16 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 		return null;
 	}
 	
-	private void checkForDuplicates(TaskEventListener taskEventListener) throws MorriganException {
+	private void checkForDuplicates(TaskEventListener taskEventListener, int prgTotal) throws MorriganException {
 		taskEventListener.subTask("Scanning for duplicates");
 		Map<MediaLibraryTrack, ScanOption> dupicateItems = new HashMap<MediaLibraryTrack, ScanOption>();
 		
 		List<MediaLibraryTrack> tracks = library.getAllLibraryEntries();
+		
+		int progress = 0;
+		int n = 0;
+		int N = tracks.size();
+		
 		for (int i = 0; i < tracks.size(); i++) {
 			if (taskEventListener.isCanceled()) break;
 			
@@ -341,6 +346,13 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 						}
 					}
 				}
+			}
+			
+			n++;
+			int p = (n * prgTotal) / N;
+			if (p > progress) {
+				taskEventListener.worked(p - progress);
+				progress = p;
 			}
 		} // End duplicate item scanning.
 		
@@ -429,6 +441,14 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 								library.moveTags(i, keep);
 							}
 							
+							if (keep.getDuration() <= 0 && i.getDuration() > 0) {
+								library.setTrackDuration(keep, i.getDuration());
+							}
+							
+							if (i.isMissing() && keep.isEnabled() && !i.isEnabled()) {
+								library.setTrackEnabled(keep, i.isEnabled());
+							}
+							
 							library.removeMediaTrack(i);
 							taskEventListener.logMsg(library.getListName(), "[REMOVED] " + i.getFilepath());
 							countMerges++;
@@ -489,7 +509,7 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 			
 			if (mi.getDuration()<=0) {
 				if (!library.isMarkedAsUnreadable(mi)) {
-					if (!mi.isEnabled()) {
+					if (mi.isEnabled()) {
 						File file = new File(mi.getFilepath());
 						if (file.exists()) {
 							if (playbackEngine == null) {
@@ -500,7 +520,7 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 									return new TaskResult(TaskOutcome.FAILED, "Failed to create playback engine instance.", e);
 								}
 							}
-
+							
 							try {
 								int d = playbackEngine.readFileDuration(mi.getFilepath());
 								if (d>0) library.setTrackDuration(mi, d);
@@ -510,7 +530,7 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 								taskEventListener.logMsg(library.getListName(), "Error while reading metadata for '"+mi.getFilepath()+"': " + t.getMessage());
 
 								// Tag track as unreadable.
-								library.markAsUnreadabled(mi);
+//								library.markAsUnreadabled(mi); // FIXME what if the user wants to try again?
 							}
 						} // End exists test.
 					} else { // If marked as disabled.
