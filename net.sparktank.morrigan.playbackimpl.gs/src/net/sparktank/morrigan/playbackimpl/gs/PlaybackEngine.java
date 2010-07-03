@@ -64,7 +64,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 	
 	@Override
 	public String getAbout () {
-		return "net.sparktank.morrigan.playbackimpl.dsj version 0.01.";
+		return "net.sparktank.morrigan.playbackimpl.gs version 0.01.";
 	}
 	
 	@Override
@@ -77,7 +77,8 @@ public class PlaybackEngine implements IPlaybackEngine {
 		initGst();
 		
 		PlayBin playb = new PlayBin("Metadata");
-		playb.setVideoSink(ElementFactory.make("fakesink", "videosink"));
+//		playb.setVideoSink(ElementFactory.make("fakesink", "videosink"));
+		playb.setVideoSink(null);
 		playb.setInputFile(new File(filepath));
 		playb.setState(State.PAUSED);
 		
