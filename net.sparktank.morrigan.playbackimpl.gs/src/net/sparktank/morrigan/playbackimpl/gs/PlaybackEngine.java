@@ -121,6 +121,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 	@Override
 	public void finalise() {
 		finalisePlayback();
+		deinitGst();
 	}
 
 	@Override
@@ -196,6 +197,12 @@ public class PlaybackEngine implements IPlaybackEngine {
 		if (inited) return;
 		Gst.init("VideoPlayer", new String[] {});
 		inited = true;
+	}
+	
+	private void deinitGst () {
+		if (!inited) return;
+		Gst.deinit();
+		inited = false;
 	}
 	
 	private void finalisePlayback () {
@@ -439,6 +446,8 @@ public class PlaybackEngine implements IPlaybackEngine {
 		
 		if (playbin!=null) {
 			playbin.setState(State.PLAYING);
+			System.err.println("playTrack() State set to PLAYING.");
+			
 			callStateListener(PlayState.Playing);
 			startWatcherThread();
 			
@@ -478,7 +487,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 			while (true) {
 				boolean check = checkIfVideoFound(decodeElement);
 				if (check) {
-					System.err.println("WaitForVideoThread : Found all pads in " + (System.currentTimeMillis() - startTime) + ".");
+					System.err.println("WaitForVideoThread : Found all pads in " + (System.currentTimeMillis() - startTime) + " ms.");
 					break;
 				}
 				
