@@ -399,13 +399,14 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 					 * Then remove missing tracks from library.
 					 */
 					for (MediaLibraryTrack i : items.keySet()) {
-						boolean success = false;
-						try {
+//						boolean success = false;
+//						try {
+						// FIXME fix this transaction stuff.
 							/*
 							 * FIXME TODO get some form of lock for this transaction?
 							 * What if the user changes something while we do this?
 							 */
-							library.setAutoCommit(false);
+//							library.setAutoCommit(false);
 							
 							library.incTrackStartCnt(keep, i.getStartCount());
 							library.incTrackEndCnt(keep, i.getEndCount());
@@ -432,15 +433,15 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 							taskEventListener.logMsg(library.getListName(), "[REMOVED] " + i.getFilepath());
 							countMerges++;
 							
-							library.commit();
-							success = true;
-						}
-						finally {
-							if (!success) {
-								library.rollback();
-							}
-							library.setAutoCommit(true);
-						}
+//							library.commit();
+//							success = true;
+//						}
+//						finally {
+//							if (!success) {
+//								library.rollback();
+//							}
+//							library.setAutoCommit(true);
+//						}
 					}
 					
 					/*
@@ -486,31 +487,35 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 			if (taskEventListener.isCanceled()) break;
 			taskEventListener.subTask("Reading track metadata: " + mi.getTitle());
 			
-			File file = new File(mi.getFilepath());
 			if (mi.getDuration()<=0) {
 				if (!library.isMarkedAsUnreadable(mi)) {
-					if (file.exists()) {
-						if (playbackEngine == null) {
-							try {
-								playbackEngine = EngineFactory.makePlaybackEngine();
-							} catch (Exception e) {
-								taskEventListener.done();
-								return new TaskResult(TaskOutcome.FAILED, "Failed to create playback engine instance.", e);
+					if (!mi.isEnabled()) {
+						File file = new File(mi.getFilepath());
+						if (file.exists()) {
+							if (playbackEngine == null) {
+								try {
+									playbackEngine = EngineFactory.makePlaybackEngine();
+								} catch (Exception e) {
+									taskEventListener.done();
+									return new TaskResult(TaskOutcome.FAILED, "Failed to create playback engine instance.", e);
+								}
 							}
-						}
-						
-						try {
-							int d = playbackEngine.readFileDuration(mi.getFilepath());
-							if (d>0) library.setTrackDuration(mi, d);
-						}
-						catch (Throwable t) {
-							// FIXME log this somewhere useful.
-							taskEventListener.logMsg(library.getListName(), "Error while reading metadata for '"+mi.getFilepath()+"': " + t.getMessage());
-							
-							// Tag track as unreadable.
-							library.markAsUnreadabled(mi);
-						}
-					} // End exists test.
+
+							try {
+								int d = playbackEngine.readFileDuration(mi.getFilepath());
+								if (d>0) library.setTrackDuration(mi, d);
+							}
+							catch (Throwable t) {
+								// FIXME log this somewhere useful.
+								taskEventListener.logMsg(library.getListName(), "Error while reading metadata for '"+mi.getFilepath()+"': " + t.getMessage());
+
+								// Tag track as unreadable.
+								library.markAsUnreadabled(mi);
+							}
+						} // End exists test.
+					} else { // If marked as disabled.
+						taskEventListener.logMsg(library.getListName(), "Ignoring disabled file '"+mi.getFilepath()+"'.");
+					}
 				} else { // If tagged as unreadable.
 					taskEventListener.logMsg(library.getListName(), "Ignoring unreadable file '"+mi.getFilepath()+"'.");
 				}
