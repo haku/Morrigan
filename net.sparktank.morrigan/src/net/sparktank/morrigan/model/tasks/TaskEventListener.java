@@ -5,6 +5,7 @@ package net.sparktank.morrigan.model.tasks;
 public interface TaskEventListener {
 	public void onStart ();
 	public void logMsg (String topic, String s);
+	public void logError (String topic, String s, Throwable t);
 	
 	public void beginTask(String name, int totalWork);
 	public void subTask(String name);
