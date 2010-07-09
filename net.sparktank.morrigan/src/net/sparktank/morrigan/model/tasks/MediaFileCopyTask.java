@@ -8,14 +8,14 @@ import net.sparktank.morrigan.model.MediaItemList;
 import net.sparktank.morrigan.model.tasks.TaskResult.TaskOutcome;
 
 
-public class MediaFileCopyTask implements IMorriganTask {
+public class MediaFileCopyTask<T extends MediaItem> implements IMorriganTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private final MediaItemList<? extends MediaItem> mediaItemList;
-	private final List<? extends MediaItem> mediaSelection;
+	private final MediaItemList<T> mediaItemList;
+	private final List<T> mediaSelection;
 	private final File targetDirectory;
 	
-	public MediaFileCopyTask (MediaItemList<? extends MediaItem> mediaItemList, List<? extends MediaItem> mediaSelection, File targetDirectory) {
+	public MediaFileCopyTask (MediaItemList<T> mediaItemList, List<T> mediaSelection, File targetDirectory) {
 		this.mediaItemList = mediaItemList;
 		this.mediaSelection = mediaSelection;
 		this.targetDirectory = targetDirectory;
@@ -35,7 +35,7 @@ public class MediaFileCopyTask implements IMorriganTask {
 		try {
 			taskEventListener.beginTask("Copying", mediaSelection.size());
 			
-			for (MediaItem mi : mediaSelection) {
+			for (T mi : mediaSelection) {
 				taskEventListener.subTask(mi.getTitle());
 				mediaItemList.copyMediaItemFile(mi, targetDirectory);
 				taskEventListener.worked(1);
