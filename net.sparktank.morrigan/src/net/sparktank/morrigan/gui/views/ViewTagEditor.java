@@ -12,6 +12,7 @@ import net.sparktank.morrigan.gui.helpers.ImageCache;
 import net.sparktank.morrigan.model.library.AbstractMediaLibrary;
 import net.sparktank.morrigan.model.library.MediaLibraryTrack;
 import net.sparktank.morrigan.model.tags.MediaTag;
+import net.sparktank.morrigan.model.tags.MediaTagClassification;
 import net.sparktank.morrigan.model.tags.MediaTagType;
 
 import org.eclipse.jface.viewers.ISelection;
@@ -271,7 +272,7 @@ public class ViewTagEditor extends ViewPart {
 			String text = txtNewTag.getText();
 			if (text.length() > 0) {
 				try {
-					editedMediaList.addTag(editedMediaItem, text, MediaTagType.MANUAL, null);
+					editedMediaList.addTag(editedMediaItem, text, MediaTagType.MANUAL, (MediaTagClassification)null);
 					tableViewer.refresh();
 					txtNewTag.setSelection(0, text.length());
 					txtNewTag.setFocus();
