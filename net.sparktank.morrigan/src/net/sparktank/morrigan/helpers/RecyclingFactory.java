@@ -7,7 +7,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-/* T = what to make (product).
+/**
+ * T = what to make (product).
  * K = what to make it from (material).
  * P = Non-unique config to use when making.
  * S = thrown by constructor.
@@ -21,6 +22,8 @@ public abstract class RecyclingFactory<T extends Object, K extends Object, P ext
 	protected RecyclingFactory (boolean allowReuse) {
 		this.allowRecycle = allowReuse;
 	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public synchronized T manufacture (K material) throws S {
 		return manufacture(material, null);
@@ -61,15 +64,7 @@ public abstract class RecyclingFactory<T extends Object, K extends Object, P ext
 		return ret;
 	}
 	
-	protected T makeNewProduct (K material) throws S {
-		throw new IllegalArgumentException("Not implemented.");
-	}
-	
-	protected T makeNewProduct (K material, P config) throws S {
-		throw new IllegalArgumentException("Not implemented.");
-	}
-	
-	protected abstract boolean isValidProduct (T product);
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public synchronized void disposeAll () {
 		Set<Entry<K,WeakReference<T>>> products = new HashSet<Entry<K, WeakReference<T>>>(cache.entrySet());
@@ -86,6 +81,18 @@ public abstract class RecyclingFactory<T extends Object, K extends Object, P ext
 	protected void disposeProduct (T product) {
 		throw new IllegalArgumentException("Not implemented.");
 	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	protected T makeNewProduct (K material) throws S {
+		throw new IllegalArgumentException("Not implemented.");
+	}
+	
+	protected T makeNewProduct (K material, P config) throws S {
+		throw new IllegalArgumentException("Not implemented.");
+	}
+	
+	protected abstract boolean isValidProduct (T product);
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
