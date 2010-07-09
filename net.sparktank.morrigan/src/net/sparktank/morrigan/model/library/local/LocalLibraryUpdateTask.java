@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -19,10 +21,17 @@ import net.sparktank.morrigan.helpers.RecyclingFactory;
 import net.sparktank.morrigan.model.MediaItem;
 import net.sparktank.morrigan.model.library.DbException;
 import net.sparktank.morrigan.model.library.MediaLibraryTrack;
+import net.sparktank.morrigan.model.tags.MediaTagType;
 import net.sparktank.morrigan.model.tasks.IMorriganTask;
 import net.sparktank.morrigan.model.tasks.TaskEventListener;
 import net.sparktank.morrigan.model.tasks.TaskResult;
 import net.sparktank.morrigan.model.tasks.TaskResult.TaskOutcome;
+
+import org.jaudiotagger.audio.AudioFile;
+import org.jaudiotagger.audio.AudioFileIO;
+import org.jaudiotagger.tag.Tag;
+import org.jaudiotagger.tag.TagField;
+import org.jaudiotagger.tag.TagTextField;
 
 public class LocalLibraryUpdateTask implements IMorriganTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -82,6 +91,8 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 	 */
 	public TaskResult run(TaskEventListener taskEventListener) {
 		TaskResult ret = null;
+		List<MediaLibraryTrack> changedItems = new LinkedList<MediaLibraryTrack>();
+		
 		try {
 			taskEventListener.onStart();
 			taskEventListener.logMsg(library.getListName(), "Starting scan...");
@@ -92,7 +103,7 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 			
 			if (ret == null) {
 				// Check known files exist and update metadata.
-				ret = updateLibraryMetadata(taskEventListener, 25);
+				ret = updateLibraryMetadata(taskEventListener, 25, changedItems);
 			}
 			
 			if (ret == null) {
@@ -102,7 +113,12 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 			
 			if (ret == null) {
 				// Read track duration.
-				ret = updateTrackMetadata(taskEventListener, 50);
+				ret = updateTrackMetadata1(taskEventListener, 25);
+			}
+			
+			if (ret == null) {
+				// Read track tags duration.
+				ret = updateTrackMetadata2(taskEventListener, 25, changedItems);
 			}
 			
 //			if (ret == null) {
@@ -203,7 +219,9 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 		return null;
 	}
 	
-	private TaskResult updateLibraryMetadata(TaskEventListener taskEventListener, int prgTotal) throws MorriganException {
+	private TaskResult updateLibraryMetadata(TaskEventListener taskEventListener, int prgTotal, List<MediaLibraryTrack> changedItems) throws MorriganException {
+		if (changedItems.size() > 0) throw new IllegalArgumentException("changedItems list must be empty.");
+		
 		taskEventListener.subTask("Reading file metadata");
 		
 		int progress = 0;
@@ -248,6 +266,8 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 						System.err.println("Throwable while writing track last modified date '"+mi.getFilepath()+"': " + t.getMessage());
 						t.printStackTrace();
 					}
+					
+					changedItems.add(mi);
 				}
 				
 				// Hash code.
@@ -256,8 +276,8 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 					
 					try {
 						hash = ChecksumHelper.generateCrc32Checksum(mi.getFilepath());
-						
-					} catch (Throwable t) {
+					}
+					catch (Throwable t) {
 						// FIXME log this somewhere useful.
 						System.err.println("Throwable while generating checksum for '"+mi.getFilepath()+": " + t.getMessage());
 						t.printStackTrace();
@@ -280,7 +300,8 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 					try {
 						taskEventListener.logMsg(library.getListName(), "[MISSING] " + mi.getFilepath());
 						library.setTrackMissing(mi, true);
-					} catch (Throwable t) {
+					}
+					catch (Throwable t) {
 						// FIXME log this somewhere useful.
 						System.err.println("Throwable while marking track as missing '"+mi.getFilepath()+"': " + t.getMessage());
 					}
@@ -493,7 +514,7 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Track specific scanning.
 	
-	private TaskResult updateTrackMetadata (TaskEventListener taskEventListener, int prgTotal) throws MorriganException {
+	private TaskResult updateTrackMetadata1 (TaskEventListener taskEventListener, int prgTotal) throws MorriganException {
 		taskEventListener.subTask("Reading track metadata");
 		
 		IPlaybackEngine playbackEngine = null;
@@ -527,7 +548,7 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 							}
 							catch (Throwable t) {
 								// FIXME log this somewhere useful.
-								taskEventListener.logMsg(library.getListName(), "Error while reading metadata for '"+mi.getFilepath()+"': " + t.getMessage());
+								taskEventListener.logError(library.getListName(), "Error while reading metadata for '"+mi.getFilepath()+"'.", t);
 
 								// Tag track as unreadable.
 //								library.markAsUnreadabled(mi); // FIXME what if the user wants to try again?
@@ -547,7 +568,7 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 				taskEventListener.worked(p - progress);
 				progress = p;
 			}
-		} // End metadata scanning.
+		} // End file metadata scanning.
 		
 		if (playbackEngine != null) {
 			playbackEngine.finalise();
@@ -555,6 +576,64 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 		
 		return null;
 	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Format specific methods.
+	
+	private TaskResult updateTrackMetadata2 (TaskEventListener taskEventListener, int prgTotal, List<MediaLibraryTrack> changedItems) throws MorriganException {
+		taskEventListener.subTask("Reading more track metadata");
+		
+		int progress = 0;
+		int n = 0;
+		int N = library.getCount();
+		
+		for (MediaLibraryTrack mlt : changedItems) {
+			if (taskEventListener.isCanceled()) break;
+			taskEventListener.subTask("Reading more track metadata: " + mlt.getTitle());
+			
+			try {
+				File file = new File(mlt.getFilepath());
+				if (file.exists()) {
+					AudioFile af = AudioFileIO.read(file);
+//					AudioHeader ah = af.getAudioHeader(); // TODO do something with this?
+					Tag tag = af.getTag();
+					
+					Iterator<TagField> fields = tag.getFields();
+					while(fields.hasNext()) {
+						TagField tagField = fields.next();
+						if (tagField instanceof TagTextField) {
+							TagTextField tagTextField = (TagTextField) tagField;
+							if (!tagTextField.isEmpty() && !tagTextField.isBinary()) {
+								String tagFieldString = tagTextField.getContent();
+								if (tagFieldString != null && tagFieldString.length() > 0) {
+									String tagId = tagTextField.getId();
+									if (tagId != null && tagId.length() < 1) tagId = null;
+									library.addTag(mlt, tagFieldString, MediaTagType.AUTOMATIC, tagId);
+								}
+							}
+						}
+					}
+					
+				} // End file existence check.
+			}
+			catch (UnsupportedOperationException t) {
+				// Do nothing.
+			}
+			catch (Throwable t) {
+				taskEventListener.logError(library.getListName(), "Error while reading more metadata for '"+mlt.getFilepath()+"'.", t);
+			}
+			
+			n++;
+			int p = (n * prgTotal) / N;
+			if (p > progress) {
+				taskEventListener.worked(p - progress);
+				progress = p;
+			}
+		} // End track metadata scanning.
+		
+		return null;
+	}
+	
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Helper methods.
