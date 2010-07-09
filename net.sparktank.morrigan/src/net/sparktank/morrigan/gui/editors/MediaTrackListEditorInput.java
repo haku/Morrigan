@@ -87,9 +87,8 @@ public class MediaTrackListEditorInput<T extends MediaItemList<? extends MediaIt
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	@SuppressWarnings("unchecked")
 	@Override
-	public Object getAdapter(Class adapter) {
+	public Object getAdapter(@SuppressWarnings("rawtypes") Class adapter) {
 		return null;
 	}
 	
