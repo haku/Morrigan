@@ -177,7 +177,7 @@ public abstract class MediaItemList<T extends MediaItem> {
 		}
 	}
 	
-	public void removeMediaTrack (MediaItem track) throws MorriganException {
+	public void removeMediaTrack (T track) throws MorriganException {
 		mediaTracks.remove(track);
 		setDirtyState(DirtyState.DIRTY);
 	}
@@ -186,32 +186,32 @@ public abstract class MediaItemList<T extends MediaItem> {
 //	Update methods.  Use these for data that is to be persisted.
 //	These methods are sub-classed where persistence is needed.
 	
-	public void setDateAdded (MediaItem track, Date date) throws MorriganException {
+	public void setDateAdded (T track, Date date) throws MorriganException {
 		track.setDateAdded(date);
 		setDirtyState(DirtyState.METADATA);
 	}
 	
-	public void setDateLastPlayed (MediaItem track, Date date) throws MorriganException {
+	public void setDateLastPlayed (T track, Date date) throws MorriganException {
 		track.setDateLastPlayed(date);
 		setDirtyState(DirtyState.METADATA);
 	}
 	
-	public void setTrackHashCode (MediaItem track, long hashcode) throws MorriganException {
+	public void setTrackHashCode (T track, long hashcode) throws MorriganException {
 		track.setHashcode(hashcode);
 		setDirtyState(DirtyState.METADATA);
 	}
 	
-	public void setTrackDateLastModified (MediaItem track, Date date) throws MorriganException {
+	public void setTrackDateLastModified (T track, Date date) throws MorriganException {
 		track.setDateLastModified(date);
 		setDirtyState(DirtyState.METADATA);
 	}
 	
-	public void setTrackEnabled (MediaItem track, boolean value) throws MorriganException {
+	public void setTrackEnabled (T track, boolean value) throws MorriganException {
 		track.setEnabled(value);
 		setDirtyState(DirtyState.METADATA);
 	}
 	
-	public void setTrackMissing (MediaItem track, boolean value) throws MorriganException {
+	public void setTrackMissing (T track, boolean value) throws MorriganException {
 		track.setMissing(value);
 		setDirtyState(DirtyState.METADATA);
 	}
@@ -219,7 +219,7 @@ public abstract class MediaItemList<T extends MediaItem> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Actions.
 	
-	public void copyMediaItemFile (MediaItem mi, File targetDirectory) throws MorriganException {
+	public void copyMediaItemFile (T mi, File targetDirectory) throws MorriganException {
 		if (!targetDirectory.isDirectory()) {
 			throw new IllegalArgumentException("targetDirectory must be a directory.");
 		}
