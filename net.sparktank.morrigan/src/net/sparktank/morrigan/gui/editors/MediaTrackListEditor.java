@@ -609,7 +609,7 @@ public abstract class MediaTrackListEditor<T extends MediaTrackList<S>, S extend
 		editorInput.getMediaList().addTrack((S) mediaItem);
 	}
 	
-	protected void removeTrack (MediaItem track) throws MorriganException {
+	protected void removeTrack (S track) throws MorriganException {
 		editorInput.getMediaList().removeMediaTrack(track);
 	}
 	
@@ -624,6 +624,7 @@ public abstract class MediaTrackListEditor<T extends MediaTrackList<S>, S extend
 			Object selectedObject = iSel.getFirstElement();
 			if (selectedObject != null) {
 				if (selectedObject instanceof MediaTrack) {
+					@SuppressWarnings("unchecked") // FIXME is there a way to avoid needing this?
 					S track = (S) selectedObject;
 					return track;
 				}
@@ -646,6 +647,7 @@ public abstract class MediaTrackListEditor<T extends MediaTrackList<S>, S extend
 			for (Object selectedObject : iSel.toList()) {
 				if (selectedObject != null) {
 					if (selectedObject instanceof MediaTrack) {
+						@SuppressWarnings("unchecked") // FIXME is there a way to avoid needing this?
 						S track = (S) selectedObject;
 						ret.add(track);
 					}
@@ -727,7 +729,7 @@ public abstract class MediaTrackListEditor<T extends MediaTrackList<S>, S extend
 			MorriganMsgDlg dlg = new MorriganMsgDlg("Remove selected from " + getTitle() + "?", MorriganMsgDlg.YESNO);
 			dlg.open();
 			if (dlg.getReturnCode() == MorriganMsgDlg.OK) {
-				for (MediaItem track : getSelectedTracks()) {
+				for (S track : getSelectedTracks()) {
 					try {
 						removeTrack(track);
 					} catch (Throwable t) {
@@ -742,7 +744,7 @@ public abstract class MediaTrackListEditor<T extends MediaTrackList<S>, S extend
 	protected IAction toggleEnabledAction = new Action("Toggle enabled") {
 		@Override
 		public void run() {
-			for (MediaItem track : getSelectedTracks()) {
+			for (S track : getSelectedTracks()) {
 				try {
 					editorInput.getMediaList().setTrackEnabled(track, !track.isEnabled());
 				} catch (Throwable t) {
