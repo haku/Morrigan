@@ -19,6 +19,7 @@ import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.RecyclingFactory;
 import net.sparktank.morrigan.model.tags.MediaTag;
 import net.sparktank.morrigan.model.tags.MediaTagClassification;
+import net.sparktank.morrigan.model.tags.MediaTagClassificationFactory;
 import net.sparktank.morrigan.model.tags.MediaTagType;
 
 public class SqliteLayer {
@@ -361,6 +362,14 @@ public class SqliteLayer {
 		}
 	}
 	
+	public boolean addTag (long mf_rowId, String tag, MediaTagType type, String mtc) throws DbException {
+		try {
+			return local_addTag(mf_rowId, tag, type, mtc);
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+	
 	public void moveTags (long from_mf_rowId, long to_mf_rowId) throws DbException {
 		try {
 			local_moveTags(from_mf_rowId, to_mf_rowId);
@@ -637,7 +646,10 @@ public class SqliteLayer {
 		"SELECT ROWID FROM tbl_tags WHERE mf_rowid=?;";
 	
 	private static final String SQL_TBL_TAGS_Q_ALL =
-		"SELECT ROWID,tag,type,cls_rowid FROM tbl_tags WHERE mf_rowid=?;";
+		"SELECT t.ROWID,t.tag,t.type,t.cls_rowid,c.cls" +
+		" FROM tbl_tags AS t, tbl_tag_cls AS c" +
+		" WHERE t.cls_rowid=c.ROWID AND t.mf_rowid=?" +
+		" ORDER BY t.type ASC, c.cls ASC, t.tag ASC;";
 	
 	private static final String SQL_TBL_TAGS_Q_HASTAG =
 		"SELECT ROWID FROM tbl_tags WHERE mf_rowid=? AND tag=? AND type=? AND cls_rowid=?;";
@@ -841,7 +853,7 @@ public class SqliteLayer {
 		} finally {
 			ps.close();
 		}
-		if (n<1) throw new DbException("No update occured.");
+		if (n<1) throw new DbException("No update occured for addSource('"+source+"').");
 	}
 	
 	private void local_removeSource (String source) throws SQLException, ClassNotFoundException, DbException {
@@ -853,7 +865,7 @@ public class SqliteLayer {
 		} finally {
 			ps.close();
 		}
-		if (n<1) throw new DbException("No update occured.");
+		if (n<1) throw new DbException("No update occured for removeSource('"+source+"').");
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1086,7 +1098,7 @@ public class SqliteLayer {
 			} finally {
 				ps.close();
 			}
-			if (n<1) throw new DbException("No update occured.");
+			if (n<1) throw new DbException("No update occured for addTrack('"+filePath+"','"+lastModified+"').");
 			
 			return true;
 		}
@@ -1295,16 +1307,19 @@ public class SqliteLayer {
 		} finally {
 			ps.close();
 		}
-		if (n<1) throw new DbException("No update occured.");
+		if (n<1) throw new DbException("No update occured for setRemoteLocation('"+sfile+"','"+remoteLocation+"').");
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Tags.
 	
-//	private boolean local_addTag (long mf_rowId, String tag, MediaTagType type, String cls_name) throws SQLException, ClassNotFoundException, DbException {
-//		MediaTagClassification mtc = local_getTagClassification(cls_name);
-//		return local_addTag(mf_rowId, tag, type, mtc);
-//	}
+	private boolean local_addTag (long mf_rowId, String tag, MediaTagType type, String cls_name) throws SQLException, ClassNotFoundException, DbException {
+		MediaTagClassification mtc = local_getTagClassification(cls_name);
+		if (mtc == null) {
+			mtc = local_addTagClassification(cls_name);
+		}
+		return local_addTag(mf_rowId, tag, type, mtc);
+	}
 	
 	private boolean local_addTag (long mf_rowId, String tag, MediaTagType type, MediaTagClassification mtc) throws SQLException, ClassNotFoundException, DbException {
 		if (local_hasTag(mf_rowId, tag, type, mtc)) {
@@ -1351,7 +1366,7 @@ public class SqliteLayer {
 		} finally {
 			ps.close();
 		}
-		if (n<1) throw new DbException("No update occured when setting '"+from_mf_rowId+"' to '"+to_mf_rowId+"'.");
+		if (n<1) throw new DbException("No update occured for moveTags('"+from_mf_rowId+"' to '"+to_mf_rowId+"').");
 	}
 	
 	private void local_removeTag(MediaTag tag) throws SQLException, ClassNotFoundException, DbException {
@@ -1377,7 +1392,7 @@ public class SqliteLayer {
 		} finally {
 			ps.close();
 		}
-		if (n<1) throw new DbException("No update occured.");
+		if (n<1) throw new DbException("No update occured for clearTags('"+mf_rowId+"').");
 	}
 	
 	private boolean local_hasTags (long mf_rowId) throws SQLException, ClassNotFoundException {
@@ -1482,7 +1497,7 @@ public class SqliteLayer {
 		} finally {
 			ps.close();
 		}
-		if (n<1) throw new DbException("No update occured.");
+		if (n<1) throw new DbException("No update occured for addTagClassification('"+classificationName+"').");
 		
 		MediaTagClassification ret = local_getTagClassification(classificationName);
 		return ret;
@@ -1527,7 +1542,7 @@ public class SqliteLayer {
 		} else if (ret.size() == 1) {
 			return ret.get(0);
 		} else {
-			throw new DbException("Query returned more than one result.");
+			throw new DbException("Query for TagClassification clsRowId='"+clsRowId+"' returned more than one result.");
 		}
 	}
 	
@@ -1549,10 +1564,12 @@ public class SqliteLayer {
 			ps.close();
 		}
 		
-		if (ret.size() == 1) {
+		if (ret.size() < 1) {
+			return null;
+		} else if (ret.size() == 1) {
 			return ret.get(0);
 		} else {
-			throw new DbException("Query returned more than one result.");
+			throw new DbException("Query for TagClassification classificationName='"+classificationName+"' returned more than one result.");
 		}
 	}
 	
@@ -1563,7 +1580,7 @@ public class SqliteLayer {
 			long rowId = rs.getLong(SQL_TBL_TAGCLS_COL_ROWID);
 			String clsName = rs.getString(SQL_TBL_TAGCLS_COL_CLS);
 			
-			MediaTagClassification mtc = new MediaTagClassification(rowId, clsName);
+			MediaTagClassification mtc = MediaTagClassificationFactory.INSTANCE.manufacture(rowId, clsName);
 			ret.add(mtc);
 		}
 		
