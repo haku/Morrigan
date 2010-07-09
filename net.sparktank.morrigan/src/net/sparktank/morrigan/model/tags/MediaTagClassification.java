@@ -1,5 +1,6 @@
 package net.sparktank.morrigan.model.tags;
 
+
 public class MediaTagClassification {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -27,6 +28,24 @@ public class MediaTagClassification {
 	@Override
 	public String toString() {
 		return getClassification();
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Equivalence methods based purely on getRowId().
+	
+	@Override
+	public boolean equals(Object aThat) {
+		if ( aThat == null ) return false;
+		if ( this == aThat ) return true;
+		if ( !(aThat instanceof MediaTagClassification) ) return false;
+		MediaTagClassification that = (MediaTagClassification)aThat;
+		
+		return this.getRowId() == that.getRowId();
+	}
+	
+	@Override
+	public int hashCode() {
+		return  (int)(this.getRowId()^(this.getRowId()>>>32));
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
