@@ -312,7 +312,7 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> exte
 			if (dir != null) {
 				lastFileCopyTargetDir = dir;
 				
-				MediaFileCopyTask task = new MediaFileCopyTask(getMediaList(), selectedTracks, new File(dir));
+				MediaFileCopyTask<MediaLibraryTrack> task = new MediaFileCopyTask<MediaLibraryTrack>(getMediaList(), selectedTracks, new File(dir));
 				TaskJob job = new TaskJob(task, getSite().getShell().getDisplay());
 				job.schedule();
 			}
