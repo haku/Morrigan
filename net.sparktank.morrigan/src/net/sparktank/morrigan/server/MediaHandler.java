@@ -209,6 +209,12 @@ public class MediaHandler extends AbstractHandler {
 		}
 		
 		@Override
+		public void logError(String topic, String s, Throwable t) {
+			String causeTrace = ErrorHelper.getCauseTrace(t);
+			logMsg(topic, s.concat("\n".concat(causeTrace)));
+		}
+		
+		@Override
 		public void onStart() {}
 		
 		@Override
