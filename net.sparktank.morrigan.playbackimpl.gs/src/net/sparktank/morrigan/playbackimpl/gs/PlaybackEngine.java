@@ -19,7 +19,6 @@ import org.eclipse.swt.widgets.Widget;
 import org.gstreamer.Bus;
 import org.gstreamer.Caps;
 import org.gstreamer.Element;
-import org.gstreamer.ElementFactory;
 import org.gstreamer.Format;
 import org.gstreamer.Gst;
 import org.gstreamer.GstObject;
@@ -85,7 +84,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 		long queryDuration = -1;
 		long startTime = System.currentTimeMillis();
 		while (true) {
-			queryDuration = playb.queryDuration(TimeUnit.SECONDS);
+			queryDuration = playb.queryDuration(TimeUnit.MILLISECONDS);
 			if (queryDuration > 0 || System.currentTimeMillis() - startTime > 5000) {
 				break;
 			}
@@ -96,7 +95,13 @@ public class PlaybackEngine implements IPlaybackEngine {
 		playb.setState(State.NULL);
 		playb.dispose();
 		
-		return (int) queryDuration;
+		int retDuration = -1;
+		if (queryDuration > 0) {
+			retDuration = (int) (queryDuration/1000);
+			if (retDuration < 1) retDuration = 1;
+		}
+		
+		return (int) retDuration;
 	}
 	
 	@Override
@@ -384,7 +389,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 			System.err.println("endOfStream("+source+") >>>");
 			
 			if (source == playbin) {
-				handleEosEvent();
+				handleEosEvent("g");
 			}
 			
 			System.err.println("endOfStream() >>>");
@@ -585,8 +590,13 @@ public class PlaybackEngine implements IPlaybackEngine {
 		}
 	}
 	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
 	private volatile boolean m_stopWatching = false;
 	private Thread watcherThread = null;
+	
+	private long lastPosition = -1;
+	private int lastDuration = -1;
 	
 	private void startWatcherThread () {
 		System.err.println("startWatcherThread() >>>");
@@ -595,6 +605,10 @@ public class PlaybackEngine implements IPlaybackEngine {
 		watcherThread = new WatcherThread();
 		watcherThread.setDaemon(true);
 		watcherThread.start();
+		
+		// Make sure that these get reset.
+		lastPosition = -1;
+		lastDuration = -1;
 		
 		System.err.println("startWatcherThread() <<<");
 	}
@@ -612,9 +626,6 @@ public class PlaybackEngine implements IPlaybackEngine {
 			e.printStackTrace();
 		}
 	}
-	
-	private long lastPosition = -1;
-	private int lastDuration = -1;
 	
 	private class WatcherThread extends Thread {
 		public void run() {
@@ -639,7 +650,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 						}
 						
 						if (lastDuration > 0 && position >= lastDuration) {
-							handleEosEvent();
+							handleEosEvent("m");
 						}
 					}
 				}
@@ -651,8 +662,8 @@ public class PlaybackEngine implements IPlaybackEngine {
 		}
 	}
 	
-	private void handleEosEvent () {
-		System.err.println("handleEosEvent("+m_stopPlaying.get()+","+m_atEos.get()+") >>>");
+	private void handleEosEvent (String debugType) {
+		System.err.println("handleEosEvent(type="+debugType+",m_stopPlaying="+m_stopPlaying.get()+",m_atEos="+m_atEos.get()+") >>>");
 		
 		if (!m_stopPlaying.get()) {
 			if (m_atEos.compareAndSet(false, true)) {
