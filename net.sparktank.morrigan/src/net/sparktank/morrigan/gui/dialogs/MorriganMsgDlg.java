@@ -7,6 +7,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 
 public class MorriganMsgDlg extends MessageDialog {
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static final String[] YESNO = {"Yes", "No"};
 	public static final String[] COPYCONTINUE = {"Copy", "Continue"};
@@ -33,7 +34,7 @@ public class MorriganMsgDlg extends MessageDialog {
 		super(
 				Display.getCurrent().getActiveShell(), 
 				"Morrigan", null, 
-				getErrMsg(t), 
+				ErrorHelper.getCauseTrace(t), 
 				MessageDialog.ERROR, COPYCONTINUE, 0);
 		
 		throwable = t;
@@ -57,29 +58,5 @@ public class MorriganMsgDlg extends MessageDialog {
 		return open;
 	}
 	
-	private static String getErrMsg (Throwable t) {
-		if (t != null) {
-			StringBuilder sb = new StringBuilder();
-			
-			boolean first = true;
-			Throwable c = t;
-			while (true) {
-				if (!first) sb.append("\n\ncaused by:\n   ");
-				first = false;
-				
-				sb.append(c.getClass().getName());
-				sb.append(": ");
-				sb.append(c.getMessage());
-				
-				c = c.getCause();
-				if (c==null) break;
-			}
-			
-			return sb.toString();
-		}
-		else {
-			return "Unable to display error message as Throwable object is null.";
-		}
-	}
-	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
