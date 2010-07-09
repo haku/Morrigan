@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.List;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
-import net.sparktank.morrigan.model.MediaItem;
 import net.sparktank.morrigan.model.MediaTrack;
 import net.sparktank.morrigan.model.MediaTrackList;
 import net.sparktank.morrigan.model.library.SqliteLayer.LibrarySort;
@@ -204,19 +203,19 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTr
 	}
 	
 	@Override
-	public void setDateAdded (MediaItem track, Date date) throws MorriganException {
+	public void setDateAdded (MediaLibraryTrack track, Date date) throws MorriganException {
 		super.setDateAdded(track, date);
 		dbLayer.setDateAdded(track.getFilepath(), date);
 	}
 	
 	@Override
-	public void setDateLastPlayed (MediaItem track, Date date) throws MorriganException {
+	public void setDateLastPlayed (MediaLibraryTrack track, Date date) throws MorriganException {
 		super.setDateLastPlayed(track, date);
 		dbLayer.setDateLastPlayed(track.getFilepath(), date);
 	}
 	
 	@Override
-	public void removeMediaTrack (MediaItem track) throws MorriganException {
+	public void removeMediaTrack (MediaLibraryTrack track) throws MorriganException {
 		_removeMediaTrack(track);
 	}
 	
@@ -224,8 +223,10 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTr
 	 * This is so that this class can always call this method, even when this
 	 * class is sub-classed and removeMediaTrack() overridden.
 	 */
-	private void _removeMediaTrack (MediaItem track) throws MorriganException {
+	private void _removeMediaTrack (MediaLibraryTrack track) throws MorriganException {
 		super.removeMediaTrack(track);
+		
+		// Remove track.
 		int n = dbLayer.removeFile(track.getFilepath());
 		if (n != 1) {
 			if (track instanceof MediaLibraryTrack) {
@@ -239,6 +240,9 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTr
 				throw new MorriganException("Failed to remove entry from DB '"+track.getFilepath()+"'.");
 			}
 		}
+		
+		// Remove tags.
+		clearTags(track);
 	}
 	
 	@Override
@@ -260,25 +264,25 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTr
 	}
 	
 	@Override
-	public void setTrackHashCode(MediaItem track, long hashcode) throws MorriganException {
+	public void setTrackHashCode(MediaLibraryTrack track, long hashcode) throws MorriganException {
 		super.setTrackHashCode(track, hashcode);
 		dbLayer.setHashcode(track.getFilepath(), hashcode);
 	}
 	
 	@Override
-	public void setTrackDateLastModified(MediaItem track, Date date) throws MorriganException {
+	public void setTrackDateLastModified(MediaLibraryTrack track, Date date) throws MorriganException {
 		super.setTrackDateLastModified(track, date);
 		dbLayer.setDateLastModified(track.getFilepath(), date);
 	}
 	
 	@Override
-	public void setTrackEnabled(MediaItem track, boolean value) throws MorriganException {
+	public void setTrackEnabled(MediaLibraryTrack track, boolean value) throws MorriganException {
 		super.setTrackEnabled(track, value);
 		dbLayer.setEnabled(track.getFilepath(), value);
 	}
 	
 	@Override
-	public void setTrackMissing(MediaItem track, boolean value) throws MorriganException {
+	public void setTrackMissing(MediaLibraryTrack track, boolean value) throws MorriganException {
 		super.setTrackMissing(track, value);
 		dbLayer.setMissing(track.getFilepath(), value);
 	}
@@ -336,12 +340,20 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTr
 		dbLayer.addTag(mlt.getDbRowId(), tag, type, mtc);
 	}
 	
+	public void addTag (MediaLibraryTrack mlt, String tag, MediaTagType type, String mtc) throws MorriganException {
+		dbLayer.addTag(mlt.getDbRowId(), tag, type, mtc);
+	}
+	
 	public void moveTags (MediaLibraryTrack from_mlt, MediaLibraryTrack to_mlt) throws MorriganException {
 		dbLayer.moveTags(from_mlt.getDbRowId(), to_mlt.getDbRowId());
 	}
 	
 	public void removeTag (MediaTag mt) throws MorriganException {
 		dbLayer.removeTag(mt);
+	}
+	
+	public void clearTags (MediaLibraryTrack mlt) throws MorriganException {
+		dbLayer.clearTags(mlt.getDbRowId());
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -355,7 +367,7 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTr
 	
 	public void markAsUnreadabled (MediaLibraryTrack mi) throws MorriganException {
 		setTrackEnabled(mi, false);
-		addTag(mi, TAG_UNREADABLE, MediaTagType.AUTOMATIC, null);
+		addTag(mi, TAG_UNREADABLE, MediaTagType.AUTOMATIC, (MediaTagClassification)null);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
