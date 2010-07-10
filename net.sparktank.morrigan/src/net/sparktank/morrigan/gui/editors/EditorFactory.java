@@ -2,12 +2,12 @@ package net.sparktank.morrigan.gui.editors;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.MediaListFactory;
-import net.sparktank.morrigan.model.library.DbException;
 import net.sparktank.morrigan.model.library.SqliteLayer.LibrarySort;
 import net.sparktank.morrigan.model.library.SqliteLayer.LibrarySortDirection;
 import net.sparktank.morrigan.model.library.local.LocalMediaLibrary;
 import net.sparktank.morrigan.model.library.remote.RemoteMediaLibrary;
 import net.sparktank.morrigan.model.playlist.MediaPlaylist;
+import net.sparktank.sqlitewrapper.DbException;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.ui.IElementFactory;
@@ -120,14 +120,7 @@ public class EditorFactory implements IElementFactory {
 	}
 	
 	public static LibraryEditorInput getRemoteMediaLibraryInput (String dbFilePath) throws MorriganException {
-		RemoteMediaLibrary ml;
-		
-		try {
-			ml = MediaListFactory.REMOTE_MEDIA_LIBRARY_FACTORY.manufacture(dbFilePath);
-		} catch (DbException e) {
-			throw new MorriganException(e);
-		}
-		
+		RemoteMediaLibrary ml = MediaListFactory.REMOTE_MEDIA_LIBRARY_FACTORY.manufacture(dbFilePath);
 		LibraryEditorInput input = new LibraryEditorInput(ml);
 		return input;
 	}

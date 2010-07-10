@@ -9,6 +9,7 @@ import net.sparktank.morrigan.model.library.remote.RemoteMediaLibrary;
 import net.sparktank.morrigan.model.tasks.TaskEventListener;
 import net.sparktank.morrigan.server.HttpClient;
 import net.sparktank.morrigan.server.feedwriters.XmlHelper;
+import net.sparktank.sqlitewrapper.DbException;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -18,7 +19,7 @@ import org.w3c.dom.NodeList;
 public class MediaListFeedParser {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public static void parseFeed (RemoteMediaLibrary library, TaskEventListener taskEventListener) throws MorriganException {
+	public static void parseFeed (RemoteMediaLibrary library, TaskEventListener taskEventListener) throws MorriganException, DbException {
 		String xmlString;
 		try {
 			xmlString = HttpClient.getHttpClient().doHttpRequest(library.getUrl()).getBody();
@@ -57,7 +58,7 @@ public class MediaListFeedParser {
 		}
 		
 		@Override
-		public void parseEntry(Node entry) throws FeedParseException {
+		public void parseEntry(Node entry) throws FeedParseException, DbException {
 			NodeList childNodes = entry.getChildNodes();
 			if (childNodes.getLength() < 1) {
 				throw new FeedParseException("Entry contains no elements.");

@@ -7,6 +7,7 @@ import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.jobs.TaskJob;
 import net.sparktank.morrigan.model.library.remote.RemoteLibraryUpdateTask;
 import net.sparktank.morrigan.model.library.remote.RemoteMediaLibrary;
+import net.sparktank.sqlitewrapper.DbException;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -45,7 +46,11 @@ public class RemoteLibraryEditor extends AbstractLibraryEditor<RemoteMediaLibrar
 	
 	@Override
 	protected void readInputData() throws MorriganException {
-		getMediaList().readFromCache();
+		try {
+			getMediaList().readFromCache();
+		} catch (DbException e) {
+			throw new MorriganException(e);
+		}
 		
 		if (getMediaList().isCacheExpired()) {
 			RemoteLibraryUpdateTask task = RemoteLibraryUpdateTask.FACTORY.manufacture(getMediaList());

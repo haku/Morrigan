@@ -18,13 +18,13 @@ import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.ChecksumHelper;
 import net.sparktank.morrigan.helpers.RecyclingFactory;
 import net.sparktank.morrigan.model.MediaItem;
-import net.sparktank.morrigan.model.library.DbException;
 import net.sparktank.morrigan.model.library.MediaLibraryTrack;
 import net.sparktank.morrigan.model.tags.TrackTagHelper;
 import net.sparktank.morrigan.model.tasks.IMorriganTask;
 import net.sparktank.morrigan.model.tasks.TaskEventListener;
 import net.sparktank.morrigan.model.tasks.TaskResult;
 import net.sparktank.morrigan.model.tasks.TaskResult.TaskOutcome;
+import net.sparktank.sqlitewrapper.DbException;
 
 public class LocalLibraryUpdateTask implements IMorriganTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -141,7 +141,7 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Generic scanning.
 	
-	private TaskResult scanLibraryDirectories(TaskEventListener taskEventListener) {
+	private TaskResult scanLibraryDirectories(TaskEventListener taskEventListener) throws DbException {
 		taskEventListener.subTask("Scanning sources");
 		
 		List<String> supportedFormats;
@@ -212,7 +212,7 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 		return null;
 	}
 	
-	private TaskResult updateLibraryMetadata(TaskEventListener taskEventListener, int prgTotal, List<MediaLibraryTrack> changedItems) throws MorriganException {
+	private TaskResult updateLibraryMetadata(TaskEventListener taskEventListener, int prgTotal, List<MediaLibraryTrack> changedItems) throws MorriganException, DbException {
 		if (changedItems.size() > 0) throw new IllegalArgumentException("changedItems list must be empty.");
 		
 		taskEventListener.subTask("Reading file metadata");
@@ -312,7 +312,7 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 		return null;
 	}
 	
-	private void checkForDuplicates(TaskEventListener taskEventListener, int prgTotal) throws MorriganException {
+	private void checkForDuplicates(TaskEventListener taskEventListener, int prgTotal) throws MorriganException, DbException {
 		taskEventListener.subTask("Scanning for duplicates");
 		Map<MediaLibraryTrack, ScanOption> dupicateItems = new HashMap<MediaLibraryTrack, ScanOption>();
 		
@@ -507,7 +507,7 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Track specific scanning.
 	
-	private TaskResult updateTrackMetadata1 (TaskEventListener taskEventListener, int prgTotal) throws MorriganException {
+	private TaskResult updateTrackMetadata1 (TaskEventListener taskEventListener, int prgTotal) throws MorriganException, DbException {
 		taskEventListener.subTask("Reading track metadata");
 		
 		IPlaybackEngine playbackEngine = null;

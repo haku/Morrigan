@@ -17,7 +17,6 @@ import net.sparktank.morrigan.engines.playback.NotImplementedException;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.MediaTrack;
 import net.sparktank.morrigan.model.library.AbstractMediaLibrary;
-import net.sparktank.morrigan.model.library.DbException;
 import net.sparktank.morrigan.model.library.MediaLibraryTrack;
 import net.sparktank.morrigan.model.library.SqliteLayer;
 import net.sparktank.morrigan.model.tags.MediaTag;
@@ -27,6 +26,7 @@ import net.sparktank.morrigan.model.tasks.TaskEventListener;
 import net.sparktank.morrigan.server.HttpClient;
 import net.sparktank.morrigan.server.HttpClient.IHttpStreamHandler;
 import net.sparktank.morrigan.server.feedreader.MediaListFeedParser2;
+import net.sparktank.sqlitewrapper.DbException;
 
 public class RemoteMediaLibrary extends AbstractMediaLibrary {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -124,15 +124,15 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 		return (getCacheAge() > MAX_CACHE_AGE); // 1 hour.  TODO extract this as config.
 	}
 	
-	public void readFromCache () throws MorriganException {
+	public void readFromCache () throws DbException, MorriganException {
 		super.doRead();
 	}
 	
 	@Override
-	protected void doRead() throws MorriganException {
+	protected void doRead() throws DbException, MorriganException {
 		if (isCacheExpired()) {
 			System.err.println("Cache for '" + getListName() + "' is " + getCacheAge() + " old, reading data from " + url.toExternalForm() + " ...");
-			forceDoRead();
+				forceDoRead();
 		}
 		else {
 			System.err.println("Not refreshing as '" + getListName() + "' cache is only " + getCacheAge() + " old.");
@@ -140,7 +140,7 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 		}
 	}
 	
-	public void forceDoRead () throws MorriganException {
+	public void forceDoRead () throws MorriganException, DbException {
 		try {
 			// This does the actual HTTP fetch.
 			MediaListFeedParser2.parseFeed(this, taskEventListener);
@@ -169,7 +169,12 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 			if (!targetFile.exists()) {
 				MediaLibraryTrack mlt = (MediaLibraryTrack) mi;
 				
-				String serverUrlString = getDbLayer().getProp(DBKEY_SERVERURL);
+				String serverUrlString;
+				try {
+					serverUrlString = getDbLayer().getProp(DBKEY_SERVERURL);
+				} catch (DbException e) {
+					throw new MorriganException(e);
+				}
 				URL serverUrl;
 				try {
 					serverUrl = new URL(serverUrlString);
