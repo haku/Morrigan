@@ -1,5 +1,6 @@
 package net.sparktank.morrigan.gui.views;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,6 +15,7 @@ import net.sparktank.morrigan.model.library.MediaLibraryTrack;
 import net.sparktank.morrigan.model.tags.MediaTag;
 import net.sparktank.morrigan.model.tags.MediaTagClassification;
 import net.sparktank.morrigan.model.tags.MediaTagType;
+import net.sparktank.morrigan.model.tags.TrackTagHelper;
 
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -164,6 +166,7 @@ public class ViewTagEditor extends ViewPart {
 		
 		btnAddTag.setEnabled(editedMediaItem != null);
 		btnRemoveTag.setEnabled(editedMediaItem != null);
+		btnReadTags.setEnabled(editedMediaItem != null);
 		
 		this.editedMediaList = editedMediaList;
 		tableViewer.refresh();
@@ -204,6 +207,7 @@ public class ViewTagEditor extends ViewPart {
 	private Text txtNewTag;
 	private Button btnAddTag;
 	private Button btnRemoveTag;
+	private Button btnReadTags;
 	private TableViewer tableViewer;
 	
 	private void createLayout (Composite parent) {
@@ -215,6 +219,7 @@ public class ViewTagEditor extends ViewPart {
 		txtNewTag = new Text(tbCom, SWT.SINGLE | SWT.BORDER);
 		btnAddTag = new Button(tbCom, SWT.PUSH);
 		btnRemoveTag = new Button(tbCom, SWT.PUSH);
+		btnReadTags = new Button(tbCom, SWT.PUSH);
 		tableViewer = new TableViewer(parent, SWT.MULTI | SWT.V_SCROLL | SWT.FULL_SELECTION);
 		
 		tbCom.setLayout(new FormLayout());
@@ -241,10 +246,17 @@ public class ViewTagEditor extends ViewPart {
 		
 		btnRemoveTag.setImage(imageCache.readImage("icons/minus.gif"));
 		formData = new FormData();
-		formData.right = new FormAttachment(100, -sep);
+		formData.right = new FormAttachment(btnReadTags, -sep);
 		formData.top = new FormAttachment(0, sep);
 		formData.bottom = new FormAttachment(100, -sep);
 		btnRemoveTag.setLayoutData(formData);
+		
+		btnReadTags.setImage(imageCache.readImage("icons/open.gif"));
+		formData = new FormData();
+		formData.right = new FormAttachment(100, -sep);
+		formData.top = new FormAttachment(0, sep);
+		formData.bottom = new FormAttachment(100, -sep);
+		btnReadTags.setLayoutData(formData);
 		
 		tableViewer.setContentProvider(sourcesProvider);
 		tableViewer.setInput(getViewSite()); // use content provider.
@@ -258,6 +270,8 @@ public class ViewTagEditor extends ViewPart {
 		
 		btnAddTag.addSelectionListener(btnAddTagListener);
 		btnRemoveTag.addSelectionListener(btnRemoteTagListener);
+		btnReadTags.addSelectionListener(btnReadTagsListener);
+		
 		txtNewTag.addListener (SWT.DefaultSelection, new Listener () {
 			public void handleEvent (Event e) {
 				procAddTag();
@@ -322,6 +336,29 @@ public class ViewTagEditor extends ViewPart {
 		}
 	}
 	
+	private void procReadTags() {
+		if (editedMediaList != null && editedMediaItem != null) {
+			File file = new File(editedMediaItem.getFilepath());
+			if (file.exists()) {
+				try {
+					TrackTagHelper.readTrackTags(editedMediaList, editedMediaItem, file);
+				}
+				catch (Exception e) {
+					new MorriganMsgDlg(e).open();
+					return;
+				}
+				tableViewer.refresh();
+			}
+			else {
+				new MorriganMsgDlg("File '"+file.getAbsolutePath()+"' does not exist.").open();
+			}
+		}
+		else {
+			new MorriganMsgDlg("No item selected to read tags for.").open();
+		}
+		
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private SelectionListener btnAddTagListener = new SelectionListener() {
@@ -337,6 +374,15 @@ public class ViewTagEditor extends ViewPart {
 		@Override
 		public void widgetSelected(SelectionEvent event) {
 			procRemoveTag();
+		}
+		@Override
+		public void widgetDefaultSelected(SelectionEvent e) {}
+	};
+	
+	private SelectionListener btnReadTagsListener = new SelectionListener() {
+		@Override
+		public void widgetSelected(SelectionEvent event) {
+			procReadTags();
 		}
 		@Override
 		public void widgetDefaultSelected(SelectionEvent e) {}
