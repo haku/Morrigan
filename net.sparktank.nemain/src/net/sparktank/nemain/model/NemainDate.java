@@ -2,6 +2,8 @@ package net.sparktank.nemain.model;
 
 import java.util.Calendar;
 
+import net.sparktank.nemain.helpers.EqualHelper;
+
 public class NemainDate {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -28,10 +30,6 @@ public class NemainDate {
 	
 	public NemainDate (Calendar cal) {
 		setFromCalendar(cal);
-	}
-	
-	protected NemainDate getThis () {
-		return this;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -70,6 +68,14 @@ public class NemainDate {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Helper methods.
 	
+	public boolean isSameDay (NemainDate date) {
+		if (getYear() == 0) {
+			return getMonth() == date.getMonth() && getDay() == date.getDay();
+		} else {
+			return getYear() == date.getYear() && getMonth() == date.getMonth() && getDay() == date.getDay();
+		}
+	}
+	
 	public boolean isOnOrAfter (NemainDate date) {
 		return isDateOnOrAfter(this, date);
 	}
@@ -106,8 +112,7 @@ public class NemainDate {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	@Override
-	public String toString() {
+	public String getDateAsString () {
 		StringBuilder sb = new StringBuilder();
 		
 		if (getYear() != 0) {
@@ -120,6 +125,32 @@ public class NemainDate {
 		sb.append(getDay());
 		
 		return sb.toString();
+	}
+	
+	@Override
+	public String toString() {
+		return getDateAsString();
+	}
+	
+	@Override
+	public boolean equals(Object aThat) {
+		if ( aThat == null ) return false;
+		if ( this == aThat ) return true;
+		if ( !(aThat instanceof NemainDate) ) return false;
+		NemainDate that = (NemainDate)aThat;
+		
+		return EqualHelper.areEqual(getYear(), that.getYear())
+				&& EqualHelper.areEqual(getMonth(), that.getMonth())
+				&& EqualHelper.areEqual(getDay(), that.getDay());
+	}
+	
+	@Override
+	public int hashCode() {
+		int hash = 1;
+		hash = hash * 31 + getYear();
+		hash = hash * 31 + getMonth();
+		hash = hash * 31 + getDay();
+		return hash;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

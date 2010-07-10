@@ -5,6 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.sparktank.nemain.config.Config;
+import net.sparktank.nemain.controls.CalendarCell;
+import net.sparktank.nemain.controls.CalendarCell.ICalendarCellEditEvent;
 import net.sparktank.nemain.helpers.ImageCache;
 import net.sparktank.nemain.model.NemainDate;
 import net.sparktank.nemain.model.NemainEvent;
@@ -12,29 +14,26 @@ import net.sparktank.nemain.model.SqliteLayer;
 import net.sparktank.nemain.shells.EditEntryShell;
 import net.sparktank.sqlitewrapper.DbException;
 
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredContentProvider;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
 public class NemainView extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static final String ID = "net.sparktank.nemain.views.NemainView";
+	
+	public static final int GRID_ROW_LENGTH = 7;
+	public static final int GRID_ROW_COUNT = 3;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -80,38 +79,41 @@ public class NemainView extends ViewPart {
 	private void setCurrentDate (NemainDate date) {
 		_currentDate = date;
 		lblStatus.setText(date.toString());
-		viewer.refresh();
+		
+		// TODO do query in DB layer?
+		List<NemainEvent> data;
+		try {
+			data = _dataSource.getEvents();
+		} catch (DbException e) {
+			throw new RuntimeException(e);
+		}
+		List<NemainEvent> eventsToShow = new LinkedList<NemainEvent>();
+		for (NemainEvent event : data) {
+			if (event.isWithinNDaysAfter(getCurrentDate(), gridButton.length)) {
+				eventsToShow.add(event);
+			}
+		}
+		
+		for (int i = 0; i < gridButton.length; i++) {
+			NemainDate d = date.daysAfter(i);
+			gridButton[i].setDate(d);
+			
+			for (NemainEvent event : eventsToShow) {
+				if (event.isSameDay(d)) {
+					if (event.getYear() == 0) {
+						gridButton[i].setAnualEvent(event);
+					} else {
+						gridButton[i].setEvent(event);
+					}
+				}
+			}
+		}
+		
+		parent.layout();
 	}
 	
 	private NemainDate getCurrentDate () {
 		return _currentDate;
-	}
-	
-	private class ViewContentProvider implements IStructuredContentProvider {
-		
-		public Object[] getElements(Object parent) {
-			List<NemainEvent> data;
-			try {
-				data = _dataSource.getEvents();
-			}
-			catch (DbException e) {
-				return new String[] {};
-			}
-			
-			// TODO do this is DB query?
-			List<NemainEvent> ret = new LinkedList<NemainEvent>();
-			for (NemainEvent event : data) {
-				if (event.isWithinNDaysAfter(getCurrentDate(), 7)) {
-					ret.add(event);
-				}
-			}
-			
-			Object[] arrRet = ret.toArray();
-			return arrRet;
-		}
-		
-		public void inputChanged(Viewer v, Object oldInput, Object newInput) {}
-		public void dispose() {}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -120,12 +122,17 @@ public class NemainView extends ViewPart {
 	private ImageCache imageCache = new ImageCache();
 	protected final int sep = 3;
 	
+	private Composite parent;
+	
 	private Button btnDateBack;
 	private Button btnDateForward;
 	private Label lblStatus;
-	private TableViewer viewer;
+	
+	Composite gridContainer;
+	private CalendarCell[] gridButton;
 	
 	private void createControls (Composite parent) {
+		this.parent = parent;
 		FormData formData;
 		parent.setLayout(new FormLayout());
 		
@@ -133,7 +140,12 @@ public class NemainView extends ViewPart {
 		btnDateBack = new Button(tbCom, SWT.PUSH);
 		btnDateForward = new Button(tbCom, SWT.PUSH);
 		lblStatus = new Label(tbCom, SWT.NONE);
-		viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
+		
+		gridContainer = new Composite(parent, SWT.NONE);
+		gridButton = new CalendarCell[GRID_ROW_LENGTH * GRID_ROW_COUNT];
+		for (int i = 0; i < gridButton.length; i++) {
+			gridButton[i] = new CalendarCell(gridContainer);
+		}
 		
 		tbCom.setLayout(new FormLayout());
 		formData = new FormData();
@@ -164,15 +176,19 @@ public class NemainView extends ViewPart {
 		formData.bottom = new FormAttachment(100, -sep);
 		btnDateForward.setLayoutData(formData);
 		
-		viewer.setContentProvider(new ViewContentProvider());
-		viewer.setInput(getViewSite()); // use content provider.
-		getSite().setSelectionProvider(viewer);
+		GridLayout gridLayout = new GridLayout(GRID_ROW_LENGTH, true);
+		gridContainer.setLayout(gridLayout);
 		formData = new FormData();
 		formData.left = new FormAttachment(0, 0);
 		formData.right = new FormAttachment(100, 0);
 		formData.top = new FormAttachment(tbCom, 0);
 		formData.bottom = new FormAttachment(100, -sep);
-		viewer.getTable().setLayoutData(formData);
+		gridContainer.setLayoutData(formData);
+		
+		for (int i = 0; i < gridButton.length; i++) {
+			GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
+			gridButton[i].getComposite().setLayoutData(gridData);
+		}
 		
 		btnDateBack.addSelectionListener(new SelectionListener() {
 			@Override
@@ -192,30 +208,33 @@ public class NemainView extends ViewPart {
 			public void widgetDefaultSelected(SelectionEvent e) {}
 		});
 		
-		viewer.addDoubleClickListener(new IDoubleClickListener() {
-			public void doubleClick(DoubleClickEvent event) {
-				ISelection selection = viewer.getSelection();
-				Object obj = ((IStructuredSelection)selection).getFirstElement();
-				if (obj instanceof NemainEvent) {
-					NemainEvent eventToEdit = (NemainEvent) obj;
-					
-					EditEntryShell editEntryShell = new EditEntryShell(getSite().getShell());
-					if (editEntryShell.showDlg(eventToEdit)) {
-						String newText = editEntryShell.getExitText();
-						
-						System.err.println("TODO: save new text: " + newText);
+		ICalendarCellEditEvent listener = new ICalendarCellEditEvent() {
+			@Override
+			public void editBtnClicked(NemainDate date, NemainEvent event, boolean anual) {
+				if (event == null) {
+					if (anual) {
+						event = new NemainEvent("", 0, date.getMonth(), date.getDay());
+					} else {
+						event = new NemainEvent("", date.getYear(), date.getMonth(), date.getDay());
 					}
-					
 				}
+				
+				EditEntryShell editEntryShell = new EditEntryShell(getSite().getShell());
+				if (editEntryShell.showDlg(event)) {
+					String newText = editEntryShell.getExitText();
+					System.err.println("TODO: save new text: " + newText);
+				}
+				
 			}
-		});
+		};
+		for (int i = 0; i < gridButton.length; i++) {
+			gridButton[i].setCellEditEventListener(listener);
+		}
 		
-		// Create the help context id for the viewer's control
-		PlatformUI.getWorkbench().getHelpSystem().setHelp(viewer.getControl(), "net.sparktank.nemain.viewer");
 	}
 	
 	public void setFocus() {
-		viewer.getControl().setFocus();
+//		viewer.getControl().setFocus();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
