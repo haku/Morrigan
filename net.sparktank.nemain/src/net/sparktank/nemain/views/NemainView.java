@@ -1,13 +1,12 @@
 package net.sparktank.nemain.views;
 
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
 import net.sparktank.nemain.config.Config;
 import net.sparktank.nemain.helpers.ImageCache;
+import net.sparktank.nemain.model.NemainDate;
 import net.sparktank.nemain.model.NemainEvent;
 import net.sparktank.nemain.model.SqliteLayer;
 import net.sparktank.sqlitewrapper.DbException;
@@ -34,10 +33,6 @@ public class NemainView extends ViewPart {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private static int MILLISECONDS_IN_DAY = 1000 * 60 * 60 * 24;
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
 	@Override
 	public void createPartControl(Composite parent) {
 		try {
@@ -46,7 +41,7 @@ public class NemainView extends ViewPart {
 			throw new RuntimeException(e);
 		}
 		createControls(parent);
-		setCurrentDate(new Date());
+		setCurrentDate(new NemainDate());
 	}
 	
 	@Override
@@ -64,8 +59,7 @@ public class NemainView extends ViewPart {
 	
 	private static final String FILE_CAL_DB = "nemain.db3";
 	private SqliteLayer _dataSource;
-	private Date _currentDate = new Date();
-	private static final SimpleDateFormat LABEL_FORMATTER = new SimpleDateFormat("yyyy-MM-dd");
+	private NemainDate _currentDate = new NemainDate();
 	
 	private void initDataSource () throws DbException {
 		String fullPathToDb = Config.getFullPathToDb(FILE_CAL_DB);
@@ -78,13 +72,13 @@ public class NemainView extends ViewPart {
 		System.err.println("Disconnected '"+_dataSource.getDbFilePath()+"'.");
 	}
 	
-	private void setCurrentDate (Date date) {
+	private void setCurrentDate (NemainDate date) {
 		_currentDate = date;
-		lblStatus.setText(LABEL_FORMATTER.format(date));
+		lblStatus.setText(date.toString());
 		viewer.refresh();
 	}
 	
-	private Date getCurrentDate () {
+	private NemainDate getCurrentDate () {
 		return _currentDate;
 	}
 	
@@ -99,12 +93,10 @@ public class NemainView extends ViewPart {
 				return new String[] {};
 			}
 			
-			Date sevenDaysTime = new Date(getCurrentDate().getTime() + MILLISECONDS_IN_DAY * 7);
-			
+			// TODO do this is DB query?
 			List<NemainEvent> ret = new LinkedList<NemainEvent>();
 			for (NemainEvent event : data) {
-				if (event.getEntryDate().after(getCurrentDate())) {
-					if (event.getEntryDate().after(sevenDaysTime)) break;
+				if (event.isWithinNDaysAfter(getCurrentDate(), 7)) {
 					ret.add(event);
 				}
 			}
@@ -180,7 +172,7 @@ public class NemainView extends ViewPart {
 		btnDateBack.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-				setCurrentDate(new Date(getCurrentDate().getTime() - MILLISECONDS_IN_DAY));
+				setCurrentDate(getCurrentDate().daysAfter(-1));
 			}
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {}
@@ -189,7 +181,7 @@ public class NemainView extends ViewPart {
 		btnDateForward.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-				setCurrentDate(new Date(getCurrentDate().getTime() + MILLISECONDS_IN_DAY));
+				setCurrentDate(getCurrentDate().daysAfter(1));
 			}
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {}
