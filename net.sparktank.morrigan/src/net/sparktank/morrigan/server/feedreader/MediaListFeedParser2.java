@@ -21,6 +21,7 @@ import net.sparktank.morrigan.server.HttpClient;
 import net.sparktank.morrigan.server.HttpClient.HttpResponse;
 import net.sparktank.morrigan.server.HttpClient.IHttpStreamHandler;
 import net.sparktank.morrigan.server.feedwriters.XmlHelper;
+import net.sparktank.sqlitewrapper.DbException;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -59,14 +60,24 @@ public class MediaListFeedParser2 extends DefaultHandler {
 						throw new MorriganException(e);
 					}
 					thereWereErrors = false;
+				} catch (DbException e) {
+					throw new MorriganException(e);
 				} finally {
 					try {
 						library.completeBulkUpdate(thereWereErrors);
+					} catch (DbException e) {
+						throw new MorriganException(e);
 					} finally {
 						try {
 							library.commit();
+						} catch (DbException e) {
+							throw new MorriganException(e);
 						} finally {
-							library.setAutoCommit(true);
+							try {
+								library.setAutoCommit(true);
+							} catch (DbException e) {
+								throw new MorriganException(e);
+							}
 						}
 					}
 				}
@@ -148,6 +159,8 @@ public class MediaListFeedParser2 extends DefaultHandler {
 				library.updateItem(currentItem);
 			}
 			catch (MorriganException e) {
+				throw new SAXException(e);
+			} catch (DbException e) {
 				throw new SAXException(e);
 			}
 			

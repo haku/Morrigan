@@ -18,6 +18,7 @@ import net.sparktank.morrigan.model.playlist.PlayItem;
 import net.sparktank.morrigan.model.playlist.PlaylistHelper;
 import net.sparktank.morrigan.player.Player;
 import net.sparktank.morrigan.player.PlayerRegister;
+import net.sparktank.sqlitewrapper.DbException;
 
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
@@ -126,7 +127,12 @@ public class PlayersHandler extends AbstractHandler {
 	private void doPlay (Player player, String param) throws MorriganException {
 		if (LocalLibraryHelper.isLibFile(param)) {
 			String f = LocalLibraryHelper.getFullPathToLib(param);
-			LocalMediaLibrary ml = MediaListFactory.LOCAL_MEDIA_LIBRARY_FACTORY.manufacture(f);
+			LocalMediaLibrary ml;
+			try {
+				ml = MediaListFactory.LOCAL_MEDIA_LIBRARY_FACTORY.manufacture(f);
+			} catch (DbException e) {
+				throw new MorriganException(e);
+			}
 			ml.read();
 			player.loadAndStartPlaying(ml);
 			

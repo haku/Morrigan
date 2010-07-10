@@ -1,8 +1,6 @@
 package net.sparktank.morrigan.model.library;
 
 import java.io.File;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -15,14 +13,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.RecyclingFactory;
 import net.sparktank.morrigan.model.tags.MediaTag;
 import net.sparktank.morrigan.model.tags.MediaTagClassification;
 import net.sparktank.morrigan.model.tags.MediaTagClassificationFactory;
 import net.sparktank.morrigan.model.tags.MediaTagType;
+import net.sparktank.sqlitewrapper.DbException;
+import net.sparktank.sqlitewrapper.GenericSqliteLayer;
 
-public class SqliteLayer {
+public class SqliteLayer extends GenericSqliteLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Factory.
 	
@@ -46,42 +45,10 @@ public class SqliteLayer {
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Instance properties.
-	
-	private final String dbFilePath;
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors.
 	
 	private SqliteLayer (String dbFilePath) throws DbException {
-		this.dbFilePath = dbFilePath;
-		
-		try {
-			initDatabaseTables();
-		} catch (Exception e) {
-			throw new DbException(e);
-		}
-	}
-	
-	@Override
-	protected void finalize() throws Throwable {
-		dispose();
-		super.finalize();
-	}
-	
-	public void dispose () throws DbException {
-		try {
-			disposeDbCon();
-		} catch (Exception e) {
-			throw new DbException(e);
-		}
-	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Properties.
-	
-	public String getDbFilePath() {
-		return dbFilePath;
+		super(dbFilePath);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -670,107 +637,18 @@ public class SqliteLayer {
 		"SELECT ROWID,cls FROM tbl_tag_cls WHERE ROWID=?;";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	DB connection.
+//	Superclass methods.
 	
-	private Connection dbConnection = null;
-	
-	private Connection getDbCon () throws ClassNotFoundException, SQLException {
-		if (dbConnection==null) {
-			Class.forName("org.sqlite.JDBC");
-			String url = "jdbc:sqlite:/" + dbFilePath;
-			dbConnection = DriverManager.getConnection(url);
-		}
-		
-		return dbConnection;
-	}
-	
-	private void disposeDbCon () throws SQLException {
-		if (dbConnection!=null) {
-			dbConnection.close();
-		}
-	}
-	
-	public void setAutoCommit (boolean b) throws MorriganException {
-		try {
-			getDbCon().setAutoCommit(b);
-		} catch (Exception e) {
-			throw new MorriganException(e);
-		}
-	}
-	
-	public void commit () throws MorriganException {
-		try {
-			getDbCon().commit();
-		} catch (Exception e) {
-			throw new MorriganException(e);
-		}
-	}
-	
-	public void rollback () throws MorriganException {
-		try {
-			getDbCon().rollback();
-		} catch (Exception e) {
-			throw new MorriganException(e);
-		}
-	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Init.
-	
-	private void initDatabaseTables () throws SQLException, ClassNotFoundException {
-		Statement stat = getDbCon().createStatement();
-		try {
-			ResultSet rs;
-			
-			rs = stat.executeQuery(SQL_TBL_PROP_EXISTS);
-			try {
-				if (!rs.next()) { // True if there are rows in the result.
-					stat.executeUpdate(SQL_TBL_PROP_CREATE);
-				}
-			} finally {
-				rs.close();
-			}
-			
-			rs = stat.executeQuery(SQL_TBL_MEDIAFILES_EXISTS);
-			try {
-				if (!rs.next()) { // True if there are rows in the result.
-					stat.executeUpdate(SQL_TBL_MEDIAFILES_CREATE);
-				}
-			} finally {
-				rs.close();
-			}
-			
-			rs = stat.executeQuery(SQL_TBL_SOURCES_EXISTS);
-			try {
-				if (!rs.next()) { // True if there are rows in the result.
-					stat.executeUpdate(SQL_TBL_SOURCES_CREATE);
-				}
-			} finally {
-				rs.close();
-			}
-			
-			rs = stat.executeQuery(SQL_TBL_TAGS_EXISTS);
-			try {
-				if (!rs.next()) { // True if there are rows in the result.
-					stat.executeUpdate(SQL_TBL_TAGS_CREATE);
-				}
-			} finally {
-				rs.close();
-			}
-			
-			rs = stat.executeQuery(SQL_TBL_TAGCLS_EXISTS);
-			try {
-				if (!rs.next()) { // True if there are rows in the result.
-					stat.executeUpdate(SQL_TBL_TAGCLS_CREATE);
-				}
-			} finally {
-				rs.close();
-			}
-			
-		} finally {
-			stat.close();
-		}
-	}
+	@Override
+	protected SqlCreateCmd[] getTblCreateCmds() {
+		return new SqlCreateCmd[] {
+				new SqlCreateCmd(SQL_TBL_PROP_EXISTS, SQL_TBL_PROP_CREATE),
+				new SqlCreateCmd(SQL_TBL_MEDIAFILES_EXISTS, SQL_TBL_MEDIAFILES_CREATE),
+				new SqlCreateCmd(SQL_TBL_SOURCES_EXISTS, SQL_TBL_SOURCES_CREATE),
+				new SqlCreateCmd(SQL_TBL_TAGS_EXISTS, SQL_TBL_TAGS_CREATE),
+				new SqlCreateCmd(SQL_TBL_TAGCLS_EXISTS, SQL_TBL_TAGCLS_CREATE)
+				};
+	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Properties.

@@ -4,7 +4,6 @@ import java.net.URL;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.RecyclingFactory;
-import net.sparktank.morrigan.model.library.DbException;
 import net.sparktank.morrigan.model.library.SqliteLayer;
 import net.sparktank.morrigan.model.library.local.LocalLibraryHelper;
 import net.sparktank.morrigan.model.library.local.LocalMediaLibrary;
@@ -12,6 +11,7 @@ import net.sparktank.morrigan.model.library.remote.RemoteLibraryHelper;
 import net.sparktank.morrigan.model.library.remote.RemoteMediaLibrary;
 import net.sparktank.morrigan.model.playlist.MediaPlaylist;
 import net.sparktank.morrigan.model.playlist.PlaylistHelper;
+import net.sparktank.sqlitewrapper.DbException;
 
 public class MediaListFactory {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -63,11 +63,17 @@ public class MediaListFactory {
 			
 			System.out.println("Making object instance '" + material + "'...");
 			if (config != null) {
-				ret = new RemoteMediaLibrary(RemoteLibraryHelper.getLibraryTitle(material), config, SqliteLayer.FACTORY.manufacture(material));
+				try {
+					ret = new RemoteMediaLibrary(RemoteLibraryHelper.getLibraryTitle(material), config, SqliteLayer.FACTORY.manufacture(material));
+				} catch (DbException e) {
+					throw new MorriganException(e);
+				}
 			} else {
 				try {
 					ret = new RemoteMediaLibrary(RemoteLibraryHelper.getLibraryTitle(material), SqliteLayer.FACTORY.manufacture(material));
 				} catch (MalformedURLException e) {
+					throw new MorriganException(e);
+				} catch (DbException e) {
 					throw new MorriganException(e);
 				}
 			}

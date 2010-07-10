@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import net.sparktank.morrigan.model.tasks.TaskEventListener;
 import net.sparktank.morrigan.server.feedwriters.XmlHelper;
+import net.sparktank.sqlitewrapper.DbException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -14,7 +15,7 @@ import org.xml.sax.SAXException;
 public class FeedParser {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	static public void parseFeed (String xmlString, TaskEventListener taskEventListener, IEntryHandler entryHandler) throws FeedParseException {
+	static public void parseFeed (String xmlString, TaskEventListener taskEventListener, IEntryHandler entryHandler) throws FeedParseException, DbException {
 //		if (taskEventListener!=null) taskEventListener.onStart(); // TODO do this?
 		if (taskEventListener!=null) taskEventListener.beginTask("Reading feed...", 100);
 		

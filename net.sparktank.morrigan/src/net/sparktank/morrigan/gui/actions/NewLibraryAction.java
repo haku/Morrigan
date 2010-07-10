@@ -9,6 +9,7 @@ import net.sparktank.morrigan.gui.editors.LocalLibraryEditor;
 import net.sparktank.morrigan.gui.views.ViewMediaExplorer;
 import net.sparktank.morrigan.model.library.local.LocalLibraryHelper;
 import net.sparktank.morrigan.model.library.local.LocalMediaLibrary;
+import net.sparktank.sqlitewrapper.DbException;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.InputDialog;
@@ -57,7 +58,7 @@ public class NewLibraryAction extends Action implements IWorkbenchAction {
 			LocalMediaLibrary createdLib;
 			try {
 				createdLib = LocalLibraryHelper.createLib(libName);
-			} catch (MorriganException e) {
+			} catch (DbException e) {
 				new MorriganMsgDlg(e).open();
 				return;
 			}

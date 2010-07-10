@@ -6,6 +6,7 @@ import java.util.List;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.library.local.LocalMediaLibrary;
+import net.sparktank.sqlitewrapper.DbException;
 
 import org.xml.sax.SAXException;
 
@@ -40,7 +41,13 @@ public class LibrarySrcFeed extends Feed {
 		addLink(dw, "/media/" + ml.getType() + "/" + listFile + "/src/add", "add", "cmd");
 		addLink(dw, "/media/" + ml.getType() + "/" + listFile + "/src/remove", "remove", "cmd");
 		
-		List<String> src = ml.getSources();
+		List<String> src;
+		try {
+			src = ml.getSources();
+		} catch (DbException e) {
+			throw new MorriganException(e);
+		}
+		
 		for (String s : src) {
 			dw.startElement("entry");
 			

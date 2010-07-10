@@ -1,8 +1,8 @@
 package net.sparktank.morrigan.model.library.local;
 
 import net.sparktank.morrigan.model.library.AbstractMediaLibrary;
-import net.sparktank.morrigan.model.library.DbException;
 import net.sparktank.morrigan.model.library.SqliteLayer;
+import net.sparktank.sqlitewrapper.DbException;
 
 
 public class LocalMediaLibrary extends AbstractMediaLibrary {

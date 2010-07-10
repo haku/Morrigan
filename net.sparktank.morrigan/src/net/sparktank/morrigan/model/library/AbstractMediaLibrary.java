@@ -13,6 +13,7 @@ import net.sparktank.morrigan.model.library.SqliteLayer.LibrarySortDirection;
 import net.sparktank.morrigan.model.tags.MediaTag;
 import net.sparktank.morrigan.model.tags.MediaTagClassification;
 import net.sparktank.morrigan.model.tags.MediaTagType;
+import net.sparktank.sqlitewrapper.DbException;
 
 public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTrack> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -70,10 +71,14 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTr
 	@Override
 	public void read () throws MorriganException {
 		if (!firstRead) return;
-		doRead();
+		try {
+			doRead();
+		} catch (DbException e) {
+			throw new MorriganException(e);
+		}
 	}
 	
-	protected void doRead () throws MorriganException {
+	protected void doRead () throws MorriganException, DbException {
 		System.err.println("[?] reading... " + getType() + " " + getListName() + "...");
 		
 		long t0 = System.currentTimeMillis();
@@ -115,25 +120,22 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTr
 		}
 	}
 	
-	public void setAutoCommit (boolean b) throws MorriganException {
+	public void setAutoCommit (boolean b) throws DbException {
 		dbLayer.setAutoCommit(b);
 	}
 	
-	public void commit () throws MorriganException {
+	public void commit () throws DbException {
 		dbLayer.commit();
 	}
 	
-	public void rollback () throws MorriganException {
+	public void rollback () throws DbException {
 		dbLayer.rollback();
 	}
 	
 	/**
 	 * Returns a copy of the main list updated with all items from the DB.
-	 * 
-	 * @return
-	 * @throws MorriganException
 	 */
-	public List<MediaLibraryTrack> getAllLibraryEntries () throws MorriganException {
+	public List<MediaLibraryTrack> getAllLibraryEntries () throws DbException {
 		ArrayList<MediaLibraryTrack> copyOfMainList = new ArrayList<MediaLibraryTrack>(getMediaTracks());
 		List<MediaLibraryTrack> allList = dbLayer.getAllMedia(LibrarySort.FILE, LibrarySortDirection.ASC, false);
 		updateList(copyOfMainList, allList);
@@ -193,37 +195,58 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTr
 	@Override
 	public void incTrackStartCnt (MediaTrack track, long n) throws MorriganException {
 		super.incTrackStartCnt(track, n);
-		dbLayer.incTrackStartCnt(track.getFilepath(), n);
+		try {
+			dbLayer.incTrackStartCnt(track.getFilepath(), n);
+		} catch (DbException e) {
+			throw new MorriganException(e);
+		}
 	}
 	
 	@Override
 	public void incTrackEndCnt (MediaTrack track, long n) throws MorriganException {
 		super.incTrackEndCnt(track, n);
-		dbLayer.incTrackEndCnt(track.getFilepath(), n);
+		try {
+			dbLayer.incTrackEndCnt(track.getFilepath(), n);
+		} catch (DbException e) {
+			throw new MorriganException(e);
+		}
 	}
 	
 	@Override
 	public void setDateAdded (MediaLibraryTrack track, Date date) throws MorriganException {
 		super.setDateAdded(track, date);
-		dbLayer.setDateAdded(track.getFilepath(), date);
+		try {
+			dbLayer.setDateAdded(track.getFilepath(), date);
+		} catch (DbException e) {
+			throw new MorriganException(e);
+		}
 	}
 	
 	@Override
 	public void setDateLastPlayed (MediaLibraryTrack track, Date date) throws MorriganException {
 		super.setDateLastPlayed(track, date);
-		dbLayer.setDateLastPlayed(track.getFilepath(), date);
+		try {
+			dbLayer.setDateLastPlayed(track.getFilepath(), date);
+		} catch (DbException e) {
+			throw new MorriganException(e);
+		}
 	}
 	
 	@Override
 	public void removeMediaTrack (MediaLibraryTrack track) throws MorriganException {
-		_removeMediaTrack(track);
+		try {
+			_removeMediaTrack(track);
+		} catch (DbException e) {
+			throw new MorriganException(e);
+		}
 	}
 	
 	/**
 	 * This is so that this class can always call this method, even when this
 	 * class is sub-classed and removeMediaTrack() overridden.
+	 * @throws DbException 
 	 */
-	private void _removeMediaTrack (MediaLibraryTrack track) throws MorriganException {
+	private void _removeMediaTrack (MediaLibraryTrack track) throws MorriganException, DbException {
 		super.removeMediaTrack(track);
 		
 		// Remove track.
@@ -248,43 +271,71 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTr
 	@Override
 	public void incTrackStartCnt(MediaTrack track) throws MorriganException {
 		super.incTrackStartCnt(track);
-		dbLayer.incTrackPlayed(track.getFilepath());
+		try {
+			dbLayer.incTrackPlayed(track.getFilepath());
+		} catch (DbException e) {
+			throw new MorriganException(e);
+		}
 	}
 	
 	@Override
 	public void incTrackEndCnt(MediaTrack track) throws MorriganException {
 		super.incTrackEndCnt(track);
-		dbLayer.incTrackFinished(track.getFilepath());
+		try {
+			dbLayer.incTrackFinished(track.getFilepath());
+		} catch (DbException e) {
+			throw new MorriganException(e);
+		}
 	}
 	
 	@Override
 	public void setTrackDuration(MediaTrack track, int duration) throws MorriganException {
 		super.setTrackDuration(track, duration);
-		dbLayer.setTrackDuration(track.getFilepath(), duration);
+		try {
+			dbLayer.setTrackDuration(track.getFilepath(), duration);
+		} catch (DbException e) {
+			throw new MorriganException(e);
+		}
 	}
 	
 	@Override
 	public void setTrackHashCode(MediaLibraryTrack track, long hashcode) throws MorriganException {
 		super.setTrackHashCode(track, hashcode);
-		dbLayer.setHashcode(track.getFilepath(), hashcode);
+		try {
+			dbLayer.setHashcode(track.getFilepath(), hashcode);
+		} catch (DbException e) {
+			throw new MorriganException(e);
+		}
 	}
 	
 	@Override
 	public void setTrackDateLastModified(MediaLibraryTrack track, Date date) throws MorriganException {
 		super.setTrackDateLastModified(track, date);
-		dbLayer.setDateLastModified(track.getFilepath(), date);
+		try {
+			dbLayer.setDateLastModified(track.getFilepath(), date);
+		} catch (DbException e) {
+			throw new MorriganException(e);
+		}
 	}
 	
 	@Override
 	public void setTrackEnabled(MediaLibraryTrack track, boolean value) throws MorriganException {
 		super.setTrackEnabled(track, value);
-		dbLayer.setEnabled(track.getFilepath(), value);
+		try {
+			dbLayer.setEnabled(track.getFilepath(), value);
+		} catch (DbException e) {
+			throw new MorriganException(e);
+		}
 	}
 	
 	@Override
 	public void setTrackMissing(MediaLibraryTrack track, boolean value) throws MorriganException {
 		super.setTrackMissing(track, value);
-		dbLayer.setMissing(track.getFilepath(), value);
+		try {
+			dbLayer.setMissing(track.getFilepath(), value);
+		} catch (DbException e) {
+			throw new MorriganException(e);
+		}
 	}
 	
 	public void setRemoteLocation (MediaLibraryTrack track, String remoteLocation) throws DbException {
@@ -325,35 +376,67 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTr
 //	Tags.
 	
 	public boolean hasTags (MediaLibraryTrack mlt) throws MorriganException {
-		return dbLayer.hasTags(mlt.getDbRowId());
+		try {
+			return dbLayer.hasTags(mlt.getDbRowId());
+		} catch (DbException e) {
+			throw new MorriganException(e);
+		}
 	}
 	
 	public boolean hasTag (MediaLibraryTrack mlt, String tag, MediaTagType type, MediaTagClassification mtc) throws MorriganException {
-		return dbLayer.hasTag(mlt.getDbRowId(), tag, type, mtc);
+		try {
+			return dbLayer.hasTag(mlt.getDbRowId(), tag, type, mtc);
+		} catch (DbException e) {
+			throw new MorriganException(e);
+		}
 	}
 	
 	public List<MediaTag> getTags (MediaLibraryTrack mlt) throws MorriganException {
-		return dbLayer.getTags(mlt.getDbRowId());
+		try {
+			return dbLayer.getTags(mlt.getDbRowId());
+		} catch (DbException e) {
+			throw new MorriganException(e);
+		}
 	}
 	
 	public void addTag (MediaLibraryTrack mlt, String tag, MediaTagType type, MediaTagClassification mtc) throws MorriganException {
-		dbLayer.addTag(mlt.getDbRowId(), tag, type, mtc);
+		try {
+			dbLayer.addTag(mlt.getDbRowId(), tag, type, mtc);
+		} catch (DbException e) {
+			throw new MorriganException(e);
+		}
 	}
 	
 	public void addTag (MediaLibraryTrack mlt, String tag, MediaTagType type, String mtc) throws MorriganException {
-		dbLayer.addTag(mlt.getDbRowId(), tag, type, mtc);
+		try {
+			dbLayer.addTag(mlt.getDbRowId(), tag, type, mtc);
+		} catch (DbException e) {
+			throw new MorriganException(e);
+		}
 	}
 	
 	public void moveTags (MediaLibraryTrack from_mlt, MediaLibraryTrack to_mlt) throws MorriganException {
-		dbLayer.moveTags(from_mlt.getDbRowId(), to_mlt.getDbRowId());
+		try {
+			dbLayer.moveTags(from_mlt.getDbRowId(), to_mlt.getDbRowId());
+		} catch (DbException e) {
+			throw new MorriganException(e);
+		}
 	}
 	
 	public void removeTag (MediaTag mt) throws MorriganException {
-		dbLayer.removeTag(mt);
+		try {
+			dbLayer.removeTag(mt);
+		} catch (DbException e) {
+			throw new MorriganException(e);
+		}
 	}
 	
 	public void clearTags (MediaLibraryTrack mlt) throws MorriganException {
-		dbLayer.clearTags(mlt.getDbRowId());
+		try {
+			dbLayer.clearTags(mlt.getDbRowId());
+		} catch (DbException e) {
+			throw new MorriganException(e);
+		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -375,8 +458,9 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTr
 	/**
 	 * Returns true if the file was added.
 	 * (i.e. it was not already in the library)
+	 * @throws DbException 
 	 */
-	public MediaLibraryTrack addFile (File file) throws MorriganException {
+	public MediaLibraryTrack addFile (File file) throws MorriganException, DbException {
 		MediaLibraryTrack track = null;
 		boolean added = dbLayer.addFile(file);
 		if (added) {
@@ -400,8 +484,9 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTr
 	 * in the correct order.
 	 * @param thereWereErrors
 	 * @throws MorriganException
+	 * @throws DbException 
 	 */
-	public void completeBulkUpdate (boolean thereWereErrors) throws MorriganException {
+	public void completeBulkUpdate (boolean thereWereErrors) throws MorriganException, DbException {
 		try {
 			List<MediaLibraryTrack> removed = replaceListWithoutSetDirty(_changedItems);
 			if (!thereWereErrors) {
@@ -418,7 +503,7 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTr
 		}
 	}
 	
-	public void updateItem (MediaLibraryTrack mi) throws MorriganException {
+	public void updateItem (MediaLibraryTrack mi) throws MorriganException, DbException {
 		if (_changedItems == null) {
 			throw new IllegalArgumentException("updateItem() can only be called after beginBulkUpdate() and before completeBulkUpdate().");
 		}

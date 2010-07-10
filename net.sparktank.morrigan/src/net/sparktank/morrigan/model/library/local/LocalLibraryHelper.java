@@ -4,9 +4,9 @@ import java.io.File;
 import java.util.ArrayList;
 
 import net.sparktank.morrigan.config.Config;
-import net.sparktank.morrigan.exceptions.MorriganException;
-import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
 import net.sparktank.morrigan.model.MediaListFactory;
+import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
+import net.sparktank.sqlitewrapper.DbException;
 
 public class LocalLibraryHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -22,7 +22,7 @@ public class LocalLibraryHelper {
 		return libFile;
 	}
 	
-	public static LocalMediaLibrary createLib (String libName) throws MorriganException {
+	public static LocalMediaLibrary createLib (String libName) throws DbException {
 		String plFile = getFullPathToLib(libName);
 		LocalMediaLibrary lib = MediaListFactory.LOCAL_MEDIA_LIBRARY_FACTORY.manufacture(plFile);
 		return lib;
