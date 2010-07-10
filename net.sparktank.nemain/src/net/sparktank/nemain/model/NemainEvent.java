@@ -1,22 +1,31 @@
 package net.sparktank.nemain.model;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.GregorianCalendar;
+
 public class NemainEvent {
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	private static final SimpleDateFormat FORMATTER = new SimpleDateFormat("yyyy-MM-dd");
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	NemainEvent (String entryText, int entryYear, int entryMonth, int entryDay) {
 		this.entryText = entryText;
-		this.entryYear = entryYear;
-		this.entryMonth = entryMonth;
-		this.entryDay = entryDay;
+		this.entryDate = new GregorianCalendar(entryYear, entryMonth - 1, entryDay).getTime();
+	}
+	
+	NemainEvent (String entryText, Date date) {
+		this.entryText = entryText;
+		this.entryDate = date;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Properties.
 	
 	private String entryText;
-	private int entryYear;
-	private int entryMonth;
-	private int entryDay;
+	private Date entryDate;
 	
 	public String getEntryText() {
 		return entryText;
@@ -25,32 +34,25 @@ public class NemainEvent {
 		this.entryText = entryText;
 	}
 	
-	public int getEntryYear() {
-		return entryYear;
+	public Date getEntryDate() {
+		return entryDate;
 	}
-	public void setEntryYear(int entryYear) {
-		this.entryYear = entryYear;
-	}
-	
-	public int getEntryMonth() {
-		return entryMonth;
-	}
-	public void setEntryMonth(int entryMonth) {
-		this.entryMonth = entryMonth;
-	}
-	
-	public int getEntryDay() {
-		return entryDay;
-	}
-	public void setEntryDay(int entryDay) {
-		this.entryDay = entryDay;
+	public void setEntryDate(Date entryDate) {
+		this.entryDate = entryDate;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
 	public String toString() {
-		return entryText;
+		StringBuilder sb = new StringBuilder();
+		
+		sb.append('(');
+		sb.append(FORMATTER.format(getEntryDate()));
+		sb.append(") ");
+		sb.append(getEntryText());
+		
+		return sb.toString();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -28,7 +28,8 @@ public class SqliteLayer extends GenericSqliteLayer {
 	private static final String SQL_TBL_EVENTS_COL_MONTH = "date_month";
 	private static final String SQL_TBL_EVENTS_COL_DAY = "date_day";
 	
-	static private final String SQL_TBL_EVENTS_Q_ALL = "SELECT entry,date_year,date_month,date_day FROM tbl_events ORDER BY date_year ASC, date_month ASC, date_day ASC;";
+	static private final String SQL_TBL_EVENTS_Q_ALL =
+		"SELECT entry,date_year,date_month,date_day FROM tbl_events ORDER BY date_year ASC, date_month ASC, date_day ASC;";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Super class methods.
