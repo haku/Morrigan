@@ -1,5 +1,6 @@
 package net.sparktank.nemain.model;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -31,6 +32,18 @@ public class SqliteLayer extends GenericSqliteLayer {
 	static private final String SQL_TBL_EVENTS_Q_ALL =
 		"SELECT entry,date_year,date_month,date_day FROM tbl_events ORDER BY date_year ASC, date_month ASC, date_day ASC;";
 	
+	static private final String SQL_TBL_EVENTS_Q_EXISTS =
+		"SELECT ROWID FROM tbl_events WHERE date_year=? AND date_month=? AND date_day=?;";
+	
+	static private final String SQL_TBL_EVENTS_ADD =
+		"INSERT INTO tbl_events (entry,date_year,date_month,date_day) VALUES (?,?,?,?);";
+	
+	static private final String SQL_TBL_EVENTS_UPDATE =
+		"UPDATE tbl_events SET entry=? WHERE date_year=? AND date_month=? AND date_day=?;";
+	
+	static private final String SQL_TBL_EVENTS_DELETE =
+		"DELETE FROM tbl_events WHERE date_year=? AND date_month=? AND date_day=?;";
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Super class methods.
 	
@@ -48,6 +61,18 @@ public class SqliteLayer extends GenericSqliteLayer {
 		} catch (SQLException e) {
 			throw new DbException(e);
 		} catch (ClassNotFoundException e) {
+			throw new DbException(e);
+		}
+	}
+	
+	public void setEvent (NemainEvent event) throws DbException {
+		try {
+			_setEvent(event);
+		} catch (SQLException e) {
+			throw new DbException(e);
+		} catch (ClassNotFoundException e) {
+			throw new DbException(e);
+		} catch (DbException e) {
 			throw new DbException(e);
 		}
 	}
@@ -71,7 +96,30 @@ public class SqliteLayer extends GenericSqliteLayer {
 		return ret;
 	}
 	
+	private boolean _isEventExists (NemainDate date) throws SQLException, ClassNotFoundException {
+		ResultSet rs;
+		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_EVENTS_Q_EXISTS);
+		try {
+			ps.setInt(1, date.getYear());
+			ps.setInt(2, date.getMonth());
+			ps.setInt(3, date.getDay());
+			rs = ps.executeQuery();
+			try {
+				if (rs.next()) {
+					return true;
+				} else {
+					return false;
+				}
+			} finally {
+				rs.close();
+			}
+		} finally {
+			ps.close();
+		}
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Data fetching helper methods.
 	
 	private List<NemainEvent> _getEvents_parseRecordSet (ResultSet rs) throws SQLException {
 		List<NemainEvent> ret = new LinkedList<NemainEvent>();
@@ -87,6 +135,76 @@ public class SqliteLayer extends GenericSqliteLayer {
 		}
 		
 		return ret;
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Data writing methods.
+	
+	private void _setEvent (NemainEvent event) throws SQLException, ClassNotFoundException, DbException {
+		if (_isEventExists(event)) {
+			if (event.getEntryText() == null || event.getEntryText().length() < 1) {
+				_deleteEvent(event);
+			} else {
+				if (event.getEntryText() != null && event.getEntryText().length() > 0) {
+					_updateEvent(event);
+				} else {
+					throw new IllegalArgumentException("Can't create empty entry.");
+				}
+			}
+		}
+		else {
+			_addEvent(event);
+		}
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Data writing helper methods.
+	
+	private void _addEvent (NemainEvent event) throws SQLException, ClassNotFoundException, DbException {
+		PreparedStatement ps;
+		ps = getDbCon().prepareStatement(SQL_TBL_EVENTS_ADD);
+		int n;
+		try {
+			ps.setString(1, event.getEntryText());
+			ps.setInt(2, event.getYear());
+			ps.setInt(3, event.getMonth());
+			ps.setInt(4, event.getDay());
+			n = ps.executeUpdate();
+		} finally {
+			ps.close();
+		}
+		if (n<1) throw new DbException("No update occured for _addEvent('"+event.toString()+"').");
+	}
+	
+	private void _updateEvent (NemainEvent event) throws SQLException, ClassNotFoundException, DbException {
+		PreparedStatement ps;
+		ps = getDbCon().prepareStatement(SQL_TBL_EVENTS_UPDATE);
+		int n;
+		try {
+			ps.setString(1, event.getEntryText());
+			ps.setInt(2, event.getYear());
+			ps.setInt(3, event.getMonth());
+			ps.setInt(4, event.getDay());
+			n = ps.executeUpdate();
+		} finally {
+			ps.close();
+		}
+		if (n<1) throw new DbException("No update occured for _updateEvent('"+event.toString()+"').");
+	}
+	
+	private void _deleteEvent (NemainDate event) throws SQLException, ClassNotFoundException, DbException {
+		PreparedStatement ps;
+		ps = getDbCon().prepareStatement(SQL_TBL_EVENTS_DELETE);
+		int n;
+		try {
+			ps.setInt(1, event.getYear());
+			ps.setInt(2, event.getMonth());
+			ps.setInt(3, event.getDay());
+			n = ps.executeUpdate();
+		} finally {
+			ps.close();
+		}
+		if (n<1) throw new DbException("No update occured for _updateEvent('"+event.toString()+"').");
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

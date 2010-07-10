@@ -11,6 +11,11 @@ public class NemainEvent extends NemainDate {
 		this.entryText = entryText;
 	}
 	
+	public NemainEvent (String entryText, NemainDate date) {
+		super(date);
+		this.entryText = entryText;
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Properties.
 	

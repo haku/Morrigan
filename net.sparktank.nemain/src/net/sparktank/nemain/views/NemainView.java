@@ -221,10 +221,14 @@ public class NemainView extends ViewPart {
 				
 				EditEntryShell editEntryShell = new EditEntryShell(getSite().getShell());
 				if (editEntryShell.showDlg(event)) {
-					String newText = editEntryShell.getExitText();
-					System.err.println("TODO: save new text: " + newText);
+					NemainEvent newEvent = new NemainEvent(editEntryShell.getExitText(), event);
+					try {
+						_dataSource.setEvent(newEvent);
+					} catch (DbException e) {
+						e.printStackTrace();
+					}
+					setCurrentDate(getCurrentDate());
 				}
-				
 			}
 		};
 		for (int i = 0; i < gridButton.length; i++) {
