@@ -25,6 +25,12 @@ public class NemainEvent extends NemainDate {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	public NemainDate getDate () {
+		return super.getThis();
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
