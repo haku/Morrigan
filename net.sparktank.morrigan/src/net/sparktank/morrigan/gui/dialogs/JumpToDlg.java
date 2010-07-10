@@ -33,14 +33,13 @@ import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-public class JumpToDlg extends Dialog {
+public class JumpToDlg {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private static final long serialVersionUID = -6047405753309652452L;
@@ -55,15 +54,14 @@ public class JumpToDlg extends Dialog {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	private final Shell parent;
 	private final LocalMediaLibrary mediaLibrary;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public JumpToDlg (Shell parent, LocalMediaLibrary mediaLibrary) {
-		super(parent, SWT.TITLE | SWT.CLOSE | SWT.APPLICATION_MODAL | SWT.RESIZE | SWT.ON_TOP);
-		
+		this.parent = parent;
 		if (mediaLibrary == null) throw new IllegalArgumentException("mediaLibrary can not be null.");
-		
 		this.mediaLibrary = mediaLibrary;
 	}
 	
@@ -106,13 +104,10 @@ public class JumpToDlg extends Dialog {
 			dlgOpen = true;
 		}
 		
-		// Set dlg text.
-		setText("Jump to track");
-		
 		// Create window.
-		shell = new Shell(getParent().getDisplay(), getStyle());
-		shell.setImage(getParent().getImage());
-		shell.setText(getText());
+		shell = new Shell(parent.getDisplay(), SWT.TITLE | SWT.CLOSE | SWT.APPLICATION_MODAL | SWT.RESIZE | SWT.ON_TOP);
+		shell.setImage(parent.getImage());
+		shell.setText("Jump to - Morrigan");
 		
 		// Create form layout.
 		FormData formData;
@@ -185,7 +180,7 @@ public class JumpToDlg extends Dialog {
 		
 		// Work out which screen to show the dlg on.
 		Point mouse = MouseInfo.getPointerInfo().getLocation();
-		for (Monitor m : getParent().getDisplay().getMonitors()) {
+		for (Monitor m : parent.getDisplay().getMonitors()) {
 			Rectangle b = m.getBounds();
 			if (mouse.x >= b.x && mouse.x <= b.x + b.width
 					&& mouse.y >= b.y && mouse.y <= b.y + b.width) {
@@ -215,7 +210,7 @@ public class JumpToDlg extends Dialog {
 		shell.open();
 		shell.setFocus();
 		shell.forceActive();
-		Display display = getParent().getDisplay();
+		Display display = parent.getDisplay();
 		while (!shell.isDisposed()) {
 			if (!display.readAndDispatch()) {
 				display.sleep();
@@ -414,7 +409,7 @@ public class JumpToDlg extends Dialog {
 	private void updateSearchResults (boolean force) {
 		synchronized (searchLock) {
 			if (!searchRunning || force) {
-				getParent().getDisplay().asyncExec(updateSearchResults);
+				parent.getDisplay().asyncExec(updateSearchResults);
 				searchRunning = true;
 			} else {
 				searchDirty = true;
@@ -446,7 +441,7 @@ public class JumpToDlg extends Dialog {
 			@Override
 			public void run() {
 				if (doSearch(query)) {
-					getParent().getDisplay().asyncExec(new Runnable() {
+					parent.getDisplay().asyncExec(new Runnable() {
 						@Override
 						public void run() {
 							if (label.isDisposed() || tableViewer.getTable().isDisposed()) return;
@@ -460,7 +455,7 @@ public class JumpToDlg extends Dialog {
 					});
 				
 				} else {
-					getParent().getDisplay().asyncExec(new Runnable() {
+					parent.getDisplay().asyncExec(new Runnable() {
 						@Override
 						public void run() {
 							if (text.getText().length() > 0) {
