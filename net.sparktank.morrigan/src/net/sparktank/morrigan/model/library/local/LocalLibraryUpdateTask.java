@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -21,17 +20,11 @@ import net.sparktank.morrigan.helpers.RecyclingFactory;
 import net.sparktank.morrigan.model.MediaItem;
 import net.sparktank.morrigan.model.library.DbException;
 import net.sparktank.morrigan.model.library.MediaLibraryTrack;
-import net.sparktank.morrigan.model.tags.MediaTagType;
+import net.sparktank.morrigan.model.tags.TrackTagHelper;
 import net.sparktank.morrigan.model.tasks.IMorriganTask;
 import net.sparktank.morrigan.model.tasks.TaskEventListener;
 import net.sparktank.morrigan.model.tasks.TaskResult;
 import net.sparktank.morrigan.model.tasks.TaskResult.TaskOutcome;
-
-import org.jaudiotagger.audio.AudioFile;
-import org.jaudiotagger.audio.AudioFileIO;
-import org.jaudiotagger.tag.Tag;
-import org.jaudiotagger.tag.TagField;
-import org.jaudiotagger.tag.TagTextField;
 
 public class LocalLibraryUpdateTask implements IMorriganTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -594,33 +587,12 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 			try {
 				File file = new File(mlt.getFilepath());
 				if (file.exists()) {
-					AudioFile af = AudioFileIO.read(file);
-//					AudioHeader ah = af.getAudioHeader(); // TODO do something with this?
-					Tag tag = af.getTag();
-					
-					Iterator<TagField> fields = tag.getFields();
-					while(fields.hasNext()) {
-						TagField tagField = fields.next();
-						if (tagField instanceof TagTextField) {
-							TagTextField tagTextField = (TagTextField) tagField;
-							if (!tagTextField.isEmpty() && !tagTextField.isBinary()) {
-								String tagFieldString = tagTextField.getContent();
-								if (tagFieldString != null && tagFieldString.length() > 0) {
-									String tagId = tagTextField.getId();
-									if (tagId != null && tagId.length() < 1) tagId = null;
-									library.addTag(mlt, tagFieldString, MediaTagType.AUTOMATIC, tagId);
-								}
-							}
-						}
-					}
-					
-				} // End file existence check.
-			}
-			catch (UnsupportedOperationException t) {
-				// Do nothing.
+					TrackTagHelper.readTrackTags(library, mlt, file);
+				}
 			}
 			catch (Throwable t) {
 				taskEventListener.logError(library.getListName(), "Error while reading more metadata for '"+mlt.getFilepath()+"'.", t);
+				t.printStackTrace();
 			}
 			
 			n++;
