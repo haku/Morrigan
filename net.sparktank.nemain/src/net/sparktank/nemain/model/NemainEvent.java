@@ -1,5 +1,7 @@
 package net.sparktank.nemain.model;
 
+import net.sparktank.nemain.helpers.EqualHelper;
+
 
 public class NemainEvent extends NemainDate {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -25,12 +27,6 @@ public class NemainEvent extends NemainDate {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public NemainDate getDate () {
-		return super.getThis();
-	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
@@ -40,6 +36,25 @@ public class NemainEvent extends NemainDate {
 		sb.append(getEntryText());
 		
 		return sb.toString();
+	}
+	
+	@Override
+	public boolean equals(Object aThat) {
+		if ( aThat == null ) return false;
+		if ( this == aThat ) return true;
+		if ( !(aThat instanceof NemainEvent) ) return false;
+		NemainEvent that = (NemainEvent)aThat;
+		
+		return super.equals(aThat)
+			&& EqualHelper.areEqual(entryText, that.getEntryText());
+	}
+	
+	@Override
+	public int hashCode() {
+		int hash = 1;
+		hash = hash * 31 + super.hashCode();
+		hash = hash * 31 + (entryText == null ? 0 : entryText.hashCode());
+		return hash;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

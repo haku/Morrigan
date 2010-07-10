@@ -144,7 +144,7 @@ public class EditEntryShell {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public boolean showDlg (NemainEvent event) {
-		shell.setText("Entry for " + event.getDate().toString());
+		shell.setText("Entry for " + event.getDateAsString());
 		text.setText(event.getEntryText());
 		
 		showAndWaitForShellToClose();
