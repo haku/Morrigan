@@ -30,6 +30,10 @@ public class NemainDate {
 		setFromCalendar(cal);
 	}
 	
+	protected NemainDate getThis () {
+		return this;
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public int getYear() {
@@ -106,8 +110,11 @@ public class NemainDate {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		
-		sb.append(getYear());
-		sb.append('-');
+		if (getYear() != 0) {
+    		sb.append(getYear());
+    		sb.append('-');
+		}
+		
 		sb.append(getMonth());
 		sb.append('-');
 		sb.append(getDay());
