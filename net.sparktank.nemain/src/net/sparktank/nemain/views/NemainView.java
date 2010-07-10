@@ -9,9 +9,14 @@ import net.sparktank.nemain.helpers.ImageCache;
 import net.sparktank.nemain.model.NemainDate;
 import net.sparktank.nemain.model.NemainEvent;
 import net.sparktank.nemain.model.SqliteLayer;
+import net.sparktank.nemain.shells.EditEntryShell;
 import net.sparktank.sqlitewrapper.DbException;
 
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
@@ -185,6 +190,24 @@ public class NemainView extends ViewPart {
 			}
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {}
+		});
+		
+		viewer.addDoubleClickListener(new IDoubleClickListener() {
+			public void doubleClick(DoubleClickEvent event) {
+				ISelection selection = viewer.getSelection();
+				Object obj = ((IStructuredSelection)selection).getFirstElement();
+				if (obj instanceof NemainEvent) {
+					NemainEvent eventToEdit = (NemainEvent) obj;
+					
+					EditEntryShell editEntryShell = new EditEntryShell(getSite().getShell());
+					if (editEntryShell.showDlg(eventToEdit)) {
+						String newText = editEntryShell.getExitText();
+						
+						System.err.println("TODO: save new text: " + newText);
+					}
+					
+				}
+			}
 		});
 		
 		// Create the help context id for the viewer's control
