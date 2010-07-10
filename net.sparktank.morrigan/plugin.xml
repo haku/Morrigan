@@ -33,10 +33,13 @@
    
    <extension point="org.eclipse.ui.views">
    
+      <category name="Morrigan" id="net.sparktank.morrigan" />
+   
       <view
             name="Media Explorer"
             class="net.sparktank.morrigan.gui.views.ViewMediaExplorer"
             id="net.sparktank.morrigan.gui.views.ViewMediaExplorer"
+            category="net.sparktank.morrigan"
             icon="icons/library.gif" >
       </view>
       
@@ -44,6 +47,7 @@
             name="Player"
             class="net.sparktank.morrigan.gui.views.ViewPlayer"
             id="net.sparktank.morrigan.gui.views.ViewPlayer"
+            category="net.sparktank.morrigan"
             icon="icons/stop.gif" >
       </view>
       
@@ -51,6 +55,7 @@
             name="Library Properties"
             class="net.sparktank.morrigan.gui.views.ViewLibraryProperties"
             id="net.sparktank.morrigan.gui.views.ViewLibraryProperties"
+            category="net.sparktank.morrigan"
             icon="icons/pref.gif" >
       </view>
       
@@ -65,6 +70,7 @@
             class="net.sparktank.morrigan.gui.views.ViewControls"
             icon="icons/play.gif"
             id="net.sparktank.morrigan.gui.views.ViewControls"
+            category="net.sparktank.morrigan"
             name="Controls"
             restorable="true">
       </view>
@@ -72,6 +78,7 @@
             class="net.sparktank.morrigan.gui.views.ViewDisplay"
             icon="icons/display.gif"
             id="net.sparktank.morrigan.gui.views.ViewDisplay"
+            category="net.sparktank.morrigan"
             name="Display"
             restorable="true">
       </view>
@@ -79,6 +86,7 @@
             class="net.sparktank.morrigan.gui.views.ViewQueue"
             icon="icons/queue.gif"
             id="net.sparktank.morrigan.gui.views.ViewQueue"
+            category="net.sparktank.morrigan"
             name="Queue"
             restorable="true">
       </view>
@@ -86,6 +94,7 @@
             class="net.sparktank.morrigan.gui.views.ViewTagEditor"
             icon="icons/pref.gif"
             id="net.sparktank.morrigan.gui.views.ViewTagEditor"
+            category="net.sparktank.morrigan"
             name="Tags"
             restorable="true">
       </view>
