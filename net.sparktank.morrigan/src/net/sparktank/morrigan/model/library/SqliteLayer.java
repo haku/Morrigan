@@ -647,8 +647,8 @@ public class SqliteLayer {
 	
 	private static final String SQL_TBL_TAGS_Q_ALL =
 		"SELECT t.ROWID,t.tag,t.type,t.cls_rowid,c.cls" +
-		" FROM tbl_tags AS t, tbl_tag_cls AS c" +
-		" WHERE t.cls_rowid=c.ROWID AND t.mf_rowid=?" +
+		" FROM tbl_tags AS t LEFT OUTER JOIN tbl_tag_cls AS c ON t.cls_rowid=c.ROWID" +
+		" WHERE t.mf_rowid=?" +
 		" ORDER BY t.type ASC, c.cls ASC, t.tag ASC;";
 	
 	private static final String SQL_TBL_TAGS_Q_HASTAG =
