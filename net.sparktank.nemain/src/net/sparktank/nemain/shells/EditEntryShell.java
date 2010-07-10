@@ -42,14 +42,13 @@ public class EditEntryShell {
 		FormData formData;
 		
 		shell = new Shell(parent.getDisplay(), SWT.TITLE | SWT.CLOSE | SWT.PRIMARY_MODAL | SWT.RESIZE);
-		text = new Text(shell, SWT.MULTI | SWT.BORDER);
+		text = new Text(shell, SWT.MULTI | SWT.WRAP | SWT.BORDER);
 		btnConfirm = new Button(shell, SWT.PUSH);
 		btnCancel = new Button(shell, SWT.PUSH);
 		
 		shell.setImage(parent.getImage());
 		shell.setText("Edit entry");
 		shell.setLayout(new FormLayout());
-		shell.setDefaultButton(btnConfirm);
 		shell.addTraverseListener(traverseListener);
 		
 		formData = new FormData();
@@ -111,9 +110,6 @@ public class EditEntryShell {
 					leaveDlg(false);
 					break;
 				
-				default:
-					throw new IllegalArgumentException();
-					
 			}
 		}
 	};
