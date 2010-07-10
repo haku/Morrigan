@@ -1,6 +1,7 @@
 package net.sparktank.nemain.views;
 
 
+import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -45,7 +46,9 @@ public class NemainView extends ViewPart {
 			throw new RuntimeException(e);
 		}
 		createControls(parent);
-		setCurrentDate(new NemainDate());
+		
+		Calendar cal = Calendar.getInstance();
+		setCurrentDate(new NemainDate().daysAfter(-cal.get(Calendar.DAY_OF_WEEK)+2)); // Start on a Monday.
 	}
 	
 	@Override
@@ -193,7 +196,7 @@ public class NemainView extends ViewPart {
 		btnDateBack.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-				setCurrentDate(getCurrentDate().daysAfter(-1));
+				setCurrentDate(getCurrentDate().daysAfter(-7));
 			}
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {}
@@ -202,7 +205,7 @@ public class NemainView extends ViewPart {
 		btnDateForward.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-				setCurrentDate(getCurrentDate().daysAfter(1));
+				setCurrentDate(getCurrentDate().daysAfter(7));
 			}
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {}
