@@ -42,10 +42,6 @@ import org.eclipse.swt.widgets.Text;
 public class JumpToDlg {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private static final long serialVersionUID = -6047405753309652452L;
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
 	private static final int MAX_RESULTS = 50;
 	
 	private static volatile WeakReference<JumpToDlg> openDlg = null;
@@ -140,7 +136,7 @@ public class JumpToDlg {
 		formData.top = new FormAttachment(text, SEP);
 		formData.right = new FormAttachment(100, -SEP);
 		formData.bottom = new FormAttachment(btnPlay, -SEP);
-		formData.width = 500;
+		formData.width = 600;
 		formData.height = 300;
 		tableViewer.getTable().setLayoutData(formData);
 		
@@ -261,7 +257,7 @@ public class JumpToDlg {
 					break;
 				
 				default:
-					throw new IllegalArgumentException();
+					break;
 					
 			}
 		}
