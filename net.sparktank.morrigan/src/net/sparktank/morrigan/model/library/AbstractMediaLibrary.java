@@ -265,7 +265,9 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTr
 		}
 		
 		// Remove tags.
-		clearTags(track);
+		if (hasTags(track)) {
+			clearTags(track);
+		}
 	}
 	
 	@Override
