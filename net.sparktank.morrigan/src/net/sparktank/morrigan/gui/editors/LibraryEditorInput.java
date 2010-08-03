@@ -1,8 +1,8 @@
 package net.sparktank.morrigan.gui.editors;
 
 import net.sparktank.morrigan.model.tracks.library.AbstractMediaLibrary;
-import net.sparktank.morrigan.model.tracks.library.SqliteLayer.LibrarySort;
-import net.sparktank.morrigan.model.tracks.library.SqliteLayer.LibrarySortDirection;
+import net.sparktank.morrigan.model.tracks.library.LibrarySqliteLayer.LibrarySort;
+import net.sparktank.morrigan.model.tracks.library.LibrarySqliteLayer.LibrarySortDirection;
 
 import org.eclipse.ui.IMemento;
 

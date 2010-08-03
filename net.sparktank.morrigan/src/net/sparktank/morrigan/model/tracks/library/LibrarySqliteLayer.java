@@ -21,26 +21,26 @@ import net.sparktank.morrigan.model.tags.MediaTagType;
 import net.sparktank.sqlitewrapper.DbException;
 import net.sparktank.sqlitewrapper.GenericSqliteLayer;
 
-public class SqliteLayer extends GenericSqliteLayer {
+public class LibrarySqliteLayer extends GenericSqliteLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Factory.
 	
 	public static final DbConFactory FACTORY = new DbConFactory();
 	
-	public static class DbConFactory extends RecyclingFactory<SqliteLayer, String, Void, DbException> {
+	public static class DbConFactory extends RecyclingFactory<LibrarySqliteLayer, String, Void, DbException> {
 		
 		DbConFactory() {
 			super(true);
 		}
 		
 		@Override
-		protected boolean isValidProduct(SqliteLayer product) {
+		protected boolean isValidProduct(LibrarySqliteLayer product) {
 			return true;
 		}
 		
 		@Override
-		protected SqliteLayer makeNewProduct(String material) throws DbException {
-			return new SqliteLayer(material);
+		protected LibrarySqliteLayer makeNewProduct(String material) throws DbException {
+			return new LibrarySqliteLayer(material);
 		}
 		
 	}
@@ -48,7 +48,7 @@ public class SqliteLayer extends GenericSqliteLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors.
 	
-	SqliteLayer (String dbFilePath) throws DbException {
+	LibrarySqliteLayer (String dbFilePath) throws DbException {
 		super(dbFilePath);
 	}
 	

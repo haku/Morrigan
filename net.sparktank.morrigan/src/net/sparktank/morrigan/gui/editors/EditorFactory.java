@@ -2,8 +2,8 @@ package net.sparktank.morrigan.gui.editors;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.tracks.MediaTrackListFactory;
-import net.sparktank.morrigan.model.tracks.library.SqliteLayer.LibrarySort;
-import net.sparktank.morrigan.model.tracks.library.SqliteLayer.LibrarySortDirection;
+import net.sparktank.morrigan.model.tracks.library.LibrarySqliteLayer.LibrarySort;
+import net.sparktank.morrigan.model.tracks.library.LibrarySqliteLayer.LibrarySortDirection;
 import net.sparktank.morrigan.model.tracks.library.local.LocalMediaLibrary;
 import net.sparktank.morrigan.model.tracks.library.remote.RemoteMediaLibrary;
 import net.sparktank.morrigan.model.tracks.playlist.MediaPlaylist;
