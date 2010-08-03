@@ -30,12 +30,12 @@ public class MediaPlaylist extends MediaTrackList<MediaTrack> {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private MediaPlaylist(String title, String filePath) throws MorriganException {
+	private MediaPlaylist(String title, String filePath) {
 		super(filePath, title);
 		this.filePath = filePath;
 	}
 	
-	public MediaPlaylist(String title, String filePath, boolean newPl) throws MorriganException {
+	public MediaPlaylist(String title, String filePath, boolean newPl) {
 		super(filePath, title);
 		this.filePath = filePath;
 		this.newPl = newPl;
@@ -72,37 +72,39 @@ public class MediaPlaylist extends MediaTrackList<MediaTrack> {
 	
 	@Override
 	public String getSerial() {
-		return filePath;
+		return this.filePath;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	@Override
 	public boolean isCanBeDirty () {
 		return true;
 	}
 	
+	@Override
 	public boolean allowDuplicateEntries () {
 		return true;
 	}
 	
 	@Override
 	public void read () throws MorriganException {
-		if (newPl) {
-			if (new File(filePath).exists()) {
+		if (this.newPl) {
+			if (new File(this.filePath).exists()) {
 				throw new MorriganException("Play list already exists.");
 			}
 			writeToFile();
-			newPl = false;
-		} else if (!alreadyRead) {
+			this.newPl = false;
+		} else if (!this.alreadyRead) {
 			loadFromFile();
-			alreadyRead = true;
+			this.alreadyRead = true;
 		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public String getFilePath () {
-		return filePath;
+		return this.filePath;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -119,9 +121,9 @@ public class MediaPlaylist extends MediaTrackList<MediaTrack> {
 	private SimpleDateFormat PL_DATE = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
 	
 	public void loadFromFile () throws MorriganException {
-		logger.fine("Reading PlayList from '" + filePath + "'...");
+		this.logger.fine("Reading PlayList from '" + this.filePath + "'...");
 		
-		File file = new File(filePath);
+		File file = new File(this.filePath);
         BufferedReader reader = null;
         
 		try {
@@ -158,7 +160,7 @@ public class MediaPlaylist extends MediaTrackList<MediaTrack> {
 					
 					if (line.length>=6 && line[5].length()>0) {
 						try {
-							Date date = PL_DATE.parse(line[5]);
+							Date date = this.PL_DATE.parse(line[5]);
 							item.setDateLastPlayed(date);
 						} catch (ParseException e) {
 							e.printStackTrace();
@@ -170,7 +172,7 @@ public class MediaPlaylist extends MediaTrackList<MediaTrack> {
 				}
 				
 			}
-			logger.fine("Read " + n + " lines from '" + filePath + "'.");
+			this.logger.fine("Read " + n + " lines from '" + this.filePath + "'.");
 			
 		} catch (IOException e) {
 			throw new MorriganException("Error while reading play list.", e);
@@ -186,9 +188,9 @@ public class MediaPlaylist extends MediaTrackList<MediaTrack> {
 	}
 	
 	public void writeToFile () throws MorriganException {
-		logger.fine("Writing PlayList to '" + filePath + "'...");
+		this.logger.fine("Writing PlayList to '" + this.filePath + "'...");
 		
-		File file = new File(filePath);
+		File file = new File(this.filePath);
         Writer writer = null;
         
         try {
@@ -207,13 +209,13 @@ public class MediaPlaylist extends MediaTrackList<MediaTrack> {
 						+ "|" + mt.getStartCount()
 						+ "|" + mt.getEndCount()
 						+ "|0" // TODO duration.
-						+ "|" + (mt.getDateLastPlayed()==null ? "" : PL_DATE.format(mt.getDateLastPlayed()))
+						+ "|" + (mt.getDateLastPlayed()==null ? "" : this.PL_DATE.format(mt.getDateLastPlayed()))
 						+ "\n");
 				
 				writer.write(mt.getFilepath() + "\n");
 				n ++;
 			}
-			logger.fine("Wrote " + n + " lines to '" + filePath + "'.");
+			this.logger.fine("Wrote " + n + " lines to '" + this.filePath + "'.");
 			
 		} catch (IOException e) {
 			throw new MorriganException("Error while write play list to file.", e);
@@ -240,11 +242,11 @@ public class MediaPlaylist extends MediaTrackList<MediaTrack> {
 			return false;
 		
 		MediaPlaylist other = (MediaPlaylist) obj;
-		if (filePath == null) {
+		if (this.filePath == null) {
 			if (other.filePath != null) {
 				return false;
 			}
-		} else if (!filePath.equals(other.filePath)) {
+		} else if (!this.filePath.equals(other.filePath)) {
 			return false;
 		}
 		
@@ -254,7 +256,7 @@ public class MediaPlaylist extends MediaTrackList<MediaTrack> {
 	@Override
 	public int hashCode() {
 		// Since equals() only uses filePath, we can do this.
-		return filePath.hashCode();
+		return this.filePath.hashCode();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
