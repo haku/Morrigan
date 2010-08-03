@@ -23,7 +23,7 @@ public class MediaPicture extends MediaItem {
 	private int height = -1;
 	
 	public int getWidth() {
-		return width;
+		return this.width;
 	}
 	public boolean setWidth(int width) {
 		if (this.width != width) {
@@ -34,7 +34,7 @@ public class MediaPicture extends MediaItem {
 	}
 	
 	public int getHeight() {
-		return height;
+		return this.height;
 	}
 	public boolean setHeight(int height) {
 		if (this.height != height) {
@@ -59,9 +59,8 @@ public class MediaPicture extends MediaItem {
 			
 			return b || setFromMediaItem;
 		}
-		else {
-			return setFromMediaItem;
-		}
+		
+		return setFromMediaItem;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
