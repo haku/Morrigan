@@ -7,10 +7,10 @@ import java.util.List;
 
 import net.sparktank.morrigan.gui.preferences.PreferenceHelper;
 import net.sparktank.morrigan.model.MediaItem;
-import net.sparktank.morrigan.model.MediaTrack;
 import net.sparktank.morrigan.model.library.MediaLibraryTrack;
 import net.sparktank.morrigan.model.library.local.LocalMediaLibrary;
 import net.sparktank.morrigan.model.playlist.PlayItem;
+import net.sparktank.morrigan.model.tracks.MediaTrack;
 import net.sparktank.sqlitewrapper.DbException;
 
 import org.eclipse.jface.viewers.ILabelProvider;

@@ -7,8 +7,8 @@ import java.util.ArrayList;
 
 import net.sparktank.morrigan.config.Config;
 import net.sparktank.morrigan.exceptions.MorriganException;
-import net.sparktank.morrigan.model.MediaListFactory;
 import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
+import net.sparktank.morrigan.model.tracks.MediaTrackListFactory;
 
 public class RemoteLibraryHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -29,7 +29,7 @@ public class RemoteLibraryHelper {
 		// FIXME better naming?
 		String name = libUrl.substring(libUrl.lastIndexOf("/")+1).replace(Config.LIB_REMOTE_FILE_EXT, "").replace(Config.LIB_LOCAL_FILE_EXT, "");
 		String file = getFullPathToLib(url.getHost() + "_" + url.getPort() + "_" + name);
-		RemoteMediaLibrary lib = MediaListFactory.REMOTE_MEDIA_LIBRARY_FACTORY.manufacture(file, url);
+		RemoteMediaLibrary lib = MediaTrackListFactory.REMOTE_MEDIA_LIBRARY_FACTORY.manufacture(file, url);
 		return lib;
 	}
 	

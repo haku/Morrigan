@@ -1,8 +1,9 @@
-package net.sparktank.morrigan.model;
+package net.sparktank.morrigan.model.tracks;
 
 import java.util.Date;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
+import net.sparktank.morrigan.model.MediaItemList;
 
 public abstract class MediaTrackList<T extends MediaTrack> extends MediaItemList<T> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

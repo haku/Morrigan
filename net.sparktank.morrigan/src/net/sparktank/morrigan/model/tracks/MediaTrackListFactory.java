@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.model;
+package net.sparktank.morrigan.model.tracks;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -13,7 +13,7 @@ import net.sparktank.morrigan.model.playlist.MediaPlaylist;
 import net.sparktank.morrigan.model.playlist.PlaylistHelper;
 import net.sparktank.sqlitewrapper.DbException;
 
-public class MediaListFactory {
+public class MediaTrackListFactory {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static class LocalMediaLibraryFactory extends RecyclingFactory<LocalMediaLibrary, String, Void, DbException> {
