@@ -7,7 +7,7 @@ import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.display.ActionListener;
 import net.sparktank.morrigan.gui.views.ViewLibraryProperties;
 import net.sparktank.morrigan.gui.views.ViewTagEditor;
-import net.sparktank.morrigan.model.library.local.LocalMediaLibrary;
+import net.sparktank.morrigan.model.tracks.library.local.LocalMediaLibrary;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;

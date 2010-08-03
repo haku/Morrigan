@@ -4,11 +4,11 @@ import java.net.URL;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.RecyclingFactory;
-import net.sparktank.morrigan.model.library.SqliteLayer;
-import net.sparktank.morrigan.model.library.local.LocalLibraryHelper;
-import net.sparktank.morrigan.model.library.local.LocalMediaLibrary;
-import net.sparktank.morrigan.model.library.remote.RemoteLibraryHelper;
-import net.sparktank.morrigan.model.library.remote.RemoteMediaLibrary;
+import net.sparktank.morrigan.model.tracks.library.SqliteLayer;
+import net.sparktank.morrigan.model.tracks.library.local.LocalLibraryHelper;
+import net.sparktank.morrigan.model.tracks.library.local.LocalMediaLibrary;
+import net.sparktank.morrigan.model.tracks.library.remote.RemoteLibraryHelper;
+import net.sparktank.morrigan.model.tracks.library.remote.RemoteMediaLibrary;
 import net.sparktank.morrigan.model.tracks.playlist.MediaPlaylist;
 import net.sparktank.morrigan.model.tracks.playlist.PlaylistHelper;
 import net.sparktank.sqlitewrapper.DbException;

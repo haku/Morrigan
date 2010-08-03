@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.model.library;
+package net.sparktank.morrigan.model.tracks.library;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -6,13 +6,13 @@ import java.util.Date;
 import java.util.List;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
-import net.sparktank.morrigan.model.library.SqliteLayer.LibrarySort;
-import net.sparktank.morrigan.model.library.SqliteLayer.LibrarySortDirection;
 import net.sparktank.morrigan.model.tags.MediaTag;
 import net.sparktank.morrigan.model.tags.MediaTagClassification;
 import net.sparktank.morrigan.model.tags.MediaTagType;
 import net.sparktank.morrigan.model.tracks.MediaTrack;
 import net.sparktank.morrigan.model.tracks.MediaTrackList;
+import net.sparktank.morrigan.model.tracks.library.SqliteLayer.LibrarySort;
+import net.sparktank.morrigan.model.tracks.library.SqliteLayer.LibrarySortDirection;
 import net.sparktank.sqlitewrapper.DbException;
 
 public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTrack> {

@@ -9,11 +9,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.ErrorHelper;
-import net.sparktank.morrigan.model.library.local.LocalLibraryHelper;
-import net.sparktank.morrigan.model.library.local.LocalMediaLibrary;
 import net.sparktank.morrigan.model.tracks.MediaTrackListFactory;
 import net.sparktank.morrigan.model.tracks.MediaTrack;
 import net.sparktank.morrigan.model.tracks.MediaTrackList;
+import net.sparktank.morrigan.model.tracks.library.local.LocalLibraryHelper;
+import net.sparktank.morrigan.model.tracks.library.local.LocalMediaLibrary;
 import net.sparktank.morrigan.model.tracks.playlist.PlayItem;
 import net.sparktank.morrigan.model.tracks.playlist.PlaylistHelper;
 import net.sparktank.morrigan.player.Player;

@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.model.library.remote;
+package net.sparktank.morrigan.model.tracks.library.remote;
 
 import net.sparktank.morrigan.helpers.RecyclingFactory;
 import net.sparktank.morrigan.model.tasks.IMorriganTask;

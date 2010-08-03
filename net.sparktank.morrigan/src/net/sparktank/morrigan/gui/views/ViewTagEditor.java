@@ -12,12 +12,12 @@ import net.sparktank.morrigan.gui.dialogs.RunnableDialog;
 import net.sparktank.morrigan.gui.display.DropMenuListener;
 import net.sparktank.morrigan.gui.editors.LocalLibraryEditor;
 import net.sparktank.morrigan.gui.helpers.ImageCache;
-import net.sparktank.morrigan.model.library.AbstractMediaLibrary;
-import net.sparktank.morrigan.model.library.MediaLibraryTrack;
 import net.sparktank.morrigan.model.tags.MediaTag;
 import net.sparktank.morrigan.model.tags.MediaTagClassification;
 import net.sparktank.morrigan.model.tags.MediaTagType;
 import net.sparktank.morrigan.model.tags.TrackTagHelper;
+import net.sparktank.morrigan.model.tracks.library.AbstractMediaLibrary;
+import net.sparktank.morrigan.model.tracks.library.MediaLibraryTrack;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
