@@ -7,7 +7,7 @@ import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.actions.LibraryUpdateAction;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.editors.AbstractLibraryEditor;
-import net.sparktank.morrigan.model.library.local.LocalMediaLibrary;
+import net.sparktank.morrigan.model.tracks.library.local.LocalMediaLibrary;
 import net.sparktank.sqlitewrapper.DbException;
 
 import org.eclipse.jface.action.Action;

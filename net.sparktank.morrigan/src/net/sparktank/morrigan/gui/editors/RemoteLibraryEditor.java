@@ -5,8 +5,8 @@ import java.util.List;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.jobs.TaskJob;
-import net.sparktank.morrigan.model.library.remote.RemoteLibraryUpdateTask;
-import net.sparktank.morrigan.model.library.remote.RemoteMediaLibrary;
+import net.sparktank.morrigan.model.tracks.library.remote.RemoteLibraryUpdateTask;
+import net.sparktank.morrigan.model.tracks.library.remote.RemoteMediaLibrary;
 import net.sparktank.sqlitewrapper.DbException;
 
 import org.eclipse.swt.SWT;

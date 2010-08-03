@@ -9,8 +9,8 @@ import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.handler.CallMediaListEditor;
 import net.sparktank.morrigan.gui.helpers.ImageCache;
 import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
-import net.sparktank.morrigan.model.library.local.LocalLibraryHelper;
-import net.sparktank.morrigan.model.library.remote.RemoteLibraryHelper;
+import net.sparktank.morrigan.model.tracks.library.local.LocalLibraryHelper;
+import net.sparktank.morrigan.model.tracks.library.remote.RemoteLibraryHelper;
 import net.sparktank.morrigan.model.tracks.playlist.PlaylistHelper;
 
 import org.eclipse.core.commands.common.CommandException;

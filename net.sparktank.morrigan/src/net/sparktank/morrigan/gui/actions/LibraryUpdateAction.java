@@ -2,8 +2,8 @@ package net.sparktank.morrigan.gui.actions;
 
 import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
-import net.sparktank.morrigan.model.library.local.LocalLibraryUpdateTask;
-import net.sparktank.morrigan.model.library.local.LocalMediaLibrary;
+import net.sparktank.morrigan.model.tracks.library.local.LocalLibraryUpdateTask;
+import net.sparktank.morrigan.model.tracks.library.local.LocalMediaLibrary;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.widgets.Display;

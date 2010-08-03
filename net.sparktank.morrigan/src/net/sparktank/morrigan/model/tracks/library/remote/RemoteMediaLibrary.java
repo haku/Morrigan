@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.model.library.remote;
+package net.sparktank.morrigan.model.tracks.library.remote;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -15,14 +15,14 @@ import java.util.List;
 
 import net.sparktank.morrigan.engines.playback.NotImplementedException;
 import net.sparktank.morrigan.exceptions.MorriganException;
-import net.sparktank.morrigan.model.library.AbstractMediaLibrary;
-import net.sparktank.morrigan.model.library.MediaLibraryTrack;
-import net.sparktank.morrigan.model.library.SqliteLayer;
 import net.sparktank.morrigan.model.tags.MediaTag;
 import net.sparktank.morrigan.model.tags.MediaTagClassification;
 import net.sparktank.morrigan.model.tags.MediaTagType;
 import net.sparktank.morrigan.model.tasks.TaskEventListener;
 import net.sparktank.morrigan.model.tracks.MediaTrack;
+import net.sparktank.morrigan.model.tracks.library.AbstractMediaLibrary;
+import net.sparktank.morrigan.model.tracks.library.MediaLibraryTrack;
+import net.sparktank.morrigan.model.tracks.library.SqliteLayer;
 import net.sparktank.morrigan.server.HttpClient;
 import net.sparktank.morrigan.server.HttpClient.IHttpStreamHandler;
 import net.sparktank.morrigan.server.feedreader.MediaListFeedParser2;

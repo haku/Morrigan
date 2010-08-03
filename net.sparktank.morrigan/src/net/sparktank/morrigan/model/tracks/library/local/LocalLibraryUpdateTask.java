@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.model.library.local;
+package net.sparktank.morrigan.model.tracks.library.local;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -18,12 +18,12 @@ import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.ChecksumHelper;
 import net.sparktank.morrigan.helpers.RecyclingFactory;
 import net.sparktank.morrigan.model.MediaItem;
-import net.sparktank.morrigan.model.library.MediaLibraryTrack;
 import net.sparktank.morrigan.model.tags.TrackTagHelper;
 import net.sparktank.morrigan.model.tasks.IMorriganTask;
 import net.sparktank.morrigan.model.tasks.TaskEventListener;
 import net.sparktank.morrigan.model.tasks.TaskResult;
 import net.sparktank.morrigan.model.tasks.TaskResult.TaskOutcome;
+import net.sparktank.morrigan.model.tracks.library.MediaLibraryTrack;
 import net.sparktank.sqlitewrapper.DbException;
 
 public class LocalLibraryUpdateTask implements IMorriganTask {

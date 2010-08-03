@@ -7,8 +7,8 @@ import net.sparktank.morrigan.gui.editors.EditorFactory;
 import net.sparktank.morrigan.gui.editors.LibraryEditorInput;
 import net.sparktank.morrigan.gui.editors.RemoteLibraryEditor;
 import net.sparktank.morrigan.gui.views.ViewMediaExplorer;
-import net.sparktank.morrigan.model.library.remote.RemoteLibraryHelper;
-import net.sparktank.morrigan.model.library.remote.RemoteMediaLibrary;
+import net.sparktank.morrigan.model.tracks.library.remote.RemoteLibraryHelper;
+import net.sparktank.morrigan.model.tracks.library.remote.RemoteMediaLibrary;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.InputDialog;
