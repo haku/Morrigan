@@ -2,7 +2,7 @@ package net.sparktank.morrigan.model.library;
 
 import net.sparktank.morrigan.helpers.EqualHelper;
 import net.sparktank.morrigan.model.MediaItem;
-import net.sparktank.morrigan.model.MediaTrack;
+import net.sparktank.morrigan.model.tracks.MediaTrack;
 
 public class MediaLibraryTrack extends MediaTrack {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

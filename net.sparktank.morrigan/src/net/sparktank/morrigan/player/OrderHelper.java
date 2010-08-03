@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Random;
 
 import net.sparktank.morrigan.model.MediaItem;
-import net.sparktank.morrigan.model.MediaTrack;
-import net.sparktank.morrigan.model.MediaTrackList;
+import net.sparktank.morrigan.model.tracks.MediaTrack;
+import net.sparktank.morrigan.model.tracks.MediaTrackList;
 
 public class OrderHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

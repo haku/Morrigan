@@ -1,4 +1,6 @@
-package net.sparktank.morrigan.model;
+package net.sparktank.morrigan.model.tracks;
+
+import net.sparktank.morrigan.model.MediaItem;
 
 
 /**

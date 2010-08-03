@@ -5,8 +5,8 @@ import java.net.URLEncoder;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.MediaItem;
-import net.sparktank.morrigan.model.MediaTrack;
-import net.sparktank.morrigan.model.MediaTrackList;
+import net.sparktank.morrigan.model.tracks.MediaTrack;
+import net.sparktank.morrigan.model.tracks.MediaTrackList;
 
 import org.xml.sax.SAXException;
 

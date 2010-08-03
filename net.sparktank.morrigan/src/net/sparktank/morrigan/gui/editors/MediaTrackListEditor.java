@@ -15,8 +15,8 @@ import net.sparktank.morrigan.gui.preferences.MediaListPref;
 import net.sparktank.morrigan.helpers.TimeHelper;
 import net.sparktank.morrigan.model.MediaItem;
 import net.sparktank.morrigan.model.MediaItemList.DirtyState;
-import net.sparktank.morrigan.model.MediaTrack;
-import net.sparktank.morrigan.model.MediaTrackList;
+import net.sparktank.morrigan.model.tracks.MediaTrack;
+import net.sparktank.morrigan.model.tracks.MediaTrackList;
 
 import org.eclipse.core.commands.common.CommandException;
 import org.eclipse.jface.action.Action;

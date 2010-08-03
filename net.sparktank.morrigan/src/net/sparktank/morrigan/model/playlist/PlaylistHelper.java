@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import net.sparktank.morrigan.config.Config;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
-import net.sparktank.morrigan.model.MediaListFactory;
+import net.sparktank.morrigan.model.tracks.MediaTrackListFactory;
 
 public class PlaylistHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -24,7 +24,7 @@ public class PlaylistHelper {
 	
 	public static MediaPlaylist createPl (String plName) throws MorriganException {
 		String plFile = getFullPathToPlaylist(plName);
-		MediaPlaylist pl = MediaListFactory.PLAYLIST_FACTORY.manufacture(plFile, true);
+		MediaPlaylist pl = MediaTrackListFactory.PLAYLIST_FACTORY.manufacture(plFile, true);
 		pl.read();
 		return pl;
 	}

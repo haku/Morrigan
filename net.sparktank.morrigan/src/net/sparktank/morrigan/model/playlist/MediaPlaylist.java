@@ -14,8 +14,8 @@ import java.util.Date;
 import java.util.logging.Logger;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
-import net.sparktank.morrigan.model.MediaTrack;
-import net.sparktank.morrigan.model.MediaTrackList;
+import net.sparktank.morrigan.model.tracks.MediaTrack;
+import net.sparktank.morrigan.model.tracks.MediaTrackList;
 
 public class MediaPlaylist extends MediaTrackList<MediaTrack> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
