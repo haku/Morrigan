@@ -36,7 +36,7 @@ public class RemoteLibraryUpdateTask implements IMorriganTask {
 	
 	private volatile boolean isFinished = false;
 	
-	private RemoteLibraryUpdateTask(RemoteMediaLibrary mediaLibrary) {
+	RemoteLibraryUpdateTask(RemoteMediaLibrary mediaLibrary) {
 		this.mediaLibrary = mediaLibrary;
 	}
 	
@@ -46,29 +46,30 @@ public class RemoteLibraryUpdateTask implements IMorriganTask {
 	}
 	
 	public RemoteMediaLibrary getLibrary () {
-		return mediaLibrary;
+		return this.mediaLibrary;
 	}
 	
 	public boolean isFinished () {
-		return isFinished;
+		return this.isFinished;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	@Override
 	public TaskResult run(TaskEventListener taskEventListener) {
 		TaskResult ret;
 		
 		try {
-			mediaLibrary.setTaskEventListener(taskEventListener);
-			mediaLibrary.forceDoRead();
+			this.mediaLibrary.setTaskEventListener(taskEventListener);
+			this.mediaLibrary.forceDoRead();
 			ret = new TaskResult(TaskOutcome.SUCCESS);
 			
 		} catch (Exception e) {
 			ret = new TaskResult(TaskOutcome.FAILED, "Failed to refresh library.", e);
 			
 		} finally {
-			isFinished = true;
-			mediaLibrary.setTaskEventListener(null);
+			this.isFinished = true;
+			this.mediaLibrary.setTaskEventListener(null);
 		}
 		
 		return ret;

@@ -16,27 +16,42 @@ public abstract class MediaTrackList<T extends MediaTrack> extends MediaItemList
 //	Update methods.  Use these for data that is to be persisted.
 //	These methods are sub-classed where persistence is needed.
 	
+	/**
+	 * @throws MorriganException  
+	 */
 	public void incTrackStartCnt (MediaTrack track, long n) throws MorriganException {
 		track.setStartCount(track.getStartCount() + n);
 		setDirtyState(DirtyState.METADATA);
 	}
 	
+	/**
+	 * @throws MorriganException  
+	 */
 	public void incTrackEndCnt (MediaTrack track, long n) throws MorriganException {
 		track.setEndCount(track.getEndCount() + n);
 		setDirtyState(DirtyState.METADATA);
 	}
 	
+	/**
+	 * @throws MorriganException  
+	 */
 	public void incTrackStartCnt (MediaTrack track) throws MorriganException {
 		track.setStartCount(track.getStartCount()+1);
 		track.setDateLastPlayed(new Date());
 		setDirtyState(DirtyState.METADATA);
 	}
 	
+	/**
+	 * @throws MorriganException  
+	 */
 	public void incTrackEndCnt (MediaTrack track) throws MorriganException {
 		track.setEndCount(track.getEndCount()+1);
 		setDirtyState(DirtyState.METADATA);
 	}
 	
+	/**
+	 * @throws MorriganException  
+	 */
 	public void setTrackDuration (MediaTrack track, int duration) throws MorriganException {
 		track.setDuration(duration);
 		setDirtyState(DirtyState.METADATA);

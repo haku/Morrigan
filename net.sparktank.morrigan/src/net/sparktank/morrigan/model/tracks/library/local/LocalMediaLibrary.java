@@ -2,7 +2,6 @@ package net.sparktank.morrigan.model.tracks.library.local;
 
 import net.sparktank.morrigan.model.tracks.library.AbstractMediaLibrary;
 import net.sparktank.morrigan.model.tracks.library.SqliteLayer;
-import net.sparktank.sqlitewrapper.DbException;
 
 
 public class LocalMediaLibrary extends AbstractMediaLibrary {
@@ -13,7 +12,7 @@ public class LocalMediaLibrary extends AbstractMediaLibrary {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	//TODO rename to "LocalLibrary".
-	public LocalMediaLibrary (String libraryName, SqliteLayer dbLayer) throws DbException {
+	public LocalMediaLibrary (String libraryName, SqliteLayer dbLayer) {
 		super(libraryName, dbLayer);
 	}
 	

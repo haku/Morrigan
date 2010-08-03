@@ -25,7 +25,7 @@ public class MediaLibraryTrack extends MediaTrack implements IDbItem {
 	
 	@Override
 	public long getDbRowId() {
-		return dbRowId;
+		return this.dbRowId;
 	}
 	@Override
 	public boolean setDbRowId(long dbRowId) {
@@ -42,7 +42,7 @@ public class MediaLibraryTrack extends MediaTrack implements IDbItem {
 	
 	@Override
 	public String getRemoteLocation() {
-		return remoteLocation;
+		return this.remoteLocation;
 	}
 	@Override
 	public boolean setRemoteLocation(String remoteLocation) {
@@ -68,9 +68,8 @@ public class MediaLibraryTrack extends MediaTrack implements IDbItem {
 			
 			return b || setFromMediaItem;
 		}
-		else {
-			return setFromMediaItem;
-		}
+		
+		return setFromMediaItem;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
