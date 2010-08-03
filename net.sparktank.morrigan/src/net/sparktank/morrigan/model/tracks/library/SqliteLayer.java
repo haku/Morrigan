@@ -29,7 +29,7 @@ public class SqliteLayer extends GenericSqliteLayer {
 	
 	public static class DbConFactory extends RecyclingFactory<SqliteLayer, String, Void, DbException> {
 		
-		private DbConFactory() {
+		DbConFactory() {
 			super(true);
 		}
 		
@@ -38,6 +38,7 @@ public class SqliteLayer extends GenericSqliteLayer {
 			return true;
 		}
 		
+		@Override
 		protected SqliteLayer makeNewProduct(String material) throws DbException {
 			return new SqliteLayer(material);
 		}
@@ -47,7 +48,7 @@ public class SqliteLayer extends GenericSqliteLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors.
 	
-	private SqliteLayer (String dbFilePath) throws DbException {
+	SqliteLayer (String dbFilePath) throws DbException {
 		super(dbFilePath);
 	}
 	
@@ -674,7 +675,7 @@ public class SqliteLayer extends GenericSqliteLayer {
 			if (n<1) throw new DbException("No update occured.");
 			
 		} finally {
-			ps.close();
+			if (ps!=null) ps.close();
 		}
 	}
 	
@@ -791,7 +792,7 @@ public class SqliteLayer extends GenericSqliteLayer {
 		return ret;
 	}
 	
-	private String local_getAllMediaSql (LibrarySort sort, LibrarySortDirection direction, boolean hideMissing) throws SQLException, ClassNotFoundException {
+	private String local_getAllMediaSql (LibrarySort sort, LibrarySortDirection direction, boolean hideMissing) {
 		String sql;
 		
 		if (hideMissing) {
@@ -1203,14 +1204,13 @@ public class SqliteLayer extends GenericSqliteLayer {
 		if (local_hasTag(mf_rowId, tag, type, mtc)) {
 			return false;
 		}
-		else {
-			if (mtc != null) {
-				local_addTag(mf_rowId, tag, type, mtc.getRowId());
-			} else {
-				local_addTag(mf_rowId, tag, type, 0);
-			}
-			return true;
+		
+		if (mtc != null) {
+			local_addTag(mf_rowId, tag, type, mtc.getRowId());
+		} else {
+			local_addTag(mf_rowId, tag, type, 0);
 		}
+		return true;
 	}
 	
 	private void local_addTag (long mf_rowId, String tag, MediaTagType type, long cls_rowid) throws SQLException, ClassNotFoundException, DbException {
@@ -1283,13 +1283,14 @@ public class SqliteLayer extends GenericSqliteLayer {
 			try {
 				if (rs.next()) {
 					return true;
-				} else {
-					return false;
 				}
-			} finally {
+				return false;
+			}
+			finally {
 				rs.close();
 			}
-		} finally {
+		}
+		finally {
 			ps.close();
 		}
 	}
@@ -1297,9 +1298,9 @@ public class SqliteLayer extends GenericSqliteLayer {
 	private boolean local_hasTag (long mf_rowId, String tag, MediaTagType type, MediaTagClassification mtc) throws SQLException, ClassNotFoundException {
 		if (mtc != null) {
 			return local_hasTag(mf_rowId, tag, type, mtc.getRowId());
-		} else {
-			return local_hasTag(mf_rowId, tag, type, 0);
 		}
+		
+		return local_hasTag(mf_rowId, tag, type, 0);
 	}
 	
 	private boolean local_hasTag (long mf_rowId, String tag, MediaTagType type, long cls_rowid) throws SQLException, ClassNotFoundException {
@@ -1323,13 +1324,14 @@ public class SqliteLayer extends GenericSqliteLayer {
 			try {
 				if (rs.next()) {
 					return true;
-				} else {
-					return false;
 				}
-			} finally {
+				return false;
+			}
+			finally {
 				rs.close();
 			}
-		} finally {
+		}
+		finally {
 			ps.close();
 		}
 	}
@@ -1458,6 +1460,7 @@ public class SqliteLayer extends GenericSqliteLayer {
 			long rowId = rs.getLong(SQL_TBL_TAGCLS_COL_ROWID);
 			String clsName = rs.getString(SQL_TBL_TAGCLS_COL_CLS);
 			
+			@SuppressWarnings("boxing")
 			MediaTagClassification mtc = MediaTagClassificationFactory.INSTANCE.manufacture(rowId, clsName);
 			ret.add(mtc);
 		}
@@ -1479,13 +1482,13 @@ public class SqliteLayer extends GenericSqliteLayer {
 			long time = date.getTime();
 			if (time > 100000) { // If the date was stored old-style, we get back the year :S.
 				return new Date(time);
-			} else {
-				String s = rs.getString(column);
-				try {
-					Date d = SQL_DATE.parse(s);
-					return d;
-				} catch (Exception e) {}
 			}
+			
+			String s = rs.getString(column);
+			try {
+				Date d = this.SQL_DATE.parse(s);
+				return d;
+			} catch (Exception e) {/*Can't really do anything with this error anyway.*/}
 		}
 		
 		return null;

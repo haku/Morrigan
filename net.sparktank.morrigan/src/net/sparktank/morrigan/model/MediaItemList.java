@@ -44,7 +44,7 @@ public abstract class MediaItemList<T extends MediaItem> {
 	 * A unique identifier.
 	 */
 	public String getListId () {
-		return listId;
+		return this.listId;
 	}
 	
 	/**
@@ -52,7 +52,7 @@ public abstract class MediaItemList<T extends MediaItem> {
 	 * @return
 	 */
 	public String getListName () {
-		return listName;
+		return this.listName;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -74,8 +74,8 @@ public abstract class MediaItemList<T extends MediaItem> {
 		if (isCanBeDirty()) {
 			// Changed?  Priority order - don't drop back down.
 			boolean changed = false;
-			if (state!=dirtyState) {
-				if (dirtyState==DirtyState.DIRTY && state==DirtyState.METADATA) {
+			if (state!=this.dirtyState) {
+				if (this.dirtyState==DirtyState.DIRTY && state==DirtyState.METADATA) {
 					// Its too late to figure this out the other way round.
 				} else {
 					changed = true;
@@ -83,37 +83,37 @@ public abstract class MediaItemList<T extends MediaItem> {
 			}
 			
 			if (changed) {
-				dirtyState = state;
+				this.dirtyState = state;
 				
-				for (Runnable r : dirtyChangeEvents) {
+				for (Runnable r : this.dirtyChangeEvents) {
 					r.run();
 				}
 			}
 		}
 		
-		for (Runnable r : changeEvents) {
+		for (Runnable r : this.changeEvents) {
 			r.run();
 		}
 	}
 	
 	public DirtyState getDirtyState () {
-		return dirtyState;
+		return this.dirtyState;
 	}
 	
 	public void addDirtyChangeEvent (Runnable r) {
-		dirtyChangeEvents.add(r);
+		this.dirtyChangeEvents.add(r);
 	}
 	
 	public void removeDirtyChangeEvent (Runnable r) {
-		dirtyChangeEvents.remove(r);
+		this.dirtyChangeEvents.remove(r);
 	}
 	
 	public void addChangeEvent (Runnable r) {
-		changeEvents.add(r);
+		this.changeEvents.add(r);
 	}
 	
 	public void removeChangeEvent (Runnable r) {
-		changeEvents.remove(r);
+		this.changeEvents.remove(r);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -130,7 +130,7 @@ public abstract class MediaItemList<T extends MediaItem> {
 	abstract public void read () throws MorriganException;
 	
 	public int getCount () {
-		return mediaTracks.size();
+		return this.mediaTracks.size();
 	}
 	
 	/**
@@ -138,13 +138,13 @@ public abstract class MediaItemList<T extends MediaItem> {
 	 * @return
 	 */
 	public List<T> getMediaTracks() {
-		return Collections.unmodifiableList(mediaTracks);
+		return Collections.unmodifiableList(this.mediaTracks);
 	}
 	
 	protected void setMediaTracks (List<T> newMediaTracks) {
-		synchronized (mediaTracks) {
-			mediaTracks.clear();
-			mediaTracks.addAll(newMediaTracks);
+		synchronized (this.mediaTracks) {
+			this.mediaTracks.clear();
+			this.mediaTracks.addAll(newMediaTracks);
 		}
 		setDirtyState(DirtyState.DIRTY);
 	}
@@ -171,14 +171,17 @@ public abstract class MediaItemList<T extends MediaItem> {
 	}
 	
 	public void addTrack (T track) {
-		if (allowDuplicateEntries() || !mediaTracks.contains(track)) {
-			mediaTracks.add(track);
+		if (allowDuplicateEntries() || !this.mediaTracks.contains(track)) {
+			this.mediaTracks.add(track);
 			setDirtyState(DirtyState.DIRTY);
 		}
 	}
 	
+	/**
+	 * @throws MorriganException  
+	 */
 	public void removeMediaTrack (T track) throws MorriganException {
-		mediaTracks.remove(track);
+		this.mediaTracks.remove(track);
 		setDirtyState(DirtyState.DIRTY);
 	}
 	
@@ -186,31 +189,49 @@ public abstract class MediaItemList<T extends MediaItem> {
 //	Update methods.  Use these for data that is to be persisted.
 //	These methods are sub-classed where persistence is needed.
 	
+	/**
+	 * @throws MorriganException  
+	 */
 	public void setDateAdded (T track, Date date) throws MorriganException {
 		track.setDateAdded(date);
 		setDirtyState(DirtyState.METADATA);
 	}
 	
+	/**
+	 * @throws MorriganException  
+	 */
 	public void setDateLastPlayed (T track, Date date) throws MorriganException {
 		track.setDateLastPlayed(date);
 		setDirtyState(DirtyState.METADATA);
 	}
 	
+	/**
+	 * @throws MorriganException  
+	 */
 	public void setTrackHashCode (T track, long hashcode) throws MorriganException {
 		track.setHashcode(hashcode);
 		setDirtyState(DirtyState.METADATA);
 	}
 	
+	/**
+	 * @throws MorriganException  
+	 */
 	public void setTrackDateLastModified (T track, Date date) throws MorriganException {
 		track.setDateLastModified(date);
 		setDirtyState(DirtyState.METADATA);
 	}
 	
+	/**
+	 * @throws MorriganException  
+	 */
 	public void setTrackEnabled (T track, boolean value) throws MorriganException {
 		track.setEnabled(value);
 		setDirtyState(DirtyState.METADATA);
 	}
 	
+	/**
+	 * @throws MorriganException  
+	 */
 	public void setTrackMissing (T track, boolean value) throws MorriganException {
 		track.setMissing(value);
 		setDirtyState(DirtyState.METADATA);
@@ -244,7 +265,7 @@ public abstract class MediaItemList<T extends MediaItem> {
 	
 	@Override
 	public String toString () {
-		return listName + " ("+mediaTracks.size()+" items)";
+		return this.listName + " ("+this.mediaTracks.size()+" items)";
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

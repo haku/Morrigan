@@ -27,7 +27,7 @@ public class MediaTrack extends MediaItem {
 	private long endCount = 0;
 	
 	public int getDuration() {
-		return duration;
+		return this.duration;
 	}
 	public boolean setDuration(int duration) {
 		if (this.duration != duration) {
@@ -38,7 +38,7 @@ public class MediaTrack extends MediaItem {
 	}
 	
 	public long getStartCount() {
-		return startCount;
+		return this.startCount;
 	}
 	public boolean setStartCount(long startCount) {
 		if (this.startCount != startCount) {
@@ -49,7 +49,7 @@ public class MediaTrack extends MediaItem {
 	}
 
 	public long getEndCount() {
-		return endCount;
+		return this.endCount;
 	}
 	public boolean setEndCount(long endCount) {
 		if (this.endCount != endCount) {
@@ -75,9 +75,8 @@ public class MediaTrack extends MediaItem {
 			
 			return b || setFromMediaItem;
 		}
-		else {
-			return setFromMediaItem;
-		}
+		
+		return setFromMediaItem;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

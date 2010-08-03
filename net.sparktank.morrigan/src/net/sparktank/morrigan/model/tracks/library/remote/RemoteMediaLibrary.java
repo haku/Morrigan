@@ -47,7 +47,7 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 		
 		String s = localDbLayer.getProp(DBKEY_SERVERURL);
 		if (s != null) {
-			url = new URL(s);
+			this.url = new URL(s);
 			
 		} else {
 			throw new IllegalArgumentException("serverUrl not found in localDbLayer ('"+localDbLayer.getDbFilePath()+"').");
@@ -77,18 +77,18 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 		if (dateString != null) {
 			long date = Long.parseLong(dateString);
 			if (date > 0) {
-				cacheDate = date;
-				System.err.println("Read cachedate=" + cacheDate + ".");
+				this.cacheDate = date;
+				System.err.println("Read cachedate=" + this.cacheDate + ".");
 			}
 		}
 		else {
-			cacheDate = -1;
+			this.cacheDate = -1;
 		}
 	}
 	
 	private void writeCacheDate () throws DbException {
-		getDbLayer().setProp(DBKEY_CACHEDATE, String.valueOf(cacheDate));
-		System.err.println("Wrote cachedate=" + cacheDate + ".");
+		getDbLayer().setProp(DBKEY_CACHEDATE, String.valueOf(this.cacheDate));
+		System.err.println("Wrote cachedate=" + this.cacheDate + ".");
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -99,11 +99,11 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 	}
 	
 	public URL getUrl() {
-		return url;
+		return this.url;
 	}
 	
 	public TaskEventListener getTaskEventListener() {
-		return taskEventListener;
+		return this.taskEventListener;
 	}
 	public void setTaskEventListener(TaskEventListener taskEventListener) {
 		this.taskEventListener = taskEventListener;
@@ -117,7 +117,7 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 	private long cacheDate = -1;
 	
 	public long getCacheAge () {
-		return new Date().getTime() - cacheDate;
+		return new Date().getTime() - this.cacheDate;
 	}
 	
 	public boolean isCacheExpired () {
@@ -131,7 +131,7 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 	@Override
 	protected void doRead() throws DbException, MorriganException {
 		if (isCacheExpired()) {
-			System.err.println("Cache for '" + getListName() + "' is " + getCacheAge() + " old, reading data from " + url.toExternalForm() + " ...");
+			System.err.println("Cache for '" + getListName() + "' is " + getCacheAge() + " old, reading data from " + this.url.toExternalForm() + " ...");
 				forceDoRead();
 		}
 		else {
@@ -143,9 +143,9 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 	public void forceDoRead () throws MorriganException, DbException {
 		try {
 			// This does the actual HTTP fetch.
-			MediaListFeedParser2.parseFeed(this, taskEventListener);
+			MediaListFeedParser2.parseFeed(this, this.taskEventListener);
 			
-			cacheDate = new Date().getTime();
+			this.cacheDate = new Date().getTime();
 			writeCacheDate();
 			
 		} finally {
@@ -157,83 +157,76 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 //	Actions.
 	
 	@Override
-	public void copyMediaItemFile(MediaLibraryTrack mi, File targetDirectory) throws MorriganException {
-		if (mi instanceof MediaLibraryTrack) {
-			if (!targetDirectory.isDirectory()) {
-				throw new IllegalArgumentException("targetDirectory must be a directory.");
+	public void copyMediaItemFile(MediaLibraryTrack mlt, File targetDirectory) throws MorriganException {
+		if (!targetDirectory.isDirectory()) {
+			throw new IllegalArgumentException("targetDirectory must be a directory.");
+		}
+		
+		final File targetFile = new File(targetDirectory.getAbsolutePath() + File.separatorChar
+				+ mlt.getFilepath().substring(mlt.getFilepath().lastIndexOf(File.separatorChar) + 1));
+		
+		if (!targetFile.exists()) {
+			String serverUrlString;
+			try {
+				serverUrlString = getDbLayer().getProp(DBKEY_SERVERURL);
+			} catch (DbException e) {
+				throw new MorriganException(e);
+			}
+			URL serverUrl;
+			try {
+				serverUrl = new URL(serverUrlString);
+			} catch (MalformedURLException e) {
+				throw new MorriganException(e);
 			}
 			
-			final File targetFile = new File(targetDirectory.getAbsolutePath() + File.separatorChar
-					+ mi.getFilepath().substring(mi.getFilepath().lastIndexOf(File.separatorChar) + 1));
+			String itemUrlString =
+				serverUrl.getProtocol() + "://" + serverUrl.getHost() + ":" + serverUrl.getPort()
+				+ mlt.getRemoteLocation();
 			
-			if (!targetFile.exists()) {
-				MediaLibraryTrack mlt = (MediaLibraryTrack) mi;
-				
-				String serverUrlString;
-				try {
-					serverUrlString = getDbLayer().getProp(DBKEY_SERVERURL);
-				} catch (DbException e) {
-					throw new MorriganException(e);
-				}
-				URL serverUrl;
-				try {
-					serverUrl = new URL(serverUrlString);
-				} catch (MalformedURLException e) {
-					throw new MorriganException(e);
-				}
-				
-				String itemUrlString =
-					serverUrl.getProtocol() + "://" + serverUrl.getHost() + ":" + serverUrl.getPort()
-					+ mlt.getRemoteLocation();
-				
-				URL itemUrl;
-				try {
-					itemUrl = new URL(itemUrlString);
-				} catch (MalformedURLException e) {
-					throw new MorriganException(e);
-				}
-				
-				System.err.println("Fetching '"+itemUrlString+"' to '"+targetFile.getAbsolutePath()+"'...");
-				
-				IHttpStreamHandler httpStreamHandler = new IHttpStreamHandler () {
-					@Override
-					public void handleStream(InputStream is) throws IOException, MorriganException {
-						BufferedInputStream bis = new BufferedInputStream(is);
-						BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(targetFile));
-						
-						// FIXME this could probably be done better.
-						try {
-							byte[] buffer = new byte[4096];
-							int bytesRead;
-							while ((bytesRead = bis.read(buffer)) != -1) {
-							  bos.write(buffer, 0, bytesRead);
-							}
-						}
-						finally {
-							bos.close();
-						}
-
-					}
-				};
-				
-				try {
-					HttpClient.getHttpClient().doHttpRequest(itemUrl, httpStreamHandler);
-				} catch (IOException e) {
-					if (e instanceof UnknownHostException) {
-						throw new MorriganException("Host unknown.", e);
-					} else if (e instanceof SocketException) {
-						throw new MorriganException("Host unreachable.", e);
-					} else {
-						throw new MorriganException(e);
-					}
-				}
+			URL itemUrl;
+			try {
+				itemUrl = new URL(itemUrlString);
+			} catch (MalformedURLException e) {
+				throw new MorriganException(e);
 			}
-			else {
-				System.err.println("Skipping '"+targetFile.getAbsolutePath()+"' as it already exists.");
+			
+			System.err.println("Fetching '"+itemUrlString+"' to '"+targetFile.getAbsolutePath()+"'...");
+			
+			IHttpStreamHandler httpStreamHandler = new IHttpStreamHandler () {
+				@Override
+				public void handleStream(InputStream is) throws IOException, MorriganException {
+					BufferedInputStream bis = new BufferedInputStream(is);
+					BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(targetFile));
+					
+					// FIXME this could probably be done better.
+					try {
+						byte[] buffer = new byte[4096];
+						int bytesRead;
+						while ((bytesRead = bis.read(buffer)) != -1) {
+							bos.write(buffer, 0, bytesRead);
+						}
+					}
+					finally {
+						bos.close();
+					}
+					
+				}
+			};
+			
+			try {
+				HttpClient.getHttpClient().doHttpRequest(itemUrl, httpStreamHandler);
+			} catch (IOException e) {
+				if (e instanceof UnknownHostException) {
+					throw new MorriganException("Host unknown.", e);
+				} else if (e instanceof SocketException) {
+					throw new MorriganException("Host unreachable.", e);
+				} else {
+					throw new MorriganException(e);
+				}
 			}
 		}
 		else {
-			super.copyMediaItemFile(mi, targetDirectory);
+			System.err.println("Skipping '"+targetFile.getAbsolutePath()+"' as it already exists.");
 		}
 	}
 	

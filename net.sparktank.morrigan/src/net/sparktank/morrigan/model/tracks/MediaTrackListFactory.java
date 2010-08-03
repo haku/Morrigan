@@ -99,11 +99,13 @@ public class MediaTrackListFactory {
 			return true;
 		}
 		
+		@SuppressWarnings("boxing")
 		@Override
 		protected MediaPlaylist makeNewProduct(String material) throws MorriganException {
 			return makeNewProduct(material, false);
 		}
 		
+		@SuppressWarnings("boxing")
 		@Override
 		protected MediaPlaylist makeNewProduct(String material, Boolean config) throws MorriganException {
 			MediaPlaylist ret = null;

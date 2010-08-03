@@ -56,7 +56,7 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 	
 	private volatile boolean isFinished = false;
 	
-	private LocalLibraryUpdateTask (LocalMediaLibrary library) {
+	LocalLibraryUpdateTask (LocalMediaLibrary library) {
 		this.library = library;
 	}
 	
@@ -66,11 +66,11 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 	}
 	
 	public LocalMediaLibrary getLibrary () {
-		return library;
+		return this.library;
 	}
 	
 	public boolean isFinished () {
-		return isFinished;
+		return this.isFinished;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -82,13 +82,14 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 	/**
 	 * TODO use monitor.worked(1);
 	 */
+	@Override
 	public TaskResult run(TaskEventListener taskEventListener) {
 		TaskResult ret = null;
 		List<MediaLibraryTrack> changedItems = new LinkedList<MediaLibraryTrack>();
 		
 		try {
 			taskEventListener.onStart();
-			taskEventListener.logMsg(library.getListName(), "Starting scan...");
+			taskEventListener.logMsg(this.library.getListName(), "Starting scan...");
 			taskEventListener.beginTask("Updating library", 100);
 			
 			// Scan directories for new files.
@@ -120,7 +121,7 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 			
 			if (ret == null) {
 				if (taskEventListener.isCanceled()) {
-					taskEventListener.logMsg(library.getListName(), "Task was canceled desu~.");
+					taskEventListener.logMsg(this.library.getListName(), "Task was canceled desu~.");
 					ret = new TaskResult(TaskOutcome.CANCELED);
 				}
 				else {
@@ -132,7 +133,7 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 			ret = new TaskResult(TaskOutcome.FAILED, "Throwable while updating library.", t);
 		}
 		
-		isFinished = true;
+		this.isFinished = true;
 		taskEventListener.done();
 		
 		return ret;
@@ -154,7 +155,7 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 		
 		List<String> sources = null;
 		try {
-			sources = library.getSources();
+			sources = this.library.getSources();
 		} catch (DbException e) {
 			taskEventListener.done();
 			return new TaskResult(TaskOutcome.FAILED, "Failed to retrieve list of media sources.", e);
@@ -188,8 +189,8 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 								ext = ext.substring(ext.lastIndexOf(".") + 1).toLowerCase();
 								if (supportedFormats.contains(ext)) {
 									try {
-										if (library.addFile(file) != null) {
-											taskEventListener.logMsg(library.getListName(), "[ADDED] " + file.getAbsolutePath());
+										if (this.library.addFile(file) != null) {
+											taskEventListener.logMsg(this.library.getListName(), "[ADDED] " + file.getAbsolutePath());
 											filesAdded++;
 										}
 									} catch (MorriganException e) {
@@ -201,27 +202,27 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 						}
 					}
 					else {
-						taskEventListener.logMsg(library.getListName(), "Failed to read directory: " + dirItem.getAbsolutePath());
+						taskEventListener.logMsg(this.library.getListName(), "Failed to read directory: " + dirItem.getAbsolutePath());
 					}
 				}
 			}
 		} // End directory scanning.
 		
-		taskEventListener.logMsg(library.getListName(), "Added " + filesAdded + " files.");
+		taskEventListener.logMsg(this.library.getListName(), "Added " + filesAdded + " files.");
 		
 		return null;
 	}
 	
-	private TaskResult updateLibraryMetadata(TaskEventListener taskEventListener, int prgTotal, List<MediaLibraryTrack> changedItems) throws MorriganException, DbException {
+	private TaskResult updateLibraryMetadata(TaskEventListener taskEventListener, int prgTotal, List<MediaLibraryTrack> changedItems) throws DbException {
 		if (changedItems.size() > 0) throw new IllegalArgumentException("changedItems list must be empty.");
 		
 		taskEventListener.subTask("Reading file metadata");
 		
 		int progress = 0;
 		int n = 0;
-		int N = library.getCount();
+		int N = this.library.getCount();
 		
-		List<MediaLibraryTrack> allLibraryEntries = library.getAllLibraryEntries();
+		List<MediaLibraryTrack> allLibraryEntries = this.library.getAllLibraryEntries();
 		for (MediaLibraryTrack mi : allLibraryEntries) {
 			if (taskEventListener.isCanceled()) break;
 			taskEventListener.subTask("Reading file metadata: " + mi.getTitle());
@@ -232,8 +233,8 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 				// If was missing, mark as found.
 				if (mi.isMissing()) {
 					try {
-						taskEventListener.logMsg(library.getListName(), "[FOUND] " + mi.getFilepath());
-						library.setTrackMissing(mi, false);
+						taskEventListener.logMsg(this.library.getListName(), "[FOUND] " + mi.getFilepath());
+						this.library.setTrackMissing(mi, false);
 					} catch (Throwable t) {
 						// FIXME log this somewhere useful.
 						System.err.println("Throwable while marking track as found '"+mi.getFilepath()+"': " + t.getMessage());
@@ -247,13 +248,13 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 					fileModified = true;
 					
 					if (mi.getDateLastModified() == null) {
-						taskEventListener.logMsg(library.getListName(), "[NEW] " + mi.getTitle());
+						taskEventListener.logMsg(this.library.getListName(), "[NEW] " + mi.getTitle());
 					} else {
-						taskEventListener.logMsg(library.getListName(), "[CHANGED] " + mi.getTitle());
+						taskEventListener.logMsg(this.library.getListName(), "[CHANGED] " + mi.getTitle());
 					}
 					
 					try {
-						library.setTrackDateLastModified(mi, new Date(lastModified));
+						this.library.setTrackDateLastModified(mi, new Date(lastModified));
 					} catch (Throwable t) {
 						// FIXME log this somewhere useful.
 						System.err.println("Throwable while writing track last modified date '"+mi.getFilepath()+"': " + t.getMessage());
@@ -278,7 +279,7 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 					
 					if (hash != 0) {
 						try {
-							library.setTrackHashCode(mi, hash);
+							this.library.setTrackHashCode(mi, hash);
 						} catch (Throwable t) {
 							// FIXME log this somewhere useful.
 							System.err.println("Throwable while setting hash code for '"+mi.getFilepath()+"' to '"+hash+"': " + t.getMessage());
@@ -291,8 +292,8 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 			else { // The file is missing.
 				if (!mi.isMissing()) {
 					try {
-						taskEventListener.logMsg(library.getListName(), "[MISSING] " + mi.getFilepath());
-						library.setTrackMissing(mi, true);
+						taskEventListener.logMsg(this.library.getListName(), "[MISSING] " + mi.getFilepath());
+						this.library.setTrackMissing(mi, true);
 					}
 					catch (Throwable t) {
 						// FIXME log this somewhere useful.
@@ -316,7 +317,7 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 		taskEventListener.subTask("Scanning for duplicates");
 		Map<MediaLibraryTrack, ScanOption> dupicateItems = new HashMap<MediaLibraryTrack, ScanOption>();
 		
-		List<MediaLibraryTrack> tracks = library.getAllLibraryEntries();
+		List<MediaLibraryTrack> tracks = this.library.getAllLibraryEntries();
 		
 		int progress = 0;
 		int n = 0;
@@ -434,37 +435,37 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 							 */
 //							library.setAutoCommit(false);
 							
-							library.incTrackStartCnt(keep, i.getStartCount());
-							library.incTrackEndCnt(keep, i.getEndCount());
+							this.library.incTrackStartCnt(keep, i.getStartCount());
+							this.library.incTrackEndCnt(keep, i.getEndCount());
 							
 							if (i.getDateAdded() != null) {
 								if (keep.getDateAdded() == null
 										|| keep.getDateAdded().getTime() > i.getDateAdded().getTime()) {
-									library.setDateAdded(keep, i.getDateAdded());
+									this.library.setDateAdded(keep, i.getDateAdded());
 								}
 							}
 							
 							if (i.getDateLastPlayed() != null) {
 								if (keep.getDateLastPlayed() == null
 										|| keep.getDateLastPlayed().getTime() < i.getDateLastPlayed().getTime()) {
-									library.setDateLastPlayed(keep, i.getDateLastPlayed());
+									this.library.setDateLastPlayed(keep, i.getDateLastPlayed());
 								}
 							}
 							
-							if (library.hasTags(i)) {
-								library.moveTags(i, keep);
+							if (this.library.hasTags(i)) {
+								this.library.moveTags(i, keep);
 							}
 							
 							if (keep.getDuration() <= 0 && i.getDuration() > 0) {
-								library.setTrackDuration(keep, i.getDuration());
+								this.library.setTrackDuration(keep, i.getDuration());
 							}
 							
 							if (i.isMissing() && keep.isEnabled() && !i.isEnabled()) {
-								library.setTrackEnabled(keep, i.isEnabled());
+								this.library.setTrackEnabled(keep, i.isEnabled());
 							}
 							
-							library.removeMediaTrack(i);
-							taskEventListener.logMsg(library.getListName(), "[REMOVED] " + i.getFilepath());
+							this.library.removeMediaTrack(i);
+							taskEventListener.logMsg(this.library.getListName(), "[REMOVED] " + i.getFilepath());
 							countMerges++;
 							
 //							library.commit();
@@ -493,14 +494,14 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 			/*
 			 * Print out what we are left with.
 			 */
-			taskEventListener.logMsg(library.getListName(), "Performed " + countMerges + " mergers.");
-			taskEventListener.logMsg(library.getListName(), "Found " + dupicateItems.size() + " duplicate items:");
+			taskEventListener.logMsg(this.library.getListName(), "Performed " + countMerges + " mergers.");
+			taskEventListener.logMsg(this.library.getListName(), "Found " + dupicateItems.size() + " duplicate items:");
 			for (Entry<MediaLibraryTrack, ScanOption> e : dupicateItems.entrySet()) {
-				taskEventListener.logMsg(library.getListName(), e.getValue() + " : " + e.getKey().getTitle());
+				taskEventListener.logMsg(this.library.getListName(), e.getValue() + " : " + e.getKey().getTitle());
 			}
 		}
 		else {
-			taskEventListener.logMsg(library.getListName(), "No duplicates found.");
+			taskEventListener.logMsg(this.library.getListName(), "No duplicates found.");
 		}
 	}
 	
@@ -514,15 +515,15 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 		
 		int progress = 0;
 		int n = 0;
-		int N = library.getCount();
+		int N = this.library.getCount();
 		
-		List<MediaLibraryTrack> allLibraryEntries = library.getAllLibraryEntries();
+		List<MediaLibraryTrack> allLibraryEntries = this.library.getAllLibraryEntries();
 		for (MediaLibraryTrack mi : allLibraryEntries) {
 			if (taskEventListener.isCanceled()) break;
 			taskEventListener.subTask("Reading track metadata: " + mi.getTitle());
 			
 			if (mi.getDuration()<=0) {
-				if (!library.isMarkedAsUnreadable(mi)) {
+				if (!this.library.isMarkedAsUnreadable(mi)) {
 					if (mi.isEnabled()) {
 						File file = new File(mi.getFilepath());
 						if (file.exists()) {
@@ -537,21 +538,21 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 							
 							try {
 								int d = playbackEngine.readFileDuration(mi.getFilepath());
-								if (d>0) library.setTrackDuration(mi, d);
+								if (d>0) this.library.setTrackDuration(mi, d);
 							}
 							catch (Throwable t) {
 								// FIXME log this somewhere useful.
-								taskEventListener.logError(library.getListName(), "Error while reading metadata for '"+mi.getFilepath()+"'.", t);
+								taskEventListener.logError(this.library.getListName(), "Error while reading metadata for '"+mi.getFilepath()+"'.", t);
 
 								// Tag track as unreadable.
 //								library.markAsUnreadabled(mi); // FIXME what if the user wants to try again?
 							}
 						} // End exists test.
 					} else { // If marked as disabled.
-						taskEventListener.logMsg(library.getListName(), "Ignoring disabled file '"+mi.getFilepath()+"'.");
+						taskEventListener.logMsg(this.library.getListName(), "Ignoring disabled file '"+mi.getFilepath()+"'.");
 					}
 				} else { // If tagged as unreadable.
-					taskEventListener.logMsg(library.getListName(), "Ignoring unreadable file '"+mi.getFilepath()+"'.");
+					taskEventListener.logMsg(this.library.getListName(), "Ignoring unreadable file '"+mi.getFilepath()+"'.");
 				}
 			}// End duration > 0 test.
 			
@@ -573,12 +574,12 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Format specific methods.
 	
-	private TaskResult updateTrackMetadata2 (TaskEventListener taskEventListener, int prgTotal, List<MediaLibraryTrack> changedItems) throws MorriganException {
+	private TaskResult updateTrackMetadata2 (TaskEventListener taskEventListener, int prgTotal, List<MediaLibraryTrack> changedItems) {
 		taskEventListener.subTask("Reading more track metadata");
 		
 		int progress = 0;
 		int n = 0;
-		int N = library.getCount();
+		int N = this.library.getCount();
 		
 		for (MediaLibraryTrack mlt : changedItems) {
 			if (taskEventListener.isCanceled()) break;
@@ -587,11 +588,11 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 			try {
 				File file = new File(mlt.getFilepath());
 				if (file.exists()) {
-					TrackTagHelper.readTrackTags(library, mlt, file);
+					TrackTagHelper.readTrackTags(this.library, mlt, file);
 				}
 			}
 			catch (Throwable t) {
-				taskEventListener.logError(library.getListName(), "Error while reading more metadata for '"+mlt.getFilepath()+"'.", t);
+				taskEventListener.logError(this.library.getListName(), "Error while reading more metadata for '"+mlt.getFilepath()+"'.", t);
 				t.printStackTrace();
 			}
 			

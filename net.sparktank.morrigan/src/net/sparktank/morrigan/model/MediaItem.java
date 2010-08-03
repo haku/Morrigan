@@ -12,10 +12,10 @@ public class MediaItem {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors.
 	
-	public MediaItem () {}
+	public MediaItem () {/*Empty constructor.*/}
 	
 	public MediaItem (String filePath) {
-		filepath = filePath;
+		this.filepath = filePath;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -30,7 +30,7 @@ public class MediaItem {
 	private boolean missing = false;
 	
 	public String getFilepath () {
-		return filepath;
+		return this.filepath;
 	}
 	public boolean setFilepath (String filePath) {
 		if (!EqualHelper.areEqual(this.filepath, filePath)) {
@@ -41,7 +41,7 @@ public class MediaItem {
 	}
 	
 	public Date getDateAdded() {
-		return dateAdded;
+		return this.dateAdded;
 	}
 	public boolean setDateAdded(Date dateAdded) {
 		if (!EqualHelper.areEqual(this.dateAdded, dateAdded)) {
@@ -52,7 +52,7 @@ public class MediaItem {
 	}
 	
 	public Date getDateLastPlayed() {
-		return dateLastPlayed;
+		return this.dateLastPlayed;
 	}
 	public boolean setDateLastPlayed(Date dateLastPlayed) {
 		if (!EqualHelper.areEqual(this.dateLastPlayed, dateLastPlayed)) {
@@ -63,7 +63,7 @@ public class MediaItem {
 	}
 	
 	public long getHashcode() {
-		return hashcode;
+		return this.hashcode;
 	}
 	public boolean setHashcode(long hashcode) {
 		if (this.hashcode != hashcode) {
@@ -74,7 +74,7 @@ public class MediaItem {
 	}
 	
 	public Date getDateLastModified() {
-		return dateLastModified;
+		return this.dateLastModified;
 	}
 	public boolean setDateLastModified(Date lastModified) {
 		if (!EqualHelper.areEqual(this.dateLastModified, lastModified)) {
@@ -85,7 +85,7 @@ public class MediaItem {
 	}
 	
 	public boolean isEnabled() {
-		return enabled;
+		return this.enabled;
 	}
 	public boolean setEnabled(boolean enabled) {
 		if (this.enabled != enabled) {
@@ -96,7 +96,7 @@ public class MediaItem {
 	}
 	
 	public boolean isMissing() {
-		return missing;
+		return this.missing;
 	}
 	public boolean setMissing(boolean missing) {
 		if (this.missing != missing) {
@@ -110,12 +110,12 @@ public class MediaItem {
 //	Secondary attributes.
 	
 	public String getTitle () {
-		int x = filepath.lastIndexOf(File.separator);
+		int x = this.filepath.lastIndexOf(File.separator);
 		if (x>0) {
-			return filepath.substring(x+1);
-		} else {
-			return filepath;
+			return this.filepath.substring(x+1);
 		}
+		
+		return this.filepath;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
