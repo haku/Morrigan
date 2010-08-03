@@ -21,15 +21,15 @@ public class PlayItem {
 		if ( !(obj instanceof PlayItem) ) return false;
 		PlayItem that = (PlayItem)obj;
 		
-		return EqualHelper.areEqual(list, that.list)
-			&& EqualHelper.areEqual(item, that.item);
+		return EqualHelper.areEqual(this.list, that.list)
+			&& EqualHelper.areEqual(this.item, that.item);
 	}
 	
 	@Override
 	public int hashCode() {
 		int hash = 1;
-	    hash = hash * 31 + (list == null ? 0 : list.hashCode());
-	    hash = hash * 31 + (item == null ? 0 : item.hashCode());
+	    hash = hash * 31 + (this.list == null ? 0 : this.list.hashCode());
+	    hash = hash * 31 + (this.item == null ? 0 : this.item.hashCode());
 	    return hash;
 	}
 	
