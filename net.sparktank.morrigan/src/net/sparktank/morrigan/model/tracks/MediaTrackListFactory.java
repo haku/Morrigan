@@ -9,8 +9,8 @@ import net.sparktank.morrigan.model.library.local.LocalLibraryHelper;
 import net.sparktank.morrigan.model.library.local.LocalMediaLibrary;
 import net.sparktank.morrigan.model.library.remote.RemoteLibraryHelper;
 import net.sparktank.morrigan.model.library.remote.RemoteMediaLibrary;
-import net.sparktank.morrigan.model.playlist.MediaPlaylist;
-import net.sparktank.morrigan.model.playlist.PlaylistHelper;
+import net.sparktank.morrigan.model.tracks.playlist.MediaPlaylist;
+import net.sparktank.morrigan.model.tracks.playlist.PlaylistHelper;
 import net.sparktank.sqlitewrapper.DbException;
 
 public class MediaTrackListFactory {

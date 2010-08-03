@@ -7,8 +7,8 @@ import net.sparktank.morrigan.gui.editors.EditorFactory;
 import net.sparktank.morrigan.gui.editors.MediaTrackListEditorInput;
 import net.sparktank.morrigan.gui.editors.PlaylistEditor;
 import net.sparktank.morrigan.gui.views.ViewMediaExplorer;
-import net.sparktank.morrigan.model.playlist.MediaPlaylist;
-import net.sparktank.morrigan.model.playlist.PlaylistHelper;
+import net.sparktank.morrigan.model.tracks.playlist.MediaPlaylist;
+import net.sparktank.morrigan.model.tracks.playlist.PlaylistHelper;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.InputDialog;

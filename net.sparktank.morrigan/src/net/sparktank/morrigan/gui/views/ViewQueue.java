@@ -5,7 +5,7 @@ import java.util.List;
 
 import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.helpers.TimeHelper;
-import net.sparktank.morrigan.model.playlist.PlayItem;
+import net.sparktank.morrigan.model.tracks.playlist.PlayItem;
 import net.sparktank.morrigan.player.Player.DurationData;
 
 import org.eclipse.jface.action.Action;

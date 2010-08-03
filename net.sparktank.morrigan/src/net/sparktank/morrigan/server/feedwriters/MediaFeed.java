@@ -6,7 +6,7 @@ import java.util.List;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
 import net.sparktank.morrigan.model.library.local.LocalLibraryHelper;
-import net.sparktank.morrigan.model.playlist.PlaylistHelper;
+import net.sparktank.morrigan.model.tracks.playlist.PlaylistHelper;
 import net.sparktank.morrigan.player.Player;
 import net.sparktank.morrigan.player.PlayerRegister;
 
