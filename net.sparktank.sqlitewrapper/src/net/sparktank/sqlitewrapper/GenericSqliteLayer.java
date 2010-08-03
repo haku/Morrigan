@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 
 public abstract class GenericSqliteLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -43,7 +44,7 @@ public abstract class GenericSqliteLayer {
 //	Properties.
 	
 	public String getDbFilePath() {
-		return dbFilePath;
+		return this.dbFilePath;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -52,18 +53,18 @@ public abstract class GenericSqliteLayer {
 	private Connection dbConnection = null;
 	
 	protected Connection getDbCon () throws ClassNotFoundException, SQLException {
-		if (dbConnection==null) {
+		if (this.dbConnection==null) {
 			Class.forName("org.sqlite.JDBC");
-			String url = "jdbc:sqlite:/" + dbFilePath;
-			dbConnection = DriverManager.getConnection(url);
+			String url = "jdbc:sqlite:/" + this.dbFilePath;
+			this.dbConnection = DriverManager.getConnection(url);
 		}
 		
-		return dbConnection;
+		return this.dbConnection;
 	}
 	
 	private void disposeDbCon () throws SQLException {
-		if (dbConnection!=null) {
-			dbConnection.close();
+		if (this.dbConnection!=null) {
+			this.dbConnection.close();
 		}
 	}
 	
@@ -97,7 +98,7 @@ public abstract class GenericSqliteLayer {
 	private void initDatabaseTables () throws SQLException, ClassNotFoundException {
 		Statement stat = getDbCon().createStatement();
 		
-		SqlCreateCmd[] tblCreateCmds = getTblCreateCmds();
+		List<SqlCreateCmd> tblCreateCmds = getTblCreateCmds();
 		
 		for (SqlCreateCmd sqlCreateCmd : tblCreateCmds) {
 			try {
@@ -132,14 +133,14 @@ public abstract class GenericSqliteLayer {
 		}
 		
 		public String getTblExistsSql() {
-			return tblExistsSql;
+			return this.tblExistsSql;
 		}
 		public void setTblExistsSql(String tblExistsSql) {
 			this.tblExistsSql = tblExistsSql;
 		}
 		
 		public String getTblCreateSql() {
-			return tblCreateSql;
+			return this.tblCreateSql;
 		}
 		public void setTblCreateSql(String tblCreateSql) {
 			this.tblCreateSql = tblCreateSql;
@@ -147,7 +148,7 @@ public abstract class GenericSqliteLayer {
 		
 	}
 	
-	protected abstract SqlCreateCmd[] getTblCreateCmds ();
+	protected abstract List<SqlCreateCmd> getTblCreateCmds ();
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

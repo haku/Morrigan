@@ -48,8 +48,12 @@ public class SqliteLayer extends GenericSqliteLayer {
 //	Super class methods.
 	
 	@Override
-	protected SqlCreateCmd[] getTblCreateCmds() {
-		return new SqlCreateCmd[] { new SqlCreateCmd(SQL_TBL_EVENTS_EXISTS, SQL_TBL_EVENTS_CREATE) };
+	protected List<SqlCreateCmd> getTblCreateCmds() {
+		List<SqlCreateCmd> l = new LinkedList<SqlCreateCmd>();
+		
+		l.add(new SqlCreateCmd(SQL_TBL_EVENTS_EXISTS, SQL_TBL_EVENTS_CREATE));
+		
+		return l;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -107,13 +111,14 @@ public class SqliteLayer extends GenericSqliteLayer {
 			try {
 				if (rs.next()) {
 					return true;
-				} else {
-					return false;
 				}
-			} finally {
+				return false;
+			}
+			finally {
 				rs.close();
 			}
-		} finally {
+		}
+		finally {
 			ps.close();
 		}
 	}
