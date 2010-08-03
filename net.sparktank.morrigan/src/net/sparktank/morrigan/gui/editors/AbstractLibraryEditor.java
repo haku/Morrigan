@@ -16,8 +16,8 @@ import net.sparktank.morrigan.model.tracks.MediaTrackList.DurationData;
 import net.sparktank.morrigan.model.tracks.library.AbstractMediaLibrary;
 import net.sparktank.morrigan.model.tracks.library.MediaLibraryTrack;
 import net.sparktank.morrigan.model.tracks.library.AbstractMediaLibrary.SortChangeListener;
-import net.sparktank.morrigan.model.tracks.library.SqliteLayer.LibrarySort;
-import net.sparktank.morrigan.model.tracks.library.SqliteLayer.LibrarySortDirection;
+import net.sparktank.morrigan.model.tracks.library.LibrarySqliteLayer.LibrarySort;
+import net.sparktank.morrigan.model.tracks.library.LibrarySqliteLayer.LibrarySortDirection;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;

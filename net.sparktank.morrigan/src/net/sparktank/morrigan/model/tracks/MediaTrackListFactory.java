@@ -4,7 +4,7 @@ import java.net.URL;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.RecyclingFactory;
-import net.sparktank.morrigan.model.tracks.library.SqliteLayer;
+import net.sparktank.morrigan.model.tracks.library.LibrarySqliteLayer;
 import net.sparktank.morrigan.model.tracks.library.local.LocalLibraryHelper;
 import net.sparktank.morrigan.model.tracks.library.local.LocalMediaLibrary;
 import net.sparktank.morrigan.model.tracks.library.remote.RemoteLibraryHelper;
@@ -31,7 +31,7 @@ public class MediaTrackListFactory {
 		@Override
 		protected LocalMediaLibrary makeNewProduct(String material) throws DbException {
 			System.out.println("Making object instance '" + material + "'...");
-			return new LocalMediaLibrary(LocalLibraryHelper.getLibraryTitle(material), SqliteLayer.FACTORY.manufacture(material));
+			return new LocalMediaLibrary(LocalLibraryHelper.getLibraryTitle(material), LibrarySqliteLayer.FACTORY.manufacture(material));
 		}
 		
 	}
@@ -64,13 +64,13 @@ public class MediaTrackListFactory {
 			System.out.println("Making object instance '" + material + "'...");
 			if (config != null) {
 				try {
-					ret = new RemoteMediaLibrary(RemoteLibraryHelper.getLibraryTitle(material), config, SqliteLayer.FACTORY.manufacture(material));
+					ret = new RemoteMediaLibrary(RemoteLibraryHelper.getLibraryTitle(material), config, LibrarySqliteLayer.FACTORY.manufacture(material));
 				} catch (DbException e) {
 					throw new MorriganException(e);
 				}
 			} else {
 				try {
-					ret = new RemoteMediaLibrary(RemoteLibraryHelper.getLibraryTitle(material), SqliteLayer.FACTORY.manufacture(material));
+					ret = new RemoteMediaLibrary(RemoteLibraryHelper.getLibraryTitle(material), LibrarySqliteLayer.FACTORY.manufacture(material));
 				} catch (MalformedURLException e) {
 					throw new MorriganException(e);
 				} catch (DbException e) {

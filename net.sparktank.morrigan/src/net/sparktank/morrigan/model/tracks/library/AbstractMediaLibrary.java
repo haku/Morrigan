@@ -11,8 +11,8 @@ import net.sparktank.morrigan.model.tags.MediaTagClassification;
 import net.sparktank.morrigan.model.tags.MediaTagType;
 import net.sparktank.morrigan.model.tracks.MediaTrack;
 import net.sparktank.morrigan.model.tracks.MediaTrackList;
-import net.sparktank.morrigan.model.tracks.library.SqliteLayer.LibrarySort;
-import net.sparktank.morrigan.model.tracks.library.SqliteLayer.LibrarySortDirection;
+import net.sparktank.morrigan.model.tracks.library.LibrarySqliteLayer.LibrarySort;
+import net.sparktank.morrigan.model.tracks.library.LibrarySqliteLayer.LibrarySortDirection;
 import net.sparktank.sqlitewrapper.DbException;
 
 public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTrack> {
@@ -20,13 +20,13 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTr
 	
 	public static final boolean HIDEMISSING = true; // TODO link this to GUI?
 	
-	private SqliteLayer dbLayer;
+	private LibrarySqliteLayer dbLayer;
 	private LibrarySort librarySort;
 	private LibrarySortDirection librarySortDirection;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	protected AbstractMediaLibrary (String libraryName, SqliteLayer dbLayer) {
+	protected AbstractMediaLibrary (String libraryName, LibrarySqliteLayer dbLayer) {
 		super(dbLayer.getDbFilePath(), libraryName);
 		this.dbLayer = dbLayer;
 		
@@ -47,7 +47,7 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTr
 		return this.dbLayer.getDbFilePath();
 	}
 	
-	protected SqliteLayer getDbLayer() {
+	protected LibrarySqliteLayer getDbLayer() {
 		return this.dbLayer;
 	}
 	
