@@ -4,15 +4,15 @@ import net.sparktank.morrigan.model.MediaItem;
 
 /* Prototype that may not be used.
  */
-public class MediaImage extends MediaItem {
+public class MediaPicture extends MediaItem {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors.
 	
-	public MediaImage() {
+	public MediaPicture() {
 		super();
 	}
 	
-	public MediaImage(String filepath) {
+	public MediaPicture(String filepath) {
 		super(filepath);
 	}
 	
@@ -51,8 +51,8 @@ public class MediaImage extends MediaItem {
 	public boolean setFromMediaItem(MediaItem mi) {
 		boolean setFromMediaItem = super.setFromMediaItem(mi);
 		
-		if (mi instanceof MediaImage) {
-			MediaImage mli = (MediaImage) mi;
+		if (mi instanceof MediaPicture) {
+			MediaPicture mli = (MediaPicture) mi;
 			
 			boolean b = this.setWidth(mli.getWidth())
 				|| this.setHeight(mli.getHeight());
