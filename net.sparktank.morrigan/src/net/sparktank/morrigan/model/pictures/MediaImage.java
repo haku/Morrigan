@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.model.gallery;
+package net.sparktank.morrigan.model.pictures;
 
 import net.sparktank.morrigan.model.MediaItem;
 
