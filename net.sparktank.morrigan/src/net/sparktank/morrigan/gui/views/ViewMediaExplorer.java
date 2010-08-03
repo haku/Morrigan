@@ -11,7 +11,7 @@ import net.sparktank.morrigan.gui.helpers.ImageCache;
 import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
 import net.sparktank.morrigan.model.library.local.LocalLibraryHelper;
 import net.sparktank.morrigan.model.library.remote.RemoteLibraryHelper;
-import net.sparktank.morrigan.model.playlist.PlaylistHelper;
+import net.sparktank.morrigan.model.tracks.playlist.PlaylistHelper;
 
 import org.eclipse.core.commands.common.CommandException;
 import org.eclipse.jface.viewers.DoubleClickEvent;

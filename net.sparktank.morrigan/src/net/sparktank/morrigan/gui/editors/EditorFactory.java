@@ -5,8 +5,8 @@ import net.sparktank.morrigan.model.library.SqliteLayer.LibrarySort;
 import net.sparktank.morrigan.model.library.SqliteLayer.LibrarySortDirection;
 import net.sparktank.morrigan.model.library.local.LocalMediaLibrary;
 import net.sparktank.morrigan.model.library.remote.RemoteMediaLibrary;
-import net.sparktank.morrigan.model.playlist.MediaPlaylist;
 import net.sparktank.morrigan.model.tracks.MediaTrackListFactory;
+import net.sparktank.morrigan.model.tracks.playlist.MediaPlaylist;
 import net.sparktank.sqlitewrapper.DbException;
 
 import org.eclipse.core.runtime.IAdaptable;

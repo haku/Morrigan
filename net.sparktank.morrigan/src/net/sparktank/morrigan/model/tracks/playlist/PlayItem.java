@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.model.playlist;
+package net.sparktank.morrigan.model.tracks.playlist;
 
 import net.sparktank.morrigan.helpers.EqualHelper;
 import net.sparktank.morrigan.model.tracks.MediaTrack;

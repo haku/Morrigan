@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.model.playlist;
+package net.sparktank.morrigan.model.tracks.playlist;
 
 import java.io.File;
 import java.util.ArrayList;

@@ -2,9 +2,9 @@ package net.sparktank.morrigan.server;
 
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import net.sparktank.morrigan.helpers.ErrorHelper;
-import net.sparktank.morrigan.model.playlist.PlayItem;
 import net.sparktank.morrigan.model.tracks.MediaTrack;
 import net.sparktank.morrigan.model.tracks.MediaTrackList;
+import net.sparktank.morrigan.model.tracks.playlist.PlayItem;
 import net.sparktank.morrigan.player.IPlayerEventHandler;
 import net.sparktank.morrigan.player.Player;
 import net.sparktank.morrigan.player.PlayerRegister;
