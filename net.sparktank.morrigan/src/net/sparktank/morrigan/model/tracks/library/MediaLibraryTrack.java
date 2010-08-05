@@ -5,6 +5,9 @@ import net.sparktank.morrigan.model.IDbItem;
 import net.sparktank.morrigan.model.MediaItem;
 import net.sparktank.morrigan.model.tracks.MediaTrack;
 
+/*
+ * TODO FIXME Extract common code between this and MediaGalleryPicture.
+ */
 public class MediaLibraryTrack extends MediaTrack implements IDbItem {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors.
