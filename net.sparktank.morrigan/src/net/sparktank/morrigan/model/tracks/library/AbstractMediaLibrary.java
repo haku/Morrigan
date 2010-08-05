@@ -15,6 +15,9 @@ import net.sparktank.morrigan.model.tracks.library.LibrarySqliteLayer.LibrarySor
 import net.sparktank.morrigan.model.tracks.library.LibrarySqliteLayer.LibrarySortDirection;
 import net.sparktank.sqlitewrapper.DbException;
 
+/*
+ * TODO FIXME Extract common code between this and LocalGallery.
+ */
 public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTrack> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	

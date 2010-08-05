@@ -15,6 +15,9 @@ import net.sparktank.morrigan.helpers.RecyclingFactory;
 import net.sparktank.morrigan.model.MediaSqliteLayer;
 import net.sparktank.sqlitewrapper.DbException;
 
+/*
+ * TODO FIXME Extract common code between this and GallerySqliteLayer.
+ */
 public class LibrarySqliteLayer extends MediaSqliteLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Factory.
