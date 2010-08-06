@@ -21,7 +21,6 @@ import net.sparktank.morrigan.model.tags.MediaTagType;
 import net.sparktank.morrigan.model.tasks.TaskEventListener;
 import net.sparktank.morrigan.model.tracks.MediaTrack;
 import net.sparktank.morrigan.model.tracks.library.AbstractMediaLibrary;
-import net.sparktank.morrigan.model.tracks.library.MediaLibraryTrack;
 import net.sparktank.morrigan.model.tracks.library.LibrarySqliteLayer;
 import net.sparktank.morrigan.server.HttpClient;
 import net.sparktank.morrigan.server.HttpClient.IHttpStreamHandler;
@@ -157,7 +156,7 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 //	Actions.
 	
 	@Override
-	public void copyMediaItemFile(MediaLibraryTrack mlt, File targetDirectory) throws MorriganException {
+	public void copyMediaItemFile(MediaTrack mlt, File targetDirectory) throws MorriganException {
 		if (!targetDirectory.isDirectory()) {
 			throw new IllegalArgumentException("targetDirectory must be a directory.");
 		}
@@ -181,7 +180,7 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 			
 			String itemUrlString =
 				serverUrl.getProtocol() + "://" + serverUrl.getHost() + ":" + serverUrl.getPort()
-				+ mlt.getIDbItem().getRemoteLocation();
+				+ mlt.getRemoteLocation();
 			
 			URL itemUrl;
 			try {
@@ -244,17 +243,17 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 	}
 	
 	@Override
-	public void setDateAdded (MediaLibraryTrack track, Date date) throws MorriganException {
+	public void setDateAdded (MediaTrack track, Date date) throws MorriganException {
 		throw new NotImplementedException();
 	}
 	
 	@Override
-	public void setDateLastPlayed (MediaLibraryTrack track, Date date) throws MorriganException {
+	public void setDateLastPlayed (MediaTrack track, Date date) throws MorriganException {
 		throw new NotImplementedException();
 	}
 	
 	@Override
-	public void removeMediaTrack (MediaLibraryTrack track) throws MorriganException {
+	public void removeMediaTrack (MediaTrack track) throws MorriganException {
 		throw new NotImplementedException();
 	}
 	
@@ -274,22 +273,22 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 	}
 	
 	@Override
-	public void setTrackHashCode(MediaLibraryTrack track, long hashcode) throws MorriganException {
+	public void setTrackHashCode(MediaTrack track, long hashcode) throws MorriganException {
 		throw new NotImplementedException();
 	}
 	
 	@Override
-	public void setTrackDateLastModified(MediaLibraryTrack track, Date date) throws MorriganException {
+	public void setTrackDateLastModified(MediaTrack track, Date date) throws MorriganException {
 		throw new NotImplementedException();
 	}
 	
 	@Override
-	public void setTrackEnabled(MediaLibraryTrack track, boolean value) throws MorriganException {
+	public void setTrackEnabled(MediaTrack track, boolean value) throws MorriganException {
 		throw new NotImplementedException();
 	}
 	
 	@Override
-	public void setTrackMissing(MediaLibraryTrack track, boolean value) throws MorriganException {
+	public void setTrackMissing(MediaTrack track, boolean value) throws MorriganException {
 		throw new NotImplementedException();
 	}
 	
@@ -310,22 +309,22 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 //	Tags.
 	
 	@Override
-	public boolean hasTags (MediaLibraryTrack mlt) throws MorriganException {
+	public boolean hasTags (MediaTrack mlt) throws MorriganException {
 		throw new NotImplementedException();
 	}
 	
 	@Override
-	public List<MediaTag> getTags (MediaLibraryTrack mlt) throws MorriganException {
+	public List<MediaTag> getTags (MediaTrack mlt) throws MorriganException {
 		throw new NotImplementedException();
 	}
 	
 	@Override
-	public void addTag (MediaLibraryTrack mlt, String tag, MediaTagType type, MediaTagClassification mtc) throws MorriganException {
+	public void addTag (MediaTrack mlt, String tag, MediaTagType type, MediaTagClassification mtc) throws MorriganException {
 		throw new NotImplementedException();
 	}
 	
 	@Override
-	public void moveTags (MediaLibraryTrack from_mlt, MediaLibraryTrack to_mlt) throws MorriganException {
+	public void moveTags (MediaTrack from_mlt, MediaTrack to_mlt) throws MorriganException {
 		throw new NotImplementedException();
 	}
 	

@@ -15,7 +15,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.tasks.TaskEventListener;
-import net.sparktank.morrigan.model.tracks.library.MediaLibraryTrack;
+import net.sparktank.morrigan.model.tracks.MediaTrack;
 import net.sparktank.morrigan.model.tracks.library.remote.RemoteMediaLibrary;
 import net.sparktank.morrigan.server.HttpClient;
 import net.sparktank.morrigan.server.HttpClient.HttpResponse;
@@ -120,13 +120,13 @@ public class MediaListFeedParser2 extends DefaultHandler {
 	private long entryCount = 0;
 	private long entriesProcessed = 0;
 	private int progress = 0;
-	private MediaLibraryTrack currentItem;
+	private MediaTrack currentItem;
 	private StringBuilder currentText;
 	
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 		stack.push(localName);
 		if (stack.size() == 2 && localName.equals("entry")) {
-			currentItem = new MediaLibraryTrack();
+			currentItem = new MediaTrack();
 		}
 		else if (stack.size() == 3 && localName.equals("link")) {
 			String relVal = attributes.getValue("rel");
@@ -136,7 +136,7 @@ public class MediaListFeedParser2 extends DefaultHandler {
 					try {
 						String remotePath = URLDecoder.decode(hrefVal, "UTF-8");
 						currentItem.setFilepath(remotePath);
-						currentItem.getIDbItem().setRemoteLocation(hrefVal);
+						currentItem.setRemoteLocation(hrefVal);
 					} catch (UnsupportedEncodingException e) {
 						throw new SAXException(e);
 					}

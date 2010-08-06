@@ -8,7 +8,6 @@ import java.util.List;
 import net.sparktank.morrigan.gui.preferences.PreferenceHelper;
 import net.sparktank.morrigan.model.MediaItem;
 import net.sparktank.morrigan.model.tracks.MediaTrack;
-import net.sparktank.morrigan.model.tracks.library.MediaLibraryTrack;
 import net.sparktank.morrigan.model.tracks.library.local.LocalMediaLibrary;
 import net.sparktank.morrigan.model.tracks.playlist.PlayItem;
 import net.sparktank.sqlitewrapper.DbException;
@@ -353,7 +352,7 @@ public class JumpToDlg {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private List<MediaLibraryTrack> searchResults = null;
+	private List<MediaTrack> searchResults = null;
 	
 	private IStructuredContentProvider contentProvider = new IStructuredContentProvider() {
 		@Override
@@ -492,7 +491,7 @@ public class JumpToDlg {
 		q = q.replace("*", "%");
 		
 		try {
-			List<MediaLibraryTrack> res = mediaLibrary.simpleSearch(q, "\\", MAX_RESULTS);
+			List<MediaTrack> res = mediaLibrary.simpleSearch(q, "\\", MAX_RESULTS);
 			if (res != null && res.size() > 0) {
 				searchResults = res;
 				return true;

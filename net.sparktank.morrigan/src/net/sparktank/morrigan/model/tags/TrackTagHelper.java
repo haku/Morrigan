@@ -5,8 +5,8 @@ import java.io.IOException;
 import java.util.Iterator;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
+import net.sparktank.morrigan.model.tracks.MediaTrack;
 import net.sparktank.morrigan.model.tracks.library.AbstractMediaLibrary;
-import net.sparktank.morrigan.model.tracks.library.MediaLibraryTrack;
 
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
@@ -22,7 +22,7 @@ import org.jaudiotagger.tag.TagTextField;
 public class TrackTagHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	static public void readTrackTags (AbstractMediaLibrary library, MediaLibraryTrack mlt, File file) throws CannotReadException, IOException, TagException, ReadOnlyFileException, InvalidAudioFrameException, MorriganException {
+	static public void readTrackTags (AbstractMediaLibrary library, MediaTrack mlt, File file) throws CannotReadException, IOException, TagException, ReadOnlyFileException, InvalidAudioFrameException, MorriganException {
 		AudioFile af;
 		
 		try {

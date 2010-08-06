@@ -9,7 +9,5 @@ public interface IDbItem {
 	public String getRemoteLocation();
 	public boolean setRemoteLocation(String remoteLocation);
 	
-	public boolean set (IDbItem item);
-	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

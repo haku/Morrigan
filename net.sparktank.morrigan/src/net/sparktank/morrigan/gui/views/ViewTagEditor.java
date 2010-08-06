@@ -16,8 +16,8 @@ import net.sparktank.morrigan.model.tags.MediaTag;
 import net.sparktank.morrigan.model.tags.MediaTagClassification;
 import net.sparktank.morrigan.model.tags.MediaTagType;
 import net.sparktank.morrigan.model.tags.TrackTagHelper;
+import net.sparktank.morrigan.model.tracks.MediaTrack;
 import net.sparktank.morrigan.model.tracks.library.AbstractMediaLibrary;
-import net.sparktank.morrigan.model.tracks.library.MediaLibraryTrack;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -131,11 +131,11 @@ public class ViewTagEditor extends ViewPart {
 				
 				if (selection instanceof IStructuredSelection) {
 					IStructuredSelection iSel = (IStructuredSelection) selection;
-					ArrayList<MediaLibraryTrack> sel = new ArrayList<MediaLibraryTrack>();
+					ArrayList<MediaTrack> sel = new ArrayList<MediaTrack>();
 					for (Object selectedObject : iSel.toList()) {
 						if (selectedObject != null) {
-							if (selectedObject instanceof MediaLibraryTrack) {
-								MediaLibraryTrack track = (MediaLibraryTrack) selectedObject;
+							if (selectedObject instanceof MediaTrack) {
+								MediaTrack track = (MediaTrack) selectedObject;
 								sel.add(track);
 							}
 						}
@@ -151,9 +151,9 @@ public class ViewTagEditor extends ViewPart {
 //	Data links.
 	
 	private AbstractMediaLibrary editedMediaList = null;
-	private MediaLibraryTrack editedMediaItem = null;
+	private MediaTrack editedMediaItem = null;
 	
-	public void setInput (AbstractMediaLibrary editedMediaList, List<MediaLibraryTrack> selection) {
+	public void setInput (AbstractMediaLibrary editedMediaList, List<MediaTrack> selection) {
 		if (selection != null && selection.size() > 0) {
 			if (selection.size() == 1) {
 				setContentDescription(selection.get(0).getTitle());
