@@ -440,7 +440,7 @@ public abstract class MediaTrackListEditor<T extends MediaTrackList<S>, S extend
 		private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 		@Override
 		public String getText(Object element) {
-			MediaItem elm = (MediaItem) element;
+			MediaTrack elm = (MediaTrack) element;
 			return elm.getDateLastPlayed() == null ? null : sdf.format(elm.getDateLastPlayed());
 		}
 	}
