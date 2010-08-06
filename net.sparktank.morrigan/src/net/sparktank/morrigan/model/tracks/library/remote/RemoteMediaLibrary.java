@@ -181,7 +181,7 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 			
 			String itemUrlString =
 				serverUrl.getProtocol() + "://" + serverUrl.getHost() + ":" + serverUrl.getPort()
-				+ mlt.getRemoteLocation();
+				+ mlt.getIDbItem().getRemoteLocation();
 			
 			URL itemUrl;
 			try {

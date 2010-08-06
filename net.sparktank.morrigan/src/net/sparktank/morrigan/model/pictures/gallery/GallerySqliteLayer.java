@@ -420,14 +420,15 @@ public class GallerySqliteLayer extends MediaSqliteLayer {
 		while (rs.next()) {
 			MediaGalleryPicture newItem = new MediaGalleryPicture();
 			newItem.setFilepath(rs.getString(SQL_TBL_MEDIAFILES_COL_FILE));
-			newItem.setDbRowId(rs.getLong(SQL_TBL_MEDIAFILES_COL_ROWID));
 			newItem.setHashcode(rs.getLong(SQL_TBL_MEDIAFILES_COL_HASHCODE));
 			newItem.setDateLastModified(readDate(rs, SQL_TBL_MEDIAFILES_COL_DMODIFIED));
 			newItem.setEnabled(rs.getInt(SQL_TBL_MEDIAFILES_COL_ENABLED) != 0); // default to true.
 			newItem.setMissing(rs.getInt(SQL_TBL_MEDIAFILES_COL_MISSING) == 1); // default to false.
-			newItem.setRemoteLocation(rs.getString(SQL_TBL_MEDIAFILES_COL_REMLOC));
 			newItem.setWidth(rs.getInt(SQL_TBL_MEDIAFILES_COL_WIDTH));
 			newItem.setHeight(rs.getInt(SQL_TBL_MEDIAFILES_COL_HEIGHT));
+			
+			newItem.getIDbItem().setDbRowId(rs.getLong(SQL_TBL_MEDIAFILES_COL_ROWID));
+			newItem.getIDbItem().setRemoteLocation(rs.getString(SQL_TBL_MEDIAFILES_COL_REMLOC));
 			
 			MediaGalleryPicture oldItem = keepMap.get(newItem.getFilepath());
 			if (oldItem != null) {
@@ -447,15 +448,16 @@ public class GallerySqliteLayer extends MediaSqliteLayer {
 		while (rs.next()) {
 			MediaGalleryPicture mt = new MediaGalleryPicture();
 			mt.setFilepath(rs.getString(SQL_TBL_MEDIAFILES_COL_FILE));
-			mt.setDbRowId(rs.getLong(SQL_TBL_MEDIAFILES_COL_ROWID));
 			mt.setDateAdded(readDate(rs, SQL_TBL_MEDIAFILES_COL_DADDED));
 			mt.setHashcode(rs.getLong(SQL_TBL_MEDIAFILES_COL_HASHCODE));
 			mt.setDateLastModified(readDate(rs, SQL_TBL_MEDIAFILES_COL_DMODIFIED));
 			mt.setEnabled(rs.getInt(SQL_TBL_MEDIAFILES_COL_ENABLED) != 0); // default to true.
 			mt.setMissing(rs.getInt(SQL_TBL_MEDIAFILES_COL_MISSING) == 1); // default to false.
-			mt.setRemoteLocation(rs.getString(SQL_TBL_MEDIAFILES_COL_REMLOC));
 			mt.setWidth(rs.getInt(SQL_TBL_MEDIAFILES_COL_WIDTH));
 			mt.setHeight(rs.getInt(SQL_TBL_MEDIAFILES_COL_HEIGHT));
+			
+			mt.getIDbItem().setDbRowId(rs.getLong(SQL_TBL_MEDIAFILES_COL_ROWID));
+			mt.getIDbItem().setRemoteLocation(rs.getString(SQL_TBL_MEDIAFILES_COL_REMLOC));
 			
 			ret.add(mt);
 		}

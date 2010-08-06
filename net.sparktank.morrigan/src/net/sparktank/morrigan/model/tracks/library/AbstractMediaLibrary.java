@@ -258,9 +258,9 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTr
 		// Remove track.
 		int n = this.dbLayer.removeFile(track.getFilepath());
 		if (n != 1) {
-			n = this.dbLayer.removeFile(track.getDbRowId());
+			n = this.dbLayer.removeFile(track.getIDbItem().getDbRowId());
 			if (n != 1) {
-				throw new MorriganException("Failed to remove entry from DB by ROWID '"+track.getDbRowId()+"' '"+track.getFilepath()+"'.");
+				throw new MorriganException("Failed to remove entry from DB by ROWID '"+track.getIDbItem().getDbRowId()+"' '"+track.getFilepath()+"'.");
 			}
 		}
 		
@@ -341,7 +341,7 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTr
 	}
 	
 	public void setRemoteLocation (MediaLibraryTrack track, String remoteLocation) throws DbException {
-		track.setRemoteLocation(remoteLocation);
+		track.getIDbItem().setRemoteLocation(remoteLocation);
 		this.dbLayer.setRemoteLocation(track.getFilepath(), remoteLocation);
 	}
 	
@@ -353,7 +353,7 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTr
 		if (track.getDateAdded() != null) this.dbLayer.setDateAdded(track.getFilepath(), track.getDateAdded());
 		if (track.getDateLastModified() != null) this.dbLayer.setDateLastModified(track.getFilepath(), track.getDateLastModified());
 		if (track.getDateLastPlayed() != null) this.dbLayer.setDateLastPlayed(track.getFilepath(), track.getDateLastPlayed());
-		this.dbLayer.setRemoteLocation(track.getFilepath(), track.getRemoteLocation());
+		this.dbLayer.setRemoteLocation(track.getFilepath(), track.getIDbItem().getRemoteLocation());
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -379,7 +379,7 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTr
 	
 	public boolean hasTags (MediaLibraryTrack mlt) throws MorriganException {
 		try {
-			return this.dbLayer.hasTags(mlt.getDbRowId());
+			return this.dbLayer.hasTags(mlt.getIDbItem());
 		} catch (DbException e) {
 			throw new MorriganException(e);
 		}
@@ -387,7 +387,7 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTr
 	
 	public boolean hasTag (MediaLibraryTrack mlt, String tag, MediaTagType type, MediaTagClassification mtc) throws MorriganException {
 		try {
-			return this.dbLayer.hasTag(mlt.getDbRowId(), tag, type, mtc);
+			return this.dbLayer.hasTag(mlt.getIDbItem(), tag, type, mtc);
 		} catch (DbException e) {
 			throw new MorriganException(e);
 		}
@@ -395,7 +395,7 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTr
 	
 	public List<MediaTag> getTags (MediaLibraryTrack mlt) throws MorriganException {
 		try {
-			return this.dbLayer.getTags(mlt.getDbRowId());
+			return this.dbLayer.getTags(mlt.getIDbItem());
 		} catch (DbException e) {
 			throw new MorriganException(e);
 		}
@@ -403,7 +403,7 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTr
 	
 	public void addTag (MediaLibraryTrack mlt, String tag, MediaTagType type, MediaTagClassification mtc) throws MorriganException {
 		try {
-			this.dbLayer.addTag(mlt.getDbRowId(), tag, type, mtc);
+			this.dbLayer.addTag(mlt.getIDbItem(), tag, type, mtc);
 		} catch (DbException e) {
 			throw new MorriganException(e);
 		}
@@ -411,7 +411,7 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTr
 	
 	public void addTag (MediaLibraryTrack mlt, String tag, MediaTagType type, String mtc) throws MorriganException {
 		try {
-			this.dbLayer.addTag(mlt.getDbRowId(), tag, type, mtc);
+			this.dbLayer.addTag(mlt.getIDbItem(), tag, type, mtc);
 		} catch (DbException e) {
 			throw new MorriganException(e);
 		}
@@ -419,7 +419,7 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTr
 	
 	public void moveTags (MediaLibraryTrack from_mlt, MediaLibraryTrack to_mlt) throws MorriganException {
 		try {
-			this.dbLayer.moveTags(from_mlt.getDbRowId(), to_mlt.getDbRowId());
+			this.dbLayer.moveTags(from_mlt.getIDbItem(), to_mlt.getIDbItem());
 		} catch (DbException e) {
 			throw new MorriganException(e);
 		}
@@ -435,7 +435,7 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaLibraryTr
 	
 	public void clearTags (MediaLibraryTrack mlt) throws MorriganException {
 		try {
-			this.dbLayer.clearTags(mlt.getDbRowId());
+			this.dbLayer.clearTags(mlt.getIDbItem());
 		} catch (DbException e) {
 			throw new MorriganException(e);
 		}

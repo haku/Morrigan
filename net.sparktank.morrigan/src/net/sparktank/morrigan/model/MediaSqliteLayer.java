@@ -50,25 +50,25 @@ public abstract class MediaSqliteLayer extends GenericSqliteLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Public methods for tags.
 	
-	public boolean hasTags (long rowId) throws DbException {
+	public boolean hasTags (IDbItem item) throws DbException {
 		try {
-			return local_hasTags(rowId);
+			return local_hasTags(item.getDbRowId());
 		} catch (Exception e) {
 			throw new DbException(e);
 		}
 	}
 	
-	public boolean hasTag (long rowId, String tag, MediaTagType type, MediaTagClassification mtc) throws DbException {
+	public boolean hasTag (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) throws DbException {
 		try {
-			return local_hasTag(rowId, tag, type, mtc);
+			return local_hasTag(item.getDbRowId(), tag, type, mtc);
 		} catch (Exception e) {
 			throw new DbException(e);
 		}
 	}
 	
-	public List<MediaTag> getTags (long rowId) throws DbException {
+	public List<MediaTag> getTags (IDbItem item) throws DbException {
 		try {
-			return local_getTags(rowId);
+			return local_getTags(item.getDbRowId());
 		} catch (Exception e) {
 			throw new DbException(e);
 		}
@@ -82,25 +82,25 @@ public abstract class MediaSqliteLayer extends GenericSqliteLayer {
 		}
 	}
 	
-	public boolean addTag (long mf_rowId, String tag, MediaTagType type, MediaTagClassification mtc) throws DbException {
+	public boolean addTag (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) throws DbException {
 		try {
-			return local_addTag(mf_rowId, tag, type, mtc);
+			return local_addTag(item.getDbRowId(), tag, type, mtc);
 		} catch (Exception e) {
 			throw new DbException(e);
 		}
 	}
 	
-	public boolean addTag (long mf_rowId, String tag, MediaTagType type, String mtc) throws DbException {
+	public boolean addTag (IDbItem item, String tag, MediaTagType type, String mtc) throws DbException {
 		try {
-			return local_addTag(mf_rowId, tag, type, mtc);
+			return local_addTag(item.getDbRowId(), tag, type, mtc);
 		} catch (Exception e) {
 			throw new DbException(e);
 		}
 	}
 	
-	public void moveTags (long from_mf_rowId, long to_mf_rowId) throws DbException {
+	public void moveTags (IDbItem from_item, IDbItem to_item) throws DbException {
 		try {
-			local_moveTags(from_mf_rowId, to_mf_rowId);
+			local_moveTags(from_item.getDbRowId(), to_item.getDbRowId());
 		} catch (Exception e) {
 			throw new DbException(e);
 		}
@@ -114,9 +114,9 @@ public abstract class MediaSqliteLayer extends GenericSqliteLayer {
 		}
 	}
 	
-	public void clearTags (long mf_rowId) throws DbException {
+	public void clearTags (IDbItem item) throws DbException {
 		try {
-			local_clearTags(mf_rowId);
+			local_clearTags(item.getDbRowId());
 		} catch (Exception e) {
 			throw new DbException(e);
 		}
