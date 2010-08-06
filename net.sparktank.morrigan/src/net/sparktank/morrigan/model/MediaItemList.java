@@ -200,14 +200,6 @@ public abstract class MediaItemList<T extends MediaItem> {
 	/**
 	 * @throws MorriganException  
 	 */
-	public void setDateLastPlayed (T track, Date date) throws MorriganException {
-		track.setDateLastPlayed(date);
-		setDirtyState(DirtyState.METADATA);
-	}
-	
-	/**
-	 * @throws MorriganException  
-	 */
 	public void setTrackHashCode (T track, long hashcode) throws MorriganException {
 		track.setHashcode(hashcode);
 		setDirtyState(DirtyState.METADATA);

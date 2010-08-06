@@ -1,5 +1,8 @@
 package net.sparktank.morrigan.model.tracks;
 
+import java.util.Date;
+
+import net.sparktank.morrigan.helpers.EqualHelper;
 import net.sparktank.morrigan.model.MediaItem;
 
 
@@ -25,6 +28,7 @@ public class MediaTrack extends MediaItem {
 	private int duration = -1;
 	private long startCount = 0;
 	private long endCount = 0;
+	private Date dateLastPlayed = null;
 	
 	public int getDuration() {
 		return this.duration;
@@ -59,6 +63,17 @@ public class MediaTrack extends MediaItem {
 		return false;
 	}
 	
+	public Date getDateLastPlayed() {
+		return this.dateLastPlayed;
+	}
+	public boolean setDateLastPlayed(Date dateLastPlayed) {
+		if (!EqualHelper.areEqual(this.dateLastPlayed, dateLastPlayed)) {
+			this.dateLastPlayed = dateLastPlayed;
+			return true;
+		}
+		return false;
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Mass setter.
 	
@@ -71,7 +86,8 @@ public class MediaTrack extends MediaItem {
 			
 			boolean b = this.setDuration(mt.getDuration())
 				|| this.setStartCount(mt.getStartCount())
-				|| this.setEndCount(mt.getEndCount());
+				|| this.setEndCount(mt.getEndCount())
+				|| this.setDateLastPlayed(mt.getDateLastPlayed());
 			
 			return b || setFromMediaItem;
 		}
