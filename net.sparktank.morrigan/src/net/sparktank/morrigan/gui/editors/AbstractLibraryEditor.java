@@ -12,9 +12,9 @@ import net.sparktank.morrigan.gui.display.DropMenuListener;
 import net.sparktank.morrigan.gui.jobs.TaskJob;
 import net.sparktank.morrigan.helpers.TimeHelper;
 import net.sparktank.morrigan.model.tasks.MediaFileCopyTask;
+import net.sparktank.morrigan.model.tracks.MediaTrack;
 import net.sparktank.morrigan.model.tracks.MediaTrackList.DurationData;
 import net.sparktank.morrigan.model.tracks.library.AbstractMediaLibrary;
-import net.sparktank.morrigan.model.tracks.library.MediaLibraryTrack;
 import net.sparktank.morrigan.model.tracks.library.AbstractMediaLibrary.SortChangeListener;
 import net.sparktank.morrigan.model.tracks.library.LibrarySqliteLayer.LibrarySort;
 import net.sparktank.morrigan.model.tracks.library.LibrarySqliteLayer.LibrarySortDirection;
@@ -38,7 +38,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 
-public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> extends MediaTrackListEditor<AbstractMediaLibrary, MediaLibraryTrack> {
+public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> extends MediaTrackListEditor<AbstractMediaLibrary, MediaTrack> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public AbstractLibraryEditor () {
@@ -299,7 +299,7 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> exte
 	
 	protected IAction copyToAction = new Action("Copy to...") {
 		public void run () {
-			ArrayList<MediaLibraryTrack> selectedTracks = getSelectedTracks();
+			ArrayList<MediaTrack> selectedTracks = getSelectedTracks();
 			
 			DirectoryDialog dlg = new DirectoryDialog(getSite().getShell());
 			dlg.setText("Copy Files...");
@@ -312,7 +312,7 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> exte
 			if (dir != null) {
 				lastFileCopyTargetDir = dir;
 				
-				MediaFileCopyTask<MediaLibraryTrack> task = new MediaFileCopyTask<MediaLibraryTrack>(getMediaList(), selectedTracks, new File(dir));
+				MediaFileCopyTask<MediaTrack> task = new MediaFileCopyTask<MediaTrack>(getMediaList(), selectedTracks, new File(dir));
 				TaskJob job = new TaskJob(task, getSite().getShell().getDisplay());
 				job.schedule();
 			}

@@ -4,6 +4,7 @@ import java.util.List;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.MediaItemList;
+import net.sparktank.morrigan.model.pictures.MediaPicture;
 import net.sparktank.morrigan.model.pictures.gallery.GallerySqliteLayer.GallerySort;
 import net.sparktank.morrigan.model.pictures.gallery.GallerySqliteLayer.GallerySortDirection;
 import net.sparktank.sqlitewrapper.DbException;
@@ -11,7 +12,7 @@ import net.sparktank.sqlitewrapper.DbException;
 /*
  * TODO FIXME Extract common code between this and AbstractMediaLibrary.
  */
-public class LocalGallery extends MediaItemList<MediaGalleryPicture> {
+public class LocalGallery extends MediaItemList<MediaPicture> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static final String TYPE = "LOCALGALLERY";
@@ -88,7 +89,7 @@ public class LocalGallery extends MediaItemList<MediaGalleryPicture> {
 		System.err.println("[?] reading... " + getType() + " " + getListName() + "...");
 		
 		long t0 = System.currentTimeMillis();
-		List<MediaGalleryPicture> allMedia = this.dbLayer.updateListOfAllMedia(getMediaTracks(), this.librarySort, this.librarySortDirection, HIDEMISSING);
+		List<MediaPicture> allMedia = this.dbLayer.updateListOfAllMedia(getMediaTracks(), this.librarySort, this.librarySortDirection, HIDEMISSING);
 		long l0 = System.currentTimeMillis() - t0;
 		
 		long t1 = System.currentTimeMillis();

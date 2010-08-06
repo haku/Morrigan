@@ -23,7 +23,7 @@ import net.sparktank.morrigan.model.tasks.IMorriganTask;
 import net.sparktank.morrigan.model.tasks.TaskEventListener;
 import net.sparktank.morrigan.model.tasks.TaskResult;
 import net.sparktank.morrigan.model.tasks.TaskResult.TaskOutcome;
-import net.sparktank.morrigan.model.tracks.library.MediaLibraryTrack;
+import net.sparktank.morrigan.model.tracks.MediaTrack;
 import net.sparktank.sqlitewrapper.DbException;
 
 public class LocalLibraryUpdateTask implements IMorriganTask {
@@ -85,7 +85,7 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 	@Override
 	public TaskResult run(TaskEventListener taskEventListener) {
 		TaskResult ret = null;
-		List<MediaLibraryTrack> changedItems = new LinkedList<MediaLibraryTrack>();
+		List<MediaTrack> changedItems = new LinkedList<MediaTrack>();
 		
 		try {
 			taskEventListener.onStart();
@@ -213,7 +213,7 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 		return null;
 	}
 	
-	private TaskResult updateLibraryMetadata(TaskEventListener taskEventListener, int prgTotal, List<MediaLibraryTrack> changedItems) throws DbException {
+	private TaskResult updateLibraryMetadata(TaskEventListener taskEventListener, int prgTotal, List<MediaTrack> changedItems) throws DbException {
 		if (changedItems.size() > 0) throw new IllegalArgumentException("changedItems list must be empty.");
 		
 		taskEventListener.subTask("Reading file metadata");
@@ -222,8 +222,8 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 		int n = 0;
 		int N = this.library.getCount();
 		
-		List<MediaLibraryTrack> allLibraryEntries = this.library.getAllLibraryEntries();
-		for (MediaLibraryTrack mi : allLibraryEntries) {
+		List<MediaTrack> allLibraryEntries = this.library.getAllLibraryEntries();
+		for (MediaTrack mi : allLibraryEntries) {
 			if (taskEventListener.isCanceled()) break;
 			taskEventListener.subTask("Reading file metadata: " + mi.getTitle());
 			
@@ -315,9 +315,9 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 	
 	private void checkForDuplicates(TaskEventListener taskEventListener, int prgTotal) throws MorriganException, DbException {
 		taskEventListener.subTask("Scanning for duplicates");
-		Map<MediaLibraryTrack, ScanOption> dupicateItems = new HashMap<MediaLibraryTrack, ScanOption>();
+		Map<MediaTrack, ScanOption> dupicateItems = new HashMap<MediaTrack, ScanOption>();
 		
-		List<MediaLibraryTrack> tracks = this.library.getAllLibraryEntries();
+		List<MediaTrack> tracks = this.library.getAllLibraryEntries();
 		
 		int progress = 0;
 		int n = 0;
@@ -396,8 +396,8 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 				/*
 				 * Find all the entries for this hashcode.
 				 */
-				Map<MediaLibraryTrack, ScanOption> items = new HashMap<MediaLibraryTrack, ScanOption>();
-				for (MediaLibraryTrack mi : dupicateItems.keySet()) {
+				Map<MediaTrack, ScanOption> items = new HashMap<MediaTrack, ScanOption>();
+				for (MediaTrack mi : dupicateItems.keySet()) {
 					if (mi.getHashcode() == l.longValue()) {
 						items.put(mi, dupicateItems.get(mi));
 					}
@@ -412,8 +412,8 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 				if (countEntriesInMap(items, ScanOption.KEEP) == 1
 						&& countEntriesInMap(items, ScanOption.DELREF) == items.size()-1) {
 					
-					MediaLibraryTrack keep = null;
-					for (MediaLibraryTrack i : items.keySet()) {
+					MediaTrack keep = null;
+					for (MediaTrack i : items.keySet()) {
 						if (items.get(i) == ScanOption.KEEP) keep = i;
 					}
 					items.remove(keep);
@@ -425,7 +425,7 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 					 * added data, last played data.
 					 * Then remove missing tracks from library.
 					 */
-					for (MediaLibraryTrack i : items.keySet()) {
+					for (MediaTrack i : items.keySet()) {
 //						boolean success = false;
 //						try {
 						// FIXME fix this transaction stuff.
@@ -496,7 +496,7 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 			 */
 			taskEventListener.logMsg(this.library.getListName(), "Performed " + countMerges + " mergers.");
 			taskEventListener.logMsg(this.library.getListName(), "Found " + dupicateItems.size() + " duplicate items:");
-			for (Entry<MediaLibraryTrack, ScanOption> e : dupicateItems.entrySet()) {
+			for (Entry<MediaTrack, ScanOption> e : dupicateItems.entrySet()) {
 				taskEventListener.logMsg(this.library.getListName(), e.getValue() + " : " + e.getKey().getTitle());
 			}
 		}
@@ -517,8 +517,8 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 		int n = 0;
 		int N = this.library.getCount();
 		
-		List<MediaLibraryTrack> allLibraryEntries = this.library.getAllLibraryEntries();
-		for (MediaLibraryTrack mi : allLibraryEntries) {
+		List<MediaTrack> allLibraryEntries = this.library.getAllLibraryEntries();
+		for (MediaTrack mi : allLibraryEntries) {
 			if (taskEventListener.isCanceled()) break;
 			taskEventListener.subTask("Reading track metadata: " + mi.getTitle());
 			
@@ -574,14 +574,14 @@ public class LocalLibraryUpdateTask implements IMorriganTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Format specific methods.
 	
-	private TaskResult updateTrackMetadata2 (TaskEventListener taskEventListener, int prgTotal, List<MediaLibraryTrack> changedItems) {
+	private TaskResult updateTrackMetadata2 (TaskEventListener taskEventListener, int prgTotal, List<MediaTrack> changedItems) {
 		taskEventListener.subTask("Reading more track metadata");
 		
 		int progress = 0;
 		int n = 0;
 		int N = this.library.getCount();
 		
-		for (MediaLibraryTrack mlt : changedItems) {
+		for (MediaTrack mlt : changedItems) {
 			if (taskEventListener.isCanceled()) break;
 			taskEventListener.subTask("Reading more track metadata: " + mlt.getTitle());
 			

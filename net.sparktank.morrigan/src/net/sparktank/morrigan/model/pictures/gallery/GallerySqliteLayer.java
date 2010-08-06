@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sparktank.morrigan.model.MediaSqliteLayer;
+import net.sparktank.morrigan.model.pictures.MediaPicture;
 import net.sparktank.sqlitewrapper.DbException;
 
 /*
@@ -28,7 +29,7 @@ public class GallerySqliteLayer extends MediaSqliteLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Public methods for tbl_mediafiles.
 	
-	public List<MediaGalleryPicture> updateListOfAllMedia (List<MediaGalleryPicture> list, GallerySort sort, GallerySortDirection direction, boolean hideMissing) throws DbException {
+	public List<MediaPicture> updateListOfAllMedia (List<MediaPicture> list, GallerySort sort, GallerySortDirection direction, boolean hideMissing) throws DbException {
 		try {
 			return local_updateListOfAllMedia(list, sort, direction, hideMissing);
 		} catch (Exception e) {
@@ -36,7 +37,7 @@ public class GallerySqliteLayer extends MediaSqliteLayer {
 		}
 	}
 	
-	public List<MediaGalleryPicture> getAllMedia (GallerySort sort, GallerySortDirection direction, boolean hideMissing) throws DbException {
+	public List<MediaPicture> getAllMedia (GallerySort sort, GallerySortDirection direction, boolean hideMissing) throws DbException {
 		try {
 			return local_getAllMedia(sort, direction, hideMissing);
 		} catch (Exception e) {
@@ -44,7 +45,7 @@ public class GallerySqliteLayer extends MediaSqliteLayer {
 		}
 	}
 	
-	public List<MediaGalleryPicture> simpleSearch (String term, String esc, int maxResults) throws DbException {
+	public List<MediaPicture> simpleSearch (String term, String esc, int maxResults) throws DbException {
 		try {
 			return local_simpleSearch(term, esc, maxResults);
 		} catch (Exception e) {
@@ -283,11 +284,11 @@ public class GallerySqliteLayer extends MediaSqliteLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Private methods for tbl_mediafiles.
 	
-	private List<MediaGalleryPicture> local_updateListOfAllMedia (List<MediaGalleryPicture> list, GallerySort sort, GallerySortDirection direction, boolean hideMissing) throws SQLException, ClassNotFoundException {
+	private List<MediaPicture> local_updateListOfAllMedia (List<MediaPicture> list, GallerySort sort, GallerySortDirection direction, boolean hideMissing) throws SQLException, ClassNotFoundException {
 		String sql = local_getAllMediaSql(sort, direction, hideMissing);
 		ResultSet rs;
 		
-		List<MediaGalleryPicture> ret;
+		List<MediaPicture> ret;
 		PreparedStatement ps = getDbCon().prepareStatement(sql);
 		try {
 			rs = ps.executeQuery();
@@ -303,11 +304,11 @@ public class GallerySqliteLayer extends MediaSqliteLayer {
 		return ret;
 	}
 	
-	private List<MediaGalleryPicture> local_getAllMedia (GallerySort sort, GallerySortDirection direction, boolean hideMissing) throws SQLException, ClassNotFoundException {
+	private List<MediaPicture> local_getAllMedia (GallerySort sort, GallerySortDirection direction, boolean hideMissing) throws SQLException, ClassNotFoundException {
 		String sql = local_getAllMediaSql(sort, direction, hideMissing);
 		ResultSet rs;
 		
-		List<MediaGalleryPicture> ret;
+		List<MediaPicture> ret;
 		PreparedStatement ps = getDbCon().prepareStatement(sql);
 		try {
 			rs = ps.executeQuery();
@@ -378,10 +379,10 @@ public class GallerySqliteLayer extends MediaSqliteLayer {
 		return sql;
 	}
 	
-	private List<MediaGalleryPicture> local_simpleSearch (String term, String esc, int maxResults) throws SQLException, ClassNotFoundException {
+	private List<MediaPicture> local_simpleSearch (String term, String esc, int maxResults) throws SQLException, ClassNotFoundException {
 		PreparedStatement ps;
 		ResultSet rs;
-		List<MediaGalleryPicture> ret;
+		List<MediaPicture> ret;
 		
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_Q_SIMPLESEARCH);
 		try {
@@ -405,12 +406,12 @@ public class GallerySqliteLayer extends MediaSqliteLayer {
 		return ret;
 	}
 	
-	private List<MediaGalleryPicture> local_parseAndUpdateFromRecordSet (List<MediaGalleryPicture> list, ResultSet rs) throws SQLException {
-		List<MediaGalleryPicture> finalList = new ArrayList<MediaGalleryPicture>();
+	private List<MediaPicture> local_parseAndUpdateFromRecordSet (List<MediaPicture> list, ResultSet rs) throws SQLException {
+		List<MediaPicture> finalList = new ArrayList<MediaPicture>();
 		
 		// Build a HashMap of existing items to make lookup a lot faster.
-		Map<String, MediaGalleryPicture> keepMap = new HashMap<String, MediaGalleryPicture>(list.size());
-		for (MediaGalleryPicture e : list) {
+		Map<String, MediaPicture> keepMap = new HashMap<String, MediaPicture>(list.size());
+		for (MediaPicture e : list) {
 			keepMap.put(e.getFilepath(), e);
 		}
 		
@@ -418,7 +419,7 @@ public class GallerySqliteLayer extends MediaSqliteLayer {
 		 * create new list as we go. 
 		 */
 		while (rs.next()) {
-			MediaGalleryPicture newItem = new MediaGalleryPicture();
+			MediaPicture newItem = new MediaPicture();
 			newItem.setFilepath(rs.getString(SQL_TBL_MEDIAFILES_COL_FILE));
 			newItem.setHashcode(rs.getLong(SQL_TBL_MEDIAFILES_COL_HASHCODE));
 			newItem.setDateLastModified(readDate(rs, SQL_TBL_MEDIAFILES_COL_DMODIFIED));
@@ -427,10 +428,10 @@ public class GallerySqliteLayer extends MediaSqliteLayer {
 			newItem.setWidth(rs.getInt(SQL_TBL_MEDIAFILES_COL_WIDTH));
 			newItem.setHeight(rs.getInt(SQL_TBL_MEDIAFILES_COL_HEIGHT));
 			
-			newItem.getIDbItem().setDbRowId(rs.getLong(SQL_TBL_MEDIAFILES_COL_ROWID));
-			newItem.getIDbItem().setRemoteLocation(rs.getString(SQL_TBL_MEDIAFILES_COL_REMLOC));
+			newItem.setDbRowId(rs.getLong(SQL_TBL_MEDIAFILES_COL_ROWID));
+			newItem.setRemoteLocation(rs.getString(SQL_TBL_MEDIAFILES_COL_REMLOC));
 			
-			MediaGalleryPicture oldItem = keepMap.get(newItem.getFilepath());
+			MediaPicture oldItem = keepMap.get(newItem.getFilepath());
 			if (oldItem != null) {
 				oldItem.setFromMediaItem(newItem);
 				finalList.add(oldItem);
@@ -442,11 +443,11 @@ public class GallerySqliteLayer extends MediaSqliteLayer {
 		return finalList;
 	}
 	
-	private List<MediaGalleryPicture> local_parseRecordSet (ResultSet rs) throws SQLException {
-		List<MediaGalleryPicture> ret = new ArrayList<MediaGalleryPicture>();
+	private List<MediaPicture> local_parseRecordSet (ResultSet rs) throws SQLException {
+		List<MediaPicture> ret = new ArrayList<MediaPicture>();
 		
 		while (rs.next()) {
-			MediaGalleryPicture mt = new MediaGalleryPicture();
+			MediaPicture mt = new MediaPicture();
 			mt.setFilepath(rs.getString(SQL_TBL_MEDIAFILES_COL_FILE));
 			mt.setDateAdded(readDate(rs, SQL_TBL_MEDIAFILES_COL_DADDED));
 			mt.setHashcode(rs.getLong(SQL_TBL_MEDIAFILES_COL_HASHCODE));
@@ -456,8 +457,8 @@ public class GallerySqliteLayer extends MediaSqliteLayer {
 			mt.setWidth(rs.getInt(SQL_TBL_MEDIAFILES_COL_WIDTH));
 			mt.setHeight(rs.getInt(SQL_TBL_MEDIAFILES_COL_HEIGHT));
 			
-			mt.getIDbItem().setDbRowId(rs.getLong(SQL_TBL_MEDIAFILES_COL_ROWID));
-			mt.getIDbItem().setRemoteLocation(rs.getString(SQL_TBL_MEDIAFILES_COL_REMLOC));
+			mt.setDbRowId(rs.getLong(SQL_TBL_MEDIAFILES_COL_ROWID));
+			mt.setRemoteLocation(rs.getString(SQL_TBL_MEDIAFILES_COL_REMLOC));
 			
 			ret.add(mt);
 		}
