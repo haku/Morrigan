@@ -80,7 +80,7 @@ public class MediaListFeedParser {
 							if (hrefNode != null) {
 								String hrefVal = hrefNode.getNodeValue();
 								if (hrefVal != null) {
-									mi.setRemoteLocation(hrefVal);
+									mi.getIDbItem().setRemoteLocation(hrefVal);
 								}
 							} else {
 								throw new FeedParseException("Link missing 'href' att.");

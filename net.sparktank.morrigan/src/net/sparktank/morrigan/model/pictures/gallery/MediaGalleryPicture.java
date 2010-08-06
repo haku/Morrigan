@@ -1,15 +1,19 @@
 package net.sparktank.morrigan.model.pictures.gallery;
 
-import net.sparktank.morrigan.helpers.EqualHelper;
+import net.sparktank.morrigan.model.DbItem;
 import net.sparktank.morrigan.model.IDbItem;
 import net.sparktank.morrigan.model.MediaItem;
 import net.sparktank.morrigan.model.pictures.MediaPicture;
-import net.sparktank.morrigan.model.tracks.library.MediaLibraryTrack;
 
 /*
- * TODO FIXME Extract common code between this and MediaLibraryTrack.
+ * The following classes are basically the same except for the class they extend.
+ * I can not work out a simpler way to merge these classes.
+ * 
+ * MediaGalleryPicture
+ * MediaLibraryTrack
+ * 
  */
-public class MediaGalleryPicture extends MediaPicture implements IDbItem {
+public class MediaGalleryPicture extends MediaPicture {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors.
 	
@@ -22,39 +26,11 @@ public class MediaGalleryPicture extends MediaPicture implements IDbItem {
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Attributes.
 	
-	private long dbRowId;
-	private String remoteLocation;
+	private IDbItem iDbItem = new DbItem();
 	
-	@Override
-	public long getDbRowId() {
-		return this.dbRowId;
-	}
-	@Override
-	public boolean setDbRowId(long dbRowId) {
-		/* Sqlite ROWID starts at 1, so if something tries to set it
-		 * less than this, don't let them clear it.
-		 * This is most likely when fetching a remote list over HTTP.
-		 */
-		if (dbRowId > 0 && this.dbRowId != dbRowId) {
-			this.dbRowId = dbRowId;
-			return true;
-		}
-		return false;
-	}
-	
-	@Override
-	public String getRemoteLocation() {
-		return this.remoteLocation;
-	}
-	@Override
-	public boolean setRemoteLocation(String remoteLocation) {
-		if (!EqualHelper.areEqual(this.remoteLocation, remoteLocation)) {
-			this.remoteLocation = remoteLocation;
-			return true;
-		}
-		return false;
+	public IDbItem getIDbItem() {
+		return this.iDbItem;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -64,17 +40,14 @@ public class MediaGalleryPicture extends MediaPicture implements IDbItem {
 	public boolean setFromMediaItem(MediaItem mi) {
 		boolean setFromMediaItem = super.setFromMediaItem(mi);
 		
-		if (mi instanceof MediaLibraryTrack) {
-			MediaLibraryTrack mli = (MediaLibraryTrack) mi;
+		if (mi instanceof MediaGalleryPicture) {
+			MediaGalleryPicture mgp = (MediaGalleryPicture) mi;
 			
-			boolean b = this.setDbRowId(mli.getDbRowId())
-				|| this.setRemoteLocation(mli.getRemoteLocation());
-			
-			return b || setFromMediaItem;
+			return this.iDbItem.set(mgp.getIDbItem()) || setFromMediaItem;
 		}
 		
 		return setFromMediaItem;
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

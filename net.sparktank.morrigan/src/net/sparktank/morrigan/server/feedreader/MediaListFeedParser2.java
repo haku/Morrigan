@@ -136,7 +136,7 @@ public class MediaListFeedParser2 extends DefaultHandler {
 					try {
 						String remotePath = URLDecoder.decode(hrefVal, "UTF-8");
 						currentItem.setFilepath(remotePath);
-						currentItem.setRemoteLocation(hrefVal);
+						currentItem.getIDbItem().setRemoteLocation(hrefVal);
 					} catch (UnsupportedEncodingException e) {
 						throw new SAXException(e);
 					}
