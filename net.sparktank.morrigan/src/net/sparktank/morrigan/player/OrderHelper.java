@@ -62,7 +62,7 @@ public class OrderHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	// TODO take into account disabled and missing tracks.
-	public static MediaTrack getNextTrack (MediaTrackList<? extends MediaItem> list, MediaItem track, PlaybackOrder mode) {
+	public static MediaTrack getNextTrack (MediaTrackList<? extends MediaTrack> list, MediaTrack track, PlaybackOrder mode) {
 		if (list.getCount() <= 0) return null;
 		
 		switch (mode) {
@@ -194,7 +194,7 @@ public class OrderHelper {
 		return ret;
 	}
 	
-	private static MediaTrack getNextTrackByLastPlayedDate (MediaTrackList<? extends MediaItem> list, MediaItem current) {
+	private static MediaTrack getNextTrackByLastPlayedDate (MediaTrackList<? extends MediaTrack> list, MediaTrack current) {
 		MediaTrack ret = null;
 		List<? extends MediaTrack> tracks = list.getMediaTracks();
 		Date now = new Date();
@@ -202,7 +202,7 @@ public class OrderHelper {
 		// Find oldest date.
 		Date maxAge = new Date();
 		int n = 0;
-		for (MediaItem i : tracks) {
+		for (MediaTrack i : tracks) {
 			if (i.isEnabled() && !i.isMissing() && i != current) {
 				if (i.getDateLastPlayed() != null && i.getDateLastPlayed().before(maxAge)) {
 					maxAge = i.getDateLastPlayed();
@@ -217,7 +217,7 @@ public class OrderHelper {
 		
 		// Build sum of all selection-indicies in units of days.
 		long sumAgeDays = 0;
-		for (MediaItem i : tracks) {
+		for (MediaTrack i : tracks) {
 			if (i.isEnabled() && !i.isMissing() && i != current) {
 				if (i.getDateLastPlayed() != null) {
 					sumAgeDays = sumAgeDays + dateDiffDays(i.getDateLastPlayed(), now);
