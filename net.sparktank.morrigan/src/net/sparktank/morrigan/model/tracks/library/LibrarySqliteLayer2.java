@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.List;
 
 import net.sparktank.morrigan.model.MediaSqliteLayer2;
 import net.sparktank.morrigan.model.tracks.MediaTrack;
@@ -14,22 +15,6 @@ public class LibrarySqliteLayer2 extends MediaSqliteLayer2<MediaTrack> {
 	
 	LibrarySqliteLayer2 (String dbFilePath) throws DbException {
 		super(dbFilePath);
-	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Types.
-	
-	@Override
-	protected MediaTrack getNewT() {
-		return new MediaTrack();
-	}
-	
-	@Override
-	protected void setTFromRs(MediaTrack item, ResultSet rs) throws SQLException {
-		item.setStartCount(rs.getLong(SQL_TBL_MEDIAFILES_COL_STARTCNT));
-		item.setEndCount(rs.getLong(SQL_TBL_MEDIAFILES_COL_ENDCNT));
-		item.setDuration(rs.getInt(SQL_TBL_MEDIAFILES_COL_DURATION));
-		item.setDateLastPlayed(readDate(rs, SQL_TBL_MEDIAFILES_COL_DLASTPLAY));
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -106,54 +91,22 @@ public class LibrarySqliteLayer2 extends MediaSqliteLayer2<MediaTrack> {
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	@Override
-	protected String getSqlTblMediaFilesCreate() {
-		return 
-			"create table tbl_mediafiles(" +
-    		"sfile VARCHAR(1000) not null collate nocase primary key," +
-    		"dadded DATETIME," +
-    		"lstartcnt INT(6)," +
-    		"lendcnt INT(6)," +
-    		"dlastplay DATETIME," +
-    		"lmd5 BIGINT," +
-    		"dmodified DATETIME," +
-    		"lduration INT(6)," +
-    		"benabled INT(1)," +
-    		"bmissing INT(1)," +
-    		"sremloc VARCHAR(1000) NOT NULL" +
-    		");";
-	}
 	
-	private static final String SQL_TBL_MEDIAFILES_COL_ROWID = "ROWID"; // sqlite automatically creates this.
-	private static final String SQL_TBL_MEDIAFILES_COL_FILE = "sfile";
-	private static final String SQL_TBL_MEDIAFILES_COL_DADDED = "dadded";
 	private static final String SQL_TBL_MEDIAFILES_COL_STARTCNT = "lstartcnt";
 	private static final String SQL_TBL_MEDIAFILES_COL_ENDCNT = "lendcnt";
 	private static final String SQL_TBL_MEDIAFILES_COL_DLASTPLAY = "dlastplay";
 	private static final String SQL_TBL_MEDIAFILES_COL_DURATION = "lduration";
-	private static final String SQL_TBL_MEDIAFILES_COL_HASHCODE = "lmd5";
-	private static final String SQL_TBL_MEDIAFILES_COL_DMODIFIED = "dmodified";
-	private static final String SQL_TBL_MEDIAFILES_COL_ENABLED = "benabled";
-	private static final String SQL_TBL_MEDIAFILES_COL_MISSING = "bmissing";
-	private static final String SQL_TBL_MEDIAFILES_COL_REMLOC = "sremloc";
 	
 	@Override
-	protected String[] getSqlTblMediaFilesCols() {
-		return new String[] {
-				SQL_TBL_MEDIAFILES_COL_ROWID,
-				SQL_TBL_MEDIAFILES_COL_FILE,
-				SQL_TBL_MEDIAFILES_COL_DADDED,
-				SQL_TBL_MEDIAFILES_COL_STARTCNT,
-				SQL_TBL_MEDIAFILES_COL_ENDCNT,
-				SQL_TBL_MEDIAFILES_COL_DLASTPLAY,
-				SQL_TBL_MEDIAFILES_COL_DURATION,
-				SQL_TBL_MEDIAFILES_COL_HASHCODE,
-				SQL_TBL_MEDIAFILES_COL_DMODIFIED,
-				SQL_TBL_MEDIAFILES_COL_ENABLED,
-				SQL_TBL_MEDIAFILES_COL_MISSING,
-				SQL_TBL_MEDIAFILES_COL_REMLOC
-				};
+	protected List<DbColumn> generateSqlTblMediaFilesFields() {
+		List<DbColumn> l = super.generateSqlTblMediaFilesFields();
+		
+		l.add(new DbColumn("lstartcnt", "INT(6)",   "0"));
+		l.add(new DbColumn("lendcnt",   "INT(6)",   "0"));
+		l.add(new DbColumn("dlastplay", "DATETIME", null));
+		l.add(new DbColumn("lduration", "INT(6)",   "-1"));
+		
+		return l;
 	}
 	
 	private static final String SQL_TBL_MEDIAFILES_INCSTART =
@@ -177,6 +130,22 @@ public class LibrarySqliteLayer2 extends MediaSqliteLayer2<MediaTrack> {
 	private static final String SQL_TBL_MEDIAFILES_SETDURATION =
 		"UPDATE tbl_mediafiles SET lduration=?" +
 		" WHERE sfile=?;";
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Types.
+	
+	@Override
+	protected MediaTrack getNewT() {
+		return new MediaTrack();
+	}
+	
+	@Override
+	protected void setTFromRs(MediaTrack item, ResultSet rs) throws SQLException {
+		item.setStartCount(rs.getLong(SQL_TBL_MEDIAFILES_COL_STARTCNT));
+		item.setEndCount(rs.getLong(SQL_TBL_MEDIAFILES_COL_ENDCNT));
+		item.setDuration(rs.getInt(SQL_TBL_MEDIAFILES_COL_DURATION));
+		item.setDateLastPlayed(readDate(rs, SQL_TBL_MEDIAFILES_COL_DLASTPLAY));
+	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
