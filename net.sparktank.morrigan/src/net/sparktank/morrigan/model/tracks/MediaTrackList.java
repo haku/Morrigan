@@ -57,6 +57,14 @@ public abstract class MediaTrackList<T extends MediaTrack> extends MediaItemList
 		setDirtyState(DirtyState.METADATA);
 	}
 	
+	/**
+	 * @throws MorriganException  
+	 */
+	public void setDateLastPlayed (T track, Date date) throws MorriganException {
+		track.setDateLastPlayed(date);
+		setDirtyState(DirtyState.METADATA);
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Metadata readers.
 	

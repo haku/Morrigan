@@ -23,7 +23,6 @@ public class MediaItem implements IDbItem {
 	
 	private String filepath = null;
 	private Date dateAdded = null;
-	private Date dateLastPlayed = null;
 	private long hashcode = 0;
 	private Date dateLastModified = null;
 	private boolean enabled = true;
@@ -46,17 +45,6 @@ public class MediaItem implements IDbItem {
 	public boolean setDateAdded(Date dateAdded) {
 		if (!EqualHelper.areEqual(this.dateAdded, dateAdded)) {
 			this.dateAdded = dateAdded;
-			return true;
-		}
-		return false;
-	}
-	
-	public Date getDateLastPlayed() {
-		return this.dateLastPlayed;
-	}
-	public boolean setDateLastPlayed(Date dateLastPlayed) {
-		if (!EqualHelper.areEqual(this.dateLastPlayed, dateLastPlayed)) {
-			this.dateLastPlayed = dateLastPlayed;
 			return true;
 		}
 		return false;
@@ -159,7 +147,6 @@ public class MediaItem implements IDbItem {
 	public boolean setFromMediaItem (MediaItem mi) {
 		boolean b = this.setFilepath(mi.getFilepath())
 			|| this.setDateAdded(mi.getDateAdded())
-			|| this.setDateLastPlayed(mi.getDateLastPlayed())
 			|| this.setHashcode(mi.getHashcode())
 			|| this.setDateLastModified(mi.getDateLastModified())
 			|| this.setEnabled(mi.isEnabled())
