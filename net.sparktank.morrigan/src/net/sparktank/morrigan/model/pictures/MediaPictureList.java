@@ -1,5 +1,6 @@
 package net.sparktank.morrigan.model.pictures;
 
+import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.MediaItemList;
 
 public abstract class MediaPictureList<T extends MediaPicture> extends MediaItemList<T> {
@@ -13,7 +14,10 @@ public abstract class MediaPictureList<T extends MediaPicture> extends MediaItem
 //	Update methods.  Use these for data that is to be persisted.
 //	These methods are sub-classed where persistence is needed.
 	
-	public void setPictureWidthAndHeight (MediaPicture mp, int width, int height) {
+	/**
+	 * @throws MorriganException  
+	 */
+	public void setPictureWidthAndHeight (MediaPicture mp, int width, int height) throws MorriganException {
 		mp.setWidth(width);
 		mp.setHeight(height);
 		setDirtyState(DirtyState.METADATA);
