@@ -5,7 +5,7 @@ import java.util.Date;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.MediaItemList;
 
-public abstract class MediaTrackList<T extends MediaTrack> extends MediaItemList<T> {
+public abstract class MediaTrackList<T extends MediaTrack> extends MediaItemList<T> implements IMediaTrackList<T> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	protected MediaTrackList(String listId, String listName) {
@@ -19,71 +19,57 @@ public abstract class MediaTrackList<T extends MediaTrack> extends MediaItemList
 	/**
 	 * @throws MorriganException  
 	 */
+	@Override
 	public void incTrackStartCnt (MediaTrack track, long n) throws MorriganException {
-		track.setStartCount(track.getStartCount() + n);
-		setDirtyState(DirtyState.METADATA);
+		MediaTrackListHelper.incTrackStartCnt(this, track, n);
 	}
 	
 	/**
 	 * @throws MorriganException  
 	 */
+	@Override
 	public void incTrackEndCnt (MediaTrack track, long n) throws MorriganException {
-		track.setEndCount(track.getEndCount() + n);
-		setDirtyState(DirtyState.METADATA);
+		MediaTrackListHelper.incTrackEndCnt(this, track, n);
 	}
 	
 	/**
 	 * @throws MorriganException  
 	 */
+	@Override
 	public void incTrackStartCnt (MediaTrack track) throws MorriganException {
-		track.setStartCount(track.getStartCount()+1);
-		track.setDateLastPlayed(new Date());
-		setDirtyState(DirtyState.METADATA);
+		MediaTrackListHelper.incTrackStartCnt(this, track);
 	}
 	
 	/**
 	 * @throws MorriganException  
 	 */
+	@Override
 	public void incTrackEndCnt (MediaTrack track) throws MorriganException {
-		track.setEndCount(track.getEndCount()+1);
-		setDirtyState(DirtyState.METADATA);
+		MediaTrackListHelper.incTrackEndCnt(this, track);
 	}
 	
 	/**
 	 * @throws MorriganException  
 	 */
+	@Override
 	public void setTrackDuration (MediaTrack track, int duration) throws MorriganException {
-		track.setDuration(duration);
-		setDirtyState(DirtyState.METADATA);
+		MediaTrackListHelper.setTrackDuration(this, track, duration);
 	}
 	
 	/**
 	 * @throws MorriganException  
 	 */
-	public void setDateLastPlayed (T track, Date date) throws MorriganException {
-		track.setDateLastPlayed(date);
-		setDirtyState(DirtyState.METADATA);
+	@Override
+	public void setDateLastPlayed (MediaTrack track, Date date) throws MorriganException {
+		MediaTrackListHelper.setDateLastPlayed(this, track, date);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Metadata readers.
 	
-	static public class DurationData {
-		public long duration;
-		public boolean complete;
-	}
-	
+	@Override
 	public DurationData getTotalDuration () {
-		DurationData ret = new DurationData();
-		ret.complete = true;
-		for (T mt : getMediaTracks()) {
-			if (mt.getDuration() > 0) {
-				ret.duration = ret.duration + mt.getDuration();
-			} else {
-				ret.complete = false;
-			}
-		}
-		return ret;
+		return MediaTrackListHelper.getTotalDuration(this.getMediaTracks());
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

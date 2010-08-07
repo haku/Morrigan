@@ -15,8 +15,8 @@ import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.dialogs.RunnableDialog;
 import net.sparktank.morrigan.gui.display.FullscreenShell;
 import net.sparktank.morrigan.gui.display.ScreenPainter;
-import net.sparktank.morrigan.gui.display.TrayHelper;
 import net.sparktank.morrigan.gui.display.ScreenPainter.TitleProvider;
+import net.sparktank.morrigan.gui.display.TrayHelper;
 import net.sparktank.morrigan.gui.editors.EditorFactory;
 import net.sparktank.morrigan.gui.editors.LibraryEditorInput;
 import net.sparktank.morrigan.gui.editors.LocalLibraryEditor;
@@ -24,8 +24,7 @@ import net.sparktank.morrigan.gui.editors.MediaTrackListEditor;
 import net.sparktank.morrigan.gui.editors.MediaTrackListEditorInput;
 import net.sparktank.morrigan.gui.editors.PlaylistEditor;
 import net.sparktank.morrigan.gui.helpers.ClipboardHelper;
-import net.sparktank.morrigan.model.MediaItem;
-import net.sparktank.morrigan.model.MediaItemList;
+import net.sparktank.morrigan.model.tracks.IMediaTrackList;
 import net.sparktank.morrigan.model.tracks.MediaTrack;
 import net.sparktank.morrigan.model.tracks.MediaTrackList;
 import net.sparktank.morrigan.model.tracks.library.local.LocalMediaLibrary;
@@ -33,9 +32,9 @@ import net.sparktank.morrigan.model.tracks.playlist.MediaPlaylist;
 import net.sparktank.morrigan.model.tracks.playlist.PlayItem;
 import net.sparktank.morrigan.player.IPlayerEventHandler;
 import net.sparktank.morrigan.player.OrderHelper;
+import net.sparktank.morrigan.player.OrderHelper.PlaybackOrder;
 import net.sparktank.morrigan.player.Player;
 import net.sparktank.morrigan.player.PlayerRegister;
-import net.sparktank.morrigan.player.OrderHelper.PlaybackOrder;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -158,7 +157,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 			
 			IEditorPart activeEditor = getViewSite().getPage().getActiveEditor();
 			if (activeEditor != null && activeEditor instanceof MediaTrackListEditor<?,?>) {
-				MediaTrackListEditor<? extends MediaTrackList<MediaTrack>,MediaTrack> mediaListEditor = (MediaTrackListEditor<? extends MediaItemList<MediaTrack>,MediaTrack>) activeEditor;
+				MediaTrackListEditor<? extends MediaTrackList<MediaTrack>,MediaTrack> mediaListEditor = (MediaTrackListEditor<? extends MediaTrackList<MediaTrack>, MediaTrack>) activeEditor;
 				MediaTrackList<MediaTrack> editedMediaList = mediaListEditor.getMediaList();
 				ret = editedMediaList;
 			}
@@ -631,7 +630,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 	protected IAction jumpToAction = new Action ("Jump to...") {
 		@Override
 		public void run() {
-			MediaItemList<? extends MediaItem> currentList = getPlayer().getCurrentList();
+			IMediaTrackList<? extends MediaTrack> currentList = getPlayer().getCurrentList();
 			if (currentList == null) return;
 			if (!(currentList instanceof LocalMediaLibrary)) return;
 			

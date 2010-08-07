@@ -11,8 +11,8 @@ import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.display.ActionListener;
 import net.sparktank.morrigan.helpers.TimeHelper;
+import net.sparktank.morrigan.model.tracks.IMediaTrackList.DurationData;
 import net.sparktank.morrigan.model.tracks.MediaTrack;
-import net.sparktank.morrigan.model.tracks.MediaTrackList.DurationData;
 import net.sparktank.morrigan.model.tracks.playlist.MediaPlaylist;
 
 import org.eclipse.core.runtime.IProgressMonitor;

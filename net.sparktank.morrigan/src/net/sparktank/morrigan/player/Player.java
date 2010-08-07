@@ -9,12 +9,12 @@ import java.util.List;
 import net.sparktank.morrigan.engines.EngineFactory;
 import net.sparktank.morrigan.engines.common.ImplException;
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine;
+import net.sparktank.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import net.sparktank.morrigan.engines.playback.IPlaybackStatusListener;
 import net.sparktank.morrigan.engines.playback.PlaybackException;
-import net.sparktank.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import net.sparktank.morrigan.exceptions.MorriganException;
+import net.sparktank.morrigan.model.tracks.IMediaTrackList;
 import net.sparktank.morrigan.model.tracks.MediaTrack;
-import net.sparktank.morrigan.model.tracks.MediaTrackList;
 import net.sparktank.morrigan.model.tracks.playlist.PlayItem;
 import net.sparktank.morrigan.player.OrderHelper.PlaybackOrder;
 
@@ -24,7 +24,7 @@ import org.eclipse.swt.widgets.Composite;
 public class Player {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private final IPlayerEventHandler eventHandler;
+	final IPlayerEventHandler eventHandler;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Main.
@@ -45,7 +45,7 @@ public class Player {
 	private int id = -1;
 	
 	public int getId() {
-		return id;
+		return this.id;
 	}
 	
 	public void setId(int id) {
@@ -64,22 +64,22 @@ public class Player {
 	 * object is disposed so as to remove listener.
 	 */
 	private void setCurrentItem (PlayItem item) {
-		synchronized (_currentItemLock) {
-			if (_currentItem != null && _currentItem.list != null) {
-				_currentItem.list.removeChangeEvent(listChangedRunnable);
+		synchronized (this._currentItemLock) {
+			if (this._currentItem != null && this._currentItem.list != null) {
+				this._currentItem.list.removeChangeEvent(this.listChangedRunnable);
 			}
 			
-			_currentItem = item;
+			this._currentItem = item;
 			
-			if (_currentItem != null && _currentItem.list != null) {
-				_currentItem.list.addChangeEvent(listChangedRunnable);
+			if (this._currentItem != null && this._currentItem.list != null) {
+				this._currentItem.list.addChangeEvent(this.listChangedRunnable);
 				
-				if (_currentItem.item != null) {
-					addToHistory(_currentItem);
+				if (this._currentItem.item != null) {
+					addToHistory(this._currentItem);
 				}
 			}
 			
-			eventHandler.currentItemChanged();
+			this.eventHandler.currentItemChanged();
 		}
 	}
 	
@@ -92,18 +92,18 @@ public class Player {
 	
 	public PlayItem getCurrentItem () {
 		// TODO check item is still valid.
-		return _currentItem;
+		return this._currentItem;
 	}
 	
-	public MediaTrackList<? extends MediaTrack> getCurrentList () {
-		MediaTrackList<? extends MediaTrack> ret = null;
+	public IMediaTrackList<? extends MediaTrack> getCurrentList () {
+		IMediaTrackList<? extends MediaTrack> ret = null;
 		
 		PlayItem currentItem = getCurrentItem();
 		if (currentItem != null && currentItem.list != null) {
 			ret = currentItem.list;
 			
 		} else {
-			ret = eventHandler.getCurrentList();
+			ret = this.eventHandler.getCurrentList();
 		}
 		
 		return ret;
@@ -115,14 +115,14 @@ public class Player {
 	private PlaybackOrder _playbackOrder = PlaybackOrder.SEQUENTIAL;
 	
 	public PlaybackOrder getPlaybackOrder () {
-		return _playbackOrder;
+		return this._playbackOrder;
 	}
 	
 	public void setPlaybackOrder (PlaybackOrder order) {
-		_playbackOrder = order;
+		this._playbackOrder = order;
 	}
 	
-	private PlayItem getNextItemToPlay () {
+	PlayItem getNextItemToPlay () {
 		PlayItem nextItem = null;
 		
 		if (isQueueHasItem()) {
@@ -130,16 +130,16 @@ public class Player {
 			
 		} else if (getCurrentItem() != null && getCurrentItem().list != null) {
 			if (getCurrentItem().item != null) {
-				MediaTrack nextTrack = OrderHelper.getNextTrack(getCurrentItem().list, getCurrentItem().item, _playbackOrder);
+				MediaTrack nextTrack = OrderHelper.getNextTrack(getCurrentItem().list, getCurrentItem().item, this._playbackOrder);
 				if (nextTrack != null) {
 					nextItem = new PlayItem(getCurrentItem().list, nextTrack);
 				}
 			}
 			
 		} else {
-			MediaTrackList<? extends MediaTrack> currentList = getCurrentList();
+			IMediaTrackList<? extends MediaTrack> currentList = getCurrentList();
 			if (currentList != null) {
-				MediaTrack nextTrack = OrderHelper.getNextTrack(currentList, null, _playbackOrder);
+				MediaTrack nextTrack = OrderHelper.getNextTrack(currentList, null, this._playbackOrder);
 				if (nextTrack != null) {
 					nextItem = new PlayItem(currentList, nextTrack);
 				}
@@ -157,35 +157,35 @@ public class Player {
 	private List<PlayItem> _history = new ArrayList<PlayItem>();
 	
 	public List<PlayItem> getHistory () {
-		return Collections.unmodifiableList(_history);
+		return Collections.unmodifiableList(this._history);
 	}
 	
 	private void addToHistory (PlayItem item) {
-		synchronized (_history) {
-			if (_history.contains(item)) {
-				_history.remove(item);
+		synchronized (this._history) {
+			if (this._history.contains(item)) {
+				this._history.remove(item);
 			}
-			_history.add(0, item);
-			if (_history.size() > HISTORY_LENGTH) {
-				_history.remove(_history.size()-1);
+			this._history.add(0, item);
+			if (this._history.size() > HISTORY_LENGTH) {
+				this._history.remove(this._history.size()-1);
 			}
-			eventHandler.historyChanged();
+			this.eventHandler.historyChanged();
 		}
 	}
 	
-	private void validateHistory () {
-		synchronized (_history) {
+	void validateHistory () {
+		synchronized (this._history) {
 			boolean changed = false;
 			
-			for (int i = _history.size() - 1; i >= 0; i--) {
-				if (!_history.get(i).list.getMediaTracks().contains(_history.get(i).item)) {
-					_history.remove(_history.get(i));
+			for (int i = this._history.size() - 1; i >= 0; i--) {
+				if (!this._history.get(i).list.getMediaTracks().contains(this._history.get(i).item)) {
+					this._history.remove(this._history.get(i));
 					changed = true;
 				}
 			}
 			
 			if (changed) {
-				eventHandler.historyChanged();
+				this.eventHandler.historyChanged();
 			}
 		}
 	}
@@ -197,27 +197,27 @@ public class Player {
 	private List<Runnable> _queueChangeListeners = new ArrayList<Runnable>();
 	
 	public void addToQueue (PlayItem item) {
-		_queue.add(item);
+		this._queue.add(item);
 		callQueueChangedListeners();
 	}
 	
 	public void removeFromQueue (PlayItem item) {
-		_queue.remove(item);
+		this._queue.remove(item);
 		callQueueChangedListeners();
 	}
 	
 	public void moveInQueue (List<PlayItem> items, boolean moveDown) {
-		synchronized (_queue) {
+		synchronized (this._queue) {
 			if (items == null || items.isEmpty()) return;
 			
-			for (int i = (moveDown ? _queue.size() - 1 : 0);
-			(moveDown ? i >= 0 : i < _queue.size());
+			for (int i = (moveDown ? this._queue.size() - 1 : 0);
+			(moveDown ? i >= 0 : i < this._queue.size());
 			i = i + (moveDown ? -1 : 1)
 			) {
-				if (items.contains(_queue.get(i))) {
+				if (items.contains(this._queue.get(i))) {
 					int j;
 					if (moveDown) {
-						if (i == _queue.size() - 1 ) {
+						if (i == this._queue.size() - 1 ) {
 							j = -1;
 						} else {
 							j = i + 1;
@@ -229,11 +229,11 @@ public class Player {
 							j = i - 1;
 						}
 					}
-					if (j != -1 && !items.contains(_queue.get(j))) {
-						PlayItem a = _queue.get(i);
-						PlayItem b = _queue.get(j);
-						_queue.set(i, b);
-						_queue.set(j, a);
+					if (j != -1 && !items.contains(this._queue.get(j))) {
+						PlayItem a = this._queue.get(i);
+						PlayItem b = this._queue.get(j);
+						this._queue.set(i, b);
+						this._queue.set(j, a);
 					}
 				}
 			}
@@ -243,31 +243,31 @@ public class Player {
 	}
 	
 	private boolean isQueueHasItem () {
-		synchronized (_queue) {
-			return !_queue.isEmpty();
+		synchronized (this._queue) {
+			return !this._queue.isEmpty();
 		}
 	}
 	
 	private PlayItem readFromQueue () {
-		synchronized (_queue) {
-			if (!_queue.isEmpty()) {
-				PlayItem item = _queue.remove(0);
+		synchronized (this._queue) {
+			if (!this._queue.isEmpty()) {
+				PlayItem item = this._queue.remove(0);
 				callQueueChangedListeners();
 				return item;
-			} else {
-				return null;
 			}
+			
+			return null;
 		}
 	}
 	
 	private void callQueueChangedListeners () {
-		for (Runnable r : _queueChangeListeners) {
+		for (Runnable r : this._queueChangeListeners) {
 			r.run();
 		}
 	}
 	
 	public List<PlayItem> getQueueList () {
-		return Collections.unmodifiableList(_queue);
+		return Collections.unmodifiableList(this._queue);
 	}
 	
 	static public class DurationData {
@@ -278,7 +278,7 @@ public class Player {
 	public DurationData getQueueTotalDuration () {
 		DurationData ret = new DurationData();
 		ret.complete = true;
-		for (PlayItem pi : _queue) {
+		for (PlayItem pi : this._queue) {
 			if (pi.item.getDuration() > 0) {
 				ret.duration = ret.duration + pi.item.getDuration();
 			} else {
@@ -289,11 +289,11 @@ public class Player {
 	}
 	
 	public void addQueueChangeListener (Runnable listener) {
-		_queueChangeListeners.add(listener);
+		this._queueChangeListeners.add(listener);
 	}
 	
 	public void removeQueueChangeListener (Runnable listener) {
-		_queueChangeListeners.remove(listener);
+		this._queueChangeListeners.remove(listener);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -302,16 +302,16 @@ public class Player {
 	IPlaybackEngine playbackEngine = null;
 	
 	public boolean isPlaybackEngineReady () {
-		return (playbackEngine != null);
+		return (this.playbackEngine != null);
 	}
 	
 	synchronized private IPlaybackEngine getPlaybackEngine (boolean create) throws ImplException {
-		if (playbackEngine == null && create) {
-			playbackEngine = EngineFactory.makePlaybackEngine();
-			playbackEngine.setStatusListener(playbackStatusListener);
+		if (this.playbackEngine == null && create) {
+			this.playbackEngine = EngineFactory.makePlaybackEngine();
+			this.playbackEngine.setStatusListener(this.playbackStatusListener);
 		}
 		
-		return playbackEngine;
+		return this.playbackEngine;
 	}
 	
 	private void finalisePlaybackEngine () {
@@ -338,21 +338,21 @@ public class Player {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Playback management.
 	
-	private long _currentPosition = -1; // In seconds.
-	private int _currentTrackDuration = -1; // In seconds.
+	long _currentPosition = -1; // In seconds.
+	int _currentTrackDuration = -1; // In seconds.
 	
 	/**
 	 * For UI handlers to call.
 	 */
-	public void loadAndStartPlaying (MediaTrackList<? extends MediaTrack> list) {
-		MediaTrack nextTrack = OrderHelper.getNextTrack(list, null, _playbackOrder);
+	public void loadAndStartPlaying (IMediaTrackList<?> list) {
+		MediaTrack nextTrack = OrderHelper.getNextTrack(list, null, this._playbackOrder);
 		loadAndStartPlaying(list, nextTrack);
 	}
 	
 	/**
 	 * For UI handlers to call.
 	 */
-	public void loadAndStartPlaying (MediaTrackList<? extends MediaTrack> list, MediaTrack track) {
+	public void loadAndStartPlaying (IMediaTrackList<?> list, MediaTrack track) {
 		if (track == null) throw new NullPointerException();
 		loadAndStartPlaying(new PlayItem(list, track));
 	}
@@ -370,28 +370,28 @@ public class Player {
 				System.err.println("Loading '" + item.item.getTitle() + "'...");
 				setCurrentItem(item);
 				engine.setFile(item.item.getFilepath());
-				Composite currentMediaFrameParent = eventHandler.getCurrentMediaFrameParent();
+				Composite currentMediaFrameParent = this.eventHandler.getCurrentMediaFrameParent();
 				engine.setVideoFrameParent(currentMediaFrameParent);
 				
 				engine.loadTrack();
 				engine.startPlaying();
 				
-				_currentTrackDuration = engine.getDuration();
+				this._currentTrackDuration = engine.getDuration();
 				System.err.println("Started to play '" + item.item.getTitle() + "'...");
 				
 				item.list.incTrackStartCnt(item.item);
 				if (item.item.getDuration() <= 0) {
-					if (_currentTrackDuration > 0) {
-						item.list.setTrackDuration(item.item, _currentTrackDuration);
+					if (this._currentTrackDuration > 0) {
+						item.list.setTrackDuration(item.item, this._currentTrackDuration);
 					}
 				}
 			} // END synchronized.
 			
 		} catch (Exception e) {
-			eventHandler.asyncThrowable(e);
+			this.eventHandler.asyncThrowable(e);
 		}
 		
-		eventHandler.updateStatus();
+		this.eventHandler.updateStatus();
 	}
 	
 	/**
@@ -401,7 +401,7 @@ public class Player {
 		try {
 			internal_pausePlaying();
 		} catch (PlaybackException e) {
-			eventHandler.asyncThrowable(e);
+			this.eventHandler.asyncThrowable(e);
 		}
 	}
 	
@@ -412,7 +412,7 @@ public class Player {
 		try {
 			internal_stopPlaying();
 		} catch (PlaybackException e) {
-			eventHandler.asyncThrowable(e);
+			this.eventHandler.asyncThrowable(e);
 		}
 	}
 	
@@ -428,27 +428,28 @@ public class Player {
 			IPlaybackEngine eng = getPlaybackEngine(false);
 			if (eng!=null) {
 				return eng.getPlaybackState();
-			} else {
-				return PlayState.Stopped;
 			}
-		} catch (ImplException e) {
+			
+			return PlayState.Stopped;
+		}
+		catch (ImplException e) {
 			return PlayState.Stopped;
 		}
 	}
 	
 	public long getCurrentPosition () {
-		return _currentPosition;
+		return this._currentPosition;
 	}
 	
 	public int getCurrentTrackDuration () {
-		return _currentTrackDuration;
+		return this._currentTrackDuration;
 	}
 	
 	public void seekTo (double d) {
 		try {
 			internal_seekTo(d);
 		} catch (PlaybackException e) {
-			eventHandler.asyncThrowable(e);
+			this.eventHandler.asyncThrowable(e);
 		}
 	}
 	
@@ -468,10 +469,10 @@ public class Player {
 					loadAndStartPlaying(getCurrentItem());
 				}
 				else {
-					eventHandler.asyncThrowable(new PlaybackException("Don't know what to do.  Playstate=" + playbackState + "."));
+					this.eventHandler.asyncThrowable(new PlaybackException("Don't know what to do.  Playstate=" + playbackState + "."));
 				}
 			} // END synchronized.
-			eventHandler.updateStatus();
+			this.eventHandler.updateStatus();
 		}
 	}
 	
@@ -490,7 +491,7 @@ public class Player {
 				eng.stopPlaying();
 				eng.unloadFile();
 			}
-			eventHandler.updateStatus();
+			this.eventHandler.updateStatus();
 		}
 	}
 	
@@ -507,13 +508,13 @@ public class Player {
 		
 		@Override
 		public void positionChanged(long position) {
-			_currentPosition = position;
-			eventHandler.updateStatus();
+			Player.this._currentPosition = position;
+			Player.this.eventHandler.updateStatus();
 		}
 		
 		@Override
 		public void durationChanged(int duration) {
-			_currentTrackDuration = duration;
+			Player.this._currentTrackDuration = duration;
 			
 			if (duration > 0) {
 				PlayItem c = getCurrentItem();
@@ -527,12 +528,12 @@ public class Player {
 				}
 			}
 			
-			eventHandler.updateStatus();
+			Player.this.eventHandler.updateStatus();
 		};
 		
 		@Override
 		public void statusChanged(PlayState state) {
-			
+			/* UNUSED */
 		}
 		
 		@Override
@@ -542,7 +543,7 @@ public class Player {
 			try {
 				getCurrentItem().list.incTrackEndCnt(getCurrentItem().item);
 			} catch (MorriganException e) {
-				eventHandler.asyncThrowable(e);
+				Player.this.eventHandler.asyncThrowable(e);
 			}
 			
 			// Play next track?
@@ -552,19 +553,19 @@ public class Player {
 			}
 			else {
 				System.err.println("No more tracks to play.");
-				eventHandler.updateStatus();
+				Player.this.eventHandler.updateStatus();
 			}
 		};
 		
 		@Override
 		public void onError(Exception e) {
-			eventHandler.asyncThrowable(e);
+			Player.this.eventHandler.asyncThrowable(e);
 		}
 		
 		@Override
 		public void onKeyPress(int keyCode) {
 			if (keyCode == SWT.ESC) {
-				eventHandler.videoAreaClose();
+				Player.this.eventHandler.videoAreaClose();
 			}
 		}
 		
@@ -572,7 +573,7 @@ public class Player {
 		public void onMouseClick(int button, int clickCount) {
 			System.err.println("Mouse click "+button+"*"+clickCount);
 			if (clickCount > 1) {
-				eventHandler.videoAreaSelected();
+				Player.this.eventHandler.videoAreaSelected();
 			}
 		}
 		

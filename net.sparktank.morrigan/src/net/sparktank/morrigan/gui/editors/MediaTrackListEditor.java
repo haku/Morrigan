@@ -13,10 +13,10 @@ import net.sparktank.morrigan.gui.handler.CallPlayMedia;
 import net.sparktank.morrigan.gui.helpers.ImageCache;
 import net.sparktank.morrigan.gui.preferences.MediaListPref;
 import net.sparktank.morrigan.helpers.TimeHelper;
+import net.sparktank.morrigan.model.IMediaItemList.DirtyState;
 import net.sparktank.morrigan.model.MediaItem;
-import net.sparktank.morrigan.model.MediaItemList.DirtyState;
+import net.sparktank.morrigan.model.tracks.IMediaTrackList;
 import net.sparktank.morrigan.model.tracks.MediaTrack;
-import net.sparktank.morrigan.model.tracks.MediaTrackList;
 
 import org.eclipse.core.commands.common.CommandException;
 import org.eclipse.jface.action.Action;
@@ -64,7 +64,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.part.EditorPart;
 
-public abstract class MediaTrackListEditor<T extends MediaTrackList<S>, S extends MediaTrack> extends EditorPart {
+public abstract class MediaTrackListEditor<T extends IMediaTrackList<S>, S extends MediaTrack> extends EditorPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constants and Enums.
 	
@@ -109,15 +109,15 @@ public abstract class MediaTrackListEditor<T extends MediaTrackList<S>, S extend
 		setInput(input);
 		
 		if (input instanceof MediaTrackListEditorInput<?>) {
-			editorInput = (MediaTrackListEditorInput<T>) input;
+			this.editorInput = (MediaTrackListEditorInput<T>) input;
 		} else {
 			throw new IllegalArgumentException("input is not instanceof MediaListEditorInput<?>.");
 		}
 		
-		setPartName(editorInput.getMediaList().getListName());
+		setPartName(this.editorInput.getMediaList().getListName());
 		
-		editorInput.getMediaList().addDirtyChangeEvent(dirtyChange);
-		editorInput.getMediaList().addChangeEvent(listChange);
+		this.editorInput.getMediaList().addDirtyChangeEvent(this.dirtyChange);
+		this.editorInput.getMediaList().addChangeEvent(this.listChange);
 		
 		try {
 			readInputData();
@@ -130,14 +130,14 @@ public abstract class MediaTrackListEditor<T extends MediaTrackList<S>, S extend
 	
 	@Override
 	public void dispose() {
-		editorInput.getMediaList().removeChangeEvent(listChange);
-		editorInput.getMediaList().removeDirtyChangeEvent(dirtyChange);
-		imageCache.clearCache();
+		this.editorInput.getMediaList().removeChangeEvent(this.listChange);
+		this.editorInput.getMediaList().removeDirtyChangeEvent(this.dirtyChange);
+		this.imageCache.clearCache();
 		super.dispose();
 	}
 	
 	protected void readInputData () throws MorriganException {
-		editorInput.getMediaList().read();
+		this.editorInput.getMediaList().read();
 	}
 	
 	protected abstract boolean handleReadError (Exception e);
@@ -181,7 +181,7 @@ public abstract class MediaTrackListEditor<T extends MediaTrackList<S>, S extend
 		formData.right = new FormAttachment(100, 0);
 		formData.bottom = new FormAttachment(100, 0);
 		tableComposite.setLayoutData(formData);
-		editTable = new TableViewer(tableComposite, SWT.MULTI | SWT.V_SCROLL | SWT.FULL_SELECTION );
+		this.editTable = new TableViewer(tableComposite, SWT.MULTI | SWT.V_SCROLL | SWT.FULL_SELECTION );
 		TableColumnLayout layout = new TableColumnLayout();
 		tableComposite.setLayout(layout);
 		
@@ -190,7 +190,7 @@ public abstract class MediaTrackListEditor<T extends MediaTrackList<S>, S extend
 		
 		for (int i = 0; i < titles.length; i++) {
 			if (MediaListPref.getColPref(titles[i])) {
-				final TableViewerColumn column = new TableViewerColumn(editTable, SWT.NONE);
+				final TableViewerColumn column = new TableViewerColumn(this.editTable, SWT.NONE);
 				
 				switch (titles[i]) {
 					case FILE:
@@ -241,28 +241,28 @@ public abstract class MediaTrackListEditor<T extends MediaTrackList<S>, S extend
 				column.getColumn().setMoveable(true);
 				
 				if (isSortable()) {
-					column.getColumn().addSelectionListener(getSelectionAdapter(editTable, column));
+					column.getColumn().addSelectionListener(getSelectionAdapter(this.editTable, column));
 				}
 			}
 		}
 		
-		Table table = editTable.getTable();
+		Table table = this.editTable.getTable();
 		table.setHeaderVisible(MediaListPref.getShowHeadersPref());
 		table.setLinesVisible(false);
 		
-		editTable.setContentProvider(contentProvider);
-		editTable.addDoubleClickListener(doubleClickListener);
-		editTable.setInput(getEditorSite());
-		mediaFilter = new MediaFilter();
-		editTable.addFilter(mediaFilter);
+		this.editTable.setContentProvider(this.contentProvider);
+		this.editTable.addDoubleClickListener(this.doubleClickListener);
+		this.editTable.setInput(getEditorSite());
+		this.mediaFilter = new MediaFilter();
+		this.editTable.addFilter(this.mediaFilter);
 		
-		getSite().setSelectionProvider(editTable);
+		getSite().setSelectionProvider(this.editTable);
 		
-		int topIndex = editorInput.getTopIndex();
+		int topIndex = this.editorInput.getTopIndex();
 		if (topIndex > 0) {
-			editTable.getTable().setTopIndex(topIndex);
+			this.editTable.getTable().setTopIndex(topIndex);
 		}
-		editorInput.setTable(editTable.getTable());
+		this.editorInput.setTable(this.editTable.getTable());
 		
 		createControls(parent2);
 		createToolbar(toolbarComposite);
@@ -274,7 +274,7 @@ public abstract class MediaTrackListEditor<T extends MediaTrackList<S>, S extend
 	
 	@Override
 	public boolean isDirty() {
-		return editorInput.getMediaList().getDirtyState() == DirtyState.DIRTY;
+		return this.editorInput.getMediaList().getDirtyState() == DirtyState.DIRTY;
 	}
 	
 	private void createToolbar (Composite toolbarParent) {
@@ -282,23 +282,23 @@ public abstract class MediaTrackListEditor<T extends MediaTrackList<S>, S extend
 		
 		List<Control> controls = populateToolbar(toolbarParent);
 		
-		lblStatus = new Label(toolbarParent, SWT.NONE);
+		this.lblStatus = new Label(toolbarParent, SWT.NONE);
 		formData = new FormData();
-		formData.top = new FormAttachment(50, -(lblStatus.computeSize(SWT.DEFAULT, SWT.DEFAULT).y)/2);
-		formData.left = new FormAttachment(0, sep*2);
-		formData.right = new FormAttachment(controls.get(0), -sep);
-		lblStatus.setLayoutData(formData);
+		formData.top = new FormAttachment(50, -(this.lblStatus.computeSize(SWT.DEFAULT, SWT.DEFAULT).y)/2);
+		formData.left = new FormAttachment(0, this.sep*2);
+		formData.right = new FormAttachment(controls.get(0), -this.sep);
+		this.lblStatus.setLayoutData(formData);
 		
 		for (int i = 0; i < controls.size(); i++) {
 			formData = new FormData();
 			
-			formData.top = new FormAttachment(0, sep);
-			formData.bottom = new FormAttachment(100, -sep);
+			formData.top = new FormAttachment(0, this.sep);
+			formData.bottom = new FormAttachment(100, -this.sep);
 			
 			if (i == controls.size() - 1) {
-				formData.right = new FormAttachment(100, -sep);
+				formData.right = new FormAttachment(100, -this.sep);
 			} else {
-				formData.right = new FormAttachment(controls.get(i+1), -sep);
+				formData.right = new FormAttachment(controls.get(i+1), -this.sep);
 			}
 			
 			controls.get(i).setLayoutData(formData);
@@ -322,26 +322,26 @@ public abstract class MediaTrackListEditor<T extends MediaTrackList<S>, S extend
 	}
 	
 	protected void setTableMenu (Menu menu) {
-		editTable.getTable().setMenu(menu);
+		this.editTable.getTable().setMenu(menu);
 	}
 	
 	public void revealTrack (Object element) {
-		editTable.setSelection(new StructuredSelection(element), true);
-		editTable.getTable().setFocus();
+		this.editTable.setSelection(new StructuredSelection(element), true);
+		this.editTable.getTable().setFocus();
 	}
 	
 	protected void setFilterString (String s) {
-		mediaFilter.setFilterString(s);
-		editTable.refresh();
+		this.mediaFilter.setFilterString(s);
+		this.editTable.refresh();
 	}
 	
 	protected ImageCache getImageCache() {
-		return imageCache;
+		return this.imageCache;
 	}
 	
 	@Override
 	public void setFocus() {
-		editTable.getTable().setFocus();
+		this.editTable.getTable().setFocus();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -351,7 +351,7 @@ public abstract class MediaTrackListEditor<T extends MediaTrackList<S>, S extend
 		
 		@Override
 		public Object[] getElements(Object inputElement) {
-			return editorInput.getMediaList().getMediaTracks().toArray();
+			return MediaTrackListEditor.this.editorInput.getMediaList().getMediaTracks().toArray();
 		}
 		
 		@Override
@@ -380,7 +380,7 @@ public abstract class MediaTrackListEditor<T extends MediaTrackList<S>, S extend
 				if (mi.getTitle() != null) {
 					Styler styler = null;
 					if (mi.isMissing() || !mi.isEnabled()) {
-						styler = strikeoutItemStyle;
+						styler = MediaTrackListEditor.this.strikeoutItemStyle;
 					}
 					StyledString styledString = new StyledString(mi.getTitle(), styler);
 					
@@ -407,7 +407,7 @@ public abstract class MediaTrackListEditor<T extends MediaTrackList<S>, S extend
 				} else if (!mi.isEnabled()) {
 					cell.setImage(null); // TODO find icon for disabled?
 				} else {
-					cell.setImage(imageCache.readImage("icons/playlist.gif")); // TODO find icon for items?
+					cell.setImage(MediaTrackListEditor.this.imageCache.readImage("icons/playlist.gif")); // TODO find icon for items?
 				}
 				
 			}
@@ -420,7 +420,7 @@ public abstract class MediaTrackListEditor<T extends MediaTrackList<S>, S extend
 		@Override
 		public String getText(Object element) {
 			MediaItem elm = (MediaItem) element;
-			return elm.getDateAdded() == null ? null : sdf.format(elm.getDateAdded());
+			return elm.getDateAdded() == null ? null : this.sdf.format(elm.getDateAdded());
 		}
 	}
 	
@@ -441,7 +441,7 @@ public abstract class MediaTrackListEditor<T extends MediaTrackList<S>, S extend
 		@Override
 		public String getText(Object element) {
 			MediaTrack elm = (MediaTrack) element;
-			return elm.getDateLastPlayed() == null ? null : sdf.format(elm.getDateLastPlayed());
+			return elm.getDateLastPlayed() == null ? null : this.sdf.format(elm.getDateLastPlayed());
 		}
 	}
 	
@@ -462,7 +462,7 @@ public abstract class MediaTrackListEditor<T extends MediaTrackList<S>, S extend
 		@Override
 		public String getText(Object element) {
 			MediaItem elm = (MediaItem) element;
-			return elm.getDateLastModified() == null ? null : sdf.format(elm.getDateLastModified());
+			return elm.getDateLastModified() == null ? null : this.sdf.format(elm.getDateLastModified());
 		}
 	}
 	
@@ -489,11 +489,11 @@ public abstract class MediaTrackListEditor<T extends MediaTrackList<S>, S extend
 		
 		@Override
 		public boolean select(Viewer viewer, Object parentElement, Object element) {
-			if (searchTerm == null || searchTerm.length() == 0) {
+			if (this.searchTerm == null || this.searchTerm.length() == 0) {
 				return true;
 			}
 			MediaItem mi = (MediaItem) element;
-			if (mi.getFilepath().matches(searchTerm)) {
+			if (mi.getFilepath().matches(this.searchTerm)) {
 				return true;
 			}
 			return false;
@@ -512,9 +512,9 @@ public abstract class MediaTrackListEditor<T extends MediaTrackList<S>, S extend
 	private Runnable dirtyChange = new Runnable() {
 		@Override
 		public void run() {
-			if (!dirtyChangedRunableScheduled) {
-				dirtyChangedRunableScheduled = true;
-				getSite().getShell().getDisplay().asyncExec(dirtyChangedRunable);
+			if (!MediaTrackListEditor.this.dirtyChangedRunableScheduled) {
+				MediaTrackListEditor.this.dirtyChangedRunableScheduled = true;
+				getSite().getShell().getDisplay().asyncExec(MediaTrackListEditor.this.dirtyChangedRunable);
 			}
 		}
 	};
@@ -522,9 +522,9 @@ public abstract class MediaTrackListEditor<T extends MediaTrackList<S>, S extend
 	private Runnable listChange = new Runnable() {
 		@Override
 		public void run() {
-			if (!updateGuiRunableScheduled) {
-				updateGuiRunableScheduled = true;
-				getSite().getShell().getDisplay().asyncExec(updateGuiRunable);
+			if (!MediaTrackListEditor.this.updateGuiRunableScheduled) {
+				MediaTrackListEditor.this.updateGuiRunableScheduled = true;
+				getSite().getShell().getDisplay().asyncExec(MediaTrackListEditor.this.updateGuiRunable);
 			}
 		}
 	};
@@ -534,7 +534,7 @@ public abstract class MediaTrackListEditor<T extends MediaTrackList<S>, S extend
 	private Runnable dirtyChangedRunable = new Runnable() {
 		@Override
 		public void run() {
-			dirtyChangedRunableScheduled = false;
+			MediaTrackListEditor.this.dirtyChangedRunableScheduled = false;
 			firePropertyChange(EditorPart.PROP_DIRTY);
 		}
 	};
@@ -544,9 +544,9 @@ public abstract class MediaTrackListEditor<T extends MediaTrackList<S>, S extend
 	private Runnable updateGuiRunable = new Runnable() {
 		@Override
 		public void run() {
-			updateGuiRunableScheduled = false;
-			if (editTable.getTable().isDisposed()) return;
-			editTable.refresh();
+			MediaTrackListEditor.this.updateGuiRunableScheduled = false;
+			if (MediaTrackListEditor.this.editTable.getTable().isDisposed()) return;
+			MediaTrackListEditor.this.editTable.refresh();
 			listChanged();
 		}
 	};
@@ -588,11 +588,11 @@ public abstract class MediaTrackListEditor<T extends MediaTrackList<S>, S extend
 	}
 	
 	protected void setSortMarker (TableViewerColumn column, int swtDirection) {
-		editTable.getTable().setSortDirection(swtDirection);
+		this.editTable.getTable().setSortDirection(swtDirection);
 		if (column != null) {
-			editTable.getTable().setSortColumn(column.getColumn());
+			this.editTable.getTable().setSortColumn(column.getColumn());
 		} else {
-			editTable.getTable().setSortColumn(null);
+			this.editTable.getTable().setSortColumn(null);
 		}
 	}
 	
@@ -600,21 +600,21 @@ public abstract class MediaTrackListEditor<T extends MediaTrackList<S>, S extend
 //	Methods for editing editedMediaList.
 	
 	public T getMediaList () {
-		return editorInput.getMediaList();
+		return this.editorInput.getMediaList();
 	}
 	
 	@SuppressWarnings("unchecked")
 	protected void addTrack (String file) {
 		MediaItem mediaItem = new MediaItem(file);
-		editorInput.getMediaList().addTrack((S) mediaItem);
+		this.editorInput.getMediaList().addTrack((S) mediaItem);
 	}
 	
 	protected void removeTrack (S track) throws MorriganException {
-		editorInput.getMediaList().removeMediaTrack(track);
+		this.editorInput.getMediaList().removeMediaTrack(track);
 	}
 	
 	public S getSelectedTrack () {
-		ISelection selection = editTable.getSelection();
+		ISelection selection = this.editTable.getSelection();
 		
 		if (selection==null) return null;
 		if (selection.isEmpty()) return null;
@@ -635,7 +635,7 @@ public abstract class MediaTrackListEditor<T extends MediaTrackList<S>, S extend
 	}
 	
 	public ArrayList<S> getSelectedTracks () {
-		ISelection selection = editTable.getSelection();
+		ISelection selection = this.editTable.getSelection();
 		
 		if (selection==null) return null;
 		if (selection.isEmpty()) return null;
@@ -700,7 +700,7 @@ public abstract class MediaTrackListEditor<T extends MediaTrackList<S>, S extend
 		@Override
 		public void run() {
 			super.run();
-			IWorkbenchPart part = editor.getPart(false);
+			IWorkbenchPart part = this.editor.getPart(false);
 			if (part != null && part instanceof PlaylistEditor) {
 				PlaylistEditor plPart = (PlaylistEditor) part;
 				for (MediaItem track : getSelectedTracks()) {
@@ -746,7 +746,7 @@ public abstract class MediaTrackListEditor<T extends MediaTrackList<S>, S extend
 		public void run() {
 			for (S track : getSelectedTracks()) {
 				try {
-					editorInput.getMediaList().setTrackEnabled(track, !track.isEnabled());
+					MediaTrackListEditor.this.editorInput.getMediaList().setTrackEnabled(track, !track.isEnabled());
 				} catch (Throwable t) {
 					// TODO something more useful here.
 					t.printStackTrace();

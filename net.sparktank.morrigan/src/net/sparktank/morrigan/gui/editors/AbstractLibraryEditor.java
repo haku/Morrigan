@@ -11,14 +11,14 @@ import net.sparktank.morrigan.gui.dialogs.RunnableDialog;
 import net.sparktank.morrigan.gui.display.DropMenuListener;
 import net.sparktank.morrigan.gui.jobs.TaskJob;
 import net.sparktank.morrigan.helpers.TimeHelper;
+import net.sparktank.morrigan.model.MediaItemDb.SortChangeListener;
 import net.sparktank.morrigan.model.MediaSqliteLayer2;
 import net.sparktank.morrigan.model.MediaSqliteLayer2.DbColumn;
 import net.sparktank.morrigan.model.MediaSqliteLayer2.SortDirection;
 import net.sparktank.morrigan.model.tasks.MediaFileCopyTask;
+import net.sparktank.morrigan.model.tracks.IMediaTrackList.DurationData;
 import net.sparktank.morrigan.model.tracks.MediaTrack;
-import net.sparktank.morrigan.model.tracks.MediaTrackList.DurationData;
 import net.sparktank.morrigan.model.tracks.library.AbstractMediaLibrary;
-import net.sparktank.morrigan.model.tracks.library.AbstractMediaLibrary.SortChangeListener;
 import net.sparktank.morrigan.model.tracks.library.LibrarySqliteLayer2;
 
 import org.eclipse.core.runtime.IProgressMonitor;
