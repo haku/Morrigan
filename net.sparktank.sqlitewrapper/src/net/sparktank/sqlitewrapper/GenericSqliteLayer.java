@@ -109,6 +109,10 @@ public abstract class GenericSqliteLayer {
 						stat.executeUpdate(sqlCreateCmd.getTblCreateSql());
 					}
 				}
+				catch (SQLException e) {
+					System.err.println("SQLException while executing '"+sqlCreateCmd.getTblCreateSql()+"'.");
+					throw e;
+				}
 				finally {
 					rs.close();
 				}
