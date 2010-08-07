@@ -1,9 +1,10 @@
 package net.sparktank.morrigan.gui.editors;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
+import net.sparktank.morrigan.model.MediaSqliteLayer2.DbColumn;
+import net.sparktank.morrigan.model.MediaSqliteLayer2.SortDirection;
 import net.sparktank.morrigan.model.tracks.MediaTrackListFactory;
-import net.sparktank.morrigan.model.tracks.library.LibrarySqliteLayer.LibrarySort;
-import net.sparktank.morrigan.model.tracks.library.LibrarySqliteLayer.LibrarySortDirection;
+import net.sparktank.morrigan.model.tracks.library.LibrarySqliteLayer2;
 import net.sparktank.morrigan.model.tracks.library.local.LocalMediaLibrary;
 import net.sparktank.morrigan.model.tracks.library.remote.RemoteMediaLibrary;
 import net.sparktank.morrigan.model.tracks.playlist.MediaPlaylist;
@@ -89,8 +90,8 @@ public class EditorFactory implements IElementFactory {
 		String sortdir = memento.getString(KEY_LIB_SORTDIR);
 		if (sortcol != null && sortdir != null) {
 			try {
-				LibrarySort ls = LibrarySort.valueOf(sortcol);
-				LibrarySortDirection lsd = LibrarySortDirection.valueOf(sortdir);
+				DbColumn ls = LibrarySqliteLayer2.parseColumnFromName(sortcol);
+				SortDirection lsd = SortDirection.valueOf(sortdir);
 				input.getMediaList().setSort(ls, lsd);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -108,8 +109,8 @@ public class EditorFactory implements IElementFactory {
 		String sortdir = memento.getString(KEY_LIB_SORTDIR);
 		if (sortcol != null && sortdir != null) {
 			try {
-				LibrarySort ls = LibrarySort.valueOf(sortcol);
-				LibrarySortDirection lsd = LibrarySortDirection.valueOf(sortdir);
+				DbColumn ls = LibrarySqliteLayer2.parseColumnFromName(sortcol);
+				SortDirection lsd = SortDirection.valueOf(sortdir);
 				input.getMediaList().setSort(ls, lsd);
 			} catch (Exception e) {
 				e.printStackTrace();

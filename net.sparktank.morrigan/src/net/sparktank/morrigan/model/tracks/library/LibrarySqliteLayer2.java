@@ -6,11 +6,35 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
+import net.sparktank.morrigan.helpers.RecyclingFactory;
 import net.sparktank.morrigan.model.MediaSqliteLayer2;
 import net.sparktank.morrigan.model.tracks.MediaTrack;
 import net.sparktank.sqlitewrapper.DbException;
 
 public class LibrarySqliteLayer2 extends MediaSqliteLayer2<MediaTrack> {
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Factory.
+	
+	public static final DbConFactory FACTORY = new DbConFactory();
+	
+	public static class DbConFactory extends RecyclingFactory<LibrarySqliteLayer2, String, Void, DbException> {
+		
+		DbConFactory() {
+			super(true);
+		}
+		
+		@Override
+		protected boolean isValidProduct(LibrarySqliteLayer2 product) {
+			return true;
+		}
+		
+		@Override
+		protected LibrarySqliteLayer2 makeNewProduct(String material) throws DbException {
+			return new LibrarySqliteLayer2(material);
+		}
+		
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	LibrarySqliteLayer2 (String dbFilePath) throws DbException {
@@ -92,20 +116,38 @@ public class LibrarySqliteLayer2 extends MediaSqliteLayer2<MediaTrack> {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private static final String SQL_TBL_MEDIAFILES_COL_STARTCNT = "lstartcnt";
-	private static final String SQL_TBL_MEDIAFILES_COL_ENDCNT = "lendcnt";
-	private static final String SQL_TBL_MEDIAFILES_COL_DLASTPLAY = "dlastplay";
-	private static final String SQL_TBL_MEDIAFILES_COL_DURATION = "lduration";
+	public static final DbColumn SQL_TBL_MEDIAFILES_COL_STARTCNT =  new DbColumn("lstartcnt", "start count", "INT(6)",   "0");
+	public static final DbColumn SQL_TBL_MEDIAFILES_COL_ENDCNT =    new DbColumn("lendcnt",   "end count",   "INT(6)",   "0");
+	public static final DbColumn SQL_TBL_MEDIAFILES_COL_DLASTPLAY = new DbColumn("dlastplay", "last played", "DATETIME", null);
+	public static final DbColumn SQL_TBL_MEDIAFILES_COL_DURATION =  new DbColumn("lduration", "duration",    "INT(6)",   "-1");
+	
+	public static final DbColumn[] SQL_TBL_MEDIAFILES_COLS2 = new DbColumn[] {
+		SQL_TBL_MEDIAFILES_COL_STARTCNT,
+		SQL_TBL_MEDIAFILES_COL_ENDCNT,
+		SQL_TBL_MEDIAFILES_COL_DLASTPLAY,
+		SQL_TBL_MEDIAFILES_COL_DURATION,
+		};
+	
+	static public DbColumn parseColumnFromName (String name) {
+		for (DbColumn c : SQL_TBL_MEDIAFILES_COLS) {
+			if (c.getName().equals(name)) {
+				return c;
+			}
+		}
+		for (DbColumn c : SQL_TBL_MEDIAFILES_COLS2) {
+			if (c.getName().equals(name)) {
+				return c;
+			}
+		}
+		throw new IllegalArgumentException("Can't parse '"+name+"'.");
+	}
 	
 	@Override
-	protected List<DbColumn> generateSqlTblMediaFilesFields() {
-		List<DbColumn> l = super.generateSqlTblMediaFilesFields();
-		
-		l.add(new DbColumn("lstartcnt", "INT(6)",   "0"));
-		l.add(new DbColumn("lendcnt",   "INT(6)",   "0"));
-		l.add(new DbColumn("dlastplay", "DATETIME", null));
-		l.add(new DbColumn("lduration", "INT(6)",   "-1"));
-		
+	protected List<DbColumn> generateSqlTblMediaFilesColumns() {
+		List<DbColumn> l = super.generateSqlTblMediaFilesColumns();
+		for (DbColumn c : SQL_TBL_MEDIAFILES_COLS2) {
+			l.add(c);
+		}
 		return l;
 	}
 	
@@ -141,10 +183,10 @@ public class LibrarySqliteLayer2 extends MediaSqliteLayer2<MediaTrack> {
 	
 	@Override
 	protected void setTFromRs(MediaTrack item, ResultSet rs) throws SQLException {
-		item.setStartCount(rs.getLong(SQL_TBL_MEDIAFILES_COL_STARTCNT));
-		item.setEndCount(rs.getLong(SQL_TBL_MEDIAFILES_COL_ENDCNT));
-		item.setDuration(rs.getInt(SQL_TBL_MEDIAFILES_COL_DURATION));
-		item.setDateLastPlayed(readDate(rs, SQL_TBL_MEDIAFILES_COL_DLASTPLAY));
+		item.setStartCount(rs.getLong(SQL_TBL_MEDIAFILES_COL_STARTCNT.getName()));
+		item.setEndCount(rs.getLong(SQL_TBL_MEDIAFILES_COL_ENDCNT.getName()));
+		item.setDuration(rs.getInt(SQL_TBL_MEDIAFILES_COL_DURATION.getName()));
+		item.setDateLastPlayed(readDate(rs, SQL_TBL_MEDIAFILES_COL_DLASTPLAY.getName()));
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

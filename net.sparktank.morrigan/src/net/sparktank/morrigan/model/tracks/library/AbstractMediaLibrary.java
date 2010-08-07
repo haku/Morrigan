@@ -6,13 +6,14 @@ import java.util.Date;
 import java.util.List;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
+import net.sparktank.morrigan.model.MediaSqliteLayer2;
+import net.sparktank.morrigan.model.MediaSqliteLayer2.DbColumn;
+import net.sparktank.morrigan.model.MediaSqliteLayer2.SortDirection;
 import net.sparktank.morrigan.model.tags.MediaTag;
 import net.sparktank.morrigan.model.tags.MediaTagClassification;
 import net.sparktank.morrigan.model.tags.MediaTagType;
 import net.sparktank.morrigan.model.tracks.MediaTrack;
 import net.sparktank.morrigan.model.tracks.MediaTrackList;
-import net.sparktank.morrigan.model.tracks.library.LibrarySqliteLayer.LibrarySort;
-import net.sparktank.morrigan.model.tracks.library.LibrarySqliteLayer.LibrarySortDirection;
 import net.sparktank.sqlitewrapper.DbException;
 
 /*
@@ -23,18 +24,18 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaTrack> {
 	
 	public static final boolean HIDEMISSING = true; // TODO link this to GUI?
 	
-	private LibrarySqliteLayer dbLayer;
-	private LibrarySort librarySort;
-	private LibrarySortDirection librarySortDirection;
+	private LibrarySqliteLayer2 dbLayer;
+	private DbColumn librarySort;
+	private SortDirection librarySortDirection;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	protected AbstractMediaLibrary (String libraryName, LibrarySqliteLayer dbLayer) {
+	protected AbstractMediaLibrary (String libraryName, LibrarySqliteLayer2 dbLayer) {
 		super(dbLayer.getDbFilePath(), libraryName);
 		this.dbLayer = dbLayer;
 		
-		this.librarySort = LibrarySort.FILE;
-		this.librarySortDirection = LibrarySortDirection.ASC;
+		this.librarySort = MediaSqliteLayer2.SQL_TBL_MEDIAFILES_COL_FILE;
+		this.librarySortDirection = SortDirection.ASC;
 	}
 	
 	@Override
@@ -50,7 +51,7 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaTrack> {
 		return this.dbLayer.getDbFilePath();
 	}
 	
-	protected LibrarySqliteLayer getDbLayer() {
+	public LibrarySqliteLayer2 getDbLayer() {
 		return this.dbLayer;
 	}
 	
@@ -143,7 +144,7 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaTrack> {
 	 */
 	public List<MediaTrack> getAllLibraryEntries () throws DbException {
 		ArrayList<MediaTrack> copyOfMainList = new ArrayList<MediaTrack>(getMediaTracks());
-		List<MediaTrack> allList = this.dbLayer.getAllMedia(LibrarySort.FILE, LibrarySortDirection.ASC, false);
+		List<MediaTrack> allList = this.dbLayer.getAllMedia(MediaSqliteLayer2.SQL_TBL_MEDIAFILES_COL_FILE, SortDirection.ASC, false);
 		updateList(copyOfMainList, allList);
 		return copyOfMainList;
 	}
@@ -155,15 +156,15 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaTrack> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Sorting.
 	
-	public LibrarySort getSort () {
+	public DbColumn getSort () {
 		return this.librarySort;
 	}
 	
-	public LibrarySortDirection getSortDirection() {
+	public SortDirection getSortDirection() {
 		return this.librarySortDirection;
 	}
 	
-	public void setSort (LibrarySort sort, LibrarySortDirection direction) throws MorriganException {
+	public void setSort (DbColumn sort, SortDirection direction) throws MorriganException {
 		this.librarySort = sort;
 		this.librarySortDirection = direction;
 		updateRead();
@@ -172,7 +173,7 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaTrack> {
 	
 	private List<SortChangeListener> _sortChangeListeners = new ArrayList<SortChangeListener>();
 	
-	private void callSortChangedListeners (LibrarySort sort, LibrarySortDirection direction) {
+	private void callSortChangedListeners (DbColumn sort, SortDirection direction) {
 		for (SortChangeListener l : this._sortChangeListeners) {
 			l.sortChanged(sort, direction);
 		}
@@ -187,7 +188,7 @@ public abstract class AbstractMediaLibrary extends MediaTrackList<MediaTrack> {
 	}
 	
 	public interface SortChangeListener {
-		public void sortChanged (LibrarySort sort, LibrarySortDirection direction);
+		public void sortChanged (DbColumn sort, SortDirection direction);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
