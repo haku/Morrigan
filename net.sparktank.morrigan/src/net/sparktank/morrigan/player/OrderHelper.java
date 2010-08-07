@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Random;
 
 import net.sparktank.morrigan.model.MediaItem;
+import net.sparktank.morrigan.model.tracks.IMediaTrackList;
 import net.sparktank.morrigan.model.tracks.MediaTrack;
-import net.sparktank.morrigan.model.tracks.MediaTrackList;
 
 public class OrderHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -62,7 +62,7 @@ public class OrderHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	// TODO take into account disabled and missing tracks.
-	public static MediaTrack getNextTrack (MediaTrackList<? extends MediaTrack> list, MediaTrack track, PlaybackOrder mode) {
+	public static MediaTrack getNextTrack (IMediaTrackList list, MediaTrack track, PlaybackOrder mode) {
 		if (list.getCount() <= 0) return null;
 		
 		switch (mode) {
@@ -86,7 +86,7 @@ public class OrderHelper {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private static MediaTrack getNextTrackSequencial (MediaTrackList<? extends MediaItem> list, MediaItem track) {
+	private static MediaTrack getNextTrackSequencial (IMediaTrackList list, MediaItem track) {
 		MediaTrack ret = null;
 		List<? extends MediaTrack> mediaTracks = list.getMediaTracks();
 		
@@ -123,7 +123,7 @@ public class OrderHelper {
 		return ret;
 	}
 	
-	private static MediaTrack getNextTrackRandom (MediaTrackList<? extends MediaItem> list, MediaItem current) {
+	private static MediaTrack getNextTrackRandom (IMediaTrackList list, MediaItem current) {
 		Random generator = new Random();
 		List<? extends MediaTrack> mediaTracks = list.getMediaTracks();
 		
@@ -148,7 +148,7 @@ public class OrderHelper {
 		throw new RuntimeException("Failed to find next track.  This should not happen.");
 	}
 	
-	private static MediaTrack getNextTrackByStartCount (MediaTrackList<? extends MediaItem> list, MediaItem current) {
+	private static MediaTrack getNextTrackByStartCount (IMediaTrackList list, MediaItem current) {
 		MediaTrack ret = null;
 		List<? extends MediaTrack> tracks = list.getMediaTracks();
 		
@@ -194,7 +194,7 @@ public class OrderHelper {
 		return ret;
 	}
 	
-	private static MediaTrack getNextTrackByLastPlayedDate (MediaTrackList<? extends MediaTrack> list, MediaTrack current) {
+	private static MediaTrack getNextTrackByLastPlayedDate (IMediaTrackList list, MediaTrack current) {
 		MediaTrack ret = null;
 		List<? extends MediaTrack> tracks = list.getMediaTracks();
 		Date now = new Date();

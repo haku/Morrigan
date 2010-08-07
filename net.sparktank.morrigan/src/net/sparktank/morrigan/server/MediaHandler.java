@@ -166,7 +166,7 @@ public class MediaHandler extends AbstractHandler {
 	
 	//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private boolean scheduleLibScan (final LocalMediaLibrary ml) throws DbException {
+	private boolean scheduleLibScan (final LocalMediaLibrary ml) {
 		final LocalLibraryUpdateTask task = LocalLibraryUpdateTask.FACTORY.manufacture(ml);
 		if (task != null) {
 			
@@ -180,10 +180,10 @@ public class MediaHandler extends AbstractHandler {
 			System.err.println("Scan of " + ml.getListId() + " scheduled on thread " + t.getId() + ".");
 			return true;
 			
-		} else {
-			System.err.println("Failed to get task object from factory method.");
-			return false;
 		}
+		
+		System.err.println("Failed to get task object from factory method.");
+		return false;
 	}
 	
 	static class LibScanMon implements TaskEventListener {
@@ -215,33 +215,33 @@ public class MediaHandler extends AbstractHandler {
 		}
 		
 		@Override
-		public void onStart() {}
+		public void onStart() {/* UNUSED */}
 		
 		@Override
 		public void beginTask(String name, int totalWork) {
 			this.totalWork = totalWork;
-			System.out.println("[" + logPrefix + "] starting task: " + name + ".");
+			System.out.println("[" + this.logPrefix + "] starting task: " + name + ".");
 		}
 		
 		@Override
 		public void done() {
-			System.out.println("[" + logPrefix + "] done.");
+			System.out.println("[" + this.logPrefix + "] done.");
 		}
 		
 		@Override
 		public void subTask(String name) {
-			System.out.println("[" + logPrefix + "] sub task: "+name+".");
+			System.out.println("[" + this.logPrefix + "] sub task: "+name+".");
 		}
 		
 		@Override
 		public boolean isCanceled() {
-			return canceled;
+			return this.canceled;
 		}
 		
 		@Override
 		public void worked(int work) {
-			workDone = workDone + work;
-			System.out.println("[" + logPrefix + "] worked " + workDone + " of " + totalWork + ".");
+			this.workDone = this.workDone + work;
+			System.out.println("[" + this.logPrefix + "] worked " + this.workDone + " of " + this.totalWork + ".");
 		}
 		
 	}

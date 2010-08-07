@@ -12,11 +12,7 @@ import java.util.Map;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.FileHelper;
 
-public abstract class MediaItemList<T extends MediaItem> {
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	public enum DirtyState { CLEAN, DIRTY, METADATA };
-	
+public abstract class MediaItemList<T extends MediaItem> implements IMediaItemList<T> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors and parameters.
 	
@@ -43,6 +39,7 @@ public abstract class MediaItemList<T extends MediaItem> {
 	/**
 	 * A unique identifier.
 	 */
+	@Override
 	public String getListId () {
 		return this.listId;
 	}
@@ -51,14 +48,17 @@ public abstract class MediaItemList<T extends MediaItem> {
 	 * A human readable name for the GUI.
 	 * @return
 	 */
+	@Override
 	public String getListName () {
 		return this.listName;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	@Override
 	abstract public String getType ();
 	
+	@Override
 	abstract public String getSerial ();
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -70,7 +70,7 @@ public abstract class MediaItemList<T extends MediaItem> {
 	
 	abstract public boolean isCanBeDirty (); 
 	
-	protected void setDirtyState (DirtyState state) {
+	public void setDirtyState (DirtyState state) {
 		if (isCanBeDirty()) {
 			// Changed?  Priority order - don't drop back down.
 			boolean changed = false;
@@ -96,22 +96,27 @@ public abstract class MediaItemList<T extends MediaItem> {
 		}
 	}
 	
+	@Override
 	public DirtyState getDirtyState () {
 		return this.dirtyState;
 	}
 	
+	@Override
 	public void addDirtyChangeEvent (Runnable r) {
 		this.dirtyChangeEvents.add(r);
 	}
 	
+	@Override
 	public void removeDirtyChangeEvent (Runnable r) {
 		this.dirtyChangeEvents.remove(r);
 	}
 	
+	@Override
 	public void addChangeEvent (Runnable r) {
 		this.changeEvents.add(r);
 	}
 	
+	@Override
 	public void removeChangeEvent (Runnable r) {
 		this.changeEvents.remove(r);
 	}
@@ -120,15 +125,10 @@ public abstract class MediaItemList<T extends MediaItem> {
 	
 	abstract public boolean allowDuplicateEntries ();
 	
-	/**
-	 * This is the signal to read any source data needed.
-	 * This will be called soon after the constructor and before
-	 * any content is read.
-	 * It may be called when no work needs doing and its
-	 * up to the implemented to track this.
-	 */
+	@Override
 	abstract public void read () throws MorriganException;
 	
+	@Override
 	public int getCount () {
 		return this.mediaTracks.size();
 	}
@@ -137,6 +137,7 @@ public abstract class MediaItemList<T extends MediaItem> {
 	 * Returns an unmodifiable list of the playlist items.
 	 * @return
 	 */
+	@Override
 	public List<T> getMediaTracks() {
 		return Collections.unmodifiableList(this.mediaTracks);
 	}
@@ -170,6 +171,7 @@ public abstract class MediaItemList<T extends MediaItem> {
 		return updateList(this.mediaTracks, newTracks, false);
 	}
 	
+	@Override
 	public void addTrack (T track) {
 		if (allowDuplicateEntries() || !this.mediaTracks.contains(track)) {
 			this.mediaTracks.add(track);
@@ -180,6 +182,7 @@ public abstract class MediaItemList<T extends MediaItem> {
 	/**
 	 * @throws MorriganException  
 	 */
+	@Override
 	public void removeMediaTrack (T track) throws MorriganException {
 		this.mediaTracks.remove(track);
 		setDirtyState(DirtyState.DIRTY);
@@ -192,6 +195,7 @@ public abstract class MediaItemList<T extends MediaItem> {
 	/**
 	 * @throws MorriganException  
 	 */
+	@Override
 	public void setDateAdded (T track, Date date) throws MorriganException {
 		track.setDateAdded(date);
 		setDirtyState(DirtyState.METADATA);
@@ -200,6 +204,7 @@ public abstract class MediaItemList<T extends MediaItem> {
 	/**
 	 * @throws MorriganException  
 	 */
+	@Override
 	public void setTrackHashCode (T track, long hashcode) throws MorriganException {
 		track.setHashcode(hashcode);
 		setDirtyState(DirtyState.METADATA);
@@ -208,6 +213,7 @@ public abstract class MediaItemList<T extends MediaItem> {
 	/**
 	 * @throws MorriganException  
 	 */
+	@Override
 	public void setTrackDateLastModified (T track, Date date) throws MorriganException {
 		track.setDateLastModified(date);
 		setDirtyState(DirtyState.METADATA);
@@ -216,6 +222,7 @@ public abstract class MediaItemList<T extends MediaItem> {
 	/**
 	 * @throws MorriganException  
 	 */
+	@Override
 	public void setTrackEnabled (T track, boolean value) throws MorriganException {
 		track.setEnabled(value);
 		setDirtyState(DirtyState.METADATA);
@@ -224,6 +231,7 @@ public abstract class MediaItemList<T extends MediaItem> {
 	/**
 	 * @throws MorriganException  
 	 */
+	@Override
 	public void setTrackMissing (T track, boolean value) throws MorriganException {
 		track.setMissing(value);
 		setDirtyState(DirtyState.METADATA);
@@ -232,6 +240,7 @@ public abstract class MediaItemList<T extends MediaItem> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Actions.
 	
+	@Override
 	public void copyMediaItemFile (T mi, File targetDirectory) throws MorriganException {
 		if (!targetDirectory.isDirectory()) {
 			throw new IllegalArgumentException("targetDirectory must be a directory.");
