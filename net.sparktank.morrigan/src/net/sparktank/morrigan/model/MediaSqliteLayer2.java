@@ -167,12 +167,22 @@ public abstract class MediaSqliteLayer2<T extends MediaItem> extends MediaSqlite
 		private String defaultValue;
 		private String sqlType;
 		private final String humanName;
+		private final String sortOpts;
+		
+		public DbColumn (String name, String humanName, String sqlType, String defaultValue, String sortOpts) {
+			this.setName(name);
+			this.humanName = humanName;
+			this.setSqlType(sqlType);
+			this.setDefaultValue(defaultValue);
+			this.sortOpts = sortOpts;
+		}
 		
 		public DbColumn (String name, String humanName, String sqlType, String defaultValue) {
 			this.setName(name);
 			this.humanName = humanName;
 			this.setSqlType(sqlType);
 			this.setDefaultValue(defaultValue);
+			this.sortOpts = null;
 		}
 		
 		public void setName(String name) {
@@ -203,6 +213,10 @@ public abstract class MediaSqliteLayer2<T extends MediaItem> extends MediaSqlite
 			return this.humanName;
 		}
 		
+		public String getSortOpts() {
+			return this.sortOpts;
+		}
+		
 	}
 	
 	/* - - - - - - - - - - - - - - - -
@@ -213,7 +227,7 @@ public abstract class MediaSqliteLayer2<T extends MediaItem> extends MediaSqlite
 		"SELECT name FROM sqlite_master WHERE name='tbl_mediafiles';";
 	
 	public static final DbColumn SQL_TBL_MEDIAFILES_COL_ROWID     = new DbColumn("ROWID", null, null, null);
-	public static final DbColumn SQL_TBL_MEDIAFILES_COL_FILE      = new DbColumn("sfile",     "file path",     "VARCHAR(1000) not null collate nocase primary key", "?");
+	public static final DbColumn SQL_TBL_MEDIAFILES_COL_FILE      = new DbColumn("sfile",     "file path",     "VARCHAR(1000) not null collate nocase primary key", "?", " collate nocase");
 	public static final DbColumn SQL_TBL_MEDIAFILES_COL_HASHCODE  = new DbColumn("lmd5",      "hashcode",      "BIGINT",   null);
 	public static final DbColumn SQL_TBL_MEDIAFILES_COL_DADDED    = new DbColumn("dadded",    "date added",    "DATETIME", "?");
 	public static final DbColumn SQL_TBL_MEDIAFILES_COL_DMODIFIED = new DbColumn("dmodified", "date modified", "DATETIME", "?");
@@ -482,7 +496,11 @@ public abstract class MediaSqliteLayer2<T extends MediaItem> extends MediaSqlite
 				
 		}
 		
-		sql = sql.replace("{COL}", sort.getName()); // FIXME make file sort non-case sensitive?
+		String sortTerm = sort.getName();
+		if (sort.getSortOpts() != null) {
+			sortTerm = sortTerm.concat(sort.getSortOpts());
+		}
+		sql = sql.replace("{COL}", sortTerm);
 		
 		return sql;
 	}
