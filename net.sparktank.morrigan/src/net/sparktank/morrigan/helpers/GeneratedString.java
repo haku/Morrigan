@@ -7,6 +7,7 @@ public class GeneratedString {
 	
 	public GeneratedString () {
 		this.string = generateString();
+		System.err.println("GeneratedString='" + this.string + "'.");
 	}
 	
 	public String generateString () {

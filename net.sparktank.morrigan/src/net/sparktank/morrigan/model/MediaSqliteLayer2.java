@@ -164,9 +164,11 @@ public abstract class MediaSqliteLayer2<T extends MediaItem> extends MediaSqlite
 		private String name;
 		private String defaultValue;
 		private String sqlType;
+		private final String humanName;
 		
-		public DbColumn (String name, String sqlType, String defaultValue) {
+		public DbColumn (String name, String humanName, String sqlType, String defaultValue) {
 			this.setName(name);
+			this.humanName = humanName;
 			this.setSqlType(sqlType);
 			this.setDefaultValue(defaultValue);
 		}
@@ -186,13 +188,17 @@ public abstract class MediaSqliteLayer2<T extends MediaItem> extends MediaSqlite
 		public String getDefaultValue() {
 			return this.defaultValue;
 		}
-
+		
 		public void setSqlType(String sqlType) {
 			this.sqlType = sqlType;
 		}
-
+		
 		public String getSqlType() {
 			return this.sqlType;
+		}
+		
+		public String getHumanName() {
+			return this.humanName;
 		}
 		
 	}
@@ -204,53 +210,79 @@ public abstract class MediaSqliteLayer2<T extends MediaItem> extends MediaSqlite
 	private static final String SQL_TBL_MEDIAFILES_EXISTS = 
 		"SELECT name FROM sqlite_master WHERE name='tbl_mediafiles';";
 	
-	private static final String SQL_TBL_MEDIAFILES_COL_ROWID = "ROWID"; // sqlite automatically creates this.
-	private static final String SQL_TBL_MEDIAFILES_COL_FILE = "sfile";
-	private static final String SQL_TBL_MEDIAFILES_COL_DADDED = "dadded";
-	private static final String SQL_TBL_MEDIAFILES_COL_HASHCODE = "lmd5";
-	private static final String SQL_TBL_MEDIAFILES_COL_DMODIFIED = "dmodified";
-	private static final String SQL_TBL_MEDIAFILES_COL_ENABLED = "benabled";
-	private static final String SQL_TBL_MEDIAFILES_COL_MISSING = "bmissing";
-	private static final String SQL_TBL_MEDIAFILES_COL_REMLOC = "sremloc";
+	public static final DbColumn SQL_TBL_MEDIAFILES_COL_ROWID     = new DbColumn("ROWID", null, null, null);
+	public static final DbColumn SQL_TBL_MEDIAFILES_COL_FILE      = new DbColumn("sfile",     "file path",     "VARCHAR(1000) not null collate nocase primary key", "?");
+	public static final DbColumn SQL_TBL_MEDIAFILES_COL_HASHCODE  = new DbColumn("lmd5",      "hashcode",      "BIGINT",   null);
+	public static final DbColumn SQL_TBL_MEDIAFILES_COL_DADDED    = new DbColumn("dadded",    "date added",    "DATETIME", "?");
+	public static final DbColumn SQL_TBL_MEDIAFILES_COL_DMODIFIED = new DbColumn("dmodified", "date modified", "DATETIME", "?");
+	public static final DbColumn SQL_TBL_MEDIAFILES_COL_ENABLED   = new DbColumn("benabled",  null,            "INT(1)",   "1");
+	public static final DbColumn SQL_TBL_MEDIAFILES_COL_MISSING   = new DbColumn("bmissing",  null,            "INT(1)",   "0");
+	public static final DbColumn SQL_TBL_MEDIAFILES_COL_REMLOC    = new DbColumn("sremloc",   null,            "VARCHAR(1000) NOT NULL", "''");
 	
-	protected List<DbColumn> generateSqlTblMediaFilesFields () {
-		List<DbColumn> l = new LinkedList<DbColumn>();
-		
-		l.add(new DbColumn("sfile",     "VARCHAR(1000) not null collate nocase primary key", ""));
-		l.add(new DbColumn("lmd5",      "BIGINT",   ""));
-		l.add(new DbColumn("dadded",    "DATETIME", ""));
-		l.add(new DbColumn("dmodified", "DATETIME", ""));
-		l.add(new DbColumn("benabled",  "INT(1)",   ""));
-		l.add(new DbColumn("bmissing",  "INT(1)",   ""));
-		l.add(new DbColumn("sremloc",  "VARCHAR(1000) NOT NULL", ""));
-		
-		return l;
+	public static final DbColumn[] SQL_TBL_MEDIAFILES_COLS = new DbColumn[] {
+		SQL_TBL_MEDIAFILES_COL_FILE,
+		SQL_TBL_MEDIAFILES_COL_HASHCODE,
+		SQL_TBL_MEDIAFILES_COL_DADDED,
+		SQL_TBL_MEDIAFILES_COL_DMODIFIED,
+		SQL_TBL_MEDIAFILES_COL_ENABLED,
+		SQL_TBL_MEDIAFILES_COL_MISSING,
+		SQL_TBL_MEDIAFILES_COL_REMLOC
+		};
+	
+	static public DbColumn parseColumnFromName (String name) {
+		for (DbColumn c : SQL_TBL_MEDIAFILES_COLS) {
+			if (c.getName().equals(name)) {
+				return c;
+			}
+		}
+		throw new IllegalArgumentException();
 	}
 	
-	private List<DbColumn> tblMediaFilesFields;
-	
-	synchronized List<DbColumn> getSqlTblMediaFilesFields () {
-		if (this.tblMediaFilesFields == null) {
-			this.tblMediaFilesFields = generateSqlTblMediaFilesFields();
+	protected List<DbColumn> generateSqlTblMediaFilesColumns () {
+		List<DbColumn> l = new LinkedList<DbColumn>();
+		for (DbColumn c : SQL_TBL_MEDIAFILES_COLS) {
+			l.add(c);
 		}
-		return this.tblMediaFilesFields;
+		return l;
 	}
 	
 	private String getSqlTblMediaFilesCreate () {
 		StringBuilder sb = new StringBuilder();
-		List<DbColumn> ef = getSqlTblMediaFilesFields();
+		List<DbColumn> ef = getSqlTblMediaFilesColumns();
 		
 		sb.append("create table tbl_mediafiles(");
+		
+		boolean first = true;
 		for (DbColumn c : ef) {
+			if (first) {
+				first = false;
+			} else {
+				sb.append(",");
+			}
 			sb.append(c.getName());
 			sb.append(" ");
 			sb.append(c.getSqlType());
-			sb.append(",");
 		}
+		
 		sb.append(");");
 		
 		return sb.toString();
 	}
+	
+	private List<DbColumn> tblMediaFilesColumns;
+	
+	public List<DbColumn> getSqlTblMediaFilesColumns () {
+		return this.tblMediaFilesColumns;
+	}
+	
+	@Override
+	protected List<SqlCreateCmd> getTblCreateCmds() {
+		this.tblMediaFilesColumns = generateSqlTblMediaFilesColumns();
+		
+		List<SqlCreateCmd> l = super.getTblCreateCmds();
+		l.add(new SqlCreateCmd(SQL_TBL_MEDIAFILES_EXISTS, getSqlTblMediaFilesCreate()));
+		return l;
+	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Library queries.
@@ -259,7 +291,7 @@ public abstract class MediaSqliteLayer2<T extends MediaItem> extends MediaSqlite
 		@Override
 		public String generateString() {
 			StringBuilder sb = new StringBuilder();
-    		List<DbColumn> ef = getSqlTblMediaFilesFields();
+    		List<DbColumn> ef = getSqlTblMediaFilesColumns();
     		
     		boolean first = true;
     		for (DbColumn c : ef) {
@@ -311,34 +343,42 @@ public abstract class MediaSqliteLayer2<T extends MediaItem> extends MediaSqlite
 	private static final String SQL_TBL_MEDIAFILES_Q_EXISTS =
 		"SELECT count(*) FROM tbl_mediafiles WHERE sfile=? COLLATE NOCASE;";
 	
-	private String sqlTblMediaFilesAdd = null;
 	
-	private synchronized String getSqlTblMediaFilesAdd () {
-		if (this.sqlTblMediaFilesAdd == null) {
-    		StringBuilder sb = new StringBuilder();
-    		List<DbColumn> ef = getSqlTblMediaFilesFields();
+	private GeneratedString sqlTblMediaFilesAdd = new GeneratedString() {
+		@Override
+		public String generateString() {
+			StringBuilder sb = new StringBuilder();
+    		List<DbColumn> ef = getSqlTblMediaFilesColumns();
     		
-    		sb.append("INSERT INTO tbl_mediafiles (sfile,dadded,lstartcnt,lendcnt,dmodified,lduration,benabled,bmissing,sremloc");
+    		sb.append("INSERT INTO tbl_mediafiles (");
+    		boolean first = true;
     		for (DbColumn c : ef) {
     			if (c.getDefaultValue() != null) {
-        			sb.append(",");
+    				if (first) {
+        				first = false;
+        			} else {
+        				sb.append(",");
+        			}
         			sb.append(c.getName());
     			}
     		}
-    		sb.append(" (?,?,0,0,?,-1,1,0,''");
+    		sb.append(") VALUES (");
+    		first = true;
     		for (DbColumn c : ef) {
     			if (c.getDefaultValue() != null) {
-        			sb.append(",");
+    				if (first) {
+        				first = false;
+        			} else {
+        				sb.append(",");
+        			}
         			sb.append(c.getDefaultValue());
     			}
     		}
     		sb.append(");");
     		
-    		this.sqlTblMediaFilesAdd = sb.toString();
-		}
-		
-		return this.sqlTblMediaFilesAdd;
-	}
+    		return sb.toString();
+		};
+	};
 	
 	private static final String SQL_TBL_MEDIAFILES_REMOVE =
 		"DELETE FROM tbl_mediafiles WHERE sfile=?";
@@ -371,18 +411,6 @@ public abstract class MediaSqliteLayer2<T extends MediaItem> extends MediaSqlite
 		" WHERE sfile=?;";
 	
 	public enum SortDirection { ASC, DESC };
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Superclass methods.
-	
-	@Override
-	protected List<SqlCreateCmd> getTblCreateCmds() {
-		List<SqlCreateCmd> l = super.getTblCreateCmds();
-		
-		l.add(new SqlCreateCmd(SQL_TBL_MEDIAFILES_EXISTS, getSqlTblMediaFilesCreate()));
-		
-		return l;
-	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Media.
@@ -498,14 +526,14 @@ public abstract class MediaSqliteLayer2<T extends MediaItem> extends MediaSqlite
 		 */
 		while (rs.next()) {
 			T newItem = getNewT();
-			newItem.setFilepath(rs.getString(SQL_TBL_MEDIAFILES_COL_FILE));
-			newItem.setDateAdded(readDate(rs, SQL_TBL_MEDIAFILES_COL_DADDED));
-			newItem.setHashcode(rs.getLong(SQL_TBL_MEDIAFILES_COL_HASHCODE));
-			newItem.setDateLastModified(readDate(rs, SQL_TBL_MEDIAFILES_COL_DMODIFIED));
-			newItem.setEnabled(rs.getInt(SQL_TBL_MEDIAFILES_COL_ENABLED) != 0); // default to true.
-			newItem.setMissing(rs.getInt(SQL_TBL_MEDIAFILES_COL_MISSING) == 1); // default to false.
-			newItem.setDbRowId(rs.getLong(SQL_TBL_MEDIAFILES_COL_ROWID));
-			newItem.setRemoteLocation(rs.getString(SQL_TBL_MEDIAFILES_COL_REMLOC));
+			newItem.setFilepath(rs.getString(SQL_TBL_MEDIAFILES_COL_FILE.getName()));
+			newItem.setDateAdded(readDate(rs, SQL_TBL_MEDIAFILES_COL_DADDED.getName()));
+			newItem.setHashcode(rs.getLong(SQL_TBL_MEDIAFILES_COL_HASHCODE.getName()));
+			newItem.setDateLastModified(readDate(rs, SQL_TBL_MEDIAFILES_COL_DMODIFIED.getName()));
+			newItem.setEnabled(rs.getInt(SQL_TBL_MEDIAFILES_COL_ENABLED.getName()) != 0); // default to true.
+			newItem.setMissing(rs.getInt(SQL_TBL_MEDIAFILES_COL_MISSING.getName()) == 1); // default to false.
+			newItem.setDbRowId(rs.getLong(SQL_TBL_MEDIAFILES_COL_ROWID.getName()));
+			newItem.setRemoteLocation(rs.getString(SQL_TBL_MEDIAFILES_COL_REMLOC.getName()));
 			
 			setTFromRs(newItem, rs);
 			
@@ -526,14 +554,14 @@ public abstract class MediaSqliteLayer2<T extends MediaItem> extends MediaSqlite
 		
 		while (rs.next()) {
 			T mt = getNewT();
-			mt.setFilepath(rs.getString(SQL_TBL_MEDIAFILES_COL_FILE));
-			mt.setDateAdded(readDate(rs, SQL_TBL_MEDIAFILES_COL_DADDED));
-			mt.setHashcode(rs.getLong(SQL_TBL_MEDIAFILES_COL_HASHCODE));
-			mt.setDateLastModified(readDate(rs, SQL_TBL_MEDIAFILES_COL_DMODIFIED));
-			mt.setEnabled(rs.getInt(SQL_TBL_MEDIAFILES_COL_ENABLED) != 0); // default to true.
-			mt.setMissing(rs.getInt(SQL_TBL_MEDIAFILES_COL_MISSING) == 1); // default to false.
-			mt.setDbRowId(rs.getLong(SQL_TBL_MEDIAFILES_COL_ROWID));
-			mt.setRemoteLocation(rs.getString(SQL_TBL_MEDIAFILES_COL_REMLOC));
+			mt.setFilepath(rs.getString(SQL_TBL_MEDIAFILES_COL_FILE.getName()));
+			mt.setDateAdded(readDate(rs, SQL_TBL_MEDIAFILES_COL_DADDED.getName()));
+			mt.setHashcode(rs.getLong(SQL_TBL_MEDIAFILES_COL_HASHCODE.getName()));
+			mt.setDateLastModified(readDate(rs, SQL_TBL_MEDIAFILES_COL_DMODIFIED.getName()));
+			mt.setEnabled(rs.getInt(SQL_TBL_MEDIAFILES_COL_ENABLED.getName()) != 0); // default to true.
+			mt.setMissing(rs.getInt(SQL_TBL_MEDIAFILES_COL_MISSING.getName()) == 1); // default to false.
+			mt.setDbRowId(rs.getLong(SQL_TBL_MEDIAFILES_COL_ROWID.getName()));
+			mt.setRemoteLocation(rs.getString(SQL_TBL_MEDIAFILES_COL_REMLOC.getName()));
 			
 			setTFromRs(mt, rs);
 			
@@ -566,7 +594,7 @@ public abstract class MediaSqliteLayer2<T extends MediaItem> extends MediaSqlite
 		
 		if (n == 0) {
 			System.err.println("Adding file '" + filePath + "' to '"+getDbFilePath()+"'.");
-			ps = getDbCon().prepareStatement(getSqlTblMediaFilesAdd());
+			ps = getDbCon().prepareStatement(this.sqlTblMediaFilesAdd.toString());
 			try {
 				ps.setString(1, filePath);
 				ps.setDate(2, new java.sql.Date(new Date().getTime()));

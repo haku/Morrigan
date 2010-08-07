@@ -11,13 +11,15 @@ import net.sparktank.morrigan.gui.dialogs.RunnableDialog;
 import net.sparktank.morrigan.gui.display.DropMenuListener;
 import net.sparktank.morrigan.gui.jobs.TaskJob;
 import net.sparktank.morrigan.helpers.TimeHelper;
+import net.sparktank.morrigan.model.MediaSqliteLayer2;
+import net.sparktank.morrigan.model.MediaSqliteLayer2.DbColumn;
+import net.sparktank.morrigan.model.MediaSqliteLayer2.SortDirection;
 import net.sparktank.morrigan.model.tasks.MediaFileCopyTask;
 import net.sparktank.morrigan.model.tracks.MediaTrack;
 import net.sparktank.morrigan.model.tracks.MediaTrackList.DurationData;
 import net.sparktank.morrigan.model.tracks.library.AbstractMediaLibrary;
 import net.sparktank.morrigan.model.tracks.library.AbstractMediaLibrary.SortChangeListener;
-import net.sparktank.morrigan.model.tracks.library.LibrarySqliteLayer.LibrarySort;
-import net.sparktank.morrigan.model.tracks.library.LibrarySqliteLayer.LibrarySortDirection;
+import net.sparktank.morrigan.model.tracks.library.LibrarySqliteLayer2;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
@@ -47,7 +49,7 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> exte
 	
 	@Override
 	public void dispose() {
-		getMediaList().unregisterSortChangeListener(sortChangeListener);
+		getMediaList().unregisterSortChangeListener(this.sortChangeListener);
 		super.dispose();
 	}
 	
@@ -65,7 +67,7 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> exte
 	}
 	
 	@Override
-	public void doSave(IProgressMonitor monitor) {}
+	public void doSave(IProgressMonitor monitor) {/* NOT USED */}
 	
 	/**
 	 * There is no need for the library to
@@ -82,20 +84,15 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> exte
 	@SuppressWarnings("unchecked")
 	@Override
 	public T getMediaList () {
-		if (editorInput.getMediaList() instanceof AbstractMediaLibrary) {
-			return (T) editorInput.getMediaList();
-			
-		} else {
-			throw new IllegalArgumentException();
-		}
+		return (T) this.editorInput.getMediaList();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	GUI components.
 	
-	private List<SortAction> sortActions = new ArrayList<SortAction>();
+	List<SortAction> sortActions = new ArrayList<SortAction>();
 	
-	private Text txtFilter = null;
+	Text txtFilter = null;
 	private Button btnClearFilter = null;
 	private Button btnProperties = null;
 	
@@ -105,17 +102,21 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> exte
 	protected void createControls(Composite parent) {
 		// Dependencies.
 		
-		for (LibrarySort s : LibrarySort.values()) {
-			SortAction a = new SortAction(s, LibrarySortDirection.ASC);
-			a.setChecked(s == getMediaList().getSort());
-			sortActions.add(a);
+		List<DbColumn> cols = getMediaList().getDbLayer().getSqlTblMediaFilesColumns();
+		
+		for (DbColumn c : cols) {
+			if (c.getHumanName() != null) {
+    			SortAction a = new SortAction(c, SortDirection.ASC);
+    			a.setChecked(c == getMediaList().getSort());
+    			this.sortActions.add(a);
+			}
 		}
-		getMediaList().registerSortChangeListener(sortChangeListener);
+		getMediaList().registerSortChangeListener(this.sortChangeListener);
 		
 		// Pref menu.
-		prefMenuMgr = new MenuManager();
-		for (SortAction a : sortActions) {
-			prefMenuMgr.add(a);
+		this.prefMenuMgr = new MenuManager();
+		for (SortAction a : this.sortActions) {
+			this.prefMenuMgr.add(a);
 		}
 	}
 	
@@ -123,31 +124,31 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> exte
 	protected List<Control> populateToolbar (Composite parent) {
 		List<Control> ret = new LinkedList<Control>();
 		
-		txtFilter = new Text(parent, SWT.SINGLE | SWT.BORDER | SWT.SEARCH);
-		txtFilter.setMessage("Filter");
-		txtFilter.addListener(SWT.Modify, filterListener);
-		ret.add(txtFilter);
+		this.txtFilter = new Text(parent, SWT.SINGLE | SWT.BORDER | SWT.SEARCH);
+		this.txtFilter.setMessage("Filter");
+		this.txtFilter.addListener(SWT.Modify, this.filterListener);
+		ret.add(this.txtFilter);
 		
-		btnClearFilter = new Button(parent, SWT.PUSH);
-		btnClearFilter.setImage(getImageCache().readImage("icons/x.gif"));
-		btnClearFilter.addSelectionListener(clearFilterListener);
-		ret.add(btnClearFilter);
+		this.btnClearFilter = new Button(parent, SWT.PUSH);
+		this.btnClearFilter.setImage(getImageCache().readImage("icons/x.gif"));
+		this.btnClearFilter.addSelectionListener(this.clearFilterListener);
+		ret.add(this.btnClearFilter);
 		
-		btnProperties = new Button(parent, SWT.PUSH);
-		btnProperties.setImage(getImageCache().readImage("icons/pref.gif"));
-		btnProperties.addSelectionListener(new DropMenuListener(btnProperties, prefMenuMgr));
-		ret.add(btnProperties);
+		this.btnProperties = new Button(parent, SWT.PUSH);
+		this.btnProperties.setImage(getImageCache().readImage("icons/pref.gif"));
+		this.btnProperties.addSelectionListener(new DropMenuListener(this.btnProperties, this.prefMenuMgr));
+		ret.add(this.btnProperties);
 		
 		return ret;
 	}
 	
 	@Override
 	protected void populateContextMenu(List<IContributionItem> menu0, List<IContributionItem> menu1) {
-		menu0.add(new ActionContributionItem(copyToAction));
+		menu0.add(new ActionContributionItem(this.copyToAction));
 	}
 	
 	protected MenuManager getPrefMenuMgr () {
-		return prefMenuMgr;
+		return this.prefMenuMgr;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -155,7 +156,7 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> exte
 	
 	@Override
 	protected void listChanged () {
-		if (lblStatus.isDisposed()) return;
+		if (this.lblStatus.isDisposed()) return;
 		
 		StringBuilder sb = new StringBuilder();
 		
@@ -176,19 +177,20 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> exte
 			sb.append(" seconds.");
 		}
 		
-		lblStatus.setText(sb.toString());
+		this.lblStatus.setText(sb.toString());
 	}
 	
 	private Listener filterListener = new Listener() {
+		@Override
 		public void handleEvent(Event event) {
-			setFilterString(txtFilter.getText());
+			setFilterString(AbstractLibraryEditor.this.txtFilter.getText());
 		}
 	};
 	
 	SelectionAdapter clearFilterListener = new SelectionAdapter() {
 		@Override
 		public void widgetSelected(SelectionEvent e) {
-			txtFilter.setText("");
+			AbstractLibraryEditor.this.txtFilter.setText("");
 			setFilterString("");
 		}
 	};
@@ -203,52 +205,52 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> exte
 	
 	@Override
 	protected void onSort (TableViewer table, TableViewerColumn column, int direction) {
-		LibrarySort sort = getMediaList().getSort();
+		DbColumn sort = getMediaList().getSort();
 		MediaColumn mCol = parseMediaColumn(column.getColumn().getText());
 		switch (mCol) {
 			case FILE:
-				sort = LibrarySort.FILE;
+				sort = MediaSqliteLayer2.SQL_TBL_MEDIAFILES_COL_FILE;
 				break;
 			
 			case DADDED:
-				sort = LibrarySort.DADDED;
+				sort = MediaSqliteLayer2.SQL_TBL_MEDIAFILES_COL_DADDED;
 				break;
 				
 			case COUNTS:
-				sort = LibrarySort.STARTCNT;
+				sort = LibrarySqliteLayer2.SQL_TBL_MEDIAFILES_COL_STARTCNT;
 				break;
 				
 			case DLASTPLAY:
-				sort = LibrarySort.DLASTPLAY;
+				sort = LibrarySqliteLayer2.SQL_TBL_MEDIAFILES_COL_DLASTPLAY;
 				break;
 				
 			case HASHCODE:
-				sort = LibrarySort.HASHCODE;
+				sort = MediaSqliteLayer2.SQL_TBL_MEDIAFILES_COL_HASHCODE;
 				break;
 				
 			case DMODIFIED:
-				sort = LibrarySort.DMODIFIED;
+				sort = MediaSqliteLayer2.SQL_TBL_MEDIAFILES_COL_DMODIFIED;
 				break;
 				
 			case DURATION:
-				sort = LibrarySort.DURATION;
+				sort = LibrarySqliteLayer2.SQL_TBL_MEDIAFILES_COL_DURATION;
 				break;
 				
 			default:
 				throw new IllegalArgumentException();
 		}
 		
-		LibrarySortDirection sortDir;
+		SortDirection sortDir;
 		if (direction==SWT.UP) {
-			sortDir = LibrarySortDirection.ASC;
+			sortDir = SortDirection.ASC;
 		} else {
-			sortDir = LibrarySortDirection.DESC;
+			sortDir = SortDirection.DESC;
 		}
 		
 		setSort(sort, sortDir);
 	}
 	
-	private void setSort (LibrarySort sort, LibrarySortDirection sortDir) {
+	void setSort (DbColumn sort, SortDirection sortDir) {
 		try {
 			getMediaList().setSort(sort, sortDir);
 		} catch (MorriganException e) {
@@ -258,8 +260,8 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> exte
 	
 	private SortChangeListener sortChangeListener = new SortChangeListener () {
 		@Override
-		public void sortChanged(LibrarySort sort, LibrarySortDirection direction) {
-			for (SortAction a : sortActions) {
+		public void sortChanged(DbColumn sort, SortDirection direction) {
+			for (SortAction a : AbstractLibraryEditor.this.sortActions) {
 				boolean c = sort == a.getSort();
 				if (a.isChecked() != c) {
 					a.setChecked(c);
@@ -270,17 +272,17 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> exte
 	
 	private class SortAction extends Action {
 		
-		private final LibrarySort sort;
-		private final LibrarySortDirection sortDir;
+		private final DbColumn sort;
+		private final SortDirection sortDir;
 
-		public SortAction (LibrarySort sort, LibrarySortDirection sortDir) {
-			super("Sort by " + sort.toString(), AS_RADIO_BUTTON);
+		public SortAction (DbColumn sort, SortDirection sortDir) {
+			super("Sort by " + sort.getHumanName(), AS_RADIO_BUTTON);
 			this.sort = sort;
 			this.sortDir = sortDir;
 		}
 		
-		public LibrarySort getSort() {
-			return sort;
+		public DbColumn getSort() {
+			return this.sort;
 		}
 		
 		@Override
@@ -288,29 +290,30 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> exte
 			super.run();
 			if (isChecked()) {
 				setSortMarker(null, SWT.NONE); // FIXME send actual column / direction.
-				setSort(sort, sortDir);
-				System.out.println("sort by " + sort.toString());
+				setSort(this.sort, this.sortDir);
+				System.out.println("sort by " + this.sort.toString());
 			}
 		}
 		
 	}
 	
-	private String lastFileCopyTargetDir = null;
+	String lastFileCopyTargetDir = null;
 	
 	protected IAction copyToAction = new Action("Copy to...") {
+		@Override
 		public void run () {
 			ArrayList<MediaTrack> selectedTracks = getSelectedTracks();
 			
 			DirectoryDialog dlg = new DirectoryDialog(getSite().getShell());
 			dlg.setText("Copy Files...");
 			dlg.setMessage("Select a directory to copy files to.");
-			if (lastFileCopyTargetDir != null) {
-				dlg.setFilterPath(lastFileCopyTargetDir);
+			if (AbstractLibraryEditor.this.lastFileCopyTargetDir != null) {
+				dlg.setFilterPath(AbstractLibraryEditor.this.lastFileCopyTargetDir);
 			}
 			String dir = dlg.open();
 			
 			if (dir != null) {
-				lastFileCopyTargetDir = dir;
+				AbstractLibraryEditor.this.lastFileCopyTargetDir = dir;
 				
 				MediaFileCopyTask<MediaTrack> task = new MediaFileCopyTask<MediaTrack>(getMediaList(), selectedTracks, new File(dir));
 				TaskJob job = new TaskJob(task, getSite().getShell().getDisplay());

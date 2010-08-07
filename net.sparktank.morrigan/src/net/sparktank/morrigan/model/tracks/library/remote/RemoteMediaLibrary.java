@@ -21,7 +21,7 @@ import net.sparktank.morrigan.model.tags.MediaTagType;
 import net.sparktank.morrigan.model.tasks.TaskEventListener;
 import net.sparktank.morrigan.model.tracks.MediaTrack;
 import net.sparktank.morrigan.model.tracks.library.AbstractMediaLibrary;
-import net.sparktank.morrigan.model.tracks.library.LibrarySqliteLayer;
+import net.sparktank.morrigan.model.tracks.library.LibrarySqliteLayer2;
 import net.sparktank.morrigan.server.HttpClient;
 import net.sparktank.morrigan.server.HttpClient.IHttpStreamHandler;
 import net.sparktank.morrigan.server.feedreader.MediaListFeedParser2;
@@ -41,7 +41,7 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public RemoteMediaLibrary (String libraryName, LibrarySqliteLayer localDbLayer) throws DbException, MalformedURLException {
+	public RemoteMediaLibrary (String libraryName, LibrarySqliteLayer2 localDbLayer) throws DbException, MalformedURLException {
 		super(libraryName, localDbLayer);
 		
 		String s = localDbLayer.getProp(DBKEY_SERVERURL);
@@ -55,7 +55,7 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 		readCacheDate();
 	}
 	
-	public RemoteMediaLibrary (String libraryName, URL url, LibrarySqliteLayer localDbLayer) throws DbException {
+	public RemoteMediaLibrary (String libraryName, URL url, LibrarySqliteLayer2 localDbLayer) throws DbException {
 		super(libraryName, localDbLayer);
 		this.url = url;
 		

@@ -4,9 +4,10 @@ import java.util.List;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.MediaItemList;
+import net.sparktank.morrigan.model.MediaSqliteLayer2;
+import net.sparktank.morrigan.model.MediaSqliteLayer2.DbColumn;
+import net.sparktank.morrigan.model.MediaSqliteLayer2.SortDirection;
 import net.sparktank.morrigan.model.pictures.MediaPicture;
-import net.sparktank.morrigan.model.pictures.gallery.GallerySqliteLayer.GallerySort;
-import net.sparktank.morrigan.model.pictures.gallery.GallerySqliteLayer.GallerySortDirection;
 import net.sparktank.sqlitewrapper.DbException;
 
 /*
@@ -20,8 +21,8 @@ public class LocalGallery extends MediaItemList<MediaPicture> {
 	public static final boolean HIDEMISSING = true; // TODO link this to GUI?
 	
 	private GallerySqliteLayer dbLayer;
-	private GallerySort librarySort;
-	private GallerySortDirection librarySortDirection;
+	private DbColumn librarySort;
+	private SortDirection librarySortDirection;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -29,8 +30,8 @@ public class LocalGallery extends MediaItemList<MediaPicture> {
 		super(dbLayer.getDbFilePath(), libraryName);
 		this.dbLayer = dbLayer;
 		
-		this.librarySort = GallerySort.FILE;
-		this.librarySortDirection = GallerySortDirection.ASC;
+		this.librarySort = MediaSqliteLayer2.SQL_TBL_MEDIAFILES_COL_FILE;
+		this.librarySortDirection = SortDirection.ASC;
 	}
 	
 	@Override
