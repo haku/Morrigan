@@ -10,9 +10,6 @@ import net.sparktank.morrigan.model.MediaSqliteLayer2;
 import net.sparktank.morrigan.model.pictures.MediaPicture;
 import net.sparktank.sqlitewrapper.DbException;
 
-/*
- * TODO FIXME Extract common code between this and LibrarySqliteLayer.
- */
 public class GallerySqliteLayer extends MediaSqliteLayer2<MediaPicture> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Factory.
