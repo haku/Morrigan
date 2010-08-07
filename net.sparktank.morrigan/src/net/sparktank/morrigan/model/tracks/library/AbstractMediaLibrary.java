@@ -6,11 +6,10 @@ import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.MediaItemDb;
 import net.sparktank.morrigan.model.tracks.IMediaTrackList;
 import net.sparktank.morrigan.model.tracks.MediaTrack;
-import net.sparktank.morrigan.model.tracks.MediaTrackList;
 import net.sparktank.morrigan.model.tracks.MediaTrackListHelper;
 import net.sparktank.sqlitewrapper.DbException;
 
-public abstract class AbstractMediaLibrary extends MediaItemDb<MediaTrackList<MediaTrack>, LibrarySqliteLayer2, MediaTrack> implements IMediaTrackList<MediaTrack> {
+public abstract class AbstractMediaLibrary extends MediaItemDb<IMediaTrackList<MediaTrack>, LibrarySqliteLayer2, MediaTrack> implements IMediaTrackList<MediaTrack> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	protected AbstractMediaLibrary (String libraryName, LibrarySqliteLayer2 dbLayer) {
