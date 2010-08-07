@@ -2,13 +2,13 @@ package net.sparktank.morrigan.server;
 
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import net.sparktank.morrigan.helpers.ErrorHelper;
+import net.sparktank.morrigan.model.tracks.IMediaTrackList;
 import net.sparktank.morrigan.model.tracks.MediaTrack;
-import net.sparktank.morrigan.model.tracks.MediaTrackList;
 import net.sparktank.morrigan.model.tracks.playlist.PlayItem;
 import net.sparktank.morrigan.player.IPlayerEventHandler;
+import net.sparktank.morrigan.player.OrderHelper.PlaybackOrder;
 import net.sparktank.morrigan.player.Player;
 import net.sparktank.morrigan.player.PlayerRegister;
-import net.sparktank.morrigan.player.OrderHelper.PlaybackOrder;
 
 import org.eclipse.swt.widgets.Composite;
 
@@ -65,7 +65,7 @@ public class ServerMain {
 			return null;
 		}
 		@Override
-		public MediaTrackList<MediaTrack> getCurrentList() {
+		public IMediaTrackList<MediaTrack> getCurrentList() {
 			return null;
 		}
 		@Override

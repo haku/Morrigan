@@ -5,6 +5,7 @@ import java.util.Date;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.MediaItemList;
 
+@Deprecated
 public abstract class MediaTrackList<T extends MediaTrack> extends MediaItemList<T> implements IMediaTrackList<T> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	

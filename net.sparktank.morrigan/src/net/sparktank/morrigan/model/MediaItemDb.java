@@ -13,7 +13,7 @@ import net.sparktank.morrigan.model.tags.MediaTagClassification;
 import net.sparktank.morrigan.model.tags.MediaTagType;
 import net.sparktank.sqlitewrapper.DbException;
 
-public abstract class MediaItemDb<Q extends MediaItemList<T>, S extends MediaSqliteLayer2<T>, T extends MediaItem> extends MediaItemList<T> {
+public abstract class MediaItemDb<Q extends IMediaItemList<T>, S extends MediaSqliteLayer2<T>, T extends MediaItem> extends MediaItemList<T> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static final boolean HIDEMISSING = true; // TODO link this to GUI?
