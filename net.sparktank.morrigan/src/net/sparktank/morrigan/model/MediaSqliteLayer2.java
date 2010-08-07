@@ -15,8 +15,10 @@ import java.util.Map;
 import net.sparktank.morrigan.helpers.GeneratedString;
 import net.sparktank.sqlitewrapper.DbException;
 
-/*
- * TODO FIXME Extract common code between this and GallerySqliteLayer.
+/**
+ * This class sits on top of MediaSqliteLayer and does all the hard work of making
+ * tbl_mediafiles generic.  Subclasses can then worry about the custom fields
+ * they wish to add.
  */
 public abstract class MediaSqliteLayer2<T extends MediaItem> extends MediaSqliteLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

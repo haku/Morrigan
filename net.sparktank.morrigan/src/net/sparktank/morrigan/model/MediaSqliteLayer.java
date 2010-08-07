@@ -15,9 +15,6 @@ import net.sparktank.morrigan.model.tags.MediaTagType;
 import net.sparktank.sqlitewrapper.DbException;
 import net.sparktank.sqlitewrapper.GenericSqliteLayer;
 
-/*
- * TODO Refactor to be DbSqliteLayer ?
- */
 public abstract class MediaSqliteLayer extends GenericSqliteLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors.
