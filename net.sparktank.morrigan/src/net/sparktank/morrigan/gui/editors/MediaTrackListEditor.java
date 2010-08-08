@@ -47,24 +47,35 @@ import org.eclipse.ui.handlers.IHandlerService;
 
 public abstract class MediaTrackListEditor<T extends IMediaTrackList<S>, S extends MediaTrack> extends MediaItemListEditor<T, S> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Constants and Enums.
+//	Column definitions.
 	
-	public enum MediaColumn { 
-		FILE       {@Override public String toString() { return "file";        } }, 
-		COUNTS     {@Override public String toString() { return "counts";      } },
-		DADDED     {@Override public String toString() { return "added";       } },
-		DLASTPLAY  {@Override public String toString() { return "last played"; } },
-		HASHCODE   {@Override public String toString() { return "hash";        } },
-		DMODIFIED  {@Override public String toString() { return "modified";    } },
-		DURATION   {@Override public String toString() { return "duration";    } }
-		}
+	public static final MediaColumn COL_FILE = new MediaColumn("file");
+	public static final MediaColumn COL_COUNTS = new MediaColumn("counts");
+	public static final MediaColumn COL_ADDED = new MediaColumn("added");
+	public static final MediaColumn COL_LASTPLAYED = new MediaColumn("last played");
+	public static final MediaColumn COL_HASH = new MediaColumn("hash");
+	public static final MediaColumn COL_MODIFIED = new MediaColumn("modified");
+	public static final MediaColumn COL_DURATION = new MediaColumn("duration");
 	
-	public static MediaColumn parseMediaColumn (String s) {
-		for (MediaColumn o : MediaColumn.values()) {
-			if (s.equals(o.toString())) return o;
+	public static final MediaColumn[] COLS = new MediaColumn[] {
+		COL_FILE,
+		COL_COUNTS,
+		COL_ADDED,
+		COL_LASTPLAYED,
+		COL_HASH,
+		COL_MODIFIED,
+		COL_DURATION
+	};
+	
+	@Override
+	protected List<MediaColumn> getColumns() {
+		List<MediaColumn> l = new LinkedList<MediaColumn>();
+		for (MediaColumn c : COLS) {
+			l.add(c);
 		}
-		throw new IllegalArgumentException();
+		return l;
 	}
+	
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Controls.
@@ -108,57 +119,46 @@ public abstract class MediaTrackListEditor<T extends IMediaTrackList<S>, S exten
 		tableComposite.setLayout(layout);
 		
 		// add and configure columns.
-		MediaColumn[] titles = MediaColumn.values();
-		
-		for (int i = 0; i < titles.length; i++) {
-			if (MediaListPref.getColPref(titles[i])) {
+		for (MediaColumn mCol : COLS) {
+			if (MediaListPref.getColPref(mCol)) {
 				final TableViewerColumn column = new TableViewerColumn(this.editTable, SWT.NONE);
 				
-				switch (titles[i]) {
-					case FILE:
-						layout.setColumnData(column.getColumn(), new ColumnWeightData(100));
-						column.setLabelProvider(new FileLblProv(this.imageCache));
-						break;
-					
-					case DADDED:
-						layout.setColumnData(column.getColumn(), new ColumnPixelData(140, true, true));
-						column.setLabelProvider(new DateAddedLblProv());
-						break;
-						
-					case COUNTS:
-						layout.setColumnData(column.getColumn(), new ColumnPixelData(70, true, true));
-						column.setLabelProvider(new CountsLblProv());
-						column.getColumn().setAlignment(SWT.CENTER);
-						break;
-						
-					case DLASTPLAY:
-						layout.setColumnData(column.getColumn(), new ColumnPixelData(140, true, true));
-						column.setLabelProvider(new DateLastPlayerLblProv());
-						break;
-						
-					case HASHCODE:
-						layout.setColumnData(column.getColumn(), new ColumnPixelData(90, true, true));
-						column.setLabelProvider(new HashcodeLblProv());
-						column.getColumn().setAlignment(SWT.CENTER);
-						break;
-						
-					case DMODIFIED:
-						layout.setColumnData(column.getColumn(), new ColumnPixelData(140, true, true));
-						column.setLabelProvider(new DateLastModifiedLblProv());
-						break;
-						
-					case DURATION:
-						layout.setColumnData(column.getColumn(), new ColumnPixelData(60, true, true));
-						column.setLabelProvider(new DurationLblProv());
-						column.getColumn().setAlignment(SWT.RIGHT);
-						break;
-					
-					default:
-						throw new IllegalArgumentException();
-					
+				if (mCol == COL_FILE) {
+					layout.setColumnData(column.getColumn(), new ColumnWeightData(100));
+					column.setLabelProvider(new FileLblProv(this.imageCache));
+				}
+				else if (mCol == COL_ADDED) {
+					layout.setColumnData(column.getColumn(), new ColumnPixelData(140, true, true));
+					column.setLabelProvider(new DateAddedLblProv());
+				}
+				else if (mCol == COL_COUNTS) {
+					layout.setColumnData(column.getColumn(), new ColumnPixelData(70, true, true));
+					column.setLabelProvider(new CountsLblProv());
+					column.getColumn().setAlignment(SWT.CENTER);
+				}
+				else if (mCol == COL_LASTPLAYED) {
+					layout.setColumnData(column.getColumn(), new ColumnPixelData(140, true, true));
+					column.setLabelProvider(new DateLastPlayerLblProv());
+				}
+				else if (mCol == COL_HASH) {
+					layout.setColumnData(column.getColumn(), new ColumnPixelData(90, true, true));
+					column.setLabelProvider(new HashcodeLblProv());
+					column.getColumn().setAlignment(SWT.CENTER);
+				}
+				else if (mCol == COL_MODIFIED) {
+					layout.setColumnData(column.getColumn(), new ColumnPixelData(140, true, true));
+					column.setLabelProvider(new DateLastModifiedLblProv());
+				}
+				else if (mCol == COL_DURATION) {
+					layout.setColumnData(column.getColumn(), new ColumnPixelData(60, true, true));
+					column.setLabelProvider(new DurationLblProv());
+					column.getColumn().setAlignment(SWT.RIGHT);
+				}
+				else {
+					throw new IllegalArgumentException();
 				}
 				
-				column.getColumn().setText(titles[i].toString());
+				column.getColumn().setText(mCol.toString());
 				column.getColumn().setResizable(true);
 				column.getColumn().setMoveable(true);
 				

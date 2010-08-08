@@ -1,7 +1,8 @@
 package net.sparktank.morrigan.gui.preferences;
 
 import net.sparktank.morrigan.gui.Activator;
-import net.sparktank.morrigan.gui.editors.MediaTrackListEditor.MediaColumn;
+import net.sparktank.morrigan.gui.editors.MediaItemListEditor.MediaColumn;
+import net.sparktank.morrigan.gui.editors.MediaTrackListEditor;
 
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
@@ -22,6 +23,7 @@ public class MediaListPref extends FieldEditorPreferencePage implements IWorkben
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	@Override
 	public void createFieldEditors() {
 		addField(new BooleanFieldEditor(PREF_SHOWHEADER, "Show column headers", getFieldEditorParent()));
 		addField(new BooleanFieldEditor(PREF_COL_COUNTS, "Show counts column", getFieldEditorParent()));
@@ -45,27 +47,26 @@ public class MediaListPref extends FieldEditorPreferencePage implements IWorkben
 	}
 	
 	public static boolean getColPref (MediaColumn column) {
-		switch (column) {
-			case DADDED:
-				return Activator.getDefault().getPreferenceStore().getBoolean(PREF_COL_DADDED);
-				
-			case COUNTS:
-				return Activator.getDefault().getPreferenceStore().getBoolean(PREF_COL_COUNTS);
-			
-			case DLASTPLAY:
-				return Activator.getDefault().getPreferenceStore().getBoolean(PREF_COL_DLASTPLAY);
-				
-			case HASHCODE:
-				return Activator.getDefault().getPreferenceStore().getBoolean(PREF_COL_HASHCODE);
-				
-			case DMODIFIED:
-				return Activator.getDefault().getPreferenceStore().getBoolean(PREF_COL_DMODIFIED);
-				
-			case DURATION:
-				return Activator.getDefault().getPreferenceStore().getBoolean(PREF_COL_DURATION);
-				
-			default:
-				return true;
+		if (column == MediaTrackListEditor.COL_FILE) {
+			return Activator.getDefault().getPreferenceStore().getBoolean(PREF_COL_DADDED);
+		}
+		else if (column == MediaTrackListEditor.COL_COUNTS) {
+			return Activator.getDefault().getPreferenceStore().getBoolean(PREF_COL_COUNTS);
+		}
+		else if (column == MediaTrackListEditor.COL_LASTPLAYED) {
+			return Activator.getDefault().getPreferenceStore().getBoolean(PREF_COL_DLASTPLAY);
+		}
+		else if (column == MediaTrackListEditor.COL_HASH) {
+			return Activator.getDefault().getPreferenceStore().getBoolean(PREF_COL_HASHCODE);
+		}
+		else if (column == MediaTrackListEditor.COL_MODIFIED) {
+			return Activator.getDefault().getPreferenceStore().getBoolean(PREF_COL_DMODIFIED);
+		}
+		else if (column == MediaTrackListEditor.COL_DURATION) {
+			return Activator.getDefault().getPreferenceStore().getBoolean(PREF_COL_DURATION);
+		}
+		else {
+			return true;
 		}
 	}
 	
