@@ -118,12 +118,21 @@
             id="net.sparktank.morrigan.gui.editors.LocalLibraryEditor"
             name="LocalLibraryEditor" >
       </editor>
+      
       <editor
             class="net.sparktank.morrigan.gui.editors.tracks.RemoteLibraryEditor"
             default="false"
             icon="icons/library-remote.gif"
             id="net.sparktank.morrigan.gui.editors.RemoteLibraryEditor"
             name="RemoteLibraryEditor">
+      </editor>
+      
+      <editor
+            class="net.sparktank.morrigan.gui.editors.pictures.LocalGalleryEditor"
+            default="false"
+            icon="icons/library.gif"
+            id="net.sparktank.morrigan.gui.editors.LocalGalleryEditor"
+            name="LocalGalleryEditor" >
       </editor>
       
    </extension>

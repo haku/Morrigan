@@ -3,6 +3,8 @@ package net.sparktank.morrigan.gui.editors;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.DbColumn;
 import net.sparktank.morrigan.model.MediaSqliteLayer2.SortDirection;
+import net.sparktank.morrigan.model.pictures.MediaPictureListFactory;
+import net.sparktank.morrigan.model.pictures.gallery.LocalGallery;
 import net.sparktank.morrigan.model.tracks.MediaTrackListFactory;
 import net.sparktank.morrigan.model.tracks.library.LibrarySqliteLayer2;
 import net.sparktank.morrigan.model.tracks.library.local.LocalMediaLibrary;
@@ -139,9 +141,32 @@ public class EditorFactory implements IElementFactory {
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Local Galleries.
 	
-	public static MediaItemDbEditorInput getGalleryInput(String dbPath) {
-		throw new RuntimeException("Not implemented.");
+	public static MediaItemDbEditorInput getGalleryInput(String dbFilePath) throws MorriganException {
+		LocalGallery l;
+		
+		try {
+			l = MediaPictureListFactory.LOCAL_GALLERY_FACTORY.manufacture(dbFilePath);
+		} catch (DbException e) {
+			throw new MorriganException(e);
+		}
+		
+		MediaItemDbEditorInput input = new MediaItemDbEditorInput(l);
+		return input;
+	}
+	
+	public static MediaItemDbEditorInput getGalleryInput (IMemento memento) throws MorriganException {
+		String dbFilePath = memento.getString(KEY_SERIAL);
+		MediaItemDbEditorInput input = getGalleryInput(dbFilePath);
+		
+		String sortcol = memento.getString(KEY_LIB_SORTCOL);
+		String sortdir = memento.getString(KEY_LIB_SORTDIR);
+		if (sortcol != null && sortdir != null) {
+			// TODO parse sort data.
+		}
+		
+		return input;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
