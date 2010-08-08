@@ -58,11 +58,11 @@ public class HotkeyPref extends PreferencePage implements IWorkbenchPreferencePa
 	private void initialize () {
 		try {
 			
-			hkShowhide.setValue(getHkShowHide());
-			hkStop.setValue(getHkStop());
-			hkPlaypause.setValue(getHkPlaypause());
-			hkNext.setValue(getHkNext());
-			hkJumpto.setValue(getHkJumpto());
+			this.hkShowhide.setValue(getHkShowHide());
+			this.hkStop.setValue(getHkStop());
+			this.hkPlaypause.setValue(getHkPlaypause());
+			this.hkNext.setValue(getHkNext());
+			this.hkJumpto.setValue(getHkJumpto());
 			
 		} catch (Exception e) {
 			new MorriganMsgDlg(e).open();
@@ -71,35 +71,35 @@ public class HotkeyPref extends PreferencePage implements IWorkbenchPreferencePa
 	
 	@Override
 	public boolean performOk () {
-		HotkeyValue hkShowhideValue = hkShowhide.getValue();
+		HotkeyValue hkShowhideValue = this.hkShowhide.getValue();
 		if (hkShowhideValue!=null) {
 			getPreferenceStore().setValue(PREF_HK_SHOWHIDE, hkShowhideValue.serialise());
 		} else {
 			getPreferenceStore().setValue(PREF_HK_SHOWHIDE, "");
 		}
 		
-		HotkeyValue hkStopValue = hkStop.getValue();
+		HotkeyValue hkStopValue = this.hkStop.getValue();
 		if (hkStopValue!=null) {
 			getPreferenceStore().setValue(PREF_HK_STOP, hkStopValue.serialise());
 		} else {
 			getPreferenceStore().setValue(PREF_HK_STOP, "");
 		}
 		
-		HotkeyValue hkPlaypauseValue = hkPlaypause.getValue();
+		HotkeyValue hkPlaypauseValue = this.hkPlaypause.getValue();
 		if (hkPlaypauseValue!=null) {
 			getPreferenceStore().setValue(PREF_HK_PLAYPAUSE, hkPlaypauseValue.serialise());
 		} else {
 			getPreferenceStore().setValue(PREF_HK_PLAYPAUSE, "");
 		}
 		
-		HotkeyValue hkNextValue = hkNext.getValue();
+		HotkeyValue hkNextValue = this.hkNext.getValue();
 		if (hkNextValue!=null) {
 			getPreferenceStore().setValue(PREF_HK_NEXT, hkNextValue.serialise());
 		} else {
 			getPreferenceStore().setValue(PREF_HK_NEXT, "");
 		}
 		
-		HotkeyValue hkJumptoValue = hkJumpto.getValue();
+		HotkeyValue hkJumptoValue = this.hkJumpto.getValue();
 		if (hkJumptoValue!=null) {
 			getPreferenceStore().setValue(PREF_HK_JUMPTO, hkJumptoValue.serialise());
 		} else {
@@ -136,11 +136,11 @@ public class HotkeyPref extends PreferencePage implements IWorkbenchPreferencePa
 		layout.verticalSpacing = convertVerticalDLUsToPixels(IDialogConstants.VERTICAL_SPACING);
 		composite.setLayout(layout);
 		
-		hkShowhide = new HotkeyChooser(composite, "Show / hide windows");
-		hkStop = new HotkeyChooser(composite, "stop");
-		hkPlaypause = new HotkeyChooser(composite, "play / pause");
-		hkNext = new HotkeyChooser(composite, "next");
-		hkJumpto = new HotkeyChooser(composite, "jump to");
+		this.hkShowhide = new HotkeyChooser(composite, "Show / hide windows");
+		this.hkStop = new HotkeyChooser(composite, "stop");
+		this.hkPlaypause = new HotkeyChooser(composite, "play / pause");
+		this.hkNext = new HotkeyChooser(composite, "next");
+		this.hkJumpto = new HotkeyChooser(composite, "jump to");
 		
 		applyDialogFont(composite);
 		return composite;
@@ -166,28 +166,28 @@ public class HotkeyPref extends PreferencePage implements IWorkbenchPreferencePa
 			Label label = new Label (group, SWT.NONE);
 			label.setText("key");
 			
-			cmbKey = new Combo (group, SWT.READ_ONLY);
+			this.cmbKey = new Combo (group, SWT.READ_ONLY);
 			String[] keys = HotkeyKeys.HkKeys.values().toArray(new String[HotkeyKeys.HkKeys.values().size()]);
 			Arrays.sort(keys);
-			cmbKey.setItems(keys);
+			this.cmbKey.setItems(keys);
 			
-			chkCtrl  = makeCheckBox(group, "ctrl",  false);
-			chkShift = makeCheckBox(group, "shift", false);
-			chkAlt   = makeCheckBox(group, "alt",   false);
-			chkSupr  = makeCheckBox(group, "super", false);
+			this.chkCtrl  = makeCheckBox(group, "ctrl",  false);
+			this.chkShift = makeCheckBox(group, "shift", false);
+			this.chkAlt   = makeCheckBox(group, "alt",   false);
+			this.chkSupr  = makeCheckBox(group, "super", false);
 		}
 		
 		public HotkeyValue getValue () {
-			if (cmbKey.getSelectionIndex() < 0) return null;
+			if (this.cmbKey.getSelectionIndex() < 0) return null;
 			
-			if (!chkCtrl.getSelection()
-				&& !chkShift.getSelection()
-				&& !chkAlt.getSelection()
-				&& !chkSupr.getSelection()
+			if (!this.chkCtrl.getSelection()
+				&& !this.chkShift.getSelection()
+				&& !this.chkAlt.getSelection()
+				&& !this.chkSupr.getSelection()
 				) return null;
 			
 			Integer selKey = -1;
-			String selKeyName = cmbKey.getItem(cmbKey.getSelectionIndex());
+			String selKeyName = this.cmbKey.getItem(this.cmbKey.getSelectionIndex());
 			for (Integer i : HotkeyKeys.HkKeys.keySet()) {
 				if (HotkeyKeys.HkKeys.get(i).equals(selKeyName)) {
 					selKey = i;
@@ -199,33 +199,33 @@ public class HotkeyPref extends PreferencePage implements IWorkbenchPreferencePa
 			
 			return new HotkeyValue(
 					selKey,
-					chkCtrl.getSelection(),
-					chkShift.getSelection(),
-					chkAlt.getSelection(),
-					chkSupr.getSelection()
+					this.chkCtrl.getSelection(),
+					this.chkShift.getSelection(),
+					this.chkAlt.getSelection(),
+					this.chkSupr.getSelection()
 					);
 		}
 		
 		public void setValue (HotkeyValue value) {
 			if (value == null) {
-				cmbKey.setText("");
-				chkCtrl.setSelection(false);
-				chkShift.setSelection(false);
-				chkAlt.setSelection(false);
-				chkSupr.setSelection(false);
+				this.cmbKey.setText("");
+				this.chkCtrl.setSelection(false);
+				this.chkShift.setSelection(false);
+				this.chkAlt.setSelection(false);
+				this.chkSupr.setSelection(false);
 				
 			} else {
-				cmbKey.setText(HotkeyKeys.HkKeys.get(value.getKey()));
-				chkCtrl.setSelection(value.getCtrl());
-				chkShift.setSelection(value.getShift());
-				chkAlt.setSelection(value.getAlt());
-				chkSupr.setSelection(value.getSupr());
+				this.cmbKey.setText(HotkeyKeys.HkKeys.get(value.getKey()));
+				this.chkCtrl.setSelection(value.getCtrl());
+				this.chkShift.setSelection(value.getShift());
+				this.chkAlt.setSelection(value.getAlt());
+				this.chkSupr.setSelection(value.getSupr());
 			}
 		}
 		
 	}
 	
-	private Button makeCheckBox (Composite composite, String text, boolean value) {
+	Button makeCheckBox (Composite composite, String text, boolean value) {
 		Button button = new Button(composite, SWT.CHECK);
 		button.setText(text);
 		button.setSelection(value);
@@ -238,9 +238,9 @@ public class HotkeyPref extends PreferencePage implements IWorkbenchPreferencePa
 		String s = Activator.getDefault().getPreferenceStore().getString(key);
 		if (s != null && s.length() > 0) {
 			return new HotkeyValue(s);
-		} else {
-			return null;
 		}
+		
+		return null;
 	}
 	
 	static public HotkeyValue getHkShowHide () {
