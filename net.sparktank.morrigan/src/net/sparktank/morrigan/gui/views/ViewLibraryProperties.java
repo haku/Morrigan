@@ -6,8 +6,9 @@ import java.util.List;
 import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.actions.LibraryUpdateAction;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
-import net.sparktank.morrigan.gui.editors.tracks.AbstractLibraryEditor;
-import net.sparktank.morrigan.model.tracks.library.local.LocalMediaLibrary;
+import net.sparktank.morrigan.gui.editors.pictures.LocalGalleryEditor;
+import net.sparktank.morrigan.gui.editors.tracks.LocalLibraryEditor;
+import net.sparktank.morrigan.model.MediaItemDb;
 import net.sparktank.sqlitewrapper.DbException;
 
 import org.eclipse.jface.action.Action;
@@ -17,6 +18,7 @@ import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DirectoryDialog;
@@ -36,19 +38,19 @@ public class ViewLibraryProperties extends ViewPart {
 		createLayout(parent);
 		addToolbar();
 		
-		getViewSite().getPage().addPartListener(partListener);
+		getViewSite().getPage().addPartListener(this.partListener);
 		
-		listChange.run();
+		this.listChange.run();
 	}
 	
 	@Override
 	public void setFocus() {
-		tableViewer.getTable().setFocus();
+		this.tableViewer.getTable().setFocus();
 	}
 	
 	@Override
 	public void dispose() {
-		getViewSite().getPage().removePartListener(partListener);
+		getViewSite().getPage().removePartListener(this.partListener);
 		setContent(null, false);
 		super.dispose();
 	}
@@ -58,51 +60,61 @@ public class ViewLibraryProperties extends ViewPart {
 	private IPartListener partListener = new IPartListener() {
 		@Override
 		public void partActivated(IWorkbenchPart part) {
-			if (part instanceof AbstractLibraryEditor<?>) {
-				AbstractLibraryEditor<?> libEditor = (AbstractLibraryEditor<?>) part;
-				// FIXME don't do this like this?
-				if (libEditor.getMediaList() instanceof LocalMediaLibrary) {
-					LocalMediaLibrary ml = (LocalMediaLibrary) libEditor.getMediaList();
-					setContent(ml);
-				}
+			MediaItemDb<?,?,?> ml = null;
+			
+			/*
+			 * At the moment this checks the supported editors directly.
+			 * TODO Is there a good way to make this more abstract?
+			 */
+			if (part instanceof LocalLibraryEditor) {
+				LocalLibraryEditor e = (LocalLibraryEditor) part;
+				ml = e.getMediaList();
+			}
+			else if (part instanceof LocalGalleryEditor) {
+				LocalGalleryEditor e = (LocalGalleryEditor) part;
+				ml = e.getMediaList();
+			}
+			
+			if (ml != null) {
+				setContent(ml);
 			}
 		}
 		
 		@Override
-		public void partOpened(IWorkbenchPart part) {}
+		public void partOpened(IWorkbenchPart part) {/* UNUSED */}
 		@Override
-		public void partDeactivated(IWorkbenchPart part) {}
+		public void partDeactivated(IWorkbenchPart part) {/* UNUSED */}
 		@Override
-		public void partClosed(IWorkbenchPart part) {}
+		public void partClosed(IWorkbenchPart part) {/* UNUSED */}
 		@Override
-		public void partBroughtToTop(IWorkbenchPart part) {}
+		public void partBroughtToTop(IWorkbenchPart part) {/* UNUSED */}
 	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private LocalMediaLibrary library;
-	private LibraryUpdateAction libraryUpdateAction = new LibraryUpdateAction();
+	MediaItemDb<?,?,?> library;
+	LibraryUpdateAction libraryUpdateAction = new LibraryUpdateAction();
 	
-	public void setContent (LocalMediaLibrary library) {
+	public void setContent (MediaItemDb<?,?,?> library) {
 		setContent(library, true);
 	}
 	
-	public void setContent (LocalMediaLibrary library, boolean updateGui) {
+	public void setContent (MediaItemDb<?,?,?> library, boolean updateGui) {
 		if (this.library == library) return;
 		
 		if (this.library!=null) {
-			this.library.removeChangeEvent(listChange);
+			this.library.removeChangeEvent(this.listChange);
 		}
 		
 		this.library = library;
 		
 		if (this.library!=null) {
-			this.library.addChangeEvent(listChange);
+			this.library.addChangeEvent(this.listChange);
 		}
 		
-		libraryUpdateAction.setMediaLibrary(this.library);
+		this.libraryUpdateAction.setMediaLibrary(this.library);
 		
-		if (updateGui) listChange.run();
+		if (updateGui) this.listChange.run();
 	}
 	
 	public void showAddDlg (boolean promptScan) {
@@ -112,19 +124,19 @@ public class ViewLibraryProperties extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	GUI stuff.
 	
-	private TableViewer tableViewer;
+	TableViewer tableViewer;
 	
 	private void createLayout (Composite parent) {
-		tableViewer = new TableViewer(parent, SWT.MULTI | SWT.V_SCROLL | SWT.FULL_SELECTION);
-		tableViewer.setContentProvider(sourcesProvider);
-		tableViewer.setInput(getViewSite()); // use content provider.
-		getSite().setSelectionProvider(tableViewer);
+		this.tableViewer = new TableViewer(parent, SWT.MULTI | SWT.V_SCROLL | SWT.FULL_SELECTION);
+		this.tableViewer.setContentProvider(this.sourcesProvider);
+		this.tableViewer.setInput(getViewSite()); // use content provider.
+		getSite().setSelectionProvider(this.tableViewer);
 	}
 	
 	private void addToolbar () {
 		getViewSite().getActionBars().getToolBarManager().add(new AddAction());
-		getViewSite().getActionBars().getToolBarManager().add(removeAction);
-		getViewSite().getActionBars().getToolBarManager().add(libraryUpdateAction);
+		getViewSite().getActionBars().getToolBarManager().add(this.removeAction);
+		getViewSite().getActionBars().getToolBarManager().add(this.libraryUpdateAction);
 	}
 	
 	private IStructuredContentProvider sourcesProvider = new IStructuredContentProvider() {
@@ -133,33 +145,33 @@ public class ViewLibraryProperties extends ViewPart {
 		public Object[] getElements(Object inputElement) {
 			List<String> sources = null;
 			
-			if (library!=null) {
+			if (ViewLibraryProperties.this.library!=null) {
 				try {
-					sources = library.getSources();
+					sources = ViewLibraryProperties.this.library.getSources();
 				} catch (DbException e) {
 					new MorriganMsgDlg(e).open();
 				}
 				
 				if (sources != null) {
 					return sources.toArray();
-				} else {
-					return new String[]{};
 				}
 				
-			} else {
 				return new String[]{};
+				
 			}
+			
+			return new String[]{};
 		}
 		
 		@Override
-		public void dispose() {}
+		public void dispose() {/* UNUSED */}
 		@Override
-		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {/* UNUSED */}
 		
 	};
 	
-	private ArrayList<String> getSelectedSources () {
-		ISelection selection = tableViewer.getSelection();
+	ArrayList<String> getSelectedSources () {
+		ISelection selection = this.tableViewer.getSelection();
 		
 		if (selection==null) return null;
 		if (selection.isEmpty()) return null;
@@ -185,35 +197,36 @@ public class ViewLibraryProperties extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Events.
 	
-	private volatile boolean updateGuiRunableScheduled = false;
+	volatile boolean updateGuiRunableScheduled = false;
 	
-	private Runnable listChange = new Runnable() {
+	Runnable listChange = new Runnable() {
 		@Override
 		public void run() {
-			if (!updateGuiRunableScheduled) {
-				updateGuiRunableScheduled = true;
-				getSite().getShell().getDisplay().asyncExec(updateGuiRunable);
+			if (!ViewLibraryProperties.this.updateGuiRunableScheduled) {
+				ViewLibraryProperties.this.updateGuiRunableScheduled = true;
+				getSite().getShell().getDisplay().asyncExec(ViewLibraryProperties.this.updateGuiRunable);
 			}
 		}
 	};
 	
-	private Runnable updateGuiRunable = new Runnable() {
+	Runnable updateGuiRunable = new Runnable() {
+		@SuppressWarnings("synthetic-access")
 		@Override
 		public void run() {
-			updateGuiRunableScheduled = false;
-			if (tableViewer.getTable().isDisposed()) return;
+			ViewLibraryProperties.this.updateGuiRunableScheduled = false;
+			if (ViewLibraryProperties.this.tableViewer.getTable().isDisposed()) return;
 			
-			if (library!=null) {
+			if (ViewLibraryProperties.this.library!=null) {
 				
 				int numSources = -1;
 				try {
-					numSources = library.getSources().size();
+					numSources = ViewLibraryProperties.this.library.getSources().size();
 				} catch (DbException e) {
 					new MorriganMsgDlg(e).open();
 				}
 				
 				setContentDescription(
-						library.getListName() + " contains " + library.getCount()
+						ViewLibraryProperties.this.library.getListName() + " contains " + ViewLibraryProperties.this.library.getCount()
 						+ " items from " + numSources + " sources."
 				);
 				
@@ -221,7 +234,7 @@ public class ViewLibraryProperties extends ViewPart {
 				setContentDescription("No library selected.");
 			}
 			
-			tableViewer.refresh();
+			ViewLibraryProperties.this.tableViewer.refresh();
 		}
 	};
 	
@@ -236,12 +249,13 @@ public class ViewLibraryProperties extends ViewPart {
 			super("add", Activator.getImageDescriptor("icons/plus.gif"));
 		}
 		
+		@Override
 		public void run() {
 			run(false);
 		}
 		
 		public void run(boolean promptScan) {
-			if (library==null) {
+			if (ViewLibraryProperties.this.library==null) {
 				new MorriganMsgDlg("No library selected desu~.").open();
 				return;
 			}
@@ -249,27 +263,27 @@ public class ViewLibraryProperties extends ViewPart {
 			DirectoryDialog dlg = new DirectoryDialog(getSite().getShell());
 			dlg.setText("Add Source");
 			dlg.setMessage("Select a directory containing media.");
-			if (lastDir != null) {
-				dlg.setFilterPath(lastDir);
+			if (this.lastDir != null) {
+				dlg.setFilterPath(this.lastDir);
 			}
 			
 			String dir = dlg.open();
 			
 			if (dir != null) {
-				lastDir = dir;
+				this.lastDir = dir;
 				
 				try {
-					library.addSource(dir);
+					ViewLibraryProperties.this.library.addSource(dir);
 				} catch (DbException e) {
 					new MorriganMsgDlg(e).open();
 				}
-				listChange.run();
+				ViewLibraryProperties.this.listChange.run();
 				
 				if (promptScan) {
-					MorriganMsgDlg dlg2 = new MorriganMsgDlg("Run scan on " + library.getListName() + " now?", MorriganMsgDlg.YESNO);
+					MorriganMsgDlg dlg2 = new MorriganMsgDlg("Run scan on " + ViewLibraryProperties.this.library.getListName() + " now?", MorriganMsgDlg.YESNO);
 					dlg2.open();
-					if (dlg2.getReturnCode() == MorriganMsgDlg.OK) {
-						libraryUpdateAction.run();
+					if (dlg2.getReturnCode() == Window.OK) {
+						ViewLibraryProperties.this.libraryUpdateAction.run();
 					}
 				}
 			}
@@ -278,8 +292,9 @@ public class ViewLibraryProperties extends ViewPart {
 	}
 	
 	private IAction removeAction = new Action("remove", Activator.getImageDescriptor("icons/minus.gif")) {
+		@Override
 		public void run() {
-			if (library==null) {
+			if (ViewLibraryProperties.this.library==null) {
 				new MorriganMsgDlg("No library selected desu~.").open();
 				return;
 			}
@@ -290,16 +305,16 @@ public class ViewLibraryProperties extends ViewPart {
 				return;
 			}
 			
-			MorriganMsgDlg dlg = new MorriganMsgDlg("Remove selected from " + library.getListName() + "?", MorriganMsgDlg.YESNO);
+			MorriganMsgDlg dlg = new MorriganMsgDlg("Remove selected from " + ViewLibraryProperties.this.library.getListName() + "?", MorriganMsgDlg.YESNO);
 			dlg.open();
-			if (dlg.getReturnCode() == MorriganMsgDlg.OK) {
+			if (dlg.getReturnCode() == Window.OK) {
 				for (String item : selectedSources) {
 					try {
-						library.removeSource(item);
+						ViewLibraryProperties.this.library.removeSource(item);
 					} catch (DbException e) {
 						new MorriganMsgDlg(e).open();
 					}
-					listChange.run();
+					ViewLibraryProperties.this.listChange.run();
 				}
 			}
 			
