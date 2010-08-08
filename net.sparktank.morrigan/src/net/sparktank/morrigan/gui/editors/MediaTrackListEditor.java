@@ -1,20 +1,25 @@
 package net.sparktank.morrigan.gui.editors;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
-import net.sparktank.morrigan.gui.Activator;
+import net.sparktank.morrigan.gui.actions.AddToPlaylistAction;
+import net.sparktank.morrigan.gui.adaptors.CountsLblProv;
+import net.sparktank.morrigan.gui.adaptors.DateAddedLblProv;
+import net.sparktank.morrigan.gui.adaptors.DateLastModifiedLblProv;
+import net.sparktank.morrigan.gui.adaptors.DateLastPlayerLblProv;
+import net.sparktank.morrigan.gui.adaptors.DurationLblProv;
+import net.sparktank.morrigan.gui.adaptors.FileLblProv;
+import net.sparktank.morrigan.gui.adaptors.HashcodeLblProv;
+import net.sparktank.morrigan.gui.adaptors.MediaFilter;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.handler.AddToQueue;
 import net.sparktank.morrigan.gui.handler.CallPlayMedia;
 import net.sparktank.morrigan.gui.helpers.ImageCache;
 import net.sparktank.morrigan.gui.preferences.MediaListPref;
-import net.sparktank.morrigan.helpers.TimeHelper;
 import net.sparktank.morrigan.model.IMediaItemList.DirtyState;
-import net.sparktank.morrigan.model.MediaItem;
 import net.sparktank.morrigan.model.tracks.IMediaTrackList;
 import net.sparktank.morrigan.model.tracks.MediaTrack;
 
@@ -27,7 +32,6 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.layout.TableColumnLayout;
-import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -36,19 +40,13 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.StyledCellLabelProvider;
-import org.eclipse.jface.viewers.StyledString;
-import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerCell;
-import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.TextStyle;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -61,7 +59,6 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.part.EditorPart;
@@ -92,7 +89,7 @@ public abstract class MediaTrackListEditor<T extends IMediaTrackList<S>, S exten
 	MediaItemListEditorInput<T> editorInput;
 	
 	TableViewer editTable = null;
-	private MediaFilter mediaFilter = null;
+	private MediaFilter<T, S> mediaFilter = null;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructor.
@@ -201,7 +198,7 @@ public abstract class MediaTrackListEditor<T extends IMediaTrackList<S>, S exten
 				switch (titles[i]) {
 					case FILE:
 						layout.setColumnData(column.getColumn(), new ColumnWeightData(100));
-						column.setLabelProvider(new FileLblProv());
+						column.setLabelProvider(new FileLblProv(this.imageCache));
 						break;
 					
 					case DADDED:
@@ -259,7 +256,7 @@ public abstract class MediaTrackListEditor<T extends IMediaTrackList<S>, S exten
 		this.editTable.setContentProvider(this.contentProvider);
 		this.editTable.addDoubleClickListener(this.doubleClickListener);
 		this.editTable.setInput(getEditorSite());
-		this.mediaFilter = new MediaFilter();
+		this.mediaFilter = new MediaFilter<T, S>();
 		this.editTable.addFilter(this.mediaFilter);
 		
 		getSite().setSelectionProvider(this.editTable);
@@ -367,176 +364,6 @@ public abstract class MediaTrackListEditor<T extends IMediaTrackList<S>, S exten
 		
 	};
 	
-	Styler strikeoutItemStyle = new Styler() {
-		@Override
-		public void applyStyles(TextStyle textStyle) {
-			textStyle.strikeout = true;
-		}
-	};
-	
-	private static final String MSG_DEC_MISSING = " (missing)";
-	private static final String MSG_DEC_DISABLED = " (disabled)";
-	
-	private class FileLblProv extends StyledCellLabelProvider {
-		
-		public FileLblProv () {/* UNUSED */}
-		
-		@Override
-		public void update(ViewerCell cell) {
-			Object element = cell.getElement();
-			if (element instanceof MediaItem) {
-				MediaItem mi = (MediaItem) element;
-				
-				if (mi.getTitle() != null) {
-					Styler styler = null;
-					if (mi.isMissing() || !mi.isEnabled()) {
-						styler = MediaTrackListEditor.this.strikeoutItemStyle;
-					}
-					StyledString styledString = new StyledString(mi.getTitle(), styler);
-					
-					String dec = null;
-					if (mi.isMissing()) {
-						dec = MSG_DEC_MISSING;
-					} else if (!mi.isEnabled()) {
-						dec = MSG_DEC_DISABLED;
-					}
-					
-					if (dec != null) {
-						styledString.append(dec, StyledString.DECORATIONS_STYLER);
-					}
-					
-					cell.setText(styledString.toString());
-					cell.setStyleRanges(styledString.getStyleRanges());
-					
-				} else {
-					cell.setText(null);
-				}
-				
-				if (mi.isMissing()) {
-					cell.setImage(null); // TODO find icon for missing?
-				} else if (!mi.isEnabled()) {
-					cell.setImage(null); // TODO find icon for disabled?
-				} else {
-					cell.setImage(MediaTrackListEditor.this.imageCache.readImage("icons/playlist.gif")); // TODO find icon for items?
-				}
-				
-			}
-			super.update(cell);
-		}
-	}
-	
-	private class DateAddedLblProv extends ColumnLabelProvider {
-		
-		public DateAddedLblProv () {/* UNUSED */}
-		
-		private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-		@Override
-		public String getText(Object element) {
-			MediaItem elm = (MediaItem) element;
-			return elm.getDateAdded() == null ? null : this.sdf.format(elm.getDateAdded());
-		}
-	}
-	
-	private class CountsLblProv extends ColumnLabelProvider {
-		
-		public CountsLblProv () {/* UNUSED */}
-		
-		@Override
-		public String getText(Object element) {
-			MediaTrack elm = (MediaTrack) element;
-			if (elm.getStartCount() <= 0 && elm.getStartCount() <= 0) {
-				return null;
-			}
-			
-			return String.valueOf(elm.getStartCount()) + "/" + String.valueOf(elm.getEndCount());
-		}
-		
-	}
-	
-	private class DateLastPlayerLblProv extends ColumnLabelProvider {
-		
-		public DateLastPlayerLblProv () {/* UNUSED */}
-		
-		private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-		@Override
-		public String getText(Object element) {
-			MediaTrack elm = (MediaTrack) element;
-			return elm.getDateLastPlayed() == null ? null : this.sdf.format(elm.getDateLastPlayed());
-		}
-		
-	}
-	
-	private class HashcodeLblProv extends ColumnLabelProvider {
-		
-		public HashcodeLblProv () {/* UNUSED */}
-		
-		@Override
-		public String getText(Object element) {
-			MediaItem elm = (MediaItem) element;
-			if (elm.getHashcode() == 0) {
-				return null;
-			}
-			
-			return Long.toHexString(elm.getHashcode());
-		}
-		
-	}
-	
-	private class DateLastModifiedLblProv extends ColumnLabelProvider {
-		
-		public DateLastModifiedLblProv () {/* UNUSED */}
-		
-		private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-		@Override
-		public String getText(Object element) {
-			MediaItem elm = (MediaItem) element;
-			return elm.getDateLastModified() == null ? null : this.sdf.format(elm.getDateLastModified());
-		}
-		
-	}
-	
-	private class DurationLblProv extends ColumnLabelProvider {
-		
-		public DurationLblProv () {/* UNUSED */}
-		
-		@Override
-		public String getText(Object element) {
-			MediaTrack elm = (MediaTrack) element;
-			if (elm.getDuration() <= 0) {
-				return null;
-			}
-			
-			return TimeHelper.formatTimeSeconds(elm.getDuration());
-		}
-		
-	}
-	
-	public class MediaFilter extends ViewerFilter {
-		
-		private String searchTerm;
-
-		public void setFilterString (String s) {
-			this.searchTerm = ".*(?i)" + s + ".*";
-			
-		}
-		
-		@Override
-		public boolean select(Viewer viewer, Object parentElement, Object element) {
-			if (this.searchTerm == null || this.searchTerm.length() == 0) {
-				return true;
-			}
-			MediaItem mi = (MediaItem) element;
-			if (mi.getFilepath().matches(this.searchTerm)) {
-				return true;
-			}
-			return false;
-		}
-		
-	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Event handelers.
-	
 	/**
 	 * This will be called on the GUI thread.
 	 */
@@ -637,7 +464,7 @@ public abstract class MediaTrackListEditor<T extends IMediaTrackList<S>, S exten
 		return this.editorInput.getMediaList();
 	}
 	
-	protected void addTrack (String file) {
+	public void addTrack (String file) {
 		this.editorInput.getMediaList().addTrack(getNewS(file));
 	}
 	
@@ -718,30 +545,6 @@ public abstract class MediaTrackListEditor<T extends IMediaTrackList<S>, S exten
 		menu.setRemoveAllWhenShown(true);
 		
 		return menu;
-	}
-	
-	protected class AddToPlaylistAction extends Action {
-		
-		private final IEditorReference editor;
-		
-		public AddToPlaylistAction (IEditorReference editor) {
-			super(editor.getName(), Activator.getImageDescriptor("icons/playlist.gif"));
-			editor.getTitleImage();
-			this.editor = editor;
-		}
-		
-		@Override
-		public void run() {
-			super.run();
-			IWorkbenchPart part = this.editor.getPart(false);
-			if (part != null && part instanceof PlaylistEditor) {
-				PlaylistEditor plPart = (PlaylistEditor) part;
-				for (MediaItem track : getSelectedTracks()) {
-					plPart.addTrack(track.getFilepath());
-				}
-			}
-		}
-		
 	}
 	
 	protected IAction addToQueueAction = new Action("Enqueue") {
