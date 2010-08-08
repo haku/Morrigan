@@ -33,13 +33,13 @@ public class LocalLibraryEditor extends AbstractLibraryEditor<LocalMediaLibrary>
 	private Button btnAdd = null;
 	
 	@Override
-		protected void createControls(Composite parent) {
-			super.createControls(parent);
-			
-			getPrefMenuMgr().add(new Separator());
-			getPrefMenuMgr().add(new LibraryUpdateAction(getMediaList()));
-			getPrefMenuMgr().add(this.showPropertiesAction);
-		}
+	protected void createControls(Composite parent) {
+		super.createControls(parent);
+		
+		getPrefMenuMgr().add(new Separator());
+		getPrefMenuMgr().add(new LibraryUpdateAction(getMediaList()));
+		getPrefMenuMgr().add(this.showPropertiesAction);
+	}
 	
 	@Override
 	protected List<Control> populateToolbar(Composite parent) {
