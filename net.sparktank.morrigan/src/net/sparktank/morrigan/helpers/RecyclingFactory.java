@@ -33,17 +33,17 @@ public abstract class RecyclingFactory<T extends Object, K extends Object, P ext
 		T ret = null;
 		
 		// See if already have a matching product we made earlier.
-		WeakReference<T> wr = cache.get(material);
+		WeakReference<T> wr = this.cache.get(material);
 		if (wr != null) {
 			ret = wr.get();
 			if (ret == null) {
-				cache.remove(material);
+				this.cache.remove(material);
 			}
 		}
 		
 		// If an object is found, check it is still valid.
 		if (ret != null && !isValidProduct(ret)) {
-			cache.remove(material);
+			this.cache.remove(material);
 			ret = null;
 		}
 		
@@ -55,9 +55,9 @@ public abstract class RecyclingFactory<T extends Object, K extends Object, P ext
 			} else {
 				ret = makeNewProduct(material, config);
 			}
-			cache.put(material, new WeakReference<T>(ret));
+			this.cache.put(material, new WeakReference<T>(ret));
 		}
-		else if (!allowRecycle) {
+		else if (!this.allowRecycle) {
 			ret = null;
 		}
 		
@@ -67,13 +67,13 @@ public abstract class RecyclingFactory<T extends Object, K extends Object, P ext
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public synchronized void disposeAll () {
-		Set<Entry<K,WeakReference<T>>> products = new HashSet<Entry<K, WeakReference<T>>>(cache.entrySet());
+		Set<Entry<K,WeakReference<T>>> products = new HashSet<Entry<K, WeakReference<T>>>(this.cache.entrySet());
 		
 		for (Entry<K, WeakReference<T>> entry : products) {
 			T product = entry.getValue().get();
 			if (product != null) {
 				disposeProduct(product);
-				cache.remove(entry.getKey());
+				this.cache.remove(entry.getKey());
 			}
 		}
 	}
@@ -84,10 +84,16 @@ public abstract class RecyclingFactory<T extends Object, K extends Object, P ext
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	/**
+	 * @throws S  
+	 */
 	protected T makeNewProduct (K material) throws S {
 		throw new IllegalArgumentException("Not implemented.");
 	}
 	
+	/**
+	 * @throws S  
+	 */
 	protected T makeNewProduct (K material, P config) throws S {
 		throw new IllegalArgumentException("Not implemented.");
 	}
