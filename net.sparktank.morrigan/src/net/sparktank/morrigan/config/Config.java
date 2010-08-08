@@ -39,12 +39,26 @@ public class Config {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private static final String LIB_DIR = "/libs";
-	public static final String LIB_ABS_FILE_EXT = ".db3";
 	public static final String LIB_LOCAL_FILE_EXT = ".local.db3";
 	public static final String LIB_REMOTE_FILE_EXT = ".remote.db3";
 	
 	public static File getLibDir () {
 		File f = new File(getConfigDir() + LIB_DIR);
+		if (!f.exists()) {
+			if (!f.mkdirs()) {
+				throw new RuntimeException("Failed to create direactory '"+f.getAbsolutePath()+"'.");
+			}
+		}
+		return f;
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	private static final String GALLERY_DIR = "/libs";
+	public static final String GALLERY_LOCAL_FILE_EXT = ".local.db3";
+	
+	public static File getGalleryDir () {
+		File f = new File(getConfigDir() + GALLERY_DIR);
 		if (!f.exists()) {
 			if (!f.mkdirs()) {
 				throw new RuntimeException("Failed to create direactory '"+f.getAbsolutePath()+"'.");
