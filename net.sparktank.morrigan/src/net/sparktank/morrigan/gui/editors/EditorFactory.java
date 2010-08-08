@@ -137,6 +137,12 @@ public class EditorFactory implements IElementFactory {
 		MediaTrackListEditorInput<MediaPlaylist> input = new MediaTrackListEditorInput<MediaPlaylist>(playList);
 		return input;
 	}
+
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	public static LibraryEditorInput getGalleryInput(String dbPath) {
+		throw new RuntimeException("Not implemented.");
+	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
