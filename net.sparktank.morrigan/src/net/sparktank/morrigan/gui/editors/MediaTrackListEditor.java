@@ -49,33 +49,39 @@ public abstract class MediaTrackListEditor<T extends IMediaTrackList<S>, S exten
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Column definitions.
 	
-	public static final MediaColumn COL_FILE = new MediaColumn("file");
-	public static final MediaColumn COL_COUNTS = new MediaColumn("counts");
-	public static final MediaColumn COL_ADDED = new MediaColumn("added");
-	public static final MediaColumn COL_LASTPLAYED = new MediaColumn("last played");
-	public static final MediaColumn COL_HASH = new MediaColumn("hash");
-	public static final MediaColumn COL_MODIFIED = new MediaColumn("modified");
-	public static final MediaColumn COL_DURATION = new MediaColumn("duration");
+	public final MediaColumn 
+		COL_FILE =       new MediaColumn("file",        new ColumnWeightData(100),            new FileLblProv(this.imageCache) );
+	public final MediaColumn 
+		COL_COUNTS =     new MediaColumn("counts",      new ColumnPixelData( 70, true, true), new CountsLblProv(),             SWT.CENTER);
+	public final MediaColumn 
+		COL_ADDED =      new MediaColumn("added",       new ColumnPixelData(140, true, true), new DateAddedLblProv()           );
+	public final MediaColumn 
+		COL_LASTPLAYED = new MediaColumn("last played", new ColumnPixelData(140, true, true), new DateLastPlayerLblProv()      );
+	public final MediaColumn 
+		COL_HASH =       new MediaColumn("hash",        new ColumnPixelData( 90, true, true), new HashcodeLblProv(),           SWT.CENTER);
+	public final MediaColumn 
+		COL_MODIFIED =   new MediaColumn("modified",    new ColumnPixelData(140, true, true), new DateLastModifiedLblProv()    );
+	public final MediaColumn 
+		COL_DURATION =   new MediaColumn("duration",    new ColumnPixelData( 60, true, true), new DurationLblProv(),           SWT.RIGHT);
 	
-	public static final MediaColumn[] COLS = new MediaColumn[] {
-		COL_FILE,
-		COL_COUNTS,
-		COL_ADDED,
-		COL_LASTPLAYED,
-		COL_HASH,
-		COL_MODIFIED,
-		COL_DURATION
+	public final MediaColumn[] COLS = new MediaColumn[] {
+		this.COL_FILE,
+		this.COL_COUNTS,
+		this.COL_ADDED,
+		this.COL_LASTPLAYED,
+		this.COL_HASH,
+		this.COL_MODIFIED,
+		this.COL_DURATION
 	};
 	
 	@Override
 	protected List<MediaColumn> getColumns() {
 		List<MediaColumn> l = new LinkedList<MediaColumn>();
-		for (MediaColumn c : COLS) {
+		for (MediaColumn c : this.COLS) {
 			l.add(c);
 		}
 		return l;
 	}
-	
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Controls.
@@ -119,43 +125,14 @@ public abstract class MediaTrackListEditor<T extends IMediaTrackList<S>, S exten
 		tableComposite.setLayout(layout);
 		
 		// add and configure columns.
-		for (MediaColumn mCol : COLS) {
-			if (MediaListPref.getColPref(mCol)) {
+		for (MediaColumn mCol : this.COLS) {
+			if (MediaListPref.getColPref(this, mCol)) {
 				final TableViewerColumn column = new TableViewerColumn(this.editTable, SWT.NONE);
 				
-				if (mCol == COL_FILE) {
-					layout.setColumnData(column.getColumn(), new ColumnWeightData(100));
-					column.setLabelProvider(new FileLblProv(this.imageCache));
-				}
-				else if (mCol == COL_ADDED) {
-					layout.setColumnData(column.getColumn(), new ColumnPixelData(140, true, true));
-					column.setLabelProvider(new DateAddedLblProv());
-				}
-				else if (mCol == COL_COUNTS) {
-					layout.setColumnData(column.getColumn(), new ColumnPixelData(70, true, true));
-					column.setLabelProvider(new CountsLblProv());
-					column.getColumn().setAlignment(SWT.CENTER);
-				}
-				else if (mCol == COL_LASTPLAYED) {
-					layout.setColumnData(column.getColumn(), new ColumnPixelData(140, true, true));
-					column.setLabelProvider(new DateLastPlayerLblProv());
-				}
-				else if (mCol == COL_HASH) {
-					layout.setColumnData(column.getColumn(), new ColumnPixelData(90, true, true));
-					column.setLabelProvider(new HashcodeLblProv());
-					column.getColumn().setAlignment(SWT.CENTER);
-				}
-				else if (mCol == COL_MODIFIED) {
-					layout.setColumnData(column.getColumn(), new ColumnPixelData(140, true, true));
-					column.setLabelProvider(new DateLastModifiedLblProv());
-				}
-				else if (mCol == COL_DURATION) {
-					layout.setColumnData(column.getColumn(), new ColumnPixelData(60, true, true));
-					column.setLabelProvider(new DurationLblProv());
-					column.getColumn().setAlignment(SWT.RIGHT);
-				}
-				else {
-					throw new IllegalArgumentException();
+				layout.setColumnData(column.getColumn(), mCol.getColumnLayoutData());
+				column.setLabelProvider(mCol.getCellLabelProvider());
+				if (mCol.getAlignment() > -1) {
+					column.getColumn().setAlignment(mCol.getAlignment());
 				}
 				
 				column.getColumn().setText(mCol.toString());
