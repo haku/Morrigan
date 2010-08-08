@@ -1,5 +1,7 @@
 package net.sparktank.morrigan.gui.editors.tracks;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -15,7 +17,9 @@ import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.editors.MediaColumn;
 import net.sparktank.morrigan.gui.editors.MediaItemListEditor;
 import net.sparktank.morrigan.gui.handler.AddToQueue;
+import net.sparktank.morrigan.gui.jobs.TaskJob;
 import net.sparktank.morrigan.gui.preferences.MediaListPref;
+import net.sparktank.morrigan.model.tasks.MediaFileCopyTask;
 import net.sparktank.morrigan.model.tracks.IMediaTrackList;
 import net.sparktank.morrigan.model.tracks.MediaTrack;
 
@@ -27,6 +31,7 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.handlers.IHandlerService;
 
@@ -125,6 +130,31 @@ public abstract class MediaTrackListEditor<T extends IMediaTrackList<S>, S exten
 				}
 			}
 		};
+	};
+	
+	String lastFileCopyTargetDir = null;
+	
+	protected IAction copyToAction = new Action("Copy to...") {
+		@Override
+		public void run () {
+			ArrayList<S> selectedTracks = getSelectedItems();
+			
+			DirectoryDialog dlg = new DirectoryDialog(getSite().getShell());
+			dlg.setText("Copy Files...");
+			dlg.setMessage("Select a directory to copy files to.");
+			if (MediaTrackListEditor.this.lastFileCopyTargetDir != null) {
+				dlg.setFilterPath(MediaTrackListEditor.this.lastFileCopyTargetDir);
+			}
+			String dir = dlg.open();
+			
+			if (dir != null) {
+				MediaTrackListEditor.this.lastFileCopyTargetDir = dir;
+				
+				MediaFileCopyTask<S> task = new MediaFileCopyTask<S>(getMediaList(), selectedTracks, new File(dir));
+				TaskJob job = new TaskJob(task, getSite().getShell().getDisplay());
+				job.schedule();
+			}
+		}
 	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

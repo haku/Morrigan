@@ -1,6 +1,5 @@
 package net.sparktank.morrigan.gui.editors.tracks;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -10,13 +9,11 @@ import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.dialogs.RunnableDialog;
 import net.sparktank.morrigan.gui.display.DropMenuListener;
 import net.sparktank.morrigan.gui.editors.MediaColumn;
-import net.sparktank.morrigan.gui.jobs.TaskJob;
 import net.sparktank.morrigan.helpers.TimeHelper;
 import net.sparktank.morrigan.model.DbColumn;
 import net.sparktank.morrigan.model.MediaItemDb.SortChangeListener;
 import net.sparktank.morrigan.model.MediaSqliteLayer2;
 import net.sparktank.morrigan.model.MediaSqliteLayer2.SortDirection;
-import net.sparktank.morrigan.model.tasks.MediaFileCopyTask;
 import net.sparktank.morrigan.model.tracks.IMediaTrackList.DurationData;
 import net.sparktank.morrigan.model.tracks.MediaTrack;
 import net.sparktank.morrigan.model.tracks.library.AbstractMediaLibrary;
@@ -25,7 +22,6 @@ import net.sparktank.morrigan.model.tracks.library.LibrarySqliteLayer2;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
-import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.TableViewer;
@@ -36,7 +32,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
@@ -297,31 +292,6 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> exte
 		}
 		
 	}
-	
-	String lastFileCopyTargetDir = null;
-	
-	protected IAction copyToAction = new Action("Copy to...") {
-		@Override
-		public void run () {
-			ArrayList<MediaTrack> selectedTracks = getSelectedItems();
-			
-			DirectoryDialog dlg = new DirectoryDialog(getSite().getShell());
-			dlg.setText("Copy Files...");
-			dlg.setMessage("Select a directory to copy files to.");
-			if (AbstractLibraryEditor.this.lastFileCopyTargetDir != null) {
-				dlg.setFilterPath(AbstractLibraryEditor.this.lastFileCopyTargetDir);
-			}
-			String dir = dlg.open();
-			
-			if (dir != null) {
-				AbstractLibraryEditor.this.lastFileCopyTargetDir = dir;
-				
-				MediaFileCopyTask<MediaTrack> task = new MediaFileCopyTask<MediaTrack>(getMediaList(), selectedTracks, new File(dir));
-				TaskJob job = new TaskJob(task, getSite().getShell().getDisplay());
-				job.schedule();
-			}
-		}
-	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
