@@ -1,28 +1,18 @@
 package net.sparktank.morrigan.gui.editors.pictures;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
-import net.sparktank.morrigan.gui.display.DropMenuListener;
 import net.sparktank.morrigan.helpers.TimeHelper;
-import net.sparktank.morrigan.model.DbColumn;
-import net.sparktank.morrigan.model.MediaSqliteLayer2.SortDirection;
 import net.sparktank.morrigan.model.pictures.MediaPicture;
 import net.sparktank.morrigan.model.pictures.gallery.AbstractGallery;
-import net.sparktank.morrigan.model.tracks.IMediaTrackList.DurationData;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.IContributionItem;
-import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Text;
 
 public abstract class AbstractGalleryEditor<T extends AbstractGallery> extends MediaPictureListEditor<AbstractGallery, MediaPicture> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -37,6 +27,7 @@ public abstract class AbstractGalleryEditor<T extends AbstractGallery> extends M
 	protected MediaPicture getNewS(String filePath) {
 		return new MediaPicture(filePath);
 	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	EditorPart methods.
 	
