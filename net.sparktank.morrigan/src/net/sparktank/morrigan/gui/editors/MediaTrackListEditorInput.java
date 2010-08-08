@@ -1,9 +1,8 @@
 package net.sparktank.morrigan.gui.editors;
 
 import net.sparktank.morrigan.helpers.EqualHelper;
-import net.sparktank.morrigan.model.MediaItem;
-import net.sparktank.morrigan.model.MediaItemList;
 import net.sparktank.morrigan.model.tracks.IMediaTrackList;
+import net.sparktank.morrigan.model.tracks.MediaTrack;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Table;
@@ -11,7 +10,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPersistableElement;
 
-public class MediaTrackListEditorInput<T extends IMediaTrackList<? extends MediaItem>> implements IEditorInput, IPersistableElement {
+public class MediaTrackListEditorInput<T extends IMediaTrackList<? extends MediaTrack>> implements IEditorInput, IPersistableElement {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private final T editedMediaList;
@@ -22,13 +21,13 @@ public class MediaTrackListEditorInput<T extends IMediaTrackList<? extends Media
 //	Constructor.
 	
 	public MediaTrackListEditorInput (T mediaList) {
-		editedMediaList = mediaList;
+		this.editedMediaList = mediaList;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public T getMediaList() {
-		return editedMediaList;
+		return this.editedMediaList;
 	}
 	
 	public void setTable (Table table) {
@@ -36,7 +35,7 @@ public class MediaTrackListEditorInput<T extends IMediaTrackList<? extends Media
 	}
 	
 	public int getTopIndex () {
-		return topIndex;
+		return this.topIndex;
 	}
 	
 	public void setTopIndex (int i) {
@@ -47,12 +46,12 @@ public class MediaTrackListEditorInput<T extends IMediaTrackList<? extends Media
 
 	@Override
 	public String getName() {
-		return editedMediaList.toString();
+		return this.editedMediaList.toString();
 	}
 	
 	@Override
 	public String getToolTipText() {
-		return editedMediaList.toString();
+		return this.editedMediaList.toString();
 	}
 	
 	@Override
@@ -79,10 +78,10 @@ public class MediaTrackListEditorInput<T extends IMediaTrackList<? extends Media
 	
 	@Override
 	public void saveState(IMemento memento) {
-		memento.putString(EditorFactory.KEY_TYPE, editedMediaList.getType());
-		memento.putString(EditorFactory.KEY_SERIAL, editedMediaList.getSerial());
-		if (table != null && !table.isDisposed()) {
-			memento.putString(EditorFactory.KEY_TOPINDEX, String.valueOf(table.getTopIndex()));
+		memento.putString(EditorFactory.KEY_TYPE, this.editedMediaList.getType());
+		memento.putString(EditorFactory.KEY_SERIAL, this.editedMediaList.getSerial());
+		if (this.table != null && !this.table.isDisposed()) {
+			memento.putString(EditorFactory.KEY_TOPINDEX, String.valueOf(this.table.getTopIndex()));
 		}
 	}
 	
@@ -102,12 +101,12 @@ public class MediaTrackListEditorInput<T extends IMediaTrackList<? extends Media
 		if ( !(aThat instanceof MediaTrackListEditorInput<?>) ) return false;
 		MediaTrackListEditorInput<?> that = (MediaTrackListEditorInput<?>)aThat;
 		
-		return EqualHelper.areEqual(editedMediaList.getListId(), that.getMediaList().getListId());
+		return EqualHelper.areEqual(this.editedMediaList.getListId(), that.getMediaList().getListId());
 	}
 	
 	@Override
 	public int hashCode() {
-		return editedMediaList.getListId().hashCode();
+		return this.editedMediaList.getListId().hashCode();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
