@@ -615,7 +615,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 					IEditorPart activeEditor = getViewSite().getWorkbenchWindow().getActivePage().getActiveEditor();
 					if (activeEditor instanceof MediaTrackListEditor<?,?>) {
 						MediaTrackListEditor<?,?> mediaListEditor = (MediaTrackListEditor<?,?>) activeEditor;
-						mediaListEditor.revealTrack(getPlayer().getCurrentItem().item);
+						mediaListEditor.revealItem(getPlayer().getCurrentItem().item);
 					}
 					
 				} catch (Exception e) {
