@@ -54,7 +54,7 @@ public class Config {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private static final String GALLERY_DIR = "/libs";
+	private static final String GALLERY_DIR = "/gals";
 	public static final String GALLERY_LOCAL_FILE_EXT = ".local.db3";
 	
 	public static File getGalleryDir () {
