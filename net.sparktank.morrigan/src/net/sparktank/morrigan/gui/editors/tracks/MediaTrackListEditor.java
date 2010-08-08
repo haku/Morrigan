@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.gui.editors;
+package net.sparktank.morrigan.gui.editors.tracks;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -12,6 +12,8 @@ import net.sparktank.morrigan.gui.adaptors.DurationLblProv;
 import net.sparktank.morrigan.gui.adaptors.FileLblProv;
 import net.sparktank.morrigan.gui.adaptors.HashcodeLblProv;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
+import net.sparktank.morrigan.gui.editors.MediaColumn;
+import net.sparktank.morrigan.gui.editors.MediaItemListEditor;
 import net.sparktank.morrigan.gui.handler.AddToQueue;
 import net.sparktank.morrigan.gui.preferences.MediaListPref;
 import net.sparktank.morrigan.model.tracks.IMediaTrackList;
@@ -33,7 +35,7 @@ public abstract class MediaTrackListEditor<T extends IMediaTrackList<S>, S exten
 //	Column definitions.
 	
 	public final MediaColumn 
-		COL_FILE =       new MediaColumn("file",        new ColumnWeightData(100),            new FileLblProv(this.imageCache) );
+		COL_FILE =       new MediaColumn("file",        new ColumnWeightData(100),            new FileLblProv(this.getImageCache()) );
 	public final MediaColumn 
 		COL_COUNTS =     new MediaColumn("counts",      new ColumnPixelData( 70, true, true), new CountsLblProv(),             SWT.CENTER);
 	public final MediaColumn 
@@ -116,7 +118,7 @@ public abstract class MediaTrackListEditor<T extends IMediaTrackList<S>, S exten
 		public void run() {
 			for (S track : getSelectedItems()) {
 				try {
-					MediaTrackListEditor.this.editorInput.getMediaList().setTrackEnabled(track, !track.isEnabled());
+					MediaTrackListEditor.this.getEditorInput().getMediaList().setTrackEnabled(track, !track.isEnabled());
 				} catch (Throwable t) {
 					// TODO something more useful here.
 					t.printStackTrace();

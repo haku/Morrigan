@@ -104,7 +104,7 @@
    <extension point="org.eclipse.ui.editors">
    
       <editor
-            class="net.sparktank.morrigan.gui.editors.PlaylistEditor"
+            class="net.sparktank.morrigan.gui.editors.tracks.PlaylistEditor"
             default="false"
             icon="icons/playlist.gif"
             id="net.sparktank.morrigan.gui.editors.PlaylistEditor"
@@ -112,14 +112,14 @@
       </editor>
       
       <editor
-            class="net.sparktank.morrigan.gui.editors.LocalLibraryEditor"
+            class="net.sparktank.morrigan.gui.editors.tracks.LocalLibraryEditor"
             default="false"
             icon="icons/library.gif"
             id="net.sparktank.morrigan.gui.editors.LocalLibraryEditor"
             name="LocalLibraryEditor" >
       </editor>
       <editor
-            class="net.sparktank.morrigan.gui.editors.RemoteLibraryEditor"
+            class="net.sparktank.morrigan.gui.editors.tracks.RemoteLibraryEditor"
             default="false"
             icon="icons/library-remote.gif"
             id="net.sparktank.morrigan.gui.editors.RemoteLibraryEditor"

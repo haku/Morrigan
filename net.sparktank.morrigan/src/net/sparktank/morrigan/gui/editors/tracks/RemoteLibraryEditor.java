@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.gui.editors;
+package net.sparktank.morrigan.gui.editors.tracks;
 
 import java.util.List;
 

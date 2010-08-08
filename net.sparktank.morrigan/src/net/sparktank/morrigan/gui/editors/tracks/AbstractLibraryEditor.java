@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.gui.editors;
+package net.sparktank.morrigan.gui.editors.tracks;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -9,6 +9,7 @@ import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.dialogs.RunnableDialog;
 import net.sparktank.morrigan.gui.display.DropMenuListener;
+import net.sparktank.morrigan.gui.editors.MediaColumn;
 import net.sparktank.morrigan.gui.jobs.TaskJob;
 import net.sparktank.morrigan.helpers.TimeHelper;
 import net.sparktank.morrigan.model.DbColumn;
@@ -91,7 +92,7 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> exte
 	@SuppressWarnings("unchecked")
 	@Override
 	public T getMediaList () {
-		return (T) this.editorInput.getMediaList();
+		return (T) this.getEditorInput().getMediaList();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

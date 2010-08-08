@@ -3,7 +3,7 @@ package net.sparktank.morrigan.gui.handler;
 import java.util.ArrayList;
 
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
-import net.sparktank.morrigan.gui.editors.MediaTrackListEditor;
+import net.sparktank.morrigan.gui.editors.tracks.MediaTrackListEditor;
 import net.sparktank.morrigan.gui.views.AbstractPlayerView;
 import net.sparktank.morrigan.gui.views.ViewControls;
 import net.sparktank.morrigan.model.MediaItemList;
