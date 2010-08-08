@@ -1,13 +1,11 @@
 package net.sparktank.morrigan.model.pictures.gallery;
 
 import net.sparktank.morrigan.model.MediaItemDb;
+import net.sparktank.morrigan.model.pictures.IMediaPictureList;
 import net.sparktank.morrigan.model.pictures.MediaPicture;
-import net.sparktank.morrigan.model.pictures.MediaPictureList;
+import net.sparktank.morrigan.model.pictures.MediaPictureListHelper;
 
-/*
- * TODO FIXME Extract common code between this and AbstractMediaLibrary.
- */
-public class LocalGallery extends MediaItemDb<MediaPictureList<MediaPicture>, GallerySqliteLayer, MediaPicture> /* TODO implements IMediaPictureList */ {
+public class LocalGallery extends MediaItemDb<IMediaPictureList<MediaPicture>, GallerySqliteLayer, MediaPicture> implements IMediaPictureList<MediaPicture> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static final String TYPE = "LOCALGALLERY";
@@ -32,12 +30,10 @@ public class LocalGallery extends MediaItemDb<MediaPictureList<MediaPicture>, Ga
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	/*
-	TODO
-	public void setPictureWidthAndHeight (MediaPicture mp, int width, int height) throws MorriganException {
-		
+	@Override
+	public void setPictureWidthAndHeight (MediaPicture mp, int width, int height) {
+		MediaPictureListHelper.setPictureWidthAndHeight(this, mp, width, height);
 	}
-	 */
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
