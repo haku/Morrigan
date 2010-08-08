@@ -116,11 +116,9 @@ public class MediaItem implements IDbItem {
 		return false;
 	}
 	
-	@Override
 	public String getRemoteLocation() {
 		return this.remoteLocation;
 	}
-	@Override
 	public boolean setRemoteLocation(String remoteLocation) {
 		if (!EqualHelper.areEqual(this.remoteLocation, remoteLocation)) {
 			this.remoteLocation = remoteLocation;
