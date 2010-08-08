@@ -24,5 +24,4 @@ public class LocalMediaLibrary extends AbstractMediaLibrary {
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
 }
