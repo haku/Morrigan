@@ -12,7 +12,7 @@ public class LocalGallery extends MediaItemDb<IMediaPictureList<MediaPicture>, G
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	protected LocalGallery (String libraryName, GallerySqliteLayer dbLayer) {
+	public LocalGallery (String libraryName, GallerySqliteLayer dbLayer) {
 		super(libraryName, dbLayer);
 	}
 	
