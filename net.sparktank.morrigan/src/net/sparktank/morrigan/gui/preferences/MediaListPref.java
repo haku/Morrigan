@@ -46,23 +46,23 @@ public class MediaListPref extends FieldEditorPreferencePage implements IWorkben
 		return Activator.getDefault().getPreferenceStore().getBoolean(PREF_SHOWHEADER);
 	}
 	
-	public static boolean getColPref (MediaColumn column) {
-		if (column == MediaTrackListEditor.COL_FILE) {
+	public static boolean getColPref (MediaTrackListEditor<?,?> editor, MediaColumn column) {
+		if (column == editor.COL_FILE) {
 			return Activator.getDefault().getPreferenceStore().getBoolean(PREF_COL_DADDED);
 		}
-		else if (column == MediaTrackListEditor.COL_COUNTS) {
+		else if (column == editor.COL_COUNTS) {
 			return Activator.getDefault().getPreferenceStore().getBoolean(PREF_COL_COUNTS);
 		}
-		else if (column == MediaTrackListEditor.COL_LASTPLAYED) {
+		else if (column == editor.COL_LASTPLAYED) {
 			return Activator.getDefault().getPreferenceStore().getBoolean(PREF_COL_DLASTPLAY);
 		}
-		else if (column == MediaTrackListEditor.COL_HASH) {
+		else if (column == editor.COL_HASH) {
 			return Activator.getDefault().getPreferenceStore().getBoolean(PREF_COL_HASHCODE);
 		}
-		else if (column == MediaTrackListEditor.COL_MODIFIED) {
+		else if (column == editor.COL_MODIFIED) {
 			return Activator.getDefault().getPreferenceStore().getBoolean(PREF_COL_DMODIFIED);
 		}
-		else if (column == MediaTrackListEditor.COL_DURATION) {
+		else if (column == editor.COL_DURATION) {
 			return Activator.getDefault().getPreferenceStore().getBoolean(PREF_COL_DURATION);
 		}
 		else {
