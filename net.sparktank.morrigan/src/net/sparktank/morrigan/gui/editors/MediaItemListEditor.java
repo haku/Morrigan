@@ -1,6 +1,7 @@
 package net.sparktank.morrigan.gui.editors;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.gui.adaptors.MediaFilter;
@@ -37,6 +38,24 @@ import org.eclipse.ui.part.EditorPart;
  */
 public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends MediaItem> extends EditorPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Nested classes.
+	
+	static public class MediaColumn {
+		
+		private final String humanName;
+
+		public MediaColumn (String humanName) {
+			this.humanName = humanName;
+		}
+		
+		@Override
+		public String toString() {
+			return this.humanName;
+		}
+		
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Member variables.
 	
 	MediaItemListEditorInput<T> editorInput;
@@ -49,7 +68,9 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Abstract methods.
 	
-	abstract S getNewS (String filePath);
+	protected abstract S getNewS (String filePath);
+	
+	protected abstract List<MediaColumn> getColumns ();
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	EditorPart methods.
@@ -170,6 +191,16 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 			}
 		}
 	};
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Column related methods.
+	
+	protected MediaColumn parseMediaColumn (String humanName) {
+		for (MediaColumn o : getColumns()) {
+			if (humanName.equals(o.toString())) return o;
+		}
+		throw new IllegalArgumentException();
+	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Sorting.

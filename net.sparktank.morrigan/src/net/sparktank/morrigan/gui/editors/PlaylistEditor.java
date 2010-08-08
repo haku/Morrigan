@@ -63,7 +63,7 @@ public class PlaylistEditor extends MediaTrackListEditor<MediaPlaylist,MediaTrac
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
-	MediaTrack getNewS(String filePath) {
+	protected MediaTrack getNewS(String filePath) {
 		return new MediaTrack(filePath);
 	}
 	
@@ -92,7 +92,7 @@ public class PlaylistEditor extends MediaTrackListEditor<MediaPlaylist,MediaTrac
 		try {
 			getMediaList().writeToFile();
 		} catch (MorriganException e) {
-			new MorriganMsgDlg(e);
+			new MorriganMsgDlg(e).open();
 		}
 	}
 	

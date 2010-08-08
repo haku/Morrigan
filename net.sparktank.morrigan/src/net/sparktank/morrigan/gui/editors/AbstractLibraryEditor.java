@@ -56,7 +56,7 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> exte
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
-	MediaTrack getNewS(String filePath) {
+	protected MediaTrack getNewS(String filePath) {
 		return new MediaTrack(filePath);
 	}
 	
@@ -214,37 +214,30 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> exte
 	protected void onSort (TableViewer table, TableViewerColumn column, int direction) {
 		DbColumn sort = getMediaList().getSort();
 		MediaColumn mCol = parseMediaColumn(column.getColumn().getText());
-		switch (mCol) {
-			case FILE:
-				sort = MediaSqliteLayer2.SQL_TBL_MEDIAFILES_COL_FILE;
-				break;
-			
-			case DADDED:
-				sort = MediaSqliteLayer2.SQL_TBL_MEDIAFILES_COL_DADDED;
-				break;
-				
-			case COUNTS:
-				sort = LibrarySqliteLayer2.SQL_TBL_MEDIAFILES_COL_STARTCNT;
-				break;
-				
-			case DLASTPLAY:
-				sort = LibrarySqliteLayer2.SQL_TBL_MEDIAFILES_COL_DLASTPLAY;
-				break;
-				
-			case HASHCODE:
-				sort = MediaSqliteLayer2.SQL_TBL_MEDIAFILES_COL_HASHCODE;
-				break;
-				
-			case DMODIFIED:
-				sort = MediaSqliteLayer2.SQL_TBL_MEDIAFILES_COL_DMODIFIED;
-				break;
-				
-			case DURATION:
-				sort = LibrarySqliteLayer2.SQL_TBL_MEDIAFILES_COL_DURATION;
-				break;
-				
-			default:
-				throw new IllegalArgumentException();
+		
+		if (mCol == COL_FILE) {
+			sort = MediaSqliteLayer2.SQL_TBL_MEDIAFILES_COL_FILE;
+		}
+		else if (mCol == COL_ADDED) {
+			sort = MediaSqliteLayer2.SQL_TBL_MEDIAFILES_COL_DADDED;
+		}
+		else if (mCol == COL_COUNTS) {
+			sort = LibrarySqliteLayer2.SQL_TBL_MEDIAFILES_COL_STARTCNT;
+		}
+		else if (mCol == COL_LASTPLAYED) {
+			sort = LibrarySqliteLayer2.SQL_TBL_MEDIAFILES_COL_DLASTPLAY;
+		}
+		else if (mCol == COL_HASH) {
+			sort = MediaSqliteLayer2.SQL_TBL_MEDIAFILES_COL_HASHCODE;
+		}
+		else if (mCol == COL_MODIFIED) {
+			sort = MediaSqliteLayer2.SQL_TBL_MEDIAFILES_COL_DMODIFIED;
+		}
+		else if (mCol == COL_DURATION) {
+			sort = LibrarySqliteLayer2.SQL_TBL_MEDIAFILES_COL_DURATION;
+		}
+		else {
+			throw new IllegalArgumentException();
 		}
 		
 		SortDirection sortDir;
