@@ -59,7 +59,7 @@ public class EditorFactory implements IElementFactory {
 		}
 		
 		String topIndex = memento.getString(KEY_TOPINDEX);
-		if (topIndex != null) {
+		if (topIndex != null && input!= null) {
 			int i = Integer.parseInt(topIndex);
 			input.setTopIndex(i);
 		}

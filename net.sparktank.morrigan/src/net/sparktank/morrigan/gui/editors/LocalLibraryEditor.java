@@ -38,34 +38,34 @@ public class LocalLibraryEditor extends AbstractLibraryEditor<LocalMediaLibrary>
 			
 			getPrefMenuMgr().add(new Separator());
 			getPrefMenuMgr().add(new LibraryUpdateAction(getMediaList()));
-			getPrefMenuMgr().add(showPropertiesAction);
+			getPrefMenuMgr().add(this.showPropertiesAction);
 		}
 	
 	@Override
 	protected List<Control> populateToolbar(Composite parent) {
 		List<Control> ret = super.populateToolbar(parent);
 		
-		btnAddToQueue = new Button(parent, SWT.PUSH);
-		btnAddToQueue.setImage(getImageCache().readImage("icons/queue-add.gif"));
-		btnAddToQueue.addSelectionListener(new ActionListener(addToQueueAction));
-		ret.add(ret.size() - 1, btnAddToQueue);
+		this.btnAddToQueue = new Button(parent, SWT.PUSH);
+		this.btnAddToQueue.setImage(getImageCache().readImage("icons/queue-add.gif"));
+		this.btnAddToQueue.addSelectionListener(new ActionListener(this.addToQueueAction));
+		ret.add(ret.size() - 1, this.btnAddToQueue);
 		
-		btnAdd = new Button(parent, SWT.PUSH);
-		btnAdd.setImage(getImageCache().readImage("icons/plus.gif"));
-		btnAdd.addSelectionListener(new ActionListener(addAction));
-		ret.add(ret.size() - 1, btnAdd);
+		this.btnAdd = new Button(parent, SWT.PUSH);
+		this.btnAdd.setImage(getImageCache().readImage("icons/plus.gif"));
+		this.btnAdd.addSelectionListener(new ActionListener(this.addAction));
+		ret.add(ret.size() - 1, this.btnAdd);
 		
 		return ret;
 	}
 	
 	@Override
 	protected void populateContextMenu(List<IContributionItem> menu0, List<IContributionItem> menu1) {
-		menu0.add(new ActionContributionItem(addToQueueAction));
-		menu0.add(new ActionContributionItem(showTagsAction));
+		menu0.add(new ActionContributionItem(this.addToQueueAction));
+		menu0.add(new ActionContributionItem(this.showTagsAction));
 		menu0.add(getAddToMenu());
 		
-		menu1.add(new ActionContributionItem(toggleEnabledAction));
-		menu1.add(new ActionContributionItem(removeAction));
+		menu1.add(new ActionContributionItem(this.toggleEnabledAction));
+		menu1.add(new ActionContributionItem(this.removeAction));
 		
 		super.populateContextMenu(menu0, menu1);
 	}
@@ -82,6 +82,7 @@ public class LocalLibraryEditor extends AbstractLibraryEditor<LocalMediaLibrary>
 //	Actions.
 	
 	protected IAction addAction = new Action("Add") {
+		@Override
 		public void run () {
 			ViewLibraryProperties propView = showLibPropView();
 			if (propView!=null) {
@@ -91,12 +92,14 @@ public class LocalLibraryEditor extends AbstractLibraryEditor<LocalMediaLibrary>
 	};
 	
 	protected IAction showPropertiesAction = new Action("Properties") {
+		@Override
 		public void run () {
 			showLibPropView();
 		}
 	};
 	
 	protected IAction showTagsAction = new Action("Tags") {
+		@Override
 		public void run () {
 			try {
 				IViewPart showView = getSite().getPage().showView(ViewTagEditor.ID);
@@ -112,18 +115,14 @@ public class LocalLibraryEditor extends AbstractLibraryEditor<LocalMediaLibrary>
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Action helpers.
 	
-	private ViewLibraryProperties showLibPropView () {
+	ViewLibraryProperties showLibPropView () {
 		try {
 			IViewPart showView = getSite().getPage().showView(ViewLibraryProperties.ID);
 			ViewLibraryProperties viewProp = (ViewLibraryProperties) showView;
-			// TODO Show props for other view types?
-			if (getMediaList() instanceof LocalMediaLibrary) {
-				LocalMediaLibrary ml = (LocalMediaLibrary) getMediaList();
-				viewProp.setContent(ml);
-			}
+			viewProp.setContent(getMediaList());
 			return viewProp;
-			
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			new MorriganMsgDlg(e).open();
 			return null;
 		}
