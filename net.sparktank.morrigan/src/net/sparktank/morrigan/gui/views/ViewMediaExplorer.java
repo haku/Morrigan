@@ -2,6 +2,7 @@ package net.sparktank.morrigan.gui.views;
 
 import java.util.ArrayList;
 
+import net.sparktank.morrigan.gui.actions.NewGalleryAction;
 import net.sparktank.morrigan.gui.actions.NewLibraryAction;
 import net.sparktank.morrigan.gui.actions.NewPlaylistAction;
 import net.sparktank.morrigan.gui.actions.NewRemoteLibraryAction;
@@ -141,6 +142,7 @@ public class ViewMediaExplorer extends ViewPart {
 		getViewSite().getActionBars().getToolBarManager().add(new NewLibraryAction(getViewSite().getWorkbenchWindow()));
 		getViewSite().getActionBars().getToolBarManager().add(new NewRemoteLibraryAction(getViewSite().getWorkbenchWindow()));
 		getViewSite().getActionBars().getToolBarManager().add(new NewPlaylistAction(getViewSite().getWorkbenchWindow()));
+		getViewSite().getActionBars().getToolBarManager().add(new NewGalleryAction(getViewSite().getWorkbenchWindow()));
 	}
 	
 	private void makeContent () {

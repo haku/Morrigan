@@ -1,9 +1,11 @@
 package net.sparktank.morrigan.gui.actions;
 
+import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.editors.EditorFactory;
 import net.sparktank.morrigan.gui.editors.MediaItemDbEditorInput;
+import net.sparktank.morrigan.gui.editors.pictures.LocalGalleryEditor;
 import net.sparktank.morrigan.gui.views.ViewMediaExplorer;
 import net.sparktank.morrigan.model.pictures.gallery.LocalGallery;
 import net.sparktank.morrigan.model.pictures.gallery.LocalGalleryHelper;
@@ -15,6 +17,7 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
 
 public class NewGalleryAction extends Action implements IWorkbenchAction {
@@ -66,16 +69,15 @@ public class NewGalleryAction extends Action implements IWorkbenchAction {
 			view.refresh();
 			
 			// Open new item.
-//			try {
+			try {
 				MediaItemDbEditorInput input = EditorFactory.getGalleryInput(createdGallery.getDbPath());
-				throw new RuntimeException("Not implemented.");
-//				page.openEditor(input, GalleryEditor.ID); // TODO
-//			}
-//			catch (PartInitException e) {
-//				new MorriganMsgDlg(e).open();
-//			} catch (MorriganException e) {
-//				new MorriganMsgDlg(e).open();
-//			}
+				page.openEditor(input, LocalGalleryEditor.ID);
+			}
+			catch (PartInitException e) {
+				new MorriganMsgDlg(e).open();
+			} catch (MorriganException e) {
+				new MorriganMsgDlg(e).open();
+			}
 			
 		}
 	}
