@@ -47,7 +47,7 @@ public class MediaListPref extends FieldEditorPreferencePage implements IWorkben
 	}
 	
 	public static boolean getColPref (MediaTrackListEditor<?,?> editor, MediaColumn column) {
-		if (column == editor.COL_FILE) {
+		if (column == editor.COL_ADDED) {
 			return Activator.getDefault().getPreferenceStore().getBoolean(PREF_COL_DADDED);
 		}
 		else if (column == editor.COL_COUNTS) {
