@@ -24,12 +24,13 @@ public class RemoteLibraryEditor extends AbstractLibraryEditor<RemoteMediaLibrar
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Create GUI.
 	
+	@Override
 	protected List<Control> populateToolbar(Composite parent) {
 		List<Control> ret = super.populateToolbar(parent);
 		
 		Button btnRefresh = new Button(parent, SWT.PUSH);
 		btnRefresh.setText("Refresh");
-		btnRefresh.addSelectionListener(refreshListener);
+		btnRefresh.addSelectionListener(this.refreshListener);
 		ret.add(ret.size() - 1, btnRefresh);
 		
 		return ret;
