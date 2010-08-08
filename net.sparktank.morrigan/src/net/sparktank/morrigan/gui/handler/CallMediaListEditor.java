@@ -3,6 +3,7 @@ package net.sparktank.morrigan.gui.handler;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.editors.EditorFactory;
 import net.sparktank.morrigan.gui.editors.MediaItemListEditorInput;
+import net.sparktank.morrigan.gui.editors.pictures.LocalGalleryEditor;
 import net.sparktank.morrigan.gui.editors.tracks.LocalLibraryEditor;
 import net.sparktank.morrigan.gui.editors.tracks.PlaylistEditor;
 import net.sparktank.morrigan.gui.editors.tracks.RemoteLibraryEditor;
@@ -69,6 +70,15 @@ public class CallMediaListEditor extends AbstractHandler {
 					try {
 						input = EditorFactory.getRemoteMediaLibraryInput(item.identifier);
 						editorId = RemoteLibraryEditor.ID;
+					} catch (Exception e) {
+						new MorriganMsgDlg(e).open();
+						return null;
+					}
+					
+				} else if (item.type == MediaExplorerItem.ItemType.LOCALGALLERY) {
+					try {
+						input = EditorFactory.getGalleryInput(item.identifier);
+						editorId = LocalGalleryEditor.ID;
 					} catch (Exception e) {
 						new MorriganMsgDlg(e).open();
 						return null;
