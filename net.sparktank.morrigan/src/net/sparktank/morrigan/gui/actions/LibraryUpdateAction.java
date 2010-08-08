@@ -2,31 +2,35 @@ package net.sparktank.morrigan.gui.actions;
 
 import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
+import net.sparktank.morrigan.gui.jobs.TaskJob;
+import net.sparktank.morrigan.model.MediaItemDb;
 import net.sparktank.morrigan.model.tracks.library.local.LocalLibraryUpdateTask;
 import net.sparktank.morrigan.model.tracks.library.local.LocalMediaLibrary;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
-import net.sparktank.morrigan.gui.jobs.*;
 
+/*
+ * TODO refactor to be LocalDbUpdateAction (or something like that).
+ */
 public class LibraryUpdateAction extends Action implements IWorkbenchAction{
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private LocalMediaLibrary library = null;
+	private MediaItemDb<?,?,?> library = null;
 	
 	public LibraryUpdateAction () {
 		super();
 	}
 	
-	public LibraryUpdateAction (LocalMediaLibrary library) {
+	public LibraryUpdateAction (MediaItemDb<?,?,?> library) {
 		super();
 		this.library = library;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public void setMediaLibrary (LocalMediaLibrary library) {
+	public void setMediaLibrary (MediaItemDb<?,?,?> library) {
 		this.library = library;
 	}
 	
@@ -34,11 +38,11 @@ public class LibraryUpdateAction extends Action implements IWorkbenchAction{
 	
 	@Override
 	public String getText() { 
-		if (library != null) {
-			return "Update " + library.getListName();
-		} else {
-			return "Update library";
+		if (this.library != null) {
+			return "Update " + this.library.getListName();
 		}
+		
+		return "Update library";
 	}
 	
 	@Override
@@ -54,12 +58,21 @@ public class LibraryUpdateAction extends Action implements IWorkbenchAction{
 	
 	@Override
 	public void run() {
-		if (library==null) {
+		if (this.library==null) {
 			new MorriganMsgDlg("No library selected desu~.").open();
 			return;
 		}
 		
-		LocalLibraryUpdateTask task = LocalLibraryUpdateTask.FACTORY.manufacture(library);
+		LocalLibraryUpdateTask task;
+		
+		if (this.library instanceof LocalMediaLibrary) {
+			LocalMediaLibrary lml = (LocalMediaLibrary) this.library;
+			task = LocalLibraryUpdateTask.FACTORY.manufacture(lml);
+		}
+		else {
+			throw new IllegalArgumentException("TODO: Only update for LocalMediaLibrary has been implemented.");
+		}
+		
 		if (task != null) {
 			TaskJob job = new TaskJob(task, Display.getCurrent());
 			job.schedule();
@@ -72,7 +85,7 @@ public class LibraryUpdateAction extends Action implements IWorkbenchAction{
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
-	public void dispose() {}
+	public void dispose() {/* UNUSED */}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
