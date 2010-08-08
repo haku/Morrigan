@@ -1,5 +1,6 @@
 package net.sparktank.morrigan.gui.editors;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -9,10 +10,12 @@ import net.sparktank.morrigan.gui.adaptors.MediaFilter;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.handler.CallPlayMedia;
 import net.sparktank.morrigan.gui.helpers.ImageCache;
+import net.sparktank.morrigan.gui.jobs.TaskJob;
 import net.sparktank.morrigan.gui.preferences.MediaListPref;
 import net.sparktank.morrigan.model.IMediaItemList;
 import net.sparktank.morrigan.model.IMediaItemList.DirtyState;
 import net.sparktank.morrigan.model.MediaItem;
+import net.sparktank.morrigan.model.tasks.MediaFileCopyTask;
 
 import org.eclipse.core.commands.common.CommandException;
 import org.eclipse.jface.action.Action;
@@ -39,6 +42,7 @@ import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
@@ -476,6 +480,31 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 						t.printStackTrace();
 					}
 				}
+			}
+		}
+	};
+	
+	String lastFileCopyTargetDir = null;
+	
+	protected IAction copyToAction = new Action("Copy to...") {
+		@Override
+		public void run () {
+			ArrayList<S> selectedTracks = getSelectedItems();
+			
+			DirectoryDialog dlg = new DirectoryDialog(getSite().getShell());
+			dlg.setText("Copy Files...");
+			dlg.setMessage("Select a directory to copy files to.");
+			if (MediaItemListEditor.this.lastFileCopyTargetDir != null) {
+				dlg.setFilterPath(MediaItemListEditor.this.lastFileCopyTargetDir);
+			}
+			String dir = dlg.open();
+			
+			if (dir != null) {
+				MediaItemListEditor.this.lastFileCopyTargetDir = dir;
+				
+				MediaFileCopyTask<S> task = new MediaFileCopyTask<S>(getMediaList(), selectedTracks, new File(dir));
+				TaskJob job = new TaskJob(task, getSite().getShell().getDisplay());
+				job.schedule();
 			}
 		}
 	};
