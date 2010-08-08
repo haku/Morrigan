@@ -1,6 +1,7 @@
 package net.sparktank.morrigan.gui.editors;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
@@ -8,12 +9,18 @@ import net.sparktank.morrigan.gui.adaptors.MediaFilter;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.handler.CallPlayMedia;
 import net.sparktank.morrigan.gui.helpers.ImageCache;
+import net.sparktank.morrigan.gui.preferences.MediaListPref;
 import net.sparktank.morrigan.model.IMediaItemList;
 import net.sparktank.morrigan.model.MediaItem;
+import net.sparktank.morrigan.model.IMediaItemList.DirtyState;
 
 import org.eclipse.core.commands.common.CommandException;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IContributionItem;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnLayoutData;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -21,6 +28,7 @@ import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
@@ -28,6 +36,14 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.FormAttachment;
+import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
@@ -98,6 +114,7 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 	protected abstract S getNewS (String filePath);
 	
 	protected abstract List<MediaColumn> getColumns ();
+	protected abstract boolean isColumnVisible (MediaColumn col);
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	EditorPart methods.
@@ -141,6 +158,166 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 	}
 	
 	protected abstract boolean handleReadError (Exception e);
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Controls.
+	
+	protected final int sep = 3;
+	
+	abstract protected void createControls (Composite parent);
+	abstract protected List<Control> populateToolbar (Composite parent);
+	abstract protected void populateContextMenu (List<IContributionItem> menu0, List<IContributionItem> menu1);
+	
+	protected Label lblStatus = null;
+	
+	@Override
+	public void createPartControl(Composite parent) {
+		FormData formData;
+		
+		Composite parent2 = new Composite(parent, SWT.NONE);
+		parent2.setLayout(new FormLayout());
+		
+		// Create toolbar area.
+		
+		Composite toolbarComposite = new Composite(parent2, SWT.NONE);
+		formData = new FormData();
+		formData.top = new FormAttachment(0, 0);
+		formData.left = new FormAttachment(0, 0);
+		formData.right = new FormAttachment(100, 0);
+		toolbarComposite.setLayoutData(formData);
+		toolbarComposite.setLayout(new FormLayout());
+		
+		// Create table.
+		
+		Composite tableComposite = new Composite(parent2, SWT.NONE); // Because of the way table column layouts work.
+		formData = new FormData();
+		formData.top = new FormAttachment(toolbarComposite, 0);
+		formData.left = new FormAttachment(0, 0);
+		formData.right = new FormAttachment(100, 0);
+		formData.bottom = new FormAttachment(100, 0);
+		tableComposite.setLayoutData(formData);
+		this.editTable = new TableViewer(tableComposite, SWT.MULTI | SWT.V_SCROLL | SWT.FULL_SELECTION );
+		TableColumnLayout layout = new TableColumnLayout();
+		tableComposite.setLayout(layout);
+		
+		// add and configure columns.
+		for (MediaColumn mCol : getColumns()) {
+			if (isColumnVisible(mCol)) {
+				final TableViewerColumn column = new TableViewerColumn(this.editTable, SWT.NONE);
+				
+				layout.setColumnData(column.getColumn(), mCol.getColumnLayoutData());
+				column.setLabelProvider(mCol.getCellLabelProvider());
+				if (mCol.getAlignment() > -1) {
+					column.getColumn().setAlignment(mCol.getAlignment());
+				}
+				
+				column.getColumn().setText(mCol.toString());
+				column.getColumn().setResizable(true);
+				column.getColumn().setMoveable(true);
+				
+				if (isSortable()) {
+					column.getColumn().addSelectionListener(getSelectionAdapter(this.editTable, column));
+				}
+			}
+		}
+		
+		Table table = this.editTable.getTable();
+		table.setHeaderVisible(MediaListPref.getShowHeadersPref());
+		table.setLinesVisible(false);
+		
+		this.editTable.setContentProvider(this.contentProvider);
+		this.editTable.addDoubleClickListener(this.doubleClickListener);
+		this.editTable.setInput(getEditorSite());
+		this.mediaFilter = new MediaFilter<T, S>();
+		this.editTable.addFilter(this.mediaFilter);
+		
+		getSite().setSelectionProvider(this.editTable);
+		
+		int topIndex = this.editorInput.getTopIndex();
+		if (topIndex > 0) {
+			this.editTable.getTable().setTopIndex(topIndex);
+		}
+		this.editorInput.setTable(this.editTable.getTable());
+		
+		createControls(parent2);
+		createToolbar(toolbarComposite);
+		createContextMenu(parent2);
+		
+		// Call update events.
+		listChanged();
+	}
+	
+	@Override
+	public boolean isDirty() {
+		return this.editorInput.getMediaList().getDirtyState() == DirtyState.DIRTY;
+	}
+	
+	private void createToolbar (Composite toolbarParent) {
+		FormData formData;
+		
+		List<Control> controls = populateToolbar(toolbarParent);
+		
+		this.lblStatus = new Label(toolbarParent, SWT.NONE);
+		formData = new FormData();
+		formData.top = new FormAttachment(50, -(this.lblStatus.computeSize(SWT.DEFAULT, SWT.DEFAULT).y)/2);
+		formData.left = new FormAttachment(0, this.sep*2);
+		formData.right = new FormAttachment(controls.get(0), -this.sep);
+		this.lblStatus.setLayoutData(formData);
+		
+		for (int i = 0; i < controls.size(); i++) {
+			formData = new FormData();
+			
+			formData.top = new FormAttachment(0, this.sep);
+			formData.bottom = new FormAttachment(100, -this.sep);
+			
+			if (i == controls.size() - 1) {
+				formData.right = new FormAttachment(100, -this.sep);
+			} else {
+				formData.right = new FormAttachment(controls.get(i+1), -this.sep);
+			}
+			
+			controls.get(i).setLayoutData(formData);
+		}
+	}
+	
+	private void createContextMenu (Composite parent) {
+		List<IContributionItem> menu0 = new LinkedList<IContributionItem>();
+		List<IContributionItem> menu1 = new LinkedList<IContributionItem>();
+		populateContextMenu(menu0, menu1);
+		
+		MenuManager contextMenuMgr = new MenuManager();
+		for (IContributionItem a : menu0) {
+			contextMenuMgr.add(a);
+		}
+		contextMenuMgr.add(new Separator());
+		for (IContributionItem a : menu1) {
+			contextMenuMgr.add(a);
+		}
+		setTableMenu(contextMenuMgr.createContextMenu(parent));
+	}
+	
+	protected void setTableMenu (Menu menu) {
+		this.editTable.getTable().setMenu(menu);
+	}
+	
+	public void revealItem (Object element) {
+		this.editTable.setSelection(new StructuredSelection(element), true);
+		this.editTable.getTable().setFocus();
+	}
+	
+	protected void setFilterString (String s) {
+		this.mediaFilter.setFilterString(s);
+		this.editTable.refresh();
+	}
+	
+	protected ImageCache getImageCache() {
+		return this.imageCache;
+	}
+	
+	@Override
+	public void setFocus() {
+		this.editTable.getTable().setFocus();
+	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Providers.

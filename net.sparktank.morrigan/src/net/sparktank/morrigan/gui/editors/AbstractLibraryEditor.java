@@ -215,25 +215,25 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> exte
 		DbColumn sort = getMediaList().getSort();
 		MediaColumn mCol = parseMediaColumn(column.getColumn().getText());
 		
-		if (mCol == COL_FILE) {
+		if (mCol == this.COL_FILE) {
 			sort = MediaSqliteLayer2.SQL_TBL_MEDIAFILES_COL_FILE;
 		}
-		else if (mCol == COL_ADDED) {
+		else if (mCol == this.COL_ADDED) {
 			sort = MediaSqliteLayer2.SQL_TBL_MEDIAFILES_COL_DADDED;
 		}
-		else if (mCol == COL_COUNTS) {
+		else if (mCol == this.COL_COUNTS) {
 			sort = LibrarySqliteLayer2.SQL_TBL_MEDIAFILES_COL_STARTCNT;
 		}
-		else if (mCol == COL_LASTPLAYED) {
+		else if (mCol == this.COL_LASTPLAYED) {
 			sort = LibrarySqliteLayer2.SQL_TBL_MEDIAFILES_COL_DLASTPLAY;
 		}
-		else if (mCol == COL_HASH) {
+		else if (mCol == this.COL_HASH) {
 			sort = MediaSqliteLayer2.SQL_TBL_MEDIAFILES_COL_HASHCODE;
 		}
-		else if (mCol == COL_MODIFIED) {
+		else if (mCol == this.COL_MODIFIED) {
 			sort = MediaSqliteLayer2.SQL_TBL_MEDIAFILES_COL_DMODIFIED;
 		}
-		else if (mCol == COL_DURATION) {
+		else if (mCol == this.COL_DURATION) {
 			sort = LibrarySqliteLayer2.SQL_TBL_MEDIAFILES_COL_DURATION;
 		}
 		else {
