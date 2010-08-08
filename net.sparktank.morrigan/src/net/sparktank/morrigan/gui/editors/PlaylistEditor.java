@@ -41,7 +41,7 @@ public class PlaylistEditor extends MediaTrackListEditor<MediaPlaylist,MediaTrac
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private Logger logger = Logger.getLogger(this.getClass().getName());
+	Logger logger = Logger.getLogger(this.getClass().getName());
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -102,7 +102,7 @@ public class PlaylistEditor extends MediaTrackListEditor<MediaPlaylist,MediaTrac
 	}
 	
 	@Override
-	protected void onSort(TableViewer table, TableViewerColumn column, int direction) {}
+	protected void onSort(TableViewer table, TableViewerColumn column, int direction) {/* UNUSED */}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	GUI components.
@@ -114,22 +114,22 @@ public class PlaylistEditor extends MediaTrackListEditor<MediaPlaylist,MediaTrac
 	private Image iconSave;
 	
 	private void makeIcons () {
-		iconX = Activator.getImageDescriptor("icons/x.gif").createImage();
-		iconQueueAdd = Activator.getImageDescriptor("icons/queue-add.gif").createImage();
-		iconAdd = Activator.getImageDescriptor("icons/plus.gif").createImage();
-		iconProperties = Activator.getImageDescriptor("icons/pref.gif").createImage();
-		iconSave = Activator.getImageDescriptor("icons/save.gif").createImage();
+		this.iconX = Activator.getImageDescriptor("icons/x.gif").createImage();
+		this.iconQueueAdd = Activator.getImageDescriptor("icons/queue-add.gif").createImage();
+		this.iconAdd = Activator.getImageDescriptor("icons/plus.gif").createImage();
+		this.iconProperties = Activator.getImageDescriptor("icons/pref.gif").createImage();
+		this.iconSave = Activator.getImageDescriptor("icons/save.gif").createImage();
 	}
 	
 	private void disposeIcons () {
-		iconX.dispose();
-		iconQueueAdd.dispose();
-		iconAdd.dispose();
-		iconProperties.dispose();
-		iconSave.dispose();
+		this.iconX.dispose();
+		this.iconQueueAdd.dispose();
+		this.iconAdd.dispose();
+		this.iconProperties.dispose();
+		this.iconSave.dispose();
 	}
 	
-	private Text txtFilter;
+	Text txtFilter;
 	
 	@Override
 	protected void createControls(Composite parent) {
@@ -141,28 +141,28 @@ public class PlaylistEditor extends MediaTrackListEditor<MediaPlaylist,MediaTrac
 	protected List<Control> populateToolbar(Composite parent) {
 		List<Control> ret = new LinkedList<Control>();
 		
-		txtFilter = new Text(parent, SWT.SINGLE | SWT.BORDER | SWT.SEARCH);
-		txtFilter.setMessage("Filter");
-		txtFilter.addSelectionListener(filterListener);
-		ret.add(txtFilter);
+		this.txtFilter = new Text(parent, SWT.SINGLE | SWT.BORDER | SWT.SEARCH);
+		this.txtFilter.setMessage("Filter");
+		this.txtFilter.addSelectionListener(this.filterListener);
+		ret.add(this.txtFilter);
 		
 		Button btnClearFilter = new Button(parent, SWT.PUSH);
-		btnClearFilter.setImage(iconX);
-		btnClearFilter.addSelectionListener(clearFilterListener);
+		btnClearFilter.setImage(this.iconX);
+		btnClearFilter.addSelectionListener(this.clearFilterListener);
 		ret.add(btnClearFilter);
 		
 		Button btnAddToQueue = new Button(parent, SWT.PUSH);
-		btnAddToQueue.setImage(iconQueueAdd);
-		btnAddToQueue.addSelectionListener(new ActionListener(addToQueueAction));
+		btnAddToQueue.setImage(this.iconQueueAdd);
+		btnAddToQueue.addSelectionListener(new ActionListener(this.addToQueueAction));
 		ret.add(btnAddToQueue);
 		
 		Button btnAdd = new Button(parent, SWT.PUSH);
-		btnAdd.setImage(iconAdd);
-		btnAdd.addSelectionListener(new ActionListener(addAction));
+		btnAdd.setImage(this.iconAdd);
+		btnAdd.addSelectionListener(new ActionListener(this.addAction));
 		ret.add(btnAdd);
 		
 		Button btnSave = new Button(parent, SWT.PUSH);
-		btnSave.setImage(iconSave);
+		btnSave.setImage(this.iconSave);
 		btnSave.addSelectionListener(new ActionListener(new SaveEditorAction(this)));
 		ret.add(btnSave);
 		
@@ -171,11 +171,11 @@ public class PlaylistEditor extends MediaTrackListEditor<MediaPlaylist,MediaTrac
 	
 	@Override
 	protected void populateContextMenu(List<IContributionItem> menu0, List<IContributionItem> menu1) {
-		menu0.add(new ActionContributionItem(addToQueueAction));
+		menu0.add(new ActionContributionItem(this.addToQueueAction));
 		menu0.add(getAddToMenu());
 		
-		menu1.add(new ActionContributionItem(toggleEnabledAction));
-		menu1.add(new ActionContributionItem(removeAction));
+		menu1.add(new ActionContributionItem(this.toggleEnabledAction));
+		menu1.add(new ActionContributionItem(this.removeAction));
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -183,11 +183,11 @@ public class PlaylistEditor extends MediaTrackListEditor<MediaPlaylist,MediaTrac
 	
 	@Override
 	protected void listChanged () {
-		if (lblStatus.isDisposed()) return;
+		if (this.lblStatus.isDisposed()) return;
 		
 		DurationData d = getMediaList().getTotalDuration();
 		
-		lblStatus.setText(
+		this.lblStatus.setText(
 				getMediaList().getCount() + " items"
 				+ " totaling " + (d.complete ? "" : "more than ") +
 				TimeHelper.formatTimeSeconds(d.duration) + "."
@@ -195,11 +195,12 @@ public class PlaylistEditor extends MediaTrackListEditor<MediaPlaylist,MediaTrac
 	}
 	
 	private SelectionAdapter filterListener = new SelectionAdapter() {
+		@Override
 		public void widgetDefaultSelected(SelectionEvent e) {
 			if (e.detail == SWT.CANCEL) {
-				clearFilterListener.widgetSelected(null);
+				PlaylistEditor.this.clearFilterListener.widgetSelected(null);
 			} else {
-				setFilterString(txtFilter.getText());
+				setFilterString(PlaylistEditor.this.txtFilter.getText());
 			}
 		}
 	};
@@ -207,7 +208,7 @@ public class PlaylistEditor extends MediaTrackListEditor<MediaPlaylist,MediaTrac
 	SelectionAdapter clearFilterListener = new SelectionAdapter() {
 		@Override
 		public void widgetSelected(SelectionEvent e) {
-			txtFilter.setText("");
+			PlaylistEditor.this.txtFilter.setText("");
 			setFilterString("");
 		}
 	};
@@ -225,6 +226,7 @@ public class PlaylistEditor extends MediaTrackListEditor<MediaPlaylist,MediaTrac
 		
 		private String lastDir = null;
 		
+		@Override
 		public void run () {
 			String[] supportedFormats;
 			try {
@@ -251,13 +253,13 @@ public class PlaylistEditor extends MediaTrackListEditor<MediaPlaylist,MediaTrac
 			dialog.setText("Add to " + getTitle());
 			dialog.setFilterNames(filterList);
 			dialog.setFilterExtensions(filterList);
-			dialog.setFilterPath(lastDir);
+			dialog.setFilterPath(this.lastDir);
 			
 			String firstSel = dialog.open();
 			if (firstSel != null) {
 				File firstSelFile = new File(firstSel);
 				String baseDir = firstSelFile.getAbsoluteFile().getParentFile().getAbsolutePath();
-				lastDir = baseDir;
+				this.lastDir = baseDir;
 				
 				String[] files = dialog.getFileNames();
 				int n = 0;
@@ -266,7 +268,7 @@ public class PlaylistEditor extends MediaTrackListEditor<MediaPlaylist,MediaTrac
 					addItem(toAdd);
 					n++;
 				}
-				logger.fine("Added " + n + " file to '" + getTitle() + "'.");
+				PlaylistEditor.this.logger.fine("Added " + n + " file to '" + getTitle() + "'.");
 			}
 		}
 		

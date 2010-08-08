@@ -33,16 +33,16 @@ public class SaveEditorAction extends Action implements IWorkbenchAction {
 	
 	@Override
 	public void run () {
-		if (editor.getSite().getWorkbenchWindow() == null) {
+		if (this.editor.getSite().getWorkbenchWindow() == null) {
 			return;
 		}
-		editor.getSite().getPage().saveEditor(editor, false);
+		this.editor.getSite().getPage().saveEditor(this.editor, false);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
-	public void dispose() {}
+	public void dispose() {/* UNUSED */}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
