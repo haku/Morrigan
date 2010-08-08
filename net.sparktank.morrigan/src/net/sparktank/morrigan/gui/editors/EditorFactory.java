@@ -35,7 +35,7 @@ public class EditorFactory implements IElementFactory {
 	 */
 	@Override
 	public IAdaptable createElement(IMemento memento) {
-		MediaTrackListEditorInput<?> input = null;
+		MediaItemListEditorInput<?> input = null;
 		
 		String type = memento.getString(KEY_TYPE);
 		
@@ -126,7 +126,7 @@ public class EditorFactory implements IElementFactory {
 		return input;
 	}
 	
-	public static MediaTrackListEditorInput<MediaPlaylist> getMediaPlaylistInput (String filePath) throws MorriganException {
+	public static MediaItemListEditorInput<MediaPlaylist> getMediaPlaylistInput (String filePath) throws MorriganException {
 		MediaPlaylist playList;
 		try {
 			playList = MediaTrackListFactory.PLAYLIST_FACTORY.manufacture(filePath);
@@ -134,7 +134,7 @@ public class EditorFactory implements IElementFactory {
 			throw new MorriganException(e);
 		}
 		
-		MediaTrackListEditorInput<MediaPlaylist> input = new MediaTrackListEditorInput<MediaPlaylist>(playList);
+		MediaItemListEditorInput<MediaPlaylist> input = new MediaItemListEditorInput<MediaPlaylist>(playList);
 		return input;
 	}
 
