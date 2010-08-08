@@ -52,7 +52,7 @@ public class AddToQueue  extends AbstractHandler {
 			if (findView != null) {
 				playerView = (AbstractPlayerView) findView;
 				
-				ArrayList<? extends MediaTrack> selectedTracks = mediaListEditor.getSelectedTracks();
+				ArrayList<? extends MediaTrack> selectedTracks = mediaListEditor.getSelectedItems();
 				if (selectedTracks != null) {
 					for (MediaTrack track : selectedTracks) {
 						PlayItem item = new PlayItem(mediaListEditor.getMediaList(), track);

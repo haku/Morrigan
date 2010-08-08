@@ -17,7 +17,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-public class CallPlayMedia  extends AbstractHandler {
+public class CallPlayMedia extends AbstractHandler {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static final String ID = "net.sparktank.morrigan.gui.handler.CallPlayMedia";
@@ -47,7 +47,7 @@ public class CallPlayMedia  extends AbstractHandler {
 			
 			if (findView != null) {
 				playerView = (AbstractPlayerView) findView;
-				playerView.getPlayer().loadAndStartPlaying(mediaListEditor.getMediaList(), mediaListEditor.getSelectedTrack());
+				playerView.getPlayer().loadAndStartPlaying(mediaListEditor.getMediaList(), mediaListEditor.getSelectedItem());
 			
 			} else {
 				new MorriganMsgDlg("Error: failed to find an AbstractPlayerView.").open();

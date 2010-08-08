@@ -309,7 +309,7 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> exte
 	protected IAction copyToAction = new Action("Copy to...") {
 		@Override
 		public void run () {
-			ArrayList<MediaTrack> selectedTracks = getSelectedTracks();
+			ArrayList<MediaTrack> selectedTracks = getSelectedItems();
 			
 			DirectoryDialog dlg = new DirectoryDialog(getSite().getShell());
 			dlg.setText("Copy Files...");
