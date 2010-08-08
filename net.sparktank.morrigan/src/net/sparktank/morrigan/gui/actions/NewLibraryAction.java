@@ -4,7 +4,7 @@ import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.editors.EditorFactory;
-import net.sparktank.morrigan.gui.editors.LibraryEditorInput;
+import net.sparktank.morrigan.gui.editors.MediaItemDbEditorInput;
 import net.sparktank.morrigan.gui.editors.LocalLibraryEditor;
 import net.sparktank.morrigan.gui.views.ViewMediaExplorer;
 import net.sparktank.morrigan.model.tracks.library.local.LocalLibraryHelper;
@@ -70,7 +70,7 @@ public class NewLibraryAction extends Action implements IWorkbenchAction {
 			
 			// Open new item.
 			try {
-				LibraryEditorInput input = EditorFactory.getMediaLibraryInput(createdLib.getDbPath());
+				MediaItemDbEditorInput input = EditorFactory.getMediaLibraryInput(createdLib.getDbPath());
 				page.openEditor(input, LocalLibraryEditor.ID);
 			}
 			catch (PartInitException e) {

@@ -1,15 +1,21 @@
 package net.sparktank.morrigan.gui.editors;
 
 import net.sparktank.morrigan.model.DbColumn;
+import net.sparktank.morrigan.model.IMediaItemList;
+import net.sparktank.morrigan.model.MediaItem;
+import net.sparktank.morrigan.model.MediaItemDb;
+import net.sparktank.morrigan.model.MediaSqliteLayer2;
 import net.sparktank.morrigan.model.MediaSqliteLayer2.SortDirection;
-import net.sparktank.morrigan.model.tracks.library.AbstractMediaLibrary;
 
 import org.eclipse.ui.IMemento;
 
-public class LibraryEditorInput extends MediaItemListEditorInput<AbstractMediaLibrary> {
+/**
+ * Subclass of MediaItemListEditorInput to allow saving of sort configuration.
+ */
+public class MediaItemDbEditorInput extends MediaItemListEditorInput<MediaItemDb<? extends IMediaItemList<? extends MediaItem>, ? extends MediaSqliteLayer2<? extends MediaItem>, ? extends MediaItem>> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public LibraryEditorInput(AbstractMediaLibrary mediaList) {
+	public MediaItemDbEditorInput(MediaItemDb<? extends IMediaItemList<? extends MediaItem>, ? extends MediaSqliteLayer2<? extends MediaItem>, ? extends MediaItem> mediaList) {
 		super(mediaList);
 	}
 	
