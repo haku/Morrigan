@@ -1,8 +1,8 @@
 package net.sparktank.morrigan.gui.editors;
 
 import net.sparktank.morrigan.helpers.EqualHelper;
-import net.sparktank.morrigan.model.tracks.IMediaTrackList;
-import net.sparktank.morrigan.model.tracks.MediaTrack;
+import net.sparktank.morrigan.model.IMediaItemList;
+import net.sparktank.morrigan.model.MediaItem;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Table;
@@ -10,7 +10,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPersistableElement;
 
-public class MediaTrackListEditorInput<T extends IMediaTrackList<? extends MediaTrack>> implements IEditorInput, IPersistableElement {
+public class MediaItemListEditorInput<T extends IMediaItemList<? extends MediaItem>> implements IEditorInput, IPersistableElement {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private final T editedMediaList;
@@ -20,7 +20,7 @@ public class MediaTrackListEditorInput<T extends IMediaTrackList<? extends Media
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructor.
 	
-	public MediaTrackListEditorInput (T mediaList) {
+	public MediaItemListEditorInput (T mediaList) {
 		this.editedMediaList = mediaList;
 	}
 	
@@ -98,8 +98,8 @@ public class MediaTrackListEditorInput<T extends IMediaTrackList<? extends Media
 	public boolean equals(Object aThat) {
 		if ( aThat == null ) return false;
 		if ( this == aThat ) return true;
-		if ( !(aThat instanceof MediaTrackListEditorInput<?>) ) return false;
-		MediaTrackListEditorInput<?> that = (MediaTrackListEditorInput<?>)aThat;
+		if ( !(aThat instanceof MediaItemListEditorInput<?>) ) return false;
+		MediaItemListEditorInput<?> that = (MediaItemListEditorInput<?>)aThat;
 		
 		return EqualHelper.areEqual(this.editedMediaList.getListId(), that.getMediaList().getListId());
 	}

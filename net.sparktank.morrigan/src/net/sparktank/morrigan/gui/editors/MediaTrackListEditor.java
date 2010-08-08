@@ -87,7 +87,7 @@ public abstract class MediaTrackListEditor<T extends IMediaTrackList<S>, S exten
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	MediaTrackListEditorInput<T> editorInput;
+	MediaItemListEditorInput<T> editorInput;
 	
 	private TableViewer editTable = null;
 	private MediaFilter mediaFilter = null;
@@ -112,8 +112,8 @@ public abstract class MediaTrackListEditor<T extends IMediaTrackList<S>, S exten
 		setSite(site);
 		setInput(input);
 		
-		if (input instanceof MediaTrackListEditorInput<?>) {
-			this.editorInput = (MediaTrackListEditorInput<T>) input;
+		if (input instanceof MediaItemListEditorInput<?>) {
+			this.editorInput = (MediaItemListEditorInput<T>) input;
 		} else {
 			throw new IllegalArgumentException("input is not instanceof MediaListEditorInput<?>.");
 		}

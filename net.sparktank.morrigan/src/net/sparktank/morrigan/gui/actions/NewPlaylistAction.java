@@ -4,7 +4,7 @@ import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.editors.EditorFactory;
-import net.sparktank.morrigan.gui.editors.MediaTrackListEditorInput;
+import net.sparktank.morrigan.gui.editors.MediaItemListEditorInput;
 import net.sparktank.morrigan.gui.editors.PlaylistEditor;
 import net.sparktank.morrigan.gui.views.ViewMediaExplorer;
 import net.sparktank.morrigan.model.tracks.playlist.MediaPlaylist;
@@ -70,7 +70,7 @@ public class NewPlaylistAction extends Action implements IWorkbenchAction {
 			
 			// Open new item.
 			try {
-				MediaTrackListEditorInput<MediaPlaylist> input = EditorFactory.getMediaPlaylistInput(createdPl.getFilePath());
+				MediaItemListEditorInput<MediaPlaylist> input = EditorFactory.getMediaPlaylistInput(createdPl.getFilePath());
 				page.openEditor(input, PlaylistEditor.ID);
 			}
 			catch (PartInitException e) {

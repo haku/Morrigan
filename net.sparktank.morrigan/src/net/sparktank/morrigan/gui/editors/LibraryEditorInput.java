@@ -6,7 +6,7 @@ import net.sparktank.morrigan.model.tracks.library.AbstractMediaLibrary;
 
 import org.eclipse.ui.IMemento;
 
-public class LibraryEditorInput extends MediaTrackListEditorInput<AbstractMediaLibrary> {
+public class LibraryEditorInput extends MediaItemListEditorInput<AbstractMediaLibrary> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public LibraryEditorInput(AbstractMediaLibrary mediaList) {
