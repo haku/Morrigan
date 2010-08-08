@@ -44,6 +44,7 @@ import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -57,6 +58,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IWorkbenchPart;
@@ -89,7 +91,7 @@ public abstract class MediaTrackListEditor<T extends IMediaTrackList<S>, S exten
 	
 	MediaItemListEditorInput<T> editorInput;
 	
-	private TableViewer editTable = null;
+	TableViewer editTable = null;
 	private MediaFilter mediaFilter = null;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -155,7 +157,7 @@ public abstract class MediaTrackListEditor<T extends IMediaTrackList<S>, S exten
 	abstract protected List<Control> populateToolbar (Composite parent);
 	abstract protected void populateContextMenu (List<IContributionItem> menu0, List<IContributionItem> menu1);
 	
-	private ImageCache imageCache = new ImageCache();
+	ImageCache imageCache = new ImageCache();
 	
 	protected Label lblStatus = null;
 	
@@ -359,13 +361,14 @@ public abstract class MediaTrackListEditor<T extends IMediaTrackList<S>, S exten
 		}
 		
 		@Override
-		public void dispose() {}
+		public void dispose() {/* UNUSED */}
 		@Override
-		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {/* UNUSED */}
 		
 	};
 	
-	private Styler strikeoutItemStyle = new Styler() {
+	Styler strikeoutItemStyle = new Styler() {
+		@Override
 		public void applyStyles(TextStyle textStyle) {
 			textStyle.strikeout = true;
 		}
@@ -375,6 +378,9 @@ public abstract class MediaTrackListEditor<T extends IMediaTrackList<S>, S exten
 	private static final String MSG_DEC_DISABLED = " (disabled)";
 	
 	private class FileLblProv extends StyledCellLabelProvider {
+		
+		public FileLblProv () {/* UNUSED */}
+		
 		@Override
 		public void update(ViewerCell cell) {
 			Object element = cell.getElement();
@@ -420,6 +426,9 @@ public abstract class MediaTrackListEditor<T extends IMediaTrackList<S>, S exten
 	}
 	
 	private class DateAddedLblProv extends ColumnLabelProvider {
+		
+		public DateAddedLblProv () {/* UNUSED */}
+		
 		private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 		@Override
 		public String getText(Object element) {
@@ -429,57 +438,77 @@ public abstract class MediaTrackListEditor<T extends IMediaTrackList<S>, S exten
 	}
 	
 	private class CountsLblProv extends ColumnLabelProvider {
+		
+		public CountsLblProv () {/* UNUSED */}
+		
 		@Override
 		public String getText(Object element) {
 			MediaTrack elm = (MediaTrack) element;
 			if (elm.getStartCount() <= 0 && elm.getStartCount() <= 0) {
 				return null;
-			} else {
-				return String.valueOf(elm.getStartCount()) + "/" + String.valueOf(elm.getEndCount());
 			}
+			
+			return String.valueOf(elm.getStartCount()) + "/" + String.valueOf(elm.getEndCount());
 		}
+		
 	}
 	
 	private class DateLastPlayerLblProv extends ColumnLabelProvider {
+		
+		public DateLastPlayerLblProv () {/* UNUSED */}
+		
 		private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 		@Override
 		public String getText(Object element) {
 			MediaTrack elm = (MediaTrack) element;
 			return elm.getDateLastPlayed() == null ? null : this.sdf.format(elm.getDateLastPlayed());
 		}
+		
 	}
 	
 	private class HashcodeLblProv extends ColumnLabelProvider {
+		
+		public HashcodeLblProv () {/* UNUSED */}
+		
 		@Override
 		public String getText(Object element) {
 			MediaItem elm = (MediaItem) element;
 			if (elm.getHashcode() == 0) {
 				return null;
-			} else {
-				return Long.toHexString(elm.getHashcode());
 			}
+			
+			return Long.toHexString(elm.getHashcode());
 		}
+		
 	}
 	
 	private class DateLastModifiedLblProv extends ColumnLabelProvider {
+		
+		public DateLastModifiedLblProv () {/* UNUSED */}
+		
 		private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 		@Override
 		public String getText(Object element) {
 			MediaItem elm = (MediaItem) element;
 			return elm.getDateLastModified() == null ? null : this.sdf.format(elm.getDateLastModified());
 		}
+		
 	}
 	
 	private class DurationLblProv extends ColumnLabelProvider {
+		
+		public DurationLblProv () {/* UNUSED */}
+		
 		@Override
 		public String getText(Object element) {
 			MediaTrack elm = (MediaTrack) element;
 			if (elm.getDuration() <= 0) {
 				return null;
-			} else {
-				return TimeHelper.formatTimeSeconds(elm.getDuration());
 			}
+			
+			return TimeHelper.formatTimeSeconds(elm.getDuration());
 		}
+		
 	}
 	
 	public class MediaFilter extends ViewerFilter {
@@ -533,19 +562,20 @@ public abstract class MediaTrackListEditor<T extends IMediaTrackList<S>, S exten
 		}
 	};
 	
-	private volatile boolean dirtyChangedRunableScheduled = false;
+	volatile boolean dirtyChangedRunableScheduled = false;
 	
-	private Runnable dirtyChangedRunable = new Runnable() {
+	Runnable dirtyChangedRunable = new Runnable() {
+		@SuppressWarnings("synthetic-access")
 		@Override
 		public void run() {
 			MediaTrackListEditor.this.dirtyChangedRunableScheduled = false;
-			firePropertyChange(EditorPart.PROP_DIRTY);
+			firePropertyChange(IEditorPart.PROP_DIRTY);
 		}
 	};
 	
-	private volatile boolean updateGuiRunableScheduled = false;
+	volatile boolean updateGuiRunableScheduled = false;
 	
-	private Runnable updateGuiRunable = new Runnable() {
+	Runnable updateGuiRunable = new Runnable() {
 		@Override
 		public void run() {
 			MediaTrackListEditor.this.updateGuiRunableScheduled = false;
@@ -669,6 +699,7 @@ public abstract class MediaTrackListEditor<T extends IMediaTrackList<S>, S exten
 		final MenuManager menu = new MenuManager("Add to playlist...");
 		
 		menu.addMenuListener(new IMenuListener () {
+			@Override
 			public void menuAboutToShow(IMenuManager manager) {
 				IEditorReference[] editors = getEditorSite().getPage().getEditorReferences();
 				for (final IEditorReference e : editors) {
@@ -677,7 +708,7 @@ public abstract class MediaTrackListEditor<T extends IMediaTrackList<S>, S exten
 					}
 				}
 				if (menu.getItems().length < 1) {
-					Action a = new Action("(No playlists open)") {};
+					Action a = new Action("(No playlists open)") {/* UNUSED */};
 					a.setEnabled(false);
 					menu.add(a);
 				}
@@ -730,7 +761,7 @@ public abstract class MediaTrackListEditor<T extends IMediaTrackList<S>, S exten
 		public void run () {
 			MorriganMsgDlg dlg = new MorriganMsgDlg("Remove selected from " + getTitle() + "?", MorriganMsgDlg.YESNO);
 			dlg.open();
-			if (dlg.getReturnCode() == MorriganMsgDlg.OK) {
+			if (dlg.getReturnCode() == Window.OK) {
 				for (S track : getSelectedTracks()) {
 					try {
 						removeTrack(track);
