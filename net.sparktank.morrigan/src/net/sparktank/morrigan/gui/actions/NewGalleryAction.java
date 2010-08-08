@@ -3,7 +3,7 @@ package net.sparktank.morrigan.gui.actions;
 import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.editors.EditorFactory;
-import net.sparktank.morrigan.gui.editors.LibraryEditorInput;
+import net.sparktank.morrigan.gui.editors.MediaItemDbEditorInput;
 import net.sparktank.morrigan.gui.views.ViewMediaExplorer;
 import net.sparktank.morrigan.model.pictures.gallery.LocalGallery;
 import net.sparktank.morrigan.model.pictures.gallery.LocalGalleryHelper;
@@ -67,7 +67,7 @@ public class NewGalleryAction extends Action implements IWorkbenchAction {
 			
 			// Open new item.
 //			try {
-				LibraryEditorInput input = EditorFactory.getGalleryInput(createdGallery.getDbPath());
+				MediaItemDbEditorInput input = EditorFactory.getGalleryInput(createdGallery.getDbPath());
 				throw new RuntimeException("Not implemented.");
 //				page.openEditor(input, GalleryEditor.ID); // TODO
 //			}

@@ -4,7 +4,7 @@ import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.editors.EditorFactory;
-import net.sparktank.morrigan.gui.editors.LibraryEditorInput;
+import net.sparktank.morrigan.gui.editors.MediaItemDbEditorInput;
 import net.sparktank.morrigan.gui.editors.RemoteLibraryEditor;
 import net.sparktank.morrigan.gui.views.ViewMediaExplorer;
 import net.sparktank.morrigan.model.tracks.library.remote.RemoteLibraryHelper;
@@ -69,7 +69,7 @@ public class NewRemoteLibraryAction extends Action implements IWorkbenchAction {
 			
 			// Open new item.
 			try {
-				LibraryEditorInput input = EditorFactory.getRemoteMediaLibraryInput(createdRemoteLib.getDbPath());
+				MediaItemDbEditorInput input = EditorFactory.getRemoteMediaLibraryInput(createdRemoteLib.getDbPath());
 				page.openEditor(input, RemoteLibraryEditor.ID);
 			}
 			catch (PartInitException e) {

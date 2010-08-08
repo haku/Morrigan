@@ -69,7 +69,7 @@ public class EditorFactory implements IElementFactory {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public static LibraryEditorInput getMediaLibraryInput (String dbFilePath) throws MorriganException {
+	public static MediaItemDbEditorInput getMediaLibraryInput (String dbFilePath) throws MorriganException {
 		LocalMediaLibrary ml;
 		
 		try {
@@ -78,13 +78,13 @@ public class EditorFactory implements IElementFactory {
 			throw new MorriganException(e);
 		}
 		
-		LibraryEditorInput input = new LibraryEditorInput(ml);
+		MediaItemDbEditorInput input = new MediaItemDbEditorInput(ml);
 		return input;
 	}
 	
-	public static LibraryEditorInput getMediaLibraryInput (IMemento memento) throws MorriganException {
+	public static MediaItemDbEditorInput getMediaLibraryInput (IMemento memento) throws MorriganException {
 		String dbFilePath = memento.getString(KEY_SERIAL);
-		LibraryEditorInput input = getMediaLibraryInput(dbFilePath);
+		MediaItemDbEditorInput input = getMediaLibraryInput(dbFilePath);
 		
 		String sortcol = memento.getString(KEY_LIB_SORTCOL);
 		String sortdir = memento.getString(KEY_LIB_SORTDIR);
@@ -101,9 +101,9 @@ public class EditorFactory implements IElementFactory {
 		return input;
 	}
 	
-	public static LibraryEditorInput getRemoteMediaLibraryInput (IMemento memento) throws MorriganException {
+	public static MediaItemDbEditorInput getRemoteMediaLibraryInput (IMemento memento) throws MorriganException {
 		String dbFilePath = memento.getString(KEY_SERIAL);
-		LibraryEditorInput input = getRemoteMediaLibraryInput(dbFilePath);
+		MediaItemDbEditorInput input = getRemoteMediaLibraryInput(dbFilePath);
 		
 		String sortcol = memento.getString(KEY_LIB_SORTCOL);
 		String sortdir = memento.getString(KEY_LIB_SORTDIR);
@@ -120,9 +120,9 @@ public class EditorFactory implements IElementFactory {
 		return input;
 	}
 	
-	public static LibraryEditorInput getRemoteMediaLibraryInput (String dbFilePath) throws MorriganException {
+	public static MediaItemDbEditorInput getRemoteMediaLibraryInput (String dbFilePath) throws MorriganException {
 		RemoteMediaLibrary ml = MediaTrackListFactory.REMOTE_MEDIA_LIBRARY_FACTORY.manufacture(dbFilePath);
-		LibraryEditorInput input = new LibraryEditorInput(ml);
+		MediaItemDbEditorInput input = new MediaItemDbEditorInput(ml);
 		return input;
 	}
 	
@@ -140,7 +140,7 @@ public class EditorFactory implements IElementFactory {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public static LibraryEditorInput getGalleryInput(String dbPath) {
+	public static MediaItemDbEditorInput getGalleryInput(String dbPath) {
 		throw new RuntimeException("Not implemented.");
 	}
 	
