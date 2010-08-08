@@ -1,10 +1,8 @@
 package net.sparktank.morrigan.gui.editors;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.gui.actions.AddToPlaylistAction;
 import net.sparktank.morrigan.gui.adaptors.CountsLblProv;
 import net.sparktank.morrigan.gui.adaptors.DateAddedLblProv;
@@ -16,14 +14,12 @@ import net.sparktank.morrigan.gui.adaptors.HashcodeLblProv;
 import net.sparktank.morrigan.gui.adaptors.MediaFilter;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.handler.AddToQueue;
-import net.sparktank.morrigan.gui.handler.CallPlayMedia;
 import net.sparktank.morrigan.gui.helpers.ImageCache;
 import net.sparktank.morrigan.gui.preferences.MediaListPref;
 import net.sparktank.morrigan.model.IMediaItemList.DirtyState;
 import net.sparktank.morrigan.model.tracks.IMediaTrackList;
 import net.sparktank.morrigan.model.tracks.MediaTrack;
 
-import org.eclipse.core.commands.common.CommandException;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionItem;
@@ -34,19 +30,10 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredContentProvider;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
-import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -55,15 +42,10 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
-import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.handlers.IHandlerService;
-import org.eclipse.ui.part.EditorPart;
 
-public abstract class MediaTrackListEditor<T extends IMediaTrackList<S>, S extends MediaTrack> extends EditorPart {
+public abstract class MediaTrackListEditor<T extends IMediaTrackList<S>, S extends MediaTrack> extends MediaItemListEditor<T, S> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constants and Enums.
 	
@@ -85,67 +67,6 @@ public abstract class MediaTrackListEditor<T extends IMediaTrackList<S>, S exten
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	MediaItemListEditorInput<T> editorInput;
-	
-	TableViewer editTable = null;
-	private MediaFilter<T, S> mediaFilter = null;
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Constructor.
-	
-	public MediaTrackListEditor() {
-		super();
-	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	abstract S getNewS (String filePath);
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	EditorPart methods.
-	
-	@SuppressWarnings("unchecked") // TODO I wish I knew how to avoid needing this.
-	@Override
-	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
-		setSite(site);
-		setInput(input);
-		
-		if (input instanceof MediaItemListEditorInput<?>) {
-			this.editorInput = (MediaItemListEditorInput<T>) input;
-		} else {
-			throw new IllegalArgumentException("input is not instanceof MediaListEditorInput<?>.");
-		}
-		
-		setPartName(this.editorInput.getMediaList().getListName());
-		
-		this.editorInput.getMediaList().addDirtyChangeEvent(this.dirtyChange);
-		this.editorInput.getMediaList().addChangeEvent(this.listChange);
-		
-		try {
-			readInputData();
-		} catch (Exception e) {
-			if (!handleReadError(e)) {
-				throw new PartInitException("Exception while calling readInputData().", e);
-			}
-		}
-	}
-	
-	@Override
-	public void dispose() {
-		this.editorInput.getMediaList().removeChangeEvent(this.listChange);
-		this.editorInput.getMediaList().removeDirtyChangeEvent(this.dirtyChange);
-		this.imageCache.clearCache();
-		super.dispose();
-	}
-	
-	protected void readInputData () throws MorriganException {
-		this.editorInput.getMediaList().read();
-	}
-	
-	protected abstract boolean handleReadError (Exception e);
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Controls.
 	
 	protected final int sep = 3;
@@ -153,8 +74,6 @@ public abstract class MediaTrackListEditor<T extends IMediaTrackList<S>, S exten
 	abstract protected void createControls (Composite parent);
 	abstract protected List<Control> populateToolbar (Composite parent);
 	abstract protected void populateContextMenu (List<IContributionItem> menu0, List<IContributionItem> menu1);
-	
-	ImageCache imageCache = new ImageCache();
 	
 	protected Label lblStatus = null;
 	
@@ -348,178 +267,6 @@ public abstract class MediaTrackListEditor<T extends IMediaTrackList<S>, S exten
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Providers.
-	
-	private IStructuredContentProvider contentProvider = new IStructuredContentProvider() {
-		
-		@Override
-		public Object[] getElements(Object inputElement) {
-			return MediaTrackListEditor.this.editorInput.getMediaList().getMediaTracks().toArray();
-		}
-		
-		@Override
-		public void dispose() {/* UNUSED */}
-		@Override
-		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {/* UNUSED */}
-		
-	};
-	
-	/**
-	 * This will be called on the GUI thread.
-	 */
-	abstract protected void listChanged ();
-	
-	private Runnable dirtyChange = new Runnable() {
-		@Override
-		public void run() {
-			if (!MediaTrackListEditor.this.dirtyChangedRunableScheduled) {
-				MediaTrackListEditor.this.dirtyChangedRunableScheduled = true;
-				getSite().getShell().getDisplay().asyncExec(MediaTrackListEditor.this.dirtyChangedRunable);
-			}
-		}
-	};
-	
-	private Runnable listChange = new Runnable() {
-		@Override
-		public void run() {
-			if (!MediaTrackListEditor.this.updateGuiRunableScheduled) {
-				MediaTrackListEditor.this.updateGuiRunableScheduled = true;
-				getSite().getShell().getDisplay().asyncExec(MediaTrackListEditor.this.updateGuiRunable);
-			}
-		}
-	};
-	
-	volatile boolean dirtyChangedRunableScheduled = false;
-	
-	Runnable dirtyChangedRunable = new Runnable() {
-		@SuppressWarnings("synthetic-access")
-		@Override
-		public void run() {
-			MediaTrackListEditor.this.dirtyChangedRunableScheduled = false;
-			firePropertyChange(IEditorPart.PROP_DIRTY);
-		}
-	};
-	
-	volatile boolean updateGuiRunableScheduled = false;
-	
-	Runnable updateGuiRunable = new Runnable() {
-		@Override
-		public void run() {
-			MediaTrackListEditor.this.updateGuiRunableScheduled = false;
-			if (MediaTrackListEditor.this.editTable.getTable().isDisposed()) return;
-			MediaTrackListEditor.this.editTable.refresh();
-			listChanged();
-		}
-	};
-	
-	private IDoubleClickListener doubleClickListener = new IDoubleClickListener() {
-		@Override
-		public void doubleClick(DoubleClickEvent event) {
-			IHandlerService handlerService = (IHandlerService) getSite().getService(IHandlerService.class);
-			try {
-				handlerService.executeCommand(CallPlayMedia.ID, null);
-			} catch (CommandException e) {
-				new MorriganMsgDlg(e).open();
-			}
-		}
-	};
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Sorting.
-	
-	abstract protected boolean isSortable ();
-	
-	abstract protected void onSort (final TableViewer table, final TableViewerColumn column, int direction);
-	
-	private SelectionAdapter getSelectionAdapter (final TableViewer table, final TableViewerColumn column) {
-		return new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				int dir = table.getTable().getSortDirection();
-				if (table.getTable().getSortColumn() == column.getColumn()) {
-					dir = dir == SWT.UP ? SWT.DOWN : SWT.UP;
-				} else {
-					dir = SWT.DOWN;
-				}
-				onSort(table, column, dir);
-				table.getTable().setSortDirection(dir);
-				table.getTable().setSortColumn(column.getColumn());
-			}
-		};
-	}
-	
-	protected void setSortMarker (TableViewerColumn column, int swtDirection) {
-		this.editTable.getTable().setSortDirection(swtDirection);
-		if (column != null) {
-			this.editTable.getTable().setSortColumn(column.getColumn());
-		} else {
-			this.editTable.getTable().setSortColumn(null);
-		}
-	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Methods for editing editedMediaList.
-	
-	public T getMediaList () {
-		return this.editorInput.getMediaList();
-	}
-	
-	public void addTrack (String file) {
-		this.editorInput.getMediaList().addTrack(getNewS(file));
-	}
-	
-	protected void removeTrack (S track) throws MorriganException {
-		this.editorInput.getMediaList().removeMediaTrack(track);
-	}
-	
-	public S getSelectedTrack () {
-		ISelection selection = this.editTable.getSelection();
-		
-		if (selection==null) return null;
-		if (selection.isEmpty()) return null;
-		
-		if (selection instanceof IStructuredSelection) {
-			IStructuredSelection iSel = (IStructuredSelection) selection;
-			Object selectedObject = iSel.getFirstElement();
-			if (selectedObject != null) {
-				if (selectedObject instanceof MediaTrack) {
-					@SuppressWarnings("unchecked") // FIXME is there a way to avoid needing this?
-					S track = (S) selectedObject;
-					return track;
-				}
-			}
-		}
-		
-		return null;
-	}
-	
-	public ArrayList<S> getSelectedTracks () {
-		ISelection selection = this.editTable.getSelection();
-		
-		if (selection==null) return null;
-		if (selection.isEmpty()) return null;
-		
-		if (selection instanceof IStructuredSelection) {
-			IStructuredSelection iSel = (IStructuredSelection) selection;
-			
-			ArrayList<S> ret = new ArrayList<S>();
-			for (Object selectedObject : iSel.toList()) {
-				if (selectedObject != null) {
-					if (selectedObject instanceof MediaTrack) {
-						@SuppressWarnings("unchecked") // FIXME is there a way to avoid needing this?
-						S track = (S) selectedObject;
-						ret.add(track);
-					}
-				}
-			}
-			return ret;
-		}
-		
-		return null;
-	}
-	
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Menus and Actions.
 	
 	protected MenuManager getAddToMenu () {
@@ -559,28 +306,10 @@ public abstract class MediaTrackListEditor<T extends IMediaTrackList<S>, S exten
 		};
 	};
 	
-	protected IAction removeAction = new Action("Remove") {
-		@Override
-		public void run () {
-			MorriganMsgDlg dlg = new MorriganMsgDlg("Remove selected from " + getTitle() + "?", MorriganMsgDlg.YESNO);
-			dlg.open();
-			if (dlg.getReturnCode() == Window.OK) {
-				for (S track : getSelectedTracks()) {
-					try {
-						removeTrack(track);
-					} catch (Throwable t) {
-						// TODO something more useful here.
-						t.printStackTrace();
-					}
-				}
-			}
-		}
-	};
-	
 	protected IAction toggleEnabledAction = new Action("Toggle enabled") {
 		@Override
 		public void run() {
-			for (S track : getSelectedTracks()) {
+			for (S track : getSelectedItems()) {
 				try {
 					MediaTrackListEditor.this.editorInput.getMediaList().setTrackEnabled(track, !track.isEnabled());
 				} catch (Throwable t) {

@@ -263,7 +263,7 @@ public class PlaylistEditor extends MediaTrackListEditor<MediaPlaylist,MediaTrac
 				int n = 0;
 				for (String file : files) {
 					String toAdd = baseDir + File.separatorChar + file;
-					addTrack(toAdd);
+					addItem(toAdd);
 					n++;
 				}
 				logger.fine("Added " + n + " file to '" + getTitle() + "'.");

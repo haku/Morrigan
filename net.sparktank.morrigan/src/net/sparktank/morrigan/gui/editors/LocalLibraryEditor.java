@@ -101,7 +101,7 @@ public class LocalLibraryEditor extends AbstractLibraryEditor<LocalMediaLibrary>
 			try {
 				IViewPart showView = getSite().getPage().showView(ViewTagEditor.ID);
 				ViewTagEditor viewTagEd = (ViewTagEditor) showView;
-				viewTagEd.setInput(getMediaList(), getSelectedTracks());
+				viewTagEd.setInput(getMediaList(), getSelectedItems());
 			}
 			catch (Exception e) {
 				new MorriganMsgDlg(e).open();

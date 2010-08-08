@@ -32,8 +32,8 @@ public class AddToPlaylistAction extends Action {
 		
 		if (part != null && part instanceof PlaylistEditor) {
 			PlaylistEditor plPart = (PlaylistEditor) part;
-			for (MediaItem track : plPart.getSelectedTracks()) {
-				plPart.addTrack(track.getFilepath());
+			for (MediaItem track : plPart.getSelectedItems()) {
+				plPart.addItem(track.getFilepath());
 			}
 		}
 		
