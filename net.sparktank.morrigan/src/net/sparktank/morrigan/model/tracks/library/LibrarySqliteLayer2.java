@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 
 import net.sparktank.morrigan.helpers.RecyclingFactory;
+import net.sparktank.morrigan.model.DbColumn;
 import net.sparktank.morrigan.model.MediaSqliteLayer2;
 import net.sparktank.morrigan.model.tracks.MediaTrack;
 import net.sparktank.sqlitewrapper.DbException;

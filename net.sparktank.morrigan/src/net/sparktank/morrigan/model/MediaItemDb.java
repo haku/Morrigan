@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.List;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
-import net.sparktank.morrigan.model.MediaSqliteLayer2.DbColumn;
 import net.sparktank.morrigan.model.MediaSqliteLayer2.SortDirection;
 import net.sparktank.morrigan.model.tags.MediaTag;
 import net.sparktank.morrigan.model.tags.MediaTagClassification;
