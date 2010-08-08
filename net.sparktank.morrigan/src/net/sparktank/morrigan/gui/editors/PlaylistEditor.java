@@ -61,6 +61,13 @@ public class PlaylistEditor extends MediaTrackListEditor<MediaPlaylist,MediaTrac
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	@Override
+	MediaTrack getNewS(String filePath) {
+		return new MediaTrack(filePath);
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	EditorPart methods.
 	
 //	@Override

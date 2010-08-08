@@ -100,6 +100,10 @@ public abstract class MediaTrackListEditor<T extends IMediaTrackList<S>, S exten
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	abstract S getNewS (String filePath);
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	EditorPart methods.
 	
 	@SuppressWarnings("unchecked") // TODO I wish I knew how to avoid needing this.
@@ -603,10 +607,8 @@ public abstract class MediaTrackListEditor<T extends IMediaTrackList<S>, S exten
 		return this.editorInput.getMediaList();
 	}
 	
-	@SuppressWarnings("unchecked")
 	protected void addTrack (String file) {
-		MediaItem mediaItem = new MediaItem(file);
-		this.editorInput.getMediaList().addTrack((S) mediaItem);
+		this.editorInput.getMediaList().addTrack(getNewS(file));
 	}
 	
 	protected void removeTrack (S track) throws MorriganException {

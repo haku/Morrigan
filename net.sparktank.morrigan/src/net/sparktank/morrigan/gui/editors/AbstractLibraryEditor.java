@@ -54,6 +54,13 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> exte
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	@Override
+	MediaTrack getNewS(String filePath) {
+		return new MediaTrack(filePath);
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	EditorPart methods.
 	
 	@Override
