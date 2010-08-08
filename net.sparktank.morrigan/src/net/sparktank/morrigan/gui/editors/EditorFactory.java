@@ -1,7 +1,7 @@
 package net.sparktank.morrigan.gui.editors;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
-import net.sparktank.morrigan.model.MediaSqliteLayer2.DbColumn;
+import net.sparktank.morrigan.model.DbColumn;
 import net.sparktank.morrigan.model.MediaSqliteLayer2.SortDirection;
 import net.sparktank.morrigan.model.tracks.MediaTrackListFactory;
 import net.sparktank.morrigan.model.tracks.library.LibrarySqliteLayer2;

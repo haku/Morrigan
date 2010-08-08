@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import net.sparktank.morrigan.helpers.RecyclingFactory;
+import net.sparktank.morrigan.model.DbColumn;
 import net.sparktank.morrigan.model.MediaSqliteLayer2;
 import net.sparktank.morrigan.model.pictures.MediaPicture;
 import net.sparktank.sqlitewrapper.DbException;
