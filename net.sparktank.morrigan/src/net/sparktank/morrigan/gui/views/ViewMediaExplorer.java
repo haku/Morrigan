@@ -34,7 +34,7 @@ public class ViewMediaExplorer extends ViewPart {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private TableViewer viewer = null;
+	private TableViewer tableViewer = null;
 	
 	ArrayList<MediaExplorerItem> items = new ArrayList<MediaExplorerItem>();
 	
@@ -43,22 +43,23 @@ public class ViewMediaExplorer extends ViewPart {
 	/**
 	 * This is a callback that will allow us to create the viewer and initialise it.
 	 */
+	@Override
 	public void createPartControl(Composite parent) {
 		makeContent();
 		
-		viewer = new TableViewer(parent, SWT.MULTI | SWT.V_SCROLL | SWT.FULL_SELECTION);
-		viewer.setContentProvider(contentProvider);
-		viewer.setLabelProvider(labelProvider);
-		viewer.setInput(getViewSite()); // use content provider.
-		getSite().setSelectionProvider(viewer);
-		viewer.addDoubleClickListener(doubleClickListener);
+		this.tableViewer = new TableViewer(parent, SWT.MULTI | SWT.V_SCROLL | SWT.FULL_SELECTION);
+		this.tableViewer.setContentProvider(this.contentProvider);
+		this.tableViewer.setLabelProvider(this.labelProvider);
+		this.tableViewer.setInput(getViewSite()); // use content provider.
+		getSite().setSelectionProvider(this.tableViewer);
+		this.tableViewer.addDoubleClickListener(this.doubleClickListener);
 		
 		addToolbar();
 	}
 	
 	@Override
 	public void dispose() {
-		imageCache.clearCache();
+		this.imageCache.clearCache();
 		super.dispose();
 	}
 	
@@ -66,14 +67,14 @@ public class ViewMediaExplorer extends ViewPart {
 		
 		@Override
 		public Object[] getElements(Object inputElement) {
-			return items.toArray();
+			return ViewMediaExplorer.this.items.toArray();
 		}
 		
 		@Override
-		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {/* UNUSED */}
 		
 		@Override
-		public void dispose() {}
+		public void dispose() {/* UNUSED */}
 		
 	};
 	
@@ -95,16 +96,16 @@ public class ViewMediaExplorer extends ViewPart {
 				switch (item.type) {
 					
 					case PLAYLIST:
-						return imageCache.readImage("icons/playlist.gif");
+						return ViewMediaExplorer.this.imageCache.readImage("icons/playlist.gif");
 						
 					case LIBRARY:
-						return imageCache.readImage("icons/library.gif");
+						return ViewMediaExplorer.this.imageCache.readImage("icons/library.gif");
 						
 					case DISPLAY:
-						return imageCache.readImage("icons/display.gif");
+						return ViewMediaExplorer.this.imageCache.readImage("icons/display.gif");
 					
 					case REMOTELIBRARY:
-						return imageCache.readImage("icons/library-remote.gif");
+						return ViewMediaExplorer.this.imageCache.readImage("icons/library-remote.gif");
 				}
 			}
 			return null;
@@ -116,14 +117,15 @@ public class ViewMediaExplorer extends ViewPart {
 		}
 		
 		@Override
-		public void removeListener(ILabelProviderListener listener) {}
+		public void removeListener(ILabelProviderListener listener) {/* UNUSED */}
 		@Override
-		public void dispose() {}
+		public void dispose() {/* UNUSED */}
 		@Override
-		public void addListener(ILabelProviderListener listener) {}
+		public void addListener(ILabelProviderListener listener) {/* UNUSED */}
 	};
 	
 	private IDoubleClickListener doubleClickListener = new IDoubleClickListener() {
+		@Override
 		public void doubleClick(DoubleClickEvent event) {
 			IHandlerService handlerService = (IHandlerService) getSite().getService(IHandlerService.class);
 			try {
@@ -141,26 +143,27 @@ public class ViewMediaExplorer extends ViewPart {
 	}
 	
 	private void makeContent () {
-		items.clear();
-		items.addAll(LocalLibraryHelper.getAllLibraries());
-		items.addAll(RemoteLibraryHelper.getAllRemoteLibraries());
-		items.addAll(PlaylistHelper.getAllPlaylists());
+		this.items.clear();
+		this.items.addAll(LocalLibraryHelper.getAllLibraries());
+		this.items.addAll(RemoteLibraryHelper.getAllRemoteLibraries());
+		this.items.addAll(PlaylistHelper.getAllPlaylists());
 	}
 	
-	private ImageCache imageCache = new ImageCache();
+	ImageCache imageCache = new ImageCache();
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	/**
 	 * Passing the focus request to the viewer's control.
 	 */
+	@Override
 	public void setFocus() {
-		viewer.getControl().setFocus();
+		this.tableViewer.getControl().setFocus();
 	}
 	
 	public void refresh () {
 		makeContent();
-		viewer.refresh();
+		this.tableViewer.refresh();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
