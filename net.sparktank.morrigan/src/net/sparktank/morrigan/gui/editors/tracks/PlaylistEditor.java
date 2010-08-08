@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.gui.editors;
+package net.sparktank.morrigan.gui.editors.tracks;
 
 import java.io.File;
 import java.util.LinkedList;
@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 import net.sparktank.morrigan.config.Config;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.gui.Activator;
+import net.sparktank.morrigan.gui.actions.SaveEditorAction;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.display.ActionListener;
 import net.sparktank.morrigan.helpers.TimeHelper;

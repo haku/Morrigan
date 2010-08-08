@@ -1,7 +1,7 @@
 package net.sparktank.morrigan.gui.actions;
 
 import net.sparktank.morrigan.gui.Activator;
-import net.sparktank.morrigan.gui.editors.PlaylistEditor;
+import net.sparktank.morrigan.gui.editors.tracks.PlaylistEditor;
 import net.sparktank.morrigan.model.MediaItem;
 
 import org.eclipse.jface.action.Action;

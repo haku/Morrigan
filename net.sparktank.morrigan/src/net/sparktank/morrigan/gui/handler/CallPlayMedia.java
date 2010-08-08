@@ -1,9 +1,9 @@
 package net.sparktank.morrigan.gui.handler;
 
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
-import net.sparktank.morrigan.gui.editors.LocalLibraryEditor;
-import net.sparktank.morrigan.gui.editors.MediaTrackListEditor;
-import net.sparktank.morrigan.gui.editors.PlaylistEditor;
+import net.sparktank.morrigan.gui.editors.tracks.LocalLibraryEditor;
+import net.sparktank.morrigan.gui.editors.tracks.MediaTrackListEditor;
+import net.sparktank.morrigan.gui.editors.tracks.PlaylistEditor;
 import net.sparktank.morrigan.gui.views.AbstractPlayerView;
 import net.sparktank.morrigan.gui.views.ViewControls;
 

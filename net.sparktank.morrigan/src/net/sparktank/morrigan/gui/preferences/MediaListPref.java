@@ -2,7 +2,7 @@ package net.sparktank.morrigan.gui.preferences;
 
 import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.editors.MediaColumn;
-import net.sparktank.morrigan.gui.editors.MediaTrackListEditor;
+import net.sparktank.morrigan.gui.editors.tracks.MediaTrackListEditor;
 
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;

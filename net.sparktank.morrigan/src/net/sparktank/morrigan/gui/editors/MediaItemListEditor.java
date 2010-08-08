@@ -11,8 +11,8 @@ import net.sparktank.morrigan.gui.handler.CallPlayMedia;
 import net.sparktank.morrigan.gui.helpers.ImageCache;
 import net.sparktank.morrigan.gui.preferences.MediaListPref;
 import net.sparktank.morrigan.model.IMediaItemList;
-import net.sparktank.morrigan.model.MediaItem;
 import net.sparktank.morrigan.model.IMediaItemList.DirtyState;
+import net.sparktank.morrigan.model.MediaItem;
 
 import org.eclipse.core.commands.common.CommandException;
 import org.eclipse.jface.action.Action;
@@ -56,12 +56,11 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Nested classes.
 	
-	MediaItemListEditorInput<T> editorInput;
+	private MediaItemListEditorInput<T> editorInput;
 	
 	TableViewer editTable = null;
 	protected MediaFilter<T, S> mediaFilter = null;
-	
-	ImageCache imageCache = new ImageCache();
+	private ImageCache imageCache = new ImageCache();
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Abstract methods.
@@ -113,6 +112,11 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 	}
 	
 	protected abstract boolean handleReadError (Exception e);
+	
+	@Override
+	public MediaItemListEditorInput<T> getEditorInput() {
+		return this.editorInput;
+	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Controls.
@@ -281,7 +285,7 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 		
 		@Override
 		public Object[] getElements(Object inputElement) {
-			return MediaItemListEditor.this.editorInput.getMediaList().getMediaTracks().toArray();
+			return MediaItemListEditor.this.getEditorInput().getMediaList().getMediaTracks().toArray();
 		}
 		
 		@Override
