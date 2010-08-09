@@ -76,6 +76,7 @@ public class Config {
 	private static final String PROP_ENG_JARDIRS = "engines.jardirs";
 	
 	private static final String PROP_MEDIA_TYPES = "media.types";
+	private static final String PROP_MEDIA_PICTURE_TYPES = "media.pictures.types";
 	
 	private static Object propertiesLock = new Object();
 	private static Properties properties = null;
@@ -153,6 +154,21 @@ public class Config {
 	 */
 	public static String[] getMediaFileTypes () throws MorriganException {
 		String types = getProperties().getProperty(PROP_MEDIA_TYPES);
+		String[] arrTypes = types.split("\\|");
+		
+		for (int i = 0; i < arrTypes.length; i++) {
+			arrTypes[i] = arrTypes[i].toLowerCase();
+		}
+		
+		return arrTypes;
+	}
+	
+	/**
+	 * @return Array of lower-case strings without dots.  e.g. "mp3", "ogg".
+	 * @throws ImplException 
+	 */
+	public static String[] getPictureFileTypes () throws MorriganException {
+		String types = getProperties().getProperty(PROP_MEDIA_PICTURE_TYPES);
 		String[] arrTypes = types.split("\\|");
 		
 		for (int i = 0; i < arrTypes.length; i++) {
