@@ -2,7 +2,7 @@ package net.sparktank.morrigan.gui.editors.tracks;
 
 import java.util.List;
 
-import net.sparktank.morrigan.gui.actions.LibraryUpdateAction;
+import net.sparktank.morrigan.gui.actions.DbUpdateAction;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.display.ActionListener;
 import net.sparktank.morrigan.gui.views.ViewLibraryProperties;
@@ -36,7 +36,7 @@ public class LocalLibraryEditor extends AbstractLibraryEditor<LocalMediaLibrary>
 		super.createControls(parent);
 		
 		getPrefMenuMgr().add(new Separator());
-		getPrefMenuMgr().add(new LibraryUpdateAction(getMediaList()));
+		getPrefMenuMgr().add(new DbUpdateAction(getMediaList()));
 		getPrefMenuMgr().add(this.showPropertiesAction);
 	}
 	
