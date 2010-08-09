@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sparktank.morrigan.gui.Activator;
-import net.sparktank.morrigan.gui.actions.LibraryUpdateAction;
+import net.sparktank.morrigan.gui.actions.DbUpdateAction;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.editors.pictures.LocalGalleryEditor;
 import net.sparktank.morrigan.gui.editors.tracks.LocalLibraryEditor;
@@ -93,7 +93,7 @@ public class ViewLibraryProperties extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	MediaItemDb<?,?,?> library;
-	LibraryUpdateAction libraryUpdateAction = new LibraryUpdateAction();
+	DbUpdateAction dbUpdateAction = new DbUpdateAction();
 	
 	public void setContent (MediaItemDb<?,?,?> library) {
 		setContent(library, true);
@@ -112,7 +112,7 @@ public class ViewLibraryProperties extends ViewPart {
 			this.library.addChangeEvent(this.listChange);
 		}
 		
-		this.libraryUpdateAction.setMediaLibrary(this.library);
+		this.dbUpdateAction.setMediaDb(this.library);
 		
 		if (updateGui) this.listChange.run();
 	}
@@ -136,7 +136,7 @@ public class ViewLibraryProperties extends ViewPart {
 	private void addToolbar () {
 		getViewSite().getActionBars().getToolBarManager().add(new AddAction());
 		getViewSite().getActionBars().getToolBarManager().add(this.removeAction);
-		getViewSite().getActionBars().getToolBarManager().add(this.libraryUpdateAction);
+		getViewSite().getActionBars().getToolBarManager().add(this.dbUpdateAction);
 	}
 	
 	private IStructuredContentProvider sourcesProvider = new IStructuredContentProvider() {
@@ -283,7 +283,7 @@ public class ViewLibraryProperties extends ViewPart {
 					MorriganMsgDlg dlg2 = new MorriganMsgDlg("Run scan on " + ViewLibraryProperties.this.library.getListName() + " now?", MorriganMsgDlg.YESNO);
 					dlg2.open();
 					if (dlg2.getReturnCode() == Window.OK) {
-						ViewLibraryProperties.this.libraryUpdateAction.run();
+						ViewLibraryProperties.this.dbUpdateAction.run();
 					}
 				}
 			}

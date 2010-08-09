@@ -1,6 +1,6 @@
 package net.sparktank.morrigan.gui.editors.pictures;
 
-import net.sparktank.morrigan.gui.actions.LibraryUpdateAction;
+import net.sparktank.morrigan.gui.actions.DbUpdateAction;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.views.ViewLibraryProperties;
 import net.sparktank.morrigan.model.pictures.gallery.LocalGallery;
@@ -24,7 +24,7 @@ public class LocalGalleryEditor extends AbstractGalleryEditor<LocalGallery> {
 		super.createControls(parent);
 		
 		getPrefMenuMgr().add(new Separator());
-		getPrefMenuMgr().add(new LibraryUpdateAction(getMediaList()));
+		getPrefMenuMgr().add(new DbUpdateAction(getMediaList()));
 		getPrefMenuMgr().add(this.showPropertiesAction);
 	}
 	
