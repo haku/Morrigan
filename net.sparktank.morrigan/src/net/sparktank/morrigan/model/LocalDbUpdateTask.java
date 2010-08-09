@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Stack;
 
-import net.sparktank.morrigan.config.Config;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.ChecksumHelper;
 import net.sparktank.morrigan.model.tasks.IMorriganTask;
@@ -154,7 +153,7 @@ public abstract class LocalDbUpdateTask<Q extends MediaItemDb<?,?,T>, T extends 
 		
 		List<String> supportedFormats;
 		try {
-			supportedFormats = Arrays.asList(Config.getMediaFileTypes());
+			supportedFormats = Arrays.asList(getItemFileExtensions());
 		} catch (MorriganException e) {
 			taskEventListener.done();
 			return new TaskResult(TaskOutcome.FAILED, "Failed to retrieve list of supported formats.", e);
@@ -219,6 +218,8 @@ public abstract class LocalDbUpdateTask<Q extends MediaItemDb<?,?,T>, T extends 
 		
 		return null;
 	}
+	
+	abstract protected String[] getItemFileExtensions () throws MorriganException;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	

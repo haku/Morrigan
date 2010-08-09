@@ -2,6 +2,7 @@ package net.sparktank.morrigan.model.tracks.library.local;
 
 import java.io.File;
 
+import net.sparktank.morrigan.config.Config;
 import net.sparktank.morrigan.engines.EngineFactory;
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine;
 import net.sparktank.morrigan.exceptions.MorriganException;
@@ -41,7 +42,11 @@ public class LocalLibraryUpdateTask extends LocalDbUpdateTask<LocalMediaLibrary,
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Format specific methods.
+	
+	@Override
+	protected String[] getItemFileExtensions() throws MorriganException {
+		return Config.getMediaFileTypes();
+	}
 	
 	@Override
 	protected void mergeItems(MediaTrack itemToKeep, MediaTrack itemToBeRemove) throws MorriganException {
