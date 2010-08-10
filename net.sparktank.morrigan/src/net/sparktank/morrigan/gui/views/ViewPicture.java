@@ -101,20 +101,17 @@ public class ViewPicture extends ViewPart {
 	public void setInput (IMediaItemDb<?,?> editedMediaList, List<? extends MediaItem> selection) {
 		if (selection != null && selection.size() > 0) {
 			if (selection.size() == 1) {
-				setContentDescription(selection.get(0).getTitle());
 				this.editedItem = selection.get(0);
 			}
 			else {
-				setContentDescription(selection.size() + " items selected.");
 				this.editedItem = null;
 			}
 		}
 		else {
-			setContentDescription("No items selected.");
 			this.editedItem = null;
 		}
 		
-		showPicture(this.editedItem);
+		setPicture(this.editedItem);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -151,11 +148,13 @@ public class ViewPicture extends ViewPart {
 		this.pictureCanvas.addPaintListener(this.picturePainter);
 	}
 	
-	private void showPicture (MediaItem item) {
+	private void setPicture (MediaItem item) {
 		if (item != null) {
 			String ext = item.getFilepath();
 			ext = ext.substring(ext.lastIndexOf(".") + 1).toLowerCase();
 			if (this.supportedFormats.contains(ext)) {
+				setContentDescription(item.getTitle());
+				
 				if (this.pictureImage != null && !this.pictureImage.isDisposed()) {
 					this.pictureImage.dispose();
 					this.pictureImage = null;
