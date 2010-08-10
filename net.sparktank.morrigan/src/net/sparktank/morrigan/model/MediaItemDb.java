@@ -12,7 +12,7 @@ import net.sparktank.morrigan.model.tags.MediaTagClassification;
 import net.sparktank.morrigan.model.tags.MediaTagType;
 import net.sparktank.sqlitewrapper.DbException;
 
-public abstract class MediaItemDb<Q extends IMediaItemList<T>, S extends MediaSqliteLayer2<T>, T extends MediaItem> extends MediaItemList<T> {
+public abstract class MediaItemDb<Q extends IMediaItemList<T>, S extends MediaSqliteLayer2<T>, T extends MediaItem> extends MediaItemList<T> implements IMediaItemDb<S,T> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static final boolean HIDEMISSING = true; // TODO link this to GUI?
@@ -48,6 +48,7 @@ public abstract class MediaItemDb<Q extends IMediaItemList<T>, S extends MediaSq
 		return this.dbLayer.getDbFilePath();
 	}
 	
+	@Override
 	public S getDbLayer() {
 		return this.dbLayer;
 	}
@@ -153,14 +154,17 @@ public abstract class MediaItemDb<Q extends IMediaItemList<T>, S extends MediaSq
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Sorting.
 	
+	@Override
 	public DbColumn getSort () {
 		return this.librarySort;
 	}
 	
+	@Override
 	public SortDirection getSortDirection() {
 		return this.librarySortDirection;
 	}
 	
+	@Override
 	public void setSort (DbColumn sort, SortDirection direction) throws MorriganException {
 		this.librarySort = sort;
 		this.librarySortDirection = direction;
@@ -176,20 +180,19 @@ public abstract class MediaItemDb<Q extends IMediaItemList<T>, S extends MediaSq
 		}
 	}
 	
+	@Override
 	public void registerSortChangeListener (SortChangeListener scl) {
 		this._sortChangeListeners.add(scl);
 	}
 	
+	@Override
 	public void unregisterSortChangeListener (SortChangeListener scl) {
 		this._sortChangeListeners.remove(scl);
 	}
 	
-	public interface SortChangeListener {
-		public void sortChanged (DbColumn sort, SortDirection direction);
-	}
-	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	@Override
 	public List<T> simpleSearch (String term, String esc, int maxResults) throws DbException {
 		return this.dbLayer.simpleSearch(term, esc, maxResults);
 	}
@@ -292,18 +295,22 @@ public abstract class MediaItemDb<Q extends IMediaItemList<T>, S extends MediaSq
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	@Override
 	public String getDbPath () {
 		return this.dbLayer.getDbFilePath();
 	}
 	
+	@Override
 	public List<String> getSources () throws DbException {
 		return this.dbLayer.getSources();
 	}
 	
+	@Override
 	public void addSource (String source) throws DbException {
 		this.dbLayer.addSource(source);
 	}
 	
+	@Override
 	public void removeSource (String source) throws DbException {
 		this.dbLayer.removeSource(source);
 	}
@@ -311,6 +318,7 @@ public abstract class MediaItemDb<Q extends IMediaItemList<T>, S extends MediaSq
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Tags.
 	
+	@Override
 	public boolean hasTags (IDbItem item) throws MorriganException {
 		try {
 			return this.dbLayer.hasTags(item);
@@ -319,6 +327,7 @@ public abstract class MediaItemDb<Q extends IMediaItemList<T>, S extends MediaSq
 		}
 	}
 	
+	@Override
 	public boolean hasTag (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) throws MorriganException {
 		try {
 			return this.dbLayer.hasTag(item, tag, type, mtc);
@@ -327,6 +336,7 @@ public abstract class MediaItemDb<Q extends IMediaItemList<T>, S extends MediaSq
 		}
 	}
 	
+	@Override
 	public List<MediaTag> getTags (IDbItem item) throws MorriganException {
 		try {
 			return this.dbLayer.getTags(item);
@@ -335,6 +345,7 @@ public abstract class MediaItemDb<Q extends IMediaItemList<T>, S extends MediaSq
 		}
 	}
 	
+	@Override
 	public void addTag (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) throws MorriganException {
 		try {
 			this.dbLayer.addTag(item, tag, type, mtc);
@@ -343,6 +354,7 @@ public abstract class MediaItemDb<Q extends IMediaItemList<T>, S extends MediaSq
 		}
 	}
 	
+	@Override
 	public void addTag (IDbItem item, String tag, MediaTagType type, String mtc) throws MorriganException {
 		try {
 			this.dbLayer.addTag(item, tag, type, mtc);
@@ -351,6 +363,7 @@ public abstract class MediaItemDb<Q extends IMediaItemList<T>, S extends MediaSq
 		}
 	}
 	
+	@Override
 	public void moveTags (IDbItem from_item, IDbItem to_item) throws MorriganException {
 		try {
 			this.dbLayer.moveTags(from_item, to_item);
@@ -359,6 +372,7 @@ public abstract class MediaItemDb<Q extends IMediaItemList<T>, S extends MediaSq
 		}
 	}
 	
+	@Override
 	public void removeTag (MediaTag mt) throws MorriganException {
 		try {
 			this.dbLayer.removeTag(mt);
@@ -367,6 +381,7 @@ public abstract class MediaItemDb<Q extends IMediaItemList<T>, S extends MediaSq
 		}
 	}
 	
+	@Override
 	public void clearTags (IDbItem item) throws MorriganException {
 		try {
 			this.dbLayer.clearTags(item);
