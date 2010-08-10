@@ -149,7 +149,7 @@ public class ViewPicture extends ViewPart {
 	}
 	
 	private void setPicture (MediaItem item) {
-		if (item != null) {
+		if (item != null && item.isEnabled()) {
 			String ext = item.getFilepath();
 			ext = ext.substring(ext.lastIndexOf(".") + 1).toLowerCase();
 			if (this.supportedFormats.contains(ext)) {
