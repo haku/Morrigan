@@ -15,6 +15,7 @@ import java.util.List;
 
 import net.sparktank.morrigan.engines.playback.NotImplementedException;
 import net.sparktank.morrigan.exceptions.MorriganException;
+import net.sparktank.morrigan.model.IDbItem;
 import net.sparktank.morrigan.model.tags.MediaTag;
 import net.sparktank.morrigan.model.tags.MediaTagClassification;
 import net.sparktank.morrigan.model.tags.MediaTagType;
@@ -309,22 +310,22 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 //	Tags.
 	
 	@Override
-	public boolean hasTags (MediaTrack mlt) throws MorriganException {
+	public boolean hasTags (IDbItem item) throws MorriganException {
 		throw new NotImplementedException();
 	}
 	
 	@Override
-	public List<MediaTag> getTags (MediaTrack mlt) throws MorriganException {
+	public List<MediaTag> getTags (IDbItem item) throws MorriganException {
 		throw new NotImplementedException();
 	}
 	
 	@Override
-	public void addTag (MediaTrack mlt, String tag, MediaTagType type, MediaTagClassification mtc) throws MorriganException {
+	public void addTag (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) throws MorriganException {
 		throw new NotImplementedException();
 	}
 	
 	@Override
-	public void moveTags (MediaTrack from_mlt, MediaTrack to_mlt) throws MorriganException {
+	public void moveTags (IDbItem from_item, IDbItem to_item) throws MorriganException {
 		throw new NotImplementedException();
 	}
 	
