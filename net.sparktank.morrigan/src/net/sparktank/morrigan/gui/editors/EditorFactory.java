@@ -44,16 +44,20 @@ public class EditorFactory implements IElementFactory {
 		try {
 			if (type.equals(LocalMediaLibrary.TYPE)) {
 				input = getMediaLibraryInput(memento);
-				
-			} else if (type.equals(MediaPlaylist.TYPE)) {
+			}
+			else if (type.equals(MediaPlaylist.TYPE)) {
 				String serial = memento.getString(KEY_SERIAL);
 				input = getMediaPlaylistInput(serial);
-				
-			} else if (type.equals(RemoteMediaLibrary.TYPE)) {
+			}
+			else if (type.equals(RemoteMediaLibrary.TYPE)) {
 				input = getRemoteMediaLibraryInput(memento);
-				
-			} else {
-				throw new IllegalArgumentException("Unknown type: '"+type+"'.");
+			}
+			else if (type.equals(LocalGallery.TYPE)) {
+				input = getGalleryInput(memento);
+			}
+			else {
+				System.err.println("EditorFactory.createElement(): Unknown type: '"+type+"'.");
+				return null;
 			}
 			
 		} catch (MorriganException e) {
