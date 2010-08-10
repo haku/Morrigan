@@ -147,19 +147,8 @@ public class ViewPicture extends ViewPart {
 		
 		this.pictureCanvas = new Canvas(parent, SWT.NONE);
 		this.pictureCanvas.setLayout(new FillLayout());
-		this.pictureCanvas.addPaintListener(new PaintListener () {
-			@Override
-			public void paintControl(PaintEvent e) {
-				if (ViewPicture.this.pictureImage != null) {
-					Rectangle srcBounds = ViewPicture.this.pictureImage.getBounds();
-					Rectangle dstBounds = ViewPicture.this.pictureCanvas.getClientArea();
-					e.gc.drawImage(ViewPicture.this.pictureImage,
-							0, 0, srcBounds.width, srcBounds.height,
-							0, 0, dstBounds.width, dstBounds.height
-					);
-				}
-			}
-		});
+		this.pictureCanvas.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_BLACK));
+		this.pictureCanvas.addPaintListener(this.picturePainter);
 	}
 	
 	private void showPicture (MediaItem item) {
@@ -177,6 +166,38 @@ public class ViewPicture extends ViewPart {
 			
 		}
 	}
+	
+	private PaintListener picturePainter = new PaintListener () {
+		@Override
+		public void paintControl(PaintEvent e) {
+			if (ViewPicture.this.pictureImage != null) {
+				Rectangle srcBounds = ViewPicture.this.pictureImage.getBounds();
+				Rectangle dstBounds = ViewPicture.this.pictureCanvas.getClientArea();
+				
+				double s1 = dstBounds.width / (double)srcBounds.width;
+				double s2 = dstBounds.height / (double)srcBounds.height;
+				
+				int w; int h; int l; int t;
+				
+				if (s1 < s2) {
+					w = (int) (srcBounds.width * s1);
+					h = (int) (srcBounds.height * s1);
+				}
+				else {
+					w = (int) (srcBounds.width * s2);
+					h = (int) (srcBounds.height * s2);
+				}
+				
+				l = (dstBounds.width / 2) - (w / 2);
+				t = (dstBounds.height / 2) - (h / 2);
+				
+				e.gc.drawImage(ViewPicture.this.pictureImage,
+						0, 0, srcBounds.width, srcBounds.height,
+						l, t, w, h
+				);
+			}
+		}
+	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
