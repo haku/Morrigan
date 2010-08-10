@@ -484,6 +484,20 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 		}
 	};
 	
+	protected IAction toggleEnabledAction = new Action("Toggle enabled") {
+		@Override
+		public void run() {
+			for (S track : getSelectedItems()) {
+				try {
+					getEditorInput().getMediaList().setTrackEnabled(track, !track.isEnabled());
+				} catch (Throwable t) {
+					// TODO something more useful here.
+					t.printStackTrace();
+				}
+			}
+		};
+	};
+	
 	String lastFileCopyTargetDir = null;
 	
 	protected IAction copyToAction = new Action("Copy to...") {

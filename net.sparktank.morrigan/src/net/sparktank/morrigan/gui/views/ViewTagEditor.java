@@ -10,14 +10,15 @@ import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.dialogs.RunnableDialog;
 import net.sparktank.morrigan.gui.display.DropMenuListener;
-import net.sparktank.morrigan.gui.editors.tracks.LocalLibraryEditor;
+import net.sparktank.morrigan.gui.editors.IMediaItemDbEditor;
 import net.sparktank.morrigan.gui.helpers.ImageCache;
+import net.sparktank.morrigan.model.IMediaItemDb;
+import net.sparktank.morrigan.model.MediaItem;
 import net.sparktank.morrigan.model.tags.MediaTag;
 import net.sparktank.morrigan.model.tags.MediaTagClassification;
 import net.sparktank.morrigan.model.tags.MediaTagType;
 import net.sparktank.morrigan.model.tags.TrackTagHelper;
 import net.sparktank.morrigan.model.tracks.MediaTrack;
-import net.sparktank.morrigan.model.tracks.library.AbstractMediaLibrary;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -27,6 +28,7 @@ import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -64,14 +66,14 @@ public class ViewTagEditor extends ViewPart {
 	
 	@Override
 	public void setFocus() {
-		txtNewTag.setFocus();
+		this.txtNewTag.setFocus();
 	}
 	
 	@Override
 	public void dispose() {
 		removeSelectionListener();
 		removePartListener();
-		imageCache.clearCache();
+		this.imageCache.clearCache();
 		super.dispose();
 	}
 	
@@ -80,68 +82,68 @@ public class ViewTagEditor extends ViewPart {
 	
 	private void initSelectionListener () {
 		ISelectionService service = getSite().getWorkbenchWindow().getSelectionService();
-		service.addSelectionListener(selectionListener);
+		service.addSelectionListener(this.selectionListener);
 	}
 	
 	private void removeSelectionListener () {
 		ISelectionService service = getSite().getWorkbenchWindow().getSelectionService();
-		service.removeSelectionListener(selectionListener);
+		service.removeSelectionListener(this.selectionListener);
 	}
 	
 	private void addPartListener () {
-		getViewSite().getPage().addPartListener(partListener);
+		getViewSite().getPage().addPartListener(this.partListener);
 	}
 	
 	private void removePartListener () {
-		getViewSite().getPage().removePartListener(partListener);
+		getViewSite().getPage().removePartListener(this.partListener);
 	}
 	
 	private IPartListener partListener = new IPartListener() {
 		@Override
 		public void partClosed(IWorkbenchPart part) {
-			if (part instanceof LocalLibraryEditor) {
-				LocalLibraryEditor libEditor = (LocalLibraryEditor) part;
-				if (libEditor.getMediaList().equals(editedMediaList)) {
+			if (part instanceof IMediaItemDbEditor) {
+				IMediaItemDbEditor libEditor = (IMediaItemDbEditor) part;
+				if (libEditor.getMediaList().equals(ViewTagEditor.this.editedItemDb)) {
 					setInput(null, null);
 				}
 			}
 		}
 		
 		@Override
-		public void partActivated(IWorkbenchPart part) {}
+		public void partActivated(IWorkbenchPart part) {/* UNUSED */}
 		@Override
-		public void partOpened(IWorkbenchPart part) {}
+		public void partOpened(IWorkbenchPart part) {/* UNUSED */}
 		@Override
-		public void partDeactivated(IWorkbenchPart part) {}
+		public void partDeactivated(IWorkbenchPart part) {/* UNUSED */}
 		@Override
-		public void partBroughtToTop(IWorkbenchPart part) {}
+		public void partBroughtToTop(IWorkbenchPart part) {/* UNUSED */}
 	};
 	
 	private ISelectionListener selectionListener = new ISelectionListener() {
 		@Override
 		public void selectionChanged(IWorkbenchPart part, ISelection selection) {
-			if (part instanceof LocalLibraryEditor) {
+			if (part instanceof IMediaItemDbEditor) {
 				if (selection==null || selection.isEmpty()) {
 					setInput(null, null);
 					return;
 				}
 				
-				LocalLibraryEditor libEditor = (LocalLibraryEditor) part;
-				AbstractMediaLibrary mediaList = libEditor.getMediaList();
+				IMediaItemDbEditor editor = (IMediaItemDbEditor) part;
+				IMediaItemDb<?,?> list = editor.getMediaList();
 				
 				if (selection instanceof IStructuredSelection) {
 					IStructuredSelection iSel = (IStructuredSelection) selection;
-					ArrayList<MediaTrack> sel = new ArrayList<MediaTrack>();
+					ArrayList<MediaItem> sel = new ArrayList<MediaItem>();
 					for (Object selectedObject : iSel.toList()) {
 						if (selectedObject != null) {
-							if (selectedObject instanceof MediaTrack) {
-								MediaTrack track = (MediaTrack) selectedObject;
+							if (selectedObject instanceof MediaItem) {
+								MediaItem track = (MediaItem) selectedObject;
 								sel.add(track);
 							}
 						}
 					}
 					
-					setInput(mediaList, sel);
+					setInput(list, sel);
 				}
 			}
 		}
@@ -150,40 +152,40 @@ public class ViewTagEditor extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Data links.
 	
-	private AbstractMediaLibrary editedMediaList = null;
-	private MediaTrack editedMediaItem = null;
+	IMediaItemDb<?,?> editedItemDb = null;
+	MediaItem editedItem = null;
 	
-	public void setInput (AbstractMediaLibrary editedMediaList, List<MediaTrack> selection) {
+	public void setInput (IMediaItemDb<?,?> editedMediaList, List<? extends MediaItem> selection) {
 		if (selection != null && selection.size() > 0) {
 			if (selection.size() == 1) {
 				setContentDescription(selection.get(0).getTitle());
-				editedMediaItem = selection.get(0);
+				this.editedItem = selection.get(0);
 			}
 			else {
 				setContentDescription(selection.size() + " items selected.");
-				editedMediaItem = null;
+				this.editedItem = null;
 			}
 		}
 		else {
 			setContentDescription("No items selected.");
-			editedMediaItem = null;
+			this.editedItem = null;
 		}
 		
-		btnAddTag.setEnabled(editedMediaItem != null);
-		btnRemoveTag.setEnabled(editedMediaItem != null);
-		readTagsAction.setEnabled(editedMediaItem != null);
+		this.btnAddTag.setEnabled(this.editedItem != null);
+		this.btnRemoveTag.setEnabled(this.editedItem != null);
+		this.readTagsAction.setEnabled(this.editedItem != null);
 		
-		this.editedMediaList = editedMediaList;
-		tableViewer.refresh();
+		this.editedItemDb = editedMediaList;
+		this.tableViewer.refresh();
 	}
 	
 	private IStructuredContentProvider sourcesProvider = new IStructuredContentProvider() {
 		
 		@Override
 		public Object[] getElements(Object inputElement) {
-			if (editedMediaList != null && editedMediaItem != null) {
+			if (ViewTagEditor.this.editedItemDb != null && ViewTagEditor.this.editedItem != null) {
 				try {
-					List<MediaTag> tags = editedMediaList.getTags(editedMediaItem);
+					List<MediaTag> tags = ViewTagEditor.this.editedItemDb.getTags(ViewTagEditor.this.editedItem);
 					return tags.toArray();
 				}
 				catch (MorriganException e) {
@@ -192,15 +194,14 @@ public class ViewTagEditor extends ViewPart {
 					return new String[]{};
 				}
 			}
-			else {
-				return new String[]{};
-			}
+			
+			return new String[]{};
 		}
 		
 		@Override
-		public void dispose() {}
+		public void dispose() {/* UNUSED */}
 		@Override
-		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {/* UNUSED */}
 		
 	};
 	
@@ -209,7 +210,7 @@ public class ViewTagEditor extends ViewPart {
 	
 	protected final int sep = 3;
 	
-	private Text txtNewTag;
+	Text txtNewTag;
 	private Button btnAddTag;
 	private Button btnRemoveTag;
 	private Button btnMenu;
@@ -221,12 +222,12 @@ public class ViewTagEditor extends ViewPart {
 		parent.setLayout(new FormLayout());
 		
 		Composite tbCom = new Composite(parent, SWT.NONE);
-		txtNewTag = new Text(tbCom, SWT.SINGLE | SWT.BORDER);
-		btnAddTag = new Button(tbCom, SWT.PUSH);
-		btnRemoveTag = new Button(tbCom, SWT.PUSH);
-		btnMenu = new Button(tbCom, SWT.PUSH);
+		this.txtNewTag = new Text(tbCom, SWT.SINGLE | SWT.BORDER);
+		this.btnAddTag = new Button(tbCom, SWT.PUSH);
+		this.btnRemoveTag = new Button(tbCom, SWT.PUSH);
+		this.btnMenu = new Button(tbCom, SWT.PUSH);
 		MenuManager menuMenuMgr = new MenuManager();
-		tableViewer = new TableViewer(parent, SWT.MULTI | SWT.V_SCROLL | SWT.FULL_SELECTION);
+		this.tableViewer = new TableViewer(parent, SWT.MULTI | SWT.V_SCROLL | SWT.FULL_SELECTION);
 		
 		tbCom.setLayout(new FormLayout());
 		formData = new FormData();
@@ -235,78 +236,79 @@ public class ViewTagEditor extends ViewPart {
 		formData.right = new FormAttachment(100, 0);
 		tbCom.setLayoutData(formData);
 		
-		txtNewTag.setMessage("New tag");
+		this.txtNewTag.setMessage("New tag");
 		formData = new FormData();
-		formData.left = new FormAttachment(0, sep);
-		formData.right = new FormAttachment(btnAddTag, -sep);
-		formData.top = new FormAttachment(0, sep);
-		formData.bottom = new FormAttachment(100, -sep);
-		txtNewTag.setLayoutData(formData);
+		formData.left = new FormAttachment(0, this.sep);
+		formData.right = new FormAttachment(this.btnAddTag, -this.sep);
+		formData.top = new FormAttachment(0, this.sep);
+		formData.bottom = new FormAttachment(100, -this.sep);
+		this.txtNewTag.setLayoutData(formData);
 		
-		btnAddTag.setImage(imageCache.readImage("icons/plus.gif"));
+		this.btnAddTag.setImage(this.imageCache.readImage("icons/plus.gif"));
 		formData = new FormData();
-		formData.right = new FormAttachment(btnRemoveTag, -sep);
-		formData.top = new FormAttachment(0, sep);
-		formData.bottom = new FormAttachment(100, -sep);
-		btnAddTag.setLayoutData(formData);
+		formData.right = new FormAttachment(this.btnRemoveTag, -this.sep);
+		formData.top = new FormAttachment(0, this.sep);
+		formData.bottom = new FormAttachment(100, -this.sep);
+		this.btnAddTag.setLayoutData(formData);
 		
-		btnRemoveTag.setImage(imageCache.readImage("icons/minus.gif"));
+		this.btnRemoveTag.setImage(this.imageCache.readImage("icons/minus.gif"));
 		formData = new FormData();
-		formData.right = new FormAttachment(btnMenu, -sep);
-		formData.top = new FormAttachment(0, sep);
-		formData.bottom = new FormAttachment(100, -sep);
-		btnRemoveTag.setLayoutData(formData);
+		formData.right = new FormAttachment(this.btnMenu, -this.sep);
+		formData.top = new FormAttachment(0, this.sep);
+		formData.bottom = new FormAttachment(100, -this.sep);
+		this.btnRemoveTag.setLayoutData(formData);
 		
-		btnMenu.setImage(imageCache.readImage("icons/pref.gif"));
+		this.btnMenu.setImage(this.imageCache.readImage("icons/pref.gif"));
 		formData = new FormData();
-		formData.right = new FormAttachment(100, -sep);
-		formData.top = new FormAttachment(0, sep);
-		formData.bottom = new FormAttachment(100, -sep);
-		btnMenu.setLayoutData(formData);
+		formData.right = new FormAttachment(100, -this.sep);
+		formData.top = new FormAttachment(0, this.sep);
+		formData.bottom = new FormAttachment(100, -this.sep);
+		this.btnMenu.setLayoutData(formData);
 		
-		tableViewer.setContentProvider(sourcesProvider);
-		tableViewer.setInput(getViewSite()); // use content provider.
-		getSite().setSelectionProvider(tableViewer);
+		this.tableViewer.setContentProvider(this.sourcesProvider);
+		this.tableViewer.setInput(getViewSite()); // use content provider.
+		getSite().setSelectionProvider(this.tableViewer);
 		formData = new FormData();
 		formData.left = new FormAttachment(0, 0);
 		formData.right = new FormAttachment(100, 0);
 		formData.top = new FormAttachment(tbCom, 0);
-		formData.bottom = new FormAttachment(100, -sep);
-		tableViewer.getTable().setLayoutData(formData);
+		formData.bottom = new FormAttachment(100, -this.sep);
+		this.tableViewer.getTable().setLayoutData(formData);
 		
-		txtNewTag.addListener (SWT.DefaultSelection, new Listener () {
+		this.txtNewTag.addListener (SWT.DefaultSelection, new Listener () {
+			@Override
 			public void handleEvent (Event e) {
 				procAddTag();
 			}
 		});
 		
-		txtNewTag.addListener (SWT.FOCUSED, new Listener() {
+		this.txtNewTag.addListener (SWT.FOCUSED, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
-				txtNewTag.setSelection(0, txtNewTag.getText().length());
+				ViewTagEditor.this.txtNewTag.setSelection(0, ViewTagEditor.this.txtNewTag.getText().length());
 			}
 		});
 		
-		btnAddTag.addSelectionListener(new SelectionListener() {
+		this.btnAddTag.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
 				procAddTag();
 			}
 			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {}
+			public void widgetDefaultSelected(SelectionEvent e) {/* UNUSED */}
 		});
 		
-		btnRemoveTag.addSelectionListener(new SelectionListener() {
+		this.btnRemoveTag.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
 				procRemoveTag();
 			}
 			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {}
+			public void widgetDefaultSelected(SelectionEvent e) {/* UNUSED */}
 		});
 		
-		menuMenuMgr.add(readTagsAction);
-		btnMenu.addSelectionListener(new DropMenuListener(btnMenu, menuMenuMgr));
+		menuMenuMgr.add(this.readTagsAction);
+		this.btnMenu.addSelectionListener(new DropMenuListener(this.btnMenu, menuMenuMgr));
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -320,15 +322,15 @@ public class ViewTagEditor extends ViewPart {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private void procAddTag() {
-		if (editedMediaList != null && editedMediaItem != null) {
-			String text = txtNewTag.getText();
+	void procAddTag() {
+		if (this.editedItemDb != null && this.editedItem != null) {
+			String text = this.txtNewTag.getText();
 			if (text.length() > 0) {
 				try {
-					editedMediaList.addTag(editedMediaItem, text, MediaTagType.MANUAL, (MediaTagClassification)null);
-					tableViewer.refresh();
-					txtNewTag.setSelection(0, text.length());
-					txtNewTag.setFocus();
+					this.editedItemDb.addTag(this.editedItem, text, MediaTagType.MANUAL, (MediaTagClassification)null);
+					this.tableViewer.refresh();
+					this.txtNewTag.setSelection(0, text.length());
+					this.txtNewTag.setFocus();
 				}
 				catch (MorriganException e) {
 					getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));
@@ -341,10 +343,10 @@ public class ViewTagEditor extends ViewPart {
 		}
 	}
 	
-	private void procRemoveTag() {
+	void procRemoveTag() {
 		List<MediaTag> selMts = new LinkedList<MediaTag>();
 		
-		ISelection selection = tableViewer.getSelection();
+		ISelection selection = this.tableViewer.getSelection();
 		if (selection instanceof IStructuredSelection) {
 			IStructuredSelection iSel = (IStructuredSelection) selection;
 			
@@ -362,31 +364,38 @@ public class ViewTagEditor extends ViewPart {
 		
 		MorriganMsgDlg dlg = new MorriganMsgDlg("Remove "+selMts.size()+" selected tags?", MorriganMsgDlg.YESNO);
 		dlg.open();
-		if (dlg.getReturnCode() == MorriganMsgDlg.OK) {
+		if (dlg.getReturnCode() == Window.OK) {
 			try {
 				for (MediaTag mt : selMts) {
-					editedMediaList.removeTag(mt);
+					this.editedItemDb.removeTag(mt);
 				}
 			}
 			catch (MorriganException e) {
 				getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));
 			}
-			tableViewer.refresh();
+			this.tableViewer.refresh();
 		}
 	}
 	
-	private void procReadTags() {
-		if (editedMediaList != null && editedMediaItem != null) {
-			File file = new File(editedMediaItem.getFilepath());
+	void procReadTags() {
+		if (this.editedItemDb != null && this.editedItem != null) {
+			File file = new File(this.editedItem.getFilepath());
 			if (file.exists()) {
-				try {
-					TrackTagHelper.readTrackTags(editedMediaList, editedMediaItem, file);
+				
+				if (this.editedItem instanceof MediaTrack) {
+					MediaTrack mt = (MediaTrack) this.editedItem;
+					try {
+						TrackTagHelper.readTrackTags(this.editedItemDb, mt, file);
+					}
+					catch (Exception e) {
+						new MorriganMsgDlg(e).open();
+						return;
+					}
+					this.tableViewer.refresh();
+				} else {
+					new MorriganMsgDlg("TODO: implement this.").open();
 				}
-				catch (Exception e) {
-					new MorriganMsgDlg(e).open();
-					return;
-				}
-				tableViewer.refresh();
+				
 			}
 			else {
 				new MorriganMsgDlg("File '"+file.getAbsolutePath()+"' does not exist.").open();
