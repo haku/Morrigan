@@ -113,19 +113,5 @@ public abstract class MediaTrackListEditor<T extends IMediaTrackList<S>, S exten
 		};
 	};
 	
-	protected IAction toggleEnabledAction = new Action("Toggle enabled") {
-		@Override
-		public void run() {
-			for (S track : getSelectedItems()) {
-				try {
-					MediaTrackListEditor.this.getEditorInput().getMediaList().setTrackEnabled(track, !track.isEnabled());
-				} catch (Throwable t) {
-					// TODO something more useful here.
-					t.printStackTrace();
-				}
-			}
-		};
-	};
-	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

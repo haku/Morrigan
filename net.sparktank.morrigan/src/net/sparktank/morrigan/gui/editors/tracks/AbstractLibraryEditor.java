@@ -8,10 +8,11 @@ import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.dialogs.RunnableDialog;
 import net.sparktank.morrigan.gui.display.DropMenuListener;
+import net.sparktank.morrigan.gui.editors.IMediaItemDbEditor;
 import net.sparktank.morrigan.gui.editors.MediaColumn;
 import net.sparktank.morrigan.helpers.TimeHelper;
 import net.sparktank.morrigan.model.DbColumn;
-import net.sparktank.morrigan.model.MediaItemDb.SortChangeListener;
+import net.sparktank.morrigan.model.IMediaItemDb.SortChangeListener;
 import net.sparktank.morrigan.model.MediaSqliteLayer2;
 import net.sparktank.morrigan.model.MediaSqliteLayer2.SortDirection;
 import net.sparktank.morrigan.model.tracks.IMediaTrackList.DurationData;
@@ -36,7 +37,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 
-public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> extends MediaTrackListEditor<AbstractMediaLibrary, MediaTrack> {
+public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> extends MediaTrackListEditor<T, MediaTrack> implements IMediaItemDbEditor {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public AbstractLibraryEditor () {
@@ -83,11 +84,9 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> exte
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	// FIXME how to remote the suppress warnings?
-	@SuppressWarnings("unchecked")
 	@Override
 	public T getMediaList () {
-		return (T) this.getEditorInput().getMediaList();
+		return this.getEditorInput().getMediaList();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
