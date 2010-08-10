@@ -311,49 +311,49 @@ public abstract class MediaItemDb<Q extends IMediaItemList<T>, S extends MediaSq
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Tags.
 	
-	public boolean hasTags (T mlt) throws MorriganException {
+	public boolean hasTags (IDbItem item) throws MorriganException {
 		try {
-			return this.dbLayer.hasTags(mlt);
+			return this.dbLayer.hasTags(item);
 		} catch (DbException e) {
 			throw new MorriganException(e);
 		}
 	}
 	
-	public boolean hasTag (T mlt, String tag, MediaTagType type, MediaTagClassification mtc) throws MorriganException {
+	public boolean hasTag (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) throws MorriganException {
 		try {
-			return this.dbLayer.hasTag(mlt, tag, type, mtc);
+			return this.dbLayer.hasTag(item, tag, type, mtc);
 		} catch (DbException e) {
 			throw new MorriganException(e);
 		}
 	}
 	
-	public List<MediaTag> getTags (T mlt) throws MorriganException {
+	public List<MediaTag> getTags (IDbItem item) throws MorriganException {
 		try {
-			return this.dbLayer.getTags(mlt);
+			return this.dbLayer.getTags(item);
 		} catch (DbException e) {
 			throw new MorriganException(e);
 		}
 	}
 	
-	public void addTag (T mlt, String tag, MediaTagType type, MediaTagClassification mtc) throws MorriganException {
+	public void addTag (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) throws MorriganException {
 		try {
-			this.dbLayer.addTag(mlt, tag, type, mtc);
+			this.dbLayer.addTag(item, tag, type, mtc);
 		} catch (DbException e) {
 			throw new MorriganException(e);
 		}
 	}
 	
-	public void addTag (T mlt, String tag, MediaTagType type, String mtc) throws MorriganException {
+	public void addTag (IDbItem item, String tag, MediaTagType type, String mtc) throws MorriganException {
 		try {
-			this.dbLayer.addTag(mlt, tag, type, mtc);
+			this.dbLayer.addTag(item, tag, type, mtc);
 		} catch (DbException e) {
 			throw new MorriganException(e);
 		}
 	}
 	
-	public void moveTags (T from_mlt, T to_mlt) throws MorriganException {
+	public void moveTags (IDbItem from_item, IDbItem to_item) throws MorriganException {
 		try {
-			this.dbLayer.moveTags(from_mlt, to_mlt);
+			this.dbLayer.moveTags(from_item, to_item);
 		} catch (DbException e) {
 			throw new MorriganException(e);
 		}
@@ -367,9 +367,9 @@ public abstract class MediaItemDb<Q extends IMediaItemList<T>, S extends MediaSq
 		}
 	}
 	
-	public void clearTags (T mlt) throws MorriganException {
+	public void clearTags (IDbItem item) throws MorriganException {
 		try {
-			this.dbLayer.clearTags(mlt);
+			this.dbLayer.clearTags(item);
 		} catch (DbException e) {
 			throw new MorriganException(e);
 		}
