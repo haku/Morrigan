@@ -98,6 +98,14 @@
             name="Tags"
             restorable="true">
       </view>
+      <view
+            class="net.sparktank.morrigan.gui.views.ViewPicture"
+            icon="icons/pref.gif"
+            id="net.sparktank.morrigan.gui.views.ViewPicture"
+            category="net.sparktank.morrigan"
+            name="Picture"
+            restorable="true">
+      </view>
       
    </extension>
    
