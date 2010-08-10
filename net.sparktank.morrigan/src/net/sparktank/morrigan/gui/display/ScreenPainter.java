@@ -26,7 +26,7 @@ public class ScreenPainter implements PaintListener {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private final Canvas canvas;
+	final Canvas canvas;
 	private final ScreenType screenType;
 	private TitleProvider titleProvider = null;
 	
@@ -43,11 +43,11 @@ public class ScreenPainter implements PaintListener {
 	}
 	
 	public void redrawTitle () {
-		if (!canvas.isDisposed()) canvas.getShell().getDisplay().asyncExec(new Runnable() {
+		if (!this.canvas.isDisposed()) this.canvas.getShell().getDisplay().asyncExec(new Runnable() {
 			@Override
 			public void run() {
-				if (!canvas.isDisposed()) {
-					canvas.redraw();
+				if (!ScreenPainter.this.canvas.isDisposed()) {
+					ScreenPainter.this.canvas.redraw();
 				}
 			}
 		});
@@ -57,10 +57,10 @@ public class ScreenPainter implements PaintListener {
 	
 	@Override
 	public void paintControl(PaintEvent e) {
-		Rectangle clientArea = canvas.getClientArea();
+		Rectangle clientArea = this.canvas.getClientArea();
 		
-		if (screenType != ScreenType.TINY) {
-			PlayItem item = titleProvider.getItem();
+		if (this.screenType != ScreenType.TINY) {
+			PlayItem item = this.titleProvider.getItem();
 			Point centre = new Point(clientArea.width/2, clientArea.height/2);
 			
 			String text;
@@ -71,7 +71,7 @@ public class ScreenPainter implements PaintListener {
 				Font font3;
 				
 				FontData fontData = e.gc.getFont().getFontData()[0];
-				if (screenType == ScreenType.LARGE) {
+				if (this.screenType == ScreenType.LARGE) {
 					font2 = new Font(e.gc.getDevice(), fontData.getName(),
 							fontData.getHeight() * 2, fontData.getStyle());
 					font3 = new Font(e.gc.getDevice(), fontData.getName(),
@@ -104,7 +104,7 @@ public class ScreenPainter implements PaintListener {
 				
 				e.gc.setFont(font);
 				
-				if (screenType == ScreenType.LARGE) {
+				if (this.screenType == ScreenType.LARGE) {
 					text = item.item.getFilepath();
 					drawTextHCen(e, centre.x, rect2.y + rect2.height, text);
 				}
