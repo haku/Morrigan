@@ -90,23 +90,80 @@ public class MixedMediaSqliteLayerImpl extends MediaSqliteLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	SQL queries.
 	
-	private static final String SQL_MEDIAFILES_SELECT = "SELECT" +
-    	" m.ROWID, type, type_rowid, sfile, lmd5, dadded, dmodified, benabled, bmissing, sremloc" +
-    	",lstartcnt,lendcnt,dlastplay,lduration" +
-    	",lwidth,lheight" +
-    	" FROM tbl_mediafiles AS m LEFT OUTER JOIN tbl_mediatracks AS t ON m.type_rowid = t.ROWID LEFT OUTER JOIN tbl_mediapics AS p ON m.type_rowid = p.ROWID";
+//	-  -  -  -  -  -  -  -  -  -  -  -
+//	Fragments.
 	
-	private static final String SQL_MEDIAFILES_Q_ALL = SQL_MEDIAFILES_SELECT
-		+ " ORDER BY {COL} {DIR};";
+	private static final String _SQL_MEDIAFILES_SELECT =
+		"SELECT"
+		+ " m.ROWID, type, type_rowid, sfile, lmd5, dadded, dmodified, benabled, bmissing, sremloc"
+		+ ",lstartcnt,lendcnt,dlastplay,lduration"
+		+ ",lwidth,lheight"
+		+ " FROM tbl_mediafiles AS m";
 	
-	private static final String SQL_MEDIAFILES_Q_NOTMISSING = SQL_MEDIAFILES_SELECT
-    	+ " WHERE (bmissing<>1 OR bmissing is NULL)"
-    	+ " ORDER BY {COL} {DIR};";
+	private static final String _SQL_MEDIA_JOINTRACKS =
+		" LEFT OUTER JOIN tbl_mediatracks AS t ON m.type_rowid = t.ROWID";
 	
-	private static final String SQL_MEDIAFILES_Q_SIMPLESEARCH = SQL_MEDIAFILES_SELECT
-		+ " WHERE sfile LIKE ? ESCAPE ?"
+	private static final String _SQL_MEDIA_JOINPICS =
+		" LEFT OUTER JOIN tbl_mediapics AS p ON m.type_rowid = p.ROWID";
+	
+	private static final String _SQL_MEDIAFILES_WHERENOTMISSING =
+		" WHERE (bmissing<>1 OR bmissing is NULL)";
+	
+	private static final String _SQL_ORDERBYREPLACE =
+		" ORDER BY {COL} {DIR};";
+	
+	private static final String _SQL_MEDIAFILES_WHEREORDERSEARCH = 
+		" WHERE sfile LIKE ? ESCAPE ?"
 		+ " AND (bmissing<>1 OR bmissing is NULL) AND (benabled<>0 OR benabled is NULL)"
 		+ " ORDER BY dlastplay DESC, lendcnt DESC, lstartcnt DESC, sfile COLLATE NOCASE ASC;";
+	
+//	-  -  -  -  -  -  -  -  -  -  -  -
+//	MediaItem Queries.
+	
+	private static final String SQL_MEDIAFILES_Q_ALL =
+		_SQL_MEDIAFILES_SELECT + _SQL_MEDIA_JOINTRACKS + _SQL_MEDIA_JOINPICS
+		+ _SQL_ORDERBYREPLACE;
+	
+	private static final String SQL_MEDIAFILES_Q_NOTMISSING =
+		_SQL_MEDIAFILES_SELECT + _SQL_MEDIA_JOINTRACKS + _SQL_MEDIA_JOINPICS
+    	+ _SQL_MEDIAFILES_WHERENOTMISSING
+    	+ _SQL_ORDERBYREPLACE;
+	
+	private static final String SQL_MEDIAFILES_Q_SIMPLESEARCH =
+		_SQL_MEDIAFILES_SELECT + _SQL_MEDIA_JOINTRACKS + _SQL_MEDIA_JOINPICS
+		+ _SQL_MEDIAFILES_WHEREORDERSEARCH;
+
+//	-  -  -  -  -  -  -  -  -  -  -  -
+//	MediaTrack Queries.
+	
+	private static final String SQL_MEDIATRACKS_Q_ALL =
+		_SQL_MEDIAFILES_SELECT + _SQL_MEDIA_JOINTRACKS
+		+ _SQL_ORDERBYREPLACE;
+	
+	private static final String SQL_MEDIATRACKS_Q_NOTMISSING =
+		_SQL_MEDIAFILES_SELECT + _SQL_MEDIA_JOINTRACKS
+    	+ _SQL_MEDIAFILES_WHERENOTMISSING
+    	+ _SQL_ORDERBYREPLACE;
+	
+	private static final String SQL_MEDIATRACKS_Q_SIMPLESEARCH =
+		_SQL_MEDIAFILES_SELECT + _SQL_MEDIA_JOINTRACKS
+		+ _SQL_MEDIAFILES_WHEREORDERSEARCH;
+	
+//	-  -  -  -  -  -  -  -  -  -  -  -
+//	MediaPic Queries.
+	
+	private static final String SQL_MEDIAPICS_Q_ALL =
+		_SQL_MEDIAFILES_SELECT + _SQL_MEDIA_JOINPICS
+		+ _SQL_ORDERBYREPLACE;
+	
+	private static final String SQL_MEDIAPICS_Q_NOTMISSING =
+		_SQL_MEDIAFILES_SELECT + _SQL_MEDIA_JOINPICS
+    	+ _SQL_MEDIAFILES_WHERENOTMISSING
+    	+ _SQL_ORDERBYREPLACE;
+	
+	private static final String SQL_MEDIAPICS_Q_SIMPLESEARCH =
+		_SQL_MEDIAFILES_SELECT + _SQL_MEDIA_JOINPICS
+		+ _SQL_MEDIAFILES_WHEREORDERSEARCH;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Create statements.
@@ -123,10 +180,10 @@ public class MixedMediaSqliteLayerImpl extends MediaSqliteLayer {
 	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Media getters.
+//	MediaItem getters.
 	
 	protected List<MediaItem> local_updateListOfAllMedia (List<MediaItem> list, DbColumn sort, SortDirection direction, boolean hideMissing) throws SQLException, ClassNotFoundException {
-		String sql = local_getAllMediaSql(sort, direction, hideMissing);
+		String sql = local_getAllMediaSql(SQL_MEDIAFILES_Q_ALL, SQL_MEDIAFILES_Q_NOTMISSING, hideMissing, sort, direction);
 		ResultSet rs;
 		
 		List<MediaItem> ret;
@@ -146,7 +203,7 @@ public class MixedMediaSqliteLayerImpl extends MediaSqliteLayer {
 	}
 	
 	protected List<MediaItem> local_getAllMedia (DbColumn sort, SortDirection direction, boolean hideMissing) throws SQLException, ClassNotFoundException {
-		String sql = local_getAllMediaSql(sort, direction, hideMissing);
+		String sql = local_getAllMediaSql(SQL_MEDIAFILES_Q_ALL, SQL_MEDIAFILES_Q_NOTMISSING, hideMissing, sort, direction);
 		ResultSet rs;
 		
 		List<MediaItem> ret;
@@ -163,38 +220,6 @@ public class MixedMediaSqliteLayerImpl extends MediaSqliteLayer {
 		}
 		
 		return ret;
-	}
-	
-	private String local_getAllMediaSql (DbColumn sort, SortDirection direction, boolean hideMissing) {
-		String sql;
-		
-		if (hideMissing) {
-			sql = SQL_MEDIAFILES_Q_NOTMISSING;
-		} else {
-			sql = SQL_MEDIAFILES_Q_ALL;
-		}
-		
-		switch (direction) {
-			case ASC:
-				sql = sql.replace("{DIR}", "ASC");
-				break;
-				
-			case DESC:
-				sql = sql.replace("{DIR}", "DESC");
-				break;
-				
-			default:
-				throw new IllegalArgumentException();
-				
-		}
-		
-		String sortTerm = sort.getName();
-		if (sort.getSortOpts() != null) {
-			sortTerm = sortTerm.concat(sort.getSortOpts());
-		}
-		sql = sql.replace("{COL}", sortTerm);
-		
-		return sql;
 	}
 	
 	protected List<MediaItem> local_simpleSearch (String term, String esc, int maxResults) throws SQLException, ClassNotFoundException {
@@ -225,12 +250,54 @@ public class MixedMediaSqliteLayerImpl extends MediaSqliteLayer {
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	MediaTrack getters.
+	
+//	TODO
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	MediaPic getters.
+	
+//	TODO
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Media setters.
 	
 //	TODO
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Static processing methods.
+	
+	static private String local_getAllMediaSql (String sqlAll, String sqlNotMissing, boolean hideMissing, DbColumn sort, SortDirection direction) {
+		String sql;
+		
+		if (hideMissing) {
+			sql = sqlNotMissing;
+		} else {
+			sql = sqlAll;
+		}
+		
+		switch (direction) {
+			case ASC:
+				sql = sql.replace("{DIR}", "ASC");
+				break;
+				
+			case DESC:
+				sql = sql.replace("{DIR}", "DESC");
+				break;
+				
+			default:
+				throw new IllegalArgumentException();
+				
+		}
+		
+		String sortTerm = sort.getName();
+		if (sort.getSortOpts() != null) {
+			sortTerm = sortTerm.concat(sort.getSortOpts());
+		}
+		sql = sql.replace("{COL}", sortTerm);
+		
+		return sql;
+	}
 	
 	static private List<MediaItem> local_parseAndUpdateFromRecordSet (List<MediaItem> list, ResultSet rs) throws SQLException {
 		List<MediaItem> finalList = new ArrayList<MediaItem>();
