@@ -3,6 +3,7 @@ package net.sparktank.morrigan.model;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -180,9 +181,15 @@ public abstract class LocalDbUpdateTask<Q extends MediaItemDb<?,?,T>, T extends 
 					if (taskEventListener.isCanceled()) break;
 					
 					File dirItem = dirStack.pop();
-					File[] listFiles = dirItem.listFiles();
-					if (listFiles != null) {
+					File[] arrFiles = dirItem.listFiles();
+					if (arrFiles != null) {
 						taskEventListener.subTask("Scanning " + dirItem.getAbsolutePath());
+						
+						List<File> listFiles = new ArrayList<File>(arrFiles.length);
+						for (File file : arrFiles) {
+							listFiles.add(file);
+						}
+						Collections.sort(listFiles);
 						
 						for (File file : listFiles) {
 							if (taskEventListener.isCanceled()) break;
