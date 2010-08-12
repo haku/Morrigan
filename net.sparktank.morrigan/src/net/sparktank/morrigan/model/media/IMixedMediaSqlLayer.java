@@ -14,6 +14,33 @@ import net.sparktank.sqlitewrapper.DbException;
 
 public interface IMixedMediaSqlLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Fixed enums - changing these requires writing more code.
+	
+	public static enum MediaType {
+		UNKNOWN(0), TRACK(1), PICTURE(2);
+		
+		private final int n;
+		
+		MediaType(int n) {
+			this.n = n;
+		}
+		
+		public int getN() {
+			return this.n;
+		}
+		
+		static public MediaType parseInt (int n) {
+			switch (n) {
+				case 0: return UNKNOWN;
+				case 1: return TRACK;
+				case 2: return PICTURE;
+				default: throw new IllegalArgumentException();
+			}
+		}
+		
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Read methods.
 	
 	public List<MediaItem> updateListOfAllMedia (List<MediaItem> list, DbColumn sort, SortDirection direction, boolean hideMissing) throws DbException;
@@ -37,7 +64,7 @@ public interface IMixedMediaSqlLayer {
 	 * @return true if the file needed to be added.
 	 * @throws DbException
 	 */
-	public boolean addFile (File file) throws DbException;
+	public boolean addFile (MediaType mediaType, File file) throws DbException;
 	
 	/**
 	 * 
@@ -46,7 +73,7 @@ public interface IMixedMediaSqlLayer {
 	 * @return true if the file needed to be added.
 	 * @throws DbException
 	 */
-	public boolean addFile (String filepath, long lastModified) throws DbException;
+	public boolean addFile (MediaType mediaType, String filepath, long lastModified) throws DbException;
 	
 	public int removeFile (String sfile) throws DbException;
 	public int removeFile (IDbItem dbItem) throws DbException;
