@@ -3,8 +3,8 @@ package net.sparktank.morrigan.model.tasks;
 import java.io.File;
 import java.util.List;
 
-import net.sparktank.morrigan.model.IMediaItemList;
 import net.sparktank.morrigan.model.MediaItem;
+import net.sparktank.morrigan.model.media.interfaces.IMediaItemList;
 import net.sparktank.morrigan.model.tasks.TaskResult.TaskOutcome;
 
 
@@ -37,7 +37,7 @@ public class MediaFileCopyTask<T extends MediaItem> implements IMorriganTask {
 			
 			for (T mi : this.mediaSelection) {
 				taskEventListener.subTask(mi.getTitle());
-				this.mediaItemList.copyMediaItemFile(mi, this.targetDirectory);
+				this.mediaItemList.copyItemFile(mi, this.targetDirectory);
 				taskEventListener.worked(1);
 				
 				if (taskEventListener.isCanceled()) {

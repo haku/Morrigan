@@ -44,7 +44,7 @@ public class MediaListFeed<T extends IMediaTrackList<? extends MediaItem>> exten
 		addLink(dw, "/media/" + this.ml.getType() + "/" + listFile + "/scan", "scan", "cmd");
 		addLink(dw, "/player/0/play/" + listFile, "play", "cmd"); // FIXME list all players here.
 		
-		for (MediaTrack mi : this.ml.getMediaTracks()) {
+		for (MediaTrack mi : this.ml.getMediaItems()) {
 			dw.startElement("entry");
 			
 			String file;

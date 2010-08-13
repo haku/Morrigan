@@ -1,6 +1,6 @@
 package net.sparktank.morrigan.model.pictures;
 
-import net.sparktank.morrigan.model.IMediaItemList.DirtyState;
+import net.sparktank.morrigan.model.media.interfaces.IMediaItemList.DirtyState;
 import net.sparktank.morrigan.model.MediaItemList;
 
 public class MediaPictureListHelper {

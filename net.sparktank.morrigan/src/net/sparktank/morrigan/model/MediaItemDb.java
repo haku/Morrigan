@@ -8,6 +8,7 @@ import java.util.List;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.MediaSqliteLayer2.SortDirection;
 import net.sparktank.morrigan.model.media.interfaces.IDbItem;
+import net.sparktank.morrigan.model.media.interfaces.IMediaItemList;
 import net.sparktank.morrigan.model.tags.MediaTag;
 import net.sparktank.morrigan.model.tags.MediaTagClassification;
 import net.sparktank.morrigan.model.tags.MediaTagType;
@@ -88,7 +89,7 @@ public abstract class MediaItemDb<Q extends IMediaItemList<T>, S extends MediaSq
 		System.err.println("[?] reading... " + getType() + " " + getListName() + "...");
 		
 		long t0 = System.currentTimeMillis();
-		List<T> allMedia = this.dbLayer.updateListOfAllMedia(getMediaTracks(), this.librarySort, this.librarySortDirection, HIDEMISSING);
+		List<T> allMedia = this.dbLayer.updateListOfAllMedia(getMediaItems(), this.librarySort, this.librarySortDirection, HIDEMISSING);
 		long l0 = System.currentTimeMillis() - t0;
 		
 		long t1 = System.currentTimeMillis();
@@ -146,7 +147,7 @@ public abstract class MediaItemDb<Q extends IMediaItemList<T>, S extends MediaSq
 	 * Returns a copy of the main list updated with all items from the DB.
 	 */
 	public List<T> getAllLibraryEntries () throws DbException {
-		ArrayList<T> copyOfMainList = new ArrayList<T>(getMediaTracks());
+		ArrayList<T> copyOfMainList = new ArrayList<T>(getMediaItems());
 		List<T> allList = this.dbLayer.getAllMedia(MediaSqliteLayer2.SQL_TBL_MEDIAFILES_COL_FILE, SortDirection.ASC, false);
 		updateList(copyOfMainList, allList);
 		return copyOfMainList;
@@ -201,8 +202,8 @@ public abstract class MediaItemDb<Q extends IMediaItemList<T>, S extends MediaSq
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
-	public void setDateAdded (T track, Date date) throws MorriganException {
-		super.setDateAdded(track, date);
+	public void setItemDateAdded (T track, Date date) throws MorriganException {
+		super.setItemDateAdded(track, date);
 		try {
 			this.dbLayer.setDateAdded(track.getFilepath(), date);
 		} catch (DbException e) {
@@ -211,7 +212,7 @@ public abstract class MediaItemDb<Q extends IMediaItemList<T>, S extends MediaSq
 	}
 	
 	@Override
-	public void removeMediaTrack (T track) throws MorriganException {
+	public void removeItem (T track) throws MorriganException {
 		try {
 			_removeMediaTrack(track);
 		} catch (DbException e) {
@@ -225,7 +226,7 @@ public abstract class MediaItemDb<Q extends IMediaItemList<T>, S extends MediaSq
 	 * @throws DbException 
 	 */
 	private void _removeMediaTrack (T track) throws MorriganException, DbException {
-		super.removeMediaTrack(track);
+		super.removeItem(track);
 		
 		// Remove track.
 		int n = this.dbLayer.removeFile(track.getFilepath());
@@ -243,8 +244,8 @@ public abstract class MediaItemDb<Q extends IMediaItemList<T>, S extends MediaSq
 	}
 	
 	@Override
-	public void setTrackHashCode(T track, long hashcode) throws MorriganException {
-		super.setTrackHashCode(track, hashcode);
+	public void setItemHashCode(T track, long hashcode) throws MorriganException {
+		super.setItemHashCode(track, hashcode);
 		try {
 			this.dbLayer.setHashcode(track.getFilepath(), hashcode);
 		} catch (DbException e) {
@@ -253,8 +254,8 @@ public abstract class MediaItemDb<Q extends IMediaItemList<T>, S extends MediaSq
 	}
 	
 	@Override
-	public void setTrackDateLastModified(T track, Date date) throws MorriganException {
-		super.setTrackDateLastModified(track, date);
+	public void setItemDateLastModified(T track, Date date) throws MorriganException {
+		super.setItemDateLastModified(track, date);
 		try {
 			this.dbLayer.setDateLastModified(track.getFilepath(), date);
 		} catch (DbException e) {
@@ -263,8 +264,8 @@ public abstract class MediaItemDb<Q extends IMediaItemList<T>, S extends MediaSq
 	}
 	
 	@Override
-	public void setTrackEnabled(T track, boolean value) throws MorriganException {
-		super.setTrackEnabled(track, value);
+	public void setItemEnabled(T track, boolean value) throws MorriganException {
+		super.setItemEnabled(track, value);
 		try {
 			this.dbLayer.setEnabled(track.getFilepath(), value);
 		} catch (DbException e) {
@@ -273,8 +274,8 @@ public abstract class MediaItemDb<Q extends IMediaItemList<T>, S extends MediaSq
 	}
 	
 	@Override
-	public void setTrackMissing(T track, boolean value) throws MorriganException {
-		super.setTrackMissing(track, value);
+	public void setItemMissing(T track, boolean value) throws MorriganException {
+		super.setItemMissing(track, value);
 		try {
 			this.dbLayer.setMissing(track.getFilepath(), value);
 		} catch (DbException e) {
@@ -401,7 +402,7 @@ public abstract class MediaItemDb<Q extends IMediaItemList<T>, S extends MediaSq
 	}
 	
 	public void markAsUnreadabled (T mi) throws MorriganException {
-		setTrackEnabled(mi, false);
+		setItemEnabled(mi, false);
 		addTag(mi, TAG_UNREADABLE, MediaTagType.AUTOMATIC, (MediaTagClassification)null);
 	}
 	
@@ -418,7 +419,7 @@ public abstract class MediaItemDb<Q extends IMediaItemList<T>, S extends MediaSq
 		boolean added = this.dbLayer.addFile(file);
 		if (added) {
 			track = getNewT(file.getAbsolutePath());
-			addTrack(track);
+			addItem(track);
 		}
 		return track;
 	}
@@ -466,12 +467,12 @@ public abstract class MediaItemDb<Q extends IMediaItemList<T>, S extends MediaSq
 		boolean added = this.dbLayer.addFile(mi.getFilepath(), -1);
 		if (added) {
 			track = mi;
-			addTrack(track);
+			addItem(track);
 			persistTrackData(track);
 			
 		} else {
 			// Update item.
-			List<T> mediaTracks = getMediaTracks();
+			List<T> mediaTracks = getMediaItems();
 			int index = mediaTracks.indexOf(mi);
 			if (index >= 0) {
 				track = mediaTracks.get(index);

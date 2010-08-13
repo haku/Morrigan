@@ -178,7 +178,7 @@ public class Player {
 			boolean changed = false;
 			
 			for (int i = this._history.size() - 1; i >= 0; i--) {
-				if (!this._history.get(i).list.getMediaTracks().contains(this._history.get(i).item)) {
+				if (!this._history.get(i).list.getMediaItems().contains(this._history.get(i).item)) {
 					this._history.remove(this._history.get(i));
 					changed = true;
 				}

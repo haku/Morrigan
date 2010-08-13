@@ -98,7 +98,7 @@ public abstract class AbstractMediaLibrary extends MediaItemDb<IMediaTrackList<M
 	
 	@Override
 	public DurationData getTotalDuration () {
-		return MediaTrackListHelper.getTotalDuration(this.getMediaTracks());
+		return MediaTrackListHelper.getTotalDuration(this.getMediaItems());
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

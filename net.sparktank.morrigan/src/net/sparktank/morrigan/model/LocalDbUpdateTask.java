@@ -251,7 +251,7 @@ public abstract class LocalDbUpdateTask<Q extends MediaItemDb<?,?,T>, T extends 
 				if (mi.isMissing()) {
 					try {
 						taskEventListener.logMsg(this.getItemList().getListName(), "[FOUND] " + mi.getFilepath());
-						this.getItemList().setTrackMissing(mi, false);
+						this.getItemList().setItemMissing(mi, false);
 					} catch (Throwable t) {
 						// FIXME log this somewhere useful.
 						System.err.println("Throwable while marking track as found '"+mi.getFilepath()+"': " + t.getMessage());
@@ -271,7 +271,7 @@ public abstract class LocalDbUpdateTask<Q extends MediaItemDb<?,?,T>, T extends 
 					}
 					
 					try {
-						this.getItemList().setTrackDateLastModified(mi, new Date(lastModified));
+						this.getItemList().setItemDateLastModified(mi, new Date(lastModified));
 					} catch (Throwable t) {
 						// FIXME log this somewhere useful.
 						System.err.println("Throwable while writing track last modified date '"+mi.getFilepath()+"': " + t.getMessage());
@@ -296,7 +296,7 @@ public abstract class LocalDbUpdateTask<Q extends MediaItemDb<?,?,T>, T extends 
 					
 					if (hash != 0) {
 						try {
-							this.getItemList().setTrackHashCode(mi, hash);
+							this.getItemList().setItemHashCode(mi, hash);
 						} catch (Throwable t) {
 							// FIXME log this somewhere useful.
 							System.err.println("Throwable while setting hash code for '"+mi.getFilepath()+"' to '"+hash+"': " + t.getMessage());
@@ -310,7 +310,7 @@ public abstract class LocalDbUpdateTask<Q extends MediaItemDb<?,?,T>, T extends 
 				if (!mi.isMissing()) {
 					try {
 						taskEventListener.logMsg(this.getItemList().getListName(), "[MISSING] " + mi.getFilepath());
-						this.getItemList().setTrackMissing(mi, true);
+						this.getItemList().setItemMissing(mi, true);
 					}
 					catch (Throwable t) {
 						// FIXME log this somewhere useful.
@@ -456,7 +456,7 @@ public abstract class LocalDbUpdateTask<Q extends MediaItemDb<?,?,T>, T extends 
 							
 							mergeItems(keep, i);
 							
-							this.getItemList().removeMediaTrack(i);
+							this.getItemList().removeItem(i);
 							taskEventListener.logMsg(this.getItemList().getListName(), "[REMOVED] " + i.getFilepath());
 							countMerges++;
 							

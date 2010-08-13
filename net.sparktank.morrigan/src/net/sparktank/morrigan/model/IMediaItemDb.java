@@ -5,12 +5,14 @@ import java.util.List;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.MediaSqliteLayer2.SortDirection;
 import net.sparktank.morrigan.model.media.interfaces.IDbItem;
+import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
+import net.sparktank.morrigan.model.media.interfaces.IMediaItemList;
 import net.sparktank.morrigan.model.tags.MediaTag;
 import net.sparktank.morrigan.model.tags.MediaTagClassification;
 import net.sparktank.morrigan.model.tags.MediaTagType;
 import net.sparktank.sqlitewrapper.DbException;
 
-public interface IMediaItemDb<S extends MediaSqliteLayer2<T>, T extends MediaItem> extends IMediaItemList<T> {
+public interface IMediaItemDb<S extends MediaSqliteLayer2<T>, T extends IMediaItem> extends IMediaItemList<T> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	// TODO add more methods?

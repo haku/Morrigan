@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sparktank.morrigan.helpers.GeneratedString;
+import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
 import net.sparktank.sqlitewrapper.DbException;
 
 /**
@@ -20,7 +21,7 @@ import net.sparktank.sqlitewrapper.DbException;
  * tbl_mediafiles generic.  Subclasses can then worry about the custom fields
  * they wish to add.
  */
-public abstract class MediaSqliteLayer2<T extends MediaItem> extends MediaSqliteLayer {
+public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqliteLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors.
 	

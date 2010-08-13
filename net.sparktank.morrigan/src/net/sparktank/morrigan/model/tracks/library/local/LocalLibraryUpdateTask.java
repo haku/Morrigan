@@ -56,7 +56,7 @@ public class LocalLibraryUpdateTask extends LocalDbUpdateTask<LocalMediaLibrary,
 		if (itemToBeRemove.getDateAdded() != null) {
 			if (itemToKeep.getDateAdded() == null
 					|| itemToKeep.getDateAdded().getTime() > itemToBeRemove.getDateAdded().getTime()) {
-				this.getItemList().setDateAdded(itemToKeep, itemToBeRemove.getDateAdded());
+				this.getItemList().setItemDateAdded(itemToKeep, itemToBeRemove.getDateAdded());
 			}
 		}
 		
@@ -76,7 +76,7 @@ public class LocalLibraryUpdateTask extends LocalDbUpdateTask<LocalMediaLibrary,
 		}
 		
 		if (itemToBeRemove.isMissing() && itemToKeep.isEnabled() && !itemToBeRemove.isEnabled()) {
-			this.getItemList().setTrackEnabled(itemToKeep, itemToBeRemove.isEnabled());
+			this.getItemList().setItemEnabled(itemToKeep, itemToBeRemove.isEnabled());
 		}
 	}
 	
