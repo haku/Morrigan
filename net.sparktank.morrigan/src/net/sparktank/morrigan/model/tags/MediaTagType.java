@@ -27,11 +27,11 @@ public enum MediaTagType {
 	}
 	
 	public int getIndex () {
-		return index;
+		return this.index;
 	}
 	
 	public String getShortName () {
-		return shortNames[index];
+		return this.shortNames[this.index];
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

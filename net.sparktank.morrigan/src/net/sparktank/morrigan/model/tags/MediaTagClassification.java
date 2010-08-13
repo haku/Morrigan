@@ -13,11 +13,11 @@ public class MediaTagClassification {
 	}
 	
 	public long getRowId() {
-		return rowId;
+		return this.rowId;
 	}
 	
 	public String getClassification() {
-		return classification;
+		return this.classification;
 	}
 	public void setClassification(String classification) {
 		this.classification = classification;

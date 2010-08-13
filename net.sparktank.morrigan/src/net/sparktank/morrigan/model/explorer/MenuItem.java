@@ -5,8 +5,7 @@ public class MenuItem {
 	public String identifier;
 	public String title;
 	
-	public MenuItem () {
-	}
+	public MenuItem () {/* UNUSED */}
 	
 	public MenuItem (String name, String title) {
 		this.identifier = name;
@@ -15,7 +14,7 @@ public class MenuItem {
 	
 	@Override
 	public String toString () {
-		return title;
+		return this.title;
 	}
 	
 }
