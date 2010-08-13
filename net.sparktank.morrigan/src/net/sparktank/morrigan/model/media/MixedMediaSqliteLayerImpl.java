@@ -14,7 +14,7 @@ import net.sparktank.morrigan.model.DbColumn;
 import net.sparktank.morrigan.model.IDbItem;
 import net.sparktank.morrigan.model.MediaSqliteLayer;
 import net.sparktank.morrigan.model.MediaSqliteLayer2.SortDirection;
-import net.sparktank.morrigan.model.media.IMixedMediaMetadataLayer.MediaType;
+import net.sparktank.morrigan.model.media.IMixedMediaStorageLayer.MediaType;
 import net.sparktank.sqlitewrapper.DbException;
 
 public class MixedMediaSqliteLayerImpl extends MediaSqliteLayer {
