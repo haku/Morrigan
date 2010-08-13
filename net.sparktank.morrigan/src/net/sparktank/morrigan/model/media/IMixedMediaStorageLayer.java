@@ -9,7 +9,7 @@ import net.sparktank.morrigan.model.IDbItem;
 import net.sparktank.morrigan.model.MediaSqliteLayer2.SortDirection;
 import net.sparktank.sqlitewrapper.DbException;
 
-public interface IMixedMediaMetadataLayer {
+public interface IMixedMediaStorageLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Fixed enums - changing these requires writing more code.
 	

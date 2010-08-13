@@ -9,7 +9,7 @@ import net.sparktank.morrigan.model.IDbItem;
 import net.sparktank.morrigan.model.MediaSqliteLayer2.SortDirection;
 import net.sparktank.sqlitewrapper.DbException;
 
-public class MixedMediaSqliteLayer extends MixedMediaSqliteLayerImpl implements IMixedMediaMetadataLayer {
+public class MixedMediaSqliteLayer extends MixedMediaSqliteLayerImpl implements IMixedMediaStorageLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors.
 	
