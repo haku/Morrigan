@@ -4,11 +4,12 @@ import java.io.File;
 import java.util.Date;
 
 import net.sparktank.morrigan.helpers.EqualHelper;
+import net.sparktank.morrigan.model.media.IMediaItem;
 
 /**
  * Generic media item, be it music, video, image, etc...
  */
-public class MediaItem implements IDbItem {
+public class MediaItem implements IMediaItem, IDbItem {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors.
 	
@@ -28,9 +29,11 @@ public class MediaItem implements IDbItem {
 	private boolean enabled = true;
 	private boolean missing = false;
 	
+	@Override
 	public String getFilepath () {
 		return this.filepath;
 	}
+	@Override
 	public boolean setFilepath (String filePath) {
 		if (!EqualHelper.areEqual(this.filepath, filePath)) {
 			this.filepath = filePath;
@@ -39,9 +42,11 @@ public class MediaItem implements IDbItem {
 		return false;
 	}
 	
+	@Override
 	public Date getDateAdded() {
 		return this.dateAdded;
 	}
+	@Override
 	public boolean setDateAdded(Date dateAdded) {
 		if (!EqualHelper.areEqual(this.dateAdded, dateAdded)) {
 			this.dateAdded = dateAdded;
@@ -50,9 +55,11 @@ public class MediaItem implements IDbItem {
 		return false;
 	}
 	
+	@Override
 	public long getHashcode() {
 		return this.hashcode;
 	}
+	@Override
 	public boolean setHashcode(long hashcode) {
 		if (this.hashcode != hashcode) {
 			this.hashcode = hashcode;
@@ -61,9 +68,11 @@ public class MediaItem implements IDbItem {
 		return false;
 	}
 	
+	@Override
 	public Date getDateLastModified() {
 		return this.dateLastModified;
 	}
+	@Override
 	public boolean setDateLastModified(Date lastModified) {
 		if (!EqualHelper.areEqual(this.dateLastModified, lastModified)) {
 			this.dateLastModified = lastModified;
@@ -72,9 +81,11 @@ public class MediaItem implements IDbItem {
 		return false;
 	}
 	
+	@Override
 	public boolean isEnabled() {
 		return this.enabled;
 	}
+	@Override
 	public boolean setEnabled(boolean enabled) {
 		if (this.enabled != enabled) {
 			this.enabled = enabled;
@@ -83,9 +94,11 @@ public class MediaItem implements IDbItem {
 		return false;
 	}
 	
+	@Override
 	public boolean isMissing() {
 		return this.missing;
 	}
+	@Override
 	public boolean setMissing(boolean missing) {
 		if (this.missing != missing) {
 			this.missing = missing;
@@ -116,9 +129,11 @@ public class MediaItem implements IDbItem {
 		return false;
 	}
 	
+	@Override
 	public String getRemoteLocation() {
 		return this.remoteLocation;
 	}
+	@Override
 	public boolean setRemoteLocation(String remoteLocation) {
 		if (!EqualHelper.areEqual(this.remoteLocation, remoteLocation)) {
 			this.remoteLocation = remoteLocation;
@@ -130,6 +145,7 @@ public class MediaItem implements IDbItem {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Secondary attributes.
 	
+	@Override
 	public String getTitle () {
 		int x = this.filepath.lastIndexOf(File.separator);
 		if (x>0) {
@@ -142,16 +158,17 @@ public class MediaItem implements IDbItem {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Mass setter.
 	
-	public boolean setFromMediaItem (MediaItem mi) {
+	@Override
+	public boolean setFromMediaItem (IMediaItem mi) {
 		boolean b = this.setFilepath(mi.getFilepath())
-			| this.setDateAdded(mi.getDateAdded())
-			| this.setHashcode(mi.getHashcode())
-			| this.setDateLastModified(mi.getDateLastModified())
-			| this.setEnabled(mi.isEnabled())
-			| this.setMissing(mi.isMissing())
-			| this.setDbRowId(mi.getDbRowId())
-			| this.setRemoteLocation(mi.getRemoteLocation());
-		return b;
+		| this.setDateAdded(mi.getDateAdded())
+		| this.setHashcode(mi.getHashcode())
+		| this.setDateLastModified(mi.getDateLastModified())
+		| this.setEnabled(mi.isEnabled())
+		| this.setMissing(mi.isMissing())
+		| this.setDbRowId(mi.getDbRowId())
+		| this.setRemoteLocation(mi.getRemoteLocation());
+	return b;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -177,6 +194,6 @@ public class MediaItem implements IDbItem {
 	public String toString () {
 		return getTitle();
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
