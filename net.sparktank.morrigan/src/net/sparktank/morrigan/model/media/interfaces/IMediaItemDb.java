@@ -9,7 +9,7 @@ import net.sparktank.morrigan.model.tags.MediaTagClassification;
 import net.sparktank.morrigan.model.tags.MediaTagType;
 import net.sparktank.sqlitewrapper.DbException;
 
-public interface IMixedMediaDb<S extends IMixedMediaStorageLayer, T extends IMixedMediaItem> extends IMixedMediaList {
+public interface IMediaItemDb<S extends IMixedMediaStorageLayer, T extends IMediaItem> extends IMixedMediaList {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public enum SortDirection { ASC, DESC };
