@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.model.media;
+package net.sparktank.morrigan.model.media.interfaces;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 
