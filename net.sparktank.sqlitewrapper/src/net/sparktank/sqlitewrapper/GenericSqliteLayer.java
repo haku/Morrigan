@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
-public abstract class GenericSqliteLayer {
+public abstract class GenericSqliteLayer implements IGenericDbLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Instance properties.
 	
@@ -32,6 +32,7 @@ public abstract class GenericSqliteLayer {
 		super.finalize();
 	}
 	
+	@Override
 	public void dispose () throws DbException {
 		try {
 			disposeDbCon();
@@ -43,6 +44,7 @@ public abstract class GenericSqliteLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Properties.
 	
+	@Override
 	public String getDbFilePath() {
 		return this.dbFilePath;
 	}
@@ -68,6 +70,7 @@ public abstract class GenericSqliteLayer {
 		}
 	}
 	
+	@Override
 	public void setAutoCommit (boolean b) throws DbException {
 		try {
 			getDbCon().setAutoCommit(b);
@@ -76,6 +79,7 @@ public abstract class GenericSqliteLayer {
 		}
 	}
 	
+	@Override
 	public void commit () throws DbException {
 		try {
 			getDbCon().commit();
@@ -84,6 +88,7 @@ public abstract class GenericSqliteLayer {
 		}
 	}
 	
+	@Override
 	public void rollback () throws DbException {
 		try {
 			getDbCon().rollback();
