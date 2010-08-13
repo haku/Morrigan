@@ -6,10 +6,9 @@ import java.util.List;
 
 import net.sparktank.morrigan.model.MediaSqliteLayer2.SortDirection;
 import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
-import net.sparktank.morrigan.model.db.interfaces.IDbItem;
 import net.sparktank.sqlitewrapper.DbException;
 
-public interface IMixedMediaStorageLayer {
+public interface IMixedMediaStorageLayer<T extends IMixedMediaItem> extends IMediaItemStorageLayer<T> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Fixed enums - changing these requires writing more code.
 	
@@ -63,16 +62,6 @@ public interface IMixedMediaStorageLayer {
 	 * @throws DbException
 	 */
 	public boolean addFile (MediaType mediaType, String filepath, long lastModified) throws DbException;
-	
-	public int removeFile (String sfile) throws DbException;
-	public int removeFile (IDbItem dbItem) throws DbException;
-	
-	public void setDateAdded (String sfile, Date date) throws DbException;
-	public void setHashcode (String sfile, long hashcode) throws DbException;
-	public void setDateLastModified (String sfile, Date date) throws DbException;
-	public void setEnabled (String sfile, boolean value) throws DbException;
-	public void setMissing (String sfile, boolean value) throws DbException;
-	public void setRemoteLocation (String sfile, String remoteLocation) throws DbException;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Setters for MediaTrack.

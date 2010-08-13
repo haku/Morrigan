@@ -9,6 +9,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.sparktank.morrigan.model.db.interfaces.IDbItem;
+import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
+import net.sparktank.morrigan.model.media.interfaces.IMediaItemStorageLayer;
 import net.sparktank.morrigan.model.tags.MediaTag;
 import net.sparktank.morrigan.model.tags.MediaTagClassification;
 import net.sparktank.morrigan.model.tags.MediaTagClassificationFactory;
@@ -16,7 +18,7 @@ import net.sparktank.morrigan.model.tags.MediaTagType;
 import net.sparktank.sqlitewrapper.DbException;
 import net.sparktank.sqlitewrapper.GenericSqliteLayer;
 
-public abstract class MediaSqliteLayer extends GenericSqliteLayer {
+public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqliteLayer implements IMediaItemStorageLayer<T> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors.
 	
@@ -27,6 +29,7 @@ public abstract class MediaSqliteLayer extends GenericSqliteLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Public methods for persisted props.
 	
+	@Override
 	public void setProp (String key, String value) throws DbException {
 		try {
 			local_setProp(key, value);
@@ -35,6 +38,7 @@ public abstract class MediaSqliteLayer extends GenericSqliteLayer {
 		}
 	}
 	
+	@Override
 	public String getProp (String key) throws DbException {
 		try {
 			return local_getProp(key);
@@ -48,6 +52,7 @@ public abstract class MediaSqliteLayer extends GenericSqliteLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Public methods for tags.
 	
+	@Override
 	public boolean hasTags (IDbItem item) throws DbException {
 		try {
 			return local_hasTags(item.getDbRowId());
@@ -56,6 +61,7 @@ public abstract class MediaSqliteLayer extends GenericSqliteLayer {
 		}
 	}
 	
+	@Override
 	public boolean hasTag (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) throws DbException {
 		try {
 			return local_hasTag(item.getDbRowId(), tag, type, mtc);
@@ -64,6 +70,7 @@ public abstract class MediaSqliteLayer extends GenericSqliteLayer {
 		}
 	}
 	
+	@Override
 	public List<MediaTag> getTags (IDbItem item) throws DbException {
 		try {
 			return local_getTags(item.getDbRowId());
@@ -72,6 +79,7 @@ public abstract class MediaSqliteLayer extends GenericSqliteLayer {
 		}
 	}
 	
+	@Override
 	public List<MediaTagClassification> getTagClassifications () throws DbException {
 		try {
 			return local_getTagClassifications();
@@ -80,6 +88,7 @@ public abstract class MediaSqliteLayer extends GenericSqliteLayer {
 		}
 	}
 	
+	@Override
 	public boolean addTag (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) throws DbException {
 		try {
 			return local_addTag(item.getDbRowId(), tag, type, mtc);
@@ -88,6 +97,7 @@ public abstract class MediaSqliteLayer extends GenericSqliteLayer {
 		}
 	}
 	
+	@Override
 	public boolean addTag (IDbItem item, String tag, MediaTagType type, String mtc) throws DbException {
 		try {
 			return local_addTag(item.getDbRowId(), tag, type, mtc);
@@ -96,6 +106,7 @@ public abstract class MediaSqliteLayer extends GenericSqliteLayer {
 		}
 	}
 	
+	@Override
 	public void moveTags (IDbItem from_item, IDbItem to_item) throws DbException {
 		try {
 			local_moveTags(from_item.getDbRowId(), to_item.getDbRowId());
@@ -104,6 +115,7 @@ public abstract class MediaSqliteLayer extends GenericSqliteLayer {
 		}
 	}
 	
+	@Override
 	public void removeTag (MediaTag tag) throws DbException {
 		try {
 			local_removeTag(tag);
@@ -112,6 +124,7 @@ public abstract class MediaSqliteLayer extends GenericSqliteLayer {
 		}
 	}
 	
+	@Override
 	public void clearTags (IDbItem item) throws DbException {
 		try {
 			local_clearTags(item.getDbRowId());
@@ -120,6 +133,7 @@ public abstract class MediaSqliteLayer extends GenericSqliteLayer {
 		}
 	}
 	
+	@Override
 	public void addTagClassification (String classificationName) throws DbException {
 		try {
 			local_addTagClassification(classificationName);
@@ -131,6 +145,7 @@ public abstract class MediaSqliteLayer extends GenericSqliteLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Public methods for Sources.
 	
+	@Override
 	public List<String> getSources () throws DbException {
 		try {
 			return local_getSources();
@@ -139,6 +154,7 @@ public abstract class MediaSqliteLayer extends GenericSqliteLayer {
 		}
 	}
 	
+	@Override
 	public void addSource (String source) throws DbException {
 		try {
 			local_addSource(source);
@@ -147,6 +163,7 @@ public abstract class MediaSqliteLayer extends GenericSqliteLayer {
 		}
 	}
 	
+	@Override
 	public void removeSource (String source) throws DbException {
 		try {
 			local_removeSource(source);

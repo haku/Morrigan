@@ -15,7 +15,9 @@ import java.util.Map;
 import net.sparktank.morrigan.helpers.GeneratedString;
 import net.sparktank.morrigan.model.db.impl.DbColumn;
 import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
+import net.sparktank.morrigan.model.db.interfaces.IDbItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
+import net.sparktank.morrigan.model.media.interfaces.IMediaItemStorageLayer;
 import net.sparktank.sqlitewrapper.DbException;
 
 /**
@@ -23,7 +25,7 @@ import net.sparktank.sqlitewrapper.DbException;
  * tbl_mediafiles generic.  Subclasses can then worry about the custom fields
  * they wish to add.
  */
-public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqliteLayer {
+public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqliteLayer<T> implements IMediaItemStorageLayer<T> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors.
 	
@@ -41,6 +43,7 @@ public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqlit
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	DB readers.
 	
+	@Override
 	public List<T> updateListOfAllMedia (List<T> list, IDbColumn sort, SortDirection direction, boolean hideMissing) throws DbException {
 		try {
 			return local_updateListOfAllMedia(list, sort, direction, hideMissing);
@@ -49,6 +52,7 @@ public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqlit
 		}
 	}
 	
+	@Override
 	public List<T> getAllMedia (IDbColumn sort, SortDirection direction, boolean hideMissing) throws DbException {
 		try {
 			return local_getAllMedia(sort, direction, hideMissing);
@@ -57,6 +61,7 @@ public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqlit
 		}
 	}
 	
+	@Override
 	public List<T> simpleSearch (String term, String esc, int maxResults) throws DbException {
 		try {
 			return local_simpleSearch(term, esc, maxResults);
@@ -68,12 +73,7 @@ public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqlit
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	DB writers.
 	
-	/**
-	 * 
-	 * @param file
-	 * @return true if the file needed to be added.
-	 * @throws DbException
-	 */
+	@Override
 	public boolean addFile (File file) throws DbException {
 		try {
 			return local_addTrack(file.getAbsolutePath(), file.lastModified());
@@ -82,13 +82,7 @@ public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqlit
 		}
 	}
 	
-	/**
-	 * 
-	 * @param filepath
-	 * @param lastModified
-	 * @return true if the file needed to be added.
-	 * @throws DbException
-	 */
+	@Override
 	public boolean addFile (String filepath, long lastModified) throws DbException {
 		try {
 			return local_addTrack(filepath, lastModified);
@@ -97,6 +91,7 @@ public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqlit
 		}
 	}
 	
+	@Override
 	public int removeFile (String sfile) throws DbException {
 		try {
 			return local_removeTrack(sfile);
@@ -105,14 +100,16 @@ public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqlit
 		}
 	}
 	
-	public int removeFile (long rowId) throws DbException {
+	@Override
+	public int removeFile (IDbItem iDbItem) throws DbException {
 		try {
-			return local_removeTrack(rowId);
+			return local_removeTrack(iDbItem.getDbRowId());
 		} catch (Exception e) {
 			throw new DbException(e);
 		}
 	}
 	
+	@Override
 	public void setDateAdded (String sfile, Date date) throws DbException {
 		try {
 			local_setDateAdded(sfile, date);
@@ -121,6 +118,7 @@ public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqlit
 		}
 	}
 	
+	@Override
 	public void setHashcode (String sfile, long hashcode) throws DbException {
 		try {
 			local_setHashCode(sfile, hashcode);
@@ -129,6 +127,7 @@ public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqlit
 		}
 	}
 	
+	@Override
 	public void setDateLastModified (String sfile, Date date) throws DbException {
 		try {
 			local_setDateLastModified(sfile, date);
@@ -137,6 +136,7 @@ public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqlit
 		}
 	}
 	
+	@Override
 	public void setEnabled (String sfile, boolean value) throws DbException {
 		try {
 			local_setEnabled(sfile, value);
@@ -145,6 +145,7 @@ public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqlit
 		}
 	}
 	
+	@Override
 	public void setMissing (String sfile, boolean value) throws DbException {
 		try {
 			local_setMissing(sfile, value);
@@ -153,6 +154,7 @@ public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqlit
 		}
 	}
 	
+	@Override
 	public void setRemoteLocation (String sfile, String remoteLocation) throws DbException {
 		try {
 			local_setRemoteLocation(sfile, remoteLocation);

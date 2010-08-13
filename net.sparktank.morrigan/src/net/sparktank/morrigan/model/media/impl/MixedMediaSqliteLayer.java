@@ -12,22 +12,22 @@ import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMixedMediaStorageLayer;
 import net.sparktank.sqlitewrapper.DbException;
 
-public class MixedMediaSqliteLayer extends MixedMediaSqliteLayerImpl implements IMixedMediaStorageLayer {
+public class MixedMediaSqliteLayer extends MixedMediaSqliteLayerImpl implements IMixedMediaStorageLayer<IMixedMediaItem> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public static class MixedMediaSqliteLayerFactory extends RecyclingFactory<IMixedMediaStorageLayer, String, Void, DbException> {
+	public static class MixedMediaSqliteLayerFactory extends RecyclingFactory<IMixedMediaStorageLayer<IMixedMediaItem>, String, Void, DbException> {
 		
 		MixedMediaSqliteLayerFactory() {
 			super(true);
 		}
 		
 		@Override
-		protected boolean isValidProduct(IMixedMediaStorageLayer product) {
+		protected boolean isValidProduct(IMixedMediaStorageLayer<IMixedMediaItem> product) {
 			return true;
 		}
 		
 		@Override
-		protected IMixedMediaStorageLayer makeNewProduct(String material) throws DbException {
+		protected IMixedMediaStorageLayer<IMixedMediaItem> makeNewProduct(String material) throws DbException {
 			return new MixedMediaSqliteLayer(material);
 		}
 		
@@ -44,6 +44,21 @@ public class MixedMediaSqliteLayer extends MixedMediaSqliteLayerImpl implements 
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Read methods for IMediaMixedItem.
+	
+	@Override
+	public List<IMixedMediaItem> getAllMedia(IDbColumn sort, SortDirection direction, boolean hideMissing) throws DbException {
+		return getAllMedia(MediaType.UNKNOWN, sort, direction, hideMissing);
+	}
+	
+	@Override
+	public List<IMixedMediaItem> updateListOfAllMedia(List<IMixedMediaItem> list, IDbColumn sort, SortDirection direction, boolean hideMissing) throws DbException {
+		return updateListOfAllMedia(MediaType.UNKNOWN, list, sort, direction, hideMissing);
+	}
+	
+	@Override
+	public List<IMixedMediaItem> simpleSearch(String term, String esc, int maxResults) throws DbException {
+		return simpleSearchMedia(MediaType.UNKNOWN, term, esc, maxResults);
+	}
 	
 	@Override
 	public List<IMixedMediaItem> getAllMedia(MediaType mediaType, IDbColumn sort, SortDirection direction, boolean hideMissing) throws DbException {
@@ -254,6 +269,19 @@ public class MixedMediaSqliteLayer extends MixedMediaSqliteLayerImpl implements 
 		} catch (Exception e) {
 			throw new DbException(e);
 		}
+	}
+
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Unwanted methods.
+	
+	@Override
+	public boolean addFile(File file) throws DbException {
+		throw new IllegalArgumentException("Do not use this method.");
+	}
+	
+	@Override
+	public boolean addFile(String filepath, long lastModified) throws DbException {
+		throw new IllegalArgumentException("Do not use this method.");
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
