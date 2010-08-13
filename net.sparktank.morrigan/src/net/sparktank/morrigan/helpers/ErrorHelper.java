@@ -34,9 +34,8 @@ public class ErrorHelper {
 			
 			return sb.toString();
 		}
-		else {
-			return "Unable to display error message as Throwable object is null.";
-		}
+		
+		return "Unable to display error message as Throwable object is null.";
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
