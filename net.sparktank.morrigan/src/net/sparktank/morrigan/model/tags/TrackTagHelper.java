@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.util.Iterator;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
-import net.sparktank.morrigan.model.IMediaItemDb;
+import net.sparktank.morrigan.model.media.interfaces.IMediaItemDb;
 import net.sparktank.morrigan.model.tracks.MediaTrack;
 
 import org.jaudiotagger.audio.AudioFile;

@@ -7,8 +7,8 @@ import java.util.List;
 import net.sparktank.morrigan.config.Config;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.gui.editors.IMediaItemDbEditor;
-import net.sparktank.morrigan.model.IMediaItemDb;
 import net.sparktank.morrigan.model.media.impl.MediaItem;
+import net.sparktank.morrigan.model.media.interfaces.IMediaItemDb;
 
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;

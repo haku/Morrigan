@@ -1,6 +1,6 @@
 package net.sparktank.morrigan.gui.editors;
 
-import net.sparktank.morrigan.model.IMediaItemDb;
+import net.sparktank.morrigan.model.media.interfaces.IMediaItemDb;
 
 public interface IMediaItemDbEditor {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

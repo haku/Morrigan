@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.Date;
 import java.util.List;
 
-import net.sparktank.morrigan.model.MediaSqliteLayer2.SortDirection;
 import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
 import net.sparktank.sqlitewrapper.DbException;
 

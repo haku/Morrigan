@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.List;
 
 import net.sparktank.morrigan.helpers.RecyclingFactory;
-import net.sparktank.morrigan.model.MediaSqliteLayer2.SortDirection;
 import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
 import net.sparktank.morrigan.model.db.interfaces.IDbItem;
 import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem;

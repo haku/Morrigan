@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.Date;
 import java.util.List;
 
-import net.sparktank.morrigan.model.MediaSqliteLayer2.SortDirection;
 import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
 import net.sparktank.morrigan.model.db.interfaces.IDbItem;
 import net.sparktank.morrigan.model.tags.MediaTag;
@@ -14,6 +13,10 @@ import net.sparktank.sqlitewrapper.DbException;
 import net.sparktank.sqlitewrapper.IGenericDbLayer;
 
 public interface IMediaItemStorageLayer<T extends IMediaItem> extends IGenericDbLayer {
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	public enum SortDirection { ASC, DESC };
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public void setProp (String key, String value) throws DbException;
