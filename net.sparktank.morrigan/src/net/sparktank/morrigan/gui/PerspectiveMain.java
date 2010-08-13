@@ -18,6 +18,7 @@ public class PerspectiveMain implements IPerspectiveFactory {
 
 	public static final String ID = "net.sparktank.morrigan.gui.PerspectiveMain";
 	
+	@Override
 	public void createInitialLayout(IPageLayout layout) {
 		String editorArea = layout.getEditorArea();
 		layout.setEditorAreaVisible(true);

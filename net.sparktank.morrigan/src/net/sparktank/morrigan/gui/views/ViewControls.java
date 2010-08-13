@@ -47,20 +47,21 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	@Override
 	public void createPartControl(Composite parent) {
 		super.createPartControl(parent);
 		
 		makeIcons();
 		makeControls(parent);
 		
-		getPlayer().addQueueChangeListener(queueChangedListener);
+		getPlayer().addQueueChangeListener(this.queueChangedListener);
 		
 		getEventHandler().updateStatus();
 	}
 	
 	@Override
 	public void dispose() {
-		getPlayer().removeQueueChangeListener(queueChangedListener);
+		getPlayer().removeQueueChangeListener(this.queueChangedListener);
 		disposeIcons();
 		super.dispose();
 	}
@@ -68,7 +69,7 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
-	public void setFocus() {}
+	public void setFocus() {/* UNUSED */}
 	
 	@Override
 	public List<FullScreenAction> getFullScreenActions() {
@@ -97,33 +98,33 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 	
 	private Label lblStatus;
 	private Button btnOrderMode;
-	private Button btnQueue;
+	Button btnQueue;
 	private Canvas videoParent;
 	
 	private void makeIcons () {
-		iconPlay = Activator.getImageDescriptor("icons/play.gif").createImage();
-		iconPause = Activator.getImageDescriptor("icons/pause.gif").createImage();
-		iconStop = Activator.getImageDescriptor("icons/stop.gif").createImage();
-		iconPrev = Activator.getImageDescriptor("icons/prev.gif").createImage();
-		iconNext = Activator.getImageDescriptor("icons/next.gif").createImage();
-		iconFindInList = Activator.getImageDescriptor("icons/jumptolist.active.gif").createImage();
-		iconSearch = Activator.getImageDescriptor("icons/search.gif").createImage();
-		iconScreen = Activator.getImageDescriptor("icons/display.gif").createImage();
-		iconQueue = Activator.getImageDescriptor("icons/queue.gif").createImage();
-		iconPref = Activator.getImageDescriptor("icons/pref.gif").createImage();
+		this.iconPlay = Activator.getImageDescriptor("icons/play.gif").createImage();
+		this.iconPause = Activator.getImageDescriptor("icons/pause.gif").createImage();
+		this.iconStop = Activator.getImageDescriptor("icons/stop.gif").createImage();
+		this.iconPrev = Activator.getImageDescriptor("icons/prev.gif").createImage();
+		this.iconNext = Activator.getImageDescriptor("icons/next.gif").createImage();
+		this.iconFindInList = Activator.getImageDescriptor("icons/jumptolist.active.gif").createImage();
+		this.iconSearch = Activator.getImageDescriptor("icons/search.gif").createImage();
+		this.iconScreen = Activator.getImageDescriptor("icons/display.gif").createImage();
+		this.iconQueue = Activator.getImageDescriptor("icons/queue.gif").createImage();
+		this.iconPref = Activator.getImageDescriptor("icons/pref.gif").createImage();
 	}
 	
 	private void disposeIcons () {
-		iconPlay.dispose();
-		iconPause.dispose();
-		iconStop.dispose();
-		iconPrev.dispose();
-		iconNext.dispose();
-		iconScreen.dispose();
-		iconQueue.dispose();
-		iconPref.dispose();
-		iconFindInList.dispose();
-		iconSearch.dispose();
+		this.iconPlay.dispose();
+		this.iconPause.dispose();
+		this.iconStop.dispose();
+		this.iconPrev.dispose();
+		this.iconNext.dispose();
+		this.iconScreen.dispose();
+		this.iconQueue.dispose();
+		this.iconPref.dispose();
+		this.iconFindInList.dispose();
+		this.iconSearch.dispose();
 	}
 	
 	private void makeControls (Composite parent) {
@@ -133,14 +134,14 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		for (final OrderSelectAction a : getOrderMenuActions()) {
 			orderModeMenuMgr.add(a);
 		}
-		menuOrderMode = orderModeMenuMgr.createContextMenu(parent);
+		this.menuOrderMode = orderModeMenuMgr.createContextMenu(parent);
 		
 		MenuManager fullscreenMenuMgr = new MenuManager();
 		for (final FullScreenAction a : getFullScreenActions()) {
 			fullscreenMenuMgr.add(a);
 		}
-		fullscreenMenuMgr.add(showDisplayViewAction);
-		menuFullscreen = fullscreenMenuMgr.createContextMenu(parent);
+		fullscreenMenuMgr.add(this.showDisplayViewAction);
+		this.menuFullscreen = fullscreenMenuMgr.createContextMenu(parent);
 		
 		MenuManager prefMenuMgr = new MenuManager();
 		prefMenuMgr.add(ActionFactory.OPEN_NEW_WINDOW.create(getSite().getWorkbenchWindow()));
@@ -162,7 +163,7 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		prefMenuMgr.add(ActionFactory.PREFERENCES.create(getSite().getWorkbenchWindow()));
 		prefMenuMgr.add(new Separator());
 		prefMenuMgr.add(ActionFactory.ABOUT.create(getSite().getWorkbenchWindow()));
-		menuPref = prefMenuMgr.createContextMenu(parent);
+		this.menuPref = prefMenuMgr.createContextMenu(parent);
 		
 		// On-screen controls.
 		
@@ -175,128 +176,128 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		Button btnPlayPause = new Button(parent, SWT.PUSH);
 		Button btnPrev = new Button(parent, SWT.PUSH);
 		Button btnNext = new Button(parent, SWT.PUSH);
-		lblStatus = new Label(parent, SWT.NONE);
+		this.lblStatus = new Label(parent, SWT.NONE);
 		Button btnFindInList = new Button(parent, SWT.PUSH);
 		Button btnJumpTo = new Button(parent, SWT.PUSH);
-		videoParent = new Canvas(parent, SWT.NONE);
-		btnOrderMode = new Button(parent, SWT.PUSH);
+		this.videoParent = new Canvas(parent, SWT.NONE);
+		this.btnOrderMode = new Button(parent, SWT.PUSH);
 		Button btnFullscreen = new Button(parent, SWT.PUSH);
 		Button btnPref = new Button(parent, SWT.PUSH);
-		btnQueue = new Button(parent, SWT.PUSH);
+		this.btnQueue = new Button(parent, SWT.PUSH);
 		Canvas seekbar = new Canvas(parent, SWT.NONE);
 		
-		btnStop.setImage(iconStop);
+		btnStop.setImage(this.iconStop);
 		formData = new FormData();
 		formData.top = new FormAttachment(0, SEP);
 		formData.left = new FormAttachment(0, SEP);
 		btnStop.setLayoutData(formData);
-		btnStop.addSelectionListener(new ActionListener(stopAction));
+		btnStop.addSelectionListener(new ActionListener(this.stopAction));
 		
-		btnPlayPause.setImage(iconPause);
+		btnPlayPause.setImage(this.iconPause);
 		formData = new FormData();
 		formData.top = new FormAttachment(0, SEP);
 		formData.left = new FormAttachment(btnStop, SEP);
 		btnPlayPause.setLayoutData(formData);
-		btnPlayPause.addSelectionListener(new ActionListener(pauseAction));
+		btnPlayPause.addSelectionListener(new ActionListener(this.pauseAction));
 		
-		btnPrev.setImage(iconPrev);
+		btnPrev.setImage(this.iconPrev);
 		formData = new FormData();
 		formData.top = new FormAttachment(0, SEP);
 		formData.left = new FormAttachment(btnPlayPause, SEP);
 		btnPrev.setLayoutData(formData);
 		btnPrev.addSelectionListener(new DropMenuListener(btnPrev, getHistoryMenuMgr()));
 		
-		btnNext.setImage(iconNext);
+		btnNext.setImage(this.iconNext);
 		formData = new FormData();
 		formData.top = new FormAttachment(0, SEP);
 		formData.left = new FormAttachment(btnPrev, SEP);
 		btnNext.setLayoutData(formData);
-		btnNext.addSelectionListener(new ActionListener(nextAction));
+		btnNext.addSelectionListener(new ActionListener(this.nextAction));
 		
 		formData = new FormData();
-		formData.top = new FormAttachment(50, -(lblStatus.computeSize(SWT.DEFAULT, SWT.DEFAULT).y)/2 - seekBarHeight/2 - SEP);
+		formData.top = new FormAttachment(50, -(this.lblStatus.computeSize(SWT.DEFAULT, SWT.DEFAULT).y)/2 - seekBarHeight/2 - SEP);
 		formData.bottom = new FormAttachment(seekbar, -SEP);
 		formData.left = new FormAttachment(btnNext, SEP*2);
 		formData.right = new FormAttachment(btnFindInList, -SEP);
-		lblStatus.setLayoutData(formData);
+		this.lblStatus.setLayoutData(formData);
 		
-		btnFindInList.setImage(iconFindInList);
+		btnFindInList.setImage(this.iconFindInList);
 		formData = new FormData();
 		formData.top = new FormAttachment(0, SEP);
 		formData.right = new FormAttachment(btnJumpTo, -SEP);
 		formData.bottom = new FormAttachment(seekbar, -SEP);
 		btnFindInList.setLayoutData(formData);
-		btnFindInList.addSelectionListener(new ActionListener(findInListAction));
+		btnFindInList.addSelectionListener(new ActionListener(this.findInListAction));
 		
-		btnJumpTo.setImage(iconSearch);
+		btnJumpTo.setImage(this.iconSearch);
 		formData = new FormData();
 		formData.top = new FormAttachment(0, SEP);
-		formData.right = new FormAttachment(btnOrderMode, -SEP);
+		formData.right = new FormAttachment(this.btnOrderMode, -SEP);
 		formData.bottom = new FormAttachment(seekbar, -SEP);
 		btnJumpTo.setLayoutData(formData);
-		btnJumpTo.addSelectionListener(new ActionListener(jumpToAction));
+		btnJumpTo.addSelectionListener(new ActionListener(this.jumpToAction));
 		
-		btnOrderMode.setText(getPlayer().getPlaybackOrder().toString());
+		this.btnOrderMode.setText(getPlayer().getPlaybackOrder().toString());
 		formData = new FormData();
 		formData.top = new FormAttachment(0, SEP);
-		formData.right = new FormAttachment(btnQueue, -SEP);
+		formData.right = new FormAttachment(this.btnQueue, -SEP);
 		formData.bottom = new FormAttachment(seekbar, -SEP);
-		btnOrderMode.setLayoutData(formData);
-		btnOrderMode.addSelectionListener(new DropMenuListener(btnOrderMode, menuOrderMode));
+		this.btnOrderMode.setLayoutData(formData);
+		this.btnOrderMode.addSelectionListener(new DropMenuListener(this.btnOrderMode, this.menuOrderMode));
 		
-		btnQueue.setImage(iconQueue);
+		this.btnQueue.setImage(this.iconQueue);
 		formData = new FormData();
 		formData.top = new FormAttachment(0, SEP);
 		formData.right = new FormAttachment(btnPref, -SEP);
 		formData.bottom = new FormAttachment(seekbar, -SEP);
-		btnQueue.setLayoutData(formData);
-		btnQueue.addSelectionListener(new ActionListener(showQueueAction));
+		this.btnQueue.setLayoutData(formData);
+		this.btnQueue.addSelectionListener(new ActionListener(this.showQueueAction));
 		
-		btnPref.setImage(iconPref);
+		btnPref.setImage(this.iconPref);
 		formData = new FormData();
 		formData.top = new FormAttachment(0, SEP);
 		formData.right = new FormAttachment(btnFullscreen, -SEP);
 		btnPref.setLayoutData(formData);
-		btnPref.addSelectionListener(new DropMenuListener(btnPref, menuPref));
+		btnPref.addSelectionListener(new DropMenuListener(btnPref, this.menuPref));
 		
-		btnFullscreen.setImage(iconScreen);
+		btnFullscreen.setImage(this.iconScreen);
 		formData = new FormData();
 		formData.top = new FormAttachment(0, SEP);
-		formData.right = new FormAttachment(videoParent, -SEP);
+		formData.right = new FormAttachment(this.videoParent, -SEP);
 		btnFullscreen.setLayoutData(formData);
-		btnFullscreen.addSelectionListener(new DropMenuListener(btnFullscreen, menuFullscreen));
+		btnFullscreen.addSelectionListener(new DropMenuListener(btnFullscreen, this.menuFullscreen));
 		
 		formData = new FormData();
 		formData.top = new FormAttachment(0, SEP);
 		formData.right = new FormAttachment(100, -SEP);
 		formData.bottom = new FormAttachment(100, -SEP);
 		formData.width = 80;
-		videoParent.setLayoutData(formData);
-		videoParent.setLayout(new FillLayout());
-		videoParent.addPaintListener(new ScreenPainter(videoParent, ScreenType.TINY));
-		setLocalMediaFrameParent(videoParent);
+		this.videoParent.setLayoutData(formData);
+		this.videoParent.setLayout(new FillLayout());
+		this.videoParent.addPaintListener(new ScreenPainter(this.videoParent, ScreenType.TINY));
+		setLocalMediaFrameParent(this.videoParent);
 		
 		formData = new FormData();
 		formData.top = new FormAttachment(btnStop, SEP);
 		formData.left = new FormAttachment(0, SEP);
-		formData.right = new FormAttachment(videoParent, -SEP);
+		formData.right = new FormAttachment(this.videoParent, -SEP);
 		formData.height = seekBarHeight;
 		seekbar.setLayoutData(formData);
-		seekbarPainter = new SeekbarPainter((seekbar));
-		seekbar.addPaintListener(seekbarPainter);
+		this.seekbarPainter = new SeekbarPainter((seekbar));
+		seekbar.addPaintListener(this.seekbarPainter);
 		seekbar.addMouseListener(new SeekbarMouseListener(seekbar));
 		
-		preferedHeight = SEP + btnStop.computeSize(SWT.DEFAULT, SWT.DEFAULT).y + SEP
+		this.preferedHeight = SEP + btnStop.computeSize(SWT.DEFAULT, SWT.DEFAULT).y + SEP
 				+ seekBarHeight + SEP;
 	}
 	
 	@Override
 	public int computePreferredSize(boolean width, int availableParallel, int availablePerpendicular, int preferredResult) {
-		if (preferedHeight > 0 ) {
-			return preferedHeight;
-		} else {
-			return 30;
+		if (this.preferedHeight > 0 ) {
+			return this.preferedHeight;
 		}
+		
+		return 30;
 	}
 	
 	@Override
@@ -322,18 +323,18 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		public void setProgress (int n, int N) {
 			this.n = n;
 			this.N = N;
-			canvas.redraw();
+			this.canvas.redraw();
 		}
 		
 		@Override
 		public void paintControl(PaintEvent e) {
-			Rectangle clientArea = canvas.getClientArea();
+			Rectangle clientArea = this.canvas.getClientArea();
 			
 			e.gc.setBackground(e.gc.getForeground());
 			e.gc.fillRectangle(0, clientArea.height/2 - 1, clientArea.width, 2);
 			
-			if (N > 0) {
-				e.gc.fillRectangle(0, 0, (int) ((n / (double)N) * clientArea.width), clientArea.height - 1);
+			if (this.N > 0) {
+				e.gc.fillRectangle(0, 0, (int) ((this.n / (double)this.N) * clientArea.width), clientArea.height - 1);
 			}
 		}
 		
@@ -349,16 +350,16 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		
 		@Override
 		public void mouseUp(MouseEvent e) {
-			double s = e.x / (double) canvas.getClientArea().width;
+			double s = e.x / (double) this.canvas.getClientArea().width;
 			if (s >= 0 && s <= 1) {
 				getPlayer().seekTo(s);
 			}
 		}
 		
 		@Override
-		public void mouseDown(MouseEvent e) {}
+		public void mouseDown(MouseEvent e) {/* UNUSED */}
 		@Override
-		public void mouseDoubleClick(MouseEvent e) {}
+		public void mouseDoubleClick(MouseEvent e) {/* UNUSED */}
 	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -398,10 +399,10 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 			if (getPlayer().getCurrentTrackDuration() > 0) {
 				verb = verb + " of " + TimeHelper.formatTimeSeconds(getPlayer().getCurrentTrackDuration());
 				
-				seekbarPainter.setProgress((int) getPlayer().getCurrentPosition(), getPlayer().getCurrentTrackDuration());
+				this.seekbarPainter.setProgress((int) getPlayer().getCurrentPosition(), getPlayer().getCurrentTrackDuration());
 			}
 		}
-		lblStatus.setText(verb + ".");
+		this.lblStatus.setText(verb + ".");
 		
 		if (getPlayer().getCurrentItem() != null && getPlayer().getCurrentItem().item != null) {
 			getSite().getShell().setText(getPlayer().getCurrentItem().item.toString());
@@ -412,33 +413,33 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 	
 	@Override
 	protected void orderModeChanged(PlaybackOrder order) {
-		btnOrderMode.setText(order.toString());
-		btnOrderMode.getParent().layout();
+		this.btnOrderMode.setText(order.toString());
+		this.btnOrderMode.getParent().layout();
 	}
 	
 	@Override
 	protected void videoParentChanged(Composite newParent) {
-		if (videoParent.isDisposed()) return;
+		if (this.videoParent.isDisposed()) return;
 		
-		FormData formData = (FormData) videoParent.getLayoutData();
-		if (newParent == videoParent) {
+		FormData formData = (FormData) this.videoParent.getLayoutData();
+		if (newParent == this.videoParent) {
 			formData.width = 80;
 		} else {
 			formData.width = 0;
 		}
-		videoParent.setLayoutData(formData);
-		videoParent.setVisible(newParent == videoParent);
-		videoParent.getParent().layout();
+		this.videoParent.setLayoutData(formData);
+		this.videoParent.setVisible(newParent == this.videoParent);
+		this.videoParent.getParent().layout();
 	}
 	
-	private volatile boolean queueChangedRunnerScheduled = false;
+	volatile boolean queueChangedRunnerScheduled = false;
 	
 	private Runnable queueChangedListener = new Runnable() {
 		@Override
 		public void run() {
-			if (!queueChangedRunnerScheduled) {
-				queueChangedRunnerScheduled = true;
-				getSite().getShell().getDisplay().asyncExec(queueChangedRunner);
+			if (!ViewControls.this.queueChangedRunnerScheduled) {
+				ViewControls.this.queueChangedRunnerScheduled = true;
+				getSite().getShell().getDisplay().asyncExec(ViewControls.this.queueChangedRunner);
 			}
 		}
 	};
@@ -446,37 +447,37 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 	protected Runnable queueChangedRunner = new Runnable() {
 		@Override
 		public void run() {
-			queueChangedRunnerScheduled = false;
+			ViewControls.this.queueChangedRunnerScheduled = false;
 			int size = getPlayer().getQueueList().size();
 			if (size > 0) {
-				btnQueue.setText("(" + size + ")");
+				ViewControls.this.btnQueue.setText("(" + size + ")");
 				
 			} else {
-				btnQueue.setText("");
+				ViewControls.this.btnQueue.setText("");
 			}
-			btnQueue.getParent().layout();
+			ViewControls.this.btnQueue.getParent().layout();
 		}
 	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Display view.
 	
-	private ShowDisplayViewAction showDisplayViewAction = new ShowDisplayViewAction();
-	private ViewDisplay viewDisplay = null;
+	ShowDisplayViewAction showDisplayViewAction = new ShowDisplayViewAction();
+	ViewDisplay viewDisplay = null;
 	
-	public void attachViewDisplay (ViewDisplay viewDisplay) throws ImplException {
+	public void attachViewDisplay (ViewDisplay viewDisplay) {
 		this.viewDisplay = viewDisplay;
-		viewDisplay.setCloseRunnable(onCloseRunnable);
+		viewDisplay.setCloseRunnable(this.onCloseRunnable);
 		updateCurrentMediaFrameParent();
-		showDisplayViewAction.setChecked(true);
+		this.showDisplayViewAction.setChecked(true);
 	}
 	
 	public Runnable onCloseRunnable = new Runnable() {
 		@Override
 		public void run() {
-			viewDisplay = null;
+			ViewControls.this.viewDisplay = null;
 			updateCurrentMediaFrameParent();
-			showDisplayViewAction.setChecked(false);
+			ViewControls.this.showDisplayViewAction.setChecked(false);
 		}
 	};
 	
@@ -487,12 +488,13 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 			this.setImageDescriptor(Activator.getImageDescriptor("icons/display.gif"));
 		}
 		
+		@Override
 		public void run() {
 			try {
 				if (isChecked()) {
 					getSite().getPage().showView(ViewDisplay.ID);
 				} else {
-					getSite().getPage().hideView(viewDisplay);
+					getSite().getPage().hideView(ViewControls.this.viewDisplay);
 				}
 				
 			} catch (Exception e) {
@@ -504,11 +506,11 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 	
 	@Override
 	protected Composite getSecondaryVideoParent() {
-		if (viewDisplay != null) {
-			return viewDisplay.getMediaFrameParent();
-		} else {
-			return null;
+		if (this.viewDisplay != null) {
+			return this.viewDisplay.getMediaFrameParent();
 		}
+		
+		return null;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

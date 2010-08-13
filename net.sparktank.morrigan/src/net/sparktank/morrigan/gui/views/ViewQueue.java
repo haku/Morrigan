@@ -41,40 +41,40 @@ public class ViewQueue extends ViewPart {
 		
 		IViewPart findView = getSite().getPage().findView(ViewControls.ID); // FIXME can i find AbstractPlayerView?
 		if (findView != null && findView instanceof AbstractPlayerView) {
-			abstractPlayerView = (AbstractPlayerView) findView;
-			setContent(abstractPlayerView.getPlayer().getQueueList());
-			abstractPlayerView.getPlayer().addQueueChangeListener(queueChangedListener);
-			queueChangedListener.run();
+			this.abstractPlayerView = (AbstractPlayerView) findView;
+			setContent(this.abstractPlayerView.getPlayer().getQueueList());
+			this.abstractPlayerView.getPlayer().addQueueChangeListener(this.queueChangedListener);
+			this.queueChangedListener.run();
 		}
 	}
 	
 	@Override
 	public void setFocus() {
-		tableViewer.getTable().setFocus();
+		this.tableViewer.getTable().setFocus();
 	}
 	
 	@Override
 	public void dispose() {
-		isDisposed = true;
+		this.isDisposed = true;
 		
-		if (abstractPlayerView != null ) {
-			abstractPlayerView.getPlayer().removeQueueChangeListener(queueChangedListener);
+		if (this.abstractPlayerView != null ) {
+			this.abstractPlayerView.getPlayer().removeQueueChangeListener(this.queueChangedListener);
 		}
 		
 		super.dispose();
 	}
 	
 	protected boolean isDisposed () {
-		return isDisposed;
+		return this.isDisposed;
 	}
 	
-	private ViewQueue getThis () {
+	ViewQueue getThis () {
 		return this;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private List<PlayItem> queue = null;
+	List<PlayItem> queue = null;
 	
 	private void setContent (List<PlayItem> queue) {
 		this.queue = queue;
@@ -83,22 +83,22 @@ public class ViewQueue extends ViewPart {
 	private Runnable queueChangedListener = new Runnable() {
 		@Override
 		public void run() {
-			if (!updateGuiRunableScheduled) {
-				updateGuiRunableScheduled = true;
-				getSite().getShell().getDisplay().asyncExec(updateGuiRunable);
+			if (!ViewQueue.this.updateGuiRunableScheduled) {
+				ViewQueue.this.updateGuiRunableScheduled = true;
+				getSite().getShell().getDisplay().asyncExec(ViewQueue.this.updateGuiRunable);
 			}
 		}
 	};
 	
-	private volatile boolean updateGuiRunableScheduled = false;
+	volatile boolean updateGuiRunableScheduled = false;
 	
-	private Runnable updateGuiRunable = new Runnable() {
+	Runnable updateGuiRunable = new Runnable() {
 		@Override
 		public void run() {
-			updateGuiRunableScheduled = false;
-			if (tableViewer.getTable().isDisposed()) return;
+			ViewQueue.this.updateGuiRunableScheduled = false;
+			if (ViewQueue.this.tableViewer.getTable().isDisposed()) return;
 			updateStatus();
-			tableViewer.refresh();
+			ViewQueue.this.tableViewer.refresh();
 			bringToTopIfChanged();
 		}
 	};
@@ -106,25 +106,25 @@ public class ViewQueue extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	GUI stuff.
 	
-	private TableViewer tableViewer;
+	TableViewer tableViewer;
 	
 	private void createLayout (Composite parent) {
-		tableViewer = new TableViewer(parent, SWT.MULTI | SWT.V_SCROLL | SWT.FULL_SELECTION);
-		tableViewer.setContentProvider(contentProvider);
-		tableViewer.setLabelProvider(labelProvider);
-		tableViewer.setInput(getViewSite()); // use content provider.
-		tableViewer.getTable().addKeyListener(keyListener);
+		this.tableViewer = new TableViewer(parent, SWT.MULTI | SWT.V_SCROLL | SWT.FULL_SELECTION);
+		this.tableViewer.setContentProvider(this.contentProvider);
+		this.tableViewer.setLabelProvider(this.labelProvider);
+		this.tableViewer.setInput(getViewSite()); // use content provider.
+		this.tableViewer.getTable().addKeyListener(this.keyListener);
 		
-		getViewSite().getActionBars().getToolBarManager().add(moveUpAction);
-		getViewSite().getActionBars().getToolBarManager().add(moveDownAction);
-		getViewSite().getActionBars().getToolBarManager().add(removeAction);
+		getViewSite().getActionBars().getToolBarManager().add(this.moveUpAction);
+		getViewSite().getActionBars().getToolBarManager().add(this.moveDownAction);
+		getViewSite().getActionBars().getToolBarManager().add(this.removeAction);
 	}
 	
 	private int lastQueueSize = 0;
 	
-	private void bringToTopIfChanged () {
-		int size = queue.size();
-		if (size > lastQueueSize) {
+	void bringToTopIfChanged () {
+		int size = this.queue.size();
+		if (size > this.lastQueueSize) {
 			getSite().getShell().getDisplay().asyncExec(new Runnable() {
 				@Override
 				public void run() {
@@ -132,19 +132,19 @@ public class ViewQueue extends ViewPart {
 				}
 			});
 		}
-		lastQueueSize = size;
+		this.lastQueueSize = size;
 	}
 	
-	private void updateStatus () {
+	void updateStatus () {
 		if (isDisposed()) return ;
 		
-		if (queue.size() == 0) {
+		if (this.queue.size() == 0) {
 			setContentDescription("Queue is empty.");
 			
 		} else {
-			DurationData d = abstractPlayerView.getPlayer().getQueueTotalDuration();
+			DurationData d = this.abstractPlayerView.getPlayer().getQueueTotalDuration();
 			setContentDescription(
-					queue.size() + " items"
+					this.queue.size() + " items"
 					+ " totaling " + (d.complete ? "" : "more than ") +
 					TimeHelper.formatTimeSeconds(d.duration) + "."
 			);
@@ -155,18 +155,17 @@ public class ViewQueue extends ViewPart {
 		
 		@Override
 		public Object[] getElements(Object inputElement) {
-			if (queue!=null) {
-				return queue.toArray();
-				
-			} else {
-				return new String[]{};
+			if (ViewQueue.this.queue!=null) {
+				return ViewQueue.this.queue.toArray();
 			}
+			
+			return new String[]{};
 		}
 		
 		@Override
-		public void dispose() {}
+		public void dispose() {/* UNUSED */}
 		@Override
-		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {/* UNUSED */}
 		
 	};
 	
@@ -191,11 +190,11 @@ public class ViewQueue extends ViewPart {
 			return false;
 		}
 		@Override
-		public void removeListener(ILabelProviderListener listener) {}
+		public void removeListener(ILabelProviderListener listener) {/* UNUSED */}
 		@Override
-		public void dispose() {}
+		public void dispose() {/* UNUSED */}
 		@Override
-		public void addListener(ILabelProviderListener listener) {}
+		public void addListener(ILabelProviderListener listener) {/* UNUSED */}
 	};
 	
 	private KeyListener keyListener = new KeyListener() {
@@ -203,16 +202,16 @@ public class ViewQueue extends ViewPart {
 		@Override
 		public void keyReleased(KeyEvent e) {
 			if (e.keyCode == SWT.DEL) {
-				removeAction.run();
+				ViewQueue.this.removeAction.run();
 			}
 		}
 		
 		@Override
-		public void keyPressed(KeyEvent e) {}
+		public void keyPressed(KeyEvent e) {/* UNUSED */}
 	};
 	
-	private ArrayList<PlayItem> getSelectedSources () {
-		ISelection selection = tableViewer.getSelection();
+	ArrayList<PlayItem> getSelectedSources () {
+		ISelection selection = this.tableViewer.getSelection();
 		
 		if (selection==null) return null;
 		if (selection.isEmpty()) return null;
@@ -239,14 +238,16 @@ public class ViewQueue extends ViewPart {
 //	Actions.
 	
 	protected IAction moveUpAction = new Action("Move up", Activator.getImageDescriptor("icons/arrow-up.gif")) {
+		@Override
 		public void run() {
-			abstractPlayerView.getPlayer().moveInQueue(getSelectedSources(), false);
+			ViewQueue.this.abstractPlayerView.getPlayer().moveInQueue(getSelectedSources(), false);
 		};
 	};
 	
 	protected IAction moveDownAction = new Action("Move down", Activator.getImageDescriptor("icons/arrow-down.gif")) {
+		@Override
 		public void run() {
-			abstractPlayerView.getPlayer().moveInQueue(getSelectedSources(), true);
+			ViewQueue.this.abstractPlayerView.getPlayer().moveInQueue(getSelectedSources(), true);
 		};
 	};
 	
@@ -258,7 +259,7 @@ public class ViewQueue extends ViewPart {
 				return;
 			}
 			for (PlayItem item : selectedSources) {
-				abstractPlayerView.getPlayer().removeFromQueue(item);
+				ViewQueue.this.abstractPlayerView.getPlayer().removeFromQueue(item);
 			}
 		};
 	};

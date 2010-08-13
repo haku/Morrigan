@@ -37,7 +37,7 @@ public class MorriganMsgDlg extends MessageDialog {
 				ErrorHelper.getCauseTrace(t), 
 				MessageDialog.ERROR, COPYCONTINUE, 0);
 		
-		throwable = t;
+		this.throwable = t;
 	}
 	
 	@Override
@@ -50,9 +50,9 @@ public class MorriganMsgDlg extends MessageDialog {
 			return -1;
 		}
 		
-		if (throwable!=null && open==OK) {
-			throwable.printStackTrace();
-			ClipboardHelper.setText(ErrorHelper.getStackTrace(throwable), Display.getCurrent());
+		if (this.throwable!=null && open==OK) {
+			this.throwable.printStackTrace();
+			ClipboardHelper.setText(ErrorHelper.getStackTrace(this.throwable), Display.getCurrent());
 		}
 		
 		return open;

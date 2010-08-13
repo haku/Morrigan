@@ -29,15 +29,15 @@ public class DropMenuListener implements SelectionListener {
 	
 	@Override
 	public void widgetSelected(SelectionEvent e) {
-		Rectangle rect = button.getBounds();
+		Rectangle rect = this.button.getBounds();
 		Point pt = new Point(rect.x, rect.y + rect.height);
-		pt = button.getParent().toDisplay(pt);
+		pt = this.button.getParent().toDisplay(pt);
 		
 		Menu m = null;
-		if (menuMgr != null) {
-			m = menuMgr.createContextMenu(button.getParent());
-		} else if (menu != null) {
-			m = menu;
+		if (this.menuMgr != null) {
+			m = this.menuMgr.createContextMenu(this.button.getParent());
+		} else if (this.menu != null) {
+			m = this.menu;
 		}
 		
 		if (m != null) {
@@ -47,6 +47,6 @@ public class DropMenuListener implements SelectionListener {
 	}
 	
 	@Override
-	public void widgetDefaultSelected(SelectionEvent e) {}
+	public void widgetDefaultSelected(SelectionEvent e) {/* UNUSED */}
 	
 }

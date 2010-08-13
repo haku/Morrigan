@@ -27,9 +27,7 @@ public class ServerAction extends Action implements IWorkbenchAction {
 	}
 	
 	@Override
-	public void dispose() {
-		
-	}
+	public void dispose() {/* UNUSED */}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -41,10 +39,10 @@ public class ServerAction extends Action implements IWorkbenchAction {
 	MorriganServer _server = null;
 	
 	private MorriganServer getServer () throws Exception {
-		if (_server == null) {
-			_server = ServerMain.makeServer();
+		if (this._server == null) {
+			this._server = ServerMain.makeServer();
 			
-			_server.setOnStopRunnable(new Runnable() {
+			this._server.setOnStopRunnable(new Runnable() {
 				@Override
 				public void run() {
 					setChecked(false);
@@ -52,7 +50,7 @@ public class ServerAction extends Action implements IWorkbenchAction {
 			});
 			
 		}
-		return _server;
+		return this._server;
 	}
 	
 	@Override

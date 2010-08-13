@@ -91,62 +91,62 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		 * Registering also provides automatic disposal of the actions when the window is closed.
 		 */
 		
-		newLibraryAction = new NewLibraryAction(window);
-		register(newLibraryAction);
+		this.newLibraryAction = new NewLibraryAction(window);
+		register(this.newLibraryAction);
 		
-		newPlayListAction = new NewPlaylistAction(window);
-		register(newPlayListAction);
+		this.newPlayListAction = new NewPlaylistAction(window);
+		register(this.newPlayListAction);
 		
-		exitAction = ActionFactory.QUIT.create(window);
-		register(exitAction);
+		this.exitAction = ActionFactory.QUIT.create(window);
+		register(this.exitAction);
 		
-		newWindowAction = ActionFactory.OPEN_NEW_WINDOW.create(window);
-		register(newWindowAction);
+		this.newWindowAction = ActionFactory.OPEN_NEW_WINDOW.create(window);
+		register(this.newWindowAction);
 		
-		minToTrayAction = new MinToTrayAction(window);
-		register(minToTrayAction);
+		this.minToTrayAction = new MinToTrayAction(window);
+		register(this.minToTrayAction);
 		
-		resetPerspectiveAction = ActionFactory.RESET_PERSPECTIVE.create(window);
-		register(resetPerspectiveAction);
+		this.resetPerspectiveAction = ActionFactory.RESET_PERSPECTIVE.create(window);
+		register(this.resetPerspectiveAction);
 		
-		showViewMenuMgr = new MenuManager("Show view", "showView");
-		showViewItemShortList = ContributionItemFactory.VIEWS_SHORTLIST.create(window);
+		this.showViewMenuMgr = new MenuManager("Show view", "showView");
+		this.showViewItemShortList = ContributionItemFactory.VIEWS_SHORTLIST.create(window);
 		
-		showMediaExplorer = new ShowViewAction(ViewMediaExplorer.ID, "Media Explorer", Activator.getImageDescriptor("icons/library.gif"));
-		register(showMediaExplorer);
+		this.showMediaExplorer = new ShowViewAction(ViewMediaExplorer.ID, "Media Explorer", Activator.getImageDescriptor("icons/library.gif"));
+		register(this.showMediaExplorer);
 		
-		showPrefAction = ActionFactory.PREFERENCES.create(window);
-		register(showPrefAction);
+		this.showPrefAction = ActionFactory.PREFERENCES.create(window);
+		register(this.showPrefAction);
 		
 		// Editor actions.
 		
-		saveAction = ActionFactory.SAVE.create(window);
-		register(saveAction);
+		this.saveAction = ActionFactory.SAVE.create(window);
+		register(this.saveAction);
 		
-		saveAllAction = ActionFactory.SAVE_ALL.create(window);
-		register(saveAllAction);
+		this.saveAllAction = ActionFactory.SAVE_ALL.create(window);
+		register(this.saveAllAction);
 		
-		addAction = new RetargetAction(ACTIONID_ADD, "&add files...");
-		addAction.setImageDescriptor(Activator.getImageDescriptor("icons/plus.gif"));
-		getActionBarConfigurer().registerGlobalAction(addAction);
-		register(addAction);
-		window.getPartService().addPartListener(addAction);
+		this.addAction = new RetargetAction(ACTIONID_ADD, "&add files...");
+		this.addAction.setImageDescriptor(Activator.getImageDescriptor("icons/plus.gif"));
+		getActionBarConfigurer().registerGlobalAction(this.addAction);
+		register(this.addAction);
+		window.getPartService().addPartListener(this.addAction);
 		
-		removeAction = new RetargetAction(ACTIONID_REMOVE, "&remove selected...");
-		removeAction.setImageDescriptor(Activator.getImageDescriptor("icons/minus.gif"));
-		getActionBarConfigurer().registerGlobalAction(removeAction);
-		register(removeAction);
-		window.getPartService().addPartListener(removeAction);
+		this.removeAction = new RetargetAction(ACTIONID_REMOVE, "&remove selected...");
+		this.removeAction.setImageDescriptor(Activator.getImageDescriptor("icons/minus.gif"));
+		getActionBarConfigurer().registerGlobalAction(this.removeAction);
+		register(this.removeAction);
+		window.getPartService().addPartListener(this.removeAction);
 		
-		showPropertiesAction = new RetargetAction(ACTIONID_SHOWPROPERTIES, "&properties...");
-		showPropertiesAction.setImageDescriptor(Activator.getImageDescriptor("icons/pref.gif"));
-		getActionBarConfigurer().registerGlobalAction(showPropertiesAction);
-		register(showPropertiesAction);
-		window.getPartService().addPartListener(showPropertiesAction);
+		this.showPropertiesAction = new RetargetAction(ACTIONID_SHOWPROPERTIES, "&properties...");
+		this.showPropertiesAction.setImageDescriptor(Activator.getImageDescriptor("icons/pref.gif"));
+		getActionBarConfigurer().registerGlobalAction(this.showPropertiesAction);
+		register(this.showPropertiesAction);
+		window.getPartService().addPartListener(this.showPropertiesAction);
 		
 		// Help actions.
-		showAbout = ActionFactory.ABOUT.create(window);
-		register(showAbout);
+		this.showAbout = ActionFactory.ABOUT.create(window);
+		register(this.showAbout);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -156,46 +156,46 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	protected void fillMenuBar(IMenuManager menuBar) {
 		MenuManager fileMenu = new MenuManager("&Morrigan", IWorkbenchActionConstants.M_FILE);
 		menuBar.add(fileMenu);
-		fileMenu.add(exitAction);
+		fileMenu.add(this.exitAction);
 		
 		MenuManager collectionsMenu = new MenuManager("&Collections", "collections");
 		menuBar.add(collectionsMenu);
-		collectionsMenu.add(newLibraryAction);
-		collectionsMenu.add(newPlayListAction);
+		collectionsMenu.add(this.newLibraryAction);
+		collectionsMenu.add(this.newPlayListAction);
 		collectionsMenu.add(new Separator());
-		collectionsMenu.add(saveAction);
-		collectionsMenu.add(saveAllAction);
-		collectionsMenu.add(addAction);
-		collectionsMenu.add(removeAction);
+		collectionsMenu.add(this.saveAction);
+		collectionsMenu.add(this.saveAllAction);
+		collectionsMenu.add(this.addAction);
+		collectionsMenu.add(this.removeAction);
 		collectionsMenu.add(new Separator());
-		collectionsMenu.add(showPropertiesAction);
+		collectionsMenu.add(this.showPropertiesAction);
 		
 		MenuManager windowMenu = new MenuManager("&Window", IWorkbenchActionConstants.M_WINDOW);
 		menuBar.add(windowMenu);
-		windowMenu.add(newWindowAction);
-		windowMenu.add(minToTrayAction);
+		windowMenu.add(this.newWindowAction);
+		windowMenu.add(this.minToTrayAction);
 		windowMenu.add(new Separator());
-		showViewMenuMgr.add(showMediaExplorer);
-		showViewMenuMgr.add(new Separator());
-		showViewMenuMgr.add(showViewItemShortList);
-		windowMenu.add(showViewMenuMgr);
-		windowMenu.add(resetPerspectiveAction);
+		this.showViewMenuMgr.add(this.showMediaExplorer);
+		this.showViewMenuMgr.add(new Separator());
+		this.showViewMenuMgr.add(this.showViewItemShortList);
+		windowMenu.add(this.showViewMenuMgr);
+		windowMenu.add(this.resetPerspectiveAction);
 		windowMenu.add(new Separator());
-		windowMenu.add(showPrefAction);
+		windowMenu.add(this.showPrefAction);
 		
 		MenuManager helpMenu = new MenuManager("&Help", IWorkbenchActionConstants.M_HELP);
 		menuBar.add(helpMenu);
-		helpMenu.add(showAbout);
+		helpMenu.add(this.showAbout);
 	}
 	
 	@Override
 	protected void fillCoolBar(ICoolBarManager coolBar) {
 		coolBar.add(new GroupMarker("group.list"));
 		IToolBarManager fileToolBar = new ToolBarManager(coolBar.getStyle());
-		fileToolBar.add(saveAction);
-		fileToolBar.add(addAction);
-		fileToolBar.add(removeAction);
-		fileToolBar.add(showPropertiesAction);
+		fileToolBar.add(this.saveAction);
+		fileToolBar.add(this.addAction);
+		fileToolBar.add(this.removeAction);
+		fileToolBar.add(this.showPropertiesAction);
 		coolBar.add(new ToolBarContributionItem(fileToolBar));
 	}
 	

@@ -32,27 +32,27 @@ public class PrgListener implements TaskEventListener {
 
 	@Override
 	public void beginTask(String name, int totalWork) {
-		monitor.beginTask(name, totalWork);
+		this.monitor.beginTask(name, totalWork);
 	}
 
 	@Override
 	public void done() {
-		monitor.done();
+		this.monitor.done();
 	}
 
 	@Override
 	public boolean isCanceled() {
-		return monitor.isCanceled();
+		return this.monitor.isCanceled();
 	}
 
 	@Override
 	public void subTask(String name) {
-		monitor.subTask(name);
+		this.monitor.subTask(name);
 	}
 
 	@Override
 	public void worked(int work) {
-		monitor.worked(work);
+		this.monitor.worked(work);
 	}
 	
 }

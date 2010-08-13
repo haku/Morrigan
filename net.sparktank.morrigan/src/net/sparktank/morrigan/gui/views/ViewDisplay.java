@@ -2,8 +2,6 @@ package net.sparktank.morrigan.gui.views;
 
 import java.util.List;
 
-import net.sparktank.morrigan.engines.common.ImplException;
-import net.sparktank.morrigan.gui.dialogs.RunnableDialog;
 import net.sparktank.morrigan.gui.display.ScreenPainter;
 import net.sparktank.morrigan.gui.display.ScreenPainter.ScreenType;
 import net.sparktank.morrigan.gui.views.AbstractPlayerView.FullScreenAction;
@@ -34,45 +32,40 @@ public class ViewDisplay extends ViewPart {
 	@Override
 	public void createPartControl(Composite parent) {
 		makeControls(parent);
-		getSite().getWorkbenchWindow().addPerspectiveListener(perspectiveListener);
+		getSite().getWorkbenchWindow().addPerspectiveListener(this.perspectiveListener);
 		
 		IViewPart findView = getSite().getPage().findView(ViewControls.ID);
 		if (findView!=null) {
-			viewControls = (ViewControls) findView;
-			try {
-				viewControls.attachViewDisplay(this);
-				viewControls.registerScreenPainter(screenPainter);
-				
-				List<FullScreenAction> fullScreenActions = viewControls.getFullScreenActions();
-				for (FullScreenAction a : fullScreenActions) {
-					getViewSite().getActionBars().getToolBarManager().add(a);
-				}
-				
-			} catch (ImplException e) {
-				getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));
+			this.viewControls = (ViewControls) findView;
+			this.viewControls.attachViewDisplay(this);
+			this.viewControls.registerScreenPainter(this.screenPainter);
+			
+			List<FullScreenAction> fullScreenActions = this.viewControls.getFullScreenActions();
+			for (FullScreenAction a : fullScreenActions) {
+				getViewSite().getActionBars().getToolBarManager().add(a);
 			}
 		}
 	}
 	
 	@Override
 	public void dispose() {
-		if (viewControls != null) {
-			viewControls.unregisterScreenPainter(screenPainter);
+		if (this.viewControls != null) {
+			this.viewControls.unregisterScreenPainter(this.screenPainter);
 		}
 		
-		if (onCloseRunnable!=null) {
-			onCloseRunnable.run();
-			onCloseRunnable = null;
+		if (this.onCloseRunnable!=null) {
+			this.onCloseRunnable.run();
+			this.onCloseRunnable = null;
 		}
 		
-		getSite().getWorkbenchWindow().removePerspectiveListener(perspectiveListener);
+		getSite().getWorkbenchWindow().removePerspectiveListener(this.perspectiveListener);
 		
 		super.dispose();
 	}
 	
 	@Override
 	public void setFocus() {
-		mediaFrameParent.setFocus();
+		this.mediaFrameParent.setFocus();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -82,22 +75,20 @@ public class ViewDisplay extends ViewPart {
 		@Override
 		public void perspectiveChanged(IWorkbenchPage page, IPerspectiveDescriptor perspective, IWorkbenchPartReference partRef, String changeId) {
 			if (partRef.getId().equals(ID) && changeId.equals(IWorkbenchPage.CHANGE_VIEW_HIDE)) {
-				if (onCloseRunnable!=null) {
-					onCloseRunnable.run();
-					onCloseRunnable = null;
+				if (ViewDisplay.this.onCloseRunnable!=null) {
+					ViewDisplay.this.onCloseRunnable.run();
+					ViewDisplay.this.onCloseRunnable = null;
 				}
 			}
 		}
 		
 		@Override
-		public void perspectiveChanged(IWorkbenchPage page, IPerspectiveDescriptor perspective, String changeId) {}
+		public void perspectiveChanged(IWorkbenchPage page, IPerspectiveDescriptor perspective, String changeId) {/* UNUSED */}
 		@Override
-		public void perspectiveActivated(IWorkbenchPage page, IPerspectiveDescriptor perspective) {}
+		public void perspectiveActivated(IWorkbenchPage page, IPerspectiveDescriptor perspective) {/* UNUSED */}
 	};
 	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	private Composite mediaFrameParent;
+Composite mediaFrameParent;
 	private ScreenPainter screenPainter;
 	
 	private void makeControls (Composite parent) {
@@ -105,23 +96,23 @@ public class ViewDisplay extends ViewPart {
 		parent.addFocusListener(new FocusListener() {
 			@Override
 			public void focusGained(FocusEvent e) {
-				mediaFrameParent.setFocus();
+				ViewDisplay.this.mediaFrameParent.setFocus();
 			}
 			@Override
-			public void focusLost(FocusEvent e) {}
+			public void focusLost(FocusEvent e) {/* UNUSED */}
 		});
 		
 		Canvas canvas = new Canvas(parent, SWT.NONE);
 		canvas.setLayout(new FillLayout());
-		screenPainter = new ScreenPainter(canvas, ScreenType.MEDIUM);
-		canvas.addPaintListener(screenPainter);
-		mediaFrameParent = canvas;
+		this.screenPainter = new ScreenPainter(canvas, ScreenType.MEDIUM);
+		canvas.addPaintListener(this.screenPainter);
+		this.mediaFrameParent = canvas;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Video display related methods.
 	
-	private Runnable onCloseRunnable;
+	Runnable onCloseRunnable;
 	
 	public void setCloseRunnable (Runnable onCloseRunnable) {
 		this.onCloseRunnable = onCloseRunnable;
@@ -129,8 +120,8 @@ public class ViewDisplay extends ViewPart {
 	}
 	
 	protected Composite getMediaFrameParent () {
-		if (mediaFrameParent==null) throw new IllegalAccessError("setMediaFrameParent() has not yet been called.");
-		return mediaFrameParent;
+		if (this.mediaFrameParent==null) throw new IllegalAccessError("setMediaFrameParent() has not yet been called.");
+		return this.mediaFrameParent;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

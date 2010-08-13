@@ -24,12 +24,12 @@ public class FailStatus implements IStatus {
 	
 	@Override
 	public Throwable getException() {
-		return e;
+		return this.e;
 	}
 	
 	@Override
 	public String getMessage() {
-		return message;
+		return this.message;
 	}
 	
 	@Override

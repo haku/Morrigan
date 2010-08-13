@@ -17,7 +17,7 @@ public class LibrarySrcFeed extends Feed {
 
 	private LocalMediaLibrary ml;
 	
-	public LibrarySrcFeed (LocalMediaLibrary ml) throws MorriganException {
+	public LibrarySrcFeed (LocalMediaLibrary ml) {
 		super();
 		if (ml==null) throw new IllegalArgumentException("MediaList paramater can not be null.");
 		this.ml = ml;
@@ -25,25 +25,26 @@ public class LibrarySrcFeed extends Feed {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	@Override
 	protected void populateFeed(DataWriter dw) throws SAXException, MorriganException {
-		ml.read();
+		this.ml.read();
 		
 		String listFile;
 		try {
-			listFile = URLEncoder.encode(filenameFromPath(ml.getListId()), "UTF-8");
+			listFile = URLEncoder.encode(filenameFromPath(this.ml.getListId()), "UTF-8");
 		} catch (UnsupportedEncodingException e) {
 			throw new RuntimeException(e);
 		}
 		
-		addElement(dw, "title", ml.getListName() + " src");
-		addLink(dw, "/media/" + ml.getType() + "/" + listFile + "/src", "self", "text/xml");
-		addLink(dw, "/media/" + ml.getType() + "/" + listFile, "library", "text/xml");
-		addLink(dw, "/media/" + ml.getType() + "/" + listFile + "/src/add", "add", "cmd");
-		addLink(dw, "/media/" + ml.getType() + "/" + listFile + "/src/remove", "remove", "cmd");
+		addElement(dw, "title", this.ml.getListName() + " src");
+		addLink(dw, "/media/" + this.ml.getType() + "/" + listFile + "/src", "self", "text/xml");
+		addLink(dw, "/media/" + this.ml.getType() + "/" + listFile, "library", "text/xml");
+		addLink(dw, "/media/" + this.ml.getType() + "/" + listFile + "/src/add", "add", "cmd");
+		addLink(dw, "/media/" + this.ml.getType() + "/" + listFile + "/src/remove", "remove", "cmd");
 		
 		List<String> src;
 		try {
-			src = ml.getSources();
+			src = this.ml.getSources();
 		} catch (DbException e) {
 			throw new MorriganException(e);
 		}

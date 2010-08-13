@@ -64,7 +64,7 @@ public class NewPlaylistAction extends Action implements IWorkbenchAction {
 			}
 			
 			// refresh explorer.
-			IWorkbenchPage page = window.getActivePage();
+			IWorkbenchPage page = this.window.getActivePage();
 			ViewMediaExplorer view = (ViewMediaExplorer) page.findView(ViewMediaExplorer.ID);
 			view.refresh();
 			
@@ -85,7 +85,7 @@ public class NewPlaylistAction extends Action implements IWorkbenchAction {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
-	public void dispose() {}
+	public void dispose() {/* UNUSED */}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

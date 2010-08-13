@@ -17,38 +17,38 @@ import org.eclipse.swt.widgets.Shell;
 public class FullscreenShell {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private final Shell shell;
+	final Shell shell;
 	private final ScreenPainter screenPainter;
-	private final Runnable onCloseRunnable;
+	final Runnable onCloseRunnable;
 	
 	public FullscreenShell(Shell parent, Monitor mon, Runnable onCloseRunnable) {
-		shell = new Shell(parent.getDisplay(), SWT.ON_TOP);
+		this.shell = new Shell(parent.getDisplay(), SWT.ON_TOP);
 		this.onCloseRunnable = onCloseRunnable;
 		
-		shell.setText("Morrigan Screen");
-		shell.setImage(parent.getImage());
-		shell.setLayout(new FillLayout());
+		this.shell.setText("Morrigan Screen");
+		this.shell.setImage(parent.getImage());
+		this.shell.setLayout(new FillLayout());
 		
 		Point pt = new Point(mon.getBounds().x, mon.getBounds().y);
-		shell.setLocation(pt);
-		shell.setSize(mon.getBounds().width, mon.getBounds().height);
-		shell.setMaximized(true);
-		shell.setFullScreen(true);
+		this.shell.setLocation(pt);
+		this.shell.setSize(mon.getBounds().width, mon.getBounds().height);
+		this.shell.setMaximized(true);
+		this.shell.setFullScreen(true);
 		
-		screenPainter = new ScreenPainter(shell, ScreenType.LARGE);
-		shell.addPaintListener(screenPainter);
+		this.screenPainter = new ScreenPainter(this.shell, ScreenType.LARGE);
+		this.shell.addPaintListener(this.screenPainter);
 		
-		shell.addTraverseListener(traverseListener);
-		shell.addMouseListener(mouseListener);
-		shell.addShellListener(shellListener);
+		this.shell.addTraverseListener(this.traverseListener);
+		this.shell.addMouseListener(this.mouseListener);
+		this.shell.addShellListener(this.shellListener);
 	}
 	
 	public Shell getShell () {
-		return shell;
+		return this.shell;
 	}
 	
 	public ScreenPainter getScreenPainter() {
-		return screenPainter;
+		return this.screenPainter;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -59,7 +59,7 @@ public class FullscreenShell {
 			if (e.detail==SWT.TRAVERSE_ESCAPE) {
 				e.detail = SWT.TRAVERSE_NONE;
 				e.doit = false;
-				shell.close();
+				FullscreenShell.this.shell.close();
 			}
 		}
 	};
@@ -67,30 +67,30 @@ public class FullscreenShell {
 	private final MouseListener mouseListener = new MouseListener() {
 		@Override
 		public void mouseDoubleClick(MouseEvent e) {
-			shell.close();
+			FullscreenShell.this.shell.close();
 		}
 		
 		@Override
-		public void mouseUp(MouseEvent e) {}
+		public void mouseUp(MouseEvent e) {/* UNUSED */}
 		@Override
-		public void mouseDown(MouseEvent e) {}
+		public void mouseDown(MouseEvent e) {/* UNUSED */}
 		
 	};
 	
 	private final ShellListener shellListener = new ShellListener() {
 		@Override
 		public void shellClosed(ShellEvent e) {
-			onCloseRunnable.run();
+			FullscreenShell.this.onCloseRunnable.run();
 		}
 		
 		@Override
-		public void shellActivated(ShellEvent e) {}
+		public void shellActivated(ShellEvent e) {/* UNUSED */}
 		@Override
-		public void shellDeactivated(ShellEvent e) {}
+		public void shellDeactivated(ShellEvent e) {/* UNUSED */}
 		@Override
-		public void shellIconified(ShellEvent e) { }
+		public void shellIconified(ShellEvent e) {/* UNUSED */}
 		@Override
-		public void shellDeiconified(ShellEvent e) {}
+		public void shellDeiconified(ShellEvent e) {/* UNUSED */}
 	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

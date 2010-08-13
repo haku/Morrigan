@@ -26,6 +26,7 @@ public class ViewPlayer extends AbstractPlayerView {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	ViewPart methods.
 	
+	@Override
 	public void createPartControl(Composite parent) {
 		super.createPartControl(parent);
 		
@@ -34,7 +35,7 @@ public class ViewPlayer extends AbstractPlayerView {
 		addToolbar();
 		addMenu();
 		
-		registerScreenPainter(screenPainter);
+		registerScreenPainter(this.screenPainter);
 		
 		getEventHandler().updateStatus();
 	}
@@ -46,8 +47,8 @@ public class ViewPlayer extends AbstractPlayerView {
 	
 	@Override
 	public void dispose() {
-		if (screenPainter != null) {
-			unregisterScreenPainter(screenPainter);
+		if (this.screenPainter != null) {
+			unregisterScreenPainter(this.screenPainter);
 		}
 		
 		disposeIcons();
@@ -62,15 +63,15 @@ public class ViewPlayer extends AbstractPlayerView {
 	private Image iconStop;
 	
 	private void makeIcons () {
-		iconPlay = Activator.getImageDescriptor("icons/play.gif").createImage();
-		iconPause = Activator.getImageDescriptor("icons/pause.gif").createImage();
-		iconStop = Activator.getImageDescriptor("icons/stop.gif").createImage();
+		this.iconPlay = Activator.getImageDescriptor("icons/play.gif").createImage();
+		this.iconPause = Activator.getImageDescriptor("icons/pause.gif").createImage();
+		this.iconStop = Activator.getImageDescriptor("icons/stop.gif").createImage();
 	}
 	
 	private void disposeIcons () {
-		iconPlay.dispose();
-		iconPause.dispose();
-		iconStop.dispose();
+		this.iconPlay.dispose();
+		this.iconPause.dispose();
+		this.iconStop.dispose();
 	}
 	
 	private void makeControls (Composite parent) {
@@ -82,20 +83,20 @@ public class ViewPlayer extends AbstractPlayerView {
 				getLocalMediaFrameParent().setFocus();
 			}
 			@Override
-			public void focusLost(FocusEvent e) {}
+			public void focusLost(FocusEvent e) {/* UNUSED */}
 		});
 		
 		Canvas canvas = new Canvas(parent, SWT.NONE);
 		canvas.setLayout(new FillLayout());
-		screenPainter = new ScreenPainter(canvas, ScreenType.MEDIUM);
-		canvas.addPaintListener(screenPainter);
+		this.screenPainter = new ScreenPainter(canvas, ScreenType.MEDIUM);
+		canvas.addPaintListener(this.screenPainter);
 		setLocalMediaFrameParent(canvas);
 	}
 	
 	private void addToolbar () {
-		getViewSite().getActionBars().getToolBarManager().add(pauseAction);
-		getViewSite().getActionBars().getToolBarManager().add(stopAction);
-		getViewSite().getActionBars().getToolBarManager().add(nextAction);
+		getViewSite().getActionBars().getToolBarManager().add(this.pauseAction);
+		getViewSite().getActionBars().getToolBarManager().add(this.stopAction);
+		getViewSite().getActionBars().getToolBarManager().add(this.nextAction);
 		getViewSite().getActionBars().getToolBarManager().add(new Separator());
 	}
 	
@@ -106,9 +107,9 @@ public class ViewPlayer extends AbstractPlayerView {
 		
 		getViewSite().getActionBars().getMenuManager().add(new Separator());
 		
-		getViewSite().getActionBars().getMenuManager().add(pauseAction);
-		getViewSite().getActionBars().getMenuManager().add(stopAction);
-		getViewSite().getActionBars().getMenuManager().add(nextAction);
+		getViewSite().getActionBars().getMenuManager().add(this.pauseAction);
+		getViewSite().getActionBars().getMenuManager().add(this.stopAction);
+		getViewSite().getActionBars().getMenuManager().add(this.nextAction);
 		
 		getViewSite().getActionBars().getMenuManager().add(new Separator());
 		
@@ -118,7 +119,7 @@ public class ViewPlayer extends AbstractPlayerView {
 		
 		getViewSite().getActionBars().getMenuManager().add(new Separator());
 		
-		getViewSite().getActionBars().getMenuManager().add(copyPathAction);
+		getViewSite().getActionBars().getMenuManager().add(this.copyPathAction);
 	}
 	
 	@Override
@@ -127,19 +128,19 @@ public class ViewPlayer extends AbstractPlayerView {
 		
 		switch (getPlayer().getPlayState()) {
 			case Playing:
-				setTitleImage(iconPlay);
+				setTitleImage(this.iconPlay);
 				break;
 				
 			case Paused:
-				setTitleImage(iconPause);
+				setTitleImage(this.iconPause);
 				break;
 				
 			case Loading:
-				setTitleImage(iconPlay); // FIXME new icon?
+				setTitleImage(this.iconPlay); // FIXME new icon?
 				break;
 				
 			case Stopped:
-				setTitleImage(iconStop);
+				setTitleImage(this.iconStop);
 				break;
 				
 			default:
@@ -155,9 +156,9 @@ public class ViewPlayer extends AbstractPlayerView {
 	}
 	
 	@Override
-	protected void orderModeChanged(PlaybackOrder order) {}
+	protected void orderModeChanged(PlaybackOrder order) {/* UNUSED */}
 	@Override
-	protected void videoParentChanged(Composite newParent) {}
+	protected void videoParentChanged(Composite newParent) {/* UNUSED */}
 	@Override
 	protected Composite getSecondaryVideoParent() {
 		return null;

@@ -15,10 +15,10 @@ public class RunnableDialog implements Runnable {
 	
 	@Override
 	public void run() {
-		if (s!=null) {
-			new MorriganMsgDlg(s).open();
-		} else if (t!=null) {
-			new MorriganMsgDlg(t).open();
+		if (this.s!=null) {
+			new MorriganMsgDlg(this.s).open();
+		} else if (this.t!=null) {
+			new MorriganMsgDlg(this.t).open();
 		} else {
 			new MorriganMsgDlg("null").open();
 		}

@@ -23,7 +23,6 @@ import net.sparktank.morrigan.model.tracks.playlist.PlaylistHelper;
 import net.sparktank.morrigan.server.feedwriters.LibrarySrcFeed;
 import net.sparktank.morrigan.server.feedwriters.MediaFeed;
 import net.sparktank.morrigan.server.feedwriters.MediaListFeed;
-import net.sparktank.sqlitewrapper.DbException;
 
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
@@ -31,6 +30,7 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 public class MediaHandler extends AbstractHandler {
 	//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	@Override
 	public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 		System.err.println("request:t=" + target + ", m=" + request.getMethod());
 		

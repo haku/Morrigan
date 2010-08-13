@@ -111,7 +111,7 @@ public class MediaListFeedParser2 extends DefaultHandler {
 	
 	public MediaListFeedParser2(RemoteMediaLibrary library, TaskEventListener taskEventListener) {
 		this.taskEventListener = taskEventListener;
-		stack = new Stack<String>();
+		this.stack = new Stack<String>();
 		this.library = library; 
 	}
 	
@@ -123,20 +123,21 @@ public class MediaListFeedParser2 extends DefaultHandler {
 	private MediaTrack currentItem;
 	private StringBuilder currentText;
 	
+	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-		stack.push(localName);
-		if (stack.size() == 2 && localName.equals("entry")) {
-			currentItem = new MediaTrack();
+		this.stack.push(localName);
+		if (this.stack.size() == 2 && localName.equals("entry")) {
+			this.currentItem = new MediaTrack();
 		}
-		else if (stack.size() == 3 && localName.equals("link")) {
+		else if (this.stack.size() == 3 && localName.equals("link")) {
 			String relVal = attributes.getValue("rel");
 			if (relVal != null && relVal.equals("self")) {
 				String hrefVal = attributes.getValue("href");
 				if (hrefVal != null && hrefVal.length() > 0) {
 					try {
 						String remotePath = URLDecoder.decode(hrefVal, "UTF-8");
-						currentItem.setFilepath(remotePath);
-						currentItem.setRemoteLocation(hrefVal);
+						this.currentItem.setFilepath(remotePath);
+						this.currentItem.setRemoteLocation(hrefVal);
 					} catch (UnsupportedEncodingException e) {
 						throw new SAXException(e);
 					}
@@ -144,19 +145,19 @@ public class MediaListFeedParser2 extends DefaultHandler {
 			}
 		}
 		
-		if (currentText == null || currentText.length() > 0) {
-			currentText = new StringBuilder();
+		if (this.currentText == null || this.currentText.length() > 0) {
+			this.currentText = new StringBuilder();
 		}
 	}
 	
 	@Override
 	public void endElement(String uri, String localName, String qName) throws SAXException {
-		if (stack.size() == 2 && localName.equals("count")) {
-			entryCount = Long.parseLong(currentText.toString());
+		if (this.stack.size() == 2 && localName.equals("count")) {
+			this.entryCount = Long.parseLong(this.currentText.toString());
 		}
-		else if (stack.size() == 2 && localName.equals("entry")) {
+		else if (this.stack.size() == 2 && localName.equals("entry")) {
 			try {
-				library.updateItem(currentItem);
+				this.library.updateItem(this.currentItem);
 			}
 			catch (MorriganException e) {
 				throw new SAXException(e);
@@ -164,67 +165,68 @@ public class MediaListFeedParser2 extends DefaultHandler {
 				throw new SAXException(e);
 			}
 			
-			if (taskEventListener!=null) {
-				entriesProcessed++;
-				int p = (int) ((entriesProcessed * 100) / entryCount);
-				if (p > progress) {
-					taskEventListener.worked(p - progress);
-					progress = p;
+			if (this.taskEventListener!=null) {
+				this.entriesProcessed++;
+				int p = (int) ((this.entriesProcessed * 100) / this.entryCount);
+				if (p > this.progress) {
+					this.taskEventListener.worked(p - this.progress);
+					this.progress = p;
 				}
 			}
 		}
 //		else if (stack.size() == 3 && localName.equals("title")) {
 //			currentItem.setFilepath(currentText.toString());
 //		}
-		else if (stack.size() == 3 && localName.equals("duration")) {
-			int v = Integer.parseInt(currentText.toString());
-			currentItem.setDuration(v);
+		else if (this.stack.size() == 3 && localName.equals("duration")) {
+			int v = Integer.parseInt(this.currentText.toString());
+			this.currentItem.setDuration(v);
 		}
-		else if (stack.size() == 3 && localName.equals("hash")) {
-			long v = Long.parseLong(currentText.toString());
-			currentItem.setHashcode(v);
+		else if (this.stack.size() == 3 && localName.equals("hash")) {
+			long v = Long.parseLong(this.currentText.toString());
+			this.currentItem.setHashcode(v);
 		}
-		else if (stack.size() == 3 && localName.equals("startcount")) {
-			long v = Long.parseLong(currentText.toString());
-			currentItem.setStartCount(v);
+		else if (this.stack.size() == 3 && localName.equals("startcount")) {
+			long v = Long.parseLong(this.currentText.toString());
+			this.currentItem.setStartCount(v);
 		}
-		else if (stack.size() == 3 && localName.equals("endcount")) {
-			long v = Long.parseLong(currentText.toString());
-			currentItem.setEndCount(v);
+		else if (this.stack.size() == 3 && localName.equals("endcount")) {
+			long v = Long.parseLong(this.currentText.toString());
+			this.currentItem.setEndCount(v);
 		}
-		else if (stack.size() == 3 && localName.equals("dateadded")) {
+		else if (this.stack.size() == 3 && localName.equals("dateadded")) {
 			try {
-				Date d = XmlHelper.getIso8601UtcDateFormatter().parse(currentText.toString());
-				currentItem.setDateAdded(d);
+				Date d = XmlHelper.getIso8601UtcDateFormatter().parse(this.currentText.toString());
+				this.currentItem.setDateAdded(d);
 			}
 			catch (Exception e) {
-				throw new SAXException(flattenStack(stack) + " Exception parsing date '"+currentText.toString()+"'.", e);
+				throw new SAXException(flattenStack(this.stack) + " Exception parsing date '"+this.currentText.toString()+"'.", e);
 			}
 		}
-		else if (stack.size() == 3 && localName.equals("datelastmodified")) {
+		else if (this.stack.size() == 3 && localName.equals("datelastmodified")) {
 			try {
-				Date d = XmlHelper.getIso8601UtcDateFormatter().parse(currentText.toString());
-				currentItem.setDateLastModified(d);
+				Date d = XmlHelper.getIso8601UtcDateFormatter().parse(this.currentText.toString());
+				this.currentItem.setDateLastModified(d);
 			}
 			catch (Exception e) {
-				throw new SAXException(flattenStack(stack) + " Exception parsing date '"+currentText.toString()+"'.", e);
+				throw new SAXException(flattenStack(this.stack) + " Exception parsing date '"+this.currentText.toString()+"'.", e);
 			}
 		}
-		else if (stack.size() == 3 && localName.equals("datelastplayed")) {
+		else if (this.stack.size() == 3 && localName.equals("datelastplayed")) {
 			try {
-				Date d = XmlHelper.getIso8601UtcDateFormatter().parse(currentText.toString());
-				currentItem.setDateLastPlayed(d);
+				Date d = XmlHelper.getIso8601UtcDateFormatter().parse(this.currentText.toString());
+				this.currentItem.setDateLastPlayed(d);
 			}
 			catch (Exception e) {
-				throw new SAXException(flattenStack(stack) + " Exception parsing date '"+currentText.toString()+"'.", e);
+				throw new SAXException(flattenStack(this.stack) + " Exception parsing date '"+this.currentText.toString()+"'.", e);
 			}
 		}
 		
-		stack.pop();
+		this.stack.pop();
 	}
 	
+	@Override
 	public void characters(char[] ch, int start, int length) {
-		currentText.append( ch, start, length );
+		this.currentText.append( ch, start, length );
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
