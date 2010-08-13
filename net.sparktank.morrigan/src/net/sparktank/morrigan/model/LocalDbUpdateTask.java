@@ -21,7 +21,7 @@ import net.sparktank.morrigan.model.tasks.TaskResult;
 import net.sparktank.morrigan.model.tasks.TaskResult.TaskOutcome;
 import net.sparktank.sqlitewrapper.DbException;
 
-public abstract class LocalDbUpdateTask<Q extends MediaItemDb<?,?,T>, T extends MediaItem> implements IMorriganTask {
+public abstract class LocalDbUpdateTask<Q extends MediaItemDb<?,T>, T extends MediaItem> implements IMorriganTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	protected enum ScanOption {KEEP, DELREF, MOVEFILE};

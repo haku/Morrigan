@@ -5,17 +5,16 @@ import net.sparktank.morrigan.model.MediaSqliteLayer2;
 import net.sparktank.morrigan.model.MediaSqliteLayer2.SortDirection;
 import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
 import net.sparktank.morrigan.model.media.impl.MediaItem;
-import net.sparktank.morrigan.model.media.interfaces.IMediaItemList;
 
 import org.eclipse.ui.IMemento;
 
 /**
  * Subclass of MediaItemListEditorInput to allow saving of sort configuration.
  */
-public class MediaItemDbEditorInput extends MediaItemListEditorInput<MediaItemDb<? extends IMediaItemList<? extends MediaItem>, ? extends MediaSqliteLayer2<? extends MediaItem>, ? extends MediaItem>> {
+public class MediaItemDbEditorInput extends MediaItemListEditorInput<MediaItemDb<? extends MediaSqliteLayer2<? extends MediaItem>, ? extends MediaItem>> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public MediaItemDbEditorInput(MediaItemDb<? extends IMediaItemList<? extends MediaItem>, ? extends MediaSqliteLayer2<? extends MediaItem>, ? extends MediaItem> mediaList) {
+	public MediaItemDbEditorInput(MediaItemDb<? extends MediaSqliteLayer2<? extends MediaItem>, ? extends MediaItem> mediaList) {
 		super(mediaList);
 	}
 	
