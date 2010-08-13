@@ -12,7 +12,7 @@ import net.sparktank.morrigan.model.DbColumn;
 import net.sparktank.morrigan.model.MediaItem;
 import net.sparktank.morrigan.model.MediaSqliteLayer;
 import net.sparktank.morrigan.model.MediaSqliteLayer2.SortDirection;
-import net.sparktank.morrigan.model.media.IMixedMediaSqlLayer.MediaType;
+import net.sparktank.morrigan.model.media.IMixedMediaMetadataLayer.MediaType;
 import net.sparktank.morrigan.model.pictures.MediaPicture;
 import net.sparktank.morrigan.model.tracks.MediaTrack;
 import net.sparktank.sqlitewrapper.DbException;

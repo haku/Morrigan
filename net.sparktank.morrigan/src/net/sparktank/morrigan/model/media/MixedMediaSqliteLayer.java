@@ -12,7 +12,7 @@ import net.sparktank.morrigan.model.pictures.MediaPicture;
 import net.sparktank.morrigan.model.tracks.MediaTrack;
 import net.sparktank.sqlitewrapper.DbException;
 
-public class MixedMediaSqliteLayer extends MixedMediaSqliteLayerImpl implements IMixedMediaSqlLayer {
+public class MixedMediaSqliteLayer extends MixedMediaSqliteLayerImpl implements IMixedMediaMetadataLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors.
 	
