@@ -373,8 +373,6 @@ public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqlit
 		"UPDATE tbl_mediafiles SET sremloc=?" +
 		" WHERE sfile=?;";
 	
-	public enum SortDirection { ASC, DESC };
-	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Media.
 	

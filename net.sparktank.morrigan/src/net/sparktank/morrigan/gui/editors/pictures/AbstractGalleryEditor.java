@@ -11,11 +11,11 @@ import net.sparktank.morrigan.gui.display.DropMenuListener;
 import net.sparktank.morrigan.gui.editors.IMediaItemDbEditor;
 import net.sparktank.morrigan.gui.editors.MediaColumn;
 import net.sparktank.morrigan.helpers.TimeHelper;
-import net.sparktank.morrigan.model.IMediaItemDb.SortChangeListener;
 import net.sparktank.morrigan.model.MediaSqliteLayer2;
-import net.sparktank.morrigan.model.MediaSqliteLayer2.SortDirection;
 import net.sparktank.morrigan.model.db.impl.DbColumn;
 import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
+import net.sparktank.morrigan.model.media.interfaces.IMediaItemDb.SortChangeListener;
+import net.sparktank.morrigan.model.media.interfaces.IMediaItemStorageLayer.SortDirection;
 import net.sparktank.morrigan.model.pictures.MediaPicture;
 import net.sparktank.morrigan.model.pictures.gallery.AbstractGallery;
 

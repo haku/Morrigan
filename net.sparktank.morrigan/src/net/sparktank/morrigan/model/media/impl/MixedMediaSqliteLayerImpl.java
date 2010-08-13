@@ -11,7 +11,6 @@ import java.util.Map;
 
 import net.sparktank.morrigan.helpers.GeneratedString;
 import net.sparktank.morrigan.model.MediaSqliteLayer;
-import net.sparktank.morrigan.model.MediaSqliteLayer2.SortDirection;
 import net.sparktank.morrigan.model.db.SqliteHelper;
 import net.sparktank.morrigan.model.db.impl.DbColumn;
 import net.sparktank.morrigan.model.db.interfaces.IDbColumn;

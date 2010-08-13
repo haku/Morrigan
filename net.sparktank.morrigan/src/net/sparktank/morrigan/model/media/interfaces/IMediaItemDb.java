@@ -5,21 +5,20 @@ import java.util.List;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
 import net.sparktank.morrigan.model.db.interfaces.IDbItem;
+import net.sparktank.morrigan.model.media.interfaces.IMediaItemStorageLayer.SortDirection;
 import net.sparktank.morrigan.model.tags.MediaTag;
 import net.sparktank.morrigan.model.tags.MediaTagClassification;
 import net.sparktank.morrigan.model.tags.MediaTagType;
 import net.sparktank.sqlitewrapper.DbException;
 
-public interface IMediaItemDb<S extends IMixedMediaStorageLayer, T extends IMediaItem> extends IMixedMediaList {
+public interface IMediaItemDb<S extends IMediaItemStorageLayer<T>, T extends IMediaItem> extends IMediaItemList<T> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	public enum SortDirection { ASC, DESC };
 	
 	public interface SortChangeListener {
 		public void sortChanged (IDbColumn sort, SortDirection direction);
 	}
 	
-	public S getStorageLayer();
+	public S getDbLayer();
 	
 	public IDbColumn getSort ();
 	public SortDirection getSortDirection ();

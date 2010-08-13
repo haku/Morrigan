@@ -1,8 +1,8 @@
 package net.sparktank.morrigan.gui.editors;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
-import net.sparktank.morrigan.model.MediaSqliteLayer2.SortDirection;
 import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
+import net.sparktank.morrigan.model.media.interfaces.IMediaItemStorageLayer.SortDirection;
 import net.sparktank.morrigan.model.pictures.MediaPictureListFactory;
 import net.sparktank.morrigan.model.pictures.gallery.LocalGallery;
 import net.sparktank.morrigan.model.tracks.MediaTrackListFactory;
