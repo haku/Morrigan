@@ -3,6 +3,7 @@ package net.sparktank.morrigan.engines;
 import java.util.HashMap;
 import java.util.Map;
 
+@SuppressWarnings("boxing")
 public class HotkeyKeys {
 	
 	static public final Map<Integer, String> HkKeys = new HashMap<Integer, String>() {
@@ -18,11 +19,11 @@ public class HotkeyKeys {
 		}
 		
 		{
-			for (int i = (int) 'A'; i <= (int) 'Z'; i++) {
+			for (int i = 'A'; i <= 'Z'; i++) {
 				put(i, (char) i);
 			}
 			
-			for (int i = (int) '0'; i <= (int) '9'; i++) {
+			for (int i = '0'; i <= '9'; i++) {
 				put(i, (char) i);
 			}
 			

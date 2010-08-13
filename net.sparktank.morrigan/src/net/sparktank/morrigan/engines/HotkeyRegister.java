@@ -37,6 +37,7 @@ public class HotkeyRegister {
 	private static boolean configRead = false;
 	private static List<Integer> registeredHotkeys = new ArrayList<Integer>();
 	
+	@SuppressWarnings("boxing")
 	synchronized public static void readConfig (boolean force) throws MorriganException {
 		if (configRead && !force) return;
 		
@@ -82,6 +83,7 @@ public class HotkeyRegister {
 		configRead = true;
 	}
 	
+	@SuppressWarnings("boxing")
 	private static void clearConfig () throws HotkeyException, ImplException {
 		IHotkeyEngine engine = getHotkeyEngine(false);
 		
@@ -130,7 +132,7 @@ public class HotkeyRegister {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private static IHotkeyEngine hotkeyEngine = null;
-	private static List<IHotkeyListener> hotkeyListeners = new ArrayList<IHotkeyListener>();
+	static List<IHotkeyListener> hotkeyListeners = new ArrayList<IHotkeyListener>();
 	
 	private static IHotkeyEngine getHotkeyEngine (boolean create) throws ImplException {
 		if (hotkeyEngine == null && create) {
@@ -150,7 +152,7 @@ public class HotkeyRegister {
 		}
 	}
 	
-	private static WeakReference<IHotkeyListener> lastIHotkeyListenerUsed = null;
+	static WeakReference<IHotkeyListener> lastIHotkeyListenerUsed = null;
 	
 	private static IHotkeyListener mainHotkeyListener = new IHotkeyListener () {
 		

@@ -16,6 +16,7 @@ public class HotkeyValue {
 		this.supr = supr;
 	}
 	
+	@SuppressWarnings("boxing")
 	public HotkeyValue (String serialised) {
 		String[] arr = serialised.split("\\|");
 		
@@ -30,31 +31,35 @@ public class HotkeyValue {
 		this.supr = intToBoolean(Integer.valueOf(arr[4]));
 	}
 	
-	public int getKey() { return key; }
-	public boolean getCtrl () { return ctrl; }
-	public boolean getShift () { return shift; }
-	public boolean getAlt () { return alt; }
-	public boolean getSupr () { return supr; }
+	public int getKey() { return this.key; }
+	public boolean getCtrl () { return this.ctrl; }
+	public boolean getShift () { return this.shift; }
+	public boolean getAlt () { return this.alt; }
+	public boolean getSupr () { return this.supr; }
 	
 	public String serialise () {
-		return key
-			+ "|" + booleanToInt(ctrl)
-			+ "|" + booleanToInt(shift)
-			+ "|" + booleanToInt(alt)
-			+ "|" + booleanToInt(supr);
+		return this.key
+			+ "|" + booleanToInt(this.ctrl)
+			+ "|" + booleanToInt(this.shift)
+			+ "|" + booleanToInt(this.alt)
+			+ "|" + booleanToInt(this.supr);
 	}
 	
 	private int booleanToInt (boolean b) {
-		if (b) { return 1; } else { return 0; } 
+		if (b) { return 1; }
+		
+		return 0; 
 	}
 	
 	private boolean intToBoolean (int i) {
-		if (i==1) { return true; } else { return false; } 
+		if (i==1) { return true; }
+		
+		return false; 
 	}
 	
 	@Override
 	public String toString() {
-		return "[" + key + "," + ctrl + "," + shift + "," + alt + "," + supr + "]";
+		return "[" + this.key + "," + this.ctrl + "," + this.shift + "," + this.alt + "," + this.supr + "]";
 	}
 	
 }
