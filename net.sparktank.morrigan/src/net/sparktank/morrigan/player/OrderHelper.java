@@ -4,7 +4,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
-import net.sparktank.morrigan.model.MediaItem;
+import net.sparktank.morrigan.model.media.impl.MediaItem;
 import net.sparktank.morrigan.model.tracks.IMediaTrackList;
 import net.sparktank.morrigan.model.tracks.MediaTrack;
 

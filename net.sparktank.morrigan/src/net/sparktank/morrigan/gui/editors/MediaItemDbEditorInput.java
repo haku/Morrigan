@@ -1,10 +1,10 @@
 package net.sparktank.morrigan.gui.editors;
 
 import net.sparktank.morrigan.model.DbColumn;
-import net.sparktank.morrigan.model.MediaItem;
 import net.sparktank.morrigan.model.MediaItemDb;
 import net.sparktank.morrigan.model.MediaSqliteLayer2;
 import net.sparktank.morrigan.model.MediaSqliteLayer2.SortDirection;
+import net.sparktank.morrigan.model.media.impl.MediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemList;
 
 import org.eclipse.ui.IMemento;

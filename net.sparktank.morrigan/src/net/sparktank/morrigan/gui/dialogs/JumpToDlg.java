@@ -6,7 +6,7 @@ import java.lang.ref.WeakReference;
 import java.util.List;
 
 import net.sparktank.morrigan.gui.preferences.PreferenceHelper;
-import net.sparktank.morrigan.model.MediaItem;
+import net.sparktank.morrigan.model.media.impl.MediaItem;
 import net.sparktank.morrigan.model.tracks.MediaTrack;
 import net.sparktank.morrigan.model.tracks.library.local.LocalMediaLibrary;
 import net.sparktank.morrigan.model.tracks.playlist.PlayItem;

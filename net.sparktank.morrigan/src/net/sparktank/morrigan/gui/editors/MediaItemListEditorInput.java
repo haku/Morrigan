@@ -1,7 +1,7 @@
 package net.sparktank.morrigan.gui.editors;
 
 import net.sparktank.morrigan.helpers.EqualHelper;
-import net.sparktank.morrigan.model.MediaItem;
+import net.sparktank.morrigan.model.media.impl.MediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemList;
 
 import org.eclipse.jface.resource.ImageDescriptor;
