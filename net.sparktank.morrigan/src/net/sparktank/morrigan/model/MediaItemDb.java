@@ -11,12 +11,13 @@ import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
 import net.sparktank.morrigan.model.db.interfaces.IDbItem;
 import net.sparktank.morrigan.model.media.impl.MediaItemList;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
+import net.sparktank.morrigan.model.media.interfaces.IMediaItemStorageLayer;
 import net.sparktank.morrigan.model.tags.MediaTag;
 import net.sparktank.morrigan.model.tags.MediaTagClassification;
 import net.sparktank.morrigan.model.tags.MediaTagType;
 import net.sparktank.sqlitewrapper.DbException;
 
-public abstract class MediaItemDb<S extends MediaSqliteLayer2<T>, T extends IMediaItem> extends MediaItemList<T> implements IMediaItemDb<S,T> {
+public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends IMediaItem> extends MediaItemList<T> implements IMediaItemDb<S,T> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static final boolean HIDEMISSING = true; // TODO link this to GUI?
@@ -233,7 +234,7 @@ public abstract class MediaItemDb<S extends MediaSqliteLayer2<T>, T extends IMed
 		// Remove track.
 		int n = this.dbLayer.removeFile(track.getFilepath());
 		if (n != 1) {
-			n = this.dbLayer.removeFile(track.getDbRowId());
+			n = this.dbLayer.removeFile(track);
 			if (n != 1) {
 				throw new MorriganException("Failed to remove entry from DB by ROWID '"+track.getDbRowId()+"' '"+track.getFilepath()+"'.");
 			}

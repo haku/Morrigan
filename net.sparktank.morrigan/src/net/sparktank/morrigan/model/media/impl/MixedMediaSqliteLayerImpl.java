@@ -17,13 +17,13 @@ import net.sparktank.morrigan.model.db.impl.DbColumn;
 import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
 import net.sparktank.morrigan.model.db.interfaces.IDbItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
-import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaPicture;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
+import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMixedMediaStorageLayer.MediaType;
 import net.sparktank.sqlitewrapper.DbException;
 
-public class MixedMediaSqliteLayerImpl extends MediaSqliteLayer {
+public abstract class MixedMediaSqliteLayerImpl extends MediaSqliteLayer<IMixedMediaItem> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	protected MixedMediaSqliteLayerImpl (String dbFilePath) throws DbException {
