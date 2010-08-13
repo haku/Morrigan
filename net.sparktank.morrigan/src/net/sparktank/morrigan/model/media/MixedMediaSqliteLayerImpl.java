@@ -12,12 +12,9 @@ import java.util.Map;
 import net.sparktank.morrigan.helpers.GeneratedString;
 import net.sparktank.morrigan.model.DbColumn;
 import net.sparktank.morrigan.model.IDbItem;
-import net.sparktank.morrigan.model.MediaItem;
 import net.sparktank.morrigan.model.MediaSqliteLayer;
 import net.sparktank.morrigan.model.MediaSqliteLayer2.SortDirection;
 import net.sparktank.morrigan.model.media.IMixedMediaMetadataLayer.MediaType;
-import net.sparktank.morrigan.model.pictures.MediaPicture;
-import net.sparktank.morrigan.model.tracks.MediaTrack;
 import net.sparktank.sqlitewrapper.DbException;
 
 public class MixedMediaSqliteLayerImpl extends MediaSqliteLayer {
@@ -81,24 +78,30 @@ public class MixedMediaSqliteLayerImpl extends MediaSqliteLayer {
 	
 	private static final String _SQL_MEDIAFILES_SELECT =
 		"SELECT"
-		+ " ROWID, type, type_rowid, sfile, lmd5, dadded, dmodified, benabled, bmissing, sremloc"
+		+ " ROWID, type, sfile, lmd5, dadded, dmodified, benabled, bmissing, sremloc"
 		+ ",lstartcnt,lendcnt,dlastplay,lduration"
     	+ ",lwidth,lheight"
     	+ " FROM tbl_mediafiles";
 	
+	private static final String _SQL_MEDIAFILES_WHERE =
+		" WHERE";
+	
+	private static final String _SQL_MEDIAFILES_WHERTYPE =
+		" type=? AND";
+	
 	private static final String _SQL_MEDIAFILES_WHERENOTMISSING =
-		" WHERE (bmissing<>1 OR bmissing is NULL)";
+		" (bmissing<>1 OR bmissing is NULL)";
 	
 	private static final String _SQL_ORDERBYREPLACE =
 		" ORDER BY {COL} {DIR};";
 	
 	private static final String _SQL_MEDIAFILES_WHEREORDERSEARCH = 
-		" WHERE sfile LIKE ? ESCAPE ?"
+		" sfile LIKE ? ESCAPE ?"
 		+ " AND (bmissing<>1 OR bmissing is NULL) AND (benabled<>0 OR benabled is NULL)"
 		+ " ORDER BY dlastplay DESC, lendcnt DESC, lstartcnt DESC, sfile COLLATE NOCASE ASC;";
 	
 //	-  -  -  -  -  -  -  -  -  -  -  -
-//	MediaItem Queries.
+//	MediaMixedItem Queries.
 	
 	private static final String SQL_MEDIAFILES_Q_ALL =
 		_SQL_MEDIAFILES_SELECT
@@ -106,45 +109,29 @@ public class MixedMediaSqliteLayerImpl extends MediaSqliteLayer {
 	
 	private static final String SQL_MEDIAFILES_Q_NOTMISSING =
 		_SQL_MEDIAFILES_SELECT
-    	+ _SQL_MEDIAFILES_WHERENOTMISSING
+    	+ _SQL_MEDIAFILES_WHERE + _SQL_MEDIAFILES_WHERENOTMISSING
     	+ _SQL_ORDERBYREPLACE;
 	
 	private static final String SQL_MEDIAFILES_Q_SIMPLESEARCH =
 		_SQL_MEDIAFILES_SELECT
-		+ _SQL_MEDIAFILES_WHEREORDERSEARCH;
+		+ _SQL_MEDIAFILES_WHERE + _SQL_MEDIAFILES_WHEREORDERSEARCH;
+	
+//	-  -  -  -  -  -  -  -  -  -  -  -
+//	MediaMixedItem Queries - typed.
+	
+	private static final String SQL_MEDIAFILES_Q_ALL_T =
+		_SQL_MEDIAFILES_SELECT
+		+ _SQL_ORDERBYREPLACE;
+	
+	private static final String SQL_MEDIAFILES_Q_NOTMISSING_T =
+		_SQL_MEDIAFILES_SELECT
+		+ _SQL_MEDIAFILES_WHERE + _SQL_MEDIAFILES_WHERTYPE + _SQL_MEDIAFILES_WHERENOTMISSING
+		+ _SQL_ORDERBYREPLACE;
+	
+	private static final String SQL_MEDIAFILES_Q_SIMPLESEARCH_T =
+		_SQL_MEDIAFILES_SELECT
+		+ _SQL_MEDIAFILES_WHERE + _SQL_MEDIAFILES_WHERTYPE + _SQL_MEDIAFILES_WHEREORDERSEARCH;
 
-//	-  -  -  -  -  -  -  -  -  -  -  -
-//	MediaTrack Queries.
-	
-	private static final String SQL_MEDIATRACKS_Q_ALL =
-		_SQL_MEDIAFILES_SELECT
-		+ _SQL_ORDERBYREPLACE;
-	
-	private static final String SQL_MEDIATRACKS_Q_NOTMISSING =
-		_SQL_MEDIAFILES_SELECT
-    	+ _SQL_MEDIAFILES_WHERENOTMISSING
-    	+ _SQL_ORDERBYREPLACE;
-	
-	private static final String SQL_MEDIATRACKS_Q_SIMPLESEARCH =
-		_SQL_MEDIAFILES_SELECT
-		+ _SQL_MEDIAFILES_WHEREORDERSEARCH;
-	
-//	-  -  -  -  -  -  -  -  -  -  -  -
-//	MediaPic Queries.
-	
-	private static final String SQL_MEDIAPICS_Q_ALL =
-		_SQL_MEDIAFILES_SELECT
-		+ _SQL_ORDERBYREPLACE;
-	
-	private static final String SQL_MEDIAPICS_Q_NOTMISSING =
-		_SQL_MEDIAFILES_SELECT
-    	+ _SQL_MEDIAFILES_WHERENOTMISSING
-    	+ _SQL_ORDERBYREPLACE;
-	
-	private static final String SQL_MEDIAPICS_Q_SIMPLESEARCH =
-		_SQL_MEDIAFILES_SELECT
-		+ _SQL_MEDIAFILES_WHEREORDERSEARCH;
-	
 //	-  -  -  -  -  -  -  -  -  -  -  -
 //	Adding and removing tracks.
 	
@@ -268,11 +255,11 @@ public class MixedMediaSqliteLayerImpl extends MediaSqliteLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	MediaItem getters.
 	
-	protected List<MediaItem> local_updateListOfAllMedia (List<MediaItem> list, DbColumn sort, SortDirection direction, boolean hideMissing) throws SQLException, ClassNotFoundException {
-		String sql = local_getAllMediaSql(SQL_MEDIAFILES_Q_ALL, SQL_MEDIAFILES_Q_NOTMISSING, hideMissing, sort, direction);
+	protected List<IMediaMixedItem> local_updateListOfAllMedia (MediaType mediaType, List<IMediaMixedItem> list, DbColumn sort, SortDirection direction, boolean hideMissing) throws SQLException, ClassNotFoundException {
+		String sql = local_getAllMediaSql(SQL_MEDIAFILES_Q_ALL, SQL_MEDIAFILES_Q_NOTMISSING, SQL_MEDIAFILES_Q_ALL_T, SQL_MEDIAFILES_Q_NOTMISSING_T, mediaType, hideMissing, sort, direction);
 		ResultSet rs;
 		
-		List<MediaItem> ret;
+		List<IMediaMixedItem> ret;
 		PreparedStatement ps = getDbCon().prepareStatement(sql);
 		try {
 			rs = ps.executeQuery();
@@ -288,11 +275,11 @@ public class MixedMediaSqliteLayerImpl extends MediaSqliteLayer {
 		return ret;
 	}
 	
-	protected List<MediaItem> local_getAllMedia (DbColumn sort, SortDirection direction, boolean hideMissing) throws SQLException, ClassNotFoundException {
-		String sql = local_getAllMediaSql(SQL_MEDIAFILES_Q_ALL, SQL_MEDIAFILES_Q_NOTMISSING, hideMissing, sort, direction);
+	protected List<IMediaMixedItem> local_getAllMedia (MediaType mediaType, DbColumn sort, SortDirection direction, boolean hideMissing) throws SQLException, ClassNotFoundException {
+		String sql = local_getAllMediaSql(SQL_MEDIAFILES_Q_ALL, SQL_MEDIAFILES_Q_NOTMISSING, SQL_MEDIAFILES_Q_ALL_T, SQL_MEDIAFILES_Q_NOTMISSING_T, mediaType, hideMissing, sort, direction);
 		ResultSet rs;
 		
-		List<MediaItem> ret;
+		List<IMediaMixedItem> ret;
 		PreparedStatement ps = getDbCon().prepareStatement(sql);
 		try {
 			rs = ps.executeQuery();
@@ -308,15 +295,30 @@ public class MixedMediaSqliteLayerImpl extends MediaSqliteLayer {
 		return ret;
 	}
 	
-	protected List<MediaItem> local_simpleSearch (String term, String esc, int maxResults) throws SQLException, ClassNotFoundException {
+	protected List<IMediaMixedItem> local_simpleSearch (MediaType mediaType, String term, String esc, int maxResults) throws SQLException, ClassNotFoundException {
 		PreparedStatement ps;
 		ResultSet rs;
-		List<MediaItem> ret;
+		List<IMediaMixedItem> ret;
 		
-		ps = getDbCon().prepareStatement(SQL_MEDIAFILES_Q_SIMPLESEARCH);
+		String sql;
+		if (mediaType == MediaType.UNKNOWN) {
+			sql = SQL_MEDIAFILES_Q_SIMPLESEARCH;
+		} else {
+			sql = SQL_MEDIAFILES_Q_SIMPLESEARCH_T;
+		}
+		
+		ps = getDbCon().prepareStatement(sql);
+		
 		try {
-			ps.setString(1, "%" + term + "%");
-			ps.setString(2, esc);
+			if (mediaType == MediaType.UNKNOWN) {
+				ps.setString(1, "%" + term + "%");
+				ps.setString(2, esc);
+			}
+			else {
+				ps.setInt(1, mediaType.getN());
+				ps.setString(2, "%" + term + "%");
+				ps.setString(3, esc);
+			}
 			
 			if (maxResults > 0) {
 				ps.setMaxRows(maxResults);
@@ -334,17 +336,6 @@ public class MixedMediaSqliteLayerImpl extends MediaSqliteLayer {
 		
 		return ret;
 	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	MediaTrack getters.
-	
-//	TODO
-	
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	MediaPicture getters.
-	
-//	TODO
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Media adders and removers.
@@ -629,13 +620,25 @@ public class MixedMediaSqliteLayerImpl extends MediaSqliteLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	MediaItem getters.
 	
-	static private String local_getAllMediaSql (String sqlAll, String sqlNotMissing, boolean hideMissing, DbColumn sort, SortDirection direction) {
+	static private String local_getAllMediaSql (
+			String sqlAll, String sqlNotMissing, String sqlAllT, String sqlNotMissingT,
+			MediaType mediaType, boolean hideMissing, DbColumn sort, SortDirection direction) {
+		
 		String sql;
 		
-		if (hideMissing) {
-			sql = sqlNotMissing;
-		} else {
-			sql = sqlAll;
+		if (mediaType == MediaType.UNKNOWN) {
+			if (hideMissing) {
+				sql = sqlNotMissing;
+			} else {
+				sql = sqlAll;
+			}
+		}
+		else {
+			if (hideMissing) {
+				sql = sqlNotMissingT;
+			} else {
+				sql = sqlAllT;
+			}
 		}
 		
 		switch (direction) {
@@ -661,12 +664,12 @@ public class MixedMediaSqliteLayerImpl extends MediaSqliteLayer {
 		return sql;
 	}
 	
-	static private List<MediaItem> local_parseAndUpdateFromRecordSet (List<MediaItem> list, ResultSet rs) throws SQLException {
-		List<MediaItem> finalList = new ArrayList<MediaItem>();
+	static private List<IMediaMixedItem> local_parseAndUpdateFromRecordSet (List<IMediaMixedItem> list, ResultSet rs) throws SQLException {
+		List<IMediaMixedItem> finalList = new ArrayList<IMediaMixedItem>();
 		
 		// Build a HashMap of existing items to make lookup a lot faster.
-		Map<String, MediaItem> keepMap = new HashMap<String, MediaItem>(list.size());
-		for (MediaItem e : list) {
+		Map<String, IMediaMixedItem> keepMap = new HashMap<String, IMediaMixedItem>(list.size());
+		for (IMediaMixedItem e : list) {
 			keepMap.put(e.getFilepath(), e);
 		}
 		
@@ -674,8 +677,8 @@ public class MixedMediaSqliteLayerImpl extends MediaSqliteLayer {
 		 * create new list as we go. 
 		 */
 		while (rs.next()) {
-			MediaItem newItem = createMediaItem(rs);
-			MediaItem oldItem = keepMap.get(newItem.getFilepath());
+			IMediaMixedItem newItem = createMediaItem(rs);
+			IMediaMixedItem oldItem = keepMap.get(newItem.getFilepath());
 			if (oldItem != null) {
 				oldItem.setFromMediaItem(newItem);
 				finalList.add(oldItem);
@@ -687,29 +690,29 @@ public class MixedMediaSqliteLayerImpl extends MediaSqliteLayer {
 		return finalList;
 	}
 	
-	static private List<MediaItem> local_parseRecordSet (ResultSet rs) throws SQLException {
-		List<MediaItem> ret = new ArrayList<MediaItem>();
+	static private List<IMediaMixedItem> local_parseRecordSet (ResultSet rs) throws SQLException {
+		List<IMediaMixedItem> ret = new ArrayList<IMediaMixedItem>();
 		
 		while (rs.next()) {
-			MediaItem mi = createMediaItem(rs);
+			IMediaMixedItem mi = createMediaItem(rs);
 			ret.add(mi);
 		}
 		
 		return ret;
 	}
 	
-	static protected MediaItem createMediaItem (ResultSet rs) throws SQLException {
+	static protected IMediaMixedItem createMediaItem (ResultSet rs) throws SQLException {
 		int i = rs.getInt(SQL_TBL_MEDIAFILES_COL_TYPE.getName());
 		MediaType t = MediaType.parseInt(i);
-		MediaItem mi;
+		IMediaMixedItem mi = new MediaMixedItem();
 		
 		switch (t) {
 			case TRACK:
-				mi = createMediaTrack(rs);
+				readMediaTrack(rs, mi);
 				break;
 			
 			case PICTURE:
-				mi = createMediaPic(rs);
+				readMediaPic(rs, mi);
 				break;
 			
 			case UNKNOWN:
@@ -721,29 +724,23 @@ public class MixedMediaSqliteLayerImpl extends MediaSqliteLayer {
 		return mi;
 	}
 	
-	static protected MediaTrack createMediaTrack (ResultSet rs) throws SQLException {
-		MediaTrack mt = new MediaTrack();
-		createMediaItem(mt, rs);
+	static protected void readMediaTrack (ResultSet rs, IMediaTrack mi) throws SQLException {
+		readMediaItem(rs, mi);
 		
-		mt.setStartCount(rs.getLong(SQL_TBL_MEDIAFILES_COL_STARTCNT.getName()));
-		mt.setEndCount(rs.getLong(SQL_TBL_MEDIAFILES_COL_ENDCNT.getName()));
-		mt.setDuration(rs.getInt(SQL_TBL_MEDIAFILES_COL_DURATION.getName()));
-		mt.setDateLastPlayed(SqliteHelper.readDate(rs, SQL_TBL_MEDIAFILES_COL_DLASTPLAY.getName()));
-		
-		return mt;
+		mi.setStartCount(rs.getLong(SQL_TBL_MEDIAFILES_COL_STARTCNT.getName()));
+		mi.setEndCount(rs.getLong(SQL_TBL_MEDIAFILES_COL_ENDCNT.getName()));
+		mi.setDuration(rs.getInt(SQL_TBL_MEDIAFILES_COL_DURATION.getName()));
+		mi.setDateLastPlayed(SqliteHelper.readDate(rs, SQL_TBL_MEDIAFILES_COL_DLASTPLAY.getName()));
 	}
 	
-	static protected MediaPicture createMediaPic (ResultSet rs) throws SQLException {
-		MediaPicture mp = new MediaPicture();
-		createMediaItem(mp, rs);
+	static protected void readMediaPic (ResultSet rs, IMediaPicture mi) throws SQLException {
+		readMediaItem(rs, mi);
 		
-		mp.setWidth(rs.getInt(SQL_TBL_MEDIAFILES_COL_WIDTH.getName()));
-		mp.setHeight(rs.getInt(SQL_TBL_MEDIAFILES_COL_HEIGHT.getName()));
-		
-		return mp;
+		mi.setWidth(rs.getInt(SQL_TBL_MEDIAFILES_COL_WIDTH.getName()));
+		mi.setHeight(rs.getInt(SQL_TBL_MEDIAFILES_COL_HEIGHT.getName()));
 	}
 	
-	static protected MediaItem createMediaItem (MediaItem mi, ResultSet rs) throws SQLException {
+	static protected void readMediaItem (ResultSet rs, IMediaItem mi) throws SQLException {
 		mi.setFilepath(rs.getString(SQL_TBL_MEDIAFILES_COL_FILE.getName()));
 		mi.setDateAdded(SqliteHelper.readDate(rs, SQL_TBL_MEDIAFILES_COL_DADDED.getName()));
 		mi.setHashcode(rs.getLong(SQL_TBL_MEDIAFILES_COL_HASHCODE.getName()));
@@ -752,8 +749,6 @@ public class MixedMediaSqliteLayerImpl extends MediaSqliteLayer {
 		mi.setMissing(rs.getInt(SQL_TBL_MEDIAFILES_COL_MISSING.getName()) == 1); // default to false.
 		mi.setDbRowId(rs.getLong(SQL_TBL_MEDIAFILES_COL_ROWID.getName()));
 		mi.setRemoteLocation(rs.getString(SQL_TBL_MEDIAFILES_COL_REMLOC.getName()));
-		
-		return mi;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
