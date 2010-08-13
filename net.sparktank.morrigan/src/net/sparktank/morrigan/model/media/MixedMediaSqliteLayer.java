@@ -4,12 +4,35 @@ import java.io.File;
 import java.util.Date;
 import java.util.List;
 
+import net.sparktank.morrigan.helpers.RecyclingFactory;
 import net.sparktank.morrigan.model.DbColumn;
 import net.sparktank.morrigan.model.IDbItem;
 import net.sparktank.morrigan.model.MediaSqliteLayer2.SortDirection;
 import net.sparktank.sqlitewrapper.DbException;
 
 public class MixedMediaSqliteLayer extends MixedMediaSqliteLayerImpl implements IMixedMediaStorageLayer {
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	public static class MixedMediaSqliteLayerFactory extends RecyclingFactory<IMixedMediaStorageLayer, String, Void, DbException> {
+		
+		MixedMediaSqliteLayerFactory() {
+			super(true);
+		}
+		
+		@Override
+		protected boolean isValidProduct(IMixedMediaStorageLayer product) {
+			return true;
+		}
+		
+		@Override
+		protected IMixedMediaStorageLayer makeNewProduct(String material) throws DbException {
+			return new MixedMediaSqliteLayer(material);
+		}
+		
+	}
+	
+	public static final MixedMediaSqliteLayerFactory FACTORY = new MixedMediaSqliteLayerFactory();
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors.
 	
