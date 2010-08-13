@@ -15,7 +15,7 @@ import net.sparktank.morrigan.model.MediaSqliteLayer;
 import net.sparktank.morrigan.model.MediaSqliteLayer2.SortDirection;
 import net.sparktank.morrigan.model.media.interfaces.IDbItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
-import net.sparktank.morrigan.model.media.interfaces.IMediaMixedItem;
+import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaPicture;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
 import net.sparktank.morrigan.model.media.interfaces.IMixedMediaStorageLayer.MediaType;
@@ -258,11 +258,11 @@ public class MixedMediaSqliteLayerImpl extends MediaSqliteLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	MediaItem getters.
 	
-	protected List<IMediaMixedItem> local_getAllMedia (MediaType mediaType, DbColumn sort, SortDirection direction, boolean hideMissing) throws SQLException, ClassNotFoundException {
+	protected List<IMixedMediaItem> local_getAllMedia (MediaType mediaType, DbColumn sort, SortDirection direction, boolean hideMissing) throws SQLException, ClassNotFoundException {
 		String sql = local_getAllMediaSql(SQL_MEDIAFILES_Q_ALL, SQL_MEDIAFILES_Q_NOTMISSING, SQL_MEDIAFILES_Q_ALL_T, SQL_MEDIAFILES_Q_NOTMISSING_T, mediaType, hideMissing, sort, direction);
 		ResultSet rs;
 		
-		List<IMediaMixedItem> ret;
+		List<IMixedMediaItem> ret;
 		PreparedStatement ps = getDbCon().prepareStatement(sql);
 		try {
 			rs = ps.executeQuery();
@@ -278,11 +278,11 @@ public class MixedMediaSqliteLayerImpl extends MediaSqliteLayer {
 		return ret;
 	}
 	
-	protected List<IMediaMixedItem> local_updateListOfAllMedia (MediaType mediaType, List<IMediaMixedItem> list, DbColumn sort, SortDirection direction, boolean hideMissing) throws SQLException, ClassNotFoundException {
+	protected List<IMixedMediaItem> local_updateListOfAllMedia (MediaType mediaType, List<IMixedMediaItem> list, DbColumn sort, SortDirection direction, boolean hideMissing) throws SQLException, ClassNotFoundException {
 		String sql = local_getAllMediaSql(SQL_MEDIAFILES_Q_ALL, SQL_MEDIAFILES_Q_NOTMISSING, SQL_MEDIAFILES_Q_ALL_T, SQL_MEDIAFILES_Q_NOTMISSING_T, mediaType, hideMissing, sort, direction);
 		ResultSet rs;
 		
-		List<IMediaMixedItem> ret;
+		List<IMixedMediaItem> ret;
 		PreparedStatement ps = getDbCon().prepareStatement(sql);
 		try {
 			rs = ps.executeQuery();
@@ -298,10 +298,10 @@ public class MixedMediaSqliteLayerImpl extends MediaSqliteLayer {
 		return ret;
 	}
 	
-	protected List<IMediaMixedItem> local_simpleSearch (MediaType mediaType, String term, String esc, int maxResults) throws SQLException, ClassNotFoundException {
+	protected List<IMixedMediaItem> local_simpleSearch (MediaType mediaType, String term, String esc, int maxResults) throws SQLException, ClassNotFoundException {
 		PreparedStatement ps;
 		ResultSet rs;
-		List<IMediaMixedItem> ret;
+		List<IMixedMediaItem> ret;
 		
 		String sql;
 		if (mediaType == MediaType.UNKNOWN) {
@@ -667,12 +667,12 @@ public class MixedMediaSqliteLayerImpl extends MediaSqliteLayer {
 		return sql;
 	}
 	
-	static private List<IMediaMixedItem> local_parseAndUpdateFromRecordSet (List<IMediaMixedItem> list, ResultSet rs) throws SQLException {
-		List<IMediaMixedItem> finalList = new ArrayList<IMediaMixedItem>();
+	static private List<IMixedMediaItem> local_parseAndUpdateFromRecordSet (List<IMixedMediaItem> list, ResultSet rs) throws SQLException {
+		List<IMixedMediaItem> finalList = new ArrayList<IMixedMediaItem>();
 		
 		// Build a HashMap of existing items to make lookup a lot faster.
-		Map<String, IMediaMixedItem> keepMap = new HashMap<String, IMediaMixedItem>(list.size());
-		for (IMediaMixedItem e : list) {
+		Map<String, IMixedMediaItem> keepMap = new HashMap<String, IMixedMediaItem>(list.size());
+		for (IMixedMediaItem e : list) {
 			keepMap.put(e.getFilepath(), e);
 		}
 		
@@ -680,8 +680,8 @@ public class MixedMediaSqliteLayerImpl extends MediaSqliteLayer {
 		 * create new list as we go. 
 		 */
 		while (rs.next()) {
-			IMediaMixedItem newItem = createMediaItem(rs);
-			IMediaMixedItem oldItem = keepMap.get(newItem.getFilepath());
+			IMixedMediaItem newItem = createMediaItem(rs);
+			IMixedMediaItem oldItem = keepMap.get(newItem.getFilepath());
 			if (oldItem != null) {
 				oldItem.setFromMediaItem(newItem);
 				finalList.add(oldItem);
@@ -693,21 +693,21 @@ public class MixedMediaSqliteLayerImpl extends MediaSqliteLayer {
 		return finalList;
 	}
 	
-	static private List<IMediaMixedItem> local_parseRecordSet (ResultSet rs) throws SQLException {
-		List<IMediaMixedItem> ret = new ArrayList<IMediaMixedItem>();
+	static private List<IMixedMediaItem> local_parseRecordSet (ResultSet rs) throws SQLException {
+		List<IMixedMediaItem> ret = new ArrayList<IMixedMediaItem>();
 		
 		while (rs.next()) {
-			IMediaMixedItem mi = createMediaItem(rs);
+			IMixedMediaItem mi = createMediaItem(rs);
 			ret.add(mi);
 		}
 		
 		return ret;
 	}
 	
-	static protected IMediaMixedItem createMediaItem (ResultSet rs) throws SQLException {
+	static protected IMixedMediaItem createMediaItem (ResultSet rs) throws SQLException {
 		int i = rs.getInt(SQL_TBL_MEDIAFILES_COL_TYPE.getName());
 		MediaType t = MediaType.parseInt(i);
-		IMediaMixedItem mi = new MediaMixedItem();
+		IMixedMediaItem mi = new MediaMixedItem();
 		
 		switch (t) {
 			case TRACK:
