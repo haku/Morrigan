@@ -7,9 +7,10 @@ import java.util.List;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.MediaSqliteLayer2.SortDirection;
+import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
+import net.sparktank.morrigan.model.db.interfaces.IDbItem;
 import net.sparktank.morrigan.model.media.impl.MediaItem;
 import net.sparktank.morrigan.model.media.impl.MediaItemList;
-import net.sparktank.morrigan.model.media.interfaces.IDbItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemList;
 import net.sparktank.morrigan.model.tags.MediaTag;
 import net.sparktank.morrigan.model.tags.MediaTagClassification;
@@ -22,7 +23,7 @@ public abstract class MediaItemDb<Q extends IMediaItemList<T>, S extends MediaSq
 	public static final boolean HIDEMISSING = true; // TODO link this to GUI?
 	
 	private S dbLayer;
-	private DbColumn librarySort;
+	private IDbColumn librarySort;
 	private SortDirection librarySortDirection;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -159,7 +160,7 @@ public abstract class MediaItemDb<Q extends IMediaItemList<T>, S extends MediaSq
 //	Sorting.
 	
 	@Override
-	public DbColumn getSort () {
+	public IDbColumn getSort () {
 		return this.librarySort;
 	}
 	
@@ -169,7 +170,7 @@ public abstract class MediaItemDb<Q extends IMediaItemList<T>, S extends MediaSq
 	}
 	
 	@Override
-	public void setSort (DbColumn sort, SortDirection direction) throws MorriganException {
+	public void setSort (IDbColumn sort, SortDirection direction) throws MorriganException {
 		this.librarySort = sort;
 		this.librarySortDirection = direction;
 		updateRead();
@@ -178,7 +179,7 @@ public abstract class MediaItemDb<Q extends IMediaItemList<T>, S extends MediaSq
 	
 	private List<SortChangeListener> _sortChangeListeners = new ArrayList<SortChangeListener>();
 	
-	private void callSortChangedListeners (DbColumn sort, SortDirection direction) {
+	private void callSortChangedListeners (IDbColumn sort, SortDirection direction) {
 		for (SortChangeListener l : this._sortChangeListeners) {
 			l.sortChanged(sort, direction);
 		}

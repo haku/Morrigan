@@ -1,8 +1,8 @@
 package net.sparktank.morrigan.gui.editors;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
-import net.sparktank.morrigan.model.DbColumn;
 import net.sparktank.morrigan.model.MediaSqliteLayer2.SortDirection;
+import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
 import net.sparktank.morrigan.model.pictures.MediaPictureListFactory;
 import net.sparktank.morrigan.model.pictures.gallery.LocalGallery;
 import net.sparktank.morrigan.model.tracks.MediaTrackListFactory;
@@ -96,7 +96,7 @@ public class EditorFactory implements IElementFactory {
 		String sortdir = memento.getString(KEY_LIB_SORTDIR);
 		if (sortcol != null && sortdir != null) {
 			try {
-				DbColumn ls = LibrarySqliteLayer2.parseColumnFromName(sortcol);
+				IDbColumn ls = LibrarySqliteLayer2.parseColumnFromName(sortcol);
 				SortDirection lsd = SortDirection.valueOf(sortdir);
 				input.getMediaList().setSort(ls, lsd);
 			} catch (Exception e) {
@@ -115,7 +115,7 @@ public class EditorFactory implements IElementFactory {
 		String sortdir = memento.getString(KEY_LIB_SORTDIR);
 		if (sortcol != null && sortdir != null) {
 			try {
-				DbColumn ls = LibrarySqliteLayer2.parseColumnFromName(sortcol);
+				IDbColumn ls = LibrarySqliteLayer2.parseColumnFromName(sortcol);
 				SortDirection lsd = SortDirection.valueOf(sortdir);
 				input.getMediaList().setSort(ls, lsd);
 			} catch (Exception e) {

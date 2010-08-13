@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 
 import net.sparktank.morrigan.helpers.GeneratedString;
+import net.sparktank.morrigan.model.db.impl.DbColumn;
+import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
 import net.sparktank.sqlitewrapper.DbException;
 
@@ -39,7 +41,7 @@ public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqlit
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	DB readers.
 	
-	public List<T> updateListOfAllMedia (List<T> list, DbColumn sort, SortDirection direction, boolean hideMissing) throws DbException {
+	public List<T> updateListOfAllMedia (List<T> list, IDbColumn sort, SortDirection direction, boolean hideMissing) throws DbException {
 		try {
 			return local_updateListOfAllMedia(list, sort, direction, hideMissing);
 		} catch (Exception e) {
@@ -47,7 +49,7 @@ public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqlit
 		}
 	}
 	
-	public List<T> getAllMedia (DbColumn sort, SortDirection direction, boolean hideMissing) throws DbException {
+	public List<T> getAllMedia (IDbColumn sort, SortDirection direction, boolean hideMissing) throws DbException {
 		try {
 			return local_getAllMedia(sort, direction, hideMissing);
 		} catch (Exception e) {
@@ -169,7 +171,7 @@ public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqlit
 	private static final String SQL_TBL_MEDIAFILES_EXISTS = 
 		"SELECT name FROM sqlite_master WHERE name='tbl_mediafiles';";
 	
-	public static final DbColumn SQL_TBL_MEDIAFILES_COL_ROWID     = new DbColumn("ROWID", null, null, null);
+	public static final IDbColumn SQL_TBL_MEDIAFILES_COL_ROWID     = new DbColumn("ROWID", null, null, null);
 	public static final DbColumn SQL_TBL_MEDIAFILES_COL_FILE      = new DbColumn("sfile",     "file path",     "VARCHAR(1000) not null collate nocase primary key", "?", " collate nocase");
 	public static final DbColumn SQL_TBL_MEDIAFILES_COL_HASHCODE  = new DbColumn("lmd5",      "hashcode",      "BIGINT",   null);
 	public static final DbColumn SQL_TBL_MEDIAFILES_COL_DADDED    = new DbColumn("dadded",    "date added",    "DATETIME", "?");
@@ -188,8 +190,8 @@ public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqlit
 		SQL_TBL_MEDIAFILES_COL_REMLOC
 		};
 	
-	static public DbColumn parseColumnFromName (String name) {
-		for (DbColumn c : SQL_TBL_MEDIAFILES_COLS) {
+	static public IDbColumn parseColumnFromName (String name) {
+		for (IDbColumn c : SQL_TBL_MEDIAFILES_COLS) {
 			if (c.getName().equals(name)) {
 				return c;
 			}
@@ -212,7 +214,7 @@ public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqlit
 		sb.append("create table tbl_mediafiles(");
 		
 		boolean first = true;
-		for (DbColumn c : ef) {
+		for (IDbColumn c : ef) {
 			if (first) {
 				first = false;
 			} else {
@@ -253,7 +255,7 @@ public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqlit
     		List<DbColumn> ef = getSqlTblMediaFilesColumns();
     		
     		boolean first = true;
-    		for (DbColumn c : ef) {
+    		for (IDbColumn c : ef) {
     			if (first) {
     				first = false;
     			} else {
@@ -311,7 +313,7 @@ public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqlit
     		
     		sb.append("INSERT INTO tbl_mediafiles (");
     		boolean first = true;
-    		for (DbColumn c : ef) {
+    		for (IDbColumn c : ef) {
     			if (c.getDefaultValue() != null) {
     				if (first) {
         				first = false;
@@ -323,7 +325,7 @@ public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqlit
     		}
     		sb.append(") VALUES (");
     		first = true;
-    		for (DbColumn c : ef) {
+    		for (IDbColumn c : ef) {
     			if (c.getDefaultValue() != null) {
     				if (first) {
         				first = false;
@@ -376,7 +378,7 @@ public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqlit
 	
 	private SimpleDateFormat SQL_DATE = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
-	private List<T> local_updateListOfAllMedia (List<T> list, DbColumn sort, SortDirection direction, boolean hideMissing) throws SQLException, ClassNotFoundException {
+	private List<T> local_updateListOfAllMedia (List<T> list, IDbColumn sort, SortDirection direction, boolean hideMissing) throws SQLException, ClassNotFoundException {
 		String sql = local_getAllMediaSql(sort, direction, hideMissing);
 		ResultSet rs;
 		
@@ -396,7 +398,7 @@ public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqlit
 		return ret;
 	}
 	
-	private List<T> local_getAllMedia (DbColumn sort, SortDirection direction, boolean hideMissing) throws SQLException, ClassNotFoundException {
+	private List<T> local_getAllMedia (IDbColumn sort, SortDirection direction, boolean hideMissing) throws SQLException, ClassNotFoundException {
 		String sql = local_getAllMediaSql(sort, direction, hideMissing);
 		ResultSet rs;
 		
@@ -416,7 +418,7 @@ public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqlit
 		return ret;
 	}
 	
-	private String local_getAllMediaSql (DbColumn sort, SortDirection direction, boolean hideMissing) {
+	private String local_getAllMediaSql (IDbColumn sort, SortDirection direction, boolean hideMissing) {
 		String sql;
 		
 		if (hideMissing) {

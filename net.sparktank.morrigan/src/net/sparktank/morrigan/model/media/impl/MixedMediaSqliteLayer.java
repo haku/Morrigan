@@ -5,9 +5,9 @@ import java.util.Date;
 import java.util.List;
 
 import net.sparktank.morrigan.helpers.RecyclingFactory;
-import net.sparktank.morrigan.model.DbColumn;
 import net.sparktank.morrigan.model.MediaSqliteLayer2.SortDirection;
-import net.sparktank.morrigan.model.media.interfaces.IDbItem;
+import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
+import net.sparktank.morrigan.model.db.interfaces.IDbItem;
 import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMixedMediaStorageLayer;
 import net.sparktank.sqlitewrapper.DbException;
@@ -46,7 +46,7 @@ public class MixedMediaSqliteLayer extends MixedMediaSqliteLayerImpl implements 
 //	Read methods for IMediaMixedItem.
 	
 	@Override
-	public List<IMixedMediaItem> getAllMedia(MediaType mediaType, DbColumn sort, SortDirection direction, boolean hideMissing) throws DbException {
+	public List<IMixedMediaItem> getAllMedia(MediaType mediaType, IDbColumn sort, SortDirection direction, boolean hideMissing) throws DbException {
 		try {
 			return local_getAllMedia(mediaType, sort, direction, hideMissing);
 		} catch (Exception e) {
@@ -55,7 +55,7 @@ public class MixedMediaSqliteLayer extends MixedMediaSqliteLayerImpl implements 
 	}
 	
 	@Override
-	public List<IMixedMediaItem> updateListOfAllMedia(MediaType mediaType, List<IMixedMediaItem> list, DbColumn sort, SortDirection direction, boolean hideMissing) throws DbException {
+	public List<IMixedMediaItem> updateListOfAllMedia(MediaType mediaType, List<IMixedMediaItem> list, IDbColumn sort, SortDirection direction, boolean hideMissing) throws DbException {
 		try {
 			return local_updateListOfAllMedia(mediaType, list, sort, direction, hideMissing);
 		} catch (Exception e) {

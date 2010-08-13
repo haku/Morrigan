@@ -10,10 +10,12 @@ import java.util.List;
 import java.util.Map;
 
 import net.sparktank.morrigan.helpers.GeneratedString;
-import net.sparktank.morrigan.model.DbColumn;
 import net.sparktank.morrigan.model.MediaSqliteLayer;
 import net.sparktank.morrigan.model.MediaSqliteLayer2.SortDirection;
-import net.sparktank.morrigan.model.media.interfaces.IDbItem;
+import net.sparktank.morrigan.model.db.SqliteHelper;
+import net.sparktank.morrigan.model.db.impl.DbColumn;
+import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
+import net.sparktank.morrigan.model.db.interfaces.IDbItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaPicture;
@@ -36,7 +38,7 @@ public class MixedMediaSqliteLayerImpl extends MediaSqliteLayer {
 	
 	public static final String SQL_TBL_MEDIAFILES_NAME = "tbl_mediafiles";
 	
-	public static final DbColumn SQL_TBL_MEDIAFILES_COL_ROWID     = new DbColumn("ROWID", null, null, null);
+	public static final IDbColumn SQL_TBL_MEDIAFILES_COL_ROWID     = new DbColumn("ROWID", null, null, null);
 	public static final DbColumn SQL_TBL_MEDIAFILES_COL_TYPE      = new DbColumn("type",       "type",          "INT",      "?");
 	public static final DbColumn SQL_TBL_MEDIAFILES_COL_FILE      = new DbColumn("sfile",      "file path",     "VARCHAR(1000) not null collate nocase primary key", "?", " collate nocase");
 	public static final DbColumn SQL_TBL_MEDIAFILES_COL_HASHCODE  = new DbColumn("lmd5",       "hashcode",      "BIGINT",   null);
@@ -146,11 +148,11 @@ public class MixedMediaSqliteLayerImpl extends MediaSqliteLayer {
 		@Override
 		public String generateString() {
 			StringBuilder sb = new StringBuilder();
-    		DbColumn[] cols = SQL_TBL_MEDIAFILES_COLS;
+    		IDbColumn[] cols = SQL_TBL_MEDIAFILES_COLS;
     		
     		sb.append("INSERT INTO tbl_mediafiles (");
     		boolean first = true;
-    		for (DbColumn c : cols) {
+    		for (IDbColumn c : cols) {
     			if (c.getDefaultValue() != null) {
     				if (first) {
         				first = false;
@@ -162,7 +164,7 @@ public class MixedMediaSqliteLayerImpl extends MediaSqliteLayer {
     		}
     		sb.append(") VALUES (");
     		first = true;
-    		for (DbColumn c : cols) {
+    		for (IDbColumn c : cols) {
     			if (c.getDefaultValue() != null) {
     				if (first) {
         				first = false;
@@ -258,7 +260,7 @@ public class MixedMediaSqliteLayerImpl extends MediaSqliteLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	MediaItem getters.
 	
-	protected List<IMixedMediaItem> local_getAllMedia (MediaType mediaType, DbColumn sort, SortDirection direction, boolean hideMissing) throws SQLException, ClassNotFoundException {
+	protected List<IMixedMediaItem> local_getAllMedia (MediaType mediaType, IDbColumn sort, SortDirection direction, boolean hideMissing) throws SQLException, ClassNotFoundException {
 		String sql = local_getAllMediaSql(SQL_MEDIAFILES_Q_ALL, SQL_MEDIAFILES_Q_NOTMISSING, SQL_MEDIAFILES_Q_ALL_T, SQL_MEDIAFILES_Q_NOTMISSING_T, mediaType, hideMissing, sort, direction);
 		ResultSet rs;
 		
@@ -278,7 +280,7 @@ public class MixedMediaSqliteLayerImpl extends MediaSqliteLayer {
 		return ret;
 	}
 	
-	protected List<IMixedMediaItem> local_updateListOfAllMedia (MediaType mediaType, List<IMixedMediaItem> list, DbColumn sort, SortDirection direction, boolean hideMissing) throws SQLException, ClassNotFoundException {
+	protected List<IMixedMediaItem> local_updateListOfAllMedia (MediaType mediaType, List<IMixedMediaItem> list, IDbColumn sort, SortDirection direction, boolean hideMissing) throws SQLException, ClassNotFoundException {
 		String sql = local_getAllMediaSql(SQL_MEDIAFILES_Q_ALL, SQL_MEDIAFILES_Q_NOTMISSING, SQL_MEDIAFILES_Q_ALL_T, SQL_MEDIAFILES_Q_NOTMISSING_T, mediaType, hideMissing, sort, direction);
 		ResultSet rs;
 		
@@ -625,7 +627,7 @@ public class MixedMediaSqliteLayerImpl extends MediaSqliteLayer {
 	
 	static private String local_getAllMediaSql (
 			String sqlAll, String sqlNotMissing, String sqlAllT, String sqlNotMissingT,
-			MediaType mediaType, boolean hideMissing, DbColumn sort, SortDirection direction) {
+			MediaType mediaType, boolean hideMissing, IDbColumn sort, SortDirection direction) {
 		
 		String sql;
 		

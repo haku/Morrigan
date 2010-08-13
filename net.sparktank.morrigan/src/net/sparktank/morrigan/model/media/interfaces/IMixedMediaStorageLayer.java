@@ -4,8 +4,9 @@ import java.io.File;
 import java.util.Date;
 import java.util.List;
 
-import net.sparktank.morrigan.model.DbColumn;
 import net.sparktank.morrigan.model.MediaSqliteLayer2.SortDirection;
+import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
+import net.sparktank.morrigan.model.db.interfaces.IDbItem;
 import net.sparktank.sqlitewrapper.DbException;
 
 public interface IMixedMediaStorageLayer {
@@ -39,8 +40,8 @@ public interface IMixedMediaStorageLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Read methods.
 	
-	public List<IMixedMediaItem> getAllMedia (MediaType mediaType, DbColumn sort, SortDirection direction, boolean hideMissing) throws DbException;
-	public List<IMixedMediaItem> updateListOfAllMedia (MediaType mediaType, List<IMixedMediaItem> list, DbColumn sort, SortDirection direction, boolean hideMissing) throws DbException;
+	public List<IMixedMediaItem> getAllMedia (MediaType mediaType, IDbColumn sort, SortDirection direction, boolean hideMissing) throws DbException;
+	public List<IMixedMediaItem> updateListOfAllMedia (MediaType mediaType, List<IMixedMediaItem> list, IDbColumn sort, SortDirection direction, boolean hideMissing) throws DbException;
 	public List<IMixedMediaItem> simpleSearchMedia (MediaType mediaType, String term, String esc, int maxResults) throws DbException;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

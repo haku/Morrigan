@@ -6,8 +6,9 @@ import java.sql.SQLException;
 import java.util.List;
 
 import net.sparktank.morrigan.helpers.RecyclingFactory;
-import net.sparktank.morrigan.model.DbColumn;
 import net.sparktank.morrigan.model.MediaSqliteLayer2;
+import net.sparktank.morrigan.model.db.impl.DbColumn;
+import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
 import net.sparktank.morrigan.model.pictures.MediaPicture;
 import net.sparktank.sqlitewrapper.DbException;
 
@@ -63,13 +64,13 @@ public class GallerySqliteLayer extends MediaSqliteLayer2<MediaPicture> {
 		SQL_TBL_MEDIAFILES_COL_HEIGHT,
 		};
 	
-	static public DbColumn parseColumnFromName (String name) {
-		for (DbColumn c : SQL_TBL_MEDIAFILES_COLS) {
+	static public IDbColumn parseColumnFromName (String name) {
+		for (IDbColumn c : SQL_TBL_MEDIAFILES_COLS) {
 			if (c.getName().equals(name)) {
 				return c;
 			}
 		}
-		for (DbColumn c : SQL_TBL_MEDIAFILES_COLS2) {
+		for (IDbColumn c : SQL_TBL_MEDIAFILES_COLS2) {
 			if (c.getName().equals(name)) {
 				return c;
 			}

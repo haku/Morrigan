@@ -11,10 +11,11 @@ import net.sparktank.morrigan.gui.display.DropMenuListener;
 import net.sparktank.morrigan.gui.editors.IMediaItemDbEditor;
 import net.sparktank.morrigan.gui.editors.MediaColumn;
 import net.sparktank.morrigan.helpers.TimeHelper;
-import net.sparktank.morrigan.model.DbColumn;
 import net.sparktank.morrigan.model.IMediaItemDb.SortChangeListener;
 import net.sparktank.morrigan.model.MediaSqliteLayer2;
 import net.sparktank.morrigan.model.MediaSqliteLayer2.SortDirection;
+import net.sparktank.morrigan.model.db.impl.DbColumn;
+import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
 import net.sparktank.morrigan.model.pictures.MediaPicture;
 import net.sparktank.morrigan.model.pictures.gallery.AbstractGallery;
 
@@ -93,7 +94,7 @@ public abstract class AbstractGalleryEditor<T extends AbstractGallery> extends M
 	@Override
 	protected void createControls(Composite parent) {
 		List<DbColumn> cols = getMediaList().getDbLayer().getSqlTblMediaFilesColumns();
-		for (DbColumn c : cols) {
+		for (IDbColumn c : cols) {
 			if (c.getHumanName() != null) {
     			SortAction a = new SortAction(c, SortDirection.ASC);
     			a.setChecked(c == getMediaList().getSort());
@@ -187,7 +188,7 @@ public abstract class AbstractGalleryEditor<T extends AbstractGallery> extends M
 	
 	@Override
 	protected void onSort (TableViewer table, TableViewerColumn column, int direction) {
-		DbColumn sort = getMediaList().getSort();
+		IDbColumn sort = getMediaList().getSort();
 		MediaColumn mCol = parseMediaColumn(column.getColumn().getText());
 		
 		if (mCol == this.COL_FILE) {
@@ -216,7 +217,7 @@ public abstract class AbstractGalleryEditor<T extends AbstractGallery> extends M
 		setSort(sort, sortDir);
 	}
 	
-	void setSort (DbColumn sort, SortDirection sortDir) {
+	void setSort (IDbColumn sort, SortDirection sortDir) {
 		try {
 			getMediaList().setSort(sort, sortDir);
 		} catch (MorriganException e) {
@@ -226,7 +227,7 @@ public abstract class AbstractGalleryEditor<T extends AbstractGallery> extends M
 	
 	private SortChangeListener sortChangeListener = new SortChangeListener () {
 		@Override
-		public void sortChanged(DbColumn sort, SortDirection direction) {
+		public void sortChanged(IDbColumn sort, SortDirection direction) {
 			for (SortAction a : AbstractGalleryEditor.this.sortActions) {
 				boolean c = sort == a.getSort();
 				if (a.isChecked() != c) {
@@ -238,16 +239,16 @@ public abstract class AbstractGalleryEditor<T extends AbstractGallery> extends M
 	
 	private class SortAction extends Action {
 		
-		private final DbColumn sort;
+		private final IDbColumn sort;
 		private final SortDirection sortDir;
 
-		public SortAction (DbColumn sort, SortDirection sortDir) {
+		public SortAction (IDbColumn sort, SortDirection sortDir) {
 			super("Sort by " + sort.getHumanName(), AS_RADIO_BUTTON);
 			this.sort = sort;
 			this.sortDir = sortDir;
 		}
 		
-		public DbColumn getSort() {
+		public IDbColumn getSort() {
 			return this.sort;
 		}
 		
