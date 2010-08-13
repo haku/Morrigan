@@ -144,13 +144,13 @@ public class MediaItem implements IDbItem {
 	
 	public boolean setFromMediaItem (MediaItem mi) {
 		boolean b = this.setFilepath(mi.getFilepath())
-			|| this.setDateAdded(mi.getDateAdded())
-			|| this.setHashcode(mi.getHashcode())
-			|| this.setDateLastModified(mi.getDateLastModified())
-			|| this.setEnabled(mi.isEnabled())
-			|| this.setMissing(mi.isMissing())
-			|| this.setDbRowId(mi.getDbRowId())
-			|| this.setRemoteLocation(mi.getRemoteLocation());
+			| this.setDateAdded(mi.getDateAdded())
+			| this.setHashcode(mi.getHashcode())
+			| this.setDateLastModified(mi.getDateLastModified())
+			| this.setEnabled(mi.isEnabled())
+			| this.setMissing(mi.isMissing())
+			| this.setDbRowId(mi.getDbRowId())
+			| this.setRemoteLocation(mi.getRemoteLocation());
 		return b;
 	}
 	
