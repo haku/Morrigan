@@ -254,26 +254,6 @@ public class MixedMediaSqliteLayerImpl extends MediaSqliteLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	MediaItem getters.
 	
-	protected List<IMediaMixedItem> local_updateListOfAllMedia (MediaType mediaType, List<IMediaMixedItem> list, DbColumn sort, SortDirection direction, boolean hideMissing) throws SQLException, ClassNotFoundException {
-		String sql = local_getAllMediaSql(SQL_MEDIAFILES_Q_ALL, SQL_MEDIAFILES_Q_NOTMISSING, SQL_MEDIAFILES_Q_ALL_T, SQL_MEDIAFILES_Q_NOTMISSING_T, mediaType, hideMissing, sort, direction);
-		ResultSet rs;
-		
-		List<IMediaMixedItem> ret;
-		PreparedStatement ps = getDbCon().prepareStatement(sql);
-		try {
-			rs = ps.executeQuery();
-			try {
-				ret = local_parseAndUpdateFromRecordSet(list, rs);
-			} finally {
-				rs.close();
-			}
-		} finally {
-			ps.close();
-		}
-		
-		return ret;
-	}
-	
 	protected List<IMediaMixedItem> local_getAllMedia (MediaType mediaType, DbColumn sort, SortDirection direction, boolean hideMissing) throws SQLException, ClassNotFoundException {
 		String sql = local_getAllMediaSql(SQL_MEDIAFILES_Q_ALL, SQL_MEDIAFILES_Q_NOTMISSING, SQL_MEDIAFILES_Q_ALL_T, SQL_MEDIAFILES_Q_NOTMISSING_T, mediaType, hideMissing, sort, direction);
 		ResultSet rs;
@@ -284,6 +264,26 @@ public class MixedMediaSqliteLayerImpl extends MediaSqliteLayer {
 			rs = ps.executeQuery();
 			try {
 				ret = local_parseRecordSet(rs);
+			} finally {
+				rs.close();
+			}
+		} finally {
+			ps.close();
+		}
+		
+		return ret;
+	}
+	
+	protected List<IMediaMixedItem> local_updateListOfAllMedia (MediaType mediaType, List<IMediaMixedItem> list, DbColumn sort, SortDirection direction, boolean hideMissing) throws SQLException, ClassNotFoundException {
+		String sql = local_getAllMediaSql(SQL_MEDIAFILES_Q_ALL, SQL_MEDIAFILES_Q_NOTMISSING, SQL_MEDIAFILES_Q_ALL_T, SQL_MEDIAFILES_Q_NOTMISSING_T, mediaType, hideMissing, sort, direction);
+		ResultSet rs;
+		
+		List<IMediaMixedItem> ret;
+		PreparedStatement ps = getDbCon().prepareStatement(sql);
+		try {
+			rs = ps.executeQuery();
+			try {
+				ret = local_parseAndUpdateFromRecordSet(list, rs);
 			} finally {
 				rs.close();
 			}
