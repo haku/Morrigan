@@ -6,10 +6,7 @@ import java.util.List;
 
 import net.sparktank.morrigan.model.DbColumn;
 import net.sparktank.morrigan.model.IDbItem;
-import net.sparktank.morrigan.model.MediaItem;
 import net.sparktank.morrigan.model.MediaSqliteLayer2.SortDirection;
-import net.sparktank.morrigan.model.pictures.MediaPicture;
-import net.sparktank.morrigan.model.tracks.MediaTrack;
 import net.sparktank.sqlitewrapper.DbException;
 
 public interface IMixedMediaMetadataLayer {
@@ -43,17 +40,9 @@ public interface IMixedMediaMetadataLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Read methods.
 	
-	public List<MediaItem> updateListOfAllMedia (List<MediaItem> list, DbColumn sort, SortDirection direction, boolean hideMissing) throws DbException;
-	public List<MediaItem> getAllMedia (DbColumn sort, SortDirection direction, boolean hideMissing) throws DbException;
-	public List<MediaItem> simpleSearchMedia (String term, String esc, int maxResults) throws DbException;
-	
-	public List<MediaTrack> updateListOfAllMediaTracks (List<MediaTrack> list, DbColumn sort, SortDirection direction, boolean hideMissing) throws DbException;
-	public List<MediaTrack> getAllMediaTracks (DbColumn sort, SortDirection direction, boolean hideMissing) throws DbException;
-	public List<MediaTrack> simpleSearchMediaTracks (String term, String esc, int maxResults) throws DbException;
-	
-	public List<MediaPicture> updateListOfAllMediaPictures (List<MediaPicture> list, DbColumn sort, SortDirection direction, boolean hideMissing) throws DbException;
-	public List<MediaPicture> getAllMediaPictures (DbColumn sort, SortDirection direction, boolean hideMissing) throws DbException;
-	public List<MediaPicture> simpleSearchMediaPictures (String term, String esc, int maxResults) throws DbException;
+	public List<IMediaMixedItem> updateListOfAllMedia (MediaType mediaType, List<IMediaMixedItem> list, DbColumn sort, SortDirection direction, boolean hideMissing) throws DbException;
+	public List<IMediaMixedItem> getAllMedia (MediaType mediaType, DbColumn sort, SortDirection direction, boolean hideMissing) throws DbException;
+	public List<IMediaMixedItem> simpleSearchMedia (MediaType mediaType, String term, String esc, int maxResults) throws DbException;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Setters for generic MediaItem.

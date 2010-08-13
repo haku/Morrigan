@@ -6,10 +6,7 @@ import java.util.List;
 
 import net.sparktank.morrigan.model.DbColumn;
 import net.sparktank.morrigan.model.IDbItem;
-import net.sparktank.morrigan.model.MediaItem;
 import net.sparktank.morrigan.model.MediaSqliteLayer2.SortDirection;
-import net.sparktank.morrigan.model.pictures.MediaPicture;
-import net.sparktank.morrigan.model.tracks.MediaTrack;
 import net.sparktank.sqlitewrapper.DbException;
 
 public class MixedMediaSqliteLayer extends MixedMediaSqliteLayerImpl implements IMixedMediaMetadataLayer {
@@ -21,70 +18,33 @@ public class MixedMediaSqliteLayer extends MixedMediaSqliteLayerImpl implements 
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Read methods for MediaItem.
+//	Read methods for IMediaMixedItem.
 	
 	@Override
-	public List<MediaItem> updateListOfAllMedia(List<MediaItem> list, DbColumn sort, SortDirection direction, boolean hideMissing) throws DbException {
+	public List<IMediaMixedItem> updateListOfAllMedia(MediaType mediaType, List<IMediaMixedItem> list, DbColumn sort, SortDirection direction, boolean hideMissing) throws DbException {
 		try {
-			return local_updateListOfAllMedia(list, sort, direction, hideMissing);
+			return local_updateListOfAllMedia(mediaType, list, sort, direction, hideMissing);
 		} catch (Exception e) {
 			throw new DbException(e);
 		}
 	}
 	
 	@Override
-	public List<MediaItem> getAllMedia(DbColumn sort, SortDirection direction, boolean hideMissing) throws DbException {
+	public List<IMediaMixedItem> getAllMedia(MediaType mediaType, DbColumn sort, SortDirection direction, boolean hideMissing) throws DbException {
 		try {
-			return local_getAllMedia(sort, direction, hideMissing);
+			return local_getAllMedia(mediaType, sort, direction, hideMissing);
 		} catch (Exception e) {
 			throw new DbException(e);
 		}
 	}
 	
 	@Override
-	public List<MediaItem> simpleSearchMedia(String term, String esc, int maxResults) throws DbException {
+	public List<IMediaMixedItem> simpleSearchMedia(MediaType mediaType, String term, String esc, int maxResults) throws DbException {
 		try {
-			return local_simpleSearch(term, esc, maxResults);
+			return local_simpleSearch(mediaType, term, esc, maxResults);
 		} catch (Exception e) {
 			throw new DbException(e);
 		}
-	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Read methods for MediaTrack.
-	
-	@Override
-	public List<MediaTrack> updateListOfAllMediaTracks(List<MediaTrack> list, DbColumn sort, SortDirection direction, boolean hideMissing) throws DbException {
-		throw new RuntimeException("Not implemented yet.");
-	}
-	
-	@Override
-	public List<MediaTrack> getAllMediaTracks(DbColumn sort, SortDirection direction, boolean hideMissing) throws DbException {
-		throw new RuntimeException("Not implemented yet.");
-	}
-	
-	@Override
-	public List<MediaTrack> simpleSearchMediaTracks(String term, String esc, int maxResults)
-	throws DbException {
-		throw new RuntimeException("Not implemented yet.");
-	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Read methods for MediaPicture.
-	
-	@Override
-	public List<MediaPicture> updateListOfAllMediaPictures(List<MediaPicture> list, DbColumn sort, SortDirection direction, boolean hideMissing) throws DbException {
-		throw new RuntimeException("Not implemented yet.");
-	}
-	
-	@Override
-	public List<MediaPicture> getAllMediaPictures(DbColumn sort, SortDirection direction, boolean hideMissing) throws DbException {
-		throw new RuntimeException("Not implemented yet.");
-	}
-	
-	@Override
-	public List<MediaPicture> simpleSearchMediaPictures(String term, String esc, int maxResults) throws DbException {
-		throw new RuntimeException("Not implemented yet.");
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

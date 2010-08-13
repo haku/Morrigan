@@ -1,0 +1,17 @@
+package net.sparktank.morrigan.model.media;
+
+public interface IMediaPicture extends IMediaItem {
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	public int getWidth();
+	public boolean setWidth(int width);
+	
+	public int getHeight();
+	public boolean setHeight(int height);
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	public boolean setFromMediaPicture (IMediaPicture mp);
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+}
