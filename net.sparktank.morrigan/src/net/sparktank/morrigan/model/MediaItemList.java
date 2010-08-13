@@ -11,8 +11,9 @@ import java.util.Map;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.FileHelper;
+import net.sparktank.morrigan.model.media.IMediaItem;
 
-public abstract class MediaItemList<T extends MediaItem> implements IMediaItemList<T> {
+public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemList<T> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors and parameters.
 	
