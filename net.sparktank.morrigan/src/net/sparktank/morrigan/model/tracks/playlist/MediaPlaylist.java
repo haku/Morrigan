@@ -169,7 +169,7 @@ public class MediaPlaylist extends MediaItemList<MediaTrack> implements IMediaTr
 						}
 					}
 					
-					addTrack(item);
+					addItem(item);
 					n++;
 				}
 				
@@ -203,7 +203,7 @@ public class MediaPlaylist extends MediaItemList<MediaTrack> implements IMediaTr
         
 		try {
 			int n = 0;
-			for (MediaTrack mt : getMediaTracks()) {
+			for (MediaTrack mt : getMediaItems()) {
 				
 				writer.write(
 						PL_ITEM_IDENTIFIER + mt.getFilepath()
@@ -289,7 +289,7 @@ public class MediaPlaylist extends MediaItemList<MediaTrack> implements IMediaTr
 	
 	@Override
 	public DurationData getTotalDuration () {
-		return MediaTrackListHelper.getTotalDuration(this.getMediaTracks());
+		return MediaTrackListHelper.getTotalDuration(this.getMediaItems());
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

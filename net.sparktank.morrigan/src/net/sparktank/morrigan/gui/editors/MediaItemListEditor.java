@@ -12,9 +12,9 @@ import net.sparktank.morrigan.gui.handler.CallPlayMedia;
 import net.sparktank.morrigan.gui.helpers.ImageCache;
 import net.sparktank.morrigan.gui.jobs.TaskJob;
 import net.sparktank.morrigan.gui.preferences.MediaListPref;
-import net.sparktank.morrigan.model.IMediaItemList;
-import net.sparktank.morrigan.model.IMediaItemList.DirtyState;
 import net.sparktank.morrigan.model.MediaItem;
+import net.sparktank.morrigan.model.media.interfaces.IMediaItemList;
+import net.sparktank.morrigan.model.media.interfaces.IMediaItemList.DirtyState;
 import net.sparktank.morrigan.model.tasks.MediaFileCopyTask;
 
 import org.eclipse.core.commands.common.CommandException;
@@ -289,7 +289,7 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 		
 		@Override
 		public Object[] getElements(Object inputElement) {
-			return MediaItemListEditor.this.getEditorInput().getMediaList().getMediaTracks().toArray();
+			return MediaItemListEditor.this.getEditorInput().getMediaList().getMediaItems().toArray();
 		}
 		
 		@Override
@@ -410,11 +410,11 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 	}
 	
 	public void addItem (String file) {
-		this.editorInput.getMediaList().addTrack(getNewS(file));
+		this.editorInput.getMediaList().addItem(getNewS(file));
 	}
 	
 	protected void removeItem (S track) throws MorriganException {
-		this.editorInput.getMediaList().removeMediaTrack(track);
+		this.editorInput.getMediaList().removeItem(track);
 	}
 	
 	public S getSelectedItem () {
@@ -489,7 +489,7 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 		public void run() {
 			for (S track : getSelectedItems()) {
 				try {
-					getEditorInput().getMediaList().setTrackEnabled(track, !track.isEnabled());
+					getEditorInput().getMediaList().setItemEnabled(track, !track.isEnabled());
 				} catch (Throwable t) {
 					// TODO something more useful here.
 					t.printStackTrace();

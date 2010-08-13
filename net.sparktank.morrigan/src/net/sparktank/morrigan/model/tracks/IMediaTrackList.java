@@ -3,7 +3,7 @@ package net.sparktank.morrigan.model.tracks;
 import java.util.Date;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
-import net.sparktank.morrigan.model.IMediaItemList;
+import net.sparktank.morrigan.model.media.interfaces.IMediaItemList;
 
 public interface IMediaTrackList<T extends MediaTrack> extends IMediaItemList<T> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

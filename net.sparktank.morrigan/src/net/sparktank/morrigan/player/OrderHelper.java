@@ -88,7 +88,7 @@ public class OrderHelper {
 	
 	private static MediaTrack getNextTrackSequencial (IMediaTrackList<? extends MediaTrack> list, MediaItem track) {
 		MediaTrack ret = null;
-		List<? extends MediaTrack> mediaTracks = list.getMediaTracks();
+		List<? extends MediaTrack> mediaTracks = list.getMediaItems();
 		
 		int i;
 		if (track != null && mediaTracks.contains(track)) {
@@ -125,7 +125,7 @@ public class OrderHelper {
 	
 	private static MediaTrack getNextTrackRandom (IMediaTrackList<? extends MediaTrack> list, MediaItem current) {
 		Random generator = new Random();
-		List<? extends MediaTrack> mediaTracks = list.getMediaTracks();
+		List<? extends MediaTrack> mediaTracks = list.getMediaItems();
 		
 		int n = 0;
 		for (MediaItem mi : mediaTracks) {
@@ -150,7 +150,7 @@ public class OrderHelper {
 	
 	private static MediaTrack getNextTrackByStartCount (IMediaTrackList<? extends MediaTrack> list, MediaItem current) {
 		MediaTrack ret = null;
-		List<? extends MediaTrack> tracks = list.getMediaTracks();
+		List<? extends MediaTrack> tracks = list.getMediaItems();
 		
 		// Find highest play count.
 		long maxPlayCount = -1;
@@ -196,7 +196,7 @@ public class OrderHelper {
 	
 	private static MediaTrack getNextTrackByLastPlayedDate (IMediaTrackList<? extends MediaTrack> list, MediaTrack current) {
 		MediaTrack ret = null;
-		List<? extends MediaTrack> tracks = list.getMediaTracks();
+		List<? extends MediaTrack> tracks = list.getMediaItems();
 		Date now = new Date();
 		
 		// Find oldest date.

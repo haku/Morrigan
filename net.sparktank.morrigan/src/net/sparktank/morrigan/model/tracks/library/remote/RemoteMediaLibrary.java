@@ -157,7 +157,7 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 //	Actions.
 	
 	@Override
-	public void copyMediaItemFile(MediaTrack mlt, File targetDirectory) throws MorriganException {
+	public void copyItemFile(MediaTrack mlt, File targetDirectory) throws MorriganException {
 		if (!targetDirectory.isDirectory()) {
 			throw new IllegalArgumentException("targetDirectory must be a directory.");
 		}
@@ -244,7 +244,7 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 	}
 	
 	@Override
-	public void setDateAdded (MediaTrack track, Date date) throws MorriganException {
+	public void setItemDateAdded (MediaTrack track, Date date) throws MorriganException {
 		throw new NotImplementedException();
 	}
 	
@@ -254,7 +254,7 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 	}
 	
 	@Override
-	public void removeMediaTrack (MediaTrack track) throws MorriganException {
+	public void removeItem (MediaTrack track) throws MorriganException {
 		throw new NotImplementedException();
 	}
 	
@@ -274,22 +274,22 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 	}
 	
 	@Override
-	public void setTrackHashCode(MediaTrack track, long hashcode) throws MorriganException {
+	public void setItemHashCode(MediaTrack track, long hashcode) throws MorriganException {
 		throw new NotImplementedException();
 	}
 	
 	@Override
-	public void setTrackDateLastModified(MediaTrack track, Date date) throws MorriganException {
+	public void setItemDateLastModified(MediaTrack track, Date date) throws MorriganException {
 		throw new NotImplementedException();
 	}
 	
 	@Override
-	public void setTrackEnabled(MediaTrack track, boolean value) throws MorriganException {
+	public void setItemEnabled(MediaTrack track, boolean value) throws MorriganException {
 		throw new NotImplementedException();
 	}
 	
 	@Override
-	public void setTrackMissing(MediaTrack track, boolean value) throws MorriganException {
+	public void setItemMissing(MediaTrack track, boolean value) throws MorriganException {
 		throw new NotImplementedException();
 	}
 	

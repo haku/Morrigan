@@ -12,6 +12,7 @@ import java.util.Map;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.FileHelper;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
+import net.sparktank.morrigan.model.media.interfaces.IMediaItemList;
 
 public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemList<T> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -139,7 +140,7 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 	 * @return
 	 */
 	@Override
-	public List<T> getMediaTracks() {
+	public List<T> getMediaItems() {
 		return Collections.unmodifiableList(this.mediaTracks);
 	}
 	
@@ -173,7 +174,7 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 	}
 	
 	@Override
-	public void addTrack (T track) {
+	public void addItem (T track) {
 		if (allowDuplicateEntries() || !this.mediaTracks.contains(track)) {
 			this.mediaTracks.add(track);
 			setDirtyState(DirtyState.DIRTY);
@@ -184,7 +185,7 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 	 * @throws MorriganException  
 	 */
 	@Override
-	public void removeMediaTrack (T track) throws MorriganException {
+	public void removeItem (T track) throws MorriganException {
 		this.mediaTracks.remove(track);
 		setDirtyState(DirtyState.DIRTY);
 	}
@@ -197,7 +198,7 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 	 * @throws MorriganException  
 	 */
 	@Override
-	public void setDateAdded (T track, Date date) throws MorriganException {
+	public void setItemDateAdded (T track, Date date) throws MorriganException {
 		track.setDateAdded(date);
 		setDirtyState(DirtyState.METADATA);
 	}
@@ -206,7 +207,7 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 	 * @throws MorriganException  
 	 */
 	@Override
-	public void setTrackHashCode (T track, long hashcode) throws MorriganException {
+	public void setItemHashCode (T track, long hashcode) throws MorriganException {
 		track.setHashcode(hashcode);
 		setDirtyState(DirtyState.METADATA);
 	}
@@ -215,7 +216,7 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 	 * @throws MorriganException  
 	 */
 	@Override
-	public void setTrackDateLastModified (T track, Date date) throws MorriganException {
+	public void setItemDateLastModified (T track, Date date) throws MorriganException {
 		track.setDateLastModified(date);
 		setDirtyState(DirtyState.METADATA);
 	}
@@ -224,7 +225,7 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 	 * @throws MorriganException  
 	 */
 	@Override
-	public void setTrackEnabled (T track, boolean value) throws MorriganException {
+	public void setItemEnabled (T track, boolean value) throws MorriganException {
 		track.setEnabled(value);
 		setDirtyState(DirtyState.METADATA);
 	}
@@ -233,7 +234,7 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 	 * @throws MorriganException  
 	 */
 	@Override
-	public void setTrackMissing (T track, boolean value) throws MorriganException {
+	public void setItemMissing (T track, boolean value) throws MorriganException {
 		track.setMissing(value);
 		setDirtyState(DirtyState.METADATA);
 	}
@@ -242,7 +243,7 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 //	Actions.
 	
 	@Override
-	public void copyMediaItemFile (T mi, File targetDirectory) throws MorriganException {
+	public void copyItemFile (T mi, File targetDirectory) throws MorriganException {
 		if (!targetDirectory.isDirectory()) {
 			throw new IllegalArgumentException("targetDirectory must be a directory.");
 		}
