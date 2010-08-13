@@ -1,11 +1,10 @@
-package net.sparktank.morrigan.model;
+package net.sparktank.morrigan.model.media;
 
 import java.io.File;
 import java.util.Date;
 import java.util.List;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
-import net.sparktank.morrigan.model.media.IMediaItem;
 
 public interface IMediaItemList<T extends IMediaItem> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -27,7 +26,7 @@ public interface IMediaItemList<T extends IMediaItem> {
 	public void removeChangeEvent (Runnable r);
 	
 	public int getCount ();
-	public List<T> getMediaTracks();
+	public List<T> getMediaItems();
 	
 	/**
 	 * This is the signal to read any source data needed.
@@ -38,16 +37,16 @@ public interface IMediaItemList<T extends IMediaItem> {
 	 */
 	public void read () throws MorriganException;
 	
-	public void addTrack (T track);
-	public void removeMediaTrack (T track) throws MorriganException;
+	public void addItem (T item);
+	public void removeItem (T item) throws MorriganException;
 	
-	public void setDateAdded (T track, Date date) throws MorriganException;
-	public void setTrackHashCode (T track, long hashcode) throws MorriganException;
-	public void setTrackDateLastModified (T track, Date date) throws MorriganException;
-	public void setTrackEnabled (T track, boolean value) throws MorriganException;
-	public void setTrackMissing (T track, boolean value) throws MorriganException;
+	public void setItemDateAdded (T item, Date date) throws MorriganException;
+	public void setItemHashCode (T item, long hashcode) throws MorriganException;
+	public void setItemDateLastModified (T item, Date date) throws MorriganException;
+	public void setItemEnabled (T item, boolean value) throws MorriganException;
+	public void setItemMissing (T item, boolean value) throws MorriganException;
 	
-	public void copyMediaItemFile (T mi, File targetDirectory) throws MorriganException;
+	public void copyItemFile (T mi, File targetDirectory) throws MorriganException;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
