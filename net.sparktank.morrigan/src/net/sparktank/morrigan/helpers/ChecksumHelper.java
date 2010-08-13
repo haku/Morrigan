@@ -19,7 +19,7 @@ public class ChecksumHelper {
 			try {
 				cis = new CheckedInputStream(bis, new CRC32());
 				try {
-					while (cis.read() != -1) {}
+					while (cis.read() != -1) {/* UNUSED */}
 					return cis.getChecksum().getValue();
 					
 				} finally {
