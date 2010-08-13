@@ -6,11 +6,11 @@ import java.util.Date;
 import net.sparktank.morrigan.helpers.EqualHelper;
 import net.sparktank.morrigan.model.MediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
-import net.sparktank.morrigan.model.media.interfaces.IMediaMixedItem;
+import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaPicture;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
 
-public class MediaMixedItem implements IMediaMixedItem {
+public class MediaMixedItem implements IMixedMediaItem {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors.
 	
@@ -302,7 +302,7 @@ public class MediaMixedItem implements IMediaMixedItem {
 	}
 	
 	@Override
-	public boolean setFromMediaMixedItem (IMediaMixedItem mmi) {
+	public boolean setFromMediaMixedItem (IMixedMediaItem mmi) {
 		boolean b =
 			  this.setFromMediaItem(mmi)
 			| _setFromMediaTrack(mmi)

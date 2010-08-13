@@ -39,9 +39,9 @@ public interface IMixedMediaStorageLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Read methods.
 	
-	public List<IMediaMixedItem> getAllMedia (MediaType mediaType, DbColumn sort, SortDirection direction, boolean hideMissing) throws DbException;
-	public List<IMediaMixedItem> updateListOfAllMedia (MediaType mediaType, List<IMediaMixedItem> list, DbColumn sort, SortDirection direction, boolean hideMissing) throws DbException;
-	public List<IMediaMixedItem> simpleSearchMedia (MediaType mediaType, String term, String esc, int maxResults) throws DbException;
+	public List<IMixedMediaItem> getAllMedia (MediaType mediaType, DbColumn sort, SortDirection direction, boolean hideMissing) throws DbException;
+	public List<IMixedMediaItem> updateListOfAllMedia (MediaType mediaType, List<IMixedMediaItem> list, DbColumn sort, SortDirection direction, boolean hideMissing) throws DbException;
+	public List<IMixedMediaItem> simpleSearchMedia (MediaType mediaType, String term, String esc, int maxResults) throws DbException;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Setters for generic MediaItem.
