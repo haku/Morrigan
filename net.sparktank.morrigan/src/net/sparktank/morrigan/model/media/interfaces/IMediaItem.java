@@ -2,7 +2,6 @@ package net.sparktank.morrigan.model.media.interfaces;
 
 import java.util.Date;
 
-import net.sparktank.morrigan.model.IDbItem;
 
 public interface IMediaItem extends IDbItem {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
