@@ -23,6 +23,7 @@ public class MediaFeed extends Feed {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	@Override
 	protected void populateFeed(DataWriter dw) throws SAXException, MorriganException {
 		addElement(dw, "title", "Morrigan media desu~");
 		addLink(dw, "/media" , "self", "text/xml");

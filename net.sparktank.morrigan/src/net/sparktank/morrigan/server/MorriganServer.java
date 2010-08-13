@@ -22,9 +22,9 @@ public class MorriganServer {
 	
 	public MorriganServer () throws MorriganException {
 		try {
-			server = new Server(8080);
+			this.server = new Server(8080);
 			
-			server.addLifeCycleListener(listener);
+			this.server.addLifeCycleListener(this.listener);
 			
 			WebAppContext webapp = new WebAppContext();
 			webapp.setContextPath("/");
@@ -44,7 +44,7 @@ public class MorriganServer {
 			
 			ContextHandlerCollection contexts = new ContextHandlerCollection();
 	        contexts.setHandlers(new Handler[] { webapp, conMedia, conPlayers });
-			server.setHandler(contexts);
+			this.server.setHandler(contexts);
 			
 		} catch (Exception e) {
 			throw new MorriganException("Failed to create server object.", e);
@@ -54,15 +54,15 @@ public class MorriganServer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public void start () throws Exception {
-		server.start();
+		this.server.start();
 	}
 	
 	public void stop () throws Exception {
-		server.stop();
+		this.server.stop();
 	}
 	
 	public void join () throws InterruptedException {
-		server.join();
+		this.server.join();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -100,9 +100,9 @@ public class MorriganServer {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private void callOnStopRunnable () {
-		if (onStopRunnable != null) {
-			onStopRunnable.run();
+	void callOnStopRunnable () {
+		if (this.onStopRunnable != null) {
+			this.onStopRunnable.run();
 		}
 	}
 	

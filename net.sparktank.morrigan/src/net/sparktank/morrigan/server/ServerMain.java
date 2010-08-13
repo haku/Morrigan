@@ -69,19 +69,19 @@ public class ServerMain {
 			return null;
 		}
 		@Override
-		public void currentItemChanged() {}
+		public void currentItemChanged() {/* UNUSED */}
 		@Override
-		public void historyChanged() {}
+		public void historyChanged() {/* UNUSED */}
 		@Override
-		public void videoAreaSelected() {}
+		public void videoAreaSelected() {/* UNUSED */}
 		@Override
-		public void videoAreaClose() {}
+		public void videoAreaClose() {/* UNUSED */}
 	};
 	
 	
 	static private PlayState prevPlayState = null;
 	
-	static private void outputStatus () {
+	static void outputStatus () {
 		PlayState playState = _player.getPlayState();
 		if (playState != prevPlayState) {
 			prevPlayState = playState;

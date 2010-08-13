@@ -9,7 +9,7 @@ import org.eclipse.swt.events.SelectionListener;
 
 public class ActionListener implements SelectionListener {
 	
-	private final IAction action;
+	final IAction action;
 
 	public ActionListener (IAction action) {
 		if (action == null) throw new IllegalArgumentException("action can't be null.");
@@ -19,9 +19,10 @@ public class ActionListener implements SelectionListener {
 	@Override
 	public void widgetSelected(SelectionEvent e) {
 		e.widget.getDisplay().asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				try {
-					action.run();
+					ActionListener.this.action.run();
 				} catch (Throwable t) {
 					new MorriganMsgDlg(t).open();
 				}
@@ -30,5 +31,5 @@ public class ActionListener implements SelectionListener {
 	}
 	
 	@Override
-	public void widgetDefaultSelected(SelectionEvent e) {}
+	public void widgetDefaultSelected(SelectionEvent e) {/* UNUSED */}
 }

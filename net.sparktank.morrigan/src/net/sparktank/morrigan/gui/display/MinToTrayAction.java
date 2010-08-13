@@ -36,7 +36,7 @@ public class MinToTrayAction  extends Action implements IWorkbenchAction {
 	
 	@Override
 	public void run () {
-		if (!TrayHelper.minToTray(window, true)) {
+		if (!TrayHelper.minToTray(this.window, true)) {
 			new MorriganMsgDlg("No system tray available.").open();
 		}
 	}
@@ -44,7 +44,7 @@ public class MinToTrayAction  extends Action implements IWorkbenchAction {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
-	public void dispose() {}
+	public void dispose() {/* UNUSED */}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

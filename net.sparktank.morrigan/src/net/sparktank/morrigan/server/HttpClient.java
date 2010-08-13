@@ -29,7 +29,7 @@ public class HttpClient {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private Logger logger = Logger.getLogger(this.getClass().getName());
+	Logger logger = Logger.getLogger(this.getClass().getName());
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -53,20 +53,20 @@ public class HttpClient {
 		private Map<String, List<String>> headerFields;
 		
 		public HttpResponse (int code, String body, String etag, Map<String, List<String>> headerFields) {
-			responseCode = code;
-			responseBody = body;
+			this.responseCode = code;
+			this.responseBody = body;
 			this.etag = etag;
 			this.headerFields = headerFields;
 		}
 		
-		public int getCode () { return responseCode; }
-		public String getBody () { return responseBody; }
-		public String getEtag () { return etag; }
-		public Map<String, List<String>> getHeaderFields () { return headerFields; }
+		public int getCode () { return this.responseCode; }
+		public String getBody () { return this.responseBody; }
+		public String getEtag () { return this.etag; }
+		public Map<String, List<String>> getHeaderFields () { return this.headerFields; }
 		
 		@Override
 		public String toString () {
-			return responseCode+": "+responseBody;
+			return this.responseCode+": "+this.responseBody;
 		}
 	}
 	
@@ -77,15 +77,15 @@ public class HttpClient {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public HttpClient () {
-		cookieManager = new CookieManager();
-		cookieManager.setCookiePolicy(new CookiePolicy() {
+		this.cookieManager = new CookieManager();
+		this.cookieManager.setCookiePolicy(new CookiePolicy() {
 			@Override
 			public boolean shouldAccept(URI uri, HttpCookie cookie) {
-				logger.fine("Accpting cookie " + uri +": " + cookie.getName() + "[maxage="+cookie.getMaxAge()+"]");
+				HttpClient.this.logger.fine("Accpting cookie " + uri +": " + cookie.getName() + "[maxage="+cookie.getMaxAge()+"]");
 				return true;
 			}
 		});
-		CookieHandler.setDefault(cookieManager); // FIXME strictly speaking, we should not be setting this as default but per connection.
+		CookieHandler.setDefault(this.cookieManager); // FIXME strictly speaking, we should not be setting this as default but per connection.
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -113,7 +113,7 @@ public class HttpClient {
 	 * @throws MorriganException 
 	 */
 	public HttpResponse doHttpRequest(URL url, String httpRequestMethod, String encodedData, String contentType, Map<String, String> headers, IHttpStreamHandler httpStreamHandler) throws IOException, MorriganException {
-		logger.finest("doHttpRequest(" + (httpRequestMethod==null ? "GET" : httpRequestMethod) + " " + url + "):");
+		this.logger.finest("doHttpRequest(" + (httpRequestMethod==null ? "GET" : httpRequestMethod) + " " + url + "):");
 		
 		HttpURLConnection huc = (HttpURLConnection) url.openConnection();
 //		disableSSLCertificateChecking(huc);

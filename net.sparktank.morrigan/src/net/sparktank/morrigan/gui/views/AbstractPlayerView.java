@@ -4,11 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sparktank.morrigan.engines.HotkeyRegister;
-import net.sparktank.morrigan.engines.common.ImplException;
 import net.sparktank.morrigan.engines.hotkey.IHotkeyEngine;
 import net.sparktank.morrigan.engines.hotkey.IHotkeyListener;
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine.PlayState;
-import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.dialogs.JumpToDlg;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
@@ -67,14 +65,14 @@ public abstract class AbstractPlayerView extends ViewPart {
 	
 	@Override
 	public void dispose() {
-		isDisposed = true;
+		this.isDisposed = true;
 		disposePlayer();
 		finaliseHotkeys();
 		super.dispose();
 	}
 	
 	protected boolean isDisposed () {
-		return isDisposed;
+		return this.isDisposed;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -107,27 +105,27 @@ public abstract class AbstractPlayerView extends ViewPart {
 	private Player _player = null;
 	
 	public synchronized Player getPlayer () {
-		if (_player == null) {
-			_player = PlayerRegister.makePlayer(eventHandler);
+		if (this._player == null) {
+			this._player = PlayerRegister.makePlayer(this.eventHandler);
 		}
-		return _player;
+		return this._player;
 	}
 	
 	private void disposePlayer () {
-		if (_player != null) {
-			_player.dispose();
+		if (this._player != null) {
+			this._player.dispose();
 		}
 	}
 	
 	protected IPlayerEventHandler getEventHandler () {
-		return eventHandler;
+		return this.eventHandler;
 	}
 	
 	private final IPlayerEventHandler eventHandler = new IPlayerEventHandler() {
 		
 		@Override
 		public void updateStatus() {
-			getSite().getShell().getDisplay().asyncExec(updateStatusRunable);
+			getSite().getShell().getDisplay().asyncExec(AbstractPlayerView.this.updateStatusRunable);
 		}
 		
 		@Override
@@ -135,6 +133,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 			callRefreshHistoryMenuMgr();
 		}
 		
+		@Override
 		public void currentItemChanged() {
 			getSite().getShell().getDisplay().asyncExec(new Runnable() {
 				@Override
@@ -144,6 +143,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 			});
 		}
 		
+		@Override
 		public void asyncThrowable(Throwable t) {
 			System.err.println("Async Throwable: " + t.getMessage());
 			getSite().getShell().getDisplay().asyncExec(new RunnableDialog(t));
@@ -168,6 +168,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 			return _getCurrentMediaFrameParent();
 		}
 		
+		@Override
 		public void videoAreaClose() {
 			if (isFullScreen()) {
 				removeFullScreenSafe(true);
@@ -185,7 +186,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 		
 	};
 	
-	private Runnable updateStatusRunable = new Runnable() {
+	Runnable updateStatusRunable = new Runnable() {
 		@Override
 		public void run() {
 			updateStatus();
@@ -205,28 +206,28 @@ public abstract class AbstractPlayerView extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	History.
 	
-	private MenuManager _historyMenuMgr = new MenuManager();
+	MenuManager _historyMenuMgr = new MenuManager();
 	
-	private volatile boolean refreshHistoryMenuMgrScheduled = false;
+	volatile boolean refreshHistoryMenuMgrScheduled = false;
 	
-	private void callRefreshHistoryMenuMgr () {
-		synchronized (refreshHistoryMenuMgr) {
-			if (!refreshHistoryMenuMgrScheduled) {
-				refreshHistoryMenuMgrScheduled = true;
-				getSite().getShell().getDisplay().asyncExec(refreshHistoryMenuMgr);
+	void callRefreshHistoryMenuMgr () {
+		synchronized (this.refreshHistoryMenuMgr) {
+			if (!this.refreshHistoryMenuMgrScheduled) {
+				this.refreshHistoryMenuMgrScheduled = true;
+				getSite().getShell().getDisplay().asyncExec(this.refreshHistoryMenuMgr);
 			}
 		}
 	}
 	
-	private Runnable refreshHistoryMenuMgr = new Runnable() {
+	Runnable refreshHistoryMenuMgr = new Runnable() {
 		@Override
 		public void run() {
-			synchronized (refreshHistoryMenuMgr) {
-				_historyMenuMgr.removeAll();
+			synchronized (AbstractPlayerView.this.refreshHistoryMenuMgr) {
+				AbstractPlayerView.this._historyMenuMgr.removeAll();
 				for (PlayItem item : getPlayer().getHistory()) {
-					_historyMenuMgr.add(new HistoryAction(item));
+					AbstractPlayerView.this._historyMenuMgr.add(new HistoryAction(item));
 				}
-				refreshHistoryMenuMgrScheduled = false;
+				AbstractPlayerView.this.refreshHistoryMenuMgrScheduled = false;
 			}
 		}
 	};
@@ -242,13 +243,13 @@ public abstract class AbstractPlayerView extends ViewPart {
 		
 		@Override
 		public void run() {
-			getPlayer().loadAndStartPlaying(item.list, item.item);
+			getPlayer().loadAndStartPlaying(this.item.list, this.item.item);
 		}
 		
 	}
 	
 	protected MenuManager getHistoryMenuMgr () {
-		return _historyMenuMgr;
+		return this._historyMenuMgr;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -270,8 +271,8 @@ public abstract class AbstractPlayerView extends ViewPart {
 	
 	private List<ScreenPainter> _titlePainters = new ArrayList<ScreenPainter>();
 	
-	private void updateTitle () {
-		for (ScreenPainter sp : _titlePainters){
+	void updateTitle () {
+		for (ScreenPainter sp : this._titlePainters){
 			sp.redrawTitle();
 		}
 	}
@@ -279,12 +280,12 @@ public abstract class AbstractPlayerView extends ViewPart {
 	public void registerScreenPainter (ScreenPainter p) {
 		if (p == null) throw new NullPointerException();
 		
-		p.setTitleProvider(titleProvider);
-		_titlePainters.add(p);
+		p.setTitleProvider(this.titleProvider);
+		this._titlePainters.add(p);
 	}
 	
 	public void unregisterScreenPainter (ScreenPainter p) {
-		_titlePainters.remove(p);
+		this._titlePainters.remove(p);
 	}
 	
 	private TitleProvider titleProvider = new TitleProvider() {
@@ -304,12 +305,12 @@ public abstract class AbstractPlayerView extends ViewPart {
 	private Composite localMediaFrameParent;
 	
 	protected void setLocalMediaFrameParent (Composite parent) {
-		localMediaFrameParent = parent;
+		this.localMediaFrameParent = parent;
 	}
 	
 	protected Composite getLocalMediaFrameParent () {
-		if (localMediaFrameParent==null) throw new IllegalStateException("setMediaFrameParent() has not yet been called.");
-		return localMediaFrameParent;
+		if (this.localMediaFrameParent==null) throw new IllegalStateException("setMediaFrameParent() has not yet been called.");
+		return this.localMediaFrameParent;
 	}
 	
 	protected void updateCurrentMediaFrameParent () {
@@ -325,37 +326,35 @@ public abstract class AbstractPlayerView extends ViewPart {
 		Composite fullScreenVideoParent = getFullScreenVideoParent();
 		if (fullScreenVideoParent != null) {
 			return fullScreenVideoParent;
-			
-		} else {
-			Composite secondaryVideoParent = getSecondaryVideoParent();
-			if (secondaryVideoParent != null) {
-				return secondaryVideoParent;
-				
-			} else {
-				return localMediaFrameParent;
-			}
 		}
+		
+		Composite secondaryVideoParent = getSecondaryVideoParent();
+		if (secondaryVideoParent != null) {
+			return secondaryVideoParent;
+		}
+		
+		return this.localMediaFrameParent;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Full screen stuff.
 	
-	private FullscreenShell fullscreenShell = null;
+	FullscreenShell fullscreenShell = null;
 	
-	private boolean isFullScreen () {
-		return !(fullscreenShell == null);
+	boolean isFullScreen () {
+		return !(this.fullscreenShell == null);
 	}
 	
 	private Composite getFullScreenVideoParent () {
 		if (!isFullScreen()) return null;
-		return fullscreenShell.getShell();
+		return this.fullscreenShell.getShell();
 	}
 	
-	private void goFullScreenSafe () {
+	void goFullScreenSafe () {
 		goFullScreenSafe(null, null);
 	}
 	
-	private void goFullScreenSafe (Monitor mon, FullScreenAction action) {
+	void goFullScreenSafe (Monitor mon, FullScreenAction action) {
 		GoFullScreenRunner runner = new GoFullScreenRunner(mon, action);
 		if (Thread.currentThread().equals(getSite().getShell().getDisplay().getThread())) {
 			runner.run();
@@ -364,7 +363,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 		}
 	}
 	
-	private void removeFullScreenSafe (boolean closeShell) {
+	void removeFullScreenSafe (boolean closeShell) {
 		RemoveFullScreenRunner runner = new RemoveFullScreenRunner(closeShell);
 		if (Thread.currentThread().equals(getSite().getShell().getDisplay().getThread())) {
 			runner.run();
@@ -385,7 +384,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 		
 		@Override
 		public void run() {
-			if (mon==null || action == null) {
+			if (this.mon==null || this.action == null) {
 				Monitor currentMon = null;
 				for (Monitor mon : getSite().getShell().getDisplay().getMonitors()) {
 					if (mon.getBounds().contains(getSite().getShell().getDisplay().getCursorLocation())) {
@@ -394,7 +393,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 					}
 				}
 				if (currentMon!=null) {
-					for (FullScreenAction a : fullScreenActions) {
+					for (FullScreenAction a : AbstractPlayerView.this.fullScreenActions) {
 						if (a.getMonitor().equals(currentMon)) {
 							goFullscreen(currentMon, a);
 						}
@@ -402,27 +401,22 @@ public abstract class AbstractPlayerView extends ViewPart {
 				}
 				
 			} else {
-				goFullscreen(mon, action);
+				goFullscreen(this.mon, this.action);
 			}
 		}
 		
 		private void goFullscreen (Monitor mon, Action action) {
-			try {
-				if (isFullScreen()) {
-					new RemoveFullScreenRunner(true).run();
-					action.setChecked(false);
-					
-				} else {
-					startFullScreen(mon, action);
-				}
+			if (isFullScreen()) {
+				new RemoveFullScreenRunner(true).run();
+				action.setChecked(false);
 				
-			} catch (MorriganException e) {
-				getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));
+			} else {
+				startFullScreen(mon, action);
 			}
 		}
 		
-		private void startFullScreen (Monitor mon, final Action action) throws ImplException {
-			fullscreenShell = new FullscreenShell(getSite().getShell(), mon, new Runnable() {
+		private void startFullScreen (Monitor mon, final Action action) {
+			AbstractPlayerView.this.fullscreenShell = new FullscreenShell(getSite().getShell(), mon, new Runnable() {
 				@Override
 				public void run() {
 					removeFullScreenSafe(false);
@@ -430,8 +424,8 @@ public abstract class AbstractPlayerView extends ViewPart {
 				}
 			});
 			
-			registerScreenPainter(fullscreenShell.getScreenPainter());
-			fullscreenShell.getShell().open();
+			registerScreenPainter(AbstractPlayerView.this.fullscreenShell.getScreenPainter());
+			AbstractPlayerView.this.fullscreenShell.getShell().open();
 			updateCurrentMediaFrameParent();
 			action.setChecked(true);
 		}
@@ -451,12 +445,12 @@ public abstract class AbstractPlayerView extends ViewPart {
 			if (!isFullScreen()) return;
 			
 			try {
-				unregisterScreenPainter(fullscreenShell.getScreenPainter());
+				unregisterScreenPainter(AbstractPlayerView.this.fullscreenShell.getScreenPainter());
 				
-				if (closeShell) fullscreenShell.getShell().close();
+				if (this.closeShell) AbstractPlayerView.this.fullscreenShell.getShell().close();
 				
-				FullscreenShell fs = fullscreenShell;
-				fullscreenShell = null;
+				FullscreenShell fs = AbstractPlayerView.this.fullscreenShell;
+				AbstractPlayerView.this.fullscreenShell = null;
 				updateCurrentMediaFrameParent();
 				
 				if (fs!=null && !fs.getShell().isDisposed()) {
@@ -474,7 +468,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 //	Making actions.
 	
 	private List<OrderSelectAction> orderMenuActions = new ArrayList<OrderSelectAction>();
-	private List<FullScreenAction> fullScreenActions = new ArrayList<FullScreenAction>();
+	List<FullScreenAction> fullScreenActions = new ArrayList<FullScreenAction>();
 	
 	private void makeActions (Composite parent) {
 		// Order menu.
@@ -486,23 +480,23 @@ public abstract class AbstractPlayerView extends ViewPart {
 				}
 			});
 			if (getPlayer().getPlaybackOrder() == o) a.setChecked(true);
-			orderMenuActions.add(a);
+			this.orderMenuActions.add(a);
 		}
 		
 		// Full screen menu.
 		for (int i = 0; i < parent.getShell().getDisplay().getMonitors().length; i++) {
 			Monitor mon = parent.getShell().getDisplay().getMonitors()[i];
 			FullScreenAction a = new FullScreenAction(i, mon);
-			fullScreenActions.add(a);
+			this.fullScreenActions.add(a);
 		}
 	}
 	
 	protected List<OrderSelectAction> getOrderMenuActions () {
-		return orderMenuActions;
+		return this.orderMenuActions;
 	}
 	
 	protected List<FullScreenAction> getFullScreenActions () {
-		return fullScreenActions;
+		return this.fullScreenActions;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -526,8 +520,8 @@ public abstract class AbstractPlayerView extends ViewPart {
 		@Override
 		public void run() {
 			if (isChecked()) {
-				getPlayer().setPlaybackOrder(mode);
-				orderChangedListener.orderChanged(mode);
+				getPlayer().setPlaybackOrder(this.mode);
+				this.orderChangedListener.orderChanged(this.mode);
 			}
 		}
 		
@@ -544,12 +538,12 @@ public abstract class AbstractPlayerView extends ViewPart {
 		}
 		
 		public Monitor getMonitor () {
-			return mon;
+			return this.mon;
 		}
 		
 		@Override
 		public void run() {
-			goFullScreenSafe(mon, this);
+			goFullScreenSafe(this.mon, this);
 		}
 		
 	}
@@ -650,7 +644,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 	
 	private void setupHotkeys () {
 		try {
-			HotkeyRegister.addHotkeyListener(hotkeyListener);
+			HotkeyRegister.addHotkeyListener(this.hotkeyListener);
 			
 		} catch (Throwable t) {
 			t.printStackTrace();
@@ -659,7 +653,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 	
 	private void finaliseHotkeys () {
 		try {
-			HotkeyRegister.removeHotkeyListener(hotkeyListener);
+			HotkeyRegister.removeHotkeyListener(this.hotkeyListener);
 			
 		} catch (Throwable t) {
 			t.printStackTrace();
@@ -728,7 +722,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 					getSite().getShell().getDisplay().asyncExec(new Runnable() {
 						@Override
 						public void run() {
-							jumpToAction.run();
+							AbstractPlayerView.this.jumpToAction.run();
 						}
 					});
 					break;

@@ -28,7 +28,7 @@ public class TaskJob extends Job {
 	
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
-		TaskResult res = task.run(new PrgListener(monitor));
+		TaskResult res = this.task.run(new PrgListener(monitor));
 		
 		if (res.getOutcome() == TaskOutcome.SUCCESS) {
 			return Status.OK_STATUS;
@@ -37,7 +37,7 @@ public class TaskJob extends Job {
 			return Status.CANCEL_STATUS;
 		}
 		else {
-			display.asyncExec(new RunnableDialog(res.getErrThr()));
+			this.display.asyncExec(new RunnableDialog(res.getErrThr()));
 			return new FailStatus(res.getErrMsg(), res.getErrThr());
 		}
 	}

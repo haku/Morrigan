@@ -56,6 +56,7 @@ public class TrayHelper {
 		};
 		
 		Listener showEventListener = new Listener() {
+			@Override
 			public void handleEvent(Event event) {
 				window.getShell().setMinimized(false);
 				window.getShell().open();
@@ -63,6 +64,7 @@ public class TrayHelper {
 		};
 		
 		Listener exitEventListener = new Listener() {
+			@Override
 			public void handleEvent(Event event) {
 				window.getWorkbench().close();
 			}
@@ -72,6 +74,7 @@ public class TrayHelper {
 		exit.addListener(SWT.Selection, exitEventListener);
 		
 		trayItem.addListener(SWT.MenuDetect, new Listener() {
+			@Override
 			public void handleEvent(Event event) {
 				menu.setVisible(true);
 			}
@@ -95,9 +98,9 @@ public class TrayHelper {
 				cleanup.run();
 			}
 			@Override
-			public void shellDeactivated(ShellEvent e) {}
+			public void shellDeactivated(ShellEvent e) {/* UNUSED */}
 			@Override
-			public void shellIconified(ShellEvent e) {}
+			public void shellIconified(ShellEvent e) {/* UNUSED */}
 		});
 		
 		return true;

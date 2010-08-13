@@ -17,10 +17,12 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		super(configurer);
 	}
 
+	@Override
 	public ActionBarAdvisor createActionBarAdvisor(IActionBarConfigurer configurer) {
 		return new ApplicationActionBarAdvisor(configurer);
 	}
 
+	@Override
 	public void preWindowOpen() {
 		IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
 		configurer.setInitialSize(new Point(700, 500));
@@ -35,6 +37,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		super.postWindowOpen();
 		
 		getWindowConfigurer().getWindow().getShell().addListener(SWT.Iconify, new Listener() {
+			@SuppressWarnings("synthetic-access")
 			@Override
 			public void handleEvent(Event event) {
 				TrayHelper.minToTray(getWindowConfigurer().getWindow(), false);

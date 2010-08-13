@@ -156,6 +156,7 @@ public class HotkeyPref extends PreferencePage implements IWorkbenchPreferencePa
 		private Button chkAlt;
 		private Button chkSupr;
 		
+		@SuppressWarnings("synthetic-access")
 		public HotkeyChooser (Composite parent, String title) {
 			initializeDialogUnits(parent);
 			
@@ -177,6 +178,7 @@ public class HotkeyPref extends PreferencePage implements IWorkbenchPreferencePa
 			this.chkSupr  = makeCheckBox(group, "super", false);
 		}
 		
+		@SuppressWarnings("boxing")
 		public HotkeyValue getValue () {
 			if (this.cmbKey.getSelectionIndex() < 0) return null;
 			
@@ -206,6 +208,7 @@ public class HotkeyPref extends PreferencePage implements IWorkbenchPreferencePa
 					);
 		}
 		
+		@SuppressWarnings("boxing")
 		public void setValue (HotkeyValue value) {
 			if (value == null) {
 				this.cmbKey.setText("");

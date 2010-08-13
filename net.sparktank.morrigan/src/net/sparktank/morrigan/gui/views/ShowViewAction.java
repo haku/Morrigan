@@ -19,21 +19,21 @@ public class ShowViewAction extends Action implements IWorkbenchAction {
 	public ShowViewAction (String viewId, String text, ImageDescriptor icon ) {
 		super();
 		this.viewId = viewId;
-		text2 = text;
+		this.text2 = text;
 		this.icon = icon;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
-	public String getText() { return text2; }
+	public String getText() { return this.text2; }
 	
 	@Override
-	public String getId() { return "show_" + viewId; }
+	public String getId() { return "show_" + this.viewId; }
 	
 	@Override
 	public ImageDescriptor getImageDescriptor() {
-		return icon;
+		return this.icon;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -41,7 +41,7 @@ public class ShowViewAction extends Action implements IWorkbenchAction {
 	@Override
 	public void runWithEvent(Event event) {
 		try {
-			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(viewId);
+			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(this.viewId);
 		} catch (PartInitException e) {
 			new MorriganMsgDlg(e).open();
 		}
@@ -51,7 +51,7 @@ public class ShowViewAction extends Action implements IWorkbenchAction {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
-	public void dispose() {}
+	public void dispose() {/* UNUSED */}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

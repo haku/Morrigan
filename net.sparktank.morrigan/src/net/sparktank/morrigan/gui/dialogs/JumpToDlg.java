@@ -49,7 +49,7 @@ public class JumpToDlg {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private final Shell parent;
+	final Shell parent;
 	private final LocalMediaLibrary mediaLibrary;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -63,7 +63,7 @@ public class JumpToDlg {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public int getKeyMask() {
-		return keyMask;
+		return this.keyMask;
 	}
 	
 	public void setKeyMask(int keyMask) {
@@ -75,11 +75,11 @@ public class JumpToDlg {
 	private final static int SEP = 3;
 	
 	private Shell shell = null;
-	private Label label = null;
-	private Text text = null;
-	private TableViewer tableViewer = null;
-	private Button btnPlay = null;
-	private Button btnEnqueue = null;
+	Label label = null;
+	Text text = null;
+	TableViewer tableViewer = null;
+	Button btnPlay = null;
+	Button btnEnqueue = null;
 	private Button btnCancel = null;
 	
 	private PlayItem returnValue = null;
@@ -100,91 +100,91 @@ public class JumpToDlg {
 		}
 		
 		// Create window.
-		shell = new Shell(parent.getDisplay(), SWT.TITLE | SWT.CLOSE | SWT.APPLICATION_MODAL | SWT.RESIZE | SWT.ON_TOP);
-		shell.setImage(parent.getImage());
-		shell.setText("Jump to - Morrigan");
+		this.shell = new Shell(this.parent.getDisplay(), SWT.TITLE | SWT.CLOSE | SWT.APPLICATION_MODAL | SWT.RESIZE | SWT.ON_TOP);
+		this.shell.setImage(this.parent.getImage());
+		this.shell.setText("Jump to - Morrigan");
 		
 		// Create form layout.
 		FormData formData;
-		shell.setLayout(new FormLayout());
+		this.shell.setLayout(new FormLayout());
 		
-		label = new Label(shell, SWT.CENTER);
-		text = new Text(shell, SWT.SINGLE | SWT.CENTER | SWT.BORDER);
-		tableViewer =  new TableViewer(shell, SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION);
-		btnPlay = new Button(shell, SWT.PUSH);
-		btnEnqueue = new Button(shell, SWT.PUSH);
-		btnCancel = new Button(shell, SWT.PUSH);
+		this.label = new Label(this.shell, SWT.CENTER);
+		this.text = new Text(this.shell, SWT.SINGLE | SWT.CENTER | SWT.BORDER);
+		this.tableViewer =  new TableViewer(this.shell, SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION);
+		this.btnPlay = new Button(this.shell, SWT.PUSH);
+		this.btnEnqueue = new Button(this.shell, SWT.PUSH);
+		this.btnCancel = new Button(this.shell, SWT.PUSH);
 		
-		shell.setDefaultButton(btnPlay);
-		shell.addTraverseListener(traverseListener);
+		this.shell.setDefaultButton(this.btnPlay);
+		this.shell.addTraverseListener(this.traverseListener);
 		
 		formData = new FormData();
 		formData.left = new FormAttachment(0, SEP);
 		formData.top = new FormAttachment(0, SEP);
 		formData.right = new FormAttachment(100, -SEP);
-		label.setLayoutData(formData);
+		this.label.setLayoutData(formData);
 		
 		formData = new FormData();
 		formData.left = new FormAttachment(0, SEP);
-		formData.top = new FormAttachment(label, SEP);
+		formData.top = new FormAttachment(this.label, SEP);
 		formData.right = new FormAttachment(100, -SEP);
-		text.setLayoutData(formData);
+		this.text.setLayoutData(formData);
 		
 		formData = new FormData();
 		formData.left = new FormAttachment(0, SEP);
-		formData.top = new FormAttachment(text, SEP);
+		formData.top = new FormAttachment(this.text, SEP);
 		formData.right = new FormAttachment(100, -SEP);
-		formData.bottom = new FormAttachment(btnPlay, -SEP);
+		formData.bottom = new FormAttachment(this.btnPlay, -SEP);
 		formData.width = 600;
 		formData.height = 300;
-		tableViewer.getTable().setLayoutData(formData);
+		this.tableViewer.getTable().setLayoutData(formData);
 		
-		btnPlay.setText("Play");
+		this.btnPlay.setText("Play");
 		formData = new FormData();
 		formData.right = new FormAttachment(100, -SEP);
 		formData.bottom = new FormAttachment(100, -SEP);
-		btnPlay.setLayoutData(formData);
+		this.btnPlay.setLayoutData(formData);
 		
-		btnEnqueue.setText("Enqueue");
+		this.btnEnqueue.setText("Enqueue");
 		formData = new FormData();
-		formData.right = new FormAttachment(btnPlay, -SEP);
+		formData.right = new FormAttachment(this.btnPlay, -SEP);
 		formData.bottom = new FormAttachment(100, -SEP);
-		btnEnqueue.setLayoutData(formData);
+		this.btnEnqueue.setLayoutData(formData);
 		
-		btnCancel.setText("Cancel");
+		this.btnCancel.setText("Cancel");
 		formData = new FormData();
 		formData.left = new FormAttachment(0, SEP);
 		formData.bottom = new FormAttachment(100, -SEP);
-		btnCancel.setLayoutData(formData);
+		this.btnCancel.setLayoutData(formData);
 		
-		label.setText("Search:");
+		this.label.setText("Search:");
 		
-		text.addVerifyListener(textChangeListener);
-		text.addTraverseListener(textTraverseListener);
+		this.text.addVerifyListener(this.textChangeListener);
+		this.text.addTraverseListener(this.textTraverseListener);
 		
-		tableViewer.setContentProvider(contentProvider);
-		tableViewer.setLabelProvider(labelProvider);
-		tableViewer.setInput(shell);
-		tableViewer.getTable().addTraverseListener(listTraverseListener);
+		this.tableViewer.setContentProvider(this.contentProvider);
+		this.tableViewer.setLabelProvider(this.labelProvider);
+		this.tableViewer.setInput(this.shell);
+		this.tableViewer.getTable().addTraverseListener(this.listTraverseListener);
 		
-		btnPlay.addSelectionListener(buttonListener);
-		btnEnqueue.addSelectionListener(buttonListener);
-		btnCancel.addSelectionListener(buttonListener);
+		this.btnPlay.addSelectionListener(this.buttonListener);
+		this.btnEnqueue.addSelectionListener(this.buttonListener);
+		this.btnCancel.addSelectionListener(this.buttonListener);
 		
-		shell.pack();
+		this.shell.pack();
 		
 		// Work out which screen to show the dlg on.
 		Point mouse = MouseInfo.getPointerInfo().getLocation();
-		for (Monitor m : parent.getDisplay().getMonitors()) {
+		for (Monitor m : this.parent.getDisplay().getMonitors()) {
 			Rectangle b = m.getBounds();
 			if (mouse.x >= b.x && mouse.x <= b.x + b.width
 					&& mouse.y >= b.y && mouse.y <= b.y + b.width) {
 				
 				Rectangle bounds = m.getBounds ();
-				Rectangle rect = shell.getBounds ();
+				Rectangle rect = this.shell.getBounds ();
 				int x = bounds.x + (bounds.width - rect.width) / 2;
 				int y = bounds.y + (bounds.height - rect.height) / 2;
-				shell.setLocation (x, y);
+				this.shell.setLocation (x, y);
 				
 				break;
 			}
@@ -193,20 +193,20 @@ public class JumpToDlg {
 		// Read saved query string.
 		String s = PreferenceHelper.getLastJumpToDlgQuery();
 		if (s != null && s.length() > 0) {
-			text.setText(s);
-			text.setSelection(0, text.getText().length());
-			textChangeListener.verifyText(null);
+			this.text.setText(s);
+			this.text.setSelection(0, this.text.getText().length());
+			this.textChangeListener.verifyText(null);
 		}
 		
 		// Save dlg object for next time.
 		openDlg = new WeakReference<JumpToDlg>(this);
 		
 		// Show the dlg.
-		shell.open();
-		shell.setFocus();
-		shell.forceActive();
-		Display display = parent.getDisplay();
-		while (!shell.isDisposed()) {
+		this.shell.open();
+		this.shell.setFocus();
+		this.shell.forceActive();
+		Display display = this.parent.getDisplay();
+		while (!this.shell.isDisposed()) {
 			if (!display.readAndDispatch()) {
 				display.sleep();
 			}
@@ -216,7 +216,7 @@ public class JumpToDlg {
 			dlgOpen = false;
 		}
 		
-		return returnValue;
+		return this.returnValue;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -225,21 +225,22 @@ public class JumpToDlg {
 		leaveDlg(false, 0);
 	}
 	
-	private void leaveDlg (boolean ok, int mask) {
+	void leaveDlg (boolean ok, int mask) {
 		if (ok) {
 			MediaTrack item = getSelectedItem();
 			if (item == null) return;
-			returnValue = new PlayItem(mediaLibrary, item);
+			this.returnValue = new PlayItem(this.mediaLibrary, item);
 		}
 		setKeyMask(mask);
 		
 		// Save query string.
-		PreferenceHelper.setLastJumpToDlgQuery(text.getText());
+		PreferenceHelper.setLastJumpToDlgQuery(this.text.getText());
 		
-		shell.close();
+		this.shell.close();
 	}
 	
 	private TraverseListener traverseListener = new TraverseListener() {
+		@Override
 		public void keyTraversed(TraverseEvent e) {
 			switch (e.detail) {
 				
@@ -268,11 +269,11 @@ public class JumpToDlg {
 			switch (e.detail) {
 
 				case SWT.TRAVERSE_ARROW_NEXT:
-					if (e.keyCode == SWT.ARROW_DOWN && tableViewer.getTable().getItemCount() > 0) {
+					if (e.keyCode == SWT.ARROW_DOWN && JumpToDlg.this.tableViewer.getTable().getItemCount() > 0) {
 						e.detail = SWT.TRAVERSE_NONE;
 						e.doit = false;
-						tableViewer.getTable().setSelection(0);
-						tableViewer.getTable().setFocus();
+						JumpToDlg.this.tableViewer.getTable().setSelection(0);
+						JumpToDlg.this.tableViewer.getTable().setFocus();
 					}
 					break;
 				
@@ -295,10 +296,10 @@ public class JumpToDlg {
 			switch (e.detail) {
 				
 				case SWT.TRAVERSE_ARROW_PREVIOUS:
-					if (tableViewer.getTable().getSelectionIndex() == 0) {
+					if (JumpToDlg.this.tableViewer.getTable().getSelectionIndex() == 0) {
 						e.detail = SWT.TRAVERSE_NONE;
 						e.doit = false;
-						text.setFocus();
+						JumpToDlg.this.text.setFocus();
 					}
 					break;
 				
@@ -318,10 +319,10 @@ public class JumpToDlg {
 	private SelectionListener buttonListener = new SelectionAdapter() {
 		@Override
 		public void widgetSelected(SelectionEvent e) {
-			if (e.widget == btnPlay) {
+			if (e.widget == JumpToDlg.this.btnPlay) {
 				leaveDlg(true, 0);
 				
-			} else if (e.widget == btnEnqueue) {
+			} else if (e.widget == JumpToDlg.this.btnEnqueue) {
 				leaveDlg(true, SWT.CONTROL);
 				
 			} else {
@@ -334,7 +335,7 @@ public class JumpToDlg {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private MediaTrack getSelectedItem () {
-		ISelection selection = tableViewer.getSelection();
+		ISelection selection = this.tableViewer.getSelection();
 		if (selection==null) return null;
 		if (selection.isEmpty()) return null;
 		
@@ -352,22 +353,22 @@ public class JumpToDlg {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private List<MediaTrack> searchResults = null;
+	List<MediaTrack> searchResults = null;
 	
 	private IStructuredContentProvider contentProvider = new IStructuredContentProvider() {
 		@Override
 		public Object[] getElements(Object inputElement) {
-			if (searchResults != null) {
-				return searchResults.toArray();
+			if (JumpToDlg.this.searchResults != null) {
+				return JumpToDlg.this.searchResults.toArray();
 				
-			} else {
-				return new String[]{};
 			}
+			
+			return new String[]{};
 		}
 		@Override
-		public void dispose() {}
+		public void dispose() {/* UNUSED */}
 		@Override
-		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {/* UNUSED */}
 	};
 	
 	private ILabelProvider labelProvider = new LabelProvider() {
@@ -383,9 +384,9 @@ public class JumpToDlg {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private Object searchLock = new Object();
-	private volatile boolean searchRunning = false;
-	private volatile boolean searchDirty = false;
+	Object searchLock = new Object();
+	volatile boolean searchRunning = false;
+	volatile boolean searchDirty = false;
 	
 	/**
 	 * Text changed event handler.
@@ -397,17 +398,17 @@ public class JumpToDlg {
 		}
 	};
 	
-	private void updateSearchResults () {
+	void updateSearchResults () {
 		updateSearchResults(false);
 	}
 	
-	private void updateSearchResults (boolean force) {
-		synchronized (searchLock) {
-			if (!searchRunning || force) {
-				parent.getDisplay().asyncExec(updateSearchResults);
-				searchRunning = true;
+	void updateSearchResults (boolean force) {
+		synchronized (this.searchLock) {
+			if (!this.searchRunning || force) {
+				this.parent.getDisplay().asyncExec(this.updateSearchResults);
+				this.searchRunning = true;
 			} else {
-				searchDirty = true;
+				this.searchDirty = true;
 			}
 		}
 	}
@@ -420,8 +421,8 @@ public class JumpToDlg {
 	private Runnable updateSearchResults = new Runnable() {
 		@Override
 		public void run() {
-			if (!text.isDisposed()) {
-				updateSearchResults(text.getText());
+			if (!JumpToDlg.this.text.isDisposed()) {
+				updateSearchResults(JumpToDlg.this.text.getText());
 			}
 		}
 	};
@@ -431,43 +432,43 @@ public class JumpToDlg {
 	 * input has changed while the search was running.
 	 * @param query
 	 */
-	private void updateSearchResults (final String query) {
+	void updateSearchResults (final String query) {
 		Thread t = new Thread() {
 			@Override
 			public void run() {
 				if (doSearch(query)) {
-					parent.getDisplay().asyncExec(new Runnable() {
+					JumpToDlg.this.parent.getDisplay().asyncExec(new Runnable() {
 						@Override
 						public void run() {
-							if (label.isDisposed() || tableViewer.getTable().isDisposed()) return;
-							label.setText(searchResults.size() + " results.");
-							tableViewer.refresh();
+							if (JumpToDlg.this.label.isDisposed() || JumpToDlg.this.tableViewer.getTable().isDisposed()) return;
+							JumpToDlg.this.label.setText(JumpToDlg.this.searchResults.size() + " results.");
+							JumpToDlg.this.tableViewer.refresh();
 							
-							if (tableViewer.getTable().getItemCount() > 0) {
-								tableViewer.getTable().setSelection(0);
+							if (JumpToDlg.this.tableViewer.getTable().getItemCount() > 0) {
+								JumpToDlg.this.tableViewer.getTable().setSelection(0);
 							}
 						}
 					});
 				
 				} else {
-					parent.getDisplay().asyncExec(new Runnable() {
+					JumpToDlg.this.parent.getDisplay().asyncExec(new Runnable() {
 						@Override
 						public void run() {
-							if (text.getText().length() > 0) {
-								label.setText("No results for query.");
+							if (JumpToDlg.this.text.getText().length() > 0) {
+								JumpToDlg.this.label.setText("No results for query.");
 							} else {
-								label.setText("Search:");
+								JumpToDlg.this.label.setText("Search:");
 							}
 						}
 					});
 				}
 				
-				synchronized (searchLock) {
-					if (searchDirty) {
+				synchronized (JumpToDlg.this.searchLock) {
+					if (JumpToDlg.this.searchDirty) {
 						updateSearchResults(true);
-						searchDirty = false;
+						JumpToDlg.this.searchDirty = false;
 					} else {
-						searchRunning = false;
+						JumpToDlg.this.searchRunning = false;
 					}
 				}
 			}
@@ -480,7 +481,7 @@ public class JumpToDlg {
 	 * Do the actual searching.
 	 * @param query
 	 */
-	private boolean doSearch (String query) {
+	boolean doSearch (String query) {
 		if (query == null || query.length() < 1) return false;
 		
 		String q = query.replace("'", "''");
@@ -491,9 +492,9 @@ public class JumpToDlg {
 		q = q.replace("*", "%");
 		
 		try {
-			List<MediaTrack> res = mediaLibrary.simpleSearch(q, "\\", MAX_RESULTS);
+			List<MediaTrack> res = this.mediaLibrary.simpleSearch(q, "\\", MAX_RESULTS);
 			if (res != null && res.size() > 0) {
-				searchResults = res;
+				this.searchResults = res;
 				return true;
 			}
 			

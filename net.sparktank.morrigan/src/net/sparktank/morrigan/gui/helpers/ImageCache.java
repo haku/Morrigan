@@ -12,16 +12,16 @@ public class ImageCache {
 	private Map<String, Image> imageCache = new HashMap<String, Image>();
 	
 	public void clearCache () {
-		for (String i : imageCache.keySet()) {
-			imageCache.get(i).dispose();
+		for (String i : this.imageCache.keySet()) {
+			this.imageCache.get(i).dispose();
 		}
 	}
 	
 	public Image readImage (String path) {
-		if (!imageCache.containsKey(path)) {
-			imageCache.put(path, Activator.getImageDescriptor(path).createImage());
+		if (!this.imageCache.containsKey(path)) {
+			this.imageCache.put(path, Activator.getImageDescriptor(path).createImage());
 		}
-		return imageCache.get(path);
+		return this.imageCache.get(path);
 	}
 	
 }
