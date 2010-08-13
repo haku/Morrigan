@@ -9,15 +9,14 @@ import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.MediaSqliteLayer2.SortDirection;
 import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
 import net.sparktank.morrigan.model.db.interfaces.IDbItem;
-import net.sparktank.morrigan.model.media.impl.MediaItem;
 import net.sparktank.morrigan.model.media.impl.MediaItemList;
-import net.sparktank.morrigan.model.media.interfaces.IMediaItemList;
+import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
 import net.sparktank.morrigan.model.tags.MediaTag;
 import net.sparktank.morrigan.model.tags.MediaTagClassification;
 import net.sparktank.morrigan.model.tags.MediaTagType;
 import net.sparktank.sqlitewrapper.DbException;
 
-public abstract class MediaItemDb<Q extends IMediaItemList<T>, S extends MediaSqliteLayer2<T>, T extends MediaItem> extends MediaItemList<T> implements IMediaItemDb<S,T> {
+public abstract class MediaItemDb<S extends MediaSqliteLayer2<T>, T extends IMediaItem> extends MediaItemList<T> implements IMediaItemDb<S,T> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static final boolean HIDEMISSING = true; // TODO link this to GUI?
