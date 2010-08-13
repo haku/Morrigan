@@ -12,7 +12,7 @@ import net.sparktank.morrigan.model.pictures.MediaPicture;
 import net.sparktank.morrigan.model.tracks.MediaTrack;
 import net.sparktank.sqlitewrapper.DbException;
 
-public interface IMixedMediaSqlLayer {
+public interface IMixedMediaMetadataLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Fixed enums - changing these requires writing more code.
 	
