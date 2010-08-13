@@ -53,9 +53,9 @@ public class MediaPicture extends MediaItem {
 			MediaPicture mli = (MediaPicture) mi;
 			
 			boolean b = this.setWidth(mli.getWidth())
-				|| this.setHeight(mli.getHeight());
+				| this.setHeight(mli.getHeight());
 			
-			return b || setFromMediaItem;
+			return b | setFromMediaItem;
 		}
 		
 		return setFromMediaItem;

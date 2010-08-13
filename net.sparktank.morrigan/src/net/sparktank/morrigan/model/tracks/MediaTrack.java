@@ -85,11 +85,11 @@ public class MediaTrack extends MediaItem {
 			MediaTrack mt = (MediaTrack) mi;
 			
 			boolean b = this.setDuration(mt.getDuration())
-				|| this.setStartCount(mt.getStartCount())
-				|| this.setEndCount(mt.getEndCount())
-				|| this.setDateLastPlayed(mt.getDateLastPlayed());
+				| this.setStartCount(mt.getStartCount())
+				| this.setEndCount(mt.getEndCount())
+				| this.setDateLastPlayed(mt.getDateLastPlayed());
 			
-			return b || setFromMediaItem;
+			return b | setFromMediaItem;
 		}
 		
 		return setFromMediaItem;
