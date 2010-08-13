@@ -14,7 +14,7 @@ import java.util.Date;
 import java.util.logging.Logger;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
-import net.sparktank.morrigan.model.MediaItemList;
+import net.sparktank.morrigan.model.media.impl.MediaItemList;
 import net.sparktank.morrigan.model.tracks.IMediaTrackList;
 import net.sparktank.morrigan.model.tracks.MediaTrack;
 import net.sparktank.morrigan.model.tracks.MediaTrackListHelper;

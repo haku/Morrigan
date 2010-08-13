@@ -3,7 +3,7 @@ package net.sparktank.morrigan.model.tracks;
 import java.util.Date;
 
 import net.sparktank.morrigan.helpers.EqualHelper;
-import net.sparktank.morrigan.model.MediaItem;
+import net.sparktank.morrigan.model.media.impl.MediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
 

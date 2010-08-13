@@ -7,6 +7,8 @@ import java.util.List;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.MediaSqliteLayer2.SortDirection;
+import net.sparktank.morrigan.model.media.impl.MediaItem;
+import net.sparktank.morrigan.model.media.impl.MediaItemList;
 import net.sparktank.morrigan.model.media.interfaces.IDbItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemList;
 import net.sparktank.morrigan.model.tags.MediaTag;

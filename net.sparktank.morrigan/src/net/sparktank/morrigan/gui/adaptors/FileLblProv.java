@@ -1,7 +1,7 @@
 package net.sparktank.morrigan.gui.adaptors;
 
 import net.sparktank.morrigan.gui.helpers.ImageCache;
-import net.sparktank.morrigan.model.MediaItem;
+import net.sparktank.morrigan.model.media.impl.MediaItem;
 
 import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.StyledString;

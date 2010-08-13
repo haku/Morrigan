@@ -12,7 +12,7 @@ import net.sparktank.morrigan.gui.handler.CallPlayMedia;
 import net.sparktank.morrigan.gui.helpers.ImageCache;
 import net.sparktank.morrigan.gui.jobs.TaskJob;
 import net.sparktank.morrigan.gui.preferences.MediaListPref;
-import net.sparktank.morrigan.model.MediaItem;
+import net.sparktank.morrigan.model.media.impl.MediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemList;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemList.DirtyState;
 import net.sparktank.morrigan.model.tasks.MediaFileCopyTask;

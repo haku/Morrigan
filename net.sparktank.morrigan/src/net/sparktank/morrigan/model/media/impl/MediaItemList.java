@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.model;
+package net.sparktank.morrigan.model.media.impl;
 
 import java.io.File;
 import java.io.IOException;
