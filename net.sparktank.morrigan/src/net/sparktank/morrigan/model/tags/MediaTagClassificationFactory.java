@@ -18,6 +18,7 @@ public class MediaTagClassificationFactory extends RecyclingFactory<MediaTagClas
 		return true;
 	}
 	
+	@SuppressWarnings("boxing")
 	@Override
 	protected MediaTagClassification makeNewProduct(Long material, String config) {
 		return new MediaTagClassification(material, config);

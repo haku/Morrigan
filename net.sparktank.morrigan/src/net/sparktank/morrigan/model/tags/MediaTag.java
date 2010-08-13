@@ -23,25 +23,25 @@ public class MediaTag {
 	}
 	
 	public long getDbRowId() {
-		return dbRowId;
+		return this.dbRowId;
 	}
 	
 	public String getTag() {
-		return tag;
+		return this.tag;
 	}
 	public void setTag(String tag) {
 		this.tag = tag;
 	}
 	
 	public MediaTagType getType() {
-		return type;
+		return this.type;
 	}
 	public void setType(MediaTagType type) {
 		this.type = type;
 	}
 	
 	public MediaTagClassification getClassification() {
-		return classification;
+		return this.classification;
 	}
 	public void setClassification(MediaTagClassification classification) {
 		this.classification = classification;

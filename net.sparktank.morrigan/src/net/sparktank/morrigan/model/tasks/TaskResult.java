@@ -23,21 +23,21 @@ public class TaskResult {
 		this.outcome = outcome;
 	}
 	public TaskOutcome getOutcome() {
-		return outcome;
+		return this.outcome;
 	}
 	
 	public void setErrMsg(String errMsg) {
 		this.errMsg = errMsg;
 	}
 	public String getErrMsg() {
-		return errMsg;
+		return this.errMsg;
 	}
 	
 	public void setErrThr(Throwable errThr) {
 		this.errThr = errThr;
 	}
 	public Throwable getErrThr() {
-		return errThr;
+		return this.errThr;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
