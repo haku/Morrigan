@@ -1,8 +1,8 @@
 package net.sparktank.morrigan.model.pictures;
 
 import net.sparktank.morrigan.model.MediaItem;
-import net.sparktank.morrigan.model.media.IMediaItem;
-import net.sparktank.morrigan.model.media.IMediaPicture;
+import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
+import net.sparktank.morrigan.model.media.interfaces.IMediaPicture;
 
 public class MediaPicture extends MediaItem implements IMediaPicture {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

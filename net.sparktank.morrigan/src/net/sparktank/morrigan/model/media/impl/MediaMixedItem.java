@@ -1,10 +1,14 @@
-package net.sparktank.morrigan.model.media;
+package net.sparktank.morrigan.model.media.impl;
 
 import java.io.File;
 import java.util.Date;
 
 import net.sparktank.morrigan.helpers.EqualHelper;
 import net.sparktank.morrigan.model.MediaItem;
+import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
+import net.sparktank.morrigan.model.media.interfaces.IMediaMixedItem;
+import net.sparktank.morrigan.model.media.interfaces.IMediaPicture;
+import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
 
 public class MediaMixedItem implements IMediaMixedItem {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

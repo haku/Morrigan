@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.model.media;
+package net.sparktank.morrigan.model.media.impl;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,7 +14,11 @@ import net.sparktank.morrigan.model.DbColumn;
 import net.sparktank.morrigan.model.IDbItem;
 import net.sparktank.morrigan.model.MediaSqliteLayer;
 import net.sparktank.morrigan.model.MediaSqliteLayer2.SortDirection;
-import net.sparktank.morrigan.model.media.IMixedMediaStorageLayer.MediaType;
+import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
+import net.sparktank.morrigan.model.media.interfaces.IMediaMixedItem;
+import net.sparktank.morrigan.model.media.interfaces.IMediaPicture;
+import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
+import net.sparktank.morrigan.model.media.interfaces.IMixedMediaStorageLayer.MediaType;
 import net.sparktank.sqlitewrapper.DbException;
 
 public class MixedMediaSqliteLayerImpl extends MediaSqliteLayer {

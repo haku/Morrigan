@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.model.media;
+package net.sparktank.morrigan.model.media.impl;
 
 import java.io.File;
 import java.util.Date;
@@ -8,6 +8,8 @@ import net.sparktank.morrigan.helpers.RecyclingFactory;
 import net.sparktank.morrigan.model.DbColumn;
 import net.sparktank.morrigan.model.IDbItem;
 import net.sparktank.morrigan.model.MediaSqliteLayer2.SortDirection;
+import net.sparktank.morrigan.model.media.interfaces.IMediaMixedItem;
+import net.sparktank.morrigan.model.media.interfaces.IMixedMediaStorageLayer;
 import net.sparktank.sqlitewrapper.DbException;
 
 public class MixedMediaSqliteLayer extends MixedMediaSqliteLayerImpl implements IMixedMediaStorageLayer {

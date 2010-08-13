@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.model.media;
+package net.sparktank.morrigan.model.media.impl;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -12,6 +12,9 @@ import net.sparktank.sqlitewrapper.GenericSqliteLayer.SqlCreateCmd;
 
 /*
  * Totally generic SQLite helper methods.
+ * 
+ * TODO put somewhere more generic?
+ * 
  */
 public class SqliteHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
