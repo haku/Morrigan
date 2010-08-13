@@ -21,18 +21,18 @@ public class MixedMediaSqliteLayer extends MixedMediaSqliteLayerImpl implements 
 //	Read methods for IMediaMixedItem.
 	
 	@Override
-	public List<IMediaMixedItem> updateListOfAllMedia(MediaType mediaType, List<IMediaMixedItem> list, DbColumn sort, SortDirection direction, boolean hideMissing) throws DbException {
+	public List<IMediaMixedItem> getAllMedia(MediaType mediaType, DbColumn sort, SortDirection direction, boolean hideMissing) throws DbException {
 		try {
-			return local_updateListOfAllMedia(mediaType, list, sort, direction, hideMissing);
+			return local_getAllMedia(mediaType, sort, direction, hideMissing);
 		} catch (Exception e) {
 			throw new DbException(e);
 		}
 	}
 	
 	@Override
-	public List<IMediaMixedItem> getAllMedia(MediaType mediaType, DbColumn sort, SortDirection direction, boolean hideMissing) throws DbException {
+	public List<IMediaMixedItem> updateListOfAllMedia(MediaType mediaType, List<IMediaMixedItem> list, DbColumn sort, SortDirection direction, boolean hideMissing) throws DbException {
 		try {
-			return local_getAllMedia(mediaType, sort, direction, hideMissing);
+			return local_updateListOfAllMedia(mediaType, list, sort, direction, hideMissing);
 		} catch (Exception e) {
 			throw new DbException(e);
 		}

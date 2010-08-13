@@ -40,8 +40,8 @@ public interface IMixedMediaMetadataLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Read methods.
 	
-	public List<IMediaMixedItem> updateListOfAllMedia (MediaType mediaType, List<IMediaMixedItem> list, DbColumn sort, SortDirection direction, boolean hideMissing) throws DbException;
 	public List<IMediaMixedItem> getAllMedia (MediaType mediaType, DbColumn sort, SortDirection direction, boolean hideMissing) throws DbException;
+	public List<IMediaMixedItem> updateListOfAllMedia (MediaType mediaType, List<IMediaMixedItem> list, DbColumn sort, SortDirection direction, boolean hideMissing) throws DbException;
 	public List<IMediaMixedItem> simpleSearchMedia (MediaType mediaType, String term, String esc, int maxResults) throws DbException;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
