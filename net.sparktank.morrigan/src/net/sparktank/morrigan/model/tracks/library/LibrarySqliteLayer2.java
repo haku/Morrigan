@@ -7,8 +7,9 @@ import java.util.Date;
 import java.util.List;
 
 import net.sparktank.morrigan.helpers.RecyclingFactory;
-import net.sparktank.morrigan.model.DbColumn;
 import net.sparktank.morrigan.model.MediaSqliteLayer2;
+import net.sparktank.morrigan.model.db.impl.DbColumn;
+import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
 import net.sparktank.morrigan.model.tracks.MediaTrack;
 import net.sparktank.sqlitewrapper.DbException;
 
@@ -129,13 +130,13 @@ public class LibrarySqliteLayer2 extends MediaSqliteLayer2<MediaTrack> {
 		SQL_TBL_MEDIAFILES_COL_DURATION,
 		};
 	
-	static public DbColumn parseColumnFromName (String name) {
-		for (DbColumn c : SQL_TBL_MEDIAFILES_COLS) {
+	static public IDbColumn parseColumnFromName (String name) {
+		for (IDbColumn c : SQL_TBL_MEDIAFILES_COLS) {
 			if (c.getName().equals(name)) {
 				return c;
 			}
 		}
-		for (DbColumn c : SQL_TBL_MEDIAFILES_COLS2) {
+		for (IDbColumn c : SQL_TBL_MEDIAFILES_COLS2) {
 			if (c.getName().equals(name)) {
 				return c;
 			}

@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.model.media.interfaces;
+package net.sparktank.morrigan.model.db.interfaces;
 
 public interface IDbItem {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

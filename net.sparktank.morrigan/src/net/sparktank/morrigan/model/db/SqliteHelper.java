@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.model.media.impl;
+package net.sparktank.morrigan.model.db;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -7,7 +7,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import net.sparktank.morrigan.model.DbColumn;
+import net.sparktank.morrigan.model.db.impl.DbColumn;
+import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
 import net.sparktank.sqlitewrapper.GenericSqliteLayer.SqlCreateCmd;
 
 /*
@@ -36,7 +37,7 @@ public class SqliteHelper {
 		sbCreate.append("(");
 		
 		boolean first = true;
-		for (DbColumn c : columns) {
+		for (IDbColumn c : columns) {
 			if (first) {
 				first = false;
 			} else {

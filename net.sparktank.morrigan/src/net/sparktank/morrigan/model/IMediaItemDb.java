@@ -4,7 +4,8 @@ import java.util.List;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.MediaSqliteLayer2.SortDirection;
-import net.sparktank.morrigan.model.media.interfaces.IDbItem;
+import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
+import net.sparktank.morrigan.model.db.interfaces.IDbItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemList;
 import net.sparktank.morrigan.model.tags.MediaTag;
@@ -18,14 +19,14 @@ public interface IMediaItemDb<S extends MediaSqliteLayer2<T>, T extends IMediaIt
 	// TODO add more methods?
 	
 	public interface SortChangeListener {
-		public void sortChanged (DbColumn sort, SortDirection direction);
+		public void sortChanged (IDbColumn sort, SortDirection direction);
 	}
 	
 	public S getDbLayer();
 	
-	public DbColumn getSort ();
+	public IDbColumn getSort ();
 	public SortDirection getSortDirection ();
-	public void setSort (DbColumn sort, SortDirection direction) throws MorriganException;
+	public void setSort (IDbColumn sort, SortDirection direction) throws MorriganException;
 	public void registerSortChangeListener (SortChangeListener scl);
 	public void unregisterSortChangeListener (SortChangeListener scl);
 	

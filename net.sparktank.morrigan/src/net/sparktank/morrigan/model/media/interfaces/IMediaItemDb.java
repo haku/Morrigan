@@ -3,7 +3,8 @@ package net.sparktank.morrigan.model.media.interfaces;
 import java.util.List;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
-import net.sparktank.morrigan.model.DbColumn;
+import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
+import net.sparktank.morrigan.model.db.interfaces.IDbItem;
 import net.sparktank.morrigan.model.tags.MediaTag;
 import net.sparktank.morrigan.model.tags.MediaTagClassification;
 import net.sparktank.morrigan.model.tags.MediaTagType;
@@ -15,14 +16,14 @@ public interface IMediaItemDb<S extends IMixedMediaStorageLayer, T extends IMedi
 	public enum SortDirection { ASC, DESC };
 	
 	public interface SortChangeListener {
-		public void sortChanged (DbColumn sort, SortDirection direction);
+		public void sortChanged (IDbColumn sort, SortDirection direction);
 	}
 	
 	public S getStorageLayer();
 	
-	public DbColumn getSort ();
+	public IDbColumn getSort ();
 	public SortDirection getSortDirection ();
-	public void setSort (DbColumn sort, SortDirection direction) throws MorriganException;
+	public void setSort (IDbColumn sort, SortDirection direction) throws MorriganException;
 	public void registerSortChangeListener (SortChangeListener scl);
 	public void unregisterSortChangeListener (SortChangeListener scl);
 	
