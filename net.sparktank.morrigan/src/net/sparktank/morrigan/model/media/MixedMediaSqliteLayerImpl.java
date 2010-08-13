@@ -69,7 +69,6 @@ public class MixedMediaSqliteLayerImpl extends MediaSqliteLayer {
 		SQL_TBL_MEDIAFILES_COL_HEIGHT,
 		};
 	
-	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	SQL queries.
 	
