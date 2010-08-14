@@ -10,7 +10,7 @@ import net.sparktank.morrigan.gui.adaptors.HashcodeLblProv;
 import net.sparktank.morrigan.gui.editors.MediaColumn;
 import net.sparktank.morrigan.gui.editors.MediaItemListEditor;
 import net.sparktank.morrigan.model.media.interfaces.IMediaPicture;
-import net.sparktank.morrigan.model.pictures.IMediaPictureList;
+import net.sparktank.morrigan.model.media.interfaces.IMediaPictureList;
 
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;

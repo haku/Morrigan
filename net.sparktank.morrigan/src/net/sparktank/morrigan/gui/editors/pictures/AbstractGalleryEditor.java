@@ -16,6 +16,7 @@ import net.sparktank.morrigan.model.db.impl.DbColumn;
 import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemDb.SortChangeListener;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemStorageLayer.SortDirection;
+import net.sparktank.morrigan.model.media.interfaces.IMediaPicture;
 import net.sparktank.morrigan.model.pictures.MediaPicture;
 import net.sparktank.morrigan.model.pictures.gallery.AbstractGallery;
 
@@ -36,7 +37,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 
-public abstract class AbstractGalleryEditor<T extends AbstractGallery> extends MediaPictureListEditor<T, MediaPicture> implements IMediaItemDbEditor {
+public abstract class AbstractGalleryEditor<T extends AbstractGallery> extends MediaPictureListEditor<T, IMediaPicture> implements IMediaItemDbEditor {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public AbstractGalleryEditor () {
@@ -46,7 +47,7 @@ public abstract class AbstractGalleryEditor<T extends AbstractGallery> extends M
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
-	protected MediaPicture getNewS(String filePath) {
+	protected IMediaPicture getNewS(String filePath) {
 		return new MediaPicture(filePath);
 	}
 	
