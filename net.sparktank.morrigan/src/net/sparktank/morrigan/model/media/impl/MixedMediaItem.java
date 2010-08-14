@@ -11,14 +11,41 @@ public class MixedMediaItem extends MediaItem implements IMixedMediaItem {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors.
 	
-	public MixedMediaItem () {/*Empty constructor.*/}
+	public MixedMediaItem (MediaType type) {
+		setMediaType(type);
+		
+	}
 	
 	public MixedMediaItem (String filePath) {
 		super(filePath);
 	}
 	
+	public MixedMediaItem (MediaType type, String filePath) {
+		super(filePath);
+		setMediaType(type);
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Attributes.
+	
+//	-  -  -  -  -  -  -  -  -
+//	IMixedMediaItem
+	
+	private MediaType type;
+	
+	@Override
+	public MediaType getMediaType() {
+		return this.type;
+	}
+
+	@Override
+	public boolean setMediaType(MediaType newType) {
+		if (this.type != newType) {
+			this.type = newType;
+			return true;
+		}
+		return false;
+	}
 	
 //	-  -  -  -  -  -  -  -  -
 //	IMediaTrack.
@@ -153,9 +180,10 @@ public class MixedMediaItem extends MediaItem implements IMixedMediaItem {
 			  this.setFromMediaItem(mmi)
 			| _setFromMediaTrack(mmi)
 			| _setFromMediaPicture(mmi)
+			| this.setMediaType(mmi.getMediaType())
 			;
 		return b;
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

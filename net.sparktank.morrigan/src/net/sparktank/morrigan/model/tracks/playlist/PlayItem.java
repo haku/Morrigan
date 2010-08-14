@@ -6,10 +6,10 @@ import net.sparktank.morrigan.model.media.interfaces.IMediaTrackList;
 
 public class PlayItem {
 	
-	public IMediaTrackList<IMediaTrack> list;
+	public IMediaTrackList<? extends IMediaTrack> list;
 	public IMediaTrack item;
 	
-	public PlayItem (IMediaTrackList<IMediaTrack> list, IMediaTrack item) {
+	public PlayItem (IMediaTrackList<? extends IMediaTrack> list, IMediaTrack item) {
 		this.list = list;
 		this.item = item;
 	}

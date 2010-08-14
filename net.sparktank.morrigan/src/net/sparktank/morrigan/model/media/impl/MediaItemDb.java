@@ -150,7 +150,8 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	/**
 	 * Returns a copy of the main list updated with all items from the DB.
 	 */
-	public List<T> getAllLibraryEntries () throws DbException {
+	@Override
+	public List<T> getAllDbEntries () throws DbException {
 		ArrayList<T> copyOfMainList = new ArrayList<T>(getMediaItems());
 		List<T> allList = this.dbLayer.getAllMedia(MediaSqliteLayer2.SQL_TBL_MEDIAFILES_COL_FILE, SortDirection.ASC, false);
 		updateList(copyOfMainList, allList);
@@ -418,6 +419,7 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	 * @throws MorriganException 
 	 * @throws DbException 
 	 */
+	@Override
 	public T addFile (File file) throws MorriganException, DbException {
 		T track = null;
 		boolean added = this.dbLayer.addFile(file);

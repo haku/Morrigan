@@ -211,7 +211,7 @@ public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqlit
 	
 	private String getSqlTblMediaFilesCreate () {
 		StringBuilder sb = new StringBuilder();
-		List<DbColumn> ef = getSqlTblMediaFilesColumns();
+		List<DbColumn> ef = getMediaTblColumns();
 		
 		sb.append("create table tbl_mediafiles(");
 		
@@ -234,7 +234,8 @@ public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqlit
 	
 	private List<DbColumn> tblMediaFilesColumns;
 	
-	public List<DbColumn> getSqlTblMediaFilesColumns () {
+	@Override
+	public List<DbColumn> getMediaTblColumns () {
 		return this.tblMediaFilesColumns;
 	}
 	
@@ -254,7 +255,7 @@ public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqlit
 		@Override
 		public String generateString() {
 			StringBuilder sb = new StringBuilder();
-    		List<DbColumn> ef = getSqlTblMediaFilesColumns();
+    		List<DbColumn> ef = getMediaTblColumns();
     		
     		boolean first = true;
     		for (IDbColumn c : ef) {
@@ -306,12 +307,11 @@ public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqlit
 	private static final String SQL_TBL_MEDIAFILES_Q_EXISTS =
 		"SELECT count(*) FROM tbl_mediafiles WHERE sfile=? COLLATE NOCASE;";
 	
-	
 	private GeneratedString sqlTblMediaFilesAdd = new GeneratedString() {
 		@Override
 		public String generateString() {
 			StringBuilder sb = new StringBuilder();
-    		List<DbColumn> ef = getSqlTblMediaFilesColumns();
+    		List<DbColumn> ef = getMediaTblColumns();
     		
     		sb.append("INSERT INTO tbl_mediafiles (");
     		boolean first = true;

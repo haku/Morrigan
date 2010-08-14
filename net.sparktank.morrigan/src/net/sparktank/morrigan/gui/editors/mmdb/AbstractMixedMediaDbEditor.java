@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.gui.editors.pictures;
+package net.sparktank.morrigan.gui.editors.mmdb;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -14,11 +14,13 @@ import net.sparktank.morrigan.helpers.TimeHelper;
 import net.sparktank.morrigan.model.MediaSqliteLayer2;
 import net.sparktank.morrigan.model.db.impl.DbColumn;
 import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
+import net.sparktank.morrigan.model.media.impl.AbstractMixedMediaDb;
+import net.sparktank.morrigan.model.media.impl.MixedMediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemDb.SortChangeListener;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemStorageLayer.SortDirection;
-import net.sparktank.morrigan.model.media.interfaces.IMediaPicture;
-import net.sparktank.morrigan.model.pictures.MediaPicture;
-import net.sparktank.morrigan.model.pictures.gallery.AbstractGallery;
+import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem;
+import net.sparktank.morrigan.model.media.interfaces.IMixedMediaStorageLayer;
+import net.sparktank.morrigan.model.tracks.library.LibrarySqliteLayer2;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
@@ -37,18 +39,24 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 
-public abstract class AbstractGalleryEditor<T extends AbstractGallery> extends MediaPictureListEditor<T, IMediaPicture> implements IMediaItemDbEditor {
+public abstract class AbstractMixedMediaDbEditor<T extends AbstractMixedMediaDb> extends MixedMediaListEditor<T, IMixedMediaItem> implements IMediaItemDbEditor<IMixedMediaStorageLayer<IMixedMediaItem>, IMixedMediaItem> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public AbstractGalleryEditor () {
+	public AbstractMixedMediaDbEditor () {
 		super();
+	}
+	
+	@Override
+	public void dispose() {
+		getMediaList().unregisterSortChangeListener(this.sortChangeListener);
+		super.dispose();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
-	protected IMediaPicture getNewS(String filePath) {
-		return new MediaPicture(filePath);
+	protected IMixedMediaItem getNewS(String filePath) {
+		return new MixedMediaItem(filePath);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -167,14 +175,14 @@ public abstract class AbstractGalleryEditor<T extends AbstractGallery> extends M
 	private Listener filterListener = new Listener() {
 		@Override
 		public void handleEvent(Event event) {
-			setFilterString(AbstractGalleryEditor.this.txtFilter.getText());
+			setFilterString(AbstractMixedMediaDbEditor.this.txtFilter.getText());
 		}
 	};
 	
 	SelectionAdapter clearFilterListener = new SelectionAdapter() {
 		@Override
 		public void widgetSelected(SelectionEvent e) {
-			AbstractGalleryEditor.this.txtFilter.setText("");
+			AbstractMixedMediaDbEditor.this.txtFilter.setText("");
 			setFilterString("");
 		}
 	};
@@ -204,6 +212,15 @@ public abstract class AbstractGalleryEditor<T extends AbstractGallery> extends M
 		else if (mCol == this.COL_MODIFIED) {
 			sort = MediaSqliteLayer2.SQL_TBL_MEDIAFILES_COL_DMODIFIED;
 		}
+		else if (mCol == this.COL_COUNTS) {
+			sort = LibrarySqliteLayer2.SQL_TBL_MEDIAFILES_COL_STARTCNT;
+		}
+		else if (mCol == this.COL_LASTPLAYED) {
+			sort = LibrarySqliteLayer2.SQL_TBL_MEDIAFILES_COL_DLASTPLAY;
+		}
+		else if (mCol == this.COL_DURATION) {
+			sort = LibrarySqliteLayer2.SQL_TBL_MEDIAFILES_COL_DURATION;
+		}
 		else {
 			throw new IllegalArgumentException();
 		}
@@ -229,7 +246,7 @@ public abstract class AbstractGalleryEditor<T extends AbstractGallery> extends M
 	private SortChangeListener sortChangeListener = new SortChangeListener () {
 		@Override
 		public void sortChanged(IDbColumn sort, SortDirection direction) {
-			for (SortAction a : AbstractGalleryEditor.this.sortActions) {
+			for (SortAction a : AbstractMixedMediaDbEditor.this.sortActions) {
 				boolean c = sort == a.getSort();
 				if (a.isChecked() != c) {
 					a.setChecked(c);

@@ -5,9 +5,11 @@ import java.util.Date;
 import java.util.List;
 
 import net.sparktank.morrigan.helpers.RecyclingFactory;
+import net.sparktank.morrigan.model.db.impl.DbColumn;
 import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
 import net.sparktank.morrigan.model.db.interfaces.IDbItem;
 import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem;
+import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem.MediaType;
 import net.sparktank.morrigan.model.media.interfaces.IMixedMediaStorageLayer;
 import net.sparktank.sqlitewrapper.DbException;
 
@@ -39,6 +41,13 @@ public class MixedMediaSqliteLayer extends MixedMediaSqliteLayerImpl implements 
 	
 	protected MixedMediaSqliteLayer (String dbFilePath) throws DbException {
 		super(dbFilePath);
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	@Override
+	public List<DbColumn> getMediaTblColumns() {
+		return generateSqlTblMediaFilesColumns();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -88,6 +97,17 @@ public class MixedMediaSqliteLayer extends MixedMediaSqliteLayerImpl implements 
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Media adders and removers.
+	
+
+	@Override
+	public boolean addFile(File file) throws DbException {
+		return addFile(MediaType.UNKNOWN, file);
+	}
+	
+	@Override
+	public boolean addFile(String filepath, long lastModified) throws DbException {
+		return addFile(MediaType.UNKNOWN, filepath, lastModified);
+	}
 	
 	@Override
 	public boolean addFile (MediaType mediaType, File file) throws DbException {
@@ -183,6 +203,18 @@ public class MixedMediaSqliteLayer extends MixedMediaSqliteLayerImpl implements 
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	MixedMediaItem setters.
+	
+	@Override
+	public void setItemMediaType(String sfile, MediaType newType) throws DbException {
+		try {
+			local_setItemMediaType(sfile, newType);
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	MediaTrack setters.
 	
 	@Override
@@ -268,19 +300,6 @@ public class MixedMediaSqliteLayer extends MixedMediaSqliteLayerImpl implements 
 		} catch (Exception e) {
 			throw new DbException(e);
 		}
-	}
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Unwanted methods.
-	
-	@Override
-	public boolean addFile(File file) throws DbException {
-		throw new IllegalArgumentException("Do not use this method.");
-	}
-	
-	@Override
-	public boolean addFile(String filepath, long lastModified) throws DbException {
-		throw new IllegalArgumentException("Do not use this method.");
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

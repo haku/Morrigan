@@ -14,15 +14,16 @@ import java.util.Stack;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.ChecksumHelper;
-import net.sparktank.morrigan.model.media.impl.MediaItemDb;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
+import net.sparktank.morrigan.model.media.interfaces.IMediaItemDb;
+import net.sparktank.morrigan.model.media.interfaces.IMediaItemStorageLayer;
 import net.sparktank.morrigan.model.tasks.IMorriganTask;
 import net.sparktank.morrigan.model.tasks.TaskEventListener;
 import net.sparktank.morrigan.model.tasks.TaskResult;
 import net.sparktank.morrigan.model.tasks.TaskResult.TaskOutcome;
 import net.sparktank.sqlitewrapper.DbException;
 
-public abstract class LocalDbUpdateTask<Q extends MediaItemDb<?,T>, T extends IMediaItem> implements IMorriganTask {
+public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaItemStorageLayer<T>,T>, T extends IMediaItem> implements IMorriganTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	protected enum ScanOption {KEEP, DELREF, MOVEFILE};
@@ -241,7 +242,7 @@ public abstract class LocalDbUpdateTask<Q extends MediaItemDb<?,T>, T extends IM
 		int n = 0;
 		int N = this.getItemList().getCount();
 		
-		List<T> allLibraryEntries = this.getItemList().getAllLibraryEntries();
+		List<T> allLibraryEntries = this.getItemList().getAllDbEntries();
 		for (T mi : allLibraryEntries) {
 			if (taskEventListener.isCanceled()) break;
 			taskEventListener.subTask("Reading file metadata: " + mi.getTitle());
@@ -338,7 +339,7 @@ public abstract class LocalDbUpdateTask<Q extends MediaItemDb<?,T>, T extends IM
 		taskEventListener.subTask("Scanning for duplicates");
 		Map<T, ScanOption> dupicateItems = new HashMap<T, ScanOption>();
 		
-		List<T> tracks = this.getItemList().getAllLibraryEntries();
+		List<T> tracks = this.getItemList().getAllDbEntries();
 		
 		int progress = 0;
 		int n = 0;
@@ -510,36 +511,32 @@ public abstract class LocalDbUpdateTask<Q extends MediaItemDb<?,T>, T extends IM
 		int n = 0;
 		int N = this.getItemList().getCount();
 		
-		List<T> allLibraryEntries = this.getItemList().getAllLibraryEntries();
+		List<T> allLibraryEntries = this.getItemList().getAllDbEntries();
 		
 		try {
     		for (T mi : allLibraryEntries) {
     			if (taskEventListener.isCanceled()) break;
     			taskEventListener.subTask("Reading track metadata: " + mi.getTitle());
     			
-    			if (shouldTrackMetaData1(this.getItemList(), mi)) {
-    				if (!this.getItemList().isMarkedAsUnreadable(mi)) {
-    					if (mi.isEnabled()) {
-    						File file = new File(mi.getFilepath());
-    						if (file.exists()) {
-    							OpResult ret = readTrackMetaData1(this.getItemList(), mi, file);
-    							if (ret != null) {
-    								if (ret.isFaital()) {
-    									throw ret.getThrowable();
-    								}
-    								
-    								// FIXME log this somewhere useful.
-    								taskEventListener.logError(this.getItemList().getListName(), "Error while reading metadata for '"+mi.getFilepath()+"'.", ret.getThrowable());
-    								
-    								// Tag track as unreadable.
-    								//library.markAsUnreadabled(mi); // FIXME what if the user wants to try again?
+    			if (shouldTrackMetaData1(taskEventListener, this.getItemList(), mi)) {
+    				if (mi.isEnabled()) {
+    					File file = new File(mi.getFilepath());
+    					if (file.exists()) {
+    						OpResult ret = readTrackMetaData1(this.getItemList(), mi, file);
+    						if (ret != null) {
+    							if (ret.isFaital()) {
+    								throw ret.getThrowable();
     							}
-    						} // End exists test.
-    					} else { // If marked as disabled.
-    						taskEventListener.logMsg(this.getItemList().getListName(), "Ignoring disabled file '"+mi.getFilepath()+"'.");
-    					}
-    				} else { // If tagged as unreadable.
-    					taskEventListener.logMsg(this.getItemList().getListName(), "Ignoring unreadable file '"+mi.getFilepath()+"'.");
+    							
+    							// FIXME log this somewhere useful.
+    							taskEventListener.logError(this.getItemList().getListName(), "Error while reading metadata for '"+mi.getFilepath()+"'.", ret.getThrowable());
+    							
+    							// Tag track as unreadable.
+    							//library.markAsUnreadabled(mi); // FIXME what if the user wants to try again?
+    						}
+    					} // End exists test.
+    				} else { // If marked as disabled.
+    					taskEventListener.logMsg(this.getItemList().getListName(), "Ignoring disabled file '"+mi.getFilepath()+"'.");
     				}
     			}// End duration > 0 test.
     			
@@ -565,7 +562,7 @@ public abstract class LocalDbUpdateTask<Q extends MediaItemDb<?,T>, T extends IM
 		return null;
 	}
 	
-	abstract protected boolean shouldTrackMetaData1 (Q library, T item);
+	abstract protected boolean shouldTrackMetaData1 (TaskEventListener taskEventListener, Q library, T item) throws MorriganException;
 	abstract protected OpResult readTrackMetaData1 (Q library, T item, File file);
 	abstract protected void cleanUpAfterTrackMetaData1 ();
 	

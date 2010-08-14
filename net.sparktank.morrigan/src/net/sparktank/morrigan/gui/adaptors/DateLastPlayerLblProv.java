@@ -2,7 +2,7 @@ package net.sparktank.morrigan.gui.adaptors;
 
 import java.text.SimpleDateFormat;
 
-import net.sparktank.morrigan.model.tracks.MediaTrack;
+import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
 
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 
@@ -13,7 +13,7 @@ public class DateLastPlayerLblProv extends ColumnLabelProvider {
 	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 	@Override
 	public String getText(Object element) {
-		MediaTrack elm = (MediaTrack) element;
+		IMediaTrack elm = (IMediaTrack) element;
 		return elm.getDateLastPlayed() == null ? null : this.sdf.format(elm.getDateLastPlayed());
 	}
 	

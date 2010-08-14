@@ -1,6 +1,6 @@
 package net.sparktank.morrigan.gui.adaptors;
 
-import net.sparktank.morrigan.model.media.impl.MediaItem;
+import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
 
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 
@@ -10,7 +10,7 @@ public class HashcodeLblProv extends ColumnLabelProvider {
 	
 	@Override
 	public String getText(Object element) {
-		MediaItem elm = (MediaItem) element;
+		IMediaItem elm = (IMediaItem) element;
 		if (elm.getHashcode() == 0) {
 			return null;
 		}
