@@ -708,7 +708,7 @@ public abstract class MixedMediaSqliteLayerImpl extends MediaSqliteLayer<IMixedM
 	static protected IMixedMediaItem createMediaItem (ResultSet rs) throws SQLException {
 		int i = rs.getInt(SQL_TBL_MEDIAFILES_COL_TYPE.getName());
 		MediaType t = MediaType.parseInt(i);
-		IMixedMediaItem mi = new MediaMixedItem();
+		IMixedMediaItem mi = new MixedMediaItem();
 		
 		switch (t) {
 			case TRACK:
