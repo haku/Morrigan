@@ -4,12 +4,14 @@ import java.util.Date;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.impl.MediaItemDb;
-import net.sparktank.morrigan.model.tracks.IMediaTrackList;
+import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
+import net.sparktank.morrigan.model.media.interfaces.IMediaTrackList;
+import net.sparktank.morrigan.model.media.interfaces.IMediaTrackList.DurationData;
 import net.sparktank.morrigan.model.tracks.MediaTrack;
 import net.sparktank.morrigan.model.tracks.MediaTrackListHelper;
 import net.sparktank.sqlitewrapper.DbException;
 
-public abstract class AbstractMediaLibrary extends MediaItemDb<LibrarySqliteLayer2, MediaTrack> implements IMediaTrackList<MediaTrack> {
+public abstract class AbstractMediaLibrary extends MediaItemDb<LibrarySqliteLayer2, IMediaTrack> implements IMediaTrackList<IMediaTrack> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	protected AbstractMediaLibrary (String libraryName, LibrarySqliteLayer2 dbLayer) {
@@ -26,7 +28,7 @@ public abstract class AbstractMediaLibrary extends MediaItemDb<LibrarySqliteLaye
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
-	public void incTrackStartCnt (MediaTrack track, long n) throws MorriganException {
+	public void incTrackStartCnt (IMediaTrack track, long n) throws MorriganException {
 		MediaTrackListHelper.incTrackStartCnt(this, track, n);
 		try {
 			this.getDbLayer().incTrackStartCnt(track.getFilepath(), n);
@@ -36,7 +38,7 @@ public abstract class AbstractMediaLibrary extends MediaItemDb<LibrarySqliteLaye
 	}
 	
 	@Override
-	public void incTrackEndCnt (MediaTrack track, long n) throws MorriganException {
+	public void incTrackEndCnt (IMediaTrack track, long n) throws MorriganException {
 		MediaTrackListHelper.incTrackEndCnt(this, track, n);
 		try {
 			this.getDbLayer().incTrackEndCnt(track.getFilepath(), n);
@@ -46,7 +48,7 @@ public abstract class AbstractMediaLibrary extends MediaItemDb<LibrarySqliteLaye
 	}
 	
 	@Override
-	public void setDateLastPlayed (MediaTrack track, Date date) throws MorriganException {
+	public void setTrackDateLastPlayed (IMediaTrack track, Date date) throws MorriganException {
 		MediaTrackListHelper.setDateLastPlayed(this, track, date);
 		try {
 			this.getDbLayer().setDateLastPlayed(track.getFilepath(), date);
@@ -56,7 +58,7 @@ public abstract class AbstractMediaLibrary extends MediaItemDb<LibrarySqliteLaye
 	}
 	
 	@Override
-	public void incTrackStartCnt(MediaTrack track) throws MorriganException {
+	public void incTrackStartCnt(IMediaTrack track) throws MorriganException {
 		MediaTrackListHelper.incTrackStartCnt(this, track);
 		try {
 			this.getDbLayer().incTrackPlayed(track.getFilepath());
@@ -66,7 +68,7 @@ public abstract class AbstractMediaLibrary extends MediaItemDb<LibrarySqliteLaye
 	}
 	
 	@Override
-	public void incTrackEndCnt(MediaTrack track) throws MorriganException {
+	public void incTrackEndCnt(IMediaTrack track) throws MorriganException {
 		MediaTrackListHelper.incTrackEndCnt(this, track);
 		try {
 			this.getDbLayer().incTrackFinished(track.getFilepath());
@@ -76,7 +78,7 @@ public abstract class AbstractMediaLibrary extends MediaItemDb<LibrarySqliteLaye
 	}
 	
 	@Override
-	public void setTrackDuration(MediaTrack track, int duration) throws MorriganException {
+	public void setTrackDuration(IMediaTrack track, int duration) throws MorriganException {
 		MediaTrackListHelper.setTrackDuration(this, track, duration);
 		try {
 			this.getDbLayer().setTrackDuration(track.getFilepath(), duration);
@@ -86,7 +88,9 @@ public abstract class AbstractMediaLibrary extends MediaItemDb<LibrarySqliteLaye
 	}
 	
 	@Override
-	public void persistTrackData (MediaTrack track) throws DbException {
+	public void persistTrackData (IMediaTrack track) throws DbException {
+		super.persistTrackData(track);
+		
 		this.getDbLayer().setTrackStartCnt(track.getFilepath(), track.getStartCount());
 		this.getDbLayer().setTrackEndCnt(track.getFilepath(), track.getEndCount());
 		this.getDbLayer().setTrackDuration(track.getFilepath(), track.getDuration());

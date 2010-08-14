@@ -6,8 +6,8 @@ import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.editors.tracks.MediaTrackListEditor;
 import net.sparktank.morrigan.gui.views.AbstractPlayerView;
 import net.sparktank.morrigan.gui.views.ViewControls;
-import net.sparktank.morrigan.model.tracks.IMediaTrackList;
-import net.sparktank.morrigan.model.tracks.MediaTrack;
+import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
+import net.sparktank.morrigan.model.media.interfaces.IMediaTrackList;
 import net.sparktank.morrigan.model.tracks.playlist.PlayItem;
 
 import org.eclipse.core.commands.AbstractHandler;
@@ -36,7 +36,7 @@ public class AddToQueue  extends AbstractHandler {
 		IEditorPart activeEditor = page.getActiveEditor();
 		
 		if (activeEditor instanceof MediaTrackListEditor<?,?>) {
-			MediaTrackListEditor<IMediaTrackList<? extends MediaTrack>, ? extends MediaTrack> mediaListEditor = (MediaTrackListEditor<IMediaTrackList<? extends MediaTrack>, ? extends MediaTrack>) activeEditor;
+			MediaTrackListEditor<IMediaTrackList<IMediaTrack>, IMediaTrack> mediaListEditor = (MediaTrackListEditor<IMediaTrackList<IMediaTrack>, IMediaTrack>) activeEditor;
 			AbstractPlayerView playerView;
 			IViewPart findView = page.findView(ViewControls.ID);
 			
@@ -51,9 +51,9 @@ public class AddToQueue  extends AbstractHandler {
 			if (findView != null) {
 				playerView = (AbstractPlayerView) findView;
 				
-				ArrayList<? extends MediaTrack> selectedTracks = mediaListEditor.getSelectedItems();
+				ArrayList<? extends IMediaTrack> selectedTracks = mediaListEditor.getSelectedItems();
 				if (selectedTracks != null) {
-					for (MediaTrack track : selectedTracks) {
+					for (IMediaTrack track : selectedTracks) {
 						PlayItem item = new PlayItem(mediaListEditor.getMediaList(), track);
 						playerView.getPlayer().addToQueue(item);
 					}

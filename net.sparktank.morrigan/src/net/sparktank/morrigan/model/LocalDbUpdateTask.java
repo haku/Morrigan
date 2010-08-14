@@ -14,15 +14,15 @@ import java.util.Stack;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.ChecksumHelper;
-import net.sparktank.morrigan.model.media.impl.MediaItem;
 import net.sparktank.morrigan.model.media.impl.MediaItemDb;
+import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
 import net.sparktank.morrigan.model.tasks.IMorriganTask;
 import net.sparktank.morrigan.model.tasks.TaskEventListener;
 import net.sparktank.morrigan.model.tasks.TaskResult;
 import net.sparktank.morrigan.model.tasks.TaskResult.TaskOutcome;
 import net.sparktank.sqlitewrapper.DbException;
 
-public abstract class LocalDbUpdateTask<Q extends MediaItemDb<?,T>, T extends MediaItem> implements IMorriganTask {
+public abstract class LocalDbUpdateTask<Q extends MediaItemDb<?,T>, T extends IMediaItem> implements IMorriganTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	protected enum ScanOption {KEEP, DELREF, MOVEFILE};
@@ -399,7 +399,7 @@ public abstract class LocalDbUpdateTask<Q extends MediaItemDb<?,T>, T extends Me
 			 * Make a list of all the unique hashcodes we know.
 			 */
 			List<Long> hashcodes = new ArrayList<Long>();
-			for (MediaItem mi : dupicateItems.keySet()) {
+			for (IMediaItem mi : dupicateItems.keySet()) {
 				Long l = Long.valueOf(mi.getHashcode());
 				if (!hashcodes.contains(l)) {
 					hashcodes.add(l);
@@ -478,7 +478,7 @@ public abstract class LocalDbUpdateTask<Q extends MediaItemDb<?,T>, T extends Me
 					 * items list.
 					 */
 					dupicateItems.remove(keep);
-					for (MediaItem i : items.keySet()) {
+					for (IMediaItem i : items.keySet()) {
 						dupicateItems.remove(i);
 					}
 				}

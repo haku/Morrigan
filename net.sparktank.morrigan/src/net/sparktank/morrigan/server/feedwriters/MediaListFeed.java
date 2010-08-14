@@ -4,15 +4,15 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
-import net.sparktank.morrigan.model.media.impl.MediaItem;
-import net.sparktank.morrigan.model.tracks.IMediaTrackList;
-import net.sparktank.morrigan.model.tracks.MediaTrack;
+import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
+import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
+import net.sparktank.morrigan.model.media.interfaces.IMediaTrackList;
 
 import org.xml.sax.SAXException;
 
 import com.megginson.sax.DataWriter;
 
-public class MediaListFeed<T extends IMediaTrackList<? extends MediaItem>> extends Feed {
+public class MediaListFeed<T extends IMediaTrackList<? extends IMediaItem>> extends Feed {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private final T ml;
@@ -44,7 +44,7 @@ public class MediaListFeed<T extends IMediaTrackList<? extends MediaItem>> exten
 		addLink(dw, "/media/" + this.ml.getType() + "/" + listFile + "/scan", "scan", "cmd");
 		addLink(dw, "/player/0/play/" + listFile, "play", "cmd"); // FIXME list all players here.
 		
-		for (MediaTrack mi : this.ml.getMediaItems()) {
+		for (IMediaTrack mi : this.ml.getMediaItems()) {
 			dw.startElement("entry");
 			
 			String file;

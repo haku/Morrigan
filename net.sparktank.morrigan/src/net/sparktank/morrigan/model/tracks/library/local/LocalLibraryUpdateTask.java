@@ -8,10 +8,10 @@ import net.sparktank.morrigan.engines.playback.IPlaybackEngine;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.RecyclingFactory;
 import net.sparktank.morrigan.model.LocalDbUpdateTask;
+import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
 import net.sparktank.morrigan.model.tags.TrackTagHelper;
-import net.sparktank.morrigan.model.tracks.MediaTrack;
 
-public class LocalLibraryUpdateTask extends LocalDbUpdateTask<LocalMediaLibrary, MediaTrack> {
+public class LocalLibraryUpdateTask extends LocalDbUpdateTask<LocalMediaLibrary, IMediaTrack> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Factory stuff.
 	
@@ -49,7 +49,7 @@ public class LocalLibraryUpdateTask extends LocalDbUpdateTask<LocalMediaLibrary,
 	}
 	
 	@Override
-	protected void mergeItems(MediaTrack itemToKeep, MediaTrack itemToBeRemove) throws MorriganException {
+	protected void mergeItems(IMediaTrack itemToKeep, IMediaTrack itemToBeRemove) throws MorriganException {
 		this.getItemList().incTrackStartCnt(itemToKeep, itemToBeRemove.getStartCount());
 		this.getItemList().incTrackEndCnt(itemToKeep, itemToBeRemove.getEndCount());
 		
@@ -63,7 +63,7 @@ public class LocalLibraryUpdateTask extends LocalDbUpdateTask<LocalMediaLibrary,
 		if (itemToBeRemove.getDateLastPlayed() != null) {
 			if (itemToKeep.getDateLastPlayed() == null
 					|| itemToKeep.getDateLastPlayed().getTime() < itemToBeRemove.getDateLastPlayed().getTime()) {
-				this.getItemList().setDateLastPlayed(itemToKeep, itemToBeRemove.getDateLastPlayed());
+				this.getItemList().setTrackDateLastPlayed(itemToKeep, itemToBeRemove.getDateLastPlayed());
 			}
 		}
 		
@@ -85,12 +85,12 @@ public class LocalLibraryUpdateTask extends LocalDbUpdateTask<LocalMediaLibrary,
 	private IPlaybackEngine playbackEngine = null;
 	
 	@Override
-	protected boolean shouldTrackMetaData1(LocalMediaLibrary library, MediaTrack item) {
+	protected boolean shouldTrackMetaData1(LocalMediaLibrary library, IMediaTrack item) {
 		return item.getDuration()<=0;
 	}
 	
 	@Override
-	protected OpResult readTrackMetaData1(LocalMediaLibrary library, MediaTrack item, File file) {
+	protected OpResult readTrackMetaData1(LocalMediaLibrary library, IMediaTrack item, File file) {
 		if (this.playbackEngine == null) {
 			try {
 				this.playbackEngine = EngineFactory.makePlaybackEngine();
@@ -121,7 +121,7 @@ public class LocalLibraryUpdateTask extends LocalDbUpdateTask<LocalMediaLibrary,
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
-	protected void readTrackMetaData2(LocalMediaLibrary library, MediaTrack item, File file) throws Throwable {
+	protected void readTrackMetaData2(LocalMediaLibrary library, IMediaTrack item, File file) throws Throwable {
 		TrackTagHelper.readTrackTags(this.getItemList(), item, file);
 	}
 	

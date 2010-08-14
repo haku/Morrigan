@@ -16,11 +16,11 @@ import java.util.List;
 import net.sparktank.morrigan.engines.playback.NotImplementedException;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.db.interfaces.IDbItem;
+import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
 import net.sparktank.morrigan.model.tags.MediaTag;
 import net.sparktank.morrigan.model.tags.MediaTagClassification;
 import net.sparktank.morrigan.model.tags.MediaTagType;
 import net.sparktank.morrigan.model.tasks.TaskEventListener;
-import net.sparktank.morrigan.model.tracks.MediaTrack;
 import net.sparktank.morrigan.model.tracks.library.AbstractMediaLibrary;
 import net.sparktank.morrigan.model.tracks.library.LibrarySqliteLayer2;
 import net.sparktank.morrigan.server.HttpClient;
@@ -157,7 +157,7 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 //	Actions.
 	
 	@Override
-	public void copyItemFile(MediaTrack mlt, File targetDirectory) throws MorriganException {
+	public void copyItemFile(IMediaTrack mlt, File targetDirectory) throws MorriganException {
 		if (!targetDirectory.isDirectory()) {
 			throw new IllegalArgumentException("targetDirectory must be a directory.");
 		}
@@ -234,62 +234,62 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 //	Item metadata modifiers.
 	
 	@Override
-	public void incTrackStartCnt (MediaTrack track, long n) throws MorriganException {
+	public void incTrackStartCnt (IMediaTrack track, long n) throws MorriganException {
 		throw new NotImplementedException();
 	}
 	
 	@Override
-	public void incTrackEndCnt (MediaTrack track, long n) throws MorriganException {
+	public void incTrackEndCnt (IMediaTrack track, long n) throws MorriganException {
 		throw new NotImplementedException();
 	}
 	
 	@Override
-	public void setItemDateAdded (MediaTrack track, Date date) throws MorriganException {
+	public void setItemDateAdded (IMediaTrack track, Date date) throws MorriganException {
 		throw new NotImplementedException();
 	}
 	
 	@Override
-	public void setDateLastPlayed (MediaTrack track, Date date) throws MorriganException {
+	public void setTrackDateLastPlayed (IMediaTrack track, Date date) throws MorriganException {
 		throw new NotImplementedException();
 	}
 	
 	@Override
-	public void removeItem (MediaTrack track) throws MorriganException {
+	public void removeItem (IMediaTrack track) throws MorriganException {
 		throw new NotImplementedException();
 	}
 	
 	@Override
-	public void incTrackStartCnt(MediaTrack track) throws MorriganException {
+	public void incTrackStartCnt(IMediaTrack track) throws MorriganException {
 		throw new NotImplementedException();
 	}
 	
 	@Override
-	public void incTrackEndCnt(MediaTrack track) throws MorriganException {
+	public void incTrackEndCnt(IMediaTrack track) throws MorriganException {
 		throw new NotImplementedException();
 	}
 	
 	@Override
-	public void setTrackDuration(MediaTrack track, int duration) throws MorriganException {
+	public void setTrackDuration(IMediaTrack track, int duration) throws MorriganException {
 		throw new NotImplementedException();
 	}
 	
 	@Override
-	public void setItemHashCode(MediaTrack track, long hashcode) throws MorriganException {
+	public void setItemHashCode(IMediaTrack track, long hashcode) throws MorriganException {
 		throw new NotImplementedException();
 	}
 	
 	@Override
-	public void setItemDateLastModified(MediaTrack track, Date date) throws MorriganException {
+	public void setItemDateLastModified(IMediaTrack track, Date date) throws MorriganException {
 		throw new NotImplementedException();
 	}
 	
 	@Override
-	public void setItemEnabled(MediaTrack track, boolean value) throws MorriganException {
+	public void setItemEnabled(IMediaTrack track, boolean value) throws MorriganException {
 		throw new NotImplementedException();
 	}
 	
 	@Override
-	public void setItemMissing(MediaTrack track, boolean value) throws MorriganException {
+	public void setItemMissing(IMediaTrack track, boolean value) throws MorriganException {
 		throw new NotImplementedException();
 	}
 	

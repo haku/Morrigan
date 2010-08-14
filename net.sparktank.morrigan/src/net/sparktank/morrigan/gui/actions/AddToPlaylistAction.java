@@ -2,7 +2,7 @@ package net.sparktank.morrigan.gui.actions;
 
 import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.editors.tracks.PlaylistEditor;
-import net.sparktank.morrigan.model.media.impl.MediaItem;
+import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.IEditorReference;
@@ -32,7 +32,7 @@ public class AddToPlaylistAction extends Action {
 		
 		if (part != null && part instanceof PlaylistEditor) {
 			PlaylistEditor plPart = (PlaylistEditor) part;
-			for (MediaItem track : plPart.getSelectedItems()) {
+			for (IMediaItem track : plPart.getSelectedItems()) {
 				plPart.addItem(track.getFilepath());
 			}
 		}

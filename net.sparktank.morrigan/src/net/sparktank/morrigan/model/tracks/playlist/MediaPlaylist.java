@@ -15,11 +15,12 @@ import java.util.logging.Logger;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.impl.MediaItemList;
-import net.sparktank.morrigan.model.tracks.IMediaTrackList;
+import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
+import net.sparktank.morrigan.model.media.interfaces.IMediaTrackList;
 import net.sparktank.morrigan.model.tracks.MediaTrack;
 import net.sparktank.morrigan.model.tracks.MediaTrackListHelper;
 
-public class MediaPlaylist extends MediaItemList<MediaTrack> implements IMediaTrackList<MediaTrack> {
+public class MediaPlaylist extends MediaItemList<IMediaTrack> implements IMediaTrackList<IMediaTrack> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static final String TYPE = "PLAYLIST";
@@ -203,7 +204,7 @@ public class MediaPlaylist extends MediaItemList<MediaTrack> implements IMediaTr
         
 		try {
 			int n = 0;
-			for (MediaTrack mt : getMediaItems()) {
+			for (IMediaTrack mt : getMediaItems()) {
 				
 				writer.write(
 						PL_ITEM_IDENTIFIER + mt.getFilepath()
@@ -240,7 +241,7 @@ public class MediaPlaylist extends MediaItemList<MediaTrack> implements IMediaTr
 	 * @throws MorriganException  
 	 */
 	@Override
-	public void incTrackStartCnt (MediaTrack track, long n) throws MorriganException {
+	public void incTrackStartCnt (IMediaTrack track, long n) throws MorriganException {
 		MediaTrackListHelper.incTrackStartCnt(this, track, n);
 	}
 	
@@ -248,7 +249,7 @@ public class MediaPlaylist extends MediaItemList<MediaTrack> implements IMediaTr
 	 * @throws MorriganException  
 	 */
 	@Override
-	public void incTrackEndCnt (MediaTrack track, long n) throws MorriganException {
+	public void incTrackEndCnt (IMediaTrack track, long n) throws MorriganException {
 		MediaTrackListHelper.incTrackEndCnt(this, track, n);
 	}
 	
@@ -256,7 +257,7 @@ public class MediaPlaylist extends MediaItemList<MediaTrack> implements IMediaTr
 	 * @throws MorriganException  
 	 */
 	@Override
-	public void incTrackStartCnt (MediaTrack track) throws MorriganException {
+	public void incTrackStartCnt (IMediaTrack track) throws MorriganException {
 		MediaTrackListHelper.incTrackStartCnt(this, track);
 	}
 	
@@ -264,7 +265,7 @@ public class MediaPlaylist extends MediaItemList<MediaTrack> implements IMediaTr
 	 * @throws MorriganException  
 	 */
 	@Override
-	public void incTrackEndCnt (MediaTrack track) throws MorriganException {
+	public void incTrackEndCnt (IMediaTrack track) throws MorriganException {
 		MediaTrackListHelper.incTrackEndCnt(this, track);
 	}
 	
@@ -272,7 +273,7 @@ public class MediaPlaylist extends MediaItemList<MediaTrack> implements IMediaTr
 	 * @throws MorriganException  
 	 */
 	@Override
-	public void setTrackDuration (MediaTrack track, int duration) throws MorriganException {
+	public void setTrackDuration (IMediaTrack track, int duration) throws MorriganException {
 		MediaTrackListHelper.setTrackDuration(this, track, duration);
 	}
 	
@@ -280,7 +281,7 @@ public class MediaPlaylist extends MediaItemList<MediaTrack> implements IMediaTr
 	 * @throws MorriganException  
 	 */
 	@Override
-	public void setDateLastPlayed (MediaTrack track, Date date) throws MorriganException {
+	public void setTrackDateLastPlayed (IMediaTrack track, Date date) throws MorriganException {
 		MediaTrackListHelper.setDateLastPlayed(this, track, date);
 	}
 	

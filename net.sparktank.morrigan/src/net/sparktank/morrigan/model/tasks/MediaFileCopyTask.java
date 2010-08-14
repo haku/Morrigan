@@ -3,12 +3,12 @@ package net.sparktank.morrigan.model.tasks;
 import java.io.File;
 import java.util.List;
 
-import net.sparktank.morrigan.model.media.impl.MediaItem;
+import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemList;
 import net.sparktank.morrigan.model.tasks.TaskResult.TaskOutcome;
 
 
-public class MediaFileCopyTask<T extends MediaItem> implements IMorriganTask {
+public class MediaFileCopyTask<T extends IMediaItem> implements IMorriganTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private final IMediaItemList<T> mediaItemList;

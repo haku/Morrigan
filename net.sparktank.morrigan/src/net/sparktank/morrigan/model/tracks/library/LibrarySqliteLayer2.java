@@ -10,10 +10,11 @@ import net.sparktank.morrigan.helpers.RecyclingFactory;
 import net.sparktank.morrigan.model.MediaSqliteLayer2;
 import net.sparktank.morrigan.model.db.impl.DbColumn;
 import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
+import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
 import net.sparktank.morrigan.model.tracks.MediaTrack;
 import net.sparktank.sqlitewrapper.DbException;
 
-public class LibrarySqliteLayer2 extends MediaSqliteLayer2<MediaTrack> {
+public class LibrarySqliteLayer2 extends MediaSqliteLayer2<IMediaTrack> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Factory.
 	
@@ -184,7 +185,7 @@ public class LibrarySqliteLayer2 extends MediaSqliteLayer2<MediaTrack> {
 	}
 	
 	@Override
-	protected void setTFromRs(MediaTrack item, ResultSet rs) throws SQLException {
+	protected void setTFromRs(IMediaTrack item, ResultSet rs) throws SQLException {
 		item.setStartCount(rs.getLong(SQL_TBL_MEDIAFILES_COL_STARTCNT.getName()));
 		item.setEndCount(rs.getLong(SQL_TBL_MEDIAFILES_COL_ENDCNT.getName()));
 		item.setDuration(rs.getInt(SQL_TBL_MEDIAFILES_COL_DURATION.getName()));

@@ -9,14 +9,14 @@ import net.sparktank.morrigan.gui.adaptors.FileLblProv;
 import net.sparktank.morrigan.gui.adaptors.HashcodeLblProv;
 import net.sparktank.morrigan.gui.editors.MediaColumn;
 import net.sparktank.morrigan.gui.editors.MediaItemListEditor;
+import net.sparktank.morrigan.model.media.interfaces.IMediaPicture;
 import net.sparktank.morrigan.model.pictures.IMediaPictureList;
-import net.sparktank.morrigan.model.pictures.MediaPicture;
 
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.swt.SWT;
 
-public abstract class MediaPictureListEditor<T extends IMediaPictureList<S>, S extends MediaPicture> extends MediaItemListEditor<T, S> {
+public abstract class MediaPictureListEditor<T extends IMediaPictureList<S>, S extends IMediaPicture> extends MediaItemListEditor<T, S> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Column definitions.
 	
