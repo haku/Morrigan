@@ -1,9 +1,8 @@
 package net.sparktank.morrigan.model.media.interfaces;
 
-import net.sparktank.morrigan.model.media.impl.MediaMixedItem;
 
 
-public interface IMixedMediaList extends IMediaItemList<MediaMixedItem>, IMediaTrackList<MediaMixedItem>, IMediaPictureList<MediaMixedItem> {
+public interface IMixedMediaList extends IMediaItemList<IMixedMediaItem>, IMediaTrackList<IMixedMediaItem>, IMediaPictureList<IMixedMediaItem> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 //	Nothing needed.
