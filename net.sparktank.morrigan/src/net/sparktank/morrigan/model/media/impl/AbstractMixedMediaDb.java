@@ -89,6 +89,11 @@ public abstract class AbstractMixedMediaDb extends MediaItemDb<IMixedMediaStorag
 	@Override
 	public void setPictureWidthAndHeight(IMixedMediaItem item, int width, int height) throws MorriganException {
 		MediaPictureListHelper.setPictureWidthAndHeight(this, item, width, height);
+		try {
+			this.getDbLayer().setDimensions(item.getFilepath(), width, height);
+		} catch (DbException e) {
+			throw new MorriganException(e);
+		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
