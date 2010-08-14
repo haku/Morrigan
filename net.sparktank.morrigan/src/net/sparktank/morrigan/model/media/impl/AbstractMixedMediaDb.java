@@ -5,6 +5,7 @@ import java.util.Date;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMixedMediaList;
+import net.sparktank.morrigan.model.pictures.MediaPictureListHelper;
 import net.sparktank.morrigan.model.tracks.MediaTrackListHelper;
 import net.sparktank.sqlitewrapper.DbException;
 
@@ -25,45 +26,68 @@ public abstract class AbstractMixedMediaDb extends MediaItemDb<MixedMediaSqliteL
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	public void incTrackStartCnt(IMixedMediaItem item, long n) throws MorriganException {
-		// TODO Auto-generated method stub
-		
+	public void incTrackStartCnt (IMixedMediaItem track, long n) throws MorriganException {
+		MediaTrackListHelper.incTrackStartCnt(this, track, n);
+		try {
+			this.getDbLayer().incTrackStartCnt(track.getFilepath(), n);
+		} catch (DbException e) {
+			throw new MorriganException(e);
+		}
 	}
-
+	
 	@Override
-	public void incTrackStartCnt(IMixedMediaItem item) throws MorriganException {
-		// TODO Auto-generated method stub
-		
+	public void incTrackEndCnt (IMixedMediaItem track, long n) throws MorriganException {
+		MediaTrackListHelper.incTrackEndCnt(this, track, n);
+		try {
+			this.getDbLayer().incTrackEndCnt(track.getFilepath(), n);
+		} catch (DbException e) {
+			throw new MorriganException(e);
+		}
 	}
-
+	
 	@Override
-	public void incTrackEndCnt(IMixedMediaItem item, long n) throws MorriganException {
-		// TODO Auto-generated method stub
-		
+	public void setTrackDateLastPlayed (IMixedMediaItem track, Date date) throws MorriganException {
+		MediaTrackListHelper.setDateLastPlayed(this, track, date);
+		try {
+			this.getDbLayer().setDateLastPlayed(track.getFilepath(), date);
+		} catch (DbException e) {
+			throw new MorriganException(e);
+		}
 	}
-
+	
 	@Override
-	public void incTrackEndCnt(IMixedMediaItem item) throws MorriganException {
-		// TODO Auto-generated method stub
-		
+	public void incTrackStartCnt(IMixedMediaItem track) throws MorriganException {
+		MediaTrackListHelper.incTrackStartCnt(this, track);
+		try {
+			this.getDbLayer().incTrackPlayed(track.getFilepath());
+		} catch (DbException e) {
+			throw new MorriganException(e);
+		}
 	}
-
+	
 	@Override
-	public void setTrackDuration(IMixedMediaItem item, int duration) throws MorriganException {
-		// TODO Auto-generated method stub
-		
+	public void incTrackEndCnt(IMixedMediaItem track) throws MorriganException {
+		MediaTrackListHelper.incTrackEndCnt(this, track);
+		try {
+			this.getDbLayer().incTrackFinished(track.getFilepath());
+		} catch (DbException e) {
+			throw new MorriganException(e);
+		}
 	}
-
+	
 	@Override
-	public void setTrackDateLastPlayed(IMixedMediaItem item, Date date) throws MorriganException {
-		// TODO Auto-generated method stub
-		
+	public void setTrackDuration(IMixedMediaItem track, int duration) throws MorriganException {
+		MediaTrackListHelper.setTrackDuration(this, track, duration);
+		try {
+			this.getDbLayer().setTrackDuration(track.getFilepath(), duration);
+		} catch (DbException e) {
+			throw new MorriganException(e);
+		}
 	}
 
 	@Override
 	public void setPictureWidthAndHeight(IMixedMediaItem item, int width, int height) throws MorriganException {
-		// TODO Auto-generated method stub
-		
+		MediaPictureListHelper.setPictureWidthAndHeight(this, item, width, height);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
