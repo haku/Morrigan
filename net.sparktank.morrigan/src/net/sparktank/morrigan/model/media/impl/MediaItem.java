@@ -161,15 +161,16 @@ public class MediaItem implements IMediaItem, IDbItem {
 	
 	@Override
 	public boolean setFromMediaItem (IMediaItem mi) {
-		boolean b = this.setFilepath(mi.getFilepath())
-		| this.setDateAdded(mi.getDateAdded())
-		| this.setHashcode(mi.getHashcode())
-		| this.setDateLastModified(mi.getDateLastModified())
-		| this.setEnabled(mi.isEnabled())
-		| this.setMissing(mi.isMissing())
-		| this.setDbRowId(mi.getDbRowId())
-		| this.setRemoteLocation(mi.getRemoteLocation());
-	return b;
+		boolean b =
+    		  this.setFilepath(mi.getFilepath())
+    		| this.setDateAdded(mi.getDateAdded())
+    		| this.setHashcode(mi.getHashcode())
+    		| this.setDateLastModified(mi.getDateLastModified())
+    		| this.setEnabled(mi.isEnabled())
+    		| this.setMissing(mi.isMissing())
+    		| this.setDbRowId(mi.getDbRowId())
+    		| this.setRemoteLocation(mi.getRemoteLocation());
+    	return b;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
