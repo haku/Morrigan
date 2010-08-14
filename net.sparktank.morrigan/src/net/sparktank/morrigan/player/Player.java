@@ -95,8 +95,8 @@ public class Player {
 		return this._currentItem;
 	}
 	
-	public IMediaTrackList<IMediaTrack> getCurrentList () {
-		IMediaTrackList<IMediaTrack> ret = null;
+	public IMediaTrackList<? extends IMediaTrack> getCurrentList () {
+		IMediaTrackList<? extends IMediaTrack> ret = null;
 		
 		PlayItem currentItem = getCurrentItem();
 		if (currentItem != null && currentItem.list != null) {
@@ -137,7 +137,7 @@ public class Player {
 			}
 			
 		} else {
-			IMediaTrackList<IMediaTrack> currentList = getCurrentList();
+			IMediaTrackList<? extends IMediaTrack> currentList = getCurrentList();
 			if (currentList != null) {
 				IMediaTrack nextTrack = OrderHelper.getNextTrack(currentList, null, this._playbackOrder);
 				if (nextTrack != null) {
@@ -352,7 +352,7 @@ public class Player {
 	/**
 	 * For UI handlers to call.
 	 */
-	public void loadAndStartPlaying (IMediaTrackList<IMediaTrack> list, IMediaTrack track) {
+	public void loadAndStartPlaying (IMediaTrackList<? extends IMediaTrack> list, IMediaTrack track) {
 		if (track == null) throw new NullPointerException();
 		loadAndStartPlaying(new PlayItem(list, track));
 	}

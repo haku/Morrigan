@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -19,7 +20,7 @@ import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaPicture;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
 import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem;
-import net.sparktank.morrigan.model.media.interfaces.IMixedMediaStorageLayer.MediaType;
+import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem.MediaType;
 import net.sparktank.sqlitewrapper.DbException;
 
 public abstract class MixedMediaSqliteLayerImpl extends MediaSqliteLayer<IMixedMediaItem> {
@@ -73,6 +74,23 @@ public abstract class MixedMediaSqliteLayerImpl extends MediaSqliteLayer<IMixedM
 		SQL_TBL_MEDIAFILES_COL_WIDTH,
 		SQL_TBL_MEDIAFILES_COL_HEIGHT,
 		};
+	
+	static public IDbColumn parseColumnFromName (String name) {
+		for (IDbColumn c : SQL_TBL_MEDIAFILES_COLS) {
+			if (c.getName().equals(name)) {
+				return c;
+			}
+		}
+		throw new IllegalArgumentException();
+	}
+	
+	static protected List<DbColumn> generateSqlTblMediaFilesColumns () {
+		List<DbColumn> l = new LinkedList<DbColumn>();
+		for (DbColumn c : SQL_TBL_MEDIAFILES_COLS) {
+			l.add(c);
+		}
+		return l;
+	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	SQL queries.
@@ -210,6 +228,14 @@ public abstract class MixedMediaSqliteLayerImpl extends MediaSqliteLayer<IMixedM
 	
 	private static final String SQL_TBL_MEDIAFILES_SETREMLOC =
 		"UPDATE tbl_mediafiles SET sremloc=?" +
+		" WHERE sfile=?;";
+	
+	
+//	-  -  -  -  -  -  -  -  -  -  -  -
+//	Setting MixedMediaItem data.
+	
+	private static final String SQL_TBL_MEDIAFILES_SETTYPE =
+		"UPDATE tbl_mediafiles SET type=?" +
 		" WHERE sfile=?;";
 	
 //	-  -  -  -  -  -  -  -  -  -  -  -
@@ -504,6 +530,24 @@ public abstract class MixedMediaSqliteLayerImpl extends MediaSqliteLayer<IMixedM
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	MixedMediaItem setters.
+	
+	protected void local_setItemMediaType(String sfile, MediaType newType) throws DbException, SQLException, ClassNotFoundException {
+		PreparedStatement ps;
+		
+		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETTYPE);
+		int n;
+		try {
+			ps.setInt(1, newType.getN());
+			ps.setString(2, sfile);
+			n = ps.executeUpdate();
+		} finally {
+			ps.close();
+		}
+		if (n<1) throw new DbException("No update occured.");
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	MediaTrack setters.
 	
 	protected void local_incTrackStartCnt (String sfile, long x) throws SQLException, ClassNotFoundException, DbException {
@@ -708,7 +752,7 @@ public abstract class MixedMediaSqliteLayerImpl extends MediaSqliteLayer<IMixedM
 	static protected IMixedMediaItem createMediaItem (ResultSet rs) throws SQLException {
 		int i = rs.getInt(SQL_TBL_MEDIAFILES_COL_TYPE.getName());
 		MediaType t = MediaType.parseInt(i);
-		IMixedMediaItem mi = new MixedMediaItem();
+		IMixedMediaItem mi = new MixedMediaItem(t);
 		
 		switch (t) {
 			case TRACK:
@@ -720,8 +764,7 @@ public abstract class MixedMediaSqliteLayerImpl extends MediaSqliteLayer<IMixedM
 				break;
 			
 			case UNKNOWN:
-			default:
-				throw new IllegalArgumentException("Encountered media with type UNKNOWN.");
+				readMediaItem(rs, mi);
 			
 		}
 		

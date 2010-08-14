@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Date;
 import java.util.List;
 
+import net.sparktank.morrigan.model.db.impl.DbColumn;
 import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
 import net.sparktank.morrigan.model.db.interfaces.IDbItem;
 import net.sparktank.morrigan.model.tags.MediaTag;
@@ -36,6 +37,8 @@ public interface IMediaItemStorageLayer<T extends IMediaItem> extends IGenericDb
 	public void removeTag (MediaTag tag) throws DbException;
 	public void clearTags (IDbItem item) throws DbException;
 	public void addTagClassification (String classificationName) throws DbException;
+	
+	public List<DbColumn> getMediaTblColumns ();
 	
 	public List<T> getAllMedia(IDbColumn sort, SortDirection direction, boolean hideMissing) throws DbException;
 	public List<T> updateListOfAllMedia(List<T> list, IDbColumn sort, SortDirection direction, boolean hideMissing) throws DbException;

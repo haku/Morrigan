@@ -3,6 +3,8 @@ package net.sparktank.morrigan.gui.actions;
 import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.jobs.TaskJob;
+import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
+import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDbUpdateTask;
 import net.sparktank.morrigan.model.media.impl.MediaItemDb;
 import net.sparktank.morrigan.model.pictures.gallery.LocalGallery;
 import net.sparktank.morrigan.model.pictures.gallery.LocalGalleryUpdateTask;
@@ -72,6 +74,10 @@ public class DbUpdateAction extends Action implements IWorkbenchAction{
 		else if (this.itemDb instanceof LocalGallery) {
 			LocalGallery lml = (LocalGallery) this.itemDb;
 			task = LocalGalleryUpdateTask.FACTORY.manufacture(lml);
+		}
+		else if (this.itemDb instanceof LocalMixedMediaDb) {
+			LocalMixedMediaDb lmmdb = (LocalMixedMediaDb) this.itemDb;
+			task = LocalMixedMediaDbUpdateTask.FACTORY.manufacture(lmmdb);
 		}
 		else {
 			throw new IllegalArgumentException("TODO: Update has not been implemented for this type of DB.");

@@ -3,14 +3,17 @@ package net.sparktank.morrigan.model.media.impl;
 import java.util.Date;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
+import net.sparktank.morrigan.model.media.interfaces.IMediaPicture;
+import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
 import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem;
+import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem.MediaType;
 import net.sparktank.morrigan.model.media.interfaces.IMixedMediaList;
 import net.sparktank.morrigan.model.media.interfaces.IMixedMediaStorageLayer;
 import net.sparktank.morrigan.model.pictures.MediaPictureListHelper;
 import net.sparktank.morrigan.model.tracks.MediaTrackListHelper;
 import net.sparktank.sqlitewrapper.DbException;
 
-public abstract class AbstractMixedMediaDb extends MediaItemDb<IMixedMediaStorageLayer<IMixedMediaItem>, IMixedMediaItem> implements IMixedMediaList {
+public abstract class AbstractMixedMediaDb extends MediaItemDb<IMixedMediaStorageLayer<IMixedMediaItem>, IMixedMediaItem> implements IMixedMediaList<IMixedMediaItem> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	protected AbstractMixedMediaDb (String libraryName, IMixedMediaStorageLayer<IMixedMediaItem> dbLayer) {
@@ -25,9 +28,20 @@ public abstract class AbstractMixedMediaDb extends MediaItemDb<IMixedMediaStorag
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
+	
 	@Override
-	public void incTrackStartCnt (IMixedMediaItem track, long n) throws MorriganException {
+	public void setItemMediaType(IMixedMediaItem item, MediaType newType) throws MorriganException {
+		item.setMediaType(newType);
+		this.setDirtyState(DirtyState.METADATA);
+		try {
+			this.getDbLayer().setItemMediaType(item.getFilepath(), newType);
+		} catch (DbException e) {
+			throw new MorriganException(e);
+		}
+	}
+	
+	@Override
+	public void incTrackStartCnt (IMediaTrack track, long n) throws MorriganException {
 		MediaTrackListHelper.incTrackStartCnt(this, track, n);
 		try {
 			this.getDbLayer().incTrackStartCnt(track.getFilepath(), n);
@@ -37,7 +51,7 @@ public abstract class AbstractMixedMediaDb extends MediaItemDb<IMixedMediaStorag
 	}
 	
 	@Override
-	public void incTrackEndCnt (IMixedMediaItem track, long n) throws MorriganException {
+	public void incTrackEndCnt (IMediaTrack track, long n) throws MorriganException {
 		MediaTrackListHelper.incTrackEndCnt(this, track, n);
 		try {
 			this.getDbLayer().incTrackEndCnt(track.getFilepath(), n);
@@ -47,7 +61,7 @@ public abstract class AbstractMixedMediaDb extends MediaItemDb<IMixedMediaStorag
 	}
 	
 	@Override
-	public void setTrackDateLastPlayed (IMixedMediaItem track, Date date) throws MorriganException {
+	public void setTrackDateLastPlayed (IMediaTrack track, Date date) throws MorriganException {
 		MediaTrackListHelper.setDateLastPlayed(this, track, date);
 		try {
 			this.getDbLayer().setDateLastPlayed(track.getFilepath(), date);
@@ -57,7 +71,7 @@ public abstract class AbstractMixedMediaDb extends MediaItemDb<IMixedMediaStorag
 	}
 	
 	@Override
-	public void incTrackStartCnt(IMixedMediaItem track) throws MorriganException {
+	public void incTrackStartCnt(IMediaTrack track) throws MorriganException {
 		MediaTrackListHelper.incTrackStartCnt(this, track);
 		try {
 			this.getDbLayer().incTrackPlayed(track.getFilepath());
@@ -67,7 +81,7 @@ public abstract class AbstractMixedMediaDb extends MediaItemDb<IMixedMediaStorag
 	}
 	
 	@Override
-	public void incTrackEndCnt(IMixedMediaItem track) throws MorriganException {
+	public void incTrackEndCnt(IMediaTrack track) throws MorriganException {
 		MediaTrackListHelper.incTrackEndCnt(this, track);
 		try {
 			this.getDbLayer().incTrackFinished(track.getFilepath());
@@ -77,7 +91,7 @@ public abstract class AbstractMixedMediaDb extends MediaItemDb<IMixedMediaStorag
 	}
 	
 	@Override
-	public void setTrackDuration(IMixedMediaItem track, int duration) throws MorriganException {
+	public void setTrackDuration(IMediaTrack track, int duration) throws MorriganException {
 		MediaTrackListHelper.setTrackDuration(this, track, duration);
 		try {
 			this.getDbLayer().setTrackDuration(track.getFilepath(), duration);
@@ -87,7 +101,7 @@ public abstract class AbstractMixedMediaDb extends MediaItemDb<IMixedMediaStorag
 	}
 
 	@Override
-	public void setPictureWidthAndHeight(IMixedMediaItem item, int width, int height) throws MorriganException {
+	public void setPictureWidthAndHeight(IMediaPicture item, int width, int height) throws MorriganException {
 		MediaPictureListHelper.setPictureWidthAndHeight(this, item, width, height);
 		try {
 			this.getDbLayer().setDimensions(item.getFilepath(), width, height);

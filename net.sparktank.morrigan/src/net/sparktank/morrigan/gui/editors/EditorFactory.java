@@ -2,6 +2,9 @@ package net.sparktank.morrigan.gui.editors;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
+import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
+import net.sparktank.morrigan.model.media.impl.MixedMediaListFactory;
+import net.sparktank.morrigan.model.media.impl.MixedMediaSqliteLayerImpl;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemStorageLayer.SortDirection;
 import net.sparktank.morrigan.model.pictures.MediaPictureListFactory;
 import net.sparktank.morrigan.model.pictures.gallery.LocalGallery;
@@ -54,6 +57,9 @@ public class EditorFactory implements IElementFactory {
 			}
 			else if (type.equals(LocalGallery.TYPE)) {
 				input = getGalleryInput(memento);
+			}
+			else if (type.equals(LocalMixedMediaDb.TYPE)) {
+				input = getMmdbInput(memento);
 			}
 			else {
 				System.err.println("EditorFactory.createElement(): Unknown type: '"+type+"'.");
@@ -168,6 +174,40 @@ public class EditorFactory implements IElementFactory {
 		String sortdir = memento.getString(KEY_LIB_SORTDIR);
 		if (sortcol != null && sortdir != null) {
 			// TODO parse sort data.
+		}
+		
+		return input;
+	}
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Local MixedMediaDb.
+	
+	public static MediaItemDbEditorInput getMmdbInput(String dbFilePath) throws MorriganException {
+		LocalMixedMediaDb l;
+		
+		try {
+			l = MixedMediaListFactory.LOCAL_MMDB_FACTORY.manufacture(dbFilePath);
+		} catch (DbException e) {
+			throw new MorriganException(e);
+		}
+		
+		MediaItemDbEditorInput input = new MediaItemDbEditorInput(l);
+		return input;
+	}
+	
+	public static MediaItemDbEditorInput getMmdbInput (IMemento memento) throws MorriganException {
+		String dbFilePath = memento.getString(KEY_SERIAL);
+		MediaItemDbEditorInput input = getMmdbInput(dbFilePath);
+		
+		String sortcol = memento.getString(KEY_LIB_SORTCOL);
+		String sortdir = memento.getString(KEY_LIB_SORTDIR);
+		if (sortcol != null && sortdir != null) {
+			try {
+				IDbColumn ls = MixedMediaSqliteLayerImpl.parseColumnFromName(sortcol);
+				SortDirection lsd = SortDirection.valueOf(sortdir);
+				input.getMediaList().setSort(ls, lsd);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 		
 		return input;

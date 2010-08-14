@@ -1,6 +1,6 @@
 package net.sparktank.morrigan.gui.adaptors;
 
-import net.sparktank.morrigan.model.tracks.MediaTrack;
+import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
 
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 
@@ -10,7 +10,7 @@ public class CountsLblProv extends ColumnLabelProvider {
 	
 	@Override
 	public String getText(Object element) {
-		MediaTrack elm = (MediaTrack) element;
+		IMediaTrack elm = (IMediaTrack) element;
 		if (elm.getStartCount() <= 0 && elm.getStartCount() <= 0) {
 			return null;
 		}

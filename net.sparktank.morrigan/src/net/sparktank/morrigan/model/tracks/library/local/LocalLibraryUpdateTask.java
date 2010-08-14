@@ -10,6 +10,7 @@ import net.sparktank.morrigan.helpers.RecyclingFactory;
 import net.sparktank.morrigan.model.LocalDbUpdateTask;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
 import net.sparktank.morrigan.model.tags.TrackTagHelper;
+import net.sparktank.morrigan.model.tasks.TaskEventListener;
 
 public class LocalLibraryUpdateTask extends LocalDbUpdateTask<LocalMediaLibrary, IMediaTrack> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -85,8 +86,14 @@ public class LocalLibraryUpdateTask extends LocalDbUpdateTask<LocalMediaLibrary,
 	private IPlaybackEngine playbackEngine = null;
 	
 	@Override
-	protected boolean shouldTrackMetaData1(LocalMediaLibrary library, IMediaTrack item) {
-		return item.getDuration()<=0;
+	protected boolean shouldTrackMetaData1(TaskEventListener taskEventListener, LocalMediaLibrary library, IMediaTrack item) throws MorriganException {
+		if (item.getDuration()<=0) {
+			if (!library.isMarkedAsUnreadable(item)) {
+				return true;
+			}
+			taskEventListener.logMsg(this.getItemList().getListName(), "Ignoring unreadable file '"+item.getFilepath()+"'.");
+		}
+		return false;
 	}
 	
 	@Override

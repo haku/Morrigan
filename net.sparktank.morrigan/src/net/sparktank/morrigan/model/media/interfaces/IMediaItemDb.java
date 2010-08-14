@@ -1,5 +1,6 @@
 package net.sparktank.morrigan.model.media.interfaces;
 
+import java.io.File;
 import java.util.List;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
@@ -18,20 +19,23 @@ public interface IMediaItemDb<S extends IMediaItemStorageLayer<T>, T extends IMe
 		public void sortChanged (IDbColumn sort, SortDirection direction);
 	}
 	
+	public String getDbPath ();
 	public S getDbLayer();
+	
+	public List<String> getSources () throws DbException;
+	public void addSource (String source) throws DbException;
+	public void removeSource (String source) throws DbException;
+	
+	public List<T> simpleSearch (String term, String esc, int maxResults) throws DbException;
+	public List<T> getAllDbEntries () throws DbException;
+	
+	public T addFile (File file) throws MorriganException, DbException;
 	
 	public IDbColumn getSort ();
 	public SortDirection getSortDirection ();
 	public void setSort (IDbColumn sort, SortDirection direction) throws MorriganException;
 	public void registerSortChangeListener (SortChangeListener scl);
 	public void unregisterSortChangeListener (SortChangeListener scl);
-	
-	public List<T> simpleSearch (String term, String esc, int maxResults) throws DbException;
-	
-	public String getDbPath ();
-	public List<String> getSources () throws DbException;
-	public void addSource (String source) throws DbException;
-	public void removeSource (String source) throws DbException;
 	
 	public boolean hasTags (IDbItem item) throws MorriganException;
 	public boolean hasTag (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) throws MorriganException;

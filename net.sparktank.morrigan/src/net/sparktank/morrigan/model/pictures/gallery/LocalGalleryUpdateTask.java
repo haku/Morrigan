@@ -7,6 +7,7 @@ import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.RecyclingFactory;
 import net.sparktank.morrigan.model.LocalDbUpdateTask;
 import net.sparktank.morrigan.model.media.interfaces.IMediaPicture;
+import net.sparktank.morrigan.model.tasks.TaskEventListener;
 
 public class LocalGalleryUpdateTask extends LocalDbUpdateTask<LocalGallery, IMediaPicture> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -71,7 +72,7 @@ public class LocalGalleryUpdateTask extends LocalDbUpdateTask<LocalGallery, IMed
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
-	protected boolean shouldTrackMetaData1(LocalGallery library, IMediaPicture item) {
+	protected boolean shouldTrackMetaData1(TaskEventListener taskEventListener, LocalGallery library, IMediaPicture item) {
 		return item.getWidth() <= 0 || item.getHeight() <= 0;
 	}
 	

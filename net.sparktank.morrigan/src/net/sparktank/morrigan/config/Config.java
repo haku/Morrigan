@@ -69,6 +69,21 @@ public class Config {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	private static final String MMDB_DIR = "/mmdb";
+	public static final String MMDB_LOCAL_FILE_EXT = ".local.db3";
+	
+	public static File getMmdbDir () {
+		File f = new File(getConfigDir() + MMDB_DIR);
+		if (!f.exists()) {
+			if (!f.mkdirs()) {
+				throw new RuntimeException("Failed to create direactory '"+f.getAbsolutePath()+"'.");
+			}
+		}
+		return f;
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
 	private static final String PROP_FILE = "morrigan.properties";
 	
 	private static final String PROP_ENG_PE_CLASS = "engines.playback.class";

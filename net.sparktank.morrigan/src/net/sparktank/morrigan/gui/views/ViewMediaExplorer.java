@@ -4,12 +4,14 @@ import java.util.ArrayList;
 
 import net.sparktank.morrigan.gui.actions.NewGalleryAction;
 import net.sparktank.morrigan.gui.actions.NewLibraryAction;
+import net.sparktank.morrigan.gui.actions.NewMixedDbAction;
 import net.sparktank.morrigan.gui.actions.NewPlaylistAction;
 import net.sparktank.morrigan.gui.actions.NewRemoteLibraryAction;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.handler.CallMediaListEditor;
 import net.sparktank.morrigan.gui.helpers.ImageCache;
 import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
+import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDbHelper;
 import net.sparktank.morrigan.model.pictures.gallery.LocalGalleryHelper;
 import net.sparktank.morrigan.model.tracks.library.local.LocalLibraryHelper;
 import net.sparktank.morrigan.model.tracks.library.remote.RemoteLibraryHelper;
@@ -108,6 +110,13 @@ public class ViewMediaExplorer extends ViewPart {
 					
 					case REMOTELIBRARY:
 						return ViewMediaExplorer.this.imageCache.readImage("icons/library-remote.gif");
+						
+					case  LOCALGALLERY:
+						return ViewMediaExplorer.this.imageCache.readImage("icons/library.gif"); // TODO choose icon.
+						
+					case LOCALMMDB:
+						return ViewMediaExplorer.this.imageCache.readImage("icons/library.gif"); // TODO choose icon.
+						
 				}
 			}
 			return null;
@@ -143,10 +152,12 @@ public class ViewMediaExplorer extends ViewPart {
 		getViewSite().getActionBars().getToolBarManager().add(new NewRemoteLibraryAction(getViewSite().getWorkbenchWindow()));
 		getViewSite().getActionBars().getToolBarManager().add(new NewPlaylistAction(getViewSite().getWorkbenchWindow()));
 		getViewSite().getActionBars().getToolBarManager().add(new NewGalleryAction(getViewSite().getWorkbenchWindow()));
+		getViewSite().getActionBars().getToolBarManager().add(new NewMixedDbAction(getViewSite().getWorkbenchWindow()));
 	}
 	
 	private void makeContent () {
 		this.items.clear();
+		this.items.addAll(LocalMixedMediaDbHelper.getAllMmdb());
 		this.items.addAll(LocalLibraryHelper.getAllLibraries());
 		this.items.addAll(LocalGalleryHelper.getAllGalleries());
 		this.items.addAll(RemoteLibraryHelper.getAllRemoteLibraries());

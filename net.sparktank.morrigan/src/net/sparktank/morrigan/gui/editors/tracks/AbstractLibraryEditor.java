@@ -106,7 +106,7 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> exte
 	protected void createControls(Composite parent) {
 		// Dependencies.
 		
-		List<DbColumn> cols = getMediaList().getDbLayer().getSqlTblMediaFilesColumns();
+		List<DbColumn> cols = getMediaList().getDbLayer().getMediaTblColumns();
 		
 		for (IDbColumn c : cols) {
 			if (c.getHumanName() != null) {
