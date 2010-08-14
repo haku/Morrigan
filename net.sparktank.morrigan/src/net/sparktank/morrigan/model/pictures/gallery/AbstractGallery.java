@@ -1,6 +1,6 @@
 package net.sparktank.morrigan.model.pictures.gallery;
 
-import net.sparktank.morrigan.model.MediaItemDb;
+import net.sparktank.morrigan.model.media.impl.MediaItemDb;
 import net.sparktank.morrigan.model.pictures.IMediaPictureList;
 import net.sparktank.morrigan.model.pictures.MediaPicture;
 import net.sparktank.morrigan.model.pictures.MediaPictureListHelper;
