@@ -3,7 +3,6 @@ package net.sparktank.morrigan.model.tracks;
 import java.util.Date;
 import java.util.List;
 
-import net.sparktank.morrigan.model.media.impl.MediaItemList;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemList;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemList.DirtyState;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;

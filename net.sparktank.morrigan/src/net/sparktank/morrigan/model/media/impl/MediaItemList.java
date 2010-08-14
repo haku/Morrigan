@@ -72,6 +72,7 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 	
 	abstract public boolean isCanBeDirty (); 
 	
+	@Override
 	public void setDirtyState (DirtyState state) {
 		if (isCanBeDirty()) {
 			// Changed?  Priority order - don't drop back down.
