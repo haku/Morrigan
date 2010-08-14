@@ -5,14 +5,15 @@ import java.util.Date;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMixedMediaList;
+import net.sparktank.morrigan.model.media.interfaces.IMixedMediaStorageLayer;
 import net.sparktank.morrigan.model.pictures.MediaPictureListHelper;
 import net.sparktank.morrigan.model.tracks.MediaTrackListHelper;
 import net.sparktank.sqlitewrapper.DbException;
 
-public abstract class AbstractMixedMediaDb extends MediaItemDb<MixedMediaSqliteLayer, IMixedMediaItem> implements IMixedMediaList {
+public abstract class AbstractMixedMediaDb extends MediaItemDb<IMixedMediaStorageLayer<IMixedMediaItem>, IMixedMediaItem> implements IMixedMediaList {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	protected AbstractMixedMediaDb (String libraryName, MixedMediaSqliteLayer dbLayer) {
+	protected AbstractMixedMediaDb (String libraryName, IMixedMediaStorageLayer<IMixedMediaItem> dbLayer) {
 		super(libraryName, dbLayer);
 	}
 	
