@@ -1,6 +1,7 @@
 package net.sparktank.morrigan.model.pictures.gallery;
 
 import net.sparktank.morrigan.model.media.impl.MediaItemDb;
+import net.sparktank.morrigan.model.media.interfaces.IMediaPicture;
 import net.sparktank.morrigan.model.pictures.IMediaPictureList;
 import net.sparktank.morrigan.model.pictures.MediaPicture;
 import net.sparktank.morrigan.model.pictures.MediaPictureListHelper;
@@ -22,7 +23,7 @@ public abstract class AbstractGallery extends MediaItemDb<GallerySqliteLayer, Me
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
-	public void setPictureWidthAndHeight (MediaPicture mp, int width, int height) {
+	public void setPictureWidthAndHeight (IMediaPicture mp, int width, int height) {
 		MediaPictureListHelper.setPictureWidthAndHeight(this, mp, width, height);
 	}
 	

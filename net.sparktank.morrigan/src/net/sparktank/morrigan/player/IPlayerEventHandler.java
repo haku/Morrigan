@@ -1,7 +1,7 @@
 package net.sparktank.morrigan.player;
 
-import net.sparktank.morrigan.model.tracks.IMediaTrackList;
-import net.sparktank.morrigan.model.tracks.MediaTrack;
+import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
+import net.sparktank.morrigan.model.media.interfaces.IMediaTrackList;
 
 import org.eclipse.swt.widgets.Composite;
 
@@ -29,7 +29,7 @@ public interface IPlayerEventHandler {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public IMediaTrackList<MediaTrack> getCurrentList () ;
+	public IMediaTrackList<IMediaTrack> getCurrentList () ;
 	
 	public Composite getCurrentMediaFrameParent () ;
 	

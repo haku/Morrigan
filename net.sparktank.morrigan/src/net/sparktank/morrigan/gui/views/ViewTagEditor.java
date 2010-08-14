@@ -13,6 +13,7 @@ import net.sparktank.morrigan.gui.display.DropMenuListener;
 import net.sparktank.morrigan.gui.editors.IMediaItemDbEditor;
 import net.sparktank.morrigan.gui.helpers.ImageCache;
 import net.sparktank.morrigan.model.media.impl.MediaItem;
+import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemDb;
 import net.sparktank.morrigan.model.tags.MediaTag;
 import net.sparktank.morrigan.model.tags.MediaTagClassification;
@@ -153,9 +154,9 @@ public class ViewTagEditor extends ViewPart {
 //	Data links.
 	
 	IMediaItemDb<?,?> editedItemDb = null;
-	MediaItem editedItem = null;
+	IMediaItem editedItem = null;
 	
-	public void setInput (IMediaItemDb<?,?> editedMediaList, List<? extends MediaItem> selection) {
+	public void setInput (IMediaItemDb<?,?> editedMediaList, List<? extends IMediaItem> selection) {
 		if (selection != null && selection.size() > 0) {
 			if (selection.size() == 1) {
 				setContentDescription(selection.get(0).getTitle());

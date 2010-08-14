@@ -20,6 +20,7 @@ public interface IMediaItemList<T extends IMediaItem> {
 	public String getSerial ();
 	
 	public DirtyState getDirtyState ();
+	public void setDirtyState (DirtyState state);
 	public void addDirtyChangeEvent (Runnable r);
 	public void removeDirtyChangeEvent (Runnable r);
 	public void addChangeEvent (Runnable r);

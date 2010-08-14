@@ -13,6 +13,7 @@ import net.sparktank.morrigan.gui.helpers.ImageCache;
 import net.sparktank.morrigan.gui.jobs.TaskJob;
 import net.sparktank.morrigan.gui.preferences.MediaListPref;
 import net.sparktank.morrigan.model.media.impl.MediaItem;
+import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemList;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemList.DirtyState;
 import net.sparktank.morrigan.model.tasks.MediaFileCopyTask;
@@ -56,7 +57,7 @@ import org.eclipse.ui.part.EditorPart;
 /*
  * TODO Finish extracting generic stuff from MediaTrackListEditor.
  */
-public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends MediaItem> extends EditorPart {
+public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends IMediaItem> extends EditorPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Nested classes.
 	

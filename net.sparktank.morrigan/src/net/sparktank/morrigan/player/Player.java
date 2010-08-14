@@ -13,8 +13,8 @@ import net.sparktank.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import net.sparktank.morrigan.engines.playback.IPlaybackStatusListener;
 import net.sparktank.morrigan.engines.playback.PlaybackException;
 import net.sparktank.morrigan.exceptions.MorriganException;
-import net.sparktank.morrigan.model.tracks.IMediaTrackList;
-import net.sparktank.morrigan.model.tracks.MediaTrack;
+import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
+import net.sparktank.morrigan.model.media.interfaces.IMediaTrackList;
 import net.sparktank.morrigan.model.tracks.playlist.PlayItem;
 import net.sparktank.morrigan.player.OrderHelper.PlaybackOrder;
 
@@ -95,8 +95,8 @@ public class Player {
 		return this._currentItem;
 	}
 	
-	public IMediaTrackList<? extends MediaTrack> getCurrentList () {
-		IMediaTrackList<? extends MediaTrack> ret = null;
+	public IMediaTrackList<IMediaTrack> getCurrentList () {
+		IMediaTrackList<IMediaTrack> ret = null;
 		
 		PlayItem currentItem = getCurrentItem();
 		if (currentItem != null && currentItem.list != null) {
@@ -130,16 +130,16 @@ public class Player {
 			
 		} else if (getCurrentItem() != null && getCurrentItem().list != null) {
 			if (getCurrentItem().item != null) {
-				MediaTrack nextTrack = OrderHelper.getNextTrack(getCurrentItem().list, getCurrentItem().item, this._playbackOrder);
+				IMediaTrack nextTrack = OrderHelper.getNextTrack(getCurrentItem().list, getCurrentItem().item, this._playbackOrder);
 				if (nextTrack != null) {
 					nextItem = new PlayItem(getCurrentItem().list, nextTrack);
 				}
 			}
 			
 		} else {
-			IMediaTrackList<? extends MediaTrack> currentList = getCurrentList();
+			IMediaTrackList<IMediaTrack> currentList = getCurrentList();
 			if (currentList != null) {
-				MediaTrack nextTrack = OrderHelper.getNextTrack(currentList, null, this._playbackOrder);
+				IMediaTrack nextTrack = OrderHelper.getNextTrack(currentList, null, this._playbackOrder);
 				if (nextTrack != null) {
 					nextItem = new PlayItem(currentList, nextTrack);
 				}
@@ -344,15 +344,15 @@ public class Player {
 	/**
 	 * For UI handlers to call.
 	 */
-	public void loadAndStartPlaying (IMediaTrackList<?> list) {
-		MediaTrack nextTrack = OrderHelper.getNextTrack(list, null, this._playbackOrder);
+	public void loadAndStartPlaying (IMediaTrackList<IMediaTrack> list) {
+		IMediaTrack nextTrack = OrderHelper.getNextTrack(list, null, this._playbackOrder);
 		loadAndStartPlaying(list, nextTrack);
 	}
 	
 	/**
 	 * For UI handlers to call.
 	 */
-	public void loadAndStartPlaying (IMediaTrackList<?> list, MediaTrack track) {
+	public void loadAndStartPlaying (IMediaTrackList<IMediaTrack> list, IMediaTrack track) {
 		if (track == null) throw new NullPointerException();
 		loadAndStartPlaying(new PlayItem(list, track));
 	}

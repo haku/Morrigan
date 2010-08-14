@@ -22,8 +22,8 @@ import net.sparktank.morrigan.gui.editors.tracks.LocalLibraryEditor;
 import net.sparktank.morrigan.gui.editors.tracks.MediaTrackListEditor;
 import net.sparktank.morrigan.gui.editors.tracks.PlaylistEditor;
 import net.sparktank.morrigan.gui.helpers.ClipboardHelper;
-import net.sparktank.morrigan.model.tracks.IMediaTrackList;
-import net.sparktank.morrigan.model.tracks.MediaTrack;
+import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
+import net.sparktank.morrigan.model.media.interfaces.IMediaTrackList;
 import net.sparktank.morrigan.model.tracks.library.local.LocalMediaLibrary;
 import net.sparktank.morrigan.model.tracks.playlist.MediaPlaylist;
 import net.sparktank.morrigan.model.tracks.playlist.PlayItem;
@@ -151,13 +151,13 @@ public abstract class AbstractPlayerView extends ViewPart {
 		
 		@SuppressWarnings("unchecked") // FIXME ???
 		@Override
-		public IMediaTrackList<MediaTrack> getCurrentList() {
-			IMediaTrackList<MediaTrack> ret = null;
+		public IMediaTrackList<IMediaTrack> getCurrentList() {
+			IMediaTrackList<IMediaTrack> ret = null;
 			
 			IEditorPart activeEditor = getViewSite().getPage().getActiveEditor();
 			if (activeEditor != null && activeEditor instanceof MediaTrackListEditor<?,?>) {
-				MediaTrackListEditor<? extends IMediaTrackList<MediaTrack>,MediaTrack> mediaListEditor = (MediaTrackListEditor<? extends IMediaTrackList<MediaTrack>, MediaTrack>) activeEditor;
-				IMediaTrackList<MediaTrack> editedMediaList = mediaListEditor.getMediaList();
+				MediaTrackListEditor<? extends IMediaTrackList<IMediaTrack>,IMediaTrack> mediaListEditor = (MediaTrackListEditor<? extends IMediaTrackList<IMediaTrack>, IMediaTrack>) activeEditor;
+				IMediaTrackList<IMediaTrack> editedMediaList = mediaListEditor.getMediaList();
 				ret = editedMediaList;
 			}
 			return ret;
@@ -623,7 +623,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 	protected IAction jumpToAction = new Action ("Jump to...") {
 		@Override
 		public void run() {
-			IMediaTrackList<? extends MediaTrack> currentList = getPlayer().getCurrentList();
+			IMediaTrackList<? extends IMediaTrack> currentList = getPlayer().getCurrentList();
 			if (currentList == null) return;
 			if (!(currentList instanceof LocalMediaLibrary)) return;
 			
