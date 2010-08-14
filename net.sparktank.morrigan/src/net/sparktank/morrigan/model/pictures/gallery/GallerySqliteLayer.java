@@ -9,10 +9,11 @@ import net.sparktank.morrigan.helpers.RecyclingFactory;
 import net.sparktank.morrigan.model.MediaSqliteLayer2;
 import net.sparktank.morrigan.model.db.impl.DbColumn;
 import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
+import net.sparktank.morrigan.model.media.interfaces.IMediaPicture;
 import net.sparktank.morrigan.model.pictures.MediaPicture;
 import net.sparktank.sqlitewrapper.DbException;
 
-public class GallerySqliteLayer extends MediaSqliteLayer2<MediaPicture> {
+public class GallerySqliteLayer extends MediaSqliteLayer2<IMediaPicture> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Factory.
 	
@@ -100,7 +101,7 @@ public class GallerySqliteLayer extends MediaSqliteLayer2<MediaPicture> {
 	}
 	
 	@Override
-	protected void setTFromRs(MediaPicture item, ResultSet rs) throws SQLException {
+	protected void setTFromRs(IMediaPicture item, ResultSet rs) throws SQLException {
 		item.setWidth(rs.getInt(SQL_TBL_MEDIAFILES_COL_WIDTH.getName()));
 		item.setHeight(rs.getInt(SQL_TBL_MEDIAFILES_COL_HEIGHT.getName()));
 	}

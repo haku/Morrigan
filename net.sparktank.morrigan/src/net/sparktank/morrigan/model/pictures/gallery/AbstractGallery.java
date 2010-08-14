@@ -2,11 +2,11 @@ package net.sparktank.morrigan.model.pictures.gallery;
 
 import net.sparktank.morrigan.model.media.impl.MediaItemDb;
 import net.sparktank.morrigan.model.media.interfaces.IMediaPicture;
-import net.sparktank.morrigan.model.pictures.IMediaPictureList;
+import net.sparktank.morrigan.model.media.interfaces.IMediaPictureList;
 import net.sparktank.morrigan.model.pictures.MediaPicture;
 import net.sparktank.morrigan.model.pictures.MediaPictureListHelper;
 
-public abstract class AbstractGallery extends MediaItemDb<GallerySqliteLayer, MediaPicture> implements IMediaPictureList<MediaPicture> {
+public abstract class AbstractGallery extends MediaItemDb<GallerySqliteLayer, IMediaPicture> implements IMediaPictureList<IMediaPicture> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -	
 
 	protected AbstractGallery (String libraryName, GallerySqliteLayer dbLayer) {

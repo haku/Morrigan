@@ -6,9 +6,9 @@ import net.sparktank.morrigan.config.Config;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.RecyclingFactory;
 import net.sparktank.morrigan.model.LocalDbUpdateTask;
-import net.sparktank.morrigan.model.pictures.MediaPicture;
+import net.sparktank.morrigan.model.media.interfaces.IMediaPicture;
 
-public class LocalGalleryUpdateTask extends LocalDbUpdateTask<LocalGallery, MediaPicture> {
+public class LocalGalleryUpdateTask extends LocalDbUpdateTask<LocalGallery, IMediaPicture> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Factory stuff.
 	
@@ -46,7 +46,7 @@ public class LocalGalleryUpdateTask extends LocalDbUpdateTask<LocalGallery, Medi
 	}
 	
 	@Override
-	protected void mergeItems(MediaPicture itemToKeep, MediaPicture itemToBeRemove) throws MorriganException {
+	protected void mergeItems(IMediaPicture itemToKeep, IMediaPicture itemToBeRemove) throws MorriganException {
 		if (itemToBeRemove.getDateAdded() != null) {
 			if (itemToKeep.getDateAdded() == null
 					|| itemToKeep.getDateAdded().getTime() > itemToBeRemove.getDateAdded().getTime()) {
@@ -71,12 +71,12 @@ public class LocalGalleryUpdateTask extends LocalDbUpdateTask<LocalGallery, Medi
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
-	protected boolean shouldTrackMetaData1(LocalGallery library, MediaPicture item) {
+	protected boolean shouldTrackMetaData1(LocalGallery library, IMediaPicture item) {
 		return item.getWidth() <= 0 || item.getHeight() <= 0;
 	}
 	
 	@Override
-	protected OpResult readTrackMetaData1(LocalGallery library, MediaPicture item, File file) {
+	protected OpResult readTrackMetaData1(LocalGallery library, IMediaPicture item, File file) {
 		// TODO read picture dimensions.
 		
 		return null;
@@ -90,7 +90,7 @@ public class LocalGalleryUpdateTask extends LocalDbUpdateTask<LocalGallery, Medi
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
-	protected void readTrackMetaData2(LocalGallery library, MediaPicture item, File file) throws Throwable {
+	protected void readTrackMetaData2(LocalGallery library, IMediaPicture item, File file) throws Throwable {
 //		TODO Read exif data or something?
 	}
 	
