@@ -3,7 +3,7 @@ package net.sparktank.morrigan.gui.actions;
 import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.jobs.TaskJob;
-import net.sparktank.morrigan.model.MediaItemDb;
+import net.sparktank.morrigan.model.media.impl.MediaItemDb;
 import net.sparktank.morrigan.model.pictures.gallery.LocalGallery;
 import net.sparktank.morrigan.model.pictures.gallery.LocalGalleryUpdateTask;
 import net.sparktank.morrigan.model.tasks.IMorriganTask;
