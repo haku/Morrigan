@@ -36,6 +36,13 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 		this.listName = listName;
 	}
 	
+	@Override
+	public void dispose () {
+		this.changeEvents.clear();
+		this.dirtyChangeEvents.clear();
+		this.mediaTracks.clear();
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	/**

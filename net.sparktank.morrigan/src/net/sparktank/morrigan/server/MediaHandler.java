@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.sparktank.morrigan.helpers.ErrorHelper;
 import net.sparktank.morrigan.model.tasks.TaskEventListener;
-import net.sparktank.morrigan.model.tracks.MediaTrackListFactory;
 import net.sparktank.morrigan.model.tracks.library.local.LocalLibraryHelper;
 import net.sparktank.morrigan.model.tracks.library.local.LocalLibraryUpdateTask;
 import net.sparktank.morrigan.model.tracks.library.local.LocalMediaLibrary;
@@ -54,7 +53,7 @@ public class MediaHandler extends AbstractHandler {
 					String id = split[1];
 					if (type.equals("library")) {
 						String f = LocalLibraryHelper.getFullPathToLib(id);
-						LocalMediaLibrary ml = MediaTrackListFactory.LOCAL_MEDIA_LIBRARY_FACTORY.manufacture(f);
+						LocalMediaLibrary ml = LocalMediaLibrary.FACTORY.manufacture(f);
 						
 						if (split.length > 2) {
 							String param = split[2];
@@ -106,7 +105,7 @@ public class MediaHandler extends AbstractHandler {
 						
 					} else if (type.equals("playlist")) {
 						String f = PlaylistHelper.getFullPathToPlaylist(id);
-						MediaPlaylist ml = MediaTrackListFactory.PLAYLIST_FACTORY.manufacture(f);
+						MediaPlaylist ml = MediaPlaylist.FACTORY.manufacture(f);
 						MediaListFeed<MediaPlaylist> libraryFeed = new MediaListFeed<MediaPlaylist>(ml);
 						libraryFeed.process(out);
 					}

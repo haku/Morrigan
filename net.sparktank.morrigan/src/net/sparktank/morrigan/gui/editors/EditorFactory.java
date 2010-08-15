@@ -3,12 +3,9 @@ package net.sparktank.morrigan.gui.editors;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
-import net.sparktank.morrigan.model.media.impl.MixedMediaListFactory;
 import net.sparktank.morrigan.model.media.impl.MixedMediaSqliteLayerImpl;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemStorageLayer.SortDirection;
-import net.sparktank.morrigan.model.pictures.MediaPictureListFactory;
 import net.sparktank.morrigan.model.pictures.gallery.LocalGallery;
-import net.sparktank.morrigan.model.tracks.MediaTrackListFactory;
 import net.sparktank.morrigan.model.tracks.library.LibrarySqliteLayer2;
 import net.sparktank.morrigan.model.tracks.library.local.LocalMediaLibrary;
 import net.sparktank.morrigan.model.tracks.library.remote.RemoteMediaLibrary;
@@ -85,7 +82,7 @@ public class EditorFactory implements IElementFactory {
 		LocalMediaLibrary ml;
 		
 		try {
-			ml = MediaTrackListFactory.LOCAL_MEDIA_LIBRARY_FACTORY.manufacture(dbFilePath);
+			ml = LocalMediaLibrary.FACTORY.manufacture(dbFilePath);
 		} catch (DbException e) {
 			throw new MorriganException(e);
 		}
@@ -133,7 +130,7 @@ public class EditorFactory implements IElementFactory {
 	}
 	
 	public static MediaItemDbEditorInput getRemoteMediaLibraryInput (String dbFilePath) throws MorriganException {
-		RemoteMediaLibrary ml = MediaTrackListFactory.REMOTE_MEDIA_LIBRARY_FACTORY.manufacture(dbFilePath);
+		RemoteMediaLibrary ml = RemoteMediaLibrary.FACTORY.manufacture(dbFilePath);
 		MediaItemDbEditorInput input = new MediaItemDbEditorInput(ml);
 		return input;
 	}
@@ -141,7 +138,7 @@ public class EditorFactory implements IElementFactory {
 	public static MediaItemListEditorInput<MediaPlaylist> getMediaPlaylistInput (String filePath) throws MorriganException {
 		MediaPlaylist playList;
 		try {
-			playList = MediaTrackListFactory.PLAYLIST_FACTORY.manufacture(filePath);
+			playList = MediaPlaylist.FACTORY.manufacture(filePath);
 		} catch (MorriganException e) {
 			throw new MorriganException(e);
 		}
@@ -157,7 +154,7 @@ public class EditorFactory implements IElementFactory {
 		LocalGallery l;
 		
 		try {
-			l = MediaPictureListFactory.LOCAL_GALLERY_FACTORY.manufacture(dbFilePath);
+			l = LocalGallery.FACTORY.manufacture(dbFilePath);
 		} catch (DbException e) {
 			throw new MorriganException(e);
 		}
@@ -185,7 +182,7 @@ public class EditorFactory implements IElementFactory {
 		LocalMixedMediaDb l;
 		
 		try {
-			l = MixedMediaListFactory.LOCAL_MMDB_FACTORY.manufacture(dbFilePath);
+			l = LocalMixedMediaDb.LOCAL_MMDB_FACTORY.manufacture(dbFilePath);
 		} catch (DbException e) {
 			throw new MorriganException(e);
 		}

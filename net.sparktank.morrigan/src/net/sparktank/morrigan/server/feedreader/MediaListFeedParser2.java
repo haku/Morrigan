@@ -42,15 +42,17 @@ public class MediaListFeedParser2 extends DefaultHandler {
 			@Override
 			public void handleStream(InputStream is) throws MorriganException {
 				boolean thereWereErrors = true;
+				RemoteMediaLibrary transClone = null;
 				try {
-					library.setAutoCommit(false);
-					library.beginBulkUpdate();
+					transClone = library.getTransactionalClone();
+					transClone.readFromCache();
+					transClone.beginBulkUpdate();
 			        try {
 			        	SAXParserFactory factory = SAXParserFactory.newInstance();
 			        	factory.setNamespaceAware(true);
 			        	factory.setValidating(true);
 			        	SAXParser parser = factory.newSAXParser();
-			        	parser.parse(is, new MediaListFeedParser2(library, taskEventListener));
+			        	parser.parse(is, new MediaListFeedParser2(transClone, taskEventListener));
 					}
 			        catch (SAXException e) {
 						throw new MorriganException(e);
@@ -60,23 +62,29 @@ public class MediaListFeedParser2 extends DefaultHandler {
 						throw new MorriganException(e);
 					}
 					thereWereErrors = false;
-				} catch (DbException e) {
+				}
+				catch (DbException e) {
 					throw new MorriganException(e);
-				} finally {
-					try {
-						library.completeBulkUpdate(thereWereErrors);
-					} catch (DbException e) {
-						throw new MorriganException(e);
-					} finally {
+				}
+				finally {
+					if (transClone != null) {
 						try {
-							library.commit();
+							transClone.completeBulkUpdate(thereWereErrors);
 						} catch (DbException e) {
 							throw new MorriganException(e);
 						} finally {
 							try {
-								library.setAutoCommit(true);
+								if (thereWereErrors) {
+									transClone.rollback();
+								}
+								else {
+									transClone.commitOrRollback();
+								}
 							} catch (DbException e) {
 								throw new MorriganException(e);
+							}
+							finally {
+								transClone.dispose();
 							}
 						}
 					}
@@ -157,7 +165,7 @@ public class MediaListFeedParser2 extends DefaultHandler {
 		}
 		else if (this.stack.size() == 2 && localName.equals("entry")) {
 			try {
-				this.library.updateItem(this.currentItem);
+				this.library.updateItem(this.currentItem); 
 			}
 			catch (MorriganException e) {
 				throw new SAXException(e);
@@ -199,7 +207,7 @@ public class MediaListFeedParser2 extends DefaultHandler {
 				this.currentItem.setDateAdded(d);
 			}
 			catch (Exception e) {
-				throw new SAXException(flattenStack(this.stack) + " Exception parsing date '"+this.currentText.toString()+"'.", e);
+				throw new SAXException(flattenStack(this.stack) + " Exception parsing date '"+this.currentText.toString()+"' for item '"+this.currentItem.getFilepath()+"'.", e);
 			}
 		}
 		else if (this.stack.size() == 3 && localName.equals("datelastmodified")) {
@@ -208,7 +216,7 @@ public class MediaListFeedParser2 extends DefaultHandler {
 				this.currentItem.setDateLastModified(d);
 			}
 			catch (Exception e) {
-				throw new SAXException(flattenStack(this.stack) + " Exception parsing date '"+this.currentText.toString()+"'.", e);
+				throw new SAXException(flattenStack(this.stack) + " Exception parsing date '"+this.currentText.toString()+"' for item '"+this.currentItem.getFilepath()+"'.", e);
 			}
 		}
 		else if (this.stack.size() == 3 && localName.equals("datelastplayed")) {
@@ -217,7 +225,7 @@ public class MediaListFeedParser2 extends DefaultHandler {
 				this.currentItem.setDateLastPlayed(d);
 			}
 			catch (Exception e) {
-				throw new SAXException(flattenStack(this.stack) + " Exception parsing date '"+this.currentText.toString()+"'.", e);
+				throw new SAXException(flattenStack(this.stack) + " Exception parsing date '"+this.currentText.toString()+"' for item '"+this.currentItem.getFilepath()+"'.", e);
 			}
 		}
 		

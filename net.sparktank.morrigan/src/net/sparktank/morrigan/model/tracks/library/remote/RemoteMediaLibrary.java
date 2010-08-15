@@ -15,6 +15,7 @@ import java.util.List;
 
 import net.sparktank.morrigan.engines.playback.NotImplementedException;
 import net.sparktank.morrigan.exceptions.MorriganException;
+import net.sparktank.morrigan.helpers.RecyclingFactory;
 import net.sparktank.morrigan.model.db.interfaces.IDbItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
 import net.sparktank.morrigan.model.tags.MediaTag;
@@ -28,7 +29,56 @@ import net.sparktank.morrigan.server.HttpClient.IHttpStreamHandler;
 import net.sparktank.morrigan.server.feedreader.MediaListFeedParser2;
 import net.sparktank.sqlitewrapper.DbException;
 
-public class RemoteMediaLibrary extends AbstractMediaLibrary {
+public class RemoteMediaLibrary extends AbstractMediaLibrary<RemoteMediaLibrary> {
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Factory.
+	
+	public static class RemoteMediaLibraryFactory extends RecyclingFactory<RemoteMediaLibrary, String, URL, MorriganException> {
+		
+		protected RemoteMediaLibraryFactory() {
+			super(true);
+		}
+		
+		@Override
+		protected boolean isValidProduct(RemoteMediaLibrary product) {
+			System.out.println("Found '" + product.getDbPath() + "' in cache.");
+			return true;
+		}
+		
+		@Override
+		protected RemoteMediaLibrary makeNewProduct(String material) throws MorriganException {
+			return makeNewProduct(material, null);
+		}
+		
+		@Override
+		protected RemoteMediaLibrary makeNewProduct(String material, URL config) throws MorriganException {
+			RemoteMediaLibrary ret = null;
+			
+			System.out.println("Making object instance '" + material + "'...");
+			if (config != null) {
+				try {
+					ret = new RemoteMediaLibrary(RemoteLibraryHelper.getLibraryTitle(material), config, LibrarySqliteLayer2.FACTORY.manufacture(material));
+				} catch (DbException e) {
+					throw new MorriganException(e);
+				}
+			} else {
+				try {
+					ret = new RemoteMediaLibrary(RemoteLibraryHelper.getLibraryTitle(material), LibrarySqliteLayer2.FACTORY.manufacture(material));
+				} catch (MalformedURLException e) {
+					throw new MorriganException(e);
+				} catch (DbException e) {
+					throw new MorriganException(e);
+				}
+			}
+			
+			return ret;
+		}
+		
+	}
+	
+	public static final RemoteMediaLibraryFactory FACTORY = new RemoteMediaLibraryFactory();
+	
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static final String TYPE = "REMOTELIBRARY";
@@ -89,6 +139,14 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 	private void writeCacheDate () throws DbException {
 		getDbLayer().setProp(DBKEY_CACHEDATE, String.valueOf(this.cacheDate));
 		System.err.println("Wrote cachedate=" + this.cacheDate + ".");
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	@SuppressWarnings("boxing")
+	@Override
+	public RemoteMediaLibrary getTransactionalClone() throws DbException {
+		return new RemoteMediaLibrary(RemoteLibraryHelper.getLibraryTitle(getDbPath()), getUrl(), LibrarySqliteLayer2.FACTORY.manufacture(getDbPath(), false, true));
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -311,7 +369,7 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary {
 	
 	@Override
 	public boolean hasTags (IDbItem item) throws MorriganException {
-		throw new NotImplementedException();
+		return false;
 	}
 	
 	@Override

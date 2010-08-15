@@ -19,7 +19,7 @@ public class GallerySqliteLayer extends MediaSqliteLayer2<IMediaPicture> {
 	
 	public static final DbConFactory FACTORY = new DbConFactory();
 	
-	public static class DbConFactory extends RecyclingFactory<GallerySqliteLayer, String, Void, DbException> {
+	public static class DbConFactory extends RecyclingFactory<GallerySqliteLayer, String, Boolean, DbException> {
 		
 		DbConFactory() {
 			super(true);
@@ -32,7 +32,13 @@ public class GallerySqliteLayer extends MediaSqliteLayer2<IMediaPicture> {
 		
 		@Override
 		protected GallerySqliteLayer makeNewProduct(String material) throws DbException {
-			return new GallerySqliteLayer(material);
+			return new GallerySqliteLayer(material, true);
+		}
+		
+		@SuppressWarnings("boxing")
+		@Override
+		protected GallerySqliteLayer makeNewProduct(String material, Boolean config) throws DbException {
+			return new GallerySqliteLayer(material, config);
 		}
 		
 	}
@@ -40,8 +46,8 @@ public class GallerySqliteLayer extends MediaSqliteLayer2<IMediaPicture> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors.
 	
-	protected GallerySqliteLayer (String dbFilePath) throws DbException {
-		super(dbFilePath);
+	protected GallerySqliteLayer (String dbFilePath, boolean autoCommit) throws DbException {
+		super(dbFilePath, autoCommit);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

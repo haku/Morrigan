@@ -4,6 +4,7 @@ import java.io.File;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -29,8 +30,8 @@ public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqlit
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors.
 	
-	protected MediaSqliteLayer2 (String dbFilePath) throws DbException {
-		super(dbFilePath);
+	protected MediaSqliteLayer2 (String dbFilePath, boolean autoCommit) throws DbException {
+		super(dbFilePath, autoCommit);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -74,6 +75,15 @@ public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqlit
 //	DB writers.
 	
 	@Override
+	public boolean hasFile(File file) throws DbException {
+		try {
+			return local_hasFile(file.getAbsolutePath());
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+	
+	@Override
 	public boolean addFile (File file) throws DbException {
 		try {
 			return local_addTrack(file.getAbsolutePath(), file.lastModified());
@@ -86,6 +96,15 @@ public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqlit
 	public boolean addFile (String filepath, long lastModified) throws DbException {
 		try {
 			return local_addTrack(filepath, lastModified);
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+	
+	@Override
+	public boolean[] addFiles(List<File> files) throws DbException {
+		try {
+			return local_addFiles(files);
 		} catch (Exception e) {
 			throw new DbException(e);
 		}
@@ -536,7 +555,7 @@ public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqlit
 		return ret;
 	}
 	
-	private boolean local_addTrack (String filePath, long lastModified) throws SQLException, ClassNotFoundException, DbException {
+	protected boolean local_hasFile (String filePath) throws SQLException, ClassNotFoundException {
 		PreparedStatement ps;
 		ResultSet rs;
 		
@@ -557,7 +576,14 @@ public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqlit
 			ps.close();
 		}
 		
-		if (n == 0) {
+		return (n > 0);
+	}
+	
+	private boolean local_addTrack (String filePath, long lastModified) throws SQLException, ClassNotFoundException, DbException {
+		PreparedStatement ps;
+		
+		int n;
+		if (!local_hasFile(filePath)) {
 			System.err.println("Adding file '" + filePath + "' to '"+getDbFilePath()+"'.");
 			ps = getDbCon().prepareStatement(this.sqlTblMediaFilesAdd.toString());
 			try {
@@ -574,6 +600,35 @@ public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqlit
 		}
 		
 		return false;
+	}
+	
+	protected boolean[] local_addFiles (List<File> files) throws SQLException, ClassNotFoundException {
+		PreparedStatement ps;
+		int[] n;
+		
+		ps = getDbCon().prepareStatement(this.sqlTblMediaFilesAdd.toString());
+		try {
+			for (File file : files) {
+				String filePath = file.getAbsolutePath();
+				if (!local_hasFile(filePath)) {
+					ps.setString(1, filePath);
+					ps.setDate(2, new java.sql.Date(new Date().getTime()));
+					ps.setDate(3, new java.sql.Date(file.lastModified()));
+					ps.addBatch();
+				}
+			}
+			
+			n = ps.executeBatch();
+			
+			boolean[] b = new boolean[n.length];
+			for (int i = 0; i < n.length; i++) {
+				b[i] = (n[i] > 0 || n[i] == Statement.SUCCESS_NO_INFO);
+			}
+			return b;
+		}
+		finally {
+			ps.close();
+		}
 	}
 	
 	private int local_removeTrack (String sfile) throws SQLException, ClassNotFoundException {

@@ -130,7 +130,7 @@ public class ViewTagEditor extends ViewPart {
 				}
 				
 				IMediaItemDbEditor editor = (IMediaItemDbEditor) part;
-				IMediaItemDb<?,?> list = editor.getMediaList();
+				IMediaItemDb<?,?,?> list = editor.getMediaList();
 				
 				if (selection instanceof IStructuredSelection) {
 					IStructuredSelection iSel = (IStructuredSelection) selection;
@@ -153,10 +153,10 @@ public class ViewTagEditor extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Data links.
 	
-	IMediaItemDb<?,?> editedItemDb = null;
+	IMediaItemDb<?,?,?> editedItemDb = null;
 	IMediaItem editedItem = null;
 	
-	public void setInput (IMediaItemDb<?,?> editedMediaList, List<? extends IMediaItem> selection) {
+	public void setInput (IMediaItemDb<?,?,?> editedMediaList, List<? extends IMediaItem> selection) {
 		if (selection != null && selection.size() > 0) {
 			if (selection.size() == 1) {
 				setContentDescription(selection.get(0).getTitle());
@@ -186,8 +186,10 @@ public class ViewTagEditor extends ViewPart {
 		public Object[] getElements(Object inputElement) {
 			if (ViewTagEditor.this.editedItemDb != null && ViewTagEditor.this.editedItem != null) {
 				try {
-					List<MediaTag> tags = ViewTagEditor.this.editedItemDb.getTags(ViewTagEditor.this.editedItem);
-					return tags.toArray();
+					if (ViewTagEditor.this.editedItemDb.hasTags(ViewTagEditor.this.editedItem)) {
+    					List<MediaTag> tags = ViewTagEditor.this.editedItemDb.getTags(ViewTagEditor.this.editedItem);
+    					return tags.toArray();
+					}
 				}
 				catch (MorriganException e) {
 					getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));

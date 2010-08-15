@@ -19,6 +19,7 @@ import net.sparktank.morrigan.model.media.interfaces.IMediaItemStorageLayer.Sort
 import net.sparktank.morrigan.model.media.interfaces.IMediaPicture;
 import net.sparktank.morrigan.model.pictures.MediaPicture;
 import net.sparktank.morrigan.model.pictures.gallery.AbstractGallery;
+import net.sparktank.morrigan.model.pictures.gallery.GallerySqliteLayer;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
@@ -37,7 +38,9 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 
-public abstract class AbstractGalleryEditor<T extends AbstractGallery> extends MediaPictureListEditor<T, IMediaPicture> implements IMediaItemDbEditor {
+public abstract class AbstractGalleryEditor<T extends AbstractGallery<T>>
+        extends MediaPictureListEditor<T, IMediaPicture>
+        implements IMediaItemDbEditor<T, GallerySqliteLayer, IMediaPicture> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public AbstractGalleryEditor () {
