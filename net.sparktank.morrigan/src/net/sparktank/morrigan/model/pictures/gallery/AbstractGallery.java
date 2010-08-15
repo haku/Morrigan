@@ -8,7 +8,9 @@ import net.sparktank.morrigan.model.pictures.MediaPicture;
 import net.sparktank.morrigan.model.pictures.MediaPictureListHelper;
 import net.sparktank.sqlitewrapper.DbException;
 
-public abstract class AbstractGallery extends MediaItemDb<GallerySqliteLayer, IMediaPicture> implements IMediaPictureList<IMediaPicture> {
+public abstract class AbstractGallery<H extends AbstractGallery<H>>
+		extends MediaItemDb<H, GallerySqliteLayer, IMediaPicture>
+		implements IMediaPictureList<IMediaPicture> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -	
 
 	protected AbstractGallery (String libraryName, GallerySqliteLayer dbLayer) {

@@ -47,15 +47,17 @@ public class XmlHelper {
 		return document;
 	}
 	
-	static private SimpleDateFormat Iso8601Utc = null;
-	
-	// TODO make thread safe.
-	static public DateFormat getIso8601UtcDateFormatter () {
-		if (Iso8601Utc==null) {
-			Iso8601Utc = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-			Iso8601Utc.setTimeZone(TimeZone.getTimeZone("UTC"));
+	static private ThreadLocal<SimpleDateFormat> Iso8601Utc = new ThreadLocal<SimpleDateFormat>() {
+		@Override
+		protected SimpleDateFormat initialValue() {
+			SimpleDateFormat a = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+			a.setTimeZone(TimeZone.getTimeZone("UTC"));
+			return a;
 		}
-		return Iso8601Utc;
+	};
+	
+	static public DateFormat getIso8601UtcDateFormatter () {
+		return Iso8601Utc.get();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

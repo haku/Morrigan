@@ -39,7 +39,9 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 
-public abstract class AbstractMixedMediaDbEditor<T extends AbstractMixedMediaDb> extends MixedMediaListEditor<T, IMixedMediaItem> implements IMediaItemDbEditor<IMixedMediaStorageLayer<IMixedMediaItem>, IMixedMediaItem> {
+public abstract class AbstractMixedMediaDbEditor<T extends AbstractMixedMediaDb<T>>
+		extends MixedMediaListEditor<T, IMixedMediaItem>
+		implements IMediaItemDbEditor<T, IMixedMediaStorageLayer<IMixedMediaItem>, IMixedMediaItem> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public AbstractMixedMediaDbEditor () {

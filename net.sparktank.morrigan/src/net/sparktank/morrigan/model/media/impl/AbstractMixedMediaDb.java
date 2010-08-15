@@ -13,7 +13,9 @@ import net.sparktank.morrigan.model.pictures.MediaPictureListHelper;
 import net.sparktank.morrigan.model.tracks.MediaTrackListHelper;
 import net.sparktank.sqlitewrapper.DbException;
 
-public abstract class AbstractMixedMediaDb extends MediaItemDb<IMixedMediaStorageLayer<IMixedMediaItem>, IMixedMediaItem> implements IMixedMediaList<IMixedMediaItem> {
+public abstract class AbstractMixedMediaDb<H extends AbstractMixedMediaDb<H>>
+		extends MediaItemDb<H, IMixedMediaStorageLayer<IMixedMediaItem>, IMixedMediaItem>
+		implements IMixedMediaList<IMixedMediaItem> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	protected AbstractMixedMediaDb (String libraryName, IMixedMediaStorageLayer<IMixedMediaItem> dbLayer) {

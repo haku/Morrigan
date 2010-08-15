@@ -16,7 +16,8 @@ import net.sparktank.morrigan.gui.views.ViewLibraryProperties;
 import net.sparktank.morrigan.gui.views.ViewTagEditor;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
 
-public class LocalMixedMediaDbEditor  extends AbstractMixedMediaDbEditor<LocalMixedMediaDb> {
+public class LocalMixedMediaDbEditor 
+		extends AbstractMixedMediaDbEditor<LocalMixedMediaDb> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static final String ID = "net.sparktank.morrigan.gui.editors.LocalMixedMediaDbEditor";

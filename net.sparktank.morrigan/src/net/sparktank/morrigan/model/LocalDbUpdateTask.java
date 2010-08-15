@@ -23,7 +23,7 @@ import net.sparktank.morrigan.model.tasks.TaskResult;
 import net.sparktank.morrigan.model.tasks.TaskResult.TaskOutcome;
 import net.sparktank.sqlitewrapper.DbException;
 
-public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaItemStorageLayer<T>,T>, T extends IMediaItem> implements IMorriganTask {
+public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<Q, ? extends IMediaItemStorageLayer<T>,T>, T extends IMediaItem> implements IMorriganTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	protected enum ScanOption {KEEP, DELREF, MOVEFILE};
@@ -152,7 +152,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Generic scanning.
 	
-	private TaskResult scanLibraryDirectories(TaskEventListener taskEventListener) throws DbException {
+	private TaskResult scanLibraryDirectories(TaskEventListener taskEventListener) throws DbException, MorriganException {
 		taskEventListener.subTask("Scanning sources");
 		
 		List<String> supportedFormats;
@@ -171,6 +171,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 			return new TaskResult(TaskOutcome.FAILED, "Failed to retrieve list of media sources.", e);
 		}
 		
+		List<File> filesToAdd = new LinkedList<File>();
 		int filesAdded = 0;
 		
 		if (sources!=null) {
@@ -184,9 +185,10 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 					if (taskEventListener.isCanceled()) break;
 					
 					File dirItem = dirStack.pop();
+					taskEventListener.subTask("(" + filesToAdd.size() + ") Scanning " + dirItem.getAbsolutePath());
+					
 					File[] arrFiles = dirItem.listFiles();
 					if (arrFiles != null) {
-						taskEventListener.subTask("Scanning " + dirItem.getAbsolutePath());
 						
 						List<File> listFiles = new ArrayList<File>(arrFiles.length);
 						for (File file : arrFiles) {
@@ -204,17 +206,17 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 								String ext = file.getName();
 								ext = ext.substring(ext.lastIndexOf(".") + 1).toLowerCase();
 								if (supportedFormats.contains(ext)) {
-									try {
-										if (this.getItemList().addFile(file) != null) {
-											taskEventListener.logMsg(this.getItemList().getListName(), "[ADDED] " + file.getAbsolutePath());
-											filesAdded++;
-										}
-									} catch (MorriganException e) {
-										// FIXME log this somewhere useful.
-										e.printStackTrace();
+									if (!this.getItemList().hasFile(file)) {
+										filesToAdd.add(file);
 									}
 								}
 							}
+							
+//							if (filesToAdd.size() >= 100) {
+//								this.getItemList().addFiles(filesToAdd);
+//								filesAdded = filesAdded + filesToAdd.size();
+//								filesToAdd.clear();
+//							}
 						}
 					}
 					else {
@@ -223,6 +225,27 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 				}
 			}
 		} // End directory scanning.
+		
+		if (filesToAdd.size() > 0) {
+			taskEventListener.logMsg(this.getItemList().getListName(), "Addeding " + filesToAdd.size() + " files to DB...");
+			
+			Q transClone = this.getItemList().getTransactionalClone();
+			try {
+				transClone.addFiles(filesToAdd);
+				filesAdded = filesAdded + filesToAdd.size();
+			}
+			finally {
+				taskEventListener.logMsg(this.getItemList().getListName(), "Committing " + filesAdded + " inserts to DB...");
+				try {
+					transClone.commitOrRollback();
+				} finally {
+					transClone.dispose();
+				}
+			}
+		}
+		
+		// Make main connection pick up changes to DB.
+		this.getItemList().forceRead();
 		
 		taskEventListener.logMsg(this.getItemList().getListName(), "Added " + filesAdded + " files.");
 		
@@ -323,7 +346,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 			}
 			
 			n++;
-			int p = (n * prgTotal) / N;
+			int p = N > 0 ? (n * prgTotal) / N : 0;
 			if (p > progress) {
 				taskEventListener.worked(p - progress);
 				progress = p;
@@ -386,7 +409,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 			}
 			
 			n++;
-			int p = (n * prgTotal) / N;
+			int p = N > 0 ? (n * prgTotal) / N : 0;
 			if (p > progress) {
 				taskEventListener.worked(p - progress);
 				progress = p;
@@ -541,7 +564,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
     			}// End duration > 0 test.
     			
     			n++;
-    			int p = (n * prgTotal) / N;
+    			int p = N > 0 ? (n * prgTotal) / N : 0;
     			if (p > progress) {
     				taskEventListener.worked(p - progress);
     				progress = p;
@@ -591,7 +614,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 			}
 			
 			n++;
-			int p = (n * prgTotal) / N;
+			int p = N > 0 ? (n * prgTotal) / N : 0;
 			if (p > progress) {
 				taskEventListener.worked(p - progress);
 				progress = p;

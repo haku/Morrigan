@@ -5,7 +5,6 @@ import java.util.ArrayList;
 
 import net.sparktank.morrigan.config.Config;
 import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
-import net.sparktank.morrigan.model.pictures.MediaPictureListFactory;
 import net.sparktank.sqlitewrapper.DbException;
 
 public class LocalGalleryHelper {
@@ -24,7 +23,7 @@ public class LocalGalleryHelper {
 	
 	public static LocalGallery createGallery (String name) throws DbException {
 		String file = getFullPathToGallery(name);
-		LocalGallery l = MediaPictureListFactory.LOCAL_GALLERY_FACTORY.manufacture(file);
+		LocalGallery l = LocalGallery.FACTORY.manufacture(file);
 		return l;
 	}
 	

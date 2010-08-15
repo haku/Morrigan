@@ -12,12 +12,16 @@ import net.sparktank.morrigan.model.tags.MediaTagClassification;
 import net.sparktank.morrigan.model.tags.MediaTagType;
 import net.sparktank.sqlitewrapper.DbException;
 
-public interface IMediaItemDb<S extends IMediaItemStorageLayer<T>, T extends IMediaItem> extends IMediaItemList<T> {
+public interface IMediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMediaItemStorageLayer<T>, T extends IMediaItem> extends IMediaItemList<T> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public interface SortChangeListener {
 		public void sortChanged (IDbColumn sort, SortDirection direction);
 	}
+	
+	public H getTransactionalClone () throws DbException;
+	public void commitOrRollback () throws DbException;
+	public void rollback () throws DbException;
 	
 	public String getDbPath ();
 	public S getDbLayer();
@@ -30,6 +34,8 @@ public interface IMediaItemDb<S extends IMediaItemStorageLayer<T>, T extends IMe
 	public List<T> getAllDbEntries () throws DbException;
 	
 	public T addFile (File file) throws MorriganException, DbException;
+	public boolean hasFile (File file) throws MorriganException, DbException;
+	public List<T> addFiles (List<File> files) throws MorriganException, DbException;
 	
 	public IDbColumn getSort ();
 	public SortDirection getSortDirection ();

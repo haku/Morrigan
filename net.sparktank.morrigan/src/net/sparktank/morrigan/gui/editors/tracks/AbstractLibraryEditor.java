@@ -39,7 +39,9 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 
-public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary> extends MediaTrackListEditor<T, IMediaTrack> implements IMediaItemDbEditor {
+public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary<T>>
+        extends MediaTrackListEditor<T, IMediaTrack>
+        implements IMediaItemDbEditor<T, LibrarySqliteLayer2, IMediaTrack> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public AbstractLibraryEditor () {

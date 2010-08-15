@@ -16,7 +16,7 @@ import net.sparktank.sqlitewrapper.DbException;
 public class MixedMediaSqliteLayer extends MixedMediaSqliteLayerImpl implements IMixedMediaStorageLayer<IMixedMediaItem> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public static class MixedMediaSqliteLayerFactory extends RecyclingFactory<IMixedMediaStorageLayer<IMixedMediaItem>, String, Void, DbException> {
+	public static class MixedMediaSqliteLayerFactory extends RecyclingFactory<IMixedMediaStorageLayer<IMixedMediaItem>, String, Boolean, DbException> {
 		
 		MixedMediaSqliteLayerFactory() {
 			super(true);
@@ -29,7 +29,13 @@ public class MixedMediaSqliteLayer extends MixedMediaSqliteLayerImpl implements 
 		
 		@Override
 		protected IMixedMediaStorageLayer<IMixedMediaItem> makeNewProduct(String material) throws DbException {
-			return new MixedMediaSqliteLayer(material);
+			return new MixedMediaSqliteLayer(material, true);
+		}
+		
+		@SuppressWarnings("boxing")
+		@Override
+		protected IMixedMediaStorageLayer<IMixedMediaItem> makeNewProduct(String material, Boolean config) throws DbException {
+			return new MixedMediaSqliteLayer(material, config);
 		}
 		
 	}
@@ -39,8 +45,8 @@ public class MixedMediaSqliteLayer extends MixedMediaSqliteLayerImpl implements 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors.
 	
-	protected MixedMediaSqliteLayer (String dbFilePath) throws DbException {
-		super(dbFilePath);
+	protected MixedMediaSqliteLayer (String dbFilePath, boolean autoCommit) throws DbException {
+		super(dbFilePath, autoCommit);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -96,6 +102,18 @@ public class MixedMediaSqliteLayer extends MixedMediaSqliteLayerImpl implements 
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Media queries.
+	
+	@Override
+	public boolean hasFile(File file) throws DbException {
+		try {
+			return local_hasFile(file.getAbsolutePath());
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Media adders and removers.
 	
 
@@ -122,6 +140,15 @@ public class MixedMediaSqliteLayer extends MixedMediaSqliteLayerImpl implements 
 	public boolean addFile (MediaType mediaType, String filepath, long lastModified) throws DbException {
 		try {
 			return local_addTrack(mediaType, filepath, lastModified);
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+	
+	@Override
+	public boolean[] addFiles(List<File> files) throws DbException {
+		try {
+			return local_addFiles(files);
 		} catch (Exception e) {
 			throw new DbException(e);
 		}

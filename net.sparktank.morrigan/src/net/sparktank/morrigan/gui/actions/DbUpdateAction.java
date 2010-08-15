@@ -19,20 +19,20 @@ import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
 public class DbUpdateAction extends Action implements IWorkbenchAction{
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private MediaItemDb<?,?> itemDb = null;
+	private MediaItemDb<?,?,?> itemDb = null;
 	
 	public DbUpdateAction () {
 		super();
 	}
 	
-	public DbUpdateAction (MediaItemDb<?,?> library) {
+	public DbUpdateAction (MediaItemDb<?,?,?> library) {
 		super();
 		this.itemDb = library;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public void setMediaDb (MediaItemDb<?,?> itemDb) {
+	public void setMediaDb (MediaItemDb<?,?,?> itemDb) {
 		this.itemDb = itemDb;
 	}
 	

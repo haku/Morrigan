@@ -20,7 +20,7 @@ public class LibrarySqliteLayer2 extends MediaSqliteLayer2<IMediaTrack> {
 	
 	public static final DbConFactory FACTORY = new DbConFactory();
 	
-	public static class DbConFactory extends RecyclingFactory<LibrarySqliteLayer2, String, Void, DbException> {
+	public static class DbConFactory extends RecyclingFactory<LibrarySqliteLayer2, String, Boolean, DbException> {
 		
 		DbConFactory() {
 			super(true);
@@ -33,15 +33,21 @@ public class LibrarySqliteLayer2 extends MediaSqliteLayer2<IMediaTrack> {
 		
 		@Override
 		protected LibrarySqliteLayer2 makeNewProduct(String material) throws DbException {
-			return new LibrarySqliteLayer2(material);
+			return new LibrarySqliteLayer2(material, true);
+		}
+		
+		@SuppressWarnings("boxing")
+		@Override
+		protected LibrarySqliteLayer2 makeNewProduct(String material, Boolean config) throws DbException {
+			return new LibrarySqliteLayer2(material, config);
 		}
 		
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	LibrarySqliteLayer2 (String dbFilePath) throws DbException {
-		super(dbFilePath);
+	LibrarySqliteLayer2 (String dbFilePath, boolean autoCommit) throws DbException {
+		super(dbFilePath, autoCommit);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

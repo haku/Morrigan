@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.logging.Logger;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
+import net.sparktank.morrigan.helpers.RecyclingFactory;
 import net.sparktank.morrigan.model.media.impl.MediaItemList;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrackList;
@@ -21,6 +22,51 @@ import net.sparktank.morrigan.model.tracks.MediaTrack;
 import net.sparktank.morrigan.model.tracks.MediaTrackListHelper;
 
 public class MediaPlaylist extends MediaItemList<IMediaTrack> implements IMediaTrackList<IMediaTrack> {
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Factory.
+	
+	public static class PlaylistFactory extends RecyclingFactory<MediaPlaylist, String, Boolean, MorriganException> {
+		
+		protected PlaylistFactory() {
+			super(true);
+		}
+		
+		@Override
+		protected boolean isValidProduct(MediaPlaylist product) {
+			System.out.println("Found '" + product.getFilePath() + "' in cache.");
+			return true;
+		}
+		
+		@SuppressWarnings("boxing")
+		@Override
+		protected MediaPlaylist makeNewProduct(String material) throws MorriganException {
+			return makeNewProduct(material, false);
+		}
+		
+		@SuppressWarnings("boxing")
+		@Override
+		protected MediaPlaylist makeNewProduct(String material, Boolean config) throws MorriganException {
+			MediaPlaylist ret = null;
+			
+			System.out.println("Making object instance '" + material + "'...");
+			ret = new MediaPlaylist(PlaylistHelper.getPlaylistTitle(material), material, config);
+			
+			return ret;
+		}
+		
+		@Override
+		protected void disposeProduct(MediaPlaylist product) {
+			try {
+				product.clean();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+	}
+	
+	public static final PlaylistFactory FACTORY = new PlaylistFactory();
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static final String TYPE = "PLAYLIST";
@@ -102,6 +148,11 @@ public class MediaPlaylist extends MediaItemList<IMediaTrack> implements IMediaT
 			loadFromFile();
 			this.alreadyRead = true;
 		}
+	}
+	
+	@Override
+	public void forceRead() throws MorriganException {
+		throw new IllegalArgumentException("Don't do this.");
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

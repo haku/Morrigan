@@ -22,8 +22,8 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors.
 	
-	protected MediaSqliteLayer (String dbFilePath) throws DbException {
-		super(dbFilePath);
+	protected MediaSqliteLayer (String dbFilePath, boolean autoCommit) throws DbException {
+		super(dbFilePath, autoCommit);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

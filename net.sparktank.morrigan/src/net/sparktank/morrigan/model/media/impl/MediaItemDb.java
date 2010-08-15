@@ -3,6 +3,7 @@ package net.sparktank.morrigan.model.media.impl;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
@@ -18,7 +19,7 @@ import net.sparktank.morrigan.model.tags.MediaTagClassification;
 import net.sparktank.morrigan.model.tags.MediaTagType;
 import net.sparktank.sqlitewrapper.DbException;
 
-public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends IMediaItem> extends MediaItemList<T> implements IMediaItemDb<S,T> {
+public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMediaItemStorageLayer<T>, T extends IMediaItem> extends MediaItemList<T> implements IMediaItemDb<H,S,T> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static final boolean HIDEMISSING = true; // TODO link this to GUI?
@@ -39,8 +40,15 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	
 	@Override
 	protected void finalize() throws Throwable {
-		this.dbLayer.dispose();
+		dispose();
 		super.finalize();
+	}
+	
+	@Override
+	public void dispose () {
+		super.dispose();
+		this._sortChangeListeners.clear();
+		this.dbLayer.dispose();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -117,7 +125,8 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	 * Would need to be thread-safe.
 	 * @throws MorriganException
 	 */
-	public void reRead () throws MorriganException {
+	@Override
+	public void forceRead () throws MorriganException {
 		this.firstRead = true;
 		read();
 	}
@@ -129,21 +138,19 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	 */
 	public void updateRead () throws MorriganException {
 		if (!this.firstRead) {
-			reRead();
+			forceRead();
 		} else {
 			System.err.println("updateRead() : Skipping reRead() because its un-needed.");
 		}
 	}
 	
-	public void setAutoCommit (boolean b) throws DbException {
-		this.dbLayer.setAutoCommit(b);
+	@Override
+	public void commitOrRollback () throws DbException {
+		this.dbLayer.commitOrRollBack();
 	}
 	
-	public void commit () throws DbException {
-		this.dbLayer.commit();
-	}
-	
-	public void rollback () throws DbException {
+	@Override
+	public void rollback() throws DbException {
 		this.dbLayer.rollback();
 	}
 	
@@ -414,7 +421,7 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	/**
-	 * Returns true if the file was added.
+	 * Returns object if the file was added.
 	 * (i.e. it was not already in the library)
 	 * @throws MorriganException 
 	 * @throws DbException 
@@ -428,6 +435,29 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 			addItem(track);
 		}
 		return track;
+	}
+	
+	@Override
+	public boolean hasFile (File file) throws MorriganException, DbException {
+		return this.dbLayer.hasFile(file);
+	}
+	
+	/**
+	 * Returns list of objects that were added.
+	 * Files that were already present are ignored.
+	 */
+	@Override
+	public List<T> addFiles (List<File> files) throws MorriganException, DbException {
+		List<T> ret = new LinkedList<T>();
+		boolean[] res = this.dbLayer.addFiles(files);
+		for (int i = 0; i < files.size(); i++) {
+			if (res[i]) {
+				T t = getNewT(files.get(i).getAbsolutePath());
+				addItem(t);
+				ret.add(t);
+			}
+		}
+		return ret;
 	}
 	
 	private List<T> _changedItems = null;
@@ -468,16 +498,14 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 			throw new IllegalArgumentException("updateItem() can only be called after beginBulkUpdate() and before completeBulkUpdate().");
 		}
 		
-		T track = null;
-		
 		boolean added = this.dbLayer.addFile(mi.getFilepath(), -1);
 		if (added) {
-			track = mi;
-			addItem(track);
-			persistTrackData(track);
-			
-		} else {
+			addItem(mi);
+			persistTrackData(mi);
+		}
+		else {
 			// Update item.
+			T track = null;
 			List<T> mediaTracks = getMediaItems();
 			int index = mediaTracks.indexOf(mi);
 			if (index >= 0) {
@@ -491,7 +519,7 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 			}
 		}
 		
-		this._changedItems.add(mi);
+		if (this._changedItems != null) this._changedItems.add(mi);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

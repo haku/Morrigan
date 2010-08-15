@@ -13,6 +13,8 @@ public interface IMediaItemList<T extends IMediaItem> {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	public void dispose ();
+	
 	public String getListId ();
 	public String getListName ();
 	
@@ -37,6 +39,7 @@ public interface IMediaItemList<T extends IMediaItem> {
 	 * up to the implemented to track this.
 	 */
 	public void read () throws MorriganException;
+	public void forceRead () throws MorriganException;
 	
 	public void addItem (T item);
 	public void removeItem (T item) throws MorriganException;

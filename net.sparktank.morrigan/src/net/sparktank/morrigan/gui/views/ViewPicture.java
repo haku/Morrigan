@@ -71,8 +71,8 @@ public class ViewPicture extends ViewPart {
 					return;
 				}
 				
-				IMediaItemDbEditor editor = (IMediaItemDbEditor) part;
-				IMediaItemDb<?,?> list = editor.getMediaList();
+				IMediaItemDbEditor<?,?,?> editor = (IMediaItemDbEditor<?,?,?>) part;
+				IMediaItemDb<?,?,?> list = editor.getMediaList();
 				
 				if (selection instanceof IStructuredSelection) {
 					IStructuredSelection iSel = (IStructuredSelection) selection;
@@ -95,10 +95,10 @@ public class ViewPicture extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Data links.
 	
-	IMediaItemDb<?,?> editedItemDb = null;
+	IMediaItemDb<?,?,?> editedItemDb = null;
 	MediaItem editedItem = null;
 	
-	public void setInput (IMediaItemDb<?,?> editedMediaList, List<? extends MediaItem> selection) {
+	public void setInput (IMediaItemDb<?,?,?> editedMediaList, List<? extends MediaItem> selection) {
 		if (selection != null && selection.size() > 0) {
 			if (selection.size() == 1) {
 				this.editedItem = selection.get(0);

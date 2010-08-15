@@ -12,12 +12,14 @@ public abstract class GenericSqliteLayer implements IGenericDbLayer {
 //	Instance properties.
 	
 	private final String dbFilePath;
+	private final boolean autoCommit;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors.
 	
-	protected GenericSqliteLayer (String dbFilePath) throws DbException {
+	protected GenericSqliteLayer (String dbFilePath, boolean autoCommit) throws DbException {
 		this.dbFilePath = dbFilePath;
+		this.autoCommit = autoCommit;
 		
 		try {
 			initDatabaseTables();
@@ -33,11 +35,11 @@ public abstract class GenericSqliteLayer implements IGenericDbLayer {
 	}
 	
 	@Override
-	public void dispose () throws DbException {
+	public void dispose () {
 		try {
 			disposeDbCon();
 		} catch (Exception e) {
-			throw new DbException(e);
+			e.printStackTrace();
 		}
 	}
 	
@@ -59,8 +61,10 @@ public abstract class GenericSqliteLayer implements IGenericDbLayer {
 			Class.forName("org.sqlite.JDBC");
 			String url = "jdbc:sqlite:/" + this.dbFilePath;
 			this.dbConnection = DriverManager.getConnection(url);
+			
+			this.dbConnection.setAutoCommit(this.autoCommit);
+			System.err.println("AutoCommit=" + this.dbConnection.getAutoCommit() + " for '"+getDbFilePath()+"'.");
 		}
-		
 		return this.dbConnection;
 	}
 	
@@ -71,19 +75,12 @@ public abstract class GenericSqliteLayer implements IGenericDbLayer {
 	}
 	
 	@Override
-	public void setAutoCommit (boolean b) throws DbException {
-		try {
-			getDbCon().setAutoCommit(b);
-		} catch (Exception e) {
-			throw new DbException(e);
-		}
-	}
-	
-	@Override
-	public void commit () throws DbException {
+	public void commitOrRollBack () throws DbException {
 		try {
 			getDbCon().commit();
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
+			rollback();
 			throw new DbException(e);
 		}
 	}

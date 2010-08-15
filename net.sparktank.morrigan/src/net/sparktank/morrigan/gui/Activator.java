@@ -1,6 +1,6 @@
 package net.sparktank.morrigan.gui;
 
-import net.sparktank.morrigan.model.tracks.MediaTrackListFactory;
+import net.sparktank.morrigan.model.tracks.playlist.MediaPlaylist;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -41,7 +41,7 @@ public class Activator extends AbstractUIPlugin {
 		plugin = null;
 		
 		try {
-			MediaTrackListFactory.PLAYLIST_FACTORY.disposeAll();
+			MediaPlaylist.FACTORY.disposeAll();
 		} finally {
 			super.stop(context);
 		}

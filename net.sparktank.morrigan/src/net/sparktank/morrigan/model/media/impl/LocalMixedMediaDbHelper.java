@@ -23,7 +23,7 @@ public class LocalMixedMediaDbHelper {
 	
 	public static LocalMixedMediaDb createMmdb (String name) throws DbException {
 		String file = getFullPathToMmdb(name);
-		LocalMixedMediaDb l = MixedMediaListFactory.LOCAL_MMDB_FACTORY.manufacture(file);
+		LocalMixedMediaDb l = LocalMixedMediaDb.LOCAL_MMDB_FACTORY.manufacture(file);
 		return l;
 	}
 	

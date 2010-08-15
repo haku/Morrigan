@@ -5,7 +5,6 @@ import java.util.ArrayList;
 
 import net.sparktank.morrigan.config.Config;
 import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
-import net.sparktank.morrigan.model.tracks.MediaTrackListFactory;
 import net.sparktank.sqlitewrapper.DbException;
 
 public class LocalLibraryHelper {
@@ -24,7 +23,7 @@ public class LocalLibraryHelper {
 	
 	public static LocalMediaLibrary createLib (String libName) throws DbException {
 		String plFile = getFullPathToLib(libName);
-		LocalMediaLibrary lib = MediaTrackListFactory.LOCAL_MEDIA_LIBRARY_FACTORY.manufacture(plFile);
+		LocalMediaLibrary lib = LocalMediaLibrary.FACTORY.manufacture(plFile);
 		return lib;
 	}
 	

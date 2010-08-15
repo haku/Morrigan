@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.ErrorHelper;
-import net.sparktank.morrigan.model.tracks.MediaTrackListFactory;
 import net.sparktank.morrigan.model.tracks.library.local.LocalLibraryHelper;
 import net.sparktank.morrigan.model.tracks.library.local.LocalMediaLibrary;
 import net.sparktank.morrigan.model.tracks.playlist.MediaPlaylist;
@@ -129,7 +128,7 @@ public class PlayersHandler extends AbstractHandler {
 			String f = LocalLibraryHelper.getFullPathToLib(param);
 			LocalMediaLibrary ml;
 			try {
-				ml = MediaTrackListFactory.LOCAL_MEDIA_LIBRARY_FACTORY.manufacture(f);
+				ml = LocalMediaLibrary.FACTORY.manufacture(f);
 			} catch (DbException e) {
 				throw new MorriganException(e);
 			}
@@ -138,7 +137,7 @@ public class PlayersHandler extends AbstractHandler {
 			
 		} else if (PlaylistHelper.isPlFile(param)) {
 			String f = PlaylistHelper.getFullPathToPlaylist(param);
-			MediaPlaylist ml = MediaTrackListFactory.PLAYLIST_FACTORY.manufacture(f);
+			MediaPlaylist ml = MediaPlaylist.FACTORY.manufacture(f);
 			ml.read();
 			player.loadAndStartPlaying(ml);
 			

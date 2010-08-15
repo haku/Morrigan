@@ -1,8 +1,10 @@
 package net.sparktank.morrigan.model.media.impl;
 
+import java.io.File;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -26,8 +28,8 @@ import net.sparktank.sqlitewrapper.DbException;
 public abstract class MixedMediaSqliteLayerImpl extends MediaSqliteLayer<IMixedMediaItem> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	protected MixedMediaSqliteLayerImpl (String dbFilePath) throws DbException {
-		super(dbFilePath);
+	protected MixedMediaSqliteLayerImpl (String dbFilePath, boolean autoCommit) throws DbException {
+		super(dbFilePath, autoCommit);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -368,9 +370,9 @@ public abstract class MixedMediaSqliteLayerImpl extends MediaSqliteLayer<IMixedM
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Media adders and removers.
+//	Media queries.
 	
-	protected boolean local_addTrack (MediaType mediaType, String filePath, long lastModified) throws SQLException, ClassNotFoundException, DbException {
+	protected boolean local_hasFile (String filePath) throws SQLException, ClassNotFoundException {
 		PreparedStatement ps;
 		ResultSet rs;
 		
@@ -391,7 +393,17 @@ public abstract class MixedMediaSqliteLayerImpl extends MediaSqliteLayer<IMixedM
 			ps.close();
 		}
 		
-		if (n == 0) {
+		return (n > 0);
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Media adders and removers.
+	
+	protected boolean local_addTrack (MediaType mediaType, String filePath, long lastModified) throws SQLException, ClassNotFoundException, DbException {
+		PreparedStatement ps;
+		
+		int n;
+		if (!local_hasFile(filePath)) {
 			System.err.println("Adding file '" + filePath + "' to '"+getDbFilePath()+"'.");
 			ps = getDbCon().prepareStatement(this.sqlTblMediaFilesAdd.toString());
 			try {
@@ -409,6 +421,36 @@ public abstract class MixedMediaSqliteLayerImpl extends MediaSqliteLayer<IMixedM
 		}
 		
 		return false;
+	}
+	
+	protected boolean[] local_addFiles (List<File> files) throws SQLException, ClassNotFoundException {
+		PreparedStatement ps;
+		int[] n;
+		
+		ps = getDbCon().prepareStatement(this.sqlTblMediaFilesAdd.toString());
+		try {
+			for (File file : files) {
+				String filePath = file.getAbsolutePath();
+				if (!local_hasFile(filePath)) {
+					ps.setInt(1, MediaType.UNKNOWN.getN());
+					ps.setString(2, filePath);
+					ps.setDate(3, new java.sql.Date(new Date().getTime()));
+					ps.setDate(4, new java.sql.Date(file.lastModified()));
+					ps.addBatch();
+				}
+			}
+			
+			n = ps.executeBatch();
+			
+			boolean[] b = new boolean[n.length];
+			for (int i = 0; i < n.length; i++) {
+				b[i] = (n[i] > 0 || n[i] == Statement.SUCCESS_NO_INFO);
+			}
+			return b;
+		}
+		finally {
+			ps.close();
+		}
 	}
 	
 	protected int local_removeTrack (String sfile) throws SQLException, ClassNotFoundException {
