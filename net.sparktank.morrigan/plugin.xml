@@ -182,7 +182,7 @@
       <page
             class="net.sparktank.morrigan.gui.preferences.GeneralPref"
             id="net.sparktank.morrigan.gui.preferences.GeneralPref"
-            name="General">
+            name="Morrigan">
       </page>
       <page
             category="org.eclipse.ui.preferencePages.Workbench"
