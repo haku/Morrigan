@@ -15,7 +15,7 @@ public class SqliteLayer extends GenericSqliteLayer {
 //	Constructors.
 	
 	public SqliteLayer (String dbFilePath) throws DbException {
-		super(dbFilePath);
+		super(dbFilePath, true);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
