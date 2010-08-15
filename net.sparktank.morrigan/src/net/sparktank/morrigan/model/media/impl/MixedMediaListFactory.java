@@ -1,7 +1,6 @@
 package net.sparktank.morrigan.model.media.impl;
 
 import net.sparktank.morrigan.helpers.RecyclingFactory;
-import net.sparktank.morrigan.model.tracks.library.local.LocalLibraryHelper;
 import net.sparktank.sqlitewrapper.DbException;
 
 
@@ -23,10 +22,7 @@ public class MixedMediaListFactory {
 		@Override
 		protected LocalMixedMediaDb makeNewProduct(String material) throws DbException {
 			System.out.println("Making object instance '" + material + "'...");
-			/*
-			 * TODO replace LocalLibraryHelper with MixedMediaDbHelper.
-			 */
-			return new LocalMixedMediaDb(LocalLibraryHelper.getLibraryTitle(material), MixedMediaSqliteLayer.FACTORY.manufacture(material));
+			return new LocalMixedMediaDb(LocalMixedMediaDbHelper.getMmdbTitle(material), MixedMediaSqliteLayer.FACTORY.manufacture(material));
 		}
 		
 	}
