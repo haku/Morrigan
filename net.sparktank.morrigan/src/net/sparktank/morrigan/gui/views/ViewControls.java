@@ -2,7 +2,6 @@ package net.sparktank.morrigan.gui.views;
 
 import java.util.List;
 
-import net.sparktank.morrigan.engines.common.ImplException;
 import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.actions.ServerAction;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
