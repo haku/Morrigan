@@ -64,19 +64,30 @@ public class MixedMediaSqliteLayer extends MixedMediaSqliteLayerImpl implements 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Read methods for IMediaMixedItem.
 	
+	private MediaType defaultMediaType = MediaType.UNKNOWN;
+	
+	@Override
+	public void setDefaultMediaType (MediaType mediaType) {
+		this.defaultMediaType = mediaType;
+	}
+	@Override
+	public MediaType getDefaultMediaType() {
+		return this.defaultMediaType;
+	}
+	
 	@Override
 	public List<IMixedMediaItem> getAllMedia(IDbColumn sort, SortDirection direction, boolean hideMissing) throws DbException {
-		return getAllMedia(MediaType.UNKNOWN, sort, direction, hideMissing);
+		return getAllMedia(this.defaultMediaType, sort, direction, hideMissing);
 	}
 	
 	@Override
 	public List<IMixedMediaItem> updateListOfAllMedia(List<IMixedMediaItem> list, IDbColumn sort, SortDirection direction, boolean hideMissing) throws DbException {
-		return updateListOfAllMedia(MediaType.UNKNOWN, list, sort, direction, hideMissing);
+		return updateListOfAllMedia(this.defaultMediaType, list, sort, direction, hideMissing);
 	}
 	
 	@Override
 	public List<IMixedMediaItem> simpleSearch(String term, String esc, int maxResults) throws DbException {
-		return simpleSearchMedia(MediaType.UNKNOWN, term, esc, maxResults);
+		return simpleSearchMedia(this.defaultMediaType, term, esc, maxResults);
 	}
 	
 	@Override

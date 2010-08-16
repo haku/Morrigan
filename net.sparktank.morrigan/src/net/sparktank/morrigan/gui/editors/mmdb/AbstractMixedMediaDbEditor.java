@@ -19,6 +19,7 @@ import net.sparktank.morrigan.model.media.impl.MixedMediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemDb.SortChangeListener;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemStorageLayer.SortDirection;
 import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem;
+import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem.MediaType;
 import net.sparktank.morrigan.model.media.interfaces.IMixedMediaStorageLayer;
 import net.sparktank.morrigan.model.tracks.library.LibrarySqliteLayer2;
 
@@ -27,6 +28,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
@@ -100,10 +102,17 @@ public abstract class AbstractMixedMediaDbEditor<T extends AbstractMixedMediaDb<
 	private Button btnClearFilter = null;
 	private Button btnProperties = null;
 	private MenuManager prefMenuMgr = null;
+	List<TypeFilterAction> typeFilterActions = new ArrayList<TypeFilterAction>();
 	List<SortAction> sortActions = new ArrayList<SortAction>();
 	
 	@Override
 	protected void createControls(Composite parent) {
+		for (MediaType t : MediaType.values()) {
+			TypeFilterAction a = new TypeFilterAction(t);
+			a.setChecked(t == getMediaList().getDefaultMediaType());
+			this.typeFilterActions.add(a);
+		}
+		
 		List<DbColumn> cols = getMediaList().getDbLayer().getMediaTblColumns();
 		for (IDbColumn c : cols) {
 			if (c.getHumanName() != null) {
@@ -116,6 +125,10 @@ public abstract class AbstractMixedMediaDbEditor<T extends AbstractMixedMediaDb<
 		
 		// Pref menu.
 		this.prefMenuMgr = new MenuManager();
+		for (TypeFilterAction a : this.typeFilterActions) {
+			this.prefMenuMgr.add(a);
+		}
+		this.prefMenuMgr.add(new Separator());
 		for (SortAction a : this.sortActions) {
 			this.prefMenuMgr.add(a);
 		}
@@ -279,6 +292,36 @@ public abstract class AbstractMixedMediaDbEditor<T extends AbstractMixedMediaDb<
 				setSortMarker(null, SWT.NONE); // FIXME send actual column / direction.
 				setSort(this.sort, this.sortDir);
 				System.out.println("sort by " + this.sort.toString());
+			}
+		}
+		
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Type filtering.
+	
+	void setTypeFilter (MediaType filterType) {
+		try {
+			getMediaList().setDefaultMediaType(filterType);
+		} catch (MorriganException e) {
+			getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));
+		}
+	}
+	
+	private class TypeFilterAction extends Action {
+		
+		private final MediaType filterType;
+
+		public TypeFilterAction (MediaType filterType) {
+			super("Filter by " + filterType.getHumanName(), AS_RADIO_BUTTON);
+			this.filterType = filterType;
+		}
+		
+		@Override
+		public void run() {
+			super.run();
+			if (isChecked()) {
+				setTypeFilter(this.filterType);
 			}
 		}
 		

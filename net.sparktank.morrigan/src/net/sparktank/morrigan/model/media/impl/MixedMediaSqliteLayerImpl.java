@@ -294,6 +294,9 @@ public abstract class MixedMediaSqliteLayerImpl extends MediaSqliteLayer<IMixedM
 		List<IMixedMediaItem> ret;
 		PreparedStatement ps = getDbCon().prepareStatement(sql);
 		try {
+			if (mediaType != MediaType.UNKNOWN) {
+				ps.setInt(1, mediaType.getN());
+			}
 			rs = ps.executeQuery();
 			try {
 				ret = local_parseRecordSet(rs);
@@ -314,6 +317,9 @@ public abstract class MixedMediaSqliteLayerImpl extends MediaSqliteLayer<IMixedM
 		List<IMixedMediaItem> ret;
 		PreparedStatement ps = getDbCon().prepareStatement(sql);
 		try {
+			if (mediaType != MediaType.UNKNOWN) {
+				ps.setInt(1, mediaType.getN());
+			}
 			rs = ps.executeQuery();
 			try {
 				ret = local_parseAndUpdateFromRecordSet(list, rs);
