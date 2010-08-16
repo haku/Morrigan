@@ -13,7 +13,9 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 public class MediaListPref extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public static final String PREF_SHOWHEADER = "PREF_SHOWHEADER";
+	public static final String PREF_COL_          = "PREF_COL_"; // Prefix for matching.
+	
+	public static final String PREF_COL_SHOWHEADER = "PREF_COL_SHOWHEADER";
 	
 	public static final String PREF_COL_DADDED    = "PREF_COL_DADDED";
 	public static final String PREF_COL_COUNTS    = "PREF_COL_COUNTS";
@@ -27,7 +29,7 @@ public class MediaListPref extends FieldEditorPreferencePage implements IWorkben
 	
 	@Override
 	public void createFieldEditors() {
-		addField(new BooleanFieldEditor(PREF_SHOWHEADER, "Show column headers", getFieldEditorParent()));
+		addField(new BooleanFieldEditor(PREF_COL_SHOWHEADER, "Show column headers", getFieldEditorParent()));
 		addField(new BooleanFieldEditor(PREF_COL_COUNTS, "Show counts column", getFieldEditorParent()));
 		addField(new BooleanFieldEditor(PREF_COL_DADDED, "Show date added column", getFieldEditorParent()));
 		addField(new BooleanFieldEditor(PREF_COL_DLASTPLAY, "Show date last played column", getFieldEditorParent()));
@@ -46,7 +48,7 @@ public class MediaListPref extends FieldEditorPreferencePage implements IWorkben
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static boolean getShowHeadersPref () {
-		return Activator.getDefault().getPreferenceStore().getBoolean(PREF_SHOWHEADER);
+		return Activator.getDefault().getPreferenceStore().getBoolean(PREF_COL_SHOWHEADER);
 	}
 	
 	public static boolean getColPref (MediaTrackListEditor<?,?> editor, MediaColumn column) {
