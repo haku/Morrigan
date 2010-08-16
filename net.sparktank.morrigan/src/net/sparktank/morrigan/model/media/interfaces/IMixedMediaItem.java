@@ -6,16 +6,22 @@ public interface IMixedMediaItem extends IMediaTrack, IMediaPicture {
 //	Fixed enums - changing these requires writing more code.
 	
 	public static enum MediaType {
-		UNKNOWN(0), TRACK(1), PICTURE(2);
+		UNKNOWN(0, "all"), TRACK(1, "tracks"), PICTURE(2, "pictures");
 		
+		private final String humanName;
 		private final int n;
 		
-		MediaType(int n) {
+		MediaType(int n, String humanName) {
 			this.n = n;
+			this.humanName = humanName;
 		}
 		
 		public int getN() {
 			return this.n;
+		}
+		
+		public String getHumanName () {
+			return humanName;
 		}
 		
 		static public MediaType parseInt (int n) {
