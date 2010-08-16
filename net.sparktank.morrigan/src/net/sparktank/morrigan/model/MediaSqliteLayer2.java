@@ -259,6 +259,11 @@ public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqlit
 	}
 	
 	@Override
+	public DbColumn getDefaultSortColumn() {
+		return SQL_TBL_MEDIAFILES_COL_FILE;
+	}
+	
+	@Override
 	protected List<SqlCreateCmd> getTblCreateCmds() {
 		this.tblMediaFilesColumns = generateSqlTblMediaFilesColumns();
 		

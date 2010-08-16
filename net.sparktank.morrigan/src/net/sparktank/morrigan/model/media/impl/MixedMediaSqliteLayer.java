@@ -56,6 +56,11 @@ public class MixedMediaSqliteLayer extends MixedMediaSqliteLayerImpl implements 
 		return generateSqlTblMediaFilesColumns();
 	}
 	
+	@Override
+	public DbColumn getDefaultSortColumn() {
+		return SQL_TBL_MEDIAFILES_COL_FILE;
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Read methods for IMediaMixedItem.
 	
