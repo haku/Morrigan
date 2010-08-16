@@ -1,7 +1,7 @@
 package net.sparktank.morrigan.gui.adaptors;
 
 import net.sparktank.morrigan.gui.helpers.ImageCache;
-import net.sparktank.morrigan.model.media.impl.MediaItem;
+import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
 
 import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
@@ -35,8 +35,8 @@ public class FileLblProv extends StyledCellLabelProvider {
 	@Override
 	public void update(ViewerCell cell) {
 		Object element = cell.getElement();
-		if (element instanceof MediaItem) {
-			MediaItem mi = (MediaItem) element;
+		if (element instanceof IMediaItem) {
+			IMediaItem mi = (IMediaItem) element;
 			
 			if (mi.getTitle() != null) {
 				Styler styler = null;
