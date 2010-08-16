@@ -12,6 +12,12 @@ public interface IMixedMediaStorageLayer<T extends IMixedMediaItem> extends IMed
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Read methods.
 	
+	/**
+	 * Set the default media type for the untyped getters to return.
+	 */
+	public void setDefaultMediaType (MediaType mediaType);
+	public MediaType getDefaultMediaType();
+	
 	public List<IMixedMediaItem> getAllMedia (MediaType mediaType, IDbColumn sort, SortDirection direction, boolean hideMissing) throws DbException;
 	public List<IMixedMediaItem> updateListOfAllMedia (MediaType mediaType, List<IMixedMediaItem> list, IDbColumn sort, SortDirection direction, boolean hideMissing) throws DbException;
 	public List<IMixedMediaItem> simpleSearchMedia (MediaType mediaType, String term, String esc, int maxResults) throws DbException;

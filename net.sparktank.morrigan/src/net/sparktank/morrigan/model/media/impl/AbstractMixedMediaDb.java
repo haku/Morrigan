@@ -31,6 +31,17 @@ public abstract class AbstractMixedMediaDb<H extends AbstractMixedMediaDb<H>>
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	public void setDefaultMediaType (MediaType mediaType) throws MorriganException {
+		this.getDbLayer().setDefaultMediaType(mediaType);
+		updateRead();
+	}
+	
+	public MediaType getDefaultMediaType () {
+		return this.getDbLayer().getDefaultMediaType();
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
 	@Override
 	public void setItemMediaType(IMixedMediaItem item, MediaType newType) throws MorriganException {
 		item.setMediaType(newType);
