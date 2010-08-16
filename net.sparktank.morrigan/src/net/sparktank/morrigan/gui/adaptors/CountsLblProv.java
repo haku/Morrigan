@@ -11,7 +11,7 @@ public class CountsLblProv extends ColumnLabelProvider {
 	@Override
 	public String getText(Object element) {
 		IMediaTrack elm = (IMediaTrack) element;
-		if (elm.getStartCount() <= 0 && elm.getStartCount() <= 0) {
+		if (elm.getStartCount() <= 0 && elm.getEndCount() <= 0) {
 			return null;
 		}
 		

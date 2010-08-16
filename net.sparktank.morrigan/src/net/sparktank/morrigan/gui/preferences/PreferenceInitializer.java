@@ -22,6 +22,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		defaults.putBoolean(MediaListPref.PREF_COL_HASHCODE, false);
 		defaults.putBoolean(MediaListPref.PREF_COL_DMODIFIED, false);
 		defaults.putBoolean(MediaListPref.PREF_COL_DURATION, true);
+		defaults.putBoolean(MediaListPref.PREF_COL_DIMENSIONS, false);
 	}
 	
 }

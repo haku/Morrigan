@@ -8,6 +8,7 @@ import net.sparktank.morrigan.gui.adaptors.CountsLblProv;
 import net.sparktank.morrigan.gui.adaptors.DateAddedLblProv;
 import net.sparktank.morrigan.gui.adaptors.DateLastModifiedLblProv;
 import net.sparktank.morrigan.gui.adaptors.DateLastPlayerLblProv;
+import net.sparktank.morrigan.gui.adaptors.DimensionsLblProv;
 import net.sparktank.morrigan.gui.adaptors.DurationLblProv;
 import net.sparktank.morrigan.gui.adaptors.FileLblProv;
 import net.sparktank.morrigan.gui.adaptors.HashcodeLblProv;
@@ -16,6 +17,7 @@ import net.sparktank.morrigan.gui.editors.MediaColumn;
 import net.sparktank.morrigan.gui.editors.MediaItemListEditor;
 import net.sparktank.morrigan.gui.editors.tracks.PlaylistEditor;
 import net.sparktank.morrigan.gui.handler.AddToQueue;
+import net.sparktank.morrigan.gui.preferences.MediaListPref;
 import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMixedMediaList;
 
@@ -49,6 +51,8 @@ public abstract class MixedMediaListEditor<T extends IMixedMediaList<S>, S exten
     	COL_LASTPLAYED = new MediaColumn("last played", new ColumnPixelData(140, true, true), new DateLastPlayerLblProv()      );
     public final MediaColumn 
     	COL_DURATION =   new MediaColumn("duration",    new ColumnPixelData( 60, true, true), new DurationLblProv(),           SWT.RIGHT);
+    public final MediaColumn 
+    	COL_DIMENSIONS =   new MediaColumn("dimensions",new ColumnPixelData( 60, true, true), new DimensionsLblProv(),         SWT.CENTER);
 	
     public final MediaColumn[] COLS = new MediaColumn[] {
     		this.COL_FILE,
@@ -57,7 +61,8 @@ public abstract class MixedMediaListEditor<T extends IMixedMediaList<S>, S exten
     		this.COL_LASTPLAYED,
     		this.COL_HASH,
     		this.COL_MODIFIED,
-    		this.COL_DURATION
+    		this.COL_DURATION,
+    		this.COL_DIMENSIONS
     	};
 	
 	@Override
@@ -71,7 +76,7 @@ public abstract class MixedMediaListEditor<T extends IMixedMediaList<S>, S exten
 	
 	@Override
 	protected boolean isColumnVisible(MediaColumn col) {
-		return true;
+		return MediaListPref.getColPref(this, col);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
