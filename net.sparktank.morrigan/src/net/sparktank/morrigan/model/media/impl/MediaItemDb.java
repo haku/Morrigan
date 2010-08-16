@@ -7,7 +7,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
-import net.sparktank.morrigan.model.MediaSqliteLayer2;
 import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
 import net.sparktank.morrigan.model.db.interfaces.IDbItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
@@ -34,7 +33,7 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 		super(dbLayer.getDbFilePath(), libraryName);
 		this.dbLayer = dbLayer;
 		
-		this.librarySort = MediaSqliteLayer2.SQL_TBL_MEDIAFILES_COL_FILE;
+		this.librarySort = dbLayer.getDefaultSortColumn();
 		this.librarySortDirection = SortDirection.ASC;
 	}
 	
@@ -160,7 +159,7 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 	@Override
 	public List<T> getAllDbEntries () throws DbException {
 		ArrayList<T> copyOfMainList = new ArrayList<T>(getMediaItems());
-		List<T> allList = this.dbLayer.getAllMedia(MediaSqliteLayer2.SQL_TBL_MEDIAFILES_COL_FILE, SortDirection.ASC, false);
+		List<T> allList = this.dbLayer.getAllMedia(this.dbLayer.getDefaultSortColumn(), SortDirection.ASC, false);
 		updateList(copyOfMainList, allList);
 		return copyOfMainList;
 	}
