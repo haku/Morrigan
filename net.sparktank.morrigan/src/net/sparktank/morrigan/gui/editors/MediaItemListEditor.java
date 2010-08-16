@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
+import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.adaptors.MediaFilter;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.handler.CallPlayMedia;
@@ -25,6 +26,8 @@ import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.layout.TableColumnLayout;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
@@ -106,6 +109,7 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 	
 	@Override
 	public void dispose() {
+		removePropListener();
 		this.editorInput.getMediaList().removeChangeEvent(this.listChange);
 		this.editorInput.getMediaList().removeDirtyChangeEvent(this.dirtyChange);
 		this.imageCache.clearCache();
@@ -209,6 +213,8 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 		
 		// Call update events.
 		listChanged();
+		
+		initPropListener();
 	}
 	
 	@Override
@@ -282,6 +288,21 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 	public void setFocus() {
 		this.editTable.getTable().setFocus();
 	}
+	
+	private void initPropListener () {
+		Activator.getDefault().getPreferenceStore().addPropertyChangeListener(this.propListener);
+	}
+	
+	private void removePropListener () {
+		Activator.getDefault().getPreferenceStore().removePropertyChangeListener(this.propListener);
+	}
+	
+	private IPropertyChangeListener propListener = new IPropertyChangeListener() {
+		@Override
+		public void propertyChange(PropertyChangeEvent event) {
+			System.err.println("TODO: propertyChange="+event.getProperty());
+		}
+	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Providers.
