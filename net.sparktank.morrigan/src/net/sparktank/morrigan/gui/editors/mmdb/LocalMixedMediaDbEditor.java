@@ -36,6 +36,7 @@ public class LocalMixedMediaDbEditor
 	
 	@Override
 	protected void populateContextMenu(List<IContributionItem> menu0, List<IContributionItem> menu1) {
+		menu0.add(new ActionContributionItem(this.addToQueueAction));
 		menu0.add(new ActionContributionItem(this.showTagsAction));
 		
 		menu1.add(new ActionContributionItem(this.toggleEnabledAction));
