@@ -1,6 +1,6 @@
 package net.sparktank.morrigan.gui.editors.mmdb;
 
-import java.util.LinkedList;
+import java.util.Arrays;
 import java.util.List;
 
 import net.sparktank.morrigan.gui.actions.AddToPlaylistAction;
@@ -19,6 +19,7 @@ import net.sparktank.morrigan.gui.editors.tracks.PlaylistEditor;
 import net.sparktank.morrigan.gui.handler.AddToQueue;
 import net.sparktank.morrigan.gui.preferences.MediaListPref;
 import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem;
+import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem.MediaType;
 import net.sparktank.morrigan.model.media.interfaces.IMixedMediaList;
 
 import org.eclipse.jface.action.Action;
@@ -36,6 +37,8 @@ public abstract class MixedMediaListEditor<T extends IMixedMediaList<S>, S exten
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Column definitions.
 	
+	private volatile MediaType columnMediaType = MediaType.UNKNOWN;
+	
 	public final MediaColumn 
 		COL_FILE =       new MediaColumn("file",        new ColumnWeightData(100),            new FileLblProv(this.getImageCache()) );
 	public final MediaColumn 
@@ -52,31 +55,59 @@ public abstract class MixedMediaListEditor<T extends IMixedMediaList<S>, S exten
     public final MediaColumn 
     	COL_DURATION =   new MediaColumn("duration",    new ColumnPixelData( 60, true, true), new DurationLblProv(),           SWT.RIGHT);
     public final MediaColumn 
-    	COL_DIMENSIONS =   new MediaColumn("dimensions",new ColumnPixelData( 60, true, true), new DimensionsLblProv(),         SWT.CENTER);
+    	COL_DIMENSIONS = new MediaColumn("dimensions",  new ColumnPixelData(100, true, true), new DimensionsLblProv(),         SWT.CENTER);
 	
-    public final MediaColumn[] COLS = new MediaColumn[] {
+    public final MediaColumn[] COLS_UNKNOWN = new MediaColumn[] {
+    		this.COL_FILE,
+    		this.COL_ADDED,
+    		this.COL_HASH,
+    		this.COL_MODIFIED,
+    };
+    
+    public final MediaColumn[] COLS_TRACKS = new MediaColumn[] {
     		this.COL_FILE,
     		this.COL_COUNTS,
     		this.COL_ADDED,
+    		this.COL_MODIFIED,
     		this.COL_LASTPLAYED,
     		this.COL_HASH,
+    		this.COL_DURATION
+    };
+    
+    public final MediaColumn[] COLS_PICTURES = new MediaColumn[] {
+    		this.COL_FILE,
+    		this.COL_ADDED,
+    		this.COL_HASH,
     		this.COL_MODIFIED,
-    		this.COL_DURATION,
     		this.COL_DIMENSIONS
-    	};
-	
+    };
+    
 	@Override
 	protected List<MediaColumn> getColumns() {
-		List<MediaColumn> l = new LinkedList<MediaColumn>();
-		for (MediaColumn c : this.COLS) {
-			l.add(c);
+		MediaColumn[] cols;
+		switch (this.columnMediaType) {
+			case UNKNOWN:
+				cols = this.COLS_UNKNOWN;
+				break;
+			case TRACK:
+				cols = this.COLS_TRACKS;
+				break;
+			case PICTURE:
+				cols = this.COLS_PICTURES;
+				break;
+			default: throw new IllegalArgumentException();
 		}
-		return l;
+		
+		return Arrays.asList(cols);
 	}
 	
 	@Override
 	protected boolean isColumnVisible(MediaColumn col) {
 		return MediaListPref.getColPref(this, col);
+	}
+	
+	protected void setColumnMediaType (MediaType mt) {
+		this.columnMediaType = mt;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
