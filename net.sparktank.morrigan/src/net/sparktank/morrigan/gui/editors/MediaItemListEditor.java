@@ -49,7 +49,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
@@ -67,6 +67,9 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 	private MediaItemListEditorInput<T> editorInput;
 	
 	TableViewer editTable = null;
+	Composite editTableComposite = null;
+	TableColumnLayout editTableCompositeTableColumnLayout = null;
+	
 	protected MediaFilter<T, S> mediaFilter = null;
 	private ImageCache imageCache = new ImageCache();
 	
@@ -157,45 +160,26 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 		
 		// Create table.
 		
-		Composite tableComposite = new Composite(parent2, SWT.NONE); // Because of the way table column layouts work.
+		this.editTableComposite = new Composite(parent2, SWT.NONE); // Because of the way table column layouts work.
 		formData = new FormData();
 		formData.top = new FormAttachment(toolbarComposite, 0);
 		formData.left = new FormAttachment(0, 0);
 		formData.right = new FormAttachment(100, 0);
 		formData.bottom = new FormAttachment(100, 0);
-		tableComposite.setLayoutData(formData);
-		this.editTable = new TableViewer(tableComposite, SWT.MULTI | SWT.V_SCROLL | SWT.FULL_SELECTION );
-		TableColumnLayout layout = new TableColumnLayout();
-		tableComposite.setLayout(layout);
+		this.editTableComposite.setLayoutData(formData);
+		this.editTable = new TableViewer(this.editTableComposite, SWT.MULTI | SWT.V_SCROLL | SWT.FULL_SELECTION );
+		this.editTableCompositeTableColumnLayout = new TableColumnLayout();
+		this.editTableComposite.setLayout(this.editTableCompositeTableColumnLayout);
 		
 		// add and configure columns.
-		for (MediaColumn mCol : getColumns()) {
-			if (isColumnVisible(mCol)) {
-				final TableViewerColumn column = new TableViewerColumn(this.editTable, SWT.NONE);
-				
-				layout.setColumnData(column.getColumn(), mCol.getColumnLayoutData());
-				column.setLabelProvider(mCol.getCellLabelProvider());
-				if (mCol.getAlignment() > -1) {
-					column.getColumn().setAlignment(mCol.getAlignment());
-				}
-				
-				column.getColumn().setText(mCol.toString());
-				column.getColumn().setResizable(true);
-				column.getColumn().setMoveable(true);
-				
-				if (isSortable()) {
-					column.getColumn().addSelectionListener(getSelectionAdapter(this.editTable, column));
-				}
-			}
-		}
+		updateColumns(null);
 		
-		Table table = this.editTable.getTable();
-		table.setHeaderVisible(MediaListPref.getShowHeadersPref());
-		table.setLinesVisible(false);
+		this.editTable.getTable().setLinesVisible(false);
 		
 		this.editTable.setContentProvider(this.contentProvider);
 		this.editTable.addDoubleClickListener(this.doubleClickListener);
 		this.editTable.setInput(getEditorSite());
+		
 		this.mediaFilter = new MediaFilter<T, S>();
 		this.editTable.addFilter(this.mediaFilter);
 		
@@ -215,6 +199,60 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 		listChanged();
 		
 		initPropListener();
+	}
+	
+	protected void updateColumns (List<MediaColumn> keep) {
+		TableColumn[] columns = this.editTable.getTable().getColumns();
+		for (TableColumn tableColumn : columns) {
+			if (keep != null) {
+				boolean b = false;
+				for (MediaColumn mCol : keep) {
+					if (tableColumn.getText().equals(mCol.toString())) {
+						b = true;
+						break;
+					}
+				}
+				if (b) continue;
+				
+				tableColumn.dispose();
+			}
+		}
+		
+		columns = this.editTable.getTable().getColumns();
+		for (MediaColumn mCol : getColumns()) {
+			boolean b = false;
+			for (TableColumn tableColumn : columns) {
+				if (tableColumn.getText().equals(mCol.toString())) {
+					b = true;
+					break;
+				}
+			}
+			if (b) continue;
+			
+			if (isColumnVisible(mCol)) {
+				final TableViewerColumn column = new TableViewerColumn(this.editTable, SWT.NONE);
+				
+				this.editTableCompositeTableColumnLayout.setColumnData(column.getColumn(), mCol.getColumnLayoutData());
+				column.setLabelProvider(mCol.getCellLabelProvider());
+				if (mCol.getAlignment() > -1) {
+					column.getColumn().setAlignment(mCol.getAlignment());
+				}
+				
+				column.getColumn().setText(mCol.toString());
+				column.getColumn().setResizable(true);
+				column.getColumn().setMoveable(true);
+				
+				if (isSortable()) {
+					column.getColumn().addSelectionListener(getSelectionAdapter(this.editTable, column));
+				}
+			}
+		}
+		
+		this.editTable.getTable().setHeaderVisible(MediaListPref.getShowHeadersPref());
+	}
+	
+	protected void refreshColumns () {
+		this.editTable.getTable().getParent().layout();
 	}
 	
 	@Override
