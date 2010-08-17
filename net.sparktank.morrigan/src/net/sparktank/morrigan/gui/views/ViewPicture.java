@@ -10,6 +10,10 @@ import net.sparktank.morrigan.gui.editors.IMediaItemDbEditor;
 import net.sparktank.morrigan.model.media.impl.MediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemDb;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
@@ -20,10 +24,12 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.ISelectionService;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.ViewPart;
+import org.eclipse.ui.progress.UIJob;
 
 public class ViewPicture extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -117,7 +123,7 @@ public class ViewPicture extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	GUI stuff.
 	
-	private List<String> supportedFormats = null;
+	List<String> supportedFormats = null;
 	
 	protected final int sep = 3;
 	
@@ -148,21 +154,72 @@ public class ViewPicture extends ViewPart {
 		this.pictureCanvas.addPaintListener(this.picturePainter);
 	}
 	
-	private void setPicture (MediaItem item) {
-		if (item != null && item.isEnabled()) {
-			String ext = item.getFilepath();
-			ext = ext.substring(ext.lastIndexOf(".") + 1).toLowerCase();
-			if (this.supportedFormats.contains(ext)) {
-				setContentDescription(item.getTitle());
-				
-				if (this.pictureImage != null && !this.pictureImage.isDisposed()) {
-					this.pictureImage.dispose();
-					this.pictureImage = null;
-				}
-				this.pictureImage = new Image(this.pictureCanvas.getDisplay(), item.getFilepath());
-				this.pictureCanvas.redraw();
+	class LoadPictureJob extends Job {
+		
+		private final MediaItem item;
+		private final Display display;
+
+		public LoadPictureJob (Display display, MediaItem item) {
+			super("Loading picture");
+			this.display = display;
+			this.item = item;
+		}
+		
+		@Override
+		protected IStatus run(IProgressMonitor monitor) {
+			if (this.item != null && this.item.isEnabled()) {
+				if (ViewPicture.this.pictureImage != null) throw new IllegalArgumentException();
+				ViewPicture.this.pictureImage = new Image(ViewPicture.this.pictureCanvas.getDisplay(), this.item.getFilepath());
+				new UpdatePictureJob(this.display).schedule();
 			}
+			return Status.OK_STATUS;
+		}
+		
+	}
+	
+	class UpdatePictureJob extends UIJob {
+		
+		public UpdatePictureJob (Display jobDisplay) {
+			super(jobDisplay, "Update picture");
+		}
+		
+		@Override
+		public IStatus runInUIThread(IProgressMonitor monitor) {
+			ViewPicture.this.pictureCanvas.redraw();
+			return Status.OK_STATUS;
+		}
+		
+	}
+	
+	private void setPicture (MediaItem item) {
+		String ext = item.getFilepath();
+		ext = ext.substring(ext.lastIndexOf(".") + 1).toLowerCase();
+		if (ViewPicture.this.supportedFormats.contains(ext)) {
+			if (ViewPicture.this.pictureImage != null && !ViewPicture.this.pictureImage.isDisposed()) {
+				ViewPicture.this.pictureImage.dispose();
+				ViewPicture.this.pictureImage = null;
+			}
+			setContentDescription(item.getTitle());
 			
+			LoadPictureJob loadPictureJob = new LoadPictureJob(getSite().getShell().getDisplay(), item);
+			
+			/*
+			 * TODO FIXME use this to prevent two running at once!
+			 */
+//			loadPictureJob.setRule(new ISchedulingRule() {
+//				
+//				@Override
+//				public boolean isConflicting(ISchedulingRule rule) {
+//					return false;
+//				}
+//				
+//				@Override
+//				public boolean contains(ISchedulingRule rule) {
+//					return false;
+//				}
+//			});
+			
+			loadPictureJob.schedule();
 		}
 	}
 	
