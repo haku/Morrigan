@@ -145,6 +145,7 @@ public abstract class MixedMediaSqliteLayerImpl extends MediaSqliteLayer<IMixedM
 	
 	private static final String SQL_MEDIAFILES_Q_ALL_T =
 		_SQL_MEDIAFILES_SELECT
+		+ _SQL_MEDIAFILES_WHERE + _SQL_MEDIAFILES_WHERTYPE
 		+ _SQL_ORDERBYREPLACE;
 	
 	private static final String SQL_MEDIAFILES_Q_NOTMISSING_T =
