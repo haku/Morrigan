@@ -1,7 +1,6 @@
 package net.sparktank.morrigan.gui.editors.mmdb;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -304,7 +303,7 @@ public abstract class AbstractMixedMediaDbEditor<T extends AbstractMixedMediaDb<
 	void setTypeFilter (MediaType filterType) {
 		try {
 			setColumnMediaType(filterType);
-			updateColumns(Arrays.asList(this.COLS_UNKNOWN));
+			updateColumns();
 			getMediaList().setDefaultMediaType(filterType);
 			refreshColumns();
 		}

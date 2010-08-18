@@ -172,7 +172,7 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 		this.editTableComposite.setLayout(this.editTableCompositeTableColumnLayout);
 		
 		// add and configure columns.
-		updateColumns(null);
+		updateColumns();
 		
 		this.editTable.getTable().setLinesVisible(false);
 		
@@ -201,27 +201,27 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 		initPropListener();
 	}
 	
-	protected void updateColumns (List<MediaColumn> keep) {
-		TableColumn[] columns = this.editTable.getTable().getColumns();
-		for (TableColumn tableColumn : columns) {
-			if (keep != null) {
-				boolean b = false;
-				for (MediaColumn mCol : keep) {
-					if (tableColumn.getText().equals(mCol.toString())) {
-						b = true;
-						break;
-					}
+	protected void updateColumns () {
+		TableColumn[] tableColumns = this.editTable.getTable().getColumns();
+		List<MediaColumn> mediaColumns = getColumns();
+		
+		for (TableColumn tableColumn : tableColumns) {
+			boolean b = false;
+			for (MediaColumn mCol : mediaColumns) {
+				if (tableColumn.getText().equals(mCol.toString())) {
+					b = true;
+					break;
 				}
-				if (b) continue;
-				
-				tableColumn.dispose();
 			}
+			if (b) continue;
+			
+			tableColumn.dispose();
 		}
 		
-		columns = this.editTable.getTable().getColumns();
-		for (MediaColumn mCol : getColumns()) {
+		tableColumns = this.editTable.getTable().getColumns(); // Since we just changed this list.
+		for (MediaColumn mCol : mediaColumns) {
 			boolean b = false;
-			for (TableColumn tableColumn : columns) {
+			for (TableColumn tableColumn : tableColumns) {
 				if (tableColumn.getText().equals(mCol.toString())) {
 					b = true;
 					break;
