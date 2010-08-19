@@ -35,6 +35,13 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 		
 		this.librarySort = dbLayer.getDefaultSortColumn();
 		this.librarySortDirection = SortDirection.ASC;
+		
+		try {
+			readSortFromDb();
+		} catch (DbException e) {
+			e.printStackTrace();
+		}
+		
 	}
 	
 	@Override
@@ -181,6 +188,9 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 	public void setSort (IDbColumn sort, SortDirection direction) throws MorriganException {
 		this.librarySort = sort;
 		this.librarySortDirection = direction;
+		
+		saveSortToDbInNewThread();
+		
 		updateRead();
 		callSortChangedListeners(this.librarySort, this.librarySortDirection);
 	}
@@ -204,6 +214,50 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Sort saving.
+	
+	public static final String KEY_SORTCOL = "SORTCOL";
+	public static final String KEY_SORTDIR = "SORTDIR";
+	
+	private void saveSortToDbInNewThread () {
+		new Thread() {
+			@Override
+			public void run() {
+				try {
+					saveSortToDb();
+				} catch (DbException e) {
+					e.printStackTrace();
+				}
+			};
+		}.run();
+		
+	}
+	
+	void saveSortToDb () throws DbException {
+		long t1 = System.currentTimeMillis();
+		
+		getDbLayer().setProp(KEY_SORTCOL, getSort().getName());
+		getDbLayer().setProp(KEY_SORTDIR, String.valueOf(getSortDirection().getN()));
+		
+		long l1 = System.currentTimeMillis() - t1;
+		System.err.println("Saved sort in " + l1 + " ms.");
+	}
+	
+	private void readSortFromDb () throws DbException {
+		String sortcol = getDbLayer().getProp(KEY_SORTCOL);
+		String sortdir = getDbLayer().getProp(KEY_SORTDIR);
+		if (sortcol != null && sortdir != null) {
+    		IDbColumn col = parseColumnFromName(sortcol);
+    		SortDirection dir = SortDirection.parseN(Integer.parseInt(sortdir));
+    		this.librarySort = col;
+    		this.librarySortDirection = dir;
+		}
+	}
+	
+	protected abstract IDbColumn parseColumnFromName (String name);
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Queries.
 	
 	@Override
 	public List<T> simpleSearch (String term, String esc, int maxResults) throws DbException {
@@ -211,6 +265,7 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Updating tracks.
 	
 	@Override
 	public void setItemDateAdded (T track, Date date) throws MorriganException {

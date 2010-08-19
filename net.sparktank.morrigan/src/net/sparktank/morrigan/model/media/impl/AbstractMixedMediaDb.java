@@ -3,6 +3,7 @@ package net.sparktank.morrigan.model.media.impl;
 import java.util.Date;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
+import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
 import net.sparktank.morrigan.model.media.interfaces.IMediaPicture;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
 import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem;
@@ -128,6 +129,13 @@ public abstract class AbstractMixedMediaDb<H extends AbstractMixedMediaDb<H>>
 	@Override
 	public DurationData getTotalDuration() {
 		return MediaTrackListHelper.getTotalDuration(this.getMediaItems());
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	@Override
+	protected IDbColumn parseColumnFromName(String name) {
+		return MixedMediaSqliteLayerImpl.parseColumnFromName(name);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

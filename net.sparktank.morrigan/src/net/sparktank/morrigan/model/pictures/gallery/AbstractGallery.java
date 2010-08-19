@@ -1,6 +1,7 @@
 package net.sparktank.morrigan.model.pictures.gallery;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
+import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
 import net.sparktank.morrigan.model.media.impl.MediaItemDb;
 import net.sparktank.morrigan.model.media.interfaces.IMediaPicture;
 import net.sparktank.morrigan.model.media.interfaces.IMediaPictureList;
@@ -34,6 +35,13 @@ public abstract class AbstractGallery<H extends AbstractGallery<H>>
 		} catch (DbException e) {
 			throw new MorriganException(e);
 		}
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	@Override
+	protected IDbColumn parseColumnFromName(String name) {
+		return GallerySqliteLayer.parseColumnFromName(name);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
