@@ -21,6 +21,12 @@ public abstract class AbstractMixedMediaDb<H extends AbstractMixedMediaDb<H>>
 
 	protected AbstractMixedMediaDb (String libraryName, IMixedMediaStorageLayer<IMixedMediaItem> dbLayer) {
 		super(libraryName, dbLayer);
+		
+		try {
+			readDefaultMediaTypeToDb();
+		} catch (DbException e) {
+			e.printStackTrace();
+		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -31,14 +37,43 @@ public abstract class AbstractMixedMediaDb<H extends AbstractMixedMediaDb<H>>
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Default MediaType.
 	
 	public void setDefaultMediaType (MediaType mediaType) throws MorriganException {
 		this.getDbLayer().setDefaultMediaType(mediaType);
 		updateRead();
+		saveDefaultMediaTypeToDbInNewThread();
 	}
 	
 	public MediaType getDefaultMediaType () {
 		return this.getDbLayer().getDefaultMediaType();
+	}
+	
+	public static final String KEY_DEFAULTMEDIATYPE = "DEFAULTMEDIATYPE";
+	
+	private void saveDefaultMediaTypeToDbInNewThread () {
+		new Thread() {
+			@Override
+			public void run() {
+				try {
+					saveDefaultMediaTypeToDb();
+				} catch (DbException e) {
+					e.printStackTrace();
+				}
+			};
+		}.run();
+	}
+	
+	void saveDefaultMediaTypeToDb () throws DbException {
+		getDbLayer().setProp(KEY_DEFAULTMEDIATYPE, String.valueOf(getDefaultMediaType().getN()));
+	}
+	
+	private void readDefaultMediaTypeToDb () throws DbException {
+		String s = getDbLayer().getProp(KEY_DEFAULTMEDIATYPE);
+		if (s != null) {
+    		MediaType mt = MediaType.parseInt(Integer.parseInt(s));
+    		this.getDbLayer().setDefaultMediaType(mt);
+		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -1,6 +1,7 @@
 package net.sparktank.morrigan.gui.editors.mmdb;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -10,6 +11,7 @@ import net.sparktank.morrigan.gui.dialogs.RunnableDialog;
 import net.sparktank.morrigan.gui.display.DropMenuListener;
 import net.sparktank.morrigan.gui.editors.IMediaItemDbEditor;
 import net.sparktank.morrigan.gui.editors.MediaColumn;
+import net.sparktank.morrigan.gui.preferences.MediaListPref;
 import net.sparktank.morrigan.helpers.TimeHelper;
 import net.sparktank.morrigan.model.MediaSqliteLayer2;
 import net.sparktank.morrigan.model.db.impl.DbColumn;
@@ -300,9 +302,32 @@ public abstract class AbstractMixedMediaDbEditor<T extends AbstractMixedMediaDb<
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Type filtering.
 	
+	@Override
+	protected List<MediaColumn> getColumns() {
+		MediaColumn[] cols;
+		switch (getMediaList().getDefaultMediaType()) {
+			case UNKNOWN:
+				cols = this.COLS_UNKNOWN;
+				break;
+			case TRACK:
+				cols = this.COLS_TRACKS;
+				break;
+			case PICTURE:
+				cols = this.COLS_PICTURES;
+				break;
+			default: throw new IllegalArgumentException();
+		}
+		
+		return Arrays.asList(cols);
+	}
+	
+	@Override
+	protected boolean isColumnVisible(MediaColumn col) {
+		return MediaListPref.getColPref(this, col);
+	}
+	
 	void setTypeFilter (MediaType filterType) {
 		try {
-			setColumnMediaType(filterType);
 			updateColumns();
 			getMediaList().setDefaultMediaType(filterType);
 			refreshColumns();
