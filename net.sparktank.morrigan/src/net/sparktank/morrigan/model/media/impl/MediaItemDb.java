@@ -189,10 +189,10 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 		this.librarySort = sort;
 		this.librarySortDirection = direction;
 		
-		saveSortToDbInNewThread();
-		
 		updateRead();
 		callSortChangedListeners(this.librarySort, this.librarySortDirection);
+		
+		saveSortToDbInNewThread();
 	}
 	
 	private List<SortChangeListener> _sortChangeListeners = new ArrayList<SortChangeListener>();
@@ -230,7 +230,6 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 				}
 			};
 		}.run();
-		
 	}
 	
 	void saveSortToDb () throws DbException {
