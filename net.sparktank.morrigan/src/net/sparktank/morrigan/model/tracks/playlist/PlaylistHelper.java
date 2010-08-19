@@ -2,6 +2,7 @@ package net.sparktank.morrigan.model.tracks.playlist;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import net.sparktank.morrigan.config.Config;
 import net.sparktank.morrigan.exceptions.MorriganException;
@@ -50,6 +51,8 @@ public class PlaylistHelper {
 				ret.add(newItem);
 			}
 		}
+		
+		Collections.sort(ret);
 		
 		return ret;
 	}

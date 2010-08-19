@@ -2,6 +2,7 @@ package net.sparktank.morrigan.model.pictures.gallery;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import net.sparktank.morrigan.config.Config;
 import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
@@ -48,6 +49,8 @@ public class LocalGalleryHelper {
 				ret.add(newItem);
 			}
 		}
+		
+		Collections.sort(ret);
 		
 		return ret;
 	}

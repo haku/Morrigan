@@ -2,6 +2,8 @@ package net.sparktank.morrigan.model.media.impl;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import net.sparktank.morrigan.config.Config;
 import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
@@ -31,8 +33,8 @@ public class LocalMixedMediaDbHelper {
 		return (filePath.toLowerCase().endsWith(Config.MMDB_LOCAL_FILE_EXT));
 	}
 	
-	public static ArrayList<MediaExplorerItem> getAllMmdb () {
-		ArrayList<MediaExplorerItem> ret = new ArrayList<MediaExplorerItem>();
+	public static List<MediaExplorerItem> getAllMmdb () {
+		List<MediaExplorerItem> ret = new ArrayList<MediaExplorerItem>();
 		
 		File dir = Config.getMmdbDir();
 		File [] files = dir.listFiles();
@@ -48,6 +50,8 @@ public class LocalMixedMediaDbHelper {
 				ret.add(newItem);
 			}
 		}
+		
+		Collections.sort(ret);
 		
 		return ret;
 	}

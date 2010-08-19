@@ -1,6 +1,6 @@
 package net.sparktank.morrigan.model.explorer;
 
-public class MenuItem {
+public class MenuItem implements Comparable<MediaExplorerItem> {
 	
 	public String identifier;
 	public String title;
@@ -15,6 +15,11 @@ public class MenuItem {
 	@Override
 	public String toString () {
 		return this.title;
+	}
+	
+	@Override
+	public int compareTo(MediaExplorerItem o) {
+		return this.toString().compareTo(o.toString());
 	}
 	
 }
