@@ -1,8 +1,5 @@
 package net.sparktank.morrigan.gui.editors.mmdb;
 
-import java.util.Arrays;
-import java.util.List;
-
 import net.sparktank.morrigan.gui.actions.AddToPlaylistAction;
 import net.sparktank.morrigan.gui.adaptors.CountsLblProv;
 import net.sparktank.morrigan.gui.adaptors.DateAddedLblProv;
@@ -17,9 +14,7 @@ import net.sparktank.morrigan.gui.editors.MediaColumn;
 import net.sparktank.morrigan.gui.editors.MediaItemListEditor;
 import net.sparktank.morrigan.gui.editors.tracks.PlaylistEditor;
 import net.sparktank.morrigan.gui.handler.AddToQueue;
-import net.sparktank.morrigan.gui.preferences.MediaListPref;
 import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem;
-import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem.MediaType;
 import net.sparktank.morrigan.model.media.interfaces.IMixedMediaList;
 
 import org.eclipse.jface.action.Action;
@@ -36,8 +31,6 @@ import org.eclipse.ui.handlers.IHandlerService;
 public abstract class MixedMediaListEditor<T extends IMixedMediaList<S>, S extends IMixedMediaItem> extends MediaItemListEditor<T,S> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Column definitions.
-	
-	private volatile MediaType columnMediaType = MediaType.UNKNOWN;
 	
 	public final MediaColumn 
 		COL_FILE =       new MediaColumn("file",        new ColumnWeightData(100),            new FileLblProv(this.getImageCache()) );
@@ -82,34 +75,6 @@ public abstract class MixedMediaListEditor<T extends IMixedMediaList<S>, S exten
     		this.COL_DIMENSIONS
     };
     
-	@Override
-	protected List<MediaColumn> getColumns() {
-		MediaColumn[] cols;
-		switch (this.columnMediaType) {
-			case UNKNOWN:
-				cols = this.COLS_UNKNOWN;
-				break;
-			case TRACK:
-				cols = this.COLS_TRACKS;
-				break;
-			case PICTURE:
-				cols = this.COLS_PICTURES;
-				break;
-			default: throw new IllegalArgumentException();
-		}
-		
-		return Arrays.asList(cols);
-	}
-	
-	@Override
-	protected boolean isColumnVisible(MediaColumn col) {
-		return MediaListPref.getColPref(this, col);
-	}
-	
-	protected void setColumnMediaType (MediaType mt) {
-		this.columnMediaType = mt;
-	}
-	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Menus and Actions.
 	
