@@ -1,10 +1,8 @@
 package net.sparktank.morrigan.gui.editors;
 
-import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemDb;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemStorageLayer;
-import net.sparktank.morrigan.model.media.interfaces.IMediaItemStorageLayer.SortDirection;
 
 import org.eclipse.ui.IMemento;
 
@@ -20,12 +18,6 @@ public class MediaItemDbEditorInput extends MediaItemListEditorInput<IMediaItemD
 	
 	@Override
 	public void saveState(IMemento memento) {
-		IDbColumn sort = getMediaList().getSort();
-		memento.putString(EditorFactory.KEY_LIB_SORTCOL, sort.getName());
-		
-		SortDirection dir = getMediaList().getSortDirection();
-		memento.putString(EditorFactory.KEY_LIB_SORTDIR, dir.name());
-		
 		super.saveState(memento);
 	}
 	

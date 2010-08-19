@@ -16,7 +16,28 @@ import net.sparktank.sqlitewrapper.IGenericDbLayer;
 public interface IMediaItemStorageLayer<T extends IMediaItem> extends IGenericDbLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public enum SortDirection { ASC, DESC };
+	public enum SortDirection {
+		ASC(0), DESC(1);
+		
+		private final int n;
+		
+		SortDirection (int n) {
+			this.n = n;
+		}
+		
+		public int getN () {
+			return this.n;
+		}
+		
+		static public SortDirection parseN (int n) {
+			switch (n) {
+				case 0: return ASC;
+				case 1: return DESC;
+				default: throw new IllegalArgumentException();
+			}
+		}
+		
+	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	

@@ -1,12 +1,8 @@
 package net.sparktank.morrigan.gui.editors;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
-import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
-import net.sparktank.morrigan.model.media.impl.MixedMediaSqliteLayerImpl;
-import net.sparktank.morrigan.model.media.interfaces.IMediaItemStorageLayer.SortDirection;
 import net.sparktank.morrigan.model.pictures.gallery.LocalGallery;
-import net.sparktank.morrigan.model.tracks.library.LibrarySqliteLayer2;
 import net.sparktank.morrigan.model.tracks.library.local.LocalMediaLibrary;
 import net.sparktank.morrigan.model.tracks.library.remote.RemoteMediaLibrary;
 import net.sparktank.morrigan.model.tracks.playlist.MediaPlaylist;
@@ -24,9 +20,6 @@ public class EditorFactory implements IElementFactory {
 	public static final String KEY_TYPE = "TYPE";
 	public static final String KEY_SERIAL = "SERIAL";
 	public static final String KEY_TOPINDEX = "TOPINDEX";
-	
-	public static final String KEY_LIB_SORTCOL = "LIB_SORTCOL";
-	public static final String KEY_LIB_SORTDIR = "LIB_SORTDIR";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -94,38 +87,12 @@ public class EditorFactory implements IElementFactory {
 	public static MediaItemDbEditorInput getMediaLibraryInput (IMemento memento) throws MorriganException {
 		String dbFilePath = memento.getString(KEY_SERIAL);
 		MediaItemDbEditorInput input = getMediaLibraryInput(dbFilePath);
-		
-		String sortcol = memento.getString(KEY_LIB_SORTCOL);
-		String sortdir = memento.getString(KEY_LIB_SORTDIR);
-		if (sortcol != null && sortdir != null) {
-			try {
-				IDbColumn ls = LibrarySqliteLayer2.parseColumnFromName(sortcol);
-				SortDirection lsd = SortDirection.valueOf(sortdir);
-				input.getMediaList().setSort(ls, lsd);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		
 		return input;
 	}
 	
 	public static MediaItemDbEditorInput getRemoteMediaLibraryInput (IMemento memento) throws MorriganException {
 		String dbFilePath = memento.getString(KEY_SERIAL);
 		MediaItemDbEditorInput input = getRemoteMediaLibraryInput(dbFilePath);
-		
-		String sortcol = memento.getString(KEY_LIB_SORTCOL);
-		String sortdir = memento.getString(KEY_LIB_SORTDIR);
-		if (sortcol != null && sortdir != null) {
-			try {
-				IDbColumn ls = LibrarySqliteLayer2.parseColumnFromName(sortcol);
-				SortDirection lsd = SortDirection.valueOf(sortdir);
-				input.getMediaList().setSort(ls, lsd);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		
 		return input;
 	}
 	
@@ -166,13 +133,6 @@ public class EditorFactory implements IElementFactory {
 	public static MediaItemDbEditorInput getGalleryInput (IMemento memento) throws MorriganException {
 		String dbFilePath = memento.getString(KEY_SERIAL);
 		MediaItemDbEditorInput input = getGalleryInput(dbFilePath);
-		
-		String sortcol = memento.getString(KEY_LIB_SORTCOL);
-		String sortdir = memento.getString(KEY_LIB_SORTDIR);
-		if (sortcol != null && sortdir != null) {
-			// TODO parse sort data.
-		}
-		
 		return input;
 	}
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -194,19 +154,6 @@ public class EditorFactory implements IElementFactory {
 	public static MediaItemDbEditorInput getMmdbInput (IMemento memento) throws MorriganException {
 		String dbFilePath = memento.getString(KEY_SERIAL);
 		MediaItemDbEditorInput input = getMmdbInput(dbFilePath);
-		
-		String sortcol = memento.getString(KEY_LIB_SORTCOL);
-		String sortdir = memento.getString(KEY_LIB_SORTDIR);
-		if (sortcol != null && sortdir != null) {
-			try {
-				IDbColumn ls = MixedMediaSqliteLayerImpl.parseColumnFromName(sortcol);
-				SortDirection lsd = SortDirection.valueOf(sortdir);
-				input.getMediaList().setSort(ls, lsd);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		
 		return input;
 	}
 	

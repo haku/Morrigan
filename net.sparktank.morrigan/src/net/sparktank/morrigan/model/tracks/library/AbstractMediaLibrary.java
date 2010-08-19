@@ -3,6 +3,7 @@ package net.sparktank.morrigan.model.tracks.library;
 import java.util.Date;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
+import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
 import net.sparktank.morrigan.model.media.impl.MediaItemDb;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrackList;
@@ -96,6 +97,13 @@ public abstract class AbstractMediaLibrary<H extends AbstractMediaLibrary<H>>
 		this.getDbLayer().setTrackEndCnt(track.getFilepath(), track.getEndCount());
 		this.getDbLayer().setTrackDuration(track.getFilepath(), track.getDuration());
 		if (track.getDateLastPlayed() != null) this.getDbLayer().setDateLastPlayed(track.getFilepath(), track.getDateLastPlayed());
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	@Override
+	protected IDbColumn parseColumnFromName(String name) {
+		return LibrarySqliteLayer2.parseColumnFromName(name);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
