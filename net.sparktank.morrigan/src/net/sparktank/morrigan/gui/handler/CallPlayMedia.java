@@ -9,6 +9,8 @@ import net.sparktank.morrigan.gui.views.AbstractPlayerView;
 import net.sparktank.morrigan.gui.views.ViewControls;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrackList;
+import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem;
+import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem.MediaType;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -36,6 +38,7 @@ public class CallPlayMedia extends AbstractHandler {
 		IEditorPart activeEditor = page.getActiveEditor();
 		
 		if (activeEditor instanceof PlaylistEditor || activeEditor instanceof LocalLibraryEditor) {
+			@SuppressWarnings("unchecked")
 			MediaTrackListEditor<IMediaTrackList<IMediaTrack>, IMediaTrack> mediaListEditor = (MediaTrackListEditor<IMediaTrackList<IMediaTrack>, IMediaTrack>) activeEditor;
 			IMediaTrackList<IMediaTrack> mediaList = mediaListEditor.getMediaList();
 			IMediaTrack selectedItem = mediaListEditor.getSelectedItem();
@@ -44,8 +47,16 @@ public class CallPlayMedia extends AbstractHandler {
 		else if (activeEditor instanceof LocalMixedMediaDbEditor) {
 			LocalMixedMediaDbEditor lmmdbe = (LocalMixedMediaDbEditor) activeEditor;
 			IMediaTrackList<? extends IMediaTrack> mediaList = lmmdbe.getMediaList();
-			IMediaTrack selectedItem = lmmdbe.getSelectedItem();
-			playItem(page, mediaList, selectedItem);
+			IMixedMediaItem selectedItem = lmmdbe.getSelectedItem();
+			if (selectedItem.getMediaType() == MediaType.TRACK) { 
+				playItem(page, mediaList, selectedItem);
+			}
+			else if (selectedItem.getMediaType() == MediaType.PICTURE) {
+				new MorriganMsgDlg("TODO: play PICTURE items.").open();
+			}
+			else {
+				new MorriganMsgDlg("Error: don't know how to play the type '"+selectedItem.getMediaType()+"'.").open();
+			}
 		}
 		else {
 			new MorriganMsgDlg("Error: invalid active editor.").open();
