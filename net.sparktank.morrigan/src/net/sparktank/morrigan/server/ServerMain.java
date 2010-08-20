@@ -4,9 +4,9 @@ import net.sparktank.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import net.sparktank.morrigan.helpers.ErrorHelper;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrackList;
-import net.sparktank.morrigan.model.tracks.playlist.PlayItem;
 import net.sparktank.morrigan.player.IPlayerEventHandler;
 import net.sparktank.morrigan.player.OrderHelper.PlaybackOrder;
+import net.sparktank.morrigan.player.PlayItem;
 import net.sparktank.morrigan.player.Player;
 import net.sparktank.morrigan.player.PlayerRegister;
 

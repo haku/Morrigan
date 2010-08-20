@@ -15,7 +15,6 @@ import net.sparktank.morrigan.engines.playback.PlaybackException;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrackList;
-import net.sparktank.morrigan.model.tracks.playlist.PlayItem;
 import net.sparktank.morrigan.player.OrderHelper.PlaybackOrder;
 
 import org.eclipse.swt.SWT;
