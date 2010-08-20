@@ -77,7 +77,7 @@ public class MixedMediaSqliteLayer extends MixedMediaSqliteLayerImpl implements 
 	
 	@Override
 	public List<IMixedMediaItem> getAllMedia(IDbColumn sort, SortDirection direction, boolean hideMissing) throws DbException {
-		return getAllMedia(this.defaultMediaType, sort, direction, hideMissing);
+		return getAllMedia(MediaType.UNKNOWN, sort, direction, hideMissing);
 	}
 	
 	@Override
