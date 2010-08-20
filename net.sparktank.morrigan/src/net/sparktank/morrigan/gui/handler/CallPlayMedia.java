@@ -7,7 +7,6 @@ import net.sparktank.morrigan.gui.editors.tracks.MediaTrackListEditor;
 import net.sparktank.morrigan.gui.editors.tracks.PlaylistEditor;
 import net.sparktank.morrigan.gui.views.AbstractPlayerView;
 import net.sparktank.morrigan.gui.views.ViewControls;
-import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrackList;
 
@@ -51,7 +50,6 @@ public class CallPlayMedia extends AbstractHandler {
 		else {
 			new MorriganMsgDlg("Error: invalid active editor.").open();
 		}
-		
 		
 		return null;
 	}
