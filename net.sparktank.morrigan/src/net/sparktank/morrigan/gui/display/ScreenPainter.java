@@ -2,7 +2,7 @@ package net.sparktank.morrigan.gui.display;
 
 
 import net.sparktank.morrigan.helpers.TimeHelper;
-import net.sparktank.morrigan.model.tracks.playlist.PlayItem;
+import net.sparktank.morrigan.player.PlayItem;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
