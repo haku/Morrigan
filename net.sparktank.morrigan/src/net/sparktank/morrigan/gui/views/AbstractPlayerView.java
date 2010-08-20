@@ -18,18 +18,21 @@ import net.sparktank.morrigan.gui.display.TrayHelper;
 import net.sparktank.morrigan.gui.editors.EditorFactory;
 import net.sparktank.morrigan.gui.editors.MediaItemDbEditorInput;
 import net.sparktank.morrigan.gui.editors.MediaItemListEditorInput;
+import net.sparktank.morrigan.gui.editors.mmdb.MixedMediaListEditor;
 import net.sparktank.morrigan.gui.editors.tracks.LocalLibraryEditor;
 import net.sparktank.morrigan.gui.editors.tracks.MediaTrackListEditor;
 import net.sparktank.morrigan.gui.editors.tracks.PlaylistEditor;
 import net.sparktank.morrigan.gui.helpers.ClipboardHelper;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrackList;
+import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem;
+import net.sparktank.morrigan.model.media.interfaces.IMixedMediaList;
 import net.sparktank.morrigan.model.tracks.library.local.LocalMediaLibrary;
 import net.sparktank.morrigan.model.tracks.playlist.MediaPlaylist;
 import net.sparktank.morrigan.player.IPlayerEventHandler;
 import net.sparktank.morrigan.player.OrderHelper;
-import net.sparktank.morrigan.player.PlayItem;
 import net.sparktank.morrigan.player.OrderHelper.PlaybackOrder;
+import net.sparktank.morrigan.player.PlayItem;
 import net.sparktank.morrigan.player.Player;
 import net.sparktank.morrigan.player.PlayerRegister;
 
@@ -160,6 +163,11 @@ public abstract class AbstractPlayerView extends ViewPart {
 				IMediaTrackList<IMediaTrack> editedMediaList = mediaListEditor.getMediaList();
 				ret = editedMediaList;
 			}
+			else if (activeEditor != null && activeEditor instanceof MixedMediaListEditor<?,?>) {
+				MixedMediaListEditor<? extends IMixedMediaList<? extends IMixedMediaItem>, ? extends IMixedMediaItem> ed = (MixedMediaListEditor<? extends IMixedMediaList<? extends IMixedMediaItem>, ? extends IMixedMediaItem>) activeEditor;
+				ret = (IMediaTrackList<IMediaTrack>) ed.getMediaList();
+			}
+			
 			return ret;
 		}
 		
