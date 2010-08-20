@@ -107,11 +107,14 @@ public abstract class MixedMediaSqliteLayerImpl extends MediaSqliteLayer<IMixedM
     	+ ",lwidth,lheight"
     	+ " FROM tbl_mediafiles";
 	
-	private static final String _SQL_MEDIAFILES_WHERE =
+	private static final String _SQL_WHERE =
 		" WHERE";
 	
+	private static final String _SQL_AND =
+		" AND";
+	
 	private static final String _SQL_MEDIAFILES_WHERTYPE =
-		" type=? AND";
+		" type=?";
 	
 	private static final String _SQL_MEDIAFILES_WHERENOTMISSING =
 		" (bmissing<>1 OR bmissing is NULL)";
@@ -133,30 +136,30 @@ public abstract class MixedMediaSqliteLayerImpl extends MediaSqliteLayer<IMixedM
 	
 	private static final String SQL_MEDIAFILES_Q_NOTMISSING =
 		_SQL_MEDIAFILES_SELECT
-    	+ _SQL_MEDIAFILES_WHERE + _SQL_MEDIAFILES_WHERENOTMISSING
+    	+ _SQL_WHERE + _SQL_MEDIAFILES_WHERENOTMISSING
     	+ _SQL_ORDERBYREPLACE;
 	
 	private static final String SQL_MEDIAFILES_Q_SIMPLESEARCH =
 		_SQL_MEDIAFILES_SELECT
-		+ _SQL_MEDIAFILES_WHERE + _SQL_MEDIAFILES_WHEREORDERSEARCH;
+		+ _SQL_WHERE + _SQL_MEDIAFILES_WHEREORDERSEARCH;
 	
 //	-  -  -  -  -  -  -  -  -  -  -  -
 //	MediaMixedItem Queries - typed.
 	
 	private static final String SQL_MEDIAFILES_Q_ALL_T =
 		_SQL_MEDIAFILES_SELECT
-		+ _SQL_MEDIAFILES_WHERE + _SQL_MEDIAFILES_WHERTYPE
+		+ _SQL_WHERE + _SQL_MEDIAFILES_WHERTYPE
 		+ _SQL_ORDERBYREPLACE;
 	
 	private static final String SQL_MEDIAFILES_Q_NOTMISSING_T =
 		_SQL_MEDIAFILES_SELECT
-		+ _SQL_MEDIAFILES_WHERE + _SQL_MEDIAFILES_WHERTYPE + _SQL_MEDIAFILES_WHERENOTMISSING
+		+ _SQL_WHERE + _SQL_MEDIAFILES_WHERTYPE + _SQL_AND + _SQL_MEDIAFILES_WHERENOTMISSING
 		+ _SQL_ORDERBYREPLACE;
 	
 	private static final String SQL_MEDIAFILES_Q_SIMPLESEARCH_T =
 		_SQL_MEDIAFILES_SELECT
-		+ _SQL_MEDIAFILES_WHERE + _SQL_MEDIAFILES_WHERTYPE + _SQL_MEDIAFILES_WHEREORDERSEARCH;
-
+		+ _SQL_WHERE + _SQL_MEDIAFILES_WHERTYPE + _SQL_AND + _SQL_MEDIAFILES_WHEREORDERSEARCH;
+	
 //	-  -  -  -  -  -  -  -  -  -  -  -
 //	Adding and removing tracks.
 	
