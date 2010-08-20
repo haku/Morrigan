@@ -50,6 +50,11 @@ public class MixedMediaItem extends MediaItem implements IMixedMediaItem {
 //	-  -  -  -  -  -  -  -  -
 //	IMediaTrack.
 	
+	@Override
+	public boolean isPlayable() {
+		return (getMediaType() == MediaType.TRACK);
+	}
+	
 	private int duration;
 	private long startCount;
 	private long endCount;

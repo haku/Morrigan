@@ -25,6 +25,13 @@ public class MediaTrack extends MediaItem implements IMediaTrack {
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	@Override
+	public boolean isPlayable() {
+		return true;
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Attributes.
 	
 	private int duration = -1;

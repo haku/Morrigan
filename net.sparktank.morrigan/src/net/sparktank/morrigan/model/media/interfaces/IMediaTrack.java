@@ -5,6 +5,10 @@ import java.util.Date;
 public interface IMediaTrack extends IMediaItem {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	public boolean isPlayable ();
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
 	public int getDuration();
 	public boolean setDuration(int duration);
 	
