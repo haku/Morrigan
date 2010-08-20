@@ -126,16 +126,16 @@ public class Player {
 		
 		if (isQueueHasItem()) {
 			nextItem = readFromQueue();
-			
-		} else if (getCurrentItem() != null && getCurrentItem().list != null) {
+		}
+		else if (getCurrentItem() != null && getCurrentItem().list != null) {
 			if (getCurrentItem().item != null) {
 				IMediaTrack nextTrack = OrderHelper.getNextTrack(getCurrentItem().list, getCurrentItem().item, this._playbackOrder);
 				if (nextTrack != null) {
 					nextItem = new PlayItem(getCurrentItem().list, nextTrack);
 				}
 			}
-			
-		} else {
+		}
+		else {
 			IMediaTrackList<? extends IMediaTrack> currentList = getCurrentList();
 			if (currentList != null) {
 				IMediaTrack nextTrack = OrderHelper.getNextTrack(currentList, null, this._playbackOrder);
@@ -196,6 +196,7 @@ public class Player {
 	private List<Runnable> _queueChangeListeners = new ArrayList<Runnable>();
 	
 	public void addToQueue (PlayItem item) {
+		// TODO check item is of MediaType == TRACK.
 		this._queue.add(item);
 		callQueueChangedListeners();
 	}
@@ -361,6 +362,8 @@ public class Player {
 	 */
 	public void loadAndStartPlaying (PlayItem item) {
 		try {
+			if (!item.item.isPlayable()) throw new IllegalArgumentException("Item is not playable: '"+item.item.getFilepath()+"'.");
+			
 			File file = new File(item.item.getFilepath());
 			if (!file.exists()) throw new FileNotFoundException(item.item.getFilepath());
 			
