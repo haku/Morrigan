@@ -103,7 +103,7 @@ public class ViewTagEditor extends ViewPart {
 		@Override
 		public void partClosed(IWorkbenchPart part) {
 			if (part instanceof IMediaItemDbEditor) {
-				IMediaItemDbEditor libEditor = (IMediaItemDbEditor) part;
+				IMediaItemDbEditor<?,?,?> libEditor = (IMediaItemDbEditor<?,?,?>) part;
 				if (libEditor.getMediaList().equals(ViewTagEditor.this.editedItemDb)) {
 					setInput(null, null);
 				}
@@ -129,7 +129,7 @@ public class ViewTagEditor extends ViewPart {
 					return;
 				}
 				
-				IMediaItemDbEditor editor = (IMediaItemDbEditor) part;
+				IMediaItemDbEditor<?,?,?> editor = (IMediaItemDbEditor<?,?,?>) part;
 				IMediaItemDb<?,?,?> list = editor.getMediaList();
 				
 				if (selection instanceof IStructuredSelection) {

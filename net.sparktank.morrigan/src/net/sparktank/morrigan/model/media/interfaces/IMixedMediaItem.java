@@ -21,7 +21,7 @@ public interface IMixedMediaItem extends IMediaTrack, IMediaPicture {
 		}
 		
 		public String getHumanName () {
-			return humanName;
+			return this.humanName;
 		}
 		
 		static public MediaType parseInt (int n) {
