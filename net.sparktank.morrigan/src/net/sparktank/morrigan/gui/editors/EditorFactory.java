@@ -70,6 +70,7 @@ public class EditorFactory implements IElementFactory {
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Local libraries.
 	
 	public static MediaItemDbEditorInput getMediaLibraryInput (String dbFilePath) throws MorriganException {
 		LocalMediaLibrary ml;
@@ -90,6 +91,9 @@ public class EditorFactory implements IElementFactory {
 		return input;
 	}
 	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Remote libraries.
+	
 	public static MediaItemDbEditorInput getRemoteMediaLibraryInput (IMemento memento) throws MorriganException {
 		String dbFilePath = memento.getString(KEY_SERIAL);
 		MediaItemDbEditorInput input = getRemoteMediaLibraryInput(dbFilePath);
@@ -101,6 +105,9 @@ public class EditorFactory implements IElementFactory {
 		MediaItemDbEditorInput input = new MediaItemDbEditorInput(ml);
 		return input;
 	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Playlists.
 	
 	public static MediaItemListEditorInput<MediaPlaylist> getMediaPlaylistInput (String filePath) throws MorriganException {
 		MediaPlaylist playList;
