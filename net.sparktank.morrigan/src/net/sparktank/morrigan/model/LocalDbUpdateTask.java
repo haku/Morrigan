@@ -117,7 +117,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<Q, ? extends IMed
 			
 			if (ret == null) {
 				// Read track duration.
-				ret = updateTrackMetadata1(taskEventListener, 25);
+				ret = updateTrackMetadata1(taskEventListener, 25, changedItems);
 			}
 			
 			if (ret == null) {
@@ -217,12 +217,6 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<Q, ? extends IMed
 									}
 								}
 							}
-							
-//							if (filesToAdd.size() >= 100) {
-//								this.getItemList().addFiles(filesToAdd);
-//								filesAdded = filesAdded + filesToAdd.size();
-//								filesToAdd.clear();
-//							}
 						}
 					}
 					else {
@@ -535,7 +529,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<Q, ? extends IMed
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private TaskResult updateTrackMetadata1 (TaskEventListener taskEventListener, int prgTotal) throws MorriganException, DbException {
+	private TaskResult updateTrackMetadata1 (TaskEventListener taskEventListener, int prgTotal, List<T> changedItems) throws MorriganException, DbException {
 		taskEventListener.subTask("Reading track metadata");
 		
 		int progress = 0;
@@ -549,7 +543,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<Q, ? extends IMed
     			if (taskEventListener.isCanceled()) break;
     			taskEventListener.subTask("Reading track metadata: " + mi.getTitle());
     			
-    			if (shouldTrackMetaData1(taskEventListener, this.getItemList(), mi)) {
+    			if (shouldTrackMetaData1(taskEventListener, this.getItemList(), mi) || changedItems.contains(mi)) {
     				if (mi.isEnabled()) {
     					File file = new File(mi.getFilepath());
     					if (file.exists()) {
