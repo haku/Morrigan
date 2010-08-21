@@ -80,6 +80,16 @@ public abstract class AbstractMixedMediaDb<H extends AbstractMixedMediaDb<H>>
 	
 	@Override
 	public void setItemMediaType(IMixedMediaItem item, MediaType newType) throws MorriganException {
+		
+		if (item.getMediaType() != newType) {
+			if (newType == getDefaultMediaType()) {
+				// TODO add this item to the list.
+			}
+			else if (item.getMediaType() == getDefaultMediaType()) {
+				// TODO remove item from the list.
+			}
+		}
+		
 		item.setMediaType(newType);
 		this.setDirtyState(DirtyState.METADATA);
 		try {
