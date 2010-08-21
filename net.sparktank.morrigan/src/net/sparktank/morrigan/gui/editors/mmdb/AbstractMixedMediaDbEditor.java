@@ -304,8 +304,12 @@ public abstract class AbstractMixedMediaDbEditor<T extends AbstractMixedMediaDb<
 	
 	@Override
 	protected List<MediaColumn> getColumns() {
+		return getColumns(getMediaList().getDefaultMediaType());
+	}
+	
+	protected List<MediaColumn> getColumns (MediaType mediaType) {
 		MediaColumn[] cols;
-		switch (getMediaList().getDefaultMediaType()) {
+		switch (mediaType) {
 			case UNKNOWN:
 				cols = this.COLS_UNKNOWN;
 				break;
@@ -328,7 +332,7 @@ public abstract class AbstractMixedMediaDbEditor<T extends AbstractMixedMediaDb<
 	
 	void setTypeFilter (MediaType filterType) {
 		try {
-			updateColumns();
+			updateColumns(getColumns(filterType));
 			getMediaList().setDefaultMediaType(filterType);
 			refreshColumns();
 		}
