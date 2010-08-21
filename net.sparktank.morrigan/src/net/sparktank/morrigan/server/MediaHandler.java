@@ -217,7 +217,7 @@ public class MediaHandler extends AbstractHandler {
 		public void onStart() {/* UNUSED */}
 		
 		@Override
-		public void beginTask(String name, int totalWork) {
+		public void beginTask(String name, @SuppressWarnings("hiding") int totalWork) {
 			this.totalWork = totalWork;
 			System.out.println("[" + this.logPrefix + "] starting task: " + name + ".");
 		}

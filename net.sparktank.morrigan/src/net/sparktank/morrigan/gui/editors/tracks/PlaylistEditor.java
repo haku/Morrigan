@@ -197,6 +197,7 @@ public class PlaylistEditor extends MediaTrackListEditor<MediaPlaylist,IMediaTra
 	}
 	
 	private SelectionAdapter filterListener = new SelectionAdapter() {
+		@SuppressWarnings("synthetic-access")
 		@Override
 		public void widgetDefaultSelected(SelectionEvent e) {
 			if (e.detail == SWT.CANCEL) {
@@ -208,6 +209,7 @@ public class PlaylistEditor extends MediaTrackListEditor<MediaPlaylist,IMediaTra
 	};
 	
 	SelectionAdapter clearFilterListener = new SelectionAdapter() {
+		@SuppressWarnings("synthetic-access")
 		@Override
 		public void widgetSelected(SelectionEvent e) {
 			PlaylistEditor.this.txtFilter.setText("");

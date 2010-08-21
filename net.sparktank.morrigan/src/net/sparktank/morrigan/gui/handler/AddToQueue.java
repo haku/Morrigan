@@ -36,6 +36,7 @@ public class AddToQueue  extends AbstractHandler {
 		IEditorPart activeEditor = page.getActiveEditor();
 		
 		if (activeEditor instanceof MediaTrackListEditor<?,?>) {
+			@SuppressWarnings("unchecked")
 			MediaTrackListEditor<IMediaTrackList<IMediaTrack>, IMediaTrack> mediaListEditor = (MediaTrackListEditor<IMediaTrackList<IMediaTrack>, IMediaTrack>) activeEditor;
 			AbstractPlayerView playerView;
 			IViewPart findView = page.findView(ViewControls.ID);

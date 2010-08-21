@@ -190,6 +190,7 @@ public abstract class AbstractMixedMediaDbEditor<T extends AbstractMixedMediaDb<
 	}
 	
 	private Listener filterListener = new Listener() {
+		@SuppressWarnings("synthetic-access")
 		@Override
 		public void handleEvent(Event event) {
 			setFilterString(AbstractMixedMediaDbEditor.this.txtFilter.getText());
@@ -197,6 +198,7 @@ public abstract class AbstractMixedMediaDbEditor<T extends AbstractMixedMediaDb<
 	};
 	
 	SelectionAdapter clearFilterListener = new SelectionAdapter() {
+		@SuppressWarnings("synthetic-access")
 		@Override
 		public void widgetSelected(SelectionEvent e) {
 			AbstractMixedMediaDbEditor.this.txtFilter.setText("");
@@ -287,6 +289,7 @@ public abstract class AbstractMixedMediaDbEditor<T extends AbstractMixedMediaDb<
 			return this.sort;
 		}
 		
+		@SuppressWarnings("synthetic-access")
 		@Override
 		public void run() {
 			super.run();

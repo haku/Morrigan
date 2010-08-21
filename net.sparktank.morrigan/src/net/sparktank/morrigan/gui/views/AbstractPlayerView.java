@@ -398,9 +398,9 @@ public abstract class AbstractPlayerView extends ViewPart {
 		public void run() {
 			if (this.mon==null || this.action == null) {
 				Monitor currentMon = null;
-				for (Monitor mon : getSite().getShell().getDisplay().getMonitors()) {
-					if (mon.getBounds().contains(getSite().getShell().getDisplay().getCursorLocation())) {
-						currentMon = mon;
+				for (Monitor m : getSite().getShell().getDisplay().getMonitors()) {
+					if (m.getBounds().contains(getSite().getShell().getDisplay().getCursorLocation())) {
+						currentMon = m;
 						break;
 					}
 				}
@@ -417,29 +417,29 @@ public abstract class AbstractPlayerView extends ViewPart {
 			}
 		}
 		
-		private void goFullscreen (Monitor mon, Action action) {
+		private void goFullscreen (Monitor m, Action a) {
 			if (isFullScreen()) {
 				new RemoveFullScreenRunner(true).run();
-				action.setChecked(false);
-				
-			} else {
-				startFullScreen(mon, action);
+				a.setChecked(false);
+			}
+			else {
+				startFullScreen(m, a);
 			}
 		}
 		
-		private void startFullScreen (Monitor mon, final Action action) {
-			AbstractPlayerView.this.fullscreenShell = new FullscreenShell(getSite().getShell(), mon, new Runnable() {
+		private void startFullScreen (Monitor m, final Action a) {
+			AbstractPlayerView.this.fullscreenShell = new FullscreenShell(getSite().getShell(), m, new Runnable() {
 				@Override
 				public void run() {
 					removeFullScreenSafe(false);
-					action.setChecked(false);
+					a.setChecked(false);
 				}
 			});
 			
 			registerScreenPainter(AbstractPlayerView.this.fullscreenShell.getScreenPainter());
 			AbstractPlayerView.this.fullscreenShell.getShell().open();
 			updateCurrentMediaFrameParent();
-			action.setChecked(true);
+			a.setChecked(true);
 		}
 		
 	}

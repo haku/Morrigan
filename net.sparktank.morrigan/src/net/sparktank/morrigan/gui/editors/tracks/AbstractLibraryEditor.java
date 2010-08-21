@@ -187,6 +187,7 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary<T>>
 	}
 	
 	private Listener filterListener = new Listener() {
+		@SuppressWarnings("synthetic-access")
 		@Override
 		public void handleEvent(Event event) {
 			setFilterString(AbstractLibraryEditor.this.txtFilter.getText());
@@ -194,6 +195,7 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary<T>>
 	};
 	
 	SelectionAdapter clearFilterListener = new SelectionAdapter() {
+		@SuppressWarnings("synthetic-access")
 		@Override
 		public void widgetSelected(SelectionEvent e) {
 			AbstractLibraryEditor.this.txtFilter.setText("");
@@ -284,6 +286,7 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary<T>>
 			return this.sort;
 		}
 		
+		@SuppressWarnings("synthetic-access")
 		@Override
 		public void run() {
 			super.run();

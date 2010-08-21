@@ -464,7 +464,7 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 	ShowDisplayViewAction showDisplayViewAction = new ShowDisplayViewAction();
 	ViewDisplay viewDisplay = null;
 	
-	public void attachViewDisplay (ViewDisplay viewDisplay) {
+	public void attachViewDisplay (@SuppressWarnings("hiding") ViewDisplay viewDisplay) {
 		this.viewDisplay = viewDisplay;
 		viewDisplay.setCloseRunnable(this.onCloseRunnable);
 		updateCurrentMediaFrameParent();
