@@ -1,8 +1,15 @@
 package net.sparktank.morrigan.model.media.impl;
 
+import java.awt.Dimension;
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
 
 import net.sparktank.morrigan.config.Config;
 import net.sparktank.morrigan.engines.EngineFactory;
@@ -169,7 +176,16 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<LocalMixedMed
 			return null;
 		}
 		else if (item.getMediaType() == MediaType.PICTURE) {
-			// TODO read picture dimensions.
+			try {
+				Dimension d = readImageDimensions(file);
+				if (d != null && d.width > 0 && d.height > 0) {
+					this.getItemList().setPictureWidthAndHeight(item, d.width, d.height);
+				}
+			}
+			catch (Throwable t) {
+				// FIXME log this somewhere useful.
+				return new OpResult("Error while reading metadata for '"+item.getFilepath()+"'.", t);
+			}
 			
 			return null;
 		}
@@ -197,5 +213,32 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<LocalMixedMed
 		}
 	}
 	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Static helpers.
+	
+	static public Dimension readImageDimensions(File file) throws IOException {
+		Dimension ret = null;
+		
+		ImageInputStream in = ImageIO.createImageInputStream(file);
+		try {
+			final Iterator<ImageReader> readers = ImageIO.getImageReaders(in);
+			if (readers.hasNext()) {
+				ImageReader reader = readers.next();
+				try {
+					reader.setInput(in);
+					ret = new Dimension(reader.getWidth(0), reader.getHeight(0));
+				}
+				finally {
+					reader.dispose();
+				}
+			}
+		}
+		finally {
+			if (in != null) in.close();
+		}
+		
+		return ret;
+	}
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
