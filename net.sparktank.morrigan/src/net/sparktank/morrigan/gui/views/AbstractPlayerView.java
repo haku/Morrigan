@@ -17,12 +17,15 @@ import net.sparktank.morrigan.gui.display.ScreenPainter.TitleProvider;
 import net.sparktank.morrigan.gui.display.TrayHelper;
 import net.sparktank.morrigan.gui.editors.EditorFactory;
 import net.sparktank.morrigan.gui.editors.MediaItemDbEditorInput;
+import net.sparktank.morrigan.gui.editors.MediaItemListEditor;
 import net.sparktank.morrigan.gui.editors.MediaItemListEditorInput;
+import net.sparktank.morrigan.gui.editors.mmdb.LocalMixedMediaDbEditor;
 import net.sparktank.morrigan.gui.editors.mmdb.MixedMediaListEditor;
 import net.sparktank.morrigan.gui.editors.tracks.LocalLibraryEditor;
 import net.sparktank.morrigan.gui.editors.tracks.MediaTrackListEditor;
 import net.sparktank.morrigan.gui.editors.tracks.PlaylistEditor;
 import net.sparktank.morrigan.gui.helpers.ClipboardHelper;
+import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrackList;
 import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem;
@@ -607,20 +610,23 @@ public abstract class AbstractPlayerView extends ViewPart {
 					if (getPlayer().getCurrentItem().list.getType().equals(LocalMediaLibrary.TYPE)) {
 						MediaItemDbEditorInput input = EditorFactory.getMediaLibraryInput(getPlayer().getCurrentItem().list.getListId());
 						getViewSite().getWorkbenchWindow().getActivePage().openEditor(input, LocalLibraryEditor.ID);
-						
-					} else if (getPlayer().getCurrentItem().list.getType().equals(MediaPlaylist.TYPE)) {
+					}
+					else if (getPlayer().getCurrentItem().list.getType().equals(MediaPlaylist.TYPE)) {
 						MediaItemListEditorInput<MediaPlaylist> input = EditorFactory.getMediaPlaylistInput(getPlayer().getCurrentItem().list.getListId());
 						getViewSite().getWorkbenchWindow().getActivePage().openEditor(input, PlaylistEditor.ID);
-						
+					}
+					else if (getPlayer().getCurrentItem().list.getType().equals(LocalMixedMediaDb.TYPE)) {
+						MediaItemDbEditorInput input = EditorFactory.getMmdbInput(getPlayer().getCurrentItem().list.getListId());
+						getViewSite().getWorkbenchWindow().getActivePage().openEditor(input, LocalMixedMediaDbEditor.ID);
 					}
 					
 					IEditorPart activeEditor = getViewSite().getWorkbenchWindow().getActivePage().getActiveEditor();
-					if (activeEditor instanceof MediaTrackListEditor<?,?>) {
-						MediaTrackListEditor<?,?> mediaListEditor = (MediaTrackListEditor<?,?>) activeEditor;
+					if (activeEditor instanceof MediaItemListEditor<?,?>) {
+						MediaItemListEditor<?,?> mediaListEditor = (MediaItemListEditor<?,?>) activeEditor;
 						mediaListEditor.revealItem(getPlayer().getCurrentItem().item);
 					}
-					
-				} catch (Exception e) {
+				}
+				catch (Exception e) {
 					getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));
 				}
 				
