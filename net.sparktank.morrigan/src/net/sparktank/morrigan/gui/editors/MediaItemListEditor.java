@@ -202,8 +202,11 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 	}
 	
 	protected void updateColumns () {
+		updateColumns(getColumns());
+	}
+	
+	protected void updateColumns (List<MediaColumn> mediaColumns) {
 		TableColumn[] tableColumns = this.editTable.getTable().getColumns();
-		List<MediaColumn> mediaColumns = getColumns();
 		
 		for (TableColumn tableColumn : tableColumns) {
 			boolean b = false;
@@ -215,6 +218,7 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 			}
 			if (b) continue;
 			
+			System.err.println("Removing column '"+tableColumn.getText()+"'.");
 			tableColumn.dispose();
 		}
 		
@@ -230,6 +234,7 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 			if (b) continue;
 			
 			if (isColumnVisible(mCol)) {
+				System.err.println("Adding column '"+mCol.toString()+"'.");
 				final TableViewerColumn column = new TableViewerColumn(this.editTable, SWT.NONE);
 				
 				this.editTableCompositeTableColumnLayout.setColumnData(column.getColumn(), mCol.getColumnLayoutData());
