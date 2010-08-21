@@ -6,6 +6,7 @@ import java.util.List;
 import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.actions.DbUpdateAction;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
+import net.sparktank.morrigan.gui.editors.mmdb.LocalMixedMediaDbEditor;
 import net.sparktank.morrigan.gui.editors.pictures.LocalGalleryEditor;
 import net.sparktank.morrigan.gui.editors.tracks.LocalLibraryEditor;
 import net.sparktank.morrigan.model.media.impl.MediaItemDb;
@@ -68,6 +69,10 @@ public class ViewLibraryProperties extends ViewPart {
 			 */
 			if (part instanceof LocalLibraryEditor) {
 				LocalLibraryEditor e = (LocalLibraryEditor) part;
+				ml = e.getMediaList();
+			}
+			else if (part instanceof LocalMixedMediaDbEditor) {
+				LocalMixedMediaDbEditor e = (LocalMixedMediaDbEditor) part;
 				ml = e.getMediaList();
 			}
 			else if (part instanceof LocalGalleryEditor) {
