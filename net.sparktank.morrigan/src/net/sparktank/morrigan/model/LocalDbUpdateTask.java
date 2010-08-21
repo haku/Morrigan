@@ -130,6 +130,12 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<Q, ? extends IMed
 //			}
 			
 			if (ret == null) {
+				/*
+				 * FIXME This refresh is here until AbstractMixedMediaDb.setItemMediaType()
+				 * is properly finished. 
+				 */
+				getItemList().forceRead(); // Item types in MMDB might have changed.
+				
 				if (taskEventListener.isCanceled()) {
 					taskEventListener.logMsg(this.getItemList().getListName(), "Task was canceled desu~.");
 					ret = new TaskResult(TaskOutcome.CANCELED);
@@ -244,8 +250,10 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<Q, ? extends IMed
 			}
 		}
 		
-		// Make main connection pick up changes to DB.
-		this.getItemList().forceRead();
+		if (filesAdded > 0) {
+    		// Make main connection pick up changes to DB.
+    		this.getItemList().forceRead();
+		}
 		
 		taskEventListener.logMsg(this.getItemList().getListName(), "Added " + filesAdded + " files.");
 		
