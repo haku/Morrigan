@@ -11,10 +11,11 @@ public class ImageCache {
 	
 	private Map<String, Image> imageCache = new HashMap<String, Image>();
 	
-	public void clearCache () {
-		for (String i : this.imageCache.keySet()) {
-			this.imageCache.get(i).dispose();
+	synchronized public void clearCache () {
+		for (Image i : this.imageCache.values()) {
+			i.dispose();
 		}
+		this.imageCache.clear();
 	}
 	
 	public Image readImage (String path) {
