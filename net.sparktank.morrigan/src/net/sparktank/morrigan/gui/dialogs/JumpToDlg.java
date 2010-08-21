@@ -8,8 +8,7 @@ import java.util.List;
 import net.sparktank.morrigan.gui.preferences.PreferenceHelper;
 import net.sparktank.morrigan.model.media.impl.MediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
-import net.sparktank.morrigan.model.tracks.MediaTrack;
-import net.sparktank.morrigan.model.tracks.library.local.LocalMediaLibrary;
+import net.sparktank.morrigan.model.media.interfaces.IMediaTrackDb;
 import net.sparktank.morrigan.player.PlayItem;
 import net.sparktank.sqlitewrapper.DbException;
 
@@ -51,14 +50,14 @@ public class JumpToDlg {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	final Shell parent;
-	private final LocalMediaLibrary mediaLibrary;
+	private final IMediaTrackDb<?,?,? extends IMediaTrack> mediaDb;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public JumpToDlg (Shell parent, LocalMediaLibrary mediaLibrary) {
+	public JumpToDlg (Shell parent, IMediaTrackDb<?,?,? extends IMediaTrack> mediaDb) {
 		this.parent = parent;
-		if (mediaLibrary == null) throw new IllegalArgumentException("mediaLibrary can not be null.");
-		this.mediaLibrary = mediaLibrary;
+		if (mediaDb == null) throw new IllegalArgumentException("mediaDb can not be null.");
+		this.mediaDb = mediaDb;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -228,9 +227,9 @@ public class JumpToDlg {
 	
 	void leaveDlg (boolean ok, int mask) {
 		if (ok) {
-			MediaTrack item = getSelectedItem();
+			IMediaTrack item = getSelectedItem();
 			if (item == null) return;
-			this.returnValue = new PlayItem(this.mediaLibrary, item);
+			this.returnValue = new PlayItem(this.mediaDb, item);
 		}
 		setKeyMask(mask);
 		
@@ -335,7 +334,7 @@ public class JumpToDlg {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private MediaTrack getSelectedItem () {
+	private IMediaTrack getSelectedItem () {
 		ISelection selection = this.tableViewer.getSelection();
 		if (selection==null) return null;
 		if (selection.isEmpty()) return null;
@@ -343,8 +342,8 @@ public class JumpToDlg {
 		if (selection instanceof IStructuredSelection) {
 			IStructuredSelection iSel = (IStructuredSelection) selection;
 			Object o = iSel.toList().get(0);
-			if (o instanceof MediaItem) {
-				MediaTrack i = (MediaTrack) o;
+			if (o instanceof IMediaTrack) {
+				IMediaTrack i = (IMediaTrack) o;
 				return i;
 			}
 		}
@@ -354,7 +353,7 @@ public class JumpToDlg {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	List<IMediaTrack> searchResults = null;
+	List<? extends IMediaTrack> searchResults = null;
 	
 	private IStructuredContentProvider contentProvider = new IStructuredContentProvider() {
 		@Override
@@ -493,7 +492,7 @@ public class JumpToDlg {
 		q = q.replace("*", "%");
 		
 		try {
-			List<IMediaTrack> res = this.mediaLibrary.simpleSearch(q, "\\", MAX_RESULTS);
+			List<? extends IMediaTrack> res = this.mediaDb.simpleSearch(q, "\\", MAX_RESULTS);
 			if (res != null && res.size() > 0) {
 				this.searchResults = res;
 				return true;

@@ -27,6 +27,7 @@ import net.sparktank.morrigan.gui.editors.tracks.PlaylistEditor;
 import net.sparktank.morrigan.gui.helpers.ClipboardHelper;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
+import net.sparktank.morrigan.model.media.interfaces.IMediaTrackDb;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrackList;
 import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMixedMediaList;
@@ -639,9 +640,9 @@ public abstract class AbstractPlayerView extends ViewPart {
 		public void run() {
 			IMediaTrackList<? extends IMediaTrack> currentList = getPlayer().getCurrentList();
 			if (currentList == null) return;
-			if (!(currentList instanceof LocalMediaLibrary)) return;
+			if (!(currentList instanceof IMediaTrackDb<?,?,?>)) return;
 			
-			JumpToDlg dlg = new JumpToDlg(getViewSite().getShell(), (LocalMediaLibrary) currentList);
+			JumpToDlg dlg = new JumpToDlg(getViewSite().getShell(), (IMediaTrackDb<?,?,?>) currentList);
 			PlayItem item = dlg.open();
 			if (item != null) {
 				if ((dlg.getKeyMask() & SWT.SHIFT) != 0 || (dlg.getKeyMask() & SWT.CONTROL) != 0) {
