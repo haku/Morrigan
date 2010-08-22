@@ -149,7 +149,6 @@ public class ViewPicture extends ViewPart {
 		parent.setLayout(new FillLayout());
 		
 		this.pictureCanvas = new Canvas(parent, SWT.NONE);
-		this.pictureCanvas.setLayout(new FillLayout());
 		this.pictureCanvas.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_BLACK));
 		this.pictureCanvas.addPaintListener(this.picturePainter);
 	}
@@ -194,6 +193,8 @@ public class ViewPicture extends ViewPart {
 	}
 	
 	private void setPicture (MediaItem item) {
+		if (item == null) return;
+		
 		String ext = item.getFilepath();
 		ext = ext.substring(ext.lastIndexOf(".") + 1).toLowerCase();
 		if (ViewPicture.this.supportedFormats.contains(ext)) {
