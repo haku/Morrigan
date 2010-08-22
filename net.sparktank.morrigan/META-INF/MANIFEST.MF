@@ -1,13 +1,12 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: morrigan
-Bundle-SymbolicName: net.sparktank.morrigan.gui;singleton:=true
+Bundle-SymbolicName: net.sparktank.morrigan;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Bundle-Activator: net.sparktank.morrigan.gui.Activator
+Bundle-Activator: net.sparktank.morrigan.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.ui.console;bundle-version="3.4.0"
-Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: .,
  lib/jetty-continuation-7.0.2.v20100331.jar,
@@ -25,3 +24,36 @@ Bundle-ClassPath: .,
  lib/jaudiotagger-2.0.2.jar
 Bundle-Vendor: sparktank.net
 Import-Package: net.sparktank.sqlitewrapper
+Bundle-ActivationPolicy: lazy
+Export-Package: net.sparktank.morrigan.config,
+ net.sparktank.morrigan.engines,
+ net.sparktank.morrigan.engines.common,
+ net.sparktank.morrigan.engines.hotkey,
+ net.sparktank.morrigan.engines.playback,
+ net.sparktank.morrigan.exceptions,
+ net.sparktank.morrigan.helpers,
+ net.sparktank.morrigan.model;
+  uses:="net.sparktank.sqlitewrapper,
+   net.sparktank.morrigan.model.tasks,
+   net.sparktank.morrigan.model.db.interfaces,
+   net.sparktank.morrigan.model.media.interfaces,
+   net.sparktank.morrigan.model.db.impl,
+   net.sparktank.morrigan.model.tags,
+   net.sparktank.morrigan.helpers",
+ net.sparktank.morrigan.model.db,
+ net.sparktank.morrigan.model.db.impl,
+ net.sparktank.morrigan.model.db.interfaces,
+ net.sparktank.morrigan.model.explorer,
+ net.sparktank.morrigan.model.media.impl,
+ net.sparktank.morrigan.model.media.interfaces,
+ net.sparktank.morrigan.model.pictures,
+ net.sparktank.morrigan.model.pictures.gallery,
+ net.sparktank.morrigan.model.tags,
+ net.sparktank.morrigan.model.tasks,
+ net.sparktank.morrigan.model.tracks,
+ net.sparktank.morrigan.model.tracks.library,
+ net.sparktank.morrigan.model.tracks.library.local,
+ net.sparktank.morrigan.model.tracks.library.remote,
+ net.sparktank.morrigan.model.tracks.playlist,
+ net.sparktank.morrigan.player,
+ net.sparktank.morrigan.server
