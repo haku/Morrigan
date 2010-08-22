@@ -151,7 +151,7 @@ public class ViewMediaExplorer extends ViewPart {
 		getViewSite().getActionBars().getToolBarManager().add(new NewLibraryAction(getViewSite().getWorkbenchWindow()));
 		getViewSite().getActionBars().getToolBarManager().add(new NewRemoteLibraryAction(getViewSite().getWorkbenchWindow()));
 		getViewSite().getActionBars().getToolBarManager().add(new NewPlaylistAction(getViewSite().getWorkbenchWindow()));
-		getViewSite().getActionBars().getToolBarManager().add(new NewGalleryAction(getViewSite().getWorkbenchWindow()));
+//		getViewSite().getActionBars().getToolBarManager().add(new NewGalleryAction(getViewSite().getWorkbenchWindow()));
 		getViewSite().getActionBars().getToolBarManager().add(new NewMixedDbAction(getViewSite().getWorkbenchWindow()));
 	}
 	
