@@ -185,7 +185,9 @@ public class ViewPicture extends ViewPart {
 		
 		@Override
 		public IStatus runInUIThread(IProgressMonitor monitor) {
-			ViewPicture.this.pictureCanvas.redraw();
+			if (!ViewPicture.this.pictureCanvas.isDisposed()) {
+				ViewPicture.this.pictureCanvas.redraw();
+			}
 			return Status.OK_STATUS;
 		}
 		
