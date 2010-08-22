@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Gui
+Bundle-SymbolicName: net.sparktank.morrigan.gui;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: net.sparktank.morrigan.gui.Activator
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.ui.console;bundle-version="3.5.0",
+ net.sparktank.sqlitewrapper;bundle-version="1.0.0",
+ net.sparktank.morrigan;bundle-version="1.0.0"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
