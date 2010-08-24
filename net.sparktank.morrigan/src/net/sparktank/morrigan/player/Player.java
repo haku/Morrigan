@@ -421,6 +421,7 @@ public class Player {
 	public void nextTrack () {
 		PlayItem nextItemToPlay = getNextItemToPlay();
 		if (nextItemToPlay != null) {
+			stopPlaying();
 			loadAndStartPlaying(nextItemToPlay);
 		}
 	}
