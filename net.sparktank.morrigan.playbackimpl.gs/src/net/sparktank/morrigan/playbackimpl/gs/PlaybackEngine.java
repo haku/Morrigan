@@ -19,6 +19,7 @@ import org.eclipse.swt.widgets.Widget;
 import org.gstreamer.Bus;
 import org.gstreamer.Caps;
 import org.gstreamer.Element;
+import org.gstreamer.ElementFactory;
 import org.gstreamer.Format;
 import org.gstreamer.Gst;
 import org.gstreamer.GstObject;
@@ -49,14 +50,14 @@ public class PlaybackEngine implements IPlaybackEngine {
 	private final AtomicBoolean m_stopPlaying = new AtomicBoolean();
 	
 	private String filepath = null;
-	private Composite videoFrameParent = null;
+	Composite videoFrameParent = null;
 	private IPlaybackStatusListener listener = null;
 	private PlayState playbackState = PlayState.Stopped;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructor.
 
-	public PlaybackEngine () {}
+	public PlaybackEngine () { /* UNUSED */ }
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	IPlaybackEngine methods.
@@ -72,13 +73,13 @@ public class PlaybackEngine implements IPlaybackEngine {
 	}
 	
 	@Override
-	public int readFileDuration(final String filepath) throws PlaybackException {
+	public int readFileDuration(final String fpath) throws PlaybackException {
 		initGst();
 		
 		PlayBin playb = new PlayBin("Metadata");
 //		playb.setVideoSink(ElementFactory.make("fakesink", "videosink"));
 		playb.setVideoSink(null);
-		playb.setInputFile(new File(filepath));
+		playb.setInputFile(new File(fpath));
 		playb.setState(State.PAUSED);
 		
 		long queryDuration = -1;
@@ -90,7 +91,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 			}
 			try {
 				Thread.sleep(200);
-			} catch (InterruptedException e) {}
+			} catch (InterruptedException e) { /* UNUSED */ }
 		}
 		playb.setState(State.NULL);
 		playb.dispose();
@@ -101,11 +102,11 @@ public class PlaybackEngine implements IPlaybackEngine {
 			if (retDuration < 1) retDuration = 1;
 		}
 		
-		return (int) retDuration;
+		return retDuration;
 	}
 	
 	@Override
-	public void setClassPath(File[] arg0) {}
+	public void setClassPath(File[] arg0) { /* UNUSED */ }
 	
 	@Override
 	public void setFile(String filepath) {
@@ -114,7 +115,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 	
 	@Override
 	public void setVideoFrameParent (Composite frame) {
-		if (frame==videoFrameParent) return;
+		if (frame==this.videoFrameParent) return;
 		this.videoFrameParent = frame;
 		reparentVideo();
 	}
@@ -148,7 +149,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 	
 	@Override
 	public void stopPlaying() throws PlaybackException {
-		m_stopPlaying.set(true);
+		this.m_stopPlaying.set(true);
 		stopTrack();
 	}
 	
@@ -164,23 +165,24 @@ public class PlaybackEngine implements IPlaybackEngine {
 	
 	@Override
 	public PlayState getPlaybackState() {
-		return playbackState;
+		return this.playbackState;
 	}
 	
 	@Override
 	public int getDuration() throws PlaybackException {
-		return (int) playbin.queryDuration(TimeUnit.SECONDS);
+		return (int) this.playbin.queryDuration(TimeUnit.SECONDS);
 	}
 	
 	@Override
 	public long getPlaybackProgress() throws PlaybackException {
-		return playbin.queryPosition(TimeUnit.SECONDS);
+		return this.playbin.queryPosition(TimeUnit.SECONDS);
 	}
 	
+	@Override
 	public void seekTo(double d) throws PlaybackException {
-		if (playbin!=null) {
-			long duration = playbin.queryDuration(TimeUnit.NANOSECONDS);
-			playbin.seek(1.0d, Format.TIME, SeekFlags.FLUSH | SeekFlags.SEGMENT, SeekType.SET, (long) (d * duration), SeekType.NONE, -1);
+		if (this.playbin!=null) {
+			long duration = this.playbin.queryDuration(TimeUnit.NANOSECONDS);
+			this.playbin.seek(1.0d, Format.TIME, SeekFlags.FLUSH | SeekFlags.SEGMENT, SeekType.SET, (long) (d * duration), SeekType.NONE, -1);
 		}
 	}
 	
@@ -192,50 +194,52 @@ public class PlaybackEngine implements IPlaybackEngine {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Local playback methods.
 	
-	private PlayBin playbin = null;
-	private VideoComponent videoComponent = null;   // SWT / GStreamer.
-	private Element videoElement = null;            // GStreamer.
+	PlayBin playbin = null;
+	VideoComponent videoComponent = null;   // SWT / GStreamer.
+	Element videoElement = null;            // GStreamer.
 	private volatile boolean hasVideo = false;
 	
 	private boolean inited = false;
 	
 	private void initGst () {
-		if (inited) return;
+		if (this.inited) return;
 		Gst.init("VideoPlayer", new String[] {});
-		inited = true;
+		this.inited = true;
 	}
 	
 	private void deinitGst () {
-		if (!inited) return;
+		if (!this.inited) return;
 		Gst.deinit();
-		inited = false;
+		this.inited = false;
 	}
 	
 	private void finalisePlayback () {
 		System.err.println("finalisePlayback() >>>");
 		
-		if (playbin!=null) {
-			playbin.setState(State.NULL);
-			playbin.dispose();
-			playbin = null;
+		stopWatcherThread();
+		
+		if (this.playbin!=null) {
+			this.playbin.setState(State.NULL);
+			this.playbin.dispose();
+			this.playbin = null;
 			
-			if (videoElement != null) {
-				videoElement.dispose();
+			if (this.videoElement != null) {
+				this.videoElement.dispose();
 			}
 			
-			if (videoComponent!=null) {
-				if (!videoComponent.isDisposed()) {
-					_runInUiThread(videoComponent, new Runnable() {
+			if (this.videoComponent!=null) {
+				if (!this.videoComponent.isDisposed()) {
+					_runInUiThread(this.videoComponent, new Runnable() {
 						@Override
 						public void run() {
-							videoComponent.removeKeyListener(keyListener);
-							videoComponent.removeMouseListener(mouseListener);
-							videoComponent.dispose();
+							PlaybackEngine.this.videoComponent.removeKeyListener(PlaybackEngine.this.keyListener);
+							PlaybackEngine.this.videoComponent.removeMouseListener(PlaybackEngine.this.mouseListener);
+							PlaybackEngine.this.videoComponent.dispose();
 						}
 					});
 				}
-				videoComponent = null;
-				videoFrameParent.redraw();
+				this.videoComponent = null;
+				this.videoFrameParent.redraw();
 			}
 		}
 		
@@ -245,7 +249,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 	private void _loadTrack () throws PlaybackException {
 		try {
 			callStateListener(PlayState.Loading);
-			boolean firstLoad = (playbin==null);
+			boolean firstLoad = (this.playbin==null);
 			
 			System.err.println("loadTrack() : firstLoad=" + firstLoad);
 			
@@ -253,101 +257,113 @@ public class PlaybackEngine implements IPlaybackEngine {
 				System.err.println("loadTrack() : initGst()...");
 				initGst();
 				System.err.println("loadTrack() : About to create PlayBin object...");
-				playbin = new PlayBin("VideoPlayer");
+				this.playbin = new PlayBin("VideoPlayer");
 				
 				System.err.println("loadTrack() : Connecting eosBus...");
-				playbin.getBus().connect(eosBus);
+				this.playbin.getBus().connect(this.eosBus);
 				System.err.println("loadTrack() : Connecting stateChangedBus...");
-				playbin.getBus().connect(stateChangedBus);
+				this.playbin.getBus().connect(this.stateChangedBus);
 				
 			} else {
-				playbin.setState(State.NULL);
+				this.playbin.setState(State.NULL);
 			}
 			
-			hasVideo = mightFileHaveVideo(filepath);
+			if (this.videoFrameParent == null) {
+				this.hasVideo = false;
+			}
+			else {
+				this.hasVideo = mightFileHaveVideo(this.filepath);
+			}
 			
-			System.err.println("loadTrack() : About to set input file to '"+filepath+"'...");
-	        playbin.setInputFile(new File(filepath));
+			System.err.println("loadTrack() : About to set input file to '"+this.filepath+"'...");
+	        this.playbin.setInputFile(new File(this.filepath));
 	        System.err.println("loadTrack() : Set file input file.");
 	        
-	        reparentVideo(false);
+        	reparentVideo(false);
 		}
 		catch (Throwable t) {
 			callStateListener(PlayState.Stopped);
-			throw new PlaybackException("Failed to load '"+filepath+"'.", t);
+			throw new PlaybackException("Failed to load '"+this.filepath+"'.", t);
 		}
 	}
 	
-	private void reparentVideo () {
+	void reparentVideo () {
 		reparentVideo(true);
 	}
 	
 	private void reparentVideo (boolean seek) {
+		if (this.videoFrameParent == null) {
+			System.err.println("reparentVideo(): setting video sink = null.");
+//			this.playbin.setVideoSink(null);
+			this.playbin.setVideoSink(ElementFactory.make("fakesink", "videosink"));
+			return;
+		}
+		
 		System.err.println("reparentVideo() >>>");
 		
-		if (videoComponent!=null) {
-			if (!videoComponent.isDisposed()) {
-				_runInUiThread(videoComponent, new Runnable() {
+		if (this.videoComponent!=null) {
+			if (!this.videoComponent.isDisposed()) {
+				_runInUiThread(this.videoComponent, new Runnable() {
 					@Override
 					public void run() {
-						videoComponent.removeKeyListener(keyListener);
-						videoComponent.removeMouseListener(mouseListener);
+						PlaybackEngine.this.videoComponent.removeKeyListener(PlaybackEngine.this.keyListener);
+						PlaybackEngine.this.videoComponent.removeMouseListener(PlaybackEngine.this.mouseListener);
 					}
 				});
 				System.err.println("reparentVideo() : removed listeners.");
 			}
 		}
 		
-		final VideoComponent old_videoComponent = videoComponent;
-		videoComponent = null;
+		final VideoComponent old_videoComponent = this.videoComponent;
+		this.videoComponent = null;
 		
-		Element old_videoElement = videoElement;
-		videoElement = null;
+		Element old_videoElement = this.videoElement;
+		this.videoElement = null;
 		
-		if (playbin!=null) {
-			if (hasVideo) {
+		if (this.playbin!=null) {
+			if (this.hasVideo) {
 				long position = -1;
-				State state = playbin.getState();
+				State state = this.playbin.getState();
 				if (state==State.PLAYING || state==State.PAUSED) {
-					position = playbin.queryPosition(TimeUnit.NANOSECONDS);
+					position = this.playbin.queryPosition(TimeUnit.NANOSECONDS);
 					System.err.println("reparentVideo() : position=" + position);
-					playbin.setState(State.NULL);
+					this.playbin.setState(State.NULL);
 				}
 
 				System.err.println("reparentVideo() : creating new VideoComponent.");
 				
-				_runInUiThread(videoFrameParent, new Runnable() {
+				_runInUiThread(this.videoFrameParent, new Runnable() {
 					@Override
 					public void run() {
-						videoComponent = new VideoComponent(videoFrameParent, SWT.NO_BACKGROUND);
-						videoComponent.setKeepAspect(true);
-						videoElement = videoComponent.getElement();
-						playbin.setVideoSink(videoElement);
-						videoFrameParent.layout();
+						PlaybackEngine.this.videoComponent = new VideoComponent(PlaybackEngine.this.videoFrameParent, SWT.NO_BACKGROUND);
+						PlaybackEngine.this.videoComponent.setKeepAspect(true);
+						PlaybackEngine.this.videoElement = PlaybackEngine.this.videoComponent.getElement();
+						PlaybackEngine.this.playbin.setVideoSink(PlaybackEngine.this.videoElement);
+						PlaybackEngine.this.videoFrameParent.layout();
 						
-						videoComponent.addKeyListener(keyListener);
-						videoComponent.addMouseListener(mouseListener);
+						PlaybackEngine.this.videoComponent.addKeyListener(PlaybackEngine.this.keyListener);
+						PlaybackEngine.this.videoComponent.addMouseListener(PlaybackEngine.this.mouseListener);
 					}
 				});
 
 				if (seek && position>=0) {
-					playbin.setState(State.PAUSED);
+					this.playbin.setState(State.PAUSED);
 
 					if (position > 0) {
 						long startTime = System.currentTimeMillis();
 
 						while (true) {
-							playbin.seek(1.0d, Format.TIME, SeekFlags.FLUSH | SeekFlags.SEGMENT, SeekType.SET, position, SeekType.NONE, -1);
+							this.playbin.seek(1.0d, Format.TIME, SeekFlags.FLUSH | SeekFlags.SEGMENT, SeekType.SET, position, SeekType.NONE, -1);
 
-							if (playbin.queryPosition(TimeUnit.NANOSECONDS) > 0) {
+							if (this.playbin.queryPosition(TimeUnit.NANOSECONDS) > 0) {
 								break;
 							}
 
 							try {
 								Thread.sleep(200);
-							} catch (InterruptedException e) {}
+							} catch (InterruptedException e) { /* UNUSED */ }
 
-							if (playbin.queryPosition(TimeUnit.NANOSECONDS) > 0) {
+							if (this.playbin.queryPosition(TimeUnit.NANOSECONDS) > 0) {
 								break;
 							}
 						}
@@ -356,13 +372,13 @@ public class PlaybackEngine implements IPlaybackEngine {
 					}
 
 					if (state != State.PAUSED) {
-						playbin.setState(state);
+						this.playbin.setState(state);
 					}
 				}
 
 			} else {
 				System.err.println("reparentVideo() : setVideoSink(null).");
-				playbin.setVideoSink(null); // If we had video and now don't, remove it.
+				this.playbin.setVideoSink(null); // If we had video and now don't, remove it.
 			}
 		}
 		
@@ -385,10 +401,11 @@ public class PlaybackEngine implements IPlaybackEngine {
 	}
 	
 	private Bus.EOS eosBus = new Bus.EOS() {
+		@Override
 		public void endOfStream(GstObject source) {
 			System.err.println("endOfStream("+source+") >>>");
 			
-			if (source == playbin) {
+			if (source == PlaybackEngine.this.playbin) {
 				handleEosEvent("g");
 			}
 			
@@ -397,8 +414,9 @@ public class PlaybackEngine implements IPlaybackEngine {
 	};
 	
 	private Bus.STATE_CHANGED stateChangedBus = new Bus.STATE_CHANGED() {
+		@Override
 		public void stateChanged(GstObject source, State old, State current, State pending) {
-			if (source == playbin) {
+			if (source == PlaybackEngine.this.playbin) {
 				switch (current) {
 				case NULL:
 					callStateListener(PlayState.Stopped);
@@ -421,24 +439,24 @@ public class PlaybackEngine implements IPlaybackEngine {
 		}
 	};
 	
-	private KeyListener keyListener = new KeyListener() {
+	KeyListener keyListener = new KeyListener() {
 		@Override
 		public void keyReleased(KeyEvent key) {
 			callOnKeyPressListener(key.keyCode);
 		}
 		@Override
-		public void keyPressed(KeyEvent arg0) {}
+		public void keyPressed(KeyEvent arg0) { /* UNUSED */ }
 	};
 	
-	private MouseListener mouseListener = new MouseListener() {
+	MouseListener mouseListener = new MouseListener() {
 		@Override
 		public void mouseDoubleClick(MouseEvent e) {
 			callOnClickListener(e.button, e.count);
 		}
 		@Override
-		public void mouseUp(MouseEvent arg0) {}
+		public void mouseUp(MouseEvent arg0) { /* UNUSED */ }
 		@Override
-		public void mouseDown(MouseEvent arg0) {}
+		public void mouseDown(MouseEvent arg0) { /* UNUSED */ }
 	};
 	
 	
@@ -447,17 +465,17 @@ public class PlaybackEngine implements IPlaybackEngine {
 	private void _startTrack () {
 		System.err.println("playTrack() >>>");
 		
-		m_stopPlaying.set(false);
-		m_atEos.set(false);
+		this.m_stopPlaying.set(false);
+		this.m_atEos.set(false);
 		
-		if (playbin!=null) {
-			playbin.setState(State.PLAYING);
+		if (this.playbin!=null) {
+			this.playbin.setState(State.PLAYING);
 			System.err.println("playTrack() State set to PLAYING.");
 			
 			callStateListener(PlayState.Playing);
 			startWatcherThread();
 			
-			if (hasVideo) {
+			if (this.hasVideo) {
 				new WaitForVideoThread().start();
 			}
 		}
@@ -471,6 +489,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 			setDaemon(true);
 		}
 		
+		@Override
 		public void run() {
 			Element decodeElement = null;
 			long startTime = System.currentTimeMillis();
@@ -480,9 +499,9 @@ public class PlaybackEngine implements IPlaybackEngine {
 				}
 				try {
 					Thread.sleep(200);
-				} catch (InterruptedException e) {}
+				} catch (InterruptedException e) { /* UNUSED */ }
 				
-				List<Element> elements = playbin.getElements();
+				List<Element> elements = PlaybackEngine.this.playbin.getElements();
 				for (Element element : elements) {
 					if (element.getName().contains("decodebin")) {
 						decodeElement = element;
@@ -502,14 +521,14 @@ public class PlaybackEngine implements IPlaybackEngine {
 				}
 				try {
 					Thread.sleep(200);
-				} catch (InterruptedException e) {}
+				} catch (InterruptedException e) { /* UNUSED */ }
 			}
 		}
 		
 	}
 	
-	private boolean checkIfVideoFound (Element decodeElement) {
-		if (!hasVideo) {
+	boolean checkIfVideoFound (Element decodeElement) {
+		if (!this.hasVideo) {
 			System.err.println("checkIfVideoFound() : Already concluded no video, aborting checkIfVideoFound.");
 			return true;
 		}
@@ -547,11 +566,11 @@ public class PlaybackEngine implements IPlaybackEngine {
 		
 		if (noMorePads) {
 //			if (srcCount < 2 && hasVideo) {
-			if (!foundVideo && hasVideo) {
+			if (!foundVideo && this.hasVideo) {
 				System.err.println("checkIfVideoFound() : Removing video area...");
 
-				hasVideo = false;
-				videoFrameParent.getDisplay().syncExec(new Runnable() {
+				this.hasVideo = false;
+				this.videoFrameParent.getDisplay().syncExec(new Runnable() {
 					@Override
 					public void run() {
 						reparentVideo();
@@ -561,112 +580,140 @@ public class PlaybackEngine implements IPlaybackEngine {
 				System.err.println("checkIfVideoFound() : Removed video area.");
 			}
 			return true;
-		} else {
-			return false;
 		}
+		
+		return false;
 	}
 	
 	
 	
 	private void pauseTrack () {
-		if (playbin!=null) {
-			playbin.setState(State.PAUSED);
+		if (this.playbin!=null) {
+			this.playbin.setState(State.PAUSED);
 			callStateListener(PlayState.Paused);
 		}
 	}
 	
 	private void resumeTrack () {
-		if (playbin!=null) {
-			playbin.setState(State.PLAYING);
+		if (this.playbin!=null) {
+			this.playbin.setState(State.PLAYING);
 			callStateListener(PlayState.Playing);
 		}
 	}
 	
 	private void stopTrack () {
 		stopWatcherThread();
-		if (playbin!=null) {
-			playbin.setState(State.NULL);
+		if (this.playbin!=null) {
+			this.playbin.setState(State.NULL);
 			callStateListener(PlayState.Stopped);
 		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private volatile boolean m_stopWatching = false;
+	volatile boolean m_stopWatching = false;
 	private Thread watcherThread = null;
 	
-	private long lastPosition = -1;
-	private int lastDuration = -1;
+	long lastPosition = -1;
+	int lastDuration = -1;
+	int eosManCounter = 0;
 	
 	private void startWatcherThread () {
 		System.err.println("startWatcherThread() >>>");
 		
-		m_stopWatching = false;
-		watcherThread = new WatcherThread();
-		watcherThread.setDaemon(true);
-		watcherThread.start();
+		if (this.watcherThread != null) {
+			System.err.println("WARNING: having to stop watcher thread from startWatcherThread().");
+			stopWatcherThread();
+		}
+		
+		this.m_stopWatching = false;
+		this.watcherThread = new WatcherThread();
+		this.watcherThread.setDaemon(true);
+		this.watcherThread.start();
 		
 		// Make sure that these get reset.
-		lastPosition = -1;
-		lastDuration = -1;
+		this.lastPosition = -1;
+		this.lastDuration = -1;
+		this.eosManCounter = 0;
 		
 		System.err.println("startWatcherThread() <<<");
 	}
 	
 	private void stopWatcherThread () {
-		m_stopWatching = true;
-		try {
-			if (watcherThread!=null
-					&& watcherThread.isAlive()
-					&& !Thread.currentThread().equals(watcherThread)) {
-				watcherThread.join();
-			}
-			
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+		System.err.println("stopWatcherThread() >>>");
+		
+		if (this.watcherThread != null) {
+    		this.m_stopWatching = true;
+    		if (this.watcherThread.isAlive()) {
+    			this.watcherThread.interrupt();
+        		try {
+        			if (this.watcherThread!=null && !Thread.currentThread().equals(this.watcherThread)) {
+        				this.watcherThread.join();
+        			}
+        		}
+        		catch (InterruptedException e) {
+        			e.printStackTrace();
+        		}
+    		}
+    		this.watcherThread = null;
 		}
+		
+		System.err.println("stopWatcherThread() <<<");
 	}
 	
 	private class WatcherThread extends Thread {
+		
+		public WatcherThread () { /* UNUSED */ }
+
+		@Override
 		public void run() {
-			while (!m_stopWatching) {
+			while (!PlaybackEngine.this.m_stopWatching) {
 				
-				if (playbin!=null) {
-					long position = playbin.queryPosition(TimeUnit.SECONDS);
-					if (position != lastPosition) {
+				if (PlaybackEngine.this.playbin!=null) {
+					long position = PlaybackEngine.this.playbin.queryPosition(TimeUnit.SECONDS);
+					
+					if (position != PlaybackEngine.this.lastPosition) {
+						System.err.println("position="+position);
 						callPositionListener(position);
 						
-						if (lastPosition > position) {
-							lastDuration = -1;
+						if (PlaybackEngine.this.lastPosition > position) {
+							PlaybackEngine.this.lastDuration = -1;
 						}
-						lastPosition = position;
+						PlaybackEngine.this.lastPosition = position;
 						
-						if (lastDuration < 1) {
-							long duration = playbin.queryDuration(TimeUnit.SECONDS);
+						if (PlaybackEngine.this.lastDuration < 1) {
+							long duration = PlaybackEngine.this.playbin.queryDuration(TimeUnit.SECONDS);
 							if (duration > 0) {
-								lastDuration = (int) duration;
-								callDurationListener(lastDuration);
+								PlaybackEngine.this.lastDuration = (int) duration;
+								callDurationListener(PlaybackEngine.this.lastDuration);
 							}
 						}
-						
-						if (lastDuration > 0 && position >= lastDuration) {
-							handleEosEvent("m");
+					}
+					
+					if (PlaybackEngine.this.lastDuration > 0 && position >= PlaybackEngine.this.lastDuration) {
+						PlaybackEngine.this.eosManCounter++;
+						System.err.println("eosManCounter++ = " + PlaybackEngine.this.eosManCounter);
+						if (PlaybackEngine.this.eosManCounter == 4) {
+							PlaybackEngine.this.eosManCounter = 0;
+							handleEosEvent("m=" + position + ">=" + PlaybackEngine.this.lastDuration);
 						}
 					}
 				}
 				
 				try {
 					Thread.sleep(500);
-				} catch (InterruptedException e) {}
+				} catch (InterruptedException e) { /* UNUSED */ }
 			}
 		}
 	}
 	
-	private void handleEosEvent (String debugType) {
-		System.err.println("handleEosEvent(type="+debugType+",m_stopPlaying="+m_stopPlaying.get()+",m_atEos="+m_atEos.get()+") >>>");
+	void handleEosEvent (String debugType) {
+		System.err.println("handleEosEvent(type="+debugType+",m_stopPlaying="+this.m_stopPlaying.get()+",m_atEos="+this.m_atEos.get()+") >>>");
 		
-		if (!m_stopPlaying.get()) {
-			if (m_atEos.compareAndSet(false, true)) {
+		stopWatcherThread();
+		
+		if (!this.m_stopPlaying.get()) {
+			if (this.m_atEos.compareAndSet(false, true)) {
 				callOnEndOfTrackHandler();
 			}
 		}
@@ -687,47 +734,47 @@ public class PlaybackEngine implements IPlaybackEngine {
 		System.err.println("callOnEndOfTrackHandler() >>>");
 		
 		callStateListener(PlayState.Stopped);
-		if (listener!=null) {
-			listener.onEndOfTrack();
+		if (this.listener!=null) {
+			this.listener.onEndOfTrack();
 		}
 		
 		System.err.println("callOnEndOfTrackHandler() <<<");
 	}
 	
-	private void callStateListener (PlayState state) {
+	void callStateListener (PlayState state) {
 		System.err.println("callStateListener("+state.name()+") >>>");
 		
 		this.playbackState = state;
-		if (listener!=null) listener.statusChanged(state);
+		if (this.listener!=null) this.listener.statusChanged(state);
 		
 		System.err.println("callStateListener() <<<");
 	}
 	
-	private void callPositionListener (long position) {
-		if (listener!=null) {
-			listener.positionChanged(position);
+	void callPositionListener (long position) {
+		if (this.listener!=null) {
+			this.listener.positionChanged(position);
 		}
 	}
 	
-	private void callDurationListener (int duration) {
+	void callDurationListener (int duration) {
 		System.err.println("callDurationListener("+duration+") >>>");
 		
-		if (listener!=null) {
-			listener.durationChanged(duration);
+		if (this.listener!=null) {
+			this.listener.durationChanged(duration);
 		}
 		
 		System.err.println("callDurationListener() <<<");
 	}
 	
-	private void callOnKeyPressListener (int keyCode) {
-		if (listener!=null) {
-			listener.onKeyPress(keyCode);
+	void callOnKeyPressListener (int keyCode) {
+		if (this.listener!=null) {
+			this.listener.onKeyPress(keyCode);
 		}
 	}
 	
-	private void callOnClickListener (int button, int clickCount) {
-		if (listener!=null) {
-			listener.onMouseClick(button, clickCount);
+	void callOnClickListener (int button, int clickCount) {
+		if (this.listener!=null) {
+			this.listener.onMouseClick(button, clickCount);
 		}
 	}
 	
