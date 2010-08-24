@@ -13,7 +13,6 @@ import net.sparktank.morrigan.player.PlayerRegister;
 import org.eclipse.swt.widgets.Composite;
 
 public class ServerMain {
-
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	static public MorriganServer makeServer () throws Exception {
