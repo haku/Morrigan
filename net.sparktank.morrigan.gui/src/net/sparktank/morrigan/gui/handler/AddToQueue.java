@@ -3,6 +3,7 @@ package net.sparktank.morrigan.gui.handler;
 import java.util.ArrayList;
 
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
+import net.sparktank.morrigan.gui.editors.mmdb.MixedMediaListEditor;
 import net.sparktank.morrigan.gui.editors.tracks.MediaTrackListEditor;
 import net.sparktank.morrigan.gui.views.AbstractPlayerView;
 import net.sparktank.morrigan.gui.views.ViewControls;
@@ -33,41 +34,50 @@ public class AddToQueue  extends AbstractHandler {
 		
 		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindow(event);
 		IWorkbenchPage page = window.getActivePage();
-		IEditorPart activeEditor = page.getActiveEditor();
 		
-		if (activeEditor instanceof MediaTrackListEditor<?,?>) {
-			@SuppressWarnings("unchecked")
-			MediaTrackListEditor<IMediaTrackList<IMediaTrack>, IMediaTrack> mediaListEditor = (MediaTrackListEditor<IMediaTrackList<IMediaTrack>, IMediaTrack>) activeEditor;
-			AbstractPlayerView playerView;
-			IViewPart findView = page.findView(ViewControls.ID);
+		IViewPart findView = page.findView(ViewControls.ID);
+		if (findView == null) {
+			try {
+				findView = page.showView(ViewControls.ID);
+			} catch (PartInitException e) {
+				new MorriganMsgDlg(e).open();
+			}
+		}
+		
+		if (findView != null) {
+			IMediaTrackList<? extends IMediaTrack> list;
+			ArrayList<? extends IMediaTrack> selectedTracks;
 			
-			if (findView == null) {
-				try {
-					findView = page.showView(ViewControls.ID);
-				} catch (PartInitException e) {
-					new MorriganMsgDlg(e).open();
-				}
+			IEditorPart activeEditor = page.getActiveEditor();
+			if (activeEditor instanceof MediaTrackListEditor<?,?>) {
+				MediaTrackListEditor<?,?> editor = (MediaTrackListEditor<?,?>) activeEditor;
+				list = editor.getMediaList();
+				selectedTracks = editor.getSelectedItems();
+			}
+			else if (activeEditor instanceof MixedMediaListEditor<?,?>) {
+				MixedMediaListEditor<?,?> editor = (MixedMediaListEditor<?,?>) activeEditor;
+				list = editor.getMediaList();
+				selectedTracks = editor.getSelectedItems();
+			}
+			else {
+				new MorriganMsgDlg("Error: invalid active editor.").open();
+				return null;
 			}
 			
-			if (findView != null) {
-				playerView = (AbstractPlayerView) findView;
-				
-				ArrayList<? extends IMediaTrack> selectedTracks = mediaListEditor.getSelectedItems();
-				if (selectedTracks != null) {
-					for (IMediaTrack track : selectedTracks) {
-						PlayItem item = new PlayItem(mediaListEditor.getMediaList(), track);
+			AbstractPlayerView playerView = (AbstractPlayerView) findView;
+			
+			if (selectedTracks != null) {
+				for (IMediaTrack track : selectedTracks) {
+					if (track.isPlayable()) { // Don't queue things we can't play.
+						PlayItem item = new PlayItem(list, track);
 						playerView.getPlayer().addToQueue(item);
 					}
 				}
-				
-			} else {
-				new MorriganMsgDlg("Error: failed to find an AbstractPlayerView.").open();
 			}
-			
-		} else {
-			new MorriganMsgDlg("Error: invalid active editor.").open();
 		}
-		
+		else {
+			new MorriganMsgDlg("Error: failed to find ViewControls.").open();
+		}
 		
 		return null;
 	}
