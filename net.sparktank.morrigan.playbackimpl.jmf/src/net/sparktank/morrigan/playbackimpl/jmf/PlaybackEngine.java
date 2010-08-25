@@ -35,7 +35,6 @@ import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 
-@SuppressWarnings("restriction")
 public class PlaybackEngine  implements IPlaybackEngine {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -44,17 +43,17 @@ public class PlaybackEngine  implements IPlaybackEngine {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private volatile boolean m_stopPlaying;
+	volatile boolean m_stopPlaying;
 	
 	private String filepath = null;
-	private Composite videoFrameParent = null;
+	Composite videoFrameParent = null;
 	private IPlaybackStatusListener listener = null;
 	private PlayState playbackState = PlayState.Stopped;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructor.
 
-	public PlaybackEngine () {}
+	public PlaybackEngine () { /* UNUSED */ }
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	IPlaybackEngine methods.
@@ -70,10 +69,10 @@ public class PlaybackEngine  implements IPlaybackEngine {
 	}
 	
 	@Override
-	public int readFileDuration(String filepath) throws PlaybackException {
-		mediaFile = new File(filepath);
+	public int readFileDuration(String fpath) throws PlaybackException {
+		this.mediaFile = new File(fpath);
 		try {
-			Player player = Manager.createRealizedPlayer(mediaFile.toURI().toURL());
+			Player player = Manager.createRealizedPlayer(this.mediaFile.toURI().toURL());
 			Time duration = player.getDuration();
 			double seconds = duration.getSeconds();
 			player.close();
@@ -86,7 +85,7 @@ public class PlaybackEngine  implements IPlaybackEngine {
 	}
 	
 	@Override
-	public void setClassPath(File[] arg0) {}
+	public void setClassPath(File[] arg0) { /* UNUSED */ }
 	
 	@Override
 	public void setFile(String filepath) {
@@ -95,7 +94,7 @@ public class PlaybackEngine  implements IPlaybackEngine {
 	
 	@Override
 	public void setVideoFrameParent(Composite frame) {
-		if (frame==videoFrameParent) return;
+		if (frame==this.videoFrameParent) return;
 		this.videoFrameParent = frame;
 		reparentVideo();
 	}
@@ -106,7 +105,7 @@ public class PlaybackEngine  implements IPlaybackEngine {
 	}
 	
 	@Override
-	public void finalise() {}
+	public void finalise() { /* UNUSED */ }
 	
 	@Override
 	public void loadTrack() throws PlaybackException {
@@ -120,10 +119,10 @@ public class PlaybackEngine  implements IPlaybackEngine {
 	public void startPlaying() throws PlaybackException {
 		long t0 = System.currentTimeMillis();
 		
-		m_stopPlaying = false;
+		this.m_stopPlaying = false;
 		
-		if (mediaPlayer!=null) {
-			mediaPlayer.start();
+		if (this.mediaPlayer!=null) {
+			this.mediaPlayer.start();
 			startWatcherThread();
 		}
 		
@@ -133,58 +132,59 @@ public class PlaybackEngine  implements IPlaybackEngine {
 	
 	@Override
 	public void stopPlaying() throws PlaybackException {
-		m_stopPlaying = true;
+		this.m_stopPlaying = true;
 		
 		stopWatcherThread();
-		if (mediaPlayer!=null) {
-			mediaPlayer.stop();
+		if (this.mediaPlayer!=null) {
+			this.mediaPlayer.stop();
 		}
 	}
 	
 	@Override
 	public void pausePlaying() throws PlaybackException {
-		if (mediaPlayer!=null) {
-			mediaPlayer.stop();
+		if (this.mediaPlayer!=null) {
+			this.mediaPlayer.stop();
 		}
 	}
 	
 	@Override
 	public void resumePlaying() throws PlaybackException {
-		if (mediaPlayer!=null) {
-			mediaPlayer.start();
+		if (this.mediaPlayer!=null) {
+			this.mediaPlayer.start();
 		}
 	}
 	
 	@Override
 	public PlayState getPlaybackState() {
-		return playbackState;
+		return this.playbackState;
 	}
 	
 	@Override
 	public int getDuration() throws PlaybackException {
-		if (mediaPlayer!=null) {
-			Time mediaTime = mediaPlayer.getDuration();
+		if (this.mediaPlayer!=null) {
+			Time mediaTime = this.mediaPlayer.getDuration();
 			return (int) Math.round(mediaTime.getSeconds()); // FIXME return long.
-		} else {
-			return -1;
 		}
+		
+		return -1;
 	}
 	
 	@Override
 	public long getPlaybackProgress() throws PlaybackException {
-		if (mediaPlayer!=null) {
-			Time mediaTime = mediaPlayer.getMediaTime();
+		if (this.mediaPlayer!=null) {
+			Time mediaTime = this.mediaPlayer.getMediaTime();
 			return Math.round(mediaTime.getSeconds());
-		} else {
-			return -1;
 		}
+		
+		return -1;
 	}
 	
+	@Override
 	public void seekTo(double d) throws PlaybackException {
-		if (mediaPlayer!=null) {
-			Time duration = mediaPlayer.getDuration();
+		if (this.mediaPlayer!=null) {
+			Time duration = this.mediaPlayer.getDuration();
 			Time target = new Time(duration.getSeconds() * d);
-			mediaPlayer.setMediaTime(target);
+			this.mediaPlayer.setMediaTime(target);
 		}
 	}
 	
@@ -204,34 +204,34 @@ public class PlaybackEngine  implements IPlaybackEngine {
 	VideoResizeListener videoResizeListener = null;
 	
 	private void finalisePlayback () {
-		if (mediaPlayer!=null) {
-			mediaPlayer.removeControllerListener(mediaListener);
-			mediaPlayer.stop();
-			mediaPlayer.close();
-			mediaPlayer = null;
+		if (this.mediaPlayer!=null) {
+			this.mediaPlayer.removeControllerListener(this.mediaListener);
+			this.mediaPlayer.stop();
+			this.mediaPlayer.close();
+			this.mediaPlayer = null;
 			
-			if (videoComponent!=null) {
-				videoFrame.remove(videoComponent);
-				videoFrame.removeComponentListener(videoResizeListener);
-				videoFrame.dispose();
-				videoFrame = null;
+			if (this.videoComponent!=null) {
+				this.videoFrame.remove(this.videoComponent);
+				this.videoFrame.removeComponentListener(this.videoResizeListener);
+				this.videoFrame.dispose();
+				this.videoFrame = null;
 				
-				videoComponent.invalidate();
-				videoComponent = null;
+				this.videoComponent.invalidate();
+				this.videoComponent = null;
 				
-				if (!videoComposite.isDisposed()) {
-					if (videoComposite.getDisplay().getThread().equals(Thread.currentThread())) {
-						videoComposite.dispose();
+				if (!this.videoComposite.isDisposed()) {
+					if (this.videoComposite.getDisplay().getThread().equals(Thread.currentThread())) {
+						this.videoComposite.dispose();
 					} else {
-						videoComposite.getDisplay().syncExec(new Runnable() {
+						this.videoComposite.getDisplay().syncExec(new Runnable() {
 							@Override
 							public void run() {
-								videoComposite.dispose();
+								PlaybackEngine.this.videoComposite.dispose();
 							}
 						});
 					}
 				}
-				videoComposite = null;
+				this.videoComposite = null;
 			}
 		}
 	}
@@ -240,66 +240,66 @@ public class PlaybackEngine  implements IPlaybackEngine {
 		callStateListener(PlayState.Loading);
 		
 		try {
-			if (mediaPlayer != null) finalisePlayback();
+			if (this.mediaPlayer != null) finalisePlayback();
 			
-			mediaFile = new File(filepath);
+			this.mediaFile = new File(this.filepath);
 			System.err.println("jmf.PlaybackEngine Creating realized Player...");
-			Player player = Manager.createRealizedPlayer(mediaFile.toURI().toURL());
+			Player player = Manager.createRealizedPlayer(this.mediaFile.toURI().toURL());
 			
 			System.err.println("jmf.PlaybackEngine Creating MediaPlayer...");
-			mediaPlayer = new MediaPlayer();
-			mediaPlayer.setFixedAspectRatio(true);
-			mediaPlayer.setPlayer(player);
-			mediaPlayer.setControlPanelVisible(false);
+			this.mediaPlayer = new MediaPlayer();
+			this.mediaPlayer.setFixedAspectRatio(true);
+			this.mediaPlayer.setPlayer(player);
+			this.mediaPlayer.setControlPanelVisible(false);
 			
-			mediaPlayer.addControllerListener(mediaListener);
+			this.mediaPlayer.addControllerListener(this.mediaListener);
 			
 			reparentVideo();
 		}
 		catch (Exception e) {
-			throw new PlaybackException("Failed to load '"+filepath+"'.", e);
+			throw new PlaybackException("Failed to load '"+this.filepath+"'.", e);
 		}
 	}
 	
 	private void reparentVideo() {
 		System.err.println("jmf.PlaybackEngine >>> reparentVideo()");
 		
-		if (videoFrameParent != null && mediaPlayer != null) {
-			videoComponent = mediaPlayer.getVisualComponent();
+		if (this.videoFrameParent != null && this.mediaPlayer != null) {
+			this.videoComponent = this.mediaPlayer.getVisualComponent();
 			
-			videoFrameParent.getDisplay().syncExec(new Runnable() {
+			this.videoFrameParent.getDisplay().syncExec(new Runnable() {
 				@Override
 				public void run() {
 					try {
-						if (videoComponent != null) {
-							if (videoComposite == null) {
-								videoComposite = new Composite(videoFrameParent, SWT.EMBEDDED);
-								videoComposite.setLayout(new FillLayout());
+						if (PlaybackEngine.this.videoComponent != null) {
+							if (PlaybackEngine.this.videoComposite == null) {
+								PlaybackEngine.this.videoComposite = new Composite(PlaybackEngine.this.videoFrameParent, SWT.EMBEDDED);
+								PlaybackEngine.this.videoComposite.setLayout(new FillLayout());
 								
-								videoFrame = SWT_AWT.new_Frame(videoComposite);
-								videoFrame.setBackground(Color.BLACK);
+								PlaybackEngine.this.videoFrame = SWT_AWT.new_Frame(PlaybackEngine.this.videoComposite);
+								PlaybackEngine.this.videoFrame.setBackground(Color.BLACK);
 								
-								videoFrame.setLayout(null);
-								videoFrame.add(videoComponent);
-								videoFrame.doLayout();
+								PlaybackEngine.this.videoFrame.setLayout(null);
+								PlaybackEngine.this.videoFrame.add(PlaybackEngine.this.videoComponent);
+								PlaybackEngine.this.videoFrame.doLayout();
 								
-								videoFrameParent.layout();
+								PlaybackEngine.this.videoFrameParent.layout();
 								
-								VideoPanel panelVideo = new VideoPanel(mediaPlayer);
+								VideoPanel panelVideo = new VideoPanel(PlaybackEngine.this.mediaPlayer);
 								panelVideo.resizeVisualComponent();
 								Dimension preferredSize = panelVideo.getPreferredSize();
-								videoResizeListener = new VideoResizeListener(preferredSize);
-								videoFrame.addComponentListener(videoResizeListener);
-								videoResizeListener.componentResized(null);
+								PlaybackEngine.this.videoResizeListener = new VideoResizeListener(preferredSize);
+								PlaybackEngine.this.videoFrame.addComponentListener(PlaybackEngine.this.videoResizeListener);
+								PlaybackEngine.this.videoResizeListener.componentResized(null);
 								
 								System.err.println("jmf.PlaybackEngine Adding listeners to videoComponent...");
-								videoComponent.addMouseListener(mouseListener);
-								videoComponent.addKeyListener(keyListener);
+								PlaybackEngine.this.videoComponent.addMouseListener(PlaybackEngine.this.mouseListener);
+								PlaybackEngine.this.videoComponent.addKeyListener(PlaybackEngine.this.keyListener);
 								
 							} else {
 								System.err.println("jmf.PlaybackEngine Moveing videoComposite...");
-								videoComposite.setParent(videoFrameParent);
-								videoFrameParent.layout();
+								PlaybackEngine.this.videoComposite.setParent(PlaybackEngine.this.videoFrameParent);
+								PlaybackEngine.this.videoFrameParent.layout();
 							}
 							
 						} else {
@@ -320,31 +320,31 @@ public class PlaybackEngine  implements IPlaybackEngine {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Listeners.
 	
-	private MouseListener mouseListener = new MouseListener() {
+	MouseListener mouseListener = new MouseListener() {
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			callOnClickListener(e.getButton(), e.getClickCount());
 		}
 		
 		@Override
-		public void mouseReleased(MouseEvent e) {}
+		public void mouseReleased(MouseEvent e) { /* UNUSED */ }
 		@Override
-		public void mousePressed(MouseEvent e) {}
+		public void mousePressed(MouseEvent e) { /* UNUSED */ }
 		@Override
-		public void mouseExited(MouseEvent e) {}
+		public void mouseExited(MouseEvent e) { /* UNUSED */ }
 		@Override
-		public void mouseEntered(MouseEvent e) {}
+		public void mouseEntered(MouseEvent e) { /* UNUSED */ }
 	};
 	
-	private KeyListener keyListener = new KeyListener() {
+	KeyListener keyListener = new KeyListener() {
 		@Override
 		public void keyTyped(KeyEvent key) {
 			callOnKeyPressListener(key.getKeyCode());
 		}
 		@Override
-		public void keyReleased(KeyEvent key) {}
+		public void keyReleased(KeyEvent key) { /* UNUSED */ }
 		@Override
-		public void keyPressed(KeyEvent key) {}
+		public void keyPressed(KeyEvent key) { /* UNUSED */ }
 	};
 	
 	private class VideoResizeListener implements ComponentListener {
@@ -357,39 +357,39 @@ public class PlaybackEngine  implements IPlaybackEngine {
 		
 		@Override
 		public void componentResized(ComponentEvent arg0) {
-			if (videoFrame!=null && videoComponent!=null && preferredSize!=null) {
-				Dimension dimVideoFrame = videoFrame.getSize();
+			if (PlaybackEngine.this.videoFrame!=null && PlaybackEngine.this.videoComponent!=null && this.preferredSize!=null) {
+				Dimension dimVideoFrame = PlaybackEngine.this.videoFrame.getSize();
 				Rectangle rectVideo = new Rectangle (0, 0, dimVideoFrame.width, dimVideoFrame.height);
 				
-	            if ((float)preferredSize.width/preferredSize.height >= (float)dimVideoFrame.width/dimVideoFrame.height) {
-	                rectVideo.height = (preferredSize.height * dimVideoFrame.width) / preferredSize.width;
+	            if ((float)this.preferredSize.width/this.preferredSize.height >= (float)dimVideoFrame.width/dimVideoFrame.height) {
+	                rectVideo.height = (this.preferredSize.height * dimVideoFrame.width) / this.preferredSize.width;
 	                rectVideo.y = (dimVideoFrame.height - rectVideo.height) / 2;
 	            } else {
-	                rectVideo.width = (preferredSize.width * dimVideoFrame.height) / preferredSize.height;
+	                rectVideo.width = (this.preferredSize.width * dimVideoFrame.height) / this.preferredSize.height;
 	                rectVideo.x = (dimVideoFrame.width - rectVideo.width) / 2;
 	            }
 	            
-	            videoComponent.setBounds (rectVideo);
-	            videoFrame.invalidate();
+	            PlaybackEngine.this.videoComponent.setBounds (rectVideo);
+	            PlaybackEngine.this.videoFrame.invalidate();
 			}
 		}
 		
 		@Override
-		public void componentShown(ComponentEvent arg0) {}
+		public void componentShown(ComponentEvent arg0) { /* UNUSED */ }
 		@Override
-		public void componentMoved(ComponentEvent arg0) {}
+		public void componentMoved(ComponentEvent arg0) { /* UNUSED */ }
 		@Override
-		public void componentHidden(ComponentEvent arg0) {}
+		public void componentHidden(ComponentEvent arg0) { /* UNUSED */ }
 	};
 	
 	private ControllerListener mediaListener = new ControllerListener () {
 		@Override
 		public void controllerUpdate(ControllerEvent event) {
 			
-			if (mediaPlayer==null) return;
+			if (PlaybackEngine.this.mediaPlayer==null) return;
 			
 			if (event instanceof EndOfMediaEvent) {
-				if (!m_stopPlaying) {
+				if (!PlaybackEngine.this.m_stopPlaying) {
 					callOnEndOfTrackHandler();
 				}
 				
@@ -423,23 +423,23 @@ public class PlaybackEngine  implements IPlaybackEngine {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Watcher thread.
 	
-	private volatile boolean m_stopWatching = false;
+	volatile boolean m_stopWatching = false;
 	private Thread watcherThread = null;
 	
 	private void startWatcherThread () {
-		m_stopWatching = false;
-		watcherThread = new WatcherThread();
-		watcherThread.setDaemon(true);
-		watcherThread.start();
+		this.m_stopWatching = false;
+		this.watcherThread = new WatcherThread();
+		this.watcherThread.setDaemon(true);
+		this.watcherThread.start();
 	}
 	
 	private void stopWatcherThread () {
-		m_stopWatching = true;
+		this.m_stopWatching = true;
 		try {
-			if (watcherThread!=null
-					&& watcherThread.isAlive()
-					&& !Thread.currentThread().equals(watcherThread)) {
-				watcherThread.join();
+			if (this.watcherThread!=null
+					&& this.watcherThread.isAlive()
+					&& !Thread.currentThread().equals(this.watcherThread)) {
+				this.watcherThread.join();
 			}
 			
 		} catch (InterruptedException e) {
@@ -448,17 +448,21 @@ public class PlaybackEngine  implements IPlaybackEngine {
 	}
 	
 	private class WatcherThread extends Thread {
+		
+		public WatcherThread () {  /* UNUSED */ }
+
+		@Override
 		public void run() {
-			while (!m_stopWatching) {
+			while (!PlaybackEngine.this.m_stopWatching) {
 				
-				if (mediaPlayer!=null) {
-					Time mediaTime = mediaPlayer.getMediaTime();
+				if (PlaybackEngine.this.mediaPlayer!=null) {
+					Time mediaTime = PlaybackEngine.this.mediaPlayer.getMediaTime();
 					callPositionListener(Math.round(mediaTime.getSeconds()));
 				}
 				
 				try {
 					Thread.sleep(500);
-				} catch (InterruptedException e) {}
+				} catch (InterruptedException e) { /* UNUSED */ }
 			}
 		};
 	}
@@ -466,40 +470,40 @@ public class PlaybackEngine  implements IPlaybackEngine {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Local helper methods.
 	
-	private void callOnErrorHandler (Exception e) {
-		if (listener!=null) {
-			listener.onError(e);
+	void callOnErrorHandler (Exception e) {
+		if (this.listener!=null) {
+			this.listener.onError(e);
 		}
 	}
 	
-	private void callOnEndOfTrackHandler () {
-		if (listener!=null) {
-			listener.onEndOfTrack();
+	void callOnEndOfTrackHandler () {
+		if (this.listener!=null) {
+			this.listener.onEndOfTrack();
 		}
 	}
 	
-	private void callStateListener (PlayState state) {
+	void callStateListener (PlayState state) {
 		this.playbackState = state;
-		if (listener!=null) listener.statusChanged(state);
+		if (this.listener!=null) this.listener.statusChanged(state);
 	}
 	
-	private void callPositionListener (long position) {
-		if (listener!=null) {
-			listener.positionChanged(position);
+	void callPositionListener (long position) {
+		if (this.listener!=null) {
+			this.listener.positionChanged(position);
 		}
 	}
 	
 	// TODO use callOnKeyPressListener
-	private void callOnKeyPressListener (int keyCode) {
-		if (listener!=null) {
-			listener.onKeyPress(keyCode);
+	void callOnKeyPressListener (int keyCode) {
+		if (this.listener!=null) {
+			this.listener.onKeyPress(keyCode);
 		}
 	}
 	
 	// TODO use callOnClickListener
-	private void callOnClickListener (int button, int clickCount) {
-		if (listener!=null) {
-			listener.onMouseClick(button, clickCount);
+	void callOnClickListener (int button, int clickCount) {
+		if (this.listener!=null) {
+			this.listener.onMouseClick(button, clickCount);
 		}
 	}
 	
