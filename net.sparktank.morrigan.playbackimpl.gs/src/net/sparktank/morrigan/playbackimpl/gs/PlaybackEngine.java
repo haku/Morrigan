@@ -239,7 +239,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 					});
 				}
 				this.videoComponent = null;
-				this.videoFrameParent.redraw();
+				if (!this.videoFrameParent.isDisposed()) this.videoFrameParent.redraw();
 			}
 		}
 		
@@ -292,16 +292,9 @@ public class PlaybackEngine implements IPlaybackEngine {
 	}
 	
 	private void reparentVideo (boolean seek) {
-		if (this.videoFrameParent == null) {
-			System.err.println("reparentVideo(): setting video sink = null.");
-			Element fakesink = ElementFactory.make("fakesink", "videosink");
-			fakesink.set("sync", new Boolean(true));
-			this.playbin.setVideoSink(fakesink);
-			return;
-		}
-		
 		System.err.println("reparentVideo() >>>");
 		
+		// Clean up any stuff we had before.
 		if (this.videoComponent!=null) {
 			if (!this.videoComponent.isDisposed()) {
 				_runInUiThread(this.videoComponent, new Runnable() {
@@ -315,14 +308,20 @@ public class PlaybackEngine implements IPlaybackEngine {
 			}
 		}
 		
+		// Clear old values but keep references so we can dispose them later.
 		final VideoComponent old_videoComponent = this.videoComponent;
 		this.videoComponent = null;
-		
 		Element old_videoElement = this.videoElement;
 		this.videoElement = null;
 		
+		// Do we have anything to attach video output to?
 		if (this.playbin!=null) {
-			if (this.hasVideo) {
+			// Can not attach video to something that is not there...
+			if (this.videoFrameParent != null && this.hasVideo) {
+				/*
+				 * We can not move the video while it is playing, so if it is,
+				 * stop it and remember where it was.
+				 */
 				long position = -1;
 				State state = this.playbin.getState();
 				if (state==State.PLAYING || state==State.PAUSED) {
@@ -330,9 +329,8 @@ public class PlaybackEngine implements IPlaybackEngine {
 					System.err.println("reparentVideo() : position=" + position);
 					this.playbin.setState(State.NULL);
 				}
-
-				System.err.println("reparentVideo() : creating new VideoComponent.");
 				
+				System.err.println("reparentVideo() : creating new VideoComponent.");
 				_runInUiThread(this.videoFrameParent, new Runnable() {
 					@Override
 					public void run() {
@@ -346,47 +344,44 @@ public class PlaybackEngine implements IPlaybackEngine {
 						PlaybackEngine.this.videoComponent.addMouseListener(PlaybackEngine.this.mouseListener);
 					}
 				});
-
+				
+				/*
+				 * If video was playing, put it back again...
+				 */
 				if (seek && position>=0) {
 					this.playbin.setState(State.PAUSED);
-
+					
 					if (position > 0) {
 						long startTime = System.currentTimeMillis();
-
+						
 						while (true) {
 							this.playbin.seek(1.0d, Format.TIME, SeekFlags.FLUSH | SeekFlags.SEGMENT, SeekType.SET, position, SeekType.NONE, -1);
-
-							if (this.playbin.queryPosition(TimeUnit.NANOSECONDS) > 0) {
-								break;
-							}
-
-							try {
-								Thread.sleep(200);
-							} catch (InterruptedException e) { /* UNUSED */ }
-
-							if (this.playbin.queryPosition(TimeUnit.NANOSECONDS) > 0) {
-								break;
-							}
+							
+							if (this.playbin.queryPosition(TimeUnit.NANOSECONDS) > 0) { break; }
+							try { Thread.sleep(200); } catch (InterruptedException e) { /* UNUSED */ }
+							if (this.playbin.queryPosition(TimeUnit.NANOSECONDS) > 0) { break; }
 						}
-
+						
 						System.err.println("reparentVideo() : Seek took " + (System.currentTimeMillis() - startTime) + " ms.");
 					}
-
+					
 					if (state != State.PAUSED) {
 						this.playbin.setState(state);
 					}
 				}
-
-			} else {
-				System.err.println("reparentVideo() : setVideoSink(null).");
-				this.playbin.setVideoSink(null); // If we had video and now don't, remove it.
+			}
+			else { // If there is no video or nowhere to put video...
+				System.err.println("reparentVideo() : setVideoSink(fakesink).");
+				Element fakesink = ElementFactory.make("fakesink", "videosink");
+				fakesink.set("sync", new Boolean(true));
+				this.playbin.setVideoSink(fakesink); // If we had video and now don't, remove it.
 			}
 		}
 		
+		// If we left stuff that needed disposing, do so here.
 		if (old_videoElement!=null) {
 			old_videoElement.dispose();
 		}
-		
 		if (old_videoComponent!=null && !old_videoComponent.isDisposed()) {
 			_runInUiThread(old_videoComponent, new Runnable() {
 				@Override
