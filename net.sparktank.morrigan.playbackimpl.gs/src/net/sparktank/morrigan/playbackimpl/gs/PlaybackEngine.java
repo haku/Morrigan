@@ -669,7 +669,6 @@ public class PlaybackEngine implements IPlaybackEngine {
 					long position = PlaybackEngine.this.playbin.queryPosition(TimeUnit.SECONDS);
 					
 					if (position != PlaybackEngine.this.lastPosition) {
-						System.err.println("position="+position);
 						callPositionListener(position);
 						
 						if (PlaybackEngine.this.lastPosition > position) {
