@@ -3,7 +3,6 @@ Bundle-ManifestVersion: 2
 Bundle-Name: morrigan
 Bundle-SymbolicName: net.sparktank.morrigan;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Bundle-Activator: net.sparktank.morrigan.Activator
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: .,
  lib/jetty-continuation-7.0.2.v20100331.jar,
@@ -21,8 +20,12 @@ Bundle-ClassPath: .,
  lib/jaudiotagger-2.0.2.jar
 Bundle-Vendor: sparktank.net
 Import-Package: net.sparktank.sqlitewrapper,
+ org.eclipse.swt,
+ org.eclipse.swt.awt,
+ org.eclipse.swt.events,
+ org.eclipse.swt.layout,
+ org.eclipse.swt.widgets,
  org.osgi.framework;version="1.5.0"
-Bundle-ActivationPolicy: lazy
 Export-Package: net.sparktank.morrigan.config,
  net.sparktank.morrigan.engines,
  net.sparktank.morrigan.engines.common,
@@ -55,4 +58,3 @@ Export-Package: net.sparktank.morrigan.config,
  net.sparktank.morrigan.model.tracks.playlist,
  net.sparktank.morrigan.player,
  net.sparktank.morrigan.server
-Require-Bundle: org.eclipse.ui;bundle-version="3.6.0"
