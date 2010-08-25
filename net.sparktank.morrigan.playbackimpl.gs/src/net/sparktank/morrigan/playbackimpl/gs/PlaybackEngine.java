@@ -294,8 +294,9 @@ public class PlaybackEngine implements IPlaybackEngine {
 	private void reparentVideo (boolean seek) {
 		if (this.videoFrameParent == null) {
 			System.err.println("reparentVideo(): setting video sink = null.");
-//			this.playbin.setVideoSink(null);
-			this.playbin.setVideoSink(ElementFactory.make("fakesink", "videosink"));
+			Element fakesink = ElementFactory.make("fakesink", "videosink");
+			fakesink.set("sync", new Boolean(true));
+			this.playbin.setVideoSink(fakesink);
 			return;
 		}
 		
