@@ -63,7 +63,7 @@
 			<fileset dir="${buildDirectory}/${buildLabel}" includes="*.zip" />
 		</move>
 
-		<!-- Build server jar. -->
+		<!-- Build bits (e.g. WUI war file). -->
 		<antcall target="buildbits" />
 
 		<!-- Build outputs. -->
@@ -78,9 +78,6 @@
 	<target name="buildbits" depends="setup">
 		<ant antfile="../net.sparktank.morrigan.wui/build.xml"
 		     dir="../net.sparktank.morrigan.wui"
-		/>
-		<ant antfile="../net.sparktank.morrigan/build_serverjar.xml"
-		     dir="../net.sparktank.morrigan"
 		/>
 	</target>
 
@@ -119,10 +116,6 @@
 			<zipfileset dir="propfiles"
 			            includes="win32.properties"
 			            fullpath="morrigan/morrigan.properties"
-			/>
-			<zipfileset dir="../net.sparktank.morrigan"
-			            includes="morrigan.server.jar"
-			            fullpath="morrigan/morrigan.server.jar"
 			/>
 			<zipfileset dir="../net.sparktank.morrigan/lib" prefix="morrigan/lib" />
 			<zipfileset dir="../net.sparktank.morrigan.wui" includes="morrigan.wui.war" prefix="morrigan/" />
@@ -165,10 +158,6 @@
 			            includes="linux.properties"
 			            fullpath="morrigan/morrigan.properties"
 			/>
-			<zipfileset dir="../net.sparktank.morrigan"
-			            includes="morrigan.server.jar"
-			            fullpath="morrigan/morrigan.server.jar"
-			/>
 			<zipfileset dir="../net.sparktank.morrigan/lib" prefix="morrigan/lib" />
 			<zipfileset dir="../net.sparktank.morrigan.wui" includes="morrigan.wui.war" prefix="morrigan/" />
 		</zip>
@@ -198,10 +187,6 @@
 			<zipfileset dir="propfiles"
 			            includes="mac.properties"
 			            fullpath="morrigan/morrigan.properties"
-			/>
-			<zipfileset dir="../net.sparktank.morrigan"
-			            includes="morrigan.server.jar"
-			            fullpath="morrigan/morrigan.server.jar"
 			/>
 			<zipfileset dir="../net.sparktank.morrigan/lib" prefix="morrigan/lib" />
 			<zipfileset dir="../net.sparktank.morrigan.wui" includes="morrigan.wui.war" prefix="morrigan/" />
