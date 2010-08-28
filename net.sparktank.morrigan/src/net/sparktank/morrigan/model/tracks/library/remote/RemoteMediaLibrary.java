@@ -26,7 +26,7 @@ import net.sparktank.morrigan.model.tracks.library.AbstractMediaLibrary;
 import net.sparktank.morrigan.model.tracks.library.LibrarySqliteLayer2;
 import net.sparktank.morrigan.server.HttpClient;
 import net.sparktank.morrigan.server.HttpClient.IHttpStreamHandler;
-import net.sparktank.morrigan.server.feedreader.MediaListFeedParser2;
+import net.sparktank.morrigan.server.feedreader.MediaLibraryFeedParser;
 import net.sparktank.sqlitewrapper.DbException;
 
 public class RemoteMediaLibrary extends AbstractMediaLibrary<RemoteMediaLibrary> {
@@ -201,7 +201,7 @@ public class RemoteMediaLibrary extends AbstractMediaLibrary<RemoteMediaLibrary>
 	public void forceDoRead () throws MorriganException, DbException {
 		try {
 			// This does the actual HTTP fetch.
-			MediaListFeedParser2.parseFeed(this, this.taskEventListener);
+			MediaLibraryFeedParser.parseFeed(this, this.taskEventListener);
 			
 			this.cacheDate = new Date().getTime();
 			writeCacheDate();
