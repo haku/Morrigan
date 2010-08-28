@@ -5,6 +5,7 @@ import java.util.List;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
+import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDbHelper;
 import net.sparktank.morrigan.model.tracks.library.local.LocalLibraryHelper;
 import net.sparktank.morrigan.model.tracks.playlist.PlaylistHelper;
 import net.sparktank.morrigan.player.Player;
@@ -27,6 +28,7 @@ public class MediaExplorerFeed extends AbstractFeed {
 	protected void populateFeed(DataWriter dw) throws SAXException, MorriganException {
 		addElement(dw, "title", "Morrigan media desu~");
 		addLink(dw, "/media" , "self", "text/xml");
+		addLink(dw, "/media/newmmdb", "newmmdb", "cmd");
 		addLink(dw, "/media/newlib", "newlib", "cmd");
 		
 		List<Player> players = PlayerRegister.getPlayers();
@@ -37,11 +39,16 @@ public class MediaExplorerFeed extends AbstractFeed {
 			
 			switch (n) {
 				case 0:
+					type="mmdb";
+					items.addAll(LocalMixedMediaDbHelper.getAllMmdb());
+					break;
+					
+				case 1:
 					type="library";
 					items.addAll(LocalLibraryHelper.getAllLibraries());
 					break;
 				
-				case 1:
+				case 2:
 					type="playlist";
 					items.addAll(PlaylistHelper.getAllPlaylists());
 					break;
