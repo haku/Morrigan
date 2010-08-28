@@ -9,6 +9,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.ErrorHelper;
+import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
+import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDbHelper;
 import net.sparktank.morrigan.model.tracks.library.local.LocalLibraryHelper;
 import net.sparktank.morrigan.model.tracks.library.local.LocalMediaLibrary;
 import net.sparktank.morrigan.model.tracks.playlist.MediaPlaylist;
@@ -38,10 +40,9 @@ public class PlayersHandler extends AbstractHandler {
 		try {
 			if (target.equals("/")) {
 				sb = getPlayers();
-				
-			} else {
+			}
+			else {
 				String id = target.substring(1);
-				
 				if (id.contains("/")) {
 					String[] split = id.split("/");
 					id = split[0];
@@ -53,11 +54,10 @@ public class PlayersHandler extends AbstractHandler {
 						doAction(Integer.parseInt(id), action, null);
 					}
 				}
-				
 				sb = getPlayer(Integer.parseInt(id));
 			}
-			
-		} catch (Throwable t) {
+		}
+		catch (Throwable t) {
 			sb = new StringBuilder();
 			sb.append(ErrorHelper.getStackTrace(t));
 		}
@@ -114,17 +114,28 @@ public class PlayersHandler extends AbstractHandler {
 		String a = action.toLowerCase();
 		if (a.equals("playpause")) {
 			player.pausePlaying();
-			
-		} else if (a.equals("next")) {
+		}
+		else if (a.equals("next")) {
 			player.nextTrack();
-			
-		} else if (a.equals("play")) {
+		}
+		else if (a.equals("play")) {
 			doPlay(player, param);
 		}
 	}
 	
 	private void doPlay (Player player, String param) throws MorriganException {
-		if (LocalLibraryHelper.isLibFile(param)) {
+		if (LocalMixedMediaDbHelper.isMmdbFile(param)) {
+			String f = LocalMixedMediaDbHelper.getFullPathToMmdb(param);
+			LocalMixedMediaDb mmdb;
+			try {
+				mmdb = LocalMixedMediaDb.LOCAL_MMDB_FACTORY.manufacture(f);
+			} catch (DbException e) {
+				throw new MorriganException(e);
+			}
+			mmdb.read();
+			player.loadAndStartPlaying(mmdb);
+		}
+		else if (LocalLibraryHelper.isLibFile(param)) {
 			String f = LocalLibraryHelper.getFullPathToLib(param);
 			LocalMediaLibrary ml;
 			try {
@@ -134,13 +145,12 @@ public class PlayersHandler extends AbstractHandler {
 			}
 			ml.read();
 			player.loadAndStartPlaying(ml);
-			
-		} else if (PlaylistHelper.isPlFile(param)) {
+		}
+		else if (PlaylistHelper.isPlFile(param)) {
 			String f = PlaylistHelper.getFullPathToPlaylist(param);
 			MediaPlaylist ml = MediaPlaylist.FACTORY.manufacture(f);
 			ml.read();
 			player.loadAndStartPlaying(ml);
-			
 		}
 	}
 	

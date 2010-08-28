@@ -344,7 +344,7 @@ public class Player {
 	/**
 	 * For UI handlers to call.
 	 */
-	public void loadAndStartPlaying (IMediaTrackList<IMediaTrack> list) {
+	public void loadAndStartPlaying (IMediaTrackList<? extends IMediaTrack> list) {
 		IMediaTrack nextTrack = OrderHelper.getNextTrack(list, null, this._playbackOrder);
 		loadAndStartPlaying(list, nextTrack);
 	}
