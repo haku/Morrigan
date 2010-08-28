@@ -7,11 +7,15 @@ import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IViewPart;
 
 import net.sparktank.morrigan.gui.actions.DbUpdateAction;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
+import net.sparktank.morrigan.gui.display.ActionListener;
 import net.sparktank.morrigan.gui.views.ViewLibraryProperties;
 import net.sparktank.morrigan.gui.views.ViewTagEditor;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
@@ -25,6 +29,9 @@ public class LocalMixedMediaDbEditor
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Create GUI.
 	
+	private Button btnAddToQueue = null;
+	private Button btnAdd = null;
+	
 	@Override
 	protected void createControls(Composite parent) {
 		super.createControls(parent);
@@ -35,9 +42,27 @@ public class LocalMixedMediaDbEditor
 	}
 	
 	@Override
+	protected List<Control> populateToolbar(Composite parent) {
+		List<Control> ret = super.populateToolbar(parent);
+		
+		this.btnAddToQueue = new Button(parent, SWT.PUSH);
+		this.btnAddToQueue.setImage(getImageCache().readImage("icons/queue-add.gif"));
+		this.btnAddToQueue.addSelectionListener(new ActionListener(this.addToQueueAction));
+		ret.add(ret.size() - 1, this.btnAddToQueue);
+		
+		this.btnAdd = new Button(parent, SWT.PUSH);
+		this.btnAdd.setImage(getImageCache().readImage("icons/plus.gif"));
+		this.btnAdd.addSelectionListener(new ActionListener(this.addAction));
+		ret.add(ret.size() - 1, this.btnAdd);
+		
+		return ret;
+	}
+	
+	@Override
 	protected void populateContextMenu(List<IContributionItem> menu0, List<IContributionItem> menu1) {
 		menu0.add(new ActionContributionItem(this.addToQueueAction));
 		menu0.add(new ActionContributionItem(this.showTagsAction));
+		menu0.add(getAddToMenu());
 		
 		menu1.add(new ActionContributionItem(this.toggleEnabledAction));
 		menu1.add(new ActionContributionItem(this.removeAction));
@@ -55,6 +80,16 @@ public class LocalMixedMediaDbEditor
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Actions.
+	
+	protected IAction addAction = new Action("Add") {
+		@Override
+		public void run () {
+			ViewLibraryProperties propView = showLibPropView();
+			if (propView!=null) {
+				propView.showAddDlg(true);
+			}
+		}
+	};
 	
 	protected IAction showPropertiesAction = new Action("Properties") {
 		@Override
