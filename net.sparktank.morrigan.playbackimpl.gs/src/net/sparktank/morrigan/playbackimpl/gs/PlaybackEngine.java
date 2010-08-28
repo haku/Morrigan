@@ -239,7 +239,17 @@ public class PlaybackEngine implements IPlaybackEngine {
 					});
 				}
 				this.videoComponent = null;
-				if (!this.videoFrameParent.isDisposed()) this.videoFrameParent.redraw();
+				
+				if (this.videoFrameParent!=null && !this.videoFrameParent.isDisposed()) {
+					_runInUiThread(this.videoFrameParent, new Runnable() {
+						@Override
+						public void run() {
+							if (!PlaybackEngine.this.videoFrameParent.isDisposed()) {
+								PlaybackEngine.this.videoFrameParent.redraw();
+							}
+						}
+					});
+				}
 			}
 		}
 		
