@@ -1,7 +1,5 @@
 package net.sparktank.morrigan.gui.adaptors;
 
-import net.sparktank.morrigan.model.media.impl.MediaItem;
-
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 
@@ -19,8 +17,7 @@ public class MediaFilter extends ViewerFilter {
 		if (this.searchTerm == null || this.searchTerm.length() == 0) {
 			return true;
 		}
-		MediaItem mi = (MediaItem) element;
-		if (mi.getFilepath().matches(this.searchTerm)) {
+		if (element.toString().matches(this.searchTerm)) {
 			return true;
 		}
 		return false;
