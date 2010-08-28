@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Map;
 
@@ -12,22 +13,29 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.ErrorHelper;
+import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
+import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDbHelper;
+import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDbUpdateTask;
 import net.sparktank.morrigan.model.tasks.TaskEventListener;
 import net.sparktank.morrigan.model.tracks.library.local.LocalLibraryHelper;
 import net.sparktank.morrigan.model.tracks.library.local.LocalLibraryUpdateTask;
 import net.sparktank.morrigan.model.tracks.library.local.LocalMediaLibrary;
 import net.sparktank.morrigan.model.tracks.playlist.MediaPlaylist;
 import net.sparktank.morrigan.model.tracks.playlist.PlaylistHelper;
-import net.sparktank.morrigan.server.feedwriters.LibrarySrcFeed;
+import net.sparktank.morrigan.server.feedwriters.MediaItemDbSrcFeed;
 import net.sparktank.morrigan.server.feedwriters.MediaExplorerFeed;
 import net.sparktank.morrigan.server.feedwriters.MediaTrackListFeed;
+import net.sparktank.morrigan.server.feedwriters.MixedMediaListFeed;
+import net.sparktank.sqlitewrapper.DbException;
 
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.xml.sax.SAXException;
 
 public class MediaHandler extends AbstractHandler {
-	//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
 	public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -41,8 +49,8 @@ public class MediaHandler extends AbstractHandler {
 		try {
 			if (target.equals("/")) {
 				new MediaExplorerFeed().process(out);
-				
-			} else {
+			}
+			else {
 				String r = target.substring(1);
 				Map<?,?> paramMap = request.getParameterMap();
 				
@@ -51,66 +59,25 @@ public class MediaHandler extends AbstractHandler {
 				
 				if (split.length > 1) {
 					String id = split[1];
-					if (type.equals("library")) {
-						String f = LocalLibraryHelper.getFullPathToLib(id);
-						LocalMediaLibrary ml = LocalMediaLibrary.FACTORY.manufacture(f);
-						
-						if (split.length > 2) {
-							String param = split[2];
-							if (param.equals("src")) {
-								if (split.length > 3) {
-									String cmd = split[3];
-									if (cmd.equals("add")) {
-										if (paramMap.containsKey("dir")) {
-											String[] v = (String[]) paramMap.get("dir");
-											ml.addSource(v[0]);
-											out.print("Added src '"+v[0]+"'.");
-										} else {
-											out.print("To add a src, POST with param 'dir' set.");
-										}
-									} else if (cmd.equals("remove")) {
-										if (paramMap.containsKey("dir")) {
-											String[] v = (String[]) paramMap.get("dir");
-											ml.removeSource(v[0]);
-											out.print("Removed src '"+v[0]+"'.");
-										} else {
-											out.print("To remove a src, POST with param 'dir' set.");
-										}
-									}
-									
-								} else {
-									new LibrarySrcFeed(ml).process(out);
-								}
-								
-							} else if (param.equals("scan")) {
-								if (scheduleLibScan(ml)) {
-									out.print("Scan scheduled.");
-								} else {
-									out.print("Failed to schedule scan.");
-								}
-								
-							} else {
-								String filename = URLDecoder.decode(param, "UTF-8");
-								File file = new File(filename);
-								if (file.exists()) {
-									System.err.println("About to send file '"+file.getAbsolutePath()+"'.");
-									returnFile(file, response);
-								}
-							}
-							
-						} else {
-							MediaTrackListFeed<LocalMediaLibrary> libraryFeed = new MediaTrackListFeed<LocalMediaLibrary>(ml);
-							libraryFeed.process(out);
-						}
-						
-					} else if (type.equals("playlist")) {
-						String f = PlaylistHelper.getFullPathToPlaylist(id);
-						MediaPlaylist ml = MediaPlaylist.FACTORY.manufacture(f);
-						MediaTrackListFeed<MediaPlaylist> libraryFeed = new MediaTrackListFeed<MediaPlaylist>(ml);
-						libraryFeed.process(out);
+					if (type.equals("mmdb")) {
+						handleMmdbRequest(response, out, paramMap, split, id);
 					}
-					
-				} else if (type.equals("newlib")) {
+					else if (type.equals("library")) {
+						handleLibraryRequest(response, out, paramMap, split, id);
+					}
+					else if (type.equals("playlist")) {
+						handlePlaylistRequest(out, id);
+					}
+				}
+				else if (type.equals("newmmdb")) {
+					if (paramMap.containsKey("name")) {
+						String[] v = (String[]) paramMap.get("name");
+						LocalMixedMediaDbHelper.createMmdb(v[0]);
+					} else {
+						out.print("To create a MMDB, POST with param 'name' set.");
+					}
+				}
+				else if (type.equals("newlib")) {
 					if (paramMap.containsKey("name")) {
 						String[] v = (String[]) paramMap.get("name");
 						LocalLibraryHelper.createLib(v[0]);
@@ -119,13 +86,139 @@ public class MediaHandler extends AbstractHandler {
 					}
 				}
 			} 
-			
-		} catch (Throwable t) {
+		}
+		catch (Throwable t) {
 			out.print(ErrorHelper.getStackTrace(t));
 		}
 	}
 	
-	//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	private void handleMmdbRequest(HttpServletResponse response, PrintWriter out, Map<?, ?> paramMap, String[] split, String id)
+		throws DbException, SAXException, MorriganException, UnsupportedEncodingException, IOException {
+		
+		String f = LocalMixedMediaDbHelper.getFullPathToMmdb(id);
+		LocalMixedMediaDb mmdb = LocalMixedMediaDb.LOCAL_MMDB_FACTORY.manufacture(f);
+		
+		if (split.length > 2) {
+			String param = split[2];
+			if (param.equals("src")) {
+				if (split.length > 3) {
+					String cmd = split[3];
+					if (cmd.equals("add")) {
+						if (paramMap.containsKey("dir")) {
+							String[] v = (String[]) paramMap.get("dir");
+							mmdb.addSource(v[0]);
+							out.print("Added src '"+v[0]+"'.");
+						}
+						else {
+							out.print("To add a src, POST with param 'dir' set.");
+						}
+					}
+					else if (cmd.equals("remove")) {
+						if (paramMap.containsKey("dir")) {
+							String[] v = (String[]) paramMap.get("dir");
+							mmdb.removeSource(v[0]);
+							out.print("Removed src '"+v[0]+"'.");
+						}
+						else {
+							out.print("To remove a src, POST with param 'dir' set.");
+						}
+					}
+				}
+				else {
+					new MediaItemDbSrcFeed(mmdb).process(out);
+				}
+			}
+			else if (param.equals("scan")) {
+				if (scheduleMmdbScan(mmdb)) {
+					out.print("Scan scheduled.");
+				}
+				else {
+					out.print("Failed to schedule scan.");
+				}
+			}
+			else {
+				String filename = URLDecoder.decode(param, "UTF-8");
+				File file = new File(filename);
+				if (file.exists()) {
+					System.err.println("About to send file '"+file.getAbsolutePath()+"'.");
+					returnFile(file, response);
+				}
+			}
+		}
+		else {
+			MixedMediaListFeed<LocalMixedMediaDb> libraryFeed = new MixedMediaListFeed<LocalMixedMediaDb>(mmdb);
+			libraryFeed.process(out);
+		}
+	}
+	
+	private void handleLibraryRequest(HttpServletResponse response, PrintWriter out, Map<?, ?> paramMap, String[] split, String id)
+		throws DbException, SAXException, MorriganException, UnsupportedEncodingException, IOException {
+		
+		String f = LocalLibraryHelper.getFullPathToLib(id);
+		LocalMediaLibrary ml = LocalMediaLibrary.FACTORY.manufacture(f);
+		
+		if (split.length > 2) {
+			String param = split[2];
+			if (param.equals("src")) {
+				if (split.length > 3) {
+					String cmd = split[3];
+					if (cmd.equals("add")) {
+						if (paramMap.containsKey("dir")) {
+							String[] v = (String[]) paramMap.get("dir");
+							ml.addSource(v[0]);
+							out.print("Added src '"+v[0]+"'.");
+						}
+						else {
+							out.print("To add a src, POST with param 'dir' set.");
+						}
+					}
+					else if (cmd.equals("remove")) {
+						if (paramMap.containsKey("dir")) {
+							String[] v = (String[]) paramMap.get("dir");
+							ml.removeSource(v[0]);
+							out.print("Removed src '"+v[0]+"'.");
+						}
+						else {
+							out.print("To remove a src, POST with param 'dir' set.");
+						}
+					}
+				}
+				else {
+					new MediaItemDbSrcFeed(ml).process(out);
+				}
+			}
+			else if (param.equals("scan")) {
+				if (scheduleLibScan(ml)) {
+					out.print("Scan scheduled.");
+				}
+				else {
+					out.print("Failed to schedule scan.");
+				}
+			}
+			else {
+				String filename = URLDecoder.decode(param, "UTF-8");
+				File file = new File(filename);
+				if (file.exists()) {
+					System.err.println("About to send file '"+file.getAbsolutePath()+"'.");
+					returnFile(file, response);
+				}
+			}
+		}
+		else {
+			MediaTrackListFeed<LocalMediaLibrary> libraryFeed = new MediaTrackListFeed<LocalMediaLibrary>(ml);
+			libraryFeed.process(out);
+		}
+	}
+	
+
+	private void handlePlaylistRequest(PrintWriter out, String id) throws MorriganException, SAXException {
+		String f = PlaylistHelper.getFullPathToPlaylist(id);
+		MediaPlaylist ml = MediaPlaylist.FACTORY.manufacture(f);
+		MediaTrackListFeed<MediaPlaylist> libraryFeed = new MediaTrackListFeed<MediaPlaylist>(ml);
+		libraryFeed.process(out);
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private void returnFile (File file, HttpServletResponse response) throws IOException {
 		response.reset();
@@ -163,16 +256,34 @@ public class MediaHandler extends AbstractHandler {
 		
 	}
 	
-	//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	private boolean scheduleMmdbScan (final LocalMixedMediaDb mmdb) {
+		final LocalMixedMediaDbUpdateTask task = LocalMixedMediaDbUpdateTask.FACTORY.manufacture(mmdb);
+		if (task != null) {
+			Thread t = new Thread () {
+				@Override
+				public void run() {
+					task.run(new DbScanMon(mmdb.getListName()));
+				}
+			};
+			t.start();
+			System.err.println("Scan of " + mmdb.getListId() + " scheduled on thread " + t.getId() + ".");
+			return true;
+			
+		}
+		
+		System.err.println("Failed to get task object from factory method.");
+		return false;
+	}
 	
 	private boolean scheduleLibScan (final LocalMediaLibrary ml) {
 		final LocalLibraryUpdateTask task = LocalLibraryUpdateTask.FACTORY.manufacture(ml);
 		if (task != null) {
-			
 			Thread t = new Thread () {
 				@Override
 				public void run() {
-					task.run(new LibScanMon(ml.getListName()));
+					task.run(new DbScanMon(ml.getListName()));
 				}
 			};
 			t.start();
@@ -185,14 +296,14 @@ public class MediaHandler extends AbstractHandler {
 		return false;
 	}
 	
-	static class LibScanMon implements TaskEventListener {
+	static class DbScanMon implements TaskEventListener {
 		
 		private final String logPrefix;
 		private int totalWork = 0;
 		private int workDone = 0;
 		private boolean canceled;
 		
-		public LibScanMon (String logPrefix) {
+		public DbScanMon (String logPrefix) {
 			this.logPrefix = logPrefix;
 		}
 		
@@ -245,5 +356,5 @@ public class MediaHandler extends AbstractHandler {
 		
 	}
 	
-	//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

@@ -5,19 +5,19 @@ import java.net.URLEncoder;
 import java.util.List;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
-import net.sparktank.morrigan.model.tracks.library.local.LocalMediaLibrary;
+import net.sparktank.morrigan.model.media.impl.MediaItemDb;
 import net.sparktank.sqlitewrapper.DbException;
 
 import org.xml.sax.SAXException;
 
 import com.megginson.sax.DataWriter;
 
-public class LibrarySrcFeed extends AbstractFeed {
+public class MediaItemDbSrcFeed extends AbstractFeed {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private LocalMediaLibrary ml;
+	private MediaItemDb<?,?,?> ml;
 	
-	public LibrarySrcFeed (LocalMediaLibrary ml) {
+	public MediaItemDbSrcFeed (MediaItemDb<?,?,?> ml) {
 		super();
 		if (ml==null) throw new IllegalArgumentException("MediaList paramater can not be null.");
 		this.ml = ml;
