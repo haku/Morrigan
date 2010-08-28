@@ -10,7 +10,7 @@ import org.xml.sax.helpers.AttributesImpl;
 
 import com.megginson.sax.DataWriter;
 
-public abstract class Feed {
+public abstract class AbstractFeed {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public void process (PrintWriter out) throws SAXException, MorriganException {

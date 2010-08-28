@@ -20,8 +20,8 @@ import net.sparktank.morrigan.model.tracks.library.local.LocalMediaLibrary;
 import net.sparktank.morrigan.model.tracks.playlist.MediaPlaylist;
 import net.sparktank.morrigan.model.tracks.playlist.PlaylistHelper;
 import net.sparktank.morrigan.server.feedwriters.LibrarySrcFeed;
-import net.sparktank.morrigan.server.feedwriters.MediaFeed;
-import net.sparktank.morrigan.server.feedwriters.MediaListFeed;
+import net.sparktank.morrigan.server.feedwriters.MediaExplorerFeed;
+import net.sparktank.morrigan.server.feedwriters.MediaTrackListFeed;
 
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
@@ -40,7 +40,7 @@ public class MediaHandler extends AbstractHandler {
 		
 		try {
 			if (target.equals("/")) {
-				new MediaFeed().process(out);
+				new MediaExplorerFeed().process(out);
 				
 			} else {
 				String r = target.substring(1);
@@ -99,14 +99,14 @@ public class MediaHandler extends AbstractHandler {
 							}
 							
 						} else {
-							MediaListFeed<LocalMediaLibrary> libraryFeed = new MediaListFeed<LocalMediaLibrary>(ml);
+							MediaTrackListFeed<LocalMediaLibrary> libraryFeed = new MediaTrackListFeed<LocalMediaLibrary>(ml);
 							libraryFeed.process(out);
 						}
 						
 					} else if (type.equals("playlist")) {
 						String f = PlaylistHelper.getFullPathToPlaylist(id);
 						MediaPlaylist ml = MediaPlaylist.FACTORY.manufacture(f);
-						MediaListFeed<MediaPlaylist> libraryFeed = new MediaListFeed<MediaPlaylist>(ml);
+						MediaTrackListFeed<MediaPlaylist> libraryFeed = new MediaTrackListFeed<MediaPlaylist>(ml);
 						libraryFeed.process(out);
 					}
 					
