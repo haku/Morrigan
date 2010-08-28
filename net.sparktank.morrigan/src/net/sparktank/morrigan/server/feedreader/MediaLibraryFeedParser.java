@@ -27,7 +27,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-public class MediaListFeedParser2 extends DefaultHandler {
+public class MediaLibraryFeedParser extends DefaultHandler {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	/**
@@ -52,7 +52,7 @@ public class MediaListFeedParser2 extends DefaultHandler {
 			        	factory.setNamespaceAware(true);
 			        	factory.setValidating(true);
 			        	SAXParser parser = factory.newSAXParser();
-			        	parser.parse(is, new MediaListFeedParser2(transClone, taskEventListener));
+			        	parser.parse(is, new MediaLibraryFeedParser(transClone, taskEventListener));
 					}
 			        catch (SAXException e) {
 						throw new MorriganException(e);
@@ -117,7 +117,7 @@ public class MediaListFeedParser2 extends DefaultHandler {
 	private final TaskEventListener taskEventListener;
 	private final Stack<String> stack;
 	
-	public MediaListFeedParser2(RemoteMediaLibrary library, TaskEventListener taskEventListener) {
+	public MediaLibraryFeedParser(RemoteMediaLibrary library, TaskEventListener taskEventListener) {
 		this.taskEventListener = taskEventListener;
 		this.stack = new Stack<String>();
 		this.library = library; 
