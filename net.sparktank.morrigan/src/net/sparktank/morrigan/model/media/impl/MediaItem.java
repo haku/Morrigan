@@ -38,6 +38,7 @@ public class MediaItem implements IMediaItem, IDbItem {
 	public boolean setFilepath (String filePath) {
 		if (!EqualHelper.areEqual(this.filepath, filePath)) {
 			this.filepath = filePath;
+			updateTitle();
 			return true;
 		}
 		return false;
@@ -146,14 +147,21 @@ public class MediaItem implements IMediaItem, IDbItem {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Secondary attributes.
 	
-	@Override
-	public String getTitle () {
+	private String title = null;
+	
+	private void updateTitle () {
 		int x = this.filepath.lastIndexOf(File.separator);
 		if (x>0) {
-			return this.filepath.substring(x+1);
+			this.title = this.filepath.substring(x+1);
 		}
-		
-		return this.filepath;
+		else {
+			this.title = this.filepath;
+		}
+	}
+	
+	@Override
+	public String getTitle () {
+		return this.title;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
