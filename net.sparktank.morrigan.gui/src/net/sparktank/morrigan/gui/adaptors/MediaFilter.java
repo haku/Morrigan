@@ -5,7 +5,7 @@ import net.sparktank.morrigan.model.media.impl.MediaItem;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 
-public class MediaFilter<T, S> extends ViewerFilter {
+public class MediaFilter extends ViewerFilter {
 	
 	private String searchTerm;
 

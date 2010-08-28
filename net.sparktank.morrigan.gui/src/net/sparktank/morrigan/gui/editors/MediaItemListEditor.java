@@ -70,7 +70,7 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 	Composite editTableComposite = null;
 	TableColumnLayout editTableCompositeTableColumnLayout = null;
 	
-	protected MediaFilter<T, S> mediaFilter = null;
+	protected MediaFilter mediaFilter = null;
 	private ImageCache imageCache = new ImageCache();
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -180,7 +180,7 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 		this.editTable.addDoubleClickListener(this.doubleClickListener);
 		this.editTable.setInput(getEditorSite());
 		
-		this.mediaFilter = new MediaFilter<T, S>();
+		this.mediaFilter = new MediaFilter();
 		this.editTable.addFilter(this.mediaFilter);
 		
 		getSite().setSelectionProvider(this.editTable);
