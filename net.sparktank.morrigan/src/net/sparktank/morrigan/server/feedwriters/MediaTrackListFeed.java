@@ -12,12 +12,12 @@ import org.xml.sax.SAXException;
 
 import com.megginson.sax.DataWriter;
 
-public class MediaListFeed<T extends IMediaTrackList<? extends IMediaItem>> extends Feed {
+public class MediaTrackListFeed<T extends IMediaTrackList<? extends IMediaItem>> extends AbstractFeed {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private final T ml;
 
-	public MediaListFeed (T ml) {
+	public MediaTrackListFeed (T ml) {
 		super();
 		if (ml==null) throw new IllegalArgumentException("MediaList paramater can not be null.");
 		this.ml = ml;

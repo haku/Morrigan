@@ -14,10 +14,10 @@ import org.xml.sax.SAXException;
 
 import com.megginson.sax.DataWriter;
 
-public class MediaFeed extends Feed {
+public class MediaExplorerFeed extends AbstractFeed {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public MediaFeed () {
+	public MediaExplorerFeed () {
 		super();
 	}
 

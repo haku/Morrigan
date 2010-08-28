@@ -12,7 +12,7 @@ import org.xml.sax.SAXException;
 
 import com.megginson.sax.DataWriter;
 
-public class LibrarySrcFeed extends Feed {
+public class LibrarySrcFeed extends AbstractFeed {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private LocalMediaLibrary ml;
