@@ -80,6 +80,7 @@ public class JumpToDlg {
 	TableViewer tableViewer = null;
 	Button btnPlay = null;
 	Button btnEnqueue = null;
+	Button btnReveal = null;
 	private Button btnCancel = null;
 	
 	private PlayItem returnValue = null;
@@ -113,6 +114,7 @@ public class JumpToDlg {
 		this.tableViewer =  new TableViewer(this.shell, SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION);
 		this.btnPlay = new Button(this.shell, SWT.PUSH);
 		this.btnEnqueue = new Button(this.shell, SWT.PUSH);
+		this.btnReveal = new Button(this.shell, SWT.PUSH);
 		this.btnCancel = new Button(this.shell, SWT.PUSH);
 		
 		this.shell.setDefaultButton(this.btnPlay);
@@ -151,6 +153,12 @@ public class JumpToDlg {
 		formData.bottom = new FormAttachment(100, -SEP);
 		this.btnEnqueue.setLayoutData(formData);
 		
+		this.btnReveal.setText("Reveal");
+		formData = new FormData();
+		formData.right = new FormAttachment(this.btnEnqueue, -SEP);
+		formData.bottom = new FormAttachment(100, -SEP);
+		this.btnReveal.setLayoutData(formData);
+		
 		this.btnCancel.setText("Cancel");
 		formData = new FormData();
 		formData.left = new FormAttachment(0, SEP);
@@ -169,6 +177,7 @@ public class JumpToDlg {
 		
 		this.btnPlay.addSelectionListener(this.buttonListener);
 		this.btnEnqueue.addSelectionListener(this.buttonListener);
+		this.btnReveal.addSelectionListener(this.buttonListener);
 		this.btnCancel.addSelectionListener(this.buttonListener);
 		
 		this.shell.pack();
@@ -321,13 +330,15 @@ public class JumpToDlg {
 		public void widgetSelected(SelectionEvent e) {
 			if (e.widget == JumpToDlg.this.btnPlay) {
 				leaveDlg(true, 0);
-				
-			} else if (e.widget == JumpToDlg.this.btnEnqueue) {
+			}
+			else if (e.widget == JumpToDlg.this.btnEnqueue) {
 				leaveDlg(true, SWT.CONTROL);
-				
-			} else {
+			}
+			else if (e.widget == JumpToDlg.this.btnReveal) {
+				leaveDlg(true, SWT.CONTROL | SWT.SHIFT);
+			}
+			else {
 				leaveDlg(false, 0);
-				
 			}
 		}
 	};
