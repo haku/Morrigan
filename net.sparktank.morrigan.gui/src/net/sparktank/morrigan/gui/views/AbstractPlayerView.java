@@ -606,31 +606,8 @@ public abstract class AbstractPlayerView extends ViewPart {
 			if (getPlayer().getCurrentItem() != null
 					&& getPlayer().getCurrentItem().list != null
 					&& getPlayer().getCurrentItem().item != null) {
-				
-				try {
-					if (getPlayer().getCurrentItem().list.getType().equals(LocalMediaLibrary.TYPE)) {
-						MediaItemDbEditorInput input = EditorFactory.getMediaLibraryInput(getPlayer().getCurrentItem().list.getListId());
-						getViewSite().getWorkbenchWindow().getActivePage().openEditor(input, LocalLibraryEditor.ID);
-					}
-					else if (getPlayer().getCurrentItem().list.getType().equals(MediaPlaylist.TYPE)) {
-						MediaItemListEditorInput<MediaPlaylist> input = EditorFactory.getMediaPlaylistInput(getPlayer().getCurrentItem().list.getListId());
-						getViewSite().getWorkbenchWindow().getActivePage().openEditor(input, PlaylistEditor.ID);
-					}
-					else if (getPlayer().getCurrentItem().list.getType().equals(LocalMixedMediaDb.TYPE)) {
-						MediaItemDbEditorInput input = EditorFactory.getMmdbInput(getPlayer().getCurrentItem().list.getListId());
-						getViewSite().getWorkbenchWindow().getActivePage().openEditor(input, LocalMixedMediaDbEditor.ID);
-					}
-					
-					IEditorPart activeEditor = getViewSite().getWorkbenchWindow().getActivePage().getActiveEditor();
-					if (activeEditor instanceof MediaItemListEditor<?,?>) {
-						MediaItemListEditor<?,?> mediaListEditor = (MediaItemListEditor<?,?>) activeEditor;
-						mediaListEditor.revealItem(getPlayer().getCurrentItem().item);
-					}
-				}
-				catch (Exception e) {
-					getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));
-				}
-				
+				PlayItem currentItem = getPlayer().getCurrentItem();
+				revealItemInLists(currentItem.list, currentItem.item);
 			}
 		}
 	};
@@ -645,7 +622,10 @@ public abstract class AbstractPlayerView extends ViewPart {
 			JumpToDlg dlg = new JumpToDlg(getViewSite().getShell(), (IMediaTrackDb<?,?,?>) currentList);
 			PlayItem item = dlg.open();
 			if (item != null) {
-				if ((dlg.getKeyMask() & SWT.SHIFT) != 0 || (dlg.getKeyMask() & SWT.CONTROL) != 0) {
+				if ((dlg.getKeyMask() & SWT.SHIFT) != 0 && (dlg.getKeyMask() & SWT.CONTROL) != 0) {
+					revealItemInLists(currentList, item.item);
+				}
+				else if ((dlg.getKeyMask() & SWT.SHIFT) != 0 || (dlg.getKeyMask() & SWT.CONTROL) != 0) {
 					getPlayer().addToQueue(item);
 				} else {
 					getPlayer().loadAndStartPlaying(item);
@@ -653,6 +633,35 @@ public abstract class AbstractPlayerView extends ViewPart {
 			}
 		};
 	};
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Find in list.
+	
+	protected void revealItemInLists (IMediaTrackList<? extends IMediaTrack> list, IMediaTrack item) {
+		try {
+			if (list.getType().equals(LocalMediaLibrary.TYPE)) {
+				MediaItemDbEditorInput input = EditorFactory.getMediaLibraryInput(list.getListId());
+				getViewSite().getWorkbenchWindow().getActivePage().openEditor(input, LocalLibraryEditor.ID);
+			}
+			else if (list.getType().equals(MediaPlaylist.TYPE)) {
+				MediaItemListEditorInput<MediaPlaylist> input = EditorFactory.getMediaPlaylistInput(list.getListId());
+				getViewSite().getWorkbenchWindow().getActivePage().openEditor(input, PlaylistEditor.ID);
+			}
+			else if (list.getType().equals(LocalMixedMediaDb.TYPE)) {
+				MediaItemDbEditorInput input = EditorFactory.getMmdbInput(list.getListId());
+				getViewSite().getWorkbenchWindow().getActivePage().openEditor(input, LocalMixedMediaDbEditor.ID);
+			}
+			
+			IEditorPart activeEditor = getViewSite().getWorkbenchWindow().getActivePage().getActiveEditor();
+			if (activeEditor instanceof MediaItemListEditor<?,?>) {
+				MediaItemListEditor<?,?> mediaListEditor = (MediaItemListEditor<?,?>) activeEditor;
+				mediaListEditor.revealItem(item);
+			}
+		}
+		catch (Exception e) {
+			getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));
+		}
+	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Hotkeys.
