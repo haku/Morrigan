@@ -65,7 +65,7 @@ public class PlayersHandler extends AbstractHandler {
 		response.getWriter().println(sb.toString());
 	}
 	
-	private StringBuilder getPlayers () {
+	static private StringBuilder getPlayers () {
 		StringBuilder sb = new StringBuilder();
 		sb.append("<h2>All players</h2>");
 		
@@ -85,7 +85,7 @@ public class PlayersHandler extends AbstractHandler {
 		return sb;
 	}
 	
-	private StringBuilder getPlayer (int n) {
+	static private StringBuilder getPlayer (int n) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("<h2><a href=\"/player/"+n+"\">Player "+n+"</a></h2>");
 		sb.append("<p style=\"font-size:1.5em;text-align:center;\"><a href=\"/player/"+n+"/playpause\">play / pause</a> | <a href=\"/player/"+n+"/next\">next</a></p>");
@@ -107,7 +107,7 @@ public class PlayersHandler extends AbstractHandler {
 		return sb;
 	}
 	
-	private void doAction (int id, String action, String param) throws MorriganException {
+	static private void doAction (int id, String action, String param) throws MorriganException {
 		System.err.println("[doAction] id=" + id + ", action=" + action + ", param=" + param);
 		Player player = PlayerRegister.getPlayer(id);
 		
@@ -123,7 +123,7 @@ public class PlayersHandler extends AbstractHandler {
 		}
 	}
 	
-	private void doPlay (Player player, String param) throws MorriganException {
+	static private void doPlay (Player player, String param) throws MorriganException {
 		if (LocalMixedMediaDbHelper.isMmdbFile(param)) {
 			String f = LocalMixedMediaDbHelper.getFullPathToMmdb(param);
 			LocalMixedMediaDb mmdb;
