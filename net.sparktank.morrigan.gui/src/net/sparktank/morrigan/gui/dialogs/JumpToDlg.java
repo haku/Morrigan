@@ -5,12 +5,13 @@ import java.awt.Point;
 import java.lang.ref.WeakReference;
 import java.util.List;
 
+import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.gui.preferences.PreferenceHelper;
 import net.sparktank.morrigan.model.media.impl.MediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrackDb;
 import net.sparktank.morrigan.player.PlayItem;
-import net.sparktank.sqlitewrapper.DbException;
+import net.sparktank.morrigan.player.PlayerHelper;
 
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelection;
@@ -495,21 +496,14 @@ public class JumpToDlg {
 	boolean doSearch (String query) {
 		if (query == null || query.length() < 1) return false;
 		
-		String q = query.replace("'", "''");
-		q = q.replace(" ", "*");
-		q = q.replace("\\", "\\\\");
-		q = q.replace("%", "\\%");
-		q = q.replace("_", "\\_");
-		q = q.replace("*", "%");
-		
 		try {
-			List<? extends IMediaTrack> res = this.mediaDb.simpleSearch(q, "\\", MAX_RESULTS);
+			List<? extends IMediaTrack> res = PlayerHelper.runQueryOnList(this.mediaDb, query, MAX_RESULTS);
 			if (res != null && res.size() > 0) {
 				this.searchResults = res;
 				return true;
 			}
-			
-		} catch (DbException e) {
+		}
+		catch (MorriganException e) {
 			e.printStackTrace();
 		}
 		

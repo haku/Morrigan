@@ -13,6 +13,7 @@ import net.sparktank.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import net.sparktank.morrigan.engines.playback.IPlaybackStatusListener;
 import net.sparktank.morrigan.engines.playback.PlaybackException;
 import net.sparktank.morrigan.exceptions.MorriganException;
+import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrackList;
 import net.sparktank.morrigan.player.OrderHelper.PlaybackOrder;
@@ -341,6 +342,11 @@ public class Player {
 	long _currentPosition = -1; // In seconds.
 	int _currentTrackDuration = -1; // In seconds.
 	
+	public void loadAndStartPlaying (MediaExplorerItem item) throws MorriganException {
+		IMediaTrackList<? extends IMediaTrack> list = PlayerHelper.mediaExporerItemToReadTrackDb(item);
+		loadAndStartPlaying(list);
+	}
+	
 	/**
 	 * For UI handlers to call.
 	 */
@@ -362,6 +368,12 @@ public class Player {
 	 */
 	public void loadAndStartPlaying (PlayItem item) {
 		try {
+			if (item.list == null) throw new IllegalArgumentException("PlayItem list can not be null.");
+			
+			if (item.item == null) {
+				item.item = OrderHelper.getNextTrack(item.list, null, this._playbackOrder);
+			}
+			
 			if (!item.item.isPlayable()) throw new IllegalArgumentException("Item is not playable: '"+item.item.getFilepath()+"'.");
 			
 			File file = new File(item.item.getFilepath());
