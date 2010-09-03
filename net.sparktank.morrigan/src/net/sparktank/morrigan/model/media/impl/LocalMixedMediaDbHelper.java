@@ -30,7 +30,13 @@ public class LocalMixedMediaDbHelper {
 	}
 	
 	public static boolean isMmdbFile (String filePath) {
-		return (filePath.toLowerCase().endsWith(Config.MMDB_LOCAL_FILE_EXT));
+		if (filePath.toLowerCase().endsWith(Config.MMDB_LOCAL_FILE_EXT)) {
+			File file = new File(filePath);
+			if (file.exists()) return true;
+			file = new File(Config.getMmdbDir(), filePath);
+			if (file.exists())  return true;
+		}
+		return false;
 	}
 	
 	public static List<MediaExplorerItem> getAllMmdb () {
