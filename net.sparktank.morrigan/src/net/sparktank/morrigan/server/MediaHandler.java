@@ -15,17 +15,15 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.ErrorHelper;
+import net.sparktank.morrigan.model.media.HeadlessHelper;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDbHelper;
-import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDbUpdateTask;
-import net.sparktank.morrigan.model.tasks.TaskEventListener;
 import net.sparktank.morrigan.model.tracks.library.local.LocalLibraryHelper;
-import net.sparktank.morrigan.model.tracks.library.local.LocalLibraryUpdateTask;
 import net.sparktank.morrigan.model.tracks.library.local.LocalMediaLibrary;
 import net.sparktank.morrigan.model.tracks.playlist.MediaPlaylist;
 import net.sparktank.morrigan.model.tracks.playlist.PlaylistHelper;
-import net.sparktank.morrigan.server.feedwriters.MediaItemDbSrcFeed;
 import net.sparktank.morrigan.server.feedwriters.MediaExplorerFeed;
+import net.sparktank.morrigan.server.feedwriters.MediaItemDbSrcFeed;
 import net.sparktank.morrigan.server.feedwriters.MediaTrackListFeed;
 import net.sparktank.morrigan.server.feedwriters.MixedMediaListFeed;
 import net.sparktank.sqlitewrapper.DbException;
@@ -129,7 +127,7 @@ public class MediaHandler extends AbstractHandler {
 				}
 			}
 			else if (param.equals("scan")) {
-				if (scheduleMmdbScan(mmdb)) {
+				if (HeadlessHelper.scheduleMmdbScan(mmdb)) {
 					out.print("Scan scheduled.");
 				}
 				else {
@@ -188,7 +186,7 @@ public class MediaHandler extends AbstractHandler {
 				}
 			}
 			else if (param.equals("scan")) {
-				if (scheduleLibScan(ml)) {
+				if (HeadlessHelper.scheduleLibScan(ml)) {
 					out.print("Scan scheduled.");
 				}
 				else {
@@ -252,106 +250,6 @@ public class MediaHandler extends AbstractHandler {
 		} finally {
 			if (fileInputStream != null) fileInputStream.close();
 			if (outputStream != null) outputStream.close();
-		}
-		
-	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	private boolean scheduleMmdbScan (final LocalMixedMediaDb mmdb) {
-		final LocalMixedMediaDbUpdateTask task = LocalMixedMediaDbUpdateTask.FACTORY.manufacture(mmdb);
-		if (task != null) {
-			Thread t = new Thread () {
-				@Override
-				public void run() {
-					task.run(new DbScanMon(mmdb.getListName()));
-				}
-			};
-			t.start();
-			System.err.println("Scan of " + mmdb.getListId() + " scheduled on thread " + t.getId() + ".");
-			return true;
-			
-		}
-		
-		System.err.println("Failed to get task object from factory method.");
-		return false;
-	}
-	
-	private boolean scheduleLibScan (final LocalMediaLibrary ml) {
-		final LocalLibraryUpdateTask task = LocalLibraryUpdateTask.FACTORY.manufacture(ml);
-		if (task != null) {
-			Thread t = new Thread () {
-				@Override
-				public void run() {
-					task.run(new DbScanMon(ml.getListName()));
-				}
-			};
-			t.start();
-			System.err.println("Scan of " + ml.getListId() + " scheduled on thread " + t.getId() + ".");
-			return true;
-			
-		}
-		
-		System.err.println("Failed to get task object from factory method.");
-		return false;
-	}
-	
-	static class DbScanMon implements TaskEventListener {
-		
-		private final String logPrefix;
-		private int totalWork = 0;
-		private int workDone = 0;
-		private boolean canceled;
-		
-		public DbScanMon (String logPrefix) {
-			this.logPrefix = logPrefix;
-		}
-		
-		@Override
-		public void logMsg(String topic, String s) {
-			StringBuilder sb = new StringBuilder();
-			sb.append("[");
-			sb.append(topic);
-			sb.append("] ");
-			sb.append(s);
-			
-			System.out.println(sb.toString());
-		}
-		
-		@Override
-		public void logError(String topic, String s, Throwable t) {
-			String causeTrace = ErrorHelper.getCauseTrace(t);
-			logMsg(topic, s.concat("\n".concat(causeTrace)));
-		}
-		
-		@Override
-		public void onStart() {/* UNUSED */}
-		
-		@Override
-		public void beginTask(String name, @SuppressWarnings("hiding") int totalWork) {
-			this.totalWork = totalWork;
-			System.out.println("[" + this.logPrefix + "] starting task: " + name + ".");
-		}
-		
-		@Override
-		public void done() {
-			System.out.println("[" + this.logPrefix + "] done.");
-		}
-		
-		@Override
-		public void subTask(String name) {
-			System.out.println("[" + this.logPrefix + "] sub task: "+name+".");
-		}
-		
-		@Override
-		public boolean isCanceled() {
-			return this.canceled;
-		}
-		
-		@Override
-		public void worked(int work) {
-			this.workDone = this.workDone + work;
-			System.out.println("[" + this.logPrefix + "] worked " + this.workDone + " of " + this.totalWork + ".");
 		}
 		
 	}
