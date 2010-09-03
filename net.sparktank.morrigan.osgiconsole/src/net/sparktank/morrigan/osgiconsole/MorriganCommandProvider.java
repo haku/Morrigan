@@ -6,9 +6,14 @@ import java.util.List;
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
+import net.sparktank.morrigan.model.media.HeadlessHelper;
+import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDbHelper;
+import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
+import net.sparktank.morrigan.model.media.interfaces.IMediaTrackList;
 import net.sparktank.morrigan.model.pictures.gallery.LocalGalleryHelper;
 import net.sparktank.morrigan.model.tracks.library.local.LocalLibraryHelper;
+import net.sparktank.morrigan.model.tracks.library.local.LocalMediaLibrary;
 import net.sparktank.morrigan.model.tracks.library.remote.RemoteLibraryHelper;
 import net.sparktank.morrigan.model.tracks.playlist.PlaylistHelper;
 import net.sparktank.morrigan.player.PlayItem;
@@ -28,6 +33,7 @@ public class MorriganCommandProvider implements CommandProvider {
 				"\tmn media\n" +
 				"\tmn media <q1>\n" +
 				"\tmn media <q1> <q2>\n" +
+				"\tmn media scan <q1>\n" +
 				"\tmn players\n" +
 				"\tmn player 0\n" +
 				"\tmn player 0 play\n" +
@@ -96,6 +102,9 @@ public class MorriganCommandProvider implements CommandProvider {
 		if (cmd.equals("list")) {
 			doMediaList();
 		}
+		else if (cmd.equals("scan") || cmd.equals("update")) {
+			doMediaScan(args);
+		}
 		else {
 			String q1 = cmd;
 			String q2 = args.size() >= 1 ? args.get(0) : null;
@@ -128,6 +137,39 @@ public class MorriganCommandProvider implements CommandProvider {
 		items.addAll(PlaylistHelper.getAllPlaylists());
 		for (MediaExplorerItem i : items) {
 			System.out.println(i.type + " " + i.title);
+		}
+	}
+	
+	static private void doMediaScan (List<String> args) {
+		if (args.size() < 1) {
+			System.out.println("No query parameter.");
+		}
+		else {
+			String q1 = args.get(0);
+			List<PlayItem> results = null;
+			try {
+				results = PlayerHelper.queryForPlayableItems(q1, null, 2);
+			}
+			catch (MorriganException e) {
+				e.printStackTrace();
+			}
+			
+			if (results == null || results.size() != 1) {
+				System.out.println("Query '"+q1+"' did not return only one result.");
+			}
+			else {
+				IMediaTrackList<? extends IMediaTrack> list = results.get(0).list;
+				if (list instanceof LocalMixedMediaDb) {
+					HeadlessHelper.scheduleMmdbScan((LocalMixedMediaDb) list);
+				}
+				else if (list instanceof LocalMediaLibrary) {
+					HeadlessHelper.scheduleLibScan((LocalMediaLibrary) list);
+				}
+				else {
+					System.out.println("Unable to schedule scan for item '"+list.getListName()+"'.");
+				}
+			}
+			
 		}
 	}
 	
