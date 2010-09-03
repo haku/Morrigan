@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?pde version="3.5"?>
+
+<product name="morriganserver" uid="net.sparktank.morrigan.server.product" id="net.sparktank.morrigan.server.product" application="org.eclipse.ui.ide.workbench" useFeatures="false" includeLaunchers="true">
+
+   <configIni use="default">
+   </configIni>
+
+   <launcherArgs>
+      <programArgs>-os ${target.os} -ws ${target.ws} -arch ${target.arch} -nl ${target.nl} -consoleLog -console</programArgs>
+      <vmArgs>-Dosgi.requiredJavaVersion=1.5 -XX:MaxPermSize=256m -Xms40m -Xmx512m -Declipse.ignoreApp=true -Dosgi.noShutdown=true</vmArgs>
+      <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
+   </launcherArgs>
+
+   <launcher name="morriganserver">
+      <solaris/>
+      <win useIco="false">
+         <bmp/>
+      </win>
+   </launcher>
+
+   <vm>
+   </vm>
+
+   <plugins>
+      <plugin id="net.sparktank.morrigan"/>
+      <plugin id="net.sparktank.morrigan.osgiconsole"/>
+      <plugin id="net.sparktank.morrigan.server"/>
+      <plugin id="net.sparktank.sqlitewrapper"/>
+      <plugin id="org.eclipse.core.runtime"/>
+      <plugin id="org.eclipse.osgi"/>
+      <plugin id="org.eclipse.swt"/>
+   </plugins>
+
+   <configurations>
+      <plugin id="net.sparktank.morrigan.osgiconsole" autoStart="true" startLevel="0" />
+      <plugin id="net.sparktank.morrigan.server" autoStart="true" startLevel="0" />
+      <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="0" />
+      <plugin id="org.eclipse.osgi" autoStart="true" startLevel="0" />
+   </configurations>
+
+</product>
