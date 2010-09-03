@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine.PlayState;
+import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDbHelper;
 import net.sparktank.morrigan.model.pictures.gallery.LocalGalleryHelper;
@@ -12,6 +13,7 @@ import net.sparktank.morrigan.model.tracks.library.remote.RemoteLibraryHelper;
 import net.sparktank.morrigan.model.tracks.playlist.PlaylistHelper;
 import net.sparktank.morrigan.player.PlayItem;
 import net.sparktank.morrigan.player.Player;
+import net.sparktank.morrigan.player.PlayerHelper;
 import net.sparktank.morrigan.player.PlayerRegister;
 
 import org.eclipse.osgi.framework.console.CommandInterpreter;
@@ -24,13 +26,24 @@ public class MorriganCommandProvider implements CommandProvider {
 	public String getHelp() {
 		return "---Morrigan---\n" +
 				"\tmn media\n" +
+				"\tmn media <q1>\n" +
+				"\tmn media <q1> <q2>\n" +
 				"\tmn players\n" +
 				"\tmn player 0\n" +
 				"\tmn player 0 play\n" +
-				"\tmn player 0 play <item>\n" +
+				"\tmn player 0 play <q1>\n" +
+				"\tmn player 0 play <q1> <q2>\n" +
 				"\tmn player 0 pause\n" +
 				"\tmn player 0 stop\n" +
-				"\tmn player 0 next\n";
+				"\tmn player 0 next\n" +
+				"\tmn play\n" +
+				"\tmn play <q1>\n" +
+				"\tmn play <q1> <q2>\n" +
+				"\tmn pause\n" +
+				"\tmn stop\n" +
+				"\tmn next\n" +
+				"\tNOTE 1: <q1> = list, <q2> = item in <q1>.\n" +
+				"\tNOTE 2: Only omit player ID when there is only one player.\n";
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -53,6 +66,18 @@ public class MorriganCommandProvider implements CommandProvider {
 		else if (cmd.equals("players") || cmd.equals("player")) {
 			doPlayers(args);
 		}
+		else if (cmd.equals("play")) {
+			doPlay(args);
+		}
+		else if (cmd.equals("pause")) {
+			doPause(args);
+		}
+		else if (cmd.equals("stop")) {
+			doStop(args);
+		}
+		else if (cmd.equals("next")) {
+			doNext(args);
+		}
 		else {
 			System.out.println("Unknown command '"+cmd+"'.");
 		}
@@ -72,7 +97,25 @@ public class MorriganCommandProvider implements CommandProvider {
 			doMediaList();
 		}
 		else {
-			System.out.println("Unknown command '"+cmd+"'.");
+			String q1 = cmd;
+			String q2 = args.size() >= 1 ? args.get(0) : null;
+			
+			List<PlayItem> results = null;
+			try {
+				results = PlayerHelper.queryForPlayableItems(q1, q2, 10);
+			} catch (MorriganException e) {
+				e.printStackTrace();
+			}
+			
+			if (results == null || results.size() < 1) {
+				System.out.println("No results for query '"+q1+"' '"+q2+"'.");
+			}
+			else {
+				System.out.println("Results for query:");
+				for (PlayItem pi : results) {
+					System.out.println(" > " + pi.toString());
+				}
+			}
 		}
 	}
 	
@@ -117,9 +160,10 @@ public class MorriganCommandProvider implements CommandProvider {
 	
 	static private void doPlayersList() {
 		List<Player> players = PlayerRegister.getPlayers();
+		System.out.println("id\tplayer");
 		for (Player p : players) {
 			System.out.print(p.getId());
-			System.out.print(" ");
+			System.out.print("\t");
 			System.out.print(p.getPlayState());
 			
 			PlayItem currentItem = p.getCurrentItem();
@@ -193,9 +237,29 @@ public class MorriganCommandProvider implements CommandProvider {
 			}
 		}
 		else {
-			// TODO
-			String cmd = args.get(0);
-			System.out.println("TODO: find and start playing '"+cmd+"'.");
+			String q1 = args.get(0);
+			String q2 = args.size() >= 2 ? args.get(1) : null;
+			
+			List<PlayItem> results = null;
+			try {
+				results = PlayerHelper.queryForPlayableItems(q1, q2, 10);
+			} catch (MorriganException e) {
+				e.printStackTrace();
+			}
+			
+			if (results == null || results.size() < 1) {
+				System.out.println("No results for query '"+q1+"' '"+q2+"'.");
+			}
+			else if (results.size() == 1) {
+				player.loadAndStartPlaying(results.get(0));
+			}
+			else {
+				System.out.println("Multipe results for query:");
+				for (PlayItem pi : results) {
+					System.out.println(" > " + pi.toString());
+				}
+			}
+			
 		}
 	}
 	
@@ -217,6 +281,50 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 		else {
 			System.out.println("Player " + player.getId() + ": " + currentItem.item.getTitle());
+		}
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Top-level shortcuts.
+//	TODO reduce code duplication?
+	
+	static private void doPlay (List<String> args) {
+		if (PlayerRegister.getPlayers().size() == 1) {
+			Player player = PlayerRegister.getPlayer(0);
+			doPlayersPlayerPlay(player, args);
+		}
+		else {
+			System.out.println("There is not only one player, so you need to specfy the player to use.");
+		}
+	}
+	
+	static private void doPause (List<String> args) {
+		if (PlayerRegister.getPlayers().size() == 1) {
+			Player player = PlayerRegister.getPlayer(0);
+			doPlayersPlayerPause(player);
+		}
+		else {
+			System.out.println("There is not only one player, so you need to specfy the player to use.");
+		}
+	}
+	
+	static private void doStop (List<String> args) {
+		if (PlayerRegister.getPlayers().size() == 1) {
+			Player player = PlayerRegister.getPlayer(0);
+			doPlayersPlayerStop(player);
+		}
+		else {
+			System.out.println("There is not only one player, so you need to specfy the player to use.");
+		}
+	}
+	
+	static private void doNext (List<String> args) {
+		if (PlayerRegister.getPlayers().size() == 1) {
+			Player player = PlayerRegister.getPlayer(0);
+			doPlayersPlayerNext(player);
+		}
+		else {
+			System.out.println("There is not only one player, so you need to specfy the player to use.");
 		}
 	}
 	

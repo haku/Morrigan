@@ -9,16 +9,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.ErrorHelper;
-import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
-import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDbHelper;
-import net.sparktank.morrigan.model.tracks.library.local.LocalLibraryHelper;
-import net.sparktank.morrigan.model.tracks.library.local.LocalMediaLibrary;
-import net.sparktank.morrigan.model.tracks.playlist.MediaPlaylist;
-import net.sparktank.morrigan.model.tracks.playlist.PlaylistHelper;
 import net.sparktank.morrigan.player.PlayItem;
 import net.sparktank.morrigan.player.Player;
+import net.sparktank.morrigan.player.PlayerHelper;
 import net.sparktank.morrigan.player.PlayerRegister;
-import net.sparktank.sqlitewrapper.DbException;
 
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
@@ -124,33 +118,13 @@ public class PlayersHandler extends AbstractHandler {
 	}
 	
 	static private void doPlay (Player player, String param) throws MorriganException {
-		if (LocalMixedMediaDbHelper.isMmdbFile(param)) {
-			String f = LocalMixedMediaDbHelper.getFullPathToMmdb(param);
-			LocalMixedMediaDb mmdb;
-			try {
-				mmdb = LocalMixedMediaDb.LOCAL_MMDB_FACTORY.manufacture(f);
-			} catch (DbException e) {
-				throw new MorriganException(e);
-			}
-			mmdb.read();
-			player.loadAndStartPlaying(mmdb);
+		List<PlayItem> results = PlayerHelper.queryForPlayableItems(param, null, 2);
+		if (results.size() == 1) {
+			player.loadAndStartPlaying(results.get(0));
 		}
-		else if (LocalLibraryHelper.isLibFile(param)) {
-			String f = LocalLibraryHelper.getFullPathToLib(param);
-			LocalMediaLibrary ml;
-			try {
-				ml = LocalMediaLibrary.FACTORY.manufacture(f);
-			} catch (DbException e) {
-				throw new MorriganException(e);
-			}
-			ml.read();
-			player.loadAndStartPlaying(ml);
-		}
-		else if (PlaylistHelper.isPlFile(param)) {
-			String f = PlaylistHelper.getFullPathToPlaylist(param);
-			MediaPlaylist ml = MediaPlaylist.FACTORY.manufacture(f);
-			ml.read();
-			player.loadAndStartPlaying(ml);
+		else {
+			// TODO display some form of message???
+			System.err.println("WARNING: Multiple results when trying to play '"+param+"' via servlet.");
 		}
 	}
 	

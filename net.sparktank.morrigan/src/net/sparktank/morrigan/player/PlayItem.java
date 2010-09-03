@@ -5,14 +5,30 @@ import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrackList;
 
 public class PlayItem {
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public IMediaTrackList<? extends IMediaTrack> list;
 	public IMediaTrack item;
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public PlayItem (IMediaTrackList<? extends IMediaTrack> list, IMediaTrack item) {
 		this.list = list;
 		this.item = item;
 	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	@Override
+	public String toString() {
+		if (this.item == null) {
+			return this.list.getListName();
+		}
+		
+		return this.list.getListName() + "/" + this.item.getTitle();
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
 	public boolean equals (Object obj) {
@@ -33,4 +49,5 @@ public class PlayItem {
 	    return hash;
 	}
 	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
