@@ -47,6 +47,7 @@ public class MixedMediaDbFeedParser extends DefaultHandler {
 				RemoteMixedMediaDb transClone = null;
 				try {
 					transClone = mmdb.getTransactionalClone();
+					transClone.setDefaultMediaType(MediaType.UNKNOWN, false);
 					transClone.readFromCache();
 					transClone.beginBulkUpdate();
 			        try {
