@@ -40,6 +40,9 @@ public class MorriganCommandProvider implements CommandProvider {
 				"\tmn player 0 play\n" +
 				"\tmn player 0 play <q1>\n" +
 				"\tmn player 0 play <q1> <q2>\n" +
+				"\tmn player 0 queue\n" +
+				"\tmn player 0 queue <q1>\n" +
+				"\tmn player 0 queue <q1> <q2>\n" +
 				"\tmn player 0 pause\n" +
 				"\tmn player 0 stop\n" +
 				"\tmn player 0 next\n" +
@@ -47,6 +50,9 @@ public class MorriganCommandProvider implements CommandProvider {
 				"\tmn play\n" +
 				"\tmn play <q1>\n" +
 				"\tmn play <q1> <q2>\n" +
+				"\tmn queue\n" +
+				"\tmn queue <q1>\n" +
+				"\tmn queue <q1> <q2>\n" +
 				"\tmn pause\n" +
 				"\tmn stop\n" +
 				"\tmn next\n" +
@@ -68,22 +74,25 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 		
 		String cmd = args.remove(0);
-		if (cmd.equals("media")) {
+		if (cmd.equals("m") || cmd.equals("media")) {
 			doMedia(args);
 		}
-		else if (cmd.equals("players") || cmd.equals("player")) {
+		else if (cmd.equals("p") || cmd.equals("players") || cmd.equals("player")) {
 			doPlayers(args);
 		}
 		else if (cmd.equals("play")) {
 			doPlay(args);
 		}
+		else if (cmd.equals("q") || cmd.equals("queue") || cmd.equals("enqueue")) {
+			doQueue(args);
+		}
 		else if (cmd.equals("pause")) {
 			doPause(args);
 		}
-		else if (cmd.equals("stop")) {
+		else if (cmd.equals("s") || cmd.equals("stop")) {
 			doStop(args);
 		}
-		else if (cmd.equals("next")) {
+		else if (cmd.equals("n") || cmd.equals("next")) {
 			doNext(args);
 		}
 		else {
@@ -104,13 +113,13 @@ public class MorriganCommandProvider implements CommandProvider {
 		if (cmd.equals("list")) {
 			doMediaList();
 		}
-		else if (cmd.equals("scan") || cmd.equals("update")) {
+		else if (cmd.equals("s") || cmd.equals("u") || cmd.equals("scan") || cmd.equals("update")) {
 			doMediaScan(args);
 		}
-		else if (cmd.equals("create")) {
+		else if (cmd.equals("c") || cmd.equals("create")) {
 			doMediaCreate(args);
 		}
-		else if (cmd.equals("add")) {
+		else if (cmd.equals("a") || cmd.equals("add")) {
 			doMediaAdd(args);
 		}
 		else {
@@ -311,19 +320,22 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 		
 		String cmd = args.remove(0);
-		if (cmd.equals("play")) {
-			doPlayersPlayerPlay(player, args);
+		if (cmd.equals("p") || cmd.equals("play")) {
+			doPlayersPlayerPlay(player, args, false);
+		}
+		else if (cmd.equals("q") || cmd.equals("queue") || cmd.equals("enqueue")) {
+			doPlayersPlayerPlay(player, args, true);
 		}
 		else if (cmd.equals("pause")) {
 			doPlayersPlayerPause(player);
 		}
-		else if (cmd.equals("stop")) {
+		else if (cmd.equals("s") || cmd.equals("stop")) {
 			doPlayersPlayerStop(player);
 		}
-		else if (cmd.equals("next")) {
+		else if (cmd.equals("n") || cmd.equals("next")) {
 			doPlayersPlayerNext(player);
 		}
-		else if (cmd.equals("order")) {
+		else if (cmd.equals("o") || cmd.equals("order")) {
 			doPlayersPlayerOrder(player, args);
 		}
 		else {
@@ -348,23 +360,30 @@ public class MorriganCommandProvider implements CommandProvider {
 		IMediaTrackList<? extends IMediaTrack> currentList = player.getCurrentList();
 		String list = currentList != null ? currentList.getListName() : "";
 		System.out.println("\tlist=" + list);
+		
+		System.out.println("\tqueue=" + player.getQueueList().size() + " items.");
 	}
 	
-	static private void doPlayersPlayerPlay (Player player, List<String> args) {
+	static private void doPlayersPlayerPlay (Player player, List<String> args, boolean addToQueue) {
 		if (args.size() < 1) {
-			if (player.getPlayState() == PlayState.Paused) {
-				doPlayersPlayerPause(player);
-			}
-			else if (player.getPlayState() == PlayState.Playing) {
-				System.out.println("Already playing.");
+			if (addToQueue) {
+				doPlayersPlayerPrintQueue(player);
 			}
 			else {
-				PlayItem currentItem = player.getCurrentItem();
-				if (currentItem != null) {
-					player.loadAndStartPlaying(currentItem);
+				if (player.getPlayState() == PlayState.Paused) {
+					doPlayersPlayerPause(player);
+				}
+				else if (player.getPlayState() == PlayState.Playing) {
+					System.out.println("Already playing.");
 				}
 				else {
-					System.out.println("Nothing to play.");
+					PlayItem currentItem = player.getCurrentItem();
+					if (currentItem != null) {
+						player.loadAndStartPlaying(currentItem);
+					}
+					else {
+						System.out.println("Nothing to play.");
+					}
 				}
 			}
 		}
@@ -383,7 +402,13 @@ public class MorriganCommandProvider implements CommandProvider {
 				System.out.println("No results for query '"+q1+"' '"+q2+"'.");
 			}
 			else if (results.size() == 1) {
-				player.loadAndStartPlaying(results.get(0));
+				if (addToQueue) {
+					player.addToQueue(results.get(0));
+					System.out.println("Enqueued '"+results.get(0).toString()+"'.");
+				}
+				else {
+					player.loadAndStartPlaying(results.get(0));
+				}
 			}
 			else {
 				System.out.println("Multipe results for query:");
@@ -433,6 +458,20 @@ public class MorriganCommandProvider implements CommandProvider {
 		System.out.println("Unknown playback order '"+arg+"'.");
 	}
 	
+	static private void doPlayersPlayerPrintQueue (Player player) {
+		List<PlayItem> queue = player.getQueueList();
+		
+		if (queue.size() < 1) {
+			System.out.println("Queue for player " + player.getId() + " is empty.");
+			return;
+		}
+		
+		System.out.println("Player " + player.getId() + " has " + queue.size() + " items in its queue.");
+		for (PlayItem pi : queue) {
+			System.out.println(" > " + pi.toString());
+		}
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Top-level shortcuts.
 //	TODO reduce code duplication?
@@ -440,7 +479,17 @@ public class MorriganCommandProvider implements CommandProvider {
 	static private void doPlay (List<String> args) {
 		if (PlayerRegister.getPlayers().size() == 1) {
 			Player player = PlayerRegister.getPlayer(0);
-			doPlayersPlayerPlay(player, args);
+			doPlayersPlayerPlay(player, args, false);
+		}
+		else {
+			System.out.println("There is not only one player, so you need to specfy the player to use.");
+		}
+	}
+	
+	static private void doQueue (List<String> args) {
+		if (PlayerRegister.getPlayers().size() == 1) {
+			Player player = PlayerRegister.getPlayer(0);
+			doPlayersPlayerPlay(player, args, true);
 		}
 		else {
 			System.out.println("There is not only one player, so you need to specfy the player to use.");
