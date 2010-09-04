@@ -52,6 +52,9 @@ public class EditorFactory implements IElementFactory {
 			else if (type.equals(LocalMixedMediaDb.TYPE)) {
 				input = getMmdbInput(memento);
 			}
+			else if (type.equals(RemoteMixedMediaDb.TYPE)) {
+				input = getRemoteMmdbInput(memento);
+			}
 			else {
 				System.err.println("EditorFactory.createElement(): Unknown type: '"+type+"'.");
 				return null;
