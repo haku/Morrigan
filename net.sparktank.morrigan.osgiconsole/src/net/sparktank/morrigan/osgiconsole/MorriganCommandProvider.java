@@ -1,5 +1,6 @@
 package net.sparktank.morrigan.osgiconsole;
 
+import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -28,9 +29,11 @@ public class MorriganCommandProvider implements CommandProvider {
 	public String getHelp() {
 		return "---Morrigan---\n" +
 				"\tmn media\n" +
+				"\tmn media create <dbname>\n" +
+				"\tmn media add <dir> <q1>\n" +
+				"\tmn media scan <q1>\n" +
 				"\tmn media <q1>\n" +
 				"\tmn media <q1> <q2>\n" +
-				"\tmn media scan <q1>\n" +
 				"\tmn players\n" +
 				"\tmn player 0\n" +
 				"\tmn player 0 play\n" +
@@ -102,6 +105,12 @@ public class MorriganCommandProvider implements CommandProvider {
 		else if (cmd.equals("scan") || cmd.equals("update")) {
 			doMediaScan(args);
 		}
+		else if (cmd.equals("create")) {
+			doMediaCreate(args);
+		}
+		else if (cmd.equals("add")) {
+			doMediaAdd(args);
+		}
 		else {
 			String q1 = cmd;
 			String q2 = args.size() >= 1 ? args.get(0) : null;
@@ -111,10 +120,28 @@ public class MorriganCommandProvider implements CommandProvider {
 				results = PlayerHelper.queryForPlayableItems(q1, q2, 10);
 			} catch (MorriganException e) {
 				e.printStackTrace();
+				return;
 			}
 			
 			if (results == null || results.size() < 1) {
 				System.out.println("No results for query '"+q1+"' '"+q2+"'.");
+			}
+			else if (results.size() == 1) {
+				IMediaTrackList<? extends IMediaTrack> list = results.get(0).list;
+				System.out.println("Query match: " + list);
+				if (results.get(0).list instanceof LocalMixedMediaDb) {
+					LocalMixedMediaDb mmdb = (LocalMixedMediaDb) list;
+					List<String> sources;
+					try {
+						sources = mmdb.getSources();
+					} catch (MorriganException e) {
+						e.printStackTrace();
+						return;
+					}
+					for (String s : sources) {
+						System.out.println(" src > " + s);
+					}
+				}
 			}
 			else {
 				System.out.println("Results for query:");
@@ -134,6 +161,69 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 	}
 	
+	static private void doMediaCreate (List<String> args) {
+		if (args.size() >= 1) {
+			String name = args.get(0);
+			try {
+				LocalMixedMediaDb mmdb = LocalMixedMediaDbHelper.createMmdb(name);
+				System.out.println("Created MMDB '"+mmdb.getListName()+"'.");
+			}
+			catch (MorriganException e) {
+				e.printStackTrace();
+			}
+		}
+		else {
+			System.out.println("You must specify a name for the new DB.");
+		}
+	}
+	
+	static private void doMediaAdd (List<String> args) {
+		if (args.size() < 2) {
+			System.out.println("Not enough arguments.");
+			return;
+		}
+		
+		String dirArg = args.get(0);
+		String q1 = args.get(1);
+		
+		File dir = new File(dirArg);
+		if (!dir.exists()) {
+			System.out.println("Directory '"+dir.getAbsolutePath()+"' not found.");
+			return;
+		}
+		
+		List<PlayItem> results = null;
+		try {
+			results = PlayerHelper.queryForPlayableItems(q1, null, 2);
+		}
+		catch (MorriganException e) {
+			e.printStackTrace();
+			return;
+		}
+		
+		if (results == null || results.size() != 1) {
+			System.out.println("Query '"+q1+"' did not return only one result.");
+		}
+		else {
+			IMediaTrackList<? extends IMediaTrack> list = results.get(0).list;
+			if (list instanceof LocalMixedMediaDb) {
+				LocalMixedMediaDb mmdb = (LocalMixedMediaDb) list;
+				try {
+					mmdb.addSource(dir.getAbsolutePath());
+				} catch (MorriganException e) {
+					e.printStackTrace();
+					return;
+				}
+			}
+			else if (list instanceof RemoteMixedMediaDb) {
+				System.out.println("You can not edit the sources for a remote library.");
+			}
+			else {
+				System.out.println("Unable to add to the item type of '"+list.getListName()+"'.");
+			}
+		}
+	}
+	
 	static private void doMediaScan (List<String> args) {
 		if (args.size() < 1) {
 			System.out.println("No query parameter.");
@@ -146,6 +236,7 @@ public class MorriganCommandProvider implements CommandProvider {
 			}
 			catch (MorriganException e) {
 				e.printStackTrace();
+				return;
 			}
 			
 			if (results == null || results.size() != 1) {
@@ -156,14 +247,13 @@ public class MorriganCommandProvider implements CommandProvider {
 				if (list instanceof LocalMixedMediaDb) {
 					HeadlessHelper.scheduleMmdbScan((LocalMixedMediaDb) list);
 				}
-				if (list instanceof RemoteMixedMediaDb) {
-					System.out.println("TODO: schedule remote library update."); // TODO
+				else if (list instanceof RemoteMixedMediaDb) {
+					HeadlessHelper.scheduleRemoteMmdbScan((RemoteMixedMediaDb) list);
 				}
 				else {
 					System.out.println("Unable to schedule scan for item '"+list.getListName()+"'.");
 				}
 			}
-			
 		}
 	}
 	
