@@ -66,9 +66,11 @@ public class FileLblProv extends StyledCellLabelProvider {
 			if (mi.isMissing()) {
 				cell.setImage(null); // TODO find icon for missing?
 			} else if (!mi.isEnabled()) {
-				cell.setImage(null); // TODO find icon for disabled?
+				cell.setImage(this.imageCache.readImage("icons/noentry-red.png"));
+			} else if (mi.getHashcode() == 0) {
+				cell.setImage(this.imageCache.readImage("icons/exclamation-red.png"));
 			} else {
-				cell.setImage(this.imageCache.readImage("icons/playlist.gif")); // TODO find icon for items?
+				cell.setImage(this.imageCache.readImage("icons/circledot.png"));
 			}
 			
 		}
