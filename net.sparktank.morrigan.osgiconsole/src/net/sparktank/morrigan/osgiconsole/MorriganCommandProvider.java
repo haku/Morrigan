@@ -14,6 +14,7 @@ import net.sparktank.morrigan.model.media.impl.RemoteMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.RemoteMixedMediaDbHelper;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrackList;
+import net.sparktank.morrigan.player.OrderHelper.PlaybackOrder;
 import net.sparktank.morrigan.player.PlayItem;
 import net.sparktank.morrigan.player.Player;
 import net.sparktank.morrigan.player.PlayerHelper;
@@ -42,6 +43,7 @@ public class MorriganCommandProvider implements CommandProvider {
 				"\tmn player 0 pause\n" +
 				"\tmn player 0 stop\n" +
 				"\tmn player 0 next\n" +
+				"\tmn player 0 order <order>\n" +
 				"\tmn play\n" +
 				"\tmn play <q1>\n" +
 				"\tmn play <q1> <q2>\n" +
@@ -321,6 +323,9 @@ public class MorriganCommandProvider implements CommandProvider {
 		else if (cmd.equals("next")) {
 			doPlayersPlayerNext(player);
 		}
+		else if (cmd.equals("order")) {
+			doPlayersPlayerOrder(player, args);
+		}
 		else {
 			System.out.println("Unknown command '"+cmd+"'.");
 		}
@@ -331,17 +336,18 @@ public class MorriganCommandProvider implements CommandProvider {
 		System.out.print(player.getId());
 		System.out.print(": ");
 		System.out.print(player.getPlayState().toString());
+		System.out.print(" (");
+		System.out.print(player.getPlaybackOrder().toString());
+		System.out.print(")");
 		System.out.println();
 		
 		PlayItem currentItem = player.getCurrentItem();
-		String item;
-		if (currentItem != null && currentItem.item != null) {
-			item = currentItem.item.getTitle();
-		} else {
-			item = "";
-		}
+		String item = (currentItem != null && currentItem.item != null) ? currentItem.item.getTitle() : "";
 		System.out.println("\titem=" + item);
-		System.out.println("\tlist=" + player.getCurrentList());
+		
+		IMediaTrackList<? extends IMediaTrack> currentList = player.getCurrentList();
+		String list = currentList != null ? currentList.getListName() : "";
+		System.out.println("\tlist=" + list);
 	}
 	
 	static private void doPlayersPlayerPlay (Player player, List<String> args) {
@@ -408,6 +414,23 @@ public class MorriganCommandProvider implements CommandProvider {
 		else {
 			System.out.println("Player " + player.getId() + ": " + currentItem.item.getTitle());
 		}
+	}
+	
+	static private void doPlayersPlayerOrder (Player player, List<String> args) {
+		if (args.size() < 1) {
+			System.out.println("Order mode parameter not specifed.");
+			return;
+		}
+		
+		String arg = args.get(0);
+		for (PlaybackOrder po : PlaybackOrder.values()) {
+			if (po.toString().toLowerCase().contains(arg.toLowerCase())) {
+				player.setPlaybackOrder(po);
+				System.out.println("Playback order set to '"+po.toString()+"' for player "+player.getId()+".");
+				return;
+			}
+		}
+		System.out.println("Unknown playback order '"+arg+"'.");
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
