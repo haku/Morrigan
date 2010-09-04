@@ -93,20 +93,14 @@ public class ViewMediaExplorer extends ViewPart {
 				MediaExplorerItem item = (MediaExplorerItem) element;
 				switch (item.type) {
 					
-					case LIBRARY:
-						return ViewMediaExplorer.this.imageCache.readImage("icons/library.gif");
-					
 					case DISPLAY:
 						return ViewMediaExplorer.this.imageCache.readImage("icons/display.gif");
 					
-					case REMOTELIBRARY:
-						return ViewMediaExplorer.this.imageCache.readImage("icons/library-remote.gif");
-					
 					case LOCALMMDB:
-						return ViewMediaExplorer.this.imageCache.readImage("icons/library.gif"); // TODO choose icon.
+						return ViewMediaExplorer.this.imageCache.readImage("icons/db.png");
 					
 					case REMOTEMMDB:
-						return ViewMediaExplorer.this.imageCache.readImage("icons/library-remote.gif"); // TODO choose icon.
+						return ViewMediaExplorer.this.imageCache.readImage("icons/db-remote.png");
 					
 				}
 			}

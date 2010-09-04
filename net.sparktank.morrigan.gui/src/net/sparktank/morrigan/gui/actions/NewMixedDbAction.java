@@ -41,7 +41,7 @@ public class NewMixedDbAction extends Action implements IWorkbenchAction {
 	@Override
 	public org.eclipse.jface.resource.ImageDescriptor getImageDescriptor() {
 		// TODO choose icon.
-		return Activator.getImageDescriptor("icons/library.gif");
+		return Activator.getImageDescriptor("icons/db.png");
 	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -3,7 +3,7 @@ package net.sparktank.morrigan.model.explorer;
 public class MediaExplorerItem extends MenuItem {
 	
 	// TODO refactor LIBRARY to LOCALLIBRARY.
-	public enum ItemType {DISPLAY, LIBRARY, PLAYLIST, REMOTELIBRARY, LOCALGALLERY, LOCALMMDB, REMOTEMMDB}
+	public enum ItemType {DISPLAY, PLAYLIST, LOCALGALLERY, LOCALMMDB, REMOTEMMDB}
 	
 	public ItemType type = null;
 	
