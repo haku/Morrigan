@@ -27,62 +27,38 @@ public class DbColumn implements IDbColumn {
 		this.sortOpts = null;
 	}
 	
-	/* (non-Javadoc)
-	 * @see net.sparktank.morrigan.model.db.IDbColumn#setName(java.lang.String)
-	 */
 	@Override
 	public void setName(String name) {
 		this.name = name;
 	}
-	/* (non-Javadoc)
-	 * @see net.sparktank.morrigan.model.db.IDbColumn#getName()
-	 */
 	@Override
 	public String getName() {
 		return this.name;
 	}
 	
-	/* (non-Javadoc)
-	 * @see net.sparktank.morrigan.model.db.IDbColumn#setDefaultValue(java.lang.String)
-	 */
 	@Override
 	public void setDefaultValue(String defaultValue) {
 		this.defaultValue = defaultValue;
 	}
-	/* (non-Javadoc)
-	 * @see net.sparktank.morrigan.model.db.IDbColumn#getDefaultValue()
-	 */
 	@Override
 	public String getDefaultValue() {
 		return this.defaultValue;
 	}
 	
-	/* (non-Javadoc)
-	 * @see net.sparktank.morrigan.model.db.IDbColumn#setSqlType(java.lang.String)
-	 */
 	@Override
 	public void setSqlType(String sqlType) {
 		this.sqlType = sqlType;
 	}
-	/* (non-Javadoc)
-	 * @see net.sparktank.morrigan.model.db.IDbColumn#getSqlType()
-	 */
 	@Override
 	public String getSqlType() {
 		return this.sqlType;
 	}
 	
-	/* (non-Javadoc)
-	 * @see net.sparktank.morrigan.model.db.IDbColumn#getHumanName()
-	 */
 	@Override
 	public String getHumanName() {
 		return this.humanName;
 	}
 	
-	/* (non-Javadoc)
-	 * @see net.sparktank.morrigan.model.db.IDbColumn#getSortOpts()
-	 */
 	@Override
 	public String getSortOpts() {
 		return this.sortOpts;
