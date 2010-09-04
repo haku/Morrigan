@@ -125,12 +125,12 @@ public class LibrarySqliteLayer2 extends MediaSqliteLayer2<IMediaTrack> {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public static final DbColumn SQL_TBL_MEDIAFILES_COL_STARTCNT =  new DbColumn("lstartcnt", "start count", "INT(6)",   "0");
-	public static final DbColumn SQL_TBL_MEDIAFILES_COL_ENDCNT =    new DbColumn("lendcnt",   "end count",   "INT(6)",   "0");
-	public static final DbColumn SQL_TBL_MEDIAFILES_COL_DLASTPLAY = new DbColumn("dlastplay", "last played", "DATETIME", null);
-	public static final DbColumn SQL_TBL_MEDIAFILES_COL_DURATION =  new DbColumn("lduration", "duration",    "INT(6)",   "-1");
+	public static final IDbColumn SQL_TBL_MEDIAFILES_COL_STARTCNT =  new DbColumn("lstartcnt", "start count", "INT(6)",   "0");
+	public static final IDbColumn SQL_TBL_MEDIAFILES_COL_ENDCNT =    new DbColumn("lendcnt",   "end count",   "INT(6)",   "0");
+	public static final IDbColumn SQL_TBL_MEDIAFILES_COL_DLASTPLAY = new DbColumn("dlastplay", "last played", "DATETIME", null);
+	public static final IDbColumn SQL_TBL_MEDIAFILES_COL_DURATION =  new DbColumn("lduration", "duration",    "INT(6)",   "-1");
 	
-	public static final DbColumn[] SQL_TBL_MEDIAFILES_COLS2 = new DbColumn[] {
+	public static final IDbColumn[] SQL_TBL_MEDIAFILES_COLS2 = new IDbColumn[] {
 		SQL_TBL_MEDIAFILES_COL_STARTCNT,
 		SQL_TBL_MEDIAFILES_COL_ENDCNT,
 		SQL_TBL_MEDIAFILES_COL_DLASTPLAY,
@@ -152,9 +152,9 @@ public class LibrarySqliteLayer2 extends MediaSqliteLayer2<IMediaTrack> {
 	}
 	
 	@Override
-	protected List<DbColumn> generateSqlTblMediaFilesColumns() {
-		List<DbColumn> l = super.generateSqlTblMediaFilesColumns();
-		for (DbColumn c : SQL_TBL_MEDIAFILES_COLS2) {
+	protected List<IDbColumn> generateSqlTblMediaFilesColumns() {
+		List<IDbColumn> l = super.generateSqlTblMediaFilesColumns();
+		for (IDbColumn c : SQL_TBL_MEDIAFILES_COLS2) {
 			l.add(c);
 		}
 		return l;
