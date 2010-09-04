@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 
 import net.sparktank.morrigan.config.Config;
+import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
 import net.sparktank.sqlitewrapper.DbException;
 
@@ -23,9 +24,14 @@ public class LocalMixedMediaDbHelper {
 		return file;
 	}
 	
-	public static LocalMixedMediaDb createMmdb (String name) throws DbException {
+	public static LocalMixedMediaDb createMmdb (String name) throws MorriganException {
 		String file = getFullPathToMmdb(name);
-		LocalMixedMediaDb l = LocalMixedMediaDb.LOCAL_MMDB_FACTORY.manufacture(file);
+		LocalMixedMediaDb l;
+		try {
+			l = LocalMixedMediaDb.LOCAL_MMDB_FACTORY.manufacture(file);
+		} catch (DbException e) {
+			throw new MorriganException(e);
+		}
 		return l;
 	}
 	

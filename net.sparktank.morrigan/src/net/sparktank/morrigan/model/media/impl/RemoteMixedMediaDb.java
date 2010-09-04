@@ -355,13 +355,13 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb<RemoteMixedMediaDb>
 //	Db property modifiers.
 	
 	@Override
-	public void addSource (String source) throws DbException {
-		throw new DbException("Not implemented.");
+	public void addSource (String source) throws MorriganException {
+		throw new NotImplementedException ("Not implemented.");
 	}
 	
 	@Override
-	public void removeSource (String source) throws DbException {
-		throw new DbException("Not implemented.");
+	public void removeSource (String source) throws MorriganException {
+		throw new NotImplementedException("Not implemented.");
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -368,18 +368,30 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 	}
 	
 	@Override
-	public List<String> getSources () throws DbException {
-		return this.dbLayer.getSources();
+	public List<String> getSources () throws MorriganException {
+		try {
+			return this.dbLayer.getSources();
+		} catch (DbException e) {
+			throw new MorriganException(e);
+		}
 	}
 	
 	@Override
-	public void addSource (String source) throws DbException {
-		this.dbLayer.addSource(source);
+	public void addSource (String source) throws MorriganException {
+		try {
+			this.dbLayer.addSource(source);
+		} catch (DbException e) {
+			throw new MorriganException(e);
+		}
 	}
 	
 	@Override
-	public void removeSource (String source) throws DbException {
-		this.dbLayer.removeSource(source);
+	public void removeSource (String source) throws MorriganException {
+		try {
+			this.dbLayer.removeSource(source);
+		} catch (DbException e) {
+			throw new MorriganException(e);
+		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

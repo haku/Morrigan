@@ -8,7 +8,6 @@ import net.sparktank.morrigan.gui.actions.DbUpdateAction;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.editors.mmdb.LocalMixedMediaDbEditor;
 import net.sparktank.morrigan.model.media.impl.MediaItemDb;
-import net.sparktank.sqlitewrapper.DbException;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -143,7 +142,7 @@ public class ViewLibraryProperties extends ViewPart {
 			if (ViewLibraryProperties.this.library!=null) {
 				try {
 					sources = ViewLibraryProperties.this.library.getSources();
-				} catch (DbException e) {
+				} catch (Exception e) {
 					new MorriganMsgDlg(e).open();
 				}
 				
@@ -216,7 +215,7 @@ public class ViewLibraryProperties extends ViewPart {
 				int numSources = -1;
 				try {
 					numSources = ViewLibraryProperties.this.library.getSources().size();
-				} catch (DbException e) {
+				} catch (Exception e) {
 					new MorriganMsgDlg(e).open();
 				}
 				
@@ -269,7 +268,7 @@ public class ViewLibraryProperties extends ViewPart {
 				
 				try {
 					ViewLibraryProperties.this.library.addSource(dir);
-				} catch (DbException e) {
+				} catch (Exception e) {
 					new MorriganMsgDlg(e).open();
 				}
 				ViewLibraryProperties.this.listChange.run();
@@ -306,7 +305,7 @@ public class ViewLibraryProperties extends ViewPart {
 				for (String item : selectedSources) {
 					try {
 						ViewLibraryProperties.this.library.removeSource(item);
-					} catch (DbException e) {
+					} catch (Exception e) {
 						new MorriganMsgDlg(e).open();
 					}
 					ViewLibraryProperties.this.listChange.run();
