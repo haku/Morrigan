@@ -207,6 +207,11 @@ public class Player {
 		callQueueChangedListeners();
 	}
 	
+	public void clearQueue () {
+		this._queue.clear();
+		callQueueChangedListeners();
+	}
+	
 	public void moveInQueue (List<PlayItem> items, boolean moveDown) {
 		synchronized (this._queue) {
 			if (items == null || items.isEmpty()) return;
