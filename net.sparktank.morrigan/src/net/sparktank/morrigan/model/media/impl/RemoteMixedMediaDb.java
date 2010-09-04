@@ -41,7 +41,7 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb<RemoteMixedMediaDb>
 		
 		@Override
 		protected boolean isValidProduct(RemoteMixedMediaDb product) {
-			System.out.println("Found '" + product.getDbPath() + "' in cache.");
+//			System.out.println("Found '" + product.getDbPath() + "' in cache.");
 			return true;
 		}
 		
@@ -54,7 +54,7 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb<RemoteMixedMediaDb>
 		protected RemoteMixedMediaDb makeNewProduct(String material, URL config) throws MorriganException {
 			RemoteMixedMediaDb ret = null;
 			
-			System.out.println("Making object instance '" + material + "'...");
+//			System.out.println("Making object instance '" + material + "'...");
 			if (config != null) {
 				try {
 					ret = new RemoteMixedMediaDb(RemoteMixedMediaDbHelper.getRemoteMmdbTitle(material), config, MixedMediaSqliteLayer.FACTORY.manufacture(material));
