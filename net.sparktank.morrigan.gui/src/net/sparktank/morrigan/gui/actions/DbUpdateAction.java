@@ -7,8 +7,6 @@ import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDbUpdateTask;
 import net.sparktank.morrigan.model.media.impl.MediaItemDb;
 import net.sparktank.morrigan.model.tasks.IMorriganTask;
-import net.sparktank.morrigan.model.tracks.library.local.LocalLibraryUpdateTask;
-import net.sparktank.morrigan.model.tracks.library.local.LocalMediaLibrary;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.widgets.Display;
@@ -65,11 +63,7 @@ public class DbUpdateAction extends Action implements IWorkbenchAction{
 		
 		IMorriganTask task;
 		
-		if (this.itemDb instanceof LocalMediaLibrary) {
-			LocalMediaLibrary lml = (LocalMediaLibrary) this.itemDb;
-			task = LocalLibraryUpdateTask.FACTORY.manufacture(lml);
-		}
-		else if (this.itemDb instanceof LocalMixedMediaDb) {
+		if (this.itemDb instanceof LocalMixedMediaDb) {
 			LocalMixedMediaDb lmmdb = (LocalMixedMediaDb) this.itemDb;
 			task = LocalMixedMediaDbUpdateTask.FACTORY.manufacture(lmmdb);
 		}

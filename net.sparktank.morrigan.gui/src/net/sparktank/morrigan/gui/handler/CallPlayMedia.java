@@ -2,7 +2,6 @@ package net.sparktank.morrigan.gui.handler;
 
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.editors.mmdb.LocalMixedMediaDbEditor;
-import net.sparktank.morrigan.gui.editors.tracks.LocalLibraryEditor;
 import net.sparktank.morrigan.gui.editors.tracks.MediaTrackListEditor;
 import net.sparktank.morrigan.gui.editors.tracks.PlaylistEditor;
 import net.sparktank.morrigan.gui.views.AbstractPlayerView;
@@ -37,14 +36,7 @@ public class CallPlayMedia extends AbstractHandler {
 		IWorkbenchPage page = window.getActivePage();
 		IEditorPart activeEditor = page.getActiveEditor();
 		
-		if (activeEditor instanceof PlaylistEditor || activeEditor instanceof LocalLibraryEditor) {
-			@SuppressWarnings("unchecked")
-			MediaTrackListEditor<IMediaTrackList<IMediaTrack>, IMediaTrack> mediaListEditor = (MediaTrackListEditor<IMediaTrackList<IMediaTrack>, IMediaTrack>) activeEditor;
-			IMediaTrackList<IMediaTrack> mediaList = mediaListEditor.getMediaList();
-			IMediaTrack selectedItem = mediaListEditor.getSelectedItem();
-			playItem(page, mediaList, selectedItem);
-		}
-		else if (activeEditor instanceof LocalMixedMediaDbEditor) {
+		if (activeEditor instanceof LocalMixedMediaDbEditor) {
 			LocalMixedMediaDbEditor lmmdbe = (LocalMixedMediaDbEditor) activeEditor;
 			IMediaTrackList<? extends IMediaTrack> mediaList = lmmdbe.getMediaList();
 			IMixedMediaItem selectedItem = lmmdbe.getSelectedItem();
@@ -57,6 +49,13 @@ public class CallPlayMedia extends AbstractHandler {
 			else {
 				new MorriganMsgDlg("Error: don't know how to play the type '"+selectedItem.getMediaType()+"'.").open();
 			}
+		}
+		else if (activeEditor instanceof PlaylistEditor) {
+			@SuppressWarnings("unchecked")
+			MediaTrackListEditor<IMediaTrackList<IMediaTrack>, IMediaTrack> mediaListEditor = (MediaTrackListEditor<IMediaTrackList<IMediaTrack>, IMediaTrack>) activeEditor;
+			IMediaTrackList<IMediaTrack> mediaList = mediaListEditor.getMediaList();
+			IMediaTrack selectedItem = mediaListEditor.getSelectedItem();
+			playItem(page, mediaList, selectedItem);
 		}
 		else {
 			new MorriganMsgDlg("Error: invalid active editor.").open();

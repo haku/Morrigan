@@ -9,8 +9,6 @@ import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDbHelper;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrackDb;
-import net.sparktank.morrigan.model.tracks.library.local.LocalLibraryHelper;
-import net.sparktank.morrigan.model.tracks.library.local.LocalMediaLibrary;
 import net.sparktank.sqlitewrapper.DbException;
 
 public class PlayerHelper {
@@ -25,7 +23,6 @@ public class PlayerHelper {
 		List<MediaExplorerItem> items = new LinkedList<MediaExplorerItem>();
 		List<MediaExplorerItem> matches = new LinkedList<MediaExplorerItem>();
 		items.addAll(LocalMixedMediaDbHelper.getAllMmdb());
-		items.addAll(LocalLibraryHelper.getAllLibraries());
 		for (MediaExplorerItem i : items) {
 			if (i.title.contains(query1) || query1.contains(i.title) ) {
 				matches.add(i);
@@ -73,16 +70,6 @@ public class PlayerHelper {
 			}
 			mmdb.read();
 			ret = mmdb;
-		}
-		else if (item.type == MediaExplorerItem.ItemType.LIBRARY) {
-			LocalMediaLibrary ml;
-			try {
-				ml = LocalMediaLibrary.FACTORY.manufacture(item.identifier);
-			} catch (DbException e) {
-				throw new MorriganException(e);
-			}
-			ml.read();
-			ret = ml;
 		}
 		else {
 			throw new MorriganException("TODO: show " + item.identifier);

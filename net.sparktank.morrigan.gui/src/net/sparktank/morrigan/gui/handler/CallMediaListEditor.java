@@ -5,9 +5,7 @@ import net.sparktank.morrigan.gui.editors.EditorFactory;
 import net.sparktank.morrigan.gui.editors.MediaItemListEditorInput;
 import net.sparktank.morrigan.gui.editors.mmdb.LocalMixedMediaDbEditor;
 import net.sparktank.morrigan.gui.editors.mmdb.RemoteMixedMediaDbEditor;
-import net.sparktank.morrigan.gui.editors.tracks.LocalLibraryEditor;
 import net.sparktank.morrigan.gui.editors.tracks.PlaylistEditor;
-import net.sparktank.morrigan.gui.editors.tracks.RemoteLibraryEditor;
 import net.sparktank.morrigan.gui.views.ViewMediaExplorer;
 import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
 
@@ -57,26 +55,8 @@ public class CallMediaListEditor extends AbstractHandler {
 						new MorriganMsgDlg(e).open();
 						return null;
 					}
-					
-				} else if (item.type == MediaExplorerItem.ItemType.LIBRARY) {
-					try {
-						input = EditorFactory.getMediaLibraryInput(item.identifier);
-						editorId = LocalLibraryEditor.ID;
-					} catch (Exception e) {
-						new MorriganMsgDlg(e).open();
-						return null;
-					}
-					
-				} else if (item.type == MediaExplorerItem.ItemType.REMOTELIBRARY) {
-					try {
-						input = EditorFactory.getRemoteMediaLibraryInput(item.identifier);
-						editorId = RemoteLibraryEditor.ID;
-					} catch (Exception e) {
-						new MorriganMsgDlg(e).open();
-						return null;
-					}
-					
-				} else if (item.type == MediaExplorerItem.ItemType.LOCALMMDB) {
+				}
+				else if (item.type == MediaExplorerItem.ItemType.LOCALMMDB) {
 					try {
 						input = EditorFactory.getMmdbInput(item.identifier);
 						editorId = LocalMixedMediaDbEditor.ID;
@@ -84,8 +64,8 @@ public class CallMediaListEditor extends AbstractHandler {
 						new MorriganMsgDlg(e).open();
 						return null;
 					}
-					
-				} else if (item.type == MediaExplorerItem.ItemType.REMOTEMMDB) {
+				}
+				else if (item.type == MediaExplorerItem.ItemType.REMOTEMMDB) {
 					try {
 						input = EditorFactory.getRemoteMmdbInput(item.identifier);
 						editorId = RemoteMixedMediaDbEditor.ID;
@@ -93,16 +73,16 @@ public class CallMediaListEditor extends AbstractHandler {
 						new MorriganMsgDlg(e).open();
 						return null;
 					}
-					
-				} else {
+				}
+				else {
 					new MorriganMsgDlg("TODO: show " + item.identifier).open();
 					return null;
 				}
 				
 				try {
 					page.openEditor(input, editorId);
-					
-				} catch (Exception e) {
+				}
+				catch (Exception e) {
 					new MorriganMsgDlg(e).open();
 					return null;
 				}

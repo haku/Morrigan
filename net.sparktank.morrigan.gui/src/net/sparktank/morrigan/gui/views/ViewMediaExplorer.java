@@ -10,8 +10,6 @@ import net.sparktank.morrigan.gui.helpers.ImageCache;
 import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDbHelper;
 import net.sparktank.morrigan.model.media.impl.RemoteMixedMediaDbHelper;
-import net.sparktank.morrigan.model.tracks.library.local.LocalLibraryHelper;
-import net.sparktank.morrigan.model.tracks.library.remote.RemoteLibraryHelper;
 
 import org.eclipse.core.commands.common.CommandException;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -149,8 +147,6 @@ public class ViewMediaExplorer extends ViewPart {
 		this.items.clear();
 		this.items.addAll(LocalMixedMediaDbHelper.getAllMmdb());
 		this.items.addAll(RemoteMixedMediaDbHelper.getAllRemoteMmdb());
-		this.items.addAll(LocalLibraryHelper.getAllLibraries());
-		this.items.addAll(RemoteLibraryHelper.getAllRemoteLibraries());
 	}
 	
 	ImageCache imageCache = new ImageCache();

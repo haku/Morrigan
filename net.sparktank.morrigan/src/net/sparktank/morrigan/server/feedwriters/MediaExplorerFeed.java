@@ -6,8 +6,6 @@ import java.util.List;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDbHelper;
-import net.sparktank.morrigan.model.tracks.library.local.LocalLibraryHelper;
-import net.sparktank.morrigan.model.tracks.playlist.PlaylistHelper;
 import net.sparktank.morrigan.player.Player;
 import net.sparktank.morrigan.player.PlayerRegister;
 
@@ -41,16 +39,6 @@ public class MediaExplorerFeed extends AbstractFeed {
 				case 0:
 					type="mmdb";
 					items.addAll(LocalMixedMediaDbHelper.getAllMmdb());
-					break;
-					
-				case 1:
-					type="library";
-					items.addAll(LocalLibraryHelper.getAllLibraries());
-					break;
-				
-				case 2:
-					type="playlist";
-					items.addAll(PlaylistHelper.getAllPlaylists());
 					break;
 				
 			}

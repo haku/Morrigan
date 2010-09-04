@@ -3,8 +3,6 @@ package net.sparktank.morrigan.gui.editors;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.RemoteMixedMediaDb;
-import net.sparktank.morrigan.model.tracks.library.local.LocalMediaLibrary;
-import net.sparktank.morrigan.model.tracks.library.remote.RemoteMediaLibrary;
 import net.sparktank.morrigan.model.tracks.playlist.MediaPlaylist;
 import net.sparktank.sqlitewrapper.DbException;
 
@@ -35,21 +33,15 @@ public class EditorFactory implements IElementFactory {
 		String type = memento.getString(KEY_TYPE);
 		
 		try {
-			if (type.equals(LocalMediaLibrary.TYPE)) {
-				input = getMediaLibraryInput(memento);
-			}
-			else if (type.equals(MediaPlaylist.TYPE)) {
-				String serial = memento.getString(KEY_SERIAL);
-				input = getMediaPlaylistInput(serial);
-			}
-			else if (type.equals(RemoteMediaLibrary.TYPE)) {
-				input = getRemoteMediaLibraryInput(memento);
-			}
-			else if (type.equals(LocalMixedMediaDb.TYPE)) {
+			if (type.equals(LocalMixedMediaDb.TYPE)) {
 				input = getMmdbInput(memento);
 			}
 			else if (type.equals(RemoteMixedMediaDb.TYPE)) {
 				input = getRemoteMmdbInput(memento);
+			}
+			if (type.equals(MediaPlaylist.TYPE)) {
+				String serial = memento.getString(KEY_SERIAL);
+				input = getMediaPlaylistInput(serial);
 			}
 			else {
 				System.err.println("EditorFactory.createElement(): Unknown type: '"+type+"'.");
@@ -66,43 +58,6 @@ public class EditorFactory implements IElementFactory {
 			input.setTopIndex(i);
 		}
 		
-		return input;
-	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Local libraries.
-	
-	public static MediaItemDbEditorInput getMediaLibraryInput (String dbFilePath) throws MorriganException {
-		LocalMediaLibrary ml;
-		
-		try {
-			ml = LocalMediaLibrary.FACTORY.manufacture(dbFilePath);
-		} catch (DbException e) {
-			throw new MorriganException(e);
-		}
-		
-		MediaItemDbEditorInput input = new MediaItemDbEditorInput(ml);
-		return input;
-	}
-	
-	public static MediaItemDbEditorInput getMediaLibraryInput (IMemento memento) throws MorriganException {
-		String dbFilePath = memento.getString(KEY_SERIAL);
-		MediaItemDbEditorInput input = getMediaLibraryInput(dbFilePath);
-		return input;
-	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Remote libraries.
-	
-	public static MediaItemDbEditorInput getRemoteMediaLibraryInput (IMemento memento) throws MorriganException {
-		String dbFilePath = memento.getString(KEY_SERIAL);
-		MediaItemDbEditorInput input = getRemoteMediaLibraryInput(dbFilePath);
-		return input;
-	}
-	
-	public static MediaItemDbEditorInput getRemoteMediaLibraryInput (String dbFilePath) throws MorriganException {
-		RemoteMediaLibrary ml = RemoteMediaLibrary.FACTORY.manufacture(dbFilePath);
-		MediaItemDbEditorInput input = new MediaItemDbEditorInput(ml);
 		return input;
 	}
 	

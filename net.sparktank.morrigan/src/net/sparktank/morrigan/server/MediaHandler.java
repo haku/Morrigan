@@ -18,8 +18,6 @@ import net.sparktank.morrigan.helpers.ErrorHelper;
 import net.sparktank.morrigan.model.media.HeadlessHelper;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDbHelper;
-import net.sparktank.morrigan.model.tracks.library.local.LocalLibraryHelper;
-import net.sparktank.morrigan.model.tracks.library.local.LocalMediaLibrary;
 import net.sparktank.morrigan.model.tracks.playlist.MediaPlaylist;
 import net.sparktank.morrigan.model.tracks.playlist.PlaylistHelper;
 import net.sparktank.morrigan.server.feedwriters.MediaExplorerFeed;
@@ -60,9 +58,6 @@ public class MediaHandler extends AbstractHandler {
 					if (type.equals("mmdb")) {
 						handleMmdbRequest(response, out, paramMap, split, id);
 					}
-					else if (type.equals("library")) {
-						handleLibraryRequest(response, out, paramMap, split, id);
-					}
 					else if (type.equals("playlist")) {
 						handlePlaylistRequest(out, id);
 					}
@@ -73,14 +68,6 @@ public class MediaHandler extends AbstractHandler {
 						LocalMixedMediaDbHelper.createMmdb(v[0]);
 					} else {
 						out.print("To create a MMDB, POST with param 'name' set.");
-					}
-				}
-				else if (type.equals("newlib")) {
-					if (paramMap.containsKey("name")) {
-						String[] v = (String[]) paramMap.get("name");
-						LocalLibraryHelper.createLib(v[0]);
-					} else {
-						out.print("To create a library, POST with param 'name' set.");
 					}
 				}
 			} 
@@ -149,66 +136,6 @@ public class MediaHandler extends AbstractHandler {
 		}
 	}
 	
-	private void handleLibraryRequest(HttpServletResponse response, PrintWriter out, Map<?, ?> paramMap, String[] split, String id)
-		throws DbException, SAXException, MorriganException, UnsupportedEncodingException, IOException {
-		
-		String f = LocalLibraryHelper.getFullPathToLib(id);
-		LocalMediaLibrary ml = LocalMediaLibrary.FACTORY.manufacture(f);
-		
-		if (split.length > 2) {
-			String param = split[2];
-			if (param.equals("src")) {
-				if (split.length > 3) {
-					String cmd = split[3];
-					if (cmd.equals("add")) {
-						if (paramMap.containsKey("dir")) {
-							String[] v = (String[]) paramMap.get("dir");
-							ml.addSource(v[0]);
-							out.print("Added src '"+v[0]+"'.");
-						}
-						else {
-							out.print("To add a src, POST with param 'dir' set.");
-						}
-					}
-					else if (cmd.equals("remove")) {
-						if (paramMap.containsKey("dir")) {
-							String[] v = (String[]) paramMap.get("dir");
-							ml.removeSource(v[0]);
-							out.print("Removed src '"+v[0]+"'.");
-						}
-						else {
-							out.print("To remove a src, POST with param 'dir' set.");
-						}
-					}
-				}
-				else {
-					new MediaItemDbSrcFeed(ml).process(out);
-				}
-			}
-			else if (param.equals("scan")) {
-				if (HeadlessHelper.scheduleLibScan(ml)) {
-					out.print("Scan scheduled.");
-				}
-				else {
-					out.print("Failed to schedule scan.");
-				}
-			}
-			else {
-				String filename = URLDecoder.decode(param, "UTF-8");
-				File file = new File(filename);
-				if (file.exists()) {
-					System.err.println("About to send file '"+file.getAbsolutePath()+"'.");
-					returnFile(file, response);
-				}
-			}
-		}
-		else {
-			MediaTrackListFeed<LocalMediaLibrary> libraryFeed = new MediaTrackListFeed<LocalMediaLibrary>(ml);
-			libraryFeed.process(out);
-		}
-	}
-	
-
 	private void handlePlaylistRequest(PrintWriter out, String id) throws MorriganException, SAXException {
 		String f = PlaylistHelper.getFullPathToPlaylist(id);
 		MediaPlaylist ml = MediaPlaylist.FACTORY.manufacture(f);
