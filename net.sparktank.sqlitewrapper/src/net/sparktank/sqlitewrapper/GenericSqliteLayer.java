@@ -63,7 +63,7 @@ public abstract class GenericSqliteLayer implements IGenericDbLayer {
 			this.dbConnection = DriverManager.getConnection(url);
 			
 			this.dbConnection.setAutoCommit(this.autoCommit);
-			System.err.println("AutoCommit=" + this.dbConnection.getAutoCommit() + " for '"+getDbFilePath()+"'.");
+//			System.err.println("AutoCommit=" + this.dbConnection.getAutoCommit() + " for '"+getDbFilePath()+"'.");
 		}
 		return this.dbConnection;
 	}

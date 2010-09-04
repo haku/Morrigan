@@ -95,14 +95,14 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 			if (changed) {
 				this.dirtyState = state;
 				
-				System.err.println("[t" + Thread.currentThread().getId() + "] " + getListName() + ": calling dirtyChangeEvents.");
+//				System.err.println("[t" + Thread.currentThread().getId() + "] " + getListName() + ": calling dirtyChangeEvents.");
 				for (Runnable r : this.dirtyChangeEvents) {
 					r.run();
 				}
 			}
 		}
 		
-		System.err.println("[t" + Thread.currentThread().getId() + "] " + getListName() + ": calling changeEvents.");
+//		System.err.println("[t" + Thread.currentThread().getId() + "] " + getListName() + ": calling changeEvents.");
 		for (Runnable r : this.changeEvents) {
 			r.run();
 		}

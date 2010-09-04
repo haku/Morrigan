@@ -51,7 +51,7 @@ public class LocalMixedMediaDb extends AbstractMixedMediaDb<LocalMixedMediaDb> {
 	@SuppressWarnings("boxing")
 	@Override
 	public LocalMixedMediaDb getTransactionalClone() throws DbException {
-		System.out.println("Making transactional object instance '" + getDbPath() + "'...");
+//		System.out.println("Making transactional object instance '" + getDbPath() + "'...");
 		return new LocalMixedMediaDb(LocalMixedMediaDbHelper.getMmdbTitle(getDbPath()), MixedMediaSqliteLayer.FACTORY.manufacture(getDbPath(), false, true));
 	}
 	
