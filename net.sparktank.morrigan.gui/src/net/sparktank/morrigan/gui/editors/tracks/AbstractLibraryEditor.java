@@ -12,7 +12,6 @@ import net.sparktank.morrigan.gui.editors.IMediaItemDbEditor;
 import net.sparktank.morrigan.gui.editors.MediaColumn;
 import net.sparktank.morrigan.helpers.TimeHelper;
 import net.sparktank.morrigan.model.MediaSqliteLayer2;
-import net.sparktank.morrigan.model.db.impl.DbColumn;
 import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemDb.SortChangeListener;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemStorageLayer.SortDirection;
@@ -108,7 +107,7 @@ public abstract class AbstractLibraryEditor<T extends AbstractMediaLibrary<T>>
 	protected void createControls(Composite parent) {
 		// Dependencies.
 		
-		List<DbColumn> cols = getMediaList().getDbLayer().getMediaTblColumns();
+		List<IDbColumn> cols = getMediaList().getDbLayer().getMediaTblColumns();
 		
 		for (IDbColumn c : cols) {
 			if (c.getHumanName() != null) {

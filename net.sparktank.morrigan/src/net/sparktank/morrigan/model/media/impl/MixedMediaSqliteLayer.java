@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.List;
 
 import net.sparktank.morrigan.helpers.RecyclingFactory;
-import net.sparktank.morrigan.model.db.impl.DbColumn;
 import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
 import net.sparktank.morrigan.model.db.interfaces.IDbItem;
 import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem;
@@ -52,12 +51,12 @@ public class MixedMediaSqliteLayer extends MixedMediaSqliteLayerImpl implements 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
-	public List<DbColumn> getMediaTblColumns() {
+	public List<IDbColumn> getMediaTblColumns() {
 		return generateSqlTblMediaFilesColumns();
 	}
 	
 	@Override
-	public DbColumn getDefaultSortColumn() {
+	public IDbColumn getDefaultSortColumn() {
 		return SQL_TBL_MEDIAFILES_COL_FILE;
 	}
 	

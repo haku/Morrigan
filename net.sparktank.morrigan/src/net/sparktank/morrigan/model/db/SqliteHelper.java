@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import net.sparktank.morrigan.model.db.impl.DbColumn;
 import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
 import net.sparktank.sqlitewrapper.GenericSqliteLayer.SqlCreateCmd;
 
@@ -20,11 +19,11 @@ import net.sparktank.sqlitewrapper.GenericSqliteLayer.SqlCreateCmd;
 public class SqliteHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	static public SqlCreateCmd generateSql_Create (String tblName, DbColumn[] columns) {
+	static public SqlCreateCmd generateSql_Create (String tblName, IDbColumn[] columns) {
 		return generateSql_Create(tblName, Arrays.asList(columns));
 	}
 	
-	static public SqlCreateCmd generateSql_Create (String tblName, List<DbColumn> columns) {
+	static public SqlCreateCmd generateSql_Create (String tblName, List<IDbColumn> columns) {
 		StringBuilder sbExists = new StringBuilder();
 		StringBuilder sbCreate = new StringBuilder();
 		

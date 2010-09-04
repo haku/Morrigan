@@ -193,15 +193,15 @@ public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqlit
 		"SELECT name FROM sqlite_master WHERE name='tbl_mediafiles';";
 	
 	public static final IDbColumn SQL_TBL_MEDIAFILES_COL_ROWID     = new DbColumn("ROWID", null, null, null);
-	public static final DbColumn SQL_TBL_MEDIAFILES_COL_FILE      = new DbColumn("sfile",     "file path",     "VARCHAR(1000) not null collate nocase primary key", "?", " collate nocase");
-	public static final DbColumn SQL_TBL_MEDIAFILES_COL_HASHCODE  = new DbColumn("lmd5",      "hashcode",      "BIGINT",   null);
-	public static final DbColumn SQL_TBL_MEDIAFILES_COL_DADDED    = new DbColumn("dadded",    "date added",    "DATETIME", "?");
-	public static final DbColumn SQL_TBL_MEDIAFILES_COL_DMODIFIED = new DbColumn("dmodified", "date modified", "DATETIME", "?");
-	public static final DbColumn SQL_TBL_MEDIAFILES_COL_ENABLED   = new DbColumn("benabled",  null,            "INT(1)",   "1");
-	public static final DbColumn SQL_TBL_MEDIAFILES_COL_MISSING   = new DbColumn("bmissing",  null,            "INT(1)",   "0");
-	public static final DbColumn SQL_TBL_MEDIAFILES_COL_REMLOC    = new DbColumn("sremloc",   null,            "VARCHAR(1000) NOT NULL", "''");
+	public static final IDbColumn SQL_TBL_MEDIAFILES_COL_FILE      = new DbColumn("sfile",     "file path",     "VARCHAR(1000) not null collate nocase primary key", "?", " collate nocase");
+	public static final IDbColumn SQL_TBL_MEDIAFILES_COL_HASHCODE  = new DbColumn("lmd5",      "hashcode",      "BIGINT",   null);
+	public static final IDbColumn SQL_TBL_MEDIAFILES_COL_DADDED    = new DbColumn("dadded",    "date added",    "DATETIME", "?");
+	public static final IDbColumn SQL_TBL_MEDIAFILES_COL_DMODIFIED = new DbColumn("dmodified", "date modified", "DATETIME", "?");
+	public static final IDbColumn SQL_TBL_MEDIAFILES_COL_ENABLED   = new DbColumn("benabled",  null,            "INT(1)",   "1");
+	public static final IDbColumn SQL_TBL_MEDIAFILES_COL_MISSING   = new DbColumn("bmissing",  null,            "INT(1)",   "0");
+	public static final IDbColumn SQL_TBL_MEDIAFILES_COL_REMLOC    = new DbColumn("sremloc",   null,            "VARCHAR(1000) NOT NULL", "''");
 	
-	public static final DbColumn[] SQL_TBL_MEDIAFILES_COLS = new DbColumn[] {
+	public static final IDbColumn[] SQL_TBL_MEDIAFILES_COLS = new IDbColumn[] {
 		SQL_TBL_MEDIAFILES_COL_FILE,
 		SQL_TBL_MEDIAFILES_COL_HASHCODE,
 		SQL_TBL_MEDIAFILES_COL_DADDED,
@@ -220,9 +220,9 @@ public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqlit
 		throw new IllegalArgumentException();
 	}
 	
-	protected List<DbColumn> generateSqlTblMediaFilesColumns () {
-		List<DbColumn> l = new LinkedList<DbColumn>();
-		for (DbColumn c : SQL_TBL_MEDIAFILES_COLS) {
+	protected List<IDbColumn> generateSqlTblMediaFilesColumns () {
+		List<IDbColumn> l = new LinkedList<IDbColumn>();
+		for (IDbColumn c : SQL_TBL_MEDIAFILES_COLS) {
 			l.add(c);
 		}
 		return l;
@@ -230,7 +230,7 @@ public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqlit
 	
 	private String getSqlTblMediaFilesCreate () {
 		StringBuilder sb = new StringBuilder();
-		List<DbColumn> ef = getMediaTblColumns();
+		List<IDbColumn> ef = getMediaTblColumns();
 		
 		sb.append("create table tbl_mediafiles(");
 		
@@ -251,15 +251,15 @@ public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqlit
 		return sb.toString();
 	}
 	
-	private List<DbColumn> tblMediaFilesColumns;
+	private List<IDbColumn> tblMediaFilesColumns;
 	
 	@Override
-	public List<DbColumn> getMediaTblColumns () {
+	public List<IDbColumn> getMediaTblColumns () {
 		return this.tblMediaFilesColumns;
 	}
 	
 	@Override
-	public DbColumn getDefaultSortColumn() {
+	public IDbColumn getDefaultSortColumn() {
 		return SQL_TBL_MEDIAFILES_COL_FILE;
 	}
 	
@@ -279,7 +279,7 @@ public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqlit
 		@Override
 		public String generateString() {
 			StringBuilder sb = new StringBuilder();
-    		List<DbColumn> ef = getMediaTblColumns();
+    		List<IDbColumn> ef = getMediaTblColumns();
     		
     		boolean first = true;
     		for (IDbColumn c : ef) {
@@ -335,7 +335,7 @@ public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqlit
 		@Override
 		public String generateString() {
 			StringBuilder sb = new StringBuilder();
-    		List<DbColumn> ef = getMediaTblColumns();
+    		List<IDbColumn> ef = getMediaTblColumns();
     		
     		sb.append("INSERT INTO tbl_mediafiles (");
     		boolean first = true;

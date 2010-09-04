@@ -14,7 +14,6 @@ import net.sparktank.morrigan.gui.editors.MediaColumn;
 import net.sparktank.morrigan.gui.preferences.MediaListPref;
 import net.sparktank.morrigan.helpers.TimeHelper;
 import net.sparktank.morrigan.model.MediaSqliteLayer2;
-import net.sparktank.morrigan.model.db.impl.DbColumn;
 import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
 import net.sparktank.morrigan.model.media.impl.AbstractMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.MixedMediaItem;
@@ -115,7 +114,7 @@ public abstract class AbstractMixedMediaDbEditor<T extends AbstractMixedMediaDb<
 			this.typeFilterActions.add(a);
 		}
 		
-		List<DbColumn> cols = getMediaList().getDbLayer().getMediaTblColumns();
+		List<IDbColumn> cols = getMediaList().getDbLayer().getMediaTblColumns();
 		for (IDbColumn c : cols) {
 			if (c.getHumanName() != null) {
     			SortAction a = new SortAction(c, SortDirection.ASC);
