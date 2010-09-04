@@ -11,11 +11,9 @@ import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDbHelper;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrackList;
-import net.sparktank.morrigan.model.pictures.gallery.LocalGalleryHelper;
 import net.sparktank.morrigan.model.tracks.library.local.LocalLibraryHelper;
 import net.sparktank.morrigan.model.tracks.library.local.LocalMediaLibrary;
 import net.sparktank.morrigan.model.tracks.library.remote.RemoteLibraryHelper;
-import net.sparktank.morrigan.model.tracks.playlist.PlaylistHelper;
 import net.sparktank.morrigan.player.PlayItem;
 import net.sparktank.morrigan.player.Player;
 import net.sparktank.morrigan.player.PlayerHelper;
@@ -132,9 +130,7 @@ public class MorriganCommandProvider implements CommandProvider {
 		List<MediaExplorerItem> items = new LinkedList<MediaExplorerItem>();
 		items.addAll(LocalMixedMediaDbHelper.getAllMmdb());
 		items.addAll(LocalLibraryHelper.getAllLibraries());
-		items.addAll(LocalGalleryHelper.getAllGalleries());
 		items.addAll(RemoteLibraryHelper.getAllRemoteLibraries());
-		items.addAll(PlaylistHelper.getAllPlaylists());
 		for (MediaExplorerItem i : items) {
 			System.out.println(i.type + " " + i.title);
 		}

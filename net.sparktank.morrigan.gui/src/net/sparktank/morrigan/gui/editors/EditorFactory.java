@@ -3,7 +3,6 @@ package net.sparktank.morrigan.gui.editors;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.RemoteMixedMediaDb;
-import net.sparktank.morrigan.model.pictures.gallery.LocalGallery;
 import net.sparktank.morrigan.model.tracks.library.local.LocalMediaLibrary;
 import net.sparktank.morrigan.model.tracks.library.remote.RemoteMediaLibrary;
 import net.sparktank.morrigan.model.tracks.playlist.MediaPlaylist;
@@ -45,9 +44,6 @@ public class EditorFactory implements IElementFactory {
 			}
 			else if (type.equals(RemoteMediaLibrary.TYPE)) {
 				input = getRemoteMediaLibraryInput(memento);
-			}
-			else if (type.equals(LocalGallery.TYPE)) {
-				input = getGalleryInput(memento);
 			}
 			else if (type.equals(LocalMixedMediaDb.TYPE)) {
 				input = getMmdbInput(memento);
@@ -122,28 +118,6 @@ public class EditorFactory implements IElementFactory {
 		}
 		
 		MediaItemListEditorInput<MediaPlaylist> input = new MediaItemListEditorInput<MediaPlaylist>(playList);
-		return input;
-	}
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Local Galleries.
-	
-	public static MediaItemDbEditorInput getGalleryInput(String dbFilePath) throws MorriganException {
-		LocalGallery l;
-		
-		try {
-			l = LocalGallery.FACTORY.manufacture(dbFilePath);
-		} catch (DbException e) {
-			throw new MorriganException(e);
-		}
-		
-		MediaItemDbEditorInput input = new MediaItemDbEditorInput(l);
-		return input;
-	}
-	
-	public static MediaItemDbEditorInput getGalleryInput (IMemento memento) throws MorriganException {
-		String dbFilePath = memento.getString(KEY_SERIAL);
-		MediaItemDbEditorInput input = getGalleryInput(dbFilePath);
 		return input;
 	}
 	
