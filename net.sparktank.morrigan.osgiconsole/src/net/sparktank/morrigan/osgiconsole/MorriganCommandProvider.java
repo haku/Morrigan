@@ -6,6 +6,7 @@ import java.util.List;
 
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import net.sparktank.morrigan.exceptions.MorriganException;
+import net.sparktank.morrigan.helpers.TimeHelper;
 import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
 import net.sparktank.morrigan.model.media.HeadlessHelper;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
@@ -17,6 +18,7 @@ import net.sparktank.morrigan.model.media.interfaces.IMediaTrackList;
 import net.sparktank.morrigan.player.OrderHelper.PlaybackOrder;
 import net.sparktank.morrigan.player.PlayItem;
 import net.sparktank.morrigan.player.Player;
+import net.sparktank.morrigan.player.Player.DurationData;
 import net.sparktank.morrigan.player.PlayerHelper;
 import net.sparktank.morrigan.player.PlayerRegister;
 
@@ -43,6 +45,7 @@ public class MorriganCommandProvider implements CommandProvider {
 				"\tmn player 0 queue\n" +
 				"\tmn player 0 queue <q1>\n" +
 				"\tmn player 0 queue <q1> <q2>\n" +
+				"\tmn player 0 queue clear\n" +
 				"\tmn player 0 pause\n" +
 				"\tmn player 0 stop\n" +
 				"\tmn player 0 next\n" +
@@ -387,6 +390,10 @@ public class MorriganCommandProvider implements CommandProvider {
 				}
 			}
 		}
+		else if (addToQueue && args.size() == 1 && args.get(0).equals("clear")) {
+			player.clearQueue();
+			System.out.println("Queue for player " + player.getId() + " cleared.");
+		}
 		else {
 			String q1 = args.get(0);
 			String q2 = args.size() >= 2 ? args.get(1) : null;
@@ -466,7 +473,10 @@ public class MorriganCommandProvider implements CommandProvider {
 			return;
 		}
 		
-		System.out.println("Player " + player.getId() + " has " + queue.size() + " items in its queue.");
+		DurationData duration = player.getQueueTotalDuration();
+		System.out.println("Player " + player.getId() + " has " + queue.size()
+				+ " items totaling " + (duration.complete ? "" : " more than ") 
+				+ TimeHelper.formatTimeSeconds(duration.duration) + " in its queue.");
 		for (PlayItem pi : queue) {
 			System.out.println(" > " + pi.toString());
 		}
