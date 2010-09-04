@@ -2,10 +2,7 @@ package net.sparktank.morrigan.gui.views;
 
 import java.util.ArrayList;
 
-import net.sparktank.morrigan.gui.actions.NewLibraryAction;
 import net.sparktank.morrigan.gui.actions.NewMixedDbAction;
-import net.sparktank.morrigan.gui.actions.NewPlaylistAction;
-import net.sparktank.morrigan.gui.actions.NewRemoteLibraryAction;
 import net.sparktank.morrigan.gui.actions.NewRemoteMixedDbAction;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.handler.CallMediaListEditor;
@@ -152,9 +149,9 @@ public class ViewMediaExplorer extends ViewPart {
 	};
 	
 	private void addToolbar () {
-		getViewSite().getActionBars().getToolBarManager().add(new NewLibraryAction(getViewSite().getWorkbenchWindow()));
-		getViewSite().getActionBars().getToolBarManager().add(new NewRemoteLibraryAction(getViewSite().getWorkbenchWindow()));
-		getViewSite().getActionBars().getToolBarManager().add(new NewPlaylistAction(getViewSite().getWorkbenchWindow()));
+//		getViewSite().getActionBars().getToolBarManager().add(new NewLibraryAction(getViewSite().getWorkbenchWindow()));
+//		getViewSite().getActionBars().getToolBarManager().add(new NewRemoteLibraryAction(getViewSite().getWorkbenchWindow()));
+//		getViewSite().getActionBars().getToolBarManager().add(new NewPlaylistAction(getViewSite().getWorkbenchWindow()));
 //		getViewSite().getActionBars().getToolBarManager().add(new NewGalleryAction(getViewSite().getWorkbenchWindow()));
 		getViewSite().getActionBars().getToolBarManager().add(new NewMixedDbAction(getViewSite().getWorkbenchWindow()));
 		getViewSite().getActionBars().getToolBarManager().add(new NewRemoteMixedDbAction(getViewSite().getWorkbenchWindow()));
