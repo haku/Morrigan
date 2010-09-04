@@ -104,7 +104,7 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 	 * @throws MorriganException  
 	 */
 	protected void doRead () throws MorriganException, DbException {
-		System.err.println("[?] reading... " + getType() + " " + getListName() + "...");
+//		System.err.println("[?] reading... " + getType() + " " + getListName() + "...");
 		
 		long t0 = System.currentTimeMillis();
 		List<T> allMedia = this.dbLayer.updateListOfAllMedia(getMediaItems(), this.librarySort, this.librarySortDirection, HIDEMISSING);
@@ -114,7 +114,7 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 		setMediaTracks(allMedia);
 		long l1 = System.currentTimeMillis() - t1;
 		
-		System.err.println("[" + l0 + "," + l1 + " ms] " + getType() + " " + getListName());
+//		System.err.println("[" + l0 + "," + l1 + " ms] " + getType() + " " + getListName());
 		this.durationOfLastRead = l0+l1;
 		
 		this.firstRead = false;
