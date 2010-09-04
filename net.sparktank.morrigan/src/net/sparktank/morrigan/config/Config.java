@@ -71,6 +71,7 @@ public class Config {
 	
 	private static final String MMDB_DIR = "/mmdb";
 	public static final String MMDB_LOCAL_FILE_EXT = ".local.db3";
+	public static final String MMDB_REMOTE_FILE_EXT = ".remote.db3";
 	
 	public static File getMmdbDir () {
 		File f = new File(getConfigDir() + MMDB_DIR);
