@@ -6,11 +6,13 @@ import net.sparktank.morrigan.gui.actions.NewLibraryAction;
 import net.sparktank.morrigan.gui.actions.NewMixedDbAction;
 import net.sparktank.morrigan.gui.actions.NewPlaylistAction;
 import net.sparktank.morrigan.gui.actions.NewRemoteLibraryAction;
+import net.sparktank.morrigan.gui.actions.NewRemoteMixedDbAction;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.handler.CallMediaListEditor;
 import net.sparktank.morrigan.gui.helpers.ImageCache;
 import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDbHelper;
+import net.sparktank.morrigan.model.media.impl.RemoteMixedMediaDbHelper;
 import net.sparktank.morrigan.model.pictures.gallery.LocalGalleryHelper;
 import net.sparktank.morrigan.model.tracks.library.local.LocalLibraryHelper;
 import net.sparktank.morrigan.model.tracks.library.remote.RemoteLibraryHelper;
@@ -152,11 +154,13 @@ public class ViewMediaExplorer extends ViewPart {
 		getViewSite().getActionBars().getToolBarManager().add(new NewPlaylistAction(getViewSite().getWorkbenchWindow()));
 //		getViewSite().getActionBars().getToolBarManager().add(new NewGalleryAction(getViewSite().getWorkbenchWindow()));
 		getViewSite().getActionBars().getToolBarManager().add(new NewMixedDbAction(getViewSite().getWorkbenchWindow()));
+		getViewSite().getActionBars().getToolBarManager().add(new NewRemoteMixedDbAction(getViewSite().getWorkbenchWindow()));
 	}
 	
 	private void makeContent () {
 		this.items.clear();
 		this.items.addAll(LocalMixedMediaDbHelper.getAllMmdb());
+		this.items.addAll(RemoteMixedMediaDbHelper.getAllRemoteMmdb());
 		this.items.addAll(LocalLibraryHelper.getAllLibraries());
 		this.items.addAll(LocalGalleryHelper.getAllGalleries());
 		this.items.addAll(RemoteLibraryHelper.getAllRemoteLibraries());

@@ -151,6 +151,14 @@
             name="LocalMixedMediaDbEditor" >
       </editor>
       
+      <editor
+            class="net.sparktank.morrigan.gui.editors.mmdb.RemoteMixedMediaDbEditor"
+            default="false"
+            icon="icons/library-remote.gif"
+            id="net.sparktank.morrigan.gui.editors.RemoteMixedMediaDbEditor"
+            name="RemoteMixedMediaDbEditor" >
+      </editor>
+      
    </extension>
    
    <extension point="org.eclipse.ui.commands">
