@@ -122,7 +122,7 @@
       <editor
             class="net.sparktank.morrigan.gui.editors.mmdb.LocalMixedMediaDbEditor"
             default="false"
-            icon="icons/library.gif"
+            icon="icons/db.png"
             id="net.sparktank.morrigan.gui.editors.LocalMixedMediaDbEditor"
             name="LocalMixedMediaDbEditor" >
       </editor>
@@ -130,7 +130,7 @@
       <editor
             class="net.sparktank.morrigan.gui.editors.mmdb.RemoteMixedMediaDbEditor"
             default="false"
-            icon="icons/library-remote.gif"
+            icon="icons/db-remote.png"
             id="net.sparktank.morrigan.gui.editors.RemoteMixedMediaDbEditor"
             name="RemoteMixedMediaDbEditor" >
       </editor>
