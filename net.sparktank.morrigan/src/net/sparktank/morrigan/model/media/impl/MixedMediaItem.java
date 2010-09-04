@@ -3,6 +3,7 @@ package net.sparktank.morrigan.model.media.impl;
 import java.util.Date;
 
 import net.sparktank.morrigan.helpers.EqualHelper;
+import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaPicture;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
 import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem;
@@ -188,6 +189,43 @@ public class MixedMediaItem extends MediaItem implements IMixedMediaItem {
 			| this.setMediaType(mmi.getMediaType())
 			;
 		return b;
+	}
+	
+	@Override
+	public boolean setFromMediaItem (IMediaItem mi) {
+		boolean ret = super.setFromMediaItem(mi);
+		
+		if (mi instanceof IMixedMediaItem) {
+			IMixedMediaItem mmi = (IMixedMediaItem) mi;
+			
+			boolean b =
+				this.setMediaType(mmi.getMediaType())
+				;
+			
+			ret = b | ret;
+		}
+		
+		if (mi instanceof IMediaTrack) {
+			IMediaTrack mt = (IMediaTrack) mi;
+			
+			boolean b = this.setDuration(mt.getDuration())
+				| this.setStartCount(mt.getStartCount())
+				| this.setEndCount(mt.getEndCount())
+				| this.setDateLastPlayed(mt.getDateLastPlayed());
+			
+			ret = b | ret;
+		}
+		
+		if (mi instanceof IMediaPicture) {
+			IMediaPicture mli = (IMediaPicture) mi;
+			
+			boolean b = this.setWidth(mli.getWidth())
+				| this.setHeight(mli.getHeight());
+			
+			ret = b | ret;
+		}
+		
+		return ret;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
