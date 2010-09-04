@@ -2,6 +2,7 @@ package net.sparktank.morrigan.gui.editors;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
+import net.sparktank.morrigan.model.media.impl.RemoteMixedMediaDb;
 import net.sparktank.morrigan.model.pictures.gallery.LocalGallery;
 import net.sparktank.morrigan.model.tracks.library.local.LocalMediaLibrary;
 import net.sparktank.morrigan.model.tracks.library.remote.RemoteMediaLibrary;
@@ -142,6 +143,7 @@ public class EditorFactory implements IElementFactory {
 		MediaItemDbEditorInput input = getGalleryInput(dbFilePath);
 		return input;
 	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Local MixedMediaDb.
 	
@@ -161,6 +163,21 @@ public class EditorFactory implements IElementFactory {
 	public static MediaItemDbEditorInput getMmdbInput (IMemento memento) throws MorriganException {
 		String dbFilePath = memento.getString(KEY_SERIAL);
 		MediaItemDbEditorInput input = getMmdbInput(dbFilePath);
+		return input;
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Remote MixedMediaDb.
+	
+	public static MediaItemDbEditorInput getRemoteMmdbInput (IMemento memento) throws MorriganException {
+		String dbFilePath = memento.getString(KEY_SERIAL);
+		MediaItemDbEditorInput input = getRemoteMmdbInput(dbFilePath);
+		return input;
+	}
+	
+	public static MediaItemDbEditorInput getRemoteMmdbInput (String dbFilePath) throws MorriganException {
+		RemoteMixedMediaDb ml = RemoteMixedMediaDb.FACTORY.manufacture(dbFilePath);
+		MediaItemDbEditorInput input = new MediaItemDbEditorInput(ml);
 		return input;
 	}
 	
