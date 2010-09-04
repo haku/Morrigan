@@ -118,6 +118,9 @@ public class ViewMediaExplorer extends ViewPart {
 					case LOCALMMDB:
 						return ViewMediaExplorer.this.imageCache.readImage("icons/library.gif"); // TODO choose icon.
 						
+					case REMOTEMMDB:
+						return ViewMediaExplorer.this.imageCache.readImage("icons/library-remote.gif"); // TODO choose icon.
+						
 				}
 			}
 			return null;
