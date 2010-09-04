@@ -172,7 +172,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<Q, ? extends IMed
 		List<String> sources = null;
 		try {
 			sources = this.getItemList().getSources();
-		} catch (DbException e) {
+		} catch (MorriganException e) {
 			taskEventListener.done();
 			return new TaskResult(TaskOutcome.FAILED, "Failed to retrieve list of media sources.", e);
 		}

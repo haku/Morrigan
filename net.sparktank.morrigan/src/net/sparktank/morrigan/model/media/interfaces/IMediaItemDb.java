@@ -26,9 +26,9 @@ public interface IMediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMediaIte
 	public String getDbPath ();
 	public S getDbLayer();
 	
-	public List<String> getSources () throws DbException;
-	public void addSource (String source) throws DbException;
-	public void removeSource (String source) throws DbException;
+	public List<String> getSources () throws MorriganException;
+	public void addSource (String source) throws MorriganException;
+	public void removeSource (String source) throws MorriganException;
 	
 	public List<T> simpleSearch (String term, String esc, int maxResults) throws DbException;
 	public List<T> getAllDbEntries () throws DbException;

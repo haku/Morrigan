@@ -6,7 +6,6 @@ import java.util.List;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.impl.MediaItemDb;
-import net.sparktank.sqlitewrapper.DbException;
 
 import org.xml.sax.SAXException;
 
@@ -43,11 +42,7 @@ public class MediaItemDbSrcFeed extends AbstractFeed {
 		addLink(dw, "/media/" + this.ml.getType() + "/" + listFile + "/src/remove", "remove", "cmd");
 		
 		List<String> src;
-		try {
-			src = this.ml.getSources();
-		} catch (DbException e) {
-			throw new MorriganException(e);
-		}
+		src = this.ml.getSources();
 		
 		for (String s : src) {
 			dw.startElement("entry");

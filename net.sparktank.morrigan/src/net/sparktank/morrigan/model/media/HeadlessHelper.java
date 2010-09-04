@@ -3,6 +3,8 @@ package net.sparktank.morrigan.model.media;
 import net.sparktank.morrigan.helpers.ErrorHelper;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDbUpdateTask;
+import net.sparktank.morrigan.model.media.impl.RemoteMixedMediaDb;
+import net.sparktank.morrigan.model.media.impl.RemoteMixedMediaDbUpdateTask;
 import net.sparktank.morrigan.model.tasks.TaskEventListener;
 
 // TODO move this class somewhere more appropriate ???
@@ -20,6 +22,25 @@ public class HeadlessHelper {
 			};
 			t.start();
 			System.err.println("Scan of " + mmdb.getListId() + " scheduled on thread " + t.getId() + ".");
+			return true;
+			
+		}
+		
+		System.err.println("Failed to get task object from factory method.");
+		return false;
+	}
+	
+	static public boolean scheduleRemoteMmdbScan (final RemoteMixedMediaDb mmdb) {
+		final RemoteMixedMediaDbUpdateTask task = RemoteMixedMediaDbUpdateTask.FACTORY.manufacture(mmdb);
+		if (task != null) {
+			Thread t = new Thread () {
+				@Override
+				public void run() {
+					task.run(new DbScanMon(mmdb.getListName()));
+				}
+			};
+			t.start();
+			System.err.println("Refresh of " + mmdb.getListId() + " scheduled on thread " + t.getId() + ".");
 			return true;
 			
 		}
