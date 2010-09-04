@@ -63,13 +63,13 @@ public class MixedMediaListFeed<T extends IMixedMediaList<? extends IMixedMediaI
 				addElement(dw, "datelastmodified", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateLastModified()));
 			}
 			addElement(dw, "type", mi.getMediaType().getN());
+			addElement(dw, "hash", mi.getHashcode());
 			
 			if (mi.getMediaType() == MediaType.TRACK) {
 				if (mi.isPlayable()) {
 					addLink(dw, "/player/0/play/" + listFile + "/" + file, "play", "cmd"); // FIXME list all players here.
 				}
     			addElement(dw, "duration", mi.getDuration());
-    			addElement(dw, "hash", mi.getHashcode());
     			addElement(dw, "startcount", mi.getStartCount());
     			addElement(dw, "endcount", mi.getEndCount());
     			if (mi.getDateLastPlayed() != null) {
