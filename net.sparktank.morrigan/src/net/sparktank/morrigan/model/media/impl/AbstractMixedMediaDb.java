@@ -24,7 +24,7 @@ public abstract class AbstractMixedMediaDb<H extends AbstractMixedMediaDb<H>>
 		super(libraryName, dbLayer);
 		
 		try {
-			readDefaultMediaTypeToDb();
+			readDefaultMediaTypeFromDb();
 		} catch (DbException e) {
 			e.printStackTrace();
 		}
@@ -41,9 +41,13 @@ public abstract class AbstractMixedMediaDb<H extends AbstractMixedMediaDb<H>>
 //	Default MediaType.
 	
 	public void setDefaultMediaType (MediaType mediaType) throws MorriganException {
+		setDefaultMediaType(mediaType, true);
+	}
+	
+	public void setDefaultMediaType (MediaType mediaType, boolean saveToDb) throws MorriganException {
 		this.getDbLayer().setDefaultMediaType(mediaType);
 		updateRead();
-		saveDefaultMediaTypeToDbInNewThread();
+		if (saveToDb) saveDefaultMediaTypeToDbInNewThread();
 	}
 	
 	public MediaType getDefaultMediaType () {
@@ -69,7 +73,7 @@ public abstract class AbstractMixedMediaDb<H extends AbstractMixedMediaDb<H>>
 		getDbLayer().setProp(KEY_DEFAULTMEDIATYPE, String.valueOf(getDefaultMediaType().getN()));
 	}
 	
-	private void readDefaultMediaTypeToDb () throws DbException {
+	private void readDefaultMediaTypeFromDb () throws DbException {
 		String s = getDbLayer().getProp(KEY_DEFAULTMEDIATYPE);
 		if (s != null) {
     		MediaType mt = MediaType.parseInt(Integer.parseInt(s));
@@ -189,6 +193,9 @@ public abstract class AbstractMixedMediaDb<H extends AbstractMixedMediaDb<H>>
 	@Override
 	public void persistTrackData(IMixedMediaItem item) throws DbException {
 		super.persistTrackData(item);
+		
+		System.err.println(item.getFilepath() + "=" + item.getMediaType());
+		this.getDbLayer().setItemMediaType(item.getFilepath(), item.getMediaType());
 		
 		this.getDbLayer().setTrackStartCnt(item.getFilepath(), item.getStartCount());
 		this.getDbLayer().setTrackEndCnt(item.getFilepath(), item.getEndCount());
