@@ -136,14 +136,6 @@
       </editor>
       
       <editor
-            class="net.sparktank.morrigan.gui.editors.pictures.LocalGalleryEditor"
-            default="false"
-            icon="icons/library.gif"
-            id="net.sparktank.morrigan.gui.editors.LocalGalleryEditor"
-            name="LocalGalleryEditor" >
-      </editor>
-      
-      <editor
             class="net.sparktank.morrigan.gui.editors.mmdb.LocalMixedMediaDbEditor"
             default="false"
             icon="icons/library.gif"

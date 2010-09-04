@@ -10,10 +10,8 @@ import net.sparktank.morrigan.gui.helpers.ImageCache;
 import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDbHelper;
 import net.sparktank.morrigan.model.media.impl.RemoteMixedMediaDbHelper;
-import net.sparktank.morrigan.model.pictures.gallery.LocalGalleryHelper;
 import net.sparktank.morrigan.model.tracks.library.local.LocalLibraryHelper;
 import net.sparktank.morrigan.model.tracks.library.remote.RemoteLibraryHelper;
-import net.sparktank.morrigan.model.tracks.playlist.PlaylistHelper;
 
 import org.eclipse.core.commands.common.CommandException;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -97,27 +95,21 @@ public class ViewMediaExplorer extends ViewPart {
 				MediaExplorerItem item = (MediaExplorerItem) element;
 				switch (item.type) {
 					
-					case PLAYLIST:
-						return ViewMediaExplorer.this.imageCache.readImage("icons/playlist.gif");
-						
 					case LIBRARY:
 						return ViewMediaExplorer.this.imageCache.readImage("icons/library.gif");
-						
+					
 					case DISPLAY:
 						return ViewMediaExplorer.this.imageCache.readImage("icons/display.gif");
 					
 					case REMOTELIBRARY:
 						return ViewMediaExplorer.this.imageCache.readImage("icons/library-remote.gif");
-						
-					case  LOCALGALLERY:
-						return ViewMediaExplorer.this.imageCache.readImage("icons/library.gif"); // TODO choose icon.
-						
+					
 					case LOCALMMDB:
 						return ViewMediaExplorer.this.imageCache.readImage("icons/library.gif"); // TODO choose icon.
-						
+					
 					case REMOTEMMDB:
 						return ViewMediaExplorer.this.imageCache.readImage("icons/library-remote.gif"); // TODO choose icon.
-						
+					
 				}
 			}
 			return null;
@@ -149,10 +141,6 @@ public class ViewMediaExplorer extends ViewPart {
 	};
 	
 	private void addToolbar () {
-//		getViewSite().getActionBars().getToolBarManager().add(new NewLibraryAction(getViewSite().getWorkbenchWindow()));
-//		getViewSite().getActionBars().getToolBarManager().add(new NewRemoteLibraryAction(getViewSite().getWorkbenchWindow()));
-//		getViewSite().getActionBars().getToolBarManager().add(new NewPlaylistAction(getViewSite().getWorkbenchWindow()));
-//		getViewSite().getActionBars().getToolBarManager().add(new NewGalleryAction(getViewSite().getWorkbenchWindow()));
 		getViewSite().getActionBars().getToolBarManager().add(new NewMixedDbAction(getViewSite().getWorkbenchWindow()));
 		getViewSite().getActionBars().getToolBarManager().add(new NewRemoteMixedDbAction(getViewSite().getWorkbenchWindow()));
 	}
@@ -162,9 +150,7 @@ public class ViewMediaExplorer extends ViewPart {
 		this.items.addAll(LocalMixedMediaDbHelper.getAllMmdb());
 		this.items.addAll(RemoteMixedMediaDbHelper.getAllRemoteMmdb());
 		this.items.addAll(LocalLibraryHelper.getAllLibraries());
-		this.items.addAll(LocalGalleryHelper.getAllGalleries());
 		this.items.addAll(RemoteLibraryHelper.getAllRemoteLibraries());
-		this.items.addAll(PlaylistHelper.getAllPlaylists());
 	}
 	
 	ImageCache imageCache = new ImageCache();

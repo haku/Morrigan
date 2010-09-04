@@ -6,8 +6,6 @@ import net.sparktank.morrigan.gui.jobs.TaskJob;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDbUpdateTask;
 import net.sparktank.morrigan.model.media.impl.MediaItemDb;
-import net.sparktank.morrigan.model.pictures.gallery.LocalGallery;
-import net.sparktank.morrigan.model.pictures.gallery.LocalGalleryUpdateTask;
 import net.sparktank.morrigan.model.tasks.IMorriganTask;
 import net.sparktank.morrigan.model.tracks.library.local.LocalLibraryUpdateTask;
 import net.sparktank.morrigan.model.tracks.library.local.LocalMediaLibrary;
@@ -70,10 +68,6 @@ public class DbUpdateAction extends Action implements IWorkbenchAction{
 		if (this.itemDb instanceof LocalMediaLibrary) {
 			LocalMediaLibrary lml = (LocalMediaLibrary) this.itemDb;
 			task = LocalLibraryUpdateTask.FACTORY.manufacture(lml);
-		}
-		else if (this.itemDb instanceof LocalGallery) {
-			LocalGallery lml = (LocalGallery) this.itemDb;
-			task = LocalGalleryUpdateTask.FACTORY.manufacture(lml);
 		}
 		else if (this.itemDb instanceof LocalMixedMediaDb) {
 			LocalMixedMediaDb lmmdb = (LocalMixedMediaDb) this.itemDb;
