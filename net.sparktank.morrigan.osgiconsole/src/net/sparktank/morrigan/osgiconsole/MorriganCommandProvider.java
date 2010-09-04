@@ -9,11 +9,10 @@ import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
 import net.sparktank.morrigan.model.media.HeadlessHelper;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDbHelper;
+import net.sparktank.morrigan.model.media.impl.RemoteMixedMediaDb;
+import net.sparktank.morrigan.model.media.impl.RemoteMixedMediaDbHelper;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrackList;
-import net.sparktank.morrigan.model.tracks.library.local.LocalLibraryHelper;
-import net.sparktank.morrigan.model.tracks.library.local.LocalMediaLibrary;
-import net.sparktank.morrigan.model.tracks.library.remote.RemoteLibraryHelper;
 import net.sparktank.morrigan.player.PlayItem;
 import net.sparktank.morrigan.player.Player;
 import net.sparktank.morrigan.player.PlayerHelper;
@@ -129,8 +128,7 @@ public class MorriganCommandProvider implements CommandProvider {
 	static private void doMediaList () {
 		List<MediaExplorerItem> items = new LinkedList<MediaExplorerItem>();
 		items.addAll(LocalMixedMediaDbHelper.getAllMmdb());
-		items.addAll(LocalLibraryHelper.getAllLibraries());
-		items.addAll(RemoteLibraryHelper.getAllRemoteLibraries());
+		items.addAll(RemoteMixedMediaDbHelper.getAllRemoteMmdb());
 		for (MediaExplorerItem i : items) {
 			System.out.println(i.type + " " + i.title);
 		}
@@ -158,8 +156,8 @@ public class MorriganCommandProvider implements CommandProvider {
 				if (list instanceof LocalMixedMediaDb) {
 					HeadlessHelper.scheduleMmdbScan((LocalMixedMediaDb) list);
 				}
-				else if (list instanceof LocalMediaLibrary) {
-					HeadlessHelper.scheduleLibScan((LocalMediaLibrary) list);
+				if (list instanceof RemoteMixedMediaDb) {
+					System.out.println("TODO: schedule remote library update."); // TODO
 				}
 				else {
 					System.out.println("Unable to schedule scan for item '"+list.getListName()+"'.");

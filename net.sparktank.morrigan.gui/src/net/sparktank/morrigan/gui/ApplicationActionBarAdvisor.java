@@ -1,7 +1,5 @@
 package net.sparktank.morrigan.gui;
 
-import net.sparktank.morrigan.gui.actions.NewLibraryAction;
-import net.sparktank.morrigan.gui.actions.NewPlaylistAction;
 import net.sparktank.morrigan.gui.display.MinToTrayAction;
 import net.sparktank.morrigan.gui.views.ShowViewAction;
 import net.sparktank.morrigan.gui.views.ViewMediaExplorer;
@@ -19,9 +17,9 @@ import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.actions.ActionFactory;
+import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
 import org.eclipse.ui.actions.ContributionItemFactory;
 import org.eclipse.ui.actions.RetargetAction;
-import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
 import org.eclipse.ui.application.ActionBarAdvisor;
 import org.eclipse.ui.application.IActionBarConfigurer;
 
@@ -58,8 +56,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	private IWorkbenchAction showPrefAction;
 	
 	// List actions.
-	private IAction newLibraryAction;
-	private IAction newPlayListAction;
 	private IWorkbenchAction saveAction;
 	private IWorkbenchAction saveAllAction;
 	private RetargetAction addAction;
@@ -90,12 +86,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		 * The corresponding commands keybindings are defined in the plugin.xml file.
 		 * Registering also provides automatic disposal of the actions when the window is closed.
 		 */
-		
-		this.newLibraryAction = new NewLibraryAction(window);
-		register(this.newLibraryAction);
-		
-		this.newPlayListAction = new NewPlaylistAction(window);
-		register(this.newPlayListAction);
 		
 		this.exitAction = ActionFactory.QUIT.create(window);
 		register(this.exitAction);
@@ -160,9 +150,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		
 		MenuManager collectionsMenu = new MenuManager("&Collections", "collections");
 		menuBar.add(collectionsMenu);
-		collectionsMenu.add(this.newLibraryAction);
-		collectionsMenu.add(this.newPlayListAction);
-		collectionsMenu.add(new Separator());
 		collectionsMenu.add(this.saveAction);
 		collectionsMenu.add(this.saveAllAction);
 		collectionsMenu.add(this.addAction);

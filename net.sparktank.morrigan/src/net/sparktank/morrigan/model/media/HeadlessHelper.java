@@ -4,8 +4,6 @@ import net.sparktank.morrigan.helpers.ErrorHelper;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDbUpdateTask;
 import net.sparktank.morrigan.model.tasks.TaskEventListener;
-import net.sparktank.morrigan.model.tracks.library.local.LocalLibraryUpdateTask;
-import net.sparktank.morrigan.model.tracks.library.local.LocalMediaLibrary;
 
 // TODO move this class somewhere more appropriate ???
 public class HeadlessHelper {
@@ -22,25 +20,6 @@ public class HeadlessHelper {
 			};
 			t.start();
 			System.err.println("Scan of " + mmdb.getListId() + " scheduled on thread " + t.getId() + ".");
-			return true;
-			
-		}
-		
-		System.err.println("Failed to get task object from factory method.");
-		return false;
-	}
-	
-	static public boolean scheduleLibScan (final LocalMediaLibrary ml) {
-		final LocalLibraryUpdateTask task = LocalLibraryUpdateTask.FACTORY.manufacture(ml);
-		if (task != null) {
-			Thread t = new Thread () {
-				@Override
-				public void run() {
-					task.run(new DbScanMon(ml.getListName()));
-				}
-			};
-			t.start();
-			System.err.println("Scan of " + ml.getListId() + " scheduled on thread " + t.getId() + ".");
 			return true;
 			
 		}
