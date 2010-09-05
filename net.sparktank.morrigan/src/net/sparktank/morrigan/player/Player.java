@@ -371,7 +371,7 @@ public class Player {
 	/**
 	 * For UI handlers to call.
 	 */
-	public void loadAndStartPlaying (PlayItem item) {
+	public void loadAndStartPlaying (final PlayItem item) {
 		try {
 			if (item.list == null) throw new IllegalArgumentException("PlayItem list can not be null.");
 			
@@ -398,15 +398,30 @@ public class Player {
 				this._currentTrackDuration = engine.getDuration();
 				System.err.println("Started to play '" + item.item.getTitle() + "'...");
 				
-				item.list.incTrackStartCnt(item.item);
-				if (item.item.getDuration() <= 0) {
-					if (this._currentTrackDuration > 0) {
-						item.list.setTrackDuration(item.item, this._currentTrackDuration);
+				// Put DB stuff in DB thread.
+				Thread bgthread = new Thread() {
+					@Override
+					public void run() {
+						try {
+							item.list.incTrackStartCnt(item.item);
+						} catch (Throwable t) {
+							t.printStackTrace();
+						}
 					}
-				}
+				};
+				bgthread.setDaemon(true);
+				bgthread.start();
+				
+				/* This was useful at some point, but leaving it disabled for now.
+				 * Will put it back if it proves needed.
+				 */
+//				if (item.item.getDuration() <= 0 && Player.this._currentTrackDuration > 0) {
+//					item.list.setTrackDuration(item.item, Player.this._currentTrackDuration);
+//				}
+				
 			} // END synchronized.
-			
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			this.eventHandler.asyncThrowable(e);
 		}
 		
@@ -539,17 +554,19 @@ public class Player {
 			if (duration > 0) {
 				PlayItem c = getCurrentItem();
 				if (c != null && c.list != null && c.item != null) {
-					try {
-						System.err.println("duration=" + duration);
-						c.list.setTrackDuration(c.item, duration);
-					} catch (Throwable t) {
-						t.printStackTrace();
+					if (c.item.getDuration() != duration) {
+						try {
+							System.err.println("setting item duration=" + duration);
+							c.list.setTrackDuration(c.item, duration);
+						} catch (Throwable t) {
+							t.printStackTrace();
+						}
 					}
 				}
 			}
 			
 			Player.this.eventHandler.updateStatus();
-		};
+		}
 		
 		@Override
 		public void statusChanged(PlayState state) {
