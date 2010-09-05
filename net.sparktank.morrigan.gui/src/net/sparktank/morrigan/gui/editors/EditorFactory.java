@@ -39,7 +39,7 @@ public class EditorFactory implements IElementFactory {
 			else if (type.equals(RemoteMixedMediaDb.TYPE)) {
 				input = getRemoteMmdbInput(memento);
 			}
-			if (type.equals(MediaPlaylist.TYPE)) {
+			else if (type.equals(MediaPlaylist.TYPE)) {
 				String serial = memento.getString(KEY_SERIAL);
 				input = getMediaPlaylistInput(serial);
 			}
@@ -47,8 +47,8 @@ public class EditorFactory implements IElementFactory {
 				System.err.println("EditorFactory.createElement(): Unknown type: '"+type+"'.");
 				return null;
 			}
-			
-		} catch (MorriganException e) {
+		}
+		catch (MorriganException e) {
 			e.printStackTrace();
 		}
 		
