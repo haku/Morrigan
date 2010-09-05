@@ -6,6 +6,8 @@ import net.sparktank.morrigan.gui.jobs.TaskJob;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDbUpdateTask;
 import net.sparktank.morrigan.model.media.impl.MediaItemDb;
+import net.sparktank.morrigan.model.media.impl.RemoteMixedMediaDb;
+import net.sparktank.morrigan.model.media.impl.RemoteMixedMediaDbUpdateTask;
 import net.sparktank.morrigan.model.tasks.IMorriganTask;
 
 import org.eclipse.jface.action.Action;
@@ -67,8 +69,12 @@ public class DbUpdateAction extends Action implements IWorkbenchAction{
 			LocalMixedMediaDb lmmdb = (LocalMixedMediaDb) this.itemDb;
 			task = LocalMixedMediaDbUpdateTask.FACTORY.manufacture(lmmdb);
 		}
+		else if (this.itemDb instanceof RemoteMixedMediaDb) {
+			RemoteMixedMediaDb rmmdb = (RemoteMixedMediaDb) this.itemDb;
+			task = RemoteMixedMediaDbUpdateTask.FACTORY.manufacture(rmmdb);
+		}
 		else {
-			throw new IllegalArgumentException("TODO: Update has not been implemented for this type of DB.");
+			throw new IllegalArgumentException("TODO: Update has not been implemented for this type of DB '"+this.itemDb.getType()+"'.");
 		}
 		
 		if (task != null) {
