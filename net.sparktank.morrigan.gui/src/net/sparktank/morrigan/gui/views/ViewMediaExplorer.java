@@ -23,6 +23,7 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -121,8 +122,11 @@ public class ViewMediaExplorer extends ViewPart {
 						MediaExplorerItem item = (MediaExplorerItem) selectedObject;
 						
 						if (item.type == ItemType.LOCALMMDB) {
-							mgr.add(new PlayAction(item));
+							mgr.add(new PlayAction(item, false));
+							mgr.add(new PlayAction(item, true));
 						}
+						
+						mgr.add(new Separator());
 						
 						if (item.type == ItemType.LOCALMMDB || item.type == ItemType.REMOTEMMDB) {
 							mgr.add(new MediaExplorerItemUpdateAction(item));
@@ -205,10 +209,12 @@ public class ViewMediaExplorer extends ViewPart {
 	class PlayAction extends Action {
 		
 		private final MediaExplorerItem mediaExplorerItem;
+		private final boolean addToQueue;
 		
-		public PlayAction (MediaExplorerItem mediaExplorerItem) {
-			super("Play " + mediaExplorerItem.title);
+		public PlayAction (MediaExplorerItem mediaExplorerItem, boolean addToQueue) {
+			super((addToQueue ? "Enqueue " : "Play ") + mediaExplorerItem.title);
 			this.mediaExplorerItem = mediaExplorerItem;
+			this.addToQueue = addToQueue;
 		}
 		
 		@Override
@@ -217,7 +223,7 @@ public class ViewMediaExplorer extends ViewPart {
 				if (this.mediaExplorerItem.type == MediaExplorerItem.ItemType.LOCALMMDB) {
 					LocalMixedMediaDb l = LocalMixedMediaDb.LOCAL_MMDB_FACTORY.manufacture(this.mediaExplorerItem.identifier);
 					l.read();
-					CallPlayMedia.playItem(getSite().getWorkbenchWindow().getActivePage(), l);
+					CallPlayMedia.playItem(getSite().getWorkbenchWindow().getActivePage(), l, this.addToQueue);
 				}
 				else if (this.mediaExplorerItem.type == MediaExplorerItem.ItemType.REMOTEMMDB) {
 					new MorriganMsgDlg("TODO: Implement play for RMMDBs.").open();
