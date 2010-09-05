@@ -10,6 +10,7 @@ import net.sparktank.morrigan.gui.display.DropMenuListener;
 import net.sparktank.morrigan.gui.display.MinToTrayAction;
 import net.sparktank.morrigan.gui.display.ScreenPainter;
 import net.sparktank.morrigan.gui.display.ScreenPainter.ScreenType;
+import net.sparktank.morrigan.gui.helpers.RefreshTimer;
 import net.sparktank.morrigan.helpers.TimeHelper;
 import net.sparktank.morrigan.player.OrderHelper.PlaybackOrder;
 
@@ -53,14 +54,15 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		makeIcons();
 		makeControls(parent);
 		
-		getPlayer().addQueueChangeListener(this.queueChangedListener);
+		makeQueueRefresher();
+		getPlayer().addQueueChangeListener(this.queueChangedRrefresher);
 		
 		getEventHandler().updateStatus();
 	}
 	
 	@Override
 	public void dispose() {
-		getPlayer().removeQueueChangeListener(this.queueChangedListener);
+		getPlayer().removeQueueChangeListener(this.queueChangedRrefresher);
 		disposeIcons();
 		super.dispose();
 	}
@@ -431,32 +433,23 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		this.videoParent.getParent().layout();
 	}
 	
-	volatile boolean queueChangedRunnerScheduled = false;
+	Runnable queueChangedRrefresher;
 	
-	private Runnable queueChangedListener = new Runnable() {
-		@Override
-		public void run() {
-			if (!ViewControls.this.queueChangedRunnerScheduled) {
-				ViewControls.this.queueChangedRunnerScheduled = true;
-				getSite().getShell().getDisplay().asyncExec(ViewControls.this.queueChangedRunner);
+	private void makeQueueRefresher () {
+		this.queueChangedRrefresher = new RefreshTimer(getSite().getShell().getDisplay(), 5000, new Runnable() {
+			@Override
+			public void run() {
+				int size = getPlayer().getQueueList().size();
+				if (size > 0) {
+					ViewControls.this.btnQueue.setText("(" + size + ")");
+					
+				} else {
+					ViewControls.this.btnQueue.setText("");
+				}
+				ViewControls.this.btnQueue.getParent().layout();
 			}
-		}
-	};
-	
-	protected Runnable queueChangedRunner = new Runnable() {
-		@Override
-		public void run() {
-			ViewControls.this.queueChangedRunnerScheduled = false;
-			int size = getPlayer().getQueueList().size();
-			if (size > 0) {
-				ViewControls.this.btnQueue.setText("(" + size + ")");
-				
-			} else {
-				ViewControls.this.btnQueue.setText("");
-			}
-			ViewControls.this.btnQueue.getParent().layout();
-		}
-	};
+		});
+	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Display view.

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sparktank.morrigan.gui.Activator;
+import net.sparktank.morrigan.gui.helpers.RefreshTimer;
 import net.sparktank.morrigan.helpers.TimeHelper;
 import net.sparktank.morrigan.player.PlayItem;
 import net.sparktank.morrigan.player.Player.DurationData;
@@ -37,14 +38,15 @@ public class ViewQueue extends ViewPart {
 	
 	@Override
 	public void createPartControl(Composite parent) {
+		makeQueueChangedRrefresher();
 		createLayout(parent);
 		
 		IViewPart findView = getSite().getPage().findView(ViewControls.ID); // FIXME can i find AbstractPlayerView?
 		if (findView != null && findView instanceof AbstractPlayerView) {
 			this.abstractPlayerView = (AbstractPlayerView) findView;
 			setContent(this.abstractPlayerView.getPlayer().getQueueList());
-			this.abstractPlayerView.getPlayer().addQueueChangeListener(this.queueChangedListener);
-			this.queueChangedListener.run();
+			this.abstractPlayerView.getPlayer().addQueueChangeListener(this.queueChangedRrefresher);
+			this.queueChangedRrefresher.run();
 		}
 	}
 	
@@ -58,7 +60,7 @@ public class ViewQueue extends ViewPart {
 		this.isDisposed = true;
 		
 		if (this.abstractPlayerView != null ) {
-			this.abstractPlayerView.getPlayer().removeQueueChangeListener(this.queueChangedListener);
+			this.abstractPlayerView.getPlayer().removeQueueChangeListener(this.queueChangedRrefresher);
 		}
 		
 		super.dispose();
@@ -80,28 +82,19 @@ public class ViewQueue extends ViewPart {
 		this.queue = queue;
 	}
 	
-	private Runnable queueChangedListener = new Runnable() {
-		@Override
-		public void run() {
-			if (!ViewQueue.this.updateGuiRunableScheduled) {
-				ViewQueue.this.updateGuiRunableScheduled = true;
-				getSite().getShell().getDisplay().asyncExec(ViewQueue.this.updateGuiRunable);
+	Runnable queueChangedRrefresher;
+	
+	private void makeQueueChangedRrefresher () {
+		this.queueChangedRrefresher = new RefreshTimer(getSite().getShell().getDisplay(), 1000, new Runnable() {
+			@Override
+			public void run() {
+				if (ViewQueue.this.tableViewer.getTable().isDisposed()) return;
+				updateStatus();
+				ViewQueue.this.tableViewer.refresh();
+				bringToTopIfChanged();
 			}
-		}
-	};
-	
-	volatile boolean updateGuiRunableScheduled = false;
-	
-	Runnable updateGuiRunable = new Runnable() {
-		@Override
-		public void run() {
-			ViewQueue.this.updateGuiRunableScheduled = false;
-			if (ViewQueue.this.tableViewer.getTable().isDisposed()) return;
-			updateStatus();
-			ViewQueue.this.tableViewer.refresh();
-			bringToTopIfChanged();
-		}
-	};
+		});
+	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	GUI stuff.

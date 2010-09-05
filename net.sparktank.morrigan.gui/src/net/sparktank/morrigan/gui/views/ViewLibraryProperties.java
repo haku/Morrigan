@@ -7,6 +7,7 @@ import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.actions.DbUpdateAction;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.editors.mmdb.LocalMixedMediaDbEditor;
+import net.sparktank.morrigan.gui.helpers.RefreshTimer;
 import net.sparktank.morrigan.model.media.impl.MediaItemDb;
 
 import org.eclipse.jface.action.Action;
@@ -33,12 +34,14 @@ public class ViewLibraryProperties extends ViewPart {
 	
 	@Override
 	public void createPartControl(Composite parent) {
+		makeGuiRrefresher();
+		
 		createLayout(parent);
 		addToolbar();
 		
 		getViewSite().getPage().addPartListener(this.partListener);
 		
-		this.listChange.run();
+		this.updateGuiRrefresher.run();
 	}
 	
 	@Override
@@ -97,18 +100,18 @@ public class ViewLibraryProperties extends ViewPart {
 		if (this.library == library) return;
 		
 		if (this.library!=null) {
-			this.library.removeChangeEvent(this.listChange);
+			this.library.removeChangeEvent(this.updateGuiRrefresher);
 		}
 		
 		this.library = library;
 		
 		if (this.library!=null) {
-			this.library.addChangeEvent(this.listChange);
+			this.library.addChangeEvent(this.updateGuiRrefresher);
 		}
 		
 		this.dbUpdateAction.setMediaDb(this.library);
 		
-		if (updateGui) this.listChange.run();
+		if (updateGui) this.updateGuiRrefresher.run();
 	}
 	
 	public void showAddDlg (boolean promptScan) {
@@ -191,46 +194,37 @@ public class ViewLibraryProperties extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Events.
 	
-	volatile boolean updateGuiRunableScheduled = false;
+	Runnable updateGuiRrefresher;
 	
-	Runnable listChange = new Runnable() {
-		@Override
-		public void run() {
-			if (!ViewLibraryProperties.this.updateGuiRunableScheduled) {
-				ViewLibraryProperties.this.updateGuiRunableScheduled = true;
-				getSite().getShell().getDisplay().asyncExec(ViewLibraryProperties.this.updateGuiRunable);
-			}
-		}
-	};
-	
-	Runnable updateGuiRunable = new Runnable() {
-		@SuppressWarnings("synthetic-access")
-		@Override
-		public void run() {
-			ViewLibraryProperties.this.updateGuiRunableScheduled = false;
-			if (ViewLibraryProperties.this.tableViewer.getTable().isDisposed()) return;
-			
-			if (ViewLibraryProperties.this.library!=null) {
+	private void makeGuiRrefresher () {
+		this.updateGuiRrefresher = new RefreshTimer(getSite().getShell().getDisplay(), 1000, new Runnable() {
+			@SuppressWarnings("synthetic-access")
+			@Override
+			public void run() {
+				if (ViewLibraryProperties.this.tableViewer.getTable().isDisposed()) return;
 				
-				int numSources = -1;
-				try {
-					numSources = ViewLibraryProperties.this.library.getSources().size();
-				} catch (Exception e) {
-					new MorriganMsgDlg(e).open();
+				if (ViewLibraryProperties.this.library!=null) {
+					
+					int numSources = -1;
+					try {
+						numSources = ViewLibraryProperties.this.library.getSources().size();
+					} catch (Exception e) {
+						new MorriganMsgDlg(e).open();
+					}
+					
+					setContentDescription(
+							ViewLibraryProperties.this.library.getListName() + " contains " + ViewLibraryProperties.this.library.getCount()
+							+ " items from " + numSources + " sources."
+					);
+					
+				} else {
+					setContentDescription("No library selected.");
 				}
 				
-				setContentDescription(
-						ViewLibraryProperties.this.library.getListName() + " contains " + ViewLibraryProperties.this.library.getCount()
-						+ " items from " + numSources + " sources."
-				);
-				
-			} else {
-				setContentDescription("No library selected.");
+				ViewLibraryProperties.this.tableViewer.refresh();
 			}
-			
-			ViewLibraryProperties.this.tableViewer.refresh();
-		}
-	};
+		});
+	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Actions.
@@ -271,7 +265,7 @@ public class ViewLibraryProperties extends ViewPart {
 				} catch (Exception e) {
 					new MorriganMsgDlg(e).open();
 				}
-				ViewLibraryProperties.this.listChange.run();
+				ViewLibraryProperties.this.updateGuiRrefresher.run();
 				
 				if (promptScan) {
 					MorriganMsgDlg dlg2 = new MorriganMsgDlg("Run scan on " + ViewLibraryProperties.this.library.getListName() + " now?", MorriganMsgDlg.YESNO);
@@ -308,7 +302,7 @@ public class ViewLibraryProperties extends ViewPart {
 					} catch (Exception e) {
 						new MorriganMsgDlg(e).open();
 					}
-					ViewLibraryProperties.this.listChange.run();
+					ViewLibraryProperties.this.updateGuiRrefresher.run();
 				}
 			}
 			

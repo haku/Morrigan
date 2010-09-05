@@ -24,6 +24,7 @@ import net.sparktank.morrigan.gui.editors.tracks.MediaTrackListEditor;
 import net.sparktank.morrigan.gui.editors.tracks.PlaylistEditor;
 import net.sparktank.morrigan.gui.engines.HotkeyRegister;
 import net.sparktank.morrigan.gui.helpers.ClipboardHelper;
+import net.sparktank.morrigan.gui.helpers.RefreshTimer;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrackDb;
@@ -64,6 +65,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 	
 	@Override
 	public void createPartControl(Composite parent) {
+		makeHistoryRefresher();
 		makeActions(parent);
 		setupHotkeys();
 	}
@@ -135,7 +137,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 		
 		@Override
 		public void historyChanged() {
-			callRefreshHistoryMenuMgr();
+			AbstractPlayerView.this.historyChangedRrefresher.run();
 		}
 		
 		@Override
@@ -217,30 +219,19 @@ public abstract class AbstractPlayerView extends ViewPart {
 //	History.
 	
 	MenuManager _historyMenuMgr = new MenuManager();
+	Runnable historyChangedRrefresher;
 	
-	volatile boolean refreshHistoryMenuMgrScheduled = false;
-	
-	void callRefreshHistoryMenuMgr () {
-		synchronized (this.refreshHistoryMenuMgr) {
-			if (!this.refreshHistoryMenuMgrScheduled) {
-				this.refreshHistoryMenuMgrScheduled = true;
-				getSite().getShell().getDisplay().asyncExec(this.refreshHistoryMenuMgr);
-			}
-		}
-	}
-	
-	Runnable refreshHistoryMenuMgr = new Runnable() {
-		@Override
-		public void run() {
-			synchronized (AbstractPlayerView.this.refreshHistoryMenuMgr) {
+	private void makeHistoryRefresher () {
+		this.historyChangedRrefresher = new RefreshTimer(getSite().getShell().getDisplay(), 5000, new Runnable() {
+			@Override
+			public void run() {
 				AbstractPlayerView.this._historyMenuMgr.removeAll();
 				for (PlayItem item : getPlayer().getHistory()) {
 					AbstractPlayerView.this._historyMenuMgr.add(new HistoryAction(item));
 				}
-				AbstractPlayerView.this.refreshHistoryMenuMgrScheduled = false;
 			}
-		}
-	};
+		});
+	}
 	
 	private class HistoryAction extends Action {
 		
