@@ -66,7 +66,11 @@ public class CallPlayMedia extends AbstractHandler {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	static private void playItem(IWorkbenchPage page, IMediaTrackList<? extends IMediaTrack> mediaList, IMediaTrack selectedItem) {
+	static public void playItem (IWorkbenchPage page, IMediaTrackList<? extends IMediaTrack> mediaList) {
+		playItem(page, mediaList, null);
+	}
+	
+	static public void playItem (IWorkbenchPage page, IMediaTrackList<? extends IMediaTrack> mediaList, IMediaTrack selectedItem) {
 		AbstractPlayerView playerView;
 		IViewPart findView = page.findView(ViewControls.ID);
 		
@@ -80,7 +84,12 @@ public class CallPlayMedia extends AbstractHandler {
 		
 		if (findView != null) {
 			playerView = (AbstractPlayerView) findView;
-			playerView.getPlayer().loadAndStartPlaying(mediaList, selectedItem);
+			if (selectedItem == null) {
+				playerView.getPlayer().loadAndStartPlaying(mediaList);
+			}
+			else {
+				playerView.getPlayer().loadAndStartPlaying(mediaList, selectedItem);
+			}
 		
 		} else {
 			new MorriganMsgDlg("Error: failed to find an AbstractPlayerView.").open();
