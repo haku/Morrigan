@@ -285,7 +285,7 @@ public class Player {
 		DurationData ret = new DurationData();
 		ret.complete = true;
 		for (PlayItem pi : this._queue) {
-			if (pi.item.getDuration() > 0) {
+			if (pi.item != null && pi.item.getDuration() > 0) {
 				ret.duration = ret.duration + pi.item.getDuration();
 			} else {
 				ret.complete = false;
