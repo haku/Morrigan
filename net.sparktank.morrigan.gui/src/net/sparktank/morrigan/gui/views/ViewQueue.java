@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sparktank.morrigan.gui.Activator;
+import net.sparktank.morrigan.gui.adaptors.PlayItemLblProv;
+import net.sparktank.morrigan.gui.helpers.ImageCache;
 import net.sparktank.morrigan.gui.helpers.RefreshTimer;
 import net.sparktank.morrigan.helpers.TimeHelper;
 import net.sparktank.morrigan.player.PlayItem;
@@ -11,8 +13,6 @@ import net.sparktank.morrigan.player.Player.DurationData;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.viewers.ILabelProvider;
-import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -21,7 +21,6 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.part.ViewPart;
@@ -63,6 +62,8 @@ public class ViewQueue extends ViewPart {
 			this.abstractPlayerView.getPlayer().removeQueueChangeListener(this.queueChangedRrefresher);
 		}
 		
+		this.imageCache.clearCache();
+		
 		super.dispose();
 	}
 	
@@ -99,12 +100,13 @@ public class ViewQueue extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	GUI stuff.
 	
+	ImageCache imageCache = new ImageCache();
 	TableViewer tableViewer;
 	
 	private void createLayout (Composite parent) {
 		this.tableViewer = new TableViewer(parent, SWT.MULTI | SWT.V_SCROLL | SWT.FULL_SELECTION);
 		this.tableViewer.setContentProvider(this.contentProvider);
-		this.tableViewer.setLabelProvider(this.labelProvider);
+		this.tableViewer.setLabelProvider(new PlayItemLblProv(this.imageCache));
 		this.tableViewer.setInput(getViewSite()); // use content provider.
 		this.tableViewer.getTable().addKeyListener(this.keyListener);
 		
@@ -129,12 +131,12 @@ public class ViewQueue extends ViewPart {
 	}
 	
 	void updateStatus () {
-		if (isDisposed()) return ;
+		if (isDisposed()) return;
 		
 		if (this.queue.size() == 0) {
 			setContentDescription("Queue is empty.");
-			
-		} else {
+		}
+		else {
 			DurationData d = this.abstractPlayerView.getPlayer().getQueueTotalDuration();
 			setContentDescription(
 					this.queue.size() + " items"
@@ -160,34 +162,6 @@ public class ViewQueue extends ViewPart {
 		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {/* UNUSED */}
 		
-	};
-	
-	private ILabelProvider labelProvider = new ILabelProvider() {
-		
-		@Override
-		public String getText(Object element) {
-			if (element instanceof PlayItem) {
-				PlayItem item = (PlayItem) element;
-				return item.item.toString();
-			}
-			return null;
-		}
-		
-		@Override
-		public Image getImage(Object element) {
-			return null;
-		}
-		
-		@Override
-		public boolean isLabelProperty(Object element, String property) {
-			return false;
-		}
-		@Override
-		public void removeListener(ILabelProviderListener listener) {/* UNUSED */}
-		@Override
-		public void dispose() {/* UNUSED */}
-		@Override
-		public void addListener(ILabelProviderListener listener) {/* UNUSED */}
 	};
 	
 	private KeyListener keyListener = new KeyListener() {
