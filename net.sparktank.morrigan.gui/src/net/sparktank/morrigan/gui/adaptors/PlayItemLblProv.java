@@ -23,7 +23,7 @@ public class PlayItemLblProv implements ILabelProvider {
 	public String getText(Object element) {
 		if (element instanceof PlayItem) {
 			PlayItem item = (PlayItem) element;
-			return item.item.toString();
+			return item.toString();
 		}
 		return null;
 	}
