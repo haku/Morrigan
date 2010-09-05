@@ -10,6 +10,7 @@ import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrackList;
 import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem.MediaType;
+import net.sparktank.morrigan.player.PlayItem;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -67,10 +68,18 @@ public class CallPlayMedia extends AbstractHandler {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	static public void playItem (IWorkbenchPage page, IMediaTrackList<? extends IMediaTrack> mediaList) {
-		playItem(page, mediaList, null);
+		playItem(page, mediaList, null, false);
+	}
+	
+	static public void playItem (IWorkbenchPage page, IMediaTrackList<? extends IMediaTrack> mediaList, boolean addToQueue) {
+		playItem(page, mediaList, null, addToQueue);
 	}
 	
 	static public void playItem (IWorkbenchPage page, IMediaTrackList<? extends IMediaTrack> mediaList, IMediaTrack selectedItem) {
+		playItem(page, mediaList, selectedItem, false);
+	}
+	
+	static public void playItem (IWorkbenchPage page, IMediaTrackList<? extends IMediaTrack> mediaList, IMediaTrack selectedItem, boolean addToQueue) {
 		AbstractPlayerView playerView;
 		IViewPart findView = page.findView(ViewControls.ID);
 		
@@ -85,10 +94,20 @@ public class CallPlayMedia extends AbstractHandler {
 		if (findView != null) {
 			playerView = (AbstractPlayerView) findView;
 			if (selectedItem == null) {
-				playerView.getPlayer().loadAndStartPlaying(mediaList);
+				if (addToQueue) {
+					playerView.getPlayer().addToQueue(new PlayItem(mediaList, null));
+				}
+				else {
+					playerView.getPlayer().loadAndStartPlaying(mediaList);
+				}
 			}
 			else {
-				playerView.getPlayer().loadAndStartPlaying(mediaList, selectedItem);
+				if (addToQueue) {
+					playerView.getPlayer().addToQueue(new PlayItem(mediaList, selectedItem));
+				}
+				else {
+					playerView.getPlayer().loadAndStartPlaying(mediaList, selectedItem);
+				}
 			}
 		
 		} else {
