@@ -11,6 +11,7 @@ import net.sparktank.morrigan.gui.adaptors.MediaFilter;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.handler.CallPlayMedia;
 import net.sparktank.morrigan.gui.helpers.ImageCache;
+import net.sparktank.morrigan.gui.helpers.RefreshTimer;
 import net.sparktank.morrigan.gui.jobs.TaskJob;
 import net.sparktank.morrigan.gui.preferences.MediaListPref;
 import net.sparktank.morrigan.model.media.impl.MediaItem;
@@ -98,8 +99,9 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 		
 		setPartName(this.editorInput.getMediaList().getListName());
 		
-		this.editorInput.getMediaList().addDirtyChangeEvent(this.dirtyChange);
-		this.editorInput.getMediaList().addChangeEvent(this.listChange);
+		makeRefreshers();
+		this.editorInput.getMediaList().addChangeEvent(this.listChangeRrefresher);
+		this.editorInput.getMediaList().addDirtyChangeEvent(this.listDirtyRrefresher);
 		
 		try {
 			readInputData();
@@ -113,8 +115,8 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 	@Override
 	public void dispose() {
 		removePropListener();
-		this.editorInput.getMediaList().removeChangeEvent(this.listChange);
-		this.editorInput.getMediaList().removeDirtyChangeEvent(this.dirtyChange);
+		this.editorInput.getMediaList().removeChangeEvent(this.listChangeRrefresher);
+		this.editorInput.getMediaList().removeDirtyChangeEvent(this.listDirtyRrefresher);
 		this.imageCache.clearCache();
 		super.dispose();
 	}
@@ -362,53 +364,35 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 		
 	};
 	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Refreshing.
+	
+	private Runnable listChangeRrefresher;
+	private Runnable listDirtyRrefresher;
+	
+	private void makeRefreshers () {
+		this.listChangeRrefresher = new RefreshTimer(getSite().getShell().getDisplay(), 5000, new Runnable() {
+			@Override
+			public void run() {
+				if (MediaItemListEditor.this.editTable.getTable().isDisposed()) return;
+				MediaItemListEditor.this.editTable.refresh();
+				listChanged();
+			}
+		});
+		
+		this.listDirtyRrefresher = new RefreshTimer(getSite().getShell().getDisplay(), 5000, new Runnable() {
+			@SuppressWarnings("synthetic-access")
+			@Override
+			public void run() {
+				firePropertyChange(IEditorPart.PROP_DIRTY);
+			}
+		});
+	}
+	
 	/**
 	 * This will be called on the GUI thread.
 	 */
 	abstract protected void listChanged ();
-	
-	private Runnable dirtyChange = new Runnable() {
-		@Override
-		public void run() {
-			if (!MediaItemListEditor.this.dirtyChangedRunableScheduled) {
-				MediaItemListEditor.this.dirtyChangedRunableScheduled = true;
-				getSite().getShell().getDisplay().asyncExec(MediaItemListEditor.this.dirtyChangedRunable);
-			}
-		}
-	};
-	
-	private Runnable listChange = new Runnable() {
-		@Override
-		public void run() {
-			if (!MediaItemListEditor.this.updateGuiRunableScheduled) {
-				MediaItemListEditor.this.updateGuiRunableScheduled = true;
-				getSite().getShell().getDisplay().asyncExec(MediaItemListEditor.this.updateGuiRunable);
-			}
-		}
-	};
-	
-	volatile boolean dirtyChangedRunableScheduled = false;
-	
-	Runnable dirtyChangedRunable = new Runnable() {
-		@SuppressWarnings("synthetic-access")
-		@Override
-		public void run() {
-			MediaItemListEditor.this.dirtyChangedRunableScheduled = false;
-			firePropertyChange(IEditorPart.PROP_DIRTY);
-		}
-	};
-	
-	volatile boolean updateGuiRunableScheduled = false;
-	
-	Runnable updateGuiRunable = new Runnable() {
-		@Override
-		public void run() {
-			MediaItemListEditor.this.updateGuiRunableScheduled = false;
-			if (MediaItemListEditor.this.editTable.getTable().isDisposed()) return;
-			MediaItemListEditor.this.editTable.refresh();
-			listChanged();
-		}
-	};
 	
 	protected IDoubleClickListener doubleClickListener = new IDoubleClickListener() {
 		@Override
