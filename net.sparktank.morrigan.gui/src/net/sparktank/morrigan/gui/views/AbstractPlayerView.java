@@ -33,10 +33,10 @@ import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMixedMediaList;
 import net.sparktank.morrigan.model.tracks.playlist.MediaPlaylist;
 import net.sparktank.morrigan.player.IPlayerEventHandler;
+import net.sparktank.morrigan.player.IPlayerLocal;
 import net.sparktank.morrigan.player.OrderHelper;
 import net.sparktank.morrigan.player.OrderHelper.PlaybackOrder;
 import net.sparktank.morrigan.player.PlayItem;
-import net.sparktank.morrigan.player.Player;
 import net.sparktank.morrigan.player.PlayerRegister;
 
 import org.eclipse.jface.action.Action;
@@ -109,9 +109,9 @@ public abstract class AbstractPlayerView extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Player.
 	
-	private Player _player = null;
+	private IPlayerLocal _player = null;
 	
-	public synchronized Player getPlayer () {
+	public synchronized IPlayerLocal getPlayer () {
 		if (this._player == null) {
 			this._player = PlayerRegister.makePlayer(this.eventHandler);
 		}

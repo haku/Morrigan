@@ -5,8 +5,8 @@ import net.sparktank.morrigan.helpers.ErrorHelper;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrackList;
 import net.sparktank.morrigan.player.IPlayerEventHandler;
+import net.sparktank.morrigan.player.IPlayerLocal;
 import net.sparktank.morrigan.player.PlayItem;
-import net.sparktank.morrigan.player.Player;
 import net.sparktank.morrigan.player.PlayerRegister;
 import net.sparktank.morrigan.player.OrderHelper.PlaybackOrder;
 
@@ -45,7 +45,7 @@ public class Activator implements BundleActivator {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private static Player _player;
+	private static IPlayerLocal _player;
 	
 	static private void setupPlayer () {
 		_player = PlayerRegister.makePlayer(eventHandler);

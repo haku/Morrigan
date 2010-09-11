@@ -14,6 +14,7 @@ import net.sparktank.morrigan.engines.playback.IPlaybackStatusListener;
 import net.sparktank.morrigan.engines.playback.PlaybackException;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
+import net.sparktank.morrigan.model.media.impl.DurationData;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrackList;
 import net.sparktank.morrigan.player.OrderHelper.PlaybackOrder;
@@ -21,18 +22,22 @@ import net.sparktank.morrigan.player.OrderHelper.PlaybackOrder;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
-public class Player {
+public class Player implements IPlayerLocal {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
+	
+	private final int id;
+	
 	final IPlayerEventHandler eventHandler;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Main.
 	
-	public Player (IPlayerEventHandler eventHandler) {
+	public Player (int id, IPlayerEventHandler eventHandler) {
+		this.id = id;
 		this.eventHandler = eventHandler;
 	}
 	
+	@Override
 	public void dispose () {
 		PlayerRegister.removePlayer(this);
 		setCurrentItem(null);
@@ -42,14 +47,9 @@ public class Player {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	ID.
 	
-	private int id = -1;
-	
+	@Override
 	public int getId() {
 		return this.id;
-	}
-	
-	public void setId(int id) {
-		this.id = id;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -90,11 +90,13 @@ public class Player {
 		}
 	};
 	
+	@Override
 	public PlayItem getCurrentItem () {
 		// TODO check item is still valid.
 		return this._currentItem;
 	}
 	
+	@Override
 	public IMediaTrackList<? extends IMediaTrack> getCurrentList () {
 		IMediaTrackList<? extends IMediaTrack> ret = null;
 		
@@ -114,10 +116,12 @@ public class Player {
 	
 	private PlaybackOrder _playbackOrder = PlaybackOrder.SEQUENTIAL;
 	
+	@Override
 	public PlaybackOrder getPlaybackOrder () {
 		return this._playbackOrder;
 	}
 	
+	@Override
 	public void setPlaybackOrder (PlaybackOrder order) {
 		this._playbackOrder = order;
 	}
@@ -156,6 +160,7 @@ public class Player {
 	
 	private List<PlayItem> _history = new ArrayList<PlayItem>();
 	
+	@Override
 	public List<PlayItem> getHistory () {
 		return Collections.unmodifiableList(this._history);
 	}
@@ -196,22 +201,26 @@ public class Player {
 	private List<PlayItem> _queue = new ArrayList<PlayItem>();
 	private List<Runnable> _queueChangeListeners = new ArrayList<Runnable>();
 	
+	@Override
 	public void addToQueue (PlayItem item) {
 		// TODO check item is of MediaType == TRACK.
 		this._queue.add(item);
 		callQueueChangedListeners();
 	}
 	
+	@Override
 	public void removeFromQueue (PlayItem item) {
 		this._queue.remove(item);
 		callQueueChangedListeners();
 	}
 	
+	@Override
 	public void clearQueue () {
 		this._queue.clear();
 		callQueueChangedListeners();
 	}
 	
+	@Override
 	public void moveInQueue (List<PlayItem> items, boolean moveDown) {
 		synchronized (this._queue) {
 			if (items == null || items.isEmpty()) return;
@@ -272,32 +281,33 @@ public class Player {
 		}
 	}
 	
+	@Override
 	public List<PlayItem> getQueueList () {
 		return Collections.unmodifiableList(this._queue);
 	}
 	
-	static public class DurationData {
-		public long duration = 0;
-		public boolean complete;
-	}
-	
+	@Override
 	public DurationData getQueueTotalDuration () {
-		DurationData ret = new DurationData();
-		ret.complete = true;
+		boolean complete = true;
+		long duration = 0;
+		
 		for (PlayItem pi : this._queue) {
 			if (pi.item != null && pi.item.getDuration() > 0) {
-				ret.duration = ret.duration + pi.item.getDuration();
+				duration = duration + pi.item.getDuration();
 			} else {
-				ret.complete = false;
+				complete = false;
 			}
 		}
-		return ret;
+		
+		return new DurationData(duration, complete);
 	}
 	
+	@Override
 	public void addQueueChangeListener (Runnable listener) {
 		this._queueChangeListeners.add(listener);
 	}
 	
+	@Override
 	public void removeQueueChangeListener (Runnable listener) {
 		this._queueChangeListeners.remove(listener);
 	}
@@ -307,6 +317,7 @@ public class Player {
 	
 	IPlaybackEngine playbackEngine = null;
 	
+	@Override
 	public boolean isPlaybackEngineReady () {
 		return (this.playbackEngine != null);
 	}
@@ -347,6 +358,7 @@ public class Player {
 	long _currentPosition = -1; // In seconds.
 	int _currentTrackDuration = -1; // In seconds.
 	
+	@Override
 	public void loadAndStartPlaying (MediaExplorerItem item) throws MorriganException {
 		IMediaTrackList<? extends IMediaTrack> list = PlayerHelper.mediaExporerItemToReadTrackDb(item);
 		loadAndStartPlaying(list);
@@ -355,6 +367,7 @@ public class Player {
 	/**
 	 * For UI handlers to call.
 	 */
+	@Override
 	public void loadAndStartPlaying (IMediaTrackList<? extends IMediaTrack> list) {
 		IMediaTrack nextTrack = OrderHelper.getNextTrack(list, null, this._playbackOrder);
 		loadAndStartPlaying(list, nextTrack);
@@ -363,6 +376,7 @@ public class Player {
 	/**
 	 * For UI handlers to call.
 	 */
+	@Override
 	public void loadAndStartPlaying (IMediaTrackList<? extends IMediaTrack> list, IMediaTrack track) {
 		if (track == null) throw new NullPointerException();
 		loadAndStartPlaying(new PlayItem(list, track));
@@ -371,6 +385,7 @@ public class Player {
 	/**
 	 * For UI handlers to call.
 	 */
+	@Override
 	public void loadAndStartPlaying (final PlayItem item) {
 		try {
 			if (item.list == null) throw new IllegalArgumentException("PlayItem list can not be null.");
@@ -431,6 +446,7 @@ public class Player {
 	/**
 	 * For UI handlers to call.
 	 */
+	@Override
 	public void pausePlaying () {
 		try {
 			internal_pausePlaying();
@@ -442,6 +458,7 @@ public class Player {
 	/**
 	 * For UI handlers to call.
 	 */
+	@Override
 	public void stopPlaying () {
 		try {
 			internal_stopPlaying();
@@ -450,6 +467,7 @@ public class Player {
 		}
 	}
 	
+	@Override
 	public void nextTrack () {
 		PlayItem nextItemToPlay = getNextItemToPlay();
 		if (nextItemToPlay != null) {
@@ -458,6 +476,7 @@ public class Player {
 		}
 	}
 	
+	@Override
 	public PlayState getPlayState () {
 		try {
 			IPlaybackEngine eng = getPlaybackEngine(false);
@@ -472,14 +491,17 @@ public class Player {
 		}
 	}
 	
+	@Override
 	public long getCurrentPosition () {
 		return this._currentPosition;
 	}
 	
+	@Override
 	public int getCurrentTrackDuration () {
 		return this._currentTrackDuration;
 	}
 	
+	@Override
 	public void seekTo (double d) {
 		try {
 			internal_seekTo(d);
@@ -616,6 +638,7 @@ public class Player {
 		
 	};
 	
+	@Override
 	public void setVideoFrameParent(Composite cmfp) {
 		try {
 			IPlaybackEngine engine = getPlaybackEngine(false);

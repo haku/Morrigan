@@ -9,10 +9,9 @@ public class PlayerRegister {
 	
 	static private int playerN = 0;
 	
-	static public Player makePlayer (IPlayerEventHandler eventHandler) {
+	static public IPlayerLocal makePlayer (IPlayerEventHandler eventHandler) {
 		synchronized (listPlayers) {
-			Player player = new Player(eventHandler);
-			player.setId(playerN);
+			Player player = new Player(playerN, eventHandler);
 			playerN++;
 			addPlayer(player);
 			return player;
@@ -27,7 +26,7 @@ public class PlayerRegister {
 		listPlayers.add(player);
 	}
 	
-	static public void removePlayer (Player player) {
+	static public void removePlayer (IPlayerLocal player) {
 		listPlayers.remove(player);
 	}
 	
@@ -35,8 +34,8 @@ public class PlayerRegister {
 		return Collections.unmodifiableList(listPlayers);
 	}
 	
-	static public Player getPlayer (int n) {
-		for (Player p : listPlayers) {
+	static public IPlayerLocal getPlayer (int n) {
+		for (IPlayerLocal p : listPlayers) {
 			if (p.getId() == n) {
 				return p;
 			}
