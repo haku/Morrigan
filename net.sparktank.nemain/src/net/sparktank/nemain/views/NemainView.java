@@ -55,7 +55,7 @@ public class NemainView extends ViewPart {
 	public void dispose() {
 		try {
 			closeDataSource();
-		} catch (DbException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		super.dispose();
@@ -65,58 +65,58 @@ public class NemainView extends ViewPart {
 //	Data providers.
 	
 	private static final String FILE_CAL_DB = "nemain.db3";
-	private SqliteLayer _dataSource;
+	SqliteLayer _dataSource;
 	private NemainDate _currentDate = new NemainDate();
 	
 	private void initDataSource () throws DbException {
 		String fullPathToDb = Config.getFullPathToDb(FILE_CAL_DB);
-		_dataSource = new SqliteLayer(fullPathToDb);
+		this._dataSource = new SqliteLayer(fullPathToDb);
 		System.err.println("Connected to '"+fullPathToDb+"'.");
 	}
 	
-	private void closeDataSource () throws DbException {
-		_dataSource.dispose();
-		System.err.println("Disconnected '"+_dataSource.getDbFilePath()+"'.");
+	private void closeDataSource () {
+		this._dataSource.dispose();
+		System.err.println("Disconnected '"+this._dataSource.getDbFilePath()+"'.");
 	}
 	
-	private void setCurrentDate (NemainDate date) {
-		_currentDate = date;
-		lblStatus.setText(date.toString());
+	void setCurrentDate (NemainDate date) {
+		this._currentDate = date;
+		this.lblStatus.setText(date.toString());
 		
 		// TODO do query in DB layer?
 		List<NemainEvent> data;
 		try {
-			data = _dataSource.getEvents();
+			data = this._dataSource.getEvents();
 		} catch (DbException e) {
 			throw new RuntimeException(e);
 		}
 		List<NemainEvent> eventsToShow = new LinkedList<NemainEvent>();
 		for (NemainEvent event : data) {
-			if (event.isWithinNDaysAfter(getCurrentDate(), gridButton.length)) {
+			if (event.isWithinNDaysAfter(getCurrentDate(), this.gridButton.length)) {
 				eventsToShow.add(event);
 			}
 		}
 		
-		for (int i = 0; i < gridButton.length; i++) {
+		for (int i = 0; i < this.gridButton.length; i++) {
 			NemainDate d = date.daysAfter(i);
-			gridButton[i].setDate(d);
+			this.gridButton[i].setDate(d);
 			
 			for (NemainEvent event : eventsToShow) {
 				if (event.isSameDay(d)) {
 					if (event.getYear() == 0) {
-						gridButton[i].setAnualEvent(event);
+						this.gridButton[i].setAnualEvent(event);
 					} else {
-						gridButton[i].setEvent(event);
+						this.gridButton[i].setEvent(event);
 					}
 				}
 			}
 		}
 		
-		parent.layout();
+		this.viewParent.layout();
 	}
 	
-	private NemainDate getCurrentDate () {
-		return _currentDate;
+	NemainDate getCurrentDate () {
+		return this._currentDate;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -125,7 +125,7 @@ public class NemainView extends ViewPart {
 	private ImageCache imageCache = new ImageCache();
 	protected final int sep = 3;
 	
-	private Composite parent;
+	private Composite viewParent;
 	
 	private Button btnDateBack;
 	private Button btnDateForward;
@@ -135,19 +135,19 @@ public class NemainView extends ViewPart {
 	private CalendarCell[] gridButton;
 	
 	private void createControls (Composite parent) {
-		this.parent = parent;
+		this.viewParent = parent;
 		FormData formData;
 		parent.setLayout(new FormLayout());
 		
 		Composite tbCom = new Composite(parent, SWT.NONE);
-		btnDateBack = new Button(tbCom, SWT.PUSH);
-		btnDateForward = new Button(tbCom, SWT.PUSH);
-		lblStatus = new Label(tbCom, SWT.NONE);
+		this.btnDateBack = new Button(tbCom, SWT.PUSH);
+		this.btnDateForward = new Button(tbCom, SWT.PUSH);
+		this.lblStatus = new Label(tbCom, SWT.NONE);
 		
-		gridContainer = new Composite(parent, SWT.NONE);
-		gridButton = new CalendarCell[GRID_ROW_LENGTH * GRID_ROW_COUNT];
-		for (int i = 0; i < gridButton.length; i++) {
-			gridButton[i] = new CalendarCell(gridContainer);
+		this.gridContainer = new Composite(parent, SWT.NONE);
+		this.gridButton = new CalendarCell[GRID_ROW_LENGTH * GRID_ROW_COUNT];
+		for (int i = 0; i < this.gridButton.length; i++) {
+			this.gridButton[i] = new CalendarCell(this.gridContainer);
 		}
 		
 		tbCom.setLayout(new FormLayout());
@@ -157,76 +157,81 @@ public class NemainView extends ViewPart {
 		formData.right = new FormAttachment(100, 0);
 		tbCom.setLayoutData(formData);
 		
-		btnDateBack.setImage(imageCache.readImage("icons/minus.gif"));
+		this.btnDateBack.setImage(this.imageCache.readImage("icons/minus.gif"));
 		formData = new FormData();
-		formData.left = new FormAttachment(0, sep);
-		formData.top = new FormAttachment(0, sep);
-		formData.bottom = new FormAttachment(100, -sep);
-		btnDateBack.setLayoutData(formData);
+		formData.left = new FormAttachment(0, this.sep);
+		formData.top = new FormAttachment(0, this.sep);
+		formData.bottom = new FormAttachment(100, -this.sep);
+		this.btnDateBack.setLayoutData(formData);
 		
 		formData = new FormData();
-		formData.left = new FormAttachment(btnDateBack, sep);
-		formData.right = new FormAttachment(btnDateForward, -sep);
-		formData.top = new FormAttachment(0, sep);
-		formData.bottom = new FormAttachment(100, -sep);
-		lblStatus.setLayoutData(formData);
-		lblStatus.setAlignment(SWT.CENTER);
+		formData.left = new FormAttachment(this.btnDateBack, this.sep);
+		formData.right = new FormAttachment(this.btnDateForward, -this.sep);
+		formData.top = new FormAttachment(0, this.sep);
+		formData.bottom = new FormAttachment(100, -this.sep);
+		this.lblStatus.setLayoutData(formData);
+		this.lblStatus.setAlignment(SWT.CENTER);
 		
-		btnDateForward.setImage(imageCache.readImage("icons/plus.gif"));
+		this.btnDateForward.setImage(this.imageCache.readImage("icons/plus.gif"));
 		formData = new FormData();
-		formData.right = new FormAttachment(100, -sep);
-		formData.top = new FormAttachment(0, sep);
-		formData.bottom = new FormAttachment(100, -sep);
-		btnDateForward.setLayoutData(formData);
+		formData.right = new FormAttachment(100, -this.sep);
+		formData.top = new FormAttachment(0, this.sep);
+		formData.bottom = new FormAttachment(100, -this.sep);
+		this.btnDateForward.setLayoutData(formData);
 		
 		GridLayout gridLayout = new GridLayout(GRID_ROW_LENGTH, true);
-		gridContainer.setLayout(gridLayout);
+		this.gridContainer.setLayout(gridLayout);
 		formData = new FormData();
 		formData.left = new FormAttachment(0, 0);
 		formData.right = new FormAttachment(100, 0);
 		formData.top = new FormAttachment(tbCom, 0);
-		formData.bottom = new FormAttachment(100, -sep);
-		gridContainer.setLayoutData(formData);
+		formData.bottom = new FormAttachment(100, -this.sep);
+		this.gridContainer.setLayoutData(formData);
 		
-		for (int i = 0; i < gridButton.length; i++) {
+		for (int i = 0; i < this.gridButton.length; i++) {
 			GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
-			gridButton[i].getComposite().setLayoutData(gridData);
+			this.gridButton[i].getComposite().setLayoutData(gridData);
 		}
 		
-		btnDateBack.addSelectionListener(new SelectionListener() {
+		this.btnDateBack.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
 				setCurrentDate(getCurrentDate().daysAfter(-7));
 			}
 			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {}
+			public void widgetDefaultSelected(SelectionEvent e) {/* UNUSED */}
 		});
 		
-		btnDateForward.addSelectionListener(new SelectionListener() {
+		this.btnDateForward.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
 				setCurrentDate(getCurrentDate().daysAfter(7));
 			}
 			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {}
+			public void widgetDefaultSelected(SelectionEvent e) {/* UNUSED */}
 		});
 		
 		ICalendarCellEditEvent listener = new ICalendarCellEditEvent() {
 			@Override
 			public void editBtnClicked(NemainDate date, NemainEvent event, boolean anual) {
+				NemainEvent eventClicked;
+				
 				if (event == null) {
 					if (anual) {
-						event = new NemainEvent("", 0, date.getMonth(), date.getDay());
+						eventClicked = new NemainEvent("", 0, date.getMonth(), date.getDay());
 					} else {
-						event = new NemainEvent("", date.getYear(), date.getMonth(), date.getDay());
+						eventClicked = new NemainEvent("", date.getYear(), date.getMonth(), date.getDay());
 					}
+				}
+				else {
+					eventClicked = event;
 				}
 				
 				EditEntryShell editEntryShell = new EditEntryShell(getSite().getShell());
-				if (editEntryShell.showDlg(event)) {
-					NemainEvent newEvent = new NemainEvent(editEntryShell.getExitText(), event);
+				if (editEntryShell.showDlg(eventClicked)) {
+					NemainEvent newEvent = new NemainEvent(editEntryShell.getExitText(), eventClicked);
 					try {
-						_dataSource.setEvent(newEvent);
+						NemainView.this._dataSource.setEvent(newEvent);
 					} catch (DbException e) {
 						e.printStackTrace();
 					}
@@ -234,12 +239,13 @@ public class NemainView extends ViewPart {
 				}
 			}
 		};
-		for (int i = 0; i < gridButton.length; i++) {
-			gridButton[i].setCellEditEventListener(listener);
+		for (int i = 0; i < this.gridButton.length; i++) {
+			this.gridButton[i].setCellEditEventListener(listener);
 		}
 		
 	}
 	
+	@Override
 	public void setFocus() {
 //		viewer.getControl().setFocus();
 	}

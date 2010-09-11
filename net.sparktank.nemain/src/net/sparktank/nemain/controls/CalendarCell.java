@@ -22,45 +22,45 @@ public class CalendarCell {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private NemainDate date;
-	private NemainEvent anualEvent;
-	private NemainEvent event;
-	private ICalendarCellEditEvent cellEditEventListener;
+	NemainDate date;
+	NemainEvent anualEvent;
+	NemainEvent event;
+	ICalendarCellEditEvent cellEditEventListener;
 	
 	Composite composite;
 	private Label label;
 	private Button button;
 	
 	public CalendarCell (Composite parent) {
-		composite = new Composite(parent, SWT.NONE);
-		label = new Label(composite, SWT.PUSH + SWT.WRAP + SWT.BORDER);
-		button = new Button(composite, SWT.PUSH);
+		this.composite = new Composite(parent, SWT.NONE);
+		this.label = new Label(this.composite, SWT.PUSH + SWT.WRAP + SWT.BORDER);
+		this.button = new Button(this.composite, SWT.PUSH);
 		
 		FormData formData;
-		composite.setLayout(new FormLayout());
+		this.composite.setLayout(new FormLayout());
 		
 		formData = new FormData();
 		formData.top = new FormAttachment(0, 0);
 		formData.left = new FormAttachment(0, 0);
 		formData.right = new FormAttachment(100, 0);
-		button.setLayoutData(formData);
+		this.button.setLayoutData(formData);
 		
 		formData = new FormData();
-		formData.top = new FormAttachment(button, 0);
+		formData.top = new FormAttachment(this.button, 0);
 		formData.left = new FormAttachment(0, 0);
 		formData.right = new FormAttachment(100, 0);
 		formData.bottom = new FormAttachment(100, 0);
-		label.setLayoutData(formData);
+		this.label.setLayoutData(formData);
 		
-		button.addSelectionListener(new SelectionListener() {
+		this.button.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if (cellEditEventListener != null) {
+				if (CalendarCell.this.cellEditEventListener != null) {
 					try {
 						if ((e.stateMask & SWT.SHIFT) != 0 || (e.stateMask & SWT.CONTROL) != 0) {
-    						cellEditEventListener.editBtnClicked(date, anualEvent, true);
+    						CalendarCell.this.cellEditEventListener.editBtnClicked(CalendarCell.this.date, CalendarCell.this.anualEvent, true);
 						} else {
-    						cellEditEventListener.editBtnClicked(date, event, false);
+    						CalendarCell.this.cellEditEventListener.editBtnClicked(CalendarCell.this.date, CalendarCell.this.event, false);
     					}
 					} catch (Throwable t) {
 						t.printStackTrace();
@@ -73,26 +73,26 @@ public class CalendarCell {
 	}
 	
 	public Composite getComposite () {
-		return composite;
+		return this.composite;
 	}
 	
 	private void update () {
-		button.setText(date.toString());
+		this.button.setText(this.date.toString());
 		
 		StringBuilder sb = new StringBuilder();
 		
-		if (anualEvent != null) {
-			sb.append(anualEvent.getEntryText());
+		if (this.anualEvent != null) {
+			sb.append(this.anualEvent.getEntryText());
 		}
 		
-		if (event != null) {
-			if (anualEvent != null) {
+		if (this.event != null) {
+			if (this.anualEvent != null) {
 				sb.append("\n\n");
 			}
-			sb.append(event.getEntryText());
+			sb.append(this.event.getEntryText());
 		}
 		
-		label.setText(sb.toString());
+		this.label.setText(sb.toString());
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
