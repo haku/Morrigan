@@ -61,7 +61,12 @@ public class PlayerRegister {
 //	Remote players.
 	
 	static public IPlayerRemote makeRemotePlayer (String remoteHost, int remotePlayerId, IPlayerEventHandler eventHandler) {
-		throw new RuntimeException("Not implemented.");
+		synchronized (listLocalPlayers) {
+			PlayerRemote player = new PlayerRemote(playerN, remoteHost, remotePlayerId);
+			playerN++;
+			addRemotePlayer(player);
+			return player;
+		}
 	}
 	
 //	-   -   -   -   -   -   -   -   -
