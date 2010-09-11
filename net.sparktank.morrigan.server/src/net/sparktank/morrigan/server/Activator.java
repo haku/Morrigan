@@ -48,7 +48,7 @@ public class Activator implements BundleActivator {
 	private static IPlayerLocal _player;
 	
 	static private void setupPlayer () {
-		_player = PlayerRegister.makePlayer(eventHandler);
+		_player = PlayerRegister.makeLocalPlayer(eventHandler);
 		_player.setPlaybackOrder(PlaybackOrder.RANDOM);
 	}
 	

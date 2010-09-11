@@ -19,7 +19,6 @@ import net.sparktank.morrigan.model.media.interfaces.IMediaTrackList;
 import net.sparktank.morrigan.player.IPlayerLocal;
 import net.sparktank.morrigan.player.OrderHelper.PlaybackOrder;
 import net.sparktank.morrigan.player.PlayItem;
-import net.sparktank.morrigan.player.Player;
 import net.sparktank.morrigan.player.PlayerHelper;
 import net.sparktank.morrigan.player.PlayerRegister;
 
@@ -283,13 +282,13 @@ public class MorriganCommandProvider implements CommandProvider {
 		String cmd = args.remove(0);
 		try {
 			int playerId = Integer.parseInt(cmd);
-			IPlayerLocal player = PlayerRegister.getPlayer(playerId);
+			IPlayerLocal player = PlayerRegister.getLocalPlayer(playerId);
 			doPlayersPlayer(player, args);
 		}
 		catch (NumberFormatException e) {
 			// If we only have one player, assume the next param is a cmd.
-			if (PlayerRegister.getPlayers().size() == 1) {
-				IPlayerLocal player = PlayerRegister.getPlayer(0);
+			if (PlayerRegister.getLocalPlayers().size() == 1) {
+				IPlayerLocal player = PlayerRegister.getLocalPlayer(0);
 				args.add(0, cmd);
 				doPlayersPlayer(player, args);
 			}
@@ -300,7 +299,7 @@ public class MorriganCommandProvider implements CommandProvider {
 	}
 	
 	static private void doPlayersList() {
-		List<Player> players = PlayerRegister.getPlayers();
+		List<IPlayerLocal> players = PlayerRegister.getLocalPlayers();
 		System.out.println("id\tplayer");
 		for (IPlayerLocal p : players) {
 			System.out.print(p.getId());
@@ -488,8 +487,8 @@ public class MorriganCommandProvider implements CommandProvider {
 //	TODO reduce code duplication?
 	
 	static private void doPlay (List<String> args) {
-		if (PlayerRegister.getPlayers().size() == 1) {
-			IPlayerLocal player = PlayerRegister.getPlayer(0);
+		if (PlayerRegister.getLocalPlayers().size() == 1) {
+			IPlayerLocal player = PlayerRegister.getLocalPlayer(0);
 			doPlayersPlayerPlay(player, args, false);
 		}
 		else {
@@ -498,8 +497,8 @@ public class MorriganCommandProvider implements CommandProvider {
 	}
 	
 	static private void doQueue (List<String> args) {
-		if (PlayerRegister.getPlayers().size() == 1) {
-			IPlayerLocal player = PlayerRegister.getPlayer(0);
+		if (PlayerRegister.getLocalPlayers().size() == 1) {
+			IPlayerLocal player = PlayerRegister.getLocalPlayer(0);
 			doPlayersPlayerPlay(player, args, true);
 		}
 		else {
@@ -508,8 +507,8 @@ public class MorriganCommandProvider implements CommandProvider {
 	}
 	
 	static private void doPause (List<String> args) {
-		if (PlayerRegister.getPlayers().size() == 1) {
-			IPlayerLocal player = PlayerRegister.getPlayer(0);
+		if (PlayerRegister.getLocalPlayers().size() == 1) {
+			IPlayerLocal player = PlayerRegister.getLocalPlayer(0);
 			doPlayersPlayerPause(player);
 		}
 		else {
@@ -518,8 +517,8 @@ public class MorriganCommandProvider implements CommandProvider {
 	}
 	
 	static private void doStop (List<String> args) {
-		if (PlayerRegister.getPlayers().size() == 1) {
-			IPlayerLocal player = PlayerRegister.getPlayer(0);
+		if (PlayerRegister.getLocalPlayers().size() == 1) {
+			IPlayerLocal player = PlayerRegister.getLocalPlayer(0);
 			doPlayersPlayerStop(player);
 		}
 		else {
@@ -528,8 +527,8 @@ public class MorriganCommandProvider implements CommandProvider {
 	}
 	
 	static private void doNext (List<String> args) {
-		if (PlayerRegister.getPlayers().size() == 1) {
-			IPlayerLocal player = PlayerRegister.getPlayer(0);
+		if (PlayerRegister.getLocalPlayers().size() == 1) {
+			IPlayerLocal player = PlayerRegister.getLocalPlayer(0);
 			doPlayersPlayerNext(player);
 		}
 		else {

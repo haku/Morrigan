@@ -11,7 +11,6 @@ import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.ErrorHelper;
 import net.sparktank.morrigan.player.IPlayerLocal;
 import net.sparktank.morrigan.player.PlayItem;
-import net.sparktank.morrigan.player.Player;
 import net.sparktank.morrigan.player.PlayerHelper;
 import net.sparktank.morrigan.player.PlayerRegister;
 
@@ -64,7 +63,7 @@ public class PlayersHandler extends AbstractHandler {
 		StringBuilder sb = new StringBuilder();
 		sb.append("<h2>All players</h2>");
 		
-		List<Player> players = PlayerRegister.getPlayers();
+		List<IPlayerLocal> players = PlayerRegister.getLocalPlayers();
 		sb.append("<ul>");
 		for (IPlayerLocal p : players) {
 			sb.append("<li><a href=\"/player/"+p.getId()+"\"> p"+p.getId());
@@ -85,7 +84,7 @@ public class PlayersHandler extends AbstractHandler {
 		sb.append("<h2><a href=\"/player/"+n+"\">Player "+n+"</a></h2>");
 		sb.append("<p style=\"font-size:1.5em;text-align:center;\"><a href=\"/player/"+n+"/playpause\">play / pause</a> | <a href=\"/player/"+n+"/next\">next</a></p>");
 		
-		IPlayerLocal player = PlayerRegister.getPlayer(n);
+		IPlayerLocal player = PlayerRegister.getLocalPlayer(n);
 		sb.append("<ul>");
 		sb.append("<li>state="+player.getPlayState().toString()+"</li>");
 		PlayItem currentItem = player.getCurrentItem();
@@ -104,7 +103,7 @@ public class PlayersHandler extends AbstractHandler {
 	
 	static private void doAction (int id, String action, String param) throws MorriganException {
 		System.err.println("[doAction] id=" + id + ", action=" + action + ", param=" + param);
-		IPlayerLocal player = PlayerRegister.getPlayer(id);
+		IPlayerLocal player = PlayerRegister.getLocalPlayer(id);
 		
 		String a = action.toLowerCase();
 		if (a.equals("playpause")) {

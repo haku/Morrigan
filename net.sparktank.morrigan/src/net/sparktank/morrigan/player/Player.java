@@ -39,7 +39,7 @@ public class Player implements IPlayerLocal {
 	
 	@Override
 	public void dispose () {
-		PlayerRegister.removePlayer(this);
+		PlayerRegister.removeLocalPlayer(this);
 		setCurrentItem(null);
 		finalisePlaybackEngine();
 	}

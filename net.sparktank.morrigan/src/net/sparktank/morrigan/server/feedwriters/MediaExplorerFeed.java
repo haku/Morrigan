@@ -7,7 +7,6 @@ import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDbHelper;
 import net.sparktank.morrigan.player.IPlayerLocal;
-import net.sparktank.morrigan.player.Player;
 import net.sparktank.morrigan.player.PlayerRegister;
 
 import org.xml.sax.SAXException;
@@ -30,7 +29,7 @@ public class MediaExplorerFeed extends AbstractFeed {
 		addLink(dw, "/media/newmmdb", "newmmdb", "cmd");
 		addLink(dw, "/media/newlib", "newlib", "cmd");
 		
-		List<Player> players = PlayerRegister.getPlayers();
+		List<IPlayerLocal> players = PlayerRegister.getLocalPlayers();
 		
 		for (int n = 0; n < 2; n++) {
 			ArrayList<MediaExplorerItem> items = new ArrayList<MediaExplorerItem>();
