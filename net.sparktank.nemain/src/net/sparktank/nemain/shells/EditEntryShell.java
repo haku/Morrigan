@@ -35,66 +35,67 @@ public class EditEntryShell {
 	
 	private Shell shell;
 	private Text text = null;
-	private Button btnConfirm = null;
+	Button btnConfirm = null;
 	private Button btnCancel = null;
 	
 	private void makeShell () {
 		FormData formData;
 		
-		shell = new Shell(parent.getDisplay(), SWT.TITLE | SWT.CLOSE | SWT.PRIMARY_MODAL | SWT.RESIZE);
-		text = new Text(shell, SWT.MULTI | SWT.WRAP | SWT.BORDER);
-		btnConfirm = new Button(shell, SWT.PUSH);
-		btnCancel = new Button(shell, SWT.PUSH);
+		this.shell = new Shell(this.parent.getDisplay(), SWT.TITLE | SWT.CLOSE | SWT.PRIMARY_MODAL | SWT.RESIZE);
+		this.text = new Text(this.shell, SWT.MULTI | SWT.WRAP | SWT.BORDER);
+		this.btnConfirm = new Button(this.shell, SWT.PUSH);
+		this.btnCancel = new Button(this.shell, SWT.PUSH);
 		
-		shell.setImage(parent.getImage());
-		shell.setText("Edit entry");
-		shell.setLayout(new FormLayout());
-		shell.addTraverseListener(traverseListener);
+		this.shell.setImage(this.parent.getImage());
+		this.shell.setText("Edit entry");
+		this.shell.setLayout(new FormLayout());
+		this.shell.addTraverseListener(this.traverseListener);
 		
 		formData = new FormData();
 		formData.left = new FormAttachment(0, SEP);
 		formData.top = new FormAttachment(0, SEP);
 		formData.right = new FormAttachment(100, -SEP);
-		formData.bottom = new FormAttachment(btnConfirm, -SEP);
+		formData.bottom = new FormAttachment(this.btnConfirm, -SEP);
 		formData.width = 500;
 		formData.height = 300;
-		text.setLayoutData(formData);
+		this.text.setLayoutData(formData);
 		
-		btnConfirm.setText("Confirm");
+		this.btnConfirm.setText("Confirm");
 		formData = new FormData();
 		formData.right = new FormAttachment(100, -SEP);
 		formData.bottom = new FormAttachment(100, -SEP);
-		btnConfirm.setLayoutData(formData);
+		this.btnConfirm.setLayoutData(formData);
 		
-		btnCancel.setText("Cancel");
+		this.btnCancel.setText("Cancel");
 		formData = new FormData();
 		formData.left = new FormAttachment(0, SEP);
 		formData.bottom = new FormAttachment(100, -SEP);
-		btnCancel.setLayoutData(formData);
+		this.btnCancel.setLayoutData(formData);
 		
-		btnConfirm.addSelectionListener(buttonListener);
-		btnCancel.addSelectionListener(buttonListener);
+		this.btnConfirm.addSelectionListener(this.buttonListener);
+		this.btnCancel.addSelectionListener(this.buttonListener);
 		
-		shell.pack();
+		this.shell.pack();
 	}
 	
 	public void remoteClose () {
 		leaveDlg(false);
 	}
 	
-	private void leaveDlg (boolean ok) {
-		exitValue = ok;
+	void leaveDlg (boolean ok) {
+		this.exitValue = ok;
 		
 		if (ok) {
-			exitText = text.getText();
+			this.exitText = this.text.getText();
 		} else {
-			exitText = null;
+			this.exitText = null;
 		}
 		
-		shell.close();
+		this.shell.close();
 	}
 	
 	private TraverseListener traverseListener = new TraverseListener() {
+		@Override
 		public void keyTraversed(TraverseEvent e) {
 			switch (e.detail) {
 				
@@ -117,7 +118,7 @@ public class EditEntryShell {
 	private SelectionListener buttonListener = new SelectionAdapter() {
 		@Override
 		public void widgetSelected(SelectionEvent e) {
-			if (e.widget == btnConfirm) {
+			if (e.widget == EditEntryShell.this.btnConfirm) {
 				leaveDlg(true);
 				
 			} else {
@@ -128,9 +129,9 @@ public class EditEntryShell {
 	};
 	
 	private void showAndWaitForShellToClose () {
-		shell.open();
-		Display display = parent.getDisplay();
-		while (!shell.isDisposed()) {
+		this.shell.open();
+		Display display = this.parent.getDisplay();
+		while (!this.shell.isDisposed()) {
 			if (!display.readAndDispatch()) {
 				display.sleep();
 			}
@@ -140,15 +141,15 @@ public class EditEntryShell {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public boolean showDlg (NemainEvent event) {
-		shell.setText("Entry for " + event.getDateAsString());
-		text.setText(event.getEntryText());
+		this.shell.setText("Entry for " + event.getDateAsString());
+		this.text.setText(event.getEntryText());
 		
 		showAndWaitForShellToClose();
-		return exitValue;
+		return this.exitValue;
 	}
 	
 	public String getExitText() {
-		return exitText;
+		return this.exitText;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

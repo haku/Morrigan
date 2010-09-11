@@ -35,15 +35,15 @@ public class NemainDate {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public int getYear() {
-		return entryYear;
+		return this.entryYear;
 	}
 	
 	public int getMonth() {
-		return entryMonth;
+		return this.entryMonth;
 	}
 	
 	public int getDay() {
-		return entryDay;
+		return this.entryDay;
 	}
 	
 	public boolean isMutable () {
@@ -71,9 +71,9 @@ public class NemainDate {
 	public boolean isSameDay (NemainDate date) {
 		if (getYear() == 0) {
 			return getMonth() == date.getMonth() && getDay() == date.getDay();
-		} else {
-			return getYear() == date.getYear() && getMonth() == date.getMonth() && getDay() == date.getDay();
 		}
+		
+		return getYear() == date.getYear() && getMonth() == date.getMonth() && getDay() == date.getDay();
 	}
 	
 	public boolean isOnOrAfter (NemainDate date) {
@@ -92,10 +92,10 @@ public class NemainDate {
 		if (getYear() == 0) {
 			return isDateOnOrAfter(ref_year, getMonth(), getDay(), ref_year, ref_month, ref_day)
 					&& !isDateOnOrAfter(ref_year, getMonth(), getDay(), daysAfterDate(ref_year, ref_month, ref_day, nDaysAfter+1));
-		} else {
-			return isDateOnOrAfter(getYear(), getMonth(), getDay(), ref_year, ref_month, ref_day)
-					&& !isDateOnOrAfter(getYear(), getMonth(), getDay(), daysAfterDate(ref_year, ref_month, ref_day, nDaysAfter+1));
 		}
+		
+		return isDateOnOrAfter(getYear(), getMonth(), getDay(), ref_year, ref_month, ref_day)
+				&& !isDateOnOrAfter(getYear(), getMonth(), getDay(), daysAfterDate(ref_year, ref_month, ref_day, nDaysAfter+1));
 	}
 	
 	public NemainDate daysAfter (int nDays) {

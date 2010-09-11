@@ -22,7 +22,7 @@ public class NemainEvent extends NemainDate {
 	private String entryText;
 	
 	public String getEntryText() {
-		return entryText;
+		return this.entryText;
 	}
 	
 	@Override
@@ -51,14 +51,14 @@ public class NemainEvent extends NemainDate {
 		NemainEvent that = (NemainEvent)aThat;
 		
 		return super.equals(aThat)
-			&& EqualHelper.areEqual(entryText, that.getEntryText());
+			&& EqualHelper.areEqual(this.entryText, that.getEntryText());
 	}
 	
 	@Override
 	public int hashCode() {
 		int hash = 1;
 		hash = hash * 31 + super.hashCode();
-		hash = hash * 31 + (entryText == null ? 0 : entryText.hashCode());
+		hash = hash * 31 + (this.entryText == null ? 0 : this.entryText.hashCode());
 		return hash;
 	}
 	
