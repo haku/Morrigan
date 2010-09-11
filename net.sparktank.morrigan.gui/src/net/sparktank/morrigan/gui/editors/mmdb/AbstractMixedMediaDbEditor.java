@@ -16,11 +16,11 @@ import net.sparktank.morrigan.helpers.TimeHelper;
 import net.sparktank.morrigan.model.MediaSqliteLayer2;
 import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
 import net.sparktank.morrigan.model.media.impl.AbstractMixedMediaDb;
+import net.sparktank.morrigan.model.media.impl.DurationData;
 import net.sparktank.morrigan.model.media.impl.MixedMediaItem;
 import net.sparktank.morrigan.model.media.impl.MixedMediaSqliteLayerImpl;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemDb.SortChangeListener;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemStorageLayer.SortDirection;
-import net.sparktank.morrigan.model.media.interfaces.IMediaTrackList.DurationData;
 import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem.MediaType;
 import net.sparktank.morrigan.model.media.interfaces.IMixedMediaStorageLayer;
@@ -180,10 +180,10 @@ public abstract class AbstractMixedMediaDbEditor<T extends AbstractMixedMediaDb<
 		
 		sb.append(getMediaList().getCount());
 		sb.append(" items totaling ");
-		if (!d.complete) {
+		if (!d.isComplete()) {
 			sb.append("more than ");
 		}
-		sb.append(TimeHelper.formatTimeSeconds(d.duration));
+		sb.append(TimeHelper.formatTimeSeconds(d.getDuration()));
 		sb.append(".");
 		
 		long queryTime = getMediaList().getDurationOfLastRead();

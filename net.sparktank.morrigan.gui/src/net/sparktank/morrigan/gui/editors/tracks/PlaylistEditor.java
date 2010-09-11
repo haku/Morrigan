@@ -12,8 +12,8 @@ import net.sparktank.morrigan.gui.actions.SaveEditorAction;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.display.ActionListener;
 import net.sparktank.morrigan.helpers.TimeHelper;
+import net.sparktank.morrigan.model.media.impl.DurationData;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
-import net.sparktank.morrigan.model.media.interfaces.IMediaTrackList.DurationData;
 import net.sparktank.morrigan.model.tracks.MediaTrack;
 import net.sparktank.morrigan.model.tracks.playlist.MediaPlaylist;
 
@@ -191,8 +191,8 @@ public class PlaylistEditor extends MediaTrackListEditor<MediaPlaylist,IMediaTra
 		
 		this.lblStatus.setText(
 				getMediaList().getCount() + " items"
-				+ " totaling " + (d.complete ? "" : "more than ") +
-				TimeHelper.formatTimeSeconds(d.duration) + "."
+				+ " totaling " + (d.isComplete() ? "" : "more than ") +
+				TimeHelper.formatTimeSeconds(d.getDuration()) + "."
 				);
 	}
 	

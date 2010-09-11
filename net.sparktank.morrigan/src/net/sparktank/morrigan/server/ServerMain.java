@@ -5,9 +5,9 @@ import net.sparktank.morrigan.helpers.ErrorHelper;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrackList;
 import net.sparktank.morrigan.player.IPlayerEventHandler;
+import net.sparktank.morrigan.player.IPlayerLocal;
 import net.sparktank.morrigan.player.OrderHelper.PlaybackOrder;
 import net.sparktank.morrigan.player.PlayItem;
-import net.sparktank.morrigan.player.Player;
 import net.sparktank.morrigan.player.PlayerRegister;
 
 import org.eclipse.swt.widgets.Composite;
@@ -36,7 +36,7 @@ public class ServerMain {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private static Player _player;
+	private static IPlayerLocal _player;
 	
 	static private void setupPlayer () {
 		_player = PlayerRegister.makePlayer(eventHandler);

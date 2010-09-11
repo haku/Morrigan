@@ -9,16 +9,17 @@ import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.TimeHelper;
 import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
 import net.sparktank.morrigan.model.media.HeadlessHelper;
+import net.sparktank.morrigan.model.media.impl.DurationData;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDbHelper;
 import net.sparktank.morrigan.model.media.impl.RemoteMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.RemoteMixedMediaDbHelper;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrackList;
+import net.sparktank.morrigan.player.IPlayerLocal;
 import net.sparktank.morrigan.player.OrderHelper.PlaybackOrder;
 import net.sparktank.morrigan.player.PlayItem;
 import net.sparktank.morrigan.player.Player;
-import net.sparktank.morrigan.player.Player.DurationData;
 import net.sparktank.morrigan.player.PlayerHelper;
 import net.sparktank.morrigan.player.PlayerRegister;
 
@@ -282,13 +283,13 @@ public class MorriganCommandProvider implements CommandProvider {
 		String cmd = args.remove(0);
 		try {
 			int playerId = Integer.parseInt(cmd);
-			Player player = PlayerRegister.getPlayer(playerId);
+			IPlayerLocal player = PlayerRegister.getPlayer(playerId);
 			doPlayersPlayer(player, args);
 		}
 		catch (NumberFormatException e) {
 			// If we only have one player, assume the next param is a cmd.
 			if (PlayerRegister.getPlayers().size() == 1) {
-				Player player = PlayerRegister.getPlayer(0);
+				IPlayerLocal player = PlayerRegister.getPlayer(0);
 				args.add(0, cmd);
 				doPlayersPlayer(player, args);
 			}
@@ -301,7 +302,7 @@ public class MorriganCommandProvider implements CommandProvider {
 	static private void doPlayersList() {
 		List<Player> players = PlayerRegister.getPlayers();
 		System.out.println("id\tplayer");
-		for (Player p : players) {
+		for (IPlayerLocal p : players) {
 			System.out.print(p.getId());
 			System.out.print("\t");
 			System.out.print(p.getPlayState());
@@ -316,7 +317,7 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 	}
 	
-	static private void doPlayersPlayer (Player player, List<String> args) {
+	static private void doPlayersPlayer (IPlayerLocal player, List<String> args) {
 		if (args.size() < 1) {
 			doPlayersPlayerInfo(player);
 			return;
@@ -346,7 +347,7 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 	}
 	
-	static private void doPlayersPlayerInfo (Player player) {
+	static private void doPlayersPlayerInfo (IPlayerLocal player) {
 		System.out.print("Player ");
 		System.out.print(player.getId());
 		System.out.print(": ");
@@ -367,7 +368,7 @@ public class MorriganCommandProvider implements CommandProvider {
 		System.out.println("\tqueue=" + player.getQueueList().size() + " items.");
 	}
 	
-	static private void doPlayersPlayerPlay (Player player, List<String> args, boolean addToQueue) {
+	static private void doPlayersPlayerPlay (IPlayerLocal player, List<String> args, boolean addToQueue) {
 		if (args.size() < 1) {
 			if (addToQueue) {
 				doPlayersPlayerPrintQueue(player);
@@ -427,17 +428,17 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 	}
 	
-	static private void doPlayersPlayerPause (Player player) {
+	static private void doPlayersPlayerPause (IPlayerLocal player) {
 		player.pausePlaying();
 		System.out.println("Player " + player.getId() + ": " + player.getPlayState().toString());
 	}
 	
-	static private void doPlayersPlayerStop (Player player) {
+	static private void doPlayersPlayerStop (IPlayerLocal player) {
 		player.stopPlaying();
 		System.out.println("Player " + player.getId() + ": " + player.getPlayState().toString());
 	}
 	
-	static private void doPlayersPlayerNext (Player player) {
+	static private void doPlayersPlayerNext (IPlayerLocal player) {
 		player.nextTrack();
 		PlayItem currentItem = player.getCurrentItem();
 		if (currentItem == null) {
@@ -448,7 +449,7 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 	}
 	
-	static private void doPlayersPlayerOrder (Player player, List<String> args) {
+	static private void doPlayersPlayerOrder (IPlayerLocal player, List<String> args) {
 		if (args.size() < 1) {
 			System.out.println("Order mode parameter not specifed.");
 			return;
@@ -465,7 +466,7 @@ public class MorriganCommandProvider implements CommandProvider {
 		System.out.println("Unknown playback order '"+arg+"'.");
 	}
 	
-	static private void doPlayersPlayerPrintQueue (Player player) {
+	static private void doPlayersPlayerPrintQueue (IPlayerLocal player) {
 		List<PlayItem> queue = player.getQueueList();
 		
 		if (queue.size() < 1) {
@@ -475,8 +476,8 @@ public class MorriganCommandProvider implements CommandProvider {
 		
 		DurationData duration = player.getQueueTotalDuration();
 		System.out.println("Player " + player.getId() + " has " + queue.size()
-				+ " items totaling " + (duration.complete ? "" : " more than ") 
-				+ TimeHelper.formatTimeSeconds(duration.duration) + " in its queue.");
+				+ " items totaling " + (duration.isComplete() ? "" : " more than ") 
+				+ TimeHelper.formatTimeSeconds(duration.getDuration()) + " in its queue.");
 		for (PlayItem pi : queue) {
 			System.out.println(" > " + pi.toString());
 		}
@@ -488,7 +489,7 @@ public class MorriganCommandProvider implements CommandProvider {
 	
 	static private void doPlay (List<String> args) {
 		if (PlayerRegister.getPlayers().size() == 1) {
-			Player player = PlayerRegister.getPlayer(0);
+			IPlayerLocal player = PlayerRegister.getPlayer(0);
 			doPlayersPlayerPlay(player, args, false);
 		}
 		else {
@@ -498,7 +499,7 @@ public class MorriganCommandProvider implements CommandProvider {
 	
 	static private void doQueue (List<String> args) {
 		if (PlayerRegister.getPlayers().size() == 1) {
-			Player player = PlayerRegister.getPlayer(0);
+			IPlayerLocal player = PlayerRegister.getPlayer(0);
 			doPlayersPlayerPlay(player, args, true);
 		}
 		else {
@@ -508,7 +509,7 @@ public class MorriganCommandProvider implements CommandProvider {
 	
 	static private void doPause (List<String> args) {
 		if (PlayerRegister.getPlayers().size() == 1) {
-			Player player = PlayerRegister.getPlayer(0);
+			IPlayerLocal player = PlayerRegister.getPlayer(0);
 			doPlayersPlayerPause(player);
 		}
 		else {
@@ -518,7 +519,7 @@ public class MorriganCommandProvider implements CommandProvider {
 	
 	static private void doStop (List<String> args) {
 		if (PlayerRegister.getPlayers().size() == 1) {
-			Player player = PlayerRegister.getPlayer(0);
+			IPlayerLocal player = PlayerRegister.getPlayer(0);
 			doPlayersPlayerStop(player);
 		}
 		else {
@@ -528,7 +529,7 @@ public class MorriganCommandProvider implements CommandProvider {
 	
 	static private void doNext (List<String> args) {
 		if (PlayerRegister.getPlayers().size() == 1) {
-			Player player = PlayerRegister.getPlayer(0);
+			IPlayerLocal player = PlayerRegister.getPlayer(0);
 			doPlayersPlayerNext(player);
 		}
 		else {

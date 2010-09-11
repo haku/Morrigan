@@ -6,6 +6,7 @@ import java.util.List;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDbHelper;
+import net.sparktank.morrigan.player.IPlayerLocal;
 import net.sparktank.morrigan.player.Player;
 import net.sparktank.morrigan.player.PlayerRegister;
 
@@ -50,7 +51,7 @@ public class MediaExplorerFeed extends AbstractFeed {
 				addElement(dw, "title", i.title);
 				addLink(dw, "/media/" + type + "/" + fileName, "self", "text/xml");
 				
-				for (Player p : players) {
+				for (IPlayerLocal p : players) {
 					addLink(dw, "/player/" + p.getId() + "/play/" + fileName, "play", "cmd");
 				}
 				

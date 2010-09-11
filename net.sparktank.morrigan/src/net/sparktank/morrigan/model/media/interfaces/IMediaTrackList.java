@@ -3,15 +3,9 @@ package net.sparktank.morrigan.model.media.interfaces;
 import java.util.Date;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
+import net.sparktank.morrigan.model.media.impl.DurationData;
 
 public interface IMediaTrackList<T extends IMediaTrack> extends IMediaItemList<T> {
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	static public class DurationData {
-		public long duration;
-		public boolean complete;
-	}
-	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public void incTrackStartCnt (IMediaTrack item, long n) throws MorriganException;

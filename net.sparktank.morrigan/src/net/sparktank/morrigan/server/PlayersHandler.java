@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.helpers.ErrorHelper;
+import net.sparktank.morrigan.player.IPlayerLocal;
 import net.sparktank.morrigan.player.PlayItem;
 import net.sparktank.morrigan.player.Player;
 import net.sparktank.morrigan.player.PlayerHelper;
@@ -65,7 +66,7 @@ public class PlayersHandler extends AbstractHandler {
 		
 		List<Player> players = PlayerRegister.getPlayers();
 		sb.append("<ul>");
-		for (Player p : players) {
+		for (IPlayerLocal p : players) {
 			sb.append("<li><a href=\"/player/"+p.getId()+"\"> p"+p.getId());
 			sb.append(" " + p.getPlayState().toString()+ ": ");
 			PlayItem currentItem = p.getCurrentItem();
@@ -84,7 +85,7 @@ public class PlayersHandler extends AbstractHandler {
 		sb.append("<h2><a href=\"/player/"+n+"\">Player "+n+"</a></h2>");
 		sb.append("<p style=\"font-size:1.5em;text-align:center;\"><a href=\"/player/"+n+"/playpause\">play / pause</a> | <a href=\"/player/"+n+"/next\">next</a></p>");
 		
-		Player player = PlayerRegister.getPlayer(n);
+		IPlayerLocal player = PlayerRegister.getPlayer(n);
 		sb.append("<ul>");
 		sb.append("<li>state="+player.getPlayState().toString()+"</li>");
 		PlayItem currentItem = player.getCurrentItem();
@@ -103,7 +104,7 @@ public class PlayersHandler extends AbstractHandler {
 	
 	static private void doAction (int id, String action, String param) throws MorriganException {
 		System.err.println("[doAction] id=" + id + ", action=" + action + ", param=" + param);
-		Player player = PlayerRegister.getPlayer(id);
+		IPlayerLocal player = PlayerRegister.getPlayer(id);
 		
 		String a = action.toLowerCase();
 		if (a.equals("playpause")) {
@@ -117,7 +118,7 @@ public class PlayersHandler extends AbstractHandler {
 		}
 	}
 	
-	static private void doPlay (Player player, String param) throws MorriganException {
+	static private void doPlay (IPlayerLocal player, String param) throws MorriganException {
 		List<PlayItem> results = PlayerHelper.queryForPlayableItems(param, null, 2);
 		if (results.size() == 1) {
 			player.loadAndStartPlaying(results.get(0));
