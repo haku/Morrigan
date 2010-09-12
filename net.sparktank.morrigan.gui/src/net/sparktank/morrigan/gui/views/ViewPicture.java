@@ -6,17 +6,25 @@ import java.util.List;
 
 import net.sparktank.morrigan.config.Config;
 import net.sparktank.morrigan.exceptions.MorriganException;
+import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.editors.IMediaItemDbEditor;
+import net.sparktank.morrigan.gui.editors.MediaItemListEditor;
+import net.sparktank.morrigan.gui.editors.MediaItemListEditorInput;
 import net.sparktank.morrigan.model.media.impl.MediaItem;
+import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemDb;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Image;
@@ -25,6 +33,8 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.ISelectionService;
 import org.eclipse.ui.IWorkbenchPart;
@@ -44,9 +54,6 @@ public class ViewPicture extends ViewPart {
 		createLayout(parent);
 		initSelectionListener();
 	}
-	
-	@Override
-	public void setFocus() {/* UNUSED */}
 	
 	@Override
 	public void dispose() {
@@ -73,7 +80,7 @@ public class ViewPicture extends ViewPart {
 		public void selectionChanged(IWorkbenchPart part, ISelection selection) {
 			if (part instanceof IMediaItemDbEditor) {
 				if (selection==null || selection.isEmpty()) {
-					setInput(null, null);
+					setInput(null, (IMediaItem)null);
 					return;
 				}
 				
@@ -101,20 +108,27 @@ public class ViewPicture extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Data links.
 	
-	IMediaItemDb<?,?,?> editedItemDb = null;
-	MediaItem editedItem = null;
+	IMediaItemDb<?,?,? extends IMediaItem> editedItemDb = null;
+	IMediaItem editedItem = null;
 	
-	public void setInput (IMediaItemDb<?,?,?> editedMediaList, List<? extends MediaItem> selection) {
+	public void setInput (IMediaItemDb<?,?,? extends IMediaItem> editedMediaList, List<? extends IMediaItem> selection) {
+		IMediaItem item = null;
 		if (selection != null && selection.size() > 0) {
 			if (selection.size() == 1) {
-				this.editedItem = selection.get(0);
-			}
-			else {
-				this.editedItem = null;
+				item = selection.get(0);
 			}
 		}
+		setInput(editedMediaList, item);
+	}
+	
+	public void setInput (IMediaItemDb<?,?,? extends IMediaItem> editedMediaList, IMediaItem item) {
+		this.editedItem = item;
+		
+		if (this.editedItem != null) {
+			this.editedItemDb = editedMediaList;
+		}
 		else {
-			this.editedItem = null;
+			this.editedItemDb = null;
 		}
 		
 		setPicture(this.editedItem);
@@ -151,14 +165,44 @@ public class ViewPicture extends ViewPart {
 		this.pictureCanvas = new Canvas(parent, SWT.NONE);
 		this.pictureCanvas.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_BLACK));
 		this.pictureCanvas.addPaintListener(this.picturePainter);
+		this.pictureCanvas.addKeyListener(this.keyListener);
+		
+		getViewSite().getActionBars().getToolBarManager().add(this.prevItemAction);
+		getViewSite().getActionBars().getToolBarManager().add(this.nextItemAction);
 	}
+	
+	@Override
+	public void setFocus() {
+		if (this.pictureCanvas != null && !this.pictureCanvas.isDisposed()) {
+			this.pictureCanvas.setFocus();
+		}
+	}
+	
+	private KeyListener keyListener = new KeyListener() {
+		@Override
+		public void keyReleased(KeyEvent e) {
+			if (e.keyCode == SWT.ARROW_RIGHT || e.keyCode == SWT.ARROW_DOWN || e.keyCode == SWT.PAGE_DOWN
+					|| e.character == ' ' || e.character == 'n' || e.character == 'f' || e.character == '\r') {
+				nextPicture(1);
+			}
+			else if (e.keyCode == SWT.ARROW_LEFT || e.keyCode == SWT.ARROW_UP || e.keyCode == SWT.PAGE_UP
+					|| e.character == 'p' || e.character == 'b') {
+				nextPicture(-1);
+			}
+		}
+		@Override
+		public void keyPressed(KeyEvent e) {/* UNUSED */}
+	};
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Loading and showing pictures.
 	
 	class LoadPictureJob extends Job {
 		
-		private final MediaItem item;
+		private final IMediaItem item;
 		private final Display display;
 
-		public LoadPictureJob (Display display, MediaItem item) {
+		public LoadPictureJob (Display display, IMediaItem item) {
 			super("Loading picture");
 			this.display = display;
 			this.item = item;
@@ -192,7 +236,7 @@ public class ViewPicture extends ViewPart {
 		
 	}
 	
-	private void setPicture (MediaItem item) {
+	private void setPicture (IMediaItem item) {
 		if (item == null) return;
 		
 		String ext = item.getFilepath();
@@ -256,6 +300,59 @@ public class ViewPicture extends ViewPart {
 				);
 			}
 		}
+	};
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Control methods.
+	
+	protected void nextPicture (int x) {
+		if (this.editedItemDb != null && this.editedItem != null) {
+			List<? extends IMediaItem> dbEntries = this.editedItemDb.getMediaItems();
+			int i = dbEntries.indexOf(this.editedItem);
+			if (i >= 0) { // Did we find the current item?
+				i = i + x;
+				if (i > dbEntries.size() -1) {
+					i = 0;
+				}
+				else if (i < 0) {
+					i = dbEntries.size() - 1;
+				}
+			} else {
+				i = 0;
+			}
+			IMediaItem entry = dbEntries.get(i);
+			
+			IEditorPart activeEditor = getViewSite().getWorkbenchWindow().getActivePage().getActiveEditor();
+			IEditorInput edInput = activeEditor.getEditorInput();
+			if (edInput instanceof MediaItemListEditorInput) {
+				MediaItemListEditorInput<?> miEdInput = (MediaItemListEditorInput<?>) edInput;
+				if (miEdInput.getMediaList().getListId().equals(this.editedItemDb.getListId())) {
+					if (activeEditor instanceof MediaItemListEditor<?,?>) {
+						MediaItemListEditor<?,?> mediaListEditor = (MediaItemListEditor<?,?>) activeEditor;
+						mediaListEditor.revealItem(entry, false);
+					}
+				}
+			}
+			
+			setInput(this.editedItemDb, entry);
+		}
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Actions.
+	
+	protected IAction nextItemAction = new Action ("Next", Activator.getImageDescriptor("icons/next.gif")) {
+		@Override
+		public void run() {
+			nextPicture(1);
+		};
+	};
+	
+	protected IAction prevItemAction = new Action ("Previous", Activator.getImageDescriptor("icons/prev.gif")) {
+		@Override
+		public void run() {
+			nextPicture(-1);
+		};
 	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
