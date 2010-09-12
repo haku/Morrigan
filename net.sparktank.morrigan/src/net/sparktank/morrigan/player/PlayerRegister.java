@@ -41,7 +41,7 @@ public class PlayerRegister {
 	
 	static public void removeLocalPlayer (IPlayerLocal player) {
 		listLocalPlayers.remove(player);
-		listAllPlayers.remove(playerN);
+		listAllPlayers.remove(player);
 	}
 	
 	static public List<IPlayerLocal> getLocalPlayers () {
@@ -80,7 +80,7 @@ public class PlayerRegister {
 	
 	static public void removeRemotePlayer (IPlayerRemote player) {
 		listRemotePlayers.remove(player);
-		listAllPlayers.remove(playerN);
+		listAllPlayers.remove(player);
 	}
 	
 	static public List<IPlayerRemote> getRemotePlayers () {
