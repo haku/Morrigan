@@ -314,8 +314,12 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 	}
 	
 	public void revealItem (Object element) {
+		revealItem(element, true);
+	}
+	
+	public void revealItem (Object element, boolean setFocus) {
 		this.editTable.setSelection(new StructuredSelection(element), true);
-		this.editTable.getTable().setFocus();
+		if (setFocus) this.editTable.getTable().setFocus();
 	}
 	
 	protected void setFilterString (String s) {
