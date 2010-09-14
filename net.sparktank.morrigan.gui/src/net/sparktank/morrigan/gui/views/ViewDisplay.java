@@ -88,7 +88,7 @@ public class ViewDisplay extends ViewPart {
 		public void perspectiveActivated(IWorkbenchPage page, IPerspectiveDescriptor perspective) {/* UNUSED */}
 	};
 	
-Composite mediaFrameParent;
+	Composite mediaFrameParent;
 	private ScreenPainter screenPainter;
 	
 	private void makeControls (Composite parent) {
