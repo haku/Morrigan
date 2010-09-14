@@ -3,6 +3,10 @@ package net.sparktank.morrigan.gui.views;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicReference;
 
 import net.sparktank.morrigan.config.Config;
 import net.sparktank.morrigan.exceptions.MorriganException;
@@ -17,6 +21,7 @@ import net.sparktank.morrigan.gui.editors.mmdb.LocalMixedMediaDbEditor;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemDb;
+import net.sparktank.morrigan.model.media.interfaces.IMediaPicture;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -52,6 +57,8 @@ public class ViewPicture extends ViewPart {
 	
 	public static final String ID = "net.sparktank.morrigan.gui.views.ViewPicture";
 	
+	private static final int PICTURE_CHANGE_INTERVAL = 60000;
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
@@ -59,10 +66,12 @@ public class ViewPicture extends ViewPart {
 		initFileTypes();
 		createLayout(parent);
 		initSelectionListener();
+		startTimer();
 	}
 	
 	@Override
 	public void dispose() {
+		stopTimer();
 		removeSelectionListener();
 		disposeGui();
 		super.dispose();
@@ -152,6 +161,7 @@ public class ViewPicture extends ViewPart {
 	
 	Canvas pictureCanvas = null;
 	Image pictureImage = null;
+	long pictureLastChanged = 0;
 	
 	private void disposeGui () {
 		if (this.pictureImage != null && !this.pictureImage.isDisposed()) {
@@ -178,6 +188,8 @@ public class ViewPicture extends ViewPart {
 		
 		getViewSite().getActionBars().getToolBarManager().add(this.prevItemAction);
 		getViewSite().getActionBars().getToolBarManager().add(this.nextItemAction);
+		getViewSite().getActionBars().getToolBarManager().add(this.randomItemAction);
+		getViewSite().getActionBars().getToolBarManager().add(this.enableTimerAction);
 		getViewSite().getActionBars().getToolBarManager().add(new Separator());
 		getViewSite().getActionBars().getToolBarManager().add(this.revealItemAction);
 	}
@@ -239,6 +251,8 @@ public class ViewPicture extends ViewPart {
 		
 		@Override
 		public IStatus runInUIThread(IProgressMonitor monitor) {
+			ViewPicture.this.pictureLastChanged = System.currentTimeMillis();
+			
 			if (!ViewPicture.this.pictureCanvas.isDisposed()) {
 				ViewPicture.this.pictureCanvas.redraw();
 			}
@@ -247,7 +261,7 @@ public class ViewPicture extends ViewPart {
 		
 	}
 	
-	private void setPicture (IMediaItem item) {
+	private void setPicture (final IMediaItem item) {
 		if (item == null) return;
 		
 		if (isPictureItem(item)) {
@@ -255,7 +269,19 @@ public class ViewPicture extends ViewPart {
 				ViewPicture.this.pictureImage.dispose();
 				ViewPicture.this.pictureImage = null;
 			}
-			setContentDescription(item.getTitle());
+			getSite().getShell().getDisplay().asyncExec(new Runnable() {
+				@SuppressWarnings("synthetic-access")
+				@Override
+				public void run() {
+					if (item instanceof IMediaPicture) {
+						IMediaPicture itemPic = (IMediaPicture) item;
+						setContentDescription(itemPic.getTitle() + " (" + itemPic.getWidth() + "x" + itemPic.getHeight() + ")");
+					}
+					else {
+						setContentDescription(item.getTitle());
+					}
+				}
+			});
 			
 			LoadPictureJob loadPictureJob = new LoadPictureJob(getSite().getShell().getDisplay(), item);
 			
@@ -349,6 +375,13 @@ public class ViewPicture extends ViewPart {
 		}
 	}
 	
+	protected void randomPicture () {
+		if (this.editedItemDb != null && this.editedItem != null) {
+			IMediaItem item = getRandomItem(this.editedItemDb.getMediaItems(), this.editedItem);
+			setInput(this.editedItemDb, item);
+		}
+	}
+	
 	protected void revealItemInList () throws PartInitException, MorriganException {
 		if (this.editedItemDb != null && this.editedItem != null) {
 			if (this.editedItemDb.getType().equals(LocalMixedMediaDb.TYPE)) {
@@ -366,6 +399,48 @@ public class ViewPicture extends ViewPart {
 				mediaListEditor.revealItem(this.editedItem);
 			}
 		}
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Scheduler.
+	
+	private Timer timer = new Timer();
+	private AtomicReference<TimerTask> changeTimer = new AtomicReference<TimerTask>();
+	
+	void startTimer () {
+		ChangeTask t = new ChangeTask();
+		if (this.changeTimer.compareAndSet(null, t)) {
+			this.timer.schedule(t, 5000, 5000);
+			this.enableTimerAction.setChecked(true);
+		}
+	}
+	
+	void stopTimer () {
+		TimerTask t = this.changeTimer.get();
+		if (t != null && this.changeTimer.compareAndSet(t, null)) {
+			t.cancel();
+			this.enableTimerAction.setChecked(false);
+		}
+	}
+	
+	private class ChangeTask extends TimerTask {
+
+		long lastChaged = 0;
+		
+		public ChangeTask () {/* UNUSED */}
+		
+		@Override
+		public void run() {
+			if (this.lastChaged != ViewPicture.this.pictureLastChanged
+					&& System.currentTimeMillis() - ViewPicture.this.pictureLastChanged >= PICTURE_CHANGE_INTERVAL) {
+				this.lastChaged = ViewPicture.this.pictureLastChanged;
+				randomPicture();
+			}
+//			else {
+//				System.err.println("Picture change in " + (PICTURE_CHANGE_INTERVAL - (System.currentTimeMillis() - ViewPicture.this.pictureLastChanged)));
+//			}
+		}
+		
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -396,12 +471,61 @@ public class ViewPicture extends ViewPart {
 		};
 	};
 	
+	protected IAction randomItemAction = new Action ("Random", Activator.getImageDescriptor("icons/question.png")) {
+		@Override
+		public void run() {
+			randomPicture();
+		};
+	};
+	
+	protected class EnableTimerAction extends Action {
+		
+		public EnableTimerAction () {
+			super("Timer", AS_CHECK_BOX);
+			this.setImageDescriptor(Activator.getImageDescriptor("icons/play.gif"));
+		}
+		
+	}
+	
+	protected IAction enableTimerAction = new EnableTimerAction () {
+		@Override
+		public void run() {
+			if (isChecked()) startTimer(); else stopTimer();
+		};
+	};
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private boolean isPictureItem (IMediaItem item) {
 		String ext = item.getFilepath();
 		ext = ext.substring(ext.lastIndexOf(".") + 1).toLowerCase();
 		return (this.supportedFormats.contains(ext));
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	private static IMediaItem getRandomItem (List<? extends IMediaItem> dbEntries, IMediaItem current) {
+		Random generator = new Random();
+		
+		int n = 0;
+		for (IMediaItem mi : dbEntries) {
+			if (mi.isEnabled() && !mi.isMissing() && mi != current) {
+				n++;
+			}
+		}
+		if (n == 0) return null;
+		
+		long x = Math.round(generator.nextDouble() * n);
+		for (IMediaItem mi : dbEntries) {
+			if (mi.isEnabled() && !mi.isMissing() && mi != current) {
+				x--;
+				if (x<=0) {
+					return mi;
+				}
+			}
+		}
+		
+		throw new RuntimeException("Failed to find random item.  This should not happen.");
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
