@@ -212,6 +212,9 @@ public class ViewPicture extends ViewPart {
 					|| e.character == 'p' || e.character == 'b') {
 				nextPicture(-1);
 			}
+			else if (e.character == 'r' || e.character == 'q' || e.character == 'g') {
+				randomPicture();
+			}
 		}
 		@Override
 		public void keyPressed(KeyEvent e) {/* UNUSED */}
