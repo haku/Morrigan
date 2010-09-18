@@ -47,6 +47,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.ISelectionService;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
@@ -192,6 +193,7 @@ public class ViewPicture extends ViewPart {
 		getViewSite().getActionBars().getToolBarManager().add(this.enableTimerAction);
 		getViewSite().getActionBars().getToolBarManager().add(new Separator());
 		getViewSite().getActionBars().getToolBarManager().add(this.revealItemAction);
+		getViewSite().getActionBars().getToolBarManager().add(this.showTagsAction);
 	}
 	
 	@Override
@@ -214,6 +216,14 @@ public class ViewPicture extends ViewPart {
 			}
 			else if (e.character == 'r' || e.character == 'q' || e.character == 'g') {
 				randomPicture();
+			}
+			else if (e.character == 't') {
+				try {
+					showTagsView();
+				}
+				catch (Exception ex) {
+					new MorriganMsgDlg(ex).open();
+				}
 			}
 		}
 		@Override
@@ -404,6 +414,14 @@ public class ViewPicture extends ViewPart {
 		}
 	}
 	
+	protected void showTagsView () throws PartInitException {
+		if (this.editedItemDb != null && this.editedItem != null) {
+			IViewPart showView = getSite().getPage().showView(ViewTagEditor.ID);
+			ViewTagEditor viewTagEd = (ViewTagEditor) showView;
+			viewTagEd.setInput(this.editedItemDb, this.editedItem);
+		}
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Scheduler.
 	
@@ -485,7 +503,7 @@ public class ViewPicture extends ViewPart {
 		
 		public EnableTimerAction () {
 			super("Timer", AS_CHECK_BOX);
-			this.setImageDescriptor(Activator.getImageDescriptor("icons/play.gif"));
+			this.setImageDescriptor(Activator.getImageDescriptor("icons/timer.png"));
 		}
 		
 	}
@@ -495,6 +513,18 @@ public class ViewPicture extends ViewPart {
 		public void run() {
 			if (isChecked()) startTimer(); else stopTimer();
 		};
+	};
+	
+	protected IAction showTagsAction = new Action("Tags", Activator.getImageDescriptor("icons/tag.png")) {
+		@Override
+		public void run () {
+			try {
+				showTagsView();
+			}
+			catch (Exception e) {
+				new MorriganMsgDlg(e).open();
+			}
+		}
 	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
