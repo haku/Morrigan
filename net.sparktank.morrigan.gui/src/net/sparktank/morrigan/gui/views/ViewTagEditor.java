@@ -67,6 +67,7 @@ public class ViewTagEditor extends ViewPart {
 	
 	@Override
 	public void setFocus() {
+		this.txtNewTag.setSelection(0, this.txtNewTag.getText().length());
 		this.txtNewTag.setFocus();
 	}
 	
@@ -105,7 +106,7 @@ public class ViewTagEditor extends ViewPart {
 			if (part instanceof IMediaItemDbEditor) {
 				IMediaItemDbEditor<?,?,?> libEditor = (IMediaItemDbEditor<?,?,?>) part;
 				if (libEditor.getMediaList().equals(ViewTagEditor.this.editedItemDb)) {
-					setInput(null, null);
+					setInput(null, (IMediaItem)null);
 				}
 			}
 		}
@@ -125,7 +126,7 @@ public class ViewTagEditor extends ViewPart {
 		public void selectionChanged(IWorkbenchPart part, ISelection selection) {
 			if (part instanceof IMediaItemDbEditor) {
 				if (selection==null || selection.isEmpty()) {
-					setInput(null, null);
+					setInput(null, (IMediaItem)null);
 					return;
 				}
 				
@@ -155,6 +156,17 @@ public class ViewTagEditor extends ViewPart {
 	
 	IMediaItemDb<?,?,?> editedItemDb = null;
 	IMediaItem editedItem = null;
+	
+	public void setInput (IMediaItemDb<?,?,?> editedMediaList, IMediaItem item) {
+		if (item != null) {
+    		List<IMediaItem> list = new LinkedList<IMediaItem>();
+    		list.add(item);
+    		setInput(editedMediaList, list);
+		}
+		else {
+			setInput(editedMediaList, (List<? extends IMediaItem>)null);
+		}
+	}
 	
 	public void setInput (IMediaItemDb<?,?,?> editedMediaList, List<? extends IMediaItem> selection) {
 		if (selection != null && selection.size() > 0) {

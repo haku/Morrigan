@@ -92,7 +92,7 @@
       </view>
       <view
             class="net.sparktank.morrigan.gui.views.ViewTagEditor"
-            icon="icons/pref.gif"
+            icon="icons/tag.png"
             id="net.sparktank.morrigan.gui.views.ViewTagEditor"
             category="net.sparktank.morrigan"
             name="Tags"
