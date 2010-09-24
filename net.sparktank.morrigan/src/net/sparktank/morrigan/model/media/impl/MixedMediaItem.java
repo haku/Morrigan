@@ -116,6 +116,11 @@ public class MixedMediaItem extends MediaItem implements IMixedMediaItem {
 //	-  -  -  -  -  -  -  -  -
 //	IMediaPicture.
 	
+	@Override
+	public boolean isPicture() {
+		return (getMediaType() == MediaType.PICTURE);
+	}
+	
 	private int width;
 	private int height;
 	
