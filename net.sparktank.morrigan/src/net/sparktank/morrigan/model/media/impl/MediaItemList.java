@@ -275,6 +275,18 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Queries.
+	
+	@Override
+	public T findItemByFilePath (String path) {
+		Map<String, T> map = new HashMap<String, T>();
+		for (T item : this.mediaTracks) {
+			map.put(item.getFilepath(), item);
+		}
+		return map.get(path);
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
 	public String toString () {
