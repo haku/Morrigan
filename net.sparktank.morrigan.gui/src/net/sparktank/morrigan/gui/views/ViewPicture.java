@@ -19,7 +19,7 @@ import net.sparktank.morrigan.gui.editors.MediaItemListEditorInput;
 import net.sparktank.morrigan.gui.editors.mmdb.LocalMixedMediaDbEditor;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemDb;
-import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem;
+import net.sparktank.morrigan.model.media.interfaces.IMediaPicture;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -111,7 +111,7 @@ public class ViewPicture extends ViewPart {
     			LocalMixedMediaDb mmdb;
     			mmdb = LocalMixedMediaDb.LOCAL_MMDB_FACTORY.manufacture(dbpath);
     			mmdb.read();
-    			IMixedMediaItem item = mmdb.findItemByFilePath(itempath);
+    			IMediaPicture item = mmdb.findItemByFilePath(itempath);
     			
     			if (item != null) { 
     				setInput(mmdb, item);
@@ -156,15 +156,15 @@ public class ViewPicture extends ViewPart {
 				}
 				
 				IMixedMediaItemDbEditor<?,?,?> editor = (IMixedMediaItemDbEditor<?,?,?>) part;
-				IMediaItemDb<?,?,? extends IMixedMediaItem> list = editor.getMediaList();
+				IMediaItemDb<?,?,? extends IMediaPicture> list = editor.getMediaList();
 				
 				if (selection instanceof IStructuredSelection) {
 					IStructuredSelection iSel = (IStructuredSelection) selection;
-					ArrayList<IMixedMediaItem> sel = new ArrayList<IMixedMediaItem>();
+					ArrayList<IMediaPicture> sel = new ArrayList<IMediaPicture>();
 					for (Object selectedObject : iSel.toList()) {
 						if (selectedObject != null) {
-							if (selectedObject instanceof IMixedMediaItem) {
-								IMixedMediaItem track = (IMixedMediaItem) selectedObject;
+							if (selectedObject instanceof IMediaPicture) {
+								IMediaPicture track = (IMediaPicture) selectedObject;
 								sel.add(track);
 							}
 						}
@@ -179,11 +179,11 @@ public class ViewPicture extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Data links.
 	
-	IMediaItemDb<?,?,? extends IMixedMediaItem> editedItemDb = null;
-	IMixedMediaItem editedItem = null;
+	IMediaItemDb<?,?,? extends IMediaPicture> editedItemDb = null;
+	IMediaPicture editedItem = null;
 	
-	public void setInput (IMediaItemDb<?,?,? extends IMixedMediaItem> editedMediaList, List<? extends IMixedMediaItem> selection) {
-		IMixedMediaItem item = null;
+	public void setInput (IMediaItemDb<?,?,? extends IMediaPicture> editedMediaList, List<? extends IMediaPicture> selection) {
+		IMediaPicture item = null;
 		if (selection != null && selection.size() > 0) {
 			if (selection.size() == 1) {
 				item = selection.get(0);
@@ -195,7 +195,7 @@ public class ViewPicture extends ViewPart {
 		}
 	}
 	
-	public void setInput (IMediaItemDb<?,?,? extends IMixedMediaItem> editedMediaList, IMixedMediaItem item) {
+	public void setInput (IMediaItemDb<?,?,? extends IMediaPicture> editedMediaList, IMediaPicture item) {
 		this.editedItem = item;
 		
 		if (this.editedItem != null) {
@@ -280,10 +280,10 @@ public class ViewPicture extends ViewPart {
 	
 	class LoadPictureJob extends Job {
 		
-		private final IMixedMediaItem item;
+		private final IMediaPicture item;
 		private final Display display;
 		
-		public LoadPictureJob (Display display, IMixedMediaItem item) {
+		public LoadPictureJob (Display display, IMediaPicture item) {
 			super("Loading picture");
 			this.display = display;
 			this.item = item;
@@ -320,7 +320,7 @@ public class ViewPicture extends ViewPart {
 		
 	}
 	
-	private void setPicture (final IMixedMediaItem item) {
+	private void setPicture (final IMediaPicture item) {
 		if (item == null) return;
 		
 		if (item.isPicture()) {
@@ -395,7 +395,7 @@ public class ViewPicture extends ViewPart {
 	
 	protected void nextPicture (int x) {
 		if (this.editedItemDb != null && this.editedItem != null) {
-			List<? extends IMixedMediaItem> dbEntries = this.editedItemDb.getMediaItems();
+			List<? extends IMediaPicture> dbEntries = this.editedItemDb.getMediaItems();
 			int current = dbEntries.indexOf(this.editedItem);
 			int res = -1;
 			if (current >= 0) { // Did we find the current item?
@@ -419,7 +419,7 @@ public class ViewPicture extends ViewPart {
 			}
 			
 			if (res >= 0) {
-				IMixedMediaItem entry = dbEntries.get(res);
+				IMediaPicture entry = dbEntries.get(res);
 				
 				// Reveal current item in list?
 				IEditorPart activeEditor = getViewSite().getWorkbenchWindow().getActivePage().getActiveEditor();
@@ -443,7 +443,7 @@ public class ViewPicture extends ViewPart {
 	
 	protected void randomPicture () {
 		if (this.editedItemDb != null && this.editedItem != null) {
-			IMixedMediaItem item = getRandomItem(this.editedItemDb.getMediaItems(), this.editedItem);
+			IMediaPicture item = getRandomItem(this.editedItemDb.getMediaItems(), this.editedItem);
 			setInput(this.editedItemDb, item);
 		}
 	}
@@ -586,9 +586,9 @@ public class ViewPicture extends ViewPart {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private static IMixedMediaItem getRandomItem (List<? extends IMixedMediaItem> dbEntries, IMixedMediaItem current) {
-		List<IMixedMediaItem> list = new LinkedList<IMixedMediaItem>();
-		for (IMixedMediaItem mi : dbEntries) {
+	private static IMediaPicture getRandomItem (List<? extends IMediaPicture> dbEntries, IMediaPicture current) {
+		List<IMediaPicture> list = new LinkedList<IMediaPicture>();
+		for (IMediaPicture mi : dbEntries) {
 			if (mi.isEnabled() && !mi.isMissing() && mi != current && mi.isPicture()) {
 				list.add(mi);
 			}
