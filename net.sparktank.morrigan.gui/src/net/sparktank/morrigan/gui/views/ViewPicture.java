@@ -22,6 +22,7 @@ import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemDb;
 import net.sparktank.morrigan.model.media.interfaces.IMediaPicture;
+import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -45,9 +46,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IMemento;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.ISelectionService;
 import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
@@ -64,10 +67,8 @@ public class ViewPicture extends ViewPart {
 	
 	@Override
 	public void createPartControl(Composite parent) {
-		initFileTypes();
 		createLayout(parent);
 		initSelectionListener();
-		startTimer();
 	}
 	
 	@Override
@@ -76,6 +77,81 @@ public class ViewPicture extends ViewPart {
 		removeSelectionListener();
 		disposeGui();
 		super.dispose();
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	State.
+	
+	/*
+	 * Some very basic code to save / restore local MMDB.
+	 */
+	
+	private static final String KEY_TIMER = "TIMER";
+	private static final String KEY_DB = "DB";
+	private static final String KEY_ITEM = "ITEM";
+	
+	@Override
+	public void saveState(IMemento memento) {
+		super.saveState(memento);
+		
+		memento.putBoolean(KEY_TIMER, isTimerEnabled());
+		
+		if (this.editedItemDb != null && this.editedItemDb.getType().equals(LocalMixedMediaDb.TYPE)) {
+			memento.putString(KEY_DB, this.editedItemDb.getDbPath());
+			memento.putString(KEY_ITEM, this.editedItem.getFilepath());
+		}
+	}
+	
+	@Override
+	public void init(IViewSite site, IMemento memento) throws PartInitException {
+		super.init(site, memento);
+		
+		try {
+			String dbpath = memento.getString(KEY_DB);
+			String itempath = memento.getString(KEY_ITEM);
+			
+			if (dbpath != null && itempath != null) {
+    			LocalMixedMediaDb mmdb;
+    			mmdb = LocalMixedMediaDb.LOCAL_MMDB_FACTORY.manufacture(dbpath);
+    			mmdb.read();
+    			IMixedMediaItem item = mmdb.findItemByFilePath(itempath);
+    			
+    			if (item != null) { 
+    				setInput(mmdb, item);
+    			}
+    			else {
+    				// TODO something with this error.
+    				System.err.println("Failed to restore item '"+itempath+"' from '"+dbpath+"'.");
+    			}
+			}
+		}
+		catch (Exception e) {
+			new MorriganMsgDlg(e).open();
+		}
+		
+		Boolean b = memento.getBoolean(KEY_TIMER);
+		if (b == null || b.booleanValue()) { // Default to true.
+			startTimer();
+		}
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	File types.
+	
+	List<String> supportedFormats = null;
+	
+	private boolean isPictureItem (IMediaItem item) {
+		if (this.supportedFormats == null) {
+    		try {
+    			this.supportedFormats = Arrays.asList(Config.getPictureFileTypes());
+    		} catch (MorriganException e) {
+    			throw new RuntimeException(e);
+    		}
+		}
+		
+		String ext = item.getFilepath();
+		ext = ext.substring(ext.lastIndexOf(".") + 1).toLowerCase();
+		return (this.supportedFormats.contains(ext));
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -156,8 +232,6 @@ public class ViewPicture extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	GUI stuff.
 	
-	List<String> supportedFormats = null;
-	
 	protected final int sep = 3;
 	
 	Canvas pictureCanvas = null;
@@ -168,14 +242,6 @@ public class ViewPicture extends ViewPart {
 		if (this.pictureImage != null && !this.pictureImage.isDisposed()) {
 			this.pictureImage.dispose();
 			this.pictureImage = null;
-		}
-	}
-	
-	public void initFileTypes () {
-		try {
-			this.supportedFormats = Arrays.asList(Config.getPictureFileTypes());
-		} catch (MorriganException e) {
-			throw new RuntimeException(e);
 		}
 	}
 	
@@ -248,7 +314,8 @@ public class ViewPicture extends ViewPart {
 		protected IStatus run(IProgressMonitor monitor) {
 			if (this.item != null && this.item.isEnabled()) {
 				if (ViewPicture.this.pictureImage != null) throw new IllegalArgumentException();
-				ViewPicture.this.pictureImage = new Image(ViewPicture.this.pictureCanvas.getDisplay(), this.item.getFilepath());
+				String filepath = this.item.getFilepath();
+				ViewPicture.this.pictureImage = new Image(this.display, filepath);
 				new UpdatePictureJob(this.display).schedule();
 			}
 			return Status.OK_STATUS;
@@ -444,6 +511,10 @@ public class ViewPicture extends ViewPart {
 		}
 	}
 	
+	boolean isTimerEnabled () {
+		return this.changeTimer.get() != null;
+	}
+	
 	private class ChangeTask extends TimerTask {
 
 		long lastChaged = 0;
@@ -526,14 +597,6 @@ public class ViewPicture extends ViewPart {
 			}
 		}
 	};
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	private boolean isPictureItem (IMediaItem item) {
-		String ext = item.getFilepath();
-		ext = ext.substring(ext.lastIndexOf(".") + 1).toLowerCase();
-		return (this.supportedFormats.contains(ext));
-	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
