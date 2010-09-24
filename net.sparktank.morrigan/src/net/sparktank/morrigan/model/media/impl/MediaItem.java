@@ -10,7 +10,7 @@ import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
 /**
  * Generic media item, be it music, video, image, etc...
  */
-public class MediaItem implements IMediaItem, IDbItem {
+public abstract class MediaItem implements IMediaItem, IDbItem {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors.
 	
