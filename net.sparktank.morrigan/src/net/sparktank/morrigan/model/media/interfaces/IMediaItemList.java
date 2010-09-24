@@ -52,5 +52,7 @@ public interface IMediaItemList<T extends IMediaItem> {
 	
 	public void copyItemFile (T item, File targetDirectory) throws MorriganException;
 	
+	public T findItemByFilePath (String path);
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
