@@ -1,27 +1,24 @@
 package net.sparktank.morrigan.gui.views;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicReference;
 
-import net.sparktank.morrigan.config.Config;
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.editors.EditorFactory;
-import net.sparktank.morrigan.gui.editors.IMediaItemDbEditor;
+import net.sparktank.morrigan.gui.editors.IMixedMediaItemDbEditor;
 import net.sparktank.morrigan.gui.editors.MediaItemDbEditorInput;
 import net.sparktank.morrigan.gui.editors.MediaItemListEditor;
 import net.sparktank.morrigan.gui.editors.MediaItemListEditorInput;
 import net.sparktank.morrigan.gui.editors.mmdb.LocalMixedMediaDbEditor;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
-import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemDb;
-import net.sparktank.morrigan.model.media.interfaces.IMediaPicture;
 import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -136,25 +133,6 @@ public class ViewPicture extends ViewPart {
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	File types.
-	
-	List<String> supportedFormats = null;
-	
-	private boolean isPictureItem (IMediaItem item) {
-		if (this.supportedFormats == null) {
-    		try {
-    			this.supportedFormats = Arrays.asList(Config.getPictureFileTypes());
-    		} catch (MorriganException e) {
-    			throw new RuntimeException(e);
-    		}
-		}
-		
-		String ext = item.getFilepath();
-		ext = ext.substring(ext.lastIndexOf(".") + 1).toLowerCase();
-		return (this.supportedFormats.contains(ext));
-	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	External events.
 	
 	private void initSelectionListener () {
@@ -172,21 +150,21 @@ public class ViewPicture extends ViewPart {
 	private ISelectionListener selectionListener = new ISelectionListener() {
 		@Override
 		public void selectionChanged(IWorkbenchPart part, ISelection selection) {
-			if (ViewPicture.this.listenToSelectionListener && part instanceof IMediaItemDbEditor) {
+			if (ViewPicture.this.listenToSelectionListener && part instanceof IMixedMediaItemDbEditor) {
 				if (selection==null || selection.isEmpty()) {
 					return;
 				}
 				
-				IMediaItemDbEditor<?,?,?> editor = (IMediaItemDbEditor<?,?,?>) part;
-				IMediaItemDb<?,?,?> list = editor.getMediaList();
+				IMixedMediaItemDbEditor<?,?,?> editor = (IMixedMediaItemDbEditor<?,?,?>) part;
+				IMediaItemDb<?,?,? extends IMixedMediaItem> list = editor.getMediaList();
 				
 				if (selection instanceof IStructuredSelection) {
 					IStructuredSelection iSel = (IStructuredSelection) selection;
-					ArrayList<IMediaItem> sel = new ArrayList<IMediaItem>();
+					ArrayList<IMixedMediaItem> sel = new ArrayList<IMixedMediaItem>();
 					for (Object selectedObject : iSel.toList()) {
 						if (selectedObject != null) {
-							if (selectedObject instanceof IMediaItem) {
-								IMediaItem track = (IMediaItem) selectedObject;
+							if (selectedObject instanceof IMixedMediaItem) {
+								IMixedMediaItem track = (IMixedMediaItem) selectedObject;
 								sel.add(track);
 							}
 						}
@@ -201,22 +179,23 @@ public class ViewPicture extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Data links.
 	
-	IMediaItemDb<?,?,? extends IMediaItem> editedItemDb = null;
-	IMediaItem editedItem = null;
+	IMediaItemDb<?,?,? extends IMixedMediaItem> editedItemDb = null;
+	IMixedMediaItem editedItem = null;
 	
-	public void setInput (IMediaItemDb<?,?,? extends IMediaItem> editedMediaList, List<? extends IMediaItem> selection) {
-		IMediaItem item = null;
+	public void setInput (IMediaItemDb<?,?,? extends IMixedMediaItem> editedMediaList, List<? extends IMixedMediaItem> selection) {
+		IMixedMediaItem item = null;
 		if (selection != null && selection.size() > 0) {
 			if (selection.size() == 1) {
 				item = selection.get(0);
 			}
 		}
-		if (isPictureItem(item)) {
+		if (item == null) throw new IllegalArgumentException("item can not be null.");
+		if (item.isPicture()) {
 			setInput(editedMediaList, item);
 		}
 	}
 	
-	public void setInput (IMediaItemDb<?,?,? extends IMediaItem> editedMediaList, IMediaItem item) {
+	public void setInput (IMediaItemDb<?,?,? extends IMixedMediaItem> editedMediaList, IMixedMediaItem item) {
 		this.editedItem = item;
 		
 		if (this.editedItem != null) {
@@ -301,10 +280,10 @@ public class ViewPicture extends ViewPart {
 	
 	class LoadPictureJob extends Job {
 		
-		private final IMediaItem item;
+		private final IMixedMediaItem item;
 		private final Display display;
-
-		public LoadPictureJob (Display display, IMediaItem item) {
+		
+		public LoadPictureJob (Display display, IMixedMediaItem item) {
 			super("Loading picture");
 			this.display = display;
 			this.item = item;
@@ -341,10 +320,10 @@ public class ViewPicture extends ViewPart {
 		
 	}
 	
-	private void setPicture (final IMediaItem item) {
+	private void setPicture (final IMixedMediaItem item) {
 		if (item == null) return;
 		
-		if (isPictureItem(item)) {
+		if (item.isPicture()) {
 			if (ViewPicture.this.pictureImage != null && !ViewPicture.this.pictureImage.isDisposed()) {
 				ViewPicture.this.pictureImage.dispose();
 				ViewPicture.this.pictureImage = null;
@@ -353,13 +332,7 @@ public class ViewPicture extends ViewPart {
 				@SuppressWarnings("synthetic-access")
 				@Override
 				public void run() {
-					if (item instanceof IMediaPicture) {
-						IMediaPicture itemPic = (IMediaPicture) item;
-						setContentDescription(itemPic.getTitle() + " (" + itemPic.getWidth() + "x" + itemPic.getHeight() + ")");
-					}
-					else {
-						setContentDescription(item.getTitle());
-					}
+					setContentDescription(item.getTitle() + " (" + item.getWidth() + "x" + item.getHeight() + ")");
 				}
 			});
 			
@@ -422,42 +395,55 @@ public class ViewPicture extends ViewPart {
 	
 	protected void nextPicture (int x) {
 		if (this.editedItemDb != null && this.editedItem != null) {
-			List<? extends IMediaItem> dbEntries = this.editedItemDb.getMediaItems();
-			int i = dbEntries.indexOf(this.editedItem);
-			if (i >= 0) { // Did we find the current item?
-				i = i + x;
-				if (i > dbEntries.size() -1) {
-					i = 0;
+			List<? extends IMixedMediaItem> dbEntries = this.editedItemDb.getMediaItems();
+			int current = dbEntries.indexOf(this.editedItem);
+			int res = -1;
+			if (current >= 0) { // Did we find the current item?
+				int i = current + x;
+				while (i != current) { // Keep searching until we find a picture or we get back where we started.
+					i = i + x;
+					if (i > dbEntries.size() -1) {
+						i = 0;
+					}
+					else if (i < 0) {
+						i = dbEntries.size() - 1;
+					}
+					if (dbEntries.get(i).isPicture()) {
+						res = i;
+						break;
+					}
 				}
-				else if (i < 0) {
-					i = dbEntries.size() - 1;
-				}
-			} else {
-				i = 0;
 			}
-			IMediaItem entry = dbEntries.get(i);
-			
-			IEditorPart activeEditor = getViewSite().getWorkbenchWindow().getActivePage().getActiveEditor();
-			if (activeEditor != null) {
-    			IEditorInput edInput = activeEditor.getEditorInput();
-    			if (edInput instanceof MediaItemListEditorInput) {
-    				MediaItemListEditorInput<?> miEdInput = (MediaItemListEditorInput<?>) edInput;
-    				if (miEdInput.getMediaList().getListId().equals(this.editedItemDb.getListId())) {
-    					if (activeEditor instanceof MediaItemListEditor<?,?>) {
-    						MediaItemListEditor<?,?> mediaListEditor = (MediaItemListEditor<?,?>) activeEditor;
-    						mediaListEditor.revealItem(entry, false);
-    					}
-    				}
-    			}
+			else if (dbEntries.size() > 0) {
+				res = 0;
 			}
 			
-			setInput(this.editedItemDb, entry);
+			if (res >= 0) {
+				IMixedMediaItem entry = dbEntries.get(res);
+				
+				// Reveal current item in list?
+				IEditorPart activeEditor = getViewSite().getWorkbenchWindow().getActivePage().getActiveEditor();
+				if (activeEditor != null) {
+					IEditorInput edInput = activeEditor.getEditorInput();
+					if (edInput instanceof MediaItemListEditorInput) {
+						MediaItemListEditorInput<?> miEdInput = (MediaItemListEditorInput<?>) edInput;
+						if (miEdInput.getMediaList().getListId().equals(this.editedItemDb.getListId())) {
+							if (activeEditor instanceof MediaItemListEditor<?,?>) {
+								MediaItemListEditor<?,?> mediaListEditor = (MediaItemListEditor<?,?>) activeEditor;
+								mediaListEditor.revealItem(entry, false);
+							}
+						}
+					}
+				}
+				
+				setInput(this.editedItemDb, entry);
+			}
 		}
 	}
 	
 	protected void randomPicture () {
 		if (this.editedItemDb != null && this.editedItem != null) {
-			IMediaItem item = getRandomItem(this.editedItemDb.getMediaItems(), this.editedItem);
+			IMixedMediaItem item = getRandomItem(this.editedItemDb.getMediaItems(), this.editedItem);
 			setInput(this.editedItemDb, item);
 		}
 	}
@@ -600,28 +586,18 @@ public class ViewPicture extends ViewPart {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private static IMediaItem getRandomItem (List<? extends IMediaItem> dbEntries, IMediaItem current) {
+	private static IMixedMediaItem getRandomItem (List<? extends IMixedMediaItem> dbEntries, IMixedMediaItem current) {
+		List<IMixedMediaItem> list = new LinkedList<IMixedMediaItem>();
+		for (IMixedMediaItem mi : dbEntries) {
+			if (mi.isEnabled() && !mi.isMissing() && mi != current && mi.isPicture()) {
+				list.add(mi);
+			}
+		}
+		if (list.size() < 1) return null;
+		
 		Random generator = new Random();
-		
-		int n = 0;
-		for (IMediaItem mi : dbEntries) {
-			if (mi.isEnabled() && !mi.isMissing() && mi != current) {
-				n++;
-			}
-		}
-		if (n == 0) return null;
-		
-		long x = Math.round(generator.nextDouble() * n);
-		for (IMediaItem mi : dbEntries) {
-			if (mi.isEnabled() && !mi.isMissing() && mi != current) {
-				x--;
-				if (x<=0) {
-					return mi;
-				}
-			}
-		}
-		
-		throw new RuntimeException("Failed to find random item.  This should not happen.");
+		int x = Math.round(generator.nextFloat() * list.size());
+		return list.get(x);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
