@@ -9,7 +9,7 @@ import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.dialogs.RunnableDialog;
 import net.sparktank.morrigan.gui.display.DropMenuListener;
-import net.sparktank.morrigan.gui.editors.IMediaItemDbEditor;
+import net.sparktank.morrigan.gui.editors.IMixedMediaItemDbEditor;
 import net.sparktank.morrigan.gui.editors.MediaColumn;
 import net.sparktank.morrigan.gui.preferences.MediaListPref;
 import net.sparktank.morrigan.helpers.TimeHelper;
@@ -45,7 +45,7 @@ import org.eclipse.swt.widgets.Text;
 
 public abstract class AbstractMixedMediaDbEditor<T extends AbstractMixedMediaDb<T>>
 		extends MixedMediaListEditor<T, IMixedMediaItem>
-		implements IMediaItemDbEditor<T, IMixedMediaStorageLayer<IMixedMediaItem>, IMixedMediaItem> {
+		implements IMixedMediaItemDbEditor<T, IMixedMediaStorageLayer<IMixedMediaItem>, IMixedMediaItem> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public AbstractMixedMediaDbEditor () {
