@@ -87,7 +87,7 @@ public abstract class MixedMediaListEditor<T extends IMixedMediaList<S>, S exten
 				IEditorReference[] editors = getEditorSite().getPage().getEditorReferences();
 				for (final IEditorReference e : editors) {
 					if (e.getId().equals(PlaylistEditor.ID)) {
-						menu.add(new AddToPlaylistAction(e));
+						menu.add(new AddToPlaylistAction(MixedMediaListEditor.this, e));
 					}
 				}
 				if (menu.getItems().length < 1) {

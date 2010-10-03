@@ -85,7 +85,7 @@ public abstract class MediaTrackListEditor<T extends IMediaTrackList<S>, S exten
 				IEditorReference[] editors = getEditorSite().getPage().getEditorReferences();
 				for (final IEditorReference e : editors) {
 					if (e.getId().equals(PlaylistEditor.ID)) {
-						menu.add(new AddToPlaylistAction(e));
+						menu.add(new AddToPlaylistAction(MediaTrackListEditor.this, e));
 					}
 				}
 				if (menu.getItems().length < 1) {
