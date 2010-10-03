@@ -72,58 +72,58 @@ public class MorriganCommandProvider implements CommandProvider {
 			args.add(arg);
 		}
 		if (args.size() < 1) {
-			System.out.println("No method specified.");
+			ci.println("No method specified.");
 			return;
 		}
 		
 		String cmd = args.remove(0);
 		if (cmd.equals("m") || cmd.equals("media")) {
-			doMedia(args);
+			doMedia(ci, args);
 		}
 		else if (cmd.equals("p") || cmd.equals("players") || cmd.equals("player")) {
-			doPlayers(args);
+			doPlayers(ci, args);
 		}
 		else if (cmd.equals("play")) {
-			doPlay(args);
+			doPlay(ci, args);
 		}
 		else if (cmd.equals("q") || cmd.equals("queue") || cmd.equals("enqueue")) {
-			doQueue(args);
+			doQueue(ci, args);
 		}
 		else if (cmd.equals("pause")) {
-			doPause(args);
+			doPause(ci, args);
 		}
 		else if (cmd.equals("s") || cmd.equals("stop")) {
-			doStop(args);
+			doStop(ci, args);
 		}
 		else if (cmd.equals("n") || cmd.equals("next")) {
-			doNext(args);
+			doNext(ci, args);
 		}
 		else {
-			System.out.println("Unknown command '"+cmd+"'.");
+			ci.println("Unknown command '"+cmd+"'.");
 		}
 		
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	static private void doMedia (List<String> args) {
+	static private void doMedia (CommandInterpreter ci, List<String> args) {
 		if (args.size() < 1) {
-			doMediaList();
+			doMediaList(ci);
 			return;
 		}
 		
 		String cmd = args.remove(0);
 		if (cmd.equals("list")) {
-			doMediaList();
+			doMediaList(ci);
 		}
 		else if (cmd.equals("s") || cmd.equals("u") || cmd.equals("scan") || cmd.equals("update")) {
-			doMediaScan(args);
+			doMediaScan(ci, args);
 		}
 		else if (cmd.equals("c") || cmd.equals("create")) {
-			doMediaCreate(args);
+			doMediaCreate(ci, args);
 		}
 		else if (cmd.equals("a") || cmd.equals("add")) {
-			doMediaAdd(args);
+			doMediaAdd(ci, args);
 		}
 		else {
 			String q1 = cmd;
@@ -138,11 +138,11 @@ public class MorriganCommandProvider implements CommandProvider {
 			}
 			
 			if (results == null || results.size() < 1) {
-				System.out.println("No results for query '"+q1+"' '"+q2+"'.");
+				ci.println("No results for query '"+q1+"' '"+q2+"'.");
 			}
 			else if (results.size() == 1) {
 				IMediaTrackList<? extends IMediaTrack> list = results.get(0).list;
-				System.out.println("Query match: " + list);
+				ci.println("Query match: " + list);
 				if (results.get(0).list instanceof LocalMixedMediaDb) {
 					LocalMixedMediaDb mmdb = (LocalMixedMediaDb) list;
 					List<String> sources;
@@ -153,47 +153,47 @@ public class MorriganCommandProvider implements CommandProvider {
 						return;
 					}
 					for (String s : sources) {
-						System.out.println(" src > " + s);
+						ci.println(" src > " + s);
 					}
 				}
 			}
 			else {
-				System.out.println("Results for query:");
+				ci.println("Results for query:");
 				for (PlayItem pi : results) {
-					System.out.println(" > " + pi.toString());
+					ci.println(" > " + pi.toString());
 				}
 			}
 		}
 	}
 	
-	static private void doMediaList () {
+	static private void doMediaList (CommandInterpreter ci) {
 		List<MediaExplorerItem> items = new LinkedList<MediaExplorerItem>();
 		items.addAll(LocalMixedMediaDbHelper.getAllMmdb());
 		items.addAll(RemoteMixedMediaDbHelper.getAllRemoteMmdb());
 		for (MediaExplorerItem i : items) {
-			System.out.println(i.type + " " + i.title);
+			ci.println(i.type + " " + i.title);
 		}
 	}
 	
-	static private void doMediaCreate (List<String> args) {
+	static private void doMediaCreate (CommandInterpreter ci, List<String> args) {
 		if (args.size() >= 1) {
 			String name = args.get(0);
 			try {
 				LocalMixedMediaDb mmdb = LocalMixedMediaDbHelper.createMmdb(name);
-				System.out.println("Created MMDB '"+mmdb.getListName()+"'.");
+				ci.println("Created MMDB '"+mmdb.getListName()+"'.");
 			}
 			catch (MorriganException e) {
 				e.printStackTrace();
 			}
 		}
 		else {
-			System.out.println("You must specify a name for the new DB.");
+			ci.println("You must specify a name for the new DB.");
 		}
 	}
 	
-	static private void doMediaAdd (List<String> args) {
+	static private void doMediaAdd (CommandInterpreter ci, List<String> args) {
 		if (args.size() < 2) {
-			System.out.println("Not enough arguments.");
+			ci.println("Not enough arguments.");
 			return;
 		}
 		
@@ -202,7 +202,7 @@ public class MorriganCommandProvider implements CommandProvider {
 		
 		File dir = new File(dirArg);
 		if (!dir.exists()) {
-			System.out.println("Directory '"+dir.getAbsolutePath()+"' not found.");
+			ci.println("Directory '"+dir.getAbsolutePath()+"' not found.");
 			return;
 		}
 		
@@ -216,7 +216,7 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 		
 		if (results == null || results.size() != 1) {
-			System.out.println("Query '"+q1+"' did not return only one result.");
+			ci.println("Query '"+q1+"' did not return only one result.");
 		}
 		else {
 			IMediaTrackList<? extends IMediaTrack> list = results.get(0).list;
@@ -230,17 +230,17 @@ public class MorriganCommandProvider implements CommandProvider {
 				}
 			}
 			else if (list instanceof RemoteMixedMediaDb) {
-				System.out.println("You can not edit the sources for a remote library.");
+				ci.println("You can not edit the sources for a remote library.");
 			}
 			else {
-				System.out.println("Unable to add to the item type of '"+list.getListName()+"'.");
+				ci.println("Unable to add to the item type of '"+list.getListName()+"'.");
 			}
 		}
 	}
 	
-	static private void doMediaScan (List<String> args) {
+	static private void doMediaScan (CommandInterpreter ci, List<String> args) {
 		if (args.size() < 1) {
-			System.out.println("No query parameter.");
+			ci.println("No query parameter.");
 		}
 		else {
 			String q1 = args.get(0);
@@ -254,7 +254,7 @@ public class MorriganCommandProvider implements CommandProvider {
 			}
 			
 			if (results == null || results.size() != 1) {
-				System.out.println("Query '"+q1+"' did not return only one result.");
+				ci.println("Query '"+q1+"' did not return only one result.");
 			}
 			else {
 				IMediaTrackList<? extends IMediaTrack> list = results.get(0).list;
@@ -265,7 +265,7 @@ public class MorriganCommandProvider implements CommandProvider {
 					HeadlessHelper.scheduleRemoteMmdbScan((RemoteMixedMediaDb) list);
 				}
 				else {
-					System.out.println("Unable to schedule scan for item '"+list.getListName()+"'.");
+					ci.println("Unable to schedule scan for item '"+list.getListName()+"'.");
 				}
 			}
 		}
@@ -273,9 +273,9 @@ public class MorriganCommandProvider implements CommandProvider {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	static private void doPlayers (List<String> args) {
+	static private void doPlayers (CommandInterpreter ci, List<String> args) {
 		if (args.size() < 1) {
-			doPlayersList();
+			doPlayersList(ci);
 			return;
 		}
 		
@@ -283,101 +283,101 @@ public class MorriganCommandProvider implements CommandProvider {
 		try {
 			int playerId = Integer.parseInt(cmd);
 			IPlayerLocal player = PlayerRegister.getLocalPlayer(playerId);
-			doPlayersPlayer(player, args);
+			doPlayersPlayer(ci, player, args);
 		}
 		catch (NumberFormatException e) {
 			// If we only have one player, assume the next param is a cmd.
 			if (PlayerRegister.getLocalPlayers().size() == 1) {
 				IPlayerLocal player = PlayerRegister.getLocalPlayer(0);
 				args.add(0, cmd);
-				doPlayersPlayer(player, args);
+				doPlayersPlayer(ci, player, args);
 			}
 			else {
-				System.out.println("Unknown player ID '"+cmd+"'.");
+				ci.println("Unknown player ID '"+cmd+"'.");
 			}
 		}
 	}
 	
-	static private void doPlayersList() {
+	static private void doPlayersList(CommandInterpreter ci) {
 		List<IPlayerLocal> players = PlayerRegister.getLocalPlayers();
-		System.out.println("id\tplayer");
+		ci.println("id\tplayer");
 		for (IPlayerLocal p : players) {
-			System.out.print(p.getId());
-			System.out.print("\t");
-			System.out.print(p.getPlayState());
+			ci.print(String.valueOf( p.getId() ));
+			ci.print("\t");
+			ci.print(p.getPlayState());
 			
 			PlayItem currentItem = p.getCurrentItem();
 			if (currentItem != null && currentItem.item != null) {
-				System.out.print(": ");
-				System.out.print(currentItem.item.getTitle());
+				ci.print(": ");
+				ci.print(currentItem.item.getTitle());
 			}
 			
-			System.out.println();
+			ci.println();
 		}
 	}
 	
-	static private void doPlayersPlayer (IPlayerLocal player, List<String> args) {
+	static private void doPlayersPlayer (CommandInterpreter ci, IPlayerLocal player, List<String> args) {
 		if (args.size() < 1) {
-			doPlayersPlayerInfo(player);
+			doPlayersPlayerInfo(ci, player);
 			return;
 		}
 		
 		String cmd = args.remove(0);
 		if (cmd.equals("p") || cmd.equals("play")) {
-			doPlayersPlayerPlay(player, args, false);
+			doPlayersPlayerPlay(ci, player, args, false);
 		}
 		else if (cmd.equals("q") || cmd.equals("queue") || cmd.equals("enqueue")) {
-			doPlayersPlayerPlay(player, args, true);
+			doPlayersPlayerPlay(ci, player, args, true);
 		}
 		else if (cmd.equals("pause")) {
-			doPlayersPlayerPause(player);
+			doPlayersPlayerPause(ci, player);
 		}
 		else if (cmd.equals("s") || cmd.equals("stop")) {
-			doPlayersPlayerStop(player);
+			doPlayersPlayerStop(ci, player);
 		}
 		else if (cmd.equals("n") || cmd.equals("next")) {
-			doPlayersPlayerNext(player);
+			doPlayersPlayerNext(ci, player);
 		}
 		else if (cmd.equals("o") || cmd.equals("order")) {
-			doPlayersPlayerOrder(player, args);
+			doPlayersPlayerOrder(ci, player, args);
 		}
 		else {
-			System.out.println("Unknown command '"+cmd+"'.");
+			ci.println("Unknown command '"+cmd+"'.");
 		}
 	}
 	
-	static private void doPlayersPlayerInfo (IPlayerLocal player) {
-		System.out.print("Player ");
-		System.out.print(player.getId());
-		System.out.print(": ");
-		System.out.print(player.getPlayState().toString());
-		System.out.print(" (");
-		System.out.print(player.getPlaybackOrder().toString());
-		System.out.print(")");
-		System.out.println();
+	static private void doPlayersPlayerInfo (CommandInterpreter ci, IPlayerLocal player) {
+		ci.print("Player ");
+		ci.print(String.valueOf( player.getId() ));
+		ci.print(": ");
+		ci.print(player.getPlayState().toString());
+		ci.print(" (");
+		ci.print(player.getPlaybackOrder().toString());
+		ci.print(")");
+		ci.println();
 		
 		PlayItem currentItem = player.getCurrentItem();
 		String item = (currentItem != null && currentItem.item != null) ? currentItem.item.getTitle() : "";
-		System.out.println("\titem=" + item);
+		ci.println("\titem=" + item);
 		
 		IMediaTrackList<? extends IMediaTrack> currentList = player.getCurrentList();
 		String list = currentList != null ? currentList.getListName() : "";
-		System.out.println("\tlist=" + list);
+		ci.println("\tlist=" + list);
 		
-		System.out.println("\tqueue=" + player.getQueueList().size() + " items.");
+		ci.println("\tqueue=" + player.getQueueList().size() + " items.");
 	}
 	
-	static private void doPlayersPlayerPlay (IPlayerLocal player, List<String> args, boolean addToQueue) {
+	static private void doPlayersPlayerPlay (CommandInterpreter ci, IPlayerLocal player, List<String> args, boolean addToQueue) {
 		if (args.size() < 1) {
 			if (addToQueue) {
-				doPlayersPlayerPrintQueue(player);
+				doPlayersPlayerPrintQueue(ci, player);
 			}
 			else {
 				if (player.getPlayState() == PlayState.Paused) {
-					doPlayersPlayerPause(player);
+					doPlayersPlayerPause(ci, player);
 				}
 				else if (player.getPlayState() == PlayState.Playing) {
-					System.out.println("Already playing.");
+					ci.println("Already playing.");
 				}
 				else {
 					PlayItem currentItem = player.getCurrentItem();
@@ -385,14 +385,14 @@ public class MorriganCommandProvider implements CommandProvider {
 						player.loadAndStartPlaying(currentItem);
 					}
 					else {
-						System.out.println("Nothing to play.");
+						ci.println("Nothing to play.");
 					}
 				}
 			}
 		}
 		else if (addToQueue && args.size() == 1 && args.get(0).equals("clear")) {
 			player.clearQueue();
-			System.out.println("Queue for player " + player.getId() + " cleared.");
+			ci.println("Queue for player " + player.getId() + " cleared.");
 		}
 		else {
 			String q1 = args.get(0);
@@ -406,51 +406,51 @@ public class MorriganCommandProvider implements CommandProvider {
 			}
 			
 			if (results == null || results.size() < 1) {
-				System.out.println("No results for query '"+q1+"' '"+q2+"'.");
+				ci.println("No results for query '"+q1+"' '"+q2+"'.");
 			}
 			else if (results.size() == 1) {
 				if (addToQueue) {
 					player.addToQueue(results.get(0));
-					System.out.println("Enqueued '"+results.get(0).toString()+"'.");
+					ci.println("Enqueued '"+results.get(0).toString()+"'.");
 				}
 				else {
 					player.loadAndStartPlaying(results.get(0));
 				}
 			}
 			else {
-				System.out.println("Multipe results for query:");
+				ci.println("Multipe results for query:");
 				for (PlayItem pi : results) {
-					System.out.println(" > " + pi.toString());
+					ci.println(" > " + pi.toString());
 				}
 			}
 			
 		}
 	}
 	
-	static private void doPlayersPlayerPause (IPlayerLocal player) {
+	static private void doPlayersPlayerPause (CommandInterpreter ci, IPlayerLocal player) {
 		player.pausePlaying();
-		System.out.println("Player " + player.getId() + ": " + player.getPlayState().toString());
+		ci.println("Player " + player.getId() + ": " + player.getPlayState().toString());
 	}
 	
-	static private void doPlayersPlayerStop (IPlayerLocal player) {
+	static private void doPlayersPlayerStop (CommandInterpreter ci, IPlayerLocal player) {
 		player.stopPlaying();
-		System.out.println("Player " + player.getId() + ": " + player.getPlayState().toString());
+		ci.println("Player " + player.getId() + ": " + player.getPlayState().toString());
 	}
 	
-	static private void doPlayersPlayerNext (IPlayerLocal player) {
+	static private void doPlayersPlayerNext (CommandInterpreter ci, IPlayerLocal player) {
 		player.nextTrack();
 		PlayItem currentItem = player.getCurrentItem();
 		if (currentItem == null) {
-			System.out.println("Player " + player.getId() + ": " + player.getPlayState().toString());
+			ci.println("Player " + player.getId() + ": " + player.getPlayState().toString());
 		}
 		else {
-			System.out.println("Player " + player.getId() + ": " + currentItem.item.getTitle());
+			ci.println("Player " + player.getId() + ": " + currentItem.item.getTitle());
 		}
 	}
 	
-	static private void doPlayersPlayerOrder (IPlayerLocal player, List<String> args) {
+	static private void doPlayersPlayerOrder (CommandInterpreter ci, IPlayerLocal player, List<String> args) {
 		if (args.size() < 1) {
-			System.out.println("Order mode parameter not specifed.");
+			ci.println("Order mode parameter not specifed.");
 			return;
 		}
 		
@@ -458,27 +458,27 @@ public class MorriganCommandProvider implements CommandProvider {
 		for (PlaybackOrder po : PlaybackOrder.values()) {
 			if (po.toString().toLowerCase().contains(arg.toLowerCase())) {
 				player.setPlaybackOrder(po);
-				System.out.println("Playback order set to '"+po.toString()+"' for player "+player.getId()+".");
+				ci.println("Playback order set to '"+po.toString()+"' for player "+player.getId()+".");
 				return;
 			}
 		}
-		System.out.println("Unknown playback order '"+arg+"'.");
+		ci.println("Unknown playback order '"+arg+"'.");
 	}
 	
-	static private void doPlayersPlayerPrintQueue (IPlayerLocal player) {
+	static private void doPlayersPlayerPrintQueue (CommandInterpreter ci, IPlayerLocal player) {
 		List<PlayItem> queue = player.getQueueList();
 		
 		if (queue.size() < 1) {
-			System.out.println("Queue for player " + player.getId() + " is empty.");
+			ci.println("Queue for player " + player.getId() + " is empty.");
 			return;
 		}
 		
 		DurationData duration = player.getQueueTotalDuration();
-		System.out.println("Player " + player.getId() + " has " + queue.size()
+		ci.println("Player " + player.getId() + " has " + queue.size()
 				+ " items totaling " + (duration.isComplete() ? "" : " more than ") 
 				+ TimeHelper.formatTimeSeconds(duration.getDuration()) + " in its queue.");
 		for (PlayItem pi : queue) {
-			System.out.println(" > " + pi.toString());
+			ci.println(" > " + pi.toString());
 		}
 	}
 	
@@ -486,53 +486,53 @@ public class MorriganCommandProvider implements CommandProvider {
 //	Top-level shortcuts.
 //	TODO reduce code duplication?
 	
-	static private void doPlay (List<String> args) {
+	static private void doPlay (CommandInterpreter ci, List<String> args) {
 		if (PlayerRegister.getLocalPlayers().size() == 1) {
 			IPlayerLocal player = PlayerRegister.getLocalPlayer(0);
-			doPlayersPlayerPlay(player, args, false);
+			doPlayersPlayerPlay(ci, player, args, false);
 		}
 		else {
-			System.out.println("There is not only one player, so you need to specfy the player to use.");
+			ci.println("There is not only one player, so you need to specfy the player to use.");
 		}
 	}
 	
-	static private void doQueue (List<String> args) {
+	static private void doQueue (CommandInterpreter ci, List<String> args) {
 		if (PlayerRegister.getLocalPlayers().size() == 1) {
 			IPlayerLocal player = PlayerRegister.getLocalPlayer(0);
-			doPlayersPlayerPlay(player, args, true);
+			doPlayersPlayerPlay(ci, player, args, true);
 		}
 		else {
-			System.out.println("There is not only one player, so you need to specfy the player to use.");
+			ci.println("There is not only one player, so you need to specfy the player to use.");
 		}
 	}
 	
-	static private void doPause (List<String> args) {
+	static private void doPause (CommandInterpreter ci, List<String> args) {
 		if (PlayerRegister.getLocalPlayers().size() == 1) {
 			IPlayerLocal player = PlayerRegister.getLocalPlayer(0);
-			doPlayersPlayerPause(player);
+			doPlayersPlayerPause(ci, player);
 		}
 		else {
-			System.out.println("There is not only one player, so you need to specfy the player to use.");
+			ci.println("There is not only one player, so you need to specfy the player to use.");
 		}
 	}
 	
-	static private void doStop (List<String> args) {
+	static private void doStop (CommandInterpreter ci, List<String> args) {
 		if (PlayerRegister.getLocalPlayers().size() == 1) {
 			IPlayerLocal player = PlayerRegister.getLocalPlayer(0);
-			doPlayersPlayerStop(player);
+			doPlayersPlayerStop(ci, player);
 		}
 		else {
-			System.out.println("There is not only one player, so you need to specfy the player to use.");
+			ci.println("There is not only one player, so you need to specfy the player to use.");
 		}
 	}
 	
-	static private void doNext (List<String> args) {
+	static private void doNext (CommandInterpreter ci, List<String> args) {
 		if (PlayerRegister.getLocalPlayers().size() == 1) {
 			IPlayerLocal player = PlayerRegister.getLocalPlayer(0);
-			doPlayersPlayerNext(player);
+			doPlayersPlayerNext(ci, player);
 		}
 		else {
-			System.out.println("There is not only one player, so you need to specfy the player to use.");
+			ci.println("There is not only one player, so you need to specfy the player to use.");
 		}
 	}
 	
