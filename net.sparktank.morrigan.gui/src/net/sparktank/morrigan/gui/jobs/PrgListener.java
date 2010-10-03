@@ -16,7 +16,7 @@ public class PrgListener implements TaskEventListener {
 	
 	@Override
 	public void onStart() {
-		ConsoleHelper.showConsole();
+//		ConsoleHelper.showConsole();
 	}
 	
 	@Override
