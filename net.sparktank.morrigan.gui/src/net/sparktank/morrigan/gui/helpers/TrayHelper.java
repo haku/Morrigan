@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.gui.display;
+package net.sparktank.morrigan.gui.helpers;
 
 import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.preferences.GeneralPref;

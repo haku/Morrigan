@@ -1,6 +1,6 @@
 package net.sparktank.morrigan.gui;
 
-import net.sparktank.morrigan.gui.display.MinToTrayAction;
+import net.sparktank.morrigan.gui.actions.MinToTrayAction;
 import net.sparktank.morrigan.gui.views.ShowViewAction;
 import net.sparktank.morrigan.gui.views.ViewMediaExplorer;
 

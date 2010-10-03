@@ -1,6 +1,6 @@
 package net.sparktank.morrigan.gui;
 
-import net.sparktank.morrigan.gui.display.TrayHelper;
+import net.sparktank.morrigan.gui.helpers.TrayHelper;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;

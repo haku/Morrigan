@@ -3,11 +3,11 @@ package net.sparktank.morrigan.gui.views;
 import java.util.List;
 
 import net.sparktank.morrigan.gui.Activator;
+import net.sparktank.morrigan.gui.actions.MinToTrayAction;
 import net.sparktank.morrigan.gui.actions.ServerAction;
+import net.sparktank.morrigan.gui.adaptors.ActionListener;
+import net.sparktank.morrigan.gui.adaptors.DropMenuListener;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
-import net.sparktank.morrigan.gui.display.ActionListener;
-import net.sparktank.morrigan.gui.display.DropMenuListener;
-import net.sparktank.morrigan.gui.display.MinToTrayAction;
 import net.sparktank.morrigan.gui.display.ScreenPainter;
 import net.sparktank.morrigan.gui.display.ScreenPainter.ScreenType;
 import net.sparktank.morrigan.gui.helpers.RefreshTimer;
