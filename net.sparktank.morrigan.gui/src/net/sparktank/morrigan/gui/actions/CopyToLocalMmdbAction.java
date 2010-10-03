@@ -30,14 +30,21 @@ public class CopyToLocalMmdbAction extends Action {
 		IWorkbenchPart toPart = this.toEd.getPart(true);
 		
 		if (this.fromEd != null && toPart != null && toPart instanceof LocalMixedMediaDbEditor) {
-			LocalMixedMediaDbEditor ed = (LocalMixedMediaDbEditor) toPart;
-			LocalMixedMediaDb ml = ed.getMediaList();
+			LocalMixedMediaDbEditor fromMmdbEd = (LocalMixedMediaDbEditor) toPart;
+			LocalMixedMediaDb toMl = fromMmdbEd.getMediaList();
 			
 			StringBuilder sb = new StringBuilder();
-			sb.append("TODO: add files to '"+ml.getListName()+"'.");
+			sb.append("TODO: add files to '"+toMl.getListName()+"'.");
 			for (IMediaItem item : this.fromEd.getSelectedItems()) {
 				sb.append("\n");
 				sb.append(item.getTitle());
+				
+//				IMixedMediaItem i = new MixedMediaItem(item.getFilepath());
+//				i.setFromMediaItem(item);
+//				// TODO copy file locally.
+//				i.setFilepath("/local/file/path");
+//				toMl.addItem(i);
+				
 			}
 			new MorriganMsgDlg(sb.toString()).open();
 		}
