@@ -14,7 +14,6 @@ import net.sparktank.morrigan.gui.helpers.ImageCache;
 import net.sparktank.morrigan.gui.helpers.RefreshTimer;
 import net.sparktank.morrigan.gui.jobs.TaskJob;
 import net.sparktank.morrigan.gui.preferences.MediaListPref;
-import net.sparktank.morrigan.model.media.impl.MediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemList;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemList.DirtyState;
@@ -471,14 +470,13 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 	public S getSelectedItem () {
 		ISelection selection = this.editTable.getSelection();
 		
-		if (selection==null) return null;
-		if (selection.isEmpty()) return null;
+		if (selection==null || selection.isEmpty()) return null;
 		
 		if (selection instanceof IStructuredSelection) {
 			IStructuredSelection iSel = (IStructuredSelection) selection;
 			Object selectedObject = iSel.getFirstElement();
 			if (selectedObject != null) {
-				if (selectedObject instanceof MediaItem) {
+				if (selectedObject instanceof IMediaItem) {
 					@SuppressWarnings("unchecked") // FIXME is there a way to avoid needing this?
 					S track = (S) selectedObject;
 					return track;
@@ -492,16 +490,14 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 	public ArrayList<S> getSelectedItems () {
 		ISelection selection = this.editTable.getSelection();
 		
-		if (selection==null) return null;
-		if (selection.isEmpty()) return null;
+		if (selection==null || selection.isEmpty()) return null;
 		
 		if (selection instanceof IStructuredSelection) {
 			IStructuredSelection iSel = (IStructuredSelection) selection;
-			
 			ArrayList<S> ret = new ArrayList<S>();
 			for (Object selectedObject : iSel.toList()) {
 				if (selectedObject != null) {
-					if (selectedObject instanceof MediaItem) {
+					if (selectedObject instanceof IMediaItem) {
 						@SuppressWarnings("unchecked") // FIXME is there a way to avoid needing this?
 						S track = (S) selectedObject;
 						ret.add(track);

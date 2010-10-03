@@ -1,6 +1,7 @@
 package net.sparktank.morrigan.gui.actions;
 
 import net.sparktank.morrigan.gui.Activator;
+import net.sparktank.morrigan.gui.editors.MediaItemListEditor;
 import net.sparktank.morrigan.gui.editors.tracks.PlaylistEditor;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
 
@@ -11,28 +12,29 @@ import org.eclipse.ui.IWorkbenchPart;
 public class AddToPlaylistAction extends Action {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private final IEditorReference editor;
+	private final MediaItemListEditor<?,?> fromEd;
+	private final IEditorReference toEd;
 	
 	/**
 	 * 
 	 * @param editor The editor for the playlist we are going to add
 	 * the selected items to.
 	 */
-	public AddToPlaylistAction (IEditorReference editor) {
-		super(editor.getName(), Activator.getImageDescriptor("icons/playlist.gif"));
-		editor.getTitleImage();
-		this.editor = editor;
+	public AddToPlaylistAction (MediaItemListEditor<?,?> fromEd, IEditorReference toEd) {
+		super(toEd.getName(), Activator.getImageDescriptor("icons/playlist.gif"));
+		this.fromEd = fromEd;
+		this.toEd = toEd;
 	}
 	
 	@Override
 	public void run() {
 		super.run();
 		
-		IWorkbenchPart part = this.editor.getPart(false);
+		IWorkbenchPart toPart = this.toEd.getPart(true);
 		
-		if (part != null && part instanceof PlaylistEditor) {
-			PlaylistEditor plPart = (PlaylistEditor) part;
-			for (IMediaItem track : plPart.getSelectedItems()) {
+		if (this.fromEd != null && toPart != null && toPart instanceof PlaylistEditor) {
+			PlaylistEditor plPart = (PlaylistEditor) toPart;
+			for (IMediaItem track : this.fromEd.getSelectedItems()) {
 				plPart.addItem(track.getFilepath());
 			}
 		}
