@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.gui.display;
+package net.sparktank.morrigan.gui.adaptors;
 
 
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;

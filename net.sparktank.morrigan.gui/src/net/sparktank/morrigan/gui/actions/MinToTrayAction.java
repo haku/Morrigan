@@ -1,6 +1,7 @@
-package net.sparktank.morrigan.gui.display;
+package net.sparktank.morrigan.gui.actions;
 
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
+import net.sparktank.morrigan.gui.helpers.TrayHelper;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.IWorkbenchWindow;

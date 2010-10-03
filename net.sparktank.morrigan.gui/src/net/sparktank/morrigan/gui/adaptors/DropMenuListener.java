@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.gui.display;
+package net.sparktank.morrigan.gui.adaptors;
 
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.swt.events.SelectionEvent;
