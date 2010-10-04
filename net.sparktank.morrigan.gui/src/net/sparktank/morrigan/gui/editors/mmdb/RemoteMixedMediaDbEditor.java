@@ -8,6 +8,7 @@ import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.jobs.TaskJob;
 import net.sparktank.morrigan.model.media.impl.RemoteMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.RemoteMixedMediaDbUpdateTask;
+import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem;
 import net.sparktank.sqlitewrapper.DbException;
 
 import org.eclipse.jface.action.Action;
@@ -58,7 +59,7 @@ public class RemoteMixedMediaDbEditor
 				IEditorReference[] editors = getEditorSite().getPage().getEditorReferences();
 				for (final IEditorReference e : editors) {
 					if (e.getId().equals(LocalMixedMediaDbEditor.ID)) {
-						CopyToLocalMmdbAction a = new CopyToLocalMmdbAction(RemoteMixedMediaDbEditor.this, e);
+						CopyToLocalMmdbAction<IMixedMediaItem> a = new CopyToLocalMmdbAction<IMixedMediaItem>(RemoteMixedMediaDbEditor.this, e);
 						menu.add(a);
 					}
 				}
