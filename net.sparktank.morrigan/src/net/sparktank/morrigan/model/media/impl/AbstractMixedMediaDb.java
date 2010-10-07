@@ -194,7 +194,6 @@ public abstract class AbstractMixedMediaDb<H extends AbstractMixedMediaDb<H>>
 	public void persistTrackData(IMixedMediaItem item) throws DbException {
 		super.persistTrackData(item);
 		
-		System.err.println(item.getFilepath() + "=" + item.getMediaType());
 		this.getDbLayer().setItemMediaType(item.getFilepath(), item.getMediaType());
 		
 		this.getDbLayer().setTrackStartCnt(item.getFilepath(), item.getStartCount());
