@@ -50,7 +50,7 @@ public interface IMediaItemList<T extends IMediaItem> {
 	public void setItemEnabled (T item, boolean value) throws MorriganException;
 	public void setItemMissing (T item, boolean value) throws MorriganException;
 	
-	public void copyItemFile (T item, File targetDirectory) throws MorriganException;
+	public File copyItemFile (T item, File targetDirectory) throws MorriganException;
 	
 	public T findItemByFilePath (String path);
 	

@@ -1,8 +1,11 @@
 package net.sparktank.morrigan.model.media.impl;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Collection;
 
+import net.sparktank.morrigan.config.Config;
+import net.sparktank.morrigan.helpers.ChecksumHelper;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemList;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemList.DirtyState;
@@ -45,6 +48,8 @@ public class CopyToLocalMmdbTask<T extends IMediaItem> implements IMorriganTask 
 			taskEventListener.logMsg(this.toDb.getListName(), "Starting copy of "+this.itemsToCopy.size()+" items from "+this.fromList.getListName()+"...");
 			taskEventListener.beginTask("Fetching media", 100);
 			
+			File coDir = getCheckoutDirectory(this.toDb);
+			
 			/*
 			 * TODO rewrite this using a trans-clone?
 			 */
@@ -53,14 +58,23 @@ public class CopyToLocalMmdbTask<T extends IMediaItem> implements IMorriganTask 
 	    		IMixedMediaItem newItem = new MixedMediaItem(item.getFilepath());
 	    		newItem.setFromMediaItem(item);
 	    		
-	    		newItem.setFilepath("TODO insert file path here!"); // FIXME TODO
-	    		File localFile = new File(newItem.getFilepath());
+	    		File coItemDir = getCheckoutItemDirectory(coDir, newItem);
+	    		File coFile = this.fromList.copyItemFile(item, coItemDir);
+	    		if (!coFile.exists()) {
+	    			throw new FileNotFoundException("After fetching '"+item.getRemoteLocation()+"' can't find '"+coFile.getAbsolutePath()+"'.");
+	    		}
 	    		
-	    		this.fromList.copyItemFile(item, localFile.getParentFile());
+	    		newItem.setFilepath(coFile.getAbsolutePath());
 	    		
-	    		// TODO this next 3 methods should really be combined into a single method in MediaItemDb.
-	    		this.toDb.addFile(localFile);
-	    		this.toDb.persistTrackData(newItem);
+	    		// TODO FIXME re-write remote path with URL we fetched it from?  Perhaps this should be returned from copyItemFile()?
+	    		
+	    		// TODO these next few methods should really be combined into a single method in MediaItemDb.
+	    		if (this.toDb.getDbLayer().hasFile(coFile)) {
+	    			this.toDb.getDbLayer().removeFile(coFile.getAbsolutePath());
+	    		}
+	    		IMixedMediaItem addedItem = this.toDb.addFile(coFile);
+	    		addedItem.setFromMediaItem(newItem);
+	    		this.toDb.persistTrackData(addedItem);
 	    		this.toDb.setDirtyState(DirtyState.DIRTY); // just to trigger change events.
 			}
 			
@@ -79,6 +93,42 @@ public class CopyToLocalMmdbTask<T extends IMediaItem> implements IMorriganTask 
 		
 		taskEventListener.done();
 		return ret;
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	// TODO extract this to config?
+	static private File getCheckoutDirectory (LocalMixedMediaDb db) {
+		String configDir = Config.getConfigDir();
+		
+		File coDir = new File(configDir, "checkout");
+		if (!coDir.exists()) {
+			if (!coDir.mkdir()) {
+				throw new RuntimeException("Failed to mkdir '"+coDir.getAbsolutePath()+"'.");
+			}
+		}
+		
+		File dbCoDir = new File(coDir, db.getListName());
+		if (!dbCoDir.exists()) {
+			if (!dbCoDir.mkdir()) {
+				throw new RuntimeException("Failed to mkdir '"+dbCoDir.getAbsolutePath()+"'.");
+			}
+		}
+		
+		return dbCoDir;
+	}
+	
+	static private File getCheckoutItemDirectory (File coDir, IMixedMediaItem item) {
+		String srcPath = item.getRemoteLocation();
+		
+		File dir = new File(coDir, ChecksumHelper.Md5String(srcPath));
+		if (!dir.exists()) {
+			if (!dir.mkdir()) {
+				throw new RuntimeException("Failed to mkdir '"+dir.getAbsolutePath()+"'.");
+			}
+		}
+		
+		return dir;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
