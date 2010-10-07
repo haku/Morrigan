@@ -253,7 +253,7 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 //	Actions.
 	
 	@Override
-	public void copyItemFile (T mi, File targetDirectory) throws MorriganException {
+	public File copyItemFile (T mi, File targetDirectory) throws MorriganException {
 		if (!targetDirectory.isDirectory()) {
 			throw new IllegalArgumentException("targetDirectory must be a directory.");
 		}
@@ -272,6 +272,8 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 		else {
 			System.err.println("Skipping '"+targetFile.getAbsolutePath()+"' as it already exists.");
 		}
+		
+		return targetFile;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

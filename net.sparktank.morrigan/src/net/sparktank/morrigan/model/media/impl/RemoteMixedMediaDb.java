@@ -215,7 +215,7 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb<RemoteMixedMediaDb>
 //	Actions.
 	
 	@Override
-	public void copyItemFile(IMixedMediaItem mlt, File targetDirectory) throws MorriganException {
+	public File copyItemFile(IMixedMediaItem mlt, File targetDirectory) throws MorriganException {
 		if (!targetDirectory.isDirectory()) {
 			throw new IllegalArgumentException("targetDirectory must be a directory.");
 		}
@@ -237,18 +237,15 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb<RemoteMixedMediaDb>
 				throw new MorriganException(e);
 			}
 			
-			String itemUrlString =
-				serverUrl.getProtocol() + "://" + serverUrl.getHost() + ":" + serverUrl.getPort()
-				+ mlt.getRemoteLocation();
-			
 			URL itemUrl;
 			try {
-				itemUrl = new URL(itemUrlString);
-			} catch (MalformedURLException e) {
+				itemUrl = new URL(serverUrl.getProtocol(), serverUrl.getHost(), serverUrl.getPort(), mlt.getRemoteLocation());
+			}
+			catch (MalformedURLException e) {
 				throw new MorriganException(e);
 			}
 			
-			System.err.println("Fetching '"+itemUrlString+"' to '"+targetFile.getAbsolutePath()+"'...");
+			System.err.println("Fetching '"+itemUrl+"' to '"+targetFile.getAbsolutePath()+"'...");
 			
 			IHttpStreamHandler httpStreamHandler = new IHttpStreamHandler () {
 				@Override
@@ -273,12 +270,15 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb<RemoteMixedMediaDb>
 			
 			try {
 				HttpClient.getHttpClient().doHttpRequest(itemUrl, httpStreamHandler);
-			} catch (IOException e) {
+			}
+			catch (IOException e) {
 				if (e instanceof UnknownHostException) {
 					throw new MorriganException("Host unknown.", e);
-				} else if (e instanceof SocketException) {
+				}
+				else if (e instanceof SocketException) {
 					throw new MorriganException("Host unreachable.", e);
-				} else {
+				}
+				else {
 					throw new MorriganException(e);
 				}
 			}
@@ -286,6 +286,8 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb<RemoteMixedMediaDb>
 		else {
 			System.err.println("Skipping '"+targetFile.getAbsolutePath()+"' as it already exists.");
 		}
+		
+		return targetFile;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
