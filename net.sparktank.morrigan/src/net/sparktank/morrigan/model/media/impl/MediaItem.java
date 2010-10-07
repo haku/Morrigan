@@ -17,7 +17,7 @@ public abstract class MediaItem implements IMediaItem, IDbItem {
 	public MediaItem () {/*Empty constructor.*/}
 	
 	public MediaItem (String filePath) {
-		this.filepath = filePath;
+		setFilepath(filePath);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
