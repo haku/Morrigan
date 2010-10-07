@@ -35,7 +35,8 @@ public class MediaHandler extends AbstractHandler {
 	
 	@Override
 	public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-		System.err.println("request:t=" + target + ", m=" + request.getMethod());
+		String actualTarget = baseRequest.getRequestURI().substring(baseRequest.getServletContext().getContextPath().length());
+		System.err.println("request:t=" + actualTarget + ", m=" + request.getMethod());
 		
 		response.setContentType("text/html;charset=utf-8");
 		response.setStatus(HttpServletResponse.SC_OK);
@@ -43,23 +44,26 @@ public class MediaHandler extends AbstractHandler {
 		PrintWriter out = response.getWriter();
 		
 		try {
-			if (target.equals("/")) {
+			if (actualTarget.equals("/")) {
 				new MediaExplorerFeed().process(out);
 			}
 			else {
-				String r = target.substring(1);
+				String r = actualTarget.substring(1);
 				Map<?,?> paramMap = request.getParameterMap();
 				
 				String[] split = r.split("/");
-				String type = split[0].toLowerCase();
+				String type = split[0];
 				
 				if (split.length > 1) {
 					String id = split[1];
-					if (type.equals("mmdb")) {
+					if (type.equals(LocalMixedMediaDb.TYPE)) {
 						handleMmdbRequest(response, out, paramMap, split, id);
 					}
-					else if (type.equals("playlist")) {
+					else if (type.equals(MediaPlaylist.TYPE)) {
 						handlePlaylistRequest(out, id);
+					}
+					else {
+						System.err.println("Unknown type '"+type+"'.");
 					}
 				}
 				else if (type.equals("newmmdb")) {
@@ -124,8 +128,9 @@ public class MediaHandler extends AbstractHandler {
 			else {
 				String filename = URLDecoder.decode(param, "UTF-8");
 				File file = new File(filename);
+				// FIXME TODO security check here that the file is indeed in the specified library.
 				if (file.exists()) {
-					System.err.println("About to send file '"+file.getAbsolutePath()+"'.");
+					System.err.println("About to send file '"+file.getAbsolutePath()+"' (length = "+file.length()+").");
 					returnFile(file, response);
 				}
 			}
@@ -173,8 +178,8 @@ public class MediaHandler extends AbstractHandler {
 			outputStream.flush();
 			
 			response.flushBuffer();
-			
-		} finally {
+		}
+		finally {
 			if (fileInputStream != null) fileInputStream.close();
 			if (outputStream != null) outputStream.close();
 		}
