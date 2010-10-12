@@ -401,8 +401,7 @@ public class ViewPicture extends ViewPart {
 			if (current >= 0) { // Did we find the current item?
 				int i = current + x;
 				while (i != current) { // Keep searching until we find a picture or we get back where we started.
-					i = i + x;
-					if (i > dbEntries.size() -1) {
+					if (i > dbEntries.size() - 1) {
 						i = 0;
 					}
 					else if (i < 0) {
@@ -412,6 +411,7 @@ public class ViewPicture extends ViewPart {
 						res = i;
 						break;
 					}
+					i = i + x;
 				}
 			}
 			else if (dbEntries.size() > 0) {
