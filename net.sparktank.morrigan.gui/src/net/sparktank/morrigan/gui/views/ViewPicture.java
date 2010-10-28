@@ -103,32 +103,34 @@ public class ViewPicture extends ViewPart {
 	public void init(IViewSite site, IMemento memento) throws PartInitException {
 		super.init(site, memento);
 		
-		try {
-			String dbpath = memento.getString(KEY_DB);
-			String itempath = memento.getString(KEY_ITEM);
-			
-			if (dbpath != null && itempath != null) {
-    			LocalMixedMediaDb mmdb;
-    			mmdb = LocalMixedMediaDb.LOCAL_MMDB_FACTORY.manufacture(dbpath);
-    			mmdb.read();
-    			IMediaPicture item = mmdb.findItemByFilePath(itempath);
-    			
-    			if (item != null) { 
-    				setInput(mmdb, item);
-    			}
-    			else {
-    				// TODO something with this error.
-    				System.err.println("Failed to restore item '"+itempath+"' from '"+dbpath+"'.");
-    			}
+		if (memento != null) {
+			try {
+				String dbpath = memento.getString(KEY_DB);
+				String itempath = memento.getString(KEY_ITEM);
+				
+				if (dbpath != null && itempath != null) {
+	    			LocalMixedMediaDb mmdb;
+	    			mmdb = LocalMixedMediaDb.LOCAL_MMDB_FACTORY.manufacture(dbpath);
+	    			mmdb.read();
+	    			IMediaPicture item = mmdb.findItemByFilePath(itempath);
+	    			
+	    			if (item != null) { 
+	    				setInput(mmdb, item);
+	    			}
+	    			else {
+	    				// TODO something with this error.
+	    				System.err.println("Failed to restore item '"+itempath+"' from '"+dbpath+"'.");
+	    			}
+				}
 			}
+			catch (Exception e) {
+				new MorriganMsgDlg(e).open();
+			}
+			
+			Boolean b = memento.getBoolean(KEY_TIMER);
+			if (b == null || b.booleanValue()) { // Default to true.
+				startTimer();
 		}
-		catch (Exception e) {
-			new MorriganMsgDlg(e).open();
-		}
-		
-		Boolean b = memento.getBoolean(KEY_TIMER);
-		if (b == null || b.booleanValue()) { // Default to true.
-			startTimer();
 		}
 	}
 	
