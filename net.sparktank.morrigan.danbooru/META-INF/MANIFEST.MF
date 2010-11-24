@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: morrigan-danbooru
+Bundle-SymbolicName: net.sparktank.morrigan.danbooru
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: net.sparktank.morrigan.danbooru.Activator
+Bundle-Vendor: sparktank.net
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
+Import-Package: net.sparktank.morrigan.gui.dialogs,
+ net.sparktank.morrigan.gui.views,
+ net.sparktank.morrigan.model.media.interfaces
