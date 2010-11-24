@@ -327,6 +327,25 @@ public class ViewTagEditor extends ViewPart {
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	External API methods.
+	
+//	public void addToolbarButton (String id, String label) {
+//		
+//	}
+	
+//	public void removeToolbarButton (String id, String label) {
+//		
+//	}
+	
+	public IMediaItemDb<?, ?, ?> getEditedItemDb() {
+		return this.editedItemDb;
+	}
+	
+	public IMediaItem getEditedItem() {
+		return this.editedItem;
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	protected IAction readTagsAction = new Action("Read tags from file", Activator.getImageDescriptor("icons/open.gif")) {
 		@Override
