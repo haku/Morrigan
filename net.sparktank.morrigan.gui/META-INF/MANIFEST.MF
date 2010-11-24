@@ -41,3 +41,5 @@ Import-Package: org.eclipse.core.commands,
  org.eclipse.ui.services,
  org.osgi.framework,
  org.osgi.service.prefs;version="1.1.1"
+Export-Package: net.sparktank.morrigan.gui.dialogs,
+ net.sparktank.morrigan.gui.views
