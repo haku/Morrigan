@@ -12,5 +12,7 @@ Bundle-ActivationPolicy: lazy
 Import-Package: net.sparktank.morrigan.gui.dialogs,
  net.sparktank.morrigan.gui.views,
  net.sparktank.morrigan.helpers,
+ net.sparktank.morrigan.model.db.interfaces,
  net.sparktank.morrigan.model.media.interfaces,
+ net.sparktank.morrigan.model.tags,
  net.sparktank.morrigan.server

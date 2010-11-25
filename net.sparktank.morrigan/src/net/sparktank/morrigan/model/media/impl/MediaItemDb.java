@@ -469,6 +469,33 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 		}
 	}
 	
+	@Override
+	public List<MediaTagClassification> getTagClassifications() throws MorriganException {
+		try {
+			return this.dbLayer.getTagClassifications();
+		} catch (DbException e) {
+			throw new MorriganException(e);
+		}
+	}
+	
+	@Override
+	public MediaTagClassification getTagClassification(String classificationName) throws MorriganException {
+		try {
+			return this.dbLayer.getTagClassification(classificationName);
+		} catch (DbException e) {
+			throw new MorriganException(e);
+		}
+	}
+	
+	@Override
+	public void addTagClassification(String classificationName) throws MorriganException {
+		try {
+			this.dbLayer.addTagClassification(classificationName);
+		} catch (DbException e) {
+			throw new MorriganException(e);
+		}
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Meta tagging.
 	

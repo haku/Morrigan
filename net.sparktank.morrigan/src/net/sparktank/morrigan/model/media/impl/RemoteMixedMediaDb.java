@@ -394,5 +394,10 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb<RemoteMixedMediaDb>
 		throw new NotImplementedException();
 	}
 	
+	@Override
+	public void addTagClassification(String classificationName) throws MorriganException {
+		throw new NotImplementedException();
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

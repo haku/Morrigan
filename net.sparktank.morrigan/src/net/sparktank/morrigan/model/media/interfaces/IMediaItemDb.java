@@ -43,6 +43,9 @@ public interface IMediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMediaIte
 	public void registerSortChangeListener (SortChangeListener scl);
 	public void unregisterSortChangeListener (SortChangeListener scl);
 	
+	public List<MediaTagClassification> getTagClassifications () throws MorriganException;
+	public void addTagClassification (String classificationName) throws MorriganException;
+	public MediaTagClassification getTagClassification (String classificationName) throws MorriganException;
 	public boolean hasTags (IDbItem item) throws MorriganException;
 	public boolean hasTag (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) throws MorriganException;
 	public List<MediaTag> getTags (IDbItem item) throws MorriganException;
