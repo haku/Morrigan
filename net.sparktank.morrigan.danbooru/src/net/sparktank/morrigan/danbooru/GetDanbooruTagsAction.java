@@ -78,29 +78,34 @@ public class GetDanbooruTagsAction extends Action {
 				URL url = new URL(surl);
 				HttpResponse response = HttpClient.getHttpClient().doHttpRequest(url);
 				
-				String tagstring = substringByTokens(response.getBody(), "tags=\"", "\"");
-				String[] tags = tagstring.split(" ");
-				
-				MediaTagClassification cls = this.editedItemDb.getTagClassification(CATEGORY);
-				if (cls == null) {
-					this.editedItemDb.addTagClassification(CATEGORY);
-					cls = this.editedItemDb.getTagClassification(CATEGORY);
-					if (cls == null) throw new IllegalArgumentException("Failed to add tag category '"+CATEGORY+"'.");
-				}
-				
-				int n = 0;
-				for (String tag : tags) {
-					if (!this.editedItemDb.hasTag(this.editedItem, tag, MediaTagType.AUTOMATIC, cls)) {
-						this.editedItemDb.addTag(this.editedItem, tag, MediaTagType.AUTOMATIC, cls);
-						n++;
+				if (response.getBody().contains("<posts count=\"1\"")) {
+					String tagstring = substringByTokens(response.getBody(), "tags=\"", "\"");
+					String[] tags = tagstring.split(" ");
+					
+					MediaTagClassification cls = this.editedItemDb.getTagClassification(CATEGORY);
+					if (cls == null) {
+						this.editedItemDb.addTagClassification(CATEGORY);
+						cls = this.editedItemDb.getTagClassification(CATEGORY);
+						if (cls == null) throw new IllegalArgumentException("Failed to add tag category '"+CATEGORY+"'.");
 					}
+					
+					int n = 0;
+					for (String tag : tags) {
+						if (!this.editedItemDb.hasTag(this.editedItem, tag, MediaTagType.AUTOMATIC, cls)) {
+							this.editedItemDb.addTag(this.editedItem, tag, MediaTagType.AUTOMATIC, cls);
+							n++;
+						}
+					}
+					
+					if (n > 0) {
+						this.viewTagEd.refreshContent();
+					}
+					
+					Display.getDefault().asyncExec(new RunnableDialog("Found " + tags.length + " tags, added " + n + " new ones."));
 				}
-				
-				if (n > 0) {
-					this.viewTagEd.refreshContent();
+				else {
+					Display.getDefault().asyncExec(new RunnableDialog("No tags found on Danbooru."));
 				}
-				
-				Display.getDefault().asyncExec(new RunnableDialog("Found " + tags.length + " tags, added " + n + " new ones."));
 				
 				return Status.OK_STATUS;
 			}
