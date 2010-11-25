@@ -2,8 +2,8 @@ package net.sparktank.morrigan.danbooru;
 
 import java.io.File;
 import java.math.BigInteger;
-import java.net.URL;
 
+import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.gui.dialogs.RunnableDialog;
 import net.sparktank.morrigan.gui.views.ViewTagEditor;
 import net.sparktank.morrigan.helpers.ChecksumHelper;
@@ -11,8 +11,6 @@ import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemDb;
 import net.sparktank.morrigan.model.tags.MediaTagClassification;
 import net.sparktank.morrigan.model.tags.MediaTagType;
-import net.sparktank.morrigan.server.HttpClient;
-import net.sparktank.morrigan.server.HttpClient.HttpResponse;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -73,20 +71,13 @@ public class GetDanbooruTagsAction extends Action {
 			try {
 				BigInteger checksum = ChecksumHelper.generateMd5Checksum(file); // TODO update model to track MD5.
 				String md5 = checksum.toString(16);
-				
-				String surl = "http://danbooru.donmai.us/post/index.xml?tags=md5:" + md5;
-				URL url = new URL(surl);
-				HttpResponse response = HttpClient.getHttpClient().doHttpRequest(url);
-				
-				if (response.getBody().contains("<posts count=\"1\"")) {
-					String tagstring = substringByTokens(response.getBody(), "tags=\"", "\"");
-					String[] tags = tagstring.split(" ");
-					
+				String[] tags = Danbooru.getTags(md5);
+				if (tags != null) {
 					MediaTagClassification cls = this.editedItemDb.getTagClassification(CATEGORY);
 					if (cls == null) {
 						this.editedItemDb.addTagClassification(CATEGORY);
 						cls = this.editedItemDb.getTagClassification(CATEGORY);
-						if (cls == null) throw new IllegalArgumentException("Failed to add tag category '"+CATEGORY+"'.");
+						if (cls == null) throw new MorriganException("Failed to add tag category '"+CATEGORY+"'.");
 					}
 					
 					int n = 0;
@@ -115,40 +106,6 @@ public class GetDanbooruTagsAction extends Action {
 			}
 		}
 		
-	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	static public String substringByTokens (String d, String k0, String k1) {
-		String ret;
-		int x0;
-		int l;
-		
-		try {
-			if (k0 == null) {
-				x0 = 0;
-				l = 0;
-			}
-			else {
-				x0 = d.indexOf(k0);
-				if (x0 < 0) throw new IllegalArgumentException("k0 '"+k0+"' not found in '"+d+"'.");
-				l = k0.length();
-			}
-
-			if (k1 != null) {
-				int x1 = d.indexOf(k1, x0+l+1);
-				if (x1 < 0) throw new IllegalArgumentException("k1 '"+k1+"' not found in '"+d+"'.");
-				ret = d.substring(x0+l, x1);
-			}
-			else {
-				ret = d.substring(x0+l);
-			}
-		}
-		catch (Exception e) {
-			throw new IllegalArgumentException("data='"+d+"' k0='"+k0+"' k1='"+k1+"'.", e);
-		}
-		
-		return ret;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
