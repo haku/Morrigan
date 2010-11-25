@@ -191,8 +191,7 @@ public class ViewPicture extends ViewPart {
 				item = selection.get(0);
 			}
 		}
-		if (item == null) throw new IllegalArgumentException("item can not be null.");
-		if (item.isPicture()) {
+		if (item != null && item.isPicture()) { // item will be null if multiple items selected.
 			setInput(editedMediaList, item);
 		}
 	}
