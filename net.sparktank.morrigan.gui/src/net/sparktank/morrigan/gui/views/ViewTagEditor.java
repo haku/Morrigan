@@ -158,6 +158,7 @@ public class ViewTagEditor extends ViewPart {
 	
 	IMediaItemDb<?,?,?> editedItemDb = null;
 	IMediaItem editedItem = null;
+	List<IMediaItem> editedItems = null;
 	
 	public void setInput (IMediaItemDb<?,?,?> editedMediaList, IMediaItem item) {
 		if (item != null) {
@@ -175,15 +176,18 @@ public class ViewTagEditor extends ViewPart {
 			if (selection.size() == 1) {
 				setContentDescription(selection.get(0).getTitle());
 				this.editedItem = selection.get(0);
+				this.editedItems = new LinkedList<IMediaItem>(selection);
 			}
 			else {
 				setContentDescription(selection.size() + " items selected.");
 				this.editedItem = null;
+				this.editedItems = new LinkedList<IMediaItem>(selection);
 			}
 		}
 		else {
 			setContentDescription("No items selected.");
 			this.editedItem = null;
+			this.editedItems = null;
 		}
 		
 		this.btnAddTag.setEnabled(this.editedItem != null);
@@ -343,11 +347,11 @@ public class ViewTagEditor extends ViewPart {
 //	External API methods.
 	
 //	public void addToolbarButton (String id, String label) {
-//		
+//		TODO
 //	}
 	
 //	public void removeToolbarButton (String id, String label) {
-//		
+//		TODO
 //	}
 	
 	public IMediaItemDb<?, ?, ?> getEditedItemDb() {
@@ -356,6 +360,10 @@ public class ViewTagEditor extends ViewPart {
 	
 	public IMediaItem getEditedItem() {
 		return this.editedItem;
+	}
+	
+	public List<IMediaItem> getEditedItems() {
+		return this.editedItems;
 	}
 	
 	public void refreshContent () {

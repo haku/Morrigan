@@ -15,6 +15,10 @@ public class Danbooru {
 		URL url = new URL(surl);
 		HttpResponse response = HttpClient.getHttpClient().doHttpRequest(url);
 		
+		if (response.getCode() != 200) {
+			throw new MorriganException("Danbooru returned code " + response.getCode() + ".\n\n" + response.getBody());
+		}
+		
 		if (response.getBody().contains("<posts count=\"1\"")) {
 			String tagstring = substringByTokens(response.getBody(), "tags=\"", "\"");
 			String[] tags = tagstring.split(" ");
