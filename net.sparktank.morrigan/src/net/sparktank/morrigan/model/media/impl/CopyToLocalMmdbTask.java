@@ -121,7 +121,7 @@ public class CopyToLocalMmdbTask<T extends IMediaItem> implements IMorriganTask 
 	static private File getCheckoutItemDirectory (File coDir, IMixedMediaItem item) {
 		String srcPath = item.getRemoteLocation();
 		
-		File dir = new File(coDir, ChecksumHelper.Md5String(srcPath));
+		File dir = new File(coDir, ChecksumHelper.md5String(srcPath));
 		if (!dir.exists()) {
 			if (!dir.mkdir()) {
 				throw new RuntimeException("Failed to mkdir '"+dir.getAbsolutePath()+"'.");

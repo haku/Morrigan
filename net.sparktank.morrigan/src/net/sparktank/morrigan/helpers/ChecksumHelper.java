@@ -79,7 +79,7 @@ public class ChecksumHelper {
 		}
 	}
 	
-	public static String Md5String(String text) {
+	public static String md5String(String text) {
 		MessageDigest md;
 		try {
 			md = MessageDigest.getInstance("MD5");
