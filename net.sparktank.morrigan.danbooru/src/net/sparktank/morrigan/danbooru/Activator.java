@@ -6,7 +6,7 @@ import java.util.List;
 import net.sparktank.morrigan.gui.views.ViewTagEditor;
 
 import org.eclipse.jface.action.IContributionItem;
-import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IPageListener;
 import org.eclipse.ui.IPartListener;
@@ -176,10 +176,10 @@ public class Activator extends AbstractUIPlugin {
 	}
 	
 	void enhanceTagEditor (final ViewTagEditor tagEd) {
-		IMenuManager menuManager = tagEd.getViewSite().getActionBars().getMenuManager();
+		IToolBarManager toolBarManager = tagEd.getViewSite().getActionBars().getToolBarManager();
 		
 		boolean found = false;
-		for (IContributionItem item : menuManager.getItems()) {
+		for (IContributionItem item : toolBarManager.getItems()) {
 			if (item.getId().equals(GetDanbooruTagsAction.ID)) {
 				found = true;
 				break;
@@ -187,7 +187,7 @@ public class Activator extends AbstractUIPlugin {
 		}
 		
 		if (!found) {
-			menuManager.add(new GetDanbooruTagsAction(tagEd));
+			toolBarManager.add(new GetDanbooruTagsAction(tagEd));
 			
 			this.getWorkbench().getDisplay().syncExec(new Runnable() {
 				@Override
@@ -199,10 +199,10 @@ public class Activator extends AbstractUIPlugin {
 	}
 	
 	void dehanceTagEditor (final ViewTagEditor tagEd) {
-		final IMenuManager menuManager = tagEd.getViewSite().getActionBars().getMenuManager();
+		final IToolBarManager toolBarManager = tagEd.getViewSite().getActionBars().getToolBarManager();
 		
 		List<IContributionItem> items = new LinkedList<IContributionItem>();
-		for (IContributionItem item : menuManager.getItems()) {
+		for (IContributionItem item : toolBarManager.getItems()) {
 			if (item.getId().equals(GetDanbooruTagsAction.ID)) {
 				items.add(item);
 			}
@@ -211,7 +211,7 @@ public class Activator extends AbstractUIPlugin {
 			this.getWorkbench().getDisplay().syncExec(new Runnable() {
 				@Override
 				public void run() {
-					menuManager.remove(item);
+					toolBarManager.remove(item);
 					tagEd.getViewSite().getActionBars().updateActionBars();
 				}
 			});
