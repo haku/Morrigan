@@ -142,6 +142,15 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		}
 	}
 	
+	@Override
+	public MediaTagClassification getTagClassification(String classificationName) throws DbException {
+		try {
+			return local_getTagClassification(classificationName);
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Public methods for Sources.
 	

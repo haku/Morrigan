@@ -12,6 +12,7 @@ import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.dialogs.RunnableDialog;
 import net.sparktank.morrigan.gui.editors.IMediaItemDbEditor;
 import net.sparktank.morrigan.gui.helpers.ImageCache;
+import net.sparktank.morrigan.gui.helpers.RefreshTimer;
 import net.sparktank.morrigan.model.media.impl.MediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemDb;
@@ -63,6 +64,7 @@ public class ViewTagEditor extends ViewPart {
 		createLayout(parent);
 		addPartListener();
 		initSelectionListener();
+		makeRefresher();
 	}
 	
 	@Override
@@ -229,7 +231,9 @@ public class ViewTagEditor extends ViewPart {
 	private Button btnAddTag;
 	private Button btnRemoveTag;
 	private Button btnMenu;
-	private TableViewer tableViewer;
+	TableViewer tableViewer;
+	
+	Runnable tagsChangedRrefresher;
 	
 	private void createLayout (Composite parent) {
 		FormData formData;
@@ -326,6 +330,15 @@ public class ViewTagEditor extends ViewPart {
 		this.btnMenu.addSelectionListener(new DropMenuListener(this.btnMenu, menuMenuMgr));
 	}
 	
+	private void makeRefresher () {
+		this.tagsChangedRrefresher = new RefreshTimer(getSite().getShell().getDisplay(), 5000, new Runnable() {
+			@Override
+			public void run() {
+				ViewTagEditor.this.tableViewer.refresh();
+			}
+		});
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	External API methods.
 	
@@ -343,6 +356,10 @@ public class ViewTagEditor extends ViewPart {
 	
 	public IMediaItem getEditedItem() {
 		return this.editedItem;
+	}
+	
+	public void refreshContent () {
+		this.tagsChangedRrefresher.run();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

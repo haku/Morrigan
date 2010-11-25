@@ -47,16 +47,17 @@ public interface IMediaItemStorageLayer<T extends IMediaItem> extends IGenericDb
 	public void addSource (String source) throws DbException;
 	public void removeSource (String source) throws DbException;
 	
+	public List<MediaTagClassification> getTagClassifications () throws DbException;
+	public void addTagClassification (String classificationName) throws DbException;
+	public MediaTagClassification getTagClassification (String classificationName) throws DbException;
 	public boolean hasTags (IDbItem item) throws DbException;
 	public boolean hasTag (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) throws DbException;
 	public List<MediaTag> getTags (IDbItem item) throws DbException;
-	public List<MediaTagClassification> getTagClassifications () throws DbException;
 	public boolean addTag (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) throws DbException;
 	public boolean addTag (IDbItem item, String tag, MediaTagType type, String mtc) throws DbException;
 	public void moveTags (IDbItem from_item, IDbItem to_item) throws DbException;
 	public void removeTag (MediaTag tag) throws DbException;
 	public void clearTags (IDbItem item) throws DbException;
-	public void addTagClassification (String classificationName) throws DbException;
 	
 	public List<IDbColumn> getMediaTblColumns ();
 	public IDbColumn getDefaultSortColumn ();

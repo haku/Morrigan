@@ -7,6 +7,7 @@ import net.sparktank.morrigan.gui.views.ViewTagEditor;
 
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IPageListener;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IViewReference;
@@ -56,6 +57,10 @@ public class Activator extends AbstractUIPlugin {
 	 */
 	public static Activator getDefault () {
 		return plugin;
+	}
+	
+	public static ImageDescriptor getImageDescriptor(String path) {
+		return imageDescriptorFromPlugin(PLUGIN_ID, path);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -170,7 +175,7 @@ public class Activator extends AbstractUIPlugin {
 		}
 	}
 	
-	void enhanceTagEditor (ViewTagEditor tagEd) {
+	void enhanceTagEditor (final ViewTagEditor tagEd) {
 		IMenuManager menuManager = tagEd.getViewSite().getActionBars().getMenuManager();
 		
 		boolean found = false;
@@ -183,10 +188,17 @@ public class Activator extends AbstractUIPlugin {
 		
 		if (!found) {
 			menuManager.add(new GetDanbooruTagsAction(tagEd));
+			
+			this.getWorkbench().getDisplay().syncExec(new Runnable() {
+				@Override
+				public void run() {
+					tagEd.getViewSite().getActionBars().updateActionBars();
+				}
+			});
 		}
 	}
 	
-	void dehanceTagEditor (ViewTagEditor tagEd) {
+	void dehanceTagEditor (final ViewTagEditor tagEd) {
 		final IMenuManager menuManager = tagEd.getViewSite().getActionBars().getMenuManager();
 		
 		List<IContributionItem> items = new LinkedList<IContributionItem>();
@@ -200,6 +212,7 @@ public class Activator extends AbstractUIPlugin {
 				@Override
 				public void run() {
 					menuManager.remove(item);
+					tagEd.getViewSite().getActionBars().updateActionBars();
 				}
 			});
 		}
