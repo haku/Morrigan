@@ -198,16 +198,18 @@ public class ViewPicture extends ViewPart {
 	}
 	
 	public void setInput (IMediaItemDb<?,?,? extends IMediaPicture> editedMediaList, IMediaPicture item) {
-		this.editedItem = item;
-		
-		if (this.editedItem != null) {
-			this.editedItemDb = editedMediaList;
+		if (this.editedItemDb != editedMediaList || this.editedItem != item) {
+			this.editedItem = item;
+			
+			if (this.editedItem != null) {
+				this.editedItemDb = editedMediaList;
+			}
+			else {
+				this.editedItemDb = null;
+			}
+			
+			setPicture(this.editedItem);
 		}
-		else {
-			this.editedItemDb = null;
-		}
-		
-		setPicture(this.editedItem);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
