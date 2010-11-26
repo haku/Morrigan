@@ -4,6 +4,7 @@ import java.io.File;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
@@ -73,40 +74,45 @@ class FetchDanbooruTagsJob extends Job {
 			Date now = new Date();
 			String nowString = tagDateFormat.format(now);
 			
-			monitor.beginTask("Fetching", this.editedItems.size());
+			// Calculate work to do.
+			List<IMixedMediaItem> itemsToWork = new LinkedList<IMixedMediaItem>();
 			for (IMixedMediaItem item : this.editedItems) {
-				
 				if (item.isPicture()) {
 					MediaTag markerTag = getMarkerTag(this.editedItemDb, item, dateTagCls);
 					Date markerDate = null;
 					if (markerTag != null) markerDate = tagDateFormat.parse(markerTag.getTag());
-					
 					if (markerDate == null || now.getTime() - markerDate.getTime() > MIN_TIME_BETWEEN_SCANS_MILISECONDS) {
-						File file = new File(item.getFilepath());
-						BigInteger checksum = ChecksumHelper.generateMd5Checksum(file); // TODO update model to track MD5.
-						String md5 = checksum.toString(16);
-						
-						String[] tags = Danbooru.getTags(md5); // TODO batch tag lookup.
-						if (tags != null) {
-							boolean added = false;
-							for (String tag : tags) {
-								if (!this.editedItemDb.hasTag(item, tag, MediaTagType.AUTOMATIC, tagCls)) {
-									this.editedItemDb.addTag(item, tag, MediaTagType.AUTOMATIC, tagCls);
-									added = true;
-									nTags++;
-								}
-							}
-							
-							if (added) nUpdated++;
-						}
-						
-						updateMarkerTag(this.editedItemDb, item, dateTagCls, markerTag, nowString);
-						nScanned++;
+						itemsToWork.add(item);
 					}
-					else {
-						nAlreadyFresh++;
-					}
+    				else {
+    					nAlreadyFresh++;
+    				}
 				}
+			}
+			
+			// Do work that needs doing.
+			monitor.beginTask("Fetching", itemsToWork.size());
+			for (IMixedMediaItem item : itemsToWork) {
+				File file = new File(item.getFilepath());
+				BigInteger checksum = ChecksumHelper.generateMd5Checksum(file); // TODO update model to track MD5.
+				String md5 = checksum.toString(16);
+				
+				String[] tags = Danbooru.getTags(md5); // TODO batch tag lookup.
+				if (tags != null) {
+					boolean added = false;
+					for (String tag : tags) {
+						if (!this.editedItemDb.hasTag(item, tag, MediaTagType.AUTOMATIC, tagCls)) {
+							this.editedItemDb.addTag(item, tag, MediaTagType.AUTOMATIC, tagCls);
+							added = true;
+							nTags++;
+						}
+					}
+					if (added) nUpdated++;
+				}
+				
+				MediaTag markerTag = getMarkerTag(this.editedItemDb, item, dateTagCls);
+				updateMarkerTag(this.editedItemDb, item, dateTagCls, markerTag, nowString);
+				nScanned++;
 				
 				monitor.worked(1);
 				if (monitor.isCanceled()) break;
@@ -118,7 +124,7 @@ class FetchDanbooruTagsJob extends Job {
 			
 			String msg = "Scanned "+nScanned+" items, "+nAlreadyFresh+" already up to date."
 					+ "\nFound " + nTags + " new tags for " + nUpdated + " items.";
-			if (monitor.isCanceled()) msg = msg + "\n\nTask canceled.";
+			if (monitor.isCanceled()) msg = msg + "\n\nTask canceled desu~.";
 			Display.getDefault().asyncExec(new RunnableDialog(msg));
 			
 			return monitor.isCanceled() ? Status.CANCEL_STATUS : Status.OK_STATUS;
