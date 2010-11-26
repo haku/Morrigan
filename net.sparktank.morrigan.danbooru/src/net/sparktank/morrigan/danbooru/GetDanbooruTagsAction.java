@@ -17,8 +17,6 @@ public class GetDanbooruTagsAction extends Action {
 	
 	public static final String ID = "net.sparktank.morrigan.danbooru.GetDanbooruTagsAction";
 	
-	public static final String CATEGORY = "Danbooru"; // Tag category.
-	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private final ViewTagEditor viewTagEd;

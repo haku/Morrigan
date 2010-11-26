@@ -2,6 +2,8 @@ package net.sparktank.morrigan.danbooru;
 
 import java.io.File;
 import java.math.BigInteger;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
@@ -10,6 +12,7 @@ import net.sparktank.morrigan.gui.views.ViewTagEditor;
 import net.sparktank.morrigan.helpers.ChecksumHelper;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemDb;
 import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem;
+import net.sparktank.morrigan.model.tags.MediaTag;
 import net.sparktank.morrigan.model.tags.MediaTagClassification;
 import net.sparktank.morrigan.model.tags.MediaTagType;
 
@@ -20,6 +23,13 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.swt.widgets.Display;
 
 class FetchDanbooruTagsJob extends Job {
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	public static final String TAG_CATEGORY = "Danbooru";
+	public static final String DATE_TAG_CATEGORY = "DanbooruDate";
+	public static final String DATE_TAG_FORMAT = "yyyy-MM-dd";
+	public static final long MIN_TIME_BETWEEN_SCANS_MILISECONDS = 10 * 24 * 60 * 60 * 1000; // 10 days.
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private final IMediaItemDb<?, ?, ?> editedItemDb;
@@ -38,37 +48,63 @@ class FetchDanbooruTagsJob extends Job {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
-	protected IStatus run(IProgressMonitor monitor) { // TODO use progress monitor.
+	protected IStatus run(IProgressMonitor monitor) { // TODO use progress monitor.  TODO use transactions.
 		try {
-			long nItems = 0;
+			long nScanned = 0;
+			long nUpdated = 0;
 			long nTags = 0;
+			long nAlreadyFresh = 0;
+			
+			MediaTagClassification dateTagCls = this.editedItemDb.getTagClassification(DATE_TAG_CATEGORY);
+			if (dateTagCls == null) {
+				this.editedItemDb.addTagClassification(DATE_TAG_CATEGORY);
+				dateTagCls = this.editedItemDb.getTagClassification(DATE_TAG_CATEGORY);
+				if (dateTagCls == null) throw new MorriganException("Failed to add tag category '"+DATE_TAG_CATEGORY+"'.");
+			}
+			
+			MediaTagClassification tagCls = this.editedItemDb.getTagClassification(TAG_CATEGORY);
+			if (tagCls == null) {
+				this.editedItemDb.addTagClassification(TAG_CATEGORY);
+				tagCls = this.editedItemDb.getTagClassification(TAG_CATEGORY);
+				if (tagCls == null) throw new MorriganException("Failed to add tag category '"+TAG_CATEGORY+"'.");
+			}
+			
+			SimpleDateFormat tagDateFormat = new SimpleDateFormat(DATE_TAG_FORMAT);
+			Date now = new Date();
+			String nowString = tagDateFormat.format(now);
 			
 			for (IMixedMediaItem item : this.editedItems) {
 				if (item.isPicture()) {
-					File file = new File(item.getFilepath());
-					BigInteger checksum = ChecksumHelper.generateMd5Checksum(file); // TODO update model to track MD5.
-					String md5 = checksum.toString(16);
+					MediaTag markerTag = getMarkerTag(this.editedItemDb, item, dateTagCls);
+					Date markerDate = null;
+					if (markerTag != null) markerDate = tagDateFormat.parse(markerTag.getTag());
 					
-					String[] tags = Danbooru.getTags(md5);
-					if (tags != null) {
-						MediaTagClassification cls = this.editedItemDb.getTagClassification(GetDanbooruTagsAction.CATEGORY);
-						if (cls == null) {
-							this.editedItemDb.addTagClassification(GetDanbooruTagsAction.CATEGORY);
-							cls = this.editedItemDb.getTagClassification(GetDanbooruTagsAction.CATEGORY);
-							if (cls == null) throw new MorriganException("Failed to add tag category '"+GetDanbooruTagsAction.CATEGORY+"'.");
-						}
+					if (markerDate == null || now.getTime() - markerDate.getTime() > MIN_TIME_BETWEEN_SCANS_MILISECONDS) {
+						File file = new File(item.getFilepath());
+						BigInteger checksum = ChecksumHelper.generateMd5Checksum(file); // TODO update model to track MD5.
+						String md5 = checksum.toString(16);
 						
-						boolean added = false;
-						for (String tag : tags) {
-							if (!this.editedItemDb.hasTag(item, tag, MediaTagType.AUTOMATIC, cls)) {
-								this.editedItemDb.addTag(item, tag, MediaTagType.AUTOMATIC, cls);
-								added = true;
-								nTags++;
+						String[] tags = Danbooru.getTags(md5);
+						if (tags != null) {
+							boolean added = false;
+							for (String tag : tags) {
+								if (!this.editedItemDb.hasTag(item, tag, MediaTagType.AUTOMATIC, tagCls)) {
+									this.editedItemDb.addTag(item, tag, MediaTagType.AUTOMATIC, tagCls);
+									added = true;
+									nTags++;
+								}
 							}
+							
+							if (added) nUpdated++;
 						}
 						
-						if (added) nItems++;
+						updateMarkerTag(this.editedItemDb, item, dateTagCls, markerTag, nowString);
+						nScanned++;
 					}
+					else {
+						nAlreadyFresh++;
+					}
+					
 				}
 			}
 			
@@ -76,7 +112,9 @@ class FetchDanbooruTagsJob extends Job {
 				this.viewTagEd.refreshContent();
 			}
 			
-			Display.getDefault().asyncExec(new RunnableDialog("Found " + nTags + " new tags for " + nItems + " items."));
+			String msg = "Scanned "+nScanned+" items, "+nAlreadyFresh+" already up to date."
+					+ "\nFound " + nTags + " new tags for " + nUpdated + " items.";
+			Display.getDefault().asyncExec(new RunnableDialog(msg));
 			
 			return Status.OK_STATUS;
 		}
@@ -84,6 +122,31 @@ class FetchDanbooruTagsJob extends Job {
 			Display.getDefault().asyncExec(new RunnableDialog(e));
 			return new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e);
 		}
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	static public MediaTag getMarkerTag (IMediaItemDb<?, ?, ?> itemDb, IMixedMediaItem item, MediaTagClassification cls) throws MorriganException {
+		List<MediaTag> tags = itemDb.getTags(item);
+		
+		MediaTag markerTag = null;
+		for (MediaTag tag : tags) {
+			if (tag.getClassification().equals(cls)) {
+				if (markerTag == null) {
+					markerTag = tag;
+				}
+				else {
+					throw new MorriganException("Item '"+item.getFilepath()+"' has more than one marker tag '"+cls.getClassification()+"'.");
+				}
+			}
+		}
+		
+		return markerTag;
+	}
+	
+	static public void updateMarkerTag (IMediaItemDb<?, ?, ?> itemDb, IMixedMediaItem item, MediaTagClassification cls, MediaTag markerTag, String newString) throws MorriganException {
+		if (markerTag != null) itemDb.removeTag(markerTag);
+		itemDb.addTag(item, newString, MediaTagType.AUTOMATIC, cls);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
