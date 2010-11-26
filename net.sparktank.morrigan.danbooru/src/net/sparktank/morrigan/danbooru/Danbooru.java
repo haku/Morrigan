@@ -2,6 +2,9 @@ package net.sparktank.morrigan.danbooru;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.server.HttpClient;
@@ -26,6 +29,46 @@ public class Danbooru {
 		}
 		
 		return null;
+	}
+	
+	/**
+	 * Not sure what the max number of searches is...
+	 * @param md5s list of md5s to query for.
+	 * @return Map where key=md5, value = tags.
+	 * @throws IOException
+	 * @throws MorriganException
+	 */
+	static public Map<String, String[]> getTags (List<String> md5s) throws IOException, MorriganException {
+		StringBuilder urlString = new StringBuilder();
+		urlString.append("http://danbooru.donmai.us/post/index.xml?tags=md5:");
+		boolean first = true;
+		for (String md5 : md5s) {
+			if (!first) urlString.append(",");
+			first = false;
+			
+			urlString.append(md5);
+		}
+		
+		URL url = new URL(urlString.toString());
+		HttpResponse response = HttpClient.getHttpClient().doHttpRequest(url);
+		if (response.getCode() != 200) {
+			throw new MorriganException("Danbooru returned code " + response.getCode() + ".\n\n" + response.getBody());
+		}
+		
+		if (response.getBody().contains("<posts count=\"0\"")) { // No results.
+			return null;
+		}
+		
+		String[] results = response.getBody().split("<post "); // The space is important, stops it matching "<posts".
+		Map<String, String[]> ret = new HashMap<String, String[]>();
+		for (String result : results) {
+			String md5 = substringByTokens(result, "md5=\"", "\"");
+			String tagstring = substringByTokens(response.getBody(), "tags=\"", "\"");
+			String[] tags = tagstring.split(" ");
+			ret.put(md5, tags);
+		}
+		
+		return ret;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
