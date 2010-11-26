@@ -73,7 +73,9 @@ class FetchDanbooruTagsJob extends Job {
 			Date now = new Date();
 			String nowString = tagDateFormat.format(now);
 			
+			monitor.beginTask("Fetching", this.editedItems.size());
 			for (IMixedMediaItem item : this.editedItems) {
+				
 				if (item.isPicture()) {
 					MediaTag markerTag = getMarkerTag(this.editedItemDb, item, dateTagCls);
 					Date markerDate = null;
@@ -84,7 +86,7 @@ class FetchDanbooruTagsJob extends Job {
 						BigInteger checksum = ChecksumHelper.generateMd5Checksum(file); // TODO update model to track MD5.
 						String md5 = checksum.toString(16);
 						
-						String[] tags = Danbooru.getTags(md5);
+						String[] tags = Danbooru.getTags(md5); // TODO batch tag lookup.
 						if (tags != null) {
 							boolean added = false;
 							for (String tag : tags) {
@@ -104,8 +106,10 @@ class FetchDanbooruTagsJob extends Job {
 					else {
 						nAlreadyFresh++;
 					}
-					
 				}
+				
+				monitor.worked(1);
+				if (monitor.isCanceled()) break;
 			}
 			
 			if (this.editedItems.size() == 1 && nTags > 0) {  // TODO improve this by checking the selected item was updated.
@@ -114,9 +118,10 @@ class FetchDanbooruTagsJob extends Job {
 			
 			String msg = "Scanned "+nScanned+" items, "+nAlreadyFresh+" already up to date."
 					+ "\nFound " + nTags + " new tags for " + nUpdated + " items.";
+			if (monitor.isCanceled()) msg = msg + "\n\nTask canceled.";
 			Display.getDefault().asyncExec(new RunnableDialog(msg));
 			
-			return Status.OK_STATUS;
+			return monitor.isCanceled() ? Status.CANCEL_STATUS : Status.OK_STATUS;
 		}
 		catch (Exception e) {
 			Display.getDefault().asyncExec(new RunnableDialog(e));
