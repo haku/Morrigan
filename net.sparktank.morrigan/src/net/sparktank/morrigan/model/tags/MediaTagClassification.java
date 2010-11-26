@@ -1,7 +1,7 @@
 package net.sparktank.morrigan.model.tags;
 
 
-public class MediaTagClassification {
+public class MediaTagClassification { // TODO add interface.
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private long rowId;
