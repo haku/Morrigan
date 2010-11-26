@@ -4,8 +4,10 @@ import java.io.File;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.gui.dialogs.RunnableDialog;
@@ -90,32 +92,64 @@ class FetchDanbooruTagsJob extends Job {
 				}
 			}
 			
+			System.err.println("itemsToWork.size()=" + itemsToWork.size());
+			
+			// Batch work that needs doing.
+			List<List<IMixedMediaItem>> batchedWork = new LinkedList<List<IMixedMediaItem>>();
+			int n = 0;
+			List<IMixedMediaItem> newBatch = new LinkedList<IMixedMediaItem>();
+			for (IMixedMediaItem item : itemsToWork) {
+				newBatch.add(item);
+				n++;
+				
+				if (n >= 10) { // Batch size = 10.
+					n = 0;
+					batchedWork.add(newBatch);
+					newBatch = new LinkedList<IMixedMediaItem>();
+				}
+			}
+			if (newBatch.size() > 0) batchedWork.add(newBatch);
+			
+			System.err.println("batchedWork.size()=" + batchedWork.size());
+			
 			// Do work that needs doing.
 			monitor.beginTask("Fetching", itemsToWork.size());
-			for (IMixedMediaItem item : itemsToWork) {
-				File file = new File(item.getFilepath());
-				BigInteger checksum = ChecksumHelper.generateMd5Checksum(file); // TODO update model to track MD5.
-				String md5 = checksum.toString(16);
+			for (List<IMixedMediaItem> batch : batchedWork) {
+				Map<IMixedMediaItem, String> md5s = new HashMap<IMixedMediaItem, String>();
 				
-				String[] tags = Danbooru.getTags(md5); // TODO batch tag lookup.
-				if (tags != null) {
-					boolean added = false;
-					for (String tag : tags) {
-						if (!this.editedItemDb.hasTag(item, tag, MediaTagType.AUTOMATIC, tagCls)) {
-							this.editedItemDb.addTag(item, tag, MediaTagType.AUTOMATIC, tagCls);
-							added = true;
-							nTags++;
-						}
-					}
-					if (added) nUpdated++;
+				// TODO update model to track MD5s so this block is not longer needed.
+				for (IMixedMediaItem item : batch) {
+					File file = new File(item.getFilepath());
+					BigInteger checksum = ChecksumHelper.generateMd5Checksum(file);
+					String md5 = checksum.toString(16);
+					md5s.put(item, md5);
 				}
 				
-				MediaTag markerTag = getMarkerTag(this.editedItemDb, item, dateTagCls);
-				updateMarkerTag(this.editedItemDb, item, dateTagCls, markerTag, nowString);
-				nScanned++;
+				System.err.println("Looking up " + md5s.values().size() + " MD5s...");
 				
-				monitor.worked(1);
-				if (monitor.isCanceled()) break;
+				Map<String, String[]> tagSets = Danbooru.getTags(md5s.values());
+				
+				for (IMixedMediaItem item : batch) {
+					String[] tags = tagSets.get(md5s.get(item));
+					if (tags != null) {
+						boolean added = false;
+						for (String tag : tags) {
+							if (!this.editedItemDb.hasTag(item, tag, MediaTagType.AUTOMATIC, tagCls)) {
+								this.editedItemDb.addTag(item, tag, MediaTagType.AUTOMATIC, tagCls);
+								added = true;
+								nTags++;
+							}
+						}
+						if (added) nUpdated++;
+					}
+					
+					MediaTag markerTag = getMarkerTag(this.editedItemDb, item, dateTagCls);
+					updateMarkerTag(this.editedItemDb, item, dateTagCls, markerTag, nowString);
+					nScanned++;
+					
+					monitor.worked(1);
+					if (monitor.isCanceled()) break;
+				}
 			}
 			
 			if (this.editedItems.size() == 1 && nTags > 0) {  // TODO improve this by checking the selected item was updated.

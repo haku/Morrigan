@@ -2,8 +2,8 @@ package net.sparktank.morrigan.danbooru;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
@@ -38,7 +38,7 @@ public class Danbooru {
 	 * @throws IOException
 	 * @throws MorriganException
 	 */
-	static public Map<String, String[]> getTags (List<String> md5s) throws IOException, MorriganException {
+	static public Map<String, String[]> getTags (Collection<String> md5s) throws IOException, MorriganException {
 		StringBuilder urlString = new StringBuilder();
 		urlString.append("http://danbooru.donmai.us/post/index.xml?tags=md5:");
 		boolean first = true;
@@ -62,10 +62,12 @@ public class Danbooru {
 		String[] results = response.getBody().split("<post "); // The space is important, stops it matching "<posts".
 		Map<String, String[]> ret = new HashMap<String, String[]>();
 		for (String result : results) {
-			String md5 = substringByTokens(result, "md5=\"", "\"");
-			String tagstring = substringByTokens(response.getBody(), "tags=\"", "\"");
-			String[] tags = tagstring.split(" ");
-			ret.put(md5, tags);
+			if (result.contains("md5=\"")) {
+    			String md5 = substringByTokens(result, "md5=\"", "\"");
+    			String tagstring = substringByTokens(response.getBody(), "tags=\"", "\"");
+    			String[] tags = tagstring.split(" ");
+    			ret.put(md5, tags);
+			}
 		}
 		
 		return ret;
