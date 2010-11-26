@@ -64,7 +64,7 @@ public class Danbooru {
 		for (String result : results) {
 			if (result.contains("md5=\"")) {
     			String md5 = substringByTokens(result, "md5=\"", "\"");
-    			String tagstring = substringByTokens(response.getBody(), "tags=\"", "\"");
+    			String tagstring = substringByTokens(result, "tags=\"", "\"");
     			String[] tags = tagstring.split(" ");
     			ret.put(md5, tags);
 			}
