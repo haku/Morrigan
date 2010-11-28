@@ -56,7 +56,7 @@ public class Danbooru {
 		}
 		
 		if (response.getBody().contains("<posts count=\"0\"")) { // No results.
-			return null;
+			return new HashMap<String, String[]>();
 		}
 		
 		String[] results = response.getBody().split("<post "); // The space is important, stops it matching "<posts".
