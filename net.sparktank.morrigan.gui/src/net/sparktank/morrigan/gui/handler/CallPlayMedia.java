@@ -6,6 +6,8 @@ import net.sparktank.morrigan.gui.editors.tracks.MediaTrackListEditor;
 import net.sparktank.morrigan.gui.editors.tracks.PlaylistEditor;
 import net.sparktank.morrigan.gui.views.AbstractPlayerView;
 import net.sparktank.morrigan.gui.views.ViewControls;
+import net.sparktank.morrigan.gui.views.ViewPicture;
+import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrackList;
 import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem;
@@ -20,6 +22,7 @@ import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 public class CallPlayMedia extends AbstractHandler {
@@ -39,13 +42,20 @@ public class CallPlayMedia extends AbstractHandler {
 		
 		if (activeEditor instanceof LocalMixedMediaDbEditor) {
 			LocalMixedMediaDbEditor lmmdbe = (LocalMixedMediaDbEditor) activeEditor;
-			IMediaTrackList<? extends IMediaTrack> mediaList = lmmdbe.getMediaList();
+			LocalMixedMediaDb mediaList = lmmdbe.getMediaList();
 			IMixedMediaItem selectedItem = lmmdbe.getSelectedItem();
 			if (selectedItem.getMediaType() == MediaType.TRACK) { 
 				playItem(page, mediaList, selectedItem);
 			}
 			else if (selectedItem.getMediaType() == MediaType.PICTURE) {
-				new MorriganMsgDlg("TODO: play PICTURE items.").open();
+				try {
+					IViewPart view = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(ViewPicture.ID);
+					ViewPicture picView = (ViewPicture) view;
+					picView.setInput(mediaList, selectedItem);
+				}
+				catch (PartInitException e) {
+					throw new ExecutionException("", e); // TODO add msg.
+				}
 			}
 			else {
 				new MorriganMsgDlg("Error: don't know how to play the type '"+selectedItem.getMediaType()+"'.").open();
