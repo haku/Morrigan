@@ -16,4 +16,5 @@ Import-Package: net.sparktank.morrigan.exceptions,
  net.sparktank.morrigan.model.db.interfaces,
  net.sparktank.morrigan.model.media.interfaces,
  net.sparktank.morrigan.model.tags,
- net.sparktank.morrigan.server
+ net.sparktank.morrigan.server,
+ net.sparktank.sqlitewrapper
