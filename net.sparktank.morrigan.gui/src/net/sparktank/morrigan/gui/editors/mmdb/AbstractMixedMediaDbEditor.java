@@ -15,10 +15,10 @@ import net.sparktank.morrigan.gui.preferences.MediaListPref;
 import net.sparktank.morrigan.helpers.TimeHelper;
 import net.sparktank.morrigan.model.MediaSqliteLayer2;
 import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
-import net.sparktank.morrigan.model.media.impl.AbstractMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.DurationData;
 import net.sparktank.morrigan.model.media.impl.MixedMediaItem;
 import net.sparktank.morrigan.model.media.impl.MixedMediaSqliteLayerImpl;
+import net.sparktank.morrigan.model.media.interfaces.IAbstractMixedMediaDb;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemDb.SortChangeListener;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemStorageLayer.SortDirection;
 import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem;
@@ -43,7 +43,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 
-public abstract class AbstractMixedMediaDbEditor<T extends AbstractMixedMediaDb<T>>
+public abstract class AbstractMixedMediaDbEditor<T extends IAbstractMixedMediaDb<T>>
 		extends MixedMediaListEditor<T, IMixedMediaItem>
 		implements IMixedMediaItemDbEditor<T, IMixedMediaStorageLayer<IMixedMediaItem>, IMixedMediaItem> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
