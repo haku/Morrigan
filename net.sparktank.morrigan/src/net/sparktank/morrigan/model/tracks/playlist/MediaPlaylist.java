@@ -137,18 +137,33 @@ public class MediaPlaylist extends MediaItemList<IMediaTrack> implements IMediaT
 		return true;
 	}
 	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	private long durationOfLastRead = -1;
+	
 	@Override
 	public void read () throws MorriganException {
+		long t0 = System.currentTimeMillis();
+		
 		if (this.newPl) {
 			if (new File(this.filePath).exists()) {
 				throw new MorriganException("Play list already exists.");
 			}
 			writeToFile();
 			this.newPl = false;
-		} else if (!this.alreadyRead) {
+		}
+		else if (!this.alreadyRead) {
 			loadFromFile();
 			this.alreadyRead = true;
 		}
+		
+		long l0 = System.currentTimeMillis() - t0;
+		this.durationOfLastRead = l0;
+	}
+	
+	@Override
+	public long getDurationOfLastRead() {
+		return this.durationOfLastRead;
 	}
 	
 	@Override
