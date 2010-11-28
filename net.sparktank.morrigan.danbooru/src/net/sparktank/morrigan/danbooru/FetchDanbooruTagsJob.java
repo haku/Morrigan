@@ -31,7 +31,7 @@ class FetchDanbooruTagsJob extends Job {
 	public static final String TAG_CATEGORY = "Danbooru";
 	public static final String DATE_TAG_CATEGORY = "DanbooruDate";
 	public static final String DATE_TAG_FORMAT = "yyyy-MM-dd";
-	public static final long MIN_TIME_BETWEEN_SCANS_MILISECONDS = 30 * 24 * 60 * 60 * 1000; // 30 days.
+	public static final long MIN_TIME_BETWEEN_SCANS_MILISECONDS = 60 * 24 * 60 * 60 * 1000; // 60 days.
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
