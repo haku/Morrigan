@@ -51,7 +51,7 @@ class FetchDanbooruTagsJob extends Job {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
-	protected IStatus run(IProgressMonitor monitor) { // TODO use progress monitor.  TODO use transactions.
+	protected IStatus run(IProgressMonitor monitor) {
 		try {
 			long nScanned = 0;
 			long nUpdated = 0;
@@ -160,7 +160,6 @@ class FetchDanbooruTagsJob extends Job {
 				transClone.dispose();
 			}
 			
-			this.editedItemDb.forceRead();
 			if (this.editedItems.size() == 1 && nTags > 0) {  // TODO improve this by checking the selected item was updated.
 				this.viewTagEd.refreshContent();
 			}
@@ -189,7 +188,7 @@ class FetchDanbooruTagsJob extends Job {
 		
 		MediaTag markerTag = null;
 		for (MediaTag tag : tags) {
-			if (tag.getClassification().equals(cls)) {
+			if (tag.getClassification() != null && tag.getClassification().equals(cls)) {
 				if (markerTag == null) {
 					markerTag = tag;
 				}
