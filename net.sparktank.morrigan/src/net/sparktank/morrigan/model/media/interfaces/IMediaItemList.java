@@ -40,6 +40,7 @@ public interface IMediaItemList<T extends IMediaItem> {
 	 */
 	public void read () throws MorriganException;
 	public void forceRead () throws MorriganException;
+	public long getDurationOfLastRead();
 	
 	public void addItem (T item);
 	public void removeItem (T item) throws MorriganException;
