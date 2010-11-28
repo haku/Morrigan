@@ -35,7 +35,7 @@ class FetchDanbooruTagsJob extends Job {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private final IMediaItemDb<?, ?, ?> editedItemDb;
+	private final IMediaItemDb<? extends IMediaItemDb<?,?,?>, ?, ?> editedItemDb;
 	private final List<IMixedMediaItem> editedItems;
 	private final ViewTagEditor viewTagEd;
 	
@@ -113,45 +113,54 @@ class FetchDanbooruTagsJob extends Job {
 			System.err.println("batchedWork.size()=" + batchedWork.size());
 			
 			// Do work that needs doing.
-			monitor.beginTask("Fetching", itemsToWork.size());
-			for (List<IMixedMediaItem> batch : batchedWork) {
-				Map<IMixedMediaItem, String> md5s = new HashMap<IMixedMediaItem, String>();
-				
-				// TODO update model to track MD5s so this block is not longer needed.
-				for (IMixedMediaItem item : batch) {
-					File file = new File(item.getFilepath());
-					BigInteger checksum = ChecksumHelper.generateMd5Checksum(file);
-					String md5 = checksum.toString(16);
-					md5s.put(item, md5);
-				}
-				
-				System.err.println("Looking up " + md5s.values().size() + " MD5s...");
-				
-				Map<String, String[]> tagSets = Danbooru.getTags(md5s.values());
-				
-				for (IMixedMediaItem item : batch) {
-					String[] tags = tagSets.get(md5s.get(item));
-					if (tags != null) {
-						boolean added = false;
-						for (String tag : tags) {
-							if (!this.editedItemDb.hasTag(item, tag, MediaTagType.AUTOMATIC, tagCls)) {
-								this.editedItemDb.addTag(item, tag, MediaTagType.AUTOMATIC, tagCls);
-								added = true;
-								nTags++;
-							}
-						}
-						if (added) nUpdated++;
+			IMediaItemDb<?,?,?> transClone = this.editedItemDb.getTransactionalClone();
+			try {
+				monitor.beginTask("Fetching", itemsToWork.size());
+				for (List<IMixedMediaItem> batch : batchedWork) {
+					Map<IMixedMediaItem, String> md5s = new HashMap<IMixedMediaItem, String>();
+					
+					// TODO update model to track MD5s so this block is not longer needed.
+					for (IMixedMediaItem item : batch) {
+						File file = new File(item.getFilepath());
+						BigInteger checksum = ChecksumHelper.generateMd5Checksum(file);
+						String md5 = checksum.toString(16);
+						md5s.put(item, md5);
 					}
 					
-					MediaTag markerTag = getMarkerTag(this.editedItemDb, item, dateTagCls);
-					updateMarkerTag(this.editedItemDb, item, dateTagCls, markerTag, nowString);
-					nScanned++;
+					System.err.println("Looking up " + md5s.values().size() + " MD5s...");
 					
-					monitor.worked(1);
-					if (monitor.isCanceled()) break;
+					Map<String, String[]> tagSets = Danbooru.getTags(md5s.values());
+					
+					for (IMixedMediaItem item : batch) {
+						String[] tags = tagSets.get(md5s.get(item));
+						if (tags != null) {
+							boolean added = false;
+							for (String tag : tags) {
+								if (!transClone.hasTag(item, tag, MediaTagType.AUTOMATIC, tagCls)) {
+									transClone.addTag(item, tag, MediaTagType.AUTOMATIC, tagCls);
+									added = true;
+									nTags++;
+								}
+							}
+							if (added) nUpdated++;
+						}
+						
+						MediaTag markerTag = getMarkerTag(transClone, item, dateTagCls);
+						updateMarkerTag(transClone, item, dateTagCls, markerTag, nowString);
+						nScanned++;
+						
+						monitor.worked(1);
+						if (monitor.isCanceled()) break;
+					}
+					
+					transClone.commitOrRollback();
 				}
 			}
+			finally {
+				transClone.dispose();
+			}
 			
+			this.editedItemDb.forceRead();
 			if (this.editedItems.size() == 1 && nTags > 0) {  // TODO improve this by checking the selected item was updated.
 				this.viewTagEd.refreshContent();
 			}
@@ -172,6 +181,10 @@ class FetchDanbooruTagsJob extends Job {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	static public MediaTag getMarkerTag (IMediaItemDb<?, ?, ?> itemDb, IMixedMediaItem item, MediaTagClassification cls) throws MorriganException {
+		if (itemDb == null) throw new IllegalArgumentException("itemDb == null.");
+		if (item == null) throw new IllegalArgumentException("item == null.");
+		if (cls == null) throw new IllegalArgumentException("cls == null.");
+		
 		List<MediaTag> tags = itemDb.getTags(item);
 		
 		MediaTag markerTag = null;
@@ -190,6 +203,11 @@ class FetchDanbooruTagsJob extends Job {
 	}
 	
 	static public void updateMarkerTag (IMediaItemDb<?, ?, ?> itemDb, IMixedMediaItem item, MediaTagClassification cls, MediaTag markerTag, String newString) throws MorriganException {
+		if (itemDb == null) throw new IllegalArgumentException("itemDb == null.");
+		if (item == null) throw new IllegalArgumentException("item == null.");
+		if (cls == null) throw new IllegalArgumentException("cls == null.");
+		if (newString == null) throw new IllegalArgumentException("newString == null.");
+		
 		if (markerTag != null) itemDb.removeTag(markerTag);
 		itemDb.addTag(item, newString, MediaTagType.AUTOMATIC, cls);
 	}
