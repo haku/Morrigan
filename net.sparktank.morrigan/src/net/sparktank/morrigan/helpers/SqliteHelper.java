@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
+import net.sparktank.morrigan.model.db.IDbColumn;
 import net.sparktank.sqlitewrapper.GenericSqliteLayer.SqlCreateCmd;
 
 /*

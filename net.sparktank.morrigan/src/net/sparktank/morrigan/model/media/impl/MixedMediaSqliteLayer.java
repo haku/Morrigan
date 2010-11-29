@@ -4,8 +4,8 @@ import java.io.File;
 import java.util.Date;
 import java.util.List;
 
-import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
-import net.sparktank.morrigan.model.db.interfaces.IDbItem;
+import net.sparktank.morrigan.model.db.IDbColumn;
+import net.sparktank.morrigan.model.db.IDbItem;
 import net.sparktank.morrigan.model.factory.RecyclingFactory;
 import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem.MediaType;

@@ -14,9 +14,9 @@ import java.util.List;
 import java.util.Map;
 
 import net.sparktank.morrigan.helpers.GeneratedString;
-import net.sparktank.morrigan.model.db.impl.DbColumn;
-import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
-import net.sparktank.morrigan.model.db.interfaces.IDbItem;
+import net.sparktank.morrigan.model.db.IDbColumn;
+import net.sparktank.morrigan.model.db.IDbItem;
+import net.sparktank.morrigan.model.db.basicimpl.DbColumn;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemStorageLayer;
 import net.sparktank.sqlitewrapper.DbException;
