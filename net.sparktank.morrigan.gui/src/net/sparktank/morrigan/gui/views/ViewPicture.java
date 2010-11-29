@@ -17,6 +17,7 @@ import net.sparktank.morrigan.gui.editors.MediaItemListEditor;
 import net.sparktank.morrigan.gui.editors.MediaItemListEditorInput;
 import net.sparktank.morrigan.gui.editors.mmdb.LocalMixedMediaDbEditor;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
+import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.IMediaItemDb;
 import net.sparktank.morrigan.model.media.IMediaPicture;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
@@ -109,7 +110,7 @@ public class ViewPicture extends ViewPart {
 				String itempath = memento.getString(KEY_ITEM);
 				
 				if (dbpath != null && itempath != null) {
-	    			LocalMixedMediaDb mmdb;
+	    			ILocalMixedMediaDb mmdb;
 	    			mmdb = LocalMixedMediaDb.LOCAL_MMDB_FACTORY.manufacture(dbpath);
 	    			mmdb.read();
 	    			IMediaPicture item = mmdb.findItemByFilePath(itempath);

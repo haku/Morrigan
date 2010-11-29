@@ -9,6 +9,7 @@ import net.sparktank.morrigan.helpers.HeadlessHelper;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
 import net.sparktank.morrigan.model.media.DurationData;
+import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.IMediaTrack;
 import net.sparktank.morrigan.model.media.IMediaTrackList;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
@@ -179,7 +180,7 @@ public class MorriganCommandProvider implements CommandProvider {
 		if (args.size() >= 1) {
 			String name = args.get(0);
 			try {
-				LocalMixedMediaDb mmdb = LocalMixedMediaDbHelper.createMmdb(name);
+				ILocalMixedMediaDb mmdb = LocalMixedMediaDbHelper.createMmdb(name);
 				ci.println("Created MMDB '"+mmdb.getListName()+"'.");
 			}
 			catch (MorriganException e) {

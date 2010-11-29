@@ -30,6 +30,8 @@ public interface IMediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMediaIte
 	public List<T> simpleSearch (String term, String esc, int maxResults) throws DbException;
 	public List<T> getAllDbEntries () throws DbException;
 	
+	public T getNewT (String filePath);
+	
 	public T addFile (File file) throws MorriganException, DbException;
 	public boolean hasFile (File file) throws MorriganException, DbException;
 	public List<T> addFiles (List<File> files) throws MorriganException, DbException;
@@ -51,6 +53,9 @@ public interface IMediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMediaIte
 	public void moveTags (IDbItem from_item, IDbItem to_item) throws MorriganException;
 	public void removeTag (MediaTag mt) throws MorriganException;
 	public void clearTags (IDbItem item) throws MorriganException;
+	
+	public boolean isMarkedAsUnreadable (T mi) throws MorriganException;
+	public void markAsUnreadabled (T mi) throws MorriganException;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

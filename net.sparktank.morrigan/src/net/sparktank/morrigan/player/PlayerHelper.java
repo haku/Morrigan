@@ -5,6 +5,7 @@ import java.util.List;
 
 import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
+import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.IMediaTrack;
 import net.sparktank.morrigan.model.media.IMediaTrackDb;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
@@ -63,7 +64,7 @@ public class PlayerHelper {
 		IMediaTrackDb<?, ?, ? extends IMediaTrack> ret = null;
 		
 		if (item.type == MediaExplorerItem.ItemType.LOCALMMDB) {
-			LocalMixedMediaDb mmdb;
+			ILocalMixedMediaDb mmdb;
 			try {
 				mmdb = LocalMixedMediaDb.LOCAL_MMDB_FACTORY.manufacture(item.identifier);
 			} catch (DbException e) {

@@ -74,10 +74,6 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	protected abstract T getNewT (String filePath);
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
 	@Override
 	public String getSerial() {
 		return this.dbLayer.getDbFilePath();
@@ -368,16 +364,26 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 		}
 	}
 	
-	public void setRemoteLocation (T track, String remoteLocation) throws DbException {
+	@Override
+	public void setRemoteLocation (T track, String remoteLocation) throws MorriganException {
 		track.setRemoteLocation(remoteLocation);
-		this.dbLayer.setRemoteLocation(track.getFilepath(), remoteLocation);
+		try {
+			this.dbLayer.setRemoteLocation(track.getFilepath(), remoteLocation);
+		} catch (DbException e) {
+			throw new MorriganException(e);
+		}
 	}
 	
-	public void persistTrackData (T track) throws DbException {
-		this.dbLayer.setHashcode(track.getFilepath(), track.getHashcode());
+	@Override
+	public void persistTrackData (T track) throws MorriganException {
+		try {
+			this.dbLayer.setHashcode(track.getFilepath(), track.getHashcode());
 		if (track.getDateAdded() != null) this.dbLayer.setDateAdded(track.getFilepath(), track.getDateAdded());
 		if (track.getDateLastModified() != null) this.dbLayer.setDateLastModified(track.getFilepath(), track.getDateLastModified());
 		this.dbLayer.setRemoteLocation(track.getFilepath(), track.getRemoteLocation());
+		} catch (DbException e) {
+			throw new MorriganException(e);
+		}
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -521,10 +527,12 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 	
 	private static final String TAG_UNREADABLE = "UNREADABLE";
 	
+	@Override
 	public boolean isMarkedAsUnreadable (T mi) throws MorriganException {
 		return hasTag(mi, TAG_UNREADABLE, MediaTagTypeImpl.AUTOMATIC, null);
 	}
 	
+	@Override
 	public void markAsUnreadabled (T mi) throws MorriganException {
 		setItemEnabled(mi, false);
 		addTag(mi, TAG_UNREADABLE, MediaTagTypeImpl.AUTOMATIC, (MediaTagClassificationImpl)null);

@@ -15,7 +15,7 @@ import net.sparktank.morrigan.model.pictures.MediaPictureListHelper;
 import net.sparktank.morrigan.model.tracks.MediaTrackListHelper;
 import net.sparktank.sqlitewrapper.DbException;
 
-public abstract class AbstractMixedMediaDb<H extends AbstractMixedMediaDb<H>>
+public abstract class AbstractMixedMediaDb<H extends IAbstractMixedMediaDb<H>>
 		extends MediaItemDb<H, IMixedMediaStorageLayer<IMixedMediaItem>, IMixedMediaItem>
 		implements IAbstractMixedMediaDb<H> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -194,17 +194,22 @@ public abstract class AbstractMixedMediaDb<H extends AbstractMixedMediaDb<H>>
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
-	public void persistTrackData(IMixedMediaItem item) throws DbException {
+	public void persistTrackData(IMixedMediaItem item) throws MorriganException {
 		super.persistTrackData(item);
 		
-		this.getDbLayer().setItemMediaType(item.getFilepath(), item.getMediaType());
-		
-		this.getDbLayer().setTrackStartCnt(item.getFilepath(), item.getStartCount());
-		this.getDbLayer().setTrackEndCnt(item.getFilepath(), item.getEndCount());
-		this.getDbLayer().setTrackDuration(item.getFilepath(), item.getDuration());
-		if (item.getDateLastPlayed() != null) this.getDbLayer().setDateLastPlayed(item.getFilepath(), item.getDateLastPlayed());
-		
-		this.getDbLayer().setDimensions(item.getFilepath(), item.getWidth(), item.getHeight());
+		try {
+			this.getDbLayer().setItemMediaType(item.getFilepath(), item.getMediaType());
+			
+			this.getDbLayer().setTrackStartCnt(item.getFilepath(), item.getStartCount());
+			this.getDbLayer().setTrackEndCnt(item.getFilepath(), item.getEndCount());
+			this.getDbLayer().setTrackDuration(item.getFilepath(), item.getDuration());
+			if (item.getDateLastPlayed() != null) this.getDbLayer().setDateLastPlayed(item.getFilepath(), item.getDateLastPlayed());
+			
+			this.getDbLayer().setDimensions(item.getFilepath(), item.getWidth(), item.getHeight());
+		}
+		catch (DbException e) {
+			throw new MorriganException(e);
+		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -50,6 +50,8 @@ public interface IMediaItemList<T extends IMediaItem> {
 	public void setItemDateLastModified (T item, Date date) throws MorriganException;
 	public void setItemEnabled (T item, boolean value) throws MorriganException;
 	public void setItemMissing (T item, boolean value) throws MorriganException;
+	public void setRemoteLocation (T track, String remoteLocation) throws MorriganException;
+	public void persistTrackData (T track) throws MorriganException;
 	
 	public File copyItemFile (T item, File targetDirectory) throws MorriganException;
 	

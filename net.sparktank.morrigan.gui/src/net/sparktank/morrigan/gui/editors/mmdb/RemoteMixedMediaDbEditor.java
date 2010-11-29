@@ -7,7 +7,7 @@ import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.jobs.TaskJob;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.IMixedMediaItem;
-import net.sparktank.morrigan.model.media.impl.RemoteMixedMediaDb;
+import net.sparktank.morrigan.model.media.IRemoteMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.RemoteMixedMediaDbUpdateTask;
 import net.sparktank.sqlitewrapper.DbException;
 
@@ -25,7 +25,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IEditorReference;
 
 public class RemoteMixedMediaDbEditor
-		extends AbstractMixedMediaDbEditor<RemoteMixedMediaDb> {
+		extends AbstractMixedMediaDbEditor<IRemoteMixedMediaDb> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static final String ID = "net.sparktank.morrigan.gui.editors.RemoteMixedMediaDbEditor";

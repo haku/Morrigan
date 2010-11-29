@@ -9,6 +9,7 @@ import java.util.Collections;
 import net.sparktank.morrigan.config.Config;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
+import net.sparktank.morrigan.model.media.IRemoteMixedMediaDb;
 
 public class RemoteMixedMediaDbHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -24,12 +25,12 @@ public class RemoteMixedMediaDbHelper {
 		return file;
 	}
 	
-	public static RemoteMixedMediaDb createRemoteMmdb (String mmdbUrl) throws MorriganException, MalformedURLException {
+	public static IRemoteMixedMediaDb createRemoteMmdb (String mmdbUrl) throws MorriganException, MalformedURLException {
 		URL url = new URL(mmdbUrl);
 		// FIXME better naming?
 		String name = mmdbUrl.substring(mmdbUrl.lastIndexOf("/")+1).replace(Config.MMDB_REMOTE_FILE_EXT, "").replace(Config.MMDB_LOCAL_FILE_EXT, "");
 		String file = getFullPathToMmdb(url.getHost() + "_" + url.getPort() + "_" + name);
-		RemoteMixedMediaDb db = RemoteMixedMediaDb.FACTORY.manufacture(file, url);
+		IRemoteMixedMediaDb db = RemoteMixedMediaDb.FACTORY.manufacture(file, url);
 		return db;
 	}
 	

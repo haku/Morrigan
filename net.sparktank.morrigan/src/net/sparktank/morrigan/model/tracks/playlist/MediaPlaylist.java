@@ -13,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.Logger;
 
+import net.sparktank.morrigan.engines.playback.NotImplementedException;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.factory.RecyclingFactory;
 import net.sparktank.morrigan.model.media.DurationData;
@@ -350,6 +351,16 @@ public class MediaPlaylist extends MediaItemList<IMediaTrack> implements IMediaT
 	@Override
 	public void setTrackDateLastPlayed (IMediaTrack track, Date date) throws MorriganException {
 		MediaTrackListHelper.setDateLastPlayed(this, track, date);
+	}
+	
+	@Override
+	public void setRemoteLocation(IMediaTrack track, String remoteLocation) throws MorriganException {
+		throw new NotImplementedException();
+	}
+	
+	@Override
+	public void persistTrackData(IMediaTrack track) throws MorriganException {
+		throw new NotImplementedException();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

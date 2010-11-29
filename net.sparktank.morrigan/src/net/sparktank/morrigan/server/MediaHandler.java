@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.sparktank.morrigan.helpers.HeadlessHelper;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
+import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDbHelper;
 import net.sparktank.morrigan.model.tracks.playlist.MediaPlaylist;
@@ -86,7 +87,7 @@ public class MediaHandler extends AbstractHandler {
 		throws DbException, SAXException, MorriganException, UnsupportedEncodingException, IOException {
 		
 		String f = LocalMixedMediaDbHelper.getFullPathToMmdb(id);
-		LocalMixedMediaDb mmdb = LocalMixedMediaDb.LOCAL_MMDB_FACTORY.manufacture(f);
+		ILocalMixedMediaDb mmdb = LocalMixedMediaDb.LOCAL_MMDB_FACTORY.manufacture(f);
 		
 		if (split.length > 2) {
 			String param = split[2];
@@ -137,7 +138,7 @@ public class MediaHandler extends AbstractHandler {
 			}
 		}
 		else {
-			MixedMediaListFeed<LocalMixedMediaDb> libraryFeed = new MixedMediaListFeed<LocalMixedMediaDb>(mmdb);
+			MixedMediaListFeed<ILocalMixedMediaDb> libraryFeed = new MixedMediaListFeed<ILocalMixedMediaDb>(mmdb);
 			libraryFeed.process(out);
 		}
 	}

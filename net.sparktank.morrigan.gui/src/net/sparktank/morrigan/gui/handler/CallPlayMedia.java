@@ -7,11 +7,11 @@ import net.sparktank.morrigan.gui.editors.tracks.PlaylistEditor;
 import net.sparktank.morrigan.gui.views.AbstractPlayerView;
 import net.sparktank.morrigan.gui.views.ViewControls;
 import net.sparktank.morrigan.gui.views.ViewPicture;
+import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.IMediaTrack;
 import net.sparktank.morrigan.model.media.IMediaTrackList;
 import net.sparktank.morrigan.model.media.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.IMixedMediaItem.MediaType;
-import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
 import net.sparktank.morrigan.player.PlayItem;
 
 import org.eclipse.core.commands.AbstractHandler;
@@ -42,7 +42,7 @@ public class CallPlayMedia extends AbstractHandler {
 		
 		if (activeEditor instanceof LocalMixedMediaDbEditor) {
 			LocalMixedMediaDbEditor lmmdbe = (LocalMixedMediaDbEditor) activeEditor;
-			LocalMixedMediaDb mediaList = lmmdbe.getMediaList();
+			ILocalMixedMediaDb mediaList = lmmdbe.getMediaList();
 			IMixedMediaItem selectedItem = lmmdbe.getSelectedItem();
 			if (selectedItem.getMediaType() == MediaType.TRACK) { 
 				playItem(page, mediaList, selectedItem);

@@ -8,7 +8,7 @@ import net.sparktank.morrigan.gui.actions.DbUpdateAction;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.editors.mmdb.LocalMixedMediaDbEditor;
 import net.sparktank.morrigan.gui.helpers.RefreshTimer;
-import net.sparktank.morrigan.model.media.impl.MediaItemDb;
+import net.sparktank.morrigan.model.media.IMediaItemDb;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -61,7 +61,7 @@ public class ViewLibraryProperties extends ViewPart {
 	private IPartListener partListener = new IPartListener() {
 		@Override
 		public void partActivated(IWorkbenchPart part) {
-			MediaItemDb<?,?,?> ml = null;
+			IMediaItemDb<?,?,?> ml = null;
 			
 			/*
 			 * At the moment this checks the supported editors directly.
@@ -89,14 +89,14 @@ public class ViewLibraryProperties extends ViewPart {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	MediaItemDb<?,?,?> library;
+	IMediaItemDb<?,?,?> library;
 	DbUpdateAction dbUpdateAction = new DbUpdateAction();
 	
-	public void setContent (MediaItemDb<?,?,?> library) {
+	public void setContent (IMediaItemDb<?,?,?> library) {
 		setContent(library, true);
 	}
 	
-	public void setContent (MediaItemDb<?,?,?> library, boolean updateGui) {
+	public void setContent (IMediaItemDb<?,?,?> library, boolean updateGui) {
 		if (this.library == library) return;
 		
 		if (this.library!=null) {

@@ -5,7 +5,7 @@ import java.net.URLEncoder;
 import java.util.List;
 
 import net.sparktank.morrigan.model.exceptions.MorriganException;
-import net.sparktank.morrigan.model.media.impl.MediaItemDb;
+import net.sparktank.morrigan.model.media.IMediaItemDb;
 
 import org.xml.sax.SAXException;
 
@@ -14,9 +14,9 @@ import com.megginson.sax.DataWriter;
 public class MediaItemDbSrcFeed extends AbstractFeed {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private MediaItemDb<?,?,?> ml;
+	private IMediaItemDb<?,?,?> ml;
 	
-	public MediaItemDbSrcFeed (MediaItemDb<?,?,?> ml) {
+	public MediaItemDbSrcFeed (IMediaItemDb<?,?,?> ml) {
 		super();
 		if (ml==null) throw new IllegalArgumentException("MediaList paramater can not be null.");
 		this.ml = ml;
