@@ -14,7 +14,6 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.sparktank.morrigan.helpers.ErrorHelper;
 import net.sparktank.morrigan.helpers.HeadlessHelper;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
@@ -25,6 +24,7 @@ import net.sparktank.morrigan.server.feedwriters.MediaExplorerFeed;
 import net.sparktank.morrigan.server.feedwriters.MediaItemDbSrcFeed;
 import net.sparktank.morrigan.server.feedwriters.MediaTrackListFeed;
 import net.sparktank.morrigan.server.feedwriters.MixedMediaListFeed;
+import net.sparktank.morrigan.util.ErrorHelper;
 import net.sparktank.sqlitewrapper.DbException;
 
 import org.eclipse.jetty.server.Request;

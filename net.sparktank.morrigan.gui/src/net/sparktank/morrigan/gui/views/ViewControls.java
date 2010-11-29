@@ -11,8 +11,8 @@ import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.display.ScreenPainter;
 import net.sparktank.morrigan.gui.display.ScreenPainter.ScreenType;
 import net.sparktank.morrigan.gui.helpers.RefreshTimer;
-import net.sparktank.morrigan.helpers.TimeHelper;
 import net.sparktank.morrigan.player.OrderHelper.PlaybackOrder;
+import net.sparktank.morrigan.util.TimeHelper;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.MenuManager;

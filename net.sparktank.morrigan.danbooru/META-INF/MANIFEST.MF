@@ -17,4 +17,5 @@ Import-Package: net.sparktank.morrigan.gui.dialogs,
  net.sparktank.morrigan.model.media,
  net.sparktank.morrigan.model.tags,
  net.sparktank.morrigan.server,
+ net.sparktank.morrigan.util,
  net.sparktank.sqlitewrapper

@@ -12,7 +12,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import net.sparktank.morrigan.helpers.GeneratedString;
 import net.sparktank.morrigan.helpers.SqliteHelper;
 import net.sparktank.morrigan.model.MediaSqliteLayer;
 import net.sparktank.morrigan.model.db.IDbColumn;
@@ -23,6 +22,7 @@ import net.sparktank.morrigan.model.media.IMediaPicture;
 import net.sparktank.morrigan.model.media.IMediaTrack;
 import net.sparktank.morrigan.model.media.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.IMixedMediaItem.MediaType;
+import net.sparktank.morrigan.util.GeneratedString;
 import net.sparktank.sqlitewrapper.DbException;
 
 public abstract class MixedMediaSqliteLayerImpl extends MediaSqliteLayer<IMixedMediaItem> {

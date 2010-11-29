@@ -11,13 +11,13 @@ import java.util.Map;
 
 import net.sparktank.morrigan.gui.dialogs.RunnableDialog;
 import net.sparktank.morrigan.gui.views.ViewTagEditor;
-import net.sparktank.morrigan.helpers.ChecksumHelper;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.IMediaItemDb;
 import net.sparktank.morrigan.model.media.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.MediaTag;
 import net.sparktank.morrigan.model.media.MediaTagClassification;
 import net.sparktank.morrigan.model.tags.MediaTagTypeImpl;
+import net.sparktank.morrigan.util.ChecksumHelper;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
