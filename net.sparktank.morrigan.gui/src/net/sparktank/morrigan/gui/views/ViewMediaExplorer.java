@@ -16,8 +16,8 @@ import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.IRemoteMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDbHelper;
-import net.sparktank.morrigan.model.media.impl.RemoteMixedMediaDb;
-import net.sparktank.morrigan.model.media.impl.RemoteMixedMediaDbHelper;
+import net.sparktank.morrigan.server.model.RemoteMixedMediaDb;
+import net.sparktank.morrigan.server.model.RemoteMixedMediaDbHelper;
 
 import org.eclipse.core.commands.common.CommandException;
 import org.eclipse.jface.action.Action;

@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.model.media.impl;
+package net.sparktank.morrigan.server.model;
 
 import java.io.File;
 import java.net.MalformedURLException;

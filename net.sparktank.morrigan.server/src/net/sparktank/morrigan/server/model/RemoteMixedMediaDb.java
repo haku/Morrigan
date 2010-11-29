@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.model.media.impl;
+package net.sparktank.morrigan.server.model;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -24,6 +24,8 @@ import net.sparktank.morrigan.model.media.IRemoteMixedMediaDb;
 import net.sparktank.morrigan.model.media.MediaTag;
 import net.sparktank.morrigan.model.media.MediaTagClassification;
 import net.sparktank.morrigan.model.media.MediaTagType;
+import net.sparktank.morrigan.model.media.impl.AbstractMixedMediaDb;
+import net.sparktank.morrigan.model.media.impl.MixedMediaSqliteLayer;
 import net.sparktank.morrigan.model.tasks.TaskEventListener;
 import net.sparktank.morrigan.server.feedreader.MixedMediaDbFeedParser;
 import net.sparktank.morrigan.util.httpclient.HttpClient;

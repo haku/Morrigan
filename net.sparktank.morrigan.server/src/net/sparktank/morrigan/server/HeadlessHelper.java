@@ -1,10 +1,10 @@
-package net.sparktank.morrigan.helpers;
+package net.sparktank.morrigan.server;
 
 import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDbUpdateTask;
-import net.sparktank.morrigan.model.media.impl.RemoteMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.RemoteMixedMediaDbUpdateTask;
 import net.sparktank.morrigan.model.tasks.TaskEventListener;
+import net.sparktank.morrigan.server.model.RemoteMixedMediaDb;
 import net.sparktank.morrigan.util.ErrorHelper;
 
 // TODO move this class somewhere more appropriate ???

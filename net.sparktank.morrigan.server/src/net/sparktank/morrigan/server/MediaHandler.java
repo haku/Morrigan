@@ -14,16 +14,12 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.sparktank.morrigan.helpers.HeadlessHelper;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDbHelper;
-import net.sparktank.morrigan.model.tracks.playlist.MediaPlaylist;
-import net.sparktank.morrigan.model.tracks.playlist.PlaylistHelper;
 import net.sparktank.morrigan.server.feedwriters.MediaExplorerFeed;
 import net.sparktank.morrigan.server.feedwriters.MediaItemDbSrcFeed;
-import net.sparktank.morrigan.server.feedwriters.MediaTrackListFeed;
 import net.sparktank.morrigan.server.feedwriters.MixedMediaListFeed;
 import net.sparktank.morrigan.util.ErrorHelper;
 import net.sparktank.sqlitewrapper.DbException;
@@ -60,9 +56,6 @@ public class MediaHandler extends AbstractHandler {
 					String id = split[1];
 					if (type.equals(LocalMixedMediaDb.TYPE)) {
 						handleMmdbRequest(response, out, paramMap, split, id);
-					}
-					else if (type.equals(MediaPlaylist.TYPE)) {
-						handlePlaylistRequest(out, id);
 					}
 					else {
 						System.err.println("Unknown type '"+type+"'.");
@@ -141,13 +134,6 @@ public class MediaHandler extends AbstractHandler {
 			MixedMediaListFeed<ILocalMixedMediaDb> libraryFeed = new MixedMediaListFeed<ILocalMixedMediaDb>(mmdb);
 			libraryFeed.process(out);
 		}
-	}
-	
-	private void handlePlaylistRequest(PrintWriter out, String id) throws MorriganException, SAXException {
-		String f = PlaylistHelper.getFullPathToPlaylist(id);
-		MediaPlaylist ml = MediaPlaylist.FACTORY.manufacture(f);
-		MediaTrackListFeed<MediaPlaylist> libraryFeed = new MediaTrackListFeed<MediaPlaylist>(ml);
-		libraryFeed.process(out);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
