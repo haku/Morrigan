@@ -41,7 +41,6 @@ Image &quot;The Morrígan&quot; by Louis le Brocquy used under the Creative Comm
    <plugins>
       <plugin id="com.ibm.icu"/>
       <plugin id="javax.transaction" fragment="true"/>
-      <plugin id="net.sparktank.morrigan"/>
       <plugin id="net.sparktank.morrigan.config"/>
       <plugin id="net.sparktank.morrigan.engines"/>
       <plugin id="net.sparktank.morrigan.gui"/>
