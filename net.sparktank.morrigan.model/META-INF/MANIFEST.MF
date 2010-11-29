@@ -5,6 +5,7 @@ Bundle-SymbolicName: net.sparktank.morrigan.model
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: net.sparktank.morrigan.model.exceptions,
+ net.sparktank.morrigan.model.explorer,
  net.sparktank.morrigan.model.factory,
  net.sparktank.morrigan.model.helper,
  net.sparktank.morrigan.model.tasks
