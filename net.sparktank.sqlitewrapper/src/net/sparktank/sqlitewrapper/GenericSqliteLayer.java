@@ -56,15 +56,28 @@ public abstract class GenericSqliteLayer implements IGenericDbLayer {
 	
 	private Connection dbConnection = null;
 	
+	private Connection makeConnection() throws ClassNotFoundException, SQLException {
+		Class.forName("org.sqlite.JDBC");
+		String url = "jdbc:sqlite:/" + this.dbFilePath;
+		Connection con = DriverManager.getConnection(url);
+		
+		con.setAutoCommit(this.autoCommit);
+//		System.err.println("AutoCommit=" + this.dbConnection.getAutoCommit() + " for '"+getDbFilePath()+"'.");
+		
+		return con;
+	}
+	
 	protected Connection getDbCon () throws ClassNotFoundException, SQLException {
-		if (this.dbConnection==null) {
-			Class.forName("org.sqlite.JDBC");
-			String url = "jdbc:sqlite:/" + this.dbFilePath;
-			this.dbConnection = DriverManager.getConnection(url);
-			
-			this.dbConnection.setAutoCommit(this.autoCommit);
-//			System.err.println("AutoCommit=" + this.dbConnection.getAutoCommit() + " for '"+getDbFilePath()+"'.");
+		if (this.dbConnection==null || this.dbConnection.isClosed()) {
+			this.dbConnection = makeConnection();
 		}
+//		else if (!this.dbConnection.isValid(10)) {
+//			this.dbConnection.close();
+//			this.dbConnection = makeConnection();
+//		}
+		
+		if (this.dbConnection == null) throw new IllegalArgumentException("Failed to make driver class instance.");
+		
 		return this.dbConnection;
 	}
 	
