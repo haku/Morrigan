@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.model.db;
+package net.sparktank.morrigan.helpers;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Map;
 
 import net.sparktank.morrigan.helpers.GeneratedString;
+import net.sparktank.morrigan.helpers.SqliteHelper;
 import net.sparktank.morrigan.model.MediaSqliteLayer;
-import net.sparktank.morrigan.model.db.SqliteHelper;
 import net.sparktank.morrigan.model.db.impl.DbColumn;
 import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
 import net.sparktank.morrigan.model.db.interfaces.IDbItem;
