@@ -55,7 +55,7 @@ public class CopyToLocalMmdbTask<T extends IMediaItem> implements IMorriganTask 
 			 */
 			
 			for (T item : this.itemsToCopy) {
-	    		IMixedMediaItem newItem = new MixedMediaItem(item.getFilepath());
+	    		IMixedMediaItem newItem = this.toDb.getNewT(item.getFilepath());
 	    		newItem.setFromMediaItem(item);
 	    		
 	    		File coItemDir = getCheckoutItemDirectory(coDir, newItem);

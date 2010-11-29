@@ -13,7 +13,6 @@ import net.sparktank.morrigan.gui.dialogs.RunnableDialog;
 import net.sparktank.morrigan.gui.editors.IMediaItemDbEditor;
 import net.sparktank.morrigan.gui.helpers.ImageCache;
 import net.sparktank.morrigan.gui.helpers.RefreshTimer;
-import net.sparktank.morrigan.model.media.impl.MediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemDb;
 import net.sparktank.morrigan.model.tags.MediaTag;
@@ -137,11 +136,11 @@ public class ViewTagEditor extends ViewPart {
 				
 				if (selection instanceof IStructuredSelection) {
 					IStructuredSelection iSel = (IStructuredSelection) selection;
-					ArrayList<MediaItem> sel = new ArrayList<MediaItem>();
+					ArrayList<IMediaItem> sel = new ArrayList<IMediaItem>();
 					for (Object selectedObject : iSel.toList()) {
 						if (selectedObject != null) {
-							if (selectedObject instanceof MediaItem) {
-								MediaItem track = (MediaItem) selectedObject;
+							if (selectedObject instanceof IMediaItem) {
+								IMediaItem track = (IMediaItem) selectedObject;
 								sel.add(track);
 							}
 						}

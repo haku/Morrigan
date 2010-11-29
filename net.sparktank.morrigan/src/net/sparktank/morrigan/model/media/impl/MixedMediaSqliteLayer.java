@@ -359,4 +359,11 @@ public class MixedMediaSqliteLayer extends MixedMediaSqliteLayerImpl implements 
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	@Override
+	public IMixedMediaItem getNewT(String filePath) {
+		return getNewMediaItem(filePath);
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

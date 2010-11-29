@@ -16,7 +16,6 @@ import net.sparktank.morrigan.helpers.TimeHelper;
 import net.sparktank.morrigan.model.MediaSqliteLayer2;
 import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
 import net.sparktank.morrigan.model.media.impl.DurationData;
-import net.sparktank.morrigan.model.media.impl.MixedMediaItem;
 import net.sparktank.morrigan.model.media.impl.MixedMediaSqliteLayerImpl;
 import net.sparktank.morrigan.model.media.interfaces.IAbstractMixedMediaDb;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemDb.SortChangeListener;
@@ -62,7 +61,7 @@ public abstract class AbstractMixedMediaDbEditor<T extends IAbstractMixedMediaDb
 	
 	@Override
 	protected IMixedMediaItem getNewS(String filePath) {
-		return new MixedMediaItem(filePath);
+		return getMediaList().getDbLayer().getNewT(filePath);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -32,8 +32,8 @@ public abstract class AbstractMixedMediaDb<H extends AbstractMixedMediaDb<H>>
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
-	protected IMixedMediaItem getNewT(String filePath) {
-		return new MixedMediaItem(filePath);
+	public IMixedMediaItem getNewT(String filePath) {
+		return getDbLayer().getNewT(filePath);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

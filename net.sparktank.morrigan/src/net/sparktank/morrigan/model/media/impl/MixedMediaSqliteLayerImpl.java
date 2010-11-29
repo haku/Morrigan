@@ -804,10 +804,18 @@ public abstract class MixedMediaSqliteLayerImpl extends MediaSqliteLayer<IMixedM
 		return ret;
 	}
 	
+	static public IMixedMediaItem getNewMediaItem (String filePath) {
+		return new MixedMediaItem(filePath);
+	}
+	
+	static public IMixedMediaItem getNewMediaItem (MediaType type) {
+		return new MixedMediaItem(type);
+	}
+	
 	static protected IMixedMediaItem createMediaItem (ResultSet rs) throws SQLException {
 		int i = rs.getInt(SQL_TBL_MEDIAFILES_COL_TYPE.getName());
 		MediaType t = MediaType.parseInt(i);
-		IMixedMediaItem mi = new MixedMediaItem(t);
+		IMixedMediaItem mi = getNewMediaItem(t);
 		
 		switch (t) {
 			case TRACK:
