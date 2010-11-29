@@ -30,4 +30,3 @@ Import-Package: net.sparktank.morrigan.config,
  org.eclipse.swt.layout,
  org.eclipse.swt.widgets,
  org.osgi.framework;version="1.5.0"
-Export-Package: net.sparktank.morrigan.helpers
