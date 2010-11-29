@@ -1,13 +1,13 @@
 package net.sparktank.morrigan.model.tags;
 
 
-public class MediaTagClassification { // TODO add interface.
+public class MediaTagClassificationImpl { // TODO add interface.
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private long rowId;
 	private String classification;
 	
-	public MediaTagClassification (long rowId, String classification) {
+	public MediaTagClassificationImpl (long rowId, String classification) {
 		this.rowId = rowId;
 		this.classification = classification;
 	}
@@ -37,8 +37,8 @@ public class MediaTagClassification { // TODO add interface.
 	public boolean equals(Object aThat) {
 		if ( aThat == null ) return false;
 		if ( this == aThat ) return true;
-		if ( !(aThat instanceof MediaTagClassification) ) return false;
-		MediaTagClassification that = (MediaTagClassification)aThat;
+		if ( !(aThat instanceof MediaTagClassificationImpl) ) return false;
+		MediaTagClassificationImpl that = (MediaTagClassificationImpl)aThat;
 		
 		return this.getRowId() == that.getRowId();
 	}

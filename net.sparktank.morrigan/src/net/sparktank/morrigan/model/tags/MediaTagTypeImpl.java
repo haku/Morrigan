@@ -1,6 +1,6 @@
 package net.sparktank.morrigan.model.tags;
 
-public enum MediaTagType {
+public enum MediaTagTypeImpl {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	MANUAL(0),
@@ -10,7 +10,7 @@ public enum MediaTagType {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public static MediaTagType getFromIndex (int index) {
+	public static MediaTagTypeImpl getFromIndex (int index) {
 		switch (index) {
 			case 0: return MANUAL;
 			case 1: return AUTOMATIC;
@@ -22,7 +22,7 @@ public enum MediaTagType {
 	
 	private final int index;
 	
-	private MediaTagType (int index) {
+	private MediaTagTypeImpl (int index) {
 		this.index = index;
 	}
 	

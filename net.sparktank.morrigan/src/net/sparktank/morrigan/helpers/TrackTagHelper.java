@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.model.tags;
+package net.sparktank.morrigan.helpers;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,6 +7,7 @@ import java.util.Iterator;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemDb;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
+import net.sparktank.morrigan.model.tags.MediaTagTypeImpl;
 
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
@@ -64,7 +65,7 @@ public class TrackTagHelper {
 					if (tagFieldString != null && tagFieldString.length() > 0) {
 						String tagId = tagTextField.getId();
 						if (tagId != null && tagId.length() < 1) tagId = null;
-						itemDb.addTag(mlt, tagFieldString, MediaTagType.AUTOMATIC, tagId);
+						itemDb.addTag(mlt, tagFieldString, MediaTagTypeImpl.AUTOMATIC, tagId);
 					}
 					
 				}
