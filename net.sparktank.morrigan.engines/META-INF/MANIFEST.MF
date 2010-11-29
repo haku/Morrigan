@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Engines
+Bundle-SymbolicName: net.sparktank.morrigan.engines
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: net.sparktank.morrigan.engines,
+ net.sparktank.morrigan.engines.common,
+ net.sparktank.morrigan.engines.hotkey,
+ net.sparktank.morrigan.engines.playback
+Import-Package: net.sparktank.morrigan.config,
+ net.sparktank.morrigan.model.exceptions,
+ org.eclipse.swt.widgets
