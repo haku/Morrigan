@@ -97,5 +97,7 @@ public interface IMediaItemStorageLayer<T extends IMediaItem> extends IGenericDb
 	public void setMissing(String sfile, boolean value) throws DbException;
 	public void setRemoteLocation(String sfile, String remoteLocation) throws DbException;
 	
+	public T getNewT(String filePath);
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

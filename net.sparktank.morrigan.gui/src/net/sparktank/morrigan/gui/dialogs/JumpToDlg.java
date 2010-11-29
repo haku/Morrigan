@@ -7,7 +7,6 @@ import java.util.List;
 
 import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.gui.preferences.PreferenceHelper;
-import net.sparktank.morrigan.model.media.impl.MediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrackDb;
 import net.sparktank.morrigan.player.PlayItem;
@@ -386,9 +385,8 @@ public class JumpToDlg {
 	private ILabelProvider labelProvider = new LabelProvider() {
 		@Override
 		public String getText(Object element) {
-			if (element instanceof MediaItem) {
-				MediaItem item = (MediaItem) element;
-				return item.toString();
+			if (element  != null) {
+				return element.toString();
 			}
 			return null;
 		}
