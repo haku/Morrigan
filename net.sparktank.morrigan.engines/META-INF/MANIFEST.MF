@@ -10,4 +10,5 @@ Export-Package: net.sparktank.morrigan.engines,
  net.sparktank.morrigan.engines.playback
 Import-Package: net.sparktank.morrigan.config,
  net.sparktank.morrigan.model.exceptions,
+ org.eclipse.swt.events,
  org.eclipse.swt.widgets
