@@ -14,14 +14,15 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import net.sparktank.morrigan.model.exceptions.MorriganException;
-import net.sparktank.morrigan.model.media.impl.RemoteMixedMediaDb;
 import net.sparktank.morrigan.model.media.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.IMixedMediaItem.MediaType;
+import net.sparktank.morrigan.model.media.impl.RemoteMixedMediaDb;
 import net.sparktank.morrigan.model.tasks.TaskEventListener;
-import net.sparktank.morrigan.server.HttpClient;
-import net.sparktank.morrigan.server.HttpClient.HttpResponse;
-import net.sparktank.morrigan.server.HttpClient.IHttpStreamHandler;
 import net.sparktank.morrigan.server.feedwriters.XmlHelper;
+import net.sparktank.morrigan.util.httpclient.HttpClient;
+import net.sparktank.morrigan.util.httpclient.HttpStreamHandlerException;
+import net.sparktank.morrigan.util.httpclient.HttpClient.HttpResponse;
+import net.sparktank.morrigan.util.httpclient.HttpStreamHandler;
 import net.sparktank.sqlitewrapper.DbException;
 
 import org.xml.sax.Attributes;
@@ -39,9 +40,9 @@ public class MixedMediaDbFeedParser extends DefaultHandler {
 //		if (taskEventListener!=null) taskEventListener.onStart(); // TODO do this?
 		if (taskEventListener!=null) taskEventListener.beginTask("Reading feed...", 100);
 		
-		IHttpStreamHandler httpStreamHandler = new IHttpStreamHandler () {
+		HttpStreamHandler httpStreamHandler = new HttpStreamHandler () {
 			@Override
-			public void handleStream(InputStream is) throws MorriganException {
+			public void handleStream(InputStream is) throws IOException, HttpStreamHandlerException {
 				boolean thereWereErrors = true;
 				RemoteMixedMediaDb transClone = null;
 				try {
@@ -57,23 +58,27 @@ public class MixedMediaDbFeedParser extends DefaultHandler {
 			        	parser.parse(is, new MixedMediaDbFeedParser(transClone, taskEventListener));
 					}
 			        catch (SAXException e) {
-						throw new MorriganException(e);
+						throw new HttpStreamHandlerException(e);
 					} catch (ParserConfigurationException e) {
-						throw new MorriganException(e);
+						throw new HttpStreamHandlerException(e);
 					} catch (IOException e) {
-						throw new MorriganException(e);
+						throw new HttpStreamHandlerException(e);
 					}
 					thereWereErrors = false;
 				}
 				catch (DbException e) {
-					throw new MorriganException(e);
+					throw new HttpStreamHandlerException(e);
+				} catch (MorriganException e) {
+					throw new HttpStreamHandlerException(e);
 				}
 				finally {
 					if (transClone != null) {
 						try {
 							transClone.completeBulkUpdate(thereWereErrors);
 						} catch (DbException e) {
-							throw new MorriganException(e);
+							throw new HttpStreamHandlerException(e);
+						} catch (MorriganException e) {
+							throw new HttpStreamHandlerException(e);
 						} finally {
 							try {
 								if (thereWereErrors) {
@@ -83,7 +88,7 @@ public class MixedMediaDbFeedParser extends DefaultHandler {
 									transClone.commitOrRollback();
 								}
 							} catch (DbException e) {
-								throw new MorriganException(e);
+								throw new HttpStreamHandlerException(e);
 							}
 							finally {
 								transClone.dispose();
@@ -108,6 +113,8 @@ public class MixedMediaDbFeedParser extends DefaultHandler {
 			} else {
 				throw new MorriganException(e);
 			}
+		} catch (HttpStreamHandlerException e) {
+			throw new MorriganException(e);
 		}
 		
 		if (taskEventListener!=null) taskEventListener.done();
