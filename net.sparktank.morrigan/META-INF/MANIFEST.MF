@@ -4,8 +4,7 @@ Bundle-Name: morrigan
 Bundle-SymbolicName: net.sparktank.morrigan;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Bundle-ClassPath: .,
- lib/jaudiotagger-2.0.2.jar
+Bundle-ClassPath: .
 Bundle-Vendor: sparktank.net
 Import-Package: net.sparktank.morrigan.config,
  net.sparktank.morrigan.engines,
