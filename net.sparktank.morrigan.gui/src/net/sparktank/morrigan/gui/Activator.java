@@ -1,6 +1,6 @@
 package net.sparktank.morrigan.gui;
 
-import net.sparktank.morrigan.model.tracks.playlist.MediaPlaylist;
+import net.sparktank.morrigan.model.media.internal.MediaPlaylist;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -22,20 +22,12 @@ public class Activator extends AbstractUIPlugin {
 	 */
 	public Activator() {/* UNUSED */}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
-	 */
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
-	 */
 	@Override
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;

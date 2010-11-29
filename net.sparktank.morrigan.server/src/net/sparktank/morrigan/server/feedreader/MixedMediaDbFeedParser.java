@@ -20,9 +20,9 @@ import net.sparktank.morrigan.model.tasks.TaskEventListener;
 import net.sparktank.morrigan.server.feedwriters.XmlHelper;
 import net.sparktank.morrigan.server.model.RemoteMixedMediaDb;
 import net.sparktank.morrigan.util.httpclient.HttpClient;
-import net.sparktank.morrigan.util.httpclient.HttpStreamHandlerException;
 import net.sparktank.morrigan.util.httpclient.HttpClient.HttpResponse;
 import net.sparktank.morrigan.util.httpclient.HttpStreamHandler;
+import net.sparktank.morrigan.util.httpclient.HttpStreamHandlerException;
 import net.sparktank.sqlitewrapper.DbException;
 
 import org.xml.sax.Attributes;

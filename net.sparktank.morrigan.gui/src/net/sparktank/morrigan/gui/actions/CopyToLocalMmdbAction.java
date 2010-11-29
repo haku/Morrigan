@@ -7,7 +7,7 @@ import net.sparktank.morrigan.gui.jobs.TaskJob;
 import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.IMediaItem;
 import net.sparktank.morrigan.model.media.IMediaItemList;
-import net.sparktank.morrigan.model.media.impl.CopyToLocalMmdbTask;
+import net.sparktank.morrigan.model.media.internal.CopyToLocalMmdbTask;
 import net.sparktank.morrigan.model.tasks.IMorriganTask;
 
 import org.eclipse.jface.action.Action;

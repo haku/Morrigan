@@ -16,8 +16,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
-import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
-import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDbHelper;
+import net.sparktank.morrigan.model.media.internal.LocalMixedMediaDb;
+import net.sparktank.morrigan.model.media.internal.LocalMixedMediaDbHelper;
 import net.sparktank.morrigan.server.feedwriters.MediaExplorerFeed;
 import net.sparktank.morrigan.server.feedwriters.MediaItemDbSrcFeed;
 import net.sparktank.morrigan.server.feedwriters.MixedMediaListFeed;

@@ -16,7 +16,7 @@ import net.sparktank.morrigan.model.media.IMediaItemDb;
 import net.sparktank.morrigan.model.media.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.MediaTag;
 import net.sparktank.morrigan.model.media.MediaTagClassification;
-import net.sparktank.morrigan.model.tags.MediaTagTypeImpl;
+import net.sparktank.morrigan.model.media.internal.MediaTagTypeImpl;
 import net.sparktank.morrigan.util.ChecksumHelper;
 
 import org.eclipse.core.runtime.IProgressMonitor;
