@@ -2,6 +2,13 @@ package net.sparktank.morrigan.gui.editors.mmdb;
 
 import java.util.List;
 
+import net.sparktank.morrigan.gui.actions.DbUpdateAction;
+import net.sparktank.morrigan.gui.adaptors.ActionListener;
+import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
+import net.sparktank.morrigan.gui.views.ViewLibraryProperties;
+import net.sparktank.morrigan.gui.views.ViewTagEditor;
+import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
+
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IAction;
@@ -12,13 +19,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IViewPart;
-
-import net.sparktank.morrigan.gui.actions.DbUpdateAction;
-import net.sparktank.morrigan.gui.adaptors.ActionListener;
-import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
-import net.sparktank.morrigan.gui.views.ViewLibraryProperties;
-import net.sparktank.morrigan.gui.views.ViewTagEditor;
-import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
 
 public class LocalMixedMediaDbEditor 
 		extends AbstractMixedMediaDbEditor<LocalMixedMediaDb> {

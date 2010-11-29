@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.adaptors.MediaFilter;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
@@ -14,6 +13,7 @@ import net.sparktank.morrigan.gui.helpers.ImageCache;
 import net.sparktank.morrigan.gui.helpers.RefreshTimer;
 import net.sparktank.morrigan.gui.jobs.TaskJob;
 import net.sparktank.morrigan.gui.preferences.MediaListPref;
+import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.impl.MediaFileCopyTask;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemList;

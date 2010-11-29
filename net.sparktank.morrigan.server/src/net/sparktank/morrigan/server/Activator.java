@@ -6,9 +6,9 @@ import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrackList;
 import net.sparktank.morrigan.player.IPlayerEventHandler;
 import net.sparktank.morrigan.player.IPlayerLocal;
+import net.sparktank.morrigan.player.OrderHelper.PlaybackOrder;
 import net.sparktank.morrigan.player.PlayItem;
 import net.sparktank.morrigan.player.PlayerRegister;
-import net.sparktank.morrigan.player.OrderHelper.PlaybackOrder;
 
 import org.eclipse.swt.widgets.Composite;
 import org.osgi.framework.BundleActivator;

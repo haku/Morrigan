@@ -10,8 +10,8 @@ import net.sparktank.morrigan.engines.hotkey.HotkeyException;
 import net.sparktank.morrigan.engines.hotkey.HotkeyValue;
 import net.sparktank.morrigan.engines.hotkey.IHotkeyEngine;
 import net.sparktank.morrigan.engines.hotkey.IHotkeyListener;
-import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.gui.preferences.HotkeyPref;
+import net.sparktank.morrigan.model.exceptions.MorriganException;
 
 public class HotkeyRegister {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

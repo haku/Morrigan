@@ -1,6 +1,6 @@
 package net.sparktank.morrigan.engines.playback;
 
-import net.sparktank.morrigan.exceptions.MorriganException;
+import net.sparktank.morrigan.model.exceptions.MorriganException;
 
 public class PlaybackException extends MorriganException {
 	

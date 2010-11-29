@@ -1,6 +1,6 @@
 package net.sparktank.morrigan.gui.editors;
 
-import net.sparktank.morrigan.exceptions.MorriganException;
+import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.RemoteMixedMediaDb;
 import net.sparktank.morrigan.model.tracks.playlist.MediaPlaylist;

@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.List;
 
 import net.sparktank.morrigan.config.Config;
-import net.sparktank.morrigan.exceptions.MorriganException;
+import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
 import net.sparktank.sqlitewrapper.DbException;
 

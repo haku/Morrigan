@@ -1,12 +1,12 @@
 package net.sparktank.morrigan.gui.actions;
 
-import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.editors.EditorFactory;
 import net.sparktank.morrigan.gui.editors.MediaItemDbEditorInput;
 import net.sparktank.morrigan.gui.editors.mmdb.RemoteMixedMediaDbEditor;
 import net.sparktank.morrigan.gui.views.ViewMediaExplorer;
+import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.RemoteMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.RemoteMixedMediaDbHelper;

@@ -1,6 +1,6 @@
 package net.sparktank.morrigan.engines.hotkey;
 
-import net.sparktank.morrigan.exceptions.MorriganException;
+import net.sparktank.morrigan.model.exceptions.MorriganException;
 
 public class HotkeyException extends MorriganException {
 	

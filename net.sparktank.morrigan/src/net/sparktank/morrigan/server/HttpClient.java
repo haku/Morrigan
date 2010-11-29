@@ -13,7 +13,8 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-import net.sparktank.morrigan.exceptions.MorriganException;
+
+import net.sparktank.morrigan.model.exceptions.MorriganException;
 
 public class HttpClient {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

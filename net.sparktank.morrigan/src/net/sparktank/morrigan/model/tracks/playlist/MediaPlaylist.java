@@ -13,8 +13,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.Logger;
 
-import net.sparktank.morrigan.exceptions.MorriganException;
-import net.sparktank.morrigan.helpers.RecyclingFactory;
+import net.sparktank.morrigan.model.exceptions.MorriganException;
+import net.sparktank.morrigan.model.factory.RecyclingFactory;
 import net.sparktank.morrigan.model.media.impl.DurationData;
 import net.sparktank.morrigan.model.media.impl.MediaItemList;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;

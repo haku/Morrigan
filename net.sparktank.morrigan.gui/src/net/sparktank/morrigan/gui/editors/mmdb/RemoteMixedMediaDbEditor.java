@@ -2,10 +2,10 @@ package net.sparktank.morrigan.gui.editors.mmdb;
 
 import java.util.List;
 
-import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.gui.actions.CopyToLocalMmdbAction;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.jobs.TaskJob;
+import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.impl.RemoteMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.RemoteMixedMediaDbUpdateTask;
 import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem;

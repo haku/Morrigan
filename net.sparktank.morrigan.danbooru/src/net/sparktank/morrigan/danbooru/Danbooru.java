@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sparktank.morrigan.exceptions.MorriganException;
+import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.server.HttpClient;
 import net.sparktank.morrigan.server.HttpClient.HttpResponse;
 

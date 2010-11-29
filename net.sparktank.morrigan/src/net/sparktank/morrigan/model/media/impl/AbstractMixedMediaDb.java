@@ -2,8 +2,8 @@ package net.sparktank.morrigan.model.media.impl;
 
 import java.util.Date;
 
-import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
+import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.interfaces.IAbstractMixedMediaDb;
 import net.sparktank.morrigan.model.media.interfaces.IMediaPicture;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;

@@ -8,7 +8,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicReference;
 
-import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.editors.EditorFactory;
@@ -17,6 +16,7 @@ import net.sparktank.morrigan.gui.editors.MediaItemDbEditorInput;
 import net.sparktank.morrigan.gui.editors.MediaItemListEditor;
 import net.sparktank.morrigan.gui.editors.MediaItemListEditorInput;
 import net.sparktank.morrigan.gui.editors.mmdb.LocalMixedMediaDbEditor;
+import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemDb;
 import net.sparktank.morrigan.model.media.interfaces.IMediaPicture;

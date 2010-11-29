@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import net.sparktank.morrigan.config.Config;
-import net.sparktank.morrigan.exceptions.MorriganException;
+import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
 
 public class RemoteMixedMediaDbHelper {

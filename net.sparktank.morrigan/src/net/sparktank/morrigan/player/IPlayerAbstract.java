@@ -3,7 +3,7 @@ package net.sparktank.morrigan.player;
 import java.util.List;
 
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine.PlayState;
-import net.sparktank.morrigan.exceptions.MorriganException;
+import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
 import net.sparktank.morrigan.model.media.impl.DurationData;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
