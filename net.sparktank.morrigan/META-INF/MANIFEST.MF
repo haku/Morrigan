@@ -35,5 +35,4 @@ Export-Package: net.sparktank.morrigan.helpers,
  net.sparktank.morrigan.model.pictures,
  net.sparktank.morrigan.model.tags,
  net.sparktank.morrigan.model.tracks,
- net.sparktank.morrigan.model.tracks.playlist,
- net.sparktank.morrigan.player
+ net.sparktank.morrigan.model.tracks.playlist
