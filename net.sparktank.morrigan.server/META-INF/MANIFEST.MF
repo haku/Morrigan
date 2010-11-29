@@ -8,7 +8,6 @@ Export-Package: net.sparktank.morrigan.server,
  net.sparktank.morrigan.server.model
 Import-Package: net.sparktank.morrigan.config,
  net.sparktank.morrigan.engines.playback,
- net.sparktank.morrigan.helpers,
  net.sparktank.morrigan.model.db,
  net.sparktank.morrigan.model.exceptions,
  net.sparktank.morrigan.model.explorer,

@@ -12,7 +12,6 @@ import net.sparktank.morrigan.gui.dialogs.RunnableDialog;
 import net.sparktank.morrigan.gui.editors.IMediaItemDbEditor;
 import net.sparktank.morrigan.gui.helpers.ImageCache;
 import net.sparktank.morrigan.gui.helpers.RefreshTimer;
-import net.sparktank.morrigan.helpers.TrackTagHelper;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.IMediaItem;
 import net.sparktank.morrigan.model.media.IMediaItemDb;
@@ -21,6 +20,7 @@ import net.sparktank.morrigan.model.media.MediaTag;
 import net.sparktank.morrigan.model.media.MediaTagClassification;
 import net.sparktank.morrigan.model.media.internal.MediaTagImpl;
 import net.sparktank.morrigan.model.media.internal.MediaTagTypeImpl;
+import net.sparktank.morrigan.model.media.internal.TrackTagHelper;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;

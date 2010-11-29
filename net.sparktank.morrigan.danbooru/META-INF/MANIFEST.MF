@@ -11,7 +11,6 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Import-Package: net.sparktank.morrigan.gui.dialogs,
  net.sparktank.morrigan.gui.views,
- net.sparktank.morrigan.helpers,
  net.sparktank.morrigan.model.db,
  net.sparktank.morrigan.model.exceptions,
  net.sparktank.morrigan.model.media,
