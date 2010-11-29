@@ -5,7 +5,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine.PlayState;
-import net.sparktank.morrigan.helpers.HeadlessHelper;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
 import net.sparktank.morrigan.model.media.DurationData;
@@ -14,13 +13,14 @@ import net.sparktank.morrigan.model.media.IMediaTrack;
 import net.sparktank.morrigan.model.media.IMediaTrackList;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDbHelper;
-import net.sparktank.morrigan.model.media.impl.RemoteMixedMediaDb;
-import net.sparktank.morrigan.model.media.impl.RemoteMixedMediaDbHelper;
 import net.sparktank.morrigan.player.IPlayerLocal;
 import net.sparktank.morrigan.player.OrderHelper.PlaybackOrder;
 import net.sparktank.morrigan.player.PlayItem;
 import net.sparktank.morrigan.player.PlayerHelper;
 import net.sparktank.morrigan.player.PlayerRegister;
+import net.sparktank.morrigan.server.HeadlessHelper;
+import net.sparktank.morrigan.server.model.RemoteMixedMediaDb;
+import net.sparktank.morrigan.server.model.RemoteMixedMediaDbHelper;
 import net.sparktank.morrigan.util.TimeHelper;
 
 import org.eclipse.osgi.framework.console.CommandInterpreter;

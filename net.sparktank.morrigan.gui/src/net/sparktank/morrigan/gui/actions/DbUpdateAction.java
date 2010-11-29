@@ -6,9 +6,9 @@ import net.sparktank.morrigan.gui.jobs.TaskJob;
 import net.sparktank.morrigan.model.media.IMediaItemDb;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDbUpdateTask;
-import net.sparktank.morrigan.model.media.impl.RemoteMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.RemoteMixedMediaDbUpdateTask;
 import net.sparktank.morrigan.model.tasks.IMorriganTask;
+import net.sparktank.morrigan.server.model.RemoteMixedMediaDb;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.widgets.Display;

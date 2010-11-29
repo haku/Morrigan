@@ -4,8 +4,8 @@ import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.IRemoteMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
-import net.sparktank.morrigan.model.media.impl.RemoteMixedMediaDb;
 import net.sparktank.morrigan.model.tracks.playlist.MediaPlaylist;
+import net.sparktank.morrigan.server.model.RemoteMixedMediaDb;
 import net.sparktank.sqlitewrapper.DbException;
 
 import org.eclipse.core.runtime.IAdaptable;
