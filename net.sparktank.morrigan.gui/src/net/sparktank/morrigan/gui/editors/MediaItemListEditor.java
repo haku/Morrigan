@@ -14,10 +14,10 @@ import net.sparktank.morrigan.gui.helpers.ImageCache;
 import net.sparktank.morrigan.gui.helpers.RefreshTimer;
 import net.sparktank.morrigan.gui.jobs.TaskJob;
 import net.sparktank.morrigan.gui.preferences.MediaListPref;
+import net.sparktank.morrigan.model.media.impl.MediaFileCopyTask;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemList;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemList.DirtyState;
-import net.sparktank.morrigan.model.tasks.MediaFileCopyTask;
 
 import org.eclipse.core.commands.common.CommandException;
 import org.eclipse.jface.action.Action;

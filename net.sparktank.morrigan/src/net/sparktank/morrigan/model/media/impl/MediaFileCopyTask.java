@@ -1,10 +1,13 @@
-package net.sparktank.morrigan.model.tasks;
+package net.sparktank.morrigan.model.media.impl;
 
 import java.io.File;
 import java.util.List;
 
 import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemList;
+import net.sparktank.morrigan.model.tasks.IMorriganTask;
+import net.sparktank.morrigan.model.tasks.TaskEventListener;
+import net.sparktank.morrigan.model.tasks.TaskResult;
 import net.sparktank.morrigan.model.tasks.TaskResult.TaskOutcome;
 
 
