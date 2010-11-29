@@ -7,13 +7,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.sparktank.morrigan.model.exceptions.MorriganException;
-import net.sparktank.morrigan.server.HttpClient;
-import net.sparktank.morrigan.server.HttpClient.HttpResponse;
+import net.sparktank.morrigan.util.httpclient.HttpClient;
+import net.sparktank.morrigan.util.httpclient.HttpClient.HttpResponse;
+import net.sparktank.morrigan.util.httpclient.HttpStreamHandlerException;
 
 public class Danbooru {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	static public String[] getTags (String md5) throws IOException, MorriganException {
+	static public String[] getTags (String md5) throws IOException, MorriganException, HttpStreamHandlerException {
 		String surl = "http://danbooru.donmai.us/post/index.xml?tags=md5:" + md5;
 		URL url = new URL(surl);
 		HttpResponse response = HttpClient.getHttpClient().doHttpRequest(url);
@@ -37,8 +38,9 @@ public class Danbooru {
 	 * @return Map where key=md5, value = tags.
 	 * @throws IOException
 	 * @throws MorriganException
+	 * @throws HttpStreamHandlerException 
 	 */
-	static public Map<String, String[]> getTags (Collection<String> md5s) throws IOException, MorriganException {
+	static public Map<String, String[]> getTags (Collection<String> md5s) throws IOException, MorriganException, HttpStreamHandlerException {
 		StringBuilder urlString = new StringBuilder();
 		urlString.append("http://danbooru.donmai.us/post/index.xml?tags=md5:");
 		boolean first = true;

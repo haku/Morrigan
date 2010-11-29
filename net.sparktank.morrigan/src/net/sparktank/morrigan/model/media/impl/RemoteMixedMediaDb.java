@@ -24,9 +24,10 @@ import net.sparktank.morrigan.model.media.MediaTag;
 import net.sparktank.morrigan.model.media.MediaTagClassification;
 import net.sparktank.morrigan.model.media.MediaTagType;
 import net.sparktank.morrigan.model.tasks.TaskEventListener;
-import net.sparktank.morrigan.server.HttpClient;
-import net.sparktank.morrigan.server.HttpClient.IHttpStreamHandler;
 import net.sparktank.morrigan.server.feedreader.MixedMediaDbFeedParser;
+import net.sparktank.morrigan.util.httpclient.HttpClient;
+import net.sparktank.morrigan.util.httpclient.HttpStreamHandler;
+import net.sparktank.morrigan.util.httpclient.HttpStreamHandlerException;
 import net.sparktank.sqlitewrapper.DbException;
 
 public class RemoteMixedMediaDb extends AbstractMixedMediaDb<RemoteMixedMediaDb> {
@@ -247,9 +248,9 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb<RemoteMixedMediaDb>
 			
 			System.err.println("Fetching '"+itemUrl+"' to '"+targetFile.getAbsolutePath()+"'...");
 			
-			IHttpStreamHandler httpStreamHandler = new IHttpStreamHandler () {
+			HttpStreamHandler httpStreamHandler = new HttpStreamHandler () {
 				@Override
-				public void handleStream(InputStream is) throws IOException, MorriganException {
+				public void handleStream(InputStream is) throws IOException, HttpStreamHandlerException {
 					BufferedInputStream bis = new BufferedInputStream(is);
 					BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(targetFile));
 					
@@ -281,6 +282,8 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb<RemoteMixedMediaDb>
 				else {
 					throw new MorriganException(e);
 				}
+			} catch (HttpStreamHandlerException e) {
+				throw new MorriganException(e);
 			}
 		}
 		else {
