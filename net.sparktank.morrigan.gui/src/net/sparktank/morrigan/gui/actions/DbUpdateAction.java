@@ -4,9 +4,9 @@ import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.jobs.TaskJob;
 import net.sparktank.morrigan.model.media.IMediaItemDb;
-import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
-import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDbUpdateTask;
-import net.sparktank.morrigan.model.media.impl.RemoteMixedMediaDbUpdateTask;
+import net.sparktank.morrigan.model.media.internal.LocalMixedMediaDb;
+import net.sparktank.morrigan.model.media.internal.LocalMixedMediaDbUpdateTask;
+import net.sparktank.morrigan.model.media.internal.RemoteMixedMediaDbUpdateTask;
 import net.sparktank.morrigan.model.tasks.IMorriganTask;
 import net.sparktank.morrigan.server.model.RemoteMixedMediaDb;
 

@@ -16,11 +16,11 @@ import net.sparktank.morrigan.helpers.TrackTagHelper;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.IMediaItem;
 import net.sparktank.morrigan.model.media.IMediaItemDb;
+import net.sparktank.morrigan.model.media.IMediaTrack;
 import net.sparktank.morrigan.model.media.MediaTag;
 import net.sparktank.morrigan.model.media.MediaTagClassification;
-import net.sparktank.morrigan.model.tags.MediaTagImpl;
-import net.sparktank.morrigan.model.tags.MediaTagTypeImpl;
-import net.sparktank.morrigan.model.tracks.MediaTrack;
+import net.sparktank.morrigan.model.media.internal.MediaTagImpl;
+import net.sparktank.morrigan.model.media.internal.MediaTagTypeImpl;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -441,8 +441,8 @@ public class ViewTagEditor extends ViewPart {
 			File file = new File(this.editedItem.getFilepath());
 			if (file.exists()) {
 				
-				if (this.editedItem instanceof MediaTrack) {
-					MediaTrack mt = (MediaTrack) this.editedItem;
+				if (this.editedItem instanceof IMediaTrack) {
+					IMediaTrack mt = (IMediaTrack) this.editedItem;
 					try {
 						TrackTagHelper.readTrackTags(this.editedItemDb, mt, file);
 					}

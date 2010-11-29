@@ -11,7 +11,6 @@ import net.sparktank.morrigan.gui.dialogs.RunnableDialog;
 import net.sparktank.morrigan.gui.editors.IMixedMediaItemDbEditor;
 import net.sparktank.morrigan.gui.editors.MediaColumn;
 import net.sparktank.morrigan.gui.preferences.MediaListPref;
-import net.sparktank.morrigan.model.MediaSqliteLayer2;
 import net.sparktank.morrigan.model.db.IDbColumn;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.DurationData;
@@ -21,7 +20,8 @@ import net.sparktank.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
 import net.sparktank.morrigan.model.media.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.IMixedMediaItem.MediaType;
 import net.sparktank.morrigan.model.media.IMixedMediaStorageLayer;
-import net.sparktank.morrigan.model.media.impl.MixedMediaSqliteLayerImpl;
+import net.sparktank.morrigan.model.media.internal.MediaSqliteLayer2;
+import net.sparktank.morrigan.model.media.internal.MixedMediaSqliteLayerImpl;
 import net.sparktank.morrigan.util.TimeHelper;
 
 import org.eclipse.core.runtime.IProgressMonitor;
