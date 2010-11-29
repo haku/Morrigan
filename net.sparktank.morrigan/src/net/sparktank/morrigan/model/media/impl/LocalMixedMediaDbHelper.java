@@ -8,6 +8,7 @@ import java.util.List;
 import net.sparktank.morrigan.config.Config;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
+import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
 import net.sparktank.sqlitewrapper.DbException;
 
 public class LocalMixedMediaDbHelper {
@@ -24,9 +25,9 @@ public class LocalMixedMediaDbHelper {
 		return file;
 	}
 	
-	public static LocalMixedMediaDb createMmdb (String name) throws MorriganException {
+	public static ILocalMixedMediaDb createMmdb (String name) throws MorriganException {
 		String file = getFullPathToMmdb(name);
-		LocalMixedMediaDb l;
+		ILocalMixedMediaDb l;
 		try {
 			l = LocalMixedMediaDb.LOCAL_MMDB_FACTORY.manufacture(file);
 		} catch (DbException e) {

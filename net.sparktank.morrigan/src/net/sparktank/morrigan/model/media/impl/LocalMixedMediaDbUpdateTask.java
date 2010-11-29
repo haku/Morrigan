@@ -18,15 +18,16 @@ import net.sparktank.morrigan.helpers.TrackTagHelper;
 import net.sparktank.morrigan.model.LocalDbUpdateTask;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.factory.RecyclingFactory;
+import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.IMixedMediaItem.MediaType;
 import net.sparktank.morrigan.model.tasks.TaskEventListener;
 
-public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<LocalMixedMediaDb, IMixedMediaItem> {
+public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMediaDb, IMixedMediaItem> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Factory stuff.
 	
-	public static class Factory extends RecyclingFactory<LocalMixedMediaDbUpdateTask, LocalMixedMediaDb, Void, RuntimeException> {
+	public static class Factory extends RecyclingFactory<LocalMixedMediaDbUpdateTask, ILocalMixedMediaDb, Void, RuntimeException> {
 		
 		protected Factory() {
 			super(false);
@@ -38,7 +39,7 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<LocalMixedMed
 		}
 		
 		@Override
-		protected LocalMixedMediaDbUpdateTask makeNewProduct(LocalMixedMediaDb material) {
+		protected LocalMixedMediaDbUpdateTask makeNewProduct(ILocalMixedMediaDb material) {
 			return new LocalMixedMediaDbUpdateTask(material);
 		}
 		
@@ -48,7 +49,7 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<LocalMixedMed
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	LocalMixedMediaDbUpdateTask (LocalMixedMediaDb library) {
+	LocalMixedMediaDbUpdateTask (ILocalMixedMediaDb library) {
 		super(library);
 	}
 	
@@ -122,7 +123,7 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<LocalMixedMed
 	private IPlaybackEngine playbackEngine = null;
 	
 	@Override
-	protected boolean shouldTrackMetaData1(TaskEventListener taskEventListener, LocalMixedMediaDb library, IMixedMediaItem item) throws MorriganException {
+	protected boolean shouldTrackMetaData1(TaskEventListener taskEventListener, ILocalMixedMediaDb library, IMixedMediaItem item) throws MorriganException {
 		if (item.getMediaType() == MediaType.TRACK) {
 			if (item.getDuration()<=0) {
 				if (!library.isMarkedAsUnreadable(item)) {
@@ -154,7 +155,7 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<LocalMixedMed
 	}
 	
 	@Override
-	protected OpResult readTrackMetaData1(LocalMixedMediaDb library, IMixedMediaItem item, File file) {
+	protected OpResult readTrackMetaData1(ILocalMixedMediaDb library, IMixedMediaItem item, File file) {
 		if (item.getMediaType() == MediaType.TRACK) {
 			if (this.playbackEngine == null) {
 				try {
@@ -204,7 +205,7 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<LocalMixedMed
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
-	protected void readTrackMetaData2(LocalMixedMediaDb library, IMixedMediaItem item, File file) throws Throwable {
+	protected void readTrackMetaData2(ILocalMixedMediaDb library, IMixedMediaItem item, File file) throws Throwable {
 		if (item.getMediaType() == MediaType.TRACK) {
 			TrackTagHelper.readTrackTags(this.getItemList(), item, file);
 		}

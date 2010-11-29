@@ -3,9 +3,9 @@ package net.sparktank.morrigan.gui.actions;
 import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.jobs.TaskJob;
+import net.sparktank.morrigan.model.media.IMediaItemDb;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDbUpdateTask;
-import net.sparktank.morrigan.model.media.impl.MediaItemDb;
 import net.sparktank.morrigan.model.media.impl.RemoteMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.RemoteMixedMediaDbUpdateTask;
 import net.sparktank.morrigan.model.tasks.IMorriganTask;
@@ -17,20 +17,20 @@ import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
 public class DbUpdateAction extends Action implements IWorkbenchAction{
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private MediaItemDb<?,?,?> itemDb = null;
+	private IMediaItemDb<?,?,?> itemDb = null;
 	
 	public DbUpdateAction () {
 		super();
 	}
 	
-	public DbUpdateAction (MediaItemDb<?,?,?> library) {
+	public DbUpdateAction (IMediaItemDb<?,?,?> library) {
 		super();
 		this.itemDb = library;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public void setMediaDb (MediaItemDb<?,?,?> itemDb) {
+	public void setMediaDb (IMediaItemDb<?,?,?> itemDb) {
 		this.itemDb = itemDb;
 	}
 	

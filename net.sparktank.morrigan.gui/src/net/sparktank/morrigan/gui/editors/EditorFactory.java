@@ -1,6 +1,8 @@
 package net.sparktank.morrigan.gui.editors;
 
 import net.sparktank.morrigan.model.exceptions.MorriganException;
+import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
+import net.sparktank.morrigan.model.media.IRemoteMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.RemoteMixedMediaDb;
 import net.sparktank.morrigan.model.tracks.playlist.MediaPlaylist;
@@ -80,7 +82,7 @@ public class EditorFactory implements IElementFactory {
 //	Local MixedMediaDb.
 	
 	public static MediaItemDbEditorInput getMmdbInput(String dbFilePath) throws MorriganException {
-		LocalMixedMediaDb l;
+		ILocalMixedMediaDb l;
 		
 		try {
 			l = LocalMixedMediaDb.LOCAL_MMDB_FACTORY.manufacture(dbFilePath);
@@ -108,7 +110,7 @@ public class EditorFactory implements IElementFactory {
 	}
 	
 	public static MediaItemDbEditorInput getRemoteMmdbInput (String dbFilePath) throws MorriganException {
-		RemoteMixedMediaDb ml = RemoteMixedMediaDb.FACTORY.manufacture(dbFilePath);
+		IRemoteMixedMediaDb ml = RemoteMixedMediaDb.FACTORY.manufacture(dbFilePath);
 		MediaItemDbEditorInput input = new MediaItemDbEditorInput(ml);
 		return input;
 	}

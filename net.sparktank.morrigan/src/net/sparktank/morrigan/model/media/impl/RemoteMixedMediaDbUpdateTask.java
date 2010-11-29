@@ -1,6 +1,7 @@
 package net.sparktank.morrigan.model.media.impl;
 
 import net.sparktank.morrigan.model.factory.RecyclingFactory;
+import net.sparktank.morrigan.model.media.IRemoteMixedMediaDb;
 import net.sparktank.morrigan.model.tasks.IMorriganTask;
 import net.sparktank.morrigan.model.tasks.TaskEventListener;
 import net.sparktank.morrigan.model.tasks.TaskResult;
@@ -10,7 +11,7 @@ public class RemoteMixedMediaDbUpdateTask implements IMorriganTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Factory stuff.
 	
-	public static class Factory extends RecyclingFactory<RemoteMixedMediaDbUpdateTask, RemoteMixedMediaDb, Void, RuntimeException> {
+	public static class Factory extends RecyclingFactory<RemoteMixedMediaDbUpdateTask, IRemoteMixedMediaDb, Void, RuntimeException> {
 		
 		protected Factory() {
 			super(false);
@@ -22,7 +23,7 @@ public class RemoteMixedMediaDbUpdateTask implements IMorriganTask {
 		}
 		
 		@Override
-		protected RemoteMixedMediaDbUpdateTask makeNewProduct(RemoteMixedMediaDb material) {
+		protected RemoteMixedMediaDbUpdateTask makeNewProduct(IRemoteMixedMediaDb material) {
 			return new RemoteMixedMediaDbUpdateTask(material);
 		}
 		
@@ -32,11 +33,11 @@ public class RemoteMixedMediaDbUpdateTask implements IMorriganTask {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private final RemoteMixedMediaDb rmmdb;
+	private final IRemoteMixedMediaDb rmmdb;
 	
 	private volatile boolean isFinished = false;
 	
-	RemoteMixedMediaDbUpdateTask(RemoteMixedMediaDb rmmdb) {
+	RemoteMixedMediaDbUpdateTask(IRemoteMixedMediaDb rmmdb) {
 		this.rmmdb = rmmdb;
 	}
 	
@@ -45,7 +46,7 @@ public class RemoteMixedMediaDbUpdateTask implements IMorriganTask {
 		return "Update " + getRmmdb().getListName();
 	}
 	
-	public RemoteMixedMediaDb getRmmdb () {
+	public IRemoteMixedMediaDb getRmmdb () {
 		return this.rmmdb;
 	}
 	

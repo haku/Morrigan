@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.util.Collection;
 
 import net.sparktank.morrigan.config.Config;
+import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.IMediaItem;
 import net.sparktank.morrigan.model.media.IMediaItemList;
 import net.sparktank.morrigan.model.media.IMediaItemList.DirtyState;
@@ -24,9 +25,9 @@ public class CopyToLocalMmdbTask<T extends IMediaItem> implements IMorriganTask 
 	
 	private final IMediaItemList<T> fromList;
 	private final Collection<T> itemsToCopy;
-	private final LocalMixedMediaDb toDb;
+	private final ILocalMixedMediaDb toDb;
 	
-	public CopyToLocalMmdbTask (IMediaItemList<T> fromList, Collection<T> itemsToCopy, LocalMixedMediaDb toDb) {
+	public CopyToLocalMmdbTask (IMediaItemList<T> fromList, Collection<T> itemsToCopy, ILocalMixedMediaDb toDb) {
 		this.fromList = fromList;
 		this.itemsToCopy = itemsToCopy;
 		this.toDb = toDb;
@@ -98,7 +99,7 @@ public class CopyToLocalMmdbTask<T extends IMediaItem> implements IMorriganTask 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	// TODO extract this to config?
-	static private File getCheckoutDirectory (LocalMixedMediaDb db) {
+	static private File getCheckoutDirectory (ILocalMixedMediaDb db) {
 		String configDir = Config.getConfigDir();
 		
 		File coDir = new File(configDir, "checkout");

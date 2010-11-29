@@ -20,6 +20,7 @@ import net.sparktank.morrigan.model.factory.RecyclingFactory;
 import net.sparktank.morrigan.model.media.IMediaTrack;
 import net.sparktank.morrigan.model.media.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.IMixedMediaStorageLayer;
+import net.sparktank.morrigan.model.media.IRemoteMixedMediaDb;
 import net.sparktank.morrigan.model.media.MediaTag;
 import net.sparktank.morrigan.model.media.MediaTagClassification;
 import net.sparktank.morrigan.model.media.MediaTagType;
@@ -30,30 +31,30 @@ import net.sparktank.morrigan.util.httpclient.HttpStreamHandler;
 import net.sparktank.morrigan.util.httpclient.HttpStreamHandlerException;
 import net.sparktank.sqlitewrapper.DbException;
 
-public class RemoteMixedMediaDb extends AbstractMixedMediaDb<RemoteMixedMediaDb> {
+public class RemoteMixedMediaDb extends AbstractMixedMediaDb<IRemoteMixedMediaDb> implements IRemoteMixedMediaDb {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Factory.
 	
-	public static class RemoteMixedMediaDbFactory extends RecyclingFactory<RemoteMixedMediaDb, String, URL, MorriganException> {
+	public static class RemoteMixedMediaDbFactory extends RecyclingFactory<IRemoteMixedMediaDb, String, URL, MorriganException> {
 		
 		protected RemoteMixedMediaDbFactory() {
 			super(true);
 		}
 		
 		@Override
-		protected boolean isValidProduct(RemoteMixedMediaDb product) {
+		protected boolean isValidProduct(IRemoteMixedMediaDb product) {
 //			System.out.println("Found '" + product.getDbPath() + "' in cache.");
 			return true;
 		}
 		
 		@Override
-		protected RemoteMixedMediaDb makeNewProduct(String material) throws MorriganException {
+		protected IRemoteMixedMediaDb makeNewProduct(String material) throws MorriganException {
 			return makeNewProduct(material, null);
 		}
 		
 		@Override
-		protected RemoteMixedMediaDb makeNewProduct(String material, URL config) throws MorriganException {
-			RemoteMixedMediaDb ret = null;
+		protected IRemoteMixedMediaDb makeNewProduct(String material, URL config) throws MorriganException {
+			IRemoteMixedMediaDb ret = null;
 			
 //			System.out.println("Making object instance '" + material + "'...");
 			if (config != null) {
@@ -157,13 +158,16 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb<RemoteMixedMediaDb>
 		return TYPE;
 	}
 	
+	@Override
 	public URL getUrl() {
 		return this.url;
 	}
 	
+	@Override
 	public TaskEventListener getTaskEventListener() {
 		return this.taskEventListener;
 	}
+	@Override
 	public void setTaskEventListener(TaskEventListener taskEventListener) {
 		this.taskEventListener = taskEventListener;
 	}
@@ -175,14 +179,17 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb<RemoteMixedMediaDb>
 	
 	private long cacheDate = -1;
 	
+	@Override
 	public long getCacheAge () {
 		return new Date().getTime() - this.cacheDate;
 	}
 	
+	@Override
 	public boolean isCacheExpired () {
 		return (getCacheAge() > MAX_CACHE_AGE); // 1 hour.  TODO extract this as config.
 	}
 	
+	@Override
 	public void readFromCache () throws DbException, MorriganException {
 		super.doRead();
 	}
@@ -199,6 +206,7 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb<RemoteMixedMediaDb>
 		}
 	}
 	
+	@Override
 	public void forceDoRead () throws MorriganException, DbException {
 		try {
 			// This does the actual HTTP fetch.

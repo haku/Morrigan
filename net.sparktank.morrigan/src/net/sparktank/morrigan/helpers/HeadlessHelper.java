@@ -1,6 +1,6 @@
 package net.sparktank.morrigan.helpers;
 
-import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
+import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDbUpdateTask;
 import net.sparktank.morrigan.model.media.impl.RemoteMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.RemoteMixedMediaDbUpdateTask;
@@ -11,7 +11,7 @@ import net.sparktank.morrigan.util.ErrorHelper;
 public class HeadlessHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	static public boolean scheduleMmdbScan (final LocalMixedMediaDb mmdb) {
+	static public boolean scheduleMmdbScan (final ILocalMixedMediaDb mmdb) {
 		final LocalMixedMediaDbUpdateTask task = LocalMixedMediaDbUpdateTask.FACTORY.manufacture(mmdb);
 		if (task != null) {
 			Thread t = new Thread () {
