@@ -451,7 +451,7 @@ public class Player implements IPlayerLocal {
 	public void pausePlaying () {
 		try {
 			internal_pausePlaying();
-		} catch (PlaybackException e) {
+		} catch (MorriganException e) {
 			this.eventHandler.asyncThrowable(e);
 		}
 	}
@@ -463,7 +463,7 @@ public class Player implements IPlayerLocal {
 	public void stopPlaying () {
 		try {
 			internal_stopPlaying();
-		} catch (PlaybackException e) {
+		} catch (MorriganException e) {
 			this.eventHandler.asyncThrowable(e);
 		}
 	}
@@ -506,12 +506,12 @@ public class Player implements IPlayerLocal {
 	public void seekTo (double d) {
 		try {
 			internal_seekTo(d);
-		} catch (PlaybackException e) {
+		} catch (MorriganException e) {
 			this.eventHandler.asyncThrowable(e);
 		}
 	}
 	
-	private void internal_pausePlaying () throws PlaybackException {
+	private void internal_pausePlaying () throws MorriganException {
 		// Don't go and make a player engine instance.
 		IPlaybackEngine eng = getPlaybackEngine(false);
 		if (eng!=null) {
@@ -553,7 +553,7 @@ public class Player implements IPlayerLocal {
 		}
 	}
 	
-	protected void internal_seekTo (double d) throws PlaybackException {
+	protected void internal_seekTo (double d) throws MorriganException {
 		IPlaybackEngine eng = getPlaybackEngine(false);
 		if (eng!=null) {
 			synchronized (eng) {
