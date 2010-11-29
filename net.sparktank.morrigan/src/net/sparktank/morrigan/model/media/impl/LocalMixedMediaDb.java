@@ -1,8 +1,8 @@
 package net.sparktank.morrigan.model.media.impl;
 
 import net.sparktank.morrigan.model.factory.RecyclingFactory;
-import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem;
-import net.sparktank.morrigan.model.media.interfaces.IMixedMediaStorageLayer;
+import net.sparktank.morrigan.model.media.IMixedMediaItem;
+import net.sparktank.morrigan.model.media.IMixedMediaStorageLayer;
 import net.sparktank.sqlitewrapper.DbException;
 
 public class LocalMixedMediaDb extends AbstractMixedMediaDb<LocalMixedMediaDb> {

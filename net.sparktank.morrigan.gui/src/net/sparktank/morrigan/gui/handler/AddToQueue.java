@@ -7,8 +7,8 @@ import net.sparktank.morrigan.gui.editors.mmdb.MixedMediaListEditor;
 import net.sparktank.morrigan.gui.editors.tracks.MediaTrackListEditor;
 import net.sparktank.morrigan.gui.views.AbstractPlayerView;
 import net.sparktank.morrigan.gui.views.ViewControls;
-import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
-import net.sparktank.morrigan.model.media.interfaces.IMediaTrackList;
+import net.sparktank.morrigan.model.media.IMediaTrack;
+import net.sparktank.morrigan.model.media.IMediaTrackList;
 import net.sparktank.morrigan.player.PlayItem;
 
 import org.eclipse.core.commands.AbstractHandler;

@@ -1,7 +1,9 @@
 package net.sparktank.morrigan.model.tags;
 
+import net.sparktank.morrigan.model.media.MediaTagClassification;
 
-public class MediaTagClassificationImpl { // TODO add interface.
+
+public class MediaTagClassificationImpl implements MediaTagClassification {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private long rowId;
@@ -12,13 +14,16 @@ public class MediaTagClassificationImpl { // TODO add interface.
 		this.classification = classification;
 	}
 	
+	@Override
 	public long getRowId() {
 		return this.rowId;
 	}
 	
+	@Override
 	public String getClassification() {
 		return this.classification;
 	}
+	@Override
 	public void setClassification(String classification) {
 		this.classification = classification;
 	}

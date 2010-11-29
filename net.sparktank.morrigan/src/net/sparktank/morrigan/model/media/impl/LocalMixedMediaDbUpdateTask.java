@@ -18,8 +18,8 @@ import net.sparktank.morrigan.helpers.TrackTagHelper;
 import net.sparktank.morrigan.model.LocalDbUpdateTask;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.factory.RecyclingFactory;
-import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem;
-import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem.MediaType;
+import net.sparktank.morrigan.model.media.IMixedMediaItem;
+import net.sparktank.morrigan.model.media.IMixedMediaItem.MediaType;
 import net.sparktank.morrigan.model.tasks.TaskEventListener;
 
 public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<LocalMixedMediaDb, IMixedMediaItem> {

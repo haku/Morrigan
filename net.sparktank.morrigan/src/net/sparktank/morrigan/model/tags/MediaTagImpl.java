@@ -1,49 +1,60 @@
 package net.sparktank.morrigan.model.tags;
 
-public class MediaTagImpl {
+import net.sparktank.morrigan.model.media.MediaTag;
+import net.sparktank.morrigan.model.media.MediaTagClassification;
+import net.sparktank.morrigan.model.media.MediaTagType;
+
+public class MediaTagImpl implements MediaTag {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private long dbRowId;
 	private String tag;
-	private MediaTagTypeImpl type;
-	private MediaTagClassificationImpl classification;
+	private MediaTagType type;
+	private MediaTagClassification classification;
 	
-	public MediaTagImpl (long dbRowId, String tag, MediaTagTypeImpl type) {
+	public MediaTagImpl (long dbRowId, String tag, MediaTagType type) {
 		this.dbRowId = dbRowId;
 		this.tag = tag;
 		this.type = type;
 		this.classification = null;
 	}
 	
-	public MediaTagImpl (long dbRowId, String tag, MediaTagTypeImpl type, MediaTagClassificationImpl classification) {
+	public MediaTagImpl (long dbRowId, String tag, MediaTagType type, MediaTagClassification classification) {
 		this.dbRowId = dbRowId;
 		this.tag = tag;
 		this.type = type;
 		this.classification = classification;
 	}
 	
+	@Override
 	public long getDbRowId() {
 		return this.dbRowId;
 	}
 	
+	@Override
 	public String getTag() {
 		return this.tag;
 	}
+	@Override
 	public void setTag(String tag) {
 		this.tag = tag;
 	}
 	
-	public MediaTagTypeImpl getType() {
+	@Override
+	public MediaTagType getType() {
 		return this.type;
 	}
-	public void setType(MediaTagTypeImpl type) {
+	@Override
+	public void setType(MediaTagType type) {
 		this.type = type;
 	}
 	
-	public MediaTagClassificationImpl getClassification() {
+	@Override
+	public MediaTagClassification getClassification() {
 		return this.classification;
 	}
-	public void setClassification(MediaTagClassificationImpl classification) {
+	@Override
+	public void setClassification(MediaTagClassification classification) {
 		this.classification = classification;
 	}
 	
