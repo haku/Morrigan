@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Server
 Bundle-SymbolicName: net.sparktank.morrigan.server;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Bundle-Activator: net.sparktank.morrigan.server.Activator
+Bundle-Activator: net.sparktank.morrigan.server.boot.Activator
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: net.sparktank.morrigan.engines.playback,
  net.sparktank.morrigan.helpers,

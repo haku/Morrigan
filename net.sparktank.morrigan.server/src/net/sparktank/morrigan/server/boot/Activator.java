@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.server;
+package net.sparktank.morrigan.server.boot;
 
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import net.sparktank.morrigan.model.media.IMediaTrack;
@@ -8,6 +8,7 @@ import net.sparktank.morrigan.player.IPlayerLocal;
 import net.sparktank.morrigan.player.OrderHelper.PlaybackOrder;
 import net.sparktank.morrigan.player.PlayItem;
 import net.sparktank.morrigan.player.PlayerRegister;
+import net.sparktank.morrigan.server.MorriganServer;
 import net.sparktank.morrigan.util.ErrorHelper;
 
 import org.eclipse.swt.widgets.Composite;
