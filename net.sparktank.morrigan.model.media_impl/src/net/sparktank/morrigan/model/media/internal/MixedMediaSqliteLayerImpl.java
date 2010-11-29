@@ -760,7 +760,7 @@ public abstract class MixedMediaSqliteLayerImpl extends MediaSqliteLayer<IMixedM
 		}
 		sqls = sqls.replace("{COL}", sortTerm);
 		
-		System.err.println("sqls=" + sqls);
+//		System.err.println("sqls=" + sqls);
 		
 		return sqls;
 	}
