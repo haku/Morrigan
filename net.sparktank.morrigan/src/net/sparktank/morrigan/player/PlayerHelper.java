@@ -7,6 +7,7 @@ import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDbHelper;
+import net.sparktank.morrigan.model.media.impl.MediaItemDb;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrackDb;
 import net.sparktank.sqlitewrapper.DbException;
@@ -81,16 +82,11 @@ public class PlayerHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	static public List<? extends IMediaTrack> runQueryOnList (IMediaTrackDb<?,?,? extends IMediaTrack> mediaDb, String query, int maxResults) throws MorriganException {
-		String q = query.replace("'", "''");
-		q = q.replace(" ", "*");
-		q = q.replace("\\", "\\\\");
-		q = q.replace("%", "\\%");
-		q = q.replace("_", "\\_");
-		q = q.replace("*", "%");
+		String q = MediaItemDb.escapeSearch(query);
 		
 		List<? extends IMediaTrack> res;
 		try {
-			res = mediaDb.simpleSearch(q, "\\", maxResults);
+			res = mediaDb.simpleSearch(q, MediaItemDb.SEARCH_ESC, maxResults);
 		} catch (DbException e) {
 			throw new MorriganException(e);
 		}

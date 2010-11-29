@@ -25,18 +25,29 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 	
 	public static final boolean HIDEMISSING = true; // TODO link this to GUI?
 	
+	/**
+	 * This pairs with escapeSearch().
+	 */
+	public static final String SEARCH_ESC = "\\";
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
 	private S dbLayer;
 	private IDbColumn librarySort;
 	private SortDirection librarySortDirection;
 	
+	private String escapedSearchTerm = null;
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	protected MediaItemDb (String libraryName, S dbLayer) {
+	protected MediaItemDb (String libraryName, S dbLayer, String searchTerm) {
 		super(dbLayer.getDbFilePath(), libraryName);
 		this.dbLayer = dbLayer;
 		
 		this.librarySort = dbLayer.getDefaultSortColumn();
 		this.librarySortDirection = SortDirection.ASC;
+		
+		if (searchTerm != null) this.escapedSearchTerm = escapeSearch(searchTerm);
 		
 		try {
 			readSortFromDb();
@@ -75,6 +86,10 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 		return this.dbLayer;
 	}
 	
+	public String getEscapedSearchTerm() {
+		return this.escapedSearchTerm;
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
@@ -109,7 +124,7 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 //		System.err.println("[?] reading... " + getType() + " " + getListName() + "...");
 		
 		long t0 = System.currentTimeMillis();
-		List<T> allMedia = this.dbLayer.updateListOfAllMedia(getMediaItems(), this.librarySort, this.librarySortDirection, HIDEMISSING);
+		List<T> allMedia = this.dbLayer.updateListOfAllMedia(getMediaItems(), this.librarySort, this.librarySortDirection, HIDEMISSING, this.escapedSearchTerm, SEARCH_ESC);
 		long l0 = System.currentTimeMillis() - t0;
 		
 		long t1 = System.currentTimeMillis();
@@ -615,6 +630,22 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 		}
 		
 		if (this._changedItems != null) this._changedItems.add(mi);
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	/**
+	 * This pairs with SEARCH_ESC.
+	 */
+	static public String escapeSearch (String term) {
+		String q = term.replace("'", "''");
+		q = q.replace(" ", "*");
+		q = q.replace("\\", "\\\\");
+		q = q.replace("%", "\\%");
+		q = q.replace("_", "\\_");
+		q = q.replace("*", "%");
+		
+		return q;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
