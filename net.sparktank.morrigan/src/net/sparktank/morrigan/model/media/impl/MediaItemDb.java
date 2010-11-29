@@ -13,9 +13,9 @@ import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemDb;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemStorageLayer;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemStorageLayer.SortDirection;
-import net.sparktank.morrigan.model.tags.MediaTag;
-import net.sparktank.morrigan.model.tags.MediaTagClassification;
-import net.sparktank.morrigan.model.tags.MediaTagType;
+import net.sparktank.morrigan.model.tags.MediaTagImpl;
+import net.sparktank.morrigan.model.tags.MediaTagClassificationImpl;
+import net.sparktank.morrigan.model.tags.MediaTagTypeImpl;
 import net.sparktank.sqlitewrapper.DbException;
 
 public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMediaItemStorageLayer<T>, T extends IMediaItem>
@@ -425,7 +425,7 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 	}
 	
 	@Override
-	public boolean hasTag (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) throws MorriganException {
+	public boolean hasTag (IDbItem item, String tag, MediaTagTypeImpl type, MediaTagClassificationImpl mtc) throws MorriganException {
 		try {
 			return this.dbLayer.hasTag(item, tag, type, mtc);
 		} catch (DbException e) {
@@ -434,7 +434,7 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 	}
 	
 	@Override
-	public List<MediaTag> getTags (IDbItem item) throws MorriganException {
+	public List<MediaTagImpl> getTags (IDbItem item) throws MorriganException {
 		try {
 			return this.dbLayer.getTags(item);
 		} catch (DbException e) {
@@ -443,7 +443,7 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 	}
 	
 	@Override
-	public void addTag (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) throws MorriganException {
+	public void addTag (IDbItem item, String tag, MediaTagTypeImpl type, MediaTagClassificationImpl mtc) throws MorriganException {
 		try {
 			this.dbLayer.addTag(item, tag, type, mtc);
 		} catch (DbException e) {
@@ -452,7 +452,7 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 	}
 	
 	@Override
-	public void addTag (IDbItem item, String tag, MediaTagType type, String mtc) throws MorriganException {
+	public void addTag (IDbItem item, String tag, MediaTagTypeImpl type, String mtc) throws MorriganException {
 		try {
 			this.dbLayer.addTag(item, tag, type, mtc);
 		} catch (DbException e) {
@@ -470,7 +470,7 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 	}
 	
 	@Override
-	public void removeTag (MediaTag mt) throws MorriganException {
+	public void removeTag (MediaTagImpl mt) throws MorriganException {
 		try {
 			this.dbLayer.removeTag(mt);
 		} catch (DbException e) {
@@ -488,7 +488,7 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 	}
 	
 	@Override
-	public List<MediaTagClassification> getTagClassifications() throws MorriganException {
+	public List<MediaTagClassificationImpl> getTagClassifications() throws MorriganException {
 		try {
 			return this.dbLayer.getTagClassifications();
 		} catch (DbException e) {
@@ -497,7 +497,7 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 	}
 	
 	@Override
-	public MediaTagClassification getTagClassification(String classificationName) throws MorriganException {
+	public MediaTagClassificationImpl getTagClassification(String classificationName) throws MorriganException {
 		try {
 			return this.dbLayer.getTagClassification(classificationName);
 		} catch (DbException e) {
@@ -520,12 +520,12 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 	private static final String TAG_UNREADABLE = "UNREADABLE";
 	
 	public boolean isMarkedAsUnreadable (T mi) throws MorriganException {
-		return hasTag(mi, TAG_UNREADABLE, MediaTagType.AUTOMATIC, null);
+		return hasTag(mi, TAG_UNREADABLE, MediaTagTypeImpl.AUTOMATIC, null);
 	}
 	
 	public void markAsUnreadabled (T mi) throws MorriganException {
 		setItemEnabled(mi, false);
-		addTag(mi, TAG_UNREADABLE, MediaTagType.AUTOMATIC, (MediaTagClassification)null);
+		addTag(mi, TAG_UNREADABLE, MediaTagTypeImpl.AUTOMATIC, (MediaTagClassificationImpl)null);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

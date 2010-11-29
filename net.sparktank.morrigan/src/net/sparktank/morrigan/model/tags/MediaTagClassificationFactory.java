@@ -2,7 +2,7 @@ package net.sparktank.morrigan.model.tags;
 
 import net.sparktank.morrigan.model.factory.RecyclingFactory;
 
-public class MediaTagClassificationFactory extends RecyclingFactory<MediaTagClassification, Long, String, RuntimeException> {
+public class MediaTagClassificationFactory extends RecyclingFactory<MediaTagClassificationImpl, Long, String, RuntimeException> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	static public final MediaTagClassificationFactory INSTANCE = new MediaTagClassificationFactory();
@@ -14,14 +14,14 @@ public class MediaTagClassificationFactory extends RecyclingFactory<MediaTagClas
 	}
 	
 	@Override
-	protected boolean isValidProduct(MediaTagClassification product) {
+	protected boolean isValidProduct(MediaTagClassificationImpl product) {
 		return true;
 	}
 	
 	@SuppressWarnings("boxing")
 	@Override
-	protected MediaTagClassification makeNewProduct(Long material, String config) {
-		return new MediaTagClassification(material, config);
+	protected MediaTagClassificationImpl makeNewProduct(Long material, String config) {
+		return new MediaTagClassificationImpl(material, config);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

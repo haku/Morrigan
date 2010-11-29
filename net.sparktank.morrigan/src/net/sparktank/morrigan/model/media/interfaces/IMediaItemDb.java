@@ -7,9 +7,9 @@ import net.sparktank.morrigan.model.db.IDbColumn;
 import net.sparktank.morrigan.model.db.IDbItem;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemStorageLayer.SortDirection;
-import net.sparktank.morrigan.model.tags.MediaTag;
-import net.sparktank.morrigan.model.tags.MediaTagClassification;
-import net.sparktank.morrigan.model.tags.MediaTagType;
+import net.sparktank.morrigan.model.tags.MediaTagImpl;
+import net.sparktank.morrigan.model.tags.MediaTagClassificationImpl;
+import net.sparktank.morrigan.model.tags.MediaTagTypeImpl;
 import net.sparktank.sqlitewrapper.DbException;
 
 public interface IMediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMediaItemStorageLayer<T>, T extends IMediaItem> extends IMediaItemList<T> {
@@ -43,16 +43,16 @@ public interface IMediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMediaIte
 	public void registerSortChangeListener (SortChangeListener scl);
 	public void unregisterSortChangeListener (SortChangeListener scl);
 	
-	public List<MediaTagClassification> getTagClassifications () throws MorriganException;
+	public List<MediaTagClassificationImpl> getTagClassifications () throws MorriganException;
 	public void addTagClassification (String classificationName) throws MorriganException;
-	public MediaTagClassification getTagClassification (String classificationName) throws MorriganException;
+	public MediaTagClassificationImpl getTagClassification (String classificationName) throws MorriganException;
 	public boolean hasTags (IDbItem item) throws MorriganException;
-	public boolean hasTag (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) throws MorriganException;
-	public List<MediaTag> getTags (IDbItem item) throws MorriganException;
-	public void addTag (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) throws MorriganException;
-	public void addTag (IDbItem item, String tag, MediaTagType type, String mtc) throws MorriganException;
+	public boolean hasTag (IDbItem item, String tag, MediaTagTypeImpl type, MediaTagClassificationImpl mtc) throws MorriganException;
+	public List<MediaTagImpl> getTags (IDbItem item) throws MorriganException;
+	public void addTag (IDbItem item, String tag, MediaTagTypeImpl type, MediaTagClassificationImpl mtc) throws MorriganException;
+	public void addTag (IDbItem item, String tag, MediaTagTypeImpl type, String mtc) throws MorriganException;
 	public void moveTags (IDbItem from_item, IDbItem to_item) throws MorriganException;
-	public void removeTag (MediaTag mt) throws MorriganException;
+	public void removeTag (MediaTagImpl mt) throws MorriganException;
 	public void clearTags (IDbItem item) throws MorriganException;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

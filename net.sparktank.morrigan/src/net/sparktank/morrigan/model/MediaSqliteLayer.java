@@ -11,10 +11,10 @@ import java.util.List;
 import net.sparktank.morrigan.model.db.IDbItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemStorageLayer;
-import net.sparktank.morrigan.model.tags.MediaTag;
-import net.sparktank.morrigan.model.tags.MediaTagClassification;
+import net.sparktank.morrigan.model.tags.MediaTagImpl;
+import net.sparktank.morrigan.model.tags.MediaTagClassificationImpl;
 import net.sparktank.morrigan.model.tags.MediaTagClassificationFactory;
-import net.sparktank.morrigan.model.tags.MediaTagType;
+import net.sparktank.morrigan.model.tags.MediaTagTypeImpl;
 import net.sparktank.sqlitewrapper.DbException;
 import net.sparktank.sqlitewrapper.GenericSqliteLayer;
 
@@ -62,7 +62,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	}
 	
 	@Override
-	public boolean hasTag (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) throws DbException {
+	public boolean hasTag (IDbItem item, String tag, MediaTagTypeImpl type, MediaTagClassificationImpl mtc) throws DbException {
 		try {
 			return local_hasTag(item.getDbRowId(), tag, type, mtc);
 		} catch (Exception e) {
@@ -71,7 +71,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	}
 	
 	@Override
-	public List<MediaTag> getTags (IDbItem item) throws DbException {
+	public List<MediaTagImpl> getTags (IDbItem item) throws DbException {
 		try {
 			return local_getTags(item.getDbRowId());
 		} catch (Exception e) {
@@ -80,7 +80,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	}
 	
 	@Override
-	public List<MediaTagClassification> getTagClassifications () throws DbException {
+	public List<MediaTagClassificationImpl> getTagClassifications () throws DbException {
 		try {
 			return local_getTagClassifications();
 		} catch (Exception e) {
@@ -89,7 +89,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	}
 	
 	@Override
-	public boolean addTag (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) throws DbException {
+	public boolean addTag (IDbItem item, String tag, MediaTagTypeImpl type, MediaTagClassificationImpl mtc) throws DbException {
 		try {
 			return local_addTag(item.getDbRowId(), tag, type, mtc);
 		} catch (Exception e) {
@@ -98,7 +98,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	}
 	
 	@Override
-	public boolean addTag (IDbItem item, String tag, MediaTagType type, String mtc) throws DbException {
+	public boolean addTag (IDbItem item, String tag, MediaTagTypeImpl type, String mtc) throws DbException {
 		try {
 			return local_addTag(item.getDbRowId(), tag, type, mtc);
 		} catch (Exception e) {
@@ -116,7 +116,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	}
 	
 	@Override
-	public void removeTag (MediaTag tag) throws DbException {
+	public void removeTag (MediaTagImpl tag) throws DbException {
 		try {
 			local_removeTag(tag);
 		} catch (Exception e) {
@@ -143,7 +143,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	}
 	
 	@Override
-	public MediaTagClassification getTagClassification(String classificationName) throws DbException {
+	public MediaTagClassificationImpl getTagClassification(String classificationName) throws DbException {
 		try {
 			return local_getTagClassification(classificationName);
 		} catch (Exception e) {
@@ -389,15 +389,15 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Private methods for tags.
 	
-	private boolean local_addTag (long mf_rowId, String tag, MediaTagType type, String cls_name) throws SQLException, ClassNotFoundException, DbException {
-		MediaTagClassification mtc = local_getTagClassification(cls_name);
+	private boolean local_addTag (long mf_rowId, String tag, MediaTagTypeImpl type, String cls_name) throws SQLException, ClassNotFoundException, DbException {
+		MediaTagClassificationImpl mtc = local_getTagClassification(cls_name);
 		if (mtc == null) {
 			mtc = local_addTagClassification(cls_name);
 		}
 		return local_addTag(mf_rowId, tag, type, mtc);
 	}
 	
-	private boolean local_addTag (long mf_rowId, String tag, MediaTagType type, MediaTagClassification mtc) throws SQLException, ClassNotFoundException, DbException {
+	private boolean local_addTag (long mf_rowId, String tag, MediaTagTypeImpl type, MediaTagClassificationImpl mtc) throws SQLException, ClassNotFoundException, DbException {
 		if (local_hasTag(mf_rowId, tag, type, mtc)) {
 			return false;
 		}
@@ -410,7 +410,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		return true;
 	}
 	
-	private void local_addTag (long mf_rowId, String tag, MediaTagType type, long cls_rowid) throws SQLException, ClassNotFoundException, DbException {
+	private void local_addTag (long mf_rowId, String tag, MediaTagTypeImpl type, long cls_rowid) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps;
 		ps = getDbCon().prepareStatement(SQL_TBL_TAGS_ADD);
 		int n;
@@ -444,7 +444,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		if (n<1) throw new DbException("No update occured for moveTags('"+from_mf_rowId+"' to '"+to_mf_rowId+"').");
 	}
 	
-	private void local_removeTag(MediaTag tag) throws SQLException, ClassNotFoundException, DbException {
+	private void local_removeTag(MediaTagImpl tag) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps;
 		ps = getDbCon().prepareStatement(SQL_TBL_TAGS_REMOVE);
 		int n;
@@ -492,7 +492,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		}
 	}
 	
-	private boolean local_hasTag (long mf_rowId, String tag, MediaTagType type, MediaTagClassification mtc) throws SQLException, ClassNotFoundException {
+	private boolean local_hasTag (long mf_rowId, String tag, MediaTagTypeImpl type, MediaTagClassificationImpl mtc) throws SQLException, ClassNotFoundException {
 		if (mtc != null) {
 			return local_hasTag(mf_rowId, tag, type, mtc.getRowId());
 		}
@@ -500,7 +500,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		return local_hasTag(mf_rowId, tag, type, 0);
 	}
 	
-	private boolean local_hasTag (long mf_rowId, String tag, MediaTagType type, long cls_rowid) throws SQLException, ClassNotFoundException {
+	private boolean local_hasTag (long mf_rowId, String tag, MediaTagTypeImpl type, long cls_rowid) throws SQLException, ClassNotFoundException {
 		String sql;
 		if (cls_rowid > 0 ) {
 			sql = SQL_TBL_TAGS_Q_HASTAG;
@@ -533,8 +533,8 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		}
 	}
 	
-	private List<MediaTag> local_getTags(long mf_rowId) throws SQLException, ClassNotFoundException, DbException {
-		List<MediaTag> ret = new LinkedList<MediaTag>();
+	private List<MediaTagImpl> local_getTags(long mf_rowId) throws SQLException, ClassNotFoundException, DbException {
+		List<MediaTagImpl> ret = new LinkedList<MediaTagImpl>();
 		ResultSet rs;
 		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_TAGS_Q_ALL);
 		
@@ -548,10 +548,10 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 					int type = rs.getInt(SQL_TBL_TAGS_COL_TYPE);
 					long clsRowId = rs.getLong(SQL_TBL_TAGS_COL_CLSROWID);
 					
-					MediaTagType mtt = MediaTagType.getFromIndex(type);
-					MediaTagClassification mtc = local_getTagClassification(clsRowId);
+					MediaTagTypeImpl mtt = MediaTagTypeImpl.getFromIndex(type);
+					MediaTagClassificationImpl mtc = local_getTagClassification(clsRowId);
 					
-					MediaTag mt = new MediaTag(rowId, tag, mtt, mtc);
+					MediaTagImpl mt = new MediaTagImpl(rowId, tag, mtt, mtc);
 					ret.add(mt);
 				}
 			} finally {
@@ -564,7 +564,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		return ret;
 	}
 	
-	private MediaTagClassification local_addTagClassification (String classificationName) throws SQLException, ClassNotFoundException, DbException {
+	private MediaTagClassificationImpl local_addTagClassification (String classificationName) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps;
 		ps = getDbCon().prepareStatement(SQL_TBL_TAGCLS_ADD);
 		int n;
@@ -576,12 +576,12 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		}
 		if (n<1) throw new DbException("No update occured for addTagClassification('"+classificationName+"').");
 		
-		MediaTagClassification ret = local_getTagClassification(classificationName);
+		MediaTagClassificationImpl ret = local_getTagClassification(classificationName);
 		return ret;
 	}
 	
-	private List<MediaTagClassification> local_getTagClassifications () throws SQLException, ClassNotFoundException {
-		List<MediaTagClassification> ret;
+	private List<MediaTagClassificationImpl> local_getTagClassifications () throws SQLException, ClassNotFoundException {
+		List<MediaTagClassificationImpl> ret;
 		Statement stat = getDbCon().createStatement();
 		try {
 			ResultSet rs = stat.executeQuery(SQL_TBL_TAGCLS_Q_ALL);
@@ -596,10 +596,10 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		return ret;
 	}
 	
-	private MediaTagClassification local_getTagClassification (long clsRowId) throws DbException, SQLException, ClassNotFoundException {
+	private MediaTagClassificationImpl local_getTagClassification (long clsRowId) throws DbException, SQLException, ClassNotFoundException {
 		PreparedStatement ps;
 		ResultSet rs;
-		List<MediaTagClassification> ret;
+		List<MediaTagClassificationImpl> ret;
 		
 		ps = getDbCon().prepareStatement(SQL_TBL_TAGCLS_Q_ROWID);
 		try {
@@ -623,10 +623,10 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		}
 	}
 	
-	private MediaTagClassification local_getTagClassification (String classificationName) throws SQLException, ClassNotFoundException, DbException {
+	private MediaTagClassificationImpl local_getTagClassification (String classificationName) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps;
 		ResultSet rs;
-		List<MediaTagClassification> ret;
+		List<MediaTagClassificationImpl> ret;
 		
 		ps = getDbCon().prepareStatement(SQL_TBL_TAGCLS_Q_CLS);
 		try {
@@ -650,15 +650,15 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		}
 	}
 	
-	private List<MediaTagClassification> local_getTagClassification_parseRecordSet (ResultSet rs) throws SQLException {
-		List<MediaTagClassification> ret = new LinkedList<MediaTagClassification>();
+	private List<MediaTagClassificationImpl> local_getTagClassification_parseRecordSet (ResultSet rs) throws SQLException {
+		List<MediaTagClassificationImpl> ret = new LinkedList<MediaTagClassificationImpl>();
 		
 		while (rs.next()) {
 			long rowId = rs.getLong(SQL_TBL_TAGCLS_COL_ROWID);
 			String clsName = rs.getString(SQL_TBL_TAGCLS_COL_CLS);
 			
 			@SuppressWarnings("boxing")
-			MediaTagClassification mtc = MediaTagClassificationFactory.INSTANCE.manufacture(rowId, clsName);
+			MediaTagClassificationImpl mtc = MediaTagClassificationFactory.INSTANCE.manufacture(rowId, clsName);
 			ret.add(mtc);
 		}
 		

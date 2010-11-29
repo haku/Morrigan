@@ -12,13 +12,13 @@ import net.sparktank.morrigan.gui.dialogs.RunnableDialog;
 import net.sparktank.morrigan.gui.editors.IMediaItemDbEditor;
 import net.sparktank.morrigan.gui.helpers.ImageCache;
 import net.sparktank.morrigan.gui.helpers.RefreshTimer;
+import net.sparktank.morrigan.helpers.TrackTagHelper;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemDb;
-import net.sparktank.morrigan.model.tags.MediaTag;
-import net.sparktank.morrigan.model.tags.MediaTagClassification;
-import net.sparktank.morrigan.model.tags.MediaTagType;
-import net.sparktank.morrigan.model.tags.TrackTagHelper;
+import net.sparktank.morrigan.model.tags.MediaTagImpl;
+import net.sparktank.morrigan.model.tags.MediaTagClassificationImpl;
+import net.sparktank.morrigan.model.tags.MediaTagTypeImpl;
 import net.sparktank.morrigan.model.tracks.MediaTrack;
 
 import org.eclipse.jface.action.Action;
@@ -204,7 +204,7 @@ public class ViewTagEditor extends ViewPart {
 			if (ViewTagEditor.this.editedItemDb != null && ViewTagEditor.this.editedItem != null) {
 				try {
 					if (ViewTagEditor.this.editedItemDb.hasTags(ViewTagEditor.this.editedItem)) {
-    					List<MediaTag> tags = ViewTagEditor.this.editedItemDb.getTags(ViewTagEditor.this.editedItem);
+    					List<MediaTagImpl> tags = ViewTagEditor.this.editedItemDb.getTags(ViewTagEditor.this.editedItem);
     					return tags.toArray();
 					}
 				}
@@ -385,7 +385,7 @@ public class ViewTagEditor extends ViewPart {
 			String text = this.txtNewTag.getText();
 			if (text.length() > 0) {
 				try {
-					this.editedItemDb.addTag(this.editedItem, text, MediaTagType.MANUAL, (MediaTagClassification)null);
+					this.editedItemDb.addTag(this.editedItem, text, MediaTagTypeImpl.MANUAL, (MediaTagClassificationImpl)null);
 					this.tableViewer.refresh();
 					this.txtNewTag.setSelection(0, text.length());
 					this.txtNewTag.setFocus();
@@ -402,7 +402,7 @@ public class ViewTagEditor extends ViewPart {
 	}
 	
 	void procRemoveTag() {
-		List<MediaTag> selMts = new LinkedList<MediaTag>();
+		List<MediaTagImpl> selMts = new LinkedList<MediaTagImpl>();
 		
 		ISelection selection = this.tableViewer.getSelection();
 		if (selection instanceof IStructuredSelection) {
@@ -413,8 +413,8 @@ public class ViewTagEditor extends ViewPart {
 			}
 			
 			for (Object selObj : iSel.toList()) {
-				if (selObj instanceof MediaTag) {
-					MediaTag selMt = (MediaTag) selObj;
+				if (selObj instanceof MediaTagImpl) {
+					MediaTagImpl selMt = (MediaTagImpl) selObj;
 					selMts.add(selMt);
 				}
 			}
@@ -424,7 +424,7 @@ public class ViewTagEditor extends ViewPart {
 		dlg.open();
 		if (dlg.getReturnCode() == Window.OK) {
 			try {
-				for (MediaTag mt : selMts) {
+				for (MediaTagImpl mt : selMts) {
 					this.editedItemDb.removeTag(mt);
 				}
 			}

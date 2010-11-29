@@ -1,21 +1,21 @@
 package net.sparktank.morrigan.model.tags;
 
-public class MediaTag {
+public class MediaTagImpl {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private long dbRowId;
 	private String tag;
-	private MediaTagType type;
-	private MediaTagClassification classification;
+	private MediaTagTypeImpl type;
+	private MediaTagClassificationImpl classification;
 	
-	public MediaTag (long dbRowId, String tag, MediaTagType type) {
+	public MediaTagImpl (long dbRowId, String tag, MediaTagTypeImpl type) {
 		this.dbRowId = dbRowId;
 		this.tag = tag;
 		this.type = type;
 		this.classification = null;
 	}
 	
-	public MediaTag (long dbRowId, String tag, MediaTagType type, MediaTagClassification classification) {
+	public MediaTagImpl (long dbRowId, String tag, MediaTagTypeImpl type, MediaTagClassificationImpl classification) {
 		this.dbRowId = dbRowId;
 		this.tag = tag;
 		this.type = type;
@@ -33,17 +33,17 @@ public class MediaTag {
 		this.tag = tag;
 	}
 	
-	public MediaTagType getType() {
+	public MediaTagTypeImpl getType() {
 		return this.type;
 	}
-	public void setType(MediaTagType type) {
+	public void setType(MediaTagTypeImpl type) {
 		this.type = type;
 	}
 	
-	public MediaTagClassification getClassification() {
+	public MediaTagClassificationImpl getClassification() {
 		return this.classification;
 	}
-	public void setClassification(MediaTagClassification classification) {
+	public void setClassification(MediaTagClassificationImpl classification) {
 		this.classification = classification;
 	}
 	

@@ -14,12 +14,12 @@ import javax.imageio.stream.ImageInputStream;
 import net.sparktank.morrigan.config.Config;
 import net.sparktank.morrigan.engines.EngineFactory;
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine;
+import net.sparktank.morrigan.helpers.TrackTagHelper;
 import net.sparktank.morrigan.model.LocalDbUpdateTask;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.factory.RecyclingFactory;
 import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem.MediaType;
-import net.sparktank.morrigan.model.tags.TrackTagHelper;
 import net.sparktank.morrigan.model.tasks.TaskEventListener;
 
 public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<LocalMixedMediaDb, IMixedMediaItem> {
