@@ -14,7 +14,7 @@ import java.util.Date;
 import java.util.List;
 
 import net.sparktank.morrigan.engines.playback.NotImplementedException;
-import net.sparktank.morrigan.model.db.interfaces.IDbItem;
+import net.sparktank.morrigan.model.db.IDbItem;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.factory.RecyclingFactory;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;

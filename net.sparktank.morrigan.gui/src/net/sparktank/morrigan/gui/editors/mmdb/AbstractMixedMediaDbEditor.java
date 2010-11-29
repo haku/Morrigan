@@ -13,7 +13,7 @@ import net.sparktank.morrigan.gui.editors.MediaColumn;
 import net.sparktank.morrigan.gui.preferences.MediaListPref;
 import net.sparktank.morrigan.helpers.TimeHelper;
 import net.sparktank.morrigan.model.MediaSqliteLayer2;
-import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
+import net.sparktank.morrigan.model.db.IDbColumn;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.impl.DurationData;
 import net.sparktank.morrigan.model.media.impl.MixedMediaSqliteLayerImpl;

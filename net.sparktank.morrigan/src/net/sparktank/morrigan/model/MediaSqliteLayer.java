@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.sparktank.morrigan.model.db.interfaces.IDbItem;
+import net.sparktank.morrigan.model.db.IDbItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemStorageLayer;
 import net.sparktank.morrigan.model.tags.MediaTag;

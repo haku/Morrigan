@@ -6,8 +6,8 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.sparktank.morrigan.model.db.interfaces.IDbColumn;
-import net.sparktank.morrigan.model.db.interfaces.IDbItem;
+import net.sparktank.morrigan.model.db.IDbColumn;
+import net.sparktank.morrigan.model.db.IDbItem;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemDb;
