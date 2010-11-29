@@ -42,7 +42,18 @@ Image &quot;The Morrígan&quot; by Louis le Brocquy used under the Creative Comm
       <plugin id="com.ibm.icu"/>
       <plugin id="javax.transaction" fragment="true"/>
       <plugin id="net.sparktank.morrigan"/>
+      <plugin id="net.sparktank.morrigan.config"/>
+      <plugin id="net.sparktank.morrigan.engines"/>
       <plugin id="net.sparktank.morrigan.gui"/>
+      <plugin id="net.sparktank.morrigan.model"/>
+      <plugin id="net.sparktank.morrigan.model.db"/>
+      <plugin id="net.sparktank.morrigan.model.media"/>
+      <plugin id="net.sparktank.morrigan.model.media_impl"/>
+      <plugin id="net.sparktank.morrigan.osgiconsole"/>
+      <plugin id="net.sparktank.morrigan.player"/>
+      <plugin id="net.sparktank.morrigan.server"/>
+      <plugin id="net.sparktank.morrigan.util"/>
+      <plugin id="net.sparktank.morrigan.util.httpclient"/>
       <plugin id="net.sparktank.nemain"/>
       <plugin id="net.sparktank.sqlitewrapper"/>
       <plugin id="org.eclipse.compare.core"/>
