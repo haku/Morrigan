@@ -25,7 +25,7 @@
    <plugins>
       <plugin id="net.sparktank.morrigan"/>
       <plugin id="net.sparktank.morrigan.osgiconsole"/>
-      <plugin id="net.sparktank.morrigan.server"/>
+      <plugin id="net.sparktank.morrigan.server.boot"/>
       <plugin id="net.sparktank.sqlitewrapper"/>
       <plugin id="org.eclipse.core.runtime"/>
       <plugin id="org.eclipse.osgi"/>
@@ -34,7 +34,6 @@
 
    <configurations>
       <plugin id="net.sparktank.morrigan.osgiconsole" autoStart="true" startLevel="0" />
-      <plugin id="net.sparktank.morrigan.server" autoStart="true" startLevel="0" />
       <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="0" />
       <plugin id="org.eclipse.osgi" autoStart="true" startLevel="0" />
    </configurations>
