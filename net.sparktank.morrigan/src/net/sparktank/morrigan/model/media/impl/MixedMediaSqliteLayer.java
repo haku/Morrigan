@@ -85,6 +85,11 @@ public class MixedMediaSqliteLayer extends MixedMediaSqliteLayerImpl implements 
 	}
 	
 	@Override
+	public List<IMixedMediaItem> updateListOfAllMedia(List<IMixedMediaItem> list, IDbColumn sort, SortDirection direction, boolean hideMissing, String search, String searchEsc) throws DbException {
+		return updateListOfAllMedia(this.defaultMediaType, list, sort, direction, hideMissing, search, searchEsc);
+	}
+	
+	@Override
 	public List<IMixedMediaItem> simpleSearch(String term, String esc, int maxResults) throws DbException {
 		return simpleSearchMedia(this.defaultMediaType, term, esc, maxResults);
 	}
@@ -101,7 +106,16 @@ public class MixedMediaSqliteLayer extends MixedMediaSqliteLayerImpl implements 
 	@Override
 	public List<IMixedMediaItem> updateListOfAllMedia(MediaType mediaType, List<IMixedMediaItem> list, IDbColumn sort, SortDirection direction, boolean hideMissing) throws DbException {
 		try {
-			return local_updateListOfAllMedia(mediaType, list, sort, direction, hideMissing);
+			return local_updateListOfAllMedia(mediaType, list, sort, direction, hideMissing, null, null);
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+	
+	@Override
+	public List<IMixedMediaItem> updateListOfAllMedia(MediaType mediaType, List<IMixedMediaItem> list, IDbColumn sort, SortDirection direction, boolean hideMissing, String search, String searchEsc) throws DbException {
+		try {
+			return local_updateListOfAllMedia(mediaType, list, sort, direction, hideMissing, search, searchEsc);
 		} catch (Exception e) {
 			throw new DbException(e);
 		}

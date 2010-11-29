@@ -93,7 +93,7 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb<RemoteMixedMediaDb>
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public RemoteMixedMediaDb (String dbName, IMixedMediaStorageLayer<IMixedMediaItem> localDbLayer) throws DbException, MalformedURLException {
-		super(dbName, localDbLayer);
+		super(dbName, localDbLayer, null); // TODO expose search term.
 		
 		String s = localDbLayer.getProp(DBKEY_SERVERURL);
 		if (s != null) {
@@ -107,7 +107,7 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb<RemoteMixedMediaDb>
 	}
 	
 	public RemoteMixedMediaDb (String dbName,  URL url, IMixedMediaStorageLayer<IMixedMediaItem> localDbLayer) throws DbException {
-		super(dbName, localDbLayer);
+		super(dbName, localDbLayer, null); // TODO expose search term.
 		this.url = url;
 		
 		String s = localDbLayer.getProp(DBKEY_SERVERURL);

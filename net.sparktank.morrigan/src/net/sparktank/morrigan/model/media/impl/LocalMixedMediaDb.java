@@ -9,7 +9,7 @@ public class LocalMixedMediaDb extends AbstractMixedMediaDb<LocalMixedMediaDb> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Factories.
 	
-	public static class LocalMixedMediaDbFactory extends RecyclingFactory<LocalMixedMediaDb, String, Void, DbException> {
+	public static class LocalMixedMediaDbFactory extends RecyclingFactory<LocalMixedMediaDb, String, String, DbException> {
 		
 		protected LocalMixedMediaDbFactory() {
 			super(true);
@@ -24,7 +24,12 @@ public class LocalMixedMediaDb extends AbstractMixedMediaDb<LocalMixedMediaDb> {
 		@Override
 		protected LocalMixedMediaDb makeNewProduct(String material) throws DbException {
 //			System.out.println("Making object instance '" + material + "'...");
-			return new LocalMixedMediaDb(LocalMixedMediaDbHelper.getMmdbTitle(material), MixedMediaSqliteLayer.FACTORY.manufacture(material));
+			return new LocalMixedMediaDb(LocalMixedMediaDbHelper.getMmdbTitle(material), MixedMediaSqliteLayer.FACTORY.manufacture(material), null);
+		}
+		
+		@Override
+		protected LocalMixedMediaDb makeNewProduct(String material, String config) throws DbException {
+			return new LocalMixedMediaDb(LocalMixedMediaDbHelper.getMmdbTitle(material), MixedMediaSqliteLayer.FACTORY.manufacture(material), config);
 		}
 		
 	}
@@ -37,8 +42,8 @@ public class LocalMixedMediaDb extends AbstractMixedMediaDb<LocalMixedMediaDb> {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	protected LocalMixedMediaDb (String libraryName, IMixedMediaStorageLayer<IMixedMediaItem> dbLayer) {
-		super(libraryName, dbLayer);
+	protected LocalMixedMediaDb (String libraryName, IMixedMediaStorageLayer<IMixedMediaItem> dbLayer, String searchTerm) {
+		super(libraryName, dbLayer, searchTerm);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -51,8 +56,9 @@ public class LocalMixedMediaDb extends AbstractMixedMediaDb<LocalMixedMediaDb> {
 	@SuppressWarnings("boxing")
 	@Override
 	public LocalMixedMediaDb getTransactionalClone() throws DbException {
-//		System.out.println("Making transactional object instance '" + getDbPath() + "'...");
-		return new LocalMixedMediaDb(LocalMixedMediaDbHelper.getMmdbTitle(getDbPath()), MixedMediaSqliteLayer.FACTORY.manufacture(getDbPath(), false, true));
+		return new LocalMixedMediaDb(LocalMixedMediaDbHelper.getMmdbTitle(getDbPath()),
+				MixedMediaSqliteLayer.FACTORY.manufacture(getDbPath(), false, true),
+				this.getEscapedSearchTerm());
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

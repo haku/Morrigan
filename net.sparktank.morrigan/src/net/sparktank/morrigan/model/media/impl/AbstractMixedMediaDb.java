@@ -19,8 +19,8 @@ public abstract class AbstractMixedMediaDb<H extends AbstractMixedMediaDb<H>>
 		implements IAbstractMixedMediaDb<H> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	protected AbstractMixedMediaDb (String libraryName, IMixedMediaStorageLayer<IMixedMediaItem> dbLayer) {
-		super(libraryName, dbLayer);
+	protected AbstractMixedMediaDb (String libraryName, IMixedMediaStorageLayer<IMixedMediaItem> dbLayer, String searchTerm) {
+		super(libraryName, dbLayer, searchTerm);
 		
 		try {
 			readDefaultMediaTypeFromDb();

@@ -122,43 +122,13 @@ public abstract class MixedMediaSqliteLayerImpl extends MediaSqliteLayer<IMixedM
 	private static final String _SQL_ORDERBYREPLACE =
 		" ORDER BY {COL} {DIR};";
 	
+	private static final String _SQL_MEDIAFILES_WHERESEARCH = 
+		" sfile LIKE ? ESCAPE ?";
+	
 	private static final String _SQL_MEDIAFILES_WHEREORDERSEARCH = 
 		" sfile LIKE ? ESCAPE ?"
 		+ " AND (bmissing<>1 OR bmissing is NULL) AND (benabled<>0 OR benabled is NULL)"
 		+ " ORDER BY dlastplay DESC, lendcnt DESC, lstartcnt DESC, sfile COLLATE NOCASE ASC;";
-	
-//	-  -  -  -  -  -  -  -  -  -  -  -
-//	MediaMixedItem Queries.
-	
-	private static final String SQL_MEDIAFILES_Q_ALL =
-		_SQL_MEDIAFILES_SELECT
-		+ _SQL_ORDERBYREPLACE;
-	
-	private static final String SQL_MEDIAFILES_Q_NOTMISSING =
-		_SQL_MEDIAFILES_SELECT
-    	+ _SQL_WHERE + _SQL_MEDIAFILES_WHERENOTMISSING
-    	+ _SQL_ORDERBYREPLACE;
-	
-	private static final String SQL_MEDIAFILES_Q_SIMPLESEARCH =
-		_SQL_MEDIAFILES_SELECT
-		+ _SQL_WHERE + _SQL_MEDIAFILES_WHEREORDERSEARCH;
-	
-//	-  -  -  -  -  -  -  -  -  -  -  -
-//	MediaMixedItem Queries - typed.
-	
-	private static final String SQL_MEDIAFILES_Q_ALL_T =
-		_SQL_MEDIAFILES_SELECT
-		+ _SQL_WHERE + _SQL_MEDIAFILES_WHERTYPE
-		+ _SQL_ORDERBYREPLACE;
-	
-	private static final String SQL_MEDIAFILES_Q_NOTMISSING_T =
-		_SQL_MEDIAFILES_SELECT
-		+ _SQL_WHERE + _SQL_MEDIAFILES_WHERTYPE + _SQL_AND + _SQL_MEDIAFILES_WHERENOTMISSING
-		+ _SQL_ORDERBYREPLACE;
-	
-	private static final String SQL_MEDIAFILES_Q_SIMPLESEARCH_T =
-		_SQL_MEDIAFILES_SELECT
-		+ _SQL_WHERE + _SQL_MEDIAFILES_WHERTYPE + _SQL_AND + _SQL_MEDIAFILES_WHEREORDERSEARCH;
 	
 //	-  -  -  -  -  -  -  -  -  -  -  -
 //	Adding and removing tracks.
@@ -292,7 +262,7 @@ public abstract class MixedMediaSqliteLayerImpl extends MediaSqliteLayer<IMixedM
 //	MediaItem getters.
 	
 	protected List<IMixedMediaItem> local_getAllMedia (MediaType mediaType, IDbColumn sort, SortDirection direction, boolean hideMissing) throws SQLException, ClassNotFoundException {
-		String sql = local_getAllMediaSql(SQL_MEDIAFILES_Q_ALL, SQL_MEDIAFILES_Q_NOTMISSING, SQL_MEDIAFILES_Q_ALL_T, SQL_MEDIAFILES_Q_NOTMISSING_T, mediaType, hideMissing, sort, direction);
+		String sql = local_getAllMediaSql(mediaType, hideMissing, sort, direction, null);
 		ResultSet rs;
 		
 		List<IMixedMediaItem> ret;
@@ -314,15 +284,23 @@ public abstract class MixedMediaSqliteLayerImpl extends MediaSqliteLayer<IMixedM
 		return ret;
 	}
 	
-	protected List<IMixedMediaItem> local_updateListOfAllMedia (MediaType mediaType, List<IMixedMediaItem> list, IDbColumn sort, SortDirection direction, boolean hideMissing) throws SQLException, ClassNotFoundException {
-		String sql = local_getAllMediaSql(SQL_MEDIAFILES_Q_ALL, SQL_MEDIAFILES_Q_NOTMISSING, SQL_MEDIAFILES_Q_ALL_T, SQL_MEDIAFILES_Q_NOTMISSING_T, mediaType, hideMissing, sort, direction);
+	protected List<IMixedMediaItem> local_updateListOfAllMedia (MediaType mediaType, List<IMixedMediaItem> list, IDbColumn sort, SortDirection direction, boolean hideMissing, String search, String searchEsc) throws SQLException, ClassNotFoundException {
+		String sql = local_getAllMediaSql(mediaType, hideMissing, sort, direction, search);
 		ResultSet rs;
 		
 		List<IMixedMediaItem> ret;
 		PreparedStatement ps = getDbCon().prepareStatement(sql);
+		int n = 1;
 		try {
 			if (mediaType != MediaType.UNKNOWN) {
-				ps.setInt(1, mediaType.getN());
+				ps.setInt(n, mediaType.getN());
+				n++;
+			}
+			if (search != null) {
+				ps.setString(n, "%" + search + "%");
+				n++;
+				ps.setString(n, searchEsc);
+				n++;
 			}
 			rs = ps.executeQuery();
 			try {
@@ -344,9 +322,11 @@ public abstract class MixedMediaSqliteLayerImpl extends MediaSqliteLayer<IMixedM
 		
 		String sql;
 		if (mediaType == MediaType.UNKNOWN) {
-			sql = SQL_MEDIAFILES_Q_SIMPLESEARCH;
+			sql = _SQL_MEDIAFILES_SELECT
+				+ _SQL_WHERE + _SQL_MEDIAFILES_WHEREORDERSEARCH;
 		} else {
-			sql = SQL_MEDIAFILES_Q_SIMPLESEARCH_T;
+			sql = _SQL_MEDIAFILES_SELECT
+				+ _SQL_WHERE + _SQL_MEDIAFILES_WHERTYPE + _SQL_AND + _SQL_MEDIAFILES_WHEREORDERSEARCH;
 		}
 		
 		ps = getDbCon().prepareStatement(sql);
@@ -720,34 +700,55 @@ public abstract class MixedMediaSqliteLayerImpl extends MediaSqliteLayer<IMixedM
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	MediaItem getters.
 	
-	static private String local_getAllMediaSql (
-			String sqlAll, String sqlNotMissing, String sqlAllT, String sqlNotMissingT,
-			MediaType mediaType, boolean hideMissing, IDbColumn sort, SortDirection direction) {
+	static private String local_getAllMediaSql (MediaType mediaType, boolean hideMissing, IDbColumn sort, SortDirection direction, String search) {
+		StringBuilder sql = new StringBuilder();
 		
-		String sql;
+		sql.append(_SQL_MEDIAFILES_SELECT);
+		if (hideMissing || mediaType != MediaType.UNKNOWN) sql.append(_SQL_WHERE);
+		if (mediaType != MediaType.UNKNOWN) {
+			sql.append(_SQL_MEDIAFILES_WHERTYPE);
+		}
+		if (hideMissing) {
+			if (mediaType != MediaType.UNKNOWN) sql.append(_SQL_AND);
+			sql.append(_SQL_MEDIAFILES_WHERENOTMISSING);
+		}
+		if (search != null) {
+			if (hideMissing || mediaType != MediaType.UNKNOWN) sql.append(_SQL_AND);
+			sql.append(_SQL_MEDIAFILES_WHERESEARCH);
+		}
+		sql.append(_SQL_ORDERBYREPLACE);
 		
-		if (mediaType == MediaType.UNKNOWN) {
-			if (hideMissing) {
-				sql = sqlNotMissing;
-			} else {
-				sql = sqlAll;
-			}
-		}
-		else {
-			if (hideMissing) {
-				sql = sqlNotMissingT;
-			} else {
-				sql = sqlAllT;
-			}
-		}
+//		if (mediaType == MediaType.UNKNOWN) {
+//			if (hideMissing) {
+//				sql.append(_SQL_WHERE);
+//				sql.append(_SQL_MEDIAFILES_WHERENOTMISSING);
+//				sql.append(_SQL_ORDERBYREPLACE);
+//			} else {
+//				sql.append(_SQL_ORDERBYREPLACE);
+//			}
+//		}
+//		else {
+//			if (hideMissing) {
+//				sql.append(_SQL_WHERE);
+//				sql.append(_SQL_MEDIAFILES_WHERTYPE);
+//				sql.append(_SQL_AND);
+//				sql.append(_SQL_MEDIAFILES_WHERENOTMISSING);
+//				sql.append(_SQL_ORDERBYREPLACE);
+//			} else {
+//				
+//				sql.append(_SQL_ORDERBYREPLACE);
+//			}
+//		}
+		
+		String sqls = sql.toString();
 		
 		switch (direction) {
 			case ASC:
-				sql = sql.replace("{DIR}", "ASC");
+				sqls = sqls.replace("{DIR}", "ASC");
 				break;
 				
 			case DESC:
-				sql = sql.replace("{DIR}", "DESC");
+				sqls = sqls.replace("{DIR}", "DESC");
 				break;
 				
 			default:
@@ -759,9 +760,11 @@ public abstract class MixedMediaSqliteLayerImpl extends MediaSqliteLayer<IMixedM
 		if (sort.getSortOpts() != null) {
 			sortTerm = sortTerm.concat(sort.getSortOpts());
 		}
-		sql = sql.replace("{COL}", sortTerm);
+		sqls = sqls.replace("{COL}", sortTerm);
 		
-		return sql;
+		System.err.println("sqls=" + sqls);
+		
+		return sqls;
 	}
 	
 	static private List<IMixedMediaItem> local_parseAndUpdateFromRecordSet (List<IMixedMediaItem> list, ResultSet rs) throws SQLException {
