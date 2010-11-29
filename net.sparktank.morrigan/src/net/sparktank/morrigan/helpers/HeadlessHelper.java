@@ -1,6 +1,5 @@
-package net.sparktank.morrigan.model.media;
+package net.sparktank.morrigan.helpers;
 
-import net.sparktank.morrigan.helpers.ErrorHelper;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDbUpdateTask;
 import net.sparktank.morrigan.model.media.impl.RemoteMixedMediaDb;

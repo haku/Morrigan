@@ -14,8 +14,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.sparktank.morrigan.helpers.ErrorHelper;
+import net.sparktank.morrigan.helpers.HeadlessHelper;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
-import net.sparktank.morrigan.model.media.HeadlessHelper;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDbHelper;
 import net.sparktank.morrigan.model.tracks.playlist.MediaPlaylist;
