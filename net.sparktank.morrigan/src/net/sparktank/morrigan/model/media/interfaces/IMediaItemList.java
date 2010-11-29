@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.Date;
 import java.util.List;
 
-import net.sparktank.morrigan.exceptions.MorriganException;
+import net.sparktank.morrigan.model.exceptions.MorriganException;
 
 public interface IMediaItemList<T extends IMediaItem> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

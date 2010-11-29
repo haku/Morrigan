@@ -6,12 +6,12 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import net.sparktank.morrigan.config.Config;
-import net.sparktank.morrigan.exceptions.MorriganException;
 import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.actions.SaveEditorAction;
 import net.sparktank.morrigan.gui.adaptors.ActionListener;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.helpers.TimeHelper;
+import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.impl.DurationData;
 import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
 import net.sparktank.morrigan.model.tracks.MediaTrack;

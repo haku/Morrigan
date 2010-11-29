@@ -1,7 +1,7 @@
 package net.sparktank.morrigan.server;
 
 import net.sparktank.morrigan.config.Config;
-import net.sparktank.morrigan.exceptions.MorriganException;
+import net.sparktank.morrigan.model.exceptions.MorriganException;
 
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;

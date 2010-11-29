@@ -1,6 +1,6 @@
 package net.sparktank.morrigan.gui.editors;
 
-import net.sparktank.morrigan.helpers.EqualHelper;
+import net.sparktank.morrigan.model.helper.EqualHelper;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItemList;
 

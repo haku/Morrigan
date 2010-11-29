@@ -3,8 +3,8 @@ package net.sparktank.morrigan.model.media.impl;
 import java.io.File;
 import java.util.Date;
 
-import net.sparktank.morrigan.helpers.EqualHelper;
 import net.sparktank.morrigan.model.db.interfaces.IDbItem;
+import net.sparktank.morrigan.model.helper.EqualHelper;
 import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
 
 /**

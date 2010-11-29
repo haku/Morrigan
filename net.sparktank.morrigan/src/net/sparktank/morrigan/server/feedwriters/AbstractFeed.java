@@ -3,7 +3,7 @@ package net.sparktank.morrigan.server.feedwriters;
 import java.io.File;
 import java.io.PrintWriter;
 
-import net.sparktank.morrigan.exceptions.MorriganException;
+import net.sparktank.morrigan.model.exceptions.MorriganException;
 
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;

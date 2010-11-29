@@ -9,7 +9,7 @@ import net.sparktank.morrigan.config.Config;
 import net.sparktank.morrigan.engines.common.ImplException;
 import net.sparktank.morrigan.engines.hotkey.IHotkeyEngine;
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine;
-import net.sparktank.morrigan.exceptions.MorriganException;
+import net.sparktank.morrigan.model.exceptions.MorriganException;
 
 public class EngineFactory {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

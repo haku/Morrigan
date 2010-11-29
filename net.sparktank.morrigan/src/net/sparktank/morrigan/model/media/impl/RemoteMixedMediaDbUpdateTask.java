@@ -1,6 +1,6 @@
 package net.sparktank.morrigan.model.media.impl;
 
-import net.sparktank.morrigan.helpers.RecyclingFactory;
+import net.sparktank.morrigan.model.factory.RecyclingFactory;
 import net.sparktank.morrigan.model.tasks.IMorriganTask;
 import net.sparktank.morrigan.model.tasks.TaskEventListener;
 import net.sparktank.morrigan.model.tasks.TaskResult;

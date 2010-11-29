@@ -1,6 +1,6 @@
 package net.sparktank.morrigan.model.media.interfaces;
 
-import net.sparktank.morrigan.exceptions.MorriganException;
+import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem.MediaType;
 
 public interface IAbstractMixedMediaDb<H extends IAbstractMixedMediaDb<H>>

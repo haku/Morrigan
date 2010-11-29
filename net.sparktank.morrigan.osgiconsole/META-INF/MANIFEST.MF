@@ -7,12 +7,15 @@ Bundle-Activator: net.sparktank.morrigan.osgiconsole.Activator
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: net.sparktank.morrigan.engines.playback,
- net.sparktank.morrigan.exceptions,
  net.sparktank.morrigan.helpers,
+ net.sparktank.morrigan.model.exceptions,
  net.sparktank.morrigan.model.explorer,
+ net.sparktank.morrigan.model.factory,
+ net.sparktank.morrigan.model.helper,
  net.sparktank.morrigan.model.media,
  net.sparktank.morrigan.model.media.impl,
  net.sparktank.morrigan.model.media.interfaces,
+ net.sparktank.morrigan.model.tasks,
  net.sparktank.morrigan.model.tracks.playlist,
  net.sparktank.morrigan.player,
  org.eclipse.osgi.framework.console;version="1.1.0",
