@@ -17,8 +17,8 @@ import net.sparktank.morrigan.helpers.GeneratedString;
 import net.sparktank.morrigan.model.db.IDbColumn;
 import net.sparktank.morrigan.model.db.IDbItem;
 import net.sparktank.morrigan.model.db.basicimpl.DbColumn;
-import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
-import net.sparktank.morrigan.model.media.interfaces.IMediaItemStorageLayer;
+import net.sparktank.morrigan.model.media.IMediaItem;
+import net.sparktank.morrigan.model.media.IMediaItemStorageLayer;
 import net.sparktank.sqlitewrapper.DbException;
 
 /**

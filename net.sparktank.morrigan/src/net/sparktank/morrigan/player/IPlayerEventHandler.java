@@ -1,7 +1,7 @@
 package net.sparktank.morrigan.player;
 
-import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
-import net.sparktank.morrigan.model.media.interfaces.IMediaTrackList;
+import net.sparktank.morrigan.model.media.IMediaTrack;
+import net.sparktank.morrigan.model.media.IMediaTrackList;
 
 import org.eclipse.swt.widgets.Composite;
 

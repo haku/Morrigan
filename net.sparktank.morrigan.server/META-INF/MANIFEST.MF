@@ -5,7 +5,11 @@ Bundle-SymbolicName: net.sparktank.morrigan.server;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: net.sparktank.morrigan.server.Activator
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: net.sparktank.morrigan.model.exceptions,
+Import-Package: net.sparktank.morrigan.engines.playback,
+ net.sparktank.morrigan.helpers,
+ net.sparktank.morrigan.model.exceptions,
+ net.sparktank.morrigan.model.media,
+ net.sparktank.morrigan.player,
+ net.sparktank.morrigan.server,
  org.eclipse.swt.widgets,
  org.osgi.framework;version="1.3.0"
-Require-Bundle: net.sparktank.morrigan;bundle-version="1.0.0"

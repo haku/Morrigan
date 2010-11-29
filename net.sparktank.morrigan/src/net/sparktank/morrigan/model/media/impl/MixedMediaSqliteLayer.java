@@ -7,9 +7,9 @@ import java.util.List;
 import net.sparktank.morrigan.model.db.IDbColumn;
 import net.sparktank.morrigan.model.db.IDbItem;
 import net.sparktank.morrigan.model.factory.RecyclingFactory;
-import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem;
-import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem.MediaType;
-import net.sparktank.morrigan.model.media.interfaces.IMixedMediaStorageLayer;
+import net.sparktank.morrigan.model.media.IMixedMediaItem;
+import net.sparktank.morrigan.model.media.IMixedMediaItem.MediaType;
+import net.sparktank.morrigan.model.media.IMixedMediaStorageLayer;
 import net.sparktank.sqlitewrapper.DbException;
 
 public class MixedMediaSqliteLayer extends MixedMediaSqliteLayerImpl implements IMixedMediaStorageLayer<IMixedMediaItem> {

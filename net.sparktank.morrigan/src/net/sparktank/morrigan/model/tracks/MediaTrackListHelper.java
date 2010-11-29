@@ -3,10 +3,10 @@ package net.sparktank.morrigan.model.tracks;
 import java.util.Date;
 import java.util.List;
 
-import net.sparktank.morrigan.model.media.impl.DurationData;
-import net.sparktank.morrigan.model.media.interfaces.IMediaItemList;
-import net.sparktank.morrigan.model.media.interfaces.IMediaItemList.DirtyState;
-import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
+import net.sparktank.morrigan.model.media.IMediaItemList;
+import net.sparktank.morrigan.model.media.IMediaItemList.DirtyState;
+import net.sparktank.morrigan.model.media.IMediaTrack;
+import net.sparktank.morrigan.model.media.impl.DurationDataImpl;
 
 public class MediaTrackListHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -44,7 +44,7 @@ public class MediaTrackListHelper {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	static public DurationData getTotalDuration (List<? extends IMediaTrack> mediaTracks) {
+	static public net.sparktank.morrigan.model.media.DurationData getTotalDuration (List<? extends IMediaTrack> mediaTracks) {
 		boolean complete = true;
 		long duration = 0;
 		
@@ -55,7 +55,7 @@ public class MediaTrackListHelper {
 				complete = false;
 			}
 		}
-		return new DurationData(duration, complete);
+		return new DurationDataImpl(duration, complete);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

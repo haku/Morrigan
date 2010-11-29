@@ -4,10 +4,10 @@ import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.editors.MediaItemListEditor;
 import net.sparktank.morrigan.gui.editors.mmdb.LocalMixedMediaDbEditor;
 import net.sparktank.morrigan.gui.jobs.TaskJob;
+import net.sparktank.morrigan.model.media.IMediaItem;
+import net.sparktank.morrigan.model.media.IMediaItemList;
 import net.sparktank.morrigan.model.media.impl.CopyToLocalMmdbTask;
 import net.sparktank.morrigan.model.media.impl.LocalMixedMediaDb;
-import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
-import net.sparktank.morrigan.model.media.interfaces.IMediaItemList;
 import net.sparktank.morrigan.model.tasks.IMorriganTask;
 
 import org.eclipse.jface.action.Action;

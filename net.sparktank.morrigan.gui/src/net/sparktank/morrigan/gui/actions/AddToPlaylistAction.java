@@ -3,7 +3,7 @@ package net.sparktank.morrigan.gui.actions;
 import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.editors.MediaItemListEditor;
 import net.sparktank.morrigan.gui.editors.tracks.PlaylistEditor;
-import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
+import net.sparktank.morrigan.model.media.IMediaItem;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.IEditorReference;

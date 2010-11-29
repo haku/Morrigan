@@ -4,9 +4,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
-import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
-import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
-import net.sparktank.morrigan.model.media.interfaces.IMediaTrackList;
+import net.sparktank.morrigan.model.media.IMediaItem;
+import net.sparktank.morrigan.model.media.IMediaTrack;
+import net.sparktank.morrigan.model.media.IMediaTrackList;
 
 public class OrderHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

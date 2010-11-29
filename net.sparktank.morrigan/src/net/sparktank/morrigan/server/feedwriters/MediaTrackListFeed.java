@@ -4,9 +4,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 import net.sparktank.morrigan.model.exceptions.MorriganException;
-import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
-import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
-import net.sparktank.morrigan.model.media.interfaces.IMediaTrackList;
+import net.sparktank.morrigan.model.media.IMediaItem;
+import net.sparktank.morrigan.model.media.IMediaTrack;
+import net.sparktank.morrigan.model.media.IMediaTrackList;
 
 import org.xml.sax.SAXException;
 

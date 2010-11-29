@@ -14,10 +14,11 @@ import net.sparktank.morrigan.gui.helpers.ImageCache;
 import net.sparktank.morrigan.gui.helpers.RefreshTimer;
 import net.sparktank.morrigan.helpers.TrackTagHelper;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
-import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
-import net.sparktank.morrigan.model.media.interfaces.IMediaItemDb;
+import net.sparktank.morrigan.model.media.IMediaItem;
+import net.sparktank.morrigan.model.media.IMediaItemDb;
+import net.sparktank.morrigan.model.media.MediaTag;
+import net.sparktank.morrigan.model.media.MediaTagClassification;
 import net.sparktank.morrigan.model.tags.MediaTagImpl;
-import net.sparktank.morrigan.model.tags.MediaTagClassificationImpl;
 import net.sparktank.morrigan.model.tags.MediaTagTypeImpl;
 import net.sparktank.morrigan.model.tracks.MediaTrack;
 
@@ -204,7 +205,7 @@ public class ViewTagEditor extends ViewPart {
 			if (ViewTagEditor.this.editedItemDb != null && ViewTagEditor.this.editedItem != null) {
 				try {
 					if (ViewTagEditor.this.editedItemDb.hasTags(ViewTagEditor.this.editedItem)) {
-    					List<MediaTagImpl> tags = ViewTagEditor.this.editedItemDb.getTags(ViewTagEditor.this.editedItem);
+    					List<MediaTag> tags = ViewTagEditor.this.editedItemDb.getTags(ViewTagEditor.this.editedItem);
     					return tags.toArray();
 					}
 				}
@@ -385,7 +386,7 @@ public class ViewTagEditor extends ViewPart {
 			String text = this.txtNewTag.getText();
 			if (text.length() > 0) {
 				try {
-					this.editedItemDb.addTag(this.editedItem, text, MediaTagTypeImpl.MANUAL, (MediaTagClassificationImpl)null);
+					this.editedItemDb.addTag(this.editedItem, text, MediaTagTypeImpl.MANUAL, (MediaTagClassification)null);
 					this.tableViewer.refresh();
 					this.txtNewTag.setSelection(0, text.length());
 					this.txtNewTag.setFocus();

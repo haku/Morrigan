@@ -5,9 +5,9 @@ import java.util.List;
 
 import net.sparktank.morrigan.gui.dialogs.RunnableDialog;
 import net.sparktank.morrigan.gui.views.ViewTagEditor;
-import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
-import net.sparktank.morrigan.model.media.interfaces.IMediaItemDb;
-import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem;
+import net.sparktank.morrigan.model.media.IMediaItem;
+import net.sparktank.morrigan.model.media.IMediaItemDb;
+import net.sparktank.morrigan.model.media.IMixedMediaItem;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.widgets.Display;

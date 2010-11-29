@@ -17,12 +17,12 @@ import net.sparktank.morrigan.engines.playback.NotImplementedException;
 import net.sparktank.morrigan.model.db.IDbItem;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.factory.RecyclingFactory;
-import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
-import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem;
-import net.sparktank.morrigan.model.media.interfaces.IMixedMediaStorageLayer;
-import net.sparktank.morrigan.model.tags.MediaTagImpl;
-import net.sparktank.morrigan.model.tags.MediaTagClassificationImpl;
-import net.sparktank.morrigan.model.tags.MediaTagTypeImpl;
+import net.sparktank.morrigan.model.media.IMediaTrack;
+import net.sparktank.morrigan.model.media.IMixedMediaItem;
+import net.sparktank.morrigan.model.media.IMixedMediaStorageLayer;
+import net.sparktank.morrigan.model.media.MediaTag;
+import net.sparktank.morrigan.model.media.MediaTagClassification;
+import net.sparktank.morrigan.model.media.MediaTagType;
 import net.sparktank.morrigan.model.tasks.TaskEventListener;
 import net.sparktank.morrigan.server.HttpClient;
 import net.sparktank.morrigan.server.HttpClient.IHttpStreamHandler;
@@ -375,12 +375,12 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb<RemoteMixedMediaDb>
 	}
 	
 	@Override
-	public List<MediaTagImpl> getTags (IDbItem item) throws MorriganException {
+	public List<MediaTag> getTags (IDbItem item) throws MorriganException {
 		throw new NotImplementedException();
 	}
 	
 	@Override
-	public void addTag (IDbItem item, String tag, MediaTagTypeImpl type, MediaTagClassificationImpl mtc) throws MorriganException {
+	public void addTag (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) throws MorriganException {
 		throw new NotImplementedException();
 	}
 	
@@ -390,7 +390,7 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb<RemoteMixedMediaDb>
 	}
 	
 	@Override
-	public void removeTag (MediaTagImpl mt) throws MorriganException {
+	public void removeTag (MediaTag mt) throws MorriganException {
 		throw new NotImplementedException();
 	}
 	

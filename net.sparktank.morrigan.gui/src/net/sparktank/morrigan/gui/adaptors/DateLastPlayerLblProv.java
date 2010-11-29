@@ -2,7 +2,7 @@ package net.sparktank.morrigan.gui.adaptors;
 
 import java.text.SimpleDateFormat;
 
-import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
+import net.sparktank.morrigan.model.media.IMediaTrack;
 
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 

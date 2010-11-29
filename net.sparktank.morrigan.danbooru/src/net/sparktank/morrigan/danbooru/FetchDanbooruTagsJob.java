@@ -13,10 +13,10 @@ import net.sparktank.morrigan.gui.dialogs.RunnableDialog;
 import net.sparktank.morrigan.gui.views.ViewTagEditor;
 import net.sparktank.morrigan.helpers.ChecksumHelper;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
-import net.sparktank.morrigan.model.media.interfaces.IMediaItemDb;
-import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem;
-import net.sparktank.morrigan.model.tags.MediaTagImpl;
-import net.sparktank.morrigan.model.tags.MediaTagClassificationImpl;
+import net.sparktank.morrigan.model.media.IMediaItemDb;
+import net.sparktank.morrigan.model.media.IMixedMediaItem;
+import net.sparktank.morrigan.model.media.MediaTag;
+import net.sparktank.morrigan.model.media.MediaTagClassification;
 import net.sparktank.morrigan.model.tags.MediaTagTypeImpl;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -58,14 +58,14 @@ class FetchDanbooruTagsJob extends Job {
 			long nTags = 0;
 			long nAlreadyFresh = 0;
 			
-			MediaTagClassificationImpl dateTagCls = this.editedItemDb.getTagClassification(DATE_TAG_CATEGORY);
+			MediaTagClassification dateTagCls = this.editedItemDb.getTagClassification(DATE_TAG_CATEGORY);
 			if (dateTagCls == null) {
 				this.editedItemDb.addTagClassification(DATE_TAG_CATEGORY);
 				dateTagCls = this.editedItemDb.getTagClassification(DATE_TAG_CATEGORY);
 				if (dateTagCls == null) throw new MorriganException("Failed to add tag category '"+DATE_TAG_CATEGORY+"'.");
 			}
 			
-			MediaTagClassificationImpl tagCls = this.editedItemDb.getTagClassification(TAG_CATEGORY);
+			MediaTagClassification tagCls = this.editedItemDb.getTagClassification(TAG_CATEGORY);
 			if (tagCls == null) {
 				this.editedItemDb.addTagClassification(TAG_CATEGORY);
 				tagCls = this.editedItemDb.getTagClassification(TAG_CATEGORY);
@@ -80,7 +80,7 @@ class FetchDanbooruTagsJob extends Job {
 			List<IMixedMediaItem> itemsToWork = new LinkedList<IMixedMediaItem>();
 			for (IMixedMediaItem item : this.editedItems) {
 				if (item.isPicture()) {
-					MediaTagImpl markerTag = getMarkerTag(this.editedItemDb, item, dateTagCls);
+					MediaTag markerTag = getMarkerTag(this.editedItemDb, item, dateTagCls);
 					Date markerDate = null;
 					if (markerTag != null) markerDate = tagDateFormat.parse(markerTag.getTag());
 					if (markerDate == null || now.getTime() - markerDate.getTime() > MIN_TIME_BETWEEN_SCANS_MILISECONDS) {
@@ -145,7 +145,7 @@ class FetchDanbooruTagsJob extends Job {
 							if (added) nUpdated++;
 						}
 						
-						MediaTagImpl markerTag = getMarkerTag(transClone, item, dateTagCls);
+						MediaTag markerTag = getMarkerTag(transClone, item, dateTagCls);
 						updateMarkerTag(transClone, item, dateTagCls, markerTag, nowString);
 						nScanned++;
 						
@@ -179,15 +179,15 @@ class FetchDanbooruTagsJob extends Job {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	static public MediaTagImpl getMarkerTag (IMediaItemDb<?, ?, ?> itemDb, IMixedMediaItem item, MediaTagClassificationImpl cls) throws MorriganException {
+	static public MediaTag getMarkerTag (IMediaItemDb<?, ?, ?> itemDb, IMixedMediaItem item, MediaTagClassification cls) throws MorriganException {
 		if (itemDb == null) throw new IllegalArgumentException("itemDb == null.");
 		if (item == null) throw new IllegalArgumentException("item == null.");
 		if (cls == null) throw new IllegalArgumentException("cls == null.");
 		
-		List<MediaTagImpl> tags = itemDb.getTags(item);
+		List<MediaTag> tags = itemDb.getTags(item);
 		
-		MediaTagImpl markerTag = null;
-		for (MediaTagImpl tag : tags) {
+		MediaTag markerTag = null;
+		for (MediaTag tag : tags) {
 			if (tag.getClassification() != null && tag.getClassification().equals(cls)) {
 				if (markerTag == null) {
 					markerTag = tag;
@@ -201,7 +201,7 @@ class FetchDanbooruTagsJob extends Job {
 		return markerTag;
 	}
 	
-	static public void updateMarkerTag (IMediaItemDb<?, ?, ?> itemDb, IMixedMediaItem item, MediaTagClassificationImpl cls, MediaTagImpl markerTag, String newString) throws MorriganException {
+	static public void updateMarkerTag (IMediaItemDb<?, ?, ?> itemDb, IMixedMediaItem item, MediaTagClassification cls, MediaTag markerTag, String newString) throws MorriganException {
 		if (itemDb == null) throw new IllegalArgumentException("itemDb == null.");
 		if (item == null) throw new IllegalArgumentException("item == null.");
 		if (cls == null) throw new IllegalArgumentException("cls == null.");

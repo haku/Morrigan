@@ -15,8 +15,8 @@ import javax.xml.parsers.SAXParserFactory;
 
 import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.impl.RemoteMixedMediaDb;
-import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem;
-import net.sparktank.morrigan.model.media.interfaces.IMixedMediaItem.MediaType;
+import net.sparktank.morrigan.model.media.IMixedMediaItem;
+import net.sparktank.morrigan.model.media.IMixedMediaItem.MediaType;
 import net.sparktank.morrigan.model.tasks.TaskEventListener;
 import net.sparktank.morrigan.server.HttpClient;
 import net.sparktank.morrigan.server.HttpClient.HttpResponse;

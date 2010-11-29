@@ -5,7 +5,7 @@ import java.util.Date;
 
 import net.sparktank.morrigan.model.db.IDbItem;
 import net.sparktank.morrigan.model.helper.EqualHelper;
-import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
+import net.sparktank.morrigan.model.media.IMediaItem;
 
 /**
  * Generic media item, be it music, video, image, etc...

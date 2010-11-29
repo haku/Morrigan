@@ -14,9 +14,9 @@ import java.util.Stack;
 
 import net.sparktank.morrigan.helpers.ChecksumHelper;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
-import net.sparktank.morrigan.model.media.interfaces.IMediaItem;
-import net.sparktank.morrigan.model.media.interfaces.IMediaItemDb;
-import net.sparktank.morrigan.model.media.interfaces.IMediaItemStorageLayer;
+import net.sparktank.morrigan.model.media.IMediaItem;
+import net.sparktank.morrigan.model.media.IMediaItemDb;
+import net.sparktank.morrigan.model.media.IMediaItemStorageLayer;
 import net.sparktank.morrigan.model.tasks.IMorriganTask;
 import net.sparktank.morrigan.model.tasks.TaskEventListener;
 import net.sparktank.morrigan.model.tasks.TaskResult;

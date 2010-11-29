@@ -1,6 +1,6 @@
 package net.sparktank.morrigan.gui.adaptors;
 
-import net.sparktank.morrigan.model.media.interfaces.IMediaPicture;
+import net.sparktank.morrigan.model.media.IMediaPicture;
 
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 

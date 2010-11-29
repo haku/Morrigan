@@ -5,9 +5,9 @@ import java.util.List;
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
-import net.sparktank.morrigan.model.media.impl.DurationData;
-import net.sparktank.morrigan.model.media.interfaces.IMediaTrack;
-import net.sparktank.morrigan.model.media.interfaces.IMediaTrackList;
+import net.sparktank.morrigan.model.media.DurationData;
+import net.sparktank.morrigan.model.media.IMediaTrack;
+import net.sparktank.morrigan.model.media.IMediaTrackList;
 import net.sparktank.morrigan.player.OrderHelper.PlaybackOrder;
 
 public class PlayerRemote implements IPlayerRemote {

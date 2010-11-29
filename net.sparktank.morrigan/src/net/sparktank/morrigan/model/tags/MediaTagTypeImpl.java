@@ -1,6 +1,8 @@
 package net.sparktank.morrigan.model.tags;
 
-public enum MediaTagTypeImpl {
+import net.sparktank.morrigan.model.media.MediaTagType;
+
+public enum MediaTagTypeImpl implements MediaTagType {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	MANUAL(0),
@@ -26,10 +28,12 @@ public enum MediaTagTypeImpl {
 		this.index = index;
 	}
 	
+	@Override
 	public int getIndex () {
 		return this.index;
 	}
 	
+	@Override
 	public String getShortName () {
 		return this.shortNames[this.index];
 	}

@@ -8,7 +8,7 @@ import net.sparktank.morrigan.gui.adaptors.PlayItemLblProv;
 import net.sparktank.morrigan.gui.helpers.ImageCache;
 import net.sparktank.morrigan.gui.helpers.RefreshTimer;
 import net.sparktank.morrigan.helpers.TimeHelper;
-import net.sparktank.morrigan.model.media.impl.DurationData;
+import net.sparktank.morrigan.model.media.DurationData;
 import net.sparktank.morrigan.player.PlayItem;
 
 import org.eclipse.jface.action.Action;

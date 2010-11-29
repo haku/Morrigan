@@ -1,6 +1,8 @@
 package net.sparktank.morrigan.model.media.impl;
 
-public class DurationData {
+import net.sparktank.morrigan.model.media.DurationData;
+
+public class DurationDataImpl implements DurationData {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private final long duration;
@@ -8,17 +10,19 @@ public class DurationData {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public DurationData (long duration, boolean complete) {
+	public DurationDataImpl (long duration, boolean complete) {
 		this.duration = duration;
 		this.complete = complete;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	@Override
 	public long getDuration() {
 		return this.duration;
 	}
 	
+	@Override
 	public boolean isComplete() {
 		return this.complete;
 	}
