@@ -68,7 +68,7 @@ public class CalendarCell {
 				}
 			}
 			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {}
+			public void widgetDefaultSelected(SelectionEvent e) { /* UNUSED */ }
 		});
 	}
 	
