@@ -20,7 +20,7 @@ import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.IMediaItemDb;
 import net.sparktank.morrigan.model.media.IMediaPicture;
-import net.sparktank.morrigan.model.media.internal.LocalMixedMediaDb;
+import net.sparktank.morrigan.model.media.impl.MediaFactoryImpl;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -94,7 +94,7 @@ public class ViewPicture extends ViewPart {
 		
 		memento.putBoolean(KEY_TIMER, isTimerEnabled());
 		
-		if (this.editedItemDb != null && this.editedItemDb.getType().equals(LocalMixedMediaDb.TYPE)) {
+		if (this.editedItemDb != null && this.editedItemDb.getType().equals(ILocalMixedMediaDb.TYPE)) {
 			memento.putString(KEY_DB, this.editedItemDb.getDbPath());
 			memento.putString(KEY_ITEM, this.editedItem.getFilepath());
 		}
@@ -111,7 +111,7 @@ public class ViewPicture extends ViewPart {
 				
 				if (dbpath != null && itempath != null) {
 	    			ILocalMixedMediaDb mmdb;
-	    			mmdb = LocalMixedMediaDb.LOCAL_MMDB_FACTORY.manufacture(dbpath);
+	    			mmdb = MediaFactoryImpl.get().getLocalMixedMediaDb(dbpath);
 	    			mmdb.read();
 	    			IMediaPicture item = mmdb.findItemByFilePath(itempath);
 	    			
@@ -295,11 +295,16 @@ public class ViewPicture extends ViewPart {
 		
 		@Override
 		protected IStatus run(IProgressMonitor monitor) {
-			if (this.item != null && this.item.isEnabled()) {
-				if (ViewPicture.this.pictureImage != null) throw new IllegalArgumentException();
-				String filepath = this.item.getFilepath();
-				ViewPicture.this.pictureImage = new Image(this.display, filepath);
-				new UpdatePictureJob(this.display).schedule();
+			if (this.item != null ) {
+				if (this.item.isEnabled()) {
+					if (ViewPicture.this.pictureImage != null) throw new IllegalArgumentException();
+					String filepath = this.item.getFilepath();
+					ViewPicture.this.pictureImage = new Image(this.display, filepath);
+					new UpdatePictureJob(this.display).schedule();
+				}
+				else {
+					// TODO show disabled msg...
+				}
 			}
 			return Status.OK_STATUS;
 		}
@@ -454,7 +459,7 @@ public class ViewPicture extends ViewPart {
 	
 	protected void revealItemInList () throws PartInitException, MorriganException {
 		if (this.editedItemDb != null && this.editedItem != null) {
-			if (this.editedItemDb.getType().equals(LocalMixedMediaDb.TYPE)) {
+			if (this.editedItemDb.getType().equals(ILocalMixedMediaDb.TYPE)) {
 				this.listenToSelectionListener = false;
 				try {
     				MediaItemDbEditorInput input = EditorFactory.getMmdbInput(this.editedItemDb.getListId());

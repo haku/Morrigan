@@ -18,6 +18,7 @@ Import-Package: net.sparktank.morrigan.config,
  net.sparktank.morrigan.util,
  net.sparktank.morrigan.util.httpclient,
  net.sparktank.sqlitewrapper
-Export-Package: net.sparktank.morrigan.model.media.internal
+Export-Package: net.sparktank.morrigan.model.media.impl,
+ net.sparktank.morrigan.model.media.internal;x-friends:="net.sparktank.morrigan.server"
 Bundle-ClassPath: lib/jaudiotagger-2.0.2.jar,
  .

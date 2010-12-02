@@ -12,9 +12,9 @@ import net.sparktank.morrigan.gui.adaptors.ActionListener;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.DurationData;
+import net.sparktank.morrigan.model.media.IMediaPlaylist;
 import net.sparktank.morrigan.model.media.IMediaTrack;
-import net.sparktank.morrigan.model.media.internal.MediaPlaylist;
-import net.sparktank.morrigan.model.media.internal.MediaTrack;
+import net.sparktank.morrigan.model.media.impl.MediaFactoryImpl;
 import net.sparktank.morrigan.util.TimeHelper;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -36,7 +36,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 
-public class PlaylistEditor extends MediaTrackListEditor<MediaPlaylist,IMediaTrack> {
+public class PlaylistEditor extends MediaTrackListEditor<IMediaPlaylist,IMediaTrack> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static final String ID = "net.sparktank.morrigan.gui.editors.PlaylistEditor";
@@ -66,7 +66,7 @@ public class PlaylistEditor extends MediaTrackListEditor<MediaPlaylist,IMediaTra
 	
 	@Override
 	protected IMediaTrack getNewS(String filePath) {
-		return new MediaTrack(filePath);
+		return MediaFactoryImpl.get().getNewMediaTrack(filePath);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

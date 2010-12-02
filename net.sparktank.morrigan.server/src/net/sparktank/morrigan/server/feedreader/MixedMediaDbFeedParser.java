@@ -16,9 +16,9 @@ import javax.xml.parsers.SAXParserFactory;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.IMixedMediaItem.MediaType;
+import net.sparktank.morrigan.model.media.IRemoteMixedMediaDb;
 import net.sparktank.morrigan.model.tasks.TaskEventListener;
 import net.sparktank.morrigan.server.feedwriters.XmlHelper;
-import net.sparktank.morrigan.server.model.RemoteMixedMediaDb;
 import net.sparktank.morrigan.util.httpclient.HttpClient;
 import net.sparktank.morrigan.util.httpclient.HttpClient.HttpResponse;
 import net.sparktank.morrigan.util.httpclient.HttpStreamHandler;
@@ -36,7 +36,7 @@ public class MixedMediaDbFeedParser extends DefaultHandler {
 	 * TODO report progress to taskEventListener.
 	 * TODO support event cancellation.
 	 */
-	public static void parseFeed (final RemoteMixedMediaDb mmdb, final TaskEventListener taskEventListener) throws MorriganException {
+	public static void parseFeed (final IRemoteMixedMediaDb mmdb, final TaskEventListener taskEventListener) throws MorriganException {
 //		if (taskEventListener!=null) taskEventListener.onStart(); // TODO do this?
 		if (taskEventListener!=null) taskEventListener.beginTask("Reading feed...", 100);
 		
@@ -44,7 +44,7 @@ public class MixedMediaDbFeedParser extends DefaultHandler {
 			@Override
 			public void handleStream(InputStream is) throws IOException, HttpStreamHandlerException {
 				boolean thereWereErrors = true;
-				RemoteMixedMediaDb transClone = null;
+				IRemoteMixedMediaDb transClone = null;
 				try {
 					transClone = mmdb.getTransactionalClone();
 					transClone.setDefaultMediaType(MediaType.UNKNOWN, false);
@@ -122,11 +122,11 @@ public class MixedMediaDbFeedParser extends DefaultHandler {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private final RemoteMixedMediaDb rmmdb;
+	private final IRemoteMixedMediaDb rmmdb;
 	private final TaskEventListener taskEventListener;
 	private final Stack<String> stack;
 	
-	public MixedMediaDbFeedParser(RemoteMixedMediaDb rmmdb, TaskEventListener taskEventListener) {
+	public MixedMediaDbFeedParser(IRemoteMixedMediaDb rmmdb, TaskEventListener taskEventListener) {
 		this.taskEventListener = taskEventListener;
 		this.stack = new Stack<String>();
 		this.rmmdb = rmmdb; 

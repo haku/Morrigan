@@ -17,7 +17,7 @@ import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
 import net.sparktank.morrigan.model.media.DurationData;
 import net.sparktank.morrigan.model.media.IMediaTrack;
 import net.sparktank.morrigan.model.media.IMediaTrackList;
-import net.sparktank.morrigan.model.media.internal.DurationDataImpl;
+import net.sparktank.morrigan.model.media.impl.MediaFactoryImpl;
 import net.sparktank.morrigan.player.OrderHelper.PlaybackOrder;
 
 import org.eclipse.swt.SWT;
@@ -300,7 +300,7 @@ public class Player implements IPlayerLocal {
 			}
 		}
 		
-		return new DurationDataImpl(duration, complete);
+		return MediaFactoryImpl.get().getNewDurationData(duration, complete);
 	}
 	
 	@Override

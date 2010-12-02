@@ -2,9 +2,9 @@ package net.sparktank.morrigan.gui.editors;
 
 import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
+import net.sparktank.morrigan.model.media.IMediaPlaylist;
 import net.sparktank.morrigan.model.media.IRemoteMixedMediaDb;
-import net.sparktank.morrigan.model.media.internal.LocalMixedMediaDb;
-import net.sparktank.morrigan.model.media.internal.MediaPlaylist;
+import net.sparktank.morrigan.model.media.impl.MediaFactoryImpl;
 import net.sparktank.morrigan.server.model.RemoteMixedMediaDb;
 import net.sparktank.sqlitewrapper.DbException;
 
@@ -35,13 +35,13 @@ public class EditorFactory implements IElementFactory {
 		String type = memento.getString(KEY_TYPE);
 		
 		try {
-			if (type.equals(LocalMixedMediaDb.TYPE)) {
+			if (type.equals(ILocalMixedMediaDb.TYPE)) {
 				input = getMmdbInput(memento);
 			}
-			else if (type.equals(RemoteMixedMediaDb.TYPE)) {
+			else if (type.equals(IRemoteMixedMediaDb.TYPE)) {
 				input = getRemoteMmdbInput(memento);
 			}
-			else if (type.equals(MediaPlaylist.TYPE)) {
+			else if (type.equals(IMediaPlaylist.TYPE)) {
 				String serial = memento.getString(KEY_SERIAL);
 				input = getMediaPlaylistInput(serial);
 			}
@@ -63,18 +63,18 @@ public class EditorFactory implements IElementFactory {
 		return input;
 	}
 	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	- - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - - - - - - -
 //	Playlists.
 	
-	public static MediaItemListEditorInput<MediaPlaylist> getMediaPlaylistInput (String filePath) throws MorriganException {
-		MediaPlaylist playList;
+	public static MediaItemListEditorInput<IMediaPlaylist> getMediaPlaylistInput (String filePath) throws MorriganException {
+		IMediaPlaylist playList;
 		try {
-			playList = MediaPlaylist.FACTORY.manufacture(filePath);
+			playList = MediaFactoryImpl.get().getPlaylist(filePath);
 		} catch (MorriganException e) {
 			throw new MorriganException(e);
 		}
 		
-		MediaItemListEditorInput<MediaPlaylist> input = new MediaItemListEditorInput<MediaPlaylist>(playList);
+		MediaItemListEditorInput<IMediaPlaylist> input = new MediaItemListEditorInput<IMediaPlaylist>(playList);
 		return input;
 	}
 	
@@ -85,7 +85,7 @@ public class EditorFactory implements IElementFactory {
 		ILocalMixedMediaDb l;
 		
 		try {
-			l = LocalMixedMediaDb.LOCAL_MMDB_FACTORY.manufacture(dbFilePath);
+			l = MediaFactoryImpl.get().getLocalMixedMediaDb(dbFilePath);
 		} catch (DbException e) {
 			throw new MorriganException(e);
 		}

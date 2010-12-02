@@ -3,12 +3,11 @@ package net.sparktank.morrigan.gui.actions;
 import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.jobs.TaskJob;
+import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.IMediaItemDb;
-import net.sparktank.morrigan.model.media.internal.LocalMixedMediaDb;
-import net.sparktank.morrigan.model.media.internal.LocalMixedMediaDbUpdateTask;
-import net.sparktank.morrigan.model.media.internal.RemoteMixedMediaDbUpdateTask;
+import net.sparktank.morrigan.model.media.IRemoteMixedMediaDb;
+import net.sparktank.morrigan.model.media.impl.MediaFactoryImpl;
 import net.sparktank.morrigan.model.tasks.IMorriganTask;
-import net.sparktank.morrigan.server.model.RemoteMixedMediaDb;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.widgets.Display;
@@ -65,13 +64,13 @@ public class DbUpdateAction extends Action implements IWorkbenchAction{
 		
 		IMorriganTask task;
 		
-		if (this.itemDb instanceof LocalMixedMediaDb) {
-			LocalMixedMediaDb lmmdb = (LocalMixedMediaDb) this.itemDb;
-			task = LocalMixedMediaDbUpdateTask.FACTORY.manufacture(lmmdb);
+		if (this.itemDb instanceof ILocalMixedMediaDb) {
+			ILocalMixedMediaDb lmmdb = (ILocalMixedMediaDb) this.itemDb;
+			task = MediaFactoryImpl.get().getLocalMixedMediaDbUpdateTask(lmmdb);
 		}
-		else if (this.itemDb instanceof RemoteMixedMediaDb) {
-			RemoteMixedMediaDb rmmdb = (RemoteMixedMediaDb) this.itemDb;
-			task = RemoteMixedMediaDbUpdateTask.FACTORY.manufacture(rmmdb);
+		else if (this.itemDb instanceof IRemoteMixedMediaDb) {
+			IRemoteMixedMediaDb rmmdb = (IRemoteMixedMediaDb) this.itemDb;
+			task = MediaFactoryImpl.get().getRemoteMixedMediaDbUpdateTask(rmmdb);
 		}
 		else {
 			throw new IllegalArgumentException("TODO: Update has not been implemented for this type of DB '"+this.itemDb.getType()+"'.");

@@ -1,10 +1,10 @@
 package net.sparktank.morrigan.server;
 
 import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
-import net.sparktank.morrigan.model.media.internal.LocalMixedMediaDbUpdateTask;
-import net.sparktank.morrigan.model.media.internal.RemoteMixedMediaDbUpdateTask;
+import net.sparktank.morrigan.model.media.IRemoteMixedMediaDb;
+import net.sparktank.morrigan.model.media.impl.MediaFactoryImpl;
+import net.sparktank.morrigan.model.tasks.IMorriganTask;
 import net.sparktank.morrigan.model.tasks.TaskEventListener;
-import net.sparktank.morrigan.server.model.RemoteMixedMediaDb;
 import net.sparktank.morrigan.util.ErrorHelper;
 
 // TODO move this class somewhere more appropriate ???
@@ -12,7 +12,7 @@ public class HeadlessHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	static public boolean scheduleMmdbScan (final ILocalMixedMediaDb mmdb) {
-		final LocalMixedMediaDbUpdateTask task = LocalMixedMediaDbUpdateTask.FACTORY.manufacture(mmdb);
+		final IMorriganTask task = MediaFactoryImpl.get().getLocalMixedMediaDbUpdateTask(mmdb);
 		if (task != null) {
 			Thread t = new Thread () {
 				@Override
@@ -30,8 +30,8 @@ public class HeadlessHelper {
 		return false;
 	}
 	
-	static public boolean scheduleRemoteMmdbScan (final RemoteMixedMediaDb mmdb) {
-		final RemoteMixedMediaDbUpdateTask task = RemoteMixedMediaDbUpdateTask.FACTORY.manufacture(mmdb);
+	static public boolean scheduleRemoteMmdbScan (final IRemoteMixedMediaDb mmdb) {
+		final IMorriganTask task = MediaFactoryImpl.get().getRemoteMixedMediaDbUpdateTask(mmdb);
 		if (task != null) {
 			Thread t = new Thread () {
 				@Override

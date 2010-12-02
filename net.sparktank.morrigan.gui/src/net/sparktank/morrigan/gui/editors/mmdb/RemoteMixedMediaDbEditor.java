@@ -8,7 +8,8 @@ import net.sparktank.morrigan.gui.jobs.TaskJob;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.IRemoteMixedMediaDb;
-import net.sparktank.morrigan.model.media.internal.RemoteMixedMediaDbUpdateTask;
+import net.sparktank.morrigan.model.media.impl.MediaFactoryImpl;
+import net.sparktank.morrigan.model.tasks.IMorriganTask;
 import net.sparktank.sqlitewrapper.DbException;
 
 import org.eclipse.jface.action.Action;
@@ -94,7 +95,7 @@ public class RemoteMixedMediaDbEditor
 		}
 		
 		if (getMediaList().isCacheExpired()) {
-			RemoteMixedMediaDbUpdateTask task = RemoteMixedMediaDbUpdateTask.FACTORY.manufacture(getMediaList());
+			IMorriganTask task = MediaFactoryImpl.get().getRemoteMixedMediaDbUpdateTask(getMediaList());
 			if (task != null) {
 				TaskJob job = new TaskJob(task, getSite().getShell().getDisplay());
 				job.schedule(3000);
@@ -112,7 +113,7 @@ public class RemoteMixedMediaDbEditor
 		@Override
 		public void widgetSelected(SelectionEvent event) {
 			try {
-				RemoteMixedMediaDbUpdateTask task = RemoteMixedMediaDbUpdateTask.FACTORY.manufacture(getMediaList());
+				IMorriganTask task = MediaFactoryImpl.get().getRemoteMixedMediaDbUpdateTask(getMediaList());
 				if (task != null) {
 					TaskJob job = new TaskJob(task, getSite().getShell().getDisplay());
 					job.schedule();

@@ -39,10 +39,6 @@ public class LocalMixedMediaDb extends AbstractMixedMediaDb<ILocalMixedMediaDb> 
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public static final String TYPE = "LOCALMMDB";
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
 	protected LocalMixedMediaDb (String libraryName, IMixedMediaStorageLayer<IMixedMediaItem> dbLayer, String searchTerm) {
 		super(libraryName, dbLayer, searchTerm);
 	}

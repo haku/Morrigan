@@ -11,8 +11,7 @@ import net.sparktank.morrigan.model.media.DurationData;
 import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.IMediaTrack;
 import net.sparktank.morrigan.model.media.IMediaTrackList;
-import net.sparktank.morrigan.model.media.internal.LocalMixedMediaDb;
-import net.sparktank.morrigan.model.media.internal.LocalMixedMediaDbHelper;
+import net.sparktank.morrigan.model.media.impl.MediaFactoryImpl;
 import net.sparktank.morrigan.player.IPlayerLocal;
 import net.sparktank.morrigan.player.OrderHelper.PlaybackOrder;
 import net.sparktank.morrigan.player.PlayItem;
@@ -144,8 +143,8 @@ public class MorriganCommandProvider implements CommandProvider {
 			else if (results.size() == 1) {
 				IMediaTrackList<? extends IMediaTrack> list = results.get(0).list;
 				ci.println("Query match: " + list);
-				if (results.get(0).list instanceof LocalMixedMediaDb) {
-					LocalMixedMediaDb mmdb = (LocalMixedMediaDb) list;
+				if (results.get(0).list instanceof ILocalMixedMediaDb) {
+					ILocalMixedMediaDb mmdb = (ILocalMixedMediaDb) list;
 					List<String> sources;
 					try {
 						sources = mmdb.getSources();
@@ -169,7 +168,7 @@ public class MorriganCommandProvider implements CommandProvider {
 	
 	static private void doMediaList (CommandInterpreter ci) {
 		List<MediaExplorerItem> items = new LinkedList<MediaExplorerItem>();
-		items.addAll(LocalMixedMediaDbHelper.getAllMmdb());
+		items.addAll(MediaFactoryImpl.get().getAllLocalMixedMediaDbs());
 		items.addAll(RemoteMixedMediaDbHelper.getAllRemoteMmdb());
 		for (MediaExplorerItem i : items) {
 			ci.println(i.type + " " + i.title);
@@ -180,7 +179,7 @@ public class MorriganCommandProvider implements CommandProvider {
 		if (args.size() >= 1) {
 			String name = args.get(0);
 			try {
-				ILocalMixedMediaDb mmdb = LocalMixedMediaDbHelper.createMmdb(name);
+				ILocalMixedMediaDb mmdb = MediaFactoryImpl.get().createLocalMixedMediaDb(name);
 				ci.println("Created MMDB '"+mmdb.getListName()+"'.");
 			}
 			catch (MorriganException e) {
@@ -221,8 +220,8 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 		else {
 			IMediaTrackList<? extends IMediaTrack> list = results.get(0).list;
-			if (list instanceof LocalMixedMediaDb) {
-				LocalMixedMediaDb mmdb = (LocalMixedMediaDb) list;
+			if (list instanceof ILocalMixedMediaDb) {
+				ILocalMixedMediaDb mmdb = (ILocalMixedMediaDb) list;
 				try {
 					mmdb.addSource(dir.getAbsolutePath());
 				} catch (MorriganException e) {
@@ -259,8 +258,8 @@ public class MorriganCommandProvider implements CommandProvider {
 			}
 			else {
 				IMediaTrackList<? extends IMediaTrack> list = results.get(0).list;
-				if (list instanceof LocalMixedMediaDb) {
-					HeadlessHelper.scheduleMmdbScan((LocalMixedMediaDb) list);
+				if (list instanceof ILocalMixedMediaDb) {
+					HeadlessHelper.scheduleMmdbScan((ILocalMixedMediaDb) list);
 				}
 				else if (list instanceof RemoteMixedMediaDb) {
 					HeadlessHelper.scheduleRemoteMmdbScan((RemoteMixedMediaDb) list);

@@ -27,7 +27,7 @@ public interface IMediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMediaIte
 	public void addSource (String source) throws MorriganException;
 	public void removeSource (String source) throws MorriganException;
 	
-	public List<T> simpleSearch (String term, String esc, int maxResults) throws DbException;
+	public List<T> simpleSearch (String term, int maxResults) throws DbException;
 	public List<T> getAllDbEntries () throws DbException;
 	
 	public T getNewT (String filePath);
@@ -56,6 +56,10 @@ public interface IMediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMediaIte
 	
 	public boolean isMarkedAsUnreadable (T mi) throws MorriganException;
 	public void markAsUnreadabled (T mi) throws MorriganException;
+	
+	public void beginBulkUpdate ();
+	public void completeBulkUpdate (boolean thereWereErrors) throws MorriganException, DbException;
+	public void updateItem (T item) throws MorriganException, DbException;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

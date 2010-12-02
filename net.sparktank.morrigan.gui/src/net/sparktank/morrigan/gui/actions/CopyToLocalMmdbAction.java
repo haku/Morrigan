@@ -7,7 +7,7 @@ import net.sparktank.morrigan.gui.jobs.TaskJob;
 import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.IMediaItem;
 import net.sparktank.morrigan.model.media.IMediaItemList;
-import net.sparktank.morrigan.model.media.internal.CopyToLocalMmdbTask;
+import net.sparktank.morrigan.model.media.impl.MediaFactoryImpl;
 import net.sparktank.morrigan.model.tasks.IMorriganTask;
 
 import org.eclipse.jface.action.Action;
@@ -42,7 +42,7 @@ public class CopyToLocalMmdbAction<T extends IMediaItem> extends Action {
 			LocalMixedMediaDbEditor toMmdbEd = (LocalMixedMediaDbEditor) toPart;
 			ILocalMixedMediaDb toMmdb = toMmdbEd.getMediaList();
 			
-			IMorriganTask task = new CopyToLocalMmdbTask<T>(fromList, this.fromEd.getSelectedItems(), toMmdb);
+			IMorriganTask task = MediaFactoryImpl.get().getNewCopyToLocalMmdbTask(fromList, this.fromEd.getSelectedItems(), toMmdb);
 			TaskJob job = new TaskJob(task, Display.getCurrent());
 			job.schedule();
 		}

@@ -12,9 +12,13 @@ public class MixedMediaItem extends MediaItem implements IMixedMediaItem {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors.
 	
+	public MixedMediaItem () {
+		super();
+	}
+	
 	public MixedMediaItem (MediaType type) {
+		super();
 		setMediaType(type);
-		
 	}
 	
 	public MixedMediaItem (String filePath) {

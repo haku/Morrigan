@@ -17,7 +17,8 @@ import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.IMediaItem;
 import net.sparktank.morrigan.model.media.IMediaItemList;
 import net.sparktank.morrigan.model.media.IMediaItemList.DirtyState;
-import net.sparktank.morrigan.model.media.internal.MediaFileCopyTask;
+import net.sparktank.morrigan.model.media.impl.MediaFactoryImpl;
+import net.sparktank.morrigan.model.tasks.IMorriganTask;
 
 import org.eclipse.core.commands.common.CommandException;
 import org.eclipse.jface.action.Action;
@@ -563,7 +564,7 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 			if (dir != null) {
 				MediaItemListEditor.this.lastFileCopyTargetDir = dir;
 				
-				MediaFileCopyTask<S> task = new MediaFileCopyTask<S>(getMediaList(), selectedTracks, new File(dir));
+				IMorriganTask task = MediaFactoryImpl.get().getMediaFileCopyTask(getMediaList(), selectedTracks, new File(dir));
 				TaskJob job = new TaskJob(task, getSite().getShell().getDisplay());
 				job.schedule();
 			}

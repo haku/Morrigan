@@ -273,8 +273,8 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 //	Queries.
 	
 	@Override
-	public List<T> simpleSearch (String term, String esc, int maxResults) throws DbException {
-		return this.dbLayer.simpleSearch(term, esc, maxResults);
+	public List<T> simpleSearch (String term, int maxResults) throws DbException {
+		return this.dbLayer.simpleSearch(term, MediaItemDb.SEARCH_ESC, maxResults);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -580,6 +580,7 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 	
 	private List<T> _changedItems = null;
 	
+	@Override
 	public void beginBulkUpdate () {
 		if (this._changedItems != null) throw new IllegalArgumentException("beginBulkUpdate() : Build update alredy in progress.");
 		this._changedItems = new ArrayList<T>();
@@ -594,6 +595,7 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 	 * @throws MorriganException
 	 * @throws DbException 
 	 */
+	@Override
 	public void completeBulkUpdate (boolean thereWereErrors) throws MorriganException, DbException {
 		try {
 			List<T> removed = replaceListWithoutSetDirty(this._changedItems);
@@ -611,6 +613,7 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 		}
 	}
 	
+	@Override
 	public void updateItem (T mi) throws MorriganException, DbException {
 		if (this._changedItems == null) {
 			throw new IllegalArgumentException("updateItem() can only be called after beginBulkUpdate() and before completeBulkUpdate().");

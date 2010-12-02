@@ -7,8 +7,8 @@ import net.sparktank.morrigan.gui.editors.MediaItemDbEditorInput;
 import net.sparktank.morrigan.gui.editors.mmdb.RemoteMixedMediaDbEditor;
 import net.sparktank.morrigan.gui.views.ViewMediaExplorer;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
+import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.IRemoteMixedMediaDb;
-import net.sparktank.morrigan.model.media.internal.LocalMixedMediaDb;
 import net.sparktank.morrigan.server.model.RemoteMixedMediaDbHelper;
 
 import org.eclipse.jface.action.Action;
@@ -51,7 +51,7 @@ public class NewRemoteMixedDbAction extends Action implements IWorkbenchAction {
 	public void run () {
 		InputDialog dlg = new InputDialog(
 				Display.getCurrent().getActiveShell(),
-				"", "Enter MMDB URL.", "http://localhost:8080/media/"+LocalMixedMediaDb.TYPE+"/mymmdb.local.db3", null);
+				"", "Enter MMDB URL.", "http://localhost:8080/media/"+ILocalMixedMediaDb.TYPE+"/mymmdb.local.db3", null);
 		if (dlg.open() == Window.OK) {
 			String url = dlg.getValue();
 			IRemoteMixedMediaDb createdRemoteMmdb;

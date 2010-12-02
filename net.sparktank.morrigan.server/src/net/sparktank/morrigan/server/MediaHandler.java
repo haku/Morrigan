@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
-import net.sparktank.morrigan.model.media.internal.LocalMixedMediaDb;
+import net.sparktank.morrigan.model.media.impl.MediaFactoryImpl;
 import net.sparktank.morrigan.model.media.internal.LocalMixedMediaDbHelper;
 import net.sparktank.morrigan.server.feedwriters.MediaExplorerFeed;
 import net.sparktank.morrigan.server.feedwriters.MediaItemDbSrcFeed;
@@ -54,7 +54,7 @@ public class MediaHandler extends AbstractHandler {
 				
 				if (split.length > 1) {
 					String id = split[1];
-					if (type.equals(LocalMixedMediaDb.TYPE)) {
+					if (type.equals(ILocalMixedMediaDb.TYPE)) {
 						handleMmdbRequest(response, out, paramMap, split, id);
 					}
 					else {
@@ -64,7 +64,7 @@ public class MediaHandler extends AbstractHandler {
 				else if (type.equals("newmmdb")) {
 					if (paramMap.containsKey("name")) {
 						String[] v = (String[]) paramMap.get("name");
-						LocalMixedMediaDbHelper.createMmdb(v[0]);
+						MediaFactoryImpl.get().createLocalMixedMediaDb(v[0]);
 					} else {
 						out.print("To create a MMDB, POST with param 'name' set.");
 					}
@@ -80,7 +80,7 @@ public class MediaHandler extends AbstractHandler {
 		throws DbException, SAXException, MorriganException, UnsupportedEncodingException, IOException {
 		
 		String f = LocalMixedMediaDbHelper.getFullPathToMmdb(id);
-		ILocalMixedMediaDb mmdb = LocalMixedMediaDb.LOCAL_MMDB_FACTORY.manufacture(f);
+		ILocalMixedMediaDb mmdb = MediaFactoryImpl.get().getLocalMixedMediaDb(f);
 		
 		if (split.length > 2) {
 			String param = split[2];

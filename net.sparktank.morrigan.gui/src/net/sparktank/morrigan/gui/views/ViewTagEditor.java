@@ -18,9 +18,7 @@ import net.sparktank.morrigan.model.media.IMediaItemDb;
 import net.sparktank.morrigan.model.media.IMediaTrack;
 import net.sparktank.morrigan.model.media.MediaTag;
 import net.sparktank.morrigan.model.media.MediaTagClassification;
-import net.sparktank.morrigan.model.media.internal.MediaTagImpl;
-import net.sparktank.morrigan.model.media.internal.MediaTagTypeImpl;
-import net.sparktank.morrigan.model.media.internal.TrackTagHelper;
+import net.sparktank.morrigan.model.media.impl.MediaFactoryImpl;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -386,7 +384,7 @@ public class ViewTagEditor extends ViewPart {
 			String text = this.txtNewTag.getText();
 			if (text.length() > 0) {
 				try {
-					this.editedItemDb.addTag(this.editedItem, text, MediaTagTypeImpl.MANUAL, (MediaTagClassification)null);
+					this.editedItemDb.addTag(this.editedItem, text, MediaFactoryImpl.get().getMediaTagTypeManual(), (MediaTagClassification)null);
 					this.tableViewer.refresh();
 					this.txtNewTag.setSelection(0, text.length());
 					this.txtNewTag.setFocus();
@@ -403,7 +401,7 @@ public class ViewTagEditor extends ViewPart {
 	}
 	
 	void procRemoveTag() {
-		List<MediaTagImpl> selMts = new LinkedList<MediaTagImpl>();
+		List<MediaTag> selMts = new LinkedList<MediaTag>();
 		
 		ISelection selection = this.tableViewer.getSelection();
 		if (selection instanceof IStructuredSelection) {
@@ -414,8 +412,8 @@ public class ViewTagEditor extends ViewPart {
 			}
 			
 			for (Object selObj : iSel.toList()) {
-				if (selObj instanceof MediaTagImpl) {
-					MediaTagImpl selMt = (MediaTagImpl) selObj;
+				if (selObj instanceof MediaTag) {
+					MediaTag selMt = (MediaTag) selObj;
 					selMts.add(selMt);
 				}
 			}
@@ -425,7 +423,7 @@ public class ViewTagEditor extends ViewPart {
 		dlg.open();
 		if (dlg.getReturnCode() == Window.OK) {
 			try {
-				for (MediaTagImpl mt : selMts) {
+				for (MediaTag mt : selMts) {
 					this.editedItemDb.removeTag(mt);
 				}
 			}
@@ -444,7 +442,7 @@ public class ViewTagEditor extends ViewPart {
 				if (this.editedItem instanceof IMediaTrack) {
 					IMediaTrack mt = (IMediaTrack) this.editedItem;
 					try {
-						TrackTagHelper.readTrackTags(this.editedItemDb, mt, file);
+						MediaFactoryImpl.get().readTrackTags(this.editedItemDb, mt, file);
 					}
 					catch (Exception e) {
 						new MorriganMsgDlg(e).open();
