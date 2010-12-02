@@ -15,9 +15,8 @@ import java.util.Map;
 
 import net.sparktank.morrigan.model.db.IDbColumn;
 import net.sparktank.morrigan.model.db.IDbItem;
-import net.sparktank.morrigan.model.db.basicimpl.DbColumn;
 import net.sparktank.morrigan.model.media.IMediaItem;
-import net.sparktank.morrigan.model.media.IMediaItemStorageLayer;
+import net.sparktank.morrigan.model.media.IMediaItemStorageLayer2;
 import net.sparktank.morrigan.util.GeneratedString;
 import net.sparktank.sqlitewrapper.DbException;
 
@@ -26,7 +25,7 @@ import net.sparktank.sqlitewrapper.DbException;
  * tbl_mediafiles generic.  Subclasses can then worry about the custom fields
  * they wish to add.
  */
-public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqliteLayer<T> implements IMediaItemStorageLayer<T> {
+public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqliteLayer<T> implements IMediaItemStorageLayer2<T> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors.
 	
@@ -191,25 +190,6 @@ public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqlit
 	
 	private static final String SQL_TBL_MEDIAFILES_EXISTS = 
 		"SELECT name FROM sqlite_master WHERE name='tbl_mediafiles';";
-	
-	public static final IDbColumn SQL_TBL_MEDIAFILES_COL_ROWID     = new DbColumn("ROWID", null, null, null);
-	public static final IDbColumn SQL_TBL_MEDIAFILES_COL_FILE      = new DbColumn("sfile",     "file path",     "VARCHAR(1000) not null collate nocase primary key", "?", " collate nocase");
-	public static final IDbColumn SQL_TBL_MEDIAFILES_COL_HASHCODE  = new DbColumn("lmd5",      "hashcode",      "BIGINT",   null);
-	public static final IDbColumn SQL_TBL_MEDIAFILES_COL_DADDED    = new DbColumn("dadded",    "date added",    "DATETIME", "?");
-	public static final IDbColumn SQL_TBL_MEDIAFILES_COL_DMODIFIED = new DbColumn("dmodified", "date modified", "DATETIME", "?");
-	public static final IDbColumn SQL_TBL_MEDIAFILES_COL_ENABLED   = new DbColumn("benabled",  null,            "INT(1)",   "1");
-	public static final IDbColumn SQL_TBL_MEDIAFILES_COL_MISSING   = new DbColumn("bmissing",  null,            "INT(1)",   "0");
-	public static final IDbColumn SQL_TBL_MEDIAFILES_COL_REMLOC    = new DbColumn("sremloc",   null,            "VARCHAR(1000) NOT NULL", "''");
-	
-	public static final IDbColumn[] SQL_TBL_MEDIAFILES_COLS = new IDbColumn[] {
-		SQL_TBL_MEDIAFILES_COL_FILE,
-		SQL_TBL_MEDIAFILES_COL_HASHCODE,
-		SQL_TBL_MEDIAFILES_COL_DADDED,
-		SQL_TBL_MEDIAFILES_COL_DMODIFIED,
-		SQL_TBL_MEDIAFILES_COL_ENABLED,
-		SQL_TBL_MEDIAFILES_COL_MISSING,
-		SQL_TBL_MEDIAFILES_COL_REMLOC
-		};
 	
 	static public IDbColumn parseColumnFromName (String name) {
 		for (IDbColumn c : SQL_TBL_MEDIAFILES_COLS) {

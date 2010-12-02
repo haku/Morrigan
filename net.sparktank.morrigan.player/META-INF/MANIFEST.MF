@@ -14,7 +14,7 @@ Import-Package: net.sparktank.morrigan.engines,
  net.sparktank.morrigan.model.factory,
  net.sparktank.morrigan.model.helper,
  net.sparktank.morrigan.model.media,
- net.sparktank.morrigan.model.media.internal,
+ net.sparktank.morrigan.model.media.impl,
  net.sparktank.sqlitewrapper,
  org.eclipse.swt,
  org.eclipse.swt.widgets

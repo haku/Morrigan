@@ -9,6 +9,10 @@ import net.sparktank.sqlitewrapper.DbException;
 public interface IRemoteMixedMediaDb extends IAbstractMixedMediaDb<IRemoteMixedMediaDb> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	public static final String TYPE = "REMOTEMMDB";
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
 	public URL getUrl();
 	
 	public long getCacheAge ();

@@ -17,11 +17,11 @@ import net.sparktank.morrigan.model.media.DurationData;
 import net.sparktank.morrigan.model.media.IAbstractMixedMediaDb;
 import net.sparktank.morrigan.model.media.IMediaItemDb.SortChangeListener;
 import net.sparktank.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
+import net.sparktank.morrigan.model.media.IMediaItemStorageLayer2;
 import net.sparktank.morrigan.model.media.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.IMixedMediaItem.MediaType;
+import net.sparktank.morrigan.model.media.IMixedMediaItemStorageLayer;
 import net.sparktank.morrigan.model.media.IMixedMediaStorageLayer;
-import net.sparktank.morrigan.model.media.internal.MediaSqliteLayer2;
-import net.sparktank.morrigan.model.media.internal.MixedMediaSqliteLayerImpl;
 import net.sparktank.morrigan.util.TimeHelper;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -226,25 +226,25 @@ public abstract class AbstractMixedMediaDbEditor<T extends IAbstractMixedMediaDb
 		MediaColumn mCol = parseMediaColumn(column.getColumn().getText());
 		
 		if (mCol == this.COL_FILE) {
-			sort = MediaSqliteLayer2.SQL_TBL_MEDIAFILES_COL_FILE;
+			sort = IMediaItemStorageLayer2.SQL_TBL_MEDIAFILES_COL_FILE;
 		}
 		else if (mCol == this.COL_ADDED) {
-			sort = MediaSqliteLayer2.SQL_TBL_MEDIAFILES_COL_DADDED;
+			sort = IMediaItemStorageLayer2.SQL_TBL_MEDIAFILES_COL_DADDED;
 		}
 		else if (mCol == this.COL_HASH) {
-			sort = MediaSqliteLayer2.SQL_TBL_MEDIAFILES_COL_HASHCODE;
+			sort = IMediaItemStorageLayer2.SQL_TBL_MEDIAFILES_COL_HASHCODE;
 		}
 		else if (mCol == this.COL_MODIFIED) {
-			sort = MediaSqliteLayer2.SQL_TBL_MEDIAFILES_COL_DMODIFIED;
+			sort = IMediaItemStorageLayer2.SQL_TBL_MEDIAFILES_COL_DMODIFIED;
 		}
 		else if (mCol == this.COL_COUNTS) {
-			sort = MixedMediaSqliteLayerImpl.SQL_TBL_MEDIAFILES_COL_STARTCNT;
+			sort = IMixedMediaItemStorageLayer.SQL_TBL_MEDIAFILES_COL_STARTCNT;
 		}
 		else if (mCol == this.COL_LASTPLAYED) {
-			sort = MixedMediaSqliteLayerImpl.SQL_TBL_MEDIAFILES_COL_DLASTPLAY;
+			sort = IMixedMediaItemStorageLayer.SQL_TBL_MEDIAFILES_COL_DLASTPLAY;
 		}
 		else if (mCol == this.COL_DURATION) {
-			sort = MixedMediaSqliteLayerImpl.SQL_TBL_MEDIAFILES_COL_DURATION;
+			sort = IMixedMediaItemStorageLayer.SQL_TBL_MEDIAFILES_COL_DURATION;
 		}
 		else {
 			throw new IllegalArgumentException();

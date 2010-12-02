@@ -8,9 +8,7 @@ import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
 import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.IMediaTrack;
 import net.sparktank.morrigan.model.media.IMediaTrackDb;
-import net.sparktank.morrigan.model.media.internal.LocalMixedMediaDb;
-import net.sparktank.morrigan.model.media.internal.LocalMixedMediaDbHelper;
-import net.sparktank.morrigan.model.media.internal.MediaItemDb;
+import net.sparktank.morrigan.model.media.impl.MediaFactoryImpl;
 import net.sparktank.sqlitewrapper.DbException;
 
 public class PlayerHelper {
@@ -24,7 +22,7 @@ public class PlayerHelper {
 		
 		List<MediaExplorerItem> items = new LinkedList<MediaExplorerItem>();
 		List<MediaExplorerItem> matches = new LinkedList<MediaExplorerItem>();
-		items.addAll(LocalMixedMediaDbHelper.getAllMmdb());
+		items.addAll(MediaFactoryImpl.get().getAllLocalMixedMediaDbs());
 		for (MediaExplorerItem i : items) {
 			if (i.title.contains(query1) || query1.contains(i.title) ) {
 				matches.add(i);
@@ -66,7 +64,7 @@ public class PlayerHelper {
 		if (item.type == MediaExplorerItem.ItemType.LOCALMMDB) {
 			ILocalMixedMediaDb mmdb;
 			try {
-				mmdb = LocalMixedMediaDb.LOCAL_MMDB_FACTORY.manufacture(item.identifier);
+				mmdb = MediaFactoryImpl.get().getLocalMixedMediaDb(item.identifier);
 			} catch (DbException e) {
 				throw new MorriganException(e);
 			}
@@ -83,11 +81,11 @@ public class PlayerHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	static public List<? extends IMediaTrack> runQueryOnList (IMediaTrackDb<?,?,? extends IMediaTrack> mediaDb, String query, int maxResults) throws MorriganException {
-		String q = MediaItemDb.escapeSearch(query);
+		String q = MediaFactoryImpl.get().escapeSearch(query);
 		
 		List<? extends IMediaTrack> res;
 		try {
-			res = mediaDb.simpleSearch(q, MediaItemDb.SEARCH_ESC, maxResults);
+			res = mediaDb.simpleSearch(q, maxResults);
 		} catch (DbException e) {
 			throw new MorriganException(e);
 		}

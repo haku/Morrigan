@@ -14,8 +14,7 @@ import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
 import net.sparktank.morrigan.model.explorer.MediaExplorerItem.ItemType;
 import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.IRemoteMixedMediaDb;
-import net.sparktank.morrigan.model.media.internal.LocalMixedMediaDb;
-import net.sparktank.morrigan.model.media.internal.LocalMixedMediaDbHelper;
+import net.sparktank.morrigan.model.media.impl.MediaFactoryImpl;
 import net.sparktank.morrigan.server.model.RemoteMixedMediaDb;
 import net.sparktank.morrigan.server.model.RemoteMixedMediaDbHelper;
 
@@ -146,7 +145,7 @@ public class ViewMediaExplorer extends ViewPart {
 	
 	private void makeContent () {
 		this.items.clear();
-		this.items.addAll(LocalMixedMediaDbHelper.getAllMmdb());
+		this.items.addAll(MediaFactoryImpl.get().getAllLocalMixedMediaDbs());
 		this.items.addAll(RemoteMixedMediaDbHelper.getAllRemoteMmdb());
 	}
 	
@@ -191,7 +190,7 @@ public class ViewMediaExplorer extends ViewPart {
 		public void run() {
 			try {
 				if (this.mediaExplorerItem.type == MediaExplorerItem.ItemType.LOCALMMDB) {
-					ILocalMixedMediaDb l = LocalMixedMediaDb.LOCAL_MMDB_FACTORY.manufacture(this.mediaExplorerItem.identifier);
+					ILocalMixedMediaDb l = MediaFactoryImpl.get().getLocalMixedMediaDb(this.mediaExplorerItem.identifier);
 					new DbUpdateAction(l).run();
 				}
 				else if (this.mediaExplorerItem.type == MediaExplorerItem.ItemType.REMOTEMMDB) {
@@ -223,7 +222,7 @@ public class ViewMediaExplorer extends ViewPart {
 		public void run() {
 			try {
 				if (this.mediaExplorerItem.type == MediaExplorerItem.ItemType.LOCALMMDB) {
-					ILocalMixedMediaDb l = LocalMixedMediaDb.LOCAL_MMDB_FACTORY.manufacture(this.mediaExplorerItem.identifier);
+					ILocalMixedMediaDb l = MediaFactoryImpl.get().getLocalMixedMediaDb(this.mediaExplorerItem.identifier);
 					l.read();
 					CallPlayMedia.playItem(getSite().getWorkbenchWindow().getActivePage(), l, this.addToQueue);
 				}
@@ -253,7 +252,7 @@ public class ViewMediaExplorer extends ViewPart {
 		public void run() {
 			try {
 				if (this.mediaExplorerItem.type == MediaExplorerItem.ItemType.LOCALMMDB) {
-					ILocalMixedMediaDb l = LocalMixedMediaDb.LOCAL_MMDB_FACTORY.manufacture(this.mediaExplorerItem.identifier);
+					ILocalMixedMediaDb l = MediaFactoryImpl.get().getLocalMixedMediaDb(this.mediaExplorerItem.identifier);
 					IViewPart showView = getSite().getPage().showView(ViewLibraryProperties.ID);
 					ViewLibraryProperties viewProp = (ViewLibraryProperties) showView;
 					viewProp.setContent(l);

@@ -17,10 +17,10 @@ import net.sparktank.morrigan.engines.playback.NotImplementedException;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.factory.RecyclingFactory;
 import net.sparktank.morrigan.model.media.DurationData;
+import net.sparktank.morrigan.model.media.IMediaPlaylist;
 import net.sparktank.morrigan.model.media.IMediaTrack;
-import net.sparktank.morrigan.model.media.IMediaTrackList;
 
-public class MediaPlaylist extends MediaItemList<IMediaTrack> implements IMediaTrackList<IMediaTrack> {
+public class MediaPlaylist extends MediaItemList<IMediaTrack> implements IMediaPlaylist {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Factory.
 	
@@ -67,8 +67,6 @@ public class MediaPlaylist extends MediaItemList<IMediaTrack> implements IMediaT
 	public static final PlaylistFactory FACTORY = new PlaylistFactory();
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	public static final String TYPE = "PLAYLIST";
 	
 	private Logger logger = Logger.getLogger(this.getClass().getName());
 	
@@ -171,6 +169,7 @@ public class MediaPlaylist extends MediaItemList<IMediaTrack> implements IMediaT
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	@Override
 	public String getFilePath () {
 		return this.filePath;
 	}
@@ -188,6 +187,7 @@ public class MediaPlaylist extends MediaItemList<IMediaTrack> implements IMediaT
 	
 	private SimpleDateFormat PL_DATE = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
 	
+	@Override
 	public void loadFromFile () throws MorriganException {
 		this.logger.fine("Reading PlayList from '" + this.filePath + "'...");
 		
@@ -255,6 +255,7 @@ public class MediaPlaylist extends MediaItemList<IMediaTrack> implements IMediaT
 		setDirtyState(DirtyState.CLEAN);
 	}
 	
+	@Override
 	public void writeToFile () throws MorriganException {
 		this.logger.fine("Writing PlayList to '" + this.filePath + "'...");
 		

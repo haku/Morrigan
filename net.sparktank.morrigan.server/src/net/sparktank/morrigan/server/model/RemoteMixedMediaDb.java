@@ -85,8 +85,6 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb<IRemoteMixedMediaDb
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public static final String TYPE = "REMOTEMMDB";
-	
 	public static final String DBKEY_SERVERURL = "SERVERURL";
 	public static final String DBKEY_CACHEDATE = "CACHEDATE";
 

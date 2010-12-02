@@ -25,13 +25,13 @@ import net.sparktank.morrigan.gui.engines.HotkeyRegister;
 import net.sparktank.morrigan.gui.helpers.ClipboardHelper;
 import net.sparktank.morrigan.gui.helpers.RefreshTimer;
 import net.sparktank.morrigan.gui.helpers.TrayHelper;
+import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
+import net.sparktank.morrigan.model.media.IMediaPlaylist;
 import net.sparktank.morrigan.model.media.IMediaTrack;
 import net.sparktank.morrigan.model.media.IMediaTrackDb;
 import net.sparktank.morrigan.model.media.IMediaTrackList;
 import net.sparktank.morrigan.model.media.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.IMixedMediaList;
-import net.sparktank.morrigan.model.media.internal.LocalMixedMediaDb;
-import net.sparktank.morrigan.model.media.internal.MediaPlaylist;
 import net.sparktank.morrigan.player.IPlayerEventHandler;
 import net.sparktank.morrigan.player.IPlayerLocal;
 import net.sparktank.morrigan.player.OrderHelper;
@@ -628,12 +628,12 @@ public abstract class AbstractPlayerView extends ViewPart {
 	
 	protected void revealItemInLists (IMediaTrackList<? extends IMediaTrack> list, IMediaTrack item) {
 		try {
-			if (list.getType().equals(LocalMixedMediaDb.TYPE)) {
+			if (list.getType().equals(ILocalMixedMediaDb.TYPE)) {
 				MediaItemDbEditorInput input = EditorFactory.getMmdbInput(list.getListId());
 				getViewSite().getWorkbenchWindow().getActivePage().openEditor(input, LocalMixedMediaDbEditor.ID);
 			}
-			else if (list.getType().equals(MediaPlaylist.TYPE)) {
-				MediaItemListEditorInput<MediaPlaylist> input = EditorFactory.getMediaPlaylistInput(list.getListId());
+			else if (list.getType().equals(IMediaPlaylist.TYPE)) {
+				MediaItemListEditorInput<IMediaPlaylist> input = EditorFactory.getMediaPlaylistInput(list.getListId());
 				getViewSite().getWorkbenchWindow().getActivePage().openEditor(input, PlaylistEditor.ID);
 			}
 			

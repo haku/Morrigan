@@ -8,7 +8,7 @@ import net.sparktank.morrigan.gui.editors.mmdb.LocalMixedMediaDbEditor;
 import net.sparktank.morrigan.gui.views.ViewMediaExplorer;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
-import net.sparktank.morrigan.model.media.internal.LocalMixedMediaDbHelper;
+import net.sparktank.morrigan.model.media.impl.MediaFactoryImpl;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.InputDialog;
@@ -56,7 +56,7 @@ public class NewMixedDbAction extends Action implements IWorkbenchAction {
 			String libName = dlg.getValue();
 			ILocalMixedMediaDb createdMmdb;
 			try {
-				createdMmdb = LocalMixedMediaDbHelper.createMmdb(libName);
+				createdMmdb = MediaFactoryImpl.get().createLocalMixedMediaDb(libName);
 			} catch (Exception e) {
 				new MorriganMsgDlg(e).open();
 				return;
