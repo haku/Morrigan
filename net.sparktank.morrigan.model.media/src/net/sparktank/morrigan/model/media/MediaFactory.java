@@ -12,6 +12,10 @@ import net.sparktank.morrigan.model.media.IMixedMediaItem.MediaType;
 import net.sparktank.morrigan.model.tasks.IMorriganTask;
 import net.sparktank.sqlitewrapper.DbException;
 
+/**
+ * TODO replace MediaExplorerItem with MediaListReference (interface).
+ * TODO remove remains of play-lists - they don't even work anyway.
+ */
 public interface MediaFactory {
 	
 	public Collection<MediaExplorerItem> getAllLocalMixedMediaDbs ();
@@ -36,16 +40,26 @@ public interface MediaFactory {
 	
 	public DurationData getNewDurationData (long duration, boolean complete);
 	
+	/*
+	 * TODO merge these next two methods?
+	 */
 	public IMorriganTask getLocalMixedMediaDbUpdateTask (ILocalMixedMediaDb library);
 	public IMorriganTask getRemoteMixedMediaDbUpdateTask (IRemoteMixedMediaDb library);
 	public <T extends IMediaItem> IMorriganTask getMediaFileCopyTask (IMediaItemList<T> mediaItemList, List<T> mediaSelection, File targetDirectory);
 	public <T extends IMediaItem> IMorriganTask getNewCopyToLocalMmdbTask (IMediaItemList<T> fromList, Collection<T> itemsToCopy, ILocalMixedMediaDb toDb);
 	
+	/**
+	 * This is a really stupid way to use an enum.. must fix this.
+	 */
 	public MediaTagType getMediaTagTypeManual ();
 	public MediaTagType getMediaTagTypeAutomatic ();
 	
 	public void readTrackTags (IMediaItemDb<?,?,?> itemDb, IMediaTrack mlt, File file) throws IOException, MorriganException;
 	
+	/*
+	 * TODO fix this unhelpful name.
+	 * Merge into functions that do searching so its not exposed?
+	 */
 	public String escapeSearch (String term);
 	
 }
