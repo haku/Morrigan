@@ -1,10 +1,10 @@
 package net.sparktank.morrigan.server.feedwriters;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
+import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.MediaFactoryImpl;
 import net.sparktank.morrigan.player.IPlayerLocal;
 import net.sparktank.morrigan.player.PlayerRegister;
@@ -31,33 +31,20 @@ public class MediaExplorerFeed extends AbstractFeed {
 		
 		List<IPlayerLocal> players = PlayerRegister.getLocalPlayers();
 		
-		for (int n = 0; n < 2; n++) {
-			ArrayList<MediaExplorerItem> items = new ArrayList<MediaExplorerItem>();
-			String type = null;
+		for (MediaExplorerItem i : MediaFactoryImpl.get().getAllLocalMixedMediaDbs()) {
+			String fileName = i.identifier.substring(i.identifier.lastIndexOf(File.separator) + 1);
+			dw.startElement("entry");
 			
-			switch (n) {
-				case 0:
-					type="mmdb";
-					items.addAll(MediaFactoryImpl.get().getAllLocalMixedMediaDbs());
-					break;
-				
+			addElement(dw, "title", i.title);
+			addLink(dw, "/media/" + ILocalMixedMediaDb.TYPE + "/" + fileName, "self", "text/xml");
+			
+			for (IPlayerLocal p : players) {
+				addLink(dw, "/player/" + p.getId() + "/play/" + fileName, "play", "cmd");
 			}
 			
-			for (MediaExplorerItem i : items) {
-				String fileName = i.identifier.substring(i.identifier.lastIndexOf(File.separator) + 1);
-				dw.startElement("entry");
-
-				addElement(dw, "title", i.title);
-				addLink(dw, "/media/" + type + "/" + fileName, "self", "text/xml");
-				
-				for (IPlayerLocal p : players) {
-					addLink(dw, "/player/" + p.getId() + "/play/" + fileName, "play", "cmd");
-				}
-				
-				dw.endElement("entry");
-			}
-			
+			dw.endElement("entry");
 		}
+		
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
