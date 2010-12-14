@@ -698,7 +698,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 					if (PlaybackEngine.this.lastDuration > 0 && position >= PlaybackEngine.this.lastDuration) {
 						PlaybackEngine.this.eosManCounter++;
 						System.err.println("eosManCounter++ = " + PlaybackEngine.this.eosManCounter);
-						if (PlaybackEngine.this.eosManCounter == 4) {
+						if (PlaybackEngine.this.eosManCounter >= 4) {
 							PlaybackEngine.this.eosManCounter = 0;
 							handleEosEvent("m=" + position + ">=" + PlaybackEngine.this.lastDuration);
 						}
