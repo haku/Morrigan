@@ -50,7 +50,13 @@ public class MediaFactoryImpl implements MediaFactory {
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
+	
+	private MediaFactoryImpl () {
+		// empty.
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
 	@Override
 	public Collection<MediaListReference> getAllLocalMixedMediaDbs() {
 		return LocalMixedMediaDbHelper.getAllMmdb();
