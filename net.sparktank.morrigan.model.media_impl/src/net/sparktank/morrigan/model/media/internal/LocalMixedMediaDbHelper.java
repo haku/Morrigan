@@ -7,8 +7,9 @@ import java.util.List;
 
 import net.sparktank.morrigan.config.Config;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
-import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
 import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
+import net.sparktank.morrigan.model.media.MediaListReference;
+import net.sparktank.morrigan.model.media.MediaListReference.MediaListType;
 import net.sparktank.sqlitewrapper.DbException;
 
 public class LocalMixedMediaDbHelper {
@@ -46,8 +47,8 @@ public class LocalMixedMediaDbHelper {
 		return false;
 	}
 	
-	public static List<MediaExplorerItem> getAllMmdb () {
-		List<MediaExplorerItem> ret = new ArrayList<MediaExplorerItem>();
+	public static List<MediaListReference> getAllMmdb () {
+		List<MediaListReference> ret = new ArrayList<MediaListReference>();
 		
 		File dir = Config.getMmdbDir();
 		File [] files = dir.listFiles();
@@ -56,10 +57,9 @@ public class LocalMixedMediaDbHelper {
 		if (files == null || files.length < 1 ) return ret;
 		
 		for (File file : files) {
-			if (isMmdbFile(file.getAbsolutePath())) {
-				MediaExplorerItem newItem = new MediaExplorerItem(MediaExplorerItem.ItemType.LOCALMMDB);
-				newItem.identifier = file.getAbsolutePath();
-				newItem.title = getMmdbTitle(newItem.identifier);
+			String absolutePath = file.getAbsolutePath();
+			if (isMmdbFile(absolutePath)) {
+				MediaListReference newItem = new MediaListReferenceImpl(MediaListType.LOCALMMDB, absolutePath, getMmdbTitle(absolutePath));
 				ret.add(newItem);
 			}
 		}

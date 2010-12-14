@@ -4,10 +4,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.sparktank.morrigan.model.exceptions.MorriganException;
-import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
 import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.IMediaTrack;
 import net.sparktank.morrigan.model.media.IMediaTrackDb;
+import net.sparktank.morrigan.model.media.MediaListReference;
 import net.sparktank.morrigan.model.media.impl.MediaFactoryImpl;
 import net.sparktank.sqlitewrapper.DbException;
 
@@ -20,23 +20,23 @@ public class PlayerHelper {
 	static public List<PlayItem> queryForPlayableItems (String query1, String query2, int maxResults) throws MorriganException {
 		List<PlayItem> ret = new LinkedList<PlayItem>();
 		
-		List<MediaExplorerItem> items = new LinkedList<MediaExplorerItem>();
-		List<MediaExplorerItem> matches = new LinkedList<MediaExplorerItem>();
+		List<MediaListReference> items = new LinkedList<MediaListReference>();
+		List<MediaListReference> matches = new LinkedList<MediaListReference>();
 		items.addAll(MediaFactoryImpl.get().getAllLocalMixedMediaDbs());
-		for (MediaExplorerItem i : items) {
-			if (i.title.contains(query1) || query1.contains(i.title) ) {
+		for (MediaListReference i : items) {
+			if (i.getTitle().contains(query1) || query1.contains(i.getTitle()) ) {
 				matches.add(i);
 			}
 		}
 		
-		for (MediaExplorerItem explorerItem : matches) {
+		for (MediaListReference explorerItem : matches) {
 			if (ret.size() >= maxResults) break;
 			
 			/*
 			 * FIXME this will load the DB (if its not already loaded), which is excessive if we are
 			 * just going to show some search results.
 			 */
-			IMediaTrackDb<?, ?, ? extends IMediaTrack> db = mediaExporerItemToReadTrackDb(explorerItem);
+			IMediaTrackDb<?, ?, ? extends IMediaTrack> db = mediaListReferenceToReadTrackDb(explorerItem);
 			
     		if (query2 == null) {
     			ret.add(new PlayItem(db, null));
@@ -58,13 +58,13 @@ public class PlayerHelper {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	static public IMediaTrackDb<?, ?, ? extends IMediaTrack> mediaExporerItemToReadTrackDb (MediaExplorerItem item) throws MorriganException {
+	static public IMediaTrackDb<?, ?, ? extends IMediaTrack> mediaListReferenceToReadTrackDb (MediaListReference item) throws MorriganException {
 		IMediaTrackDb<?, ?, ? extends IMediaTrack> ret = null;
 		
-		if (item.type == MediaExplorerItem.ItemType.LOCALMMDB) {
+		if (item.getType() == MediaListReference.MediaListType.LOCALMMDB) {
 			ILocalMixedMediaDb mmdb;
 			try {
-				mmdb = MediaFactoryImpl.get().getLocalMixedMediaDb(item.identifier);
+				mmdb = MediaFactoryImpl.get().getLocalMixedMediaDb(item.getIdentifier());
 			} catch (DbException e) {
 				throw new MorriganException(e);
 			}
@@ -72,7 +72,7 @@ public class PlayerHelper {
 			ret = mmdb;
 		}
 		else {
-			throw new MorriganException("TODO: show " + item.identifier);
+			throw new MorriganException("TODO: show " + item.getIdentifier());
 		}
 		
 		return ret;

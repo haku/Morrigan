@@ -5,9 +5,8 @@ import net.sparktank.morrigan.gui.editors.EditorFactory;
 import net.sparktank.morrigan.gui.editors.MediaItemListEditorInput;
 import net.sparktank.morrigan.gui.editors.mmdb.LocalMixedMediaDbEditor;
 import net.sparktank.morrigan.gui.editors.mmdb.RemoteMixedMediaDbEditor;
-import net.sparktank.morrigan.gui.editors.tracks.PlaylistEditor;
 import net.sparktank.morrigan.gui.views.ViewMediaExplorer;
-import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
+import net.sparktank.morrigan.model.media.MediaListReference;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -42,32 +41,23 @@ public class CallMediaListEditor extends AbstractHandler {
 			
 			// If we had a selection lets open the editor.
 			if (obj != null) {
-				MediaExplorerItem item = (MediaExplorerItem) obj;
+				MediaListReference item = (MediaListReference) obj;
 				
 				MediaItemListEditorInput<?> input;
 				String editorId;
 				
-				if (item.type == MediaExplorerItem.ItemType.PLAYLIST) {
+				if (item.getType() == MediaListReference.MediaListType.LOCALMMDB) {
 					try {
-						input = EditorFactory.getMediaPlaylistInput(item.identifier);
-						editorId = PlaylistEditor.ID;
-					} catch (Exception e) {
-						new MorriganMsgDlg(e).open();
-						return null;
-					}
-				}
-				else if (item.type == MediaExplorerItem.ItemType.LOCALMMDB) {
-					try {
-						input = EditorFactory.getMmdbInput(item.identifier);
+						input = EditorFactory.getMmdbInput(item.getIdentifier());
 						editorId = LocalMixedMediaDbEditor.ID;
 					} catch (Exception e) {
 						new MorriganMsgDlg(e).open();
 						return null;
 					}
 				}
-				else if (item.type == MediaExplorerItem.ItemType.REMOTEMMDB) {
+				else if (item.getType() == MediaListReference.MediaListType.REMOTEMMDB) {
 					try {
-						input = EditorFactory.getRemoteMmdbInput(item.identifier);
+						input = EditorFactory.getRemoteMmdbInput(item.getIdentifier());
 						editorId = RemoteMixedMediaDbEditor.ID;
 					} catch (Exception e) {
 						new MorriganMsgDlg(e).open();
@@ -75,7 +65,7 @@ public class CallMediaListEditor extends AbstractHandler {
 					}
 				}
 				else {
-					new MorriganMsgDlg("TODO: show " + item.identifier).open();
+					new MorriganMsgDlg("TODO: show " + item.getIdentifier()).open();
 					return null;
 				}
 				
