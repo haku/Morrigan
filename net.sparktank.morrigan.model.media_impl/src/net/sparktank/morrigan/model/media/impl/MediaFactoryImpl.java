@@ -26,7 +26,6 @@ import net.sparktank.morrigan.model.media.internal.LocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.internal.LocalMixedMediaDbHelper;
 import net.sparktank.morrigan.model.media.internal.LocalMixedMediaDbUpdateTask;
 import net.sparktank.morrigan.model.media.internal.MediaFileCopyTask;
-import net.sparktank.morrigan.model.media.internal.MediaItemDb;
 import net.sparktank.morrigan.model.media.internal.MediaPlaylist;
 import net.sparktank.morrigan.model.media.internal.MediaTagTypeImpl;
 import net.sparktank.morrigan.model.media.internal.MediaTrack;
@@ -196,11 +195,6 @@ public class MediaFactoryImpl implements MediaFactory {
 		} catch (InvalidAudioFrameException e) {
 			throw new MorriganException(e);
 		}
-	}
-	
-	@Override
-	public String escapeSearch(String term) {
-		return MediaItemDb.escapeSearch(term);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

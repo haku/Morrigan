@@ -54,10 +54,4 @@ public interface MediaFactory {
 	
 	public void readTrackTags (IMediaItemDb<?,?,?> itemDb, IMediaTrack mlt, File file) throws IOException, MorriganException;
 	
-	/*
-	 * TODO fix this unhelpful name.
-	 * Merge into functions that do searching so its not exposed?
-	 */
-	public String escapeSearch (String term);
-	
 }

@@ -274,7 +274,7 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 	
 	@Override
 	public List<T> simpleSearch (String term, int maxResults) throws DbException {
-		return this.dbLayer.simpleSearch(term, MediaItemDb.SEARCH_ESC, maxResults);
+		return this.dbLayer.simpleSearch(escapeSearch(term), SEARCH_ESC, maxResults);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
