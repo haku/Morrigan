@@ -81,11 +81,9 @@ public class PlayerHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	static public List<? extends IMediaTrack> runQueryOnList (IMediaTrackDb<?,?,? extends IMediaTrack> mediaDb, String query, int maxResults) throws MorriganException {
-		String q = MediaFactoryImpl.get().escapeSearch(query);
-		
 		List<? extends IMediaTrack> res;
 		try {
-			res = mediaDb.simpleSearch(q, maxResults);
+			res = mediaDb.simpleSearch(query, maxResults);
 		} catch (DbException e) {
 			throw new MorriganException(e);
 		}
