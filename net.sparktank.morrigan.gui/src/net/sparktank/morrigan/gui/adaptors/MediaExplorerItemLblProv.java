@@ -1,7 +1,7 @@
 package net.sparktank.morrigan.gui.adaptors;
 
 import net.sparktank.morrigan.gui.helpers.ImageCache;
-import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
+import net.sparktank.morrigan.model.media.MediaListReference;
 
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
@@ -20,8 +20,8 @@ public class MediaExplorerItemLblProv implements ILabelProvider {
 	
 	@Override
 	public String getText(Object element) {
-		if (element instanceof MediaExplorerItem) {
-			MediaExplorerItem item = (MediaExplorerItem) element;
+		if (element instanceof MediaListReference) {
+			MediaListReference item = (MediaListReference) element;
 			return item.toString();
 		}
 		return null;
@@ -29,12 +29,9 @@ public class MediaExplorerItemLblProv implements ILabelProvider {
 	
 	@Override
 	public Image getImage(Object element) {
-		if (element instanceof MediaExplorerItem) {
-			MediaExplorerItem item = (MediaExplorerItem) element;
-			switch (item.type) {
-				
-				case DISPLAY:
-					return this.imageCache.readImage("icons/display.gif");
+		if (element instanceof MediaListReference) {
+			MediaListReference item = (MediaListReference) element;
+			switch (item.getType()) {
 				
 				case LOCALMMDB:
 					return this.imageCache.readImage("icons/db.png");

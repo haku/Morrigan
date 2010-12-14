@@ -6,11 +6,11 @@ import java.util.List;
 
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
-import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
 import net.sparktank.morrigan.model.media.DurationData;
 import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.IMediaTrack;
 import net.sparktank.morrigan.model.media.IMediaTrackList;
+import net.sparktank.morrigan.model.media.MediaListReference;
 import net.sparktank.morrigan.model.media.impl.MediaFactoryImpl;
 import net.sparktank.morrigan.player.IPlayerLocal;
 import net.sparktank.morrigan.player.OrderHelper.PlaybackOrder;
@@ -167,11 +167,11 @@ public class MorriganCommandProvider implements CommandProvider {
 	}
 	
 	static private void doMediaList (CommandInterpreter ci) {
-		List<MediaExplorerItem> items = new LinkedList<MediaExplorerItem>();
+		List<MediaListReference> items = new LinkedList<MediaListReference>();
 		items.addAll(MediaFactoryImpl.get().getAllLocalMixedMediaDbs());
 		items.addAll(RemoteMixedMediaDbHelper.getAllRemoteMmdb());
-		for (MediaExplorerItem i : items) {
-			ci.println(i.type + " " + i.title);
+		for (MediaListReference i : items) {
+			ci.println(i.getType() + " " + i.getTitle());
 		}
 	}
 	

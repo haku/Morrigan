@@ -4,10 +4,10 @@ import java.util.List;
 
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
-import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
 import net.sparktank.morrigan.model.media.DurationData;
 import net.sparktank.morrigan.model.media.IMediaTrack;
 import net.sparktank.morrigan.model.media.IMediaTrackList;
+import net.sparktank.morrigan.model.media.MediaListReference;
 import net.sparktank.morrigan.player.OrderHelper.PlaybackOrder;
 
 public interface IPlayerAbstract {
@@ -18,7 +18,7 @@ public interface IPlayerAbstract {
 	public int getId();
 	
 	public boolean isPlaybackEngineReady();
-	public void loadAndStartPlaying(MediaExplorerItem item) throws MorriganException;
+	public void loadAndStartPlaying(MediaListReference item) throws MorriganException;
 	public void loadAndStartPlaying(IMediaTrackList<? extends IMediaTrack> list);
 	public void loadAndStartPlaying(IMediaTrackList<? extends IMediaTrack> list, IMediaTrack track);
 	public void loadAndStartPlaying(final PlayItem item);

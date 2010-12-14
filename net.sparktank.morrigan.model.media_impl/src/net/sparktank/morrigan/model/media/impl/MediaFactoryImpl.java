@@ -6,12 +6,7 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.List;
 
-import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
-import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
-import org.jaudiotagger.tag.TagException;
-
 import net.sparktank.morrigan.model.exceptions.MorriganException;
-import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
 import net.sparktank.morrigan.model.media.DurationData;
 import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.IMediaItem;
@@ -23,6 +18,7 @@ import net.sparktank.morrigan.model.media.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.IMixedMediaItem.MediaType;
 import net.sparktank.morrigan.model.media.IRemoteMixedMediaDb;
 import net.sparktank.morrigan.model.media.MediaFactory;
+import net.sparktank.morrigan.model.media.MediaListReference;
 import net.sparktank.morrigan.model.media.MediaTagType;
 import net.sparktank.morrigan.model.media.internal.CopyToLocalMmdbTask;
 import net.sparktank.morrigan.model.media.internal.DurationDataImpl;
@@ -41,6 +37,10 @@ import net.sparktank.morrigan.model.media.internal.TrackTagHelper;
 import net.sparktank.morrigan.model.tasks.IMorriganTask;
 import net.sparktank.sqlitewrapper.DbException;
 
+import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
+import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
+import org.jaudiotagger.tag.TagException;
+
 public class MediaFactoryImpl implements MediaFactory {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -53,7 +53,7 @@ public class MediaFactoryImpl implements MediaFactory {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	public Collection<MediaExplorerItem> getAllLocalMixedMediaDbs() {
+	public Collection<MediaListReference> getAllLocalMixedMediaDbs() {
 		return LocalMixedMediaDbHelper.getAllMmdb();
 	}
 	
@@ -78,7 +78,7 @@ public class MediaFactoryImpl implements MediaFactory {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
-	public Collection<MediaExplorerItem> getAllRemoteMixedMediaDbs() {
+	public Collection<MediaListReference> getAllRemoteMixedMediaDbs() {
 		throw new IllegalArgumentException("See server package.");
 	}
 	

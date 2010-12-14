@@ -8,8 +8,9 @@ import java.util.Collections;
 
 import net.sparktank.morrigan.config.Config;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
-import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
 import net.sparktank.morrigan.model.media.IRemoteMixedMediaDb;
+import net.sparktank.morrigan.model.media.MediaListReference;
+import net.sparktank.morrigan.model.media.internal.MediaListReferenceImpl;
 
 public class RemoteMixedMediaDbHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -38,8 +39,8 @@ public class RemoteMixedMediaDbHelper {
 		return (filePath.toLowerCase().endsWith(Config.MMDB_REMOTE_FILE_EXT));
 	}
 	
-	public static ArrayList<MediaExplorerItem> getAllRemoteMmdb () {
-		ArrayList<MediaExplorerItem> ret = new ArrayList<MediaExplorerItem>();
+	public static ArrayList<MediaListReference> getAllRemoteMmdb () {
+		ArrayList<MediaListReference> ret = new ArrayList<MediaListReference>();
 		
 		File dir = Config.getMmdbDir();
 		File [] files = dir.listFiles();
@@ -48,10 +49,9 @@ public class RemoteMixedMediaDbHelper {
 		if (files == null || files.length < 1 ) return ret;
 		
 		for (File file : files) {
-			if (isRemoteMmdbFile(file.getAbsolutePath())) {
-				MediaExplorerItem newItem = new MediaExplorerItem(MediaExplorerItem.ItemType.REMOTEMMDB);
-				newItem.identifier = file.getAbsolutePath();
-				newItem.title = getRemoteMmdbTitle(newItem.identifier);
+			String absolutePath = file.getAbsolutePath();
+			if (isRemoteMmdbFile(absolutePath)) {
+				MediaListReference newItem = new MediaListReferenceImpl(MediaListReference.MediaListType.REMOTEMMDB, absolutePath, getRemoteMmdbTitle(absolutePath));
 				ret.add(newItem);
 			}
 		}

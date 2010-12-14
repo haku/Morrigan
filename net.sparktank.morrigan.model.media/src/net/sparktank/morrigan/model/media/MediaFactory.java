@@ -7,23 +7,21 @@ import java.util.Collection;
 import java.util.List;
 
 import net.sparktank.morrigan.model.exceptions.MorriganException;
-import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
 import net.sparktank.morrigan.model.media.IMixedMediaItem.MediaType;
 import net.sparktank.morrigan.model.tasks.IMorriganTask;
 import net.sparktank.sqlitewrapper.DbException;
 
 /**
- * TODO replace MediaExplorerItem with MediaListReference (interface).
  * TODO remove remains of play-lists - they don't even work anyway.
  */
 public interface MediaFactory {
 	
-	public Collection<MediaExplorerItem> getAllLocalMixedMediaDbs ();
+	public Collection<MediaListReference> getAllLocalMixedMediaDbs ();
 	public ILocalMixedMediaDb createLocalMixedMediaDb (String name) throws MorriganException;
 	public ILocalMixedMediaDb getLocalMixedMediaDb (String libraryName) throws DbException;
 	public ILocalMixedMediaDb getLocalMixedMediaDb (String libraryName, String searchTerm) throws DbException;
 	
-	public Collection<MediaExplorerItem> getAllRemoteMixedMediaDbs ();
+	public Collection<MediaListReference> getAllRemoteMixedMediaDbs ();
 	public IRemoteMixedMediaDb createRemoteMixedMediaDb (String mmdbUrl);
 	public IRemoteMixedMediaDb getRemoteMixedMediaDb (String dbName);
 	public IRemoteMixedMediaDb getRemoteMixedMediaDb (String dbName, URL url);

@@ -6,7 +6,7 @@ import java.util.Collections;
 
 import net.sparktank.morrigan.config.Config;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
-import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
+import net.sparktank.morrigan.model.media.MediaListReference;
 
 public class PlaylistHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -33,8 +33,8 @@ public class PlaylistHelper {
 		return (filePath.toLowerCase().endsWith(Config.PL_FILE_EXT));
 	}
 	
-	public static ArrayList<MediaExplorerItem> getAllPlaylists () {
-		ArrayList<MediaExplorerItem> ret = new ArrayList<MediaExplorerItem>();
+	public static ArrayList<MediaListReference> getAllPlaylists () {
+		ArrayList<MediaListReference> ret = new ArrayList<MediaListReference>();
 		
 		File plDir = Config.getPlDir();
 		File [] plFiles = plDir.listFiles();
@@ -43,10 +43,9 @@ public class PlaylistHelper {
 		if (plFiles == null || plFiles.length < 1 ) return ret;
 		
 		for (File file : plFiles) {
-			if (isPlFile(file.getAbsolutePath())) {
-				MediaExplorerItem newItem = new MediaExplorerItem(MediaExplorerItem.ItemType.PLAYLIST);
-				newItem.identifier = file.getAbsolutePath();
-				newItem.title = getPlaylistTitle(newItem.identifier);
+			String absolutePath = file.getAbsolutePath();
+			if (isPlFile(absolutePath)) {
+				MediaListReference newItem = new MediaListReferenceImpl(MediaListReference.MediaListType.PLAYLIST, absolutePath, getPlaylistTitle(absolutePath));
 				ret.add(newItem);
 			}
 		}

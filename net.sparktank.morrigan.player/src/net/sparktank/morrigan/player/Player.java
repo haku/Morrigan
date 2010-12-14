@@ -13,10 +13,10 @@ import net.sparktank.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import net.sparktank.morrigan.engines.playback.IPlaybackStatusListener;
 import net.sparktank.morrigan.engines.playback.PlaybackException;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
-import net.sparktank.morrigan.model.explorer.MediaExplorerItem;
 import net.sparktank.morrigan.model.media.DurationData;
 import net.sparktank.morrigan.model.media.IMediaTrack;
 import net.sparktank.morrigan.model.media.IMediaTrackList;
+import net.sparktank.morrigan.model.media.MediaListReference;
 import net.sparktank.morrigan.model.media.impl.MediaFactoryImpl;
 import net.sparktank.morrigan.player.OrderHelper.PlaybackOrder;
 
@@ -360,8 +360,8 @@ public class Player implements IPlayerLocal {
 	int _currentTrackDuration = -1; // In seconds.
 	
 	@Override
-	public void loadAndStartPlaying (MediaExplorerItem item) throws MorriganException {
-		IMediaTrackList<? extends IMediaTrack> list = PlayerHelper.mediaExporerItemToReadTrackDb(item);
+	public void loadAndStartPlaying (MediaListReference item) throws MorriganException {
+		IMediaTrackList<? extends IMediaTrack> list = PlayerHelper.mediaListReferenceToReadTrackDb(item);
 		loadAndStartPlaying(list);
 	}
 	
