@@ -99,6 +99,7 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMe
 		}
 		
 		if (this.getItemList().hasTags(itemToBeRemove)) {
+			// TODO FIXME check for duplicate tags.
 			this.getItemList().moveTags(itemToBeRemove, itemToKeep);
 		}
 		
