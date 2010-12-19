@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello">Hello World, PlayerActivity!</string>
-    <string name="app_name"></string>
+
+	<string name="app_name">Morrigan</string>
+
+	<string name="gui_btn_playpause">play / pause</string>
+	<string name="gui_btn_next">next</string>
+
 </resources>
