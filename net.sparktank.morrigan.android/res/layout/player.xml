@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent" >
+	
+	<ScrollView
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_weight="1"
+		android:fillViewport="true" >
+		<LinearLayout android:orientation="vertical"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:padding="2dip" >
+			
+			<LinearLayout android:orientation="horizontal"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:layout_weight="0" >
+				
+				<ImageView android:id="@+id/imgListtype"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_weight="0"
+					android:layout_gravity="left|center_vertical"
+					android:padding="5dip"
+					android:src="@drawable/db" />
+				
+				<TextView android:id="@+id/txtListname"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_weight="1"
+					android:layout_gravity="left|center_vertical"
+					android:padding="5dip"
+					android:textSize="7pt"
+					android:text="[db name]" />
+				
+			</LinearLayout>
+			
+			<LinearLayout android:orientation="horizontal"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:layout_weight="0" >
+				
+				<ImageView android:id="@+id/imgPlaystate"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_weight="0"
+					android:layout_gravity="left|center_vertical"
+					android:padding="5dip"
+					android:src="@drawable/play" />
+				
+				<TextView android:id="@+id/txtTitle"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_weight="1"
+					android:layout_gravity="left|center_vertical"
+					android:padding="5dip"
+					android:textSize="9pt"
+					android:text="[track title goes here]" />
+				
+			</LinearLayout>
+			
+			<LinearLayout android:orientation="horizontal"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:layout_weight="0" >
+				
+				<ImageView android:id="@+id/imgQueue"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_weight="0"
+					android:layout_gravity="left|center_vertical"
+					android:padding="5dip"
+					android:src="@drawable/queue" />
+				
+				<TextView android:id="@+id/txtQueue"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_weight="1"
+					android:layout_gravity="left|center_vertical"
+					android:padding="5dip"
+					android:text="[n items totaling 00:00.]" />
+				
+			</LinearLayout>
+			
+		</LinearLayout>
+	</ScrollView>
+	
+	<TableLayout
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_weight="0"
+		android:layout_gravity="bottom" >
+		<TableRow>
+			
+			<ImageButton android:id="@+id/btnPlaypause"
+				android:layout_width="0dip"
+				android:layout_height="80dip"
+				android:layout_weight="1"
+				android:src="@drawable/pause" />
+			
+			<ImageButton android:id="@+id/btnNext"
+				android:layout_width="0dip"
+				android:layout_height="80dip"
+				android:layout_weight="1"
+				android:src="@drawable/next" />
+			
+			<ImageButton android:id="@+id/btnSearch"
+				android:layout_width="0dip"
+				android:layout_height="80dip"
+				android:layout_weight="1"
+				android:src="@drawable/search" />
+			
+		</TableRow>
+	</TableLayout>
+	
+</LinearLayout>
