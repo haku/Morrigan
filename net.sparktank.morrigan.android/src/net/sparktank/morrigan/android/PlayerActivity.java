@@ -1,5 +1,8 @@
 package net.sparktank.morrigan.android;
 
+import net.sparktank.morrigan.android.model.ServerReference;
+import net.sparktank.morrigan.android.model.impl.ServerReferenceImpl;
+import net.sparktank.morrigan.android.tasks.PlaypauseTask;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
@@ -8,6 +11,10 @@ import android.widget.Button;
 import android.widget.Toast;
 
 public class PlayerActivity extends Activity {
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	ServerReference serverReference = new ServerReferenceImpl(TempConstants.serverUrl);
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Activity methods.
 	
@@ -35,7 +42,10 @@ public class PlayerActivity extends Activity {
     class BtnPlaypause_OnClick implements OnClickListener {
 		@Override
 		public void onClick(View v) {
-			Toast.makeText(getApplicationContext(), "TODO: Playpause.", Toast.LENGTH_LONG).show();
+			// Toast.makeText(getApplicationContext(), "TODO: Playpause.", Toast.LENGTH_LONG).show();
+			
+			PlaypauseTask playpauseTask = new PlaypauseTask(PlayerActivity.this, PlayerActivity.this.serverReference);
+			playpauseTask.execute();
 		}
     }
     
