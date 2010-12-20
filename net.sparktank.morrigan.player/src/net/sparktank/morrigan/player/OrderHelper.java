@@ -13,33 +13,43 @@ public class OrderHelper {
 	
 	public static enum PlaybackOrder {
 		
-		SEQUENTIAL {
+		SEQUENTIAL(0) {
 			@Override
 			public String toString() {
 				return "sequential";
 			}
 		},
 		
-		RANDOM {
+		RANDOM(1) {
 			@Override
 			public String toString() {
 				return "random";
 			}
 		},
 		
-		BYSTARTCOUNT {
+		BYSTARTCOUNT(2) {
 			@Override
 			public String toString() {
 				return "by start-count";
 			}
 		},
 		
-		BYLASTPLAYED {
+		BYLASTPLAYED(3) {
 			@Override
 			public String toString() {
 				return "by last-played";
 			}
-		} 
+		};
+		
+		private int n;
+		
+		private PlaybackOrder (int n) {
+			this.n = n;
+		}
+		
+		public int getN() {
+			return this.n;
+		}
 		
 	};
 	
