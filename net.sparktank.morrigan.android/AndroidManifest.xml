@@ -5,6 +5,7 @@
 	android:versionName="1.0" >
 	
 	<application android:icon="@drawable/icon" android:label="@string/app_name">
+	
 		<activity android:name=".ServersActivity"
 			android:label="@string/app_name" >
 			
@@ -14,6 +15,10 @@
 			</intent-filter>
 			
 		</activity>
+		
+		<activity android:name=".PlayerActivity"
+			android:label="@string/app_name" />
+		
 	</application>
 
 	<uses-permission android:name="android.permission.INTERNET"></uses-permission>

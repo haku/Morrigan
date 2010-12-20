@@ -35,7 +35,7 @@ import android.widget.TextView;
 public class PlayerActivity extends Activity implements PlayerStateChangeListener {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	ServerReference serverReference = new ServerReferenceImpl(TempConstants.serverUrl);
+	ServerReference serverReference = null;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Activity methods.
@@ -43,14 +43,29 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.player);
 		
+		/*
+		 *  FIXME once ServerActivity is done, we should also receive a playerId here.
+		 */
+		
+		Bundle extras = getIntent().getExtras();
+		String baseUrl = extras.getString("baseUrl");
+		if (baseUrl != null) {
+			this.serverReference = new ServerReferenceImpl(baseUrl); // TODO use data passed into activity to get ServerReference from DB.
+		}
+		else {
+			finish();
+		}
+		this.setTitle(baseUrl);
+		
+		setContentView(R.layout.player);
 		hookUpButtons();
 	}
 	
 	@Override
 	protected void onStart() {
 		super.onStart();
+		
 		refresh();
 	}
 	

@@ -24,6 +24,7 @@ public interface ServersListAdapter extends ListAdapter {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public void setInputData (List<ServerReference> data);
+	public List<ServerReference> getInputData ();
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
