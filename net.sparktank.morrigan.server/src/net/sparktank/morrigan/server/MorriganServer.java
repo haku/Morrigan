@@ -3,10 +3,12 @@ package net.sparktank.morrigan.server;
 import net.sparktank.morrigan.config.Config;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
 
-import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.bio.SocketConnector;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
+import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.util.component.LifeCycle;
 import org.eclipse.jetty.util.component.LifeCycle.Listener;
 import org.eclipse.jetty.webapp.WebAppContext;
@@ -22,7 +24,21 @@ public class MorriganServer {
 	
 	public MorriganServer () throws MorriganException {
 		try {
-			this.server = new Server(8080);
+			this.server = new Server();
+			
+			Connector connector = new SocketConnector();
+			connector.setPort(8080);
+			this.server.addConnector(connector);
+			
+//			SslSocketConnector sslConnector = new SslSocketConnector();
+//			sslConnector.setKeystore(KEYSTORE);
+//			sslConnector.setTruststore(KEYSTORE);
+//			sslConnector.setPassword(KEYPASSWORD);
+//			sslConnector.setKeyPassword(KEYPASSWORD);
+//			sslConnector.setTrustPassword(KEYPASSWORD);
+//			sslConnector.setMaxIdleTime(30000);
+//			sslConnector.setPort(8443);
+//			this.server.addConnector(sslConnector);
 			
 			this.server.addLifeCycleListener(this.listener);
 			
@@ -42,8 +58,18 @@ public class MorriganServer {
 			conPlayers.setClassLoader(Thread.currentThread().getContextClassLoader());
 			conPlayers.setHandler(new PlayersHandler());
 			
+			ContextHandler conPlayersXml = new ContextHandler();
+			conPlayersXml.setContextPath("/players");
+			conPlayersXml.setResourceBase(".");
+			ServletHandler playersHandlerXml = new ServletHandler();
+			playersHandlerXml.addServletWithMapping(PlayersHandlerXml.class, "/"); // Relative to conPlayersXml's context.
+			conPlayersXml.setHandler(playersHandlerXml);
+			
 			ContextHandlerCollection contexts = new ContextHandlerCollection();
-	        contexts.setHandlers(new Handler[] { webapp, conMedia, conPlayers });
+			contexts.addHandler(webapp);
+			contexts.addHandler(conMedia);
+			contexts.addHandler(conPlayers);
+			contexts.addHandler(conPlayersXml);
 			this.server.setHandler(contexts);
 			
 		} catch (Exception e) {
