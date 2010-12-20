@@ -65,6 +65,9 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 		
 		cmd = (ImageButton) findViewById(R.id.btnNext);
 		cmd.setOnClickListener(new BtnNext_OnClick());
+		
+		cmd = (ImageButton) findViewById(R.id.btnRefresh);
+		cmd.setOnClickListener(new BtnRefresh_OnClick());
 	}
 	
 	class BtnPlaypause_OnClick implements OnClickListener {
@@ -80,6 +83,13 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 			next();
 		}
 	}
+	
+	class BtnRefresh_OnClick implements OnClickListener {
+		@Override
+		public void onClick(View v) {
+			refresh();
+		}
+	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Menu items.
@@ -89,7 +99,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		boolean result = super.onCreateOptionsMenu(menu);
-		menu.add(0, MENU_REFRESH, 0, R.string.menu_refresh);
+		menu.add(0, MENU_REFRESH, 0, R.string.menu_refresh).setIcon(R.drawable.ic_menu_refresh);
 		return result;
 	}
 	
