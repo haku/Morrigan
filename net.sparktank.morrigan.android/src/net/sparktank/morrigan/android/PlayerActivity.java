@@ -29,8 +29,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class PlayerActivity extends Activity implements PlayerStateChangeListener {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -46,6 +46,12 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 		setContentView(R.layout.player);
 		
 		hookUpButtons();
+	}
+	
+	@Override
+	protected void onStart() {
+		super.onStart();
+		refresh();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -64,16 +70,14 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 	class BtnPlaypause_OnClick implements OnClickListener {
 		@Override
 		public void onClick(View v) {
-			SetPlaystateTask playpauseTask = new SetPlaystateTask(PlayerActivity.this, PlayerActivity.this.serverReference, TargetPlayState.PLAYPAUSE, PlayerActivity.this);
-			playpauseTask.execute();
+			playpause();
 		}
 	}
 	
 	class BtnNext_OnClick implements OnClickListener {
 		@Override
 		public void onClick(View v) {
-			SetPlaystateTask playpauseTask = new SetPlaystateTask(PlayerActivity.this, PlayerActivity.this.serverReference, TargetPlayState.NEXT, PlayerActivity.this);
-			playpauseTask.execute();
+			next();
 		}
 	}
 
@@ -94,7 +98,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 		switch (item.getItemId()) {
 			
 			case MENU_REFRESH:
-				Toast.makeText(getApplicationContext(), "TODO: refresh.", Toast.LENGTH_LONG).show();
+				refresh();
 				return true;
 			
 		}
@@ -103,6 +107,25 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Commands - to be called on the UI thread.
+	
+	protected void refresh () {
+		SetPlaystateTask playpauseTask = new SetPlaystateTask(this, this.serverReference, null, this);
+		playpauseTask.execute();
+	}
+	
+	protected void playpause () {
+		SetPlaystateTask playpauseTask = new SetPlaystateTask(this, this.serverReference, TargetPlayState.PLAYPAUSE, this);
+		playpauseTask.execute();
+	}
+	
+	protected void next () {
+		SetPlaystateTask playpauseTask = new SetPlaystateTask(this, this.serverReference, TargetPlayState.NEXT, this);
+		playpauseTask.execute();
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	UI updating.
 	
 	@Override
 	public void onPlayerStateChange(PlayerState newState) {
@@ -115,7 +138,13 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 		TextView txtQueue = (TextView) findViewById(R.id.txtQueue);
 		txtQueue.setText(newState.getQueueLength() + " items.");
 		
-		Toast.makeText(this, "state=" + newState.getState(), Toast.LENGTH_LONG).show();
+		ImageView imgPlaystate = (ImageView) findViewById(R.id.imgPlaystate);
+		switch (newState.getPlayState()) {
+			case STOPPED: imgPlaystate.setImageResource(R.drawable.stop);  break;
+			case PLAYING: imgPlaystate.setImageResource(R.drawable.play);  break;
+			case PAUSED:  imgPlaystate.setImageResource(R.drawable.pause); break;
+			case LOADING: imgPlaystate.setImageResource(R.drawable.db);    break; // TODO find better icon.
+		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

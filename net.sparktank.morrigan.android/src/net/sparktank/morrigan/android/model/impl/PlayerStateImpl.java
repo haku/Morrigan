@@ -3,6 +3,7 @@ package net.sparktank.morrigan.android.model.impl;
 import org.xml.sax.SAXException;
 
 import net.sparktank.morrigan.android.helper.XmlParser;
+import net.sparktank.morrigan.android.model.PlayState;
 import net.sparktank.morrigan.android.model.PlayerState;
 
 public class PlayerStateImpl extends XmlParser implements PlayerState {
@@ -48,8 +49,8 @@ public class PlayerStateImpl extends XmlParser implements PlayerState {
 	}
 	
 	@Override
-	public int getState() {
-		return this.getNodeInt(PLAYSTATE);
+	public PlayState getPlayState() {
+		return PlayState.parseN(this.getNodeInt(PLAYSTATE));
 	}
 	
 	@Override
