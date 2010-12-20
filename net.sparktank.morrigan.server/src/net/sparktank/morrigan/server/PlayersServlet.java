@@ -25,6 +25,10 @@ import com.megginson.sax.DataWriter;
 public class PlayersServlet extends HttpServlet {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	public static final String CONTEXTPATH = "/players";
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
 	private static final long serialVersionUID = -6463380542721345844L;
 	
 	private static final String ROOTPATH = "/";
@@ -81,7 +85,7 @@ public class PlayersServlet extends HttpServlet {
 		DataWriter dw = AbstractFeed.startFeed(resp.getWriter());
 		
 		AbstractFeed.addElement(dw, "title", "Morrigan players desu~");
-		AbstractFeed.addLink(dw, "/players" , "self", "text/xml"); // TODO don't hard-code this?
+		AbstractFeed.addLink(dw, CONTEXTPATH, "self", "text/xml");
 		
 		List<IPlayerLocal> players = PlayerRegister.getLocalPlayers();
 		for (IPlayerLocal p : players) {
@@ -136,7 +140,7 @@ public class PlayersServlet extends HttpServlet {
 				TimeHelper.formatTimeSeconds(queueDuration.getDuration());
 		
 		AbstractFeed.addElement(dw, "title", "p" + p.getId() + ":" + p.getPlayState().toString() + ":" + title);
-		AbstractFeed.addLink(dw, "/players/" + p.getId(), "self", "text/xml");// TODO again, don't hard-code "/players".
+		AbstractFeed.addLink(dw, CONTEXTPATH + "/" + p.getId(), "self", "text/xml");
 		
 		AbstractFeed.addElement(dw, "playerid", p.getId());
 		AbstractFeed.addElement(dw, "playstate", p.getPlayState().getN());
