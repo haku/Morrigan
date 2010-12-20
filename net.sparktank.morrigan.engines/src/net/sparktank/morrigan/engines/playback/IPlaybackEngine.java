@@ -6,7 +6,20 @@ import org.eclipse.swt.widgets.Composite;
 
 public interface IPlaybackEngine {
 	
-	public enum PlayState { Stopped, Playing, Paused, Loading };
+	public enum PlayState {
+		Stopped(0), Playing(1), Paused(2), Loading(3);
+		
+		private int n;
+		
+		private PlayState (int n) {
+			this.n = n;
+		}
+		
+		public int getN() {
+			return this.n;
+		}
+		
+	};
 	
 	/**
 	 * Returns the description of this playback engine.
