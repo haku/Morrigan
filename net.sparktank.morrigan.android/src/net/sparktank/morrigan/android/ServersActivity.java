@@ -74,12 +74,8 @@ public class ServersActivity extends Activity {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	protected void showServerActivity (ServerReference item) {
-		/*
-		 *  FIXME once ServerActivity is done, stop using PlayerActivity directly.
-		 */
-		
-		Intent intent = new Intent(getApplicationContext(), PlayerActivity.class);
-		intent.putExtra("baseUrl", item.getBaseUrl()); // TODO pass a reference that can be used to get the ServerReference from the DB.
+		Intent intent = new Intent(getApplicationContext(), ServerActivity.class);
+		intent.putExtra(ServerActivity.BASE_URL, item.getBaseUrl()); // TODO pass a reference that can be used to get the ServerReference from the DB.
 		startActivity(intent);
 	}
 	
