@@ -4,6 +4,7 @@ import net.sparktank.morrigan.model.helper.EqualHelper;
 import net.sparktank.morrigan.model.media.IMediaTrack;
 import net.sparktank.morrigan.model.media.IMediaTrackList;
 
+// TODO add interface to refer to this class with.
 public class PlayItem {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
