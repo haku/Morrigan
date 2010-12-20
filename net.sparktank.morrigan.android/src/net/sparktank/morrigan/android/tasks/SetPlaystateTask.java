@@ -9,19 +9,38 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.widget.Toast;
 
-public class PlaypauseTask extends AsyncTask<Void, Void, Boolean> {
+public class SetPlaystateTask extends AsyncTask<Void, Void, Boolean> {
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	public enum TargetPlayState {
+		STOPPED(0), PLAY(1), NEXT(2), PLAYPAUSE(3);
+		
+		private int n;
+		
+		private TargetPlayState (int n) {
+			this.n = n;
+		}
+		
+		public int getN() {
+			return this.n;
+		}
+		
+	};
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private final Context context;
 	private final ServerReference serverReference;
+	private final TargetPlayState targetPlayState;
 	
 	private ProgressDialog dialog;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public PlaypauseTask (Context context, ServerReference serverReference) {
+	public SetPlaystateTask (Context context, ServerReference serverReference, TargetPlayState targetPlayState) {
 		this.context = context;
 		this.serverReference = serverReference;
+		this.targetPlayState = targetPlayState;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -36,7 +55,26 @@ public class PlaypauseTask extends AsyncTask<Void, Void, Boolean> {
 	// In background thread:
 	@Override
 	protected Boolean doInBackground(Void... params) {
-		String url = this.serverReference.getBaseUrl() + "/player/0/playpause";
+		String url = this.serverReference.getBaseUrl();
+		url = url.concat("/player/0"); // TODO remove temp hard-coded values.
+		
+		switch (this.targetPlayState) {
+			case PLAYPAUSE:
+				url = url.concat("/playpause");
+				break;
+				
+			case NEXT:
+				url = url.concat("/next");
+				break;
+				
+			case PLAY:
+				url = url.concat("/play");
+				break;
+				
+			default:
+				throw new IllegalArgumentException();
+			
+		}
 		
 		try {
 			// TODO parse response?
@@ -56,7 +94,7 @@ public class PlaypauseTask extends AsyncTask<Void, Void, Boolean> {
 	protected void onPostExecute(Boolean result) {
 		super.onPostExecute(result);
 		
-		Toast.makeText(this.context, "Playpause result: " + result, Toast.LENGTH_LONG).show();
+		Toast.makeText(this.context, this.targetPlayState.toString() + " result: " + result, Toast.LENGTH_LONG).show();
 		
 		// FIXME This will fail if the screen is rotated while we are fetching.
 		this.dialog.dismiss();
