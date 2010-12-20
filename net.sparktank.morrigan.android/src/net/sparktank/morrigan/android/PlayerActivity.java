@@ -35,7 +35,13 @@ import android.widget.TextView;
 public class PlayerActivity extends Activity implements PlayerStateChangeListener {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	ServerReference serverReference = null;
+	public static final String BASE_URL = "baseUrl";
+	public static final String PLAYER_ID = "playerId";
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	private ServerReference serverReference = null;
+	private int playerId;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Activity methods.
@@ -49,7 +55,9 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 		 */
 		
 		Bundle extras = getIntent().getExtras();
-		String baseUrl = extras.getString("baseUrl");
+		String baseUrl = extras.getString(BASE_URL);
+		int id = extras.getInt(PLAYER_ID, -1);
+		
 		if (baseUrl != null) {
 			this.serverReference = new ServerReferenceImpl(baseUrl); // TODO use data passed into activity to get ServerReference from DB.
 		}
@@ -57,6 +65,13 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 			finish();
 		}
 		this.setTitle(baseUrl);
+		
+		if (id >= 0) {
+			this.playerId = id;
+		}
+		else {
+			finish();
+		}
 		
 		setContentView(R.layout.player);
 		hookUpButtons();

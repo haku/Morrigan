@@ -4,13 +4,12 @@
 	android:layout_width="fill_parent"
 	android:layout_height="fill_parent" >
 	
-	<ImageView android:id="@+id/icon"
+	<ImageView android:id="@+id/rowimg"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_weight="0"
 		android:layout_gravity="left|center_vertical"
-		android:padding="5dip"
-		android:src="@drawable/db" />
+		android:padding="5dip" />
 	
 	<TextView android:id="@+id/rowtext"
 		android:layout_width="0dip"
