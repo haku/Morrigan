@@ -62,7 +62,7 @@ public class MorriganServer {
 			conPlayersXml.setContextPath("/players");
 			conPlayersXml.setResourceBase(".");
 			ServletHandler playersHandlerXml = new ServletHandler();
-			playersHandlerXml.addServletWithMapping(PlayersHandlerXml.class, "/"); // Relative to conPlayersXml's context.
+			playersHandlerXml.addServletWithMapping(PlayersServlet.class, "/"); // Relative to conPlayersXml's context.
 			conPlayersXml.setHandler(playersHandlerXml);
 			
 			ContextHandlerCollection contexts = new ContextHandlerCollection();
