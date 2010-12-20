@@ -64,7 +64,6 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 		else {
 			finish();
 		}
-		this.setTitle(baseUrl);
 		
 		if (id >= 0) {
 			this.playerId = id;
@@ -72,6 +71,8 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 		else {
 			finish();
 		}
+		
+		this.setTitle(baseUrl + "/p" + this.playerId);
 		
 		setContentView(R.layout.player);
 		hookUpButtons();
