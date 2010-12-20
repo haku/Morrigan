@@ -43,7 +43,7 @@ public class MediaHandler extends AbstractHandler {
 		
 		try {
 			if (actualTarget.equals("/")) {
-				new MediaExplorerFeed().process(out);
+				MediaExplorerFeed.getInsance().process(out);
 			}
 			else {
 				String r = actualTarget.substring(1);

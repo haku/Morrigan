@@ -15,6 +15,20 @@ import com.megginson.sax.DataWriter;
 
 public class MediaExplorerFeed extends AbstractFeed {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Factory.
+	
+	static private final ThreadLocal<MediaExplorerFeed> FACTORY = new ThreadLocal<MediaExplorerFeed>() {
+		@Override
+		protected MediaExplorerFeed initialValue() {
+			return new MediaExplorerFeed();
+		}
+	};
+	
+	static public MediaExplorerFeed getInsance () {
+		return FACTORY.get();
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public MediaExplorerFeed () {
 		super();
