@@ -24,7 +24,11 @@ import net.sparktank.morrigan.android.model.ServersListAdapter;
 import net.sparktank.morrigan.android.model.impl.ServerReferenceImpl;
 import net.sparktank.morrigan.android.model.impl.ServersListAdapterImpl;
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
 public class ServersActivity extends Activity {
@@ -56,7 +60,27 @@ public class ServersActivity extends Activity {
 		
 		ListView lstServers = (ListView) findViewById(R.id.lstServers);
 		lstServers.setAdapter(this.serversListAdapter);
-		// lstServers.setOnItemClickListener(inventoryAdapter);
+		lstServers.setOnItemClickListener(this.serversListCickListener);
+	}
+	
+	private OnItemClickListener serversListCickListener = new OnItemClickListener() {
+		@Override
+		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+			ServerReference item = ServersActivity.this.serversListAdapter.getInputData().get(position);
+			showServerActivity(item);
+		}
+	};
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	protected void showServerActivity (ServerReference item) {
+		/*
+		 *  FIXME once ServerActivity is done, stop using PlayerActivity directly.
+		 */
+		
+		Intent intent = new Intent(getApplicationContext(), PlayerActivity.class);
+		intent.putExtra("baseUrl", item.getBaseUrl()); // TODO pass a reference that can be used to get the ServerReference from the DB.
+		startActivity(intent);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

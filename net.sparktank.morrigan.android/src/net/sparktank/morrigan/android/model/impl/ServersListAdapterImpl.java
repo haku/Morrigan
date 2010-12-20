@@ -16,6 +16,7 @@
 
 package net.sparktank.morrigan.android.model.impl;
 
+import java.util.Collections;
 import java.util.List;
 
 import net.sparktank.morrigan.android.R;
@@ -49,6 +50,11 @@ public class ServersListAdapterImpl extends BaseAdapter implements ServersListAd
 	@Override
 	public void setInputData(List<ServerReference> data) {
 		this.listData = data;
+	}
+	
+	@Override
+	public List<ServerReference> getInputData() {
+		return Collections.unmodifiableList(this.listData);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
