@@ -72,7 +72,7 @@ public class SetPlaystateTask extends AsyncTask<Void, Void, PlayerState> {
 	@Override
 	protected void onPreExecute() {
 		super.onPreExecute();
-		this.dialog = ProgressDialog.show(this.context, "Play / Pause", "Please wait...", true);
+		this.dialog = ProgressDialog.show(this.context, null, "Please wait...", true);
 	}
 	
 	// In background thread:
@@ -81,28 +81,31 @@ public class SetPlaystateTask extends AsyncTask<Void, Void, PlayerState> {
 		String url = this.serverReference.getBaseUrl();
 		url = url.concat("/players/0"); // TODO remove temp hard-coded values.
 		
-		String encodedData = "action=";
-		switch (this.targetPlayState) {
-			case PLAYPAUSE:
-				encodedData = encodedData.concat("playpause");
-				break;
-				
-			case NEXT:
-				encodedData = encodedData.concat("next");
-				break;
-				
-			case STOP:
-				encodedData = encodedData.concat("stop");
-				break;
-				
-			default:
-				throw new IllegalArgumentException();
-			
+		String verb = null;
+		String encodedData = null;
+		
+		if (this.targetPlayState != null) {
+			verb = "POST";
+			encodedData = "action=";
+    		switch (this.targetPlayState) {
+    			case PLAYPAUSE:
+    				encodedData = encodedData.concat("playpause");
+    				break;
+    				
+    			case NEXT:
+    				encodedData = encodedData.concat("next");
+    				break;
+    				
+    			case STOP:
+    				encodedData = encodedData.concat("stop");
+    				break;
+    				
+    			default: throw new IllegalArgumentException();
+    		}
 		}
 		
 		try {
-			// TODO parse response?
-			String resp = HttpHelper.getUrlContent(url, "POST", encodedData, "application/x-www-form-urlencoded");
+			String resp = HttpHelper.getUrlContent(url, verb, encodedData, "application/x-www-form-urlencoded");
 			PlayerState playerState = new PlayerStateImpl(resp);
 			return playerState;
 		}

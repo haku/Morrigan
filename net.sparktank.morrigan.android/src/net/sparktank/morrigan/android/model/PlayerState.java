@@ -5,7 +5,7 @@ public interface PlayerState {
 	
 	public int getId ();
 	
-	public int getState (); // TODO replace with enum.
+	public PlayState getPlayState ();
 	public int getPlayOrder (); // TODO replace with enum.
 	public int getPlayerPosition ();
 	
