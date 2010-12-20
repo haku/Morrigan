@@ -16,6 +16,8 @@
 
 package net.sparktank.morrigan.android;
 
+import net.sparktank.morrigan.android.model.PlayerState;
+import net.sparktank.morrigan.android.model.PlayerStateChangeListener;
 import net.sparktank.morrigan.android.model.ServerReference;
 import net.sparktank.morrigan.android.model.impl.ServerReferenceImpl;
 import net.sparktank.morrigan.android.tasks.SetPlaystateTask;
@@ -27,9 +29,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
-public class PlayerActivity extends Activity {
+public class PlayerActivity extends Activity implements PlayerStateChangeListener {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	ServerReference serverReference = new ServerReferenceImpl(TempConstants.serverUrl);
@@ -61,7 +64,7 @@ public class PlayerActivity extends Activity {
 	class BtnPlaypause_OnClick implements OnClickListener {
 		@Override
 		public void onClick(View v) {
-			SetPlaystateTask playpauseTask = new SetPlaystateTask(PlayerActivity.this, PlayerActivity.this.serverReference, TargetPlayState.PLAYPAUSE);
+			SetPlaystateTask playpauseTask = new SetPlaystateTask(PlayerActivity.this, PlayerActivity.this.serverReference, TargetPlayState.PLAYPAUSE, PlayerActivity.this);
 			playpauseTask.execute();
 		}
 	}
@@ -69,7 +72,7 @@ public class PlayerActivity extends Activity {
 	class BtnNext_OnClick implements OnClickListener {
 		@Override
 		public void onClick(View v) {
-			SetPlaystateTask playpauseTask = new SetPlaystateTask(PlayerActivity.this, PlayerActivity.this.serverReference, TargetPlayState.NEXT);
+			SetPlaystateTask playpauseTask = new SetPlaystateTask(PlayerActivity.this, PlayerActivity.this.serverReference, TargetPlayState.NEXT, PlayerActivity.this);
 			playpauseTask.execute();
 		}
 	}
@@ -97,6 +100,22 @@ public class PlayerActivity extends Activity {
 		}
 		
 		return super.onOptionsItemSelected(item);
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	@Override
+	public void onPlayerStateChange(PlayerState newState) {
+		TextView txtListname = (TextView) findViewById(R.id.txtListname);
+		txtListname.setText(newState.getListTitle());
+		
+		TextView txtTitle = (TextView) findViewById(R.id.txtTitle);
+		txtTitle.setText(newState.getTrackTitle());
+		
+		TextView txtQueue = (TextView) findViewById(R.id.txtQueue);
+		txtQueue.setText(newState.getQueueLength() + " items.");
+		
+		Toast.makeText(this, "state=" + newState.getState(), Toast.LENGTH_LONG).show();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
