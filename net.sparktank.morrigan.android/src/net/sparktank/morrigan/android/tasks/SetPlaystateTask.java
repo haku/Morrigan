@@ -19,17 +19,22 @@ package net.sparktank.morrigan.android.tasks;
 import java.io.IOException;
 
 import net.sparktank.morrigan.android.helper.HttpHelper;
+import net.sparktank.morrigan.android.model.PlayerState;
+import net.sparktank.morrigan.android.model.PlayerStateChangeListener;
 import net.sparktank.morrigan.android.model.ServerReference;
+import net.sparktank.morrigan.android.model.impl.PlayerStateImpl;
+
+import org.xml.sax.SAXException;
+
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.widget.Toast;
 
-public class SetPlaystateTask extends AsyncTask<Void, Void, Boolean> {
+public class SetPlaystateTask extends AsyncTask<Void, Void, PlayerState> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public enum TargetPlayState {
-		STOPPED(0), PLAY(1), NEXT(2), PLAYPAUSE(3);
+		STOP(0), NEXT(1), PLAYPAUSE(2);
 		
 		private int n;
 		
@@ -48,15 +53,17 @@ public class SetPlaystateTask extends AsyncTask<Void, Void, Boolean> {
 	private final Context context;
 	private final ServerReference serverReference;
 	private final TargetPlayState targetPlayState;
+	private final PlayerStateChangeListener changeListener;
 	
 	private ProgressDialog dialog;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	public SetPlaystateTask (Context context, ServerReference serverReference, TargetPlayState targetPlayState) {
+	
+	public SetPlaystateTask (Context context, ServerReference serverReference, TargetPlayState targetPlayState, PlayerStateChangeListener changeListener) {
 		this.context = context;
 		this.serverReference = serverReference;
 		this.targetPlayState = targetPlayState;
+		this.changeListener = changeListener;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -70,21 +77,22 @@ public class SetPlaystateTask extends AsyncTask<Void, Void, Boolean> {
 	
 	// In background thread:
 	@Override
-	protected Boolean doInBackground(Void... params) {
+	protected PlayerState doInBackground(Void... params) {
 		String url = this.serverReference.getBaseUrl();
-		url = url.concat("/player/0"); // TODO remove temp hard-coded values.
+		url = url.concat("/players/0"); // TODO remove temp hard-coded values.
 		
+		String encodedData = "action=";
 		switch (this.targetPlayState) {
 			case PLAYPAUSE:
-				url = url.concat("/playpause");
+				encodedData = encodedData.concat("playpause");
 				break;
 				
 			case NEXT:
-				url = url.concat("/next");
+				encodedData = encodedData.concat("next");
 				break;
 				
-			case PLAY:
-				url = url.concat("/play");
+			case STOP:
+				encodedData = encodedData.concat("stop");
 				break;
 				
 			default:
@@ -94,26 +102,25 @@ public class SetPlaystateTask extends AsyncTask<Void, Void, Boolean> {
 		
 		try {
 			// TODO parse response?
-			HttpHelper.getUrlContent(url);
-			
+			String resp = HttpHelper.getUrlContent(url, "POST", encodedData, "application/x-www-form-urlencoded");
+			PlayerState playerState = new PlayerStateImpl(resp);
+			return playerState;
 		}
 		catch (IOException e) {
-			e.printStackTrace();
-			return Boolean.FALSE;
+			throw new RuntimeException(e);
+		} catch (SAXException e) {
+			throw new RuntimeException(e);
 		}
-		
-		return Boolean.TRUE;
 	}
 	
 	// In UI thread:
 	@Override
-	protected void onPostExecute(Boolean result) {
+	protected void onPostExecute(PlayerState result) {
 		super.onPostExecute(result);
 		
-		Toast.makeText(this.context, this.targetPlayState.toString() + " result: " + result, Toast.LENGTH_LONG).show();
+		if (this.changeListener != null) this.changeListener.onPlayerStateChange(result);
 		
-		// FIXME This will fail if the screen is rotated while we are fetching.
-		this.dialog.dismiss();
+		this.dialog.dismiss(); // FIXME This will fail if the screen is rotated while we are fetching.
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

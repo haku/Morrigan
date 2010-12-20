@@ -19,6 +19,7 @@ package net.sparktank.morrigan.android.helper;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -31,13 +32,31 @@ public class HttpHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static String getUrlContent (String sUrl) throws IOException {
+		return getUrlContent(sUrl, null, null, null);
+	}
+	
+	public static String getUrlContent (String sUrl, String httpRequestMethod, String encodedData, String contentType) throws IOException {
 		URL url = new URL(sUrl);
 		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 		connection.setRequestMethod("GET");
 		connection.setDoOutput(true);
 		connection.setConnectTimeout(HTTP_CONNECT_TIMEOUT_SECONDS * 1000);
 		connection.setReadTimeout(HTTP_READ_TIMEOUT_SECONDS * 1000);
-		connection.connect();
+		
+		if (httpRequestMethod != null) {
+			connection.setRequestMethod(httpRequestMethod);
+		}
+		
+		if (encodedData != null) {
+			if (contentType!=null) connection.setRequestProperty("Content-Type", contentType);
+			OutputStreamWriter out = new OutputStreamWriter(connection.getOutputStream());
+			try {
+				out.write(encodedData);
+				out.flush();
+			} finally {
+				out.close();
+			}
+		}
 		
 		BufferedReader rd = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 		StringBuilder sb = new StringBuilder();
