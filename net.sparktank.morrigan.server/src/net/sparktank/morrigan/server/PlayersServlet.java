@@ -40,12 +40,46 @@ public class PlayersServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String actualTarget = req.getRequestURI().substring(req.getContextPath().length());
 //		System.err.println("PlayersHandlerXml:target="+actualTarget);
+		writeResponse(resp, actualTarget);
+	}
+	
+	@Override
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		String actualTarget = req.getRequestURI().substring(req.getContextPath().length());
 		
+		int n = Integer.parseInt(actualTarget.substring(ROOTPATH.length()));
+		IPlayerLocal player = PlayerRegister.getLocalPlayer(n);
+		
+		String act = req.getParameter("action");
+		if (act == null) {
+			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			resp.setContentType("text/plain");
+			resp.getWriter().println("HTTP Error 400 'action' parameter not set desu~");
+		}
+		else if (act.equals("playpause")) {
+			player.pausePlaying();
+			writeResponse(resp, actualTarget);
+		}
+		else if (act.equals("next")) {
+			player.nextTrack();
+			writeResponse(resp, actualTarget);
+		}
+		else if (act.equals("stop")) {
+			player.stopPlaying();
+			writeResponse(resp, actualTarget);
+		}
+		else {
+			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			resp.setContentType("text/plain");
+			resp.getWriter().println("HTTP Error 400 invalid 'action' parameter '"+act+"' desu~");
+		}
+	}
+	
+	private void writeResponse (HttpServletResponse resp, String actualTarget) throws IOException, ServletException {
 		if (actualTarget.equals(ROOTPATH)) {
 			try {
 				printPlayersList(resp);
-			}
-			catch (SAXException e) {
+			} catch (SAXException e) {
 				throw new ServletException(e);
 			}
 		}
@@ -54,28 +88,19 @@ public class PlayersServlet extends HttpServlet {
 				int n = Integer.parseInt(actualTarget.substring(ROOTPATH.length()));
 				try {
 					printPlayer(resp, n);
-				}
-				catch (IllegalArgumentException e) {
+				} catch (IllegalArgumentException e) {
 					resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
 					resp.setContentType("text/plain");
-					resp.getWriter().println("HTTP Error 404 player "+n+" not found desu~");
-				}
-				catch (SAXException e) {
+					resp.getWriter().println("HTTP Error 404 player " + n + " not found desu~");
+				} catch (SAXException e) {
 					throw new ServletException(e);
 				}
-			}
-			catch (NumberFormatException e) {
+			} catch (NumberFormatException e) {
 				resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
 				resp.setContentType("text/plain");
-				resp.getWriter().println("HTTP Error 404 not found '"+actualTarget+"' desu~");
+				resp.getWriter().println("HTTP Error 404 not found '" + actualTarget + "' desu~");
 			}
 		}
-	}
-	
-	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		resp.setContentType("text/plain");
-		resp.getWriter().println("POST to PlayersHandlerXml desu~");
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
