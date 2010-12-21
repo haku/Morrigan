@@ -20,9 +20,9 @@ import java.io.IOException;
 import java.net.ConnectException;
 
 import net.sparktank.morrigan.android.helper.HttpHelper;
+import net.sparktank.morrigan.android.model.PlayerReference;
 import net.sparktank.morrigan.android.model.PlayerState;
 import net.sparktank.morrigan.android.model.PlayerStateChangeListener;
-import net.sparktank.morrigan.android.model.ServerReference;
 import net.sparktank.morrigan.android.model.impl.PlayerStateParser;
 
 import org.xml.sax.SAXException;
@@ -53,7 +53,7 @@ public class SetPlaystateTask extends AsyncTask<Void, Void, PlayerState> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private final Context context;
-	private final ServerReference serverReference;
+	private final PlayerReference playerReference;
 	private final TargetPlayState targetPlayState;
 	private final PlayerStateChangeListener changeListener;
 	
@@ -62,9 +62,9 @@ public class SetPlaystateTask extends AsyncTask<Void, Void, PlayerState> {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public SetPlaystateTask (Context context, ServerReference serverReference, TargetPlayState targetPlayState, PlayerStateChangeListener changeListener) {
+	public SetPlaystateTask (Context context, PlayerReference playerReference, TargetPlayState targetPlayState, PlayerStateChangeListener changeListener) {
 		this.context = context;
-		this.serverReference = serverReference;
+		this.playerReference = playerReference;
 		this.targetPlayState = targetPlayState;
 		this.changeListener = changeListener;
 	}
@@ -81,8 +81,7 @@ public class SetPlaystateTask extends AsyncTask<Void, Void, PlayerState> {
 	// In background thread:
 	@Override
 	protected PlayerState doInBackground(Void... params) {
-		String url = this.serverReference.getBaseUrl();
-		url = url.concat("/players/0"); // TODO remove temp hard-coded values.
+		String url = this.playerReference.getBaseUrl();
 		
 		String verb = null;
 		String encodedData = null;
