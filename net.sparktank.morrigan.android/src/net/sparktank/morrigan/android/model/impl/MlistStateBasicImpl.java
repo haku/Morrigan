@@ -25,6 +25,9 @@ public class MlistStateBasicImpl implements MlistState, MlistReference {
 	
 	private String title;
 	private String baseUrl;
+	private int count;
+	private long duration;
+	private boolean durationComplete;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -49,6 +52,33 @@ public class MlistStateBasicImpl implements MlistState, MlistReference {
 	
 	public void setBaseUrl(String baseUrl) {
 		this.baseUrl = baseUrl;
+	}
+	
+	@Override
+	public int getCount() {
+		return this.count;
+	}
+	
+	public void setCount(int count) {
+		this.count = count;
+	}
+	
+	@Override
+	public long getDuration() {
+		return this.duration;
+	}
+	
+	public void setDuration(long duration) {
+		this.duration = duration;
+	}
+	
+	public void setDurationComplete(boolean durationComplete) {
+		this.durationComplete = durationComplete;
+	}
+	
+	@Override
+	public boolean isDurationComplete() {
+		return this.durationComplete;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

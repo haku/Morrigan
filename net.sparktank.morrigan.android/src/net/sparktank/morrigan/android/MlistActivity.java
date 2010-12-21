@@ -16,17 +16,22 @@
 
 package net.sparktank.morrigan.android;
 
+import net.sparktank.morrigan.android.helper.TimeHelper;
 import net.sparktank.morrigan.android.model.MlistReference;
+import net.sparktank.morrigan.android.model.MlistState;
+import net.sparktank.morrigan.android.model.MlistStateChangeListener;
 import net.sparktank.morrigan.android.model.impl.MlistReferenceImpl;
+import net.sparktank.morrigan.android.tasks.GetMlistTask;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
-public class MlistActivity extends Activity {
+public class MlistActivity extends Activity implements MlistStateChangeListener {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static final String BASE_URL = "baseUrl";
@@ -132,7 +137,27 @@ public class MlistActivity extends Activity {
 	}
 	
 	protected void refresh () {
-		Toast.makeText(this, "TODO: refresh", Toast.LENGTH_SHORT).show();
+		GetMlistTask playpauseTask = new GetMlistTask(this, this.mlistReference, this);
+		playpauseTask.execute();
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	@Override
+	public void onMlistStateChange(MlistState newState) {
+		if (newState == null) {
+			finish(); // TODO show a msg here? Retry / Fail dlg?
+		}
+		else {
+			TextView txtListname = (TextView) findViewById(R.id.txtListname);
+			txtListname.setText(newState.getTitle());
+			
+			TextView txtCount = (TextView) findViewById(R.id.txtCount);
+			txtCount.setText(newState.getCount() + " items totalling "
+					+ (newState.isDurationComplete() ? "" : "more than ")
+					+ TimeHelper.formatTimeSeconds(newState.getDuration()) + ".");
+			
+		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

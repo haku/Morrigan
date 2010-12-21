@@ -89,8 +89,22 @@ public class XmlParser implements ContentHandler {
 	
 	public int getNodeInt (String node) {
 		String s = this.nodes.get(node);
+		if (s == null) return -1;
 		int i = Integer.parseInt(s);
 		return i;
+	}
+	
+	public long getNodeLong (String node) {
+		String s = this.nodes.get(node);
+		if (s == null) return -1;
+		long l = Long.parseLong(s);
+		return l;
+	}
+	
+	public boolean getNodeBoolean (String node) {
+		String s = this.nodes.get(node);
+		boolean b = Boolean.parseBoolean(s);
+		return b;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
