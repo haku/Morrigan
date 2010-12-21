@@ -31,6 +31,10 @@ public class PlayerReferenceImpl implements PlayerReference {
 		this.baseUrl = serverReference.getBaseUrl() + Constants.CONTEXT_PLAYERS + "/" + playerId;
 	}
 	
+	public PlayerReferenceImpl (String baseUrl) {
+		this.baseUrl = baseUrl;
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override

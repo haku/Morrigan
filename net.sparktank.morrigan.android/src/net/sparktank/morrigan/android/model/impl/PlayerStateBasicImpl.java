@@ -17,12 +17,15 @@
 package net.sparktank.morrigan.android.model.impl;
 
 import net.sparktank.morrigan.android.model.PlayState;
+import net.sparktank.morrigan.android.model.PlayerReference;
 import net.sparktank.morrigan.android.model.PlayerState;
 
-public class PlayerStateBasicImpl implements PlayerState {
+public class PlayerStateBasicImpl implements PlayerState, PlayerReference {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private int id;
+	
+	private String baseUrl;
 	
 	private PlayState playState;
 	private int playOrder;
@@ -55,6 +58,15 @@ public class PlayerStateBasicImpl implements PlayerState {
 		this.id = id;
 	}
 
+	public void setBaseUrl(String baseUrl) {
+		this.baseUrl = baseUrl;
+	}
+
+	@Override
+	public String getBaseUrl() {
+		return this.baseUrl;
+	}
+	
 	@Override
 	public PlayState getPlayState() {
 		return this.playState;

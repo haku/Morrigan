@@ -32,6 +32,7 @@ import net.sparktank.morrigan.android.model.Artifact;
 import net.sparktank.morrigan.android.model.PlayState;
 import net.sparktank.morrigan.android.model.PlayerState;
 import net.sparktank.morrigan.android.model.PlayersState;
+import net.sparktank.morrigan.android.model.ServerReference;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -40,16 +41,16 @@ import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
-import android.util.Log;
-
 public class PlayersStateImpl implements PlayersState, ContentHandler {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public final List<PlayerState> playersState = new LinkedList<PlayerState>();
+	private final ServerReference serverReference;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public PlayersStateImpl (String data) throws SAXException {
+	public PlayersStateImpl (String data, ServerReference serverReference) throws SAXException {
+		this.serverReference = serverReference;
 		String xml;
 		if (data.startsWith(XmlParser.XMLSTART)) {
 			xml = data;
@@ -109,8 +110,8 @@ public class PlayersStateImpl implements PlayersState, ContentHandler {
 			if (relVal != null && relVal.equals("self")) {
 				String hrefVal = attributes.getValue("href");
 				if (hrefVal != null && hrefVal.length() > 0) {
-					// TODO
-					Log.d("Morrigan", "hrefVal=" + hrefVal);
+					// Log.d("Morrigan", "hrefVal=" + hrefVal); // e.g. '/players/0'.
+					this.currentItem.setBaseUrl(this.serverReference.getBaseUrl() + hrefVal);
 				}
 			}
 		}
