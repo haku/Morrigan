@@ -79,11 +79,6 @@ public class ServerActivity extends Activity implements PlayersChangedListener {
 	private void wireGui () {
 		this.artifactListAdaptor = new ArtifactListAdaptorImpl(this);
 		
-//		// FIXME temp test data.
-//		List<Artifact> data = new ArrayList<Artifact>();
-//		data.add(new PlayerArtifactImpl(0));
-//		this.artifactListAdaptor.setInputData(data);
-		
 		ListView lstServers = (ListView) findViewById(R.id.lstServer);
 		lstServers.setAdapter(this.artifactListAdaptor);
 		lstServers.setOnItemClickListener(this.artifactsListCickListener);
