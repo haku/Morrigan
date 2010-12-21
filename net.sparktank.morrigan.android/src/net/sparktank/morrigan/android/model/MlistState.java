@@ -22,5 +22,9 @@ public interface MlistState extends Artifact {
 	@Override
 	public String getTitle ();
 	
+	public int getCount ();
+	public long getDuration ();
+	public boolean isDurationComplete ();
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
