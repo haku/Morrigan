@@ -65,11 +65,19 @@ public class MorriganServer {
 			playersHandlerXml.addServletWithMapping(PlayersServlet.class, "/"); // Relative to conPlayersXml's context.
 			conPlayersXml.setHandler(playersHandlerXml);
 			
+			ContextHandler conMlist = new ContextHandler();
+			conMlist.setContextPath(MlistServlet.CONTEXTPATH);
+			conMlist.setResourceBase(".");
+			ServletHandler mlistHandler = new ServletHandler();
+			mlistHandler.addServletWithMapping(MlistServlet.class, "/"); // Relative to mlistHandler's context.
+			conMlist.setHandler(mlistHandler);
+			
 			ContextHandlerCollection contexts = new ContextHandlerCollection();
 			contexts.addHandler(webapp);
 			contexts.addHandler(conMedia);
 			contexts.addHandler(conPlayers);
 			contexts.addHandler(conPlayersXml);
+			contexts.addHandler(conMlist);
 			this.server.setHandler(contexts);
 			
 		} catch (Exception e) {
