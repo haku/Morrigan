@@ -36,7 +36,7 @@ public class MediaHandler extends AbstractHandler {
 		String actualTarget = baseRequest.getRequestURI().substring(baseRequest.getServletContext().getContextPath().length());
 		System.err.println("request:t=" + actualTarget + ", m=" + request.getMethod());
 		
-		response.setContentType("text/html;charset=utf-8");
+		response.setContentType("text/xml;charset=utf-8");
 		response.setStatus(HttpServletResponse.SC_OK);
 		baseRequest.setHandled(true);
 		PrintWriter out = response.getWriter();
