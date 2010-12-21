@@ -95,7 +95,8 @@ public class MlistsServlet extends HttpServlet {
 						printMlist(resp, mmdb, subPath, afterSubPath);
 					}
 					else {
-						System.err.println("Unknown type '"+type+"'.");
+						resp.setContentType("text/plain");
+						resp.getWriter().println("Unknown type '"+type+"' desu~.");
 					}
 				}
 				else {
