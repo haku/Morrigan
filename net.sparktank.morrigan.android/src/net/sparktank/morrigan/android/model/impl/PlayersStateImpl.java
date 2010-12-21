@@ -31,7 +31,7 @@ import net.sparktank.morrigan.android.helper.XmlParser;
 import net.sparktank.morrigan.android.model.Artifact;
 import net.sparktank.morrigan.android.model.PlayState;
 import net.sparktank.morrigan.android.model.PlayerState;
-import net.sparktank.morrigan.android.model.PlayersState;
+import net.sparktank.morrigan.android.model.PlayerStateList;
 import net.sparktank.morrigan.android.model.ServerReference;
 
 import org.xml.sax.Attributes;
@@ -41,7 +41,7 @@ import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
-public class PlayersStateImpl implements PlayersState, ContentHandler {
+public class PlayersStateImpl implements PlayerStateList, ContentHandler {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public final List<PlayerState> playersState = new LinkedList<PlayerState>();

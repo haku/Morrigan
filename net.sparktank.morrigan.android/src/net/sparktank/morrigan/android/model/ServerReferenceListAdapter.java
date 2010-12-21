@@ -18,10 +18,15 @@ package net.sparktank.morrigan.android.model;
 
 import java.util.List;
 
-public interface PlayersState extends ArtifactList {
+import android.widget.ListAdapter;
+
+public interface ServerReferenceListAdapter extends ListAdapter {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public List<? extends PlayerState> getPlayersState ();
+	public void setInputData (List<? extends ServerReference> data);
+	public List<? extends ServerReference> getInputData ();
+	
+	public void notifyDataSetChanged ();
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

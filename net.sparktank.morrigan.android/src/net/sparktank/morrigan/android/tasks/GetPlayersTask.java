@@ -21,8 +21,8 @@ import java.net.ConnectException;
 
 import net.sparktank.morrigan.android.Constants;
 import net.sparktank.morrigan.android.helper.HttpHelper;
-import net.sparktank.morrigan.android.model.PlayersChangedListener;
-import net.sparktank.morrigan.android.model.PlayersState;
+import net.sparktank.morrigan.android.model.PlayerStateListChangeListener;
+import net.sparktank.morrigan.android.model.PlayerStateList;
 import net.sparktank.morrigan.android.model.ServerReference;
 import net.sparktank.morrigan.android.model.impl.PlayersStateImpl;
 
@@ -32,18 +32,18 @@ import android.app.Activity;
 import android.os.AsyncTask;
 import android.widget.Toast;
 
-public class GetPlayersTask extends AsyncTask<Void, Void, PlayersState> {
+public class GetPlayersTask extends AsyncTask<Void, Void, PlayerStateList> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private final Activity activity;
 	private final ServerReference serverReference;
-	private final PlayersChangedListener changedListener;
+	private final PlayerStateListChangeListener changedListener;
 	
 	private Exception exception;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public GetPlayersTask (Activity activity, ServerReference serverReference, PlayersChangedListener changedListener) {
+	public GetPlayersTask (Activity activity, ServerReference serverReference, PlayerStateListChangeListener changedListener) {
 		this.activity = activity;
 		this.serverReference = serverReference;
 		this.changedListener = changedListener;
@@ -60,13 +60,13 @@ public class GetPlayersTask extends AsyncTask<Void, Void, PlayersState> {
 	
 	// In background thread:
 	@Override
-	protected PlayersState doInBackground(Void... params) {
+	protected PlayerStateList doInBackground(Void... params) {
 		String url = this.serverReference.getBaseUrl();
 		url = url.concat(Constants.CONTEXT_PLAYERS);
 		
 		try {
 			String resp = HttpHelper.getUrlContent(url);
-			PlayersState playersState = new PlayersStateImpl(resp, this.serverReference);
+			PlayerStateList playersState = new PlayersStateImpl(resp, this.serverReference);
 			return playersState;
 		}
 		catch (ConnectException e) {
@@ -82,7 +82,7 @@ public class GetPlayersTask extends AsyncTask<Void, Void, PlayersState> {
 	
 	// In UI thread:
 	@Override
-	protected void onPostExecute(PlayersState result) {
+	protected void onPostExecute(PlayerStateList result) {
 		super.onPostExecute(result);
 		
 		if (this.exception != null) { // TODO handle this better.
