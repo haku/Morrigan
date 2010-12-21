@@ -3,6 +3,7 @@ package net.sparktank.morrigan.server;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.List;
 
@@ -32,11 +33,11 @@ import com.megginson.sax.DataWriter;
 public class MlistServlet extends HttpServlet {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-
-	public static final String CONTEXTPATH = "/mlist";
+	public static final String CONTEXTPATH = "/mlists";
 	
 	public static final String PATH_ITEMS = "items";
 	public static final String PATH_SRC = "src";
+	public static final String PATH_ITEM = "item";
 	
 	public static final String CMD_NEWMMDB = "newmmdb";
 	
@@ -90,7 +91,8 @@ public class MlistServlet extends HttpServlet {
 						String f = LocalMixedMediaDbHelper.getFullPathToMmdb(pathParts[1]);
 						ILocalMixedMediaDb mmdb = MediaFactoryImpl.get().getLocalMixedMediaDb(f);
 						String subPath = pathParts.length >= 3 ? pathParts[2] : null;
-						printMlist(resp, mmdb, subPath);
+						String afterSubPath = pathParts.length >= 4 ? pathParts[3] : null;
+						printMlist(resp, mmdb, subPath, afterSubPath);
 					}
 					else {
 						System.err.println("Unknown type '"+type+"'.");
@@ -128,7 +130,7 @@ public class MlistServlet extends HttpServlet {
 		AbstractFeed.endFeed(dw);
 	}
 	
-	static private void printMlist (HttpServletResponse resp, ILocalMixedMediaDb mmdb, String path) throws IOException, SAXException, MorriganException {
+	static private void printMlist (HttpServletResponse resp, ILocalMixedMediaDb mmdb, String path, String afterPath) throws IOException, SAXException, MorriganException, DbException {
 		resp.setContentType("text/xml;charset=utf-8");
 		DataWriter dw = AbstractFeed.startDocument(resp.getWriter(), "mlist");
 		
@@ -140,6 +142,13 @@ public class MlistServlet extends HttpServlet {
 		}
 		else if (path.equals(PATH_SRC)) {
 			printMlistLong(dw, mmdb, true, false);
+		}
+		else if (path.equals(PATH_ITEM) && afterPath != null && afterPath.length() > 0) {
+			String filename = URLDecoder.decode(afterPath, "UTF-8");
+			File file = new File(filename);
+			if (mmdb.hasFile(file) && file.exists()) {
+				ServletHelper.returnFile(file, resp);
+			}
 		}
 		else {
 			AbstractFeed.addElement(dw, "error", "Unknown path '"+path+"' desu~");
@@ -178,9 +187,10 @@ public class MlistServlet extends HttpServlet {
 		dw.dataElement("duration", String.valueOf(totalDuration.getDuration()));
 		dw.dataElement("durationcomplete", String.valueOf(totalDuration.isComplete()));
 		
-		AbstractFeed.addLink(dw, CONTEXTPATH + "/" + ml.getType() + "/" + listFile, "self", "text/xml");
-		if (!listItems) AbstractFeed.addLink(dw, CONTEXTPATH + "/" + ml.getType() + "/" + listFile + "/" + PATH_ITEMS, PATH_ITEMS, "text/xml");
-		AbstractFeed.addLink(dw, CONTEXTPATH + "/" + ml.getType() + "/" + listFile + "/" + PATH_SRC, PATH_SRC, "text/xml");
+		String pathToSelf = CONTEXTPATH + "/" + ml.getType() + "/" + listFile;
+		AbstractFeed.addLink(dw, pathToSelf, "self", "text/xml");
+		if (!listItems) AbstractFeed.addLink(dw, pathToSelf + "/" + PATH_ITEMS, PATH_ITEMS, "text/xml");
+		AbstractFeed.addLink(dw, pathToSelf + "/" + PATH_SRC, PATH_SRC, "text/xml");
 		
 		if (listSrcs) {
 			List<String> src;
@@ -203,7 +213,15 @@ public class MlistServlet extends HttpServlet {
     			}
     			
     			AbstractFeed.addElement(dw, "title", mi.getTitle());
-    			AbstractFeed.addLink(dw, CONTEXTPATH + "/" + ml.getType() + "/" + AbstractFeed.filenameFromPath(ml.getListId()) + "/" + file, "self", "text/xml");
+    			
+    			StringBuilder sb = new StringBuilder();
+    			sb.append(pathToSelf);
+    			sb.append("/");
+    			sb.append(PATH_ITEM);
+    			sb.append("/");
+    			sb.append(file);
+    			AbstractFeed.addLink(dw, sb.toString(), "self", "text/xml");
+    			
     			if (mi.getDateAdded() != null) {
     				AbstractFeed.addElement(dw, "dateadded", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateAdded()));
     			}
@@ -214,9 +232,6 @@ public class MlistServlet extends HttpServlet {
     			AbstractFeed.addElement(dw, "hash", mi.getHashcode());
     			
     			if (mi.getMediaType() == MediaType.TRACK) {
-    				if (mi.isPlayable()) {
-    					AbstractFeed.addLink(dw, "/player/0/play/" + listFile + "/" + file, "play", "cmd"); // FIXME list all players here.
-    				}
     				AbstractFeed.addElement(dw, "duration", mi.getDuration());
         			AbstractFeed.addElement(dw, "startcount", mi.getStartCount());
         			AbstractFeed.addElement(dw, "endcount", mi.getEndCount());
