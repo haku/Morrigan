@@ -19,8 +19,8 @@ package net.sparktank.morrigan.android;
 import net.sparktank.morrigan.android.model.Artifact;
 import net.sparktank.morrigan.android.model.ArtifactListAdaptor;
 import net.sparktank.morrigan.android.model.PlayerReference;
-import net.sparktank.morrigan.android.model.PlayersChangedListener;
-import net.sparktank.morrigan.android.model.PlayersState;
+import net.sparktank.morrigan.android.model.PlayerStateListChangeListener;
+import net.sparktank.morrigan.android.model.PlayerStateList;
 import net.sparktank.morrigan.android.model.ServerReference;
 import net.sparktank.morrigan.android.model.impl.ArtifactListAdaptorImpl;
 import net.sparktank.morrigan.android.model.impl.ServerReferenceImpl;
@@ -37,7 +37,7 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
-public class ServerActivity extends Activity implements PlayersChangedListener {
+public class ServerActivity extends Activity implements PlayerStateListChangeListener {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static final String BASE_URL = "baseUrl";
@@ -150,7 +150,7 @@ public class ServerActivity extends Activity implements PlayersChangedListener {
 //	UI updating.
 	
 	@Override
-	public void onPlayersChange(PlayersState playersState) {
+	public void onPlayersChange(PlayerStateList playersState) {
 		if (playersState == null) {
 			finish(); // TODO show a msg here? Retry / Fail dlg?
 		}

@@ -21,7 +21,7 @@ import java.util.List;
 
 import net.sparktank.morrigan.android.R;
 import net.sparktank.morrigan.android.model.ServerReference;
-import net.sparktank.morrigan.android.model.ServersListAdapter;
+import net.sparktank.morrigan.android.model.ServerReferenceListAdapter;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,10 +30,10 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class ServersListAdapterImpl extends BaseAdapter implements ServersListAdapter {
+public class ServersListAdapterImpl extends BaseAdapter implements ServerReferenceListAdapter {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private List<ServerReference> listData;
+	private List<? extends ServerReference> listData;
 	
 	private LayoutInflater layoutInflater;
 	
@@ -47,13 +47,13 @@ public class ServersListAdapterImpl extends BaseAdapter implements ServersListAd
 //	ServersListAdapter methods.
 	
 	@Override
-	public void setInputData(List<ServerReference> data) {
+	public void setInputData(List<? extends ServerReference> data) {
 		this.listData = data;
 		notifyDataSetChanged();
 	}
 	
 	@Override
-	public List<ServerReference> getInputData() {
+	public List<? extends ServerReference> getInputData() {
 		return Collections.unmodifiableList(this.listData);
 	}
 	

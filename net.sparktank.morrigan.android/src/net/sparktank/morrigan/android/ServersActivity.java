@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sparktank.morrigan.android.model.ServerReference;
-import net.sparktank.morrigan.android.model.ServersListAdapter;
+import net.sparktank.morrigan.android.model.ServerReferenceListAdapter;
 import net.sparktank.morrigan.android.model.impl.ServerReferenceImpl;
 import net.sparktank.morrigan.android.model.impl.ServersListAdapterImpl;
 import android.app.Activity;
@@ -34,7 +34,7 @@ import android.widget.ListView;
 public class ServersActivity extends Activity {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	ServersListAdapter serversListAdapter;
+	ServerReferenceListAdapter serversListAdapter;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Activity methods.
