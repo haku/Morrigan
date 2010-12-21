@@ -16,9 +16,10 @@
 
 package net.sparktank.morrigan.android;
 
+import net.sparktank.morrigan.android.model.PlayerReference;
 import net.sparktank.morrigan.android.model.PlayerState;
 import net.sparktank.morrigan.android.model.PlayerStateChangeListener;
-import net.sparktank.morrigan.android.model.ServerReference;
+import net.sparktank.morrigan.android.model.impl.PlayerReferenceImpl;
 import net.sparktank.morrigan.android.model.impl.ServerReferenceImpl;
 import net.sparktank.morrigan.android.tasks.SetPlaystateTask;
 import net.sparktank.morrigan.android.tasks.SetPlaystateTask.TargetPlayState;
@@ -40,8 +41,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private ServerReference serverReference = null;
-	private int playerId;
+	private PlayerReference playerReference = null;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Activity methods.
@@ -54,21 +54,15 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 		String baseUrl = extras.getString(BASE_URL);
 		int id = extras.getInt(PLAYER_ID, -1);
 		
-		if (baseUrl != null) {
-			this.serverReference = new ServerReferenceImpl(baseUrl); // TODO use data passed into activity to get ServerReference from DB.
+		if (baseUrl != null && id >= 0) {
+			ServerReferenceImpl serverReference = new ServerReferenceImpl(baseUrl);
+			this.playerReference = new PlayerReferenceImpl(serverReference, id); // TODO use data passed into activity to get ServerReference from DB.
 		}
 		else {
 			finish();
 		}
 		
-		if (id >= 0) {
-			this.playerId = id;
-		}
-		else {
-			finish();
-		}
-		
-		this.setTitle(baseUrl + "/p" + this.playerId);
+		this.setTitle(this.playerReference.getBaseUrl());
 		
 		setContentView(R.layout.player);
 		hookUpButtons();
@@ -147,17 +141,17 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 //	Commands - to be called on the UI thread.
 	
 	protected void refresh () {
-		SetPlaystateTask playpauseTask = new SetPlaystateTask(this, this.serverReference, null, this);
+		SetPlaystateTask playpauseTask = new SetPlaystateTask(this, this.playerReference, null, this);
 		playpauseTask.execute();
 	}
 	
 	protected void playpause () {
-		SetPlaystateTask playpauseTask = new SetPlaystateTask(this, this.serverReference, TargetPlayState.PLAYPAUSE, this);
+		SetPlaystateTask playpauseTask = new SetPlaystateTask(this, this.playerReference, TargetPlayState.PLAYPAUSE, this);
 		playpauseTask.execute();
 	}
 	
 	protected void next () {
-		SetPlaystateTask playpauseTask = new SetPlaystateTask(this, this.serverReference, TargetPlayState.NEXT, this);
+		SetPlaystateTask playpauseTask = new SetPlaystateTask(this, this.playerReference, TargetPlayState.NEXT, this);
 		playpauseTask.execute();
 	}
 	
