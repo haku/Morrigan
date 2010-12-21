@@ -18,6 +18,7 @@ package net.sparktank.morrigan.android;
 
 import net.sparktank.morrigan.android.model.Artifact;
 import net.sparktank.morrigan.android.model.ArtifactListAdaptor;
+import net.sparktank.morrigan.android.model.MlistReference;
 import net.sparktank.morrigan.android.model.MlistStateList;
 import net.sparktank.morrigan.android.model.MlistStateListChangeListener;
 import net.sparktank.morrigan.android.model.PlayerReference;
@@ -130,8 +131,12 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 	
 	protected void showArtifactActivity (Artifact item) {
 		if (item instanceof PlayerReference) {
-			PlayerReference pa = (PlayerReference) item;
-			showArtifactActivity(pa);
+			PlayerReference pr = (PlayerReference) item;
+			showArtifactActivity(pr);
+		}
+		else if (item instanceof MlistReference) {
+			MlistReference mr = (MlistReference) item;
+			showArtifactActivity(mr);
 		}
 		else {
 			Toast.makeText(this, "TODO: open type '"+item.getClass().getName()+"' desu~", Toast.LENGTH_LONG).show();
@@ -142,6 +147,10 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 		Intent intent = new Intent(getApplicationContext(), PlayerActivity.class);
 		intent.putExtra(PlayerActivity.BASE_URL, item.getBaseUrl());
 		startActivity(intent);
+	}
+	
+	protected void showArtifactActivity (MlistReference item) {
+		Toast.makeText(this, "TODO: open Mlist '"+item.getBaseUrl()+"' desu~", Toast.LENGTH_LONG).show();
 	}
 	
 	protected void refresh () {
