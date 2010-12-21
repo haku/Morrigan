@@ -28,6 +28,7 @@ import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.xml.sax.SAXException;
 
+@Deprecated
 public class MediaHandler extends AbstractHandler {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	

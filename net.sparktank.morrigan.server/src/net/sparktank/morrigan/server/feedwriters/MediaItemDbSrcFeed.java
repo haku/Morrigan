@@ -11,6 +11,7 @@ import org.xml.sax.SAXException;
 
 import com.megginson.sax.DataWriter;
 
+@Deprecated
 public class MediaItemDbSrcFeed extends AbstractFeed {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

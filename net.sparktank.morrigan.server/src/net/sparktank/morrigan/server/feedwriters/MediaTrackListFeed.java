@@ -12,6 +12,7 @@ import org.xml.sax.SAXException;
 
 import com.megginson.sax.DataWriter;
 
+@Deprecated
 public class MediaTrackListFeed<T extends IMediaTrackList<? extends IMediaItem>> extends AbstractFeed {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
