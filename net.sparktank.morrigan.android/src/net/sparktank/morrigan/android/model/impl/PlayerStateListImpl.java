@@ -41,15 +41,15 @@ import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
-public class PlayersStateImpl implements PlayerStateList, ContentHandler {
+public class PlayerStateListImpl implements PlayerStateList, ContentHandler {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public final List<PlayerState> playersState = new LinkedList<PlayerState>();
+	private final List<PlayerState> playerStateList = new LinkedList<PlayerState>();
 	private final ServerReference serverReference;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public PlayersStateImpl (String data, ServerReference serverReference) throws SAXException {
+	public PlayerStateListImpl (String data, ServerReference serverReference) throws SAXException {
 		this.serverReference = serverReference;
 		String xml;
 		if (data.startsWith(XmlParser.XMLSTART)) {
@@ -83,13 +83,13 @@ public class PlayersStateImpl implements PlayerStateList, ContentHandler {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
-	public List<PlayerState> getPlayersState() {
-		return Collections.unmodifiableList(this.playersState);
+	public List<PlayerState> getPlayersStateList() {
+		return Collections.unmodifiableList(this.playerStateList);
 	}
 	
 	@Override
-	public List<? extends Artifact> getArtifacts() {
-		return Collections.unmodifiableList(this.playersState);
+	public List<? extends Artifact> getArtifactList() {
+		return Collections.unmodifiableList(this.playerStateList);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -125,7 +125,7 @@ public class PlayersStateImpl implements PlayerStateList, ContentHandler {
 	@Override
 	public void endElement(String uri, String localName, String qName) throws SAXException {
 		if (this.stack.size() == 2 && localName.equals("entry")) {
-			this.playersState.add(this.currentItem);
+			this.playerStateList.add(this.currentItem);
 			this.currentItem = null;
 		}
 		else if (this.stack.size() == 3 && localName.equals(PlayerStateXmlImpl.PLAYERID)) {

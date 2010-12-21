@@ -22,7 +22,7 @@ import java.util.List;
 import net.sparktank.morrigan.android.model.ServerReference;
 import net.sparktank.morrigan.android.model.ServerReferenceListAdapter;
 import net.sparktank.morrigan.android.model.impl.ServerReferenceImpl;
-import net.sparktank.morrigan.android.model.impl.ServersListAdapterImpl;
+import net.sparktank.morrigan.android.model.impl.ServerReferenceListAdapterImpl;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -51,7 +51,7 @@ public class ServersActivity extends Activity {
 //	GUI methods.
 	
 	private void wireGui () {
-		this.serversListAdapter = new ServersListAdapterImpl(this);
+		this.serversListAdapter = new ServerReferenceListAdapterImpl(this);
 		
 		// FIXME temp test data.
 		List<ServerReference> data = new ArrayList<ServerReference>();

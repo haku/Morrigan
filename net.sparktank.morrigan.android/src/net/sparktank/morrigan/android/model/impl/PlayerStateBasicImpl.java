@@ -39,7 +39,7 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference {
 	private String listId;
 	
 	private int queueLength;
-
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
