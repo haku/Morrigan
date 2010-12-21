@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.SocketException;
+import java.net.URL;
 import java.net.URLDecoder;
 import java.net.UnknownHostException;
 import java.util.Date;
@@ -18,6 +19,7 @@ import net.sparktank.morrigan.model.media.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.IMixedMediaItem.MediaType;
 import net.sparktank.morrigan.model.media.IRemoteMixedMediaDb;
 import net.sparktank.morrigan.model.tasks.TaskEventListener;
+import net.sparktank.morrigan.server.MlistServlet;
 import net.sparktank.morrigan.server.feedwriters.XmlHelper;
 import net.sparktank.morrigan.util.httpclient.HttpClient;
 import net.sparktank.morrigan.util.httpclient.HttpClient.HttpResponse;
@@ -100,7 +102,11 @@ public class MixedMediaDbFeedParser extends DefaultHandler {
 		};
 		
 		try {
-			HttpResponse response = HttpClient.getHttpClient().doHttpRequest(mmdb.getUrl(), httpStreamHandler);
+			// We want to request the items for this list.
+			String surl = mmdb.getUrl().toString() + "/" + MlistServlet.PATH_ITEMS;
+			URL url = new URL(surl);
+			
+			HttpResponse response = HttpClient.getHttpClient().doHttpRequest(url, httpStreamHandler);
 			if (response.getCode() != 200) {
 				throw new MorriganException("After fetching remote MMDB response code was " + response.getCode() + " (expected 200).");
 			}

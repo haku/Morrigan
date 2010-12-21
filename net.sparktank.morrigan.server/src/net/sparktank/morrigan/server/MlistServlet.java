@@ -35,8 +35,8 @@ public class MlistServlet extends HttpServlet {
 
 	public static final String CONTEXTPATH = "/mlist";
 	
-	private static final String PATH_ITEMS = "items";
-	private static final String PATH_SRC = "src";
+	public static final String PATH_ITEMS = "items";
+	public static final String PATH_SRC = "src";
 	
 	public static final String CMD_NEWMMDB = "newmmdb";
 	
