@@ -112,11 +112,12 @@ public class SetPlaystateTask extends AsyncTask<Void, Void, PlayerState> {
 		catch (ConnectException e) {
 			this.exception = e;
 			return null;
-		}
-		catch (IOException e) {
-			throw new RuntimeException(e);
+		} catch (IOException e) {
+			this.exception = e;
+			return null;
 		} catch (SAXException e) {
-			throw new RuntimeException(e);
+			this.exception = e;
+			return null;
 		}
 	}
 	

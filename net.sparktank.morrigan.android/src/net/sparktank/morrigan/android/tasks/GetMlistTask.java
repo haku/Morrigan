@@ -60,21 +60,20 @@ public class GetMlistTask extends AsyncTask<Void, Void, MlistState> {
 	// In background thread:
 	@Override
 	protected MlistState doInBackground(Void... params) {
-		String url = this.mlistReference.getBaseUrl();
-		
 		try {
-			String resp = HttpHelper.getUrlContent(url);
+			String resp = HttpHelper.getUrlContent(this.mlistReference.getBaseUrl());
 			MlistState state = new MlistStateXmlImpl(resp);
 			return state;
 		}
 		catch (ConnectException e) {
 			this.exception = e;
 			return null;
-		}
-		catch (IOException e) {
-			throw new RuntimeException(e);
+		} catch (IOException e) {
+			this.exception = e;
+			return null;
 		} catch (SAXException e) {
-			throw new RuntimeException(e);
+			this.exception = e;
+			return null;
 		}
 	}
 	
