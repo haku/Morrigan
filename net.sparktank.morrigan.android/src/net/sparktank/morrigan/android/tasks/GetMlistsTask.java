@@ -72,11 +72,12 @@ public class GetMlistsTask extends AsyncTask<Void, Void, MlistStateList> {
 		catch (ConnectException e) {
 			this.exception = e;
 			return null;
-		}
-		catch (IOException e) {
-			throw new RuntimeException(e);
+		} catch (IOException e) {
+			this.exception = e;
+			return null;
 		} catch (SAXException e) {
-			throw new RuntimeException(e);
+			this.exception = e;
+			return null;
 		}
 	}
 	

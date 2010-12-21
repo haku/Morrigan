@@ -22,8 +22,12 @@ import net.sparktank.morrigan.android.model.MlistState;
 import net.sparktank.morrigan.android.model.MlistStateChangeListener;
 import net.sparktank.morrigan.android.model.impl.MlistReferenceImpl;
 import net.sparktank.morrigan.android.tasks.GetMlistTask;
+import net.sparktank.morrigan.android.tasks.RunMlistActionTask;
+import net.sparktank.morrigan.android.tasks.RunMlistActionTask.CommandToRun;
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -122,14 +126,46 @@ public class MlistActivity extends Activity implements MlistStateChangeListener 
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Menu items.
+	
+	private static final int MENU_SCAN = 1;
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		boolean result = super.onCreateOptionsMenu(menu);
+		menu.add(0, MENU_SCAN, 0, R.string.menu_scan);
+		return result;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			
+			case MENU_SCAN:
+				scan();
+				return true;
+			
+		}
+		
+		return super.onOptionsItemSelected(item);
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Commands - to be called on the UI thread.
 	
 	protected void play () {
-		Toast.makeText(this, "TODO: play", Toast.LENGTH_SHORT).show();
+		RunMlistActionTask task = new RunMlistActionTask(this, this.mlistReference, CommandToRun.PLAY);
+		task.execute();
 	}
 	
 	protected void queue () {
-		Toast.makeText(this, "TODO: queue", Toast.LENGTH_SHORT).show();
+		RunMlistActionTask task = new RunMlistActionTask(this, this.mlistReference, CommandToRun.QUEUE);
+		task.execute();
+	}
+	
+	protected void scan () {
+		RunMlistActionTask task = new RunMlistActionTask(this, this.mlistReference, CommandToRun.SCAN);
+		task.execute();
 	}
 	
 	protected void search () {
@@ -137,8 +173,8 @@ public class MlistActivity extends Activity implements MlistStateChangeListener 
 	}
 	
 	protected void refresh () {
-		GetMlistTask playpauseTask = new GetMlistTask(this, this.mlistReference, this);
-		playpauseTask.execute();
+		GetMlistTask task = new GetMlistTask(this, this.mlistReference, this);
+		task.execute();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

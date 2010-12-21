@@ -72,11 +72,12 @@ public class GetPlayersTask extends AsyncTask<Void, Void, PlayerStateList> {
 		catch (ConnectException e) {
 			this.exception = e;
 			return null;
-		}
-		catch (IOException e) {
-			throw new RuntimeException(e);
+		} catch (IOException e) {
+			this.exception = e;
+			return null;
 		} catch (SAXException e) {
-			throw new RuntimeException(e);
+			this.exception = e;
+			return null;
 		}
 	}
 	
