@@ -158,7 +158,6 @@ public class ServerActivity extends Activity implements PlayersChangedListener {
 		}
 		else {
 			this.artifactListAdaptor.setInputData(playersState);
-			this.artifactListAdaptor.notifyDataSetChanged();
 		}
 	}
 	

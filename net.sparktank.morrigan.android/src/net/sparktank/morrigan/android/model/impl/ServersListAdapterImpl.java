@@ -49,6 +49,7 @@ public class ServersListAdapterImpl extends BaseAdapter implements ServersListAd
 	@Override
 	public void setInputData(List<ServerReference> data) {
 		this.listData = data;
+		notifyDataSetChanged();
 	}
 	
 	@Override

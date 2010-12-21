@@ -46,6 +46,7 @@ public class ArtifactListAdaptorImpl extends BaseAdapter implements ArtifactList
 	@Override
 	public void setInputData(ArtifactList data) {
 		this.listData = data;
+		notifyDataSetChanged();
 	}
 	
 	@Override
