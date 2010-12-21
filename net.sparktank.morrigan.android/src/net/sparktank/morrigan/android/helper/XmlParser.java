@@ -34,7 +34,7 @@ import org.xml.sax.XMLReader;
 public class XmlParser implements ContentHandler {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private static final String XMLSTART = "<?xml";
+	public static final String XMLSTART = "<?xml";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	

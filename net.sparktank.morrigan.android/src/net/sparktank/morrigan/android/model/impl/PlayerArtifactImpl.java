@@ -18,6 +18,7 @@ package net.sparktank.morrigan.android.model.impl;
 
 import net.sparktank.morrigan.android.model.PlayerArtifact;
 
+@Deprecated
 public class PlayerArtifactImpl implements PlayerArtifact {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
