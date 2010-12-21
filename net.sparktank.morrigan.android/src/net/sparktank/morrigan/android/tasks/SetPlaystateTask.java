@@ -23,7 +23,7 @@ import net.sparktank.morrigan.android.helper.HttpHelper;
 import net.sparktank.morrigan.android.model.PlayerReference;
 import net.sparktank.morrigan.android.model.PlayerState;
 import net.sparktank.morrigan.android.model.PlayerStateChangeListener;
-import net.sparktank.morrigan.android.model.impl.PlayerStateParser;
+import net.sparktank.morrigan.android.model.impl.PlayerStateXmlImpl;
 
 import org.xml.sax.SAXException;
 
@@ -106,7 +106,7 @@ public class SetPlaystateTask extends AsyncTask<Void, Void, PlayerState> {
 		
 		try {
 			String resp = HttpHelper.getUrlContent(url, verb, encodedData, "application/x-www-form-urlencoded");
-			PlayerState playerState = new PlayerStateParser(resp);
+			PlayerState playerState = new PlayerStateXmlImpl(resp);
 			return playerState;
 		}
 		catch (ConnectException e) {
