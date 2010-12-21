@@ -28,6 +28,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -63,6 +64,9 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 		}
 		
 		this.setTitle(this.playerReference.getBaseUrl());
+		
+		// TODO check return value.
+		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		
 		setContentView(R.layout.player);
 		hookUpButtons();

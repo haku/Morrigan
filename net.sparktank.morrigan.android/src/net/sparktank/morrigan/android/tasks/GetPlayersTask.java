@@ -28,25 +28,23 @@ import net.sparktank.morrigan.android.model.impl.PlayersStateImpl;
 
 import org.xml.sax.SAXException;
 
-import android.app.ProgressDialog;
-import android.content.Context;
+import android.app.Activity;
 import android.os.AsyncTask;
 import android.widget.Toast;
 
 public class GetPlayersTask extends AsyncTask<Void, Void, PlayersState> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private final Context context;
+	private final Activity activity;
 	private final ServerReference serverReference;
 	private final PlayersChangedListener changedListener;
 	
-	private ProgressDialog dialog;
 	private Exception exception;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public GetPlayersTask (Context context, ServerReference serverReference, PlayersChangedListener changedListener) {
-		this.context = context;
+	public GetPlayersTask (Activity activity, ServerReference serverReference, PlayersChangedListener changedListener) {
+		this.activity = activity;
 		this.serverReference = serverReference;
 		this.changedListener = changedListener;
 	}
@@ -57,7 +55,7 @@ public class GetPlayersTask extends AsyncTask<Void, Void, PlayersState> {
 	@Override
 	protected void onPreExecute() {
 		super.onPreExecute();
-		this.dialog = ProgressDialog.show(this.context, null, "Please wait...", true);
+		this.activity.setProgressBarIndeterminateVisibility(true);
 	}
 	
 	// In background thread:
@@ -88,12 +86,12 @@ public class GetPlayersTask extends AsyncTask<Void, Void, PlayersState> {
 		super.onPostExecute(result);
 		
 		if (this.exception != null) { // TODO handle this better.
-			Toast.makeText(this.context, this.exception.getMessage(), Toast.LENGTH_LONG).show();
+			Toast.makeText(this.activity, this.exception.getMessage(), Toast.LENGTH_LONG).show();
 		}
 		
 		if (this.changedListener != null) this.changedListener.onPlayersChange(result);
 		
-		this.dialog.dismiss(); // FIXME This will fail if the screen is rotated while we are fetching.
+		this.activity.setProgressBarIndeterminateVisibility(false);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

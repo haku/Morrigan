@@ -27,8 +27,7 @@ import net.sparktank.morrigan.android.model.impl.PlayerStateParser;
 
 import org.xml.sax.SAXException;
 
-import android.app.ProgressDialog;
-import android.content.Context;
+import android.app.Activity;
 import android.os.AsyncTask;
 import android.widget.Toast;
 
@@ -52,18 +51,17 @@ public class SetPlaystateTask extends AsyncTask<Void, Void, PlayerState> {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private final Context context;
+	private final Activity activity;
 	private final PlayerReference playerReference;
 	private final TargetPlayState targetPlayState;
 	private final PlayerStateChangeListener changeListener;
 	
-	private ProgressDialog dialog;
 	private Exception exception;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public SetPlaystateTask (Context context, PlayerReference playerReference, TargetPlayState targetPlayState, PlayerStateChangeListener changeListener) {
-		this.context = context;
+	public SetPlaystateTask (Activity activity, PlayerReference playerReference, TargetPlayState targetPlayState, PlayerStateChangeListener changeListener) {
+		this.activity = activity;
 		this.playerReference = playerReference;
 		this.targetPlayState = targetPlayState;
 		this.changeListener = changeListener;
@@ -75,7 +73,7 @@ public class SetPlaystateTask extends AsyncTask<Void, Void, PlayerState> {
 	@Override
 	protected void onPreExecute() {
 		super.onPreExecute();
-		this.dialog = ProgressDialog.show(this.context, null, "Please wait...", true);
+		this.activity.setProgressBarIndeterminateVisibility(true);
 	}
 	
 	// In background thread:
@@ -128,12 +126,12 @@ public class SetPlaystateTask extends AsyncTask<Void, Void, PlayerState> {
 		super.onPostExecute(result);
 		
 		if (this.exception != null) { // TODO handle this better.
-			Toast.makeText(this.context, this.exception.getMessage(), Toast.LENGTH_LONG).show();
+			Toast.makeText(this.activity, this.exception.getMessage(), Toast.LENGTH_LONG).show();
 		}
 		
 		if (this.changeListener != null) this.changeListener.onPlayerStateChange(result);
 		
-		this.dialog.dismiss(); // FIXME This will fail if the screen is rotated while we are fetching.
+		this.activity.setProgressBarIndeterminateVisibility(false);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

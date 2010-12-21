@@ -30,6 +30,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageButton;
@@ -61,6 +62,9 @@ public class ServerActivity extends Activity implements PlayersChangedListener {
 			finish();
 		}
 		this.setTitle(baseUrl);
+		
+		// TODO check return value.
+		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		
 		setContentView(R.layout.server);
 		wireGui();
