@@ -17,18 +17,20 @@
 package net.sparktank.morrigan.android.tasks;
 
 import java.io.IOException;
+import java.net.ConnectException;
 
 import net.sparktank.morrigan.android.helper.HttpHelper;
 import net.sparktank.morrigan.android.model.PlayerState;
 import net.sparktank.morrigan.android.model.PlayerStateChangeListener;
 import net.sparktank.morrigan.android.model.ServerReference;
-import net.sparktank.morrigan.android.model.impl.PlayerStateImpl;
+import net.sparktank.morrigan.android.model.impl.PlayerStateParser;
 
 import org.xml.sax.SAXException;
 
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.widget.Toast;
 
 public class SetPlaystateTask extends AsyncTask<Void, Void, PlayerState> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -56,6 +58,7 @@ public class SetPlaystateTask extends AsyncTask<Void, Void, PlayerState> {
 	private final PlayerStateChangeListener changeListener;
 	
 	private ProgressDialog dialog;
+	private Exception exception;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -106,8 +109,12 @@ public class SetPlaystateTask extends AsyncTask<Void, Void, PlayerState> {
 		
 		try {
 			String resp = HttpHelper.getUrlContent(url, verb, encodedData, "application/x-www-form-urlencoded");
-			PlayerState playerState = new PlayerStateImpl(resp);
+			PlayerState playerState = new PlayerStateParser(resp);
 			return playerState;
+		}
+		catch (ConnectException e) {
+			this.exception = e;
+			return null;
 		}
 		catch (IOException e) {
 			throw new RuntimeException(e);
@@ -120,6 +127,10 @@ public class SetPlaystateTask extends AsyncTask<Void, Void, PlayerState> {
 	@Override
 	protected void onPostExecute(PlayerState result) {
 		super.onPostExecute(result);
+		
+		if (this.exception != null) { // TODO handle this better.
+			Toast.makeText(this.context, this.exception.getMessage(), Toast.LENGTH_LONG).show();
+		}
 		
 		if (this.changeListener != null) this.changeListener.onPlayerStateChange(result);
 		

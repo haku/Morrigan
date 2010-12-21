@@ -170,21 +170,26 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 	
 	@Override
 	public void onPlayerStateChange(PlayerState newState) {
-		TextView txtListname = (TextView) findViewById(R.id.txtListname);
-		txtListname.setText(newState.getListTitle());
-		
-		TextView txtTitle = (TextView) findViewById(R.id.txtTitle);
-		txtTitle.setText(newState.getTrackTitle());
-		
-		TextView txtQueue = (TextView) findViewById(R.id.txtQueue);
-		txtQueue.setText(newState.getQueueLength() + " items.");
-		
-		ImageView imgPlaystate = (ImageView) findViewById(R.id.imgPlaystate);
-		switch (newState.getPlayState()) {
-			case STOPPED: imgPlaystate.setImageResource(R.drawable.stop);  break;
-			case PLAYING: imgPlaystate.setImageResource(R.drawable.play);  break;
-			case PAUSED:  imgPlaystate.setImageResource(R.drawable.pause); break;
-			case LOADING: imgPlaystate.setImageResource(R.drawable.db);    break; // TODO find better icon.
+		if (newState == null) {
+			finish(); // TODO show a msg here? Retry / Fail dlg?
+		}
+		else {
+			TextView txtListname = (TextView) findViewById(R.id.txtListname);
+			txtListname.setText(newState.getListTitle());
+			
+			TextView txtTitle = (TextView) findViewById(R.id.txtTitle);
+			txtTitle.setText(newState.getTrackTitle());
+			
+			TextView txtQueue = (TextView) findViewById(R.id.txtQueue);
+			txtQueue.setText(newState.getQueueLength() + " items.");
+			
+			ImageView imgPlaystate = (ImageView) findViewById(R.id.imgPlaystate);
+			switch (newState.getPlayState()) {
+				case STOPPED: imgPlaystate.setImageResource(R.drawable.stop);  break;
+				case PLAYING: imgPlaystate.setImageResource(R.drawable.play);  break;
+				case PAUSED:  imgPlaystate.setImageResource(R.drawable.pause); break;
+				case LOADING: imgPlaystate.setImageResource(R.drawable.db);    break; // TODO find better icon.
+			}
 		}
 	}
 	

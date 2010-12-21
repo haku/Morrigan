@@ -22,20 +22,20 @@ import net.sparktank.morrigan.android.helper.XmlParser;
 import net.sparktank.morrigan.android.model.PlayState;
 import net.sparktank.morrigan.android.model.PlayerState;
 
-public class PlayerStateImpl extends XmlParser implements PlayerState {
+public class PlayerStateParser extends XmlParser implements PlayerState {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private static final String TRACKDURATION = "trackduration";
-	private static final String TRACKFILE = "trackfile";
-	private static final String PLAYPOSITION = "playposition";
-	private static final String TRACKTITLE = "tracktitle";
-	private static final String LISTID = "listid";
-	private static final String LISTTITLE = "listtitle";
-	private static final String QUEUEDURATION = "queueduration";
-	private static final String QUEUELENGTH = "queuelength";
-	private static final String PLAYORDER = "playorder";
-	private static final String PLAYSTATE = "playstate";
-	private static final String PLAYERID = "playerid";
+	public static final String TRACKDURATION = "trackduration";
+	public static final String TRACKFILE = "trackfile";
+	public static final String PLAYPOSITION = "playposition";
+	public static final String TRACKTITLE = "tracktitle";
+	public static final String LISTID = "listid";
+	public static final String LISTTITLE = "listtitle";
+	public static final String QUEUEDURATION = "queueduration";
+	public static final String QUEUELENGTH = "queuelength";
+	public static final String PLAYORDER = "playorder";
+	public static final String PLAYSTATE = "playstate";
+	public static final String PLAYERID = "playerid";
 	
 	public final static String[] nodes = new String[] { 
 		PLAYERID,
@@ -53,12 +53,19 @@ public class PlayerStateImpl extends XmlParser implements PlayerState {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public PlayerStateImpl (String xmlString) throws SAXException {
+	public PlayerStateParser (String xmlString) throws SAXException {
 		super(xmlString, nodes);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
+	
+	@Override
+	public String getTitle() {
+		return "p" + getId() + ":" + getTrackTitle();
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
 	@Override
 	public int getId() {
 		return this.getNodeInt(PLAYERID);
@@ -95,7 +102,7 @@ public class PlayerStateImpl extends XmlParser implements PlayerState {
 	}
 	
 	@Override
-	public String getTrckFile() {
+	public String getTrackFile() {
 		return this.getNode(TRACKFILE);
 	}
 	

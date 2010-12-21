@@ -16,11 +16,8 @@
 
 package net.sparktank.morrigan.android.model.impl;
 
-import java.util.Collections;
-import java.util.List;
-
 import net.sparktank.morrigan.android.R;
-import net.sparktank.morrigan.android.model.Artifact;
+import net.sparktank.morrigan.android.model.ArtifactList;
 import net.sparktank.morrigan.android.model.ArtifactListAdaptor;
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -33,7 +30,7 @@ import android.widget.TextView;
 public class ArtifactListAdaptorImpl extends BaseAdapter implements ArtifactListAdaptor {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private List<Artifact> listData;
+	private ArtifactList listData;
 	
 	private LayoutInflater layoutInflater;
 	
@@ -47,13 +44,13 @@ public class ArtifactListAdaptorImpl extends BaseAdapter implements ArtifactList
 //	ArtifactListAdaptor methods.
 	
 	@Override
-	public void setInputData(List<Artifact> data) {
+	public void setInputData(ArtifactList data) {
 		this.listData = data;
 	}
 	
 	@Override
-	public List<Artifact> getInputData() {
-		return Collections.unmodifiableList(this.listData);
+	public ArtifactList getInputData() {
+		return this.listData;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -61,7 +58,9 @@ public class ArtifactListAdaptorImpl extends BaseAdapter implements ArtifactList
 	
 	@Override
 	public int getCount() {
-		return this.listData.size();
+		if (this.listData == null) return 0;
+		if (this.listData.getArtifacts() == null) return 0;
+		return this.listData.getArtifacts().size();
 	}
 	
 	@Override
@@ -94,7 +93,7 @@ public class ArtifactListAdaptorImpl extends BaseAdapter implements ArtifactList
 			rowView = (RowView) view.getTag();
 		}
 		
-		rowView.text.setText(this.listData.get(position).getTitle());
+		rowView.text.setText(this.listData.getArtifacts().get(position).getTitle());
 		
 		return view;
 	}

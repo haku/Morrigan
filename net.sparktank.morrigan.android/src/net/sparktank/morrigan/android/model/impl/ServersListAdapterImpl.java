@@ -61,6 +61,7 @@ public class ServersListAdapterImpl extends BaseAdapter implements ServersListAd
 	
 	@Override
 	public int getCount() {
+		if (this.listData == null) return 0;
 		return this.listData.size();
 	}
 	

@@ -16,10 +16,10 @@
 
 package net.sparktank.morrigan.android.model;
 
-public interface PlayerState {
+public interface PlayerState extends PlayerArtifact {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public int getId ();
+//	public int getId ();
 	
 	public PlayState getPlayState ();
 	public int getPlayOrder (); // TODO replace with enum.
@@ -29,7 +29,7 @@ public interface PlayerState {
 	public String getListId ();
 	
 	public String getTrackTitle ();
-	public String getTrckFile ();
+	public String getTrackFile ();
 	public int getTrackDuration ();
 	
 	public int getQueueLength ();

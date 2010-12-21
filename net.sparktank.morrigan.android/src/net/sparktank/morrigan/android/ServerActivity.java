@@ -16,16 +16,15 @@
 
 package net.sparktank.morrigan.android;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.sparktank.morrigan.android.model.Artifact;
 import net.sparktank.morrigan.android.model.ArtifactListAdaptor;
 import net.sparktank.morrigan.android.model.PlayerArtifact;
+import net.sparktank.morrigan.android.model.PlayersChangedListener;
+import net.sparktank.morrigan.android.model.PlayersState;
 import net.sparktank.morrigan.android.model.ServerReference;
 import net.sparktank.morrigan.android.model.impl.ArtifactListAdaptorImpl;
-import net.sparktank.morrigan.android.model.impl.PlayerArtifactImpl;
 import net.sparktank.morrigan.android.model.impl.ServerReferenceImpl;
+import net.sparktank.morrigan.android.tasks.GetPlayersTask;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -37,7 +36,7 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
-public class ServerActivity extends Activity {
+public class ServerActivity extends Activity implements PlayersChangedListener {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static final String BASE_URL = "baseUrl";
@@ -67,16 +66,23 @@ public class ServerActivity extends Activity {
 		wireGui();
 	}
 	
+	@Override
+	protected void onStart() {
+		super.onStart();
+		
+		refresh();
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	GUI methods.
 	
 	private void wireGui () {
 		this.artifactListAdaptor = new ArtifactListAdaptorImpl(this);
 		
-		// FIXME temp test data.
-		List<Artifact> data = new ArrayList<Artifact>();
-		data.add(new PlayerArtifactImpl(0));
-		this.artifactListAdaptor.setInputData(data);
+//		// FIXME temp test data.
+//		List<Artifact> data = new ArrayList<Artifact>();
+//		data.add(new PlayerArtifactImpl(0));
+//		this.artifactListAdaptor.setInputData(data);
 		
 		ListView lstServers = (ListView) findViewById(R.id.lstServer);
 		lstServers.setAdapter(this.artifactListAdaptor);
@@ -94,7 +100,7 @@ public class ServerActivity extends Activity {
 	private OnItemClickListener artifactsListCickListener = new OnItemClickListener() {
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-			Artifact item = ServerActivity.this.artifactListAdaptor.getInputData().get(position);
+			Artifact item = ServerActivity.this.artifactListAdaptor.getInputData().getArtifacts().get(position);
 			showArtifactActivity(item);
 		}
 	};
@@ -134,11 +140,26 @@ public class ServerActivity extends Activity {
 	}
 	
 	protected void refresh () {
-		Toast.makeText(this, "TODO: refresh", Toast.LENGTH_SHORT).show();
+		GetPlayersTask playpauseTask = new GetPlayersTask(this, this.serverReference, this);
+		playpauseTask.execute();
 	}
 	
 	protected void search () {
 		Toast.makeText(this, "TODO: search", Toast.LENGTH_SHORT).show();
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	UI updating.
+	
+	@Override
+	public void onPlayersChange(PlayersState playersState) {
+		if (playersState == null) {
+			finish(); // TODO show a msg here? Retry / Fail dlg?
+		}
+		else {
+			this.artifactListAdaptor.setInputData(playersState);
+			this.artifactListAdaptor.notifyDataSetChanged();
+		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
