@@ -29,6 +29,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 import net.sparktank.morrigan.android.helper.XmlParser;
 import net.sparktank.morrigan.android.model.Artifact;
+import net.sparktank.morrigan.android.model.ArtifactList;
 import net.sparktank.morrigan.android.model.PlayState;
 import net.sparktank.morrigan.android.model.PlayerState;
 import net.sparktank.morrigan.android.model.PlayerStateList;
@@ -194,6 +195,18 @@ public class PlayerStateListImpl implements PlayerStateList, ContentHandler {
 	public void startDocument() throws SAXException { /* UNUSED */ }
 	@Override
 	public void startPrefixMapping(String prefix, String uri) throws SAXException { /* UNUSED */ }
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	@Override
+	public String getSortKey() {
+		return "1";
+	}
+	
+	@Override
+	public int compareTo(ArtifactList another) {
+		return this.getSortKey().compareTo(another.getSortKey());
+	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
