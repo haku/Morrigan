@@ -19,7 +19,7 @@ import net.sparktank.morrigan.model.media.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.IMixedMediaItem.MediaType;
 import net.sparktank.morrigan.model.media.IRemoteMixedMediaDb;
 import net.sparktank.morrigan.model.tasks.TaskEventListener;
-import net.sparktank.morrigan.server.MlistServlet;
+import net.sparktank.morrigan.server.MlistsServlet;
 import net.sparktank.morrigan.server.feedwriters.XmlHelper;
 import net.sparktank.morrigan.util.httpclient.HttpClient;
 import net.sparktank.morrigan.util.httpclient.HttpClient.HttpResponse;
@@ -103,7 +103,7 @@ public class MixedMediaDbFeedParser extends DefaultHandler {
 		
 		try {
 			// We want to request the items for this list.
-			String surl = mmdb.getUrl().toString() + "/" + MlistServlet.PATH_ITEMS;
+			String surl = mmdb.getUrl().toString() + "/" + MlistsServlet.PATH_ITEMS;
 			URL url = new URL(surl);
 			
 			HttpResponse response = HttpClient.getHttpClient().doHttpRequest(url, httpStreamHandler);

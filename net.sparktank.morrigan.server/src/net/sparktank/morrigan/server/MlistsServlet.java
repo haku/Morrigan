@@ -30,7 +30,7 @@ import org.xml.sax.SAXException;
 
 import com.megginson.sax.DataWriter;
 
-public class MlistServlet extends HttpServlet {
+public class MlistsServlet extends HttpServlet {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static final String CONTEXTPATH = "/mlists";
