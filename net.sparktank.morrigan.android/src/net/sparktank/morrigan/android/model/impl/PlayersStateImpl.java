@@ -128,42 +128,42 @@ public class PlayersStateImpl implements PlayersState, ContentHandler {
 			this.playersState.add(this.currentItem);
 			this.currentItem = null;
 		}
-		else if (this.stack.size() == 3 && localName.equals(PlayerStateParser.PLAYERID)) {
+		else if (this.stack.size() == 3 && localName.equals(PlayerStateXmlImpl.PLAYERID)) {
 			int v = Integer.parseInt(this.currentText.toString());
 			this.currentItem.setId(v);
 		}
-		else if (this.stack.size() == 3 && localName.equals(PlayerStateParser.PLAYSTATE)) {
+		else if (this.stack.size() == 3 && localName.equals(PlayerStateXmlImpl.PLAYSTATE)) {
 			int v = Integer.parseInt(this.currentText.toString());
 			this.currentItem.setPlayState(PlayState.parseN(v));
 		}
-		else if (this.stack.size() == 3 && localName.equals(PlayerStateParser.PLAYORDER)) {
+		else if (this.stack.size() == 3 && localName.equals(PlayerStateXmlImpl.PLAYORDER)) {
 			int v = Integer.parseInt(this.currentText.toString());
 			this.currentItem.setPlayOrder(v);
 		}
-		else if (this.stack.size() == 3 && localName.equals(PlayerStateParser.QUEUELENGTH)) {
+		else if (this.stack.size() == 3 && localName.equals(PlayerStateXmlImpl.QUEUELENGTH)) {
 			int v = Integer.parseInt(this.currentText.toString());
 			this.currentItem.setQueueLength(v);
 		}
 //		else if (this.stack.size() == 3 && localName.equals(PlayerStateParser.QUEUEDURATION)) {
 //			TODO
 //		}
-		else if (this.stack.size() == 3 && localName.equals(PlayerStateParser.LISTTITLE)) {
+		else if (this.stack.size() == 3 && localName.equals(PlayerStateXmlImpl.LISTTITLE)) {
 			this.currentItem.setListTitle(this.currentText.toString());
 		}
-		else if (this.stack.size() == 3 && localName.equals(PlayerStateParser.LISTID)) {
+		else if (this.stack.size() == 3 && localName.equals(PlayerStateXmlImpl.LISTID)) {
 			this.currentItem.setListId(this.currentText.toString());
 		}
-		else if (this.stack.size() == 3 && localName.equals(PlayerStateParser.TRACKTITLE)) {
+		else if (this.stack.size() == 3 && localName.equals(PlayerStateXmlImpl.TRACKTITLE)) {
 			this.currentItem.setTrackTitle(this.currentText.toString());
 		}
-		else if (this.stack.size() == 3 && localName.equals(PlayerStateParser.PLAYPOSITION)) {
+		else if (this.stack.size() == 3 && localName.equals(PlayerStateXmlImpl.PLAYPOSITION)) {
 			int v = Integer.parseInt(this.currentText.toString());
 			this.currentItem.setPlayerPosition(v);
 		}
-		else if (this.stack.size() == 3 && localName.equals(PlayerStateParser.TRACKFILE)) {
+		else if (this.stack.size() == 3 && localName.equals(PlayerStateXmlImpl.TRACKFILE)) {
 			this.currentItem.setTrackFile(this.currentText.toString());
 		}
-		else if (this.stack.size() == 3 && localName.equals(PlayerStateParser.TRACKDURATION)) {
+		else if (this.stack.size() == 3 && localName.equals(PlayerStateXmlImpl.TRACKDURATION)) {
 			int v = Integer.parseInt(this.currentText.toString());
 			this.currentItem.setTrackDuration(v);
 		}

@@ -22,7 +22,7 @@ import net.sparktank.morrigan.android.helper.XmlParser;
 import net.sparktank.morrigan.android.model.PlayState;
 import net.sparktank.morrigan.android.model.PlayerState;
 
-public class PlayerStateParser extends XmlParser implements PlayerState {
+public class PlayerStateXmlImpl extends XmlParser implements PlayerState {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static final String TRACKDURATION = "trackduration";
@@ -53,7 +53,7 @@ public class PlayerStateParser extends XmlParser implements PlayerState {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public PlayerStateParser (String xmlString) throws SAXException {
+	public PlayerStateXmlImpl (String xmlString) throws SAXException {
 		super(xmlString, nodes);
 	}
 	
