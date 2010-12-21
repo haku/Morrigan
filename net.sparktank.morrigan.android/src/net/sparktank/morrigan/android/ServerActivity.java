@@ -123,7 +123,7 @@ public class ServerActivity extends Activity implements PlayersChangedListener {
 			showArtifactActivity(pa);
 		}
 		else {
-			throw new IllegalArgumentException();
+			Toast.makeText(this, "TODO: open type '"+item.getClass().getName()+"' desu~", Toast.LENGTH_LONG).show();
 		}
 	}
 	
