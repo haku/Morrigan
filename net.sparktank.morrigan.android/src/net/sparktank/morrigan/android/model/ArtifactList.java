@@ -18,10 +18,12 @@ package net.sparktank.morrigan.android.model;
 
 import java.util.List;
 
-public interface ArtifactList {
+public interface ArtifactList extends Comparable<ArtifactList> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public List<? extends Artifact> getArtifactList ();
+	
+	public String getSortKey ();
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

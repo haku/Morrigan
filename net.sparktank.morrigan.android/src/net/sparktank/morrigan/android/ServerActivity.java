@@ -18,12 +18,16 @@ package net.sparktank.morrigan.android;
 
 import net.sparktank.morrigan.android.model.Artifact;
 import net.sparktank.morrigan.android.model.ArtifactListAdaptor;
+import net.sparktank.morrigan.android.model.MlistStateList;
+import net.sparktank.morrigan.android.model.MlistStateListChangeListener;
 import net.sparktank.morrigan.android.model.PlayerReference;
-import net.sparktank.morrigan.android.model.PlayerStateListChangeListener;
 import net.sparktank.morrigan.android.model.PlayerStateList;
+import net.sparktank.morrigan.android.model.PlayerStateListChangeListener;
 import net.sparktank.morrigan.android.model.ServerReference;
 import net.sparktank.morrigan.android.model.impl.ArtifactListAdaptorImpl;
+import net.sparktank.morrigan.android.model.impl.ArtifactListGroupImpl;
 import net.sparktank.morrigan.android.model.impl.ServerReferenceImpl;
+import net.sparktank.morrigan.android.tasks.GetMlistsTask;
 import net.sparktank.morrigan.android.tasks.GetPlayersTask;
 import android.app.Activity;
 import android.content.Intent;
@@ -37,7 +41,7 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
-public class ServerActivity extends Activity implements PlayerStateListChangeListener {
+public class ServerActivity extends Activity implements PlayerStateListChangeListener, MlistStateListChangeListener {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static final String BASE_URL = "baseUrl";
@@ -46,6 +50,7 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 	
 	ServerReference serverReference = null;
 	ArtifactListAdaptor artifactListAdaptor;
+	private ArtifactListGroupImpl artifactListImpl;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -82,6 +87,8 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 	
 	private void wireGui () {
 		this.artifactListAdaptor = new ArtifactListAdaptorImpl(this);
+		this.artifactListImpl = new ArtifactListGroupImpl();
+		this.artifactListAdaptor.setInputData(this.artifactListImpl);
 		
 		ListView lstServers = (ListView) findViewById(R.id.lstServer);
 		lstServers.setAdapter(this.artifactListAdaptor);
@@ -138,8 +145,10 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 	}
 	
 	protected void refresh () {
-		GetPlayersTask playpauseTask = new GetPlayersTask(this, this.serverReference, this);
-		playpauseTask.execute();
+		GetPlayersTask playersTask = new GetPlayersTask(this, this.serverReference, this);
+		playersTask.execute();
+		GetMlistsTask mlistTask = new GetMlistsTask(this, this.serverReference, this);
+		mlistTask.execute();
 	}
 	
 	protected void search () {
@@ -155,7 +164,19 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 			finish(); // TODO show a msg here? Retry / Fail dlg?
 		}
 		else {
-			this.artifactListAdaptor.setInputData(playersState);
+			this.artifactListImpl.addList("players", playersState);
+			this.artifactListAdaptor.notifyDataSetChanged();
+		}
+	}
+	
+	@Override
+	public void onMlistsChange(MlistStateList mlistsState) {
+		if (mlistsState == null) {
+			finish(); // TODO show a msg here? Retry / Fail dlg?
+		}
+		else {
+			this.artifactListImpl.addList("mlists", mlistsState);
+			this.artifactListAdaptor.notifyDataSetChanged();
 		}
 	}
 	
