@@ -17,6 +17,7 @@
 package net.sparktank.morrigan.android.model.impl;
 
 import net.sparktank.morrigan.android.R;
+import net.sparktank.morrigan.android.model.Artifact;
 import net.sparktank.morrigan.android.model.ArtifactList;
 import net.sparktank.morrigan.android.model.ArtifactListAdaptor;
 import android.content.Context;
@@ -86,15 +87,15 @@ public class ArtifactListAdaptorImpl extends BaseAdapter implements ArtifactList
 			rowView.text = (TextView) view.findViewById(R.id.rowtext);
 			rowView.image = (ImageView) view.findViewById(R.id.rowimg);
 			
-			rowView.image.setImageResource(R.drawable.play);
-			
 			view.setTag(rowView);
 		}
 		else {
 			rowView = (RowView) view.getTag();
 		}
 		
-		rowView.text.setText(this.listData.getArtifactList().get(position).getTitle());
+		Artifact artifact = this.listData.getArtifactList().get(position);
+		rowView.text.setText(artifact.getTitle());
+		rowView.image.setImageResource(artifact.getImageResource());
 		
 		return view;
 	}
