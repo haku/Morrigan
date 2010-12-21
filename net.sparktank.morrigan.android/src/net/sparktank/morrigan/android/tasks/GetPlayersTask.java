@@ -19,6 +19,7 @@ package net.sparktank.morrigan.android.tasks;
 import java.io.IOException;
 import java.net.ConnectException;
 
+import net.sparktank.morrigan.android.Constants;
 import net.sparktank.morrigan.android.helper.HttpHelper;
 import net.sparktank.morrigan.android.model.PlayersChangedListener;
 import net.sparktank.morrigan.android.model.PlayersState;
@@ -63,7 +64,7 @@ public class GetPlayersTask extends AsyncTask<Void, Void, PlayersState> {
 	@Override
 	protected PlayersState doInBackground(Void... params) {
 		String url = this.serverReference.getBaseUrl();
-		url = url.concat("/players"); // TODO extract constant.
+		url = url.concat(Constants.CONTEXT_PLAYERS);
 		
 		try {
 			String resp = HttpHelper.getUrlContent(url);
