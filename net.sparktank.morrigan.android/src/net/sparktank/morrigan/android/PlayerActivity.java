@@ -20,7 +20,6 @@ import net.sparktank.morrigan.android.model.PlayerReference;
 import net.sparktank.morrigan.android.model.PlayerState;
 import net.sparktank.morrigan.android.model.PlayerStateChangeListener;
 import net.sparktank.morrigan.android.model.impl.PlayerReferenceImpl;
-import net.sparktank.morrigan.android.model.impl.ServerReferenceImpl;
 import net.sparktank.morrigan.android.tasks.SetPlaystateTask;
 import net.sparktank.morrigan.android.tasks.SetPlaystateTask.TargetPlayState;
 import android.app.Activity;
@@ -28,8 +27,8 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.view.View.OnClickListener;
+import android.view.Window;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -38,7 +37,6 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static final String BASE_URL = "baseUrl";
-	public static final String PLAYER_ID = "playerId";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -53,11 +51,9 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 		
 		Bundle extras = getIntent().getExtras();
 		String baseUrl = extras.getString(BASE_URL);
-		int id = extras.getInt(PLAYER_ID, -1);
 		
-		if (baseUrl != null && id >= 0) {
-			ServerReferenceImpl serverReference = new ServerReferenceImpl(baseUrl);
-			this.playerReference = new PlayerReferenceImpl(serverReference, id); // TODO use data passed into activity to get ServerReference from DB.
+		if (baseUrl != null) {
+			this.playerReference = new PlayerReferenceImpl(baseUrl);
 		}
 		else {
 			finish();

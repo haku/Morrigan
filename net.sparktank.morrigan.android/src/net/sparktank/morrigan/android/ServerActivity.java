@@ -18,7 +18,7 @@ package net.sparktank.morrigan.android;
 
 import net.sparktank.morrigan.android.model.Artifact;
 import net.sparktank.morrigan.android.model.ArtifactListAdaptor;
-import net.sparktank.morrigan.android.model.PlayerArtifact;
+import net.sparktank.morrigan.android.model.PlayerReference;
 import net.sparktank.morrigan.android.model.PlayersChangedListener;
 import net.sparktank.morrigan.android.model.PlayersState;
 import net.sparktank.morrigan.android.model.ServerReference;
@@ -122,8 +122,8 @@ public class ServerActivity extends Activity implements PlayersChangedListener {
 //	Commands - to be called on the UI thread.
 	
 	protected void showArtifactActivity (Artifact item) {
-		if (item instanceof PlayerArtifact) {
-			PlayerArtifact pa = (PlayerArtifact) item;
+		if (item instanceof PlayerReference) {
+			PlayerReference pa = (PlayerReference) item;
 			showArtifactActivity(pa);
 		}
 		else {
@@ -131,10 +131,9 @@ public class ServerActivity extends Activity implements PlayersChangedListener {
 		}
 	}
 	
-	protected void showArtifactActivity (PlayerArtifact item) {
+	protected void showArtifactActivity (PlayerReference item) {
 		Intent intent = new Intent(getApplicationContext(), PlayerActivity.class);
-		intent.putExtra(PlayerActivity.BASE_URL, this.serverReference.getBaseUrl());
-		intent.putExtra(PlayerActivity.PLAYER_ID, item.getId());
+		intent.putExtra(PlayerActivity.BASE_URL, item.getBaseUrl());
 		startActivity(intent);
 	}
 	

@@ -66,7 +66,7 @@ public class GetPlayersTask extends AsyncTask<Void, Void, PlayersState> {
 		
 		try {
 			String resp = HttpHelper.getUrlContent(url);
-			PlayersState playersState = new PlayersStateImpl(resp);
+			PlayersState playersState = new PlayersStateImpl(resp, this.serverReference);
 			return playersState;
 		}
 		catch (ConnectException e) {
