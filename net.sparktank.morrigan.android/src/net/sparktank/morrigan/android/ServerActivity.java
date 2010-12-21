@@ -150,7 +150,9 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 	}
 	
 	protected void showArtifactActivity (MlistReference item) {
-		Toast.makeText(this, "TODO: open Mlist '"+item.getBaseUrl()+"' desu~", Toast.LENGTH_LONG).show();
+		Intent intent = new Intent(getApplicationContext(), MlistActivity.class);
+		intent.putExtra(MlistActivity.BASE_URL, item.getBaseUrl());
+		startActivity(intent);
 	}
 	
 	protected void refresh () {

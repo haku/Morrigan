@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent" >
+	
+	<ScrollView
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_weight="1"
+		android:fillViewport="true" >
+		<LinearLayout android:orientation="vertical"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:padding="2dip" >
+			
+			<LinearLayout android:orientation="horizontal"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:layout_weight="0" >
+				
+				<ImageView android:id="@+id/imgListtype"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_weight="0"
+					android:layout_gravity="left|center_vertical"
+					android:padding="5dip"
+					android:src="@drawable/db" />
+				
+				<TextView android:id="@+id/txtListname"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_weight="1"
+					android:layout_gravity="left|center_vertical"
+					android:padding="5dip"
+					android:textSize="7pt"
+					android:text="..." />
+				
+			</LinearLayout>
+			
+			
+			
+			
+			
+		</LinearLayout>
+	</ScrollView>
+	
+	<TableLayout
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_weight="0"
+		android:layout_gravity="bottom" >
+		<TableRow>
+			
+			<ImageButton android:id="@+id/btnPlay"
+				android:layout_width="0dip"
+				android:layout_height="80dip"
+				android:layout_weight="1"
+				android:src="@drawable/play" />
+			
+			<ImageButton android:id="@+id/btnQueue"
+				android:layout_width="0dip"
+				android:layout_height="80dip"
+				android:layout_weight="1"
+				android:src="@drawable/queue" />
+			
+			<ImageButton android:id="@+id/btnSearch"
+				android:layout_width="0dip"
+				android:layout_height="80dip"
+				android:layout_weight="1"
+				android:src="@drawable/search" />
+			
+			<ImageButton android:id="@+id/btnRefresh"
+				android:layout_width="0dip"
+				android:layout_height="80dip"
+				android:layout_weight="1"
+				android:src="@drawable/ic_menu_refresh" />
+			
+		</TableRow>
+	</TableLayout>
+	
+</LinearLayout>
