@@ -60,8 +60,8 @@ public class ArtifactListAdaptorImpl extends BaseAdapter implements ArtifactList
 	@Override
 	public int getCount() {
 		if (this.listData == null) return 0;
-		if (this.listData.getArtifacts() == null) return 0;
-		return this.listData.getArtifacts().size();
+		if (this.listData.getArtifactList() == null) return 0;
+		return this.listData.getArtifactList().size();
 	}
 	
 	@Override
@@ -94,7 +94,7 @@ public class ArtifactListAdaptorImpl extends BaseAdapter implements ArtifactList
 			rowView = (RowView) view.getTag();
 		}
 		
-		rowView.text.setText(this.listData.getArtifacts().get(position).getTitle());
+		rowView.text.setText(this.listData.getArtifactList().get(position).getTitle());
 		
 		return view;
 	}

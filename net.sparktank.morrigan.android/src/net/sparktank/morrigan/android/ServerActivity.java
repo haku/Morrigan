@@ -99,7 +99,7 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 	private OnItemClickListener artifactsListCickListener = new OnItemClickListener() {
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-			Artifact item = ServerActivity.this.artifactListAdaptor.getInputData().getArtifacts().get(position);
+			Artifact item = ServerActivity.this.artifactListAdaptor.getInputData().getArtifactList().get(position);
 			showArtifactActivity(item);
 		}
 	};

@@ -21,7 +21,7 @@ import java.util.List;
 public interface ArtifactList {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public List<? extends Artifact> getArtifacts ();
+	public List<? extends Artifact> getArtifactList ();
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

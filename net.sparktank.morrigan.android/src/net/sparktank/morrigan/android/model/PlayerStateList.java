@@ -21,7 +21,7 @@ import java.util.List;
 public interface PlayerStateList extends ArtifactList {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public List<? extends PlayerState> getPlayersState ();
+	public List<? extends PlayerState> getPlayersStateList ();
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

@@ -24,7 +24,7 @@ import net.sparktank.morrigan.android.helper.HttpHelper;
 import net.sparktank.morrigan.android.model.PlayerStateListChangeListener;
 import net.sparktank.morrigan.android.model.PlayerStateList;
 import net.sparktank.morrigan.android.model.ServerReference;
-import net.sparktank.morrigan.android.model.impl.PlayersStateImpl;
+import net.sparktank.morrigan.android.model.impl.PlayerStateListImpl;
 
 import org.xml.sax.SAXException;
 
@@ -66,7 +66,7 @@ public class GetPlayersTask extends AsyncTask<Void, Void, PlayerStateList> {
 		
 		try {
 			String resp = HttpHelper.getUrlContent(url);
-			PlayerStateList playersState = new PlayersStateImpl(resp, this.serverReference);
+			PlayerStateList playersState = new PlayerStateListImpl(resp, this.serverReference);
 			return playersState;
 		}
 		catch (ConnectException e) {

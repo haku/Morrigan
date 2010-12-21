@@ -30,7 +30,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class ServersListAdapterImpl extends BaseAdapter implements ServerReferenceListAdapter {
+public class ServerReferenceListAdapterImpl extends BaseAdapter implements ServerReferenceListAdapter {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private List<? extends ServerReference> listData;
@@ -39,7 +39,7 @@ public class ServersListAdapterImpl extends BaseAdapter implements ServerReferen
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public ServersListAdapterImpl (Context context) {
+	public ServerReferenceListAdapterImpl (Context context) {
 		this.layoutInflater = LayoutInflater.from(context);
 	}
 	
