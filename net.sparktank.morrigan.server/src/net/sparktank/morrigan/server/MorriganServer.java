@@ -60,10 +60,10 @@ public class MorriganServer {
 			conPlayersXml.setHandler(playersHandlerXml);
 			
 			ContextHandler conMlist = new ContextHandler();
-			conMlist.setContextPath(MlistServlet.CONTEXTPATH);
+			conMlist.setContextPath(MlistsServlet.CONTEXTPATH);
 			conMlist.setResourceBase(".");
 			ServletHandler mlistHandler = new ServletHandler();
-			mlistHandler.addServletWithMapping(MlistServlet.class, "/"); // Relative to mlistHandler's context.
+			mlistHandler.addServletWithMapping(MlistsServlet.class, "/"); // Relative to mlistHandler's context.
 			conMlist.setHandler(mlistHandler);
 			
 			ContextHandlerCollection contexts = new ContextHandlerCollection();
