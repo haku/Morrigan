@@ -62,7 +62,7 @@ public class PlayerStateXmlImpl extends XmlParser implements PlayerState {
 	
 	@Override
 	public String getTitle() {
-		return "p" + getId() + ":" + getTrackTitle();
+		return getTrackTitle();
 	}
 	
 	@Override

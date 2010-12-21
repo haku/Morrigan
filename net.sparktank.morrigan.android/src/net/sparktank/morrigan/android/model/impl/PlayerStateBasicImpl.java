@@ -45,7 +45,7 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference {
 	
 	@Override
 	public String getTitle() {
-		return "p" + getId() + ":" + getTrackTitle();
+		return getTrackTitle();
 	}
 	
 	@Override
