@@ -21,6 +21,7 @@ import net.sparktank.morrigan.model.media.MediaListReference;
 import net.sparktank.morrigan.model.media.impl.MediaFactoryImpl;
 import net.sparktank.morrigan.model.media.internal.LocalMixedMediaDbHelper;
 import net.sparktank.morrigan.player.IPlayerLocal;
+import net.sparktank.morrigan.player.PlayItem;
 import net.sparktank.morrigan.player.PlayerRegister;
 import net.sparktank.morrigan.server.feedwriters.AbstractFeed;
 import net.sparktank.morrigan.server.feedwriters.XmlHelper;
@@ -40,6 +41,9 @@ public class MlistsServlet extends HttpServlet {
 	public static final String PATH_ITEM = "item";
 	
 	public static final String CMD_NEWMMDB = "newmmdb";
+	public static final String CMD_SCAN = "scan";
+	public static final String CMD_PLAY = "play";
+	public static final String CMD_QUEUE = "queue";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -51,9 +55,8 @@ public class MlistsServlet extends HttpServlet {
 	
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		String actualTarget = req.getRequestURI().substring(req.getContextPath().length());
 		try {
-			writeResponse(resp, actualTarget);
+			processRequest(Verb.GET, req, resp, null);
 		}
 		catch (DbException e) {
 			throw new ServletException(e);
@@ -66,19 +69,42 @@ public class MlistsServlet extends HttpServlet {
 	
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-		resp.setContentType("text/plain");
-		resp.getWriter().println("POST not yet implemented desu~");
+		try {
+    		String act = req.getParameter("action");
+    		if (act == null) {
+    			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+    			resp.setContentType("text/plain");
+    			resp.getWriter().println("HTTP Error 400 'action' parameter not set desu~");
+    		}
+    		else {
+    			processRequest(Verb.POST, req, resp, act);
+    		}
+		}
+		catch (DbException e) {
+			throw new ServletException(e);
+		} catch (SAXException e) {
+			throw new ServletException(e);
+		} catch (MorriganException e) {
+			throw new ServletException(e);
+		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private void writeResponse (HttpServletResponse resp, String actualTarget) throws IOException, ServletException, DbException, SAXException, MorriganException {
+	static private enum Verb {GET, POST};
+	
+	/**
+	 * Param action will not be null when verb==POST.
+	 */
+	private void processRequest (Verb verb, HttpServletRequest req, HttpServletResponse resp, String action) throws IOException, DbException, SAXException, MorriganException {
+		String actualTarget = req.getRequestURI().substring(req.getContextPath().length());
+		
 		if (actualTarget.equals(ROOTPATH)) {
-			try {
+			if (verb == Verb.POST) {
+				postToRoot(resp, action);
+			}
+			else {
 				printMlistList(resp);
-			} catch (SAXException e) {
-				throw new ServletException(e);
 			}
 		}
 		else {
@@ -90,9 +116,14 @@ public class MlistsServlet extends HttpServlet {
 					if (type.equals(ILocalMixedMediaDb.TYPE)) {
 						String f = LocalMixedMediaDbHelper.getFullPathToMmdb(pathParts[1]);
 						ILocalMixedMediaDb mmdb = MediaFactoryImpl.get().getLocalMixedMediaDb(f);
-						String subPath = pathParts.length >= 3 ? pathParts[2] : null;
-						String afterSubPath = pathParts.length >= 4 ? pathParts[3] : null;
-						printMlist(resp, mmdb, subPath, afterSubPath);
+						if (verb == Verb.POST) {
+							postToMmdb(req, resp, action, mmdb);
+						}
+						else {
+							String subPath = pathParts.length >= 3 ? pathParts[2] : null;
+							String afterSubPath = pathParts.length >= 4 ? pathParts[3] : null;
+							printMlist(resp, mmdb, subPath, afterSubPath);
+						}
 					}
 					else {
 						resp.setContentType("text/plain");
@@ -108,6 +139,56 @@ public class MlistsServlet extends HttpServlet {
 				resp.setContentType("text/plain");
 				resp.getWriter().println("Invalid request '"+path+"' desu~");
 			}
+		}
+	}
+	
+	private void postToRoot(HttpServletResponse resp, String action) throws IOException {
+		if (action.equals(CMD_NEWMMDB)) {
+			resp.setContentType("text/plain");
+			resp.getWriter().println("TODO implement create new MMDB cmd desu~");
+		}
+		else {
+			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			resp.setContentType("text/plain");
+			resp.getWriter().println("HTTP error 400 '"+action+"' is not a valid action parameter desu~");
+		}
+	}
+	
+	private void postToMmdb(HttpServletRequest req, HttpServletResponse resp, String action, ILocalMixedMediaDb mmdb) throws IOException {
+		if (action.equals(CMD_PLAY) || action.equals(CMD_QUEUE)) {
+			String playerIdS = req.getParameter("playerid");
+			if (playerIdS == null) {
+				resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+				resp.setContentType("text/plain");
+				resp.getWriter().println("HTTP error 400 'playerId' parameter not set desu~");
+			}
+			else {
+				int playerId = Integer.parseInt(playerIdS);
+				IPlayerLocal player = PlayerRegister.getLocalPlayer(playerId);
+				
+				resp.setContentType("text/plain");
+				if (action.equals(CMD_PLAY)) {
+					player.loadAndStartPlaying(mmdb);
+					resp.getWriter().println("MMDB playing desu~");
+				}
+				else if (action.equals(CMD_QUEUE)) {
+					player.addToQueue(new PlayItem(mmdb, null));
+					resp.getWriter().println("MMDB added to queue desu~");
+				}
+				else {
+					throw new IllegalArgumentException("The world has exploded desu~.");
+				}
+			}
+		}
+		else if (action.equals(CMD_SCAN)) {
+			HeadlessHelper.scheduleMmdbScan(mmdb);
+			resp.setContentType("text/plain");
+			resp.getWriter().println("Scan scheduled desu~");
+		}
+		else {
+			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			resp.setContentType("text/plain");
+			resp.getWriter().println("HTTP error 400 '"+action+"' is not a valid action parameter desu~");
 		}
 	}
 	
