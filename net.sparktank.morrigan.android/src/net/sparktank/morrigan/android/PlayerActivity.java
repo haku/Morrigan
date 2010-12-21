@@ -50,10 +50,6 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		/*
-		 *  FIXME once ServerActivity is done, we should also receive a playerId here.
-		 */
-		
 		Bundle extras = getIntent().getExtras();
 		String baseUrl = extras.getString(BASE_URL);
 		int id = extras.getInt(PLAYER_ID, -1);
