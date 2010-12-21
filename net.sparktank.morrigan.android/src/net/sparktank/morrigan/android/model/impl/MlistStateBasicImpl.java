@@ -16,6 +16,7 @@
 
 package net.sparktank.morrigan.android.model.impl;
 
+import net.sparktank.morrigan.android.R;
 import net.sparktank.morrigan.android.model.MlistReference;
 import net.sparktank.morrigan.android.model.MlistState;
 
@@ -34,6 +35,11 @@ public class MlistStateBasicImpl implements MlistState, MlistReference {
 	
 	public void setTitle(String title) {
 		this.title = title;
+	}
+	
+	@Override
+	public int getImageResource() {
+		return R.drawable.db;
 	}
 	
 	@Override

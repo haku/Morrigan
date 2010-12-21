@@ -21,5 +21,7 @@ public interface Artifact {
 	
 	public String getTitle ();
 	
+	public int getImageResource ();
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

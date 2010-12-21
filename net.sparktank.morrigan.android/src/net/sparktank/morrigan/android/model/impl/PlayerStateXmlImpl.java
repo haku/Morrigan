@@ -18,6 +18,7 @@ package net.sparktank.morrigan.android.model.impl;
 
 import org.xml.sax.SAXException;
 
+import net.sparktank.morrigan.android.R;
 import net.sparktank.morrigan.android.helper.XmlParser;
 import net.sparktank.morrigan.android.model.PlayState;
 import net.sparktank.morrigan.android.model.PlayerState;
@@ -62,6 +63,11 @@ public class PlayerStateXmlImpl extends XmlParser implements PlayerState {
 	@Override
 	public String getTitle() {
 		return "p" + getId() + ":" + getTrackTitle();
+	}
+	
+	@Override
+	public int getImageResource() {
+		return R.drawable.play;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

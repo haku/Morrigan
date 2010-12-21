@@ -16,6 +16,7 @@
 
 package net.sparktank.morrigan.android.model.impl;
 
+import net.sparktank.morrigan.android.R;
 import net.sparktank.morrigan.android.model.PlayState;
 import net.sparktank.morrigan.android.model.PlayerReference;
 import net.sparktank.morrigan.android.model.PlayerState;
@@ -45,6 +46,11 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference {
 	@Override
 	public String getTitle() {
 		return "p" + getId() + ":" + getTrackTitle();
+	}
+	
+	@Override
+	public int getImageResource() {
+		return R.drawable.play;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
