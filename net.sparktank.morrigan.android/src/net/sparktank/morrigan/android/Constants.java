@@ -20,7 +20,7 @@ public class Constants {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static final String CONTEXT_PLAYERS = "/players";
-	public static final String CONTEXT_MLISTS = "/media";
+	public static final String CONTEXT_MLISTS = "/mlists";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
