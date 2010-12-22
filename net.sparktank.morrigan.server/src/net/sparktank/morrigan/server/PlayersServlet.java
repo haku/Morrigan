@@ -1,6 +1,8 @@
 package net.sparktank.morrigan.server;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -135,19 +137,22 @@ public class PlayersServlet extends HttpServlet {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	static private void printPlayer (DataWriter dw, IPlayerAbstract p, int detailLevel) throws SAXException {
+	static private void printPlayer (DataWriter dw, IPlayerAbstract p, int detailLevel) throws SAXException, UnsupportedEncodingException {
 		if (detailLevel < 0 || detailLevel > 1) throw new IllegalArgumentException("detailLevel must be 0 or 1, not "+detailLevel+".");
 		
 		String listTitle;
 		String listId;
+		String listUrl;
 		IMediaTrackList<? extends IMediaTrack> currentList = p.getCurrentList();
 		if (currentList != null) {
 			listTitle = currentList.getListName();
 			listId = currentList.getListId();
+			listUrl = MlistsServlet.CONTEXTPATH + "/" + currentList.getType() + "/" + URLEncoder.encode(AbstractFeed.filenameFromPath(currentList.getListId()), "UTF-8");
 		}
 		else {
 			listTitle = NULL;
 			listId = NULL;
+			listUrl = null;
 		}
 		
 		String title;
@@ -174,6 +179,7 @@ public class PlayersServlet extends HttpServlet {
 		AbstractFeed.addElement(dw, "queueduration", queueDurationString);
 		AbstractFeed.addElement(dw, "listtitle", listTitle);
 		AbstractFeed.addElement(dw, "listid", listId);
+		if (listUrl != null) AbstractFeed.addLink(dw, listUrl, "list", "text/xml");
 		AbstractFeed.addElement(dw, "tracktitle", title);
 		
 		if (detailLevel == 1) {

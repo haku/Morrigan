@@ -170,7 +170,7 @@ public class MlistsServlet extends HttpServlet {
 				
 				mmdb.read(); // TODO make this call only when needed?  This is a bit catch-all.
 				
-				if (path.equals(PATH_ITEM) && afterPath != null && afterPath.length() > 0) {
+				if (path != null && path.equals(PATH_ITEM) && afterPath != null && afterPath.length() > 0) {
 					String filename = URLDecoder.decode(afterPath, "UTF-8");
 					File file = new File(filename);
 					
