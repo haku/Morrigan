@@ -295,6 +295,9 @@ public abstract class MixedMediaSqliteLayerImpl extends MediaSqliteLayer<IMixedM
 		return ret;
 	}
 	
+	/**
+	 * Querying for type UNKNOWN will return all types (i.e. wild-card).
+	 */
 	protected List<IMixedMediaItem> local_simpleSearch (MediaType mediaType, String term, String esc, int maxResults) throws SQLException, ClassNotFoundException {
 		PreparedStatement ps;
 		ResultSet rs;

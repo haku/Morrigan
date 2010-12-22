@@ -1,6 +1,7 @@
 package net.sparktank.morrigan.model.media.internal;
 
 import java.util.Date;
+import java.util.List;
 
 import net.sparktank.morrigan.model.db.IDbColumn;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
@@ -80,6 +81,13 @@ public abstract class AbstractMixedMediaDb<H extends IAbstractMixedMediaDb<H>>
     		MediaType mt = MediaType.parseInt(Integer.parseInt(s));
     		this.getDbLayer().setDefaultMediaType(mt);
 		}
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	@Override
+	public List<IMixedMediaItem> simpleSearchMedia(MediaType mediaType, String term, int maxResults) throws DbException {
+		return getDbLayer().simpleSearchMedia(mediaType, escapeSearch(term), SEARCH_ESC, maxResults);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
