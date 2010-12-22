@@ -168,6 +168,8 @@ public class MlistsServlet extends HttpServlet {
 				int playerId = Integer.parseInt(playerIdS);
 				IPlayerLocal player = PlayerRegister.getLocalPlayer(playerId);
 				
+				mmdb.read(); // TODO make this call only when needed?  This is a bit catch-all.
+				
 				if (path.equals(PATH_ITEM) && afterPath != null && afterPath.length() > 0) {
 					String filename = URLDecoder.decode(afterPath, "UTF-8");
 					File file = new File(filename);
