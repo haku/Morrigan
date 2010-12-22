@@ -23,5 +23,7 @@ public interface MlistItemList {
 	
 	public List<? extends MlistItem> getMlistItemList ();
 	
+	public String getQuery ();
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
