@@ -102,6 +102,9 @@ public abstract class MixedMediaSqliteLayerImpl extends MediaSqliteLayer<IMixedM
 	private static final String _SQL_ORDERBYREPLACE =
 		" ORDER BY {COL} {DIR};";
 	
+	private static final String _SQL_MEDIAFILES_WHEREFILEEQ = 
+		" sfile = ?";
+	
 	private static final String _SQL_MEDIAFILES_WHERESEARCH = 
 		" sfile LIKE ? ESCAPE ?";
 	
@@ -367,6 +370,31 @@ public abstract class MixedMediaSqliteLayerImpl extends MediaSqliteLayer<IMixedM
 		}
 		
 		return (n > 0);
+	}
+	
+	protected IMixedMediaItem local_getByFile (String filePath) throws SQLException, ClassNotFoundException {
+		PreparedStatement ps;
+		ResultSet rs;
+		List<IMixedMediaItem> res;
+		
+		String sql = _SQL_MEDIAFILES_SELECT + _SQL_WHERE + _SQL_MEDIAFILES_WHEREFILEEQ;
+		ps = getDbCon().prepareStatement(sql);
+		try {
+			ps.setString(1, filePath);
+			ps.setMaxRows(2); // Ask for 1, so we know if there is more than 1.
+			
+			rs = ps.executeQuery();
+			try {
+				res = local_parseRecordSet(rs);
+			} finally {
+				rs.close();
+			}
+		} finally {
+			ps.close();
+		}
+		
+		if (res.size() == 1) return res.get(0);
+		throw new IllegalArgumentException("File not found '"+filePath+"' (results count = "+res.size()+").");
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

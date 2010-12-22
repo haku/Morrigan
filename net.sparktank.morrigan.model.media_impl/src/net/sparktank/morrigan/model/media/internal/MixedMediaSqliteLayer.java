@@ -142,6 +142,15 @@ public class MixedMediaSqliteLayer extends MixedMediaSqliteLayerImpl implements 
 		}
 	}
 	
+	@Override
+	public IMixedMediaItem getByFile(File file) throws DbException {
+		try {
+			return local_getByFile(file.getAbsolutePath());
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Media adders and removers.
 	

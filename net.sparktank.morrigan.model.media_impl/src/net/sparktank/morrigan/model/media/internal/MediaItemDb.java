@@ -273,6 +273,16 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 //	Queries.
 	
 	@Override
+	public boolean hasFile (File file) throws MorriganException, DbException {
+		return this.dbLayer.hasFile(file);
+	}
+	
+	@Override
+	public T getByFile(File file) throws DbException {
+		return this.dbLayer.getByFile(file);
+	}
+	
+	@Override
 	public List<T> simpleSearch (String term, int maxResults) throws DbException {
 		return this.dbLayer.simpleSearch(escapeSearch(term), SEARCH_ESC, maxResults);
 	}
@@ -553,11 +563,6 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 			addItem(track);
 		}
 		return track;
-	}
-	
-	@Override
-	public boolean hasFile (File file) throws MorriganException, DbException {
-		return this.dbLayer.hasFile(file);
 	}
 	
 	/**
