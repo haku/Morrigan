@@ -18,10 +18,12 @@ package net.sparktank.morrigan.android;
 
 import net.sparktank.morrigan.android.helper.TimeHelper;
 import net.sparktank.morrigan.android.model.MlistItemList;
+import net.sparktank.morrigan.android.model.MlistItemListAdapter;
 import net.sparktank.morrigan.android.model.MlistItemListChangeListener;
 import net.sparktank.morrigan.android.model.MlistReference;
 import net.sparktank.morrigan.android.model.MlistState;
 import net.sparktank.morrigan.android.model.MlistStateChangeListener;
+import net.sparktank.morrigan.android.model.impl.MlistItemListAdaptorImpl;
 import net.sparktank.morrigan.android.model.impl.MlistReferenceImpl;
 import net.sparktank.morrigan.android.tasks.GetMlistItemListTask;
 import net.sparktank.morrigan.android.tasks.GetMlistTask;
@@ -38,8 +40,8 @@ import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class MlistActivity extends Activity implements MlistStateChangeListener, MlistItemListChangeListener {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -50,6 +52,7 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 	
 	protected MlistReference mlistReference = null;
 	private MlistState currentState = null;
+	private MlistItemListAdapter mlistItemListAdapter;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Activity methods.
@@ -74,7 +77,7 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		
 		setContentView(R.layout.mlist);
-		hookUpButtons();
+		wireGui();
 	}
 	
 	@Override
@@ -87,7 +90,13 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Buttons.
     
-	private void hookUpButtons () {
+	private void wireGui () {
+		this.mlistItemListAdapter = new MlistItemListAdaptorImpl(this);
+		
+		ListView lstServers = (ListView) findViewById(R.id.lstItems);
+		lstServers.setAdapter(this.mlistItemListAdapter);
+//		lstServers.setOnItemClickListener(this.artifactsListCickListener);
+		
 		ImageButton cmd;
 		
 		cmd = (ImageButton) findViewById(R.id.btnPlay);
@@ -220,10 +229,9 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 			finish(); // TODO show a msg here? Retry / Fail dlg?
 		}
 		else {
-			TextView txtListname = (TextView) findViewById(R.id.txtListname);
-			txtListname.setText(newState.getTitle());
+			this.setTitle(newState.getTitle());
 			
-			TextView txtCount = (TextView) findViewById(R.id.txtCount);
+			TextView txtCount = (TextView) findViewById(R.id.txtTitle);
 			txtCount.setText(newState.getCount() + " items, "
 					+ (newState.isDurationComplete() ? "" : "> ")
 					+ TimeHelper.formatTimeSeconds(newState.getDuration()) + ".");
@@ -233,7 +241,10 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 	
 	@Override
 	public void onMlistItemListChange(MlistItemList mlistItemList) {
-		Toast.makeText(MlistActivity.this, "TODO query returned "+mlistItemList.getMlistItemList().size()+" results desu~.", Toast.LENGTH_SHORT).show();
+		TextView txtSubTitle = (TextView) findViewById(R.id.txtSubTitle);
+		txtSubTitle.setText(mlistItemList.getMlistItemList().size() + " results."); // TODO show search term?
+		
+		this.mlistItemListAdapter.setInputData(mlistItemList);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
