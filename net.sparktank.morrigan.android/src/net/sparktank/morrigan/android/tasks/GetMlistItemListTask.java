@@ -83,7 +83,7 @@ public class GetMlistItemListTask extends AsyncTask<Void, Void, MlistItemList> {
 		
 		try {
 			String resp = HttpHelper.getUrlContent(url);
-			MlistItemList list = new MlistItemListImpl(resp);
+			MlistItemList list = new MlistItemListImpl(resp, this.query);
 			return list;
 		}
 		catch (ConnectException e) {

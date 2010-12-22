@@ -60,8 +60,9 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 	
 	protected ServerReference serverReference = null;
 	protected MlistReference mlistReference = null;
-	private MlistState currentState = null;
 	protected MlistItemListAdapter mlistItemListAdapter;
+	private MlistState currentState = null;
+	private MlistItemList currentItemList = null;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Activity methods.
@@ -210,15 +211,16 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 		dlgBuilder.setTitle("Query " + this.currentState.getTitle());
 		
 		final EditText editText = new EditText(this);
+		if (this.currentItemList != null) editText.setText(this.currentItemList.getQuery());
 		dlgBuilder.setView(editText);
 		
 		dlgBuilder.setPositiveButton("Search", new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int whichButton) {
-				String value = editText.getText().toString().trim();
+				String query = editText.getText().toString().trim();
 				dialog.dismiss();
 				
-				GetMlistItemListTask task = new GetMlistItemListTask(MlistActivity.this, MlistActivity.this.mlistReference, MlistActivity.this, value);
+				GetMlistItemListTask task = new GetMlistItemListTask(MlistActivity.this, MlistActivity.this.mlistReference, MlistActivity.this, query);
 				task.execute();
 			}
 		});
@@ -236,6 +238,13 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 	protected void refresh () {
 		GetMlistTask task = new GetMlistTask(this, this.mlistReference, this);
 		task.execute();
+		
+		if (this.currentItemList != null) {
+    		GetMlistItemListTask task2 = new GetMlistItemListTask(
+    				MlistActivity.this, MlistActivity.this.mlistReference,
+    				MlistActivity.this, this.currentItemList.getQuery());
+    		task2.execute();
+		}
 	}
 	
 	protected void itemClicked (final MlistItem item) {
@@ -275,6 +284,7 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 	@Override
 	public void onMlistStateChange(MlistState newState) {
 		this.currentState = newState;
+		
 		if (newState == null) {
 			finish(); // TODO show a msg here? Retry / Fail dlg?
 		}
@@ -291,10 +301,17 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 	
 	@Override
 	public void onMlistItemListChange(MlistItemList mlistItemList) {
-		TextView txtSubTitle = (TextView) findViewById(R.id.txtSubTitle);
-		txtSubTitle.setText(mlistItemList.getMlistItemList().size() + " results."); // TODO show search term?
+		this.currentItemList = mlistItemList;
 		
-		this.mlistItemListAdapter.setInputData(mlistItemList);
+		if (mlistItemList == null) {
+			finish(); // TODO show a msg here? Retry / Fail dlg?
+		}
+		else {
+    		TextView txtSubTitle = (TextView) findViewById(R.id.txtSubTitle);
+    		txtSubTitle.setText(mlistItemList.getMlistItemList().size() + " results for '"+mlistItemList.getQuery()+"'.");
+    		
+    		this.mlistItemListAdapter.setInputData(mlistItemList);
+		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

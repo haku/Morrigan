@@ -50,9 +50,12 @@ public class MlistItemListImpl implements MlistItemList, ContentHandler {
 	
 	private final List<MlistItem> mlistItemList = new LinkedList<MlistItem>();
 	
+	private final String query;
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public MlistItemListImpl (String data) throws SAXException {
+	public MlistItemListImpl (String data, String query) throws SAXException {
+		this.query = query;
 		String xml;
 		if (data.startsWith(XmlParser.XMLSTART)) {
 			xml = data;
@@ -87,6 +90,11 @@ public class MlistItemListImpl implements MlistItemList, ContentHandler {
 	@Override
 	public List<? extends MlistItem> getMlistItemList() {
 		return Collections.unmodifiableList(this.mlistItemList);
+	}
+	
+	@Override
+	public String getQuery() {
+		return this.query;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
