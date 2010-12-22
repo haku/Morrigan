@@ -24,12 +24,16 @@ import net.sparktank.morrigan.android.model.MlistItemListChangeListener;
 import net.sparktank.morrigan.android.model.MlistReference;
 import net.sparktank.morrigan.android.model.MlistState;
 import net.sparktank.morrigan.android.model.MlistStateChangeListener;
+import net.sparktank.morrigan.android.model.ServerReference;
 import net.sparktank.morrigan.android.model.impl.MlistItemListAdaptorImpl;
 import net.sparktank.morrigan.android.model.impl.MlistReferenceImpl;
+import net.sparktank.morrigan.android.model.impl.ServerReferenceImpl;
 import net.sparktank.morrigan.android.tasks.GetMlistItemListTask;
 import net.sparktank.morrigan.android.tasks.GetMlistTask;
 import net.sparktank.morrigan.android.tasks.RunMlistActionTask;
-import net.sparktank.morrigan.android.tasks.RunMlistActionTask.CommandToRun;
+import net.sparktank.morrigan.android.tasks.RunMlistActionTask.MlistCommand;
+import net.sparktank.morrigan.android.tasks.RunMlistItemActionTask;
+import net.sparktank.morrigan.android.tasks.RunMlistItemActionTask.MlistItemCommand;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -45,15 +49,16 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class MlistActivity extends Activity implements MlistStateChangeListener, MlistItemListChangeListener {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public static final String BASE_URL = "baseUrl";
+	public static final String SERVER_BASE_URL = "serverBaseUrl";
+	public static final String MLIST_BASE_URL = "mlistBaseUrl";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	protected ServerReference serverReference = null;
 	protected MlistReference mlistReference = null;
 	private MlistState currentState = null;
 	protected MlistItemListAdapter mlistItemListAdapter;
@@ -66,10 +71,12 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 		super.onCreate(savedInstanceState);
 		
 		Bundle extras = getIntent().getExtras();
-		String baseUrl = extras.getString(BASE_URL);
+		String serverBaseUrl = extras.getString(SERVER_BASE_URL);
+		String mlistBaseUrl = extras.getString(MLIST_BASE_URL);
 		
-		if (baseUrl != null) {
-			this.mlistReference = new MlistReferenceImpl(baseUrl);
+		if (serverBaseUrl != null && mlistBaseUrl != null) {
+			this.serverReference = new ServerReferenceImpl(serverBaseUrl);
+			this.mlistReference = new MlistReferenceImpl(mlistBaseUrl);
 		}
 		else {
 			finish();
@@ -121,7 +128,7 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 			MlistItem item = MlistActivity.this.mlistItemListAdapter.getInputData().getMlistItemList().get(position);
-			Toast.makeText(MlistActivity.this, "Clicked: " + item.getRelativeUrl(), Toast.LENGTH_LONG).show();
+			itemClicked(item);
 		}
 	};
 	
@@ -182,17 +189,17 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 //	Commands - to be called on the UI thread.
 	
 	protected void play () {
-		RunMlistActionTask task = new RunMlistActionTask(this, this.mlistReference, CommandToRun.PLAY);
+		RunMlistActionTask task = new RunMlistActionTask(this, this.mlistReference, MlistCommand.PLAY);
 		task.execute();
 	}
 	
 	protected void queue () {
-		RunMlistActionTask task = new RunMlistActionTask(this, this.mlistReference, CommandToRun.QUEUE);
+		RunMlistActionTask task = new RunMlistActionTask(this, this.mlistReference, MlistCommand.QUEUE);
 		task.execute();
 	}
 	
 	protected void scan () {
-		RunMlistActionTask task = new RunMlistActionTask(this, this.mlistReference, CommandToRun.SCAN);
+		RunMlistActionTask task = new RunMlistActionTask(this, this.mlistReference, MlistCommand.SCAN);
 		task.execute();
 	}
 	
@@ -200,7 +207,6 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 		if (this.currentState == null) return; // TODO show msg here?
 		
 		final AlertDialog.Builder dlgBuilder = new AlertDialog.Builder(this);
-		
 		dlgBuilder.setTitle("Query " + this.currentState.getTitle());
 		
 		final EditText editText = new EditText(this);
@@ -230,6 +236,38 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 	protected void refresh () {
 		GetMlistTask task = new GetMlistTask(this, this.mlistReference, this);
 		task.execute();
+	}
+	
+	protected void itemClicked (final MlistItem item) {
+		final AlertDialog.Builder dlgBuilder = new AlertDialog.Builder(this);
+		dlgBuilder.setMessage(item.getTitle());
+		
+		dlgBuilder.setPositiveButton("Play", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+				RunMlistItemActionTask task = new RunMlistItemActionTask(MlistActivity.this, MlistActivity.this.serverReference, item, MlistItemCommand.PLAY);
+				task.execute();
+			}
+		});
+		
+		dlgBuilder.setNeutralButton("Queue", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+				RunMlistItemActionTask task = new RunMlistItemActionTask(MlistActivity.this, MlistActivity.this.serverReference, item, MlistItemCommand.QUEUE);
+				task.execute();
+			}
+		});
+		
+		dlgBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int whichButton) {
+				dialog.cancel();
+			}
+		});
+		
+		dlgBuilder.show();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -1,19 +1,3 @@
-/*
- * Copyright 2010 Fae Hutter
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License. You may
- * obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations
- * under the License.
- */
-
 package net.sparktank.morrigan.android.tasks;
 
 import java.io.IOException;
@@ -21,21 +5,22 @@ import java.net.ConnectException;
 
 import net.sparktank.morrigan.android.TempConstants;
 import net.sparktank.morrigan.android.helper.HttpHelper;
-import net.sparktank.morrigan.android.model.MlistReference;
+import net.sparktank.morrigan.android.model.MlistItem;
+import net.sparktank.morrigan.android.model.ServerReference;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.widget.Toast;
 
-public class RunMlistActionTask extends AsyncTask<Void, Void, String> {
+public class RunMlistItemActionTask extends AsyncTask<Void, Void, String> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	static public enum MlistCommand {
-		PLAY(0), QUEUE(1), SCAN(2);
+	static public enum MlistItemCommand {
+		PLAY(0), QUEUE(1);
 		
 		private int n;
 		
-		private MlistCommand (int n) {
+		private MlistItemCommand (int n) {
 			this.n = n;
 		}
 		
@@ -48,16 +33,18 @@ public class RunMlistActionTask extends AsyncTask<Void, Void, String> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private final Activity activity;
-	private final MlistReference mlistReference;
-	private final MlistCommand cmd;
+	private final ServerReference serverReference;
+	private final MlistItem mlistItem;
+	private final MlistItemCommand cmd;
 	
 	private Exception exception;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public RunMlistActionTask (Activity activity, MlistReference mlistReference, MlistCommand cmd) {
+	public RunMlistItemActionTask (Activity activity, ServerReference serverReference, MlistItem mlistItem, MlistItemCommand cmd) {
 		this.activity = activity;
-		this.mlistReference = mlistReference;
+		this.serverReference = serverReference;
+		this.mlistItem = mlistItem;
 		this.cmd = cmd;
 	}
 	
@@ -75,6 +62,8 @@ public class RunMlistActionTask extends AsyncTask<Void, Void, String> {
 	// In background thread:
 	@Override
 	protected String doInBackground(Void... params) {
+		String url = this.serverReference.getBaseUrl() + this.mlistItem.getRelativeUrl();
+		
 		String encodedData = "action=";
 		switch (this.cmd) {
 			case PLAY:
@@ -85,17 +74,13 @@ public class RunMlistActionTask extends AsyncTask<Void, Void, String> {
 				encodedData = encodedData.concat("queue");
 				break;
 				
-			case SCAN:
-				encodedData = encodedData.concat("scan");
-				break;
-				
 			default: throw new IllegalArgumentException();
 		}
 		
 		encodedData = encodedData.concat("&playerid=" + TempConstants.PLAYERID);
 		
 		try {
-			String resp = HttpHelper.getUrlContent(this.mlistReference.getBaseUrl(), "POST", encodedData, "application/x-www-form-urlencoded");
+			String resp = HttpHelper.getUrlContent(url, "POST", encodedData, "application/x-www-form-urlencoded");
 			return resp;
 		}
 		catch (ConnectException e) {
