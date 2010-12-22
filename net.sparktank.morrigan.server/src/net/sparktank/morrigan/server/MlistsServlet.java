@@ -118,12 +118,12 @@ public class MlistsServlet extends HttpServlet {
 					if (type.equals(ILocalMixedMediaDb.TYPE)) {
 						String f = LocalMixedMediaDbHelper.getFullPathToMmdb(pathParts[1]);
 						ILocalMixedMediaDb mmdb = MediaFactoryImpl.get().getLocalMixedMediaDb(f);
+						String subPath = pathParts.length >= 3 ? pathParts[2] : null;
+						String afterSubPath = pathParts.length >= 4 ? pathParts[3] : null;
 						if (verb == Verb.POST) {
-							postToMmdb(req, resp, action, mmdb);
+							postToMmdb(req, resp, action, mmdb, subPath, afterSubPath);
 						}
 						else {
-							String subPath = pathParts.length >= 3 ? pathParts[2] : null;
-							String afterSubPath = pathParts.length >= 4 ? pathParts[3] : null;
 							printMlist(resp, mmdb, subPath, afterSubPath);
 						}
 					}
@@ -156,7 +156,7 @@ public class MlistsServlet extends HttpServlet {
 		}
 	}
 	
-	private void postToMmdb(HttpServletRequest req, HttpServletResponse resp, String action, ILocalMixedMediaDb mmdb) throws IOException {
+	private void postToMmdb(HttpServletRequest req, HttpServletResponse resp, String action, ILocalMixedMediaDb mmdb, String path, String afterPath) throws IOException, MorriganException, DbException {
 		if (action.equals(CMD_PLAY) || action.equals(CMD_QUEUE)) {
 			String playerIdS = req.getParameter("playerid");
 			if (playerIdS == null) {
@@ -168,17 +168,49 @@ public class MlistsServlet extends HttpServlet {
 				int playerId = Integer.parseInt(playerIdS);
 				IPlayerLocal player = PlayerRegister.getLocalPlayer(playerId);
 				
-				resp.setContentType("text/plain");
-				if (action.equals(CMD_PLAY)) {
-					player.loadAndStartPlaying(mmdb);
-					resp.getWriter().println("MMDB playing desu~");
-				}
-				else if (action.equals(CMD_QUEUE)) {
-					player.addToQueue(new PlayItem(mmdb, null));
-					resp.getWriter().println("MMDB added to queue desu~");
+				if (path.equals(PATH_ITEM) && afterPath != null && afterPath.length() > 0) {
+					String filename = URLDecoder.decode(afterPath, "UTF-8");
+					File file = new File(filename);
+					
+					if (mmdb.hasFile(file)) {
+						IMixedMediaItem item = mmdb.getByFile(file);
+						if (item != null) {
+    						resp.setContentType("text/plain");
+    						if (action.equals(CMD_PLAY)) {
+    							player.loadAndStartPlaying(mmdb, item);
+    							resp.getWriter().println("Item playing desu~");
+    						}
+    						else if (action.equals(CMD_QUEUE)) {
+    							player.addToQueue(new PlayItem(mmdb, item));
+    							resp.getWriter().println("Item added to queue desu~");
+    						}
+    						else {
+    							throw new IllegalArgumentException("The world has exploded desu~.");
+    						}
+						}
+						else {
+							throw new IllegalArgumentException("Failed to retrieve file '"+file.getAbsolutePath()+"' from MMDB desu~.");
+						}
+					}
+					else {
+						resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+						resp.setContentType("text/plain");
+						resp.getWriter().println("HTTP error 404 file '"+file.getAbsolutePath()+"' not found in MMDB '"+mmdb.getListName()+"' desu~");
+					}
 				}
 				else {
-					throw new IllegalArgumentException("The world has exploded desu~.");
+					resp.setContentType("text/plain");
+					if (action.equals(CMD_PLAY)) {
+						player.loadAndStartPlaying(mmdb);
+						resp.getWriter().println("MMDB playing desu~");
+					}
+					else if (action.equals(CMD_QUEUE)) {
+						player.addToQueue(new PlayItem(mmdb, null));
+						resp.getWriter().println("MMDB added to queue desu~");
+					}
+					else {
+						throw new IllegalArgumentException("The world has exploded desu~.");
+					}
 				}
 			}
 		}
