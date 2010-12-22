@@ -56,6 +56,8 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 	public static final String SERVER_BASE_URL = "serverBaseUrl";
 	public static final String MLIST_BASE_URL = "mlistBaseUrl";
 	
+	public static final String QUERY = "query";
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	protected ServerReference serverReference = null;
@@ -63,6 +65,7 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 	protected MlistItemListAdapter mlistItemListAdapter;
 	private MlistState currentState = null;
 	private MlistItemList currentItemList = null;
+	private String initialQuery = null;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Activity methods.
@@ -74,10 +77,11 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 		Bundle extras = getIntent().getExtras();
 		String serverBaseUrl = extras.getString(SERVER_BASE_URL);
 		String mlistBaseUrl = extras.getString(MLIST_BASE_URL);
+		this.initialQuery = extras.getString(QUERY);
 		
 		if (serverBaseUrl != null && mlistBaseUrl != null) {
 			this.serverReference = new ServerReferenceImpl(serverBaseUrl);
-			this.mlistReference = new MlistReferenceImpl(mlistBaseUrl);
+			this.mlistReference = new MlistReferenceImpl(mlistBaseUrl, this.serverReference);
 		}
 		else {
 			finish();
@@ -239,10 +243,19 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 		GetMlistTask task = new GetMlistTask(this, this.mlistReference, this);
 		task.execute();
 		
+		String query = null;
 		if (this.currentItemList != null) {
+			query = this.currentItemList.getQuery();
+		}
+		else if (this.initialQuery != null) {
+			query = this.initialQuery;
+			this.initialQuery = null;
+		}
+		
+		if (query != null) {
     		GetMlistItemListTask task2 = new GetMlistItemListTask(
     				MlistActivity.this, MlistActivity.this.mlistReference,
-    				MlistActivity.this, this.currentItemList.getQuery());
+    				MlistActivity.this, query);
     		task2.execute();
 		}
 	}

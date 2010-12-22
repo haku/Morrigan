@@ -21,5 +21,7 @@ public interface MlistReference {
 	
 	public String getBaseUrl ();
 	
+	public ServerReference getServerReference ();
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

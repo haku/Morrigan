@@ -16,10 +16,14 @@
 
 package net.sparktank.morrigan.android;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 import net.sparktank.morrigan.android.model.PlayerReference;
 import net.sparktank.morrigan.android.model.PlayerState;
 import net.sparktank.morrigan.android.model.PlayerStateChangeListener;
+import net.sparktank.morrigan.android.model.ServerReference;
 import net.sparktank.morrigan.android.model.impl.PlayerReferenceImpl;
+import net.sparktank.morrigan.android.model.impl.ServerReferenceImpl;
 import net.sparktank.morrigan.android.tasks.SetPlaystateTask;
 import net.sparktank.morrigan.android.tasks.SetPlaystateTask.TargetPlayState;
 import android.app.Activity;
@@ -37,11 +41,16 @@ import android.widget.Toast;
 public class PlayerActivity extends Activity implements PlayerStateChangeListener {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public static final String BASE_URL = "baseUrl";
+	public static final String SERVER_BASE_URL = "serverBaseUrl";
+	public static final String PLAYER_BASE_URL = "playerBaseUrl";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	protected ServerReference serverReference = null;
 	private PlayerReference playerReference = null;
+	private PlayerState currentState;
+	
+	private AtomicReference<String> lastQuery = new AtomicReference<String>();
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Activity methods.
@@ -51,10 +60,12 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 		super.onCreate(savedInstanceState);
 		
 		Bundle extras = getIntent().getExtras();
-		String baseUrl = extras.getString(BASE_URL);
+		String serverBaseUrl = extras.getString(SERVER_BASE_URL);
+		String mlistBaseUrl = extras.getString(PLAYER_BASE_URL);
 		
-		if (baseUrl != null) {
-			this.playerReference = new PlayerReferenceImpl(baseUrl);
+		if (serverBaseUrl != null && mlistBaseUrl != null) {
+			this.serverReference = new ServerReferenceImpl(serverBaseUrl);
+			this.playerReference = new PlayerReferenceImpl(mlistBaseUrl, this.serverReference);
 		}
 		else {
 			finish();
@@ -167,7 +178,19 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 	}
 	
 	protected void search () {
-		Toast.makeText(this, "TODO: search desu~", Toast.LENGTH_SHORT).show();
+		if (this.currentState != null) {
+			String listUrl = this.currentState.getListUrl();
+			if (listUrl != null) {
+				CommonDialogs.doSearchMlist(this, this.currentState, this.lastQuery);
+			}
+			else {
+				Toast.makeText(this, "No list selected desu~", Toast.LENGTH_SHORT).show();
+			}
+		}
+		else {
+			Toast.makeText(this, "No player selected desu~", Toast.LENGTH_SHORT).show();
+		}
+		
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -175,6 +198,8 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 	
 	@Override
 	public void onPlayerStateChange(PlayerState newState) {
+		this.currentState = newState;
+		
 		if (newState == null) {
 			finish(); // TODO show a msg here? Retry / Fail dlg?
 		}

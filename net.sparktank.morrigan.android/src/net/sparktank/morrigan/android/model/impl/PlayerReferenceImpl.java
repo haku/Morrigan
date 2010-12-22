@@ -24,15 +24,23 @@ public class PlayerReferenceImpl implements PlayerReference {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private final String baseUrl;
+	private final ServerReference serverReference;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public PlayerReferenceImpl (ServerReference serverReference, int playerId) {
+		if (serverReference == null) throw new IllegalArgumentException();
+		
+		this.serverReference = serverReference;
 		this.baseUrl = serverReference.getBaseUrl() + Constants.CONTEXT_PLAYERS + "/" + playerId;
 	}
 	
-	public PlayerReferenceImpl (String baseUrl) {
+	public PlayerReferenceImpl (String baseUrl, ServerReference serverReference) {
+		if (baseUrl == null) throw new IllegalArgumentException();
+		if (serverReference == null) throw new IllegalArgumentException();
+		
 		this.baseUrl = baseUrl;
+		this.serverReference = serverReference;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -40,6 +48,11 @@ public class PlayerReferenceImpl implements PlayerReference {
 	@Override
 	public String getBaseUrl() {
 		return this.baseUrl;
+	}
+	
+	@Override
+	public ServerReference getServerReference() {
+		return this.serverReference;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

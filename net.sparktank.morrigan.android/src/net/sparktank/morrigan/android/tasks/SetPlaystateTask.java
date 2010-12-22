@@ -106,7 +106,7 @@ public class SetPlaystateTask extends AsyncTask<Void, Void, PlayerState> {
 		
 		try {
 			String resp = HttpHelper.getUrlContent(url, verb, encodedData, "application/x-www-form-urlencoded");
-			PlayerState playerState = new PlayerStateXmlImpl(resp);
+			PlayerState playerState = new PlayerStateXmlImpl(resp, this.playerReference);
 			return playerState;
 		}
 		catch (ConnectException e) {

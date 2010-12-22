@@ -19,6 +19,8 @@ package net.sparktank.morrigan.android.model;
 public interface PlayerState extends Artifact {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	public PlayerReference getPlayerReference ();
+	
 	public int getId ();
 	
 	public PlayState getPlayState ();
@@ -27,6 +29,7 @@ public interface PlayerState extends Artifact {
 	
 	public String getListTitle ();
 	public String getListId ();
+	public String getListUrl ();
 	
 	public String getTrackTitle ();
 	public String getTrackFile ();

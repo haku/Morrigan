@@ -20,6 +20,7 @@ import net.sparktank.morrigan.android.R;
 import net.sparktank.morrigan.android.model.PlayState;
 import net.sparktank.morrigan.android.model.PlayerReference;
 import net.sparktank.morrigan.android.model.PlayerState;
+import net.sparktank.morrigan.android.model.ServerReference;
 
 public class PlayerStateBasicImpl implements PlayerState, PlayerReference {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -27,6 +28,7 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference {
 	private int id;
 	
 	private String baseUrl;
+	private PlayerReference playerReference;
 	
 	private PlayState playState;
 	private int playOrder;
@@ -38,6 +40,7 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference {
 	
 	private String listTitle;
 	private String listId;
+	private String listUrl;
 	
 	private int queueLength;
 	
@@ -55,6 +58,29 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	public void setPlayerReference(PlayerReference playerReference) {
+		this.playerReference = playerReference;
+	}
+	
+	@Override
+	public PlayerReference getPlayerReference() {
+		return this.playerReference;
+	}
+	
+	@Override
+	public ServerReference getServerReference() {
+		return this.playerReference.getServerReference();
+	}
+	
+	public void setBaseUrl(String baseUrl) {
+		this.baseUrl = baseUrl;
+	}
+	
+	@Override
+	public String getBaseUrl() {
+		return this.baseUrl;
+	}
+	
 	@Override
 	public int getId() {
 		return this.id;
@@ -62,15 +88,6 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference {
 
 	public void setId(int id) {
 		this.id = id;
-	}
-
-	public void setBaseUrl(String baseUrl) {
-		this.baseUrl = baseUrl;
-	}
-
-	@Override
-	public String getBaseUrl() {
-		return this.baseUrl;
 	}
 	
 	@Override
@@ -143,6 +160,15 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference {
 
 	public void setListId(String listId) {
 		this.listId = listId;
+	}
+
+	@Override
+	public String getListUrl() {
+		return this.listUrl;
+	}
+	
+	public void setListUrl(String listUrl) {
+		this.listUrl = listUrl;
 	}
 
 	@Override

@@ -19,10 +19,13 @@ package net.sparktank.morrigan.android.helper;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Stack;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+
+import net.sparktank.morrigan.android.model.ServerReference;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -38,11 +41,13 @@ public class XmlParser implements ContentHandler {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	private final ServerReference serverReference;
 	private Map<String, String> nodes = new HashMap<String, String>();
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public XmlParser (String data, String[] nodes) throws SAXException {
+	public XmlParser (String data, String[] nodes, ServerReference serverReference) throws SAXException {
+		this.serverReference = serverReference;
 		
 		for (String node : nodes) {
 			this.nodes.put(node, null);
@@ -109,30 +114,39 @@ public class XmlParser implements ContentHandler {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private String inNode = null;
+	private final Stack<String> stack = new Stack<String>();
+	private StringBuilder currentText;
 	
 	@Override
-	public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
-		this.inNode = localName.trim();
+	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+		this.stack.push(localName);
+		
+		if (localName.equals("link")) {
+			String relVal = attributes.getValue("rel");
+			if (relVal != null) {
+				String hrefVal = attributes.getValue("href");
+				if (hrefVal != null && hrefVal.length() > 0) {
+					this.nodes.put(relVal, this.serverReference.getBaseUrl() + hrefVal);
+				}
+			}
+		}
+		
+		// If we need a new StringBuilder, make one.
+		if (this.currentText == null || this.currentText.length() > 0) {
+			this.currentText = new StringBuilder();
+		}
 	}
 	
 	@Override
 	public void endElement(String uri, String localName, String qName) throws SAXException {
-		this.inNode = null;
+		this.nodes.put(localName, this.currentText.toString());
+		
+		this.stack.pop();
 	}
 	
 	@Override
-	public void characters(char[] ch, int start, int length) throws SAXException {
-        if (this.inNode!=null) {
-        	String chars = (new String(ch).substring(start, start + length));
-        	
-        	String prev=this.nodes.get(this.inNode);
-        	if (prev==null) {
-        		this.nodes.put(this.inNode, chars);
-        	} else {
-        		this.nodes.put(this.inNode, prev.concat(chars));
-        	}
-        }
+	public void characters (char[] ch, int start, int length) throws SAXException {
+        this.currentText.append( ch, start, length );
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -99,9 +99,6 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 		
 		cmd = (ImageButton) findViewById(R.id.btnRefresh);
 		cmd.setOnClickListener(new BtnRefresh_OnClick());
-		
-		cmd = (ImageButton) findViewById(R.id.btnSearch);
-		cmd.setOnClickListener(new BtnSearch_OnClick());
 	}
 	
 	private OnItemClickListener artifactsListCickListener = new OnItemClickListener() {
@@ -116,13 +113,6 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 		@Override
 		public void onClick(View v) {
 			refresh();
-		}
-	}
-	
-	class BtnSearch_OnClick implements OnClickListener {
-		@Override
-		public void onClick(View v) {
-			search();
 		}
 	}
 	
@@ -145,7 +135,8 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 	
 	protected void showArtifactActivity (PlayerReference item) {
 		Intent intent = new Intent(getApplicationContext(), PlayerActivity.class);
-		intent.putExtra(PlayerActivity.BASE_URL, item.getBaseUrl());
+		intent.putExtra(MlistActivity.SERVER_BASE_URL, this.serverReference.getBaseUrl());
+		intent.putExtra(PlayerActivity.PLAYER_BASE_URL, item.getBaseUrl());
 		startActivity(intent);
 	}
 	
@@ -161,10 +152,6 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 		playersTask.execute();
 		GetMlistsTask mlistTask = new GetMlistsTask(this, this.serverReference, this);
 		mlistTask.execute();
-	}
-	
-	protected void search () {
-		Toast.makeText(this, "TODO: search desu~", Toast.LENGTH_SHORT).show();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

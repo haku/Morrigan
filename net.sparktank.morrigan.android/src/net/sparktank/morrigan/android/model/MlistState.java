@@ -19,6 +19,8 @@ package net.sparktank.morrigan.android.model;
 public interface MlistState extends Artifact {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	public MlistReference getMlistReference ();
+	
 	@Override
 	public String getTitle ();
 	

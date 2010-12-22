@@ -21,5 +21,7 @@ public interface PlayerReference {
 	
 	public String getBaseUrl ();
 	
+	public ServerReference getServerReference ();
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
