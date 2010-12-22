@@ -17,12 +17,15 @@
 package net.sparktank.morrigan.android.tasks;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.ConnectException;
+import java.util.concurrent.atomic.AtomicReference;
 
 import net.sparktank.morrigan.android.Constants;
 import net.sparktank.morrigan.android.helper.HttpHelper;
-import net.sparktank.morrigan.android.model.PlayerStateListChangeListener;
+import net.sparktank.morrigan.android.helper.HttpHelper.HttpStreamHandler;
 import net.sparktank.morrigan.android.model.PlayerStateList;
+import net.sparktank.morrigan.android.model.PlayerStateListChangeListener;
 import net.sparktank.morrigan.android.model.ServerReference;
 import net.sparktank.morrigan.android.model.impl.PlayerStateListImpl;
 
@@ -36,7 +39,7 @@ public class GetPlayersTask extends AsyncTask<Void, Void, PlayerStateList> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private final Activity activity;
-	private final ServerReference serverReference;
+	protected final ServerReference serverReference;
 	private final PlayerStateListChangeListener changedListener;
 	
 	private Exception exception;
@@ -65,9 +68,20 @@ public class GetPlayersTask extends AsyncTask<Void, Void, PlayerStateList> {
 		url = url.concat(Constants.CONTEXT_PLAYERS);
 		
 		try {
-			String resp = HttpHelper.getUrlContent(url);
-			PlayerStateList playersState = new PlayerStateListImpl(resp, this.serverReference);
-			return playersState;
+			final AtomicReference<PlayerStateList> list = new AtomicReference<PlayerStateList>();
+			
+			HttpStreamHandler<SAXException> handler = new HttpStreamHandler<SAXException>() {
+				@Override
+				public void handleStream(InputStream is) throws IOException, SAXException {
+					PlayerStateList l;
+					l = new PlayerStateListImpl(is, GetPlayersTask.this.serverReference);
+					list.set(l);
+				}
+			};
+			
+			HttpHelper.getUrlContent(url, handler);
+			
+			return list.get();
 		}
 		catch (ConnectException e) {
 			this.exception = e;

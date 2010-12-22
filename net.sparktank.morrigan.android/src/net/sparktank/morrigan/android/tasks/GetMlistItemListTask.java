@@ -17,11 +17,14 @@
 package net.sparktank.morrigan.android.tasks;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.ConnectException;
 import java.net.URLEncoder;
+import java.util.concurrent.atomic.AtomicReference;
 
 import net.sparktank.morrigan.android.Constants;
 import net.sparktank.morrigan.android.helper.HttpHelper;
+import net.sparktank.morrigan.android.helper.HttpHelper.HttpStreamHandler;
 import net.sparktank.morrigan.android.model.MlistItemList;
 import net.sparktank.morrigan.android.model.MlistItemListChangeListener;
 import net.sparktank.morrigan.android.model.MlistReference;
@@ -40,7 +43,7 @@ public class GetMlistItemListTask extends AsyncTask<Void, Void, MlistItemList> {
 	private final Activity activity;
 	private final MlistReference mlistReference;
 	private final MlistItemListChangeListener changedListener;
-	private final String query;
+	protected final String query;
 	
 	private Exception exception;
 	
@@ -82,9 +85,20 @@ public class GetMlistItemListTask extends AsyncTask<Void, Void, MlistItemList> {
 		}
 		
 		try {
-			String resp = HttpHelper.getUrlContent(url);
-			MlistItemList list = new MlistItemListImpl(resp, this.query);
-			return list;
+			final AtomicReference<MlistItemList> list = new AtomicReference<MlistItemList>();
+			
+			HttpStreamHandler<SAXException> handler = new HttpStreamHandler<SAXException>() {
+				@Override
+				public void handleStream(InputStream is) throws IOException, SAXException {
+					MlistItemList l;
+					l = new MlistItemListImpl(is, GetMlistItemListTask.this.query);
+					list.set(l);
+				}
+			};
+			
+			HttpHelper.getUrlContent(url, handler);
+			
+			return list.get();
 		}
 		catch (ConnectException e) {
 			this.exception = e;
