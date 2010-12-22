@@ -93,6 +93,10 @@ public abstract class AbstractFeed {
 		dw.dataElement(newElement, textContent);
 	}
 	
+	static public void addLink (DataWriter dw, String href, String rel) throws SAXException {
+		addLink(dw, href, rel, null);
+	}
+	
 	static public void addLink (DataWriter dw, String href, String rel, String type) throws SAXException {
 		AttributesImpl atts = new AttributesImpl();
 		

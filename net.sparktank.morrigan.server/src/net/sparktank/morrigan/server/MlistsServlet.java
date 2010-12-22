@@ -39,6 +39,7 @@ public class MlistsServlet extends HttpServlet {
 	public static final String PATH_ITEMS = "items";
 	public static final String PATH_SRC = "src";
 	public static final String PATH_ITEM = "item";
+	public static final String PATH_QUERY = "query";
 	
 	public static final String CMD_NEWMMDB = "newmmdb";
 	public static final String CMD_SCAN = "scan";
@@ -50,6 +51,7 @@ public class MlistsServlet extends HttpServlet {
 	private static final long serialVersionUID = 2754601524882233866L;
 	
 	private static final String ROOTPATH = "/";
+	private static final int MAX_RESULTS = 50;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -232,6 +234,10 @@ public class MlistsServlet extends HttpServlet {
 				ServletHelper.returnFile(file, resp);
 			}
 		}
+		else if (path.equals(PATH_QUERY) && afterPath != null && afterPath.length() > 0) {
+			String query = URLDecoder.decode(afterPath, "UTF-8");
+			printMlistLong(dw, mmdb, false, true, query);
+		}
 		else {
 			AbstractFeed.addElement(dw, "error", "Unknown path '"+path+"' desu~");
 		}
@@ -252,8 +258,20 @@ public class MlistsServlet extends HttpServlet {
 		}
 	}
 	
-	static private void printMlistLong (DataWriter dw, ILocalMixedMediaDb ml, boolean listSrcs, boolean listItems) throws SAXException, MorriganException {
+	static private void printMlistLong (DataWriter dw, ILocalMixedMediaDb ml, boolean listSrcs, boolean listItems) throws SAXException, MorriganException, DbException {
+		printMlistLong(dw, ml, listSrcs, listItems, null);
+	}
+	
+	static private void printMlistLong (DataWriter dw, ILocalMixedMediaDb ml, boolean listSrcs, boolean listItems, String queryString) throws SAXException, MorriganException, DbException {
 		ml.read();
+		
+		List<IMixedMediaItem> items;
+		if (queryString != null) {
+			items = ml.simpleSearch(queryString, MAX_RESULTS);
+		}
+		else {
+			items = ml.getMediaItems();
+		}
 		
 		String listFile;
 		try {
@@ -263,11 +281,19 @@ public class MlistsServlet extends HttpServlet {
 		}
 		
 		dw.dataElement("title", ml.getListName());
-		dw.dataElement("count", String.valueOf(ml.getCount()));
+		if (queryString != null) dw.dataElement("query", queryString);
+		dw.dataElement("count", String.valueOf(items.size()));
 		
-		DurationData totalDuration = ml.getTotalDuration();
-		dw.dataElement("duration", String.valueOf(totalDuration.getDuration()));
-		dw.dataElement("durationcomplete", String.valueOf(totalDuration.isComplete()));
+		// TODO calculate these values from query results.
+		if (queryString == null) {
+			DurationData totalDuration = ml.getTotalDuration();
+    		dw.dataElement("duration", String.valueOf(totalDuration.getDuration()));
+    		dw.dataElement("durationcomplete", String.valueOf(totalDuration.isComplete()));
+    		
+    		dw.dataElement("defaulttype", String.valueOf(ml.getDefaultMediaType().getN()));
+    		dw.dataElement("sortcolumn", ml.getSort().getHumanName());
+    		dw.dataElement("sortdirection", ml.getSortDirection().toString());
+		}
 		
 		String pathToSelf = CONTEXTPATH + "/" + ml.getType() + "/" + listFile;
 		AbstractFeed.addLink(dw, pathToSelf, "self", "text/xml");
@@ -284,7 +310,7 @@ public class MlistsServlet extends HttpServlet {
 		}
 		
 		if (listItems) {
-    		for (IMixedMediaItem mi : ml.getMediaItems()) {
+			for (IMixedMediaItem mi : items) {
     			dw.startElement("entry");
     			
     			String file;
@@ -302,7 +328,7 @@ public class MlistsServlet extends HttpServlet {
     			sb.append(PATH_ITEM);
     			sb.append("/");
     			sb.append(file);
-    			AbstractFeed.addLink(dw, sb.toString(), "self", "text/xml");
+    			AbstractFeed.addLink(dw, sb.toString(), "self");
     			
     			if (mi.getDateAdded() != null) {
     				AbstractFeed.addElement(dw, "dateadded", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateAdded()));
