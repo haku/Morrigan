@@ -63,7 +63,7 @@ public class RunMlistActionTask extends AsyncTask<Void, Void, String> {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	ProgressDialog dialog;
+	private ProgressDialog dialog;
 	
 	// In UI thread:
 	@Override

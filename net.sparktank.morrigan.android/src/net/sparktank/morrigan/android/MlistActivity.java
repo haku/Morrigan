@@ -17,32 +17,39 @@
 package net.sparktank.morrigan.android;
 
 import net.sparktank.morrigan.android.helper.TimeHelper;
+import net.sparktank.morrigan.android.model.MlistItemList;
+import net.sparktank.morrigan.android.model.MlistItemListChangeListener;
 import net.sparktank.morrigan.android.model.MlistReference;
 import net.sparktank.morrigan.android.model.MlistState;
 import net.sparktank.morrigan.android.model.MlistStateChangeListener;
 import net.sparktank.morrigan.android.model.impl.MlistReferenceImpl;
+import net.sparktank.morrigan.android.tasks.GetMlistItemListTask;
 import net.sparktank.morrigan.android.tasks.GetMlistTask;
 import net.sparktank.morrigan.android.tasks.RunMlistActionTask;
 import net.sparktank.morrigan.android.tasks.RunMlistActionTask.CommandToRun;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MlistActivity extends Activity implements MlistStateChangeListener {
+public class MlistActivity extends Activity implements MlistStateChangeListener, MlistItemListChangeListener {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static final String BASE_URL = "baseUrl";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private MlistReference mlistReference = null; 
+	protected MlistReference mlistReference = null;
+	private MlistState currentState = null;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Activity methods.
@@ -169,7 +176,34 @@ public class MlistActivity extends Activity implements MlistStateChangeListener 
 	}
 	
 	protected void search () {
-		Toast.makeText(this, "TODO: search", Toast.LENGTH_SHORT).show();
+		if (this.currentState == null) return; // TODO show msg here?
+		
+		final AlertDialog.Builder dlgBuilder = new AlertDialog.Builder(this);
+		
+		dlgBuilder.setTitle("Query " + this.currentState.getTitle());
+		
+		final EditText editText = new EditText(this);
+		dlgBuilder.setView(editText);
+		
+		dlgBuilder.setPositiveButton("Search", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int whichButton) {
+				String value = editText.getText().toString().trim();
+				dialog.dismiss();
+				
+				GetMlistItemListTask task = new GetMlistItemListTask(MlistActivity.this, MlistActivity.this.mlistReference, MlistActivity.this, value);
+				task.execute();
+			}
+		});
+		
+		dlgBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int whichButton) {
+				dialog.cancel();
+			}
+		});
+		
+		dlgBuilder.show();
 	}
 	
 	protected void refresh () {
@@ -181,6 +215,7 @@ public class MlistActivity extends Activity implements MlistStateChangeListener 
 	
 	@Override
 	public void onMlistStateChange(MlistState newState) {
+		this.currentState = newState;
 		if (newState == null) {
 			finish(); // TODO show a msg here? Retry / Fail dlg?
 		}
@@ -189,11 +224,16 @@ public class MlistActivity extends Activity implements MlistStateChangeListener 
 			txtListname.setText(newState.getTitle());
 			
 			TextView txtCount = (TextView) findViewById(R.id.txtCount);
-			txtCount.setText(newState.getCount() + " items totalling "
-					+ (newState.isDurationComplete() ? "" : "more than ")
+			txtCount.setText(newState.getCount() + " items, "
+					+ (newState.isDurationComplete() ? "" : "> ")
 					+ TimeHelper.formatTimeSeconds(newState.getDuration()) + ".");
 			
 		}
+	}
+	
+	@Override
+	public void onMlistItemListChange(MlistItemList mlistItemList) {
+		Toast.makeText(MlistActivity.this, "TODO query returned "+mlistItemList.getMlistItemList().size()+" results desu~.", Toast.LENGTH_SHORT).show();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
