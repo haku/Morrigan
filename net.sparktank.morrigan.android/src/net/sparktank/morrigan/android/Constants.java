@@ -22,5 +22,8 @@ public class Constants {
 	public static final String CONTEXT_PLAYERS = "/players";
 	public static final String CONTEXT_MLISTS = "/mlists";
 	
+	public static final String CONTEXT_MLIST_ITEMS = "/items";
+	public static final String CONTEXT_MLIST_QUERY = "/query";
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
