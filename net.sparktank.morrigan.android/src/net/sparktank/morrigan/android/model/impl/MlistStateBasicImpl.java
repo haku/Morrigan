@@ -19,17 +19,43 @@ package net.sparktank.morrigan.android.model.impl;
 import net.sparktank.morrigan.android.R;
 import net.sparktank.morrigan.android.model.MlistReference;
 import net.sparktank.morrigan.android.model.MlistState;
+import net.sparktank.morrigan.android.model.ServerReference;
 
 public class MlistStateBasicImpl implements MlistState, MlistReference {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private String title;
 	private String baseUrl;
+	private ServerReference serverReference;
+	
+	private String title;
 	private int count;
 	private long duration;
 	private boolean durationComplete;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	@Override
+	public ServerReference getServerReference() {
+		return this.serverReference;
+	}
+	
+	public void setServerReference(ServerReference serverReference) {
+		this.serverReference = serverReference;
+	}
+	
+	@Override
+	public MlistReference getMlistReference() {
+		return this;
+	}
+	
+	@Override
+	public String getBaseUrl() {
+		return this.baseUrl;
+	}
+	
+	public void setBaseUrl(String baseUrl) {
+		this.baseUrl = baseUrl;
+	}
 	
 	@Override
 	public String getTitle() {
@@ -43,15 +69,6 @@ public class MlistStateBasicImpl implements MlistState, MlistReference {
 	@Override
 	public int getImageResource() {
 		return R.drawable.db;
-	}
-	
-	@Override
-	public String getBaseUrl() {
-		return this.baseUrl;
-	}
-	
-	public void setBaseUrl(String baseUrl) {
-		this.baseUrl = baseUrl;
 	}
 	
 	@Override

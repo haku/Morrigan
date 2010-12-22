@@ -17,16 +17,22 @@
 package net.sparktank.morrigan.android.model.impl;
 
 import net.sparktank.morrigan.android.model.MlistReference;
+import net.sparktank.morrigan.android.model.ServerReference;
 
 public class MlistReferenceImpl implements MlistReference {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private final String baseUrl;
+	private final ServerReference serverReference;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public MlistReferenceImpl (String baseUrl) {
+	public MlistReferenceImpl (String baseUrl, ServerReference serverReference) {
+		if (baseUrl == null) throw new IllegalArgumentException();
+		if (serverReference == null) throw new IllegalArgumentException();
+		
 		this.baseUrl = baseUrl;
+		this.serverReference = serverReference;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -34,6 +40,11 @@ public class MlistReferenceImpl implements MlistReference {
 	@Override
 	public String getBaseUrl() {
 		return this.baseUrl;
+	}
+	
+	@Override
+	public ServerReference getServerReference() {
+		return this.serverReference;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

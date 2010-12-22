@@ -18,6 +18,7 @@ package net.sparktank.morrigan.android.model.impl;
 
 import net.sparktank.morrigan.android.R;
 import net.sparktank.morrigan.android.helper.XmlParser;
+import net.sparktank.morrigan.android.model.MlistReference;
 import net.sparktank.morrigan.android.model.MlistState;
 
 import org.xml.sax.SAXException;
@@ -39,8 +40,13 @@ public class MlistStateXmlImpl  extends XmlParser implements MlistState {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public MlistStateXmlImpl (String xmlString) throws SAXException {
-		super(xmlString, nodes);
+	private final MlistReference mlistReference;
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	public MlistStateXmlImpl (String xmlString, MlistReference mlistReference) throws SAXException {
+		super(xmlString, nodes, mlistReference.getServerReference());
+		this.mlistReference = mlistReference;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -51,6 +57,11 @@ public class MlistStateXmlImpl  extends XmlParser implements MlistState {
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	@Override
+	public MlistReference getMlistReference () {
+		return this.mlistReference;
+	}
 	
 	@Override
 	public String getTitle() {

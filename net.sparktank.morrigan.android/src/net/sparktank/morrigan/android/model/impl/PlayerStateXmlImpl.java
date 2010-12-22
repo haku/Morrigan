@@ -16,12 +16,13 @@
 
 package net.sparktank.morrigan.android.model.impl;
 
-import org.xml.sax.SAXException;
-
 import net.sparktank.morrigan.android.R;
 import net.sparktank.morrigan.android.helper.XmlParser;
 import net.sparktank.morrigan.android.model.PlayState;
+import net.sparktank.morrigan.android.model.PlayerReference;
 import net.sparktank.morrigan.android.model.PlayerState;
+
+import org.xml.sax.SAXException;
 
 public class PlayerStateXmlImpl extends XmlParser implements PlayerState {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -30,8 +31,9 @@ public class PlayerStateXmlImpl extends XmlParser implements PlayerState {
 	public static final String TRACKFILE = "trackfile";
 	public static final String PLAYPOSITION = "playposition";
 	public static final String TRACKTITLE = "tracktitle";
-	public static final String LISTID = "listid";
 	public static final String LISTTITLE = "listtitle";
+	public static final String LISTID = "listid";
+	public static final String LISTURL = "list"; // Because its a link.
 	public static final String QUEUEDURATION = "queueduration";
 	public static final String QUEUELENGTH = "queuelength";
 	public static final String PLAYORDER = "playorder";
@@ -46,6 +48,7 @@ public class PlayerStateXmlImpl extends XmlParser implements PlayerState {
         QUEUEDURATION,
         LISTTITLE,
         LISTID,
+        LISTURL,
         TRACKTITLE,
         PLAYPOSITION,
         TRACKFILE,
@@ -54,11 +57,21 @@ public class PlayerStateXmlImpl extends XmlParser implements PlayerState {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public PlayerStateXmlImpl (String xmlString) throws SAXException {
-		super(xmlString, nodes);
+	private final PlayerReference playerReference;
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	public PlayerStateXmlImpl (String xmlString, PlayerReference playerReference) throws SAXException {
+		super(xmlString, nodes, playerReference.getServerReference());
+		this.playerReference = playerReference;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	@Override
+	public PlayerReference getPlayerReference() {
+		return this.playerReference;
+	}
 	
 	@Override
 	public String getTitle() {
@@ -100,6 +113,11 @@ public class PlayerStateXmlImpl extends XmlParser implements PlayerState {
 	@Override
 	public String getListId() {
 		return this.getNode(LISTID);
+	}
+	
+	@Override
+	public String getListUrl() {
+		return this.getNode(LISTURL);
 	}
 	
 	@Override

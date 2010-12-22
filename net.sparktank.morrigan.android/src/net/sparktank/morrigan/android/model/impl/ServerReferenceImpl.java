@@ -26,6 +26,8 @@ public class ServerReferenceImpl implements ServerReference {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public ServerReferenceImpl (String baseUrl) {
+		if (baseUrl == null) throw new IllegalArgumentException();
+		
 		this.baseUrl = baseUrl;
 	}
 	
