@@ -163,7 +163,7 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 	}
 	
 	protected void search () {
-		Toast.makeText(this, "TODO: search", Toast.LENGTH_SHORT).show();
+		Toast.makeText(this, "TODO: search desu~", Toast.LENGTH_SHORT).show();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

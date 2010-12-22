@@ -17,6 +17,7 @@
 package net.sparktank.morrigan.android;
 
 import net.sparktank.morrigan.android.helper.TimeHelper;
+import net.sparktank.morrigan.android.model.MlistItem;
 import net.sparktank.morrigan.android.model.MlistItemList;
 import net.sparktank.morrigan.android.model.MlistItemListAdapter;
 import net.sparktank.morrigan.android.model.MlistItemListChangeListener;
@@ -38,10 +39,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MlistActivity extends Activity implements MlistStateChangeListener, MlistItemListChangeListener {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -52,7 +56,7 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 	
 	protected MlistReference mlistReference = null;
 	private MlistState currentState = null;
-	private MlistItemListAdapter mlistItemListAdapter;
+	protected MlistItemListAdapter mlistItemListAdapter;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Activity methods.
@@ -95,7 +99,7 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 		
 		ListView lstServers = (ListView) findViewById(R.id.lstItems);
 		lstServers.setAdapter(this.mlistItemListAdapter);
-//		lstServers.setOnItemClickListener(this.artifactsListCickListener);
+		lstServers.setOnItemClickListener(this.mlistItemListCickListener);
 		
 		ImageButton cmd;
 		
@@ -112,6 +116,14 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 		cmd.setOnClickListener(new BtnRefresh_OnClick());
 		
 	}
+	
+	private OnItemClickListener mlistItemListCickListener = new OnItemClickListener() {
+		@Override
+		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+			MlistItem item = MlistActivity.this.mlistItemListAdapter.getInputData().getMlistItemList().get(position);
+			Toast.makeText(MlistActivity.this, "Clicked: " + item.getRelativeUrl(), Toast.LENGTH_LONG).show();
+		}
+	};
 	
 	class BtnPlay_OnClick implements OnClickListener {
 		@Override
