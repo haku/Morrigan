@@ -17,7 +17,7 @@
 package net.sparktank.morrigan.android.model.impl;
 
 import java.io.IOException;
-import java.io.StringReader;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -27,7 +27,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import net.sparktank.morrigan.android.helper.XmlParser;
 import net.sparktank.morrigan.android.model.MlistItem;
 import net.sparktank.morrigan.android.model.MlistItemList;
 
@@ -54,18 +53,8 @@ public class MlistItemListImpl implements MlistItemList, ContentHandler {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public MlistItemListImpl (String data, String query) throws SAXException {
+	public MlistItemListImpl (InputStream dataIs, String query) throws SAXException {
 		this.query = query;
-		String xml;
-		if (data.startsWith(XmlParser.XMLSTART)) {
-			xml = data;
-		}
-		else if (data.contains(XmlParser.XMLSTART)) {
-			xml = data.substring(data.indexOf(XmlParser.XMLSTART));
-		}
-		else {
-			throw new SAXException("Data does not contain XML.");
-		}
 		
 		SAXParserFactory spf = SAXParserFactory.newInstance();
         SAXParser sp;
@@ -74,7 +63,7 @@ public class MlistItemListImpl implements MlistItemList, ContentHandler {
 			XMLReader xmlReader = sp.getXMLReader();
 			xmlReader.setContentHandler(this);
 			try {
-				xmlReader.parse(new InputSource(new StringReader(xml)));
+				xmlReader.parse(new InputSource(dataIs));
 			}
 			catch (IOException e) {
 				throw new SAXException(e);

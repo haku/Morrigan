@@ -18,6 +18,7 @@ package net.sparktank.morrigan.android.helper;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
@@ -31,11 +32,27 @@ public class HttpHelper {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	static public interface HttpStreamHandler <T extends Exception> {
+		
+		public void handleStream (InputStream is) throws IOException, T;
+		
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
 	public static String getUrlContent (String sUrl) throws IOException {
 		return getUrlContent(sUrl, null, null, null);
 	}
 	
 	public static String getUrlContent (String sUrl, String httpRequestMethod, String encodedData, String contentType) throws IOException {
+		return getUrlContent(sUrl, httpRequestMethod, encodedData, contentType, (HttpStreamHandler<RuntimeException>) null);
+	}
+	
+	public static <T extends Exception> String getUrlContent (String sUrl, HttpStreamHandler<T> streamHandler) throws IOException, T {
+		return getUrlContent(sUrl, null, null, null, streamHandler);
+	}
+	
+	public static <T extends Exception> String getUrlContent (String sUrl, String httpRequestMethod, String encodedData, String contentType, HttpStreamHandler<T> streamHandler) throws IOException, T {
 		URL url = new URL(sUrl);
 		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 		connection.setRequestMethod("GET");
@@ -58,15 +75,35 @@ public class HttpHelper {
 			}
 		}
 		
-		BufferedReader rd = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-		StringBuilder sb = new StringBuilder();
-		String line;
-		while ((line = rd.readLine()) != null) {
-			sb.append(line);
-			sb.append("\n");
+		StringBuilder sb = null;
+		InputStream is = null;
+		try {
+			is = connection.getInputStream();
+			
+			if (streamHandler != null) {
+				streamHandler.handleStream(is);
+			}
+			else {
+//				int v;
+//				sb = new StringBuilder();
+//				while( (v = is.read()) != -1){
+//					sb.append((char)v);
+//				}
+				
+				BufferedReader rd = new BufferedReader(new InputStreamReader(is));
+				sb = new StringBuilder();
+				String line;
+				while ((line = rd.readLine()) != null) {
+					sb.append(line);
+					sb.append("\n");
+				}
+			}
+		}
+		finally {
+			if (is != null) is.close();
 		}
 		
-		return sb.toString();
+		return sb == null ? null : sb.toString();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
