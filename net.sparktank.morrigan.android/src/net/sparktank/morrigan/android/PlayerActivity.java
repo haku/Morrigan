@@ -32,6 +32,7 @@ import android.view.Window;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class PlayerActivity extends Activity implements PlayerStateChangeListener {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -87,6 +88,9 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 		cmd = (ImageButton) findViewById(R.id.btnNext);
 		cmd.setOnClickListener(new BtnNext_OnClick());
 		
+		cmd = (ImageButton) findViewById(R.id.btnSearch);
+		cmd.setOnClickListener(new BtnSearch_OnClick());
+		
 		cmd = (ImageButton) findViewById(R.id.btnRefresh);
 		cmd.setOnClickListener(new BtnRefresh_OnClick());
 	}
@@ -102,6 +106,13 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 		@Override
 		public void onClick(View v) {
 			next();
+		}
+	}
+	
+	class BtnSearch_OnClick implements OnClickListener {
+		@Override
+		public void onClick(View v) {
+			search();
 		}
 	}
 	
@@ -153,6 +164,10 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 	protected void next () {
 		SetPlaystateTask playpauseTask = new SetPlaystateTask(this, this.playerReference, TargetPlayState.NEXT, this);
 		playpauseTask.execute();
+	}
+	
+	protected void search () {
+		Toast.makeText(this, "TODO: search desu~", Toast.LENGTH_SHORT).show();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
