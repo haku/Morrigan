@@ -20,8 +20,8 @@ public interface MlistItem {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public String getTitle ();
+	public int getImageResource ();
 	public int getType ();
-	
 	public String getRelativeUrl ();
 	
 //	public int getDuration ();

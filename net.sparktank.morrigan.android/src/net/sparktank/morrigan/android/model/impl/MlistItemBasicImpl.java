@@ -16,6 +16,7 @@
 
 package net.sparktank.morrigan.android.model.impl;
 
+import net.sparktank.morrigan.android.R;
 import net.sparktank.morrigan.android.model.MlistItem;
 
 public class MlistItemBasicImpl implements MlistItem {
@@ -34,6 +35,22 @@ public class MlistItemBasicImpl implements MlistItem {
 	
 	public void setTitle(String title) {
 		this.title = title;
+	}
+	
+	@Override
+	public int getImageResource() {
+//		if (mi.isMissing()) {
+//			cell.setImage(null); // TODO find icon for missing?
+//		}
+//		else if (!mi.isEnabled()) {
+//			cell.setImage(this.imageCache.readImage("icons/noentry-red.png"));
+//		}
+//		else if (mi.getHashcode() == 0) {
+//			cell.setImage(this.imageCache.readImage("icons/exclamation-red.png"));
+//		}
+//		else {
+			return R.drawable.circledot;
+//		}
 	}
 	
 	@Override
