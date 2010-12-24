@@ -70,7 +70,9 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
-	public void setFocus() {/* UNUSED */}
+	public void setFocus() {
+		this.btnPlayPause.setFocus();
+	}
 	
 	@Override
 	public List<FullScreenAction> getFullScreenActions() {
@@ -97,6 +99,7 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 	private Menu menuFullscreen;
 	private Menu menuPref;
 	
+	private Button btnPlayPause;
 	private Label lblStatus;
 	private Button btnOrderMode;
 	Button btnQueue;
@@ -174,7 +177,7 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		FormData formData;
 		
 		Button btnStop = new Button(parent, SWT.PUSH);
-		Button btnPlayPause = new Button(parent, SWT.PUSH);
+		this.btnPlayPause = new Button(parent, SWT.PUSH);
 		Button btnPrev = new Button(parent, SWT.PUSH);
 		Button btnNext = new Button(parent, SWT.PUSH);
 		this.lblStatus = new Label(parent, SWT.NONE);
@@ -194,17 +197,17 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		btnStop.setLayoutData(formData);
 		btnStop.addSelectionListener(new ActionListener(this.stopAction));
 		
-		btnPlayPause.setImage(this.iconPause);
+		this.btnPlayPause.setImage(this.iconPause);
 		formData = new FormData();
 		formData.top = new FormAttachment(0, SEP);
 		formData.left = new FormAttachment(btnStop, SEP);
-		btnPlayPause.setLayoutData(formData);
-		btnPlayPause.addSelectionListener(new ActionListener(this.pauseAction));
+		this.btnPlayPause.setLayoutData(formData);
+		this.btnPlayPause.addSelectionListener(new ActionListener(this.pauseAction));
 		
 		btnPrev.setImage(this.iconPrev);
 		formData = new FormData();
 		formData.top = new FormAttachment(0, SEP);
-		formData.left = new FormAttachment(btnPlayPause, SEP);
+		formData.left = new FormAttachment(this.btnPlayPause, SEP);
 		btnPrev.setLayoutData(formData);
 		btnPrev.addSelectionListener(new DropMenuListener(btnPrev, getHistoryMenuMgr()));
 		
