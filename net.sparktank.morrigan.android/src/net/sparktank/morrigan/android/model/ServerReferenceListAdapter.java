@@ -23,8 +23,8 @@ import android.widget.ListAdapter;
 public interface ServerReferenceListAdapter extends ListAdapter {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public void setInputData (List<? extends ServerReference> data);
-	public List<? extends ServerReference> getInputData ();
+	public void setInputData (List<ServerReference> data);
+	public List<ServerReference> getInputData ();
 	
 	public void notifyDataSetChanged ();
 	

@@ -16,7 +16,6 @@
 
 package net.sparktank.morrigan.android.model.impl;
 
-import java.util.Collections;
 import java.util.List;
 
 import net.sparktank.morrigan.android.R;
@@ -33,7 +32,7 @@ import android.widget.TextView;
 public class ServerReferenceListAdapterImpl extends BaseAdapter implements ServerReferenceListAdapter {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private List<? extends ServerReference> listData;
+	private List<ServerReference> listData;
 	
 	private LayoutInflater layoutInflater;
 	
@@ -47,14 +46,14 @@ public class ServerReferenceListAdapterImpl extends BaseAdapter implements Serve
 //	ServersListAdapter methods.
 	
 	@Override
-	public void setInputData(List<? extends ServerReference> data) {
+	public void setInputData(List<ServerReference> data) {
 		this.listData = data;
 		notifyDataSetChanged();
 	}
 	
 	@Override
-	public List<? extends ServerReference> getInputData() {
-		return Collections.unmodifiableList(this.listData);
+	public List<ServerReference> getInputData() {
+		return (List<ServerReference>) this.listData;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
