@@ -16,13 +16,11 @@
 
 package net.sparktank.morrigan.android;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.sparktank.morrigan.android.model.ServerReference;
 import net.sparktank.morrigan.android.model.ServerReferenceListAdapter;
 import net.sparktank.morrigan.android.model.impl.ServerReferenceImpl;
 import net.sparktank.morrigan.android.model.impl.ServerReferenceListAdapterImpl;
+import net.sparktank.morrigan.android.state.ConfigDb;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -39,6 +37,7 @@ import android.widget.ListView;
 public class ServersActivity extends Activity {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	ConfigDb configDb;
 	ServerReferenceListAdapter serversListAdapter;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -57,11 +56,8 @@ public class ServersActivity extends Activity {
 	
 	private void wireGui () {
 		this.serversListAdapter = new ServerReferenceListAdapterImpl(this);
-		
-		// FIXME temp test data.
-		List<ServerReference> data = new ArrayList<ServerReference>();
-		data.add(new ServerReferenceImpl(TempConstants.serverUrl));
-		this.serversListAdapter.setInputData(data);
+		this.configDb = new ConfigDb(this);
+		this.serversListAdapter.setInputData(this.configDb.getServers());
 		
 		ListView lstServers = (ListView) findViewById(R.id.lstServers);
 		lstServers.setAdapter(this.serversListAdapter);
@@ -80,7 +76,7 @@ public class ServersActivity extends Activity {
 		}
 	};
 	
-	private class BtnAddServer_OnClick implements OnClickListener {
+	protected class BtnAddServer_OnClick implements OnClickListener {
 		@Override
 		public void onClick(View v) {
 			addServer();
@@ -111,8 +107,10 @@ public class ServersActivity extends Activity {
 				dialog.dismiss();
 				// TODO validate inputString!
 				
-				serversListAdapter.getInputData().add(new ServerReferenceImpl(inputString));
-				serversListAdapter.notifyDataSetChanged();
+				// TODO find a tidier way to do this.
+				ServersActivity.this.configDb.addServer(new ServerReferenceImpl(inputString));
+				ServersActivity.this.serversListAdapter.setInputData(ServersActivity.this.configDb.getServers());
+				ServersActivity.this.serversListAdapter.notifyDataSetChanged();
 			}
 		});
 		
