@@ -59,15 +59,17 @@ public class ConfigDb extends SQLiteOpenHelper {
 					List<ServerReference> ret = new LinkedList<ServerReference>();
 					
 					c = db.query(true, TBL_HOSTS,
-							new String[] {TBL_HOSTS_URL},
+							new String[] { TBL_HOSTS_ID, TBL_HOSTS_URL },
 							null, null, null, null,
 							TBL_HOSTS_URL + " DESC", null);
 					
 					if (c.moveToFirst()) {
+						int col_id = c.getColumnIndex(TBL_HOSTS_ID);
 						int col_url = c.getColumnIndex(TBL_HOSTS_URL);
 						
 						do {
 							ServerReferenceImpl i = new ServerReferenceImpl(c.getString(col_url));
+							i.setDbId(c.getLong(col_id));
 							ret.add(i);
 						}
 						while (c.moveToNext());
@@ -107,6 +109,36 @@ public class ConfigDb extends SQLiteOpenHelper {
 		finally {
 			if (db != null) db.close();
 		}
+    }
+    
+    public boolean removeServer (ServerReference sr) {
+    	if (!(sr instanceof ServerReferenceImpl)) {
+    		throw new IllegalArgumentException("sr must be instanceof ServerReferenceImpl");
+    	}
+    	
+    	ServerReferenceImpl sri = (ServerReferenceImpl) sr;
+    	
+    	SQLiteDatabase db = null;
+		try {
+			db = this.getWritableDatabase();
+			db.beginTransaction();
+			try {
+				int n = db.delete(TBL_HOSTS, TBL_HOSTS_ID + " = ?", new String[] { String.valueOf(sri.getDbId()) } );
+				if (n > 0) {
+					db.setTransactionSuccessful();
+					return true;
+				}
+				
+				return false;
+			}
+			finally {
+				db.endTransaction();
+			}
+		}
+		finally {
+			if (db != null) db.close();
+		}
+    	
     }
     
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -23,6 +23,8 @@ public class ServerReferenceImpl implements ServerReference {
 	
 	private final String baseUrl;
 	
+	private long dbId;
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public ServerReferenceImpl (String baseUrl) {
@@ -32,10 +34,21 @@ public class ServerReferenceImpl implements ServerReference {
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	ServerReference methods.
 	
 	@Override
 	public String getBaseUrl() {
 		return this.baseUrl;
+	}
+
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	public void setDbId(long dbId) {
+		this.dbId = dbId;
+	}
+	
+	public long getDbId() {
+		return this.dbId;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
