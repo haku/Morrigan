@@ -106,9 +106,9 @@ public class ServersActivity extends Activity {
 			case 1:
 				AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
 				ServerReference ref = ServersActivity.this.serversListAdapter.getInputData().get(info.position);
-				
-				Toast.makeText(this, "TODO remove " + ref.getBaseUrl(), Toast.LENGTH_SHORT).show();
+				deleteServer(ref);
 				return true;
+			
 			default:
 				return super.onContextItemSelected(item);
 		}
@@ -153,6 +153,15 @@ public class ServersActivity extends Activity {
 		});
 		
 		dlgBuilder.show();
+	}
+	
+	protected void deleteServer (ServerReference sr) {
+		// TODO find a tidier way to do this.
+		ServersActivity.this.configDb.removeServer(sr);
+		ServersActivity.this.serversListAdapter.setInputData(ServersActivity.this.configDb.getServers());
+		ServersActivity.this.serversListAdapter.notifyDataSetChanged();
+		
+		Toast.makeText(this, "Removed: " + sr.getBaseUrl(), Toast.LENGTH_SHORT).show();
 	}
 	
 	protected void showServerActivity (ServerReference item) {
