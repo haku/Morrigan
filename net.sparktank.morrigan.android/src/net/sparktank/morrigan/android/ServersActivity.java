@@ -26,13 +26,19 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnCreateContextMenuListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.Toast;
 
 public class ServersActivity extends Activity {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -62,11 +68,19 @@ public class ServersActivity extends Activity {
 		ListView lstServers = (ListView) findViewById(R.id.lstServers);
 		lstServers.setAdapter(this.serversListAdapter);
 		lstServers.setOnItemClickListener(this.serversListCickListener);
+		lstServers.setOnCreateContextMenuListener(this.serversContextMenuListener);
 		
 		ImageButton cmd;
 		cmd = (ImageButton) findViewById(R.id.btnAddServer);
-		cmd.setOnClickListener(new BtnAddServer_OnClick());
+		cmd.setOnClickListener(this.btnAddServerClickListener);
 	}
+	
+	private OnClickListener btnAddServerClickListener = new OnClickListener () {
+		@Override
+		public void onClick(View v) {
+			addServer();
+		}
+	};
 	
 	private OnItemClickListener serversListCickListener = new OnItemClickListener() {
 		@Override
@@ -76,10 +90,27 @@ public class ServersActivity extends Activity {
 		}
 	};
 	
-	protected class BtnAddServer_OnClick implements OnClickListener {
+	private OnCreateContextMenuListener serversContextMenuListener = new OnCreateContextMenuListener () {
 		@Override
-		public void onClick(View v) {
-			addServer();
+		public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+			AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
+			ServerReference item = ServersActivity.this.serversListAdapter.getInputData().get(info.position);
+			menu.setHeaderTitle(item.getBaseUrl());
+			menu.add(Menu.NONE, 1, Menu.NONE, "Remove");
+		}
+	};
+	
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case 1:
+				AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+				ServerReference ref = ServersActivity.this.serversListAdapter.getInputData().get(info.position);
+				
+				Toast.makeText(this, "TODO remove " + ref.getBaseUrl(), Toast.LENGTH_SHORT).show();
+				return true;
+			default:
+				return super.onContextItemSelected(item);
 		}
 	}
 	
