@@ -117,7 +117,7 @@ public class MlistStateListImpl implements MlistStateList, ContentHandler {
 			this.currentItem = null;
 		}
 		else if (this.stack.size() == 3 && localName.equals("title")) {
-			this.currentItem.setTitle(this.currentText.toString());
+			this.currentItem.setTitle(this.currentText == null ? null : this.currentText.toString());
 		}
 		
 		this.stack.pop();
