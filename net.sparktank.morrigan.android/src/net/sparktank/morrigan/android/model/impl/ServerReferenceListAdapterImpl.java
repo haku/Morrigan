@@ -53,7 +53,7 @@ public class ServerReferenceListAdapterImpl extends BaseAdapter implements Serve
 	
 	@Override
 	public List<ServerReference> getInputData() {
-		return (List<ServerReference>) this.listData;
+		return this.listData;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
