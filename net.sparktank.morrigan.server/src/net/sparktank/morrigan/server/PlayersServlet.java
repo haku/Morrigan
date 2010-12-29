@@ -29,6 +29,8 @@ public class PlayersServlet extends HttpServlet {
 	
 	public static final String CONTEXTPATH = "/players";
 	
+	public static final String PATH_QUEUE = "queue";
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private static final long serialVersionUID = -6463380542721345844L;
@@ -86,22 +88,58 @@ public class PlayersServlet extends HttpServlet {
 			}
 		}
 		else {
-			try {
-				int n = Integer.parseInt(actualTarget.substring(ROOTPATH.length()));
-				try {
-					printPlayer(resp, n);
-				} catch (IllegalArgumentException e) {
-					resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-					resp.setContentType("text/plain");
-					resp.getWriter().println("HTTP Error 404 player " + n + " not found desu~");
-				} catch (SAXException e) {
-					throw new ServletException(e);
+			String path = actualTarget.substring(ROOTPATH.length()); // Expecting path = '0' or '0/queue'.
+			if (path.length() > 0) {
+				String[] pathParts = path.split("/");
+				if (pathParts.length >= 1) {
+					String playerNumberRaw = pathParts[0];
+					try {
+						int playerNumber = Integer.parseInt(playerNumberRaw);
+						IPlayerLocal player;
+						try {
+							player = PlayerRegister.getLocalPlayer(playerNumber);
+						}
+						catch (IllegalArgumentException e) {
+							resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+							resp.setContentType("text/plain");
+							resp.getWriter().println("HTTP Error 404 player " + playerNumber + " not found desu~");
+							return;
+						}
+						
+						if (pathParts.length >= 2) {
+							String subPath = pathParts[1];
+							if (subPath.equals(PATH_QUEUE)) {
+								try {
+									printPlayerQueue(resp, player);
+								}
+								catch (SAXException e) {
+									throw new ServletException(e);
+								}
+							}
+							else {
+								resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+								resp.setContentType("text/plain");
+								resp.getWriter().println("HTTP Error 404 " + subPath + " not found desu~");
+							}
+						}
+						else {
+							try {
+								printPlayer(resp, player);
+							}
+							catch (SAXException e) {
+								throw new ServletException(e);
+							}
+						}
+						
+					}
+					catch (NumberFormatException e) {
+						resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+						resp.setContentType("text/plain");
+						resp.getWriter().println("HTTP Error 404 not found '" + actualTarget + "' desu~");
+					}
 				}
-			} catch (NumberFormatException e) {
-				resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-				resp.setContentType("text/plain");
-				resp.getWriter().println("HTTP Error 404 not found '" + actualTarget + "' desu~");
 			}
+			
 		}
 	}
 	
@@ -124,15 +162,22 @@ public class PlayersServlet extends HttpServlet {
 		AbstractFeed.endFeed(dw);
 	}
 	
-	static private void printPlayer (HttpServletResponse resp, int playerNumber) throws IOException, SAXException {
-		IPlayerLocal p = PlayerRegister.getLocalPlayer(playerNumber);
-		
+	static private void printPlayer (HttpServletResponse resp, IPlayerLocal player) throws IOException, SAXException {
 		resp.setContentType("text/xml;charset=utf-8");
 		DataWriter dw = AbstractFeed.startDocument(resp.getWriter(), "player");
 		
-		printPlayer(dw, p, 1);
+		printPlayer(dw, player, 1);
 		
 		AbstractFeed.endDocument(dw, "player");
+	}
+	
+	static private void printPlayerQueue (HttpServletResponse resp, IPlayerLocal player) throws IOException, SAXException {
+		resp.setContentType("text/xml;charset=utf-8");
+		DataWriter dw = AbstractFeed.startDocument(resp.getWriter(), "queue");
+		
+		printQueue(dw, player);
+		
+		AbstractFeed.endDocument(dw, "queue");
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -170,13 +215,15 @@ public class PlayersServlet extends HttpServlet {
 				TimeHelper.formatTimeSeconds(queueDuration.getDuration());
 		
 		AbstractFeed.addElement(dw, "title", "p" + p.getId() + ":" + p.getPlayState().toString() + ":" + title);
-		AbstractFeed.addLink(dw, CONTEXTPATH + "/" + p.getId(), "self", "text/xml");
+		String selfUrl = CONTEXTPATH + "/" + p.getId();
+		AbstractFeed.addLink(dw, selfUrl, "self", "text/xml");
 		
 		AbstractFeed.addElement(dw, "playerid", p.getId());
 		AbstractFeed.addElement(dw, "playstate", p.getPlayState().getN());
 		AbstractFeed.addElement(dw, "playorder", p.getPlaybackOrder().getN());
 		AbstractFeed.addElement(dw, "queuelength", queueLength);
-		AbstractFeed.addElement(dw, "queueduration", queueDurationString);
+		AbstractFeed.addElement(dw, "queueduration", queueDurationString); // FIXME make parsasble.
+		AbstractFeed.addLink(dw, selfUrl + "/" + PATH_QUEUE, "queue", "text/xml");
 		AbstractFeed.addElement(dw, "listtitle", listTitle);
 		AbstractFeed.addElement(dw, "listid", listId);
 		if (listUrl != null) AbstractFeed.addLink(dw, listUrl, "list", "text/xml");
@@ -195,6 +242,63 @@ public class PlayersServlet extends HttpServlet {
 			AbstractFeed.addElement(dw, "trackfile", filepath);
 			AbstractFeed.addElement(dw, "trackduration", p.getCurrentTrackDuration());
 		}
+	}
+	
+	static private void printQueue (DataWriter dw, IPlayerAbstract p) throws SAXException {
+		
+		AbstractFeed.addLink(dw, CONTEXTPATH + "/" + p.getId() + "/" + PATH_QUEUE, "self", "text/xml");
+		AbstractFeed.addLink(dw, CONTEXTPATH + "/" + p.getId(), "player", "text/xml");
+		
+		int queueLength = p.getQueueList().size();
+		DurationData queueDuration = p.getQueueTotalDuration();
+		String queueDurationString = (queueDuration.isComplete() ? "" : "more than ") +
+				TimeHelper.formatTimeSeconds(queueDuration.getDuration());
+		
+		AbstractFeed.addElement(dw, "queuelength", queueLength);
+		AbstractFeed.addElement(dw, "queueduration", queueDurationString); // FIXME make parsasble.
+		
+		List<PlayItem> queueList = p.getQueueList();
+		for (PlayItem playItem : queueList) {
+			dw.startElement("entry");
+			
+			AbstractFeed.addElement(dw, "title", playItem.toString());
+			
+			IMediaTrackList<? extends IMediaTrack> list = playItem.list;
+			String listFile;
+			try {
+				listFile = URLEncoder.encode(AbstractFeed.filenameFromPath(list.getListId()), "UTF-8");
+			} catch (UnsupportedEncodingException e) {
+				throw new RuntimeException(e);
+			}
+			
+			String pathToSelf = CONTEXTPATH + "/" + list.getType() + "/" + listFile;
+			AbstractFeed.addLink(dw, pathToSelf, "list", "text/xml");
+			
+			IMediaTrack item = playItem.item;
+			if (item != null) {
+				String file;
+				try {
+					file = URLEncoder.encode(item.getFilepath(), "UTF-8");
+				} catch (UnsupportedEncodingException e) {
+					throw new RuntimeException(e);
+				}
+				
+				StringBuilder sb = new StringBuilder();
+				sb.append(MlistsServlet.CONTEXTPATH);
+				sb.append("/");
+				sb.append(list.getType());
+				sb.append("/");
+				sb.append(listFile);
+				sb.append("/");
+				sb.append(MlistsServlet.PATH_ITEM);
+				sb.append("/");
+				sb.append(file);
+				AbstractFeed.addLink(dw, sb.toString(), "item");
+			}
+			
+			dw.endElement("entry");
+		}
+		
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
