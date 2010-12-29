@@ -517,7 +517,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<Q, ? extends IMed
 			taskEventListener.logMsg(this.getItemList().getListName(), "Performed " + countMerges + " mergers.");
 			taskEventListener.logMsg(this.getItemList().getListName(), "Found " + dupicateItems.size() + " duplicate items:");
 			for (Entry<T, ScanOption> e : dupicateItems.entrySet()) {
-				taskEventListener.logMsg(this.getItemList().getListName(), e.getValue() + " : " + e.getKey().getTitle());
+				taskEventListener.logMsg(this.getItemList().getListName(), e.getKey().getHashcode() + " : " + e.getValue() + " : " + e.getKey().getTitle());
 			}
 		}
 		else {
