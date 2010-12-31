@@ -31,34 +31,19 @@ public class MorriganCommandProvider implements CommandProvider {
 	@Override
 	public String getHelp() {
 		return "---Morrigan---\n" +
-				"\tmn media\n" +
-				"\tmn media create <dbname>\n" +
-				"\tmn media add <dir> <q1>\n" +
-				"\tmn media scan <q1>\n" +
-				"\tmn media <q1>\n" +
-				"\tmn media <q1> <q2>\n" +
-				"\tmn players\n" +
-				"\tmn player 0\n" +
-				"\tmn player 0 play\n" +
-				"\tmn player 0 play <q1>\n" +
-				"\tmn player 0 play <q1> <q2>\n" +
-				"\tmn player 0 queue\n" +
-				"\tmn player 0 queue <q1>\n" +
-				"\tmn player 0 queue <q1> <q2>\n" +
-				"\tmn player 0 queue clear\n" +
-				"\tmn player 0 pause\n" +
-				"\tmn player 0 stop\n" +
-				"\tmn player 0 next\n" +
-				"\tmn player 0 order <order>\n" +
-				"\tmn play\n" +
-				"\tmn play <q1>\n" +
-				"\tmn play <q1> <q2>\n" +
-				"\tmn queue\n" +
-				"\tmn queue <q1>\n" +
-				"\tmn queue <q1> <q2>\n" +
-				"\tmn pause\n" +
-				"\tmn stop\n" +
-				"\tmn next\n" +
+				"\tmn [media|m]\n" +
+				"\tmn [media|m] [create|c] <dbname>\n" +
+				"\tmn [media|m] [add|a] <dir> <q1>\n" +
+				"\tmn [media|m] [scan|s] <q1>\n" +
+				"\tmn [media|m] <q1> [<q2>]\n" +
+				"\tmn [players|player|p]\n" +
+				"\tmn [player|p] 0 [play|queue] [<q1> [<q2>]]\n" +
+				"\tmn [player|p] 0 [queue|q] clear\n" +
+				"\tmn [player|p] 0 [pause|stop|next]\n" +
+				"\tmn [player|p] 0 [order|o] [<order>]\n" +
+				"\tmn play [<q1> [<q2>]]\n" +
+				"\tmn [queue|q] [<q1> [<q2>]|clear]\n" +
+				"\tmn [pause|stop|s|next|n]\n" +
 				"\tNOTE 1: <q1> = list, <q2> = item in <q1>.\n" +
 				"\tNOTE 2: Only omit player ID when there is only one player.\n";
 	}
@@ -145,16 +130,40 @@ public class MorriganCommandProvider implements CommandProvider {
 				ci.println("Query match: " + list);
 				if (results.get(0).list instanceof ILocalMixedMediaDb) {
 					ILocalMixedMediaDb mmdb = (ILocalMixedMediaDb) list;
-					List<String> sources;
-					try {
-						sources = mmdb.getSources();
-					} catch (MorriganException e) {
-						e.printStackTrace();
-						return;
+					if (q2 != null && q2.length() > 0) {
+						// run query q2.
+						try {
+							results = PlayerHelper.queryForPlayableItems(q1, q2, 10);
+						} catch (MorriganException e) {
+							e.printStackTrace();
+						}
+						
+						if (results == null || results.size() < 1) {
+							ci.println("No results for query '"+q1+"' '"+q2+"'.");
+						}
+						else {
+							ci.println("Results for query:");
+							for (PlayItem pi : results) {
+								ci.println(" > " + pi.toString());
+							}
+						}
 					}
-					for (String s : sources) {
-						ci.println(" src > " + s);
+					else {
+    					List<String> sources;
+    					try {
+    						sources = mmdb.getSources();
+    					} catch (MorriganException e) {
+    						e.printStackTrace();
+    						return;
+    					}
+    					for (String s : sources) {
+    						ci.println(" src > " + s);
+    					}
 					}
+				}
+				else {
+					// TODO its no ILocalMixedMediaDb.
+					ci.println("TODO query types other than ILocalMixedMediaDb.");
 				}
 			}
 			else {
@@ -450,7 +459,14 @@ public class MorriganCommandProvider implements CommandProvider {
 	
 	static private void doPlayersPlayerOrder (CommandInterpreter ci, IPlayerLocal player, List<String> args) {
 		if (args.size() < 1) {
-			ci.println("Order mode parameter not specifed.");
+			ci.println("Player " + player.getId() + " order = " + player.getPlaybackOrder().toString() + ".");
+			ci.print("Options:");
+			for (PlaybackOrder i : PlaybackOrder.values()) {
+				ci.print(" '");
+				ci.print(i.toString());
+				ci.print("'");
+			}
+			ci.println();
 			return;
 		}
 		
