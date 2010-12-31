@@ -63,7 +63,7 @@ public class MixedMediaSqliteLayer extends MixedMediaSqliteLayerImpl implements 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Read methods for IMediaMixedItem.
 	
-	private MediaType defaultMediaType = MediaType.UNKNOWN;
+	private MediaType defaultMediaType = Defaults.MEDIA_ASPECT;
 	
 	@Override
 	public void setDefaultMediaType (MediaType mediaType) {
