@@ -17,6 +17,7 @@
 package net.sparktank.morrigan.android;
 
 import net.sparktank.morrigan.android.model.Artifact;
+import net.sparktank.morrigan.android.model.ArtifactList;
 import net.sparktank.morrigan.android.model.ArtifactListAdaptor;
 import net.sparktank.morrigan.android.model.MlistReference;
 import net.sparktank.morrigan.android.model.MlistStateList;
@@ -50,7 +51,7 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	ServerReference serverReference = null;
-	ArtifactListAdaptor artifactListAdaptor;
+	ArtifactListAdaptor<ArtifactList> artifactListAdaptor;
 	private ArtifactListGroupImpl artifactListImpl;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -87,7 +88,7 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 //	GUI methods.
 	
 	private void wireGui () {
-		this.artifactListAdaptor = new ArtifactListAdaptorImpl(this);
+		this.artifactListAdaptor = new ArtifactListAdaptorImpl<ArtifactList>(this, R.layout.simplelistrow);
 		this.artifactListImpl = new ArtifactListGroupImpl();
 		this.artifactListAdaptor.setInputData(this.artifactListImpl);
 		

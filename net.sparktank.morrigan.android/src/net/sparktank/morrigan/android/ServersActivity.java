@@ -16,10 +16,11 @@
 
 package net.sparktank.morrigan.android;
 
+import net.sparktank.morrigan.android.model.ArtifactListAdaptor;
 import net.sparktank.morrigan.android.model.ServerReference;
-import net.sparktank.morrigan.android.model.ServerReferenceListAdapter;
+import net.sparktank.morrigan.android.model.ServerReferenceList;
+import net.sparktank.morrigan.android.model.impl.ArtifactListAdaptorImpl;
 import net.sparktank.morrigan.android.model.impl.ServerReferenceImpl;
-import net.sparktank.morrigan.android.model.impl.ServerReferenceListAdapterImpl;
 import net.sparktank.morrigan.android.state.ConfigDb;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -44,7 +45,7 @@ public class ServersActivity extends Activity {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	ConfigDb configDb;
-	ServerReferenceListAdapter serversListAdapter;
+	ArtifactListAdaptor<ServerReferenceList> serversListAdapter;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Activity methods.
@@ -61,9 +62,9 @@ public class ServersActivity extends Activity {
 //	GUI methods.
 	
 	private void wireGui () {
-		this.serversListAdapter = new ServerReferenceListAdapterImpl(this);
+		this.serversListAdapter = new ArtifactListAdaptorImpl<ServerReferenceList>(this, R.layout.simplelistrow);
 		this.configDb = new ConfigDb(this);
-		this.serversListAdapter.setInputData(this.configDb.getServers());
+		this.serversListAdapter.setInputData(this.configDb);
 		
 		ListView lstServers = (ListView) findViewById(R.id.lstServers);
 		lstServers.setAdapter(this.serversListAdapter);
@@ -85,7 +86,7 @@ public class ServersActivity extends Activity {
 	private OnItemClickListener serversListCickListener = new OnItemClickListener() {
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-			ServerReference item = ServersActivity.this.serversListAdapter.getInputData().get(position);
+			ServerReference item = ServersActivity.this.serversListAdapter.getInputData().getServerReferenceList().get(position);
 			showServerActivity(item);
 		}
 	};
@@ -94,7 +95,7 @@ public class ServersActivity extends Activity {
 		@Override
 		public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 			AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-			ServerReference item = ServersActivity.this.serversListAdapter.getInputData().get(info.position);
+			ServerReference item = ServersActivity.this.serversListAdapter.getInputData().getServerReferenceList().get(info.position);
 			menu.setHeaderTitle(item.getBaseUrl());
 			menu.add(Menu.NONE, 1, Menu.NONE, "Remove");
 		}
@@ -105,7 +106,7 @@ public class ServersActivity extends Activity {
 		switch (item.getItemId()) {
 			case 1:
 				AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-				ServerReference ref = ServersActivity.this.serversListAdapter.getInputData().get(info.position);
+				ServerReference ref = ServersActivity.this.serversListAdapter.getInputData().getServerReferenceList().get(info.position);
 				deleteServer(ref);
 				return true;
 			
@@ -138,9 +139,7 @@ public class ServersActivity extends Activity {
 				dialog.dismiss();
 				// TODO validate inputString!
 				
-				// TODO find a tidier way to do this.
 				ServersActivity.this.configDb.addServer(new ServerReferenceImpl(inputString));
-				ServersActivity.this.serversListAdapter.setInputData(ServersActivity.this.configDb.getServers());
 				ServersActivity.this.serversListAdapter.notifyDataSetChanged();
 			}
 		});
@@ -156,9 +155,7 @@ public class ServersActivity extends Activity {
 	}
 	
 	protected void deleteServer (ServerReference sr) {
-		// TODO find a tidier way to do this.
 		ServersActivity.this.configDb.removeServer(sr);
-		ServersActivity.this.serversListAdapter.setInputData(ServersActivity.this.configDb.getServers());
 		ServersActivity.this.serversListAdapter.notifyDataSetChanged();
 		
 		Toast.makeText(this, "Removed: " + sr.getBaseUrl(), Toast.LENGTH_SHORT).show();

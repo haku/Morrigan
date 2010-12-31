@@ -18,11 +18,11 @@ package net.sparktank.morrigan.android.model;
 
 import android.widget.ListAdapter;
 
-public interface ArtifactListAdaptor extends ListAdapter {
+public interface ArtifactListAdaptor<T extends ArtifactList> extends ListAdapter {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public void setInputData (ArtifactList data);
-	public ArtifactList getInputData ();
+	public void setInputData (T data);
+	public T getInputData ();
 	
 	public void notifyDataSetChanged ();
 	

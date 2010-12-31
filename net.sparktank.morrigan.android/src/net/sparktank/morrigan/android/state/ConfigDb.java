@@ -4,7 +4,10 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.sparktank.morrigan.android.model.Artifact;
+import net.sparktank.morrigan.android.model.ArtifactList;
 import net.sparktank.morrigan.android.model.ServerReference;
+import net.sparktank.morrigan.android.model.ServerReferenceList;
 import net.sparktank.morrigan.android.model.impl.ServerReferenceImpl;
 import android.content.ContentValues;
 import android.content.Context;
@@ -12,7 +15,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-public class ConfigDb extends SQLiteOpenHelper {
+public class ConfigDb extends SQLiteOpenHelper implements ServerReferenceList {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private static final String DB_NAME = "config";
@@ -47,8 +50,15 @@ public class ConfigDb extends SQLiteOpenHelper {
 	}
     
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	ServerReferenceList methods.
     
-    public List<ServerReference> getServers () {
+    @Override
+	public List<? extends Artifact> getArtifactList() {
+    	return getServerReferenceList();
+	}
+    
+    @Override
+	public List<? extends ServerReference> getServerReferenceList () {
     	SQLiteDatabase db = null;
 		try {
 			db = this.getReadableDatabase();
@@ -141,5 +151,15 @@ public class ConfigDb extends SQLiteOpenHelper {
     	
     }
     
+    @Override
+	public String getSortKey() {
+		return ""; // This should never be relevant.
+	}
+	
+	@Override
+	public int compareTo(ArtifactList another) {
+		return this.getSortKey().compareTo(another.getSortKey());
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
