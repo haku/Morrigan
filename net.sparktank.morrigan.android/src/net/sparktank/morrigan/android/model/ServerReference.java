@@ -16,7 +16,7 @@
 
 package net.sparktank.morrigan.android.model;
 
-public interface ServerReference {
+public interface ServerReference extends Artifact {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public String getBaseUrl ();

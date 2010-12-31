@@ -1,19 +1,3 @@
-/*
- * Copyright 2010 Alex Hutter
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License. You may
- * obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations
- * under the License.
- */
-
 package net.sparktank.morrigan.android.model.impl;
 
 import java.io.IOException;
@@ -29,8 +13,8 @@ import javax.xml.parsers.SAXParserFactory;
 
 import net.sparktank.morrigan.android.model.Artifact;
 import net.sparktank.morrigan.android.model.ArtifactList;
-import net.sparktank.morrigan.android.model.MlistItem;
-import net.sparktank.morrigan.android.model.MlistItemList;
+import net.sparktank.morrigan.android.model.PlayerQueue;
+import net.sparktank.morrigan.android.model.PlayerReference;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -39,24 +23,21 @@ import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
-public class MlistItemListImpl implements MlistItemList, ContentHandler {
+public class PlayerQueueImpl implements PlayerQueue, ContentHandler {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private static final String ENTRY = "entry";
-	
 	public static final String TITLE = "title";
-	public static final String TYPE = "type";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private final List<MlistItem> mlistItemList = new LinkedList<MlistItem>();
-	
-	private final String query;
+	private final List<Artifact> artifactList = new LinkedList<Artifact>();
+	private final PlayerReference playerReference;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public MlistItemListImpl (InputStream dataIs, String query) throws SAXException {
-		this.query = query;
+	public PlayerQueueImpl (InputStream dataIs, PlayerReference playerReference) throws SAXException {
+		this.playerReference = playerReference;
 		
 		SAXParserFactory spf = SAXParserFactory.newInstance();
         SAXParser sp;
@@ -79,39 +60,45 @@ public class MlistItemListImpl implements MlistItemList, ContentHandler {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
-	public List<? extends MlistItem> getMlistItemList() {
-		return Collections.unmodifiableList(this.mlistItemList);
-	}
-	
-	@Override
 	public List<? extends Artifact> getArtifactList() {
-		return Collections.unmodifiableList(this.mlistItemList);
+		return Collections.unmodifiableList(this.artifactList);
 	}
 	
-	@Override
-	public String getQuery() {
-		return this.query;
-	}
+//	@Override
+//	public List<? extends MlistItem> getQueueItemList() {
+//		return Collections.unmodifiableList(this.mlistItemList);
+//	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private final Stack<String> stack = new Stack<String>();
 	private StringBuilder currentText;
-	private MlistItemBasicImpl currentItem;
+	
+	private String currentTitle = null;
+	private String currentListRelativeUrl = null;
+	private String currentItemRelativeUrl = null;
 	
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 		this.stack.push(localName);
 		
 		if (this.stack.size() == 2 && localName.equals(ENTRY)) {
-			this.currentItem = new MlistItemBasicImpl();
+			this.currentTitle = null;
+			this.currentListRelativeUrl = null;
+			this.currentItemRelativeUrl = null;
 		}
 		else if (this.stack.size() == 3 && localName.equals("link")) {
 			String relVal = attributes.getValue("rel");
-			if (relVal != null && relVal.equals("self")) {
+			if (relVal != null && relVal.equals("item")) {
 				String hrefVal = attributes.getValue("href");
 				if (hrefVal != null && hrefVal.length() > 0) {
-					this.currentItem.setRelativeUrl(hrefVal);
+					this.currentItemRelativeUrl = hrefVal;
+				}
+			}
+			else if (relVal != null && relVal.equals("list")) {
+				String hrefVal = attributes.getValue("href");
+				if (hrefVal != null && hrefVal.length() > 0) {
+					this.currentListRelativeUrl = hrefVal;
 				}
 			}
 		}
@@ -125,15 +112,23 @@ public class MlistItemListImpl implements MlistItemList, ContentHandler {
 	@Override
 	public void endElement(String uri, String localName, String qName) throws SAXException {
 		if (this.stack.size() == 2 && localName.equals(ENTRY)) {
-			this.mlistItemList.add(this.currentItem);
-			this.currentItem = null;
+			if (this.currentItemRelativeUrl != null) {
+				MlistItemBasicImpl item = new MlistItemBasicImpl();
+				item.setTitle(this.currentTitle);
+				item.setRelativeUrl(this.currentItemRelativeUrl);
+				item.setType(1); // TODO reference an enum?
+				this.artifactList.add(item);
+			}
+			else {
+				MlistStateBasicImpl list = new MlistStateBasicImpl();
+				list.setTitle(this.currentTitle);
+				list.setBaseUrl(this.playerReference.getServerReference().getBaseUrl() + this.currentListRelativeUrl);
+				
+				this.artifactList.add(list);
+			}
 		}
 		else if (this.stack.size() == 3 && localName.equals(TITLE)) {
-			this.currentItem.setTitle(this.currentText.toString());
-		}
-		else if (this.stack.size() == 3 && localName.equals(TYPE)) {
-			int v = Integer.parseInt(this.currentText.toString());
-			this.currentItem.setType(v);
+			this.currentTitle = this.currentText.toString();
 		}
 		
 		this.stack.pop();

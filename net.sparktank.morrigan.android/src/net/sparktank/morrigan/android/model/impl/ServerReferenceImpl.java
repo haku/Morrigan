@@ -16,6 +16,7 @@
 
 package net.sparktank.morrigan.android.model.impl;
 
+import net.sparktank.morrigan.android.R;
 import net.sparktank.morrigan.android.model.ServerReference;
 
 public class ServerReferenceImpl implements ServerReference {
@@ -41,6 +42,19 @@ public class ServerReferenceImpl implements ServerReference {
 		return this.baseUrl;
 	}
 
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Artifact methods.
+	
+	@Override
+	public String getTitle() {
+		return getBaseUrl();
+	}
+	
+	@Override
+	public int getImageResource() {
+		return R.drawable.db;
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public void setDbId(long dbId) {

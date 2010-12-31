@@ -19,13 +19,12 @@ package net.sparktank.morrigan.android;
 import net.sparktank.morrigan.android.helper.TimeHelper;
 import net.sparktank.morrigan.android.model.MlistItem;
 import net.sparktank.morrigan.android.model.MlistItemList;
-import net.sparktank.morrigan.android.model.MlistItemListAdapter;
 import net.sparktank.morrigan.android.model.MlistItemListChangeListener;
 import net.sparktank.morrigan.android.model.MlistReference;
 import net.sparktank.morrigan.android.model.MlistState;
 import net.sparktank.morrigan.android.model.MlistStateChangeListener;
 import net.sparktank.morrigan.android.model.ServerReference;
-import net.sparktank.morrigan.android.model.impl.MlistItemListAdaptorImpl;
+import net.sparktank.morrigan.android.model.impl.ArtifactListAdaptorImpl;
 import net.sparktank.morrigan.android.model.impl.MlistReferenceImpl;
 import net.sparktank.morrigan.android.model.impl.ServerReferenceImpl;
 import net.sparktank.morrigan.android.tasks.GetMlistItemListTask;
@@ -62,7 +61,7 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 	
 	protected ServerReference serverReference = null;
 	protected MlistReference mlistReference = null;
-	protected MlistItemListAdapter mlistItemListAdapter;
+	protected ArtifactListAdaptorImpl<MlistItemList> mlistItemListAdapter;
 	private MlistState currentState = null;
 	private MlistItemList currentItemList = null;
 	private String initialQuery = null;
@@ -107,7 +106,7 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 //	Buttons.
     
 	private void wireGui () {
-		this.mlistItemListAdapter = new MlistItemListAdaptorImpl(this);
+		this.mlistItemListAdapter = new ArtifactListAdaptorImpl<MlistItemList>(this, R.layout.mlistitemlistrow);
 		
 		ListView lstServers = (ListView) findViewById(R.id.lstItems);
 		lstServers.setAdapter(this.mlistItemListAdapter);

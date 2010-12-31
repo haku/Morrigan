@@ -28,16 +28,17 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class ArtifactListAdaptorImpl extends BaseAdapter implements ArtifactListAdaptor {
+public class ArtifactListAdaptorImpl<T extends ArtifactList> extends BaseAdapter implements ArtifactListAdaptor<T> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private ArtifactList listData;
-	
+	private final int rowLayout;
+	private T listData;
 	private LayoutInflater layoutInflater;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public ArtifactListAdaptorImpl (Context context) {
+	public ArtifactListAdaptorImpl (Context context, int rowLayout) {
+		this.rowLayout = rowLayout;
 		this.layoutInflater = LayoutInflater.from(context);
 	}
 	
@@ -45,13 +46,13 @@ public class ArtifactListAdaptorImpl extends BaseAdapter implements ArtifactList
 //	ArtifactListAdaptor methods.
 	
 	@Override
-	public void setInputData(ArtifactList data) {
+	public void setInputData(T data) {
 		this.listData = data;
 		notifyDataSetChanged();
 	}
 	
 	@Override
-	public ArtifactList getInputData() {
+	public T getInputData() {
 		return this.listData;
 	}
 	
@@ -81,7 +82,7 @@ public class ArtifactListAdaptorImpl extends BaseAdapter implements ArtifactList
 		RowView rowView;
 		
 		if (view == null) {
-			view = this.layoutInflater.inflate(R.layout.simplelistrow, null);
+			view = this.layoutInflater.inflate(this.rowLayout, null);
 			
 			rowView = new RowView();
 			rowView.text = (TextView) view.findViewById(R.id.rowtext);

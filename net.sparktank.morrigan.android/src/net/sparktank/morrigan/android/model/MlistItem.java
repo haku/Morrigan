@@ -16,11 +16,14 @@
 
 package net.sparktank.morrigan.android.model;
 
-public interface MlistItem {
+public interface MlistItem extends Artifact {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	@Override
 	public String getTitle ();
+	@Override
 	public int getImageResource ();
+	
 	public int getType ();
 	public String getRelativeUrl ();
 	

@@ -18,12 +18,18 @@ package net.sparktank.morrigan.android;
 
 import java.util.concurrent.atomic.AtomicReference;
 
+import net.sparktank.morrigan.android.model.ArtifactList;
+import net.sparktank.morrigan.android.model.ArtifactListAdaptor;
+import net.sparktank.morrigan.android.model.PlayerQueue;
+import net.sparktank.morrigan.android.model.PlayerQueueChangeListener;
 import net.sparktank.morrigan.android.model.PlayerReference;
 import net.sparktank.morrigan.android.model.PlayerState;
 import net.sparktank.morrigan.android.model.PlayerStateChangeListener;
 import net.sparktank.morrigan.android.model.ServerReference;
+import net.sparktank.morrigan.android.model.impl.ArtifactListAdaptorImpl;
 import net.sparktank.morrigan.android.model.impl.PlayerReferenceImpl;
 import net.sparktank.morrigan.android.model.impl.ServerReferenceImpl;
+import net.sparktank.morrigan.android.tasks.GetPlayerQueueTask;
 import net.sparktank.morrigan.android.tasks.SetPlaystateTask;
 import net.sparktank.morrigan.android.tasks.SetPlaystateTask.TargetPlayState;
 import android.app.Activity;
@@ -35,10 +41,11 @@ import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class PlayerActivity extends Activity implements PlayerStateChangeListener {
+public class PlayerActivity extends Activity implements PlayerStateChangeListener, PlayerQueueChangeListener {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static final String SERVER_BASE_URL = "serverBaseUrl";
@@ -49,6 +56,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 	protected ServerReference serverReference = null;
 	private PlayerReference playerReference = null;
 	private PlayerState currentState;
+	private ArtifactListAdaptor<ArtifactList> queueListAdaptor;
 	
 	private AtomicReference<String> lastQuery = new AtomicReference<String>();
 	
@@ -77,7 +85,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		
 		setContentView(R.layout.player);
-		hookUpButtons();
+		wireGui();
 	}
 	
 	@Override
@@ -90,7 +98,11 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Buttons.
     
-	private void hookUpButtons () {
+	private void wireGui () {
+		this.queueListAdaptor = new ArtifactListAdaptorImpl<ArtifactList>(this, R.layout.mlistitemlistrow);
+		ListView lstQueue = (ListView) findViewById(R.id.lstQueue);
+		lstQueue.setAdapter(this.queueListAdaptor);
+		
 		ImageButton cmd;
 		
 		cmd = (ImageButton) findViewById(R.id.btnPlaypause);
@@ -165,6 +177,8 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 	protected void refresh () {
 		SetPlaystateTask playpauseTask = new SetPlaystateTask(this, this.playerReference, null, this);
 		playpauseTask.execute();
+		GetPlayerQueueTask queueTask = new GetPlayerQueueTask(this, this.playerReference, this);
+		queueTask.execute();
 	}
 	
 	protected void playpause () {
@@ -220,6 +234,16 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 				case PAUSED:  imgPlaystate.setImageResource(R.drawable.pause); break;
 				case LOADING: imgPlaystate.setImageResource(R.drawable.db);    break; // TODO find better icon.
 			}
+		}
+	}
+	
+	@Override
+	public void onPlayerQueueChange(PlayerQueue newQueue) {
+		if (newQueue == null) {
+			finish(); // TODO show a msg here? Retry / Fail dlg?
+		}
+		else {
+    		this.queueListAdaptor.setInputData(newQueue);
 		}
 	}
 	

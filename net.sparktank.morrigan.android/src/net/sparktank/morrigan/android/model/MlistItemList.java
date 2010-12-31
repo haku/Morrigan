@@ -18,7 +18,7 @@ package net.sparktank.morrigan.android.model;
 
 import java.util.List;
 
-public interface MlistItemList {
+public interface MlistItemList extends ArtifactList {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public List<? extends MlistItem> getMlistItemList ();
