@@ -25,6 +25,7 @@ import net.sparktank.sqlitewrapper.DbException;
  * tbl_mediafiles generic.  Subclasses can then worry about the custom fields
  * they wish to add.
  */
+@Deprecated
 public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqliteLayer<T> implements IMediaItemStorageLayer2<T> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors.
