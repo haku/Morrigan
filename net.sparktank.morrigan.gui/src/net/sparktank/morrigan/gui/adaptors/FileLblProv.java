@@ -1,5 +1,7 @@
 package net.sparktank.morrigan.gui.adaptors;
 
+import java.math.BigInteger;
+
 import net.sparktank.morrigan.gui.helpers.ImageCache;
 import net.sparktank.morrigan.model.media.IMediaItem;
 
@@ -67,7 +69,7 @@ public class FileLblProv extends StyledCellLabelProvider {
 				cell.setImage(null); // TODO find icon for missing?
 			} else if (!mi.isEnabled()) {
 				cell.setImage(this.imageCache.readImage("icons/noentry-red.png"));
-			} else if (mi.getHashcode() == 0) {
+			} else if (mi.getHashcode() == null || mi.getHashcode().equals(BigInteger.ZERO)) {
 				cell.setImage(this.imageCache.readImage("icons/exclamation-red.png"));
 			} else {
 				cell.setImage(this.imageCache.readImage("icons/circledot.png"));

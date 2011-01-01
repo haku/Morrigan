@@ -232,7 +232,7 @@ public abstract class AbstractMixedMediaDbEditor<T extends IAbstractMixedMediaDb
 			sort = IMediaItemStorageLayer2.SQL_TBL_MEDIAFILES_COL_DADDED;
 		}
 		else if (mCol == this.COL_HASH) {
-			sort = IMediaItemStorageLayer2.SQL_TBL_MEDIAFILES_COL_HASHCODE;
+			sort = IMediaItemStorageLayer2.SQL_TBL_MEDIAFILES_COL_MD5;
 		}
 		else if (mCol == this.COL_MODIFIED) {
 			sort = IMediaItemStorageLayer2.SQL_TBL_MEDIAFILES_COL_DMODIFIED;

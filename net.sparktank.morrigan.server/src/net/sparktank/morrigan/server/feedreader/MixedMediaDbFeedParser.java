@@ -3,6 +3,7 @@ package net.sparktank.morrigan.server.feedreader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.net.SocketException;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -226,7 +227,7 @@ public class MixedMediaDbFeedParser extends DefaultHandler {
 			this.currentItem.setDuration(v);
 		}
 		else if (this.stack.size() == 3 && localName.equals("hash")) {
-			long v = Long.parseLong(this.currentText.toString());
+			BigInteger v = new BigInteger(this.currentText.toString().trim());
 			this.currentItem.setHashcode(v);
 		}
 		else if (this.stack.size() == 3 && localName.equals("startcount")) {

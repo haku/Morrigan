@@ -1,6 +1,7 @@
 package net.sparktank.morrigan.model.media.internal;
 
 import java.io.File;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -310,11 +311,11 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<Q, ? extends IMed
 				}
 				
 				// Hash code.
-				if (fileModified || mi.getHashcode() == 0) {
-					long hash = 0;
+				if (fileModified || mi.getHashcode() == null || mi.getHashcode().equals(BigInteger.ZERO)) {
+					BigInteger hash = null;
 					
 					try {
-						hash = ChecksumHelper.generateCrc32Checksum(mi.getFilepath());
+						hash = ChecksumHelper.generateMd5Checksum(file);
 					}
 					catch (Throwable t) {
 						// FIXME log this somewhere useful.
@@ -322,10 +323,11 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<Q, ? extends IMed
 						t.printStackTrace();
 					}
 					
-					if (hash != 0) {
+					if (hash != null && !hash.equals(BigInteger.ZERO)) {
 						try {
 							this.getItemList().setItemHashCode(mi, hash);
-						} catch (Throwable t) {
+						}
+						catch (Throwable t) {
 							// FIXME log this somewhere useful.
 							System.err.println("Throwable while setting hash code for '"+mi.getFilepath()+"' to '"+hash+"': " + t.getMessage());
 							t.printStackTrace();
@@ -373,13 +375,13 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<Q, ? extends IMed
 		for (int i = 0; i < tracks.size(); i++) {
 			if (taskEventListener.isCanceled()) break;
 			
-			if (tracks.get(i).getHashcode() != 0) {
+			if (tracks.get(i).getHashcode() != null && !tracks.get(i).getHashcode().equals(BigInteger.ZERO)) {
 				boolean a = new File(tracks.get(i).getFilepath()).exists();
 				for (int j = i + 1; j < tracks.size(); j++) {
 					if (taskEventListener.isCanceled()) break;
 					
-					if (tracks.get(j).getHashcode() != 0) {
-						if (tracks.get(i).getHashcode() == tracks.get(j).getHashcode()) {
+					if (tracks.get(j).getHashcode() != null && !tracks.get(j).getHashcode().equals(BigInteger.ZERO)) {
+						if (tracks.get(i).getHashcode().equals(tracks.get(j).getHashcode())) {
 							boolean b = new File(tracks.get(j).getFilepath()).exists();
 							
 							if (a && b) { // Both exist.
@@ -424,11 +426,11 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<Q, ? extends IMed
 			/*
 			 * Make a list of all the unique hashcodes we know.
 			 */
-			List<Long> hashcodes = new ArrayList<Long>();
+			List<BigInteger> hashcodes = new ArrayList<BigInteger>();
 			for (IMediaItem mi : dupicateItems.keySet()) {
-				Long l = Long.valueOf(mi.getHashcode());
-				if (!hashcodes.contains(l)) {
-					hashcodes.add(l);
+				BigInteger h = mi.getHashcode();
+				if (!hashcodes.contains(h)) { // FIXME .contains() is VERY slow.
+					hashcodes.add(h);
 				}
 			}
 			
@@ -437,7 +439,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<Q, ? extends IMed
 			/*
 			 * Resolve each unique hashcode.
 			 */
-			for (Long l : hashcodes) {
+			for (BigInteger h : hashcodes) {
 				if (taskEventListener.isCanceled()) break;
 				
 				/*
@@ -445,7 +447,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<Q, ? extends IMed
 				 */
 				Map<T, ScanOption> items = new HashMap<T, ScanOption>();
 				for (T mi : dupicateItems.keySet()) {
-					if (mi.getHashcode() == l.longValue()) {
+					if (mi.getHashcode().equals(h)) {
 						items.put(mi, dupicateItems.get(mi));
 					}
 				}
@@ -517,7 +519,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<Q, ? extends IMed
 			taskEventListener.logMsg(this.getItemList().getListName(), "Performed " + countMerges + " mergers.");
 			taskEventListener.logMsg(this.getItemList().getListName(), "Found " + dupicateItems.size() + " duplicate items:");
 			for (Entry<T, ScanOption> e : dupicateItems.entrySet()) {
-				taskEventListener.logMsg(this.getItemList().getListName(), e.getKey().getHashcode() + " : " + e.getValue() + " : " + e.getKey().getTitle());
+				taskEventListener.logMsg(this.getItemList().getListName(), e.getKey().getHashcode().toString(16) + " : " + e.getValue() + " : " + e.getKey().getTitle());
 			}
 		}
 		else {

@@ -1,6 +1,7 @@
 package net.sparktank.morrigan.model.media.internal;
 
 import java.io.File;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
@@ -333,7 +334,7 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 	}
 	
 	@Override
-	public void setItemHashCode(T track, long hashcode) throws MorriganException {
+	public void setItemHashCode(T track, BigInteger hashcode) throws MorriganException {
 		super.setItemHashCode(track, hashcode);
 		try {
 			this.dbLayer.setHashcode(track.getFilepath(), hashcode);

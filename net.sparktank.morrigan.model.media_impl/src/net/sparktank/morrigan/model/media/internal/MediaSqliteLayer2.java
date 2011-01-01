@@ -1,6 +1,7 @@
 package net.sparktank.morrigan.model.media.internal;
 
 import java.io.File;
+import java.math.BigInteger;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -138,7 +139,7 @@ public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqlit
 	}
 	
 	@Override
-	public void setHashcode (String sfile, long hashcode) throws DbException {
+	public void setHashcode (String sfile, BigInteger hashcode) throws DbException {
 		try {
 			local_setHashCode(sfile, hashcode);
 		} catch (Exception e) {
@@ -359,7 +360,7 @@ public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqlit
 		" WHERE sfile=?;";
 	
 	private static final String SQL_TBL_MEDIAFILES_SETHASHCODE =
-		"UPDATE tbl_mediafiles SET lmd5=?" +
+		"UPDATE tbl_mediafiles SET md5=?" +
 		" WHERE sfile=?;";
 	
 	private static final String SQL_TBL_MEDIAFILES_SETDMODIFIED =
@@ -498,7 +499,10 @@ public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqlit
 			T newItem = getNewT();
 			newItem.setFilepath(rs.getString(SQL_TBL_MEDIAFILES_COL_FILE.getName()));
 			newItem.setDateAdded(readDate(rs, SQL_TBL_MEDIAFILES_COL_DADDED.getName()));
-			newItem.setHashcode(rs.getLong(SQL_TBL_MEDIAFILES_COL_HASHCODE.getName()));
+			
+			byte[] bytes = rs.getBytes(SQL_TBL_MEDIAFILES_COL_MD5.getName());
+			if (bytes != null) newItem.setHashcode(new BigInteger(bytes));
+			
 			newItem.setDateLastModified(readDate(rs, SQL_TBL_MEDIAFILES_COL_DMODIFIED.getName()));
 			newItem.setEnabled(rs.getInt(SQL_TBL_MEDIAFILES_COL_ENABLED.getName()) != 0); // default to true.
 			newItem.setMissing(rs.getInt(SQL_TBL_MEDIAFILES_COL_MISSING.getName()) == 1); // default to false.
@@ -526,7 +530,10 @@ public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqlit
 			T mt = getNewT();
 			mt.setFilepath(rs.getString(SQL_TBL_MEDIAFILES_COL_FILE.getName()));
 			mt.setDateAdded(readDate(rs, SQL_TBL_MEDIAFILES_COL_DADDED.getName()));
-			mt.setHashcode(rs.getLong(SQL_TBL_MEDIAFILES_COL_HASHCODE.getName()));
+			
+			byte[] bytes = rs.getBytes(SQL_TBL_MEDIAFILES_COL_MD5.getName());
+			if (bytes != null) mt.setHashcode(new BigInteger(bytes));
+			
 			mt.setDateLastModified(readDate(rs, SQL_TBL_MEDIAFILES_COL_DMODIFIED.getName()));
 			mt.setEnabled(rs.getInt(SQL_TBL_MEDIAFILES_COL_ENABLED.getName()) != 0); // default to true.
 			mt.setMissing(rs.getInt(SQL_TBL_MEDIAFILES_COL_MISSING.getName()) == 1); // default to false.
@@ -662,12 +669,12 @@ public abstract class MediaSqliteLayer2<T extends IMediaItem> extends MediaSqlit
 		if (n<1) throw new DbException("No update occured.");
 	}
 	
-	private void local_setHashCode (String sfile, long hashcode) throws SQLException, ClassNotFoundException, DbException {
+	private void local_setHashCode (String sfile, BigInteger hashcode) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps;
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETHASHCODE);
 		int n;
 		try {
-			ps.setLong(1, hashcode);
+			ps.setBytes(1, hashcode.toByteArray());
 			ps.setString(2, sfile);
 			n = ps.executeUpdate();
 		} finally {

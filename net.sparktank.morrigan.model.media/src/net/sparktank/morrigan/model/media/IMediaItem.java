@@ -1,5 +1,6 @@
 package net.sparktank.morrigan.model.media;
 
+import java.math.BigInteger;
 import java.util.Date;
 
 import net.sparktank.morrigan.model.db.IDbItem;
@@ -14,8 +15,8 @@ public interface IMediaItem extends IDbItem {
 	public Date getDateAdded();
 	public boolean setDateAdded(Date dateAdded);
 		
-	public long getHashcode();
-	public boolean setHashcode(long hashcode);
+	public BigInteger getHashcode();
+	public boolean setHashcode(BigInteger hashcode);
 	
 	public Date getDateLastModified();
 	public boolean setDateLastModified(Date lastModified);

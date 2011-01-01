@@ -12,7 +12,8 @@ public interface IMediaItemStorageLayer2<T extends IMediaItem> extends IMediaIte
 	
 	public static final IDbColumn SQL_TBL_MEDIAFILES_COL_ROWID     = new DbColumn("ROWID", null, null, null);
 	public static final IDbColumn SQL_TBL_MEDIAFILES_COL_FILE      = new DbColumn("sfile",     "file path",     "VARCHAR(1000) not null collate nocase primary key", "?", " collate nocase");
-	public static final IDbColumn SQL_TBL_MEDIAFILES_COL_HASHCODE  = new DbColumn("lmd5",      "hashcode",      "BIGINT",   null);
+//	public static final IDbColumn SQL_TBL_MEDIAFILES_COL_HASHCODE  = new DbColumn("lmd5",      "hashcode",      "BIGINT",   null);
+	public static final IDbColumn SQL_TBL_MEDIAFILES_COL_MD5       = new DbColumn("md5",       "MD5",           "BLOB",     null);
 	public static final IDbColumn SQL_TBL_MEDIAFILES_COL_DADDED    = new DbColumn("dadded",    "date added",    "DATETIME", "?");
 	public static final IDbColumn SQL_TBL_MEDIAFILES_COL_DMODIFIED = new DbColumn("dmodified", "date modified", "DATETIME", "?");
 	public static final IDbColumn SQL_TBL_MEDIAFILES_COL_ENABLED   = new DbColumn("benabled",  null,            "INT(1)",   "1");
@@ -21,7 +22,8 @@ public interface IMediaItemStorageLayer2<T extends IMediaItem> extends IMediaIte
 	
 	public static final IDbColumn[] SQL_TBL_MEDIAFILES_COLS = new IDbColumn[] {
 		SQL_TBL_MEDIAFILES_COL_FILE,
-		SQL_TBL_MEDIAFILES_COL_HASHCODE,
+//		SQL_TBL_MEDIAFILES_COL_HASHCODE,
+		SQL_TBL_MEDIAFILES_COL_MD5,
 		SQL_TBL_MEDIAFILES_COL_DADDED,
 		SQL_TBL_MEDIAFILES_COL_DMODIFIED,
 		SQL_TBL_MEDIAFILES_COL_ENABLED,
