@@ -1,6 +1,7 @@
 package net.sparktank.morrigan.model.media.internal;
 
 import java.io.File;
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 
@@ -223,7 +224,7 @@ public class MixedMediaSqliteLayer extends MixedMediaSqliteLayerImpl implements 
 	}
 	
 	@Override
-	public void setHashcode (String sfile, long hashcode) throws DbException {
+	public void setHashcode (String sfile, BigInteger hashcode) throws DbException {
 		try {
 			local_setHashCode(sfile, hashcode);
 		} catch (Exception e) {

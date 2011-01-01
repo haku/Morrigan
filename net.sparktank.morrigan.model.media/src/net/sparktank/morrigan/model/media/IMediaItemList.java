@@ -1,6 +1,7 @@
 package net.sparktank.morrigan.model.media;
 
 import java.io.File;
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 
@@ -46,7 +47,7 @@ public interface IMediaItemList<T extends IMediaItem> {
 	public void removeItem (T item) throws MorriganException;
 	
 	public void setItemDateAdded (T item, Date date) throws MorriganException;
-	public void setItemHashCode (T item, long hashcode) throws MorriganException;
+	public void setItemHashCode (T item, BigInteger hashcode) throws MorriganException;
 	public void setItemDateLastModified (T item, Date date) throws MorriganException;
 	public void setItemEnabled (T item, boolean value) throws MorriganException;
 	public void setItemMissing (T item, boolean value) throws MorriganException;

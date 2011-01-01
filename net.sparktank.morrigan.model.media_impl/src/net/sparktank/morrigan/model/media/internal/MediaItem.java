@@ -1,6 +1,7 @@
 package net.sparktank.morrigan.model.media.internal;
 
 import java.io.File;
+import java.math.BigInteger;
 import java.util.Date;
 
 import net.sparktank.morrigan.model.db.IDbItem;
@@ -25,7 +26,7 @@ public abstract class MediaItem implements IMediaItem, IDbItem {
 	
 	private String filepath = null;
 	private Date dateAdded = null;
-	private long hashcode = 0;
+	private BigInteger hashcode = BigInteger.ZERO;
 	private Date dateLastModified = null;
 	private boolean enabled = true;
 	private boolean missing = false;
@@ -58,12 +59,12 @@ public abstract class MediaItem implements IMediaItem, IDbItem {
 	}
 	
 	@Override
-	public long getHashcode() {
+	public BigInteger getHashcode() {
 		return this.hashcode;
 	}
 	@Override
-	public boolean setHashcode(long hashcode) {
-		if (this.hashcode != hashcode) {
+	public boolean setHashcode(BigInteger hashcode) {
+		if (!this.hashcode.equals(hashcode)) {
 			this.hashcode = hashcode;
 			return true;
 		}

@@ -1,5 +1,7 @@
 package net.sparktank.morrigan.gui.adaptors;
 
+import java.math.BigInteger;
+
 import net.sparktank.morrigan.gui.helpers.ImageCache;
 import net.sparktank.morrigan.player.PlayItem;
 
@@ -42,7 +44,7 @@ public class PlayItemLblProv implements ILabelProvider {
 			else if (!item.item.isEnabled()) {
 				return this.imageCache.readImage("icons/noentry-red.png");
 			}
-			else if (item.item.getHashcode() == 0) {
+			else if (item.item.getHashcode() == null || item.item.getHashcode().equals(BigInteger.ZERO)) {
 				return this.imageCache.readImage("icons/exclamation-red.png");
 			}
 			else {

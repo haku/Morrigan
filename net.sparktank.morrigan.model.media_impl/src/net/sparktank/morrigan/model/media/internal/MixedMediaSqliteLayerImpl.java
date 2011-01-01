@@ -1,6 +1,7 @@
 package net.sparktank.morrigan.model.media.internal;
 
 import java.io.File;
+import java.math.BigInteger;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -41,7 +42,7 @@ public abstract class MixedMediaSqliteLayerImpl extends MediaSqliteLayer<IMixedM
 	public static final IDbColumn[] SQL_TBL_MEDIAFILES_COLS = new IDbColumn[] {
 		SQL_TBL_MEDIAFILES_COL_TYPE,
 		SQL_TBL_MEDIAFILES_COL_FILE,
-		SQL_TBL_MEDIAFILES_COL_HASHCODE,
+		SQL_TBL_MEDIAFILES_COL_MD5,
 		SQL_TBL_MEDIAFILES_COL_DADDED,
 		SQL_TBL_MEDIAFILES_COL_DMODIFIED,
 		SQL_TBL_MEDIAFILES_COL_ENABLED,
@@ -82,7 +83,7 @@ public abstract class MixedMediaSqliteLayerImpl extends MediaSqliteLayer<IMixedM
 	
 	private static final String _SQL_MEDIAFILES_SELECT =
 		"SELECT"
-		+ " ROWID, type, sfile, lmd5, dadded, dmodified, benabled, bmissing, sremloc"
+		+ " ROWID, type, sfile, md5, dadded, dmodified, benabled, bmissing, sremloc"
 		+ ",lstartcnt,lendcnt,dlastplay,lduration"
     	+ ",lwidth,lheight"
     	+ " FROM tbl_mediafiles";
@@ -170,7 +171,7 @@ public abstract class MixedMediaSqliteLayerImpl extends MediaSqliteLayer<IMixedM
 		" WHERE sfile=?;";
 	
 	private static final String SQL_TBL_MEDIAFILES_SETHASHCODE =
-		"UPDATE tbl_mediafiles SET lmd5=?" +
+		"UPDATE tbl_mediafiles SET md5=?" +
 		" WHERE sfile=?;";
 	
 	private static final String SQL_TBL_MEDIAFILES_SETDMODIFIED =
@@ -502,12 +503,12 @@ public abstract class MixedMediaSqliteLayerImpl extends MediaSqliteLayer<IMixedM
 		if (n<1) throw new DbException("No update occured for local_setDateAdded('"+sfile+"','"+date+"').");
 	}
 	
-	protected void local_setHashCode (String sfile, long hashcode) throws SQLException, ClassNotFoundException, DbException {
+	protected void local_setHashCode (String sfile, BigInteger hashcode) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps;
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETHASHCODE);
 		int n;
 		try {
-			ps.setLong(1, hashcode);
+			ps.setBytes(1, hashcode.toByteArray());
 			ps.setString(2, sfile);
 			n = ps.executeUpdate();
 		} finally {
@@ -864,7 +865,10 @@ public abstract class MixedMediaSqliteLayerImpl extends MediaSqliteLayer<IMixedM
 	static protected void readMediaItem (ResultSet rs, IMediaItem mi) throws SQLException {
 		mi.setFilepath(rs.getString(SQL_TBL_MEDIAFILES_COL_FILE.getName()));
 		mi.setDateAdded(SqliteHelper.readDate(rs, SQL_TBL_MEDIAFILES_COL_DADDED.getName()));
-		mi.setHashcode(rs.getLong(SQL_TBL_MEDIAFILES_COL_HASHCODE.getName()));
+		
+		byte[] bytes = rs.getBytes(SQL_TBL_MEDIAFILES_COL_MD5.getName());
+		if (bytes != null) mi.setHashcode(new BigInteger(bytes));
+		
 		mi.setDateLastModified(SqliteHelper.readDate(rs, SQL_TBL_MEDIAFILES_COL_DMODIFIED.getName()));
 		mi.setEnabled(rs.getInt(SQL_TBL_MEDIAFILES_COL_ENABLED.getName()) != 0); // default to true.
 		mi.setMissing(rs.getInt(SQL_TBL_MEDIAFILES_COL_MISSING.getName()) == 1); // default to false.

@@ -371,7 +371,7 @@ public class MlistsServlet extends HttpServlet {
     				AbstractFeed.addElement(dw, "datelastmodified", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateLastModified()));
     			}
     			AbstractFeed.addElement(dw, "type", mi.getMediaType().getN());
-    			AbstractFeed.addElement(dw, "hash", mi.getHashcode());
+    			AbstractFeed.addElement(dw, "hash", mi.getHashcode().toString());
     			
     			if (mi.getMediaType() == MediaType.TRACK) {
     				AbstractFeed.addElement(dw, "duration", mi.getDuration());

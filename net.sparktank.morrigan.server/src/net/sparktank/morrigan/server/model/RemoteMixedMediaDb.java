@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.SocketException;
 import java.net.URL;
@@ -345,7 +346,7 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb<IRemoteMixedMediaDb
 	}
 	
 	@Override
-	public void setItemHashCode(IMixedMediaItem track, long hashcode) throws MorriganException {
+	public void setItemHashCode(IMixedMediaItem track, BigInteger hashcode) throws MorriganException {
 		throw new NotImplementedException();
 	}
 	

@@ -2,6 +2,7 @@ package net.sparktank.morrigan.model.media.internal;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -217,7 +218,7 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 	 * @throws MorriganException  
 	 */
 	@Override
-	public void setItemHashCode (T track, long hashcode) throws MorriganException {
+	public void setItemHashCode (T track, BigInteger hashcode) throws MorriganException {
 		track.setHashcode(hashcode);
 		setDirtyState(DirtyState.METADATA);
 	}

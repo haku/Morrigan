@@ -1,6 +1,7 @@
 package net.sparktank.morrigan.model.media;
 
 import java.io.File;
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 
@@ -90,7 +91,7 @@ public interface IMediaItemStorageLayer<T extends IMediaItem> extends IGenericDb
 	public int removeFile (IDbItem dbItem) throws DbException;
 	
 	public void setDateAdded(String sfile, Date date) throws DbException;
-	public void setHashcode(String sfile, long hashcode) throws DbException;
+	public void setHashcode(String sfile, BigInteger hashcode) throws DbException;
 	public void setDateLastModified(String sfile, Date date) throws DbException;
 	public void setEnabled(String sfile, boolean value) throws DbException;
 	public void setMissing(String sfile, boolean value) throws DbException;

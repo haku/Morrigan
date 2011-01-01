@@ -24,3 +24,4 @@ ALTER TABLE tbl_mediafiles ADD COLUMN type INT;
 ALTER TABLE tbl_mediafiles ADD COLUMN lwidth INT(6);
 ALTER TABLE tbl_mediafiles ADD COLUMN lheight INT(6);
 UPDATE tbl_mediafiles SET type=1;
+ALTER TABLE tbl_mediafiles ADD COLUMN md5 BLOB;
