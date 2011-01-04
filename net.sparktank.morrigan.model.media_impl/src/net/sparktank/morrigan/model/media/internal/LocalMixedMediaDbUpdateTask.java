@@ -84,6 +84,10 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMe
 		this.getItemList().incTrackStartCnt(itemToKeep, itemToBeRemove.getStartCount());
 		this.getItemList().incTrackEndCnt(itemToKeep, itemToBeRemove.getEndCount());
 		
+		if (itemToKeep.getMediaType() == MediaType.UNKNOWN && itemToBeRemove.getMediaType() != MediaType.UNKNOWN) {
+			this.getItemList().setItemMediaType(itemToKeep, itemToBeRemove.getMediaType());
+		}
+		
 		if (itemToBeRemove.getDateAdded() != null) {
 			if (itemToKeep.getDateAdded() == null
 					|| itemToKeep.getDateAdded().getTime() > itemToBeRemove.getDateAdded().getTime()) {
