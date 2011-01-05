@@ -1,192 +1,222 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- ====================================================================== 
-      
+      Main build for Morrigan.
+      Calling target 'all' builds both GUI and server versions.
      ====================================================================== -->
 
-<project name="net.sparktank.morrigan.build" default="main">
-
-	<target name="setup">
-		<!-- Main props file. -->
-		<property file="build.properties" />
-
-		<!-- Generated properties. -->
-		<tstamp>
-			<format property="timestamp" pattern="yyyyMMdd_HHmm" timezone="UTC" />
-		</tstamp>
-		<property name="buildId" value="${archivePrefix}-${releaseName}-${timestamp}" />
-		<property name="buildLabel" value="${buildType}.${buildId}" />
-
+<project name="net.sparktank.morrigan.build" default="all" >
+	
+	<target name="all" depends="clean,ready,build-gui,build-server,refreshWorkspace" />
+	
+	<!-- May be safely called as many times as needed. -->
+	<target name="setprop" >
 		<!-- Configure build process. -->
 		<property name="outputDirectory" value="${basedir}/builds" />
-
+		<property name="procDirectory" value="${basedir}/proc" />
+		
 		<!-- Locate deltapack. -->
 		<property name="deltapack" value="${eclipse.home}/../eclipse-3.6.1-delta-pack" />
 		<echo message="deltapack=${deltapack}" />
 		<available property="haveDeltaPack" file="${deltapack}" />
 		<fail unless="haveDeltaPack" message="Deltapack not found." />
-
+		
 		<!-- Configure RCP build process. -->
 		<property name="baseLocation" value="${eclipse.home}" />
 		<property name="builder" value="${basedir}" />
 		<property name="buildDirectory" value="${basedir}/buildDirectory" />
-		<property name="pluginPath" value="${basedir}/..${path.separator}${deltapack}" />
+		<!-- TODO FIXME remove reference to Morrigan-git directory. -->
+		<property name="pluginPath" value="${basedir}/..${path.separator}${basedir}/../Morrigan-git${path.separator}${deltapack}" />
 		<property name="buildTempFolder" value="${buildDirectory}" />
-
+		
+		<!-- Echo properties. -->
 		<echo message="baseLocation=${baseLocation}" />
 		<echo message="builder=${builder}" />
 		<echo message="buildDirectory=${buildDirectory}" />
 		<echo message="pluginPath=${pluginPath}" />
 		<echo message="buildTempFolder=${buildTempFolder}" />
 	</target>
-
-	<target name="clean" depends="setup">
+	
+	<!-- Only run once per build, so only ref via direct depends. -->
+	<target name="configure" depends="clean,setprop" >
+		<!-- Generated properties. -->
+		<tstamp>
+			<format property="buildTime" pattern="yyyyMMdd_HHmm" timezone="UTC" />
+		</tstamp>
+	</target>
+	
+	<target name="clean" depends="setprop" >
 		<delete dir="${buildDirectory}" failonerror="false" />
+		<delete dir="${procDirectory}" failonerror="false" />
 		<delete dir="${outputDirectory}" failonerror="false" />
 
 		<antcall target="refreshWorkspace" />
 	</target>
-
-	<target name="refreshWorkspace">
+	
+	<target name="ready" depends="setprop" >
+		<!-- Prep output dir. -->
+		<mkdir dir="${outputDirectory}" />
+	</target>
+	
+	<target name="refreshWorkspace" >
 		<!-- Refresh eclipse workspace -->
 		<eclipse.convertPath fileSystemPath="${basedir}" property="resourcePath" />
 		<eclipse.refreshLocal resource="${resourcePath}" depth="infinite" />
 	</target>
-
-	<target name="main" depends="setup,clean">
-		<!-- Call RCP build process. -->
-		<ant antfile="${eclipse.pdebuild.scripts}/productBuild/productBuild.xml" />
-
-		<!-- Move output. -->
-		<mkdir dir="${outputDirectory}" />
-		<move todir="${outputDirectory}">
-			<fileset dir="${buildDirectory}/${buildLabel}" includes="*.zip" />
-		</move>
-
-		<!-- Build bits (e.g. WUI war file). -->
-		<antcall target="buildbits" />
-
-		<!-- Build outputs. -->
-		<antcall target="zip_win32" />
-		<antcall target="zip_linux" />
-		<antcall target="zip_mac" />
-
-		<!-- Clean up. -->
-		<antcall target="refreshWorkspace" />
-	</target>
-
-	<target name="buildbits" depends="setup">
+	
+	<target name="buildbits" >
 		<ant antfile="../net.sparktank.morrigan.wui/build.xml"
 		     dir="../net.sparktank.morrigan.wui"
 		/>
 	</target>
-
-	<target name="zip_win32" depends="setup">
+ 	
+	<target name="build-gui" depends="configure" >
+		<antcall target="main-build" >
+			<param file="build.properties" />
+			<reference refid="${buildTime}" />
+		</antcall>
+	</target>
+	
+	<target name="build-server" depends="configure" >
+		<antcall target="main-build" >
+			<param file="build.server.properties" />
+			<reference refid="${buildTime}" />
+		</antcall>
+	</target>
+	
+	<target name="main-build" depends="setprop,buildbits" >
+		<property name="buildId" value="${archivePrefix}-${releaseName}-${buildTime}" />
+		<property name="buildLabel" value="${buildType}.${buildId}" />
+		
+		<!-- Call RCP build process. -->
+		<ant antfile="${eclipse.pdebuild.scripts}/productBuild/productBuild.xml" />
+		
+		<!-- Move to proc dir. -->
+		<mkdir dir="${procDirectory}" />
+		<move todir="${procDirectory}">
+			<fileset dir="${buildDirectory}/${buildLabel}" includes="*.zip" />
+		</move>
+		
+		<!-- Augment build outputs. -->
+		<antcall target="zip_win32" > <reference refid="${archivePrefix}" /> </antcall>
+		<antcall target="zip_linux" > <reference refid="${archivePrefix}" /> </antcall>
+		<antcall target="zip_mac"   > <reference refid="${archivePrefix}" /> </antcall>
+		
+		<!-- Move to final output dir. -->
+		<move todir="${outputDirectory}">
+			<fileset dir="${procDirectory}" includes="*.zip" />
+		</move>
+		
+		<!-- Delete proc dir. -->
+		<delete dir="${procDirectory}" />
+	</target>
+	
+	<target name="zip_win32" depends="setprop" >
 		<ant antfile="../net.sparktank.morrigan.playbackimpl.dsj/makejar.xml"
 		     dir="../net.sparktank.morrigan.playbackimpl.dsj"
 		/>
 		<ant antfile="../net.sparktank.morrigan.hotkeyimpl.jintellitype/makejar.xml"
 		     dir="../net.sparktank.morrigan.hotkeyimpl.jintellitype"
 		/>
-
-		<fileset dir="${outputDirectory}" id="zipfiles">
+		
+		<fileset dir="${procDirectory}" id="zipfiles" >
 			<include name="*win32*.zip" />
 		</fileset>
 		<pathconvert pathsep="" property="zipfile" refid="zipfiles" />
 		<echo message="zipfile=${zipfile}" />
 
-		<zip destfile="${zipfile}" update="true" whenempty="fail">
+		<zip destfile="${zipfile}" update="true" whenempty="fail" >
 			<zipfileset dir="../net.sparktank.morrigan.playbackimpl.dsj"
 			            includes="*.jar"
-			            prefix="morrigan/engines"
+			            prefix="${archivePrefix}/engines"
 			/>
 			<zipfileset dir="../net.sparktank.morrigan.playbackimpl.dsj/lib"
 			            includes="*"
 			            excludes="swt.jar"
-			            prefix="morrigan/engines"
+			            prefix="${archivePrefix}/engines"
 			/>
 			<zipfileset dir="../net.sparktank.morrigan.hotkeyimpl.jintellitype"
 			            includes="*.jar"
-			            prefix="morrigan/engines"
+			            prefix="${archivePrefix}/engines"
 			/>
 			<zipfileset dir="../net.sparktank.morrigan.hotkeyimpl.jintellitype/lib"
 			            includes="*"
-			            prefix="morrigan/engines"
+			            prefix="${archivePrefix}/engines"
 			/>
 			<zipfileset dir="propfiles"
 			            includes="win32.properties"
-			            fullpath="morrigan/morrigan.properties"
+			            fullpath="${archivePrefix}/morrigan.properties"
 			/>
-			<zipfileset dir="../net.sparktank.morrigan.wui" includes="morrigan.wui.war" prefix="morrigan/" />
+			<zipfileset dir="../net.sparktank.morrigan.wui" includes="morrigan.wui.war" prefix="${archivePrefix}/" />
 		</zip>
 	</target>
-
-	<target name="zip_linux" depends="setup">
+	
+	<target name="zip_linux" depends="setprop" >
 		<ant antfile="../net.sparktank.morrigan.playbackimpl.gs/makejar.xml"
 		     dir="../net.sparktank.morrigan.playbackimpl.gs"
 		/>
 		<ant antfile="../net.sparktank.morrigan.hotkeyimpl.jxgrabkey/makejar.xml"
 		     dir="../net.sparktank.morrigan.hotkeyimpl.jxgrabkey"
 		/>
-
-		<fileset dir="${outputDirectory}" id="zipfiles">
+		
+		<fileset dir="${procDirectory}" id="zipfiles" >
 			<include name="*linux*.zip" />
 		</fileset>
 		<pathconvert pathsep="" property="zipfile" refid="zipfiles" />
 		<echo message="zipfile=${zipfile}" />
 
-		<zip destfile="${zipfile}" update="true" whenempty="fail">
+		<zip destfile="${zipfile}" update="true" whenempty="fail" >
 			<zipfileset dir="../net.sparktank.morrigan.playbackimpl.gs"
 			            includes="*.jar"
-			            prefix="morrigan/engines"
+			            prefix="${archivePrefix}/engines"
 			/>
 			<zipfileset dir="../net.sparktank.morrigan.playbackimpl.gs/lib"
 			            includes="*"
 			            excludes="swt.jar"
-			            prefix="morrigan/engines"
+			            prefix="${archivePrefix}/engines"
 			/>
 			<zipfileset dir="../net.sparktank.morrigan.hotkeyimpl.jxgrabkey"
 			            includes="*.jar"
-			            prefix="morrigan/engines"
+			            prefix="${archivePrefix}/engines"
 			/>
 			<zipfileset dir="../net.sparktank.morrigan.hotkeyimpl.jxgrabkey/lib"
 			            includes="*"
-			            prefix="morrigan/engines"
+			            prefix="${archivePrefix}/engines"
 			/>
 			<zipfileset dir="propfiles"
 			            includes="linux.properties"
-			            fullpath="morrigan/morrigan.properties"
+			            fullpath="${archivePrefix}/morrigan.properties"
 			/>
-			<zipfileset dir="../net.sparktank.morrigan.wui" includes="morrigan.wui.war" prefix="morrigan/" />
+			<zipfileset dir="../net.sparktank.morrigan.wui" includes="morrigan.wui.war" prefix="${archivePrefix}/" />
 		</zip>
 	</target>
-
-	<target name="zip_mac" depends="setup">
+	
+	<target name="zip_mac" depends="setprop" >
 		<ant antfile="../net.sparktank.morrigan.playbackimpl.jmf/makejar.xml"
 		     dir="../net.sparktank.morrigan.playbackimpl.jmf"
 		/>
-
-		<fileset dir="${outputDirectory}" id="zipfiles">
+		
+		<fileset dir="${procDirectory}" id="zipfiles" >
 			<include name="*macosx*.zip" />
 		</fileset>
 		<pathconvert pathsep="" property="zipfile" refid="zipfiles" />
 		<echo message="zipfile=${zipfile}" />
 
-		<zip destfile="${zipfile}" update="true" whenempty="fail">
+		<zip destfile="${zipfile}" update="true" whenempty="fail" >
 			<zipfileset dir="../net.sparktank.morrigan.playbackimpl.jmf"
 			            includes="*.jar"
-			            prefix="morrigan/engines"
+			            prefix="${archivePrefix}/engines"
 			/>
 			<zipfileset dir="../net.sparktank.morrigan.playbackimpl.jmf/lib"
 			            includes="*"
 			            excludes="swt.jar"
-			            prefix="morrigan/engines"
+			            prefix="${archivePrefix}/engines"
 			/>
 			<zipfileset dir="propfiles"
 			            includes="mac.properties"
-			            fullpath="morrigan/morrigan.properties"
+			            fullpath="${archivePrefix}/morrigan.properties"
 			/>
-			<zipfileset dir="../net.sparktank.morrigan.wui" includes="morrigan.wui.war" prefix="morrigan/" />
+			<zipfileset dir="../net.sparktank.morrigan.wui" includes="morrigan.wui.war" prefix="${archivePrefix}/" />
 		</zip>
 	</target>
 
