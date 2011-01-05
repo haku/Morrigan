@@ -14,20 +14,17 @@ import net.sparktank.morrigan.model.exceptions.MorriganException;
 public class EngineFactory {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private static URLClassLoader classLoader = null;
-	
 	private static URLClassLoader getClassLoader () throws MorriganException, MalformedURLException {
-		if (classLoader == null) {
-			File[] files = Config.getPluginJars();
-			
-			URL jarUrls[] = new URL [files.length];
-			for (int i = 0; i < files.length; i++) {
-				jarUrls[i] = new URL("jar", "", "file:" + files[i].getAbsolutePath() + "!/");
-				System.out.println("loaded jarUrl=" + files[i].getAbsolutePath());
-			}
-			
-			classLoader = URLClassLoader.newInstance(jarUrls, IPlaybackEngine.class.getClassLoader());
+		File[] files = Config.getPluginJars();
+		
+		URL jarUrls[] = new URL [files.length];
+		for (int i = 0; i < files.length; i++) {
+			jarUrls[i] = new URL("jar", "", "file:" + files[i].getAbsolutePath() + "!/");
+			System.err.println("loaded jarUrl=" + files[i].getAbsolutePath());
 		}
+		
+		URLClassLoader classLoader = URLClassLoader.newInstance(jarUrls, IPlaybackEngine.class.getClassLoader());
+		
 		return classLoader;
 	}
 	
@@ -43,8 +40,8 @@ public class EngineFactory {
 			System.out.println("About " + playbackEngineClass + ":\n" + playbackEngine.getAbout());
 			
 			return playbackEngine;
-			
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			throw new ImplException(e);
 		}
 	}
@@ -69,8 +66,8 @@ public class EngineFactory {
 			System.out.println("About " + engineClass + ":\n" + engine.getAbout());
 			
 			return engine;
-			
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			throw new ImplException(e);
 		}
 	}
