@@ -31,6 +31,7 @@
       <plugin id="net.sparktank.morrigan.model.media"/>
       <plugin id="net.sparktank.morrigan.model.media_impl"/>
       <plugin id="net.sparktank.morrigan.osgiconsole"/>
+      <plugin id="net.sparktank.morrigan.playbackimpl.gs"/>
       <plugin id="net.sparktank.morrigan.player"/>
       <plugin id="net.sparktank.morrigan.server"/>
       <plugin id="net.sparktank.morrigan.server.boot"/>
@@ -62,6 +63,7 @@
 
    <configurations>
       <plugin id="net.sparktank.morrigan.osgiconsole" autoStart="true" startLevel="1" />
+      <plugin id="net.sparktank.morrigan.playbackimpl.gs" autoStart="true" startLevel="1" />
       <plugin id="net.sparktank.morrigan.server.boot" autoStart="true" startLevel="1" />
       <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="0" />
       <plugin id="org.eclipse.osgi" autoStart="true" startLevel="0" />
