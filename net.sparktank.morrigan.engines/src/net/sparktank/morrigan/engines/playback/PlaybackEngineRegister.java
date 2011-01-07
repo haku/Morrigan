@@ -11,7 +11,7 @@ public class PlaybackEngineRegister {
 	
 	static public void registerFactory (String id, PlaybackEngineFactory factory) {
 		PlaybackEngineFactory r = engineFactories.putIfAbsent(id, factory);
-		if (r == null) throw new IllegalArgumentException("ID '"+id+"' already in use.");
+		if (r != null) throw new IllegalArgumentException("ID '"+id+"' already in use.");
 	}
 	
 	static public void unregisterFactory (String id) {
