@@ -9,6 +9,7 @@ import net.sparktank.morrigan.config.Config;
 import net.sparktank.morrigan.engines.common.ImplException;
 import net.sparktank.morrigan.engines.hotkey.IHotkeyEngine;
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine;
+import net.sparktank.morrigan.engines.playback.PlaybackEngineRegister;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
 
 public class EngineFactory {
@@ -31,13 +32,19 @@ public class EngineFactory {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static IPlaybackEngine makePlaybackEngine () throws ImplException {
+		IPlaybackEngine engine = PlaybackEngineRegister.getNewPlaybackEngine();
+		if (engine != null) {
+			return engine;
+		}
+		System.err.println("Failed to find playback engine using new method, reverting to old.");
+		
 		try {
 			String playbackEngineClass = Config.getPlaybackEngineClass();
 			Class<?> c = getClassLoader().loadClass(playbackEngineClass);
 			IPlaybackEngine playbackEngine = (IPlaybackEngine) c.newInstance();
 			
 			playbackEngine.setClassPath(Config.getPluginJarPaths());
-			System.out.println("About " + playbackEngineClass + ":\n" + playbackEngine.getAbout());
+			System.err.println("About " + playbackEngineClass + ":\n" + playbackEngine.getAbout());
 			
 			return playbackEngine;
 		}
@@ -63,7 +70,7 @@ public class EngineFactory {
 			IHotkeyEngine engine = (IHotkeyEngine) c.newInstance();
 			
 			engine.setClassPath(Config.getPluginJarPaths());
-			System.out.println("About " + engineClass + ":\n" + engine.getAbout());
+			System.err.println("About " + engineClass + ":\n" + engine.getAbout());
 			
 			return engine;
 		}
