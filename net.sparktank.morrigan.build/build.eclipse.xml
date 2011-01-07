@@ -152,9 +152,6 @@
 	</target>
 	
 	<target name="zip_linux" depends="setprop" >
-		<ant antfile="../net.sparktank.morrigan.playbackimpl.gs/makejar.xml"
-		     dir="../net.sparktank.morrigan.playbackimpl.gs"
-		/>
 		<ant antfile="../net.sparktank.morrigan.hotkeyimpl.jxgrabkey/makejar.xml"
 		     dir="../net.sparktank.morrigan.hotkeyimpl.jxgrabkey"
 		/>
@@ -166,15 +163,6 @@
 		<echo message="zipfile=${zipfile}" />
 
 		<zip destfile="${zipfile}" update="true" whenempty="fail" >
-			<zipfileset dir="../net.sparktank.morrigan.playbackimpl.gs"
-			            includes="*.jar"
-			            prefix="${archivePrefix}/engines"
-			/>
-			<zipfileset dir="../net.sparktank.morrigan.playbackimpl.gs/lib"
-			            includes="*"
-			            excludes="swt.jar"
-			            prefix="${archivePrefix}/engines"
-			/>
 			<zipfileset dir="../net.sparktank.morrigan.hotkeyimpl.jxgrabkey"
 			            includes="*.jar"
 			            prefix="${archivePrefix}/engines"
