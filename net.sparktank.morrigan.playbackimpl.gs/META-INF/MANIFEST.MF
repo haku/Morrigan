@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: IPlaybackEngine
+Bundle-SymbolicName: net.sparktank.morrigan.playbackimpl.gs
+Bundle-Version: 1.0.0.qualifier
+Bundle-ClassPath: lib/gstreamer-java-1.4.jar,
+ lib/gstreamer-java-swt-1.4.jar,
+ lib/jna-3.2.4.jar
+Bundle-Vendor: sparktank.net
+Bundle-Activator: net.sparktank.morrigan.playbackimpl.gs.Activator
+Import-Package: net.sparktank.morrigan.engines.playback,
+ net.sparktank.morrigan.model.exceptions,
+ org.eclipse.swt,
+ org.eclipse.swt.events,
+ org.eclipse.swt.widgets,
+ org.osgi.framework
