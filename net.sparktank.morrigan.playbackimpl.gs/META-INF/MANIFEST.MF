@@ -14,3 +14,5 @@ Import-Package: net.sparktank.morrigan.engines.playback,
  org.eclipse.swt.events,
  org.eclipse.swt.widgets,
  org.osgi.framework
+Eclipse-PlatformFilter: (& (osgi.ws=gtk) (osgi.os=linux) (osgi.arch=x86))
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
