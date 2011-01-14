@@ -62,13 +62,11 @@ public class HeadlessHelper {
 		
 		@Override
 		public void logMsg(String topic, String s) {
-			StringBuilder sb = new StringBuilder();
-			sb.append("[");
-			sb.append(topic);
-			sb.append("] ");
-			sb.append(s);
-			
-			System.out.println(sb.toString());
+			System.out.print("[");
+			System.out.print(topic);
+			System.out.print("] ");
+			System.out.print(s);
+			System.out.println();
 		}
 		
 		@Override
