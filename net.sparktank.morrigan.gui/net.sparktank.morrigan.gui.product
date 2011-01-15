@@ -134,5 +134,9 @@ Image &quot;The Morrígan&quot; by Louis le Brocquy used under the Creative Comm
       <plugin id="org.eclipse.ui.workbench.texteditor"/>
    </plugins>
 
+   <configurations>
+      <plugin id="net.sparktank.morrigan.playbackimpl.gs" autoStart="true" startLevel="0" />
+      <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="0" />
+   </configurations>
 
 </product>
