@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Logger;
 
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine;
 import net.sparktank.morrigan.engines.playback.IPlaybackStatusListener;
@@ -39,11 +40,18 @@ import org.gstreamer.swt.overlay.VideoComponent;
 
 public class PlaybackEngine implements IPlaybackEngine {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Constants.
 	
 	// TODO Any more?
 	private final static String[] SUPPORTED_FORMATS = {"wav", "mp3"};
 	
+	private static final int FILE_READ_DURATION_TIMEOUT = 5000; // 5 seconds.
+	private static final int WAIT_FOR_decodeElement_TIMEOUT = 30000; // 30 seconds.
+	private static final int EOS_MAN_LIMIT = 10; // 10 times.
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	protected final Logger logger = Logger.getLogger(this.getClass().getName());
 	
 	private final AtomicBoolean m_atEos = new AtomicBoolean();
 	private final AtomicBoolean m_stopPlaying = new AtomicBoolean();
@@ -83,7 +91,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 		long startTime = System.currentTimeMillis();
 		while (true) {
 			queryDuration = playb.queryDuration(TimeUnit.MILLISECONDS);
-			if (queryDuration > 0 || System.currentTimeMillis() - startTime > 5000) {
+			if (queryDuration > 0 || System.currentTimeMillis() - startTime > FILE_READ_DURATION_TIMEOUT) {
 				break;
 			}
 			try {
@@ -95,7 +103,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 		
 		int retDuration = -1;
 		if (queryDuration > 0) {
-			retDuration = (int) (queryDuration/1000);
+			retDuration = (int) (queryDuration / 1000);
 			if (retDuration < 1) retDuration = 1;
 		}
 		
@@ -132,7 +140,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 		long t0 = System.currentTimeMillis();
 		_loadTrack();
 		long l0 = System.currentTimeMillis() - t0;
-		System.err.println("Track load time: "+l0+" ms.");
+		this.logger.fine("Track load time: "+l0+" ms.");
 	}
 	
 	@Override
@@ -140,7 +148,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 		long t0 = System.currentTimeMillis();
 		_startTrack();
 		long l0 = System.currentTimeMillis() - t0;
-		System.err.println("Track start time: "+l0+" ms.");
+		this.logger.fine("Track start time: "+l0+" ms.");
 	}
 	
 	@Override
@@ -196,7 +204,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 	private volatile boolean hasVideo = false;
 	
 	private void finalisePlayback () {
-		System.err.println("finalisePlayback() >>>");
+		this.logger.fine("finalisePlayback() >>>");
 		
 		stopWatcherThread();
 		
@@ -235,7 +243,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 			}
 		}
 		
-		System.err.println("finalisePlayback() <<<");
+		this.logger.fine("finalisePlayback() <<<");
 	}
 	
 	private void _loadTrack () throws PlaybackException {
@@ -243,15 +251,15 @@ public class PlaybackEngine implements IPlaybackEngine {
 			callStateListener(PlayState.Loading);
 			boolean firstLoad = (this.playbin==null);
 			
-			System.err.println("loadTrack() : firstLoad=" + firstLoad);
+			this.logger.fine("loadTrack() : firstLoad=" + firstLoad);
 			
 			if (firstLoad) {
-				System.err.println("loadTrack() : About to create PlayBin object...");
+				this.logger.fine("loadTrack() : About to create PlayBin object...");
 				this.playbin = new PlayBin("VideoPlayer");
 				
-				System.err.println("loadTrack() : Connecting eosBus...");
+				this.logger.fine("loadTrack() : Connecting eosBus...");
 				this.playbin.getBus().connect(this.eosBus);
-				System.err.println("loadTrack() : Connecting stateChangedBus...");
+				this.logger.fine("loadTrack() : Connecting stateChangedBus...");
 				this.playbin.getBus().connect(this.stateChangedBus);
 				
 			} else {
@@ -265,9 +273,9 @@ public class PlaybackEngine implements IPlaybackEngine {
 				this.hasVideo = mightFileHaveVideo(this.filepath);
 			}
 			
-			System.err.println("loadTrack() : About to set input file to '"+this.filepath+"'...");
+			this.logger.fine("loadTrack() : About to set input file to '"+this.filepath+"'...");
 	        this.playbin.setInputFile(new File(this.filepath));
-	        System.err.println("loadTrack() : Set file input file.");
+	        this.logger.fine("loadTrack() : Set file input file.");
 	        
         	reparentVideo(false);
 		}
@@ -282,7 +290,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 	}
 	
 	private void reparentVideo (boolean seek) {
-		System.err.println("reparentVideo() >>>");
+		this.logger.fine("reparentVideo() >>>");
 		
 		// Clean up any stuff we had before.
 		if (this.videoComponent!=null) {
@@ -294,7 +302,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 						PlaybackEngine.this.videoComponent.removeMouseListener(PlaybackEngine.this.mouseListener);
 					}
 				});
-				System.err.println("reparentVideo() : removed listeners.");
+				this.logger.fine("reparentVideo() : removed listeners.");
 			}
 		}
 		
@@ -316,11 +324,11 @@ public class PlaybackEngine implements IPlaybackEngine {
 				State state = this.playbin.getState();
 				if (state==State.PLAYING || state==State.PAUSED) {
 					position = this.playbin.queryPosition(TimeUnit.NANOSECONDS);
-					System.err.println("reparentVideo() : position=" + position);
+					this.logger.fine("reparentVideo() : position=" + position);
 					this.playbin.setState(State.NULL);
 				}
 				
-				System.err.println("reparentVideo() : creating new VideoComponent.");
+				this.logger.fine("reparentVideo() : creating new VideoComponent.");
 				_runInUiThread(this.videoFrameParent, new Runnable() {
 					@Override
 					public void run() {
@@ -352,7 +360,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 							if (this.playbin.queryPosition(TimeUnit.NANOSECONDS) > 0) { break; }
 						}
 						
-						System.err.println("reparentVideo() : Seek took " + (System.currentTimeMillis() - startTime) + " ms.");
+						this.logger.fine("reparentVideo() : Seek took " + (System.currentTimeMillis() - startTime) + " ms.");
 					}
 					
 					if (state != State.PAUSED) {
@@ -361,7 +369,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 				}
 			}
 			else { // If there is no video or nowhere to put video...
-				System.err.println("reparentVideo() : setVideoSink(fakesink).");
+				this.logger.fine("reparentVideo() : setVideoSink(fakesink).");
 				Element fakesink = ElementFactory.make("fakesink", "videosink");
 				fakesink.set("sync", new Boolean(true));
 				this.playbin.setVideoSink(fakesink); // If we had video and now don't, remove it.
@@ -383,19 +391,19 @@ public class PlaybackEngine implements IPlaybackEngine {
 			});
 		}
 		
-		System.err.println("reparentVideo() <<<");
+		this.logger.fine("reparentVideo() <<<");
 	}
 	
 	private Bus.EOS eosBus = new Bus.EOS() {
 		@Override
 		public void endOfStream(GstObject source) {
-			System.err.println("endOfStream("+source+") >>>");
+			PlaybackEngine.this.logger.fine("endOfStream("+source+") >>>");
 			
 			if (source == PlaybackEngine.this.playbin) {
 				handleEosEvent("g");
 			}
 			
-			System.err.println("endOfStream() >>>");
+			PlaybackEngine.this.logger.fine("endOfStream() >>>");
 		}
 	};
 	
@@ -449,14 +457,14 @@ public class PlaybackEngine implements IPlaybackEngine {
 	
 	
 	private void _startTrack () {
-		System.err.println("playTrack() >>>");
+		this.logger.fine("playTrack() >>>");
 		
 		this.m_stopPlaying.set(false);
 		this.m_atEos.set(false);
 		
 		if (this.playbin!=null) {
 			this.playbin.setState(State.PLAYING);
-			System.err.println("playTrack() State set to PLAYING.");
+			this.logger.fine("playTrack() State set to PLAYING.");
 			
 			callStateListener(PlayState.Playing);
 			startWatcherThread();
@@ -466,7 +474,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 			}
 		}
 		
-		System.err.println("playTrack() <<<");
+		this.logger.fine("playTrack() <<<");
 	}
 	
 	private class WaitForVideoThread extends Thread {
@@ -480,8 +488,8 @@ public class PlaybackEngine implements IPlaybackEngine {
 			Element decodeElement = null;
 			long startTime = System.currentTimeMillis();
 			while (decodeElement == null) {
-				if (System.currentTimeMillis() - startTime > 30000) {
-					System.err.println("WaitForVideoThread : Timed out waiting for decodeElement to be available.");
+				if (System.currentTimeMillis() - startTime > WAIT_FOR_decodeElement_TIMEOUT) {
+					PlaybackEngine.this.logger.fine("WaitForVideoThread : Timed out waiting for decodeElement to be available.");
 				}
 				try {
 					Thread.sleep(200);
@@ -498,12 +506,12 @@ public class PlaybackEngine implements IPlaybackEngine {
 			while (true) {
 				boolean check = checkIfVideoFound(decodeElement);
 				if (check) {
-					System.err.println("WaitForVideoThread : Found all pads in " + (System.currentTimeMillis() - startTime) + " ms.");
+					PlaybackEngine.this.logger.fine("WaitForVideoThread : Found all pads in " + (System.currentTimeMillis() - startTime) + " ms.");
 					break;
 				}
 				
 				if (System.currentTimeMillis() - startTime > 30000) {
-					System.err.println("WaitForVideoThread : Timed out waiting for checkIfVideoFound to return true.");
+					PlaybackEngine.this.logger.fine("WaitForVideoThread : Timed out waiting for checkIfVideoFound to return true.");
 				}
 				try {
 					Thread.sleep(200);
@@ -515,7 +523,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 	
 	boolean checkIfVideoFound (Element decodeElement) {
 		if (!this.hasVideo) {
-			System.err.println("checkIfVideoFound() : Already concluded no video, aborting checkIfVideoFound.");
+			this.logger.fine("checkIfVideoFound() : Already concluded no video, aborting checkIfVideoFound.");
 			return true;
 		}
 		
@@ -526,7 +534,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 		List<Pad> pads = decodeElement.getPads();
 		for (int i = 0; i < pads.size(); i++) {
 			Pad pad = pads.get(i);
-			System.err.println("checkIfVideoFound() : pad["+i+" of "+pads.size()+"]: " + pad.getName());
+			this.logger.fine("checkIfVideoFound() : pad["+i+" of "+pads.size()+"]: " + pad.getName());
 			
 			Caps caps = pad.getCaps();
 			if (caps != null) {
@@ -542,9 +550,9 @@ public class PlaybackEngine implements IPlaybackEngine {
 			
 			if (pad.getName().contains("src")) {
 				srcCount++;
-				
-			} else if (pad.getName().contains("sink") && srcCount > 0) {
-				System.err.println("checkIfVideoFound() : Found sink pad and at least 1 src pad, assuming noMorePads.");
+			}
+			else if (pad.getName().contains("sink") && srcCount > 0) {
+				this.logger.fine("checkIfVideoFound() : Found sink pad and at least 1 src pad, assuming noMorePads.");
 				noMorePads = true;
 				break;
 			}
@@ -553,7 +561,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 		if (noMorePads) {
 //			if (srcCount < 2 && hasVideo) {
 			if (!foundVideo && this.hasVideo) {
-				System.err.println("checkIfVideoFound() : Removing video area...");
+				this.logger.fine("checkIfVideoFound() : Removing video area...");
 
 				this.hasVideo = false;
 				this.videoFrameParent.getDisplay().syncExec(new Runnable() {
@@ -563,7 +571,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 					}
 				});
 
-				System.err.println("checkIfVideoFound() : Removed video area.");
+				this.logger.fine("checkIfVideoFound() : Removed video area.");
 			}
 			return true;
 		}
@@ -605,10 +613,10 @@ public class PlaybackEngine implements IPlaybackEngine {
 	int eosManCounter = 0;
 	
 	private void startWatcherThread () {
-		System.err.println("startWatcherThread() >>>");
+		this.logger.fine("startWatcherThread() >>>");
 		
 		if (this.watcherThread != null) {
-			System.err.println("WARNING: having to stop watcher thread from startWatcherThread().");
+			this.logger.warning("WARNING: having to stop watcher thread from startWatcherThread().");
 			stopWatcherThread();
 		}
 		
@@ -622,11 +630,11 @@ public class PlaybackEngine implements IPlaybackEngine {
 		this.lastDuration = -1;
 		this.eosManCounter = 0;
 		
-		System.err.println("startWatcherThread() <<<");
+		this.logger.fine("startWatcherThread() <<<");
 	}
 	
 	private void stopWatcherThread () {
-		System.err.println("stopWatcherThread() >>>");
+		this.logger.fine("stopWatcherThread() >>>");
 		
 		if (this.watcherThread != null) {
     		this.m_stopWatching = true;
@@ -644,7 +652,7 @@ public class PlaybackEngine implements IPlaybackEngine {
     		this.watcherThread = null;
 		}
 		
-		System.err.println("stopWatcherThread() <<<");
+		this.logger.fine("stopWatcherThread() <<<");
 	}
 	
 	private class WatcherThread extends Thread {
@@ -677,8 +685,8 @@ public class PlaybackEngine implements IPlaybackEngine {
 					
 					if (PlaybackEngine.this.lastDuration > 0 && position >= PlaybackEngine.this.lastDuration) {
 						PlaybackEngine.this.eosManCounter++;
-						System.err.println("eosManCounter++ = " + PlaybackEngine.this.eosManCounter);
-						if (PlaybackEngine.this.eosManCounter >= 4) {
+						PlaybackEngine.this.logger.fine("eosManCounter++ = " + PlaybackEngine.this.eosManCounter);
+						if (PlaybackEngine.this.eosManCounter >= EOS_MAN_LIMIT) {
 							PlaybackEngine.this.eosManCounter = 0;
 							handleEosEvent("m=" + position + ">=" + PlaybackEngine.this.lastDuration);
 						}
@@ -693,7 +701,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 	}
 	
 	void handleEosEvent (String debugType) {
-		System.err.println("handleEosEvent(type="+debugType+",m_stopPlaying="+this.m_stopPlaying.get()+",m_atEos="+this.m_atEos.get()+") >>>");
+		this.logger.fine("handleEosEvent(type="+debugType+",m_stopPlaying="+this.m_stopPlaying.get()+",m_atEos="+this.m_atEos.get()+") >>>");
 		
 		stopWatcherThread();
 		
@@ -703,7 +711,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 			}
 		}
 		
-		System.err.println("handleEosEvent() <<<");
+		this.logger.fine("handleEosEvent() <<<");
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -716,23 +724,23 @@ public class PlaybackEngine implements IPlaybackEngine {
 //	}
 	
 	private void callOnEndOfTrackHandler () {
-		System.err.println("callOnEndOfTrackHandler() >>>");
+		this.logger.fine("callOnEndOfTrackHandler() >>>");
 		
 		callStateListener(PlayState.Stopped);
 		if (this.listener!=null) {
 			this.listener.onEndOfTrack();
 		}
 		
-		System.err.println("callOnEndOfTrackHandler() <<<");
+		this.logger.fine("callOnEndOfTrackHandler() <<<");
 	}
 	
 	void callStateListener (PlayState state) {
-		System.err.println("callStateListener("+state.name()+") >>>");
+		this.logger.fine("callStateListener("+state.name()+") >>>");
 		
 		this.playbackState = state;
 		if (this.listener!=null) this.listener.statusChanged(state);
 		
-		System.err.println("callStateListener() <<<");
+		this.logger.fine("callStateListener() <<<");
 	}
 	
 	void callPositionListener (long position) {
@@ -742,13 +750,13 @@ public class PlaybackEngine implements IPlaybackEngine {
 	}
 	
 	void callDurationListener (int duration) {
-		System.err.println("callDurationListener("+duration+") >>>");
+		this.logger.fine("callDurationListener("+duration+") >>>");
 		
 		if (this.listener!=null) {
 			this.listener.durationChanged(duration);
 		}
 		
-		System.err.println("callDurationListener() <<<");
+		this.logger.fine("callDurationListener() <<<");
 	}
 	
 	void callOnKeyPressListener (int keyCode) {
@@ -783,11 +791,11 @@ public class PlaybackEngine implements IPlaybackEngine {
 		String ext = f.substring(f.lastIndexOf('.') + 1).toLowerCase();
 		for (String e : AUDIO_ONLY_FORMATS) {
 			if (e.equals(ext)) {
-				System.err.println("mightFileHaveVideo() : No video in '"+f+"'.");
+				this.logger.fine("mightFileHaveVideo() : No video in '"+f+"'.");
 				return false;
 			}
 		}
-		System.err.println("mightFileHaveVideo() : Might be video in '"+f+"'.");
+		this.logger.fine("mightFileHaveVideo() : Might be video in '"+f+"'.");
 		return true;
 	}
 	
