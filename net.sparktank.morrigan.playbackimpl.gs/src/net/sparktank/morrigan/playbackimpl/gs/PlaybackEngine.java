@@ -21,7 +21,6 @@ import org.gstreamer.Caps;
 import org.gstreamer.Element;
 import org.gstreamer.ElementFactory;
 import org.gstreamer.Format;
-import org.gstreamer.Gst;
 import org.gstreamer.GstObject;
 import org.gstreamer.Pad;
 import org.gstreamer.SeekFlags;
@@ -74,8 +73,6 @@ public class PlaybackEngine implements IPlaybackEngine {
 	
 	@Override
 	public int readFileDuration(final String fpath) throws PlaybackException {
-		initGst();
-		
 		PlayBin playb = new PlayBin("Metadata");
 //		playb.setVideoSink(ElementFactory.make("fakesink", "videosink"));
 		playb.setVideoSink(null);
@@ -128,7 +125,6 @@ public class PlaybackEngine implements IPlaybackEngine {
 	@Override
 	public void finalise() {
 		finalisePlayback();
-		deinitGst();
 	}
 
 	@Override
@@ -199,20 +195,6 @@ public class PlaybackEngine implements IPlaybackEngine {
 	Element videoElement = null;            // GStreamer.
 	private volatile boolean hasVideo = false;
 	
-	private boolean inited = false;
-	
-	private void initGst () {
-		if (this.inited) return;
-		Gst.init("VideoPlayer", new String[] {});
-		this.inited = true;
-	}
-	
-	private void deinitGst () {
-		if (!this.inited) return;
-		Gst.deinit();
-		this.inited = false;
-	}
-	
 	private void finalisePlayback () {
 		System.err.println("finalisePlayback() >>>");
 		
@@ -264,8 +246,6 @@ public class PlaybackEngine implements IPlaybackEngine {
 			System.err.println("loadTrack() : firstLoad=" + firstLoad);
 			
 			if (firstLoad) {
-				System.err.println("loadTrack() : initGst()...");
-				initGst();
 				System.err.println("loadTrack() : About to create PlayBin object...");
 				this.playbin = new PlayBin("VideoPlayer");
 				
