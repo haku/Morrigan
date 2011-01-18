@@ -6,12 +6,15 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.zip.CRC32;
 import java.util.zip.CheckedInputStream;
 
 public class ChecksumHelper {
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	static public long generateCrc32Checksum (String filepath) throws IOException {
 		FileInputStream fis;
@@ -38,6 +41,8 @@ public class ChecksumHelper {
 		}
 	}
 	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
 	/**
 	 * MessageDigest.getInstance("MD5") can take up to a second,
 	 * so using this to cache it and improve performance.
@@ -57,13 +62,23 @@ public class ChecksumHelper {
 		}
 	};
 	
+	public static final int BUFFERSIZE = 8192;
+	
+	static public byte[] createBuffer () {
+		return new byte[BUFFERSIZE];
+	}
+	
 	static public BigInteger generateMd5Checksum (File file) throws IOException {
-		InputStream is = null;
-		byte[] buffer = new byte[1024]; // TODO is this the right buffer size to use?
+		return generateMd5Checksum(file, createBuffer());
+	}
+	
+	static public BigInteger generateMd5Checksum (File file, byte[] buffer) throws IOException {
+		MessageDigest md = mdMd5Factory.get();
+		md.reset();
 		
+		InputStream is = null;
 		try {
 			is = new FileInputStream(file);
-			MessageDigest md = mdMd5Factory.get();
 			
 			int n;
 			do {
@@ -79,13 +94,39 @@ public class ChecksumHelper {
 		}
 	}
 	
-	static public String md5String(String text) {
-		MessageDigest md;
+	static public ByteBuffer createByteBuffer () {
+		return ByteBuffer.allocateDirect(BUFFERSIZE);
+	}
+	
+	static public BigInteger generateMd5Checksum (File file, ByteBuffer buffer) throws IOException {
+		MessageDigest md = mdMd5Factory.get();
+		md.reset();
+		
+		FileInputStream is = null;
 		try {
-			md = MessageDigest.getInstance("MD5");
-		} catch (NoSuchAlgorithmException e) {
-			throw new RuntimeException(e);
+			is = new FileInputStream(file);
+			FileChannel fc = is.getChannel();
+			
+			while (fc.position() < fc.size()) {
+				buffer.clear();
+				fc.read(buffer);
+				buffer.flip();
+				md.update(buffer);
+			}
+			
+			BigInteger bi = new BigInteger(1, md.digest());
+			return bi;
 		}
+		finally {
+			if (is != null) is.close();
+		}
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	static public String md5String(String text) {
+		MessageDigest md = mdMd5Factory.get();
+		md.reset();
 		
 		byte[] md5hash = new byte[32];
 		md.update(text.getBytes(), 0, text.length());
@@ -101,4 +142,5 @@ public class ChecksumHelper {
 		return sb.toString();
 	}
 	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

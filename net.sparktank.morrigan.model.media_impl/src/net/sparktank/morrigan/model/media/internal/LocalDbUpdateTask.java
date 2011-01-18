@@ -2,6 +2,7 @@ package net.sparktank.morrigan.model.media.internal;
 
 import java.io.File;
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -268,6 +269,8 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<Q, ? extends IMed
 		int n = 0;
 		int N = this.getItemList().getCount();
 		
+		ByteBuffer byteBuffer = ChecksumHelper.createByteBuffer();
+		
 		List<T> allLibraryEntries = this.getItemList().getAllDbEntries();
 		for (T mi : allLibraryEntries) {
 			if (taskEventListener.isCanceled()) break;
@@ -315,7 +318,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<Q, ? extends IMed
 					BigInteger hash = null;
 					
 					try {
-						hash = ChecksumHelper.generateMd5Checksum(file);
+						hash = ChecksumHelper.generateMd5Checksum(file, byteBuffer);
 					}
 					catch (Throwable t) {
 						// FIXME log this somewhere useful.
