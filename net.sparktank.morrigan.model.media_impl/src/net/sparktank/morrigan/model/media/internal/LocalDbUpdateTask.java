@@ -6,6 +6,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -274,7 +275,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<Q, ? extends IMed
 		List<T> allLibraryEntries = this.getItemList().getAllDbEntries();
 		for (T mi : allLibraryEntries) {
 			if (taskEventListener.isCanceled()) break;
-			taskEventListener.subTask("Reading file metadata: " + mi.getTitle());
+//			taskEventListener.subTask("Reading file metadata: " + mi.getTitle());
 			
 			// Existence test.
 			File file = new File(mi.getFilepath());
@@ -286,7 +287,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<Q, ? extends IMed
 						this.getItemList().setItemMissing(mi, false);
 					} catch (Throwable t) {
 						// FIXME log this somewhere useful.
-						System.err.println("Throwable while marking track as found '"+mi.getFilepath()+"': " + t.getMessage());
+						taskEventListener.logMsg(this.getItemList().getListName(), "Throwable while marking track as found '"+mi.getFilepath()+"': " + t.getMessage());
 					}
 				}
 				
@@ -306,7 +307,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<Q, ? extends IMed
 						this.getItemList().setItemDateLastModified(mi, new Date(lastModified));
 					} catch (Throwable t) {
 						// FIXME log this somewhere useful.
-						System.err.println("Throwable while writing track last modified date '"+mi.getFilepath()+"': " + t.getMessage());
+						taskEventListener.logMsg(this.getItemList().getListName(), "Throwable while writing track last modified date '"+mi.getFilepath()+"': " + t.getMessage());
 						t.printStackTrace();
 					}
 					
@@ -322,7 +323,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<Q, ? extends IMed
 					}
 					catch (Throwable t) {
 						// FIXME log this somewhere useful.
-						System.err.println("Throwable while generating checksum for '"+mi.getFilepath()+": " + t.getMessage());
+						taskEventListener.logMsg(this.getItemList().getListName(), "Throwable while generating checksum for '"+mi.getFilepath()+": " + t.getMessage());
 						t.printStackTrace();
 					}
 					
@@ -332,7 +333,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<Q, ? extends IMed
 						}
 						catch (Throwable t) {
 							// FIXME log this somewhere useful.
-							System.err.println("Throwable while setting hash code for '"+mi.getFilepath()+"' to '"+hash+"': " + t.getMessage());
+							taskEventListener.logMsg(this.getItemList().getListName(), "Throwable while setting hash code for '"+mi.getFilepath()+"' to '"+hash+"': " + t.getMessage());
 							t.printStackTrace();
 						}
 					}
@@ -347,7 +348,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<Q, ? extends IMed
 					}
 					catch (Throwable t) {
 						// FIXME log this somewhere useful.
-						System.err.println("Throwable while marking track as missing '"+mi.getFilepath()+"': " + t.getMessage());
+						taskEventListener.logMsg(this.getItemList().getListName(), "Throwable while marking track as missing '"+mi.getFilepath()+"': " + t.getMessage());
 					}
 				}
 			}
@@ -516,12 +517,27 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<Q, ? extends IMed
 				
 			} // End metadata merging.
 			
+			taskEventListener.logMsg(this.getItemList().getListName(), "Performed " + countMerges + " mergers.");
+			
 			/*
 			 * Print out what we are left with.
 			 */
-			taskEventListener.logMsg(this.getItemList().getListName(), "Performed " + countMerges + " mergers.");
-			taskEventListener.logMsg(this.getItemList().getListName(), "Found " + dupicateItems.size() + " duplicate items:");
+			
+			// Sort list of duplicates before printing it.
+			List<Entry<T, ScanOption>> dups = new ArrayList<Map.Entry<T,ScanOption>>(dupicateItems.size());
 			for (Entry<T, ScanOption> e : dupicateItems.entrySet()) {
+				dups.add(e);
+			}
+			Collections.sort(dups, new Comparator<Entry<T, ScanOption>>() {
+				@Override
+				public int compare(Entry<T, ScanOption> o1, Entry<T, ScanOption> o2) {
+					return o1.getKey().getHashcode().compareTo(o2.getKey().getHashcode());
+				}
+			});
+			
+			taskEventListener.logMsg(this.getItemList().getListName(), "Found " + dups.size() + " duplicate items:");
+			// Print list if duplicates.
+			for (Entry<T, ScanOption> e : dups) {
 				taskEventListener.logMsg(this.getItemList().getListName(), e.getKey().getHashcode().toString(16) + " : " + e.getValue() + " : " + e.getKey().getTitle());
 			}
 		}
@@ -546,10 +562,10 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<Q, ? extends IMed
 		try {
     		for (T mi : allLibraryEntries) {
     			if (taskEventListener.isCanceled()) break;
-    			taskEventListener.subTask("Reading track metadata: " + mi.getTitle());
-    			
     			if (shouldTrackMetaData1(taskEventListener, this.getItemList(), mi) || changedItems.contains(mi)) {
     				if (mi.isEnabled()) {
+    					taskEventListener.subTask("Reading track metadata: " + mi.getTitle());
+    					
     					File file = new File(mi.getFilepath());
     					if (file.exists()) {
     						OpResult ret = readTrackMetaData1(this.getItemList(), mi, file);
