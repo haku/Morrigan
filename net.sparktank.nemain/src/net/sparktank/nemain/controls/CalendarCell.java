@@ -32,16 +32,10 @@ import org.eclipse.swt.widgets.Label;
 public class CalendarCell {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	static public interface ICalendarCellEditEvent {
-		public void editBtnClicked (NemainDate date, NemainEvent event, boolean anual);
-	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
 	NemainDate date;
 	NemainEvent anualEvent;
 	NemainEvent event;
-	ICalendarCellEditEvent cellEditEventListener;
+	CalendarCellEditEventHandler cellEditEventListener;
 	
 	Composite composite;
 	private Label label;
@@ -130,7 +124,7 @@ public class CalendarCell {
 		update();
 	}
 	
-	public void setCellEditEventListener (ICalendarCellEditEvent listener) {
+	public void setCellEditEventListener (CalendarCellEditEventHandler listener) {
 		this.cellEditEventListener = listener;
 	}
 	
