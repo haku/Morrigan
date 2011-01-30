@@ -55,6 +55,7 @@ public class NemainView extends ViewPart implements CalendarPlotDataSource {
 	public static final int GRID_ROW_COUNT = 3; // Default row count.
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	ViewPart life-cycle methods.
 	
 	@Override
 	public void createPartControl(Composite parent) {
@@ -66,7 +67,7 @@ public class NemainView extends ViewPart implements CalendarPlotDataSource {
 		createControls(parent);
 		
 		Calendar cal = Calendar.getInstance();
-		setCurrentDate(new NemainDate().daysAfter(-cal.get(Calendar.DAY_OF_WEEK)+2)); // Start on a Monday.
+		setFirstCellDate(new NemainDate().daysAfter(-cal.get(Calendar.DAY_OF_WEEK)+2)); // Start on a Monday.
 	}
 	
 	@Override
@@ -79,8 +80,13 @@ public class NemainView extends ViewPart implements CalendarPlotDataSource {
 		super.dispose();
 	}
 	
+	@Override
+	public void setFocus() {
+		this.calendarPlot.setFocus();
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	State.
+//	ViewPart state methods.
 	
 	private static final String KEY_ROWCOUNT = "ROWCOUNT";
 	private int savedRowCount = GRID_ROW_COUNT;
@@ -104,8 +110,7 @@ public class NemainView extends ViewPart implements CalendarPlotDataSource {
 //	Data providers.
 	
 	private static final String FILE_CAL_DB = "nemain.db3";
-	SqliteLayer _dataSource;
-	private NemainDate _currentDate;
+	protected SqliteLayer _dataSource;
 	
 	private void initDataSource () throws DbException {
 		String fullPathToDb = Config.getFullPathToDb(FILE_CAL_DB);
@@ -118,14 +123,13 @@ public class NemainView extends ViewPart implements CalendarPlotDataSource {
 		System.err.println("Disconnected '"+this._dataSource.getDbFilePath()+"'.");
 	}
 	
-	void setCurrentDate (NemainDate date) {
-		this._currentDate = date;
+	protected void setFirstCellDate (NemainDate date) {
 		this.lblStatus.setText(date.toString());
-		this.calendarPlot.setFirstCellDate(this._currentDate);
+		this.calendarPlot.setFirstCellDate(date);
 	}
 	
-	NemainDate getCurrentDate () {
-		return this._currentDate;
+	protected NemainDate getFirstCellDate () {
+		return this.calendarPlot.getFirstCellDate();
 	}
 	
 	@Override
@@ -240,7 +244,7 @@ public class NemainView extends ViewPart implements CalendarPlotDataSource {
 	private SelectionListener nextListener = new SelectionListener() {
 		@Override
 		public void widgetSelected(SelectionEvent event) {
-			setCurrentDate(getCurrentDate().daysAfter(-7));
+			setFirstCellDate(getFirstCellDate().daysAfter(-7));
 		}
 		@Override
 		public void widgetDefaultSelected(SelectionEvent e) {/* UNUSED */}
@@ -249,7 +253,7 @@ public class NemainView extends ViewPart implements CalendarPlotDataSource {
 	private SelectionListener prevListener = new SelectionListener() {
 		@Override
 		public void widgetSelected(SelectionEvent event) {
-			setCurrentDate(getCurrentDate().daysAfter(7));
+			setFirstCellDate(getFirstCellDate().daysAfter(7));
 		}
 		@Override
 		public void widgetDefaultSelected(SelectionEvent e) {/* UNUSED */}
@@ -259,7 +263,7 @@ public class NemainView extends ViewPart implements CalendarPlotDataSource {
 		@Override
 		public void widgetSelected(SelectionEvent event) {
 			NemainView.this.calendarPlot.setRowCount(NemainView.this.calendarPlot.getRowCount() + 1);
-			setCurrentDate(getCurrentDate()); // FIXME TODO replace this hack by giving calendarPlot at data source object.
+			setFirstCellDate(getFirstCellDate()); // FIXME TODO replace this hack by giving calendarPlot at data source object.
 		}
 		@Override
 		public void widgetDefaultSelected(SelectionEvent e) {/* UNUSED */}
@@ -298,15 +302,10 @@ public class NemainView extends ViewPart implements CalendarPlotDataSource {
 				} catch (DbException e) {
 					e.printStackTrace();
 				}
-				setCurrentDate(getCurrentDate());
+				NemainView.this.calendarPlot.dataChanged();
 			}
 		}
 	};
-	
-	@Override
-	public void setFocus() {
-//		viewer.getControl().setFocus();
-	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

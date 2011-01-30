@@ -99,6 +99,10 @@ public class CalendarPlot extends Canvas implements PaintListener, MouseListener
 		redraw();
 	}
 	
+	public NemainDate getFirstCellDate() {
+		return this.firstCellDate;
+	}
+	
 	public void setDataSource (CalendarPlotDataSource dataSource) {
 		this.dataSource = dataSource;
 		fetchData();
@@ -129,6 +133,11 @@ public class CalendarPlot extends Canvas implements PaintListener, MouseListener
 			this.selectedCell = selected;
 			redraw();
 		}
+	}
+	
+	public void dataChanged () {
+		fetchData();
+		redraw();
 	}
 	
 	private void fetchData () {
