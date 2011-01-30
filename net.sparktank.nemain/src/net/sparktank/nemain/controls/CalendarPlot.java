@@ -167,8 +167,8 @@ public class CalendarPlot extends Canvas implements PaintListener, MouseListener
 	@Override
 	public void paintControl(PaintEvent e) {
 		Rectangle clientArea = getClientArea();
-		this.cellW = clientArea.width / DAYS_IN_WEEK;
-		this.cellH = clientArea.height / this.rows;
+		this.cellW = (int) Math.floor((clientArea.width - 1) / DAYS_IN_WEEK);
+		this.cellH = (int) Math.floor((clientArea.height - 1) / this.rows);
 		
 		final TextLayout msgLayout = new TextLayout(getDisplay());
 		try {
