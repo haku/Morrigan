@@ -102,8 +102,10 @@ public class NemainView extends ViewPart implements CalendarPlotDataSource {
 	public void init(IViewSite site, IMemento memento) throws PartInitException {
 		super.init(site, memento);
 		
-		Integer i = memento.getInteger(KEY_ROWCOUNT);
-		if (i != null) this.savedRowCount = i.intValue();
+		if (memento != null) {
+    		Integer i = memento.getInteger(KEY_ROWCOUNT);
+    		if (i != null) this.savedRowCount = i.intValue();
+		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
