@@ -17,7 +17,6 @@
 package net.sparktank.nemain.controls;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import net.sparktank.nemain.model.NemainDate;
@@ -49,9 +48,10 @@ public class CalendarPlot extends Canvas implements PaintListener, MouseListener
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private final int rows;
+	private int rows;
 	private NemainDate firstCellDate;
 	private CalendarCellEditEventHandler cellEditEventListener;
+	private CalendarPlotDataSource dataSource;
 	
 	private Map<NemainDate, NemainEvent> singleEvents;
 	private Map<NemainDate, NemainEvent> anualEvents;
@@ -79,27 +79,29 @@ public class CalendarPlot extends Canvas implements PaintListener, MouseListener
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Data methods.
 	
+	public void setRowCount (int rows) {
+		if (rows > this.rows) fetchData(); // If there are going to be more rows of data, fetch new data.
+		this.rows = rows;
+		redraw();
+	}
+	
+	public int getRowCount () {
+		return this.rows;
+	}
+	
 	public int dayCount () {
 		return DAYS_IN_WEEK * this.rows;
 	}
 	
 	public void setFirstCellDate (NemainDate firstCellDate) {
 		this.firstCellDate = firstCellDate;
+		fetchData();
+		redraw();
 	}
 	
-	public void setEvents (List<NemainEvent> events) {
-		this.singleEvents = new HashMap<NemainDate, NemainEvent>();
-		this.anualEvents = new HashMap<NemainDate, NemainEvent>();
-		
-		for (NemainEvent event : events) {
-			if (event.getYear() == 0) {
-				this.anualEvents.put(new NemainDate(event), event);
-			}
-			else {
-				this.singleEvents.put(new NemainDate(event), event);
-			}
-		}
-		
+	public void setDataSource (CalendarPlotDataSource dataSource) {
+		this.dataSource = dataSource;
+		fetchData();
 		redraw();
 	}
 	
@@ -112,14 +114,36 @@ public class CalendarPlot extends Canvas implements PaintListener, MouseListener
 		
 		final int MAX = (this.rows * DAYS_IN_WEEK) - 1;
 		if (selected > MAX) {
-			setSelectedCell(selected - MAX - 1);
+			NemainDate newFirstCellDate = this.firstCellDate.daysAfter(DAYS_IN_WEEK);
+			this.selectedCell = selected - DAYS_IN_WEEK;
+			setFirstCellDate(newFirstCellDate);
+			redraw();
 		}
 		else if (selected < 0) {
-			setSelectedCell(selected + MAX + 1);
+			NemainDate newFirstCellDate = this.firstCellDate.daysAfter(-DAYS_IN_WEEK);
+			this.selectedCell = selected + DAYS_IN_WEEK;
+			setFirstCellDate(newFirstCellDate);
+			redraw();
 		}
 		else {
 			this.selectedCell = selected;
 			redraw();
+		}
+	}
+	
+	private void fetchData () {
+		this.singleEvents = new HashMap<NemainDate, NemainEvent>();
+		this.anualEvents = new HashMap<NemainDate, NemainEvent>();
+		
+		if (this.dataSource != null && this.firstCellDate != null) {
+    		for (NemainEvent event : this.dataSource.getCalendarEvents(this.firstCellDate, dayCount())) {
+    			if (event.getYear() == 0) {
+    				this.anualEvents.put(new NemainDate(event), event);
+    			}
+    			else {
+    				this.singleEvents.put(new NemainDate(event), event);
+    			}
+    		}
 		}
 	}
 	
