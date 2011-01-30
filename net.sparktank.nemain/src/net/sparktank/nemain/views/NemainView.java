@@ -42,6 +42,9 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.ui.IMemento;
+import org.eclipse.ui.IViewSite;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
 
 public class NemainView extends ViewPart implements CalendarPlotDataSource {
@@ -49,7 +52,7 @@ public class NemainView extends ViewPart implements CalendarPlotDataSource {
 	
 	public static final String ID = "net.sparktank.nemain.views.NemainView";
 	
-	public static final int GRID_ROW_COUNT = 3;
+	public static final int GRID_ROW_COUNT = 3; // Default row count.
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -77,11 +80,32 @@ public class NemainView extends ViewPart implements CalendarPlotDataSource {
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	State.
+	
+	private static final String KEY_ROWCOUNT = "ROWCOUNT";
+	private int savedRowCount = GRID_ROW_COUNT;
+	
+	@Override
+	public void saveState(IMemento memento) {
+		super.saveState(memento);
+		
+		memento.putInteger(KEY_ROWCOUNT, this.calendarPlot.getRowCount());
+	}
+	
+	@Override
+	public void init(IViewSite site, IMemento memento) throws PartInitException {
+		super.init(site, memento);
+		
+		Integer i = memento.getInteger(KEY_ROWCOUNT);
+		if (i != null) this.savedRowCount = i.intValue();
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Data providers.
 	
 	private static final String FILE_CAL_DB = "nemain.db3";
 	SqliteLayer _dataSource;
-	private NemainDate _currentDate = new NemainDate();
+	private NemainDate _currentDate;
 	
 	private void initDataSource () throws DbException {
 		String fullPathToDb = Config.getFullPathToDb(FILE_CAL_DB);
@@ -150,7 +174,7 @@ public class NemainView extends ViewPart implements CalendarPlotDataSource {
 		this.lblStatus = new Label(tbCom, SWT.NONE);
 		this.btnRowsMore = new Button(tbCom, SWT.PUSH);
 		this.btnRowsLess = new Button(tbCom, SWT.PUSH);
-		this.calendarPlot = new CalendarPlot(parent, GRID_ROW_COUNT);
+		this.calendarPlot = new CalendarPlot(parent, this.savedRowCount);
 		
 		parent.setTabList(new Control[] {this.calendarPlot, tbCom} );
 		
