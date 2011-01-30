@@ -25,23 +25,17 @@ import net.sparktank.nemain.config.Config;
 import net.sparktank.nemain.controls.CalendarCellEditEventHandler;
 import net.sparktank.nemain.controls.CalendarPlot;
 import net.sparktank.nemain.controls.CalendarPlotDataSource;
-import net.sparktank.nemain.helpers.ImageCache;
 import net.sparktank.nemain.model.NemainDate;
 import net.sparktank.nemain.model.NemainEvent;
 import net.sparktank.nemain.model.SqliteLayer;
 import net.sparktank.nemain.shells.EditEntryShell;
 import net.sparktank.sqlitewrapper.DbException;
 
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.jface.action.Action;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PartInitException;
@@ -53,6 +47,7 @@ public class NemainView extends ViewPart implements CalendarPlotDataSource {
 	public static final String ID = "net.sparktank.nemain.views.NemainView";
 	
 	public static final int GRID_ROW_COUNT = 3; // Default row count.
+	public static final int GRID_ROW_COUNT_MAX = 10;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	ViewPart life-cycle methods.
@@ -67,7 +62,8 @@ public class NemainView extends ViewPart implements CalendarPlotDataSource {
 		createControls(parent);
 		
 		Calendar cal = Calendar.getInstance();
-		setFirstCellDate(new NemainDate().daysAfter(-cal.get(Calendar.DAY_OF_WEEK)+2)); // Start on a Monday.
+		cal.set(Calendar.DAY_OF_WEEK, cal.getFirstDayOfWeek());
+		this.calendarPlot.setFirstCellDate(new NemainDate(cal));
 	}
 	
 	@Override
@@ -125,15 +121,6 @@ public class NemainView extends ViewPart implements CalendarPlotDataSource {
 		System.err.println("Disconnected '"+this._dataSource.getDbFilePath()+"'.");
 	}
 	
-	protected void setFirstCellDate (NemainDate date) {
-		this.lblStatus.setText(date.toString());
-		this.calendarPlot.setFirstCellDate(date);
-	}
-	
-	protected NemainDate getFirstCellDate () {
-		return this.calendarPlot.getFirstCellDate();
-	}
-	
 	@Override
 	public List<NemainEvent> getCalendarEvents(NemainDate firstDate, int dayCount) {
 		/*
@@ -159,14 +146,7 @@ public class NemainView extends ViewPart implements CalendarPlotDataSource {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	GUI controls.
 	
-	private ImageCache imageCache = new ImageCache();
 	protected final int sep = 3;
-	
-	private Button btnDateBack;
-	private Button btnDateForward;
-	private Label lblStatus;
-	private Button btnRowsMore;
-	private Button btnRowsLess;
 	
 	CalendarPlot calendarPlot;
 	
@@ -174,111 +154,28 @@ public class NemainView extends ViewPart implements CalendarPlotDataSource {
 		FormData formData;
 		parent.setLayout(new FormLayout());
 		
-		Composite tbCom = new Composite(parent, SWT.NONE);
-		this.btnDateBack = new Button(tbCom, SWT.PUSH);
-		this.btnDateForward = new Button(tbCom, SWT.PUSH);
-		this.lblStatus = new Label(tbCom, SWT.NONE);
-		this.btnRowsMore = new Button(tbCom, SWT.PUSH);
-		this.btnRowsLess = new Button(tbCom, SWT.PUSH);
+		for (int i = 1; i <= GRID_ROW_COUNT_MAX; i++) {
+			final int n = i;
+    		getViewSite().getActionBars().getMenuManager().add(new Action (n + " rows") {
+    			@Override
+    			public void run() {
+    				NemainView.this.calendarPlot.setRowCount(n);
+    			}
+    		});
+		}
+		
 		this.calendarPlot = new CalendarPlot(parent, this.savedRowCount);
 		
-		parent.setTabList(new Control[] {this.calendarPlot, tbCom} );
-		
-		tbCom.setLayout(new FormLayout());
 		formData = new FormData();
+		formData.left = new FormAttachment(0, 0);
+		formData.right = new FormAttachment(100, 0);
 		formData.top = new FormAttachment(0, 0);
-		formData.left = new FormAttachment(0, 0);
-		formData.right = new FormAttachment(100, 0);
-		tbCom.setLayoutData(formData);
-		
-		this.btnDateBack.setImage(this.imageCache.readImage("icons/minus.gif"));
-		formData = new FormData();
-		formData.left = new FormAttachment(0, this.sep);
-		formData.top = new FormAttachment(0, this.sep);
-		formData.bottom = new FormAttachment(100, -this.sep);
-		this.btnDateBack.setLayoutData(formData);
-		
-		this.btnDateForward.setImage(this.imageCache.readImage("icons/plus.gif"));
-		formData = new FormData();
-		formData.left = new FormAttachment(this.btnDateBack, this.sep);
-		formData.top = new FormAttachment(0, this.sep);
-		formData.bottom = new FormAttachment(100, -this.sep);
-		this.btnDateForward.setLayoutData(formData);
-		
-		formData = new FormData();
-		formData.left = new FormAttachment(this.btnDateForward, this.sep);
-		formData.right = new FormAttachment(this.btnRowsMore, -this.sep);
-		formData.top = new FormAttachment(0, this.sep);
-		formData.bottom = new FormAttachment(100, -this.sep);
-		this.lblStatus.setLayoutData(formData);
-		this.lblStatus.setAlignment(SWT.CENTER);
-		
-		this.btnRowsMore.setImage(this.imageCache.readImage("icons/plus.gif"));
-		formData = new FormData();
-		formData.right = new FormAttachment(this.btnRowsLess, -this.sep);
-		formData.top = new FormAttachment(0, this.sep);
-		formData.bottom = new FormAttachment(100, -this.sep);
-		this.btnRowsMore.setLayoutData(formData);
-		
-		this.btnRowsLess.setImage(this.imageCache.readImage("icons/minus.gif"));
-		formData = new FormData();
-		formData.right = new FormAttachment(100, -this.sep);
-		formData.top = new FormAttachment(0, this.sep);
-		formData.bottom = new FormAttachment(100, -this.sep);
-		this.btnRowsLess.setLayoutData(formData);
-		
-		formData = new FormData();
-		formData.left = new FormAttachment(0, 0);
-		formData.right = new FormAttachment(100, 0);
-		formData.top = new FormAttachment(tbCom, 0);
 		formData.bottom = new FormAttachment(100, 0);
 		this.calendarPlot.setLayoutData(formData);
 		
-		this.btnDateBack.addSelectionListener(this.nextListener);
-		this.btnDateForward.addSelectionListener(this.prevListener);
-		this.btnRowsMore.addSelectionListener(this.moreRowsListener);
-		this.btnRowsLess.addSelectionListener(this.lessRowsListener);
 		this.calendarPlot.setCellEditEventListener(this.listener);
-		
 		this.calendarPlot.setDataSource(this);
 	}
-	
-	private SelectionListener nextListener = new SelectionListener() {
-		@Override
-		public void widgetSelected(SelectionEvent event) {
-			setFirstCellDate(getFirstCellDate().daysAfter(-7));
-		}
-		@Override
-		public void widgetDefaultSelected(SelectionEvent e) {/* UNUSED */}
-	};
-	
-	private SelectionListener prevListener = new SelectionListener() {
-		@Override
-		public void widgetSelected(SelectionEvent event) {
-			setFirstCellDate(getFirstCellDate().daysAfter(7));
-		}
-		@Override
-		public void widgetDefaultSelected(SelectionEvent e) {/* UNUSED */}
-	};
-	
-	private SelectionListener moreRowsListener = new SelectionListener() {
-		@Override
-		public void widgetSelected(SelectionEvent event) {
-			NemainView.this.calendarPlot.setRowCount(NemainView.this.calendarPlot.getRowCount() + 1);
-			setFirstCellDate(getFirstCellDate()); // FIXME TODO replace this hack by giving calendarPlot at data source object.
-		}
-		@Override
-		public void widgetDefaultSelected(SelectionEvent e) {/* UNUSED */}
-	};
-	
-	private SelectionListener lessRowsListener = new SelectionListener() {
-		@Override
-		public void widgetSelected(SelectionEvent event) {
-			NemainView.this.calendarPlot.setRowCount(NemainView.this.calendarPlot.getRowCount() > 1 ? NemainView.this.calendarPlot.getRowCount() - 1 : 1);
-		}
-		@Override
-		public void widgetDefaultSelected(SelectionEvent e) {/* UNUSED */}
-	};
 	
 	private CalendarCellEditEventHandler listener = new CalendarCellEditEventHandler() {
 		@Override
