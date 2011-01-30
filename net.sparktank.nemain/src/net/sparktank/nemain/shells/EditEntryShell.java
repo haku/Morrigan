@@ -16,6 +16,9 @@
 
 package net.sparktank.nemain.shells;
 
+import java.awt.MouseInfo;
+import java.awt.Point;
+
 import net.sparktank.nemain.model.NemainEvent;
 
 import org.eclipse.swt.SWT;
@@ -24,11 +27,13 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
@@ -76,13 +81,13 @@ public class EditEntryShell {
 		formData.height = 300;
 		this.text.setLayoutData(formData);
 		
-		this.btnConfirm.setText("Confirm");
+		this.btnConfirm.setText("&Save");
 		formData = new FormData();
 		formData.right = new FormAttachment(100, -SEP);
 		formData.bottom = new FormAttachment(100, -SEP);
 		this.btnConfirm.setLayoutData(formData);
 		
-		this.btnCancel.setText("Cancel");
+		this.btnCancel.setText("&Cancel");
 		formData = new FormData();
 		formData.left = new FormAttachment(0, SEP);
 		formData.bottom = new FormAttachment(100, -SEP);
@@ -92,6 +97,23 @@ public class EditEntryShell {
 		this.btnCancel.addSelectionListener(this.buttonListener);
 		
 		this.shell.pack();
+		
+		// Work out which screen to show the dlg on.
+		Point mouse = MouseInfo.getPointerInfo().getLocation();
+		for (Monitor m : this.parent.getDisplay().getMonitors()) {
+			Rectangle b = m.getBounds();
+			if (mouse.x >= b.x && mouse.x <= b.x + b.width
+					&& mouse.y >= b.y && mouse.y <= b.y + b.width) {
+				
+				Rectangle bounds = m.getBounds ();
+				Rectangle rect = this.shell.getBounds ();
+				int x = bounds.x + (bounds.width - rect.width) / 2;
+				int y = bounds.y + (bounds.height - rect.height) / 2;
+				this.shell.setLocation (x, y);
+				
+				break;
+			}
+		}
 	}
 	
 	public void remoteClose () {
