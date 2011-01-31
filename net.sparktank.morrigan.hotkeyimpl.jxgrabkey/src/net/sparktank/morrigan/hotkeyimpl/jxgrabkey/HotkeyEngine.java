@@ -1,8 +1,7 @@
 package net.sparktank.morrigan.hotkeyimpl.jxgrabkey;
 
-import java.awt.event.KeyEvent;
+import java.awt.event.InputEvent;
 import java.io.File;
-import java.io.IOException;
 
 import jxgrabkey.HotkeyListener;
 import jxgrabkey.JXGrabKey;
@@ -15,14 +14,12 @@ import net.sparktank.morrigan.engines.hotkey.IHotkeyListener;
 public class HotkeyEngine implements IHotkeyEngine {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private File[] classPath;
-	
 	private IHotkeyListener listener;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructor.
 	
-	public HotkeyEngine () {}
+	public HotkeyEngine () {/* UNUSED */}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	IHotkeyEngine methods.
@@ -33,25 +30,18 @@ public class HotkeyEngine implements IHotkeyEngine {
 	}
 	
 	@Override
-	public void setClassPath(File[] classPath) {
-		this.classPath = classPath;
-	}
+	public void setClassPath(File[] classPath) { /* UNUSED */ }
 	
 	@Override
 	public void registerHotkey(int id, HotkeyValue value) throws HotkeyException {
-		try {
-			loadSo();
-		} catch (IOException e) {
-			throw new HotkeyException("Error loading .so.", e);
-		}
-		
+		loadSo();
 		setup();
 		
 		int mask = 0;
-		if (value.getCtrl()) mask += KeyEvent.CTRL_MASK;
-		if (value.getShift()) mask += KeyEvent.SHIFT_MASK;
-		if (value.getAlt()) mask += KeyEvent.ALT_MASK;
-		if (value.getSupr()) mask += KeyEvent.META_MASK;
+		if (value.getCtrl()) mask += InputEvent.CTRL_MASK;
+		if (value.getShift()) mask += InputEvent.SHIFT_MASK;
+		if (value.getAlt()) mask += InputEvent.ALT_MASK;
+		if (value.getSupr()) mask += InputEvent.META_MASK;
 		
 		try {
 			JXGrabKey.getInstance().registerAwtHotkey(id, mask, value.getKey());
@@ -62,7 +52,7 @@ public class HotkeyEngine implements IHotkeyEngine {
 	
 	@Override
 	public void unregisterHotkey(int id) throws HotkeyException {
-		if (!soLoaded || !haveSetup) return;
+		if (!this.soLoaded || !this.haveSetup) return;
 		JXGrabKey.getInstance().unregisterHotKey(id);
 	}
 	
@@ -81,75 +71,45 @@ public class HotkeyEngine implements IHotkeyEngine {
 	boolean haveSetup = false;
 	
 	private void setup () {
-		if (haveSetup) return;
+		if (this.haveSetup) return;
 		
-		JXGrabKey.setDebugOutput(true);
-		JXGrabKey.getInstance().addHotkeyListener(hotkeyListener);
+		JXGrabKey.setDebugOutput(false);
+		JXGrabKey.getInstance().addHotkeyListener(this.hotkeyListener);
 		
-		haveSetup = true;
+		this.haveSetup = true;
 	}
 	
 	private void teardown () {
-		if (!haveSetup) return;
+		if (!this.haveSetup) return;
 		
-		JXGrabKey.getInstance().removeHotkeyListener(hotkeyListener);
+		JXGrabKey.getInstance().removeHotkeyListener(this.hotkeyListener);
 		JXGrabKey.getInstance().cleanUp();
 		
-		haveSetup = false;
+		this.haveSetup = false;
 	}
 	
 	private HotkeyListener hotkeyListener = new jxgrabkey.HotkeyListener(){
+		@Override
 		public void onHotkey(int hotkey_idx) {
 			callListener(hotkey_idx);
 		}
 	};
 	
-	private void callListener(int id) {
-		if (listener!=null) {
-			listener.onKeyPress(id);
+	protected void callListener(int id) {
+		if (this.listener!=null) {
+			this.listener.onKeyPress(id);
 		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private static final String soName = "libJXGrabKey.so";
-	
+	private static final String SONAME = "JXGrabKey";
 	private boolean soLoaded = false;
 	
-	private void loadSo () throws IOException {
-		if (soLoaded) return;
-		
-		File soFile = null;
-		
-		for (File classPathFile : classPath) {
-			if (classPathFile.isDirectory()) {
-				File[] listFiles = classPathFile.listFiles();
-				if (listFiles!=null && listFiles.length>0) {
-					for (File file : listFiles) {
-						if (file.isFile()) {
-							if (file.getName().equals(soName)) {
-								soFile = file;
-								break;
-							}
-						}
-					}
-				}
-			}
-		}
-		
-		if (soFile==null) {
-			System.out.println("Did not find '" + soName + "'.");
-			return;
-		}
-		System.out.println("so " + soName + "=" + soFile.getAbsolutePath());
-		
-		System.load(soFile.getCanonicalPath());
-		
-		System.out.println("loaded so=" + soFile.getAbsolutePath());
-		
-		soLoaded = true;
-		
-		JXGrabKey.setDebugOutput(true);
+	private void loadSo () {
+		if (this.soLoaded) return;
+		System.loadLibrary(SONAME);
+		this.soLoaded = true;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

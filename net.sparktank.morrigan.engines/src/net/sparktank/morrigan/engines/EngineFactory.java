@@ -7,6 +7,7 @@ import java.net.URLClassLoader;
 
 import net.sparktank.morrigan.config.Config;
 import net.sparktank.morrigan.engines.common.ImplException;
+import net.sparktank.morrigan.engines.hotkey.HotkeyEngineRegister;
 import net.sparktank.morrigan.engines.hotkey.IHotkeyEngine;
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine;
 import net.sparktank.morrigan.engines.playback.PlaybackEngineRegister;
@@ -53,6 +54,8 @@ public class EngineFactory {
 		}
 	}
 	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
 	public static boolean canMakeHotkeyEngine () {
 		try {
 			return (Config.getHotKeyEngineClass() != null);
@@ -62,12 +65,18 @@ public class EngineFactory {
 	}
 	
 	public static IHotkeyEngine makeHotkeyEngine () throws ImplException {
+		IHotkeyEngine engine = HotkeyEngineRegister.getNewHeykeyEngine();
+		if (engine != null) {
+			return engine;
+		}
+		System.err.println("Failed to find hotkey engine using new method, reverting to old.");
+		
 		try {
 			String engineClass = Config.getHotKeyEngineClass();
 			if (engineClass == null) return null;
 			
 			Class<?> c = getClassLoader().loadClass(engineClass);
-			IHotkeyEngine engine = (IHotkeyEngine) c.newInstance();
+			engine = (IHotkeyEngine) c.newInstance();
 			
 			engine.setClassPath(Config.getPluginJarPaths());
 			System.err.println("About " + engineClass + ":\n" + engine.getAbout());
