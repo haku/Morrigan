@@ -155,8 +155,8 @@
       </command>
       
    </extension>
-   <extension
-         point="org.eclipse.ui.preferencePages">
+   
+   <extension point="org.eclipse.ui.preferencePages" >
       <page
             category="net.sparktank.morrigan.gui.preferences.GeneralPref"
             class="net.sparktank.morrigan.gui.preferences.MediaListPref"
@@ -204,18 +204,24 @@
             name="Hotkeys">
       </page>
    </extension>
-   <extension
-         point="org.eclipse.core.runtime.preferences">
-      <initializer
-            class="net.sparktank.morrigan.gui.preferences.PreferenceInitializer">
+   
+   <extension point="org.eclipse.core.runtime.preferences" >
+      <initializer class="net.sparktank.morrigan.gui.preferences.PreferenceInitializer">
       </initializer>
    </extension>
-   <extension
-         point="org.eclipse.ui.elementFactories">
-      <factory
-            class="net.sparktank.morrigan.gui.editors.EditorFactory"
+   
+   <extension point="org.eclipse.ui.elementFactories">
+      <factory class="net.sparktank.morrigan.gui.editors.EditorFactory"
             id="net.sparktank.morrigan.gui.editors.EditorFactory">
       </factory>
    </extension>
+
+	<extension point="org.eclipse.ui.menus" >
+		<menuContribution locationURI="toolbar:org.eclipse.ui.trim.status" >
+			<toolbar id="net.sparktank.morrigan.gui.controls.ServerTrim" >
+				<control class="net.sparktank.morrigan.gui.controls.ServerTrim" />
+			</toolbar>
+		</menuContribution>
+	</extension>
 
 </plugin>
