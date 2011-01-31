@@ -7,6 +7,7 @@ import net.sparktank.morrigan.server.ServerMain;
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
 
+@Deprecated
 public class ServerAction extends Action implements IWorkbenchAction {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
