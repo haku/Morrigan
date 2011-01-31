@@ -131,7 +131,7 @@ public class ViewPicture extends ViewPart {
 			Boolean b = memento.getBoolean(KEY_TIMER);
 			if (b == null || b.booleanValue()) { // Default to true.
 				startTimer();
-		}
+			}
 		}
 	}
 	
