@@ -1,5 +1,8 @@
 package net.sparktank.morrigan.server.boot;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import net.sparktank.morrigan.model.media.IMediaTrack;
 import net.sparktank.morrigan.model.media.IMediaTrackList;
@@ -9,7 +12,6 @@ import net.sparktank.morrigan.player.OrderHelper.PlaybackOrder;
 import net.sparktank.morrigan.player.PlayItem;
 import net.sparktank.morrigan.player.PlayerRegister;
 import net.sparktank.morrigan.server.MorriganServer;
-import net.sparktank.morrigan.util.ErrorHelper;
 
 import org.eclipse.swt.widgets.Composite;
 import org.osgi.framework.BundleActivator;
@@ -18,21 +20,27 @@ import org.osgi.framework.BundleContext;
 public class Activator implements BundleActivator {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	static protected final Logger logger = Logger.getLogger(Activator.class.getName());
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	private MorriganServer server;
+	
 	@Override
 	public void start (BundleContext context) throws Exception {
-		System.err.println("Starting Morrigan server...");
-		
 		// Prep player.
 		setupPlayer();
 		
 		// Start server.
-		MorriganServer s = makeServer();
-		s.start();
+		this.server = makeServer();
+		this.server.start();
+		logger.fine("Morrigan Server listening on port [TODO insert port number here].");
 	}
 	
 	@Override
 	public void stop (BundleContext context) throws Exception {
-		System.err.println("Stopping Morrigan server...");
+		this.server.stop();
+		logger.fine("Morrigan Server stopped.");
 		
 		// Clean up.
 		cleanupPlayer();
@@ -66,7 +74,7 @@ public class Activator implements BundleActivator {
 		
 		@Override
 		public void asyncThrowable(Throwable t) {
-			System.err.println("Throwable=" + ErrorHelper.getStackTrace(t));
+			logger.log(Level.WARNING, "asyncThrowable", t);
 		}
 		
 		@Override
@@ -97,9 +105,9 @@ public class Activator implements BundleActivator {
 			
 			PlayItem currentItem = _player.getCurrentItem();
 			if (currentItem.item != null) {
-				System.out.println(prevPlayState.toString() + " " + currentItem.item);
+				System.out.println(playState.toString() + " " + currentItem.item);
 			} else {
-				System.out.println(prevPlayState.toString());
+				System.out.println(playState.toString());
 			}
 		}
 	}
