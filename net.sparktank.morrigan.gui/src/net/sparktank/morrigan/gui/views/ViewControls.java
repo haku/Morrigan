@@ -4,7 +4,6 @@ import java.util.List;
 
 import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.actions.MinToTrayAction;
-import net.sparktank.morrigan.gui.actions.ServerAction;
 import net.sparktank.morrigan.gui.adaptors.ActionListener;
 import net.sparktank.morrigan.gui.adaptors.DropMenuListener;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
@@ -162,8 +161,6 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		showViewMenuMgr.add(ContributionItemFactory.VIEWS_SHORTLIST.create(getSite().getWorkbenchWindow()));
 		prefMenuMgr.add(showViewMenuMgr);
 		prefMenuMgr.add(ActionFactory.RESET_PERSPECTIVE.create(getSite().getWorkbenchWindow()));
-		prefMenuMgr.add(new Separator());
-		prefMenuMgr.add(ServerAction.getInstance());
 		prefMenuMgr.add(ActionFactory.PREFERENCES.create(getSite().getWorkbenchWindow()));
 		prefMenuMgr.add(new Separator());
 		prefMenuMgr.add(ActionFactory.ABOUT.create(getSite().getWorkbenchWindow()));
