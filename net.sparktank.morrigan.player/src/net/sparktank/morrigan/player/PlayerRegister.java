@@ -1,59 +1,54 @@
 package net.sparktank.morrigan.player;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class PlayerRegister {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	static private int playerN = 0;
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	All players.
 	
-	static private List<IPlayerAbstract> listAllPlayers = new ArrayList<IPlayerAbstract>();
+	static final private AtomicInteger nextPlayerN = new AtomicInteger(0);
+	static final private ConcurrentHashMap<Integer, IPlayerAbstract> allPlayers = new ConcurrentHashMap<Integer, IPlayerAbstract>();
 	
-	static public List<IPlayerAbstract> getAllPlayers () {
-		return Collections.unmodifiableList(listAllPlayers);
+	static public Collection<IPlayerAbstract> getAllPlayers () {
+		return Collections.unmodifiableCollection(allPlayers.values());
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Local players.
 	
 	static public IPlayerLocal makeLocalPlayer (IPlayerEventHandler eventHandler) {
-		synchronized (listLocalPlayers) {
-			Player player = new Player(playerN, eventHandler);
-			playerN++;
-			addLocalPlayer(player);
-			return player;
-		}
+		int n = nextPlayerN.getAndIncrement();
+		Player player = new Player(n, eventHandler);
+		addLocalPlayer(player);
+		return player;
 	}
 	
 //	-   -   -   -   -   -   -   -   -
 	
-	static private List<IPlayerLocal> listLocalPlayers = new ArrayList<IPlayerLocal>();
+	static final private ConcurrentHashMap<Integer, IPlayerLocal> localPlayers = new ConcurrentHashMap<Integer, IPlayerLocal>();
 	
 	static private void addLocalPlayer (IPlayerLocal player) {
-		listLocalPlayers.add(player);
-		listAllPlayers.add(player);
+		Integer id = Integer.valueOf(player.getId());
+		allPlayers.put(id, player);
+		localPlayers.put(id, player);
 	}
 	
 	static public void removeLocalPlayer (IPlayerLocal player) {
-		listLocalPlayers.remove(player);
-		listAllPlayers.remove(player);
+		Integer id = Integer.valueOf(player.getId());
+		allPlayers.remove(id);
+		localPlayers.remove(id);
 	}
 	
-	static public List<IPlayerLocal> getLocalPlayers () {
-		return Collections.unmodifiableList(listLocalPlayers);
+	static public Collection<IPlayerLocal> getLocalPlayers () {
+		return Collections.unmodifiableCollection(localPlayers.values());
 	}
 	
 	static public IPlayerLocal getLocalPlayer (int n) {
-		for (IPlayerLocal p : listLocalPlayers) {
-			if (p.getId() == n) {
-				return p;
-			}
-		}
+		IPlayerLocal p = localPlayers.get(Integer.valueOf(n));
+		if (p != null) return p;
 		throw new IllegalArgumentException();
 	}
 	
@@ -61,38 +56,35 @@ public class PlayerRegister {
 //	Remote players.
 	
 	static public IPlayerRemote makeRemotePlayer (String remoteHost, int remotePlayerId, IPlayerEventHandler eventHandler) {
-		synchronized (listLocalPlayers) {
-			PlayerRemote player = new PlayerRemote(playerN, remoteHost, remotePlayerId);
-			playerN++;
-			addRemotePlayer(player);
-			return player;
-		}
+		int n = nextPlayerN.getAndIncrement();
+		PlayerRemote player = new PlayerRemote(n, remoteHost, remotePlayerId);
+		addRemotePlayer(player);
+		return player;
 	}
 	
 //	-   -   -   -   -   -   -   -   -
 	
-	static private List<IPlayerRemote> listRemotePlayers = new ArrayList<IPlayerRemote>();
+	static final private ConcurrentHashMap<Integer, IPlayerRemote> remotePlayers = new ConcurrentHashMap<Integer, IPlayerRemote>();
 	
 	static private void addRemotePlayer (IPlayerRemote player) {
-		listRemotePlayers.add(player);
-		listAllPlayers.add(player);
+		Integer id = Integer.valueOf(player.getId());
+		allPlayers.put(id, player);
+		remotePlayers.put(id, player);
 	}
 	
 	static public void removeRemotePlayer (IPlayerRemote player) {
-		listRemotePlayers.remove(player);
-		listAllPlayers.remove(player);
+		Integer id = Integer.valueOf(player.getId());
+		allPlayers.remove(id);
+		remotePlayers.remove(id);
 	}
 	
-	static public List<IPlayerRemote> getRemotePlayers () {
-		return Collections.unmodifiableList(listRemotePlayers);
+	static public Collection<IPlayerRemote> getRemotePlayers () {
+		return Collections.unmodifiableCollection(remotePlayers.values());
 	}
 	
 	static public IPlayerRemote getRemotePlayer (int n) {
-		for (IPlayerRemote p : listRemotePlayers) {
-			if (p.getId() == n) {
-				return p;
-			}
-		}
+		IPlayerRemote p = remotePlayers.get(Integer.valueOf(n));
+		if (p != null) return p;
 		throw new IllegalArgumentException();
 	}
 	
