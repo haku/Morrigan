@@ -42,10 +42,10 @@ public class PlaybackEngine implements IPlaybackEngine {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private volatile boolean m_stopPlaying;
+	protected volatile boolean m_stopPlaying;
 	
 	private String filepath = null;
-	private Composite videoFrameParent = null;
+	protected Composite videoFrameParent = null;
 	private IPlaybackStatusListener listener = null;
 	private PlayState playbackState = PlayState.Stopped;
 
@@ -53,8 +53,8 @@ public class PlaybackEngine implements IPlaybackEngine {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructor.
-
-	public PlaybackEngine () {}
+	
+	public PlaybackEngine () {/* UNUSED */}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	IPlaybackEngine methods.
@@ -70,10 +70,10 @@ public class PlaybackEngine implements IPlaybackEngine {
 	}
 	
 	@Override
-	public int readFileDuration(String filepath) throws PlaybackException {
+	public int readFileDuration(String file) throws PlaybackException {
 		_shoeHorn();
 		
-		int[] stats = DSJUtils.getBasicFileStats(filepath);
+		int[] stats = DSJUtils.getBasicFileStats(file);
 		return stats[0] / 1000;
 	}
 	
@@ -89,7 +89,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 	
 	@Override
 	public void setVideoFrameParent(Composite frame) {
-		if (frame==videoFrameParent) return;
+		if (frame==this.videoFrameParent) return;
 		this.videoFrameParent = frame;
 		_reparentVideo();
 	}
@@ -100,7 +100,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 	}
 	
 	@Override
-	public void finalise() {}
+	public void finalise() {/* UNUSED */}
 
 	@Override
 	public void loadTrack() throws PlaybackException {
@@ -135,33 +135,31 @@ public class PlaybackEngine implements IPlaybackEngine {
 	
 	@Override
 	public PlayState getPlaybackState() {
-		return playbackState;
+		return this.playbackState;
 	}
 	
 	@Override
 	public int getDuration() throws PlaybackException {
-		if (dsMovie!=null) {
-			return dsMovie.getDuration() / 1000;
-		} else {
-			return -1;
+		if (this.dsMovie!=null) {
+			return this.dsMovie.getDuration() / 1000;
 		}
+		return -1;
 	}
 	
 	@Override
 	public long getPlaybackProgress() throws PlaybackException {
-		if (dsMovie!=null) {
-			return dsMovie.getTime() / 1000;
-		} else {
-			return -1;
+		if (this.dsMovie!=null) {
+			return this.dsMovie.getTime() / 1000;
 		}
+		return -1;
 	}
 	
 	@Override
 	public void seekTo(double d) throws PlaybackException {
-		if (dsMovie!=null) {
-			int duration = dsMovie.getDuration();
+		if (this.dsMovie!=null) {
+			int duration = this.dsMovie.getDuration();
 			if (duration > 0) {
-				dsMovie.setTimeValue((int) (d * duration));
+				this.dsMovie.setTimeValue((int) (d * duration));
 			}
 		}
 	}
@@ -174,40 +172,40 @@ public class PlaybackEngine implements IPlaybackEngine {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Local playback methods.
 	
-	private DSMovie dsMovie = null;
-	private Composite videoComposite = null;   // SWT.
-	private Frame videoFrame = null;           // AWT.
-	private Component videoComponent = null;   // AWT.
+	protected DSMovie dsMovie = null;
+	protected Composite videoComposite = null;   // SWT.
+	protected Frame videoFrame = null;           // AWT.
+	protected Component videoComponent = null;   // AWT.
 	
 	private void _finalisePlayback () {
-		if (dsMovie!=null) {
+		if (this.dsMovie!=null) {
 			_stopTrack();
 			
-			if (videoComponent!=null) {
-				videoFrame.remove(videoComponent);
-				videoFrame.dispose();
-				videoFrame = null;
+			if (this.videoComponent!=null) {
+				this.videoFrame.remove(this.videoComponent);
+				this.videoFrame.dispose();
+				this.videoFrame = null;
 				
-				videoComponent.invalidate();
-				videoComponent = null;
+				this.videoComponent.invalidate();
+				this.videoComponent = null;
 				
-				if (!videoComposite.isDisposed()) {
-					if (videoComposite.getDisplay().getThread().equals(Thread.currentThread())) {
-						videoComposite.dispose();
+				if (!this.videoComposite.isDisposed()) {
+					if (this.videoComposite.getDisplay().getThread().equals(Thread.currentThread())) {
+						this.videoComposite.dispose();
 					} else {
-						videoComposite.getDisplay().syncExec(new Runnable() {
+						this.videoComposite.getDisplay().syncExec(new Runnable() {
 							@Override
 							public void run() {
-								videoComposite.dispose();
+								PlaybackEngine.this.videoComposite.dispose();
 							}
 						});
 					}
 				}
-				videoComposite = null;
+				this.videoComposite = null;
 			}
 			
-			dsMovie.dispose();
-			dsMovie = null;
+			this.dsMovie.dispose();
+			this.dsMovie = null;
 		}
 		
 		_setScreenSaverActive(true);
@@ -216,7 +214,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 	private void _loadTrack () throws PlaybackException {
 		try {
 			_callStateListener(PlayState.Loading);
-			boolean firstLoad = (dsMovie==null);
+			boolean firstLoad = (this.dsMovie==null);
 			
 			System.err.println("dsj.PlaybackEngine firstLoad=" + firstLoad);
 			
@@ -228,42 +226,42 @@ public class PlaybackEngine implements IPlaybackEngine {
 			
 			_setScreenSaverActive(false); // FIXME THIS IS A WORKAROUND!
 			
-			dsMovie = new DSMovie(filepath,
+			this.dsMovie = new DSMovie(this.filepath,
 					DSFiltergraph.OVERLAY | DSFiltergraph.MOUSE_ENABLED | DSFiltergraph.INIT_PAUSED,
-					propertyChangeLlistener);
-			dsMovie.setVolume(1.0f);
-			dsMovie.setRecueOnStop(false);
+					this.propertyChangeLlistener);
+			this.dsMovie.setVolume(1.0f);
+			this.dsMovie.setRecueOnStop(false);
 			
 			_reparentVideo();
 		}
 		catch (Exception e) {
 			_callStateListener(PlayState.Stopped);
-			throw new PlaybackException("Failed to load '"+filepath+"'.", e);
+			throw new PlaybackException("Failed to load '"+this.filepath+"'.", e);
 		}
 	}
 	
 	private void _startTrack () {
 		System.err.println("dsj.PlaybackEngine playTrack()");
 		
-		m_stopPlaying = false;
+		this.m_stopPlaying = false;
 		
-		if (dsMovie!=null) {
+		if (this.dsMovie!=null) {
 			/* I wish I knew why this made a difference...
 			 * Without doing it like this, it sometimes play video
 			 * at high speed and with no sound.
 			 * This makes no sense to me.
 			 */
-			if (videoFrameParent != null) {
-				videoFrameParent.getDisplay().syncExec(new Runnable() {
+			if (this.videoFrameParent != null) {
+				this.videoFrameParent.getDisplay().syncExec(new Runnable() {
 					@Override
 					public void run() {
-						dsMovie.pause(); // If this is not here, then sometimes playback does not start when play() is called.
-						dsMovie.play();
+						PlaybackEngine.this.dsMovie.pause(); // If this is not here, then sometimes playback does not start when play() is called.
+						PlaybackEngine.this.dsMovie.play();
 					}
 				});
 			}
 			else {
-				dsMovie.play();
+				this.dsMovie.play();
 			}
 			
 			_startWatcherThread();
@@ -272,26 +270,26 @@ public class PlaybackEngine implements IPlaybackEngine {
 	}
 	
 	private void _pauseTrack () {
-		if (dsMovie!=null) {
-			dsMovie.pause();
+		if (this.dsMovie!=null) {
+			this.dsMovie.pause();
 			_callStateListener(PlayState.Paused);
 			_setScreenSaverActive(true);
 		}
 	}
 	
 	private void _resumeTrack () {
-		if (dsMovie!=null) {
+		if (this.dsMovie!=null) {
 			_setScreenSaverActive(false);
-			dsMovie.play();
+			this.dsMovie.play();
 			_callStateListener(PlayState.Playing);
 		}
 	}
 	
 	private void _stopTrack () {
-		m_stopPlaying = true;
+		this.m_stopPlaying = true;
 		_stopWatcherThread();
-		if (dsMovie!=null) {
-			dsMovie.stop();
+		if (this.dsMovie!=null) {
+			this.dsMovie.stop();
 			_callStateListener(PlayState.Stopped);
 			_setScreenSaverActive(true);
 		}
@@ -317,41 +315,41 @@ public class PlaybackEngine implements IPlaybackEngine {
 //			videoComposite = null;
 //		}
 		
-		if (videoFrameParent==null) return;
-		if (dsMovie==null) return;
-		if (!dsMovie.hasMediaOfType(DSMediaType.WMMEDIATYPE_Video)) return;
+		if (this.videoFrameParent==null) return;
+		if (this.dsMovie==null) return;
+		if (!this.dsMovie.hasMediaOfType(DSMediaType.WMMEDIATYPE_Video)) return;
 		
-		videoFrameParent.getDisplay().syncExec(new Runnable() {
+		this.videoFrameParent.getDisplay().syncExec(new Runnable() {
 			@Override
 			public void run() {
 				try {
-					if (videoComponent==null) {
-						videoComponent = dsMovie.asComponent();
-						videoComponent.setBackground(Color.BLACK);
+					if (PlaybackEngine.this.videoComponent==null) {
+						PlaybackEngine.this.videoComponent = PlaybackEngine.this.dsMovie.asComponent();
+						PlaybackEngine.this.videoComponent.setBackground(Color.BLACK);
 						
 						System.err.println("dsj.PlaybackEngine Adding listeners to videoComponent...");
-						videoComponent.addMouseListener(mouseListener);
-						videoComponent.addKeyListener(keyListener);
+						PlaybackEngine.this.videoComponent.addMouseListener(PlaybackEngine.this.mouseListener);
+						PlaybackEngine.this.videoComponent.addKeyListener(PlaybackEngine.this.keyListener);
 					}
 					
-					if (videoComposite == null || videoComposite.isDisposed()) {
+					if (PlaybackEngine.this.videoComposite == null || PlaybackEngine.this.videoComposite.isDisposed()) {
 						System.err.println("dsj.PlaybackEngine Making videoComposite...");
 						
-						videoComposite = new Composite(videoFrameParent, SWT.EMBEDDED);
-						videoComposite.setLayout(new FillLayout());
+						PlaybackEngine.this.videoComposite = new Composite(PlaybackEngine.this.videoFrameParent, SWT.EMBEDDED);
+						PlaybackEngine.this.videoComposite.setLayout(new FillLayout());
 						
-						videoFrame = SWT_AWT.new_Frame(videoComposite);
-						videoFrame.setBackground(Color.BLACK);
+						PlaybackEngine.this.videoFrame = SWT_AWT.new_Frame(PlaybackEngine.this.videoComposite);
+						PlaybackEngine.this.videoFrame.setBackground(Color.BLACK);
 						
-						videoFrame.add(videoComponent, BorderLayout.CENTER);
-						videoFrame.doLayout();
+						PlaybackEngine.this.videoFrame.add(PlaybackEngine.this.videoComponent, BorderLayout.CENTER);
+						PlaybackEngine.this.videoFrame.doLayout();
 						
 					} else {
 						System.err.println("dsj.PlaybackEngine Moveing videoComposite...");
-						videoComposite.setParent(videoFrameParent);
+						PlaybackEngine.this.videoComposite.setParent(PlaybackEngine.this.videoFrameParent);
 					}
 					
-					videoFrameParent.layout();
+					PlaybackEngine.this.videoFrameParent.layout();
 				}
 				catch (Exception e) {
 					callOnErrorHandler(e);
@@ -365,31 +363,31 @@ public class PlaybackEngine implements IPlaybackEngine {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Listeners.
 	
-	private MouseListener mouseListener = new MouseListener() {
+	protected MouseListener mouseListener = new MouseListener() {
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			_callOnClickListener(e.getButton(), e.getClickCount());
 		}
 		
 		@Override
-		public void mouseReleased(MouseEvent e) {}
+		public void mouseReleased(MouseEvent e) {/* UNUSED */}
 		@Override
-		public void mousePressed(MouseEvent e) {}
+		public void mousePressed(MouseEvent e) {/* UNUSED */}
 		@Override
-		public void mouseExited(MouseEvent e) {}
+		public void mouseExited(MouseEvent e) {/* UNUSED */}
 		@Override
-		public void mouseEntered(MouseEvent e) {}
+		public void mouseEntered(MouseEvent e) {/* UNUSED */}
 	};
 	
-	private KeyListener keyListener = new KeyListener() {
+	protected KeyListener keyListener = new KeyListener() {
 		@Override
 		public void keyTyped(KeyEvent key) {
 			_callOnKeyPressListener(key.getKeyCode());
 		}
 		@Override
-		public void keyReleased(KeyEvent key) {}
+		public void keyReleased(KeyEvent key) {/* UNUSED */}
 		@Override
-		public void keyPressed(KeyEvent key) {}
+		public void keyPressed(KeyEvent key) {/* UNUSED */}
 	};
 	
 	private PropertyChangeListener propertyChangeLlistener = new PropertyChangeListener() {
@@ -406,7 +404,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 //					break;
 					
 				case (DSFiltergraph.DONE):
-					if (!m_stopPlaying) {
+					if (!PlaybackEngine.this.m_stopPlaying) {
 						_callOnEndOfTrackHandler();
 					} else {
 						System.err.println("dsj.PlaybackEngine Not calling onEndOfTrackHandler because we are stopping.");
@@ -445,23 +443,23 @@ public class PlaybackEngine implements IPlaybackEngine {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Watcher thread.
 	
-	private volatile boolean m_stopWatching = false;
+	protected volatile boolean m_stopWatching = false;
 	private Thread watcherThread = null;
 	
 	private void _startWatcherThread () {
-		m_stopWatching = false;
-		watcherThread = new WatcherThread();
-		watcherThread.setDaemon(true);
-		watcherThread.start();
+		this.m_stopWatching = false;
+		this.watcherThread = new WatcherThread();
+		this.watcherThread.setDaemon(true);
+		this.watcherThread.start();
 	}
 	
 	private void _stopWatcherThread () {
-		m_stopWatching = true;
+		this.m_stopWatching = true;
 		try {
-			if (watcherThread!=null
-					&& watcherThread.isAlive()
-					&& !Thread.currentThread().equals(watcherThread)) {
-				watcherThread.join();
+			if (this.watcherThread!=null
+					&& this.watcherThread.isAlive()
+					&& !Thread.currentThread().equals(this.watcherThread)) {
+				this.watcherThread.join();
 			}
 			
 		} catch (InterruptedException e) {
@@ -474,24 +472,27 @@ public class PlaybackEngine implements IPlaybackEngine {
 		private int lastMeasuredPosition = -1;
 		private int lastSentPosition = -1;
 		
+		public WatcherThread() {/* UNUSED */}
+		
+		@Override
 		public void run() {
-			while (!m_stopWatching) {
+			while (!PlaybackEngine.this.m_stopWatching) {
 				try {
 					Thread.sleep(500);
-				} catch (InterruptedException e) {}
+				} catch (InterruptedException e) {/* UNUSED */}
 				
-				if (dsMovie!=null) {
-					int measuredPosition = dsMovie.getTime();
-					if (getPlaybackState() == PlayState.Playing && measuredPosition == lastMeasuredPosition) {
+				if (PlaybackEngine.this.dsMovie!=null) {
+					int measuredPosition = PlaybackEngine.this.dsMovie.getTime();
+					if (getPlaybackState() == PlayState.Playing && measuredPosition == this.lastMeasuredPosition) {
 						System.err.println("dsj.PlaybackEngine Prompting playback...");
-						dsMovie.play();
+						PlaybackEngine.this.dsMovie.play();
 					}
-					lastMeasuredPosition = measuredPosition;
+					this.lastMeasuredPosition = measuredPosition;
 					
 					int position = measuredPosition / 1000;
-					if (position != lastSentPosition) {
+					if (position != this.lastSentPosition) {
 						_callPositionListener(position);
-						lastSentPosition = position;
+						this.lastSentPosition = position;
 					}
 				}
 			}
@@ -502,39 +503,39 @@ public class PlaybackEngine implements IPlaybackEngine {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Local helper methods.
 	
-	private void callOnErrorHandler (Exception e) {
-		if (listener!=null) {
-			listener.onError(e);
+	protected void callOnErrorHandler (Exception e) {
+		if (this.listener!=null) {
+			this.listener.onError(e);
 		}
 	}
 	
-	private void _callOnEndOfTrackHandler () {
+	protected  void _callOnEndOfTrackHandler () {
 		_callStateListener(PlayState.Stopped);
-		if (listener!=null) {
-			listener.onEndOfTrack();
+		if (this.listener!=null) {
+			this.listener.onEndOfTrack();
 		}
 	}
 	
 	private void _callStateListener (PlayState state) {
 		this.playbackState = state;
-		if (listener!=null) listener.statusChanged(state);
+		if (this.listener!=null) this.listener.statusChanged(state);
 	}
 	
-	private void _callPositionListener (long position) {
-		if (listener!=null) {
-			listener.positionChanged(position);
+	protected void _callPositionListener (long position) {
+		if (this.listener!=null) {
+			this.listener.positionChanged(position);
 		}
 	}
 	
-	private void _callOnKeyPressListener (int keyCode) {
-		if (listener!=null) {
-			listener.onKeyPress(keyCode);
+	protected void _callOnKeyPressListener (int keyCode) {
+		if (this.listener!=null) {
+			this.listener.onKeyPress(keyCode);
 		}
 	}
 	
-	private void _callOnClickListener (int button, int clickCount) {
-		if (listener!=null) {
-			listener.onMouseClick(button, clickCount);
+	protected void _callOnClickListener (int button, int clickCount) {
+		if (this.listener!=null) {
+			this.listener.onMouseClick(button, clickCount);
 		}
 	}
 	
@@ -543,7 +544,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 	
 	private void _setScreenSaverActive (boolean active) {
 		if (DSJUtils.getScreenSaverActive()!=active) {
-			if (active || (dsMovie!=null && dsMovie.hasMediaOfType(DSMediaType.WMMEDIATYPE_Video)) ) {
+			if (active || (this.dsMovie!=null && this.dsMovie.hasMediaOfType(DSMediaType.WMMEDIATYPE_Video)) ) {
 				
 				DSJUtils.setScreenSaverActive(active); // FIXME crashes JVM ???
 				
@@ -565,13 +566,12 @@ public class PlaybackEngine implements IPlaybackEngine {
 	private boolean haveShoeHorned = false;
 	
 	// FIXME this is all REALLY nasty.
-	@SuppressWarnings("unchecked")
 	private void _shoeHorn () {
-		if (haveShoeHorned) return;
+		if (this.haveShoeHorned) return;
 		
 		File dsjDllFile = null;
 		
-		for (File classPathFile : classPath) {
+		for (File classPathFile : this.classPath) {
 			if (classPathFile.isDirectory()) {
 				File[] listFiles = classPathFile.listFiles();
 				if (listFiles!=null && listFiles.length>0) {
@@ -594,7 +594,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 		System.err.println("dsj.PlaybackEngine dll " + dsjDll + "=" + dsjDllFile.getAbsolutePath());
 		
 		try {
-			Class clazz = ClassLoader.class;
+			Class<?> clazz = ClassLoader.class;
 			Field field = clazz.getDeclaredField("sys_paths");
 			boolean accessible = field.isAccessible();
 			if (!accessible) field.setAccessible(true);
@@ -619,7 +619,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 		
 		System.err.println("dsj.PlaybackEngine Loaded dll=" + dsjDllFile.getAbsolutePath());
 		
-		haveShoeHorned = true;
+		this.haveShoeHorned = true;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
