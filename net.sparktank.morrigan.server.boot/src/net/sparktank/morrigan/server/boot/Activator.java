@@ -25,16 +25,18 @@ public class Activator implements BundleActivator {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private MorriganServer server;
+	private IPlayerLocal player;
 	
 	@Override
 	public void start (BundleContext context) throws Exception {
-		// Prep player.
-		setupPlayer();
-		
 		// Start server.
-		this.server = makeServer();
+		this.server = new MorriganServer();
 		this.server.start();
 		logger.fine("Morrigan Server listening on port [TODO insert port number here].");
+		
+		// Prep player.
+		this.player = PlayerRegister.makeLocalPlayer(this.eventHandler);
+		this.player.setPlaybackOrder(PlaybackOrder.RANDOM);
 	}
 	
 	@Override
@@ -43,29 +45,12 @@ public class Activator implements BundleActivator {
 		logger.fine("Morrigan Server stopped.");
 		
 		// Clean up.
-		cleanupPlayer();
+		this.player.dispose();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	static public MorriganServer makeServer () throws Exception {
-		return new MorriganServer();
-	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	private static IPlayerLocal _player;
-	
-	static private void setupPlayer () {
-		_player = PlayerRegister.makeLocalPlayer(eventHandler);
-		_player.setPlaybackOrder(PlaybackOrder.RANDOM);
-	}
-	
-	static private void cleanupPlayer () {
-		_player.dispose();
-	}
-	
-	static private IPlayerEventHandler eventHandler = new IPlayerEventHandler() {
+	private IPlayerEventHandler eventHandler = new IPlayerEventHandler() {
 		
 		@Override
 		public void updateStatus() {
@@ -96,14 +81,14 @@ public class Activator implements BundleActivator {
 	};
 	
 	
-	static private PlayState prevPlayState = null;
+	private PlayState prevPlayState = null;
 	
-	static void outputStatus () {
-		PlayState playState = _player.getPlayState();
-		if (playState != prevPlayState) {
-			prevPlayState = playState;
+	protected void outputStatus () {
+		PlayState playState = this.player.getPlayState();
+		if (playState != this.prevPlayState) {
+			this.prevPlayState = playState;
 			
-			PlayItem currentItem = _player.getCurrentItem();
+			PlayItem currentItem = this.player.getCurrentItem();
 			if (currentItem.item != null) {
 				System.out.println(playState.toString() + " " + currentItem.item);
 			} else {
