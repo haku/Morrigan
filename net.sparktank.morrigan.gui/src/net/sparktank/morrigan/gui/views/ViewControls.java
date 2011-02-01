@@ -339,7 +339,7 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 			}
 		}
 		
-	};
+	}
 	
 	private class SeekbarMouseListener implements MouseListener {
 		
@@ -361,7 +361,7 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		public void mouseDown(MouseEvent e) {/* UNUSED */}
 		@Override
 		public void mouseDoubleClick(MouseEvent e) {/* UNUSED */}
-	};
+	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Events.
@@ -409,7 +409,7 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 			getSite().getShell().setText(getPlayer().getCurrentItem().item.toString());
 		} else {
 			getSite().getShell().setText("Morrigan");
-		};
+		}
 	}
 	
 	@Override

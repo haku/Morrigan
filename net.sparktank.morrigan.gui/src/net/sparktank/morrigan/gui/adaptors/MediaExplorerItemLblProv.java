@@ -27,6 +27,7 @@ public class MediaExplorerItemLblProv implements ILabelProvider {
 		return null;
 	}
 	
+	@SuppressWarnings("incomplete-switch")
 	@Override
 	public Image getImage(Object element) {
 		if (element instanceof MediaListReference) {

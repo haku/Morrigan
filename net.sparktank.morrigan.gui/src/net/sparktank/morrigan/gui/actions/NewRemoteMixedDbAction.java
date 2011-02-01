@@ -44,7 +44,7 @@ public class NewRemoteMixedDbAction extends Action implements IWorkbenchAction {
 	public org.eclipse.jface.resource.ImageDescriptor getImageDescriptor() {
 		// TODO choose icon.
 		return Activator.getImageDescriptor("icons/db-remote.png");
-	};
+	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	

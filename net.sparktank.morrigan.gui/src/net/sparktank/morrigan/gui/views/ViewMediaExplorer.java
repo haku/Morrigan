@@ -173,7 +173,7 @@ public class ViewMediaExplorer extends ViewPart {
 			} catch (CommandException e) {
 				new MorriganMsgDlg(e).open();
 			}
-		};
+		}
 	};
 	
 	static class MediaExplorerItemUpdateAction extends Action {

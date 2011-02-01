@@ -1,6 +1,7 @@
 package net.sparktank.morrigan.server;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -63,7 +64,7 @@ public class PlayersHandler extends AbstractHandler {
 		StringBuilder sb = new StringBuilder();
 		sb.append("<h2>All players</h2>");
 		
-		List<IPlayerLocal> players = PlayerRegister.getLocalPlayers();
+		Collection<IPlayerLocal> players = PlayerRegister.getLocalPlayers();
 		sb.append("<ul>");
 		for (IPlayerLocal p : players) {
 			sb.append("<li><a href=\"/player/"+p.getId()+"\"> p"+p.getId());

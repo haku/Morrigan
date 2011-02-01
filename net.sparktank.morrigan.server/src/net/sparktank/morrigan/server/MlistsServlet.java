@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.Collection;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -93,7 +94,7 @@ public class MlistsServlet extends HttpServlet {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	static private enum Verb {GET, POST};
+	static private enum Verb {GET, POST}
 	
 	/**
 	 * Param action will not be null when verb==POST.
@@ -237,7 +238,7 @@ public class MlistsServlet extends HttpServlet {
 		AbstractFeed.addElement(dw, "title", "Morrigan media lists desu~");
 		AbstractFeed.addLink(dw, CONTEXTPATH, "self", "text/xml");
 		
-		List<IPlayerLocal> players = PlayerRegister.getLocalPlayers();
+		Collection<IPlayerLocal> players = PlayerRegister.getLocalPlayers();
 		
 		for (MediaListReference listRef : MediaFactoryImpl.get().getAllLocalMixedMediaDbs()) {
 			dw.startElement("entry");
@@ -281,7 +282,7 @@ public class MlistsServlet extends HttpServlet {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	static private void printMlistShort (DataWriter dw, MediaListReference listRef, List<IPlayerLocal> players) throws SAXException {
+	static private void printMlistShort (DataWriter dw, MediaListReference listRef, Collection<IPlayerLocal> players) throws SAXException {
 		String fileName = listRef.getIdentifier().substring(listRef.getIdentifier().lastIndexOf(File.separator) + 1);
 		
 		AbstractFeed.addElement(dw, "title", listRef.getTitle());

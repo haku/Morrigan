@@ -31,7 +31,7 @@ public class MinToTrayAction  extends Action implements IWorkbenchAction {
 	public org.eclipse.jface.resource.ImageDescriptor getImageDescriptor() {
 		// TODO choose icon.
 		return null;
-	};
+	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	

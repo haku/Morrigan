@@ -10,7 +10,7 @@ import net.sparktank.morrigan.model.exceptions.MorriganException;
 public interface IMediaItemList<T extends IMediaItem> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public enum DirtyState { CLEAN, DIRTY, METADATA };
+	public enum DirtyState { CLEAN, DIRTY, METADATA }
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	

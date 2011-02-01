@@ -3,6 +3,7 @@ package net.sparktank.morrigan.server;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Collection;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -152,7 +153,7 @@ public class PlayersServlet extends HttpServlet {
 		AbstractFeed.addElement(dw, "title", "Morrigan players desu~");
 		AbstractFeed.addLink(dw, CONTEXTPATH, "self", "text/xml");
 		
-		List<IPlayerLocal> players = PlayerRegister.getLocalPlayers();
+		Collection<IPlayerLocal> players = PlayerRegister.getLocalPlayers();
 		for (IPlayerLocal p : players) {
 			dw.startElement("entry");
 			printPlayer(dw, p, 0);

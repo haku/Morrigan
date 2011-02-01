@@ -110,7 +110,7 @@ public abstract class MediaTrackListEditor<T extends IMediaTrackList<S>, S exten
 			} catch (Throwable t) {
 				new MorriganMsgDlg(t).open();
 			}
-		};
+		}
 	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
