@@ -11,6 +11,7 @@ import net.sparktank.morrigan.engines.hotkey.IHotkeyListener;
 import com.melloware.jintellitype.HotkeyListener;
 import com.melloware.jintellitype.IntellitypeListener;
 import com.melloware.jintellitype.JIntellitype;
+import com.melloware.jintellitype.JIntellitypeConstants;
 
 public class HotkeyEngine implements IHotkeyEngine {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -21,7 +22,7 @@ public class HotkeyEngine implements IHotkeyEngine {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructor.
 
-	public HotkeyEngine () {}
+	public HotkeyEngine () {/* UNUSED */}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	IHotkeyEngine methods.
@@ -47,10 +48,10 @@ public class HotkeyEngine implements IHotkeyEngine {
 		setup();
 		
 		int mask = 0;
-		if (value.getCtrl()) mask += JIntellitype.MOD_CONTROL;
-		if (value.getShift()) mask += JIntellitype.MOD_SHIFT;
-		if (value.getAlt()) mask += JIntellitype.MOD_ALT;
-		if (value.getSupr()) mask += JIntellitype.MOD_WIN;
+		if (value.getCtrl()) mask += JIntellitypeConstants.MOD_CONTROL;
+		if (value.getShift()) mask += JIntellitypeConstants.MOD_SHIFT;
+		if (value.getAlt()) mask += JIntellitypeConstants.MOD_ALT;
+		if (value.getSupr()) mask += JIntellitypeConstants.MOD_WIN;
 		
 		try {
 			JIntellitype.getInstance().registerHotKey(id, mask, value.getKey());
@@ -72,7 +73,7 @@ public class HotkeyEngine implements IHotkeyEngine {
 	@Override
 	public void finalise() {
 		teardown();
-		if (haveShoeHorned) {
+		if (this.haveShoeHorned) {
 			JIntellitype.getInstance().cleanUp();
 		}
 	}
@@ -82,17 +83,17 @@ public class HotkeyEngine implements IHotkeyEngine {
 	boolean haveSetup = false;
 	
 	private void setup () {
-		if (haveSetup) return;
-		JIntellitype.getInstance().addHotKeyListener(hotkeyListener);
-		JIntellitype.getInstance().addIntellitypeListener(intellitypeListener);
-		haveSetup = true;
+		if (this.haveSetup) return;
+		JIntellitype.getInstance().addHotKeyListener(this.hotkeyListener);
+		JIntellitype.getInstance().addIntellitypeListener(this.intellitypeListener);
+		this.haveSetup = true;
 	}
 	
 	private void teardown () {
-		if (!haveSetup) return;
-		JIntellitype.getInstance().removeHotKeyListener(hotkeyListener);
-		JIntellitype.getInstance().removeIntellitypeListener(intellitypeListener);
-		haveSetup = false;
+		if (!this.haveSetup) return;
+		JIntellitype.getInstance().removeHotKeyListener(this.hotkeyListener);
+		JIntellitype.getInstance().removeIntellitypeListener(this.intellitypeListener);
+		this.haveSetup = false;
 	}
 	
 	private HotkeyListener hotkeyListener = new HotkeyListener() {
@@ -107,15 +108,15 @@ public class HotkeyEngine implements IHotkeyEngine {
 		public void onIntellitype(int aCommand) {
 			switch (aCommand) {
 				
-				case JIntellitype.APPCOMMAND_MEDIA_STOP:
+				case JIntellitypeConstants.APPCOMMAND_MEDIA_STOP:
 					callListener(MORRIGAN_HK_STOP);
 					break;
 					
-				case JIntellitype.APPCOMMAND_MEDIA_PLAY_PAUSE:
+				case JIntellitypeConstants.APPCOMMAND_MEDIA_PLAY_PAUSE:
 					callListener(MORRIGAN_HK_PLAYPAUSE);
 					break;
 					
-				case JIntellitype.APPCOMMAND_MEDIA_NEXTTRACK:
+				case JIntellitypeConstants.APPCOMMAND_MEDIA_NEXTTRACK:
 					callListener(MORRIGAN_HK_NEXT);
 					break;
 				
@@ -123,9 +124,9 @@ public class HotkeyEngine implements IHotkeyEngine {
 		}
 	}; 
 	
-	private void callListener(int id) {
-		if (listener!=null) {
-			listener.onKeyPress(id);
+	protected void callListener(int id) {
+		if (this.listener!=null) {
+			this.listener.onKeyPress(id);
 		}
 	}
 	
@@ -136,13 +137,12 @@ public class HotkeyEngine implements IHotkeyEngine {
 	private boolean haveShoeHorned = false;
 	
 	// FIXME this is all REALLY nasty.
-	@SuppressWarnings("unchecked")
 	private void shoeHorn () {
-		if (haveShoeHorned) return;
+		if (this.haveShoeHorned) return;
 		
 		File dllFile = null;
 		
-		for (File classPathFile : classPath) {
+		for (File classPathFile : this.classPath) {
 			if (classPathFile.isDirectory()) {
 				File[] listFiles = classPathFile.listFiles();
 				if (listFiles!=null && listFiles.length>0) {
@@ -165,7 +165,7 @@ public class HotkeyEngine implements IHotkeyEngine {
 		System.err.println("dll " + dllName + "=" + dllFile.getAbsolutePath());
 		
 		try {
-			Class clazz = ClassLoader.class;
+			Class<?> clazz = ClassLoader.class;
 			Field field = clazz.getDeclaredField("sys_paths");
 			boolean accessible = field.isAccessible();
 			if (!accessible) field.setAccessible(true);
@@ -191,7 +191,7 @@ public class HotkeyEngine implements IHotkeyEngine {
 		
 		System.err.println("loaded dll=" + dllFile.getAbsolutePath());
 		
-		haveShoeHorned = true;
+		this.haveShoeHorned = true;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
