@@ -3,7 +3,7 @@ package net.sparktank.morrigan.model.tasks;
 public class TaskResult {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	static public enum TaskOutcome {SUCCESS, FAILED, CANCELED};
+	static public enum TaskOutcome {SUCCESS, FAILED, CANCELED}
 	
 	private TaskOutcome outcome;
 	private String errMsg;

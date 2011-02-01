@@ -154,7 +154,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 		public void asyncThrowable(Throwable t) {
 			System.err.println("Async Throwable: " + t.getMessage());
 			getSite().getShell().getDisplay().asyncExec(new RunnableDialog(t));
-		};
+		}
 		
 		@SuppressWarnings("unchecked") // FIXME ???
 		@Override
@@ -185,7 +185,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 			if (isFullScreen()) {
 				removeFullScreenSafe(true);
 			}
-		};
+		}
 		
 		@Override
 		public void videoAreaSelected() {
@@ -264,7 +264,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 			} catch (PartInitException e) {
 				new MorriganMsgDlg(e).open();
 			}
-		};
+		}
 	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -556,21 +556,21 @@ public abstract class AbstractPlayerView extends ViewPart {
 		@Override
 		public void run() {
 			getPlayer().pausePlaying();
-		};
+		}
 	};
 	
 	protected IAction stopAction = new Action("Stop", Activator.getImageDescriptor("icons/stop.gif")) {
 		@Override
 		public void run() {
 			getPlayer().stopPlaying();
-		};
+		}
 	};
 	
 	protected IAction nextAction = new Action("Next", Activator.getImageDescriptor("icons/next.gif")) {
 		@Override
 		public void run() {
 			getPlayer().nextTrack();
-		};
+		}
 	};
 	
 	protected IAction copyPathAction = new Action("Copy file path") {
@@ -583,7 +583,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 			} else {
 				new MorriganMsgDlg("No track loaded desu~.").open();
 			}
-		};
+		}
 	};
 	
 	/*
@@ -620,7 +620,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 					getPlayer().loadAndStartPlaying(item);
 				}
 			}
-		};
+		}
 	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

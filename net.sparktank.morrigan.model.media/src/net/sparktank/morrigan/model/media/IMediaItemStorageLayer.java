@@ -34,7 +34,7 @@ public interface IMediaItemStorageLayer<T extends IMediaItem> extends IGenericDb
 			}
 		}
 		
-	};
+	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	

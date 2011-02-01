@@ -537,14 +537,14 @@ public class ViewPicture extends ViewPart {
 		@Override
 		public void run() {
 			nextPicture(1);
-		};
+		}
 	};
 	
 	protected IAction prevItemAction = new Action ("Previous", Activator.getImageDescriptor("icons/prev.gif")) {
 		@Override
 		public void run() {
 			nextPicture(-1);
-		};
+		}
 	};
 	
 	protected IAction revealItemAction = new Action ("Reveal", Activator.getImageDescriptor("icons/jumptolist.active.gif")) {
@@ -555,14 +555,14 @@ public class ViewPicture extends ViewPart {
 			} catch (Exception e) {
 				new MorriganMsgDlg(e).open();
 			}
-		};
+		}
 	};
 	
 	protected IAction randomItemAction = new Action ("Random", Activator.getImageDescriptor("icons/question.png")) {
 		@Override
 		public void run() {
 			randomPicture();
-		};
+		}
 	};
 	
 	protected class EnableTimerAction extends Action {
@@ -578,7 +578,7 @@ public class ViewPicture extends ViewPart {
 		@Override
 		public void run() {
 			if (isChecked()) startTimer(); else stopTimer();
-		};
+		}
 	};
 	
 	protected IAction showTagsAction = new Action("Tags", Activator.getImageDescriptor("icons/tag.png")) {

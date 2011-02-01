@@ -1,6 +1,7 @@
 package net.sparktank.morrigan.osgiconsole;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -308,7 +309,7 @@ public class MorriganCommandProvider implements CommandProvider {
 	}
 	
 	static private void doPlayersList(CommandInterpreter ci) {
-		List<IPlayerLocal> players = PlayerRegister.getLocalPlayers();
+		Collection<IPlayerLocal> players = PlayerRegister.getLocalPlayers();
 		ci.println("id\tplayer");
 		for (IPlayerLocal p : players) {
 			ci.print(String.valueOf( p.getId() ));

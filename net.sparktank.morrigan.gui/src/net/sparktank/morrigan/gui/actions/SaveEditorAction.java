@@ -29,7 +29,7 @@ public class SaveEditorAction extends Action implements IWorkbenchAction {
 	@Override
 	public org.eclipse.jface.resource.ImageDescriptor getImageDescriptor() {
 		return Activator.getImageDescriptor("icons/save.gif");
-	};
+	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	

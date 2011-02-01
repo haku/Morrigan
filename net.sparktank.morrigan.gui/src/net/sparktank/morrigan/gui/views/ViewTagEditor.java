@@ -374,7 +374,7 @@ public class ViewTagEditor extends ViewPart {
 		@Override
 		public void run() {
 			procReadTags();
-		};
+		}
 	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -208,14 +208,14 @@ public class ViewQueue extends ViewPart {
 		@Override
 		public void run() {
 			ViewQueue.this.abstractPlayerView.getPlayer().moveInQueue(getSelectedSources(), false);
-		};
+		}
 	};
 	
 	protected IAction moveDownAction = new Action("Move down", Activator.getImageDescriptor("icons/arrow-down.gif")) {
 		@Override
 		public void run() {
 			ViewQueue.this.abstractPlayerView.getPlayer().moveInQueue(getSelectedSources(), true);
-		};
+		}
 	};
 	
 	protected IAction removeAction = new Action("Remove", Activator.getImageDescriptor("icons/minus.gif")) {
@@ -228,7 +228,7 @@ public class ViewQueue extends ViewPart {
 			for (PlayItem item : selectedSources) {
 				ViewQueue.this.abstractPlayerView.getPlayer().removeFromQueue(item);
 			}
-		};
+		}
 	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -16,7 +16,7 @@ import org.eclipse.swt.widgets.Canvas;
 public class ScreenPainter implements PaintListener {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public enum ScreenType {TINY, MEDIUM, LARGE};
+	public enum ScreenType {TINY, MEDIUM, LARGE}
 	
 	public interface TitleProvider {
 		

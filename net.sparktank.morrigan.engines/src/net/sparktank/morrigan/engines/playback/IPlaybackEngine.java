@@ -19,7 +19,7 @@ public interface IPlaybackEngine {
 			return this.n;
 		}
 		
-	};
+	}
 	
 	/**
 	 * Returns the description of this playback engine.

@@ -152,7 +152,7 @@ public class ViewPlayer extends AbstractPlayerView {
 			setContentDescription("Playing: " + getPlayer().getCurrentPosition() + " : " + getPlayer().getCurrentItem().toString());
 		} else {
 			setContentDescription("Idle.");
-		};
+		}
 	}
 	
 	@Override

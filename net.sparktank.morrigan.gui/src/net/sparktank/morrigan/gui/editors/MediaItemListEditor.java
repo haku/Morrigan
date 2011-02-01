@@ -543,7 +543,7 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 					t.printStackTrace();
 				}
 			}
-		};
+		}
 	};
 	
 	String lastFileCopyTargetDir = null;

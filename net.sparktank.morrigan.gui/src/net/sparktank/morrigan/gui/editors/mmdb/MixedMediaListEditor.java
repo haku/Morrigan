@@ -112,7 +112,7 @@ public abstract class MixedMediaListEditor<T extends IMixedMediaList<S>, S exten
 			} catch (Throwable t) {
 				new MorriganMsgDlg(t).open();
 			}
-		};
+		}
 	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
