@@ -38,7 +38,7 @@ public class ServerTrim extends WorkbenchWindowControlContribution {
 		this.lblStatus = new Label(composite, SWT.NONE);
 		this.btnStartStop = new Button(composite, SWT.PUSH);
 		
-		GridLayout layout = new GridLayout(3, false);
+		GridLayout layout = new GridLayout(2, false);
 		layout.marginHeight = 0;
 		composite.setLayout(layout);
 		
