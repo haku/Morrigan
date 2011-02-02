@@ -3,6 +3,11 @@ package net.sparktank.morrigan.gui.engines;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.logging.Logger;
 
 import net.sparktank.morrigan.engines.EngineFactory;
 import net.sparktank.morrigan.engines.common.ImplException;
@@ -16,18 +21,21 @@ import net.sparktank.morrigan.model.exceptions.MorriganException;
 public class HotkeyRegister {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	synchronized public static void addHotkeyListener (IHotkeyListener listener) throws MorriganException {
-		if (!hotkeyListeners.contains(listener)) {
-			readConfig(false);
-			hotkeyListeners.add(listener);
-		}
+	protected static final Logger logger = Logger.getLogger(HotkeyRegister.class.getName());
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	static protected final ConcurrentMap<IHotkeyListener, Object> hotkeyListeners = new ConcurrentHashMap<IHotkeyListener, Object>();
+	
+	public static void addHotkeyListener (IHotkeyListener listener) throws MorriganException {
+		hotkeyListeners.put(listener, listener);
+		logger.fine("Hotkey listener registered: '"+listener+"'.");
+		readConfig(false);
 	}
 	
-	synchronized public static void removeHotkeyListener (IHotkeyListener listener) throws MorriganException {
-		if (hotkeyListeners.contains(listener)) {
-			hotkeyListeners.remove(listener);
-		}
-		if (hotkeyListeners.size()<1) {
+	public static void removeHotkeyListener (IHotkeyListener listener) throws MorriganException {
+		hotkeyListeners.remove(listener);
+		if (hotkeyListeners.size() < 1) {
 			clearConfig();
 			clearHotkeyEngine();
 		}
@@ -35,12 +43,15 @@ public class HotkeyRegister {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private static boolean configRead = false;
+	static private final AtomicBoolean configRead = new AtomicBoolean(false);
 	private static List<Integer> registeredHotkeys = new ArrayList<Integer>();
 	
 	@SuppressWarnings("boxing")
-	synchronized public static void readConfig (boolean force) throws MorriganException {
-		if (configRead && !force) return;
+	public static void readConfig (boolean force) throws MorriganException {
+		if (!configRead.compareAndSet(false, true) & !force) {
+			logger.fine("Hotkey config already read, skipping.");
+			return;
+		}
 		
 		clearConfig();
 		
@@ -49,137 +60,143 @@ public class HotkeyRegister {
 			if (hkShowHide!=null) {
 				getHotkeyEngine(true).registerHotkey(IHotkeyEngine.MORRIGAN_HK_SHOWHIDE, hkShowHide);
 				registeredHotkeys.add(IHotkeyEngine.MORRIGAN_HK_SHOWHIDE);
-				System.out.println("registered MORRIGAN_HK_SHOWHIDE: " + hkShowHide.toString());
+				logger.fine("registered MORRIGAN_HK_SHOWHIDE: " + hkShowHide.toString());
 			}
 			
 			HotkeyValue hkStop = HotkeyPref.getHkStop();
 			if (hkStop!=null) {
 				getHotkeyEngine(true).registerHotkey(IHotkeyEngine.MORRIGAN_HK_STOP, hkStop);
 				registeredHotkeys.add(IHotkeyEngine.MORRIGAN_HK_STOP);
-				System.out.println("registered MORRIGAN_HK_STOP: " + hkStop.toString());
+				logger.fine("registered MORRIGAN_HK_STOP: " + hkStop.toString());
 			}
 			
 			HotkeyValue hkPlaypause = HotkeyPref.getHkPlaypause();
 			if (hkPlaypause!=null) {
 				getHotkeyEngine(true).registerHotkey(IHotkeyEngine.MORRIGAN_HK_PLAYPAUSE, hkPlaypause);
 				registeredHotkeys.add(IHotkeyEngine.MORRIGAN_HK_PLAYPAUSE);
-				System.out.println("registered MORRIGAN_HK_PLAYPAUSE: " + hkPlaypause.toString());
+				logger.fine("registered MORRIGAN_HK_PLAYPAUSE: " + hkPlaypause.toString());
 			}
 			
 			HotkeyValue hkNext = HotkeyPref.getHkNext();
 			if (hkNext!=null) {
 				getHotkeyEngine(true).registerHotkey(IHotkeyEngine.MORRIGAN_HK_NEXT, hkNext);
 				registeredHotkeys.add(IHotkeyEngine.MORRIGAN_HK_NEXT);
-				System.out.println("registered MORRIGAN_HK_NEXT: " + hkNext.toString());
+				logger.fine("registered MORRIGAN_HK_NEXT: " + hkNext.toString());
 			}
 			
 			HotkeyValue hkJumpto = HotkeyPref.getHkJumpto();
 			if (hkJumpto!=null) {
 				getHotkeyEngine(true).registerHotkey(IHotkeyEngine.MORRIGAN_HK_JUMPTO, hkJumpto);
 				registeredHotkeys.add(IHotkeyEngine.MORRIGAN_HK_JUMPTO);
-				System.out.println("registered MORRIGAN_HK_JUMPTO: " + hkJumpto.toString());
+				logger.fine("registered MORRIGAN_HK_JUMPTO: " + hkJumpto.toString());
 			}
 		}
-		
-		configRead = true;
+		else {
+			logger.warning("EngineFactory.canMakeHotkeyEngine() == false.");
+		}
 	}
 	
 	@SuppressWarnings("boxing")
 	private static void clearConfig () throws HotkeyException, ImplException {
 		IHotkeyEngine engine = getHotkeyEngine(false);
 		
-		if (engine!=null) {
-			System.out.println("Going to unregister hotkeys...");
+		if (engine != null) {
+			logger.fine("Going to unregister hotkeys...");
 			
 			if (registeredHotkeys.contains(IHotkeyEngine.MORRIGAN_HK_SHOWHIDE)) {
-				System.out.println("Going to unregister MORRIGAN_HK_SHOWHIDE...");
+				logger.fine("Going to unregister MORRIGAN_HK_SHOWHIDE...");
 				engine.unregisterHotkey(IHotkeyEngine.MORRIGAN_HK_SHOWHIDE);
 				registeredHotkeys.remove(Integer.valueOf(IHotkeyEngine.MORRIGAN_HK_SHOWHIDE));
-				System.out.println("unregistered MORRIGAN_HK_SHOWHIDE.");
+				logger.fine("unregistered MORRIGAN_HK_SHOWHIDE.");
 			}
 			
 			if (registeredHotkeys.contains(IHotkeyEngine.MORRIGAN_HK_STOP)) {
-				System.out.println("Going to unregister MORRIGAN_HK_STOP...");
+				logger.fine("Going to unregister MORRIGAN_HK_STOP...");
 				engine.unregisterHotkey(IHotkeyEngine.MORRIGAN_HK_STOP);
 				registeredHotkeys.remove(Integer.valueOf(IHotkeyEngine.MORRIGAN_HK_STOP));
-				System.out.println("unregistered MORRIGAN_HK_STOP.");
+				logger.fine("unregistered MORRIGAN_HK_STOP.");
 			}
 			
 			if (registeredHotkeys.contains(IHotkeyEngine.MORRIGAN_HK_PLAYPAUSE)) {
-				System.out.println("Going to unregister MORRIGAN_HK_PLAYPAUSE...");
+				logger.fine("Going to unregister MORRIGAN_HK_PLAYPAUSE...");
 				engine.unregisterHotkey(IHotkeyEngine.MORRIGAN_HK_PLAYPAUSE);
 				registeredHotkeys.remove(Integer.valueOf(IHotkeyEngine.MORRIGAN_HK_PLAYPAUSE));
-				System.out.println("unregistered MORRIGAN_HK_PLAYPAUSE.");
+				logger.fine("unregistered MORRIGAN_HK_PLAYPAUSE.");
 			}
 			
 			if (registeredHotkeys.contains(IHotkeyEngine.MORRIGAN_HK_NEXT)) {
-				System.out.println("Going to unregister MORRIGAN_HK_NEXT...");
+				logger.fine("Going to unregister MORRIGAN_HK_NEXT...");
 				engine.unregisterHotkey(IHotkeyEngine.MORRIGAN_HK_NEXT);
 				registeredHotkeys.remove(Integer.valueOf(IHotkeyEngine.MORRIGAN_HK_NEXT));
-				System.out.println("unregistered MORRIGAN_HK_NEXT.");
+				logger.fine("unregistered MORRIGAN_HK_NEXT.");
 			}
 			
 			if (registeredHotkeys.contains(IHotkeyEngine.MORRIGAN_HK_JUMPTO)) {
-				System.out.println("Going to unregister MORRIGAN_HK_JUMPTO...");
+				logger.fine("Going to unregister MORRIGAN_HK_JUMPTO...");
 				engine.unregisterHotkey(IHotkeyEngine.MORRIGAN_HK_JUMPTO);
 				registeredHotkeys.remove(Integer.valueOf(IHotkeyEngine.MORRIGAN_HK_JUMPTO));
-				System.out.println("unregistered MORRIGAN_HK_JUMPTO.");
+				logger.fine("unregistered MORRIGAN_HK_JUMPTO.");
 			}
 		}
 		
-		configRead = false;
+		configRead.set(false);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private static IHotkeyEngine hotkeyEngine = null;
-	static List<IHotkeyListener> hotkeyListeners = new ArrayList<IHotkeyListener>();
+	static private final AtomicReference<IHotkeyEngine> hotkeyEngine = new AtomicReference<IHotkeyEngine>(null);
 	
 	private static IHotkeyEngine getHotkeyEngine (boolean create) throws ImplException {
-		if (hotkeyEngine == null && create) {
-			hotkeyEngine = EngineFactory.makeHotkeyEngine();
-			if (hotkeyEngine != null) {
-				hotkeyEngine.setListener(mainHotkeyListener);
+		if (hotkeyEngine.get() == null && create) {
+			IHotkeyEngine e = EngineFactory.makeHotkeyEngine();
+			if (e != null) {
+				if (hotkeyEngine.compareAndSet(null, e)) {
+					e.setListener(mainHotkeyListener);
+				}
+				else {
+					e.finalise();
+				}
 			}
 		}
 		
-		return hotkeyEngine;
+		return hotkeyEngine.get();
 	}
 	
 	private static void clearHotkeyEngine () {
-		if (hotkeyEngine!=null) {
-			hotkeyEngine.finalise();
-			hotkeyEngine = null;
-		}
+		IHotkeyEngine e = hotkeyEngine.getAndSet(null);
+		if (e != null) e.finalise();
 	}
 	
-	static WeakReference<IHotkeyListener> lastIHotkeyListenerUsed = null;
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private static IHotkeyListener mainHotkeyListener = new IHotkeyListener () {
+		
+		private WeakReference<IHotkeyListener> lastIHotkeyListenerUsed = null;
 		
 		@Override
 		public void onKeyPress(int id) {
 			List<IHotkeyListener> answers = new ArrayList<IHotkeyListener>();
 			
 			IHotkeyListener last = null;
-			if (lastIHotkeyListenerUsed != null) {
-				last = lastIHotkeyListenerUsed.get();
+			if (this.lastIHotkeyListenerUsed != null) {
+				last = this.lastIHotkeyListenerUsed.get();
 			}
 			
-			for (IHotkeyListener l : hotkeyListeners) {
+			for (IHotkeyListener l : hotkeyListeners.keySet()) {
 				CanDo canDo = l.canDoKeyPress(id);
 				
 				if (canDo == CanDo.YESANDFRIENDS) {
 					answers.add(l);
-					
-				} else if (canDo == CanDo.YES) {
+				}
+				else if (canDo == CanDo.YES) {
 					answers.add(l);
 					break;
-					
-				} else if (canDo == CanDo.MAYBE) {
+				}
+				else if (canDo == CanDo.MAYBE) {
 					if (l == last) {
 						answers.add(l);
-					} else if (answers.isEmpty()) {
+					}
+					else if (answers.isEmpty()) {
 						answers.add(l);
 					}
 				}
@@ -191,11 +208,11 @@ public class HotkeyRegister {
 				}
 				
 				if (answers.size() == 1) {
-					lastIHotkeyListenerUsed = new WeakReference<IHotkeyListener>(answers.get(0));
+					this.lastIHotkeyListenerUsed = new WeakReference<IHotkeyListener>(answers.get(0));
 				}
-				
-			} else {
-				System.err.println("Failed to find handler for hotkey cmd '"+id+"'.");
+			}
+			else {
+				logger.warning("Failed to find handler for hotkey cmd '"+id+"'.");
 			}
 		}
 		

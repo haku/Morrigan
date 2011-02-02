@@ -3,8 +3,13 @@ package net.sparktank.morrigan.engines.hotkey;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.logging.Logger;
 
 public class HotkeyEngineRegister {
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	private static final Logger logger = Logger.getLogger(HotkeyEngineRegister.class.getName());
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	static private ConcurrentMap<String, HotkeyEngineFactory> engineFactories = new ConcurrentHashMap<String, HotkeyEngineFactory>();
@@ -12,10 +17,15 @@ public class HotkeyEngineRegister {
 	static public void registerFactory (String id, HotkeyEngineFactory factory) {
 		HotkeyEngineFactory r = engineFactories.putIfAbsent(id, factory);
 		if (r != null) throw new IllegalArgumentException("ID '"+id+"' already in use.");
+		logger.info("Hotkey engine factory registered: '"+id+"'.");
 	}
 	
 	static public void unregisterFactory (String id) {
 		engineFactories.remove(id);
+	}
+	
+	static public int countFactories () {
+		return engineFactories.size();
 	}
 	
 	/**
