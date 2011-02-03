@@ -1,7 +1,0 @@
-<project name="net.sparktank.morrigan.build.headlessbuild" default="all">
-
-	<property name="eclipse.home" value="E:\software\eclipsercpgalileo" />
-	
-	<import file="build.eclipse.xml" />
-	
-</project>
