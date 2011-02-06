@@ -16,7 +16,6 @@
 
 package net.sparktank.morrigan.android.model.impl;
 
-import net.sparktank.morrigan.android.R;
 import net.sparktank.morrigan.android.helper.XmlParser;
 import net.sparktank.morrigan.android.model.PlayState;
 import net.sparktank.morrigan.android.model.PlayerReference;
@@ -80,7 +79,7 @@ public class PlayerStateXmlImpl extends XmlParser implements PlayerState {
 	
 	@Override
 	public int getImageResource() {
-		return R.drawable.play;
+		return PlayerStateBasicImpl.getImageResource(getPlayState());
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
