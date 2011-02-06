@@ -19,13 +19,13 @@ package net.sparktank.morrigan.android.tasks;
 import java.io.IOException;
 import java.net.ConnectException;
 
-import net.sparktank.morrigan.android.TempConstants;
 import net.sparktank.morrigan.android.helper.HttpHelper;
 import net.sparktank.morrigan.android.model.MlistItem;
-import net.sparktank.morrigan.android.model.ServerReference;
+import net.sparktank.morrigan.android.model.PlayerReference;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.widget.Toast;
 
 public class RunMlistItemActionTask extends AsyncTask<Void, Void, String> {
@@ -49,7 +49,7 @@ public class RunMlistItemActionTask extends AsyncTask<Void, Void, String> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private final Activity activity;
-	private final ServerReference serverReference;
+	private final PlayerReference playerReference;
 	private final MlistItem mlistItem;
 	private final MlistItemCommand cmd;
 	
@@ -57,9 +57,9 @@ public class RunMlistItemActionTask extends AsyncTask<Void, Void, String> {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public RunMlistItemActionTask (Activity activity, ServerReference serverReference, MlistItem mlistItem, MlistItemCommand cmd) {
+	public RunMlistItemActionTask (Activity activity, PlayerReference playerReference, MlistItem mlistItem, MlistItemCommand cmd) {
 		this.activity = activity;
-		this.serverReference = serverReference;
+		this.playerReference = playerReference;
 		this.mlistItem = mlistItem;
 		this.cmd = cmd;
 	}
@@ -78,7 +78,7 @@ public class RunMlistItemActionTask extends AsyncTask<Void, Void, String> {
 	// In background thread:
 	@Override
 	protected String doInBackground(Void... params) {
-		String url = this.serverReference.getBaseUrl() + this.mlistItem.getRelativeUrl();
+		String url = this.playerReference.getServerReference().getBaseUrl() + this.mlistItem.getRelativeUrl();
 		
 		String encodedData = "action=";
 		switch (this.cmd) {
@@ -93,7 +93,7 @@ public class RunMlistItemActionTask extends AsyncTask<Void, Void, String> {
 			default: throw new IllegalArgumentException();
 		}
 		
-		encodedData = encodedData.concat("&playerid=" + TempConstants.PLAYERID);
+		encodedData = encodedData.concat("&playerid=" + String.valueOf(this.playerReference.getPlayerId()));
 		
 		try {
 			String resp = HttpHelper.getUrlContent(url, "POST", encodedData, "application/x-www-form-urlencoded");
@@ -115,6 +115,7 @@ public class RunMlistItemActionTask extends AsyncTask<Void, Void, String> {
 		
 		if (this.exception != null) { // TODO handle this better.
 			Toast.makeText(this.activity, this.exception.getMessage(), Toast.LENGTH_LONG).show();
+			Log.e("Morrigan", "result=" + result, this.exception);
 		}
 		else {
 			Toast.makeText(this.activity, result, Toast.LENGTH_LONG).show();

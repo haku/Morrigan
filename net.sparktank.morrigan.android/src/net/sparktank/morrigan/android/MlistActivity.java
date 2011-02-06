@@ -26,6 +26,7 @@ import net.sparktank.morrigan.android.model.MlistStateChangeListener;
 import net.sparktank.morrigan.android.model.ServerReference;
 import net.sparktank.morrigan.android.model.impl.ArtifactListAdaptorImpl;
 import net.sparktank.morrigan.android.model.impl.MlistReferenceImpl;
+import net.sparktank.morrigan.android.model.impl.PlayerReferenceImpl;
 import net.sparktank.morrigan.android.model.impl.ServerReferenceImpl;
 import net.sparktank.morrigan.android.tasks.GetMlistItemListTask;
 import net.sparktank.morrigan.android.tasks.GetMlistTask;
@@ -48,12 +49,14 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MlistActivity extends Activity implements MlistStateChangeListener, MlistItemListChangeListener {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public static final String SERVER_BASE_URL = "serverBaseUrl";
-	public static final String MLIST_BASE_URL = "mlistBaseUrl";
+	public static final String SERVER_BASE_URL = "serverBaseUrl"; // String.
+	public static final String MLIST_BASE_URL = "mlistBaseUrl"; // String.
+	public static final String PLAYER_ID = "playerId"; // int.
 	
 	public static final String QUERY = "query";
 	
@@ -65,6 +68,7 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 	private MlistState currentState = null;
 	private MlistItemList currentItemList = null;
 	private String initialQuery = null;
+	protected PlayerReferenceImpl playerReference;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Activity methods.
@@ -76,6 +80,7 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 		Bundle extras = getIntent().getExtras();
 		String serverBaseUrl = extras.getString(SERVER_BASE_URL);
 		String mlistBaseUrl = extras.getString(MLIST_BASE_URL);
+		int playerId = extras.getInt(PLAYER_ID, -1);
 		this.initialQuery = extras.getString(QUERY);
 		
 		if (serverBaseUrl != null && mlistBaseUrl != null) {
@@ -84,6 +89,10 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 		}
 		else {
 			finish();
+		}
+		
+		if (playerId >= 0) {
+			this.playerReference = new PlayerReferenceImpl(this.serverReference, playerId);
 		}
 		
 		this.setTitle(this.mlistReference.getBaseUrl());
@@ -193,13 +202,15 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 //	Commands - to be called on the UI thread.
 	
 	protected void play () {
-		RunMlistActionTask task = new RunMlistActionTask(this, this.mlistReference, MlistCommand.PLAY);
-		task.execute();
+		Toast.makeText(this, "No player specified.", Toast.LENGTH_LONG).show();
+//		RunMlistActionTask task = new RunMlistActionTask(this, this.mlistReference, MlistCommand.PLAY);
+//		task.execute();
 	}
 	
 	protected void queue () {
-		RunMlistActionTask task = new RunMlistActionTask(this, this.mlistReference, MlistCommand.QUEUE);
-		task.execute();
+		Toast.makeText(this, "No player specified.", Toast.LENGTH_LONG).show();
+//		RunMlistActionTask task = new RunMlistActionTask(this, this.mlistReference, MlistCommand.QUEUE);
+//		task.execute();
 	}
 	
 	protected void scan () {
@@ -267,8 +278,13 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				dialog.dismiss();
-				RunMlistItemActionTask task = new RunMlistItemActionTask(MlistActivity.this, MlistActivity.this.serverReference, item, MlistItemCommand.PLAY);
-				task.execute();
+				if (MlistActivity.this.playerReference != null) {
+					RunMlistItemActionTask task = new RunMlistItemActionTask(MlistActivity.this, MlistActivity.this.playerReference, item, MlistItemCommand.PLAY);
+					task.execute();
+				}
+				else {
+					Toast.makeText(MlistActivity.this, "Player not set.", Toast.LENGTH_LONG).show();
+				}
 			}
 		});
 		
@@ -276,8 +292,13 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				dialog.dismiss();
-				RunMlistItemActionTask task = new RunMlistItemActionTask(MlistActivity.this, MlistActivity.this.serverReference, item, MlistItemCommand.QUEUE);
-				task.execute();
+				if (MlistActivity.this.playerReference != null) {
+    				RunMlistItemActionTask task = new RunMlistItemActionTask(MlistActivity.this, MlistActivity.this.playerReference, item, MlistItemCommand.QUEUE);
+    				task.execute();
+				}
+				else {
+					Toast.makeText(MlistActivity.this, "Player not set.", Toast.LENGTH_LONG).show();
+				}
 			}
 		});
 		

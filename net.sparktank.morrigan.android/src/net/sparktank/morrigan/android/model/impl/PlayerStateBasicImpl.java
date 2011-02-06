@@ -25,8 +25,7 @@ import net.sparktank.morrigan.android.model.ServerReference;
 public class PlayerStateBasicImpl implements PlayerState, PlayerReference {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private int id;
-	
+	private int playerId;
 	private String baseUrl;
 	private PlayerReference playerReference;
 	
@@ -68,6 +67,11 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference {
 	}
 	
 	@Override
+	public int getPlayerId() {
+		return this.playerId;
+	}
+	
+	@Override
 	public ServerReference getServerReference() {
 		return this.playerReference.getServerReference();
 	}
@@ -83,11 +87,11 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference {
 	
 	@Override
 	public int getId() {
-		return this.id;
+		return this.playerId;
 	}
 
 	public void setId(int id) {
-		this.id = id;
+		this.playerId = id;
 	}
 	
 	@Override

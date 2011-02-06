@@ -19,9 +19,9 @@ package net.sparktank.morrigan.android.tasks;
 import java.io.IOException;
 import java.net.ConnectException;
 
-import net.sparktank.morrigan.android.TempConstants;
 import net.sparktank.morrigan.android.helper.HttpHelper;
 import net.sparktank.morrigan.android.model.MlistReference;
+import net.sparktank.morrigan.android.model.PlayerReference;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
@@ -50,15 +50,23 @@ public class RunMlistActionTask extends AsyncTask<Void, Void, String> {
 	private final Activity activity;
 	private final MlistReference mlistReference;
 	private final MlistCommand cmd;
+	private final PlayerReference playerReference;
 	
 	private Exception exception;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public RunMlistActionTask (Activity activity, MlistReference mlistReference, MlistCommand cmd) {
+		this(activity, mlistReference, cmd, null);
+	}
+	
+	public RunMlistActionTask (Activity activity, MlistReference mlistReference, MlistCommand cmd, PlayerReference playerReference) {
+		if ((cmd == MlistCommand.PLAY || cmd == MlistCommand.QUEUE) && playerReference == null) throw new IllegalArgumentException("No player specified.");
+		
 		this.activity = activity;
 		this.mlistReference = mlistReference;
 		this.cmd = cmd;
+		this.playerReference = playerReference;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -78,21 +86,19 @@ public class RunMlistActionTask extends AsyncTask<Void, Void, String> {
 		String encodedData = "action=";
 		switch (this.cmd) {
 			case PLAY:
-				encodedData = encodedData.concat("play");
+				encodedData = encodedData.concat("play").concat("&playerid=" + this.playerReference.getPlayerId());
 				break;
-				
+			
 			case QUEUE:
-				encodedData = encodedData.concat("queue");
+				encodedData = encodedData.concat("queue").concat("&playerid=" + this.playerReference.getPlayerId());
 				break;
-				
+			
 			case SCAN:
 				encodedData = encodedData.concat("scan");
 				break;
-				
+			
 			default: throw new IllegalArgumentException();
 		}
-		
-		encodedData = encodedData.concat("&playerid=" + TempConstants.PLAYERID);
 		
 		try {
 			String resp = HttpHelper.getUrlContent(this.mlistReference.getBaseUrl(), "POST", encodedData, "application/x-www-form-urlencoded");

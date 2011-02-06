@@ -48,8 +48,8 @@ import android.widget.Toast;
 public class PlayerActivity extends Activity implements PlayerStateChangeListener, PlayerQueueChangeListener {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public static final String SERVER_BASE_URL = "serverBaseUrl";
-	public static final String PLAYER_BASE_URL = "playerBaseUrl";
+	public static final String SERVER_BASE_URL = "serverBaseUrl"; // String.
+	public static final String PLAYER_ID = "playerId"; // int.
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -69,11 +69,11 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 		
 		Bundle extras = getIntent().getExtras();
 		String serverBaseUrl = extras.getString(SERVER_BASE_URL);
-		String mlistBaseUrl = extras.getString(PLAYER_BASE_URL);
+		int playerId = extras.getInt(PLAYER_ID, -1);
 		
-		if (serverBaseUrl != null && mlistBaseUrl != null) {
+		if (serverBaseUrl != null && playerId >= 0) {
 			this.serverReference = new ServerReferenceImpl(serverBaseUrl);
-			this.playerReference = new PlayerReferenceImpl(mlistBaseUrl, this.serverReference);
+			this.playerReference = new PlayerReferenceImpl(this.serverReference, playerId);
 		}
 		else {
 			finish();

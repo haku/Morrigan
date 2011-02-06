@@ -19,6 +19,7 @@ package net.sparktank.morrigan.android.model;
 public interface PlayerReference {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	public int getPlayerId ();
 	public String getBaseUrl ();
 	
 	public ServerReference getServerReference ();

@@ -23,6 +23,7 @@ import net.sparktank.morrigan.android.model.ServerReference;
 public class PlayerReferenceImpl implements PlayerReference {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	private final int playerId;
 	private final String baseUrl;
 	private final ServerReference serverReference;
 	
@@ -31,19 +32,25 @@ public class PlayerReferenceImpl implements PlayerReference {
 	public PlayerReferenceImpl (ServerReference serverReference, int playerId) {
 		if (serverReference == null) throw new IllegalArgumentException();
 		
-		this.serverReference = serverReference;
+		this.playerId = playerId;
 		this.baseUrl = serverReference.getBaseUrl() + Constants.CONTEXT_PLAYERS + "/" + playerId;
+		this.serverReference = serverReference;
 	}
 	
-	public PlayerReferenceImpl (String baseUrl, ServerReference serverReference) {
-		if (baseUrl == null) throw new IllegalArgumentException();
-		if (serverReference == null) throw new IllegalArgumentException();
-		
-		this.baseUrl = baseUrl;
-		this.serverReference = serverReference;
-	}
+//	public PlayerReferenceImpl (String baseUrl, ServerReference serverReference) {
+//		if (baseUrl == null) throw new IllegalArgumentException();
+//		if (serverReference == null) throw new IllegalArgumentException();
+//		
+//		this.baseUrl = baseUrl;
+//		this.serverReference = serverReference;
+//	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	@Override
+	public int getPlayerId() {
+		return this.playerId;
+	}
 	
 	@Override
 	public String getBaseUrl() {
