@@ -137,7 +137,7 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 	protected void showArtifactActivity (PlayerReference item) {
 		Intent intent = new Intent(getApplicationContext(), PlayerActivity.class);
 		intent.putExtra(MlistActivity.SERVER_BASE_URL, this.serverReference.getBaseUrl());
-		intent.putExtra(PlayerActivity.PLAYER_BASE_URL, item.getBaseUrl());
+		intent.putExtra(PlayerActivity.PLAYER_ID, item.getPlayerId());
 		startActivity(intent);
 	}
 	

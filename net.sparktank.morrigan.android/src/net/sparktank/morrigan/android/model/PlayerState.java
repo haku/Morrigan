@@ -21,6 +21,9 @@ public interface PlayerState extends Artifact {
 	
 	public PlayerReference getPlayerReference ();
 	
+	/**
+	 * Get the player id.
+	 */
 	public int getId ();
 	
 	public PlayState getPlayState ();

@@ -55,6 +55,7 @@ public class CommonDialogs {
 				intent.putExtra(MlistActivity.SERVER_BASE_URL, playerState.getPlayerReference().getServerReference().getBaseUrl());
 				intent.putExtra(MlistActivity.MLIST_BASE_URL, playerState.getListUrl());
 				intent.putExtra(MlistActivity.QUERY, query);
+				intent.putExtra(MlistActivity.PLAYER_ID, playerState.getPlayerReference().getPlayerId());
 				context.startActivity(intent);
 				
 			}
