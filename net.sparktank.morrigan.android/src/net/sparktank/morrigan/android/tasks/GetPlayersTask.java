@@ -18,7 +18,6 @@ package net.sparktank.morrigan.android.tasks;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.ConnectException;
 import java.util.concurrent.atomic.AtomicReference;
 
 import net.sparktank.morrigan.android.Constants;
@@ -64,29 +63,10 @@ public class GetPlayersTask extends AsyncTask<Void, Void, PlayerStateList> {
 	// In background thread:
 	@Override
 	protected PlayerStateList doInBackground(Void... params) {
-		String url = this.serverReference.getBaseUrl();
-		url = url.concat(Constants.CONTEXT_PLAYERS);
-		
 		try {
-			final AtomicReference<PlayerStateList> list = new AtomicReference<PlayerStateList>();
-			
-			HttpStreamHandler<SAXException> handler = new HttpStreamHandler<SAXException>() {
-				@Override
-				public void handleStream(InputStream is) throws IOException, SAXException {
-					PlayerStateList l;
-					l = new PlayerStateListImpl(is, GetPlayersTask.this.serverReference);
-					list.set(l);
-				}
-			};
-			
-			HttpHelper.getUrlContent(url, handler);
-			
-			return list.get();
+			return fetchPlayerList(this.serverReference);
 		}
-		catch (ConnectException e) {
-			this.exception = e;
-			return null;
-		} catch (IOException e) {
+		catch (IOException e) {
 			this.exception = e;
 			return null;
 		} catch (SAXException e) {
@@ -107,6 +87,28 @@ public class GetPlayersTask extends AsyncTask<Void, Void, PlayerStateList> {
 		if (this.changedListener != null) this.changedListener.onPlayersChange(result);
 		
 		this.activity.setProgressBarIndeterminateVisibility(false);
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	static public PlayerStateList fetchPlayerList (final ServerReference serverReference) throws IOException, SAXException {
+		String url = serverReference.getBaseUrl();
+		url = url.concat(Constants.CONTEXT_PLAYERS);
+		
+		final AtomicReference<PlayerStateList> list = new AtomicReference<PlayerStateList>();
+		
+		HttpStreamHandler<SAXException> handler = new HttpStreamHandler<SAXException>() {
+			@Override
+			public void handleStream(InputStream is) throws IOException, SAXException {
+				PlayerStateList l;
+				l = new PlayerStateListImpl(is, serverReference);
+				list.set(l);
+			}
+		};
+		
+		HttpHelper.getUrlContent(url, handler);
+		
+		return list.get();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

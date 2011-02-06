@@ -121,6 +121,7 @@ public class PlayerStateListImpl implements PlayerStateList, ContentHandler {
 		else if (this.stack.size() == 3 && localName.equals(PlayerStateXmlImpl.PLAYERID)) {
 			int v = Integer.parseInt(this.currentText.toString());
 			this.currentItem.setId(v);
+			this.currentItem.setPlayerReference(new PlayerReferenceImpl(this.serverReference, v));
 		}
 		else if (this.stack.size() == 3 && localName.equals(PlayerStateXmlImpl.PLAYSTATE)) {
 			int v = Integer.parseInt(this.currentText.toString());
