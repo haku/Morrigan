@@ -228,12 +228,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 			txtQueue.setText(newState.getQueueLength() + " items.");
 			
 			ImageView imgPlaystate = (ImageView) findViewById(R.id.imgPlaystate);
-			switch (newState.getPlayState()) {
-				case STOPPED: imgPlaystate.setImageResource(R.drawable.stop);  break;
-				case PLAYING: imgPlaystate.setImageResource(R.drawable.play);  break;
-				case PAUSED:  imgPlaystate.setImageResource(R.drawable.pause); break;
-				case LOADING: imgPlaystate.setImageResource(R.drawable.db);    break; // TODO find better icon.
-			}
+			imgPlaystate.setImageResource(newState.getImageResource());
 		}
 	}
 	

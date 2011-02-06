@@ -52,7 +52,7 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference {
 	
 	@Override
 	public int getImageResource() {
-		return R.drawable.play;
+		return getImageResource(getPlayState());
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -182,6 +182,18 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference {
 
 	public void setQueueLength(int queueLength) {
 		this.queueLength = queueLength;
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	static public int getImageResource (PlayState playState) {
+		switch (playState) {
+			case STOPPED: return R.drawable.stop;
+			case PLAYING: return R.drawable.play;
+			case PAUSED:  return R.drawable.pause;
+			case LOADING: return R.drawable.db; // TODO find better icon.
+			default: throw new IllegalArgumentException();
+		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
