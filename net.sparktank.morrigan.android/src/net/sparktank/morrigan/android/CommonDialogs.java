@@ -16,17 +16,14 @@
 
 package net.sparktank.morrigan.android;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import net.sparktank.morrigan.android.model.PlayerState;
 import net.sparktank.morrigan.android.model.PlayerStateList;
+import net.sparktank.morrigan.android.model.PlayerStateListChangeListener;
 import net.sparktank.morrigan.android.model.ServerReference;
 import net.sparktank.morrigan.android.tasks.GetPlayersTask;
-
-import org.xml.sax.SAXException;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -42,54 +39,48 @@ public class CommonDialogs {
 	}
 	
 	static public void doAskWhichPlayer (final Context context, final ServerReference serverReference, final PlayerSelectedListener listener) {
-		List<? extends PlayerState> playerList = null;
-		
-		try {
-			PlayerStateList fetchPlayerList = GetPlayersTask.fetchPlayerList(serverReference);
-			if (fetchPlayerList != null) playerList = fetchPlayerList.getPlayersStateList();
-		}
-		catch (IOException e) {
-			Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
-			return;
-		} catch (SAXException e) {
-			Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
-			return;
-		}
-		
-		if (playerList == null || playerList.size() < 1) {
-			Toast.makeText(context, "No players found.", Toast.LENGTH_LONG).show();
-			return;
-		}
-		
-		if (playerList.size() == 1) {
-			listener.playerSelected(playerList.iterator().next());
-			return;
-		}
-		
-		final List<? extends PlayerState> list = playerList;
-		String[] labels = new String[playerList.size()];
-		for (int i = 0; i < playerList.size(); i ++) {
-			PlayerState ps = playerList.get(i);
-			labels[i] = "Player " + ps.getId() + " (" + ps.getPlayState() + ")";
-		}
-		
-		AlertDialog.Builder builder = new AlertDialog.Builder(context);
-		builder.setTitle("Select player");
-		builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+		GetPlayersTask task = new GetPlayersTask(context, serverReference, new PlayerStateListChangeListener () {
 			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.dismiss();
+			public void onPlayersChange(PlayerStateList playersState) {
+				List<? extends PlayerState> playerList = playersState.getPlayersStateList();
+				
+				if (playerList == null || playerList.size() < 1) {
+					Toast.makeText(context, "No players found.", Toast.LENGTH_LONG).show();
+					return;
+				}
+				
+				if (playerList.size() == 1) {
+					listener.playerSelected(playerList.iterator().next());
+					return;
+				}
+				
+				final List<? extends PlayerState> list = playerList;
+				String[] labels = new String[playerList.size()];
+				for (int i = 0; i < playerList.size(); i ++) {
+					PlayerState ps = playerList.get(i);
+					labels[i] = "Player " + ps.getId() + " (" + ps.getPlayState() + ")";
+				}
+				
+				AlertDialog.Builder builder = new AlertDialog.Builder(context);
+				builder.setTitle("Select player");
+				builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				});
+				builder.setItems(labels, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int item) {
+						dialog.dismiss();
+						listener.playerSelected(list.get(item));
+					}
+				});
+				AlertDialog alert = builder.create();
+				alert.show();
 			}
 		});
-		builder.setItems(labels, new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int item) {
-				dialog.dismiss();
-				listener.playerSelected(list.get(item));
-			}
-		});
-		AlertDialog alert = builder.create();
-		alert.show();
+		task.execute();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

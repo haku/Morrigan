@@ -31,12 +31,15 @@ import net.sparktank.morrigan.android.model.impl.PlayerStateListImpl;
 import org.xml.sax.SAXException;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.widget.Toast;
 
 public class GetPlayersTask extends AsyncTask<Void, Void, PlayerStateList> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	private final Context context;
 	private final Activity activity;
 	protected final ServerReference serverReference;
 	private final PlayerStateListChangeListener changedListener;
@@ -45,7 +48,15 @@ public class GetPlayersTask extends AsyncTask<Void, Void, PlayerStateList> {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	public GetPlayersTask (Context context, ServerReference serverReference, PlayerStateListChangeListener changedListener) {
+		this.context = context;
+		this.activity = null;
+		this.serverReference = serverReference;
+		this.changedListener = changedListener;
+	}
+	
 	public GetPlayersTask (Activity activity, ServerReference serverReference, PlayerStateListChangeListener changedListener) {
+		this.context = activity;
 		this.activity = activity;
 		this.serverReference = serverReference;
 		this.changedListener = changedListener;
@@ -53,11 +64,18 @@ public class GetPlayersTask extends AsyncTask<Void, Void, PlayerStateList> {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	private ProgressDialog dialog;
+	
 	// In UI thread:
 	@Override
 	protected void onPreExecute() {
 		super.onPreExecute();
-		this.activity.setProgressBarIndeterminateVisibility(true);
+		if (this.activity != null) {
+			this.activity.setProgressBarIndeterminateVisibility(true);
+		}
+		else {
+			this.dialog = ProgressDialog.show(this.context, null, "Please wait...", true);
+		}
 	}
 	
 	// In background thread:
@@ -81,12 +99,13 @@ public class GetPlayersTask extends AsyncTask<Void, Void, PlayerStateList> {
 		super.onPostExecute(result);
 		
 		if (this.exception != null) { // TODO handle this better.
-			Toast.makeText(this.activity, this.exception.getMessage(), Toast.LENGTH_LONG).show();
+			Toast.makeText(this.context, this.exception.getMessage(), Toast.LENGTH_LONG).show();
 		}
 		
 		if (this.changedListener != null) this.changedListener.onPlayersChange(result);
 		
-		this.activity.setProgressBarIndeterminateVisibility(false);
+		if (this.dialog != null) this.dialog.dismiss(); // This will fail if the screen is rotated while we are fetching.
+		if (this.activity != null) this.activity.setProgressBarIndeterminateVisibility(false);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
