@@ -8,7 +8,8 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.bio.SocketConnector;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
-import org.eclipse.jetty.servlet.ServletHandler;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.component.LifeCycle;
 import org.eclipse.jetty.util.component.LifeCycle.Listener;
 import org.eclipse.jetty.webapp.WebAppContext;
@@ -42,38 +43,30 @@ public class MorriganServer {
 			
 			this.server.addLifeCycleListener(this.listener);
 			
-			WebAppContext webapp = new WebAppContext();
-			webapp.setContextPath("/");
-			webapp.setWar(Config.getWuiWarLocation());
+			ContextHandlerCollection contexts = new ContextHandlerCollection();
+			this.server.setHandler(contexts);
+			
+			ServletContextHandler servletContext = new ServletContextHandler(contexts, "/", ServletContextHandler.SESSIONS);
+			servletContext.addServlet(new ServletHolder(new PlayersServlet()), PlayersServlet.CONTEXTPATH + "/*");
+			servletContext.addServlet(new ServletHolder(new MlistsServlet()), MlistsServlet.CONTEXTPATH + "/*");
+			
+//			final URL warUrl = this.class.getClassLoader().getResource(WEBAPPDIR);
+//			final String warUrlString = warUrl.toExternalForm();
+//			server.setHandler(new WebAppContext(warUrlString, CONTEXTPATH));
+			
+			WebAppContext webapp = new WebAppContext(Config.getWuiWarLocation(), "/");
+			// This is a hack to fix FileNotFound "org/eclipse/jetty/webapp/webdefault.xml" (in jetty-webapp-7.2.2.v20101205.jar)
+			Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
+			contexts.addHandler(webapp);
 			
 			ContextHandler conPlayers = new ContextHandler();
 			conPlayers.setContextPath("/player");
 			conPlayers.setResourceBase(".");
-			conPlayers.setClassLoader(Thread.currentThread().getContextClassLoader());
 			conPlayers.setHandler(new PlayersHandler());
-			
-			ContextHandler conPlayersXml = new ContextHandler();
-			conPlayersXml.setContextPath(PlayersServlet.CONTEXTPATH);
-			conPlayersXml.setResourceBase(".");
-			ServletHandler playersHandlerXml = new ServletHandler();
-			playersHandlerXml.addServletWithMapping(PlayersServlet.class, "/"); // Relative to conPlayersXml's context.
-			conPlayersXml.setHandler(playersHandlerXml);
-			
-			ContextHandler conMlist = new ContextHandler();
-			conMlist.setContextPath(MlistsServlet.CONTEXTPATH);
-			conMlist.setResourceBase(".");
-			ServletHandler mlistHandler = new ServletHandler();
-			mlistHandler.addServletWithMapping(MlistsServlet.class, "/"); // Relative to mlistHandler's context.
-			conMlist.setHandler(mlistHandler);
-			
-			ContextHandlerCollection contexts = new ContextHandlerCollection();
-			contexts.addHandler(webapp);
 			contexts.addHandler(conPlayers);
-			contexts.addHandler(conPlayersXml);
-			contexts.addHandler(conMlist);
-			this.server.setHandler(contexts);
 			
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			throw new MorriganException("Failed to create server object.", e);
 		}
 	}

@@ -100,9 +100,8 @@ public class MlistsServlet extends HttpServlet {
 	 * Param action will not be null when verb==POST.
 	 */
 	private void processRequest (Verb verb, HttpServletRequest req, HttpServletResponse resp, String action) throws IOException, DbException, SAXException, MorriganException {
-		String actualTarget = req.getRequestURI().substring(req.getContextPath().length());
-		
-		if (actualTarget.equals(ROOTPATH)) {
+		String pathInfo = req.getPathInfo();
+		if (pathInfo == null || pathInfo.length() < 1 || pathInfo.equals(ROOTPATH)) {
 			if (verb == Verb.POST) {
 				postToRoot(resp, action);
 			}
@@ -111,7 +110,7 @@ public class MlistsServlet extends HttpServlet {
 			}
 		}
 		else {
-			String path = actualTarget.substring(ROOTPATH.length());
+			String path = pathInfo.substring(ROOTPATH.length());
 			if (path.length() > 0) {
 				String[] pathParts = path.split("/");
 				if (pathParts.length >= 2) {

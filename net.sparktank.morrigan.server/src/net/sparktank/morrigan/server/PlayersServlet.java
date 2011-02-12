@@ -5,6 +5,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -43,16 +45,12 @@ public class PlayersServlet extends HttpServlet {
 	
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		String actualTarget = req.getRequestURI().substring(req.getContextPath().length());
-//		System.err.println("PlayersHandlerXml:target="+actualTarget);
-		writeResponse(resp, actualTarget);
+		writeResponse(resp, req.getPathInfo());
 	}
 	
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		String actualTarget = req.getRequestURI().substring(req.getContextPath().length());
-		
-		int n = Integer.parseInt(actualTarget.substring(ROOTPATH.length()));
+		int n = Integer.parseInt(req.getPathInfo().substring(ROOTPATH.length()));
 		IPlayerLocal player = PlayerRegister.getLocalPlayer(n);
 		
 		String act = req.getParameter("action");
@@ -63,15 +61,15 @@ public class PlayersServlet extends HttpServlet {
 		}
 		else if (act.equals("playpause")) {
 			player.pausePlaying();
-			writeResponse(resp, actualTarget);
+			writeResponse(resp, req.getPathInfo());
 		}
 		else if (act.equals("next")) {
 			player.nextTrack();
-			writeResponse(resp, actualTarget);
+			writeResponse(resp, req.getPathInfo());
 		}
 		else if (act.equals("stop")) {
 			player.stopPlaying();
-			writeResponse(resp, actualTarget);
+			writeResponse(resp, req.getPathInfo());
 		}
 		else {
 			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -80,8 +78,8 @@ public class PlayersServlet extends HttpServlet {
 		}
 	}
 	
-	private void writeResponse (HttpServletResponse resp, String actualTarget) throws IOException, ServletException {
-		if (actualTarget.equals(ROOTPATH)) {
+	private void writeResponse (HttpServletResponse resp, String relativePath) throws IOException, ServletException {
+		if (relativePath == null || relativePath.length() < 1 || relativePath.equals(ROOTPATH)) {
 			try {
 				printPlayersList(resp);
 			} catch (SAXException e) {
@@ -89,7 +87,7 @@ public class PlayersServlet extends HttpServlet {
 			}
 		}
 		else {
-			String path = actualTarget.substring(ROOTPATH.length()); // Expecting path = '0' or '0/queue'.
+			String path = relativePath.substring(ROOTPATH.length()); // Expecting path = '0' or '0/queue'.
 			if (path.length() > 0) {
 				String[] pathParts = path.split("/");
 				if (pathParts.length >= 1) {
@@ -136,7 +134,7 @@ public class PlayersServlet extends HttpServlet {
 					catch (NumberFormatException e) {
 						resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
 						resp.setContentType("text/plain");
-						resp.getWriter().println("HTTP Error 404 not found '" + actualTarget + "' desu~");
+						resp.getWriter().println("HTTP Error 404 not found '" + relativePath + "' desu~ (could not parse '"+playerNumberRaw+"' as a player.)");
 					}
 				}
 			}
@@ -242,6 +240,13 @@ public class PlayersServlet extends HttpServlet {
 			AbstractFeed.addElement(dw, "playposition", p.getCurrentPosition());
 			AbstractFeed.addElement(dw, "trackfile", filepath);
 			AbstractFeed.addElement(dw, "trackduration", p.getCurrentTrackDuration());
+			
+			Map<Integer, String> mons = p.getMonitors();
+			if (mons != null) {
+				for (Entry<Integer, String> mon : mons.entrySet()) {
+					AbstractFeed.addElement(dw, "monitor", mon.getKey() + ":" + mon.getValue());
+				}
+			}
 		}
 	}
 	
