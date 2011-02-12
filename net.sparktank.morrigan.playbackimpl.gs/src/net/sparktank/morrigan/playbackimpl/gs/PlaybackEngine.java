@@ -201,7 +201,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 	PlayBin playbin = null;
 	VideoComponent videoComponent = null;   // SWT / GStreamer.
 	Element videoElement = null;            // GStreamer.
-	private volatile boolean hasVideo = false;
+	volatile boolean hasVideo = false;
 	
 	private void finalisePlayback () {
 		this.logger.fine("finalisePlayback() >>>");
@@ -691,6 +691,8 @@ public class PlaybackEngine implements IPlaybackEngine {
 							handleEosEvent("m=" + position + ">=" + PlaybackEngine.this.lastDuration);
 						}
 					}
+					
+					if (PlaybackEngine.this.videoFrameParent != null && PlaybackEngine.this.hasVideo) ScreenSaver.pokeScreenSaverProtected();
 				}
 				
 				try {
