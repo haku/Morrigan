@@ -1,5 +1,6 @@
 package net.sparktank.morrigan.server.boot;
 
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -64,6 +65,10 @@ public class Activator implements BundleActivator {
 		
 		@Override
 		public Composite getCurrentMediaFrameParent() {
+			return null;
+		}
+		@Override
+		public Map<Integer, String> getMonitors() {
 			return null;
 		}
 		@Override

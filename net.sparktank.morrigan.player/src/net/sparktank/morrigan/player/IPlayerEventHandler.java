@@ -1,5 +1,7 @@
 package net.sparktank.morrigan.player;
 
+import java.util.Map;
+
 import net.sparktank.morrigan.model.media.IMediaTrack;
 import net.sparktank.morrigan.model.media.IMediaTrackList;
 
@@ -32,6 +34,8 @@ public interface IPlayerEventHandler {
 	public IMediaTrackList<IMediaTrack> getCurrentList () ;
 	
 	public Composite getCurrentMediaFrameParent () ;
+	
+	public Map<Integer, String> getMonitors ();
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

@@ -1,5 +1,7 @@
 package net.sparktank.morrigan.server;
 
+import java.util.Map;
+
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import net.sparktank.morrigan.model.media.IMediaTrack;
 import net.sparktank.morrigan.model.media.IMediaTrackList;
@@ -12,6 +14,7 @@ import net.sparktank.morrigan.util.ErrorHelper;
 
 import org.eclipse.swt.widgets.Composite;
 
+@Deprecated
 public class ServerMain {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -61,6 +64,10 @@ public class ServerMain {
 		
 		@Override
 		public Composite getCurrentMediaFrameParent() {
+			return null;
+		}
+		@Override
+		public Map<Integer, String> getMonitors() {
 			return null;
 		}
 		@Override
