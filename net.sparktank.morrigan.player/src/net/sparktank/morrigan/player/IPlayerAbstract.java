@@ -1,6 +1,7 @@
 package net.sparktank.morrigan.player;
 
 import java.util.List;
+import java.util.Map;
 
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
@@ -45,6 +46,8 @@ public interface IPlayerAbstract {
 	public void moveInQueue(List<PlayItem> items, boolean moveDown);
 	public List<PlayItem> getQueueList();
 	public DurationData getQueueTotalDuration();
+	
+	public Map<Integer, String> getMonitors ();
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
