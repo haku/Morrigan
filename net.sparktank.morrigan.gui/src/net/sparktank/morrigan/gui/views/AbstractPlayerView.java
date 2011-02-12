@@ -1,7 +1,9 @@
 package net.sparktank.morrigan.gui.views;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.sparktank.morrigan.engines.hotkey.IHotkeyEngine;
 import net.sparktank.morrigan.engines.hotkey.IHotkeyListener;
@@ -43,6 +45,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Monitor;
@@ -178,6 +181,17 @@ public abstract class AbstractPlayerView extends ViewPart {
 		@Override
 		public Composite getCurrentMediaFrameParent() {
 			return _getCurrentMediaFrameParent();
+		}
+		
+		@Override
+		public Map<Integer, String> getMonitors () {
+			Map<Integer, String> ret = new LinkedHashMap<Integer, String>();
+			for (int i = 0; i < getSite().getShell().getDisplay().getMonitors().length; i++) {
+				Monitor mon = getSite().getShell().getDisplay().getMonitors()[i];
+				Rectangle bounds = mon.getBounds();
+				ret.put(Integer.valueOf(i), bounds.width + "x" + bounds.height);
+			}
+			return ret;
 		}
 		
 		@Override
