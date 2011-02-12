@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import net.sparktank.morrigan.engines.EngineFactory;
 import net.sparktank.morrigan.engines.common.ImplException;
@@ -652,5 +653,12 @@ public class Player implements IPlayerLocal {
 		}
 	}
 
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	@Override
+	public Map<Integer, String> getMonitors() {
+		return this.eventHandler.getMonitors();
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

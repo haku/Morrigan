@@ -1,6 +1,7 @@
 package net.sparktank.morrigan.player;
 
 import java.util.List;
+import java.util.Map;
 
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
@@ -167,6 +168,11 @@ public class PlayerRemote implements IPlayerRemote {
 	@Override
 	public DurationData getQueueTotalDuration() {
 		throw new RuntimeException("Not implemented.");
+	}
+	
+	@Override
+	public Map<Integer, String> getMonitors() {
+		throw new UnsupportedOperationException("Not implemented.");
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
