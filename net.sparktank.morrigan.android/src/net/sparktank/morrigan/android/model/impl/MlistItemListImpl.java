@@ -46,6 +46,9 @@ public class MlistItemListImpl implements MlistItemList, ContentHandler {
 	
 	public static final String TITLE = "title";
 	public static final String TYPE = "type";
+	public static final String DURATION = "duration";
+	public static final String STARTCOUNT = "startcount";
+	public static final String ENDCOUNT = "endcount";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -129,11 +132,23 @@ public class MlistItemListImpl implements MlistItemList, ContentHandler {
 			this.currentItem = null;
 		}
 		else if (this.stack.size() == 3 && localName.equals(TITLE)) {
-			this.currentItem.setTitle(this.currentText.toString());
+			this.currentItem.setTrackTitle(this.currentText.toString());
 		}
 		else if (this.stack.size() == 3 && localName.equals(TYPE)) {
 			int v = Integer.parseInt(this.currentText.toString());
 			this.currentItem.setType(v);
+		}
+		else if (this.stack.size() == 3 && localName.equals(DURATION)) {
+			long v = Integer.parseInt(this.currentText.toString());
+			this.currentItem.setDuration(v);
+		}
+		else if (this.stack.size() == 3 && localName.equals(STARTCOUNT)) {
+			long v = Integer.parseInt(this.currentText.toString());
+			this.currentItem.setStartCount(v);
+		}
+		else if (this.stack.size() == 3 && localName.equals(ENDCOUNT)) {
+			long v = Integer.parseInt(this.currentText.toString());
+			this.currentItem.setEndCount(v);
 		}
 		
 		this.stack.pop();
