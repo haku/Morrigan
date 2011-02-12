@@ -17,6 +17,7 @@
 package net.sparktank.morrigan.android.model.impl;
 
 import net.sparktank.morrigan.android.R;
+import net.sparktank.morrigan.android.helper.TimeHelper;
 import net.sparktank.morrigan.android.model.MlistItem;
 
 public class MlistItemBasicImpl implements MlistItem {
@@ -25,15 +26,22 @@ public class MlistItemBasicImpl implements MlistItem {
 	private String title;
 	private int type;
 	private String relativeUrl;
+	private long duration;
+	private long startCount;
+	private long endCount;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
 	public String getTitle() {
+		return this.title + " (" + TimeHelper.formatTimeSeconds(this.duration) + ")";
+	}
+	
+	public String getTrackTitle() {
 		return this.title;
 	}
 	
-	public void setTitle(String title) {
+	public void setTrackTitle(String title) {
 		this.title = title;
 	}
 	
@@ -69,6 +77,30 @@ public class MlistItemBasicImpl implements MlistItem {
 	@Override
 	public String getRelativeUrl() {
 		return this.relativeUrl;
+	}
+
+	public long getDuration() {
+		return this.duration;
+	}
+
+	public void setDuration(long duration) {
+		this.duration = duration;
+	}
+
+	public long getStartCount() {
+		return this.startCount;
+	}
+
+	public void setStartCount(long startCount) {
+		this.startCount = startCount;
+	}
+
+	public long getEndCount() {
+		return this.endCount;
+	}
+
+	public void setEndCount(long endCount) {
+		this.endCount = endCount;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

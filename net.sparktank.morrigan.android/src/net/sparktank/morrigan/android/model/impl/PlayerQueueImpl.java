@@ -130,7 +130,7 @@ public class PlayerQueueImpl implements PlayerQueue, ContentHandler {
 		if (this.stack.size() == 2 && localName.equals(ENTRY)) {
 			if (this.currentItemRelativeUrl != null) {
 				MlistItemBasicImpl item = new MlistItemBasicImpl();
-				item.setTitle(this.currentTitle);
+				item.setTrackTitle(this.currentTitle);
 				item.setRelativeUrl(this.currentItemRelativeUrl);
 				item.setType(1); // TODO reference an enum?
 				this.artifactList.add(item);

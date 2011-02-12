@@ -18,6 +18,7 @@ package net.sparktank.morrigan.android;
 
 import java.util.concurrent.atomic.AtomicReference;
 
+import net.sparktank.morrigan.android.helper.TimeHelper;
 import net.sparktank.morrigan.android.model.ArtifactList;
 import net.sparktank.morrigan.android.model.ArtifactListAdaptor;
 import net.sparktank.morrigan.android.model.PlayerQueue;
@@ -222,7 +223,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 			txtListname.setText(newState.getListTitle());
 			
 			TextView txtTitle = (TextView) findViewById(R.id.txtTitle);
-			txtTitle.setText(newState.getTrackTitle());
+			txtTitle.setText(newState.getTrackTitle() + " (" + TimeHelper.formatTimeSeconds(newState.getTrackDuration()) + ")");
 			
 			TextView txtQueue = (TextView) findViewById(R.id.txtQueue);
 			txtQueue.setText(newState.getQueueLength() + " items.");
