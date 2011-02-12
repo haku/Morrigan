@@ -16,6 +16,8 @@
 
 package net.sparktank.morrigan.android.model.impl;
 
+import java.util.Map;
+
 import net.sparktank.morrigan.android.helper.XmlParser;
 import net.sparktank.morrigan.android.model.PlayState;
 import net.sparktank.morrigan.android.model.PlayerReference;
@@ -137,6 +139,12 @@ public class PlayerStateXmlImpl extends XmlParser implements PlayerState {
 	@Override
 	public int getQueueLength() {
 		return this.getNodeInt(QUEUELENGTH);
+	}
+	
+	@Override
+	public Map<Integer, String> getMonitors() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Not implemented.");
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

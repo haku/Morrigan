@@ -16,6 +16,8 @@
 
 package net.sparktank.morrigan.android.model.impl;
 
+import java.util.Map;
+
 import net.sparktank.morrigan.android.R;
 import net.sparktank.morrigan.android.model.PlayState;
 import net.sparktank.morrigan.android.model.PlayerReference;
@@ -182,6 +184,12 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference {
 
 	public void setQueueLength(int queueLength) {
 		this.queueLength = queueLength;
+	}
+	
+	@Override
+	public Map<Integer, String> getMonitors() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Not implemented.");
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

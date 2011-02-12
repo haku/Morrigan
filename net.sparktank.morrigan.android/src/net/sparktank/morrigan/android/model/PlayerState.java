@@ -16,6 +16,8 @@
 
 package net.sparktank.morrigan.android.model;
 
+import java.util.Map;
+
 public interface PlayerState extends Artifact {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -40,6 +42,8 @@ public interface PlayerState extends Artifact {
 	
 	public int getQueueLength ();
 	// TODO queueduration
+	
+	public Map<Integer, String> getMonitors ();
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -	
 }
