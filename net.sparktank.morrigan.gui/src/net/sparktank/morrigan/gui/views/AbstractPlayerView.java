@@ -185,13 +185,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 		
 		@Override
 		public Map<Integer, String> getMonitors () {
-			Map<Integer, String> ret = new LinkedHashMap<Integer, String>();
-			for (int i = 0; i < getSite().getShell().getDisplay().getMonitors().length; i++) {
-				Monitor mon = getSite().getShell().getDisplay().getMonitors()[i];
-				Rectangle bounds = mon.getBounds();
-				ret.put(Integer.valueOf(i), bounds.width + "x" + bounds.height);
-			}
-			return ret;
+			return getMonitorCache();
 		}
 		
 		@Override
@@ -355,6 +349,25 @@ public abstract class AbstractPlayerView extends ViewPart {
 //	Full screen stuff.
 	
 	FullscreenShell fullscreenShell = null;
+	Map<Integer, String> monitorCache = null;
+	
+	protected Map<Integer, String> getMonitorCache () {
+		if (this.monitorCache == null) { // TODO check age of cache?
+			getSite().getShell().getDisplay().syncExec(new Runnable() {
+				@Override
+				public void run() {
+					Map<Integer, String> ret = new LinkedHashMap<Integer, String>();
+					for (int i = 0; i < getSite().getShell().getDisplay().getMonitors().length; i++) {
+						Monitor mon = getSite().getShell().getDisplay().getMonitors()[i];
+						Rectangle bounds = mon.getBounds();
+						ret.put(Integer.valueOf(i), bounds.width + "x" + bounds.height);
+					}
+					AbstractPlayerView.this.monitorCache = ret;
+				}
+			});
+		}
+		return this.monitorCache;
+	}
 	
 	boolean isFullScreen () {
 		return !(this.fullscreenShell == null);
