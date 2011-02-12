@@ -1,0 +1,12 @@
+03c7eb7165857bd80678b2da78d45a4a jetty-distribution-7.2.2.v20101205.tar.gz http://download.eclipse.org/jetty/7.2.2.v20101205/dist/jetty-distribution-7.2.2.v20101205.tar.gz
+dc85c39af1ae1f65ff993a7f983caaaa jetty-continuation-7.2.2.v20101205.jar
+ec37f47eff1f908a29f30d6e05429dc1 jetty-http-7.2.2.v20101205.jar
+a1d1ac554c5593c047b78bc33d2e54b7 jetty-io-7.2.2.v20101205.jar
+ec8778b1562f1c0375f367ce8b78b55f jetty-security-7.2.2.v20101205.jar
+af5a7b85e6ed54376887ea888ff8cd2f jetty-server-7.2.2.v20101205.jar
+3572066ade89c3327abc859db51caa2e jetty-servlet-7.2.2.v20101205.jar
+ecb748324d770d41c15762a1cb480ba9 jetty-servlets-7.2.2.v20101205.jar
+1c6f8267aa3416c7b9b5fab401ece78b jetty-util-7.2.2.v20101205.jar
+d3e679a9964baa3aacfe4028ab61661b jetty-webapp-7.2.2.v20101205.jar
+7a11ce81781d9af8ddb2f4f69c1bb0e7 jetty-xml-7.2.2.v20101205.jar
+a321a8c8130d63b832b7b6d44d82dca5 servlet-api-2.5.jar
