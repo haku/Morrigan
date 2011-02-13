@@ -34,7 +34,10 @@ public class MlistItemBasicImpl implements MlistItem {
 	
 	@Override
 	public String getTitle() {
-		return this.title + " (" + TimeHelper.formatTimeSeconds(this.duration) + ")";
+		if (this.duration > 0) {
+			return this.title + " (" + TimeHelper.formatTimeSeconds(this.duration) + ")";
+		}
+		return this.title;
 	}
 	
 	public String getTrackTitle() {
