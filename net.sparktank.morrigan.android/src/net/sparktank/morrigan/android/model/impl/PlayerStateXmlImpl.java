@@ -198,7 +198,7 @@ public class PlayerStateXmlImpl implements PlayerState, ContentHandler {
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 		this.stack.push(localName);
 		
-		if (this.stack.size() == 1 && localName.equals("link")) {
+		if (this.stack.size() == 2 && localName.equals("link")) {
 			String relVal = attributes.getValue("rel");
 			if (relVal != null && relVal.equals("list")) {
 				String hrefVal = attributes.getValue("href");
