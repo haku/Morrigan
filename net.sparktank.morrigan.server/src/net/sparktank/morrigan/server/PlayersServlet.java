@@ -45,7 +45,7 @@ public class PlayersServlet extends HttpServlet {
 	
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		writeResponse(resp, req.getPathInfo());
+		writeResponse(req, resp);
 	}
 	
 	@Override
@@ -61,15 +61,15 @@ public class PlayersServlet extends HttpServlet {
 		}
 		else if (act.equals("playpause")) {
 			player.pausePlaying();
-			writeResponse(resp, req.getPathInfo());
+			writeResponse(req, resp);
 		}
 		else if (act.equals("next")) {
 			player.nextTrack();
-			writeResponse(resp, req.getPathInfo());
+			writeResponse(req, resp);
 		}
 		else if (act.equals("stop")) {
 			player.stopPlaying();
-			writeResponse(resp, req.getPathInfo());
+			writeResponse(req, resp);
 		}
 		else {
 			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -78,8 +78,11 @@ public class PlayersServlet extends HttpServlet {
 		}
 	}
 	
-	private void writeResponse (HttpServletResponse resp, String relativePath) throws IOException, ServletException {
-		if (relativePath == null || relativePath.length() < 1 || relativePath.equals(ROOTPATH)) {
+	private void writeResponse (HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+		String requestURI = req.getRequestURI();
+		String reqPath = requestURI.startsWith(CONTEXTPATH) ? requestURI.substring(CONTEXTPATH.length()) : requestURI;
+		
+		if (reqPath == null || reqPath.length() < 1 || reqPath.equals(ROOTPATH)) {
 			try {
 				printPlayersList(resp);
 			} catch (SAXException e) {
@@ -87,7 +90,7 @@ public class PlayersServlet extends HttpServlet {
 			}
 		}
 		else {
-			String path = relativePath.substring(ROOTPATH.length()); // Expecting path = '0' or '0/queue'.
+			String path = reqPath.substring(ROOTPATH.length()); // Expecting path = '0' or '0/queue'.
 			if (path.length() > 0) {
 				String[] pathParts = path.split("/");
 				if (pathParts.length >= 1) {
@@ -134,7 +137,7 @@ public class PlayersServlet extends HttpServlet {
 					catch (NumberFormatException e) {
 						resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
 						resp.setContentType("text/plain");
-						resp.getWriter().println("HTTP Error 404 not found '" + relativePath + "' desu~ (could not parse '"+playerNumberRaw+"' as a player.)");
+						resp.getWriter().println("HTTP Error 404 not found '" + reqPath + "' desu~ (could not parse '"+playerNumberRaw+"' as a player.)");
 					}
 				}
 			}
