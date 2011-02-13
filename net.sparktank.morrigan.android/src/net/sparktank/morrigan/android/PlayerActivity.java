@@ -256,10 +256,20 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 			txtListname.setText(newState.getListTitle());
 			
 			TextView txtTitle = (TextView) findViewById(R.id.txtTitle);
-			txtTitle.setText(newState.getTrackTitle() + " (" + TimeHelper.formatTimeSeconds(newState.getTrackDuration()) + ")");
+			if (newState.getTrackDuration() > 0) {
+				txtTitle.setText(newState.getTrackTitle() + " (" + TimeHelper.formatTimeSeconds(newState.getTrackDuration()) + ")");
+			}
+			else {
+				txtTitle.setText(newState.getTrackTitle());
+			}
 			
 			TextView txtQueue = (TextView) findViewById(R.id.txtQueue);
-			txtQueue.setText(newState.getQueueLength() + " items.");
+			if (newState.getQueueDuration() > 0) {
+				txtQueue.setText(newState.getQueueLength() + " items, "+TimeHelper.formatTimeSeconds(newState.getQueueDuration())+".");
+			}
+			else {
+				txtQueue.setText(newState.getQueueLength() + " items.");
+			}
 			
 			ImageView imgPlaystate = (ImageView) findViewById(R.id.imgPlaystate);
 			imgPlaystate.setImageResource(newState.getImageResource());
