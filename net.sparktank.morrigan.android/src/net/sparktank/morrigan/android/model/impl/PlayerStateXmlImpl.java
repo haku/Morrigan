@@ -261,7 +261,7 @@ public class PlayerStateXmlImpl implements PlayerState, ContentHandler {
 				String data = this.currentText.toString();
 				int indexOf = data.indexOf(":");
 				String idString = data.substring(0, indexOf);
-				String desString = data.substring(indexOf);
+				String desString = data.substring(indexOf + 1);
 				Integer id = Integer.valueOf(idString);
 				this.monitors.put(id, desString);
 			}
