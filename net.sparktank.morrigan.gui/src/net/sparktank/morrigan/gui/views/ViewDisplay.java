@@ -1,6 +1,6 @@
 package net.sparktank.morrigan.gui.views;
 
-import java.util.List;
+import java.util.Collection;
 
 import net.sparktank.morrigan.gui.display.ScreenPainter;
 import net.sparktank.morrigan.gui.display.ScreenPainter.ScreenType;
@@ -40,7 +40,7 @@ public class ViewDisplay extends ViewPart {
 			this.viewControls.attachViewDisplay(this);
 			this.viewControls.registerScreenPainter(this.screenPainter);
 			
-			List<FullScreenAction> fullScreenActions = this.viewControls.getFullScreenActions();
+			Collection<FullScreenAction> fullScreenActions = this.viewControls.getFullScreenActions();
 			for (FullScreenAction a : fullScreenActions) {
 				getViewSite().getActionBars().getToolBarManager().add(a);
 			}

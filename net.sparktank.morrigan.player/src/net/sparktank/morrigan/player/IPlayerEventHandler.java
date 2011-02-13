@@ -37,5 +37,7 @@ public interface IPlayerEventHandler {
 	
 	public Map<Integer, String> getMonitors ();
 	
+	public void goFullscreen (int monitor);
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

@@ -51,7 +51,7 @@ public class PlayersServlet extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		int n = Integer.parseInt(req.getPathInfo().substring(ROOTPATH.length()));
-		IPlayerLocal player = PlayerRegister.getLocalPlayer(n);
+		IPlayerAbstract player = PlayerRegister.getLocalPlayer(n);
 		
 		String act = req.getParameter("action");
 		if (act == null) {
@@ -70,6 +70,19 @@ public class PlayersServlet extends HttpServlet {
 		else if (act.equals("stop")) {
 			player.stopPlaying();
 			writeResponse(req, resp);
+		}
+		else if (act.equals("fullscreen")) {
+			String monitorString = req.getParameter("monitor");
+			if (monitorString != null && monitorString.length() > 0) {
+				int monitorId = Integer.parseInt(monitorString);
+				player.goFullscreen(monitorId);
+				writeResponse(req, resp);
+			}
+			else {
+				resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+				resp.setContentType("text/plain");
+				resp.getWriter().println("HTTP Error 400 'fullscreen' parameter not set desu~");
+			}
 		}
 		else {
 			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
