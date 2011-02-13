@@ -16,6 +16,10 @@
 
 package net.sparktank.morrigan.android;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicReference;
 
 import net.sparktank.morrigan.android.helper.TimeHelper;
@@ -34,6 +38,8 @@ import net.sparktank.morrigan.android.tasks.GetPlayerQueueTask;
 import net.sparktank.morrigan.android.tasks.SetPlaystateTask;
 import net.sparktank.morrigan.android.tasks.SetPlaystateTask.TargetPlayState;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -164,7 +170,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 		switch (item.getItemId()) {
 			
 			case MENU_FULLSCREEN:
-				Toast.makeText(this, "TODO", Toast.LENGTH_LONG).show();
+				fullscreen();
 				return true;
 			
 		}
@@ -206,6 +212,33 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 			Toast.makeText(this, "No player selected desu~", Toast.LENGTH_SHORT).show();
 		}
 		
+	}
+	
+	protected void fullscreen () {
+		Map<Integer, String> monitors = this.currentState.getMonitors();
+		final List<String> list = new LinkedList<String>();
+		for (Entry<Integer, String> monitor : monitors.entrySet()) {
+			list.add(monitor.getKey() + ":" + monitor.getValue());
+		}
+		final String[] labels = list.toArray(new String[list.size()]);
+		
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle("Full-screen");
+		builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+			}
+		});
+		builder.setItems(labels, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int item) {
+				dialog.dismiss();
+				Toast.makeText(PlayerActivity.this, "TODO:" + labels[item], Toast.LENGTH_LONG).show();
+			}
+		});
+		AlertDialog alert = builder.create();
+		alert.show();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
