@@ -17,9 +17,12 @@
 package net.sparktank.morrigan.android.tasks;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.ConnectException;
+import java.util.concurrent.atomic.AtomicReference;
 
 import net.sparktank.morrigan.android.helper.HttpHelper;
+import net.sparktank.morrigan.android.helper.HttpHelper.HttpStreamHandler;
 import net.sparktank.morrigan.android.model.PlayerReference;
 import net.sparktank.morrigan.android.model.PlayerState;
 import net.sparktank.morrigan.android.model.PlayerStateChangeListener;
@@ -52,7 +55,7 @@ public class SetPlaystateTask extends AsyncTask<Void, Void, PlayerState> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private final Activity activity;
-	private final PlayerReference playerReference;
+	protected final PlayerReference playerReference;
 	private final TargetPlayState targetPlayState;
 	private final PlayerStateChangeListener changeListener;
 	
@@ -105,9 +108,19 @@ public class SetPlaystateTask extends AsyncTask<Void, Void, PlayerState> {
 		}
 		
 		try {
-			String resp = HttpHelper.getUrlContent(url, verb, encodedData, "application/x-www-form-urlencoded");
-			PlayerState playerState = new PlayerStateXmlImpl(resp, this.playerReference);
-			return playerState;
+			final AtomicReference<PlayerState> state = new AtomicReference<PlayerState>();
+			
+			HttpStreamHandler<SAXException> handler = new HttpStreamHandler<SAXException>() {
+				@Override
+				public void handleStream(InputStream is) throws IOException, SAXException {
+					PlayerState playerState = new PlayerStateXmlImpl(is, SetPlaystateTask.this.playerReference);
+					state.set(playerState);
+				}
+			};
+			
+			HttpHelper.getUrlContent(url, verb, encodedData, "application/x-www-form-urlencoded", handler);
+			
+			return state.get();
 		}
 		catch (ConnectException e) {
 			this.exception = e;
