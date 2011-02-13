@@ -660,5 +660,10 @@ public class Player implements IPlayerLocal {
 		return this.eventHandler.getMonitors();
 	}
 	
+	@Override
+	public void goFullscreen(int monitor) {
+		this.eventHandler.goFullscreen(monitor);
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

@@ -48,6 +48,7 @@ public interface IPlayerAbstract {
 	public DurationData getQueueTotalDuration();
 	
 	public Map<Integer, String> getMonitors ();
+	public void goFullscreen (int monitor);
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

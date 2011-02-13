@@ -175,5 +175,10 @@ public class PlayerRemote implements IPlayerRemote {
 		throw new UnsupportedOperationException("Not implemented.");
 	}
 	
+	@Override
+	public void goFullscreen(int monitor) {
+		throw new UnsupportedOperationException("Not implemented.");
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

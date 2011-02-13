@@ -1,6 +1,6 @@
 package net.sparktank.morrigan.gui.views;
 
-import java.util.List;
+import java.util.Collection;
 
 import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.actions.MinToTrayAction;
@@ -74,7 +74,7 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 	}
 	
 	@Override
-	public List<FullScreenAction> getFullScreenActions() {
+	public Collection<FullScreenAction> getFullScreenActions() {
 		return super.getFullScreenActions();
 	}
 	

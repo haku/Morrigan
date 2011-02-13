@@ -72,6 +72,8 @@ public class Activator implements BundleActivator {
 			return null;
 		}
 		@Override
+		public void goFullscreen(int monitor) {/* UNUSED */}
+		@Override
 		public IMediaTrackList<IMediaTrack> getCurrentList() {
 			return null;
 		}

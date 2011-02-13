@@ -1,6 +1,7 @@
 package net.sparktank.morrigan.gui.views;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -190,6 +191,13 @@ public abstract class AbstractPlayerView extends ViewPart {
 		}
 		
 		@Override
+		public void goFullscreen(int monitor) {
+			Monitor mon = monitorFromIndex(monitor);
+			FullScreenAction act = fullScreenActionFromIndex(monitor);
+			goFullScreenSafe(mon, act);
+		}
+		
+		@Override
 		public void videoAreaClose() {
 			if (isFullScreen()) {
 				removeFullScreenSafe(true);
@@ -349,25 +357,57 @@ public abstract class AbstractPlayerView extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Full screen stuff.
 	
+	Map<Integer, String> monitorCacheS = null;
+	Map<Integer, Monitor> monitorCacheM = null;
+	Map<Integer, FullScreenAction> fullScreenActions = null;
+	
 	FullscreenShell fullscreenShell = null;
-	Map<Integer, String> monitorCache = null;
 	
 	protected Map<Integer, String> getMonitorCache () {
-		if (this.monitorCache == null) { // TODO check age of cache?
+		if (this.monitorCacheS == null || this.monitorCacheM == null) { // TODO check age of cache?
 			getSite().getShell().getDisplay().syncExec(new Runnable() {
 				@Override
 				public void run() {
-					Map<Integer, String> ret = new LinkedHashMap<Integer, String>();
+					Map<Integer, String> retS = new LinkedHashMap<Integer, String>();
+					Map<Integer, Monitor> retM = new LinkedHashMap<Integer, Monitor>();
+					
 					for (int i = 0; i < getSite().getShell().getDisplay().getMonitors().length; i++) {
 						Monitor mon = getSite().getShell().getDisplay().getMonitors()[i];
 						Rectangle bounds = mon.getBounds();
-						ret.put(Integer.valueOf(i), bounds.width + "x" + bounds.height);
+						Integer integer = Integer.valueOf(i);
+						retS.put(integer, bounds.width + "x" + bounds.height);
+						retM.put(integer, mon);
 					}
-					AbstractPlayerView.this.monitorCache = Collections.unmodifiableMap(ret);
+					
+					AbstractPlayerView.this.monitorCacheS = Collections.unmodifiableMap(retS);
+					AbstractPlayerView.this.monitorCacheM = Collections.unmodifiableMap(retM);
 				}
 			});
 		}
-		return this.monitorCache;
+		return this.monitorCacheS;
+	}
+	
+	protected Monitor monitorFromIndex (int index) {
+		getMonitorCache();
+		return this.monitorCacheM.get(Integer.valueOf(index));
+	}
+	
+	private void makeFullScreenActions (Composite parent) {
+		this.fullScreenActions = new LinkedHashMap<Integer, FullScreenAction>();
+		// Full screen menu.
+		for (int i = 0; i < parent.getShell().getDisplay().getMonitors().length; i++) {
+			Monitor mon = parent.getShell().getDisplay().getMonitors()[i];
+			FullScreenAction a = new FullScreenAction(i, mon);
+			this.fullScreenActions.put(Integer.valueOf(i), a);
+		}
+	}
+	
+	protected Collection<FullScreenAction> getFullScreenActions () {
+		return this.fullScreenActions.values();
+	}
+	
+	protected FullScreenAction fullScreenActionFromIndex (int index) {
+		return this.fullScreenActions.get(Integer.valueOf(index));
 	}
 	
 	boolean isFullScreen () {
@@ -422,7 +462,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 					}
 				}
 				if (currentMon!=null) {
-					for (FullScreenAction a : AbstractPlayerView.this.fullScreenActions) {
+					for (FullScreenAction a : getFullScreenActions()) {
 						if (a.getMonitor().equals(currentMon)) {
 							goFullscreen(currentMon, a);
 						}
@@ -497,7 +537,6 @@ public abstract class AbstractPlayerView extends ViewPart {
 //	Making actions.
 	
 	private List<OrderSelectAction> orderMenuActions = new ArrayList<OrderSelectAction>();
-	List<FullScreenAction> fullScreenActions = new ArrayList<FullScreenAction>();
 	
 	private void makeActions (Composite parent) {
 		// Order menu.
@@ -512,20 +551,11 @@ public abstract class AbstractPlayerView extends ViewPart {
 			this.orderMenuActions.add(a);
 		}
 		
-		// Full screen menu.
-		for (int i = 0; i < parent.getShell().getDisplay().getMonitors().length; i++) {
-			Monitor mon = parent.getShell().getDisplay().getMonitors()[i];
-			FullScreenAction a = new FullScreenAction(i, mon);
-			this.fullScreenActions.add(a);
-		}
+		makeFullScreenActions(parent);
 	}
 	
 	protected List<OrderSelectAction> getOrderMenuActions () {
 		return this.orderMenuActions;
-	}
-	
-	protected List<FullScreenAction> getFullScreenActions () {
-		return this.fullScreenActions;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
