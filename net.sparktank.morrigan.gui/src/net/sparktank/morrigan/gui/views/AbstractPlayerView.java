@@ -1,6 +1,7 @@
 package net.sparktank.morrigan.gui.views;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -362,7 +363,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 						Rectangle bounds = mon.getBounds();
 						ret.put(Integer.valueOf(i), bounds.width + "x" + bounds.height);
 					}
-					AbstractPlayerView.this.monitorCache = ret;
+					AbstractPlayerView.this.monitorCache = Collections.unmodifiableMap(ret);
 				}
 			});
 		}
