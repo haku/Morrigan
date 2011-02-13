@@ -44,6 +44,7 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference {
 	private String listUrl;
 	
 	private int queueLength;
+	private long queueDuration;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -184,6 +185,15 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference {
 
 	public void setQueueLength(int queueLength) {
 		this.queueLength = queueLength;
+	}
+	
+	@Override
+	public long getQueueDuration() {
+		return this.queueDuration;
+	}
+	
+	public void setQueueDuration (long queueDuration) {
+		this.queueDuration = queueDuration;
 	}
 	
 	@Override

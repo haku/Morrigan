@@ -41,7 +41,7 @@ public interface PlayerState extends Artifact {
 	public int getTrackDuration ();
 	
 	public int getQueueLength ();
-	// TODO queueduration
+	public long getQueueDuration ();
 	
 	public Map<Integer, String> getMonitors ();
 	
