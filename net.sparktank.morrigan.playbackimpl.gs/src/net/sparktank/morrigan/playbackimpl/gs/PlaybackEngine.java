@@ -59,7 +59,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 	private String filepath = null;
 	Composite videoFrameParent = null;
 	private IPlaybackStatusListener listener = null;
-	private PlayState playbackState = PlayState.Stopped;
+	PlayState playbackState = PlayState.Stopped;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructor.
@@ -692,7 +692,12 @@ public class PlaybackEngine implements IPlaybackEngine {
 						}
 					}
 					
-					if (PlaybackEngine.this.videoFrameParent != null && PlaybackEngine.this.hasVideo) ScreenSaver.pokeScreenSaverProtected();
+					if (PlaybackEngine.this.videoFrameParent != null
+							&& PlaybackEngine.this.hasVideo
+							&& PlaybackEngine.this.playbackState == PlayState.Playing
+							) {
+						ScreenSaver.pokeScreenSaverProtected();
+					}
 				}
 				
 				try {
