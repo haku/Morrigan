@@ -213,8 +213,6 @@ public class PlayersServlet extends HttpServlet {
 		
 		int queueLength = p.getQueueList().size();
 		DurationData queueDuration = p.getQueueTotalDuration();
-		String queueDurationString = (queueDuration.isComplete() ? "" : "more than ") +
-				TimeHelper.formatTimeSeconds(queueDuration.getDuration());
 		
 		AbstractFeed.addElement(dw, "title", "p" + p.getId() + ":" + p.getPlayState().toString() + ":" + title);
 		String selfUrl = CONTEXTPATH + "/" + p.getId();
@@ -224,7 +222,7 @@ public class PlayersServlet extends HttpServlet {
 		AbstractFeed.addElement(dw, "playstate", p.getPlayState().getN());
 		AbstractFeed.addElement(dw, "playorder", p.getPlaybackOrder().getN());
 		AbstractFeed.addElement(dw, "queuelength", queueLength);
-		AbstractFeed.addElement(dw, "queueduration", queueDurationString); // FIXME make parsasble.
+		AbstractFeed.addElement(dw, "queueduration", queueDuration.getDuration());
 		AbstractFeed.addLink(dw, selfUrl + "/" + PATH_QUEUE, "queue", "text/xml");
 		AbstractFeed.addElement(dw, "listtitle", listTitle);
 		AbstractFeed.addElement(dw, "listid", listId);
