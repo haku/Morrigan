@@ -3,7 +3,7 @@
 	
 	<string name="app_name">Morrigan</string>
 	
-	<string name="menu_refresh">refresh</string>
+	<string name="menu_fullscreen">full-screen</string>
 	<string name="menu_scan">scan</string>
 	
 </resources>

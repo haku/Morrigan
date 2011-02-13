@@ -150,12 +150,12 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Menu items.
 	
-	private static final int MENU_REFRESH = 1;
+	private static final int MENU_FULLSCREEN = 2;
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		boolean result = super.onCreateOptionsMenu(menu);
-		menu.add(0, MENU_REFRESH, 0, R.string.menu_refresh).setIcon(R.drawable.ic_menu_refresh);
+		menu.add(0, MENU_FULLSCREEN, 0, R.string.menu_fullscreen).setIcon(R.drawable.display);
 		return result;
 	}
 	
@@ -163,8 +163,8 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			
-			case MENU_REFRESH:
-				refresh();
+			case MENU_FULLSCREEN:
+				Toast.makeText(this, "TODO", Toast.LENGTH_LONG).show();
 				return true;
 			
 		}
