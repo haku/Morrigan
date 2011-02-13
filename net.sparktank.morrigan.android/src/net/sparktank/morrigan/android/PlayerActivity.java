@@ -200,8 +200,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 	
 	protected void search () {
 		if (this.currentState != null) {
-			String listUrl = this.currentState.getListUrl();
-			if (listUrl != null) {
+			if (this.currentState.getListUrl() != null) {
 				CommonDialogs.doSearchMlist(this, this.currentState, this.lastQuery);
 			}
 			else {
