@@ -61,7 +61,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	protected ServerReference serverReference = null;
-	private PlayerReference playerReference = null;
+	protected PlayerReference playerReference = null;
 	private PlayerState currentState;
 	private ArtifactListAdaptor<ArtifactList> queueListAdaptor;
 	
@@ -182,7 +182,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 //	Commands - to be called on the UI thread.
 	
 	protected void refresh () {
-		SetPlaystateTask playpauseTask = new SetPlaystateTask(this, this.playerReference, null, this);
+		SetPlaystateTask playpauseTask = new SetPlaystateTask(this, this.playerReference, this);
 		playpauseTask.execute();
 		GetPlayerQueueTask queueTask = new GetPlayerQueueTask(this, this.playerReference, this);
 		queueTask.execute();
@@ -234,7 +234,8 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 			@Override
 			public void onClick(DialogInterface dialog, int item) {
 				dialog.dismiss();
-				Toast.makeText(PlayerActivity.this, "TODO:" + labels[item], Toast.LENGTH_LONG).show();
+				SetPlaystateTask playpauseTask = new SetPlaystateTask(PlayerActivity.this, PlayerActivity.this.playerReference, item, PlayerActivity.this);
+				playpauseTask.execute();
 			}
 		});
 		AlertDialog alert = builder.create();

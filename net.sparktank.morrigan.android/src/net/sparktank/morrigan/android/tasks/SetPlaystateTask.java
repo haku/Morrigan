@@ -56,17 +56,32 @@ public class SetPlaystateTask extends AsyncTask<Void, Void, PlayerState> {
 	
 	private final Activity activity;
 	protected final PlayerReference playerReference;
-	private final TargetPlayState targetPlayState;
 	private final PlayerStateChangeListener changeListener;
+	
+	private final TargetPlayState targetPlayState;
+	private final int fullscreenMonitor;
 	
 	private Exception exception;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	public SetPlaystateTask (Activity activity, PlayerReference playerReference, PlayerStateChangeListener changeListener) {
+		this(activity, playerReference, null, changeListener);
+	}
+	
 	public SetPlaystateTask (Activity activity, PlayerReference playerReference, TargetPlayState targetPlayState, PlayerStateChangeListener changeListener) {
 		this.activity = activity;
 		this.playerReference = playerReference;
 		this.targetPlayState = targetPlayState;
+		this.fullscreenMonitor = -1;
+		this.changeListener = changeListener;
+	}
+	
+	public SetPlaystateTask (Activity activity, PlayerReference playerReference, int fullscreenMonitor, PlayerStateChangeListener changeListener) {
+		this.activity = activity;
+		this.playerReference = playerReference;
+		this.targetPlayState = null;
+		this.fullscreenMonitor = fullscreenMonitor;
 		this.changeListener = changeListener;
 	}
 	
@@ -105,6 +120,10 @@ public class SetPlaystateTask extends AsyncTask<Void, Void, PlayerState> {
     				
     			default: throw new IllegalArgumentException();
     		}
+		}
+		else if (this.fullscreenMonitor >= 0) {
+			verb = "POST";
+			encodedData = "action=fullscreen&monitor=" + this.fullscreenMonitor;
 		}
 		
 		try {
