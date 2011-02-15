@@ -143,8 +143,8 @@ public abstract class GenericSqliteLayer implements IGenericDbLayer {
 	
 	static public class SqlCreateCmd {
 		
-		private String tblExistsSql;
-		private String tblCreateSql;
+		final private String tblExistsSql;
+		final private String tblCreateSql;
 		
 		public SqlCreateCmd (String tblExistsSql, String tblCreateSql) {
 			this.tblExistsSql = tblExistsSql;
@@ -154,15 +154,9 @@ public abstract class GenericSqliteLayer implements IGenericDbLayer {
 		public String getTblExistsSql() {
 			return this.tblExistsSql;
 		}
-		public void setTblExistsSql(String tblExistsSql) {
-			this.tblExistsSql = tblExistsSql;
-		}
 		
 		public String getTblCreateSql() {
 			return this.tblCreateSql;
-		}
-		public void setTblCreateSql(String tblCreateSql) {
-			this.tblCreateSql = tblCreateSql;
 		}
 		
 	}
