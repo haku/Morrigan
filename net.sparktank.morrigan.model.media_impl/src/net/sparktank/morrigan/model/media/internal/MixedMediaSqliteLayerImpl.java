@@ -88,6 +88,13 @@ public abstract class MixedMediaSqliteLayerImpl extends MediaSqliteLayer<IMixedM
     	+ ",lwidth,lheight"
     	+ " FROM tbl_mediafiles";
 	
+	private static final String _SQL_MEDIAFILESTAGS_SELECT =
+		"SELECT"
+		+ " m.ROWID AS ROWID,m.type AS type,sfile,md5,dadded,dmodified,benabled,bmissing,sremloc"
+		+ ",lstartcnt,lendcnt,dlastplay,lduration"
+		+ ",lwidth,lheight"
+		+ " FROM tbl_mediafiles AS m LEFT OUTER JOIN tbl_tags ON m.ROWID=tbl_tags.mf_rowid";
+	
 	private static final String _SQL_WHERE =
 		" WHERE";
 	
@@ -96,6 +103,9 @@ public abstract class MixedMediaSqliteLayerImpl extends MediaSqliteLayer<IMixedM
 	
 	private static final String _SQL_MEDIAFILES_WHERTYPE =
 		" type=?";
+	
+	private static final String _SQL_MEDIAFILESTAGS_WHERTYPE =
+		" m.type=?";
 	
 	private static final String _SQL_MEDIAFILES_WHERENOTMISSING =
 		" (bmissing<>1 OR bmissing is NULL)";
@@ -109,8 +119,13 @@ public abstract class MixedMediaSqliteLayerImpl extends MediaSqliteLayer<IMixedM
 	private static final String _SQL_MEDIAFILES_WHERESEARCH = 
 		" sfile LIKE ? ESCAPE ?";
 	
-	private static final String _SQL_MEDIAFILES_WHEREORDERSEARCH = 
-		" sfile LIKE ? ESCAPE ?"
+//	private static final String _SQL_MEDIAFILES_WHEREORDERSEARCH = 
+//		" sfile LIKE ? ESCAPE ?"
+//		+ " AND (bmissing<>1 OR bmissing is NULL) AND (benabled<>0 OR benabled is NULL)"
+//		+ " ORDER BY dlastplay DESC, lendcnt DESC, lstartcnt DESC, sfile COLLATE NOCASE ASC;";
+	
+	private static final String _SQL_MEDIAFILESTAGS_WHEREORDERSEARCH = 
+		" sfile LIKE ? ESCAPE ? OR tag LIKE ? ESCAPE ?"
 		+ " AND (bmissing<>1 OR bmissing is NULL) AND (benabled<>0 OR benabled is NULL)"
 		+ " ORDER BY dlastplay DESC, lendcnt DESC, lstartcnt DESC, sfile COLLATE NOCASE ASC;";
 	
@@ -309,11 +324,11 @@ public abstract class MixedMediaSqliteLayerImpl extends MediaSqliteLayer<IMixedM
 		
 		String sql;
 		if (mediaType == MediaType.UNKNOWN) {
-			sql = _SQL_MEDIAFILES_SELECT
-				+ _SQL_WHERE + _SQL_MEDIAFILES_WHEREORDERSEARCH;
+			sql = _SQL_MEDIAFILESTAGS_SELECT
+				+ _SQL_WHERE + _SQL_MEDIAFILESTAGS_WHEREORDERSEARCH;
 		} else {
-			sql = _SQL_MEDIAFILES_SELECT
-				+ _SQL_WHERE + _SQL_MEDIAFILES_WHERTYPE + _SQL_AND + _SQL_MEDIAFILES_WHEREORDERSEARCH;
+			sql = _SQL_MEDIAFILESTAGS_SELECT
+				+ _SQL_WHERE + _SQL_MEDIAFILESTAGS_WHERTYPE + _SQL_AND + _SQL_MEDIAFILESTAGS_WHEREORDERSEARCH;
 		}
 		
 		ps = getDbCon().prepareStatement(sql);
@@ -322,11 +337,15 @@ public abstract class MixedMediaSqliteLayerImpl extends MediaSqliteLayer<IMixedM
 			if (mediaType == MediaType.UNKNOWN) {
 				ps.setString(1, "%" + term + "%");
 				ps.setString(2, esc);
+				ps.setString(3, "%" + term + "%");
+				ps.setString(4, esc);
 			}
 			else {
 				ps.setInt(1, mediaType.getN());
 				ps.setString(2, "%" + term + "%");
 				ps.setString(3, esc);
+				ps.setString(4, "%" + term + "%");
+				ps.setString(5, esc);
 			}
 			
 			if (maxResults > 0) {
