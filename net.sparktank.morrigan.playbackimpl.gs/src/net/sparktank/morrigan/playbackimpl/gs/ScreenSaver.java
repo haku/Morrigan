@@ -21,11 +21,16 @@ public class ScreenSaver {
 	static public boolean pokeScreenSaver () throws IOException {
 		File file = new File(FILE);
 		if (file.exists()) {
-    		Process proc = Runtime.getRuntime().exec(CMD);
+    		Process proc = null;
     		try {
+    			proc = Runtime.getRuntime().exec(CMD);
     			proc.waitFor();
-    		} catch (InterruptedException e) {
+    		}
+    		catch (InterruptedException e) {
     			throw new RuntimeException(e);
+    		}
+    		finally {
+    			if (proc != null) proc.destroy();
     		}
     		logger.fine("Screensaver poked.");
     		return true;
