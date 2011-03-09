@@ -41,7 +41,6 @@ Image &quot;The Morrígan&quot; by Louis le Brocquy used under the Creative Comm
    <plugins>
       <plugin id="com.ibm.icu"/>
       <plugin id="javax.servlet"/>
-      <plugin id="javax.transaction" fragment="true"/>
       <plugin id="net.sparktank.morrigan.config"/>
       <plugin id="net.sparktank.morrigan.engines"/>
       <plugin id="net.sparktank.morrigan.gui"/>
@@ -98,9 +97,6 @@ Image &quot;The Morrígan&quot; by Louis le Brocquy used under the Creative Comm
       <plugin id="org.eclipse.equinox.security"/>
       <plugin id="org.eclipse.equinox.security.macosx" fragment="true"/>
       <plugin id="org.eclipse.equinox.security.win32.x86" fragment="true"/>
-      <plugin id="org.eclipse.equinox.servletbridge.extensionbundle" fragment="true"/>
-      <plugin id="org.eclipse.equinox.transforms.hook" fragment="true"/>
-      <plugin id="org.eclipse.equinox.weaving.hook" fragment="true"/>
       <plugin id="org.eclipse.help"/>
       <plugin id="org.eclipse.jface"/>
       <plugin id="org.eclipse.jface.databinding"/>
@@ -135,6 +131,15 @@ Image &quot;The Morrígan&quot; by Louis le Brocquy used under the Creative Comm
       <plugin id="org.eclipse.ui.win32" fragment="true"/>
       <plugin id="org.eclipse.ui.workbench"/>
       <plugin id="org.eclipse.ui.workbench.texteditor"/>
+      <plugin id="org.eclipse.jetty.http"/>
+      <plugin id="org.eclipse.jetty.server"/>
+      <plugin id="org.eclipse.jetty.servlet"/>
+      <plugin id="org.eclipse.jetty.util"/>
+      <plugin id="org.eclipse.jetty.webapp"/>
+      <plugin id="org.eclipse.jetty.xml"/>
+      <plugin id="org.eclipse.jetty.io"/>
+      <plugin id="org.eclipse.jetty.security"/>
+      <plugin id="org.eclipse.jetty.continuation"/>
    </plugins>
 
    <configurations>
