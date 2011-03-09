@@ -7,7 +7,7 @@
 
 <project name="net.sparktank.morrigan.build" default="all" >
 	
-	<target name="all" depends="clean,ready,build-gui,build-server,refreshWorkspace" />
+	<target name="all" depends="clean,ready,build-gui,build-server" />
 	
 	<!-- May be safely called as many times as needed. -->
 	<target name="setprop" >
@@ -49,19 +49,11 @@
 		<delete dir="${buildDirectory}" failonerror="false" />
 		<delete dir="${procDirectory}" failonerror="false" />
 		<delete dir="${outputDirectory}" failonerror="false" />
-
-		<antcall target="refreshWorkspace" />
 	</target>
 	
 	<target name="ready" depends="setprop" >
 		<!-- Prep output dir. -->
 		<mkdir dir="${outputDirectory}" />
-	</target>
-	
-	<target name="refreshWorkspace" >
-		<!-- Refresh eclipse workspace -->
-		<eclipse.convertPath fileSystemPath="${basedir}" property="resourcePath" />
-		<eclipse.refreshLocal resource="${resourcePath}" depth="infinite" />
 	</target>
 	
 	<target name="buildbits" >
