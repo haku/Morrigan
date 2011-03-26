@@ -324,7 +324,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 				State state = this.playbin.getState();
 				if (state==State.PLAYING || state==State.PAUSED) {
 					position = this.playbin.queryPosition(TimeUnit.NANOSECONDS);
-					this.logger.fine("reparentVideo() : position=" + position);
+					this.logger.fine("position=" + position);
 					this.playbin.setState(State.NULL);
 				}
 				
@@ -457,24 +457,25 @@ public class PlaybackEngine implements IPlaybackEngine {
 	
 	
 	private void _startTrack () {
-		this.logger.fine("playTrack() >>>");
+		this.logger.entering(this.getClass().getName(), "_startTrack");
 		
 		this.m_stopPlaying.set(false);
 		this.m_atEos.set(false);
 		
-		if (this.playbin!=null) {
+		if (this.playbin != null) {
 			this.playbin.setState(State.PLAYING);
-			this.logger.fine("playTrack() State set to PLAYING.");
+			this.logger.fine("playbin.setState(PLAYING).");
 			
 			callStateListener(PlayState.Playing);
 			startWatcherThread();
 			
 			if (this.hasVideo) {
 				new WaitForVideoThread().start();
+				reparentVideo();
 			}
 		}
 		
-		this.logger.fine("playTrack() <<<");
+		this.logger.exiting(this.getClass().getName(), "_startTrack");
 	}
 	
 	private class WaitForVideoThread extends Thread {
