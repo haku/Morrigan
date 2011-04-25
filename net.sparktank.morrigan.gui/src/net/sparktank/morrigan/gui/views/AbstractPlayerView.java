@@ -27,6 +27,7 @@ import net.sparktank.morrigan.gui.editors.tracks.MediaTrackListEditor;
 import net.sparktank.morrigan.gui.editors.tracks.PlaylistEditor;
 import net.sparktank.morrigan.gui.engines.HotkeyRegister;
 import net.sparktank.morrigan.gui.helpers.ClipboardHelper;
+import net.sparktank.morrigan.gui.helpers.MonitorHelper;
 import net.sparktank.morrigan.gui.helpers.RefreshTimer;
 import net.sparktank.morrigan.gui.helpers.TrayHelper;
 import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
@@ -485,7 +486,8 @@ public abstract class AbstractPlayerView extends ViewPart {
 		}
 		
 		private void startFullScreen (Monitor m, final Action a) {
-			AbstractPlayerView.this.fullscreenShell = new FullscreenShell(getSite().getShell(), m, new Runnable() {
+			Monitor refreshedMon = MonitorHelper.refreshMonitor(getSite().getShell().getDisplay(), m);
+			AbstractPlayerView.this.fullscreenShell = new FullscreenShell(getSite().getShell(), refreshedMon, new Runnable() {
 				@Override
 				public void run() {
 					removeFullScreenSafe(false);
