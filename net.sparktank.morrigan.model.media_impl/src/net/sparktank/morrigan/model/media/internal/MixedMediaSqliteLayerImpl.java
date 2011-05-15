@@ -90,7 +90,7 @@ public abstract class MixedMediaSqliteLayerImpl extends MediaSqliteLayer<IMixedM
 	
 	private static final String _SQL_MEDIAFILESTAGS_SELECT =
 		"SELECT"
-		+ " m.ROWID AS ROWID,m.type AS type,sfile,md5,dadded,dmodified,benabled,bmissing,sremloc"
+		+ " distinct m.ROWID AS ROWID,m.type AS type,sfile,md5,dadded,dmodified,benabled,bmissing,sremloc"
 		+ ",lstartcnt,lendcnt,dlastplay,lduration"
 		+ ",lwidth,lheight"
 		+ " FROM tbl_mediafiles AS m LEFT OUTER JOIN tbl_tags ON m.ROWID=tbl_tags.mf_rowid";
@@ -331,7 +331,13 @@ public abstract class MixedMediaSqliteLayerImpl extends MediaSqliteLayer<IMixedM
 				+ _SQL_WHERE + _SQL_MEDIAFILESTAGS_WHERTYPE + _SQL_AND + _SQL_MEDIAFILESTAGS_WHEREORDERSEARCH;
 		}
 		
-		ps = getDbCon().prepareStatement(sql);
+		try {
+			ps = getDbCon().prepareStatement(sql);
+		}
+		catch (SQLException e) {
+			System.err.println("sql='"+sql+"'");
+			throw e;
+		}
 		
 		try {
 			if (mediaType == MediaType.UNKNOWN) {
