@@ -17,6 +17,7 @@ public interface IPlayerAbstract {
 	public void dispose();
 	
 	public int getId();
+	public String getName();
 	
 	public boolean isPlaybackEngineReady();
 	public void loadAndStartPlaying(MediaListReference item) throws MorriganException;

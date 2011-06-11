@@ -221,7 +221,7 @@ public class PlayersServlet extends HttpServlet {
 			title = currentItem.item.getTitle();
 		}
 		else {
-			title = NULL;
+			title = p.getName();
 		}
 		
 		int queueLength = p.getQueueList().size();

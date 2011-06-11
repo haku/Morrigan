@@ -119,7 +119,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 	
 	public synchronized IPlayerLocal getPlayer () {
 		if (this._player == null) {
-			this._player = PlayerRegister.makeLocalPlayer(this.eventHandler);
+			this._player = PlayerRegister.makeLocalPlayer("Gui", this.eventHandler);
 		}
 		return this._player;
 	}
