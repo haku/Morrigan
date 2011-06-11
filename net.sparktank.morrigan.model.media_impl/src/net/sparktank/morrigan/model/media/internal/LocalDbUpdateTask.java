@@ -268,7 +268,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<Q, ? extends IMed
 		
 		int progress = 0;
 		int n = 0;
-		int N = this.getItemList().getCount();
+		int N = this.getItemList().getAllDbEntries().size();
 		
 		ByteBuffer byteBuffer = ChecksumHelper.createByteBuffer();
 		
@@ -555,7 +555,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<Q, ? extends IMed
 		
 		int progress = 0;
 		int n = 0;
-		int N = this.getItemList().getCount();
+		int N = this.getItemList().getAllDbEntries().size();
 		
 		List<T> allLibraryEntries = this.getItemList().getAllDbEntries();
 		
@@ -614,12 +614,12 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<Q, ? extends IMed
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private TaskResult updateTrackMetadata2 (TaskEventListener taskEventListener, int prgTotal, List<T> changedItems) {
+	private TaskResult updateTrackMetadata2 (TaskEventListener taskEventListener, int prgTotal, List<T> changedItems) throws DbException {
 		taskEventListener.subTask("Reading more track metadata");
 		
 		int progress = 0;
 		int n = 0;
-		int N = this.getItemList().getCount();
+		int N = this.getItemList().getAllDbEntries().size();
 		
 		for (T mlt : changedItems) {
 			if (taskEventListener.isCanceled()) break;
