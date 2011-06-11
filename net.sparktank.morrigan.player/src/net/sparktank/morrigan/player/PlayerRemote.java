@@ -15,13 +15,15 @@ public class PlayerRemote implements IPlayerRemote {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private final int id;
+	private final String name;
 	private final String remoteHost;
 	private final int remotePlayerId;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public PlayerRemote (int id, String remoteHost, int remotePlayerId) {
+	public PlayerRemote (int id, String name, String remoteHost, int remotePlayerId) {
 		this.id = id;
+		this.name = name;
 		this.remoteHost = remoteHost;
 		this.remotePlayerId = remotePlayerId;
 		
@@ -36,6 +38,11 @@ public class PlayerRemote implements IPlayerRemote {
 	@Override
 	public int getId() {
 		return this.id;
+	}
+	
+	@Override
+	public String getName() {
+		return this.name;
 	}
 	
 	@Override

@@ -42,7 +42,7 @@ public class ServerMain {
 	private static IPlayerLocal _player;
 	
 	static private void setupPlayer () {
-		_player = PlayerRegister.makeLocalPlayer(eventHandler);
+		_player = PlayerRegister.makeLocalPlayer("Server", eventHandler); // TODO why is this called in 2 places???
 		_player.setPlaybackOrder(PlaybackOrder.RANDOM);
 	}
 	

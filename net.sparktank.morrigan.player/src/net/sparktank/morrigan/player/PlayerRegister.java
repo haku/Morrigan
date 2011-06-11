@@ -19,9 +19,9 @@ public class PlayerRegister {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Local players.
 	
-	static public IPlayerLocal makeLocalPlayer (IPlayerEventHandler eventHandler) {
+	static public IPlayerLocal makeLocalPlayer (String name, IPlayerEventHandler eventHandler) {
 		int n = nextPlayerN.getAndIncrement();
-		Player player = new Player(n, eventHandler);
+		Player player = new Player(n, name, eventHandler);
 		addLocalPlayer(player);
 		return player;
 	}
@@ -55,9 +55,9 @@ public class PlayerRegister {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Remote players.
 	
-	static public IPlayerRemote makeRemotePlayer (String remoteHost, int remotePlayerId, IPlayerEventHandler eventHandler) {
+	static public IPlayerRemote makeRemotePlayer (String name, String remoteHost, int remotePlayerId, IPlayerEventHandler eventHandler) {
 		int n = nextPlayerN.getAndIncrement();
-		PlayerRemote player = new PlayerRemote(n, remoteHost, remotePlayerId);
+		PlayerRemote player = new PlayerRemote(n, name, remoteHost, remotePlayerId);
 		addRemotePlayer(player);
 		return player;
 	}

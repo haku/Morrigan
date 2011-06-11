@@ -28,14 +28,16 @@ public class Player implements IPlayerLocal {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private final int id;
+	private final String name;
 	
 	final IPlayerEventHandler eventHandler;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Main.
 	
-	public Player (int id, IPlayerEventHandler eventHandler) {
+	public Player (int id, String name, IPlayerEventHandler eventHandler) {
 		this.id = id;
+		this.name = name;
 		this.eventHandler = eventHandler;
 	}
 	
@@ -52,6 +54,11 @@ public class Player implements IPlayerLocal {
 	@Override
 	public int getId() {
 		return this.id;
+	}
+	
+	@Override
+	public String getName() {
+		return this.name;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
