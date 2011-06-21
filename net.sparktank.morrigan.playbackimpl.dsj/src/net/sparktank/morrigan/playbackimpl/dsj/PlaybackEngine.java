@@ -23,18 +23,21 @@ import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 
+import de.humatic.dsj.DSEnvironment;
 import de.humatic.dsj.DSFiltergraph;
 import de.humatic.dsj.DSJUtils;
 import de.humatic.dsj.DSMediaType;
 import de.humatic.dsj.DSMovie;
 
-/* Main playback class:
+/* Main play-back class:
+ * Java doc:
+ * http://www.humatic.de/htools/dsj/javadoc/index.html
+ * 
  * http://www.humatic.de/htools/dsj/javadoc/de/humatic/dsj/DSFiltergraph.html
  * 
  * Event constants:
  * http://www.humatic.de/htools/dsj/javadoc/constant-values.html
  */
-
 public class PlaybackEngine implements IPlaybackEngine {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -229,6 +232,11 @@ public class PlaybackEngine implements IPlaybackEngine {
 			
 			_setScreenSaverActive(false); // FIXME THIS IS A WORKAROUND!
 			
+			DSEnvironment.setDebugLevel(3); // 0 to 3.  3 is max.
+			/* error codes can be looked up in de.humatic.dsj.DSJException
+			 * Also error codes are in:
+			 * http://www.humatic.de/htools/dsj/javadoc/constant-values.html
+			 */
 			this.dsMovie = new DSMovie(this.filepath,
 					DSFiltergraph.OVERLAY | DSFiltergraph.MOUSE_ENABLED | DSFiltergraph.INIT_PAUSED,
 					this.propertyChangeLlistener);
