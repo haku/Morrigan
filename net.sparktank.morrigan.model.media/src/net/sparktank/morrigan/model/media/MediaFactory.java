@@ -45,6 +45,7 @@ public interface MediaFactory {
 	public IMorriganTask getRemoteMixedMediaDbUpdateTask (IRemoteMixedMediaDb library);
 	public <T extends IMediaItem> IMorriganTask getMediaFileCopyTask (IMediaItemList<T> mediaItemList, List<T> mediaSelection, File targetDirectory);
 	public <T extends IMediaItem> IMorriganTask getNewCopyToLocalMmdbTask (IMediaItemList<T> fromList, Collection<T> itemsToCopy, ILocalMixedMediaDb toDb);
+	public IMorriganTask getSyncMetadataRemoteToLocalTask (ILocalMixedMediaDb local, IRemoteMixedMediaDb remote);
 	
 	/**
 	 * This is a really stupid way to use an enum.. must fix this.

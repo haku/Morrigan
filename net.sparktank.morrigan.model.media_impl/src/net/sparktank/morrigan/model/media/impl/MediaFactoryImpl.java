@@ -32,6 +32,7 @@ import net.sparktank.morrigan.model.media.internal.MediaTrack;
 import net.sparktank.morrigan.model.media.internal.MixedMediaItem;
 import net.sparktank.morrigan.model.media.internal.PlaylistHelper;
 import net.sparktank.morrigan.model.media.internal.RemoteMixedMediaDbUpdateTask;
+import net.sparktank.morrigan.model.media.internal.SyncMetadataRemoteToLocalTask;
 import net.sparktank.morrigan.model.media.internal.TrackTagHelper;
 import net.sparktank.morrigan.model.tasks.IMorriganTask;
 import net.sparktank.sqlitewrapper.DbException;
@@ -173,6 +174,12 @@ public class MediaFactoryImpl implements MediaFactory {
 	@Override
 	public <T extends IMediaItem> IMorriganTask getNewCopyToLocalMmdbTask(IMediaItemList<T> fromList, Collection<T> itemsToCopy, ILocalMixedMediaDb toDb) {
 		return new CopyToLocalMmdbTask<T>(fromList, itemsToCopy, toDb);
+	}
+	
+	@Override
+	public IMorriganTask getSyncMetadataRemoteToLocalTask (ILocalMixedMediaDb local, IRemoteMixedMediaDb remote) {
+		// TODO FIXME use a factory to prevent duplicates.
+		return new SyncMetadataRemoteToLocalTask(local, remote);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -1,6 +1,7 @@
 package net.sparktank.morrigan.gui.views;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import net.sparktank.morrigan.gui.actions.DbUpdateAction;
 import net.sparktank.morrigan.gui.actions.NewMixedDbAction;
@@ -10,10 +11,13 @@ import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.handler.CallMediaListEditor;
 import net.sparktank.morrigan.gui.handler.CallPlayMedia;
 import net.sparktank.morrigan.gui.helpers.ImageCache;
+import net.sparktank.morrigan.gui.jobs.TaskJob;
 import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.IRemoteMixedMediaDb;
 import net.sparktank.morrigan.model.media.MediaListReference;
+import net.sparktank.morrigan.model.media.MediaListReference.MediaListType;
 import net.sparktank.morrigan.model.media.impl.MediaFactoryImpl;
+import net.sparktank.morrigan.model.tasks.IMorriganTask;
 import net.sparktank.morrigan.server.model.RemoteMixedMediaDb;
 import net.sparktank.morrigan.server.model.RemoteMixedMediaDbHelper;
 
@@ -32,6 +36,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.part.ViewPart;
@@ -134,6 +139,36 @@ public class ViewMediaExplorer extends ViewPart {
 						
 						if (item.getType() == MediaListReference.MediaListType.LOCALMMDB) {
 							mgr.add(new DbPropertiesAction(item));
+						}
+					}
+				}
+				else if (selection.size() == 2) {
+					Iterator<?> iterator = selection.iterator();
+					Object o1 = iterator.next();
+					Object o2 = iterator.next();
+					if (o1 instanceof MediaListReference && o2 instanceof MediaListReference) {
+						MediaListReference r1 = (MediaListReference) o1;
+						MediaListReference r2 = (MediaListReference) o2;
+						
+						MediaListReference local = null;
+						MediaListReference remote = null;
+						
+						if (r1.getType() == MediaListType.LOCALMMDB) {
+							local = r1;
+						}
+						else if (r2.getType() == MediaListType.LOCALMMDB) {
+							local = r2;
+						}
+						
+						if (r1.getType() == MediaListType.REMOTEMMDB) {
+							remote = r1;
+						}
+						else if (r2.getType() == MediaListType.REMOTEMMDB) {
+							remote = r2;
+						}
+						
+						if (local != null && remote != null) {
+							mgr.add(new SyncMetadataAction(local, remote));
 						}
 					}
 				}
@@ -260,6 +295,33 @@ public class ViewMediaExplorer extends ViewPart {
 					throw new IllegalArgumentException("Unable to show properties for MediaExplorerItem of type '"+this.mediaExplorerItem.getType()+"'.");
 				}
 			} catch (Exception e) {
+				new MorriganMsgDlg(e).open();
+			}
+		}
+		
+	}
+	
+	class SyncMetadataAction extends Action {
+		
+		private final MediaListReference local;
+		private final MediaListReference remote;
+
+		public SyncMetadataAction (MediaListReference local, MediaListReference remote) {
+			super("Sync metadata '"+local+"' x '"+remote+"' desu~");
+			this.local = local;
+			this.remote = remote;
+		}
+		
+		@Override
+		public void run() {
+			try {
+    			ILocalMixedMediaDb localDb = MediaFactoryImpl.get().getLocalMixedMediaDb(this.local.getIdentifier());
+    			IRemoteMixedMediaDb remoteDb = RemoteMixedMediaDb.FACTORY.manufacture(this.remote.getIdentifier());
+    			IMorriganTask task = MediaFactoryImpl.get().getSyncMetadataRemoteToLocalTask(localDb, remoteDb);
+    			TaskJob job = new TaskJob(task, Display.getCurrent());
+    			job.schedule();
+			}
+			catch (Exception e) {
 				new MorriganMsgDlg(e).open();
 			}
 		}
