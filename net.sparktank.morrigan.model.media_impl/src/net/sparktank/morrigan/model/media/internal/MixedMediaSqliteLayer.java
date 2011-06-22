@@ -4,6 +4,8 @@ import java.io.File;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.sparktank.morrigan.model.db.IDbColumn;
 import net.sparktank.morrigan.model.db.IDbItem;
@@ -11,9 +13,14 @@ import net.sparktank.morrigan.model.factory.RecyclingFactory;
 import net.sparktank.morrigan.model.media.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.IMixedMediaItem.MediaType;
 import net.sparktank.morrigan.model.media.IMixedMediaStorageLayer;
+import net.sparktank.morrigan.util.StringHelper;
 import net.sparktank.sqlitewrapper.DbException;
 
 public class MixedMediaSqliteLayer extends MixedMediaSqliteLayerImpl implements IMixedMediaStorageLayer<IMixedMediaItem> {
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	private final Logger logger = Logger.getLogger(this.getClass().getName());
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static class MixedMediaSqliteLayerFactory extends RecyclingFactory<IMixedMediaStorageLayer<IMixedMediaItem>, String, Boolean, DbException> {
@@ -170,7 +177,9 @@ public class MixedMediaSqliteLayer extends MixedMediaSqliteLayerImpl implements 
 	public boolean addFile (MediaType mediaType, File file) throws DbException {
 		try {
 			return local_addTrack(mediaType, file.getAbsolutePath(), file.lastModified());
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
+			this.logger.log(Level.SEVERE, "Exception while adding file: " + file.getAbsolutePath(), e);
 			throw new DbException(e);
 		}
 	}
@@ -179,7 +188,9 @@ public class MixedMediaSqliteLayer extends MixedMediaSqliteLayerImpl implements 
 	public boolean addFile (MediaType mediaType, String filepath, long lastModified) throws DbException {
 		try {
 			return local_addTrack(mediaType, filepath, lastModified);
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
+			this.logger.log(Level.SEVERE, "Exception while adding file: " + filepath, e);
 			throw new DbException(e);
 		}
 	}
@@ -188,7 +199,9 @@ public class MixedMediaSqliteLayer extends MixedMediaSqliteLayerImpl implements 
 	public boolean[] addFiles(List<File> files) throws DbException {
 		try {
 			return local_addFiles(files);
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
+			this.logger.log(Level.SEVERE, "Exception while adding files: " + StringHelper.joinCollection(files, File.pathSeparator), e);
 			throw new DbException(e);
 		}
 	}
