@@ -387,10 +387,13 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 	public void persistTrackData (T track) throws MorriganException {
 		try {
 			this.dbLayer.setHashcode(track.getFilepath(), track.getHashcode());
-		if (track.getDateAdded() != null) this.dbLayer.setDateAdded(track.getFilepath(), track.getDateAdded());
-		if (track.getDateLastModified() != null) this.dbLayer.setDateLastModified(track.getFilepath(), track.getDateLastModified());
-		this.dbLayer.setRemoteLocation(track.getFilepath(), track.getRemoteLocation());
-		} catch (DbException e) {
+    		if (track.getDateAdded() != null) this.dbLayer.setDateAdded(track.getFilepath(), track.getDateAdded());
+    		if (track.getDateLastModified() != null) this.dbLayer.setDateLastModified(track.getFilepath(), track.getDateLastModified());
+    		this.dbLayer.setRemoteLocation(track.getFilepath(), track.getRemoteLocation());
+    		this.dbLayer.setEnabled(track.getFilepath(), track.isEnabled());
+    		this.dbLayer.setMissing(track.getFilepath(), track.isMissing());
+		}
+		catch (DbException e) {
 			throw new MorriganException(e);
 		}
 	}
