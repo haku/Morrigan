@@ -335,6 +335,19 @@ public class MediaPlaylist extends MediaItemList<IMediaTrack> implements IMediaP
 		MediaTrackListHelper.incTrackEndCnt(this, track);
 	}
 	
+	@Override
+	public void setTrackStartCnt(IMediaTrack item, long n) throws MorriganException {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Not implemented.");
+	}
+	
+	@Override
+	public void setTrackEndCnt(IMediaTrack item, long n) throws MorriganException {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Not implemented.");
+	}
+	
+	
 	/**
 	 * @throws MorriganException  
 	 */

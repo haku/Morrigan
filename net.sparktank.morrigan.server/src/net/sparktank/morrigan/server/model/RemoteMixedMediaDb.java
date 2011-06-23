@@ -341,6 +341,16 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb<IRemoteMixedMediaDb
 	}
 	
 	@Override
+	public void setTrackStartCnt(IMediaTrack item, long n) throws MorriganException {
+		throw new NotImplementedException();
+	}
+	
+	@Override
+	public void setTrackEndCnt(IMediaTrack item, long n) throws MorriganException {
+		throw new NotImplementedException();
+	}
+	
+	@Override
 	public void setTrackDuration(IMediaTrack track, int duration) throws MorriganException {
 		throw new NotImplementedException();
 	}
