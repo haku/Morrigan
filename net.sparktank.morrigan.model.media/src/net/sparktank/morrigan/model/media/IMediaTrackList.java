@@ -9,8 +9,12 @@ public interface IMediaTrackList<T extends IMediaTrack> extends IMediaItemList<T
 	
 	public void incTrackStartCnt (IMediaTrack item, long n) throws MorriganException;
 	public void incTrackStartCnt (IMediaTrack item) throws MorriganException;
+	public void setTrackStartCnt (IMediaTrack item, long n) throws MorriganException;
+	
 	public void incTrackEndCnt (IMediaTrack item, long n) throws MorriganException;
 	public void incTrackEndCnt (IMediaTrack item) throws MorriganException;
+	public void setTrackEndCnt (IMediaTrack item, long n) throws MorriganException;
+	
 	public void setTrackDuration (IMediaTrack item, int duration) throws MorriganException;
 	public void setTrackDateLastPlayed (IMediaTrack item, Date date) throws MorriganException;
 	

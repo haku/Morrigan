@@ -164,6 +164,26 @@ public abstract class AbstractMixedMediaDb<H extends IAbstractMixedMediaDb<H>>
 	}
 	
 	@Override
+	public void setTrackStartCnt(IMediaTrack track, long n) throws MorriganException {
+		MediaTrackListHelper.setTrackStartCnt(this, track, n);
+		try {
+			this.getDbLayer().setTrackStartCnt(track.getFilepath(), n);
+		} catch (DbException e) {
+			throw new MorriganException(e);
+		}
+	}
+	
+	@Override
+	public void setTrackEndCnt(IMediaTrack track, long n) throws MorriganException {
+		MediaTrackListHelper.setTrackEndCnt(this, track, n);
+		try {
+			this.getDbLayer().setTrackEndCnt(track.getFilepath(), n);
+		} catch (DbException e) {
+			throw new MorriganException(e);
+		}
+	}
+	
+	@Override
 	public void setTrackDuration(IMediaTrack track, int duration) throws MorriganException {
 		MediaTrackListHelper.setTrackDuration(this, track, duration);
 		try {

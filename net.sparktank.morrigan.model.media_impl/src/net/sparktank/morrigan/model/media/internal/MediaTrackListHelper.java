@@ -21,6 +21,16 @@ public class MediaTrackListHelper {
 		mtl.setDirtyState(DirtyState.METADATA);
 	}
 	
+	static public void setTrackStartCnt (IMediaItemList<?> mtl, IMediaTrack track, long n) {
+		track.setStartCount(n);
+		mtl.setDirtyState(DirtyState.METADATA);
+	}
+	
+	static public void setTrackEndCnt (IMediaItemList<?> mtl, IMediaTrack track, long n) {
+		track.setEndCount(n);
+		mtl.setDirtyState(DirtyState.METADATA);
+	}
+	
 	static public void incTrackStartCnt (IMediaItemList<?> mtl, IMediaTrack track) {
 		track.setStartCount(track.getStartCount()+1);
 		track.setDateLastPlayed(new Date());
