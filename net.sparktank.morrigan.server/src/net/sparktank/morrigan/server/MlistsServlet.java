@@ -374,6 +374,7 @@ public class MlistsServlet extends HttpServlet {
     			}
     			AbstractFeed.addElement(dw, "type", mi.getMediaType().getN());
     			AbstractFeed.addElement(dw, "hash", mi.getHashcode().toString());
+    			AbstractFeed.addElement(dw, "enabled", Boolean.toString(mi.isEnabled()));
     			
     			if (mi.getMediaType() == MediaType.TRACK) {
     				AbstractFeed.addElement(dw, "duration", mi.getDuration());

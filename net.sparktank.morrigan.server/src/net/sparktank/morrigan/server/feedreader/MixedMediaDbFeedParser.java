@@ -186,7 +186,8 @@ public class MixedMediaDbFeedParser extends DefaultHandler {
 			}
 			catch (MorriganException e) {
 				throw new SAXException(e);
-			} catch (DbException e) {
+			}
+			catch (DbException e) {
 				throw new SAXException(e);
 			}
 			
@@ -229,6 +230,10 @@ public class MixedMediaDbFeedParser extends DefaultHandler {
 		else if (this.stack.size() == 3 && localName.equals("hash")) {
 			BigInteger v = new BigInteger(this.currentText.toString().trim());
 			this.currentItem.setHashcode(v);
+		}
+		else if (this.stack.size() == 3 && localName.equals("enabled")) {
+			boolean v = Boolean.parseBoolean(this.currentText.toString().trim());
+			this.currentItem.setEnabled(v);
 		}
 		else if (this.stack.size() == 3 && localName.equals("startcount")) {
 			long v = Long.parseLong(this.currentText.toString());
