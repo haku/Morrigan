@@ -109,7 +109,6 @@ public class SyncMetadataRemoteToLocalTask implements IMorriganTask {
 			db.setTrackDateLastPlayed(localItem, remoteItem.getDateLastPlayed());
 		}
 		
-		// TODO FIXME does remote DB in fact sync enabled state??
 		if (remoteItem.isEnabled() != localItem.isEnabled()) {
 			db.setItemEnabled(localItem, remoteItem.isEnabled());
 		}
