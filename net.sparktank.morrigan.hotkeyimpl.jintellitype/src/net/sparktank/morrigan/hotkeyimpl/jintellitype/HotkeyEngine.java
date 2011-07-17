@@ -1,7 +1,6 @@
 package net.sparktank.morrigan.hotkeyimpl.jintellitype;
 
 import java.io.File;
-import java.lang.reflect.Field;
 
 import net.sparktank.morrigan.engines.hotkey.HotkeyException;
 import net.sparktank.morrigan.engines.hotkey.HotkeyValue;
@@ -16,7 +15,7 @@ import com.melloware.jintellitype.JIntellitypeConstants;
 public class HotkeyEngine implements IHotkeyEngine {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private File[] classPath;
+//	private File[] classPath;
 	private IHotkeyListener listener;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -34,12 +33,12 @@ public class HotkeyEngine implements IHotkeyEngine {
 	
 	@Override
 	public void setClassPath(File[] classPath) {
-		this.classPath = classPath;
+//		this.classPath = classPath;
 	}
 	
 	@Override
 	public void registerHotkey(int id, HotkeyValue value) throws HotkeyException {
-		shoeHorn();
+//		shoeHorn();
 		
 		if (!JIntellitype.isJIntellitypeSupported()) {
 			throw new HotkeyException("JIntellitype is not available.");
@@ -73,9 +72,9 @@ public class HotkeyEngine implements IHotkeyEngine {
 	@Override
 	public void finalise() {
 		teardown();
-		if (this.haveShoeHorned) {
+//		if (this.haveShoeHorned) {
 			JIntellitype.getInstance().cleanUp();
-		}
+//		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -132,67 +131,67 @@ public class HotkeyEngine implements IHotkeyEngine {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private static final String dllName = "JIntellitype.dll";
-	
-	private boolean haveShoeHorned = false;
-	
-	// FIXME this is all REALLY nasty.
-	private void shoeHorn () {
-		if (this.haveShoeHorned) return;
-		
-		File dllFile = null;
-		
-		for (File classPathFile : this.classPath) {
-			if (classPathFile.isDirectory()) {
-				File[] listFiles = classPathFile.listFiles();
-				if (listFiles!=null && listFiles.length>0) {
-					for (File file : listFiles) {
-						if (file.isFile()) {
-							if (file.getName().equals(dllName)) {
-								dllFile = file;
-								break;
-							}
-						}
-					}
-				}
-			}
-		}
-		
-		if (dllFile==null) {
-			System.err.println("Did not find '" + dllName + "'.");
-			return;
-		}
-		System.err.println("dll " + dllName + "=" + dllFile.getAbsolutePath());
-		
-		try {
-			Class<?> clazz = ClassLoader.class;
-			Field field = clazz.getDeclaredField("sys_paths");
-			boolean accessible = field.isAccessible();
-			if (!accessible) field.setAccessible(true);
-			field.set(clazz, null);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		String newLibPath = System.getProperty("java.library.path") + File.pathSeparator + dllFile.getParentFile().getAbsolutePath();
-		System.err.println("Setting java.library.path=" + newLibPath);
-		System.setProperty("java.library.path", newLibPath);
-		
-		/* FIXME
-		 * This next line fails with
-		 * java.lang.UnsatisfiedLinkError: Native Library D:\haku\development\eclipseWorkspace-java\dsjtest\lib\dsj.dll already loaded in another classloader
-		 * if it is already loaded.
-		 */
-		try {
-			System.load(dllFile.getAbsolutePath());
-		} catch (Throwable t) {
-			t.printStackTrace();
-		}
-		
-		System.err.println("loaded dll=" + dllFile.getAbsolutePath());
-		
-		this.haveShoeHorned = true;
-	}
+//	private static final String dllName = "JIntellitype.dll";
+//	
+//	private boolean haveShoeHorned = false;
+//	
+//	// FIXME this is all REALLY nasty.
+//	private void shoeHorn () {
+//		if (this.haveShoeHorned) return;
+//		
+//		File dllFile = null;
+//		
+//		for (File classPathFile : this.classPath) {
+//			if (classPathFile.isDirectory()) {
+//				File[] listFiles = classPathFile.listFiles();
+//				if (listFiles!=null && listFiles.length>0) {
+//					for (File file : listFiles) {
+//						if (file.isFile()) {
+//							if (file.getName().equals(dllName)) {
+//								dllFile = file;
+//								break;
+//							}
+//						}
+//					}
+//				}
+//			}
+//		}
+//		
+//		if (dllFile==null) {
+//			System.err.println("Did not find '" + dllName + "'.");
+//			return;
+//		}
+//		System.err.println("dll " + dllName + "=" + dllFile.getAbsolutePath());
+//		
+//		try {
+//			Class<?> clazz = ClassLoader.class;
+//			Field field = clazz.getDeclaredField("sys_paths");
+//			boolean accessible = field.isAccessible();
+//			if (!accessible) field.setAccessible(true);
+//			field.set(clazz, null);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//		
+//		String newLibPath = System.getProperty("java.library.path") + File.pathSeparator + dllFile.getParentFile().getAbsolutePath();
+//		System.err.println("Setting java.library.path=" + newLibPath);
+//		System.setProperty("java.library.path", newLibPath);
+//		
+//		/* FIXME
+//		 * This next line fails with
+//		 * java.lang.UnsatisfiedLinkError: Native Library D:\haku\development\eclipseWorkspace-java\dsjtest\lib\dsj.dll already loaded in another classloader
+//		 * if it is already loaded.
+//		 */
+//		try {
+//			System.load(dllFile.getAbsolutePath());
+//		} catch (Throwable t) {
+//			t.printStackTrace();
+//		}
+//		
+//		System.err.println("loaded dll=" + dllFile.getAbsolutePath());
+//		
+//		this.haveShoeHorned = true;
+//	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
