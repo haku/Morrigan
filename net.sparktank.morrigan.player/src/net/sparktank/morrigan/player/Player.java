@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import net.sparktank.morrigan.engines.EngineFactory;
 import net.sparktank.morrigan.engines.common.ImplException;
@@ -29,6 +30,8 @@ public class Player implements IPlayerLocal {
 	
 	private final int id;
 	private final String name;
+	
+	protected final Logger logger = Logger.getLogger(this.getClass().getName());
 	
 	final IPlayerEventHandler eventHandler;
 	
@@ -436,7 +439,7 @@ public class Player implements IPlayerLocal {
 			
 			IPlaybackEngine engine = getPlaybackEngine(true);
 			synchronized (engine) {
-				System.err.println("Loading '" + item.item.getTitle() + "'...");
+				this.logger.info("Loading '" + item.item.getTitle() + "'...");
 				setCurrentItem(item);
 				engine.setFile(item.item.getFilepath());
 				Composite currentMediaFrameParent = this.eventHandler.getCurrentMediaFrameParent();
@@ -446,7 +449,7 @@ public class Player implements IPlayerLocal {
 				engine.startPlaying();
 				
 				this._currentTrackDuration = engine.getDuration();
-				System.err.println("Started to play '" + item.item.getTitle() + "'...");
+				this.logger.info("Started to play '" + item.item.getTitle() + "'...");
 				
 				// Put DB stuff in DB thread.
 				Thread bgthread = new Thread() {
@@ -613,7 +616,7 @@ public class Player implements IPlayerLocal {
 				if (c != null && c.list != null && c.item != null) {
 					if (c.item.getDuration() != duration) {
 						try {
-							System.err.println("setting item duration=" + duration);
+							Player.this.logger.info("setting item duration=" + duration);
 							c.list.setTrackDuration(c.item, duration);
 						} catch (Throwable t) {
 							t.printStackTrace();
@@ -632,7 +635,7 @@ public class Player implements IPlayerLocal {
 		
 		@Override
 		public void onEndOfTrack() {
-			System.err.println("Player received endOfTrack event.");
+			Player.this.logger.info("Player received endOfTrack event.");
 			// Inc. stats.
 			try {
 				getCurrentItem().list.incTrackEndCnt(getCurrentItem().item);
@@ -646,7 +649,7 @@ public class Player implements IPlayerLocal {
 				loadAndStartPlaying(nextItemToPlay);
 			}
 			else {
-				System.err.println("No more tracks to play.");
+				Player.this.logger.info("No more tracks to play.");
 				Player.this.eventHandler.updateStatus();
 			}
 		};
@@ -665,7 +668,7 @@ public class Player implements IPlayerLocal {
 		
 		@Override
 		public void onMouseClick(int button, int clickCount) {
-			System.err.println("Mouse click "+button+"*"+clickCount);
+			Player.this.logger.info("Mouse click "+button+"*"+clickCount);
 			if (clickCount > 1) {
 				Player.this.eventHandler.videoAreaSelected();
 			}
