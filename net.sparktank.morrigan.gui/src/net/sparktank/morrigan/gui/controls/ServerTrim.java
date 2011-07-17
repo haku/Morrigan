@@ -30,7 +30,7 @@ public class ServerTrim extends WorkbenchWindowControlContribution {
 //	WorkbenchWindowControlContribution and GUI methods.
 	
 	private Label lblStatus;
-	private Button btnStartStop;
+	Button btnStartStop;
 	
 	@Override
 	protected Control createControl (Composite parent) {
@@ -108,8 +108,10 @@ public class ServerTrim extends WorkbenchWindowControlContribution {
 		@Override
 		public void widgetSelected(SelectionEvent e) {
 			try {
+				ServerTrim.this.btnStartStop.setEnabled(false);
 				invertServer();
-			} catch (BundleException e1) {
+			}
+			catch (BundleException e1) {
 				new MorriganMsgDlg(e1).open();
 			}
 		}
