@@ -218,6 +218,13 @@ public class Player implements IPlayerLocal {
 	}
 	
 	@Override
+	public void addToQueue(List<PlayItem> item) {
+		// TODO check item is of MediaType == TRACK.
+		this._queue.addAll(item);
+		callQueueChangedListeners();
+	}
+	
+	@Override
 	public void removeFromQueue (PlayItem item) {
 		this._queue.remove(item);
 		callQueueChangedListeners();
@@ -285,6 +292,7 @@ public class Player implements IPlayerLocal {
 	}
 	
 	private void callQueueChangedListeners () {
+		// TODO upgrade to use RunHelper.
 		for (Runnable r : this._queueChangeListeners) {
 			r.run();
 		}
@@ -293,6 +301,24 @@ public class Player implements IPlayerLocal {
 	@Override
 	public List<PlayItem> getQueueList () {
 		return Collections.unmodifiableList(this._queue);
+	}
+	
+	@Override
+	public void setQueueList(List<PlayItem> items) {
+		// TODO make thread safe.
+		synchronized (this._queue) {
+			this._queue.clear();
+			this._queue.addAll(items);
+		}
+		callQueueChangedListeners();
+	}
+	
+	@Override
+	public void shuffleQueue() {
+		synchronized (this._queue) {
+			Collections.shuffle(this._queue);
+		}
+		callQueueChangedListeners();
 	}
 	
 	@Override

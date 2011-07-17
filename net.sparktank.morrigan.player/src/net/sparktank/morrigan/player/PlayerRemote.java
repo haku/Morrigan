@@ -153,6 +153,11 @@ public class PlayerRemote implements IPlayerRemote {
 	}
 	
 	@Override
+	public void addToQueue(List<PlayItem> item) {
+		throw new UnsupportedOperationException("Not implemented.");
+	}
+	
+	@Override
 	public void removeFromQueue(PlayItem item) {
 		throw new RuntimeException("Not implemented.");
 	}
@@ -168,8 +173,18 @@ public class PlayerRemote implements IPlayerRemote {
 	}
 	
 	@Override
+	public void shuffleQueue() {
+		throw new UnsupportedOperationException("Not implemented.");
+	}
+	
+	@Override
 	public List<PlayItem> getQueueList() {
 		throw new RuntimeException("Not implemented.");
+	}
+	
+	@Override
+	public void setQueueList(List<PlayItem> items) {
+		throw new UnsupportedOperationException("Not implemented.");
 	}
 	
 	@Override

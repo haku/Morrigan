@@ -3,6 +3,7 @@ package net.sparktank.morrigan.gui.dialogs;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.List;
 
 import net.sparktank.morrigan.gui.preferences.PreferenceHelper;
@@ -41,7 +42,7 @@ import org.eclipse.swt.widgets.Text;
 public class JumpToDlg {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private static final int MAX_RESULTS = 50;
+	private static final int MAX_RESULTS = 100;
 	
 	private static volatile WeakReference<JumpToDlg> openDlg = null;
 	private static volatile Object dlgOpenLock = new Object();
@@ -52,6 +53,9 @@ public class JumpToDlg {
 	final Shell parent;
 	private final IMediaTrackDb<?,?,? extends IMediaTrack> mediaDb;
 	
+	private PlayItem returnValue = null;
+	private List<PlayItem> returnList = null;
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public JumpToDlg (Shell parent, IMediaTrackDb<?,?,? extends IMediaTrack> mediaDb) {
@@ -61,6 +65,14 @@ public class JumpToDlg {
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	public PlayItem getReturnItem () {
+		return this.returnValue;
+	}
+	
+	public List<PlayItem> getReturnList () {
+		return this.returnList;
+	}
 	
 	public int getKeyMask() {
 		return this.keyMask;
@@ -81,12 +93,12 @@ public class JumpToDlg {
 	Button btnPlay = null;
 	Button btnEnqueue = null;
 	Button btnReveal = null;
+	Button btnShuffleAll = null;
 	private Button btnCancel = null;
 	
-	private PlayItem returnValue = null;
 	private int keyMask = 0;
 	
-	public PlayItem open () {
+	public void open () {
 		synchronized (dlgOpenLock) {
 			if (dlgOpen) {
 				if (openDlg != null) {
@@ -95,7 +107,7 @@ public class JumpToDlg {
 						j.remoteClose();
 					}
 				}
-				return null;
+				return;
 			}
 			dlgOpen = true;
 		}
@@ -115,6 +127,7 @@ public class JumpToDlg {
 		this.btnPlay = new Button(this.shell, SWT.PUSH);
 		this.btnEnqueue = new Button(this.shell, SWT.PUSH);
 		this.btnReveal = new Button(this.shell, SWT.PUSH);
+		this.btnShuffleAll = new Button(this.shell, SWT.PUSH);
 		this.btnCancel = new Button(this.shell, SWT.PUSH);
 		
 		this.shell.setDefaultButton(this.btnPlay);
@@ -141,9 +154,15 @@ public class JumpToDlg {
 		formData.height = 300;
 		this.tableViewer.getTable().setLayoutData(formData);
 		
-		this.btnPlay.setText("Play");
+		this.btnShuffleAll.setText("Shuffle all");
 		formData = new FormData();
 		formData.right = new FormAttachment(100, -SEP);
+		formData.bottom = new FormAttachment(100, -SEP);
+		this.btnShuffleAll.setLayoutData(formData);
+		
+		this.btnPlay.setText("Play");
+		formData = new FormData();
+		formData.right = new FormAttachment(this.btnShuffleAll, -SEP);
 		formData.bottom = new FormAttachment(100, -SEP);
 		this.btnPlay.setLayoutData(formData);
 		
@@ -178,6 +197,7 @@ public class JumpToDlg {
 		this.btnPlay.addSelectionListener(this.buttonListener);
 		this.btnEnqueue.addSelectionListener(this.buttonListener);
 		this.btnReveal.addSelectionListener(this.buttonListener);
+		this.btnShuffleAll.addSelectionListener(this.buttonListener);
 		this.btnCancel.addSelectionListener(this.buttonListener);
 		
 		this.shell.pack();
@@ -224,21 +244,20 @@ public class JumpToDlg {
 		synchronized (dlgOpenLock) {
 			dlgOpen = false;
 		}
-		
-		return this.returnValue;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public void remoteClose () {
-		leaveDlg(false, 0);
+		leaveDlg(false, 0, false);
 	}
 	
-	void leaveDlg (boolean ok, int mask) {
+	void leaveDlg (boolean ok, int mask, boolean makeList) {
 		if (ok) {
 			IMediaTrack item = getSelectedItem();
 			if (item == null) return;
 			this.returnValue = new PlayItem(this.mediaDb, item);
+			if (makeList) this.returnList = makePlayItems(this.mediaDb, this.searchResults);
 		}
 		setKeyMask(mask);
 		
@@ -256,13 +275,13 @@ public class JumpToDlg {
 				case SWT.TRAVERSE_RETURN:
 					e.detail = SWT.TRAVERSE_NONE;
 					e.doit = false;
-					leaveDlg(true, e.stateMask);
+					leaveDlg(true, e.stateMask, false);
 					break;
 					
 				case SWT.TRAVERSE_ESCAPE:
 					e.detail = SWT.TRAVERSE_NONE;
 					e.doit = false;
-					leaveDlg(false, e.stateMask);
+					leaveDlg(false, e.stateMask, false);
 					break;
 				
 				default:
@@ -289,7 +308,7 @@ public class JumpToDlg {
 				case SWT.TRAVERSE_ESCAPE:
 					e.detail = SWT.TRAVERSE_NONE;
 					e.doit = false;
-					leaveDlg(false, e.stateMask);
+					leaveDlg(false, e.stateMask, false);
 					break;
 				
 				default:
@@ -315,7 +334,7 @@ public class JumpToDlg {
 				case SWT.TRAVERSE_ESCAPE:
 					e.detail = SWT.TRAVERSE_NONE;
 					e.doit = false;
-					leaveDlg(false, e.stateMask);
+					leaveDlg(false, e.stateMask, false);
 					break;
 				
 				default:
@@ -329,16 +348,19 @@ public class JumpToDlg {
 		@Override
 		public void widgetSelected(SelectionEvent e) {
 			if (e.widget == JumpToDlg.this.btnPlay) {
-				leaveDlg(true, 0);
+				leaveDlg(true, 0, false);
 			}
 			else if (e.widget == JumpToDlg.this.btnEnqueue) {
-				leaveDlg(true, SWT.CONTROL);
+				leaveDlg(true, SWT.CONTROL, false);
 			}
 			else if (e.widget == JumpToDlg.this.btnReveal) {
-				leaveDlg(true, SWT.CONTROL | SWT.SHIFT);
+				leaveDlg(true, SWT.CONTROL | SWT.SHIFT, false);
+			}
+			else if (e.widget == JumpToDlg.this.btnShuffleAll) {
+				leaveDlg(true, SWT.ALT, true);
 			}
 			else {
-				leaveDlg(false, 0);
+				leaveDlg(false, 0, false);
 			}
 		}
 	};
@@ -506,6 +528,16 @@ public class JumpToDlg {
 		}
 		
 		return false;
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	private static List<PlayItem> makePlayItems (IMediaTrackDb<?,?,? extends IMediaTrack> mediaDb, List<? extends IMediaTrack> tracks) {
+		List<PlayItem> ret = new ArrayList<PlayItem>(tracks.size());
+		for (IMediaTrack track : tracks) {
+			ret.add(new PlayItem(mediaDb, track));
+		}
+		return ret;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

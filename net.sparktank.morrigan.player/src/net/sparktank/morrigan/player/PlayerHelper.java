@@ -80,6 +80,9 @@ public class PlayerHelper {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	/**
+	 * What is the point in this???
+	 */
 	static public List<? extends IMediaTrack> runQueryOnList (IMediaTrackDb<?,?,? extends IMediaTrack> mediaDb, String query, int maxResults) throws MorriganException {
 		List<? extends IMediaTrack> res;
 		try {
