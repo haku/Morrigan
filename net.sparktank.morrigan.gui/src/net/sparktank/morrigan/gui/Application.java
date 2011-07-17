@@ -2,6 +2,7 @@ package net.sparktank.morrigan.gui;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.logging.Logger;
 
 import net.sparktank.morrigan.config.Config;
 
@@ -17,12 +18,14 @@ import org.eclipse.ui.PlatformUI;
  * This class controls all aspects of the application's execution.
  */
 public class Application implements IApplication {
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.equinox.app.IApplication#start(org.eclipse.equinox.app.IApplicationContext)
-	 */
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	protected final Logger logger = Logger.getLogger(this.getClass().getName());
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
 	@Override
-	public Object start(IApplicationContext context) {
+	public Object start (IApplicationContext context) {
 		Display display = PlatformUI.createDisplay();
 		try {
 			// Set workspace location.
@@ -31,11 +34,12 @@ public class Application implements IApplication {
 				String configDir = Config.getConfigDir();
 				try {
 					instanceLoc.set(new URL("file", null, configDir), false);
-				} catch (IOException e) {
+				}
+				catch (IOException e) {
 					throw new RuntimeException(e);
 				}
 			}
-			System.out.println("instanceLoc=" + instanceLoc.getURL().toExternalForm());
+			this.logger.info("instanceLoc=" + instanceLoc.getURL().toExternalForm());
 			
 			// Run workbench.
 			int returnCode = PlatformUI.createAndRunWorkbench(display, new ApplicationWorkbenchAdvisor());
@@ -43,17 +47,14 @@ public class Application implements IApplication {
 				return IApplication.EXIT_RESTART;
 			}
 			return IApplication.EXIT_OK;
-			
-		} finally {
+		}
+		finally {
 			display.dispose();
 		}
 	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.equinox.app.IApplication#stop()
-	 */
+	
 	@Override
-	public void stop() {
+	public void stop () {
 		final IWorkbench workbench = PlatformUI.getWorkbench();
 		if (workbench == null) return;
 		final Display display = workbench.getDisplay();
@@ -64,4 +65,6 @@ public class Application implements IApplication {
 			}
 		});
 	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
