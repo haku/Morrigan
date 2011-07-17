@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Mmorrigan Danbooru
+Bundle-Name: Morrigan Danbooru
 Bundle-SymbolicName: net.sparktank.morrigan.danbooru
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: net.sparktank.morrigan.danbooru.Activator
