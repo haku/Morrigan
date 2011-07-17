@@ -12,7 +12,7 @@
    </property>
    <property
          name="aboutText"
-         value="This alpha build of morrigan is released as free software and is provided &quot;as is&quot; for testing pourpouses only.  For more information, please see this wiki page:&#x0A;&#x0A;http://sparktank.net/w/index.php?title=Project_Morrigan&#x0A;&#x0A;You can email the developer at haku@vaguehope.com&#x0A;&#x0A;This build of morrigan is copyright Alex Hutter 2010.  All rights reserved.&#x0A;&#x0A;Image &quot;The Morrígan&quot; by Louis le Brocquy used under the Creative Commons Attribution 2.5 Generic license.">
+         value="This alpha build of morrigan is released as free software and is provided &quot;as is&quot; for testing use only.  For more information, please see this wiki page:&#x0A;&#x0A;http://sparktank.net/w/Morrigan&#x0A;&#x0A;You can email the developer at haku@vaguehope.com&#x0A;&#x0A;This build of Morrigan is copyright Alex Hutter 2010, 2011.  All rights reserved.&#x0A;&#x0A;Image &quot;The Morrígan&quot; by Louis le Brocquy used under the Creative Commons Attribution 2.5 Generic license.">
    </property>
 		</product>
 	</extension>
