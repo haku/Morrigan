@@ -55,6 +55,7 @@ Image &quot;The Morrígan&quot; by Louis le Brocquy used under the Creative Comm
       <plugin id="net.sparktank.morrigan.osgiconsole"/>
       <plugin id="net.sparktank.morrigan.playbackimpl.dsj"/>
       <plugin id="net.sparktank.morrigan.playbackimpl.gs"/>
+      <plugin id="net.sparktank.morrigan.playbackimpl.jmf"/>
       <plugin id="net.sparktank.morrigan.player"/>
       <plugin id="net.sparktank.morrigan.server"/>
       <plugin id="net.sparktank.morrigan.server.boot"/>
@@ -151,6 +152,7 @@ Image &quot;The Morrígan&quot; by Louis le Brocquy used under the Creative Comm
       <plugin id="net.sparktank.morrigan.hotkeyimpl.jxgrabkey" autoStart="true" startLevel="0" />
       <plugin id="net.sparktank.morrigan.playbackimpl.dsj" autoStart="true" startLevel="0" />
       <plugin id="net.sparktank.morrigan.playbackimpl.gs" autoStart="true" startLevel="0" />
+      <plugin id="net.sparktank.morrigan.playbackimpl.jmf" autoStart="true" startLevel="0" />
       <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="0" />
    </configurations>
 
