@@ -113,6 +113,7 @@ public class ViewQueue extends ViewPart {
 		getViewSite().getActionBars().getToolBarManager().add(this.moveUpAction);
 		getViewSite().getActionBars().getToolBarManager().add(this.moveDownAction);
 		getViewSite().getActionBars().getToolBarManager().add(this.removeAction);
+		getViewSite().getActionBars().getToolBarManager().add(this.shuffleAction);
 	}
 	
 	private int lastQueueSize = 0;
@@ -229,6 +230,13 @@ public class ViewQueue extends ViewPart {
 				ViewQueue.this.abstractPlayerView.getPlayer().removeFromQueue(item);
 			}
 		}
+	};
+	
+	protected IAction shuffleAction = new Action ("Shuffle", Activator.getImageDescriptor("icons/question.png")) {
+		@Override
+		public void run() {
+			ViewQueue.this.abstractPlayerView.getPlayer().shuffleQueue();
+		};
 	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -669,15 +669,27 @@ public abstract class AbstractPlayerView extends ViewPart {
 			if (!(currentList instanceof IMediaTrackDb<?,?,?>)) return;
 			
 			JumpToDlg dlg = new JumpToDlg(getViewSite().getShell(), (IMediaTrackDb<?,?,?>) currentList);
-			PlayItem item = dlg.open();
+			dlg.open();
+			PlayItem item = dlg.getReturnItem();
 			if (item != null) {
-				if ((dlg.getKeyMask() & SWT.SHIFT) != 0 && (dlg.getKeyMask() & SWT.CONTROL) != 0) {
-					revealItemInLists(currentList, item.item);
+				List<PlayItem> list = dlg.getReturnList();
+				if (list != null) {
+					if ((dlg.getKeyMask() & SWT.ALT) != 0) {
+						List<PlayItem> shuffeledList = new ArrayList<PlayItem>(list);
+						Collections.shuffle(shuffeledList);
+						getPlayer().addToQueue(shuffeledList);
+					}
 				}
-				else if ((dlg.getKeyMask() & SWT.SHIFT) != 0 || (dlg.getKeyMask() & SWT.CONTROL) != 0) {
-					getPlayer().addToQueue(item);
-				} else {
-					getPlayer().loadAndStartPlaying(item);
+				else {
+					if ((dlg.getKeyMask() & SWT.SHIFT) != 0 && (dlg.getKeyMask() & SWT.CONTROL) != 0) {
+						revealItemInLists(currentList, item.item);
+					}
+					else if ((dlg.getKeyMask() & SWT.SHIFT) != 0 || (dlg.getKeyMask() & SWT.CONTROL) != 0) {
+						getPlayer().addToQueue(item);
+					}
+					else {
+						getPlayer().loadAndStartPlaying(item);
+					}
 				}
 			}
 		}

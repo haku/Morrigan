@@ -42,10 +42,13 @@ public interface IPlayerAbstract {
 	public List<PlayItem> getHistory();
 	
 	public void addToQueue(PlayItem item);
+	public void addToQueue(List<PlayItem> item);
 	public void removeFromQueue(PlayItem item);
 	public void clearQueue();
 	public void moveInQueue(List<PlayItem> items, boolean moveDown);
 	public List<PlayItem> getQueueList();
+	public void setQueueList (List<PlayItem> items);
+	public void shuffleQueue ();
 	public DurationData getQueueTotalDuration();
 	
 	public Map<Integer, String> getMonitors ();
