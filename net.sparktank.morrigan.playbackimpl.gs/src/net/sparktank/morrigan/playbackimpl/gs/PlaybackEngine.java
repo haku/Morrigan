@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Logger;
 
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine;
@@ -134,7 +136,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 	public void finalise() {
 		finalisePlayback();
 	}
-
+	
 	@Override
 	public void loadTrack() throws PlaybackException {
 		long t0 = System.currentTimeMillis();
@@ -184,9 +186,15 @@ public class PlaybackEngine implements IPlaybackEngine {
 	
 	@Override
 	public void seekTo(double d) throws PlaybackException {
-		if (this.playbin!=null) {
-			long duration = this.playbin.queryDuration(TimeUnit.NANOSECONDS);
-			this.playbin.seek(1.0d, Format.TIME, SeekFlags.FLUSH | SeekFlags.SEGMENT, SeekType.SET, (long) (d * duration), SeekType.NONE, -1);
+		this.playLock.lock();
+		try {
+			if (this.playbin!=null) {
+				long duration = this.playbin.queryDuration(TimeUnit.NANOSECONDS);
+				this.playbin.seek(1.0d, Format.TIME, SeekFlags.FLUSH | SeekFlags.SEGMENT, SeekType.SET, (long) (d * duration), SeekType.NONE, -1);
+			}
+		}
+		finally {
+			this.playLock.unlock();
 		}
 	}
 	
@@ -198,6 +206,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Local playback methods.
 	
+	private Lock playLock = new ReentrantLock();
 	PlayBin playbin = null;
 	VideoComponent videoComponent = null;   // SWT / GStreamer.
 	Element videoElement = null;            // GStreamer.
@@ -208,45 +217,49 @@ public class PlaybackEngine implements IPlaybackEngine {
 		
 		stopWatcherThread();
 		
-		if (this.playbin!=null) {
-			this.playbin.setState(State.NULL);
-			this.playbin.dispose();
-			this.playbin = null;
-			
-			if (this.videoElement != null) {
-				this.videoElement.dispose();
-			}
-			
-			if (this.videoComponent!=null) {
-				if (!this.videoComponent.isDisposed()) {
-					_runInUiThread(this.videoComponent, new Runnable() {
-						@Override
-						public void run() {
-							PlaybackEngine.this.videoComponent.removeKeyListener(PlaybackEngine.this.keyListener);
-							PlaybackEngine.this.videoComponent.removeMouseListener(PlaybackEngine.this.mouseListener);
-							PlaybackEngine.this.videoComponent.dispose();
-						}
-					});
-				}
-				this.videoComponent = null;
+		this.playLock.lock();
+		try {
+			if (this.playbin!=null) {
+				this.playbin.setState(State.NULL);
+				this.playbin.dispose();
+				this.playbin = null;
+				if (this.videoElement != null) this.videoElement.dispose();
 				
-				if (this.videoFrameParent!=null && !this.videoFrameParent.isDisposed()) {
-					_runInUiThread(this.videoFrameParent, new Runnable() {
-						@Override
-						public void run() {
-							if (!PlaybackEngine.this.videoFrameParent.isDisposed()) {
-								PlaybackEngine.this.videoFrameParent.redraw();
+				if (this.videoComponent!=null) {
+					if (!this.videoComponent.isDisposed()) {
+						_runInUiThread(this.videoComponent, new Runnable() {
+							@Override
+							public void run() {
+								PlaybackEngine.this.videoComponent.removeKeyListener(PlaybackEngine.this.keyListener);
+								PlaybackEngine.this.videoComponent.removeMouseListener(PlaybackEngine.this.mouseListener);
+								PlaybackEngine.this.videoComponent.dispose();
 							}
-						}
-					});
+						});
+					}
+					this.videoComponent = null;
+					
+					if (this.videoFrameParent!=null && !this.videoFrameParent.isDisposed()) {
+						_runInUiThread(this.videoFrameParent, new Runnable() {
+							@Override
+							public void run() {
+								if (!PlaybackEngine.this.videoFrameParent.isDisposed()) {
+									PlaybackEngine.this.videoFrameParent.redraw();
+								}
+							}
+						});
+					}
 				}
 			}
+		}
+		finally {
+			this.playLock.unlock();
 		}
 		
 		this.logger.fine("finalisePlayback() <<<");
 	}
 	
 	private void _loadTrack () throws PlaybackException {
+		this.playLock.lock();
 		try {
 			callStateListener(PlayState.Loading);
 			boolean firstLoad = (this.playbin==null);
@@ -283,6 +296,9 @@ public class PlaybackEngine implements IPlaybackEngine {
 			callStateListener(PlayState.Stopped);
 			throw new PlaybackException("Failed to load '"+this.filepath+"'.", t);
 		}
+		finally {
+			this.playLock.unlock();
+		}
 	}
 	
 	void reparentVideo () {
@@ -292,103 +308,110 @@ public class PlaybackEngine implements IPlaybackEngine {
 	private void reparentVideo (boolean seek) {
 		this.logger.fine("reparentVideo() >>>");
 		
-		// Clean up any stuff we had before.
-		if (this.videoComponent!=null) {
-			if (!this.videoComponent.isDisposed()) {
-				_runInUiThread(this.videoComponent, new Runnable() {
-					@Override
-					public void run() {
-						PlaybackEngine.this.videoComponent.removeKeyListener(PlaybackEngine.this.keyListener);
-						PlaybackEngine.this.videoComponent.removeMouseListener(PlaybackEngine.this.mouseListener);
-					}
-				});
-				this.logger.fine("reparentVideo() : removed listeners.");
-			}
-		}
-		
-		// Clear old values but keep references so we can dispose them later.
-		final VideoComponent old_videoComponent = this.videoComponent;
-		this.videoComponent = null;
-		Element old_videoElement = this.videoElement;
-		this.videoElement = null;
-		
-		// Do we have anything to attach video output to?
-		if (this.playbin!=null) {
-			// Can not attach video to something that is not there...
-			if (this.videoFrameParent != null && this.hasVideo) {
-				/*
-				 * We can not move the video while it is playing, so if it is,
-				 * stop it and remember where it was.
-				 */
-				long position = -1;
-				State state = this.playbin.getState();
-				if (state==State.PLAYING || state==State.PAUSED) {
-					position = this.playbin.queryPosition(TimeUnit.NANOSECONDS);
-					this.logger.fine("position=" + position);
-					this.playbin.setState(State.NULL);
+		this.playLock.lock();
+		try {
+			// Clean up any stuff we had before.
+			if (this.videoComponent!=null) {
+				if (!this.videoComponent.isDisposed()) {
+					_runInUiThread(this.videoComponent, new Runnable() {
+						@Override
+						public void run() {
+							PlaybackEngine.this.videoComponent.removeKeyListener(PlaybackEngine.this.keyListener);
+							PlaybackEngine.this.videoComponent.removeMouseListener(PlaybackEngine.this.mouseListener);
+						}
+					});
+					this.logger.fine("reparentVideo() : removed listeners.");
 				}
-				
-				this.logger.fine("reparentVideo() : creating new VideoComponent.");
-				_runInUiThread(this.videoFrameParent, new Runnable() {
-					@Override
-					public void run() {
-						PlaybackEngine.this.videoComponent = new VideoComponent(PlaybackEngine.this.videoFrameParent, SWT.NO_BACKGROUND);
-						PlaybackEngine.this.videoComponent.setKeepAspect(true);
-						PlaybackEngine.this.videoElement = PlaybackEngine.this.videoComponent.getElement();
-						PlaybackEngine.this.playbin.setVideoSink(PlaybackEngine.this.videoElement);
-						PlaybackEngine.this.videoFrameParent.layout();
-						
-						PlaybackEngine.this.videoComponent.addKeyListener(PlaybackEngine.this.keyListener);
-						PlaybackEngine.this.videoComponent.addMouseListener(PlaybackEngine.this.mouseListener);
+			}
+			
+			// Clear old values but keep references so we can dispose them later.
+			final VideoComponent old_videoComponent = this.videoComponent;
+			this.videoComponent = null;
+			Element old_videoElement = this.videoElement;
+			this.videoElement = null;
+			
+			// Do we have anything to attach video output to?
+			if (this.playbin!=null) {
+				// Can not attach video to something that is not there...
+				if (this.videoFrameParent != null && this.hasVideo) {
+					/*
+					 * We can not move the video while it is playing, so if it is,
+					 * stop it and remember where it was.
+					 */
+					long position = -1;
+					State state = this.playbin.getState();
+					if (state==State.PLAYING || state==State.PAUSED) {
+						position = this.playbin.queryPosition(TimeUnit.NANOSECONDS);
+						this.logger.fine("position=" + position);
+						this.playbin.setState(State.NULL);
 					}
-				});
-				
-				/*
-				 * If video was playing, put it back again...
-				 */
-				if (seek && position>=0) {
-					this.playbin.setState(State.PAUSED);
 					
-					if (position > 0) {
-						long startTime = System.currentTimeMillis();
-						
-						while (true) {
-							this.playbin.seek(1.0d, Format.TIME, SeekFlags.FLUSH | SeekFlags.SEGMENT, SeekType.SET, position, SeekType.NONE, -1);
+					this.logger.fine("reparentVideo() : creating new VideoComponent.");
+					_runInUiThread(this.videoFrameParent, new Runnable() {
+						@Override
+						public void run() {
+							PlaybackEngine.this.videoComponent = new VideoComponent(PlaybackEngine.this.videoFrameParent, SWT.NO_BACKGROUND);
+							PlaybackEngine.this.videoComponent.setKeepAspect(true);
+							PlaybackEngine.this.videoElement = PlaybackEngine.this.videoComponent.getElement();
+							PlaybackEngine.this.playbin.setVideoSink(PlaybackEngine.this.videoElement);
+							PlaybackEngine.this.videoFrameParent.layout();
 							
-							if (this.playbin.queryPosition(TimeUnit.NANOSECONDS) > 0) { break; }
-							try { Thread.sleep(200); } catch (InterruptedException e) { /* UNUSED */ }
-							if (this.playbin.queryPosition(TimeUnit.NANOSECONDS) > 0) { break; }
+							PlaybackEngine.this.videoComponent.addKeyListener(PlaybackEngine.this.keyListener);
+							PlaybackEngine.this.videoComponent.addMouseListener(PlaybackEngine.this.mouseListener);
+						}
+					});
+					
+					/*
+					 * If video was playing, put it back again...
+					 */
+					if (seek && position>=0) {
+						this.playbin.setState(State.PAUSED);
+						
+						if (position > 0) {
+							long startTime = System.currentTimeMillis();
+							
+							while (true) {
+								this.playbin.seek(1.0d, Format.TIME, SeekFlags.FLUSH | SeekFlags.SEGMENT, SeekType.SET, position, SeekType.NONE, -1);
+								
+								if (this.playbin.queryPosition(TimeUnit.NANOSECONDS) > 0) { break; }
+								try { Thread.sleep(200); } catch (InterruptedException e) { /* UNUSED */ }
+								if (this.playbin.queryPosition(TimeUnit.NANOSECONDS) > 0) { break; }
+							}
+							
+							this.logger.fine("reparentVideo() : Seek took " + (System.currentTimeMillis() - startTime) + " ms.");
 						}
 						
-						this.logger.fine("reparentVideo() : Seek took " + (System.currentTimeMillis() - startTime) + " ms.");
-					}
-					
-					if (state != State.PAUSED) {
-						this.playbin.setState(state);
+						if (state != State.PAUSED) {
+							this.playbin.setState(state);
+						}
 					}
 				}
-			}
-			else { // If there is no video or nowhere to put video...
-				this.logger.fine("reparentVideo() : setVideoSink(fakesink).");
-				Element fakesink = ElementFactory.make("fakesink", "videosink");
-				fakesink.set("sync", new Boolean(true));
-				this.playbin.setVideoSink(fakesink); // If we had video and now don't, remove it.
-			}
-		}
-		
-		// If we left stuff that needed disposing, do so here.
-		if (old_videoElement!=null) {
-			old_videoElement.dispose();
-		}
-		if (old_videoComponent!=null && !old_videoComponent.isDisposed()) {
-			_runInUiThread(old_videoComponent, new Runnable() {
-				@Override
-				public void run() {
-					Composite parent = old_videoComponent.getParent();
-					old_videoComponent.dispose();
-					parent.layout();
+				else { // If there is no video or nowhere to put video...
+					this.logger.fine("reparentVideo() : setVideoSink(fakesink).");
+					Element fakesink = ElementFactory.make("fakesink", "videosink");
+					fakesink.set("sync", new Boolean(true));
+					this.playbin.setVideoSink(fakesink); // If we had video and now don't, remove it.
 				}
-			});
+			}
+			
+			// If we left stuff that needed disposing, do so here.
+			if (old_videoElement!=null) {
+				old_videoElement.dispose();
+			}
+			if (old_videoComponent!=null && !old_videoComponent.isDisposed()) {
+				_runInUiThread(old_videoComponent, new Runnable() {
+					@Override
+					public void run() {
+						Composite parent = old_videoComponent.getParent();
+						old_videoComponent.dispose();
+						parent.layout();
+					}
+				});
+			}
+			
+		}
+		finally {
+			this.playLock.unlock();
 		}
 		
 		this.logger.fine("reparentVideo() <<<");
@@ -459,20 +482,26 @@ public class PlaybackEngine implements IPlaybackEngine {
 	private void _startTrack () {
 		this.logger.entering(this.getClass().getName(), "_startTrack");
 		
-		this.m_stopPlaying.set(false);
-		this.m_atEos.set(false);
-		
-		if (this.playbin != null) {
-			this.playbin.setState(State.PLAYING);
-			this.logger.fine("playbin.setState(PLAYING).");
+		this.playLock.lock();
+		try {
+			this.m_stopPlaying.set(false);
+			this.m_atEos.set(false);
 			
-			callStateListener(PlayState.Playing);
-			startWatcherThread();
-			
-			if (this.hasVideo) {
-				new WaitForVideoThread().start();
-				reparentVideo();
+			if (this.playbin != null) {
+				this.playbin.setState(State.PLAYING);
+				this.logger.fine("playbin.setState(PLAYING).");
+				
+				callStateListener(PlayState.Playing);
+				startWatcherThread();
+				
+				if (this.hasVideo) {
+					new WaitForVideoThread().start();
+					reparentVideo();
+				}
 			}
+		}
+		finally {
+			this.playLock.unlock();
 		}
 		
 		this.logger.exiting(this.getClass().getName(), "_startTrack");
@@ -583,24 +612,42 @@ public class PlaybackEngine implements IPlaybackEngine {
 	
 	
 	private void pauseTrack () {
-		if (this.playbin!=null) {
-			this.playbin.setState(State.PAUSED);
-			callStateListener(PlayState.Paused);
+		this.playLock.lock();
+		try {
+			if (this.playbin!=null) {
+				this.playbin.setState(State.PAUSED);
+				callStateListener(PlayState.Paused);
+			}
+		}
+		finally {
+			this.playLock.unlock();
 		}
 	}
 	
 	private void resumeTrack () {
-		if (this.playbin!=null) {
-			this.playbin.setState(State.PLAYING);
-			callStateListener(PlayState.Playing);
+		this.playLock.lock();
+		try {
+			if (this.playbin!=null) {
+				this.playbin.setState(State.PLAYING);
+				callStateListener(PlayState.Playing);
+			}
+		}
+		finally {
+			this.playLock.unlock();
 		}
 	}
 	
 	private void stopTrack () {
-		stopWatcherThread();
-		if (this.playbin!=null) {
-			this.playbin.setState(State.NULL);
-			callStateListener(PlayState.Stopped);
+		this.playLock.lock();
+		try {
+			stopWatcherThread();
+			if (this.playbin!=null) {
+				this.playbin.setState(State.NULL);
+				callStateListener(PlayState.Stopped);
+			}
+		}
+		finally {
+			this.playLock.unlock();
 		}
 	}
 	
