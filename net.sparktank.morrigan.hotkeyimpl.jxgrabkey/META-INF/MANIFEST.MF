@@ -1,12 +1,12 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Jxgrabkey
+Bundle-Name: Morrigan Jxgrabkey Engine
 Bundle-SymbolicName: net.sparktank.morrigan.hotkeyimpl.jxgrabkey
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: .,
  lib/JXGrabKey.jar
-Bundle-Vendor: sparktank.net
+Bundle-Vendor: vaguehope.com
 Import-Package: net.sparktank.morrigan.engines.hotkey,
  net.sparktank.morrigan.model.exceptions,
  org.osgi.framework;version="1.3.0"

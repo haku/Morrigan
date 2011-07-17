@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Media_impl
+Bundle-Name: Morrigan Model-Media_impl
 Bundle-SymbolicName: net.sparktank.morrigan.model.media_impl
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
@@ -21,3 +21,4 @@ Export-Package: net.sparktank.morrigan.model.media.impl,
  net.sparktank.morrigan.model.media.internal;x-friends:="net.sparktank.morrigan.server"
 Bundle-ClassPath: .,
  lib/jaudiotagger-2.0.3.jar
+Bundle-Vendor: vaguehope.com

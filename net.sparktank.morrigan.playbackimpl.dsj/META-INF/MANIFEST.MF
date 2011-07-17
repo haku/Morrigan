@@ -1,12 +1,12 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: PlaybackEngineDsj
+Bundle-Name: Morrigan DSJ Engine
 Bundle-SymbolicName: net.sparktank.morrigan.playbackimpl.dsj
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: .,
  lib/dsj.jar
-Bundle-Vendor: sparktank.net
+Bundle-Vendor: vaguehope.com
 Import-Package: net.sparktank.morrigan.engines.playback,
  net.sparktank.morrigan.model.exceptions,
  org.eclipse.swt,

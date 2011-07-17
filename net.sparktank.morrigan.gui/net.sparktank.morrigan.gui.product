@@ -6,13 +6,13 @@
    <aboutInfo>
       <image path="/net.sparktank.morrigan.gui/graphics/crow-full.png"/>
       <text>
-         This alpha build of morrigan is released as free software and is provided &quot;as is&quot; for testing pourpouses only.  For more information, please see this wiki page:
+         This alpha build of morrigan is released as free software and is provided &quot;as is&quot; for testing use only.  For more information, please see this wiki page:
 
-http://sparktank.net/w/index.php?title=Project_Morrigan
+http://sparktank.net/w/Morrigan
 
 You can email the developer at haku@vaguehope.com
 
-This build of morrigan is copyright Alex Hutter 2010.  All rights reserved.
+This build of Morrigan is copyright Alex Hutter 2010, 2011.  All rights reserved.
 
 Image &quot;The Morrígan&quot; by Louis le Brocquy used under the Creative Commons Attribution 2.5 Generic license.
       </text>
@@ -28,6 +28,7 @@ Image &quot;The Morrígan&quot; by Louis le Brocquy used under the Creative Comm
 
    <windowImages i16="/net.sparktank.morrigan.gui/icons/crow-16.png" i32="/net.sparktank.morrigan.gui/icons/crow-32.png" i48="/net.sparktank.morrigan.gui/icons/crow-48.png"/>
 
+
    <launcher name="morrigan">
       <solaris/>
       <win useIco="true">
@@ -36,8 +37,10 @@ Image &quot;The Morrígan&quot; by Louis le Brocquy used under the Creative Comm
       </win>
    </launcher>
 
+
    <vm>
    </vm>
+
 
    <plugins>
       <plugin id="com.ibm.icu"/>
