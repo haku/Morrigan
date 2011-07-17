@@ -11,7 +11,6 @@ import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.lang.reflect.Field;
 import java.util.logging.Logger;
 
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine;
@@ -55,7 +54,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 	private IPlaybackStatusListener listener = null;
 	private PlayState playbackState = PlayState.Stopped;
 
-	private File[] classPath = null;
+//	private File[] classPath = null;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructor.
@@ -77,7 +76,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 	
 	@Override
 	public int readFileDuration(String file) throws PlaybackException {
-		_shoeHorn();
+//		_shoeHorn();
 		
 		int[] stats = DSJUtils.getBasicFileStats(file);
 		return stats[0] / 1000;
@@ -85,7 +84,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 	
 	@Override
 	public void setClassPath(File[] classPath) {
-		this.classPath = classPath;
+//		this.classPath = classPath;
 	}
 	
 	@Override
@@ -225,7 +224,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 			this.logger.fine("dsj.PlaybackEngine firstLoad=" + firstLoad);
 			
 			if (firstLoad) {
-				_shoeHorn();
+//				_shoeHorn();
 			} else {
 				_finalisePlayback();
 			}
@@ -572,66 +571,66 @@ public class PlaybackEngine implements IPlaybackEngine {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Runtime DLL loading.
 	
-	private static final String dsjDll = "dsj.dll";
-	
-	private boolean haveShoeHorned = false;
-	
-	// FIXME this is all REALLY nasty.
-	private void _shoeHorn () {
-		if (this.haveShoeHorned) return;
-		
-		File dsjDllFile = null;
-		
-		for (File classPathFile : this.classPath) {
-			if (classPathFile.isDirectory()) {
-				File[] listFiles = classPathFile.listFiles();
-				if (listFiles!=null && listFiles.length>0) {
-					for (File file : listFiles) {
-						if (file.isFile()) {
-							if (file.getName().equals(dsjDll)) {
-								dsjDllFile = file;
-								break;
-							}
-						}
-					}
-				}
-			}
-		}
-		
-		if (dsjDllFile==null) {
-			this.logger.warning("dsj.PlaybackEngine Did not find '" + dsjDll + "'.");
-			return;
-		}
-		this.logger.fine("dsj.PlaybackEngine dll " + dsjDll + "=" + dsjDllFile.getAbsolutePath());
-		
-		try {
-			Class<?> clazz = ClassLoader.class;
-			Field field = clazz.getDeclaredField("sys_paths");
-			boolean accessible = field.isAccessible();
-			if (!accessible) field.setAccessible(true);
-			field.set(clazz, null);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		String newLibPath = System.getProperty("java.library.path") + File.pathSeparator + dsjDllFile.getParentFile().getAbsolutePath();
-		this.logger.fine("Setting java.library.path=" + newLibPath);
-		System.setProperty("java.library.path", newLibPath);
-		
-		/* FIXME
-		 * This next line fails with
-		 * java.lang.UnsatisfiedLinkError: Native Library D:\haku\development\eclipseWorkspace-java\dsjtest\lib\dsj.dll already loaded in another classloader
-		 * if it is already loaded.
-		 */
-		try {
-			System.load(dsjDllFile.getAbsolutePath());
-		} catch (Throwable t) {
-			t.printStackTrace();
-		}
-		
-		this.logger.fine("dsj.PlaybackEngine Loaded dll=" + dsjDllFile.getAbsolutePath());
-		
-		this.haveShoeHorned = true;
-	}
+//	private static final String dsjDll = "dsj.dll";
+//	
+//	private boolean haveShoeHorned = false;
+//	
+//	// FIXME this is all REALLY nasty.
+//	private void _shoeHorn () {
+//		if (this.haveShoeHorned) return;
+//		
+//		File dsjDllFile = null;
+//		
+//		for (File classPathFile : this.classPath) {
+//			if (classPathFile.isDirectory()) {
+//				File[] listFiles = classPathFile.listFiles();
+//				if (listFiles!=null && listFiles.length>0) {
+//					for (File file : listFiles) {
+//						if (file.isFile()) {
+//							if (file.getName().equals(dsjDll)) {
+//								dsjDllFile = file;
+//								break;
+//							}
+//						}
+//					}
+//				}
+//			}
+//		}
+//		
+//		if (dsjDllFile==null) {
+//			this.logger.warning("dsj.PlaybackEngine Did not find '" + dsjDll + "'.");
+//			return;
+//		}
+//		this.logger.fine("dsj.PlaybackEngine dll " + dsjDll + "=" + dsjDllFile.getAbsolutePath());
+//		
+//		try {
+//			Class<?> clazz = ClassLoader.class;
+//			Field field = clazz.getDeclaredField("sys_paths");
+//			boolean accessible = field.isAccessible();
+//			if (!accessible) field.setAccessible(true);
+//			field.set(clazz, null);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//		String newLibPath = System.getProperty("java.library.path") + File.pathSeparator + dsjDllFile.getParentFile().getAbsolutePath();
+//		this.logger.fine("Setting java.library.path=" + newLibPath);
+//		System.setProperty("java.library.path", newLibPath);
+//		
+//		/* FIXME
+//		 * This next line fails with
+//		 * java.lang.UnsatisfiedLinkError: Native Library D:\haku\development\eclipseWorkspace-java\dsjtest\lib\dsj.dll already loaded in another classloader
+//		 * if it is already loaded.
+//		 */
+//		try {
+//			System.load(dsjDllFile.getAbsolutePath());
+//		} catch (Throwable t) {
+//			t.printStackTrace();
+//		}
+//		
+//		this.logger.fine("dsj.PlaybackEngine Loaded dll=" + dsjDllFile.getAbsolutePath());
+//		
+//		this.haveShoeHorned = true;
+//	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

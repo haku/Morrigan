@@ -104,37 +104,13 @@
 	</target>
 	
 	<target name="zip_win32" depends="setprop" >
-		<ant antfile="../net.sparktank.morrigan.playbackimpl.dsj/makejar.xml"
-		     dir="../net.sparktank.morrigan.playbackimpl.dsj"
-		/>
-		<ant antfile="../net.sparktank.morrigan.hotkeyimpl.jintellitype/makejar.xml"
-		     dir="../net.sparktank.morrigan.hotkeyimpl.jintellitype"
-		/>
-		
 		<fileset dir="${procDirectory}" id="zipfiles" >
 			<include name="*win32*.zip" />
 		</fileset>
 		<pathconvert pathsep="" property="zipfile" refid="zipfiles" />
 		<echo message="zipfile=${zipfile}" />
-
+		
 		<zip destfile="${zipfile}" update="true" whenempty="fail" >
-			<zipfileset dir="../net.sparktank.morrigan.playbackimpl.dsj"
-			            includes="*.jar"
-			            prefix="${archivePrefix}/engines"
-			/>
-			<zipfileset dir="../net.sparktank.morrigan.playbackimpl.dsj/lib"
-			            includes="*"
-			            excludes="swt.jar"
-			            prefix="${archivePrefix}/engines"
-			/>
-			<zipfileset dir="../net.sparktank.morrigan.hotkeyimpl.jintellitype"
-			            includes="*.jar"
-			            prefix="${archivePrefix}/engines"
-			/>
-			<zipfileset dir="../net.sparktank.morrigan.hotkeyimpl.jintellitype/lib"
-			            includes="*"
-			            prefix="${archivePrefix}/engines"
-			/>
 			<zipfileset dir="propfiles"
 			            includes="win32.properties"
 			            fullpath="${archivePrefix}/morrigan.properties"

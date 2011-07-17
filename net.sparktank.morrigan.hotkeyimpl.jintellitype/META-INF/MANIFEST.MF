@@ -1,0 +1,19 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Jintellitype
+Bundle-SymbolicName: net.sparktank.morrigan.hotkeyimpl.jintellitype
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ClassPath: .,
+ lib/jintellitype-1.3.1.jar,
+ lib/commons-logging-1.0.4.jar,
+ lib/log4j-1.2.14.jar
+Bundle-Vendor: sparktank.net
+Import-Package: net.sparktank.morrigan.engines.hotkey,
+ net.sparktank.morrigan.model.exceptions,
+ org.osgi.framework
+Eclipse-PlatformFilter: (& (osgi.ws=win32) (osgi.os=win32) (osgi.arch=x86))
+Bundle-Activator: net.sparktank.morrigan.hotkeyimpl.jintellitype.Activator
+Bundle-NativeCode: lib/JIntellitype.dll ;
+ osname=Win32 ;
+ processor=x86

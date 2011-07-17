@@ -1,0 +1,22 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: PlaybackEngineDsj
+Bundle-SymbolicName: net.sparktank.morrigan.playbackimpl.dsj
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ClassPath: .,
+ lib/dsj.jar
+Bundle-Vendor: sparktank.net
+Export-Package: net.sparktank.morrigan.playbackimpl.dsj
+Import-Package: net.sparktank.morrigan.engines.playback,
+ net.sparktank.morrigan.model.exceptions,
+ org.eclipse.swt,
+ org.eclipse.swt.awt,
+ org.eclipse.swt.layout,
+ org.eclipse.swt.widgets,
+ org.osgi.framework;version="1.3.0"
+Eclipse-PlatformFilter: (& (osgi.ws=win32) (osgi.os=win32) (osgi.arch=x86))
+Bundle-Activator: net.sparktank.morrigan.playbackimpl.dsj.Activator
+Bundle-NativeCode: lib/dsj.dll ;
+ osname=Win32 ;
+ processor=x86
