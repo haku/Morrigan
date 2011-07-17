@@ -1,12 +1,12 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Jmf
+Bundle-Name: Morrigan JMF Engine
 Bundle-SymbolicName: net.sparktank.morrigan.playbackimpl.jmf
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: .,
  lib/jmf.jar
-Bundle-Vendor: sparktank.net
+Bundle-Vendor: vaguehope.com
 Import-Package: net.sparktank.morrigan.engines.playback,
  net.sparktank.morrigan.model.exceptions,
  org.eclipse.swt,

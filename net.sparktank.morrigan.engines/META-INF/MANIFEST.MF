@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Engines
+Bundle-Name: Morrigan Engines
 Bundle-SymbolicName: net.sparktank.morrigan.engines
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
@@ -12,3 +12,4 @@ Import-Package: net.sparktank.morrigan.config,
  net.sparktank.morrigan.model.exceptions,
  org.eclipse.swt.events,
  org.eclipse.swt.widgets
+Bundle-Vendor: vaguehope.com

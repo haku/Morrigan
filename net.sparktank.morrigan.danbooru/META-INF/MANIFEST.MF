@@ -1,10 +1,10 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: morrigan-danbooru
+Bundle-Name: Mmorrigan Danbooru
 Bundle-SymbolicName: net.sparktank.morrigan.danbooru
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: net.sparktank.morrigan.danbooru.Activator
-Bundle-Vendor: sparktank.net
+Bundle-Vendor: vaguehope.com
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

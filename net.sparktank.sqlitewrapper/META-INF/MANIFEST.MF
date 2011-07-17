@@ -7,3 +7,4 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: .,
  lib/sqlitejdbc-v056.jar
 Export-Package: net.sparktank.sqlitewrapper
+Bundle-Vendor: vaguehope.com

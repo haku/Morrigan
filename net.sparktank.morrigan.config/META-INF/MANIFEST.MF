@@ -1,8 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Config
+Bundle-Name: Morrigan Config
 Bundle-SymbolicName: net.sparktank.morrigan.config
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: net.sparktank.morrigan.config
 Import-Package: net.sparktank.morrigan.model.exceptions
+Bundle-Vendor: vaguehope.com

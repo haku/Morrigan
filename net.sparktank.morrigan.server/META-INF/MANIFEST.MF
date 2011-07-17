@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Server
+Bundle-Name: Morrigan Server
 Bundle-SymbolicName: net.sparktank.morrigan.server
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
@@ -31,3 +31,4 @@ Import-Package: javax.servlet,
  org.eclipse.swt.widgets
 Bundle-ClassPath: lib/xml-writer.jar,
  .
+Bundle-Vendor: vaguehope.com
