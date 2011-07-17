@@ -375,6 +375,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 						public void run() {
 							PlaybackEngine.this.videoComponent = new VideoComponent(PlaybackEngine.this.videoFrameParent, SWT.NO_BACKGROUND);
 							PlaybackEngine.this.videoComponent.setKeepAspect(true);
+							PlaybackEngine.this.videoComponent.expose(); // This is important on Ubuntu 10.10 (not needed on 10.04).
 							PlaybackEngine.this.videoElement = PlaybackEngine.this.videoComponent.getElement();
 							PlaybackEngine.this.playbin.setVideoSink(PlaybackEngine.this.videoElement);
 							PlaybackEngine.this.videoFrameParent.layout();
