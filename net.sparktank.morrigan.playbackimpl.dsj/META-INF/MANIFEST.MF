@@ -7,7 +7,6 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: .,
  lib/dsj.jar
 Bundle-Vendor: sparktank.net
-Export-Package: net.sparktank.morrigan.playbackimpl.dsj
 Import-Package: net.sparktank.morrigan.engines.playback,
  net.sparktank.morrigan.model.exceptions,
  org.eclipse.swt,
