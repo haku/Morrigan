@@ -136,10 +136,6 @@
 	</target>
 	
 	<target name="zip_mac" depends="setprop" >
-		<ant antfile="../net.sparktank.morrigan.playbackimpl.jmf/makejar.xml"
-		     dir="../net.sparktank.morrigan.playbackimpl.jmf"
-		/>
-		
 		<fileset dir="${procDirectory}" id="zipfiles" >
 			<include name="*macosx*.zip" />
 		</fileset>
@@ -147,15 +143,6 @@
 		<echo message="zipfile=${zipfile}" />
 
 		<zip destfile="${zipfile}" update="true" whenempty="fail" >
-			<zipfileset dir="../net.sparktank.morrigan.playbackimpl.jmf"
-			            includes="*.jar"
-			            prefix="${archivePrefix}/engines"
-			/>
-			<zipfileset dir="../net.sparktank.morrigan.playbackimpl.jmf/lib"
-			            includes="*"
-			            excludes="swt.jar"
-			            prefix="${archivePrefix}/engines"
-			/>
 			<zipfileset dir="propfiles"
 			            includes="mac.properties"
 			            fullpath="${archivePrefix}/morrigan.properties"
