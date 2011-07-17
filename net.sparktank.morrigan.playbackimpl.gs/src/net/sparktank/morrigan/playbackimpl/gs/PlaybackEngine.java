@@ -49,7 +49,9 @@ public class PlaybackEngine implements IPlaybackEngine {
 	
 	private static final int FILE_READ_DURATION_TIMEOUT = 5000; // 5 seconds.
 	private static final int WAIT_FOR_decodeElement_TIMEOUT = 30000; // 30 seconds.
-	private static final int EOS_MAN_LIMIT = 10; // 10 times.
+	private static final int WATCHER_POLL_INTERVAL_MILLIS = 500; // 0.5 seconds.
+	private static final int EOS_MAN_LIMIT = 10; // 10*500 = 5 seconds.
+	private static final int EOS_MARGIN_SECONDS = 1; // 1 second from end of track.
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -122,7 +124,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 	
 	@Override
 	public void setVideoFrameParent (Composite frame) {
-		if (frame==this.videoFrameParent) return;
+		if (frame == this.videoFrameParent) return;
 		this.videoFrameParent = frame;
 		reparentVideo();
 	}
@@ -213,7 +215,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 	volatile boolean hasVideo = false;
 	
 	private void finalisePlayback () {
-		this.logger.fine("finalisePlayback() >>>");
+		this.logger.entering(this.getClass().getName(), "finalisePlayback");
 		
 		stopWatcherThread();
 		
@@ -255,24 +257,26 @@ public class PlaybackEngine implements IPlaybackEngine {
 			this.playLock.unlock();
 		}
 		
-		this.logger.fine("finalisePlayback() <<<");
+		this.logger.exiting(this.getClass().getName(), "finalisePlayback");
 	}
 	
 	private void _loadTrack () throws PlaybackException {
+		this.logger.entering(this.getClass().getName(), "_loadTrack");
+		
 		this.playLock.lock();
 		try {
 			callStateListener(PlayState.Loading);
 			boolean firstLoad = (this.playbin==null);
 			
-			this.logger.fine("loadTrack() : firstLoad=" + firstLoad);
+			this.logger.fine("firstLoad=" + firstLoad);
 			
 			if (firstLoad) {
-				this.logger.fine("loadTrack() : About to create PlayBin object...");
+				this.logger.fine("About to create PlayBin object...");
 				this.playbin = new PlayBin("VideoPlayer");
 				
-				this.logger.fine("loadTrack() : Connecting eosBus...");
+				this.logger.fine("Connecting eosBus...");
 				this.playbin.getBus().connect(this.eosBus);
-				this.logger.fine("loadTrack() : Connecting stateChangedBus...");
+				this.logger.fine("Connecting stateChangedBus...");
 				this.playbin.getBus().connect(this.stateChangedBus);
 				
 			} else {
@@ -286,9 +290,9 @@ public class PlaybackEngine implements IPlaybackEngine {
 				this.hasVideo = mightFileHaveVideo(this.filepath);
 			}
 			
-			this.logger.fine("loadTrack() : About to set input file to '"+this.filepath+"'...");
+			this.logger.fine("About to set input file to '"+this.filepath+"'...");
 	        this.playbin.setInputFile(new File(this.filepath));
-	        this.logger.fine("loadTrack() : Set file input file.");
+	        this.logger.fine("Set file input file.");
 	        
         	reparentVideo(false);
 		}
@@ -299,28 +303,44 @@ public class PlaybackEngine implements IPlaybackEngine {
 		finally {
 			this.playLock.unlock();
 		}
+		
+		this.logger.exiting(this.getClass().getName(), "_loadTrack");
 	}
 	
 	void reparentVideo () {
 		reparentVideo(true);
 	}
 	
+	@SuppressWarnings("boxing")
 	private void reparentVideo (boolean seek) {
-		this.logger.fine("reparentVideo() >>>");
+		this.logger.entering(this.getClass().getName(), "reparentVideo", seek);
+		
+		// TODO tidy this.
+		if (this.videoComponent != null) {
+			_runInUiThread(this.videoComponent, new Runnable() {
+				@Override
+				public void run() {
+					if (PlaybackEngine.this.videoComponent.getParent() == PlaybackEngine.this.videoFrameParent) {
+						PlaybackEngine.this.logger.warning("Reparenting to same parent!");
+					}
+				}
+			});
+		}
 		
 		this.playLock.lock();
 		try {
 			// Clean up any stuff we had before.
-			if (this.videoComponent!=null) {
+			if (this.videoComponent != null) {
 				if (!this.videoComponent.isDisposed()) {
+					this.logger.fine("Removing listeners...");
 					_runInUiThread(this.videoComponent, new Runnable() {
 						@Override
 						public void run() {
 							PlaybackEngine.this.videoComponent.removeKeyListener(PlaybackEngine.this.keyListener);
 							PlaybackEngine.this.videoComponent.removeMouseListener(PlaybackEngine.this.mouseListener);
+							PlaybackEngine.this.logger.fine("listeners removed.");
 						}
 					});
-					this.logger.fine("reparentVideo() : removed listeners.");
 				}
 			}
 			
@@ -331,7 +351,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 			this.videoElement = null;
 			
 			// Do we have anything to attach video output to?
-			if (this.playbin!=null) {
+			if (this.playbin != null) {
 				// Can not attach video to something that is not there...
 				if (this.videoFrameParent != null && this.hasVideo) {
 					/*
@@ -339,14 +359,17 @@ public class PlaybackEngine implements IPlaybackEngine {
 					 * stop it and remember where it was.
 					 */
 					long position = -1;
+					this.logger.fine("checking current state...");
 					State state = this.playbin.getState();
-					if (state==State.PLAYING || state==State.PAUSED) {
+					this.logger.fine("state = " + state + ".");
+					if (state == State.PLAYING || state == State.PAUSED) {
+						this.logger.fine("stopping playback...");
 						position = this.playbin.queryPosition(TimeUnit.NANOSECONDS);
 						this.logger.fine("position=" + position);
 						this.playbin.setState(State.NULL);
 					}
 					
-					this.logger.fine("reparentVideo() : creating new VideoComponent.");
+					this.logger.fine("creating new VideoComponent.");
 					_runInUiThread(this.videoFrameParent, new Runnable() {
 						@Override
 						public void run() {
@@ -378,7 +401,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 								if (this.playbin.queryPosition(TimeUnit.NANOSECONDS) > 0) { break; }
 							}
 							
-							this.logger.fine("reparentVideo() : Seek took " + (System.currentTimeMillis() - startTime) + " ms.");
+							this.logger.fine("Seek took " + (System.currentTimeMillis() - startTime) + " ms.");
 						}
 						
 						if (state != State.PAUSED) {
@@ -395,10 +418,11 @@ public class PlaybackEngine implements IPlaybackEngine {
 			}
 			
 			// If we left stuff that needed disposing, do so here.
-			if (old_videoElement!=null) {
+			this.logger.fine("cleanup...");
+			if (old_videoElement != null) {
 				old_videoElement.dispose();
 			}
-			if (old_videoComponent!=null && !old_videoComponent.isDisposed()) {
+			if (old_videoComponent != null && !old_videoComponent.isDisposed()) {
 				_runInUiThread(old_videoComponent, new Runnable() {
 					@Override
 					public void run() {
@@ -414,19 +438,19 @@ public class PlaybackEngine implements IPlaybackEngine {
 			this.playLock.unlock();
 		}
 		
-		this.logger.fine("reparentVideo() <<<");
+		this.logger.exiting(this.getClass().getName(), "reparentVideo");
 	}
 	
 	private Bus.EOS eosBus = new Bus.EOS() {
 		@Override
 		public void endOfStream(GstObject source) {
-			PlaybackEngine.this.logger.fine("endOfStream("+source+") >>>");
+			PlaybackEngine.this.logger.entering(this.getClass().getName(), "endOfStream");
 			
 			if (source == PlaybackEngine.this.playbin) {
 				handleEosEvent("g");
 			}
 			
-			PlaybackEngine.this.logger.fine("endOfStream() >>>");
+			PlaybackEngine.this.logger.exiting(this.getClass().getName(), "endOfStream");
 		}
 	};
 	
@@ -488,15 +512,15 @@ public class PlaybackEngine implements IPlaybackEngine {
 			this.m_atEos.set(false);
 			
 			if (this.playbin != null) {
-				this.playbin.setState(State.PLAYING);
-				this.logger.fine("playbin.setState(PLAYING).");
-				
-				callStateListener(PlayState.Playing);
 				startWatcherThread();
+				
+				this.logger.fine("calling playbin.setState(PLAYING)...");
+				this.playbin.setState(State.PLAYING);
+				callStateListener(PlayState.Playing);
 				
 				if (this.hasVideo) {
 					new WaitForVideoThread().start();
-					reparentVideo();
+//					reparentVideo(); // I have no idea why this was here or if it was important.
 				}
 			}
 		}
@@ -656,15 +680,11 @@ public class PlaybackEngine implements IPlaybackEngine {
 	volatile boolean m_stopWatching = false;
 	private Thread watcherThread = null;
 	
-	long lastPosition = -1;
-	int lastDuration = -1;
-	int eosManCounter = 0;
-	
 	private void startWatcherThread () {
-		this.logger.fine("startWatcherThread() >>>");
+		this.logger.entering(this.getClass().getName(), "startWatcherThread");
 		
 		if (this.watcherThread != null) {
-			this.logger.warning("WARNING: having to stop watcher thread from startWatcherThread().");
+			this.logger.warning("having to stop watcher thread from startWatcherThread().");
 			stopWatcherThread();
 		}
 		
@@ -673,16 +693,11 @@ public class PlaybackEngine implements IPlaybackEngine {
 		this.watcherThread.setDaemon(true);
 		this.watcherThread.start();
 		
-		// Make sure that these get reset.
-		this.lastPosition = -1;
-		this.lastDuration = -1;
-		this.eosManCounter = 0;
-		
-		this.logger.fine("startWatcherThread() <<<");
+		this.logger.exiting(this.getClass().getName(), "startWatcherThread");
 	}
 	
 	private void stopWatcherThread () {
-		this.logger.fine("stopWatcherThread() >>>");
+		this.logger.entering(this.getClass().getName(), "stopWatcherThread");
 		
 		if (this.watcherThread != null) {
     		this.m_stopWatching = true;
@@ -700,46 +715,48 @@ public class PlaybackEngine implements IPlaybackEngine {
     		this.watcherThread = null;
 		}
 		
-		this.logger.fine("stopWatcherThread() <<<");
+		this.logger.exiting(this.getClass().getName(), "stopWatcherThread");
 	}
 	
 	private class WatcherThread extends Thread {
 		
+		private int lastPositionSec = -1;
+		private int lastDurationSec = -1;
+		private int eosManCounter = 0;
+		
 		public WatcherThread () { /* UNUSED */ }
-
+		
 		@Override
 		public void run() {
 			while (!PlaybackEngine.this.m_stopWatching) {
 				
-				if (PlaybackEngine.this.playbin!=null) {
-					long position = PlaybackEngine.this.playbin.queryPosition(TimeUnit.SECONDS);
+				if (PlaybackEngine.this.playbin != null) {
+					int positionSec = (int) PlaybackEngine.this.playbin.queryPosition(TimeUnit.SECONDS);
+					int durationSec = (int) PlaybackEngine.this.playbin.queryDuration(TimeUnit.SECONDS);
 					
-					if (position != PlaybackEngine.this.lastPosition) {
-						callPositionListener(position);
-						
-						if (PlaybackEngine.this.lastPosition > position) {
-							PlaybackEngine.this.lastDuration = -1;
-						}
-						PlaybackEngine.this.lastPosition = position;
-						
-						if (PlaybackEngine.this.lastDuration < 1) {
-							long duration = PlaybackEngine.this.playbin.queryDuration(TimeUnit.SECONDS);
-							if (duration > 0) {
-								PlaybackEngine.this.lastDuration = (int) duration;
-								callDurationListener(PlaybackEngine.this.lastDuration);
-							}
+					// See if we need to notify owner of progress.
+					if (positionSec != this.lastPositionSec) {
+						callPositionListener(positionSec);
+						this.lastPositionSec = positionSec;
+					}
+					
+					// See if we need to notify owner of duration change.
+					if (durationSec != this.lastDurationSec) {
+						callDurationListener(durationSec);
+						this.lastDurationSec = durationSec;
+					}
+					
+					// End of track and GStreamer has failed to notify us?
+					if (durationSec > 0 && positionSec >= (durationSec - EOS_MARGIN_SECONDS)) {
+						this.eosManCounter = this.eosManCounter + 1;
+						PlaybackEngine.this.logger.fine("eosManCounter++ = " + this.eosManCounter);
+						if (this.eosManCounter >= EOS_MAN_LIMIT) {
+							this.eosManCounter = 0;
+							handleEosEvent("m=" + positionSec + "ns >= " + durationSec + "ns");
 						}
 					}
 					
-					if (PlaybackEngine.this.lastDuration > 0 && position >= PlaybackEngine.this.lastDuration) {
-						PlaybackEngine.this.eosManCounter++;
-						PlaybackEngine.this.logger.fine("eosManCounter++ = " + PlaybackEngine.this.eosManCounter);
-						if (PlaybackEngine.this.eosManCounter >= EOS_MAN_LIMIT) {
-							PlaybackEngine.this.eosManCounter = 0;
-							handleEosEvent("m=" + position + ">=" + PlaybackEngine.this.lastDuration);
-						}
-					}
-					
+					// Poke screen saver.
 					if (PlaybackEngine.this.videoFrameParent != null
 							&& PlaybackEngine.this.hasVideo
 							&& PlaybackEngine.this.playbackState == PlayState.Playing
@@ -749,14 +766,14 @@ public class PlaybackEngine implements IPlaybackEngine {
 				}
 				
 				try {
-					Thread.sleep(500);
+					Thread.sleep(WATCHER_POLL_INTERVAL_MILLIS);
 				} catch (InterruptedException e) { /* UNUSED */ }
 			}
 		}
 	}
 	
 	void handleEosEvent (String debugType) {
-		this.logger.fine("handleEosEvent(type="+debugType+",m_stopPlaying="+this.m_stopPlaying.get()+",m_atEos="+this.m_atEos.get()+") >>>");
+		this.logger.entering(this.getClass().getName(), "handleEosEvent", "(type="+debugType+",m_stopPlaying="+this.m_stopPlaying.get()+",m_atEos="+this.m_atEos.get()+")");
 		
 		stopWatcherThread();
 		
@@ -766,7 +783,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 			}
 		}
 		
-		this.logger.fine("handleEosEvent() <<<");
+		this.logger.exiting(this.getClass().getName(), "handleEosEvent");
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -779,23 +796,23 @@ public class PlaybackEngine implements IPlaybackEngine {
 //	}
 	
 	private void callOnEndOfTrackHandler () {
-		this.logger.fine("callOnEndOfTrackHandler() >>>");
+		this.logger.entering(this.getClass().getName(), "callOnEndOfTrackHandler");
 		
 		callStateListener(PlayState.Stopped);
 		if (this.listener!=null) {
 			this.listener.onEndOfTrack();
 		}
 		
-		this.logger.fine("callOnEndOfTrackHandler() <<<");
+		this.logger.exiting(this.getClass().getName(), "callOnEndOfTrackHandler");
 	}
 	
 	void callStateListener (PlayState state) {
-		this.logger.fine("callStateListener("+state.name()+") >>>");
+		this.logger.entering(this.getClass().getName(), "callStateListener", state);
 		
 		this.playbackState = state;
-		if (this.listener!=null) this.listener.statusChanged(state);
+		if (this.listener != null) this.listener.statusChanged(state);
 		
-		this.logger.fine("callStateListener() <<<");
+		this.logger.exiting(this.getClass().getName(), "callStateListener");
 	}
 	
 	void callPositionListener (long position) {
@@ -804,14 +821,15 @@ public class PlaybackEngine implements IPlaybackEngine {
 		}
 	}
 	
+	@SuppressWarnings("boxing")
 	void callDurationListener (int duration) {
-		this.logger.fine("callDurationListener("+duration+") >>>");
+		this.logger.entering(this.getClass().getName(), "callDurationListener", duration);
 		
 		if (this.listener!=null) {
 			this.listener.durationChanged(duration);
 		}
 		
-		this.logger.fine("callDurationListener() <<<");
+		this.logger.exiting(this.getClass().getName(), "callDurationListener");
 	}
 	
 	void callOnKeyPressListener (int keyCode) {
@@ -846,11 +864,11 @@ public class PlaybackEngine implements IPlaybackEngine {
 		String ext = f.substring(f.lastIndexOf('.') + 1).toLowerCase();
 		for (String e : AUDIO_ONLY_FORMATS) {
 			if (e.equals(ext)) {
-				this.logger.fine("mightFileHaveVideo() : No video in '"+f+"'.");
+				this.logger.fine("No video in '"+f+"'.");
 				return false;
 			}
 		}
-		this.logger.fine("mightFileHaveVideo() : Might be video in '"+f+"'.");
+		this.logger.fine("Might be video in '"+f+"'.");
 		return true;
 	}
 	
