@@ -3,14 +3,12 @@ package net.sparktank.morrigan.gui.dialogs;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 import java.util.List;
 
 import net.sparktank.morrigan.gui.preferences.PreferenceHelper;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.IMediaTrack;
 import net.sparktank.morrigan.model.media.IMediaTrackDb;
-import net.sparktank.morrigan.player.PlayItem;
 import net.sparktank.morrigan.player.PlayerHelper;
 
 import org.eclipse.jface.viewers.ILabelProvider;
@@ -53,8 +51,8 @@ public class JumpToDlg {
 	final Shell parent;
 	private final IMediaTrackDb<?,?,? extends IMediaTrack> mediaDb;
 	
-	private PlayItem returnValue = null;
-	private List<PlayItem> returnList = null;
+	private IMediaTrack returnValue = null;
+	private List<? extends IMediaTrack> returnList = null;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -66,11 +64,11 @@ public class JumpToDlg {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public PlayItem getReturnItem () {
+	public IMediaTrack getReturnItem () {
 		return this.returnValue;
 	}
 	
-	public List<PlayItem> getReturnList () {
+	public List<? extends IMediaTrack> getReturnList () {
 		return this.returnList;
 	}
 	
@@ -154,7 +152,7 @@ public class JumpToDlg {
 		formData.height = 300;
 		this.tableViewer.getTable().setLayoutData(formData);
 		
-		this.btnShuffleAll.setText("Shuffle all");
+		this.btnShuffleAll.setText("Shuffle and enqueue");
 		formData = new FormData();
 		formData.right = new FormAttachment(100, -SEP);
 		formData.bottom = new FormAttachment(100, -SEP);
@@ -249,15 +247,13 @@ public class JumpToDlg {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public void remoteClose () {
-		leaveDlg(false, 0, false);
+		leaveDlg(false, 0);
 	}
 	
-	void leaveDlg (boolean ok, int mask, boolean makeList) {
+	void leaveDlg (boolean ok, int mask) {
 		if (ok) {
-			IMediaTrack item = getSelectedItem();
-			if (item == null) return;
-			this.returnValue = new PlayItem(this.mediaDb, item);
-			if (makeList) this.returnList = makePlayItems(this.mediaDb, this.searchResults);
+			this.returnValue = getSelectedItem();
+			this.returnList = this.searchResults;
 		}
 		setKeyMask(mask);
 		
@@ -275,13 +271,13 @@ public class JumpToDlg {
 				case SWT.TRAVERSE_RETURN:
 					e.detail = SWT.TRAVERSE_NONE;
 					e.doit = false;
-					leaveDlg(true, e.stateMask, false);
+					leaveDlg(true, e.stateMask);
 					break;
 					
 				case SWT.TRAVERSE_ESCAPE:
 					e.detail = SWT.TRAVERSE_NONE;
 					e.doit = false;
-					leaveDlg(false, e.stateMask, false);
+					leaveDlg(false, e.stateMask);
 					break;
 				
 				default:
@@ -308,7 +304,7 @@ public class JumpToDlg {
 				case SWT.TRAVERSE_ESCAPE:
 					e.detail = SWT.TRAVERSE_NONE;
 					e.doit = false;
-					leaveDlg(false, e.stateMask, false);
+					leaveDlg(false, e.stateMask);
 					break;
 				
 				default:
@@ -334,7 +330,7 @@ public class JumpToDlg {
 				case SWT.TRAVERSE_ESCAPE:
 					e.detail = SWT.TRAVERSE_NONE;
 					e.doit = false;
-					leaveDlg(false, e.stateMask, false);
+					leaveDlg(false, e.stateMask);
 					break;
 				
 				default:
@@ -348,19 +344,19 @@ public class JumpToDlg {
 		@Override
 		public void widgetSelected(SelectionEvent e) {
 			if (e.widget == JumpToDlg.this.btnPlay) {
-				leaveDlg(true, 0, false);
+				leaveDlg(true, 0);
 			}
 			else if (e.widget == JumpToDlg.this.btnEnqueue) {
-				leaveDlg(true, SWT.CONTROL, false);
+				leaveDlg(true, SWT.CONTROL);
 			}
 			else if (e.widget == JumpToDlg.this.btnReveal) {
-				leaveDlg(true, SWT.CONTROL | SWT.SHIFT, false);
+				leaveDlg(true, SWT.CONTROL | SWT.SHIFT);
 			}
 			else if (e.widget == JumpToDlg.this.btnShuffleAll) {
-				leaveDlg(true, SWT.ALT, true);
+				leaveDlg(true, SWT.ALT);
 			}
 			else {
-				leaveDlg(false, 0, false);
+				leaveDlg(false, 0);
 			}
 		}
 	};
@@ -532,13 +528,13 @@ public class JumpToDlg {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private static List<PlayItem> makePlayItems (IMediaTrackDb<?,?,? extends IMediaTrack> mediaDb, List<? extends IMediaTrack> tracks) {
-		List<PlayItem> ret = new ArrayList<PlayItem>(tracks.size());
-		for (IMediaTrack track : tracks) {
-			ret.add(new PlayItem(mediaDb, track));
-		}
-		return ret;
-	}
+//	private static List<PlayItem> makePlayItems (IMediaTrackDb<?,?,? extends IMediaTrack> mediaDb, List<? extends IMediaTrack> tracks) {
+//		List<PlayItem> ret = new ArrayList<PlayItem>(tracks.size());
+//		for (IMediaTrack track : tracks) {
+//			ret.add(new PlayItem(mediaDb, track));
+//		}
+//		return ret;
+//	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

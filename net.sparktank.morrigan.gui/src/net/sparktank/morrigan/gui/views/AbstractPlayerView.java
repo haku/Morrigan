@@ -670,26 +670,23 @@ public abstract class AbstractPlayerView extends ViewPart {
 			
 			JumpToDlg dlg = new JumpToDlg(getViewSite().getShell(), (IMediaTrackDb<?,?,?>) currentList);
 			dlg.open();
-			PlayItem item = dlg.getReturnItem();
+			IMediaTrack item = dlg.getReturnItem();
 			if (item != null) {
-				List<PlayItem> list = dlg.getReturnList();
-				if (list != null) {
-					if ((dlg.getKeyMask() & SWT.ALT) != 0) {
-						List<PlayItem> shuffeledList = new ArrayList<PlayItem>(list);
-						Collections.shuffle(shuffeledList);
-						getPlayer().addToQueue(shuffeledList);
+				if ((dlg.getKeyMask() & SWT.ALT) != 0 && dlg.getReturnList() != null) {
+					List<IMediaTrack> shuffeledList = new ArrayList<IMediaTrack>(dlg.getReturnList());
+					Collections.shuffle(shuffeledList);
+					for (IMediaTrack track : shuffeledList) {
+						getPlayer().addToQueue(new PlayItem(currentList, track));
 					}
 				}
+				else if ((dlg.getKeyMask() & SWT.SHIFT) != 0 && (dlg.getKeyMask() & SWT.CONTROL) != 0) {
+					revealItemInLists(currentList, item);
+				}
+				else if ((dlg.getKeyMask() & SWT.SHIFT) != 0 || (dlg.getKeyMask() & SWT.CONTROL) != 0) {
+					getPlayer().addToQueue(new PlayItem(currentList, item));
+				}
 				else {
-					if ((dlg.getKeyMask() & SWT.SHIFT) != 0 && (dlg.getKeyMask() & SWT.CONTROL) != 0) {
-						revealItemInLists(currentList, item.item);
-					}
-					else if ((dlg.getKeyMask() & SWT.SHIFT) != 0 || (dlg.getKeyMask() & SWT.CONTROL) != 0) {
-						getPlayer().addToQueue(item);
-					}
-					else {
-						getPlayer().loadAndStartPlaying(item);
-					}
+					getPlayer().loadAndStartPlaying(currentList, item);
 				}
 			}
 		}
