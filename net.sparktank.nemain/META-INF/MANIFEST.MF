@@ -21,3 +21,4 @@ Import-Package: net.sparktank.sqlitewrapper,
  org.eclipse.ui.plugin,
  org.osgi.framework;version="1.5.0"
 Bundle-ClassPath: .
+Bundle-Vendor: vaguehope.com
