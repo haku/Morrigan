@@ -1,9 +1,9 @@
 package net.sparktank.morrigan.model.media;
 
+import net.sparktank.morrigan.model.db.IDbItem;
 
-public interface MediaTag { // TODO extends IDbItem
-	
-	public long getDbRowId();
+
+public interface MediaTag extends IDbItem {
 	
 	public String getTag();
 	public void setTag(String tag);
