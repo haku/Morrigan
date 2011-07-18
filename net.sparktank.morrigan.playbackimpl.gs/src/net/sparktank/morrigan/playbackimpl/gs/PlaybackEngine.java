@@ -218,7 +218,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 				this.playbin.setState(State.NULL);
 			}
 			
-			this.hasVideo.set(this.m_videoParent == null ? false : mightFileHaveVideo(this.m_filepath));
+			this.hasVideo.set(this.m_videoParent == null ? false : FormatHelper.mightFileHaveVideo(this.m_filepath));
 			reparentVideo(this.hasVideo.get() ? this.m_videoParent : null, false);
 			
 			this.logger.fine("About to set input file to '" + this.m_filepath + "'...");
@@ -375,7 +375,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 					break;
 					
 				case READY:
-					callStateListener(PlayState.Stopped); // FIXME add "Loaded" to enum?
+					callStateListener(PlayState.Stopped); // TODO add "Loaded" to enum?
 					break;
 					
 				}
@@ -599,22 +599,6 @@ public class PlaybackEngine implements IPlaybackEngine {
 		if (this.m_listener!=null) {
 			this.m_listener.onMouseClick(button, clickCount);
 		}
-	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	private final static String[] AUDIO_ONLY_FORMATS = {"mp3", "ogg", "wav", "wma", "m4a", "aac", "ra", "mpc", "ac3"};
-	
-	private boolean mightFileHaveVideo (String f) {
-		String ext = f.substring(f.lastIndexOf('.') + 1).toLowerCase();
-		for (String e : AUDIO_ONLY_FORMATS) {
-			if (e.equals(ext)) {
-				this.logger.fine("No video in '"+f+"'.");
-				return false;
-			}
-		}
-		this.logger.fine("Might be video in '"+f+"'.");
-		return true;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
