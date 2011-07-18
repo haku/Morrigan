@@ -442,10 +442,9 @@ public class Player implements IPlayerLocal {
 			synchronized (engine) {
 				this.logger.info("Loading '" + item.item.getTitle() + "'...");
 				setCurrentItem(item);
-				engine.setFile(item.item.getFilepath());
-				Composite currentMediaFrameParent = this.eventHandler.getCurrentMediaFrameParent();
-				engine.setVideoFrameParent(currentMediaFrameParent);
 				
+				engine.setFile(item.item.getFilepath());
+				engine.setVideoFrameParent(this.eventHandler.getCurrentMediaFrameParent());
 				engine.loadTrack();
 				engine.startPlaying();
 				
@@ -510,7 +509,7 @@ public class Player implements IPlayerLocal {
 	public void nextTrack () {
 		PlayItem nextItemToPlay = getNextItemToPlay();
 		if (nextItemToPlay != null) {
-			stopPlaying();
+//			stopPlaying(); // Is this really needed?
 			loadAndStartPlaying(nextItemToPlay);
 		}
 	}
