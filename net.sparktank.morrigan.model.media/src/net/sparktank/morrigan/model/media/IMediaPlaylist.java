@@ -14,5 +14,7 @@ public interface IMediaPlaylist extends IMediaTrackList<IMediaTrack> {
 	public void loadFromFile () throws MorriganException;
 	public void writeToFile () throws MorriganException;
 	
+	public void addNewItem (String filepath);
+	
 //	- - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - - - - - - -
 }

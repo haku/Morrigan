@@ -14,7 +14,6 @@ import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.DurationData;
 import net.sparktank.morrigan.model.media.IMediaPlaylist;
 import net.sparktank.morrigan.model.media.IMediaTrack;
-import net.sparktank.morrigan.model.media.impl.MediaFactoryImpl;
 import net.sparktank.morrigan.util.TimeHelper;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -60,13 +59,6 @@ public class PlaylistEditor extends MediaTrackListEditor<IMediaPlaylist,IMediaTr
 	@Override
 	protected boolean handleReadError(Exception e) {
 		return false;
-	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	@Override
-	protected IMediaTrack getNewS(String filePath) {
-		return MediaFactoryImpl.get().getNewMediaTrack(filePath);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -269,7 +261,7 @@ public class PlaylistEditor extends MediaTrackListEditor<IMediaPlaylist,IMediaTr
 				int n = 0;
 				for (String file : files) {
 					String toAdd = baseDir + File.separatorChar + file;
-					addItem(toAdd);
+					getMediaList().addNewItem(toAdd);
 					n++;
 				}
 				PlaylistEditor.this.logger.fine("Added " + n + " file to '" + getTitle() + "'.");

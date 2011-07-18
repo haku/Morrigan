@@ -77,8 +77,6 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Abstract methods.
 	
-	protected abstract S getNewS (String filePath);
-	
 	protected abstract List<MediaColumn> getColumns ();
 	protected abstract boolean isColumnVisible (MediaColumn col);
 	
@@ -458,10 +456,6 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 	
 	public T getMediaList () {
 		return this.editorInput.getMediaList();
-	}
-	
-	public void addItem (String file) {
-		this.editorInput.getMediaList().addItem(getNewS(file));
 	}
 	
 	protected void removeItem (S track) throws MorriganException {

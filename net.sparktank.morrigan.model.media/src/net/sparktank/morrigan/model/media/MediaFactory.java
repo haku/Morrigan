@@ -7,7 +7,6 @@ import java.util.Collection;
 import java.util.List;
 
 import net.sparktank.morrigan.model.exceptions.MorriganException;
-import net.sparktank.morrigan.model.media.IMixedMediaItem.MediaType;
 import net.sparktank.morrigan.model.tasks.IMorriganTask;
 import net.sparktank.sqlitewrapper.DbException;
 
@@ -16,9 +15,24 @@ import net.sparktank.sqlitewrapper.DbException;
  */
 public interface MediaFactory {
 	
+	/**
+	 * List them all.
+	 */
 	public Collection<MediaListReference> getAllLocalMixedMediaDbs ();
+	
+	/**
+	 * Create a new one.
+	 */
 	public ILocalMixedMediaDb createLocalMixedMediaDb (String name) throws MorriganException;
+	
+	/**
+	 * Basic impl.
+	 */
 	public ILocalMixedMediaDb getLocalMixedMediaDb (String libraryName) throws DbException;
+	
+	/**
+	 * Impl with a filter set.
+	 */
 	public ILocalMixedMediaDb getLocalMixedMediaDb (String libraryName, String searchTerm) throws DbException;
 	
 	public Collection<MediaListReference> getAllRemoteMixedMediaDbs ();
@@ -28,13 +42,7 @@ public interface MediaFactory {
 	
 	public IMediaPlaylist createPlaylist (String plName) throws MorriganException;
 	public IMediaPlaylist getPlaylist (String filePath) throws MorriganException;
-	public IMediaTrack getNewMediaTrack (String filePath);
 	public void disposeAllPlaylists ();
-	
-	public IMixedMediaItem getMixedMediaItem ();
-	public IMixedMediaItem getMixedMediaItem (MediaType type);
-	public IMixedMediaItem getMixedMediaItem (String filePath);
-	public IMixedMediaItem getMixedMediaItem (MediaType type, String filePath);
 	
 	public DurationData getNewDurationData (long duration, boolean complete);
 	
