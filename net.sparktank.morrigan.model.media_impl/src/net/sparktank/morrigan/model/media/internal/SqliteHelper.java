@@ -66,7 +66,7 @@ public class SqliteHelper {
 	 * This method will read the date from the DB
 	 * weather it was stored as a number or a string.
 	 * Morrigan uses the number method, but terra used strings.
-	 * Using this method allows for backward compatability.
+	 * Using this method allows for backward compatibility.
 	 */
 	static public Date readDate (ResultSet rs, String column) throws SQLException {
 		java.sql.Date date = rs.getDate(column);
