@@ -202,7 +202,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 		
 		this.playLock.lock();
 		try {
-			callStateListener(PlayState.Loading);
+			setStateAndCallListener(PlayState.Loading);
 			boolean firstLoad = (this.playbin == null);
 			this.logger.fine("firstLoad=" + firstLoad);
 			if (firstLoad) {
@@ -226,7 +226,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 			this.logger.fine("Input file set.");
 		}
 		catch (Throwable t) {
-			callStateListener(PlayState.Stopped);
+			setStateAndCallListener(PlayState.Stopped);
 			throw new PlaybackException("Failed to load '"+this.m_filepath+"'.", t);
 		}
 		finally {
@@ -363,19 +363,19 @@ public class PlaybackEngine implements IPlaybackEngine {
 			if (source == PlaybackEngine.this.playbin) {
 				switch (current) {
 				case NULL:
-					callStateListener(PlayState.Stopped);
+					setStateAndCallListener(PlayState.Stopped);
 					break;
 					
 				case PLAYING:
-					callStateListener(PlayState.Playing);
+					setStateAndCallListener(PlayState.Playing);
 					break;
 					
 				case PAUSED:
-					callStateListener(PlayState.Paused);
+					setStateAndCallListener(PlayState.Paused);
 					break;
 					
 				case READY:
-					callStateListener(PlayState.Stopped); // TODO add "Loaded" to enum?
+					setStateAndCallListener(PlayState.Stopped); // TODO add "Loaded" to enum?
 					break;
 					
 				}
@@ -419,7 +419,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 				
 				this.logger.fine("calling playbin.setState(PLAYING)...");
 				this.playbin.setState(State.PLAYING);
-				callStateListener(PlayState.Playing);
+				setStateAndCallListener(PlayState.Playing);
 				
 				if (this.hasVideo.get()) {
 					// FIXME How to stop more than one of these starting?
@@ -446,7 +446,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 		try {
 			if (this.playbin!=null) {
 				this.playbin.setState(State.PAUSED);
-				callStateListener(PlayState.Paused);
+				setStateAndCallListener(PlayState.Paused);
 			}
 		}
 		finally {
@@ -459,7 +459,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 		try {
 			if (this.playbin != null) {
 				this.playbin.setState(State.PLAYING);
-				callStateListener(PlayState.Playing);
+				setStateAndCallListener(PlayState.Playing);
 			}
 		}
 		finally {
@@ -474,7 +474,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 			stopWatcherThread();
 			if (this.playbin != null) {
 				this.playbin.setState(State.NULL);
-				callStateListener(PlayState.Stopped);
+				setStateAndCallListener(PlayState.Stopped);
 			}
 		}
 		finally {
@@ -550,55 +550,32 @@ public class PlaybackEngine implements IPlaybackEngine {
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Local helper methods.
+//	Listener helper methods.
 	
 	private void callOnEndOfTrackHandler () {
-		this.logger.entering(this.getClass().getName(), "callOnEndOfTrackHandler");
-		
-		callStateListener(PlayState.Stopped);
-		if (this.m_listener!=null) {
-			this.m_listener.onEndOfTrack();
-		}
-		
-		this.logger.exiting(this.getClass().getName(), "callOnEndOfTrackHandler");
+		setStateAndCallListener(PlayState.Stopped);
+		if (this.m_listener!=null) this.m_listener.onEndOfTrack();
 	}
 	
-	void callStateListener (PlayState state) {
-		this.logger.entering(this.getClass().getName(), "callStateListener", state);
-		
+	void setStateAndCallListener (PlayState state) {
 		this.m_playbackState = state;
 		if (this.m_listener != null) this.m_listener.statusChanged(state);
-		
-		this.logger.exiting(this.getClass().getName(), "callStateListener");
 	}
 	
-	void callPositionListener (long position) {
-		if (this.m_listener!=null) {
-			this.m_listener.positionChanged(position);
-		}
+	void callPositionListener(long position) {
+		if (this.m_listener != null) this.m_listener.positionChanged(position);
 	}
 	
-	@SuppressWarnings("boxing")
-	void callDurationListener (int duration) {
-		this.logger.entering(this.getClass().getName(), "callDurationListener", duration);
-		
-		if (this.m_listener!=null) {
-			this.m_listener.durationChanged(duration);
-		}
-		
-		this.logger.exiting(this.getClass().getName(), "callDurationListener");
+	void callDurationListener(int duration) {
+		if (this.m_listener != null) this.m_listener.durationChanged(duration);
 	}
 	
-	void callOnKeyPressListener (int keyCode) {
-		if (this.m_listener!=null) {
-			this.m_listener.onKeyPress(keyCode);
-		}
+	void callOnKeyPressListener(int keyCode) {
+		if (this.m_listener != null) this.m_listener.onKeyPress(keyCode);
 	}
 	
-	void callOnClickListener (int button, int clickCount) {
-		if (this.m_listener!=null) {
-			this.m_listener.onMouseClick(button, clickCount);
-		}
+	void callOnClickListener(int button, int clickCount) {
+		if (this.m_listener != null) this.m_listener.onMouseClick(button, clickCount);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
