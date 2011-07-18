@@ -32,6 +32,11 @@ public class MediaTagImpl implements MediaTag {
 	}
 	
 	@Override
+	public boolean setDbRowId(long dbRowId) {
+		throw new UnsupportedOperationException();
+	}
+	
+	@Override
 	public String getTag() {
 		return this.tag;
 	}

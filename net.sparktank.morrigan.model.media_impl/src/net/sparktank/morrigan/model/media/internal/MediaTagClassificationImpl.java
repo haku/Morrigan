@@ -3,7 +3,7 @@ package net.sparktank.morrigan.model.media.internal;
 import net.sparktank.morrigan.model.media.MediaTagClassification;
 
 
-public class MediaTagClassificationImpl implements MediaTagClassification { // TODO add interface.
+public class MediaTagClassificationImpl implements MediaTagClassification {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private long rowId;
@@ -15,8 +15,13 @@ public class MediaTagClassificationImpl implements MediaTagClassification { // T
 	}
 	
 	@Override
-	public long getRowId() {
+	public long getDbRowId() {
 		return this.rowId;
+	}
+	
+	@Override
+	public boolean setDbRowId(long dbRowId) {
+		throw new UnsupportedOperationException();
 	}
 	
 	@Override
@@ -45,12 +50,12 @@ public class MediaTagClassificationImpl implements MediaTagClassification { // T
 		if ( !(aThat instanceof MediaTagClassificationImpl) ) return false;
 		MediaTagClassificationImpl that = (MediaTagClassificationImpl)aThat;
 		
-		return this.getRowId() == that.getRowId();
+		return this.getDbRowId() == that.getDbRowId();
 	}
 	
 	@Override
 	public int hashCode() {
-		return  (int)(this.getRowId()^(this.getRowId()>>>32));
+		return  (int)(this.getDbRowId()^(this.getDbRowId()>>>32));
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

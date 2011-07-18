@@ -405,7 +405,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		}
 		
 		if (mtc != null) {
-			local_addTag(mf_rowId, tag, type, mtc.getRowId());
+			local_addTag(mf_rowId, tag, type, mtc.getDbRowId());
 		} else {
 			local_addTag(mf_rowId, tag, type, 0);
 		}
@@ -496,7 +496,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	
 	private boolean local_hasTag (long mf_rowId, String tag, MediaTagType type, MediaTagClassification mtc) throws SQLException, ClassNotFoundException {
 		if (mtc != null) {
-			return local_hasTag(mf_rowId, tag, type, mtc.getRowId());
+			return local_hasTag(mf_rowId, tag, type, mtc.getDbRowId());
 		}
 		
 		return local_hasTag(mf_rowId, tag, type, 0);
