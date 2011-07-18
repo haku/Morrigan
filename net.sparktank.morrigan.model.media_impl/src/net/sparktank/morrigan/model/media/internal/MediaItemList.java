@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -75,8 +76,8 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 //	Dirty state and event listeners.
 	
 	private DirtyState dirtyState = DirtyState.CLEAN;
-	private ArrayList<Runnable> dirtyChangeEvents = new ArrayList<Runnable>();
-	private ArrayList<Runnable> changeEvents = new ArrayList<Runnable>();
+	private List<Runnable> dirtyChangeEvents = new LinkedList<Runnable>();
+	private List<Runnable> changeEvents = new LinkedList<Runnable>();
 	
 	abstract public boolean isCanBeDirty (); 
 	
