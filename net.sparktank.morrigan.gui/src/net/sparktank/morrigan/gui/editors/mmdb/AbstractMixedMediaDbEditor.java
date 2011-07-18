@@ -58,13 +58,6 @@ public abstract class AbstractMixedMediaDbEditor<T extends IAbstractMixedMediaDb
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	@Override
-	protected IMixedMediaItem getNewS(String filePath) {
-		return getMediaList().getDbLayer().getNewT(filePath);
-	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	EditorPart methods.
 	
 	@Override

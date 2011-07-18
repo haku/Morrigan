@@ -174,6 +174,11 @@ public class MediaPlaylist extends MediaItemList<IMediaTrack> implements IMediaP
 		return this.filePath;
 	}
 	
+	@Override
+	public void addNewItem(String filepath) {
+		addItem(new MediaTrack(filepath));
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	The playlist file format.
 	

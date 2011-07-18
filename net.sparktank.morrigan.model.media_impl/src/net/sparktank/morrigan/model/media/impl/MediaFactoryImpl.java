@@ -14,8 +14,6 @@ import net.sparktank.morrigan.model.media.IMediaItemDb;
 import net.sparktank.morrigan.model.media.IMediaItemList;
 import net.sparktank.morrigan.model.media.IMediaPlaylist;
 import net.sparktank.morrigan.model.media.IMediaTrack;
-import net.sparktank.morrigan.model.media.IMixedMediaItem;
-import net.sparktank.morrigan.model.media.IMixedMediaItem.MediaType;
 import net.sparktank.morrigan.model.media.IRemoteMixedMediaDb;
 import net.sparktank.morrigan.model.media.MediaFactory;
 import net.sparktank.morrigan.model.media.MediaListReference;
@@ -28,8 +26,6 @@ import net.sparktank.morrigan.model.media.internal.LocalMixedMediaDbUpdateTask;
 import net.sparktank.morrigan.model.media.internal.MediaFileCopyTask;
 import net.sparktank.morrigan.model.media.internal.MediaPlaylist;
 import net.sparktank.morrigan.model.media.internal.MediaTagTypeImpl;
-import net.sparktank.morrigan.model.media.internal.MediaTrack;
-import net.sparktank.morrigan.model.media.internal.MixedMediaItem;
 import net.sparktank.morrigan.model.media.internal.PlaylistHelper;
 import net.sparktank.morrigan.model.media.internal.RemoteMixedMediaDbUpdateTask;
 import net.sparktank.morrigan.model.media.internal.SyncMetadataRemoteToLocalTask;
@@ -73,12 +69,10 @@ public class MediaFactoryImpl implements MediaFactory {
 		return LocalMixedMediaDb.LOCAL_MMDB_FACTORY.manufacture(libraryName);
 	}
 	
-	/**
-	 * // FIXME This will not work ATM.
-	 */
 	@Override
 	public ILocalMixedMediaDb getLocalMixedMediaDb(String libraryName, String searchTerm) throws DbException {
-		return LocalMixedMediaDb.LOCAL_MMDB_FACTORY.manufacture(libraryName, searchTerm);
+		throw new RuntimeException("This is not implemented yet! :'(");
+//		return LocalMixedMediaDb.LOCAL_MMDB_FACTORY.manufacture(libraryName, searchTerm);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -116,37 +110,10 @@ public class MediaFactoryImpl implements MediaFactory {
 	}
 	
 	@Override
-	public IMediaTrack getNewMediaTrack(String filePath) {
-		return new MediaTrack(filePath);
-	}
-	
-	@Override
 	public void disposeAllPlaylists() {
 		MediaPlaylist.FACTORY.disposeAll();
 	}
 	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	@Override
-	public IMixedMediaItem getMixedMediaItem() {
-		return new MixedMediaItem();
-	}
-	
-	@Override
-	public IMixedMediaItem getMixedMediaItem(MediaType type) {
-		return new MixedMediaItem(type);
-	}
-	
-	@Override
-	public IMixedMediaItem getMixedMediaItem(String filePath) {
-		return new MixedMediaItem(filePath);
-	}
-	
-	@Override
-	public IMixedMediaItem getMixedMediaItem(MediaType type, String filePath) {
-		return new MixedMediaItem(type, filePath);
-	}
-
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
@@ -197,9 +164,9 @@ public class MediaFactoryImpl implements MediaFactory {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
-	public void readTrackTags(IMediaItemDb<?, ?, ?> itemDb, IMediaTrack mlt, File file) throws IOException, MorriganException {
+	public void readTrackTags(IMediaItemDb<?, ?, ?> itemDb, IMediaTrack mt, File file) throws IOException, MorriganException {
 		try {
-			TrackTagHelper.readTrackTags(itemDb, mlt, file);
+			TrackTagHelper.readTrackTags(itemDb, mt, file);
 		}
 		catch (TagException e) {
 			throw new MorriganException(e);

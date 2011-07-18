@@ -35,7 +35,7 @@ public class AddToPlaylistAction extends Action {
 		if (this.fromEd != null && toPart != null && toPart instanceof PlaylistEditor) {
 			PlaylistEditor plPart = (PlaylistEditor) toPart;
 			for (IMediaItem track : this.fromEd.getSelectedItems()) {
-				plPart.addItem(track.getFilepath());
+				plPart.getMediaList().addNewItem(track.getFilepath()); // I assume I meant to clone the media item here.
 			}
 		}
 		
