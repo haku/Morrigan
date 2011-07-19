@@ -21,11 +21,14 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	
 	private final Logger logger = Logger.getLogger(this.getClass().getName());
 	
+	private final MixedMediaItemFactory itemFactory;
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors.
 	
-	protected MixedMediaSqliteLayerOuter (String dbFilePath, boolean autoCommit) throws DbException {
-		super(dbFilePath, autoCommit);
+	protected MixedMediaSqliteLayerOuter (String dbFilePath, boolean autoCommit, MixedMediaItemFactory itemFactory) throws DbException {
+		super(dbFilePath, autoCommit, itemFactory);
+		this.itemFactory = itemFactory;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -357,7 +360,7 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	
 	@Override
 	public IMixedMediaItem getNewT(String filePath) {
-		return getNewMediaItem(filePath);
+		return this.itemFactory.getNewMediaItem(filePath);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
