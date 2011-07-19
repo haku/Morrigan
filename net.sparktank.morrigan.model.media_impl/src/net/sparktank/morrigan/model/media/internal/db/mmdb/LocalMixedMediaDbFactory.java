@@ -40,7 +40,7 @@ public class LocalMixedMediaDbFactory extends RecyclingFactory2<ILocalMixedMedia
 	 */
 	public static ILocalMixedMediaDb getMain (String fullFilePath) throws DbException {
 		LocalMixedMediaDbConfig config = new LocalMixedMediaDbConfig(fullFilePath, null);
-		ILocalMixedMediaDb r = INSTANCE.makeNewProduct(config);
+		ILocalMixedMediaDb r = INSTANCE.manufacture(config);
 		return r;
 	}
 	
@@ -72,7 +72,7 @@ public class LocalMixedMediaDbFactory extends RecyclingFactory2<ILocalMixedMedia
 	 */
 	public static ILocalMixedMediaDb getView (String fullFilePath, String filter) throws DbException {
 		LocalMixedMediaDbConfig config = new LocalMixedMediaDbConfig(fullFilePath, filter);
-		ILocalMixedMediaDb r = INSTANCE.makeNewProduct(config);
+		ILocalMixedMediaDb r = INSTANCE.manufacture(config);
 		return r;
 	}
 	
