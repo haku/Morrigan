@@ -550,7 +550,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 					int type = rs.getInt(SQL_TBL_TAGS_COL_TYPE);
 					long clsRowId = rs.getLong(SQL_TBL_TAGS_COL_CLSROWID);
 					
-					MediaTagTypeImpl mtt = MediaTagTypeImpl.getFromIndex(type);
+					MediaTagType mtt = MediaTagType.getFromIndex(type);
 					MediaTagClassification mtc = local_getTagClassification(clsRowId);
 					
 					MediaTag mt = new MediaTagImpl(rowId, tag, mtt, mtc);

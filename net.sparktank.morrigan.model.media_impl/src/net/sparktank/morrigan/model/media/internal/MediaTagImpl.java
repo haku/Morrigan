@@ -12,14 +12,14 @@ public class MediaTagImpl implements MediaTag {
 	private MediaTagType type;
 	private MediaTagClassification classification;
 	
-	public MediaTagImpl (long dbRowId, String tag, MediaTagTypeImpl type) {
+	public MediaTagImpl (long dbRowId, String tag, MediaTagType type) {
 		this.dbRowId = dbRowId;
 		this.tag = tag;
 		this.type = type;
 		this.classification = null;
 	}
 	
-	public MediaTagImpl (long dbRowId, String tag, MediaTagTypeImpl type, MediaTagClassification classification) {
+	public MediaTagImpl (long dbRowId, String tag, MediaTagType type, MediaTagClassification classification) {
 		this.dbRowId = dbRowId;
 		this.tag = tag;
 		this.type = type;

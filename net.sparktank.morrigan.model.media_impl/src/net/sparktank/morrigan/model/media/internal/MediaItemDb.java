@@ -541,13 +541,13 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 	
 	@Override
 	public boolean isMarkedAsUnreadable (T mi) throws MorriganException {
-		return hasTag(mi, TAG_UNREADABLE, MediaTagTypeImpl.AUTOMATIC, null);
+		return hasTag(mi, TAG_UNREADABLE, MediaTagType.AUTOMATIC, null);
 	}
 	
 	@Override
 	public void markAsUnreadabled (T mi) throws MorriganException {
 		setItemEnabled(mi, false);
-		addTag(mi, TAG_UNREADABLE, MediaTagTypeImpl.AUTOMATIC, (MediaTagClassificationImpl)null);
+		addTag(mi, TAG_UNREADABLE, MediaTagType.AUTOMATIC, (MediaTagClassificationImpl)null);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
