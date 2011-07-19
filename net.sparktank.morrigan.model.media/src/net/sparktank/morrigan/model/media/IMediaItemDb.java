@@ -16,7 +16,7 @@ public interface IMediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMediaIte
 		public void sortChanged (IDbColumn sort, SortDirection direction);
 	}
 	
-	public H getTransactionalClone () throws DbException;
+	public H getTransactionalClone () throws DbException; // TODO remove this horrifying hack.
 	public void commitOrRollback () throws DbException;
 	public void rollback () throws DbException;
 	
