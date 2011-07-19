@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.model.media.internal;
+package net.sparktank.morrigan.model.media.internal.db.mmdb;
 
 import java.awt.Dimension;
 import java.io.File;
@@ -19,6 +19,8 @@ import net.sparktank.morrigan.model.factory.RecyclingFactory;
 import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.IMixedMediaItem.MediaType;
+import net.sparktank.morrigan.model.media.internal.TrackTagHelper;
+import net.sparktank.morrigan.model.media.internal.db.LocalDbUpdateTask;
 import net.sparktank.morrigan.model.tasks.TaskEventListener;
 
 public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMediaDb, IMixedMediaItem> {

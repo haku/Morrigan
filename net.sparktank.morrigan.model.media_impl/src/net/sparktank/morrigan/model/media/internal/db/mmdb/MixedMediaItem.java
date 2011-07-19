@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.model.media.internal;
+package net.sparktank.morrigan.model.media.internal.db.mmdb;
 
 import java.util.Date;
 
@@ -7,25 +7,26 @@ import net.sparktank.morrigan.model.media.IMediaItem;
 import net.sparktank.morrigan.model.media.IMediaPicture;
 import net.sparktank.morrigan.model.media.IMediaTrack;
 import net.sparktank.morrigan.model.media.IMixedMediaItem;
+import net.sparktank.morrigan.model.media.internal.MediaItem;
 
 public class MixedMediaItem extends MediaItem implements IMixedMediaItem {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Constructors.
+//	Constructors - protected so only siblings can create instances.
 	
-	public MixedMediaItem () {
+	protected MixedMediaItem () {
 		super();
 	}
 	
-	public MixedMediaItem (MediaType type) {
+	protected MixedMediaItem (MediaType type) {
 		super();
 		setMediaType(type);
 	}
 	
-	public MixedMediaItem (String filePath) {
+	protected MixedMediaItem (String filePath) {
 		super(filePath);
 	}
 	
-	public MixedMediaItem (MediaType type, String filePath) {
+	protected MixedMediaItem (MediaType type, String filePath) {
 		super(filePath);
 		setMediaType(type);
 	}

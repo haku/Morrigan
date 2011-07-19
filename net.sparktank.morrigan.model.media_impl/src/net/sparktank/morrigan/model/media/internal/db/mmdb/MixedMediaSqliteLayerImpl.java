@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.model.media.internal;
+package net.sparktank.morrigan.model.media.internal.db.mmdb;
 
 import java.io.File;
 import java.math.BigInteger;
@@ -20,6 +20,8 @@ import net.sparktank.morrigan.model.media.IMediaPicture;
 import net.sparktank.morrigan.model.media.IMediaTrack;
 import net.sparktank.morrigan.model.media.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.IMixedMediaItem.MediaType;
+import net.sparktank.morrigan.model.media.internal.db.MediaSqliteLayer;
+import net.sparktank.morrigan.model.media.internal.db.SqliteHelper;
 import net.sparktank.morrigan.model.media.IMixedMediaItemStorageLayer;
 import net.sparktank.morrigan.util.GeneratedString;
 import net.sparktank.sqlitewrapper.DbException;

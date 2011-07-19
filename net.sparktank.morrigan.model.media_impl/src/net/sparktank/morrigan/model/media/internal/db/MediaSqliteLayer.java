@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.model.media.internal;
+package net.sparktank.morrigan.model.media.internal.db;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,6 +14,8 @@ import net.sparktank.morrigan.model.media.IMediaItemStorageLayer;
 import net.sparktank.morrigan.model.media.MediaTag;
 import net.sparktank.morrigan.model.media.MediaTagClassification;
 import net.sparktank.morrigan.model.media.MediaTagType;
+import net.sparktank.morrigan.model.media.internal.MediaTagClassificationFactory;
+import net.sparktank.morrigan.model.media.internal.MediaTagImpl;
 import net.sparktank.sqlitewrapper.DbException;
 import net.sparktank.sqlitewrapper.GenericSqliteLayer;
 

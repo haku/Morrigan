@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.model.media.internal;
+package net.sparktank.morrigan.model.media.internal.db;
 
 import java.io.File;
 import java.math.BigInteger;

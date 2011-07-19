@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.model.media.internal;
+package net.sparktank.morrigan.model.media.internal.db;
 
 import java.io.File;
 import java.math.BigInteger;
@@ -14,6 +14,8 @@ import net.sparktank.morrigan.model.media.IMediaItem;
 import net.sparktank.morrigan.model.media.IMediaItemDb;
 import net.sparktank.morrigan.model.media.IMediaItemStorageLayer;
 import net.sparktank.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
+import net.sparktank.morrigan.model.media.internal.MediaItemList;
+import net.sparktank.morrigan.model.media.internal.MediaTagClassificationImpl;
 import net.sparktank.morrigan.model.media.MediaTag;
 import net.sparktank.morrigan.model.media.MediaTagClassification;
 import net.sparktank.morrigan.model.media.MediaTagType;

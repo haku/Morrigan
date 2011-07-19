@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.model.media.internal;
+package net.sparktank.morrigan.model.media.internal.pl;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -19,6 +19,8 @@ import net.sparktank.morrigan.model.factory.RecyclingFactory;
 import net.sparktank.morrigan.model.media.DurationData;
 import net.sparktank.morrigan.model.media.IMediaPlaylist;
 import net.sparktank.morrigan.model.media.IMediaTrack;
+import net.sparktank.morrigan.model.media.internal.MediaItemList;
+import net.sparktank.morrigan.model.media.internal.MediaTrackListHelper;
 
 public class MediaPlaylist extends MediaItemList<IMediaTrack> implements IMediaPlaylist {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -176,7 +178,7 @@ public class MediaPlaylist extends MediaItemList<IMediaTrack> implements IMediaP
 	
 	@Override
 	public void addNewItem(String filepath) {
-		addItem(new MediaTrack(filepath));
+		addItem(new MediaPlaylistTrack(filepath));
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -213,7 +215,7 @@ public class MediaPlaylist extends MediaItemList<IMediaTrack> implements IMediaP
 				
 				if (text.startsWith(PL_ITEM_IDENTIFIER)) {
 					String[] line = text.substring(PL_ITEM_IDENTIFIER.length()).split("\\|");
-					IMediaTrack item = new MediaTrack(line[0]);
+					IMediaTrack item = new MediaPlaylistTrack(line[0]);
 					
 //					if (line.length>=2 && line[1].length()>0) {
 //						// TODO set hash for item = item[1].

@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.model.media.internal;
+package net.sparktank.morrigan.model.media.internal.db.mmdb;
 
 import java.util.Date;
 import java.util.List;
@@ -11,6 +11,9 @@ import net.sparktank.morrigan.model.media.IMediaPicture;
 import net.sparktank.morrigan.model.media.IMediaTrack;
 import net.sparktank.morrigan.model.media.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.IMixedMediaItem.MediaType;
+import net.sparktank.morrigan.model.media.internal.MediaPictureListHelper;
+import net.sparktank.morrigan.model.media.internal.MediaTrackListHelper;
+import net.sparktank.morrigan.model.media.internal.db.MediaItemDb;
 import net.sparktank.morrigan.model.media.IMixedMediaStorageLayer;
 import net.sparktank.sqlitewrapper.DbException;
 

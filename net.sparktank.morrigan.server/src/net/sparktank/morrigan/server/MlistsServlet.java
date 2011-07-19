@@ -20,7 +20,7 @@ import net.sparktank.morrigan.model.media.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.IMixedMediaItem.MediaType;
 import net.sparktank.morrigan.model.media.MediaListReference;
 import net.sparktank.morrigan.model.media.impl.MediaFactoryImpl;
-import net.sparktank.morrigan.model.media.internal.LocalMixedMediaDbHelper;
+import net.sparktank.morrigan.model.media.internal.db.mmdb.LocalMixedMediaDbHelper;
 import net.sparktank.morrigan.player.IPlayerLocal;
 import net.sparktank.morrigan.player.PlayItem;
 import net.sparktank.morrigan.player.PlayerRegister;
