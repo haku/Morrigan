@@ -9,7 +9,6 @@ import java.util.logging.Logger;
 
 import net.sparktank.morrigan.model.db.IDbColumn;
 import net.sparktank.morrigan.model.db.IDbItem;
-import net.sparktank.morrigan.model.factory.RecyclingFactory;
 import net.sparktank.morrigan.model.media.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.IMixedMediaItem.MediaType;
 import net.sparktank.morrigan.model.media.internal.Defaults;
@@ -17,43 +16,15 @@ import net.sparktank.morrigan.model.media.IMixedMediaStorageLayer;
 import net.sparktank.morrigan.util.StringHelper;
 import net.sparktank.sqlitewrapper.DbException;
 
-public class MixedMediaSqliteLayer extends MixedMediaSqliteLayerImpl implements IMixedMediaStorageLayer<IMixedMediaItem> {
+public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner implements IMixedMediaStorageLayer<IMixedMediaItem> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private final Logger logger = Logger.getLogger(this.getClass().getName());
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	public static class MixedMediaSqliteLayerFactory extends RecyclingFactory<IMixedMediaStorageLayer<IMixedMediaItem>, String, Boolean, DbException> {
-		
-		MixedMediaSqliteLayerFactory() {
-			super(true);
-		}
-		
-		@Override
-		protected boolean isValidProduct(IMixedMediaStorageLayer<IMixedMediaItem> product) {
-			return true;
-		}
-		
-		@Override
-		protected IMixedMediaStorageLayer<IMixedMediaItem> makeNewProduct(String material) throws DbException {
-			return new MixedMediaSqliteLayer(material, true);
-		}
-		
-		@SuppressWarnings("boxing")
-		@Override
-		protected IMixedMediaStorageLayer<IMixedMediaItem> makeNewProduct(String material, Boolean config) throws DbException {
-			return new MixedMediaSqliteLayer(material, config);
-		}
-		
-	}
-	
-	public static final MixedMediaSqliteLayerFactory FACTORY = new MixedMediaSqliteLayerFactory();
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors.
 	
-	protected MixedMediaSqliteLayer (String dbFilePath, boolean autoCommit) throws DbException {
+	protected MixedMediaSqliteLayerOuter (String dbFilePath, boolean autoCommit) throws DbException {
 		super(dbFilePath, autoCommit);
 	}
 	

@@ -217,7 +217,7 @@ public abstract class AbstractMixedMediaDb<H extends IAbstractMixedMediaDb<H>>
 	
 	@Override
 	protected IDbColumn parseColumnFromName(String name) {
-		return MixedMediaSqliteLayerImpl.parseColumnFromName(name);
+		return MixedMediaSqliteLayerInner.parseColumnFromName(name);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
