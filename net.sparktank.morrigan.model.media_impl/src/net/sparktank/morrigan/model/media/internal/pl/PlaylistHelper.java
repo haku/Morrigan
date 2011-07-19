@@ -25,7 +25,7 @@ public class PlaylistHelper {
 	
 	public static MediaPlaylist createPl (String plName) throws MorriganException {
 		String plFile = getFullPathToPlaylist(plName);
-		MediaPlaylist pl = MediaPlaylist.FACTORY.manufacture(plFile, true);
+		MediaPlaylist pl = MediaPlaylistFactory.INSTANCE.manufacture(plFile, true);
 		pl.read();
 		return pl;
 	}

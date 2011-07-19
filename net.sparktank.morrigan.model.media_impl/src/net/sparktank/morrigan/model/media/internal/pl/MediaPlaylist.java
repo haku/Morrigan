@@ -15,7 +15,6 @@ import java.util.logging.Logger;
 
 import net.sparktank.morrigan.engines.playback.NotImplementedException;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
-import net.sparktank.morrigan.model.factory.RecyclingFactory;
 import net.sparktank.morrigan.model.media.DurationData;
 import net.sparktank.morrigan.model.media.IMediaPlaylist;
 import net.sparktank.morrigan.model.media.IMediaTrack;
@@ -23,51 +22,6 @@ import net.sparktank.morrigan.model.media.internal.MediaItemList;
 import net.sparktank.morrigan.model.media.internal.MediaTrackListHelper;
 
 public class MediaPlaylist extends MediaItemList<IMediaTrack> implements IMediaPlaylist {
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Factory.
-	
-	public static class PlaylistFactory extends RecyclingFactory<MediaPlaylist, String, Boolean, MorriganException> {
-		
-		protected PlaylistFactory() {
-			super(true);
-		}
-		
-		@Override
-		protected boolean isValidProduct(MediaPlaylist product) {
-			System.out.println("Found '" + product.getFilePath() + "' in cache.");
-			return true;
-		}
-		
-		@SuppressWarnings("boxing")
-		@Override
-		protected MediaPlaylist makeNewProduct(String material) throws MorriganException {
-			return makeNewProduct(material, false);
-		}
-		
-		@SuppressWarnings("boxing")
-		@Override
-		protected MediaPlaylist makeNewProduct(String material, Boolean config) throws MorriganException {
-			MediaPlaylist ret = null;
-			
-			System.out.println("Making object instance '" + material + "'...");
-			ret = new MediaPlaylist(PlaylistHelper.getPlaylistTitle(material), material, config);
-			
-			return ret;
-		}
-		
-		@Override
-		protected void disposeProduct(MediaPlaylist product) {
-			try {
-				product.clean();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		
-	}
-	
-	public static final PlaylistFactory FACTORY = new PlaylistFactory();
-	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private Logger logger = Logger.getLogger(this.getClass().getName());

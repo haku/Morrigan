@@ -26,7 +26,7 @@ import net.sparktank.morrigan.model.media.internal.db.mmdb.LocalMixedMediaDbHelp
 import net.sparktank.morrigan.model.media.internal.db.mmdb.LocalMixedMediaDbUpdateTask;
 import net.sparktank.morrigan.model.media.internal.db.mmdb.RemoteMixedMediaDbUpdateTask;
 import net.sparktank.morrigan.model.media.internal.db.mmdb.SyncMetadataRemoteToLocalTask;
-import net.sparktank.morrigan.model.media.internal.pl.MediaPlaylist;
+import net.sparktank.morrigan.model.media.internal.pl.MediaPlaylistFactory;
 import net.sparktank.morrigan.model.media.internal.pl.PlaylistHelper;
 import net.sparktank.morrigan.model.tasks.IMorriganTask;
 import net.sparktank.sqlitewrapper.DbException;
@@ -104,12 +104,12 @@ public class MediaFactoryImpl implements MediaFactory {
 	
 	@Override
 	public IMediaPlaylist getPlaylist(String filePath) throws MorriganException {
-		return MediaPlaylist.FACTORY.manufacture(filePath);
+		return MediaPlaylistFactory.INSTANCE.manufacture(filePath);
 	}
 	
 	@Override
 	public void disposeAllPlaylists() {
-		MediaPlaylist.FACTORY.disposeAll();
+		MediaPlaylistFactory.INSTANCE.disposeAll();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
