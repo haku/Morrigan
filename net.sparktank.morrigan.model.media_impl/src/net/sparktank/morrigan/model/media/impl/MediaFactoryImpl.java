@@ -17,7 +17,6 @@ import net.sparktank.morrigan.model.media.IMediaTrack;
 import net.sparktank.morrigan.model.media.IRemoteMixedMediaDb;
 import net.sparktank.morrigan.model.media.MediaFactory;
 import net.sparktank.morrigan.model.media.MediaListReference;
-import net.sparktank.morrigan.model.media.MediaTagType;
 import net.sparktank.morrigan.model.media.internal.CopyToLocalMmdbTask;
 import net.sparktank.morrigan.model.media.internal.DurationDataImpl;
 import net.sparktank.morrigan.model.media.internal.LocalMixedMediaDb;
@@ -25,7 +24,6 @@ import net.sparktank.morrigan.model.media.internal.LocalMixedMediaDbHelper;
 import net.sparktank.morrigan.model.media.internal.LocalMixedMediaDbUpdateTask;
 import net.sparktank.morrigan.model.media.internal.MediaFileCopyTask;
 import net.sparktank.morrigan.model.media.internal.MediaPlaylist;
-import net.sparktank.morrigan.model.media.internal.MediaTagTypeImpl;
 import net.sparktank.morrigan.model.media.internal.PlaylistHelper;
 import net.sparktank.morrigan.model.media.internal.RemoteMixedMediaDbUpdateTask;
 import net.sparktank.morrigan.model.media.internal.SyncMetadataRemoteToLocalTask;
@@ -147,18 +145,6 @@ public class MediaFactoryImpl implements MediaFactory {
 	public IMorriganTask getSyncMetadataRemoteToLocalTask (ILocalMixedMediaDb local, IRemoteMixedMediaDb remote) {
 		// TODO FIXME use a factory to prevent duplicates.
 		return new SyncMetadataRemoteToLocalTask(local, remote);
-	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	@Override
-	public MediaTagType getMediaTagTypeManual() {
-		return MediaTagTypeImpl.MANUAL;
-	}
-	
-	@Override
-	public MediaTagType getMediaTagTypeAutomatic() {
-		return MediaTagTypeImpl.AUTOMATIC;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

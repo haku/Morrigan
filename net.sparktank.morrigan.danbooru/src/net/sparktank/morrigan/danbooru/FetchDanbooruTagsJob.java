@@ -16,7 +16,7 @@ import net.sparktank.morrigan.model.media.IMediaItemDb;
 import net.sparktank.morrigan.model.media.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.MediaTag;
 import net.sparktank.morrigan.model.media.MediaTagClassification;
-import net.sparktank.morrigan.model.media.impl.MediaFactoryImpl;
+import net.sparktank.morrigan.model.media.MediaTagType;
 import net.sparktank.morrigan.util.ChecksumHelper;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -136,8 +136,8 @@ class FetchDanbooruTagsJob extends Job {
 						if (tags != null) {
 							boolean added = false;
 							for (String tag : tags) {
-								if (!transClone.hasTag(item, tag, MediaFactoryImpl.get().getMediaTagTypeAutomatic(), tagCls)) {
-									transClone.addTag(item, tag, MediaFactoryImpl.get().getMediaTagTypeAutomatic(), tagCls);
+								if (!transClone.hasTag(item, tag, MediaTagType.AUTOMATIC, tagCls)) {
+									transClone.addTag(item, tag, MediaTagType.AUTOMATIC, tagCls);
 									added = true;
 									nTags++;
 								}
@@ -208,7 +208,7 @@ class FetchDanbooruTagsJob extends Job {
 		if (newString == null) throw new IllegalArgumentException("newString == null.");
 		
 		if (markerTag != null) itemDb.removeTag(markerTag);
-		itemDb.addTag(item, newString, MediaFactoryImpl.get().getMediaTagTypeAutomatic(), cls);
+		itemDb.addTag(item, newString, MediaTagType.AUTOMATIC, cls);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
