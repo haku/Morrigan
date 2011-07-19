@@ -20,7 +20,7 @@ public interface IMediaItemList<T extends IMediaItem> {
 	public String getListName ();
 	
 	public String getType ();
-	public String getSerial ();
+	public String getSerial (); // TODO rename to something more helpful?
 	
 	public DirtyState getDirtyState ();
 	public void setDirtyState (DirtyState state);
@@ -56,6 +56,7 @@ public interface IMediaItemList<T extends IMediaItem> {
 	
 	public File copyItemFile (T item, File targetDirectory) throws MorriganException;
 	
+	// TODO rename to getItemByFilePath().
 	public T findItemByFilePath (String path);
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
