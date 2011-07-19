@@ -26,10 +26,10 @@ import net.sparktank.morrigan.model.media.IMixedMediaItemStorageLayer;
 import net.sparktank.morrigan.util.GeneratedString;
 import net.sparktank.sqlitewrapper.DbException;
 
-public abstract class MixedMediaSqliteLayerImpl extends MediaSqliteLayer<IMixedMediaItem> implements IMixedMediaItemStorageLayer {
+public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixedMediaItem> implements IMixedMediaItemStorageLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	protected MixedMediaSqliteLayerImpl (String dbFilePath, boolean autoCommit) throws DbException {
+	protected MixedMediaSqliteLayerInner (String dbFilePath, boolean autoCommit) throws DbException {
 		super(dbFilePath, autoCommit);
 	}
 	

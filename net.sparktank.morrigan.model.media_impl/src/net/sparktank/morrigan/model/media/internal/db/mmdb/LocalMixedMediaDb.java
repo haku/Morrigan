@@ -25,12 +25,12 @@ public class LocalMixedMediaDb extends AbstractMixedMediaDb<ILocalMixedMediaDb> 
 		@Override
 		protected ILocalMixedMediaDb makeNewProduct (String material) throws DbException {
 //			System.out.println("Making object instance '" + material + "'...");
-			return new LocalMixedMediaDb(LocalMixedMediaDbHelper.getMmdbTitle(material), MixedMediaSqliteLayer.FACTORY.manufacture(material), null);
+			return new LocalMixedMediaDb(LocalMixedMediaDbHelper.getMmdbTitle(material), MixedMediaSqliteLayerFactory.FACTORY.manufacture(material), null);
 		}
 		
 		@Override
 		protected ILocalMixedMediaDb makeNewProduct (String material, String config) throws DbException {
-			return new LocalMixedMediaDb(LocalMixedMediaDbHelper.getMmdbTitle(material), MixedMediaSqliteLayer.FACTORY.manufacture(material), config);
+			return new LocalMixedMediaDb(LocalMixedMediaDbHelper.getMmdbTitle(material), MixedMediaSqliteLayerFactory.FACTORY.manufacture(material), config);
 		}
 		
 	}
@@ -54,7 +54,7 @@ public class LocalMixedMediaDb extends AbstractMixedMediaDb<ILocalMixedMediaDb> 
 	@Override
 	public LocalMixedMediaDb getTransactionalClone () throws DbException {
 		return new LocalMixedMediaDb(LocalMixedMediaDbHelper.getMmdbTitle(getDbPath()),
-				MixedMediaSqliteLayer.FACTORY.manufacture(getDbPath(), false, true),
+				MixedMediaSqliteLayerFactory.FACTORY.manufacture(getDbPath(), false, true),
 				this.getEscapedSearchTerm());
 	}
 	
