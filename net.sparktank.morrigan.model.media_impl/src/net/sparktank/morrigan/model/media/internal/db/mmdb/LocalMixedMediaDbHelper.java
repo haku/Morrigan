@@ -31,7 +31,7 @@ public class LocalMixedMediaDbHelper {
 		String file = getFullPathToMmdb(name);
 		ILocalMixedMediaDb l;
 		try {
-			l = LocalMixedMediaDb.LOCAL_MMDB_FACTORY.manufacture(file);
+			l = LocalMixedMediaDbFactory.INSTANCE.manufacture(file);
 		} catch (DbException e) {
 			throw new MorriganException(e);
 		}

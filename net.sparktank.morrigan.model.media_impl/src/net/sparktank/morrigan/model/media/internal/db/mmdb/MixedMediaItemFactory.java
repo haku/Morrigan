@@ -8,6 +8,9 @@ import net.sparktank.morrigan.model.media.IMixedMediaItem.MediaType;
  * so that we don't have to have crazy stuff in other parts of the
  * model.
  * 
+ * This class will be instanceateable as each instance will hold a
+ * its own cache.
+ * 
  * If all goes well these can then be removed.  I hope.
  * 
  * IMediaItemDb.beginBulkUpdate ()
@@ -17,6 +20,10 @@ import net.sparktank.morrigan.model.media.IMixedMediaItem.MediaType;
  * 
  */
 public class MixedMediaItemFactory {
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	protected MixedMediaItemFactory () { /* Empty */ }
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public IMixedMediaItem getNewMediaItem (String filePath) {

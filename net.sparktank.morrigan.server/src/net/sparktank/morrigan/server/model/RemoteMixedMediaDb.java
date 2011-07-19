@@ -62,13 +62,13 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb<IRemoteMixedMediaDb
 //			System.out.println("Making object instance '" + material + "'...");
 			if (config != null) {
 				try {
-					ret = new RemoteMixedMediaDb(RemoteMixedMediaDbHelper.getRemoteMmdbTitle(material), config, MixedMediaSqliteLayerFactory.FACTORY.manufacture(material));
+					ret = new RemoteMixedMediaDb(RemoteMixedMediaDbHelper.getRemoteMmdbTitle(material), config, MixedMediaSqliteLayerFactory.INSTANCE.manufacture(material));
 				} catch (DbException e) {
 					throw new MorriganException(e);
 				}
 			} else {
 				try {
-					ret = new RemoteMixedMediaDb(RemoteMixedMediaDbHelper.getRemoteMmdbTitle(material), MixedMediaSqliteLayerFactory.FACTORY.manufacture(material));
+					ret = new RemoteMixedMediaDb(RemoteMixedMediaDbHelper.getRemoteMmdbTitle(material), MixedMediaSqliteLayerFactory.INSTANCE.manufacture(material));
 				} catch (MalformedURLException e) {
 					throw new MorriganException(e);
 				} catch (DbException e) {
@@ -149,7 +149,7 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb<IRemoteMixedMediaDb
 	@SuppressWarnings("boxing")
 	@Override
 	public RemoteMixedMediaDb getTransactionalClone() throws DbException {
-		return new RemoteMixedMediaDb(RemoteMixedMediaDbHelper.getRemoteMmdbTitle(getDbPath()), getUrl(), MixedMediaSqliteLayerFactory.FACTORY.manufacture(getDbPath(), false, true));
+		return new RemoteMixedMediaDb(RemoteMixedMediaDbHelper.getRemoteMmdbTitle(getDbPath()), getUrl(), MixedMediaSqliteLayerFactory.INSTANCE.manufacture(getDbPath(), false, true));
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
