@@ -29,8 +29,13 @@ import net.sparktank.sqlitewrapper.DbException;
 public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixedMediaItem> implements IMixedMediaItemStorageLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	protected MixedMediaSqliteLayerInner (String dbFilePath, boolean autoCommit) throws DbException {
+	private final MixedMediaItemFactory itemFactory;
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	protected MixedMediaSqliteLayerInner (String dbFilePath, boolean autoCommit, MixedMediaItemFactory itemFactory) throws DbException {
 		super(dbFilePath, autoCommit);
+		this.itemFactory = itemFactory;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -274,7 +279,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 			}
 			rs = ps.executeQuery();
 			try {
-				ret = local_parseRecordSet(rs);
+				ret = local_parseRecordSet(rs, this.itemFactory);
 			} finally {
 				rs.close();
 			}
@@ -305,7 +310,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 			}
 			rs = ps.executeQuery();
 			try {
-				ret = local_parseAndUpdateFromRecordSet(list, rs);
+				ret = local_parseAndUpdateFromRecordSet(list, rs, this.itemFactory);
 			} finally {
 				rs.close();
 			}
@@ -362,7 +367,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 			
 			rs = ps.executeQuery();
 			try {
-				ret = local_parseRecordSet(rs);
+				ret = local_parseRecordSet(rs, this.itemFactory);
 			} finally {
 				rs.close();
 			}
@@ -413,7 +418,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 			
 			rs = ps.executeQuery();
 			try {
-				res = local_parseRecordSet(rs);
+				res = local_parseRecordSet(rs, this.itemFactory);
 			} finally {
 				rs.close();
 			}
@@ -806,7 +811,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 		return sqls;
 	}
 	
-	static private List<IMixedMediaItem> local_parseAndUpdateFromRecordSet (List<IMixedMediaItem> list, ResultSet rs) throws SQLException {
+	static private List<IMixedMediaItem> local_parseAndUpdateFromRecordSet (List<IMixedMediaItem> list, ResultSet rs, MixedMediaItemFactory itemFactory) throws SQLException {
 		List<IMixedMediaItem> finalList = new ArrayList<IMixedMediaItem>();
 		
 		// Build a HashMap of existing items to make lookup a lot faster.
@@ -819,7 +824,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 		 * create new list as we go. 
 		 */
 		while (rs.next()) {
-			IMixedMediaItem newItem = createMediaItem(rs);
+			IMixedMediaItem newItem = createMediaItem(rs, itemFactory);
 			IMixedMediaItem oldItem = keepMap.get(newItem.getFilepath());
 			if (oldItem != null) {
 				oldItem.setFromMediaItem(newItem);
@@ -832,29 +837,21 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 		return finalList;
 	}
 	
-	static private List<IMixedMediaItem> local_parseRecordSet (ResultSet rs) throws SQLException {
+	static private List<IMixedMediaItem> local_parseRecordSet (ResultSet rs, MixedMediaItemFactory itemFactory) throws SQLException {
 		List<IMixedMediaItem> ret = new ArrayList<IMixedMediaItem>();
 		
 		while (rs.next()) {
-			IMixedMediaItem mi = createMediaItem(rs);
+			IMixedMediaItem mi = createMediaItem(rs, itemFactory);
 			ret.add(mi);
 		}
 		
 		return ret;
 	}
 	
-	static public IMixedMediaItem getNewMediaItem (String filePath) {
-		return new MixedMediaItem(filePath);
-	}
-	
-	static public IMixedMediaItem getNewMediaItem (MediaType type) {
-		return new MixedMediaItem(type);
-	}
-	
-	static protected IMixedMediaItem createMediaItem (ResultSet rs) throws SQLException {
+	static protected IMixedMediaItem createMediaItem (ResultSet rs, MixedMediaItemFactory itemFactory) throws SQLException {
 		int i = rs.getInt(SQL_TBL_MEDIAFILES_COL_TYPE.getName());
 		MediaType t = MediaType.parseInt(i);
-		IMixedMediaItem mi = getNewMediaItem(t);
+		IMixedMediaItem mi = itemFactory.getNewMediaItem(t);
 		
 		switch (t) {
 			case TRACK:

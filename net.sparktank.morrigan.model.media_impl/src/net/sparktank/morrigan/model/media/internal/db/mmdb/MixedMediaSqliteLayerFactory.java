@@ -23,13 +23,22 @@ public class MixedMediaSqliteLayerFactory extends RecyclingFactory<IMixedMediaSt
 	
 	@Override
 	protected IMixedMediaStorageLayer<IMixedMediaItem> makeNewProduct(String material) throws DbException {
-		return new MixedMediaSqliteLayerOuter(material, true);
+		return new MixedMediaSqliteLayerOuter(material, true, getItemFactory());
 	}
 	
 	@SuppressWarnings("boxing")
 	@Override
 	protected IMixedMediaStorageLayer<IMixedMediaItem> makeNewProduct(String material, Boolean config) throws DbException {
-		return new MixedMediaSqliteLayerOuter(material, config);
+		return new MixedMediaSqliteLayerOuter(material, config, getItemFactory());
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	/**
+	 * TODO share this between same DBs?
+	 */
+	private MixedMediaItemFactory getItemFactory () {
+		return new MixedMediaItemFactory();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
