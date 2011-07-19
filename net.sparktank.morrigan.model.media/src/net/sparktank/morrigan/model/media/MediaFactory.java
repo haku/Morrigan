@@ -28,12 +28,12 @@ public interface MediaFactory {
 	/**
 	 * Basic impl.
 	 */
-	public ILocalMixedMediaDb getLocalMixedMediaDb (String libraryName) throws DbException;
+	public ILocalMixedMediaDb getLocalMixedMediaDb (String fullFilePath) throws DbException;
 	
 	/**
 	 * Impl with a filter set.
 	 */
-	public ILocalMixedMediaDb getLocalMixedMediaDb (String libraryName, String searchTerm) throws DbException;
+	public ILocalMixedMediaDb getLocalMixedMediaDb (String fullFilePath, String searchTerm) throws DbException;
 	
 	public Collection<MediaListReference> getAllRemoteMixedMediaDbs ();
 	public IRemoteMixedMediaDb createRemoteMixedMediaDb (String mmdbUrl);
