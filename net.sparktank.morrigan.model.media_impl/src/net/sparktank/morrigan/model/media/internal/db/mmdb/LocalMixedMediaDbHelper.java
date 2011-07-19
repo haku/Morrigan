@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.model.media.internal;
+package net.sparktank.morrigan.model.media.internal.db.mmdb;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -10,6 +10,7 @@ import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.MediaListReference;
 import net.sparktank.morrigan.model.media.MediaListReference.MediaListType;
+import net.sparktank.morrigan.model.media.internal.MediaListReferenceImpl;
 import net.sparktank.sqlitewrapper.DbException;
 
 public class LocalMixedMediaDbHelper {

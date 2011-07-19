@@ -1,25 +1,26 @@
-package net.sparktank.morrigan.model.media.internal;
+package net.sparktank.morrigan.model.media.internal.pl;
 
 import java.util.Date;
 
 import net.sparktank.morrigan.model.helper.EqualHelper;
 import net.sparktank.morrigan.model.media.IMediaItem;
 import net.sparktank.morrigan.model.media.IMediaTrack;
+import net.sparktank.morrigan.model.media.internal.MediaItem;
 
 
 /**
  * A media track is something that has a temporal dimension;
  * music or video.
  */
-public class MediaTrack extends MediaItem implements IMediaTrack {
+public class MediaPlaylistTrack extends MediaItem implements IMediaTrack {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Constructors.
+//	Constructors - protected so only siblings can create instances.
 	
-	public MediaTrack () {
+	protected MediaPlaylistTrack () {
 		super();
 	}
 	
-	public MediaTrack (String filePath) {
+	protected MediaPlaylistTrack (String filePath) {
 		super(filePath);
 	}
 	
@@ -97,8 +98,8 @@ public class MediaTrack extends MediaItem implements IMediaTrack {
 	public boolean setFromMediaItem (IMediaItem mi) {
 		boolean setFromMediaItem = super.setFromMediaItem(mi);
 		
-		if (mi instanceof MediaTrack) {
-			MediaTrack mt = (MediaTrack) mi;
+		if (mi instanceof IMediaTrack) {
+			IMediaTrack mt = (IMediaTrack) mi;
 			
 			boolean b = this.setDuration(mt.getDuration())
 				| this.setStartCount(mt.getStartCount())
