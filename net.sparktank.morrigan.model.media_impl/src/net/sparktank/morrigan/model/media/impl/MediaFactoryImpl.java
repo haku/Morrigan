@@ -21,7 +21,7 @@ import net.sparktank.morrigan.model.media.internal.DurationDataImpl;
 import net.sparktank.morrigan.model.media.internal.MediaFileCopyTask;
 import net.sparktank.morrigan.model.media.internal.TrackTagHelper;
 import net.sparktank.morrigan.model.media.internal.db.mmdb.CopyToLocalMmdbTask;
-import net.sparktank.morrigan.model.media.internal.db.mmdb.LocalMixedMediaDb;
+import net.sparktank.morrigan.model.media.internal.db.mmdb.LocalMixedMediaDbFactory;
 import net.sparktank.morrigan.model.media.internal.db.mmdb.LocalMixedMediaDbHelper;
 import net.sparktank.morrigan.model.media.internal.db.mmdb.LocalMixedMediaDbUpdateTask;
 import net.sparktank.morrigan.model.media.internal.db.mmdb.RemoteMixedMediaDbUpdateTask;
@@ -64,7 +64,7 @@ public class MediaFactoryImpl implements MediaFactory {
 	
 	@Override
 	public ILocalMixedMediaDb getLocalMixedMediaDb(String libraryName) throws DbException {
-		return LocalMixedMediaDb.LOCAL_MMDB_FACTORY.manufacture(libraryName);
+		return LocalMixedMediaDbFactory.INSTANCE.manufacture(libraryName);
 	}
 	
 	@Override

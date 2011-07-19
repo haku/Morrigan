@@ -8,11 +8,11 @@ import net.sparktank.sqlitewrapper.DbException;
 public class MixedMediaSqliteLayerFactory extends RecyclingFactory<IMixedMediaStorageLayer<IMixedMediaItem>, String, Boolean, DbException> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public static final MixedMediaSqliteLayerFactory FACTORY = new MixedMediaSqliteLayerFactory();
+	public static final MixedMediaSqliteLayerFactory INSTANCE = new MixedMediaSqliteLayerFactory();
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	MixedMediaSqliteLayerFactory() {
+	private MixedMediaSqliteLayerFactory() {
 		super(true);
 	}
 	
