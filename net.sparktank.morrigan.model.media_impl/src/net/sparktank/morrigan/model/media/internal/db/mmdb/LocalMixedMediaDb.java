@@ -19,12 +19,10 @@ public class LocalMixedMediaDb extends AbstractMixedMediaDb<ILocalMixedMediaDb> 
 		return TYPE;
 	}
 	
-	@SuppressWarnings("boxing")
 	@Override
-	public LocalMixedMediaDb getTransactionalClone () throws DbException {
-		return new LocalMixedMediaDb(LocalMixedMediaDbHelper.getMmdbTitle(getDbPath()),
-				MixedMediaSqliteLayerFactory.INSTANCE.manufacture(getDbPath(), false, true),
-				this.getEscapedSearchTerm());
+	public ILocalMixedMediaDb getTransactionalClone () throws DbException {
+		ILocalMixedMediaDb r = LocalMixedMediaDbFactory.getTransactional(getDbPath());
+		return r;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -63,14 +63,13 @@ public class MediaFactoryImpl implements MediaFactory {
 	}
 	
 	@Override
-	public ILocalMixedMediaDb getLocalMixedMediaDb(String libraryName) throws DbException {
-		return LocalMixedMediaDbFactory.INSTANCE.manufacture(libraryName);
+	public ILocalMixedMediaDb getLocalMixedMediaDb(String fullFilePath) throws DbException {
+		return LocalMixedMediaDbFactory.getMain(fullFilePath);
 	}
 	
 	@Override
-	public ILocalMixedMediaDb getLocalMixedMediaDb(String libraryName, String searchTerm) throws DbException {
-		throw new RuntimeException("This is not implemented yet! :'(");
-//		return LocalMixedMediaDb.LOCAL_MMDB_FACTORY.manufacture(libraryName, searchTerm);
+	public ILocalMixedMediaDb getLocalMixedMediaDb(String fullFilePath, String filter) throws DbException {
+		return LocalMixedMediaDbFactory.getView(fullFilePath, filter);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
