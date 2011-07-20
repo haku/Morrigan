@@ -32,6 +32,12 @@ public interface IMediaItem extends IDbItem {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	/**
+	 * Reset item back to its default state.
+	 * This may not reset fixed properties such as filename.
+	 */
+	public void reset ();
+	
 	public boolean setFromMediaItem (IMediaItem mt);
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

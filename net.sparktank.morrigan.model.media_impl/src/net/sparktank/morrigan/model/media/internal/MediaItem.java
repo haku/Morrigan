@@ -15,6 +15,11 @@ public abstract class MediaItem implements IMediaItem, IDbItem {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors.
 	
+	private static final BigInteger HASHCODE_DEFAULT = null;
+	private static final boolean MISSING_DEFAULT = false;
+	private static final boolean ENABLED_DEFAULT = true;
+	private static final int DBROWID_DEFAULT = -1;
+	
 	public MediaItem (String filePath) {
 		setFilepath(filePath);
 	}
@@ -24,10 +29,10 @@ public abstract class MediaItem implements IMediaItem, IDbItem {
 	
 	private String filepath = null;
 	private Date dateAdded = null;
-	private BigInteger hashcode = BigInteger.ZERO;
+	private BigInteger hashcode = HASHCODE_DEFAULT;
 	private Date dateLastModified = null;
-	private boolean enabled = true;
-	private boolean missing = false;
+	private boolean enabled = ENABLED_DEFAULT;
+	private boolean missing = MISSING_DEFAULT;
 	
 	@Override
 	public String getFilepath () {
@@ -76,9 +81,10 @@ public abstract class MediaItem implements IMediaItem, IDbItem {
 		return this.hashcode;
 	}
 	@Override
-	public boolean setHashcode(BigInteger hashcode) {
-		if (!this.hashcode.equals(hashcode)) {
-			this.hashcode = hashcode;
+	public boolean setHashcode(BigInteger newHashcode) {
+		if (!EqualHelper.areEqual(this.hashcode, newHashcode)) {
+			System.err.println("hashcode set to " + newHashcode + " " + getFilepath());
+			this.hashcode = newHashcode;
 			return true;
 		}
 		return false;
@@ -125,7 +131,7 @@ public abstract class MediaItem implements IMediaItem, IDbItem {
 	
 //	-  -  -  -  -  -  -  -
 	
-	private long dbRowId;
+	private long dbRowId = DBROWID_DEFAULT;
 	private String remoteLocation;
 	
 	@Override
@@ -180,6 +186,17 @@ public abstract class MediaItem implements IMediaItem, IDbItem {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Mass setter.
+	
+	@Override
+	public void reset () {
+		this.setDateAdded(null);
+		this.setHashcode(HASHCODE_DEFAULT);
+		this.setDateLastModified(null);
+		this.setEnabled(ENABLED_DEFAULT);
+		this.setMissing(MISSING_DEFAULT);
+		this.setDbRowId(DBROWID_DEFAULT);
+		this.setRemoteLocation(null);
+	}
 	
 	@Override
 	public boolean setFromMediaItem (IMediaItem mi) {

@@ -14,6 +14,12 @@ import net.sparktank.morrigan.model.media.internal.MediaItem;
  */
 public class MediaPlaylistTrack extends MediaItem implements IMediaTrack {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	private static final int DURATION_DEFAULT = -1;
+	private static final int STARTCOUNT_DEFAULT = 0;
+	private static final int ENDCOUNT_DEFAULT = 0;
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors - protected so only siblings can create instances.
 	
 	protected MediaPlaylistTrack (String filePath) {
@@ -30,9 +36,9 @@ public class MediaPlaylistTrack extends MediaItem implements IMediaTrack {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Attributes.
 	
-	private int duration = -1;
-	private long startCount = 0;
-	private long endCount = 0;
+	private int duration = DURATION_DEFAULT;
+	private long startCount = STARTCOUNT_DEFAULT;
+	private long endCount = ENDCOUNT_DEFAULT;
 	private Date dateLastPlayed = null;
 	
 	@Override
@@ -89,6 +95,16 @@ public class MediaPlaylistTrack extends MediaItem implements IMediaTrack {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Mass setter.
+	
+	@Override
+	public void reset() {
+		super.reset();
+		
+		this.setDuration(DURATION_DEFAULT);
+		this.setStartCount(STARTCOUNT_DEFAULT);
+		this.setEndCount(ENDCOUNT_DEFAULT);
+		this.setDateLastPlayed(null);
+	}
 	
 	@Override
 	public boolean setFromMediaItem (IMediaItem mi) {
