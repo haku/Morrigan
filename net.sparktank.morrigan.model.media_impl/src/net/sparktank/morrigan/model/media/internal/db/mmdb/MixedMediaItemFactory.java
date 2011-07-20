@@ -39,7 +39,7 @@ public class MixedMediaItemFactory {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	protected MixedMediaItemFactory () {
-		System.err.println("new MixedMediaItemFactory()");
+//		System.err.println("new MixedMediaItemFactory()");
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -50,7 +50,7 @@ public class MixedMediaItemFactory {
 	}
 	
 	static MixedMediaItem newItem (String filePath) {
-		System.err.println("new MixedMediaItem("+filePath+")");
+//		System.err.println("new MixedMediaItem("+filePath+")");
 		MixedMediaItem item = new MixedMediaItem(filePath);
 		return item;
 	}
