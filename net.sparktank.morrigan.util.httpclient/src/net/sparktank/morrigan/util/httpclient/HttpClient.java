@@ -111,62 +111,70 @@ public class HttpClient {
 	public HttpResponse doHttpRequest(URL url, String httpRequestMethod, String encodedData, String contentType, Map<String, String> headers, HttpStreamHandler httpStreamHandler) throws IOException, HttpStreamHandlerException {
 		this.logger.finest("doHttpRequest(" + (httpRequestMethod==null ? "GET" : httpRequestMethod) + " " + url + "):");
 		
-		HttpURLConnection huc = (HttpURLConnection) url.openConnection();
-//		disableSSLCertificateChecking(huc);
-		huc.setConnectTimeout(HTTP_CONNECT_TIMEOUT_SECONDS * 1000);
-		huc.setReadTimeout(HTTP_READ_TIMEOUT_SECONDS * 1000);
-//		huc.setChunkedStreamingMode(0);
-		
-		if (httpRequestMethod!=null) {
-			huc.setDoOutput(true);
-			huc.setRequestMethod(httpRequestMethod);
-			if (contentType!=null) huc.setRequestProperty("Content-Type", contentType);
-			
-			if (headers!=null) {
-				for (String header : headers.keySet()) {
-					huc.setRequestProperty(header, headers.get(header));
-				}
-			}
-			
-			OutputStreamWriter out = new OutputStreamWriter(huc.getOutputStream());
-			try {
-				out.write(encodedData);
-				out.flush();
-			} finally {
-				out.close();
-			}
-		}
-		
-		Map<String, List<String>> headerFields = huc.getHeaderFields();
-		String etag = huc.getHeaderField("Etag");
-		int responseCode = huc.getResponseCode();
-		
 		StringBuilder sb = null;
-		InputStream is = huc.getInputStream();
+		int responseCode = -1;
+		Map<String, List<String>> headerFields = null;
+		String etag = null;
+		
+		HttpURLConnection huc = (HttpURLConnection) url.openConnection();
 		try {
-			if (httpStreamHandler != null) {
-				httpStreamHandler.handleStream(is);
-			}
-			else {
-				int v;
-				sb = new StringBuilder();
-				while( (v = is.read()) != -1){
-					sb.append((char)v);
+//			disableSSLCertificateChecking(huc);
+			huc.setConnectTimeout(HTTP_CONNECT_TIMEOUT_SECONDS * 1000);
+			huc.setReadTimeout(HTTP_READ_TIMEOUT_SECONDS * 1000);
+//			huc.setChunkedStreamingMode(0);
+			
+			if (httpRequestMethod!=null) {
+				huc.setDoOutput(true);
+				huc.setRequestMethod(httpRequestMethod);
+				if (contentType!=null) huc.setRequestProperty("Content-Type", contentType);
+				
+				if (headers!=null) {
+					for (String header : headers.keySet()) {
+						huc.setRequestProperty(header, headers.get(header));
+					}
+				}
+				
+				OutputStreamWriter out = new OutputStreamWriter(huc.getOutputStream());
+				try {
+					out.write(encodedData);
+					out.flush();
+				} finally {
+					out.close();
 				}
 			}
-		} finally {
-			is.close();
+			
+			headerFields = huc.getHeaderFields();
+			etag = huc.getHeaderField("Etag");
+			responseCode = huc.getResponseCode();
+			
+			InputStream is = huc.getInputStream();
+			try {
+				if (httpStreamHandler != null) {
+					httpStreamHandler.handleStream(is);
+				}
+				else {
+					int v;
+					sb = new StringBuilder();
+					while( (v = is.read()) != -1){
+						sb.append((char)v);
+					}
+				}
+			} finally {
+				is.close();
+			}
 		}
-        
-        huc.disconnect();
-        
-        HttpResponse hr;
-        if (sb == null) {
-        	hr = new HttpResponse(responseCode, null, etag, headerFields);
-        } else {
-        	hr = new HttpResponse(responseCode, sb.toString(), etag, headerFields);
-        }
-        return hr;
+		finally {
+			huc.disconnect();
+		}
+		
+		HttpResponse hr;
+		if (sb == null) {
+			hr = new HttpResponse(responseCode, null, etag, headerFields);
+		}
+		else {
+			hr = new HttpResponse(responseCode, sb.toString(), etag, headerFields);
+		}
+		return hr;
 	}
 	
 //	/**
