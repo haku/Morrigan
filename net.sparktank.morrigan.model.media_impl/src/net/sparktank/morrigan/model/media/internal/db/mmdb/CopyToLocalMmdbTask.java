@@ -56,16 +56,12 @@ public class CopyToLocalMmdbTask<T extends IMediaItem> implements IMorriganTask 
 			 */
 			
 			for (T item : this.itemsToCopy) {
-	    		IMixedMediaItem newItem = this.toDb.getNewT(item.getFilepath());
+				File coItemDir = getCheckoutItemDirectory(coDir, item);
+				File coFile = this.fromList.copyItemFile(item, coItemDir);
+	    		if (!coFile.exists()) throw new FileNotFoundException("After fetching '"+item.getRemoteLocation()+"' can't find '"+coFile.getAbsolutePath()+"'.");
+	    		
+	    		IMixedMediaItem newItem = this.toDb.getNewT(coFile.getAbsolutePath());
 	    		newItem.setFromMediaItem(item);
-	    		
-	    		File coItemDir = getCheckoutItemDirectory(coDir, newItem);
-	    		File coFile = this.fromList.copyItemFile(item, coItemDir);
-	    		if (!coFile.exists()) {
-	    			throw new FileNotFoundException("After fetching '"+item.getRemoteLocation()+"' can't find '"+coFile.getAbsolutePath()+"'.");
-	    		}
-	    		
-	    		newItem.setFilepath(coFile.getAbsolutePath());
 	    		
 	    		// TODO FIXME re-write remote path with URL we fetched it from?  Perhaps this should be returned from copyItemFile()?
 	    		
@@ -119,7 +115,7 @@ public class CopyToLocalMmdbTask<T extends IMediaItem> implements IMorriganTask 
 		return dbCoDir;
 	}
 	
-	static private File getCheckoutItemDirectory (File coDir, IMixedMediaItem item) {
+	static private File getCheckoutItemDirectory (File coDir, IMediaItem item) {
 		String srcPath = item.getRemoteLocation();
 		
 		File dir = new File(coDir, ChecksumHelper.md5String(srcPath));

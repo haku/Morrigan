@@ -16,10 +16,6 @@ public class MediaPlaylistTrack extends MediaItem implements IMediaTrack {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors - protected so only siblings can create instances.
 	
-	protected MediaPlaylistTrack () {
-		super();
-	}
-	
 	protected MediaPlaylistTrack (String filePath) {
 		super(filePath);
 	}

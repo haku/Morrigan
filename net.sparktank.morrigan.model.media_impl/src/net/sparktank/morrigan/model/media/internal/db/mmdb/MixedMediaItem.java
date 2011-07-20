@@ -13,22 +13,8 @@ public class MixedMediaItem extends MediaItem implements IMixedMediaItem {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors - protected so only siblings can create instances.
 	
-	protected MixedMediaItem () {
-		super();
-	}
-	
-	protected MixedMediaItem (MediaType type) {
-		super();
-		setMediaType(type);
-	}
-	
 	protected MixedMediaItem (String filePath) {
 		super(filePath);
-	}
-	
-	protected MixedMediaItem (MediaType type, String filePath) {
-		super(filePath);
-		setMediaType(type);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -43,7 +29,7 @@ public class MixedMediaItem extends MediaItem implements IMixedMediaItem {
 	public MediaType getMediaType() {
 		return this.type;
 	}
-
+	
 	@Override
 	public boolean setMediaType(MediaType newType) {
 		if (this.type != newType) {

@@ -15,8 +15,6 @@ public abstract class MediaItem implements IMediaItem, IDbItem {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors.
 	
-	public MediaItem () {/*Empty constructor.*/}
-	
 	public MediaItem (String filePath) {
 		setFilepath(filePath);
 	}
@@ -36,9 +34,24 @@ public abstract class MediaItem implements IMediaItem, IDbItem {
 		return this.filepath;
 	}
 	@Override
-	public boolean setFilepath (String filePath) {
-		if (!EqualHelper.areEqual(this.filepath, filePath)) {
-			this.filepath = filePath;
+	public boolean setFilepath (String filepath) {
+		if (this.filepath == null && filepath != null) {
+			return setFilepathIfNotSet(filepath);
+		}
+		else if (EqualHelper.areEqual(this.filepath, filepath)) {
+			return false;
+		}
+		else {
+			throw new IllegalStateException("filepath can not be modified once set.  Current='"+this.filepath+"' proposed='"+filepath+"'.");
+		}
+	}
+	
+	/**
+	 * This will silently fail if filepath is already set.
+	 */
+	private boolean setFilepathIfNotSet (String filepath) {
+		if (this.filepath == null && !EqualHelper.areEqual(this.filepath, filepath)) {
+			this.filepath = filepath;
 			updateTitle();
 			return true;
 		}
@@ -171,7 +184,7 @@ public abstract class MediaItem implements IMediaItem, IDbItem {
 	@Override
 	public boolean setFromMediaItem (IMediaItem mi) {
 		boolean b =
-    		  this.setFilepath(mi.getFilepath())
+    		  this.setFilepathIfNotSet(mi.getFilepath()) // Do not set it if it is already set.
     		| this.setDateAdded(mi.getDateAdded())
     		| this.setHashcode(mi.getHashcode())
     		| this.setDateLastModified(mi.getDateLastModified())
