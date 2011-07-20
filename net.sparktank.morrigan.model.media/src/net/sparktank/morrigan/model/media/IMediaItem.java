@@ -11,10 +11,10 @@ public interface IMediaItem extends IDbItem {
 	
 	public String getFilepath ();
 	public boolean setFilepath (String filePath);
-		
+	
 	public Date getDateAdded();
 	public boolean setDateAdded(Date dateAdded);
-		
+	
 	public BigInteger getHashcode();
 	public boolean setHashcode(BigInteger hashcode);
 	
