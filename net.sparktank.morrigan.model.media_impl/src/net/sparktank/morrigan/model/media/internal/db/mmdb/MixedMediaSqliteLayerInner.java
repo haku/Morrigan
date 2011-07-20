@@ -849,6 +849,12 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 		String filePath = rs.getString(SQL_TBL_MEDIAFILES_COL_FILE.getName());
 		IMixedMediaItem mi = itemFactory.getNewMediaItem(filePath);
 		
+		/* The object returned by the itemFactory may not be fresh.
+		 * It is important that this method call every possible setter.
+		 * Any setter not called will result in stale data remaining.
+		 * Not using .reset() as that would not be thread safe.
+		 */
+		
 		int i = rs.getInt(SQL_TBL_MEDIAFILES_COL_TYPE.getName());
 		MediaType t = MediaType.parseInt(i);
 		mi.setMediaType(t);
@@ -856,7 +862,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 		mi.setDateAdded(SqliteHelper.readDate(rs, SQL_TBL_MEDIAFILES_COL_DADDED.getName()));
 		
 		byte[] bytes = rs.getBytes(SQL_TBL_MEDIAFILES_COL_MD5.getName());
-		if (bytes != null) mi.setHashcode(new BigInteger(bytes));
+		mi.setHashcode(bytes == null ? null : new BigInteger(bytes));
 		
 		mi.setDateLastModified(SqliteHelper.readDate(rs, SQL_TBL_MEDIAFILES_COL_DMODIFIED.getName()));
 		mi.setEnabled(rs.getInt(SQL_TBL_MEDIAFILES_COL_ENABLED.getName()) != 0); // default to true.
@@ -864,19 +870,26 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 		mi.setDbRowId(rs.getLong(SQL_TBL_MEDIAFILES_COL_ROWID.getName()));
 		mi.setRemoteLocation(rs.getString(SQL_TBL_MEDIAFILES_COL_REMLOC.getName()));
 		
-		switch (t) {
-			case TRACK:
-				mi.setStartCount(rs.getLong(SQL_TBL_MEDIAFILES_COL_STARTCNT.getName()));
-				mi.setEndCount(rs.getLong(SQL_TBL_MEDIAFILES_COL_ENDCNT.getName()));
-				mi.setDuration(rs.getInt(SQL_TBL_MEDIAFILES_COL_DURATION.getName()));
-				mi.setDateLastPlayed(SqliteHelper.readDate(rs, SQL_TBL_MEDIAFILES_COL_DLASTPLAY.getName()));
-				break;
-			
-			case PICTURE:
-				mi.setWidth(rs.getInt(SQL_TBL_MEDIAFILES_COL_WIDTH.getName()));
-				mi.setHeight(rs.getInt(SQL_TBL_MEDIAFILES_COL_HEIGHT.getName()));
-				break;
-			
+		if (t == MediaType.TRACK) {
+			mi.setStartCount(rs.getLong(SQL_TBL_MEDIAFILES_COL_STARTCNT.getName()));
+			mi.setEndCount(rs.getLong(SQL_TBL_MEDIAFILES_COL_ENDCNT.getName()));
+			mi.setDuration(rs.getInt(SQL_TBL_MEDIAFILES_COL_DURATION.getName()));
+			mi.setDateLastPlayed(SqliteHelper.readDate(rs, SQL_TBL_MEDIAFILES_COL_DLASTPLAY.getName()));
+		}
+		else {
+			mi.setStartCount(0); // TODO extract constant for default value.
+			mi.setEndCount(0); // TODO extract constant for default value.
+			mi.setDuration(0); // TODO extract constant for default value.
+			mi.setDateLastPlayed(null); // TODO extract constant for default value.
+		}
+		
+		if (t == MediaType.PICTURE) {
+			mi.setWidth(rs.getInt(SQL_TBL_MEDIAFILES_COL_WIDTH.getName()));
+			mi.setHeight(rs.getInt(SQL_TBL_MEDIAFILES_COL_HEIGHT.getName()));
+		}
+		else {
+			mi.setWidth(0); // TODO extract constant for default value.
+			mi.setHeight(0); // TODO extract constant for default value.
 		}
 		
 		return mi;

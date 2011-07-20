@@ -144,6 +144,18 @@ public class MixedMediaItem extends MediaItem implements IMixedMediaItem {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Mass setter.
 	
+	@Override
+	public void reset() {
+		super.reset();
+		
+		this.setDuration(0);
+		this.setStartCount(0);
+		this.setEndCount(0);
+		this.setDateLastPlayed(null);
+		this.setWidth(0);
+		this.setHeight(0);
+	}
+	
 	private boolean _setFromMediaTrack (IMediaTrack mt) {
 		boolean b =
 			  this.setDuration(mt.getDuration())

@@ -451,7 +451,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<Q, ? extends IMed
 				 */
 				Map<T, ScanOption> items = new HashMap<T, ScanOption>();
 				for (T mi : dupicateItems.keySet()) {
-					if (mi.getHashcode().equals(h)) {
+					if (h.equals(mi.getHashcode())) {
 						items.put(mi, dupicateItems.get(mi));
 					}
 				}
@@ -531,14 +531,21 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<Q, ? extends IMed
 			Collections.sort(dups, new Comparator<Entry<T, ScanOption>>() {
 				@Override
 				public int compare(Entry<T, ScanOption> o1, Entry<T, ScanOption> o2) {
-					return o1.getKey().getHashcode().compareTo(o2.getKey().getHashcode());
+					// comp(1234, null) == -1, comp(null, null) == 0, comp(null, 1234) == 1
+					
+					BigInteger h1 = o1.getKey().getHashcode();
+					BigInteger h2 = o2.getKey().getHashcode();
+					
+					return h1 == null ? (h2 == null ? 0 : 1) : h1.compareTo(h2);
 				}
 			});
 			
 			taskEventListener.logMsg(this.getItemList().getListName(), "Found " + dups.size() + " duplicate items:");
 			// Print list if duplicates.
 			for (Entry<T, ScanOption> e : dups) {
-				taskEventListener.logMsg(this.getItemList().getListName(), e.getKey().getHashcode().toString(16) + " : " + e.getValue() + " : " + e.getKey().getTitle());
+				BigInteger hashcode = e.getKey().getHashcode();
+				String hashcodeString = hashcode == null ? "null" : hashcode.toString(16);
+				taskEventListener.logMsg(this.getItemList().getListName(), hashcodeString + " : " + e.getValue() + " : " + e.getKey().getTitle());
 			}
 		}
 		else {

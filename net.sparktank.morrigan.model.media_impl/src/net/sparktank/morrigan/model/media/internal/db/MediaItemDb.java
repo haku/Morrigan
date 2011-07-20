@@ -565,7 +565,8 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 		T track = null;
 		boolean added = this.dbLayer.addFile(file);
 		if (added) {
-			track = getNewT(file.getAbsolutePath());
+			track = getDbLayer().getNewT(file.getAbsolutePath());
+			track.reset();
 			addItem(track);
 		}
 		return track;
@@ -581,7 +582,8 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 		boolean[] res = this.dbLayer.addFiles(files);
 		for (int i = 0; i < files.size(); i++) {
 			if (res[i]) {
-				T t = getNewT(files.get(i).getAbsolutePath());
+				T t = getDbLayer().getNewT(files.get(i).getAbsolutePath());
+				t.reset();
 				addItem(t);
 				ret.add(t);
 			}

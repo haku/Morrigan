@@ -33,13 +33,6 @@ public abstract class AbstractMixedMediaDb<H extends IAbstractMixedMediaDb<H>>
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	@Override
-	public IMixedMediaItem getNewT(String filePath) {
-		return getDbLayer().getNewT(filePath);
-	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Default MediaType.
 	
 	@Override

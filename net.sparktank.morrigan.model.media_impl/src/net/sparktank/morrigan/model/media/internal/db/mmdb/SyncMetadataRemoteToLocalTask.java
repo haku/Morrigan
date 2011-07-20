@@ -45,19 +45,23 @@ public class SyncMetadataRemoteToLocalTask implements IMorriganTask {
 				// FIXME add getByHashcode() to local DB.
 				final Map<BigInteger, IMixedMediaItem> localItems = new HashMap<BigInteger, IMixedMediaItem>();
 				for (IMixedMediaItem localItem : trans.getAllDbEntries()) {
-					localItems.put(localItem.getHashcode(), localItem);
+					BigInteger hashcode = localItem.getHashcode();
+					if (hashcode != null && !BigInteger.ZERO.equals(hashcode)) localItems.put(hashcode, localItem);
 				}
 				
 				final List<IMixedMediaItem> remoteItems = this.remote.getAllDbEntries();
 				taskEventListener.beginTask("Sync'ing", remoteItems.size());
 				for (IMixedMediaItem remoteItem : remoteItems) {
-					final IMixedMediaItem localItem = localItems.get(remoteItem.getHashcode());
-					if (localItem != null) {
-						taskEventListener.subTask(localItem.getTitle());
-						syncMediaItems(trans, remoteItem, localItem);
+					BigInteger hashcode = remoteItem.getHashcode();
+					if (hashcode != null && !BigInteger.ZERO.equals(hashcode)) {
+						final IMixedMediaItem localItem = localItems.get(hashcode);
+						if (localItem != null) {
+							taskEventListener.subTask(localItem.getTitle());
+							syncMediaItems(trans, remoteItem, localItem);
+						}
+						taskEventListener.worked(1);
+						if (taskEventListener.isCanceled()) break;
 					}
-					taskEventListener.worked(1);
-					if (taskEventListener.isCanceled()) break;
 				}
 				
 				trans.commitOrRollback();

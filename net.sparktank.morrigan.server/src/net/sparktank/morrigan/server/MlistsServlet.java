@@ -3,6 +3,7 @@ package net.sparktank.morrigan.server;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Collection;
@@ -373,7 +374,7 @@ public class MlistsServlet extends HttpServlet {
     				AbstractFeed.addElement(dw, "datelastmodified", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateLastModified()));
     			}
     			AbstractFeed.addElement(dw, "type", mi.getMediaType().getN());
-    			AbstractFeed.addElement(dw, "hash", mi.getHashcode().toString());
+    			if (mi.getHashcode() != null && !BigInteger.ZERO.equals(mi.getHashcode())) AbstractFeed.addElement(dw, "hash", mi.getHashcode().toString(16));
     			AbstractFeed.addElement(dw, "enabled", Boolean.toString(mi.isEnabled()));
     			
     			if (mi.getMediaType() == MediaType.TRACK) {

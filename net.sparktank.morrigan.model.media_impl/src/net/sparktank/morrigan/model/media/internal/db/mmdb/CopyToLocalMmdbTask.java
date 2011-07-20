@@ -60,7 +60,7 @@ public class CopyToLocalMmdbTask<T extends IMediaItem> implements IMorriganTask 
 				File coFile = this.fromList.copyItemFile(item, coItemDir);
 	    		if (!coFile.exists()) throw new FileNotFoundException("After fetching '"+item.getRemoteLocation()+"' can't find '"+coFile.getAbsolutePath()+"'.");
 	    		
-	    		IMixedMediaItem newItem = this.toDb.getNewT(coFile.getAbsolutePath());
+	    		IMixedMediaItem newItem = this.toDb.getDbLayer().getNewT(coFile.getAbsolutePath());
 	    		newItem.setFromMediaItem(item);
 	    		
 	    		// TODO FIXME re-write remote path with URL we fetched it from?  Perhaps this should be returned from copyItemFile()?
