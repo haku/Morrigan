@@ -11,6 +11,7 @@ import java.util.List;
 import net.sparktank.morrigan.model.db.IDbItem;
 import net.sparktank.morrigan.model.media.IMediaItem;
 import net.sparktank.morrigan.model.media.IMediaItemStorageLayer;
+import net.sparktank.morrigan.model.media.IMediaItemStorageLayerChangeListener;
 import net.sparktank.morrigan.model.media.MediaTag;
 import net.sparktank.morrigan.model.media.MediaTagClassification;
 import net.sparktank.morrigan.model.media.MediaTagType;
@@ -25,6 +26,20 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	
 	protected MediaSqliteLayer (String dbFilePath, boolean autoCommit) throws DbException {
 		super(dbFilePath, autoCommit);
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	@Override
+	public void addChangeListener(IMediaItemStorageLayerChangeListener<T> listener) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Not implemented.");
+	}
+	
+	@Override
+	public void removeChangeListener(IMediaItemStorageLayerChangeListener<T> listener) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Not implemented.");
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
