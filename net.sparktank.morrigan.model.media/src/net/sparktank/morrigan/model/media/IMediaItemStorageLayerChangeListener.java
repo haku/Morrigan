@@ -1,19 +1,17 @@
 package net.sparktank.morrigan.model.media;
 
+import java.io.File;
+import java.util.List;
+
 public interface IMediaItemStorageLayerChangeListener<T extends IMediaItem> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public void propertySet (String key, String value);
 	
-	public void mediaItemAdded (T item);
-	public void mediaItemRemoved (T item);
-	public void mediaItemUpdated (T item);
-	
-	public void mediaItemTagClassificationAdded (MediaTagClassification classification);
-	public void mediaItemTagAdded (T item, MediaTag tag);
-	public void mediaItemTagRemoved (T item, MediaTag tag);
-	public void mediaItemTagsMoved (T fromItem, T toItem);
-	public void mediaItemTagsCleared (T item);
+	public void mediaItemAdded (String filePath);
+	public void mediaItemsAdded (List<File> filePaths);
+	public void mediaItemRemoved (String filePath);
+	public void mediaItemUpdated (String filePath);
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
