@@ -71,6 +71,7 @@ public class LocalMixedMediaDbFactory extends RecyclingFactory2<ILocalMixedMedia
 	 * TODO initially, disable making changes?
 	 */
 	public static ILocalMixedMediaDb getView (String fullFilePath, String filter) throws DbException {
+		if (true) throw new RuntimeException("Its not ready yet! ~desu");
 		LocalMixedMediaDbConfig config = new LocalMixedMediaDbConfig(fullFilePath, filter);
 		ILocalMixedMediaDb r = INSTANCE.manufacture(config);
 		return r;
