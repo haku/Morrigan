@@ -83,7 +83,6 @@ public abstract class MediaItem implements IMediaItem, IDbItem {
 	@Override
 	public boolean setHashcode(BigInteger newHashcode) {
 		if (!EqualHelper.areEqual(this.hashcode, newHashcode)) {
-			System.err.println("hashcode set to " + newHashcode + " " + getFilepath());
 			this.hashcode = newHashcode;
 			return true;
 		}
