@@ -151,7 +151,7 @@ public class MixedMediaDbFeedParser extends DefaultHandler {
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 		this.stack.push(localName);
 		if (this.stack.size() == 2 && localName.equals("entry")) {
-			this.currentItem = this.rmmdb.getNewT("");
+			this.currentItem = this.rmmdb.getNewT(null);
 		}
 		else if (this.stack.size() == 3 && localName.equals("link")) {
 			String relVal = attributes.getValue("rel");
@@ -182,7 +182,7 @@ public class MixedMediaDbFeedParser extends DefaultHandler {
 		}
 		else if (this.stack.size() == 2 && localName.equals("entry")) {
 			try {
-				this.rmmdb.updateItem(this.currentItem); 
+				this.rmmdb.updateItem(this.currentItem);
 			}
 			catch (MorriganException e) {
 				throw new SAXException(e);

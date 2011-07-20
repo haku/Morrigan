@@ -15,14 +15,11 @@ import java.util.Map;
 
 import net.sparktank.morrigan.model.db.IDbColumn;
 import net.sparktank.morrigan.model.db.IDbItem;
-import net.sparktank.morrigan.model.media.IMediaItem;
-import net.sparktank.morrigan.model.media.IMediaPicture;
-import net.sparktank.morrigan.model.media.IMediaTrack;
 import net.sparktank.morrigan.model.media.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.IMixedMediaItem.MediaType;
+import net.sparktank.morrigan.model.media.IMixedMediaItemStorageLayer;
 import net.sparktank.morrigan.model.media.internal.db.MediaSqliteLayer;
 import net.sparktank.morrigan.model.media.internal.db.SqliteHelper;
-import net.sparktank.morrigan.model.media.IMixedMediaItemStorageLayer;
 import net.sparktank.morrigan.util.GeneratedString;
 import net.sparktank.sqlitewrapper.DbException;
 
@@ -849,45 +846,13 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 	}
 	
 	static protected IMixedMediaItem createMediaItem (ResultSet rs, MixedMediaItemFactory itemFactory) throws SQLException {
+		String filePath = rs.getString(SQL_TBL_MEDIAFILES_COL_FILE.getName());
+		IMixedMediaItem mi = itemFactory.getNewMediaItem(filePath);
+		
 		int i = rs.getInt(SQL_TBL_MEDIAFILES_COL_TYPE.getName());
 		MediaType t = MediaType.parseInt(i);
-		IMixedMediaItem mi = itemFactory.getNewMediaItem(t);
+		mi.setMediaType(t);
 		
-		switch (t) {
-			case TRACK:
-				readMediaTrack(rs, mi);
-				break;
-			
-			case PICTURE:
-				readMediaPic(rs, mi);
-				break;
-			
-			case UNKNOWN:
-				readMediaItem(rs, mi);
-			
-		}
-		
-		return mi;
-	}
-	
-	static protected void readMediaTrack (ResultSet rs, IMediaTrack mi) throws SQLException {
-		readMediaItem(rs, mi);
-		
-		mi.setStartCount(rs.getLong(SQL_TBL_MEDIAFILES_COL_STARTCNT.getName()));
-		mi.setEndCount(rs.getLong(SQL_TBL_MEDIAFILES_COL_ENDCNT.getName()));
-		mi.setDuration(rs.getInt(SQL_TBL_MEDIAFILES_COL_DURATION.getName()));
-		mi.setDateLastPlayed(SqliteHelper.readDate(rs, SQL_TBL_MEDIAFILES_COL_DLASTPLAY.getName()));
-	}
-	
-	static protected void readMediaPic (ResultSet rs, IMediaPicture mi) throws SQLException {
-		readMediaItem(rs, mi);
-		
-		mi.setWidth(rs.getInt(SQL_TBL_MEDIAFILES_COL_WIDTH.getName()));
-		mi.setHeight(rs.getInt(SQL_TBL_MEDIAFILES_COL_HEIGHT.getName()));
-	}
-	
-	static protected void readMediaItem (ResultSet rs, IMediaItem mi) throws SQLException {
-		mi.setFilepath(rs.getString(SQL_TBL_MEDIAFILES_COL_FILE.getName()));
 		mi.setDateAdded(SqliteHelper.readDate(rs, SQL_TBL_MEDIAFILES_COL_DADDED.getName()));
 		
 		byte[] bytes = rs.getBytes(SQL_TBL_MEDIAFILES_COL_MD5.getName());
@@ -898,6 +863,23 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 		mi.setMissing(rs.getInt(SQL_TBL_MEDIAFILES_COL_MISSING.getName()) == 1); // default to false.
 		mi.setDbRowId(rs.getLong(SQL_TBL_MEDIAFILES_COL_ROWID.getName()));
 		mi.setRemoteLocation(rs.getString(SQL_TBL_MEDIAFILES_COL_REMLOC.getName()));
+		
+		switch (t) {
+			case TRACK:
+				mi.setStartCount(rs.getLong(SQL_TBL_MEDIAFILES_COL_STARTCNT.getName()));
+				mi.setEndCount(rs.getLong(SQL_TBL_MEDIAFILES_COL_ENDCNT.getName()));
+				mi.setDuration(rs.getInt(SQL_TBL_MEDIAFILES_COL_DURATION.getName()));
+				mi.setDateLastPlayed(SqliteHelper.readDate(rs, SQL_TBL_MEDIAFILES_COL_DLASTPLAY.getName()));
+				break;
+			
+			case PICTURE:
+				mi.setWidth(rs.getInt(SQL_TBL_MEDIAFILES_COL_WIDTH.getName()));
+				mi.setHeight(rs.getInt(SQL_TBL_MEDIAFILES_COL_HEIGHT.getName()));
+				break;
+			
+		}
+		
+		return mi;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

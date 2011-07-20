@@ -1,7 +1,6 @@
 package net.sparktank.morrigan.model.media.internal.db.mmdb;
 
 import net.sparktank.morrigan.model.media.IMixedMediaItem;
-import net.sparktank.morrigan.model.media.IMixedMediaItem.MediaType;
 
 /**
  * This object will be responsible for all caching of item instances
@@ -28,10 +27,6 @@ public class MixedMediaItemFactory {
 	
 	public IMixedMediaItem getNewMediaItem (String filePath) {
 		return new MixedMediaItem(filePath);
-	}
-	
-	public IMixedMediaItem getNewMediaItem (MediaType type) {
-		return new MixedMediaItem(type);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
