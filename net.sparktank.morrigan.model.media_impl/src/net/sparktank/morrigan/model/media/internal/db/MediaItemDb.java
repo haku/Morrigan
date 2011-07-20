@@ -639,7 +639,7 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 			// Update item.
 			T track = null;
 			List<T> mediaTracks = getMediaItems();
-			int index = mediaTracks.indexOf(mi);
+			int index = mediaTracks.indexOf(mi); // TODO FIXME This REALLY should be a HashMap lookup.
 			if (index >= 0) {
 				track = mediaTracks.get(index);
 			} else {
