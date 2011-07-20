@@ -84,14 +84,9 @@ public abstract class RecyclingFactory2<T extends Object, K extends Object, S ex
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	/**
-	 * @throws S  
-	 */
-	protected T makeNewProduct (K material) throws S {
-		throw new IllegalArgumentException("Not implemented.");
-	}
-	
 	protected abstract boolean isValidProduct (T product);
+	
+	protected abstract T makeNewProduct (K material) throws S;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
