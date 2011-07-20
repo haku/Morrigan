@@ -38,6 +38,9 @@ public interface IMediaItemStorageLayer<T extends IMediaItem> extends IGenericDb
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	public void addChangeListener (IMediaItemStorageLayerChangeListener<T> listener);
+	public void removeChangeListener (IMediaItemStorageLayerChangeListener<T> listener);
+	
 	public void setProp (String key, String value) throws DbException;
 	public String getProp (String key) throws DbException;
 	
