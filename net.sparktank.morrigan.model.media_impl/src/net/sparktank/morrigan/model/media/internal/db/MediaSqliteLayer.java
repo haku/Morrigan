@@ -1,10 +1,12 @@
 package net.sparktank.morrigan.model.media.internal.db;
 
+import java.io.File;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -30,16 +32,59 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	protected final Collection<IMediaItemStorageLayerChangeListener<T>> changeListeners = new LinkedList<IMediaItemStorageLayerChangeListener<T>>();
+	
 	@Override
 	public void addChangeListener(IMediaItemStorageLayerChangeListener<T> listener) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Not implemented.");
+		this.changeListeners.add(listener);
 	}
 	
 	@Override
 	public void removeChangeListener(IMediaItemStorageLayerChangeListener<T> listener) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Not implemented.");
+		this.changeListeners.remove(listener);
+	}
+	
+	private final IMediaItemStorageLayerChangeListener<T> changeCaller = new IMediaItemStorageLayerChangeListener<T> () {
+		
+		@Override
+		public void propertySet(String key, String value) {
+			for (IMediaItemStorageLayerChangeListener<T> l : MediaSqliteLayer.this.changeListeners) {
+				l.propertySet(key, value);
+			}
+		}
+		
+		@Override
+		public void mediaItemAdded(String filePath) {
+			for (IMediaItemStorageLayerChangeListener<T> l : MediaSqliteLayer.this.changeListeners) {
+				l.mediaItemAdded(filePath);
+			}
+		}
+		
+		@Override
+		public void mediaItemsAdded(List<File> files) {
+			for (IMediaItemStorageLayerChangeListener<T> l : MediaSqliteLayer.this.changeListeners) {
+				l.mediaItemsAdded(files);
+			}
+		}
+		
+		@Override
+		public void mediaItemRemoved(String filePath) {
+			for (IMediaItemStorageLayerChangeListener<T> l : MediaSqliteLayer.this.changeListeners) {
+				l.mediaItemRemoved(filePath);
+			}
+		}
+		
+		@Override
+		public void mediaItemUpdated(String filePath) {
+			for (IMediaItemStorageLayerChangeListener<T> l : MediaSqliteLayer.this.changeListeners) {
+				l.mediaItemUpdated(filePath);
+			}
+		}
+		
+	};
+	
+	protected IMediaItemStorageLayerChangeListener<T> getChangeCaller () {
+		return this.changeCaller;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -378,7 +423,9 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 			n = ps.executeUpdate();
 			if (n<1) throw new DbException("No update occured.");
 			
-		} finally {
+			this.changeCaller.propertySet(key, value);
+		}
+		finally {
 			if (ps!=null) ps.close();
 		}
 	}
