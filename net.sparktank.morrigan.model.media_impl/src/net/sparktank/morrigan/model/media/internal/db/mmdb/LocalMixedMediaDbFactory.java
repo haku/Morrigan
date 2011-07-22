@@ -72,6 +72,7 @@ public class LocalMixedMediaDbFactory extends RecyclingFactory2<ILocalMixedMedia
 	 */
 	public static ILocalMixedMediaDb getView (String fullFilePath, String filter) throws DbException {
 		if (true) throw new RuntimeException("Its not ready yet! ~desu");
+		@SuppressWarnings("unused")
 		LocalMixedMediaDbConfig config = new LocalMixedMediaDbConfig(fullFilePath, filter);
 		ILocalMixedMediaDb r = INSTANCE.manufacture(config);
 		return r;
