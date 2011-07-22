@@ -8,7 +8,7 @@ import net.sparktank.sqlitewrapper.DbException;
 public class MixedMediaSqliteLayerFactory extends RecyclingFactory<IMixedMediaStorageLayer<IMixedMediaItem>, String, Boolean, DbException> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public static final MixedMediaSqliteLayerFactory INSTANCE = new MixedMediaSqliteLayerFactory();
+	private static final MixedMediaSqliteLayerFactory INSTANCE = new MixedMediaSqliteLayerFactory();
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -30,6 +30,18 @@ public class MixedMediaSqliteLayerFactory extends RecyclingFactory<IMixedMediaSt
 	@Override
 	protected IMixedMediaStorageLayer<IMixedMediaItem> makeNewProduct(String material, Boolean config) throws DbException {
 		return new MixedMediaSqliteLayerOuter(material, config, getItemFactory());
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	public static IMixedMediaStorageLayer<IMixedMediaItem> getAutocommit (String filepath) throws DbException {
+		IMixedMediaStorageLayer<IMixedMediaItem> l = INSTANCE.manufacture(filepath);
+		return l;
+	}
+	
+	public static IMixedMediaStorageLayer<IMixedMediaItem> getTransactional (String filepath) throws DbException {
+		IMixedMediaStorageLayer<IMixedMediaItem> l = INSTANCE.manufacture(filepath, Boolean.FALSE, true);
+		return l;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

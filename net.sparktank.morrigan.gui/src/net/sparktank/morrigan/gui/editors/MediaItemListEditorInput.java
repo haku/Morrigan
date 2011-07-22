@@ -101,7 +101,7 @@ public class MediaItemListEditorInput<T extends IMediaItemList<? extends IMediaI
 		if ( !(aThat instanceof MediaItemListEditorInput<?>) ) return false;
 		MediaItemListEditorInput<?> that = (MediaItemListEditorInput<?>)aThat;
 		
-		return EqualHelper.areEqual(this.editedMediaList.getListId(), that.getMediaList().getListId());
+		return EqualHelper.areEqual(this.editedMediaList.getSerial(), that.getMediaList().getSerial());
 	}
 	
 	@Override

@@ -16,6 +16,7 @@ import net.sparktank.morrigan.model.media.IMixedMediaStorageLayer;
 import net.sparktank.morrigan.model.media.internal.MediaPictureListHelper;
 import net.sparktank.morrigan.model.media.internal.MediaTrackListHelper;
 import net.sparktank.morrigan.model.media.internal.db.MediaItemDb;
+import net.sparktank.morrigan.model.media.internal.db.MediaItemDbConfig;
 import net.sparktank.sqlitewrapper.DbException;
 
 public abstract class AbstractMixedMediaDb<H extends IAbstractMixedMediaDb<H>>
@@ -23,8 +24,8 @@ public abstract class AbstractMixedMediaDb<H extends IAbstractMixedMediaDb<H>>
 		implements IAbstractMixedMediaDb<H> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	protected AbstractMixedMediaDb (String libraryName, IMixedMediaStorageLayer<IMixedMediaItem> dbLayer, String searchTerm) {
-		super(libraryName, dbLayer, searchTerm);
+	protected AbstractMixedMediaDb (String listName, MediaItemDbConfig config, IMixedMediaStorageLayer<IMixedMediaItem> dbLayer) {
+		super(listName, config, dbLayer);
 		
 		try {
 			readDefaultMediaTypeFromDb();

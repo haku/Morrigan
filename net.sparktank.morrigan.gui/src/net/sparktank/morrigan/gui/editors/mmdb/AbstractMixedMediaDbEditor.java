@@ -262,6 +262,7 @@ public abstract class AbstractMixedMediaDbEditor<T extends IAbstractMixedMediaDb
 	}
 	
 	private SortChangeListener sortChangeListener = new SortChangeListener () {
+		@SuppressWarnings("synthetic-access")
 		@Override
 		public void sortChanged(IDbColumn sort, SortDirection direction) {
 			for (SortAction a : AbstractMixedMediaDbEditor.this.sortActions) {
@@ -270,6 +271,7 @@ public abstract class AbstractMixedMediaDbEditor<T extends IAbstractMixedMediaDb
 					a.setChecked(c);
 				}
 			}
+			AbstractMixedMediaDbEditor.this.listChangeRrefresher.run();
 		}
 	};
 	
@@ -295,7 +297,6 @@ public abstract class AbstractMixedMediaDbEditor<T extends IAbstractMixedMediaDb
 			if (isChecked()) {
 				setSortMarker(null, SWT.NONE); // FIXME send actual column / direction.
 				setSort(this.sort, this.sortDir);
-				System.out.println("sort by " + this.sort.toString());
 			}
 		}
 		

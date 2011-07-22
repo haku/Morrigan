@@ -8,6 +8,9 @@ import net.sparktank.morrigan.gui.actions.NewMixedDbAction;
 import net.sparktank.morrigan.gui.actions.NewRemoteMixedDbAction;
 import net.sparktank.morrigan.gui.adaptors.MediaExplorerItemLblProv;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
+import net.sparktank.morrigan.gui.editors.EditorFactory;
+import net.sparktank.morrigan.gui.editors.MediaItemDbEditorInput;
+import net.sparktank.morrigan.gui.editors.mmdb.LocalMixedMediaDbEditor;
 import net.sparktank.morrigan.gui.handler.CallMediaListEditor;
 import net.sparktank.morrigan.gui.handler.CallPlayMedia;
 import net.sparktank.morrigan.gui.helpers.ImageCache;
@@ -28,16 +31,19 @@ import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.part.ViewPart;
 
@@ -127,6 +133,8 @@ public class ViewMediaExplorer extends ViewPart {
 						MediaListReference item = (MediaListReference) selectedObject;
 						
 						if (item.getType() == MediaListReference.MediaListType.LOCALMMDB) {
+							mgr.add(new OpenViewAction(item));
+							
 							mgr.add(new PlayAction(item, false));
 							mgr.add(new PlayAction(item, true));
 						}
@@ -210,6 +218,42 @@ public class ViewMediaExplorer extends ViewPart {
 			}
 		}
 	};
+	
+	class OpenViewAction extends Action {
+		
+		private final MediaListReference mediaExplorerItem;
+
+		public OpenViewAction (MediaListReference mediaExplorerItem) {
+			super("Open view... ");
+			this.mediaExplorerItem = mediaExplorerItem;
+		}
+		
+		@Override
+		public void run() {
+			try {
+				if (this.mediaExplorerItem.getType() == MediaListReference.MediaListType.LOCALMMDB) {
+					InputDialog dlg = new InputDialog(
+							Display.getCurrent().getActiveShell(),
+							"Open view", "Filter string:", "", null);
+					if (dlg.open() == Window.OK) {
+						String filter = dlg.getValue();
+						if (filter != null && filter.length() > 0) {
+							MediaItemDbEditorInput input = EditorFactory.getMmdbInput(this.mediaExplorerItem.getIdentifier(), filter);
+							IWorkbenchPage page = getSite().getWorkbenchWindow().getActivePage();
+							page.openEditor(input, LocalMixedMediaDbEditor.ID);
+						}
+					}
+				}
+				else {
+					throw new IllegalArgumentException("Views are not supported on MediaExplorerItem of type '"+this.mediaExplorerItem.getType()+"'.");
+				}
+			}
+			catch (Exception e) {
+				new MorriganMsgDlg(e).open();
+			}
+		}
+		
+	}
 	
 	static class MediaExplorerItemUpdateAction extends Action {
 		
@@ -301,7 +345,7 @@ public class ViewMediaExplorer extends ViewPart {
 		
 	}
 	
-	class SyncMetadataAction extends Action {
+	static class SyncMetadataAction extends Action {
 		
 		private final MediaListReference local;
 		private final MediaListReference remote;

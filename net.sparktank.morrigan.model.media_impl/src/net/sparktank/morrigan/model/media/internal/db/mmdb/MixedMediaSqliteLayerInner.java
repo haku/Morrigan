@@ -120,8 +120,8 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 	private static final String _SQL_MEDIAFILES_WHEREFILEEQ = 
 		" sfile = ?";
 	
-	private static final String _SQL_MEDIAFILES_WHERESEARCH = 
-		" sfile LIKE ? ESCAPE ?";
+	private static final String _SQL_MEDIAFILES_WHERESEARCHTAGS = 
+		" sfile LIKE ? ESCAPE ? OR tag LIKE ? ESCAPE ?";
 	
 //	private static final String _SQL_MEDIAFILES_WHEREORDERSEARCH = 
 //		" sfile LIKE ? ESCAPE ?"
@@ -304,6 +304,10 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 				n++;
 			}
 			if (search != null) {
+				ps.setString(n, "%" + search + "%");
+				n++;
+				ps.setString(n, searchEsc);
+				n++;
 				ps.setString(n, "%" + search + "%");
 				n++;
 				ps.setString(n, searchEsc);
@@ -787,10 +791,11 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 	static private String local_getAllMediaSql (MediaType mediaType, boolean hideMissing, IDbColumn sort, SortDirection direction, String search) {
 		StringBuilder sql = new StringBuilder();
 		
-		sql.append(_SQL_MEDIAFILES_SELECT);
+		sql.append(search == null ? _SQL_MEDIAFILES_SELECT : _SQL_MEDIAFILESTAGS_SELECT); // If we are searching need to join tags table.
+		
 		if (hideMissing || mediaType != MediaType.UNKNOWN) sql.append(_SQL_WHERE);
 		if (mediaType != MediaType.UNKNOWN) {
-			sql.append(_SQL_MEDIAFILES_WHERTYPE);
+			sql.append(search == null ? _SQL_MEDIAFILES_WHERTYPE : _SQL_MEDIAFILESTAGS_WHERTYPE); // Type has prefix of 'm' when joining tags DB.
 		}
 		if (hideMissing) {
 			if (mediaType != MediaType.UNKNOWN) sql.append(_SQL_AND);
@@ -798,7 +803,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 		}
 		if (search != null) {
 			if (hideMissing || mediaType != MediaType.UNKNOWN) sql.append(_SQL_AND);
-			sql.append(_SQL_MEDIAFILES_WHERESEARCH);
+			sql.append(_SQL_MEDIAFILES_WHERESEARCHTAGS);
 		}
 		sql.append(_SQL_ORDERBYREPLACE);
 		

@@ -3,13 +3,14 @@ package net.sparktank.morrigan.model.media.internal.db.mmdb;
 import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.IMixedMediaStorageLayer;
+import net.sparktank.morrigan.model.media.internal.db.MediaItemDbConfig;
 import net.sparktank.sqlitewrapper.DbException;
 
 public class LocalMixedMediaDb extends AbstractMixedMediaDb<ILocalMixedMediaDb> implements ILocalMixedMediaDb {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	protected LocalMixedMediaDb (String libraryName, IMixedMediaStorageLayer<IMixedMediaItem> dbLayer, String searchTerm) {
-		super(libraryName, dbLayer, searchTerm);
+	protected LocalMixedMediaDb (String listName, MediaItemDbConfig config, IMixedMediaStorageLayer<IMixedMediaItem> dbLayer) {
+		super(listName, config, dbLayer);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

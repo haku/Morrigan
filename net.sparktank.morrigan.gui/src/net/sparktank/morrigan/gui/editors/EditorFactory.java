@@ -81,22 +81,35 @@ public class EditorFactory implements IElementFactory {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Local MixedMediaDb.
 	
-	public static MediaItemDbEditorInput getMmdbInput(String dbFilePath) throws MorriganException {
+	public static MediaItemDbEditorInput getMmdbInput (String dbFilePath) throws MorriganException {
+		return getMmdbInput(dbFilePath, null);
+	}
+	
+	public static MediaItemDbEditorInput getMmdbInput (String dbFilePath, String filter) throws MorriganException {
 		ILocalMixedMediaDb l;
-		
 		try {
-			l = MediaFactoryImpl.get().getLocalMixedMediaDb(dbFilePath);
+			l = MediaFactoryImpl.get().getLocalMixedMediaDb(dbFilePath, filter);
 		} catch (DbException e) {
 			throw new MorriganException(e);
 		}
-		
+		MediaItemDbEditorInput input = new MediaItemDbEditorInput(l);
+		return input;
+	}
+	
+	public static MediaItemDbEditorInput getMmdbInputBySerial (String serial) throws MorriganException {
+		ILocalMixedMediaDb l;
+		try {
+			l = MediaFactoryImpl.get().getLocalMixedMediaDbBySerial(serial);
+		} catch (DbException e) {
+			throw new MorriganException(e);
+		}
 		MediaItemDbEditorInput input = new MediaItemDbEditorInput(l);
 		return input;
 	}
 	
 	public static MediaItemDbEditorInput getMmdbInput (IMemento memento) throws MorriganException {
-		String dbFilePath = memento.getString(KEY_SERIAL);
-		MediaItemDbEditorInput input = getMmdbInput(dbFilePath);
+		String serial = memento.getString(KEY_SERIAL);
+		MediaItemDbEditorInput input = getMmdbInputBySerial(serial);
 		return input;
 	}
 	

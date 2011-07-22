@@ -35,6 +35,8 @@ public interface MediaFactory {
 	 */
 	public ILocalMixedMediaDb getLocalMixedMediaDb (String fullFilePath, String searchTerm) throws DbException;
 	
+	public ILocalMixedMediaDb getLocalMixedMediaDbBySerial (String serial) throws DbException;
+	
 	public Collection<MediaListReference> getAllRemoteMixedMediaDbs ();
 	public IRemoteMixedMediaDb createRemoteMixedMediaDb (String mmdbUrl);
 	public IRemoteMixedMediaDb getRemoteMixedMediaDb (String dbName);

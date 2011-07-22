@@ -25,6 +25,7 @@ import net.sparktank.morrigan.model.media.IRemoteMixedMediaDb;
 import net.sparktank.morrigan.model.media.MediaTag;
 import net.sparktank.morrigan.model.media.MediaTagClassification;
 import net.sparktank.morrigan.model.media.MediaTagType;
+import net.sparktank.morrigan.model.media.internal.db.MediaItemDbConfig;
 import net.sparktank.morrigan.model.media.internal.db.mmdb.AbstractMixedMediaDb;
 import net.sparktank.morrigan.model.media.internal.db.mmdb.MixedMediaSqliteLayerFactory;
 import net.sparktank.morrigan.model.tasks.TaskEventListener;
@@ -62,14 +63,23 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb<IRemoteMixedMediaDb
 //			System.out.println("Making object instance '" + material + "'...");
 			if (config != null) {
 				try {
-					ret = new RemoteMixedMediaDb(RemoteMixedMediaDbHelper.getRemoteMmdbTitle(material), config, MixedMediaSqliteLayerFactory.INSTANCE.manufacture(material));
-				} catch (DbException e) {
+					ret = new RemoteMixedMediaDb(
+							RemoteMixedMediaDbHelper.getRemoteMmdbTitle(material),
+							new MediaItemDbConfig(material, null),
+							config,
+							MixedMediaSqliteLayerFactory.getAutocommit(material));
+				}
+				catch (DbException e) {
 					throw new MorriganException(e);
 				}
 			} else {
 				try {
-					ret = new RemoteMixedMediaDb(RemoteMixedMediaDbHelper.getRemoteMmdbTitle(material), MixedMediaSqliteLayerFactory.INSTANCE.manufacture(material));
-				} catch (MalformedURLException e) {
+					ret = new RemoteMixedMediaDb(
+							RemoteMixedMediaDbHelper.getRemoteMmdbTitle(material),
+							new MediaItemDbConfig(material, null),
+							MixedMediaSqliteLayerFactory.getAutocommit(material));
+				}
+				catch (MalformedURLException e) {
 					throw new MorriganException(e);
 				} catch (DbException e) {
 					throw new MorriganException(e);
@@ -95,8 +105,8 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb<IRemoteMixedMediaDb
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public RemoteMixedMediaDb (String dbName, IMixedMediaStorageLayer<IMixedMediaItem> localDbLayer) throws DbException, MalformedURLException {
-		super(dbName, localDbLayer, null); // TODO expose search term.
+	public RemoteMixedMediaDb (String dbName, MediaItemDbConfig config, IMixedMediaStorageLayer<IMixedMediaItem> localDbLayer) throws DbException, MalformedURLException {
+		super(dbName, config, localDbLayer); // TODO expose search term.
 		
 		String s = localDbLayer.getProp(DBKEY_SERVERURL);
 		if (s != null) {
@@ -109,8 +119,8 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb<IRemoteMixedMediaDb
 		readCacheDate();
 	}
 	
-	public RemoteMixedMediaDb (String dbName,  URL url, IMixedMediaStorageLayer<IMixedMediaItem> localDbLayer) throws DbException {
-		super(dbName, localDbLayer, null); // TODO expose search term.
+	public RemoteMixedMediaDb (String dbName, MediaItemDbConfig config,  URL url, IMixedMediaStorageLayer<IMixedMediaItem> localDbLayer) throws DbException {
+		super(dbName, config, localDbLayer); // TODO expose search term.
 		this.url = url;
 		
 		String s = localDbLayer.getProp(DBKEY_SERVERURL);
@@ -146,10 +156,13 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb<IRemoteMixedMediaDb
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	@SuppressWarnings("boxing")
 	@Override
 	public RemoteMixedMediaDb getTransactionalClone() throws DbException {
-		return new RemoteMixedMediaDb(RemoteMixedMediaDbHelper.getRemoteMmdbTitle(getDbPath()), getUrl(), MixedMediaSqliteLayerFactory.INSTANCE.manufacture(getDbPath(), false, true));
+		return new RemoteMixedMediaDb(
+				RemoteMixedMediaDbHelper.getRemoteMmdbTitle(getDbPath()),
+				new MediaItemDbConfig(getDbPath(), null),
+				getUrl(), MixedMediaSqliteLayerFactory.getTransactional(getDbPath())
+				);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
