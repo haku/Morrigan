@@ -49,9 +49,8 @@ public class NewMixedDbAction extends Action implements IWorkbenchAction {
 	public void run () {
 		InputDialog dlg = new InputDialog(
 				Display.getCurrent().getActiveShell(),
-				"", "Enter a name for the new mixed db.", "newMMDB", null);
+				"New DB", "Enter a file name for the new DB.", "newMMDB", null);
 		if (dlg.open() == Window.OK) {
-			
 			// create library.
 			String libName = dlg.getValue();
 			ILocalMixedMediaDb createdMmdb;
