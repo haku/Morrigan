@@ -61,6 +61,10 @@ public interface IMediaItemStorageLayer<T extends IMediaItem> extends IGenericDb
 	public void clearTags (IDbItem item) throws DbException;
 	
 	public List<IDbColumn> getMediaTblColumns ();
+	
+	/**
+	 * Will always return the same value; i.e. it returns a constant.
+	 */
 	public IDbColumn getDefaultSortColumn ();
 	
 	public List<T> getAllMedia(IDbColumn sort, SortDirection direction, boolean hideMissing) throws DbException;
