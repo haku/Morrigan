@@ -10,9 +10,11 @@ import java.util.List;
 import net.sparktank.morrigan.model.db.IDbColumn;
 import net.sparktank.morrigan.model.db.IDbItem;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
+import net.sparktank.morrigan.model.media.DirtyState;
 import net.sparktank.morrigan.model.media.IMediaItem;
 import net.sparktank.morrigan.model.media.IMediaItemDb;
 import net.sparktank.morrigan.model.media.IMediaItemStorageLayer;
+import net.sparktank.morrigan.model.media.IMediaItemStorageLayerChangeListener;
 import net.sparktank.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
 import net.sparktank.morrigan.model.media.internal.MediaItemList;
 import net.sparktank.morrigan.model.media.internal.MediaTagClassificationImpl;
@@ -49,6 +51,7 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 		
 		this.librarySort = dbLayer.getDefaultSortColumn();
 		this.librarySortDirection = SortDirection.ASC;
+		dbLayer.addChangeListener(this.storageChangeListener);
 		
 		if (searchTerm != null) this.escapedSearchTerm = escapeSearch(searchTerm);
 		
@@ -70,7 +73,8 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 	public void dispose () {
 		super.dispose();
 		this._sortChangeListeners.clear();
-		this.dbLayer.dispose();
+		this.dbLayer.removeChangeListener(this.storageChangeListener);
+		this.dbLayer.dispose(); // TODO FIXME what if this layer is shared???  Count attached change listeners?
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -289,6 +293,36 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 	public List<T> simpleSearch (String term, int maxResults) throws DbException {
 		return this.dbLayer.simpleSearch(escapeSearch(term), SEARCH_ESC, maxResults);
 	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	DB events.
+	
+	private IMediaItemStorageLayerChangeListener<T> storageChangeListener = new IMediaItemStorageLayerChangeListener<T> () {
+		
+		@Override
+		public void propertySet(String key, String value) { /* Unused. */ }
+		
+		@Override
+		public void mediaItemAdded(String filePath) {
+			getChangeEventCaller().mediaItemsAdded((IMediaItem[])null);
+		}
+		
+		@Override
+		public void mediaItemsAdded(List<File> filePaths) {
+			getChangeEventCaller().mediaItemsAdded((IMediaItem[])null);
+		}
+		
+		@Override
+		public void mediaItemRemoved(String filePath) {
+			getChangeEventCaller().mediaItemsRemoved((IMediaItem[])null);
+		}
+		
+		@Override
+		public void mediaItemUpdated(String filePath) {
+			getChangeEventCaller().mediaItemsUpdated((IMediaItem[])null);
+		}
+		
+	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Updating tracks.
@@ -648,6 +682,7 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 				throw new MorriganException("updateItem() : Failed to find item '"+mi.getFilepath()+"' in list '"+this+"'.");
 			}
 			if (track.setFromMediaItem(mi)) {
+				getChangeEventCaller().mediaItemsUpdated(track);
 				setDirtyState(DirtyState.DIRTY); // just to trigger change events.
 				persistTrackData(track);
 			}

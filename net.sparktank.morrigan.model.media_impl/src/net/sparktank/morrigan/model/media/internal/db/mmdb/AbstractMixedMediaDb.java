@@ -5,16 +5,17 @@ import java.util.List;
 
 import net.sparktank.morrigan.model.db.IDbColumn;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
+import net.sparktank.morrigan.model.media.DirtyState;
 import net.sparktank.morrigan.model.media.DurationData;
 import net.sparktank.morrigan.model.media.IAbstractMixedMediaDb;
 import net.sparktank.morrigan.model.media.IMediaPicture;
 import net.sparktank.morrigan.model.media.IMediaTrack;
 import net.sparktank.morrigan.model.media.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.IMixedMediaItem.MediaType;
+import net.sparktank.morrigan.model.media.IMixedMediaStorageLayer;
 import net.sparktank.morrigan.model.media.internal.MediaPictureListHelper;
 import net.sparktank.morrigan.model.media.internal.MediaTrackListHelper;
 import net.sparktank.morrigan.model.media.internal.db.MediaItemDb;
-import net.sparktank.morrigan.model.media.IMixedMediaStorageLayer;
 import net.sparktank.sqlitewrapper.DbException;
 
 public abstract class AbstractMixedMediaDb<H extends IAbstractMixedMediaDb<H>>
@@ -101,6 +102,7 @@ public abstract class AbstractMixedMediaDb<H extends IAbstractMixedMediaDb<H>>
 		}
 		
 		item.setMediaType(newType);
+		getChangeEventCaller().mediaItemsUpdated(item);
 		this.setDirtyState(DirtyState.METADATA);
 		try {
 			this.getDbLayer().setItemMediaType(item.getFilepath(), newType);
@@ -188,7 +190,7 @@ public abstract class AbstractMixedMediaDb<H extends IAbstractMixedMediaDb<H>>
 			throw new MorriganException(e);
 		}
 	}
-
+	
 	@Override
 	public void setPictureWidthAndHeight(IMediaPicture item, int width, int height) throws MorriganException {
 		MediaPictureListHelper.setPictureWidthAndHeight(this, item, width, height);

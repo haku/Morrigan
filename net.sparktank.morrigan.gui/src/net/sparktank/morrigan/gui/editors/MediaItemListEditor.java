@@ -14,9 +14,10 @@ import net.sparktank.morrigan.gui.helpers.RefreshTimer;
 import net.sparktank.morrigan.gui.jobs.TaskJob;
 import net.sparktank.morrigan.gui.preferences.MediaListPref;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
+import net.sparktank.morrigan.model.media.DirtyState;
 import net.sparktank.morrigan.model.media.IMediaItem;
 import net.sparktank.morrigan.model.media.IMediaItemList;
-import net.sparktank.morrigan.model.media.IMediaItemList.DirtyState;
+import net.sparktank.morrigan.model.media.MediaItemListChangeListener;
 import net.sparktank.morrigan.model.media.impl.MediaFactoryImpl;
 import net.sparktank.morrigan.model.tasks.IMorriganTask;
 
@@ -98,8 +99,7 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 		setPartName(this.editorInput.getMediaList().getListName());
 		
 		makeRefreshers();
-		this.editorInput.getMediaList().addChangeEvent(this.listChangeRrefresher);
-		this.editorInput.getMediaList().addDirtyChangeEvent(this.listDirtyRrefresher);
+		this.editorInput.getMediaList().addChangeEventListener(this.listChangeListener);
 		
 		try {
 			readInputData();
@@ -113,8 +113,7 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 	@Override
 	public void dispose() {
 		removePropListener();
-		this.editorInput.getMediaList().removeChangeEvent(this.listChangeRrefresher);
-		this.editorInput.getMediaList().removeDirtyChangeEvent(this.listDirtyRrefresher);
+		this.editorInput.getMediaList().removeChangeEventListener(this.listChangeListener);
 		this.imageCache.clearCache();
 		super.dispose();
 	}
@@ -369,8 +368,32 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Refreshing.
 	
-	private Runnable listChangeRrefresher;
-	private Runnable listDirtyRrefresher;
+	private MediaItemListChangeListener listChangeListener = new MediaItemListChangeListener () {
+		
+		@Override
+		public void dirtyStateChanged(DirtyState oldState, DirtyState newState) {
+			MediaItemListEditor.this.listDirtyRrefresher.run();
+		}
+		
+		@Override
+		public void mediaItemsAdded(IMediaItem... items) {
+			MediaItemListEditor.this.listChangeRrefresher.run();
+		}
+		
+		@Override
+		public void mediaItemsRemoved(IMediaItem... items) {
+			MediaItemListEditor.this.listChangeRrefresher.run();
+		}
+		
+		@Override
+		public void mediaItemsUpdated(IMediaItem... items) {
+			MediaItemListEditor.this.listChangeRrefresher.run();
+		}
+		
+	};
+	
+	protected Runnable listChangeRrefresher;
+	protected Runnable listDirtyRrefresher;
 	
 	private void makeRefreshers () {
 		this.listChangeRrefresher = new RefreshTimer(getSite().getShell().getDisplay(), 5000, new Runnable() {

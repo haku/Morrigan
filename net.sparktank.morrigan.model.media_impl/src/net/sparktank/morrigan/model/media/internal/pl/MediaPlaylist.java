@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 
 import net.sparktank.morrigan.engines.playback.NotImplementedException;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
+import net.sparktank.morrigan.model.media.DirtyState;
 import net.sparktank.morrigan.model.media.DurationData;
 import net.sparktank.morrigan.model.media.IMediaPlaylist;
 import net.sparktank.morrigan.model.media.IMediaTrack;
@@ -60,7 +61,7 @@ public class MediaPlaylist extends MediaItemList<IMediaTrack> implements IMediaP
 	 * @throws MorriganException 
 	 */
 	public void clean () throws MorriganException {
-		if (getDirtyState()==DirtyState.METADATA) {
+		if (getDirtyState() == DirtyState.METADATA) {
 			writeToFile();
 		}
 	}
