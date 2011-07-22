@@ -220,9 +220,13 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 //	-  -  -  -  -  -  -  -  -  -  -  -
 //	Setting MediaTrack data.
 	
+	private static final String SQL_TBL_MEDIAFILES_TRACKPLAYED =
+		"UPDATE tbl_mediafiles SET lstartcnt=lstartcnt+?,dlastplay=?" +
+		" WHERE sfile=?;";
+	
 	private static final String SQL_TBL_MEDIAFILES_INCSTART =
 		"UPDATE tbl_mediafiles SET lstartcnt=lstartcnt+?" +
-        " WHERE sfile=?;";
+		" WHERE sfile=?;";
 	
 	private static final String SQL_TBL_MEDIAFILES_SETSTART =
 		"UPDATE tbl_mediafiles SET lstartcnt=? WHERE sfile=?;";
@@ -637,6 +641,23 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	MediaTrack setters.
+	
+	protected void local_trackPlayed (String sfile, long x, Date date) throws DbException, SQLException, ClassNotFoundException {
+		PreparedStatement ps;
+		
+		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_TRACKPLAYED);
+		int n;
+		try {
+			ps.setLong(1, x);
+			ps.setDate(2, new java.sql.Date(date.getTime()));
+			ps.setString(3, sfile);
+			n = ps.executeUpdate();
+		} finally {
+			ps.close();
+		}
+		if (n<1) throw new DbException("No update occured.");
+		getChangeCaller().mediaItemUpdated(sfile);
+	}
 	
 	protected void local_incTrackStartCnt (String sfile, long x) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps;

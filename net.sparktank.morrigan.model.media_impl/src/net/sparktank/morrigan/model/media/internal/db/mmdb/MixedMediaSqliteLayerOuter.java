@@ -274,8 +274,7 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	@Override
 	public void incTrackPlayed (String sfile) throws DbException {
 		try {
-			local_incTrackStartCnt(sfile, 1);
-			local_setDateLastPlayed(sfile, new Date());
+			local_trackPlayed(sfile, 1, new Date());
 		} catch (Exception e) {
 			throw new DbException(e);
 		}
