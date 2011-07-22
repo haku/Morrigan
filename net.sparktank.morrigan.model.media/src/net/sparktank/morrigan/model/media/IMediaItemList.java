@@ -10,10 +10,6 @@ import net.sparktank.morrigan.model.exceptions.MorriganException;
 public interface IMediaItemList<T extends IMediaItem> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public enum DirtyState { CLEAN, DIRTY, METADATA }
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
 	public void dispose ();
 	
 	public String getListId ();
@@ -24,10 +20,13 @@ public interface IMediaItemList<T extends IMediaItem> {
 	
 	public DirtyState getDirtyState ();
 	public void setDirtyState (DirtyState state);
-	public void addDirtyChangeEvent (Runnable r);
-	public void removeDirtyChangeEvent (Runnable r);
-	public void addChangeEvent (Runnable r);
-	public void removeChangeEvent (Runnable r);
+	
+	/**
+	 * A change event will occur every time the state might have changed.
+	 */
+	public void addChangeEventListener (MediaItemListChangeListener listener);
+	public void removeChangeEventListener (MediaItemListChangeListener listener);
+	public MediaItemListChangeListener getChangeEventCaller ();
 	
 	public int getCount ();
 	public List<T> getMediaItems();

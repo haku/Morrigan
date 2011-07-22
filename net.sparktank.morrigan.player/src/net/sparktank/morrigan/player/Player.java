@@ -15,9 +15,12 @@ import net.sparktank.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import net.sparktank.morrigan.engines.playback.IPlaybackStatusListener;
 import net.sparktank.morrigan.engines.playback.PlaybackException;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
+import net.sparktank.morrigan.model.media.DirtyState;
 import net.sparktank.morrigan.model.media.DurationData;
+import net.sparktank.morrigan.model.media.IMediaItem;
 import net.sparktank.morrigan.model.media.IMediaTrack;
 import net.sparktank.morrigan.model.media.IMediaTrackList;
+import net.sparktank.morrigan.model.media.MediaItemListChangeListener;
 import net.sparktank.morrigan.model.media.MediaListReference;
 import net.sparktank.morrigan.model.media.impl.MediaFactoryImpl;
 import net.sparktank.morrigan.player.OrderHelper.PlaybackOrder;
@@ -78,13 +81,13 @@ public class Player implements IPlayerLocal {
 	private void setCurrentItem (PlayItem item) {
 		synchronized (this._currentItemLock) {
 			if (this._currentItem != null && this._currentItem.list != null) {
-				this._currentItem.list.removeChangeEvent(this.listChangedRunnable);
+				this._currentItem.list.removeChangeEventListener(this.listChangedRunnable);
 			}
 			
 			this._currentItem = item;
 			
 			if (this._currentItem != null && this._currentItem.list != null) {
-				this._currentItem.list.addChangeEvent(this.listChangedRunnable);
+				this._currentItem.list.addChangeEventListener(this.listChangedRunnable);
 				
 				if (this._currentItem.item != null) {
 					addToHistory(this._currentItem);
@@ -95,11 +98,19 @@ public class Player implements IPlayerLocal {
 		}
 	}
 	
-	private Runnable listChangedRunnable = new Runnable() {
+	private MediaItemListChangeListener listChangedRunnable = new MediaItemListChangeListener () {
+		
 		@Override
-		public void run() {
-			validateHistory();
+		public void mediaItemsRemoved (IMediaItem... items) {
+			validateHistory(); // TODO should this be scheduled / rate limited?
 		}
+		
+		@Override
+		public void dirtyStateChanged (DirtyState oldState, DirtyState newState) { /* Unused. */ }
+		@Override
+		public void mediaItemsAdded (IMediaItem... items) { /* Unused. */ }
+		@Override
+		public void mediaItemsUpdated (IMediaItem... items) { /* Unused. */ }
 	};
 	
 	@Override
@@ -115,8 +126,8 @@ public class Player implements IPlayerLocal {
 		PlayItem currentItem = getCurrentItem();
 		if (currentItem != null && currentItem.list != null) {
 			ret = currentItem.list;
-			
-		} else {
+		}
+		else {
 			ret = this.eventHandler.getCurrentList();
 		}
 		

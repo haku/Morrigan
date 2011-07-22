@@ -4,19 +4,28 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.sparktank.morrigan.model.exceptions.MorriganException;
+import net.sparktank.morrigan.model.media.DirtyState;
 import net.sparktank.morrigan.model.media.IMediaItem;
 import net.sparktank.morrigan.model.media.IMediaItemList;
+import net.sparktank.morrigan.model.media.MediaItemListChangeListener;
 import net.sparktank.morrigan.util.FileHelper;
 
 public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemList<T> {
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	protected final Logger logger = Logger.getLogger(this.getClass().getName());
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors and parameters.
 	
@@ -41,7 +50,6 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 	@Override
 	public void dispose () {
 		this.changeEvents.clear();
-		this.dirtyChangeEvents.clear();
 		this.mediaTracks.clear();
 	}
 	
@@ -76,37 +84,16 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 //	Dirty state and event listeners.
 	
 	private DirtyState dirtyState = DirtyState.CLEAN;
-	private List<Runnable> dirtyChangeEvents = new LinkedList<Runnable>();
-	private List<Runnable> changeEvents = new LinkedList<Runnable>();
+	final protected List<MediaItemListChangeListener> changeEvents = new LinkedList<MediaItemListChangeListener>();
 	
-	abstract public boolean isCanBeDirty (); 
+	abstract public boolean isCanBeDirty ();
 	
 	@Override
-	public void setDirtyState (DirtyState state) {
+	public void setDirtyState (final DirtyState state) {
+		final DirtyState oldState = this.dirtyState;
 		if (isCanBeDirty()) {
-			// Changed?  Priority order - don't drop back down.
-			boolean changed = false;
-			if (state!=this.dirtyState) {
-				if (this.dirtyState==DirtyState.DIRTY && state==DirtyState.METADATA) {
-					// Its too late to figure this out the other way round.
-				} else {
-					changed = true;
-				}
-			}
-			
-			if (changed) {
-				this.dirtyState = state;
-				
-//				System.err.println("[t" + Thread.currentThread().getId() + "] " + getListName() + ": calling dirtyChangeEvents.");
-				for (Runnable r : this.dirtyChangeEvents) {
-					r.run();
-				}
-			}
-		}
-		
-//		System.err.println("[t" + Thread.currentThread().getId() + "] " + getListName() + ": calling changeEvents.");
-		for (Runnable r : this.changeEvents) {
-			r.run();
+			this.dirtyState = state;
+			getChangeEventCaller().dirtyStateChanged(oldState, state);
 		}
 	}
 	
@@ -116,23 +103,54 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 	}
 	
 	@Override
-	public void addDirtyChangeEvent (Runnable r) {
-		this.dirtyChangeEvents.add(r);
+	public void addChangeEventListener (MediaItemListChangeListener listener) {
+		this.changeEvents.add(listener);
 	}
 	
 	@Override
-	public void removeDirtyChangeEvent (Runnable r) {
-		this.dirtyChangeEvents.remove(r);
+	public void removeChangeEventListener (MediaItemListChangeListener listener) {
+		this.changeEvents.remove(listener);
 	}
 	
-	@Override
-	public void addChangeEvent (Runnable r) {
-		this.changeEvents.add(r);
-	}
+	private MediaItemListChangeListener changeCaller = new MediaItemListChangeListener () {
+		
+		@Override
+		public void dirtyStateChanged(DirtyState oldState, DirtyState newState) {
+			if (MediaItemList.this.logger.isLoggable(Level.FINEST)) MediaItemList.this.logger.finest(getListName() +  " oldState=" + oldState + " newState=" + newState);
+			for (MediaItemListChangeListener listener : MediaItemList.this.changeEvents) {
+				listener.dirtyStateChanged(oldState, newState);
+			}
+		}
+		
+		@Override
+		public void mediaItemsAdded(IMediaItem... items) {
+			if (MediaItemList.this.logger.isLoggable(Level.FINEST)) MediaItemList.this.logger.finest(getListName() +  " " + Arrays.toString(items));
+			for (MediaItemListChangeListener listener : MediaItemList.this.changeEvents) {
+				listener.mediaItemsAdded(items);
+			}
+		}
+		
+		@Override
+		public void mediaItemsRemoved(IMediaItem... items) {
+			if (MediaItemList.this.logger.isLoggable(Level.FINEST)) MediaItemList.this.logger.finest(getListName() +  " " + Arrays.toString(items));
+			for (MediaItemListChangeListener listener : MediaItemList.this.changeEvents) {
+				listener.mediaItemsRemoved(items);
+			}
+		}
+		
+		@Override
+		public void mediaItemsUpdated(IMediaItem... items) {
+			if (MediaItemList.this.logger.isLoggable(Level.FINEST)) MediaItemList.this.logger.finest(getListName() +  " " + Arrays.toString(items));
+			for (MediaItemListChangeListener listener : MediaItemList.this.changeEvents) {
+				listener.mediaItemsUpdated(items);
+			}
+		}
+		
+	};
 	
 	@Override
-	public void removeChangeEvent (Runnable r) {
-		this.changeEvents.remove(r);
+	public MediaItemListChangeListener getChangeEventCaller () {
+		return this.changeCaller;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -189,6 +207,7 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 	public void addItem (T track) {
 		if (allowDuplicateEntries() || !this.mediaTracks.contains(track)) {
 			this.mediaTracks.add(track);
+			getChangeEventCaller().mediaItemsAdded(track);
 			setDirtyState(DirtyState.DIRTY);
 		}
 	}
@@ -199,6 +218,7 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 	@Override
 	public void removeItem (T track) throws MorriganException {
 		this.mediaTracks.remove(track);
+		getChangeEventCaller().mediaItemsRemoved(track);
 		setDirtyState(DirtyState.DIRTY);
 	}
 	
@@ -212,6 +232,7 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 	@Override
 	public void setItemDateAdded (T track, Date date) throws MorriganException {
 		track.setDateAdded(date);
+		getChangeEventCaller().mediaItemsUpdated(track);
 		setDirtyState(DirtyState.METADATA);
 	}
 	
@@ -221,6 +242,7 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 	@Override
 	public void setItemHashCode (T track, BigInteger hashcode) throws MorriganException {
 		track.setHashcode(hashcode);
+		getChangeEventCaller().mediaItemsUpdated(track);
 		setDirtyState(DirtyState.METADATA);
 	}
 	
@@ -230,6 +252,7 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 	@Override
 	public void setItemDateLastModified (T track, Date date) throws MorriganException {
 		track.setDateLastModified(date);
+		getChangeEventCaller().mediaItemsUpdated(track);
 		setDirtyState(DirtyState.METADATA);
 	}
 	
@@ -239,6 +262,7 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 	@Override
 	public void setItemEnabled (T track, boolean value) throws MorriganException {
 		track.setEnabled(value);
+		getChangeEventCaller().mediaItemsUpdated(track);
 		setDirtyState(DirtyState.METADATA);
 	}
 	
@@ -248,6 +272,7 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 	@Override
 	public void setItemMissing (T track, boolean value) throws MorriganException {
 		track.setMissing(value);
+		getChangeEventCaller().mediaItemsUpdated(track);
 		setDirtyState(DirtyState.METADATA);
 	}
 	

@@ -5,10 +5,10 @@ import java.io.FileNotFoundException;
 import java.util.Collection;
 
 import net.sparktank.morrigan.config.Config;
+import net.sparktank.morrigan.model.media.DirtyState;
 import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.IMediaItem;
 import net.sparktank.morrigan.model.media.IMediaItemList;
-import net.sparktank.morrigan.model.media.IMediaItemList.DirtyState;
 import net.sparktank.morrigan.model.media.IMixedMediaItem;
 import net.sparktank.morrigan.model.tasks.IMorriganTask;
 import net.sparktank.morrigan.model.tasks.TaskEventListener;

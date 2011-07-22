@@ -8,7 +8,10 @@ import net.sparktank.morrigan.gui.actions.DbUpdateAction;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.editors.mmdb.LocalMixedMediaDbEditor;
 import net.sparktank.morrigan.gui.helpers.RefreshTimer;
+import net.sparktank.morrigan.model.media.DirtyState;
+import net.sparktank.morrigan.model.media.IMediaItem;
 import net.sparktank.morrigan.model.media.IMediaItemDb;
+import net.sparktank.morrigan.model.media.MediaItemListChangeListener;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -100,13 +103,13 @@ public class ViewLibraryProperties extends ViewPart {
 		if (this.library == library) return;
 		
 		if (this.library!=null) {
-			this.library.removeChangeEvent(this.updateGuiRrefresher);
+			this.library.removeChangeEventListener(this.listChangeListener);
 		}
 		
 		this.library = library;
 		
 		if (this.library!=null) {
-			this.library.addChangeEvent(this.updateGuiRrefresher);
+			this.library.addChangeEventListener(this.listChangeListener);
 		}
 		
 		this.dbUpdateAction.setMediaDb(this.library);
@@ -193,6 +196,28 @@ public class ViewLibraryProperties extends ViewPart {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Events.
+	
+	private MediaItemListChangeListener listChangeListener = new MediaItemListChangeListener () {
+		
+		@Override
+		public void dirtyStateChanged(DirtyState oldState, DirtyState newState) { /* Unused. */ }
+		
+		@Override
+		public void mediaItemsAdded(IMediaItem... items) {
+			ViewLibraryProperties.this.updateGuiRrefresher.run();
+		}
+		
+		@Override
+		public void mediaItemsRemoved(IMediaItem... item) {
+			ViewLibraryProperties.this.updateGuiRrefresher.run();
+		}
+		
+		@Override
+		public void mediaItemsUpdated(IMediaItem... item) {
+			ViewLibraryProperties.this.updateGuiRrefresher.run();
+		}
+		
+	};
 	
 	Runnable updateGuiRrefresher;
 	
