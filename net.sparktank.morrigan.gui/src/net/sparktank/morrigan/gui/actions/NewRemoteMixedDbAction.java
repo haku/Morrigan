@@ -52,7 +52,7 @@ public class NewRemoteMixedDbAction extends Action implements IWorkbenchAction {
 	public void run () {
 		InputDialog dlg = new InputDialog(
 				Display.getCurrent().getActiveShell(),
-				"", "Enter MMDB URL.", "http://localhost:8080/"+MlistsServlet.CONTEXTPATH+"/"+ILocalMixedMediaDb.TYPE+"/mymmdb.local.db3", null);
+				"New remote DB", "Enter MMDB URL.", "http://localhost:8080/"+MlistsServlet.CONTEXTPATH+"/"+ILocalMixedMediaDb.TYPE+"/mymmdb.local.db3", null);
 		if (dlg.open() == Window.OK) {
 			String url = dlg.getValue();
 			IRemoteMixedMediaDb createdRemoteMmdb;
