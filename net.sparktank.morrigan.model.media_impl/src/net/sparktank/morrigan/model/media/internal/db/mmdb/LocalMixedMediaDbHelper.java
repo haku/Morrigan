@@ -11,6 +11,7 @@ import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.MediaListReference;
 import net.sparktank.morrigan.model.media.MediaListReference.MediaListType;
 import net.sparktank.morrigan.model.media.internal.MediaListReferenceImpl;
+import net.sparktank.morrigan.model.media.internal.db.MediaItemDbConfig;
 import net.sparktank.sqlitewrapper.DbException;
 
 public class LocalMixedMediaDbHelper {
@@ -60,7 +61,7 @@ public class LocalMixedMediaDbHelper {
 		for (File file : files) {
 			String absolutePath = file.getAbsolutePath();
 			if (isMmdbFile(absolutePath)) {
-				MediaListReference newItem = new MediaListReferenceImpl(MediaListType.LOCALMMDB, absolutePath, getMmdbTitle(absolutePath));
+				MediaListReference newItem = new MediaListReferenceImpl(MediaListType.LOCALMMDB, absolutePath, getMmdbFileTitle(absolutePath));
 				ret.add(newItem);
 			}
 		}
@@ -70,7 +71,17 @@ public class LocalMixedMediaDbHelper {
 		return ret;
 	}
 	
-	public static String getMmdbTitle (String filePath) {
+	public static String getMmdbTitle (MediaItemDbConfig config) {
+		String ret = getMmdbFileTitle(config.getFilePath());
+		
+		if (config.getFilter() != null) {
+			ret = ret + "{" + config.getFilter() + "}";
+		}
+		
+		return ret;
+	}
+	
+	private static String getMmdbFileTitle (String filePath) {
 		String ret = filePath;
 		int x;
 		

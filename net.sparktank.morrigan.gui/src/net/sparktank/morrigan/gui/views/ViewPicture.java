@@ -462,8 +462,8 @@ public class ViewPicture extends ViewPart {
 			if (this.editedItemDb.getType().equals(ILocalMixedMediaDb.TYPE)) {
 				this.listenToSelectionListener = false;
 				try {
-    				MediaItemDbEditorInput input = EditorFactory.getMmdbInput(this.editedItemDb.getListId());
-    				getViewSite().getWorkbenchWindow().getActivePage().openEditor(input, LocalMixedMediaDbEditor.ID);
+					MediaItemDbEditorInput input = EditorFactory.getMmdbInputBySerial(this.editedItemDb.getSerial());
+					getViewSite().getWorkbenchWindow().getActivePage().openEditor(input, LocalMixedMediaDbEditor.ID);
 				} finally {
 					this.listenToSelectionListener = true;
 				}

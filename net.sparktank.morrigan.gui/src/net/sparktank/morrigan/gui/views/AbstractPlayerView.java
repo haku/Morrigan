@@ -698,7 +698,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 	protected void revealItemInLists (IMediaTrackList<? extends IMediaTrack> list, IMediaTrack item) {
 		try {
 			if (list.getType().equals(ILocalMixedMediaDb.TYPE)) {
-				MediaItemDbEditorInput input = EditorFactory.getMmdbInput(list.getListId());
+				MediaItemDbEditorInput input = EditorFactory.getMmdbInputBySerial(list.getSerial());
 				getViewSite().getWorkbenchWindow().getActivePage().openEditor(input, LocalMixedMediaDbEditor.ID);
 			}
 			else if (list.getType().equals(IMediaPlaylist.TYPE)) {

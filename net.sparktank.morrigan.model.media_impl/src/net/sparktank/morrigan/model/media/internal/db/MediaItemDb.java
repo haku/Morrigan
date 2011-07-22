@@ -37,23 +37,34 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	private final MediaItemDbConfig config;
+	private final String escapedSearchTerm;
+	
 	private S dbLayer;
 	private IDbColumn librarySort;
 	private SortDirection librarySortDirection;
 	
-	private String escapedSearchTerm = null;
-	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	protected MediaItemDb (String libraryName, S dbLayer, String searchTerm) {
-		super(dbLayer.getDbFilePath(), libraryName);
+	/**
+	 * TODO FIXME merge libraryName and searchTerm to match return value of getSerial().
+	 */
+	protected MediaItemDb (String listName, MediaItemDbConfig config, S dbLayer) {
+		super(dbLayer.getDbFilePath(), listName);
+		
+		this.config = config;
 		this.dbLayer = dbLayer;
 		
 		this.librarySort = dbLayer.getDefaultSortColumn();
 		this.librarySortDirection = SortDirection.ASC;
 		dbLayer.addChangeListener(this.storageChangeListener);
 		
-		if (searchTerm != null) this.escapedSearchTerm = escapeSearch(searchTerm);
+		if (config.getFilter() != null) {
+			this.escapedSearchTerm = escapeSearch(config.getFilter());
+		}
+		else {
+			this.escapedSearchTerm = null;
+		}
 		
 		try {
 			readSortFromDb();
@@ -81,7 +92,7 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 	
 	@Override
 	public String getSerial() {
-		return this.dbLayer.getDbFilePath();
+		return this.config.getSerial();
 	}
 	
 	@Override

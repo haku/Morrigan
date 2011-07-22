@@ -72,6 +72,11 @@ public class MediaFactoryImpl implements MediaFactory {
 		return LocalMixedMediaDbFactory.getView(fullFilePath, filter);
 	}
 	
+	@Override
+	public ILocalMixedMediaDb getLocalMixedMediaDbBySerial(String serial) throws DbException {
+		return LocalMixedMediaDbFactory.getMainBySerial(serial);
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
