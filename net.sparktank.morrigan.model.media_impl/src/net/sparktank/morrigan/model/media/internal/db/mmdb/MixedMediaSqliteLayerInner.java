@@ -856,6 +856,9 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 		return sqls;
 	}
 	
+	/**
+	 * TODO FIXME is this method now redundant?
+	 */
 	static private List<IMixedMediaItem> local_parseAndUpdateFromRecordSet (List<IMixedMediaItem> list, ResultSet rs, MixedMediaItemFactory itemFactory) throws SQLException {
 		List<IMixedMediaItem> finalList = new ArrayList<IMixedMediaItem>();
 		
@@ -883,6 +886,10 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 	}
 	
 	static private List<IMixedMediaItem> local_parseRecordSet (ResultSet rs, MixedMediaItemFactory itemFactory) throws SQLException {
+		/* Apparently I don't need to preset the size of the array,
+		 * and using the auto-grow feature is more efficient than
+		 * trying to count the length of the record set.
+		 */
 		List<IMixedMediaItem> ret = new ArrayList<IMixedMediaItem>();
 		
 		while (rs.next()) {
