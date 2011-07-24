@@ -11,8 +11,8 @@ import net.sparktank.morrigan.model.db.IDbColumn;
 import net.sparktank.morrigan.model.db.IDbItem;
 import net.sparktank.morrigan.model.media.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.IMixedMediaItem.MediaType;
-import net.sparktank.morrigan.model.media.internal.Defaults;
 import net.sparktank.morrigan.model.media.IMixedMediaStorageLayer;
+import net.sparktank.morrigan.model.media.internal.Defaults;
 import net.sparktank.morrigan.util.StringHelper;
 import net.sparktank.sqlitewrapper.DbException;
 
@@ -58,22 +58,27 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	}
 	
 	@Override
-	public List<IMixedMediaItem> getAllMedia(IDbColumn sort, SortDirection direction, boolean hideMissing) throws DbException {
-		return getAllMedia(MediaType.UNKNOWN, sort, direction, hideMissing);
+	public List<IMixedMediaItem> getAllMedia (IDbColumn sort, SortDirection direction, boolean hideMissing) throws DbException {
+		return getMedia(MediaType.UNKNOWN, sort, direction, hideMissing);
 	}
 	
 	@Override
-	public List<IMixedMediaItem> getAllMedia(IDbColumn sort, net.sparktank.morrigan.model.media.IMediaItemStorageLayer.SortDirection direction, boolean hideMissing, String search, String searchEsc) throws DbException {
-		return getAllMedia(MediaType.UNKNOWN, sort, direction, hideMissing, search, searchEsc);
+	public List<IMixedMediaItem> getMedia(IDbColumn sort, SortDirection direction, boolean hideMissing) throws DbException {
+		return getMedia(getDefaultMediaType(), sort, direction, hideMissing);
+	}
+	
+	@Override
+	public List<IMixedMediaItem> getMedia(IDbColumn sort, SortDirection direction, boolean hideMissing, String search, String searchEsc) throws DbException {
+		return getMedia(getDefaultMediaType(), sort, direction, hideMissing, search, searchEsc);
 	}
 	
 	@Override
 	public List<IMixedMediaItem> simpleSearch(String term, String esc, int maxResults) throws DbException {
-		return simpleSearchMedia(this.defaultMediaType, term, esc, maxResults);
+		return simpleSearchMedia(getDefaultMediaType(), term, esc, maxResults);
 	}
 	
 	@Override
-	public List<IMixedMediaItem> getAllMedia(MediaType mediaType, IDbColumn sort, SortDirection direction, boolean hideMissing) throws DbException {
+	public List<IMixedMediaItem> getMedia(MediaType mediaType, IDbColumn sort, SortDirection direction, boolean hideMissing) throws DbException {
 		try {
 			return local_getAllMedia(mediaType, sort, direction, hideMissing);
 		} catch (Exception e) {
@@ -82,7 +87,7 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	}
 	
 	@Override
-	public List<IMixedMediaItem> getAllMedia(MediaType mediaType, IDbColumn sort, net.sparktank.morrigan.model.media.IMediaItemStorageLayer.SortDirection direction, boolean hideMissing, String search, String searchEsc) throws DbException {
+	public List<IMixedMediaItem> getMedia(MediaType mediaType, IDbColumn sort, SortDirection direction, boolean hideMissing, String search, String searchEsc) throws DbException {
 		try {
 			return local_getAllMedia(mediaType, sort, direction, hideMissing, search, searchEsc);
 		} catch (Exception e) {

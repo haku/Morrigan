@@ -119,7 +119,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 		" sfile = ?";
 	
 	private static final String _SQL_MEDIAFILES_WHERESEARCHTAGS = 
-		" sfile LIKE ? ESCAPE ? OR tag LIKE ? ESCAPE ?";
+		" (sfile LIKE ? ESCAPE ? OR tag LIKE ? ESCAPE ?)";
 	
 //	private static final String _SQL_MEDIAFILES_WHEREORDERSEARCH = 
 //		" sfile LIKE ? ESCAPE ?"

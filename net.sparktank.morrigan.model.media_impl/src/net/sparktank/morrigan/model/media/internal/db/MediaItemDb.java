@@ -159,8 +159,14 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 	protected void doRead () throws MorriganException, DbException {
 //		System.err.println("[?] reading... " + getType() + " " + getListName() + "...");
 		
+		List<T> allMedia;
 		long t0 = System.currentTimeMillis();
-		List<T> allMedia = this.dbLayer.getAllMedia(this.librarySort, this.librarySortDirection, HIDEMISSING, this.escapedSearchTerm, SEARCH_ESC);
+		if (this.escapedSearchTerm != null) {
+			allMedia = this.dbLayer.getMedia(this.librarySort, this.librarySortDirection, HIDEMISSING, this.escapedSearchTerm, SEARCH_ESC);
+		}
+		else {
+			allMedia = this.dbLayer.getMedia(this.librarySort, this.librarySortDirection, HIDEMISSING);
+		}
 		long l0 = System.currentTimeMillis() - t0;
 		
 		long t1 = System.currentTimeMillis();
