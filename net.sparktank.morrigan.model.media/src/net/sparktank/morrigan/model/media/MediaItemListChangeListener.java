@@ -12,10 +12,11 @@ public interface MediaItemListChangeListener {
 	
 	public void dirtyStateChanged (DirtyState oldState, DirtyState newState);
 	
+	public void mediaListRead ();
 	public void mediaItemsAdded (IMediaItem... items);
 	public void mediaItemsRemoved (IMediaItem... items);
 	public void mediaItemsUpdated (IMediaItem... items);
-	public void mediaItemsTagsChanged (IMediaItem... items);
+	public void mediaItemsForceReadRequired (IMediaItem... items);
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

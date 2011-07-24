@@ -200,6 +200,11 @@ public class ViewLibraryProperties extends ViewPart {
 	private MediaItemListChangeListener listChangeListener = new MediaItemListChangeListener () {
 		
 		@Override
+		public void mediaListRead() {
+			ViewLibraryProperties.this.updateGuiRrefresher.run();
+		}
+		
+		@Override
 		public void mediaItemsAdded(IMediaItem... items) {
 			ViewLibraryProperties.this.updateGuiRrefresher.run();
 		}
@@ -214,7 +219,7 @@ public class ViewLibraryProperties extends ViewPart {
 		@Override
 		public void mediaItemsUpdated(IMediaItem... item) { /* Nothing to refresh. */ }
 		@Override
-		public void mediaItemsTagsChanged(IMediaItem... items) { /* Nothing to refresh. */ }
+		public void mediaItemsForceReadRequired(IMediaItem... items) { /* Nothing to refresh. */ }
 	};
 	
 	Runnable updateGuiRrefresher;

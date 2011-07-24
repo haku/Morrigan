@@ -85,28 +85,28 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		@Override
 		public void mediaItemTagAdded(IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) {
 			for (IMediaItemStorageLayerChangeListener<T> l : MediaSqliteLayer.this.changeListeners) {
-				l.mediaItemUpdated(null); // TODO pass-through actual file.
+				l.mediaItemTagAdded(item, tag, type, mtc);
 			}
 		}
 		
 		@Override
 		public void mediaItemTagsMoved(IDbItem from_item, IDbItem to_item) {
 			for (IMediaItemStorageLayerChangeListener<T> l : MediaSqliteLayer.this.changeListeners) {
-				l.mediaItemUpdated(null); // TODO pass-through actual file.
+				l.mediaItemTagsMoved(from_item, to_item);
 			}
 		}
 		
 		@Override
 		public void mediaItemTagRemoved(MediaTag tag) {
 			for (IMediaItemStorageLayerChangeListener<T> l : MediaSqliteLayer.this.changeListeners) {
-				l.mediaItemUpdated(null); // TODO pass-through actual file.
+				l.mediaItemTagRemoved(tag);
 			}
 		}
 		
 		@Override
 		public void mediaItemTagsCleared(IDbItem item) {
 			for (IMediaItemStorageLayerChangeListener<T> l : MediaSqliteLayer.this.changeListeners) {
-				l.mediaItemUpdated(null); // TODO pass-through actual file.
+				l.mediaItemTagsCleared(item);
 			}
 		}
 		
