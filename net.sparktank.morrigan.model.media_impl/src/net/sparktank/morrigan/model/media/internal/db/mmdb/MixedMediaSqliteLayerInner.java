@@ -8,10 +8,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import net.sparktank.morrigan.model.db.IDbColumn;
 import net.sparktank.morrigan.model.db.IDbItem;
@@ -291,7 +289,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 		return ret;
 	}
 	
-	protected List<IMixedMediaItem> local_updateListOfAllMedia (MediaType mediaType, List<IMixedMediaItem> list, IDbColumn sort, SortDirection direction, boolean hideMissing, String search, String searchEsc) throws SQLException, ClassNotFoundException {
+	protected List<IMixedMediaItem> local_getAllMedia (MediaType mediaType, IDbColumn sort, SortDirection direction, boolean hideMissing, String search, String searchEsc) throws SQLException, ClassNotFoundException {
 		String sql = local_getAllMediaSql(mediaType, hideMissing, sort, direction, search);
 		ResultSet rs;
 		
@@ -315,7 +313,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 			}
 			rs = ps.executeQuery();
 			try {
-				ret = local_parseAndUpdateFromRecordSet(list, rs, this.itemFactory);
+				ret = local_parseRecordSet(rs, this.itemFactory);
 			} finally {
 				rs.close();
 			}
@@ -854,35 +852,6 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 //		System.err.println("sqls=" + sqls);
 		
 		return sqls;
-	}
-	
-	/**
-	 * TODO FIXME is this method now redundant?
-	 */
-	static private List<IMixedMediaItem> local_parseAndUpdateFromRecordSet (List<IMixedMediaItem> list, ResultSet rs, MixedMediaItemFactory itemFactory) throws SQLException {
-		List<IMixedMediaItem> finalList = new ArrayList<IMixedMediaItem>();
-		
-		// Build a HashMap of existing items to make lookup a lot faster.
-		Map<String, IMixedMediaItem> keepMap = new HashMap<String, IMixedMediaItem>(list.size());
-		for (IMixedMediaItem e : list) {
-			keepMap.put(e.getFilepath(), e);
-		}
-		
-		/* Extract entry from DB.  Compare it to existing entries and
-		 * create new list as we go. 
-		 */
-		while (rs.next()) {
-			IMixedMediaItem newItem = createMediaItem(rs, itemFactory);
-			IMixedMediaItem oldItem = keepMap.get(newItem.getFilepath());
-			if (oldItem != null) {
-				oldItem.setFromMediaItem(newItem);
-				finalList.add(oldItem);
-			} else {
-				finalList.add(newItem);
-			}
-		}
-		
-		return finalList;
 	}
 	
 	static private List<IMixedMediaItem> local_parseRecordSet (ResultSet rs, MixedMediaItemFactory itemFactory) throws SQLException {

@@ -390,6 +390,11 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 			MediaItemListEditor.this.listChangeRrefresher.run();
 		}
 		
+		@Override
+		public void mediaItemsTagsChanged(IMediaItem... items) {
+			System.out.println("TODO: Requery DB: "+getTitle()+"."); // TODO FIXME implement a refresher for this.
+		}
+		
 	};
 	
 	protected Runnable listChangeRrefresher;

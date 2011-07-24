@@ -200,9 +200,6 @@ public class ViewLibraryProperties extends ViewPart {
 	private MediaItemListChangeListener listChangeListener = new MediaItemListChangeListener () {
 		
 		@Override
-		public void dirtyStateChanged(DirtyState oldState, DirtyState newState) { /* Unused. */ }
-		
-		@Override
 		public void mediaItemsAdded(IMediaItem... items) {
 			ViewLibraryProperties.this.updateGuiRrefresher.run();
 		}
@@ -213,10 +210,11 @@ public class ViewLibraryProperties extends ViewPart {
 		}
 		
 		@Override
-		public void mediaItemsUpdated(IMediaItem... item) {
-			ViewLibraryProperties.this.updateGuiRrefresher.run();
-		}
-		
+		public void dirtyStateChanged(DirtyState oldState, DirtyState newState) { /* Unused. */ }
+		@Override
+		public void mediaItemsUpdated(IMediaItem... item) { /* Nothing to refresh. */ }
+		@Override
+		public void mediaItemsTagsChanged(IMediaItem... items) { /* Nothing to refresh. */ }
 	};
 	
 	Runnable updateGuiRrefresher;

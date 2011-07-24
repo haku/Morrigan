@@ -63,13 +63,8 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	}
 	
 	@Override
-	public List<IMixedMediaItem> updateListOfAllMedia(List<IMixedMediaItem> list, IDbColumn sort, SortDirection direction, boolean hideMissing) throws DbException {
-		return updateListOfAllMedia(this.defaultMediaType, list, sort, direction, hideMissing);
-	}
-	
-	@Override
-	public List<IMixedMediaItem> updateListOfAllMedia(List<IMixedMediaItem> list, IDbColumn sort, SortDirection direction, boolean hideMissing, String search, String searchEsc) throws DbException {
-		return updateListOfAllMedia(this.defaultMediaType, list, sort, direction, hideMissing, search, searchEsc);
+	public List<IMixedMediaItem> getAllMedia(IDbColumn sort, net.sparktank.morrigan.model.media.IMediaItemStorageLayer.SortDirection direction, boolean hideMissing, String search, String searchEsc) throws DbException {
+		return getAllMedia(MediaType.UNKNOWN, sort, direction, hideMissing, search, searchEsc);
 	}
 	
 	@Override
@@ -87,18 +82,9 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	}
 	
 	@Override
-	public List<IMixedMediaItem> updateListOfAllMedia(MediaType mediaType, List<IMixedMediaItem> list, IDbColumn sort, SortDirection direction, boolean hideMissing) throws DbException {
+	public List<IMixedMediaItem> getAllMedia(MediaType mediaType, IDbColumn sort, net.sparktank.morrigan.model.media.IMediaItemStorageLayer.SortDirection direction, boolean hideMissing, String search, String searchEsc) throws DbException {
 		try {
-			return local_updateListOfAllMedia(mediaType, list, sort, direction, hideMissing, null, null);
-		} catch (Exception e) {
-			throw new DbException(e);
-		}
-	}
-	
-	@Override
-	public List<IMixedMediaItem> updateListOfAllMedia(MediaType mediaType, List<IMixedMediaItem> list, IDbColumn sort, SortDirection direction, boolean hideMissing, String search, String searchEsc) throws DbException {
-		try {
-			return local_updateListOfAllMedia(mediaType, list, sort, direction, hideMissing, search, searchEsc);
+			return local_getAllMedia(mediaType, sort, direction, hideMissing, search, searchEsc);
 		} catch (Exception e) {
 			throw new DbException(e);
 		}

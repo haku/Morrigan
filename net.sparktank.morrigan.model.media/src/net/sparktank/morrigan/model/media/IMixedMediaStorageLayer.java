@@ -19,8 +19,7 @@ public interface IMixedMediaStorageLayer<T extends IMixedMediaItem> extends IMed
 	public MediaType getDefaultMediaType();
 	
 	public List<IMixedMediaItem> getAllMedia (MediaType mediaType, IDbColumn sort, SortDirection direction, boolean hideMissing) throws DbException;
-	public List<IMixedMediaItem> updateListOfAllMedia (MediaType mediaType, List<IMixedMediaItem> list, IDbColumn sort, SortDirection direction, boolean hideMissing) throws DbException;
-	public List<IMixedMediaItem> updateListOfAllMedia (MediaType mediaType, List<IMixedMediaItem> list, IDbColumn sort, SortDirection direction, boolean hideMissing, String search, String searchEsc) throws DbException;
+	public List<IMixedMediaItem> getAllMedia (MediaType mediaType, IDbColumn sort, SortDirection direction, boolean hideMissing, String search, String searchEsc) throws DbException;
 	public List<IMixedMediaItem> simpleSearchMedia (MediaType mediaType, String term, String esc, int maxResults) throws DbException;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

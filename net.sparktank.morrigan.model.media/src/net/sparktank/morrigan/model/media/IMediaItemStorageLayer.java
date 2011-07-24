@@ -68,8 +68,7 @@ public interface IMediaItemStorageLayer<T extends IMediaItem> extends IGenericDb
 	public IDbColumn getDefaultSortColumn ();
 	
 	public List<T> getAllMedia(IDbColumn sort, SortDirection direction, boolean hideMissing) throws DbException;
-	public List<T> updateListOfAllMedia(List<T> list, IDbColumn sort, SortDirection direction, boolean hideMissing) throws DbException;
-	public List<T> updateListOfAllMedia(List<T> list, IDbColumn sort, SortDirection direction, boolean hideMissing, String search, String searchEsc) throws DbException;
+	public List<T> getAllMedia(IDbColumn sort, SortDirection direction, boolean hideMissing, String search, String searchEsc) throws DbException;
 	
 	public boolean hasFile (File file) throws DbException;
 	public T getByFile (File file) throws DbException;
