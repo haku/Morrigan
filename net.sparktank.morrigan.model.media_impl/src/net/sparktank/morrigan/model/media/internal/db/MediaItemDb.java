@@ -113,6 +113,10 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 		return this.config.getSerial();
 	}
 	
+	public MediaItemDbConfig getConfig() {
+		return this.config;
+	}
+	
 	@Override
 	public S getDbLayer() {
 		return this.dbLayer;
@@ -167,6 +171,8 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 		this.durationOfLastRead = l0+l1;
 		
 		this.firstRead = false;
+		
+		this.getChangeEventCaller().mediaListRead();
 	}
 	
 	@Override
@@ -353,26 +359,30 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 		
 		@Override
 		public void mediaItemTagAdded(IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) {
-			// TODO does tag change event trigger re-query?
-			getChangeEventCaller().mediaItemsTagsChanged((IMediaItem[])null); // TODO pass-through actual item?
+			if (MediaItemDb.this.getConfig().getFilter() != null) { // TODO make more specific?
+				getChangeEventCaller().mediaItemsForceReadRequired((IMediaItem[])null); // TODO pass-through actual item?
+			}
 		}
 		
 		@Override
 		public void mediaItemTagsMoved(IDbItem from_item, IDbItem to_item) {
-			// TODO does tag change event trigger re-query?
-			getChangeEventCaller().mediaItemsTagsChanged((IMediaItem[])null); // TODO pass-through actual item?
+			if (MediaItemDb.this.getConfig().getFilter() != null) { // TODO make more specific?
+				getChangeEventCaller().mediaItemsForceReadRequired((IMediaItem[])null); // TODO pass-through actual item?
+			}
 		}
 		
 		@Override
 		public void mediaItemTagRemoved(MediaTag tag) {
-			// TODO does tag change event trigger re-query?
-			getChangeEventCaller().mediaItemsTagsChanged((IMediaItem[])null); // TODO pass-through actual item?
+			if (MediaItemDb.this.getConfig().getFilter() != null) { // TODO make more specific?
+				getChangeEventCaller().mediaItemsForceReadRequired((IMediaItem[])null); // TODO pass-through actual item?
+			}
 		}
 		
 		@Override
 		public void mediaItemTagsCleared(IDbItem item) {
-			// TODO does tag change event trigger re-query?
-			getChangeEventCaller().mediaItemsTagsChanged((IMediaItem[])null); // TODO pass-through actual item?
+			if (MediaItemDb.this.getConfig().getFilter() != null) { // TODO make more specific?
+				getChangeEventCaller().mediaItemsForceReadRequired((IMediaItem[])null); // TODO pass-through actual item?
+			}
 		}
 		
 	};

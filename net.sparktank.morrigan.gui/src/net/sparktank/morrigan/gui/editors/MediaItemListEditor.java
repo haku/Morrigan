@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.adaptors.MediaFilter;
@@ -63,6 +65,10 @@ import org.eclipse.ui.part.EditorPart;
  * TODO Finish extracting generic stuff from MediaTrackListEditor.
  */
 public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends IMediaItem> extends EditorPart {
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	protected final Logger logger = Logger.getLogger(this.getClass().getName());
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Nested classes.
 	
@@ -376,6 +382,11 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 		}
 		
 		@Override
+		public void mediaListRead() {
+			MediaItemListEditor.this.listChangeRrefresher.run();
+		}
+		
+		@Override
 		public void mediaItemsAdded(IMediaItem... items) {
 			MediaItemListEditor.this.listChangeRrefresher.run();
 		}
@@ -391,14 +402,15 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 		}
 		
 		@Override
-		public void mediaItemsTagsChanged(IMediaItem... items) {
-			System.out.println("TODO: Requery DB: "+getTitle()+"."); // TODO FIXME implement a refresher for this.
+		public void mediaItemsForceReadRequired (IMediaItem... items) {
+			MediaItemListEditor.this.listRequeryRefresher.run();
 		}
 		
 	};
 	
 	protected Runnable listChangeRrefresher;
 	protected Runnable listDirtyRrefresher;
+	protected Runnable listRequeryRefresher;
 	
 	private void makeRefreshers () {
 		this.listChangeRrefresher = new RefreshTimer(getSite().getShell().getDisplay(), 5000, new Runnable() {
@@ -415,6 +427,18 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 			@Override
 			public void run() {
 				firePropertyChange(IEditorPart.PROP_DIRTY);
+			}
+		});
+		
+		this.listRequeryRefresher = new RefreshTimer(getSite().getShell().getDisplay(), 5000, new Runnable() {
+			@Override
+			public void run() {
+				try {
+					getMediaList().forceRead();
+				}
+				catch (MorriganException e) {
+					MediaItemListEditor.this.logger.log(Level.WARNING, "Exception during requery event.", e);
+				}
 			}
 		});
 	}

@@ -124,6 +124,14 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 		}
 		
 		@Override
+		public void mediaListRead() {
+			if (MediaItemList.this.logger.isLoggable(Level.FINEST)) MediaItemList.this.logger.finest(getListName());
+			for (MediaItemListChangeListener listener : MediaItemList.this.changeEventListeners) {
+				listener.mediaListRead();
+			}
+		}
+		
+		@Override
 		public void mediaItemsAdded(IMediaItem... items) {
 			if (MediaItemList.this.logger.isLoggable(Level.FINEST)) MediaItemList.this.logger.finest(getListName() +  " " + Arrays.toString(items));
 			for (MediaItemListChangeListener listener : MediaItemList.this.changeEventListeners) {
@@ -148,10 +156,10 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 		}
 		
 		@Override
-		public void mediaItemsTagsChanged(IMediaItem... items) {
+		public void mediaItemsForceReadRequired(IMediaItem... items) {
 			if (MediaItemList.this.logger.isLoggable(Level.FINEST)) MediaItemList.this.logger.finest(getListName() +  " " + Arrays.toString(items));
 			for (MediaItemListChangeListener listener : MediaItemList.this.changeEventListeners) {
-				listener.mediaItemsTagsChanged(items);
+				listener.mediaItemsForceReadRequired(items);
 			}
 		}
 		
