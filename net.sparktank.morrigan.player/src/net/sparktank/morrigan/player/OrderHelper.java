@@ -113,7 +113,7 @@ public class OrderHelper {
 		while (true) {
 			if (i >= mediaTracks.size()) i = 0;
 			
-			if (mediaTracks.get(i).isEnabled() && !mediaTracks.get(i).isMissing()) {
+			if (validChoice(mediaTracks.get(i))) {
 				break;
 			}
 			
@@ -138,19 +138,19 @@ public class OrderHelper {
 		List<? extends IMediaTrack> mediaTracks = list.getMediaItems();
 		
 		int n = 0;
-		for (IMediaItem mi : mediaTracks) {
-			if (mi.isEnabled() && !mi.isMissing() && mi != current) {
+		for (IMediaTrack i : mediaTracks) {
+			if (validChoice(i, current)) {
 				n++;
 			}
 		}
 		if (n == 0) return null;
 		
 		long x = Math.round(generator.nextDouble() * n);
-		for (IMediaTrack mi : mediaTracks) {
-			if (mi.isEnabled() && !mi.isMissing() && mi != current) {
+		for (IMediaTrack i : mediaTracks) {
+			if (validChoice(i, current)) {
 				x--;
 				if (x<=0) {
-					return mi;
+					return i;
 				}
 			}
 		}
@@ -165,7 +165,7 @@ public class OrderHelper {
 		// Find highest play count.
 		long maxPlayCount = -1;
 		for (IMediaTrack i : tracks) {
-			if (i.getStartCount() > maxPlayCount && i.isEnabled() && !i.isMissing() && i != current) {
+			if (i.getStartCount() > maxPlayCount && validChoice(i, current)) {
 				maxPlayCount = i.getStartCount();
 			}
 		}
@@ -177,7 +177,7 @@ public class OrderHelper {
 		// Find sum of all selection indicies.
 		long selIndexSum = 0;
 		for (IMediaTrack i : tracks) {
-			if (i.isEnabled() && !i.isMissing() && i != current) {
+			if (validChoice(i, current)) {
 				selIndexSum = selIndexSum + (maxPlayCount - i.getStartCount());
 			}
 		}
@@ -188,7 +188,7 @@ public class OrderHelper {
 		
 		// Find the target item.
 		for (IMediaTrack i : tracks) {
-			if (i.isEnabled() && !i.isMissing() && i != current) {
+			if (validChoice(i, current)) {
 				targetIndex = targetIndex - (maxPlayCount - i.getStartCount());
 				if (targetIndex <= 0) {
 					ret = i;
@@ -197,8 +197,8 @@ public class OrderHelper {
 			}
 		}
 		
-		if (ret == null) {
-			throw new RuntimeException("Failed to find next track.  This should not happen.");
+		if (ret == null || !ret.isPlayable()) {
+			throw new RuntimeException("Failed to correctly find next track.  This should not happen.");
 		}
 		
 		return ret;
@@ -213,7 +213,7 @@ public class OrderHelper {
 		Date maxAge = new Date();
 		int n = 0;
 		for (IMediaTrack i : tracks) {
-			if (i.isEnabled() && !i.isMissing() && i != current) {
+			if (validChoice(i, current)) {
 				if (i.getDateLastPlayed() != null && i.getDateLastPlayed().before(maxAge)) {
 					maxAge = i.getDateLastPlayed();
 				}
@@ -228,7 +228,7 @@ public class OrderHelper {
 		// Build sum of all selection-indicies in units of days.
 		long sumAgeDays = 0;
 		for (IMediaTrack i : tracks) {
-			if (i.isEnabled() && !i.isMissing() && i != current) {
+			if (validChoice(i, current)) {
 				if (i.getDateLastPlayed() != null) {
 					sumAgeDays = sumAgeDays + dateDiffDays(i.getDateLastPlayed(), now);
 				} else {
@@ -243,7 +243,7 @@ public class OrderHelper {
 		
 		// Find the target item.
 		for (IMediaTrack i : tracks) {
-			if (i.isEnabled() && !i.isMissing() && i != current) {
+			if (validChoice(i, current)) {
 				if (i.getDateLastPlayed() != null) {
 					targetIndex = targetIndex - dateDiffDays(i.getDateLastPlayed(), now);
 				} else {
@@ -256,11 +256,21 @@ public class OrderHelper {
 			}
 		}
 		
-		if (ret == null) {
-			throw new RuntimeException("Failed to find next track.  This should not happen.  targetIndex=" + targetIndex);
+		if (ret == null || !ret.isPlayable()) {
+			throw new RuntimeException("Failed to correctly find next track.  This should not happen.  targetIndex=" + targetIndex);
 		}
 		
 		return ret;
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	static private boolean validChoice (IMediaTrack i) {
+		return i.isEnabled() && i.isPlayable() && !i.isMissing();
+	}
+	
+	static private boolean validChoice (IMediaTrack i, IMediaItem current) {
+		return i.isEnabled() && i.isPlayable() && !i.isMissing() && i != current;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
