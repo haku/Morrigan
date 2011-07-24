@@ -11,6 +11,7 @@ import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.adaptors.MediaFilter;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.handler.CallPlayMedia;
+import net.sparktank.morrigan.gui.helpers.ClipboardHelper;
 import net.sparktank.morrigan.gui.helpers.ImageCache;
 import net.sparktank.morrigan.gui.helpers.RefreshTimer;
 import net.sparktank.morrigan.gui.jobs.TaskJob;
@@ -51,6 +52,7 @@ import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.TableColumn;
@@ -614,6 +616,20 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 				TaskJob job = new TaskJob(task, getSite().getShell().getDisplay());
 				job.schedule();
 			}
+		}
+	};
+	
+	protected IAction copyFilePath = new Action("Copy paths") {
+		@Override
+		public void run() {
+			String newLine = System.getProperty("line.separator");
+			StringBuffer sb = new StringBuffer();
+			ArrayList<S> items = getSelectedItems();
+			for (S item : items) {
+				sb.append(item.getFilepath());
+				if (items.size() > 1) sb.append(newLine);
+			}
+			ClipboardHelper.setText(sb.toString(), Display.getCurrent());
 		}
 	};
 	

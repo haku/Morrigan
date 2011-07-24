@@ -153,6 +153,7 @@ public abstract class AbstractMixedMediaDbEditor<T extends IAbstractMixedMediaDb
 	@Override
 	protected void populateContextMenu(List<IContributionItem> menu0, List<IContributionItem> menu1) {
 		menu0.add(new ActionContributionItem(this.copyToAction));
+		menu0.add(new ActionContributionItem(this.copyFilePath));
 	}
 	
 	protected MenuManager getPrefMenuMgr () {
