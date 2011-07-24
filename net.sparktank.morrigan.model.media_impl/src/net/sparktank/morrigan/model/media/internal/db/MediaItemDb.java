@@ -15,6 +15,7 @@ import net.sparktank.morrigan.model.media.IMediaItem;
 import net.sparktank.morrigan.model.media.IMediaItemDb;
 import net.sparktank.morrigan.model.media.IMediaItemStorageLayer;
 import net.sparktank.morrigan.model.media.IMediaItemStorageLayerChangeListener;
+import net.sparktank.morrigan.model.media.MediaItemListChangeListener;
 import net.sparktank.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
 import net.sparktank.morrigan.model.media.internal.MediaItemList;
 import net.sparktank.morrigan.model.media.internal.MediaTagClassificationImpl;
@@ -57,7 +58,6 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 		
 		this.librarySort = dbLayer.getDefaultSortColumn();
 		this.librarySortDirection = SortDirection.ASC;
-		dbLayer.addChangeListener(this.storageChangeListener);
 		
 		if (config.getFilter() != null) {
 			this.escapedSearchTerm = escapeSearch(config.getFilter());
@@ -84,8 +84,26 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 	public void dispose () {
 		super.dispose();
 		this._sortChangeListeners.clear();
-		this.dbLayer.removeChangeListener(this.storageChangeListener);
 		this.dbLayer.dispose(); // TODO FIXME what if this layer is shared???  Count attached change listeners?
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Change event listeners.
+	
+	/* This way we only listen for DB events when someone is listening to our own events.
+	 * Should help things from getting tangled during GC.  Possibly.
+	 */
+	
+	@Override
+	public void addChangeEventListener(MediaItemListChangeListener listener) {
+		if (this.changeEventListeners.size() == 0) this.dbLayer.addChangeListener(this.storageChangeListener);
+		super.addChangeEventListener(listener);
+	}
+	
+	@Override
+	public void removeChangeEventListener(MediaItemListChangeListener listener) {
+		super.removeChangeEventListener(listener);
+		if (this.changeEventListeners.size() == 0) this.dbLayer.removeChangeListener(this.storageChangeListener);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -138,7 +156,7 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 //		System.err.println("[?] reading... " + getType() + " " + getListName() + "...");
 		
 		long t0 = System.currentTimeMillis();
-		List<T> allMedia = this.dbLayer.updateListOfAllMedia(getMediaItems(), this.librarySort, this.librarySortDirection, HIDEMISSING, this.escapedSearchTerm, SEARCH_ESC);
+		List<T> allMedia = this.dbLayer.getAllMedia(this.librarySort, this.librarySortDirection, HIDEMISSING, this.escapedSearchTerm, SEARCH_ESC);
 		long l0 = System.currentTimeMillis() - t0;
 		
 		long t1 = System.currentTimeMillis();
@@ -315,22 +333,46 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 		
 		@Override
 		public void mediaItemAdded(String filePath) {
-			getChangeEventCaller().mediaItemsAdded((IMediaItem[])null);
+			getChangeEventCaller().mediaItemsAdded((IMediaItem[])null); // TODO pass-through actual item?
 		}
 		
 		@Override
 		public void mediaItemsAdded(List<File> filePaths) {
-			getChangeEventCaller().mediaItemsAdded((IMediaItem[])null);
+			getChangeEventCaller().mediaItemsAdded((IMediaItem[])null); // TODO pass-through actual item?
 		}
 		
 		@Override
 		public void mediaItemRemoved(String filePath) {
-			getChangeEventCaller().mediaItemsRemoved((IMediaItem[])null);
+			getChangeEventCaller().mediaItemsRemoved((IMediaItem[])null); // TODO pass-through actual item?
 		}
 		
 		@Override
 		public void mediaItemUpdated(String filePath) {
-			getChangeEventCaller().mediaItemsUpdated((IMediaItem[])null);
+			getChangeEventCaller().mediaItemsUpdated((IMediaItem[])null); // TODO pass-through actual item?
+		}
+		
+		@Override
+		public void mediaItemTagAdded(IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) {
+			// TODO does tag change event trigger re-query?
+			getChangeEventCaller().mediaItemsTagsChanged((IMediaItem[])null); // TODO pass-through actual item?
+		}
+		
+		@Override
+		public void mediaItemTagsMoved(IDbItem from_item, IDbItem to_item) {
+			// TODO does tag change event trigger re-query?
+			getChangeEventCaller().mediaItemsTagsChanged((IMediaItem[])null); // TODO pass-through actual item?
+		}
+		
+		@Override
+		public void mediaItemTagRemoved(MediaTag tag) {
+			// TODO does tag change event trigger re-query?
+			getChangeEventCaller().mediaItemsTagsChanged((IMediaItem[])null); // TODO pass-through actual item?
+		}
+		
+		@Override
+		public void mediaItemTagsCleared(IDbItem item) {
+			// TODO does tag change event trigger re-query?
+			getChangeEventCaller().mediaItemsTagsChanged((IMediaItem[])null); // TODO pass-through actual item?
 		}
 		
 	};

@@ -111,6 +111,8 @@ public class Player implements IPlayerLocal {
 		public void mediaItemsAdded (IMediaItem... items) { /* Unused. */ }
 		@Override
 		public void mediaItemsUpdated (IMediaItem... items) { /* Unused. */ }
+		@Override
+		public void mediaItemsTagsChanged(IMediaItem... items) { /* Unused. */ }
 	};
 	
 	@Override

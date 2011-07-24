@@ -15,6 +15,7 @@ public interface MediaItemListChangeListener {
 	public void mediaItemsAdded (IMediaItem... items);
 	public void mediaItemsRemoved (IMediaItem... items);
 	public void mediaItemsUpdated (IMediaItem... items);
+	public void mediaItemsTagsChanged (IMediaItem... items);
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

@@ -36,7 +36,8 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	
 	@Override
 	public void addChangeListener(IMediaItemStorageLayerChangeListener<T> listener) {
-		this.changeListeners.add(listener);
+		// TODO rewrite this to use a map instead?
+		if (!this.changeListeners.contains(listener)) this.changeListeners.add(listener);
 	}
 	
 	@Override
@@ -78,6 +79,34 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		public void mediaItemUpdated(String filePath) {
 			for (IMediaItemStorageLayerChangeListener<T> l : MediaSqliteLayer.this.changeListeners) {
 				l.mediaItemUpdated(filePath);
+			}
+		}
+		
+		@Override
+		public void mediaItemTagAdded(IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) {
+			for (IMediaItemStorageLayerChangeListener<T> l : MediaSqliteLayer.this.changeListeners) {
+				l.mediaItemUpdated(null); // TODO pass-through actual file.
+			}
+		}
+		
+		@Override
+		public void mediaItemTagsMoved(IDbItem from_item, IDbItem to_item) {
+			for (IMediaItemStorageLayerChangeListener<T> l : MediaSqliteLayer.this.changeListeners) {
+				l.mediaItemUpdated(null); // TODO pass-through actual file.
+			}
+		}
+		
+		@Override
+		public void mediaItemTagRemoved(MediaTag tag) {
+			for (IMediaItemStorageLayerChangeListener<T> l : MediaSqliteLayer.this.changeListeners) {
+				l.mediaItemUpdated(null); // TODO pass-through actual file.
+			}
+		}
+		
+		@Override
+		public void mediaItemTagsCleared(IDbItem item) {
+			for (IMediaItemStorageLayerChangeListener<T> l : MediaSqliteLayer.this.changeListeners) {
+				l.mediaItemUpdated(null); // TODO pass-through actual file.
 			}
 		}
 		
@@ -152,7 +181,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	@Override
 	public boolean addTag (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) throws DbException {
 		try {
-			return local_addTag(item.getDbRowId(), tag, type, mtc);
+			return local_addTag(item, tag, type, mtc);
 		} catch (Exception e) {
 			throw new DbException(e);
 		}
@@ -161,7 +190,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	@Override
 	public boolean addTag (IDbItem item, String tag, MediaTagType type, String mtc) throws DbException {
 		try {
-			return local_addTag(item.getDbRowId(), tag, type, mtc);
+			return local_addTag(item, tag, type, mtc);
 		} catch (Exception e) {
 			throw new DbException(e);
 		}
@@ -170,7 +199,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	@Override
 	public void moveTags (IDbItem from_item, IDbItem to_item) throws DbException {
 		try {
-			local_moveTags(from_item.getDbRowId(), to_item.getDbRowId());
+			local_moveTags(from_item, to_item);
 		} catch (Exception e) {
 			throw new DbException(e);
 		}
@@ -188,7 +217,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	@Override
 	public void clearTags (IDbItem item) throws DbException {
 		try {
-			local_clearTags(item.getDbRowId());
+			local_clearTags(item);
 		} catch (Exception e) {
 			throw new DbException(e);
 		}
@@ -455,59 +484,60 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Private methods for tags.
 	
-	private boolean local_addTag (long mf_rowId, String tag, MediaTagType type, String cls_name) throws SQLException, ClassNotFoundException, DbException {
+	private boolean local_addTag (IDbItem item, String tag, MediaTagType type, String cls_name) throws SQLException, ClassNotFoundException, DbException {
 		MediaTagClassification mtc = local_getTagClassification(cls_name);
 		if (mtc == null) {
 			mtc = local_addTagClassification(cls_name);
 		}
-		return local_addTag(mf_rowId, tag, type, mtc);
+		return local_addTag(item, tag, type, mtc);
 	}
 	
-	private boolean local_addTag (long mf_rowId, String tag, MediaTagType type, MediaTagClassification mtc) throws SQLException, ClassNotFoundException, DbException {
-		if (local_hasTag(mf_rowId, tag, type, mtc)) {
+	private boolean local_addTag (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) throws SQLException, ClassNotFoundException, DbException {
+		if (local_hasTag(item.getDbRowId(), tag, type, mtc)) {
 			return false;
 		}
 		
-		if (mtc != null) {
-			local_addTag(mf_rowId, tag, type, mtc.getDbRowId());
-		} else {
-			local_addTag(mf_rowId, tag, type, 0);
-		}
-		return true;
-	}
-	
-	private void local_addTag (long mf_rowId, String tag, MediaTagType type, long cls_rowid) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps;
 		ps = getDbCon().prepareStatement(SQL_TBL_TAGS_ADD);
 		int n;
 		try {
-			ps.setLong(1, mf_rowId);
+			ps.setLong(1, item.getDbRowId());
 			ps.setString(2, tag);
 			ps.setInt(3, type.getIndex());
-			if (cls_rowid > 0 ) {
-				ps.setLong(4, cls_rowid);
-			} else {
+			if (mtc != null) {
+				ps.setLong(4, mtc.getDbRowId());
+			}
+			else {
 				ps.setNull(4, java.sql.Types.INTEGER);
 			}
 			n = ps.executeUpdate();
-		} finally {
+			if (n<1) throw new DbException("No update occured.");
+			
+			this.changeCaller.mediaItemTagAdded(item, tag, type, mtc);
+			
+			return true;
+		}
+		finally {
 			ps.close();
 		}
-		if (n<1) throw new DbException("No update occured.");
 	}
 	
-	private void local_moveTags (long from_mf_rowId, long to_mf_rowId) throws SQLException, ClassNotFoundException, DbException {
+	private void local_moveTags (IDbItem from_item, IDbItem to_item) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps;
 		ps = getDbCon().prepareStatement(SQL_TBL_TAGS_MOVE);
 		int n;
 		try {
-			ps.setLong(1, to_mf_rowId);
-			ps.setLong(2, from_mf_rowId);
+			ps.setLong(1, to_item.getDbRowId());
+			ps.setLong(2, from_item.getDbRowId());
+			
 			n = ps.executeUpdate();
-		} finally {
+			if (n<1) throw new DbException("No update occured for moveTags('"+from_item+"' to '"+to_item+"').");
+			
+			this.changeCaller.mediaItemTagsMoved(from_item, to_item);
+		}
+		finally {
 			ps.close();
 		}
-		if (n<1) throw new DbException("No update occured for moveTags('"+from_mf_rowId+"' to '"+to_mf_rowId+"').");
 	}
 	
 	private void local_removeTag(MediaTag tag) throws SQLException, ClassNotFoundException, DbException {
@@ -517,23 +547,29 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		try {
 			ps.setLong(1, tag.getDbRowId());
 			n = ps.executeUpdate();
-		} finally {
+			if (n<1) throw new DbException("No update occured.");
+			
+			this.changeCaller.mediaItemTagRemoved(tag);
+		}
+		finally {
 			ps.close();
 		}
-		if (n<1) throw new DbException("No update occured.");
 	}
 	
-	private void local_clearTags(long mf_rowId) throws SQLException, ClassNotFoundException, DbException {
+	private void local_clearTags(IDbItem item) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps;
 		ps = getDbCon().prepareStatement(SQL_TBL_TAGS_CLEAR);
 		int n;
 		try {
-			ps.setLong(1, mf_rowId);
+			ps.setLong(1, item.getDbRowId());
 			n = ps.executeUpdate();
-		} finally {
+			if (n<1) throw new DbException("No update occured for clearTags('"+item+"').");
+			
+			this.changeCaller.mediaItemTagsCleared(item);
+		}
+		finally {
 			ps.close();
 		}
-		if (n<1) throw new DbException("No update occured for clearTags('"+mf_rowId+"').");
 	}
 	
 	private boolean local_hasTags (long mf_rowId) throws SQLException, ClassNotFoundException {

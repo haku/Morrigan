@@ -49,7 +49,7 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 	
 	@Override
 	public void dispose () {
-		this.changeEvents.clear();
+		this.changeEventListeners.clear();
 		this.mediaTracks.clear();
 	}
 	
@@ -84,7 +84,7 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 //	Dirty state and event listeners.
 	
 	private DirtyState dirtyState = DirtyState.CLEAN;
-	final protected List<MediaItemListChangeListener> changeEvents = new LinkedList<MediaItemListChangeListener>();
+	final protected List<MediaItemListChangeListener> changeEventListeners = new LinkedList<MediaItemListChangeListener>();
 	
 	abstract public boolean isCanBeDirty ();
 	
@@ -104,12 +104,13 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 	
 	@Override
 	public void addChangeEventListener (MediaItemListChangeListener listener) {
-		this.changeEvents.add(listener);
+		// TODO rewrite this to use a map instead?
+		if (!this.changeEventListeners.contains(listener)) this.changeEventListeners.add(listener);
 	}
 	
 	@Override
 	public void removeChangeEventListener (MediaItemListChangeListener listener) {
-		this.changeEvents.remove(listener);
+		this.changeEventListeners.remove(listener);
 	}
 	
 	private MediaItemListChangeListener changeCaller = new MediaItemListChangeListener () {
@@ -117,7 +118,7 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 		@Override
 		public void dirtyStateChanged(DirtyState oldState, DirtyState newState) {
 			if (MediaItemList.this.logger.isLoggable(Level.FINEST)) MediaItemList.this.logger.finest(getListName() +  " oldState=" + oldState + " newState=" + newState);
-			for (MediaItemListChangeListener listener : MediaItemList.this.changeEvents) {
+			for (MediaItemListChangeListener listener : MediaItemList.this.changeEventListeners) {
 				listener.dirtyStateChanged(oldState, newState);
 			}
 		}
@@ -125,7 +126,7 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 		@Override
 		public void mediaItemsAdded(IMediaItem... items) {
 			if (MediaItemList.this.logger.isLoggable(Level.FINEST)) MediaItemList.this.logger.finest(getListName() +  " " + Arrays.toString(items));
-			for (MediaItemListChangeListener listener : MediaItemList.this.changeEvents) {
+			for (MediaItemListChangeListener listener : MediaItemList.this.changeEventListeners) {
 				listener.mediaItemsAdded(items);
 			}
 		}
@@ -133,7 +134,7 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 		@Override
 		public void mediaItemsRemoved(IMediaItem... items) {
 			if (MediaItemList.this.logger.isLoggable(Level.FINEST)) MediaItemList.this.logger.finest(getListName() +  " " + Arrays.toString(items));
-			for (MediaItemListChangeListener listener : MediaItemList.this.changeEvents) {
+			for (MediaItemListChangeListener listener : MediaItemList.this.changeEventListeners) {
 				listener.mediaItemsRemoved(items);
 			}
 		}
@@ -141,8 +142,16 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 		@Override
 		public void mediaItemsUpdated(IMediaItem... items) {
 			if (MediaItemList.this.logger.isLoggable(Level.FINEST)) MediaItemList.this.logger.finest(getListName() +  " " + Arrays.toString(items));
-			for (MediaItemListChangeListener listener : MediaItemList.this.changeEvents) {
+			for (MediaItemListChangeListener listener : MediaItemList.this.changeEventListeners) {
 				listener.mediaItemsUpdated(items);
+			}
+		}
+		
+		@Override
+		public void mediaItemsTagsChanged(IMediaItem... items) {
+			if (MediaItemList.this.logger.isLoggable(Level.FINEST)) MediaItemList.this.logger.finest(getListName() +  " " + Arrays.toString(items));
+			for (MediaItemListChangeListener listener : MediaItemList.this.changeEventListeners) {
+				listener.mediaItemsTagsChanged(items);
 			}
 		}
 		
