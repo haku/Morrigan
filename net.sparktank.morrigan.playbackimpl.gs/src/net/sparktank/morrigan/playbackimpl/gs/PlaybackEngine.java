@@ -263,7 +263,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 			final Element old_videoElement = this.videoElement;
 			this.videoElement = null;
 			
-			if (this.playbin != null) { // Do we have anything to attach video output to?
+			if (this.playbin != null && this.hasVideo.get()) { // Do we have anything to attach video output to and does it need it?
 				if (newParent != null) { // Can not attach video to something that is not there...
 					/* We can not move the video while it is playing, so if it is,
 					 * stop it and remember where it was.
