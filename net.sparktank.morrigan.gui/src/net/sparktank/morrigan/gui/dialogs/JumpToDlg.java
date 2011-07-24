@@ -53,6 +53,7 @@ public class JumpToDlg {
 	
 	private IMediaTrack returnValue = null;
 	private List<? extends IMediaTrack> returnList = null;
+	private String returnFilter = null;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -70,6 +71,10 @@ public class JumpToDlg {
 	
 	public List<? extends IMediaTrack> getReturnList () {
 		return this.returnList;
+	}
+	
+	public String getReturnFilter() {
+		return this.returnFilter;
 	}
 	
 	public int getKeyMask() {
@@ -92,6 +97,7 @@ public class JumpToDlg {
 	Button btnEnqueue = null;
 	Button btnReveal = null;
 	Button btnShuffleAll = null;
+	Button btnOpenView = null;
 	private Button btnCancel = null;
 	
 	private int keyMask = 0;
@@ -126,6 +132,7 @@ public class JumpToDlg {
 		this.btnEnqueue = new Button(this.shell, SWT.PUSH);
 		this.btnReveal = new Button(this.shell, SWT.PUSH);
 		this.btnShuffleAll = new Button(this.shell, SWT.PUSH);
+		this.btnOpenView = new Button(this.shell, SWT.PUSH);
 		this.btnCancel = new Button(this.shell, SWT.PUSH);
 		
 		this.shell.setDefaultButton(this.btnPlay);
@@ -152,9 +159,15 @@ public class JumpToDlg {
 		formData.height = 300;
 		this.tableViewer.getTable().setLayoutData(formData);
 		
-		this.btnShuffleAll.setText("Shuffle and enqueue");
+		this.btnOpenView.setText("Open view");
 		formData = new FormData();
 		formData.right = new FormAttachment(100, -SEP);
+		formData.bottom = new FormAttachment(100, -SEP);
+		this.btnOpenView.setLayoutData(formData);
+		
+		this.btnShuffleAll.setText("Shuffle and enqueue");
+		formData = new FormData();
+		formData.right = new FormAttachment(this.btnOpenView, -SEP);
 		formData.bottom = new FormAttachment(100, -SEP);
 		this.btnShuffleAll.setLayoutData(formData);
 		
@@ -196,6 +209,7 @@ public class JumpToDlg {
 		this.btnEnqueue.addSelectionListener(this.buttonListener);
 		this.btnReveal.addSelectionListener(this.buttonListener);
 		this.btnShuffleAll.addSelectionListener(this.buttonListener);
+		this.btnOpenView.addSelectionListener(this.buttonListener);
 		this.btnCancel.addSelectionListener(this.buttonListener);
 		
 		this.shell.pack();
@@ -254,6 +268,7 @@ public class JumpToDlg {
 		if (ok) {
 			this.returnValue = getSelectedItem();
 			this.returnList = this.searchResults;
+			this.returnFilter = this.text.getText();
 		}
 		setKeyMask(mask);
 		
@@ -354,6 +369,9 @@ public class JumpToDlg {
 			}
 			else if (e.widget == JumpToDlg.this.btnShuffleAll) {
 				leaveDlg(true, SWT.ALT);
+			}
+			else if (e.widget == JumpToDlg.this.btnOpenView) {
+				leaveDlg(true, SWT.CONTROL | SWT.SHIFT | SWT.ALT);
 			}
 			else {
 				leaveDlg(false, 0);
