@@ -30,6 +30,7 @@ import net.sparktank.morrigan.gui.helpers.ClipboardHelper;
 import net.sparktank.morrigan.gui.helpers.MonitorHelper;
 import net.sparktank.morrigan.gui.helpers.RefreshTimer;
 import net.sparktank.morrigan.gui.helpers.TrayHelper;
+import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.IMediaPlaylist;
 import net.sparktank.morrigan.model.media.IMediaTrack;
@@ -667,16 +668,31 @@ public abstract class AbstractPlayerView extends ViewPart {
 			IMediaTrackList<? extends IMediaTrack> currentList = getPlayer().getCurrentList();
 			if (currentList == null) return;
 			if (!(currentList instanceof IMediaTrackDb<?,?,?>)) return;
+			IMediaTrackDb<?,?,?> mediaTrackDb = (IMediaTrackDb<?,?,?>) currentList;
 			
 			JumpToDlg dlg = new JumpToDlg(getViewSite().getShell(), (IMediaTrackDb<?,?,?>) currentList);
 			dlg.open();
 			IMediaTrack item = dlg.getReturnItem();
 			if (item != null) {
 				if ((dlg.getKeyMask() & SWT.ALT) != 0 && dlg.getReturnList() != null) {
-					List<IMediaTrack> shuffeledList = new ArrayList<IMediaTrack>(dlg.getReturnList());
-					Collections.shuffle(shuffeledList);
-					for (IMediaTrack track : shuffeledList) {
-						getPlayer().addToQueue(new PlayItem(currentList, track));
+					if ((dlg.getKeyMask() & SWT.SHIFT) != 0 && (dlg.getKeyMask() & SWT.CONTROL) != 0) {
+						String filter = dlg.getReturnFilter();
+						try {
+							MediaItemDbEditorInput input = EditorFactory.getMmdbInput(mediaTrackDb.getDbPath(), filter);
+							getSite().getWorkbenchWindow().getActivePage().openEditor(input, LocalMixedMediaDbEditor.ID);
+						}
+						catch (MorriganException e) {
+							getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));
+						} catch (PartInitException e) {
+							getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));
+						}
+					}
+					else {
+						List<IMediaTrack> shuffeledList = new ArrayList<IMediaTrack>(dlg.getReturnList());
+						Collections.shuffle(shuffeledList);
+						for (IMediaTrack track : shuffeledList) {
+							getPlayer().addToQueue(new PlayItem(currentList, track));
+						}
 					}
 				}
 				else if ((dlg.getKeyMask() & SWT.SHIFT) != 0 && (dlg.getKeyMask() & SWT.CONTROL) != 0) {
