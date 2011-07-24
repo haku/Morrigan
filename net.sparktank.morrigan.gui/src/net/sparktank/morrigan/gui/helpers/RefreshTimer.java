@@ -22,14 +22,29 @@ public class RefreshTimer implements Runnable {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	AtomicBoolean running = new AtomicBoolean(false);
-	AtomicBoolean requested = new AtomicBoolean(false);
-	AtomicLong lastRun = new AtomicLong();
+	public void scheduleUpdate () {
+		this.update(false);
+	}
 	
-	public void triggerUpdate () {
+	public void updateNow () {
+		this.update(true);
+	}
+	
+	@Override
+	public void run() { // from Runnable interface.
+		scheduleUpdate();
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	protected AtomicBoolean running = new AtomicBoolean(false);
+	protected AtomicBoolean requested = new AtomicBoolean(false);
+	protected AtomicLong lastRun = new AtomicLong();
+	
+	private void update (boolean force) {
 		if (this.requested.compareAndSet(false, true) && !this.running.get()) {
 			final long d = System.currentTimeMillis() - this.lastRun.get();
-			if (d > this.minInterval) {
+			if (force || d > this.minInterval) {
 //				System.err.println("RefreshTimer.triggerUpdate(): calling asyncExec(update).");
 				this.display.asyncExec(this.update);
 			}
@@ -46,7 +61,7 @@ public class RefreshTimer implements Runnable {
 		}
 	}
 	
-	Runnable update = new Runnable() {
+	protected Runnable update = new Runnable() {
 		@Override
 		public void run() {
 			RefreshTimer.this.running.set(true);
@@ -66,13 +81,6 @@ public class RefreshTimer implements Runnable {
 			}
 		}
 	};
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	@Override
-	public void run() {
-		triggerUpdate();
-	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
