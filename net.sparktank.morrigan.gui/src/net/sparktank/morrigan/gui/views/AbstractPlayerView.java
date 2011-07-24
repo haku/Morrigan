@@ -11,7 +11,7 @@ import net.sparktank.morrigan.engines.hotkey.IHotkeyEngine;
 import net.sparktank.morrigan.engines.hotkey.IHotkeyListener;
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import net.sparktank.morrigan.gui.Activator;
-import net.sparktank.morrigan.gui.dialogs.JumpToDlg;
+import net.sparktank.morrigan.gui.actions.JumpToAction;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.dialogs.RunnableDialog;
 import net.sparktank.morrigan.gui.display.FullscreenShell;
@@ -30,11 +30,9 @@ import net.sparktank.morrigan.gui.helpers.ClipboardHelper;
 import net.sparktank.morrigan.gui.helpers.MonitorHelper;
 import net.sparktank.morrigan.gui.helpers.RefreshTimer;
 import net.sparktank.morrigan.gui.helpers.TrayHelper;
-import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.IMediaPlaylist;
 import net.sparktank.morrigan.model.media.IMediaTrack;
-import net.sparktank.morrigan.model.media.IMediaTrackDb;
 import net.sparktank.morrigan.model.media.IMediaTrackList;
 import net.sparktank.morrigan.model.media.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.IMixedMediaList;
@@ -48,7 +46,6 @@ import net.sparktank.morrigan.player.PlayerRegister;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.MenuManager;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -540,6 +537,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 //	Making actions.
 	
 	private List<OrderSelectAction> orderMenuActions = new ArrayList<OrderSelectAction>();
+	protected IAction jumpToAction;
 	
 	private void makeActions (Composite parent) {
 		// Order menu.
@@ -555,6 +553,8 @@ public abstract class AbstractPlayerView extends ViewPart {
 		}
 		
 		makeFullScreenActions(parent);
+		
+		this.jumpToAction = new JumpToAction(getSite().getWorkbenchWindow());
 	}
 	
 	protected List<OrderSelectAction> getOrderMenuActions () {
@@ -662,56 +662,10 @@ public abstract class AbstractPlayerView extends ViewPart {
 		}
 	};
 	
-	protected IAction jumpToAction = new Action ("Jump to...") {
-		@Override
-		public void run() {
-			IMediaTrackList<? extends IMediaTrack> currentList = getPlayer().getCurrentList();
-			if (currentList == null) return;
-			if (!(currentList instanceof IMediaTrackDb<?,?,?>)) return;
-			IMediaTrackDb<?,?,?> mediaTrackDb = (IMediaTrackDb<?,?,?>) currentList;
-			
-			JumpToDlg dlg = new JumpToDlg(getViewSite().getShell(), (IMediaTrackDb<?,?,?>) currentList);
-			dlg.open();
-			IMediaTrack item = dlg.getReturnItem();
-			if (item != null) {
-				if ((dlg.getKeyMask() & SWT.ALT) != 0 && dlg.getReturnList() != null) {
-					if ((dlg.getKeyMask() & SWT.SHIFT) != 0 && (dlg.getKeyMask() & SWT.CONTROL) != 0) {
-						String filter = dlg.getReturnFilter();
-						try {
-							MediaItemDbEditorInput input = EditorFactory.getMmdbInput(mediaTrackDb.getDbPath(), filter);
-							getSite().getWorkbenchWindow().getActivePage().openEditor(input, LocalMixedMediaDbEditor.ID);
-						}
-						catch (MorriganException e) {
-							getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));
-						} catch (PartInitException e) {
-							getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));
-						}
-					}
-					else {
-						List<IMediaTrack> shuffeledList = new ArrayList<IMediaTrack>(dlg.getReturnList());
-						Collections.shuffle(shuffeledList);
-						for (IMediaTrack track : shuffeledList) {
-							getPlayer().addToQueue(new PlayItem(currentList, track));
-						}
-					}
-				}
-				else if ((dlg.getKeyMask() & SWT.SHIFT) != 0 && (dlg.getKeyMask() & SWT.CONTROL) != 0) {
-					revealItemInLists(currentList, item);
-				}
-				else if ((dlg.getKeyMask() & SWT.SHIFT) != 0 || (dlg.getKeyMask() & SWT.CONTROL) != 0) {
-					getPlayer().addToQueue(new PlayItem(currentList, item));
-				}
-				else {
-					getPlayer().loadAndStartPlaying(currentList, item);
-				}
-			}
-		}
-	};
-	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Find in list.
 	
-	protected void revealItemInLists (IMediaTrackList<? extends IMediaTrack> list, IMediaTrack item) {
+	public void revealItemInLists (IMediaTrackList<? extends IMediaTrack> list, IMediaTrack item) {
 		try {
 			if (list.getType().equals(ILocalMixedMediaDb.TYPE)) {
 				MediaItemDbEditorInput input = EditorFactory.getMmdbInputBySerial(list.getSerial());

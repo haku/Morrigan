@@ -3,6 +3,7 @@ package net.sparktank.morrigan.gui.editors.mmdb;
 import java.util.List;
 
 import net.sparktank.morrigan.gui.actions.DbUpdateAction;
+import net.sparktank.morrigan.gui.actions.JumpToAction;
 import net.sparktank.morrigan.gui.adaptors.ActionListener;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.views.ViewLibraryProperties;
@@ -29,6 +30,7 @@ public class LocalMixedMediaDbEditor
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Create GUI.
 	
+	private Button btnJumpTo = null;
 	private Button btnAddToQueue = null;
 	private Button btnAdd = null;
 	
@@ -44,6 +46,11 @@ public class LocalMixedMediaDbEditor
 	@Override
 	protected List<Control> populateToolbar(Composite parent) {
 		List<Control> ret = super.populateToolbar(parent);
+		
+		this.btnJumpTo = new Button(parent, SWT.PUSH);
+		this.btnJumpTo.setImage(getImageCache().readImage("icons/search.gif"));
+		this.btnJumpTo.addSelectionListener(new ActionListener(new JumpToAction(getSite().getWorkbenchWindow(), getMediaList())));
+		ret.add(ret.size() - 1, this.btnJumpTo);
 		
 		this.btnAddToQueue = new Button(parent, SWT.PUSH);
 		this.btnAddToQueue.setImage(getImageCache().readImage("icons/queue-add.gif"));
