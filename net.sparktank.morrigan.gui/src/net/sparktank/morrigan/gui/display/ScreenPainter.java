@@ -122,14 +122,14 @@ public class ScreenPainter implements PaintListener {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private Rectangle drawTextHCen (PaintEvent e, int x, int top, String text) {
+	private static Rectangle drawTextHCen (PaintEvent e, int x, int top, String text) {
 		Point textSize = e.gc.textExtent(text);
 		int _left = x - (textSize.x / 2);
 		e.gc.drawText(text, _left, top, SWT.TRANSPARENT);
 		return new Rectangle(_left, top, textSize.x, textSize.y);
 	}
 	
-	private Rectangle drawTextHVCen (PaintEvent e, int x, int y, String... text) {
+	private static Rectangle drawTextHVCen (PaintEvent e, int x, int y, String... text) {
 		Rectangle ret = new Rectangle(x, y, 0, 0);
 		
 		for (int i=0; i < text.length; i++) {
@@ -148,7 +148,7 @@ public class ScreenPainter implements PaintListener {
 		return ret;
 	}
 	
-	private Rectangle drawTextHVCen (PaintEvent e, int x, int y, String text) {
+	private static Rectangle drawTextHVCen (PaintEvent e, int x, int y, String text) {
 		String[] split = text.split("\n");
 		return drawTextHVCen(e, x, y, split);
 	}

@@ -65,7 +65,7 @@ public abstract class AbstractMixedMediaDb<H extends IAbstractMixedMediaDb<H>>
 				} catch (DbException e) {
 					e.printStackTrace();
 				}
-			};
+			}
 		}.run();
 	}
 	

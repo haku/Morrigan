@@ -49,7 +49,7 @@ public class MixedMediaSqliteLayerFactory extends RecyclingFactory<IMixedMediaSt
 	/**
 	 * TODO share this between same DBs?
 	 */
-	private MixedMediaItemFactory getItemFactory () {
+	private static MixedMediaItemFactory getItemFactory () {
 		return new MixedMediaItemFactory();
 	}
 	

@@ -78,7 +78,7 @@ public abstract class RecyclingFactory2<T extends Object, K extends Object, S ex
 		}
 	}
 	
-	protected void disposeProduct (T product) {
+	protected void disposeProduct (@SuppressWarnings("unused") T product) {
 		throw new IllegalArgumentException("Not implemented.");
 	}
 	

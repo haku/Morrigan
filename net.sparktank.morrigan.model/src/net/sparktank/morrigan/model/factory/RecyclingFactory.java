@@ -95,7 +95,7 @@ public abstract class RecyclingFactory<T extends Object, K extends Object, P ext
 		}
 	}
 	
-	protected void disposeProduct (T product) {
+	protected void disposeProduct (@SuppressWarnings("unused") T product) {
 		throw new IllegalArgumentException("Not implemented.");
 	}
 	
@@ -104,14 +104,14 @@ public abstract class RecyclingFactory<T extends Object, K extends Object, P ext
 	/**
 	 * @throws S  
 	 */
-	protected T makeNewProduct (K material) throws S {
+	protected T makeNewProduct (@SuppressWarnings("unused") K material) throws S {
 		throw new IllegalArgumentException("Not implemented.");
 	}
 	
 	/**
 	 * @throws S  
 	 */
-	protected T makeNewProduct (K material, P config) throws S {
+	protected T makeNewProduct (@SuppressWarnings("unused") K material, @SuppressWarnings("unused") P config) throws S {
 		throw new IllegalArgumentException("Not implemented.");
 	}
 	

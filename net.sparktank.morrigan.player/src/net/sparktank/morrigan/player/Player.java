@@ -667,7 +667,7 @@ public class Player implements IPlayerLocal {
 				Player.this.logger.info("No more tracks to play.");
 				Player.this.eventHandler.updateStatus();
 			}
-		};
+		}
 		
 		@Override
 		public void onError(Exception e) {

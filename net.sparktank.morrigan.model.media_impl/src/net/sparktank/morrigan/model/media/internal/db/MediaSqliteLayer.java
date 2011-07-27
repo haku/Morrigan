@@ -752,7 +752,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		}
 	}
 	
-	private List<MediaTagClassification> local_getTagClassification_parseRecordSet (ResultSet rs) throws SQLException {
+	private static List<MediaTagClassification> local_getTagClassification_parseRecordSet (ResultSet rs) throws SQLException {
 		List<MediaTagClassification> ret = new LinkedList<MediaTagClassification>();
 		
 		while (rs.next()) {

@@ -171,7 +171,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
     		sb.append(");");
     		
     		return sb.toString();
-		};
+		}
 	};
 	
 	private static final String SQL_TBL_MEDIAFILES_REMOVE =
@@ -261,7 +261,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 		l.add(SqliteHelper.generateSql_Create(SQL_TBL_MEDIAFILES_NAME, SQL_TBL_MEDIAFILES_COLS));
 		
 		return l;
-	};
+	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	MediaItem getters.

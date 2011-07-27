@@ -91,7 +91,7 @@ public class PlayersServlet extends HttpServlet {
 		}
 	}
 	
-	private void writeResponse (HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+	private static void writeResponse (HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
 		String requestURI = req.getRequestURI();
 		String reqPath = requestURI.startsWith(CONTEXTPATH) ? requestURI.substring(CONTEXTPATH.length()) : requestURI;
 		

@@ -76,13 +76,13 @@ public class MorriganCommandProvider implements CommandProvider {
 			doQueue(ci, args);
 		}
 		else if (cmd.equals("pause")) {
-			doPause(ci, args);
+			doPause(ci);
 		}
 		else if (cmd.equals("s") || cmd.equals("stop")) {
-			doStop(ci, args);
+			doStop(ci);
 		}
 		else if (cmd.equals("n") || cmd.equals("next")) {
-			doNext(ci, args);
+			doNext(ci);
 		}
 		else {
 			ci.println("Unknown command '"+cmd+"'.");
@@ -523,7 +523,7 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 	}
 	
-	static private void doPause (CommandInterpreter ci, List<String> args) {
+	static private void doPause (CommandInterpreter ci) {
 		if (PlayerRegister.getLocalPlayers().size() == 1) {
 			IPlayerLocal player = PlayerRegister.getLocalPlayer(0);
 			doPlayersPlayerPause(ci, player);
@@ -533,7 +533,7 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 	}
 	
-	static private void doStop (CommandInterpreter ci, List<String> args) {
+	static private void doStop (CommandInterpreter ci) {
 		if (PlayerRegister.getLocalPlayers().size() == 1) {
 			IPlayerLocal player = PlayerRegister.getLocalPlayer(0);
 			doPlayersPlayerStop(ci, player);
@@ -543,7 +543,7 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 	}
 	
-	static private void doNext (CommandInterpreter ci, List<String> args) {
+	static private void doNext (CommandInterpreter ci) {
 		if (PlayerRegister.getLocalPlayers().size() == 1) {
 			IPlayerLocal player = PlayerRegister.getLocalPlayer(0);
 			doPlayersPlayerNext(ci, player);

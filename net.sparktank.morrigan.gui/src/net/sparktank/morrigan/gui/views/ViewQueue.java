@@ -236,7 +236,7 @@ public class ViewQueue extends ViewPart {
 		@Override
 		public void run() {
 			ViewQueue.this.abstractPlayerView.getPlayer().shuffleQueue();
-		};
+		}
 	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

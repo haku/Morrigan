@@ -45,13 +45,13 @@ public class HotkeyValue {
 			+ "|" + booleanToInt(this.supr);
 	}
 	
-	private int booleanToInt (boolean b) {
+	private static int booleanToInt (boolean b) {
 		if (b) { return 1; }
 		
 		return 0; 
 	}
 	
-	private boolean intToBoolean (int i) {
+	private static boolean intToBoolean (int i) {
 		if (i==1) { return true; }
 		
 		return false; 

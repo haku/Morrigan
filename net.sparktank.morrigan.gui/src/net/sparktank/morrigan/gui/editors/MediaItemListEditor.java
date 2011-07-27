@@ -52,7 +52,6 @@ import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.TableColumn;
@@ -629,7 +628,7 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 				sb.append(item.getFilepath());
 				if (items.size() > 1) sb.append(newLine);
 			}
-			ClipboardHelper.setText(sb.toString(), Display.getCurrent());
+			ClipboardHelper.setText(sb.toString());
 		}
 	};
 	
