@@ -142,7 +142,7 @@ public class SqliteLayer extends GenericSqliteLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Data fetching helper methods.
 	
-	private List<NemainEvent> _getEvents_parseRecordSet (ResultSet rs) throws SQLException {
+	private static List<NemainEvent> _getEvents_parseRecordSet (ResultSet rs) throws SQLException {
 		List<NemainEvent> ret = new LinkedList<NemainEvent>();
 		
 		while (rs.next()) {
