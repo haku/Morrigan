@@ -16,7 +16,7 @@
 		<property name="procDirectory" value="${basedir}/proc" />
 		
 		<!-- Locate deltapack. -->
-		<property name="deltapack" value="${eclipse.home}/../eclipse-3.6.1-delta-pack" />
+		<property name="deltapack" value="${eclipse.home}/../eclipse-3.7-delta-pack" />
 		<echo message="deltapack=${deltapack}" />
 		<available property="haveDeltaPack" file="${deltapack}" />
 		<fail unless="haveDeltaPack" message="Deltapack not found." />

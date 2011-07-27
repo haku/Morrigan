@@ -4,7 +4,7 @@
 <target name="net.sparktank.morrigan">
 <locations>
 <location path="${eclipse_home}" type="Directory"/>
-<location path="${eclipse_home}/../eclipse-3.6.1-delta-pack" type="Directory"/>
+<location path="${eclipse_home}/../eclipse-3.7-delta-pack" type="Directory"/>
 <location path="${project_loc}" type="Directory"/>
 </locations>
 </target>
