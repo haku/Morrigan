@@ -75,7 +75,7 @@ public class ViewMediaExplorer extends ViewPart {
 		this.tableViewer.addDoubleClickListener(this.doubleClickListener);
 		
 		addToolbar();
-		makeContextMenu(parent);
+		makeContextMenu();
 	}
 	
 	@Override
@@ -118,7 +118,7 @@ public class ViewMediaExplorer extends ViewPart {
 		getViewSite().getActionBars().getToolBarManager().add(new NewRemoteMixedDbAction(getViewSite().getWorkbenchWindow()));
 	}
 	
-	private void makeContextMenu (Composite parent) {
+	private void makeContextMenu () {
 		final MenuManager mgr = new MenuManager();
 		mgr.setRemoveAllWhenShown(true);
 		mgr.addMenuListener(new IMenuListener() {

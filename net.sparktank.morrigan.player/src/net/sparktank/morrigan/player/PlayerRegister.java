@@ -55,7 +55,7 @@ public class PlayerRegister {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Remote players.
 	
-	static public IPlayerRemote makeRemotePlayer (String name, String remoteHost, int remotePlayerId, IPlayerEventHandler eventHandler) {
+	static public IPlayerRemote makeRemotePlayer (String name, String remoteHost, int remotePlayerId) {
 		int n = nextPlayerN.getAndIncrement();
 		PlayerRemote player = new PlayerRemote(n, name, remoteHost, remotePlayerId);
 		addRemotePlayer(player);

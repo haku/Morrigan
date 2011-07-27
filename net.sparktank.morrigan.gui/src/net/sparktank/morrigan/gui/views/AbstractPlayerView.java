@@ -48,7 +48,6 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IMemento;
@@ -639,7 +638,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 		public void run() {
 			PlayItem currentItem = getPlayer().getCurrentItem();
 			if (currentItem != null) {
-				ClipboardHelper.setText(currentItem.item.getFilepath(), Display.getCurrent());
+				ClipboardHelper.setText(currentItem.item.getFilepath());
 			
 			} else {
 				new MorriganMsgDlg("No track loaded desu~.").open();

@@ -29,7 +29,7 @@ import net.sparktank.sqlitewrapper.DbException;
 public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<Q, ? extends IMediaItemStorageLayer<T>,T>, T extends IMediaItem> implements IMorriganTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	protected enum ScanOption {KEEP, DELREF, MOVEFILE};
+	protected enum ScanOption {KEEP, DELREF, MOVEFILE}
 	
 	protected class OpResult {
 		
@@ -61,7 +61,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<Q, ? extends IMed
 			return this.faital;
 		}
 		
-	};
+	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	

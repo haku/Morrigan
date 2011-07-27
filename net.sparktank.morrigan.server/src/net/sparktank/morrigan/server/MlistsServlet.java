@@ -100,7 +100,7 @@ public class MlistsServlet extends HttpServlet {
 	/**
 	 * Param action will not be null when verb==POST.
 	 */
-	private void processRequest (Verb verb, HttpServletRequest req, HttpServletResponse resp, String action) throws IOException, DbException, SAXException, MorriganException {
+	private static void processRequest (Verb verb, HttpServletRequest req, HttpServletResponse resp, String action) throws IOException, DbException, SAXException, MorriganException {
 		String requestURI = req.getRequestURI();
 		String reqPath = requestURI.startsWith(CONTEXTPATH) ? requestURI.substring(CONTEXTPATH.length()) : requestURI;
 		
@@ -147,7 +147,7 @@ public class MlistsServlet extends HttpServlet {
 		}
 	}
 	
-	private void postToRoot(HttpServletResponse resp, String action) throws IOException {
+	private static void postToRoot(HttpServletResponse resp, String action) throws IOException {
 		if (action.equals(CMD_NEWMMDB)) {
 			resp.setContentType("text/plain");
 			resp.getWriter().println("TODO implement create new MMDB cmd desu~");
@@ -159,7 +159,7 @@ public class MlistsServlet extends HttpServlet {
 		}
 	}
 	
-	private void postToMmdb(HttpServletRequest req, HttpServletResponse resp, String action, ILocalMixedMediaDb mmdb, String path, String afterPath) throws IOException, MorriganException, DbException {
+	private static void postToMmdb(HttpServletRequest req, HttpServletResponse resp, String action, ILocalMixedMediaDb mmdb, String path, String afterPath) throws IOException, MorriganException, DbException {
 		if (action.equals(CMD_PLAY) || action.equals(CMD_QUEUE)) {
 			String playerIdS = req.getParameter("playerid");
 			if (playerIdS == null) {

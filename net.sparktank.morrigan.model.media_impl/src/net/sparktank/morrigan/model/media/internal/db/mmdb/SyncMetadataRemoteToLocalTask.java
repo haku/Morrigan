@@ -93,7 +93,7 @@ public class SyncMetadataRemoteToLocalTask implements IMorriganTask {
 	/**
 	 * TODO also sync tags.
 	 */
-	private void syncMediaItems (final ILocalMixedMediaDb db, IMixedMediaItem remoteItem, IMixedMediaItem localItem) throws MorriganException {
+	private static void syncMediaItems (final ILocalMixedMediaDb db, IMixedMediaItem remoteItem, IMixedMediaItem localItem) throws MorriganException {
 		if (remoteItem.getStartCount() > localItem.getStartCount()) {
 			db.setTrackStartCnt(localItem, remoteItem.getStartCount());
 		}

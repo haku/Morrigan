@@ -51,7 +51,7 @@ public class OrderHelper {
 			return this.n;
 		}
 		
-	};
+	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	

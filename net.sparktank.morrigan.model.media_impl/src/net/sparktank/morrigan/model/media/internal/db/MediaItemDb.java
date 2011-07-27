@@ -290,7 +290,7 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 				} catch (DbException e) {
 					e.printStackTrace();
 				}
-			};
+			}
 		}.run();
 	}
 	
