@@ -10,7 +10,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 	
 	@Override
 	public void initializeDefaultPreferences() {
-		IEclipsePreferences defaults = new DefaultScope().getNode(Activator.PLUGIN_ID);
+		IEclipsePreferences defaults = DefaultScope.INSTANCE.getNode(Activator.PLUGIN_ID);
 		
 		defaults.putBoolean(GeneralPref.PREF_WINDOW_MINTOTRAY, false);
 		

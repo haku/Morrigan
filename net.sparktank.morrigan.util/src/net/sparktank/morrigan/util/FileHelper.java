@@ -49,13 +49,10 @@ public class FileHelper {
 							throw e; // We have run out of options.
 						}
 						System.err.println("Reduced chunk size to " + chunkSizeMb + " mb.");
-						if (srcChannel != null) {
-							srcChannel.close();
-						}
-						if (dstChannel != null) {
-							dstChannel.close();
-						}
-					} else {
+						srcChannel.close();
+						if (dstChannel != null) dstChannel.close();
+					}
+					else {
 						throw e;
 					}
 					
