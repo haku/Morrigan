@@ -24,7 +24,7 @@ import net.sparktank.morrigan.util.FileHelper;
 public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemList<T> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	protected final Logger logger = Logger.getLogger(this.getClass().getName());
+	final Logger logger = Logger.getLogger(this.getClass().getName());
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors and parameters.

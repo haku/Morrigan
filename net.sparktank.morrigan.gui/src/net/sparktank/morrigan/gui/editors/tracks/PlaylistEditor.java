@@ -3,7 +3,6 @@ package net.sparktank.morrigan.gui.editors.tracks;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import net.sparktank.morrigan.config.Config;
 import net.sparktank.morrigan.gui.Activator;
@@ -39,10 +38,6 @@ public class PlaylistEditor extends MediaTrackListEditor<IMediaPlaylist,IMediaTr
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static final String ID = "net.sparktank.morrigan.gui.editors.PlaylistEditor";
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	Logger logger = Logger.getLogger(this.getClass().getName());
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -258,13 +253,10 @@ public class PlaylistEditor extends MediaTrackListEditor<IMediaPlaylist,IMediaTr
 				this.lastDir = baseDir;
 				
 				String[] files = dialog.getFileNames();
-				int n = 0;
 				for (String file : files) {
 					String toAdd = baseDir + File.separatorChar + file;
 					getMediaList().addNewItem(toAdd);
-					n++;
 				}
-				PlaylistEditor.this.logger.fine("Added " + n + " file to '" + getTitle() + "'.");
 			}
 		}
 		
