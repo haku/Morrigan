@@ -294,7 +294,7 @@ public class CalendarPlot extends Canvas implements PaintListener, MouseListener
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private Rectangle drawTextHCen (PaintEvent e, int x, int top, String text) {
+	private static Rectangle drawTextHCen (PaintEvent e, int x, int top, String text) {
 		Point textSize = e.gc.textExtent(text);
 		int _left = x - (textSize.x / 2);
 		e.gc.drawText(text, _left, top, SWT.DRAW_TRANSPARENT);
