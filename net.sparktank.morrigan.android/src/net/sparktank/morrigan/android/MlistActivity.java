@@ -40,10 +40,13 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnCreateContextMenuListener;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -51,6 +54,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MlistActivity extends Activity implements MlistStateChangeListener, MlistItemListChangeListener {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -118,9 +122,10 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 	private void wireGui () {
 		this.mlistItemListAdapter = new ArtifactListAdaptorImpl<MlistItemList>(this, R.layout.mlistitemlistrow);
 		
-		ListView lstServers = (ListView) findViewById(R.id.lstItems);
-		lstServers.setAdapter(this.mlistItemListAdapter);
-		lstServers.setOnItemClickListener(this.mlistItemListCickListener);
+		ListView lstItems = (ListView) findViewById(R.id.lstItems);
+		lstItems.setAdapter(this.mlistItemListAdapter);
+		lstItems.setOnItemClickListener(this.mlistItemListCickListener);
+		lstItems.setOnCreateContextMenuListener(this.itemsContextMenuListener);
 		
 		ImageButton cmd;
 		
@@ -145,6 +150,31 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 			itemClicked(item);
 		}
 	};
+	
+	private OnCreateContextMenuListener itemsContextMenuListener = new OnCreateContextMenuListener () {
+		@Override
+		public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+			AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
+			MlistItem mlistItem = MlistActivity.this.mlistItemListAdapter.getInputData().getMlistItemList().get(info.position);
+			menu.setHeaderTitle(mlistItem.getTitle());
+			menu.add(Menu.NONE, 1, Menu.NONE, "Download");
+		}
+	};
+	
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case 1:
+				AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+				MlistItem mlistItem = MlistActivity.this.mlistItemListAdapter.getInputData().getMlistItemList().get(info.position);
+				String url = this.playerReference.getServerReference().getBaseUrl() + mlistItem.getRelativeUrl();
+				Toast.makeText(MlistActivity.this, "TODO: download '" + url + "'.", Toast.LENGTH_LONG).show();
+				return true;
+			
+			default:
+				return super.onContextItemSelected(item);
+		}
+	}
 	
 	class BtnPlay_OnClick implements OnClickListener {
 		@Override
