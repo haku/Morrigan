@@ -17,18 +17,17 @@
 package net.sparktank.morrigan.android.tasks;
 
 import java.io.IOException;
-import java.net.ConnectException;
+import java.io.InputStream;
 
-import net.sparktank.morrigan.android.helper.HttpHelper;
 import net.sparktank.morrigan.android.model.MlistItem;
 import net.sparktank.morrigan.android.model.PlayerReference;
+
+import org.xml.sax.SAXException;
+
 import android.app.Activity;
-import android.app.ProgressDialog;
-import android.os.AsyncTask;
-import android.util.Log;
 import android.widget.Toast;
 
-public class RunMlistItemActionTask extends AsyncTask<Void, Void, String> {
+public class RunMlistItemActionTask extends AbstractTask<String> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	static public enum MlistItemCommand {
@@ -48,17 +47,14 @@ public class RunMlistItemActionTask extends AsyncTask<Void, Void, String> {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private final Activity activity;
 	private final PlayerReference playerReference;
 	private final MlistItem mlistItem;
 	private final MlistItemCommand cmd;
 	
-	private Exception exception;
-	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public RunMlistItemActionTask (Activity activity, PlayerReference playerReference, MlistItem mlistItem, MlistItemCommand cmd) {
-		this.activity = activity;
+		super(activity);
 		this.playerReference = playerReference;
 		this.mlistItem = mlistItem;
 		this.cmd = cmd;
@@ -66,20 +62,23 @@ public class RunMlistItemActionTask extends AsyncTask<Void, Void, String> {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private ProgressDialog dialog;
-	
-	// In UI thread:
 	@Override
-	protected void onPreExecute() {
-		super.onPreExecute();
-		this.dialog = ProgressDialog.show(this.activity, null, "Please wait...", true);
+		protected String getProgressMsg () {
+		return "Please wait...";
+		}
+	
+	@Override
+	protected String getUrl () {
+		return this.playerReference.getServerReference().getBaseUrl() + this.mlistItem.getRelativeUrl();
 	}
 	
-	// In background thread:
 	@Override
-	protected String doInBackground(Void... params) {
-		String url = this.playerReference.getServerReference().getBaseUrl() + this.mlistItem.getRelativeUrl();
-		
+	protected String getVerb () {
+		return "POST";
+	}
+	
+	@Override
+	protected String getEncodedData () {
 		String encodedData = "action=";
 		switch (this.cmd) {
 			case PLAY:
@@ -92,36 +91,24 @@ public class RunMlistItemActionTask extends AsyncTask<Void, Void, String> {
 				
 			default: throw new IllegalArgumentException();
 		}
-		
 		encodedData = encodedData.concat("&playerid=" + String.valueOf(this.playerReference.getPlayerId()));
-		
-		try {
-			String resp = HttpHelper.getUrlContent(url, "POST", encodedData, "application/x-www-form-urlencoded");
-			return resp;
-		}
-		catch (ConnectException e) {
-			this.exception = e;
-			return null;
-		} catch (IOException e) {
-			this.exception = e;
-			return null;
-		}
+		return encodedData;
+	}
+	
+	@Override
+	protected String getContentType () {
+		return "application/x-www-form-urlencoded";
+	}
+	
+	@Override
+	protected String parseStream (InputStream is) throws IOException, SAXException {
+		return parseStreamToString(is);
 	}
 	
 	// In UI thread:
 	@Override
-	protected void onPostExecute(String result) {
-		super.onPostExecute(result);
-		
-		if (this.exception != null) { // TODO handle this better.
-			Toast.makeText(this.activity, this.exception.getMessage(), Toast.LENGTH_SHORT).show();
-			Log.e("Morrigan", "result=" + result, this.exception);
-		}
-		else {
-			Toast.makeText(this.activity, result, Toast.LENGTH_SHORT).show();
-		}
-		
-		this.dialog.dismiss(); // This will fail if the screen is rotated while we are fetching.
+	protected void onSuccess (String result) {
+		Toast.makeText(getActivity(), result, Toast.LENGTH_SHORT).show();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

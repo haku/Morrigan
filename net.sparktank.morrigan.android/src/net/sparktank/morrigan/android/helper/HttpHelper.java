@@ -84,19 +84,8 @@ public class HttpHelper {
 				streamHandler.handleStream(is);
 			}
 			else {
-//				int v;
-//				sb = new StringBuilder();
-//				while( (v = is.read()) != -1){
-//					sb.append((char)v);
-//				}
-				
-				BufferedReader rd = new BufferedReader(new InputStreamReader(is));
 				sb = new StringBuilder();
-				String line;
-				while ((line = rd.readLine()) != null) {
-					sb.append(line);
-					sb.append("\n");
-				}
+				buildString(is, sb);
 			}
 		}
 		finally {
@@ -104,6 +93,23 @@ public class HttpHelper {
 		}
 		
 		return sb == null ? null : sb.toString();
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	public static void buildString (InputStream is, StringBuilder sb) throws IOException {
+//		int v;
+//		sb = new StringBuilder();
+//		while( (v = is.read()) != -1){
+//			sb.append((char)v);
+//		}
+		
+		BufferedReader rd = new BufferedReader(new InputStreamReader(is));
+		String line;
+		while ((line = rd.readLine()) != null) {
+			sb.append(line);
+			sb.append("\n");
+		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
