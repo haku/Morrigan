@@ -30,6 +30,7 @@ import net.sparktank.morrigan.android.model.impl.ArtifactListAdaptorImpl;
 import net.sparktank.morrigan.android.model.impl.MlistReferenceImpl;
 import net.sparktank.morrigan.android.model.impl.PlayerReferenceImpl;
 import net.sparktank.morrigan.android.model.impl.ServerReferenceImpl;
+import net.sparktank.morrigan.android.tasks.DownloadMediaTask;
 import net.sparktank.morrigan.android.tasks.GetMlistItemListTask;
 import net.sparktank.morrigan.android.tasks.GetMlistTask;
 import net.sparktank.morrigan.android.tasks.RunMlistActionTask;
@@ -54,7 +55,6 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class MlistActivity extends Activity implements MlistStateChangeListener, MlistItemListChangeListener {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -167,8 +167,10 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 			case 1:
 				AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
 				MlistItem mlistItem = MlistActivity.this.mlistItemListAdapter.getInputData().getMlistItemList().get(info.position);
-				String url = this.playerReference.getServerReference().getBaseUrl() + mlistItem.getRelativeUrl();
-				Toast.makeText(MlistActivity.this, "TODO: download '" + url + "'.", Toast.LENGTH_LONG).show();
+				
+				DownloadMediaTask task = new DownloadMediaTask(this, this.serverReference);
+				task.execute(mlistItem);
+				
 				return true;
 			
 			default:
