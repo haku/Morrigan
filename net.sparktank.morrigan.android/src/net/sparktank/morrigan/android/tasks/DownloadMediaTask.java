@@ -16,15 +16,12 @@
 
 package net.sparktank.morrigan.android.tasks;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
+import net.sparktank.morrigan.android.helper.HttpFileDownloadHandler;
+import net.sparktank.morrigan.android.helper.HttpFileDownloadHandler.DownloadProgressListener;
 import net.sparktank.morrigan.android.helper.HttpHelper;
-import net.sparktank.morrigan.android.helper.HttpHelper.HttpStreamHandler;
 import net.sparktank.morrigan.android.model.MlistItem;
 import net.sparktank.morrigan.android.model.ServerReference;
 import android.app.ProgressDialog;
@@ -34,11 +31,6 @@ import android.os.Environment;
 import android.widget.Toast;
 
 public class DownloadMediaTask extends AsyncTask<MlistItem, Integer, String> {
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	private static final int DOWNLOADBUFFERSIZE = 8192;
-	private static final int GUIUPDATEINTERVALMILLIS = 500;
-	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private final Context context;
@@ -64,7 +56,6 @@ public class DownloadMediaTask extends AsyncTask<MlistItem, Integer, String> {
 	private static int PRGMAX = 10000;
 	
 	@Override
-//	- - - - - - - - - - - - - - - - - - - -
 	protected void onPreExecute () {
 		ProgressDialog progressDialog = new ProgressDialog(this.context);
 		progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
@@ -82,9 +73,17 @@ public class DownloadMediaTask extends AsyncTask<MlistItem, Integer, String> {
 		if (items.length < 1) throw new IllegalArgumentException("No items desu~");
 		
 		final int pPerItem = (int) (PRGMAX / (float)items.length);
+		DownloadProgressListener progressListener = new DownloadProgressListener() {
+			@SuppressWarnings("synthetic-access")
+			@Override
+			public void downloadProgress (int bytesRead, int totalBytes) {
+				float p = (bytesRead / (float)totalBytes) * pPerItem;
+				publishProgress(Integer.valueOf(0), Integer.valueOf((int) p));
+			}
+		};
 		
 		File sdCard = Environment.getExternalStorageDirectory();
-		File dir = new File (sdCard.getAbsolutePath() + "/morrigan");
+		File dir = new File (sdCard.getAbsolutePath() + "/morrigan"); // TODO make this configurable.
 		dir.mkdirs();
 		
 		for (MlistItem item : items) {
@@ -92,35 +91,7 @@ public class DownloadMediaTask extends AsyncTask<MlistItem, Integer, String> {
 			final File file = new File(dir, item.getFileName());
 			
 			try {
-				HttpHelper.getUrlContent(url, new HttpStreamHandler<RuntimeException>() {
-					@SuppressWarnings("synthetic-access")
-					@Override
-					public void handleStream (InputStream is, int contentLength) throws IOException {
-						BufferedInputStream bis = new BufferedInputStream(is);
-						BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
-						try { // TODO this could probably be done better.
-							byte[] buffer = new byte[DOWNLOADBUFFERSIZE];
-							int bytesRead;
-							int totalBytesRead = 0;
-							long lastPublishTime = 0;
-							while ((bytesRead = bis.read(buffer)) != -1) {
-								bos.write(buffer, 0, bytesRead);
-								totalBytesRead = totalBytesRead + bytesRead;
-								
-								if (contentLength > 0) {
-									if (System.currentTimeMillis() - lastPublishTime > GUIUPDATEINTERVALMILLIS) {
-										float p = (totalBytesRead / (float)contentLength) * pPerItem;
-										publishProgress(Integer.valueOf(0), Integer.valueOf((int) p));
-										lastPublishTime = System.currentTimeMillis();
-									}
-								}
-							}
-						}
-						finally {
-							bos.close();
-						}
-					}
-				});
+				HttpHelper.getUrlContent(url, new HttpFileDownloadHandler(file, progressListener));
 			}
 			catch (IOException e) {
 				throw new RuntimeException(e);
