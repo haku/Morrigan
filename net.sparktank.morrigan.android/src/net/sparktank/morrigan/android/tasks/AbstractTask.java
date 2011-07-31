@@ -76,7 +76,7 @@ public abstract class AbstractTask<T extends Object> extends AsyncTask<Void, Voi
 	}
 	
 	@Override
-	public void handleStream (InputStream is) throws IOException, SAXException {
+	public void handleStream (InputStream is, int contentLength) throws IOException, SAXException {
 		this.state.set(this.parseStream(is));
 	}
 	
