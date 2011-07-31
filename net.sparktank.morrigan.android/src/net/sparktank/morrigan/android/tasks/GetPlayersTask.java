@@ -99,7 +99,7 @@ public class GetPlayersTask extends AsyncTask<Void, Void, PlayerStateList> {
 		super.onPostExecute(result);
 		
 		if (this.exception != null) { // TODO handle this better.
-			Toast.makeText(this.context, this.exception.getMessage(), Toast.LENGTH_LONG).show();
+			Toast.makeText(this.context, this.exception.getMessage(), Toast.LENGTH_SHORT).show();
 		}
 		
 		if (this.changedListener != null) this.changedListener.onPlayersChange(result);
