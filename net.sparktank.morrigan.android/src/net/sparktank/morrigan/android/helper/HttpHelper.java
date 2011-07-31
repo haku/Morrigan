@@ -34,7 +34,7 @@ public class HttpHelper {
 	
 	static public interface HttpStreamHandler <T extends Exception> {
 		
-		public void handleStream (InputStream is) throws IOException, T;
+		public void handleStream (InputStream is, int contentLength) throws IOException, T;
 		
 	}
 	
@@ -81,7 +81,7 @@ public class HttpHelper {
 			is = connection.getInputStream();
 			
 			if (streamHandler != null) {
-				streamHandler.handleStream(is);
+				streamHandler.handleStream(is, connection.getContentLength());
 			}
 			else {
 				sb = new StringBuilder();

@@ -49,6 +49,11 @@ public class MlistItemBasicImpl implements MlistItem {
 	}
 	
 	@Override
+	public String getFileName () {
+		return this.title; // TODO name this more explicitly?
+	}
+	
+	@Override
 	public int getImageResource() {
 //		if (mi.isMissing()) {
 //			cell.setImage(null); // TODO find icon for missing?
@@ -68,7 +73,6 @@ public class MlistItemBasicImpl implements MlistItem {
 	public int getType() {
 		return this.type;
 	}
-	
 	public void setType(int type) {
 		this.type = type;
 	}
@@ -76,32 +80,28 @@ public class MlistItemBasicImpl implements MlistItem {
 	public void setRelativeUrl(String url) {
 		this.relativeUrl = url;
 	}
-	
 	@Override
 	public String getRelativeUrl() {
 		return this.relativeUrl;
 	}
-
+	
 	public long getDuration() {
 		return this.duration;
 	}
-
 	public void setDuration(long duration) {
 		this.duration = duration;
 	}
-
+	
 	public long getStartCount() {
 		return this.startCount;
 	}
-
 	public void setStartCount(long startCount) {
 		this.startCount = startCount;
 	}
-
+	
 	public long getEndCount() {
 		return this.endCount;
 	}
-
 	public void setEndCount(long endCount) {
 		this.endCount = endCount;
 	}
