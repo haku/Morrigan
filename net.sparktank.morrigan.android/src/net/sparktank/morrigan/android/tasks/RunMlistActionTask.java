@@ -17,17 +17,17 @@
 package net.sparktank.morrigan.android.tasks;
 
 import java.io.IOException;
-import java.net.ConnectException;
+import java.io.InputStream;
 
-import net.sparktank.morrigan.android.helper.HttpHelper;
 import net.sparktank.morrigan.android.model.MlistReference;
 import net.sparktank.morrigan.android.model.PlayerReference;
+
+import org.xml.sax.SAXException;
+
 import android.app.Activity;
-import android.app.ProgressDialog;
-import android.os.AsyncTask;
 import android.widget.Toast;
 
-public class RunMlistActionTask extends AsyncTask<Void, Void, String> {
+public class RunMlistActionTask extends AbstractTask<String> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	static public enum MlistCommand {
@@ -47,12 +47,9 @@ public class RunMlistActionTask extends AsyncTask<Void, Void, String> {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private final Activity activity;
 	private final MlistReference mlistReference;
 	private final MlistCommand cmd;
 	private final PlayerReference playerReference;
-	
-	private Exception exception;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -61,9 +58,10 @@ public class RunMlistActionTask extends AsyncTask<Void, Void, String> {
 	}
 	
 	public RunMlistActionTask (Activity activity, MlistReference mlistReference, MlistCommand cmd, PlayerReference playerReference) {
+		super(activity);
+		
 		if ((cmd == MlistCommand.PLAY || cmd == MlistCommand.QUEUE) && playerReference == null) throw new IllegalArgumentException("No player specified.");
 		
-		this.activity = activity;
 		this.mlistReference = mlistReference;
 		this.cmd = cmd;
 		this.playerReference = playerReference;
@@ -71,18 +69,18 @@ public class RunMlistActionTask extends AsyncTask<Void, Void, String> {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private ProgressDialog dialog;
-	
-	// In UI thread:
 	@Override
-	protected void onPreExecute() {
-		super.onPreExecute();
-		this.dialog = ProgressDialog.show(this.activity, null, "Please wait...", true);
+	protected String getProgressMsg () {
+		return "Please wait...";
 	}
 	
-	// In background thread:
 	@Override
-	protected String doInBackground(Void... params) {
+	protected String getUrl () {
+		return this.mlistReference.getBaseUrl();
+	}
+	
+	@Override
+	protected String getEncodedData () {
 		String encodedData = "action=";
 		switch (this.cmd) {
 			case PLAY:
@@ -97,35 +95,31 @@ public class RunMlistActionTask extends AsyncTask<Void, Void, String> {
 				encodedData = encodedData.concat("scan");
 				break;
 			
-			default: throw new IllegalArgumentException();
+			default: throw new IllegalStateException();
 		}
-		
-		try {
-			String resp = HttpHelper.getUrlContent(this.mlistReference.getBaseUrl(), "POST", encodedData, "application/x-www-form-urlencoded");
-			return resp;
-		}
-		catch (ConnectException e) {
-			this.exception = e;
-			return null;
-		} catch (IOException e) {
-			this.exception = e;
-			return null;
-		}
+		return encodedData;
+	}
+	
+	@Override
+	protected String getVerb () {
+		return "POST";
+	}
+	
+	@Override
+	protected String getContentType () {
+		return "application/x-www-form-urlencoded";
+	}
+	
+	// In background thread:
+	@Override
+	protected String parseStream (InputStream is) throws IOException, SAXException {
+		return parseStreamToString(is);
 	}
 	
 	// In UI thread:
 	@Override
-	protected void onPostExecute(String result) {
-		super.onPostExecute(result);
-		
-		if (this.exception != null) { // TODO handle this better.
-			Toast.makeText(this.activity, this.exception.getMessage(), Toast.LENGTH_SHORT).show();
-		}
-		else {
-			Toast.makeText(this.activity, result, Toast.LENGTH_SHORT).show();
-		}
-		
-		this.dialog.dismiss(); // This will fail if the screen is rotated while we are fetching.
+	protected void onSuccess (String result) {
+		Toast.makeText(getActivity(), result, Toast.LENGTH_SHORT).show();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

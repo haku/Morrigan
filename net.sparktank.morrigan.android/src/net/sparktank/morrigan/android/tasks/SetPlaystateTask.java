@@ -18,11 +18,7 @@ package net.sparktank.morrigan.android.tasks;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.ConnectException;
-import java.util.concurrent.atomic.AtomicReference;
 
-import net.sparktank.morrigan.android.helper.HttpHelper;
-import net.sparktank.morrigan.android.helper.HttpHelper.HttpStreamHandler;
 import net.sparktank.morrigan.android.model.PlayerReference;
 import net.sparktank.morrigan.android.model.PlayerState;
 import net.sparktank.morrigan.android.model.PlayerStateChangeListener;
@@ -31,10 +27,8 @@ import net.sparktank.morrigan.android.model.impl.PlayerStateXmlImpl;
 import org.xml.sax.SAXException;
 
 import android.app.Activity;
-import android.os.AsyncTask;
-import android.widget.Toast;
 
-public class SetPlaystateTask extends AsyncTask<Void, Void, PlayerState> {
+public class SetPlaystateTask extends AbstractTask<PlayerState> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public enum TargetPlayState {
@@ -54,14 +48,11 @@ public class SetPlaystateTask extends AsyncTask<Void, Void, PlayerState> {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private final Activity activity;
 	protected final PlayerReference playerReference;
 	private final PlayerStateChangeListener changeListener;
 	
 	private final TargetPlayState targetPlayState;
 	private final int fullscreenMonitor;
-	
-	private Exception exception;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -70,7 +61,7 @@ public class SetPlaystateTask extends AsyncTask<Void, Void, PlayerState> {
 	}
 	
 	public SetPlaystateTask (Activity activity, PlayerReference playerReference, TargetPlayState targetPlayState, PlayerStateChangeListener changeListener) {
-		this.activity = activity;
+		super(activity);
 		this.playerReference = playerReference;
 		this.targetPlayState = targetPlayState;
 		this.fullscreenMonitor = -1;
@@ -78,7 +69,7 @@ public class SetPlaystateTask extends AsyncTask<Void, Void, PlayerState> {
 	}
 	
 	public SetPlaystateTask (Activity activity, PlayerReference playerReference, int fullscreenMonitor, PlayerStateChangeListener changeListener) {
-		this.activity = activity;
+		super(activity);
 		this.playerReference = playerReference;
 		this.targetPlayState = null;
 		this.fullscreenMonitor = fullscreenMonitor;
@@ -87,84 +78,65 @@ public class SetPlaystateTask extends AsyncTask<Void, Void, PlayerState> {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	// In UI thread:
+	private String verb = null;
+	private String encodedData = null;
+	
 	@Override
-	protected void onPreExecute() {
-		super.onPreExecute();
-		this.activity.setProgressBarIndeterminateVisibility(true);
+	protected String getUrl () {
+		String url = this.playerReference.getBaseUrl();
+		
+		if (this.targetPlayState != null) {
+			this.verb = "POST";
+			this.encodedData = "action=";
+			switch (this.targetPlayState) {
+				case PLAYPAUSE:
+					this.encodedData = this.encodedData.concat("playpause");
+					break;
+					
+				case NEXT:
+					this.encodedData = this.encodedData.concat("next");
+					break;
+					
+				case STOP:
+					this.encodedData = this.encodedData.concat("stop");
+					break;
+					
+				default: throw new IllegalArgumentException();
+			}
+		}
+		else if (this.fullscreenMonitor >= 0) {
+			this.verb = "POST";
+			this.encodedData = "action=fullscreen&monitor=" + this.fullscreenMonitor;
+		}
+		
+		return url;
+	}
+	
+	@Override
+	protected String getVerb () {
+		return this.verb; // TODO always POST ?
+	}
+	
+	@Override
+	protected String getEncodedData () {
+		return this.encodedData;
+	}
+	
+	@Override
+	protected String getContentType () {
+		return "application/x-www-form-urlencoded";
 	}
 	
 	// In background thread:
 	@Override
-	protected PlayerState doInBackground(Void... params) {
-		String url = this.playerReference.getBaseUrl();
-		
-		String verb = null;
-		String encodedData = null;
-		
-		if (this.targetPlayState != null) {
-			verb = "POST";
-			encodedData = "action=";
-    		switch (this.targetPlayState) {
-    			case PLAYPAUSE:
-    				encodedData = encodedData.concat("playpause");
-    				break;
-    				
-    			case NEXT:
-    				encodedData = encodedData.concat("next");
-    				break;
-    				
-    			case STOP:
-    				encodedData = encodedData.concat("stop");
-    				break;
-    				
-    			default: throw new IllegalArgumentException();
-    		}
-		}
-		else if (this.fullscreenMonitor >= 0) {
-			verb = "POST";
-			encodedData = "action=fullscreen&monitor=" + this.fullscreenMonitor;
-		}
-		
-		try {
-			final AtomicReference<PlayerState> state = new AtomicReference<PlayerState>();
-			
-			HttpStreamHandler<SAXException> handler = new HttpStreamHandler<SAXException>() {
-				@Override
-				public void handleStream(InputStream is) throws IOException, SAXException {
-					PlayerState playerState = new PlayerStateXmlImpl(is, SetPlaystateTask.this.playerReference);
-					state.set(playerState);
-				}
-			};
-			
-			HttpHelper.getUrlContent(url, verb, encodedData, "application/x-www-form-urlencoded", handler);
-			
-			return state.get();
-		}
-		catch (ConnectException e) {
-			this.exception = e;
-			return null;
-		} catch (IOException e) {
-			this.exception = e;
-			return null;
-		} catch (SAXException e) {
-			this.exception = e;
-			return null;
-		}
+	protected PlayerState parseStream (InputStream is) throws IOException, SAXException {
+		return new PlayerStateXmlImpl(is, this.playerReference);
 	}
 	
 	// In UI thread:
 	@Override
-	protected void onPostExecute(PlayerState result) {
-		super.onPostExecute(result);
-		
-		if (this.exception != null) { // TODO handle this better.
-			Toast.makeText(this.activity, this.exception.getMessage(), Toast.LENGTH_SHORT).show();
-		}
-		
+	protected void onSuccess (PlayerState result) {
 		if (this.changeListener != null) this.changeListener.onPlayerStateChange(result);
-		
-		this.activity.setProgressBarIndeterminateVisibility(false);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
