@@ -43,7 +43,7 @@ public class RunMlistActionTask extends AsyncTask<Void, Void, String> {
 			return this.n;
 		}
 		
-	};
+	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	

@@ -50,7 +50,7 @@ public class SetPlaystateTask extends AsyncTask<Void, Void, PlayerState> {
 			return this.n;
 		}
 		
-	};
+	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
