@@ -119,10 +119,10 @@ public class RunMlistActionTask extends AsyncTask<Void, Void, String> {
 		super.onPostExecute(result);
 		
 		if (this.exception != null) { // TODO handle this better.
-			Toast.makeText(this.activity, this.exception.getMessage(), Toast.LENGTH_LONG).show();
+			Toast.makeText(this.activity, this.exception.getMessage(), Toast.LENGTH_SHORT).show();
 		}
 		else {
-			Toast.makeText(this.activity, result, Toast.LENGTH_LONG).show();
+			Toast.makeText(this.activity, result, Toast.LENGTH_SHORT).show();
 		}
 		
 		this.dialog.dismiss(); // This will fail if the screen is rotated while we are fetching.

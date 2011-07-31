@@ -83,7 +83,7 @@ public class GetMlistTask extends AsyncTask<Void, Void, MlistState> {
 		super.onPostExecute(result);
 		
 		if (this.exception != null) { // TODO handle this better.
-			Toast.makeText(this.activity, this.exception.getMessage(), Toast.LENGTH_LONG).show();
+			Toast.makeText(this.activity, this.exception.getMessage(), Toast.LENGTH_SHORT).show();
 		}
 		
 		if (this.changedListener != null) this.changedListener.onMlistStateChange(result);

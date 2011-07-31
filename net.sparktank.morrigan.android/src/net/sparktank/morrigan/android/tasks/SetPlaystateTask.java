@@ -159,7 +159,7 @@ public class SetPlaystateTask extends AsyncTask<Void, Void, PlayerState> {
 		super.onPostExecute(result);
 		
 		if (this.exception != null) { // TODO handle this better.
-			Toast.makeText(this.activity, this.exception.getMessage(), Toast.LENGTH_LONG).show();
+			Toast.makeText(this.activity, this.exception.getMessage(), Toast.LENGTH_SHORT).show();
 		}
 		
 		if (this.changeListener != null) this.changeListener.onPlayerStateChange(result);
