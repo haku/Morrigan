@@ -243,25 +243,48 @@ public class PlayersServlet extends HttpServlet {
 		AbstractFeed.addElement(dw, "tracktitle", title);
 		
 		if (detailLevel == 1) {
+			String trackLink = null;
+			String filename;
 			String filepath;
 			String hashcode;
 			String startcount;
 			String endcount;
 			if (currentItem != null && currentItem.item != null) {
+				if (listUrl != null) {
+					String file;
+					try {
+						file = URLEncoder.encode(currentItem.item.getFilepath(), "UTF-8");
+					} catch (UnsupportedEncodingException e) {
+						throw new RuntimeException(e);
+					}
+					StringBuilder sb = new StringBuilder();
+					sb.append(listUrl);
+					sb.append("/");
+					sb.append(MlistsServlet.PATH_ITEM);
+					sb.append("/");
+					sb.append(file);
+					trackLink = sb.toString();
+				}
+				
+				filename = currentItem.item.getTitle(); // This is a hack :s .
 				filepath = currentItem.item.getFilepath();
 				hashcode = currentItem.item.getHashcode() != null ? currentItem.item.getHashcode().toString(16) : NULL;
 				startcount = String.valueOf(currentItem.item.getStartCount());
 				endcount = String.valueOf(currentItem.item.getEndCount());
 			}
 			else {
+				filename = NULL;
 				filepath = NULL;
 				hashcode = NULL;
 				startcount = NULL;
 				endcount = NULL;
 			}
 			
+			if (trackLink != null) AbstractFeed.addLink(dw, trackLink, "track");
+			
 			AbstractFeed.addElement(dw, "playposition", p.getCurrentPosition());
 			AbstractFeed.addElement(dw, "trackfile", filepath);
+			AbstractFeed.addElement(dw, "trackfilename", filename);
 			AbstractFeed.addElement(dw, "trackduration", p.getCurrentTrackDuration());
 			
 			AbstractFeed.addElement(dw, "trackhash", hashcode);
