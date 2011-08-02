@@ -25,6 +25,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import net.sparktank.morrigan.android.helper.TimeHelper;
 import net.sparktank.morrigan.android.model.ArtifactList;
 import net.sparktank.morrigan.android.model.ArtifactListAdaptor;
+import net.sparktank.morrigan.android.model.MlistItem;
 import net.sparktank.morrigan.android.model.PlayerQueue;
 import net.sparktank.morrigan.android.model.PlayerQueueChangeListener;
 import net.sparktank.morrigan.android.model.PlayerReference;
@@ -34,6 +35,7 @@ import net.sparktank.morrigan.android.model.ServerReference;
 import net.sparktank.morrigan.android.model.impl.ArtifactListAdaptorImpl;
 import net.sparktank.morrigan.android.model.impl.PlayerReferenceImpl;
 import net.sparktank.morrigan.android.model.impl.ServerReferenceImpl;
+import net.sparktank.morrigan.android.tasks.DownloadMediaTask;
 import net.sparktank.morrigan.android.tasks.GetPlayerQueueTask;
 import net.sparktank.morrigan.android.tasks.SetPlaystateTask;
 import net.sparktank.morrigan.android.tasks.SetPlaystateTask.TargetPlayState;
@@ -157,11 +159,13 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 //	Menu items.
 	
 	private static final int MENU_FULLSCREEN = 2;
+	private static final int MENU_DOWNLOAD = 3;
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		boolean result = super.onCreateOptionsMenu(menu);
 		menu.add(0, MENU_FULLSCREEN, 0, R.string.menu_fullscreen).setIcon(R.drawable.display);
+		menu.add(0, MENU_DOWNLOAD, 0, R.string.menu_download);
 		return result;
 	}
 	
@@ -171,6 +175,10 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 			
 			case MENU_FULLSCREEN:
 				fullscreen();
+				return true;
+			
+			case MENU_DOWNLOAD:
+				downloadCurrentItem();
 				return true;
 			
 		}
@@ -239,6 +247,17 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 		});
 		AlertDialog alert = builder.create();
 		alert.show();
+	}
+	
+	protected void downloadCurrentItem () {
+		MlistItem item = this.currentState.getItem();
+		if (item != null) {
+			DownloadMediaTask task = new DownloadMediaTask(this, this.serverReference);
+			task.execute(item);
+		}
+		else {
+			Toast.makeText(this, "No item to download desu~", Toast.LENGTH_SHORT).show();
+		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

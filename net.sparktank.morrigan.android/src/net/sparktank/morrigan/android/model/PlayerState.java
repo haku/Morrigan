@@ -16,6 +16,7 @@
 
 package net.sparktank.morrigan.android.model;
 
+import java.math.BigInteger;
 import java.util.Map;
 
 public interface PlayerState extends Artifact {
@@ -36,9 +37,16 @@ public interface PlayerState extends Artifact {
 	public String getListId ();
 	public String getListUrl ();
 	
+	public String getTrackRelativeUrl ();
 	public String getTrackTitle ();
 	public String getTrackFile ();
+	public String getTrackFileName ();
 	public int getTrackDuration ();
+	public BigInteger getTrackHashCode ();
+	public int getTrackStartCount ();
+	public int getTrackEndCount ();
+	
+	public MlistItem getItem ();
 	
 	public int getQueueLength ();
 	public long getQueueDuration ();

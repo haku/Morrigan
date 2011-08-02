@@ -16,15 +16,17 @@
 
 package net.sparktank.morrigan.android.model.impl;
 
+import java.math.BigInteger;
 import java.util.Map;
 
 import net.sparktank.morrigan.android.R;
+import net.sparktank.morrigan.android.model.MlistItem;
 import net.sparktank.morrigan.android.model.PlayState;
 import net.sparktank.morrigan.android.model.PlayerReference;
 import net.sparktank.morrigan.android.model.PlayerState;
 import net.sparktank.morrigan.android.model.ServerReference;
 
-public class PlayerStateBasicImpl implements PlayerState, PlayerReference {
+public class PlayerStateBasicImpl implements PlayerState, PlayerReference, MlistItem {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private int playerId;
@@ -35,9 +37,14 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference {
 	private int playOrder;
 	private int playerPosition;
 	
+	private String trackRelativeUrl;
 	private String trackTitle;
 	private String trackFile;
+	private String trackFileName;
 	private int trackDuration;
+	private BigInteger trackHashCode;
+	private int trackStartCount;
+	private int trackEndCount;
 	
 	private String listTitle;
 	private String listId;
@@ -63,7 +70,6 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference {
 	public void setPlayerReference(PlayerReference playerReference) {
 		this.playerReference = playerReference;
 	}
-	
 	@Override
 	public PlayerReference getPlayerReference() {
 		return this.playerReference;
@@ -78,7 +84,6 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference {
 	public ServerReference getServerReference() {
 		return this.playerReference.getServerReference();
 	}
-	
 	public void setBaseUrl(String baseUrl) {
 		this.baseUrl = baseUrl;
 	}
@@ -92,7 +97,6 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference {
 	public int getId() {
 		return this.playerId;
 	}
-
 	public void setId(int id) {
 		this.playerId = id;
 	}
@@ -101,7 +105,6 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference {
 	public PlayState getPlayState() {
 		return this.playState;
 	}
-
 	public void setPlayState(PlayState playState) {
 		this.playState = playState;
 	}
@@ -110,7 +113,6 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference {
 	public int getPlayOrder() {
 		return this.playOrder;
 	}
-
 	public void setPlayOrder(int playOrder) {
 		this.playOrder = playOrder;
 	}
@@ -119,16 +121,22 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference {
 	public int getPlayerPosition() {
 		return this.playerPosition;
 	}
-
 	public void setPlayerPosition(int playerPosition) {
 		this.playerPosition = playerPosition;
 	}
-
+	
+	@Override
+	public String getTrackRelativeUrl () {
+		return this.trackRelativeUrl;
+	}
+	public void setTrackRelativeUrl (String trackRelativeUrl) {
+		this.trackRelativeUrl = trackRelativeUrl;
+	}
+	
 	@Override
 	public String getTrackTitle() {
 		return this.trackTitle;
 	}
-
 	public void setTrackTitle(String trackTitle) {
 		this.trackTitle = trackTitle;
 	}
@@ -137,25 +145,54 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference {
 	public String getTrackFile() {
 		return this.trackFile;
 	}
-
 	public void setTrackFile(String trackFile) {
 		this.trackFile = trackFile;
 	}
-
+	
+	@Override
+	public String getTrackFileName () {
+		return this.trackFileName;
+	}
+	public void setTrackFileName (String trackFileName) {
+		this.trackFileName = trackFileName;
+	}
+	
 	@Override
 	public int getTrackDuration() {
 		return this.trackDuration;
 	}
-
 	public void setTrackDuration(int trackDuration) {
 		this.trackDuration = trackDuration;
 	}
-
+	
+	@Override
+	public BigInteger getTrackHashCode () {
+		return this.trackHashCode;
+	}
+	public void setTrackHashCode (BigInteger trackHashCode) {
+		this.trackHashCode = trackHashCode;
+	}
+	
+	@Override
+	public int getTrackStartCount () {
+		return this.trackStartCount;
+	}
+	public void setTrackStartCount (int trackStartCount) {
+		this.trackStartCount = trackStartCount;
+	}
+	
+	@Override
+	public int getTrackEndCount () {
+		return this.trackEndCount;
+	}
+	public void setTrackEndCount (int trackEndCount) {
+		this.trackEndCount = trackEndCount;
+	}
+	
 	@Override
 	public String getListTitle() {
 		return this.listTitle;
 	}
-
 	public void setListTitle(String listTitle) {
 		this.listTitle = listTitle;
 	}
@@ -164,7 +201,6 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference {
 	public String getListId() {
 		return this.listId;
 	}
-
 	public void setListId(String listId) {
 		this.listId = listId;
 	}
@@ -173,16 +209,19 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference {
 	public String getListUrl() {
 		return this.listUrl;
 	}
-	
 	public void setListUrl(String listUrl) {
 		this.listUrl = listUrl;
 	}
-
+	
+	@Override
+	public MlistItem getItem () {
+		return this;
+	}
+	
 	@Override
 	public int getQueueLength() {
 		return this.queueLength;
 	}
-
 	public void setQueueLength(int queueLength) {
 		this.queueLength = queueLength;
 	}
@@ -191,7 +230,6 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference {
 	public long getQueueDuration() {
 		return this.queueDuration;
 	}
-	
 	public void setQueueDuration (long queueDuration) {
 		this.queueDuration = queueDuration;
 	}
@@ -200,6 +238,44 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference {
 	public Map<Integer, String> getMonitors() {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("Not implemented.");
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	MlistItem methods.
+	
+	@Override
+	public int getType () {
+		return -1;
+	}
+	
+	@Override
+	public String getRelativeUrl () {
+		return getTrackRelativeUrl();
+	}
+	
+	@Override
+	public String getFileName () {
+		return getTrackFileName();
+	}
+	
+	@Override
+	public BigInteger getHashCode () {
+		return getTrackHashCode();
+	}
+	
+	@Override
+	public int getDuration () {
+		return getTrackDuration();
+	}
+	
+	@Override
+	public int getStartCount () {
+		return getStartCount();
+	}
+	
+	@Override
+	public int getEndCount () {
+		return getEndCount();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
