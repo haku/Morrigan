@@ -16,6 +16,8 @@
 
 package net.sparktank.morrigan.android;
 
+import java.util.List;
+
 import net.sparktank.morrigan.android.CommonDialogs.PlayerSelectedListener;
 import net.sparktank.morrigan.android.helper.TimeHelper;
 import net.sparktank.morrigan.android.model.MlistItem;
@@ -55,6 +57,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MlistActivity extends Activity implements MlistStateChangeListener, MlistItemListChangeListener {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -210,11 +213,13 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 //	Menu items.
 	
 	private static final int MENU_SCAN = 1;
+	private static final int MENU_DOWNLOAD = 2;
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		boolean result = super.onCreateOptionsMenu(menu);
 		menu.add(0, MENU_SCAN, 0, R.string.menu_scan);
+		menu.add(0, MENU_DOWNLOAD, 1, R.string.menu_download);
 		return result;
 	}
 	
@@ -226,6 +231,9 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 				scan();
 				return true;
 			
+			case MENU_DOWNLOAD:
+				downloadAllInList();
+				return true;
 		}
 		
 		return super.onOptionsItemSelected(item);
@@ -377,6 +385,17 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 		});
 		
 		dlgBuilder.show();
+	}
+	
+	protected void downloadAllInList () {
+		List<? extends MlistItem> mitems = this.currentItemList.getMlistItemList();
+		if (mitems.size() > 0) {
+			DownloadMediaTask task = new DownloadMediaTask(this, this.serverReference);
+			task.execute(mitems.toArray(new MlistItem[] {}));
+		}
+		else {
+			Toast.makeText(this, "No items to download desu~", Toast.LENGTH_SHORT).show();
+		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
