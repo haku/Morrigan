@@ -18,6 +18,7 @@ package net.sparktank.morrigan.android.model.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigInteger;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -27,6 +28,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import net.sparktank.morrigan.android.model.MlistItem;
 import net.sparktank.morrigan.android.model.PlayState;
 import net.sparktank.morrigan.android.model.PlayerReference;
 import net.sparktank.morrigan.android.model.PlayerState;
@@ -38,7 +40,7 @@ import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
-public class PlayerStateXmlImpl implements PlayerState, ContentHandler {
+public class PlayerStateXmlImpl implements PlayerState, MlistItem, ContentHandler {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static final String PLAYERID = "playerid";
@@ -46,9 +48,15 @@ public class PlayerStateXmlImpl implements PlayerState, ContentHandler {
 	public static final String PLAYSTATE = "playstate";
 	public static final String PLAYPOSITION = "playposition";
 	
+	public static final String TRACKLINKNAME = "track"; // Name of link rel attribute.
 	public static final String TRACKTITLE = "tracktitle";
 	public static final String TRACKFILE = "trackfile";
+	public static final String TRACKFILENAME = "trackfilename";
 	public static final String TRACKDURATION = "trackduration";
+	
+	public static final String TRACKHASHCODE = "trackhash";
+	public static final String TRACKSTARTCOUNT = "trackstartcount";
+	public static final String TRACKENDCOUNT = "trackendcount";
 	
 	public static final String LISTID = "listid";
 //	public static final String LISTURL = "list"; // Because its a link.
@@ -68,9 +76,14 @@ public class PlayerStateXmlImpl implements PlayerState, ContentHandler {
 	private PlayState playerState;
 	private int playerPosition;
 	
+	private String trackRelativeUrl;
 	private String trackTitle;
 	private String trackFile;
+	private String trackFileName;
 	private int trackDuration;
+	private BigInteger trackHashCode;
+	private int trackStartCount;
+	private int trackEndCount;
 	
 	private String listId;
 	private String listUrl;
@@ -160,6 +173,11 @@ public class PlayerStateXmlImpl implements PlayerState, ContentHandler {
 	}
 	
 	@Override
+	public String getTrackRelativeUrl () {
+		return this.trackRelativeUrl;
+	}
+	
+	@Override
 	public String getTrackTitle() {
 		return this.trackTitle;
 	}
@@ -170,8 +188,33 @@ public class PlayerStateXmlImpl implements PlayerState, ContentHandler {
 	}
 	
 	@Override
+	public String getTrackFileName() {
+		return this.trackFileName;
+	}
+	
+	@Override
 	public int getTrackDuration() {
 		return this.trackDuration;
+	}
+	
+	@Override
+	public BigInteger getTrackHashCode () {
+		return this.trackHashCode;
+	}
+	
+	@Override
+	public int getTrackStartCount () {
+		return this.trackStartCount;
+	}
+	
+	@Override
+	public int getTrackEndCount () {
+		return this.trackEndCount;
+	}
+	
+	@Override
+	public MlistItem getItem () {
+		return this;
 	}
 	
 	@Override
@@ -190,6 +233,44 @@ public class PlayerStateXmlImpl implements PlayerState, ContentHandler {
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	MlistItem methods.
+	
+	@Override
+	public int getType () {
+		return -1;
+	}
+	
+	@Override
+	public String getRelativeUrl () {
+		return getTrackRelativeUrl();
+	}
+	
+	@Override
+	public String getFileName () {
+		return getTrackFileName();
+	}
+	
+	@Override
+	public BigInteger getHashCode () {
+		return getTrackHashCode();
+	}
+	
+	@Override
+	public int getDuration () {
+		return getTrackDuration();
+	}
+	
+	@Override
+	public int getStartCount () {
+		return getTrackStartCount();
+	}
+	
+	@Override
+	public int getEndCount () {
+		return getTrackEndCount();
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private final Stack<String> stack = new Stack<String>();
 	private StringBuilder currentText;
@@ -204,6 +285,12 @@ public class PlayerStateXmlImpl implements PlayerState, ContentHandler {
 				String hrefVal = attributes.getValue("href");
 				if (hrefVal != null && hrefVal.length() > 0) {
 					this.listUrl = this.playerReference.getServerReference().getBaseUrl() + hrefVal;
+				}
+			}
+			else if (relVal != null && relVal.equals(TRACKLINKNAME)) {
+				String hrefVal = attributes.getValue("href");
+				if (hrefVal != null && hrefVal.length() > 0) {
+					this.trackRelativeUrl = hrefVal;
 				}
 			}
 		}
@@ -239,9 +326,24 @@ public class PlayerStateXmlImpl implements PlayerState, ContentHandler {
 			else if (localName.equals(TRACKFILE)) {
 				this.trackFile = this.currentText.toString();
 			}
+			else if (localName.equals(TRACKFILENAME)) {
+				this.trackFileName = this.currentText.toString();
+			}
 			else if (localName.equals(TRACKDURATION)) {
 				int v = Integer.parseInt(this.currentText.toString());
 				this.trackDuration = v;
+			}
+			else if (localName.equals(TRACKHASHCODE)) {
+				BigInteger v = new BigInteger(this.currentText.toString(), 16);
+				this.trackHashCode = v;
+			}
+			else if (localName.equals(TRACKSTARTCOUNT)) {
+				int v = Integer.parseInt(this.currentText.toString());
+				this.trackStartCount = v;
+			}
+			else if (localName.equals(TRACKENDCOUNT)) {
+				int v = Integer.parseInt(this.currentText.toString());
+				this.trackEndCount = v;
 			}
 			else if (localName.equals(LISTID)) {
 				this.listId = this.currentText.toString();
