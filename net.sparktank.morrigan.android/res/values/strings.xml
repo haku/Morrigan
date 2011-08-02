@@ -5,5 +5,6 @@
 	
 	<string name="menu_fullscreen">full-screen</string>
 	<string name="menu_scan">scan</string>
+	<string name="menu_download">download</string>
 	
 </resources>
