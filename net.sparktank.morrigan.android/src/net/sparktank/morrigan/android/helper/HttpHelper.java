@@ -55,14 +55,10 @@ public class HttpHelper {
 	public static <T extends Exception> String getUrlContent (String sUrl, String httpRequestMethod, String encodedData, String contentType, HttpStreamHandler<T> streamHandler) throws IOException, T {
 		URL url = new URL(sUrl);
 		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-		connection.setRequestMethod("GET");
 		connection.setDoOutput(true);
+		connection.setRequestMethod(httpRequestMethod != null ? httpRequestMethod : "GET");
 		connection.setConnectTimeout(HTTP_CONNECT_TIMEOUT_SECONDS * 1000);
 		connection.setReadTimeout(HTTP_READ_TIMEOUT_SECONDS * 1000);
-		
-		if (httpRequestMethod != null) {
-			connection.setRequestMethod(httpRequestMethod);
-		}
 		
 		if (encodedData != null) {
 			if (contentType!=null) connection.setRequestProperty("Content-Type", contentType);
@@ -70,7 +66,8 @@ public class HttpHelper {
 			try {
 				out.write(encodedData);
 				out.flush();
-			} finally {
+			}
+			finally {
 				out.close();
 			}
 		}
