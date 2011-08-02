@@ -18,9 +18,13 @@ package net.sparktank.morrigan.android.tasks;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import net.sparktank.morrigan.android.Constants;
+import net.sparktank.morrigan.android.helper.ChecksumHelper;
 import net.sparktank.morrigan.android.helper.HttpFileDownloadHandler;
 import net.sparktank.morrigan.android.helper.HttpFileDownloadHandler.DownloadProgressListener;
 import net.sparktank.morrigan.android.helper.HttpHelper;
@@ -32,6 +36,7 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.util.Log;
 import android.widget.Toast;
 
 public class DownloadMediaTask extends AsyncTask<MlistItem, Integer, String> implements OnClickListener {
@@ -110,29 +115,41 @@ public class DownloadMediaTask extends AsyncTask<MlistItem, Integer, String> imp
 		File dir = new File (sdCard.getAbsolutePath() + "/morrigan"); // TODO make this configurable.
 		dir.mkdirs();
 		
+		final ByteBuffer byteBuffer = ChecksumHelper.createByteBuffer();
+		
 		for (MlistItem item : items) {
 			final String url = this.serverReference.getBaseUrl() + item.getRelativeUrl();
 			final File file = new File(dir, item.getFileName());
 			boolean transferComplete = false;
 			
-			try { // TODO only download if not already present?
-				HttpHelper.getUrlContent(url, new HttpFileDownloadHandler(file, progressListener));
-				transferComplete = true;
-			}
-			catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-			finally {
-				if (!transferComplete || this.cancelled.get()) {
-					file.delete(); // TODO only delete if file checksum in incorrect?
+			// Will only skip if checksums really match.
+			if (!fileMatchedItem(file, item, false, byteBuffer)) {
+				try {
+					HttpHelper.getUrlContent(url, new HttpFileDownloadHandler(file, progressListener));
+					transferComplete = true;
+				}
+				catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+				finally {
+					// If the current file is defiantly not valid delete it.
+					if (!transferComplete || this.cancelled.get()) {
+						if (file.exists() && !fileMatchedItem(file, item, false, byteBuffer)) {
+							Log.i(Constants.LOGTAG, "Deleting incomplete file: " + file.getAbsolutePath());
+							file.delete();
+						}
+					}
 				}
 			}
 			
+			// This will only fail if the checksums really do not match.
+			if (!fileMatchedItem(file, item, true, byteBuffer)) return "Checksum check failed.";
+			
 			publishProgress(Integer.valueOf(pPerItem * itemsCopied.incrementAndGet()));
-			if (this.cancelled.get()) break;
+			if (this.cancelled.get()) return "Download cancelled desu~";
 		}
 		
-		return this.cancelled.get() ? "Download cancelled desu~" : "Download complete desu~";
+		return "Download complete desu~";
 	}
 	
 	@Override
@@ -150,6 +167,24 @@ public class DownloadMediaTask extends AsyncTask<MlistItem, Integer, String> imp
 	protected void onPostExecute (String result) {
 		if (this.progressDialog != null) this.progressDialog.dismiss(); // This will fail if the screen is rotated while we are fetching.
 		Toast.makeText(getContext(), result, Toast.LENGTH_SHORT).show();
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	/**
+	 * defaultResponse is returned if comparison is not possible.
+	 */
+	private static boolean fileMatchedItem (File file, MlistItem item, boolean defaultResponse, ByteBuffer byteBuffer) {
+		if (file.exists() && item.getHashCode() != null && !item.getHashCode().equals(BigInteger.ZERO)) {
+			try {
+				BigInteger hash = ChecksumHelper.generateMd5Checksum(file, byteBuffer);
+				return hash.equals(item.getHashCode());
+			}
+			catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		return defaultResponse;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

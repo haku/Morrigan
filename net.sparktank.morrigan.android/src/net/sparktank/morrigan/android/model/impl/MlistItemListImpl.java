@@ -18,6 +18,7 @@ package net.sparktank.morrigan.android.model.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigInteger;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -49,6 +50,7 @@ public class MlistItemListImpl implements MlistItemList, ContentHandler {
 	public static final String DURATION = "duration";
 	public static final String STARTCOUNT = "startcount";
 	public static final String ENDCOUNT = "endcount";
+	public static final String HASHCODE = "hash";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -139,16 +141,20 @@ public class MlistItemListImpl implements MlistItemList, ContentHandler {
 			this.currentItem.setType(v);
 		}
 		else if (this.stack.size() == 3 && localName.equals(DURATION)) {
-			long v = Integer.parseInt(this.currentText.toString());
+			int v = Integer.parseInt(this.currentText.toString());
 			this.currentItem.setDuration(v);
 		}
 		else if (this.stack.size() == 3 && localName.equals(STARTCOUNT)) {
-			long v = Integer.parseInt(this.currentText.toString());
+			int v = Integer.parseInt(this.currentText.toString());
 			this.currentItem.setStartCount(v);
 		}
 		else if (this.stack.size() == 3 && localName.equals(ENDCOUNT)) {
-			long v = Integer.parseInt(this.currentText.toString());
+			int v = Integer.parseInt(this.currentText.toString());
 			this.currentItem.setEndCount(v);
+		}
+		else if (this.stack.size() == 3 && localName.equals(HASHCODE)) {
+			BigInteger v = new BigInteger(this.currentText.toString(), 16);
+			this.currentItem.setHashCode(v);
 		}
 		
 		this.stack.pop();

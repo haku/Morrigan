@@ -16,6 +16,8 @@
 
 package net.sparktank.morrigan.android.model.impl;
 
+import java.math.BigInteger;
+
 import net.sparktank.morrigan.android.R;
 import net.sparktank.morrigan.android.helper.TimeHelper;
 import net.sparktank.morrigan.android.model.MlistItem;
@@ -26,9 +28,10 @@ public class MlistItemBasicImpl implements MlistItem {
 	private String title;
 	private int type;
 	private String relativeUrl;
-	private long duration;
-	private long startCount;
-	private long endCount;
+	private BigInteger hashCode;
+	private int duration;
+	private int startCount;
+	private int endCount;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -61,12 +64,11 @@ public class MlistItemBasicImpl implements MlistItem {
 //		else if (!mi.isEnabled()) {
 //			cell.setImage(this.imageCache.readImage("icons/noentry-red.png"));
 //		}
-//		else if (mi.getHashcode() == 0) {
-//			cell.setImage(this.imageCache.readImage("icons/exclamation-red.png"));
-//		}
-//		else {
-			return R.drawable.circledot;
-//		}
+		
+		if (getHashCode() == null || getHashCode().equals(BigInteger.ZERO)) {
+			return R.drawable.exclamation_red;
+		}
+		return R.drawable.circledot;
 	}
 	
 	@Override
@@ -77,32 +79,43 @@ public class MlistItemBasicImpl implements MlistItem {
 		this.type = type;
 	}
 	
-	public void setRelativeUrl(String url) {
-		this.relativeUrl = url;
-	}
 	@Override
 	public String getRelativeUrl() {
 		return this.relativeUrl;
 	}
+	public void setRelativeUrl(String url) {
+		this.relativeUrl = url;
+	}
 	
-	public long getDuration() {
+	@Override
+	public BigInteger getHashCode () {
+		return this.hashCode;
+	}
+	public void setHashCode (BigInteger hashCode) {
+		this.hashCode = hashCode;
+	}
+	
+	@Override
+	public int getDuration() {
 		return this.duration;
 	}
-	public void setDuration(long duration) {
+	public void setDuration(int duration) {
 		this.duration = duration;
 	}
 	
-	public long getStartCount() {
+	@Override
+	public int getStartCount() {
 		return this.startCount;
 	}
-	public void setStartCount(long startCount) {
+	public void setStartCount(int startCount) {
 		this.startCount = startCount;
 	}
 	
-	public long getEndCount() {
+	@Override
+	public int getEndCount() {
 		return this.endCount;
 	}
-	public void setEndCount(long endCount) {
+	public void setEndCount(int endCount) {
 		this.endCount = endCount;
 	}
 	
