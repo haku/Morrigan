@@ -244,16 +244,29 @@ public class PlayersServlet extends HttpServlet {
 		
 		if (detailLevel == 1) {
 			String filepath;
+			String hashcode;
+			String startcount;
+			String endcount;
 			if (currentItem != null && currentItem.item != null) {
 				filepath = currentItem.item.getFilepath();
+				hashcode = currentItem.item.getHashcode() != null ? currentItem.item.getHashcode().toString(16) : NULL;
+				startcount = String.valueOf(currentItem.item.getStartCount());
+				endcount = String.valueOf(currentItem.item.getEndCount());
 			}
 			else {
 				filepath = NULL;
+				hashcode = NULL;
+				startcount = NULL;
+				endcount = NULL;
 			}
 			
 			AbstractFeed.addElement(dw, "playposition", p.getCurrentPosition());
 			AbstractFeed.addElement(dw, "trackfile", filepath);
 			AbstractFeed.addElement(dw, "trackduration", p.getCurrentTrackDuration());
+			
+			AbstractFeed.addElement(dw, "trackhash", hashcode);
+			AbstractFeed.addElement(dw, "trackstartcount", startcount);
+			AbstractFeed.addElement(dw, "trackendcount", endcount);
 			
 			Map<Integer, String> mons = p.getMonitors();
 			if (mons != null) {
