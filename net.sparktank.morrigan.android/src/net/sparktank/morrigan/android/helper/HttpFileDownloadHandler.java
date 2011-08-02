@@ -37,6 +37,11 @@ public class HttpFileDownloadHandler implements HttpStreamHandler<RuntimeExcepti
 		
 		public void downloadProgress (int bytesRead, int totalBytes);
 		
+		/**
+		 * Return true to abort download.
+		 */
+		public boolean abortListener ();
+		
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -70,6 +75,7 @@ public class HttpFileDownloadHandler implements HttpStreamHandler<RuntimeExcepti
 				if (contentLength > 0 && System.currentTimeMillis() - lastPublishTime > GUIUPDATEINTERVALMILLIS) {
 					this.listener.downloadProgress(totalBytesRead, contentLength);
 					lastPublishTime = System.currentTimeMillis();
+					if (this.listener.abortListener()) is.close();
 				}
 			}
 		}

@@ -18,6 +18,8 @@ package net.sparktank.morrigan.android.tasks;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.sparktank.morrigan.android.helper.HttpFileDownloadHandler;
 import net.sparktank.morrigan.android.helper.HttpFileDownloadHandler.DownloadProgressListener;
@@ -26,17 +28,20 @@ import net.sparktank.morrigan.android.model.MlistItem;
 import net.sparktank.morrigan.android.model.ServerReference;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.widget.Toast;
 
-public class DownloadMediaTask extends AsyncTask<MlistItem, Integer, String> {
+public class DownloadMediaTask extends AsyncTask<MlistItem, Integer, String> implements OnClickListener {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private final Context context;
 	private final ServerReference serverReference;
 
-	private ProgressDialog dialog;
+	private ProgressDialog progressDialog;
+	protected AtomicBoolean cancelled = new AtomicBoolean(false);
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -57,15 +62,28 @@ public class DownloadMediaTask extends AsyncTask<MlistItem, Integer, String> {
 	
 	@Override
 	protected void onPreExecute () {
-		ProgressDialog progressDialog = new ProgressDialog(this.context);
-		progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-		progressDialog.setCancelable(false);
-		progressDialog.setIndeterminate(false);
-		progressDialog.setMax(PRGMAX);
-		progressDialog.setTitle("Downloading...");
+		ProgressDialog dialog = new ProgressDialog(this.context);
+		dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+		dialog.setCancelable(false);
+		dialog.setIndeterminate(false);
+		dialog.setMax(PRGMAX);
+		dialog.setTitle("Downloading...");
 //		progressDialog.setProgressNumberFormat(null); // Not available 'till API 11 (3.x).
-		progressDialog.show();
-		this.dialog = progressDialog;
+		
+		dialog.setCancelable(true);
+		dialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", this);
+		
+		dialog.show();
+		this.progressDialog = dialog;
+	}
+	
+	@Override
+	public void onClick (DialogInterface dialog, int which) {
+		if (which == DialogInterface.BUTTON_NEGATIVE) {
+			if (DownloadMediaTask.this.cancelled.compareAndSet(false, true)) {
+				DownloadMediaTask.this.progressDialog.setCancelable(false);
+			}
+		}
 	}
 	
 	@Override
@@ -73,12 +91,18 @@ public class DownloadMediaTask extends AsyncTask<MlistItem, Integer, String> {
 		if (items.length < 1) throw new IllegalArgumentException("No items desu~");
 		
 		final int pPerItem = (int) (PRGMAX / (float)items.length);
+		final AtomicInteger itemsCopied = new AtomicInteger(0);
+		
 		DownloadProgressListener progressListener = new DownloadProgressListener() {
 			@SuppressWarnings("synthetic-access")
 			@Override
 			public void downloadProgress (int bytesRead, int totalBytes) {
 				float p = (bytesRead / (float)totalBytes) * pPerItem;
-				publishProgress(Integer.valueOf(0), Integer.valueOf((int) p));
+				publishProgress(Integer.valueOf(0), Integer.valueOf((pPerItem * itemsCopied.get()) + (int) p));
+			}
+			@Override
+			public boolean abortListener () {
+				return DownloadMediaTask.this.cancelled.get();
 			}
 		};
 		
@@ -89,34 +113,42 @@ public class DownloadMediaTask extends AsyncTask<MlistItem, Integer, String> {
 		for (MlistItem item : items) {
 			final String url = this.serverReference.getBaseUrl() + item.getRelativeUrl();
 			final File file = new File(dir, item.getFileName());
+			boolean transferComplete = false;
 			
-			try {
+			try { // TODO only download if not already present?
 				HttpHelper.getUrlContent(url, new HttpFileDownloadHandler(file, progressListener));
+				transferComplete = true;
 			}
 			catch (IOException e) {
 				throw new RuntimeException(e);
 			}
+			finally {
+				if (!transferComplete || this.cancelled.get()) {
+					file.delete(); // TODO only delete if file checksum in incorrect?
+				}
+			}
 			
-			publishProgress(Integer.valueOf(pPerItem));
+			publishProgress(Integer.valueOf(pPerItem * itemsCopied.incrementAndGet()));
+			if (this.cancelled.get()) break;
 		}
 		
-		return "Download complete desu~";
+		return this.cancelled.get() ? "Download cancelled desu~" : "Download complete desu~";
 	}
 	
 	@Override
 	protected void onProgressUpdate (Integer... values) {
 		// Note that one is increment and one is set.
 		if (values.length >= 1 && values[0] != null && values[0].intValue() > 0) {
-			this.dialog.incrementProgressBy(values[0].intValue());
+			this.progressDialog.setProgress(values[0].intValue());
 		}
 		if (values.length >= 2 && values[1] != null && values[1].intValue() > 0) {
-			this.dialog.setSecondaryProgress(values[1].intValue());
+			this.progressDialog.setSecondaryProgress(values[1].intValue());
 		}
 	}
 	
 	@Override
 	protected void onPostExecute (String result) {
-		if (this.dialog != null) this.dialog.dismiss(); // This will fail if the screen is rotated while we are fetching.
+		if (this.progressDialog != null) this.progressDialog.dismiss(); // This will fail if the screen is rotated while we are fetching.
 		Toast.makeText(getContext(), result, Toast.LENGTH_SHORT).show();
 	}
 	
