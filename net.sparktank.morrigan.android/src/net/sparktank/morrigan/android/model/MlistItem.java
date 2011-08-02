@@ -16,6 +16,8 @@
 
 package net.sparktank.morrigan.android.model;
 
+import java.math.BigInteger;
+
 public interface MlistItem extends Artifact {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -27,10 +29,11 @@ public interface MlistItem extends Artifact {
 	public int getType ();
 	public String getRelativeUrl ();
 	public String getFileName ();
+	public BigInteger getHashCode ();
 	
-//	public int getDuration ();
-//	public int getStartCount ();
-//	public int getEndCount ();
+	public int getDuration ();
+	public int getStartCount ();
+	public int getEndCount ();
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
