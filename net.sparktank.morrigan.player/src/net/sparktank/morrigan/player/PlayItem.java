@@ -8,14 +8,21 @@ import net.sparktank.morrigan.model.media.IMediaTrackList;
 public class PlayItem {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public IMediaTrackList<? extends IMediaTrack> list;
+	// TODO make these final.
+	public final IMediaTrackList<? extends IMediaTrack> list;
 	public IMediaTrack item;
+	public int id;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public PlayItem (IMediaTrackList<? extends IMediaTrack> list, IMediaTrack item) {
+		this(list, item, -1);
+	}
+	
+	public PlayItem (IMediaTrackList<? extends IMediaTrack> list, IMediaTrack item, int id) {
 		this.list = list;
 		this.item = item;
+		this.id = id;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -39,15 +46,17 @@ public class PlayItem {
 		PlayItem that = (PlayItem)obj;
 		
 		return EqualHelper.areEqual(this.list, that.list)
-			&& EqualHelper.areEqual(this.item, that.item);
+			&& EqualHelper.areEqual(this.item, that.item)
+			&& this.id == that.id;
 	}
 	
 	@Override
 	public int hashCode() {
 		int hash = 1;
-	    hash = hash * 31 + (this.list == null ? 0 : this.list.hashCode());
-	    hash = hash * 31 + (this.item == null ? 0 : this.item.hashCode());
-	    return hash;
+		hash = hash * 31 + (this.list == null ? 0 : this.list.hashCode());
+		hash = hash * 31 + (this.item == null ? 0 : this.item.hashCode());
+		hash = hash * 31 + this.id;
+		return hash;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

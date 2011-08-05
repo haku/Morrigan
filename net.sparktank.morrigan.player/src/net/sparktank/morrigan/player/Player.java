@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
 import net.sparktank.morrigan.engines.EngineFactory;
@@ -225,20 +226,29 @@ public class Player implements IPlayerLocal {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Queue.
 	
+	private AtomicInteger _queueId = new AtomicInteger(0);
 	private List<PlayItem> _queue = new ArrayList<PlayItem>();
 	private List<Runnable> _queueChangeListeners = new ArrayList<Runnable>();
 	
+	private void validateQueueItemBeforeAdd (PlayItem item) {
+		if (item.item != null && !item.item.isPlayable()) throw new IllegalArgumentException("item is not playable.");
+		if (item.id >= 0) throw new IllegalArgumentException("item can not already have id.");
+		item.id = this._queueId.getAndIncrement();
+	}
+	
 	@Override
 	public void addToQueue (PlayItem item) {
-		// TODO check item is of MediaType == TRACK.
+		validateQueueItemBeforeAdd(item);
 		this._queue.add(item);
 		callQueueChangedListeners();
 	}
 	
 	@Override
-	public void addToQueue(List<PlayItem> item) {
-		// TODO check item is of MediaType == TRACK.
-		this._queue.addAll(item);
+	public void addToQueue(List<PlayItem> items) {
+		for (PlayItem item : items) {
+			validateQueueItemBeforeAdd(item);
+		}
+		this._queue.addAll(items);
 		callQueueChangedListeners();
 	}
 	
