@@ -2,6 +2,7 @@ package net.sparktank.morrigan.server;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.net.URLEncoder;
 import java.util.Collection;
 import java.util.List;
@@ -16,11 +17,13 @@ import javax.servlet.http.HttpServletResponse;
 import net.sparktank.morrigan.model.media.DurationData;
 import net.sparktank.morrigan.model.media.IMediaTrack;
 import net.sparktank.morrigan.model.media.IMediaTrackList;
+import net.sparktank.morrigan.model.media.IMixedMediaItem.MediaType;
 import net.sparktank.morrigan.player.IPlayerAbstract;
 import net.sparktank.morrigan.player.IPlayerLocal;
 import net.sparktank.morrigan.player.PlayItem;
 import net.sparktank.morrigan.player.PlayerRegister;
 import net.sparktank.morrigan.server.feedwriters.AbstractFeed;
+import net.sparktank.morrigan.server.feedwriters.XmlHelper;
 import net.sparktank.morrigan.util.TimeHelper;
 
 import org.xml.sax.SAXException;
@@ -315,11 +318,13 @@ public class PlayersServlet extends HttpServlet {
 		
 		List<PlayItem> queueList = p.getQueueList();
 		for (PlayItem playItem : queueList) {
+			final IMediaTrackList<? extends IMediaTrack> list = playItem.list;
+			final IMediaTrack mi = playItem.item;
+			
 			dw.startElement("entry");
 			
 			AbstractFeed.addElement(dw, "title", playItem.toString());
 			
-			IMediaTrackList<? extends IMediaTrack> list = playItem.list;
 			String listFile;
 			try {
 				listFile = URLEncoder.encode(AbstractFeed.filenameFromPath(list.getListId()), "UTF-8");
@@ -330,11 +335,12 @@ public class PlayersServlet extends HttpServlet {
 			String pathToSelf = CONTEXTPATH + "/" + list.getType() + "/" + listFile;
 			AbstractFeed.addLink(dw, pathToSelf, "list", "text/xml");
 			
-			IMediaTrack item = playItem.item;
-			if (item != null) {
+			AbstractFeed.addElement(dw, "id", playItem.id);
+			
+			if (mi != null) {
 				String file;
 				try {
-					file = URLEncoder.encode(item.getFilepath(), "UTF-8");
+					file = URLEncoder.encode(mi.getFilepath(), "UTF-8");
 				} catch (UnsupportedEncodingException e) {
 					throw new RuntimeException(e);
 				}
@@ -350,7 +356,24 @@ public class PlayersServlet extends HttpServlet {
 				sb.append("/");
 				sb.append(file);
 				AbstractFeed.addLink(dw, sb.toString(), "item");
+				
+				if (mi.getDateAdded() != null) {
+					AbstractFeed.addElement(dw, "dateadded", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateAdded()));
+				}
+				if (mi.getDateLastModified() != null) {
+					AbstractFeed.addElement(dw, "datelastmodified", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateLastModified()));
+				}
+				AbstractFeed.addElement(dw, "type", MediaType.TRACK.getN());
+				if (mi.getHashcode() != null && !BigInteger.ZERO.equals(mi.getHashcode())) AbstractFeed.addElement(dw, "hash", mi.getHashcode().toString(16));
+				AbstractFeed.addElement(dw, "enabled", Boolean.toString(mi.isEnabled()));
+				AbstractFeed.addElement(dw, "duration", mi.getDuration());
+				AbstractFeed.addElement(dw, "startcount", mi.getStartCount());
+				AbstractFeed.addElement(dw, "endcount", mi.getEndCount());
+				if (mi.getDateLastPlayed() != null) {
+					AbstractFeed.addElement(dw, "datelastplayed", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateLastPlayed()));
+				}
 			}
+			
 			
 			dw.endElement("entry");
 		}
