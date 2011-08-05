@@ -18,6 +18,7 @@ package net.sparktank.morrigan.android.model.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigInteger;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -43,7 +44,14 @@ public class PlayerQueueImpl implements PlayerQueue, ContentHandler {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private static final String ENTRY = "entry";
-	public static final String TITLE = "title";
+	private static final String TITLE = "title";
+	private static final String LISTREL = "list";
+	private static final String ITEMREL = "item";
+	private static final String ID = "id";
+	private static final String HASH = "hash";
+	private static final String DURATION = "duration";
+	private static final String STARTCOUNT = "startcount";
+	private static final String ENDCOUNT = "endcount";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -93,6 +101,11 @@ public class PlayerQueueImpl implements PlayerQueue, ContentHandler {
 	private String currentTitle = null;
 	private String currentListRelativeUrl = null;
 	private String currentItemRelativeUrl = null;
+	private int currentId;
+	private BigInteger currentHash = null;
+	private int currentDuration;
+	private int currentStartCount;
+	private int currentEndCount;
 	
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
@@ -105,13 +118,13 @@ public class PlayerQueueImpl implements PlayerQueue, ContentHandler {
 		}
 		else if (this.stack.size() == 3 && localName.equals("link")) {
 			String relVal = attributes.getValue("rel");
-			if (relVal != null && relVal.equals("item")) {
+			if (relVal != null && relVal.equals(ITEMREL)) {
 				String hrefVal = attributes.getValue("href");
 				if (hrefVal != null && hrefVal.length() > 0) {
 					this.currentItemRelativeUrl = hrefVal;
 				}
 			}
-			else if (relVal != null && relVal.equals("list")) {
+			else if (relVal != null && relVal.equals(LISTREL)) {
 				String hrefVal = attributes.getValue("href");
 				if (hrefVal != null && hrefVal.length() > 0) {
 					this.currentListRelativeUrl = hrefVal;
@@ -133,6 +146,11 @@ public class PlayerQueueImpl implements PlayerQueue, ContentHandler {
 				item.setTrackTitle(this.currentTitle);
 				item.setRelativeUrl(this.currentItemRelativeUrl);
 				item.setType(1); // TODO reference an enum?
+				item.setId(this.currentId);
+				item.setHashCode(this.currentHash);
+				item.setDuration(this.currentDuration);
+				item.setStartCount(this.currentStartCount);
+				item.setEndCount(this.currentEndCount);
 				this.artifactList.add(item);
 			}
 			else {
@@ -145,6 +163,26 @@ public class PlayerQueueImpl implements PlayerQueue, ContentHandler {
 		}
 		else if (this.stack.size() == 3 && localName.equals(TITLE)) {
 			this.currentTitle = this.currentText.toString();
+		}
+		else if (this.stack.size() == 3 && localName.equals(ID)) {
+			int v = Integer.parseInt(this.currentText.toString());
+			this.currentId = v;
+		}
+		else if (this.stack.size() == 3 && localName.equals(HASH)) {
+			BigInteger v = new BigInteger(this.currentText.toString(), 16);
+			this.currentHash = v;
+		}
+		else if (this.stack.size() == 3 && localName.equals(DURATION)) {
+			int v = Integer.parseInt(this.currentText.toString());
+			this.currentDuration = v;
+		}
+		else if (this.stack.size() == 3 && localName.equals(STARTCOUNT)) {
+			int v = Integer.parseInt(this.currentText.toString());
+			this.currentStartCount = v;
+		}
+		else if (this.stack.size() == 3 && localName.equals(ENDCOUNT)) {
+			int v = Integer.parseInt(this.currentText.toString());
+			this.currentEndCount = v;
 		}
 		
 		this.stack.pop();

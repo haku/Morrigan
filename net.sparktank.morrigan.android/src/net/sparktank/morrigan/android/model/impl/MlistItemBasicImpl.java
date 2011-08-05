@@ -27,6 +27,7 @@ public class MlistItemBasicImpl implements MlistItem {
 	
 	private String title;
 	private int type;
+	private int id;
 	private String relativeUrl;
 	private BigInteger hashCode;
 	private int duration;
@@ -77,6 +78,14 @@ public class MlistItemBasicImpl implements MlistItem {
 	}
 	public void setType(int type) {
 		this.type = type;
+	}
+	
+	@Override
+	public int getId () {
+		return this.id;
+	}
+	public void setId (int id) {
+		this.id = id;
 	}
 	
 	@Override
