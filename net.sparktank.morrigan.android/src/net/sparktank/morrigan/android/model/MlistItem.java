@@ -27,6 +27,7 @@ public interface MlistItem extends Artifact {
 	public int getImageResource ();
 	
 	public int getType ();
+	public int getId ();
 	public String getRelativeUrl ();
 	public String getFileName ();
 	public BigInteger getHashCode ();
