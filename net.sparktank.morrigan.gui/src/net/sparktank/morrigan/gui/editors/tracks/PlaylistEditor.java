@@ -23,6 +23,7 @@ import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -203,6 +204,11 @@ public class PlaylistEditor extends MediaTrackListEditor<IMediaPlaylist,IMediaTr
 			setFilterString("");
 		}
 	};
+	
+	@Override
+	protected void middleClickEvent (MouseEvent e) {
+		this.addToQueueAction.run();
+	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Actions.

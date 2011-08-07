@@ -16,6 +16,7 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -82,6 +83,11 @@ public class LocalMixedMediaDbEditor
 	@Override
 	protected boolean handleReadError(Exception e) {
 		return false;
+	}
+	
+	@Override
+	protected void middleClickEvent (MouseEvent e) {
+		this.addToQueueAction.run();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

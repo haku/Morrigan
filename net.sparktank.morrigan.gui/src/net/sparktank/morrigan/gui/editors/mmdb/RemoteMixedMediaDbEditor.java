@@ -18,6 +18,7 @@ import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
@@ -104,6 +105,11 @@ public class RemoteMixedMediaDbEditor
 				new MorriganMsgDlg("An update is already running for this library.").open();
 			}
 		}
+	}
+	
+	@Override
+	protected void middleClickEvent (MouseEvent e) {
+		// Unused.
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
