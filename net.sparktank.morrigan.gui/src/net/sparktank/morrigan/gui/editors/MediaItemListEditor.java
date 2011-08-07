@@ -44,6 +44,8 @@ import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FormAttachment;
@@ -184,6 +186,7 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 		
 		this.editTable.setContentProvider(this.contentProvider);
 		this.editTable.addDoubleClickListener(this.doubleClickListener);
+		this.editTable.getTable().addMouseListener(this.middleClickListener);
 		this.editTable.setInput(getEditorSite());
 		
 		this.mediaFilter = new MediaFilter();
@@ -459,6 +462,22 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 				new MorriganMsgDlg(e).open();
 			}
 		}
+	};
+	
+	/**
+	 * This will be called on the GUI thread.
+	 */
+	abstract protected void middleClickEvent (MouseEvent e);
+	
+	protected MouseListener middleClickListener = new MouseListener() {
+		@Override
+		public void mouseUp (MouseEvent e) {
+			if (e.button == 2) { // 1 is left, 2 is middle, 3 is right.
+				middleClickEvent(e);
+			}
+		}
+		@Override public void mouseDown (MouseEvent e) { /* Unused. */ }
+		@Override public void mouseDoubleClick (MouseEvent e) { /* Unused. */ }
 	};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
