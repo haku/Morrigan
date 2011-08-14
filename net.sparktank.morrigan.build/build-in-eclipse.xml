@@ -128,12 +128,13 @@
 
 		<zip destfile="${zipfile}" update="true" whenempty="fail" >
 			<zipfileset dir="propfiles"
-			            includes="linux.properties"
-			            fullpath="${archivePrefix}/morrigan.properties"
+						includes="linux.properties"
+						fullpath="${archivePrefix}/morrigan.properties"
 			/>
 			<zipfileset dir="rootfiles"
-			            includes="morrigan.sh"
-			            fullpath="${archivePrefix}/morrigan.sh"
+						includes="morrigan.sh"
+						fullpath="${archivePrefix}/morrigan.sh"
+						filemode="755"
 			/>
 			<zipfileset dir="../net.sparktank.morrigan.wui" includes="morrigan.wui.war" prefix="${archivePrefix}/" />
 		</zip>
