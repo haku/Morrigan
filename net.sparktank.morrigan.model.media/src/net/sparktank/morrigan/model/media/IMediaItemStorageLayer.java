@@ -73,6 +73,7 @@ public interface IMediaItemStorageLayer<T extends IMediaItem> extends IGenericDb
 	
 	public boolean hasFile (File file) throws DbException;
 	public T getByFile (File file) throws DbException;
+	public T getByFile (String filePath) throws DbException;
 	public List<T> simpleSearch(String term, String esc, int maxResults) throws DbException;
 	
 	public boolean[] addFiles (List<File> files) throws DbException;

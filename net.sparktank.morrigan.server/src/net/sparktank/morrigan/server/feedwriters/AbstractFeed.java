@@ -13,7 +13,9 @@ import com.megginson.sax.DataWriter;
 // TODO make into static helper class.
 public abstract class AbstractFeed {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
+	
+	private static final String CDATA = "CDATA";
+	
 	public void process (PrintWriter out) throws SAXException, MorriganException {
 		DataWriter dw = startFeed(out);
 		populateFeed(dw);
@@ -31,7 +33,7 @@ public abstract class AbstractFeed {
 	
 	static public DataWriter startFeed (PrintWriter out) throws SAXException {
 		AttributesImpl atts = new AttributesImpl();
-		atts.addAttribute("", "xmlns", "", "CDATA", FEEDNS);
+		atts.addAttribute("", "xmlns", "", CDATA, FEEDNS);
 		DataWriter dw = startDocument(out, FEED, atts);
 		
 		return dw;
@@ -93,6 +95,17 @@ public abstract class AbstractFeed {
 		dw.dataElement(newElement, textContent);
 	}
 	
+	static public void addElement (DataWriter dw, String newElement, String textContent, String[][] attrs) throws SAXException {
+		AttributesImpl atts = new AttributesImpl();
+		for (String[] attr : attrs) {
+			String key = attr[0];
+			String value = attr[1];
+			atts.addAttribute("", key, "", CDATA, value);
+		}
+		
+		dw.dataElement("", newElement, null, atts, textContent);
+	}
+	
 	static public void addLink (DataWriter dw, String href, String rel) throws SAXException {
 		addLink(dw, href, rel, null);
 	}
@@ -101,14 +114,14 @@ public abstract class AbstractFeed {
 		AttributesImpl atts = new AttributesImpl();
 		
 		if (rel != null) {
-			atts.addAttribute("", "rel", "", "CDATA", rel);
+			atts.addAttribute("", "rel", "", CDATA, rel);
 		}
 		
 		if (type != null) {
-			atts.addAttribute("", "type", "", "CDATA", type);
+			atts.addAttribute("", "type", "", CDATA, type);
 		}
 		
-		atts.addAttribute("", "href", "", "CDATA", href);
+		atts.addAttribute("", "href", "", CDATA, href);
 		
 		dw.emptyElement("", "link", "", atts);
 	}

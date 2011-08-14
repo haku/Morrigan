@@ -9,6 +9,8 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.net.UnknownHostException;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Stack;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -19,6 +21,7 @@ import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.IMixedMediaItem.MediaType;
 import net.sparktank.morrigan.model.media.IRemoteMixedMediaDb;
+import net.sparktank.morrigan.model.media.MediaTagType;
 import net.sparktank.morrigan.model.tasks.TaskEventListener;
 import net.sparktank.morrigan.server.MlistsServlet;
 import net.sparktank.morrigan.server.feedwriters.XmlHelper;
@@ -144,14 +147,22 @@ public class MixedMediaDbFeedParser extends DefaultHandler {
 	private long entryCount = 0;
 	private long entriesProcessed = 0;
 	private int progress = 0;
+	
 	private IMixedMediaItem currentItem;
 	private StringBuilder currentText;
+	
+	private List<String> tagValues = new LinkedList<String>();
+	private List<MediaTagType> tagTypes = new LinkedList<MediaTagType>();
+	private List<String> tagClasses = new LinkedList<String>();
 	
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 		this.stack.push(localName);
 		if (this.stack.size() == 2 && localName.equals("entry")) {
 			this.currentItem = this.rmmdb.getDbLayer().getNewT(null);
+			this.tagValues.clear();
+			this.tagTypes.clear();
+			this.tagClasses.clear();
 		}
 		else if (this.stack.size() == 3 && localName.equals("link")) {
 			String relVal = attributes.getValue("rel");
@@ -168,6 +179,13 @@ public class MixedMediaDbFeedParser extends DefaultHandler {
 				}
 			}
 		}
+		else if (this.stack.size() == 3 && localName.equals("tag")) {
+			String typeString = attributes.getValue("t");
+			MediaTagType type = typeString == null ? null : MediaTagType.getFromIndex(Integer.parseInt(typeString));
+			this.tagTypes.add(type);
+			String classString = attributes.getValue("c");
+			this.tagClasses.add(classString);
+		}
 		
 		// If we need a new StringBuilder, make one.
 		if (this.currentText == null || this.currentText.length() > 0) {
@@ -182,7 +200,21 @@ public class MixedMediaDbFeedParser extends DefaultHandler {
 		}
 		else if (this.stack.size() == 2 && localName.equals("entry")) {
 			try {
-				this.rmmdb.updateItem(this.currentItem);
+				// Returned item should have DB row ID filed in.
+				IMixedMediaItem realItem = this.rmmdb.updateItem(this.currentItem);
+				if (realItem.getDbRowId() < 0) throw new IllegalStateException("Can not add tags without DB row id for '"+realItem+"'.");
+				if (this.tagValues.size() > 0) {
+					if (this.tagValues.size() != this.tagTypes.size() || this.tagValues.size() != this.tagClasses.size()) {
+    					throw new IllegalArgumentException("Unbalanced tag lists.");
+    				}
+					// TODO what about removing deleted tags?
+					for (int i = 0; i < this.tagValues.size(); i++) {
+    					String value = this.tagValues.get(i);
+    					MediaTagType type = this.tagTypes.get(i);
+    					String classString = this.tagClasses.get(i);
+    					this.rmmdb.addTag(realItem, value, type, classString);
+    				}
+				}
 			}
 			catch (MorriganException e) {
 				throw new SAXException(e);
@@ -259,6 +291,10 @@ public class MixedMediaDbFeedParser extends DefaultHandler {
 		else if (this.stack.size() == 3 && localName.equals("height")) {
 			int v = Integer.parseInt(this.currentText.toString());
 			this.currentItem.setHeight(v);
+		}
+		else if (this.stack.size() == 3 && localName.equals("tag")) {
+			String v = this.currentText.toString();
+			this.tagValues.add(v);
 		}
 		
 		this.stack.pop();
