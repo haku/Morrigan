@@ -406,7 +406,7 @@ public class MlistsServlet extends HttpServlet {
     				for (MediaTag tag : tags) {
 						AbstractFeed.addElement(dw, "tag", tag.getTag(), new String[][] {
 							{"t", String.valueOf(tag.getType().getIndex())},
-							{"c", tag.getClassification().getClassification()}
+							{"c", tag.getClassification() == null ? "" : tag.getClassification().getClassification()}
 							});
 					}
     			}
