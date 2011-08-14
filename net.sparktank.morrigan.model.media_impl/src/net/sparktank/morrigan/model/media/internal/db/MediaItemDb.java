@@ -730,15 +730,17 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 	}
 	
 	@Override
-	public void updateItem (T mi) throws MorriganException, DbException {
+	public T updateItem (T mi) throws MorriganException, DbException {
 		if (this._changedItems == null) {
 			throw new IllegalArgumentException("updateItem() can only be called after beginBulkUpdate() and before completeBulkUpdate().");
 		}
 		
+		T ret;
 		boolean added = this.dbLayer.addFile(mi.getFilepath(), -1);
 		if (added) {
 			addItem(mi);
 			persistTrackData(mi);
+			ret = this.dbLayer.getByFile(mi.getFilepath());
 		}
 		else {
 			// Update item.
@@ -755,9 +757,12 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 				setDirtyState(DirtyState.DIRTY); // just to trigger change events.
 				persistTrackData(track);
 			}
+			ret = track;
 		}
 		
 		if (this._changedItems != null) this._changedItems.add(mi);
+		
+		return ret;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

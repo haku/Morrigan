@@ -20,6 +20,7 @@ import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.IMixedMediaItem.MediaType;
 import net.sparktank.morrigan.model.media.MediaListReference;
+import net.sparktank.morrigan.model.media.MediaTag;
 import net.sparktank.morrigan.model.media.impl.MediaFactoryImpl;
 import net.sparktank.morrigan.model.media.internal.db.mmdb.LocalMixedMediaDbHelper;
 import net.sparktank.morrigan.player.IPlayerLocal;
@@ -33,6 +34,12 @@ import org.xml.sax.SAXException;
 
 import com.megginson.sax.DataWriter;
 
+/**
+ * Valid URLs:
+ * 
+ * 
+ *
+ */
 public class MlistsServlet extends HttpServlet {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -300,6 +307,10 @@ public class MlistsServlet extends HttpServlet {
 	}
 	
 	static private void printMlistLong (DataWriter dw, ILocalMixedMediaDb ml, boolean listSrcs, boolean listItems, String queryString) throws SAXException, MorriganException, DbException {
+		printMlistLong(dw, ml, listSrcs, listItems, true, queryString); // TODO always include tags?
+	}
+	
+	static private void printMlistLong (DataWriter dw, ILocalMixedMediaDb ml, boolean listSrcs, boolean listItems, boolean includeTags, String queryString) throws SAXException, MorriganException, DbException {
 		ml.read();
 		
 		List<IMixedMediaItem> items;
@@ -388,6 +399,16 @@ public class MlistsServlet extends HttpServlet {
     			else if (mi.getMediaType() == MediaType.PICTURE) {
     				AbstractFeed.addElement(dw, "width", mi.getWidth());
     				AbstractFeed.addElement(dw, "height", mi.getHeight());
+    			}
+    			
+    			if (includeTags) {
+    				List<MediaTag> tags = ml.getTags(mi);
+    				for (MediaTag tag : tags) {
+						AbstractFeed.addElement(dw, "tag", tag.getTag(), new String[][] {
+							{"t", String.valueOf(tag.getType().getIndex())},
+							{"c", tag.getClassification().getClassification()}
+							});
+					}
     			}
     			
     			dw.endElement("entry");

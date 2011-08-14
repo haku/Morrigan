@@ -12,19 +12,14 @@ import java.net.SocketException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.Date;
-import java.util.List;
 
 import net.sparktank.morrigan.engines.playback.NotImplementedException;
-import net.sparktank.morrigan.model.db.IDbItem;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.factory.RecyclingFactory;
 import net.sparktank.morrigan.model.media.IMediaTrack;
 import net.sparktank.morrigan.model.media.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.IMixedMediaStorageLayer;
 import net.sparktank.morrigan.model.media.IRemoteMixedMediaDb;
-import net.sparktank.morrigan.model.media.MediaTag;
-import net.sparktank.morrigan.model.media.MediaTagClassification;
-import net.sparktank.morrigan.model.media.MediaTagType;
 import net.sparktank.morrigan.model.media.internal.db.MediaItemDbConfig;
 import net.sparktank.morrigan.model.media.internal.db.mmdb.AbstractMixedMediaDb;
 import net.sparktank.morrigan.model.media.internal.db.mmdb.MixedMediaSqliteLayerFactory;
@@ -111,8 +106,8 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb<IRemoteMixedMediaDb
 		String s = localDbLayer.getProp(DBKEY_SERVERURL);
 		if (s != null) {
 			this.url = new URL(s);
-			
-		} else {
+		}
+		else {
 			throw new IllegalArgumentException("serverUrl not found in localDbLayer ('"+localDbLayer.getDbFilePath()+"').");
 		}
 		
@@ -389,7 +384,7 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb<IRemoteMixedMediaDb
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Db property modifiers.
+//	DB property modifiers.
 	
 	@Override
 	public void addSource (String source) throws MorriganException {
@@ -404,35 +399,7 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb<IRemoteMixedMediaDb
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Tags.
 	
-	@Override
-	public boolean hasTags (IDbItem item) throws MorriganException {
-		return false;
-	}
-	
-	@Override
-	public List<MediaTag> getTags (IDbItem item) throws MorriganException {
-		throw new NotImplementedException();
-	}
-	
-	@Override
-	public void addTag (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) throws MorriganException {
-		throw new NotImplementedException();
-	}
-	
-	@Override
-	public void moveTags (IDbItem from_item, IDbItem to_item) throws MorriganException {
-		throw new NotImplementedException();
-	}
-	
-	@Override
-	public void removeTag (MediaTag mt) throws MorriganException {
-		throw new NotImplementedException();
-	}
-	
-	@Override
-	public void addTagClassification(String classificationName) throws MorriganException {
-		throw new NotImplementedException();
-	}
+	// TODO FIXME stop user adding tags?
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

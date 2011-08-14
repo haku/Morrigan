@@ -58,7 +58,7 @@ public interface IMediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMediaIte
 	
 	public void beginBulkUpdate ();
 	public void completeBulkUpdate (boolean thereWereErrors) throws MorriganException, DbException;
-	public void updateItem (T item) throws MorriganException, DbException;
+	public T updateItem (T item) throws MorriganException, DbException;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
