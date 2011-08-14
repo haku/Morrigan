@@ -9,6 +9,7 @@ import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.IRemoteMixedMediaDb;
+import net.sparktank.morrigan.model.media.MediaTag;
 import net.sparktank.morrigan.model.tasks.IMorriganTask;
 import net.sparktank.morrigan.model.tasks.TaskEventListener;
 import net.sparktank.morrigan.model.tasks.TaskResult;
@@ -57,7 +58,7 @@ public class SyncMetadataRemoteToLocalTask implements IMorriganTask {
 						final IMixedMediaItem localItem = localItems.get(hashcode);
 						if (localItem != null) {
 							taskEventListener.subTask(localItem.getTitle());
-							syncMediaItems(trans, remoteItem, localItem);
+							syncMediaItems(trans, this.remote, remoteItem, localItem);
 						}
 						taskEventListener.worked(1);
 						if (taskEventListener.isCanceled()) break;
@@ -90,31 +91,35 @@ public class SyncMetadataRemoteToLocalTask implements IMorriganTask {
 		return ret;
 	}
 	
-	/**
-	 * TODO also sync tags.
-	 */
-	private static void syncMediaItems (final ILocalMixedMediaDb db, IMixedMediaItem remoteItem, IMixedMediaItem localItem) throws MorriganException {
+	private static void syncMediaItems (final ILocalMixedMediaDb ldb, IRemoteMixedMediaDb rdb, IMixedMediaItem remoteItem, IMixedMediaItem localItem) throws MorriganException {
 		if (remoteItem.getStartCount() > localItem.getStartCount()) {
-			db.setTrackStartCnt(localItem, remoteItem.getStartCount());
+			ldb.setTrackStartCnt(localItem, remoteItem.getStartCount());
 		}
 		
 		if (remoteItem.getEndCount() > localItem.getEndCount()) {
-			db.setTrackEndCnt(localItem, remoteItem.getEndCount());
+			ldb.setTrackEndCnt(localItem, remoteItem.getEndCount());
 		}
 		
 		if (remoteItem.getDateAdded().getTime() > 0 && remoteItem.getDateAdded().getTime() < localItem.getDateAdded().getTime()) {
-			db.setItemDateAdded(localItem, remoteItem.getDateAdded());
+			ldb.setItemDateAdded(localItem, remoteItem.getDateAdded());
 		}
 		
 		if (
 				remoteItem.getDateLastPlayed() != null && remoteItem.getDateLastPlayed().getTime() > 0
 				&& (localItem.getDateLastPlayed() == null || remoteItem.getDateLastPlayed().getTime() > localItem.getDateLastPlayed().getTime())
 				) {
-			db.setTrackDateLastPlayed(localItem, remoteItem.getDateLastPlayed());
+			ldb.setTrackDateLastPlayed(localItem, remoteItem.getDateLastPlayed());
 		}
 		
 		if (remoteItem.isEnabled() != localItem.isEnabled()) {
-			db.setItemEnabled(localItem, remoteItem.isEnabled());
+			ldb.setItemEnabled(localItem, remoteItem.isEnabled());
+		}
+		
+		List<MediaTag> rTags = rdb.getTags(remoteItem);
+		if (rTags != null && rTags.size() > 0) {
+			for (MediaTag rTag : rTags) {
+				ldb.addTag(localItem, rTag.getTag(), rTag.getType(), rTag.getClassification().getClassification());
+			}
 		}
 	}
 	
