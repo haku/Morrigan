@@ -131,6 +131,10 @@
 			            includes="linux.properties"
 			            fullpath="${archivePrefix}/morrigan.properties"
 			/>
+			<zipfileset dir="rootfiles"
+			            includes="morrigan.sh"
+			            fullpath="${archivePrefix}/morrigan.sh"
+			/>
 			<zipfileset dir="../net.sparktank.morrigan.wui" includes="morrigan.wui.war" prefix="${archivePrefix}/" />
 		</zip>
 	</target>
