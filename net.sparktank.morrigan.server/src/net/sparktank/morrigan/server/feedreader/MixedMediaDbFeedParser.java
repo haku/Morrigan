@@ -169,10 +169,10 @@ public class MixedMediaDbFeedParser extends DefaultHandler {
 			if (relVal != null && relVal.equals("self")) {
 				String hrefVal = attributes.getValue("href");
 				if (hrefVal != null && hrefVal.length() > 0) {
+					this.currentItem.setRemoteLocation(hrefVal);
 					try {
 						String remotePath = URLDecoder.decode(hrefVal, "UTF-8");
 						this.currentItem.setFilepath(remotePath);
-						this.currentItem.setRemoteLocation(hrefVal);
 					} catch (UnsupportedEncodingException e) {
 						throw new SAXException(e);
 					}
