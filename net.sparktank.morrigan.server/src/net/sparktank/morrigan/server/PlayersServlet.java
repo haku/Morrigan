@@ -30,12 +30,30 @@ import org.xml.sax.SAXException;
 
 import com.megginson.sax.DataWriter;
 
+/**
+ * Valid URLs:
+ * <pre>
+ *  GET /players
+ *  GET /players/0
+ *  GET /players/0/queue
+ * 
+ * POST /players/0 action=playpause
+ * POST /players/0 action=next
+ * POST /players/0 action=stop
+ * POST /players/0 action=fullscreen&monitor=0
+ * </pre>
+ */
 public class PlayersServlet extends HttpServlet {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static final String CONTEXTPATH = "/players";
 	
 	public static final String PATH_QUEUE = "queue";
+	
+	private static final String CMD_PLAYPAUSE = "playpause";
+	private static final String CMD_NEXT = "next";
+	private static final String CMD_STOP = "stop";
+	private static final String CMD_FULLSCREEN = "fullscreen";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -62,19 +80,19 @@ public class PlayersServlet extends HttpServlet {
 			resp.setContentType("text/plain");
 			resp.getWriter().println("HTTP Error 400 'action' parameter not set desu~");
 		}
-		else if (act.equals("playpause")) {
+		else if (act.equals(CMD_PLAYPAUSE)) {
 			player.pausePlaying();
 			writeResponse(req, resp);
 		}
-		else if (act.equals("next")) {
+		else if (act.equals(CMD_NEXT)) {
 			player.nextTrack();
 			writeResponse(req, resp);
 		}
-		else if (act.equals("stop")) {
+		else if (act.equals(CMD_STOP)) {
 			player.stopPlaying();
 			writeResponse(req, resp);
 		}
-		else if (act.equals("fullscreen")) {
+		else if (act.equals(CMD_FULLSCREEN)) {
 			String monitorString = req.getParameter("monitor");
 			if (monitorString != null && monitorString.length() > 0) {
 				int monitorId = Integer.parseInt(monitorString);
@@ -263,7 +281,7 @@ public class PlayersServlet extends HttpServlet {
 					StringBuilder sb = new StringBuilder();
 					sb.append(listUrl);
 					sb.append("/");
-					sb.append(MlistsServlet.PATH_ITEM);
+					sb.append(MlistsServlet.PATH_ITEMS);
 					sb.append("/");
 					sb.append(file);
 					trackLink = sb.toString();
@@ -352,7 +370,7 @@ public class PlayersServlet extends HttpServlet {
 				sb.append("/");
 				sb.append(listFile);
 				sb.append("/");
-				sb.append(MlistsServlet.PATH_ITEM);
+				sb.append(MlistsServlet.PATH_ITEMS);
 				sb.append("/");
 				sb.append(file);
 				AbstractFeed.addLink(dw, sb.toString(), "item");
