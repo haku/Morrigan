@@ -321,6 +321,11 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 //	Queries.
 	
 	@Override
+	public boolean hasFile (String filepath) throws MorriganException, DbException {
+		return this.dbLayer.hasFile(filepath);
+	}
+	
+	@Override
 	public boolean hasFile (File file) throws MorriganException, DbException {
 		return this.dbLayer.hasFile(file);
 	}
