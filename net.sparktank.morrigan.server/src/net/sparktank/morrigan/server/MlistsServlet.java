@@ -16,9 +16,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.DurationData;
+import net.sparktank.morrigan.model.media.IAbstractMixedMediaDb;
 import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.IMixedMediaItem.MediaType;
+import net.sparktank.morrigan.model.media.IRemoteMixedMediaDb;
 import net.sparktank.morrigan.model.media.MediaListReference;
 import net.sparktank.morrigan.model.media.MediaTag;
 import net.sparktank.morrigan.model.media.impl.MediaFactoryImpl;
@@ -28,6 +30,8 @@ import net.sparktank.morrigan.player.PlayItem;
 import net.sparktank.morrigan.player.PlayerRegister;
 import net.sparktank.morrigan.server.feedwriters.AbstractFeed;
 import net.sparktank.morrigan.server.feedwriters.XmlHelper;
+import net.sparktank.morrigan.server.model.RemoteMixedMediaDb;
+import net.sparktank.morrigan.server.model.RemoteMixedMediaDbHelper;
 import net.sparktank.sqlitewrapper.DbException;
 
 import org.xml.sax.SAXException;
@@ -36,9 +40,22 @@ import com.megginson.sax.DataWriter;
 
 /**
  * Valid URLs:
+ * <pre>
+ *  GET /mlists
  * 
+ *  GET /mlists/LOCALMMDB/example.local.db3
+ *  GET /mlists/LOCALMMDB/example.local.db3/src
+ * POST /mlists/LOCALMMDB/example.local.db3 action=play&playerid=0
+ * POST /mlists/LOCALMMDB/example.local.db3 action=queue&playerid=0
+ * POST /mlists/LOCALMMDB/example.local.db3 action=scan
  * 
- *
+ *  GET /mlists/LOCALMMDB/example.local.db3/items
+ *  GET /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3
+ * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 action=play&playerid=0
+ * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 action=queue&playerid=0
+ * 
+ *  GET /mlists/LOCALMMDB/wui.local.db3/query/example
+ * </pre>
  */
 public class MlistsServlet extends HttpServlet {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -47,13 +64,14 @@ public class MlistsServlet extends HttpServlet {
 	
 	public static final String PATH_ITEMS = "items";
 	public static final String PATH_SRC = "src";
-	public static final String PATH_ITEM = "item";
 	public static final String PATH_QUERY = "query";
 	
 	public static final String CMD_NEWMMDB = "newmmdb";
 	public static final String CMD_SCAN = "scan";
 	public static final String CMD_PLAY = "play";
 	public static final String CMD_QUEUE = "queue";
+	
+	private static final String ELEMENT_ERROR = "error";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -137,6 +155,20 @@ public class MlistsServlet extends HttpServlet {
 							printMlist(resp, mmdb, subPath, afterSubPath);
 						}
 					}
+					else if (type.equals(IRemoteMixedMediaDb.TYPE)) {
+						String f = RemoteMixedMediaDbHelper.getFullPathToMmdb(pathParts[1]);
+						IRemoteMixedMediaDb mmdb = RemoteMixedMediaDb.FACTORY.manufacture(f);
+						
+						// TODO remove duplicate code.
+						String subPath = pathParts.length >= 3 ? pathParts[2] : null;
+						String afterSubPath = pathParts.length >= 4 ? pathParts[3] : null;
+						if (verb == Verb.POST) {
+							postToMmdb(req, resp, action, mmdb, subPath, afterSubPath);
+						}
+						else {
+							printMlist(resp, mmdb, subPath, afterSubPath);
+						}
+					}
 					else {
 						resp.setContentType("text/plain");
 						resp.getWriter().println("Unknown type '"+type+"' desu~.");
@@ -166,7 +198,7 @@ public class MlistsServlet extends HttpServlet {
 		}
 	}
 	
-	private static void postToMmdb(HttpServletRequest req, HttpServletResponse resp, String action, ILocalMixedMediaDb mmdb, String path, String afterPath) throws IOException, MorriganException, DbException {
+	private static void postToMmdb(HttpServletRequest req, HttpServletResponse resp, String action, IAbstractMixedMediaDb<?> mmdb, String path, String afterPath) throws IOException, MorriganException, DbException {
 		if (action.equals(CMD_PLAY) || action.equals(CMD_QUEUE)) {
 			String playerIdS = req.getParameter("playerid");
 			if (playerIdS == null) {
@@ -180,7 +212,7 @@ public class MlistsServlet extends HttpServlet {
 				
 				mmdb.read(); // TODO make this call only when needed?  This is a bit catch-all.
 				
-				if (path != null && path.equals(PATH_ITEM) && afterPath != null && afterPath.length() > 0) {
+				if (path != null && path.equals(PATH_ITEMS) && afterPath != null && afterPath.length() > 0) {
 					String filename = URLDecoder.decode(afterPath, "UTF-8");
 					File file = new File(filename);
 					
@@ -249,7 +281,15 @@ public class MlistsServlet extends HttpServlet {
 		
 		Collection<IPlayerLocal> players = PlayerRegister.getLocalPlayers();
 		
+		// TODO merge 2 loops.
+		
 		for (MediaListReference listRef : MediaFactoryImpl.get().getAllLocalMixedMediaDbs()) {
+			dw.startElement("entry");
+			printMlistShort(dw, listRef, players);
+			dw.endElement("entry");
+		}
+		
+		for (MediaListReference listRef : RemoteMixedMediaDbHelper.getAllRemoteMmdb()) {
 			dw.startElement("entry");
 			printMlistShort(dw, listRef, players);
 			dw.endElement("entry");
@@ -258,7 +298,7 @@ public class MlistsServlet extends HttpServlet {
 		AbstractFeed.endFeed(dw);
 	}
 	
-	static private void printMlist (HttpServletResponse resp, ILocalMixedMediaDb mmdb, String path, String afterPath) throws IOException, SAXException, MorriganException, DbException {
+	static private void printMlist (HttpServletResponse resp, IAbstractMixedMediaDb<?> mmdb, String path, String afterPath) throws IOException, SAXException, MorriganException, DbException {
 		resp.setContentType("text/xml;charset=utf-8");
 		DataWriter dw = AbstractFeed.startDocument(resp.getWriter(), "mlist");
 		
@@ -266,24 +306,44 @@ public class MlistsServlet extends HttpServlet {
 			printMlistLong(dw, mmdb, false, false);
 		}
 		else if (path.equals(PATH_ITEMS)) {
-			printMlistLong(dw, mmdb, false, true);
+			if (afterPath != null && afterPath.length() > 0) {
+				// Request to fetch media file.
+				String filename = URLDecoder.decode(afterPath, "UTF-8");
+				if (mmdb.hasFile(filename)) {
+					// TODO FIXME what if path is from RMMDB?
+					File file = new File(filename);
+					if (file.exists()) {
+						ServletHelper.returnFile(file, resp);
+					}
+					else {
+						resp.reset();
+						resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+						resp.setContentType("text/plain");
+						resp.getWriter().println("HTTP error 404 '"+filename+"' not found desu~");
+						return;
+					}
+				}
+				else {
+					resp.reset();
+					resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+					resp.setContentType("text/plain");
+					resp.getWriter().println("HTTP error 404 '"+filename+"' is not in '"+mmdb.getListId()+"' desu~");
+					return;
+				}
+			}
+			else {
+				printMlistLong(dw, mmdb, false, true);
+			}
 		}
 		else if (path.equals(PATH_SRC)) {
 			printMlistLong(dw, mmdb, true, false);
-		}
-		else if (path.equals(PATH_ITEM) && afterPath != null && afterPath.length() > 0) {
-			String filename = URLDecoder.decode(afterPath, "UTF-8");
-			File file = new File(filename);
-			if (mmdb.hasFile(file) && file.exists()) {
-				ServletHelper.returnFile(file, resp);
-			}
 		}
 		else if (path.equals(PATH_QUERY) && afterPath != null && afterPath.length() > 0) {
 			String query = URLDecoder.decode(afterPath, "UTF-8");
 			printMlistLong(dw, mmdb, false, true, query);
 		}
 		else {
-			AbstractFeed.addElement(dw, "error", "Unknown path '"+path+"' desu~");
+			AbstractFeed.addElement(dw, ELEMENT_ERROR, "Unknown path '"+path+"' desu~");
 		}
 		
 		AbstractFeed.endDocument(dw, "mlist");
@@ -295,22 +355,29 @@ public class MlistsServlet extends HttpServlet {
 		String fileName = listRef.getIdentifier().substring(listRef.getIdentifier().lastIndexOf(File.separator) + 1);
 		
 		AbstractFeed.addElement(dw, "title", listRef.getTitle());
-		AbstractFeed.addLink(dw, CONTEXTPATH + "/" + ILocalMixedMediaDb.TYPE + "/" + fileName, "self", "text/xml");
+		
+		String type;
+		switch (listRef.getType()) {
+			case LOCALMMDB:  type = ILocalMixedMediaDb.TYPE;  break;
+			case REMOTEMMDB: type = IRemoteMixedMediaDb.TYPE; break;
+			default: throw new IllegalArgumentException("Can not list type '"+listRef.getType()+"' desu~");
+		}
+		AbstractFeed.addLink(dw, CONTEXTPATH + "/" + type + "/" + fileName, "self", "text/xml");
 		
 		for (IPlayerLocal p : players) {
 			AbstractFeed.addLink(dw, "/player/" + p.getId() + "/play/" + fileName, "play", "cmd");
 		}
 	}
 	
-	static private void printMlistLong (DataWriter dw, ILocalMixedMediaDb ml, boolean listSrcs, boolean listItems) throws SAXException, MorriganException, DbException {
+	static private void printMlistLong (DataWriter dw, IAbstractMixedMediaDb<?> ml, boolean listSrcs, boolean listItems) throws SAXException, MorriganException, DbException {
 		printMlistLong(dw, ml, listSrcs, listItems, null);
 	}
 	
-	static private void printMlistLong (DataWriter dw, ILocalMixedMediaDb ml, boolean listSrcs, boolean listItems, String queryString) throws SAXException, MorriganException, DbException {
+	static private void printMlistLong (DataWriter dw, IAbstractMixedMediaDb<?> ml, boolean listSrcs, boolean listItems, String queryString) throws SAXException, MorriganException, DbException {
 		printMlistLong(dw, ml, listSrcs, listItems, true, queryString); // TODO always include tags?
 	}
 	
-	static private void printMlistLong (DataWriter dw, ILocalMixedMediaDb ml, boolean listSrcs, boolean listItems, boolean includeTags, String queryString) throws SAXException, MorriganException, DbException {
+	static private void printMlistLong (DataWriter dw, IAbstractMixedMediaDb<?> ml, boolean listSrcs, boolean listItems, boolean includeTags, String queryString) throws SAXException, MorriganException, DbException {
 		ml.read();
 		
 		List<IMixedMediaItem> items;
@@ -373,7 +440,7 @@ public class MlistsServlet extends HttpServlet {
     			StringBuilder sb = new StringBuilder();
     			sb.append(pathToSelf);
     			sb.append("/");
-    			sb.append(PATH_ITEM);
+    			sb.append(PATH_ITEMS);
     			sb.append("/");
     			sb.append(file);
     			AbstractFeed.addLink(dw, sb.toString(), "self");
