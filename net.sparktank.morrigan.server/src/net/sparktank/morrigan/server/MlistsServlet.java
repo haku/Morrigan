@@ -208,33 +208,33 @@ public class MlistsServlet extends HttpServlet {
 				mmdb.read(); // TODO make this call only when needed?  This is a bit catch-all.
 				
 				if (path != null && path.equals(PATH_ITEMS) && afterPath != null && afterPath.length() > 0) {
-					String filename = URLDecoder.decode(afterPath, "UTF-8");
-					File file = new File(filename);
-					
-					if (mmdb.hasFile(file)) {
-						IMixedMediaItem item = mmdb.getByFile(file);
+					String filepath = URLDecoder.decode(afterPath, "UTF-8");
+					if (mmdb.hasFile(filepath)) {
+						IMixedMediaItem item = mmdb.getByFile(filepath);
 						if (item != null) {
-    						resp.setContentType("text/plain");
-    						if (action.equals(CMD_PLAY)) {
-    							player.loadAndStartPlaying(mmdb, item);
-    							resp.getWriter().println("Item playing desu~");
-    						}
-    						else if (action.equals(CMD_QUEUE)) {
-    							player.addToQueue(new PlayItem(mmdb, item));
-    							resp.getWriter().println("Item added to queue desu~");
-    						}
-    						else {
-    							throw new IllegalArgumentException("The world has exploded desu~.");
-    						}
+							resp.setContentType("text/plain");
+							if (action.equals(CMD_PLAY)) {
+								player.loadAndStartPlaying(mmdb, item);
+								resp.getWriter().println("Item playing desu~");
+							}
+							else if (action.equals(CMD_QUEUE)) {
+								player.addToQueue(new PlayItem(mmdb, item));
+								resp.getWriter().println("Item added to queue desu~");
+							}
+							else {
+								throw new IllegalArgumentException("The world has exploded desu~.");
+							}
 						}
 						else {
-							throw new IllegalArgumentException("Failed to retrieve file '"+file.getAbsolutePath()+"' from MMDB desu~.");
+							resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+							resp.setContentType("text/plain");
+							resp.getWriter().println("Failed to retrieve file '"+filepath+"' from MMDB when it should have been there desu~.");
 						}
 					}
 					else {
 						resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
 						resp.setContentType("text/plain");
-						resp.getWriter().println("HTTP error 404 file '"+file.getAbsolutePath()+"' not found in MMDB '"+mmdb.getListName()+"' desu~");
+						resp.getWriter().println("HTTP error 404 file '"+filepath+"' not found in MMDB '"+mmdb.getListName()+"' desu~");
 					}
 				}
 				else {
