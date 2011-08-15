@@ -308,26 +308,36 @@ public class MlistsServlet extends HttpServlet {
 		else if (path.equals(PATH_ITEMS)) {
 			if (afterPath != null && afterPath.length() > 0) {
 				// Request to fetch media file.
-				String filename = URLDecoder.decode(afterPath, "UTF-8");
-				if (mmdb.hasFile(filename)) {
-					// TODO FIXME what if path is from RMMDB?
-					File file = new File(filename);
+				String filepath = URLDecoder.decode(afterPath, "UTF-8");
+				if (mmdb.hasFile(filepath)) {
+					// First see if we have the file locally to send.
+					File file = new File(filepath);
 					if (file.exists()) {
 						ServletHelper.returnFile(file, resp);
 					}
 					else {
-						resp.reset();
-						resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-						resp.setContentType("text/plain");
-						resp.getWriter().println("HTTP error 404 '"+filename+"' not found desu~");
-						return;
+						// Then see if the MMDB can find the file somewhere?
+						IMixedMediaItem item = mmdb.getByFile(filepath);
+						if (item != null) {
+							ServletHelper.prepForReturnFile(item.getTitle(), 0, resp); // TODO pass through length?
+							mmdb.copyItemFile(item, resp.getOutputStream());
+							resp.flushBuffer();
+						}
+						else { // OK give up - no idea where this file is supposed to be.
+    						resp.reset();
+    						resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+    						resp.setContentType("text/plain");
+    						resp.getWriter().println("HTTP error 404 '"+filepath+"' in list but not availabe desu~");
+    						return;
+						}
+						
 					}
 				}
 				else {
 					resp.reset();
 					resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
 					resp.setContentType("text/plain");
-					resp.getWriter().println("HTTP error 404 '"+filename+"' is not in '"+mmdb.getListId()+"' desu~");
+					resp.getWriter().println("HTTP error 404 '"+filepath+"' is not in '"+mmdb.getListId()+"' desu~");
 					return;
 				}
 			}

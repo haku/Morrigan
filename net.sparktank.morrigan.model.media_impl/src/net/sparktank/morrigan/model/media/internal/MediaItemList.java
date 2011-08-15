@@ -2,6 +2,7 @@ package net.sparktank.morrigan.model.media.internal;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -295,6 +296,12 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Actions.
+	
+	@Override
+	public void copyItemFile (T item, OutputStream os) throws MorriganException {
+		// TODO implement this when it is needed.
+		throw new UnsupportedOperationException("Not implemented.");
+	}
 	
 	@Override
 	public File copyItemFile (T mi, File targetDirectory) throws MorriganException {

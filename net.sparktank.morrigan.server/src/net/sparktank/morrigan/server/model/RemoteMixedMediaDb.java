@@ -2,6 +2,7 @@ package net.sparktank.morrigan.server.model;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.SocketException;
@@ -233,7 +234,30 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb<IRemoteMixedMediaDb
 //	Actions.
 	
 	@Override
-	public File copyItemFile(IMixedMediaItem mlt, File targetDirectory) throws MorriganException {
+	public void copyItemFile (IMixedMediaItem item, OutputStream os) throws MorriganException {
+		URL itemUrl = getRemoteItemUrl(this, item);
+		this.logger.fine("Fetching '" + itemUrl + "' to '" + item.getFilepath() + "'...");
+		try {
+			HttpClient.getHttpClient().downloadFile(itemUrl, os);
+		}
+		catch (IOException e) {
+			if (e instanceof UnknownHostException) {
+				throw new MorriganException("Host unknown.", e);
+			}
+			else if (e instanceof SocketException) {
+				throw new MorriganException("Host unreachable.", e);
+			}
+			else {
+				throw new MorriganException(e);
+			}
+		}
+		catch (HttpStreamHandlerException e) {
+			throw new MorriganException(e);
+		}
+	}
+	
+	@Override
+	public File copyItemFile (IMixedMediaItem mlt, File targetDirectory) throws MorriganException {
 		if (!targetDirectory.isDirectory()) {
 			throw new IllegalArgumentException("targetDirectory must be a directory.");
 		}
