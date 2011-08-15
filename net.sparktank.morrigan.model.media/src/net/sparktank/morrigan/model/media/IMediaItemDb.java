@@ -32,6 +32,7 @@ public interface IMediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMediaIte
 	public T getByFile (File file) throws DbException;
 	
 	public T addFile (File file) throws MorriganException, DbException;
+	public boolean hasFile (String filepath) throws MorriganException, DbException;
 	public boolean hasFile (File file) throws MorriganException, DbException;
 	public List<T> addFiles (List<File> files) throws MorriganException, DbException;
 	

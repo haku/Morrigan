@@ -117,6 +117,15 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	}
 	
 	@Override
+	public boolean hasFile(String filePath) throws DbException {
+		try {
+			return local_hasFile(filePath);
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+	
+	@Override
 	public IMixedMediaItem getByFile(File file) throws DbException {
 		try {
 			return local_getByFile(file.getAbsolutePath());
