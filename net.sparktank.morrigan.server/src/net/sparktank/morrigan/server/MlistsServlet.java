@@ -71,8 +71,6 @@ public class MlistsServlet extends HttpServlet {
 	public static final String CMD_PLAY = "play";
 	public static final String CMD_QUEUE = "queue";
 	
-	private static final String ELEMENT_ERROR = "error";
-	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private static final long serialVersionUID = 2754601524882233866L;
@@ -143,30 +141,27 @@ public class MlistsServlet extends HttpServlet {
 				String[] pathParts = path.split("/");
 				if (pathParts.length >= 2) {
 					String type = pathParts[0];
-					if (type.equals(ILocalMixedMediaDb.TYPE)) {
-						String f = LocalMixedMediaDbHelper.getFullPathToMmdb(pathParts[1]);
-						ILocalMixedMediaDb mmdb = MediaFactoryImpl.get().getLocalMixedMediaDb(f);
-						String subPath = pathParts.length >= 3 ? pathParts[2] : null;
-						String afterSubPath = pathParts.length >= 4 ? pathParts[3] : null;
-						if (verb == Verb.POST) {
-							postToMmdb(req, resp, action, mmdb, subPath, afterSubPath);
+					if (type.equals(ILocalMixedMediaDb.TYPE) || type.equals(IRemoteMixedMediaDb.TYPE)) {
+						IAbstractMixedMediaDb<?> mmdb;
+						if (type.equals(ILocalMixedMediaDb.TYPE)) {
+							String f = LocalMixedMediaDbHelper.getFullPathToMmdb(pathParts[1]);
+							mmdb = MediaFactoryImpl.get().getLocalMixedMediaDb(f);
+						}
+						else if (type.equals(IRemoteMixedMediaDb.TYPE)) {
+							String f = RemoteMixedMediaDbHelper.getFullPathToMmdb(pathParts[1]);
+							mmdb = RemoteMixedMediaDb.FACTORY.manufacture(f);
 						}
 						else {
-							printMlist(resp, mmdb, subPath, afterSubPath);
+							throw new IllegalArgumentException("Out of cheese desu~.  Please reinstall universe and reboot desu~.");
 						}
-					}
-					else if (type.equals(IRemoteMixedMediaDb.TYPE)) {
-						String f = RemoteMixedMediaDbHelper.getFullPathToMmdb(pathParts[1]);
-						IRemoteMixedMediaDb mmdb = RemoteMixedMediaDb.FACTORY.manufacture(f);
 						
-						// TODO remove duplicate code.
 						String subPath = pathParts.length >= 3 ? pathParts[2] : null;
 						String afterSubPath = pathParts.length >= 4 ? pathParts[3] : null;
 						if (verb == Verb.POST) {
 							postToMmdb(req, resp, action, mmdb, subPath, afterSubPath);
 						}
 						else {
-							printMlist(resp, mmdb, subPath, afterSubPath);
+							getToMmdb(resp, mmdb, subPath, afterSubPath);
 						}
 					}
 					else {
@@ -298,12 +293,9 @@ public class MlistsServlet extends HttpServlet {
 		AbstractFeed.endFeed(dw);
 	}
 	
-	static private void printMlist (HttpServletResponse resp, IAbstractMixedMediaDb<?> mmdb, String path, String afterPath) throws IOException, SAXException, MorriganException, DbException {
-		resp.setContentType("text/xml;charset=utf-8");
-		DataWriter dw = AbstractFeed.startDocument(resp.getWriter(), "mlist");
-		
+	static private void getToMmdb (HttpServletResponse resp, IAbstractMixedMediaDb<?> mmdb, String path, String afterPath) throws IOException, SAXException, MorriganException, DbException {
 		if (path == null) {
-			printMlistLong(dw, mmdb, false, false);
+			printMlistLong(resp, mmdb, false, false);
 		}
 		else if (path.equals(PATH_ITEMS)) {
 			if (afterPath != null && afterPath.length() > 0) {
@@ -324,13 +316,11 @@ public class MlistsServlet extends HttpServlet {
 							resp.flushBuffer();
 						}
 						else { // OK give up - no idea where this file is supposed to be.
-    						resp.reset();
-    						resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-    						resp.setContentType("text/plain");
-    						resp.getWriter().println("HTTP error 404 '"+filepath+"' in list but not availabe desu~");
-    						return;
+							resp.reset();
+							resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+							resp.setContentType("text/plain");
+							resp.getWriter().println("HTTP error 404 '"+filepath+"' in list but not availabe desu~");
 						}
-						
 					}
 				}
 				else {
@@ -338,25 +328,25 @@ public class MlistsServlet extends HttpServlet {
 					resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
 					resp.setContentType("text/plain");
 					resp.getWriter().println("HTTP error 404 '"+filepath+"' is not in '"+mmdb.getListId()+"' desu~");
-					return;
 				}
 			}
 			else {
-				printMlistLong(dw, mmdb, false, true);
+				printMlistLong(resp, mmdb, false, true);
 			}
 		}
 		else if (path.equals(PATH_SRC)) {
-			printMlistLong(dw, mmdb, true, false);
+			printMlistLong(resp, mmdb, true, false);
 		}
 		else if (path.equals(PATH_QUERY) && afterPath != null && afterPath.length() > 0) {
 			String query = URLDecoder.decode(afterPath, "UTF-8");
-			printMlistLong(dw, mmdb, false, true, query);
+			printMlistLong(resp, mmdb, false, true, query);
 		}
 		else {
-			AbstractFeed.addElement(dw, ELEMENT_ERROR, "Unknown path '"+path+"' desu~");
+			resp.reset();
+			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			resp.setContentType("text/plain");
+			resp.getWriter().println("HTTP error 404 unknown path '"+path+"' desu~");
 		}
-		
-		AbstractFeed.endDocument(dw, "mlist");
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -379,15 +369,18 @@ public class MlistsServlet extends HttpServlet {
 		}
 	}
 	
-	static private void printMlistLong (DataWriter dw, IAbstractMixedMediaDb<?> ml, boolean listSrcs, boolean listItems) throws SAXException, MorriganException, DbException {
-		printMlistLong(dw, ml, listSrcs, listItems, null);
+	static private void printMlistLong (HttpServletResponse resp, IAbstractMixedMediaDb<?> ml, boolean listSrcs, boolean listItems) throws SAXException, MorriganException, DbException, IOException {
+		printMlistLong(resp, ml, listSrcs, listItems, null);
 	}
 	
-	static private void printMlistLong (DataWriter dw, IAbstractMixedMediaDb<?> ml, boolean listSrcs, boolean listItems, String queryString) throws SAXException, MorriganException, DbException {
-		printMlistLong(dw, ml, listSrcs, listItems, true, queryString); // TODO always include tags?
+	static private void printMlistLong (HttpServletResponse resp, IAbstractMixedMediaDb<?> ml, boolean listSrcs, boolean listItems, String queryString) throws SAXException, MorriganException, DbException, IOException {
+		printMlistLong(resp, ml, listSrcs, listItems, true, queryString); // TODO always include tags?
 	}
 	
-	static private void printMlistLong (DataWriter dw, IAbstractMixedMediaDb<?> ml, boolean listSrcs, boolean listItems, boolean includeTags, String queryString) throws SAXException, MorriganException, DbException {
+	static private void printMlistLong (HttpServletResponse resp, IAbstractMixedMediaDb<?> ml, boolean listSrcs, boolean listItems, boolean includeTags, String queryString) throws SAXException, MorriganException, DbException, IOException {
+		resp.setContentType("text/xml;charset=utf-8");
+		DataWriter dw = AbstractFeed.startDocument(resp.getWriter(), "mlist");
+		
 		ml.read();
 		
 		List<IMixedMediaItem> items;
@@ -491,6 +484,8 @@ public class MlistsServlet extends HttpServlet {
     			dw.endElement("entry");
     		}
 		}
+		
+		AbstractFeed.endDocument(dw, "mlist");
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
