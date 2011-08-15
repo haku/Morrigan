@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.CookieHandler;
 import java.net.CookieManager;
@@ -225,29 +226,38 @@ public class HttpClient {
 	
 	/**
 	 * TODO remove HttpStreamHandlerException
+	 * 
+	 * This will flush the OutputStream.
+	 * This will not close the output stream.
 	 */
-	public void downloadFile (URL url, final File file) throws IOException, HttpStreamHandlerException {
+	public void downloadFile (URL url, final OutputStream os) throws IOException, HttpStreamHandlerException {
 		HttpStreamHandler httpStreamHandler = new HttpStreamHandler () {
 			@Override
-			public void handleStream(InputStream is) throws IOException, HttpStreamHandlerException {
+			public void handleStream (InputStream is) throws IOException, HttpStreamHandlerException {
 				BufferedInputStream bis = new BufferedInputStream(is);
-				BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
-				
-				// FIXME this could probably be done better.
-				try {
-					byte[] buffer = new byte[DOWNLOADBUFFERSIZE];
-					int bytesRead;
-					while ((bytesRead = bis.read(buffer)) != -1) {
-						bos.write(buffer, 0, bytesRead);
-					}
+				byte[] buffer = new byte[DOWNLOADBUFFERSIZE];
+				int bytesRead;
+				while ((bytesRead = bis.read(buffer)) != -1) {
+					os.write(buffer, 0, bytesRead);
 				}
-				finally {
-					bos.close();
-				}
-				
+				os.flush();
 			}
 		};
 		doHttpRequest(url, httpStreamHandler);
+	}
+	
+	/**
+	 * TODO remove HttpStreamHandlerException
+	 */
+	public void downloadFile (URL url, final File file) throws IOException, HttpStreamHandlerException {
+		BufferedOutputStream os = null;
+		try {
+			os = new BufferedOutputStream(new FileOutputStream(file));
+			downloadFile(url, os);
+		}
+		finally {
+			if (os != null) os.close();
+		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -1,6 +1,7 @@
 package net.sparktank.morrigan.model.media;
 
 import java.io.File;
+import java.io.OutputStream;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
@@ -53,6 +54,11 @@ public interface IMediaItemList<T extends IMediaItem> {
 	public void setRemoteLocation (T track, String remoteLocation) throws MorriganException;
 	public void persistTrackData (T track) throws MorriganException;
 	
+	/**
+	 * This will flush the OutputStream.
+	 * This will not close the output stream.
+	 */
+	public void copyItemFile (T item, OutputStream os) throws MorriganException;
 	public File copyItemFile (T item, File targetDirectory) throws MorriganException;
 	
 	// TODO rename to getItemByFilePath().
