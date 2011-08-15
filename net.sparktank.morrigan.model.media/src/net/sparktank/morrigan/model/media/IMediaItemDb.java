@@ -30,6 +30,7 @@ public interface IMediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMediaIte
 	public List<T> simpleSearch (String term, int maxResults) throws DbException;
 	public List<T> getAllDbEntries () throws DbException;
 	public T getByFile (File file) throws DbException;
+	public T getByFile (String filepath) throws DbException;
 	
 	public T addFile (File file) throws MorriganException, DbException;
 	public boolean hasFile (String filepath) throws MorriganException, DbException;
