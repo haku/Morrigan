@@ -242,26 +242,7 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb<IRemoteMixedMediaDb
 				+ mlt.getFilepath().substring(mlt.getFilepath().lastIndexOf(File.separatorChar) + 1));
 		
 		if (!targetFile.exists()) {
-			String serverUrlString;
-			try {
-				serverUrlString = getDbLayer().getProp(DBKEY_SERVERURL);
-			} catch (DbException e) {
-				throw new MorriganException(e);
-			}
-			URL serverUrl;
-			try {
-				serverUrl = new URL(serverUrlString);
-			} catch (MalformedURLException e) {
-				throw new MorriganException(e);
-			}
-			
-			URL itemUrl;
-			try {
-				itemUrl = new URL(serverUrl.getProtocol(), serverUrl.getHost(), serverUrl.getPort(), mlt.getRemoteLocation());
-			}
-			catch (MalformedURLException e) {
-				throw new MorriganException(e);
-			}
+			URL itemUrl = getRemoteItemUrl(this, mlt);
 			
 			System.err.println("Fetching '"+itemUrl+"' to '"+targetFile.getAbsolutePath()+"'...");
 			
@@ -308,6 +289,32 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb<IRemoteMixedMediaDb
 		}
 		
 		return targetFile;
+	}
+	
+	static public URL getRemoteItemUrl (RemoteMixedMediaDb rmmdb, IMixedMediaItem mlt) throws MorriganException {
+		String serverUrlString;
+		try {
+			serverUrlString = rmmdb.getDbLayer().getProp(DBKEY_SERVERURL);
+		}
+		catch (DbException e) {
+			throw new MorriganException(e);
+		}
+		URL serverUrl;
+		try {
+			serverUrl = new URL(serverUrlString);
+		}
+		catch (MalformedURLException e) {
+			throw new MorriganException(e);
+		}
+		
+		URL itemUrl;
+		try {
+			itemUrl = new URL(serverUrl.getProtocol(), serverUrl.getHost(), serverUrl.getPort(), mlt.getRemoteLocation());
+		}
+		catch (MalformedURLException e) {
+			throw new MorriganException(e);
+		}
+		return itemUrl;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
