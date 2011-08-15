@@ -1,5 +1,6 @@
 package net.sparktank.morrigan.server;
 
+import net.sparktank.morrigan.model.media.IAbstractMixedMediaDb;
 import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.IRemoteMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.MediaFactoryImpl;
@@ -10,6 +11,20 @@ import net.sparktank.morrigan.util.ErrorHelper;
 // TODO move this class somewhere more appropriate ???
 public class HeadlessHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	static public boolean scheduleMmdbScan (final IAbstractMixedMediaDb<?> mmdb) {
+		if (mmdb instanceof ILocalMixedMediaDb) {
+			ILocalMixedMediaDb lmmdb = (ILocalMixedMediaDb) mmdb;
+			return scheduleMmdbScan(lmmdb);
+		}
+		else if (mmdb instanceof IRemoteMixedMediaDb) {
+			IRemoteMixedMediaDb rmmdb = (IRemoteMixedMediaDb) mmdb;
+			return scheduleRemoteMmdbScan(rmmdb);
+		}
+		else {
+			throw new IllegalArgumentException("Unknown type: '"+mmdb.getClass().getName()+"'.");
+		}
+	}
 	
 	static public boolean scheduleMmdbScan (final ILocalMixedMediaDb mmdb) {
 		final IMorriganTask task = MediaFactoryImpl.get().getLocalMixedMediaDbUpdateTask(mmdb);
