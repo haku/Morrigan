@@ -5,8 +5,8 @@ Bundle-SymbolicName: net.sparktank.morrigan.playbackimpl.gs
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: .,
- lib/gstreamer-java-1.4.jar,
- lib/gstreamer-java-swt-1.4.jar,
+ lib/gstreamer-java-1.5.jar,
+ lib/gstreamer-java-swt-1.5.jar,
  lib/jna-3.2.4.jar
 Bundle-Vendor: vaguehope.com
 Import-Package: net.sparktank.morrigan.engines.playback,
