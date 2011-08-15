@@ -1,5 +1,9 @@
 package net.sparktank.morrigan.util.httpclient;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
@@ -34,6 +38,7 @@ public class HttpClient {
 	
 	private static final int HTTP_CONNECT_TIMEOUT_SECONDS = 60;
 	private static final int HTTP_READ_TIMEOUT_SECONDS = 600;
+	private static final int DOWNLOADBUFFERSIZE = 8192;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -218,4 +223,32 @@ public class HttpClient {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	/**
+	 * TODO remove HttpStreamHandlerException
+	 */
+	public void downloadFile (URL url, final File file) throws IOException, HttpStreamHandlerException {
+		HttpStreamHandler httpStreamHandler = new HttpStreamHandler () {
+			@Override
+			public void handleStream(InputStream is) throws IOException, HttpStreamHandlerException {
+				BufferedInputStream bis = new BufferedInputStream(is);
+				BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
+				
+				// FIXME this could probably be done better.
+				try {
+					byte[] buffer = new byte[DOWNLOADBUFFERSIZE];
+					int bytesRead;
+					while ((bytesRead = bis.read(buffer)) != -1) {
+						bos.write(buffer, 0, bytesRead);
+					}
+				}
+				finally {
+					bos.close();
+				}
+				
+			}
+		};
+		doHttpRequest(url, httpStreamHandler);
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

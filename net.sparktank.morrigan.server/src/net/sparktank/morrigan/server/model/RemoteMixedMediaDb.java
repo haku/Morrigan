@@ -1,17 +1,14 @@
 package net.sparktank.morrigan.server.model;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.SocketException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.Date;
+import java.util.logging.Logger;
 
 import net.sparktank.morrigan.engines.playback.NotImplementedException;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
@@ -26,11 +23,14 @@ import net.sparktank.morrigan.model.media.internal.db.mmdb.MixedMediaSqliteLayer
 import net.sparktank.morrigan.model.tasks.TaskEventListener;
 import net.sparktank.morrigan.server.feedreader.MixedMediaDbFeedParser;
 import net.sparktank.morrigan.util.httpclient.HttpClient;
-import net.sparktank.morrigan.util.httpclient.HttpStreamHandler;
 import net.sparktank.morrigan.util.httpclient.HttpStreamHandlerException;
 import net.sparktank.sqlitewrapper.DbException;
 
 public class RemoteMixedMediaDb extends AbstractMixedMediaDb<IRemoteMixedMediaDb> implements IRemoteMixedMediaDb {
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	private final Logger logger = Logger.getLogger(this.getClass().getName());
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Factory.
 	
@@ -93,9 +93,9 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb<IRemoteMixedMediaDb
 	
 	public static final String DBKEY_SERVERURL = "SERVERURL";
 	public static final String DBKEY_CACHEDATE = "CACHEDATE";
-
+	
 	private final URL url;
-
+	
 	private TaskEventListener taskEventListener;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -121,7 +121,7 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb<IRemoteMixedMediaDb
 		String s = localDbLayer.getProp(DBKEY_SERVERURL);
 		if (s == null) {
 			localDbLayer.setProp(DBKEY_SERVERURL, url.toExternalForm());
-			System.err.println("Set DBKEY_SERVERURL=" + url.toExternalForm() + " in " + localDbLayer.getDbFilePath());
+			this.logger.fine("Set DBKEY_SERVERURL=" + url.toExternalForm() + " in " + localDbLayer.getDbFilePath());
 			
 		} else if (!s.equals(url.toExternalForm())) {
 			throw new IllegalArgumentException("serverUrl does not match localDbLayer ('"+url.toExternalForm()+"' != '"+s+"' in '"+localDbLayer.getDbFilePath()+"').");
@@ -136,7 +136,7 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb<IRemoteMixedMediaDb
 			long date = Long.parseLong(dateString);
 			if (date > 0) {
 				this.cacheDate = date;
-				System.err.println("Read cachedate=" + this.cacheDate + ".");
+				this.logger.fine("Read cachedate=" + this.cacheDate + ".");
 			}
 		}
 		else {
@@ -146,7 +146,7 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb<IRemoteMixedMediaDb
 	
 	private void writeCacheDate () throws DbException {
 		getDbLayer().setProp(DBKEY_CACHEDATE, String.valueOf(this.cacheDate));
-		System.err.println("Wrote cachedate=" + this.cacheDate + ".");
+		this.logger.fine("Wrote cachedate=" + this.cacheDate + ".");
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -206,11 +206,11 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb<IRemoteMixedMediaDb
 	@Override
 	protected void doRead() throws DbException, MorriganException {
 		if (isCacheExpired()) {
-			System.err.println("Cache for '" + getListName() + "' is " + getCacheAge() + " old, reading data from " + this.url.toExternalForm() + " ...");
+			this.logger.info("Cache for '" + getListName() + "' is " + getCacheAge() + " old, reading data from " + this.url.toExternalForm() + " ...");
 				forceDoRead();
 		}
 		else {
-			System.err.println("Not refreshing as '" + getListName() + "' cache is only " + getCacheAge() + " old.");
+			this.logger.info("Not refreshing as '" + getListName() + "' cache is only " + getCacheAge() + " old.");
 			super.doRead(); // This forces a DB query - sorts entries.)
 		}
 	}
@@ -243,32 +243,9 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb<IRemoteMixedMediaDb
 		
 		if (!targetFile.exists()) {
 			URL itemUrl = getRemoteItemUrl(this, mlt);
-			
-			System.err.println("Fetching '"+itemUrl+"' to '"+targetFile.getAbsolutePath()+"'...");
-			
-			HttpStreamHandler httpStreamHandler = new HttpStreamHandler () {
-				@Override
-				public void handleStream(InputStream is) throws IOException, HttpStreamHandlerException {
-					BufferedInputStream bis = new BufferedInputStream(is);
-					BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(targetFile));
-					
-					// FIXME this could probably be done better.
-					try {
-						byte[] buffer = new byte[4096];
-						int bytesRead;
-						while ((bytesRead = bis.read(buffer)) != -1) {
-							bos.write(buffer, 0, bytesRead);
-						}
-					}
-					finally {
-						bos.close();
-					}
-					
-				}
-			};
-			
+			this.logger.fine("Fetching '"+itemUrl+"' to '"+targetFile.getAbsolutePath()+"'...");
 			try {
-				HttpClient.getHttpClient().doHttpRequest(itemUrl, httpStreamHandler);
+				HttpClient.getHttpClient().downloadFile(itemUrl, targetFile);
 			}
 			catch (IOException e) {
 				if (e instanceof UnknownHostException) {
@@ -285,7 +262,7 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb<IRemoteMixedMediaDb
 			}
 		}
 		else {
-			System.err.println("Skipping '"+targetFile.getAbsolutePath()+"' as it already exists.");
+			this.logger.warning("Skipping '"+targetFile.getAbsolutePath()+"' as it already exists.");
 		}
 		
 		return targetFile;
