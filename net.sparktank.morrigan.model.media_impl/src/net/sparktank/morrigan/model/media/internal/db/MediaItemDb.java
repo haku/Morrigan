@@ -336,6 +336,11 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 	}
 	
 	@Override
+	public T getByFile (String filepath) throws DbException {
+		return this.dbLayer.getByFile(filepath);
+	}
+	
+	@Override
 	public List<T> simpleSearch (String term, int maxResults) throws DbException {
 		return this.dbLayer.simpleSearch(escapeSearch(term), SEARCH_ESC, maxResults);
 	}
