@@ -36,7 +36,7 @@ public class CopyToLocalMmdbTask<T extends IMediaItem> implements IMorriganTask 
 	
 	@Override
 	public String getTitle() {
-		return "Copying media from " + this.fromList.getListName();
+		return "Copy " + this.itemsToCopy.size() + " items from " + this.fromList.getListName() + " to " + this.toDb.getListName();
 	}
 	
 	@Override
@@ -45,8 +45,7 @@ public class CopyToLocalMmdbTask<T extends IMediaItem> implements IMorriganTask 
 		
 		try {
 			taskEventListener.onStart();
-			taskEventListener.logMsg(this.toDb.getListName(), "Starting copy of "+this.itemsToCopy.size()+" items from "+this.fromList.getListName()+"...");
-			taskEventListener.beginTask("Fetching media", 100);
+			taskEventListener.beginTask("Copying", this.itemsToCopy.size());
 			
 			File coDir = getCheckoutDirectory(this.toDb);
 			
@@ -55,6 +54,8 @@ public class CopyToLocalMmdbTask<T extends IMediaItem> implements IMorriganTask 
 			 */
 			
 			for (T item : this.itemsToCopy) {
+				taskEventListener.subTask(item.getTitle());
+				
 				File coItemDir = getCheckoutItemDirectory(coDir, item);
 				File coFile = this.fromList.copyItemFile(item, coItemDir);
 	    		if (!coFile.exists()) throw new FileNotFoundException("After fetching '"+item.getRemoteLocation()+"' can't find '"+coFile.getAbsolutePath()+"'.");
@@ -68,6 +69,8 @@ public class CopyToLocalMmdbTask<T extends IMediaItem> implements IMorriganTask 
 	    		IMixedMediaItem addedItem = this.toDb.addFile(coFile);
 	    		addedItem.setFromMediaItem(item);
 	    		this.toDb.persistTrackData(addedItem);
+	    		
+	    		taskEventListener.worked(1);
 			}
 			
 			if (taskEventListener.isCanceled()) {
