@@ -19,7 +19,9 @@ package net.sparktank.morrigan.android.tasks;
 import java.io.IOException;
 import java.io.InputStream;
 
+import net.sparktank.morrigan.android.Constants;
 import net.sparktank.morrigan.android.model.MlistItem;
+import net.sparktank.morrigan.android.model.MlistReference;
 import net.sparktank.morrigan.android.model.PlayerReference;
 
 import org.xml.sax.SAXException;
@@ -48,14 +50,16 @@ public class RunMlistItemActionTask extends AbstractTask<String> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private final PlayerReference playerReference;
+	private final MlistReference mlistReference;
 	private final MlistItem mlistItem;
 	private final MlistItemCommand cmd;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public RunMlistItemActionTask (Activity activity, PlayerReference playerReference, MlistItem mlistItem, MlistItemCommand cmd) {
+	public RunMlistItemActionTask (Activity activity, PlayerReference playerReference, MlistReference mlistReference, MlistItem mlistItem, MlistItemCommand cmd) {
 		super(activity);
 		this.playerReference = playerReference;
+		this.mlistReference = mlistReference;
 		this.mlistItem = mlistItem;
 		this.cmd = cmd;
 	}
@@ -63,13 +67,13 @@ public class RunMlistItemActionTask extends AbstractTask<String> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
-		protected String getProgressMsg () {
+	protected String getProgressMsg () {
 		return "Please wait...";
-		}
+	}
 	
 	@Override
 	protected String getUrl () {
-		return this.playerReference.getServerReference().getBaseUrl() + this.mlistItem.getRelativeUrl();
+		return this.mlistReference.getBaseUrl() + Constants.CONTEXT_MLIST_ITEMS + "/" + this.mlistItem.getRelativeUrl();
 	}
 	
 	@Override

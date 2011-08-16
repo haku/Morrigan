@@ -29,7 +29,7 @@ import net.sparktank.morrigan.android.helper.HttpFileDownloadHandler;
 import net.sparktank.morrigan.android.helper.HttpFileDownloadHandler.DownloadProgressListener;
 import net.sparktank.morrigan.android.helper.HttpHelper;
 import net.sparktank.morrigan.android.model.MlistItem;
-import net.sparktank.morrigan.android.model.ServerReference;
+import net.sparktank.morrigan.android.model.MlistReference;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -43,16 +43,16 @@ public class DownloadMediaTask extends AsyncTask<MlistItem, Integer, String> imp
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private final Context context;
-	private final ServerReference serverReference;
+	private final MlistReference mlistReference;
 
 	private ProgressDialog progressDialog;
 	protected AtomicBoolean cancelled = new AtomicBoolean(false);
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public DownloadMediaTask (Context context, ServerReference serverReference) {
+	public DownloadMediaTask (Context context, MlistReference mlistReference) {
 		this.context = context;
-		this.serverReference = serverReference;
+		this.mlistReference = mlistReference;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -118,7 +118,7 @@ public class DownloadMediaTask extends AsyncTask<MlistItem, Integer, String> imp
 		final ByteBuffer byteBuffer = ChecksumHelper.createByteBuffer();
 		
 		for (MlistItem item : items) {
-			final String url = this.serverReference.getBaseUrl() + item.getRelativeUrl();
+			final String url = this.mlistReference.getBaseUrl() + Constants.CONTEXT_MLIST_ITEMS + "/" + item.getRelativeUrl();
 			final File file = new File(dir, item.getFileName());
 			boolean transferComplete = false;
 			

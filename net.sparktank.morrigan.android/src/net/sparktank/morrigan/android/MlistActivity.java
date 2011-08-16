@@ -171,7 +171,7 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 				AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
 				MlistItem mlistItem = MlistActivity.this.mlistItemListAdapter.getInputData().getMlistItemList().get(info.position);
 				
-				DownloadMediaTask task = new DownloadMediaTask(this, this.serverReference);
+				DownloadMediaTask task = new DownloadMediaTask(this, this.mlistReference);
 				task.execute(mlistItem);
 				
 				return true;
@@ -344,13 +344,13 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 					CommonDialogs.doAskWhichPlayer(MlistActivity.this, MlistActivity.this.serverReference, new PlayerSelectedListener () {
 						@Override
 						public void playerSelected(PlayerState playerState) {
-							RunMlistItemActionTask task = new RunMlistItemActionTask(MlistActivity.this, playerState.getPlayerReference(), item, MlistItemCommand.PLAY);
+							RunMlistItemActionTask task = new RunMlistItemActionTask(MlistActivity.this, playerState.getPlayerReference(), MlistActivity.this.mlistReference, item, MlistItemCommand.PLAY);
 							task.execute();
 						}
 					});
 				}
 				else {
-					RunMlistItemActionTask task = new RunMlistItemActionTask(MlistActivity.this, MlistActivity.this.playerReference, item, MlistItemCommand.PLAY);
+					RunMlistItemActionTask task = new RunMlistItemActionTask(MlistActivity.this, MlistActivity.this.playerReference, MlistActivity.this.mlistReference, item, MlistItemCommand.PLAY);
 					task.execute();
 				}
 			}
@@ -365,13 +365,13 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 					CommonDialogs.doAskWhichPlayer(MlistActivity.this, MlistActivity.this.serverReference, new PlayerSelectedListener () {
 						@Override
 						public void playerSelected(PlayerState playerState) {
-							RunMlistItemActionTask task = new RunMlistItemActionTask(MlistActivity.this, playerState.getPlayerReference(), item, MlistItemCommand.QUEUE);
+							RunMlistItemActionTask task = new RunMlistItemActionTask(MlistActivity.this, playerState.getPlayerReference(), MlistActivity.this.mlistReference, item, MlistItemCommand.QUEUE);
 							task.execute();
 						}
 					});
 				}
 				else {
-    				RunMlistItemActionTask task = new RunMlistItemActionTask(MlistActivity.this, MlistActivity.this.playerReference, item, MlistItemCommand.QUEUE);
+    				RunMlistItemActionTask task = new RunMlistItemActionTask(MlistActivity.this, MlistActivity.this.playerReference, MlistActivity.this.mlistReference, item, MlistItemCommand.QUEUE);
     				task.execute();
 				}
 			}
@@ -390,7 +390,7 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 	protected void downloadAllInList () {
 		List<? extends MlistItem> mitems = this.currentItemList.getMlistItemList();
 		if (mitems.size() > 0) {
-			DownloadMediaTask task = new DownloadMediaTask(this, this.serverReference);
+			DownloadMediaTask task = new DownloadMediaTask(this, this.mlistReference);
 			task.execute(mitems.toArray(new MlistItem[] {}));
 		}
 		else {

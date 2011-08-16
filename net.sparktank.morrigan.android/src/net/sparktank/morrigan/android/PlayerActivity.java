@@ -26,6 +26,7 @@ import net.sparktank.morrigan.android.helper.TimeHelper;
 import net.sparktank.morrigan.android.model.ArtifactList;
 import net.sparktank.morrigan.android.model.ArtifactListAdaptor;
 import net.sparktank.morrigan.android.model.MlistItem;
+import net.sparktank.morrigan.android.model.MlistReference;
 import net.sparktank.morrigan.android.model.PlayerQueue;
 import net.sparktank.morrigan.android.model.PlayerQueueChangeListener;
 import net.sparktank.morrigan.android.model.PlayerReference;
@@ -33,6 +34,7 @@ import net.sparktank.morrigan.android.model.PlayerState;
 import net.sparktank.morrigan.android.model.PlayerStateChangeListener;
 import net.sparktank.morrigan.android.model.ServerReference;
 import net.sparktank.morrigan.android.model.impl.ArtifactListAdaptorImpl;
+import net.sparktank.morrigan.android.model.impl.MlistReferenceImpl;
 import net.sparktank.morrigan.android.model.impl.PlayerReferenceImpl;
 import net.sparktank.morrigan.android.model.impl.ServerReferenceImpl;
 import net.sparktank.morrigan.android.tasks.DownloadMediaTask;
@@ -66,6 +68,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 	protected PlayerReference playerReference = null;
 	private PlayerState currentState;
 	private ArtifactListAdaptor<ArtifactList> queueListAdaptor;
+	private MlistReference mlistReference = null;
 	
 	private AtomicReference<String> lastQuery = new AtomicReference<String>();
 	
@@ -251,8 +254,8 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 	
 	protected void downloadCurrentItem () {
 		MlistItem item = this.currentState.getItem();
-		if (item != null) {
-			DownloadMediaTask task = new DownloadMediaTask(this, this.serverReference);
+		if (item != null && this.mlistReference != null) {
+			DownloadMediaTask task = new DownloadMediaTask(this, this.mlistReference);
 			task.execute(item);
 		}
 		else {
@@ -271,6 +274,8 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 			finish(); // TODO show a msg here? Retry / Fail dlg?
 		}
 		else {
+			this.mlistReference = new MlistReferenceImpl(newState.getListUrl(), this.serverReference);
+			
 			TextView txtListname = (TextView) findViewById(R.id.txtListname);
 			txtListname.setText(newState.getListTitle());
 			
