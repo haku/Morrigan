@@ -5,7 +5,6 @@ import java.io.FileNotFoundException;
 import java.util.Collection;
 
 import net.sparktank.morrigan.config.Config;
-import net.sparktank.morrigan.model.media.DirtyState;
 import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.IMediaItem;
 import net.sparktank.morrigan.model.media.IMediaItemList;
@@ -60,9 +59,6 @@ public class CopyToLocalMmdbTask<T extends IMediaItem> implements IMorriganTask 
 				File coFile = this.fromList.copyItemFile(item, coItemDir);
 	    		if (!coFile.exists()) throw new FileNotFoundException("After fetching '"+item.getRemoteLocation()+"' can't find '"+coFile.getAbsolutePath()+"'.");
 	    		
-	    		IMixedMediaItem newItem = this.toDb.getDbLayer().getNewT(coFile.getAbsolutePath());
-	    		newItem.setFromMediaItem(item);
-	    		
 	    		// TODO FIXME re-write remote path with URL we fetched it from?  Perhaps this should be returned from copyItemFile()?
 	    		
 	    		// TODO these next few methods should really be combined into a single method in MediaItemDb.
@@ -70,9 +66,8 @@ public class CopyToLocalMmdbTask<T extends IMediaItem> implements IMorriganTask 
 	    			this.toDb.getDbLayer().removeFile(coFile.getAbsolutePath());
 	    		}
 	    		IMixedMediaItem addedItem = this.toDb.addFile(coFile);
-	    		addedItem.setFromMediaItem(newItem);
+	    		addedItem.setFromMediaItem(item);
 	    		this.toDb.persistTrackData(addedItem);
-	    		this.toDb.setDirtyState(DirtyState.DIRTY); // just to trigger change events.
 			}
 			
 			if (taskEventListener.isCanceled()) {

@@ -552,7 +552,12 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETHASHCODE);
 		int n;
 		try {
-			ps.setBytes(1, hashcode.toByteArray());
+			if (hashcode != null) {
+				ps.setBytes(1, hashcode.toByteArray());
+			}
+			else {
+				ps.setNull(1, java.sql.Types.BLOB);
+			}
 			ps.setString(2, sfile);
 			n = ps.executeUpdate();
 		} finally {
