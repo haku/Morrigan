@@ -271,23 +271,9 @@ public class PlayersServlet extends HttpServlet {
 			String startcount;
 			String endcount;
 			if (currentItem != null && currentItem.item != null) {
-				if (listUrl != null) {
-					String file;
-					try {
-						file = URLEncoder.encode(currentItem.item.getFilepath(), "UTF-8");
-					} catch (UnsupportedEncodingException e) {
-						throw new RuntimeException(e);
-					}
-					StringBuilder sb = new StringBuilder();
-					sb.append(listUrl);
-					sb.append("/");
-					sb.append(MlistsServlet.PATH_ITEMS);
-					sb.append("/");
-					sb.append(file);
-					trackLink = sb.toString();
-				}
+				trackLink = URLEncoder.encode(currentItem.item.getFilepath(), "UTF-8");
 				
-				filename = currentItem.item.getTitle(); // This is a hack :s .
+				filename = currentItem.item.getTitle(); // FIXME This is a hack :s .
 				filepath = currentItem.item.getFilepath();
 				hashcode = currentItem.item.getHashcode() != null ? currentItem.item.getHashcode().toString(16) : NULL;
 				startcount = String.valueOf(currentItem.item.getStartCount());
@@ -321,7 +307,7 @@ public class PlayersServlet extends HttpServlet {
 		}
 	}
 	
-	static private void printQueue (DataWriter dw, IPlayerAbstract p) throws SAXException {
+	static private void printQueue (DataWriter dw, IPlayerAbstract p) throws SAXException, UnsupportedEncodingException {
 		
 		AbstractFeed.addLink(dw, CONTEXTPATH + "/" + p.getId() + "/" + PATH_QUEUE, "self", "text/xml");
 		AbstractFeed.addLink(dw, CONTEXTPATH + "/" + p.getId(), "player", "text/xml");
@@ -343,37 +329,14 @@ public class PlayersServlet extends HttpServlet {
 			
 			AbstractFeed.addElement(dw, "title", playItem.toString());
 			
-			String listFile;
-			try {
-				listFile = URLEncoder.encode(AbstractFeed.filenameFromPath(list.getListId()), "UTF-8");
-			} catch (UnsupportedEncodingException e) {
-				throw new RuntimeException(e);
-			}
-			
-			String pathToSelf = CONTEXTPATH + "/" + list.getType() + "/" + listFile;
-			AbstractFeed.addLink(dw, pathToSelf, "list", "text/xml");
+			String listFile = URLEncoder.encode(AbstractFeed.filenameFromPath(list.getListId()), "UTF-8");
+			AbstractFeed.addLink(dw, listFile, "list", "text/xml");
 			
 			AbstractFeed.addElement(dw, "id", playItem.id);
 			
 			if (mi != null) {
-				String file;
-				try {
-					file = URLEncoder.encode(mi.getFilepath(), "UTF-8");
-				} catch (UnsupportedEncodingException e) {
-					throw new RuntimeException(e);
-				}
-				
-				StringBuilder sb = new StringBuilder();
-				sb.append(MlistsServlet.CONTEXTPATH);
-				sb.append("/");
-				sb.append(list.getType());
-				sb.append("/");
-				sb.append(listFile);
-				sb.append("/");
-				sb.append(MlistsServlet.PATH_ITEMS);
-				sb.append("/");
-				sb.append(file);
-				AbstractFeed.addLink(dw, sb.toString(), "item");
+				String file = URLEncoder.encode(mi.getFilepath(), "UTF-8");
+				AbstractFeed.addLink(dw, file, "item");
 				
 				if (mi.getDateAdded() != null) {
 					AbstractFeed.addElement(dw, "dateadded", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateAdded()));

@@ -22,6 +22,7 @@ import net.sparktank.morrigan.model.media.internal.db.MediaItemDbConfig;
 import net.sparktank.morrigan.model.media.internal.db.mmdb.AbstractMixedMediaDb;
 import net.sparktank.morrigan.model.media.internal.db.mmdb.MixedMediaSqliteLayerFactory;
 import net.sparktank.morrigan.model.tasks.TaskEventListener;
+import net.sparktank.morrigan.server.MlistsServlet;
 import net.sparktank.morrigan.server.feedreader.MixedMediaDbFeedParser;
 import net.sparktank.morrigan.util.httpclient.HttpClient;
 import net.sparktank.morrigan.util.httpclient.HttpStreamHandlerException;
@@ -295,7 +296,7 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb<IRemoteMixedMediaDb
 	static public URL getRemoteItemUrl (RemoteMixedMediaDb rmmdb, IMixedMediaItem mlt) throws MorriganException {
 		String serverUrlString;
 		try {
-			serverUrlString = rmmdb.getDbLayer().getProp(DBKEY_SERVERURL);
+			serverUrlString = rmmdb.getDbLayer().getProp(DBKEY_SERVERURL); // e.g. http://localhost:8080/mlists/REMOTEMMDB/localhost_8080_wui.remote.db3
 		}
 		catch (DbException e) {
 			throw new MorriganException(e);
@@ -310,7 +311,9 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb<IRemoteMixedMediaDb
 		
 		URL itemUrl;
 		try {
-			itemUrl = new URL(serverUrl.getProtocol(), serverUrl.getHost(), serverUrl.getPort(), mlt.getRemoteLocation());
+			// need to prepend "/items/".
+			String remoteLocation = serverUrl.getFile() + "/" + MlistsServlet.PATH_ITEMS + "/" + mlt.getRemoteLocation();
+			itemUrl = new URL(serverUrl.getProtocol(), serverUrl.getHost(), serverUrl.getPort(), remoteLocation);
 		}
 		catch (MalformedURLException e) {
 			throw new MorriganException(e);

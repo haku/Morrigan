@@ -431,22 +431,15 @@ public class MlistsServlet extends HttpServlet {
 			for (IMixedMediaItem mi : items) {
     			dw.startElement("entry");
     			
+    			AbstractFeed.addElement(dw, "title", mi.getTitle());
+    			
     			String file;
     			try {
     				file = URLEncoder.encode(mi.getFilepath(), "UTF-8");
     			} catch (UnsupportedEncodingException e) {
     				throw new RuntimeException(e);
     			}
-    			
-    			AbstractFeed.addElement(dw, "title", mi.getTitle());
-    			
-    			StringBuilder sb = new StringBuilder();
-    			sb.append(pathToSelf);
-    			sb.append("/");
-    			sb.append(PATH_ITEMS);
-    			sb.append("/");
-    			sb.append(file);
-    			AbstractFeed.addLink(dw, sb.toString(), "self");
+    			AbstractFeed.addLink(dw, file, "self"); // Path is relative to this feed.
     			
     			if (mi.getDateAdded() != null) {
     				AbstractFeed.addElement(dw, "dateadded", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateAdded()));
