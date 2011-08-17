@@ -19,7 +19,6 @@ package com.vaguehope.nemain.shells;
 import java.awt.MouseInfo;
 import java.awt.Point;
 
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
