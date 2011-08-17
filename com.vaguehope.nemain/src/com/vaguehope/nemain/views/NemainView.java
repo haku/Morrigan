@@ -21,7 +21,6 @@ import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.sparktank.sqlitewrapper.DbException;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.layout.FormAttachment;
@@ -41,6 +40,7 @@ import com.vaguehope.nemain.model.NemainDate;
 import com.vaguehope.nemain.model.NemainEvent;
 import com.vaguehope.nemain.model.SqliteLayer;
 import com.vaguehope.nemain.shells.EditEntryShell;
+import com.vaguehope.sqlitewrapper.DbException;
 
 public class NemainView extends ViewPart implements CalendarPlotDataSource {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
