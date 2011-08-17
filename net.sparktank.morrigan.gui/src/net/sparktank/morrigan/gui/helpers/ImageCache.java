@@ -7,6 +7,9 @@ import net.sparktank.morrigan.gui.Activator;
 
 import org.eclipse.swt.graphics.Image;
 
+/**
+ * TODO replace this class with Activator.plugin.getImageRegistry()
+ */
 public class ImageCache {
 	
 	private Map<String, Image> imageCache = new HashMap<String, Image>();
