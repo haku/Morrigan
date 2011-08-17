@@ -23,8 +23,9 @@ import java.sql.Statement;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.sparktank.sqlitewrapper.DbException;
-import net.sparktank.sqlitewrapper.GenericSqliteLayer;
+import com.vaguehope.sqlitewrapper.DbException;
+import com.vaguehope.sqlitewrapper.GenericSqliteLayer;
+
 
 public class SqliteLayer extends GenericSqliteLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
