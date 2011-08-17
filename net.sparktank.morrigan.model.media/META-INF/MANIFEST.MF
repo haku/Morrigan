@@ -5,9 +5,9 @@ Bundle-SymbolicName: net.sparktank.morrigan.model.media
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: vaguehope.com
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: net.sparktank.morrigan.model.db,
+Import-Package: com.vaguehope.sqlitewrapper,
+ net.sparktank.morrigan.model.db,
  net.sparktank.morrigan.model.db.basicimpl,
  net.sparktank.morrigan.model.exceptions,
- net.sparktank.morrigan.model.tasks,
- net.sparktank.sqlitewrapper
+ net.sparktank.morrigan.model.tasks
 Export-Package: net.sparktank.morrigan.model.media

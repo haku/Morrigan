@@ -5,10 +5,11 @@ import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 
+import com.vaguehope.sqlitewrapper.DbException;
+import com.vaguehope.sqlitewrapper.IGenericDbLayer;
+
 import net.sparktank.morrigan.model.db.IDbColumn;
 import net.sparktank.morrigan.model.db.IDbItem;
-import net.sparktank.sqlitewrapper.DbException;
-import net.sparktank.sqlitewrapper.IGenericDbLayer;
 
 public interface IMediaItemStorageLayer<T extends IMediaItem> extends IGenericDbLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

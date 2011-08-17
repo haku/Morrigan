@@ -23,7 +23,6 @@
    </vm>
 
    <plugins>
-      <plugin id="net.sparktank.morrigan"/>
       <plugin id="net.sparktank.morrigan.config"/>
       <plugin id="net.sparktank.morrigan.engines"/>
       <plugin id="net.sparktank.morrigan.model"/>
@@ -39,7 +38,7 @@
       <plugin id="net.sparktank.morrigan.server.boot"/>
       <plugin id="net.sparktank.morrigan.util"/>
       <plugin id="net.sparktank.morrigan.util.httpclient"/>
-      <plugin id="net.sparktank.sqlitewrapper"/>
+      <plugin id="com.vaguehope.sqlitewrapper"/>
       <plugin id="org.eclipse.core.runtime"/>
       <plugin id="org.eclipse.osgi"/>
       <plugin id="org.eclipse.swt"/>

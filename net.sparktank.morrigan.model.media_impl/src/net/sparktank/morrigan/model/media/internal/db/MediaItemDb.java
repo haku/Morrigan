@@ -7,6 +7,8 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.vaguehope.sqlitewrapper.DbException;
+
 import net.sparktank.morrigan.model.db.IDbColumn;
 import net.sparktank.morrigan.model.db.IDbItem;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
@@ -22,7 +24,6 @@ import net.sparktank.morrigan.model.media.internal.MediaTagClassificationImpl;
 import net.sparktank.morrigan.model.media.MediaTag;
 import net.sparktank.morrigan.model.media.MediaTagClassification;
 import net.sparktank.morrigan.model.media.MediaTagType;
-import net.sparktank.sqlitewrapper.DbException;
 
 public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMediaItemStorageLayer<T>, T extends IMediaItem>
 		extends MediaItemList<T>

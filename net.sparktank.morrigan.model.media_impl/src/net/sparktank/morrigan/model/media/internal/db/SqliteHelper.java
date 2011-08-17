@@ -7,8 +7,9 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import com.vaguehope.sqlitewrapper.GenericSqliteLayer.SqlCreateCmd;
+
 import net.sparktank.morrigan.model.db.IDbColumn;
-import net.sparktank.sqlitewrapper.GenericSqliteLayer.SqlCreateCmd;
 
 /*
  * Totally generic SQLite helper methods.

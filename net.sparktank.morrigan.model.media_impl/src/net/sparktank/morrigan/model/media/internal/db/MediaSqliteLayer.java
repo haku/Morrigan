@@ -10,6 +10,9 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.vaguehope.sqlitewrapper.DbException;
+import com.vaguehope.sqlitewrapper.GenericSqliteLayer;
+
 import net.sparktank.morrigan.model.db.IDbItem;
 import net.sparktank.morrigan.model.media.IMediaItem;
 import net.sparktank.morrigan.model.media.IMediaItemStorageLayer;
@@ -19,8 +22,6 @@ import net.sparktank.morrigan.model.media.MediaTagClassification;
 import net.sparktank.morrigan.model.media.MediaTagType;
 import net.sparktank.morrigan.model.media.internal.MediaTagClassificationFactory;
 import net.sparktank.morrigan.model.media.internal.MediaTagImpl;
-import net.sparktank.sqlitewrapper.DbException;
-import net.sparktank.sqlitewrapper.GenericSqliteLayer;
 
 public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqliteLayer implements IMediaItemStorageLayer<T> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

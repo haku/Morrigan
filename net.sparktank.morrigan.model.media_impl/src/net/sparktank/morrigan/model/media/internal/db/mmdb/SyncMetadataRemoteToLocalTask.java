@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.vaguehope.sqlitewrapper.DbException;
+
 import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.IMixedMediaItem;
@@ -14,7 +16,6 @@ import net.sparktank.morrigan.model.tasks.IMorriganTask;
 import net.sparktank.morrigan.model.tasks.TaskEventListener;
 import net.sparktank.morrigan.model.tasks.TaskResult;
 import net.sparktank.morrigan.model.tasks.TaskResult.TaskOutcome;
-import net.sparktank.sqlitewrapper.DbException;
 
 public class SyncMetadataRemoteToLocalTask implements IMorriganTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

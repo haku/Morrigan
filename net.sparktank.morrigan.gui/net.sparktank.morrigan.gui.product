@@ -62,7 +62,7 @@ Image &quot;The Morrígan&quot; by Louis le Brocquy used under the Creative Comm
       <plugin id="net.sparktank.morrigan.util"/>
       <plugin id="net.sparktank.morrigan.util.httpclient"/>
       <plugin id="com.vaguehope.nemain"/>
-      <plugin id="net.sparktank.sqlitewrapper"/>
+      <plugin id="com.vaguehope.sqlitewrapper"/>
       <plugin id="org.eclipse.compare.core"/>
       <plugin id="org.eclipse.core.commands"/>
       <plugin id="org.eclipse.core.contenttype"/>

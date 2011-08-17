@@ -3,6 +3,8 @@ package net.sparktank.morrigan.model.media.internal.db.mmdb;
 import java.util.Date;
 import java.util.List;
 
+import com.vaguehope.sqlitewrapper.DbException;
+
 import net.sparktank.morrigan.model.db.IDbColumn;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.DirtyState;
@@ -17,7 +19,6 @@ import net.sparktank.morrigan.model.media.internal.MediaPictureListHelper;
 import net.sparktank.morrigan.model.media.internal.MediaTrackListHelper;
 import net.sparktank.morrigan.model.media.internal.db.MediaItemDb;
 import net.sparktank.morrigan.model.media.internal.db.MediaItemDbConfig;
-import net.sparktank.sqlitewrapper.DbException;
 
 public abstract class AbstractMixedMediaDb<H extends IAbstractMixedMediaDb<H>>
 		extends MediaItemDb<H, IMixedMediaStorageLayer<IMixedMediaItem>, IMixedMediaItem>

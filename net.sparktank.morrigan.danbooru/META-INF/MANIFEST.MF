@@ -9,12 +9,12 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
-Import-Package: net.sparktank.morrigan.gui.dialogs,
+Import-Package: com.vaguehope.sqlitewrapper,
+ net.sparktank.morrigan.gui.dialogs,
  net.sparktank.morrigan.gui.views,
  net.sparktank.morrigan.model.db,
  net.sparktank.morrigan.model.exceptions,
  net.sparktank.morrigan.model.media,
  net.sparktank.morrigan.model.media.impl,
  net.sparktank.morrigan.util,
- net.sparktank.morrigan.util.httpclient,
- net.sparktank.sqlitewrapper
+ net.sparktank.morrigan.util.httpclient
