@@ -14,10 +14,8 @@
  * under the License.
  */
 
-package net.sparktank.nemain.controls;
+package com.vaguehope.nemain.controls;
 
-import net.sparktank.nemain.model.NemainDate;
-import net.sparktank.nemain.model.NemainEvent;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -28,6 +26,9 @@ import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+
+import com.vaguehope.nemain.model.NemainDate;
+import com.vaguehope.nemain.model.NemainEvent;
 
 public class CalendarCell {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

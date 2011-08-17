@@ -14,13 +14,11 @@
  * under the License.
  */
 
-package net.sparktank.nemain.controls;
+package com.vaguehope.nemain.controls;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sparktank.nemain.model.NemainDate;
-import net.sparktank.nemain.model.NemainEvent;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
@@ -39,6 +37,9 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.TextLayout;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
+
+import com.vaguehope.nemain.model.NemainDate;
+import com.vaguehope.nemain.model.NemainEvent;
 
 public class CalendarPlot extends Canvas implements PaintListener, MouseListener, MouseWheelListener, KeyListener, TraverseListener, FocusListener {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

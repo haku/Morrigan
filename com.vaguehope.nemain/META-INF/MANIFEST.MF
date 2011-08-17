@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Nemain
-Bundle-SymbolicName: net.sparktank.nemain; singleton:=true
+Bundle-SymbolicName: com.vaguehope.nemain;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Bundle-Activator: net.sparktank.nemain.Activator
+Bundle-Activator: com.vaguehope.nemain.Activator
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: net.sparktank.sqlitewrapper,

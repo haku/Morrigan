@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 Fae Hutter
+ * Copyright 2011 Fae Hutter
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License. You may
@@ -14,24 +14,13 @@
  * under the License.
  */
 
-package net.sparktank.nemain.model;
+package com.vaguehope.nemain.controls;
 
-public class NemainException extends Exception {
-	
-	private static final long serialVersionUID = -4285110456878964140L;
-	
-	public NemainException() {/* UNUSED */}
-	
-	public NemainException (String s) {
-		super(s);
-	}
-	
-	public NemainException (String s, Throwable t) {
-		super(s, t);
-	}
+import com.vaguehope.nemain.model.NemainDate;
+import com.vaguehope.nemain.model.NemainEvent;
 
-	public NemainException(Throwable t) {
-		super(t);
-	}
+public interface CalendarCellEditEventHandler {
+	
+	public void editBtnClicked (NemainDate date, NemainEvent event, boolean anual);
 	
 }

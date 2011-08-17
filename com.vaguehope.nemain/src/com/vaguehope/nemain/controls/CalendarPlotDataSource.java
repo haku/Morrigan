@@ -14,13 +14,16 @@
  * under the License.
  */
 
-package net.sparktank.nemain.controls;
+package com.vaguehope.nemain.controls;
 
-import net.sparktank.nemain.model.NemainDate;
-import net.sparktank.nemain.model.NemainEvent;
+import java.util.List;
 
-public interface CalendarCellEditEventHandler {
+import com.vaguehope.nemain.model.NemainDate;
+import com.vaguehope.nemain.model.NemainEvent;
+
+
+public interface CalendarPlotDataSource {
 	
-	public void editBtnClicked (NemainDate date, NemainEvent event, boolean anual);
+	public List<NemainEvent> getCalendarEvents (NemainDate firstDate, int dayCount);
 	
 }

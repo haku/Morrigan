@@ -14,21 +14,13 @@
  * under the License.
  */
 
-package net.sparktank.nemain.views;
+package com.vaguehope.nemain.views;
 
 
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.sparktank.nemain.config.Config;
-import net.sparktank.nemain.controls.CalendarCellEditEventHandler;
-import net.sparktank.nemain.controls.CalendarPlot;
-import net.sparktank.nemain.controls.CalendarPlotDataSource;
-import net.sparktank.nemain.model.NemainDate;
-import net.sparktank.nemain.model.NemainEvent;
-import net.sparktank.nemain.model.SqliteLayer;
-import net.sparktank.nemain.shells.EditEntryShell;
 import net.sparktank.sqlitewrapper.DbException;
 
 import org.eclipse.jface.action.Action;
@@ -41,10 +33,19 @@ import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
 
+import com.vaguehope.nemain.config.Config;
+import com.vaguehope.nemain.controls.CalendarCellEditEventHandler;
+import com.vaguehope.nemain.controls.CalendarPlot;
+import com.vaguehope.nemain.controls.CalendarPlotDataSource;
+import com.vaguehope.nemain.model.NemainDate;
+import com.vaguehope.nemain.model.NemainEvent;
+import com.vaguehope.nemain.model.SqliteLayer;
+import com.vaguehope.nemain.shells.EditEntryShell;
+
 public class NemainView extends ViewPart implements CalendarPlotDataSource {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public static final String ID = "net.sparktank.nemain.views.NemainView";
+	public static final String ID = "com.vaguehope.nemain.views.NemainView";
 	
 	public static final int GRID_ROW_COUNT = 3; // Default row count.
 	public static final int GRID_ROW_COUNT_MAX = 10;

@@ -14,16 +14,31 @@
  * under the License.
  */
 
-package net.sparktank.nemain.helpers;
+package com.vaguehope.nemain.helpers;
 
-public class EqualHelper {
+import java.util.HashMap;
+import java.util.Map;
+
+
+import org.eclipse.swt.graphics.Image;
+
+import com.vaguehope.nemain.Activator;
+
+public class ImageCache {
 	
-	public static boolean areEqual (Object aThis, Object aThat) {
-		return aThis == null ? aThat == null : aThis.equals(aThat);
+	private Map<String, Image> imageCache = new HashMap<String, Image>();
+	
+	public void clearCache () {
+		for (String i : this.imageCache.keySet()) {
+			this.imageCache.get(i).dispose();
+		}
 	}
 	
-	public static boolean areEqual (int aThis, int aThat) {
-		return aThis == aThat;
+	public Image readImage (String path) {
+		if (!this.imageCache.containsKey(path)) {
+			this.imageCache.put(path, Activator.getImageDescriptor(path).createImage());
+		}
+		return this.imageCache.get(path);
 	}
 	
 }
