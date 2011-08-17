@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package net.sparktank.nemain.helpers;
+package com.vaguehope.nemain.helpers;
 
 public class EqualHelper {
 	

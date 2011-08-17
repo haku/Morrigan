@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package net.sparktank.nemain.model;
+package com.vaguehope.nemain.model;
 
 public class NemainException extends Exception {
 	

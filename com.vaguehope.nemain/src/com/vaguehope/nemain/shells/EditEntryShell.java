@@ -14,12 +14,11 @@
  * under the License.
  */
 
-package net.sparktank.nemain.shells;
+package com.vaguehope.nemain.shells;
 
 import java.awt.MouseInfo;
 import java.awt.Point;
 
-import net.sparktank.nemain.model.NemainEvent;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -36,6 +35,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+
+import com.vaguehope.nemain.model.NemainEvent;
 
 public class EditEntryShell {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

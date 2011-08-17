@@ -14,9 +14,9 @@
  * under the License.
  */
 
-package net.sparktank.nemain.model;
+package com.vaguehope.nemain.model;
 
-import net.sparktank.nemain.helpers.EqualHelper;
+import com.vaguehope.nemain.helpers.EqualHelper;
 
 
 public class NemainEvent extends NemainDate {

@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package net.sparktank.nemain.config;
+package com.vaguehope.nemain.config;
 
 import java.io.File;
 

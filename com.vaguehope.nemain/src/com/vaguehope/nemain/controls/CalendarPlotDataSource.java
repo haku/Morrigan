@@ -14,12 +14,13 @@
  * under the License.
  */
 
-package net.sparktank.nemain.controls;
+package com.vaguehope.nemain.controls;
 
 import java.util.List;
 
-import net.sparktank.nemain.model.NemainDate;
-import net.sparktank.nemain.model.NemainEvent;
+import com.vaguehope.nemain.model.NemainDate;
+import com.vaguehope.nemain.model.NemainEvent;
+
 
 public interface CalendarPlotDataSource {
 	

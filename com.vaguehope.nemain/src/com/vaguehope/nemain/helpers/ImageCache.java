@@ -14,14 +14,15 @@
  * under the License.
  */
 
-package net.sparktank.nemain.helpers;
+package com.vaguehope.nemain.helpers;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sparktank.nemain.Activator;
 
 import org.eclipse.swt.graphics.Image;
+
+import com.vaguehope.nemain.Activator;
 
 public class ImageCache {
 	
