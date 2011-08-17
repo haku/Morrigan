@@ -1,4 +1,4 @@
-package net.sparktank.sqlitewrapper;
+package com.vaguehope.sqlitewrapper;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

@@ -1,10 +1,10 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: SqliteWrapper
-Bundle-SymbolicName: net.sparktank.sqlitewrapper
+Bundle-SymbolicName: com.vaguehope.sqlitewrapper
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: .,
  lib/sqlitejdbc-v056.jar
-Export-Package: net.sparktank.sqlitewrapper
+Export-Package: com.vaguehope.sqlitewrapper
 Bundle-Vendor: vaguehope.com
