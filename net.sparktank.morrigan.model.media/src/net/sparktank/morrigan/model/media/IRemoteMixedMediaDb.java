@@ -2,9 +2,10 @@ package net.sparktank.morrigan.model.media;
 
 import java.net.URL;
 
+import com.vaguehope.sqlitewrapper.DbException;
+
 import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.tasks.TaskEventListener;
-import net.sparktank.sqlitewrapper.DbException;
 
 public interface IRemoteMixedMediaDb extends IAbstractMixedMediaDb<IRemoteMixedMediaDb> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -32,11 +32,11 @@ import net.sparktank.morrigan.server.feedwriters.AbstractFeed;
 import net.sparktank.morrigan.server.feedwriters.XmlHelper;
 import net.sparktank.morrigan.server.model.RemoteMixedMediaDb;
 import net.sparktank.morrigan.server.model.RemoteMixedMediaDbHelper;
-import net.sparktank.sqlitewrapper.DbException;
 
 import org.xml.sax.SAXException;
 
 import com.megginson.sax.DataWriter;
+import com.vaguehope.sqlitewrapper.DbException;
 
 /**
  * Valid URLs:

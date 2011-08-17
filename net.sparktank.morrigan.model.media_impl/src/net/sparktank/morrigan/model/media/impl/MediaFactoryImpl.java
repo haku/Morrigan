@@ -29,11 +29,12 @@ import net.sparktank.morrigan.model.media.internal.db.mmdb.SyncMetadataRemoteToL
 import net.sparktank.morrigan.model.media.internal.pl.MediaPlaylistFactory;
 import net.sparktank.morrigan.model.media.internal.pl.PlaylistHelper;
 import net.sparktank.morrigan.model.tasks.IMorriganTask;
-import net.sparktank.sqlitewrapper.DbException;
 
 import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
 import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.tag.TagException;
+
+import com.vaguehope.sqlitewrapper.DbException;
 
 public class MediaFactoryImpl implements MediaFactory {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

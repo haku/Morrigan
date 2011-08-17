@@ -11,6 +11,8 @@ import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.logging.Logger;
 
+import com.vaguehope.sqlitewrapper.DbException;
+
 import net.sparktank.morrigan.engines.playback.NotImplementedException;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.factory.RecyclingFactory;
@@ -26,7 +28,6 @@ import net.sparktank.morrigan.server.MlistsServlet;
 import net.sparktank.morrigan.server.feedreader.MixedMediaDbFeedParser;
 import net.sparktank.morrigan.util.httpclient.HttpClient;
 import net.sparktank.morrigan.util.httpclient.HttpStreamHandlerException;
-import net.sparktank.sqlitewrapper.DbException;
 
 public class RemoteMixedMediaDb extends AbstractMixedMediaDb<IRemoteMixedMediaDb> implements IRemoteMixedMediaDb {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

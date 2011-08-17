@@ -4,9 +4,10 @@ import java.io.File;
 import java.util.Date;
 import java.util.List;
 
+import com.vaguehope.sqlitewrapper.DbException;
+
 import net.sparktank.morrigan.model.db.IDbColumn;
 import net.sparktank.morrigan.model.media.IMixedMediaItem.MediaType;
-import net.sparktank.sqlitewrapper.DbException;
 
 public interface IMixedMediaStorageLayer<T extends IMixedMediaItem> extends IMediaItemStorageLayer<T> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

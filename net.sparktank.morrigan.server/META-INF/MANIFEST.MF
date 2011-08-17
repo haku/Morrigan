@@ -6,7 +6,8 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: net.sparktank.morrigan.server,
  net.sparktank.morrigan.server.model
-Import-Package: javax.servlet,
+Import-Package: com.vaguehope.sqlitewrapper,
+ javax.servlet,
  javax.servlet.http,
  net.sparktank.morrigan.config,
  net.sparktank.morrigan.engines.playback,
@@ -22,7 +23,6 @@ Import-Package: javax.servlet,
  net.sparktank.morrigan.player,
  net.sparktank.morrigan.util,
  net.sparktank.morrigan.util.httpclient,
- net.sparktank.sqlitewrapper,
  org.eclipse.jetty.http,
  org.eclipse.jetty.server,
  org.eclipse.jetty.server.bio,

@@ -10,7 +10,6 @@ import net.sparktank.morrigan.model.media.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.IRemoteMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.MediaFactoryImpl;
 import net.sparktank.morrigan.model.tasks.IMorriganTask;
-import net.sparktank.sqlitewrapper.DbException;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IContributionItem;
@@ -25,6 +24,8 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IEditorReference;
+
+import com.vaguehope.sqlitewrapper.DbException;
 
 public class RemoteMixedMediaDbEditor
 		extends AbstractMixedMediaDbEditor<IRemoteMixedMediaDb> {

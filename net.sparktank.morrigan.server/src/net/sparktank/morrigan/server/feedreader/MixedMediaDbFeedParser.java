@@ -29,11 +29,12 @@ import net.sparktank.morrigan.util.httpclient.HttpClient;
 import net.sparktank.morrigan.util.httpclient.HttpClient.HttpResponse;
 import net.sparktank.morrigan.util.httpclient.HttpStreamHandler;
 import net.sparktank.morrigan.util.httpclient.HttpStreamHandlerException;
-import net.sparktank.sqlitewrapper.DbException;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
+
+import com.vaguehope.sqlitewrapper.DbException;
 
 public class MixedMediaDbFeedParser extends DefaultHandler {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
