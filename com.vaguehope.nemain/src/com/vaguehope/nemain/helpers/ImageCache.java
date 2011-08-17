@@ -19,7 +19,6 @@ package com.vaguehope.nemain.helpers;
 import java.util.HashMap;
 import java.util.Map;
 
-
 import org.eclipse.swt.graphics.Image;
 
 import com.vaguehope.nemain.Activator;

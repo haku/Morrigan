@@ -19,7 +19,6 @@ package com.vaguehope.nemain.controls;
 import java.util.HashMap;
 import java.util.Map;
 
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
