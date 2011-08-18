@@ -32,8 +32,8 @@ $TABLEDIR/eclipse-jee-helios/eclipse \
  -noSplash \
  -application org.eclipse.ant.core.antRunner \
  -data $TABLEDIR/src/trunk \
- -buildfile $TABLEDIR/src/trunk/net.sparktank.morrigan.build/build-in-eclipse.xml
+ -buildfile $TABLEDIR/src/trunk/com.vaguehope.morrigan.build/build-in-eclipse.xml
 
 #mkdir output
-#cp $TABLEDIR/src/trunk/net.sparktank.morrigan.build/builds/* output/
+#cp $TABLEDIR/src/trunk/com.vaguehope.morrigan.build/builds/* output/
 
