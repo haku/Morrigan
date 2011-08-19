@@ -57,7 +57,7 @@
    </plugins>
 
    <configurations>
-      <plugin id="net.sparktank.morrigan.osgiconsole" autoStart="true" startLevel="1" />
+      <plugin id="com.vaguehope.morrigan.osgiconsole" autoStart="true" startLevel="1" />
       <plugin id="net.sparktank.morrigan.playbackimpl.dsj" autoStart="true" startLevel="1" />
       <plugin id="net.sparktank.morrigan.playbackimpl.gs" autoStart="true" startLevel="1" />
       <plugin id="net.sparktank.morrigan.playbackimpl.jmf" autoStart="true" startLevel="1" />
