@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.osgiconsole;
+package com.vaguehope.morrigan.osgiconsole;
 
 import java.io.File;
 import java.util.Collection;
