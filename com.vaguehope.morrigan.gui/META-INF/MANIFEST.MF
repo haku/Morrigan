@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Morrigan GUI
-Bundle-SymbolicName: net.sparktank.morrigan.gui;singleton:=true
+Bundle-SymbolicName: com.vaguehope.morrigan.gui;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Bundle-Activator: net.sparktank.morrigan.gui.Activator
+Bundle-Activator: com.vaguehope.morrigan.gui.Activator
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: com.vaguehope.morrigan.config,
@@ -57,6 +57,6 @@ Import-Package: com.vaguehope.morrigan.config,
  org.eclipse.ui.services,
  org.osgi.framework,
  org.osgi.service.prefs;version="1.1.1"
-Export-Package: net.sparktank.morrigan.gui.dialogs,
- net.sparktank.morrigan.gui.views
+Export-Package: com.vaguehope.morrigan.gui.dialogs,
+ com.vaguehope.morrigan.gui.views
 Bundle-Vendor: vaguehope.com

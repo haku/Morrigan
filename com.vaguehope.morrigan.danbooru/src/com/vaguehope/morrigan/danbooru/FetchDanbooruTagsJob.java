@@ -9,8 +9,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import net.sparktank.morrigan.gui.dialogs.RunnableDialog;
-import net.sparktank.morrigan.gui.views.ViewTagEditor;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -18,6 +16,8 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.swt.widgets.Display;
 
+import com.vaguehope.morrigan.gui.dialogs.RunnableDialog;
+import com.vaguehope.morrigan.gui.views.ViewTagEditor;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
