@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.config;
+package com.vaguehope.morrigan.config;
 
 import java.io.File;
 import java.io.FileFilter;

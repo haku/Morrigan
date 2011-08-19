@@ -11,6 +11,7 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 
+import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.engines.EngineFactory;
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
@@ -22,7 +23,6 @@ import com.vaguehope.morrigan.model.media.internal.TrackTagHelper;
 import com.vaguehope.morrigan.model.media.internal.db.LocalDbUpdateTask;
 import com.vaguehope.morrigan.model.tasks.TaskEventListener;
 
-import net.sparktank.morrigan.config.Config;
 
 public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMediaDb, IMixedMediaItem> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
