@@ -13,8 +13,8 @@ Import-Package: com.vaguehope.morrigan.engines,
  com.vaguehope.morrigan.model.factory,
  com.vaguehope.morrigan.model.helper,
  com.vaguehope.morrigan.model.media,
+ com.vaguehope.morrigan.model.media.impl,
  com.vaguehope.sqlitewrapper,
- net.sparktank.morrigan.model.media.impl,
  org.eclipse.swt,
  org.eclipse.swt.widgets
 Bundle-Vendor: vaguehope.com

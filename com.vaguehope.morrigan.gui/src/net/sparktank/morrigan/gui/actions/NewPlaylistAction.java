@@ -6,7 +6,6 @@ import net.sparktank.morrigan.gui.editors.EditorFactory;
 import net.sparktank.morrigan.gui.editors.MediaItemListEditorInput;
 import net.sparktank.morrigan.gui.editors.tracks.PlaylistEditor;
 import net.sparktank.morrigan.gui.views.ViewMediaExplorer;
-import net.sparktank.morrigan.model.media.impl.MediaFactoryImpl;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.InputDialog;
@@ -19,6 +18,7 @@ import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaPlaylist;
+import com.vaguehope.morrigan.model.media.impl.MediaFactoryImpl;
 
 
 public class NewPlaylistAction extends Action implements IWorkbenchAction {
