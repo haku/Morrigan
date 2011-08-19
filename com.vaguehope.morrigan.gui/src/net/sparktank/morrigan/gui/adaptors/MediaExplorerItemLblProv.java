@@ -1,11 +1,12 @@
 package net.sparktank.morrigan.gui.adaptors;
 
 import net.sparktank.morrigan.gui.helpers.ImageCache;
-import net.sparktank.morrigan.model.media.MediaListReference;
 
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.swt.graphics.Image;
+
+import com.vaguehope.morrigan.model.media.MediaListReference;
 
 public class MediaExplorerItemLblProv implements ILabelProvider {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

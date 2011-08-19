@@ -4,12 +4,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
+import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
+import com.vaguehope.morrigan.model.media.IMediaTrack;
+import com.vaguehope.morrigan.model.media.IMediaTrackDb;
+import com.vaguehope.morrigan.model.media.MediaListReference;
 import com.vaguehope.sqlitewrapper.DbException;
 
-import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
-import net.sparktank.morrigan.model.media.IMediaTrack;
-import net.sparktank.morrigan.model.media.IMediaTrackDb;
-import net.sparktank.morrigan.model.media.MediaListReference;
 import net.sparktank.morrigan.model.media.impl.MediaFactoryImpl;
 
 public class PlayerHelper {

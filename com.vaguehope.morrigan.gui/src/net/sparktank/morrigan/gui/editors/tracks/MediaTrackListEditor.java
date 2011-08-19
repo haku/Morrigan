@@ -16,8 +16,6 @@ import net.sparktank.morrigan.gui.editors.MediaColumn;
 import net.sparktank.morrigan.gui.editors.MediaItemListEditor;
 import net.sparktank.morrigan.gui.handler.AddToQueue;
 import net.sparktank.morrigan.gui.preferences.MediaListPref;
-import net.sparktank.morrigan.model.media.IMediaTrack;
-import net.sparktank.morrigan.model.media.IMediaTrackList;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -29,6 +27,9 @@ import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.swt.SWT;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.handlers.IHandlerService;
+
+import com.vaguehope.morrigan.model.media.IMediaTrack;
+import com.vaguehope.morrigan.model.media.IMediaTrackList;
 
 public abstract class MediaTrackListEditor<T extends IMediaTrackList<S>, S extends IMediaTrack> extends MediaItemListEditor<T, S> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -16,10 +16,6 @@ import net.sparktank.morrigan.gui.helpers.ImageCache;
 import net.sparktank.morrigan.gui.helpers.RefreshTimer;
 import net.sparktank.morrigan.gui.jobs.TaskJob;
 import net.sparktank.morrigan.gui.preferences.MediaListPref;
-import net.sparktank.morrigan.model.media.DirtyState;
-import net.sparktank.morrigan.model.media.IMediaItem;
-import net.sparktank.morrigan.model.media.IMediaItemList;
-import net.sparktank.morrigan.model.media.MediaItemListChangeListener;
 import net.sparktank.morrigan.model.media.impl.MediaFactoryImpl;
 
 import org.eclipse.core.commands.common.CommandException;
@@ -63,6 +59,10 @@ import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.part.EditorPart;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
+import com.vaguehope.morrigan.model.media.DirtyState;
+import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.IMediaItemList;
+import com.vaguehope.morrigan.model.media.MediaItemListChangeListener;
 import com.vaguehope.morrigan.model.tasks.IMorriganTask;
 
 /*

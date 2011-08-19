@@ -6,12 +6,12 @@ import java.util.Collections;
 import java.util.List;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
+import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
+import com.vaguehope.morrigan.model.media.MediaListReference;
+import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 import com.vaguehope.sqlitewrapper.DbException;
 
 import net.sparktank.morrigan.config.Config;
-import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
-import net.sparktank.morrigan.model.media.MediaListReference;
-import net.sparktank.morrigan.model.media.MediaListReference.MediaListType;
 import net.sparktank.morrigan.model.media.internal.MediaListReferenceImpl;
 import net.sparktank.morrigan.model.media.internal.db.MediaItemDbConfig;
 

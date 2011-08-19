@@ -6,16 +6,6 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.List;
 
-import net.sparktank.morrigan.model.media.DurationData;
-import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
-import net.sparktank.morrigan.model.media.IMediaItem;
-import net.sparktank.morrigan.model.media.IMediaItemDb;
-import net.sparktank.morrigan.model.media.IMediaItemList;
-import net.sparktank.morrigan.model.media.IMediaPlaylist;
-import net.sparktank.morrigan.model.media.IMediaTrack;
-import net.sparktank.morrigan.model.media.IRemoteMixedMediaDb;
-import net.sparktank.morrigan.model.media.MediaFactory;
-import net.sparktank.morrigan.model.media.MediaListReference;
 import net.sparktank.morrigan.model.media.internal.DurationDataImpl;
 import net.sparktank.morrigan.model.media.internal.MediaFileCopyTask;
 import net.sparktank.morrigan.model.media.internal.TrackTagHelper;
@@ -33,6 +23,16 @@ import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.tag.TagException;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
+import com.vaguehope.morrigan.model.media.DurationData;
+import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
+import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.IMediaItemDb;
+import com.vaguehope.morrigan.model.media.IMediaItemList;
+import com.vaguehope.morrigan.model.media.IMediaPlaylist;
+import com.vaguehope.morrigan.model.media.IMediaTrack;
+import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
+import com.vaguehope.morrigan.model.media.MediaFactory;
+import com.vaguehope.morrigan.model.media.MediaListReference;
 import com.vaguehope.morrigan.model.tasks.IMorriganTask;
 import com.vaguehope.sqlitewrapper.DbException;
 

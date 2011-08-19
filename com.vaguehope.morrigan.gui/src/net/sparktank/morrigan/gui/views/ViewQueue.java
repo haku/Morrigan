@@ -7,7 +7,6 @@ import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.adaptors.PlayItemLblProv;
 import net.sparktank.morrigan.gui.helpers.ImageCache;
 import net.sparktank.morrigan.gui.helpers.RefreshTimer;
-import net.sparktank.morrigan.model.media.DurationData;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -23,6 +22,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.part.ViewPart;
 
+import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.util.TimeHelper;
 

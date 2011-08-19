@@ -11,11 +11,6 @@ import java.util.Map;
 
 import net.sparktank.morrigan.gui.dialogs.RunnableDialog;
 import net.sparktank.morrigan.gui.views.ViewTagEditor;
-import net.sparktank.morrigan.model.media.IMediaItemDb;
-import net.sparktank.morrigan.model.media.IMixedMediaItem;
-import net.sparktank.morrigan.model.media.MediaTag;
-import net.sparktank.morrigan.model.media.MediaTagClassification;
-import net.sparktank.morrigan.model.media.MediaTagType;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -24,6 +19,11 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.swt.widgets.Display;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
+import com.vaguehope.morrigan.model.media.IMediaItemDb;
+import com.vaguehope.morrigan.model.media.IMixedMediaItem;
+import com.vaguehope.morrigan.model.media.MediaTag;
+import com.vaguehope.morrigan.model.media.MediaTagClassification;
+import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.util.ChecksumHelper;
 
 class FetchDanbooruTagsJob extends Job {

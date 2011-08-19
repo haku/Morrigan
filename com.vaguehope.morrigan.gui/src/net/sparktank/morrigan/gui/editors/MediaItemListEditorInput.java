@@ -1,7 +1,5 @@
 package net.sparktank.morrigan.gui.editors;
 
-import net.sparktank.morrigan.model.media.IMediaItem;
-import net.sparktank.morrigan.model.media.IMediaItemList;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Table;
@@ -10,6 +8,8 @@ import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPersistableElement;
 
 import com.vaguehope.morrigan.model.helper.EqualHelper;
+import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.IMediaItemList;
 
 public class MediaItemListEditorInput<T extends IMediaItemList<? extends IMediaItem>> implements IEditorInput, IPersistableElement {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

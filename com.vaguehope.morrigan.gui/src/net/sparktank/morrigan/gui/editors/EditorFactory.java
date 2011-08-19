@@ -1,8 +1,5 @@
 package net.sparktank.morrigan.gui.editors;
 
-import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
-import net.sparktank.morrigan.model.media.IMediaPlaylist;
-import net.sparktank.morrigan.model.media.IRemoteMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.MediaFactoryImpl;
 
 import org.eclipse.core.runtime.IAdaptable;
@@ -10,6 +7,9 @@ import org.eclipse.ui.IElementFactory;
 import org.eclipse.ui.IMemento;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
+import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
+import com.vaguehope.morrigan.model.media.IMediaPlaylist;
+import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDb;
 import com.vaguehope.sqlitewrapper.DbException;
 

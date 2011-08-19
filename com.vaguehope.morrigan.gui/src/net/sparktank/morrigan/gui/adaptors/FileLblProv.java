@@ -3,13 +3,14 @@ package net.sparktank.morrigan.gui.adaptors;
 import java.math.BigInteger;
 
 import net.sparktank.morrigan.gui.helpers.ImageCache;
-import net.sparktank.morrigan.model.media.IMediaItem;
 
 import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.graphics.TextStyle;
+
+import com.vaguehope.morrigan.model.media.IMediaItem;
 
 public class FileLblProv extends StyledCellLabelProvider {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

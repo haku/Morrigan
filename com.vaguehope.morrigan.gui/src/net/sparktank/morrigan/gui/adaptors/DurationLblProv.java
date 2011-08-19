@@ -1,9 +1,9 @@
 package net.sparktank.morrigan.gui.adaptors;
 
-import net.sparktank.morrigan.model.media.IMediaTrack;
 
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 
+import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.util.TimeHelper;
 
 public class DurationLblProv extends ColumnLabelProvider {

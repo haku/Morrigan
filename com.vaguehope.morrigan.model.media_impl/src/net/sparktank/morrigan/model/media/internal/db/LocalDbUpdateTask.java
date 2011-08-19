@@ -16,6 +16,9 @@ import java.util.Map.Entry;
 import java.util.Stack;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
+import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.IMediaItemDb;
+import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.tasks.IMorriganTask;
 import com.vaguehope.morrigan.model.tasks.TaskEventListener;
 import com.vaguehope.morrigan.model.tasks.TaskResult;
@@ -23,9 +26,6 @@ import com.vaguehope.morrigan.model.tasks.TaskResult.TaskOutcome;
 import com.vaguehope.morrigan.util.ChecksumHelper;
 import com.vaguehope.sqlitewrapper.DbException;
 
-import net.sparktank.morrigan.model.media.IMediaItem;
-import net.sparktank.morrigan.model.media.IMediaItemDb;
-import net.sparktank.morrigan.model.media.IMediaItemStorageLayer;
 
 public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<Q, ? extends IMediaItemStorageLayer<T>,T>, T extends IMediaItem> implements IMorriganTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -1,9 +1,9 @@
 package com.vaguehope.morrigan.player;
 
 import com.vaguehope.morrigan.model.helper.EqualHelper;
+import com.vaguehope.morrigan.model.media.IMediaTrack;
+import com.vaguehope.morrigan.model.media.IMediaTrackList;
 
-import net.sparktank.morrigan.model.media.IMediaTrack;
-import net.sparktank.morrigan.model.media.IMediaTrackList;
 
 // TODO add interface to refer to this class with.
 public class PlayItem {

@@ -1,8 +1,9 @@
 package net.sparktank.morrigan.gui.adaptors;
 
-import net.sparktank.morrigan.model.media.IMediaPicture;
 
 import org.eclipse.jface.viewers.ColumnLabelProvider;
+
+import com.vaguehope.morrigan.model.media.IMediaPicture;
 
 public class DimensionsLblProv extends ColumnLabelProvider {
 	

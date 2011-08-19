@@ -3,11 +3,11 @@ package net.sparktank.morrigan.model.media.internal.db.mmdb;
 import java.util.Date;
 
 import com.vaguehope.morrigan.model.helper.EqualHelper;
+import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.IMediaPicture;
+import com.vaguehope.morrigan.model.media.IMediaTrack;
+import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 
-import net.sparktank.morrigan.model.media.IMediaItem;
-import net.sparktank.morrigan.model.media.IMediaPicture;
-import net.sparktank.morrigan.model.media.IMediaTrack;
-import net.sparktank.morrigan.model.media.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.internal.MediaItem;
 
 public class MixedMediaItem extends MediaItem implements IMixedMediaItem {

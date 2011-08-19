@@ -2,9 +2,10 @@ package net.sparktank.morrigan.gui.adaptors;
 
 import java.text.SimpleDateFormat;
 
-import net.sparktank.morrigan.model.media.IMediaTrack;
 
 import org.eclipse.jface.viewers.ColumnLabelProvider;
+
+import com.vaguehope.morrigan.model.media.IMediaTrack;
 
 public class DateLastPlayerLblProv extends ColumnLabelProvider {
 	

@@ -2,9 +2,10 @@ package net.sparktank.morrigan.gui.adaptors;
 
 import java.math.BigInteger;
 
-import net.sparktank.morrigan.model.media.IMediaItem;
 
 import org.eclipse.jface.viewers.ColumnLabelProvider;
+
+import com.vaguehope.morrigan.model.media.IMediaItem;
 
 public class HashcodeLblProv extends ColumnLabelProvider {
 	

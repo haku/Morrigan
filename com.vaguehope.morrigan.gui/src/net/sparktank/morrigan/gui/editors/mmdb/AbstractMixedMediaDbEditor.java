@@ -11,15 +11,6 @@ import net.sparktank.morrigan.gui.dialogs.RunnableDialog;
 import net.sparktank.morrigan.gui.editors.IMixedMediaItemDbEditor;
 import net.sparktank.morrigan.gui.editors.MediaColumn;
 import net.sparktank.morrigan.gui.preferences.MediaListPref;
-import net.sparktank.morrigan.model.media.DurationData;
-import net.sparktank.morrigan.model.media.IAbstractMixedMediaDb;
-import net.sparktank.morrigan.model.media.IMediaItemDb.SortChangeListener;
-import net.sparktank.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
-import net.sparktank.morrigan.model.media.IMediaItemStorageLayer2;
-import net.sparktank.morrigan.model.media.IMixedMediaItem;
-import net.sparktank.morrigan.model.media.IMixedMediaItem.MediaType;
-import net.sparktank.morrigan.model.media.IMixedMediaItemStorageLayer;
-import net.sparktank.morrigan.model.media.IMixedMediaStorageLayer;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
@@ -41,6 +32,15 @@ import org.eclipse.swt.widgets.Text;
 
 import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
+import com.vaguehope.morrigan.model.media.DurationData;
+import com.vaguehope.morrigan.model.media.IAbstractMixedMediaDb;
+import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer2;
+import com.vaguehope.morrigan.model.media.IMixedMediaItem;
+import com.vaguehope.morrigan.model.media.IMixedMediaItemStorageLayer;
+import com.vaguehope.morrigan.model.media.IMixedMediaStorageLayer;
+import com.vaguehope.morrigan.model.media.IMediaItemDb.SortChangeListener;
+import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
+import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
 import com.vaguehope.morrigan.util.TimeHelper;
 
 public abstract class AbstractMixedMediaDbEditor<T extends IAbstractMixedMediaDb<T>>

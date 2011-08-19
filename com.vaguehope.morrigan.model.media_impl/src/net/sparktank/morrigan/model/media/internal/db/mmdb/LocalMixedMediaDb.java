@@ -1,10 +1,10 @@
 package net.sparktank.morrigan.model.media.internal.db.mmdb;
 
+import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
+import com.vaguehope.morrigan.model.media.IMixedMediaItem;
+import com.vaguehope.morrigan.model.media.IMixedMediaStorageLayer;
 import com.vaguehope.sqlitewrapper.DbException;
 
-import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
-import net.sparktank.morrigan.model.media.IMixedMediaItem;
-import net.sparktank.morrigan.model.media.IMixedMediaStorageLayer;
 import net.sparktank.morrigan.model.media.internal.db.MediaItemDbConfig;
 
 public class LocalMixedMediaDb extends AbstractMixedMediaDb<ILocalMixedMediaDb> implements ILocalMixedMediaDb {

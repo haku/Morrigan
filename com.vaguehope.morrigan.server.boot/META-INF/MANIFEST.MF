@@ -7,10 +7,10 @@ Bundle-Activator: com.vaguehope.morrigan.server.boot.Activator
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: com.vaguehope.morrigan.engines.playback,
  com.vaguehope.morrigan.model.exceptions,
+ com.vaguehope.morrigan.model.media,
  com.vaguehope.morrigan.player,
  com.vaguehope.morrigan.server,
  com.vaguehope.morrigan.util,
- net.sparktank.morrigan.model.media,
  org.eclipse.swt.widgets,
  org.osgi.framework;version="1.3.0"
 Bundle-Vendor: vaguehope.com
