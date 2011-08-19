@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.server;
+package com.vaguehope.morrigan.server;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -22,13 +22,13 @@ import net.sparktank.morrigan.player.IPlayerAbstract;
 import net.sparktank.morrigan.player.IPlayerLocal;
 import net.sparktank.morrigan.player.PlayItem;
 import net.sparktank.morrigan.player.PlayerRegister;
-import net.sparktank.morrigan.server.feedwriters.AbstractFeed;
-import net.sparktank.morrigan.server.feedwriters.XmlHelper;
 import net.sparktank.morrigan.util.TimeHelper;
 
 import org.xml.sax.SAXException;
 
 import com.megginson.sax.DataWriter;
+import com.vaguehope.morrigan.server.feedwriters.AbstractFeed;
+import com.vaguehope.morrigan.server.feedwriters.XmlHelper;
 
 /**
  * Valid URLs:

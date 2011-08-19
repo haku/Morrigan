@@ -1,11 +1,12 @@
 package net.sparktank.morrigan.gui.actions;
 
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
-import net.sparktank.morrigan.server.MorriganServer;
-import net.sparktank.morrigan.server.ServerMain;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
+
+import com.vaguehope.morrigan.server.MorriganServer;
+import com.vaguehope.morrigan.server.ServerMain;
 
 @Deprecated
 public class ServerAction extends Action implements IWorkbenchAction {

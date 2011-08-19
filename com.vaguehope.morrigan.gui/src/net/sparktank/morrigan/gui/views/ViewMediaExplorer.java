@@ -21,8 +21,6 @@ import net.sparktank.morrigan.model.media.MediaListReference;
 import net.sparktank.morrigan.model.media.MediaListReference.MediaListType;
 import net.sparktank.morrigan.model.media.impl.MediaFactoryImpl;
 import net.sparktank.morrigan.model.tasks.IMorriganTask;
-import net.sparktank.morrigan.server.model.RemoteMixedMediaDb;
-import net.sparktank.morrigan.server.model.RemoteMixedMediaDbHelper;
 
 import org.eclipse.core.commands.common.CommandException;
 import org.eclipse.jface.action.Action;
@@ -46,6 +44,9 @@ import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.part.ViewPart;
+
+import com.vaguehope.morrigan.server.model.RemoteMixedMediaDb;
+import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbHelper;
 
 public class ViewMediaExplorer extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

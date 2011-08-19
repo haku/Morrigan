@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.server;
+package com.vaguehope.morrigan.server;
 
 import java.io.IOException;
 import java.util.Collection;

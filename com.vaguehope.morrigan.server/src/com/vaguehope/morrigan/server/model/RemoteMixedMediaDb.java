@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.server.model;
+package com.vaguehope.morrigan.server.model;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,6 +11,8 @@ import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.logging.Logger;
 
+import com.vaguehope.morrigan.server.MlistsServlet;
+import com.vaguehope.morrigan.server.feedreader.MixedMediaDbFeedParser;
 import com.vaguehope.sqlitewrapper.DbException;
 
 import net.sparktank.morrigan.engines.playback.NotImplementedException;
@@ -24,8 +26,6 @@ import net.sparktank.morrigan.model.media.internal.db.MediaItemDbConfig;
 import net.sparktank.morrigan.model.media.internal.db.mmdb.AbstractMixedMediaDb;
 import net.sparktank.morrigan.model.media.internal.db.mmdb.MixedMediaSqliteLayerFactory;
 import net.sparktank.morrigan.model.tasks.TaskEventListener;
-import net.sparktank.morrigan.server.MlistsServlet;
-import net.sparktank.morrigan.server.feedreader.MixedMediaDbFeedParser;
 import net.sparktank.morrigan.util.httpclient.HttpClient;
 import net.sparktank.morrigan.util.httpclient.HttpStreamHandlerException;
 

@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.server.boot;
+package com.vaguehope.morrigan.server.boot;
 
 import java.util.Map;
 import java.util.logging.Level;
@@ -12,11 +12,12 @@ import net.sparktank.morrigan.player.IPlayerLocal;
 import net.sparktank.morrigan.player.OrderHelper.PlaybackOrder;
 import net.sparktank.morrigan.player.PlayItem;
 import net.sparktank.morrigan.player.PlayerRegister;
-import net.sparktank.morrigan.server.MorriganServer;
 
 import org.eclipse.swt.widgets.Composite;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+
+import com.vaguehope.morrigan.server.MorriganServer;
 
 public class Activator implements BundleActivator {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

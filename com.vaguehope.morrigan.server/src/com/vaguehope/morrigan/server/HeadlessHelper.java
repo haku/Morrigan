@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.server;
+package com.vaguehope.morrigan.server;
 
 import net.sparktank.morrigan.model.media.IAbstractMixedMediaDb;
 import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;

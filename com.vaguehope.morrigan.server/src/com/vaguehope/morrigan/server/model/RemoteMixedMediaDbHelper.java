@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.server.model;
+package com.vaguehope.morrigan.server.model;
 
 import java.io.File;
 import java.net.MalformedURLException;

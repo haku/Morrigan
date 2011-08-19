@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.server;
+package com.vaguehope.morrigan.server;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,14 +28,14 @@ import net.sparktank.morrigan.model.media.internal.db.mmdb.LocalMixedMediaDbHelp
 import net.sparktank.morrigan.player.IPlayerLocal;
 import net.sparktank.morrigan.player.PlayItem;
 import net.sparktank.morrigan.player.PlayerRegister;
-import net.sparktank.morrigan.server.feedwriters.AbstractFeed;
-import net.sparktank.morrigan.server.feedwriters.XmlHelper;
-import net.sparktank.morrigan.server.model.RemoteMixedMediaDb;
-import net.sparktank.morrigan.server.model.RemoteMixedMediaDbHelper;
 
 import org.xml.sax.SAXException;
 
 import com.megginson.sax.DataWriter;
+import com.vaguehope.morrigan.server.feedwriters.AbstractFeed;
+import com.vaguehope.morrigan.server.feedwriters.XmlHelper;
+import com.vaguehope.morrigan.server.model.RemoteMixedMediaDb;
+import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbHelper;
 import com.vaguehope.sqlitewrapper.DbException;
 
 /**
