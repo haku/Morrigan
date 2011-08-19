@@ -9,12 +9,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Logger;
 
-import net.sparktank.morrigan.engines.EngineFactory;
-import net.sparktank.morrigan.engines.common.ImplException;
-import net.sparktank.morrigan.engines.hotkey.HotkeyException;
-import net.sparktank.morrigan.engines.hotkey.HotkeyValue;
-import net.sparktank.morrigan.engines.hotkey.IHotkeyEngine;
-import net.sparktank.morrigan.engines.hotkey.IHotkeyListener;
+import com.vaguehope.morrigan.engines.EngineFactory;
+import com.vaguehope.morrigan.engines.common.ImplException;
+import com.vaguehope.morrigan.engines.hotkey.HotkeyException;
+import com.vaguehope.morrigan.engines.hotkey.HotkeyValue;
+import com.vaguehope.morrigan.engines.hotkey.IHotkeyEngine;
+import com.vaguehope.morrigan.engines.hotkey.IHotkeyListener;
+
 import net.sparktank.morrigan.gui.preferences.HotkeyPref;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
 

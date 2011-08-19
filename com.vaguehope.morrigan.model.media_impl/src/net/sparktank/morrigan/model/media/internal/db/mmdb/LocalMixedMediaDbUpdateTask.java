@@ -11,9 +11,10 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 
+import com.vaguehope.morrigan.engines.EngineFactory;
+import com.vaguehope.morrigan.engines.playback.IPlaybackEngine;
+
 import net.sparktank.morrigan.config.Config;
-import net.sparktank.morrigan.engines.EngineFactory;
-import net.sparktank.morrigan.engines.playback.IPlaybackEngine;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.factory.RecyclingFactory;
 import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;

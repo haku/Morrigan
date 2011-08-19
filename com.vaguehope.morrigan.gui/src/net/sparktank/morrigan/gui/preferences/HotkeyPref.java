@@ -2,9 +2,6 @@ package net.sparktank.morrigan.gui.preferences;
 
 import java.util.Arrays;
 
-import net.sparktank.morrigan.engines.EngineFactory;
-import net.sparktank.morrigan.engines.HotkeyKeys;
-import net.sparktank.morrigan.engines.hotkey.HotkeyValue;
 import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.dialogs.RunnableDialog;
@@ -24,6 +21,10 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+
+import com.vaguehope.morrigan.engines.EngineFactory;
+import com.vaguehope.morrigan.engines.HotkeyKeys;
+import com.vaguehope.morrigan.engines.hotkey.HotkeyValue;
 
 public class HotkeyPref extends PreferencePage implements IWorkbenchPreferencePage {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

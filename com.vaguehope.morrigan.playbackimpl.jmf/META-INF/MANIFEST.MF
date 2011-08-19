@@ -1,13 +1,13 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Morrigan JMF Engine
-Bundle-SymbolicName: net.sparktank.morrigan.playbackimpl.jmf
+Bundle-SymbolicName: com.vaguehope.morrigan.playbackimpl.jmf
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: .,
  lib/jmf.jar
 Bundle-Vendor: vaguehope.com
-Import-Package: net.sparktank.morrigan.engines.playback,
+Import-Package: com.vaguehope.morrigan.engines.playback,
  net.sparktank.morrigan.model.exceptions,
  org.eclipse.swt,
  org.eclipse.swt.awt,
@@ -15,4 +15,4 @@ Import-Package: net.sparktank.morrigan.engines.playback,
  org.eclipse.swt.widgets,
  org.osgi.framework;version="1.3.0"
 Eclipse-PlatformFilter: (& (osgi.ws=cocoa) (osgi.os=macosx) (osgi.arch=x86))
-Bundle-Activator: net.sparktank.morrigan.playbackimpl.jmf.Activator
+Bundle-Activator: com.vaguehope.morrigan.playbackimpl.jmf.Activator

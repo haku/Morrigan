@@ -3,9 +3,9 @@ package com.vaguehope.morrigan.player;
 import java.util.List;
 import java.util.Map;
 
+import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 
-import net.sparktank.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.DurationData;
 import net.sparktank.morrigan.model.media.IMediaTrack;
