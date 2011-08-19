@@ -24,7 +24,7 @@ public class ServerTrim extends WorkbenchWindowControlContribution {
 	
 	public static final String ID = "net.sparktank.morrigan.gui.controls.ServerTrim";
 	
-	public static final String SERVER_BOOT_BUNDLE = "net.sparktank.morrigan.server.boot";
+	public static final String SERVER_BOOT_BUNDLE = "com.vaguehope.morrigan.server.boot";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	WorkbenchWindowControlContribution and GUI methods.
