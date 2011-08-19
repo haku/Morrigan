@@ -2,9 +2,9 @@ package net.sparktank.morrigan.model.media;
 
 import java.util.List;
 
+import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.sqlitewrapper.DbException;
 
-import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.IMixedMediaItem.MediaType;
 
 public interface IAbstractMixedMediaDb<H extends IAbstractMixedMediaDb<H>>

@@ -1,10 +1,10 @@
 package net.sparktank.morrigan.gui.jobs;
 
 import net.sparktank.morrigan.gui.helpers.ConsoleHelper;
-import net.sparktank.morrigan.model.tasks.TaskEventListener;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
+import com.vaguehope.morrigan.model.tasks.TaskEventListener;
 import com.vaguehope.morrigan.util.ErrorHelper;
 
 public class PrgListener implements TaskEventListener {

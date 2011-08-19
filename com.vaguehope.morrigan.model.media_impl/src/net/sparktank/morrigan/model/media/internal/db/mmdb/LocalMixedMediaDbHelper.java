@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.sqlitewrapper.DbException;
 
 import net.sparktank.morrigan.config.Config;
-import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.MediaListReference;
 import net.sparktank.morrigan.model.media.MediaListReference.MediaListType;

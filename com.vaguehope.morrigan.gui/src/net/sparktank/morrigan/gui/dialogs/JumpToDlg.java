@@ -6,7 +6,6 @@ import java.lang.ref.WeakReference;
 import java.util.List;
 
 import net.sparktank.morrigan.gui.preferences.PreferenceHelper;
-import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.IMediaTrack;
 import net.sparktank.morrigan.model.media.IMediaTrackDb;
 
@@ -36,6 +35,7 @@ import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.player.PlayerHelper;
 
 public class JumpToDlg {

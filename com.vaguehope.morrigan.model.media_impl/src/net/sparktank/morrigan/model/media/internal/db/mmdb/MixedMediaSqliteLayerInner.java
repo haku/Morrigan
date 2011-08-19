@@ -11,11 +11,11 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.vaguehope.morrigan.model.db.IDbColumn;
+import com.vaguehope.morrigan.model.db.IDbItem;
 import com.vaguehope.morrigan.util.GeneratedString;
 import com.vaguehope.sqlitewrapper.DbException;
 
-import net.sparktank.morrigan.model.db.IDbColumn;
-import net.sparktank.morrigan.model.db.IDbItem;
 import net.sparktank.morrigan.model.media.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.IMixedMediaItem.MediaType;
 import net.sparktank.morrigan.model.media.IMixedMediaItemStorageLayer;

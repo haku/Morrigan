@@ -2,7 +2,8 @@ package net.sparktank.morrigan.model.media.internal.db;
 
 import java.io.File;
 
-import net.sparktank.morrigan.model.helper.EqualHelper;
+import com.vaguehope.morrigan.model.helper.EqualHelper;
+
 
 public final class MediaItemDbConfig {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

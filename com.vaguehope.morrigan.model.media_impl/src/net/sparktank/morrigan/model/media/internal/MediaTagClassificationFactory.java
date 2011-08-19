@@ -1,6 +1,6 @@
 package net.sparktank.morrigan.model.media.internal;
 
-import net.sparktank.morrigan.model.factory.RecyclingFactory;
+import com.vaguehope.morrigan.model.factory.RecyclingFactory;
 
 public class MediaTagClassificationFactory extends RecyclingFactory<MediaTagClassificationImpl, Long, String, RuntimeException> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.model.db;
+package com.vaguehope.morrigan.model.db;
 
 public interface IDbColumn {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

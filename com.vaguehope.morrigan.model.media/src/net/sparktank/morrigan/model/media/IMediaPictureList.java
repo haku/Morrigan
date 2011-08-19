@@ -1,6 +1,6 @@
 package net.sparktank.morrigan.model.media;
 
-import net.sparktank.morrigan.model.exceptions.MorriganException;
+import com.vaguehope.morrigan.model.exceptions.MorriganException;
 
 
 public interface IMediaPictureList <T extends IMediaPicture> extends IMediaItemList<T> {

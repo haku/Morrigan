@@ -2,7 +2,8 @@ package net.sparktank.morrigan.model.media.internal.pl;
 
 import java.util.Date;
 
-import net.sparktank.morrigan.model.helper.EqualHelper;
+import com.vaguehope.morrigan.model.helper.EqualHelper;
+
 import net.sparktank.morrigan.model.media.IMediaItem;
 import net.sparktank.morrigan.model.media.IMediaTrack;
 import net.sparktank.morrigan.model.media.internal.MediaItem;

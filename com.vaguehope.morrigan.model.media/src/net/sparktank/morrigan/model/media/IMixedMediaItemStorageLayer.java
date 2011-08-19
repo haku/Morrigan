@@ -1,7 +1,7 @@
 package net.sparktank.morrigan.model.media;
 
-import net.sparktank.morrigan.model.db.IDbColumn;
-import net.sparktank.morrigan.model.db.basicimpl.DbColumn;
+import com.vaguehope.morrigan.model.db.IDbColumn;
+import com.vaguehope.morrigan.model.db.basicimpl.DbColumn;
 
 public interface IMixedMediaItemStorageLayer extends IMediaItemStorageLayer<IMixedMediaItem> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

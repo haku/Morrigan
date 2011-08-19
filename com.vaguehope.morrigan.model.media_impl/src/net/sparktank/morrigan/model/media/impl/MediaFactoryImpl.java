@@ -6,7 +6,6 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.List;
 
-import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.DurationData;
 import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.IMediaItem;
@@ -28,12 +27,13 @@ import net.sparktank.morrigan.model.media.internal.db.mmdb.RemoteMixedMediaDbUpd
 import net.sparktank.morrigan.model.media.internal.db.mmdb.SyncMetadataRemoteToLocalTask;
 import net.sparktank.morrigan.model.media.internal.pl.MediaPlaylistFactory;
 import net.sparktank.morrigan.model.media.internal.pl.PlaylistHelper;
-import net.sparktank.morrigan.model.tasks.IMorriganTask;
 
 import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
 import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.tag.TagException;
 
+import com.vaguehope.morrigan.model.exceptions.MorriganException;
+import com.vaguehope.morrigan.model.tasks.IMorriganTask;
 import com.vaguehope.sqlitewrapper.DbException;
 
 public class MediaFactoryImpl implements MediaFactory {

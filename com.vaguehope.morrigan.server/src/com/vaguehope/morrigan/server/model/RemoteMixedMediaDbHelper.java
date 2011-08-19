@@ -6,8 +6,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import com.vaguehope.morrigan.model.exceptions.MorriganException;
+
 import net.sparktank.morrigan.config.Config;
-import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.IRemoteMixedMediaDb;
 import net.sparktank.morrigan.model.media.MediaListReference;
 import net.sparktank.morrigan.model.media.internal.MediaListReferenceImpl;

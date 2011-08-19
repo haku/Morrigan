@@ -10,7 +10,7 @@ Bundle-ClassPath: .,
  lib/jna-3.2.4.jar
 Bundle-Vendor: vaguehope.com
 Import-Package: com.vaguehope.morrigan.engines.playback,
- net.sparktank.morrigan.model.exceptions,
+ com.vaguehope.morrigan.model.exceptions,
  org.eclipse.swt,
  org.eclipse.swt.events,
  org.eclipse.swt.widgets,

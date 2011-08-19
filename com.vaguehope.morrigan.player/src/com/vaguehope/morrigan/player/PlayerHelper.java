@@ -3,9 +3,9 @@ package com.vaguehope.morrigan.player;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.sqlitewrapper.DbException;
 
-import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.IMediaTrack;
 import net.sparktank.morrigan.model.media.IMediaTrackDb;

@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.model.exceptions;
+package com.vaguehope.morrigan.model.exceptions;
 
 public class MorriganException extends Exception {
 	

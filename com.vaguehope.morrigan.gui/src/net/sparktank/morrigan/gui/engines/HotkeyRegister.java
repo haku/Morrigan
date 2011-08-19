@@ -15,9 +15,9 @@ import com.vaguehope.morrigan.engines.hotkey.HotkeyException;
 import com.vaguehope.morrigan.engines.hotkey.HotkeyValue;
 import com.vaguehope.morrigan.engines.hotkey.IHotkeyEngine;
 import com.vaguehope.morrigan.engines.hotkey.IHotkeyListener;
+import com.vaguehope.morrigan.model.exceptions.MorriganException;
 
 import net.sparktank.morrigan.gui.preferences.HotkeyPref;
-import net.sparktank.morrigan.model.exceptions.MorriganException;
 
 public class HotkeyRegister {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

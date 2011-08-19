@@ -8,8 +8,8 @@ Export-Package: com.vaguehope.morrigan.engines,
  com.vaguehope.morrigan.engines.common,
  com.vaguehope.morrigan.engines.hotkey,
  com.vaguehope.morrigan.engines.playback
-Import-Package: net.sparktank.morrigan.config,
- net.sparktank.morrigan.model.exceptions,
+Import-Package: com.vaguehope.morrigan.model.exceptions,
+ net.sparktank.morrigan.config,
  org.eclipse.swt.events,
  org.eclipse.swt.widgets
 Bundle-Vendor: vaguehope.com

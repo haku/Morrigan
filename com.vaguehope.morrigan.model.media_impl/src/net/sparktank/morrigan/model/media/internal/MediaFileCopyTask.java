@@ -3,12 +3,13 @@ package net.sparktank.morrigan.model.media.internal;
 import java.io.File;
 import java.util.List;
 
+import com.vaguehope.morrigan.model.tasks.IMorriganTask;
+import com.vaguehope.morrigan.model.tasks.TaskEventListener;
+import com.vaguehope.morrigan.model.tasks.TaskResult;
+import com.vaguehope.morrigan.model.tasks.TaskResult.TaskOutcome;
+
 import net.sparktank.morrigan.model.media.IMediaItem;
 import net.sparktank.morrigan.model.media.IMediaItemList;
-import net.sparktank.morrigan.model.tasks.IMorriganTask;
-import net.sparktank.morrigan.model.tasks.TaskEventListener;
-import net.sparktank.morrigan.model.tasks.TaskResult;
-import net.sparktank.morrigan.model.tasks.TaskResult.TaskOutcome;
 
 
 public class MediaFileCopyTask<T extends IMediaItem> implements IMorriganTask {

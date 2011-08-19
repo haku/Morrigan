@@ -1,6 +1,7 @@
 package net.sparktank.morrigan.model.media;
 
-import net.sparktank.morrigan.model.exceptions.MorriganException;
+import com.vaguehope.morrigan.model.exceptions.MorriganException;
+
 import net.sparktank.morrigan.model.media.IMixedMediaItem.MediaType;
 
 

@@ -3,7 +3,8 @@ package net.sparktank.morrigan.model.media;
 import java.math.BigInteger;
 import java.util.Date;
 
-import net.sparktank.morrigan.model.db.IDbItem;
+import com.vaguehope.morrigan.model.db.IDbItem;
+
 
 
 public interface IMediaItem extends IDbItem {
