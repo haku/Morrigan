@@ -27,7 +27,7 @@ public class LocalMixedMediaDbEditor
 		extends AbstractMixedMediaDbEditor<ILocalMixedMediaDb> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public static final String ID = "net.sparktank.morrigan.gui.editors.LocalMixedMediaDbEditor";
+	public static final String ID = "com.vaguehope.morrigan.gui.editors.LocalMixedMediaDbEditor";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Create GUI.

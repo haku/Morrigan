@@ -23,7 +23,7 @@ import com.vaguehope.morrigan.gui.dialogs.MorriganMsgDlg;
 public class ServerTrim extends WorkbenchWindowControlContribution {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public static final String ID = "net.sparktank.morrigan.gui.controls.ServerTrim";
+	public static final String ID = "com.vaguehope.morrigan.gui.controls.ServerTrim";
 	
 	public static final String SERVER_BOOT_BUNDLE = "com.vaguehope.morrigan.server.boot";
 	

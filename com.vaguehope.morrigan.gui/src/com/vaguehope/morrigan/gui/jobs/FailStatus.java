@@ -34,7 +34,7 @@ public class FailStatus implements IStatus {
 	
 	@Override
 	public String getPlugin() {
-		return "net.sparktank.morrigan";
+		return "com.vaguehope.morrigan";
 	}
 	
 	@Override

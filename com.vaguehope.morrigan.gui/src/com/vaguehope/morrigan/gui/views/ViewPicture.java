@@ -58,7 +58,7 @@ import com.vaguehope.morrigan.model.media.impl.MediaFactoryImpl;
 public class ViewPicture extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public static final String ID = "net.sparktank.morrigan.gui.views.ViewPicture";
+	public static final String ID = "com.vaguehope.morrigan.gui.views.ViewPicture";
 	
 	private static final int PICTURE_CHANGE_INTERVAL = 60000;
 	

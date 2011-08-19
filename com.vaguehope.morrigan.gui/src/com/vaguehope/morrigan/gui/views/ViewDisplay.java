@@ -23,7 +23,7 @@ import com.vaguehope.morrigan.gui.views.AbstractPlayerView.FullScreenAction;
 public class ViewDisplay extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public static final String ID = "net.sparktank.morrigan.gui.views.ViewDisplay";
+	public static final String ID = "com.vaguehope.morrigan.gui.views.ViewDisplay";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	ViewPart methods.

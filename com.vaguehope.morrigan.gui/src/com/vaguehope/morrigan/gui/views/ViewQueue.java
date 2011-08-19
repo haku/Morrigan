@@ -29,7 +29,7 @@ import com.vaguehope.morrigan.util.TimeHelper;
 public class ViewQueue extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public static final String ID = "net.sparktank.morrigan.gui.views.ViewQueue";
+	public static final String ID = "com.vaguehope.morrigan.gui.views.ViewQueue";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	

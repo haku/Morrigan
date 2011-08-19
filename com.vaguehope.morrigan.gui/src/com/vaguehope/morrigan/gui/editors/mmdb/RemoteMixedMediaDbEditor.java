@@ -31,7 +31,7 @@ public class RemoteMixedMediaDbEditor
 		extends AbstractMixedMediaDbEditor<IRemoteMixedMediaDb> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public static final String ID = "net.sparktank.morrigan.gui.editors.RemoteMixedMediaDbEditor";
+	public static final String ID = "com.vaguehope.morrigan.gui.editors.RemoteMixedMediaDbEditor";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Create GUI.

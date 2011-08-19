@@ -16,7 +16,7 @@ import com.vaguehope.sqlitewrapper.DbException;
 public class EditorFactory implements IElementFactory {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public static final String ID = "net.sparktank.morrigan.gui.editors.EditorFactory";
+	public static final String ID = "com.vaguehope.morrigan.gui.editors.EditorFactory";
 	
 	public static final String KEY_TYPE = "TYPE";
 	public static final String KEY_SERIAL = "SERIAL";

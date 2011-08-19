@@ -51,7 +51,7 @@ import com.vaguehope.morrigan.model.media.impl.MediaFactoryImpl;
 public class ViewTagEditor extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public static final String ID = "net.sparktank.morrigan.gui.views.ViewTagEditor";
+	public static final String ID = "com.vaguehope.morrigan.gui.views.ViewTagEditor";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
