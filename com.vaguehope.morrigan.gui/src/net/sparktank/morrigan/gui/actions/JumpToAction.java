@@ -14,14 +14,15 @@ import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.IMediaTrack;
 import net.sparktank.morrigan.model.media.IMediaTrackDb;
 import net.sparktank.morrigan.model.media.IMediaTrackList;
-import net.sparktank.morrigan.player.IPlayerLocal;
-import net.sparktank.morrigan.player.PlayItem;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.SWT;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
+
+import com.vaguehope.morrigan.player.IPlayerLocal;
+import com.vaguehope.morrigan.player.PlayItem;
 
 public class JumpToAction extends Action {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -9,14 +9,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.sparktank.morrigan.model.exceptions.MorriganException;
-import net.sparktank.morrigan.player.IPlayerLocal;
-import net.sparktank.morrigan.player.PlayItem;
-import net.sparktank.morrigan.player.PlayerHelper;
-import net.sparktank.morrigan.player.PlayerRegister;
 
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 
+import com.vaguehope.morrigan.player.IPlayerLocal;
+import com.vaguehope.morrigan.player.PlayItem;
+import com.vaguehope.morrigan.player.PlayerHelper;
+import com.vaguehope.morrigan.player.PlayerRegister;
 import com.vaguehope.morrigan.util.ErrorHelper;
 
 public class PlayersHandler extends AbstractHandler {

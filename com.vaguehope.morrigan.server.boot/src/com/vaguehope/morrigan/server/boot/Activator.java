@@ -7,16 +7,16 @@ import java.util.logging.Logger;
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import net.sparktank.morrigan.model.media.IMediaTrack;
 import net.sparktank.morrigan.model.media.IMediaTrackList;
-import net.sparktank.morrigan.player.IPlayerEventHandler;
-import net.sparktank.morrigan.player.IPlayerLocal;
-import net.sparktank.morrigan.player.OrderHelper.PlaybackOrder;
-import net.sparktank.morrigan.player.PlayItem;
-import net.sparktank.morrigan.player.PlayerRegister;
 
 import org.eclipse.swt.widgets.Composite;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
+import com.vaguehope.morrigan.player.IPlayerEventHandler;
+import com.vaguehope.morrigan.player.IPlayerLocal;
+import com.vaguehope.morrigan.player.PlayItem;
+import com.vaguehope.morrigan.player.PlayerRegister;
+import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.server.MorriganServer;
 
 public class Activator implements BundleActivator {

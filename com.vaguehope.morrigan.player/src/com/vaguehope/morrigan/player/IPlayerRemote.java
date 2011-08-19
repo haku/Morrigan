@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.player;
+package com.vaguehope.morrigan.player;
 
 
 public interface IPlayerRemote extends IPlayerAbstract {

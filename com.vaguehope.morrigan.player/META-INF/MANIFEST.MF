@@ -1,10 +1,10 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Morrigan Player
-Bundle-SymbolicName: net.sparktank.morrigan.player
+Bundle-SymbolicName: com.vaguehope.morrigan.player
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Export-Package: net.sparktank.morrigan.player
+Export-Package: com.vaguehope.morrigan.player
 Import-Package: com.vaguehope.sqlitewrapper,
  net.sparktank.morrigan.engines,
  net.sparktank.morrigan.engines.common,

@@ -3,11 +3,12 @@ package net.sparktank.morrigan.gui.adaptors;
 import java.math.BigInteger;
 
 import net.sparktank.morrigan.gui.helpers.ImageCache;
-import net.sparktank.morrigan.player.PlayItem;
 
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.swt.graphics.Image;
+
+import com.vaguehope.morrigan.player.PlayItem;
 
 public class PlayItemLblProv implements ILabelProvider {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
