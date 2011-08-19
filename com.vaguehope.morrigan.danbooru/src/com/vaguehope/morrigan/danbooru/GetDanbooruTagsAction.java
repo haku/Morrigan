@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.danbooru;
+package com.vaguehope.morrigan.danbooru;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -15,7 +15,7 @@ import org.eclipse.swt.widgets.Display;
 public class GetDanbooruTagsAction extends Action {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public static final String ID = "net.sparktank.morrigan.danbooru.GetDanbooruTagsAction";
+	public static final String ID = "com.vaguehope.morrigan.danbooru.GetDanbooruTagsAction";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	

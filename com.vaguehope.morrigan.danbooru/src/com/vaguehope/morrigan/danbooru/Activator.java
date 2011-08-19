@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.danbooru;
+package com.vaguehope.morrigan.danbooru;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -21,7 +21,7 @@ import org.osgi.framework.BundleContext;
 public class Activator extends AbstractUIPlugin {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public static final String PLUGIN_ID = "net.sparktank.morrigan.danbooru"; //$NON-NLS-1$
+	public static final String PLUGIN_ID = "com.vaguehope.morrigan.danbooru"; //$NON-NLS-1$
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
