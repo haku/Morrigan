@@ -18,9 +18,9 @@ Import-Package: com.vaguehope.morrigan.config,
  com.vaguehope.morrigan.util.httpclient,
  com.vaguehope.sqlitewrapper
 Export-Package: com.vaguehope.morrigan.model.media.impl,
- com.vaguehope.morrigan.model.media.internal;x-friends:="net.sparktank.morrigan.server",
- com.vaguehope.morrigan.model.media.internal.db;x-friends:="net.sparktank.morrigan.server",
- com.vaguehope.morrigan.model.media.internal.db.mmdb;x-friends:="net.sparktank.morrigan.server"
+ com.vaguehope.morrigan.model.media.internal;x-friends:="com.vaguehope.morrigan.server",
+ com.vaguehope.morrigan.model.media.internal.db;x-friends:="com.vaguehope.morrigan.server",
+ com.vaguehope.morrigan.model.media.internal.db.mmdb;x-friends:="com.vaguehope.morrigan.server"
 Bundle-ClassPath: .,
  lib/jaudiotagger-2.0.3.jar
 Bundle-Vendor: vaguehope.com
