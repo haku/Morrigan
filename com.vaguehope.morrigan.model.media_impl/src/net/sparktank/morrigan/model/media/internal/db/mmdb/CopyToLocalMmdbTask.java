@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Collection;
 
+import com.vaguehope.morrigan.util.ChecksumHelper;
+
 import net.sparktank.morrigan.config.Config;
 import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.IMediaItem;
@@ -13,7 +15,6 @@ import net.sparktank.morrigan.model.tasks.IMorriganTask;
 import net.sparktank.morrigan.model.tasks.TaskEventListener;
 import net.sparktank.morrigan.model.tasks.TaskResult;
 import net.sparktank.morrigan.model.tasks.TaskResult.TaskOutcome;
-import net.sparktank.morrigan.util.ChecksumHelper;
 
 /**
  * 

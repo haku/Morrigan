@@ -11,7 +11,6 @@ import net.sparktank.morrigan.gui.display.ScreenPainter;
 import net.sparktank.morrigan.gui.display.ScreenPainter.ScreenType;
 import net.sparktank.morrigan.gui.helpers.RefreshTimer;
 import net.sparktank.morrigan.player.OrderHelper.PlaybackOrder;
-import net.sparktank.morrigan.util.TimeHelper;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.MenuManager;
@@ -36,6 +35,8 @@ import org.eclipse.ui.ISizeProvider;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.actions.ContributionItemFactory;
 import org.eclipse.ui.console.IConsoleConstants;
+
+import com.vaguehope.morrigan.util.TimeHelper;
 
 public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

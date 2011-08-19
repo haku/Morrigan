@@ -6,10 +6,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.vaguehope.morrigan.util.httpclient.HttpClient;
+import com.vaguehope.morrigan.util.httpclient.HttpStreamHandlerException;
+import com.vaguehope.morrigan.util.httpclient.HttpClient.HttpResponse;
+
 import net.sparktank.morrigan.model.exceptions.MorriganException;
-import net.sparktank.morrigan.util.httpclient.HttpClient;
-import net.sparktank.morrigan.util.httpclient.HttpClient.HttpResponse;
-import net.sparktank.morrigan.util.httpclient.HttpStreamHandlerException;
 
 public class Danbooru {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

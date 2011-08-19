@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.util.httpclient;
+package com.vaguehope.morrigan.util.httpclient;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;

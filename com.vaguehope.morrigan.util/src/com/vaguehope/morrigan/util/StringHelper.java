@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.util;
+package com.vaguehope.morrigan.util;
 
 import java.util.Collection;
 

@@ -1,10 +1,11 @@
 package net.sparktank.morrigan.gui.dialogs;
 
 import net.sparktank.morrigan.gui.helpers.ClipboardHelper;
-import net.sparktank.morrigan.util.ErrorHelper;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
+
+import com.vaguehope.morrigan.util.ErrorHelper;
 
 public class MorriganMsgDlg extends MessageDialog {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

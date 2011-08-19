@@ -9,7 +9,6 @@ import net.sparktank.morrigan.gui.helpers.ImageCache;
 import net.sparktank.morrigan.gui.helpers.RefreshTimer;
 import net.sparktank.morrigan.model.media.DurationData;
 import net.sparktank.morrigan.player.PlayItem;
-import net.sparktank.morrigan.util.TimeHelper;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -24,6 +23,8 @@ import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.part.ViewPart;
+
+import com.vaguehope.morrigan.util.TimeHelper;
 
 public class ViewQueue extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

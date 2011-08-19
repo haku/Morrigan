@@ -2,7 +2,6 @@ package net.sparktank.morrigan.gui.display;
 
 
 import net.sparktank.morrigan.player.PlayItem;
-import net.sparktank.morrigan.util.TimeHelper;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
@@ -12,6 +11,8 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
+
+import com.vaguehope.morrigan.util.TimeHelper;
 
 public class ScreenPainter implements PaintListener {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
