@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="morriganserver" uid="net.sparktank.morrigan.server.product" id="net.sparktank.morrigan.server.product" application="org.eclipse.ui.ide.workbench" useFeatures="false" includeLaunchers="true">
+<product name="morriganserver" uid="com.vaguehope.morrigan.server.product" id="com.vaguehope.morrigan.server.product" application="org.eclipse.ui.ide.workbench" useFeatures="false" includeLaunchers="true">
 
    <configIni use="default">
    </configIni>
@@ -34,8 +34,8 @@
       <plugin id="net.sparktank.morrigan.playbackimpl.gs"/>
       <plugin id="net.sparktank.morrigan.playbackimpl.jmf"/>
       <plugin id="net.sparktank.morrigan.player"/>
-      <plugin id="net.sparktank.morrigan.server"/>
-      <plugin id="net.sparktank.morrigan.server.boot"/>
+      <plugin id="com.vaguehope.morrigan.server"/>
+      <plugin id="com.vaguehope.morrigan.server.boot"/>
       <plugin id="net.sparktank.morrigan.util"/>
       <plugin id="net.sparktank.morrigan.util.httpclient"/>
       <plugin id="com.vaguehope.sqlitewrapper"/>
@@ -61,7 +61,7 @@
       <plugin id="net.sparktank.morrigan.playbackimpl.dsj" autoStart="true" startLevel="1" />
       <plugin id="net.sparktank.morrigan.playbackimpl.gs" autoStart="true" startLevel="1" />
       <plugin id="net.sparktank.morrigan.playbackimpl.jmf" autoStart="true" startLevel="1" />
-      <plugin id="net.sparktank.morrigan.server.boot" autoStart="true" startLevel="1" />
+      <plugin id="com.vaguehope.morrigan.server.boot" autoStart="true" startLevel="1" />
       <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="0" />
       <plugin id="org.eclipse.osgi" autoStart="true" startLevel="0" />
    </configurations>

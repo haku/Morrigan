@@ -9,8 +9,6 @@ import net.sparktank.morrigan.gui.views.ViewMediaExplorer;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.IRemoteMixedMediaDb;
-import net.sparktank.morrigan.server.MlistsServlet;
-import net.sparktank.morrigan.server.model.RemoteMixedMediaDbHelper;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.InputDialog;
@@ -20,6 +18,9 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
+
+import com.vaguehope.morrigan.server.MlistsServlet;
+import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbHelper;
 
 
 public class NewRemoteMixedDbAction extends Action implements IWorkbenchAction {

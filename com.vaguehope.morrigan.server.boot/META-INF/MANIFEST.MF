@@ -1,15 +1,15 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Morrigan Server Boot
-Bundle-SymbolicName: net.sparktank.morrigan.server.boot;singleton:=true
+Bundle-SymbolicName: com.vaguehope.morrigan.server.boot;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Bundle-Activator: net.sparktank.morrigan.server.boot.Activator
+Bundle-Activator: com.vaguehope.morrigan.server.boot.Activator
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: net.sparktank.morrigan.engines.playback,
+Import-Package: com.vaguehope.morrigan.server,
+ net.sparktank.morrigan.engines.playback,
  net.sparktank.morrigan.model.exceptions,
  net.sparktank.morrigan.model.media,
  net.sparktank.morrigan.player,
- net.sparktank.morrigan.server,
  net.sparktank.morrigan.util,
  org.eclipse.swt.widgets,
  org.osgi.framework;version="1.3.0"

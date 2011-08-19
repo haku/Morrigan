@@ -5,12 +5,12 @@ import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.IMediaPlaylist;
 import net.sparktank.morrigan.model.media.IRemoteMixedMediaDb;
 import net.sparktank.morrigan.model.media.impl.MediaFactoryImpl;
-import net.sparktank.morrigan.server.model.RemoteMixedMediaDb;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.ui.IElementFactory;
 import org.eclipse.ui.IMemento;
 
+import com.vaguehope.morrigan.server.model.RemoteMixedMediaDb;
 import com.vaguehope.sqlitewrapper.DbException;
 
 public class EditorFactory implements IElementFactory {

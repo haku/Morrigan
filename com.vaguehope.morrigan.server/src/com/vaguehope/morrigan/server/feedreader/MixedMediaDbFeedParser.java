@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.server.feedreader;
+package com.vaguehope.morrigan.server.feedreader;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,8 +23,6 @@ import net.sparktank.morrigan.model.media.IMixedMediaItem.MediaType;
 import net.sparktank.morrigan.model.media.IRemoteMixedMediaDb;
 import net.sparktank.morrigan.model.media.MediaTagType;
 import net.sparktank.morrigan.model.tasks.TaskEventListener;
-import net.sparktank.morrigan.server.MlistsServlet;
-import net.sparktank.morrigan.server.feedwriters.XmlHelper;
 import net.sparktank.morrigan.util.httpclient.HttpClient;
 import net.sparktank.morrigan.util.httpclient.HttpClient.HttpResponse;
 import net.sparktank.morrigan.util.httpclient.HttpStreamHandler;
@@ -34,6 +32,8 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import com.vaguehope.morrigan.server.MlistsServlet;
+import com.vaguehope.morrigan.server.feedwriters.XmlHelper;
 import com.vaguehope.sqlitewrapper.DbException;
 
 public class MixedMediaDbFeedParser extends DefaultHandler {
