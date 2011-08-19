@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Morrigan OSGi Console
-Bundle-SymbolicName: net.sparktank.morrigan.osgiconsole
+Bundle-SymbolicName: com.vaguehope.morrigan.osgiconsole
 Bundle-Version: 1.0.0.qualifier
-Bundle-Activator: net.sparktank.morrigan.osgiconsole.Activator
+Bundle-Activator: com.vaguehope.morrigan.osgiconsole.Activator
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: net.sparktank.morrigan.engines.playback,

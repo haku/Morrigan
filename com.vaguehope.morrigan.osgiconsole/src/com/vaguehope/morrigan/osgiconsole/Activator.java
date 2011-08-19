@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.osgiconsole;
+package com.vaguehope.morrigan.osgiconsole;
 
 import org.eclipse.osgi.framework.console.CommandProvider;
 import org.osgi.framework.BundleActivator;
