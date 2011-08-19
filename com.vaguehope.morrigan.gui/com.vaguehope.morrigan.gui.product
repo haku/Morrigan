@@ -45,7 +45,7 @@ Image &quot;The Morrígan&quot; by Louis le Brocquy used under the Creative Comm
       <plugin id="com.vaguehope.morrigan.config"/>
       <plugin id="com.vaguehope.morrigan.danbooru"/>
       <plugin id="com.vaguehope.morrigan.engines"/>
-      <plugin id="net.sparktank.morrigan.gui"/>
+      <plugin id="com.vaguehope.morrigan.gui"/>
       <plugin id="com.vaguehope.morrigan.hotkeyimpl.jintellitype"/>
       <plugin id="com.vaguehope.morrigan.hotkeyimpl.jxgrabkey"/>
       <plugin id="com.vaguehope.morrigan.model"/>

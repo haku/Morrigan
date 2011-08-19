@@ -19,14 +19,14 @@
 	
    <extension id="application" point="org.eclipse.core.runtime.applications" >
       <application>
-         <run class="net.sparktank.morrigan.gui.Application"></run>
+         <run class="com.vaguehope.morrigan.gui.Application"></run>
       </application>
    </extension>
    
    <extension point="org.eclipse.ui.perspectives">
       <perspective
             name="Main"
-            class="net.sparktank.morrigan.gui.PerspectiveMain"
+            class="com.vaguehope.morrigan.gui.PerspectiveMain"
             id="net.sparktank.morrigan.gui.PerspectiveMain">
       </perspective>
    </extension>
@@ -37,7 +37,7 @@
    
       <view
             name="Media Explorer"
-            class="net.sparktank.morrigan.gui.views.ViewMediaExplorer"
+            class="com.vaguehope.morrigan.gui.views.ViewMediaExplorer"
             id="net.sparktank.morrigan.gui.views.ViewMediaExplorer"
             category="net.sparktank.morrigan"
             icon="icons/library.gif" >
@@ -45,7 +45,7 @@
       
       <view
             name="Player"
-            class="net.sparktank.morrigan.gui.views.ViewPlayer"
+            class="com.vaguehope.morrigan.gui.views.ViewPlayer"
             id="net.sparktank.morrigan.gui.views.ViewPlayer"
             category="net.sparktank.morrigan"
             icon="icons/stop.gif" >
@@ -53,7 +53,7 @@
       
       <view
             name="Library Properties"
-            class="net.sparktank.morrigan.gui.views.ViewLibraryProperties"
+            class="com.vaguehope.morrigan.gui.views.ViewLibraryProperties"
             id="net.sparktank.morrigan.gui.views.ViewLibraryProperties"
             category="net.sparktank.morrigan"
             icon="icons/pref.gif" >
@@ -67,7 +67,7 @@
             id="org.eclipse.ui.views.ProgressView">
       </view>
       <view
-            class="net.sparktank.morrigan.gui.views.ViewControls"
+            class="com.vaguehope.morrigan.gui.views.ViewControls"
             icon="icons/play.gif"
             id="net.sparktank.morrigan.gui.views.ViewControls"
             category="net.sparktank.morrigan"
@@ -75,7 +75,7 @@
             restorable="true">
       </view>
       <view
-            class="net.sparktank.morrigan.gui.views.ViewDisplay"
+            class="com.vaguehope.morrigan.gui.views.ViewDisplay"
             icon="icons/display.gif"
             id="net.sparktank.morrigan.gui.views.ViewDisplay"
             category="net.sparktank.morrigan"
@@ -83,7 +83,7 @@
             restorable="true">
       </view>
       <view
-            class="net.sparktank.morrigan.gui.views.ViewQueue"
+            class="com.vaguehope.morrigan.gui.views.ViewQueue"
             icon="icons/queue.gif"
             id="net.sparktank.morrigan.gui.views.ViewQueue"
             category="net.sparktank.morrigan"
@@ -91,7 +91,7 @@
             restorable="true">
       </view>
       <view
-            class="net.sparktank.morrigan.gui.views.ViewTagEditor"
+            class="com.vaguehope.morrigan.gui.views.ViewTagEditor"
             icon="icons/tag.png"
             id="net.sparktank.morrigan.gui.views.ViewTagEditor"
             category="net.sparktank.morrigan"
@@ -99,7 +99,7 @@
             restorable="true">
       </view>
       <view
-            class="net.sparktank.morrigan.gui.views.ViewPicture"
+            class="com.vaguehope.morrigan.gui.views.ViewPicture"
             icon="icons/pref.gif"
             id="net.sparktank.morrigan.gui.views.ViewPicture"
             category="net.sparktank.morrigan"
@@ -112,7 +112,7 @@
    <extension point="org.eclipse.ui.editors">
    
       <editor
-            class="net.sparktank.morrigan.gui.editors.tracks.PlaylistEditor"
+            class="com.vaguehope.morrigan.gui.editors.tracks.PlaylistEditor"
             default="false"
             icon="icons/playlist.gif"
             id="net.sparktank.morrigan.gui.editors.PlaylistEditor"
@@ -120,7 +120,7 @@
       </editor>
       
       <editor
-            class="net.sparktank.morrigan.gui.editors.mmdb.LocalMixedMediaDbEditor"
+            class="com.vaguehope.morrigan.gui.editors.mmdb.LocalMixedMediaDbEditor"
             default="false"
             icon="icons/db.png"
             id="net.sparktank.morrigan.gui.editors.LocalMixedMediaDbEditor"
@@ -128,7 +128,7 @@
       </editor>
       
       <editor
-            class="net.sparktank.morrigan.gui.editors.mmdb.RemoteMixedMediaDbEditor"
+            class="com.vaguehope.morrigan.gui.editors.mmdb.RemoteMixedMediaDbEditor"
             default="false"
             icon="icons/db-remote.png"
             id="net.sparktank.morrigan.gui.editors.RemoteMixedMediaDbEditor"
@@ -140,16 +140,16 @@
    <extension point="org.eclipse.ui.commands">
    
       <command
-            defaultHandler="net.sparktank.morrigan.gui.handler.CallMediaListEditor"
+            defaultHandler="com.vaguehope.morrigan.gui.handler.CallMediaListEditor"
             id="net.sparktank.morrigan.gui.handler.CallMediaListEditor"
             name="CallMediaListEditor" />
             
       <command
-            defaultHandler="net.sparktank.morrigan.gui.handler.CallPlayMedia"
+            defaultHandler="com.vaguehope.morrigan.gui.handler.CallPlayMedia"
             id="net.sparktank.morrigan.gui.handler.CallPlayMedia"
             name="CallPlayMedia" />
       <command
-            defaultHandler="net.sparktank.morrigan.gui.handler.AddToQueue"
+            defaultHandler="com.vaguehope.morrigan.gui.handler.AddToQueue"
             id="net.sparktank.morrigan.gui.handler.AddToQueue"
             name="AddToQueue">
       </command>
@@ -159,12 +159,12 @@
    <extension point="org.eclipse.ui.preferencePages" >
       <page
             category="net.sparktank.morrigan.gui.preferences.GeneralPref"
-            class="net.sparktank.morrigan.gui.preferences.MediaListPref"
+            class="com.vaguehope.morrigan.gui.preferences.MediaListPref"
             id="net.sparktank.morrigan.gui.preferences.MediaListPref"
             name="Media lists">
       </page>
       <page
-            class="net.sparktank.morrigan.gui.preferences.GeneralPref"
+            class="com.vaguehope.morrigan.gui.preferences.GeneralPref"
             id="net.sparktank.morrigan.gui.preferences.GeneralPref"
             name="Morrigan">
       </page>
@@ -199,19 +199,19 @@
       </page>
       <page
             category="net.sparktank.morrigan.gui.preferences.GeneralPref"
-            class="net.sparktank.morrigan.gui.preferences.HotkeyPref"
+            class="com.vaguehope.morrigan.gui.preferences.HotkeyPref"
             id="net.sparktank.morrigan.gui.preferences.HotkeyPref"
             name="Hotkeys">
       </page>
    </extension>
    
    <extension point="org.eclipse.core.runtime.preferences" >
-      <initializer class="net.sparktank.morrigan.gui.preferences.PreferenceInitializer">
+      <initializer class="com.vaguehope.morrigan.gui.preferences.PreferenceInitializer">
       </initializer>
    </extension>
    
    <extension point="org.eclipse.ui.elementFactories">
-      <factory class="net.sparktank.morrigan.gui.editors.EditorFactory"
+      <factory class="com.vaguehope.morrigan.gui.editors.EditorFactory"
             id="net.sparktank.morrigan.gui.editors.EditorFactory">
       </factory>
    </extension>
@@ -219,7 +219,7 @@
 	<extension point="org.eclipse.ui.menus" >
 		<menuContribution locationURI="toolbar:org.eclipse.ui.trim.status" >
 			<toolbar id="net.sparktank.morrigan.gui.controls.ServerTrim" >
-				<control class="net.sparktank.morrigan.gui.controls.ServerTrim" />
+				<control class="com.vaguehope.morrigan.gui.controls.ServerTrim" />
 			</toolbar>
 		</menuContribution>
 	</extension>

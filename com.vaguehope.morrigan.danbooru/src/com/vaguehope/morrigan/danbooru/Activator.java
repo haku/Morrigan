@@ -3,7 +3,6 @@ package com.vaguehope.morrigan.danbooru;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.sparktank.morrigan.gui.views.ViewTagEditor;
 
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IToolBarManager;
@@ -17,6 +16,8 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
+
+import com.vaguehope.morrigan.gui.views.ViewTagEditor;
 
 public class Activator extends AbstractUIPlugin {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
