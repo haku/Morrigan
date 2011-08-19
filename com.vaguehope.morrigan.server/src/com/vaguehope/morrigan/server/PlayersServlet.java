@@ -18,14 +18,14 @@ import net.sparktank.morrigan.model.media.DurationData;
 import net.sparktank.morrigan.model.media.IMediaTrack;
 import net.sparktank.morrigan.model.media.IMediaTrackList;
 import net.sparktank.morrigan.model.media.IMixedMediaItem.MediaType;
-import net.sparktank.morrigan.player.IPlayerAbstract;
-import net.sparktank.morrigan.player.IPlayerLocal;
-import net.sparktank.morrigan.player.PlayItem;
-import net.sparktank.morrigan.player.PlayerRegister;
 
 import org.xml.sax.SAXException;
 
 import com.megginson.sax.DataWriter;
+import com.vaguehope.morrigan.player.IPlayerAbstract;
+import com.vaguehope.morrigan.player.IPlayerLocal;
+import com.vaguehope.morrigan.player.PlayItem;
+import com.vaguehope.morrigan.player.PlayerRegister;
 import com.vaguehope.morrigan.server.feedwriters.AbstractFeed;
 import com.vaguehope.morrigan.server.feedwriters.XmlHelper;
 import com.vaguehope.morrigan.util.TimeHelper;

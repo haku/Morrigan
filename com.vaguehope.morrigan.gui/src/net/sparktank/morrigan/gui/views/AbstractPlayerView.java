@@ -36,12 +36,6 @@ import net.sparktank.morrigan.model.media.IMediaTrack;
 import net.sparktank.morrigan.model.media.IMediaTrackList;
 import net.sparktank.morrigan.model.media.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.IMixedMediaList;
-import net.sparktank.morrigan.player.IPlayerEventHandler;
-import net.sparktank.morrigan.player.IPlayerLocal;
-import net.sparktank.morrigan.player.OrderHelper;
-import net.sparktank.morrigan.player.OrderHelper.PlaybackOrder;
-import net.sparktank.morrigan.player.PlayItem;
-import net.sparktank.morrigan.player.PlayerRegister;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -54,6 +48,13 @@ import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
+
+import com.vaguehope.morrigan.player.IPlayerEventHandler;
+import com.vaguehope.morrigan.player.IPlayerLocal;
+import com.vaguehope.morrigan.player.OrderHelper;
+import com.vaguehope.morrigan.player.PlayItem;
+import com.vaguehope.morrigan.player.PlayerRegister;
+import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 
 /**
  * TODO tidy this class.

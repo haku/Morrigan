@@ -5,14 +5,14 @@ import java.util.Map;
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import net.sparktank.morrigan.model.media.IMediaTrack;
 import net.sparktank.morrigan.model.media.IMediaTrackList;
-import net.sparktank.morrigan.player.IPlayerEventHandler;
-import net.sparktank.morrigan.player.IPlayerLocal;
-import net.sparktank.morrigan.player.OrderHelper.PlaybackOrder;
-import net.sparktank.morrigan.player.PlayItem;
-import net.sparktank.morrigan.player.PlayerRegister;
 
 import org.eclipse.swt.widgets.Composite;
 
+import com.vaguehope.morrigan.player.IPlayerEventHandler;
+import com.vaguehope.morrigan.player.IPlayerLocal;
+import com.vaguehope.morrigan.player.PlayItem;
+import com.vaguehope.morrigan.player.PlayerRegister;
+import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.util.ErrorHelper;
 
 @Deprecated

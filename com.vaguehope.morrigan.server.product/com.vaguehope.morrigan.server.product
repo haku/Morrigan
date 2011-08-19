@@ -33,7 +33,7 @@
       <plugin id="net.sparktank.morrigan.playbackimpl.dsj"/>
       <plugin id="net.sparktank.morrigan.playbackimpl.gs"/>
       <plugin id="net.sparktank.morrigan.playbackimpl.jmf"/>
-      <plugin id="net.sparktank.morrigan.player"/>
+      <plugin id="com.vaguehope.morrigan.player"/>
       <plugin id="com.vaguehope.morrigan.server"/>
       <plugin id="com.vaguehope.morrigan.server.boot"/>
       <plugin id="com.vaguehope.morrigan.util"/>

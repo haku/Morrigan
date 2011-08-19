@@ -3,7 +3,6 @@ package net.sparktank.morrigan.gui.views;
 import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.display.ScreenPainter;
 import net.sparktank.morrigan.gui.display.ScreenPainter.ScreenType;
-import net.sparktank.morrigan.player.OrderHelper.PlaybackOrder;
 
 import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.SWT;
@@ -13,6 +12,8 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
+
+import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 
 public class ViewPlayer extends AbstractPlayerView {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

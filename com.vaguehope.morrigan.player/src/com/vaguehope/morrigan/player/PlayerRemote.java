@@ -1,7 +1,9 @@
-package net.sparktank.morrigan.player;
+package com.vaguehope.morrigan.player;
 
 import java.util.List;
 import java.util.Map;
+
+import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 
 import net.sparktank.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
@@ -9,7 +11,6 @@ import net.sparktank.morrigan.model.media.DurationData;
 import net.sparktank.morrigan.model.media.IMediaTrack;
 import net.sparktank.morrigan.model.media.IMediaTrackList;
 import net.sparktank.morrigan.model.media.MediaListReference;
-import net.sparktank.morrigan.player.OrderHelper.PlaybackOrder;
 
 public class PlayerRemote implements IPlayerRemote {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.player;
+package com.vaguehope.morrigan.player;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -24,10 +24,11 @@ import net.sparktank.morrigan.model.media.IMediaTrackList;
 import net.sparktank.morrigan.model.media.MediaItemListChangeListener;
 import net.sparktank.morrigan.model.media.MediaListReference;
 import net.sparktank.morrigan.model.media.impl.MediaFactoryImpl;
-import net.sparktank.morrigan.player.OrderHelper.PlaybackOrder;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+
+import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 
 public class Player implements IPlayerLocal {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
