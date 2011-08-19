@@ -9,12 +9,6 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
-import net.sparktank.morrigan.engines.EngineFactory;
-import net.sparktank.morrigan.engines.common.ImplException;
-import net.sparktank.morrigan.engines.playback.IPlaybackEngine;
-import net.sparktank.morrigan.engines.playback.IPlaybackEngine.PlayState;
-import net.sparktank.morrigan.engines.playback.IPlaybackStatusListener;
-import net.sparktank.morrigan.engines.playback.PlaybackException;
 import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.DirtyState;
 import net.sparktank.morrigan.model.media.DurationData;
@@ -28,6 +22,12 @@ import net.sparktank.morrigan.model.media.impl.MediaFactoryImpl;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
+import com.vaguehope.morrigan.engines.EngineFactory;
+import com.vaguehope.morrigan.engines.common.ImplException;
+import com.vaguehope.morrigan.engines.playback.IPlaybackEngine;
+import com.vaguehope.morrigan.engines.playback.IPlaybackStatusListener;
+import com.vaguehope.morrigan.engines.playback.PlaybackException;
+import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 
 public class Player implements IPlayerLocal {

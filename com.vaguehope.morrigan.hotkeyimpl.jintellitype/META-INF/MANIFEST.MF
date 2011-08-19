@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Morrigan Jintellitype Engine
-Bundle-SymbolicName: net.sparktank.morrigan.hotkeyimpl.jintellitype
+Bundle-SymbolicName: com.vaguehope.morrigan.hotkeyimpl.jintellitype
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: .,
@@ -9,11 +9,11 @@ Bundle-ClassPath: .,
  lib/commons-logging-1.0.4.jar,
  lib/log4j-1.2.14.jar
 Bundle-Vendor: vaguehope.com
-Import-Package: net.sparktank.morrigan.engines.hotkey,
+Import-Package: com.vaguehope.morrigan.engines.hotkey,
  net.sparktank.morrigan.model.exceptions,
  org.osgi.framework
 Eclipse-PlatformFilter: (& (osgi.ws=win32) (osgi.os=win32) (osgi.arch=x86))
-Bundle-Activator: net.sparktank.morrigan.hotkeyimpl.jintellitype.Activator
+Bundle-Activator: com.vaguehope.morrigan.hotkeyimpl.jintellitype.Activator
 Bundle-NativeCode: lib/JIntellitype.dll ;
  osname=Win32 ;
  processor=x86

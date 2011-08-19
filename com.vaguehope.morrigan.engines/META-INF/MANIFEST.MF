@@ -1,13 +1,13 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Morrigan Engines
-Bundle-SymbolicName: net.sparktank.morrigan.engines
+Bundle-SymbolicName: com.vaguehope.morrigan.engines
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Export-Package: net.sparktank.morrigan.engines,
- net.sparktank.morrigan.engines.common,
- net.sparktank.morrigan.engines.hotkey,
- net.sparktank.morrigan.engines.playback
+Export-Package: com.vaguehope.morrigan.engines,
+ com.vaguehope.morrigan.engines.common,
+ com.vaguehope.morrigan.engines.hotkey,
+ com.vaguehope.morrigan.engines.playback
 Import-Package: net.sparktank.morrigan.config,
  net.sparktank.morrigan.model.exceptions,
  org.eclipse.swt.events,

@@ -6,16 +6,16 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: net.sparktank.morrigan.gui.Activator
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: com.vaguehope.morrigan.player,
+Import-Package: com.vaguehope.morrigan.engines,
+ com.vaguehope.morrigan.engines.common,
+ com.vaguehope.morrigan.engines.hotkey,
+ com.vaguehope.morrigan.engines.playback,
+ com.vaguehope.morrigan.player,
  com.vaguehope.morrigan.server,
  com.vaguehope.morrigan.server.model,
  com.vaguehope.morrigan.util,
  com.vaguehope.sqlitewrapper,
  net.sparktank.morrigan.config,
- net.sparktank.morrigan.engines,
- net.sparktank.morrigan.engines.common,
- net.sparktank.morrigan.engines.hotkey,
- net.sparktank.morrigan.engines.playback,
  net.sparktank.morrigan.model.db,
  net.sparktank.morrigan.model.exceptions,
  net.sparktank.morrigan.model.factory,

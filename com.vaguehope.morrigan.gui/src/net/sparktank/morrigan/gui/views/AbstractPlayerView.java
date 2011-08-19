@@ -7,9 +7,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sparktank.morrigan.engines.hotkey.IHotkeyEngine;
-import net.sparktank.morrigan.engines.hotkey.IHotkeyListener;
-import net.sparktank.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.actions.JumpToAction;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
@@ -49,6 +46,9 @@ import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
 
+import com.vaguehope.morrigan.engines.hotkey.IHotkeyEngine;
+import com.vaguehope.morrigan.engines.hotkey.IHotkeyListener;
+import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import com.vaguehope.morrigan.player.IPlayerEventHandler;
 import com.vaguehope.morrigan.player.IPlayerLocal;
 import com.vaguehope.morrigan.player.OrderHelper;

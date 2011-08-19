@@ -5,10 +5,10 @@ Bundle-SymbolicName: com.vaguehope.morrigan.player
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: com.vaguehope.morrigan.player
-Import-Package: com.vaguehope.sqlitewrapper,
- net.sparktank.morrigan.engines,
- net.sparktank.morrigan.engines.common,
- net.sparktank.morrigan.engines.playback,
+Import-Package: com.vaguehope.morrigan.engines,
+ com.vaguehope.morrigan.engines.common,
+ com.vaguehope.morrigan.engines.playback,
+ com.vaguehope.sqlitewrapper,
  net.sparktank.morrigan.model.db,
  net.sparktank.morrigan.model.exceptions,
  net.sparktank.morrigan.model.factory,
