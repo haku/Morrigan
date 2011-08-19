@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.danbooru;
+package com.vaguehope.morrigan.danbooru;
 
 import java.io.File;
 import java.math.BigInteger;

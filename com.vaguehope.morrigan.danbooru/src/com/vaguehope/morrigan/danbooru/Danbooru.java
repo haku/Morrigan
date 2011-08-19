@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.danbooru;
+package com.vaguehope.morrigan.danbooru;
 
 import java.io.IOException;
 import java.net.URL;
