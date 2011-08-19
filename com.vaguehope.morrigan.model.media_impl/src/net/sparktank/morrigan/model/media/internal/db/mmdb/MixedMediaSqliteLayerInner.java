@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.vaguehope.morrigan.util.GeneratedString;
 import com.vaguehope.sqlitewrapper.DbException;
 
 import net.sparktank.morrigan.model.db.IDbColumn;
@@ -20,7 +21,6 @@ import net.sparktank.morrigan.model.media.IMixedMediaItem.MediaType;
 import net.sparktank.morrigan.model.media.IMixedMediaItemStorageLayer;
 import net.sparktank.morrigan.model.media.internal.db.MediaSqliteLayer;
 import net.sparktank.morrigan.model.media.internal.db.SqliteHelper;
-import net.sparktank.morrigan.util.GeneratedString;
 
 public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixedMediaItem> implements IMixedMediaItemStorageLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

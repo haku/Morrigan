@@ -22,7 +22,6 @@ import net.sparktank.morrigan.model.media.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.IMixedMediaItem.MediaType;
 import net.sparktank.morrigan.model.media.IMixedMediaItemStorageLayer;
 import net.sparktank.morrigan.model.media.IMixedMediaStorageLayer;
-import net.sparktank.morrigan.util.TimeHelper;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
@@ -41,6 +40,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
+
+import com.vaguehope.morrigan.util.TimeHelper;
 
 public abstract class AbstractMixedMediaDbEditor<T extends IAbstractMixedMediaDb<T>>
 		extends MixedMediaListEditor<T, IMixedMediaItem>

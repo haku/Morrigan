@@ -13,6 +13,8 @@ import java.util.logging.Logger;
 
 import com.vaguehope.morrigan.server.MlistsServlet;
 import com.vaguehope.morrigan.server.feedreader.MixedMediaDbFeedParser;
+import com.vaguehope.morrigan.util.httpclient.HttpClient;
+import com.vaguehope.morrigan.util.httpclient.HttpStreamHandlerException;
 import com.vaguehope.sqlitewrapper.DbException;
 
 import net.sparktank.morrigan.engines.playback.NotImplementedException;
@@ -26,8 +28,6 @@ import net.sparktank.morrigan.model.media.internal.db.MediaItemDbConfig;
 import net.sparktank.morrigan.model.media.internal.db.mmdb.AbstractMixedMediaDb;
 import net.sparktank.morrigan.model.media.internal.db.mmdb.MixedMediaSqliteLayerFactory;
 import net.sparktank.morrigan.model.tasks.TaskEventListener;
-import net.sparktank.morrigan.util.httpclient.HttpClient;
-import net.sparktank.morrigan.util.httpclient.HttpStreamHandlerException;
 
 public class RemoteMixedMediaDb extends AbstractMixedMediaDb<IRemoteMixedMediaDb> implements IRemoteMixedMediaDb {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

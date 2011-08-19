@@ -10,9 +10,10 @@ import net.sparktank.morrigan.player.IPlayerLocal;
 import net.sparktank.morrigan.player.OrderHelper.PlaybackOrder;
 import net.sparktank.morrigan.player.PlayItem;
 import net.sparktank.morrigan.player.PlayerRegister;
-import net.sparktank.morrigan.util.ErrorHelper;
 
 import org.eclipse.swt.widgets.Composite;
+
+import com.vaguehope.morrigan.util.ErrorHelper;
 
 @Deprecated
 public class ServerMain {
