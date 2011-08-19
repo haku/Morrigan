@@ -51,7 +51,7 @@ import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbHelper;
 public class ViewMediaExplorer extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public static final String ID = "net.sparktank.morrigan.gui.views.ViewMediaExplorer";
+	public static final String ID = "com.vaguehope.morrigan.gui.views.ViewMediaExplorer";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	

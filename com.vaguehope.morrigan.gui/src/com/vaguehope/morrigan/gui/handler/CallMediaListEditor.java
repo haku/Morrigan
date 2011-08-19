@@ -21,7 +21,7 @@ import com.vaguehope.morrigan.model.media.MediaListReference;
 public class CallMediaListEditor extends AbstractHandler {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public static final String ID = "net.sparktank.morrigan.gui.handler.CallMediaListEditor";
+	public static final String ID = "com.vaguehope.morrigan.gui.handler.CallMediaListEditor";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

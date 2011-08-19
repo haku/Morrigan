@@ -18,7 +18,7 @@ import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 public class ViewPlayer extends AbstractPlayerView {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public static final String ID = "net.sparktank.morrigan.gui.views.ViewPlayer";
+	public static final String ID = "com.vaguehope.morrigan.gui.views.ViewPlayer";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	

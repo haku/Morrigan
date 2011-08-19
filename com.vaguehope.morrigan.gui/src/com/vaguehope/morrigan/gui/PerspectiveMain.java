@@ -17,7 +17,7 @@ import com.vaguehope.morrigan.gui.views.ViewTagEditor;
 
 public class PerspectiveMain implements IPerspectiveFactory {
 
-	public static final String ID = "net.sparktank.morrigan.gui.PerspectiveMain";
+	public static final String ID = "com.vaguehope.morrigan.gui.PerspectiveMain";
 	
 	@Override
 	public void createInitialLayout(IPageLayout layout) {

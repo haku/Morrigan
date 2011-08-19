@@ -25,7 +25,7 @@ import com.vaguehope.morrigan.player.PlayItem;
 public class AddToQueue  extends AbstractHandler {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public static final String ID = "net.sparktank.morrigan.gui.handler.AddToQueue";
+	public static final String ID = "com.vaguehope.morrigan.gui.handler.AddToQueue";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	

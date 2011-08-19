@@ -10,7 +10,7 @@ import com.vaguehope.morrigan.model.media.impl.MediaFactoryImpl;
 public class Activator extends AbstractUIPlugin {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public static final String PLUGIN_ID = "net.sparktank.morrigan.gui";
+	public static final String PLUGIN_ID = "com.vaguehope.morrigan.gui";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	

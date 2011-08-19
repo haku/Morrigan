@@ -32,7 +32,7 @@ import com.vaguehope.morrigan.model.media.MediaItemListChangeListener;
 public class ViewLibraryProperties extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public static final String ID = "net.sparktank.morrigan.gui.views.ViewLibraryProperties";
+	public static final String ID = "com.vaguehope.morrigan.gui.views.ViewLibraryProperties";
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	

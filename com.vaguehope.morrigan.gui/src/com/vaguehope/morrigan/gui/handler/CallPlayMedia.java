@@ -29,7 +29,7 @@ import com.vaguehope.morrigan.player.PlayItem;
 public class CallPlayMedia extends AbstractHandler {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public static final String ID = "net.sparktank.morrigan.gui.handler.CallPlayMedia";
+	public static final String ID = "com.vaguehope.morrigan.gui.handler.CallPlayMedia";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	

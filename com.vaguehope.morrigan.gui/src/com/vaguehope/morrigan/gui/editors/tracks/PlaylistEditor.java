@@ -39,7 +39,7 @@ import com.vaguehope.morrigan.util.TimeHelper;
 public class PlaylistEditor extends MediaTrackListEditor<IMediaPlaylist,IMediaTrack> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public static final String ID = "net.sparktank.morrigan.gui.editors.PlaylistEditor";
+	public static final String ID = "com.vaguehope.morrigan.gui.editors.PlaylistEditor";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	

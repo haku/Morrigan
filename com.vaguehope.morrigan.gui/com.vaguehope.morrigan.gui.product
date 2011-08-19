@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="morrigan" uid="net.sparktank.morrigan.gui.product" id="net.sparktank.morrigan.gui.product" application="net.sparktank.morrigan.gui.application" useFeatures="false" includeLaunchers="true">
+<product name="morrigan" uid="com.vaguehope.morrigan.gui.product" id="com.vaguehope.morrigan.gui.product" application="com.vaguehope.morrigan.gui.application" useFeatures="false" includeLaunchers="true">
 
    <aboutInfo>
-      <image path="/net.sparktank.morrigan.gui/graphics/crow-full.png"/>
+      <image path="/com.vaguehope.morrigan.gui/graphics/crow-full.png"/>
       <text>
          This alpha build of morrigan is released as free software and is provided &quot;as is&quot; for testing use only.  For more information, please see this wiki page:
 
@@ -26,12 +26,12 @@ Image &quot;The Morrígan&quot; by Louis le Brocquy used under the Creative Comm
       <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
    </launcherArgs>
 
-   <windowImages i16="/net.sparktank.morrigan.gui/icons/crow-16.png" i32="/net.sparktank.morrigan.gui/icons/crow-32.png" i48="/net.sparktank.morrigan.gui/icons/crow-48.png"/>
+   <windowImages i16="/com.vaguehope.morrigan.gui/icons/crow-16.png" i32="/com.vaguehope.morrigan.gui/icons/crow-32.png" i48="/com.vaguehope.morrigan.gui/icons/crow-48.png"/>
 
    <launcher name="morrigan">
       <solaris/>
       <win useIco="true">
-         <ico path="/net.sparktank.morrigan.gui/icons/crow.ico"/>
+         <ico path="/com.vaguehope.morrigan.gui/icons/crow.ico"/>
          <bmp/>
       </win>
    </launcher>

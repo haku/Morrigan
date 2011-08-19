@@ -41,7 +41,7 @@ import com.vaguehope.morrigan.util.TimeHelper;
 public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public static final String ID = "net.sparktank.morrigan.gui.views.ViewControls";
+	public static final String ID = "com.vaguehope.morrigan.gui.views.ViewControls";
 	
 	final static int SEP = 3;
 	
