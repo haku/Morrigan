@@ -3,11 +3,11 @@ package com.vaguehope.morrigan.server;
 import com.vaguehope.morrigan.model.media.IAbstractMixedMediaDb;
 import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
+import com.vaguehope.morrigan.model.media.impl.MediaFactoryImpl;
 import com.vaguehope.morrigan.model.tasks.IMorriganTask;
 import com.vaguehope.morrigan.model.tasks.TaskEventListener;
 import com.vaguehope.morrigan.util.ErrorHelper;
 
-import net.sparktank.morrigan.model.media.impl.MediaFactoryImpl;
 
 // TODO move this class somewhere more appropriate ???
 public class HeadlessHelper {

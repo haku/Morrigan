@@ -12,7 +12,6 @@ import net.sparktank.morrigan.gui.dialogs.RunnableDialog;
 import net.sparktank.morrigan.gui.editors.IMediaItemDbEditor;
 import net.sparktank.morrigan.gui.helpers.ImageCache;
 import net.sparktank.morrigan.gui.helpers.RefreshTimer;
-import net.sparktank.morrigan.model.media.impl.MediaFactoryImpl;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -47,6 +46,7 @@ import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagClassification;
 import com.vaguehope.morrigan.model.media.MediaTagType;
+import com.vaguehope.morrigan.model.media.impl.MediaFactoryImpl;
 
 public class ViewTagEditor extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

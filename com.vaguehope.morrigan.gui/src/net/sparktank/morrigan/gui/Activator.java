@@ -1,10 +1,11 @@
 package net.sparktank.morrigan.gui;
 
-import net.sparktank.morrigan.model.media.impl.MediaFactoryImpl;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
+
+import com.vaguehope.morrigan.model.media.impl.MediaFactoryImpl;
 
 public class Activator extends AbstractUIPlugin {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

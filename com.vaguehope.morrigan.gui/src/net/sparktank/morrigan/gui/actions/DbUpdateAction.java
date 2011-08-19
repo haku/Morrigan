@@ -3,7 +3,6 @@ package net.sparktank.morrigan.gui.actions;
 import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.jobs.TaskJob;
-import net.sparktank.morrigan.model.media.impl.MediaFactoryImpl;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.widgets.Display;
@@ -12,6 +11,7 @@ import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
 import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
+import com.vaguehope.morrigan.model.media.impl.MediaFactoryImpl;
 import com.vaguehope.morrigan.model.tasks.IMorriganTask;
 
 public class DbUpdateAction extends Action implements IWorkbenchAction{

@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Morrigan Model-Media_impl
-Bundle-SymbolicName: net.sparktank.morrigan.model.media_impl
+Bundle-SymbolicName: com.vaguehope.morrigan.model.media_impl
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: com.vaguehope.morrigan.engines,
@@ -17,10 +17,10 @@ Import-Package: com.vaguehope.morrigan.engines,
  com.vaguehope.morrigan.util.httpclient,
  com.vaguehope.sqlitewrapper,
  net.sparktank.morrigan.config
-Export-Package: net.sparktank.morrigan.model.media.impl,
- net.sparktank.morrigan.model.media.internal;x-friends:="net.sparktank.morrigan.server",
- net.sparktank.morrigan.model.media.internal.db;x-friends:="net.sparktank.morrigan.server",
- net.sparktank.morrigan.model.media.internal.db.mmdb;x-friends:="net.sparktank.morrigan.server"
+Export-Package: com.vaguehope.morrigan.model.media.impl,
+ com.vaguehope.morrigan.model.media.internal;x-friends:="net.sparktank.morrigan.server",
+ com.vaguehope.morrigan.model.media.internal.db;x-friends:="net.sparktank.morrigan.server",
+ com.vaguehope.morrigan.model.media.internal.db.mmdb;x-friends:="net.sparktank.morrigan.server"
 Bundle-ClassPath: .,
  lib/jaudiotagger-2.0.3.jar
 Bundle-Vendor: vaguehope.com

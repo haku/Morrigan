@@ -18,6 +18,9 @@ import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.model.media.IMixedMediaStorageLayer;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
+import com.vaguehope.morrigan.model.media.internal.db.MediaItemDbConfig;
+import com.vaguehope.morrigan.model.media.internal.db.mmdb.AbstractMixedMediaDb;
+import com.vaguehope.morrigan.model.media.internal.db.mmdb.MixedMediaSqliteLayerFactory;
 import com.vaguehope.morrigan.model.tasks.TaskEventListener;
 import com.vaguehope.morrigan.server.MlistsServlet;
 import com.vaguehope.morrigan.server.feedreader.MixedMediaDbFeedParser;
@@ -25,9 +28,6 @@ import com.vaguehope.morrigan.util.httpclient.HttpClient;
 import com.vaguehope.morrigan.util.httpclient.HttpStreamHandlerException;
 import com.vaguehope.sqlitewrapper.DbException;
 
-import net.sparktank.morrigan.model.media.internal.db.MediaItemDbConfig;
-import net.sparktank.morrigan.model.media.internal.db.mmdb.AbstractMixedMediaDb;
-import net.sparktank.morrigan.model.media.internal.db.mmdb.MixedMediaSqliteLayerFactory;
 
 public class RemoteMixedMediaDb extends AbstractMixedMediaDb<IRemoteMixedMediaDb> implements IRemoteMixedMediaDb {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
