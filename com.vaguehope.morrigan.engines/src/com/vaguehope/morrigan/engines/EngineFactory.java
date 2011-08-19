@@ -6,6 +6,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.logging.Logger;
 
+import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.engines.common.ImplException;
 import com.vaguehope.morrigan.engines.hotkey.HotkeyEngineRegister;
 import com.vaguehope.morrigan.engines.hotkey.IHotkeyEngine;
@@ -13,7 +14,6 @@ import com.vaguehope.morrigan.engines.playback.IPlaybackEngine;
 import com.vaguehope.morrigan.engines.playback.PlaybackEngineRegister;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 
-import net.sparktank.morrigan.config.Config;
 
 public class EngineFactory {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.sparktank.morrigan.config.Config;
 import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.actions.SaveEditorAction;
 import net.sparktank.morrigan.gui.adaptors.ActionListener;
@@ -30,6 +29,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 
+import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.model.media.IMediaPlaylist;

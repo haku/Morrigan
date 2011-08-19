@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.logging.Logger;
 
-import net.sparktank.morrigan.config.Config;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplication;
@@ -13,6 +12,8 @@ import org.eclipse.osgi.service.datalocation.Location;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
+
+import com.vaguehope.morrigan.config.Config;
 
 /**
  * This class controls all aspects of the application's execution.

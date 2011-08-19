@@ -6,12 +6,12 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaListReference;
 import com.vaguehope.morrigan.model.media.internal.MediaListReferenceImpl;
 
-import net.sparktank.morrigan.config.Config;
 
 public class RemoteMixedMediaDbHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

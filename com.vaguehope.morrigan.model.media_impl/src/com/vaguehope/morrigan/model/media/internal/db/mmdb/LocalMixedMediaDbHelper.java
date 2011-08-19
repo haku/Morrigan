@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaListReference;
@@ -13,7 +14,6 @@ import com.vaguehope.morrigan.model.media.internal.MediaListReferenceImpl;
 import com.vaguehope.morrigan.model.media.internal.db.MediaItemDbConfig;
 import com.vaguehope.sqlitewrapper.DbException;
 
-import net.sparktank.morrigan.config.Config;
 
 public class LocalMixedMediaDbHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

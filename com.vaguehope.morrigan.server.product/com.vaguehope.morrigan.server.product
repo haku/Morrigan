@@ -23,7 +23,7 @@
    </vm>
 
    <plugins>
-      <plugin id="net.sparktank.morrigan.config"/>
+      <plugin id="com.vaguehope.morrigan.config"/>
       <plugin id="com.vaguehope.morrigan.engines"/>
       <plugin id="com.vaguehope.morrigan.model"/>
       <plugin id="com.vaguehope.morrigan.model.db"/>
