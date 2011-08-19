@@ -1,6 +1,6 @@
 package net.sparktank.morrigan.model.media;
 
-import net.sparktank.morrigan.model.db.IDbItem;
+import com.vaguehope.morrigan.model.db.IDbItem;
 
 
 public interface MediaTag extends IDbItem {

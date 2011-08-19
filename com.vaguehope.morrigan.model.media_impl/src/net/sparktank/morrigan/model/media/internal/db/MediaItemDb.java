@@ -7,11 +7,11 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.vaguehope.morrigan.model.db.IDbColumn;
+import com.vaguehope.morrigan.model.db.IDbItem;
+import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.sqlitewrapper.DbException;
 
-import net.sparktank.morrigan.model.db.IDbColumn;
-import net.sparktank.morrigan.model.db.IDbItem;
-import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.DirtyState;
 import net.sparktank.morrigan.model.media.IMediaItem;
 import net.sparktank.morrigan.model.media.IMediaItemDb;

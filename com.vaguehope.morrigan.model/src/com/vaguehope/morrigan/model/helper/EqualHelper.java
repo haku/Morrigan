@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.model.helper;
+package com.vaguehope.morrigan.model.helper;
 
 public class EqualHelper {
 	

@@ -7,11 +7,11 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.vaguehope.morrigan.model.db.IDbColumn;
+import com.vaguehope.morrigan.model.db.IDbItem;
 import com.vaguehope.morrigan.util.StringHelper;
 import com.vaguehope.sqlitewrapper.DbException;
 
-import net.sparktank.morrigan.model.db.IDbColumn;
-import net.sparktank.morrigan.model.db.IDbItem;
 import net.sparktank.morrigan.model.media.IMixedMediaItem;
 import net.sparktank.morrigan.model.media.IMixedMediaItem.MediaType;
 import net.sparktank.morrigan.model.media.IMixedMediaStorageLayer;

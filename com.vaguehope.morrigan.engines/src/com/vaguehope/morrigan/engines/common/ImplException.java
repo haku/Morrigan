@@ -1,6 +1,6 @@
 package com.vaguehope.morrigan.engines.common;
 
-import net.sparktank.morrigan.model.exceptions.MorriganException;
+import com.vaguehope.morrigan.model.exceptions.MorriganException;
 
 public class ImplException extends MorriganException {
 	

@@ -3,12 +3,12 @@ package com.vaguehope.morrigan.server.feedwriters;
 import java.io.File;
 import java.io.PrintWriter;
 
-import net.sparktank.morrigan.model.exceptions.MorriganException;
 
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
 import com.megginson.sax.DataWriter;
+import com.vaguehope.morrigan.model.exceptions.MorriganException;
 
 // TODO make into static helper class.
 public abstract class AbstractFeed {

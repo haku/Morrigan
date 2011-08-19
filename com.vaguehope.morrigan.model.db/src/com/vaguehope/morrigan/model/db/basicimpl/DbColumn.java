@@ -1,6 +1,6 @@
-package net.sparktank.morrigan.model.db.basicimpl;
+package com.vaguehope.morrigan.model.db.basicimpl;
 
-import net.sparktank.morrigan.model.db.IDbColumn;
+import com.vaguehope.morrigan.model.db.IDbColumn;
 
 public class DbColumn implements IDbColumn {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

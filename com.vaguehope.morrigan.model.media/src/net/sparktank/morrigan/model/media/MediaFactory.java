@@ -6,10 +6,10 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.List;
 
+import com.vaguehope.morrigan.model.exceptions.MorriganException;
+import com.vaguehope.morrigan.model.tasks.IMorriganTask;
 import com.vaguehope.sqlitewrapper.DbException;
 
-import net.sparktank.morrigan.model.exceptions.MorriganException;
-import net.sparktank.morrigan.model.tasks.IMorriganTask;
 
 /**
  * TODO remove remains of play-lists - they don't even work anyway.

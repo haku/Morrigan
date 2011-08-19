@@ -1,7 +1,7 @@
 package net.sparktank.morrigan.model.media.internal.pl;
 
-import net.sparktank.morrigan.model.exceptions.MorriganException;
-import net.sparktank.morrigan.model.factory.RecyclingFactory;
+import com.vaguehope.morrigan.model.exceptions.MorriganException;
+import com.vaguehope.morrigan.model.factory.RecyclingFactory;
 
 public class MediaPlaylistFactory extends RecyclingFactory<MediaPlaylist, String, Boolean, MorriganException> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

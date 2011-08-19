@@ -8,7 +8,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
-import net.sparktank.morrigan.model.exceptions.MorriganException;
+import com.vaguehope.morrigan.model.exceptions.MorriganException;
+
 
 public class Config {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

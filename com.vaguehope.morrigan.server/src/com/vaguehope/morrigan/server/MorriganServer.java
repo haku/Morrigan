@@ -1,7 +1,6 @@
 package com.vaguehope.morrigan.server;
 
 import net.sparktank.morrigan.config.Config;
-import net.sparktank.morrigan.model.exceptions.MorriganException;
 
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
@@ -13,6 +12,8 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.component.LifeCycle;
 import org.eclipse.jetty.util.component.LifeCycle.Listener;
 import org.eclipse.jetty.webapp.WebAppContext;
+
+import com.vaguehope.morrigan.model.exceptions.MorriganException;
 
 public class MorriganServer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

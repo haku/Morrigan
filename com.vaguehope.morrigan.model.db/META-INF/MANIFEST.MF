@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Morrigan Model-DB
-Bundle-SymbolicName: net.sparktank.morrigan.model.db
+Bundle-SymbolicName: com.vaguehope.morrigan.model.db
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Export-Package: net.sparktank.morrigan.model.db,
- net.sparktank.morrigan.model.db.basicimpl
+Export-Package: com.vaguehope.morrigan.model.db,
+ com.vaguehope.morrigan.model.db.basicimpl
 Bundle-Vendor: vaguehope.com

@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.model.tasks;
+package com.vaguehope.morrigan.model.tasks;
 
 public class TaskResult {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

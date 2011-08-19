@@ -9,7 +9,6 @@ import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.actions.SaveEditorAction;
 import net.sparktank.morrigan.gui.adaptors.ActionListener;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
-import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.DurationData;
 import net.sparktank.morrigan.model.media.IMediaPlaylist;
 import net.sparktank.morrigan.model.media.IMediaTrack;
@@ -34,6 +33,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 
+import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.util.TimeHelper;
 
 public class PlaylistEditor extends MediaTrackListEditor<IMediaPlaylist,IMediaTrack> {

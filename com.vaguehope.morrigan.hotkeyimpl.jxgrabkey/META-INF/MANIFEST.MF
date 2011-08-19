@@ -8,7 +8,7 @@ Bundle-ClassPath: .,
  lib/JXGrabKey.jar
 Bundle-Vendor: vaguehope.com
 Import-Package: com.vaguehope.morrigan.engines.hotkey,
- net.sparktank.morrigan.model.exceptions,
+ com.vaguehope.morrigan.model.exceptions,
  org.osgi.framework;version="1.3.0"
 Eclipse-PlatformFilter: (& (osgi.ws=gtk) (osgi.os=linux) (osgi.arch=x86))
 Bundle-Activator: com.vaguehope.morrigan.hotkeyimpl.jxgrabkey.Activator

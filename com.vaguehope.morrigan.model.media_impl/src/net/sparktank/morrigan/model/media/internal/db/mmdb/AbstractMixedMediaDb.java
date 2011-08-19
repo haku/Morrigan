@@ -3,10 +3,10 @@ package net.sparktank.morrigan.model.media.internal.db.mmdb;
 import java.util.Date;
 import java.util.List;
 
+import com.vaguehope.morrigan.model.db.IDbColumn;
+import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.sqlitewrapper.DbException;
 
-import net.sparktank.morrigan.model.db.IDbColumn;
-import net.sparktank.morrigan.model.exceptions.MorriganException;
 import net.sparktank.morrigan.model.media.DirtyState;
 import net.sparktank.morrigan.model.media.DurationData;
 import net.sparktank.morrigan.model.media.IAbstractMixedMediaDb;

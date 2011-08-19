@@ -3,7 +3,8 @@ package net.sparktank.morrigan.model.media;
 import java.io.File;
 import java.util.List;
 
-import net.sparktank.morrigan.model.db.IDbItem;
+import com.vaguehope.morrigan.model.db.IDbItem;
+
 
 public interface IMediaItemStorageLayerChangeListener<T extends IMediaItem> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

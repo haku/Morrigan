@@ -10,7 +10,7 @@ Bundle-ClassPath: .,
  lib/log4j-1.2.14.jar
 Bundle-Vendor: vaguehope.com
 Import-Package: com.vaguehope.morrigan.engines.hotkey,
- net.sparktank.morrigan.model.exceptions,
+ com.vaguehope.morrigan.model.exceptions,
  org.osgi.framework
 Eclipse-PlatformFilter: (& (osgi.ws=win32) (osgi.os=win32) (osgi.arch=x86))
 Bundle-Activator: com.vaguehope.morrigan.hotkeyimpl.jintellitype.Activator

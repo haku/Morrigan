@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.model.factory;
+package com.vaguehope.morrigan.model.factory;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;

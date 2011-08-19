@@ -1,6 +1,7 @@
 package com.vaguehope.morrigan.player;
 
-import net.sparktank.morrigan.model.helper.EqualHelper;
+import com.vaguehope.morrigan.model.helper.EqualHelper;
+
 import net.sparktank.morrigan.model.media.IMediaTrack;
 import net.sparktank.morrigan.model.media.IMediaTrackList;
 

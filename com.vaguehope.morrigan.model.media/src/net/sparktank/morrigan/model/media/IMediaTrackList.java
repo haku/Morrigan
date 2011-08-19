@@ -2,7 +2,8 @@ package net.sparktank.morrigan.model.media;
 
 import java.util.Date;
 
-import net.sparktank.morrigan.model.exceptions.MorriganException;
+import com.vaguehope.morrigan.model.exceptions.MorriganException;
+
 
 public interface IMediaTrackList<T extends IMediaTrack> extends IMediaItemList<T> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

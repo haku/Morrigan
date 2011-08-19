@@ -1,15 +1,16 @@
 package net.sparktank.morrigan.gui.jobs;
 
 import net.sparktank.morrigan.gui.dialogs.RunnableDialog;
-import net.sparktank.morrigan.model.tasks.IMorriganTask;
-import net.sparktank.morrigan.model.tasks.TaskResult;
-import net.sparktank.morrigan.model.tasks.TaskResult.TaskOutcome;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.swt.widgets.Display;
+
+import com.vaguehope.morrigan.model.tasks.IMorriganTask;
+import com.vaguehope.morrigan.model.tasks.TaskResult;
+import com.vaguehope.morrigan.model.tasks.TaskResult.TaskOutcome;
 
 public class TaskJob extends Job {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
