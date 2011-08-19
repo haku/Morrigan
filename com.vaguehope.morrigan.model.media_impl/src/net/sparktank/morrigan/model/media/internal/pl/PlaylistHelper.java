@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
+import com.vaguehope.morrigan.model.media.MediaListReference;
 
 import net.sparktank.morrigan.config.Config;
-import net.sparktank.morrigan.model.media.MediaListReference;
 import net.sparktank.morrigan.model.media.internal.MediaListReferenceImpl;
 
 public class PlaylistHelper {

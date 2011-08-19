@@ -15,11 +15,11 @@ import java.util.logging.Logger;
 
 import com.vaguehope.morrigan.engines.playback.NotImplementedException;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
+import com.vaguehope.morrigan.model.media.DirtyState;
+import com.vaguehope.morrigan.model.media.DurationData;
+import com.vaguehope.morrigan.model.media.IMediaPlaylist;
+import com.vaguehope.morrigan.model.media.IMediaTrack;
 
-import net.sparktank.morrigan.model.media.DirtyState;
-import net.sparktank.morrigan.model.media.DurationData;
-import net.sparktank.morrigan.model.media.IMediaPlaylist;
-import net.sparktank.morrigan.model.media.IMediaTrack;
 import net.sparktank.morrigan.model.media.internal.MediaItemList;
 import net.sparktank.morrigan.model.media.internal.MediaTrackListHelper;
 

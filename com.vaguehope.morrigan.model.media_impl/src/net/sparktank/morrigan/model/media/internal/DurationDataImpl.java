@@ -1,6 +1,6 @@
 package net.sparktank.morrigan.model.media.internal;
 
-import net.sparktank.morrigan.model.media.DurationData;
+import com.vaguehope.morrigan.model.media.DurationData;
 
 public class DurationDataImpl implements DurationData {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

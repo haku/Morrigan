@@ -1,8 +1,8 @@
 package net.sparktank.morrigan.model.media.internal;
 
-import net.sparktank.morrigan.model.media.MediaTag;
-import net.sparktank.morrigan.model.media.MediaTagClassification;
-import net.sparktank.morrigan.model.media.MediaTagType;
+import com.vaguehope.morrigan.model.media.MediaTag;
+import com.vaguehope.morrigan.model.media.MediaTagClassification;
+import com.vaguehope.morrigan.model.media.MediaTagType;
 
 public class MediaTagImpl implements MediaTag {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

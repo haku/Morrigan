@@ -1,6 +1,6 @@
 package net.sparktank.morrigan.model.media.internal;
 
-import net.sparktank.morrigan.model.media.IMixedMediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
 
 public class Defaults {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

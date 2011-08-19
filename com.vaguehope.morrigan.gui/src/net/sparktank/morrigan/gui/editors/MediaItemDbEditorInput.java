@@ -1,10 +1,11 @@
 package net.sparktank.morrigan.gui.editors;
 
-import net.sparktank.morrigan.model.media.IMediaItem;
-import net.sparktank.morrigan.model.media.IMediaItemDb;
-import net.sparktank.morrigan.model.media.IMediaItemStorageLayer;
 
 import org.eclipse.ui.IMemento;
+
+import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.IMediaItemDb;
+import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
 
 /**
  * Subclass of MediaItemListEditorInput to allow saving of sort configuration.

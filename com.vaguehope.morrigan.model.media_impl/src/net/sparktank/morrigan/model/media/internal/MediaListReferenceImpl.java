@@ -1,6 +1,6 @@
 package net.sparktank.morrigan.model.media.internal;
 
-import net.sparktank.morrigan.model.media.MediaListReference;
+import com.vaguehope.morrigan.model.media.MediaListReference;
 
 public class MediaListReferenceImpl implements MediaListReference {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

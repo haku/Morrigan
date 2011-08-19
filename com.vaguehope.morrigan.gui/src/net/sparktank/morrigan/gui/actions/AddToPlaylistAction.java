@@ -3,11 +3,12 @@ package net.sparktank.morrigan.gui.actions;
 import net.sparktank.morrigan.gui.Activator;
 import net.sparktank.morrigan.gui.editors.MediaItemListEditor;
 import net.sparktank.morrigan.gui.editors.tracks.PlaylistEditor;
-import net.sparktank.morrigan.model.media.IMediaItem;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbenchPart;
+
+import com.vaguehope.morrigan.model.media.IMediaItem;
 
 public class AddToPlaylistAction extends Action {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

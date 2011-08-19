@@ -5,8 +5,8 @@ import java.math.BigInteger;
 import java.util.Date;
 
 import com.vaguehope.morrigan.model.helper.EqualHelper;
+import com.vaguehope.morrigan.model.media.IMediaItem;
 
-import net.sparktank.morrigan.model.media.IMediaItem;
 
 /**
  * Generic media item, be it music, video, image, etc...

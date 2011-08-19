@@ -3,10 +3,11 @@ package net.sparktank.morrigan.model.media.internal;
 import java.util.Date;
 import java.util.List;
 
-import net.sparktank.morrigan.model.media.DirtyState;
-import net.sparktank.morrigan.model.media.DurationData;
-import net.sparktank.morrigan.model.media.IMediaItemList;
-import net.sparktank.morrigan.model.media.IMediaTrack;
+import com.vaguehope.morrigan.model.media.DirtyState;
+import com.vaguehope.morrigan.model.media.DurationData;
+import com.vaguehope.morrigan.model.media.IMediaItemList;
+import com.vaguehope.morrigan.model.media.IMediaTrack;
+
 
 public class MediaTrackListHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

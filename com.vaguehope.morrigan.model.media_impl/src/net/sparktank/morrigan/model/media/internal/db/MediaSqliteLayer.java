@@ -11,15 +11,15 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.vaguehope.morrigan.model.db.IDbItem;
+import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
+import com.vaguehope.morrigan.model.media.IMediaItemStorageLayerChangeListener;
+import com.vaguehope.morrigan.model.media.MediaTag;
+import com.vaguehope.morrigan.model.media.MediaTagClassification;
+import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.sqlitewrapper.DbException;
 import com.vaguehope.sqlitewrapper.GenericSqliteLayer;
 
-import net.sparktank.morrigan.model.media.IMediaItem;
-import net.sparktank.morrigan.model.media.IMediaItemStorageLayer;
-import net.sparktank.morrigan.model.media.IMediaItemStorageLayerChangeListener;
-import net.sparktank.morrigan.model.media.MediaTag;
-import net.sparktank.morrigan.model.media.MediaTagClassification;
-import net.sparktank.morrigan.model.media.MediaTagType;
 import net.sparktank.morrigan.model.media.internal.MediaTagClassificationFactory;
 import net.sparktank.morrigan.model.media.internal.MediaTagImpl;
 

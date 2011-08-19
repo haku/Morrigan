@@ -1,6 +1,6 @@
 package net.sparktank.morrigan.model.media.internal;
 
-import net.sparktank.morrigan.model.media.MediaTagClassification;
+import com.vaguehope.morrigan.model.media.MediaTagClassification;
 
 
 public class MediaTagClassificationImpl implements MediaTagClassification {

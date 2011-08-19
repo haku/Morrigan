@@ -8,7 +8,6 @@ import net.sparktank.morrigan.gui.adaptors.ActionListener;
 import net.sparktank.morrigan.gui.dialogs.MorriganMsgDlg;
 import net.sparktank.morrigan.gui.views.ViewLibraryProperties;
 import net.sparktank.morrigan.gui.views.ViewTagEditor;
-import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
@@ -21,6 +20,8 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IViewPart;
+
+import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
 
 public class LocalMixedMediaDbEditor 
 		extends AbstractMixedMediaDbEditor<ILocalMixedMediaDb> {

@@ -1,9 +1,9 @@
 package net.sparktank.morrigan.model.media.internal.db.mmdb;
 
 import com.vaguehope.morrigan.model.factory.RecyclingFactory2;
+import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
 import com.vaguehope.sqlitewrapper.DbException;
 
-import net.sparktank.morrigan.model.media.ILocalMixedMediaDb;
 import net.sparktank.morrigan.model.media.internal.db.MediaItemDbConfig;
 
 public class LocalMixedMediaDbFactory extends RecyclingFactory2<ILocalMixedMediaDb, MediaItemDbConfig, DbException> {
