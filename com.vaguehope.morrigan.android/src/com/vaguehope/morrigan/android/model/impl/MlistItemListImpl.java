@@ -52,6 +52,8 @@ public class MlistItemListImpl implements MlistItemList, ContentHandler {
 	public static final String STARTCOUNT = "startcount";
 	public static final String ENDCOUNT = "endcount";
 	public static final String HASHCODE = "hash";
+	public static final String ENABLED = "enabled";
+	public static final String MISSING = "missing";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -156,6 +158,14 @@ public class MlistItemListImpl implements MlistItemList, ContentHandler {
 		else if (this.stack.size() == 3 && localName.equals(HASHCODE)) {
 			BigInteger v = new BigInteger(this.currentText.toString(), 16);
 			this.currentItem.setHashCode(v);
+		}
+		else if (this.stack.size() == 3 && localName.equals(ENABLED)) {
+			boolean v = Boolean.parseBoolean(this.currentText.toString());
+			this.currentItem.setEnabled(v);
+		}
+		else if (this.stack.size() == 3 && localName.equals(MISSING)) {
+			boolean v = Boolean.parseBoolean(this.currentText.toString());
+			this.currentItem.setMissing(v);
 		}
 		
 		this.stack.pop();

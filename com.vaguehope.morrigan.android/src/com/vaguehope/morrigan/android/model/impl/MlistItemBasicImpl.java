@@ -31,6 +31,8 @@ public class MlistItemBasicImpl implements MlistItem {
 	private int id;
 	private String relativeUrl;
 	private BigInteger hashCode;
+	private boolean enabled;
+	private boolean missing;
 	private int duration;
 	private int startCount;
 	private int endCount;
@@ -60,14 +62,13 @@ public class MlistItemBasicImpl implements MlistItem {
 	
 	@Override
 	public int getImageResource() {
-//		if (mi.isMissing()) {
-//			cell.setImage(null); // TODO find icon for missing?
-//		}
-//		else if (!mi.isEnabled()) {
-//			cell.setImage(this.imageCache.readImage("icons/noentry-red.png"));
-//		}
-		
-		if (getHashCode() == null || getHashCode().equals(BigInteger.ZERO)) {
+		if (isMissing()) {
+			return 0; // TODO find icon for missing?
+		}
+		else if (!isEnabled()) {
+			return R.drawable.noentry_red;
+		}
+		else if (getHashCode() == null || getHashCode().equals(BigInteger.ZERO)) {
 			return R.drawable.exclamation_red;
 		}
 		return R.drawable.circledot;
@@ -103,6 +104,22 @@ public class MlistItemBasicImpl implements MlistItem {
 	}
 	public void setHashCode (BigInteger hashCode) {
 		this.hashCode = hashCode;
+	}
+	
+	@Override
+	public boolean isEnabled () {
+		return this.enabled;
+	}
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+	
+	@Override
+	public boolean isMissing () {
+		return this.missing;
+	}
+	public void setMissing(boolean missing) {
+		this.missing = missing;
 	}
 	
 	@Override

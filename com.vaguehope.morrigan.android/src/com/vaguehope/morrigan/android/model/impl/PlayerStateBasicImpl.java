@@ -44,6 +44,8 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference, Mlist
 	private String trackFileName;
 	private int trackDuration;
 	private BigInteger trackHashCode;
+	private boolean trackEnabled;
+	private boolean trackMissing;
 	private int trackStartCount;
 	private int trackEndCount;
 	
@@ -175,6 +177,22 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference, Mlist
 	}
 	
 	@Override
+	public boolean getTrackEnabled() {
+		return this.trackEnabled;
+	}
+	public void setTrackEnabled(boolean trackEnabled) {
+		this.trackEnabled = trackEnabled;
+	}
+	
+	@Override
+	public boolean getTrackMissing() {
+		return this.trackMissing;
+	}
+	public void setTrackMissing(boolean trackMissing) {
+		this.trackMissing = trackMissing;
+	}
+	
+	@Override
 	public int getTrackStartCount () {
 		return this.trackStartCount;
 	}
@@ -262,6 +280,16 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference, Mlist
 	@Override
 	public BigInteger getHashCode () {
 		return getTrackHashCode();
+	}
+	
+	@Override
+	public boolean isEnabled() {
+		return getTrackEnabled();
+	}
+	
+	@Override
+	public boolean isMissing() {
+		return getTrackMissing();
 	}
 	
 	@Override

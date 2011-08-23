@@ -56,6 +56,9 @@ public class PlayerStateXmlImpl implements PlayerState, MlistItem, ContentHandle
 	public static final String TRACKDURATION = "trackduration";
 	
 	public static final String TRACKHASHCODE = "trackhash";
+	public static final String TRACKENABLED = "trackenabled";
+	public static final String TRACKMISSING = "trackmissing";
+	
 	public static final String TRACKSTARTCOUNT = "trackstartcount";
 	public static final String TRACKENDCOUNT = "trackendcount";
 	
@@ -83,6 +86,8 @@ public class PlayerStateXmlImpl implements PlayerState, MlistItem, ContentHandle
 	private String trackFileName;
 	private int trackDuration;
 	private BigInteger trackHashCode;
+	private boolean trackEnabled;
+	private boolean trackMissing;
 	private int trackStartCount;
 	private int trackEndCount;
 	
@@ -204,6 +209,16 @@ public class PlayerStateXmlImpl implements PlayerState, MlistItem, ContentHandle
 	}
 	
 	@Override
+	public boolean getTrackEnabled() {
+		return this.trackEnabled;
+	}
+	
+	@Override
+	public boolean getTrackMissing() {
+		return this.trackMissing;
+	}
+	
+	@Override
 	public int getTrackStartCount () {
 		return this.trackStartCount;
 	}
@@ -254,6 +269,16 @@ public class PlayerStateXmlImpl implements PlayerState, MlistItem, ContentHandle
 	@Override
 	public BigInteger getHashCode () {
 		return getTrackHashCode();
+	}
+	
+	@Override
+	public boolean isEnabled() {
+		return getTrackEnabled();
+	}
+	
+	@Override
+	public boolean isMissing() {
+		return getTrackMissing();
 	}
 	
 	@Override
@@ -337,6 +362,14 @@ public class PlayerStateXmlImpl implements PlayerState, MlistItem, ContentHandle
 			else if (localName.equals(TRACKHASHCODE)) {
 				BigInteger v = new BigInteger(this.currentText.toString(), 16);
 				this.trackHashCode = v;
+			}
+			else if (localName.equals(TRACKENABLED)) {
+				boolean v = Boolean.parseBoolean(this.currentText.toString());
+				this.trackEnabled = v;
+			}
+			else if (localName.equals(TRACKMISSING)) {
+				boolean v = Boolean.parseBoolean(this.currentText.toString());
+				this.trackMissing = v;
 			}
 			else if (localName.equals(TRACKSTARTCOUNT)) {
 				int v = Integer.parseInt(this.currentText.toString());

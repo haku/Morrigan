@@ -43,6 +43,8 @@ public interface PlayerState extends Artifact {
 	public String getTrackFileName ();
 	public int getTrackDuration ();
 	public BigInteger getTrackHashCode ();
+	public boolean getTrackEnabled();
+	public boolean getTrackMissing();
 	public int getTrackStartCount ();
 	public int getTrackEndCount ();
 	
