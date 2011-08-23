@@ -7,7 +7,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.MenuManager;
@@ -52,9 +51,9 @@ import com.vaguehope.morrigan.model.media.IMixedMediaList;
 import com.vaguehope.morrigan.player.IPlayerEventHandler;
 import com.vaguehope.morrigan.player.IPlayerLocal;
 import com.vaguehope.morrigan.player.OrderHelper;
+import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlayerRegister;
-import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 
 /**
  * TODO tidy this class.
@@ -391,21 +390,25 @@ public abstract class AbstractPlayerView extends ViewPart {
 		return this.monitorCacheM.get(Integer.valueOf(index));
 	}
 	
-	private void makeFullScreenActions (Composite parent) {
-		this.fullScreenActions = new LinkedHashMap<Integer, FullScreenAction>();
-		// Full screen menu.
-		for (int i = 0; i < parent.getShell().getDisplay().getMonitors().length; i++) {
-			Monitor mon = parent.getShell().getDisplay().getMonitors()[i];
-			FullScreenAction a = new FullScreenAction(i, mon);
-			this.fullScreenActions.put(Integer.valueOf(i), a);
-		}
-	}
-	
 	protected Collection<FullScreenAction> getFullScreenActions () {
+		if (this.fullScreenActions == null || this.fullScreenActions.size() != getSite().getShell().getDisplay().getMonitors().length) {
+			LinkedHashMap<Integer, FullScreenAction> newActions = new LinkedHashMap<Integer, FullScreenAction>();
+			for (int i = 0; i < getSite().getShell().getDisplay().getMonitors().length; i++) {
+				Monitor mon = getSite().getShell().getDisplay().getMonitors()[i];
+				
+				FullScreenAction a = null;
+				if (this.fullScreenActions != null) a = this.fullScreenActions.get(Integer.valueOf(i));
+				if (a == null) a = new FullScreenAction(i, mon);
+				newActions.put(Integer.valueOf(i), a);
+			}
+			this.fullScreenActions = newActions;
+		}
+		
 		return this.fullScreenActions.values();
 	}
 	
 	protected FullScreenAction fullScreenActionFromIndex (int index) {
+		getFullScreenActions();
 		return this.fullScreenActions.get(Integer.valueOf(index));
 	}
 	
@@ -551,8 +554,6 @@ public abstract class AbstractPlayerView extends ViewPart {
 			if (getPlayer().getPlaybackOrder() == o) a.setChecked(true);
 			this.orderMenuActions.add(a);
 		}
-		
-		makeFullScreenActions(parent);
 		
 		this.jumpToAction = new JumpToAction(getSite().getWorkbenchWindow());
 	}

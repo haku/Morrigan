@@ -3,6 +3,9 @@ package com.vaguehope.morrigan.gui.views;
 import java.util.Collection;
 
 
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IContributionItem;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
@@ -36,15 +39,18 @@ public class ViewDisplay extends ViewPart {
 		getSite().getWorkbenchWindow().addPerspectiveListener(this.perspectiveListener);
 		
 		IViewPart findView = getSite().getPage().findView(ViewControls.ID);
-		if (findView!=null) {
+		if (findView != null) {
 			this.viewControls = (ViewControls) findView;
 			this.viewControls.attachViewDisplay(this);
 			this.viewControls.registerScreenPainter(this.screenPainter);
 			
-			Collection<FullScreenAction> fullScreenActions = this.viewControls.getFullScreenActions();
-			for (FullScreenAction a : fullScreenActions) {
-				getViewSite().getActionBars().getToolBarManager().add(a);
-			}
+			refreshFullscreenActions();
+			getViewSite().getActionBars().getMenuManager().add(new Action("Refresh monitors") {
+				@Override
+				public void run() {
+					refreshFullscreenActions();
+				}
+			});
 		}
 	}
 	
@@ -67,6 +73,21 @@ public class ViewDisplay extends ViewPart {
 	@Override
 	public void setFocus() {
 		this.mediaFrameParent.setFocus();
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	protected void refreshFullscreenActions () {
+		IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
+		
+		for (IContributionItem item : tbm.getItems()) {
+			if (item instanceof FullScreenAction) tbm.remove(item);
+		}
+		
+		Collection<FullScreenAction> fullScreenActions = this.viewControls.getFullScreenActions();
+		for (FullScreenAction a : fullScreenActions) {
+			tbm.add(a);
+		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
