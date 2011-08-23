@@ -40,6 +40,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.AdapterView.OnItemClickListener;
 
 import com.vaguehope.morrigan.android.helper.TimeHelper;
 import com.vaguehope.morrigan.android.model.Artifact;
@@ -58,7 +59,9 @@ import com.vaguehope.morrigan.android.model.impl.PlayerReferenceImpl;
 import com.vaguehope.morrigan.android.model.impl.ServerReferenceImpl;
 import com.vaguehope.morrigan.android.tasks.DownloadMediaTask;
 import com.vaguehope.morrigan.android.tasks.GetPlayerQueueTask;
+import com.vaguehope.morrigan.android.tasks.GetPlayerQueueTask.QueueAction;
 import com.vaguehope.morrigan.android.tasks.SetPlaystateTask;
+import com.vaguehope.morrigan.android.tasks.GetPlayerQueueTask.QueueItemAction;
 import com.vaguehope.morrigan.android.tasks.SetPlaystateTask.TargetPlayState;
 
 public class PlayerActivity extends Activity implements PlayerStateChangeListener, PlayerQueueChangeListener {
@@ -119,6 +122,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 		this.queueListAdaptor = new ArtifactListAdaptorImpl<PlayerQueue>(this, R.layout.mlistitemlistrow);
 		ListView lstQueue = (ListView) findViewById(R.id.lstQueue);
 		lstQueue.setAdapter(this.queueListAdaptor);
+		lstQueue.setOnItemClickListener(this.queueListCickListener);
 		lstQueue.setOnCreateContextMenuListener(this.queueContextMenuListener);
 		
 		ImageButton cmd;
@@ -165,12 +169,20 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Queue context menu.
+//	Queue events.
 	
 	private static final int MENU_CTX_MOVETOP = 2;
 	private static final int MENU_CTX_MOVEUP = 3;
-	private static final int MENU_CTX_MOVEDOWN = 4;
-	private static final int MENU_CTX_MOVEBOTTOM = 5;
+	private static final int MENU_CTX_REMOVE = 4;
+	private static final int MENU_CTX_MOVEDOWN = 5;
+	private static final int MENU_CTX_MOVEBOTTOM = 6;
+	
+	private OnItemClickListener queueListCickListener = new OnItemClickListener() {
+		@Override
+		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+			openContextMenu(view);
+		}
+	};
 	
 	private OnCreateContextMenuListener queueContextMenuListener = new OnCreateContextMenuListener () {
 		@Override
@@ -180,6 +192,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 			menu.setHeaderTitle(item.getTitle());
 			menu.add(Menu.NONE, MENU_CTX_MOVETOP, Menu.NONE, "Move top");
 			menu.add(Menu.NONE, MENU_CTX_MOVEUP, Menu.NONE, "Move up");
+			menu.add(Menu.NONE, MENU_CTX_REMOVE, Menu.NONE, "Remove");
 			menu.add(Menu.NONE, MENU_CTX_MOVEDOWN, Menu.NONE, "Move down");
 			menu.add(Menu.NONE, MENU_CTX_MOVEBOTTOM, Menu.NONE, "Move bottom");
 		}
@@ -191,13 +204,23 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 			
 			case MENU_CTX_MOVETOP:
 			case MENU_CTX_MOVEUP:
+			case MENU_CTX_REMOVE:
 			case MENU_CTX_MOVEDOWN:
 			case MENU_CTX_MOVEBOTTOM:
 				
 				AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuItem.getMenuInfo();
 				Artifact item = PlayerActivity.this.queueListAdaptor.getInputData().getArtifactList().get(info.position);
 				
-				Toast.makeText(this, "TODO: " + menuItem.getItemId() + " " + item.getId(), Toast.LENGTH_SHORT).show();
+				QueueItemAction action;
+				if (menuItem.getItemId() == MENU_CTX_MOVEUP) action = QueueItemAction.UP;
+				else if (menuItem.getItemId() == MENU_CTX_MOVEDOWN) action = QueueItemAction.DOWN;
+				else if (menuItem.getItemId() == MENU_CTX_MOVETOP) action = QueueItemAction.TOP;
+				else if (menuItem.getItemId() == MENU_CTX_MOVEBOTTOM) action = QueueItemAction.BOTTOM;
+				else if (menuItem.getItemId() == MENU_CTX_REMOVE) action = QueueItemAction.REMOVE;
+				else throw new IllegalStateException();
+				
+				GetPlayerQueueTask queueTask = new GetPlayerQueueTask(this, this.playerReference, this, action, item);
+				queueTask.execute();
 				
 				return true;
 			
@@ -211,12 +234,16 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 	
 	private static final int MENU_FULLSCREEN = 2;
 	private static final int MENU_DOWNLOAD = 3;
+	private static final int MENU_CLEARQUEUE = 4;
+	private static final int MENU_SHUFFLEQUEUE = 5;
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		boolean result = super.onCreateOptionsMenu(menu);
 		menu.add(0, MENU_FULLSCREEN, 0, R.string.menu_fullscreen).setIcon(R.drawable.display);
 		menu.add(0, MENU_DOWNLOAD, 0, R.string.menu_download);
+		menu.add(0, MENU_CLEARQUEUE, 0, R.string.menu_queue_clear);
+		menu.add(0, MENU_SHUFFLEQUEUE, 0, R.string.menu_queue_shuffle);
 		return result;
 	}
 	
@@ -232,6 +259,15 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 				downloadCurrentItem();
 				return true;
 			
+			case MENU_CLEARQUEUE:
+				GetPlayerQueueTask clearQ = new GetPlayerQueueTask(this, this.playerReference, this, QueueAction.CLEAR);
+				clearQ.execute();
+				return true;
+				
+			case MENU_SHUFFLEQUEUE:
+				GetPlayerQueueTask shuffleQ = new GetPlayerQueueTask(this, this.playerReference, this, QueueAction.SHUFFLE);
+				shuffleQ.execute();
+				return true;
 		}
 		
 		return super.onOptionsItemSelected(item);
@@ -322,7 +358,12 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 			finish(); // TODO show a msg here? Retry / Fail dlg?
 		}
 		else {
-			this.mlistReference = new MlistReferenceImpl(newState.getListUrl(), this.serverReference);
+			if (newState.getListUrl() != null) {
+				this.mlistReference = new MlistReferenceImpl(newState.getListUrl(), this.serverReference);
+			}
+			else {
+				this.mlistReference = null;
+			}
 			
 			TextView txtListname = (TextView) findViewById(R.id.txtListname);
 			txtListname.setText(newState.getListTitle());

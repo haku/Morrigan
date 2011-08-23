@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.xml.sax.SAXException;
 
+import com.vaguehope.morrigan.android.Constants;
 import com.vaguehope.morrigan.android.helper.HttpHelper;
 import com.vaguehope.morrigan.android.helper.HttpHelper.HttpStreamHandler;
 
@@ -30,6 +31,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.widget.Toast;
 
 public abstract class AbstractTask<T extends Object> extends AsyncTask<Void, Void, T> implements HttpStreamHandler<SAXException> {
@@ -106,6 +108,7 @@ public abstract class AbstractTask<T extends Object> extends AsyncTask<Void, Voi
 		
 		if (this.exception != null) { // TODO handle this better.
 			Toast.makeText(this.context, this.exception.getMessage(), Toast.LENGTH_SHORT).show();
+			Log.e(Constants.LOGTAG, "Task throw exception.", this.exception);
 		}
 		
 		onSuccess(result);

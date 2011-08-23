@@ -23,6 +23,7 @@ import java.io.InputStream;
 import org.xml.sax.SAXException;
 
 import com.vaguehope.morrigan.android.Constants;
+import com.vaguehope.morrigan.android.model.Artifact;
 import com.vaguehope.morrigan.android.model.PlayerQueue;
 import com.vaguehope.morrigan.android.model.PlayerQueueChangeListener;
 import com.vaguehope.morrigan.android.model.PlayerReference;
@@ -33,8 +34,22 @@ import android.app.Activity;
 public class GetPlayerQueueTask extends AbstractTask<PlayerQueue> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	public enum QueueAction {
+		CLEAR, SHUFFLE;
+	}
+	
+	public enum QueueItemAction {
+		TOP, UP, REMOVE, DOWN, BOTTOM;
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
 	protected final PlayerReference playerReference;
 	private final PlayerQueueChangeListener changeListener;
+	
+	QueueAction queueAction = null;
+	QueueItemAction queueItemAction = null;
+	Artifact item = null;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -44,11 +59,62 @@ public class GetPlayerQueueTask extends AbstractTask<PlayerQueue> {
 		this.changeListener = changeListener;
 	}
 	
+	public GetPlayerQueueTask (Activity activity, PlayerReference playerReference, PlayerQueueChangeListener changeListener, QueueAction action) {
+		this(activity, playerReference, changeListener);
+		if (action == null) throw new IllegalArgumentException();
+		this.queueAction = action;
+	}
+	
+	public GetPlayerQueueTask (Activity activity, PlayerReference playerReference, PlayerQueueChangeListener changeListener, QueueItemAction action, Artifact item) {
+		this(activity, playerReference, changeListener);
+		if (action == null) throw new IllegalArgumentException();
+		if (item == null) throw new IllegalArgumentException("item is null");
+		this.queueItemAction = action;
+		this.item = item;
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
 	protected String getUrl () {
-		return this.playerReference.getBaseUrl().concat(Constants.CONTEXT_PLAYER_QUEUE);
+		String url = this.playerReference.getBaseUrl().concat(Constants.CONTEXT_PLAYER_QUEUE);
+		if (this.item != null) {
+			url = url.concat("/" + this.item.getId());
+		}
+		return url;
+	}
+	
+	@Override
+	protected String getVerb () {
+		if (this.queueAction != null || this.queueItemAction != null) {
+			return "POST";
+		}
+		return "GET";
+	}
+	
+	@Override
+	protected String getEncodedData () {
+		if (this.queueAction != null) {
+			switch (this.queueAction) {
+				case CLEAR:   return "action=clear";
+				case SHUFFLE: return "action=shuffle";
+			}
+		}
+		else if (this.queueItemAction != null) {
+			switch (this.queueItemAction) {
+				case TOP:    return "action=top";
+				case UP:     return "action=up";
+				case REMOVE: return "action=remove";
+				case DOWN:   return "action=down";
+				case BOTTOM: return "action=bottom";
+			}
+		}
+		return null;
+	}
+	
+	@Override
+	protected String getContentType () {
+		return "application/x-www-form-urlencoded";
 	}
 	
 	// In background thread:
