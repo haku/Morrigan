@@ -19,6 +19,8 @@ package com.vaguehope.morrigan.android.model;
 public interface Artifact {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	public int getId ();
+	
 	public String getTitle ();
 	
 	public int getImageResource ();

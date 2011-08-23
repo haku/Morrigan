@@ -22,8 +22,27 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicReference;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.View.OnCreateContextMenuListener;
+import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+
 import com.vaguehope.morrigan.android.helper.TimeHelper;
-import com.vaguehope.morrigan.android.model.ArtifactList;
+import com.vaguehope.morrigan.android.model.Artifact;
 import com.vaguehope.morrigan.android.model.ArtifactListAdaptor;
 import com.vaguehope.morrigan.android.model.MlistItem;
 import com.vaguehope.morrigan.android.model.MlistReference;
@@ -42,21 +61,6 @@ import com.vaguehope.morrigan.android.tasks.GetPlayerQueueTask;
 import com.vaguehope.morrigan.android.tasks.SetPlaystateTask;
 import com.vaguehope.morrigan.android.tasks.SetPlaystateTask.TargetPlayState;
 
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.Window;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
-
 public class PlayerActivity extends Activity implements PlayerStateChangeListener, PlayerQueueChangeListener {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -68,7 +72,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 	protected ServerReference serverReference = null;
 	protected PlayerReference playerReference = null;
 	private PlayerState currentState;
-	private ArtifactListAdaptor<ArtifactList> queueListAdaptor;
+	protected ArtifactListAdaptor<PlayerQueue> queueListAdaptor;
 	private MlistReference mlistReference = null;
 	
 	private AtomicReference<String> lastQuery = new AtomicReference<String>();
@@ -112,9 +116,10 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 //	Buttons.
     
 	private void wireGui () {
-		this.queueListAdaptor = new ArtifactListAdaptorImpl<ArtifactList>(this, R.layout.mlistitemlistrow);
+		this.queueListAdaptor = new ArtifactListAdaptorImpl<PlayerQueue>(this, R.layout.mlistitemlistrow);
 		ListView lstQueue = (ListView) findViewById(R.id.lstQueue);
 		lstQueue.setAdapter(this.queueListAdaptor);
+		lstQueue.setOnCreateContextMenuListener(this.queueContextMenuListener);
 		
 		ImageButton cmd;
 		
@@ -159,6 +164,48 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 		}
 	}
 
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Queue context menu.
+	
+	private static final int MENU_CTX_MOVETOP = 2;
+	private static final int MENU_CTX_MOVEUP = 3;
+	private static final int MENU_CTX_MOVEDOWN = 4;
+	private static final int MENU_CTX_MOVEBOTTOM = 5;
+	
+	private OnCreateContextMenuListener queueContextMenuListener = new OnCreateContextMenuListener () {
+		@Override
+		public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+			AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
+			Artifact item = PlayerActivity.this.queueListAdaptor.getInputData().getArtifactList().get(info.position);
+			menu.setHeaderTitle(item.getTitle());
+			menu.add(Menu.NONE, MENU_CTX_MOVETOP, Menu.NONE, "Move top");
+			menu.add(Menu.NONE, MENU_CTX_MOVEUP, Menu.NONE, "Move up");
+			menu.add(Menu.NONE, MENU_CTX_MOVEDOWN, Menu.NONE, "Move down");
+			menu.add(Menu.NONE, MENU_CTX_MOVEBOTTOM, Menu.NONE, "Move bottom");
+		}
+	};
+	
+	@Override
+	public boolean onContextItemSelected(MenuItem menuItem) {
+		switch (menuItem.getItemId()) {
+			
+			case MENU_CTX_MOVETOP:
+			case MENU_CTX_MOVEUP:
+			case MENU_CTX_MOVEDOWN:
+			case MENU_CTX_MOVEBOTTOM:
+				
+				AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuItem.getMenuInfo();
+				Artifact item = PlayerActivity.this.queueListAdaptor.getInputData().getArtifactList().get(info.position);
+				
+				Toast.makeText(this, "TODO: " + menuItem.getItemId() + " " + item.getId(), Toast.LENGTH_SHORT).show();
+				
+				return true;
+			
+			default:
+				return super.onContextItemSelected(menuItem);
+		}
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Menu items.
 	

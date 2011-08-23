@@ -17,10 +17,11 @@
 package com.vaguehope.morrigan.android.model;
 
 
+
 public interface PlayerQueue extends ArtifactList {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-//	public List<? extends MlistItem> getQueueItemList ();
+//	public List<? extends QueueItem> getQueueItemList ();
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

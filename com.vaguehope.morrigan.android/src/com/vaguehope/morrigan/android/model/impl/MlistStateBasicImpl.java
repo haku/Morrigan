@@ -27,6 +27,7 @@ public class MlistStateBasicImpl implements MlistState, MlistReference {
 	private String baseUrl;
 	private ServerReference serverReference;
 	
+	private int id;
 	private String title;
 	private int count;
 	private long duration;
@@ -56,6 +57,16 @@ public class MlistStateBasicImpl implements MlistState, MlistReference {
 	public void setBaseUrl(String baseUrl) {
 		this.baseUrl = baseUrl;
 	}
+	
+	@Override
+	public int getId() {
+		return this.id;
+	}
+	
+	public void setId(int id) {
+		this.id = id;
+	}
+	
 	
 	@Override
 	public String getTitle() {
