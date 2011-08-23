@@ -76,7 +76,7 @@ public class MlistsServlet extends HttpServlet {
 	private static final long serialVersionUID = 2754601524882233866L;
 	
 	private static final String ROOTPATH = "/";
-	private static final int MAX_RESULTS = 50;
+	private static final int MAX_RESULTS = 150;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
