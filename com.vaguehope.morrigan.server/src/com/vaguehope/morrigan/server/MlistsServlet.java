@@ -450,6 +450,7 @@ public class MlistsServlet extends HttpServlet {
     			AbstractFeed.addElement(dw, "type", mi.getMediaType().getN());
     			if (mi.getHashcode() != null && !BigInteger.ZERO.equals(mi.getHashcode())) AbstractFeed.addElement(dw, "hash", mi.getHashcode().toString(16));
     			AbstractFeed.addElement(dw, "enabled", Boolean.toString(mi.isEnabled()));
+    			AbstractFeed.addElement(dw, "missing", Boolean.toString(mi.isMissing()));
     			
     			if (mi.getMediaType() == MediaType.TRACK) {
     				AbstractFeed.addElement(dw, "duration", mi.getDuration());
