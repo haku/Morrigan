@@ -194,6 +194,11 @@ public class PlayerRemote implements IPlayerRemote {
 	}
 	
 	@Override
+	public PlayItem getQueueItemById(int itemId) {
+		throw new UnsupportedOperationException("Not implemented.");
+	}
+	
+	@Override
 	public Map<Integer, String> getMonitors() {
 		throw new UnsupportedOperationException("Not implemented.");
 	}

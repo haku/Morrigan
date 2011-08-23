@@ -51,6 +51,7 @@ public interface IPlayerAbstract {
 	public void setQueueList (List<PlayItem> items);
 	public void shuffleQueue ();
 	public DurationData getQueueTotalDuration();
+	public PlayItem getQueueItemById (int id);
 	
 	public Map<Integer, String> getMonitors ();
 	public void goFullscreen (int monitor);

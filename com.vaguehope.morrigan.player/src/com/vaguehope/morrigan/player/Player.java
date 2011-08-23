@@ -4,11 +4,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
-
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -16,9 +16,9 @@ import org.eclipse.swt.widgets.Composite;
 import com.vaguehope.morrigan.engines.EngineFactory;
 import com.vaguehope.morrigan.engines.common.ImplException;
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine;
+import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import com.vaguehope.morrigan.engines.playback.IPlaybackStatusListener;
 import com.vaguehope.morrigan.engines.playback.PlaybackException;
-import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DirtyState;
 import com.vaguehope.morrigan.model.media.DurationData;
@@ -364,6 +364,14 @@ public class Player implements IPlayerLocal {
 		}
 		
 		return MediaFactoryImpl.get().getNewDurationData(duration, complete);
+	}
+	
+	@Override
+	public PlayItem getQueueItemById (int itemId) {
+		// TODO Is there a better way to do this?
+		Map<Integer, PlayItem> q = new HashMap<Integer, PlayItem>();
+		for (PlayItem item : this._queue) q.put(Integer.valueOf(item.id), item);
+		return q.get(Integer.valueOf(itemId));
 	}
 	
 	@Override
