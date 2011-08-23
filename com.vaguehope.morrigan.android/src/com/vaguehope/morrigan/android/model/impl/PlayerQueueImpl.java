@@ -28,7 +28,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
@@ -88,11 +87,6 @@ public class PlayerQueueImpl implements PlayerQueue, ContentHandler {
 	public List<? extends Artifact> getArtifactList() {
 		return Collections.unmodifiableList(this.artifactList);
 	}
-	
-//	@Override
-//	public List<? extends MlistItem> getQueueItemList() {
-//		return Collections.unmodifiableList(this.mlistItemList);
-//	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -158,6 +152,7 @@ public class PlayerQueueImpl implements PlayerQueue, ContentHandler {
 				MlistStateBasicImpl list = new MlistStateBasicImpl();
 				list.setTitle(this.currentTitle);
 				list.setBaseUrl(this.playerReference.getServerReference().getBaseUrl() + this.currentListRelativeUrl);
+				list.setId(this.currentId);
 				
 				this.artifactList.add(list);
 			}

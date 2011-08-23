@@ -46,6 +46,11 @@ public class ServerReferenceImpl implements ServerReference {
 //	Artifact methods.
 	
 	@Override
+    public int getId() {
+    	throw new UnsupportedOperationException("Not used.");
+    }
+	
+	@Override
 	public String getTitle() {
 		return getBaseUrl();
 	}

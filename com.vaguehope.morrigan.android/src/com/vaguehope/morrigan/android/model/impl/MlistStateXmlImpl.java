@@ -24,7 +24,7 @@ import com.vaguehope.morrigan.android.helper.XmlParser;
 import com.vaguehope.morrigan.android.model.MlistReference;
 import com.vaguehope.morrigan.android.model.MlistState;
 
-public class MlistStateXmlImpl  extends XmlParser implements MlistState {
+public class MlistStateXmlImpl extends XmlParser implements MlistState {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static final String TITLE = "title";
@@ -51,6 +51,11 @@ public class MlistStateXmlImpl  extends XmlParser implements MlistState {
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	@Override
+	public int getId() {
+		throw new UnsupportedOperationException("Not used.");
+	}
 	
 	@Override
 	public int getImageResource() {
