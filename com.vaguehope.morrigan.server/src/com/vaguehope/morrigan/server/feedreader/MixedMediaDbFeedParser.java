@@ -268,6 +268,10 @@ public class MixedMediaDbFeedParser extends DefaultHandler {
 			boolean v = Boolean.parseBoolean(this.currentText.toString().trim());
 			this.currentItem.setEnabled(v);
 		}
+		else if (this.stack.size() == 3 && localName.equals("missing")) {
+			boolean v = Boolean.parseBoolean(this.currentText.toString().trim());
+			this.currentItem.setMissing(v);
+		}
 		else if (this.stack.size() == 3 && localName.equals("startcount")) {
 			long v = Long.parseLong(this.currentText.toString());
 			this.currentItem.setStartCount(v);
