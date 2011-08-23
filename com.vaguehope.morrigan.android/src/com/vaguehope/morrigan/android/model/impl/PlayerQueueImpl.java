@@ -49,6 +49,8 @@ public class PlayerQueueImpl implements PlayerQueue, ContentHandler {
 	private static final String ITEMREL = "item";
 	private static final String ID = "id";
 	private static final String HASH = "hash";
+	private static final String ENABLED = "enabled";
+	private static final String MISSING = "missing";
 	private static final String DURATION = "duration";
 	private static final String STARTCOUNT = "startcount";
 	private static final String ENDCOUNT = "endcount";
@@ -98,6 +100,8 @@ public class PlayerQueueImpl implements PlayerQueue, ContentHandler {
 	private String currentItemRelativeUrl = null;
 	private int currentId;
 	private BigInteger currentHash = null;
+	private boolean currentEnabled;
+	private boolean currentMissing;
 	private int currentDuration;
 	private int currentStartCount;
 	private int currentEndCount;
@@ -143,6 +147,8 @@ public class PlayerQueueImpl implements PlayerQueue, ContentHandler {
 				item.setType(1); // TODO reference an enum?
 				item.setId(this.currentId);
 				item.setHashCode(this.currentHash);
+				item.setEnabled(this.currentEnabled);
+				item.setMissing(this.currentMissing);
 				item.setDuration(this.currentDuration);
 				item.setStartCount(this.currentStartCount);
 				item.setEndCount(this.currentEndCount);
@@ -167,6 +173,15 @@ public class PlayerQueueImpl implements PlayerQueue, ContentHandler {
 		else if (this.stack.size() == 3 && localName.equals(HASH)) {
 			BigInteger v = new BigInteger(this.currentText.toString(), 16);
 			this.currentHash = v;
+		}
+		else if (this.stack.size() == 3 && localName.equals(ENABLED)) {
+			boolean v = Boolean.parseBoolean(this.currentText.toString());
+			this.currentEnabled = v;
+			
+		}
+		else if (this.stack.size() == 3 && localName.equals(MISSING)) {
+			boolean v = Boolean.parseBoolean(this.currentText.toString());
+			this.currentMissing = v;
 		}
 		else if (this.stack.size() == 3 && localName.equals(DURATION)) {
 			int v = Integer.parseInt(this.currentText.toString());
