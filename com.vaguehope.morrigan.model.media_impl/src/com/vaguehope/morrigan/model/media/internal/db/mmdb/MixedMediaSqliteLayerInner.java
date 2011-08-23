@@ -128,7 +128,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 //		+ " ORDER BY dlastplay DESC, lendcnt DESC, lstartcnt DESC, sfile COLLATE NOCASE ASC;";
 	
 	private static final String _SQL_MEDIAFILESTAGS_WHEREORDERSEARCH = 
-		" sfile LIKE ? ESCAPE ? OR tag LIKE ? ESCAPE ?"
+		" (sfile LIKE ? ESCAPE ? OR tag LIKE ? ESCAPE ?)"
 		+ " AND (bmissing<>1 OR bmissing is NULL) AND (benabled<>0 OR benabled is NULL)"
 		+ " ORDER BY dlastplay DESC, lendcnt DESC, lstartcnt DESC, sfile COLLATE NOCASE ASC;";
 	
