@@ -268,6 +268,8 @@ public class PlayersServlet extends HttpServlet {
 			String filename;
 			String filepath;
 			String hashcode;
+			String enabled;
+			String missing;
 			String startcount;
 			String endcount;
 			if (currentItem != null && currentItem.item != null) {
@@ -276,6 +278,8 @@ public class PlayersServlet extends HttpServlet {
 				filename = currentItem.item.getTitle(); // FIXME This is a hack :s .
 				filepath = currentItem.item.getFilepath();
 				hashcode = currentItem.item.getHashcode() != null ? currentItem.item.getHashcode().toString(16) : NULL;
+				enabled = Boolean.toString(currentItem.item.isEnabled());
+				missing = Boolean.toString(currentItem.item.isMissing());
 				startcount = String.valueOf(currentItem.item.getStartCount());
 				endcount = String.valueOf(currentItem.item.getEndCount());
 			}
@@ -283,6 +287,8 @@ public class PlayersServlet extends HttpServlet {
 				filename = NULL;
 				filepath = NULL;
 				hashcode = NULL;
+				enabled = NULL;
+				missing = NULL;
 				startcount = NULL;
 				endcount = NULL;
 			}
@@ -295,6 +301,8 @@ public class PlayersServlet extends HttpServlet {
 			AbstractFeed.addElement(dw, "trackduration", p.getCurrentTrackDuration());
 			
 			AbstractFeed.addElement(dw, "trackhash", hashcode);
+			AbstractFeed.addElement(dw, "trackenabled", enabled);
+			AbstractFeed.addElement(dw, "trackmissing", missing);
 			AbstractFeed.addElement(dw, "trackstartcount", startcount);
 			AbstractFeed.addElement(dw, "trackendcount", endcount);
 			
@@ -347,6 +355,7 @@ public class PlayersServlet extends HttpServlet {
 				AbstractFeed.addElement(dw, "type", MediaType.TRACK.getN());
 				if (mi.getHashcode() != null && !BigInteger.ZERO.equals(mi.getHashcode())) AbstractFeed.addElement(dw, "hash", mi.getHashcode().toString(16));
 				AbstractFeed.addElement(dw, "enabled", Boolean.toString(mi.isEnabled()));
+				AbstractFeed.addElement(dw, "missing", Boolean.toString(mi.isMissing()));
 				AbstractFeed.addElement(dw, "duration", mi.getDuration());
 				AbstractFeed.addElement(dw, "startcount", mi.getStartCount());
 				AbstractFeed.addElement(dw, "endcount", mi.getEndCount());
