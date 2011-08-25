@@ -391,19 +391,14 @@ public abstract class AbstractPlayerView extends ViewPart {
 	}
 	
 	protected Collection<FullScreenAction> getFullScreenActions () {
-		if (this.fullScreenActions == null || this.fullScreenActions.size() != getSite().getShell().getDisplay().getMonitors().length) {
+		Monitor[] monitors = getSite().getShell().getDisplay().getMonitors();
+		if (this.fullScreenActions == null || this.fullScreenActions.size() != monitors.length) {
 			LinkedHashMap<Integer, FullScreenAction> newActions = new LinkedHashMap<Integer, FullScreenAction>();
-			for (int i = 0; i < getSite().getShell().getDisplay().getMonitors().length; i++) {
-				Monitor mon = getSite().getShell().getDisplay().getMonitors()[i];
-				
-				FullScreenAction a = null;
-				if (this.fullScreenActions != null) a = this.fullScreenActions.get(Integer.valueOf(i));
-				if (a == null) a = new FullScreenAction(i, mon);
-				newActions.put(Integer.valueOf(i), a);
+			for (int i = 0; i < monitors.length; i++) {
+				newActions.put(Integer.valueOf(i), new FullScreenAction(i, monitors[i]));
 			}
 			this.fullScreenActions = newActions;
 		}
-		
 		return this.fullScreenActions.values();
 	}
 	
