@@ -11,6 +11,7 @@ import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaListReference;
 import com.vaguehope.morrigan.model.media.internal.MediaListReferenceImpl;
+import com.vaguehope.morrigan.model.media.internal.db.MediaItemDbConfig;
 
 
 public class RemoteMixedMediaDbHelper {
@@ -32,7 +33,7 @@ public class RemoteMixedMediaDbHelper {
 		// FIXME better naming?
 		String name = mmdbUrl.substring(mmdbUrl.lastIndexOf("/")+1).replace(Config.MMDB_REMOTE_FILE_EXT, "").replace(Config.MMDB_LOCAL_FILE_EXT, "");
 		String file = getFullPathToMmdb(url.getHost() + "_" + url.getPort() + "_" + name);
-		IRemoteMixedMediaDb db = RemoteMixedMediaDb.FACTORY.manufacture(file, url);
+		IRemoteMixedMediaDb db = RemoteMixedMediaDbFactory.getNew(file, url);
 		return db;
 	}
 	
@@ -58,6 +59,16 @@ public class RemoteMixedMediaDbHelper {
 		}
 		
 		Collections.sort(ret);
+		
+		return ret;
+	}
+	
+	public static String getRemoteMmdbTitle (MediaItemDbConfig config) {
+		String ret = getRemoteMmdbTitle(config.getFilePath());
+		
+		if (config.getFilter() != null) {
+			ret = ret + "{" + config.getFilter() + "}";
+		}
 		
 		return ret;
 	}

@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
 import org.xml.sax.SAXException;
 
 import com.megginson.sax.DataWriter;
@@ -23,10 +22,10 @@ import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.model.media.IAbstractMixedMediaDb;
 import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
+import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaListReference;
 import com.vaguehope.morrigan.model.media.MediaTag;
-import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.impl.MediaFactoryImpl;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.LocalMixedMediaDbHelper;
 import com.vaguehope.morrigan.player.IPlayerLocal;
@@ -34,7 +33,7 @@ import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlayerRegister;
 import com.vaguehope.morrigan.server.feedwriters.AbstractFeed;
 import com.vaguehope.morrigan.server.feedwriters.XmlHelper;
-import com.vaguehope.morrigan.server.model.RemoteMixedMediaDb;
+import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbFactory;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbHelper;
 import com.vaguehope.sqlitewrapper.DbException;
 
@@ -149,7 +148,7 @@ public class MlistsServlet extends HttpServlet {
 						}
 						else if (type.equals(IRemoteMixedMediaDb.TYPE)) {
 							String f = RemoteMixedMediaDbHelper.getFullPathToMmdb(pathParts[1]);
-							mmdb = RemoteMixedMediaDb.FACTORY.manufacture(f);
+							mmdb = RemoteMixedMediaDbFactory.getExisting(f);
 						}
 						else {
 							throw new IllegalArgumentException("Out of cheese desu~.  Please reinstall universe and reboot desu~.");
