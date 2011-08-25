@@ -1,8 +1,5 @@
 package com.vaguehope.morrigan.gui.views;
 
-import java.util.Collection;
-
-
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
@@ -72,11 +69,6 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 	@Override
 	public void setFocus() {
 		this.btnPlayPause.setFocus();
-	}
-	
-	@Override
-	public Collection<FullScreenAction> getFullScreenActions() {
-		return super.getFullScreenActions();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
