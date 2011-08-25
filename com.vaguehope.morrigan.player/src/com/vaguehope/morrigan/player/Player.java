@@ -302,6 +302,18 @@ public class Player implements IPlayerLocal {
 		}
 	}
 	
+	@Override
+	public void moveInQueueEnd (List<PlayItem> items, boolean toBottom) {
+		// TODO This could probably be done better.
+		synchronized (this._queue) {
+			List<PlayItem> ret = new ArrayList<PlayItem>(this._queue.size());
+			if (!toBottom) ret.addAll(items);
+			for (PlayItem item : this._queue) if (!items.contains(item)) ret.add(item);
+			if (toBottom) ret.addAll(items);
+			this.setQueueList(ret);
+		}
+	}
+	
 	private boolean isQueueHasItem () {
 		synchronized (this._queue) {
 			return !this._queue.isEmpty();

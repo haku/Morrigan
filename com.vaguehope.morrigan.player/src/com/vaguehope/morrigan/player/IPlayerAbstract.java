@@ -47,6 +47,7 @@ public interface IPlayerAbstract {
 	public void removeFromQueue(PlayItem item);
 	public void clearQueue();
 	public void moveInQueue(List<PlayItem> items, boolean moveDown);
+	public void moveInQueueEnd(List<PlayItem> items, boolean toBottom);
 	public List<PlayItem> getQueueList();
 	public void setQueueList (List<PlayItem> items);
 	public void shuffleQueue ();

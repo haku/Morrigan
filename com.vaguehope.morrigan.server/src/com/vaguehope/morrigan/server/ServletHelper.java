@@ -12,9 +12,16 @@ import javax.servlet.http.HttpServletResponse;
 public class ServletHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private static final int UPLOADBUFFERSIZE = 8192;
+	public static void error (HttpServletResponse resp, int status, String msg) throws IOException {
+		resp.reset();
+		resp.setStatus(status);
+		resp.setContentType("text/plain");
+		resp.getWriter().println("HTTP Error "+status+": " + msg);
+	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	private static final int UPLOADBUFFERSIZE = 8192;
 	
 	public static void prepForReturnFile (String name, long length, HttpServletResponse response) {
 		response.reset();
