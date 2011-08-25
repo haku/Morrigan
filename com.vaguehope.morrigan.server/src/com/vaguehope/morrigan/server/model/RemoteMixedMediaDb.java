@@ -13,7 +13,6 @@ import java.util.logging.Logger;
 
 import com.vaguehope.morrigan.engines.playback.NotImplementedException;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.factory.RecyclingFactory;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.model.media.IMixedMediaStorageLayer;
@@ -33,64 +32,6 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb<IRemoteMixedMediaDb
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private final Logger logger = Logger.getLogger(this.getClass().getName());
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Factory.
-	
-	public static class RemoteMixedMediaDbFactory extends RecyclingFactory<IRemoteMixedMediaDb, String, URL, MorriganException> {
-		
-		protected RemoteMixedMediaDbFactory() {
-			super(true);
-		}
-		
-		@Override
-		protected boolean isValidProduct(IRemoteMixedMediaDb product) {
-//			System.out.println("Found '" + product.getDbPath() + "' in cache.");
-			return true;
-		}
-		
-		@Override
-		protected IRemoteMixedMediaDb makeNewProduct(String material) throws MorriganException {
-			return makeNewProduct(material, null);
-		}
-		
-		@Override
-		protected IRemoteMixedMediaDb makeNewProduct(String material, URL config) throws MorriganException {
-			IRemoteMixedMediaDb ret = null;
-			
-//			System.out.println("Making object instance '" + material + "'...");
-			if (config != null) {
-				try {
-					ret = new RemoteMixedMediaDb(
-							RemoteMixedMediaDbHelper.getRemoteMmdbTitle(material),
-							new MediaItemDbConfig(material, null),
-							config,
-							MixedMediaSqliteLayerFactory.getAutocommit(material));
-				}
-				catch (DbException e) {
-					throw new MorriganException(e);
-				}
-			} else {
-				try {
-					ret = new RemoteMixedMediaDb(
-							RemoteMixedMediaDbHelper.getRemoteMmdbTitle(material),
-							new MediaItemDbConfig(material, null),
-							MixedMediaSqliteLayerFactory.getAutocommit(material));
-				}
-				catch (MalformedURLException e) {
-					throw new MorriganException(e);
-				} catch (DbException e) {
-					throw new MorriganException(e);
-				}
-			}
-			
-			return ret;
-		}
-		
-	}
-	
-	public static final RemoteMixedMediaDbFactory FACTORY = new RemoteMixedMediaDbFactory();
-	
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	

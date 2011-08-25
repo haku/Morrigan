@@ -3,7 +3,6 @@ package com.vaguehope.morrigan.gui.views;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-
 import org.eclipse.core.commands.common.CommandException;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -45,7 +44,7 @@ import com.vaguehope.morrigan.model.media.MediaListReference;
 import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 import com.vaguehope.morrigan.model.media.impl.MediaFactoryImpl;
 import com.vaguehope.morrigan.model.tasks.IMorriganTask;
-import com.vaguehope.morrigan.server.model.RemoteMixedMediaDb;
+import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbFactory;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbHelper;
 
 public class ViewMediaExplorer extends ViewPart {
@@ -273,7 +272,7 @@ public class ViewMediaExplorer extends ViewPart {
 					new DbUpdateAction(l).run();
 				}
 				else if (this.mediaExplorerItem.getType() == MediaListReference.MediaListType.REMOTEMMDB) {
-					IRemoteMixedMediaDb l = RemoteMixedMediaDb.FACTORY.manufacture(this.mediaExplorerItem.getIdentifier());
+					IRemoteMixedMediaDb l = RemoteMixedMediaDbFactory.getExisting(this.mediaExplorerItem.getIdentifier());
 					new DbUpdateAction(l).run();
 				}
 				else {
@@ -361,7 +360,7 @@ public class ViewMediaExplorer extends ViewPart {
 		public void run() {
 			try {
     			ILocalMixedMediaDb localDb = MediaFactoryImpl.get().getLocalMixedMediaDb(this.local.getIdentifier());
-    			IRemoteMixedMediaDb remoteDb = RemoteMixedMediaDb.FACTORY.manufacture(this.remote.getIdentifier());
+    			IRemoteMixedMediaDb remoteDb = RemoteMixedMediaDbFactory.getExisting(this.remote.getIdentifier());
     			IMorriganTask task = MediaFactoryImpl.get().getSyncMetadataRemoteToLocalTask(localDb, remoteDb);
     			TaskJob job = new TaskJob(task, Display.getCurrent());
     			job.schedule();
