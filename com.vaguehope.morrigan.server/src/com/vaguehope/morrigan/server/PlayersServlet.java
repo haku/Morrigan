@@ -89,8 +89,7 @@ public class PlayersServlet extends HttpServlet {
 			String reqPath = requestURI.startsWith(CONTEXTPATH) ? requestURI.substring(CONTEXTPATH.length()) : requestURI;
 			
 			if (reqPath == null || reqPath.length() < 1 || reqPath.equals(ROOTPATH)) { // POST to root.
-				resp.setContentType("text/plain");
-				resp.getWriter().println("Invalid POST request desu~");
+				ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid POST request desu~");
 			}
 			else {
 				String path = reqPath.startsWith(ROOTPATH) ? reqPath.substring(ROOTPATH.length()) : reqPath;
@@ -111,13 +110,11 @@ public class PlayersServlet extends HttpServlet {
 						}
 					}
 					else {
-						resp.setContentType("text/plain");
-						resp.getWriter().println("Invalid POST request to player "+player.getId()+": '"+path+"' desu~");
+						ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid POST request to player "+player.getId()+": '"+path+"' desu~");
 					}
 				}
 				else {
-					resp.setContentType("text/plain");
-					resp.getWriter().println("Invalid POST request to '"+path+"' desu~");
+					ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid POST request to '"+path+"' desu~");
 				}
 			}
 		}
@@ -129,9 +126,7 @@ public class PlayersServlet extends HttpServlet {
 	private static void postToPlayer (HttpServletRequest req, HttpServletResponse resp, IPlayerAbstract player) throws IOException, ServletException {
 		String act = req.getParameter("action");
 		if (act == null) {
-			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			resp.setContentType("text/plain");
-			resp.getWriter().println("HTTP Error 400 'action' parameter not set desu~");
+			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "'action' parameter not set desu~");
 		}
 		else if (act.equals(CMD_PLAYPAUSE)) {
 			player.pausePlaying();
@@ -153,24 +148,18 @@ public class PlayersServlet extends HttpServlet {
 				writeResponse(req, resp);
 			}
 			else {
-				resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-				resp.setContentType("text/plain");
-				resp.getWriter().println("HTTP Error 400 'fullscreen' parameter not set desu~");
+				ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "'fullscreen' parameter not set desu~");
 			}
 		}
 		else {
-			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			resp.setContentType("text/plain");
-			resp.getWriter().println("HTTP Error 400 invalid 'action' parameter '"+act+"' desu~");
+			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "invalid 'action' parameter '"+act+"' desu~");
 		}
 	}
 	
 	private static void postToQueue (HttpServletRequest req, HttpServletResponse resp, IPlayerAbstract player) throws IOException, SAXException {
 		String act = req.getParameter("action");
 		if (act == null) {
-			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			resp.setContentType("text/plain");
-			resp.getWriter().println("HTTP Error 400 'action' parameter not set desu~");
+			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "'action' parameter not set desu~");
 		}
 		else if (act.equals(CMD_CLEAR)) {
 			player.clearQueue();
@@ -181,45 +170,38 @@ public class PlayersServlet extends HttpServlet {
 			printPlayerQueue(resp, player);
 		}
 		else {
-			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			resp.setContentType("text/plain");
-			resp.getWriter().println("HTTP Error 400 invalid 'action' parameter '"+act+"' desu~");
+			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "invalid 'action' parameter '"+act+"' desu~");
 		}
 	}
 	
 	private static void postToQueue (HttpServletRequest req, HttpServletResponse resp, IPlayerAbstract player, int item) throws IOException, SAXException {
 		String act = req.getParameter("action");
 		if (act == null) {
-			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			resp.setContentType("text/plain");
-			resp.getWriter().println("HTTP Error 400 'action' parameter not set desu~");
+			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "'action' parameter not set desu~");
 		}
-		else if (act.equals(CMD_UP) || act.equals(CMD_DOWN) || act.equals(CMD_REMOVE)) {
+		else if (act.equals(CMD_UP) || act.equals(CMD_DOWN) || act.equals(CMD_REMOVE) || act.equals(CMD_TOP) || act.equals(CMD_BOTTOM)) {
 			PlayItem queueItem = player.getQueueItemById(item);
 			if (queueItem != null) {
 				if (act.equals(CMD_REMOVE)) {
 					player.removeFromQueue(queueItem);
 				}
-				else {
+				else if (act.equals(CMD_TOP) || act.equals(CMD_BOTTOM)) {
+					player.moveInQueueEnd(Arrays.asList(queueItem), act.equals(CMD_BOTTOM));
+				}
+				else if (act.equals(CMD_UP) || act.equals(CMD_DOWN)) {
 					player.moveInQueue(Arrays.asList(queueItem), act.equals(CMD_DOWN));
+				}
+				else {
+					throw new IllegalStateException("Out of cheese desu~.");
 				}
 				printPlayerQueue(resp, player);
 			}
 			else {
-				resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-				resp.setContentType("text/plain");
-				resp.getWriter().println("HTTP Error 400 item '"+item+"' not found desu~");
+				ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "item '"+item+"' not found desu~");
 			}
 		}
-		else if (act.equals(CMD_TOP) || act.equals(CMD_BOTTOM)) {
-			resp.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-			resp.setContentType("text/plain");
-			resp.getWriter().println("top/bottom not implemented desu~");
-		}
 		else {
-			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			resp.setContentType("text/plain");
-			resp.getWriter().println("HTTP Error 400 invalid 'action' parameter '"+act+"' desu~");
+			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "invalid 'action' parameter '"+act+"' desu~");
 		}
 	}
 	
@@ -247,9 +229,7 @@ public class PlayersServlet extends HttpServlet {
 							player = PlayerRegister.getLocalPlayer(playerNumber);
 						}
 						catch (IllegalArgumentException e) {
-							resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-							resp.setContentType("text/plain");
-							resp.getWriter().println("HTTP Error 404 player " + playerNumber + " not found desu~");
+							ServletHelper.error(resp, HttpServletResponse.SC_NOT_FOUND, playerNumber + " not found desu~");
 							return;
 						}
 						
@@ -264,9 +244,7 @@ public class PlayersServlet extends HttpServlet {
 								}
 							}
 							else {
-								resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-								resp.setContentType("text/plain");
-								resp.getWriter().println("HTTP Error 404 " + subPath + " not found desu~");
+								ServletHelper.error(resp, HttpServletResponse.SC_NOT_FOUND, "'" + subPath + "' not found desu~");
 							}
 						}
 						else {
@@ -280,9 +258,7 @@ public class PlayersServlet extends HttpServlet {
 						
 					}
 					catch (NumberFormatException e) {
-						resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-						resp.setContentType("text/plain");
-						resp.getWriter().println("HTTP Error 404 not found '" + reqPath + "' desu~ (could not parse '"+playerNumberRaw+"' as a player.)");
+						ServletHelper.error(resp, HttpServletResponse.SC_NOT_FOUND, "'" + reqPath + "' desu~ (could not parse '"+playerNumberRaw+"' as a player.)");
 					}
 				}
 			}

@@ -174,6 +174,11 @@ public class PlayerRemote implements IPlayerRemote {
 	}
 	
 	@Override
+	public void moveInQueueEnd(List<PlayItem> items, boolean toBottom) {
+		throw new UnsupportedOperationException("Not implemented.");
+	}
+	
+	@Override
 	public void shuffleQueue() {
 		throw new UnsupportedOperationException("Not implemented.");
 	}
