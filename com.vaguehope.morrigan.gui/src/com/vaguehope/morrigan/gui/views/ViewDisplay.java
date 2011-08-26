@@ -2,7 +2,6 @@ package com.vaguehope.morrigan.gui.views;
 
 import java.util.Collection;
 
-
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IToolBarManager;
@@ -12,7 +11,6 @@ import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IPerspectiveListener2;
 import org.eclipse.ui.IViewPart;
@@ -20,7 +18,6 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 
-import com.vaguehope.morrigan.gui.dialogs.RunnableDialog;
 import com.vaguehope.morrigan.gui.display.ScreenPainter;
 import com.vaguehope.morrigan.gui.display.ScreenPainter.ScreenType;
 import com.vaguehope.morrigan.gui.views.AbstractPlayerView.FullScreenAction;
@@ -50,8 +47,6 @@ public class ViewDisplay extends ViewPart {
 			getViewSite().getActionBars().getMenuManager().add(new Action("Refresh monitors") {
 				@Override
 				public void run() {
-					Display display = getSite().getShell().getDisplay();
-					display.asyncExec(new RunnableDialog("Monitors: " + display.getMonitors().length));
 					refreshFullscreenActions();
 				}
 			});
@@ -93,8 +88,6 @@ public class ViewDisplay extends ViewPart {
 		for (FullScreenAction a : fullScreenActions) {
 			tbm.add(a);
 		}
-		
-		getSite().getShell().getDisplay().asyncExec(new RunnableDialog("Actions: " + fullScreenActions.size()));
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
