@@ -61,6 +61,7 @@ Image &quot;The Morrígan&quot; by Louis le Brocquy used under the Creative Comm
       <plugin id="com.vaguehope.morrigan.server.boot"/>
       <plugin id="com.vaguehope.morrigan.util"/>
       <plugin id="com.vaguehope.morrigan.util.httpclient"/>
+      <plugin id="com.vaguehope.morrigan.wui"/>
       <plugin id="com.vaguehope.nemain"/>
       <plugin id="com.vaguehope.sqlitewrapper"/>
       <plugin id="org.eclipse.compare.core"/>

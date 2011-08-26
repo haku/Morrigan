@@ -56,12 +56,6 @@
 		<mkdir dir="${outputDirectory}" />
 	</target>
 
-	<target name="buildbits" >
-		<ant antfile="../com.vaguehope.morrigan.wui/build.xml"
-		     dir="../com.vaguehope.morrigan.wui"
-		/>
-	</target>
-
 	<target name="build-gui" depends="configure" >
 		<antcall target="main-build" >
 			<param file="build.properties" />
@@ -76,7 +70,7 @@
 		</antcall>
 	</target>
 
-	<target name="main-build" depends="setprop,buildbits" >
+	<target name="main-build" depends="setprop" >
 		<property name="buildId" value="${archivePrefix}-${releaseName}-${buildTime}" />
 		<property name="buildLabel" value="${buildType}.${buildId}" />
 
@@ -121,7 +115,6 @@
 			            includes="win32.properties"
 			            fullpath="${archivePrefix}/morrigan.properties"
 			/>
-			<zipfileset dir="../com.vaguehope.morrigan.wui" includes="morrigan.wui.war" prefix="${archivePrefix}/" />
 		</zip>
 	</target>
 
@@ -142,7 +135,6 @@
 						fullpath="${archivePrefix}/morrigan.sh"
 						filemode="755"
 			/>
-			<zipfileset dir="../com.vaguehope.morrigan.wui" includes="morrigan.wui.war" prefix="${archivePrefix}/" />
 		</zip>
 	</target>
 
@@ -158,7 +150,6 @@
 			            includes="mac.properties"
 			            fullpath="${archivePrefix}/morrigan.properties"
 			/>
-			<zipfileset dir="../com.vaguehope.morrigan.wui" includes="morrigan.wui.war" prefix="${archivePrefix}/" />
 		</zip>
 	</target>
 

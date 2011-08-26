@@ -14,9 +14,10 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.component.LifeCycle;
 import org.eclipse.jetty.util.component.LifeCycle.Listener;
 import org.eclipse.jetty.webapp.WebAppContext;
+import org.osgi.framework.Bundle;
 
-import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
+import com.vaguehope.morrigan.wui.MorriganWui;
 
 public class MorriganServer implements Listener {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -33,13 +34,13 @@ public class MorriganServer implements Listener {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public MorriganServer () throws MorriganException {
+	public MorriganServer (Bundle[] bundles) throws MorriganException {
 		try {
 			this.server = new Server();
-			
 			Connector connector = new SocketConnector();
 			connector.setPort(PORT);
 			this.server.addConnector(connector);
+			this.server.addLifeCycleListener(this);
 			
 //			SslSocketConnector sslConnector = new SslSocketConnector();
 //			sslConnector.setKeystore(KEYSTORE);
@@ -51,8 +52,6 @@ public class MorriganServer implements Listener {
 //			sslConnector.setPort(8443);
 //			this.server.addConnector(sslConnector);
 			
-			this.server.addLifeCycleListener(this);
-			
 			ContextHandlerCollection contexts = new ContextHandlerCollection();
 			this.server.setHandler(contexts);
 			
@@ -60,14 +59,8 @@ public class MorriganServer implements Listener {
 			servletContext.addServlet(new ServletHolder(new PlayersServlet()), PlayersServlet.CONTEXTPATH + "/*");
 			servletContext.addServlet(new ServletHolder(new MlistsServlet()), MlistsServlet.CONTEXTPATH + "/*");
 			
-//			final URL warUrl = this.class.getClassLoader().getResource(WEBAPPDIR);
-//			final String warUrlString = warUrl.toExternalForm();
-//			server.setHandler(new WebAppContext(warUrlString, CONTEXTPATH));
-			
-			WebAppContext webapp = new WebAppContext(Config.getWuiWarLocation(), "/");
-			// This is a hack to fix FileNotFound "org/eclipse/jetty/webapp/webdefault.xml" (in jetty-webapp-7.2.2.v20101205.jar)
-			Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
-			contexts.addHandler(webapp);
+			WebAppContext warContext = WebAppHelper.getWarBundleAsContext(bundles, MorriganWui.ID, "/");
+			contexts.addHandler(warContext);
 			
 			ContextHandler conPlayers = new ContextHandler();
 			conPlayers.setContextPath("/player");
@@ -82,7 +75,7 @@ public class MorriganServer implements Listener {
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+		
 	public void start () throws Exception {
 		this.server.start();
 	}
