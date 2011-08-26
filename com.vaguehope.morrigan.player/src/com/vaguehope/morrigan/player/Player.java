@@ -408,7 +408,7 @@ public class Player implements IPlayerLocal {
 		return (this.playbackEngine != null);
 	}
 	
-	synchronized private IPlaybackEngine getPlaybackEngine (boolean create) throws ImplException {
+	synchronized private IPlaybackEngine getPlaybackEngine (boolean create) {
 		if (this.playbackEngine == null && create) {
 			this.playbackEngine = EngineFactory.makePlaybackEngine();
 			if (this.playbackEngine == null) throw new RuntimeException("Failed to create playback engine instance.");
@@ -421,11 +421,7 @@ public class Player implements IPlayerLocal {
 	private void finalisePlaybackEngine () {
 		IPlaybackEngine eng = null;
 		
-		try {
-			eng = getPlaybackEngine(false);
-		} catch (ImplException e) {
-			e.printStackTrace();
-		}
+		eng = getPlaybackEngine(false);
 		
 		if (eng!=null) {
 			try {
@@ -564,17 +560,11 @@ public class Player implements IPlayerLocal {
 	
 	@Override
 	public PlayState getPlayState () {
-		try {
-			IPlaybackEngine eng = getPlaybackEngine(false);
-			if (eng!=null) {
-				return eng.getPlaybackState();
-			}
-			
-			return PlayState.Stopped;
+		IPlaybackEngine eng = getPlaybackEngine(false);
+		if (eng!=null) {
+			return eng.getPlaybackState();
 		}
-		catch (ImplException e) {
-			return PlayState.Stopped;
-		}
+		return PlayState.Stopped;
 	}
 	
 	@Override
@@ -726,14 +716,9 @@ public class Player implements IPlayerLocal {
 	
 	@Override
 	public void setVideoFrameParent(Composite cmfp) {
-		try {
-			IPlaybackEngine engine = getPlaybackEngine(false);
-			synchronized (engine) {
-				engine.setVideoFrameParent(cmfp);
-			}
-		}
-		catch (ImplException e) {
-			throw new RuntimeException(e);
+		IPlaybackEngine engine = getPlaybackEngine(false);
+		synchronized (engine) {
+			engine.setVideoFrameParent(cmfp);
 		}
 	}
 
