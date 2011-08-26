@@ -69,6 +69,7 @@ public class MediaItemListEditorInput<T extends IMediaItemList<? extends IMediaI
 	
 	@Override
 	public boolean exists() {
+		// TODO check input file still exists.
 		return true;
 	}
 	
@@ -107,7 +108,7 @@ public class MediaItemListEditorInput<T extends IMediaItemList<? extends IMediaI
 	
 	@Override
 	public int hashCode() {
-		return this.editedMediaList.getListId().hashCode();
+		return this.editedMediaList.getSerial().hashCode();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
