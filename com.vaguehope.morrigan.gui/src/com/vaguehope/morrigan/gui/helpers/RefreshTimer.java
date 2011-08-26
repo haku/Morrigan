@@ -26,8 +26,12 @@ public class RefreshTimer implements Runnable {
 		this.update(false);
 	}
 	
-	public void updateNow () {
-		this.update(true);
+//	public void updateNow () {
+//		this.update(true);
+//	}
+	
+	public void reset () {
+		this.lastRun.addAndGet(-this.minInterval); // Push it back in time.
 	}
 	
 	@Override
