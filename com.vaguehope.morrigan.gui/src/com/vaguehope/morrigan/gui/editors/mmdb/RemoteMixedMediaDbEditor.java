@@ -99,7 +99,7 @@ public class RemoteMixedMediaDbEditor
 		if (getMediaList().isCacheExpired()) {
 			IMorriganTask task = MediaFactoryImpl.get().getRemoteMixedMediaDbUpdateTask(getMediaList());
 			if (task != null) {
-				TaskJob job = new TaskJob(task, getSite().getShell().getDisplay());
+				TaskJob job = new TaskJob(task);
 				job.schedule(3000);
 			}
 			else {
@@ -122,7 +122,7 @@ public class RemoteMixedMediaDbEditor
 			try {
 				IMorriganTask task = MediaFactoryImpl.get().getRemoteMixedMediaDbUpdateTask(getMediaList());
 				if (task != null) {
-					TaskJob job = new TaskJob(task, getSite().getShell().getDisplay());
+					TaskJob job = new TaskJob(task);
 					job.schedule();
 				}
 				else {

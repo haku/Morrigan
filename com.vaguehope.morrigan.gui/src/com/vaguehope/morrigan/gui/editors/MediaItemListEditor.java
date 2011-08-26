@@ -643,7 +643,7 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 				MediaItemListEditor.this.lastFileCopyTargetDir = dir;
 				
 				IMorriganTask task = MediaFactoryImpl.get().getMediaFileCopyTask(getMediaList(), selectedTracks, new File(dir));
-				TaskJob job = new TaskJob(task, getSite().getShell().getDisplay());
+				TaskJob job = new TaskJob(task);
 				job.schedule();
 			}
 		}

@@ -16,12 +16,10 @@ public class TaskJob extends Job {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private final IMorriganTask task;
-	private final Display display;
 	
-	public TaskJob (IMorriganTask task, Display display) {
+	public TaskJob (IMorriganTask task) {
 		super(task.getTitle());
 		this.task = task;
-		this.display = display;
 		setUser(true);
 	}
 	
@@ -38,7 +36,7 @@ public class TaskJob extends Job {
 			return Status.CANCEL_STATUS;
 		}
 		else {
-			this.display.asyncExec(new RunnableDialog(res.getErrThr()));
+			Display.getDefault().asyncExec(new RunnableDialog(res.getErrThr()));
 			return new FailStatus(res.getErrMsg(), res.getErrThr());
 		}
 	}

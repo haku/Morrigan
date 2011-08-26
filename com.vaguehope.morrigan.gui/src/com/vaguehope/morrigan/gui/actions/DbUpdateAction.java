@@ -2,7 +2,6 @@ package com.vaguehope.morrigan.gui.actions;
 
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
 
 import com.vaguehope.morrigan.gui.Activator;
@@ -78,7 +77,7 @@ public class DbUpdateAction extends Action implements IWorkbenchAction{
 		}
 		
 		if (task != null) {
-			TaskJob job = new TaskJob(task, Display.getCurrent());
+			TaskJob job = new TaskJob(task);
 			job.schedule();
 		}
 		else {

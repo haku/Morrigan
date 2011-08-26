@@ -362,7 +362,7 @@ public class ViewMediaExplorer extends ViewPart {
     			ILocalMixedMediaDb localDb = MediaFactoryImpl.get().getLocalMixedMediaDb(this.local.getIdentifier());
     			IRemoteMixedMediaDb remoteDb = RemoteMixedMediaDbFactory.getExisting(this.remote.getIdentifier());
     			IMorriganTask task = MediaFactoryImpl.get().getSyncMetadataRemoteToLocalTask(localDb, remoteDb);
-    			TaskJob job = new TaskJob(task, Display.getCurrent());
+    			TaskJob job = new TaskJob(task);
     			job.schedule();
 			}
 			catch (Exception e) {

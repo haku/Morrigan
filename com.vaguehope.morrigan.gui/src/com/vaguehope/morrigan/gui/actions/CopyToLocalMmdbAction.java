@@ -2,7 +2,6 @@ package com.vaguehope.morrigan.gui.actions;
 
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbenchPart;
 
@@ -44,7 +43,7 @@ public class CopyToLocalMmdbAction<T extends IMediaItem> extends Action {
 			ILocalMixedMediaDb toMmdb = toMmdbEd.getMediaList();
 			
 			IMorriganTask task = MediaFactoryImpl.get().getNewCopyToLocalMmdbTask(fromList, this.fromEd.getSelectedItems(), toMmdb);
-			TaskJob job = new TaskJob(task, Display.getCurrent());
+			TaskJob job = new TaskJob(task);
 			job.schedule();
 		}
 		else {
