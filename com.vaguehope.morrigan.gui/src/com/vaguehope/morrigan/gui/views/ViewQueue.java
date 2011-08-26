@@ -84,7 +84,7 @@ public class ViewQueue extends ViewPart {
 		this.queue = queue;
 	}
 	
-	Runnable queueChangedRrefresher;
+	RefreshTimer queueChangedRrefresher;
 	
 	private void makeQueueChangedRrefresher () {
 		this.queueChangedRrefresher = new RefreshTimer(getSite().getShell().getDisplay(), 1000, new Runnable() {
@@ -209,6 +209,7 @@ public class ViewQueue extends ViewPart {
 	protected IAction moveUpAction = new Action("Move up", Activator.getImageDescriptor("icons/arrow-up.gif")) {
 		@Override
 		public void run() {
+			ViewQueue.this.queueChangedRrefresher.reset();
 			ViewQueue.this.abstractPlayerView.getPlayer().moveInQueue(getSelectedSources(), false);
 		}
 	};
@@ -216,6 +217,7 @@ public class ViewQueue extends ViewPart {
 	protected IAction moveDownAction = new Action("Move down", Activator.getImageDescriptor("icons/arrow-down.gif")) {
 		@Override
 		public void run() {
+			ViewQueue.this.queueChangedRrefresher.reset();
 			ViewQueue.this.abstractPlayerView.getPlayer().moveInQueue(getSelectedSources(), true);
 		}
 	};
