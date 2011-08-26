@@ -4,7 +4,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
 import org.eclipse.swt.widgets.Composite;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -14,9 +13,9 @@ import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
 import com.vaguehope.morrigan.player.IPlayerEventHandler;
 import com.vaguehope.morrigan.player.IPlayerLocal;
+import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlayerRegister;
-import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.server.MorriganServer;
 
 public class Activator implements BundleActivator {
@@ -32,7 +31,7 @@ public class Activator implements BundleActivator {
 	@Override
 	public void start (BundleContext context) throws Exception {
 		// Start server.
-		this.server = new MorriganServer();
+		this.server = new MorriganServer(context.getBundles());
 		this.server.start();
 		
 		// Prep player.

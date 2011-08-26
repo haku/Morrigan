@@ -8,7 +8,7 @@
 
    <launcherArgs>
       <programArgs>-console</programArgs>
-      <vmArgs>-Dosgi.requiredJavaVersion=1.5 -XX:MaxPermSize=256m -Xms40m -Xmx512m -Declipse.ignoreApp=true -Dosgi.noShutdown=true -Djava.net.preferIPv4Stack=true</vmArgs>
+      <vmArgs>-Declipse.ignoreApp=true -Dosgi.noShutdown=true -Djava.net.preferIPv4Stack=true</vmArgs>
       <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
    </launcherArgs>
 
@@ -38,6 +38,7 @@
       <plugin id="com.vaguehope.morrigan.server.boot"/>
       <plugin id="com.vaguehope.morrigan.util"/>
       <plugin id="com.vaguehope.morrigan.util.httpclient"/>
+      <plugin id="com.vaguehope.morrigan.wui"/>
       <plugin id="com.vaguehope.sqlitewrapper"/>
       <plugin id="org.eclipse.core.runtime"/>
       <plugin id="org.eclipse.osgi"/>
@@ -57,11 +58,11 @@
    </plugins>
 
    <configurations>
-      <plugin id="com.vaguehope.morrigan.osgiconsole" autoStart="true" startLevel="1" />
-      <plugin id="com.vaguehope.morrigan.playbackimpl.dsj" autoStart="true" startLevel="1" />
-      <plugin id="com.vaguehope.morrigan.playbackimpl.gs" autoStart="true" startLevel="1" />
-      <plugin id="com.vaguehope.morrigan.playbackimpl.jmf" autoStart="true" startLevel="1" />
-      <plugin id="com.vaguehope.morrigan.server.boot" autoStart="true" startLevel="1" />
+      <plugin id="com.vaguehope.morrigan.osgiconsole" autoStart="true" startLevel="0" />
+      <plugin id="com.vaguehope.morrigan.playbackimpl.dsj" autoStart="true" startLevel="0" />
+      <plugin id="com.vaguehope.morrigan.playbackimpl.gs" autoStart="true" startLevel="0" />
+      <plugin id="com.vaguehope.morrigan.playbackimpl.jmf" autoStart="true" startLevel="0" />
+      <plugin id="com.vaguehope.morrigan.server.boot" autoStart="true" startLevel="0" />
       <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="0" />
       <plugin id="org.eclipse.osgi" autoStart="true" startLevel="0" />
    </configurations>

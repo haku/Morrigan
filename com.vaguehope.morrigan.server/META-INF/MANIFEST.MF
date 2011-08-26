@@ -20,9 +20,11 @@ Import-Package: com.vaguehope.morrigan.config,
  com.vaguehope.morrigan.player,
  com.vaguehope.morrigan.util,
  com.vaguehope.morrigan.util.httpclient,
+ com.vaguehope.morrigan.wui,
  com.vaguehope.sqlitewrapper,
  javax.servlet,
  javax.servlet.http,
+ org.eclipse.core.runtime;version="3.4.0",
  org.eclipse.jetty.http,
  org.eclipse.jetty.server,
  org.eclipse.jetty.server.bio,
@@ -30,7 +32,8 @@ Import-Package: com.vaguehope.morrigan.config,
  org.eclipse.jetty.servlet,
  org.eclipse.jetty.util.component,
  org.eclipse.jetty.webapp,
- org.eclipse.swt.widgets
+ org.eclipse.swt.widgets,
+ org.osgi.framework;version="1.6.0"
 Bundle-ClassPath: lib/xml-writer.jar,
  .
 Bundle-Vendor: vaguehope.com
