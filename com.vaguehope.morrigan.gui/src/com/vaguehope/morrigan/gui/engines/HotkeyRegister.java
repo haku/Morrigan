@@ -10,7 +10,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Logger;
 
 import com.vaguehope.morrigan.engines.EngineFactory;
-import com.vaguehope.morrigan.engines.common.ImplException;
 import com.vaguehope.morrigan.engines.hotkey.HotkeyException;
 import com.vaguehope.morrigan.engines.hotkey.HotkeyValue;
 import com.vaguehope.morrigan.engines.hotkey.IHotkeyEngine;
@@ -98,7 +97,7 @@ public class HotkeyRegister {
 	}
 	
 	@SuppressWarnings("boxing")
-	private static void clearConfig () throws HotkeyException, ImplException {
+	private static void clearConfig () throws HotkeyException {
 		IHotkeyEngine engine = getHotkeyEngine(false);
 		
 		if (engine != null) {
@@ -147,7 +146,7 @@ public class HotkeyRegister {
 	
 	static private final AtomicReference<IHotkeyEngine> hotkeyEngine = new AtomicReference<IHotkeyEngine>(null);
 	
-	private static IHotkeyEngine getHotkeyEngine (boolean create) throws ImplException {
+	private static IHotkeyEngine getHotkeyEngine (boolean create) {
 		if (hotkeyEngine.get() == null && create) {
 			IHotkeyEngine e = EngineFactory.makeHotkeyEngine();
 			if (e != null) {
