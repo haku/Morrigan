@@ -254,6 +254,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<Q, ? extends IMed
 		}
 		
 		taskEventListener.logMsg(this.getItemList().getListName(), "Added " + filesAdded + " files.");
+		this.getItemList().getDbLayer().getChangeEventCaller().eventMessage("Added " + filesAdded + " items to " + this.getItemList().getListName() + ".");
 		
 		return null;
 	}
@@ -548,6 +549,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<Q, ? extends IMed
 				String hashcodeString = hashcode == null ? "null" : hashcode.toString(16);
 				taskEventListener.logMsg(this.getItemList().getListName(), hashcodeString + " : " + e.getValue() + " : " + e.getKey().getTitle());
 			}
+			this.getItemList().getDbLayer().getChangeEventCaller().eventMessage(this.itemList.getListName()+ " contains " + dups.size() + " duplicate items.");
 		}
 		else {
 			taskEventListener.logMsg(this.getItemList().getListName(), "No duplicates found.");

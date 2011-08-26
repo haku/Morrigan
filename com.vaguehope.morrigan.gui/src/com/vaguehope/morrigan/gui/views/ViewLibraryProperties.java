@@ -15,6 +15,7 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DirectoryDialog;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.ViewPart;
@@ -199,6 +200,16 @@ public class ViewLibraryProperties extends ViewPart {
 //	Events.
 	
 	private MediaItemListChangeListener listChangeListener = new MediaItemListChangeListener () {
+		
+		@Override
+		public void eventMessage(final String msg) {
+			Display.getDefault().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					getViewSite().getActionBars().getStatusLineManager().setMessage(msg);
+				}
+			});
+		}
 		
 		@Override
 		public void mediaListRead() {

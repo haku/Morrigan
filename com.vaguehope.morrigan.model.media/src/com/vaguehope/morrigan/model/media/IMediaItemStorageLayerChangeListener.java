@@ -9,6 +9,8 @@ import com.vaguehope.morrigan.model.db.IDbItem;
 public interface IMediaItemStorageLayerChangeListener<T extends IMediaItem> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	public void eventMessage (String msg);
+	
 	public void propertySet (String key, String value);
 	
 	public void mediaItemAdded (String filePath);
