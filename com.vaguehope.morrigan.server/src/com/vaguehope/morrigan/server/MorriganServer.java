@@ -1,6 +1,9 @@
 package com.vaguehope.morrigan.server;
 
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.bio.SocketConnector;
@@ -15,8 +18,14 @@ import org.eclipse.jetty.webapp.WebAppContext;
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 
-public class MorriganServer {
+public class MorriganServer implements Listener {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	private static final int PORT = 8080;
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	protected final Logger logger = Logger.getLogger(this.getClass().getName());
 	
 	private final Server server;
 	
@@ -29,7 +38,7 @@ public class MorriganServer {
 			this.server = new Server();
 			
 			Connector connector = new SocketConnector();
-			connector.setPort(8080);
+			connector.setPort(PORT);
 			this.server.addConnector(connector);
 			
 //			SslSocketConnector sslConnector = new SslSocketConnector();
@@ -42,7 +51,7 @@ public class MorriganServer {
 //			sslConnector.setPort(8443);
 //			this.server.addConnector(sslConnector);
 			
-			this.server.addLifeCycleListener(this.listener);
+			this.server.addLifeCycleListener(this);
 			
 			ContextHandlerCollection contexts = new ContextHandlerCollection();
 			this.server.setHandler(contexts);
@@ -87,37 +96,34 @@ public class MorriganServer {
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Listener methods.
 	
-	private Listener listener = new Listener() {
-		
-		@Override
-		public void lifeCycleStarting(LifeCycle lc) {
-			System.err.println("Server starting...");
-		}
-		
-		@Override
-		public void lifeCycleStarted(LifeCycle lc) {
-			System.err.println("Server started.");
-		}
-		
-		@Override
-		public void lifeCycleStopping(LifeCycle lc) {
-			System.err.println("Server stopping...");
-		}
-		
-		@Override
-		public void lifeCycleStopped(LifeCycle lc) {
-			System.err.println("Server stopped.");
-			callOnStopRunnable();
-		}
-		
-		@Override
-		public void lifeCycleFailure(LifeCycle lc, Throwable t) {
-			System.err.println("Server failed.");
-			t.printStackTrace();
-			callOnStopRunnable();
-		}
-	};
+	@Override
+	public void lifeCycleStarting(LifeCycle lc) {
+		MorriganServer.this.logger.fine("Server starting...");
+	}
+	
+	@Override
+	public void lifeCycleStarted(LifeCycle lc) {
+		MorriganServer.this.logger.info("Server started and listening on port "+PORT+".");
+	}
+	
+	@Override
+	public void lifeCycleStopping(LifeCycle lc) {
+		MorriganServer.this.logger.fine("Server stopping...");
+	}
+	
+	@Override
+	public void lifeCycleStopped(LifeCycle lc) {
+		MorriganServer.this.logger.info("Server stopped.");
+		callOnStopRunnable();
+	}
+	
+	@Override
+	public void lifeCycleFailure(LifeCycle lc, Throwable t) {
+		MorriganServer.this.logger.log(Level.WARNING, "Server failed.", t);
+		callOnStopRunnable();
+	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	

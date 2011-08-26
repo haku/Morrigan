@@ -42,7 +42,7 @@ public class Activator implements BundleActivator {
 	public static void init () {
 		boolean r = inited.compareAndSet(false, true);
 		if (r) {
-			logger.info("Gst.init().");
+			logger.fine("Gst.init().");
 			Gst.init("VideoPlayer", new String[] {});
 		}
 	}

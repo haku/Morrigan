@@ -34,7 +34,6 @@ public class Activator implements BundleActivator {
 		// Start server.
 		this.server = new MorriganServer();
 		this.server.start();
-		logger.fine("Morrigan Server listening on port [TODO insert port number here].");
 		
 		// Prep player.
 		this.player = PlayerRegister.makeLocalPlayer("Server", this.eventHandler); // TODO why is this called in 2 places???
