@@ -7,11 +7,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 
 
 public class Config {
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	private static final Logger logger = Logger.getLogger(Config.class.getName());
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private static final String DIR_CONFIG = "/.morrigan";
@@ -100,7 +105,7 @@ public class Config {
 		synchronized (propertiesLock) {
 			if (properties == null) {
 				File file = new File(PROP_FILE);
-				System.out.println("PROP_FILE=" + file.getAbsolutePath());
+				logger.info("PROP_FILE=" + file.getAbsolutePath());
 				Properties props = new Properties();
 				FileInputStream fis = null;
 				try {

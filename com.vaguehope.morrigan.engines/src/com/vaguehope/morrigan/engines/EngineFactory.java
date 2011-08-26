@@ -56,12 +56,7 @@ public class EngineFactory {
     		}
 		}
 		
-		if (engine != null) {
-			logger.info("About " + engine.getClass().getName() + ":\n" + engine.getAbout());
-		}
-		else {
-			logger.warning("Failed to create PlaybackEngine instance.");
-		}
+		if (engine == null) logger.warning("Failed to create PlaybackEngine instance.");
 		
 		return engine;
 	}
@@ -95,12 +90,7 @@ public class EngineFactory {
     		}
 		}
 		
-		if (engine != null) {
-			logger.info("About " + engine.getClass().getName() + ":\n" + engine.getAbout());
-		}
-		else {
-			logger.warning("Failed to create HotkeyEngine instance.");
-		}
+		if (engine == null) logger.warning("Failed to create HotkeyEngine instance.");
 		
 		return engine;
 	}
