@@ -14,7 +14,7 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.component.LifeCycle;
 import org.eclipse.jetty.util.component.LifeCycle.Listener;
 import org.eclipse.jetty.webapp.WebAppContext;
-import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.wui.MorriganWui;
@@ -34,7 +34,7 @@ public class MorriganServer implements Listener {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public MorriganServer (Bundle[] bundles) throws MorriganException {
+	public MorriganServer (BundleContext context) throws MorriganException {
 		try {
 			this.server = new Server();
 			Connector connector = new SocketConnector();
@@ -59,7 +59,7 @@ public class MorriganServer implements Listener {
 			servletContext.addServlet(new ServletHolder(new PlayersServlet()), PlayersServlet.CONTEXTPATH + "/*");
 			servletContext.addServlet(new ServletHolder(new MlistsServlet()), MlistsServlet.CONTEXTPATH + "/*");
 			
-			WebAppContext warContext = WebAppHelper.getWarBundleAsContext(bundles, MorriganWui.ID, "/");
+			WebAppContext warContext = WebAppHelper.getWarBundleAsContext(context, MorriganWui.ID, "/");
 			contexts.addHandler(warContext);
 			
 			ContextHandler conPlayers = new ContextHandler();

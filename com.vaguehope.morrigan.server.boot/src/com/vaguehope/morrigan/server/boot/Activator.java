@@ -31,7 +31,7 @@ public class Activator implements BundleActivator {
 	@Override
 	public void start (BundleContext context) throws Exception {
 		// Start server.
-		this.server = new MorriganServer(context.getBundles());
+		this.server = new MorriganServer(context);
 		this.server.start();
 		
 		// Prep player.
