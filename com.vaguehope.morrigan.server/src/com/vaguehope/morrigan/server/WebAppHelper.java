@@ -7,6 +7,7 @@ import java.net.URL;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
 
 public class WebAppHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -21,8 +22,8 @@ public class WebAppHelper {
 	/**
 	 * Look up and load a WAR bundle in an OSGI environment.
 	 */
-	static public WebAppContext getWarBundleAsContext (Bundle[] bundles, String warBundleName, String contextPath) throws IOException {
-		Bundle warBundle = findBundle(bundles, warBundleName);
+	static public WebAppContext getWarBundleAsContext (BundleContext context, String warBundleName, String contextPath) throws IOException {
+		Bundle warBundle = findBundle(context, warBundleName);
 		URL fileURL = FileLocator.toFileURL(warBundle.getEntry("/")); // I think org.eclipse.core.runtime must be started before this is called.  Or something like that.
 		File warFile = new File(fileURL.getPath());
 		
@@ -30,7 +31,7 @@ public class WebAppHelper {
 		warContext.setContextPath(contextPath);
 		warContext.setWar(warFile.getAbsolutePath());
 		
-		Bundle jettyWebappBundle = findBundle(bundles, JETTY_WEBAPP_BUNDLE_NAME);
+		Bundle jettyWebappBundle = findBundle(context, JETTY_WEBAPP_BUNDLE_NAME);
 		URL webDefaultUrl = jettyWebappBundle.getResource(JETTY_WEBDEFAULT_PATH);
 		warContext.setDefaultsDescriptor(webDefaultUrl.toExternalForm());
 		return warContext;
@@ -39,8 +40,8 @@ public class WebAppHelper {
 	/**
 	 * This should never return null.
 	 */
-	static private Bundle findBundle (Bundle[] bundles, String name) {
-		for (Bundle bundle : bundles) {
+	static private Bundle findBundle (BundleContext context, String name) {
+		for (Bundle bundle : context.getBundles()) {
 			if (bundle.getSymbolicName().equals(name)) return bundle;
 		}
 		throw new IllegalStateException("Bundle '"+name+"' not found.");
