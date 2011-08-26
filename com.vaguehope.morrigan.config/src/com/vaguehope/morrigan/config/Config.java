@@ -3,9 +3,6 @@ package com.vaguehope.morrigan.config;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -91,10 +88,6 @@ public class Config {
 	
 	private static final String PROP_FILE = "morrigan.properties";
 	
-	private static final String PROP_ENG_PE_CLASS = "engines.playback.class";
-	private static final String PROP_ENG_HK_CLASS = "engines.hotkey.class";
-	private static final String PROP_ENG_JARDIRS = "engines.jardirs";
-	
 	private static final String PROP_MEDIA_TYPES = "media.types";
 	private static final String PROP_MEDIA_PICTURE_TYPES = "media.pictures.types";
 	
@@ -126,48 +119,6 @@ public class Config {
 		return properties;
 	}
 	
-	public static File[] getPluginJarPaths () throws MorriganException {
-		List<File> ret = new ArrayList<File>();
-		
-		String data = getProperties().getProperty(PROP_ENG_JARDIRS);
-		String[] dirs = data.split("\\|");
-		for (String dir : dirs) {
-			File dirFile = new File(dir);
-			ret.add(dirFile);
-		}
-		
-		File[] files = new File[] {};
-		return ret.toArray( files );
-	}
-	
-	/**
-	 * Returns list of file objects.
-	 * @return
-	 * @throws MorriganException
-	 */
-	public static File[] getPluginJars () throws MorriganException {
-		List<File> ret = new ArrayList<File>();
-		File[] paths = getPluginJarPaths();
-		
-		for (File dir : paths) {
-			File[] listFiles = dir.listFiles(new FileExtFilter("jar"));
-			if (listFiles!=null && listFiles.length>0) {
-				ret.addAll(Arrays.asList(listFiles));
-			}
-		}
-		
-		File[] files = new File[] {};
-		return ret.toArray( files );
-	}
-	
-	public static String getPlaybackEngineClass () throws MorriganException {
-		return getProperties().getProperty(PROP_ENG_PE_CLASS);
-	}
-	
-	public static String getHotKeyEngineClass () throws MorriganException {
-		return getProperties().getProperty(PROP_ENG_HK_CLASS);
-	}
-	
 	/**
 	 * @return Array of lower-case strings without dots.  e.g. "mp3", "ogg".
 	 */
@@ -194,21 +145,6 @@ public class Config {
 		}
 		
 		return arrTypes;
-	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	static private String WAR_FILE = "morrigan.wui.war";
-	static private String WAR_PROP = "wui.war";
-	
-	static public String getWuiWarLocation () throws MorriganException {
-		File f = new File(WAR_FILE);
-		if (f.exists()) return f.getAbsolutePath();
-		
-		String p = getProperties().getProperty(WAR_PROP);
-		if (p != null) return p;
-		
-		throw new MorriganException("Failed to find " + WAR_FILE);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
