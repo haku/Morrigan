@@ -118,6 +118,14 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 	private MediaItemListChangeListener changeCaller = new MediaItemListChangeListener () {
 		
 		@Override
+		public void eventMessage(String msg) {
+			if (MediaItemList.this.logger.isLoggable(Level.FINEST)) MediaItemList.this.logger.finest(getListName() +  " eventMessage=" + msg);
+			for (MediaItemListChangeListener listener : MediaItemList.this.changeEventListeners) {
+				listener.eventMessage(msg);
+			}
+		}
+		
+		@Override
 		public void dirtyStateChanged(DirtyState oldState, DirtyState newState) {
 			if (MediaItemList.this.logger.isLoggable(Level.FINEST)) MediaItemList.this.logger.finest(getListName() +  " oldState=" + oldState + " newState=" + newState);
 			for (MediaItemListChangeListener listener : MediaItemList.this.changeEventListeners) {

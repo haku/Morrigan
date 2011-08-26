@@ -454,7 +454,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 			}
 			if (n<1) throw new DbException("No update occured for addTrack('"+filePath+"','"+lastModified+"').");
 			
-			getChangeCaller().mediaItemAdded(filePath);
+			getChangeEventCaller().mediaItemAdded(filePath);
 			
 			return true;
 		}
@@ -487,7 +487,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 				b[i] = (n[i] > 0 || n[i] == Statement.SUCCESS_NO_INFO);
 				if (b[i]) added.add(files.get(i));
 			}
-			getChangeCaller().mediaItemsAdded(added);
+			getChangeEventCaller().mediaItemsAdded(added);
 			return b;
 		}
 		finally {
@@ -507,7 +507,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 			ps.close();
 		}
 		
-		if (ret == 1) getChangeCaller().mediaItemRemoved(sfile);
+		if (ret == 1) getChangeEventCaller().mediaItemRemoved(sfile);
 		
 		return ret;
 	}
@@ -524,7 +524,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 			ps.close();
 		}
 		
-		if (ret == 1) getChangeCaller().mediaItemRemoved(null); // FIXME pass a useful parameter here.
+		if (ret == 1) getChangeEventCaller().mediaItemRemoved(null); // FIXME pass a useful parameter here.
 		
 		return ret;
 	}
@@ -545,7 +545,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 			ps.close();
 		}
 		if (n<1) throw new DbException("No update occured for local_setDateAdded('"+sfile+"','"+date+"').");
-		getChangeCaller().mediaItemUpdated(sfile);
+		getChangeEventCaller().mediaItemUpdated(sfile);
 	}
 	
 	protected void local_setHashCode (String sfile, BigInteger hashcode) throws SQLException, ClassNotFoundException, DbException {
@@ -565,7 +565,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 			ps.close();
 		}
 		if (n<1) throw new DbException("No update occured for local_setHashCode('"+sfile+"','"+hashcode+"').");
-		getChangeCaller().mediaItemUpdated(sfile);
+		getChangeEventCaller().mediaItemUpdated(sfile);
 	}
 	
 	protected void local_setDateLastModified (String sfile, Date date) throws SQLException, ClassNotFoundException, DbException {
@@ -580,7 +580,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 			ps.close();
 		}
 		if (n<1) throw new DbException("No update occured for local_setDateLastModified('"+sfile+"','"+date+"').");
-		getChangeCaller().mediaItemUpdated(sfile);
+		getChangeEventCaller().mediaItemUpdated(sfile);
 	}
 	
 	protected void local_setEnabled (String sfile, boolean value) throws SQLException, ClassNotFoundException, DbException {
@@ -595,7 +595,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 			ps.close();
 		}
 		if (n<1) throw new DbException("No update occured for local_setEnabled('"+sfile+"','"+value+"').");
-		getChangeCaller().mediaItemUpdated(sfile);
+		getChangeEventCaller().mediaItemUpdated(sfile);
 	}
 	
 	protected void local_setMissing (String sfile, boolean value) throws SQLException, ClassNotFoundException, DbException {
@@ -610,7 +610,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 			ps.close();
 		}
 		if (n<1) throw new DbException("No update occured for local_setMissing('"+sfile+"','"+value+"').");
-		getChangeCaller().mediaItemUpdated(sfile);
+		getChangeEventCaller().mediaItemUpdated(sfile);
 	}
 	
 	protected void local_setRemoteLocation(String sfile, String remoteLocation) throws SQLException, ClassNotFoundException, DbException {
@@ -625,7 +625,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 			ps.close();
 		}
 		if (n<1) throw new DbException("No update occured for local_setRemoteLocation('"+sfile+"','"+remoteLocation+"').");
-		getChangeCaller().mediaItemUpdated(sfile);
+		getChangeEventCaller().mediaItemUpdated(sfile);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -644,7 +644,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 			ps.close();
 		}
 		if (n<1) throw new DbException("No update occured.");
-		getChangeCaller().mediaItemUpdated(sfile);
+		getChangeEventCaller().mediaItemUpdated(sfile);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -664,7 +664,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 			ps.close();
 		}
 		if (n<1) throw new DbException("No update occured.");
-		getChangeCaller().mediaItemUpdated(sfile);
+		getChangeEventCaller().mediaItemUpdated(sfile);
 	}
 	
 	protected void local_incTrackStartCnt (String sfile, long x) throws SQLException, ClassNotFoundException, DbException {
@@ -680,7 +680,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 			ps.close();
 		}
 		if (n<1) throw new DbException("No update occured.");
-		getChangeCaller().mediaItemUpdated(sfile);
+		getChangeEventCaller().mediaItemUpdated(sfile);
 	}
 	
 	protected void local_setTrackStartCnt (String sfile, long x) throws SQLException, ClassNotFoundException, DbException {
@@ -696,7 +696,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 			ps.close();
 		}
 		if (n<1) throw new DbException("No update occured.");
-		getChangeCaller().mediaItemUpdated(sfile);
+		getChangeEventCaller().mediaItemUpdated(sfile);
 	}
 	
 	protected void local_setDateLastPlayed (String sfile, Date date) throws SQLException, ClassNotFoundException, DbException {
@@ -712,7 +712,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 			ps.close();
 		}
 		if (n<1) throw new DbException("No update occured.");
-		getChangeCaller().mediaItemUpdated(sfile);
+		getChangeEventCaller().mediaItemUpdated(sfile);
 	}
 	
 	protected void local_incTrackEndCnt (String sfile, long x) throws SQLException, ClassNotFoundException, DbException {
@@ -728,7 +728,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 			ps.close();
 		}
 		if (n<1) throw new DbException("No update occured.");
-		getChangeCaller().mediaItemUpdated(sfile);
+		getChangeEventCaller().mediaItemUpdated(sfile);
 	}
 	
 	protected void local_setTrackEndCnt (String sfile, long x) throws SQLException, ClassNotFoundException, DbException {
@@ -744,7 +744,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 			ps.close();
 		}
 		if (n<1) throw new DbException("No update occured.");
-		getChangeCaller().mediaItemUpdated(sfile);
+		getChangeEventCaller().mediaItemUpdated(sfile);
 	}
 	
 	protected void local_setTrackDuration (String sfile, int duration) throws SQLException, ClassNotFoundException, DbException {
@@ -759,7 +759,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 			ps.close();
 		}
 		if (n<1) throw new DbException("No update occured.");
-		getChangeCaller().mediaItemUpdated(sfile);
+		getChangeEventCaller().mediaItemUpdated(sfile);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -778,7 +778,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 			ps.close();
 		}
 		if (n<1) throw new DbException("No update occured for setRemoteLocation('"+sfile+"','"+width+"','"+height+"').");
-		getChangeCaller().mediaItemUpdated(sfile);
+		getChangeEventCaller().mediaItemUpdated(sfile);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

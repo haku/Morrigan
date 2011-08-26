@@ -38,6 +38,7 @@ import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.TableColumn;
@@ -380,6 +381,16 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 //	Refreshing.
 	
 	private MediaItemListChangeListener listChangeListener = new MediaItemListChangeListener () {
+		
+		@Override
+		public void eventMessage(final String msg) {
+			Display.getDefault().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					getEditorSite().getActionBars().getStatusLineManager().setMessage(msg);
+				}
+			});
+		}
 		
 		@Override
 		public void dirtyStateChanged(DirtyState oldState, DirtyState newState) {

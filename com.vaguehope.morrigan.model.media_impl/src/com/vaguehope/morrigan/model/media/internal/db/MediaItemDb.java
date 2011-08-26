@@ -352,6 +352,11 @@ public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMedi
 	private IMediaItemStorageLayerChangeListener<T> storageChangeListener = new IMediaItemStorageLayerChangeListener<T> () {
 		
 		@Override
+		public void eventMessage(String msg) {
+			getChangeEventCaller().eventMessage(msg);
+		}
+		
+		@Override
 		public void propertySet(String key, String value) { /* Unused. */ }
 		
 		@Override

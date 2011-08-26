@@ -108,6 +108,8 @@ public class Player implements IPlayerLocal {
 		}
 		
 		@Override
+		public void eventMessage(String msg) { /* Unused. */ }
+		@Override
 		public void mediaListRead() { /* Unused. */ }
 		@Override
 		public void dirtyStateChanged (DirtyState oldState, DirtyState newState) { /* Unused. */ }

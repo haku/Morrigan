@@ -10,6 +10,8 @@ package com.vaguehope.morrigan.model.media;
 public interface MediaItemListChangeListener {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	public void eventMessage (String msg);
+	
 	public void dirtyStateChanged (DirtyState oldState, DirtyState newState);
 	
 	public void mediaListRead ();

@@ -49,6 +49,13 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	private final IMediaItemStorageLayerChangeListener<T> changeCaller = new IMediaItemStorageLayerChangeListener<T> () {
 		
 		@Override
+		public void eventMessage(String msg) {
+			for (IMediaItemStorageLayerChangeListener<T> l : MediaSqliteLayer.this.changeListeners) {
+				l.eventMessage(msg);
+			}
+		};
+		
+		@Override
 		public void propertySet(String key, String value) {
 			for (IMediaItemStorageLayerChangeListener<T> l : MediaSqliteLayer.this.changeListeners) {
 				l.propertySet(key, value);
@@ -113,7 +120,8 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		
 	};
 	
-	protected IMediaItemStorageLayerChangeListener<T> getChangeCaller () {
+	@Override
+	public IMediaItemStorageLayerChangeListener<T> getChangeEventCaller () {
 		return this.changeCaller;
 	}
 	
