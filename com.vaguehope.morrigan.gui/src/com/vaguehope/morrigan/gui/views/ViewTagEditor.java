@@ -7,7 +7,6 @@ import java.util.List;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -15,8 +14,8 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -35,7 +34,6 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
 
 import com.vaguehope.morrigan.gui.Activator;
-import com.vaguehope.morrigan.gui.adaptors.DropMenuListener;
 import com.vaguehope.morrigan.gui.dialogs.MorriganMsgDlg;
 import com.vaguehope.morrigan.gui.dialogs.RunnableDialog;
 import com.vaguehope.morrigan.gui.editors.IMediaItemDbEditor;
@@ -270,22 +268,20 @@ public class ViewTagEditor extends ViewPart {
 	Text txtNewTag;
 	private Button btnAddTag;
 	private Button btnRemoveTag;
-	private Button btnMenu;
 	TableViewer tableViewer;
 	
 	Runnable tagsChangedRrefresher;
 	
 	private void createLayout (Composite parent) {
-		FormData formData;
+		getViewSite().getActionBars().getMenuManager().add(this.readTagsAction);
 		
+		FormData formData;
 		parent.setLayout(new FormLayout());
 		
 		Composite tbCom = new Composite(parent, SWT.NONE);
 		this.txtNewTag = new Text(tbCom, SWT.SINGLE | SWT.BORDER);
 		this.btnAddTag = new Button(tbCom, SWT.PUSH);
 		this.btnRemoveTag = new Button(tbCom, SWT.PUSH);
-		this.btnMenu = new Button(tbCom, SWT.PUSH);
-		MenuManager menuMenuMgr = new MenuManager();
 		this.tableViewer = new TableViewer(parent, SWT.MULTI | SWT.V_SCROLL | SWT.FULL_SELECTION);
 		
 		tbCom.setLayout(new FormLayout());
@@ -312,17 +308,10 @@ public class ViewTagEditor extends ViewPart {
 		
 		this.btnRemoveTag.setImage(this.imageCache.readImage("icons/minus.gif"));
 		formData = new FormData();
-		formData.right = new FormAttachment(this.btnMenu, -this.sep);
-		formData.top = new FormAttachment(0, this.sep);
-		formData.bottom = new FormAttachment(100, -this.sep);
-		this.btnRemoveTag.setLayoutData(formData);
-		
-		this.btnMenu.setImage(this.imageCache.readImage("icons/pref.gif"));
-		formData = new FormData();
 		formData.right = new FormAttachment(100, -this.sep);
 		formData.top = new FormAttachment(0, this.sep);
 		formData.bottom = new FormAttachment(100, -this.sep);
-		this.btnMenu.setLayoutData(formData);
+		this.btnRemoveTag.setLayoutData(formData);
 		
 		this.tableViewer.setContentProvider(this.sourcesProvider);
 		this.tableViewer.setInput(getViewSite()); // use content provider.
@@ -348,26 +337,19 @@ public class ViewTagEditor extends ViewPart {
 			}
 		});
 		
-		this.btnAddTag.addSelectionListener(new SelectionListener() {
+		this.btnAddTag.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
 				procAddTag();
 			}
-			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {/* UNUSED */}
 		});
 		
-		this.btnRemoveTag.addSelectionListener(new SelectionListener() {
+		this.btnRemoveTag.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
 				procRemoveTag();
 			}
-			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {/* UNUSED */}
 		});
-		
-		menuMenuMgr.add(this.readTagsAction);
-		this.btnMenu.addSelectionListener(new DropMenuListener(this.btnMenu, menuMenuMgr));
 	}
 	
 	private void makeRefresher () {
