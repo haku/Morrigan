@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.MenuManager;
@@ -26,10 +25,13 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.ISelectionService;
+import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
 
 import com.vaguehope.morrigan.gui.Activator;
@@ -65,6 +67,7 @@ public class ViewTagEditor extends ViewPart {
 		addPartListener();
 		initSelectionListener();
 		makeRefresher();
+		applySavedState();
 	}
 	
 	@Override
@@ -79,6 +82,39 @@ public class ViewTagEditor extends ViewPart {
 		removePartListener();
 		this.imageCache.clearCache();
 		super.dispose();
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	State.
+	
+	private static final String KEY_NEWTAG = "KEY_NEWTAG";
+	private String initialNewTag = null;
+	
+	/**
+	 * Called BEFORE createPartControl().
+	 */
+	@Override
+	public void init(IViewSite site, IMemento memento) throws PartInitException {
+		super.init(site, memento);
+		
+		if (memento != null) {
+			this.initialNewTag = memento.getString(KEY_NEWTAG);
+		}
+	}
+	
+	@Override
+	public void saveState(IMemento memento) {
+		memento.putString(KEY_NEWTAG, this.txtNewTag.getText());
+		
+		super.saveState(memento);
+	}
+	
+	/**
+	 * Because init() is called before createPartControl()
+	 * this is used to apply the state we read in init();
+	 */
+	private void applySavedState () {
+		if (this.initialNewTag != null) this.txtNewTag.setText(this.initialNewTag);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
