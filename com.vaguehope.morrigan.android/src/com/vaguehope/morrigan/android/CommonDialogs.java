@@ -107,7 +107,9 @@ public class CommonDialogs {
 				String query = editText.getText().toString().trim();
 				dialog.dismiss();
 				
-				if (defaultQuery != null) defaultQuery.set(query);
+				if (defaultQuery != null) defaultQuery.set(query); // Save the query for next time.
+				
+				if ("".equals(query)) query = "*"; // Default to searching for wild-card.
 				
 				Intent intent = new Intent(context.getApplicationContext(), MlistActivity.class);
 				intent.putExtra(MlistActivity.SERVER_BASE_URL, playerState.getPlayerReference().getServerReference().getBaseUrl());
