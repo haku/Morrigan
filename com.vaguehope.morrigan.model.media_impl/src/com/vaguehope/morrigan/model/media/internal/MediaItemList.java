@@ -115,7 +115,7 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 		this.changeEventListeners.remove(listener);
 	}
 	
-	private MediaItemListChangeListener changeCaller = new MediaItemListChangeListener () {
+	private final MediaItemListChangeListener changeCaller = new MediaItemListChangeListener () {
 		
 		@Override
 		public void eventMessage(String msg) {
