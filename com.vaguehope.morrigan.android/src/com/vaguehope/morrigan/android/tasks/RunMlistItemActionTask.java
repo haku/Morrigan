@@ -69,7 +69,11 @@ public class RunMlistItemActionTask extends AbstractTask<String> {
 	
 	@Override
 	protected String getProgressMsg () {
-		return "Please wait...";
+		switch (this.cmd) {
+			case PLAY: return "Playing...";
+			case QUEUE: return "Queueing...";
+			default: return "Please wait...";
+		}
 	}
 	
 	@Override

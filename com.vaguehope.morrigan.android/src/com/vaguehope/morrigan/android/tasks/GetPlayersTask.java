@@ -55,7 +55,7 @@ public class GetPlayersTask extends AbstractTask<PlayerStateList> {
 	
 	@Override
 	protected String getProgressMsg () {
-		return getActivity() == null ? "Please wait..." : null; // Only return msg if activity is null.
+		return getActivity() == null ? "Fetching player data..." : null; // Only return msg if activity is null.
 	}
 	
 	@Override
