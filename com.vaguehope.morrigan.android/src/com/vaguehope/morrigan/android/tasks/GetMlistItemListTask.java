@@ -55,7 +55,7 @@ public class GetMlistItemListTask extends AbstractTask<MlistItemList> {
 	
 	@Override
 	protected String getProgressMsg () {
-		return "Please wait...";
+		return "Fetching media items...";
 	}
 	
 	@Override
