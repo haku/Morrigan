@@ -1,0 +1,3 @@
+6237279bf1598bbcaa0a4c94a53e79fd dsj.zip http://www.humatic.de/webapps/php/download/archives/dsj.zip
+c49c9c047fdd8a9e8a6bae9ff1d30cf8 dsj.dll dsj.zip
+8cb5e230d798bc82adcf256cbcc957e9 dsj.jar dsj.zip
