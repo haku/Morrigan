@@ -1,1 +1,1 @@
-c216539ac1a4b187a2f02815372e793d lib/jaudiotagger-2.0.3.jar http://download.java.net/maven/2/org/jaudiotagger/2.0.3/jaudiotagger-2.0.3.jar
+c216539ac1a4b187a2f02815372e793d jaudiotagger-2.0.3.jar http://download.java.net/maven/2/org/jaudiotagger/2.0.3/jaudiotagger-2.0.3.jar
