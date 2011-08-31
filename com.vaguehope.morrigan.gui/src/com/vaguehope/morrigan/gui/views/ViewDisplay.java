@@ -81,13 +81,16 @@ public class ViewDisplay extends ViewPart {
 		
 		IContributionItem[] items = tbm.getItems();
 		for (int i = items.length - 1; i >= 0; i--) {
-			if (items[i] instanceof FullScreenAction) tbm.remove(items[i]);
+			if (FullScreenAction.ID.equals(items[i].getId())) {
+				tbm.remove(items[i]);
+			}
 		}
 		
 		Collection<FullScreenAction> fullScreenActions = this.viewControls.getFullScreenActions();
 		for (FullScreenAction a : fullScreenActions) {
 			tbm.add(a);
 		}
+		tbm.update(true);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
