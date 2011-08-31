@@ -3,9 +3,11 @@ package com.vaguehope.morrigan.gui.views;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -69,7 +71,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 	@Override
 	public void createPartControl(Composite parent) {
 		makeHistoryRefresher();
-		makeActions(parent);
+		makeActions();
 		setupHotkeys();
 	}
 	
@@ -185,14 +187,18 @@ public abstract class AbstractPlayerView extends ViewPart {
 		
 		@Override
 		public Map<Integer, String> getMonitors () {
-			return getMonitorCache();
+			Map<Integer, String> ret = new HashMap<Integer, String>();
+			for (Entry<Integer, Monitor> e : AbstractPlayerView.this.getMonitors().entrySet()) {
+				Rectangle bounds = e.getValue().getBounds();
+				ret.put(e.getKey(), bounds.width + "x" + bounds.height);
+			}
+			return ret;
 		}
 		
 		@Override
 		public void goFullscreen(int monitor) {
-			Monitor mon = monitorFromIndex(monitor);
 			FullScreenAction act = fullScreenActionFromIndex(monitor);
-			goFullScreenSafe(mon, act);
+			goFullScreenSafe(act);
 		}
 		
 		@Override
@@ -355,53 +361,50 @@ public abstract class AbstractPlayerView extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Full screen stuff.
 	
-	Map<Integer, String> monitorCacheS = null;
-	Map<Integer, Monitor> monitorCacheM = null;
-	Map<Integer, FullScreenAction> fullScreenActions = null;
+	private final static long MONITOR_CACHE_MAX_AGE = 1000; // 1 second.
+	private long monitorCacheAge = 0;
+	protected Map<Integer, Monitor> _monitorCacheMap = null;
 	
-	FullscreenShell fullscreenShell = null;
-	
-	protected Map<Integer, String> getMonitorCache () {
-		if (this.monitorCacheS == null || this.monitorCacheM == null) { // TODO check age of cache?
+	protected Map<Integer, Monitor> getMonitors () {
+		if (this._monitorCacheMap == null || this.monitorCacheAge <= 0 || System.currentTimeMillis() - this.monitorCacheAge > MONITOR_CACHE_MAX_AGE) {
 			getSite().getShell().getDisplay().syncExec(new Runnable() {
 				@Override
-				public void run() {
-					Map<Integer, String> retS = new LinkedHashMap<Integer, String>();
-					Map<Integer, Monitor> retM = new LinkedHashMap<Integer, Monitor>();
-					
-					for (int i = 0; i < getSite().getShell().getDisplay().getMonitors().length; i++) {
-						Monitor mon = getSite().getShell().getDisplay().getMonitors()[i];
-						Rectangle bounds = mon.getBounds();
+				public void run () {
+					Map<Integer, Monitor> ret = new LinkedHashMap<Integer, Monitor>();
+					Monitor[] monitors = getSite().getShell().getDisplay().getMonitors();
+					for (int i = 0; i < monitors.length; i++) {
 						Integer integer = Integer.valueOf(i);
-						retS.put(integer, bounds.width + "x" + bounds.height);
-						retM.put(integer, mon);
+						Monitor mon = monitors[i];
+						ret.put(integer, mon);
 					}
-					
-					AbstractPlayerView.this.monitorCacheS = Collections.unmodifiableMap(retS);
-					AbstractPlayerView.this.monitorCacheM = Collections.unmodifiableMap(retM);
+					AbstractPlayerView.this._monitorCacheMap = ret;
 				}
 			});
 		}
-		return this.monitorCacheS;
+		return Collections.unmodifiableMap(this._monitorCacheMap);
 	}
 	
-	protected Monitor monitorFromIndex (int index) {
-		getMonitorCache();
-		return this.monitorCacheM.get(Integer.valueOf(index));
-	}
+	Map<Integer, FullScreenAction> fullScreenActions = null;
+	FullscreenShell fullscreenShell = null;
 	
+	/**
+	 * Call from UI thread only.
+	 */
 	protected Collection<FullScreenAction> getFullScreenActions () {
-		Monitor[] monitors = getSite().getShell().getDisplay().getMonitors();
-		if (this.fullScreenActions == null || this.fullScreenActions.size() != monitors.length) {
+		Map<Integer, Monitor> monitors = getMonitors();
+		if (this.fullScreenActions == null || this.fullScreenActions.size() != monitors.size()) {
 			LinkedHashMap<Integer, FullScreenAction> newActions = new LinkedHashMap<Integer, FullScreenAction>();
-			for (int i = 0; i < monitors.length; i++) {
-				newActions.put(Integer.valueOf(i), new FullScreenAction(i, monitors[i]));
+			for (Entry<Integer, Monitor> e : monitors.entrySet()) {
+				newActions.put(e.getKey(), new FullScreenAction(e.getKey().intValue(), e.getValue()));
 			}
 			this.fullScreenActions = newActions;
 		}
 		return this.fullScreenActions.values();
 	}
 	
+	/**
+	 * Call from UI thread only.
+	 */
 	protected FullScreenAction fullScreenActionFromIndex (int index) {
 		getFullScreenActions();
 		return this.fullScreenActions.get(Integer.valueOf(index));
@@ -417,11 +420,11 @@ public abstract class AbstractPlayerView extends ViewPart {
 	}
 	
 	void goFullScreenSafe () {
-		goFullScreenSafe(null, null);
+		goFullScreenSafe(null);
 	}
 	
-	void goFullScreenSafe (Monitor mon, FullScreenAction action) {
-		GoFullScreenRunner runner = new GoFullScreenRunner(mon, action);
+	void goFullScreenSafe (FullScreenAction action) {
+		GoFullScreenRunner runner = new GoFullScreenRunner(action);
 		if (Thread.currentThread().equals(getSite().getShell().getDisplay().getThread())) {
 			runner.run();
 		} else {
@@ -443,16 +446,16 @@ public abstract class AbstractPlayerView extends ViewPart {
 		private final Monitor mon;
 		private final Action action;
 		
-		public GoFullScreenRunner (Monitor mon, Action action) {
-			this.mon = mon;
+		public GoFullScreenRunner (FullScreenAction action) {
+			this.mon = action.getMonitor();
 			this.action = action;
 		}
 		
 		@Override
 		public void run() {
-			if (this.mon==null || this.action == null) {
+			if (this.mon == null || this.action == null) {
 				Monitor currentMon = null;
-				for (Monitor m : getSite().getShell().getDisplay().getMonitors()) {
+				for (Monitor m : getMonitors().values()) {
 					if (m.getBounds().contains(getSite().getShell().getDisplay().getCursorLocation())) {
 						currentMon = m;
 						break;
@@ -537,7 +540,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 	private List<OrderSelectAction> orderMenuActions = new ArrayList<OrderSelectAction>();
 	protected IAction jumpToAction;
 	
-	private void makeActions (Composite parent) {
+	private void makeActions () {
 		// Order menu.
 		for (PlaybackOrder o : PlaybackOrder.values()) {
 			OrderSelectAction a = new OrderSelectAction(o, new OrderChangedListener() {
@@ -601,7 +604,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 		
 		@Override
 		public void run() {
-			goFullScreenSafe(this.mon, this);
+			goFullScreenSafe(this);
 		}
 		
 	}
