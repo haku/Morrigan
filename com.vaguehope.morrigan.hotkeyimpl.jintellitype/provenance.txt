@@ -1,0 +1,3 @@
+f9c4f003689f1e3863ec1faf680331ae jintellitype-1.3.7-dist.zip https://jintellitype.googlecode.com/files/jintellitype-1.3.7-dist.zip
+31c855187bf89dae3b3d9a0501a6a741 jintellitype-1.3.7.jar jintellitype-1.3.7-dist.zip
+2f03f2ad54574ec900f1a8c91475071f JIntellitype.dll jintellitype-1.3.7-dist.zip
