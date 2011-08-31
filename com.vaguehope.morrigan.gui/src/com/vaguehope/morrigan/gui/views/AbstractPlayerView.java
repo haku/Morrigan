@@ -590,10 +590,13 @@ public abstract class AbstractPlayerView extends ViewPart {
 	
 	protected class FullScreenAction extends Action {
 		
+		public static final String ID = "com.vaguehope.morrigan.gui.FullScreenAction";
+		
 		private final Monitor mon;
 		
 		public FullScreenAction (int i, Monitor mon) {
 			super("Full screen on " + i, AS_CHECK_BOX);
+			this.setId(ID);
 			this.setImageDescriptor(Activator.getImageDescriptor("icons/display.gif"));
 			this.mon = mon;
 		}
