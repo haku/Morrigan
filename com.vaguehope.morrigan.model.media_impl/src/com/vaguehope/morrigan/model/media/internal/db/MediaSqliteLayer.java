@@ -53,7 +53,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 			for (IMediaItemStorageLayerChangeListener<T> l : MediaSqliteLayer.this.changeListeners) {
 				l.eventMessage(msg);
 			}
-		};
+		}
 		
 		@Override
 		public void propertySet(String key, String value) {
