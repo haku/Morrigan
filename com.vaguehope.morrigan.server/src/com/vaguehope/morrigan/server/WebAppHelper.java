@@ -12,7 +12,7 @@ import org.osgi.framework.BundleContext;
 public class WebAppHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private WebAppHelper () {};
+	private WebAppHelper () {}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -32,7 +32,7 @@ public class WebAppHelper {
 		warContext.setWar(warFile.getAbsolutePath());
 		
 		/* Jetty needs to find webdefault.xml but does not know how
-		 * OSGi class loaders works, so we need to give it some help.
+		 * OSGi class loaders work, so we need to give it some help.
 		 */
 		Bundle jettyWebappBundle = findBundle(context, JETTY_WEBAPP_BUNDLE_NAME);
 		URL webDefaultUrl = jettyWebappBundle.getResource(JETTY_WEBDEFAULT_PATH);
