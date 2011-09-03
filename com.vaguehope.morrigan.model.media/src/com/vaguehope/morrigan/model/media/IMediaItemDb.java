@@ -10,14 +10,13 @@ import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
 import com.vaguehope.sqlitewrapper.DbException;
 
 
-public interface IMediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMediaItemStorageLayer<T>, T extends IMediaItem> extends IMediaItemList<T> {
+public interface IMediaItemDb<S extends IMediaItemStorageLayer<T>, T extends IMediaItem> extends IMediaItemList<T> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public interface SortChangeListener {
 		public void sortChanged (IDbColumn sort, SortDirection direction);
 	}
 	
-	public H getTransactionalClone () throws DbException; // TODO remove this horrifying hack.
 	public void commitOrRollback () throws DbException;
 	public void rollback () throws DbException;
 	

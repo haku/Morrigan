@@ -43,9 +43,9 @@ import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
 import com.vaguehope.morrigan.util.TimeHelper;
 
-public abstract class AbstractMixedMediaDbEditor<T extends IAbstractMixedMediaDb<T>>
+public abstract class AbstractMixedMediaDbEditor<T extends IAbstractMixedMediaDb>
 		extends MixedMediaListEditor<T, IMixedMediaItem>
-		implements IMixedMediaItemDbEditor<T, IMixedMediaStorageLayer<IMixedMediaItem>, IMixedMediaItem> {
+		implements IMixedMediaItemDbEditor<IMixedMediaStorageLayer<IMixedMediaItem>, IMixedMediaItem> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public AbstractMixedMediaDbEditor () {

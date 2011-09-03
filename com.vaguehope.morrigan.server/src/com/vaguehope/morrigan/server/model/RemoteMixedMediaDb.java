@@ -19,7 +19,6 @@ import com.vaguehope.morrigan.model.media.IMixedMediaStorageLayer;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.internal.db.MediaItemDbConfig;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.AbstractMixedMediaDb;
-import com.vaguehope.morrigan.model.media.internal.db.mmdb.MixedMediaSqliteLayerFactory;
 import com.vaguehope.morrigan.model.tasks.TaskEventListener;
 import com.vaguehope.morrigan.server.MlistsServlet;
 import com.vaguehope.morrigan.server.feedreader.MixedMediaDbFeedParser;
@@ -28,7 +27,7 @@ import com.vaguehope.morrigan.util.httpclient.HttpStreamHandlerException;
 import com.vaguehope.sqlitewrapper.DbException;
 
 
-public class RemoteMixedMediaDb extends AbstractMixedMediaDb<IRemoteMixedMediaDb> implements IRemoteMixedMediaDb {
+public class RemoteMixedMediaDb extends AbstractMixedMediaDb implements IRemoteMixedMediaDb {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private final Logger logger = Logger.getLogger(this.getClass().getName());
@@ -91,17 +90,6 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb<IRemoteMixedMediaDb
 	private void writeCacheDate () throws DbException {
 		getDbLayer().setProp(DBKEY_CACHEDATE, String.valueOf(this.cacheDate));
 		this.logger.fine("Wrote cachedate=" + this.cacheDate + ".");
-	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	@Override
-	public RemoteMixedMediaDb getTransactionalClone() throws DbException {
-		return new RemoteMixedMediaDb(
-				RemoteMixedMediaDbHelper.getRemoteMmdbTitle(getDbPath()),
-				new MediaItemDbConfig(getDbPath(), null),
-				getUrl(), MixedMediaSqliteLayerFactory.getTransactional(getDbPath())
-				);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

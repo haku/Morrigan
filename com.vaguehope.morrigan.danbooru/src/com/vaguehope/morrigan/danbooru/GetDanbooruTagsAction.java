@@ -35,7 +35,7 @@ public class GetDanbooruTagsAction extends Action {
 	
 	@Override
 	public void run() {
-		IMediaItemDb<?,?,?> editedItemDb = this.viewTagEd.getEditedItemDb();
+		IMediaItemDb<?,?> editedItemDb = this.viewTagEd.getEditedItemDb();
 		List<IMediaItem> editedItems = this.viewTagEd.getEditedItems();
 		
 		if (editedItemDb != null && editedItems != null && editedItems.size() > 0) {

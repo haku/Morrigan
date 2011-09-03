@@ -16,20 +16,20 @@ import com.vaguehope.morrigan.model.tasks.IMorriganTask;
 public class DbUpdateAction extends Action implements IWorkbenchAction{
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private IMediaItemDb<?,?,?> itemDb = null;
+	private IMediaItemDb<?,?> itemDb = null;
 	
 	public DbUpdateAction () {
 		super();
 	}
 	
-	public DbUpdateAction (IMediaItemDb<?,?,?> library) {
+	public DbUpdateAction (IMediaItemDb<?,?> library) {
 		super();
 		this.itemDb = library;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public void setMediaDb (IMediaItemDb<?,?,?> itemDb) {
+	public void setMediaDb (IMediaItemDb<?,?> itemDb) {
 		this.itemDb = itemDb;
 	}
 	

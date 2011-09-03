@@ -37,7 +37,7 @@ public class PlayerHelper {
 			 * FIXME this will load the DB (if its not already loaded), which is excessive if we are
 			 * just going to show some search results.
 			 */
-			IMediaTrackDb<?, ?, ? extends IMediaTrack> db = mediaListReferenceToReadTrackDb(explorerItem);
+			IMediaTrackDb<?,? extends IMediaTrack> db = mediaListReferenceToReadTrackDb(explorerItem);
 			
     		if (query2 == null) {
     			ret.add(new PlayItem(db, null));
@@ -59,8 +59,8 @@ public class PlayerHelper {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	static public IMediaTrackDb<?, ?, ? extends IMediaTrack> mediaListReferenceToReadTrackDb (MediaListReference item) throws MorriganException {
-		IMediaTrackDb<?, ?, ? extends IMediaTrack> ret = null;
+	static public IMediaTrackDb<?,? extends IMediaTrack> mediaListReferenceToReadTrackDb (MediaListReference item) throws MorriganException {
+		IMediaTrackDb<?,? extends IMediaTrack> ret = null;
 		
 		if (item.getType() == MediaListReference.MediaListType.LOCALMMDB) {
 			ILocalMixedMediaDb mmdb;
@@ -84,7 +84,7 @@ public class PlayerHelper {
 	/**
 	 * What is the point in this???
 	 */
-	static public List<? extends IMediaTrack> runQueryOnList (IMediaTrackDb<?,?,? extends IMediaTrack> mediaDb, String query, int maxResults) throws MorriganException {
+	static public List<? extends IMediaTrack> runQueryOnList (IMediaTrackDb<?,? extends IMediaTrack> mediaDb, String query, int maxResults) throws MorriganException {
 		List<? extends IMediaTrack> res;
 		try {
 			res = mediaDb.simpleSearch(query, maxResults);

@@ -24,6 +24,7 @@ import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagClassification;
 import com.vaguehope.morrigan.model.media.MediaTagType;
+import com.vaguehope.morrigan.model.media.impl.MediaFactoryImpl;
 import com.vaguehope.morrigan.util.ChecksumHelper;
 
 class FetchDanbooruTagsJob extends Job {
@@ -36,13 +37,13 @@ class FetchDanbooruTagsJob extends Job {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private final IMediaItemDb<? extends IMediaItemDb<?,?,?>, ?, ?> editedItemDb;
+	private final IMediaItemDb<?,?> editedItemDb;
 	private final List<IMixedMediaItem> editedItems;
 	private final ViewTagEditor viewTagEd;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public FetchDanbooruTagsJob (IMediaItemDb<?, ?, ?> editedItemDb, List<IMixedMediaItem> editedItems, ViewTagEditor viewTagEd) {
+	public FetchDanbooruTagsJob (IMediaItemDb<?,?> editedItemDb, List<IMixedMediaItem> editedItems, ViewTagEditor viewTagEd) {
 		super("Fetching tags from Danbooru");
 		this.editedItemDb = editedItemDb;
 		this.editedItems = editedItems;
@@ -114,7 +115,7 @@ class FetchDanbooruTagsJob extends Job {
 			System.err.println("batchedWork.size()=" + batchedWork.size());
 			
 			// Do work that needs doing.
-			IMediaItemDb<?,?,?> transClone = this.editedItemDb.getTransactionalClone();
+			IMediaItemDb<?,?> transClone = MediaFactoryImpl.get().getMediaItemDbTransactional(this.editedItemDb);
 			try {
 				monitor.beginTask("Fetching", itemsToWork.size());
 				for (List<IMixedMediaItem> batch : batchedWork) {
@@ -180,7 +181,7 @@ class FetchDanbooruTagsJob extends Job {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	static public MediaTag getMarkerTag (IMediaItemDb<?, ?, ?> itemDb, IMixedMediaItem item, MediaTagClassification cls) throws MorriganException {
+	static public MediaTag getMarkerTag (IMediaItemDb<?,?> itemDb, IMixedMediaItem item, MediaTagClassification cls) throws MorriganException {
 		if (itemDb == null) throw new IllegalArgumentException("itemDb == null.");
 		if (item == null) throw new IllegalArgumentException("item == null.");
 		if (cls == null) throw new IllegalArgumentException("cls == null.");
@@ -202,7 +203,7 @@ class FetchDanbooruTagsJob extends Job {
 		return markerTag;
 	}
 	
-	static public void updateMarkerTag (IMediaItemDb<?, ?, ?> itemDb, IMixedMediaItem item, MediaTagClassification cls, MediaTag markerTag, String newString) throws MorriganException {
+	static public void updateMarkerTag (IMediaItemDb<?,?> itemDb, IMixedMediaItem item, MediaTagClassification cls, MediaTag markerTag, String newString) throws MorriganException {
 		if (itemDb == null) throw new IllegalArgumentException("itemDb == null.");
 		if (item == null) throw new IllegalArgumentException("item == null.");
 		if (cls == null) throw new IllegalArgumentException("cls == null.");

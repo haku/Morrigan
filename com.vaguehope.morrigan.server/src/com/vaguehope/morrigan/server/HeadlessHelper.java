@@ -13,7 +13,7 @@ import com.vaguehope.morrigan.util.ErrorHelper;
 public class HeadlessHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	static public boolean scheduleMmdbScan (final IAbstractMixedMediaDb<?> mmdb) {
+	static public boolean scheduleMmdbScan (final IAbstractMixedMediaDb mmdb) {
 		if (mmdb instanceof ILocalMixedMediaDb) {
 			ILocalMixedMediaDb lmmdb = (ILocalMixedMediaDb) mmdb;
 			return scheduleMmdbScan(lmmdb);

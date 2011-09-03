@@ -20,9 +20,9 @@ import com.vaguehope.morrigan.model.media.internal.db.MediaItemDbConfig;
 import com.vaguehope.sqlitewrapper.DbException;
 
 
-public abstract class AbstractMixedMediaDb<H extends IAbstractMixedMediaDb<H>>
-		extends MediaItemDb<H, IMixedMediaStorageLayer<IMixedMediaItem>, IMixedMediaItem>
-		implements IAbstractMixedMediaDb<H> {
+public abstract class AbstractMixedMediaDb
+		extends MediaItemDb<IMixedMediaStorageLayer<IMixedMediaItem>, IMixedMediaItem>
+		implements IAbstractMixedMediaDb {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	protected AbstractMixedMediaDb (String listName, MediaItemDbConfig config, IMixedMediaStorageLayer<IMixedMediaItem> dbLayer) {

@@ -7,8 +7,14 @@ import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
 import com.vaguehope.sqlitewrapper.DbException;
 
 
-public interface IAbstractMixedMediaDb<H extends IAbstractMixedMediaDb<H>>
-		extends IMixedMediaList<IMixedMediaItem>, IMediaTrackDb<H, IMixedMediaStorageLayer<IMixedMediaItem>, IMixedMediaItem> {
+/**
+ * TODO rename me to "IMixedMediaDb".
+ */
+public interface IAbstractMixedMediaDb
+		extends
+			IMixedMediaList<IMixedMediaItem>,
+			IMediaTrackDb<IMixedMediaStorageLayer<IMixedMediaItem>, IMixedMediaItem>
+	{
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public void setDefaultMediaType (MediaType mediaType) throws MorriganException;

@@ -15,6 +15,7 @@ import com.vaguehope.sqlitewrapper.DbException;
  * TODO remove remains of play-lists - they don't even work anyway.
  */
 public interface MediaFactory {
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	/**
 	 * List them all.
@@ -27,25 +28,43 @@ public interface MediaFactory {
 	public ILocalMixedMediaDb createLocalMixedMediaDb (String name) throws MorriganException;
 	
 	/**
-	 * Basic impl.
+	 * Main instance.
 	 */
 	public ILocalMixedMediaDb getLocalMixedMediaDb (String fullFilePath) throws DbException;
 	
 	/**
-	 * Impl with a filter set.
+	 * With a filter set: a view.
 	 */
 	public ILocalMixedMediaDb getLocalMixedMediaDb (String fullFilePath, String searchTerm) throws DbException;
 	
+	/**
+	 * Same as getLocalMixedMediaDb().
+	 */
 	public ILocalMixedMediaDb getLocalMixedMediaDbBySerial (String serial) throws DbException;
+	
+	/**
+	 * Create an new instance with transactional behaviour.
+	 */
+	public ILocalMixedMediaDb getLocalMixedMediaDbTransactional (ILocalMixedMediaDb lmmdb) throws DbException;
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	public IMediaItemDb<?,?> getMediaItemDbTransactional (IMediaItemDb<?,?> db) throws DbException;
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public Collection<MediaListReference> getAllRemoteMixedMediaDbs ();
 	public IRemoteMixedMediaDb createRemoteMixedMediaDb (String mmdbUrl);
 	public IRemoteMixedMediaDb getRemoteMixedMediaDb (String dbName);
 	public IRemoteMixedMediaDb getRemoteMixedMediaDb (String dbName, URL url);
 	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
 	public IMediaPlaylist createPlaylist (String plName) throws MorriganException;
 	public IMediaPlaylist getPlaylist (String filePath) throws MorriganException;
 	public void disposeAllPlaylists ();
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public DurationData getNewDurationData (long duration, boolean complete);
 	
@@ -58,6 +77,9 @@ public interface MediaFactory {
 	public <T extends IMediaItem> IMorriganTask getNewCopyToLocalMmdbTask (IMediaItemList<T> fromList, Collection<T> itemsToCopy, ILocalMixedMediaDb toDb);
 	public IMorriganTask getSyncMetadataRemoteToLocalTask (ILocalMixedMediaDb local, IRemoteMixedMediaDb remote);
 	
-	public void readTrackTags (IMediaItemDb<?,?,?> itemDb, IMediaTrack mlt, File file) throws IOException, MorriganException;
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	public void readTrackTags (IMediaItemDb<?,?> itemDb, IMediaTrack mlt, File file) throws IOException, MorriganException;
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
