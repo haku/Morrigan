@@ -7,7 +7,7 @@ import com.vaguehope.morrigan.model.tasks.TaskEventListener;
 import com.vaguehope.sqlitewrapper.DbException;
 
 
-public interface IRemoteMixedMediaDb extends IAbstractMixedMediaDb {
+public interface IRemoteMixedMediaDb extends IMixedMediaDb {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static final String TYPE = "REMOTEMMDB";

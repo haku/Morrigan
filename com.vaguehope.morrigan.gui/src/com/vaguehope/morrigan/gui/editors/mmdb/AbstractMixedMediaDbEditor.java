@@ -33,7 +33,7 @@ import com.vaguehope.morrigan.gui.preferences.MediaListPref;
 import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DurationData;
-import com.vaguehope.morrigan.model.media.IAbstractMixedMediaDb;
+import com.vaguehope.morrigan.model.media.IMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer2;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.model.media.IMixedMediaItemStorageLayer;
@@ -43,7 +43,7 @@ import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
 import com.vaguehope.morrigan.util.TimeHelper;
 
-public abstract class AbstractMixedMediaDbEditor<T extends IAbstractMixedMediaDb>
+public abstract class AbstractMixedMediaDbEditor<T extends IMixedMediaDb>
 		extends MixedMediaListEditor<T, IMixedMediaItem>
 		implements IMixedMediaItemDbEditor<IMixedMediaStorageLayer<IMixedMediaItem>, IMixedMediaItem> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

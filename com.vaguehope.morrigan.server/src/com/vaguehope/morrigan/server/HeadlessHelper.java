@@ -1,6 +1,6 @@
 package com.vaguehope.morrigan.server;
 
-import com.vaguehope.morrigan.model.media.IAbstractMixedMediaDb;
+import com.vaguehope.morrigan.model.media.IMixedMediaDb;
 import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.impl.MediaFactoryImpl;
@@ -13,7 +13,7 @@ import com.vaguehope.morrigan.util.ErrorHelper;
 public class HeadlessHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	static public boolean scheduleMmdbScan (final IAbstractMixedMediaDb mmdb) {
+	static public boolean scheduleMmdbScan (final IMixedMediaDb mmdb) {
 		if (mmdb instanceof ILocalMixedMediaDb) {
 			ILocalMixedMediaDb lmmdb = (ILocalMixedMediaDb) mmdb;
 			return scheduleMmdbScan(lmmdb);

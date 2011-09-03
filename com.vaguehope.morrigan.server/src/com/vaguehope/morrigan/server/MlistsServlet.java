@@ -19,7 +19,7 @@ import org.xml.sax.SAXException;
 import com.megginson.sax.DataWriter;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DurationData;
-import com.vaguehope.morrigan.model.media.IAbstractMixedMediaDb;
+import com.vaguehope.morrigan.model.media.IMixedMediaDb;
 import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
@@ -141,7 +141,7 @@ public class MlistsServlet extends HttpServlet {
 				if (pathParts.length >= 2) {
 					String type = pathParts[0];
 					if (type.equals(ILocalMixedMediaDb.TYPE) || type.equals(IRemoteMixedMediaDb.TYPE)) {
-						IAbstractMixedMediaDb mmdb;
+						IMixedMediaDb mmdb;
 						if (type.equals(ILocalMixedMediaDb.TYPE)) {
 							String f = LocalMixedMediaDbHelper.getFullPathToMmdb(pathParts[1]);
 							mmdb = MediaFactoryImpl.get().getLocalMixedMediaDb(f);
@@ -192,7 +192,7 @@ public class MlistsServlet extends HttpServlet {
 		}
 	}
 	
-	private static void postToMmdb(HttpServletRequest req, HttpServletResponse resp, String action, IAbstractMixedMediaDb mmdb, String path, String afterPath) throws IOException, MorriganException, DbException {
+	private static void postToMmdb(HttpServletRequest req, HttpServletResponse resp, String action, IMixedMediaDb mmdb, String path, String afterPath) throws IOException, MorriganException, DbException {
 		if (action.equals(CMD_PLAY) || action.equals(CMD_QUEUE)) {
 			String playerIdS = req.getParameter("playerid");
 			if (playerIdS == null) {
@@ -292,7 +292,7 @@ public class MlistsServlet extends HttpServlet {
 		AbstractFeed.endFeed(dw);
 	}
 	
-	static private void getToMmdb (HttpServletResponse resp, IAbstractMixedMediaDb mmdb, String path, String afterPath) throws IOException, SAXException, MorriganException, DbException {
+	static private void getToMmdb (HttpServletResponse resp, IMixedMediaDb mmdb, String path, String afterPath) throws IOException, SAXException, MorriganException, DbException {
 		if (path == null) {
 			printMlistLong(resp, mmdb, false, false);
 		}
@@ -368,15 +368,15 @@ public class MlistsServlet extends HttpServlet {
 		}
 	}
 	
-	static private void printMlistLong (HttpServletResponse resp, IAbstractMixedMediaDb ml, boolean listSrcs, boolean listItems) throws SAXException, MorriganException, DbException, IOException {
+	static private void printMlistLong (HttpServletResponse resp, IMixedMediaDb ml, boolean listSrcs, boolean listItems) throws SAXException, MorriganException, DbException, IOException {
 		printMlistLong(resp, ml, listSrcs, listItems, null);
 	}
 	
-	static private void printMlistLong (HttpServletResponse resp, IAbstractMixedMediaDb ml, boolean listSrcs, boolean listItems, String queryString) throws SAXException, MorriganException, DbException, IOException {
+	static private void printMlistLong (HttpServletResponse resp, IMixedMediaDb ml, boolean listSrcs, boolean listItems, String queryString) throws SAXException, MorriganException, DbException, IOException {
 		printMlistLong(resp, ml, listSrcs, listItems, true, queryString); // TODO always include tags?
 	}
 	
-	static private void printMlistLong (HttpServletResponse resp, IAbstractMixedMediaDb ml, boolean listSrcs, boolean listItems, boolean includeTags, String queryString) throws SAXException, MorriganException, DbException, IOException {
+	static private void printMlistLong (HttpServletResponse resp, IMixedMediaDb ml, boolean listSrcs, boolean listItems, boolean includeTags, String queryString) throws SAXException, MorriganException, DbException, IOException {
 		resp.setContentType("text/xml;charset=utf-8");
 		DataWriter dw = AbstractFeed.startDocument(resp.getWriter(), "mlist");
 		

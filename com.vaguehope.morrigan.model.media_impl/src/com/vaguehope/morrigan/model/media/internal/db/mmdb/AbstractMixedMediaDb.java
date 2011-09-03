@@ -7,7 +7,7 @@ import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DirtyState;
 import com.vaguehope.morrigan.model.media.DurationData;
-import com.vaguehope.morrigan.model.media.IAbstractMixedMediaDb;
+import com.vaguehope.morrigan.model.media.IMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMediaPicture;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
@@ -22,7 +22,7 @@ import com.vaguehope.sqlitewrapper.DbException;
 
 public abstract class AbstractMixedMediaDb
 		extends MediaItemDb<IMixedMediaStorageLayer<IMixedMediaItem>, IMixedMediaItem>
-		implements IAbstractMixedMediaDb {
+		implements IMixedMediaDb {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	protected AbstractMixedMediaDb (String listName, MediaItemDbConfig config, IMixedMediaStorageLayer<IMixedMediaItem> dbLayer) {
