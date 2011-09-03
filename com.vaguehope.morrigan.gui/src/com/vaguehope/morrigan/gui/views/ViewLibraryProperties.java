@@ -66,7 +66,7 @@ public class ViewLibraryProperties extends ViewPart {
 	private IPartListener partListener = new IPartListener() {
 		@Override
 		public void partActivated(IWorkbenchPart part) {
-			IMediaItemDb<?,?,?> ml = null;
+			IMediaItemDb<?,?> ml = null;
 			
 			/*
 			 * At the moment this checks the supported editors directly.
@@ -94,14 +94,14 @@ public class ViewLibraryProperties extends ViewPart {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	IMediaItemDb<?,?,?> library;
+	IMediaItemDb<?,?> library;
 	DbUpdateAction dbUpdateAction = new DbUpdateAction();
 	
-	public void setContent (IMediaItemDb<?,?,?> library) {
+	public void setContent (IMediaItemDb<?,?> library) {
 		setContent(library, true);
 	}
 	
-	public void setContent (IMediaItemDb<?,?,?> library, boolean updateGui) {
+	public void setContent (IMediaItemDb<?,?> library, boolean updateGui) {
 		if (this.library == library) return;
 		
 		if (this.library!=null) {

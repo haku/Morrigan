@@ -6,7 +6,6 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.List;
 
-
 import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
 import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.tag.TagException;
@@ -76,6 +75,21 @@ public class MediaFactoryImpl implements MediaFactory {
 	@Override
 	public ILocalMixedMediaDb getLocalMixedMediaDbBySerial(String serial) throws DbException {
 		return LocalMixedMediaDbFactory.getMainBySerial(serial);
+	}
+	
+	@Override
+	public ILocalMixedMediaDb getLocalMixedMediaDbTransactional (ILocalMixedMediaDb lmmdb) throws DbException {
+		return LocalMixedMediaDbFactory.getTransactional(lmmdb.getDbPath());
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	@Override
+	public IMediaItemDb<?,?> getMediaItemDbTransactional (IMediaItemDb<?,?> db) throws DbException {
+		if (ILocalMixedMediaDb.TYPE.equals(db.getType())) {
+			return LocalMixedMediaDbFactory.getTransactional(db.getDbPath());
+		}
+		throw new IllegalArgumentException("Can't create clone of DB of type '"+db.getType()+"'.");
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -155,7 +169,7 @@ public class MediaFactoryImpl implements MediaFactory {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
-	public void readTrackTags(IMediaItemDb<?, ?, ?> itemDb, IMediaTrack mt, File file) throws IOException, MorriganException {
+	public void readTrackTags(IMediaItemDb<?,?> itemDb, IMediaTrack mt, File file) throws IOException, MorriganException {
 		try {
 			TrackTagHelper.readTrackTags(itemDb, mt, file);
 		}

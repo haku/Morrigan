@@ -10,6 +10,7 @@ import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaTag;
+import com.vaguehope.morrigan.model.media.impl.MediaFactoryImpl;
 import com.vaguehope.morrigan.model.tasks.IMorriganTask;
 import com.vaguehope.morrigan.model.tasks.TaskEventListener;
 import com.vaguehope.morrigan.model.tasks.TaskResult;
@@ -42,7 +43,7 @@ public class SyncMetadataRemoteToLocalTask implements IMorriganTask {
 	public TaskResult run (TaskEventListener taskEventListener) {
 		TaskResult ret;
 		try {
-			final ILocalMixedMediaDb trans = this.local.getTransactionalClone();
+			final ILocalMixedMediaDb trans = MediaFactoryImpl.get().getLocalMixedMediaDbTransactional(this.local);
 			try {
 				// FIXME add getByHashcode() to local DB.
 				final Map<BigInteger, IMixedMediaItem> localItems = new HashMap<BigInteger, IMixedMediaItem>();

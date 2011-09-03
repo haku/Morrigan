@@ -140,7 +140,7 @@ public class ViewTagEditor extends ViewPart {
 		@Override
 		public void partClosed(IWorkbenchPart part) {
 			if (part instanceof IMediaItemDbEditor) {
-				IMediaItemDbEditor<?,?,?> libEditor = (IMediaItemDbEditor<?,?,?>) part;
+				IMediaItemDbEditor<?,?> libEditor = (IMediaItemDbEditor<?,?>) part;
 				if (libEditor.getMediaList().equals(ViewTagEditor.this.editedItemDb)) {
 					setInput(null, (IMediaItem)null);
 				}
@@ -166,8 +166,8 @@ public class ViewTagEditor extends ViewPart {
 					return;
 				}
 				
-				IMediaItemDbEditor<?,?,?> editor = (IMediaItemDbEditor<?,?,?>) part;
-				IMediaItemDb<?,?,?> list = editor.getMediaList();
+				IMediaItemDbEditor<?,?> editor = (IMediaItemDbEditor<?,?>) part;
+				IMediaItemDb<?,?> list = editor.getMediaList();
 				
 				if (selection instanceof IStructuredSelection) {
 					IStructuredSelection iSel = (IStructuredSelection) selection;
@@ -190,11 +190,11 @@ public class ViewTagEditor extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Data links.
 	
-	IMediaItemDb<?,?,?> editedItemDb = null;
+	IMediaItemDb<?,?> editedItemDb = null;
 	IMediaItem editedItem = null;
 	List<IMediaItem> editedItems = null;
 	
-	public void setInput (IMediaItemDb<?,?,?> editedMediaList, IMediaItem item) {
+	public void setInput (IMediaItemDb<?,?> editedMediaList, IMediaItem item) {
 		if (item != null) {
     		List<IMediaItem> list = new LinkedList<IMediaItem>();
     		list.add(item);
@@ -205,7 +205,7 @@ public class ViewTagEditor extends ViewPart {
 		}
 	}
 	
-	public void setInput (IMediaItemDb<?,?,?> editedMediaList, List<? extends IMediaItem> selection) {
+	public void setInput (IMediaItemDb<?,?> editedMediaList, List<? extends IMediaItem> selection) {
 		if (selection != null && selection.size() > 0) {
 			if (selection.size() == 1) {
 				setContentDescription(selection.get(0).getTitle());
@@ -372,7 +372,7 @@ public class ViewTagEditor extends ViewPart {
 //		TODO
 //	}
 	
-	public IMediaItemDb<?, ?, ?> getEditedItemDb() {
+	public IMediaItemDb<?,?> getEditedItemDb() {
 		return this.editedItemDb;
 	}
 	

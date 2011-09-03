@@ -30,6 +30,7 @@ import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
 import com.vaguehope.morrigan.model.tasks.TaskEventListener;
 import com.vaguehope.morrigan.server.MlistsServlet;
 import com.vaguehope.morrigan.server.feedwriters.XmlHelper;
+import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbFactory;
 import com.vaguehope.morrigan.util.httpclient.HttpClient;
 import com.vaguehope.morrigan.util.httpclient.HttpStreamHandler;
 import com.vaguehope.morrigan.util.httpclient.HttpStreamHandlerException;
@@ -53,7 +54,7 @@ public class MixedMediaDbFeedParser extends DefaultHandler {
 				boolean thereWereErrors = true;
 				IRemoteMixedMediaDb transClone = null;
 				try {
-					transClone = mmdb.getTransactionalClone();
+					transClone = RemoteMixedMediaDbFactory.getTransactionalClone(mmdb);
 					transClone.setDefaultMediaType(MediaType.UNKNOWN, false);
 					transClone.readFromCache();
 					transClone.beginBulkUpdate();

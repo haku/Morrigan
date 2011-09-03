@@ -25,9 +25,9 @@ import com.vaguehope.morrigan.model.media.internal.MediaTagClassificationImpl;
 import com.vaguehope.sqlitewrapper.DbException;
 
 
-public abstract class MediaItemDb<H extends IMediaItemDb<H,S,T>, S extends IMediaItemStorageLayer<T>, T extends IMediaItem>
+public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends IMediaItem>
 		extends MediaItemList<T>
-		implements IMediaItemDb<H,S,T> {
+		implements IMediaItemDb<S,T> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static final boolean HIDEMISSING = true; // TODO link this to GUI?

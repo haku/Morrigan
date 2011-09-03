@@ -50,7 +50,7 @@ public class JumpToDlg {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	final Shell parent;
-	private final IMediaTrackDb<?,?,? extends IMediaTrack> mediaDb;
+	private final IMediaTrackDb<?,? extends IMediaTrack> mediaDb;
 	
 	private IMediaTrack returnValue = null;
 	private List<? extends IMediaTrack> returnList = null;
@@ -58,7 +58,7 @@ public class JumpToDlg {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public JumpToDlg (Shell parent, IMediaTrackDb<?,?,? extends IMediaTrack> mediaDb) {
+	public JumpToDlg (Shell parent, IMediaTrackDb<?,? extends IMediaTrack> mediaDb) {
 		this.parent = parent;
 		if (mediaDb == null) throw new IllegalArgumentException("mediaDb can not be null.");
 		this.mediaDb = mediaDb;

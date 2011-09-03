@@ -56,10 +56,10 @@ public class JumpToAction extends Action {
 		player = viewControls.getPlayer();
 		
 		IMediaTrackList<? extends IMediaTrack> currentList = this.list != null ? this.list : player.getCurrentList();
-		if (currentList == null || !(currentList instanceof IMediaTrackDb<?,?,?>)) return;
-		IMediaTrackDb<?,?,?> currentDb = (IMediaTrackDb<?,?,?>) currentList;
+		if (currentList == null || !(currentList instanceof IMediaTrackDb<?,?>)) return;
+		IMediaTrackDb<?,?> currentDb = (IMediaTrackDb<?,?>) currentList;
 		
-		JumpToDlg dlg = new JumpToDlg(this.workbenchWindow.getShell(), (IMediaTrackDb<?,?,?>) currentList);
+		JumpToDlg dlg = new JumpToDlg(this.workbenchWindow.getShell(), (IMediaTrackDb<?,?>) currentList);
 		dlg.open();
 		IMediaTrack item = dlg.getReturnItem();
 		if (item != null) {

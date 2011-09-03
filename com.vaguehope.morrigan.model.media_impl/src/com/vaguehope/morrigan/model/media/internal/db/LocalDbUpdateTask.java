@@ -19,6 +19,7 @@ import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
+import com.vaguehope.morrigan.model.media.impl.MediaFactoryImpl;
 import com.vaguehope.morrigan.model.tasks.IMorriganTask;
 import com.vaguehope.morrigan.model.tasks.TaskEventListener;
 import com.vaguehope.morrigan.model.tasks.TaskResult;
@@ -27,7 +28,7 @@ import com.vaguehope.morrigan.util.ChecksumHelper;
 import com.vaguehope.sqlitewrapper.DbException;
 
 
-public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<Q, ? extends IMediaItemStorageLayer<T>,T>, T extends IMediaItem> implements IMorriganTask {
+public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaItemStorageLayer<T>,T>, T extends IMediaItem> implements IMorriganTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	protected enum ScanOption {KEEP, DELREF, MOVEFILE}
@@ -233,7 +234,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<Q, ? extends IMed
 		if (filesToAdd.size() > 0) {
 			taskEventListener.logMsg(this.getItemList().getListName(), "Addeding " + filesToAdd.size() + " files to DB...");
 			
-			Q transClone = this.getItemList().getTransactionalClone();
+			IMediaItemDb<?,?> transClone = MediaFactoryImpl.get().getMediaItemDbTransactional(this.getItemList());
 			try {
 				transClone.addFiles(filesToAdd);
 				filesAdded = filesAdded + filesToAdd.size();

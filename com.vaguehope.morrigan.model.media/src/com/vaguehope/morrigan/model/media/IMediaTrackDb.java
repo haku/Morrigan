@@ -1,7 +1,7 @@
 package com.vaguehope.morrigan.model.media;
 
-public interface IMediaTrackDb<H extends IMediaTrackDb<H,S,T>, S extends IMediaItemStorageLayer<T>, T extends IMediaTrack>
-		extends IMediaItemDb<H,S,T>, IMediaTrackList<T> {
+public interface IMediaTrackDb<S extends IMediaItemStorageLayer<T>, T extends IMediaTrack>
+		extends IMediaItemDb<S,T>, IMediaTrackList<T> {
 	
 	/**/
 	
