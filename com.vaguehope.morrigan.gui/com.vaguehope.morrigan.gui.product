@@ -8,7 +8,7 @@
       <text>
          This alpha build of morrigan is released as free software and is provided &quot;as is&quot; for testing use only.  For more information, please see this wiki page:
 
-http://vaguehope.com/w/Morrigan
+http://vaguehope.com/morrigan
 
 You can email the developer at haku@vaguehope.com
 
@@ -36,12 +36,13 @@ Image &quot;The Morrígan&quot; by Louis le Brocquy used under the Creative Comm
       </win>
    </launcher>
 
+
    <vm>
    </vm>
 
+
    <plugins>
       <plugin id="com.ibm.icu"/>
-      <plugin id="javax.servlet"/>
       <plugin id="com.vaguehope.morrigan.config"/>
       <plugin id="com.vaguehope.morrigan.danbooru"/>
       <plugin id="com.vaguehope.morrigan.engines"/>
@@ -64,6 +65,7 @@ Image &quot;The Morrígan&quot; by Louis le Brocquy used under the Creative Comm
       <plugin id="com.vaguehope.morrigan.wui"/>
       <plugin id="com.vaguehope.nemain"/>
       <plugin id="com.vaguehope.sqlitewrapper"/>
+      <plugin id="javax.servlet"/>
       <plugin id="org.eclipse.compare.core"/>
       <plugin id="org.eclipse.core.commands"/>
       <plugin id="org.eclipse.core.contenttype"/>
