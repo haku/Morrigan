@@ -68,6 +68,7 @@ public abstract class GenericSqliteLayer implements IGenericDbLayer {
 	}
 	
 	protected Connection getDbCon () throws ClassNotFoundException, SQLException {
+		// TODO FIXME make this thread-safe using atomic objects.
 		if (this.dbConnection==null || this.dbConnection.isClosed()) {
 			this.dbConnection = makeConnection();
 		}
@@ -89,6 +90,7 @@ public abstract class GenericSqliteLayer implements IGenericDbLayer {
 	
 	@Override
 	public void commitOrRollBack () throws DbException {
+		if (this.autoCommit) throw new IllegalStateException("Can not commit auto-commit connection.");
 		try {
 			getDbCon().commit();
 		}
@@ -100,6 +102,7 @@ public abstract class GenericSqliteLayer implements IGenericDbLayer {
 	
 	@Override
 	public void rollback () throws DbException {
+		if (this.autoCommit) throw new IllegalStateException("Can not rollback auto-commit connection.");
 		try {
 			getDbCon().rollback();
 		} catch (Exception e) {
