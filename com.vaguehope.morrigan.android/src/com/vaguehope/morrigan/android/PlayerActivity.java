@@ -309,31 +309,36 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 	}
 	
 	protected void fullscreen () {
-		Map<Integer, String> monitors = this.currentState.getMonitors();
-		final List<String> list = new LinkedList<String>();
-		for (Entry<Integer, String> monitor : monitors.entrySet()) {
-			list.add(monitor.getKey() + ":" + monitor.getValue());
+		if (this.currentState != null) {
+			Map<Integer, String> monitors = this.currentState.getMonitors();
+			final List<String> list = new LinkedList<String>();
+			for (Entry<Integer, String> monitor : monitors.entrySet()) {
+				list.add(monitor.getKey() + ":" + monitor.getValue());
+			}
+			final String[] labels = list.toArray(new String[list.size()]);
+			
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setTitle("Full-screen");
+			builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.dismiss();
+				}
+			});
+			builder.setItems(labels, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int item) {
+					dialog.dismiss();
+					SetPlaystateTask playpauseTask = new SetPlaystateTask(PlayerActivity.this, PlayerActivity.this.playerReference, item, PlayerActivity.this);
+					playpauseTask.execute();
+				}
+			});
+			AlertDialog alert = builder.create();
+			alert.show();
 		}
-		final String[] labels = list.toArray(new String[list.size()]);
-		
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle("Full-screen");
-		builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.dismiss();
-			}
-		});
-		builder.setItems(labels, new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int item) {
-				dialog.dismiss();
-				SetPlaystateTask playpauseTask = new SetPlaystateTask(PlayerActivity.this, PlayerActivity.this.playerReference, item, PlayerActivity.this);
-				playpauseTask.execute();
-			}
-		});
-		AlertDialog alert = builder.create();
-		alert.show();
+		else {
+			Toast.makeText(this, "Not available.", Toast.LENGTH_SHORT).show();
+		}
 	}
 	
 	protected void downloadCurrentItem () {
