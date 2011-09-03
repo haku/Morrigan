@@ -6,11 +6,7 @@ import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
 import com.vaguehope.sqlitewrapper.DbException;
 
-
-/**
- * TODO rename me to "IMixedMediaDb".
- */
-public interface IAbstractMixedMediaDb
+public interface IMixedMediaDb
 		extends
 			IMixedMediaList<IMixedMediaItem>,
 			IMediaTrackDb<IMixedMediaStorageLayer<IMixedMediaItem>, IMixedMediaItem>
