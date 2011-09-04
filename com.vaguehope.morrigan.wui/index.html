@@ -8,26 +8,79 @@
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js" ></script>
 
 	<script type="text/javascript" >
+		$(document).ready(function() {
+			getPlayersState();
+		});
+		
 		function getPlayersState () {
 			var outDiv = $("#playersState");
 			$.ajax({
 				type : "GET",
-				cache: "false",
+				cache : "false",
 				url : "players",
 				dataType : "xml",
-				beforeSend: function () {
-					outDiv.html("Fetching...");
+				beforeSend : function () {
+					outDiv.html("Fetching..."); // TODO this creates an ugly flash during refresh.
 				},
 				success : function (xml) {
-					var txt = "";
-					$(xml).find('entry').each(function () {
-						var title = $(this).find('title').text();
-						txt = txt + title + "<br />";
+					var entires = $(xml).find('entry');
+					
+					// Set up the areas for each player to live in.
+					var base = "";
+					entires.each(function () {
+						base = base + "<div id='player" + $(this).find('playerid').text() + "' ></div>";
 					});
-					outDiv.html(txt);
+					outDiv.html(base); // This should be the last reference to outDiv in this function.
+					
+					// Create the players in the areas created above.
+					entires.each(function () {
+						var playerBody = "";
+						
+						var id = $(this).find('playerid').text();
+						var state = $(this).find('playstate').text();
+						var title = $(this).find('title').text();
+						
+						playerBody = playerBody + "<p>";
+						playerBody = playerBody + "<button type='button' onclick='setPlayerState(" + id + ",\"playpause\")' >play / pause</button>";
+						playerBody = playerBody + "&nbsp;";
+						playerBody = playerBody + "<button type='button' onclick='setPlayerState(" + id + ",\"next\")' >next</button>";
+						playerBody = playerBody + "&nbsp;";
+						playerBody = playerBody + "<span id='state' >state=" + state + "</span>";
+						playerBody = playerBody + "&nbsp;";
+						playerBody = playerBody + "<span>" + title + "</span>";
+						playerBody = playerBody + "</p>";
+						
+						$("#player" + id).html(playerBody);
+					});
 				},
 				error : function (xhr) {
-					outDiv.html("Error: " + xhr.statusText);
+					outDiv.text("Error: " + xhr.statusText);
+				}
+			});
+		}
+		
+		/**
+		 * This assumes that getPlayersState() has been called to create the elements.
+		 */
+		function setPlayerState (id, action) {
+			var outEl = $("#player" + id + " > #state");
+			$.ajax({
+				type : "POST",
+				cache : "false",
+				url : "players/" + id,
+				data : "action=" + action,
+				contentTypeString : "application/x-www-form-urlencoded",
+				dataType : "xml",
+				beforeSend : function () {
+					outEl.text("Setting...");
+				},
+				success : function (xml) {
+					var state = $(xml).find('playstate').text();
+					outEl.text("state=" + state);
+					getPlayersState(); // Hack to force refresh.
+				},
+				error : function () {
+					outEl.html("Error: " + xhr.statusText);
 				}
 			});
 		}
@@ -39,7 +92,7 @@
 	
 	<h1>Morrigan desu~</h1>
 	
-	<button type="button" onclick="getPlayersState()" >Players state</button>
+	<button type="button" onclick="getPlayersState()" >Refresh</button>
 	<div id="playersState" ></div>
 	
 	<p><a href="/player" >players</a></p>
