@@ -2,15 +2,54 @@
 
 <head>
 
-	<meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0"/>
+	<meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0" />
+
+	<script type="text/javascript" >
+		function getPlayersState () {
+			var xmlhttp;
+			if (window.XMLHttpRequest) { // code for IE7+, Firefox, Chrome, Opera, Safari.
+				xmlhttp = new XMLHttpRequest();
+			}
+			else { // code for IE6, IE5.
+				xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+			}
+			
+			xmlhttp.onreadystatechange = function () {
+				if (xmlhttp.readyState == 4) {
+					if (xmlhttp.status == 200) {
+						xmlDoc = xmlhttp.responseXML;
+						txt = "";
+						x = xmlDoc.getElementsByTagName("title");
+						for (i = 0; i < x.length; i++) {
+							txt = txt + x[i].childNodes[0].nodeValue + "<br />";
+						}
+						document.getElementById("playersState").innerHTML = txt;
+					}
+					else {
+						document.getElementById("playersState").innerHTML = "Error: " + xmlhttp.status;
+					}
+				}
+				else if (xmlhttp.readyState > 0) {
+					document.getElementById("playersState").innerHTML = "Fetching...";
+				}
+			}
+			
+			xmlhttp.open("GET", "players", true);
+			xmlhttp.send();
+		}
+	</script>
 
 </head>
 
 <body>
 	
 	<h1>Morrigan desu~</h1>
-	<p><a href="/player">players</a></p>
-	<p><a href="/mlists">mlists</a></p>
+	
+	<button type="button" onclick="getPlayersState()" >Players state</button>
+	<div id="playersState" ></div>
+	
+	<p><a href="/player" >players</a></p>
+	<p><a href="/mlists" >mlists</a></p>
 	
 </body>
 
