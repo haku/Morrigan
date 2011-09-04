@@ -4,38 +4,32 @@
 
 	<meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0" />
 
+	<!-- TODO Embed local copy of jQuery. -->
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js" ></script>
+
 	<script type="text/javascript" >
 		function getPlayersState () {
-			var xmlhttp;
-			if (window.XMLHttpRequest) { // code for IE7+, Firefox, Chrome, Opera, Safari.
-				xmlhttp = new XMLHttpRequest();
-			}
-			else { // code for IE6, IE5.
-				xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-			}
-			
-			xmlhttp.onreadystatechange = function () {
-				if (xmlhttp.readyState == 4) {
-					if (xmlhttp.status == 200) {
-						xmlDoc = xmlhttp.responseXML;
-						txt = "";
-						x = xmlDoc.getElementsByTagName("title");
-						for (i = 0; i < x.length; i++) {
-							txt = txt + x[i].childNodes[0].nodeValue + "<br />";
-						}
-						document.getElementById("playersState").innerHTML = txt;
-					}
-					else {
-						document.getElementById("playersState").innerHTML = "Error: " + xmlhttp.status;
-					}
+			var outDiv = $("#playersState");
+			$.ajax({
+				type : "GET",
+				cache: "false",
+				url : "players",
+				dataType : "xml",
+				beforeSend: function () {
+					outDiv.html("Fetching...");
+				},
+				success : function (xml) {
+					var txt = "";
+					$(xml).find('entry').each(function () {
+						var title = $(this).find('title').text();
+						txt = txt + title + "<br />";
+					});
+					outDiv.html(txt);
+				},
+				error : function (xhr) {
+					outDiv.html("Error: " + xhr.statusText);
 				}
-				else if (xmlhttp.readyState > 0) {
-					document.getElementById("playersState").innerHTML = "Fetching...";
-				}
-			}
-			
-			xmlhttp.open("GET", "players", true);
-			xmlhttp.send();
+			});
 		}
 	</script>
 
