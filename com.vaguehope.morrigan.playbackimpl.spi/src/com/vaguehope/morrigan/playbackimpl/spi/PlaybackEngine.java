@@ -1,4 +1,4 @@
-package net.sparktank.morrigan.playbackimpl.spi;
+package com.vaguehope.morrigan.playbackimpl.spi;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,10 +11,10 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
-import net.sparktank.morrigan.engines.playback.IPlaybackEngine;
-import net.sparktank.morrigan.engines.playback.IPlaybackStatusListener;
-import net.sparktank.morrigan.engines.playback.NotImplementedException;
-import net.sparktank.morrigan.engines.playback.PlaybackException;
+import com.vaguehope.morrigan.engines.playback.IPlaybackEngine;
+import com.vaguehope.morrigan.engines.playback.IPlaybackStatusListener;
+import com.vaguehope.morrigan.engines.playback.NotImplementedException;
+import com.vaguehope.morrigan.engines.playback.PlaybackException;
 
 import org.eclipse.swt.widgets.Composite;
 
