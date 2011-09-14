@@ -25,8 +25,7 @@
 		<property name="baseLocation" value="${eclipse.home}" />
 		<property name="builder" value="${basedir}" />
 		<property name="buildDirectory" value="${basedir}/buildDirectory" />
-		<!-- TODO FIXME remove reference to Morrigan-git directory. -->
-		<property name="pluginPath" value="${basedir}/..${path.separator}${basedir}/../Morrigan-git${path.separator}${basedir}/../com.vaguehope.morrigan.target${path.separator}${deltapack}" />
+		<property name="pluginPath" value="${basedir}/..${path.separator}${basedir}/../com.vaguehope.morrigan.target${path.separator}${deltapack}" />
 		<property name="buildTempFolder" value="${buildDirectory}" />
 
 		<!-- Echo properties. -->
