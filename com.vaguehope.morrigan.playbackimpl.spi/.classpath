@@ -10,7 +10,5 @@
 	<classpathentry kind="lib" path="lib/tritonus_mp3-0.3.6.jar"/>
 	<classpathentry kind="lib" path="lib/tritonus_share-0.3.6.jar"/>
 	<classpathentry kind="lib" path="lib/vorbisspi1.0.3.jar"/>
-	<classpathentry kind="lib" path="lib/swt.jar"/>
-	<classpathentry kind="lib" path="/net.sparktank.morrigan/morrigan.engines.playback.stub.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
