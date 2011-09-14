@@ -1,0 +1,17 @@
+27ae6e538b3191cd3bc5338d227959b4 vorbisspi1.0.3.zip http://www.javazoom.net/vorbisspi/sources/vorbisspi1.0.3.zip
+9d1946211b6e5ef66fe088b2432355a1 jogg-0.0.7.jar vorbisspi1.0.3.zip
+5919b38077fa66784365140cc17f027a jorbis-0.0.15.jar vorbisspi1.0.3.zip
+8957525788af372a9b883b7f54f642e7 vorbisspi1.0.3.jar vorbisspi1.0.3.zip
+
+e259e7674d9b19e76f005cee2810e7f5 mp3spi1.9.4.zip http://www.javazoom.net/mp3spi/sources/mp3spi1.9.4.zip
+09dfea6a70016b65c29b9dadbf8cad45 mp3spi1.9.4.jar mp3spi1.9.4.zip
+
+2b492764727952699cc0024a14f98bb0 jlayer1.0.1.zip http://www.javazoom.net/javalayer/sources/jlayer1.0.1.zip
+7b672b4badc89286055adcc810f47df8 jl1.0.1.jar
+
+bae4929bf3a475410563b82e9a8aecb8 j-ogg.zip http://www.j-ogg.de/j-ogg.zip
+467c6451efdebae84f5c7cf80b4ac7ee j-ogg-all.jar j-ogg.zip
+
+63cf87afa65daf82ed9473834742bc48 tritonus_share-0.3.6.jar http://www.tritonus.org/tritonus_share-0.3.6.jar
+96c67d535a1c37af300ba8131eb4b30e tritonus_mp3-0.3.6.jar http://www.tritonus.org/tritonus_mp3-0.3.6.jar
+
