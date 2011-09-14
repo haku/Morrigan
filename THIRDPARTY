@@ -1,0 +1,99 @@
+This file details the included third-party components, the license they are
+used under and links to their web sites where further license information may
+be available.
+Where appropreate the locations of specific library files are also listed.
+
+sqlitejdbc
+BSD license.
+http://www.zentus.com/sqlitejdbc
+Included files:
+    com.vaguehope.sqlitewrapper/lib/sqlitejdbc-v056.jar
+
+Jetty
+The Apache Software License, Version 2.0.
+http://jetty.codehaus.org/jetty
+Included files:
+    com.vaguehope.morrigan.target/plugins/jetty-continuation-7.2.2.v20101205.jar
+    com.vaguehope.morrigan.target/plugins/jetty-http-7.2.2.v20101205.jar
+    com.vaguehope.morrigan.target/plugins/jetty-io-7.2.2.v20101205.jar
+    com.vaguehope.morrigan.target/plugins/jetty-security-7.2.2.v20101205.jar
+    com.vaguehope.morrigan.target/plugins/jetty-server-7.2.2.v20101205.jar
+    com.vaguehope.morrigan.target/plugins/jetty-servlet-7.2.2.v20101205.jar
+    com.vaguehope.morrigan.target/plugins/jetty-servlets-7.2.2.v20101205.jar
+    com.vaguehope.morrigan.target/plugins/jetty-util-7.2.2.v20101205.jar
+    com.vaguehope.morrigan.target/plugins/jetty-webapp-7.2.2.v20101205.jar
+    com.vaguehope.morrigan.target/plugins/jetty-xml-7.2.2.v20101205.jar
+    com.vaguehope.morrigan.target/plugins/servlet-api-2.5.jar
+
+Direct Show Java Wrapper
+This library is free for use in non-commercial projects.  See wedsite for specific details.
+http://www.humatic.de/htools/dsj.htm
+Included files:
+    com.vaguehope.morrigan.playbackimpl.dsj/lib/dsj.jar
+    com.vaguehope.morrigan.playbackimpl.dsj/lib/dsj.dll
+
+gstreamer-java
+GNU Lesser General Public License.
+http://code.google.com/p/gstreamer-java
+Included files:
+    com.vaguehope.morrigan.playbackimpl.gs/lib/gstreamer-java-1.5.jar
+    com.vaguehope.morrigan.playbackimpl.gs/lib/gstreamer-java-swt-1.5.jar
+    com.vaguehope.morrigan.playbackimpl.gs/lib/jna-3.2.4.jar
+
+jintellitype
+The Apache Software License, Version 2.0.
+http://melloware.com/products/jintellitype/index.html
+Included files:
+    com.vaguehope.morrigan.hotkeyimpl.jintellitype/lib/jintellitype-1.3.7.jar
+    com.vaguehope.morrigan.hotkeyimpl.jintellitype/lib/JIntellitype.dll
+
+jxgrabkey
+GNU Library or "Lesser" General Public License version 3.0 (LGPLv3).
+http://sourceforge.net/projects/jxgrabkey
+Included files:
+    com.vaguehope.morrigan.hotkeyimpl.jxgrabkey/lib/JXGrabKey.jar
+    com.vaguehope.morrigan.hotkeyimpl.jxgrabkey/lib/libJXGrabKey.so
+
+Java Media Framework (JMF)
+JMF 2.1.1 Binary Code License (http://java.sun.com/javase/technologies/desktop/media/jmf/2.1.1/license.html)
+http://java.sun.com/javase/technologies/desktop/media/jmf
+Included files:
+    com.vaguehope.morrigan.playbackimpl.jmf/lib/jmf.jar
+
+jaudiotagger
+http://www.jthink.net/jaudiotagger
+LGPL
+Included files:
+    com.vaguehope.morrigan.model.media_impl/lib/jaudiotagger-2.0.3.jar
+
+JLayer 1.0.1
+LGPL
+http://www.javazoom.net/javalayer/javalayer.html
+Included files:
+    com.vaguehope.morrigan.playbackimpl.spi/lib/jl1.0.1.jar
+
+VorbisSPI 1.0.3
+LGPL
+http://www.javazoom.net/vorbisspi/vorbisspi.html
+Included files:
+    com.vaguehope.morrigan.playbackimpl.spi/lib/jogg-0.0.7.jar
+    com.vaguehope.morrigan.playbackimpl.spi/lib/jorbis-0.0.15.jar
+    com.vaguehope.morrigan.playbackimpl.spi/lib/vorbisspi1.0.3.jar
+
+MP3SPI 1.9.4
+LGPL
+http://www.javazoom.net/mp3spi/mp3spi.html
+Included files:
+    com.vaguehope.morrigan.playbackimpl.spi/lib/mp3spi1.9.4.jar
+
+J-Ogg
+"J-Ogg license" details: http://www.j-ogg.de/core/main?/download-libraries.html
+"This software is based on or using the J-Ogg library available from http://www.j-ogg.de and copyrighted by Tor-Einar Jarnbjo."
+Included files:
+    com.vaguehope.morrigan.playbackimpl.spi/lib/j-ogg-all.jar
+
+Tritonus
+LGPL
+http://www.tritonus.org
+Included files:
+    com.vaguehope.morrigan.playbackimpl.spi/lib/tritonus_mp3-0.3.6.jar
