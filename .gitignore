@@ -89,3 +89,27 @@
 # /com.vaguehope.sqlitewrapper/
 /com.vaguehope.sqlitewrapper/bin
 /com.vaguehope.sqlitewrapper/build.xml
+
+# Git does not store empty dirs.
+/com.vaguehope.morrigan.config/bin/
+/com.vaguehope.morrigan.danbooru/bin/
+/com.vaguehope.morrigan.engines/bin/
+/com.vaguehope.morrigan.gui/bin/
+/com.vaguehope.morrigan.hotkeyimpl.jintellitype/bin/
+/com.vaguehope.morrigan.hotkeyimpl.jxgrabkey/bin/
+/com.vaguehope.morrigan.model.db/bin/
+/com.vaguehope.morrigan.model.media/bin/
+/com.vaguehope.morrigan.model.media_impl/bin/
+/com.vaguehope.morrigan.model/bin/
+/com.vaguehope.morrigan.osgiconsole/bin/
+/com.vaguehope.morrigan.playbackimpl.dsj/bin/
+/com.vaguehope.morrigan.playbackimpl.gs/bin/
+/com.vaguehope.morrigan.playbackimpl.jmf/bin/
+/com.vaguehope.morrigan.playbackimpl.spi/bin/
+/com.vaguehope.morrigan.player/bin/
+/com.vaguehope.morrigan.server.boot/bin/
+/com.vaguehope.morrigan.server/bin/
+/com.vaguehope.morrigan.test/bin/
+/com.vaguehope.morrigan.util.httpclient/bin/
+/com.vaguehope.morrigan.util/bin/
+/com.vaguehope.morrigan.wui/bin/
