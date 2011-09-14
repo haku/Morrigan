@@ -1,0 +1,21 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Morrigan Spi Engine
+Bundle-SymbolicName: com.vaguehope.morrigan.playbackimpl.spi
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ClassPath: .,
+ lib/j-ogg-all.jar,
+ lib/jl1.0.1.jar,
+ lib/jogg-0.0.7.jar,
+ lib/jorbis-0.0.15.jar,
+ lib/mp3spi1.9.4.jar,
+ lib/tritonus_mp3-0.3.6.jar,
+ lib/tritonus_share-0.3.6.jar,
+ lib/vorbisspi1.0.3.jar
+Bundle-Vendor: vaguehope.com
+Bundle-Activator: com.vaguehope.morrigan.playbackimpl.spi.Activator
+Import-Package: com.vaguehope.morrigan.engines.playback,
+ com.vaguehope.morrigan.model.exceptions,
+ org.eclipse.swt.widgets,
+ org.osgi.framework;version="1.6.0"
