@@ -1,0 +1,2 @@
+067186abed04ffd5b5788ae8edfe035d xml-writer-0.2.zip http://www.megginson.com/downloads/xml-writer-0.2.zip
+58bf70b1c1044e5b1ab86d4d3e012d86 xml-writer.jar xml-writer-0.2.zip

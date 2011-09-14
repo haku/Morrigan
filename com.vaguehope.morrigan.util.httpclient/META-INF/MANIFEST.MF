@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Morrigan Util HTTP Client
+Bundle-SymbolicName: com.vaguehope.morrigan.util.httpclient
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: com.vaguehope.morrigan.util.httpclient
+Bundle-Vendor: vaguehope.com

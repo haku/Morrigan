@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# Once in git we should be able to do something like `dirname $0/..`.
+WORKSPACE="$1"
+
+if ! [ -e "$WORKSPACE" ] ; then echo "Workspace not found: $WORKSPACE" ; exit 1 ; fi
+
+# TODO remove path filters once we have migrated to git as they should no longer be needed.
+for JAR in `find $WORKSPACE \( -iname '*.jar' -o -iname '*.so' -o -iname '*.dll' \) \! -path '*/.*/*' -path '*/com.vaguehope.*/*' \! -path '*build/*' | sort ` ; do
+  JARDIR=`dirname "$JAR"`
+  PROVTXT="$JARDIR/../provenance.txt"
+  if [ -e "$PROVTXT" ] ; then
+    MD5=`md5sum "$JAR" | awk '{ print $1 }'`
+    if grep -q "$MD5" "$PROVTXT" ; then
+      STATUS=" OK "
+    else
+      STATUS="FAIL"
+    fi
+  else
+    STATUS="FAIL"
+  fi
+  
+  echo -n "[ $STATUS ] "
+  echo "$JAR"
+done

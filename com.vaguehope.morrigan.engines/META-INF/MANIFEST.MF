@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Morrigan Engines
+Bundle-SymbolicName: com.vaguehope.morrigan.engines
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: com.vaguehope.morrigan.engines,
+ com.vaguehope.morrigan.engines.common,
+ com.vaguehope.morrigan.engines.hotkey,
+ com.vaguehope.morrigan.engines.playback
+Import-Package: com.vaguehope.morrigan.config,
+ com.vaguehope.morrigan.model.exceptions,
+ org.eclipse.swt.events,
+ org.eclipse.swt.widgets
+Bundle-Vendor: vaguehope.com

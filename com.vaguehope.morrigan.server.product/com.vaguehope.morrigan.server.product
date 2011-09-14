@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?pde version="3.5"?>
+
+<product name="morriganserver" uid="com.vaguehope.morrigan.server.product" id="com.vaguehope.morrigan.server.product" application="org.eclipse.ui.ide.workbench" useFeatures="false" includeLaunchers="true">
+
+   <configIni use="default">
+   </configIni>
+
+   <launcherArgs>
+      <programArgs>-console</programArgs>
+      <vmArgs>-Declipse.ignoreApp=true -Dosgi.noShutdown=true -Djava.net.preferIPv4Stack=true</vmArgs>
+      <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
+   </launcherArgs>
+
+   <launcher name="morriganserver">
+      <solaris/>
+      <win useIco="false">
+         <bmp/>
+      </win>
+   </launcher>
+
+   <vm>
+   </vm>
+
+   <plugins>
+      <plugin id="com.vaguehope.morrigan.config"/>
+      <plugin id="com.vaguehope.morrigan.engines"/>
+      <plugin id="com.vaguehope.morrigan.model"/>
+      <plugin id="com.vaguehope.morrigan.model.db"/>
+      <plugin id="com.vaguehope.morrigan.model.media"/>
+      <plugin id="com.vaguehope.morrigan.model.media_impl"/>
+      <plugin id="com.vaguehope.morrigan.osgiconsole"/>
+      <plugin id="com.vaguehope.morrigan.playbackimpl.dsj"/>
+      <plugin id="com.vaguehope.morrigan.playbackimpl.gs"/>
+      <plugin id="com.vaguehope.morrigan.playbackimpl.jmf"/>
+      <plugin id="com.vaguehope.morrigan.player"/>
+      <plugin id="com.vaguehope.morrigan.server"/>
+      <plugin id="com.vaguehope.morrigan.server.boot"/>
+      <plugin id="com.vaguehope.morrigan.util"/>
+      <plugin id="com.vaguehope.morrigan.util.httpclient"/>
+      <plugin id="com.vaguehope.morrigan.wui"/>
+      <plugin id="com.vaguehope.sqlitewrapper"/>
+      <plugin id="org.eclipse.core.runtime"/>
+      <plugin id="org.eclipse.osgi"/>
+      <plugin id="org.eclipse.swt"/>
+      <plugin id="org.eclipse.swt.carbon.macosx" fragment="true"/>
+      <plugin id="org.eclipse.swt.cocoa.macosx" fragment="true"/>
+      <plugin id="org.eclipse.swt.cocoa.macosx.x86_64" fragment="true"/>
+      <plugin id="org.eclipse.swt.gtk.linux.ppc64" fragment="true"/>
+      <plugin id="org.eclipse.swt.gtk.linux.s390" fragment="true"/>
+      <plugin id="org.eclipse.swt.gtk.linux.s390x" fragment="true"/>
+      <plugin id="org.eclipse.swt.gtk.linux.x86" fragment="true"/>
+      <plugin id="org.eclipse.swt.gtk.linux.x86_64" fragment="true"/>
+      <plugin id="org.eclipse.swt.gtk.solaris.sparc" fragment="true"/>
+      <plugin id="org.eclipse.swt.gtk.solaris.x86" fragment="true"/>
+      <plugin id="org.eclipse.swt.win32.win32.x86" fragment="true"/>
+      <plugin id="org.eclipse.swt.win32.win32.x86_64" fragment="true"/>
+   </plugins>
+
+   <configurations>
+      <plugin id="com.vaguehope.morrigan.osgiconsole" autoStart="true" startLevel="0" />
+      <plugin id="com.vaguehope.morrigan.playbackimpl.dsj" autoStart="true" startLevel="0" />
+      <plugin id="com.vaguehope.morrigan.playbackimpl.gs" autoStart="true" startLevel="0" />
+      <plugin id="com.vaguehope.morrigan.playbackimpl.jmf" autoStart="true" startLevel="0" />
+      <plugin id="com.vaguehope.morrigan.server.boot" autoStart="true" startLevel="0" />
+      <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="0" />
+      <plugin id="org.eclipse.osgi" autoStart="true" startLevel="0" />
+   </configurations>
+
+</product>

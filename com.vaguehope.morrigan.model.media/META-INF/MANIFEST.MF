@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Morrigan Model-Media
+Bundle-SymbolicName: com.vaguehope.morrigan.model.media
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: vaguehope.com
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Import-Package: com.vaguehope.morrigan.model.db,
+ com.vaguehope.morrigan.model.db.basicimpl,
+ com.vaguehope.morrigan.model.exceptions,
+ com.vaguehope.morrigan.model.tasks,
+ com.vaguehope.sqlitewrapper
+Export-Package: com.vaguehope.morrigan.model.media

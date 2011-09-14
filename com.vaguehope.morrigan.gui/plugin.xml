@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+	
+	<extension id="product" point="org.eclipse.core.runtime.products" >
+		<product application="com.vaguehope.morrigan.gui.application" name="morrigan" >
+			<property name="appName" value="morrigan" />
+			<property name="windowImages" value="icons/crow-16.png,icons/crow-32.png,icons/crow-48.png" />
+   <property
+         name="aboutImage"
+         value="graphics/crow-full.png">
+   </property>
+   <property
+         name="aboutText"
+         value="This alpha build of morrigan is released as free software and is provided &quot;as is&quot; for testing use only.  For more information, please see this wiki page:&#x0A;&#x0A;http://vaguehope.com/morrigan&#x0A;&#x0A;You can email the developer at haku@vaguehope.com&#x0A;&#x0A;This build of Morrigan is copyright Fae Hutter 2010, 2011.  All rights reserved.&#x0A;&#x0A;Image &quot;The Morrígan&quot; by Louis le Brocquy used under the Creative Commons Attribution 2.5 Generic license.">
+   </property>
+		</product>
+	</extension>
+	
+   <extension id="application" point="org.eclipse.core.runtime.applications" >
+      <application>
+         <run class="com.vaguehope.morrigan.gui.Application"></run>
+      </application>
+   </extension>
+   
+   <extension point="org.eclipse.ui.perspectives">
+      <perspective
+            name="Main"
+            class="com.vaguehope.morrigan.gui.PerspectiveMain"
+            id="com.vaguehope.morrigan.gui.PerspectiveMain">
+      </perspective>
+   </extension>
+   
+   <extension point="org.eclipse.ui.views">
+   
+      <category name="Morrigan" id="com.vaguehope.morrigan" />
+   
+      <view
+            name="Media Explorer"
+            class="com.vaguehope.morrigan.gui.views.ViewMediaExplorer"
+            id="com.vaguehope.morrigan.gui.views.ViewMediaExplorer"
+            category="com.vaguehope.morrigan"
+            icon="icons/library.gif" >
+      </view>
+      
+      <view
+            name="Player"
+            class="com.vaguehope.morrigan.gui.views.ViewPlayer"
+            id="com.vaguehope.morrigan.gui.views.ViewPlayer"
+            category="com.vaguehope.morrigan"
+            icon="icons/stop.gif" >
+      </view>
+      
+      <view
+            name="Library Properties"
+            class="com.vaguehope.morrigan.gui.views.ViewLibraryProperties"
+            id="com.vaguehope.morrigan.gui.views.ViewLibraryProperties"
+            category="com.vaguehope.morrigan"
+            icon="icons/pref.gif" >
+      </view>
+      
+      <view
+            name="Progress View"
+            icon="icons/pview.gif"
+            category="org.eclipse.ui"
+            class="org.eclipse.ui.ExtensionFactory:progressView"
+            id="org.eclipse.ui.views.ProgressView">
+      </view>
+      <view
+            class="com.vaguehope.morrigan.gui.views.ViewControls"
+            icon="icons/play.gif"
+            id="com.vaguehope.morrigan.gui.views.ViewControls"
+            category="com.vaguehope.morrigan"
+            name="Controls"
+            restorable="true">
+      </view>
+      <view
+            class="com.vaguehope.morrigan.gui.views.ViewDisplay"
+            icon="icons/display.gif"
+            id="com.vaguehope.morrigan.gui.views.ViewDisplay"
+            category="com.vaguehope.morrigan"
+            name="Display"
+            restorable="true">
+      </view>
+      <view
+            class="com.vaguehope.morrigan.gui.views.ViewQueue"
+            icon="icons/queue.gif"
+            id="com.vaguehope.morrigan.gui.views.ViewQueue"
+            category="com.vaguehope.morrigan"
+            name="Queue"
+            restorable="true">
+      </view>
+      <view
+            class="com.vaguehope.morrigan.gui.views.ViewTagEditor"
+            icon="icons/tag.png"
+            id="com.vaguehope.morrigan.gui.views.ViewTagEditor"
+            category="com.vaguehope.morrigan"
+            name="Tags"
+            restorable="true">
+      </view>
+      <view
+            class="com.vaguehope.morrigan.gui.views.ViewPicture"
+            icon="icons/pref.gif"
+            id="com.vaguehope.morrigan.gui.views.ViewPicture"
+            category="com.vaguehope.morrigan"
+            name="Picture"
+            restorable="true">
+      </view>
+      
+   </extension>
+   
+   <extension point="org.eclipse.ui.editors">
+   
+      <editor
+            class="com.vaguehope.morrigan.gui.editors.tracks.PlaylistEditor"
+            default="false"
+            icon="icons/playlist.gif"
+            id="com.vaguehope.morrigan.gui.editors.PlaylistEditor"
+            name="MediaListEditor" >
+      </editor>
+      
+      <editor
+            class="com.vaguehope.morrigan.gui.editors.mmdb.LocalMixedMediaDbEditor"
+            default="false"
+            icon="icons/db.png"
+            id="com.vaguehope.morrigan.gui.editors.LocalMixedMediaDbEditor"
+            name="LocalMixedMediaDbEditor" >
+      </editor>
+      
+      <editor
+            class="com.vaguehope.morrigan.gui.editors.mmdb.RemoteMixedMediaDbEditor"
+            default="false"
+            icon="icons/db-remote.png"
+            id="com.vaguehope.morrigan.gui.editors.RemoteMixedMediaDbEditor"
+            name="RemoteMixedMediaDbEditor" >
+      </editor>
+      
+   </extension>
+   
+   <extension point="org.eclipse.ui.commands">
+   
+      <command
+            defaultHandler="com.vaguehope.morrigan.gui.handler.CallMediaListEditor"
+            id="com.vaguehope.morrigan.gui.handler.CallMediaListEditor"
+            name="CallMediaListEditor" />
+            
+      <command
+            defaultHandler="com.vaguehope.morrigan.gui.handler.CallPlayMedia"
+            id="com.vaguehope.morrigan.gui.handler.CallPlayMedia"
+            name="CallPlayMedia" />
+      <command
+            defaultHandler="com.vaguehope.morrigan.gui.handler.AddToQueue"
+            id="com.vaguehope.morrigan.gui.handler.AddToQueue"
+            name="AddToQueue">
+      </command>
+      
+   </extension>
+   
+   <extension point="org.eclipse.ui.preferencePages" >
+      <page
+            category="com.vaguehope.morrigan.gui.preferences.GeneralPref"
+            class="com.vaguehope.morrigan.gui.preferences.MediaListPref"
+            id="com.vaguehope.morrigan.gui.preferences.MediaListPref"
+            name="Media lists">
+      </page>
+      <page
+            class="com.vaguehope.morrigan.gui.preferences.GeneralPref"
+            id="com.vaguehope.morrigan.gui.preferences.GeneralPref"
+            name="Morrigan">
+      </page>
+      <page
+            category="org.eclipse.ui.preferencePages.Workbench"
+            class="org.eclipse.ui.ExtensionFactory:keysPreferencePage"
+            id="org.eclipse.ui.preferencePages.Keys"
+            name="Keys">
+      </page>
+      <page
+            category="org.eclipse.ui.preferencePages.Workbench"
+            class="org.eclipse.ui.ExtensionFactory:colorsAndFontsPreferencePage"
+            id="org.eclipse.ui.preferencePages.ColorsAndFonts"
+            name="Colors and Fonts">
+      </page>
+      <page
+            category="org.eclipse.ui.preferencePages.Workbench"
+            class="org.eclipse.ui.ExtensionFactory:appearancePreferencePage"
+            id="org.eclipse.ui.preferencePages.Appearance"
+            name="Appearance">
+      </page>
+      <page
+            category="org.eclipse.ui.preferencePages.Workbench"
+            class="org.eclipse.ui.ExtensionFactory:editorsPreferencePage"
+            id="org.eclipse.ui.preferencePages.Editors"
+            name="Editors">
+      </page>
+      <page
+            class="org.eclipse.ui.ExtensionFactory:workbenchPreferencePage"
+            id="org.eclipse.ui.preferencePages.Workbench"
+            name="Workbench">
+      </page>
+      <page
+            category="com.vaguehope.morrigan.gui.preferences.GeneralPref"
+            class="com.vaguehope.morrigan.gui.preferences.HotkeyPref"
+            id="com.vaguehope.morrigan.gui.preferences.HotkeyPref"
+            name="Hotkeys">
+      </page>
+   </extension>
+   
+   <extension point="org.eclipse.core.runtime.preferences" >
+      <initializer class="com.vaguehope.morrigan.gui.preferences.PreferenceInitializer">
+      </initializer>
+   </extension>
+   
+   <extension point="org.eclipse.ui.elementFactories">
+      <factory class="com.vaguehope.morrigan.gui.editors.EditorFactory"
+            id="com.vaguehope.morrigan.gui.editors.EditorFactory">
+      </factory>
+   </extension>
+
+	<extension point="org.eclipse.ui.menus" >
+		<menuContribution locationURI="toolbar:org.eclipse.ui.trim.status" >
+			<toolbar id="com.vaguehope.morrigan.gui.controls.ServerTrim" >
+				<control class="com.vaguehope.morrigan.gui.controls.ServerTrim" />
+			</toolbar>
+		</menuContribution>
+	</extension>
+
+</plugin>
