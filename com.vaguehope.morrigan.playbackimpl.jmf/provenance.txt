@@ -1,0 +1,2 @@
+5dafc2469b22d18420ada45972a88ec0 jmf-2_1_1e-alljava.zip http://download.oracle.com/otn-pub/java/jmf/2.1.1e/jmf-2_1_1e-alljava.zip
+d426a2343fed6e4a751d51e8069b4319 jmf.jar jmf-2_1_1e-alljava.zip

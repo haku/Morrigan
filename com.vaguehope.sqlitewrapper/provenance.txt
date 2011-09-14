@@ -1,0 +1,1 @@
+8960ef957eaa42672c338049e8dd768f sqlitejdbc-v056.jar http://files.zentus.com/sqlitejdbc/sqlitejdbc-v056.jar

@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Morrigan Config
+Bundle-SymbolicName: com.vaguehope.morrigan.config
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: com.vaguehope.morrigan.config
+Import-Package: com.vaguehope.morrigan.model.exceptions
+Bundle-Vendor: vaguehope.com

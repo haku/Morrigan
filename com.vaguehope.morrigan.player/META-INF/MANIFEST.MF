@@ -1,0 +1,20 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Morrigan Player
+Bundle-SymbolicName: com.vaguehope.morrigan.player
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: com.vaguehope.morrigan.player
+Import-Package: com.vaguehope.morrigan.engines,
+ com.vaguehope.morrigan.engines.common,
+ com.vaguehope.morrigan.engines.playback,
+ com.vaguehope.morrigan.model.db,
+ com.vaguehope.morrigan.model.exceptions,
+ com.vaguehope.morrigan.model.factory,
+ com.vaguehope.morrigan.model.helper,
+ com.vaguehope.morrigan.model.media,
+ com.vaguehope.morrigan.model.media.impl,
+ com.vaguehope.sqlitewrapper,
+ org.eclipse.swt,
+ org.eclipse.swt.widgets
+Bundle-Vendor: vaguehope.com

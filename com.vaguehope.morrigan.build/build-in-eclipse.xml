@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ====================================================================== 
+      Main build for Morrigan.
+      Calling target 'all' builds both GUI and server versions.
+     ====================================================================== -->
+
+<project name="com.vaguehope.morrigan.build" default="all" >
+
+	<target name="all" depends="clean,ready,build-gui,build-server" />
+
+	<!-- May be safely called as many times as needed. -->
+	<target name="setprop" >
+		<!-- Configure build process. -->
+		<property name="outputDirectory" value="${basedir}/builds" />
+		<property name="procDirectory" value="${basedir}/proc" />
+
+		<!-- Locate deltapack. -->
+		<property name="deltapack" value="${eclipse.home}/../eclipse-3.7-delta-pack" />
+		<echo message="deltapack=${deltapack}" />
+		<available property="haveDeltaPack" file="${deltapack}" />
+		<fail unless="haveDeltaPack" message="Deltapack not found." />
+
+		<!-- Configure RCP build process. -->
+		<property name="baseLocation" value="${eclipse.home}" />
+		<property name="builder" value="${basedir}" />
+		<property name="buildDirectory" value="${basedir}/buildDirectory" />
+		<!-- TODO FIXME remove reference to Morrigan-git directory. -->
+		<property name="pluginPath" value="${basedir}/..${path.separator}${basedir}/../Morrigan-git${path.separator}${basedir}/../com.vaguehope.morrigan.target${path.separator}${deltapack}" />
+		<property name="buildTempFolder" value="${buildDirectory}" />
+
+		<!-- Echo properties. -->
+		<echo message="baseLocation=${baseLocation}" />
+		<echo message="builder=${builder}" />
+		<echo message="buildDirectory=${buildDirectory}" />
+		<echo message="pluginPath=${pluginPath}" />
+		<echo message="buildTempFolder=${buildTempFolder}" />
+	</target>
+
+	<!-- Only run once per build, so only ref via direct depends. -->
+	<target name="configure" depends="clean,setprop" >
+		<!-- Generated properties. -->
+		<tstamp>
+			<format property="buildTime" pattern="yyyyMMdd_HHmm" timezone="UTC" />
+		</tstamp>
+	</target>
+
+	<target name="clean" depends="setprop" >
+		<delete dir="${buildDirectory}" failonerror="false" />
+		<delete dir="${procDirectory}" failonerror="false" />
+		<delete dir="${outputDirectory}" failonerror="false" />
+	</target>
+
+	<target name="ready" depends="setprop" >
+		<!-- Prep output dir. -->
+		<mkdir dir="${outputDirectory}" />
+	</target>
+
+	<target name="build-gui" depends="configure" >
+		<antcall target="main-build" >
+			<param file="build.properties" />
+			<reference refid="${buildTime}" />
+		</antcall>
+	</target>
+
+	<target name="build-server" depends="configure" >
+		<antcall target="main-build" >
+			<param file="build.server.properties" />
+			<reference refid="${buildTime}" />
+		</antcall>
+	</target>
+
+	<target name="main-build" depends="setprop" >
+		<property name="buildId" value="${archivePrefix}-${releaseName}-${buildTime}" />
+		<property name="buildLabel" value="${buildType}.${buildId}" />
+
+		<!-- Call RCP build process. -->
+		<ant antfile="${eclipse.pdebuild.scripts}/productBuild/productBuild.xml" />
+
+		<!-- Move to proc dir. -->
+		<mkdir dir="${procDirectory}" />
+		<move todir="${procDirectory}">
+			<fileset dir="${buildDirectory}/${buildLabel}" includes="*.zip" />
+		</move>
+
+		<!-- Augment build outputs. -->
+		<antcall target="zip_win32" >
+			<reference refid="${archivePrefix}" />
+		</antcall>
+		<antcall target="zip_linux" >
+			<reference refid="${archivePrefix}" />
+		</antcall>
+		<antcall target="zip_mac"   >
+			<reference refid="${archivePrefix}" />
+		</antcall>
+
+		<!-- Move to final output dir. -->
+		<move todir="${outputDirectory}">
+			<fileset dir="${procDirectory}" includes="*.zip" />
+		</move>
+
+		<!-- Delete proc dir. -->
+		<delete dir="${procDirectory}" />
+	</target>
+
+	<target name="zip_win32" depends="setprop" >
+		<fileset dir="${procDirectory}" id="zipfiles" >
+			<include name="*win32*.zip" />
+		</fileset>
+		<pathconvert pathsep="" property="zipfile" refid="zipfiles" />
+		<echo message="zipfile=${zipfile}" />
+
+		<zip destfile="${zipfile}" update="true" whenempty="fail" >
+			<zipfileset dir="propfiles"
+			            includes="win32.properties"
+			            fullpath="${archivePrefix}/morrigan.properties"
+			/>
+		</zip>
+	</target>
+
+	<target name="zip_linux" depends="setprop" >
+		<fileset dir="${procDirectory}" id="zipfiles" >
+			<include name="*linux*.zip" />
+		</fileset>
+		<pathconvert pathsep="" property="zipfile" refid="zipfiles" />
+		<echo message="zipfile=${zipfile}" />
+
+		<zip destfile="${zipfile}" update="true" whenempty="fail" >
+			<zipfileset dir="propfiles"
+						includes="linux.properties"
+						fullpath="${archivePrefix}/morrigan.properties"
+			/>
+			<zipfileset dir="rootfiles"
+						includes="morrigan.sh"
+						fullpath="${archivePrefix}/morrigan.sh"
+						filemode="755"
+			/>
+		</zip>
+	</target>
+
+	<target name="zip_mac" depends="setprop" >
+		<fileset dir="${procDirectory}" id="zipfiles" >
+			<include name="*macosx*.zip" />
+		</fileset>
+		<pathconvert pathsep="" property="zipfile" refid="zipfiles" />
+		<echo message="zipfile=${zipfile}" />
+
+		<zip destfile="${zipfile}" update="true" whenempty="fail" >
+			<zipfileset dir="propfiles"
+			            includes="mac.properties"
+			            fullpath="${archivePrefix}/morrigan.properties"
+			/>
+		</zip>
+	</target>
+
+</project>

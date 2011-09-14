@@ -1,0 +1,3 @@
+73beb7e33f1990485c49c5cfeef781ef gstreamer-java-1.5.jar https://gstreamer-java.googlecode.com/files/gstreamer-java-1.5.jar
+b7133e1c22b438b4ce7e70ab4a2dc55e gstreamer-java-swt-1.5.jar https://gstreamer-java.googlecode.com/files/gstreamer-java-swt-1.5.jar
+a7d587c5cd45c5a881d2878a3a15378e jna-3.2.4.jar https://gstreamer-java.googlecode.com/files/jna-3.2.4.jar
