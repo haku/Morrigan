@@ -97,19 +97,23 @@ public class Config {
 	private static Properties getProperties () throws MorriganException {
 		synchronized (propertiesLock) {
 			if (properties == null) {
-				File file = new File(PROP_FILE);
+				// This is a hack to try and make it work correctly on OSX.
+				File file = new File(new File(PROP_FILE).getAbsolutePath());
 				logger.info("PROP_FILE=" + file.getAbsolutePath());
 				Properties props = new Properties();
 				FileInputStream fis = null;
 				try {
 					fis = new FileInputStream(file);
 					props.load(fis);
-				} catch (Exception e) {
+				}
+				catch (IOException e) {
 					throw new MorriganException(e);
-				} finally {
+				}
+				finally {
 					try {
 						if (fis!=null) fis.close();
-					} catch (IOException e) {
+					}
+					catch (IOException e) {
 						throw new MorriganException(e);
 					}
 				}
