@@ -447,7 +447,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 		private final Action action;
 		
 		public GoFullScreenRunner (FullScreenAction action) {
-			this.mon = action.getMonitor();
+			this.mon = action == null ? null : action.getMonitor();
 			this.action = action;
 		}
 		
