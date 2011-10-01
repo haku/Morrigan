@@ -40,6 +40,12 @@ Included files:
     com.vaguehope.morrigan.playbackimpl.gs/lib/gstreamer-java-swt-1.5.jar
     com.vaguehope.morrigan.playbackimpl.gs/lib/jna-3.2.4.jar
 
+vlcj
+GNU GPL v3
+https://code.google.com/p/vlcj
+Included files:
+    com.vaguehope.morrigan.playbackimpl.vlc/lib/vlcj-1.1.5.1.jar
+
 jintellitype
 The Apache Software License, Version 2.0.
 http://melloware.com/products/jintellitype/index.html
