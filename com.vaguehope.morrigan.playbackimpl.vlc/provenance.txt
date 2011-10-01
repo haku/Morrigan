@@ -1,0 +1,2 @@
+a8f4d050c9a33ebdc9ba08d0ae40df74 vlcj-1.1.5.1.jar https://vlcj.googlecode.com/files/vlcj-1.1.5.1.jar
+
