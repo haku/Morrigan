@@ -213,28 +213,31 @@ public class MixedMediaDbFeedParser extends DefaultHandler {
     				}
 					
 					// TODO what about removing deleted tags?
-					List<MediaTag> tags = this.rmmdb.getTags(realItem);
-					Set<String> existingTags = new HashSet<String>(this.tagValues);
-					List<MediaTag> tagsToRemove = null;
-					for (MediaTag tag : tags) {
-						if (!existingTags.contains(tag.getTag())) {
-							if (tagsToRemove == null) tagsToRemove = new LinkedList<MediaTag>();
-							tagsToRemove.add(tag);
+					List<MediaTag> oldTags = this.rmmdb.getTags(realItem);
+					if (oldTags.size() > 0) {
+						Set<String> newTags = new HashSet<String>(this.tagValues);
+						List<MediaTag> tagsToRemove = null;
+						
+						for (MediaTag tag : oldTags) {
+							if (!newTags.contains(tag.getTag())) {
+								if (tagsToRemove == null) tagsToRemove = new LinkedList<MediaTag>();
+								tagsToRemove.add(tag);
+							}
+							// TODO What about partial matches with same tag but different class/type?
 						}
-						// TODO What about partial matches with same tag but different class/type?
-					}
-					
-					if (tagsToRemove != null) {
-						// TODO remove tags from [realItem].
-						StringBuilder logMsg = new StringBuilder();
-						logMsg.append("Remove tags from ");
-						logMsg.append(realItem.getTitle());
-						logMsg.append(":");
-						for (MediaTag tag : tagsToRemove) {
-							logMsg.append(" ");
-							logMsg.append(tag);
+						
+						if (tagsToRemove != null) {
+							// TODO remove tags from [realItem].
+							StringBuilder logMsg = new StringBuilder();
+							logMsg.append("Remove tags from ");
+							logMsg.append(realItem.getTitle());
+							logMsg.append(":");
+							for (MediaTag tag : tagsToRemove) {
+								logMsg.append(" ");
+								logMsg.append(tag);
+							}
+							this.taskEventListener.logMsg(this.rmmdb.getListName(), logMsg.toString());
 						}
-						this.taskEventListener.logMsg(this.rmmdb.getListName(), logMsg.toString());
 					}
 					
 					// Add new tags.  AddTag() has an implicit duplication check.
