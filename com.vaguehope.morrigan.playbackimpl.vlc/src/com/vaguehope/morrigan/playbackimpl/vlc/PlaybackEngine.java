@@ -23,8 +23,8 @@ import org.eclipse.swt.widgets.Control;
 import uk.co.caprica.vlcj.player.MediaPlayer;
 import uk.co.caprica.vlcj.player.MediaPlayerEventAdapter;
 import uk.co.caprica.vlcj.player.MediaPlayerEventListener;
-import uk.co.caprica.vlcj.player.VideoMetaData;
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
+import uk.co.caprica.vlcj.player.embedded.videosurface.CanvasVideoSurface;
 
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine;
 import com.vaguehope.morrigan.engines.playback.IPlaybackStatusListener;
@@ -33,7 +33,6 @@ import com.vaguehope.morrigan.engines.playback.PlaybackException;
 /**
  * References:
  * https://code.google.com/p/vlcj/wiki/SAQ
- * https://vlcj.googlecode.com/svn-history/r495/trunk/vlcj/javadoc/uk/co/caprica/vlcj/player/MediaPlayer.html
  */
 public class PlaybackEngine implements IPlaybackEngine {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -208,7 +207,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 			this.logger.fine("firstLoad=" + (player == null));
 			if (player == null) {
 				this.logger.fine("About to create player object...");
-				player = Activator.getFactory().newMediaPlayer(null);
+				player = Activator.getFactory().newEmbeddedMediaPlayer();
 				this.playerRef.set(player);
 				
 				this.logger.fine("Connecting event listener...");
@@ -272,14 +271,16 @@ public class PlaybackEngine implements IPlaybackEngine {
 							canvas.setBackground(java.awt.Color.black);
 							frame.add(canvas, BorderLayout.CENTER);
 							
-							player.setVideoSurface(canvas);
+							// So far as I know the video surface does not require disposal.
+							CanvasVideoSurface videoSurface = Activator.getFactory().newVideoSurface(canvas);
+							player.setVideoSurface(videoSurface);
 							
 							// If video is playing, put it back again...
 							if (seek && (player.isPlaying() || getPlaybackState() == PlayState.Paused )) {
 								PlaybackEngine.this.logger.fine("Restarting playback...");
 								long time = player.getTime();
 								player.stop();
-								player.play();
+								player.play(); // This is an async call.
 								player.setTime(time);
 							}
 							
@@ -353,11 +354,6 @@ public class PlaybackEngine implements IPlaybackEngine {
 		}
 		
 		@Override
-		public void metaDataAvailable(MediaPlayer mediaPlayer, VideoMetaData videoMetaData) {
-			// TODO do something interesting with this.
-		}
-		
-		@Override
 		public void error (MediaPlayer mediaPlayer) {
 			// TODO work out what to do with this.  call m_listener ?
 		}
@@ -405,8 +401,8 @@ public class PlaybackEngine implements IPlaybackEngine {
 			EmbeddedMediaPlayer player = this.playerRef.get();
 			if (player != null) {
 				this.logger.fine("calling playbin.setState(PLAYING)...");
-				player.play();
-				setStateAndCallListener(PlayState.Playing);
+				player.play(); // This is an async call.
+//				setStateAndCallListener(PlayState.Playing); // Do think this is needed as there will be a call back.
 			}
 		}
 		finally {
@@ -435,7 +431,10 @@ public class PlaybackEngine implements IPlaybackEngine {
 		try {
 			EmbeddedMediaPlayer player = this.playerRef.get();
 			if (player != null) {
-				player.setPause(false);
+				/* Using play() instead of setPause(false) as it seems safer.
+				 * May change it if it causes issues.
+				 */
+				player.play();
 				setStateAndCallListener(PlayState.Playing);
 			}
 		}

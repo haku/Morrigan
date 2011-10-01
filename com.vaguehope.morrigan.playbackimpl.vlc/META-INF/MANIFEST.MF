@@ -5,8 +5,8 @@ Bundle-SymbolicName: com.vaguehope.morrigan.playbackimpl.vlc
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: .,
- lib/vlcj-1.1.5.1.jar,
- lib/jna-3.2.4.jar
+ lib/jna-3.2.4.jar,
+ lib/vlcj-1.2.1-b1.jar
 Bundle-Vendor: vaguehope.com
 Import-Package: com.vaguehope.morrigan.engines.playback,
  com.vaguehope.morrigan.model.exceptions,
