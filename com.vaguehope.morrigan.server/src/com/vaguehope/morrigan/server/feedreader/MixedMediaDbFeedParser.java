@@ -9,8 +9,10 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.net.UnknownHostException;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.Stack;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -25,6 +27,7 @@ import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
+import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.model.tasks.TaskEventListener;
 import com.vaguehope.morrigan.server.MlistsServlet;
@@ -210,6 +213,29 @@ public class MixedMediaDbFeedParser extends DefaultHandler {
     				}
 					
 					// TODO what about removing deleted tags?
+					List<MediaTag> tags = this.rmmdb.getTags(realItem);
+					Set<String> existingTags = new HashSet<String>(this.tagValues);
+					List<MediaTag> tagsToRemove = null;
+					for (MediaTag tag : tags) {
+						if (!existingTags.contains(tag.getTag())) {
+							if (tagsToRemove == null) tagsToRemove = new LinkedList<MediaTag>();
+							tagsToRemove.add(tag);
+						}
+						// TODO What about partial matches with same tag but different class/type?
+					}
+					
+					if (tagsToRemove != null) {
+						// TODO remove tags from [realItem].
+						StringBuilder logMsg = new StringBuilder();
+						logMsg.append("Remove tags from ");
+						logMsg.append(realItem.getTitle());
+						logMsg.append(":");
+						for (MediaTag tag : tagsToRemove) {
+							logMsg.append(" ");
+							logMsg.append(tag);
+						}
+						this.taskEventListener.logMsg(this.rmmdb.getListName(), logMsg.toString());
+					}
 					
 					// Add new tags.  AddTag() has an implicit duplication check.
 					for (int i = 0; i < this.tagValues.size(); i++) {
