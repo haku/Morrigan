@@ -17,24 +17,23 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
+import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaTagType;
-import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
 import com.vaguehope.morrigan.model.tasks.TaskEventListener;
 import com.vaguehope.morrigan.server.MlistsServlet;
 import com.vaguehope.morrigan.server.feedwriters.XmlHelper;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbFactory;
 import com.vaguehope.morrigan.util.httpclient.HttpClient;
+import com.vaguehope.morrigan.util.httpclient.HttpClient.HttpResponse;
 import com.vaguehope.morrigan.util.httpclient.HttpStreamHandler;
 import com.vaguehope.morrigan.util.httpclient.HttpStreamHandlerException;
-import com.vaguehope.morrigan.util.httpclient.HttpClient.HttpResponse;
 import com.vaguehope.sqlitewrapper.DbException;
 
 public class MixedMediaDbFeedParser extends DefaultHandler {
@@ -209,11 +208,15 @@ public class MixedMediaDbFeedParser extends DefaultHandler {
 					if (this.tagValues.size() != this.tagTypes.size() || this.tagValues.size() != this.tagClasses.size()) {
     					throw new IllegalArgumentException("Unbalanced tag lists.");
     				}
+					
 					// TODO what about removing deleted tags?
+					
+					// Add new tags.  AddTag() has an implicit duplication check.
 					for (int i = 0; i < this.tagValues.size(); i++) {
     					String value = this.tagValues.get(i);
     					MediaTagType type = this.tagTypes.get(i);
     					String classString = this.tagClasses.get(i);
+    					if (classString != null && classString.length() < 1) classString = null;
     					this.rmmdb.addTag(realItem, value, type, classString);
     				}
 				}
