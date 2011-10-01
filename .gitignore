@@ -56,6 +56,10 @@
 /com.vaguehope.morrigan.playbackimpl.gs/build.xml
 /com.vaguehope.morrigan.playbackimpl.gs/javaCompiler...args
 
+# /com.vaguehope.morrigan.playbackimpl.gs/
+/com.vaguehope.morrigan.playbackimpl.vlc/build.xml
+/com.vaguehope.morrigan.playbackimpl.vlc/javaCompiler...args
+
 # /com.vaguehope.morrigan.playbackimpl.jmf/
 /com.vaguehope.morrigan.playbackimpl.jmf/morrigan.playbackimpl.jmf.jar
 /com.vaguehope.morrigan.playbackimpl.jmf/build.xml
