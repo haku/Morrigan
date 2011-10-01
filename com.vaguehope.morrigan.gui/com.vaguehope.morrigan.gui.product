@@ -57,6 +57,7 @@ Image &quot;The Morrígan&quot; by Louis le Brocquy used under the Creative Comm
       <plugin id="com.vaguehope.morrigan.playbackimpl.dsj"/>
       <plugin id="com.vaguehope.morrigan.playbackimpl.gs"/>
       <plugin id="com.vaguehope.morrigan.playbackimpl.jmf"/>
+      <plugin id="com.vaguehope.morrigan.playbackimpl.vlc"/>
       <plugin id="com.vaguehope.morrigan.player"/>
       <plugin id="com.vaguehope.morrigan.server"/>
       <plugin id="com.vaguehope.morrigan.server.boot"/>
