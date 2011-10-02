@@ -1,2 +1,3 @@
-a8f4d050c9a33ebdc9ba08d0ae40df74 vlcj-1.1.5.1.jar https://vlcj.googlecode.com/files/vlcj-1.1.5.1.jar
-
+32eab67f041726fd583795e8e79bf73d vlcj-1.2.1-b2.jar https://vlcj.googlecode.com/files/vlcj-1.2.1-b2.jar
+49c674131d34b68f85417909c7e3d5ba jna.jar http://java.net/projects/jna/sources/svn/content/tags/3.3.0/jnalib/dist/jna.jar?rev=1208
+49c674131d34b68f85417909c7e3d5ba jna.jar https://github.com/twall/jna/raw/3.3.0/jnalib/dist/jna.jar
