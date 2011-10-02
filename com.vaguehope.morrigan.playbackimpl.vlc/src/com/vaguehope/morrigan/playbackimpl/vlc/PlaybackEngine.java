@@ -249,8 +249,8 @@ public class PlaybackEngine implements IPlaybackEngine {
 			this.videoFrame = null;
 			
 			final EmbeddedMediaPlayer player = this.playerRef.get();
-			if (player != null && this.hasVideo.get()) { // Do we have anything to attach video output to and does it need it?
-				if (newParent != null) { // Can not attach video to something that is not there...
+			if (player != null) {
+				if (newParent != null && this.hasVideo.get()) { // Do we have any video to attach and somewhere to put it?
 					this.logger.fine("Creating new video frame...");
 					ThreadHelper.runInUiThread(newParent, new Runnable() {
 						@Override
