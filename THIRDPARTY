@@ -44,7 +44,14 @@ vlcj
 GNU GPL v3
 https://code.google.com/p/vlcj
 Included files:
-    com.vaguehope.morrigan.playbackimpl.vlc/lib/vlcj-1.1.5.1.jar
+    com.vaguehope.morrigan.playbackimpl.vlc/lib/vlcj-1.2.1-b2.jar
+
+JNA
+LGPL 2.1
+http://jna.java.net
+https://github.com/twall/jna
+Included files:
+    com.vaguehope.morrigan.playbackimpl.vlc/lib/jna.jar
 
 jintellitype
 The Apache Software License, Version 2.0.
