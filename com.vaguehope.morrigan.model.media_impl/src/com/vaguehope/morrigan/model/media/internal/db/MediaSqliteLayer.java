@@ -494,9 +494,10 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 //	Private methods for tags.
 	
 	private boolean local_addTag (IDbItem item, String tag, MediaTagType type, String cls_name) throws SQLException, ClassNotFoundException, DbException {
-		MediaTagClassification mtc = local_getTagClassification(cls_name);
-		if (mtc == null) {
-			mtc = local_addTagClassification(cls_name);
+		MediaTagClassification mtc = null;
+		if (cls_name != null && cls_name.length() > 0) {
+			mtc = local_getTagClassification(cls_name);
+			if (mtc == null) mtc = local_addTagClassification(cls_name);
 		}
 		return local_addTag(item, tag, type, mtc);
 	}
