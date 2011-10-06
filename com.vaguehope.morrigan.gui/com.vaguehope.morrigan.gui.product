@@ -54,7 +54,6 @@ Image &quot;The Morrígan&quot; by Louis le Brocquy used under the Creative Comm
       <plugin id="com.vaguehope.morrigan.osgiconsole"/>
       <plugin id="com.vaguehope.morrigan.playbackimpl.dsj"/>
       <plugin id="com.vaguehope.morrigan.playbackimpl.gs"/>
-      <plugin id="com.vaguehope.morrigan.playbackimpl.jmf"/>
       <plugin id="com.vaguehope.morrigan.playbackimpl.vlc"/>
       <plugin id="com.vaguehope.morrigan.player"/>
       <plugin id="com.vaguehope.morrigan.server"/>
@@ -147,7 +146,7 @@ Image &quot;The Morrígan&quot; by Louis le Brocquy used under the Creative Comm
       <plugin id="com.vaguehope.morrigan.hotkeyimpl.jxgrabkey" autoStart="true" startLevel="0" />
       <plugin id="com.vaguehope.morrigan.playbackimpl.dsj" autoStart="true" startLevel="0" />
       <plugin id="com.vaguehope.morrigan.playbackimpl.gs" autoStart="true" startLevel="0" />
-      <plugin id="com.vaguehope.morrigan.playbackimpl.jmf" autoStart="true" startLevel="0" />
+      <plugin id="com.vaguehope.morrigan.playbackimpl.vlc" autoStart="true" startLevel="0" />
       <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="0" />
    </configurations>
 
