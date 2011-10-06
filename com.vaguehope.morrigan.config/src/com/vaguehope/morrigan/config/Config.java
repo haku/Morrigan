@@ -1,19 +1,9 @@
 package com.vaguehope.morrigan.config;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Properties;
-import java.util.logging.Logger;
-
-import com.vaguehope.morrigan.model.exceptions.MorriganException;
 
 
 public class Config {
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	private static final Logger logger = Logger.getLogger(Config.class.getName());
-	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private static final String DIR_CONFIG = "/.morrigan";
@@ -86,48 +76,17 @@ public class Config {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private static final String PROP_FILE = "morrigan.properties";
+	private static final String PROP_MEDIA_TYPES = "morrigan.media.types";
+	private static final String PROP_MEDIA_PICTURE_TYPES = "morrigan.media.pictures.types";
 	
-	private static final String PROP_MEDIA_TYPES = "media.types";
-	private static final String PROP_MEDIA_PICTURE_TYPES = "media.pictures.types";
-	
-	private static Object propertiesLock = new Object();
-	private static Properties properties = null;
-	
-	private static Properties getProperties () throws MorriganException {
-		synchronized (propertiesLock) {
-			if (properties == null) {
-				// This is a hack to try and make it work correctly on OSX.
-				File file = new File(new File(PROP_FILE).getAbsolutePath());
-				logger.info("PROP_FILE=" + file.getAbsolutePath());
-				Properties props = new Properties();
-				FileInputStream fis = null;
-				try {
-					fis = new FileInputStream(file);
-					props.load(fis);
-				}
-				catch (IOException e) {
-					throw new MorriganException(e);
-				}
-				finally {
-					try {
-						if (fis!=null) fis.close();
-					}
-					catch (IOException e) {
-						throw new MorriganException(e);
-					}
-				}
-				properties = props;
-			}
-		}
-		return properties;
-	}
+	private final static String DEFAULT_MEDIA_TYPES = "mp3|ogg|wma|wmv|avi|mpg|mpeg|ac3|mp4|wav|ra|mpga|mkv|ogm|mpc|m4a|flv|rmvb|aac|m4v|flac";
+	private final static String DEFAULT_MEDIA_PICTURE_TYPES = "jpg|jpeg|png|gif";
 	
 	/**
 	 * @return Array of lower-case strings without dots.  e.g. "mp3", "ogg".
 	 */
-	public static String[] getMediaFileTypes () throws MorriganException {
-		String types = getProperties().getProperty(PROP_MEDIA_TYPES);
+	public static String[] getMediaFileTypes () {
+		String types = System.getProperty(PROP_MEDIA_TYPES, DEFAULT_MEDIA_TYPES);
 		String[] arrTypes = types.split("\\|");
 		
 		for (int i = 0; i < arrTypes.length; i++) {
@@ -140,8 +99,8 @@ public class Config {
 	/**
 	 * @return Array of lower-case strings without dots.  e.g. "mp3", "ogg".
 	 */
-	public static String[] getPictureFileTypes () throws MorriganException {
-		String types = getProperties().getProperty(PROP_MEDIA_PICTURE_TYPES);
+	public static String[] getPictureFileTypes () {
+		String types = System.getProperty(PROP_MEDIA_PICTURE_TYPES, DEFAULT_MEDIA_PICTURE_TYPES);
 		String[] arrTypes = types.split("\\|");
 		
 		for (int i = 0; i < arrTypes.length; i++) {

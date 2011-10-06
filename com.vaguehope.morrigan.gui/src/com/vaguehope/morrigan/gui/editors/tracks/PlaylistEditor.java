@@ -226,13 +226,7 @@ public class PlaylistEditor extends MediaTrackListEditor<IMediaPlaylist,IMediaTr
 		
 		@Override
 		public void run () {
-			String[] supportedFormats;
-			try {
-				supportedFormats = Config.getMediaFileTypes();
-			} catch (MorriganException e) {
-				new MorriganMsgDlg(e).open();
-				return;
-			}
+			String[] supportedFormats = Config.getMediaFileTypes();
 			
 			String[] filterList = new String[supportedFormats.length+2];
 			StringBuilder allTypes = new StringBuilder();
