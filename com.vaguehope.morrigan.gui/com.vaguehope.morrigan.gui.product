@@ -22,7 +22,7 @@ Image &quot;The Morrígan&quot; by Louis le Brocquy used under the Creative Comm
    </configIni>
 
    <launcherArgs>
-      <vmArgs>-Djava.net.preferIPv4Stack=true</vmArgs>
+      <vmArgs>-Djava.net.preferIPv4Stack=true -Dfile.encoding=UTF-8</vmArgs>
       <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
    </launcherArgs>
 
@@ -36,10 +36,8 @@ Image &quot;The Morrígan&quot; by Louis le Brocquy used under the Creative Comm
       </win>
    </launcher>
 
-
    <vm>
    </vm>
-
 
    <plugins>
       <plugin id="com.ibm.icu"/>
