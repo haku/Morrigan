@@ -14,6 +14,10 @@
          name="aboutText"
          value="This alpha build of morrigan is released as free software and is provided &quot;as is&quot; for testing use only.  For more information, please see this wiki page:&#x0A;&#x0A;http://vaguehope.com/morrigan&#x0A;&#x0A;You can email the developer at haku@vaguehope.com&#x0A;&#x0A;This build of Morrigan is copyright Fae Hutter 2010, 2011.  All rights reserved.&#x0A;&#x0A;Image &quot;The Morrígan&quot; by Louis le Brocquy used under the Creative Commons Attribution 2.5 Generic license.">
    </property>
+   <property
+		name="preferenceCustomization"
+		value="plugin_customization.ini"
+	/>
 		</product>
 	</extension>
 	
