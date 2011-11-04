@@ -67,7 +67,7 @@ public abstract class AbstractMixedMediaDb
 					e.printStackTrace();
 				}
 			}
-		}.run();
+		}.start();
 	}
 	
 	void saveDefaultMediaTypeToDb () throws DbException {
