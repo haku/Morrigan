@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.xml.sax.SAXException;
 
 import com.megginson.sax.DataWriter;
+import com.vaguehope.morrigan.asyncui.AsyncActions;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.model.media.IMixedMediaDb;
@@ -253,7 +254,7 @@ public class MlistsServlet extends HttpServlet {
 			}
 		}
 		else if (action.equals(CMD_SCAN)) {
-			HeadlessHelper.scheduleMmdbScan(mmdb);
+			AsyncActions.scheduleMmdbScan(mmdb);
 			resp.setContentType("text/plain");
 			resp.getWriter().println("Scan scheduled desu~");
 		}
