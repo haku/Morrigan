@@ -64,7 +64,10 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 		
 		String cmd = args.remove(0);
-		if (cmd.equals("m") || cmd.equals("media")) {
+		if (cmd.equals("h") || cmd.equals("help")) {
+			ci.print(this.getHelp()); // already ends with new line.
+		}
+		else if (cmd.equals("m") || cmd.equals("media")) {
 			doMedia(ci, args);
 		}
 		else if (cmd.equals("p") || cmd.equals("players") || cmd.equals("player")) {
