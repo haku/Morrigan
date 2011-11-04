@@ -7,6 +7,9 @@ import com.vaguehope.morrigan.gui.helpers.ConsoleHelper;
 import com.vaguehope.morrigan.model.tasks.TaskEventListener;
 import com.vaguehope.morrigan.util.ErrorHelper;
 
+/**
+ * Adaptor class for sending status data to RCP IProgressMonitor.
+ */
 public class PrgListener implements TaskEventListener {
 	
 	private final IProgressMonitor monitor;
