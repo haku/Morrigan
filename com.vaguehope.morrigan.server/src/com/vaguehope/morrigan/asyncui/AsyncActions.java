@@ -34,11 +34,10 @@ public class AsyncActions {
 			Thread t = new Thread () {
 				@Override
 				public void run() {
-					task.run(new SysOutPrgListener(mmdb.getListName()));
+					task.run(AsyncProgressRegister.makeTrackedListener());
 				}
 			};
 			t.start();
-			System.err.println("Scan of " + mmdb.getListId() + " scheduled on thread " + t.getId() + ".");
 			return;
 		}
 		throw new IllegalArgumentException("Failed to get task object from factory method.");
@@ -50,11 +49,10 @@ public class AsyncActions {
 			Thread t = new Thread () {
 				@Override
 				public void run() {
-					task.run(new SysOutPrgListener(mmdb.getListName()));
+					task.run(AsyncProgressRegister.makeTrackedListener());
 				}
 			};
 			t.start();
-			System.err.println("Refresh of " + mmdb.getListId() + " scheduled on thread " + t.getId() + ".");
 			return;
 			
 		}
