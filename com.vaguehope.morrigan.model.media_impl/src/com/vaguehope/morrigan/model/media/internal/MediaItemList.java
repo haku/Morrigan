@@ -372,7 +372,7 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 	 * @param freshList
 	 * @return items that were removed from keepList.
 	 */
-	public List<T> updateList (List<T> keepList, List<T> freshList, boolean UpdateKeepList) {
+	public List<T> updateList (List<T> keepList, List<T> freshList, boolean updateKeepList) {
 		List<T> finalList = new ArrayList<T>();
 		
 		synchronized (keepList) {
@@ -388,14 +388,14 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 				for (T newItem : freshList) {
 					T oldItem = keepMap.get(newItem.getFilepath());
 					if (oldItem != null) {
-						oldItem.setFromMediaItem(newItem);
+						if (oldItem != newItem) oldItem.setFromMediaItem(newItem);
 						finalList.add(oldItem);
 					} else {
 						finalList.add(newItem);
 					}
 				}
 				
-				System.err.println("Replacing " + keepList.size() + " items with " + finalList.size() + " items.");
+				// System.err.println("Replacing " + keepList.size() + " items with " + finalList.size() + " items.");
 				
 				/* Create a new list and populate it with the
 				 * items removed.
@@ -411,13 +411,13 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 					}
 				}
 				
-				System.err.println("Removed " + removedItems.size() + " items.");
+				// System.err.println("Removed " + removedItems.size() + " items.");
 				
 				/* Update the keep list.  We need to modify
 				 * the passed in list, not return a new one.
 				 * This block takes no time.
 				 */
-				if (UpdateKeepList) {
+				if (updateKeepList) {
 					keepList.clear();
 					keepList.addAll(finalList);
 				}
