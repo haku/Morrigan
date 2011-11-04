@@ -135,7 +135,7 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMe
 				if (!library.isMarkedAsUnreadable(item)) {
 					return true;
 				}
-				taskEventListener.logMsg(this.getItemList().getListName(), "Ignoring unreadable file '"+item.getFilepath()+"'.");
+				taskEventListener.logMsg(library.getListName(), "Ignoring unreadable file '"+item.getFilepath()+"'.");
 			}
 			return false;
 		}
@@ -155,7 +155,7 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMe
 				return shouldTrackMetaData1(taskEventListener, library, item);
 			}
 			
-			taskEventListener.logMsg(this.getItemList().getListName(), "Failed to determin type of file '"+item.getFilepath()+"'.");
+			taskEventListener.logMsg(library.getListName(), "Failed to determin type of file '"+item.getFilepath()+"'.");
 			return false;
 		}
 	}
