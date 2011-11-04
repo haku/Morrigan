@@ -10,6 +10,7 @@ import org.eclipse.osgi.framework.console.CommandInterpreter;
 import org.eclipse.osgi.framework.console.CommandProvider;
 
 import com.vaguehope.morrigan.asyncui.AsyncActions;
+import com.vaguehope.morrigan.asyncui.AsyncProgressRegister;
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DurationData;
@@ -46,6 +47,7 @@ public class MorriganCommandProvider implements CommandProvider {
 				"\tmn play [<q1> [<q2>]]\n" +
 				"\tmn [queue|q] [<q1> [<q2>]|clear]\n" +
 				"\tmn [pause|stop|s|next|n]\n" +
+				"\tmn st\n" +
 				"\tNOTE 1: <q1> = list, <q2> = item in <q1>.\n" +
 				"\tNOTE 2: Only omit player ID when there is only one player.\n";
 	}
@@ -64,8 +66,8 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 		
 		String cmd = args.remove(0);
-		if (cmd.equals("h") || cmd.equals("help")) {
-			ci.print(this.getHelp()); // already ends with new line.
+		if (cmd.equals("st")) {
+			doStat(ci);
 		}
 		else if (cmd.equals("m") || cmd.equals("media")) {
 			doMedia(ci, args);
@@ -88,10 +90,19 @@ public class MorriganCommandProvider implements CommandProvider {
 		else if (cmd.equals("n") || cmd.equals("next")) {
 			doNext(ci);
 		}
+		else if (cmd.equals("h") || cmd.equals("help")) {
+			ci.print(this.getHelp()); // already ends with new line.
+		}
 		else {
 			ci.println("Unknown command '"+cmd+"'.");
 		}
 		
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	static private void doStat (CommandInterpreter ci) {
+		ci.print(AsyncProgressRegister.reportSummary()); // Has own trailing new line.
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
