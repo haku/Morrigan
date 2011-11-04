@@ -9,6 +9,7 @@ import java.util.List;
 import org.eclipse.osgi.framework.console.CommandInterpreter;
 import org.eclipse.osgi.framework.console.CommandProvider;
 
+import com.vaguehope.morrigan.asyncui.AsyncActions;
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DurationData;
@@ -22,7 +23,6 @@ import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlayerHelper;
 import com.vaguehope.morrigan.player.PlayerRegister;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
-import com.vaguehope.morrigan.server.HeadlessHelper;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDb;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbHelper;
 import com.vaguehope.morrigan.util.TimeHelper;
@@ -273,10 +273,10 @@ public class MorriganCommandProvider implements CommandProvider {
 			else {
 				IMediaTrackList<? extends IMediaTrack> list = results.get(0).list;
 				if (list instanceof ILocalMixedMediaDb) {
-					HeadlessHelper.scheduleMmdbScan((ILocalMixedMediaDb) list);
+					AsyncActions.scheduleMmdbScan((ILocalMixedMediaDb) list);
 				}
 				else if (list instanceof RemoteMixedMediaDb) {
-					HeadlessHelper.scheduleRemoteMmdbScan((RemoteMixedMediaDb) list);
+					AsyncActions.scheduleRemoteMmdbScan((RemoteMixedMediaDb) list);
 				}
 				else {
 					ci.println("Unable to schedule scan for item '"+list.getListName()+"'.");

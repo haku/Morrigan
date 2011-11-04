@@ -1,19 +1,17 @@
-package com.vaguehope.morrigan.server;
+package com.vaguehope.morrigan.asyncui;
 
 import com.vaguehope.morrigan.model.media.IMixedMediaDb;
 import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.impl.MediaFactoryImpl;
 import com.vaguehope.morrigan.model.tasks.IMorriganTask;
-import com.vaguehope.morrigan.model.tasks.TaskEventListener;
-import com.vaguehope.morrigan.util.ErrorHelper;
 
 /**
  * Set of helper functions for interacting
  * when there is no GUI.
  *
  */
-public class HeadlessHelper {
+public class AsyncActions {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	static public void scheduleMmdbScan (final IMixedMediaDb mmdb) {
@@ -36,7 +34,7 @@ public class HeadlessHelper {
 			Thread t = new Thread () {
 				@Override
 				public void run() {
-					task.run(new DbScanMon(mmdb.getListName()));
+					task.run(new SysOutPrgListener(mmdb.getListName()));
 				}
 			};
 			t.start();
@@ -52,7 +50,7 @@ public class HeadlessHelper {
 			Thread t = new Thread () {
 				@Override
 				public void run() {
-					task.run(new DbScanMon(mmdb.getListName()));
+					task.run(new SysOutPrgListener(mmdb.getListName()));
 				}
 			};
 			t.start();
@@ -61,64 +59,6 @@ public class HeadlessHelper {
 			
 		}
 		throw new IllegalArgumentException("Failed to get task object from factory method.");
-	}
-	
-	static class DbScanMon implements TaskEventListener {
-		
-		private final String logPrefix;
-		private int totalWork = 0;
-		private int workDone = 0;
-		private boolean canceled;
-		
-		public DbScanMon (String logPrefix) {
-			this.logPrefix = logPrefix;
-		}
-		
-		@Override
-		public void logMsg(String topic, String s) {
-			System.out.print("[");
-			System.out.print(topic);
-			System.out.print("] ");
-			System.out.print(s);
-			System.out.println();
-		}
-		
-		@Override
-		public void logError(String topic, String s, Throwable t) {
-			String causeTrace = ErrorHelper.getCauseTrace(t);
-			logMsg(topic, s.concat("\n".concat(causeTrace)));
-		}
-		
-		@Override
-		public void onStart() {/* UNUSED */}
-		
-		@Override
-		public void beginTask(String name, @SuppressWarnings("hiding") int totalWork) {
-			this.totalWork = totalWork;
-			System.out.println("[" + this.logPrefix + "] starting task: " + name + ".");
-		}
-		
-		@Override
-		public void done() {
-			System.out.println("[" + this.logPrefix + "] done.");
-		}
-		
-		@Override
-		public void subTask(String name) {
-			System.out.println("[" + this.logPrefix + "] sub task: "+name+".");
-		}
-		
-		@Override
-		public boolean isCanceled() {
-			return this.canceled;
-		}
-		
-		@Override
-		public void worked(int work) {
-			this.workDone = this.workDone + work;
-			System.out.println("[" + this.logPrefix + "] worked " + this.workDone + " of " + this.totalWork + ".");
-		}
-		
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
