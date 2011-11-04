@@ -292,7 +292,7 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 					e.printStackTrace();
 				}
 			}
-		}.run();
+		}.start();
 	}
 	
 	void saveSortToDb () throws DbException {
