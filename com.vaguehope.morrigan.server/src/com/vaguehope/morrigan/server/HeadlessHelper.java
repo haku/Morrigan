@@ -8,26 +8,29 @@ import com.vaguehope.morrigan.model.tasks.IMorriganTask;
 import com.vaguehope.morrigan.model.tasks.TaskEventListener;
 import com.vaguehope.morrigan.util.ErrorHelper;
 
-
-// TODO move this class somewhere more appropriate ???
+/**
+ * Set of helper functions for interacting
+ * when there is no GUI.
+ *
+ */
 public class HeadlessHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	static public boolean scheduleMmdbScan (final IMixedMediaDb mmdb) {
+	static public void scheduleMmdbScan (final IMixedMediaDb mmdb) {
 		if (mmdb instanceof ILocalMixedMediaDb) {
 			ILocalMixedMediaDb lmmdb = (ILocalMixedMediaDb) mmdb;
-			return scheduleMmdbScan(lmmdb);
+			scheduleMmdbScan(lmmdb);
 		}
 		else if (mmdb instanceof IRemoteMixedMediaDb) {
 			IRemoteMixedMediaDb rmmdb = (IRemoteMixedMediaDb) mmdb;
-			return scheduleRemoteMmdbScan(rmmdb);
+			scheduleRemoteMmdbScan(rmmdb);
 		}
 		else {
 			throw new IllegalArgumentException("Unknown type: '"+mmdb.getClass().getName()+"'.");
 		}
 	}
 	
-	static public boolean scheduleMmdbScan (final ILocalMixedMediaDb mmdb) {
+	static public void scheduleMmdbScan (final ILocalMixedMediaDb mmdb) {
 		final IMorriganTask task = MediaFactoryImpl.get().getLocalMixedMediaDbUpdateTask(mmdb);
 		if (task != null) {
 			Thread t = new Thread () {
@@ -38,15 +41,12 @@ public class HeadlessHelper {
 			};
 			t.start();
 			System.err.println("Scan of " + mmdb.getListId() + " scheduled on thread " + t.getId() + ".");
-			return true;
-			
+			return;
 		}
-		
-		System.err.println("Failed to get task object from factory method.");
-		return false;
+		throw new IllegalArgumentException("Failed to get task object from factory method.");
 	}
 	
-	static public boolean scheduleRemoteMmdbScan (final IRemoteMixedMediaDb mmdb) {
+	static public void scheduleRemoteMmdbScan (final IRemoteMixedMediaDb mmdb) {
 		final IMorriganTask task = MediaFactoryImpl.get().getRemoteMixedMediaDbUpdateTask(mmdb);
 		if (task != null) {
 			Thread t = new Thread () {
@@ -57,12 +57,10 @@ public class HeadlessHelper {
 			};
 			t.start();
 			System.err.println("Refresh of " + mmdb.getListId() + " scheduled on thread " + t.getId() + ".");
-			return true;
+			return;
 			
 		}
-		
-		System.err.println("Failed to get task object from factory method.");
-		return false;
+		throw new IllegalArgumentException("Failed to get task object from factory method.");
 	}
 	
 	static class DbScanMon implements TaskEventListener {
