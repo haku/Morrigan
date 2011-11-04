@@ -7,7 +7,6 @@ import java.util.logging.Logger;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.bio.SocketConnector;
-import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -61,12 +60,6 @@ public class MorriganServer implements Listener {
 			
 			WebAppContext warContext = WebAppHelper.getWarBundleAsContext(context, MorriganWui.ID, "/");
 			contexts.addHandler(warContext);
-			
-			ContextHandler conPlayers = new ContextHandler();
-			conPlayers.setContextPath("/player");
-			conPlayers.setResourceBase(".");
-			conPlayers.setHandler(new PlayersHandler());
-			contexts.addHandler(conPlayers);
 			
 		}
 		catch (Exception e) {
