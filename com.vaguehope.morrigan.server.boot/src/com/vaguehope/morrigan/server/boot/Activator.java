@@ -35,7 +35,7 @@ public class Activator implements BundleActivator {
 		this.server.start();
 		
 		// Prep player.
-		this.player = PlayerRegister.makeLocalPlayer("Server", this.eventHandler); // TODO why is this called in 2 places???
+		this.player = PlayerRegister.makeLocalPlayer("Server", this.eventHandler);
 		this.player.setPlaybackOrder(PlaybackOrder.RANDOM);
 	}
 	
