@@ -118,3 +118,7 @@
 /com.vaguehope.morrigan.util.httpclient/bin/
 /com.vaguehope.morrigan.util/bin/
 /com.vaguehope.morrigan.wui/bin/
+
+com.vaguehope.morrigan.tasks/build.xml
+com.vaguehope.morrigan.tasks/javaCompiler...args
+
