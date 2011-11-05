@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.db.IDbItem;
@@ -38,6 +39,8 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	public static final String SEARCH_ESC = "\\";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	private final Logger logger = Logger.getLogger(this.getClass().getName());
 	
 	private final MediaItemDbConfig config;
 	private final String escapedSearchTerm;
@@ -209,7 +212,7 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 		if (!this.firstRead) {
 			forceRead();
 		} else {
-			System.err.println("updateRead() : Skipping reRead() because its un-needed.");
+			this.logger.fine("Skipping reRead() because its un-needed.");
 		}
 	}
 	
@@ -732,13 +735,13 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 		try {
 			List<T> removed = replaceListWithoutSetDirty(this._changedItems);
 			if (!thereWereErrors) {
-				System.err.println("completeBulkUpdate() : About to clean " + removed.size() + " items...");
+				this.logger.fine("completeBulkUpdate() : About to clean " + removed.size() + " items...");
 				for (T i : removed) {
 					_removeMediaTrack(i);
 				}
 			}
 			else {
-				System.err.println("completeBulkUpdate() : Errors occured, skipping delete.");
+				this.logger.fine("completeBulkUpdate() : Errors occured, skipping delete.");
 			}
 		} finally {
 			this._changedItems = null;
