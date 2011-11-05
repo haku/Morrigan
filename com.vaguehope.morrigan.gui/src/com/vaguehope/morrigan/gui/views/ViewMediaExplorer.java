@@ -43,9 +43,9 @@ import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaListReference;
 import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 import com.vaguehope.morrigan.model.media.impl.MediaFactoryImpl;
-import com.vaguehope.morrigan.model.tasks.IMorriganTask;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbFactory;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbHelper;
+import com.vaguehope.morrigan.tasks.IMorriganTask;
 
 public class ViewMediaExplorer extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

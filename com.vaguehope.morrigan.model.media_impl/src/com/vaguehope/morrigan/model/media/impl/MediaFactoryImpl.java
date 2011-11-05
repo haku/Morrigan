@@ -32,7 +32,7 @@ import com.vaguehope.morrigan.model.media.internal.db.mmdb.RemoteMixedMediaDbUpd
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.SyncMetadataRemoteToLocalTask;
 import com.vaguehope.morrigan.model.media.internal.pl.MediaPlaylistFactory;
 import com.vaguehope.morrigan.model.media.internal.pl.PlaylistHelper;
-import com.vaguehope.morrigan.model.tasks.IMorriganTask;
+import com.vaguehope.morrigan.tasks.IMorriganTask;
 import com.vaguehope.sqlitewrapper.DbException;
 
 public class MediaFactoryImpl implements MediaFactory {

@@ -11,7 +11,7 @@ import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.impl.MediaFactoryImpl;
-import com.vaguehope.morrigan.model.tasks.IMorriganTask;
+import com.vaguehope.morrigan.tasks.IMorriganTask;
 
 public class DbUpdateAction extends Action implements IWorkbenchAction{
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

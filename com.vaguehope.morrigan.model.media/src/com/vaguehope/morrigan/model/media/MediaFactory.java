@@ -7,7 +7,7 @@ import java.util.Collection;
 import java.util.List;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.tasks.IMorriganTask;
+import com.vaguehope.morrigan.tasks.IMorriganTask;
 import com.vaguehope.sqlitewrapper.DbException;
 
 

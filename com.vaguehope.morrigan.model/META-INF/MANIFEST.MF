@@ -6,6 +6,5 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: com.vaguehope.morrigan.model.exceptions,
  com.vaguehope.morrigan.model.factory,
- com.vaguehope.morrigan.model.helper,
- com.vaguehope.morrigan.model.tasks
+ com.vaguehope.morrigan.model.helper
 Bundle-Vendor: vaguehope.com
