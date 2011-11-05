@@ -5,7 +5,6 @@ import java.awt.Point;
 import java.lang.ref.WeakReference;
 import java.util.List;
 
-
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -33,10 +32,9 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import com.vaguehope.morrigan.gui.preferences.PreferenceHelper;
-import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackDb;
-import com.vaguehope.morrigan.player.PlayerHelper;
+import com.vaguehope.sqlitewrapper.DbException;
 
 public class JumpToDlg {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -532,13 +530,13 @@ public class JumpToDlg {
 		if (query == null || query.length() < 1) return false;
 		
 		try {
-			List<? extends IMediaTrack> res = PlayerHelper.runQueryOnList(this.mediaDb, query, MAX_RESULTS);
+			List<? extends IMediaTrack> res = this.mediaDb.simpleSearch(query, MAX_RESULTS);
 			if (res != null && res.size() > 0) {
 				this.searchResults = res;
 				return true;
 			}
 		}
-		catch (MorriganException e) {
+		catch (DbException e) {
 			e.printStackTrace();
 		}
 		
