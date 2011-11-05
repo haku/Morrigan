@@ -69,7 +69,7 @@ public class MediaTagImpl implements MediaTag {
 	public String toString() {
 		StringBuilder sb = new StringBuilder(getTag());
 		
-		if (getClassification() != null && getClassification().getClassification().length() > 0) {
+		if (getClassification() != null) { // Empty string != null.
 			sb.append(" <");
 			sb.append(getClassification());
 			sb.append(">");
