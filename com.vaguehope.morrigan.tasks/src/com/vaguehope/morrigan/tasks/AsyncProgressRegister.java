@@ -5,6 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 public class AsyncProgressRegister {
@@ -18,15 +20,26 @@ public class AsyncProgressRegister {
 	// There is no concurrent set.
 	static private final ConcurrentHashMap<AsyncTaskEventListener, Boolean> listeners = new ConcurrentHashMap<AsyncTaskEventListener, Boolean>();
 	
+	static private final ExecutorService executor = Executors.newCachedThreadPool();
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 	
-	static public TaskEventListener makeTrackedListener () {
+	static public void scheduleTask (final IMorriganTask task) {
+		executor.submit(new Runnable() {
+			@Override
+			public void run () {
+				task.run(makeTrackedListener());
+			}
+		});
+	}
+	
+	static TaskEventListener makeTrackedListener () {
 		AsyncTaskEventListener l = new AsyncTaskEventListener();
 		trackListener(l);
 		return l;
 	}
 	
-	static public void trackListener (AsyncTaskEventListener listener) {
+	static private void trackListener (AsyncTaskEventListener listener) {
 		clean();
 		listeners.put(listener, Boolean.TRUE); // Place-holder value.
 	}

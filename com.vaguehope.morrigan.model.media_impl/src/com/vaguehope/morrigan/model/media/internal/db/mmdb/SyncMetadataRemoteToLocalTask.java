@@ -42,19 +42,27 @@ public class SyncMetadataRemoteToLocalTask implements IMorriganTask {
 	
 	@Override
 	public TaskResult run (TaskEventListener taskEventListener) {
+		taskEventListener.onStart();
 		TaskResult ret;
 		try {
 			final ILocalMixedMediaDb trans = MediaFactoryImpl.get().getLocalMixedMediaDbTransactional(this.local);
 			try {
 				// FIXME add getByHashcode() to local DB.
+				// Build list of all hashed local items.
 				final Map<BigInteger, IMixedMediaItem> localItems = new HashMap<BigInteger, IMixedMediaItem>();
 				for (IMixedMediaItem localItem : trans.getAllDbEntries()) {
 					BigInteger hashcode = localItem.getHashcode();
 					if (hashcode != null && !BigInteger.ZERO.equals(hashcode)) localItems.put(hashcode, localItem);
 				}
 				
+				// All remote items.
 				final List<IMixedMediaItem> remoteItems = this.remote.getAllDbEntries();
-				taskEventListener.beginTask("Sync'ing", remoteItems.size());
+				
+				// Describe what we are doing.
+				String taskTitle = "Synchronising metadata from " + this.remote.getListName() + " to " + this.local.getListName() + ".";
+				taskEventListener.beginTask(taskTitle, remoteItems.size()); // Work total is number of remote items.
+				
+				// For each remote item, see if there is a local item to update.
 				for (IMixedMediaItem remoteItem : remoteItems) {
 					BigInteger hashcode = remoteItem.getHashcode();
 					if (hashcode != null && !BigInteger.ZERO.equals(hashcode)) {
@@ -63,9 +71,9 @@ public class SyncMetadataRemoteToLocalTask implements IMorriganTask {
 							taskEventListener.subTask(localItem.getTitle());
 							syncMediaItems(trans, this.remote, remoteItem, localItem);
 						}
-						taskEventListener.worked(1);
-						if (taskEventListener.isCanceled()) break;
 					}
+					taskEventListener.worked(1); // Increment one for each remote item.
+					if (taskEventListener.isCanceled()) break;
 				}
 				
 				trans.commitOrRollback();

@@ -39,6 +39,7 @@ public class MorriganCommandProvider implements CommandProvider {
 				"\tmn [media|m] [create|c] [remote|r] <dbname>\n" +
 				"\tmn [media|m] [add|a] <dir> <q1>\n" +
 				"\tmn [media|m] [scan|s] <q1>\n" +
+				"\tmn [media|m] sync <remote q1> <local q1>\n" +
 				"\tmn [media|m] <q1> [<q2>]\n" +
 				"\tmn [players|player|p]\n" +
 				"\tmn [player|p] 0 [play|queue] [<q1> [<q2>]]\n" +
@@ -126,6 +127,9 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 		else if (cmd.equals("a") || cmd.equals("add")) {
 			doMediaAdd(ci, args);
+		}
+		else if (cmd.equals("sync")) {
+			doMediaSync(ci, args);
 		}
 		else {
 			String q1 = cmd;
@@ -316,6 +320,45 @@ public class MorriganCommandProvider implements CommandProvider {
 				else {
 					ci.println("Unable to schedule scan for item '"+list.getListName()+"'.");
 				}
+			}
+		}
+	}
+	
+	static private void doMediaSync (CommandInterpreter ci, List<String> args) {
+		if (args.size() < 2) {
+			ci.println("Must specify a remote and a local DB.");
+		}
+		else {
+			String rq1 = args.get(0);
+			String lq1 = args.get(1);
+			try {
+				List<PlayItem> rq1Pi = CliHelper.queryForPlayableItems(rq1, null, 2);
+				List<PlayItem> lq1Pi = CliHelper.queryForPlayableItems(lq1, null, 2);
+				if (rq1Pi == null || rq1Pi.size() != 1) {
+					ci.println("Query '" + rq1 + "' did not return only one result.");
+				}
+				else if (lq1Pi == null || lq1Pi.size() != 1) {
+					ci.println("Query '" + lq1 + "' did not return only one result.");
+				}
+				else {
+					IMediaTrackList<? extends IMediaTrack> rl = rq1Pi.get(0).list;
+					IMediaTrackList<? extends IMediaTrack> ll = lq1Pi.get(0).list;
+					if (!(rl instanceof IRemoteMixedMediaDb)) {
+						ci.println("DB '" + rq1 + "' is not a remote DB.");
+					}
+					else if (!(ll instanceof ILocalMixedMediaDb)) {
+						ci.println("DB '" + rq1 + "' is not a local DB.");
+					}
+					else {
+						IRemoteMixedMediaDb rdb = (IRemoteMixedMediaDb) rl;
+						ILocalMixedMediaDb ldb = (ILocalMixedMediaDb) ll;
+						AsyncActions.syncMetaData(ldb, rdb);
+						ci.println("Synchronisation scheduled.  Use 'mn st' to track progress.");
+					}
+				}
+			}
+			catch (MorriganException e) {
+				ci.println(ErrorHelper.getCauseTrace(e));
 			}
 		}
 	}
