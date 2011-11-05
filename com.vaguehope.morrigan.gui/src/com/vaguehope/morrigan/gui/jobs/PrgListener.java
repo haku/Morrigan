@@ -4,7 +4,7 @@ package com.vaguehope.morrigan.gui.jobs;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import com.vaguehope.morrigan.gui.helpers.ConsoleHelper;
-import com.vaguehope.morrigan.model.tasks.TaskEventListener;
+import com.vaguehope.morrigan.tasks.TaskEventListener;
 import com.vaguehope.morrigan.util.ErrorHelper;
 
 /**

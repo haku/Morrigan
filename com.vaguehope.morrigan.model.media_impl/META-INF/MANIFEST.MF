@@ -13,7 +13,7 @@ Import-Package: com.vaguehope.morrigan.config,
  com.vaguehope.morrigan.model.factory,
  com.vaguehope.morrigan.model.helper,
  com.vaguehope.morrigan.model.media,
- com.vaguehope.morrigan.model.tasks,
+ com.vaguehope.morrigan.tasks,
  com.vaguehope.morrigan.util,
  com.vaguehope.morrigan.util.httpclient,
  com.vaguehope.sqlitewrapper

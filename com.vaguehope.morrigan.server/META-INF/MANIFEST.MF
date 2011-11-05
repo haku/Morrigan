@@ -4,8 +4,7 @@ Bundle-Name: Morrigan Server
 Bundle-SymbolicName: com.vaguehope.morrigan.server
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Export-Package: com.vaguehope.morrigan.asyncui,
- com.vaguehope.morrigan.server,
+Export-Package: com.vaguehope.morrigan.server,
  com.vaguehope.morrigan.server.model
 Import-Package: com.vaguehope.morrigan.config,
  com.vaguehope.morrigan.engines.playback,
@@ -17,8 +16,8 @@ Import-Package: com.vaguehope.morrigan.config,
  com.vaguehope.morrigan.model.media.internal,
  com.vaguehope.morrigan.model.media.internal.db,
  com.vaguehope.morrigan.model.media.internal.db.mmdb,
- com.vaguehope.morrigan.model.tasks,
  com.vaguehope.morrigan.player,
+ com.vaguehope.morrigan.tasks,
  com.vaguehope.morrigan.util,
  com.vaguehope.morrigan.util.httpclient,
  com.vaguehope.morrigan.wui,

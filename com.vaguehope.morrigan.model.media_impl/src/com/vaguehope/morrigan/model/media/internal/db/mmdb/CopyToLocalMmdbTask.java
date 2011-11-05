@@ -9,10 +9,10 @@ import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
-import com.vaguehope.morrigan.model.tasks.IMorriganTask;
-import com.vaguehope.morrigan.model.tasks.TaskEventListener;
-import com.vaguehope.morrigan.model.tasks.TaskResult;
-import com.vaguehope.morrigan.model.tasks.TaskResult.TaskOutcome;
+import com.vaguehope.morrigan.tasks.IMorriganTask;
+import com.vaguehope.morrigan.tasks.TaskEventListener;
+import com.vaguehope.morrigan.tasks.TaskResult;
+import com.vaguehope.morrigan.tasks.TaskResult.TaskOutcome;
 import com.vaguehope.morrigan.util.ChecksumHelper;
 
 

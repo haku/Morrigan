@@ -24,7 +24,7 @@ import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.impl.MediaFactoryImpl;
-import com.vaguehope.morrigan.model.tasks.IMorriganTask;
+import com.vaguehope.morrigan.tasks.IMorriganTask;
 import com.vaguehope.sqlitewrapper.DbException;
 
 public class RemoteMixedMediaDbEditor

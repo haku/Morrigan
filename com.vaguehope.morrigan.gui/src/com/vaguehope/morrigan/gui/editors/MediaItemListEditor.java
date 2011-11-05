@@ -64,7 +64,7 @@ import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.MediaItemListChangeListener;
 import com.vaguehope.morrigan.model.media.impl.MediaFactoryImpl;
-import com.vaguehope.morrigan.model.tasks.IMorriganTask;
+import com.vaguehope.morrigan.tasks.IMorriganTask;
 
 /*
  * TODO Finish extracting generic stuff from MediaTrackListEditor.

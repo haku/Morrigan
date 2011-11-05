@@ -10,8 +10,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.xml.sax.SAXException;
 
 import com.megginson.sax.DataWriter;
-import com.vaguehope.morrigan.asyncui.AsyncProgressRegister;
 import com.vaguehope.morrigan.server.feedwriters.AbstractFeed;
+import com.vaguehope.morrigan.tasks.AsyncProgressRegister;
 
 /**
  * Valid URLs:

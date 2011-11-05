@@ -3,7 +3,7 @@ package com.vaguehope.morrigan.model.media;
 import java.net.URL;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.tasks.TaskEventListener;
+import com.vaguehope.morrigan.tasks.TaskEventListener;
 import com.vaguehope.sqlitewrapper.DbException;
 
 

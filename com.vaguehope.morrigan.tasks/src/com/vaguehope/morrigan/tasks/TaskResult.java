@@ -1,4 +1,4 @@
-package com.vaguehope.morrigan.model.tasks;
+package com.vaguehope.morrigan.tasks;
 
 public class TaskResult {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

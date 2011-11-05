@@ -8,6 +8,6 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: com.vaguehope.morrigan.model.db,
  com.vaguehope.morrigan.model.db.basicimpl,
  com.vaguehope.morrigan.model.exceptions,
- com.vaguehope.morrigan.model.tasks,
+ com.vaguehope.morrigan.tasks,
  com.vaguehope.sqlitewrapper
 Export-Package: com.vaguehope.morrigan.model.media

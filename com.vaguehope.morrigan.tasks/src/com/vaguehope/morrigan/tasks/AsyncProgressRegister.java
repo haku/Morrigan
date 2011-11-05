@@ -1,4 +1,4 @@
-package com.vaguehope.morrigan.asyncui;
+package com.vaguehope.morrigan.tasks;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.vaguehope.morrigan.model.tasks.TaskEventListener;
 
 public class AsyncProgressRegister {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

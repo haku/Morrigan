@@ -1,10 +1,11 @@
-package com.vaguehope.morrigan.asyncui;
+package com.vaguehope.morrigan.server;
 
 import com.vaguehope.morrigan.model.media.IMixedMediaDb;
 import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.impl.MediaFactoryImpl;
-import com.vaguehope.morrigan.model.tasks.IMorriganTask;
+import com.vaguehope.morrigan.tasks.AsyncProgressRegister;
+import com.vaguehope.morrigan.tasks.IMorriganTask;
 
 /**
  * Set of helper functions for interacting

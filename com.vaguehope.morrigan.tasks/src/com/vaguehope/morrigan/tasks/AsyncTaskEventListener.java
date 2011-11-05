@@ -1,11 +1,10 @@
-package com.vaguehope.morrigan.asyncui;
+package com.vaguehope.morrigan.tasks;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.vaguehope.morrigan.model.tasks.TaskEventListener;
 import com.vaguehope.morrigan.util.ErrorHelper;
 
 public class AsyncTaskEventListener implements TaskEventListener {
