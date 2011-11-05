@@ -1,4 +1,4 @@
-package com.vaguehope.morrigan.player;
+package com.vaguehope.morrigan.osgiconsole;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -7,12 +7,16 @@ import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackDb;
+import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaListReference;
+import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 import com.vaguehope.morrigan.model.media.impl.MediaFactoryImpl;
+import com.vaguehope.morrigan.player.PlayItem;
+import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbFactory;
+import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbHelper;
 import com.vaguehope.sqlitewrapper.DbException;
 
-
-public class PlayerHelper {
+public class CliHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	/**
@@ -23,9 +27,12 @@ public class PlayerHelper {
 		
 		List<MediaListReference> items = new LinkedList<MediaListReference>();
 		List<MediaListReference> matches = new LinkedList<MediaListReference>();
+		
 		items.addAll(MediaFactoryImpl.get().getAllLocalMixedMediaDbs());
+		items.addAll(RemoteMixedMediaDbHelper.getAllRemoteMmdb());
+		
 		for (MediaListReference i : items) {
-			if (i.getTitle().contains(query1) || query1.contains(i.getTitle()) ) {
+			if (i.getTitle().contains(query1)) {
 				matches.add(i);
 			}
 		}
@@ -39,25 +46,25 @@ public class PlayerHelper {
 			 */
 			IMediaTrackDb<?,? extends IMediaTrack> db = mediaListReferenceToReadTrackDb(explorerItem);
 			
-    		if (query2 == null) {
-    			ret.add(new PlayItem(db, null));
-    		}
-    		else {
-    			List<? extends IMediaTrack> results;
-    			results = runQueryOnList(db, query2, maxResults);
-    			
-    			for (IMediaTrack result : results) {
-    				if (ret.size() >= maxResults) break;
-    				ret.add(new PlayItem(db, result));
-    			}
-    		}
+			if (query2 == null) {
+				ret.add(new PlayItem(db, null));
+			}
+			else {
+				List<? extends IMediaTrack> results;
+				try {
+					results = db.simpleSearch(query2, maxResults);
+				} catch (DbException e) { throw new MorriganException(e); }
+				
+				for (IMediaTrack result : results) {
+					if (ret.size() >= maxResults) break;
+					ret.add(new PlayItem(db, result));
+				}
+			}
 			
 		}
 		
 		return ret;
 	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	static public IMediaTrackDb<?,? extends IMediaTrack> mediaListReferenceToReadTrackDb (MediaListReference item) throws MorriganException {
 		IMediaTrackDb<?,? extends IMediaTrack> ret = null;
@@ -72,27 +79,16 @@ public class PlayerHelper {
 			mmdb.read();
 			ret = mmdb;
 		}
+		else if (item.getType() == MediaListType.REMOTEMMDB) {
+			IRemoteMixedMediaDb db = RemoteMixedMediaDbFactory.getExisting(item.getIdentifier());
+			db.read();
+			ret = db;
+		}
 		else {
 			throw new MorriganException("TODO: show " + item.getIdentifier());
 		}
 		
 		return ret;
-	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	/**
-	 * What is the point in this???
-	 */
-	static public List<? extends IMediaTrack> runQueryOnList (IMediaTrackDb<?,? extends IMediaTrack> mediaDb, String query, int maxResults) throws MorriganException {
-		List<? extends IMediaTrack> res;
-		try {
-			res = mediaDb.simpleSearch(query, maxResults);
-		} catch (DbException e) {
-			throw new MorriganException(e);
-		}
-		
-		return res;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
