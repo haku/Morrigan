@@ -31,9 +31,29 @@ public class CliHelper {
 		items.addAll(MediaFactoryImpl.get().getAllLocalMixedMediaDbs());
 		items.addAll(RemoteMixedMediaDbHelper.getAllRemoteMmdb());
 		
+		// First search exact.
 		for (MediaListReference i : items) {
-			if (i.getTitle().contains(query1)) {
-				matches.add(i);
+			if (i.getTitle().equals(query1)) matches.add(i);
+		}
+		
+		// Second search case-insensitive, but still exact.
+		if (matches.size() < 1) {
+			for (MediaListReference i : items) {
+				if (i.getTitle().toLowerCase().equals(query1.toLowerCase())) matches.add(i);
+			}
+		}
+		
+		// Third search sub-string.
+		if (matches.size() < 1) {
+			for (MediaListReference i : items) {
+				if (i.getTitle().contains(query1)) matches.add(i);
+			}
+		}
+		
+		// Fourth search sub-string and case-insensitive.
+		if (matches.size() < 1) {
+			for (MediaListReference i : items) {
+				if (i.getTitle().toLowerCase().contains(query1.toLowerCase())) matches.add(i);
 			}
 		}
 		
