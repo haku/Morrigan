@@ -3,6 +3,8 @@ package com.vaguehope.morrigan.playbackimpl.gs;
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 
+import org.gstreamer.Element;
+import org.gstreamer.ElementFactory;
 import org.gstreamer.State;
 import org.gstreamer.elements.PlayBin;
 
@@ -15,7 +17,8 @@ public class GStreamerHelper {
 	
 	static public int readFileDuration (final String fpath) {
 		PlayBin playb = new PlayBin("Metadata");
-		playb.setVideoSink(null);
+		Element fakesink = ElementFactory.make("fakesink", "videosink");
+		playb.setVideoSink(fakesink);
 		playb.setInputFile(new File(fpath));
 		playb.setState(State.PAUSED);
 		
@@ -31,6 +34,7 @@ public class GStreamerHelper {
 			} catch (InterruptedException e) { /* UNUSED */ }
 		}
 		playb.setState(State.NULL);
+		fakesink.dispose();
 		playb.dispose();
 		
 		int retDuration = -1;
