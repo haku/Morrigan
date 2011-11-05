@@ -267,7 +267,9 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 	private TaskResult updateLibraryMetadata(TaskEventListener taskEventListener, int prgTotal, List<T> changedItems) throws DbException {
 		if (changedItems.size() > 0) throw new IllegalArgumentException("changedItems list must be empty.");
 		
-		taskEventListener.subTask("Reading file metadata");
+		final String SUBTASK_TITLE = "Reading file metadata";
+		String subTaskTitle = null;
+		taskEventListener.subTask(SUBTASK_TITLE);
 		
 		int progress = 0;
 		int n = 0;
@@ -278,10 +280,15 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 		List<T> allLibraryEntries = this.getItemList().getAllDbEntries();
 		for (T mi : allLibraryEntries) {
 			if (taskEventListener.isCanceled()) break;
-//			taskEventListener.subTask("Reading file metadata: " + mi.getTitle());
+			
+			// Update status.
+			if (subTaskTitle != null) {
+				taskEventListener.subTask(SUBTASK_TITLE);
+				subTaskTitle = null;
+			}
 			
 			// Existence test.
-			File file = new File(mi.getFilepath());
+			final File file = new File(mi.getFilepath());
 			if (file.exists()) {
 				// If was missing, mark as found.
 				if (mi.isMissing()) {
@@ -321,8 +328,10 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 				if (fileModified || mi.getHashcode() == null || mi.getHashcode().equals(BigInteger.ZERO)) {
 					BigInteger hash = null;
 					
+					subTaskTitle = SUBTASK_TITLE + ": MD5 " + mi.getTitle();
+					taskEventListener.subTask(subTaskTitle);
 					try {
-						hash = ChecksumHelper.generateMd5Checksum(file, byteBuffer);
+						hash = ChecksumHelper.generateMd5Checksum(file, byteBuffer); // This is slow.
 					}
 					catch (Throwable t) {
 						// FIXME log this somewhere useful.
