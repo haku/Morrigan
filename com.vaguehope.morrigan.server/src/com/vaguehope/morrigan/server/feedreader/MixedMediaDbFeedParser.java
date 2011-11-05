@@ -47,8 +47,8 @@ public class MixedMediaDbFeedParser extends DefaultHandler {
 	 * TODO support event cancellation.
 	 */
 	public static void parseFeed (final IRemoteMixedMediaDb mmdb, final TaskEventListener taskEventListener) throws MorriganException {
-//		if (taskEventListener!=null) taskEventListener.onStart(); // TODO do this?
-		if (taskEventListener!=null) taskEventListener.beginTask("Reading feed...", 100);
+		if (taskEventListener != null) taskEventListener.onStart();
+		if (taskEventListener != null) taskEventListener.beginTask("Updating " + mmdb.getListName(), 100);
 		
 		HttpStreamHandler httpStreamHandler = new HttpStreamHandler () {
 			@Override
@@ -257,7 +257,7 @@ public class MixedMediaDbFeedParser extends DefaultHandler {
 				throw new SAXException(e);
 			}
 			
-			if (this.taskEventListener!=null) {
+			if (this.taskEventListener != null) {
 				this.entriesProcessed++;
 				int p = (int) ((this.entriesProcessed * 100) / this.entryCount);
 				if (p > this.progress) {
