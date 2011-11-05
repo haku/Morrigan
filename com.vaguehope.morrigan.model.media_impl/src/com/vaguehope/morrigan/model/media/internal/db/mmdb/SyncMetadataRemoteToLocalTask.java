@@ -10,6 +10,7 @@ import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaTag;
+import com.vaguehope.morrigan.model.media.MediaTagClassification;
 import com.vaguehope.morrigan.model.media.impl.MediaFactoryImpl;
 import com.vaguehope.morrigan.tasks.IMorriganTask;
 import com.vaguehope.morrigan.tasks.TaskEventListener;
@@ -120,7 +121,9 @@ public class SyncMetadataRemoteToLocalTask implements IMorriganTask {
 		List<MediaTag> rTags = rdb.getTags(remoteItem);
 		if (rTags != null && rTags.size() > 0) {
 			for (MediaTag rTag : rTags) {
-				ldb.addTag(localItem, rTag.getTag(), rTag.getType(), rTag.getClassification().getClassification());
+				MediaTagClassification cls = rTag.getClassification();
+				String clsString = cls == null ? null : cls.getClassification();
+				ldb.addTag(localItem, rTag.getTag(), rTag.getType(), clsString);
 			}
 		}
 	}
