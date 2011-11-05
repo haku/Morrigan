@@ -32,7 +32,7 @@
       <plugin id="com.vaguehope.morrigan.osgiconsole"/>
       <plugin id="com.vaguehope.morrigan.playbackimpl.dsj"/>
       <plugin id="com.vaguehope.morrigan.playbackimpl.gs"/>
-      <plugin id="com.vaguehope.morrigan.playbackimpl.jmf"/>
+      <plugin id="com.vaguehope.morrigan.playbackimpl.vlc"/>
       <plugin id="com.vaguehope.morrigan.player"/>
       <plugin id="com.vaguehope.morrigan.server"/>
       <plugin id="com.vaguehope.morrigan.server.boot"/>
@@ -62,7 +62,7 @@
       <plugin id="com.vaguehope.morrigan.osgiconsole" autoStart="true" startLevel="0" />
       <plugin id="com.vaguehope.morrigan.playbackimpl.dsj" autoStart="true" startLevel="0" />
       <plugin id="com.vaguehope.morrigan.playbackimpl.gs" autoStart="true" startLevel="0" />
-      <plugin id="com.vaguehope.morrigan.playbackimpl.jmf" autoStart="true" startLevel="0" />
+      <plugin id="com.vaguehope.morrigan.playbackimpl.vlc" autoStart="true" startLevel="0" />
       <plugin id="com.vaguehope.morrigan.server.boot" autoStart="true" startLevel="0" />
       <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="0" />
       <plugin id="org.eclipse.osgi" autoStart="true" startLevel="0" />
