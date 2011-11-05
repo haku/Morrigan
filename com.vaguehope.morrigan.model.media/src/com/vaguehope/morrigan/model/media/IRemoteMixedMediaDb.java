@@ -16,7 +16,11 @@ public interface IRemoteMixedMediaDb extends IMixedMediaDb {
 	
 	public URL getUrl();
 	
+	/**
+	 * Return age of cache in milliseconds.
+	 */
 	public long getCacheAge ();
+	
 	public boolean isCacheExpired ();
 	public void readFromCache ()  throws DbException, MorriganException;
 	public void forceDoRead () throws MorriganException, DbException;
