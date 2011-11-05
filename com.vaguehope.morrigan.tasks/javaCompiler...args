@@ -1,4 +1,0 @@
-#ADAPTER#ACCESS#com.vaguehope.morrigan.util/bin/[+com/vaguehope/morrigan/util/*:?**/*]
-#ADAPTER#ACCESS#com.vaguehope.morrigan.util_1.0.0.201111050001/bin/[+com/vaguehope/morrigan/util/*:?**/*]
-#ADAPTER#ACCESS#com.vaguehope.morrigan.util/@dot[+com/vaguehope/morrigan/util/*:?**/*]
-#ADAPTER#ACCESS#com.vaguehope.morrigan.util_1.0.0.201111050001/@dot[+com/vaguehope/morrigan/util/*:?**/*]
