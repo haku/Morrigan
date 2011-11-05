@@ -116,13 +116,13 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb implements IRemoteM
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Reading and refreshing.
 	
-	public static long MAX_CACHE_AGE = 60 * 60 * 1000;
+	public static long MAX_CACHE_AGE = 60 * 60 * 1000; // 1 hour.
 	
 	private long cacheDate = -1;
 	
 	@Override
 	public long getCacheAge () {
-		return new Date().getTime() - this.cacheDate;
+		return System.currentTimeMillis() - this.cacheDate;
 	}
 	
 	@Override
@@ -138,11 +138,11 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb implements IRemoteM
 	@Override
 	protected void doRead() throws DbException, MorriganException {
 		if (isCacheExpired()) {
-			this.logger.info("Cache for '" + getListName() + "' is " + getCacheAge() + " old, reading data from " + this.url.toExternalForm() + " ...");
+			this.logger.info("Cache for '" + getListName() + "' is " + getCacheAge() + "ms old, reading data from " + this.url.toExternalForm() + " ...");
 				forceDoRead();
 		}
 		else {
-			this.logger.info("Not refreshing as '" + getListName() + "' cache is only " + getCacheAge() + " old.");
+			this.logger.fine("Not refreshing as '" + getListName() + "' cache is only " + getCacheAge() + "ms old.");
 			super.doRead(); // This forces a DB query - sorts entries.)
 		}
 	}
@@ -153,7 +153,7 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb implements IRemoteM
 			// This does the actual HTTP fetch.
 			MixedMediaDbFeedParser.parseFeed(this, this.taskEventListener);
 			
-			this.cacheDate = new Date().getTime();
+			this.cacheDate = System.currentTimeMillis();
 			writeCacheDate();
 			
 		} finally {
