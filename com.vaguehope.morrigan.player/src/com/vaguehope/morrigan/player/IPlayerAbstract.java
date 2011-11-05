@@ -4,11 +4,9 @@ import java.util.List;
 import java.util.Map;
 
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
-import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
-import com.vaguehope.morrigan.model.media.MediaListReference;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 
 
@@ -21,7 +19,6 @@ public interface IPlayerAbstract {
 	public String getName();
 	
 	public boolean isPlaybackEngineReady();
-	public void loadAndStartPlaying(MediaListReference item) throws MorriganException;
 	public void loadAndStartPlaying(IMediaTrackList<? extends IMediaTrack> list);
 	public void loadAndStartPlaying(IMediaTrackList<? extends IMediaTrack> list, IMediaTrack track);
 	public void loadAndStartPlaying(final PlayItem item);

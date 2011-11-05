@@ -26,7 +26,6 @@ import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
 import com.vaguehope.morrigan.model.media.MediaItemListChangeListener;
-import com.vaguehope.morrigan.model.media.MediaListReference;
 import com.vaguehope.morrigan.model.media.impl.MediaFactoryImpl;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 
@@ -440,12 +439,6 @@ public class Player implements IPlayerLocal {
 	
 	long _currentPosition = -1; // In seconds.
 	int _currentTrackDuration = -1; // In seconds.
-	
-	@Override
-	public void loadAndStartPlaying (MediaListReference item) throws MorriganException {
-		IMediaTrackList<? extends IMediaTrack> list = PlayerHelper.mediaListReferenceToReadTrackDb(item);
-		loadAndStartPlaying(list);
-	}
 	
 	/**
 	 * For UI handlers to call.
