@@ -9,7 +9,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
@@ -189,7 +188,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 				this.playbin.dispose();
 				this.playbin = null;
 			}
-			reparentVideo(null, false);
+			reparentVideo(null, false); // Since playbin is null this should just clean up.
 		}
 		finally {
 			this.playLock.unlock();
@@ -264,8 +263,8 @@ public class PlaybackEngine implements IPlaybackEngine {
 			final Element old_videoElement = this.videoElement;
 			this.videoElement = null;
 			
-			if (this.playbin != null && this.hasVideo.get()) { // Do we have anything to attach video output to and does it need it?
-				if (newParent != null) { // Can not attach video to something that is not there...
+			if (this.playbin != null) { // Do we have anything to attach video output to?
+				if (this.hasVideo.get() && newParent != null) { // Can not attach video to something that is not there...
 					/* We can not move the video while it is playing, so if it is,
 					 * stop it and remember where it was.
 					 */
@@ -318,7 +317,8 @@ public class PlaybackEngine implements IPlaybackEngine {
 					this.logger.fine("setVideoSink(fakesink)...");
 					Element fakesink = ElementFactory.make("fakesink", "videosink");
 					fakesink.set("sync", Boolean.TRUE);
-					this.playbin.setVideoSink(fakesink); // If we had video and now don't, remove it.
+					this.playbin.setVideoSink(fakesink);
+					PlaybackEngine.this.videoElement = fakesink; // So we clean it up correctly.
 				}
 			}
 			
