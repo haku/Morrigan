@@ -169,7 +169,22 @@ public class MorriganCommandProvider implements CommandProvider {
 							}
 						}
 					}
-					else {
+					else { // Print DB info.
+						DurationData d = mmdb.getTotalDuration();
+						ci.print(" ");
+						ci.print(String.valueOf(mmdb.getCount()));
+						ci.print(" items totaling ");
+						if (!d.isComplete()) ci.print("more than ");
+						ci.print(TimeHelper.formatTimeSeconds(d.getDuration()));
+						ci.println(".");
+						
+						long queryTime = mmdb.getDurationOfLastRead();
+						if (queryTime > 0) {
+							ci.print(" Query took ");
+							ci.print(TimeHelper.formatTimeMiliseconds(queryTime));
+							ci.println(" seconds.");
+						}
+						
     					List<String> sources;
     					try {
     						sources = mmdb.getSources();
