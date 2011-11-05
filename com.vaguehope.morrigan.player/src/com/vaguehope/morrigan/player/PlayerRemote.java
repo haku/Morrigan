@@ -4,11 +4,9 @@ import java.util.List;
 import java.util.Map;
 
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
-import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
-import com.vaguehope.morrigan.model.media.MediaListReference;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 
 
@@ -66,11 +64,6 @@ public class PlayerRemote implements IPlayerRemote {
 	@Override
 	public boolean isPlaybackEngineReady() {
 		return false;
-	}
-	
-	@Override
-	public void loadAndStartPlaying(MediaListReference item) throws MorriganException {
-		throw new RuntimeException("Not implemented.");
 	}
 	
 	@Override
