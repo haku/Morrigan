@@ -2,6 +2,7 @@ package com.vaguehope.sqlitewrapper;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -11,6 +12,9 @@ public abstract class GenericSqliteLayer implements IGenericDbLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private static final String DRIVER_CLASS = "org.sqlite.JDBC";
+	
+	private static final String PRAGMA_FK_SET = "PRAGMA foreign_keys = ON;";
+	private static final String PRAGMA_FK_GET = "PRAGMA foreign_keys;";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Instance properties.
@@ -67,6 +71,25 @@ public abstract class GenericSqliteLayer implements IGenericDbLayer {
 		
 		con.setAutoCommit(this.autoCommit);
 //		System.err.println("AutoCommit=" + this.dbConnection.getAutoCommit() + " for '"+getDbFilePath()+"'.");
+		
+		// Setup environment.
+		PreparedStatement ps;
+		ps = con.prepareStatement(PRAGMA_FK_SET);
+		try {
+			ps.execute();
+		}
+		finally { ps.close(); }
+		ps = con.prepareStatement(PRAGMA_FK_GET);
+		try {
+			ResultSet rs = ps.executeQuery();
+			try {
+				rs.next();
+				int fk = rs.getInt(1);
+				if (fk != 1) throw new UnsupportedOperationException("Call had no effect: " + PRAGMA_FK_SET);
+			}
+			finally { rs.close(); }
+		}
+		finally { ps.close(); }
 		
 		return con;
 	}
