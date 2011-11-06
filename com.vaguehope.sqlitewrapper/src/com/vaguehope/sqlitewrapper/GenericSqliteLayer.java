@@ -9,6 +9,10 @@ import java.util.List;
 
 public abstract class GenericSqliteLayer implements IGenericDbLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	private static final String DRIVER_CLASS = "org.sqlite.JDBC";
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Instance properties.
 	
 	private final String dbFilePath;
@@ -57,7 +61,7 @@ public abstract class GenericSqliteLayer implements IGenericDbLayer {
 	private Connection dbConnection = null;
 	
 	private Connection makeConnection() throws ClassNotFoundException, SQLException {
-		Class.forName("org.sqlite.JDBC");
+		Class.forName(DRIVER_CLASS);
 		String url = "jdbc:sqlite:/" + this.dbFilePath;
 		Connection con = DriverManager.getConnection(url);
 		
@@ -69,7 +73,7 @@ public abstract class GenericSqliteLayer implements IGenericDbLayer {
 	
 	protected Connection getDbCon () throws ClassNotFoundException, SQLException {
 		// TODO FIXME make this thread-safe using atomic objects.
-		if (this.dbConnection==null || this.dbConnection.isClosed()) {
+		if (this.dbConnection == null || this.dbConnection.isClosed()) {
 			this.dbConnection = makeConnection();
 		}
 //		else if (!this.dbConnection.isValid(10)) {
@@ -83,7 +87,7 @@ public abstract class GenericSqliteLayer implements IGenericDbLayer {
 	}
 	
 	private void disposeDbCon () throws SQLException {
-		if (this.dbConnection!=null) {
+		if (this.dbConnection != null) {
 			this.dbConnection.close();
 		}
 	}
