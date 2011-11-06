@@ -1,1 +1,1 @@
-8960ef957eaa42672c338049e8dd768f sqlitejdbc-v056.jar http://files.zentus.com/sqlitejdbc/sqlitejdbc-v056.jar
+5fa420d75512d78ba9b08143ddca61b7 sqlite-jdbc-3.7.2.jar http://www.xerial.org/maven/repository/artifact/org/xerial/sqlite-jdbc/3.7.2/sqlite-jdbc-3.7.2.jar
