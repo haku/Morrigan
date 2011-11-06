@@ -186,7 +186,7 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 			return local_addFiles(files);
 		}
 		catch (Exception e) {
-			this.logger.log(Level.SEVERE, "Exception while adding files: " + StringHelper.joinCollection(files, File.pathSeparator), e);
+			this.logger.log(Level.SEVERE, "Exception while adding files: \n" + StringHelper.joinCollection(files, "\n"), e);
 			throw new DbException(e);
 		}
 	}

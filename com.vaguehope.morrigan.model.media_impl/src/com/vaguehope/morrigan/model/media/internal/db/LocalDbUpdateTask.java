@@ -232,7 +232,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 		} // End directory scanning.
 		
 		if (filesToAdd.size() > 0) {
-			taskEventListener.logMsg(this.getItemList().getListName(), "Addeding " + filesToAdd.size() + " files to DB...");
+			taskEventListener.logMsg(this.getItemList().getListName(), "Adding " + filesToAdd.size() + " files to DB...");
 			
 			IMediaItemDb<?,?> transClone = MediaFactoryImpl.get().getMediaItemDbTransactional(this.getItemList());
 			try {
