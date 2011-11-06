@@ -1,13 +1,13 @@
-// Important.
+/* Important. */
 
 PRAGMA foreign_keys = ON;
 
-// Verify no FK issues.
+/* Verify no FK issues. */
 
 SELECT tag, mf_rowid FROM tbl_tags WHERE NOT EXISTS (SELECT * from tbl_mediafiles WHERE tbl_tags.mf_rowid = tbl_mediafiles.ROWID);
 SELECT tag, cls_rowid FROM tbl_tags WHERE cls_rowid IS NOT NULL AND NOT EXISTS (SELECT * from tbl_tag_cls WHERE tbl_tags.cls_rowid = tbl_tag_cls.ROWID);
 
-// Add id to tbl_mediafiles;
+/* Add id to tbl_mediafiles; */
 
 CREATE TABLE tbl_mediafiles2(id INTEGER PRIMARY KEY AUTOINCREMENT,file VARCHAR(1000) NOT NULL COLLATE NOCASE UNIQUE,type INT,md5 BLOB,added DATETIME,modified DATETIME,enabled INT(1),missing INT(1),remloc VARCHAR(1000),startcnt INT(6),endcnt INT(6),lastplay DATETIME,duration INT(6),width INT(6),height INT(6));
 
@@ -16,7 +16,7 @@ INSERT INTO tbl_mediafiles2 (id,file,type,md5,added,modified,enabled,missing,rem
 DROP TABLE tbl_mediafiles;
 ALTER TABLE tbl_mediafiles2 RENAME TO tbl_mediafiles;
 
-// Update tag_cls table.
+/* Update tag_cls table. */
 
 CREATE TABLE tbl_tag_cls2 (id INTEGER PRIMARY KEY AUTOINCREMENT, cls VARCHAR(100) NOT NULL COLLATE NOCASE UNIQUE);
 
@@ -27,7 +27,7 @@ DROP TABLE tbl_tag_cls;
 ALTER TABLE tbl_tag_cls2 RENAME TO tbl_tag_cls;
 CREATE UNIQUE INDEX tag_cls_idx ON tbl_tag_cls(id, cls);
 
-// Update tags table;
+/* Update tags table; */
 
 CREATE TABLE tbl_tags2 (id INTEGER PRIMARY KEY AUTOINCREMENT, mf_id INT, tag VARCHAR(100), type INT, cls_id INT,
   FOREIGN KEY(mf_id) REFERENCES tbl_mediafiles(id) ON DELETE RESTRICT ON UPDATE RESTRICT,
@@ -41,17 +41,17 @@ DROP TABLE tbl_tags;
 ALTER TABLE tbl_tags2 RENAME TO tbl_tags;
 CREATE INDEX tags_idx ON tbl_tags(mf_id,tag);
 
-// TODO fix columns names in tbl_prop.
-// UPDATE tbl_prop SET value="file" WHERE key="SORTCOL";
+/* TODO fix columns names in tbl_prop. */
+/* UPDATE tbl_prop SET value="file" WHERE key="SORTCOL"; */
 
-// Clean.
+/* Clean. */
 
 VACUUM;
 
-// Test.
+/* Test. */
 
-SELECT distinct m.id AS id,m.type AS type,file,md5,added,modified,enabled,missing,remloc,startcnt,endcnt,lastplay,duration,width,height 
+SELECT distinct m.id AS id,m.type AS type,file,added,modified,enabled,missing,remloc,startcnt,endcnt,lastplay,duration,width,height 
  FROM tbl_mediafiles AS m LEFT OUTER JOIN tbl_tags ON m.id=tbl_tags.mf_id
- WHERE m.type=1 AND (file LIKE '%bsd%' ESCAPE '\' OR tag LIKE '%bsd%' ESCAPE '\') AND (missing<>1 OR missing is NULL) AND (enabled<>0 OR enabled is NULL) 
- ORDER BY lastplay DESC, endcnt DESC, startcnt DESC, file COLLATE NOCASE ASC;
+ WHERE m.type=1 AND (file LIKE '%a%' ESCAPE '\' OR tag LIKE '%a%' ESCAPE '\') AND (missing<>1 OR missing is NULL) AND (enabled<>0 OR enabled is NULL) 
+ ORDER BY lastplay DESC, endcnt DESC, startcnt DESC, file COLLATE NOCASE ASC LIMIT 10;
 
