@@ -62,7 +62,7 @@ public class ChecksumHelper {
 		}
 	};
 	
-	public static final int BUFFERSIZE = 8192;
+	public static final int BUFFERSIZE = 1024 * 64; // 64kb.
 	
 	static public byte[] createBuffer () {
 		return new byte[BUFFERSIZE];
