@@ -2,7 +2,6 @@ package com.vaguehope.sqlitewrapper;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -69,27 +68,20 @@ public abstract class GenericSqliteLayer implements IGenericDbLayer {
 		String url = "jdbc:sqlite:/" + this.dbFilePath;
 		Connection con = DriverManager.getConnection(url);
 		
-		con.setAutoCommit(this.autoCommit);
-//		System.err.println("AutoCommit=" + this.dbConnection.getAutoCommit() + " for '"+getDbFilePath()+"'.");
-		
 		// Setup environment.
-		PreparedStatement ps;
-		ps = con.prepareStatement(PRAGMA_FK_SET);
+		Statement stmt = con.createStatement();
 		try {
-			ps.execute();
-		}
-		finally { ps.close(); }
-		ps = con.prepareStatement(PRAGMA_FK_GET);
-		try {
-			ResultSet rs = ps.executeQuery();
+			stmt.execute(PRAGMA_FK_SET);
+			ResultSet rs = stmt.executeQuery(PRAGMA_FK_GET);
 			try {
 				rs.next();
 				int fk = rs.getInt(1);
-				if (fk != 1) throw new UnsupportedOperationException("Call had no effect: " + PRAGMA_FK_SET);
-			}
-			finally { rs.close(); }
-		}
-		finally { ps.close(); }
+				if (fk != 1) throw new UnsupportedOperationException("Call had no effect: " + PRAGMA_FK_SET + " (v="+fk+")");
+			} finally { rs.close(); }
+		} finally { stmt.close(); }
+		
+		con.setAutoCommit(this.autoCommit);
+//		System.err.println("AutoCommit=" + this.dbConnection.getAutoCommit() + " for '"+getDbFilePath()+"'.");
 		
 		return con;
 	}

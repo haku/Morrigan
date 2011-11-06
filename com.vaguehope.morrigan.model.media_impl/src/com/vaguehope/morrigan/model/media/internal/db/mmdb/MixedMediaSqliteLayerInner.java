@@ -43,8 +43,9 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 	public static final String SQL_TBL_MEDIAFILES_NAME = "tbl_mediafiles";
 	
 	public static final IDbColumn[] SQL_TBL_MEDIAFILES_COLS = new IDbColumn[] {
-		SQL_TBL_MEDIAFILES_COL_TYPE,
+		SQL_TBL_MEDIAFILES_COL_ID,
 		SQL_TBL_MEDIAFILES_COL_FILE,
+		SQL_TBL_MEDIAFILES_COL_TYPE,
 		SQL_TBL_MEDIAFILES_COL_MD5,
 		SQL_TBL_MEDIAFILES_COL_DADDED,
 		SQL_TBL_MEDIAFILES_COL_DMODIFIED,
@@ -67,7 +68,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 				return c;
 			}
 		}
-		throw new IllegalArgumentException();
+		throw new IllegalArgumentException("Failed to find column from name '"+name+"'.");
 	}
 	
 	static protected List<IDbColumn> generateSqlTblMediaFilesColumns () {
@@ -86,17 +87,15 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 	
 	private static final String _SQL_MEDIAFILES_SELECT =
 		"SELECT"
-		+ " ROWID, type, sfile, md5, dadded, dmodified, benabled, bmissing, sremloc"
-		+ ",lstartcnt,lendcnt,dlastplay,lduration"
-    	+ ",lwidth,lheight"
+		+ " id, file, type, md5, added, modified, enabled, missing, remloc"
+		+ ",startcnt,endcnt,lastplay,duration"
+    	+ ",width,height"
     	+ " FROM tbl_mediafiles";
 	
 	private static final String _SQL_MEDIAFILESTAGS_SELECT =
 		"SELECT"
-		+ " distinct m.ROWID AS ROWID,m.type AS type,sfile,md5,dadded,dmodified,benabled,bmissing,sremloc"
-		+ ",lstartcnt,lendcnt,dlastplay,lduration"
-		+ ",lwidth,lheight"
-		+ " FROM tbl_mediafiles AS m LEFT OUTER JOIN tbl_tags ON m.ROWID=tbl_tags.mf_rowid";
+		+ " distinct m.id AS id,m.type AS type,file,md5,added,modified,enabled,missing,remloc,startcnt,endcnt,lastplay,duration,width,height"
+		+ " FROM tbl_mediafiles AS m LEFT OUTER JOIN tbl_tags ON m.id=tbl_tags.mf_id";
 	
 	private static final String _SQL_WHERE =
 		" WHERE";
@@ -111,34 +110,30 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 		" m.type=?";
 	
 	private static final String _SQL_MEDIAFILES_WHERENOTMISSING =
-		" (bmissing<>1 OR bmissing is NULL)";
+		" (missing<>1 OR missing is NULL)";
 	
 	private static final String _SQL_ORDERBYREPLACE =
 		" ORDER BY {COL} {DIR};";
 	
 	private static final String _SQL_MEDIAFILES_WHEREFILEEQ = 
-		" sfile = ?";
+		" file = ?";
 	
 	private static final String _SQL_MEDIAFILES_WHERESEARCHTAGS = 
-		" (sfile LIKE ? ESCAPE ? OR tag LIKE ? ESCAPE ?)";
-	
-//	private static final String _SQL_MEDIAFILES_WHEREORDERSEARCH = 
-//		" sfile LIKE ? ESCAPE ?"
-//		+ " AND (bmissing<>1 OR bmissing is NULL) AND (benabled<>0 OR benabled is NULL)"
-//		+ " ORDER BY dlastplay DESC, lendcnt DESC, lstartcnt DESC, sfile COLLATE NOCASE ASC;";
+		" (file LIKE ? ESCAPE ? OR tag LIKE ? ESCAPE ?)";
 	
 	private static final String _SQL_MEDIAFILESTAGS_WHEREORDERSEARCH = 
-		" (sfile LIKE ? ESCAPE ? OR tag LIKE ? ESCAPE ?)"
-		+ " AND (bmissing<>1 OR bmissing is NULL) AND (benabled<>0 OR benabled is NULL)"
-		+ " ORDER BY dlastplay DESC, lendcnt DESC, lstartcnt DESC, sfile COLLATE NOCASE ASC;";
+		" (file LIKE ? ESCAPE ? OR tag LIKE ? ESCAPE ?)"
+		+ " AND (missing<>1 OR missing is NULL) AND (enabled<>0 OR enabled is NULL)"
+		+ " ORDER BY lastplay DESC, endcnt DESC, startcnt DESC, file COLLATE NOCASE ASC;";
 	
 //	-  -  -  -  -  -  -  -  -  -  -  -
 //	Adding and removing tracks.
 	
 	private static final String SQL_TBL_MEDIAFILES_Q_EXISTS =
-		"SELECT count(*) FROM tbl_mediafiles WHERE sfile=? COLLATE NOCASE;";
+		"SELECT count(*) FROM tbl_mediafiles WHERE file=? COLLATE NOCASE;";
 	
 //	TODO move to helper / where DbColumn is defined?
+	// WARNING: consuming code assumes the order of parameters in the generated SQL.
 	private GeneratedString sqlTblMediaFilesAdd = new GeneratedString() {
 		@Override
 		public String generateString() {
@@ -176,37 +171,37 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 	};
 	
 	private static final String SQL_TBL_MEDIAFILES_REMOVE =
-		"DELETE FROM tbl_mediafiles WHERE sfile=?";
+		"DELETE FROM tbl_mediafiles WHERE file=?";
 	
 	private static final String SQL_TBL_MEDIAFILES_REMOVE_BYROWID =
-		"DELETE FROM tbl_mediafiles WHERE ROWID=?";
+		"DELETE FROM tbl_mediafiles WHERE id=?";
 	
 //	-  -  -  -  -  -  -  -  -  -  -  -
 //	Setting MediaItem data.
 	
 	private static final String SQL_TBL_MEDIAFILES_SETDATEADDED =
-		"UPDATE tbl_mediafiles SET dadded=?" +
-		" WHERE sfile=?;";
+		"UPDATE tbl_mediafiles SET added=?" +
+		" WHERE file=?;";
 	
 	private static final String SQL_TBL_MEDIAFILES_SETHASHCODE =
 		"UPDATE tbl_mediafiles SET md5=?" +
-		" WHERE sfile=?;";
+		" WHERE file=?;";
 	
 	private static final String SQL_TBL_MEDIAFILES_SETDMODIFIED =
-		"UPDATE tbl_mediafiles SET dmodified=?" +
-		" WHERE sfile=?;";
+		"UPDATE tbl_mediafiles SET modified=?" +
+		" WHERE file=?;";
 	
 	private static final String SQL_TBL_MEDIAFILES_SETENABLED =
-		"UPDATE tbl_mediafiles SET benabled=?" +
-		" WHERE sfile=?;";
+		"UPDATE tbl_mediafiles SET enabled=?" +
+		" WHERE file=?;";
 	
 	private static final String SQL_TBL_MEDIAFILES_SETMISSING =
-		"UPDATE tbl_mediafiles SET bmissing=?" +
-		" WHERE sfile=?;";
+		"UPDATE tbl_mediafiles SET missing=?" +
+		" WHERE file=?;";
 	
 	private static final String SQL_TBL_MEDIAFILES_SETREMLOC =
-		"UPDATE tbl_mediafiles SET sremloc=?" +
-		" WHERE sfile=?;";
+		"UPDATE tbl_mediafiles SET remloc=?" +
+		" WHERE file=?;";
 	
 	
 //	-  -  -  -  -  -  -  -  -  -  -  -
@@ -214,43 +209,43 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 	
 	private static final String SQL_TBL_MEDIAFILES_SETTYPE =
 		"UPDATE tbl_mediafiles SET type=?" +
-		" WHERE sfile=?;";
+		" WHERE file=?;";
 	
 //	-  -  -  -  -  -  -  -  -  -  -  -
 //	Setting MediaTrack data.
 	
 	private static final String SQL_TBL_MEDIAFILES_TRACKPLAYED =
-		"UPDATE tbl_mediafiles SET lstartcnt=lstartcnt+?,dlastplay=?" +
-		" WHERE sfile=?;";
+		"UPDATE tbl_mediafiles SET startcnt=startcnt+?,lastplay=?" +
+		" WHERE file=?;";
 	
 	private static final String SQL_TBL_MEDIAFILES_INCSTART =
-		"UPDATE tbl_mediafiles SET lstartcnt=lstartcnt+?" +
-		" WHERE sfile=?;";
+		"UPDATE tbl_mediafiles SET startcnt=startcnt+?" +
+		" WHERE file=?;";
 	
 	private static final String SQL_TBL_MEDIAFILES_SETSTART =
-		"UPDATE tbl_mediafiles SET lstartcnt=? WHERE sfile=?;";
+		"UPDATE tbl_mediafiles SET startcnt=? WHERE file=?;";
 	
 	private static final String SQL_TBL_MEDIAFILES_INCEND =
-		"UPDATE tbl_mediafiles SET lendcnt=lendcnt+?" +
-		" WHERE sfile=?;";
+		"UPDATE tbl_mediafiles SET endcnt=endcnt+?" +
+		" WHERE file=?;";
 	
 	private static final String SQL_TBL_MEDIAFILES_SETEND =
-		"UPDATE tbl_mediafiles SET lendcnt=? WHERE sfile=?;";
+		"UPDATE tbl_mediafiles SET endcnt=? WHERE file=?;";
 	
 	private static final String SQL_TBL_MEDIAFILES_SETDATELASTPLAYED =
-		"UPDATE tbl_mediafiles SET dlastplay=?" +
-		" WHERE sfile=?;";
+		"UPDATE tbl_mediafiles SET lastplay=?" +
+		" WHERE file=?;";
 	
 	private static final String SQL_TBL_MEDIAFILES_SETDURATION =
-		"UPDATE tbl_mediafiles SET lduration=?" +
-		" WHERE sfile=?;";
+		"UPDATE tbl_mediafiles SET duration=?" +
+		" WHERE file=?;";
 	
 //	-  -  -  -  -  -  -  -  -  -  -  -
 //	Setting MediaPicture data.
 	
 	private static final String SQL_TBL_MEDIAFILES_SETDIMENSIONS =
-		"UPDATE tbl_mediafiles SET lwidth=?,lheight=?" +
-		" WHERE sfile=?;";
+		"UPDATE tbl_mediafiles SET width=?,height=?" +
+		" WHERE file=?;";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Create statements.
@@ -259,7 +254,8 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 	protected List<SqlCreateCmd> getTblCreateCmds() {
 		List<SqlCreateCmd> l = super.getTblCreateCmds();
 		
-		l.add(SqliteHelper.generateSql_Create(SQL_TBL_MEDIAFILES_NAME, SQL_TBL_MEDIAFILES_COLS));
+		// Insert at beginning as latter tables will have keys pointing to this one.
+		l.add(0, SqliteHelper.generateSql_Create(SQL_TBL_MEDIAFILES_NAME, SQL_TBL_MEDIAFILES_COLS));
 		
 		return l;
 	}
@@ -442,10 +438,12 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 		
 		int n;
 		if (!local_hasFile(filePath)) {
-			ps = getDbCon().prepareStatement(this.sqlTblMediaFilesAdd.toString());
+			String sql = this.sqlTblMediaFilesAdd.toString();
+			ps = getDbCon().prepareStatement(sql);
 			try {
-				ps.setInt(1, mediaType.getN());
-				ps.setString(2, filePath);
+				// WARNING: this assumes the order of parameters in the above SQL.
+				ps.setString(1, filePath);
+				ps.setInt(2, mediaType.getN());
 				ps.setDate(3, new java.sql.Date(new Date().getTime()));
 				ps.setDate(4, new java.sql.Date(lastModified));
 				n = ps.executeUpdate();
@@ -466,13 +464,19 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 		PreparedStatement ps;
 		int[] n;
 		
-		ps = getDbCon().prepareStatement(this.sqlTblMediaFilesAdd.toString());
+		String sql = this.sqlTblMediaFilesAdd.toString();
+		ps = getDbCon().prepareStatement(sql);
 		try {
 			for (File file : files) {
+				if (file == null) throw new IllegalArgumentException("File can not be null.");
+				
 				String filePath = file.getAbsolutePath();
+				if (filePath == null || filePath.isEmpty()) throw new IllegalArgumentException("filePath is null or empty: " + filePath);
+				
 				if (!local_hasFile(filePath)) {
-					ps.setInt(1, MediaType.UNKNOWN.getN());
-					ps.setString(2, filePath);
+					// WARNING: this assumes the order of parameters in the above SQL.
+					ps.setString(1, filePath);
+					ps.setInt(2, MediaType.UNKNOWN.getN());
 					ps.setDate(3, new java.sql.Date(new Date().getTime()));
 					ps.setDate(4, new java.sql.Date(file.lastModified()));
 					ps.addBatch();
@@ -897,7 +901,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 		mi.setDateLastModified(SqliteHelper.readDate(rs, SQL_TBL_MEDIAFILES_COL_DMODIFIED.getName()));
 		mi.setEnabled(rs.getInt(SQL_TBL_MEDIAFILES_COL_ENABLED.getName()) != 0); // default to true.
 		mi.setMissing(rs.getInt(SQL_TBL_MEDIAFILES_COL_MISSING.getName()) == 1); // default to false.
-		mi.setDbRowId(rs.getLong(SQL_TBL_MEDIAFILES_COL_ROWID.getName()));
+		mi.setDbRowId(rs.getLong(SQL_TBL_MEDIAFILES_COL_ID.getName()));
 		mi.setRemoteLocation(rs.getString(SQL_TBL_MEDIAFILES_COL_REMLOC.getName()));
 		
 		if (t == MediaType.TRACK) {

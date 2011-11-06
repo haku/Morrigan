@@ -307,17 +307,20 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	
 	private static final String SQL_TBL_TAGS_CREATE = 
 		"CREATE TABLE tbl_tags (" +
-		"mf_rowid INT," +
+		"id INTEGER PRIMARY KEY AUTOINCREMENT," +
+		"mf_id INT," +
 		"tag VARCHAR(100)," +
 		"type INT," +
-		"cls_rowid INT" +
+		"cls_id INT," +
+		"FOREIGN KEY(mf_id) REFERENCES tbl_mediafiles(id) ON DELETE RESTRICT ON UPDATE RESTRICT," +
+		"FOREIGN KEY(cls_id) REFERENCES tbl_tag_cls(id) ON DELETE RESTRICT ON UPDATE RESTRICT" +
 		");";
 	
-	private static final String SQL_TBL_TAGS_COL_ROWID = "ROWID";
-//	private static final String SQL_TBL_TAGS_COL_MEDIAFILEROWID = "mf_rowid";
+	private static final String SQL_TBL_TAGS_COL_ROWID = "id";
+//	private static final String SQL_TBL_TAGS_COL_MEDIAFILEROWID = "mf_id";
 	private static final String SQL_TBL_TAGS_COL_TAG = "tag";
 	private static final String SQL_TBL_TAGS_COL_TYPE = "type";
-	private static final String SQL_TBL_TAGS_COL_CLSROWID = "cls_rowid";
+	private static final String SQL_TBL_TAGS_COL_CLSROWID = "cls_id";
 	
 	/* - - - - - - - - - - - - - - - -
 	 * tbl_tag_class
@@ -328,10 +331,11 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	
 	private static final String SQL_TBL_TAGCLS_CREATE = 
 		"CREATE TABLE tbl_tag_cls (" +
-		"cls VARCHAR(100) not null collate nocase primary key" +
+		"id INTEGER PRIMARY KEY AUTOINCREMENT," +
+		"cls VARCHAR(100) NOT NULL COLLATE NOCASE UNIQUE" +
 		");";
 	
-	private static final String SQL_TBL_TAGCLS_COL_ROWID = "ROWID";
+	private static final String SQL_TBL_TAGCLS_COL_ROWID = "id";
 	private static final String SQL_TBL_TAGCLS_COL_CLS = "cls";
 	
 	/* - - - - - - - - - - - - - - - -
@@ -367,43 +371,43 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	 */
 	
 	private static final String SQL_TBL_TAGS_ADD =
-		"INSERT INTO tbl_tags (mf_rowid,tag,type,cls_rowid) VALUES (?,?,?,?);";
+		"INSERT INTO tbl_tags (mf_id,tag,type,cls_id) VALUES (?,?,?,?);";
 	
 	private static final String SQL_TBL_TAGS_MOVE =
-		"UPDATE tbl_tags SET mf_rowid=? WHERE mf_rowid=?;";
+		"UPDATE tbl_tags SET mf_id=? WHERE mf_id=?;";
 	
 	private static final String SQL_TBL_TAGS_REMOVE =
-		"DELETE FROM tbl_tags WHERE ROWID=?;";
+		"DELETE FROM tbl_tags WHERE id=?;";
 	
 	private static final String SQL_TBL_TAGS_CLEAR =
-		"DELETE FROM tbl_tags WHERE mf_rowid=?;";
+		"DELETE FROM tbl_tags WHERE mf_id=?;";
 	
 	private static final String SQL_TBL_TAGS_Q_HASANY =
-		"SELECT ROWID FROM tbl_tags WHERE mf_rowid=?;";
+		"SELECT id FROM tbl_tags WHERE mf_id=?;";
 	
 	private static final String SQL_TBL_TAGS_Q_ALL =
-		"SELECT t.ROWID,t.tag,t.type,t.cls_rowid,c.cls" +
-		" FROM tbl_tags AS t LEFT OUTER JOIN tbl_tag_cls AS c ON t.cls_rowid=c.ROWID" +
-		" WHERE t.mf_rowid=?" +
+		"SELECT t.id,t.tag,t.type,t.cls_id,c.cls" +
+		" FROM tbl_tags AS t LEFT OUTER JOIN tbl_tag_cls AS c ON t.cls_id=c.id" +
+		" WHERE t.mf_id=?" +
 		" ORDER BY t.type ASC, c.cls ASC, t.tag ASC;";
 	
 	private static final String SQL_TBL_TAGS_Q_HASTAG =
-		"SELECT ROWID FROM tbl_tags WHERE mf_rowid=? AND tag=? AND type=? AND cls_rowid=?;";
+		"SELECT id FROM tbl_tags WHERE mf_id=? AND tag=? AND type=? AND cls_id=?;";
 	
 	private static final String SQL_TBL_TAGS_Q_HASTAG_CLSNULL =
-		"SELECT ROWID FROM tbl_tags WHERE mf_rowid=? AND tag=? AND type=? AND cls_rowid IS NULL;";
+		"SELECT id FROM tbl_tags WHERE mf_id=? AND tag=? AND type=? AND cls_id IS NULL;";
 	
 	private static final String SQL_TBL_TAGCLS_ADD =
 		"INSERT INTO tbl_tag_cls (cls) VALUES (?);";
 	
 	private static final String SQL_TBL_TAGCLS_Q_ALL =
-		"SELECT ROWID,cls FROM tbl_tag_cls;";
+		"SELECT id,cls FROM tbl_tag_cls;";
 	
 	private static final String SQL_TBL_TAGCLS_Q_CLS =
-		"SELECT ROWID,cls FROM tbl_tag_cls WHERE cls=?;";
+		"SELECT id,cls FROM tbl_tag_cls WHERE cls=?;";
 	
 	private static final String SQL_TBL_TAGCLS_Q_ROWID =
-		"SELECT ROWID,cls FROM tbl_tag_cls WHERE ROWID=?;";
+		"SELECT id,cls FROM tbl_tag_cls WHERE id=?;";
 	
 	/* - - - - - - - - - - - - - - - -
 	 * tbl_sources.
@@ -427,11 +431,11 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		
 		l.add(new SqlCreateCmd(SQL_TBL_PROP_EXISTS, SQL_TBL_PROP_CREATE));
 		
-		l.add(new SqlCreateCmd(SQL_TBL_TAGS_EXISTS, SQL_TBL_TAGS_CREATE));
-		l.add(new SqlCreateCmd("SELECT name FROM sqlite_master WHERE name='tags_idx';", "CREATE INDEX tags_idx ON tbl_tags(mf_rowid,tag);")); // TODO extract strings.
-		
 		l.add(new SqlCreateCmd(SQL_TBL_TAGCLS_EXISTS, SQL_TBL_TAGCLS_CREATE));
-		l.add(new SqlCreateCmd("SELECT name FROM sqlite_master WHERE name='tag_cls_idx';", "CREATE INDEX tag_cls_idx ON tbl_tag_cls(cls);")); // TODO extract strings.
+		l.add(new SqlCreateCmd("SELECT name FROM sqlite_master WHERE name='tag_cls_idx';", "CREATE INDEX tag_cls_idx ON tbl_tag_cls(id,cls);")); // TODO extract strings.
+		
+		l.add(new SqlCreateCmd(SQL_TBL_TAGS_EXISTS, SQL_TBL_TAGS_CREATE));
+		l.add(new SqlCreateCmd("SELECT name FROM sqlite_master WHERE name='tags_idx';", "CREATE INDEX tags_idx ON tbl_tags(mf_id,tag);")); // TODO extract strings.
 		
 		l.add(new SqlCreateCmd(SQL_TBL_SOURCES_EXISTS, SQL_TBL_SOURCES_CREATE));
 		
@@ -731,7 +735,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		} else if (ret.size() == 1) {
 			return ret.get(0);
 		} else {
-			throw new DbException("Query for TagClassification clsRowId='"+clsRowId+"' returned more than one result.");
+			throw new DbException("Query for TagClassification clsId='"+clsRowId+"' returned more than one result.");
 		}
 	}
 	
