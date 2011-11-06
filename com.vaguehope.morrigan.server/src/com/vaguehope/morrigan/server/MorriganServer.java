@@ -1,13 +1,17 @@
 package com.vaguehope.morrigan.server;
 
-
+import java.util.EnumSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.servlet.Filter;
+
 import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.DispatcherType;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.bio.SocketConnector;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
+import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.component.LifeCycle;
@@ -37,32 +41,40 @@ public class MorriganServer implements Listener {
 		try {
 			org.eclipse.jetty.util.log.Log.setLog(new JettyLogger());
 			this.server = new Server();
+			this.server.addLifeCycleListener(this);
+			
 			Connector connector = new SocketConnector();
 			connector.setPort(PORT);
 			this.server.addConnector(connector);
-			this.server.addLifeCycleListener(this);
 			
-//			SslSocketConnector sslConnector = new SslSocketConnector();
-//			sslConnector.setKeystore(KEYSTORE);
-//			sslConnector.setTruststore(KEYSTORE);
-//			sslConnector.setPassword(KEYPASSWORD);
-//			sslConnector.setKeyPassword(KEYPASSWORD);
-//			sslConnector.setTrustPassword(KEYPASSWORD);
-//			sslConnector.setMaxIdleTime(30000);
+			// HTTPS.
+//			final SslContextFactory sslContextFactory = new SslContextFactory(sKeyStore);
+//			sslContextFactory.setKeyStorePassword(sPassword);
+//			final SslSocketConnector sslConnector = new SslSocketConnector(sslContextFactory);
+//			sslConnector.setReuseAddress(true);
 //			sslConnector.setPort(8443);
 //			this.server.addConnector(sslConnector);
 			
+			// Auth filter to control access.
+			Filter filter = new AuthFilter();
+			FilterHolder filterHolder = new FilterHolder(filter);
+			
+			// This will hold all our servlets and webapps.
 			ContextHandlerCollection contexts = new ContextHandlerCollection();
 			this.server.setHandler(contexts);
 			
+			// Servlets.
 			ServletContextHandler servletContext = new ServletContextHandler(contexts, "/", ServletContextHandler.SESSIONS);
+			// TODO enabled this when clients are ready.
+			//servletContext.addFilter(filterHolder, "/*", (EnumSet<DispatcherType>)null);
 			servletContext.addServlet(new ServletHolder(new PlayersServlet()), PlayersServlet.CONTEXTPATH + "/*");
 			servletContext.addServlet(new ServletHolder(new MlistsServlet()), MlistsServlet.CONTEXTPATH + "/*");
 			servletContext.addServlet(new ServletHolder(new StatusServlet()), StatusServlet.CONTEXTPATH + "/*");
 			
+			// Web UI in WAR file.
 			WebAppContext warContext = WebAppHelper.getWarBundleAsContext(context, MorriganWui.ID, "/");
+			warContext.addFilter(filterHolder, "/*", (EnumSet<DispatcherType>)null);
 			contexts.addHandler(warContext);
-			
 		}
 		catch (Exception e) {
 			throw new MorriganException("Failed to create server object.", e);
