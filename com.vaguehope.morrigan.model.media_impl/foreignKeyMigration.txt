@@ -1,0 +1,58 @@
+// Important.
+
+PRAGMA foreign_keys = ON;
+
+// Verify no FK issues.
+
+SELECT tag, mf_rowid FROM tbl_tags WHERE NOT EXISTS (SELECT * from tbl_mediafiles WHERE tbl_tags.mf_rowid = tbl_mediafiles.ROWID);
+SELECT tag, cls_rowid FROM tbl_tags WHERE cls_rowid IS NOT NULL AND NOT EXISTS (SELECT * from tbl_tag_cls WHERE tbl_tags.cls_rowid = tbl_tag_cls.ROWID);
+
+// Add id to tbl_mediafiles;
+
+CREATE TABLE tbl_mediafiles2(id INTEGER PRIMARY KEY AUTOINCREMENT,sfile VARCHAR(1000) NOT NULL COLLATE NOCASE UNIQUE,type INT,md5 BLOB,dadded DATETIME,dmodified DATETIME,benabled INT(1),bmissing INT(1),sremloc VARCHAR(1000) NOT NULL,lstartcnt INT(6),lendcnt INT(6),dlastplay DATETIME,lduration INT(6),lwidth INT(6),lheight INT(6));
+
+INSERT INTO tbl_mediafiles2 (id,sfile,type,md5,dadded,dmodified,benabled,bmissing,sremloc,lstartcnt,lendcnt,dlastplay,lduration,lwidth,lheight) SELECT ROWID,sfile,type,md5,dadded,dmodified,benabled,bmissing,sremloc,lstartcnt,lendcnt,dlastplay,lduration,lwidth,lheight FROM tbl_mediafiles;
+
+DROP TABLE tbl_mediafiles;
+ALTER TABLE tbl_mediafiles2 RENAME TO tbl_mediafiles;
+
+// Update tag_cls table.
+
+CREATE TABLE tbl_tag_cls2 (id INTEGER PRIMARY KEY AUTOINCREMENT, cls VARCHAR(100) NOT NULL COLLATE NOCASE UNIQUE);
+
+INSERT INTO tbl_tag_cls2 (id,cls) SELECT ROWID,cls FROM tbl_tag_cls;
+
+DROP INDEX tag_cls_idx;
+DROP TABLE tbl_tag_cls;
+ALTER TABLE tbl_tag_cls2 RENAME TO tbl_tag_cls;
+CREATE UNIQUE INDEX tag_cls_idx ON tbl_tag_cls(id, cls);
+
+// Update tags table;
+
+CREATE TABLE tbl_tags2 (
+  mf_id INT,
+  tag VARCHAR(100),
+  type INT,
+  cls_id INT,
+  FOREIGN KEY(mf_id) REFERENCES tbl_mediafiles(id) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  FOREIGN KEY(cls_id) REFERENCES tbl_tag_cls(id) ON DELETE RESTRICT ON UPDATE RESTRICT
+  );
+
+INSERT INTO tbl_tags2 (mf_id, tag, type, cls_id) SELECT mf_rowid, tag, type, cls_rowid FROM tbl_tags;
+
+DROP INDEX tags_idx;
+DROP TABLE tbl_tags;
+ALTER TABLE tbl_tags2 RENAME TO tbl_tags;
+CREATE INDEX tags_idx ON tbl_tags(mf_id,tag);
+
+// Clean.
+
+VACUUM;
+
+// Test.
+
+SELECT distinct m.id AS id,m.type AS type,sfile,md5,dadded,dmodified,benabled,bmissing,sremloc,lstartcnt,lendcnt,dlastplay,lduration,lwidth,lheight 
+ FROM tbl_mediafiles AS m LEFT OUTER JOIN tbl_tags ON m.id=tbl_tags.mf_id
+ WHERE m.type=1 AND (sfile LIKE '%bsd%' ESCAPE '\' OR tag LIKE '%bsd%' ESCAPE '\') AND (bmissing<>1 OR bmissing is NULL) AND (benabled<>0 OR benabled is NULL) 
+ ORDER BY dlastplay DESC, lendcnt DESC, lstartcnt DESC, sfile COLLATE NOCASE ASC;
+
