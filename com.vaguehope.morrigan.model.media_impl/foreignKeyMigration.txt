@@ -9,9 +9,9 @@ SELECT tag, cls_rowid FROM tbl_tags WHERE cls_rowid IS NOT NULL AND NOT EXISTS (
 
 // Add id to tbl_mediafiles;
 
-CREATE TABLE tbl_mediafiles2(id INTEGER PRIMARY KEY AUTOINCREMENT,sfile VARCHAR(1000) NOT NULL COLLATE NOCASE UNIQUE,type INT,md5 BLOB,dadded DATETIME,dmodified DATETIME,benabled INT(1),bmissing INT(1),sremloc VARCHAR(1000) NOT NULL,lstartcnt INT(6),lendcnt INT(6),dlastplay DATETIME,lduration INT(6),lwidth INT(6),lheight INT(6));
+CREATE TABLE tbl_mediafiles2(id INTEGER PRIMARY KEY AUTOINCREMENT,file VARCHAR(1000) NOT NULL COLLATE NOCASE UNIQUE,type INT,md5 BLOB,added DATETIME,modified DATETIME,enabled INT(1),missing INT(1),remloc VARCHAR(1000) NOT NULL,startcnt INT(6),endcnt INT(6),lastplay DATETIME,duration INT(6),width INT(6),height INT(6));
 
-INSERT INTO tbl_mediafiles2 (id,sfile,type,md5,dadded,dmodified,benabled,bmissing,sremloc,lstartcnt,lendcnt,dlastplay,lduration,lwidth,lheight) SELECT ROWID,sfile,type,md5,dadded,dmodified,benabled,bmissing,sremloc,lstartcnt,lendcnt,dlastplay,lduration,lwidth,lheight FROM tbl_mediafiles;
+INSERT INTO tbl_mediafiles2 (id,file,type,md5,added,modified,enabled,missing,remloc,startcnt,endcnt,lastplay,duration,width,height) SELECT ROWID,sfile,type,md5,dadded,dmodified,benabled,bmissing,sremloc,lstartcnt,lendcnt,dlastplay,lduration,lwidth,lheight FROM tbl_mediafiles;
 
 DROP TABLE tbl_mediafiles;
 ALTER TABLE tbl_mediafiles2 RENAME TO tbl_mediafiles;

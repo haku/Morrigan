@@ -3,11 +3,11 @@ used under and links to their web sites where further license information may
 be available.
 Where appropreate the locations of specific library files are also listed.
 
-sqlitejdbc
-BSD license.
-http://www.zentus.com/sqlitejdbc
+sqlite-jdbc
+Apache 2 license.
+https://code.google.com/p/sqlite-jdbc
 Included files:
-    com.vaguehope.sqlitewrapper/lib/sqlitejdbc-v056.jar
+    com.vaguehope.sqlitewrapper/lib/sqlite-jdbc-3.7.2.jar
 
 Jetty
 The Apache Software License, Version 2.0.
