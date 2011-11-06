@@ -89,7 +89,7 @@ public class MediaFactoryImpl implements MediaFactory {
 		if (ILocalMixedMediaDb.TYPE.equals(db.getType())) {
 			return LocalMixedMediaDbFactory.getTransactional(db.getDbPath());
 		}
-		throw new IllegalArgumentException("Can't create clone of DB of type '"+db.getType()+"'.");
+		throw new IllegalArgumentException("Can't create transactional connection to DB of type '"+db.getType()+"'.");
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
