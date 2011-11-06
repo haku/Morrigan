@@ -31,6 +31,7 @@ Import-Package: com.vaguehope.morrigan.config,
  org.eclipse.jetty.server.handler,
  org.eclipse.jetty.servlet,
  org.eclipse.jetty.util.component,
+ org.eclipse.jetty.util.log,
  org.eclipse.jetty.webapp,
  org.eclipse.swt.widgets,
  org.osgi.framework;version="1.6.0"

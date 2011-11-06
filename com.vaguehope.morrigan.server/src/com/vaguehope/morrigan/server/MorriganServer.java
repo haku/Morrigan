@@ -35,6 +35,7 @@ public class MorriganServer implements Listener {
 	
 	public MorriganServer (BundleContext context) throws MorriganException {
 		try {
+			org.eclipse.jetty.util.log.Log.setLog(new JettyLogger());
 			this.server = new Server();
 			Connector connector = new SocketConnector();
 			connector.setPort(PORT);
