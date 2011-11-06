@@ -112,6 +112,7 @@ public class AsyncTaskEventListener implements TaskEventListener {
 	@Override
 	public void done () {
 		this.lifeCycle.compareAndSet(1, 2);
+		this.endTime.set(System.currentTimeMillis());
 	}
 
 	@Override
