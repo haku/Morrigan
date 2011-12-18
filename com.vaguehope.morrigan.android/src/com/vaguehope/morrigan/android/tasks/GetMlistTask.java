@@ -22,6 +22,7 @@ import java.io.InputStream;
 
 import org.xml.sax.SAXException;
 
+import com.vaguehope.morrigan.android.helper.HttpHelper.HttpCreds;
 import com.vaguehope.morrigan.android.model.MlistReference;
 import com.vaguehope.morrigan.android.model.MlistState;
 import com.vaguehope.morrigan.android.model.MlistStateChangeListener;
@@ -48,6 +49,11 @@ public class GetMlistTask extends AbstractTask<MlistState> {
 	@Override
 	protected String getUrl () {
 		return this.mlistReference.getBaseUrl();
+	}
+	
+	@Override
+	protected HttpCreds getCreds () {
+		return this.mlistReference.getServerReference();
 	}
 	
 	// In background thread:

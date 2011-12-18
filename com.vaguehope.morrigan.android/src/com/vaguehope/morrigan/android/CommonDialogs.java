@@ -112,7 +112,7 @@ public class CommonDialogs {
 				if ("".equals(query)) query = "*"; // Default to searching for wild-card.
 				
 				Intent intent = new Intent(context.getApplicationContext(), MlistActivity.class);
-				intent.putExtra(MlistActivity.SERVER_BASE_URL, playerState.getPlayerReference().getServerReference().getBaseUrl());
+				intent.putExtra(MlistActivity.SERVER_ID, playerState.getPlayerReference().getServerReference().getId());
 				intent.putExtra(MlistActivity.MLIST_BASE_URL, playerState.getListUrl());
 				intent.putExtra(MlistActivity.QUERY, query);
 				intent.putExtra(MlistActivity.PLAYER_ID, playerState.getPlayerReference().getPlayerId());

@@ -18,28 +18,6 @@ package com.vaguehope.morrigan.android;
 
 import java.util.List;
 
-import com.vaguehope.morrigan.android.CommonDialogs.PlayerSelectedListener;
-import com.vaguehope.morrigan.android.helper.TimeHelper;
-import com.vaguehope.morrigan.android.model.MlistItem;
-import com.vaguehope.morrigan.android.model.MlistItemList;
-import com.vaguehope.morrigan.android.model.MlistItemListChangeListener;
-import com.vaguehope.morrigan.android.model.MlistReference;
-import com.vaguehope.morrigan.android.model.MlistState;
-import com.vaguehope.morrigan.android.model.MlistStateChangeListener;
-import com.vaguehope.morrigan.android.model.PlayerState;
-import com.vaguehope.morrigan.android.model.ServerReference;
-import com.vaguehope.morrigan.android.model.impl.ArtifactListAdaptorImpl;
-import com.vaguehope.morrigan.android.model.impl.MlistReferenceImpl;
-import com.vaguehope.morrigan.android.model.impl.PlayerReferenceImpl;
-import com.vaguehope.morrigan.android.model.impl.ServerReferenceImpl;
-import com.vaguehope.morrigan.android.tasks.DownloadMediaTask;
-import com.vaguehope.morrigan.android.tasks.GetMlistItemListTask;
-import com.vaguehope.morrigan.android.tasks.GetMlistTask;
-import com.vaguehope.morrigan.android.tasks.RunMlistActionTask;
-import com.vaguehope.morrigan.android.tasks.RunMlistItemActionTask;
-import com.vaguehope.morrigan.android.tasks.RunMlistActionTask.MlistCommand;
-import com.vaguehope.morrigan.android.tasks.RunMlistItemActionTask.MlistItemCommand;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -60,10 +38,32 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.vaguehope.morrigan.android.CommonDialogs.PlayerSelectedListener;
+import com.vaguehope.morrigan.android.helper.TimeHelper;
+import com.vaguehope.morrigan.android.model.MlistItem;
+import com.vaguehope.morrigan.android.model.MlistItemList;
+import com.vaguehope.morrigan.android.model.MlistItemListChangeListener;
+import com.vaguehope.morrigan.android.model.MlistReference;
+import com.vaguehope.morrigan.android.model.MlistState;
+import com.vaguehope.morrigan.android.model.MlistStateChangeListener;
+import com.vaguehope.morrigan.android.model.PlayerState;
+import com.vaguehope.morrigan.android.model.ServerReference;
+import com.vaguehope.morrigan.android.model.impl.ArtifactListAdaptorImpl;
+import com.vaguehope.morrigan.android.model.impl.MlistReferenceImpl;
+import com.vaguehope.morrigan.android.model.impl.PlayerReferenceImpl;
+import com.vaguehope.morrigan.android.state.ConfigDb;
+import com.vaguehope.morrigan.android.tasks.DownloadMediaTask;
+import com.vaguehope.morrigan.android.tasks.GetMlistItemListTask;
+import com.vaguehope.morrigan.android.tasks.GetMlistTask;
+import com.vaguehope.morrigan.android.tasks.RunMlistActionTask;
+import com.vaguehope.morrigan.android.tasks.RunMlistActionTask.MlistCommand;
+import com.vaguehope.morrigan.android.tasks.RunMlistItemActionTask;
+import com.vaguehope.morrigan.android.tasks.RunMlistItemActionTask.MlistItemCommand;
+
 public class MlistActivity extends Activity implements MlistStateChangeListener, MlistItemListChangeListener {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public static final String SERVER_BASE_URL = "serverBaseUrl"; // String.
+	public static final String SERVER_ID = "serverId"; // int.
 	public static final String MLIST_BASE_URL = "mlistBaseUrl"; // String.
 	public static final String PLAYER_ID = "playerId"; // int.
 	
@@ -71,6 +71,7 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	ConfigDb configDb;
 	protected ServerReference serverReference = null;
 	protected MlistReference mlistReference = null;
 	protected ArtifactListAdaptorImpl<MlistItemList> mlistItemListAdapter;
@@ -86,14 +87,16 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
+		this.configDb = new ConfigDb(this);
+		
 		Bundle extras = getIntent().getExtras();
-		String serverBaseUrl = extras.getString(SERVER_BASE_URL);
+		int serverId = extras.getInt(SERVER_ID, -1);
 		String mlistBaseUrl = extras.getString(MLIST_BASE_URL);
 		int playerId = extras.getInt(PLAYER_ID, -1);
 		this.initialQuery = extras.getString(QUERY);
 		
-		if (serverBaseUrl != null && mlistBaseUrl != null) {
-			this.serverReference = new ServerReferenceImpl(serverBaseUrl);
+		if (serverId >= 0 && mlistBaseUrl != null) {
+			this.serverReference = this.configDb.getServer(serverId);
 			this.mlistReference = new MlistReferenceImpl(mlistBaseUrl, this.serverReference);
 		}
 		else {

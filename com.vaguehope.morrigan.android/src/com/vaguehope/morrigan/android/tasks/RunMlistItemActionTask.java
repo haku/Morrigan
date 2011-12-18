@@ -23,6 +23,7 @@ import java.io.InputStream;
 import org.xml.sax.SAXException;
 
 import com.vaguehope.morrigan.android.Constants;
+import com.vaguehope.morrigan.android.helper.HttpHelper.HttpCreds;
 import com.vaguehope.morrigan.android.model.MlistItem;
 import com.vaguehope.morrigan.android.model.MlistReference;
 import com.vaguehope.morrigan.android.model.PlayerReference;
@@ -74,6 +75,11 @@ public class RunMlistItemActionTask extends AbstractTask<String> {
 			case QUEUE: return "Queueing...";
 			default: return "Please wait...";
 		}
+	}
+	
+	@Override
+	protected HttpCreds getCreds () {
+		return this.mlistReference.getServerReference();
 	}
 	
 	@Override

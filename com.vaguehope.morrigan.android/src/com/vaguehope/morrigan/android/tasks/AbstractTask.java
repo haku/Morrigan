@@ -25,6 +25,7 @@ import org.xml.sax.SAXException;
 
 import com.vaguehope.morrigan.android.Constants;
 import com.vaguehope.morrigan.android.helper.HttpHelper;
+import com.vaguehope.morrigan.android.helper.HttpHelper.HttpCreds;
 import com.vaguehope.morrigan.android.helper.HttpHelper.HttpStreamHandler;
 
 import android.app.Activity;
@@ -92,7 +93,7 @@ public abstract class AbstractTask<T extends Object> extends AsyncTask<Void, Voi
 			String verb = getVerb();
 			String encodedData = getEncodedData();
 			String contentType = getContentType();
-			HttpHelper.getUrlContent(url, verb, encodedData, contentType, this);
+			HttpHelper.getUrlContent(url, verb, encodedData, contentType, this, getCreds());
 			return this.state.get();
 		}
 		catch (Exception e) {
@@ -130,6 +131,7 @@ public abstract class AbstractTask<T extends Object> extends AsyncTask<Void, Voi
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	protected String getProgressMsg () { return null; }
+	protected abstract HttpCreds getCreds ();
 	protected abstract String getUrl ();
 	protected String getVerb () { return "GET"; }
 	protected String getEncodedData () { return null; }

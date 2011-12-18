@@ -35,12 +35,12 @@ import android.view.View.OnClickListener;
 import android.view.View.OnCreateContextMenuListener;
 import android.view.Window;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.AdapterView.OnItemClickListener;
 
 import com.vaguehope.morrigan.android.helper.TimeHelper;
 import com.vaguehope.morrigan.android.model.Artifact;
@@ -56,22 +56,23 @@ import com.vaguehope.morrigan.android.model.ServerReference;
 import com.vaguehope.morrigan.android.model.impl.ArtifactListAdaptorImpl;
 import com.vaguehope.morrigan.android.model.impl.MlistReferenceImpl;
 import com.vaguehope.morrigan.android.model.impl.PlayerReferenceImpl;
-import com.vaguehope.morrigan.android.model.impl.ServerReferenceImpl;
+import com.vaguehope.morrigan.android.state.ConfigDb;
 import com.vaguehope.morrigan.android.tasks.DownloadMediaTask;
 import com.vaguehope.morrigan.android.tasks.GetPlayerQueueTask;
 import com.vaguehope.morrigan.android.tasks.GetPlayerQueueTask.QueueAction;
-import com.vaguehope.morrigan.android.tasks.SetPlaystateTask;
 import com.vaguehope.morrigan.android.tasks.GetPlayerQueueTask.QueueItemAction;
+import com.vaguehope.morrigan.android.tasks.SetPlaystateTask;
 import com.vaguehope.morrigan.android.tasks.SetPlaystateTask.TargetPlayState;
 
 public class PlayerActivity extends Activity implements PlayerStateChangeListener, PlayerQueueChangeListener {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public static final String SERVER_BASE_URL = "serverBaseUrl"; // String.
+	public static final String SERVER_ID = "serverId"; // int.
 	public static final String PLAYER_ID = "playerId"; // int.
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	ConfigDb configDb;
 	protected ServerReference serverReference = null;
 	protected PlayerReference playerReference = null;
 	private PlayerState currentState;
@@ -87,12 +88,14 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
+		this.configDb = new ConfigDb(this);
+		
 		Bundle extras = getIntent().getExtras();
-		String serverBaseUrl = extras.getString(SERVER_BASE_URL);
+		int serverId = extras.getInt(SERVER_ID, -1);
 		int playerId = extras.getInt(PLAYER_ID, -1);
 		
-		if (serverBaseUrl != null && playerId >= 0) {
-			this.serverReference = new ServerReferenceImpl(serverBaseUrl);
+		if (serverId >= 0 && playerId >= 0) {
+			this.serverReference = this.configDb.getServer(serverId);
 			this.playerReference = new PlayerReferenceImpl(this.serverReference, playerId);
 		}
 		else {

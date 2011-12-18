@@ -43,40 +43,43 @@ public class ConfigDb extends SQLiteOpenHelper implements ServerReferenceList {
 	public static final String TBL_HOSTS = "hosts";
 	private static final String TBL_HOSTS_ID = "_id";
 	private static final String TBL_HOSTS_URL = "url";
+	private static final String TBL_HOSTS_PASS = "pass";
 	
-	private static final String TBL_HOSTS_CREATE = "CREATE TABLE " + TBL_HOSTS + " ("
-    	+ TBL_HOSTS_ID + " integer primary key autoincrement,"
-    	+ TBL_HOSTS_URL + " text"
-    	+ ");";
+	private static final String TBL_HOSTS_CREATE =
+			"CREATE TABLE " + TBL_HOSTS + " ("
+					+ TBL_HOSTS_ID + " integer primary key autoincrement,"
+					+ TBL_HOSTS_URL + " text,"
+					+ TBL_HOSTS_PASS + " text"
+					+ ");";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-    public ConfigDb (Context context) {
-        super(context, DB_NAME, null, DB_VERSION);
-    }
-    
-    @Override
-    public void onCreate(SQLiteDatabase db) {
-        db.execSQL(TBL_HOSTS_CREATE);
-    }
-    
-    @Override
-	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-    	db.execSQL("DROP TABLE IF EXISTS " + TBL_HOSTS);
+	public ConfigDb (Context context) {
+		super(context, DB_NAME, null, DB_VERSION);
+	}
+	
+	@Override
+	public void onCreate (SQLiteDatabase db) {
+		db.execSQL(TBL_HOSTS_CREATE);
+	}
+	
+	@Override
+	public void onUpgrade (SQLiteDatabase db, int oldVersion, int newVersion) {
+		db.execSQL("DROP TABLE IF EXISTS " + TBL_HOSTS);
 		onCreate(db);
 	}
-    
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	ServerReferenceList methods.
-    
-    @Override
-	public List<? extends Artifact> getArtifactList() {
-    	return getServerReferenceList();
+	
+	@Override
+	public List<? extends Artifact> getArtifactList () {
+		return getServerReferenceList();
 	}
-    
-    @Override
+	
+	@Override
 	public List<? extends ServerReference> getServerReferenceList () {
-    	SQLiteDatabase db = null;
+		SQLiteDatabase db = null;
 		try {
 			db = this.getReadableDatabase();
 			db.beginTransaction();
@@ -86,17 +89,20 @@ public class ConfigDb extends SQLiteOpenHelper implements ServerReferenceList {
 					List<ServerReference> ret = new LinkedList<ServerReference>();
 					
 					c = db.query(true, TBL_HOSTS,
-							new String[] { TBL_HOSTS_ID, TBL_HOSTS_URL },
+							new String[] { TBL_HOSTS_ID, TBL_HOSTS_URL, TBL_HOSTS_PASS },
 							null, null, null, null,
 							TBL_HOSTS_URL + " DESC", null);
 					
 					if (c.moveToFirst()) {
 						int col_id = c.getColumnIndex(TBL_HOSTS_ID);
 						int col_url = c.getColumnIndex(TBL_HOSTS_URL);
+						int col_pass = c.getColumnIndex(TBL_HOSTS_PASS);
 						
 						do {
-							ServerReferenceImpl i = new ServerReferenceImpl(c.getString(col_url));
-							i.setDbId(c.getLong(col_id));
+							int id = c.getInt(col_id);
+							String url = c.getString(col_url);
+							String pass = c.getString(col_pass);
+							ServerReferenceImpl i = new ServerReferenceImpl(id, url, pass);
 							ret.add(i);
 						}
 						while (c.moveToNext());
@@ -115,18 +121,62 @@ public class ConfigDb extends SQLiteOpenHelper implements ServerReferenceList {
 		finally {
 			if (db != null) db.close();
 		}
-    }
-    
-    public void addServer (ServerReference sr) {
-    	ContentValues initialValues = new ContentValues();
-		initialValues.put(TBL_HOSTS_URL, sr.getBaseUrl());
+	}
+	
+	public ServerReference getServer (int id) {
+		if (id < 0) throw new IllegalArgumentException("ID is < 0.");
+		
+		SQLiteDatabase db = null;
+		try {
+			db = this.getReadableDatabase();
+			db.beginTransaction();
+			try {
+				Cursor c = null;
+				try {
+					c = db.query(true, TBL_HOSTS,
+							new String[] { TBL_HOSTS_ID, TBL_HOSTS_URL, TBL_HOSTS_PASS },
+							TBL_HOSTS_ID + "=?", new String[] { String.valueOf(id) },
+							null, null,
+							TBL_HOSTS_URL + " DESC", null
+							);
+					if (c.moveToFirst()) {
+						int col_id = c.getColumnIndex(TBL_HOSTS_ID);
+						int col_url = c.getColumnIndex(TBL_HOSTS_URL);
+						int col_pass = c.getColumnIndex(TBL_HOSTS_PASS);
+						
+						int inId = c.getInt(col_id);
+						String url = c.getString(col_url);
+						String pass = c.getString(col_pass);
+						ServerReferenceImpl srvRef = new ServerReferenceImpl(inId, url, pass);
+						
+						return srvRef;
+					}
+					throw new UnsupportedOperationException("ID '" + id + "' not found.");
+				}
+				finally {
+					if (c != null) c.close();
+				}
+			}
+			finally {
+				db.endTransaction();
+			}
+		}
+		finally {
+			if (db != null) db.close();
+		}
+	}
+	
+	public void addServer (ServerReference sr) {
+		ContentValues values = new ContentValues();
+		values.put(TBL_HOSTS_URL, sr.getBaseUrl());
+		values.put(TBL_HOSTS_PASS, sr.getPass());
 		
 		SQLiteDatabase db = null;
 		try {
 			db = this.getWritableDatabase();
 			db.beginTransaction();
 			try {
-				db.insert(TBL_HOSTS, null, initialValues);
+				db.insert(TBL_HOSTS, null, values);
 				db.setTransactionSuccessful();
 			}
 			finally {
@@ -136,21 +186,43 @@ public class ConfigDb extends SQLiteOpenHelper implements ServerReferenceList {
 		finally {
 			if (db != null) db.close();
 		}
-    }
-    
-    public boolean removeServer (ServerReference sr) {
-    	if (!(sr instanceof ServerReferenceImpl)) {
-    		throw new IllegalArgumentException("sr must be instanceof ServerReferenceImpl");
-    	}
-    	
-    	ServerReferenceImpl sri = (ServerReferenceImpl) sr;
-    	
-    	SQLiteDatabase db = null;
+	}
+	
+	public void updateServer (ServerReference sr) {
+		ContentValues values = new ContentValues();
+		values.put(TBL_HOSTS_URL, sr.getBaseUrl());
+		values.put(TBL_HOSTS_PASS, sr.getPass());
+		
+		SQLiteDatabase db = null;
 		try {
 			db = this.getWritableDatabase();
 			db.beginTransaction();
 			try {
-				int n = db.delete(TBL_HOSTS, TBL_HOSTS_ID + " = ?", new String[] { String.valueOf(sri.getDbId()) } );
+				db.update(TBL_HOSTS, values, TBL_HOSTS_ID + "=?", new String[] { String.valueOf(sr.getId()) });
+				db.setTransactionSuccessful();
+			}
+			finally {
+				db.endTransaction();
+			}
+		}
+		finally {
+			if (db != null) db.close();
+		}
+	}
+	
+	public boolean removeServer (ServerReference sr) {
+		if (!(sr instanceof ServerReferenceImpl)) {
+			throw new IllegalArgumentException("sr must be instanceof ServerReferenceImpl");
+		}
+		
+		ServerReferenceImpl sri = (ServerReferenceImpl) sr;
+		
+		SQLiteDatabase db = null;
+		try {
+			db = this.getWritableDatabase();
+			db.beginTransaction();
+			try {
+				int n = db.delete(TBL_HOSTS, TBL_HOSTS_ID + "=?", new String[] { String.valueOf(sri.getId()) });
 				if (n > 0) {
 					db.setTransactionSuccessful();
 					return true;
@@ -165,16 +237,16 @@ public class ConfigDb extends SQLiteOpenHelper implements ServerReferenceList {
 		finally {
 			if (db != null) db.close();
 		}
-    	
-    }
-    
-    @Override
-	public String getSortKey() {
+		
+	}
+	
+	@Override
+	public String getSortKey () {
 		return ""; // This should never be relevant.
 	}
 	
 	@Override
-	public int compareTo(ArtifactList another) {
+	public int compareTo (ArtifactList another) {
 		return this.getSortKey().compareTo(another.getSortKey());
 	}
 	

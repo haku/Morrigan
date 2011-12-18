@@ -16,58 +16,69 @@
 
 package com.vaguehope.morrigan.android.model.impl;
 
+import com.vaguehope.morrigan.android.Constants;
 import com.vaguehope.morrigan.android.R;
 import com.vaguehope.morrigan.android.model.ServerReference;
 
 public class ServerReferenceImpl implements ServerReference {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	private int dbId;
 	private final String baseUrl;
-	
-	private long dbId;
+	private final String pass;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public ServerReferenceImpl (String baseUrl) {
+	public ServerReferenceImpl (String baseUrl, String pass) {
+		this(Integer.MIN_VALUE, baseUrl, pass);
+	}
+	
+	public ServerReferenceImpl (int dbId, String baseUrl, String pass) {
 		if (baseUrl == null) throw new IllegalArgumentException();
 		
+		this.dbId = dbId;
 		this.baseUrl = baseUrl;
+		this.pass = pass;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	ServerReference methods.
 	
 	@Override
-	public String getBaseUrl() {
+	public String getBaseUrl () {
 		return this.baseUrl;
 	}
-
+	
+	@Override
+	public String getPass () {
+		return this.pass;
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Artifact methods.
 	
 	@Override
-    public int getId() {
-    	throw new UnsupportedOperationException("Not used.");
-    }
+	public int getId () {
+		if (this.dbId == Integer.MIN_VALUE) throw new IllegalStateException("ID not set.");
+		return this.dbId;
+	}
 	
 	@Override
-	public String getTitle() {
+	public String getTitle () {
 		return getBaseUrl();
 	}
 	
 	@Override
-	public int getImageResource() {
+	public int getImageResource () {
 		return R.drawable.db;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	HttpCreds methods.
 	
-	public void setDbId(long dbId) {
-		this.dbId = dbId;
-	}
-	
-	public long getDbId() {
-		return this.dbId;
+	@Override
+	public String getUser () {
+		return Constants.USERNAME;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

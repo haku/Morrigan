@@ -23,6 +23,7 @@ import java.io.InputStream;
 import org.xml.sax.SAXException;
 
 import com.vaguehope.morrigan.android.Constants;
+import com.vaguehope.morrigan.android.helper.HttpHelper.HttpCreds;
 import com.vaguehope.morrigan.android.model.PlayerStateList;
 import com.vaguehope.morrigan.android.model.PlayerStateListChangeListener;
 import com.vaguehope.morrigan.android.model.ServerReference;
@@ -56,6 +57,11 @@ public class GetPlayersTask extends AbstractTask<PlayerStateList> {
 	@Override
 	protected String getProgressMsg () {
 		return getActivity() == null ? "Fetching player data..." : null; // Only return msg if activity is null.
+	}
+	
+	@Override
+	protected HttpCreds getCreds () {
+		return this.serverReference;
 	}
 	
 	@Override

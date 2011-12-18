@@ -126,7 +126,7 @@ public class DownloadMediaTask extends AsyncTask<MlistItem, Integer, String> imp
 			// Will only skip if checksums really match.
 			if (!fileMatchedItem(file, item, false, byteBuffer)) {
 				try {
-					HttpHelper.getUrlContent(url, new HttpFileDownloadHandler(file, progressListener));
+					HttpHelper.getUrlContent(url, new HttpFileDownloadHandler(file, progressListener), this.mlistReference.getServerReference());
 					transferComplete = true;
 				}
 				catch (IOException e) {

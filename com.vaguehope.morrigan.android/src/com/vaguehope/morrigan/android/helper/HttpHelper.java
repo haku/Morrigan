@@ -24,44 +24,56 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import org.apache.http.client.HttpResponseException;
+
+import android.util.Base64;
+
 public class HttpHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static final int HTTP_CONNECT_TIMEOUT_SECONDS = 20;
 	public static final int HTTP_READ_TIMEOUT_SECONDS = 60;
 	
+	private static final String HEADER_AUTHORISATION = "Authorization";
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	static public interface HttpStreamHandler <T extends Exception> {
+	static public interface HttpStreamHandler<T extends Exception> {
 		
 		public void handleStream (InputStream is, int contentLength) throws IOException, T;
 		
 	}
 	
+	static public interface HttpCreds {
+		
+		public String getUser ();
+		public String getPass ();
+		
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public static String getUrlContent (String sUrl) throws IOException {
-		return getUrlContent(sUrl, null, null, null);
+	public static String getUrlContent (String sUrl, String httpRequestMethod, String encodedData, String contentType, HttpCreds creds) throws IOException {
+		return getUrlContent(sUrl, httpRequestMethod, encodedData, contentType, (HttpStreamHandler<RuntimeException>) null, creds);
 	}
 	
-	public static String getUrlContent (String sUrl, String httpRequestMethod, String encodedData, String contentType) throws IOException {
-		return getUrlContent(sUrl, httpRequestMethod, encodedData, contentType, (HttpStreamHandler<RuntimeException>) null);
+	public static <T extends Exception> String getUrlContent (String sUrl, HttpStreamHandler<T> streamHandler, HttpCreds creds) throws IOException, T {
+		return getUrlContent(sUrl, null, null, null, streamHandler, creds);
 	}
 	
-	public static <T extends Exception> String getUrlContent (String sUrl, HttpStreamHandler<T> streamHandler) throws IOException, T {
-		return getUrlContent(sUrl, null, null, null, streamHandler);
-	}
-	
-	public static <T extends Exception> String getUrlContent (String sUrl, String httpRequestMethod, String encodedData, String contentType, HttpStreamHandler<T> streamHandler) throws IOException, T {
+	public static <T extends Exception> String getUrlContent (String sUrl, String httpRequestMethod, String encodedData, String contentType, HttpStreamHandler<T> streamHandler, HttpCreds creds) throws IOException, T {
 		URL url = new URL(sUrl);
 		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+		connection.setUseCaches(false);
 		connection.setDoOutput(true);
 		connection.setRequestMethod(httpRequestMethod != null ? httpRequestMethod : "GET");
 		connection.setConnectTimeout(HTTP_CONNECT_TIMEOUT_SECONDS * 1000);
 		connection.setReadTimeout(HTTP_READ_TIMEOUT_SECONDS * 1000);
+		connection.setRequestProperty(HEADER_AUTHORISATION, authHeader(creds));
 		
 		if (encodedData != null) {
-			if (contentType!=null) connection.setRequestProperty("Content-Type", contentType);
+			if (contentType != null) connection.setRequestProperty("Content-Type", contentType);
+			connection.setDoOutput(true);
 			OutputStreamWriter out = new OutputStreamWriter(connection.getOutputStream());
 			try {
 				out.write(encodedData);
@@ -75,6 +87,13 @@ public class HttpHelper {
 		StringBuilder sb = null;
 		InputStream is = null;
 		try {
+			int responseCode = connection.getResponseCode();
+			if (responseCode >= 400) {
+				sb = new StringBuilder();
+				buildString(connection.getErrorStream(), sb);
+				throw new HttpResponseException(responseCode, sb.toString());
+			}
+			
 			is = connection.getInputStream();
 			
 			if (streamHandler != null) {
@@ -94,13 +113,13 @@ public class HttpHelper {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	public static String authHeader (HttpCreds creds) {
+		String raw = creds.getUser() + ":" + creds.getPass();
+		String enc = Base64.encodeToString(raw.getBytes(), Base64.NO_WRAP);
+		return "Basic " + enc;
+	}
+	
 	public static void buildString (InputStream is, StringBuilder sb) throws IOException {
-//		int v;
-//		sb = new StringBuilder();
-//		while( (v = is.read()) != -1){
-//			sb.append((char)v);
-//		}
-		
 		BufferedReader rd = new BufferedReader(new InputStreamReader(is));
 		String line;
 		while ((line = rd.readLine()) != null) {

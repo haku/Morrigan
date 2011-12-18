@@ -22,6 +22,7 @@ import java.io.InputStream;
 
 import org.xml.sax.SAXException;
 
+import com.vaguehope.morrigan.android.helper.HttpHelper.HttpCreds;
 import com.vaguehope.morrigan.android.model.PlayerReference;
 import com.vaguehope.morrigan.android.model.PlayerState;
 import com.vaguehope.morrigan.android.model.PlayerStateChangeListener;
@@ -81,6 +82,11 @@ public class SetPlaystateTask extends AbstractTask<PlayerState> {
 	
 	private String verb = null;
 	private String encodedData = null;
+	
+	@Override
+	protected HttpCreds getCreds () {
+		return this.playerReference.getServerReference();
+	}
 	
 	@Override
 	protected String getUrl () {

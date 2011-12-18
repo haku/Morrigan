@@ -16,15 +16,9 @@
 
 package com.vaguehope.morrigan.android;
 
-import com.vaguehope.morrigan.android.model.ArtifactListAdaptor;
-import com.vaguehope.morrigan.android.model.ServerReference;
-import com.vaguehope.morrigan.android.model.ServerReferenceList;
-import com.vaguehope.morrigan.android.model.impl.ArtifactListAdaptorImpl;
-import com.vaguehope.morrigan.android.model.impl.ServerReferenceImpl;
-import com.vaguehope.morrigan.android.state.ConfigDb;
-
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -39,8 +33,16 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import com.vaguehope.morrigan.android.model.ArtifactListAdaptor;
+import com.vaguehope.morrigan.android.model.ServerReference;
+import com.vaguehope.morrigan.android.model.ServerReferenceList;
+import com.vaguehope.morrigan.android.model.impl.ArtifactListAdaptorImpl;
+import com.vaguehope.morrigan.android.model.impl.ServerReferenceImpl;
+import com.vaguehope.morrigan.android.state.ConfigDb;
 
 public class ServersActivity extends Activity {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -98,16 +100,26 @@ public class ServersActivity extends Activity {
 			AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
 			ServerReference item = ServersActivity.this.serversListAdapter.getInputData().getServerReferenceList().get(info.position);
 			menu.setHeaderTitle(item.getBaseUrl());
-			menu.add(Menu.NONE, 1, Menu.NONE, "Remove");
+			menu.add(Menu.NONE, 1, Menu.NONE, "Edit");
+			menu.add(Menu.NONE, 2, Menu.NONE, "Remove");
 		}
 	};
 	
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
+		AdapterView.AdapterContextMenuInfo info;
+		ServerReference ref;
+		
 		switch (item.getItemId()) {
-			case 1:
-				AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-				ServerReference ref = ServersActivity.this.serversListAdapter.getInputData().getServerReferenceList().get(info.position);
+			case 1: // Delete.
+				info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+				ref = ServersActivity.this.serversListAdapter.getInputData().getServerReferenceList().get(info.position);
+				editServer(ref);
+				return true;
+				
+			case 2: // Delete.
+				info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+				ref = ServersActivity.this.serversListAdapter.getInputData().getServerReferenceList().get(info.position);
 				deleteServer(ref);
 				return true;
 			
@@ -120,51 +132,112 @@ public class ServersActivity extends Activity {
 //	Commands - to be called on the UI thread.
 	
 	protected void addServer () {
-		final AlertDialog.Builder dlgBuilder = new AlertDialog.Builder(this);
-		dlgBuilder.setTitle("Add server");
-		
-		final EditText editText = new EditText(this);
-		editText.setText("http://host:8080");
-		dlgBuilder.setView(editText);
-		
-		dlgBuilder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+		final ServerDlg dlg = new ServerDlg(this);
+		dlg.getBldr().setPositiveButton("Add", new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int whichButton) {
-				String inputString = editText.getText().toString().trim();
-				
-				if (inputString == null || inputString.length() < 1) {
+				if (!dlg.isSet()) {
 					dialog.cancel();
 					return;
 				}
-				
 				dialog.dismiss();
-				// TODO validate inputString!
 				
-				ServersActivity.this.configDb.addServer(new ServerReferenceImpl(inputString));
+				ServersActivity.this.configDb.addServer(new ServerReferenceImpl(dlg.getUrl(), dlg.getPass()));
 				ServersActivity.this.serversListAdapter.notifyDataSetChanged();
 			}
 		});
-		
-		dlgBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int whichButton) {
-				dialog.cancel();
-			}
-		});
-		
-		dlgBuilder.show();
+		dlg.show();
 	}
 	
+	protected void editServer (final ServerReference ref) {
+		final ServerDlg dlg = new ServerDlg(this, ref);
+		dlg.getBldr().setPositiveButton("Update", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int whichButton) {
+				if (!dlg.isSet()) {
+					dialog.cancel();
+					return;
+				}
+				dialog.dismiss();
+				
+				ServersActivity.this.configDb.updateServer(new ServerReferenceImpl(ref.getId(), dlg.getUrl(), dlg.getPass()));
+				ServersActivity.this.serversListAdapter.notifyDataSetChanged();
+			}
+		});
+		dlg.show();
+	}
 	protected void deleteServer (ServerReference sr) {
+		
 		ServersActivity.this.configDb.removeServer(sr);
 		ServersActivity.this.serversListAdapter.notifyDataSetChanged();
 		
 		Toast.makeText(this, "Removed: " + sr.getBaseUrl(), Toast.LENGTH_SHORT).show();
 	}
 	
+	static class ServerDlg {
+		
+		private final AlertDialog.Builder bldr;
+		private final EditText txtUrl;
+		private final EditText txtPass;
+		
+		public ServerDlg (Context context) {
+			this(context, null);
+		}
+		
+		public ServerDlg (Context context, ServerReference ref) {
+			this.bldr = new AlertDialog.Builder(context);
+			this.bldr.setTitle("Server");
+			
+			this.txtUrl = new EditText(context);
+			this.txtUrl.setText(ref != null ? ref.getBaseUrl() : "http://host:8080");
+			
+			this.txtPass = new EditText(context);
+			this.txtPass.setHint("pass");
+			if (ref != null) this.txtPass.setText(ref.getPass());
+			
+			LinearLayout layout = new LinearLayout(context);
+			layout.setOrientation(LinearLayout.VERTICAL);
+			layout.addView(this.txtUrl);
+			layout.addView(this.txtPass);
+			this.bldr.setView(layout);
+			
+			this.bldr.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int whichButton) {
+					dialog.cancel();
+				}
+			});
+		}
+		
+		public AlertDialog.Builder getBldr () {
+			return this.bldr;
+		}
+		
+		public boolean isSet () {
+			String url = getUrl();
+			String pass = getPass();
+			return (url != null && url.length() > 0 && pass != null && pass.length() > 0);
+		}
+		
+		public String getUrl () {
+			return this.txtUrl.getText().toString().trim();
+		}
+		
+		public String getPass () {
+			return this.txtPass.getText().toString().trim();
+		}
+		
+		public void show () {
+			this.bldr.show();
+		}
+		
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
 	protected void showServerActivity (ServerReference item) {
 		Intent intent = new Intent(getApplicationContext(), ServerActivity.class);
-		intent.putExtra(ServerActivity.BASE_URL, item.getBaseUrl()); // TODO pass a reference that can be used to get the ServerReference from the DB.
+		intent.putExtra(ServerActivity.SERVER_ID, item.getId());
 		startActivity(intent);
 	}
 	
