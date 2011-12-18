@@ -25,13 +25,10 @@ import com.vaguehope.morrigan.wui.MorriganWui;
 public class MorriganServer implements Listener {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private static final int PORT = 8080;
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
 	protected final Logger logger = Logger.getLogger(this.getClass().getName());
 	
 	private final Server server;
+	private final int serverPort;
 	
 	private Runnable onStopRunnable = null;
 	
@@ -39,12 +36,18 @@ public class MorriganServer implements Listener {
 	
 	public MorriganServer (BundleContext context) throws MorriganException {
 		try {
-			org.eclipse.jetty.util.log.Log.setLog(new JettyLogger());
+			// Config.
+			ServerConfig config = new ServerConfig();
+			this.serverPort = config.getServerPort();
+			
+			// Jetty server instance.
+			org.eclipse.jetty.util.log.Log.setLog(new JettyLogger()); // Fix noisy logging.
 			this.server = new Server();
 			this.server.addLifeCycleListener(this);
 			
+			// HTTP connector.
 			Connector connector = new SocketConnector();
-			connector.setPort(PORT);
+			connector.setPort(this.serverPort);
 			this.server.addConnector(connector);
 			
 			// HTTPS.
@@ -56,8 +59,8 @@ public class MorriganServer implements Listener {
 //			this.server.addConnector(sslConnector);
 			
 			// Auth filter to control access.
-			Filter filter = new AuthFilter();
-			FilterHolder filterHolder = new FilterHolder(filter);
+			Filter authFilter = new AuthFilter(config);
+			FilterHolder filterHolder = new FilterHolder(authFilter);
 			
 			// This will hold all our servlets and webapps.
 			ContextHandlerCollection contexts = new ContextHandlerCollection();
@@ -65,24 +68,23 @@ public class MorriganServer implements Listener {
 			
 			// Servlets.
 			ServletContextHandler servletContext = new ServletContextHandler(contexts, "/", ServletContextHandler.SESSIONS);
-			// TODO enabled this when clients are ready.
-			//servletContext.addFilter(filterHolder, "/*", (EnumSet<DispatcherType>)null);
+			servletContext.addFilter(filterHolder, "/*", (EnumSet<DispatcherType>)null);
 			servletContext.addServlet(new ServletHolder(new PlayersServlet()), PlayersServlet.CONTEXTPATH + "/*");
 			servletContext.addServlet(new ServletHolder(new MlistsServlet()), MlistsServlet.CONTEXTPATH + "/*");
 			servletContext.addServlet(new ServletHolder(new StatusServlet()), StatusServlet.CONTEXTPATH + "/*");
 			
 			// Web UI in WAR file.
 			WebAppContext warContext = WebAppHelper.getWarBundleAsContext(context, MorriganWui.ID, "/");
-			warContext.addFilter(filterHolder, "/*", (EnumSet<DispatcherType>)null);
+			warContext.addFilter(filterHolder, "/*", (EnumSet<DispatcherType>) null);
 			contexts.addHandler(warContext);
 		}
 		catch (Exception e) {
-			throw new MorriganException("Failed to create server object.", e);
+			throw new MorriganException("Failed to configure and start server.", e);
 		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		
+	
 	public void start () throws Exception {
 		this.server.start();
 	}
@@ -99,28 +101,28 @@ public class MorriganServer implements Listener {
 //	Listener methods.
 	
 	@Override
-	public void lifeCycleStarting(LifeCycle lc) {
+	public void lifeCycleStarting (LifeCycle lc) {
 		MorriganServer.this.logger.fine("Server starting...");
 	}
 	
 	@Override
-	public void lifeCycleStarted(LifeCycle lc) {
-		MorriganServer.this.logger.info("Server started and listening on port "+PORT+".");
+	public void lifeCycleStarted (LifeCycle lc) {
+		MorriganServer.this.logger.info("Server started and listening on port " + this.serverPort + ".");
 	}
 	
 	@Override
-	public void lifeCycleStopping(LifeCycle lc) {
+	public void lifeCycleStopping (LifeCycle lc) {
 		MorriganServer.this.logger.fine("Server stopping...");
 	}
 	
 	@Override
-	public void lifeCycleStopped(LifeCycle lc) {
+	public void lifeCycleStopped (LifeCycle lc) {
 		MorriganServer.this.logger.info("Server stopped.");
 		callOnStopRunnable();
 	}
 	
 	@Override
-	public void lifeCycleFailure(LifeCycle lc, Throwable t) {
+	public void lifeCycleFailure (LifeCycle lc, Throwable t) {
 		MorriganServer.this.logger.log(Level.WARNING, "Server failed.", t);
 		callOnStopRunnable();
 	}
