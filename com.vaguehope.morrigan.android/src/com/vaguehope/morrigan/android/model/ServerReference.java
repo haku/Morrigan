@@ -16,10 +16,15 @@
 
 package com.vaguehope.morrigan.android.model;
 
-public interface ServerReference extends Artifact {
+import com.vaguehope.morrigan.android.helper.HttpHelper.HttpCreds;
+
+public interface ServerReference extends Artifact, HttpCreds {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public String getBaseUrl ();
+	
+	@Override
+	public String getPass ();
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

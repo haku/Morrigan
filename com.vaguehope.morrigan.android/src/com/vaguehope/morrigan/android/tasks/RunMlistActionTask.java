@@ -22,6 +22,7 @@ import java.io.InputStream;
 
 import org.xml.sax.SAXException;
 
+import com.vaguehope.morrigan.android.helper.HttpHelper.HttpCreds;
 import com.vaguehope.morrigan.android.model.MlistReference;
 import com.vaguehope.morrigan.android.model.PlayerReference;
 
@@ -78,6 +79,11 @@ public class RunMlistActionTask extends AbstractTask<String> {
 			case SCAN: return "Starting scan...";
 			default: return "Please wait...";
 		}
+	}
+	
+	@Override
+	protected HttpCreds getCreds () {
+		return this.mlistReference.getServerReference();
 	}
 	
 	@Override

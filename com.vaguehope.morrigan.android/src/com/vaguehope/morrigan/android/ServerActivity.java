@@ -16,22 +16,6 @@
 
 package com.vaguehope.morrigan.android;
 
-import com.vaguehope.morrigan.android.model.Artifact;
-import com.vaguehope.morrigan.android.model.ArtifactList;
-import com.vaguehope.morrigan.android.model.ArtifactListAdaptor;
-import com.vaguehope.morrigan.android.model.MlistReference;
-import com.vaguehope.morrigan.android.model.MlistStateList;
-import com.vaguehope.morrigan.android.model.MlistStateListChangeListener;
-import com.vaguehope.morrigan.android.model.PlayerReference;
-import com.vaguehope.morrigan.android.model.PlayerStateList;
-import com.vaguehope.morrigan.android.model.PlayerStateListChangeListener;
-import com.vaguehope.morrigan.android.model.ServerReference;
-import com.vaguehope.morrigan.android.model.impl.ArtifactListAdaptorImpl;
-import com.vaguehope.morrigan.android.model.impl.ArtifactListGroupImpl;
-import com.vaguehope.morrigan.android.model.impl.ServerReferenceImpl;
-import com.vaguehope.morrigan.android.tasks.GetMlistsTask;
-import com.vaguehope.morrigan.android.tasks.GetPlayersTask;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -44,13 +28,30 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.vaguehope.morrigan.android.model.Artifact;
+import com.vaguehope.morrigan.android.model.ArtifactList;
+import com.vaguehope.morrigan.android.model.ArtifactListAdaptor;
+import com.vaguehope.morrigan.android.model.MlistReference;
+import com.vaguehope.morrigan.android.model.MlistStateList;
+import com.vaguehope.morrigan.android.model.MlistStateListChangeListener;
+import com.vaguehope.morrigan.android.model.PlayerReference;
+import com.vaguehope.morrigan.android.model.PlayerStateList;
+import com.vaguehope.morrigan.android.model.PlayerStateListChangeListener;
+import com.vaguehope.morrigan.android.model.ServerReference;
+import com.vaguehope.morrigan.android.model.impl.ArtifactListAdaptorImpl;
+import com.vaguehope.morrigan.android.model.impl.ArtifactListGroupImpl;
+import com.vaguehope.morrigan.android.state.ConfigDb;
+import com.vaguehope.morrigan.android.tasks.GetMlistsTask;
+import com.vaguehope.morrigan.android.tasks.GetPlayersTask;
+
 public class ServerActivity extends Activity implements PlayerStateListChangeListener, MlistStateListChangeListener {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public static final String BASE_URL = "baseUrl";
+	public static final String SERVER_ID = "serverId"; // int.
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	ConfigDb configDb;
 	ServerReference serverReference = null;
 	ArtifactListAdaptor<ArtifactList> artifactListAdaptor;
 	private ArtifactListGroupImpl artifactListImpl;
@@ -61,15 +62,17 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
+		this.configDb = new ConfigDb(this);
+		
 		Bundle extras = getIntent().getExtras();
-		String baseUrl = extras.getString(BASE_URL);
-		if (baseUrl != null) {
-			this.serverReference = new ServerReferenceImpl(baseUrl); // TODO use data passed into activity to get ServerReference from DB.
+		int serverId = extras.getInt(SERVER_ID, -1);
+		if (serverId >= 0) {
+			this.serverReference = this.configDb.getServer(serverId);
 		}
 		else {
 			finish();
 		}
-		this.setTitle(baseUrl);
+		this.setTitle(this.serverReference.getBaseUrl());
 		
 		// TODO check return value.
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
@@ -137,14 +140,14 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 	
 	protected void showArtifactActivity (PlayerReference item) {
 		Intent intent = new Intent(getApplicationContext(), PlayerActivity.class);
-		intent.putExtra(MlistActivity.SERVER_BASE_URL, this.serverReference.getBaseUrl());
+		intent.putExtra(MlistActivity.SERVER_ID, this.serverReference.getId());
 		intent.putExtra(PlayerActivity.PLAYER_ID, item.getPlayerId());
 		startActivity(intent);
 	}
 	
 	protected void showArtifactActivity (MlistReference item) {
 		Intent intent = new Intent(getApplicationContext(), MlistActivity.class);
-		intent.putExtra(MlistActivity.SERVER_BASE_URL, this.serverReference.getBaseUrl());
+		intent.putExtra(MlistActivity.SERVER_ID, this.serverReference.getId());
 		intent.putExtra(MlistActivity.MLIST_BASE_URL, item.getBaseUrl());
 		intent.putExtra(MlistActivity.QUERY, "*"); // Default to showing results of wild-card search.
 		startActivity(intent);

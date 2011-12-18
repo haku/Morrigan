@@ -24,6 +24,7 @@ import java.net.URLEncoder;
 import org.xml.sax.SAXException;
 
 import com.vaguehope.morrigan.android.Constants;
+import com.vaguehope.morrigan.android.helper.HttpHelper.HttpCreds;
 import com.vaguehope.morrigan.android.model.MlistItemList;
 import com.vaguehope.morrigan.android.model.MlistItemListChangeListener;
 import com.vaguehope.morrigan.android.model.MlistReference;
@@ -56,6 +57,11 @@ public class GetMlistItemListTask extends AbstractTask<MlistItemList> {
 	@Override
 	protected String getProgressMsg () {
 		return "Fetching media items...";
+	}
+	
+	@Override
+	protected HttpCreds getCreds () {
+		return this.mlistReference.getServerReference();
 	}
 	
 	@Override

@@ -23,6 +23,7 @@ import java.io.InputStream;
 import org.xml.sax.SAXException;
 
 import com.vaguehope.morrigan.android.Constants;
+import com.vaguehope.morrigan.android.helper.HttpHelper.HttpCreds;
 import com.vaguehope.morrigan.android.model.Artifact;
 import com.vaguehope.morrigan.android.model.PlayerQueue;
 import com.vaguehope.morrigan.android.model.PlayerQueueChangeListener;
@@ -74,6 +75,11 @@ public class GetPlayerQueueTask extends AbstractTask<PlayerQueue> {
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	@Override
+	protected HttpCreds getCreds () {
+		return this.playerReference.getServerReference();
+	}
 	
 	@Override
 	protected String getUrl () {
