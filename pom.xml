@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.vaguehope.morrigan</groupId>
+  <artifactId>morrigan</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <properties>
+    <tycho-version>0.13.0</tycho-version>
+  </properties>
+
+  <modules>
+    <module>com.vaguehope.sqlitewrapper</module>
+
+    <module>com.vaguehope.morrigan.util</module>
+    <module>com.vaguehope.morrigan.util.httpclient</module>
+
+    <module>com.vaguehope.morrigan.tasks</module>
+    <module>com.vaguehope.morrigan.model</module>
+    <module>com.vaguehope.morrigan.model.db</module>
+    <module>com.vaguehope.morrigan.model.media</module>
+    <module>com.vaguehope.morrigan.config</module>
+    <module>com.vaguehope.morrigan.wui</module>
+
+<!--    <module>com.vaguehope.morrigan.gui</module> -->
+  </modules>
+
+  <repositories>
+    <repository>
+      <id>eclipse-indigo</id>
+      <layout>p2</layout>
+      <url>http://download.eclipse.org/releases/indigo</url>
+   </repository>
+  </repositories>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-maven-plugin</artifactId>
+        <version>${tycho-version}</version>
+        <extensions>true</extensions>
+      </plugin>
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>target-platform-configuration</artifactId>
+        <version>${tycho-version}</version>
+        <configuration>
+          <resolver>p2</resolver>
+
+          <environments>
+            <environment>
+              <os>linux</os>
+              <ws>gtk</ws>
+              <arch>x86</arch>
+            </environment>
+          </environments>
+
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
+
