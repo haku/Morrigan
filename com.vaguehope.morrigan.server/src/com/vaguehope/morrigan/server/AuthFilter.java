@@ -18,10 +18,22 @@ public class AuthFilter implements Filter {
 	
 	private static final String WWW_AUTHENTICATE = "WWW-Authenticate";
 	private static final String BASIC_REALM = "Basic realm=\"Secure Area\"";
-	private static final String BASIC_HEADER_PREFIX = "Basic ";
+	
+	private static final String HEADER_AUTHORISATION = "Authorization"; // Incoming request has this.
+	private static final String BASIC_HEADER_PREFIX = "Basic "; // Incoming request starts with this.
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	private final AuthChecker authChecker;
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	public AuthFilter (AuthChecker authChecker) {
+		this.authChecker = authChecker;
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 	@Override
 	public void init (FilterConfig arg0) throws ServletException {
 		// Unused.
@@ -38,7 +50,7 @@ public class AuthFilter implements Filter {
 		HttpServletResponse resp = (HttpServletResponse) response;
 		
 		// Request basic auth.
-		String authHeader64 = req.getHeader("Authorization");
+		String authHeader64 = req.getHeader(HEADER_AUTHORISATION);
 		if (authHeader64 == null
 				|| authHeader64.length() < BASIC_HEADER_PREFIX.length() + 3
 				|| !authHeader64.startsWith(BASIC_HEADER_PREFIX)) {
@@ -62,8 +74,8 @@ public class AuthFilter implements Filter {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private boolean checkUser (String user, String pass) {
-		return user.equals(pass);
+	private boolean checkUser (@SuppressWarnings("unused") String user, String pass) {
+		return this.authChecker.verifyAuth(pass);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
