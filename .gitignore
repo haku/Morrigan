@@ -134,4 +134,9 @@ com.vaguehope.morrigan.wui/target/
 com.vaguehope.sqlitewrapper/target/
 com.vaguehope.morrigan.engines/target/
 com.vaguehope.morrigan.model.media_impl/target/
+com.vaguehope.morrigan.hotkeyimpl.jintellitype/target/
+com.vaguehope.morrigan.hotkeyimpl.jxgrabkey/target/
+com.vaguehope.morrigan.osgiconsole/target/
+com.vaguehope.morrigan.player/target/
+com.vaguehope.morrigan.server/target/
 
