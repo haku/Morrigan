@@ -1,4 +1,7 @@
 #!/bin/sh
 cd `dirname $0`
-./morrigan
-
+if [ -f "morrigan" ] ; then
+  ./morrigan
+elif [ -f "morriganserver" ] ; then
+  ./morriganserver
+fi
