@@ -24,10 +24,19 @@
     <module>com.vaguehope.morrigan.engines</module>
     <module>com.vaguehope.morrigan.model.media_impl</module>
 
+    <module>com.vaguehope.morrigan.hotkeyimpl.jintellitype</module>
+    <module>com.vaguehope.morrigan.hotkeyimpl.jxgrabkey</module>
+
     <module>com.vaguehope.morrigan.config</module>
+    <module>com.vaguehope.morrigan.player</module>
+
+    <module>com.vaguehope.morrigan.server</module>
     <module>com.vaguehope.morrigan.wui</module>
 
+    <module>com.vaguehope.morrigan.osgiconsole</module>
+
 <!--    <module>com.vaguehope.morrigan.gui</module> -->
+<!--    <module>com.vaguehope.morrigan.server.boot</module> -->
   </modules>
 
   <repositories>
@@ -52,15 +61,18 @@
         <version>${tycho-version}</version>
         <configuration>
           <resolver>p2</resolver>
-
           <environments>
             <environment>
               <os>linux</os>
               <ws>gtk</ws>
               <arch>x86</arch>
             </environment>
+            <environment>
+              <os>win32</os>
+              <ws>win32</ws>
+              <arch>x86</arch>
+            </environment>
           </environments>
-
         </configuration>
       </plugin>
     </plugins>
