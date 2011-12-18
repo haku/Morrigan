@@ -20,6 +20,10 @@
     <module>com.vaguehope.morrigan.model</module>
     <module>com.vaguehope.morrigan.model.db</module>
     <module>com.vaguehope.morrigan.model.media</module>
+
+    <module>com.vaguehope.morrigan.engines</module>
+    <module>com.vaguehope.morrigan.model.media_impl</module>
+
     <module>com.vaguehope.morrigan.config</module>
     <module>com.vaguehope.morrigan.wui</module>
 
