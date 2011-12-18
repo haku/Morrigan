@@ -132,4 +132,6 @@ com.vaguehope.morrigan.util.httpclient/target/
 com.vaguehope.morrigan.util/target/
 com.vaguehope.morrigan.wui/target/
 com.vaguehope.sqlitewrapper/target/
+com.vaguehope.morrigan.engines/target/
+com.vaguehope.morrigan.model.media_impl/target/
 
