@@ -6,19 +6,9 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: com.vaguehope.nemain.Activator
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: com.vaguehope.sqlitewrapper,
- org.eclipse.core.commands.common,
- org.eclipse.core.runtime;version="3.4.0",
- org.eclipse.jface.action,
- org.eclipse.jface.resource,
+Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.swt,
- org.eclipse.swt.events,
- org.eclipse.swt.graphics,
- org.eclipse.swt.layout,
- org.eclipse.swt.widgets,
- org.eclipse.ui,
- org.eclipse.ui.part,
- org.eclipse.ui.plugin,
- org.osgi.framework;version="1.5.0"
+ org.eclipse.ui
+Import-Package: com.vaguehope.sqlitewrapper
 Bundle-ClassPath: .
 Bundle-Vendor: vaguehope.com
