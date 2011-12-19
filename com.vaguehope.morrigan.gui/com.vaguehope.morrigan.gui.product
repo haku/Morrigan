@@ -45,16 +45,16 @@ Image &quot;The Morrígan&quot; by Louis le Brocquy used under the Creative Comm
       <plugin id="com.vaguehope.morrigan.danbooru"/>
       <plugin id="com.vaguehope.morrigan.engines"/>
       <plugin id="com.vaguehope.morrigan.gui"/>
-      <plugin id="com.vaguehope.morrigan.hotkeyimpl.jintellitype"/>
-      <plugin id="com.vaguehope.morrigan.hotkeyimpl.jxgrabkey"/>
+      <plugin id="com.vaguehope.morrigan.hotkeyimpl.jintellitype" os="win32" ws="win32" arch="x86" />
+      <plugin id="com.vaguehope.morrigan.hotkeyimpl.jxgrabkey" os="linux" ws="gtk" arch="x86" />
       <plugin id="com.vaguehope.morrigan.model"/>
       <plugin id="com.vaguehope.morrigan.model.db"/>
       <plugin id="com.vaguehope.morrigan.model.media"/>
       <plugin id="com.vaguehope.morrigan.model.media_impl"/>
       <plugin id="com.vaguehope.morrigan.osgiconsole"/>
-      <plugin id="com.vaguehope.morrigan.playbackimpl.dsj"/>
-      <plugin id="com.vaguehope.morrigan.playbackimpl.gs"/>
-      <plugin id="com.vaguehope.morrigan.playbackimpl.vlc"/>
+      <plugin id="com.vaguehope.morrigan.playbackimpl.dsj" os="win32" ws="win32" arch="x86" />
+      <plugin id="com.vaguehope.morrigan.playbackimpl.gs" os="linux" ws="gtk" arch="x86" />
+      <plugin id="com.vaguehope.morrigan.playbackimpl.vlc" os="macosx" ws="cocoa" arch="x86" />
       <plugin id="com.vaguehope.morrigan.player"/>
       <plugin id="com.vaguehope.morrigan.server"/>
       <plugin id="com.vaguehope.morrigan.server.boot"/>
@@ -73,14 +73,9 @@ Image &quot;The Morrígan&quot; by Louis le Brocquy used under the Creative Comm
       <plugin id="org.eclipse.core.databinding.property"/>
       <plugin id="org.eclipse.core.expressions"/>
       <plugin id="org.eclipse.core.filesystem"/>
-      <plugin id="org.eclipse.core.filesystem.aix.ppc" fragment="true"/>
-      <plugin id="org.eclipse.core.filesystem.hpux.ia64_32" fragment="true"/>
-      <plugin id="org.eclipse.core.filesystem.linux.x86" fragment="true"/>
-      <plugin id="org.eclipse.core.filesystem.linux.x86_64" fragment="true"/>
-      <plugin id="org.eclipse.core.filesystem.macosx" fragment="true"/>
-      <plugin id="org.eclipse.core.filesystem.solaris.sparc" fragment="true"/>
-      <plugin id="org.eclipse.core.filesystem.win32.x86" fragment="true"/>
-      <plugin id="org.eclipse.core.filesystem.win32.x86_64" fragment="true"/>
+      <plugin id="org.eclipse.core.filesystem.linux.x86" fragment="true" os="linux" ws="gtk" arch="x86" />
+      <plugin id="org.eclipse.core.filesystem.macosx" fragment="true" os="macosx" ws="cocoa" arch="x86" />
+      <plugin id="org.eclipse.core.filesystem.win32.x86" fragment="true" os="win32" ws="win32" arch="x86" />
       <plugin id="org.eclipse.core.jobs"/>
       <plugin id="org.eclipse.core.runtime"/>
       <plugin id="org.eclipse.core.runtime.compatibility.registry" fragment="true"/>
@@ -101,8 +96,8 @@ Image &quot;The Morrígan&quot; by Louis le Brocquy used under the Creative Comm
       <plugin id="org.eclipse.equinox.preferences"/>
       <plugin id="org.eclipse.equinox.registry"/>
       <plugin id="org.eclipse.equinox.security"/>
-      <plugin id="org.eclipse.equinox.security.macosx" fragment="true"/>
-      <plugin id="org.eclipse.equinox.security.win32.x86" fragment="true"/>
+      <plugin id="org.eclipse.equinox.security.macosx" fragment="true" os="macosx" ws="cocoa" arch="x86" />
+      <plugin id="org.eclipse.equinox.security.win32.x86" fragment="true" os="win32" ws="win32" arch="x86" />
       <plugin id="org.eclipse.help"/>
       <plugin id="org.eclipse.jetty.continuation"/>
       <plugin id="org.eclipse.jetty.http"/>
@@ -119,25 +114,15 @@ Image &quot;The Morrígan&quot; by Louis le Brocquy used under the Creative Comm
       <plugin id="org.eclipse.osgi"/>
       <plugin id="org.eclipse.osgi.services"/>
       <plugin id="org.eclipse.swt"/>
-      <plugin id="org.eclipse.swt.carbon.macosx" fragment="true"/>
-      <plugin id="org.eclipse.swt.cocoa.macosx" fragment="true"/>
-      <plugin id="org.eclipse.swt.cocoa.macosx.x86_64" fragment="true"/>
-      <plugin id="org.eclipse.swt.gtk.linux.ppc64" fragment="true"/>
-      <plugin id="org.eclipse.swt.gtk.linux.s390" fragment="true"/>
-      <plugin id="org.eclipse.swt.gtk.linux.s390x" fragment="true"/>
-      <plugin id="org.eclipse.swt.gtk.linux.x86" fragment="true"/>
-      <plugin id="org.eclipse.swt.gtk.linux.x86_64" fragment="true"/>
-      <plugin id="org.eclipse.swt.gtk.solaris.sparc" fragment="true"/>
-      <plugin id="org.eclipse.swt.gtk.solaris.x86" fragment="true"/>
-      <plugin id="org.eclipse.swt.win32.win32.x86" fragment="true"/>
-      <plugin id="org.eclipse.swt.win32.win32.x86_64" fragment="true"/>
+      <plugin id="org.eclipse.swt.cocoa.macosx" fragment="true" os="macosx" ws="cocoa" arch="x86" />
+      <plugin id="org.eclipse.swt.gtk.linux.x86" fragment="true" os="linux" ws="gtk" arch="x86" />
+      <plugin id="org.eclipse.swt.win32.win32.x86" fragment="true" os="win32" ws="win32" arch="x86" />
       <plugin id="org.eclipse.text"/>
       <plugin id="org.eclipse.ui"/>
-      <plugin id="org.eclipse.ui.carbon" fragment="true"/>
-      <plugin id="org.eclipse.ui.cocoa" fragment="true"/>
+      <plugin id="org.eclipse.ui.cocoa" fragment="true" os="macosx" ws="cocoa" arch="x86" />
       <plugin id="org.eclipse.ui.console"/>
       <plugin id="org.eclipse.ui.ide"/>
-      <plugin id="org.eclipse.ui.win32" fragment="true"/>
+      <plugin id="org.eclipse.ui.win32" fragment="true" os="win32" ws="win32" arch="x86" />
       <plugin id="org.eclipse.ui.workbench"/>
       <plugin id="org.eclipse.ui.workbench.texteditor"/>
    </plugins>
