@@ -139,4 +139,11 @@ com.vaguehope.morrigan.hotkeyimpl.jxgrabkey/target/
 com.vaguehope.morrigan.osgiconsole/target/
 com.vaguehope.morrigan.player/target/
 com.vaguehope.morrigan.server/target/
+com.vaguehope.morrigan.danbooru/target/
+com.vaguehope.morrigan.gui/target/
+com.vaguehope.morrigan.playbackimpl.dsj/target/
+com.vaguehope.morrigan.playbackimpl.gs/target/
+com.vaguehope.morrigan.playbackimpl.vlc/target/
+com.vaguehope.morrigan.server.boot/target/
+com.vaguehope.nemain/target/
 

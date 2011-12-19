@@ -11,8 +11,10 @@
   </properties>
 
   <modules>
+    <!-- Generic util. -->
     <module>com.vaguehope.sqlitewrapper</module>
 
+    <!-- Util. -->
     <module>com.vaguehope.morrigan.util</module>
     <module>com.vaguehope.morrigan.util.httpclient</module>
 
@@ -23,20 +25,30 @@
 
     <module>com.vaguehope.morrigan.engines</module>
     <module>com.vaguehope.morrigan.model.media_impl</module>
-
-    <module>com.vaguehope.morrigan.hotkeyimpl.jintellitype</module>
-    <module>com.vaguehope.morrigan.hotkeyimpl.jxgrabkey</module>
-
     <module>com.vaguehope.morrigan.config</module>
     <module>com.vaguehope.morrigan.player</module>
 
+    <!-- Hotkey engines. -->
+    <module>com.vaguehope.morrigan.hotkeyimpl.jintellitype</module>
+    <module>com.vaguehope.morrigan.hotkeyimpl.jxgrabkey</module>
+
+    <!-- Playback engines. -->
+    <module>com.vaguehope.morrigan.playbackimpl.gs</module>
+    <module>com.vaguehope.morrigan.playbackimpl.dsj</module>
+    <module>com.vaguehope.morrigan.playbackimpl.vlc</module>
+
+    <!-- HTTP UI. -->
     <module>com.vaguehope.morrigan.server</module>
     <module>com.vaguehope.morrigan.wui</module>
-
     <module>com.vaguehope.morrigan.osgiconsole</module>
 
-<!--    <module>com.vaguehope.morrigan.gui</module> -->
-<!--    <module>com.vaguehope.morrigan.server.boot</module> -->
+    <!-- Products. -->
+    <module>com.vaguehope.morrigan.gui</module>
+    <module>com.vaguehope.morrigan.server.boot</module>
+
+    <!-- Optional extras. -->
+    <module>com.vaguehope.morrigan.danbooru</module>
+    <module>com.vaguehope.nemain</module>
   </modules>
 
   <repositories>
@@ -70,6 +82,11 @@
             <environment>
               <os>win32</os>
               <ws>win32</ws>
+              <arch>x86</arch>
+            </environment>
+            <environment>
+              <os>macosx</os>
+              <ws>cocoa</ws>
               <arch>x86</arch>
             </environment>
           </environments>
