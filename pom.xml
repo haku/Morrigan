@@ -41,10 +41,14 @@
     <module>com.vaguehope.morrigan.server</module>
     <module>com.vaguehope.morrigan.wui</module>
     <module>com.vaguehope.morrigan.osgiconsole</module>
+    <module>com.vaguehope.morrigan.server.boot</module>
+
+    <!-- GUI. -->
+    <module>com.vaguehope.morrigan.gui</module>
 
     <!-- Products. -->
-    <module>com.vaguehope.morrigan.gui</module>
-    <module>com.vaguehope.morrigan.server.boot</module>
+    <module>com.vaguehope.morrigan.gui.product</module>
+    <module>com.vaguehope.morrigan.server.product</module>
 
     <!-- Optional extras. -->
     <module>com.vaguehope.morrigan.danbooru</module>

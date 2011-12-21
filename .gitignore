@@ -123,6 +123,7 @@ com.vaguehope.morrigan.tasks/build.xml
 com.vaguehope.morrigan.tasks/javaCompiler...args
 
 # mvn targets
+target
 com.vaguehope.morrigan.config/target/
 com.vaguehope.morrigan.model.db/target/
 com.vaguehope.morrigan.model.media/target/
