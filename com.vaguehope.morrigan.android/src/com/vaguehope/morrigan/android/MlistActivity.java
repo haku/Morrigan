@@ -125,8 +125,8 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Buttons.
-    
+//	GUI setup and buttons.
+	
 	private void wireGui () {
 		this.mlistItemListAdapter = new ArtifactListAdaptorImpl<MlistItemList>(this, R.layout.mlistitemlistrow);
 		
@@ -148,42 +148,6 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 		
 		cmd = (ImageButton) findViewById(R.id.btnRefresh);
 		cmd.setOnClickListener(new BtnRefresh_OnClick());
-		
-	}
-	
-	private OnItemClickListener mlistItemListCickListener = new OnItemClickListener() {
-		@Override
-		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-			MlistItem item = MlistActivity.this.mlistItemListAdapter.getInputData().getMlistItemList().get(position);
-			itemClicked(item);
-		}
-	};
-	
-	private OnCreateContextMenuListener itemsContextMenuListener = new OnCreateContextMenuListener () {
-		@Override
-		public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-			AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-			MlistItem mlistItem = MlistActivity.this.mlistItemListAdapter.getInputData().getMlistItemList().get(info.position);
-			menu.setHeaderTitle(mlistItem.getTitle());
-			menu.add(Menu.NONE, 1, Menu.NONE, "Download");
-		}
-	};
-	
-	@Override
-	public boolean onContextItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-			case 1:
-				AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-				MlistItem mlistItem = MlistActivity.this.mlistItemListAdapter.getInputData().getMlistItemList().get(info.position);
-				
-				DownloadMediaTask task = new DownloadMediaTask(this, this.mlistReference);
-				task.execute(mlistItem);
-				
-				return true;
-			
-			default:
-				return super.onContextItemSelected(item);
-		}
 	}
 	
 	class BtnPlay_OnClick implements OnClickListener {
@@ -215,7 +179,7 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Menu items.
+//	View menu.
 	
 	private static final int MENU_SCAN = 1;
 	private static final int MENU_DOWNLOAD = 2;
@@ -242,6 +206,57 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 		}
 		
 		return super.onOptionsItemSelected(item);
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Context menu.
+	
+	private static final int MENU_CTX_PLAY = 1;
+	private static final int MENU_CTX_QUEUE = 2;
+	private static final int MENU_CTX_DOWNLOAD = 3;
+	
+	private OnItemClickListener mlistItemListCickListener = new OnItemClickListener() {
+		@Override
+		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+			openContextMenu(view);
+		}
+	};
+	
+	private OnCreateContextMenuListener itemsContextMenuListener = new OnCreateContextMenuListener () {
+		@Override
+		public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+			AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
+			MlistItem mlistItem = MlistActivity.this.mlistItemListAdapter.getInputData().getMlistItemList().get(info.position);
+			menu.setHeaderTitle(mlistItem.getTitle());
+			menu.add(Menu.NONE, MENU_CTX_PLAY, Menu.NONE, "Play now");
+			menu.add(Menu.NONE, MENU_CTX_QUEUE, Menu.NONE, "Queue");
+			menu.add(Menu.NONE, MENU_CTX_DOWNLOAD, Menu.NONE, "Download");
+		}
+	};
+	
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+		MlistItem mlistItem = MlistActivity.this.mlistItemListAdapter.getInputData().getMlistItemList().get(info.position);
+		
+		switch (item.getItemId()) {
+			case MENU_CTX_PLAY:
+				playItem(mlistItem);
+				return true;
+			
+			case MENU_CTX_QUEUE:
+				queueItem(mlistItem);
+				return true;
+				
+			case MENU_CTX_DOWNLOAD:
+				DownloadMediaTask task = new DownloadMediaTask(this, this.mlistReference);
+				task.execute(mlistItem);
+				
+				return true;
+			
+			default:
+				return super.onContextItemSelected(item);
+		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -329,67 +344,11 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 		}
 		
 		if (query != null) {
-    		GetMlistItemListTask task2 = new GetMlistItemListTask(
-    				MlistActivity.this, MlistActivity.this.mlistReference,
-    				MlistActivity.this, query);
-    		task2.execute();
+			GetMlistItemListTask task2 = new GetMlistItemListTask(
+					MlistActivity.this, MlistActivity.this.mlistReference,
+					MlistActivity.this, query);
+			task2.execute();
 		}
-	}
-	
-	protected void itemClicked (final MlistItem item) {
-		final AlertDialog.Builder dlgBuilder = new AlertDialog.Builder(this);
-		dlgBuilder.setMessage(item.getTitle());
-		
-		dlgBuilder.setPositiveButton("Play", new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.dismiss();
-				
-				if (MlistActivity.this.playerReference == null) {
-					CommonDialogs.doAskWhichPlayer(MlistActivity.this, MlistActivity.this.serverReference, new PlayerSelectedListener () {
-						@Override
-						public void playerSelected(PlayerState playerState) {
-							RunMlistItemActionTask task = new RunMlistItemActionTask(MlistActivity.this, playerState.getPlayerReference(), MlistActivity.this.mlistReference, item, MlistItemCommand.PLAY);
-							task.execute();
-						}
-					});
-				}
-				else {
-					RunMlistItemActionTask task = new RunMlistItemActionTask(MlistActivity.this, MlistActivity.this.playerReference, MlistActivity.this.mlistReference, item, MlistItemCommand.PLAY);
-					task.execute();
-				}
-			}
-		});
-		
-		dlgBuilder.setNeutralButton("Queue", new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.dismiss();
-				
-				if (MlistActivity.this.playerReference == null) {
-					CommonDialogs.doAskWhichPlayer(MlistActivity.this, MlistActivity.this.serverReference, new PlayerSelectedListener () {
-						@Override
-						public void playerSelected(PlayerState playerState) {
-							RunMlistItemActionTask task = new RunMlistItemActionTask(MlistActivity.this, playerState.getPlayerReference(), MlistActivity.this.mlistReference, item, MlistItemCommand.QUEUE);
-							task.execute();
-						}
-					});
-				}
-				else {
-    				RunMlistItemActionTask task = new RunMlistItemActionTask(MlistActivity.this, MlistActivity.this.playerReference, MlistActivity.this.mlistReference, item, MlistItemCommand.QUEUE);
-    				task.execute();
-				}
-			}
-		});
-		
-		dlgBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int whichButton) {
-				dialog.cancel();
-			}
-		});
-		
-		dlgBuilder.show();
 	}
 	
 	protected void downloadAllInList () {
@@ -400,6 +359,38 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 		}
 		else {
 			Toast.makeText(this, "No items to download desu~", Toast.LENGTH_SHORT).show();
+		}
+	}
+	
+	protected void playItem (final MlistItem item) {
+		if (MlistActivity.this.playerReference == null) {
+			CommonDialogs.doAskWhichPlayer(this, this.serverReference, new PlayerSelectedListener () {
+				@Override
+				public void playerSelected(PlayerState playerState) {
+					RunMlistItemActionTask task = new RunMlistItemActionTask(MlistActivity.this, playerState.getPlayerReference(), MlistActivity.this.mlistReference, item, MlistItemCommand.PLAY);
+					task.execute();
+				}
+			});
+		}
+		else {
+			RunMlistItemActionTask task = new RunMlistItemActionTask(this, this.playerReference, this.mlistReference, item, MlistItemCommand.PLAY);
+			task.execute();
+		}
+	}
+	
+	protected void queueItem (final MlistItem item) {
+		if (MlistActivity.this.playerReference == null) {
+			CommonDialogs.doAskWhichPlayer(this, this.serverReference, new PlayerSelectedListener () {
+				@Override
+				public void playerSelected(PlayerState playerState) {
+					RunMlistItemActionTask task = new RunMlistItemActionTask(MlistActivity.this, playerState.getPlayerReference(), MlistActivity.this.mlistReference, item, MlistItemCommand.QUEUE);
+					task.execute();
+				}
+			});
+		}
+		else {
+			RunMlistItemActionTask task = new RunMlistItemActionTask(this, this.playerReference, this.mlistReference, item, MlistItemCommand.QUEUE);
+			task.execute();
 		}
 	}
 	
@@ -431,10 +422,10 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 			finish(); // TODO show a msg here? Retry / Fail dlg?
 		}
 		else {
-    		TextView txtSubTitle = (TextView) findViewById(R.id.txtSubTitle);
-    		txtSubTitle.setText(mlistItemList.getMlistItemList().size() + " results for '"+mlistItemList.getQuery()+"'.");
-    		
-    		this.mlistItemListAdapter.setInputData(mlistItemList);
+			TextView txtSubTitle = (TextView) findViewById(R.id.txtSubTitle);
+			txtSubTitle.setText(mlistItemList.getMlistItemList().size() + " results for '"+mlistItemList.getQuery()+"'.");
+			
+			this.mlistItemListAdapter.setInputData(mlistItemList);
 		}
 	}
 	
