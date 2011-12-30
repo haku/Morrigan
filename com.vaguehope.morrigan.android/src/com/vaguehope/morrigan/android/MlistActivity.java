@@ -262,41 +262,27 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Commands - to be called on the UI thread.
 	
-	protected void play () {
-		if (this.playerReference == null) {
-			CommonDialogs.doAskWhichPlayer(MlistActivity.this, MlistActivity.this.serverReference, new PlayerSelectedListener () {
-				@Override
-				public void playerSelected(PlayerState playerState) {
-					RunMlistActionTask task = new RunMlistActionTask(MlistActivity.this, MlistActivity.this.mlistReference, MlistCommand.PLAY, playerState.getPlayerReference());
-					task.execute();
-				}
-			});
+	protected void refresh () {
+		new GetMlistTask(this, this.mlistReference, this).execute();
+		
+		String query = null;
+		if (this.currentItemList != null) {
+			query = this.currentItemList.getQuery();
 		}
-		else {
-			RunMlistActionTask task = new RunMlistActionTask(this, this.mlistReference, MlistCommand.PLAY, this.playerReference);
-			task.execute();
+		else if (this.initialQuery != null) {
+			query = this.initialQuery;
+			this.initialQuery = null;
 		}
-	}
-	
-	protected void queue () {
-		if (this.playerReference == null) {
-			CommonDialogs.doAskWhichPlayer(MlistActivity.this, MlistActivity.this.serverReference, new PlayerSelectedListener () {
-				@Override
-				public void playerSelected(PlayerState playerState) {
-					RunMlistActionTask task = new RunMlistActionTask(MlistActivity.this, MlistActivity.this.mlistReference, MlistCommand.QUEUE, playerState.getPlayerReference());
-					task.execute();
-				}
-			});
-		}
-		else {
-			RunMlistActionTask task = new RunMlistActionTask(this, this.mlistReference, MlistCommand.QUEUE, this.playerReference);
-			task.execute();
+		
+		if (query != null) {
+			new GetMlistItemListTask(
+					MlistActivity.this, MlistActivity.this.mlistReference,
+					MlistActivity.this, query).execute();
 		}
 	}
 	
 	protected void scan () {
-		RunMlistActionTask task = new RunMlistActionTask(this, this.mlistReference, MlistCommand.SCAN);
-		task.execute();
+		new RunMlistActionTask(this, this.mlistReference, MlistCommand.SCAN).execute();
 	}
 	
 	protected void search () {
@@ -315,8 +301,7 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 				String query = editText.getText().toString().trim();
 				dialog.dismiss();
 				
-				GetMlistItemListTask task = new GetMlistItemListTask(MlistActivity.this, MlistActivity.this.mlistReference, MlistActivity.this, query);
-				task.execute();
+				new GetMlistItemListTask(MlistActivity.this, MlistActivity.this.mlistReference, MlistActivity.this, query).execute();
 			}
 		});
 		
@@ -330,32 +315,38 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 		dlgBuilder.show();
 	}
 	
-	protected void refresh () {
-		GetMlistTask task = new GetMlistTask(this, this.mlistReference, this);
-		task.execute();
-		
-		String query = null;
-		if (this.currentItemList != null) {
-			query = this.currentItemList.getQuery();
+	protected void play () {
+		if (this.playerReference == null) {
+			CommonDialogs.doAskWhichPlayer(MlistActivity.this, MlistActivity.this.serverReference, new PlayerSelectedListener () {
+				@Override
+				public void playerSelected(PlayerState playerState) {
+					new RunMlistActionTask(MlistActivity.this, MlistActivity.this.mlistReference, MlistCommand.PLAY, playerState.getPlayerReference()).execute();
+				}
+			});
 		}
-		else if (this.initialQuery != null) {
-			query = this.initialQuery;
-			this.initialQuery = null;
+		else {
+			new RunMlistActionTask(this, this.mlistReference, MlistCommand.PLAY, this.playerReference).execute();
 		}
-		
-		if (query != null) {
-			GetMlistItemListTask task2 = new GetMlistItemListTask(
-					MlistActivity.this, MlistActivity.this.mlistReference,
-					MlistActivity.this, query);
-			task2.execute();
+	}
+	
+	protected void queue () {
+		if (this.playerReference == null) {
+			CommonDialogs.doAskWhichPlayer(MlistActivity.this, MlistActivity.this.serverReference, new PlayerSelectedListener () {
+				@Override
+				public void playerSelected(PlayerState playerState) {
+					new RunMlistActionTask(MlistActivity.this, MlistActivity.this.mlistReference, MlistCommand.QUEUE, playerState.getPlayerReference()).execute();
+				}
+			});
+		}
+		else {
+			new RunMlistActionTask(this, this.mlistReference, MlistCommand.QUEUE, this.playerReference).execute();
 		}
 	}
 	
 	protected void downloadAllInList () {
 		List<? extends MlistItem> mitems = this.currentItemList.getMlistItemList();
 		if (mitems.size() > 0) {
-			DownloadMediaTask task = new DownloadMediaTask(this, this.mlistReference);
-			task.execute(mitems.toArray(new MlistItem[] {}));
+			new DownloadMediaTask(this, this.mlistReference).execute(mitems.toArray(new MlistItem[] {}));
 		}
 		else {
 			Toast.makeText(this, "No items to download desu~", Toast.LENGTH_SHORT).show();
@@ -367,14 +358,12 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 			CommonDialogs.doAskWhichPlayer(this, this.serverReference, new PlayerSelectedListener () {
 				@Override
 				public void playerSelected(PlayerState playerState) {
-					RunMlistItemActionTask task = new RunMlistItemActionTask(MlistActivity.this, playerState.getPlayerReference(), MlistActivity.this.mlistReference, item, MlistItemCommand.PLAY);
-					task.execute();
+					new RunMlistItemActionTask(MlistActivity.this, playerState.getPlayerReference(), MlistActivity.this.mlistReference, item, MlistItemCommand.PLAY).execute();
 				}
 			});
 		}
 		else {
-			RunMlistItemActionTask task = new RunMlistItemActionTask(this, this.playerReference, this.mlistReference, item, MlistItemCommand.PLAY);
-			task.execute();
+			new RunMlistItemActionTask(this, this.playerReference, this.mlistReference, item, MlistItemCommand.PLAY).execute();
 		}
 	}
 	
@@ -383,14 +372,12 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 			CommonDialogs.doAskWhichPlayer(this, this.serverReference, new PlayerSelectedListener () {
 				@Override
 				public void playerSelected(PlayerState playerState) {
-					RunMlistItemActionTask task = new RunMlistItemActionTask(MlistActivity.this, playerState.getPlayerReference(), MlistActivity.this.mlistReference, item, MlistItemCommand.QUEUE);
-					task.execute();
+					new RunMlistItemActionTask(MlistActivity.this, playerState.getPlayerReference(), MlistActivity.this.mlistReference, item, MlistItemCommand.QUEUE).execute();
 				}
 			});
 		}
 		else {
-			RunMlistItemActionTask task = new RunMlistItemActionTask(this, this.playerReference, this.mlistReference, item, MlistItemCommand.QUEUE);
-			task.execute();
+			new RunMlistItemActionTask(this, this.playerReference, this.mlistReference, item, MlistItemCommand.QUEUE).execute();
 		}
 	}
 	
