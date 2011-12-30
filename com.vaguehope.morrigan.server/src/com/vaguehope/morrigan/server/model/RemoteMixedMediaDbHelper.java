@@ -28,13 +28,13 @@ public class RemoteMixedMediaDbHelper {
 		return file;
 	}
 	
-	public static IRemoteMixedMediaDb createRemoteMmdb (String mmdbUrl) throws MorriganException, MalformedURLException {
+	public static IRemoteMixedMediaDb createRemoteMmdb (String mmdbUrl, String pass) throws MorriganException, MalformedURLException {
 		URL url = new URL(mmdbUrl);
 		// FIXME better naming?
 		String name = mmdbUrl.substring(mmdbUrl.lastIndexOf("/")+1).replace(Config.MMDB_REMOTE_FILE_EXT, "").replace(Config.MMDB_LOCAL_FILE_EXT, "");
-		String file = getFullPathToMmdb(url.getHost() + "_" + url.getPort() + "_" + name);
-		IRemoteMixedMediaDb db = RemoteMixedMediaDbFactory.getNew(file, url);
-		return db;
+		String file = getFullPathToMmdb(url.getHost() + "_" + name);
+		RemoteHostDetails details = new RemoteHostDetails(url, pass);
+		return RemoteMixedMediaDbFactory.getNew(file, details);
 	}
 	
 	public static boolean isRemoteMmdbFile (String filePath) {

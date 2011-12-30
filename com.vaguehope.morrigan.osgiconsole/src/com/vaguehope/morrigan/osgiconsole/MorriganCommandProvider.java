@@ -36,7 +36,8 @@ public class MorriganCommandProvider implements CommandProvider {
 	public String getHelp() {
 		return "---Morrigan---\n" +
 				"\tmn [media|m]\n" +
-				"\tmn [media|m] [create|c] [remote|r] <dbname>\n" +
+				"\tmn [media|m] [create|c] <dbname>\n" +
+				"\tmn [media|m] [create|c] [remote|r] <dbname> <pass>\n" +
 				"\tmn [media|m] [add|a] <dir> <q1>\n" +
 				"\tmn [media|m] [scan|s] <q1>\n" +
 				"\tmn [media|m] sync <remote q1> <local q1>\n" +
@@ -223,22 +224,23 @@ public class MorriganCommandProvider implements CommandProvider {
 	static private void doMediaCreate (CommandInterpreter ci, List<String> args) {
 		if (args.size() >= 1) {
 			if ("remote".equals(args.get(0)) || "r".equals(args.get(0))) {
-				if (args.size() >= 2) {
-					String urlString = args.get(1);
+				if (args.size() >= 3) {
+					String url = args.get(1);
+					String pass = args.get(2);
 					IRemoteMixedMediaDb db;
 					try {
-						db = RemoteMixedMediaDbHelper.createRemoteMmdb(urlString);
+						db = RemoteMixedMediaDbHelper.createRemoteMmdb(url, pass);
 						ci.println("Created MMDB '"+db.getListName()+"'.");
 					}
 					catch (MalformedURLException e) {
-						ci.println("Maoformed URL: " + urlString);
+						ci.println("Maoformed URL: " + url);
 					}
 					catch (MorriganException e) {
 						ci.println(ErrorHelper.getCauseTrace(e));
 					}
 				}
 				else {
-					ci.println("You must specify a URL for the new remote DB.");
+					ci.println("You must specify a URL and pass for the new remote DB.");
 				}
 			}
 			else {

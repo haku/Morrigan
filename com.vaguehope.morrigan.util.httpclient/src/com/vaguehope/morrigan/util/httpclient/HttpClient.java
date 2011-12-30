@@ -8,12 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.net.CookieHandler;
-import java.net.CookieManager;
-import java.net.CookiePolicy;
-import java.net.HttpCookie;
 import java.net.HttpURLConnection;
-import java.net.URI;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
@@ -22,18 +17,7 @@ import java.util.logging.Logger;
 public class HttpClient {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	static private HttpClient _httpClient;
-	
-	static synchronized public HttpClient getHttpClient () {
-		if (_httpClient == null) {
-			_httpClient = new HttpClient();
-		}
-		return _httpClient;
-	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	Logger logger = Logger.getLogger(this.getClass().getName());
+	static final Logger logger = Logger.getLogger(HttpClient.class.getName());
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -43,51 +27,7 @@ public class HttpClient {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	/**
-	 * Handy class for returning all the bits of a HTTP request.
-	 */
-	public static class HttpResponse {
-		
-		private int responseCode;
-		private String responseBody;
-		private String etag;
-		private Map<String, List<String>> headerFields;
-		
-		public HttpResponse (int code, String body, String etag, Map<String, List<String>> headerFields) {
-			this.responseCode = code;
-			this.responseBody = body;
-			this.etag = etag;
-			this.headerFields = headerFields;
-		}
-		
-		public int getCode () { return this.responseCode; }
-		public String getBody () { return this.responseBody; }
-		public String getEtag () { return this.etag; }
-		public Map<String, List<String>> getHeaderFields () { return this.headerFields; }
-		
-		@Override
-		public String toString () {
-			return this.responseCode+": "+this.responseBody;
-		}
-	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	private CookieManager cookieManager;
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	public HttpClient () {
-		this.cookieManager = new CookieManager();
-		this.cookieManager.setCookiePolicy(new CookiePolicy() {
-			@Override
-			public boolean shouldAccept(URI uri, HttpCookie cookie) {
-				HttpClient.this.logger.fine("Accpting cookie " + uri +": " + cookie.getName() + "[maxage="+cookie.getMaxAge()+"]");
-				return true;
-			}
-		});
-		CookieHandler.setDefault(this.cookieManager); // FIXME strictly speaking, we should not be setting this as default but per connection.
-	}
+	private HttpClient() { /* Static helper. */ }
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -95,12 +35,16 @@ public class HttpClient {
 	 * Do a simple GET request.
 	 * @throws HttpStreamHandlerException 
 	 */
-	public HttpResponse doHttpRequest(URL url) throws IOException, HttpStreamHandlerException {
+	public static HttpResponse doHttpRequest(URL url) throws IOException, HttpStreamHandlerException {
 		return doHttpRequest(url, null, null, null, null, null);
 	}
 	
-	public HttpResponse doHttpRequest(URL url, HttpStreamHandler httpStreamHandler) throws IOException, HttpStreamHandlerException {
+	public static HttpResponse doHttpRequest(URL url, HttpStreamHandler httpStreamHandler) throws IOException, HttpStreamHandlerException {
 		return doHttpRequest(url, null, null, null, null, httpStreamHandler);
+	}
+	
+	public static HttpResponse doHttpRequest(URL url, Map<String, String> headers, HttpStreamHandler httpStreamHandler) throws IOException, HttpStreamHandlerException {
+		return doHttpRequest(url, null, null, null, headers, httpStreamHandler);
 	}
 	
 	/**
@@ -114,8 +58,8 @@ public class HttpClient {
 	 * @throws IOException
 	 * @throws HttpStreamHandlerException 
 	 */
-	public HttpResponse doHttpRequest(URL url, String httpRequestMethod, String encodedData, String contentType, Map<String, String> headers, HttpStreamHandler httpStreamHandler) throws IOException, HttpStreamHandlerException {
-		this.logger.finest("doHttpRequest(" + (httpRequestMethod==null ? "GET" : httpRequestMethod) + " " + url + "):");
+	public static HttpResponse doHttpRequest(URL url, String httpRequestMethod, String encodedData, String contentType, Map<String, String> headers, HttpStreamHandler httpStreamHandler) throws IOException, HttpStreamHandlerException {
+		logger.finest("doHttpRequest(" + (httpRequestMethod==null ? "GET" : httpRequestMethod) + " " + url + "):");
 		
 		StringBuilder sb = null;
 		int responseCode = -1;
@@ -123,22 +67,22 @@ public class HttpClient {
 		String etag = null;
 		
 		HttpURLConnection huc = (HttpURLConnection) url.openConnection();
+		huc.setConnectTimeout(HTTP_CONNECT_TIMEOUT_SECONDS * 1000);
+		huc.setReadTimeout(HTTP_READ_TIMEOUT_SECONDS * 1000);
+		
 		try {
-//			disableSSLCertificateChecking(huc);
-			huc.setConnectTimeout(HTTP_CONNECT_TIMEOUT_SECONDS * 1000);
-			huc.setReadTimeout(HTTP_READ_TIMEOUT_SECONDS * 1000);
-//			huc.setChunkedStreamingMode(0);
+			// Set headers before making request.
+			if (headers!=null) {
+				for (String header : headers.keySet()) {
+					huc.setRequestProperty(header, headers.get(header));
+				}
+			}
 			
+			// Any data to send?
 			if (httpRequestMethod!=null) {
 				huc.setDoOutput(true);
 				huc.setRequestMethod(httpRequestMethod);
 				if (contentType!=null) huc.setRequestProperty("Content-Type", contentType);
-				
-				if (headers!=null) {
-					for (String header : headers.keySet()) {
-						huc.setRequestProperty(header, headers.get(header));
-					}
-				}
 				
 				OutputStreamWriter out = new OutputStreamWriter(huc.getOutputStream());
 				try {
@@ -149,6 +93,7 @@ public class HttpClient {
 				}
 			}
 			
+			// Start receiving.
 			headerFields = huc.getHeaderFields();
 			etag = huc.getHeaderField("Etag");
 			responseCode = huc.getResponseCode();
@@ -230,7 +175,7 @@ public class HttpClient {
 	 * This will flush the OutputStream.
 	 * This will not close the output stream.
 	 */
-	public void downloadFile (URL url, final OutputStream os) throws IOException, HttpStreamHandlerException {
+	public static void downloadFile (URL url, final OutputStream os) throws IOException, HttpStreamHandlerException {
 		HttpStreamHandler httpStreamHandler = new HttpStreamHandler () {
 			@Override
 			public void handleStream (InputStream is) throws IOException, HttpStreamHandlerException {
@@ -249,7 +194,7 @@ public class HttpClient {
 	/**
 	 * TODO remove HttpStreamHandlerException
 	 */
-	public void downloadFile (URL url, final File file) throws IOException, HttpStreamHandlerException {
+	public static void downloadFile (URL url, final File file) throws IOException, HttpStreamHandlerException {
 		BufferedOutputStream os = null;
 		try {
 			os = new BufferedOutputStream(new FileOutputStream(file));

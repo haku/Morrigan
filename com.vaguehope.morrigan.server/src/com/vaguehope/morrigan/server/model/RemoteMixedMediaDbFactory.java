@@ -1,8 +1,5 @@
 package com.vaguehope.morrigan.server.model;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.factory.RecyclingFactory;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
@@ -12,7 +9,7 @@ import com.vaguehope.morrigan.model.media.internal.db.MediaItemDbConfig;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.MixedMediaSqliteLayerFactory;
 import com.vaguehope.sqlitewrapper.DbException;
 
-public class RemoteMixedMediaDbFactory  extends RecyclingFactory<IRemoteMixedMediaDb, MediaItemDbConfig, URL, MorriganException> {
+public class RemoteMixedMediaDbFactory  extends RecyclingFactory<IRemoteMixedMediaDb, MediaItemDbConfig, RemoteHostDetails, MorriganException> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private static final RemoteMixedMediaDbFactory INSTANCE = new RemoteMixedMediaDbFactory();
@@ -34,7 +31,7 @@ public class RemoteMixedMediaDbFactory  extends RecyclingFactory<IRemoteMixedMed
 	}
 	
 	@Override
-	protected IRemoteMixedMediaDb makeNewProduct(MediaItemDbConfig material, URL config) throws MorriganException {
+	protected IRemoteMixedMediaDb makeNewProduct(MediaItemDbConfig material, RemoteHostDetails config) throws MorriganException {
 		IRemoteMixedMediaDb ret = null;
 		
 //		System.out.println("Making object instance '" + material + "'...");
@@ -56,9 +53,7 @@ public class RemoteMixedMediaDbFactory  extends RecyclingFactory<IRemoteMixedMed
 						material,
 						MixedMediaSqliteLayerFactory.getAutocommit(material.getFilePath()));
 			}
-			catch (MalformedURLException e) {
-				throw new MorriganException(e);
-			} catch (DbException e) {
+			catch (DbException e) {
 				throw new MorriganException(e);
 			}
 		}
@@ -68,9 +63,9 @@ public class RemoteMixedMediaDbFactory  extends RecyclingFactory<IRemoteMixedMed
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public static IRemoteMixedMediaDb getNew (String fullFilePath, URL url) throws MorriganException {
+	public static IRemoteMixedMediaDb getNew (String fullFilePath, RemoteHostDetails details) throws MorriganException {
 		MediaItemDbConfig config = new MediaItemDbConfig(fullFilePath, null);
-		IRemoteMixedMediaDb r = INSTANCE.manufacture(config, url);
+		IRemoteMixedMediaDb r = INSTANCE.manufacture(config, details);
 		return r;
 	}
 	
@@ -96,7 +91,8 @@ public class RemoteMixedMediaDbFactory  extends RecyclingFactory<IRemoteMixedMed
 		String title = RemoteMixedMediaDbHelper.getRemoteMmdbTitle(rmmdb.getDbPath());
 		MediaItemDbConfig config = new MediaItemDbConfig(rmmdb.getDbPath(), null);
 		IMixedMediaStorageLayer<IMixedMediaItem> storage = MixedMediaSqliteLayerFactory.getTransactional(rmmdb.getDbPath());
-		RemoteMixedMediaDb r = new RemoteMixedMediaDb(title, config, rmmdb.getUrl(), storage);
+		RemoteHostDetails details = new RemoteHostDetails(rmmdb.getUrl(), rmmdb.getPass());
+		RemoteMixedMediaDb r = new RemoteMixedMediaDb(title, config, details, storage);
 		return r;
 	}
 	
