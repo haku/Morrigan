@@ -299,12 +299,17 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference, Mlist
 	
 	@Override
 	public int getStartCount () {
-		return getStartCount();
+		return getTrackStartCount();
 	}
 	
 	@Override
 	public int getEndCount () {
-		return getEndCount();
+		return getTrackEndCount();
+	}
+	
+	@Override
+	public String[] getTags () {
+		return null;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

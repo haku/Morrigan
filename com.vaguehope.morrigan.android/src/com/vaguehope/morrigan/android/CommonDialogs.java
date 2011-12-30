@@ -98,6 +98,7 @@ public class CommonDialogs {
 		dlgBuilder.setTitle("Query " + playerState.getListTitle());
 		
 		final EditText editText = new EditText(context);
+		editText.setSelectAllOnFocus(true);
 		if (defaultQuery != null && defaultQuery.get() != null) editText.setText(defaultQuery.get());
 		dlgBuilder.setView(editText);
 		

@@ -39,5 +39,7 @@ public interface MlistItem extends Artifact {
 	public int getStartCount ();
 	public int getEndCount ();
 	
+	public String[] getTags ();
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

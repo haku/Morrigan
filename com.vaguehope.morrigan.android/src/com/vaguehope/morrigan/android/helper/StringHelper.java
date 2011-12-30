@@ -19,6 +19,16 @@ package com.vaguehope.morrigan.android.helper;
 public class StringHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	static public String implode (String[] arr, String sep) {
+		if (arr == null) return null;
+		StringBuilder s = new StringBuilder();
+		for (String a : arr) s.append(a).append(sep);
+		s.delete(s.length() - sep.length(), s.length());
+		return s.toString();
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
 	static public String substringByTokens (String d, String k0, String k1) {
 		String ret;
 		int x0;

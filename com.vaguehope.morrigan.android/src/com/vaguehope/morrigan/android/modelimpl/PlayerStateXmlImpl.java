@@ -107,7 +107,7 @@ public class PlayerStateXmlImpl implements PlayerState, MlistItem, ContentHandle
 		this.monitors = new LinkedHashMap<Integer, String>();
 		
 		SAXParserFactory spf = SAXParserFactory.newInstance();
-        SAXParser sp;
+		SAXParser sp;
 		try {
 			sp = spf.newSAXParser();
 			XMLReader xmlReader = sp.getXMLReader();
@@ -294,6 +294,11 @@ public class PlayerStateXmlImpl implements PlayerState, MlistItem, ContentHandle
 	@Override
 	public int getEndCount () {
 		return getTrackEndCount();
+	}
+	
+	@Override
+	public String[] getTags () {
+		return null;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

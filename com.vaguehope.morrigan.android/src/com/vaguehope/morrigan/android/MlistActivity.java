@@ -41,6 +41,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.vaguehope.morrigan.android.CommonDialogs.PlayerSelectedListener;
+import com.vaguehope.morrigan.android.helper.StringHelper;
 import com.vaguehope.morrigan.android.helper.TimeHelper;
 import com.vaguehope.morrigan.android.model.MlistItem;
 import com.vaguehope.morrigan.android.model.MlistItemList;
@@ -241,8 +242,13 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 			
 			TextView counts = new TextView(MlistActivity.this);
 			counts.setText(mlistItem.getStartCount() + "/" + mlistItem.getEndCount() + " " + TimeHelper.formatTimeSeconds(mlistItem.getDuration()));
-			title.setTextSize(TypedValue.COMPLEX_UNIT_PT, 8);
+			counts.setTextSize(TypedValue.COMPLEX_UNIT_PT, 8);
 			header.addView(counts);
+			
+			TextView tags = new TextView(MlistActivity.this);
+			tags.setText(StringHelper.implode(mlistItem.getTags(), ", ")); // TODO set max length?
+			tags.setTextSize(TypedValue.COMPLEX_UNIT_PT, 8);
+			header.addView(tags);
 			
 			menu.setHeaderView(header);
 			menu.add(Menu.NONE, MENU_CTX_PLAY, Menu.NONE, "Play now");
@@ -309,6 +315,7 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 		dlgBuilder.setTitle("Query " + this.currentState.getTitle());
 		
 		final EditText editText = new EditText(this);
+		editText.setSelectAllOnFocus(true);
 		if (this.currentItemList != null) editText.setText(this.currentItemList.getQuery());
 		dlgBuilder.setView(editText);
 		
