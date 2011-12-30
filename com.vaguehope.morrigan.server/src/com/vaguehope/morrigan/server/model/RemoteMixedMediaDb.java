@@ -73,6 +73,8 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb implements IRemoteM
 		readCacheDate();
 	}
 	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
 	private void readCacheDate () throws DbException {
 		String dateString = getDbLayer().getProp(DBKEY_CACHEDATE);
 		if (dateString != null) {

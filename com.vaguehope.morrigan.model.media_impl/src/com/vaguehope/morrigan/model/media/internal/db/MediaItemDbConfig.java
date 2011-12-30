@@ -10,7 +10,7 @@ public final class MediaItemDbConfig {
 	
 	private final String filePath;
 	private final String filter;
-	private final int hash;
+	private final int hash; // cache.
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
