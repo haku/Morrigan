@@ -40,8 +40,8 @@ import android.widget.Toast;
 import com.vaguehope.morrigan.android.model.ArtifactListAdaptor;
 import com.vaguehope.morrigan.android.model.ServerReference;
 import com.vaguehope.morrigan.android.model.ServerReferenceList;
-import com.vaguehope.morrigan.android.model.impl.ArtifactListAdaptorImpl;
-import com.vaguehope.morrigan.android.model.impl.ServerReferenceImpl;
+import com.vaguehope.morrigan.android.modelimpl.ArtifactListAdaptorImpl;
+import com.vaguehope.morrigan.android.modelimpl.ServerReferenceImpl;
 import com.vaguehope.morrigan.android.state.ConfigDb;
 
 public class ServersActivity extends Activity {

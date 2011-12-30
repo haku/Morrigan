@@ -14,11 +14,10 @@
  * under the License.
  */
 
-package com.vaguehope.morrigan.android.model.impl;
+package com.vaguehope.morrigan.android.modelimpl;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigInteger;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,33 +37,21 @@ import org.xml.sax.XMLReader;
 
 import com.vaguehope.morrigan.android.model.Artifact;
 import com.vaguehope.morrigan.android.model.ArtifactList;
-import com.vaguehope.morrigan.android.model.MlistItem;
-import com.vaguehope.morrigan.android.model.MlistItemList;
+import com.vaguehope.morrigan.android.model.PlayState;
+import com.vaguehope.morrigan.android.model.PlayerState;
+import com.vaguehope.morrigan.android.model.PlayerStateList;
+import com.vaguehope.morrigan.android.model.ServerReference;
 
-public class MlistItemListImpl implements MlistItemList, ContentHandler {
+public class PlayerStateListImpl implements PlayerStateList, ContentHandler {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private static final String ENTRY = "entry";
-	
-	public static final String TITLE = "title";
-	public static final String TYPE = "type";
-	public static final String DURATION = "duration";
-	public static final String STARTCOUNT = "startcount";
-	public static final String ENDCOUNT = "endcount";
-	public static final String HASHCODE = "hash";
-	public static final String ENABLED = "enabled";
-	public static final String MISSING = "missing";
+	private final List<PlayerState> playerStateList = new LinkedList<PlayerState>();
+	private final ServerReference serverReference;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private final List<MlistItem> mlistItemList = new LinkedList<MlistItem>();
-	
-	private final String query;
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	public MlistItemListImpl (InputStream dataIs, String query) throws SAXException {
-		this.query = query;
+	public PlayerStateListImpl (InputStream dataIs, ServerReference serverReference) throws SAXException {
+		this.serverReference = serverReference;
 		
 		SAXParserFactory spf = SAXParserFactory.newInstance();
         SAXParser sp;
@@ -87,39 +74,35 @@ public class MlistItemListImpl implements MlistItemList, ContentHandler {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
-	public List<? extends MlistItem> getMlistItemList() {
-		return Collections.unmodifiableList(this.mlistItemList);
+	public List<PlayerState> getPlayersStateList() {
+		return Collections.unmodifiableList(this.playerStateList);
 	}
 	
 	@Override
 	public List<? extends Artifact> getArtifactList() {
-		return Collections.unmodifiableList(this.mlistItemList);
-	}
-	
-	@Override
-	public String getQuery() {
-		return this.query;
+		return Collections.unmodifiableList(this.playerStateList);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private final Stack<String> stack = new Stack<String>();
 	private StringBuilder currentText;
-	private MlistItemBasicImpl currentItem;
+	private PlayerStateBasicImpl currentItem;
 	
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 		this.stack.push(localName);
 		
-		if (this.stack.size() == 2 && localName.equals(ENTRY)) {
-			this.currentItem = new MlistItemBasicImpl();
+		if (this.stack.size() == 2 && localName.equals("entry")) {
+			this.currentItem = new PlayerStateBasicImpl();
 		}
 		else if (this.stack.size() == 3 && localName.equals("link")) {
 			String relVal = attributes.getValue("rel");
 			if (relVal != null && relVal.equals("self")) {
 				String hrefVal = attributes.getValue("href");
 				if (hrefVal != null && hrefVal.length() > 0) {
-					this.currentItem.setRelativeUrl(hrefVal);
+					// Log.d("Morrigan", "hrefVal=" + hrefVal); // e.g. '/players/0'.
+					this.currentItem.setBaseUrl(this.serverReference.getBaseUrl() + hrefVal);
 				}
 			}
 		}
@@ -132,45 +115,53 @@ public class MlistItemListImpl implements MlistItemList, ContentHandler {
 	
 	@Override
 	public void endElement(String uri, String localName, String qName) throws SAXException {
-		if (this.stack.size() == 2 && localName.equals(ENTRY)) {
-			this.mlistItemList.add(this.currentItem);
+		if (this.stack.size() == 2 && localName.equals("entry")) {
+			this.playerStateList.add(this.currentItem);
 			this.currentItem = null;
 		}
-		else if (this.stack.size() == 3 && localName.equals(TITLE)) {
+		else if (this.stack.size() == 3 && localName.equals(PlayerStateXmlImpl.PLAYERID)) {
+			int v = Integer.parseInt(this.currentText.toString());
+			this.currentItem.setId(v);
+			this.currentItem.setPlayerReference(new PlayerReferenceImpl(this.serverReference, v));
+		}
+		else if (this.stack.size() == 3 && localName.equals(PlayerStateXmlImpl.PLAYSTATE)) {
+			int v = Integer.parseInt(this.currentText.toString());
+			this.currentItem.setPlayState(PlayState.parseN(v));
+		}
+		else if (this.stack.size() == 3 && localName.equals(PlayerStateXmlImpl.PLAYORDER)) {
+			int v = Integer.parseInt(this.currentText.toString());
+			this.currentItem.setPlayOrder(v);
+		}
+		else if (this.stack.size() == 3 && localName.equals(PlayerStateXmlImpl.QUEUELENGTH)) {
+			int v = Integer.parseInt(this.currentText.toString());
+			this.currentItem.setQueueLength(v);
+		}
+//		else if (this.stack.size() == 3 && localName.equals(PlayerStateParser.QUEUEDURATION)) {
+//			TODO
+//		}
+		else if (this.stack.size() == 3 && localName.equals(PlayerStateXmlImpl.LISTTITLE)) {
+			this.currentItem.setListTitle(this.currentText.toString());
+		}
+		else if (this.stack.size() == 3 && localName.equals(PlayerStateXmlImpl.LISTID)) {
+			this.currentItem.setListId(this.currentText.toString());
+		}
+		else if (this.stack.size() == 3 && localName.equals(PlayerStateXmlImpl.TRACKTITLE)) {
 			this.currentItem.setTrackTitle(this.currentText.toString());
 		}
-		else if (this.stack.size() == 3 && localName.equals(TYPE)) {
+		else if (this.stack.size() == 3 && localName.equals(PlayerStateXmlImpl.PLAYPOSITION)) {
 			int v = Integer.parseInt(this.currentText.toString());
-			this.currentItem.setType(v);
+			this.currentItem.setPlayerPosition(v);
 		}
-		else if (this.stack.size() == 3 && localName.equals(DURATION)) {
+		else if (this.stack.size() == 3 && localName.equals(PlayerStateXmlImpl.TRACKFILE)) {
+			this.currentItem.setTrackFile(this.currentText.toString());
+		}
+		else if (this.stack.size() == 3 && localName.equals(PlayerStateXmlImpl.TRACKDURATION)) {
 			int v = Integer.parseInt(this.currentText.toString());
-			this.currentItem.setDuration(v);
-		}
-		else if (this.stack.size() == 3 && localName.equals(STARTCOUNT)) {
-			int v = Integer.parseInt(this.currentText.toString());
-			this.currentItem.setStartCount(v);
-		}
-		else if (this.stack.size() == 3 && localName.equals(ENDCOUNT)) {
-			int v = Integer.parseInt(this.currentText.toString());
-			this.currentItem.setEndCount(v);
-		}
-		else if (this.stack.size() == 3 && localName.equals(HASHCODE)) {
-			BigInteger v = new BigInteger(this.currentText.toString(), 16);
-			this.currentItem.setHashCode(v);
-		}
-		else if (this.stack.size() == 3 && localName.equals(ENABLED)) {
-			boolean v = Boolean.parseBoolean(this.currentText.toString());
-			this.currentItem.setEnabled(v);
-		}
-		else if (this.stack.size() == 3 && localName.equals(MISSING)) {
-			boolean v = Boolean.parseBoolean(this.currentText.toString());
-			this.currentItem.setMissing(v);
+			this.currentItem.setTrackDuration(v);
 		}
 		
 		this.stack.pop();
 	}
-	
 	
 	@Override
 	public void characters(char[] ch, int start, int length) throws SAXException {
@@ -200,7 +191,7 @@ public class MlistItemListImpl implements MlistItemList, ContentHandler {
 	
 	@Override
 	public String getSortKey() {
-		return ""; // This should never be relevant.
+		return "1";
 	}
 	
 	@Override

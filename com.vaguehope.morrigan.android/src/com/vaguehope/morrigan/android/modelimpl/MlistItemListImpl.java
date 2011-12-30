@@ -14,10 +14,11 @@
  * under the License.
  */
 
-package com.vaguehope.morrigan.android.model.impl;
+package com.vaguehope.morrigan.android.modelimpl;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigInteger;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,20 +38,33 @@ import org.xml.sax.XMLReader;
 
 import com.vaguehope.morrigan.android.model.Artifact;
 import com.vaguehope.morrigan.android.model.ArtifactList;
-import com.vaguehope.morrigan.android.model.MlistState;
-import com.vaguehope.morrigan.android.model.MlistStateList;
-import com.vaguehope.morrigan.android.model.ServerReference;
+import com.vaguehope.morrigan.android.model.MlistItem;
+import com.vaguehope.morrigan.android.model.MlistItemList;
 
-public class MlistStateListImpl implements MlistStateList, ContentHandler {
+public class MlistItemListImpl implements MlistItemList, ContentHandler {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private final List<MlistState> mlistStateList = new LinkedList<MlistState>();
-	private final ServerReference serverReference;
+	private static final String ENTRY = "entry";
+	
+	public static final String TITLE = "title";
+	public static final String TYPE = "type";
+	public static final String DURATION = "duration";
+	public static final String STARTCOUNT = "startcount";
+	public static final String ENDCOUNT = "endcount";
+	public static final String HASHCODE = "hash";
+	public static final String ENABLED = "enabled";
+	public static final String MISSING = "missing";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public MlistStateListImpl (InputStream dataIs, ServerReference serverReference) throws SAXException {
-		this.serverReference = serverReference;
+	private final List<MlistItem> mlistItemList = new LinkedList<MlistItem>();
+	
+	private final String query;
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	public MlistItemListImpl (InputStream dataIs, String query) throws SAXException {
+		this.query = query;
 		
 		SAXParserFactory spf = SAXParserFactory.newInstance();
         SAXParser sp;
@@ -69,38 +83,43 @@ public class MlistStateListImpl implements MlistStateList, ContentHandler {
 			throw new SAXException(e);
 		}
 	}
-
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
-	public List<? extends MlistState> getMlistStateList() {
-		return Collections.unmodifiableList(this.mlistStateList);
+	public List<? extends MlistItem> getMlistItemList() {
+		return Collections.unmodifiableList(this.mlistItemList);
 	}
 	
 	@Override
 	public List<? extends Artifact> getArtifactList() {
-		return Collections.unmodifiableList(this.mlistStateList);
+		return Collections.unmodifiableList(this.mlistItemList);
+	}
+	
+	@Override
+	public String getQuery() {
+		return this.query;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private final Stack<String> stack = new Stack<String>();
 	private StringBuilder currentText;
-	private MlistStateBasicImpl currentItem;
+	private MlistItemBasicImpl currentItem;
 	
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 		this.stack.push(localName);
 		
-		if (this.stack.size() == 2 && localName.equals("entry")) {
-			this.currentItem = new MlistStateBasicImpl();
+		if (this.stack.size() == 2 && localName.equals(ENTRY)) {
+			this.currentItem = new MlistItemBasicImpl();
 		}
 		else if (this.stack.size() == 3 && localName.equals("link")) {
 			String relVal = attributes.getValue("rel");
 			if (relVal != null && relVal.equals("self")) {
 				String hrefVal = attributes.getValue("href");
 				if (hrefVal != null && hrefVal.length() > 0) {
-					this.currentItem.setBaseUrl(this.serverReference.getBaseUrl() + hrefVal);
+					this.currentItem.setRelativeUrl(hrefVal);
 				}
 			}
 		}
@@ -113,16 +132,45 @@ public class MlistStateListImpl implements MlistStateList, ContentHandler {
 	
 	@Override
 	public void endElement(String uri, String localName, String qName) throws SAXException {
-		if (this.stack.size() == 2 && localName.equals("entry")) {
-			this.mlistStateList.add(this.currentItem);
+		if (this.stack.size() == 2 && localName.equals(ENTRY)) {
+			this.mlistItemList.add(this.currentItem);
 			this.currentItem = null;
 		}
-		else if (this.stack.size() == 3 && localName.equals("title")) {
-			this.currentItem.setTitle(this.currentText == null ? null : this.currentText.toString());
+		else if (this.stack.size() == 3 && localName.equals(TITLE)) {
+			this.currentItem.setTrackTitle(this.currentText.toString());
+		}
+		else if (this.stack.size() == 3 && localName.equals(TYPE)) {
+			int v = Integer.parseInt(this.currentText.toString());
+			this.currentItem.setType(v);
+		}
+		else if (this.stack.size() == 3 && localName.equals(DURATION)) {
+			int v = Integer.parseInt(this.currentText.toString());
+			this.currentItem.setDuration(v);
+		}
+		else if (this.stack.size() == 3 && localName.equals(STARTCOUNT)) {
+			int v = Integer.parseInt(this.currentText.toString());
+			this.currentItem.setStartCount(v);
+		}
+		else if (this.stack.size() == 3 && localName.equals(ENDCOUNT)) {
+			int v = Integer.parseInt(this.currentText.toString());
+			this.currentItem.setEndCount(v);
+		}
+		else if (this.stack.size() == 3 && localName.equals(HASHCODE)) {
+			BigInteger v = new BigInteger(this.currentText.toString(), 16);
+			this.currentItem.setHashCode(v);
+		}
+		else if (this.stack.size() == 3 && localName.equals(ENABLED)) {
+			boolean v = Boolean.parseBoolean(this.currentText.toString());
+			this.currentItem.setEnabled(v);
+		}
+		else if (this.stack.size() == 3 && localName.equals(MISSING)) {
+			boolean v = Boolean.parseBoolean(this.currentText.toString());
+			this.currentItem.setMissing(v);
 		}
 		
 		this.stack.pop();
 	}
+	
 	
 	@Override
 	public void characters(char[] ch, int start, int length) throws SAXException {
@@ -152,7 +200,7 @@ public class MlistStateListImpl implements MlistStateList, ContentHandler {
 	
 	@Override
 	public String getSortKey() {
-		return "2";
+		return ""; // This should never be relevant.
 	}
 	
 	@Override

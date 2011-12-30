@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package com.vaguehope.morrigan.android.model.impl;
+package com.vaguehope.morrigan.android.modelimpl;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,20 +37,19 @@ import org.xml.sax.XMLReader;
 
 import com.vaguehope.morrigan.android.model.Artifact;
 import com.vaguehope.morrigan.android.model.ArtifactList;
-import com.vaguehope.morrigan.android.model.PlayState;
-import com.vaguehope.morrigan.android.model.PlayerState;
-import com.vaguehope.morrigan.android.model.PlayerStateList;
+import com.vaguehope.morrigan.android.model.MlistState;
+import com.vaguehope.morrigan.android.model.MlistStateList;
 import com.vaguehope.morrigan.android.model.ServerReference;
 
-public class PlayerStateListImpl implements PlayerStateList, ContentHandler {
+public class MlistStateListImpl implements MlistStateList, ContentHandler {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private final List<PlayerState> playerStateList = new LinkedList<PlayerState>();
+	private final List<MlistState> mlistStateList = new LinkedList<MlistState>();
 	private final ServerReference serverReference;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public PlayerStateListImpl (InputStream dataIs, ServerReference serverReference) throws SAXException {
+	public MlistStateListImpl (InputStream dataIs, ServerReference serverReference) throws SAXException {
 		this.serverReference = serverReference;
 		
 		SAXParserFactory spf = SAXParserFactory.newInstance();
@@ -70,38 +69,37 @@ public class PlayerStateListImpl implements PlayerStateList, ContentHandler {
 			throw new SAXException(e);
 		}
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
-	public List<PlayerState> getPlayersStateList() {
-		return Collections.unmodifiableList(this.playerStateList);
+	public List<? extends MlistState> getMlistStateList() {
+		return Collections.unmodifiableList(this.mlistStateList);
 	}
 	
 	@Override
 	public List<? extends Artifact> getArtifactList() {
-		return Collections.unmodifiableList(this.playerStateList);
+		return Collections.unmodifiableList(this.mlistStateList);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private final Stack<String> stack = new Stack<String>();
 	private StringBuilder currentText;
-	private PlayerStateBasicImpl currentItem;
+	private MlistStateBasicImpl currentItem;
 	
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 		this.stack.push(localName);
 		
 		if (this.stack.size() == 2 && localName.equals("entry")) {
-			this.currentItem = new PlayerStateBasicImpl();
+			this.currentItem = new MlistStateBasicImpl();
 		}
 		else if (this.stack.size() == 3 && localName.equals("link")) {
 			String relVal = attributes.getValue("rel");
 			if (relVal != null && relVal.equals("self")) {
 				String hrefVal = attributes.getValue("href");
 				if (hrefVal != null && hrefVal.length() > 0) {
-					// Log.d("Morrigan", "hrefVal=" + hrefVal); // e.g. '/players/0'.
 					this.currentItem.setBaseUrl(this.serverReference.getBaseUrl() + hrefVal);
 				}
 			}
@@ -116,48 +114,11 @@ public class PlayerStateListImpl implements PlayerStateList, ContentHandler {
 	@Override
 	public void endElement(String uri, String localName, String qName) throws SAXException {
 		if (this.stack.size() == 2 && localName.equals("entry")) {
-			this.playerStateList.add(this.currentItem);
+			this.mlistStateList.add(this.currentItem);
 			this.currentItem = null;
 		}
-		else if (this.stack.size() == 3 && localName.equals(PlayerStateXmlImpl.PLAYERID)) {
-			int v = Integer.parseInt(this.currentText.toString());
-			this.currentItem.setId(v);
-			this.currentItem.setPlayerReference(new PlayerReferenceImpl(this.serverReference, v));
-		}
-		else if (this.stack.size() == 3 && localName.equals(PlayerStateXmlImpl.PLAYSTATE)) {
-			int v = Integer.parseInt(this.currentText.toString());
-			this.currentItem.setPlayState(PlayState.parseN(v));
-		}
-		else if (this.stack.size() == 3 && localName.equals(PlayerStateXmlImpl.PLAYORDER)) {
-			int v = Integer.parseInt(this.currentText.toString());
-			this.currentItem.setPlayOrder(v);
-		}
-		else if (this.stack.size() == 3 && localName.equals(PlayerStateXmlImpl.QUEUELENGTH)) {
-			int v = Integer.parseInt(this.currentText.toString());
-			this.currentItem.setQueueLength(v);
-		}
-//		else if (this.stack.size() == 3 && localName.equals(PlayerStateParser.QUEUEDURATION)) {
-//			TODO
-//		}
-		else if (this.stack.size() == 3 && localName.equals(PlayerStateXmlImpl.LISTTITLE)) {
-			this.currentItem.setListTitle(this.currentText.toString());
-		}
-		else if (this.stack.size() == 3 && localName.equals(PlayerStateXmlImpl.LISTID)) {
-			this.currentItem.setListId(this.currentText.toString());
-		}
-		else if (this.stack.size() == 3 && localName.equals(PlayerStateXmlImpl.TRACKTITLE)) {
-			this.currentItem.setTrackTitle(this.currentText.toString());
-		}
-		else if (this.stack.size() == 3 && localName.equals(PlayerStateXmlImpl.PLAYPOSITION)) {
-			int v = Integer.parseInt(this.currentText.toString());
-			this.currentItem.setPlayerPosition(v);
-		}
-		else if (this.stack.size() == 3 && localName.equals(PlayerStateXmlImpl.TRACKFILE)) {
-			this.currentItem.setTrackFile(this.currentText.toString());
-		}
-		else if (this.stack.size() == 3 && localName.equals(PlayerStateXmlImpl.TRACKDURATION)) {
-			int v = Integer.parseInt(this.currentText.toString());
-			this.currentItem.setTrackDuration(v);
+		else if (this.stack.size() == 3 && localName.equals("title")) {
+			this.currentItem.setTitle(this.currentText == null ? null : this.currentText.toString());
 		}
 		
 		this.stack.pop();
@@ -191,7 +152,7 @@ public class PlayerStateListImpl implements PlayerStateList, ContentHandler {
 	
 	@Override
 	public String getSortKey() {
-		return "1";
+		return "2";
 	}
 	
 	@Override

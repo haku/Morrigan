@@ -14,76 +14,64 @@
  * under the License.
  */
 
-package com.vaguehope.morrigan.android.model.impl;
+package com.vaguehope.morrigan.android.modelimpl;
 
 import com.vaguehope.morrigan.android.Constants;
 import com.vaguehope.morrigan.android.R;
+import com.vaguehope.morrigan.android.model.PlayerReference;
 import com.vaguehope.morrigan.android.model.ServerReference;
 
-public class ServerReferenceImpl implements ServerReference {
+public class PlayerReferenceImpl implements PlayerReference {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private int dbId;
-	private final String name;
+	private final int playerId;
 	private final String baseUrl;
-	private final String pass;
+	private final ServerReference serverReference;
+	private final String title;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public ServerReferenceImpl (String name, String baseUrl, String pass) {
-		this(Integer.MIN_VALUE, name, baseUrl, pass);
-	}
-	
-	public ServerReferenceImpl (int dbId, String name, String baseUrl, String pass) {
-		this.dbId = dbId;
-		this.name = name;
-		this.baseUrl = baseUrl;
-		this.pass = pass;
+	public PlayerReferenceImpl (ServerReference serverReference, int playerId) {
+		if (serverReference == null) throw new IllegalArgumentException();
+		
+		this.playerId = playerId;
+		this.baseUrl = serverReference.getBaseUrl() + Constants.CONTEXT_PLAYERS + "/" + playerId;
+		this.serverReference = serverReference;
+		
+		this.title = this.serverReference.getName() + " / player " + this.playerId;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	ServerReference methods.
+//	PlayerReference
 	
 	@Override
-	public String getName () {
-		return this.name;
+	public int getPlayerId() {
+		return this.playerId;
 	}
 	
 	@Override
-	public String getBaseUrl () {
+	public String getBaseUrl() {
 		return this.baseUrl;
 	}
 	
 	@Override
-	public String getPass () {
-		return this.pass;
+	public ServerReference getServerReference() {
+		return this.serverReference;
 	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Artifact methods.
-	
+
 	@Override
 	public int getId () {
-		if (this.dbId == Integer.MIN_VALUE) throw new IllegalStateException("ID not set.");
-		return this.dbId;
+		return getPlayerId();
 	}
-	
+
 	@Override
 	public String getTitle () {
-		return getName();
+		return this.title;
 	}
-	
+
 	@Override
 	public int getImageResource () {
-		return R.drawable.db;
-	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	HttpCreds methods.
-	
-	@Override
-	public String getUser () {
-		return Constants.USERNAME;
+		return R.drawable.play;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
