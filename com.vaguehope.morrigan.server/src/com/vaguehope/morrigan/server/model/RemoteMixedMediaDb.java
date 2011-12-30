@@ -20,7 +20,7 @@ import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.internal.db.MediaItemDbConfig;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.AbstractMixedMediaDb;
 import com.vaguehope.morrigan.server.MlistsServlet;
-import com.vaguehope.morrigan.server.feedreader.MixedMediaDbFeedParser;
+import com.vaguehope.morrigan.server.feedreader.MixedMediaDbFeedReader;
 import com.vaguehope.morrigan.tasks.TaskEventListener;
 import com.vaguehope.morrigan.util.httpclient.HttpClient;
 import com.vaguehope.morrigan.util.httpclient.HttpStreamHandlerException;
@@ -36,40 +36,40 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb implements IRemoteM
 	
 	public static final String DBKEY_SERVERURL = "SERVERURL";
 	public static final String DBKEY_CACHEDATE = "CACHEDATE";
+	public static final String DBKEY_PASS = "PASS";
 	
-	private final URL url;
+	public static long MAX_CACHE_AGE = 60 * 60 * 1000L; // 1 hour.
+	private long cacheDate = -1;
 	
 	private TaskEventListener taskEventListener;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public RemoteMixedMediaDb (String dbName, MediaItemDbConfig config, IMixedMediaStorageLayer<IMixedMediaItem> localDbLayer) throws DbException, MalformedURLException {
+	/**
+	 * Connect to existing DB.
+	 */
+	public RemoteMixedMediaDb (String dbName, MediaItemDbConfig config, IMixedMediaStorageLayer<IMixedMediaItem> localDbLayer) throws DbException {
 		super(dbName, config, localDbLayer); // TODO expose search term.
-		
-		String s = localDbLayer.getProp(DBKEY_SERVERURL);
-		if (s != null) {
-			this.url = new URL(s);
-		}
-		else {
-			throw new IllegalArgumentException("serverUrl not found in localDbLayer ('"+localDbLayer.getDbFilePath()+"').");
-		}
-		
 		readCacheDate();
 	}
 	
-	public RemoteMixedMediaDb (String dbName, MediaItemDbConfig config,  URL url, IMixedMediaStorageLayer<IMixedMediaItem> localDbLayer) throws DbException {
+	/**
+	 * Create a fresh DB.
+	 */
+	public RemoteMixedMediaDb (String dbName, MediaItemDbConfig config, RemoteHostDetails details, IMixedMediaStorageLayer<IMixedMediaItem> localDbLayer) throws DbException {
 		super(dbName, config, localDbLayer); // TODO expose search term.
-		this.url = url;
+		URL url = details.getUrl();
 		
-		String s = localDbLayer.getProp(DBKEY_SERVERURL);
+		String s = getDbLayer().getProp(DBKEY_SERVERURL);
 		if (s == null) {
-			localDbLayer.setProp(DBKEY_SERVERURL, url.toExternalForm());
-			this.logger.fine("Set DBKEY_SERVERURL=" + url.toExternalForm() + " in " + localDbLayer.getDbFilePath());
+			setUrl(url);
+			this.logger.fine("Set DBKEY_SERVERURL=" + url.toExternalForm() + " in " + getDbLayer().getDbFilePath());
 			
 		} else if (!s.equals(url.toExternalForm())) {
-			throw new IllegalArgumentException("serverUrl does not match localDbLayer ('"+url.toExternalForm()+"' != '"+s+"' in '"+localDbLayer.getDbFilePath()+"').");
+			throw new IllegalArgumentException("serverUrl does not match localDbLayer ('"+url.toExternalForm()+"' != '"+s+"' in '"+getDbLayer().getDbFilePath()+"').");
 		}
 		
+		setPass(details.getPass());
 		readCacheDate();
 	}
 	
@@ -94,16 +94,37 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb implements IRemoteM
 		this.logger.fine("Wrote cachedate=" + this.cacheDate + ".");
 	}
 	
+	@Override
+	public URL getUrl() throws DbException {
+		String sUrl = getDbLayer().getProp(DBKEY_SERVERURL);
+		try {
+			return new URL(sUrl);
+		}
+		catch (MalformedURLException e) {
+			throw new DbException("URL in DB is malformed: " + sUrl, e);
+		}
+	}
+	
+	@Override
+	public void setUrl (URL url) throws DbException {
+		getDbLayer().setProp(DBKEY_SERVERURL, url.toExternalForm());
+	}
+	
+	@Override
+	public String getPass () throws DbException {
+		return getDbLayer().getProp(DBKEY_PASS);
+	}
+	
+	@Override
+	public void setPass (String pass) throws DbException {
+		getDbLayer().setProp(DBKEY_PASS, pass);
+	}
+	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
 	public String getType() {
 		return TYPE;
-	}
-	
-	@Override
-	public URL getUrl() {
-		return this.url;
 	}
 	
 	@Override
@@ -117,10 +138,6 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb implements IRemoteM
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Reading and refreshing.
-	
-	public static long MAX_CACHE_AGE = 60 * 60 * 1000; // 1 hour.
-	
-	private long cacheDate = -1;
 	
 	@Override
 	public long getCacheAge () {
@@ -140,12 +157,12 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb implements IRemoteM
 	@Override
 	protected void doRead() throws DbException, MorriganException {
 		if (isCacheExpired()) {
-			this.logger.info("Cache for '" + getListName() + "' is " + getCacheAge() + "ms old, reading data from " + this.url.toExternalForm() + " ...");
+			this.logger.info("Cache for '" + getListName() + "' is " + getCacheAge() + "ms old, fetching data...");
 				forceDoRead();
 		}
 		else {
 			this.logger.fine("Not refreshing as '" + getListName() + "' cache is only " + getCacheAge() + "ms old.");
-			super.doRead(); // This forces a DB query - sorts entries.)
+			super.doRead(); // This forces a DB query - sorts entries.
 		}
 	}
 	
@@ -153,12 +170,12 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb implements IRemoteM
 	public void forceDoRead () throws MorriganException, DbException {
 		try {
 			// This does the actual HTTP fetch.
-			MixedMediaDbFeedParser.parseFeed(this, this.taskEventListener);
+			MixedMediaDbFeedReader.read(this, this.taskEventListener);
 			
 			this.cacheDate = System.currentTimeMillis();
 			writeCacheDate();
-			
-		} finally {
+		}
+		finally {
 			super.doRead(); // This forces a DB query - sorts entries.)
 		}
 	}
@@ -171,7 +188,7 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb implements IRemoteM
 		URL itemUrl = getRemoteItemUrl(this, item);
 		this.logger.fine("Fetching '" + itemUrl + "' to '" + item.getFilepath() + "'...");
 		try {
-			HttpClient.getHttpClient().downloadFile(itemUrl, os);
+			HttpClient.downloadFile(itemUrl, os);
 		}
 		catch (IOException e) {
 			if (e instanceof UnknownHostException) {
@@ -202,7 +219,7 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb implements IRemoteM
 			URL itemUrl = getRemoteItemUrl(this, mlt);
 			this.logger.fine("Fetching '"+itemUrl+"' to '"+targetFile.getAbsolutePath()+"'...");
 			try {
-				HttpClient.getHttpClient().downloadFile(itemUrl, targetFile);
+				HttpClient.downloadFile(itemUrl, targetFile);
 			}
 			catch (IOException e) {
 				if (e instanceof UnknownHostException) {

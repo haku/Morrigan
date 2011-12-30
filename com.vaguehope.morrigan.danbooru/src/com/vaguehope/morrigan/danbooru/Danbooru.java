@@ -8,8 +8,8 @@ import java.util.Map;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.util.httpclient.HttpClient;
+import com.vaguehope.morrigan.util.httpclient.HttpResponse;
 import com.vaguehope.morrigan.util.httpclient.HttpStreamHandlerException;
-import com.vaguehope.morrigan.util.httpclient.HttpClient.HttpResponse;
 
 
 public class Danbooru {
@@ -18,7 +18,7 @@ public class Danbooru {
 	static public String[] getTags (String md5) throws IOException, MorriganException, HttpStreamHandlerException {
 		String surl = "http://danbooru.donmai.us/post/index.xml?tags=md5:" + md5;
 		URL url = new URL(surl);
-		HttpResponse response = HttpClient.getHttpClient().doHttpRequest(url);
+		HttpResponse response = HttpClient.doHttpRequest(url);
 		
 		if (response.getCode() != 200) {
 			throw new MorriganException("Danbooru returned code " + response.getCode() + ".\n\n" + response.getBody());
@@ -53,7 +53,7 @@ public class Danbooru {
 		}
 		
 		URL url = new URL(urlString.toString());
-		HttpResponse response = HttpClient.getHttpClient().doHttpRequest(url);
+		HttpResponse response = HttpClient.doHttpRequest(url);
 		if (response.getCode() != 200) {
 			throw new MorriganException("Danbooru returned code " + response.getCode() + ".\n\n" + response.getBody());
 		}
@@ -66,10 +66,10 @@ public class Danbooru {
 		Map<String, String[]> ret = new HashMap<String, String[]>();
 		for (String result : results) {
 			if (result.contains("md5=\"")) {
-    			String md5 = substringByTokens(result, "md5=\"", "\"");
-    			String tagstring = substringByTokens(result, "tags=\"", "\"");
-    			String[] tags = tagstring.split(" ");
-    			ret.put(md5, tags);
+				String md5 = substringByTokens(result, "md5=\"", "\"");
+				String tagstring = substringByTokens(result, "tags=\"", "\"");
+				String[] tags = tagstring.split(" ");
+				ret.put(md5, tags);
 			}
 		}
 		

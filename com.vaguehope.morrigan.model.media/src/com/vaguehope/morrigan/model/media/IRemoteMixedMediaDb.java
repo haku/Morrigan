@@ -14,7 +14,11 @@ public interface IRemoteMixedMediaDb extends IMixedMediaDb {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public URL getUrl();
+	public URL getUrl() throws DbException;
+	public void setUrl(URL url) throws DbException;
+	
+	public String getPass () throws DbException;
+	public void setPass(String pass) throws DbException;
 	
 	/**
 	 * Return age of cache in milliseconds.

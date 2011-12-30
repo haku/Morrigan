@@ -26,6 +26,10 @@ import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbHelper;
 public class NewRemoteMixedDbAction extends Action implements IWorkbenchAction {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	private static final String DEFAULT_URL = "http://localhost:8080" + MlistsServlet.CONTEXTPATH + "/" + ILocalMixedMediaDb.TYPE + "/mymmdb.local.db3";
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
 	private IWorkbenchWindow window;
 	
 	public NewRemoteMixedDbAction (IWorkbenchWindow window) {
@@ -51,36 +55,39 @@ public class NewRemoteMixedDbAction extends Action implements IWorkbenchAction {
 	
 	@Override
 	public void run () {
-		InputDialog dlg = new InputDialog(
-				Display.getCurrent().getActiveShell(),
-				"New remote DB", "Enter MMDB URL.", "http://localhost:8080"+MlistsServlet.CONTEXTPATH+"/"+ILocalMixedMediaDb.TYPE+"/mymmdb.local.db3", null);
-		if (dlg.open() == Window.OK) {
-			String url = dlg.getValue();
-			IRemoteMixedMediaDb createdRemoteMmdb;
-			try {
-				createdRemoteMmdb = RemoteMixedMediaDbHelper.createRemoteMmdb(url);
-			} catch (Exception e) {
-				new MorriganMsgDlg(e).open();
-				return;
-			}
-			
-			// refresh explorer.
-			IWorkbenchPage page = this.window.getActivePage();
-			ViewMediaExplorer view = (ViewMediaExplorer) page.findView(ViewMediaExplorer.ID);
-			view.refresh();
-			
-			// Open new item.
-			try {
-				MediaItemDbEditorInput input = EditorFactory.getRemoteMmdbInput(createdRemoteMmdb.getDbPath());
-				page.openEditor(input, RemoteMixedMediaDbEditor.ID);
-			}
-			catch (PartInitException e) {
-				new MorriganMsgDlg(e).open();
-			} catch (MorriganException e) {
-				new MorriganMsgDlg(e).open();
-			}
-			
+		InputDialog dlg = new InputDialog(Display.getCurrent().getActiveShell(), "New remote DB", "Enter MMDB URL.", DEFAULT_URL, null);
+		if (dlg.open() != Window.OK) return;
+		String url = dlg.getValue();
+		
+		dlg = new InputDialog(Display.getCurrent().getActiveShell(), "New remote DB", "Enter pass.", null, null);
+		if (dlg.open() != Window.OK) return;
+		String pass = dlg.getValue();
+		
+		IRemoteMixedMediaDb createdRemoteMmdb;
+		try {
+			createdRemoteMmdb = RemoteMixedMediaDbHelper.createRemoteMmdb(url, pass);
 		}
+		catch (Exception e) {
+			new MorriganMsgDlg(e).open();
+			return;
+		}
+		
+		// refresh explorer.
+		IWorkbenchPage page = this.window.getActivePage();
+		ViewMediaExplorer view = (ViewMediaExplorer) page.findView(ViewMediaExplorer.ID);
+		view.refresh();
+		
+		// Open new item.
+		try {
+			MediaItemDbEditorInput input = EditorFactory.getRemoteMmdbInput(createdRemoteMmdb.getDbPath());
+			page.openEditor(input, RemoteMixedMediaDbEditor.ID);
+		}
+		catch (PartInitException e) {
+			new MorriganMsgDlg(e).open();
+		} catch (MorriganException e) {
+			new MorriganMsgDlg(e).open();
+		}
+		
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

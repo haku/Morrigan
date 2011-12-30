@@ -1,23 +1,14 @@
 package com.vaguehope.morrigan.server.feedreader;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
-import java.net.SocketException;
-import java.net.URL;
 import java.net.URLDecoder;
-import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -29,118 +20,18 @@ import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagType;
-import com.vaguehope.morrigan.server.MlistsServlet;
 import com.vaguehope.morrigan.server.feedwriters.XmlHelper;
-import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbFactory;
 import com.vaguehope.morrigan.tasks.TaskEventListener;
-import com.vaguehope.morrigan.util.httpclient.HttpClient;
-import com.vaguehope.morrigan.util.httpclient.HttpClient.HttpResponse;
-import com.vaguehope.morrigan.util.httpclient.HttpStreamHandler;
-import com.vaguehope.morrigan.util.httpclient.HttpStreamHandlerException;
 import com.vaguehope.sqlitewrapper.DbException;
 
 public class MixedMediaDbFeedParser extends DefaultHandler {
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	/**
-	 * TODO report progress to taskEventListener.
-	 * TODO support event cancellation.
-	 */
-	public static void parseFeed (final IRemoteMixedMediaDb mmdb, final TaskEventListener taskEventListener) throws MorriganException {
-		if (taskEventListener != null) taskEventListener.onStart();
-		if (taskEventListener != null) taskEventListener.beginTask("Updating " + mmdb.getListName(), 100);
-		
-		HttpStreamHandler httpStreamHandler = new HttpStreamHandler () {
-			@Override
-			public void handleStream(InputStream is) throws IOException, HttpStreamHandlerException {
-				boolean thereWereErrors = true;
-				IRemoteMixedMediaDb transClone = null;
-				try {
-					transClone = RemoteMixedMediaDbFactory.getTransactionalClone(mmdb);
-					transClone.setDefaultMediaType(MediaType.UNKNOWN, false);
-					transClone.readFromCache();
-					transClone.beginBulkUpdate();
-			        try {
-			        	SAXParserFactory factory = SAXParserFactory.newInstance();
-			        	factory.setNamespaceAware(true);
-			        	factory.setValidating(true);
-			        	SAXParser parser = factory.newSAXParser();
-			        	parser.parse(is, new MixedMediaDbFeedParser(transClone, taskEventListener));
-					}
-			        catch (SAXException e) {
-						throw new HttpStreamHandlerException(e);
-					} catch (ParserConfigurationException e) {
-						throw new HttpStreamHandlerException(e);
-					} catch (IOException e) {
-						throw new HttpStreamHandlerException(e);
-					}
-					thereWereErrors = false;
-				}
-				catch (DbException e) {
-					throw new HttpStreamHandlerException(e);
-				} catch (MorriganException e) {
-					throw new HttpStreamHandlerException(e);
-				}
-				finally {
-					if (transClone != null) {
-						try {
-							transClone.completeBulkUpdate(thereWereErrors);
-						} catch (DbException e) {
-							throw new HttpStreamHandlerException(e);
-						} catch (MorriganException e) {
-							throw new HttpStreamHandlerException(e);
-						} finally {
-							try {
-								if (thereWereErrors) {
-									transClone.rollback();
-								}
-								else {
-									transClone.commitOrRollback();
-								}
-							} catch (DbException e) {
-								throw new HttpStreamHandlerException(e);
-							}
-							finally {
-								transClone.dispose();
-							}
-						}
-					}
-				}
-			}
-		};
-		
-		try {
-			// We want to request the items for this list.
-			String surl = mmdb.getUrl().toString() + "/" + MlistsServlet.PATH_ITEMS;
-			URL url = new URL(surl);
-			
-			HttpResponse response = HttpClient.getHttpClient().doHttpRequest(url, httpStreamHandler);
-			if (response.getCode() != 200) {
-				throw new MorriganException("After fetching remote MMDB response code was " + response.getCode() + " (expected 200).");
-			}
-		}
-		catch (IOException e) {
-			if (e instanceof UnknownHostException) {
-				throw new MorriganException("Host unknown.", e);
-			} else if (e instanceof SocketException) {
-				throw new MorriganException("Host unreachable.", e);
-			} else {
-				throw new MorriganException(e);
-			}
-		} catch (HttpStreamHandlerException e) {
-			throw new MorriganException(e);
-		}
-		
-		if (taskEventListener!=null) taskEventListener.done();
-	}
-	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private final IRemoteMixedMediaDb rmmdb;
 	private final TaskEventListener taskEventListener;
 	private final Stack<String> stack;
 	
-	public MixedMediaDbFeedParser(IRemoteMixedMediaDb rmmdb, TaskEventListener taskEventListener) {
+	MixedMediaDbFeedParser(IRemoteMixedMediaDb rmmdb, TaskEventListener taskEventListener) {
 		this.taskEventListener = taskEventListener;
 		this.stack = new Stack<String>();
 		this.rmmdb = rmmdb; 
