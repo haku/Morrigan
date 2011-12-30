@@ -245,10 +245,13 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 			counts.setTextSize(TypedValue.COMPLEX_UNIT_PT, 8);
 			header.addView(counts);
 			
-			TextView tags = new TextView(MlistActivity.this);
-			tags.setText(StringHelper.implode(mlistItem.getTags(), ", ")); // TODO set max length?
-			tags.setTextSize(TypedValue.COMPLEX_UNIT_PT, 8);
-			header.addView(tags);
+			String[] tarArr = mlistItem.getTags();
+			if (tarArr != null && tarArr.length > 0) {
+				TextView tags = new TextView(MlistActivity.this);
+				tags.setText(StringHelper.implode(tarArr, ", ")); // TODO set max length?
+				tags.setTextSize(TypedValue.COMPLEX_UNIT_PT, 8);
+				header.addView(tags);
+			}
 			
 			menu.setHeaderView(header);
 			menu.add(Menu.NONE, MENU_CTX_PLAY, Menu.NONE, "Play now");
