@@ -36,6 +36,7 @@ public class MlistItemBasicImpl implements MlistItem {
 	private int duration;
 	private int startCount;
 	private int endCount;
+	private String[] tags;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -144,6 +145,14 @@ public class MlistItemBasicImpl implements MlistItem {
 	}
 	public void setEndCount(int endCount) {
 		this.endCount = endCount;
+	}
+	
+	@Override
+	public String[] getTags () {
+		return this.tags;
+	}
+	public void setTags (String[] tags) {
+		this.tags = tags;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -20,14 +20,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-
 
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -43,8 +44,13 @@ import com.vaguehope.morrigan.android.model.MlistItemList;
 
 public class MlistItemListImpl implements MlistItemList, ContentHandler {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	private static final String ENTRY = "entry";
+	
+	private static final String LINK = "link";
+	private static final String REL = "rel";
+	private static final String SELF = "self";
+	private static final String HREF = "href";
 	
 	public static final String TITLE = "title";
 	public static final String TYPE = "type";
@@ -54,6 +60,9 @@ public class MlistItemListImpl implements MlistItemList, ContentHandler {
 	public static final String HASHCODE = "hash";
 	public static final String ENABLED = "enabled";
 	public static final String MISSING = "missing";
+	public static final String TAG = "tag";
+	
+	private static final String MANUAL_TAG = "0";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -103,36 +112,52 @@ public class MlistItemListImpl implements MlistItemList, ContentHandler {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	private static final Map<String, String> EMPTY_MAP = Collections.unmodifiableMap(new HashMap<String, String>());
+	
 	private final Stack<String> stack = new Stack<String>();
+	private final Stack<Map<String, String>> currentAttributes = new Stack<Map<String,String>>();
 	private StringBuilder currentText;
 	private MlistItemBasicImpl currentItem;
+	private List<String> currentTags;
 	
 	@Override
-	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+	public void startElement(String uri, String localName, String qName, Attributes attr) throws SAXException {
 		this.stack.push(localName);
+		Map<String, String> atMap = EMPTY_MAP;
 		
 		if (this.stack.size() == 2 && localName.equals(ENTRY)) {
 			this.currentItem = new MlistItemBasicImpl();
 		}
-		else if (this.stack.size() == 3 && localName.equals("link")) {
-			String relVal = attributes.getValue("rel");
-			if (relVal != null && relVal.equals("self")) {
-				String hrefVal = attributes.getValue("href");
+		else if (this.stack.size() == 3 && localName.equals(LINK)) {
+			String relVal = attr.getValue(REL);
+			if (relVal != null && relVal.equals(SELF)) {
+				String hrefVal = attr.getValue(HREF);
 				if (hrefVal != null && hrefVal.length() > 0) {
 					this.currentItem.setRelativeUrl(hrefVal);
 				}
 			}
+		}
+		else if (attr.getLength() > 0 && this.stack.size() == 3 && localName.equals(TAG)) {
+			atMap = new HashMap<String, String>();
+			for (int i = 0; i < attr.getLength(); i++) atMap.put(attr.getLocalName(i), attr.getValue(i));
 		}
 		
 		// If we need a new StringBuilder, make one.
 		if (this.currentText == null || this.currentText.length() > 0) {
 			this.currentText = new StringBuilder();
 		}
+		this.currentAttributes.push(atMap);
 	}
 	
 	@Override
 	public void endElement(String uri, String localName, String qName) throws SAXException {
+		Map<String, String> attr = this.currentAttributes.pop();
+		
 		if (this.stack.size() == 2 && localName.equals(ENTRY)) {
+			if (this.currentTags != null) {
+				this.currentItem.setTags(this.currentTags.toArray(new String[this.currentTags.size()]));
+				this.currentTags = null;
+			}
 			this.mlistItemList.add(this.currentItem);
 			this.currentItem = null;
 		}
@@ -167,14 +192,19 @@ public class MlistItemListImpl implements MlistItemList, ContentHandler {
 			boolean v = Boolean.parseBoolean(this.currentText.toString());
 			this.currentItem.setMissing(v);
 		}
+		else if (this.stack.size() == 3 && localName.equals(TAG)) {
+			if (MANUAL_TAG.equals(attr.get("t")) && "".equals(attr.get("c"))) {
+				if (this.currentTags == null) this.currentTags = new LinkedList<String>();
+				this.currentTags.add(this.currentText.toString());
+			}
+		}
 		
 		this.stack.pop();
 	}
 	
-	
 	@Override
 	public void characters(char[] ch, int start, int length) throws SAXException {
-        this.currentText.append( ch, start, length );
+		this.currentText.append( ch, start, length );
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
