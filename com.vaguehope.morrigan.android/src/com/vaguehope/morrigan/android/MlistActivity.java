@@ -22,6 +22,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
@@ -34,6 +35,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -227,7 +229,22 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 		public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 			AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
 			MlistItem mlistItem = MlistActivity.this.mlistItemListAdapter.getInputData().getMlistItemList().get(info.position);
-			menu.setHeaderTitle(mlistItem.getTitle());
+			
+			LinearLayout header = new LinearLayout(MlistActivity.this);
+			header.setOrientation(LinearLayout.VERTICAL);
+			header.setPadding(10, 10, 10, 10);
+			
+			TextView title = new TextView(MlistActivity.this);
+			title.setText(mlistItem.getFileName());
+			title.setTextSize(TypedValue.COMPLEX_UNIT_PT, 10);
+			header.addView(title);
+			
+			TextView counts = new TextView(MlistActivity.this);
+			counts.setText(mlistItem.getStartCount() + "/" + mlistItem.getEndCount() + " " + TimeHelper.formatTimeSeconds(mlistItem.getDuration()));
+			title.setTextSize(TypedValue.COMPLEX_UNIT_PT, 8);
+			header.addView(counts);
+			
+			menu.setHeaderView(header);
 			menu.add(Menu.NONE, MENU_CTX_PLAY, Menu.NONE, "Play now");
 			menu.add(Menu.NONE, MENU_CTX_QUEUE, Menu.NONE, "Queue");
 			menu.add(Menu.NONE, MENU_CTX_DOWNLOAD, Menu.NONE, "Download");
