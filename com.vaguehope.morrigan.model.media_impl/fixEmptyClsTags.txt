@@ -1,0 +1,22 @@
+PRAGMA foreign_keys = ON;
+
+/* Check problem exists. */
+
+SELECT id FROM tbl_tag_cls WHERE cls = "";
+
+/* Note down these counts. */
+
+SELECT count(*) FROM tbl_tags WHERE cls_id = (SELECT id FROM tbl_tag_cls WHERE cls = "");
+
+SELECT count(t1.tag)
+ FROM tbl_tags AS t1, tbl_tags AS t2
+ WHERE t1.tag = t2.tag
+  AND t1.mf_id = t2.mf_id
+  AND t1.cls_id IS NULL
+  AND t2.cls_id = (SELECT id FROM tbl_tag_cls WHERE cls = "")
+ ;
+
+/* If above counts match, use these commands to fix. */
+
+DELETE FROM tbl_tags WHERE cls_id = (SELECT id FROM tbl_tag_cls WHERE cls = "");
+DELETE FROM tbl_tag_cls WHERE cls = "";
