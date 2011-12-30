@@ -21,6 +21,8 @@ import com.vaguehope.morrigan.android.helper.HttpHelper.HttpCreds;
 public interface ServerReference extends Artifact, HttpCreds {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	public String getName ();
+	
 	public String getBaseUrl ();
 	
 	@Override

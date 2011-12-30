@@ -46,6 +46,7 @@ import com.vaguehope.morrigan.android.model.MlistItemListChangeListener;
 import com.vaguehope.morrigan.android.model.MlistReference;
 import com.vaguehope.morrigan.android.model.MlistState;
 import com.vaguehope.morrigan.android.model.MlistStateChangeListener;
+import com.vaguehope.morrigan.android.model.PlayerReference;
 import com.vaguehope.morrigan.android.model.PlayerState;
 import com.vaguehope.morrigan.android.model.ServerReference;
 import com.vaguehope.morrigan.android.model.impl.ArtifactListAdaptorImpl;
@@ -78,7 +79,7 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 	private MlistState currentState = null;
 	private MlistItemList currentItemList = null;
 	private String initialQuery = null;
-	protected PlayerReferenceImpl playerReference;
+	protected PlayerReference playerReference;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Activity methods.
@@ -412,7 +413,7 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 			finish(); // TODO show a msg here? Retry / Fail dlg?
 		}
 		else {
-			this.setTitle(newState.getTitle());
+			this.setTitle(this.serverReference.getName() + " / " + newState.getTitle());
 			
 			TextView txtCount = (TextView) findViewById(R.id.txtTitle);
 			txtCount.setText(newState.getCount() + " items, "

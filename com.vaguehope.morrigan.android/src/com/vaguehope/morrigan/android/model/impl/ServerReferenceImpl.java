@@ -24,25 +24,30 @@ public class ServerReferenceImpl implements ServerReference {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private int dbId;
+	private final String name;
 	private final String baseUrl;
 	private final String pass;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public ServerReferenceImpl (String baseUrl, String pass) {
-		this(Integer.MIN_VALUE, baseUrl, pass);
+	public ServerReferenceImpl (String name, String baseUrl, String pass) {
+		this(Integer.MIN_VALUE, name, baseUrl, pass);
 	}
 	
-	public ServerReferenceImpl (int dbId, String baseUrl, String pass) {
-		if (baseUrl == null) throw new IllegalArgumentException();
-		
+	public ServerReferenceImpl (int dbId, String name, String baseUrl, String pass) {
 		this.dbId = dbId;
+		this.name = name;
 		this.baseUrl = baseUrl;
 		this.pass = pass;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	ServerReference methods.
+	
+	@Override
+	public String getName () {
+		return this.name;
+	}
 	
 	@Override
 	public String getBaseUrl () {
@@ -65,7 +70,7 @@ public class ServerReferenceImpl implements ServerReference {
 	
 	@Override
 	public String getTitle () {
-		return getBaseUrl();
+		return getName();
 	}
 	
 	@Override

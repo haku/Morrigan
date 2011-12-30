@@ -72,7 +72,7 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 		else {
 			finish();
 		}
-		this.setTitle(this.serverReference.getBaseUrl());
+		this.setTitle(this.serverReference.getName());
 		
 		// TODO check return value.
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
