@@ -28,7 +28,7 @@ import com.vaguehope.morrigan.android.model.Artifact;
 import com.vaguehope.morrigan.android.model.PlayerQueue;
 import com.vaguehope.morrigan.android.model.PlayerQueueChangeListener;
 import com.vaguehope.morrigan.android.model.PlayerReference;
-import com.vaguehope.morrigan.android.model.impl.PlayerQueueImpl;
+import com.vaguehope.morrigan.android.modelimpl.PlayerQueueImpl;
 
 import android.app.Activity;
 

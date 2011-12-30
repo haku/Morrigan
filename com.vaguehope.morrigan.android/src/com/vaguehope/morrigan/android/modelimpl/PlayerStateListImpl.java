@@ -14,11 +14,10 @@
  * under the License.
  */
 
-package com.vaguehope.morrigan.android.model.impl;
+package com.vaguehope.morrigan.android.modelimpl;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigInteger;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -27,6 +26,7 @@ import java.util.Stack;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+
 
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -37,33 +37,21 @@ import org.xml.sax.XMLReader;
 
 import com.vaguehope.morrigan.android.model.Artifact;
 import com.vaguehope.morrigan.android.model.ArtifactList;
-import com.vaguehope.morrigan.android.model.PlayerQueue;
-import com.vaguehope.morrigan.android.model.PlayerReference;
+import com.vaguehope.morrigan.android.model.PlayState;
+import com.vaguehope.morrigan.android.model.PlayerState;
+import com.vaguehope.morrigan.android.model.PlayerStateList;
+import com.vaguehope.morrigan.android.model.ServerReference;
 
-public class PlayerQueueImpl implements PlayerQueue, ContentHandler {
+public class PlayerStateListImpl implements PlayerStateList, ContentHandler {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private static final String ENTRY = "entry";
-	private static final String TITLE = "title";
-	private static final String LISTREL = "list";
-	private static final String ITEMREL = "item";
-	private static final String ID = "id";
-	private static final String HASH = "hash";
-	private static final String ENABLED = "enabled";
-	private static final String MISSING = "missing";
-	private static final String DURATION = "duration";
-	private static final String STARTCOUNT = "startcount";
-	private static final String ENDCOUNT = "endcount";
+	private final List<PlayerState> playerStateList = new LinkedList<PlayerState>();
+	private final ServerReference serverReference;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private final List<Artifact> artifactList = new LinkedList<Artifact>();
-	private final PlayerReference playerReference;
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	public PlayerQueueImpl (InputStream dataIs, PlayerReference playerReference) throws SAXException {
-		this.playerReference = playerReference;
+	public PlayerStateListImpl (InputStream dataIs, ServerReference serverReference) throws SAXException {
+		this.serverReference = serverReference;
 		
 		SAXParserFactory spf = SAXParserFactory.newInstance();
         SAXParser sp;
@@ -86,47 +74,35 @@ public class PlayerQueueImpl implements PlayerQueue, ContentHandler {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
+	public List<PlayerState> getPlayersStateList() {
+		return Collections.unmodifiableList(this.playerStateList);
+	}
+	
+	@Override
 	public List<? extends Artifact> getArtifactList() {
-		return Collections.unmodifiableList(this.artifactList);
+		return Collections.unmodifiableList(this.playerStateList);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private final Stack<String> stack = new Stack<String>();
 	private StringBuilder currentText;
-	
-	private String currentTitle = null;
-	private String currentListRelativeUrl = null;
-	private String currentItemRelativeUrl = null;
-	private int currentId;
-	private BigInteger currentHash = null;
-	private boolean currentEnabled;
-	private boolean currentMissing;
-	private int currentDuration;
-	private int currentStartCount;
-	private int currentEndCount;
+	private PlayerStateBasicImpl currentItem;
 	
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 		this.stack.push(localName);
 		
-		if (this.stack.size() == 2 && localName.equals(ENTRY)) {
-			this.currentTitle = null;
-			this.currentListRelativeUrl = null;
-			this.currentItemRelativeUrl = null;
+		if (this.stack.size() == 2 && localName.equals("entry")) {
+			this.currentItem = new PlayerStateBasicImpl();
 		}
 		else if (this.stack.size() == 3 && localName.equals("link")) {
 			String relVal = attributes.getValue("rel");
-			if (relVal != null && relVal.equals(ITEMREL)) {
+			if (relVal != null && relVal.equals("self")) {
 				String hrefVal = attributes.getValue("href");
 				if (hrefVal != null && hrefVal.length() > 0) {
-					this.currentItemRelativeUrl = hrefVal;
-				}
-			}
-			else if (relVal != null && relVal.equals(LISTREL)) {
-				String hrefVal = attributes.getValue("href");
-				if (hrefVal != null && hrefVal.length() > 0) {
-					this.currentListRelativeUrl = hrefVal;
+					// Log.d("Morrigan", "hrefVal=" + hrefVal); // e.g. '/players/0'.
+					this.currentItem.setBaseUrl(this.serverReference.getBaseUrl() + hrefVal);
 				}
 			}
 		}
@@ -139,66 +115,53 @@ public class PlayerQueueImpl implements PlayerQueue, ContentHandler {
 	
 	@Override
 	public void endElement(String uri, String localName, String qName) throws SAXException {
-		if (this.stack.size() == 2 && localName.equals(ENTRY)) {
-			if (this.currentItemRelativeUrl != null) {
-				MlistItemBasicImpl item = new MlistItemBasicImpl();
-				item.setTrackTitle(this.currentTitle);
-				item.setRelativeUrl(this.currentItemRelativeUrl);
-				item.setType(1); // TODO reference an enum?
-				item.setId(this.currentId);
-				item.setHashCode(this.currentHash);
-				item.setEnabled(this.currentEnabled);
-				item.setMissing(this.currentMissing);
-				item.setDuration(this.currentDuration);
-				item.setStartCount(this.currentStartCount);
-				item.setEndCount(this.currentEndCount);
-				this.artifactList.add(item);
-			}
-			else {
-				MlistStateBasicImpl list = new MlistStateBasicImpl();
-				list.setTitle(this.currentTitle);
-				list.setBaseUrl(this.playerReference.getServerReference().getBaseUrl() + this.currentListRelativeUrl);
-				list.setId(this.currentId);
-				
-				this.artifactList.add(list);
-			}
+		if (this.stack.size() == 2 && localName.equals("entry")) {
+			this.playerStateList.add(this.currentItem);
+			this.currentItem = null;
 		}
-		else if (this.stack.size() == 3 && localName.equals(TITLE)) {
-			this.currentTitle = this.currentText.toString();
-		}
-		else if (this.stack.size() == 3 && localName.equals(ID)) {
+		else if (this.stack.size() == 3 && localName.equals(PlayerStateXmlImpl.PLAYERID)) {
 			int v = Integer.parseInt(this.currentText.toString());
-			this.currentId = v;
+			this.currentItem.setId(v);
+			this.currentItem.setPlayerReference(new PlayerReferenceImpl(this.serverReference, v));
 		}
-		else if (this.stack.size() == 3 && localName.equals(HASH)) {
-			BigInteger v = new BigInteger(this.currentText.toString(), 16);
-			this.currentHash = v;
-		}
-		else if (this.stack.size() == 3 && localName.equals(ENABLED)) {
-			boolean v = Boolean.parseBoolean(this.currentText.toString());
-			this.currentEnabled = v;
-			
-		}
-		else if (this.stack.size() == 3 && localName.equals(MISSING)) {
-			boolean v = Boolean.parseBoolean(this.currentText.toString());
-			this.currentMissing = v;
-		}
-		else if (this.stack.size() == 3 && localName.equals(DURATION)) {
+		else if (this.stack.size() == 3 && localName.equals(PlayerStateXmlImpl.PLAYSTATE)) {
 			int v = Integer.parseInt(this.currentText.toString());
-			this.currentDuration = v;
+			this.currentItem.setPlayState(PlayState.parseN(v));
 		}
-		else if (this.stack.size() == 3 && localName.equals(STARTCOUNT)) {
+		else if (this.stack.size() == 3 && localName.equals(PlayerStateXmlImpl.PLAYORDER)) {
 			int v = Integer.parseInt(this.currentText.toString());
-			this.currentStartCount = v;
+			this.currentItem.setPlayOrder(v);
 		}
-		else if (this.stack.size() == 3 && localName.equals(ENDCOUNT)) {
+		else if (this.stack.size() == 3 && localName.equals(PlayerStateXmlImpl.QUEUELENGTH)) {
 			int v = Integer.parseInt(this.currentText.toString());
-			this.currentEndCount = v;
+			this.currentItem.setQueueLength(v);
+		}
+//		else if (this.stack.size() == 3 && localName.equals(PlayerStateParser.QUEUEDURATION)) {
+//			TODO
+//		}
+		else if (this.stack.size() == 3 && localName.equals(PlayerStateXmlImpl.LISTTITLE)) {
+			this.currentItem.setListTitle(this.currentText.toString());
+		}
+		else if (this.stack.size() == 3 && localName.equals(PlayerStateXmlImpl.LISTID)) {
+			this.currentItem.setListId(this.currentText.toString());
+		}
+		else if (this.stack.size() == 3 && localName.equals(PlayerStateXmlImpl.TRACKTITLE)) {
+			this.currentItem.setTrackTitle(this.currentText.toString());
+		}
+		else if (this.stack.size() == 3 && localName.equals(PlayerStateXmlImpl.PLAYPOSITION)) {
+			int v = Integer.parseInt(this.currentText.toString());
+			this.currentItem.setPlayerPosition(v);
+		}
+		else if (this.stack.size() == 3 && localName.equals(PlayerStateXmlImpl.TRACKFILE)) {
+			this.currentItem.setTrackFile(this.currentText.toString());
+		}
+		else if (this.stack.size() == 3 && localName.equals(PlayerStateXmlImpl.TRACKDURATION)) {
+			int v = Integer.parseInt(this.currentText.toString());
+			this.currentItem.setTrackDuration(v);
 		}
 		
 		this.stack.pop();
 	}
-	
 	
 	@Override
 	public void characters(char[] ch, int start, int length) throws SAXException {
@@ -228,7 +191,7 @@ public class PlayerQueueImpl implements PlayerQueue, ContentHandler {
 	
 	@Override
 	public String getSortKey() {
-		return ""; // This should never be relevant.
+		return "1";
 	}
 	
 	@Override

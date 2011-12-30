@@ -24,7 +24,7 @@ import com.vaguehope.morrigan.android.model.Artifact;
 import com.vaguehope.morrigan.android.model.ArtifactList;
 import com.vaguehope.morrigan.android.model.ServerReference;
 import com.vaguehope.morrigan.android.model.ServerReferenceList;
-import com.vaguehope.morrigan.android.model.impl.ServerReferenceImpl;
+import com.vaguehope.morrigan.android.modelimpl.ServerReferenceImpl;
 
 import android.content.ContentValues;
 import android.content.Context;

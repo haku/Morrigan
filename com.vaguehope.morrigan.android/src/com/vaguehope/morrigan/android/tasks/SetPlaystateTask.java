@@ -26,7 +26,7 @@ import com.vaguehope.morrigan.android.helper.HttpHelper.HttpCreds;
 import com.vaguehope.morrigan.android.model.PlayerReference;
 import com.vaguehope.morrigan.android.model.PlayerState;
 import com.vaguehope.morrigan.android.model.PlayerStateChangeListener;
-import com.vaguehope.morrigan.android.model.impl.PlayerStateXmlImpl;
+import com.vaguehope.morrigan.android.modelimpl.PlayerStateXmlImpl;
 
 import android.app.Activity;
 

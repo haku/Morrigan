@@ -26,7 +26,7 @@ import com.vaguehope.morrigan.android.helper.HttpHelper.HttpCreds;
 import com.vaguehope.morrigan.android.model.MlistReference;
 import com.vaguehope.morrigan.android.model.MlistState;
 import com.vaguehope.morrigan.android.model.MlistStateChangeListener;
-import com.vaguehope.morrigan.android.model.impl.MlistStateXmlImpl;
+import com.vaguehope.morrigan.android.modelimpl.MlistStateXmlImpl;
 
 import android.app.Activity;
 

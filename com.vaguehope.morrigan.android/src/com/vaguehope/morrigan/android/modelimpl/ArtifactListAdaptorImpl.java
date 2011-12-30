@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package com.vaguehope.morrigan.android.model.impl;
+package com.vaguehope.morrigan.android.modelimpl;
 
 import com.vaguehope.morrigan.android.R;
 import com.vaguehope.morrigan.android.model.Artifact;

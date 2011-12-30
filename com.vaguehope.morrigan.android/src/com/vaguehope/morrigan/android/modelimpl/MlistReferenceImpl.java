@@ -14,40 +14,28 @@
  * under the License.
  */
 
-package com.vaguehope.morrigan.android.model.impl;
+package com.vaguehope.morrigan.android.modelimpl;
 
-import com.vaguehope.morrigan.android.Constants;
-import com.vaguehope.morrigan.android.R;
-import com.vaguehope.morrigan.android.model.PlayerReference;
+import com.vaguehope.morrigan.android.model.MlistReference;
 import com.vaguehope.morrigan.android.model.ServerReference;
 
-public class PlayerReferenceImpl implements PlayerReference {
+public class MlistReferenceImpl implements MlistReference {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private final int playerId;
 	private final String baseUrl;
 	private final ServerReference serverReference;
-	private final String title;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public PlayerReferenceImpl (ServerReference serverReference, int playerId) {
+	public MlistReferenceImpl (String baseUrl, ServerReference serverReference) {
+		if (baseUrl == null) throw new IllegalArgumentException();
 		if (serverReference == null) throw new IllegalArgumentException();
 		
-		this.playerId = playerId;
-		this.baseUrl = serverReference.getBaseUrl() + Constants.CONTEXT_PLAYERS + "/" + playerId;
+		this.baseUrl = baseUrl;
 		this.serverReference = serverReference;
-		
-		this.title = this.serverReference.getName() + " / player " + this.playerId;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	PlayerReference
-	
-	@Override
-	public int getPlayerId() {
-		return this.playerId;
-	}
 	
 	@Override
 	public String getBaseUrl() {
@@ -57,21 +45,6 @@ public class PlayerReferenceImpl implements PlayerReference {
 	@Override
 	public ServerReference getServerReference() {
 		return this.serverReference;
-	}
-
-	@Override
-	public int getId () {
-		return getPlayerId();
-	}
-
-	@Override
-	public String getTitle () {
-		return this.title;
-	}
-
-	@Override
-	public int getImageResource () {
-		return R.drawable.play;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
