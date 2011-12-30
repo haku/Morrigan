@@ -147,7 +147,7 @@ public class ServersActivity extends Activity {
 				}
 				dialog.dismiss();
 				
-				ServersActivity.this.configDb.addServer(new ServerReferenceImpl(dlg.getUrl(), dlg.getPass()));
+				ServersActivity.this.configDb.addServer(new ServerReferenceImpl(dlg.getName(), dlg.getUrl(), dlg.getPass()));
 				ServersActivity.this.serversListAdapter.notifyDataSetChanged();
 			}
 		});
@@ -165,7 +165,7 @@ public class ServersActivity extends Activity {
 				}
 				dialog.dismiss();
 				
-				ServersActivity.this.configDb.updateServer(new ServerReferenceImpl(ref.getId(), dlg.getUrl(), dlg.getPass()));
+				ServersActivity.this.configDb.updateServer(new ServerReferenceImpl(ref.getId(), dlg.getName(), dlg.getUrl(), dlg.getPass()));
 				ServersActivity.this.serversListAdapter.notifyDataSetChanged();
 			}
 		});
@@ -197,6 +197,7 @@ public class ServersActivity extends Activity {
 	static class ServerDlg {
 		
 		private final AlertDialog.Builder bldr;
+		private final EditText txtName;
 		private final EditText txtUrl;
 		private final EditText txtPass;
 		
@@ -208,7 +209,12 @@ public class ServersActivity extends Activity {
 			this.bldr = new AlertDialog.Builder(context);
 			this.bldr.setTitle("Server");
 			
+			this.txtName = new EditText(context);
+			this.txtName.setHint("name");
+			if (ref != null) this.txtName.setText(ref.getName());
+			
 			this.txtUrl = new EditText(context);
+			this.txtUrl.setHint("url");
 			this.txtUrl.setText(ref != null ? ref.getBaseUrl() : "http://host:8080");
 			
 			this.txtPass = new EditText(context);
@@ -217,6 +223,7 @@ public class ServersActivity extends Activity {
 			
 			LinearLayout layout = new LinearLayout(context);
 			layout.setOrientation(LinearLayout.VERTICAL);
+			layout.addView(this.txtName);
 			layout.addView(this.txtUrl);
 			layout.addView(this.txtPass);
 			this.bldr.setView(layout);
@@ -234,9 +241,17 @@ public class ServersActivity extends Activity {
 		}
 		
 		public boolean isSet () {
+			String name = getName();
 			String url = getUrl();
 			String pass = getPass();
-			return (url != null && url.length() > 0 && pass != null && pass.length() > 0);
+			return (name != null && name.length() > 0
+					&& url != null && url.length() > 0
+					&& pass != null && pass.length() > 0
+					);
+		}
+		
+		public String getName () {
+			return this.txtName.getText().toString().trim();
 		}
 		
 		public String getUrl () {

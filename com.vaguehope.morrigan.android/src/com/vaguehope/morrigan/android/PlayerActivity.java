@@ -102,7 +102,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 			finish();
 		}
 		
-		this.setTitle(this.playerReference.getBaseUrl());
+		this.setTitle(this.playerReference.getTitle());
 		
 		// TODO check return value.
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
