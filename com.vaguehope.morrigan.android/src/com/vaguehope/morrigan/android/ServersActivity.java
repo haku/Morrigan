@@ -47,6 +47,11 @@ import com.vaguehope.morrigan.android.state.ConfigDb;
 public class ServersActivity extends Activity {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	private static final int MENU_EDIT = 1;
+	private static final int MENU_DELETE = 2;
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
 	ConfigDb configDb;
 	ArtifactListAdaptor<ServerReferenceList> serversListAdapter;
 	
@@ -100,8 +105,8 @@ public class ServersActivity extends Activity {
 			AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
 			ServerReference item = ServersActivity.this.serversListAdapter.getInputData().getServerReferenceList().get(info.position);
 			menu.setHeaderTitle(item.getBaseUrl());
-			menu.add(Menu.NONE, 1, Menu.NONE, "Edit");
-			menu.add(Menu.NONE, 2, Menu.NONE, "Remove");
+			menu.add(Menu.NONE, MENU_EDIT, Menu.NONE, "Edit");
+			menu.add(Menu.NONE, MENU_DELETE, Menu.NONE, "Remove");
 		}
 	};
 	
@@ -111,13 +116,13 @@ public class ServersActivity extends Activity {
 		ServerReference ref;
 		
 		switch (item.getItemId()) {
-			case 1: // Delete.
+			case MENU_EDIT:
 				info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
 				ref = ServersActivity.this.serversListAdapter.getInputData().getServerReferenceList().get(info.position);
 				editServer(ref);
 				return true;
 				
-			case 2: // Delete.
+			case MENU_DELETE:
 				info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
 				ref = ServersActivity.this.serversListAdapter.getInputData().getServerReferenceList().get(info.position);
 				deleteServer(ref);
@@ -166,12 +171,27 @@ public class ServersActivity extends Activity {
 		});
 		dlg.show();
 	}
-	protected void deleteServer (ServerReference sr) {
+	protected void deleteServer (final ServerReference sr) {
+		final AlertDialog.Builder dlgBuilder = new AlertDialog.Builder(this);
+		dlgBuilder.setMessage("Delete: " + sr.getTitle());
 		
-		ServersActivity.this.configDb.removeServer(sr);
-		ServersActivity.this.serversListAdapter.notifyDataSetChanged();
+		dlgBuilder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick (DialogInterface dialog, int which) {
+				ServersActivity.this.configDb.removeServer(sr);
+				ServersActivity.this.serversListAdapter.notifyDataSetChanged();
+				Toast.makeText(ServersActivity.this, "Removed: " + sr.getBaseUrl(), Toast.LENGTH_SHORT).show();
+			}
+		});
 		
-		Toast.makeText(this, "Removed: " + sr.getBaseUrl(), Toast.LENGTH_SHORT).show();
+		dlgBuilder.setNegativeButton("Keep", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int whichButton) {
+				dialog.cancel();
+			}
+		});
+		
+		dlgBuilder.show();
 	}
 	
 	static class ServerDlg {
