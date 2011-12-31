@@ -413,7 +413,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 				txtTags.setText(StringHelper.implode(tagArr, ", ")); // TODO set max length?
 			}
 			else {
-				txtTags.setText("(no tags)");
+				txtTags.setText("(click to add tags)");
 			}
 			
 			TextView txtQueue = (TextView) findViewById(R.id.txtQueue);
