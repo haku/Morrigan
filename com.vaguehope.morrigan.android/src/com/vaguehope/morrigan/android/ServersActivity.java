@@ -104,7 +104,7 @@ public class ServersActivity extends Activity {
 		public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 			AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
 			ServerReference item = ServersActivity.this.serversListAdapter.getInputData().getServerReferenceList().get(info.position);
-			menu.setHeaderTitle(item.getBaseUrl());
+			menu.setHeaderTitle(item.getName());
 			menu.add(Menu.NONE, MENU_EDIT, Menu.NONE, "Edit");
 			menu.add(Menu.NONE, MENU_DELETE, Menu.NONE, "Remove");
 		}

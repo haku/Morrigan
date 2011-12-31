@@ -209,6 +209,12 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference, Mlist
 	}
 	
 	@Override
+	public String[] getTrackTags () {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Not implemented.");
+	}
+	
+	@Override
 	public String getListTitle() {
 		return this.listTitle;
 	}

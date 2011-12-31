@@ -42,6 +42,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.vaguehope.morrigan.android.helper.StringHelper;
 import com.vaguehope.morrigan.android.helper.TimeHelper;
 import com.vaguehope.morrigan.android.model.Artifact;
 import com.vaguehope.morrigan.android.model.ArtifactListAdaptor;
@@ -373,15 +374,25 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 				this.mlistReference = null;
 			}
 			
-			TextView txtListname = (TextView) findViewById(R.id.txtListname);
-			txtListname.setText(newState.getListTitle());
-			
 			TextView txtTitle = (TextView) findViewById(R.id.txtTitle);
 			if (newState.getTrackDuration() > 0) {
-				txtTitle.setText(newState.getTrackTitle() + " (" + TimeHelper.formatTimeSeconds(newState.getTrackDuration()) + ")");
+				txtTitle.setText(
+						newState.getListTitle() + " / "
+						+ newState.getTrackTitle() + " ("
+						+ TimeHelper.formatTimeSeconds(newState.getTrackDuration()) + ")"
+						);
 			}
 			else {
 				txtTitle.setText(newState.getTrackTitle());
+			}
+			
+			TextView txtTags = (TextView) findViewById(R.id.txtTags);
+			String[] tagArr = newState.getTrackTags();
+			if (tagArr != null && tagArr.length > 0) {
+				txtTags.setText(StringHelper.implode(tagArr, ", ")); // TODO set max length?
+			}
+			else {
+				txtTags.setText("(no tags)");
 			}
 			
 			TextView txtQueue = (TextView) findViewById(R.id.txtQueue);
