@@ -260,7 +260,7 @@ public class MlistsServlet extends HttpServlet {
 			if (tag != null && tag.length() > 0) {
 				mmdb.addTag(item, tag, MediaTagType.MANUAL, (MediaTagClassification)null);
 				resp.setContentType("text/plain");
-				resp.getWriter().println("Tag added desu~");
+				resp.getWriter().println("Tag '" + tag + "' added desu~");
 			}
 			else {
 				ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "'tag' parameter not set desu~");
