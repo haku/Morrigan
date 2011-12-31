@@ -19,9 +19,11 @@ import org.xml.sax.SAXException;
 import com.megginson.sax.DataWriter;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DurationData;
-import com.vaguehope.morrigan.model.media.IMixedMediaDb;
 import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
+import com.vaguehope.morrigan.model.media.IMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
+import com.vaguehope.morrigan.model.media.MediaTagClassification;
+import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaListReference;
@@ -52,6 +54,7 @@ import com.vaguehope.sqlitewrapper.DbException;
  *  GET /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3
  * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 action=play&playerid=0
  * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 action=queue&playerid=0
+ * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 action=addtag&tag=foo
  * 
  *  GET /mlists/LOCALMMDB/example.local.db3/query/example
  * </pre>
@@ -69,6 +72,7 @@ public class MlistsServlet extends HttpServlet {
 	public static final String CMD_SCAN = "scan";
 	public static final String CMD_PLAY = "play";
 	public static final String CMD_QUEUE = "queue";
+	public static final String CMD_ADDTAG = "addtag";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -96,15 +100,13 @@ public class MlistsServlet extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		try {
-    		String act = req.getParameter("action");
-    		if (act == null) {
-    			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-    			resp.setContentType("text/plain");
-    			resp.getWriter().println("HTTP Error 400 'action' parameter not set desu~");
-    		}
-    		else {
-    			processRequest(Verb.POST, req, resp, act);
-    		}
+			String act = req.getParameter("action");
+			if (act == null) {
+				ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "HTTP Error 400 'action' parameter not set desu~");
+			}
+			else {
+				processRequest(Verb.POST, req, resp, act);
+			}
 		}
 		catch (DbException e) {
 			throw new ServletException(e);
@@ -164,91 +166,64 @@ public class MlistsServlet extends HttpServlet {
 						}
 					}
 					else {
-						resp.setContentType("text/plain");
-						resp.getWriter().println("Unknown type '"+type+"' desu~.");
+						ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "Unknown type '"+type+"' desu~.");
 					}
 				}
 				else {
-					resp.setContentType("text/plain");
-					resp.getWriter().println("Invalid request '"+path+"' desu~");
+					ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid request '"+path+"' desu~");
 				}
 			}
 			else {
-				resp.setContentType("text/plain");
-				resp.getWriter().println("Invalid request '"+path+"' desu~");
+				ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid request '"+path+"' desu~");
 			}
 		}
 	}
 	
 	private static void postToRoot(HttpServletResponse resp, String action) throws IOException {
 		if (action.equals(CMD_NEWMMDB)) {
-			resp.setContentType("text/plain");
-			resp.getWriter().println("TODO implement create new MMDB cmd desu~");
+			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "TODO implement create new MMDB cmd desu~");
 		}
 		else {
-			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			resp.setContentType("text/plain");
-			resp.getWriter().println("HTTP error 400 '"+action+"' is not a valid action parameter desu~");
+			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "HTTP error 400 '"+action+"' is not a valid action parameter desu~");
 		}
 	}
 	
 	private static void postToMmdb(HttpServletRequest req, HttpServletResponse resp, String action, IMixedMediaDb mmdb, String path, String afterPath) throws IOException, MorriganException, DbException {
-		if (action.equals(CMD_PLAY) || action.equals(CMD_QUEUE)) {
-			String playerIdS = req.getParameter("playerid");
-			if (playerIdS == null) {
-				resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-				resp.setContentType("text/plain");
-				resp.getWriter().println("HTTP error 400 'playerId' parameter not set desu~");
-			}
-			else {
-				int playerId = Integer.parseInt(playerIdS);
-				IPlayerLocal player = PlayerRegister.getLocalPlayer(playerId);
-				
-				mmdb.read(); // TODO make this call only when needed?  This is a bit catch-all.
-				
-				if (path != null && path.equals(PATH_ITEMS) && afterPath != null && afterPath.length() > 0) {
-					String filepath = URLDecoder.decode(afterPath, "UTF-8");
-					if (mmdb.hasFile(filepath)) {
-						IMixedMediaItem item = mmdb.getByFile(filepath);
-						if (item != null) {
-							resp.setContentType("text/plain");
-							if (action.equals(CMD_PLAY)) {
-								player.loadAndStartPlaying(mmdb, item);
-								resp.getWriter().println("Item playing desu~");
-							}
-							else if (action.equals(CMD_QUEUE)) {
-								player.addToQueue(new PlayItem(mmdb, item));
-								resp.getWriter().println("Item added to queue desu~");
-							}
-							else {
-								throw new IllegalArgumentException("The world has exploded desu~.");
-							}
-						}
-						else {
-							resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-							resp.setContentType("text/plain");
-							resp.getWriter().println("Failed to retrieve file '"+filepath+"' from MMDB when it should have been there desu~.");
-						}
-					}
-					else {
-						resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-						resp.setContentType("text/plain");
-						resp.getWriter().println("HTTP error 404 file '"+filepath+"' not found in MMDB '"+mmdb.getListName()+"' desu~");
-					}
+		if (path != null && path.equals(PATH_ITEMS) && afterPath != null && afterPath.length() > 0) {
+			String filepath = URLDecoder.decode(afterPath, "UTF-8");
+			if (mmdb.hasFile(filepath)) {
+				IMixedMediaItem item = mmdb.getByFile(filepath);
+				if (item != null) {
+					postToMmdbItem(req, resp, action, mmdb, item);
 				}
 				else {
-					resp.setContentType("text/plain");
-					if (action.equals(CMD_PLAY)) {
-						player.loadAndStartPlaying(mmdb);
-						resp.getWriter().println("MMDB playing desu~");
-					}
-					else if (action.equals(CMD_QUEUE)) {
-						player.addToQueue(new PlayItem(mmdb, null));
-						resp.getWriter().println("MMDB added to queue desu~");
-					}
-					else {
-						throw new IllegalArgumentException("The world has exploded desu~.");
-					}
+					ServletHelper.error(resp, HttpServletResponse.SC_NOT_FOUND, "Failed to retrieve file '"+filepath+"' from MMDB when it should have been there desu~.");
+				}
+			}
+			else {
+				ServletHelper.error(resp, HttpServletResponse.SC_NOT_FOUND, "HTTP error 404 file '"+filepath+"' not found in MMDB '"+mmdb.getListName()+"' desu~");
+			}
+		}
+		else {
+			postToMmdb(req, resp, action, mmdb);
+		}
+	}
+	
+	private static void postToMmdb (HttpServletRequest req, HttpServletResponse resp, String action, IMixedMediaDb mmdb) throws IOException {
+		if (action.equals(CMD_PLAY) || action.equals(CMD_QUEUE)) {
+			IPlayerLocal player = parsePlayer(req, resp);
+			if (player != null) { // parsePlayer() will write the error msg.
+				resp.setContentType("text/plain");
+				if (action.equals(CMD_PLAY)) {
+					player.loadAndStartPlaying(mmdb);
+					resp.getWriter().println("MMDB playing desu~");
+				}
+				else if (action.equals(CMD_QUEUE)) {
+					player.addToQueue(new PlayItem(mmdb, null));
+					resp.getWriter().println("MMDB added to queue desu~");
+				}
+				else {
+					throw new IllegalArgumentException("The world has exploded desu~.");
 				}
 			}
 		}
@@ -258,10 +233,52 @@ public class MlistsServlet extends HttpServlet {
 			resp.getWriter().println("Scan scheduled desu~");
 		}
 		else {
-			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			resp.setContentType("text/plain");
-			resp.getWriter().println("HTTP error 400 '"+action+"' is not a valid action parameter desu~");
+			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "HTTP error 400 '"+action+"' is not a valid action parameter desu~");
 		}
+	}
+	
+	private static void postToMmdbItem (HttpServletRequest req, HttpServletResponse resp, String action, IMixedMediaDb mmdb, IMixedMediaItem item) throws IOException, MorriganException {
+		if (action.equals(CMD_PLAY) || action.equals(CMD_QUEUE)) {
+			IPlayerLocal player = parsePlayer(req, resp);
+			if (player != null) { // parsePlayer() will write the error msg.
+				resp.setContentType("text/plain");
+				if (action.equals(CMD_PLAY)) {
+					player.loadAndStartPlaying(mmdb, item);
+					resp.getWriter().println("Item playing desu~");
+				}
+				else if (action.equals(CMD_QUEUE)) {
+					player.addToQueue(new PlayItem(mmdb, item));
+					resp.getWriter().println("Item added to queue desu~");
+				}
+				else {
+					throw new IllegalArgumentException("The world has exploded desu~.");
+				}
+			}
+		}
+		else if (action.equals(CMD_ADDTAG)) {
+			String tag = req.getParameter("tag");
+			if (tag != null && tag.length() > 0) {
+				mmdb.addTag(item, tag, MediaTagType.MANUAL, (MediaTagClassification)null);
+				resp.setContentType("text/plain");
+				resp.getWriter().println("Tag added desu~");
+			}
+			else {
+				ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "'tag' parameter not set desu~");
+			}
+		}
+		else {
+			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "HTTP error 400 '"+action+"' is not a valid action parameter desu~");
+		}
+	}
+	
+	private static IPlayerLocal parsePlayer (HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		String playerIdS = req.getParameter("playerid");
+		if (playerIdS == null) {
+			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "HTTP error 400 'playerId' parameter not set desu~");
+			return null;
+		}
+		int playerId = Integer.parseInt(playerIdS);
+		return PlayerRegister.getLocalPlayer(playerId);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -315,18 +332,12 @@ public class MlistsServlet extends HttpServlet {
 							resp.flushBuffer();
 						}
 						else { // OK give up - no idea where this file is supposed to be.
-							resp.reset();
-							resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-							resp.setContentType("text/plain");
-							resp.getWriter().println("HTTP error 404 '"+filepath+"' in list but not availabe desu~");
+							ServletHelper.error(resp, HttpServletResponse.SC_NOT_FOUND, "HTTP error 404 '"+filepath+"' in list but not availabe desu~");
 						}
 					}
 				}
 				else {
-					resp.reset();
-					resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-					resp.setContentType("text/plain");
-					resp.getWriter().println("HTTP error 404 '"+filepath+"' is not in '"+mmdb.getListId()+"' desu~");
+					ServletHelper.error(resp, HttpServletResponse.SC_NOT_FOUND, "HTTP error 404 '"+filepath+"' is not in '"+mmdb.getListId()+"' desu~");
 				}
 			}
 			else {
@@ -341,10 +352,7 @@ public class MlistsServlet extends HttpServlet {
 			printMlistLong(resp, mmdb, false, true, query);
 		}
 		else {
-			resp.reset();
-			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-			resp.setContentType("text/plain");
-			resp.getWriter().println("HTTP error 404 unknown path '"+path+"' desu~");
+			ServletHelper.error(resp, HttpServletResponse.SC_NOT_FOUND, "HTTP error 404 unknown path '"+path+"' desu~");
 		}
 	}
 	
