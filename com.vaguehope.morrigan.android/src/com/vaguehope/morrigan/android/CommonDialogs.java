@@ -19,12 +19,16 @@ package com.vaguehope.morrigan.android;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
+import com.vaguehope.morrigan.android.model.MlistItem;
+import com.vaguehope.morrigan.android.model.MlistReference;
 import com.vaguehope.morrigan.android.model.PlayerState;
 import com.vaguehope.morrigan.android.model.PlayerStateList;
 import com.vaguehope.morrigan.android.model.PlayerStateListChangeListener;
 import com.vaguehope.morrigan.android.model.ServerReference;
 import com.vaguehope.morrigan.android.tasks.GetPlayersTask;
+import com.vaguehope.morrigan.android.tasks.RunMlistItemActionTask;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -119,6 +123,35 @@ public class CommonDialogs {
 				intent.putExtra(MlistActivity.PLAYER_ID, playerState.getPlayerReference().getPlayerId());
 				context.startActivity(intent);
 				
+			}
+		});
+		
+		dlgBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int whichButton) {
+				dialog.cancel();
+			}
+		});
+		
+		dlgBuilder.show();
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	public static void addTag (final Activity activity, final MlistReference mlistReference, final MlistItem item, final Runnable afterPost) {
+		final AlertDialog.Builder dlgBuilder = new AlertDialog.Builder(activity);
+		dlgBuilder.setTitle("Tag: " + item.getTitle());
+		final EditText editText = new EditText(activity);
+		dlgBuilder.setView(editText);
+		
+		dlgBuilder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int whichButton) {
+				String tag = editText.getText().toString().trim();
+				dialog.dismiss();
+				RunMlistItemActionTask task = new RunMlistItemActionTask(activity, mlistReference, item, tag);
+				task.setOnComplete(afterPost);
+				task.execute();
 			}
 		});
 		
