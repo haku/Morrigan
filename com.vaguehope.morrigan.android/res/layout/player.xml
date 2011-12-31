@@ -28,10 +28,14 @@
 		
 	</LinearLayout>
 	
-	<LinearLayout android:orientation="horizontal"
+	<LinearLayout android:id="@+id/tagRow"
+		android:orientation="horizontal"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
-		android:layout_weight="0" >
+		android:layout_weight="0"
+		android:clickable="true"
+		android:focusable="true"
+		android:background="@drawable/list_selector_background" >
 		
 		<ImageView android:id="@+id/imgTags"
 			android:layout_width="wrap_content"

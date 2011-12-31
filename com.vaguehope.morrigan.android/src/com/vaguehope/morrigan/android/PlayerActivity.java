@@ -36,7 +36,7 @@ import android.view.View.OnCreateContextMenuListener;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ImageButton;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -76,7 +76,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 	ConfigDb configDb;
 	protected ServerReference serverReference = null;
 	protected PlayerReference playerReference = null;
-	private PlayerState currentState;
+	protected PlayerState currentState;
 	protected ArtifactListAdaptor<PlayerQueue> queueListAdaptor;
 	private MlistReference mlistReference = null;
 	
@@ -121,59 +121,48 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Buttons.
-    
+	
 	private void wireGui () {
 		this.queueListAdaptor = new ArtifactListAdaptorImpl<PlayerQueue>(this, R.layout.mlistitemlistrow);
 		ListView lstQueue = (ListView) findViewById(R.id.lstQueue);
 		lstQueue.setAdapter(this.queueListAdaptor);
-		lstQueue.setOnItemClickListener(this.queueListCickListener);
+		lstQueue.setOnItemClickListener(this.contextMenuItemCickListener);
 		lstQueue.setOnCreateContextMenuListener(this.queueContextMenuListener);
 		
-		ImageButton cmd;
+		View tagRow = findViewById(R.id.tagRow);
+		tagRow.setOnClickListener(this.contextMenuClickListener);
+		tagRow.setOnCreateContextMenuListener(this.tagRowContextMenuListener);
 		
-		cmd = (ImageButton) findViewById(R.id.btnPlaypause);
-		cmd.setOnClickListener(new BtnPlaypause_OnClick());
-		
-		cmd = (ImageButton) findViewById(R.id.btnNext);
-		cmd.setOnClickListener(new BtnNext_OnClick());
-		
-		cmd = (ImageButton) findViewById(R.id.btnSearch);
-		cmd.setOnClickListener(new BtnSearch_OnClick());
-		
-		cmd = (ImageButton) findViewById(R.id.btnRefresh);
-		cmd.setOnClickListener(new BtnRefresh_OnClick());
+		findViewById(R.id.btnPlaypause).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				playpause();
+			}
+		});
+		findViewById(R.id.btnNext).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick (View v) {
+				next();
+			}
+		});
+		findViewById(R.id.btnSearch).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick (View v) {
+				search();
+			}
+		});
+		findViewById(R.id.btnRefresh).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick (View v) {
+				refresh();
+			}
+		});
 	}
 	
-	class BtnPlaypause_OnClick implements OnClickListener {
-		@Override
-		public void onClick(View v) {
-			playpause();
-		}
-	}
-	
-	class BtnNext_OnClick implements OnClickListener {
-		@Override
-		public void onClick(View v) {
-			next();
-		}
-	}
-	
-	class BtnSearch_OnClick implements OnClickListener {
-		@Override
-		public void onClick(View v) {
-			search();
-		}
-	}
-	
-	class BtnRefresh_OnClick implements OnClickListener {
-		@Override
-		public void onClick(View v) {
-			refresh();
-		}
-	}
-
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Queue events.
+//	Context menus.
+	
+	private static final int MENU_CTX_ADDTAG = 7;
 	
 	private static final int MENU_CTX_MOVETOP = 2;
 	private static final int MENU_CTX_MOVEUP = 3;
@@ -181,12 +170,86 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 	private static final int MENU_CTX_MOVEDOWN = 5;
 	private static final int MENU_CTX_MOVEBOTTOM = 6;
 	
-	private OnItemClickListener queueListCickListener = new OnItemClickListener() {
+	@Override
+	public boolean onContextItemSelected(MenuItem menuItem) {
+		switch (menuItem.getItemId()) {
+			case MENU_CTX_ADDTAG:
+				onTagRowContextMenu(menuItem);
+				return true;
+			
+			case MENU_CTX_MOVETOP:
+			case MENU_CTX_MOVEUP:
+			case MENU_CTX_REMOVE:
+			case MENU_CTX_MOVEDOWN:
+			case MENU_CTX_MOVEBOTTOM:
+				onQueueContextMenu(menuItem);
+				return true;
+			
+			default:
+				return super.onContextItemSelected(menuItem);
+		}
+	}
+	
+	private OnClickListener contextMenuClickListener = new OnClickListener() {
+		@Override
+		public void onClick (View v) {
+			openContextMenu(v);
+		}
+	};
+	
+	private OnItemClickListener contextMenuItemCickListener = new OnItemClickListener() {
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 			openContextMenu(view);
 		}
 	};
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Tag stuff.
+	
+	private OnCreateContextMenuListener tagRowContextMenuListener = new OnCreateContextMenuListener () {
+		@Override
+		public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+			menu.setHeaderTitle(PlayerActivity.this.currentState.getTitle());
+			menu.add(Menu.NONE, MENU_CTX_ADDTAG, Menu.NONE, "Add tag");
+		}
+	};
+	
+	private void onTagRowContextMenu (MenuItem menuItem) {
+		if (menuItem.getItemId() == MENU_CTX_ADDTAG) {
+			addTag();
+		}
+	}
+	
+	private void addTag () {
+		final AlertDialog.Builder dlgBuilder = new AlertDialog.Builder(this);
+		dlgBuilder.setTitle("Tag " + this.currentState.getTitle());
+		
+		final EditText editText = new EditText(this);
+		dlgBuilder.setView(editText);
+		
+		dlgBuilder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int whichButton) {
+				String tag = editText.getText().toString().trim();
+				dialog.dismiss();
+				new SetPlaystateTask(PlayerActivity.this, PlayerActivity.this.playerReference, tag, PlayerActivity.this).execute();
+			}
+		});
+		
+		dlgBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int whichButton) {
+				dialog.cancel();
+			}
+		});
+		
+		dlgBuilder.show();
+		
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Queue events.
 	
 	private OnCreateContextMenuListener queueContextMenuListener = new OnCreateContextMenuListener () {
 		@Override
@@ -202,35 +265,20 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 		}
 	};
 	
-	@Override
-	public boolean onContextItemSelected(MenuItem menuItem) {
-		switch (menuItem.getItemId()) {
-			
-			case MENU_CTX_MOVETOP:
-			case MENU_CTX_MOVEUP:
-			case MENU_CTX_REMOVE:
-			case MENU_CTX_MOVEDOWN:
-			case MENU_CTX_MOVEBOTTOM:
-				
-				AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuItem.getMenuInfo();
-				Artifact item = PlayerActivity.this.queueListAdaptor.getInputData().getArtifactList().get(info.position);
-				
-				QueueItemAction action;
-				if (menuItem.getItemId() == MENU_CTX_MOVEUP) action = QueueItemAction.UP;
-				else if (menuItem.getItemId() == MENU_CTX_MOVEDOWN) action = QueueItemAction.DOWN;
-				else if (menuItem.getItemId() == MENU_CTX_MOVETOP) action = QueueItemAction.TOP;
-				else if (menuItem.getItemId() == MENU_CTX_MOVEBOTTOM) action = QueueItemAction.BOTTOM;
-				else if (menuItem.getItemId() == MENU_CTX_REMOVE) action = QueueItemAction.REMOVE;
-				else throw new IllegalStateException();
-				
-				GetPlayerQueueTask queueTask = new GetPlayerQueueTask(this, this.playerReference, this, action, item);
-				queueTask.execute();
-				
-				return true;
-			
-			default:
-				return super.onContextItemSelected(menuItem);
-		}
+	private void onQueueContextMenu (MenuItem menuItem) {
+		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuItem.getMenuInfo();
+		Artifact item = PlayerActivity.this.queueListAdaptor.getInputData().getArtifactList().get(info.position);
+		
+		QueueItemAction action;
+		if (menuItem.getItemId() == MENU_CTX_MOVEUP) action = QueueItemAction.UP;
+		else if (menuItem.getItemId() == MENU_CTX_MOVEDOWN) action = QueueItemAction.DOWN;
+		else if (menuItem.getItemId() == MENU_CTX_MOVETOP) action = QueueItemAction.TOP;
+		else if (menuItem.getItemId() == MENU_CTX_MOVEBOTTOM) action = QueueItemAction.BOTTOM;
+		else if (menuItem.getItemId() == MENU_CTX_REMOVE) action = QueueItemAction.REMOVE;
+		else throw new IllegalStateException();
+		
+		GetPlayerQueueTask queueTask = new GetPlayerQueueTask(this, this.playerReference, this, action, item);
+		queueTask.execute();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -264,13 +312,11 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 				return true;
 			
 			case MENU_CLEARQUEUE:
-				GetPlayerQueueTask clearQ = new GetPlayerQueueTask(this, this.playerReference, this, QueueAction.CLEAR);
-				clearQ.execute();
+				new GetPlayerQueueTask(this, this.playerReference, this, QueueAction.CLEAR).execute();
 				return true;
 				
 			case MENU_SHUFFLEQUEUE:
-				GetPlayerQueueTask shuffleQ = new GetPlayerQueueTask(this, this.playerReference, this, QueueAction.SHUFFLE);
-				shuffleQ.execute();
+				new GetPlayerQueueTask(this, this.playerReference, this, QueueAction.SHUFFLE).execute();
 				return true;
 		}
 		
@@ -281,20 +327,16 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 //	Commands - to be called on the UI thread.
 	
 	protected void refresh () {
-		SetPlaystateTask playpauseTask = new SetPlaystateTask(this, this.playerReference, this);
-		playpauseTask.execute();
-		GetPlayerQueueTask queueTask = new GetPlayerQueueTask(this, this.playerReference, this);
-		queueTask.execute();
+		new SetPlaystateTask(this, this.playerReference, this).execute();
+		new GetPlayerQueueTask(this, this.playerReference, this).execute();
 	}
 	
 	protected void playpause () {
-		SetPlaystateTask playpauseTask = new SetPlaystateTask(this, this.playerReference, TargetPlayState.PLAYPAUSE, this);
-		playpauseTask.execute();
+		new SetPlaystateTask(this, this.playerReference, TargetPlayState.PLAYPAUSE, this).execute();
 	}
 	
 	protected void next () {
-		SetPlaystateTask playpauseTask = new SetPlaystateTask(this, this.playerReference, TargetPlayState.NEXT, this);
-		playpauseTask.execute();
+		new SetPlaystateTask(this, this.playerReference, TargetPlayState.NEXT, this).execute();
 	}
 	
 	protected void search () {
@@ -333,8 +375,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 				@Override
 				public void onClick(DialogInterface dialog, int item) {
 					dialog.dismiss();
-					SetPlaystateTask playpauseTask = new SetPlaystateTask(PlayerActivity.this, PlayerActivity.this.playerReference, item, PlayerActivity.this);
-					playpauseTask.execute();
+					new SetPlaystateTask(PlayerActivity.this, PlayerActivity.this.playerReference, item, PlayerActivity.this).execute();
 				}
 			});
 			AlertDialog alert = builder.create();
@@ -348,8 +389,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 	protected void downloadCurrentItem () {
 		MlistItem item = this.currentState.getItem();
 		if (item != null && this.mlistReference != null) {
-			DownloadMediaTask task = new DownloadMediaTask(this, this.mlistReference);
-			task.execute(item);
+			new DownloadMediaTask(this, this.mlistReference).execute(item);
 		}
 		else {
 			Toast.makeText(this, "No item to download desu~", Toast.LENGTH_SHORT).show();

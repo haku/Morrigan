@@ -18,17 +18,17 @@ package com.vaguehope.morrigan.android.tasks;
 
 import java.io.IOException;
 import java.io.InputStream;
-
+import java.net.URLEncoder;
 
 import org.xml.sax.SAXException;
+
+import android.app.Activity;
 
 import com.vaguehope.morrigan.android.helper.HttpHelper.HttpCreds;
 import com.vaguehope.morrigan.android.model.PlayerReference;
 import com.vaguehope.morrigan.android.model.PlayerState;
 import com.vaguehope.morrigan.android.model.PlayerStateChangeListener;
 import com.vaguehope.morrigan.android.modelimpl.PlayerStateXmlImpl;
-
-import android.app.Activity;
 
 public class SetPlaystateTask extends AbstractTask<PlayerState> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -55,26 +55,32 @@ public class SetPlaystateTask extends AbstractTask<PlayerState> {
 	
 	private final TargetPlayState targetPlayState;
 	private final int fullscreenMonitor;
+	private final String newTag;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public SetPlaystateTask (Activity activity, PlayerReference playerReference, PlayerStateChangeListener changeListener) {
-		this(activity, playerReference, null, changeListener);
+		this(activity, playerReference, null, -1, null, changeListener);
 	}
 	
 	public SetPlaystateTask (Activity activity, PlayerReference playerReference, TargetPlayState targetPlayState, PlayerStateChangeListener changeListener) {
-		super(activity);
-		this.playerReference = playerReference;
-		this.targetPlayState = targetPlayState;
-		this.fullscreenMonitor = -1;
-		this.changeListener = changeListener;
+		this(activity, playerReference, targetPlayState, -1, null, changeListener);
 	}
 	
 	public SetPlaystateTask (Activity activity, PlayerReference playerReference, int fullscreenMonitor, PlayerStateChangeListener changeListener) {
+		this(activity, playerReference, null, fullscreenMonitor, null, changeListener);
+	}
+	
+	public SetPlaystateTask (Activity activity, PlayerReference playerReference, String newTag, PlayerStateChangeListener changeListener) {
+		this(activity, playerReference, null, -1, newTag, changeListener);
+	}
+	
+	private SetPlaystateTask (Activity activity, PlayerReference playerReference, TargetPlayState targetPlayState, int fullscreenMonitor, String newTag, PlayerStateChangeListener changeListener) {
 		super(activity);
 		this.playerReference = playerReference;
-		this.targetPlayState = null;
+		this.targetPlayState = targetPlayState;
 		this.fullscreenMonitor = fullscreenMonitor;
+		this.newTag = newTag;
 		this.changeListener = changeListener;
 	}
 	
@@ -115,13 +121,17 @@ public class SetPlaystateTask extends AbstractTask<PlayerState> {
 			this.verb = "POST";
 			this.encodedData = "action=fullscreen&monitor=" + this.fullscreenMonitor;
 		}
+		else if (this.newTag != null) {
+			this.verb = "POST";
+			this.encodedData = "action=addtag&tag=" + URLEncoder.encode(this.newTag);
+		}
 		
 		return url;
 	}
 	
 	@Override
 	protected String getVerb () {
-		return this.verb; // TODO always POST ?
+		return this.verb;
 	}
 	
 	@Override
