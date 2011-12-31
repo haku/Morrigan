@@ -42,8 +42,11 @@ import com.vaguehope.morrigan.util.TimeHelper;
  * POST /players/0 action=fullscreen&monitor=0
  * 
  *  GET /players/0/queue
+ * POST /players/0/queue action=clear
+ * POST /players/0/queue action=shuffle
  * POST /players/0/queue/0 action=top
  * POST /players/0/queue/0 action=up
+ * POST /players/0/queue/0 action=remove
  * POST /players/0/queue/0 action=down
  * POST /players/0/queue/0 action=bottom
  * </pre>
