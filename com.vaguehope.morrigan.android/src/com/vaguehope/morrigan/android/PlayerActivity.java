@@ -62,6 +62,7 @@ import com.vaguehope.morrigan.android.tasks.DownloadMediaTask;
 import com.vaguehope.morrigan.android.tasks.GetPlayerQueueTask;
 import com.vaguehope.morrigan.android.tasks.GetPlayerQueueTask.QueueAction;
 import com.vaguehope.morrigan.android.tasks.GetPlayerQueueTask.QueueItemAction;
+import com.vaguehope.morrigan.android.tasks.RunMlistItemActionTask;
 import com.vaguehope.morrigan.android.tasks.SetPlaystateTask;
 import com.vaguehope.morrigan.android.tasks.SetPlaystateTask.TargetPlayState;
 
@@ -78,7 +79,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 	protected PlayerReference playerReference = null;
 	protected PlayerState currentState;
 	protected ArtifactListAdaptor<PlayerQueue> queueListAdaptor;
-	private MlistReference mlistReference = null;
+	protected MlistReference mlistReference = null;
 	
 	private AtomicReference<String> lastQuery = new AtomicReference<String>();
 	
@@ -222,9 +223,10 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 	}
 	
 	private void addTag () {
-		final AlertDialog.Builder dlgBuilder = new AlertDialog.Builder(this);
-		dlgBuilder.setTitle("Tag: " + this.currentState.getTitle());
+		final MlistItem item = this.currentState.getItem();
 		
+		final AlertDialog.Builder dlgBuilder = new AlertDialog.Builder(this);
+		dlgBuilder.setTitle("Tag: " + item.getTitle());
 		final EditText editText = new EditText(this);
 		dlgBuilder.setView(editText);
 		
@@ -233,7 +235,14 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 			public void onClick(DialogInterface dialog, int whichButton) {
 				String tag = editText.getText().toString().trim();
 				dialog.dismiss();
-				new SetPlaystateTask(PlayerActivity.this, PlayerActivity.this.playerReference, tag, PlayerActivity.this).execute();
+				RunMlistItemActionTask task = new RunMlistItemActionTask(PlayerActivity.this, PlayerActivity.this.mlistReference, item, tag);
+				task.setOnComplete(new Runnable() {
+					@Override
+					public void run () {
+						refresh();
+					}
+				});
+				task.execute();
 			}
 		});
 		

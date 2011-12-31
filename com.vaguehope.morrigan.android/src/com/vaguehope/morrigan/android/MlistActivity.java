@@ -434,7 +434,9 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 	protected void queueItems (final List<? extends MlistItem> list, PlayerReference playerRef) {
 		List<AbstractTask<String>> tasks = new LinkedList<AbstractTask<String>>();
 		for (MlistItem item : list) {
-			tasks.add(new RunMlistItemActionTask(this, playerRef, this.mlistReference, item, MlistItemCommand.QUEUE, false));
+			RunMlistItemActionTask task = new RunMlistItemActionTask(this, playerRef, this.mlistReference, item, MlistItemCommand.QUEUE);
+			task.setShowProgress(false);
+			tasks.add(task);
 		}
 		new BulkRunner<String>(this, tasks).execute();
 	}

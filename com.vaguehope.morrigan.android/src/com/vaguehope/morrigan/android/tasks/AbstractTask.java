@@ -59,12 +59,28 @@ public abstract class AbstractTask<T extends Object> extends AsyncTask<Void, Voi
 	
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	private boolean showProgress = true;
+	private Runnable onComplete = null;
+	
+	public boolean isShowProgress () {
+		return this.showProgress;
+	}
+	public void setShowProgress (boolean showProgress) {
+		this.showProgress = showProgress;
+	}
+	
+	public void setOnComplete (Runnable onComplete) {
+		this.onComplete = onComplete;
+	}
+	
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
 	// In UI thread:
 	@Override
 	final protected void onPreExecute () {
 		super.onPreExecute();
 		
-		if (!showProgress()) return;
+		if (!isShowProgress()) return;
 		
 		String prgMsg = getProgressMsg();
 		if (prgMsg != null && this.context != null) {
@@ -118,6 +134,8 @@ public abstract class AbstractTask<T extends Object> extends AsyncTask<Void, Voi
 		
 		if (this.dialog != null) this.dialog.dismiss(); // This will fail if the screen is rotated while we are fetching.
 		if (this.activity != null) this.activity.setProgressBarIndeterminateVisibility(false);
+		
+		if (this.onComplete != null) this.onComplete.run();
 	}
 	
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -132,7 +150,6 @@ public abstract class AbstractTask<T extends Object> extends AsyncTask<Void, Voi
 	
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	protected boolean showProgress () { return true; }
 	protected String getProgressMsg () { return null; }
 	protected abstract HttpCreds getCreds ();
 	protected abstract String getUrl ();

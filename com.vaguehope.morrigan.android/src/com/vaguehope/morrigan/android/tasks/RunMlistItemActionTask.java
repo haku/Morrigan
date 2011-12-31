@@ -18,6 +18,8 @@ package com.vaguehope.morrigan.android.tasks;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 
 import org.xml.sax.SAXException;
@@ -55,36 +57,42 @@ public class RunMlistItemActionTask extends AbstractTask<String> {
 	private final MlistReference mlistReference;
 	private final MlistItem mlistItem;
 	private final MlistItemCommand cmd;
-	private final boolean showProgress;
+	private final String newTag;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public RunMlistItemActionTask (Activity activity, PlayerReference playerReference, MlistReference mlistReference, MlistItem mlistItem, MlistItemCommand cmd) {
-		this(activity, playerReference, mlistReference, mlistItem, cmd, true);
+		this(activity, playerReference, mlistReference, mlistItem, cmd, null);
 	}
 	
-	public RunMlistItemActionTask (Activity activity, PlayerReference playerReference, MlistReference mlistReference, MlistItem mlistItem, MlistItemCommand cmd, boolean showToast) {
+	public RunMlistItemActionTask (Activity activity, MlistReference mlistReference, MlistItem mlistItem, String newTag) {
+		this(activity, null, mlistReference, mlistItem, null, newTag);
+	}
+	
+	private RunMlistItemActionTask (Activity activity, PlayerReference playerReference, MlistReference mlistReference, MlistItem mlistItem, MlistItemCommand cmd, String newTag) {
 		super(activity);
 		this.playerReference = playerReference;
 		this.mlistReference = mlistReference;
 		this.mlistItem = mlistItem;
 		this.cmd = cmd;
-		this.showProgress = showToast;
+		this.newTag = newTag;
 	}
-	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
-	protected boolean showProgress () {
-		return this.showProgress;
-	}
-	
-	@Override
 	protected String getProgressMsg () {
-		switch (this.cmd) {
-			case PLAY: return "Playing...";
-			case QUEUE: return "Queueing...";
-			default: return "Please wait...";
+		if (this.cmd != null) {
+			switch (this.cmd) {
+				case PLAY: return "Playing...";
+				case QUEUE: return "Queueing...";
+				default: return "Please wait...";
+			}
+		}
+		else if (this.newTag != null) {
+			return "Tagging...";
+		}
+		else {
+			return "Please wait...";
 		}
 	}
 	
@@ -105,20 +113,32 @@ public class RunMlistItemActionTask extends AbstractTask<String> {
 	
 	@Override
 	protected String getEncodedData () {
-		String encodedData = "action=";
-		switch (this.cmd) {
-			case PLAY:
-				encodedData = encodedData.concat("play");
-				break;
-				
-			case QUEUE:
-				encodedData = encodedData.concat("queue");
-				break;
-				
-			default: throw new IllegalArgumentException();
+		if (this.cmd != null) {
+			String encodedData = "action=";
+			switch (this.cmd) {
+				case PLAY:
+					encodedData = encodedData.concat("play");
+					break;
+					
+				case QUEUE:
+					encodedData = encodedData.concat("queue");
+					break;
+					
+				default: throw new IllegalArgumentException();
+			}
+			encodedData = encodedData.concat("&playerid=" + String.valueOf(this.playerReference.getPlayerId()));
+			return encodedData;
 		}
-		encodedData = encodedData.concat("&playerid=" + String.valueOf(this.playerReference.getPlayerId()));
-		return encodedData;
+		else if (this.newTag != null) {
+			String encodedTag;
+			try {
+				encodedTag = URLEncoder.encode(this.newTag, "UTF-8");
+			} catch (UnsupportedEncodingException e) { throw new RuntimeException(e); }
+			return "action=addtag&tag=" + encodedTag;
+		}
+		else {
+			throw new IllegalStateException();
+		}
 	}
 	
 	@Override
@@ -134,7 +154,7 @@ public class RunMlistItemActionTask extends AbstractTask<String> {
 	// In UI thread:
 	@Override
 	protected void onSuccess (String result) {
-		if (this.showProgress) Toast.makeText(getActivity(), result, Toast.LENGTH_SHORT).show();
+		if (isShowProgress()) Toast.makeText(getActivity(), result, Toast.LENGTH_SHORT).show();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
