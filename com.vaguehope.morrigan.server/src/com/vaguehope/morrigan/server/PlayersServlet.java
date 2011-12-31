@@ -3,7 +3,6 @@ package com.vaguehope.morrigan.server;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
-import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.Collection;
@@ -23,9 +22,9 @@ import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
+import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagClassification;
-import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.player.IPlayerAbstract;
 import com.vaguehope.morrigan.player.IPlayerLocal;
@@ -174,13 +173,12 @@ public class PlayersServlet extends HttpServlet {
 			}
 		}
 		else if (act.equals(CMD_ADDTAG)) {
-			String encodedTag = req.getParameter("tag");
-			if (encodedTag != null && encodedTag.length() > 0) {
+			String tag = req.getParameter("tag");
+			if (tag != null && tag.length() > 0) {
 				PlayItem currentItem = player.getCurrentItem();
 				IMediaTrack item = currentItem != null ? currentItem.item : null;
 				IMediaTrackList<? extends IMediaTrack> list = currentItem != null ? currentItem.list : null;
 				if (item != null && list != null) {
-					String tag = URLDecoder.decode(encodedTag, "UTF-8");
 					list.addTag(item, tag, MediaTagType.MANUAL, (MediaTagClassification)null);
 					writeResponse(req, resp);
 				}
