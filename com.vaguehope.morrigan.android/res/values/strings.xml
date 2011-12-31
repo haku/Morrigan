@@ -6,6 +6,7 @@
 	<string name="menu_fullscreen">full-screen</string>
 	<string name="menu_scan">scan</string>
 	<string name="menu_download">download</string>
+	<string name="menu_sort">sort</string>
 	<string name="menu_queue_clear">clear queue</string>
 	<string name="menu_queue_shuffle">shuffle queue</string>
 	

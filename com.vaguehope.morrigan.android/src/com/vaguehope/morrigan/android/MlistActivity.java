@@ -54,6 +54,7 @@ import com.vaguehope.morrigan.android.model.PlayerReference;
 import com.vaguehope.morrigan.android.model.PlayerState;
 import com.vaguehope.morrigan.android.model.ServerReference;
 import com.vaguehope.morrigan.android.modelimpl.ArtifactListAdaptorImpl;
+import com.vaguehope.morrigan.android.modelimpl.MlistItemComparators;
 import com.vaguehope.morrigan.android.modelimpl.MlistReferenceImpl;
 import com.vaguehope.morrigan.android.modelimpl.PlayerReferenceImpl;
 import com.vaguehope.morrigan.android.state.ConfigDb;
@@ -168,12 +169,14 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 	
 	private static final int MENU_SCAN = 1;
 	private static final int MENU_DOWNLOAD = 2;
+	private static final int MENU_SORT = 3;
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		boolean result = super.onCreateOptionsMenu(menu);
 		menu.add(0, MENU_SCAN, 0, R.string.menu_scan);
 		menu.add(0, MENU_DOWNLOAD, 1, R.string.menu_download);
+		menu.add(0, MENU_SORT, 1, R.string.menu_sort);
 		return result;
 	}
 	
@@ -187,6 +190,11 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 			
 			case MENU_DOWNLOAD:
 				downloadAllInList();
+				return true;
+			
+			case MENU_SORT:
+				this.mlistItemListAdapter.getInputData().sort(MlistItemComparators.FILENAME);
+				this.mlistItemListAdapter.notifyDataSetChanged();
 				return true;
 		}
 		
