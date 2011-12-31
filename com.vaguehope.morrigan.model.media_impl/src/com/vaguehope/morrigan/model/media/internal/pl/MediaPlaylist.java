@@ -11,14 +11,19 @@ import java.io.Writer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Logger;
 
 import com.vaguehope.morrigan.engines.playback.NotImplementedException;
+import com.vaguehope.morrigan.model.db.IDbItem;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DirtyState;
 import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.model.media.IMediaPlaylist;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
+import com.vaguehope.morrigan.model.media.MediaTag;
+import com.vaguehope.morrigan.model.media.MediaTagClassification;
+import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.model.media.internal.MediaItemList;
 import com.vaguehope.morrigan.model.media.internal.MediaTrackListHelper;
 
@@ -372,6 +377,75 @@ public class MediaPlaylist extends MediaItemList<IMediaTrack> implements IMediaP
 	public int hashCode() {
 		// Since equals() only uses filePath, we can do this.
 		return this.filePath.hashCode();
+	}
+
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Not supported by playlist.
+	
+	@Override
+	public List<MediaTagClassification> getTagClassifications () throws MorriganException {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Not implemented.");
+	}
+
+	@Override
+	public void addTagClassification (String classificationName) throws MorriganException {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Not implemented.");
+	}
+
+	@Override
+	public MediaTagClassification getTagClassification (String classificationName) throws MorriganException {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Not implemented.");
+	}
+
+	@Override
+	public boolean hasTags (IDbItem item) throws MorriganException {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Not implemented.");
+	}
+
+	@Override
+	public boolean hasTag (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) throws MorriganException {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Not implemented.");
+	}
+
+	@Override
+	public List<MediaTag> getTags (IDbItem item) throws MorriganException {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Not implemented.");
+	}
+
+	@Override
+	public void addTag (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) throws MorriganException {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Not implemented.");
+	}
+
+	@Override
+	public void addTag (IDbItem item, String tag, MediaTagType type, String mtc) throws MorriganException {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Not implemented.");
+	}
+
+	@Override
+	public void moveTags (IDbItem from_item, IDbItem to_item) throws MorriganException {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Not implemented.");
+	}
+
+	@Override
+	public void removeTag (MediaTag mt) throws MorriganException {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Not implemented.");
+	}
+
+	@Override
+	public void clearTags (IDbItem item) throws MorriganException {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Not implemented.");
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

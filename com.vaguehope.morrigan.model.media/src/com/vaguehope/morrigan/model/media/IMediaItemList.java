@@ -6,6 +6,7 @@ import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 
+import com.vaguehope.morrigan.model.db.IDbItem;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 
 
@@ -64,6 +65,18 @@ public interface IMediaItemList<T extends IMediaItem> {
 	
 	// TODO rename to getItemByFilePath().
 	public T findItemByFilePath (String path);
+	
+	public List<MediaTagClassification> getTagClassifications () throws MorriganException;
+	public void addTagClassification (String classificationName) throws MorriganException;
+	public MediaTagClassification getTagClassification (String classificationName) throws MorriganException;
+	public boolean hasTags (IDbItem item) throws MorriganException;
+	public boolean hasTag (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) throws MorriganException;
+	public List<MediaTag> getTags (IDbItem item) throws MorriganException;
+	public void addTag (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) throws MorriganException;
+	public void addTag (IDbItem item, String tag, MediaTagType type, String mtc) throws MorriganException;
+	public void moveTags (IDbItem from_item, IDbItem to_item) throws MorriganException;
+	public void removeTag (MediaTag mt) throws MorriganException;
+	public void clearTags (IDbItem item) throws MorriganException;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
