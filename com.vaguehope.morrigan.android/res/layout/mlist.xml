@@ -46,12 +46,6 @@
 		android:layout_gravity="bottom" >
 		<TableRow>
 			
-			<ImageButton android:id="@+id/btnPlay"
-				android:layout_width="0dip"
-				android:layout_height="50dip"
-				android:layout_weight="1"
-				android:src="@drawable/play" />
-			
 			<ImageButton android:id="@+id/btnQueue"
 				android:layout_width="0dip"
 				android:layout_height="50dip"

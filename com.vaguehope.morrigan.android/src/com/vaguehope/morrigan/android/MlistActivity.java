@@ -16,6 +16,7 @@
 
 package com.vaguehope.morrigan.android;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import android.app.Activity;
@@ -56,6 +57,8 @@ import com.vaguehope.morrigan.android.modelimpl.ArtifactListAdaptorImpl;
 import com.vaguehope.morrigan.android.modelimpl.MlistReferenceImpl;
 import com.vaguehope.morrigan.android.modelimpl.PlayerReferenceImpl;
 import com.vaguehope.morrigan.android.state.ConfigDb;
+import com.vaguehope.morrigan.android.tasks.AbstractTask;
+import com.vaguehope.morrigan.android.tasks.BulkRunner;
 import com.vaguehope.morrigan.android.tasks.DownloadMediaTask;
 import com.vaguehope.morrigan.android.tasks.GetMlistItemListTask;
 import com.vaguehope.morrigan.android.tasks.GetMlistTask;
@@ -138,47 +141,26 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 		lstItems.setOnItemClickListener(this.mlistItemListCickListener);
 		lstItems.setOnCreateContextMenuListener(this.itemsContextMenuListener);
 		
-		ImageButton cmd;
+		((ImageButton) findViewById(R.id.btnQueue)).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick (View v) {
+				queueAll();
+			}
+		});
 		
-		cmd = (ImageButton) findViewById(R.id.btnPlay);
-		cmd.setOnClickListener(new BtnPlay_OnClick());
+		((ImageButton) findViewById(R.id.btnSearch)).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick (View v) {
+				search();
+			}
+		});
 		
-		cmd = (ImageButton) findViewById(R.id.btnQueue);
-		cmd.setOnClickListener(new BtnQueue_OnClick());
-		
-		cmd = (ImageButton) findViewById(R.id.btnSearch);
-		cmd.setOnClickListener(new BtnSearch_OnClick());
-		
-		cmd = (ImageButton) findViewById(R.id.btnRefresh);
-		cmd.setOnClickListener(new BtnRefresh_OnClick());
-	}
-	
-	class BtnPlay_OnClick implements OnClickListener {
-		@Override
-		public void onClick(View v) {
-			play();
-		}
-	}
-	
-	class BtnQueue_OnClick implements OnClickListener {
-		@Override
-		public void onClick(View v) {
-			queue();
-		}
-	}
-	
-	class BtnSearch_OnClick implements OnClickListener {
-		@Override
-		public void onClick(View v) {
-			search();
-		}
-	}
-	
-	class BtnRefresh_OnClick implements OnClickListener {
-		@Override
-		public void onClick(View v) {
-			refresh();
-		}
+		((ImageButton) findViewById(R.id.btnRefresh)).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick (View v) {
+				refresh();
+			}
+		});
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -356,18 +338,41 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 		}
 	}
 	
-	protected void queue () {
-		if (this.playerReference == null) {
-			CommonDialogs.doAskWhichPlayer(MlistActivity.this, MlistActivity.this.serverReference, new PlayerSelectedListener () {
-				@Override
-				public void playerSelected(PlayerState playerState) {
-					new RunMlistActionTask(MlistActivity.this, MlistActivity.this.mlistReference, MlistCommand.QUEUE, playerState.getPlayerReference()).execute();
+	protected void queueAll () {
+		int count = this.mlistItemListAdapter.getCount();
+		if (count < 1) {
+			Toast.makeText(this, "No items to queue", Toast.LENGTH_SHORT).show();
+			return;
+		}
+		
+		AlertDialog.Builder dlgBuilder = new AlertDialog.Builder(this);
+		dlgBuilder.setMessage("Queue all " + count + " items?");
+		
+		dlgBuilder.setPositiveButton("Queue all", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick (DialogInterface dialog, int which) {
+				if (MlistActivity.this.playerReference == null) {
+					CommonDialogs.doAskWhichPlayer(MlistActivity.this, MlistActivity.this.serverReference, new PlayerSelectedListener () {
+						@Override
+						public void playerSelected(PlayerState playerState) {
+							queueItems(MlistActivity.this.mlistItemListAdapter.getInputData().getMlistItemList(), playerState.getPlayerReference());
+						}
+					});
 				}
-			});
-		}
-		else {
-			new RunMlistActionTask(this, this.mlistReference, MlistCommand.QUEUE, this.playerReference).execute();
-		}
+				else {
+					queueItems(MlistActivity.this.mlistItemListAdapter.getInputData().getMlistItemList(), MlistActivity.this.playerReference);
+				}
+			}
+		});
+		
+		dlgBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int whichButton) {
+				dialog.cancel();
+			}
+		});
+		
+		dlgBuilder.show();
 	}
 	
 	protected void downloadAllInList () {
@@ -385,12 +390,12 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 			CommonDialogs.doAskWhichPlayer(this, this.serverReference, new PlayerSelectedListener () {
 				@Override
 				public void playerSelected(PlayerState playerState) {
-					new RunMlistItemActionTask(MlistActivity.this, playerState.getPlayerReference(), MlistActivity.this.mlistReference, item, MlistItemCommand.PLAY).execute();
+					playItem(item, playerState.getPlayerReference());
 				}
 			});
 		}
 		else {
-			new RunMlistItemActionTask(this, this.playerReference, this.mlistReference, item, MlistItemCommand.PLAY).execute();
+			playItem(item, this.playerReference);
 		}
 	}
 	
@@ -399,13 +404,31 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 			CommonDialogs.doAskWhichPlayer(this, this.serverReference, new PlayerSelectedListener () {
 				@Override
 				public void playerSelected(PlayerState playerState) {
-					new RunMlistItemActionTask(MlistActivity.this, playerState.getPlayerReference(), MlistActivity.this.mlistReference, item, MlistItemCommand.QUEUE).execute();
+					queueItem(item, playerState.getPlayerReference());
 				}
 			});
 		}
 		else {
-			new RunMlistItemActionTask(this, this.playerReference, this.mlistReference, item, MlistItemCommand.QUEUE).execute();
+			queueItem(item, this.playerReference);
 		}
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	protected void playItem (final MlistItem item, PlayerReference playerRef) {
+		new RunMlistItemActionTask(this, playerRef, this.mlistReference, item, MlistItemCommand.PLAY).execute();
+	}
+	
+	protected void queueItem (final MlistItem item, PlayerReference playerRef) {
+		new RunMlistItemActionTask(this, playerRef, this.mlistReference, item, MlistItemCommand.QUEUE).execute();
+	}
+	
+	protected void queueItems (final List<? extends MlistItem> list, PlayerReference playerRef) {
+		List<AbstractTask<String>> tasks = new LinkedList<AbstractTask<String>>();
+		for (MlistItem item : list) {
+			tasks.add(new RunMlistItemActionTask(this, playerRef, this.mlistReference, item, MlistItemCommand.QUEUE, false));
+		}
+		new BulkRunner<String>(this, tasks).execute();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

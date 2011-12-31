@@ -55,18 +55,29 @@ public class RunMlistItemActionTask extends AbstractTask<String> {
 	private final MlistReference mlistReference;
 	private final MlistItem mlistItem;
 	private final MlistItemCommand cmd;
+	private final boolean showProgress;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public RunMlistItemActionTask (Activity activity, PlayerReference playerReference, MlistReference mlistReference, MlistItem mlistItem, MlistItemCommand cmd) {
+		this(activity, playerReference, mlistReference, mlistItem, cmd, true);
+	}
+	
+	public RunMlistItemActionTask (Activity activity, PlayerReference playerReference, MlistReference mlistReference, MlistItem mlistItem, MlistItemCommand cmd, boolean showToast) {
 		super(activity);
 		this.playerReference = playerReference;
 		this.mlistReference = mlistReference;
 		this.mlistItem = mlistItem;
 		this.cmd = cmd;
+		this.showProgress = showToast;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	@Override
+	protected boolean showProgress () {
+		return this.showProgress;
+	}
 	
 	@Override
 	protected String getProgressMsg () {
@@ -123,7 +134,7 @@ public class RunMlistItemActionTask extends AbstractTask<String> {
 	// In UI thread:
 	@Override
 	protected void onSuccess (String result) {
-		Toast.makeText(getActivity(), result, Toast.LENGTH_SHORT).show();
+		if (this.showProgress) Toast.makeText(getActivity(), result, Toast.LENGTH_SHORT).show();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
