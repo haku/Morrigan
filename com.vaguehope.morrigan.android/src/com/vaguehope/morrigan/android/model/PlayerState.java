@@ -48,6 +48,7 @@ public interface PlayerState extends Artifact {
 	public boolean getTrackMissing();
 	public int getTrackStartCount ();
 	public int getTrackEndCount ();
+	public String[] getTrackTags ();
 	
 	public MlistItem getItem ();
 	

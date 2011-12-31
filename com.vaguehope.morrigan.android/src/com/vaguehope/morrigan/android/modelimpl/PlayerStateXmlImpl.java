@@ -20,14 +20,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-
 
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -61,6 +63,7 @@ public class PlayerStateXmlImpl implements PlayerState, MlistItem, ContentHandle
 	
 	public static final String TRACKSTARTCOUNT = "trackstartcount";
 	public static final String TRACKENDCOUNT = "trackendcount";
+	public static final String TRACKTAG = "tracktag";
 	
 	public static final String LISTID = "listid";
 //	public static final String LISTURL = "list"; // Because its a link.
@@ -70,6 +73,7 @@ public class PlayerStateXmlImpl implements PlayerState, MlistItem, ContentHandle
 	public static final String QUEUELENGTH = "queuelength";
 	
 	public static final String MONITOR = "monitor";
+	private static final String MANUAL_TAG = "0";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -90,6 +94,7 @@ public class PlayerStateXmlImpl implements PlayerState, MlistItem, ContentHandle
 	private boolean trackMissing;
 	private int trackStartCount;
 	private int trackEndCount;
+	private List<String> trackTags;
 	
 	private String listId;
 	private String listUrl;
@@ -229,6 +234,11 @@ public class PlayerStateXmlImpl implements PlayerState, MlistItem, ContentHandle
 	}
 	
 	@Override
+	public String[] getTrackTags () {
+		return this.trackTags == null ? null : this.trackTags.toArray(new String[this.trackTags.size()]);
+	}
+	
+	@Override
 	public MlistItem getItem () {
 		return this;
 	}
@@ -298,42 +308,53 @@ public class PlayerStateXmlImpl implements PlayerState, MlistItem, ContentHandle
 	
 	@Override
 	public String[] getTags () {
-		return null;
+		return getTrackTags();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	private static final Map<String, String> EMPTY_MAP = Collections.unmodifiableMap(new HashMap<String, String>());
+	
 	private final Stack<String> stack = new Stack<String>();
+	private final Stack<Map<String, String>> currentAttributes = new Stack<Map<String,String>>();
 	private StringBuilder currentText;
 	
 	@Override
-	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+	public void startElement(String uri, String localName, String qName, Attributes attr) throws SAXException {
 		this.stack.push(localName);
+		Map<String, String> atMap = EMPTY_MAP;
 		
 		if (this.stack.size() == 2 && localName.equals("link")) {
-			String relVal = attributes.getValue("rel");
+			String relVal = attr.getValue("rel");
 			if (relVal != null && relVal.equals("list")) {
-				String hrefVal = attributes.getValue("href");
+				String hrefVal = attr.getValue("href");
 				if (hrefVal != null && hrefVal.length() > 0) {
 					this.listUrl = this.playerReference.getServerReference().getBaseUrl() + hrefVal;
 				}
 			}
 			else if (relVal != null && relVal.equals(TRACKLINKNAME)) {
-				String hrefVal = attributes.getValue("href");
+				String hrefVal = attr.getValue("href");
 				if (hrefVal != null && hrefVal.length() > 0) {
 					this.trackRelativeUrl = hrefVal;
 				}
 			}
+		}
+		else if (attr.getLength() > 0 && this.stack.size() == 2 && localName.equals(TRACKTAG)) {
+			atMap = new HashMap<String, String>();
+			for (int i = 0; i < attr.getLength(); i++) atMap.put(attr.getLocalName(i), attr.getValue(i));
 		}
 		
 		// If we need a new StringBuilder, make one.
 		if (this.currentText == null || this.currentText.length() > 0) {
 			this.currentText = new StringBuilder();
 		}
+		this.currentAttributes.push(atMap);
 	}
 	
 	@Override
 	public void endElement(String uri, String localName, String qName) throws SAXException {
+		Map<String, String> attr = this.currentAttributes.pop();
+		
 		if (this.stack.size() == 2) {
 			if (localName.equals(PLAYERID)) {
 				int v = Integer.parseInt(this.currentText.toString());
@@ -384,6 +405,12 @@ public class PlayerStateXmlImpl implements PlayerState, MlistItem, ContentHandle
 				int v = Integer.parseInt(this.currentText.toString());
 				this.trackEndCount = v;
 			}
+			else if (localName.equals(TRACKTAG)) {
+				if (MANUAL_TAG.equals(attr.get("t")) && "".equals(attr.get("c"))) {
+					if (this.trackTags == null) this.trackTags = new LinkedList<String>();
+					this.trackTags.add(this.currentText.toString());
+				}
+			}
 			else if (localName.equals(LISTID)) {
 				this.listId = this.currentText.toString();
 			}
@@ -413,7 +440,7 @@ public class PlayerStateXmlImpl implements PlayerState, MlistItem, ContentHandle
 	
 	@Override
 	public void characters(char[] ch, int start, int length) throws SAXException {
-        this.currentText.append( ch, start, length );
+		this.currentText.append( ch, start, length );
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
