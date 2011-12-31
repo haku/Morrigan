@@ -223,7 +223,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 	
 	private void addTag () {
 		final AlertDialog.Builder dlgBuilder = new AlertDialog.Builder(this);
-		dlgBuilder.setTitle("Tag " + this.currentState.getTitle());
+		dlgBuilder.setTitle("Tag: " + this.currentState.getTitle());
 		
 		final EditText editText = new EditText(this);
 		dlgBuilder.setView(editText);
