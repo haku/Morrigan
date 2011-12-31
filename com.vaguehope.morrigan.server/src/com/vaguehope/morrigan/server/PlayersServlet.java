@@ -189,7 +189,6 @@ public class PlayersServlet extends HttpServlet {
 			else {
 				ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "'tag' parameter not set desu~");
 			}
-			
 		}
 		else {
 			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "invalid 'action' parameter '"+act+"' desu~");
