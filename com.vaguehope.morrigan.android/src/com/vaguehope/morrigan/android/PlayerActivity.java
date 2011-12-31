@@ -209,7 +209,9 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 	private OnCreateContextMenuListener tagRowContextMenuListener = new OnCreateContextMenuListener () {
 		@Override
 		public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-			menu.setHeaderTitle(PlayerActivity.this.currentState.getTitle());
+			PlayerState state = PlayerActivity.this.currentState;
+			String title = state != null ? state.getTitle() : "(No item)";
+			menu.setHeaderTitle(title);
 			menu.add(Menu.NONE, MENU_CTX_ADDTAG, Menu.NONE, "Add tag...");
 		}
 	};
@@ -221,12 +223,22 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 	}
 	
 	private void addTag () {
-		CommonDialogs.addTag(this, this.mlistReference, this.currentState.getItem(), new Runnable() {
-			@Override
-			public void run () {
-				refresh();
+		if (this.currentState != null) {
+			if (this.currentState.getItem() != null && this.currentState.getItem().getRelativeUrl() != null) { // TODO figure out why item is not null.
+				CommonDialogs.addTag(this, this.mlistReference, this.currentState.getItem(), new Runnable() {
+					@Override
+					public void run () {
+						refresh();
+					}
+				});
 			}
-		});
+			else {
+				Toast.makeText(this, "No item selected desu~", Toast.LENGTH_SHORT).show();
+			}
+		}
+		else {
+			Toast.makeText(this, "No player selected desu~", Toast.LENGTH_SHORT).show();
+		}
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -332,7 +344,6 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 		else {
 			Toast.makeText(this, "No player selected desu~", Toast.LENGTH_SHORT).show();
 		}
-		
 	}
 	
 	protected void fullscreen () {
