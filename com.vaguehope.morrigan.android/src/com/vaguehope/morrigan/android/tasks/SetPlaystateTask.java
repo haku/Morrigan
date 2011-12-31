@@ -18,6 +18,7 @@ package com.vaguehope.morrigan.android.tasks;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 import org.xml.sax.SAXException;
@@ -123,7 +124,11 @@ public class SetPlaystateTask extends AbstractTask<PlayerState> {
 		}
 		else if (this.newTag != null) {
 			this.verb = "POST";
-			this.encodedData = "action=addtag&tag=" + URLEncoder.encode(this.newTag);
+			String encodedTag;
+			try {
+				encodedTag = URLEncoder.encode(this.newTag, "UTF-8");
+			} catch (UnsupportedEncodingException e) { throw new RuntimeException(e); }
+			this.encodedData = "action=addtag&tag=" + encodedTag;
 		}
 		
 		return url;
