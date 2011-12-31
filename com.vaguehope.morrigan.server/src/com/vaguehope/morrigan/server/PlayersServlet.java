@@ -23,7 +23,9 @@ import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
 import com.vaguehope.morrigan.model.media.MediaTag;
+import com.vaguehope.morrigan.model.media.MediaTagClassification;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.player.IPlayerAbstract;
 import com.vaguehope.morrigan.player.IPlayerLocal;
 import com.vaguehope.morrigan.player.PlayItem;
@@ -42,6 +44,8 @@ import com.vaguehope.morrigan.util.TimeHelper;
  * POST /players/0 action=next
  * POST /players/0 action=stop
  * POST /players/0 action=fullscreen&monitor=0
+ * 
+ * POST /players/0 action=addtag&tag=foo
  * 
  *  GET /players/0/queue
  * POST /players/0/queue action=clear
@@ -64,6 +68,7 @@ public class PlayersServlet extends HttpServlet {
 	private static final String CMD_NEXT = "next";
 	private static final String CMD_STOP = "stop";
 	private static final String CMD_FULLSCREEN = "fullscreen";
+	private static final String CMD_ADDTAG = "addtag";
 	
 	private static final String CMD_CLEAR = "clear";
 	private static final String CMD_SHUFFLE = "shuffle";
@@ -166,6 +171,25 @@ public class PlayersServlet extends HttpServlet {
 			else {
 				ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "'fullscreen' parameter not set desu~");
 			}
+		}
+		else if (act.equals(CMD_ADDTAG)) {
+			String tag = req.getParameter("tag");
+			if (tag != null && tag.length() > 0) {
+				PlayItem currentItem = player.getCurrentItem();
+				IMediaTrack item = currentItem != null ? currentItem.item : null;
+				IMediaTrackList<? extends IMediaTrack> list = currentItem != null ? currentItem.list : null;
+				if (item != null && list != null) {
+					list.addTag(item, tag, MediaTagType.MANUAL, (MediaTagClassification)null);
+					writeResponse(req, resp);
+				}
+				else {
+					ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "no list or item to add tag to desu~");
+				}
+			}
+			else {
+				ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "'tag' parameter not set desu~");
+			}
+			
 		}
 		else {
 			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "invalid 'action' parameter '"+act+"' desu~");
