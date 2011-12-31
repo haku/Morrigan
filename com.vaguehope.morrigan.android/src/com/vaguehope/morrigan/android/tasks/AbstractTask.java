@@ -64,6 +64,8 @@ public abstract class AbstractTask<T extends Object> extends AsyncTask<Void, Voi
 	final protected void onPreExecute () {
 		super.onPreExecute();
 		
+		if (!showProgress()) return;
+		
 		String prgMsg = getProgressMsg();
 		if (prgMsg != null && this.context != null) {
 			this.dialog = ProgressDialog.show(this.context, null, prgMsg, true);
@@ -130,6 +132,7 @@ public abstract class AbstractTask<T extends Object> extends AsyncTask<Void, Voi
 	
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	protected boolean showProgress () { return true; }
 	protected String getProgressMsg () { return null; }
 	protected abstract HttpCreds getCreds ();
 	protected abstract String getUrl ();
