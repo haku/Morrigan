@@ -18,9 +18,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.xml.sax.SAXException;
 
 import com.megginson.sax.DataWriter;
+import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
+import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
 import com.vaguehope.morrigan.player.IPlayerAbstract;
 import com.vaguehope.morrigan.player.IPlayerLocal;
@@ -82,7 +84,15 @@ public class PlayersServlet extends HttpServlet {
 	
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		writeResponse(req, resp);
+		try {
+			writeResponse(req, resp);
+		}
+		catch (SAXException e) {
+			throw new ServletException(e);
+		}
+		catch (MorriganException e) {
+			throw new ServletException(e);
+		}
 	}
 	
 	@Override
@@ -124,9 +134,12 @@ public class PlayersServlet extends HttpServlet {
 		catch (SAXException e) {
 			throw new ServletException(e);
 		}
+		catch (MorriganException e) {
+			throw new ServletException(e);
+		}
 	}
 	
-	private static void postToPlayer (HttpServletRequest req, HttpServletResponse resp, IPlayerAbstract player) throws IOException, ServletException {
+	private static void postToPlayer (HttpServletRequest req, HttpServletResponse resp, IPlayerAbstract player) throws IOException, SAXException, MorriganException {
 		String act = req.getParameter("action");
 		if (act == null) {
 			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "'action' parameter not set desu~");
@@ -208,16 +221,12 @@ public class PlayersServlet extends HttpServlet {
 		}
 	}
 	
-	private static void writeResponse (HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+	private static void writeResponse (HttpServletRequest req, HttpServletResponse resp) throws IOException, SAXException, MorriganException {
 		String requestURI = req.getRequestURI();
 		String reqPath = requestURI.startsWith(CONTEXTPATH) ? requestURI.substring(CONTEXTPATH.length()) : requestURI;
 		
 		if (reqPath == null || reqPath.length() < 1 || reqPath.equals(ROOTPATH)) {
-			try {
-				printPlayersList(resp);
-			} catch (SAXException e) {
-				throw new ServletException(e);
-			}
+			printPlayersList(resp);
 		}
 		else {
 			String path = reqPath.substring(ROOTPATH.length()); // Expecting path = '0' or '0/queue'.
@@ -239,24 +248,14 @@ public class PlayersServlet extends HttpServlet {
 						if (pathParts.length >= 2) {
 							String subPath = pathParts[1];
 							if (subPath.equals(PATH_QUEUE)) {
-								try {
-									printPlayerQueue(resp, player);
-								}
-								catch (SAXException e) {
-									throw new ServletException(e);
-								}
+								printPlayerQueue(resp, player);
 							}
 							else {
 								ServletHelper.error(resp, HttpServletResponse.SC_NOT_FOUND, "'" + subPath + "' not found desu~");
 							}
 						}
 						else {
-							try {
-								printPlayer(resp, player);
-							}
-							catch (SAXException e) {
-								throw new ServletException(e);
-							}
+							printPlayer(resp, player);
 						}
 						
 					}
@@ -271,7 +270,7 @@ public class PlayersServlet extends HttpServlet {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	static private void printPlayersList (HttpServletResponse resp) throws IOException, SAXException {
+	static private void printPlayersList (HttpServletResponse resp) throws IOException, SAXException, MorriganException {
 		resp.setContentType("text/xml;charset=utf-8");
 		DataWriter dw = AbstractFeed.startFeed(resp.getWriter());
 		
@@ -288,7 +287,7 @@ public class PlayersServlet extends HttpServlet {
 		AbstractFeed.endFeed(dw);
 	}
 	
-	static private void printPlayer (HttpServletResponse resp, IPlayerLocal player) throws IOException, SAXException {
+	static private void printPlayer (HttpServletResponse resp, IPlayerLocal player) throws IOException, SAXException, MorriganException {
 		resp.setContentType("text/xml;charset=utf-8");
 		DataWriter dw = AbstractFeed.startDocument(resp.getWriter(), "player");
 		
@@ -308,7 +307,7 @@ public class PlayersServlet extends HttpServlet {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	static private void printPlayer (DataWriter dw, IPlayerAbstract p, int detailLevel) throws SAXException, UnsupportedEncodingException {
+	static private void printPlayer (DataWriter dw, IPlayerAbstract p, int detailLevel) throws SAXException, UnsupportedEncodingException, MorriganException {
 		if (detailLevel < 0 || detailLevel > 1) throw new IllegalArgumentException("detailLevel must be 0 or 1, not "+detailLevel+".");
 		
 		String listTitle;
@@ -381,6 +380,18 @@ public class PlayersServlet extends HttpServlet {
 				AbstractFeed.addElement(dw, "trackmissing", Boolean.toString(currentItem.item.isMissing()));
 				AbstractFeed.addElement(dw, "trackstartcount", String.valueOf(currentItem.item.getStartCount()));
 				AbstractFeed.addElement(dw, "trackendcount", String.valueOf(currentItem.item.getEndCount()));
+				
+				if (currentList != null) {
+					List<MediaTag> tags = currentList.getTags(item);
+					if (tags != null) {
+						for (MediaTag tag : tags) {
+							AbstractFeed.addElement(dw, "tracktag", tag.getTag(), new String[][] {
+								{"t", String.valueOf(tag.getType().getIndex())},
+								{"c", tag.getClassification() == null ? "" : tag.getClassification().getClassification()}
+							});
+						}
+					}
+				}
 			}
 			
 			Map<Integer, String> mons = p.getMonitors();
