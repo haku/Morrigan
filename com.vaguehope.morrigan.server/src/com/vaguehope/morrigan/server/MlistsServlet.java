@@ -53,7 +53,7 @@ import com.vaguehope.sqlitewrapper.DbException;
  * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 action=play&playerid=0
  * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 action=queue&playerid=0
  * 
- *  GET /mlists/LOCALMMDB/wui.local.db3/query/example
+ *  GET /mlists/LOCALMMDB/example.local.db3/query/example
  * </pre>
  */
 public class MlistsServlet extends HttpServlet {
