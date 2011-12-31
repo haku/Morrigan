@@ -227,19 +227,19 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 			
 			TextView title = new TextView(MlistActivity.this);
 			title.setText(mlistItem.getFileName());
-			title.setTextSize(TypedValue.COMPLEX_UNIT_PT, 10);
+			title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
 			header.addView(title);
 			
 			TextView counts = new TextView(MlistActivity.this);
 			counts.setText(mlistItem.getStartCount() + "/" + mlistItem.getEndCount() + " " + TimeHelper.formatTimeSeconds(mlistItem.getDuration()));
-			counts.setTextSize(TypedValue.COMPLEX_UNIT_PT, 8);
+			counts.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
 			header.addView(counts);
 			
 			String[] tarArr = mlistItem.getTags();
 			if (tarArr != null && tarArr.length > 0) {
 				TextView tags = new TextView(MlistActivity.this);
 				tags.setText(StringHelper.implode(tarArr, ", ")); // TODO set max length?
-				tags.setTextSize(TypedValue.COMPLEX_UNIT_PT, 8);
+				tags.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
 				header.addView(tags);
 			}
 			

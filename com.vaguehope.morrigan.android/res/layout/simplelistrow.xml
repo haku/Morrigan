@@ -17,6 +17,6 @@
 		android:layout_weight="1"
 		android:layout_gravity="center_vertical"
 		android:padding="5dip"
-		android:textSize="10pt" />
+		android:textSize="22sp" />
 	
 </LinearLayout>
