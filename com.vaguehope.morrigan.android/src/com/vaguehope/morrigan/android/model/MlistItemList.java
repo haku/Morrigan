@@ -16,6 +16,7 @@
 
 package com.vaguehope.morrigan.android.model;
 
+import java.util.Comparator;
 import java.util.List;
 
 public interface MlistItemList extends ArtifactList {
@@ -24,6 +25,8 @@ public interface MlistItemList extends ArtifactList {
 	public List<? extends MlistItem> getMlistItemList ();
 	
 	public String getQuery ();
+	
+	public void sort (Comparator<MlistItem> comparator);
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

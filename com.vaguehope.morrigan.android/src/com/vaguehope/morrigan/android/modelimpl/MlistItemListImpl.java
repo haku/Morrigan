@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -108,6 +109,11 @@ public class MlistItemListImpl implements MlistItemList, ContentHandler {
 	@Override
 	public String getQuery() {
 		return this.query;
+	}
+	
+	@Override
+	public void sort (Comparator<MlistItem> comparator) {
+		Collections.sort(this.mlistItemList, comparator);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
