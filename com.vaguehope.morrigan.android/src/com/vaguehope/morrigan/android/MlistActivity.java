@@ -206,7 +206,8 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 	
 	private static final int MENU_CTX_PLAY = 1;
 	private static final int MENU_CTX_QUEUE = 2;
-	private static final int MENU_CTX_DOWNLOAD = 3;
+	private static final int MENU_CTX_ADDTAG = 3;
+	private static final int MENU_CTX_DOWNLOAD = 4;
 	
 	private OnItemClickListener mlistItemListCickListener = new OnItemClickListener() {
 		@Override
@@ -246,6 +247,7 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 			menu.setHeaderView(header);
 			menu.add(Menu.NONE, MENU_CTX_PLAY, Menu.NONE, "Play now");
 			menu.add(Menu.NONE, MENU_CTX_QUEUE, Menu.NONE, "Queue");
+			menu.add(Menu.NONE, MENU_CTX_ADDTAG, Menu.NONE, "Add tag...");
 			menu.add(Menu.NONE, MENU_CTX_DOWNLOAD, Menu.NONE, "Download");
 		}
 	};
@@ -262,6 +264,15 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 			
 			case MENU_CTX_QUEUE:
 				queueItem(mlistItem);
+				return true;
+				
+			case MENU_CTX_ADDTAG:
+				CommonDialogs.addTag(this, this.mlistReference, mlistItem, new Runnable() {
+					@Override
+					public void run () {
+						refresh();
+					}
+				});
 				return true;
 				
 			case MENU_CTX_DOWNLOAD:

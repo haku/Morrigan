@@ -36,7 +36,6 @@ import android.view.View.OnCreateContextMenuListener;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -62,7 +61,6 @@ import com.vaguehope.morrigan.android.tasks.DownloadMediaTask;
 import com.vaguehope.morrigan.android.tasks.GetPlayerQueueTask;
 import com.vaguehope.morrigan.android.tasks.GetPlayerQueueTask.QueueAction;
 import com.vaguehope.morrigan.android.tasks.GetPlayerQueueTask.QueueItemAction;
-import com.vaguehope.morrigan.android.tasks.RunMlistItemActionTask;
 import com.vaguehope.morrigan.android.tasks.SetPlaystateTask;
 import com.vaguehope.morrigan.android.tasks.SetPlaystateTask.TargetPlayState;
 
@@ -212,7 +210,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 		@Override
 		public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 			menu.setHeaderTitle(PlayerActivity.this.currentState.getTitle());
-			menu.add(Menu.NONE, MENU_CTX_ADDTAG, Menu.NONE, "Add tag");
+			menu.add(Menu.NONE, MENU_CTX_ADDTAG, Menu.NONE, "Add tag...");
 		}
 	};
 	
@@ -223,38 +221,12 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 	}
 	
 	private void addTag () {
-		final MlistItem item = this.currentState.getItem();
-		
-		final AlertDialog.Builder dlgBuilder = new AlertDialog.Builder(this);
-		dlgBuilder.setTitle("Tag: " + item.getTitle());
-		final EditText editText = new EditText(this);
-		dlgBuilder.setView(editText);
-		
-		dlgBuilder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+		CommonDialogs.addTag(this, this.mlistReference, this.currentState.getItem(), new Runnable() {
 			@Override
-			public void onClick(DialogInterface dialog, int whichButton) {
-				String tag = editText.getText().toString().trim();
-				dialog.dismiss();
-				RunMlistItemActionTask task = new RunMlistItemActionTask(PlayerActivity.this, PlayerActivity.this.mlistReference, item, tag);
-				task.setOnComplete(new Runnable() {
-					@Override
-					public void run () {
-						refresh();
-					}
-				});
-				task.execute();
+			public void run () {
+				refresh();
 			}
 		});
-		
-		dlgBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int whichButton) {
-				dialog.cancel();
-			}
-		});
-		
-		dlgBuilder.show();
-		
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
