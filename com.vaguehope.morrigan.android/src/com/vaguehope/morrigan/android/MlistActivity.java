@@ -454,6 +454,19 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
+	private void updateTitle () {
+		String title = this.serverReference.getName();
+		if (this.currentState != null && this.currentState.getTitle() != null) {
+			title += " / " + this.currentState.getTitle();
+		}
+		if (this.currentItemList != null && this.currentItemList.getQuery() != null) {
+			title += " / " + this.currentItemList.getQuery();
+		}
+		this.setTitle(title);
+	}
+	
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
 	@Override
 	public void onMlistStateChange(MlistState newState) {
 		this.currentState = newState;
@@ -462,7 +475,7 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 			finish(); // TODO show a msg here? Retry / Fail dlg?
 		}
 		else {
-			this.setTitle(this.serverReference.getName() + " / " + newState.getTitle());
+			updateTitle();
 			
 			TextView txtCount = (TextView) findViewById(R.id.txtTitle);
 			txtCount.setText(newState.getCount() + " items, "
@@ -480,6 +493,7 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 			finish(); // TODO show a msg here? Retry / Fail dlg?
 		}
 		else {
+			updateTitle();
 			TextView txtSubTitle = (TextView) findViewById(R.id.txtSubTitle);
 			txtSubTitle.setText(mlistItemList.getMlistItemList().size() + " results for '"+mlistItemList.getQuery()+"'.");
 			
