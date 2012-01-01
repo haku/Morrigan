@@ -162,6 +162,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 //	Context menus.
 	
 	private static final int MENU_CTX_ADDTAG = 7;
+	private static final int MENU_CTX_TAG = 8;
 	
 	private static final int MENU_CTX_MOVETOP = 2;
 	private static final int MENU_CTX_MOVEUP = 3;
@@ -173,6 +174,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 	public boolean onContextItemSelected(MenuItem menuItem) {
 		switch (menuItem.getItemId()) {
 			case MENU_CTX_ADDTAG:
+			case MENU_CTX_TAG:
 				onTagRowContextMenu(menuItem);
 				return true;
 			
@@ -210,15 +212,27 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 		@Override
 		public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 			PlayerState state = PlayerActivity.this.currentState;
-			String title = state != null ? state.getTitle() : "(No item)";
-			menu.setHeaderTitle(title);
-			menu.add(Menu.NONE, MENU_CTX_ADDTAG, Menu.NONE, "Add tag...");
+			if (state != null) {
+				menu.setHeaderTitle(state.getTitle());
+				menu.add(Menu.NONE, MENU_CTX_ADDTAG, Menu.NONE, "Add tag...");
+				if (state.getTrackTags() != null) {
+					for (String tag : state.getTrackTags()) {
+						menu.add(Menu.NONE, MENU_CTX_TAG, Menu.NONE, tag);
+					}
+				}
+			}
+			else {
+				menu.setHeaderTitle("(No item)");
+			}
 		}
 	};
 	
 	private void onTagRowContextMenu (MenuItem menuItem) {
 		if (menuItem.getItemId() == MENU_CTX_ADDTAG) {
 			addTag();
+		}
+		else if (menuItem.getItemId() == MENU_CTX_TAG) {
+			CommonDialogs.searchMlist(this, this.currentState, menuItem.getTitle().toString());
 		}
 	}
 	
