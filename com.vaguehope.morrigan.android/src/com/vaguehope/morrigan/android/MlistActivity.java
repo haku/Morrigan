@@ -28,6 +28,7 @@ import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnCreateContextMenuListener;
@@ -207,6 +208,8 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 	private static final int MENU_CTX_PLAY = 1;
 	private static final int MENU_CTX_QUEUE = 2;
 	private static final int MENU_CTX_ADDTAG = 3;
+	private static final int MENU_CTX_TAGS = 5;
+	private static final int MENU_CTX_TAG = 6;
 	private static final int MENU_CTX_DOWNLOAD = 4;
 	
 	private OnItemClickListener mlistItemListCickListener = new OnItemClickListener() {
@@ -248,14 +251,29 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 			menu.add(Menu.NONE, MENU_CTX_PLAY, Menu.NONE, "Play now");
 			menu.add(Menu.NONE, MENU_CTX_QUEUE, Menu.NONE, "Queue");
 			menu.add(Menu.NONE, MENU_CTX_ADDTAG, Menu.NONE, "Add tag...");
+			
+			if (tarArr != null && tarArr.length > 0) {
+				SubMenu tagMenu = menu.addSubMenu(Menu.NONE, MENU_CTX_TAGS, Menu.NONE, "tags...");
+				for (String tag : tarArr) {
+					tagMenu.add(Menu.NONE, MENU_CTX_TAG, Menu.NONE, tag);
+				}
+			}
+			
 			menu.add(Menu.NONE, MENU_CTX_DOWNLOAD, Menu.NONE, "Download");
 		}
 	};
 	
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
-		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-		MlistItem mlistItem = MlistActivity.this.mlistItemListAdapter.getInputData().getMlistItemList().get(info.position);
+		MlistItem mlistItem = null;
+		switch (item.getItemId()) {
+			case MENU_CTX_PLAY:
+			case MENU_CTX_QUEUE:
+			case MENU_CTX_ADDTAG:
+			case MENU_CTX_DOWNLOAD:
+				AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+				mlistItem = MlistActivity.this.mlistItemListAdapter.getInputData().getMlistItemList().get(info.position);
+		}
 		
 		switch (item.getItemId()) {
 			case MENU_CTX_PLAY:
@@ -275,10 +293,13 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 				});
 				return true;
 				
+			case MENU_CTX_TAG:
+				search(item.getTitle().toString());
+				return true;
+				
 			case MENU_CTX_DOWNLOAD:
 				DownloadMediaTask task = new DownloadMediaTask(this, this.mlistReference);
 				task.execute(mlistItem);
-				
 				return true;
 			
 			default:
@@ -328,8 +349,7 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 			public void onClick(DialogInterface dialog, int whichButton) {
 				String query = editText.getText().toString().trim();
 				dialog.dismiss();
-				
-				new GetMlistItemListTask(MlistActivity.this, MlistActivity.this.mlistReference, MlistActivity.this, query).execute();
+				search(query);
 			}
 		});
 		
@@ -341,6 +361,10 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 		});
 		
 		dlgBuilder.show();
+	}
+	
+	protected void search (String query) {
+		new GetMlistItemListTask(MlistActivity.this, MlistActivity.this.mlistReference, MlistActivity.this, query).execute();
 	}
 	
 	protected void play () {
