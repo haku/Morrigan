@@ -19,6 +19,14 @@ package com.vaguehope.morrigan.android;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.widget.EditText;
+import android.widget.Toast;
+
 import com.vaguehope.morrigan.android.model.MlistItem;
 import com.vaguehope.morrigan.android.model.MlistReference;
 import com.vaguehope.morrigan.android.model.PlayerState;
@@ -27,14 +35,6 @@ import com.vaguehope.morrigan.android.model.PlayerStateListChangeListener;
 import com.vaguehope.morrigan.android.model.ServerReference;
 import com.vaguehope.morrigan.android.tasks.GetPlayersTask;
 import com.vaguehope.morrigan.android.tasks.RunMlistItemActionTask;
-
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.widget.EditText;
-import android.widget.Toast;
 
 public class CommonDialogs {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -111,18 +111,9 @@ public class CommonDialogs {
 			public void onClick(DialogInterface dialog, int whichButton) {
 				String query = editText.getText().toString().trim();
 				dialog.dismiss();
-				
 				if (defaultQuery != null) defaultQuery.set(query); // Save the query for next time.
-				
 				if ("".equals(query)) query = "*"; // Default to searching for wild-card.
-				
-				Intent intent = new Intent(context.getApplicationContext(), MlistActivity.class);
-				intent.putExtra(MlistActivity.SERVER_ID, playerState.getPlayerReference().getServerReference().getId());
-				intent.putExtra(MlistActivity.MLIST_BASE_URL, playerState.getListUrl());
-				intent.putExtra(MlistActivity.QUERY, query);
-				intent.putExtra(MlistActivity.PLAYER_ID, playerState.getPlayerReference().getPlayerId());
-				context.startActivity(intent);
-				
+				searchMlist(context, playerState, query);
 			}
 		});
 		
@@ -134,6 +125,15 @@ public class CommonDialogs {
 		});
 		
 		dlgBuilder.show();
+	}
+	
+	static public void searchMlist (Context context, PlayerState playerState, String query) {
+		Intent intent = new Intent(context.getApplicationContext(), MlistActivity.class);
+		intent.putExtra(MlistActivity.SERVER_ID, playerState.getPlayerReference().getServerReference().getId());
+		intent.putExtra(MlistActivity.MLIST_BASE_URL, playerState.getListUrl());
+		intent.putExtra(MlistActivity.QUERY, query);
+		intent.putExtra(MlistActivity.PLAYER_ID, playerState.getPlayerReference().getPlayerId());
+		context.startActivity(intent);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
