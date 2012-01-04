@@ -13,7 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Stack;
+import java.util.Queue;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItem;
@@ -185,54 +185,44 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 		List<File> filesToAdd = new LinkedList<File>();
 		int filesAdded = 0;
 		
-		if (sources!=null) {
-			for (String source : sources) {
+		if (sources != null) {
+			Queue<File> dirs = new LinkedList<File>();
+			for (String source : sources) dirs.add(new File(source));
+			
+			while (!dirs.isEmpty()) {
 				if (taskEventListener.isCanceled()) break;
+				File dirItem = dirs.poll();
+				taskEventListener.subTask("(" + filesToAdd.size() + ") Scanning " + dirItem.getAbsolutePath());
 				
-				Stack<File> dirStack = new Stack<File>();
-				dirStack.push(new File(source));
-				
-				while (!dirStack.isEmpty()) {
-					if (taskEventListener.isCanceled()) break;
-					
-					File dirItem = dirStack.pop();
-					taskEventListener.subTask("(" + filesToAdd.size() + ") Scanning " + dirItem.getAbsolutePath());
-					
-					File[] arrFiles = dirItem.listFiles();
-					if (arrFiles != null) {
+				File[] arrFiles = dirItem.listFiles();
+				if (arrFiles != null) {
+					for (File file : arrFiles) {
+						if (taskEventListener.isCanceled()) break;
 						
-						List<File> listFiles = new ArrayList<File>(arrFiles.length);
-						for (File file : arrFiles) {
-							listFiles.add(file);
+						if (file.isDirectory()) {
+							dirs.add(file);
 						}
-						Collections.sort(listFiles);
-						
-						for (File file : listFiles) {
-							if (taskEventListener.isCanceled()) break;
-							
-							if (file.isDirectory()) {
-								dirStack.push(file);
-							}
-							else if (file.isFile()) {
-								String ext = file.getName();
-								ext = ext.substring(ext.lastIndexOf(".") + 1).toLowerCase();
-								if (supportedFormats.contains(ext)) {
-									if (!this.getItemList().hasFile(file)) {
-										filesToAdd.add(file);
-									}
+						else if (file.isFile()) {
+							String ext = file.getName();
+							ext = ext.substring(ext.lastIndexOf(".") + 1).toLowerCase();
+							if (supportedFormats.contains(ext)) {
+								if (!this.getItemList().hasFile(file)) {
+									filesToAdd.add(file);
 								}
 							}
 						}
 					}
-					else {
-						taskEventListener.logMsg(this.getItemList().getListName(), "Failed to read directory: " + dirItem.getAbsolutePath());
-					}
+				}
+				else {
+					taskEventListener.logMsg(this.getItemList().getListName(), "Failed to read directory: " + dirItem.getAbsolutePath());
 				}
 			}
 		} // End directory scanning.
 		
 		if (filesToAdd.size() > 0) {
 			taskEventListener.logMsg(this.getItemList().getListName(), "Adding " + filesToAdd.size() + " files to DB...");
+			
+			Collections.sort(filesToAdd); // Ensure sequential files are in expected order.
 			
 			IMediaItemDb<?,?> transClone = MediaFactoryImpl.get().getMediaItemDbTransactional(this.getItemList());
 			try {
