@@ -34,18 +34,15 @@ import com.vaguehope.morrigan.gui.display.ScreenPainter.TitleProvider;
 import com.vaguehope.morrigan.gui.editors.EditorFactory;
 import com.vaguehope.morrigan.gui.editors.MediaItemDbEditorInput;
 import com.vaguehope.morrigan.gui.editors.MediaItemListEditor;
-import com.vaguehope.morrigan.gui.editors.MediaItemListEditorInput;
 import com.vaguehope.morrigan.gui.editors.mmdb.LocalMixedMediaDbEditor;
 import com.vaguehope.morrigan.gui.editors.mmdb.MixedMediaListEditor;
 import com.vaguehope.morrigan.gui.editors.tracks.MediaTrackListEditor;
-import com.vaguehope.morrigan.gui.editors.tracks.PlaylistEditor;
 import com.vaguehope.morrigan.gui.engines.HotkeyRegister;
 import com.vaguehope.morrigan.gui.helpers.ClipboardHelper;
 import com.vaguehope.morrigan.gui.helpers.MonitorHelper;
 import com.vaguehope.morrigan.gui.helpers.RefreshTimer;
 import com.vaguehope.morrigan.gui.helpers.TrayHelper;
 import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
-import com.vaguehope.morrigan.model.media.IMediaPlaylist;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
@@ -672,10 +669,6 @@ public abstract class AbstractPlayerView extends ViewPart {
 			if (list.getType().equals(ILocalMixedMediaDb.TYPE)) {
 				MediaItemDbEditorInput input = EditorFactory.getMmdbInputBySerial(list.getSerial());
 				getViewSite().getWorkbenchWindow().getActivePage().openEditor(input, LocalMixedMediaDbEditor.ID);
-			}
-			else if (list.getType().equals(IMediaPlaylist.TYPE)) {
-				MediaItemListEditorInput<IMediaPlaylist> input = EditorFactory.getMediaPlaylistInput(list.getListId());
-				getViewSite().getWorkbenchWindow().getActivePage().openEditor(input, PlaylistEditor.ID);
 			}
 			
 			IEditorPart activeEditor = getViewSite().getWorkbenchWindow().getActivePage().getActiveEditor();

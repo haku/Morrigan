@@ -14,8 +14,6 @@ import org.eclipse.ui.handlers.HandlerUtil;
 
 import com.vaguehope.morrigan.gui.dialogs.MorriganMsgDlg;
 import com.vaguehope.morrigan.gui.editors.mmdb.LocalMixedMediaDbEditor;
-import com.vaguehope.morrigan.gui.editors.tracks.MediaTrackListEditor;
-import com.vaguehope.morrigan.gui.editors.tracks.PlaylistEditor;
 import com.vaguehope.morrigan.gui.views.AbstractPlayerView;
 import com.vaguehope.morrigan.gui.views.ViewControls;
 import com.vaguehope.morrigan.gui.views.ViewPicture;
@@ -61,13 +59,6 @@ public class CallPlayMedia extends AbstractHandler {
 			else {
 				new MorriganMsgDlg("Error: don't know how to play the type '"+selectedItem.getMediaType()+"'.").open();
 			}
-		}
-		else if (activeEditor instanceof PlaylistEditor) {
-			@SuppressWarnings("unchecked")
-			MediaTrackListEditor<IMediaTrackList<IMediaTrack>, IMediaTrack> mediaListEditor = (MediaTrackListEditor<IMediaTrackList<IMediaTrack>, IMediaTrack>) activeEditor;
-			IMediaTrackList<IMediaTrack> mediaList = mediaListEditor.getMediaList();
-			IMediaTrack selectedItem = mediaListEditor.getSelectedItem();
-			playItem(page, mediaList, selectedItem);
 		}
 		else {
 			new MorriganMsgDlg("Error: invalid active editor.").open();

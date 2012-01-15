@@ -60,12 +60,6 @@ public interface MediaFactory {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	public IMediaPlaylist createPlaylist (String plName) throws MorriganException;
-	public IMediaPlaylist getPlaylist (String filePath) throws MorriganException;
-	public void disposeAllPlaylists ();
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
 	public DurationData getNewDurationData (long duration, boolean complete);
 	
 	/*

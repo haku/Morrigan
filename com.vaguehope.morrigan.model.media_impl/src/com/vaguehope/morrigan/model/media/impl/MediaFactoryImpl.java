@@ -16,7 +16,6 @@ import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
-import com.vaguehope.morrigan.model.media.IMediaPlaylist;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaFactory;
@@ -30,8 +29,6 @@ import com.vaguehope.morrigan.model.media.internal.db.mmdb.LocalMixedMediaDbHelp
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.LocalMixedMediaDbUpdateTask;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.RemoteMixedMediaDbUpdateTask;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.SyncMetadataRemoteToLocalTask;
-import com.vaguehope.morrigan.model.media.internal.pl.MediaPlaylistFactory;
-import com.vaguehope.morrigan.model.media.internal.pl.PlaylistHelper;
 import com.vaguehope.morrigan.tasks.IMorriganTask;
 import com.vaguehope.sqlitewrapper.DbException;
 
@@ -112,23 +109,6 @@ public class MediaFactoryImpl implements MediaFactory {
 	@Override
 	public IRemoteMixedMediaDb getRemoteMixedMediaDb(String dbName, URL url) {
 		throw new IllegalArgumentException("See server package.");
-	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	@Override
-	public IMediaPlaylist createPlaylist (String plName) throws MorriganException {
-		return PlaylistHelper.createPl(plName);
-	}
-	
-	@Override
-	public IMediaPlaylist getPlaylist(String filePath) throws MorriganException {
-		return MediaPlaylistFactory.INSTANCE.manufacture(filePath);
-	}
-	
-	@Override
-	public void disposeAllPlaylists() {
-		MediaPlaylistFactory.INSTANCE.disposeAll();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
