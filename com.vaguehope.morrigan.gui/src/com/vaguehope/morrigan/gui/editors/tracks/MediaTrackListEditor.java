@@ -3,19 +3,13 @@ package com.vaguehope.morrigan.gui.editors.tracks;
 import java.util.LinkedList;
 import java.util.List;
 
-
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.action.IMenuListener;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.swt.SWT;
-import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.handlers.IHandlerService;
 
-import com.vaguehope.morrigan.gui.actions.AddToPlaylistAction;
 import com.vaguehope.morrigan.gui.adaptors.CountsLblProv;
 import com.vaguehope.morrigan.gui.adaptors.DateAddedLblProv;
 import com.vaguehope.morrigan.gui.adaptors.DateLastModifiedLblProv;
@@ -77,30 +71,27 @@ public abstract class MediaTrackListEditor<T extends IMediaTrackList<S>, S exten
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Menus and Actions.
 	
-	protected MenuManager getAddToMenu () {
-		final MenuManager menu = new MenuManager("Add to playlist...");
-		
-		menu.addMenuListener(new IMenuListener () {
-			@Override
-			public void menuAboutToShow(IMenuManager manager) {
-				IEditorReference[] editors = getEditorSite().getPage().getEditorReferences();
-				for (final IEditorReference e : editors) {
-					if (e.getId().equals(PlaylistEditor.ID)) {
-						menu.add(new AddToPlaylistAction(MediaTrackListEditor.this, e));
-					}
-				}
-				if (menu.getItems().length < 1) {
-					Action a = new Action("(No playlists open)") {/* UNUSED */};
-					a.setEnabled(false);
-					menu.add(a);
-				}
-			}
-		});
-		
-		menu.setRemoveAllWhenShown(true);
-		
-		return menu;
-	}
+//	protected MenuManager getAddToMenu () {
+//		final MenuManager menu = new MenuManager("Add to playlist...");
+//		menu.addMenuListener(new IMenuListener () {
+//			@Override
+//			public void menuAboutToShow(IMenuManager manager) {
+//				IEditorReference[] editors = getEditorSite().getPage().getEditorReferences();
+//				for (final IEditorReference e : editors) {
+//					if (e.getId().equals(PlaylistEditor.ID)) {
+//						menu.add(new AddToPlaylistAction(MediaTrackListEditor.this, e));
+//					}
+//				}
+//				if (menu.getItems().length < 1) {
+//					Action a = new Action("(No playlists open)") {/* UNUSED */};
+//					a.setEnabled(false);
+//					menu.add(a);
+//				}
+//			}
+//		});
+//		menu.setRemoveAllWhenShown(true);
+//		return menu;
+//	}
 	
 	protected IAction addToQueueAction = new Action("Enqueue") {
 		@Override

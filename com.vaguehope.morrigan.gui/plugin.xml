@@ -114,14 +114,6 @@
    </extension>
    
    <extension point="org.eclipse.ui.editors">
-   
-      <editor
-            class="com.vaguehope.morrigan.gui.editors.tracks.PlaylistEditor"
-            default="false"
-            icon="icons/playlist.gif"
-            id="com.vaguehope.morrigan.gui.editors.PlaylistEditor"
-            name="MediaListEditor" >
-      </editor>
       
       <editor
             class="com.vaguehope.morrigan.gui.editors.mmdb.LocalMixedMediaDbEditor"

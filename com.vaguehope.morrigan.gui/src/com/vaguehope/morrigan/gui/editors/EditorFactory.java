@@ -7,7 +7,6 @@ import org.eclipse.ui.IMemento;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
-import com.vaguehope.morrigan.model.media.IMediaPlaylist;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.impl.MediaFactoryImpl;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbFactory;
@@ -42,10 +41,6 @@ public class EditorFactory implements IElementFactory {
 			else if (type.equals(IRemoteMixedMediaDb.TYPE)) {
 				input = getRemoteMmdbInput(memento);
 			}
-			else if (type.equals(IMediaPlaylist.TYPE)) {
-				String serial = memento.getString(KEY_SERIAL);
-				input = getMediaPlaylistInput(serial);
-			}
 			else {
 				System.err.println("EditorFactory.createElement(): Unknown type: '"+type+"'.");
 				return null;
@@ -61,21 +56,6 @@ public class EditorFactory implements IElementFactory {
 			input.setTopIndex(i);
 		}
 		
-		return input;
-	}
-	
-//	- - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - - - - - - -
-//	Playlists.
-	
-	public static MediaItemListEditorInput<IMediaPlaylist> getMediaPlaylistInput (String filePath) throws MorriganException {
-		IMediaPlaylist playList;
-		try {
-			playList = MediaFactoryImpl.get().getPlaylist(filePath);
-		} catch (MorriganException e) {
-			throw new MorriganException(e);
-		}
-		
-		MediaItemListEditorInput<IMediaPlaylist> input = new MediaItemListEditorInput<IMediaPlaylist>(playList);
 		return input;
 	}
 	

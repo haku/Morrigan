@@ -5,8 +5,6 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
-import com.vaguehope.morrigan.model.media.impl.MediaFactoryImpl;
-
 public class Activator extends AbstractUIPlugin {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
@@ -34,13 +32,7 @@ public class Activator extends AbstractUIPlugin {
 	public void stop(BundleContext bundleContext) throws Exception {
 		Activator.plugin = null;
 		Activator.context = null;
-		
-		try {
-			MediaFactoryImpl.get().disposeAllPlaylists();
-		}
-		finally {
-			super.stop(bundleContext);
-		}
+		super.stop(bundleContext);
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
