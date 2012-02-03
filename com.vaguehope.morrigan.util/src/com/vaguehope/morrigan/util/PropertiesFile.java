@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Set;
 
 public class PropertiesFile {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -35,6 +37,10 @@ public class PropertiesFile {
 		catch (NumberFormatException e) {
 			return defaultValue;
 		}
+	}
+	
+	public Set<Entry<Object, Object>> getAll () throws IOException {
+		return getProperties().entrySet();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
