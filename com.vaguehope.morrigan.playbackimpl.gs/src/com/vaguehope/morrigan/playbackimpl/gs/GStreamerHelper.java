@@ -10,19 +10,19 @@ import org.gstreamer.elements.PlayBin;
 
 public class GStreamerHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	private GStreamerHelper () { /* Unused */ }
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	static public int readFileDuration (final String fpath) {
 		PlayBin playb = new PlayBin("Metadata");
 		Element fakesink = ElementFactory.make("fakesink", "videosink");
 		playb.setVideoSink(fakesink);
 		playb.setInputFile(new File(fpath));
 		playb.setState(State.PAUSED);
-		
-		long queryDuration = -1;
+
+		long queryDuration;
 		long startTime = System.currentTimeMillis();
 		while (true) {
 			queryDuration = playb.queryDuration(TimeUnit.MILLISECONDS);
@@ -36,15 +36,15 @@ public class GStreamerHelper {
 		playb.setState(State.NULL);
 		fakesink.dispose();
 		playb.dispose();
-		
+
 		int retDuration = -1;
 		if (queryDuration > 0) {
 			retDuration = (int) (queryDuration / 1000);
 			if (retDuration < 1) retDuration = 1;
 		}
-		
+
 		return retDuration;
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
