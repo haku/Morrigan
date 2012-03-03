@@ -154,10 +154,8 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 	}
 	
 	protected void refresh () {
-		GetPlayersTask playersTask = new GetPlayersTask(this, this.serverReference, this);
-		playersTask.execute();
-		GetMlistsTask mlistTask = new GetMlistsTask(this, this.serverReference, this);
-		mlistTask.execute();
+		new GetPlayersTask(this, this.serverReference, this).execute();
+		new GetMlistsTask(this, this.serverReference, this).execute();
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
