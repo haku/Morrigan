@@ -21,7 +21,6 @@ import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
-import com.vaguehope.morrigan.model.media.impl.MediaFactoryImpl;
 import com.vaguehope.morrigan.tasks.IMorriganTask;
 import com.vaguehope.morrigan.tasks.TaskEventListener;
 import com.vaguehope.morrigan.tasks.TaskResult;
@@ -94,6 +93,8 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 	public void setFinished () {
 		this.isFinished = true;
 	}
+
+	protected abstract Q getTransactional (Q list) throws DbException;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Main run method.
@@ -231,7 +232,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 
 			Collections.sort(filesToAdd); // Ensure sequential files are in expected order.
 
-			IMediaItemDb<?, ?> transClone = MediaFactoryImpl.get().getMediaItemDbTransactional(this.getItemList());
+			Q transClone = getTransactional(this.getItemList());
 			try {
 				transClone.addFiles(filesToAdd);
 				filesAdded = filesAdded + filesToAdd.size();
