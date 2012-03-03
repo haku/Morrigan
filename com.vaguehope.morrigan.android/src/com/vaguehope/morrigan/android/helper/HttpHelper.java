@@ -30,47 +30,46 @@ import android.util.Base64;
 
 public class HttpHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	public static final int HTTP_CONNECT_TIMEOUT_SECONDS = 20;
 	public static final int HTTP_READ_TIMEOUT_SECONDS = 60;
-	
+
 	private static final String HEADER_AUTHORISATION = "Authorization";
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	static public interface HttpStreamHandler<T extends Exception> {
-		
+
 		public void handleStream (InputStream is, int contentLength) throws IOException, T;
-		
+
 	}
-	
+
 	static public interface HttpCreds {
-		
+
 		public String getUser ();
 		public String getPass ();
-		
+
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	public static String getUrlContent (String sUrl, String httpRequestMethod, String encodedData, String contentType, HttpCreds creds) throws IOException {
 		return getUrlContent(sUrl, httpRequestMethod, encodedData, contentType, (HttpStreamHandler<RuntimeException>) null, creds);
 	}
-	
+
 	public static <T extends Exception> String getUrlContent (String sUrl, HttpStreamHandler<T> streamHandler, HttpCreds creds) throws IOException, T {
 		return getUrlContent(sUrl, null, null, null, streamHandler, creds);
 	}
-	
+
 	public static <T extends Exception> String getUrlContent (String sUrl, String httpRequestMethod, String encodedData, String contentType, HttpStreamHandler<T> streamHandler, HttpCreds creds) throws IOException, T {
 		URL url = new URL(sUrl);
 		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 		connection.setUseCaches(false);
-		connection.setDoOutput(true);
 		connection.setRequestMethod(httpRequestMethod != null ? httpRequestMethod : "GET");
 		connection.setConnectTimeout(HTTP_CONNECT_TIMEOUT_SECONDS * 1000);
 		connection.setReadTimeout(HTTP_READ_TIMEOUT_SECONDS * 1000);
 		connection.setRequestProperty(HEADER_AUTHORISATION, authHeader(creds));
-		
+
 		if (encodedData != null) {
 			if (contentType != null) connection.setRequestProperty("Content-Type", contentType);
 			connection.setDoOutput(true);
@@ -83,7 +82,7 @@ public class HttpHelper {
 				out.close();
 			}
 		}
-		
+
 		StringBuilder sb = null;
 		InputStream is = null;
 		try {
@@ -93,9 +92,9 @@ public class HttpHelper {
 				buildString(connection.getErrorStream(), sb);
 				throw new HttpResponseException(responseCode, sb.toString());
 			}
-			
+
 			is = connection.getInputStream();
-			
+
 			if (streamHandler != null) {
 				streamHandler.handleStream(is, connection.getContentLength());
 			}
@@ -107,18 +106,18 @@ public class HttpHelper {
 		finally {
 			if (is != null) is.close();
 		}
-		
+
 		return sb == null ? null : sb.toString();
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	public static String authHeader (HttpCreds creds) {
 		String raw = creds.getUser() + ":" + creds.getPass();
 		String enc = Base64.encodeToString(raw.getBytes(), Base64.NO_WRAP);
 		return "Basic " + enc;
 	}
-	
+
 	public static void buildString (InputStream is, StringBuilder sb) throws IOException {
 		BufferedReader rd = new BufferedReader(new InputStreamReader(is));
 		String line;
@@ -127,6 +126,6 @@ public class HttpHelper {
 			sb.append("\n");
 		}
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
