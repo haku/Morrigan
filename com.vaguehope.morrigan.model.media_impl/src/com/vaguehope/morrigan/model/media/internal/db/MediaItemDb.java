@@ -146,12 +146,39 @@ implements IMediaItemDb<S, T> {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+	@Override
+	public int getCount () {
+		if (!isRead()) throw new IllegalStateException("DB has not been loaded.");
+		return super.getCount();
+	}
+
+	@Override
+	public List<T> getMediaItems () {
+		if (!isRead()) throw new IllegalStateException("DB has not been loaded.");
+		return super.getMediaItems();
+	}
+
+	@Override
+	public T findItemByFilePath (String path) {
+		if (!isRead()) throw new IllegalStateException("DB has not been loaded.");
+		return super.findItemByFilePath(path);
+	}
+
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 	private boolean firstRead = true;
 	private long durationOfLastRead = -1;
 
+	/**
+	 * @return true if DB state has been loaded.
+	 */
+	protected boolean isRead () {
+		return !this.firstRead;
+	}
+
 	@Override
 	public void read () throws MorriganException {
-		if (!this.firstRead) return;
+		if (isRead()) return;
 		try {
 			doRead();
 		}
@@ -210,7 +237,7 @@ implements IMediaItemDb<S, T> {
 	 * to already be read.
 	 */
 	public void updateRead () throws MorriganException {
-		if (!this.firstRead) {
+		if (isRead()) {
 			forceRead();
 		}
 		else {
