@@ -166,6 +166,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 
 	private TaskResult scanLibraryDirectories (TaskEventListener taskEventListener) throws DbException, MorriganException {
 		taskEventListener.subTask("Scanning sources");
+		long startTime = System.currentTimeMillis();
 
 		List<String> supportedFormats;
 		try {
@@ -243,13 +244,10 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 				}
 			}
 		}
+		if (filesAdded > 0) this.itemList.forceRead();
 
-		if (filesAdded > 0) {
-			// Make main connection pick up changes to DB.
-			this.itemList.forceRead();
-		}
-
-		taskEventListener.logMsg(this.itemList.getListName(), "Added " + filesAdded + " files.");
+		long duration = (startTime - System.currentTimeMillis()) / 1000L;
+		taskEventListener.logMsg(this.itemList.getListName(), "Added " + filesAdded + " files in " + duration + " seconds.");
 		this.itemList.getDbLayer().getChangeEventCaller().eventMessage("Added " + filesAdded + " items to " + this.itemList.getListName() + ".");
 
 		return null;
@@ -266,6 +264,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 		String subTaskTitle = null;
 		taskEventListener.subTask(SUBTASK_TITLE);
 
+		long startTime = System.currentTimeMillis();
 		int progress = 0;
 		int n = 0;
 		int N = this.itemList.getAllDbEntries().size();
@@ -371,6 +370,8 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 			}
 		} // End metadata scanning.
 
+		long duration = (System.currentTimeMillis() - startTime) / 1000L;
+		taskEventListener.logMsg(this.itemList.getListName(), "Read file metadata in " + duration + " seconds.");
 		return null;
 	}
 
@@ -396,6 +397,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 		int progress = 0;
 		int n = 0;
 		int N = tracks.size();
+		long startTime = System.currentTimeMillis();
 
 		for (int i = 0; i < tracks.size(); i++) {
 			if (hasHashCode(tracks.get(i))) {
@@ -427,6 +429,8 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 				progress = p;
 			}
 		}
+		long duration = (System.currentTimeMillis() - startTime) / 1000L;
+		taskEventListener.logMsg(this.itemList.getListName(), "Duplicate scan completed in " + duration + " seconds.");
 		return dupicateItems;
 	}
 
@@ -436,11 +440,34 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 
 	/**
 	 * Duplicates will be removed from the supplied Map if they are merged.
-	 * FIXME TODO do work in a transaction.
 	 */
-	private void mergeDuplicates (TaskEventListener taskEventListener, Map<T, ScanOption> dupicateItems) throws MorriganException {
+	private void mergeDuplicates (TaskEventListener taskEventListener, Map<T, ScanOption> dupicateItems) throws MorriganException, DbException {
 		taskEventListener.subTask("Merging duplicates");
+		int count = 0;
+		long startTime = System.currentTimeMillis();
+		Q transClone = getTransactional(this.itemList);
+		try {
+			transClone.read(); // FIXME is this needed?
+			count = mergeDuplocates(taskEventListener, transClone, dupicateItems);
+		}
+		finally {
+			taskEventListener.logMsg(this.itemList.getListName(), "Committing merges...");
+			try {
+				transClone.commitOrRollback();
+			}
+			finally {
+				transClone.dispose();
+			}
+		}
+		if (count > 0) this.itemList.forceRead();
+		long duration = (System.currentTimeMillis() - startTime) / 1000L;
+		taskEventListener.logMsg(this.itemList.getListName(), "Merged " + count + " in " + duration + " seconds.");
+	}
 
+	/**
+	 * @return Number of items merged.
+	 */
+	private int mergeDuplocates (TaskEventListener taskEventListener, Q list, Map<T, ScanOption> dupicateItems) throws MorriganException {
 		// Make a list of all the unique hashcodes we know.
 		Set<BigInteger> hashcodes = new HashSet<BigInteger>();
 		for (IMediaItem mi : dupicateItems.keySet()) {
@@ -460,15 +487,15 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 				for (T i : items.keySet()) {
 					if (items.get(i) == ScanOption.KEEP) keep = i;
 				}
-				if (keep == null) throw new NullPointerException("Something very bad happened.");
+				if (keep == null) throw new NullPointerException("Out of cheese error.  Please reinstall universe and reboot.");
 				items.remove(keep);
 
 				// Now merge: start count, end count, added data, last played data.
 				// Then remove missing tracks from library.
 				for (T i : items.keySet()) {
-					mergeItems(this.itemList, keep, i);
-					this.itemList.removeItem(i);
-					taskEventListener.logMsg(this.itemList.getListName(), "[REMOVED] " + i.getFilepath());
+					mergeItems(list, keep, i);
+					list.removeItem(i);
+					taskEventListener.logMsg(list.getListName(), "[REMOVED] " + i.getFilepath());
 					countMerges++;
 				}
 
@@ -479,7 +506,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 				}
 			}
 		}
-		taskEventListener.logMsg(this.itemList.getListName(), "Merged " + countMerges + ".");
+		return countMerges;
 	}
 
 	/*
@@ -531,13 +558,12 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 
 	private TaskResult updateTrackMetadata1 (TaskEventListener taskEventListener, int prgTotal, List<T> changedItems) throws MorriganException, DbException {
 		taskEventListener.subTask("Reading metadata");
-
+		long startTime = System.currentTimeMillis();
 		int progress = 0;
 		int n = 0;
 		int N = this.itemList.getAllDbEntries().size();
 
 		List<T> allLibraryEntries = this.itemList.getAllDbEntries();
-
 		try {
 			for (T mi : allLibraryEntries) {
 				if (taskEventListener.isCanceled()) break;
@@ -586,6 +612,8 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 			}
 		}
 
+		long duration = (System.currentTimeMillis() - startTime) / 1000L;
+		taskEventListener.logMsg(this.itemList.getListName(), "Read metadata in " + duration + " seconds.");
 		return null;
 	}
 
@@ -599,7 +627,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 
 	private TaskResult updateTrackMetadata2 (TaskEventListener taskEventListener, int prgTotal, List<T> changedItems) throws DbException {
 		taskEventListener.subTask("Reading more metadata");
-
+		long startTime = System.currentTimeMillis();
 		int progress = 0;
 		int n = 0;
 		int N = this.itemList.getAllDbEntries().size();
@@ -627,6 +655,8 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 			}
 		} // End track metadata scanning.
 
+		long duration = (System.currentTimeMillis() - startTime) / 1000L;
+		taskEventListener.logMsg(this.itemList.getListName(), "Read more metadata in " + duration + " seconds.");
 		return null;
 	}
 
