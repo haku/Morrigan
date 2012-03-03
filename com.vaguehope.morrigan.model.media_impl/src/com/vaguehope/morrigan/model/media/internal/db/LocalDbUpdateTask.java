@@ -108,6 +108,9 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 			taskEventListener.logMsg(this.itemList.getListName(), "Starting update...");
 			taskEventListener.beginTask("Updating", 100);
 
+			// Ensure list is initialised.
+			this.itemList.read();
+
 			// Scan directories for new files.
 			ret = scanLibraryDirectories(taskEventListener);
 
