@@ -89,44 +89,44 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMe
 	}
 
 	@Override
-	protected void mergeItems (IMixedMediaItem itemToKeep, IMixedMediaItem itemToBeRemove) throws MorriganException {
-		this.getItemList().incTrackStartCnt(itemToKeep, itemToBeRemove.getStartCount());
-		this.getItemList().incTrackEndCnt(itemToKeep, itemToBeRemove.getEndCount());
+	protected void mergeItems (ILocalMixedMediaDb list, IMixedMediaItem itemToKeep, IMixedMediaItem itemToBeRemove) throws MorriganException {
+		list.incTrackStartCnt(itemToKeep, itemToBeRemove.getStartCount());
+		list.incTrackEndCnt(itemToKeep, itemToBeRemove.getEndCount());
 
 		if (itemToKeep.getMediaType() == MediaType.UNKNOWN && itemToBeRemove.getMediaType() != MediaType.UNKNOWN) {
-			this.getItemList().setItemMediaType(itemToKeep, itemToBeRemove.getMediaType());
+			list.setItemMediaType(itemToKeep, itemToBeRemove.getMediaType());
 		}
 
 		if (itemToBeRemove.getDateAdded() != null) {
 			if (itemToKeep.getDateAdded() == null
 					|| itemToKeep.getDateAdded().getTime() > itemToBeRemove.getDateAdded().getTime()) {
-				this.getItemList().setItemDateAdded(itemToKeep, itemToBeRemove.getDateAdded());
+				list.setItemDateAdded(itemToKeep, itemToBeRemove.getDateAdded());
 			}
 		}
 
 		if (itemToBeRemove.getDateLastPlayed() != null) {
 			if (itemToKeep.getDateLastPlayed() == null
 					|| itemToKeep.getDateLastPlayed().getTime() < itemToBeRemove.getDateLastPlayed().getTime()) {
-				this.getItemList().setTrackDateLastPlayed(itemToKeep, itemToBeRemove.getDateLastPlayed());
+				list.setTrackDateLastPlayed(itemToKeep, itemToBeRemove.getDateLastPlayed());
 			}
 		}
 
-		if (this.getItemList().hasTags(itemToBeRemove)) {
+		if (list.hasTags(itemToBeRemove)) {
 			// TODO FIXME check for duplicate tags.
-			this.getItemList().moveTags(itemToBeRemove, itemToKeep);
+			list.moveTags(itemToBeRemove, itemToKeep);
 		}
 
 		if (itemToKeep.getDuration() <= 0 && itemToBeRemove.getDuration() > 0) {
-			this.getItemList().setTrackDuration(itemToKeep, itemToBeRemove.getDuration());
+			list.setTrackDuration(itemToKeep, itemToBeRemove.getDuration());
 		}
 
 		if (itemToBeRemove.isMissing() && itemToKeep.isEnabled() && !itemToBeRemove.isEnabled()) {
-			this.getItemList().setItemEnabled(itemToKeep, itemToBeRemove.isEnabled());
+			list.setItemEnabled(itemToKeep, itemToBeRemove.isEnabled());
 		}
 
 		if (itemToKeep.getWidth() <= 0 && itemToKeep.getHeight() <= 0
 				&& itemToBeRemove.getWidth() > 0 && itemToBeRemove.getHeight() > 0) {
-			this.getItemList().setPictureWidthAndHeight(itemToKeep, itemToBeRemove.getWidth(), itemToKeep.getHeight());
+			list.setPictureWidthAndHeight(itemToKeep, itemToBeRemove.getWidth(), itemToKeep.getHeight());
 		}
 	}
 
@@ -167,7 +167,7 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMe
 	}
 
 	@Override
-	protected OpResult readTrackMetaData1 (ILocalMixedMediaDb library, IMixedMediaItem item, File file) {
+	protected OpResult readTrackMetaData1 (ILocalMixedMediaDb list, IMixedMediaItem item, File file) {
 		if (item.getMediaType() == MediaType.TRACK) {
 			if (this.playbackEngine == null) {
 				try {
@@ -180,7 +180,7 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMe
 
 			try {
 				int d = this.playbackEngine.readFileDuration(item.getFilepath());
-				if (d > 0) this.getItemList().setTrackDuration(item, d);
+				if (d > 0) list.setTrackDuration(item, d);
 			}
 			catch (Throwable t) {
 				// FIXME log this somewhere useful.
@@ -193,7 +193,7 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMe
 			try {
 				Dimension d = readImageDimensions(file);
 				if (d != null && d.width > 0 && d.height > 0) {
-					this.getItemList().setPictureWidthAndHeight(item, d.width, d.height);
+					list.setPictureWidthAndHeight(item, d.width, d.height);
 				}
 			}
 			catch (Throwable t) {
@@ -218,9 +218,9 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMe
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	protected void readTrackMetaData2 (ILocalMixedMediaDb library, IMixedMediaItem item, File file) throws Throwable {
+	protected void readTrackMetaData2 (ILocalMixedMediaDb list, IMixedMediaItem item, File file) throws Throwable {
 		if (item.getMediaType() == MediaType.TRACK) {
-			TrackTagHelper.readTrackTags(this.getItemList(), item, file);
+			TrackTagHelper.readTrackTags(list, item, file);
 		}
 		else if (item.getMediaType() == MediaType.PICTURE) {
 			// TODO.

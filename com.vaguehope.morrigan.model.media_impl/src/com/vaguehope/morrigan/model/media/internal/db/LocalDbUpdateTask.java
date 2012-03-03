@@ -79,11 +79,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 
 	@Override
 	public String getTitle () {
-		return "Update " + getItemList().getListName();
-	}
-
-	public Q getItemList () {
-		return this.itemList;
+		return "Update " + this.itemList.getListName();
 	}
 
 	public boolean isFinished () {
@@ -109,7 +105,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 
 		try {
 			taskEventListener.onStart();
-			taskEventListener.logMsg(this.getItemList().getListName(), "Starting scan...");
+			taskEventListener.logMsg(this.itemList.getListName(), "Starting scan...");
 			taskEventListener.beginTask("Updating library", 100);
 
 			// Scan directories for new files.
@@ -144,10 +140,10 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 				 * FIXME This refresh is here until
 				 * AbstractMixedMediaDb.setItemMediaType() is properly finished.
 				 */
-				getItemList().forceRead(); // Item types in MMDB might have changed.
+				this.itemList.forceRead(); // Item types in MMDB might have changed.
 
 				if (taskEventListener.isCanceled()) {
-					taskEventListener.logMsg(this.getItemList().getListName(), "Task was canceled desu~.");
+					taskEventListener.logMsg(this.itemList.getListName(), "Task was canceled desu~.");
 					ret = new TaskResult(TaskOutcome.CANCELED);
 				}
 				else {
@@ -182,7 +178,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 
 		List<String> sources = null;
 		try {
-			sources = this.getItemList().getSources();
+			sources = this.itemList.getSources();
 		}
 		catch (MorriganException e) {
 			taskEventListener.done();
@@ -214,7 +210,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 									String ext = file.getName();
 									ext = ext.substring(ext.lastIndexOf(".") + 1).toLowerCase();
 									if (supportedFormats.contains(ext)) {
-										if (!this.getItemList().hasFile(file)) {
+										if (!this.itemList.hasFile(file)) {
 											filesToAdd.add(file);
 										}
 									}
@@ -222,23 +218,23 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 							}
 						}
 						else {
-							taskEventListener.logMsg(this.getItemList().getListName(), "Failed to read directory: " + dirItem.getAbsolutePath());
+							taskEventListener.logMsg(this.itemList.getListName(), "Failed to read directory: " + dirItem.getAbsolutePath());
 						}
 					}
 		} // End directory scanning.
 
 		if (filesToAdd.size() > 0) {
-			taskEventListener.logMsg(this.getItemList().getListName(), "Adding " + filesToAdd.size() + " files to DB...");
+			taskEventListener.logMsg(this.itemList.getListName(), "Adding " + filesToAdd.size() + " files to DB...");
 
 			Collections.sort(filesToAdd); // Ensure sequential files are in expected order.
 
-			Q transClone = getTransactional(this.getItemList());
+			Q transClone = getTransactional(this.itemList);
 			try {
 				transClone.addFiles(filesToAdd);
 				filesAdded = filesAdded + filesToAdd.size();
 			}
 			finally {
-				taskEventListener.logMsg(this.getItemList().getListName(), "Committing " + filesAdded + " inserts to DB...");
+				taskEventListener.logMsg(this.itemList.getListName(), "Committing " + filesAdded + " inserts to DB...");
 				try {
 					transClone.commitOrRollback();
 				}
@@ -250,11 +246,11 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 
 		if (filesAdded > 0) {
 			// Make main connection pick up changes to DB.
-			this.getItemList().forceRead();
+			this.itemList.forceRead();
 		}
 
-		taskEventListener.logMsg(this.getItemList().getListName(), "Added " + filesAdded + " files.");
-		this.getItemList().getDbLayer().getChangeEventCaller().eventMessage("Added " + filesAdded + " items to " + this.getItemList().getListName() + ".");
+		taskEventListener.logMsg(this.itemList.getListName(), "Added " + filesAdded + " files.");
+		this.itemList.getDbLayer().getChangeEventCaller().eventMessage("Added " + filesAdded + " items to " + this.itemList.getListName() + ".");
 
 		return null;
 	}
@@ -272,11 +268,11 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 
 		int progress = 0;
 		int n = 0;
-		int N = this.getItemList().getAllDbEntries().size();
+		int N = this.itemList.getAllDbEntries().size();
 
 		ByteBuffer byteBuffer = ChecksumHelper.createByteBuffer();
 
-		List<T> allLibraryEntries = this.getItemList().getAllDbEntries();
+		List<T> allLibraryEntries = this.itemList.getAllDbEntries();
 		for (T mi : allLibraryEntries) {
 			if (taskEventListener.isCanceled()) break;
 
@@ -292,12 +288,12 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 				// If was missing, mark as found.
 				if (mi.isMissing()) {
 					try {
-						taskEventListener.logMsg(this.getItemList().getListName(), "[FOUND] " + mi.getFilepath());
-						this.getItemList().setItemMissing(mi, false);
+						taskEventListener.logMsg(this.itemList.getListName(), "[FOUND] " + mi.getFilepath());
+						this.itemList.setItemMissing(mi, false);
 					}
 					catch (Throwable t) {
 						// FIXME log this somewhere useful.
-						taskEventListener.logMsg(this.getItemList().getListName(), "Throwable while marking track as found '" + mi.getFilepath() + "': " + t.getMessage());
+						taskEventListener.logMsg(this.itemList.getListName(), "Throwable while marking track as found '" + mi.getFilepath() + "': " + t.getMessage());
 					}
 				}
 
@@ -308,18 +304,18 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 					fileModified = true;
 
 					if (mi.getDateLastModified() == null) {
-						taskEventListener.logMsg(this.getItemList().getListName(), "[NEW] " + mi.getTitle());
+						taskEventListener.logMsg(this.itemList.getListName(), "[NEW] " + mi.getTitle());
 					}
 					else {
-						taskEventListener.logMsg(this.getItemList().getListName(), "[CHANGED] " + mi.getTitle());
+						taskEventListener.logMsg(this.itemList.getListName(), "[CHANGED] " + mi.getTitle());
 					}
 
 					try {
-						this.getItemList().setItemDateLastModified(mi, new Date(lastModified));
+						this.itemList.setItemDateLastModified(mi, new Date(lastModified));
 					}
 					catch (Throwable t) {
 						// FIXME log this somewhere useful.
-						taskEventListener.logMsg(this.getItemList().getListName(), "Throwable while writing track last modified date '" + mi.getFilepath() + "': " + t.getMessage());
+						taskEventListener.logMsg(this.itemList.getListName(), "Throwable while writing track last modified date '" + mi.getFilepath() + "': " + t.getMessage());
 						t.printStackTrace();
 					}
 
@@ -337,17 +333,17 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 					}
 					catch (Throwable t) {
 						// FIXME log this somewhere useful.
-						taskEventListener.logMsg(this.getItemList().getListName(), "Throwable while generating checksum for '" + mi.getFilepath() + ": " + t.getMessage());
+						taskEventListener.logMsg(this.itemList.getListName(), "Throwable while generating checksum for '" + mi.getFilepath() + ": " + t.getMessage());
 						t.printStackTrace();
 					}
 
 					if (hash != null && !hash.equals(BigInteger.ZERO)) {
 						try {
-							this.getItemList().setItemHashCode(mi, hash);
+							this.itemList.setItemHashCode(mi, hash);
 						}
 						catch (Throwable t) {
 							// FIXME log this somewhere useful.
-							taskEventListener.logMsg(this.getItemList().getListName(), "Throwable while setting hash code for '" + mi.getFilepath() + "' to '" + hash + "': " + t.getMessage());
+							taskEventListener.logMsg(this.itemList.getListName(), "Throwable while setting hash code for '" + mi.getFilepath() + "' to '" + hash + "': " + t.getMessage());
 							t.printStackTrace();
 						}
 					}
@@ -357,12 +353,12 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 			else { // The file is missing.
 				if (!mi.isMissing()) {
 					try {
-						taskEventListener.logMsg(this.getItemList().getListName(), "[MISSING] " + mi.getFilepath());
-						this.getItemList().setItemMissing(mi, true);
+						taskEventListener.logMsg(this.itemList.getListName(), "[MISSING] " + mi.getFilepath());
+						this.itemList.setItemMissing(mi, true);
 					}
 					catch (Throwable t) {
 						// FIXME log this somewhere useful.
-						taskEventListener.logMsg(this.getItemList().getListName(), "Throwable while marking track as missing '" + mi.getFilepath() + "': " + t.getMessage());
+						taskEventListener.logMsg(this.itemList.getListName(), "Throwable while marking track as missing '" + mi.getFilepath() + "': " + t.getMessage());
 					}
 				}
 			}
@@ -382,15 +378,15 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 
 	private void checkForDuplicates (TaskEventListener taskEventListener, int prgTotal) throws MorriganException, DbException {
 		taskEventListener.subTask("Scanning for duplicates");
-		List<T> tracks = this.getItemList().getAllDbEntries();
+		List<T> tracks = this.itemList.getAllDbEntries();
 		Map<T, ScanOption> dupicateItems = findDuplicates(taskEventListener, tracks, prgTotal);
 		if (dupicateItems.size() > 0) {
 			mergeDuplicates(taskEventListener, dupicateItems);
 			printDuplicates(taskEventListener, dupicateItems);
-			this.getItemList().getDbLayer().getChangeEventCaller().eventMessage(this.itemList.getListName() + " contains " + dupicateItems.size() + " duplicate items.");
+			this.itemList.getDbLayer().getChangeEventCaller().eventMessage(this.itemList.getListName() + " contains " + dupicateItems.size() + " duplicate items.");
 		}
 		else {
-			taskEventListener.logMsg(this.getItemList().getListName(), "No duplicates found.");
+			taskEventListener.logMsg(this.itemList.getListName(), "No duplicates found.");
 		}
 	}
 
@@ -470,9 +466,9 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 				// Now merge: start count, end count, added data, last played data.
 				// Then remove missing tracks from library.
 				for (T i : items.keySet()) {
-					mergeItems(keep, i);
-					this.getItemList().removeItem(i);
-					taskEventListener.logMsg(this.getItemList().getListName(), "[REMOVED] " + i.getFilepath());
+					mergeItems(this.itemList, keep, i);
+					this.itemList.removeItem(i);
+					taskEventListener.logMsg(this.itemList.getListName(), "[REMOVED] " + i.getFilepath());
 					countMerges++;
 				}
 
@@ -483,7 +479,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 				}
 			}
 		}
-		taskEventListener.logMsg(this.getItemList().getListName(), "Performed " + countMerges + " merges.");
+		taskEventListener.logMsg(this.itemList.getListName(), "Performed " + countMerges + " merges.");
 	}
 
 	/*
@@ -505,11 +501,11 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 		List<Entry<T, ScanOption>> dups = new ArrayList<Map.Entry<T, ScanOption>>(items.entrySet());
 		Collections.sort(dups, new HashcodeComparator());
 
-		taskEventListener.logMsg(this.getItemList().getListName(), "Found " + dups.size() + " duplicate items:");
+		taskEventListener.logMsg(this.itemList.getListName(), "Found " + dups.size() + " duplicate items:");
 		for (Entry<T, ScanOption> e : dups) {
 			BigInteger hashcode = e.getKey().getHashcode();
 			String hashcodeString = hashcode == null ? "null" : hashcode.toString(16);
-			taskEventListener.logMsg(this.getItemList().getListName(), hashcodeString + " : " + e.getValue() + " : " + e.getKey().getTitle());
+			taskEventListener.logMsg(this.itemList.getListName(), hashcodeString + " : " + e.getValue() + " : " + e.getKey().getTitle());
 		}
 	}
 
@@ -529,7 +525,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 
 	}
 
-	abstract protected void mergeItems (T itemToKeep, T itemToBeRemove) throws MorriganException;
+	abstract protected void mergeItems (Q list, T itemToKeep, T itemToBeRemove) throws MorriganException;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -538,27 +534,27 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 
 		int progress = 0;
 		int n = 0;
-		int N = this.getItemList().getAllDbEntries().size();
+		int N = this.itemList.getAllDbEntries().size();
 
-		List<T> allLibraryEntries = this.getItemList().getAllDbEntries();
+		List<T> allLibraryEntries = this.itemList.getAllDbEntries();
 
 		try {
 			for (T mi : allLibraryEntries) {
 				if (taskEventListener.isCanceled()) break;
-				if (shouldTrackMetaData1(taskEventListener, this.getItemList(), mi) || changedItems.contains(mi)) {
+				if (shouldTrackMetaData1(taskEventListener, this.itemList, mi) || changedItems.contains(mi)) {
 					if (mi.isEnabled()) {
 						taskEventListener.subTask("Reading track metadata: " + mi.getTitle());
 
 						File file = new File(mi.getFilepath());
 						if (file.exists()) {
-							OpResult ret = readTrackMetaData1(this.getItemList(), mi, file);
+							OpResult ret = readTrackMetaData1(this.itemList, mi, file);
 							if (ret != null) {
 								if (ret.isFaital()) {
 									throw ret.getThrowable();
 								}
 
 								// FIXME log this somewhere useful.
-								taskEventListener.logError(this.getItemList().getListName(), "Error while reading metadata for '" + mi.getFilepath() + "'.", ret.getThrowable());
+								taskEventListener.logError(this.itemList.getListName(), "Error while reading metadata for '" + mi.getFilepath() + "'.", ret.getThrowable());
 
 								// Tag track as unreadable.
 								//library.markAsUnreadabled(mi); // FIXME what if the user wants to try again?
@@ -566,7 +562,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 						} // End exists test.
 					}
 					else { // If marked as disabled.
-						taskEventListener.logMsg(this.getItemList().getListName(), "Ignoring disabled file '" + mi.getFilepath() + "'.");
+						taskEventListener.logMsg(this.itemList.getListName(), "Ignoring disabled file '" + mi.getFilepath() + "'.");
 					}
 				}// End duration > 0 test.
 
@@ -606,7 +602,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 
 		int progress = 0;
 		int n = 0;
-		int N = this.getItemList().getAllDbEntries().size();
+		int N = this.itemList.getAllDbEntries().size();
 
 		for (T mlt : changedItems) {
 			if (taskEventListener.isCanceled()) break;
@@ -615,11 +611,11 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 			try {
 				File file = new File(mlt.getFilepath());
 				if (file.exists()) {
-					readTrackMetaData2(this.getItemList(), mlt, file);
+					readTrackMetaData2(this.itemList, mlt, file);
 				}
 			}
 			catch (Throwable t) {
-				taskEventListener.logError(this.getItemList().getListName(), "Error while reading more metadata for '" + mlt.getFilepath() + "'.", t);
+				taskEventListener.logError(this.itemList.getListName(), "Error while reading more metadata for '" + mlt.getFilepath() + "'.", t);
 				t.printStackTrace();
 			}
 
