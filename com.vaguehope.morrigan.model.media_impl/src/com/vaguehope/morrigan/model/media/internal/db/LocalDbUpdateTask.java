@@ -9,11 +9,13 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
+import java.util.Set;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItem;
@@ -379,51 +381,45 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 
 	private void checkForDuplicates (TaskEventListener taskEventListener, int prgTotal) throws MorriganException, DbException {
 		taskEventListener.subTask("Scanning for duplicates");
-		Map<T, ScanOption> dupicateItems = new HashMap<T, ScanOption>();
-
 		List<T> tracks = this.getItemList().getAllDbEntries();
+		Map<T, ScanOption> dupicateItems = findDuplicates(taskEventListener, tracks, prgTotal);
+		if (dupicateItems.size() > 0) {
+			mergeDuplicates(taskEventListener, dupicateItems);
+			printDuplicates(taskEventListener, dupicateItems);
+			this.getItemList().getDbLayer().getChangeEventCaller().eventMessage(this.itemList.getListName() + " contains " + dupicateItems.size() + " duplicate items.");
+		}
+		else {
+			taskEventListener.logMsg(this.getItemList().getListName(), "No duplicates found.");
+		}
+	}
 
+	// Eclipse lies.
+	private Map<T, ScanOption> findDuplicates (TaskEventListener taskEventListener, List<T> tracks, int prgTotal) {
+		Map<T, ScanOption> dupicateItems = new HashMap<T, ScanOption>();
 		int progress = 0;
 		int n = 0;
 		int N = tracks.size();
 
 		for (int i = 0; i < tracks.size(); i++) {
-			if (taskEventListener.isCanceled()) break;
-
-			if (tracks.get(i).getHashcode() != null && !tracks.get(i).getHashcode().equals(BigInteger.ZERO)) {
+			if (hasHashCode(tracks.get(i))) {
 				boolean a = new File(tracks.get(i).getFilepath()).exists();
 				for (int j = i + 1; j < tracks.size(); j++) {
-					if (taskEventListener.isCanceled()) break;
-
-					if (tracks.get(j).getHashcode() != null && !tracks.get(j).getHashcode().equals(BigInteger.ZERO)) {
+					if (hasHashCode(tracks.get(j))) {
 						if (tracks.get(i).getHashcode().equals(tracks.get(j).getHashcode())) {
 							boolean b = new File(tracks.get(j).getFilepath()).exists();
-
 							if (a && b) { // Both exist.
 								// TODO prompt to move the newer one?
-								if (!dupicateItems.containsKey(tracks.get(i))) {
-									dupicateItems.put(tracks.get(i), ScanOption.KEEP);
-								}
-								if (!dupicateItems.containsKey(tracks.get(j))) {
-									dupicateItems.put(tracks.get(j), ScanOption.MOVEFILE);
-								}
+								if (!dupicateItems.containsKey(tracks.get(i))) dupicateItems.put(tracks.get(i), ScanOption.KEEP);
+								if (!dupicateItems.containsKey(tracks.get(j))) dupicateItems.put(tracks.get(j), ScanOption.MOVEFILE);
 							}
 							else if (a != b) { // Only one exists.
-								if (!dupicateItems.containsKey(tracks.get(i))) {
-									dupicateItems.put(tracks.get(i),
-											a ? ScanOption.KEEP : ScanOption.DELREF);
-								}
-								if (!dupicateItems.containsKey(tracks.get(j))) {
-									dupicateItems.put(tracks.get(j),
-											b ? ScanOption.KEEP : ScanOption.DELREF);
-								}
+								if (!dupicateItems.containsKey(tracks.get(i))) dupicateItems.put(tracks.get(i), a ? ScanOption.KEEP : ScanOption.DELREF);
+								if (!dupicateItems.containsKey(tracks.get(j))) dupicateItems.put(tracks.get(j), b ? ScanOption.KEEP : ScanOption.DELREF);
 							}
-							else { // Neither exist.
-								// They are both missing.  Don't worry about it.
-							}
-
+							// If both missing do not worry about it.
 						}
 					}
+					if (taskEventListener.isCanceled()) break;
 				}
 			}
 
@@ -433,134 +429,103 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 				taskEventListener.worked(p - progress);
 				progress = p;
 			}
-		} // End duplicate item scanning.
-
-		if (dupicateItems.size() > 0) {
-			taskEventListener.subTask("Merging duplicate items");
-
-			/*
-			 * Make a list of all the unique hashcodes we know.
-			 */
-			List<BigInteger> hashcodes = new ArrayList<BigInteger>();
-			for (IMediaItem mi : dupicateItems.keySet()) {
-				BigInteger h = mi.getHashcode();
-				if (!hashcodes.contains(h)) { // FIXME .contains() is VERY slow.
-					hashcodes.add(h);
-				}
-			}
-
-			int countMerges = 0;
-
-			/*
-			 * Resolve each unique hashcode.
-			 */
-			for (BigInteger h : hashcodes) {
-				if (taskEventListener.isCanceled()) break;
-
-				/*
-				 * Find all the entries for this hashcode.
-				 */
-				Map<T, ScanOption> items = new HashMap<T, ScanOption>();
-				for (T mi : dupicateItems.keySet()) {
-					if (h.equals(mi.getHashcode())) {
-						items.put(mi, dupicateItems.get(mi));
-					}
-				}
-
-				/*
-				 * If there is only one entry that still exists, merge metadata
-				 * and remove bad references. This is the only supported merge
-				 * case at the moment.
-				 */
-				if (countEntriesInMap(items, ScanOption.KEEP) == 1
-						&& countEntriesInMap(items, ScanOption.DELREF) == items.size() - 1) {
-
-					T keep = null;
-					for (T i : items.keySet()) {
-						if (items.get(i) == ScanOption.KEEP) keep = i;
-					}
-					items.remove(keep);
-
-					if (keep == null) throw new NullPointerException("Something very bad happened.");
-
-					/*
-					 * Now merge: start count, end count, added data, last
-					 * played data. Then remove missing tracks from library.
-					 */
-					for (T i : items.keySet()) {
-//						boolean success = false;
-//						try {
-						// FIXME fix this transaction stuff.
-						/*
-						 * FIXME TODO get some form of lock for this
-						 * transaction? What if the user changes something while
-						 * we do this?
-						 */
-//							library.setAutoCommit(false);
-
-						mergeItems(keep, i);
-
-						this.getItemList().removeItem(i);
-						taskEventListener.logMsg(this.getItemList().getListName(), "[REMOVED] " + i.getFilepath());
-						countMerges++;
-
-//							library.commit();
-//							success = true;
-//						}
-//						finally {
-//							if (!success) {
-//								library.rollback();
-//							}
-//							library.setAutoCommit(true);
-//						}
-					}
-
-					/*
-					 * Removed processed entries from duplicate items list.
-					 */
-					dupicateItems.remove(keep);
-					for (IMediaItem i : items.keySet()) {
-						dupicateItems.remove(i);
-					}
-				}
-
-			} // End metadata merging.
-
-			taskEventListener.logMsg(this.getItemList().getListName(), "Performed " + countMerges + " mergers.");
-
-			/*
-			 * Print out what we are left with.
-			 */
-
-			// Sort list of duplicates before printing it.
-			List<Entry<T, ScanOption>> dups = new ArrayList<Map.Entry<T, ScanOption>>(dupicateItems.size());
-			for (Entry<T, ScanOption> e : dupicateItems.entrySet()) {
-				dups.add(e);
-			}
-			Collections.sort(dups, new Comparator<Entry<T, ScanOption>>() {
-				@Override
-				public int compare (Entry<T, ScanOption> o1, Entry<T, ScanOption> o2) {
-					// comp(1234, null) == -1, comp(null, null) == 0, comp(null, 1234) == 1
-
-					BigInteger h1 = o1.getKey().getHashcode();
-					BigInteger h2 = o2.getKey().getHashcode();
-
-					return h1 == null ? (h2 == null ? 0 : 1) : h1.compareTo(h2);
-				}
-			});
-
-			taskEventListener.logMsg(this.getItemList().getListName(), "Found " + dups.size() + " duplicate items:");
-			// Print list if duplicates.
-			for (Entry<T, ScanOption> e : dups) {
-				BigInteger hashcode = e.getKey().getHashcode();
-				String hashcodeString = hashcode == null ? "null" : hashcode.toString(16);
-				taskEventListener.logMsg(this.getItemList().getListName(), hashcodeString + " : " + e.getValue() + " : " + e.getKey().getTitle());
-			}
-			this.getItemList().getDbLayer().getChangeEventCaller().eventMessage(this.itemList.getListName() + " contains " + dups.size() + " duplicate items.");
 		}
-		else {
-			taskEventListener.logMsg(this.getItemList().getListName(), "No duplicates found.");
+		return dupicateItems;
+	}
+
+	private boolean hasHashCode (T item) {
+		return item.getHashcode() != null && !item.getHashcode().equals(BigInteger.ZERO);
+	}
+
+	/**
+	 * Duplicates will be removed from the supplied Map if they are merged.
+	 * FIXME TODO do work in a transaction.
+	 */
+	private void mergeDuplicates (TaskEventListener taskEventListener, Map<T, ScanOption> dupicateItems) throws MorriganException {
+		taskEventListener.subTask("Merging duplicate items");
+
+		// Make a list of all the unique hashcodes we know.
+		Set<BigInteger> hashcodes = new HashSet<BigInteger>();
+		for (IMediaItem mi : dupicateItems.keySet()) {
+			hashcodes.add(mi.getHashcode());
 		}
+
+		// Resolve each unique hashcode.
+		int countMerges = 0;
+		for (BigInteger h : hashcodes) {
+			if (taskEventListener.isCanceled()) break;
+			Map<T, ScanOption> items = findByHashcode(dupicateItems, h);
+
+			// If there is only one entry that still exists, merge metadata and remove bad references.
+			// This is the only supported merge case at the moment.
+			if (countEntriesInMap(items, ScanOption.KEEP) == 1 && countEntriesInMap(items, ScanOption.DELREF) == items.size() - 1) {
+				T keep = null;
+				for (T i : items.keySet()) {
+					if (items.get(i) == ScanOption.KEEP) keep = i;
+				}
+				if (keep == null) throw new NullPointerException("Something very bad happened.");
+				items.remove(keep);
+
+				// Now merge: start count, end count, added data, last played data.
+				// Then remove missing tracks from library.
+				for (T i : items.keySet()) {
+					mergeItems(keep, i);
+					this.getItemList().removeItem(i);
+					taskEventListener.logMsg(this.getItemList().getListName(), "[REMOVED] " + i.getFilepath());
+					countMerges++;
+				}
+
+				// Removed processed entries from duplicate items list.
+				dupicateItems.remove(keep);
+				for (IMediaItem i : items.keySet()) {
+					dupicateItems.remove(i);
+				}
+			}
+		}
+		taskEventListener.logMsg(this.getItemList().getListName(), "Performed " + countMerges + " merges.");
+	}
+
+	/*
+	 * Find all the entries with this hashcode.
+	 */
+	@SuppressWarnings("static-method")
+	// Eclipse lies.
+	private Map<T, ScanOption> findByHashcode (Map<T, ScanOption> items, BigInteger hashcode) {
+		Map<T, ScanOption> ret = new HashMap<T, ScanOption>();
+		for (Entry<T, ScanOption> i : items.entrySet()) {
+			if (hashcode.equals(i.getKey().getHashcode())) {
+				ret.put(i.getKey(), i.getValue());
+			}
+		}
+		return ret;
+	}
+
+	private void printDuplicates (TaskEventListener taskEventListener, Map<T, ScanOption> items) {
+		List<Entry<T, ScanOption>> dups = new ArrayList<Map.Entry<T, ScanOption>>(items.entrySet());
+		Collections.sort(dups, new HashcodeComparator());
+
+		taskEventListener.logMsg(this.getItemList().getListName(), "Found " + dups.size() + " duplicate items:");
+		for (Entry<T, ScanOption> e : dups) {
+			BigInteger hashcode = e.getKey().getHashcode();
+			String hashcodeString = hashcode == null ? "null" : hashcode.toString(16);
+			taskEventListener.logMsg(this.getItemList().getListName(), hashcodeString + " : " + e.getValue() + " : " + e.getKey().getTitle());
+		}
+	}
+
+	private final class HashcodeComparator implements Comparator<Entry<T, ScanOption>> {
+
+		public HashcodeComparator () {}
+
+		@Override
+		public int compare (Entry<T, ScanOption> o1, Entry<T, ScanOption> o2) {
+			// comp(1234, null) == -1, comp(null, null) == 0, comp(null, 1234) == 1
+
+			BigInteger h1 = o1.getKey().getHashcode();
+			BigInteger h2 = o2.getKey().getHashcode();
+
+			return h1 == null ? (h2 == null ? 0 : 1) : h1.compareTo(h2);
+		}
+
 	}
 
 	abstract protected void mergeItems (T itemToKeep, T itemToBeRemove) throws MorriganException;
