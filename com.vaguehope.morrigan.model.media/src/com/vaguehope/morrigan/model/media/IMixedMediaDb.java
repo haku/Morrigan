@@ -8,16 +8,17 @@ import com.vaguehope.sqlitewrapper.DbException;
 
 public interface IMixedMediaDb
 		extends
-			IMixedMediaList<IMixedMediaItem>,
-			IMediaTrackDb<IMixedMediaStorageLayer<IMixedMediaItem>, IMixedMediaItem>
-	{
+		IMixedMediaList<IMixedMediaItem>,
+		IMediaTrackDb<IMixedMediaStorageLayer<IMixedMediaItem>, IMixedMediaItem> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	public void setDefaultMediaType (MediaType mediaType) throws MorriganException;
-	public void setDefaultMediaType (MediaType mediaType, boolean saveToDb) throws MorriganException;
-	public MediaType getDefaultMediaType ();
-	
-	public List<IMixedMediaItem> simpleSearchMedia (MediaType mediaType, String term, int maxResults) throws DbException;
-	
+
+	void setDefaultMediaType (MediaType mediaType) throws MorriganException;
+
+	void setDefaultMediaType (MediaType mediaType, boolean saveToDb) throws MorriganException;
+
+	MediaType getDefaultMediaType ();
+
+	List<IMixedMediaItem> simpleSearchMedia (MediaType mediaType, String term, int maxResults) throws DbException;
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

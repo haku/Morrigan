@@ -4,11 +4,11 @@ import org.eclipse.swt.widgets.Composite;
 
 public interface IPlayerLocal extends IPlayerAbstract {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	public void addQueueChangeListener(Runnable listener);
-	public void removeQueueChangeListener(Runnable listener);
-	
-	public void setVideoFrameParent(Composite cmfp);
-	
+
+	void addQueueChangeListener(Runnable listener);
+	void removeQueueChangeListener(Runnable listener);
+
+	void setVideoFrameParent(Composite cmfp);
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

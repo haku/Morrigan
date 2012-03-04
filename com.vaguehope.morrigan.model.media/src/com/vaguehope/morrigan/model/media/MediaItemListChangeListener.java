@@ -9,16 +9,16 @@ package com.vaguehope.morrigan.model.media;
  */
 public interface MediaItemListChangeListener {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	public void eventMessage (String msg);
-	
-	public void dirtyStateChanged (DirtyState oldState, DirtyState newState);
-	
-	public void mediaListRead ();
-	public void mediaItemsAdded (IMediaItem... items);
-	public void mediaItemsRemoved (IMediaItem... items);
-	public void mediaItemsUpdated (IMediaItem... items);
-	public void mediaItemsForceReadRequired (IMediaItem... items);
-	
+
+	void eventMessage (String msg);
+
+	void dirtyStateChanged (DirtyState oldState, DirtyState newState);
+
+	void mediaListRead ();
+	void mediaItemsAdded (IMediaItem... items);
+	void mediaItemsRemoved (IMediaItem... items);
+	void mediaItemsUpdated (IMediaItem... items);
+	void mediaItemsForceReadRequired (IMediaItem... items);
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

@@ -4,26 +4,26 @@ import java.util.Date;
 
 public interface IMediaTrack extends IMediaItem {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	public boolean isPlayable ();
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	public int getDuration();
-	public boolean setDuration(int duration);
-	
-	public long getStartCount();
-	public boolean setStartCount(long startCount);
 
-	public long getEndCount();
-	public boolean setEndCount(long endCount);
-	
-	public Date getDateLastPlayed();
-	public boolean setDateLastPlayed(Date dateLastPlayed);
-	
+	boolean isPlayable ();
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	public boolean setFromMediaTrack (IMediaTrack mt);
-	
+
+	int getDuration();
+	boolean setDuration(int duration);
+
+	long getStartCount();
+	boolean setStartCount(long startCount);
+
+	long getEndCount();
+	boolean setEndCount(long endCount);
+
+	Date getDateLastPlayed();
+	boolean setDateLastPlayed(Date dateLastPlayed);
+
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	boolean setFromMediaTrack (IMediaTrack mt);
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
