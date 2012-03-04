@@ -9,28 +9,28 @@ import com.vaguehope.sqlitewrapper.DbException;
 
 public interface IRemoteMixedMediaDb extends IMixedMediaDb {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	public static final String TYPE = "REMOTEMMDB";
-	
+
+	static final String TYPE = "REMOTEMMDB";
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	public URL getUrl() throws DbException;
-	public void setUrl(URL url) throws DbException;
-	
-	public String getPass () throws DbException;
-	public void setPass(String pass) throws DbException;
-	
+
+	URL getUrl() throws DbException;
+	void setUrl(URL url) throws DbException;
+
+	String getPass () throws DbException;
+	void setPass(String pass) throws DbException;
+
 	/**
 	 * Return age of cache in milliseconds.
 	 */
-	public long getCacheAge ();
-	
-	public boolean isCacheExpired ();
-	public void readFromCache ()  throws DbException, MorriganException;
-	public void forceDoRead () throws MorriganException, DbException;
-	
-	public TaskEventListener getTaskEventListener();
-	public void setTaskEventListener(TaskEventListener taskEventListener);
-	
+	long getCacheAge ();
+
+	boolean isCacheExpired ();
+	void readFromCache ()  throws DbException, MorriganException;
+	void forceDoRead () throws MorriganException, DbException;
+
+	TaskEventListener getTaskEventListener();
+	void setTaskEventListener(TaskEventListener taskEventListener);
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

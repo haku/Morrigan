@@ -4,14 +4,14 @@ import com.vaguehope.morrigan.model.db.IDbItem;
 
 
 public interface MediaTag extends IDbItem {
-	
-	public String getTag();
-	public void setTag(String tag);
-	
-	public MediaTagType getType();
-	public void setType(MediaTagType type);
-	
-	public MediaTagClassification getClassification();
-	public void setClassification(MediaTagClassification classification);
-	
+
+	String getTag();
+	void setTag(String tag);
+
+	MediaTagType getType();
+	void setType(MediaTagType type);
+
+	MediaTagClassification getClassification();
+	void setClassification(MediaTagClassification classification);
+
 }

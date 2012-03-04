@@ -16,64 +16,64 @@ import com.vaguehope.sqlitewrapper.DbException;
  */
 public interface MediaFactory {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	/**
 	 * List them all.
 	 */
-	public Collection<MediaListReference> getAllLocalMixedMediaDbs ();
-	
+	Collection<MediaListReference> getAllLocalMixedMediaDbs ();
+
 	/**
 	 * Create a new one.
 	 */
-	public ILocalMixedMediaDb createLocalMixedMediaDb (String name) throws MorriganException;
-	
+	ILocalMixedMediaDb createLocalMixedMediaDb (String name) throws MorriganException;
+
 	/**
 	 * Main instance.
 	 */
-	public ILocalMixedMediaDb getLocalMixedMediaDb (String fullFilePath) throws DbException;
-	
+	ILocalMixedMediaDb getLocalMixedMediaDb (String fullFilePath) throws DbException;
+
 	/**
 	 * With a filter set: a view.
 	 */
-	public ILocalMixedMediaDb getLocalMixedMediaDb (String fullFilePath, String searchTerm) throws DbException;
-	
+	ILocalMixedMediaDb getLocalMixedMediaDb (String fullFilePath, String searchTerm) throws DbException;
+
 	/**
 	 * Same as getLocalMixedMediaDb().
 	 */
-	public ILocalMixedMediaDb getLocalMixedMediaDbBySerial (String serial) throws DbException;
-	
+	ILocalMixedMediaDb getLocalMixedMediaDbBySerial (String serial) throws DbException;
+
 	/**
 	 * Create an new instance with transactional behaviour.
 	 */
-	public ILocalMixedMediaDb getLocalMixedMediaDbTransactional (ILocalMixedMediaDb lmmdb) throws DbException;
-	
+	ILocalMixedMediaDb getLocalMixedMediaDbTransactional (ILocalMixedMediaDb lmmdb) throws DbException;
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	public IMediaItemDb<?,?> getMediaItemDbTransactional (IMediaItemDb<?,?> db) throws DbException;
-	
+
+	IMediaItemDb<?,?> getMediaItemDbTransactional (IMediaItemDb<?,?> db) throws DbException;
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	public Collection<MediaListReference> getAllRemoteMixedMediaDbs ();
-	public IRemoteMixedMediaDb createRemoteMixedMediaDb (String mmdbUrl);
-	public IRemoteMixedMediaDb getRemoteMixedMediaDb (String dbName);
-	public IRemoteMixedMediaDb getRemoteMixedMediaDb (String dbName, URL url);
-	
+
+	Collection<MediaListReference> getAllRemoteMixedMediaDbs ();
+	IRemoteMixedMediaDb createRemoteMixedMediaDb (String mmdbUrl);
+	IRemoteMixedMediaDb getRemoteMixedMediaDb (String dbName);
+	IRemoteMixedMediaDb getRemoteMixedMediaDb (String dbName, URL url);
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	public DurationData getNewDurationData (long duration, boolean complete);
-	
+
+	DurationData getNewDurationData (long duration, boolean complete);
+
 	/*
 	 * TODO merge these next two methods?
 	 */
-	public IMorriganTask getLocalMixedMediaDbUpdateTask (ILocalMixedMediaDb library);
-	public IMorriganTask getRemoteMixedMediaDbUpdateTask (IRemoteMixedMediaDb library);
-	public <T extends IMediaItem> IMorriganTask getMediaFileCopyTask (IMediaItemList<T> mediaItemList, List<T> mediaSelection, File targetDirectory);
-	public <T extends IMediaItem> IMorriganTask getNewCopyToLocalMmdbTask (IMediaItemList<T> fromList, Collection<T> itemsToCopy, ILocalMixedMediaDb toDb);
-	public IMorriganTask getSyncMetadataRemoteToLocalTask (ILocalMixedMediaDb local, IRemoteMixedMediaDb remote);
-	
+	IMorriganTask getLocalMixedMediaDbUpdateTask (ILocalMixedMediaDb library);
+	IMorriganTask getRemoteMixedMediaDbUpdateTask (IRemoteMixedMediaDb library);
+	<T extends IMediaItem> IMorriganTask getMediaFileCopyTask (IMediaItemList<T> mediaItemList, List<T> mediaSelection, File targetDirectory);
+	<T extends IMediaItem> IMorriganTask getNewCopyToLocalMmdbTask (IMediaItemList<T> fromList, Collection<T> itemsToCopy, ILocalMixedMediaDb toDb);
+	IMorriganTask getSyncMetadataRemoteToLocalTask (ILocalMixedMediaDb local, IRemoteMixedMediaDb remote);
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	public void readTrackTags (IMediaItemDb<?,?> itemDb, IMediaTrack mlt, File file) throws IOException, MorriganException;
-	
+
+	void readTrackTags (IMediaItemDb<?,?> itemDb, IMediaTrack mlt, File file) throws IOException, MorriganException;
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

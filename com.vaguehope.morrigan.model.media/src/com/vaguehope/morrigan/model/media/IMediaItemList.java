@@ -12,28 +12,28 @@ import com.vaguehope.morrigan.model.exceptions.MorriganException;
 
 public interface IMediaItemList<T extends IMediaItem> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	public void dispose ();
-	
-	public String getListId ();
-	public String getListName ();
-	
-	public String getType ();
-	public String getSerial (); // TODO rename to something more helpful?
-	
-	public DirtyState getDirtyState ();
-	public void setDirtyState (DirtyState state);
-	
+
+	void dispose ();
+
+	String getListId ();
+	String getListName ();
+
+	String getType ();
+	String getSerial (); // TODO rename to something more helpful?
+
+	DirtyState getDirtyState ();
+	void setDirtyState (DirtyState state);
+
 	/**
 	 * A change event will occur every time the state might have changed.
 	 */
-	public void addChangeEventListener (MediaItemListChangeListener listener);
-	public void removeChangeEventListener (MediaItemListChangeListener listener);
-	public MediaItemListChangeListener getChangeEventCaller ();
-	
-	public int getCount ();
-	public List<T> getMediaItems();
-	
+	void addChangeEventListener (MediaItemListChangeListener listener);
+	void removeChangeEventListener (MediaItemListChangeListener listener);
+	MediaItemListChangeListener getChangeEventCaller ();
+
+	int getCount ();
+	List<T> getMediaItems();
+
 	/**
 	 * This is the signal to read any source data needed.
 	 * This will be called soon after the constructor and before
@@ -41,42 +41,42 @@ public interface IMediaItemList<T extends IMediaItem> {
 	 * It may be called when no work needs doing and its
 	 * up to the implemented to track this.
 	 */
-	public void read () throws MorriganException;
-	public void forceRead () throws MorriganException;
-	public long getDurationOfLastRead();
-	
-	public void addItem (T item);
-	public void removeItem (T item) throws MorriganException;
-	
-	public void setItemDateAdded (T item, Date date) throws MorriganException;
-	public void setItemHashCode (T item, BigInteger hashcode) throws MorriganException;
-	public void setItemDateLastModified (T item, Date date) throws MorriganException;
-	public void setItemEnabled (T item, boolean value) throws MorriganException;
-	public void setItemMissing (T item, boolean value) throws MorriganException;
-	public void setRemoteLocation (T track, String remoteLocation) throws MorriganException;
-	public void persistTrackData (T track) throws MorriganException;
-	
+	void read () throws MorriganException;
+	void forceRead () throws MorriganException;
+	long getDurationOfLastRead();
+
+	void addItem (T item);
+	void removeItem (T item) throws MorriganException;
+
+	void setItemDateAdded (T item, Date date) throws MorriganException;
+	void setItemHashCode (T item, BigInteger hashcode) throws MorriganException;
+	void setItemDateLastModified (T item, Date date) throws MorriganException;
+	void setItemEnabled (T item, boolean value) throws MorriganException;
+	void setItemMissing (T item, boolean value) throws MorriganException;
+	void setRemoteLocation (T track, String remoteLocation) throws MorriganException;
+	void persistTrackData (T track) throws MorriganException;
+
 	/**
 	 * This will flush the OutputStream.
 	 * This will not close the output stream.
 	 */
-	public void copyItemFile (T item, OutputStream os) throws MorriganException;
-	public File copyItemFile (T item, File targetDirectory) throws MorriganException;
-	
+	void copyItemFile (T item, OutputStream os) throws MorriganException;
+	File copyItemFile (T item, File targetDirectory) throws MorriganException;
+
 	// TODO rename to getItemByFilePath().
-	public T findItemByFilePath (String path);
-	
-	public List<MediaTagClassification> getTagClassifications () throws MorriganException;
-	public void addTagClassification (String classificationName) throws MorriganException;
-	public MediaTagClassification getTagClassification (String classificationName) throws MorriganException;
-	public boolean hasTags (IDbItem item) throws MorriganException;
-	public boolean hasTag (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) throws MorriganException;
-	public List<MediaTag> getTags (IDbItem item) throws MorriganException;
-	public void addTag (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) throws MorriganException;
-	public void addTag (IDbItem item, String tag, MediaTagType type, String mtc) throws MorriganException;
-	public void moveTags (IDbItem from_item, IDbItem to_item) throws MorriganException;
-	public void removeTag (MediaTag mt) throws MorriganException;
-	public void clearTags (IDbItem item) throws MorriganException;
-	
+	T findItemByFilePath (String path);
+
+	List<MediaTagClassification> getTagClassifications () throws MorriganException;
+	void addTagClassification (String classificationName) throws MorriganException;
+	MediaTagClassification getTagClassification (String classificationName) throws MorriganException;
+	boolean hasTags (IDbItem item) throws MorriganException;
+	boolean hasTag (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) throws MorriganException;
+	List<MediaTag> getTags (IDbItem item) throws MorriganException;
+	void addTag (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) throws MorriganException;
+	void addTag (IDbItem item, String tag, MediaTagType type, String mtc) throws MorriganException;
+	void moveTags (IDbItem from_item, IDbItem to_item) throws MorriganException;
+	void removeTag (MediaTag mt) throws MorriganException;
+	void clearTags (IDbItem item) throws MorriganException;
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
