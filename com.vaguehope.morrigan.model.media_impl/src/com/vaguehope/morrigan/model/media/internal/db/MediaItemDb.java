@@ -260,6 +260,7 @@ implements IMediaItemDb<S, T> {
 	 */
 	@Override
 	public List<T> getAllDbEntries () throws DbException {
+		// Now that MediaItem classes are shared via factory, this may no longer be needed.
 		ArrayList<T> copyOfMainList = new ArrayList<T>(getMediaItems());
 		List<T> allList = this.dbLayer.getAllMedia(this.dbLayer.getDefaultSortColumn(), SortDirection.ASC, false);
 		updateList(copyOfMainList, allList);
@@ -475,6 +476,7 @@ implements IMediaItemDb<S, T> {
 		super.removeItem(track);
 
 		// Remove track.
+		if (this.hasTags(track)) this.dbLayer.clearTags(track); // Track can not be removed if tags attached (foreign key constraint).
 		int n = this.dbLayer.removeFile(track.getFilepath());
 		if (n != 1) {
 			n = this.dbLayer.removeFile(track);
