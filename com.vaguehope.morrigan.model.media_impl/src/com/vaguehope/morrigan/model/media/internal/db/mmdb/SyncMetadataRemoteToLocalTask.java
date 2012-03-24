@@ -21,25 +21,25 @@ import com.vaguehope.sqlitewrapper.DbException;
 
 public class SyncMetadataRemoteToLocalTask implements IMorriganTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	private final ILocalMixedMediaDb local;
 	private final IRemoteMixedMediaDb remote;
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	public SyncMetadataRemoteToLocalTask (ILocalMixedMediaDb local, IRemoteMixedMediaDb remote) {
 		this.local = local;
 		this.remote = remote;
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	@Override
 	public String getTitle () {
 		// TODO make this more sensible.
 		return "Sync metadata '"+this.local+"' x '"+this.remote+"' desu~";
 	}
-	
+
 	@Override
 	public TaskResult run (TaskEventListener taskEventListener) {
 		taskEventListener.onStart();
@@ -47,6 +47,7 @@ public class SyncMetadataRemoteToLocalTask implements IMorriganTask {
 		try {
 			final ILocalMixedMediaDb trans = MediaFactoryImpl.get().getLocalMixedMediaDbTransactional(this.local);
 			try {
+				trans.read();
 				// FIXME add getByHashcode() to local DB.
 				// Build list of all hashed local items.
 				final Map<BigInteger, IMixedMediaItem> localItems = new HashMap<BigInteger, IMixedMediaItem>();
@@ -54,14 +55,14 @@ public class SyncMetadataRemoteToLocalTask implements IMorriganTask {
 					BigInteger hashcode = localItem.getHashcode();
 					if (hashcode != null && !BigInteger.ZERO.equals(hashcode)) localItems.put(hashcode, localItem);
 				}
-				
+
 				// All remote items.
 				final List<IMixedMediaItem> remoteItems = this.remote.getAllDbEntries();
-				
+
 				// Describe what we are doing.
 				String taskTitle = "Synchronising metadata from " + this.remote.getListName() + " to " + this.local.getListName() + ".";
 				taskEventListener.beginTask(taskTitle, remoteItems.size()); // Work total is number of remote items.
-				
+
 				// For each remote item, see if there is a local item to update.
 				for (IMixedMediaItem remoteItem : remoteItems) {
 					BigInteger hashcode = remoteItem.getHashcode();
@@ -75,10 +76,10 @@ public class SyncMetadataRemoteToLocalTask implements IMorriganTask {
 					taskEventListener.worked(1); // Increment one for each remote item.
 					if (taskEventListener.isCanceled()) break;
 				}
-				
+
 				trans.commitOrRollback();
 				this.local.forceRead(); // TODO replace by using bulk-update methods?  e.g. in MixedMediaDbFeedParser.
-				
+
 				if (taskEventListener.isCanceled()) {
 					taskEventListener.logMsg(this.getTitle(), "Sync task was canceled desu~."); // TODO is this quite right?
 					ret = new TaskResult(TaskOutcome.CANCELED);
@@ -98,34 +99,34 @@ public class SyncMetadataRemoteToLocalTask implements IMorriganTask {
 		catch (MorriganException e) {
 			ret = new TaskResult(TaskOutcome.FAILED, "Throwable while sync metadata.", e);
 		}
-		
+
 		return ret;
 	}
-	
+
 	private static void syncMediaItems (final ILocalMixedMediaDb ldb, IRemoteMixedMediaDb rdb, IMixedMediaItem remoteItem, IMixedMediaItem localItem) throws MorriganException {
 		if (remoteItem.getStartCount() > localItem.getStartCount()) {
 			ldb.setTrackStartCnt(localItem, remoteItem.getStartCount());
 		}
-		
+
 		if (remoteItem.getEndCount() > localItem.getEndCount()) {
 			ldb.setTrackEndCnt(localItem, remoteItem.getEndCount());
 		}
-		
+
 		if (remoteItem.getDateAdded().getTime() > 0 && remoteItem.getDateAdded().getTime() < localItem.getDateAdded().getTime()) {
 			ldb.setItemDateAdded(localItem, remoteItem.getDateAdded());
 		}
-		
+
 		if (
 				remoteItem.getDateLastPlayed() != null && remoteItem.getDateLastPlayed().getTime() > 0
 				&& (localItem.getDateLastPlayed() == null || remoteItem.getDateLastPlayed().getTime() > localItem.getDateLastPlayed().getTime())
 				) {
 			ldb.setTrackDateLastPlayed(localItem, remoteItem.getDateLastPlayed());
 		}
-		
+
 		if (remoteItem.isEnabled() != localItem.isEnabled()) {
 			ldb.setItemEnabled(localItem, remoteItem.isEnabled());
 		}
-		
+
 		List<MediaTag> rTags = rdb.getTags(remoteItem);
 		if (rTags != null && rTags.size() > 0) {
 			for (MediaTag rTag : rTags) {
@@ -135,6 +136,6 @@ public class SyncMetadataRemoteToLocalTask implements IMorriganTask {
 			}
 		}
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
