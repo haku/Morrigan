@@ -27,9 +27,8 @@ import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagClassification;
 import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.player.IPlayerAbstract;
-import com.vaguehope.morrigan.player.IPlayerLocal;
 import com.vaguehope.morrigan.player.PlayItem;
-import com.vaguehope.morrigan.player.PlayerRegister;
+import com.vaguehope.morrigan.player.PlayerActivator;
 import com.vaguehope.morrigan.server.feedwriters.AbstractFeed;
 import com.vaguehope.morrigan.server.feedwriters.XmlHelper;
 import com.vaguehope.morrigan.util.TimeHelper;
@@ -38,15 +37,15 @@ import com.vaguehope.morrigan.util.TimeHelper;
  * Valid URLs:
  * <pre>
  *  GET /players
- * 
+ *
  *  GET /players/0
  * POST /players/0 action=playpause
  * POST /players/0 action=next
  * POST /players/0 action=stop
  * POST /players/0 action=fullscreen&monitor=0
- * 
+ *
  * POST /players/0 action=addtag&tag=foo
- * 
+ *
  *  GET /players/0/queue
  * POST /players/0/queue action=clear
  * POST /players/0/queue action=shuffle
@@ -59,17 +58,17 @@ import com.vaguehope.morrigan.util.TimeHelper;
  */
 public class PlayersServlet extends HttpServlet {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	public static final String CONTEXTPATH = "/players";
-	
+
 	public static final String PATH_QUEUE = "queue";
-	
+
 	private static final String CMD_PLAYPAUSE = "playpause";
 	private static final String CMD_NEXT = "next";
 	private static final String CMD_STOP = "stop";
 	private static final String CMD_FULLSCREEN = "fullscreen";
 	private static final String CMD_ADDTAG = "addtag";
-	
+
 	private static final String CMD_CLEAR = "clear";
 	private static final String CMD_SHUFFLE = "shuffle";
 	private static final String CMD_TOP = "top";
@@ -77,16 +76,16 @@ public class PlayersServlet extends HttpServlet {
 	private static final String CMD_REMOVE = "remove";
 	private static final String CMD_DOWN = "down";
 	private static final String CMD_BOTTOM = "bottom";
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	private static final long serialVersionUID = -6463380542721345844L;
-	
+
 	private static final String ROOTPATH = "/";
 	private static final String NULL = "null";
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		try {
@@ -99,13 +98,13 @@ public class PlayersServlet extends HttpServlet {
 			throw new ServletException(e);
 		}
 	}
-	
+
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		try {
 			String requestURI = req.getRequestURI();
 			String reqPath = requestURI.startsWith(CONTEXTPATH) ? requestURI.substring(CONTEXTPATH.length()) : requestURI;
-			
+
 			if (reqPath == null || reqPath.length() < 1 || reqPath.equals(ROOTPATH)) { // POST to root.
 				ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid POST request desu~");
 			}
@@ -114,7 +113,7 @@ public class PlayersServlet extends HttpServlet {
 				if (path.length() > 0) {
 					String[] pathParts = path.split("/");
 					int playerId = Integer.parseInt(pathParts[0]);
-					IPlayerAbstract player = PlayerRegister.getLocalPlayer(playerId);
+					IPlayerAbstract player = PlayerActivator.getPlayer(playerId);
 					if (pathParts.length == 1) {
 						postToPlayer(req, resp, player);
 					}
@@ -143,7 +142,7 @@ public class PlayersServlet extends HttpServlet {
 			throw new ServletException(e);
 		}
 	}
-	
+
 	private static void postToPlayer (HttpServletRequest req, HttpServletResponse resp, IPlayerAbstract player) throws IOException, SAXException, MorriganException {
 		String act = req.getParameter("action");
 		if (act == null) {
@@ -194,7 +193,7 @@ public class PlayersServlet extends HttpServlet {
 			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "invalid 'action' parameter '"+act+"' desu~");
 		}
 	}
-	
+
 	private static void postToQueue (HttpServletRequest req, HttpServletResponse resp, IPlayerAbstract player) throws IOException, SAXException {
 		String act = req.getParameter("action");
 		if (act == null) {
@@ -212,7 +211,7 @@ public class PlayersServlet extends HttpServlet {
 			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "invalid 'action' parameter '"+act+"' desu~");
 		}
 	}
-	
+
 	private static void postToQueue (HttpServletRequest req, HttpServletResponse resp, IPlayerAbstract player, int item) throws IOException, SAXException {
 		String act = req.getParameter("action");
 		if (act == null) {
@@ -243,11 +242,11 @@ public class PlayersServlet extends HttpServlet {
 			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "invalid 'action' parameter '"+act+"' desu~");
 		}
 	}
-	
+
 	private static void writeResponse (HttpServletRequest req, HttpServletResponse resp) throws IOException, SAXException, MorriganException {
 		String requestURI = req.getRequestURI();
 		String reqPath = requestURI.startsWith(CONTEXTPATH) ? requestURI.substring(CONTEXTPATH.length()) : requestURI;
-		
+
 		if (reqPath == null || reqPath.length() < 1 || reqPath.equals(ROOTPATH)) {
 			printPlayersList(resp);
 		}
@@ -259,15 +258,15 @@ public class PlayersServlet extends HttpServlet {
 					String playerNumberRaw = pathParts[0];
 					try {
 						int playerNumber = Integer.parseInt(playerNumberRaw);
-						IPlayerLocal player;
+						IPlayerAbstract player;
 						try {
-							player = PlayerRegister.getLocalPlayer(playerNumber);
+							player = PlayerActivator.getPlayer(playerNumber);
 						}
 						catch (IllegalArgumentException e) {
 							ServletHelper.error(resp, HttpServletResponse.SC_NOT_FOUND, playerNumber + " not found desu~");
 							return;
 						}
-						
+
 						if (pathParts.length >= 2) {
 							String subPath = pathParts[1];
 							if (subPath.equals(PATH_QUEUE)) {
@@ -280,59 +279,59 @@ public class PlayersServlet extends HttpServlet {
 						else {
 							printPlayer(resp, player);
 						}
-						
+
 					}
 					catch (NumberFormatException e) {
 						ServletHelper.error(resp, HttpServletResponse.SC_NOT_FOUND, "'" + reqPath + "' desu~ (could not parse '"+playerNumberRaw+"' as a player.)");
 					}
 				}
 			}
-			
+
 		}
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	static private void printPlayersList (HttpServletResponse resp) throws IOException, SAXException, MorriganException {
 		resp.setContentType("text/xml;charset=utf-8");
 		DataWriter dw = AbstractFeed.startFeed(resp.getWriter());
-		
+
 		AbstractFeed.addElement(dw, "title", "Morrigan players desu~");
 		AbstractFeed.addLink(dw, CONTEXTPATH, "self", "text/xml");
-		
-		Collection<IPlayerLocal> players = PlayerRegister.getLocalPlayers();
-		for (IPlayerLocal p : players) {
+
+		Collection<IPlayerAbstract> players = PlayerActivator.getAllPlayers();
+		for (IPlayerAbstract p : players) {
 			dw.startElement("entry");
 			printPlayer(dw, p, 0);
 			dw.endElement("entry");
 		}
-		
+
 		AbstractFeed.endFeed(dw);
 	}
-	
-	static private void printPlayer (HttpServletResponse resp, IPlayerLocal player) throws IOException, SAXException, MorriganException {
+
+	static private void printPlayer (HttpServletResponse resp, IPlayerAbstract player) throws IOException, SAXException, MorriganException {
 		resp.setContentType("text/xml;charset=utf-8");
 		DataWriter dw = AbstractFeed.startDocument(resp.getWriter(), "player");
-		
+
 		printPlayer(dw, player, 1);
-		
+
 		AbstractFeed.endDocument(dw, "player");
 	}
-	
+
 	static private void printPlayerQueue (HttpServletResponse resp, IPlayerAbstract player) throws IOException, SAXException {
 		resp.setContentType("text/xml;charset=utf-8");
 		DataWriter dw = AbstractFeed.startDocument(resp.getWriter(), "queue");
-		
+
 		printQueue(dw, player);
-		
+
 		AbstractFeed.endDocument(dw, "queue");
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	static private void printPlayer (DataWriter dw, IPlayerAbstract p, int detailLevel) throws SAXException, UnsupportedEncodingException, MorriganException {
 		if (detailLevel < 0 || detailLevel > 1) throw new IllegalArgumentException("detailLevel must be 0 or 1, not "+detailLevel+".");
-		
+
 		String listTitle;
 		String listId;
 		String listUrl;
@@ -347,7 +346,7 @@ public class PlayersServlet extends HttpServlet {
 			listId = NULL;
 			listUrl = null;
 		}
-		
+
 		String title;
 		PlayItem currentItem = p.getCurrentItem();
 		if (currentItem != null && currentItem.item != null) {
@@ -356,14 +355,14 @@ public class PlayersServlet extends HttpServlet {
 		else {
 			title = p.getName();
 		}
-		
+
 		int queueLength = p.getQueueList().size();
 		DurationData queueDuration = p.getQueueTotalDuration();
-		
+
 		AbstractFeed.addElement(dw, "title", "p" + p.getId() + ":" + p.getPlayState().toString() + ":" + title);
 		String selfUrl = CONTEXTPATH + "/" + p.getId();
 		AbstractFeed.addLink(dw, selfUrl, "self", "text/xml");
-		
+
 		AbstractFeed.addElement(dw, "playerid", p.getId());
 		AbstractFeed.addElement(dw, "playstate", p.getPlayState().getN());
 		AbstractFeed.addElement(dw, "playorder", p.getPlaybackOrder().getN());
@@ -374,7 +373,7 @@ public class PlayersServlet extends HttpServlet {
 		AbstractFeed.addElement(dw, "listid", listId);
 		if (listUrl != null) AbstractFeed.addLink(dw, listUrl, "list", "text/xml");
 		AbstractFeed.addElement(dw, "tracktitle", title);
-		
+
 		if (detailLevel == 1) {
 			String trackLink = null;
 			String filename;
@@ -388,14 +387,14 @@ public class PlayersServlet extends HttpServlet {
 				filename = NULL;
 				filepath = NULL;
 			}
-			
+
 			if (trackLink != null) AbstractFeed.addLink(dw, trackLink, "track");
-			
+
 			AbstractFeed.addElement(dw, "trackfile", filepath);
 			AbstractFeed.addElement(dw, "trackfilename", filename);
 			AbstractFeed.addElement(dw, "playposition", p.getCurrentPosition());
 			AbstractFeed.addElement(dw, "trackduration", p.getCurrentTrackDuration());
-			
+
 			if (currentItem != null && currentItem.item != null) {
 				IMediaTrack item = currentItem.item;
 				if (item.getHashcode() != null) AbstractFeed.addElement(dw, "trackhash", item.getHashcode().toString(16));
@@ -403,7 +402,7 @@ public class PlayersServlet extends HttpServlet {
 				AbstractFeed.addElement(dw, "trackmissing", Boolean.toString(currentItem.item.isMissing()));
 				AbstractFeed.addElement(dw, "trackstartcount", String.valueOf(currentItem.item.getStartCount()));
 				AbstractFeed.addElement(dw, "trackendcount", String.valueOf(currentItem.item.getEndCount()));
-				
+
 				if (currentList != null) {
 					List<MediaTag> tags = currentList.getTags(item);
 					if (tags != null) {
@@ -416,7 +415,7 @@ public class PlayersServlet extends HttpServlet {
 					}
 				}
 			}
-			
+
 			Map<Integer, String> mons = p.getMonitors();
 			if (mons != null) {
 				for (Entry<Integer, String> mon : mons.entrySet()) {
@@ -425,38 +424,38 @@ public class PlayersServlet extends HttpServlet {
 			}
 		}
 	}
-	
+
 	static private void printQueue (DataWriter dw, IPlayerAbstract p) throws SAXException, UnsupportedEncodingException {
-		
+
 		AbstractFeed.addLink(dw, CONTEXTPATH + "/" + p.getId() + "/" + PATH_QUEUE, "self", "text/xml");
 		AbstractFeed.addLink(dw, CONTEXTPATH + "/" + p.getId(), "player", "text/xml");
-		
+
 		int queueLength = p.getQueueList().size();
 		DurationData queueDuration = p.getQueueTotalDuration();
 		String queueDurationString = (queueDuration.isComplete() ? "" : "more than ") +
 				TimeHelper.formatTimeSeconds(queueDuration.getDuration());
-		
+
 		AbstractFeed.addElement(dw, "queuelength", queueLength);
 		AbstractFeed.addElement(dw, "queueduration", queueDurationString); // FIXME make parsasble.
-		
+
 		List<PlayItem> queueList = p.getQueueList();
 		for (PlayItem playItem : queueList) {
 			final IMediaTrackList<? extends IMediaTrack> list = playItem.list;
 			final IMediaTrack mi = playItem.item;
-			
+
 			dw.startElement("entry");
-			
+
 			AbstractFeed.addElement(dw, "title", playItem.toString());
-			
+
 			String listFile = URLEncoder.encode(AbstractFeed.filenameFromPath(list.getListId()), "UTF-8");
 			AbstractFeed.addLink(dw, listFile, "list", "text/xml");
-			
+
 			AbstractFeed.addElement(dw, "id", playItem.id);
-			
+
 			if (mi != null) {
 				String file = URLEncoder.encode(mi.getFilepath(), "UTF-8");
 				AbstractFeed.addLink(dw, file, "item");
-				
+
 				if (mi.getDateAdded() != null) {
 					AbstractFeed.addElement(dw, "dateadded", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateAdded()));
 				}
@@ -474,12 +473,12 @@ public class PlayersServlet extends HttpServlet {
 					AbstractFeed.addElement(dw, "datelastplayed", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateLastPlayed()));
 				}
 			}
-			
-			
+
+
 			dw.endElement("entry");
 		}
-		
+
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

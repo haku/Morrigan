@@ -50,6 +50,7 @@
    </plugins>
 
    <configurations>
+      <plugin id="com.vaguehope.morrigan.player" autoStart="true" startLevel="0" />
       <plugin id="com.vaguehope.morrigan.osgiconsole" autoStart="true" startLevel="0" />
       <plugin id="com.vaguehope.morrigan.playbackimpl.dsj" autoStart="true" startLevel="0" />
       <plugin id="com.vaguehope.morrigan.playbackimpl.gs" autoStart="true" startLevel="0" />

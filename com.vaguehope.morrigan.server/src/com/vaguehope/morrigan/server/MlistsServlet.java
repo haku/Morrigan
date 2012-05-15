@@ -22,17 +22,17 @@ import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
-import com.vaguehope.morrigan.model.media.MediaTagClassification;
-import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaListReference;
 import com.vaguehope.morrigan.model.media.MediaTag;
+import com.vaguehope.morrigan.model.media.MediaTagClassification;
+import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.model.media.impl.MediaFactoryImpl;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.LocalMixedMediaDbHelper;
-import com.vaguehope.morrigan.player.IPlayerLocal;
+import com.vaguehope.morrigan.player.IPlayerAbstract;
 import com.vaguehope.morrigan.player.PlayItem;
-import com.vaguehope.morrigan.player.PlayerRegister;
+import com.vaguehope.morrigan.player.PlayerActivator;
 import com.vaguehope.morrigan.server.feedwriters.AbstractFeed;
 import com.vaguehope.morrigan.server.feedwriters.XmlHelper;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbFactory;
@@ -43,46 +43,46 @@ import com.vaguehope.sqlitewrapper.DbException;
  * Valid URLs:
  * <pre>
  *  GET /mlists
- * 
+ *
  *  GET /mlists/LOCALMMDB/example.local.db3
  *  GET /mlists/LOCALMMDB/example.local.db3/src
  * POST /mlists/LOCALMMDB/example.local.db3 action=play&playerid=0
  * POST /mlists/LOCALMMDB/example.local.db3 action=queue&playerid=0
  * POST /mlists/LOCALMMDB/example.local.db3 action=scan
- * 
+ *
  *  GET /mlists/LOCALMMDB/example.local.db3/items
  *  GET /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3
  * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 action=play&playerid=0
  * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 action=queue&playerid=0
  * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 action=addtag&tag=foo
- * 
+ *
  *  GET /mlists/LOCALMMDB/example.local.db3/query/example
  * </pre>
  */
 public class MlistsServlet extends HttpServlet {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	public static final String CONTEXTPATH = "/mlists";
-	
+
 	public static final String PATH_ITEMS = "items";
 	public static final String PATH_SRC = "src";
 	public static final String PATH_QUERY = "query";
-	
+
 	public static final String CMD_NEWMMDB = "newmmdb";
 	public static final String CMD_SCAN = "scan";
 	public static final String CMD_PLAY = "play";
 	public static final String CMD_QUEUE = "queue";
 	public static final String CMD_ADDTAG = "addtag";
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	private static final long serialVersionUID = 2754601524882233866L;
-	
+
 	private static final String ROOTPATH = "/";
 	private static final int MAX_RESULTS = 150;
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		try {
@@ -96,7 +96,7 @@ public class MlistsServlet extends HttpServlet {
 			throw new ServletException(e);
 		}
 	}
-	
+
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		try {
@@ -116,18 +116,18 @@ public class MlistsServlet extends HttpServlet {
 			throw new ServletException(e);
 		}
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	static private enum Verb {GET, POST}
-	
+
 	/**
 	 * Param action will not be null when verb==POST.
 	 */
 	private static void processRequest (Verb verb, HttpServletRequest req, HttpServletResponse resp, String action) throws IOException, DbException, SAXException, MorriganException {
 		String requestURI = req.getRequestURI();
 		String reqPath = requestURI.startsWith(CONTEXTPATH) ? requestURI.substring(CONTEXTPATH.length()) : requestURI;
-		
+
 		if (reqPath == null || reqPath.length() < 1 || reqPath.equals(ROOTPATH)) {
 			if (verb == Verb.POST) {
 				postToRoot(resp, action);
@@ -155,7 +155,7 @@ public class MlistsServlet extends HttpServlet {
 						else {
 							throw new IllegalArgumentException("Out of cheese desu~.  Please reinstall universe and reboot desu~.");
 						}
-						
+
 						String subPath = pathParts.length >= 3 ? pathParts[2] : null;
 						String afterSubPath = pathParts.length >= 4 ? pathParts[3] : null;
 						if (verb == Verb.POST) {
@@ -178,7 +178,7 @@ public class MlistsServlet extends HttpServlet {
 			}
 		}
 	}
-	
+
 	private static void postToRoot(HttpServletResponse resp, String action) throws IOException {
 		if (action.equals(CMD_NEWMMDB)) {
 			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "TODO implement create new MMDB cmd desu~");
@@ -187,7 +187,7 @@ public class MlistsServlet extends HttpServlet {
 			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "HTTP error 400 '"+action+"' is not a valid action parameter desu~");
 		}
 	}
-	
+
 	private static void postToMmdb(HttpServletRequest req, HttpServletResponse resp, String action, IMixedMediaDb mmdb, String path, String afterPath) throws IOException, MorriganException, DbException {
 		if (path != null && path.equals(PATH_ITEMS) && afterPath != null && afterPath.length() > 0) {
 			String filepath = URLDecoder.decode(afterPath, "UTF-8");
@@ -208,10 +208,10 @@ public class MlistsServlet extends HttpServlet {
 			postToMmdb(req, resp, action, mmdb);
 		}
 	}
-	
+
 	private static void postToMmdb (HttpServletRequest req, HttpServletResponse resp, String action, IMixedMediaDb mmdb) throws IOException {
 		if (action.equals(CMD_PLAY) || action.equals(CMD_QUEUE)) {
-			IPlayerLocal player = parsePlayer(req, resp);
+			IPlayerAbstract player = parsePlayer(req, resp);
 			if (player != null) { // parsePlayer() will write the error msg.
 				resp.setContentType("text/plain");
 				if (action.equals(CMD_PLAY)) {
@@ -236,10 +236,10 @@ public class MlistsServlet extends HttpServlet {
 			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "HTTP error 400 '"+action+"' is not a valid action parameter desu~");
 		}
 	}
-	
+
 	private static void postToMmdbItem (HttpServletRequest req, HttpServletResponse resp, String action, IMixedMediaDb mmdb, IMixedMediaItem item) throws IOException, MorriganException {
 		if (action.equals(CMD_PLAY) || action.equals(CMD_QUEUE)) {
-			IPlayerLocal player = parsePlayer(req, resp);
+			IPlayerAbstract player = parsePlayer(req, resp);
 			if (player != null) { // parsePlayer() will write the error msg.
 				resp.setContentType("text/plain");
 				if (action.equals(CMD_PLAY)) {
@@ -270,45 +270,45 @@ public class MlistsServlet extends HttpServlet {
 			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "HTTP error 400 '"+action+"' is not a valid action parameter desu~");
 		}
 	}
-	
-	private static IPlayerLocal parsePlayer (HttpServletRequest req, HttpServletResponse resp) throws IOException {
+
+	private static IPlayerAbstract parsePlayer (HttpServletRequest req, HttpServletResponse resp) throws IOException {
 		String playerIdS = req.getParameter("playerid");
 		if (playerIdS == null) {
 			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "HTTP error 400 'playerId' parameter not set desu~");
 			return null;
 		}
 		int playerId = Integer.parseInt(playerIdS);
-		return PlayerRegister.getLocalPlayer(playerId);
+		return PlayerActivator.getPlayer(playerId);
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	static private void printMlistList (HttpServletResponse resp) throws IOException, SAXException {
 		resp.setContentType("text/xml;charset=utf-8");
 		DataWriter dw = AbstractFeed.startFeed(resp.getWriter());
-		
+
 		AbstractFeed.addElement(dw, "title", "Morrigan media lists desu~");
 		AbstractFeed.addLink(dw, CONTEXTPATH, "self", "text/xml");
-		
-		Collection<IPlayerLocal> players = PlayerRegister.getLocalPlayers();
-		
+
+		Collection<IPlayerAbstract> players = PlayerActivator.getAllPlayers();
+
 		// TODO merge 2 loops.
-		
+
 		for (MediaListReference listRef : MediaFactoryImpl.get().getAllLocalMixedMediaDbs()) {
 			dw.startElement("entry");
 			printMlistShort(dw, listRef, players);
 			dw.endElement("entry");
 		}
-		
+
 		for (MediaListReference listRef : RemoteMixedMediaDbHelper.getAllRemoteMmdb()) {
 			dw.startElement("entry");
 			printMlistShort(dw, listRef, players);
 			dw.endElement("entry");
 		}
-		
+
 		AbstractFeed.endFeed(dw);
 	}
-	
+
 	static private void getToMmdb (HttpServletResponse resp, IMixedMediaDb mmdb, String path, String afterPath) throws IOException, SAXException, MorriganException, DbException {
 		if (path == null) {
 			printMlistLong(resp, mmdb, false, false);
@@ -355,14 +355,14 @@ public class MlistsServlet extends HttpServlet {
 			ServletHelper.error(resp, HttpServletResponse.SC_NOT_FOUND, "HTTP error 404 unknown path '"+path+"' desu~");
 		}
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	static private void printMlistShort (DataWriter dw, MediaListReference listRef, Collection<IPlayerLocal> players) throws SAXException {
+
+	static private void printMlistShort (DataWriter dw, MediaListReference listRef, Collection<IPlayerAbstract> players) throws SAXException {
 		String fileName = listRef.getIdentifier().substring(listRef.getIdentifier().lastIndexOf(File.separator) + 1);
-		
+
 		AbstractFeed.addElement(dw, "title", listRef.getTitle());
-		
+
 		String type;
 		switch (listRef.getType()) {
 			case LOCALMMDB:  type = ILocalMixedMediaDb.TYPE;  break;
@@ -370,26 +370,26 @@ public class MlistsServlet extends HttpServlet {
 			default: throw new IllegalArgumentException("Can not list type '"+listRef.getType()+"' desu~");
 		}
 		AbstractFeed.addLink(dw, CONTEXTPATH + "/" + type + "/" + fileName, "self", "text/xml");
-		
-		for (IPlayerLocal p : players) {
+
+		for (IPlayerAbstract p : players) {
 			AbstractFeed.addLink(dw, "/player/" + p.getId() + "/play/" + fileName, "play", "cmd");
 		}
 	}
-	
+
 	static private void printMlistLong (HttpServletResponse resp, IMixedMediaDb ml, boolean listSrcs, boolean listItems) throws SAXException, MorriganException, DbException, IOException {
 		printMlistLong(resp, ml, listSrcs, listItems, null);
 	}
-	
+
 	static private void printMlistLong (HttpServletResponse resp, IMixedMediaDb ml, boolean listSrcs, boolean listItems, String queryString) throws SAXException, MorriganException, DbException, IOException {
 		printMlistLong(resp, ml, listSrcs, listItems, true, queryString); // TODO always include tags?
 	}
-	
+
 	static private void printMlistLong (HttpServletResponse resp, IMixedMediaDb ml, boolean listSrcs, boolean listItems, boolean includeTags, String queryString) throws SAXException, MorriganException, DbException, IOException {
 		resp.setContentType("text/xml;charset=utf-8");
 		DataWriter dw = AbstractFeed.startDocument(resp.getWriter(), "mlist");
-		
+
 		ml.read();
-		
+
 		List<IMixedMediaItem> items;
 		if (queryString != null) {
 			items = ml.simpleSearch(queryString, MAX_RESULTS);
@@ -397,49 +397,49 @@ public class MlistsServlet extends HttpServlet {
 		else {
 			items = ml.getMediaItems();
 		}
-		
+
 		String listFile;
 		try {
 			listFile = URLEncoder.encode(AbstractFeed.filenameFromPath(ml.getListId()), "UTF-8");
 		} catch (UnsupportedEncodingException e) {
 			throw new RuntimeException(e);
 		}
-		
+
 		dw.dataElement("title", ml.getListName());
 		if (queryString != null) dw.dataElement("query", queryString);
 		dw.dataElement("count", String.valueOf(items.size()));
-		
+
 		// TODO calculate these values from query results.
 		if (queryString == null) {
 			DurationData totalDuration = ml.getTotalDuration();
     		dw.dataElement("duration", String.valueOf(totalDuration.getDuration()));
     		dw.dataElement("durationcomplete", String.valueOf(totalDuration.isComplete()));
-    		
+
     		dw.dataElement("defaulttype", String.valueOf(ml.getDefaultMediaType().getN()));
     		dw.dataElement("sortcolumn", ml.getSort().getHumanName());
     		dw.dataElement("sortdirection", ml.getSortDirection().toString());
 		}
-		
+
 		String pathToSelf = CONTEXTPATH + "/" + ml.getType() + "/" + listFile;
 		AbstractFeed.addLink(dw, pathToSelf, "self", "text/xml");
 		if (!listItems) AbstractFeed.addLink(dw, pathToSelf + "/" + PATH_ITEMS, PATH_ITEMS, "text/xml");
 		AbstractFeed.addLink(dw, pathToSelf + "/" + PATH_SRC, PATH_SRC, "text/xml");
-		
+
 		if (listSrcs) {
 			List<String> src;
 			src = ml.getSources();
-			
+
 			for (String s : src) {
 				AbstractFeed.addElement(dw, "src", s);
 			}
 		}
-		
+
 		if (listItems) {
 			for (IMixedMediaItem mi : items) {
     			dw.startElement("entry");
-    			
+
     			AbstractFeed.addElement(dw, "title", mi.getTitle());
-    			
+
     			String file;
     			try {
     				file = URLEncoder.encode(mi.getFilepath(), "UTF-8");
@@ -447,7 +447,7 @@ public class MlistsServlet extends HttpServlet {
     				throw new RuntimeException(e);
     			}
     			AbstractFeed.addLink(dw, file, "self"); // Path is relative to this feed.
-    			
+
     			if (mi.getDateAdded() != null) {
     				AbstractFeed.addElement(dw, "dateadded", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateAdded()));
     			}
@@ -458,7 +458,7 @@ public class MlistsServlet extends HttpServlet {
     			if (mi.getHashcode() != null && !BigInteger.ZERO.equals(mi.getHashcode())) AbstractFeed.addElement(dw, "hash", mi.getHashcode().toString(16));
     			AbstractFeed.addElement(dw, "enabled", Boolean.toString(mi.isEnabled()));
     			AbstractFeed.addElement(dw, "missing", Boolean.toString(mi.isMissing()));
-    			
+
     			if (mi.getMediaType() == MediaType.TRACK) {
     				AbstractFeed.addElement(dw, "duration", mi.getDuration());
         			AbstractFeed.addElement(dw, "startcount", mi.getStartCount());
@@ -471,7 +471,7 @@ public class MlistsServlet extends HttpServlet {
     				AbstractFeed.addElement(dw, "width", mi.getWidth());
     				AbstractFeed.addElement(dw, "height", mi.getHeight());
     			}
-    			
+
     			if (includeTags) {
     				List<MediaTag> tags = ml.getTags(mi);
     				for (MediaTag tag : tags) {
@@ -481,13 +481,13 @@ public class MlistsServlet extends HttpServlet {
 							});
 					}
     			}
-    			
+
     			dw.endElement("entry");
     		}
 		}
-		
+
 		AbstractFeed.endDocument(dw, "mlist");
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

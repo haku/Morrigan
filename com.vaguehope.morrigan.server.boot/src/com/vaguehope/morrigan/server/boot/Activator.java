@@ -15,53 +15,53 @@ import com.vaguehope.morrigan.player.IPlayerEventHandler;
 import com.vaguehope.morrigan.player.IPlayerLocal;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayItem;
-import com.vaguehope.morrigan.player.PlayerRegister;
+import com.vaguehope.morrigan.player.PlayerActivator;
 import com.vaguehope.morrigan.server.MorriganServer;
 
 public class Activator implements BundleActivator {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	static protected final Logger logger = Logger.getLogger(Activator.class.getName());
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	private MorriganServer server;
 	private IPlayerLocal player;
-	
+
 	@Override
 	public void start (BundleContext context) throws Exception {
 		// Start server.
 		this.server = new MorriganServer(context);
 		this.server.start();
-		
+
 		// Prep player.
-		this.player = PlayerRegister.makeLocalPlayer("Server", this.eventHandler);
+		this.player = PlayerActivator.makeLocal("Server", this.eventHandler);
 		this.player.setPlaybackOrder(PlaybackOrder.RANDOM);
 	}
-	
+
 	@Override
 	public void stop (BundleContext context) throws Exception {
 		this.server.stop();
 		logger.fine("Morrigan Server stopped.");
-		
+
 		// Clean up.
 		this.player.dispose();
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	private IPlayerEventHandler eventHandler = new IPlayerEventHandler() {
-		
+
 		@Override
 		public void updateStatus() {
 			outputStatus();
 		}
-		
+
 		@Override
 		public void asyncThrowable(Throwable t) {
 			logger.log(Level.WARNING, "asyncThrowable", t);
 		}
-		
+
 		@Override
 		public Composite getCurrentMediaFrameParent() {
 			return null;
@@ -85,15 +85,15 @@ public class Activator implements BundleActivator {
 		@Override
 		public void videoAreaClose() {/* UNUSED */}
 	};
-	
-	
+
+
 	private PlayState prevPlayState = null;
-	
+
 	protected void outputStatus () {
 		PlayState playState = this.player.getPlayState();
 		if (playState != this.prevPlayState) {
 			this.prevPlayState = playState;
-			
+
 			PlayItem currentItem = this.player.getCurrentItem();
 			if (currentItem.item != null) {
 				System.out.println(playState.toString() + " " + currentItem.item);
@@ -102,6 +102,6 @@ public class Activator implements BundleActivator {
 			}
 		}
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
