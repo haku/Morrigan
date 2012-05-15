@@ -8,136 +8,138 @@ import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
 
-
+/**
+ * TODO move this to internal package.
+ */
 public class OrderHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	public static enum PlaybackOrder {
-		
+
 		SEQUENTIAL(0) {
 			@Override
 			public String toString() {
 				return "sequential";
 			}
 		},
-		
+
 		RANDOM(1) {
 			@Override
 			public String toString() {
 				return "random";
 			}
 		},
-		
+
 		BYSTARTCOUNT(2) {
 			@Override
 			public String toString() {
 				return "by start-count";
 			}
 		},
-		
+
 		BYLASTPLAYED(3) {
 			@Override
 			public String toString() {
 				return "by last-played";
 			}
 		};
-		
+
 		private int n;
-		
+
 		private PlaybackOrder (int n) {
 			this.n = n;
 		}
-		
+
 		public int getN() {
 			return this.n;
 		}
-		
+
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	public static PlaybackOrder parsePlaybackOrder (String s) {
 		for (PlaybackOrder o : PlaybackOrder.values()) {
 			if (s.equals(o.toString())) return o;
 		}
 		throw new IllegalArgumentException("Unknown order mode toString: " + s);
 	}
-	
+
 	public static PlaybackOrder parsePlaybackOrderByName (String s) {
 		for (PlaybackOrder o : PlaybackOrder.values()) {
 			if (s.equals(o.name())) return o;
 		}
 		throw new IllegalArgumentException("Unknown order mode name: " + s);
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	// TODO take into account disabled and missing tracks.
 	public static IMediaTrack getNextTrack (IMediaTrackList<? extends IMediaTrack> list, IMediaTrack track, PlaybackOrder mode) {
 		if (list.getCount() <= 0) return null;
-		
+
 		switch (mode) {
 			case SEQUENTIAL:
 				return getNextTrackSequencial(list, track);
-			
+
 			case RANDOM:
 				return getNextTrackRandom(list, track);
-			
+
 			case BYSTARTCOUNT:
 				return getNextTrackByStartCount(list, track);
-				
+
 			case BYLASTPLAYED:
 				return getNextTrackByLastPlayedDate(list, track);
-				
+
 			default:
 				throw new IllegalArgumentException();
-			
+
 		}
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	private static IMediaTrack getNextTrackSequencial (IMediaTrackList<? extends IMediaTrack> list, IMediaItem track) {
 		IMediaTrack ret = null;
 		List<? extends IMediaTrack> mediaTracks = list.getMediaItems();
-		
+
 		int i;
 		if (track != null && mediaTracks.contains(track)) {
 			i = mediaTracks.indexOf(track) + 1;
-			
+
 		} else {
 			// With no other info, might as well start at the beginning.
 			i = 0;
 		}
-		
+
 		int tracksTried = 0;
 		while (true) {
 			if (i >= mediaTracks.size()) i = 0;
-			
+
 			if (validChoice(mediaTracks.get(i))) {
 				break;
 			}
-			
+
 			tracksTried++;
 			if (tracksTried >= list.getCount()) {
 				i = -1;
 				break;
 			}
-			
+
 			i++;
 		}
-		
+
 		if (i > 0) {
 			ret = mediaTracks.get(i);
 		}
-		
+
 		return ret;
 	}
-	
+
 	private static IMediaTrack getNextTrackRandom (IMediaTrackList<? extends IMediaTrack> list, IMediaItem current) {
 		Random generator = new Random();
 		List<? extends IMediaTrack> mediaTracks = list.getMediaItems();
-		
+
 		int n = 0;
 		for (IMediaTrack i : mediaTracks) {
 			if (validChoice(i, current)) {
@@ -145,7 +147,7 @@ public class OrderHelper {
 			}
 		}
 		if (n == 0) return null;
-		
+
 		long x = Math.round(generator.nextDouble() * n);
 		for (IMediaTrack i : mediaTracks) {
 			if (validChoice(i, current)) {
@@ -155,14 +157,14 @@ public class OrderHelper {
 				}
 			}
 		}
-		
+
 		throw new RuntimeException("Failed to find next track.  This should not happen.");
 	}
-	
+
 	private static IMediaTrack getNextTrackByStartCount (IMediaTrackList<? extends IMediaTrack> list, IMediaItem current) {
 		IMediaTrack ret = null;
 		List<? extends IMediaTrack> tracks = list.getMediaItems();
-		
+
 		// Find highest play count.
 		long maxPlayCount = -1;
 		for (IMediaTrack i : tracks) {
@@ -174,7 +176,7 @@ public class OrderHelper {
 			return null;
 		}
 		maxPlayCount = maxPlayCount + 1;
-		
+
 		// Find sum of all selection indicies.
 		long selIndexSum = 0;
 		for (IMediaTrack i : tracks) {
@@ -182,11 +184,11 @@ public class OrderHelper {
 				selIndexSum = selIndexSum + (maxPlayCount - i.getStartCount());
 			}
 		}
-		
+
 		// Generate target selection index.
 		Random generator = new Random();
 		long targetIndex = Math.round(generator.nextDouble() * selIndexSum);
-		
+
 		// Find the target item.
 		for (IMediaTrack i : tracks) {
 			if (validChoice(i, current)) {
@@ -197,19 +199,19 @@ public class OrderHelper {
 				}
 			}
 		}
-		
+
 		if (ret == null || !ret.isPlayable()) {
 			throw new RuntimeException("Failed to correctly find next track.  This should not happen.");
 		}
-		
+
 		return ret;
 	}
-	
+
 	private static IMediaTrack getNextTrackByLastPlayedDate (IMediaTrackList<? extends IMediaTrack> list, IMediaTrack current) {
 		IMediaTrack ret = null;
 		List<? extends IMediaTrack> tracks = list.getMediaItems();
 		Date now = new Date();
-		
+
 		// Find oldest date.
 		Date maxAge = new Date();
 		int n = 0;
@@ -225,7 +227,7 @@ public class OrderHelper {
 			return null;
 		}
 		long maxAgeDays = dateDiffDays(maxAge, now);
-		
+
 		// Build sum of all selection-indicies in units of days.
 		long sumAgeDays = 0;
 		for (IMediaTrack i : tracks) {
@@ -237,11 +239,11 @@ public class OrderHelper {
 				}
 			}
 		}
-		
+
 		// Generate target selection index.
 		Random generator = new Random();
 		long targetIndex = Math.round(generator.nextDouble() * sumAgeDays);
-		
+
 		// Find the target item.
 		for (IMediaTrack i : tracks) {
 			if (validChoice(i, current)) {
@@ -256,31 +258,31 @@ public class OrderHelper {
 				}
 			}
 		}
-		
+
 		if (ret == null || !ret.isPlayable()) {
 			throw new RuntimeException("Failed to correctly find next track.  This should not happen.  targetIndex=" + targetIndex);
 		}
-		
+
 		return ret;
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	static private boolean validChoice (IMediaTrack i) {
 		return i.isEnabled() && i.isPlayable() && !i.isMissing();
 	}
-	
+
 	static private boolean validChoice (IMediaTrack i, IMediaItem current) {
 		return i.isEnabled() && i.isPlayable() && !i.isMissing() && i != current;
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	static private long dateDiffDays (Date olderDate, Date newerDate) {
 		long l = (newerDate.getTime() - olderDate.getTime()) / 86400000;
 		if (l < 1) l = 1;
 		return l;
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

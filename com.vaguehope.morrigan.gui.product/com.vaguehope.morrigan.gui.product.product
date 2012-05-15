@@ -128,6 +128,7 @@ Image &quot;The Morrígan&quot; by Louis le Brocquy used under the Creative Comm
    </plugins>
 
    <configurations>
+      <plugin id="com.vaguehope.morrigan.player" autoStart="true" startLevel="0" />
       <plugin id="com.vaguehope.morrigan.hotkeyimpl.jintellitype" autoStart="true" startLevel="0" />
       <plugin id="com.vaguehope.morrigan.hotkeyimpl.jxgrabkey" autoStart="true" startLevel="0" />
       <plugin id="com.vaguehope.morrigan.playbackimpl.dsj" autoStart="true" startLevel="0" />
