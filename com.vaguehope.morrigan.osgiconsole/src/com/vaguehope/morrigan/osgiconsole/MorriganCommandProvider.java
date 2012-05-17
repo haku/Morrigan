@@ -427,11 +427,13 @@ public class MorriganCommandProvider implements CommandProvider {
 		for (IPlayerAbstract p : players) {
 			ci.print(String.valueOf(p.getId()));
 			ci.print("\t");
+			ci.print(p.getName());
+			ci.print(" ");
 			ci.print(p.getPlayState());
 
 			PlayItem currentItem = p.getCurrentItem();
 			if (currentItem != null && currentItem.item != null) {
-				ci.print(": ");
+				ci.print(" ");
 				ci.print(currentItem.item.getTitle());
 			}
 
@@ -470,8 +472,7 @@ public class MorriganCommandProvider implements CommandProvider {
 	}
 
 	static private void doPlayersPlayerInfo (CommandInterpreter ci, IPlayerAbstract player) {
-		ci.print("Player ");
-		ci.print(String.valueOf(player.getId()));
+		ci.print(player.getName());
 		ci.print(": ");
 		ci.print(player.getPlayState().toString());
 		ci.print(" (");
@@ -480,14 +481,37 @@ public class MorriganCommandProvider implements CommandProvider {
 		ci.println();
 
 		PlayItem currentItem = player.getCurrentItem();
-		String item = (currentItem != null && currentItem.item != null) ? currentItem.item.getTitle() : "";
-		ci.println("\titem=" + item);
+		IMediaTrack item = (currentItem != null && currentItem.item != null) ? currentItem.item : null;
+		ci.print("\t item: ");
+		if (item != null) {
+			ci.print(item.getTitle());
+			ci.print(" (");
+			ci.print(TimeHelper.formatTimeSeconds(item.getDuration()));
+			ci.println(")");
+		}
+		else {
+			ci.println("[none]");
+		}
 
 		IMediaTrackList<? extends IMediaTrack> currentList = player.getCurrentList();
-		String list = currentList != null ? currentList.getListName() : "";
-		ci.println("\tlist=" + list);
+		if (currentList != null) {
+			ci.print("\t list: ");
+			ci.print(currentList.getListName());
+			ci.print(" (");
+			ci.print(String.valueOf(currentList.getCount()));
+			ci.println(" items)");
+		}
+		else {
+			ci.println("[none]");
+		}
 
-		ci.println("\tqueue=" + player.getQueueList().size() + " items.");
+		ci.print("\tqueue: ");
+		ci.print(String.valueOf(player.getQueueList().size()));
+		ci.print(" items (");
+		DurationData d = player.getQueueTotalDuration();
+		if (!d.isComplete()) ci.print(("more than "));
+		ci.print(TimeHelper.formatTimeSeconds(d.getDuration()));
+		ci.println(")");
 	}
 
 	static private void doPlayersPlayerPlay (CommandInterpreter ci, IPlayerAbstract player, List<String> args, boolean addToQueue) {
@@ -515,7 +539,7 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 		else if (addToQueue && args.size() == 1 && args.get(0).equals("clear")) {
 			player.clearQueue();
-			ci.println("Queue for player " + player.getId() + " cleared.");
+			ci.println("Queue for " + player.getName() + " player cleared.");
 		}
 		else {
 			String q1 = args.get(0);
@@ -553,28 +577,28 @@ public class MorriganCommandProvider implements CommandProvider {
 
 	static private void doPlayersPlayerPause (CommandInterpreter ci, IPlayerAbstract player) {
 		player.pausePlaying();
-		ci.println("Player " + player.getId() + ": " + player.getPlayState().toString());
+		ci.println(player.getName() + " player: " + player.getPlayState().toString());
 	}
 
 	static private void doPlayersPlayerStop (CommandInterpreter ci, IPlayerAbstract player) {
 		player.stopPlaying();
-		ci.println("Player " + player.getId() + ": " + player.getPlayState().toString());
+		ci.println(player.getName() + " player: " + player.getPlayState().toString());
 	}
 
 	static private void doPlayersPlayerNext (CommandInterpreter ci, IPlayerAbstract player) {
 		player.nextTrack();
 		PlayItem currentItem = player.getCurrentItem();
 		if (currentItem == null) {
-			ci.println("Player " + player.getId() + ": " + player.getPlayState().toString());
+			ci.println(player.getName() + " player: " + player.getPlayState().toString());
 		}
 		else {
-			ci.println("Player " + player.getId() + ": " + currentItem.item.getTitle());
+			ci.println(player.getName() + " player: " + currentItem.item.getTitle());
 		}
 	}
 
 	static private void doPlayersPlayerOrder (CommandInterpreter ci, IPlayerAbstract player, List<String> args) {
 		if (args.size() < 1) {
-			ci.println("Player " + player.getId() + " order = " + player.getPlaybackOrder().toString() + ".");
+			ci.println(player.getName() + " player order = " + player.getPlaybackOrder().toString() + ".");
 			ci.print("Options:");
 			for (PlaybackOrder i : PlaybackOrder.values()) {
 				ci.print(" '");
@@ -589,7 +613,7 @@ public class MorriganCommandProvider implements CommandProvider {
 		for (PlaybackOrder po : PlaybackOrder.values()) {
 			if (po.toString().toLowerCase().contains(arg.toLowerCase())) {
 				player.setPlaybackOrder(po);
-				ci.println("Playback order set to '" + po.toString() + "' for player " + player.getId() + ".");
+				ci.println("Playback order set to '" + po.toString() + "' for " + player.getName() + " player.");
 				return;
 			}
 		}
@@ -600,12 +624,12 @@ public class MorriganCommandProvider implements CommandProvider {
 		List<PlayItem> queue = player.getQueueList();
 
 		if (queue.size() < 1) {
-			ci.println("Queue for player " + player.getId() + " is empty.");
+			ci.println("Queue for " + player.getName() + " player is empty.");
 			return;
 		}
 
 		DurationData duration = player.getQueueTotalDuration();
-		ci.println("Player " + player.getId() + " has " + queue.size()
+		ci.println(player.getName() + " player has " + queue.size()
 				+ " items totaling " + (duration.isComplete() ? "" : " more than ")
 				+ TimeHelper.formatTimeSeconds(duration.getDuration()) + " in its queue.");
 		for (PlayItem pi : queue) {
