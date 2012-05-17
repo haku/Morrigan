@@ -35,6 +35,9 @@ import com.vaguehope.morrigan.player.OrderHelper;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayItem;
 
+/**
+ * TODO rename to LocalPlayerImpl
+ */
 public class Player implements IPlayerLocal {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -485,7 +488,7 @@ public class Player implements IPlayerLocal {
 
 			IPlaybackEngine engine = getPlaybackEngine(true);
 			synchronized (engine) {
-				this.logger.info("Loading '" + item.item.getTitle() + "'...");
+				this.logger.fine("Loading '" + item.item.getTitle() + "'...");
 				setCurrentItem(item);
 
 				engine.setFile(item.item.getFilepath());
@@ -494,7 +497,7 @@ public class Player implements IPlayerLocal {
 				engine.startPlaying();
 
 				this._currentTrackDuration = engine.getDuration();
-				this.logger.info("Started to play '" + item.item.getTitle() + "'...");
+				this.logger.fine("Started to play '" + item.item.getTitle() + "'...");
 
 				// Put DB stuff in DB thread.
 				Thread bgthread = new Thread() {
@@ -655,7 +658,7 @@ public class Player implements IPlayerLocal {
 				if (c != null && c.list != null && c.item != null) {
 					if (c.item.getDuration() != duration) {
 						try {
-							Player.this.logger.info("setting item duration=" + duration);
+							Player.this.logger.fine("setting item duration=" + duration);
 							c.list.setTrackDuration(c.item, duration);
 						} catch (Throwable t) {
 							t.printStackTrace();
@@ -674,7 +677,7 @@ public class Player implements IPlayerLocal {
 
 		@Override
 		public void onEndOfTrack() {
-			Player.this.logger.info("Player received endOfTrack event.");
+			Player.this.logger.fine("Player received endOfTrack event.");
 			// Inc. stats.
 			try {
 				getCurrentItem().list.incTrackEndCnt(getCurrentItem().item);

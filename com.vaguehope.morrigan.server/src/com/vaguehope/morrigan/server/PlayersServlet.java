@@ -28,7 +28,7 @@ import com.vaguehope.morrigan.model.media.MediaTagClassification;
 import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.player.IPlayerAbstract;
 import com.vaguehope.morrigan.player.PlayItem;
-import com.vaguehope.morrigan.player.PlayerActivator;
+import com.vaguehope.morrigan.player.PlayerReader;
 import com.vaguehope.morrigan.server.feedwriters.AbstractFeed;
 import com.vaguehope.morrigan.server.feedwriters.XmlHelper;
 import com.vaguehope.morrigan.util.TimeHelper;
@@ -86,6 +86,16 @@ public class PlayersServlet extends HttpServlet {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+	private final PlayerReader playerListener;
+
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	public PlayersServlet (PlayerReader playerListener) {
+		this.playerListener = playerListener;
+	}
+
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		try {
@@ -113,7 +123,7 @@ public class PlayersServlet extends HttpServlet {
 				if (path.length() > 0) {
 					String[] pathParts = path.split("/");
 					int playerId = Integer.parseInt(pathParts[0]);
-					IPlayerAbstract player = PlayerActivator.getPlayer(playerId);
+					IPlayerAbstract player = this.playerListener.getPlayer(playerId);
 					if (pathParts.length == 1) {
 						postToPlayer(req, resp, player);
 					}
@@ -143,7 +153,7 @@ public class PlayersServlet extends HttpServlet {
 		}
 	}
 
-	private static void postToPlayer (HttpServletRequest req, HttpServletResponse resp, IPlayerAbstract player) throws IOException, SAXException, MorriganException {
+	private void postToPlayer (HttpServletRequest req, HttpServletResponse resp, IPlayerAbstract player) throws IOException, SAXException, MorriganException {
 		String act = req.getParameter("action");
 		if (act == null) {
 			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "'action' parameter not set desu~");
@@ -243,7 +253,7 @@ public class PlayersServlet extends HttpServlet {
 		}
 	}
 
-	private static void writeResponse (HttpServletRequest req, HttpServletResponse resp) throws IOException, SAXException, MorriganException {
+	private void writeResponse (HttpServletRequest req, HttpServletResponse resp) throws IOException, SAXException, MorriganException {
 		String requestURI = req.getRequestURI();
 		String reqPath = requestURI.startsWith(CONTEXTPATH) ? requestURI.substring(CONTEXTPATH.length()) : requestURI;
 
@@ -260,7 +270,7 @@ public class PlayersServlet extends HttpServlet {
 						int playerNumber = Integer.parseInt(playerNumberRaw);
 						IPlayerAbstract player;
 						try {
-							player = PlayerActivator.getPlayer(playerNumber);
+							player = this.playerListener.getPlayer(playerNumber);
 						}
 						catch (IllegalArgumentException e) {
 							ServletHelper.error(resp, HttpServletResponse.SC_NOT_FOUND, playerNumber + " not found desu~");
@@ -292,14 +302,14 @@ public class PlayersServlet extends HttpServlet {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	static private void printPlayersList (HttpServletResponse resp) throws IOException, SAXException, MorriganException {
+	private void printPlayersList (HttpServletResponse resp) throws IOException, SAXException, MorriganException {
 		resp.setContentType("text/xml;charset=utf-8");
 		DataWriter dw = AbstractFeed.startFeed(resp.getWriter());
 
 		AbstractFeed.addElement(dw, "title", "Morrigan players desu~");
 		AbstractFeed.addLink(dw, CONTEXTPATH, "self", "text/xml");
 
-		Collection<IPlayerAbstract> players = PlayerActivator.getAllPlayers();
+		Collection<IPlayerAbstract> players = this.playerListener.getPlayers();
 		for (IPlayerAbstract p : players) {
 			dw.startElement("entry");
 			printPlayer(dw, p, 0);

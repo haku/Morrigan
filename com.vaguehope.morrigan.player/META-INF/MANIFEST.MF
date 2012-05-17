@@ -19,5 +19,6 @@ Import-Package: com.vaguehope.morrigan.engines,
  com.vaguehope.sqlitewrapper,
  org.eclipse.swt,
  org.eclipse.swt.widgets,
- org.osgi.framework;version="1.3.0"
+ org.osgi.framework;version="1.3.0",
+ org.osgi.util.tracker;version="1.5.0"
 Bundle-Vendor: vaguehope.com

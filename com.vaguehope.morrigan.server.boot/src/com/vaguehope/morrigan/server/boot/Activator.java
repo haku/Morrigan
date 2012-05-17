@@ -1,6 +1,7 @@
 package com.vaguehope.morrigan.server.boot;
 
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -11,96 +12,142 @@ import org.osgi.framework.BundleContext;
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
+import com.vaguehope.morrigan.player.IPlayerAbstract;
 import com.vaguehope.morrigan.player.IPlayerEventHandler;
-import com.vaguehope.morrigan.player.IPlayerLocal;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayItem;
-import com.vaguehope.morrigan.player.PlayerActivator;
+import com.vaguehope.morrigan.player.PlayerContainer;
+import com.vaguehope.morrigan.player.PlayerReaderTracker;
 import com.vaguehope.morrigan.server.MorriganServer;
 
 public class Activator implements BundleActivator {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	static protected final Logger logger = Logger.getLogger(Activator.class.getName());
+	protected static final Logger logger = Logger.getLogger(Activator.class.getName());
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private MorriganServer server;
-	private IPlayerLocal player;
+	private PlayerReaderTracker playerReaderTracker;
+
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
 	public void start (BundleContext context) throws Exception {
-		// Start server.
-		this.server = new MorriganServer(context);
+		this.playerReaderTracker = new PlayerReaderTracker(context);
+
+		this.server = new MorriganServer(context, this.playerReaderTracker);
 		this.server.start();
 
-		// Prep player.
-		this.player = PlayerActivator.makeLocal("Server", this.eventHandler);
-		this.player.setPlaybackOrder(PlaybackOrder.RANDOM);
+		context.registerService(PlayerContainer.class, this.playerContainer, null);
 	}
 
 	@Override
 	public void stop (BundleContext context) throws Exception {
 		this.server.stop();
+		this.playerReaderTracker.dispose();
 		logger.fine("Morrigan Server stopped.");
-
-		// Clean up.
-		this.player.dispose();
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private IPlayerEventHandler eventHandler = new IPlayerEventHandler() {
+	private final PlayerContainer playerContainer = new PlayerContainer() {
+
+		private IPlayerAbstract player;
 
 		@Override
-		public void updateStatus() {
+		public String getName () {
+			return "Server";
+		}
+
+		@Override
+		public IPlayerEventHandler getEventHandler () {
+			return Activator.this.eventHandler;
+		}
+
+		@Override
+		public void setPlayer (IPlayerAbstract player) {
+			this.player = player;
+			player.setPlaybackOrder(PlaybackOrder.RANDOM);
+		}
+
+		@Override
+		public IPlayerAbstract getPlayer () {
+			return this.player;
+		}
+
+	};
+
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	protected final IPlayerEventHandler eventHandler = new IPlayerEventHandler() {
+
+		@Override
+		public void updateStatus () {
 			outputStatus();
 		}
 
 		@Override
-		public void asyncThrowable(Throwable t) {
+		public void asyncThrowable (Throwable t) {
 			logger.log(Level.WARNING, "asyncThrowable", t);
 		}
 
 		@Override
-		public Composite getCurrentMediaFrameParent() {
+		public Composite getCurrentMediaFrameParent () {
 			return null;
 		}
+
 		@Override
-		public Map<Integer, String> getMonitors() {
+		public Map<Integer, String> getMonitors () {
 			return null;
 		}
+
 		@Override
-		public void goFullscreen(int monitor) {/* UNUSED */}
+		public void goFullscreen (int monitor) {/* UNUSED */}
+
 		@Override
-		public IMediaTrackList<IMediaTrack> getCurrentList() {
+		public IMediaTrackList<IMediaTrack> getCurrentList () {
 			return null;
 		}
+
 		@Override
-		public void currentItemChanged() {/* UNUSED */}
+		public void currentItemChanged () {/* UNUSED */}
+
 		@Override
-		public void historyChanged() {/* UNUSED */}
+		public void historyChanged () {/* UNUSED */}
+
 		@Override
-		public void videoAreaSelected() {/* UNUSED */}
+		public void videoAreaSelected () {/* UNUSED */}
+
 		@Override
-		public void videoAreaClose() {/* UNUSED */}
+		public void videoAreaClose () {/* UNUSED */}
 	};
 
-
-	private PlayState prevPlayState = null;
+	private AtomicReference<PlayState> prevPlayState = new AtomicReference<PlayState>();
 
 	protected void outputStatus () {
-		PlayState playState = this.player.getPlayState();
-		if (playState != this.prevPlayState) {
-			this.prevPlayState = playState;
-
-			PlayItem currentItem = this.player.getCurrentItem();
-			if (currentItem.item != null) {
-				System.out.println(playState.toString() + " " + currentItem.item);
-			} else {
-				System.out.println(playState.toString());
-			}
+		IPlayerAbstract p = this.playerContainer.getPlayer();
+		PlayState currentState = (p == null ? null : p.getPlayState());
+		if (currentState != this.prevPlayState.get()) {
+			this.prevPlayState.set(currentState);
+			System.out.println(getPlayerStateDescription(p));
 		}
+	}
+
+	private static String getPlayerStateDescription (IPlayerAbstract p) {
+		if (p != null) {
+			PlayState currentState = p.getPlayState();
+			if (currentState != null) {
+				PlayItem currentPlayItem = p.getCurrentItem();
+				IMediaTrack currentItem = (currentPlayItem != null ? currentPlayItem.item : null);
+				if (currentItem != null) {
+					return currentState + " " + currentItem + ".";
+				}
+				return currentState + ".";
+			}
+			return "Unknown.";
+		}
+		return "Player unset.";
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

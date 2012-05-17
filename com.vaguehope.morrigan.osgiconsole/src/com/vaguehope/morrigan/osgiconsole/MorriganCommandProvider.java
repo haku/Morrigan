@@ -21,7 +21,7 @@ import com.vaguehope.morrigan.model.media.impl.MediaFactoryImpl;
 import com.vaguehope.morrigan.player.IPlayerAbstract;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayItem;
-import com.vaguehope.morrigan.player.PlayerActivator;
+import com.vaguehope.morrigan.player.PlayerReader;
 import com.vaguehope.morrigan.server.AsyncActions;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDb;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbHelper;
@@ -32,8 +32,18 @@ import com.vaguehope.morrigan.util.TimeHelper;
 public class MorriganCommandProvider implements CommandProvider {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+	private final PlayerReader playerReader;
+
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	public MorriganCommandProvider (PlayerReader playerReader) {
+		this.playerReader = playerReader;
+	}
+
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 	@Override
-	public String getHelp() {
+	public String getHelp () {
 		return "---Morrigan---\n" +
 				"\tmn [media|m]\n" +
 				"\tmn [media|m] [create|c] <dbname>\n" +
@@ -97,7 +107,7 @@ public class MorriganCommandProvider implements CommandProvider {
 			ci.print(this.getHelp()); // already ends with new line.
 		}
 		else {
-			ci.println("Unknown command '"+cmd+"'.");
+			ci.println("Unknown command '" + cmd + "'.");
 		}
 
 	}
@@ -139,13 +149,14 @@ public class MorriganCommandProvider implements CommandProvider {
 			List<PlayItem> results = null;
 			try {
 				results = CliHelper.queryForPlayableItems(q1, q2, 10);
-			} catch (MorriganException e) {
+			}
+			catch (MorriganException e) {
 				ci.println(ErrorHelper.getCauseTrace(e));
 				return;
 			}
 
 			if (results == null || results.size() < 1) {
-				ci.println("No results for query '"+q1+"' '"+q2+"'.");
+				ci.println("No results for query '" + q1 + "' '" + q2 + "'.");
 			}
 			else if (results.size() == 1) {
 				IMediaTrackList<? extends IMediaTrack> list = results.get(0).list;
@@ -156,12 +167,13 @@ public class MorriganCommandProvider implements CommandProvider {
 						// run query q2.
 						try {
 							results = CliHelper.queryForPlayableItems(q1, q2, 10);
-						} catch (MorriganException e) {
+						}
+						catch (MorriganException e) {
 							ci.println(ErrorHelper.getCauseTrace(e));
 						}
 
 						if (results == null || results.size() < 1) {
-							ci.println("No results for query '"+q1+"' '"+q2+"'.");
+							ci.println("No results for query '" + q1 + "' '" + q2 + "'.");
 						}
 						else {
 							ci.println("Results for query:");
@@ -186,16 +198,17 @@ public class MorriganCommandProvider implements CommandProvider {
 							ci.println(" seconds.");
 						}
 
-    					List<String> sources;
-    					try {
-    						sources = mmdb.getSources();
-    					} catch (MorriganException e) {
-    						ci.println(ErrorHelper.getCauseTrace(e));
-    						return;
-    					}
-    					for (String s : sources) {
-    						ci.println(" src > " + s);
-    					}
+						List<String> sources;
+						try {
+							sources = mmdb.getSources();
+						}
+						catch (MorriganException e) {
+							ci.println(ErrorHelper.getCauseTrace(e));
+							return;
+						}
+						for (String s : sources) {
+							ci.println(" src > " + s);
+						}
 					}
 				}
 				else {
@@ -230,7 +243,7 @@ public class MorriganCommandProvider implements CommandProvider {
 					IRemoteMixedMediaDb db;
 					try {
 						db = RemoteMixedMediaDbHelper.createRemoteMmdb(url, pass);
-						ci.println("Created MMDB '"+db.getListName()+"'.");
+						ci.println("Created MMDB '" + db.getListName() + "'.");
 					}
 					catch (MalformedURLException e) {
 						ci.println("Maoformed URL: " + url);
@@ -247,7 +260,7 @@ public class MorriganCommandProvider implements CommandProvider {
 				String name = args.get(0);
 				try {
 					ILocalMixedMediaDb mmdb = MediaFactoryImpl.get().createLocalMixedMediaDb(name);
-					ci.println("Created MMDB '"+mmdb.getListName()+"'.");
+					ci.println("Created MMDB '" + mmdb.getListName() + "'.");
 				}
 				catch (MorriganException e) {
 					ci.println(ErrorHelper.getCauseTrace(e));
@@ -270,7 +283,7 @@ public class MorriganCommandProvider implements CommandProvider {
 
 		File dir = new File(dirArg);
 		if (!dir.exists()) {
-			ci.println("Directory '"+dir.getAbsolutePath()+"' not found.");
+			ci.println("Directory '" + dir.getAbsolutePath() + "' not found.");
 			return;
 		}
 
@@ -284,7 +297,7 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 
 		if (results == null || results.size() != 1) {
-			ci.println("Query '"+q1+"' did not return only one result.");
+			ci.println("Query '" + q1 + "' did not return only one result.");
 		}
 		else {
 			IMediaTrackList<? extends IMediaTrack> list = results.get(0).list;
@@ -292,7 +305,8 @@ public class MorriganCommandProvider implements CommandProvider {
 				ILocalMixedMediaDb mmdb = (ILocalMixedMediaDb) list;
 				try {
 					mmdb.addSource(dir.getAbsolutePath());
-				} catch (MorriganException e) {
+				}
+				catch (MorriganException e) {
 					ci.println(ErrorHelper.getCauseTrace(e));
 					return;
 				}
@@ -301,7 +315,7 @@ public class MorriganCommandProvider implements CommandProvider {
 				ci.println("You can not edit the sources for a remote library.");
 			}
 			else {
-				ci.println("Unable to add to the item type of '"+list.getListName()+"'.");
+				ci.println("Unable to add to the item type of '" + list.getListName() + "'.");
 			}
 		}
 	}
@@ -322,7 +336,7 @@ public class MorriganCommandProvider implements CommandProvider {
 			}
 
 			if (results == null || results.size() != 1) {
-				ci.println("Query '"+q1+"' did not return only one result.");
+				ci.println("Query '" + q1 + "' did not return only one result.");
 			}
 			else {
 				IMediaTrackList<? extends IMediaTrack> list = results.get(0).list;
@@ -335,7 +349,7 @@ public class MorriganCommandProvider implements CommandProvider {
 					ci.println("Scan scheduled.  Use 'mn st' to track progress.");
 				}
 				else {
-					ci.println("Unable to schedule scan for item '"+list.getListName()+"'.");
+					ci.println("Unable to schedule scan for item '" + list.getListName() + "'.");
 				}
 			}
 		}
@@ -382,7 +396,7 @@ public class MorriganCommandProvider implements CommandProvider {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	static private void doPlayers (CommandInterpreter ci, List<String> args) {
+	private void doPlayers (CommandInterpreter ci, List<String> args) {
 		if (args.size() < 1) {
 			doPlayersList(ci);
 			return;
@@ -391,27 +405,27 @@ public class MorriganCommandProvider implements CommandProvider {
 		String cmd = args.remove(0);
 		try {
 			int playerId = Integer.parseInt(cmd);
-			IPlayerAbstract player = PlayerActivator.getPlayer(playerId);
+			IPlayerAbstract player = this.playerReader.getPlayer(playerId);
 			doPlayersPlayer(ci, player, args);
 		}
 		catch (NumberFormatException e) {
 			// If we only have one player, assume the next param is a cmd.
-			IPlayerAbstract player = getOnlyPlayer();
+			IPlayerAbstract player = getOnlyPlayer(ci);
 			if (player != null) {
 				args.add(0, cmd);
 				doPlayersPlayer(ci, player, args);
 			}
 			else {
-				ci.println("Unknown player ID '"+cmd+"'.");
+				ci.println("Unknown player ID '" + cmd + "'.");
 			}
 		}
 	}
 
-	static private void doPlayersList(CommandInterpreter ci) {
-		Collection<IPlayerAbstract> players = PlayerActivator.getAllPlayers();
+	private void doPlayersList (CommandInterpreter ci) {
+		Collection<IPlayerAbstract> players = this.playerReader.getPlayers();
 		ci.println("id\tplayer");
 		for (IPlayerAbstract p : players) {
-			ci.print(String.valueOf( p.getId() ));
+			ci.print(String.valueOf(p.getId()));
 			ci.print("\t");
 			ci.print(p.getPlayState());
 
@@ -451,13 +465,13 @@ public class MorriganCommandProvider implements CommandProvider {
 			doPlayersPlayerOrder(ci, player, args);
 		}
 		else {
-			ci.println("Unknown command '"+cmd+"'.");
+			ci.println("Unknown command '" + cmd + "'.");
 		}
 	}
 
 	static private void doPlayersPlayerInfo (CommandInterpreter ci, IPlayerAbstract player) {
 		ci.print("Player ");
-		ci.print(String.valueOf( player.getId() ));
+		ci.print(String.valueOf(player.getId()));
 		ci.print(": ");
 		ci.print(player.getPlayState().toString());
 		ci.print(" (");
@@ -510,17 +524,18 @@ public class MorriganCommandProvider implements CommandProvider {
 			List<PlayItem> results = null;
 			try {
 				results = CliHelper.queryForPlayableItems(q1, q2, 10);
-			} catch (MorriganException e) {
+			}
+			catch (MorriganException e) {
 				ci.println(ErrorHelper.getCauseTrace(e));
 			}
 
 			if (results == null || results.size() < 1) {
-				ci.println("No results for query '"+q1+"' '"+q2+"'.");
+				ci.println("No results for query '" + q1 + "' '" + q2 + "'.");
 			}
 			else if (results.size() == 1) {
 				if (addToQueue) {
 					player.addToQueue(results.get(0));
-					ci.println("Enqueued '"+results.get(0).toString()+"'.");
+					ci.println("Enqueued '" + results.get(0).toString() + "'.");
 				}
 				else {
 					player.loadAndStartPlaying(results.get(0));
@@ -574,11 +589,11 @@ public class MorriganCommandProvider implements CommandProvider {
 		for (PlaybackOrder po : PlaybackOrder.values()) {
 			if (po.toString().toLowerCase().contains(arg.toLowerCase())) {
 				player.setPlaybackOrder(po);
-				ci.println("Playback order set to '"+po.toString()+"' for player "+player.getId()+".");
+				ci.println("Playback order set to '" + po.toString() + "' for player " + player.getId() + ".");
 				return;
 			}
 		}
-		ci.println("Unknown playback order '"+arg+"'.");
+		ci.println("Unknown playback order '" + arg + "'.");
 	}
 
 	static private void doPlayersPlayerPrintQueue (CommandInterpreter ci, IPlayerAbstract player) {
@@ -600,63 +615,39 @@ public class MorriganCommandProvider implements CommandProvider {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Top-level shortcuts.
-//	TODO reduce code duplication?
 
-	static private void doPlay (CommandInterpreter ci, List<String> args) {
-		IPlayerAbstract player = getOnlyPlayer();
-		if (player != null) {
-			doPlayersPlayerPlay(ci, player, args, false);
-		}
-		else {
-			ci.println("There is not only one player, so you need to specfy the player to use.");
-		}
+	private void doPlay (CommandInterpreter ci, List<String> args) {
+		IPlayerAbstract player = getOnlyPlayer(ci);
+		if (player != null) doPlayersPlayerPlay(ci, player, args, false);
 	}
 
-	static private void doQueue (CommandInterpreter ci, List<String> args) {
-		IPlayerAbstract player = getOnlyPlayer();
-		if (player != null) {
-			doPlayersPlayerPlay(ci, player, args, true);
-		}
-		else {
-			ci.println("There is not only one player, so you need to specfy the player to use.");
-		}
+	private void doQueue (CommandInterpreter ci, List<String> args) {
+		IPlayerAbstract player = getOnlyPlayer(ci);
+		if (player != null) doPlayersPlayerPlay(ci, player, args, true);
 	}
 
-	static private void doPause (CommandInterpreter ci) {
-		IPlayerAbstract player = getOnlyPlayer();
-		if (player != null) {
-			doPlayersPlayerPause(ci, player);
-		}
-		else {
-			ci.println("There is not only one player, so you need to specfy the player to use.");
-		}
+	private void doPause (CommandInterpreter ci) {
+		IPlayerAbstract player = getOnlyPlayer(ci);
+		if (player != null) doPlayersPlayerPause(ci, player);
 	}
 
-	static private void doStop (CommandInterpreter ci) {
-		IPlayerAbstract player = getOnlyPlayer();
-		if (player != null) {
-			doPlayersPlayerStop(ci, player);
-		}
-		else {
-			ci.println("There is not only one player, so you need to specfy the player to use.");
-		}
+	private void doStop (CommandInterpreter ci) {
+		IPlayerAbstract player = getOnlyPlayer(ci);
+		if (player != null) doPlayersPlayerStop(ci, player);
 	}
 
-	static private void doNext (CommandInterpreter ci) {
-		IPlayerAbstract player = getOnlyPlayer();
-		if (player != null) {
-			doPlayersPlayerNext(ci, player);
-		}
-		else {
-			ci.println("There is not only one player, so you need to specfy the player to use.");
-		}
+	private void doNext (CommandInterpreter ci) {
+		IPlayerAbstract player = getOnlyPlayer(ci);
+		if (player != null) doPlayersPlayerNext(ci, player);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private static IPlayerAbstract getOnlyPlayer () {
-		Collection<IPlayerAbstract> allPlayers = PlayerActivator.getAllPlayers();
-		return allPlayers.size() == 1 ? allPlayers.iterator().next() : null;
+	private IPlayerAbstract getOnlyPlayer (CommandInterpreter ci) {
+		Collection<IPlayerAbstract> allPlayers = this.playerReader.getPlayers();
+		IPlayerAbstract player = allPlayers.size() == 1 ? allPlayers.iterator().next() : null;
+		if (player == null) ci.println("There is not only one player, so you may need to specfy the player to use.");
+		return player;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
