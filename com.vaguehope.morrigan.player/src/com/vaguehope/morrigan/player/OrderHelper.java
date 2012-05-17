@@ -10,6 +10,7 @@ import com.vaguehope.morrigan.model.media.IMediaTrackList;
 
 /**
  * TODO move this to internal package.
+ * TODO make one big enum based on an interface?
  */
 public class OrderHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

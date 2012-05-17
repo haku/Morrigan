@@ -32,7 +32,7 @@ import com.vaguehope.morrigan.model.media.impl.MediaFactoryImpl;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.LocalMixedMediaDbHelper;
 import com.vaguehope.morrigan.player.IPlayerAbstract;
 import com.vaguehope.morrigan.player.PlayItem;
-import com.vaguehope.morrigan.player.PlayerActivator;
+import com.vaguehope.morrigan.player.PlayerReader;
 import com.vaguehope.morrigan.server.feedwriters.AbstractFeed;
 import com.vaguehope.morrigan.server.feedwriters.XmlHelper;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbFactory;
@@ -41,6 +41,7 @@ import com.vaguehope.sqlitewrapper.DbException;
 
 /**
  * Valid URLs:
+ *
  * <pre>
  *  GET /mlists
  *
@@ -83,22 +84,34 @@ public class MlistsServlet extends HttpServlet {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+	private final PlayerReader playerListener;
+
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	public MlistsServlet (PlayerReader playerListener) {
+		this.playerListener = playerListener;
+	}
+
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	protected void doGet (HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		try {
 			processRequest(Verb.GET, req, resp, null);
 		}
 		catch (DbException e) {
 			throw new ServletException(e);
-		} catch (SAXException e) {
+		}
+		catch (SAXException e) {
 			throw new ServletException(e);
-		} catch (MorriganException e) {
+		}
+		catch (MorriganException e) {
 			throw new ServletException(e);
 		}
 	}
 
 	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	protected void doPost (HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		try {
 			String act = req.getParameter("action");
 			if (act == null) {
@@ -110,21 +123,25 @@ public class MlistsServlet extends HttpServlet {
 		}
 		catch (DbException e) {
 			throw new ServletException(e);
-		} catch (SAXException e) {
+		}
+		catch (SAXException e) {
 			throw new ServletException(e);
-		} catch (MorriganException e) {
+		}
+		catch (MorriganException e) {
 			throw new ServletException(e);
 		}
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	static private enum Verb {GET, POST}
+	static private enum Verb {
+		GET, POST
+	}
 
 	/**
 	 * Param action will not be null when verb==POST.
 	 */
-	private static void processRequest (Verb verb, HttpServletRequest req, HttpServletResponse resp, String action) throws IOException, DbException, SAXException, MorriganException {
+	private void processRequest (Verb verb, HttpServletRequest req, HttpServletResponse resp, String action) throws IOException, DbException, SAXException, MorriganException {
 		String requestURI = req.getRequestURI();
 		String reqPath = requestURI.startsWith(CONTEXTPATH) ? requestURI.substring(CONTEXTPATH.length()) : requestURI;
 
@@ -166,29 +183,29 @@ public class MlistsServlet extends HttpServlet {
 						}
 					}
 					else {
-						ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "Unknown type '"+type+"' desu~.");
+						ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "Unknown type '" + type + "' desu~.");
 					}
 				}
 				else {
-					ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid request '"+path+"' desu~");
+					ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid request '" + path + "' desu~");
 				}
 			}
 			else {
-				ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid request '"+path+"' desu~");
+				ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid request '" + path + "' desu~");
 			}
 		}
 	}
 
-	private static void postToRoot(HttpServletResponse resp, String action) throws IOException {
+	private static void postToRoot (HttpServletResponse resp, String action) throws IOException {
 		if (action.equals(CMD_NEWMMDB)) {
 			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "TODO implement create new MMDB cmd desu~");
 		}
 		else {
-			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "HTTP error 400 '"+action+"' is not a valid action parameter desu~");
+			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "HTTP error 400 '" + action + "' is not a valid action parameter desu~");
 		}
 	}
 
-	private static void postToMmdb(HttpServletRequest req, HttpServletResponse resp, String action, IMixedMediaDb mmdb, String path, String afterPath) throws IOException, MorriganException, DbException {
+	private void postToMmdb (HttpServletRequest req, HttpServletResponse resp, String action, IMixedMediaDb mmdb, String path, String afterPath) throws IOException, MorriganException, DbException {
 		if (path != null && path.equals(PATH_ITEMS) && afterPath != null && afterPath.length() > 0) {
 			String filepath = URLDecoder.decode(afterPath, "UTF-8");
 			if (mmdb.hasFile(filepath)) {
@@ -197,11 +214,11 @@ public class MlistsServlet extends HttpServlet {
 					postToMmdbItem(req, resp, action, mmdb, item);
 				}
 				else {
-					ServletHelper.error(resp, HttpServletResponse.SC_NOT_FOUND, "Failed to retrieve file '"+filepath+"' from MMDB when it should have been there desu~.");
+					ServletHelper.error(resp, HttpServletResponse.SC_NOT_FOUND, "Failed to retrieve file '" + filepath + "' from MMDB when it should have been there desu~.");
 				}
 			}
 			else {
-				ServletHelper.error(resp, HttpServletResponse.SC_NOT_FOUND, "HTTP error 404 file '"+filepath+"' not found in MMDB '"+mmdb.getListName()+"' desu~");
+				ServletHelper.error(resp, HttpServletResponse.SC_NOT_FOUND, "HTTP error 404 file '" + filepath + "' not found in MMDB '" + mmdb.getListName() + "' desu~");
 			}
 		}
 		else {
@@ -209,7 +226,7 @@ public class MlistsServlet extends HttpServlet {
 		}
 	}
 
-	private static void postToMmdb (HttpServletRequest req, HttpServletResponse resp, String action, IMixedMediaDb mmdb) throws IOException {
+	private void postToMmdb (HttpServletRequest req, HttpServletResponse resp, String action, IMixedMediaDb mmdb) throws IOException {
 		if (action.equals(CMD_PLAY) || action.equals(CMD_QUEUE)) {
 			IPlayerAbstract player = parsePlayer(req, resp);
 			if (player != null) { // parsePlayer() will write the error msg.
@@ -233,11 +250,11 @@ public class MlistsServlet extends HttpServlet {
 			resp.getWriter().println("Scan scheduled desu~");
 		}
 		else {
-			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "HTTP error 400 '"+action+"' is not a valid action parameter desu~");
+			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "HTTP error 400 '" + action + "' is not a valid action parameter desu~");
 		}
 	}
 
-	private static void postToMmdbItem (HttpServletRequest req, HttpServletResponse resp, String action, IMixedMediaDb mmdb, IMixedMediaItem item) throws IOException, MorriganException {
+	private void postToMmdbItem (HttpServletRequest req, HttpServletResponse resp, String action, IMixedMediaDb mmdb, IMixedMediaItem item) throws IOException, MorriganException {
 		if (action.equals(CMD_PLAY) || action.equals(CMD_QUEUE)) {
 			IPlayerAbstract player = parsePlayer(req, resp);
 			if (player != null) { // parsePlayer() will write the error msg.
@@ -258,7 +275,7 @@ public class MlistsServlet extends HttpServlet {
 		else if (action.equals(CMD_ADDTAG)) {
 			String tag = req.getParameter("tag");
 			if (tag != null && tag.length() > 0) {
-				mmdb.addTag(item, tag, MediaTagType.MANUAL, (MediaTagClassification)null);
+				mmdb.addTag(item, tag, MediaTagType.MANUAL, (MediaTagClassification) null);
 				resp.setContentType("text/plain");
 				resp.getWriter().println("Tag '" + tag + "' added desu~");
 			}
@@ -267,30 +284,30 @@ public class MlistsServlet extends HttpServlet {
 			}
 		}
 		else {
-			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "HTTP error 400 '"+action+"' is not a valid action parameter desu~");
+			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "HTTP error 400 '" + action + "' is not a valid action parameter desu~");
 		}
 	}
 
-	private static IPlayerAbstract parsePlayer (HttpServletRequest req, HttpServletResponse resp) throws IOException {
+	private IPlayerAbstract parsePlayer (HttpServletRequest req, HttpServletResponse resp) throws IOException {
 		String playerIdS = req.getParameter("playerid");
 		if (playerIdS == null) {
 			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "HTTP error 400 'playerId' parameter not set desu~");
 			return null;
 		}
 		int playerId = Integer.parseInt(playerIdS);
-		return PlayerActivator.getPlayer(playerId);
+		return this.playerListener.getPlayer(playerId);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	static private void printMlistList (HttpServletResponse resp) throws IOException, SAXException {
+	private void printMlistList (HttpServletResponse resp) throws IOException, SAXException {
 		resp.setContentType("text/xml;charset=utf-8");
 		DataWriter dw = AbstractFeed.startFeed(resp.getWriter());
 
 		AbstractFeed.addElement(dw, "title", "Morrigan media lists desu~");
 		AbstractFeed.addLink(dw, CONTEXTPATH, "self", "text/xml");
 
-		Collection<IPlayerAbstract> players = PlayerActivator.getAllPlayers();
+		Collection<IPlayerAbstract> players = this.playerListener.getPlayers();
 
 		// TODO merge 2 loops.
 
@@ -332,12 +349,12 @@ public class MlistsServlet extends HttpServlet {
 							resp.flushBuffer();
 						}
 						else { // OK give up - no idea where this file is supposed to be.
-							ServletHelper.error(resp, HttpServletResponse.SC_NOT_FOUND, "HTTP error 404 '"+filepath+"' in list but not availabe desu~");
+							ServletHelper.error(resp, HttpServletResponse.SC_NOT_FOUND, "HTTP error 404 '" + filepath + "' in list but not availabe desu~");
 						}
 					}
 				}
 				else {
-					ServletHelper.error(resp, HttpServletResponse.SC_NOT_FOUND, "HTTP error 404 '"+filepath+"' is not in '"+mmdb.getListId()+"' desu~");
+					ServletHelper.error(resp, HttpServletResponse.SC_NOT_FOUND, "HTTP error 404 '" + filepath + "' is not in '" + mmdb.getListId() + "' desu~");
 				}
 			}
 			else {
@@ -352,7 +369,7 @@ public class MlistsServlet extends HttpServlet {
 			printMlistLong(resp, mmdb, false, true, query);
 		}
 		else {
-			ServletHelper.error(resp, HttpServletResponse.SC_NOT_FOUND, "HTTP error 404 unknown path '"+path+"' desu~");
+			ServletHelper.error(resp, HttpServletResponse.SC_NOT_FOUND, "HTTP error 404 unknown path '" + path + "' desu~");
 		}
 	}
 
@@ -365,9 +382,14 @@ public class MlistsServlet extends HttpServlet {
 
 		String type;
 		switch (listRef.getType()) {
-			case LOCALMMDB:  type = ILocalMixedMediaDb.TYPE;  break;
-			case REMOTEMMDB: type = IRemoteMixedMediaDb.TYPE; break;
-			default: throw new IllegalArgumentException("Can not list type '"+listRef.getType()+"' desu~");
+			case LOCALMMDB:
+				type = ILocalMixedMediaDb.TYPE;
+				break;
+			case REMOTEMMDB:
+				type = IRemoteMixedMediaDb.TYPE;
+				break;
+			default:
+				throw new IllegalArgumentException("Can not list type '" + listRef.getType() + "' desu~");
 		}
 		AbstractFeed.addLink(dw, CONTEXTPATH + "/" + type + "/" + fileName, "self", "text/xml");
 
@@ -401,7 +423,8 @@ public class MlistsServlet extends HttpServlet {
 		String listFile;
 		try {
 			listFile = URLEncoder.encode(AbstractFeed.filenameFromPath(ml.getListId()), "UTF-8");
-		} catch (UnsupportedEncodingException e) {
+		}
+		catch (UnsupportedEncodingException e) {
 			throw new RuntimeException(e);
 		}
 
@@ -412,12 +435,12 @@ public class MlistsServlet extends HttpServlet {
 		// TODO calculate these values from query results.
 		if (queryString == null) {
 			DurationData totalDuration = ml.getTotalDuration();
-    		dw.dataElement("duration", String.valueOf(totalDuration.getDuration()));
-    		dw.dataElement("durationcomplete", String.valueOf(totalDuration.isComplete()));
+			dw.dataElement("duration", String.valueOf(totalDuration.getDuration()));
+			dw.dataElement("durationcomplete", String.valueOf(totalDuration.isComplete()));
 
-    		dw.dataElement("defaulttype", String.valueOf(ml.getDefaultMediaType().getN()));
-    		dw.dataElement("sortcolumn", ml.getSort().getHumanName());
-    		dw.dataElement("sortdirection", ml.getSortDirection().toString());
+			dw.dataElement("defaulttype", String.valueOf(ml.getDefaultMediaType().getN()));
+			dw.dataElement("sortcolumn", ml.getSort().getHumanName());
+			dw.dataElement("sortdirection", ml.getSortDirection().toString());
 		}
 
 		String pathToSelf = CONTEXTPATH + "/" + ml.getType() + "/" + listFile;
@@ -436,54 +459,55 @@ public class MlistsServlet extends HttpServlet {
 
 		if (listItems) {
 			for (IMixedMediaItem mi : items) {
-    			dw.startElement("entry");
+				dw.startElement("entry");
 
-    			AbstractFeed.addElement(dw, "title", mi.getTitle());
+				AbstractFeed.addElement(dw, "title", mi.getTitle());
 
-    			String file;
-    			try {
-    				file = URLEncoder.encode(mi.getFilepath(), "UTF-8");
-    			} catch (UnsupportedEncodingException e) {
-    				throw new RuntimeException(e);
-    			}
-    			AbstractFeed.addLink(dw, file, "self"); // Path is relative to this feed.
+				String file;
+				try {
+					file = URLEncoder.encode(mi.getFilepath(), "UTF-8");
+				}
+				catch (UnsupportedEncodingException e) {
+					throw new RuntimeException(e);
+				}
+				AbstractFeed.addLink(dw, file, "self"); // Path is relative to this feed.
 
-    			if (mi.getDateAdded() != null) {
-    				AbstractFeed.addElement(dw, "dateadded", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateAdded()));
-    			}
-    			if (mi.getDateLastModified() != null) {
-    				AbstractFeed.addElement(dw, "datelastmodified", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateLastModified()));
-    			}
-    			AbstractFeed.addElement(dw, "type", mi.getMediaType().getN());
-    			if (mi.getHashcode() != null && !BigInteger.ZERO.equals(mi.getHashcode())) AbstractFeed.addElement(dw, "hash", mi.getHashcode().toString(16));
-    			AbstractFeed.addElement(dw, "enabled", Boolean.toString(mi.isEnabled()));
-    			AbstractFeed.addElement(dw, "missing", Boolean.toString(mi.isMissing()));
+				if (mi.getDateAdded() != null) {
+					AbstractFeed.addElement(dw, "dateadded", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateAdded()));
+				}
+				if (mi.getDateLastModified() != null) {
+					AbstractFeed.addElement(dw, "datelastmodified", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateLastModified()));
+				}
+				AbstractFeed.addElement(dw, "type", mi.getMediaType().getN());
+				if (mi.getHashcode() != null && !BigInteger.ZERO.equals(mi.getHashcode())) AbstractFeed.addElement(dw, "hash", mi.getHashcode().toString(16));
+				AbstractFeed.addElement(dw, "enabled", Boolean.toString(mi.isEnabled()));
+				AbstractFeed.addElement(dw, "missing", Boolean.toString(mi.isMissing()));
 
-    			if (mi.getMediaType() == MediaType.TRACK) {
-    				AbstractFeed.addElement(dw, "duration", mi.getDuration());
-        			AbstractFeed.addElement(dw, "startcount", mi.getStartCount());
-        			AbstractFeed.addElement(dw, "endcount", mi.getEndCount());
-        			if (mi.getDateLastPlayed() != null) {
-        				AbstractFeed.addElement(dw, "datelastplayed", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateLastPlayed()));
-        			}
-    			}
-    			else if (mi.getMediaType() == MediaType.PICTURE) {
-    				AbstractFeed.addElement(dw, "width", mi.getWidth());
-    				AbstractFeed.addElement(dw, "height", mi.getHeight());
-    			}
-
-    			if (includeTags) {
-    				List<MediaTag> tags = ml.getTags(mi);
-    				for (MediaTag tag : tags) {
-						AbstractFeed.addElement(dw, "tag", tag.getTag(), new String[][] {
-							{"t", String.valueOf(tag.getType().getIndex())},
-							{"c", tag.getClassification() == null ? "" : tag.getClassification().getClassification()}
-							});
+				if (mi.getMediaType() == MediaType.TRACK) {
+					AbstractFeed.addElement(dw, "duration", mi.getDuration());
+					AbstractFeed.addElement(dw, "startcount", mi.getStartCount());
+					AbstractFeed.addElement(dw, "endcount", mi.getEndCount());
+					if (mi.getDateLastPlayed() != null) {
+						AbstractFeed.addElement(dw, "datelastplayed", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateLastPlayed()));
 					}
-    			}
+				}
+				else if (mi.getMediaType() == MediaType.PICTURE) {
+					AbstractFeed.addElement(dw, "width", mi.getWidth());
+					AbstractFeed.addElement(dw, "height", mi.getHeight());
+				}
 
-    			dw.endElement("entry");
-    		}
+				if (includeTags) {
+					List<MediaTag> tags = ml.getTags(mi);
+					for (MediaTag tag : tags) {
+						AbstractFeed.addElement(dw, "tag", tag.getTag(), new String[][] {
+								{ "t", String.valueOf(tag.getType().getIndex()) },
+								{ "c", tag.getClassification() == null ? "" : tag.getClassification().getClassification() }
+						});
+					}
+				}
+
+				dw.endElement("entry");
+			}
 		}
 
 		AbstractFeed.endDocument(dw, "mlist");

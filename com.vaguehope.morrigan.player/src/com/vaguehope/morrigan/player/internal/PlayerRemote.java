@@ -8,10 +8,12 @@ import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
 import com.vaguehope.morrigan.player.IPlayerRemote;
-import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
+import com.vaguehope.morrigan.player.PlayItem;
 
-
+/**
+ * TODO rename to RemotePlayerImpl
+ */
 public class PlayerRemote implements IPlayerRemote {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

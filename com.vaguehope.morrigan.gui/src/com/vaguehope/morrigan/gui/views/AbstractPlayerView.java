@@ -52,7 +52,7 @@ import com.vaguehope.morrigan.player.IPlayerLocal;
 import com.vaguehope.morrigan.player.OrderHelper;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayItem;
-import com.vaguehope.morrigan.player.PlayerActivator;
+import com.vaguehope.morrigan.player.PlayerFactory;
 
 /**
  * TODO tidy this class.
@@ -115,7 +115,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 
 	public synchronized IPlayerLocal getPlayer () {
 		if (this._player == null) {
-			this._player = PlayerActivator.makeLocal("Gui", this.eventHandler);
+			this._player = PlayerFactory.tryMakePlayer(Activator.getContext(), "Gui", this.eventHandler);
 		}
 		return this._player;
 	}
