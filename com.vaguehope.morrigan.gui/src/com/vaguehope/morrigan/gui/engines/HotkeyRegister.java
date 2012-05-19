@@ -9,14 +9,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Logger;
 
+import com.vaguehope.morrigan.engines.hotkey.HotkeyEngineFactory;
 import com.vaguehope.morrigan.engines.hotkey.HotkeyException;
 import com.vaguehope.morrigan.engines.hotkey.HotkeyValue;
 import com.vaguehope.morrigan.engines.hotkey.IHotkeyEngine;
 import com.vaguehope.morrigan.engines.hotkey.IHotkeyListener;
-import com.vaguehope.morrigan.gui.Activator;
 import com.vaguehope.morrigan.gui.preferences.HotkeyPref;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-
 
 public class HotkeyRegister {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -25,17 +24,25 @@ public class HotkeyRegister {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	static protected final ConcurrentMap<IHotkeyListener, Object> hotkeyListeners = new ConcurrentHashMap<IHotkeyListener, Object>();
+	private final HotkeyEngineFactory hotkeyEngineFactory;
 
-	public static void addHotkeyListener (IHotkeyListener listener) throws MorriganException {
-		hotkeyListeners.put(listener, listener);
+	protected final ConcurrentMap<IHotkeyListener, Object> hotkeyListeners = new ConcurrentHashMap<IHotkeyListener, Object>();
+
+	public HotkeyRegister (HotkeyEngineFactory hotkeyEngineFactory) {
+		this.hotkeyEngineFactory = hotkeyEngineFactory;
+	}
+
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	public void addHotkeyListener (IHotkeyListener listener) throws MorriganException {
+		this.hotkeyListeners.put(listener, listener);
 		logger.fine("Hotkey listener registered: '"+listener+"'.");
 		readConfig(false);
 	}
 
-	public static void removeHotkeyListener (IHotkeyListener listener) throws MorriganException {
-		hotkeyListeners.remove(listener);
-		if (hotkeyListeners.size() < 1) {
+	public void removeHotkeyListener (IHotkeyListener listener) throws MorriganException {
+		this.hotkeyListeners.remove(listener);
+		if (this.hotkeyListeners.size() < 1) {
 			clearConfig();
 			clearHotkeyEngine();
 		}
@@ -47,7 +54,7 @@ public class HotkeyRegister {
 	private static List<Integer> registeredHotkeys = new ArrayList<Integer>();
 
 	@SuppressWarnings("boxing")
-	public static void readConfig (boolean force) throws MorriganException {
+	public void readConfig (boolean force) throws MorriganException {
 		if (!configRead.compareAndSet(false, true) & !force) {
 			logger.fine("Hotkey config already read, skipping.");
 			return;
@@ -55,7 +62,7 @@ public class HotkeyRegister {
 
 		clearConfig();
 
-		if (Activator.getHotkeyEngineFactory().canMakeHotkeyEngine()) {
+		if (this.hotkeyEngineFactory.canMakeHotkeyEngine()) {
 			HotkeyValue hkShowHide = HotkeyPref.getHkShowHide();
 			if (hkShowHide!=null) {
 				getHotkeyEngine(true).registerHotkey(IHotkeyEngine.MORRIGAN_HK_SHOWHIDE, hkShowHide);
@@ -97,7 +104,7 @@ public class HotkeyRegister {
 	}
 
 	@SuppressWarnings("boxing")
-	private static void clearConfig () throws HotkeyException {
+	private void clearConfig () throws HotkeyException {
 		IHotkeyEngine engine = getHotkeyEngine(false);
 
 		if (engine != null) {
@@ -146,12 +153,12 @@ public class HotkeyRegister {
 
 	static private final AtomicReference<IHotkeyEngine> hotkeyEngine = new AtomicReference<IHotkeyEngine>(null);
 
-	private static IHotkeyEngine getHotkeyEngine (boolean create) {
+	private IHotkeyEngine getHotkeyEngine (boolean create) {
 		if (hotkeyEngine.get() == null && create) {
-			IHotkeyEngine e = Activator.getHotkeyEngineFactory().newHotkeyEngine();
+			IHotkeyEngine e = this.hotkeyEngineFactory.newHotkeyEngine();
 			if (e != null) {
 				if (hotkeyEngine.compareAndSet(null, e)) {
-					e.setListener(mainHotkeyListener);
+					e.setListener(this.mainHotkeyListener);
 				}
 				else {
 					e.finalise();
@@ -169,7 +176,7 @@ public class HotkeyRegister {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private static IHotkeyListener mainHotkeyListener = new IHotkeyListener () {
+	private IHotkeyListener mainHotkeyListener = new IHotkeyListener () {
 
 		private WeakReference<IHotkeyListener> lastIHotkeyListenerUsed = null;
 
@@ -182,7 +189,7 @@ public class HotkeyRegister {
 				last = this.lastIHotkeyListenerUsed.get();
 			}
 
-			for (IHotkeyListener l : hotkeyListeners.keySet()) {
+			for (IHotkeyListener l : HotkeyRegister.this.hotkeyListeners.keySet()) {
 				CanDo canDo = l.canDoKeyPress(id);
 
 				if (canDo == CanDo.YESANDFRIENDS) {

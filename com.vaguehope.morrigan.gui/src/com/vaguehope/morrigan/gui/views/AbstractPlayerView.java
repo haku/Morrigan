@@ -37,7 +37,6 @@ import com.vaguehope.morrigan.gui.editors.MediaItemListEditor;
 import com.vaguehope.morrigan.gui.editors.mmdb.LocalMixedMediaDbEditor;
 import com.vaguehope.morrigan.gui.editors.mmdb.MixedMediaListEditor;
 import com.vaguehope.morrigan.gui.editors.tracks.MediaTrackListEditor;
-import com.vaguehope.morrigan.gui.engines.HotkeyRegister;
 import com.vaguehope.morrigan.gui.helpers.ClipboardHelper;
 import com.vaguehope.morrigan.gui.helpers.MonitorHelper;
 import com.vaguehope.morrigan.gui.helpers.RefreshTimer;
@@ -66,14 +65,14 @@ public abstract class AbstractPlayerView extends ViewPart {
 //	Constructors.
 
 	@Override
-	public void createPartControl(Composite parent) {
+	public void createPartControl (Composite parent) {
 		makeHistoryRefresher();
 		makeActions();
 		setupHotkeys();
 	}
 
 	@Override
-	public void dispose() {
+	public void dispose () {
 		this.isDisposed = true;
 		disposePlayer();
 		finaliseHotkeys();
@@ -90,7 +89,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 	private static final String KEY_ORDERMODE = "KEY_ORDERMODE";
 
 	@Override
-	public void init(IViewSite site, IMemento memento) throws PartInitException {
+	public void init (IViewSite site, IMemento memento) throws PartInitException {
 		super.init(site, memento);
 
 		if (memento != null) {
@@ -102,7 +101,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 	}
 
 	@Override
-	public void saveState(IMemento memento) {
+	public void saveState (IMemento memento) {
 		memento.putString(KEY_ORDERMODE, getPlayer().getPlaybackOrder().name());
 
 		super.saveState(memento);
@@ -133,43 +132,44 @@ public abstract class AbstractPlayerView extends ViewPart {
 	private final IPlayerEventHandler eventHandler = new IPlayerEventHandler() {
 
 		@Override
-		public void updateStatus() {
+		public void updateStatus () {
 			getSite().getShell().getDisplay().asyncExec(AbstractPlayerView.this.updateStatusRunable);
 		}
 
 		@Override
-		public void historyChanged() {
+		public void historyChanged () {
 			AbstractPlayerView.this.historyChangedRrefresher.run();
 		}
 
 		@Override
-		public void currentItemChanged() {
+		public void currentItemChanged () {
 			getSite().getShell().getDisplay().asyncExec(new Runnable() {
 				@Override
-				public void run() {
+				public void run () {
 					updateTitle();
 				}
 			});
 		}
 
 		@Override
-		public void asyncThrowable(Throwable t) {
+		public void asyncThrowable (Throwable t) {
 			System.err.println("Async Throwable: " + t.getMessage());
 			getSite().getShell().getDisplay().asyncExec(new RunnableDialog(t));
 		}
 
-		@SuppressWarnings("unchecked") // FIXME ???
+		@SuppressWarnings("unchecked")
+		// FIXME ???
 		@Override
-		public IMediaTrackList<IMediaTrack> getCurrentList() {
+		public IMediaTrackList<IMediaTrack> getCurrentList () {
 			IMediaTrackList<IMediaTrack> ret = null;
 
 			IEditorPart activeEditor = getViewSite().getPage().getActiveEditor();
-			if (activeEditor != null && activeEditor instanceof MediaTrackListEditor<?,?>) {
-				MediaTrackListEditor<? extends IMediaTrackList<IMediaTrack>,IMediaTrack> mediaListEditor = (MediaTrackListEditor<? extends IMediaTrackList<IMediaTrack>, IMediaTrack>) activeEditor;
+			if (activeEditor != null && activeEditor instanceof MediaTrackListEditor<?, ?>) {
+				MediaTrackListEditor<? extends IMediaTrackList<IMediaTrack>, IMediaTrack> mediaListEditor = (MediaTrackListEditor<? extends IMediaTrackList<IMediaTrack>, IMediaTrack>) activeEditor;
 				IMediaTrackList<IMediaTrack> editedMediaList = mediaListEditor.getMediaList();
 				ret = editedMediaList;
 			}
-			else if (activeEditor != null && activeEditor instanceof MixedMediaListEditor<?,?>) {
+			else if (activeEditor != null && activeEditor instanceof MixedMediaListEditor<?, ?>) {
 				MixedMediaListEditor<? extends IMixedMediaList<? extends IMixedMediaItem>, ? extends IMixedMediaItem> ed = (MixedMediaListEditor<? extends IMixedMediaList<? extends IMixedMediaItem>, ? extends IMixedMediaItem>) activeEditor;
 				ret = (IMediaTrackList<IMediaTrack>) ed.getMediaList();
 			}
@@ -178,7 +178,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 		}
 
 		@Override
-		public Composite getCurrentMediaFrameParent() {
+		public Composite getCurrentMediaFrameParent () {
 			return _getCurrentMediaFrameParent();
 		}
 
@@ -193,23 +193,24 @@ public abstract class AbstractPlayerView extends ViewPart {
 		}
 
 		@Override
-		public void goFullscreen(int monitor) {
+		public void goFullscreen (int monitor) {
 			FullScreenAction act = fullScreenActionFromIndex(monitor);
 			goFullScreenSafe(act);
 		}
 
 		@Override
-		public void videoAreaClose() {
+		public void videoAreaClose () {
 			if (isFullScreen()) {
 				removeFullScreenSafe(true);
 			}
 		}
 
 		@Override
-		public void videoAreaSelected() {
+		public void videoAreaSelected () {
 			if (!isFullScreen()) {
 				goFullScreenSafe();
-			} else {
+			}
+			else {
 				removeFullScreenSafe(true);
 			}
 		}
@@ -218,7 +219,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 
 	Runnable updateStatusRunable = new Runnable() {
 		@Override
-		public void run() {
+		public void run () {
 			updateStatus();
 		}
 	};
@@ -242,7 +243,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 	private void makeHistoryRefresher () {
 		this.historyChangedRrefresher = new RefreshTimer(getSite().getShell().getDisplay(), 5000, new Runnable() {
 			@Override
-			public void run() {
+			public void run () {
 				AbstractPlayerView.this._historyMenuMgr.removeAll();
 				for (PlayItem item : getPlayer().getHistory()) {
 					AbstractPlayerView.this._historyMenuMgr.add(new HistoryAction(item));
@@ -261,7 +262,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 		}
 
 		@Override
-		public void run() {
+		public void run () {
 			getPlayer().loadAndStartPlaying(this.item.list, this.item.item);
 		}
 
@@ -274,12 +275,13 @@ public abstract class AbstractPlayerView extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Queue.
 
-	protected Action showQueueAction = new Action ("Queue", Activator.getImageDescriptor("icons/queue.gif")) {
+	protected Action showQueueAction = new Action("Queue", Activator.getImageDescriptor("icons/queue.gif")) {
 		@Override
-		public void run() {
+		public void run () {
 			try {
 				getSite().getPage().showView(ViewQueue.ID);
-			} catch (PartInitException e) {
+			}
+			catch (PartInitException e) {
 				new MorriganMsgDlg(e).open();
 			}
 		}
@@ -291,7 +293,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 	private List<ScreenPainter> _titlePainters = new ArrayList<ScreenPainter>();
 
 	void updateTitle () {
-		for (ScreenPainter sp : this._titlePainters){
+		for (ScreenPainter sp : this._titlePainters) {
 			sp.redrawTitle();
 		}
 	}
@@ -319,6 +321,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 //	Video frame parent stuff.
 
 	abstract protected void videoParentChanged (Composite newParent);
+
 	abstract protected Composite getSecondaryVideoParent ();
 
 	private Composite localMediaFrameParent;
@@ -328,7 +331,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 	}
 
 	protected Composite getLocalMediaFrameParent () {
-		if (this.localMediaFrameParent==null) throw new IllegalStateException("setMediaFrameParent() has not yet been called.");
+		if (this.localMediaFrameParent == null) throw new IllegalStateException("setMediaFrameParent() has not yet been called.");
 		return this.localMediaFrameParent;
 	}
 
@@ -424,7 +427,8 @@ public abstract class AbstractPlayerView extends ViewPart {
 		GoFullScreenRunner runner = new GoFullScreenRunner(action);
 		if (Thread.currentThread().equals(getSite().getShell().getDisplay().getThread())) {
 			runner.run();
-		} else {
+		}
+		else {
 			getSite().getShell().getDisplay().asyncExec(runner);
 		}
 	}
@@ -433,7 +437,8 @@ public abstract class AbstractPlayerView extends ViewPart {
 		RemoveFullScreenRunner runner = new RemoveFullScreenRunner(closeShell);
 		if (Thread.currentThread().equals(getSite().getShell().getDisplay().getThread())) {
 			runner.run();
-		} else {
+		}
+		else {
 			getSite().getShell().getDisplay().asyncExec(runner);
 		}
 	}
@@ -449,7 +454,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 		}
 
 		@Override
-		public void run() {
+		public void run () {
 			if (this.mon == null || this.action == null) {
 				Monitor currentMon = null;
 				for (Monitor m : getMonitors().values()) {
@@ -458,7 +463,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 						break;
 					}
 				}
-				if (currentMon!=null) {
+				if (currentMon != null) {
 					for (FullScreenAction a : getFullScreenActions()) {
 						if (a.getMonitor().equals(currentMon)) {
 							goFullscreen(currentMon, a);
@@ -466,7 +471,8 @@ public abstract class AbstractPlayerView extends ViewPart {
 					}
 				}
 
-			} else {
+			}
+			else {
 				goFullscreen(this.mon, this.action);
 			}
 		}
@@ -485,7 +491,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 			Monitor refreshedMon = MonitorHelper.refreshMonitor(getSite().getShell().getDisplay(), m);
 			AbstractPlayerView.this.fullscreenShell = new FullscreenShell(getSite().getShell(), refreshedMon, new Runnable() {
 				@Override
-				public void run() {
+				public void run () {
 					removeFullScreenSafe(false);
 					a.setChecked(false);
 				}
@@ -508,7 +514,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 		}
 
 		@Override
-		public void run() {
+		public void run () {
 			if (!isFullScreen()) return;
 
 			try {
@@ -520,11 +526,12 @@ public abstract class AbstractPlayerView extends ViewPart {
 				AbstractPlayerView.this.fullscreenShell = null;
 				updateCurrentMediaFrameParent();
 
-				if (fs!=null && !fs.getShell().isDisposed()) {
+				if (fs != null && !fs.getShell().isDisposed()) {
 					fs.getShell().dispose();
 				}
 
-			} catch (Exception e) {
+			}
+			catch (Exception e) {
 				getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));
 			}
 		}
@@ -542,7 +549,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 		for (PlaybackOrder o : PlaybackOrder.values()) {
 			OrderSelectAction a = new OrderSelectAction(o, new OrderChangedListener() {
 				@Override
-				public void orderChanged(PlaybackOrder newOrder) {
+				public void orderChanged (PlaybackOrder newOrder) {
 					orderModeChanged(newOrder);
 				}
 			});
@@ -576,7 +583,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 		}
 
 		@Override
-		public void run() {
+		public void run () {
 			if (isChecked()) {
 				getPlayer().setPlaybackOrder(this.mode);
 				this.orderChangedListener.orderChanged(this.mode);
@@ -603,7 +610,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 		}
 
 		@Override
-		public void run() {
+		public void run () {
 			goFullScreenSafe(this);
 		}
 
@@ -614,33 +621,34 @@ public abstract class AbstractPlayerView extends ViewPart {
 
 	protected IAction pauseAction = new Action("Pause", Activator.getImageDescriptor("icons/pause.gif")) {
 		@Override
-		public void run() {
+		public void run () {
 			getPlayer().pausePlaying();
 		}
 	};
 
 	protected IAction stopAction = new Action("Stop", Activator.getImageDescriptor("icons/stop.gif")) {
 		@Override
-		public void run() {
+		public void run () {
 			getPlayer().stopPlaying();
 		}
 	};
 
 	protected IAction nextAction = new Action("Next", Activator.getImageDescriptor("icons/next.gif")) {
 		@Override
-		public void run() {
+		public void run () {
 			getPlayer().nextTrack();
 		}
 	};
 
 	protected IAction copyPathAction = new Action("Copy file path") {
 		@Override
-		public void run() {
+		public void run () {
 			PlayItem currentItem = getPlayer().getCurrentItem();
 			if (currentItem != null) {
 				ClipboardHelper.setText(currentItem.item.getFilepath());
 
-			} else {
+			}
+			else {
 				new MorriganMsgDlg("No track loaded desu~.").open();
 			}
 		}
@@ -651,7 +659,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 	 */
 	protected IAction findInListAction = new Action("Find in list") {
 		@Override
-		public void run() {
+		public void run () {
 			if (getPlayer().getCurrentItem() != null
 					&& getPlayer().getCurrentItem().list != null
 					&& getPlayer().getCurrentItem().item != null) {
@@ -672,8 +680,8 @@ public abstract class AbstractPlayerView extends ViewPart {
 			}
 
 			IEditorPart activeEditor = getViewSite().getWorkbenchWindow().getActivePage().getActiveEditor();
-			if (activeEditor instanceof MediaItemListEditor<?,?>) {
-				MediaItemListEditor<?,?> mediaListEditor = (MediaItemListEditor<?,?>) activeEditor;
+			if (activeEditor instanceof MediaItemListEditor<?, ?>) {
+				MediaItemListEditor<?, ?> mediaListEditor = (MediaItemListEditor<?, ?>) activeEditor;
 				mediaListEditor.revealItem(item);
 			}
 		}
@@ -687,18 +695,18 @@ public abstract class AbstractPlayerView extends ViewPart {
 
 	private void setupHotkeys () {
 		try {
-			HotkeyRegister.addHotkeyListener(this.hotkeyListener);
-
-		} catch (Throwable t) {
+			Activator.getHotkeyRegister().addHotkeyListener(this.hotkeyListener);
+		}
+		catch (Throwable t) {
 			t.printStackTrace();
 		}
 	}
 
 	private void finaliseHotkeys () {
 		try {
-			HotkeyRegister.removeHotkeyListener(this.hotkeyListener);
-
-		} catch (Throwable t) {
+			Activator.getHotkeyRegister().removeHotkeyListener(this.hotkeyListener);
+		}
+		catch (Throwable t) {
 			t.printStackTrace();
 		}
 	}
@@ -706,14 +714,15 @@ public abstract class AbstractPlayerView extends ViewPart {
 	private IHotkeyListener hotkeyListener = new IHotkeyListener() {
 
 		@Override
-		public CanDo canDoKeyPress(int id) {
+		public CanDo canDoKeyPress (int id) {
 			boolean isPlaying = false;
 			boolean isPaused = false;
 			if (getPlayer().isPlaybackEngineReady()) {
 				PlayState playbackState = getPlayer().getPlayState();
 				if (playbackState == PlayState.Playing) {
 					isPlaying = true;
-				}else if (playbackState == PlayState.Paused) {
+				}
+				else if (playbackState == PlayState.Paused) {
 					isPaused = true;
 				}
 			}
@@ -727,9 +736,11 @@ public abstract class AbstractPlayerView extends ViewPart {
 				case IHotkeyEngine.MORRIGAN_HK_PLAYPAUSE:
 					if (isPlaying) {
 						return CanDo.YES;
-					} else if (isPaused) {
+					}
+					else if (isPaused) {
 						return CanDo.MAYBE;
-					} else {
+					}
+					else {
 						return CanDo.NO;
 					}
 
@@ -737,9 +748,11 @@ public abstract class AbstractPlayerView extends ViewPart {
 				case IHotkeyEngine.MORRIGAN_HK_NEXT:
 					if (isPlaying) {
 						return CanDo.YES;
-					} else if (isPaused || getPlayer().getCurrentList() != null) {
+					}
+					else if (isPaused || getPlayer().getCurrentList() != null) {
 						return CanDo.MAYBE;
-					} else {
+					}
+					else {
 						return CanDo.NO;
 					}
 
@@ -749,13 +762,13 @@ public abstract class AbstractPlayerView extends ViewPart {
 		}
 
 		@Override
-		public void onKeyPress(int id) {
+		public void onKeyPress (int id) {
 			switch (id) {
 
 				case IHotkeyEngine.MORRIGAN_HK_SHOWHIDE:
 					getSite().getShell().getDisplay().asyncExec(new Runnable() {
 						@Override
-						public void run() {
+						public void run () {
 							TrayHelper.hideShowWindow(getViewSite().getWorkbenchWindow());
 						}
 					});
@@ -764,7 +777,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 				case IHotkeyEngine.MORRIGAN_HK_JUMPTO:
 					getSite().getShell().getDisplay().asyncExec(new Runnable() {
 						@Override
-						public void run() {
+						public void run () {
 							AbstractPlayerView.this.jumpToAction.run();
 						}
 					});
@@ -773,21 +786,21 @@ public abstract class AbstractPlayerView extends ViewPart {
 				case IHotkeyEngine.MORRIGAN_HK_STOP:
 					getSite().getShell().getDisplay().asyncExec(new Runnable() {
 						@Override
-						public void run() {
+						public void run () {
 							getPlayer().stopPlaying();
 						}
 					});
 					break;
 
 				case IHotkeyEngine.MORRIGAN_HK_PLAYPAUSE:
-					/* Calling a JNI method in one DLL
-					 * from JNI thread in a different DLL
-					 * seems to cause Bad Things to happen.
-					 * Call via the GUI thread just to be safe.
+					/*
+					 * Calling a JNI method in one DLL from JNI thread in a
+					 * different DLL seems to cause Bad Things to happen. Call
+					 * via the GUI thread just to be safe.
 					 */
 					getSite().getShell().getDisplay().asyncExec(new Runnable() {
 						@Override
-						public void run() {
+						public void run () {
 							getPlayer().pausePlaying();
 						}
 					});
@@ -796,10 +809,11 @@ public abstract class AbstractPlayerView extends ViewPart {
 				case IHotkeyEngine.MORRIGAN_HK_NEXT:
 					getSite().getShell().getDisplay().asyncExec(new Runnable() {
 						@Override
-						public void run() {
+						public void run () {
 							try {
 								getPlayer().nextTrack();
-							} catch (Exception e) {
+							}
+							catch (Exception e) {
 								e.printStackTrace();
 							}
 						}

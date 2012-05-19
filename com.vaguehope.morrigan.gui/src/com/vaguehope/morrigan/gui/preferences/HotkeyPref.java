@@ -22,7 +22,6 @@ import com.vaguehope.morrigan.engines.hotkey.HotkeyValue;
 import com.vaguehope.morrigan.gui.Activator;
 import com.vaguehope.morrigan.gui.dialogs.MorriganMsgDlg;
 import com.vaguehope.morrigan.gui.dialogs.RunnableDialog;
-import com.vaguehope.morrigan.gui.engines.HotkeyRegister;
 
 public class HotkeyPref extends PreferencePage implements IWorkbenchPreferencePage {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -106,7 +105,7 @@ public class HotkeyPref extends PreferencePage implements IWorkbenchPreferencePa
 		}
 
 		try {
-			HotkeyRegister.readConfig(true);
+			Activator.getHotkeyRegister().readConfig(true);
 		} catch (Throwable t) {
 			getShell().getDisplay().asyncExec(new RunnableDialog(t));
 			return false;
