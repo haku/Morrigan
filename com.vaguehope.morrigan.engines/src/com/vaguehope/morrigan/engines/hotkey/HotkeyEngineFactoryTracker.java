@@ -34,13 +34,13 @@ public class HotkeyEngineFactoryTracker implements HotkeyEngineFactory {
 	}
 
 	@Override
-	public IHotkeyEngine getNewHotkeyEngine () {
+	public IHotkeyEngine newHotkeyEngine () {
 		checkAlive();
 		HotkeyEngineFactory[] services = this.playerReaderTracker.getServices(new HotkeyEngineFactory[]{});
 		if (services == null || services.length < 1) return null;
 		for (HotkeyEngineFactory service : services) {
 			try {
-				IHotkeyEngine engine = service.getNewHotkeyEngine();
+				IHotkeyEngine engine = service.newHotkeyEngine();
 				if (engine != null) return engine;
 			}
 			catch (Exception e) {

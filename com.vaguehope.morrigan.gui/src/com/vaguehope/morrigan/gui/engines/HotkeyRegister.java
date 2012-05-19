@@ -148,7 +148,7 @@ public class HotkeyRegister {
 
 	private static IHotkeyEngine getHotkeyEngine (boolean create) {
 		if (hotkeyEngine.get() == null && create) {
-			IHotkeyEngine e = Activator.getHotkeyEngineFactory().getNewHotkeyEngine();
+			IHotkeyEngine e = Activator.getHotkeyEngineFactory().newHotkeyEngine();
 			if (e != null) {
 				if (hotkeyEngine.compareAndSet(null, e)) {
 					e.setListener(mainHotkeyListener);

@@ -7,7 +7,7 @@ public class EngineFactory implements HotkeyEngineFactory {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	public IHotkeyEngine getNewHotkeyEngine () {
+	public IHotkeyEngine newHotkeyEngine () {
 		return new HotkeyEngine();
 	}
 
