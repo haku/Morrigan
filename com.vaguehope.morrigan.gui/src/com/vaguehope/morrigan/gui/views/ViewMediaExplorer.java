@@ -26,6 +26,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.part.ViewPart;
 
+import com.vaguehope.morrigan.gui.Activator;
 import com.vaguehope.morrigan.gui.actions.DbUpdateAction;
 import com.vaguehope.morrigan.gui.actions.NewMixedDbAction;
 import com.vaguehope.morrigan.gui.actions.NewRemoteMixedDbAction;
@@ -42,82 +43,81 @@ import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaListReference;
 import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
-import com.vaguehope.morrigan.model.media.impl.MediaFactoryImpl;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbFactory;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbHelper;
 import com.vaguehope.morrigan.tasks.IMorriganTask;
 
 public class ViewMediaExplorer extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	public static final String ID = "com.vaguehope.morrigan.gui.views.ViewMediaExplorer";
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	private volatile boolean isDisposed = false;
 	TableViewer tableViewer = null;
 	ArrayList<MediaListReference> items = new ArrayList<MediaListReference>();
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	/**
 	 * This is a callback that will allow us to create the viewer and initialise it.
 	 */
 	@Override
 	public void createPartControl(Composite parent) {
 		makeContent();
-		
+
 		this.tableViewer = new TableViewer(parent, SWT.MULTI | SWT.V_SCROLL | SWT.FULL_SELECTION);
 		this.tableViewer.setContentProvider(this.contentProvider);
 		this.tableViewer.setLabelProvider(new MediaExplorerItemLblProv(this.imageCache));
 		this.tableViewer.setInput(getViewSite()); // use content provider.
 		getSite().setSelectionProvider(this.tableViewer);
 		this.tableViewer.addDoubleClickListener(this.doubleClickListener);
-		
+
 		addToolbar();
 		makeContextMenu();
 	}
-	
+
 	@Override
 	public void dispose() {
 		this.isDisposed = true;
 		this.imageCache.clearCache();
 		super.dispose();
 	}
-	
+
 	protected boolean isDisposed () {
 		return this.isDisposed;
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	private IStructuredContentProvider contentProvider = new IStructuredContentProvider() {
-		
+
 		@Override
 		public Object[] getElements(Object inputElement) {
 			return ViewMediaExplorer.this.items.toArray();
 		}
-		
+
 		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {/* UNUSED */}
-		
+
 		@Override
 		public void dispose() {/* UNUSED */}
-		
+
 	};
-	
+
 	private IDoubleClickListener doubleClickListener = new IDoubleClickListener() {
 		@Override
 		public void doubleClick(DoubleClickEvent event) {
 			ViewMediaExplorer.this.openAction.run();
 		}
 	};
-	
+
 	private void addToolbar () {
 		getViewSite().getActionBars().getToolBarManager().add(new NewMixedDbAction(getViewSite().getWorkbenchWindow()));
 		getViewSite().getActionBars().getToolBarManager().add(new NewRemoteMixedDbAction(getViewSite().getWorkbenchWindow()));
 	}
-	
+
 	private void makeContextMenu () {
 		final MenuManager mgr = new MenuManager();
 		mgr.setRemoveAllWhenShown(true);
@@ -129,22 +129,22 @@ public class ViewMediaExplorer extends ViewPart {
 					Object selectedObject = selection.getFirstElement();
 					if (selectedObject != null && selectedObject instanceof MediaListReference) {
 						mgr.add(ViewMediaExplorer.this.openAction);
-						
+
 						MediaListReference item = (MediaListReference) selectedObject;
-						
+
 						if (item.getType() == MediaListReference.MediaListType.LOCALMMDB) {
 							mgr.add(new OpenViewAction(item));
-							
+
 							mgr.add(new PlayAction(item, false));
 							mgr.add(new PlayAction(item, true));
 						}
-						
+
 						mgr.add(new Separator());
-						
+
 						if (item.getType() == MediaListReference.MediaListType.LOCALMMDB || item.getType() == MediaListReference.MediaListType.REMOTEMMDB) {
 							mgr.add(new MediaExplorerItemUpdateAction(item));
 						}
-						
+
 						if (item.getType() == MediaListReference.MediaListType.LOCALMMDB) {
 							mgr.add(new DbPropertiesAction(item));
 						}
@@ -157,24 +157,24 @@ public class ViewMediaExplorer extends ViewPart {
 					if (o1 instanceof MediaListReference && o2 instanceof MediaListReference) {
 						MediaListReference r1 = (MediaListReference) o1;
 						MediaListReference r2 = (MediaListReference) o2;
-						
+
 						MediaListReference local = null;
 						MediaListReference remote = null;
-						
+
 						if (r1.getType() == MediaListType.LOCALMMDB) {
 							local = r1;
 						}
 						else if (r2.getType() == MediaListType.LOCALMMDB) {
 							local = r2;
 						}
-						
+
 						if (r1.getType() == MediaListType.REMOTEMMDB) {
 							remote = r1;
 						}
 						else if (r2.getType() == MediaListType.REMOTEMMDB) {
 							remote = r2;
 						}
-						
+
 						if (local != null && remote != null) {
 							mgr.add(new SyncMetadataAction(local, remote));
 						}
@@ -184,18 +184,18 @@ public class ViewMediaExplorer extends ViewPart {
 		});
 		this.tableViewer.getControl().setMenu(mgr.createContextMenu(this.tableViewer.getControl()));
 	}
-	
+
 	private void makeContent () {
 		this.items.clear();
-		this.items.addAll(MediaFactoryImpl.get().getAllLocalMixedMediaDbs());
+		this.items.addAll(Activator.getMediaFactory().getAllLocalMixedMediaDbs());
 		this.items.addAll(RemoteMixedMediaDbHelper.getAllRemoteMmdb());
 	}
-	
+
 	ImageCache imageCache = new ImageCache();
-	
+
 	void updateStatus () {
 		if (isDisposed()) return ;
-		
+
 		if (this.items.size() == 0) {
 			setContentDescription("Click the DB icon to create a new DB.");
 		}
@@ -203,10 +203,10 @@ public class ViewMediaExplorer extends ViewPart {
 			setContentDescription(this.items.size() + " items.");
 		}
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Actions.
-	
+
 	protected IAction openAction = new Action("Open") {
 		@Override
 		public void run() {
@@ -218,16 +218,16 @@ public class ViewMediaExplorer extends ViewPart {
 			}
 		}
 	};
-	
+
 	class OpenViewAction extends Action {
-		
+
 		private final MediaListReference mediaExplorerItem;
 
 		public OpenViewAction (MediaListReference mediaExplorerItem) {
 			super("Open view... ");
 			this.mediaExplorerItem = mediaExplorerItem;
 		}
-		
+
 		@Override
 		public void run() {
 			try {
@@ -252,23 +252,23 @@ public class ViewMediaExplorer extends ViewPart {
 				new MorriganMsgDlg(e).open();
 			}
 		}
-		
+
 	}
-	
+
 	static class MediaExplorerItemUpdateAction extends Action {
-		
+
 		private final MediaListReference mediaExplorerItem;
 
 		public MediaExplorerItemUpdateAction (MediaListReference mediaExplorerItem) {
 			super("Update " + mediaExplorerItem.getTitle());
 			this.mediaExplorerItem = mediaExplorerItem;
 		}
-		
+
 		@Override
 		public void run() {
 			try {
 				if (this.mediaExplorerItem.getType() == MediaListReference.MediaListType.LOCALMMDB) {
-					ILocalMixedMediaDb l = MediaFactoryImpl.get().getLocalMixedMediaDb(this.mediaExplorerItem.getIdentifier());
+					ILocalMixedMediaDb l = Activator.getMediaFactory().getLocalMixedMediaDb(this.mediaExplorerItem.getIdentifier());
 					new DbUpdateAction(l).run();
 				}
 				else if (this.mediaExplorerItem.getType() == MediaListReference.MediaListType.REMOTEMMDB) {
@@ -282,25 +282,25 @@ public class ViewMediaExplorer extends ViewPart {
 				new MorriganMsgDlg(e).open();
 			}
 		}
-		
+
 	}
-	
+
 	class PlayAction extends Action {
-		
+
 		private final MediaListReference mediaExplorerItem;
 		private final boolean addToQueue;
-		
+
 		public PlayAction (MediaListReference mediaExplorerItem, boolean addToQueue) {
 			super((addToQueue ? "Enqueue " : "Play ") + mediaExplorerItem.getTitle());
 			this.mediaExplorerItem = mediaExplorerItem;
 			this.addToQueue = addToQueue;
 		}
-		
+
 		@Override
 		public void run() {
 			try {
 				if (this.mediaExplorerItem.getType() == MediaListReference.MediaListType.LOCALMMDB) {
-					ILocalMixedMediaDb l = MediaFactoryImpl.get().getLocalMixedMediaDb(this.mediaExplorerItem.getIdentifier());
+					ILocalMixedMediaDb l = Activator.getMediaFactory().getLocalMixedMediaDb(this.mediaExplorerItem.getIdentifier());
 					l.read();
 					CallPlayMedia.playItem(getSite().getWorkbenchWindow().getActivePage(), l, this.addToQueue);
 				}
@@ -314,23 +314,23 @@ public class ViewMediaExplorer extends ViewPart {
 				new MorriganMsgDlg(e).open();
 			}
 		}
-		
+
 	}
-	
+
 	class DbPropertiesAction extends Action {
-		
+
 		private final MediaListReference mediaExplorerItem;
 
 		public DbPropertiesAction (MediaListReference mediaExplorerItem) {
 			super("Properties for " + mediaExplorerItem.getTitle());
 			this.mediaExplorerItem = mediaExplorerItem;
 		}
-		
+
 		@Override
 		public void run() {
 			try {
 				if (this.mediaExplorerItem.getType() == MediaListReference.MediaListType.LOCALMMDB) {
-					ILocalMixedMediaDb l = MediaFactoryImpl.get().getLocalMixedMediaDb(this.mediaExplorerItem.getIdentifier());
+					ILocalMixedMediaDb l = Activator.getMediaFactory().getLocalMixedMediaDb(this.mediaExplorerItem.getIdentifier());
 					IViewPart showView = getSite().getPage().showView(ViewLibraryProperties.ID);
 					ViewLibraryProperties viewProp = (ViewLibraryProperties) showView;
 					viewProp.setContent(l);
@@ -342,11 +342,11 @@ public class ViewMediaExplorer extends ViewPart {
 				new MorriganMsgDlg(e).open();
 			}
 		}
-		
+
 	}
-	
+
 	static class SyncMetadataAction extends Action {
-		
+
 		private final MediaListReference local;
 		private final MediaListReference remote;
 
@@ -355,13 +355,13 @@ public class ViewMediaExplorer extends ViewPart {
 			this.local = local;
 			this.remote = remote;
 		}
-		
+
 		@Override
 		public void run() {
 			try {
-    			ILocalMixedMediaDb localDb = MediaFactoryImpl.get().getLocalMixedMediaDb(this.local.getIdentifier());
+    			ILocalMixedMediaDb localDb = Activator.getMediaFactory().getLocalMixedMediaDb(this.local.getIdentifier());
     			IRemoteMixedMediaDb remoteDb = RemoteMixedMediaDbFactory.getExisting(this.remote.getIdentifier());
-    			IMorriganTask task = MediaFactoryImpl.get().getSyncMetadataRemoteToLocalTask(localDb, remoteDb);
+    			IMorriganTask task = Activator.getMediaFactory().getSyncMetadataRemoteToLocalTask(localDb, remoteDb);
     			TaskJob job = new TaskJob(task);
     			job.schedule();
 			}
@@ -369,11 +369,11 @@ public class ViewMediaExplorer extends ViewPart {
 				new MorriganMsgDlg(e).open();
 			}
 		}
-		
+
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	/**
 	 * Passing the focus request to the viewer's control.
 	 */
@@ -381,11 +381,11 @@ public class ViewMediaExplorer extends ViewPart {
 	public void setFocus() {
 		this.tableViewer.getControl().setFocus();
 	}
-	
+
 	public void refresh () {
 		makeContent();
 		this.tableViewer.refresh();
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

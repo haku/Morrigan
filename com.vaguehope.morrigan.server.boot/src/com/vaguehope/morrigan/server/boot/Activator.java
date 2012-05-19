@@ -12,12 +12,14 @@ import org.osgi.framework.BundleContext;
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
+import com.vaguehope.morrigan.model.media.MediaFactoryTracker;
 import com.vaguehope.morrigan.player.IPlayerAbstract;
 import com.vaguehope.morrigan.player.IPlayerEventHandler;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlayerContainer;
 import com.vaguehope.morrigan.player.PlayerReaderTracker;
+import com.vaguehope.morrigan.server.AsyncActions;
 import com.vaguehope.morrigan.server.MorriganServer;
 
 public class Activator implements BundleActivator {
@@ -29,14 +31,17 @@ public class Activator implements BundleActivator {
 
 	private MorriganServer server;
 	private PlayerReaderTracker playerReaderTracker;
+	private MediaFactoryTracker mediaFactoryTracker;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
 	public void start (BundleContext context) throws Exception {
 		this.playerReaderTracker = new PlayerReaderTracker(context);
+		this.mediaFactoryTracker = new MediaFactoryTracker(context);
 
-		this.server = new MorriganServer(context, this.playerReaderTracker);
+		AsyncActions asyncActions = new AsyncActions(this.mediaFactoryTracker);
+		this.server = new MorriganServer(context, this.playerReaderTracker, this.mediaFactoryTracker, asyncActions);
 		this.server.start();
 
 		context.registerService(PlayerContainer.class, this.playerContainer, null);
@@ -45,6 +50,7 @@ public class Activator implements BundleActivator {
 	@Override
 	public void stop (BundleContext context) throws Exception {
 		this.server.stop();
+		this.mediaFactoryTracker.dispose();
 		this.playerReaderTracker.dispose();
 		logger.fine("Morrigan Server stopped.");
 	}

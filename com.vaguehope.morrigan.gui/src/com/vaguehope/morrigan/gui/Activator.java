@@ -5,6 +5,9 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
+import com.vaguehope.morrigan.model.media.MediaFactory;
+import com.vaguehope.morrigan.model.media.MediaFactoryTracker;
+
 public class Activator extends AbstractUIPlugin {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -15,6 +18,8 @@ public class Activator extends AbstractUIPlugin {
 	private static BundleContext context;
 	private static Activator plugin;
 
+	private MediaFactoryTracker mediaFactoryTracker;
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	public Activator() {/* UNUSED */}
@@ -24,14 +29,16 @@ public class Activator extends AbstractUIPlugin {
 	@Override
 	public void start(BundleContext bundleContext) throws Exception {
 		super.start(bundleContext);
+		this.mediaFactoryTracker = new MediaFactoryTracker(bundleContext);
 		Activator.plugin = this;
 		Activator.context = bundleContext;
 	}
 
 	@Override
 	public void stop(BundleContext bundleContext) throws Exception {
-		Activator.plugin = null;
 		Activator.context = null;
+		Activator.plugin = null;
+		this.mediaFactoryTracker.dispose();
 		super.stop(bundleContext);
 	}
 
@@ -56,6 +63,10 @@ public class Activator extends AbstractUIPlugin {
 	 */
 	public static ImageDescriptor getImageDescriptor(String path) {
 		return imageDescriptorFromPlugin(PLUGIN_ID, path);
+	}
+
+	public static MediaFactory getMediaFactory () {
+		return getDefault().mediaFactoryTracker;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -18,34 +18,33 @@ import com.vaguehope.morrigan.gui.editors.mmdb.LocalMixedMediaDbEditor;
 import com.vaguehope.morrigan.gui.views.ViewMediaExplorer;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
-import com.vaguehope.morrigan.model.media.impl.MediaFactoryImpl;
 
 public class NewMixedDbAction extends Action implements IWorkbenchAction {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	private IWorkbenchWindow window;
-	
+
 	public NewMixedDbAction (IWorkbenchWindow window) {
 		super();
 		this.window = window;
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	@Override
 	public String getText() { return "New mixed db..."; }
-	
+
 	@Override
 	public String getId() { return "newmixeddb"; }
-	
+
 	@Override
 	public org.eclipse.jface.resource.ImageDescriptor getImageDescriptor() {
 		// TODO choose icon.
 		return Activator.getImageDescriptor("icons/db.png");
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	@Override
 	public void run () {
 		InputDialog dlg = new InputDialog(
@@ -56,17 +55,17 @@ public class NewMixedDbAction extends Action implements IWorkbenchAction {
 			String libName = dlg.getValue();
 			ILocalMixedMediaDb createdMmdb;
 			try {
-				createdMmdb = MediaFactoryImpl.get().createLocalMixedMediaDb(libName);
+				createdMmdb = Activator.getMediaFactory().createLocalMixedMediaDb(libName);
 			} catch (Exception e) {
 				new MorriganMsgDlg(e).open();
 				return;
 			}
-			
+
 			// refresh explorer.
 			IWorkbenchPage page = this.window.getActivePage();
 			ViewMediaExplorer view = (ViewMediaExplorer) page.findView(ViewMediaExplorer.ID);
 			view.refresh();
-			
+
 			// Open new item.
 			try {
 				MediaItemDbEditorInput input = EditorFactory.getMmdbInput(createdMmdb.getDbPath());
@@ -77,14 +76,14 @@ public class NewMixedDbAction extends Action implements IWorkbenchAction {
 			} catch (MorriganException e) {
 				new MorriganMsgDlg(e).open();
 			}
-			
+
 		}
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	@Override
 	public void dispose() {/* UNUSED */}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

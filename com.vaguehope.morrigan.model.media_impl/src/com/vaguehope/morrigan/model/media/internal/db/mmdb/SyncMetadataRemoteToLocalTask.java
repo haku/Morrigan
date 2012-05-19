@@ -9,27 +9,28 @@ import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
+import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagClassification;
-import com.vaguehope.morrigan.model.media.impl.MediaFactoryImpl;
 import com.vaguehope.morrigan.tasks.IMorriganTask;
 import com.vaguehope.morrigan.tasks.TaskEventListener;
 import com.vaguehope.morrigan.tasks.TaskResult;
 import com.vaguehope.morrigan.tasks.TaskResult.TaskOutcome;
 import com.vaguehope.sqlitewrapper.DbException;
 
-
 public class SyncMetadataRemoteToLocalTask implements IMorriganTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private final ILocalMixedMediaDb local;
 	private final IRemoteMixedMediaDb remote;
+	private final MediaFactory mediaFactory;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public SyncMetadataRemoteToLocalTask (ILocalMixedMediaDb local, IRemoteMixedMediaDb remote) {
+	public SyncMetadataRemoteToLocalTask (ILocalMixedMediaDb local, IRemoteMixedMediaDb remote, MediaFactory mediaFactory) {
 		this.local = local;
 		this.remote = remote;
+		this.mediaFactory = mediaFactory;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -37,7 +38,7 @@ public class SyncMetadataRemoteToLocalTask implements IMorriganTask {
 	@Override
 	public String getTitle () {
 		// TODO make this more sensible.
-		return "Sync metadata '"+this.local+"' x '"+this.remote+"' desu~";
+		return "Sync metadata '" + this.local + "' x '" + this.remote + "' desu~";
 	}
 
 	@Override
@@ -45,7 +46,7 @@ public class SyncMetadataRemoteToLocalTask implements IMorriganTask {
 		taskEventListener.onStart();
 		TaskResult ret;
 		try {
-			final ILocalMixedMediaDb trans = MediaFactoryImpl.get().getLocalMixedMediaDbTransactional(this.local);
+			final ILocalMixedMediaDb trans = this.mediaFactory.getLocalMixedMediaDbTransactional(this.local);
 			try {
 				trans.read();
 				// FIXME add getByHashcode() to local DB.
@@ -116,10 +117,8 @@ public class SyncMetadataRemoteToLocalTask implements IMorriganTask {
 			ldb.setItemDateAdded(localItem, remoteItem.getDateAdded());
 		}
 
-		if (
-				remoteItem.getDateLastPlayed() != null && remoteItem.getDateLastPlayed().getTime() > 0
-				&& (localItem.getDateLastPlayed() == null || remoteItem.getDateLastPlayed().getTime() > localItem.getDateLastPlayed().getTime())
-				) {
+		if (remoteItem.getDateLastPlayed() != null && remoteItem.getDateLastPlayed().getTime() > 0
+				&& (localItem.getDateLastPlayed() == null || remoteItem.getDateLastPlayed().getTime() > localItem.getDateLastPlayed().getTime())) {
 			ldb.setTrackDateLastPlayed(localItem, remoteItem.getDateLastPlayed());
 		}
 

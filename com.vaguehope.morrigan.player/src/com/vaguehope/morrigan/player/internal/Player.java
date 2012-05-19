@@ -13,11 +13,11 @@ import java.util.logging.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
-import com.vaguehope.morrigan.engines.EngineFactory;
 import com.vaguehope.morrigan.engines.common.ImplException;
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine;
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import com.vaguehope.morrigan.engines.playback.IPlaybackStatusListener;
+import com.vaguehope.morrigan.engines.playback.PlaybackEngineFactory;
 import com.vaguehope.morrigan.engines.playback.PlaybackException;
 import com.vaguehope.morrigan.model.Register;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
@@ -26,8 +26,8 @@ import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
+import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaItemListChangeListener;
-import com.vaguehope.morrigan.model.media.impl.MediaFactoryImpl;
 import com.vaguehope.morrigan.player.IPlayerAbstract;
 import com.vaguehope.morrigan.player.IPlayerEventHandler;
 import com.vaguehope.morrigan.player.IPlayerLocal;
@@ -48,15 +48,22 @@ public class Player implements IPlayerLocal {
 
 	final IPlayerEventHandler eventHandler;
 	private final Register<IPlayerAbstract> register;
+	private final PlaybackEngineFactory playbackEngineFactory;
+	private final MediaFactory mediaFactory;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Main.
 
-	public Player (int id, String name, IPlayerEventHandler eventHandler, Register<IPlayerAbstract> register) {
+	public Player (int id, String name, IPlayerEventHandler eventHandler,
+			Register<IPlayerAbstract> register,
+			PlaybackEngineFactory playbackEngineFactory,
+			MediaFactory mediaFactory) {
 		this.id = id;
 		this.name = name;
 		this.eventHandler = eventHandler;
 		this.register = register;
+		this.playbackEngineFactory = playbackEngineFactory;
+		this.mediaFactory = mediaFactory;
 	}
 
 	@Override
@@ -387,7 +394,7 @@ public class Player implements IPlayerLocal {
 			}
 		}
 
-		return MediaFactoryImpl.get().getNewDurationData(duration, complete);
+		return this.mediaFactory.getNewDurationData(duration, complete);
 	}
 
 	@Override
@@ -420,7 +427,7 @@ public class Player implements IPlayerLocal {
 
 	synchronized private IPlaybackEngine getPlaybackEngine (boolean create) {
 		if (this.playbackEngine == null && create) {
-			this.playbackEngine = EngineFactory.makePlaybackEngine();
+			this.playbackEngine = this.playbackEngineFactory.getNewPlaybackEngine();
 			if (this.playbackEngine == null) throw new RuntimeException("Failed to create playback engine instance.");
 			this.playbackEngine.setStatusListener(this.playbackStatusListener);
 		}

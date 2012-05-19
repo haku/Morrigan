@@ -46,19 +46,18 @@ import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagClassification;
 import com.vaguehope.morrigan.model.media.MediaTagType;
-import com.vaguehope.morrigan.model.media.impl.MediaFactoryImpl;
 
 public class ViewTagEditor extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	public static final String ID = "com.vaguehope.morrigan.gui.views.ViewTagEditor";
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	private ImageCache imageCache = new ImageCache();
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	@Override
 	public void createPartControl(Composite parent) {
 		createLayout(parent);
@@ -67,13 +66,13 @@ public class ViewTagEditor extends ViewPart {
 		makeRefresher();
 		applySavedState();
 	}
-	
+
 	@Override
 	public void setFocus() {
 		this.txtNewTag.setSelection(0, this.txtNewTag.getText().length());
 		this.txtNewTag.setFocus();
 	}
-	
+
 	@Override
 	public void dispose() {
 		removeSelectionListener();
@@ -81,32 +80,32 @@ public class ViewTagEditor extends ViewPart {
 		this.imageCache.clearCache();
 		super.dispose();
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	State.
-	
+
 	private static final String KEY_NEWTAG = "KEY_NEWTAG";
 	private String initialNewTag = null;
-	
+
 	/**
 	 * Called BEFORE createPartControl().
 	 */
 	@Override
 	public void init(IViewSite site, IMemento memento) throws PartInitException {
 		super.init(site, memento);
-		
+
 		if (memento != null) {
 			this.initialNewTag = memento.getString(KEY_NEWTAG);
 		}
 	}
-	
+
 	@Override
 	public void saveState(IMemento memento) {
 		memento.putString(KEY_NEWTAG, this.txtNewTag.getText());
-		
+
 		super.saveState(memento);
 	}
-	
+
 	/**
 	 * Because init() is called before createPartControl()
 	 * this is used to apply the state we read in init();
@@ -114,28 +113,28 @@ public class ViewTagEditor extends ViewPart {
 	private void applySavedState () {
 		if (this.initialNewTag != null) this.txtNewTag.setText(this.initialNewTag);
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	External events.
-	
+
 	private void initSelectionListener () {
 		ISelectionService service = getSite().getWorkbenchWindow().getSelectionService();
 		service.addSelectionListener(this.selectionListener);
 	}
-	
+
 	private void removeSelectionListener () {
 		ISelectionService service = getSite().getWorkbenchWindow().getSelectionService();
 		service.removeSelectionListener(this.selectionListener);
 	}
-	
+
 	private void addPartListener () {
 		getViewSite().getPage().addPartListener(this.partListener);
 	}
-	
+
 	private void removePartListener () {
 		getViewSite().getPage().removePartListener(this.partListener);
 	}
-	
+
 	private IPartListener partListener = new IPartListener() {
 		@Override
 		public void partClosed(IWorkbenchPart part) {
@@ -146,7 +145,7 @@ public class ViewTagEditor extends ViewPart {
 				}
 			}
 		}
-		
+
 		@Override
 		public void partActivated(IWorkbenchPart part) {/* UNUSED */}
 		@Override
@@ -156,7 +155,7 @@ public class ViewTagEditor extends ViewPart {
 		@Override
 		public void partBroughtToTop(IWorkbenchPart part) {/* UNUSED */}
 	};
-	
+
 	private ISelectionListener selectionListener = new ISelectionListener() {
 		@Override
 		public void selectionChanged(IWorkbenchPart part, ISelection selection) {
@@ -165,10 +164,10 @@ public class ViewTagEditor extends ViewPart {
 					setInput(null, (IMediaItem)null);
 					return;
 				}
-				
+
 				IMediaItemDbEditor<?,?> editor = (IMediaItemDbEditor<?,?>) part;
 				IMediaItemDb<?,?> list = editor.getMediaList();
-				
+
 				if (selection instanceof IStructuredSelection) {
 					IStructuredSelection iSel = (IStructuredSelection) selection;
 					ArrayList<IMediaItem> sel = new ArrayList<IMediaItem>();
@@ -180,20 +179,20 @@ public class ViewTagEditor extends ViewPart {
 							}
 						}
 					}
-					
+
 					setInput(list, sel);
 				}
 			}
 		}
 	};
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Data links.
-	
+
 	IMediaItemDb<?,?> editedItemDb = null;
 	IMediaItem editedItem = null;
 	List<IMediaItem> editedItems = null;
-	
+
 	public void setInput (IMediaItemDb<?,?> editedMediaList, IMediaItem item) {
 		if (item != null) {
     		List<IMediaItem> list = new LinkedList<IMediaItem>();
@@ -204,7 +203,7 @@ public class ViewTagEditor extends ViewPart {
 			setInput(editedMediaList, (List<? extends IMediaItem>)null);
 		}
 	}
-	
+
 	public void setInput (IMediaItemDb<?,?> editedMediaList, List<? extends IMediaItem> selection) {
 		if (selection != null && selection.size() > 0) {
 			if (selection.size() == 1) {
@@ -223,17 +222,17 @@ public class ViewTagEditor extends ViewPart {
 			this.editedItem = null;
 			this.editedItems = null;
 		}
-		
+
 		this.btnAddTag.setEnabled(this.editedItem != null);
 		this.btnRemoveTag.setEnabled(this.editedItem != null);
 		this.readTagsAction.setEnabled(this.editedItem != null);
-		
+
 		this.editedItemDb = editedMediaList;
 		this.tableViewer.refresh();
 	}
-	
+
 	private IStructuredContentProvider sourcesProvider = new IStructuredContentProvider() {
-		
+
 		@Override
 		public Object[] getElements(Object inputElement) {
 			if (ViewTagEditor.this.editedItemDb != null && ViewTagEditor.this.editedItem != null) {
@@ -249,48 +248,48 @@ public class ViewTagEditor extends ViewPart {
 					return new String[]{};
 				}
 			}
-			
+
 			return new String[]{};
 		}
-		
+
 		@Override
 		public void dispose() {/* UNUSED */}
 		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {/* UNUSED */}
-		
+
 	};
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	GUI stuff.
-	
+
 	protected final int sep = 3;
-	
+
 	Text txtNewTag;
 	private Button btnAddTag;
 	private Button btnRemoveTag;
 	TableViewer tableViewer;
-	
+
 	Runnable tagsChangedRrefresher;
-	
+
 	private void createLayout (Composite parent) {
 		getViewSite().getActionBars().getMenuManager().add(this.readTagsAction);
-		
+
 		FormData formData;
 		parent.setLayout(new FormLayout());
-		
+
 		Composite tbCom = new Composite(parent, SWT.NONE);
 		this.txtNewTag = new Text(tbCom, SWT.SINGLE | SWT.BORDER);
 		this.btnAddTag = new Button(tbCom, SWT.PUSH);
 		this.btnRemoveTag = new Button(tbCom, SWT.PUSH);
 		this.tableViewer = new TableViewer(parent, SWT.MULTI | SWT.V_SCROLL | SWT.FULL_SELECTION);
-		
+
 		tbCom.setLayout(new FormLayout());
 		formData = new FormData();
 		formData.top = new FormAttachment(0, 0);
 		formData.left = new FormAttachment(0, 0);
 		formData.right = new FormAttachment(100, 0);
 		tbCom.setLayoutData(formData);
-		
+
 		this.txtNewTag.setMessage("New tag");
 		formData = new FormData();
 		formData.left = new FormAttachment(0, this.sep);
@@ -298,21 +297,21 @@ public class ViewTagEditor extends ViewPart {
 		formData.top = new FormAttachment(0, this.sep);
 		formData.bottom = new FormAttachment(100, -this.sep);
 		this.txtNewTag.setLayoutData(formData);
-		
+
 		this.btnAddTag.setImage(this.imageCache.readImage("icons/plus.gif"));
 		formData = new FormData();
 		formData.right = new FormAttachment(this.btnRemoveTag, -this.sep);
 		formData.top = new FormAttachment(0, this.sep);
 		formData.bottom = new FormAttachment(100, -this.sep);
 		this.btnAddTag.setLayoutData(formData);
-		
+
 		this.btnRemoveTag.setImage(this.imageCache.readImage("icons/minus.gif"));
 		formData = new FormData();
 		formData.right = new FormAttachment(100, -this.sep);
 		formData.top = new FormAttachment(0, this.sep);
 		formData.bottom = new FormAttachment(100, -this.sep);
 		this.btnRemoveTag.setLayoutData(formData);
-		
+
 		this.tableViewer.setContentProvider(this.sourcesProvider);
 		this.tableViewer.setInput(getViewSite()); // use content provider.
 		getSite().setSelectionProvider(this.tableViewer);
@@ -322,28 +321,28 @@ public class ViewTagEditor extends ViewPart {
 		formData.top = new FormAttachment(tbCom, 0);
 		formData.bottom = new FormAttachment(100, -this.sep);
 		this.tableViewer.getTable().setLayoutData(formData);
-		
+
 		this.txtNewTag.addListener (SWT.DefaultSelection, new Listener () {
 			@Override
 			public void handleEvent (Event e) {
 				procAddTag();
 			}
 		});
-		
+
 		this.txtNewTag.addListener (SWT.FOCUSED, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
 				ViewTagEditor.this.txtNewTag.setSelection(0, ViewTagEditor.this.txtNewTag.getText().length());
 			}
 		});
-		
+
 		this.btnAddTag.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
 				procAddTag();
 			}
 		});
-		
+
 		this.btnRemoveTag.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
@@ -351,7 +350,7 @@ public class ViewTagEditor extends ViewPart {
 			}
 		});
 	}
-	
+
 	private void makeRefresher () {
 		this.tagsChangedRrefresher = new RefreshTimer(getSite().getShell().getDisplay(), 5000, new Runnable() {
 			@Override
@@ -360,45 +359,45 @@ public class ViewTagEditor extends ViewPart {
 			}
 		});
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	External API methods.
-	
+
 //	public void addToolbarButton (String id, String label) {
 //		TODO
 //	}
-	
+
 //	public void removeToolbarButton (String id, String label) {
 //		TODO
 //	}
-	
+
 	public IMediaItemDb<?,?> getEditedItemDb() {
 		return this.editedItemDb;
 	}
-	
+
 	public IMediaItem getEditedItem() {
 		return this.editedItem;
 	}
-	
+
 	public List<IMediaItem> getEditedItems() {
 		return this.editedItems;
 	}
-	
+
 	public void refreshContent () {
 		this.tagsChangedRrefresher.run();
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	protected IAction readTagsAction = new Action("Read tags from file", Activator.getImageDescriptor("icons/open.gif")) {
 		@Override
 		public void run() {
 			procReadTags();
 		}
 	};
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	void procAddTag() {
 		if (this.editedItemDb != null && this.editedItem != null) {
 			String text = this.txtNewTag.getText();
@@ -413,24 +412,24 @@ public class ViewTagEditor extends ViewPart {
 					getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));
 				}
 			}
-			
+
 		}
 		else {
 			new MorriganMsgDlg("No item selected to add tag to.").open();
 		}
 	}
-	
+
 	void procRemoveTag() {
 		List<MediaTag> selMts = new LinkedList<MediaTag>();
-		
+
 		ISelection selection = this.tableViewer.getSelection();
 		if (selection instanceof IStructuredSelection) {
 			IStructuredSelection iSel = (IStructuredSelection) selection;
-			
+
 			if (iSel.size() < 1) {
 				return;
 			}
-			
+
 			for (Object selObj : iSel.toList()) {
 				if (selObj instanceof MediaTag) {
 					MediaTag selMt = (MediaTag) selObj;
@@ -438,7 +437,7 @@ public class ViewTagEditor extends ViewPart {
 				}
 			}
 		}
-		
+
 		MorriganMsgDlg dlg = new MorriganMsgDlg("Remove "+selMts.size()+" selected tags?", MorriganMsgDlg.YESNO);
 		dlg.open();
 		if (dlg.getReturnCode() == Window.OK) {
@@ -453,16 +452,16 @@ public class ViewTagEditor extends ViewPart {
 			this.tableViewer.refresh();
 		}
 	}
-	
+
 	void procReadTags() {
 		if (this.editedItemDb != null && this.editedItem != null) {
 			File file = new File(this.editedItem.getFilepath());
 			if (file.exists()) {
-				
+
 				if (this.editedItem instanceof IMediaTrack) {
 					IMediaTrack mt = (IMediaTrack) this.editedItem;
 					try {
-						MediaFactoryImpl.get().readTrackTags(this.editedItemDb, mt, file);
+						Activator.getMediaFactory().readTrackTags(this.editedItemDb, mt, file);
 					}
 					catch (Exception e) {
 						new MorriganMsgDlg(e).open();
@@ -472,7 +471,7 @@ public class ViewTagEditor extends ViewPart {
 				} else {
 					new MorriganMsgDlg("TODO: implement this.").open();
 				}
-				
+
 			}
 			else {
 				new MorriganMsgDlg("File '"+file.getAbsolutePath()+"' does not exist.").open();
@@ -481,8 +480,8 @@ public class ViewTagEditor extends ViewPart {
 		else {
 			new MorriganMsgDlg("No item selected to read tags for.").open();
 		}
-		
+
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

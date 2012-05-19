@@ -9,5 +9,7 @@ Import-Package: com.vaguehope.morrigan.model.db,
  com.vaguehope.morrigan.model.db.basicimpl,
  com.vaguehope.morrigan.model.exceptions,
  com.vaguehope.morrigan.tasks,
- com.vaguehope.sqlitewrapper
+ com.vaguehope.sqlitewrapper,
+ org.osgi.framework;version="1.6.0",
+ org.osgi.util.tracker;version="1.5.0"
 Export-Package: com.vaguehope.morrigan.model.media
