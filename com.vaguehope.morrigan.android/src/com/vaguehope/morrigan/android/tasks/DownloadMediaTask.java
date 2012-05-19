@@ -23,14 +23,6 @@ import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.vaguehope.morrigan.android.Constants;
-import com.vaguehope.morrigan.android.helper.ChecksumHelper;
-import com.vaguehope.morrigan.android.helper.HttpFileDownloadHandler;
-import com.vaguehope.morrigan.android.helper.HttpHelper;
-import com.vaguehope.morrigan.android.helper.HttpFileDownloadHandler.DownloadProgressListener;
-import com.vaguehope.morrigan.android.model.MlistItem;
-import com.vaguehope.morrigan.android.model.MlistReference;
-
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -40,32 +32,40 @@ import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.vaguehope.morrigan.android.Constants;
+import com.vaguehope.morrigan.android.helper.ChecksumHelper;
+import com.vaguehope.morrigan.android.helper.HttpFileDownloadHandler;
+import com.vaguehope.morrigan.android.helper.HttpFileDownloadHandler.DownloadProgressListener;
+import com.vaguehope.morrigan.android.helper.HttpHelper;
+import com.vaguehope.morrigan.android.model.MlistItem;
+import com.vaguehope.morrigan.android.model.MlistReference;
+
 public class DownloadMediaTask extends AsyncTask<MlistItem, Integer, String> implements OnClickListener {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	private final Context context;
 	private final MlistReference mlistReference;
 
 	private ProgressDialog progressDialog;
 	protected AtomicBoolean cancelled = new AtomicBoolean(false);
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	public DownloadMediaTask (Context context, MlistReference mlistReference) {
 		this.context = context;
 		this.mlistReference = mlistReference;
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	public Context getContext () {
 		return this.context;
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	private static int PRGMAX = 10000;
-	
+
+	private static final int PRGMAX = 10000;
+
 	@Override
 	protected void onPreExecute () {
 		ProgressDialog dialog = new ProgressDialog(this.context);
@@ -75,14 +75,14 @@ public class DownloadMediaTask extends AsyncTask<MlistItem, Integer, String> imp
 		dialog.setMax(PRGMAX);
 		dialog.setTitle("Downloading...");
 //		progressDialog.setProgressNumberFormat(null); // Not available 'till API 11 (3.x).
-		
+
 		dialog.setCancelable(true);
 		dialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", this);
-		
+
 		dialog.show();
 		this.progressDialog = dialog;
 	}
-	
+
 	@Override
 	public void onClick (DialogInterface dialog, int which) {
 		if (which == DialogInterface.BUTTON_NEGATIVE) {
@@ -91,14 +91,14 @@ public class DownloadMediaTask extends AsyncTask<MlistItem, Integer, String> imp
 			}
 		}
 	}
-	
+
 	@Override
 	protected String doInBackground (MlistItem... items) {
 		if (items.length < 1) throw new IllegalArgumentException("No items desu~");
-		
+
 		final int pPerItem = (int) (PRGMAX / (float)items.length);
 		final AtomicInteger itemsCopied = new AtomicInteger(0);
-		
+
 		DownloadProgressListener progressListener = new DownloadProgressListener() {
 			@SuppressWarnings("synthetic-access")
 			@Override
@@ -111,18 +111,18 @@ public class DownloadMediaTask extends AsyncTask<MlistItem, Integer, String> imp
 				return DownloadMediaTask.this.cancelled.get();
 			}
 		};
-		
+
 		File sdCard = Environment.getExternalStorageDirectory();
 		File dir = new File (sdCard.getAbsolutePath() + "/morrigan"); // TODO make this configurable.
 		dir.mkdirs();
-		
+
 		final ByteBuffer byteBuffer = ChecksumHelper.createByteBuffer();
-		
+
 		for (MlistItem item : items) {
 			final String url = this.mlistReference.getBaseUrl() + Constants.CONTEXT_MLIST_ITEMS + "/" + item.getRelativeUrl();
 			final File file = new File(dir, item.getFileName());
 			boolean transferComplete = false;
-			
+
 			// Will only skip if checksums really match.
 			if (!fileMatchedItem(file, item, false, byteBuffer)) {
 				try {
@@ -142,17 +142,17 @@ public class DownloadMediaTask extends AsyncTask<MlistItem, Integer, String> imp
 					}
 				}
 			}
-			
+
 			// This will only fail if the checksums really do not match.
 			if (!fileMatchedItem(file, item, true, byteBuffer)) return "Checksum check failed.";
-			
+
 			publishProgress(Integer.valueOf(pPerItem * itemsCopied.incrementAndGet()));
 			if (this.cancelled.get()) return "Download cancelled desu~";
 		}
-		
+
 		return "Download complete desu~";
 	}
-	
+
 	@Override
 	protected void onProgressUpdate (Integer... values) {
 		// Note that one is increment and one is set.
@@ -163,15 +163,15 @@ public class DownloadMediaTask extends AsyncTask<MlistItem, Integer, String> imp
 			this.progressDialog.setSecondaryProgress(values[1].intValue());
 		}
 	}
-	
+
 	@Override
 	protected void onPostExecute (String result) {
 		if (this.progressDialog != null) this.progressDialog.dismiss(); // This will fail if the screen is rotated while we are fetching.
 		Toast.makeText(getContext(), result, Toast.LENGTH_SHORT).show();
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	/**
 	 * defaultResponse is returned if comparison is not possible.
 	 */
@@ -187,6 +187,6 @@ public class DownloadMediaTask extends AsyncTask<MlistItem, Integer, String> imp
 		}
 		return defaultResponse;
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

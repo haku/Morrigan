@@ -4,8 +4,8 @@ import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
 
 public class Defaults {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	static public MediaType MEDIA_ASPECT = MediaType.TRACK;
-	
+
+	public static final MediaType MEDIA_ASPECT = MediaType.TRACK;
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
