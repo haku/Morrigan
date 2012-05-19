@@ -26,25 +26,24 @@ import com.vaguehope.morrigan.util.httpclient.HttpClient;
 import com.vaguehope.morrigan.util.httpclient.HttpStreamHandlerException;
 import com.vaguehope.sqlitewrapper.DbException;
 
-
 public class RemoteMixedMediaDb extends AbstractMixedMediaDb implements IRemoteMixedMediaDb {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	private final Logger logger = Logger.getLogger(this.getClass().getName());
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	public static final String DBKEY_SERVERURL = "SERVERURL";
 	public static final String DBKEY_CACHEDATE = "CACHEDATE";
 	public static final String DBKEY_PASS = "PASS";
-	
+
 	public static long MAX_CACHE_AGE = 60 * 60 * 1000L; // 1 hour.
 	private long cacheDate = -1;
-	
+
 	private TaskEventListener taskEventListener;
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	/**
 	 * Connect to existing DB.
 	 */
@@ -52,29 +51,29 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb implements IRemoteM
 		super(dbName, config, localDbLayer); // TODO expose search term.
 		readCacheDate();
 	}
-	
+
 	/**
 	 * Create a fresh DB.
 	 */
 	public RemoteMixedMediaDb (String dbName, MediaItemDbConfig config, RemoteHostDetails details, IMixedMediaStorageLayer<IMixedMediaItem> localDbLayer) throws DbException {
 		super(dbName, config, localDbLayer); // TODO expose search term.
 		URL url = details.getUrl();
-		
+
 		String s = getDbLayer().getProp(DBKEY_SERVERURL);
 		if (s == null) {
 			setUrl(url);
 			this.logger.fine("Set DBKEY_SERVERURL=" + url.toExternalForm() + " in " + getDbLayer().getDbFilePath());
-			
+
 		} else if (!s.equals(url.toExternalForm())) {
 			throw new IllegalArgumentException("serverUrl does not match localDbLayer ('"+url.toExternalForm()+"' != '"+s+"' in '"+getDbLayer().getDbFilePath()+"').");
 		}
-		
+
 		setPass(details.getPass());
 		readCacheDate();
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	private void readCacheDate () throws DbException {
 		String dateString = getDbLayer().getProp(DBKEY_CACHEDATE);
 		if (dateString != null) {
@@ -88,12 +87,12 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb implements IRemoteM
 			this.cacheDate = -1;
 		}
 	}
-	
+
 	private void writeCacheDate () throws DbException {
 		getDbLayer().setProp(DBKEY_CACHEDATE, String.valueOf(this.cacheDate));
 		this.logger.fine("Wrote cachedate=" + this.cacheDate + ".");
 	}
-	
+
 	@Override
 	public URL getUrl() throws DbException {
 		String sUrl = getDbLayer().getProp(DBKEY_SERVERURL);
@@ -104,29 +103,29 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb implements IRemoteM
 			throw new DbException("URL in DB is malformed: " + sUrl, e);
 		}
 	}
-	
+
 	@Override
 	public void setUrl (URL url) throws DbException {
 		getDbLayer().setProp(DBKEY_SERVERURL, url.toExternalForm());
 	}
-	
+
 	@Override
 	public String getPass () throws DbException {
 		return getDbLayer().getProp(DBKEY_PASS);
 	}
-	
+
 	@Override
 	public void setPass (String pass) throws DbException {
 		getDbLayer().setProp(DBKEY_PASS, pass);
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	@Override
 	public String getType() {
 		return TYPE;
 	}
-	
+
 	@Override
 	public TaskEventListener getTaskEventListener() {
 		return this.taskEventListener;
@@ -135,25 +134,25 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb implements IRemoteM
 	public void setTaskEventListener(TaskEventListener taskEventListener) {
 		this.taskEventListener = taskEventListener;
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Reading and refreshing.
-	
+
 	@Override
 	public long getCacheAge () {
 		return System.currentTimeMillis() - this.cacheDate;
 	}
-	
+
 	@Override
 	public boolean isCacheExpired () {
 		return (getCacheAge() > MAX_CACHE_AGE); // 1 hour.  TODO extract this as config.
 	}
-	
+
 	@Override
 	public void readFromCache () throws DbException, MorriganException {
 		super.doRead();
 	}
-	
+
 	@Override
 	protected void doRead() throws DbException, MorriganException {
 		if (isCacheExpired()) {
@@ -165,13 +164,13 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb implements IRemoteM
 			super.doRead(); // This forces a DB query - sorts entries.
 		}
 	}
-	
+
 	@Override
 	public void forceDoRead () throws MorriganException, DbException {
 		try {
 			// This does the actual HTTP fetch.
 			MixedMediaDbFeedReader.read(this, this.taskEventListener);
-			
+
 			this.cacheDate = System.currentTimeMillis();
 			writeCacheDate();
 		}
@@ -179,10 +178,10 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb implements IRemoteM
 			super.doRead(); // This forces a DB query - sorts entries.)
 		}
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Actions.
-	
+
 	@Override
 	public void copyItemFile (IMixedMediaItem item, OutputStream os) throws MorriganException {
 		URL itemUrl = getRemoteItemUrl(this, item);
@@ -205,16 +204,16 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb implements IRemoteM
 			throw new MorriganException(e);
 		}
 	}
-	
+
 	@Override
 	public File copyItemFile (IMixedMediaItem mlt, File targetDirectory) throws MorriganException {
 		if (!targetDirectory.isDirectory()) {
 			throw new IllegalArgumentException("targetDirectory must be a directory.");
 		}
-		
+
 		final File targetFile = new File(targetDirectory.getAbsolutePath() + File.separatorChar
 				+ mlt.getFilepath().substring(mlt.getFilepath().lastIndexOf(File.separatorChar) + 1));
-		
+
 		if (!targetFile.exists()) {
 			URL itemUrl = getRemoteItemUrl(this, mlt);
 			this.logger.fine("Fetching '"+itemUrl+"' to '"+targetFile.getAbsolutePath()+"'...");
@@ -238,10 +237,10 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb implements IRemoteM
 		else {
 			this.logger.warning("Skipping '"+targetFile.getAbsolutePath()+"' as it already exists.");
 		}
-		
+
 		return targetFile;
 	}
-	
+
 	static public URL getRemoteItemUrl (RemoteMixedMediaDb rmmdb, IMixedMediaItem mlt) throws MorriganException {
 		String serverUrlString;
 		try {
@@ -257,7 +256,7 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb implements IRemoteM
 		catch (MalformedURLException e) {
 			throw new MorriganException(e);
 		}
-		
+
 		URL itemUrl;
 		try {
 			// need to prepend "/items/".
@@ -269,97 +268,97 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb implements IRemoteM
 		}
 		return itemUrl;
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Item metadata modifiers.
-	
+
 	@Override
 	public void incTrackStartCnt (IMediaTrack track, long n) throws MorriganException {
 		throw new NotImplementedException();
 	}
-	
+
 	@Override
 	public void incTrackEndCnt (IMediaTrack track, long n) throws MorriganException {
 		throw new NotImplementedException();
 	}
-	
+
 	@Override
 	public void setItemDateAdded (IMixedMediaItem track, Date date) throws MorriganException {
 		throw new NotImplementedException();
 	}
-	
+
 	@Override
 	public void setTrackDateLastPlayed (IMediaTrack track, Date date) throws MorriganException {
 		throw new NotImplementedException();
 	}
-	
+
 	@Override
 	public void removeItem (IMixedMediaItem track) throws MorriganException {
 		throw new NotImplementedException();
 	}
-	
+
 	@Override
 	public void incTrackStartCnt(IMediaTrack track) throws MorriganException {
 		throw new NotImplementedException();
 	}
-	
+
 	@Override
 	public void incTrackEndCnt(IMediaTrack track) throws MorriganException {
 		throw new NotImplementedException();
 	}
-	
+
 	@Override
 	public void setTrackStartCnt(IMediaTrack item, long n) throws MorriganException {
 		throw new NotImplementedException();
 	}
-	
+
 	@Override
 	public void setTrackEndCnt(IMediaTrack item, long n) throws MorriganException {
 		throw new NotImplementedException();
 	}
-	
+
 	@Override
 	public void setTrackDuration(IMediaTrack track, int duration) throws MorriganException {
 		throw new NotImplementedException();
 	}
-	
+
 	@Override
 	public void setItemHashCode(IMixedMediaItem track, BigInteger hashcode) throws MorriganException {
 		throw new NotImplementedException();
 	}
-	
+
 	@Override
 	public void setItemDateLastModified(IMixedMediaItem track, Date date) throws MorriganException {
 		throw new NotImplementedException();
 	}
-	
+
 	@Override
 	public void setItemEnabled(IMixedMediaItem track, boolean value) throws MorriganException {
 		throw new NotImplementedException();
 	}
-	
+
 	@Override
 	public void setItemMissing(IMixedMediaItem track, boolean value) throws MorriganException {
 		throw new NotImplementedException();
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	DB property modifiers.
-	
+
 	@Override
 	public void addSource (String source) throws MorriganException {
 		throw new NotImplementedException ("Not implemented.");
 	}
-	
+
 	@Override
 	public void removeSource (String source) throws MorriganException {
 		throw new NotImplementedException("Not implemented.");
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Tags.
-	
+
 	// TODO FIXME stop user adding tags?
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
