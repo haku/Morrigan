@@ -1,6 +1,5 @@
 package com.vaguehope.morrigan.gui.editors;
 
-
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.ui.IElementFactory;
 import org.eclipse.ui.IMemento;
@@ -24,12 +23,11 @@ public class EditorFactory implements IElementFactory {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	/**
-	 * TODO work around an eclipse bug by making it safe
-	 * for this method to be called multiple times.
-	 * (issues with restoring navigation history)
+	 * TODO work around an eclipse bug by making it safe for this method to be
+	 * called multiple times. (issues with restoring navigation history)
 	 */
 	@Override
-	public IAdaptable createElement(IMemento memento) {
+	public IAdaptable createElement (IMemento memento) {
 		MediaItemListEditorInput<?> input = null;
 
 		String type = memento.getString(KEY_TYPE);
@@ -42,7 +40,7 @@ public class EditorFactory implements IElementFactory {
 				input = getRemoteMmdbInput(memento);
 			}
 			else {
-				System.err.println("EditorFactory.createElement(): Unknown type: '"+type+"'.");
+				System.err.println("EditorFactory.createElement(): Unknown type: '" + type + "'.");
 				return null;
 			}
 		}
@@ -51,7 +49,7 @@ public class EditorFactory implements IElementFactory {
 		}
 
 		String topIndex = memento.getString(KEY_TOPINDEX);
-		if (topIndex != null && input!= null) {
+		if (topIndex != null && input != null) {
 			int i = Integer.parseInt(topIndex);
 			input.setTopIndex(i);
 		}
@@ -70,28 +68,27 @@ public class EditorFactory implements IElementFactory {
 		ILocalMixedMediaDb l;
 		try {
 			l = Activator.getMediaFactory().getLocalMixedMediaDb(dbFilePath, filter);
-		} catch (DbException e) {
+		}
+		catch (DbException e) {
 			throw new MorriganException(e);
 		}
-		MediaItemDbEditorInput input = new MediaItemDbEditorInput(l);
-		return input;
+		return new MediaItemDbEditorInput(l);
 	}
 
 	public static MediaItemDbEditorInput getMmdbInputBySerial (String serial) throws MorriganException {
 		ILocalMixedMediaDb l;
 		try {
 			l = Activator.getMediaFactory().getLocalMixedMediaDbBySerial(serial);
-		} catch (DbException e) {
+		}
+		catch (DbException e) {
 			throw new MorriganException(e);
 		}
-		MediaItemDbEditorInput input = new MediaItemDbEditorInput(l);
-		return input;
+		return new MediaItemDbEditorInput(l);
 	}
 
 	public static MediaItemDbEditorInput getMmdbInput (IMemento memento) throws MorriganException {
 		String serial = memento.getString(KEY_SERIAL);
-		MediaItemDbEditorInput input = getMmdbInputBySerial(serial);
-		return input;
+		return getMmdbInputBySerial(serial);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -99,26 +96,22 @@ public class EditorFactory implements IElementFactory {
 
 	public static MediaItemDbEditorInput getRemoteMmdbInput (String dbFilePath) throws MorriganException {
 		IRemoteMixedMediaDb ml = RemoteMixedMediaDbFactory.getExisting(dbFilePath);
-		MediaItemDbEditorInput input = new MediaItemDbEditorInput(ml);
-		return input;
+		return new MediaItemDbEditorInput(ml);
 	}
 
 	public static MediaItemDbEditorInput getRemoteMmdbInput (String dbFilePath, String filter) throws MorriganException {
 		IRemoteMixedMediaDb ml = RemoteMixedMediaDbFactory.getExisting(dbFilePath, filter);
-		MediaItemDbEditorInput input = new MediaItemDbEditorInput(ml);
-		return input;
+		return new MediaItemDbEditorInput(ml);
 	}
 
 	public static MediaItemDbEditorInput getRemoteMmdbInputBySerial (String serial) throws MorriganException {
 		IRemoteMixedMediaDb ml = RemoteMixedMediaDbFactory.getExistingBySerial(serial);
-		MediaItemDbEditorInput input = new MediaItemDbEditorInput(ml);
-		return input;
+		return new MediaItemDbEditorInput(ml);
 	}
 
 	public static MediaItemDbEditorInput getRemoteMmdbInput (IMemento memento) throws MorriganException {
 		String serial = memento.getString(KEY_SERIAL);
-		MediaItemDbEditorInput input = getRemoteMmdbInputBySerial(serial);
-		return input;
+		return getRemoteMmdbInputBySerial(serial);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
