@@ -37,7 +37,7 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb implements IRemoteM
 	public static final String DBKEY_CACHEDATE = "CACHEDATE";
 	public static final String DBKEY_PASS = "PASS";
 
-	public static long MAX_CACHE_AGE = 60 * 60 * 1000L; // 1 hour.
+	public static final long MAX_CACHE_AGE = 60 * 60 * 1000L; // 1 hour.
 	private long cacheDate = -1;
 
 	private TaskEventListener taskEventListener;
