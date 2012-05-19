@@ -11,5 +11,7 @@ Export-Package: com.vaguehope.morrigan.engines,
 Import-Package: com.vaguehope.morrigan.config,
  com.vaguehope.morrigan.model.exceptions,
  org.eclipse.swt.events,
- org.eclipse.swt.widgets
+ org.eclipse.swt.widgets,
+ org.osgi.framework;version="1.6.0",
+ org.osgi.util.tracker;version="1.5.0"
 Bundle-Vendor: vaguehope.com

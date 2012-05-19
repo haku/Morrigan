@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
 import org.eclipse.core.commands.common.CommandException;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -63,7 +62,6 @@ import com.vaguehope.morrigan.model.media.DirtyState;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.MediaItemListChangeListener;
-import com.vaguehope.morrigan.model.media.impl.MediaFactoryImpl;
 import com.vaguehope.morrigan.tasks.IMorriganTask;
 
 /*
@@ -71,47 +69,47 @@ import com.vaguehope.morrigan.tasks.IMorriganTask;
  */
 public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends IMediaItem> extends EditorPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	protected final Logger logger = Logger.getLogger(this.getClass().getName());
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Nested classes.
-	
+
 	private MediaItemListEditorInput<T> editorInput;
-	
+
 	TableViewer editTable = null;
 	Composite editTableComposite = null;
 	TableColumnLayout editTableCompositeTableColumnLayout = null;
-	
+
 	protected MediaFilter mediaFilter = null;
 	private ImageCache imageCache = new ImageCache();
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Abstract methods.
-	
+
 	protected abstract List<MediaColumn> getColumns ();
 	protected abstract boolean isColumnVisible (MediaColumn col);
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	EditorPart methods.
-	
+
 	@SuppressWarnings("unchecked") // TODO I wish I knew how to avoid needing this.
 	@Override
 	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
 		setSite(site);
 		setInput(input);
-		
+
 		if (input instanceof MediaItemListEditorInput<?>) {
 			this.editorInput = (MediaItemListEditorInput<T>) input;
 		} else {
 			throw new IllegalArgumentException("input is not instanceof MediaItemListEditorInput<?>.");
 		}
-		
+
 		setPartName(this.editorInput.getMediaList().getListName());
-		
+
 		makeRefreshers();
 		this.editorInput.getMediaList().addChangeEventListener(this.listChangeListener);
-		
+
 		try {
 			readInputData();
 		} catch (Exception e) {
@@ -120,7 +118,7 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 			}
 		}
 	}
-	
+
 	@Override
 	public void dispose() {
 		removePropListener();
@@ -128,38 +126,38 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 		this.imageCache.clearCache();
 		super.dispose();
 	}
-	
+
 	protected void readInputData () throws MorriganException {
 		this.editorInput.getMediaList().read();
 	}
-	
+
 	protected abstract boolean handleReadError (Exception e);
-	
+
 	@Override
 	public MediaItemListEditorInput<T> getEditorInput() {
 		return this.editorInput;
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Controls.
-	
+
 	protected final int sep = 3;
-	
+
 	abstract protected void createControls (Composite parent);
 	abstract protected List<Control> populateToolbar (Composite parent);
 	abstract protected void populateContextMenu (List<IContributionItem> menu0, List<IContributionItem> menu1);
-	
+
 	protected Label lblStatus = null;
-	
+
 	@Override
 	public void createPartControl(Composite parent) {
 		FormData formData;
-		
+
 		Composite parent2 = new Composite(parent, SWT.NONE);
 		parent2.setLayout(new FormLayout());
-		
+
 		// Create toolbar area.
-		
+
 		Composite toolbarComposite = new Composite(parent2, SWT.NONE);
 		formData = new FormData();
 		formData.top = new FormAttachment(0, 0);
@@ -167,9 +165,9 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 		formData.right = new FormAttachment(100, 0);
 		toolbarComposite.setLayoutData(formData);
 		toolbarComposite.setLayout(new FormLayout());
-		
+
 		// Create table.
-		
+
 		this.editTableComposite = new Composite(parent2, SWT.NONE); // Because of the way table column layouts work.
 		formData = new FormData();
 		formData.top = new FormAttachment(toolbarComposite, 0);
@@ -180,45 +178,45 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 		this.editTable = new TableViewer(this.editTableComposite, SWT.MULTI | SWT.V_SCROLL | SWT.FULL_SELECTION );
 		this.editTableCompositeTableColumnLayout = new TableColumnLayout();
 		this.editTableComposite.setLayout(this.editTableCompositeTableColumnLayout);
-		
+
 		// add and configure columns.
 		updateColumns();
-		
+
 		this.editTable.getTable().setLinesVisible(false);
-		
+
 		this.editTable.setContentProvider(this.contentProvider);
 		this.editTable.addDoubleClickListener(this.doubleClickListener);
 		this.editTable.getTable().addMouseListener(this.middleClickListener);
 		this.editTable.setInput(getEditorSite());
-		
+
 		this.mediaFilter = new MediaFilter();
 		this.editTable.addFilter(this.mediaFilter);
-		
+
 		getSite().setSelectionProvider(this.editTable);
-		
+
 		int topIndex = this.editorInput.getTopIndex();
 		if (topIndex > 0) {
 			this.editTable.getTable().setTopIndex(topIndex);
 		}
 		this.editorInput.setTable(this.editTable.getTable());
-		
+
 		createControls(parent2);
 		createToolbar(toolbarComposite);
 		createContextMenu(parent2);
-		
+
 		// Call update events.
 		listChanged();
-		
+
 		initPropListener();
 	}
-	
+
 	protected void updateColumns () {
 		updateColumns(getColumns());
 	}
-	
+
 	protected void updateColumns (List<MediaColumn> mediaColumns) {
 		TableColumn[] tableColumns = this.editTable.getTable().getColumns();
-		
+
 		for (TableColumn tableColumn : tableColumns) {
 			boolean b = false;
 			for (MediaColumn mCol : mediaColumns) {
@@ -228,10 +226,10 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 				}
 			}
 			if (b) continue;
-			
+
 			tableColumn.dispose();
 		}
-		
+
 		tableColumns = this.editTable.getTable().getColumns(); // Since we just changed this list.
 		for (MediaColumn mCol : mediaColumns) {
 			boolean b = false;
@@ -242,71 +240,71 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 				}
 			}
 			if (b) continue;
-			
+
 			if (isColumnVisible(mCol)) {
 				final TableViewerColumn column = new TableViewerColumn(this.editTable, SWT.NONE);
-				
+
 				this.editTableCompositeTableColumnLayout.setColumnData(column.getColumn(), mCol.getColumnLayoutData());
 				column.setLabelProvider(mCol.getCellLabelProvider());
 				if (mCol.getAlignment() > -1) {
 					column.getColumn().setAlignment(mCol.getAlignment());
 				}
-				
+
 				column.getColumn().setText(mCol.toString());
 				column.getColumn().setResizable(true);
 				column.getColumn().setMoveable(true);
-				
+
 				if (isSortable()) {
 					column.getColumn().addSelectionListener(getSelectionAdapter(this.editTable, column));
 				}
 			}
 		}
-		
+
 		this.editTable.getTable().setHeaderVisible(MediaListPref.getShowHeadersPref());
 	}
-	
+
 	protected void refreshColumns () {
 		this.editTable.getTable().getParent().layout();
 	}
-	
+
 	@Override
 	public boolean isDirty() {
 		return this.editorInput.getMediaList().getDirtyState() == DirtyState.DIRTY;
 	}
-	
+
 	private void createToolbar (Composite toolbarParent) {
 		FormData formData;
-		
+
 		List<Control> controls = populateToolbar(toolbarParent);
-		
+
 		this.lblStatus = new Label(toolbarParent, SWT.NONE);
 		formData = new FormData();
 		formData.top = new FormAttachment(50, -(this.lblStatus.computeSize(SWT.DEFAULT, SWT.DEFAULT).y)/2);
 		formData.left = new FormAttachment(0, this.sep*2);
 		formData.right = new FormAttachment(controls.get(0), -this.sep);
 		this.lblStatus.setLayoutData(formData);
-		
+
 		for (int i = 0; i < controls.size(); i++) {
 			formData = new FormData();
-			
+
 			formData.top = new FormAttachment(0, this.sep);
 			formData.bottom = new FormAttachment(100, -this.sep);
-			
+
 			if (i == controls.size() - 1) {
 				formData.right = new FormAttachment(100, -this.sep);
 			} else {
 				formData.right = new FormAttachment(controls.get(i+1), -this.sep);
 			}
-			
+
 			controls.get(i).setLayoutData(formData);
 		}
 	}
-	
+
 	private void createContextMenu (Composite parent) {
 		List<IContributionItem> menu0 = new LinkedList<IContributionItem>();
 		List<IContributionItem> menu1 = new LinkedList<IContributionItem>();
 		populateContextMenu(menu0, menu1);
-		
+
 		MenuManager contextMenuMgr = new MenuManager();
 		for (IContributionItem a : menu0) {
 			contextMenuMgr.add(a);
@@ -317,71 +315,71 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 		}
 		setTableMenu(contextMenuMgr.createContextMenu(parent));
 	}
-	
+
 	protected void setTableMenu (Menu menu) {
 		this.editTable.getTable().setMenu(menu);
 	}
-	
+
 	public void revealItem (Object element) {
 		revealItem(element, true);
 	}
-	
+
 	public void revealItem (Object element, boolean setFocus) {
 		this.editTable.setSelection(new StructuredSelection(element), true);
 		if (setFocus) this.editTable.getTable().setFocus();
 	}
-	
+
 	protected void setFilterString (String s) {
 		this.mediaFilter.setFilterString(s);
 		this.editTable.refresh();
 	}
-	
+
 	protected ImageCache getImageCache() {
 		return this.imageCache;
 	}
-	
+
 	@Override
 	public void setFocus() {
 		this.editTable.getTable().setFocus();
 	}
-	
+
 	private void initPropListener () {
 		Activator.getDefault().getPreferenceStore().addPropertyChangeListener(this.propListener);
 	}
-	
+
 	private void removePropListener () {
 		Activator.getDefault().getPreferenceStore().removePropertyChangeListener(this.propListener);
 	}
-	
+
 	private IPropertyChangeListener propListener = new IPropertyChangeListener() {
 		@Override
 		public void propertyChange(PropertyChangeEvent event) {
 			System.err.println("TODO: propertyChange="+event.getProperty());
 		}
 	};
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Providers.
-	
+
 	protected IStructuredContentProvider contentProvider = new IStructuredContentProvider() {
-		
+
 		@Override
 		public Object[] getElements(Object inputElement) {
 			return MediaItemListEditor.this.getEditorInput().getMediaList().getMediaItems().toArray();
 		}
-		
+
 		@Override
 		public void dispose() {/* UNUSED */}
 		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {/* UNUSED */}
-		
+
 	};
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Refreshing.
-	
+
 	private MediaItemListChangeListener listChangeListener = new MediaItemListChangeListener () {
-		
+
 		@Override
 		public void eventMessage(final String msg) {
 			Display.getDefault().asyncExec(new Runnable() {
@@ -391,43 +389,43 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 				}
 			});
 		}
-		
+
 		@Override
 		public void dirtyStateChanged(DirtyState oldState, DirtyState newState) {
 			MediaItemListEditor.this.listDirtyRrefresher.run();
 		}
-		
+
 		@Override
 		public void mediaListRead() {
 			MediaItemListEditor.this.listChangeRrefresher.run();
 		}
-		
+
 		@Override
 		public void mediaItemsAdded(IMediaItem... items) {
 			MediaItemListEditor.this.listChangeRrefresher.run();
 		}
-		
+
 		@Override
 		public void mediaItemsRemoved(IMediaItem... items) {
 			MediaItemListEditor.this.listChangeRrefresher.run();
 		}
-		
+
 		@Override
 		public void mediaItemsUpdated(IMediaItem... items) {
 			MediaItemListEditor.this.listChangeRrefresher.run();
 		}
-		
+
 		@Override
 		public void mediaItemsForceReadRequired (IMediaItem... items) {
 			MediaItemListEditor.this.listRequeryRefresher.run();
 		}
-		
+
 	};
-	
+
 	protected Runnable listChangeRrefresher;
 	protected Runnable listDirtyRrefresher;
 	protected Runnable listRequeryRefresher;
-	
+
 	private void makeRefreshers () {
 		this.listChangeRrefresher = new RefreshTimer(getSite().getShell().getDisplay(), 5000, new Runnable() {
 			@Override
@@ -437,7 +435,7 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 				listChanged();
 			}
 		});
-		
+
 		this.listDirtyRrefresher = new RefreshTimer(getSite().getShell().getDisplay(), 5000, new Runnable() {
 			@SuppressWarnings("synthetic-access")
 			@Override
@@ -445,7 +443,7 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 				firePropertyChange(IEditorPart.PROP_DIRTY);
 			}
 		});
-		
+
 		this.listRequeryRefresher = new RefreshTimer(getSite().getShell().getDisplay(), 5000, new Runnable() {
 			@Override
 			public void run() {
@@ -458,12 +456,12 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 			}
 		});
 	}
-	
+
 	/**
 	 * This will be called on the GUI thread.
 	 */
 	abstract protected void listChanged ();
-	
+
 	protected IDoubleClickListener doubleClickListener = new IDoubleClickListener() {
 		@Override
 		public void doubleClick(DoubleClickEvent event) {
@@ -475,12 +473,12 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 			}
 		}
 	};
-	
+
 	/**
 	 * This will be called on the GUI thread.
 	 */
 	abstract protected void middleClickEvent (MouseEvent e);
-	
+
 	protected MouseListener middleClickListener = new MouseListener() {
 		@Override
 		public void mouseUp (MouseEvent e) {
@@ -491,24 +489,24 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 		@Override public void mouseDown (MouseEvent e) { /* Unused. */ }
 		@Override public void mouseDoubleClick (MouseEvent e) { /* Unused. */ }
 	};
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Column related methods.
-	
+
 	protected MediaColumn parseMediaColumn (String humanName) {
 		for (MediaColumn o : getColumns()) {
 			if (humanName.equals(o.toString())) return o;
 		}
 		throw new IllegalArgumentException();
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Sorting.
-	
+
 	abstract protected boolean isSortable ();
-	
+
 	abstract protected void onSort (final TableViewer table, final TableViewerColumn column, int direction);
-	
+
 	protected SelectionAdapter getSelectionAdapter (final TableViewer table, final TableViewerColumn column) {
 		return new SelectionAdapter() {
 			@Override
@@ -525,7 +523,7 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 			}
 		};
 	}
-	
+
 	protected void setSortMarker (TableViewerColumn column, int swtDirection) {
 		this.editTable.getTable().setSortDirection(swtDirection);
 		if (column != null) {
@@ -537,20 +535,20 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Methods for editing editedMediaList.
-	
+
 	public T getMediaList () {
 		return this.editorInput.getMediaList();
 	}
-	
+
 	protected void removeItem (S track) throws MorriganException {
 		this.editorInput.getMediaList().removeItem(track);
 	}
-	
+
 	public S getSelectedItem () {
 		ISelection selection = this.editTable.getSelection();
-		
+
 		if (selection==null || selection.isEmpty()) return null;
-		
+
 		if (selection instanceof IStructuredSelection) {
 			IStructuredSelection iSel = (IStructuredSelection) selection;
 			Object selectedObject = iSel.getFirstElement();
@@ -562,15 +560,15 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 				}
 			}
 		}
-		
+
 		return null;
 	}
-	
+
 	public ArrayList<S> getSelectedItems () {
 		ISelection selection = this.editTable.getSelection();
-		
+
 		if (selection==null || selection.isEmpty()) return null;
-		
+
 		if (selection instanceof IStructuredSelection) {
 			IStructuredSelection iSel = (IStructuredSelection) selection;
 			ArrayList<S> ret = new ArrayList<S>();
@@ -585,13 +583,13 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 			}
 			return ret;
 		}
-		
+
 		return null;
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Menus and Actions.
-	
+
 	protected IAction removeAction = new Action("Remove") {
 		@Override
 		public void run () {
@@ -609,7 +607,7 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 			}
 		}
 	};
-	
+
 	protected IAction toggleEnabledAction = new Action("Toggle enabled") {
 		@Override
 		public void run() {
@@ -623,14 +621,14 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 			}
 		}
 	};
-	
+
 	String lastFileCopyTargetDir = null;
-	
+
 	protected IAction copyToAction = new Action("Copy to...") {
 		@Override
 		public void run () {
 			ArrayList<S> selectedTracks = getSelectedItems();
-			
+
 			DirectoryDialog dlg = new DirectoryDialog(getSite().getShell());
 			dlg.setText("Copy Files...");
 			dlg.setMessage("Select a directory to copy files to.");
@@ -638,17 +636,17 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 				dlg.setFilterPath(MediaItemListEditor.this.lastFileCopyTargetDir);
 			}
 			String dir = dlg.open();
-			
+
 			if (dir != null) {
 				MediaItemListEditor.this.lastFileCopyTargetDir = dir;
-				
-				IMorriganTask task = MediaFactoryImpl.get().getMediaFileCopyTask(getMediaList(), selectedTracks, new File(dir));
+
+				IMorriganTask task = Activator.getMediaFactory().getMediaFileCopyTask(getMediaList(), selectedTracks, new File(dir));
 				TaskJob job = new TaskJob(task);
 				job.schedule();
 			}
 		}
 	};
-	
+
 	protected IAction copyFilePath = new Action("Copy paths") {
 		@Override
 		public void run() {
@@ -662,6 +660,6 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 			ClipboardHelper.setText(sb.toString());
 		}
 	};
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

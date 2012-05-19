@@ -10,14 +10,22 @@ import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 
+import com.vaguehope.morrigan.engines.playback.PlaybackEngineFactoryTracker;
+import com.vaguehope.morrigan.model.media.MediaFactoryTracker;
 import com.vaguehope.morrigan.player.internal.PlayerRegisterImpl;
 
 public final class PlayerActivator implements BundleActivator {
 
-	protected final PlayerRegisterImpl playerRegister = new PlayerRegisterImpl();
+	protected PlayerRegisterImpl playerRegister;
+	private PlaybackEngineFactoryTracker playbackEngineFactoryTracker;
+	private MediaFactoryTracker mediaFactoryTracker;
 
 	@Override
 	public void start (BundleContext context) throws Exception {
+		this.playbackEngineFactoryTracker = new PlaybackEngineFactoryTracker(context);
+		this.mediaFactoryTracker = new MediaFactoryTracker(context);
+		this.playerRegister = new PlayerRegisterImpl(this.playbackEngineFactoryTracker, this.mediaFactoryTracker);
+
 		startPlayerContainerListener(context);
 		context.registerService(PlayerReader.class, this.playerListener, null);
 		context.registerService(PlayerRegister.class, this.playerRegister, null);
@@ -26,6 +34,8 @@ public final class PlayerActivator implements BundleActivator {
 	@Override
 	public void stop (BundleContext context) throws Exception {
 		this.playerRegister.dispose();
+		this.mediaFactoryTracker.dispose();
+		this.playbackEngineFactoryTracker.dispose();
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

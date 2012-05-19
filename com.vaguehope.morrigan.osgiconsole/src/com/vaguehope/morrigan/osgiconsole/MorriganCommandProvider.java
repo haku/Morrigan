@@ -16,14 +16,13 @@ import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
+import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaListReference;
-import com.vaguehope.morrigan.model.media.impl.MediaFactoryImpl;
 import com.vaguehope.morrigan.player.IPlayerAbstract;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlayerReader;
 import com.vaguehope.morrigan.server.AsyncActions;
-import com.vaguehope.morrigan.server.model.RemoteMixedMediaDb;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbHelper;
 import com.vaguehope.morrigan.tasks.AsyncProgressRegister;
 import com.vaguehope.morrigan.util.ErrorHelper;
@@ -33,11 +32,17 @@ public class MorriganCommandProvider implements CommandProvider {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private final PlayerReader playerReader;
+	private final MediaFactory mediaFactory;
+	private final AsyncActions asyncActions;
+	private final CliHelper cliHelper;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public MorriganCommandProvider (PlayerReader playerReader) {
+	public MorriganCommandProvider (PlayerReader playerReader, MediaFactory mediaFactory, AsyncActions asyncActions, CliHelper cliHelper) {
 		this.playerReader = playerReader;
+		this.mediaFactory = mediaFactory;
+		this.asyncActions = asyncActions;
+		this.cliHelper = cliHelper;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -120,7 +125,7 @@ public class MorriganCommandProvider implements CommandProvider {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	static private void doMedia (CommandInterpreter ci, List<String> args) {
+	private void doMedia (CommandInterpreter ci, List<String> args) {
 		if (args.size() < 1) {
 			doMediaList(ci);
 			return;
@@ -148,7 +153,7 @@ public class MorriganCommandProvider implements CommandProvider {
 
 			List<PlayItem> results = null;
 			try {
-				results = CliHelper.queryForPlayableItems(q1, q2, 10);
+				results = this.cliHelper.queryForPlayableItems(q1, q2, 10);
 			}
 			catch (MorriganException e) {
 				ci.println(ErrorHelper.getCauseTrace(e));
@@ -166,7 +171,7 @@ public class MorriganCommandProvider implements CommandProvider {
 					if (q2 != null && q2.length() > 0) {
 						// run query q2.
 						try {
-							results = CliHelper.queryForPlayableItems(q1, q2, 10);
+							results = this.cliHelper.queryForPlayableItems(q1, q2, 10);
 						}
 						catch (MorriganException e) {
 							ci.println(ErrorHelper.getCauseTrace(e));
@@ -225,16 +230,16 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 	}
 
-	static private void doMediaList (CommandInterpreter ci) {
+	private void doMediaList (CommandInterpreter ci) {
 		List<MediaListReference> items = new LinkedList<MediaListReference>();
-		items.addAll(MediaFactoryImpl.get().getAllLocalMixedMediaDbs());
+		items.addAll(this.mediaFactory.getAllLocalMixedMediaDbs());
 		items.addAll(RemoteMixedMediaDbHelper.getAllRemoteMmdb());
 		for (MediaListReference i : items) {
 			ci.println(i.getType() + " " + i.getTitle());
 		}
 	}
 
-	static private void doMediaCreate (CommandInterpreter ci, List<String> args) {
+	private void doMediaCreate (CommandInterpreter ci, List<String> args) {
 		if (args.size() >= 1) {
 			if ("remote".equals(args.get(0)) || "r".equals(args.get(0))) {
 				if (args.size() >= 3) {
@@ -259,7 +264,7 @@ public class MorriganCommandProvider implements CommandProvider {
 			else {
 				String name = args.get(0);
 				try {
-					ILocalMixedMediaDb mmdb = MediaFactoryImpl.get().createLocalMixedMediaDb(name);
+					ILocalMixedMediaDb mmdb = this.mediaFactory.createLocalMixedMediaDb(name);
 					ci.println("Created MMDB '" + mmdb.getListName() + "'.");
 				}
 				catch (MorriganException e) {
@@ -272,7 +277,7 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 	}
 
-	static private void doMediaAdd (CommandInterpreter ci, List<String> args) {
+	private void doMediaAdd (CommandInterpreter ci, List<String> args) {
 		if (args.size() < 2) {
 			ci.println("Not enough arguments.");
 			return;
@@ -289,7 +294,7 @@ public class MorriganCommandProvider implements CommandProvider {
 
 		List<PlayItem> results = null;
 		try {
-			results = CliHelper.queryForPlayableItems(q1, null, 2);
+			results = this.cliHelper.queryForPlayableItems(q1, null, 2);
 		}
 		catch (MorriganException e) {
 			ci.println(ErrorHelper.getCauseTrace(e));
@@ -311,7 +316,7 @@ public class MorriganCommandProvider implements CommandProvider {
 					return;
 				}
 			}
-			else if (list instanceof RemoteMixedMediaDb) {
+			else if (list instanceof IRemoteMixedMediaDb) {
 				ci.println("You can not edit the sources for a remote library.");
 			}
 			else {
@@ -320,7 +325,7 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 	}
 
-	static private void doMediaScan (CommandInterpreter ci, List<String> args) {
+	private void doMediaScan (CommandInterpreter ci, List<String> args) {
 		if (args.size() < 1) {
 			ci.println("No query parameter.");
 		}
@@ -328,7 +333,7 @@ public class MorriganCommandProvider implements CommandProvider {
 			String q1 = args.get(0);
 			List<PlayItem> results = null;
 			try {
-				results = CliHelper.queryForPlayableItems(q1, null, 2);
+				results = this.cliHelper.queryForPlayableItems(q1, null, 2);
 			}
 			catch (MorriganException e) {
 				ci.println(ErrorHelper.getCauseTrace(e));
@@ -341,11 +346,11 @@ public class MorriganCommandProvider implements CommandProvider {
 			else {
 				IMediaTrackList<? extends IMediaTrack> list = results.get(0).list;
 				if (list instanceof ILocalMixedMediaDb) {
-					AsyncActions.scheduleMmdbScan((ILocalMixedMediaDb) list);
+					this.asyncActions.scheduleMmdbScan((ILocalMixedMediaDb) list);
 					ci.println("Scan scheduled.  Use 'mn st' to track progress.");
 				}
-				else if (list instanceof RemoteMixedMediaDb) {
-					AsyncActions.scheduleRemoteMmdbScan((RemoteMixedMediaDb) list);
+				else if (list instanceof IRemoteMixedMediaDb) {
+					this.asyncActions.scheduleRemoteMmdbScan((IRemoteMixedMediaDb) list);
 					ci.println("Scan scheduled.  Use 'mn st' to track progress.");
 				}
 				else {
@@ -355,7 +360,7 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 	}
 
-	static private void doMediaSync (CommandInterpreter ci, List<String> args) {
+	private void doMediaSync (CommandInterpreter ci, List<String> args) {
 		if (args.size() < 2) {
 			ci.println("Must specify a remote and a local DB.");
 		}
@@ -363,8 +368,8 @@ public class MorriganCommandProvider implements CommandProvider {
 			String rq1 = args.get(0);
 			String lq1 = args.get(1);
 			try {
-				List<PlayItem> rq1Pi = CliHelper.queryForPlayableItems(rq1, null, 2);
-				List<PlayItem> lq1Pi = CliHelper.queryForPlayableItems(lq1, null, 2);
+				List<PlayItem> rq1Pi = this.cliHelper.queryForPlayableItems(rq1, null, 2);
+				List<PlayItem> lq1Pi = this.cliHelper.queryForPlayableItems(lq1, null, 2);
 				if (rq1Pi == null || rq1Pi.size() != 1) {
 					ci.println("Query '" + rq1 + "' did not return only one result.");
 				}
@@ -383,7 +388,7 @@ public class MorriganCommandProvider implements CommandProvider {
 					else {
 						IRemoteMixedMediaDb rdb = (IRemoteMixedMediaDb) rl;
 						ILocalMixedMediaDb ldb = (ILocalMixedMediaDb) ll;
-						AsyncActions.syncMetaData(ldb, rdb);
+						this.asyncActions.syncMetaData(ldb, rdb);
 						ci.println("Synchronisation scheduled.  Use 'mn st' to track progress.");
 					}
 				}
@@ -441,7 +446,7 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 	}
 
-	static private void doPlayersPlayer (CommandInterpreter ci, IPlayerAbstract player, List<String> args) {
+	private void doPlayersPlayer (CommandInterpreter ci, IPlayerAbstract player, List<String> args) {
 		if (args.size() < 1) {
 			doPlayersPlayerInfo(ci, player);
 			return;
@@ -514,7 +519,7 @@ public class MorriganCommandProvider implements CommandProvider {
 		ci.println(")");
 	}
 
-	static private void doPlayersPlayerPlay (CommandInterpreter ci, IPlayerAbstract player, List<String> args, boolean addToQueue) {
+	private void doPlayersPlayerPlay (CommandInterpreter ci, IPlayerAbstract player, List<String> args, boolean addToQueue) {
 		if (args.size() < 1) {
 			if (addToQueue) {
 				doPlayersPlayerPrintQueue(ci, player);
@@ -547,7 +552,7 @@ public class MorriganCommandProvider implements CommandProvider {
 
 			List<PlayItem> results = null;
 			try {
-				results = CliHelper.queryForPlayableItems(q1, q2, 10);
+				results = this.cliHelper.queryForPlayableItems(q1, q2, 10);
 			}
 			catch (MorriganException e) {
 				ci.println(ErrorHelper.getCauseTrace(e));

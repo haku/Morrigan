@@ -3,7 +3,7 @@ package com.vaguehope.morrigan.server;
 import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
-import com.vaguehope.morrigan.model.media.impl.MediaFactoryImpl;
+import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.tasks.AsyncProgressRegister;
 import com.vaguehope.morrigan.tasks.IMorriganTask;
 
@@ -14,8 +14,16 @@ import com.vaguehope.morrigan.tasks.IMorriganTask;
  */
 public class AsyncActions {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	static public void scheduleMmdbScan (final IMixedMediaDb mmdb) {
+
+	private final MediaFactory mediaFactory;
+
+	public AsyncActions (MediaFactory mediaFactory) {
+		this.mediaFactory = mediaFactory;
+	}
+
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	public void scheduleMmdbScan (final IMixedMediaDb mmdb) {
 		if (mmdb instanceof ILocalMixedMediaDb) {
 			ILocalMixedMediaDb lmmdb = (ILocalMixedMediaDb) mmdb;
 			scheduleMmdbScan(lmmdb);
@@ -28,9 +36,9 @@ public class AsyncActions {
 			throw new IllegalArgumentException("Unknown type: '"+mmdb.getClass().getName()+"'.");
 		}
 	}
-	
-	static public void scheduleMmdbScan (final ILocalMixedMediaDb mmdb) {
-		final IMorriganTask task = MediaFactoryImpl.get().getLocalMixedMediaDbUpdateTask(mmdb);
+
+	public void scheduleMmdbScan (final ILocalMixedMediaDb mmdb) {
+		final IMorriganTask task = this.mediaFactory.getLocalMixedMediaDbUpdateTask(mmdb);
 		if (task != null) {
 			AsyncProgressRegister.scheduleTask(task);
 		}
@@ -38,9 +46,9 @@ public class AsyncActions {
 			throw new IllegalArgumentException("Failed to get task object from factory method.");
 		}
 	}
-	
-	static public void scheduleRemoteMmdbScan (final IRemoteMixedMediaDb mmdb) {
-		final IMorriganTask task = MediaFactoryImpl.get().getRemoteMixedMediaDbUpdateTask(mmdb);
+
+	public void scheduleRemoteMmdbScan (final IRemoteMixedMediaDb mmdb) {
+		final IMorriganTask task = this.mediaFactory.getRemoteMixedMediaDbUpdateTask(mmdb);
 		if (task != null) {
 			AsyncProgressRegister.scheduleTask(task);
 		}
@@ -48,11 +56,11 @@ public class AsyncActions {
 			throw new IllegalArgumentException("Failed to get task object from factory method.");
 		}
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	static public void syncMetaData (ILocalMixedMediaDb ldb, IRemoteMixedMediaDb rdb) {
-		IMorriganTask task = MediaFactoryImpl.get().getSyncMetadataRemoteToLocalTask(ldb, rdb);
+
+	public void syncMetaData (ILocalMixedMediaDb ldb, IRemoteMixedMediaDb rdb) {
+		IMorriganTask task = this.mediaFactory.getSyncMetadataRemoteToLocalTask(ldb, rdb);
 		if (task != null) {
 			AsyncProgressRegister.scheduleTask(task);
 		}
@@ -60,6 +68,6 @@ public class AsyncActions {
 			throw new IllegalArgumentException("Failed to get task object from factory method.");
 		}
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

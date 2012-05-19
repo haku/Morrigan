@@ -20,6 +20,7 @@ import org.eclipse.jetty.webapp.WebAppContext;
 import org.osgi.framework.BundleContext;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
+import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.player.PlayerReader;
 import com.vaguehope.morrigan.wui.MorriganWui;
 
@@ -35,7 +36,7 @@ public class MorriganServer {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public MorriganServer (BundleContext context, PlayerReader playerListener) throws MorriganException {
+	public MorriganServer (BundleContext context, PlayerReader playerListener, MediaFactory mediaFactory, AsyncActions asyncActions) throws MorriganException {
 		try {
 			// Config.
 			ServerConfig config = new ServerConfig();
@@ -71,7 +72,7 @@ public class MorriganServer {
 			ServletContextHandler servletContext = new ServletContextHandler(contexts, "/", ServletContextHandler.SESSIONS);
 			servletContext.addFilter(filterHolder, "/*", (EnumSet<DispatcherType>) null);
 			servletContext.addServlet(new ServletHolder(new PlayersServlet(playerListener)), PlayersServlet.CONTEXTPATH + "/*");
-			servletContext.addServlet(new ServletHolder(new MlistsServlet(playerListener)), MlistsServlet.CONTEXTPATH + "/*");
+			servletContext.addServlet(new ServletHolder(new MlistsServlet(playerListener, mediaFactory, asyncActions)), MlistsServlet.CONTEXTPATH + "/*");
 			servletContext.addServlet(new ServletHolder(new StatusServlet()), StatusServlet.CONTEXTPATH + "/*");
 
 			// Web UI in WAR file.

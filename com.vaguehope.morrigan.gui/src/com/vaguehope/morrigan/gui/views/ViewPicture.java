@@ -8,7 +8,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicReference;
 
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -53,23 +52,22 @@ import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.IMediaPicture;
-import com.vaguehope.morrigan.model.media.impl.MediaFactoryImpl;
 
 public class ViewPicture extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	public static final String ID = "com.vaguehope.morrigan.gui.views.ViewPicture";
-	
+
 	private static final int PICTURE_CHANGE_INTERVAL = 60000;
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	@Override
 	public void createPartControl(Composite parent) {
 		createLayout(parent);
 		initSelectionListener();
 	}
-	
+
 	@Override
 	public void dispose() {
 		stopTimer();
@@ -77,46 +75,46 @@ public class ViewPicture extends ViewPart {
 		disposeGui();
 		super.dispose();
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	State.
-	
+
 	/*
 	 * Some very basic code to save / restore local MMDB.
 	 */
-	
+
 	private static final String KEY_TIMER = "TIMER";
 	private static final String KEY_DB = "DB";
 	private static final String KEY_ITEM = "ITEM";
-	
+
 	@Override
 	public void saveState(IMemento memento) {
 		super.saveState(memento);
-		
+
 		memento.putBoolean(KEY_TIMER, isTimerEnabled());
-		
+
 		if (this.editedItemDb != null && this.editedItemDb.getType().equals(ILocalMixedMediaDb.TYPE)) {
 			memento.putString(KEY_DB, this.editedItemDb.getDbPath());
 			memento.putString(KEY_ITEM, this.editedItem.getFilepath());
 		}
 	}
-	
+
 	@Override
 	public void init(IViewSite site, IMemento memento) throws PartInitException {
 		super.init(site, memento);
-		
+
 		if (memento != null) {
 			try {
 				String dbpath = memento.getString(KEY_DB);
 				String itempath = memento.getString(KEY_ITEM);
-				
+
 				if (dbpath != null && itempath != null) {
 	    			ILocalMixedMediaDb mmdb;
-	    			mmdb = MediaFactoryImpl.get().getLocalMixedMediaDb(dbpath);
+	    			mmdb = Activator.getMediaFactory().getLocalMixedMediaDb(dbpath);
 	    			mmdb.read();
 	    			IMediaPicture item = mmdb.findItemByFilePath(itempath);
-	    			
-	    			if (item != null) { 
+
+	    			if (item != null) {
 	    				setInput(mmdb, item);
 	    			}
 	    			else {
@@ -128,29 +126,29 @@ public class ViewPicture extends ViewPart {
 			catch (Exception e) {
 				new MorriganMsgDlg(e).open();
 			}
-			
+
 			Boolean b = memento.getBoolean(KEY_TIMER);
 			if (b == null || b.booleanValue()) { // Default to true.
 				startTimer();
 			}
 		}
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	External events.
-	
+
 	private void initSelectionListener () {
 		ISelectionService service = getSite().getWorkbenchWindow().getSelectionService();
 		service.addSelectionListener(this.selectionListener);
 	}
-	
+
 	private void removeSelectionListener () {
 		ISelectionService service = getSite().getWorkbenchWindow().getSelectionService();
 		service.removeSelectionListener(this.selectionListener);
 	}
-	
+
 	volatile boolean listenToSelectionListener = true;
-	
+
 	private ISelectionListener selectionListener = new ISelectionListener() {
 		@Override
 		public void selectionChanged(IWorkbenchPart part, ISelection selection) {
@@ -158,10 +156,10 @@ public class ViewPicture extends ViewPart {
 				if (selection==null || selection.isEmpty()) {
 					return;
 				}
-				
+
 				IMixedMediaItemDbEditor<?,?> editor = (IMixedMediaItemDbEditor<?,?>) part;
 				IMediaItemDb<?,? extends IMediaPicture> list = editor.getMediaList();
-				
+
 				if (selection instanceof IStructuredSelection) {
 					IStructuredSelection iSel = (IStructuredSelection) selection;
 					ArrayList<IMediaPicture> sel = new ArrayList<IMediaPicture>();
@@ -173,19 +171,19 @@ public class ViewPicture extends ViewPart {
 							}
 						}
 					}
-					
+
 					setInput(list, sel);
 				}
 			}
 		}
 	};
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Data links.
-	
+
 	IMediaItemDb<?,? extends IMediaPicture> editedItemDb = null;
 	IMediaPicture editedItem = null;
-	
+
 	public void setInput (IMediaItemDb<?,? extends IMediaPicture> editedMediaList, List<? extends IMediaPicture> selection) {
 		IMediaPicture item = null;
 		if (selection != null && selection.size() > 0) {
@@ -197,46 +195,46 @@ public class ViewPicture extends ViewPart {
 			setInput(editedMediaList, item);
 		}
 	}
-	
+
 	public void setInput (IMediaItemDb<?,? extends IMediaPicture> editedMediaList, IMediaPicture item) {
 		if (this.editedItemDb != editedMediaList || this.editedItem != item) {
 			this.editedItem = item;
-			
+
 			if (this.editedItem != null) {
 				this.editedItemDb = editedMediaList;
 			}
 			else {
 				this.editedItemDb = null;
 			}
-			
+
 			setPicture(this.editedItem);
 		}
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	GUI stuff.
-	
+
 	protected final int sep = 3;
-	
+
 	Canvas pictureCanvas = null;
 	Image pictureImage = null;
 	long pictureLastChanged = 0;
-	
+
 	private void disposeGui () {
 		if (this.pictureImage != null && !this.pictureImage.isDisposed()) {
 			this.pictureImage.dispose();
 			this.pictureImage = null;
 		}
 	}
-	
+
 	private void createLayout (Composite parent) {
 		parent.setLayout(new FillLayout());
-		
+
 		this.pictureCanvas = new Canvas(parent, SWT.NONE);
 		this.pictureCanvas.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_BLACK));
 		this.pictureCanvas.addPaintListener(this.picturePainter);
 		this.pictureCanvas.addKeyListener(this.keyListener);
-		
+
 		getViewSite().getActionBars().getToolBarManager().add(this.prevItemAction);
 		getViewSite().getActionBars().getToolBarManager().add(this.nextItemAction);
 		getViewSite().getActionBars().getToolBarManager().add(this.randomItemAction);
@@ -245,14 +243,14 @@ public class ViewPicture extends ViewPart {
 		getViewSite().getActionBars().getToolBarManager().add(this.revealItemAction);
 		getViewSite().getActionBars().getToolBarManager().add(this.showTagsAction);
 	}
-	
+
 	@Override
 	public void setFocus() {
 		if (this.pictureCanvas != null && !this.pictureCanvas.isDisposed()) {
 			this.pictureCanvas.setFocus();
 		}
 	}
-	
+
 	private KeyListener keyListener = new KeyListener() {
 		@Override
 		public void keyReleased(KeyEvent e) {
@@ -279,21 +277,21 @@ public class ViewPicture extends ViewPart {
 		@Override
 		public void keyPressed(KeyEvent e) {/* UNUSED */}
 	};
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Loading and showing pictures.
-	
+
 	class LoadPictureJob extends Job {
-		
+
 		private final IMediaPicture item;
 		private final Display display;
-		
+
 		public LoadPictureJob (Display display, IMediaPicture item) {
 			super("Loading picture");
 			this.display = display;
 			this.item = item;
 		}
-		
+
 		@Override
 		protected IStatus run(IProgressMonitor monitor) {
 			if (this.item != null ) {
@@ -309,30 +307,30 @@ public class ViewPicture extends ViewPart {
 			}
 			return Status.OK_STATUS;
 		}
-		
+
 	}
-	
+
 	class UpdatePictureJob extends UIJob {
-		
+
 		public UpdatePictureJob (Display jobDisplay) {
 			super(jobDisplay, "Update picture");
 		}
-		
+
 		@Override
 		public IStatus runInUIThread(IProgressMonitor monitor) {
 			ViewPicture.this.pictureLastChanged = System.currentTimeMillis();
-			
+
 			if (!ViewPicture.this.pictureCanvas.isDisposed()) {
 				ViewPicture.this.pictureCanvas.redraw();
 			}
 			return Status.OK_STATUS;
 		}
-		
+
 	}
-	
+
 	private void setPicture (final IMediaPicture item) {
 		if (item == null) return;
-		
+
 		if (item.isPicture()) {
 			if (ViewPicture.this.pictureImage != null && !ViewPicture.this.pictureImage.isDisposed()) {
 				ViewPicture.this.pictureImage.dispose();
@@ -345,41 +343,41 @@ public class ViewPicture extends ViewPart {
 					setContentDescription(item.getTitle() + " (" + item.getWidth() + "x" + item.getHeight() + ")");
 				}
 			});
-			
+
 			LoadPictureJob loadPictureJob = new LoadPictureJob(getSite().getShell().getDisplay(), item);
-			
+
 			/*
 			 * TODO FIXME use this to prevent two running at once!
 			 */
 //			loadPictureJob.setRule(new ISchedulingRule() {
-//				
+//
 //				@Override
 //				public boolean isConflicting(ISchedulingRule rule) {
 //					return false;
 //				}
-//				
+//
 //				@Override
 //				public boolean contains(ISchedulingRule rule) {
 //					return false;
 //				}
 //			});
-			
+
 			loadPictureJob.schedule();
 		}
 	}
-	
+
 	private PaintListener picturePainter = new PaintListener () {
 		@Override
 		public void paintControl(PaintEvent e) {
 			if (ViewPicture.this.pictureImage != null) {
 				Rectangle srcBounds = ViewPicture.this.pictureImage.getBounds();
 				Rectangle dstBounds = ViewPicture.this.pictureCanvas.getClientArea();
-				
+
 				double s1 = dstBounds.width / (double)srcBounds.width;
 				double s2 = dstBounds.height / (double)srcBounds.height;
-				
+
 				int w; int h; int l; int t;
-				
+
 				if (s1 < s2) {
 					w = (int) (srcBounds.width * s1);
 					h = (int) (srcBounds.height * s1);
@@ -388,10 +386,10 @@ public class ViewPicture extends ViewPart {
 					w = (int) (srcBounds.width * s2);
 					h = (int) (srcBounds.height * s2);
 				}
-				
+
 				l = (dstBounds.width / 2) - (w / 2);
 				t = (dstBounds.height / 2) - (h / 2);
-				
+
 				e.gc.drawImage(ViewPicture.this.pictureImage,
 						0, 0, srcBounds.width, srcBounds.height,
 						l, t, w, h
@@ -399,10 +397,10 @@ public class ViewPicture extends ViewPart {
 			}
 		}
 	};
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Control methods.
-	
+
 	protected void nextPicture (int x) {
 		if (this.editedItemDb != null && this.editedItem != null) {
 			List<? extends IMediaPicture> dbEntries = this.editedItemDb.getMediaItems();
@@ -427,10 +425,10 @@ public class ViewPicture extends ViewPart {
 			else if (dbEntries.size() > 0) {
 				res = 0;
 			}
-			
+
 			if (res >= 0) {
 				IMediaPicture entry = dbEntries.get(res);
-				
+
 				// Reveal current item in list?
 				IEditorPart activeEditor = getViewSite().getWorkbenchWindow().getActivePage().getActiveEditor();
 				if (activeEditor != null) {
@@ -445,19 +443,19 @@ public class ViewPicture extends ViewPart {
 						}
 					}
 				}
-				
+
 				setInput(this.editedItemDb, entry);
 			}
 		}
 	}
-	
+
 	protected void randomPicture () {
 		if (this.editedItemDb != null && this.editedItem != null) {
 			IMediaPicture item = getRandomItem(this.editedItemDb.getMediaItems(), this.editedItem);
 			setInput(this.editedItemDb, item);
 		}
 	}
-	
+
 	protected void revealItemInList () throws PartInitException, MorriganException {
 		if (this.editedItemDb != null && this.editedItem != null) {
 			if (this.editedItemDb.getType().equals(ILocalMixedMediaDb.TYPE)) {
@@ -476,7 +474,7 @@ public class ViewPicture extends ViewPart {
 			}
 		}
 	}
-	
+
 	protected void showTagsView () throws PartInitException {
 		if (this.editedItemDb != null && this.editedItem != null) {
 			IViewPart showView = getSite().getPage().showView(ViewTagEditor.ID);
@@ -484,13 +482,13 @@ public class ViewPicture extends ViewPart {
 			viewTagEd.setInput(this.editedItemDb, this.editedItem);
 		}
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Scheduler.
-	
+
 	private Timer timer = new Timer();
 	private AtomicReference<TimerTask> changeTimer = new AtomicReference<TimerTask>();
-	
+
 	void startTimer () {
 		ChangeTask t = new ChangeTask();
 		if (this.changeTimer.compareAndSet(null, t)) {
@@ -498,7 +496,7 @@ public class ViewPicture extends ViewPart {
 			this.enableTimerAction.setChecked(true);
 		}
 	}
-	
+
 	void stopTimer () {
 		TimerTask t = this.changeTimer.get();
 		if (t != null && this.changeTimer.compareAndSet(t, null)) {
@@ -506,17 +504,17 @@ public class ViewPicture extends ViewPart {
 			this.enableTimerAction.setChecked(false);
 		}
 	}
-	
+
 	boolean isTimerEnabled () {
 		return this.changeTimer.get() != null;
 	}
-	
+
 	private class ChangeTask extends TimerTask {
 
 		long lastChaged = 0;
-		
+
 		public ChangeTask () {/* UNUSED */}
-		
+
 		@Override
 		public void run() {
 			if (this.lastChaged != ViewPicture.this.pictureLastChanged
@@ -528,26 +526,26 @@ public class ViewPicture extends ViewPart {
 //				System.err.println("Picture change in " + (PICTURE_CHANGE_INTERVAL - (System.currentTimeMillis() - ViewPicture.this.pictureLastChanged)));
 //			}
 		}
-		
+
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Actions.
-	
+
 	protected IAction nextItemAction = new Action ("Next", Activator.getImageDescriptor("icons/next.gif")) {
 		@Override
 		public void run() {
 			nextPicture(1);
 		}
 	};
-	
+
 	protected IAction prevItemAction = new Action ("Previous", Activator.getImageDescriptor("icons/prev.gif")) {
 		@Override
 		public void run() {
 			nextPicture(-1);
 		}
 	};
-	
+
 	protected IAction revealItemAction = new Action ("Reveal", Activator.getImageDescriptor("icons/jumptolist.active.gif")) {
 		@Override
 		public void run() {
@@ -558,30 +556,30 @@ public class ViewPicture extends ViewPart {
 			}
 		}
 	};
-	
+
 	protected IAction randomItemAction = new Action ("Random", Activator.getImageDescriptor("icons/question.png")) {
 		@Override
 		public void run() {
 			randomPicture();
 		}
 	};
-	
+
 	protected class EnableTimerAction extends Action {
-		
+
 		public EnableTimerAction () {
 			super("Timer", AS_CHECK_BOX);
 			this.setImageDescriptor(Activator.getImageDescriptor("icons/timer.png"));
 		}
-		
+
 	}
-	
+
 	protected IAction enableTimerAction = new EnableTimerAction () {
 		@Override
 		public void run() {
 			if (isChecked()) startTimer(); else stopTimer();
 		}
 	};
-	
+
 	protected IAction showTagsAction = new Action("Tags", Activator.getImageDescriptor("icons/tag.png")) {
 		@Override
 		public void run () {
@@ -593,9 +591,9 @@ public class ViewPicture extends ViewPart {
 			}
 		}
 	};
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	private static IMediaPicture getRandomItem (List<? extends IMediaPicture> dbEntries, IMediaPicture current) {
 		List<IMediaPicture> list = new LinkedList<IMediaPicture>();
 		for (IMediaPicture mi : dbEntries) {
@@ -604,11 +602,11 @@ public class ViewPicture extends ViewPart {
 			}
 		}
 		if (list.size() < 1) return null;
-		
+
 		Random generator = new Random();
 		int x = Math.round(generator.nextFloat() * list.size());
 		return list.get(x);
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

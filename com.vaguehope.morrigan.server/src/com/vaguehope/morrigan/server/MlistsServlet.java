@@ -24,11 +24,11 @@ import com.vaguehope.morrigan.model.media.IMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
+import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaListReference;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagClassification;
 import com.vaguehope.morrigan.model.media.MediaTagType;
-import com.vaguehope.morrigan.model.media.impl.MediaFactoryImpl;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.LocalMixedMediaDbHelper;
 import com.vaguehope.morrigan.player.IPlayerAbstract;
 import com.vaguehope.morrigan.player.PlayItem;
@@ -85,11 +85,15 @@ public class MlistsServlet extends HttpServlet {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private final PlayerReader playerListener;
+	private final MediaFactory mediaFactory;
+	private final AsyncActions asyncActions;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public MlistsServlet (PlayerReader playerListener) {
+	public MlistsServlet (PlayerReader playerListener, MediaFactory mediaFactory, AsyncActions asyncActions) {
 		this.playerListener = playerListener;
+		this.mediaFactory = mediaFactory;
+		this.asyncActions = asyncActions;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -163,7 +167,7 @@ public class MlistsServlet extends HttpServlet {
 						IMixedMediaDb mmdb;
 						if (type.equals(ILocalMixedMediaDb.TYPE)) {
 							String f = LocalMixedMediaDbHelper.getFullPathToMmdb(pathParts[1]);
-							mmdb = MediaFactoryImpl.get().getLocalMixedMediaDb(f);
+							mmdb = this.mediaFactory.getLocalMixedMediaDb(f);
 						}
 						else if (type.equals(IRemoteMixedMediaDb.TYPE)) {
 							String f = RemoteMixedMediaDbHelper.getFullPathToMmdb(pathParts[1]);
@@ -245,7 +249,7 @@ public class MlistsServlet extends HttpServlet {
 			}
 		}
 		else if (action.equals(CMD_SCAN)) {
-			AsyncActions.scheduleMmdbScan(mmdb);
+			this.asyncActions.scheduleMmdbScan(mmdb);
 			resp.setContentType("text/plain");
 			resp.getWriter().println("Scan scheduled desu~");
 		}
@@ -311,7 +315,7 @@ public class MlistsServlet extends HttpServlet {
 
 		// TODO merge 2 loops.
 
-		for (MediaListReference listRef : MediaFactoryImpl.get().getAllLocalMixedMediaDbs()) {
+		for (MediaListReference listRef : this.mediaFactory.getAllLocalMixedMediaDbs()) {
 			dw.startElement("entry");
 			printMlistShort(dw, listRef, players);
 			dw.endElement("entry");

@@ -14,7 +14,6 @@ Import-Package: com.vaguehope.morrigan.gui.dialogs,
  com.vaguehope.morrigan.model.db,
  com.vaguehope.morrigan.model.exceptions,
  com.vaguehope.morrigan.model.media,
- com.vaguehope.morrigan.model.media.impl,
  com.vaguehope.morrigan.util,
  com.vaguehope.morrigan.util.httpclient,
  com.vaguehope.sqlitewrapper

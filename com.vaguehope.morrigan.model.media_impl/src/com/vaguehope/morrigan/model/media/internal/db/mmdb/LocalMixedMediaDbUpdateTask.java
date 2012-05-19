@@ -12,14 +12,14 @@ import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 
 import com.vaguehope.morrigan.config.Config;
-import com.vaguehope.morrigan.engines.EngineFactory;
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine;
+import com.vaguehope.morrigan.engines.playback.PlaybackEngineFactory;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.factory.RecyclingFactory2;
 import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
-import com.vaguehope.morrigan.model.media.impl.MediaFactoryImpl;
+import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.internal.TrackTagHelper;
 import com.vaguehope.morrigan.model.media.internal.db.LocalDbUpdateTask;
 import com.vaguehope.morrigan.tasks.TaskEventListener;
@@ -31,8 +31,13 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMe
 
 	public static class Factory extends RecyclingFactory2<LocalMixedMediaDbUpdateTask, ILocalMixedMediaDb, RuntimeException> {
 
-		protected Factory () {
+		private final PlaybackEngineFactory playbackEngineFactory;
+		private final MediaFactory mediaFactory;
+
+		public Factory (PlaybackEngineFactory playbackEngineFactory, MediaFactory mediaFactory) {
 			super(false);
+			this.playbackEngineFactory = playbackEngineFactory;
+			this.mediaFactory = mediaFactory;
 		}
 
 		@Override
@@ -42,22 +47,25 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMe
 
 		@Override
 		protected LocalMixedMediaDbUpdateTask makeNewProduct (ILocalMixedMediaDb material) {
-			return new LocalMixedMediaDbUpdateTask(material);
+			return new LocalMixedMediaDbUpdateTask(material, this.playbackEngineFactory, this.mediaFactory);
 		}
 
 	}
 
-	public static final Factory FACTORY = new Factory();
-
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	protected LocalMixedMediaDbUpdateTask (ILocalMixedMediaDb library) {
+	private final PlaybackEngineFactory playbackEngineFactory;
+	private final MediaFactory mediaFactory;
+
+	protected LocalMixedMediaDbUpdateTask (ILocalMixedMediaDb library, PlaybackEngineFactory playbackEngineFactory, MediaFactory mediaFactory) {
 		super(library);
+		this.playbackEngineFactory = playbackEngineFactory;
+		this.mediaFactory = mediaFactory;
 	}
 
 	@Override
 	protected ILocalMixedMediaDb getTransactional (ILocalMixedMediaDb itemList) throws DbException {
-		return MediaFactoryImpl.get().getLocalMixedMediaDbTransactional(itemList);
+		return this.mediaFactory.getLocalMixedMediaDbTransactional(itemList);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -171,7 +179,7 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMe
 		if (item.getMediaType() == MediaType.TRACK) {
 			if (this.playbackEngine == null) {
 				try {
-					this.playbackEngine = EngineFactory.makePlaybackEngine();
+					this.playbackEngine = this.playbackEngineFactory.getNewPlaybackEngine();
 				}
 				catch (Throwable e) {
 					return new OpResult("Failed to create playback engine instance.", e, true);
