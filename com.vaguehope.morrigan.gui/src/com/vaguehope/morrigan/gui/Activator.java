@@ -5,6 +5,8 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
+import com.vaguehope.morrigan.engines.hotkey.HotkeyEngineFactory;
+import com.vaguehope.morrigan.engines.hotkey.HotkeyEngineFactoryTracker;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaFactoryTracker;
 
@@ -19,6 +21,7 @@ public class Activator extends AbstractUIPlugin {
 	private static Activator plugin;
 
 	private MediaFactoryTracker mediaFactoryTracker;
+	private HotkeyEngineFactoryTracker hotkeyEngineFactoryTracker;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -30,6 +33,7 @@ public class Activator extends AbstractUIPlugin {
 	public void start(BundleContext bundleContext) throws Exception {
 		super.start(bundleContext);
 		this.mediaFactoryTracker = new MediaFactoryTracker(bundleContext);
+		this.hotkeyEngineFactoryTracker = new HotkeyEngineFactoryTracker(bundleContext);
 		Activator.plugin = this;
 		Activator.context = bundleContext;
 	}
@@ -38,6 +42,7 @@ public class Activator extends AbstractUIPlugin {
 	public void stop(BundleContext bundleContext) throws Exception {
 		Activator.context = null;
 		Activator.plugin = null;
+		this.hotkeyEngineFactoryTracker.dispose();
 		this.mediaFactoryTracker.dispose();
 		super.stop(bundleContext);
 	}
@@ -67,6 +72,10 @@ public class Activator extends AbstractUIPlugin {
 
 	public static MediaFactory getMediaFactory () {
 		return getDefault().mediaFactoryTracker;
+	}
+
+	public static HotkeyEngineFactory getHotkeyEngineFactory () {
+		return getDefault().hotkeyEngineFactoryTracker;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
