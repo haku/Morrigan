@@ -7,7 +7,7 @@ public class EngineFactory implements PlaybackEngineFactory {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	@Override
-	public IPlaybackEngine getNewPlaybackEngine() {
+	public IPlaybackEngine newPlaybackEngine() {
 		return new PlaybackEngine();
 	}
 	

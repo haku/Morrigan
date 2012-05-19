@@ -179,7 +179,7 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMe
 		if (item.getMediaType() == MediaType.TRACK) {
 			if (this.playbackEngine == null) {
 				try {
-					this.playbackEngine = this.playbackEngineFactory.getNewPlaybackEngine();
+					this.playbackEngine = this.playbackEngineFactory.newPlaybackEngine();
 				}
 				catch (Throwable e) {
 					return new OpResult("Failed to create playback engine instance.", e, true);
