@@ -6,7 +6,7 @@ import com.vaguehope.morrigan.engines.playback.PlaybackEngineFactory;
 public class EngineFactory implements PlaybackEngineFactory {
 	
 	@Override
-	public IPlaybackEngine getNewPlaybackEngine() {
+	public IPlaybackEngine newPlaybackEngine() {
 		return new PlaybackEngine();
 	}
 	

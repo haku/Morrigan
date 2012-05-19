@@ -29,13 +29,13 @@ public class PlaybackEngineFactoryTracker implements PlaybackEngineFactory {
 	}
 
 	@Override
-	public IPlaybackEngine getNewPlaybackEngine () {
+	public IPlaybackEngine newPlaybackEngine () {
 		checkAlive();
 		PlaybackEngineFactory[] services = this.playerReaderTracker.getServices(new PlaybackEngineFactory[]{});
 		if (services == null || services.length < 1) return null;
 		for (PlaybackEngineFactory service : services) {
 			try {
-				IPlaybackEngine engine = service.getNewPlaybackEngine();
+				IPlaybackEngine engine = service.newPlaybackEngine();
 				if (engine != null) return engine;
 			}
 			catch (Exception e) {

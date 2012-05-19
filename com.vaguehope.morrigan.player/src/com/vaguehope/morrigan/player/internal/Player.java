@@ -427,7 +427,7 @@ public class Player implements IPlayerLocal {
 
 	synchronized private IPlaybackEngine getPlaybackEngine (boolean create) {
 		if (this.playbackEngine == null && create) {
-			this.playbackEngine = this.playbackEngineFactory.getNewPlaybackEngine();
+			this.playbackEngine = this.playbackEngineFactory.newPlaybackEngine();
 			if (this.playbackEngine == null) throw new RuntimeException("Failed to create playback engine instance.");
 			this.playbackEngine.setStatusListener(this.playbackStatusListener);
 		}
