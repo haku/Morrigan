@@ -15,6 +15,8 @@ import com.vaguehope.morrigan.model.media.IMediaTrackList;
 public class OrderHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+	// TODO move to own class next to IPlayerAbstact that uses it.
+	// TODO add "STOP" entry to not auto-advance.
 	public static enum PlaybackOrder {
 
 		SEQUENTIAL(0) {
