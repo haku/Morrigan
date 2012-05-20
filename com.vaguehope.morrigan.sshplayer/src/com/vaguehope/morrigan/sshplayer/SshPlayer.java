@@ -1,8 +1,11 @@
 package com.vaguehope.morrigan.sshplayer;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
@@ -19,11 +22,15 @@ public class SshPlayer implements IPlayerAbstract {
 	private static final Logger LOG = Logger.getLogger(SshPlayer.class.getName());
 
 	private final int playerId;
+	private final MplayerHost host;
 
-	private PlaybackOrder _playbackOrder = PlaybackOrder.SEQUENTIAL;
+	private AtomicReference<PlaybackOrder> playbackOrder = new AtomicReference<PlaybackOrder>(PlaybackOrder.SEQUENTIAL);
+	private AtomicReference<Mplayer> mplayer = new AtomicReference<Mplayer>();
+	private AtomicReference<PlayItem> currentItem = new AtomicReference<PlayItem>();
 
-	public SshPlayer (int id) {
+	public SshPlayer (int id, MplayerHost host) {
 		this.playerId = id;
+		this.host = host;
 	}
 
 	@Override
@@ -38,7 +45,7 @@ public class SshPlayer implements IPlayerAbstract {
 
 	@Override
 	public String getName () {
-		return "My ssh player";
+		return "ssh player"; // FIXME
 	}
 
 	@Override
@@ -48,7 +55,7 @@ public class SshPlayer implements IPlayerAbstract {
 
 	@Override
 	public void loadAndStartPlaying (IMediaTrackList<? extends IMediaTrack> list) {
-		IMediaTrack nextTrack = OrderHelper.getNextTrack(list, null, this._playbackOrder);
+		IMediaTrack nextTrack = OrderHelper.getNextTrack(list, null, this.playbackOrder.get());
 		loadAndStartPlaying(list, nextTrack);
 	}
 
@@ -60,17 +67,45 @@ public class SshPlayer implements IPlayerAbstract {
 
 	@Override
 	public void loadAndStartPlaying (PlayItem item) {
-		LOG.info("TODO: load and start playing: " + item);
+		File media = new File(item.item.getFilepath());
+		if (!media.exists()) {
+			// TODO report to some status line.
+			LOG.warning("File not found: " + media.getAbsolutePath());
+			return;
+		}
+		LOG.info("Loading item: " + media.getAbsolutePath());
+
+		stopPlaying();
+		Mplayer newMp = new Mplayer(this.host, media);
+		if (!this.mplayer.compareAndSet(null, newMp)) {
+			LOG.warning("Another thread set the player.  Aborting playback of: " + item);
+			return;
+		}
+
+		newMp.start();
+		this.currentItem.set(item);
 	}
 
 	@Override
 	public void pausePlaying () {
-		LOG.info("TODO: pause");
+		Mplayer m = this.mplayer.get();
+		if (m != null) m.togglePaused();
 	}
 
 	@Override
 	public void stopPlaying () {
-		LOG.info("TODO: stop");
+		Mplayer mp = this.mplayer.getAndSet(null);
+		if (mp != null) {
+			try {
+				mp.cancel();
+			}
+			catch (InterruptedException e) {
+				LOG.log(Level.WARNING, "Interupted while waiting for playback to stop.", e);
+			}
+			finally {
+				this.currentItem.set(null);
+			}
+		}
 	}
 
 	@Override
@@ -80,42 +115,48 @@ public class SshPlayer implements IPlayerAbstract {
 
 	@Override
 	public PlayState getPlayState () {
-		return PlayState.Stopped;
+		Mplayer m = this.mplayer.get();
+		if (m == null) return PlayState.Stopped;
+		// TODO what about paused?
+		return m.isRunning() ? PlayState.Playing : PlayState.Stopped;
 	}
 
 	@Override
 	public PlayItem getCurrentItem () {
-		return null;
+		return this.currentItem.get();
 	}
 
 	@Override
 	public IMediaTrackList<? extends IMediaTrack> getCurrentList () {
-		return null;
+		PlayItem item = this.currentItem.get();
+		return item == null ? null : item.list;
 	}
 
 	@Override
 	public long getCurrentPosition () {
-		return 0;
+		Mplayer m = this.mplayer.get();
+		return m == null ? -1 : m.getCurrentPosition();
 	}
 
 	@Override
 	public int getCurrentTrackDuration () {
-		return 1;
+		Mplayer m = this.mplayer.get();
+		return m == null ? -1 : m.getDuration();
 	}
 
 	@Override
 	public void seekTo (double d) {
-		LOG.info("TODO: seek");
+		LOG.info("TODO: seek: " + d);
 	}
 
 	@Override
 	public PlaybackOrder getPlaybackOrder () {
-		return this._playbackOrder;
+		return this.playbackOrder.get();
 	}
 
 	@Override
 	public void setPlaybackOrder (PlaybackOrder order) {
-		this._playbackOrder = order;
+		this.playbackOrder.set(order);
 	}
 
 	@Override
