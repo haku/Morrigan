@@ -7,8 +7,8 @@ import com.vaguehope.morrigan.model.Register;
 
 public interface PlayerRegister extends Register<IPlayerAbstract> {
 
-	public Collection<IPlayerAbstract> getAll ();
-	public IPlayerAbstract get (int i);
-	public IPlayerLocal makeLocal (String name, IPlayerEventHandler eventHandler);
+	Collection<IPlayerAbstract> getAll ();
+	IPlayerAbstract get (int i);
+	IPlayerLocal makeLocal (String name, IPlayerEventHandler eventHandler);
 
 }
