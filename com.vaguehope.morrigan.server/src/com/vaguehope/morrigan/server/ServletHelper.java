@@ -5,24 +5,24 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
 public class ServletHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	public static void error (HttpServletResponse resp, int status, String msg) throws IOException {
 		resp.reset();
 		resp.setStatus(status);
 		resp.setContentType("text/plain");
 		resp.getWriter().println("HTTP Error "+status+": " + msg);
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	private static final int UPLOADBUFFERSIZE = 8192;
-	
+
 	public static void prepForReturnFile (String name, long length, HttpServletResponse response) {
 		response.reset();
 		response.setContentType("application/octet-stream");
@@ -34,7 +34,7 @@ public class ServletHelper {
 		response.addHeader("Pragma", "public");
 		if (length > 0) response.addHeader("Content-Length", String.valueOf(length));
 	}
-	
+
 	public static void returnFile (File file, HttpServletResponse response) throws IOException {
 		BufferedInputStream is = null;
 		try {
@@ -45,10 +45,10 @@ public class ServletHelper {
 			if (is != null) is.close();
 		}
 	}
-	
+
 	public static void returnFile (InputStream is, String name, long length, HttpServletResponse response) throws IOException {
 		prepForReturnFile(name, length, response);
-		ServletOutputStream os = null;
+		OutputStream os = null;
 		try { // FIXME this could be done better?
 			os = response.getOutputStream();
 			byte[] buffer = new byte[UPLOADBUFFERSIZE];
@@ -57,14 +57,14 @@ public class ServletHelper {
 				os.write(buffer, 0, bytesRead);
 			}
 			os.flush();
-			
+
 			response.flushBuffer();
 		}
 		finally {
 			if (os != null) os.close();
 		}
-		
+
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
