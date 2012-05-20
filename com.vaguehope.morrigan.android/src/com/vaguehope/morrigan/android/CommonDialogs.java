@@ -38,34 +38,34 @@ import com.vaguehope.morrigan.android.tasks.RunMlistItemActionTask;
 
 public class CommonDialogs {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	static public interface PlayerSelectedListener {
 		public void playerSelected (PlayerState playerState);
 	}
-	
+
 	static public void doAskWhichPlayer (final Context context, final ServerReference serverReference, final PlayerSelectedListener listener) {
 		GetPlayersTask task = new GetPlayersTask(context, serverReference, new PlayerStateListChangeListener () {
 			@Override
 			public void onPlayersChange(PlayerStateList playersState) {
 				List<? extends PlayerState> playerList = playersState.getPlayersStateList();
-				
+
 				if (playerList == null || playerList.size() < 1) {
 					Toast.makeText(context, "No players found.", Toast.LENGTH_LONG).show();
 					return;
 				}
-				
+
 				if (playerList.size() == 1) {
 					listener.playerSelected(playerList.iterator().next());
 					return;
 				}
-				
+
 				final List<? extends PlayerState> list = playerList;
 				String[] labels = new String[playerList.size()];
 				for (int i = 0; i < playerList.size(); i ++) {
 					PlayerState ps = playerList.get(i);
-					labels[i] = ps.getId() + " " + ps.getPlayState() + ": " + ps.getTitle();
+					labels[i] = ps.getId() + " " + ps.getPlayState() + ": " + ps.getTitle(); // TODO show player name.
 				}
-				
+
 				AlertDialog.Builder builder = new AlertDialog.Builder(context);
 				builder.setTitle("Select player");
 				builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -87,25 +87,25 @@ public class CommonDialogs {
 		});
 		task.execute();
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	static public void doSearchMlist (final Context context, final PlayerState playerState) {
 		doSearchMlist(context, playerState, null);
 	}
-	
+
 	static public void doSearchMlist (final Context context, final PlayerState playerState, final AtomicReference<String> defaultQuery) {
 		if (context == null) throw new IllegalArgumentException();
 		if (playerState == null) throw new IllegalArgumentException();
-		
+
 		final AlertDialog.Builder dlgBuilder = new AlertDialog.Builder(context);
 		dlgBuilder.setTitle("Query " + playerState.getListTitle());
-		
+
 		final EditText editText = new EditText(context);
 		editText.setSelectAllOnFocus(true);
 		if (defaultQuery != null && defaultQuery.get() != null) editText.setText(defaultQuery.get());
 		dlgBuilder.setView(editText);
-		
+
 		dlgBuilder.setPositiveButton("Search", new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int whichButton) {
@@ -116,17 +116,17 @@ public class CommonDialogs {
 				searchMlist(context, playerState, query);
 			}
 		});
-		
+
 		dlgBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int whichButton) {
 				dialog.cancel();
 			}
 		});
-		
+
 		dlgBuilder.show();
 	}
-	
+
 	static public void searchMlist (Context context, PlayerState playerState, String query) {
 		Intent intent = new Intent(context.getApplicationContext(), MlistActivity.class);
 		intent.putExtra(MlistActivity.SERVER_ID, playerState.getPlayerReference().getServerReference().getId());
@@ -135,15 +135,15 @@ public class CommonDialogs {
 		intent.putExtra(MlistActivity.PLAYER_ID, playerState.getPlayerReference().getPlayerId());
 		context.startActivity(intent);
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	public static void addTag (final Activity activity, final MlistReference mlistReference, final MlistItem item, final Runnable afterPost) {
 		final AlertDialog.Builder dlgBuilder = new AlertDialog.Builder(activity);
 		dlgBuilder.setTitle("Tag: " + item.getTitle());
 		final EditText editText = new EditText(activity);
 		dlgBuilder.setView(editText);
-		
+
 		dlgBuilder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int whichButton) {
@@ -154,16 +154,16 @@ public class CommonDialogs {
 				task.execute();
 			}
 		});
-		
+
 		dlgBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int whichButton) {
 				dialog.cancel();
 			}
 		});
-		
+
 		dlgBuilder.show();
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
