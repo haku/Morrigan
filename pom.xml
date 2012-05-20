@@ -8,6 +8,7 @@
 
   <properties>
     <tycho-version>0.13.0</tycho-version>
+    <junit-version>4.8.2</junit-version>
   </properties>
 
   <modules>
@@ -51,6 +52,10 @@
     <module>com.vaguehope.morrigan.server.product</module>
 
     <!-- Optional extras. -->
+    <module>com.vaguehope.morrigan.sshplayer</module>
+    <module>com.vaguehope.morrigan.sshplayer.tests</module>
+
+    <!-- Very optional extras. -->
     <module>com.vaguehope.morrigan.danbooru</module>
     <module>com.vaguehope.nemain</module>
   </modules>

@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Morrigan sshplayertests
+Bundle-SymbolicName: com.vaguehope.morrigan.sshplayer.tests
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: vaguehope.com
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Fragment-Host: com.vaguehope.morrigan.sshplayer
+Require-Bundle: org.junit4;bundle-version="4.8.1"
+Import-Package: com.jcraft.jsch;version="0.1.44",
+ com.vaguehope.morrigan.engines.playback,
+ com.vaguehope.morrigan.model,
+ com.vaguehope.morrigan.model.media,
+ com.vaguehope.morrigan.player,
+ org.osgi.framework
