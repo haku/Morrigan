@@ -12,9 +12,16 @@ import org.osgi.framework.ServiceReference;
 import com.vaguehope.morrigan.player.PlayerRegister;
 
 public class Activator implements BundleActivator {
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	private MplayerHosts hosts;
+
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
 	public void start (BundleContext context) throws Exception {
+		this.hosts = new MplayerHosts();
+		this.hosts.load();
 		startPlayerRegisterListener(context);
 	}
 
@@ -52,7 +59,9 @@ public class Activator implements BundleActivator {
 	}
 
 	protected void registerPlayers (PlayerRegister register) {
-		register.register(new SshPlayer(register.nextIndex()));
+		for (MplayerHost host : this.hosts.getHosts()) {
+			register.register(new SshPlayer(register.nextIndex(), host));
+		}
 	}
 
 }

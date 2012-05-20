@@ -11,7 +11,11 @@ import java.util.logging.Logger;
 
 public class MplayerStatusReader extends Thread {
 
+	static final String MORRIGAN_EOF = "Morrigan-EOF";
+
 	private static final String IDENT_LENGTH = "ID_LENGTH=";
+	private static final String IDENT_EXIT = "ID_EXIT=";
+
 	private static final String FIELD_VIDPOS = "V:";
 
 	private static final Logger LOG = Logger.getLogger(MplayerStatusReader.class.getName());
@@ -35,14 +39,22 @@ public class MplayerStatusReader extends Thread {
 			LOG.log(Level.WARNING, "Failed to complete copying stream.", e);
 		}
 		finally {
-			this.finished.set(true);
+			try {
+				this.source.close();
+			}
+			catch (IOException e) {
+				LOG.log(Level.WARNING, "Failed to close stream.", e);
+			}
+			finally {
+				this.finished.set(true);
+			}
 		}
 	}
 
 	private void read () throws IOException {
 		String line;
 		while ((line = this.source.readLine()) != null) {
-			procLine(line);
+			if (!procLine(line)) break;
 		}
 	}
 
@@ -58,18 +70,26 @@ public class MplayerStatusReader extends Thread {
 		return this.currentPosition.get();
 	}
 
-	/* Sample line:
-	 * A:   2.0 V:   2.0 A-V: -0.043 ct: -0.042  61/ 61 17%  7%  0.5% 0 0 96%
+	/**
+	 * return:
+	 *  true to keep going.
+	 *  false to abort.
 	 */
-	public void procLine (String s) {
-		if (s.length() < 1) return;
-//		System.out.println("s=" + s);
+	private boolean procLine (String s) {
+		if (s.length() < 1) return true;
 		if (s.startsWith(IDENT_LENGTH)) {
 			readLength(s);
+		}
+		else if (s.startsWith(IDENT_EXIT)) {
+			return false;
+		}
+		else if (s.startsWith(MORRIGAN_EOF)) {
+			return false;
 		}
 		else {
 			readStatusLine(s);
 		}
+		return true;
 	}
 
 	private void readLength (String s) {

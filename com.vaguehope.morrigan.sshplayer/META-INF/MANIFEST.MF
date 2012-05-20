@@ -8,8 +8,10 @@ Bundle-Vendor: vaguehope.com
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Import-Package: com.jcraft.jsch,
+ com.vaguehope.morrigan.config,
  com.vaguehope.morrigan.engines.playback,
  com.vaguehope.morrigan.model,
  com.vaguehope.morrigan.model.media,
  com.vaguehope.morrigan.player,
+ com.vaguehope.morrigan.util,
  org.osgi.framework
