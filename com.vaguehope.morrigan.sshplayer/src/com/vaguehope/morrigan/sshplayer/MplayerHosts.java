@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.logging.Logger;
 
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.util.PropertiesFile;
@@ -24,14 +25,23 @@ public class MplayerHosts {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+	private static final Logger LOG = Logger.getLogger(Mplayer.class.getName());
+
 	private final String filepath = Config.getConfigDir() + '/' + SERVER_PROPS;
 	private final AtomicReference<Collection<MplayerHost>> hosts = new AtomicReference<Collection<MplayerHost>>(Collections.<MplayerHost>emptyList());
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public void load () throws IOException, NotConfiguredException {
+	public void load () throws IOException {
 		List<MplayerHost> list = new ArrayList<MplayerHost>();
-		list.add(readHostFile(this.filepath));
+
+		try {
+			list.add(readHostFile(this.filepath));
+		}
+		catch (NotConfiguredException e) {
+			LOG.warning(e.getMessage());
+		}
+
 		this.hosts.set(list);
 	}
 
@@ -39,7 +49,9 @@ public class MplayerHosts {
 		return Collections.unmodifiableCollection(this.hosts.get());
 	}
 
-	public MplayerHost readHostFile (String file) throws IOException, NotConfiguredException {
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	private MplayerHost readHostFile (String file) throws IOException, NotConfiguredException {
 		PropertiesFile propFile = new PropertiesFile(file);
 		String host = propFile.getString(KEY_HOST, null);
 		String user = propFile.getString(KEY_USER, null);
