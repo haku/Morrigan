@@ -357,19 +357,13 @@ public class PlayersServlet extends HttpServlet {
 			listUrl = null;
 		}
 
-		String title;
 		PlayItem currentItem = p.getCurrentItem();
-		if (currentItem != null && currentItem.item != null) {
-			title = currentItem.item.getTitle();
-		}
-		else {
-			title = p.getName();
-		}
+		String trackTitle = (currentItem != null && currentItem.item != null) ? currentItem.item.getTitle() : "(empty)";
 
 		int queueLength = p.getQueueList().size();
 		DurationData queueDuration = p.getQueueTotalDuration();
 
-		AbstractFeed.addElement(dw, "title", "p" + p.getId() + ":" + p.getPlayState().toString() + ":" + title);
+		AbstractFeed.addElement(dw, "title", "p" + p.getId() + ":" + p.getPlayState().toString() + ":" + trackTitle);
 		String selfUrl = CONTEXTPATH + "/" + p.getId();
 		AbstractFeed.addLink(dw, selfUrl, "self", "text/xml");
 
@@ -383,7 +377,7 @@ public class PlayersServlet extends HttpServlet {
 		AbstractFeed.addElement(dw, "listtitle", listTitle);
 		AbstractFeed.addElement(dw, "listid", listId);
 		if (listUrl != null) AbstractFeed.addLink(dw, listUrl, "list", "text/xml");
-		AbstractFeed.addElement(dw, "tracktitle", title);
+		AbstractFeed.addElement(dw, "tracktitle", trackTitle);
 
 		if (detailLevel == 1) {
 			String trackLink = null;
