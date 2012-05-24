@@ -36,7 +36,7 @@ public class Mplayer extends Thread {
 		TOGGLE_PAUSED
 	}
 
-	private static final int CONNECT_TIMEOUT = 15000;
+	private static final int CONNECT_TIMEOUT = 15000; // 15 seconds.
 
 	private final MplayerHost mplayerHost;
 	private final File media;
@@ -73,7 +73,7 @@ public class Mplayer extends Thread {
 			if (this.isAlive() && Thread.currentThread().getId() != this.getId()) this.join();
 			LOG.info("Mplayer canceled: " + this.media.getAbsolutePath());
 		}
-		LOG.warning("Mplayer already canceled.");
+		LOG.warning("Mplayer already cancelled.");
 	}
 
 	public boolean isRunning () {
