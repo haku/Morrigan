@@ -45,7 +45,7 @@ public class SshPlayer implements IPlayerAbstract {
 
 	@Override
 	public String getName () {
-		return "ssh player"; // FIXME
+		return "Ssh(" + this.host.getHost() + ")";
 	}
 
 	@Override
