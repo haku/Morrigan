@@ -18,11 +18,11 @@ public class Activator implements BundleActivator {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	protected final static Logger logger = Logger.getLogger(Activator.class.getName());
+	protected static final Logger logger = Logger.getLogger(Activator.class.getName());
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	static private MediaPlayerFactory factory;
+	private static MediaPlayerFactory factory;
 
 	@Override
 	public void start (BundleContext context) throws Exception {
