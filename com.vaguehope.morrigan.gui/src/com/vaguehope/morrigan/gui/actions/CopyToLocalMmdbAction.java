@@ -12,7 +12,7 @@ import com.vaguehope.morrigan.gui.jobs.TaskJob;
 import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
-import com.vaguehope.morrigan.tasks.IMorriganTask;
+import com.vaguehope.morrigan.tasks.MorriganTask;
 
 /**
  *
@@ -41,7 +41,7 @@ public class CopyToLocalMmdbAction<T extends IMediaItem> extends Action {
 			LocalMixedMediaDbEditor toMmdbEd = (LocalMixedMediaDbEditor) toPart;
 			ILocalMixedMediaDb toMmdb = toMmdbEd.getMediaList();
 
-			IMorriganTask task = Activator.getMediaFactory().getNewCopyToLocalMmdbTask(fromList, this.fromEd.getSelectedItems(), toMmdb);
+			MorriganTask task = Activator.getMediaFactory().getNewCopyToLocalMmdbTask(fromList, this.fromEd.getSelectedItems(), toMmdb);
 			TaskJob job = new TaskJob(task);
 			job.schedule();
 		}

@@ -23,7 +23,7 @@ import com.vaguehope.morrigan.gui.jobs.TaskJob;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
-import com.vaguehope.morrigan.tasks.IMorriganTask;
+import com.vaguehope.morrigan.tasks.MorriganTask;
 import com.vaguehope.sqlitewrapper.DbException;
 
 public class RemoteMixedMediaDbEditor
@@ -96,7 +96,7 @@ public class RemoteMixedMediaDbEditor
 		}
 
 		if (getMediaList().isCacheExpired()) {
-			IMorriganTask task = Activator.getMediaFactory().getRemoteMixedMediaDbUpdateTask(getMediaList());
+			MorriganTask task = Activator.getMediaFactory().getRemoteMixedMediaDbUpdateTask(getMediaList());
 			if (task != null) {
 				TaskJob job = new TaskJob(task);
 				job.schedule(3000);
@@ -119,7 +119,7 @@ public class RemoteMixedMediaDbEditor
 		@Override
 		public void widgetSelected(SelectionEvent event) {
 			try {
-				IMorriganTask task = Activator.getMediaFactory().getRemoteMixedMediaDbUpdateTask(getMediaList());
+				MorriganTask task = Activator.getMediaFactory().getRemoteMixedMediaDbUpdateTask(getMediaList());
 				if (task != null) {
 					TaskJob job = new TaskJob(task);
 					job.schedule();

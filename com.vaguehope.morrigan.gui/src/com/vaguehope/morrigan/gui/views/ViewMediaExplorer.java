@@ -45,7 +45,7 @@ import com.vaguehope.morrigan.model.media.MediaListReference;
 import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbFactory;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbHelper;
-import com.vaguehope.morrigan.tasks.IMorriganTask;
+import com.vaguehope.morrigan.tasks.MorriganTask;
 
 public class ViewMediaExplorer extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -361,7 +361,7 @@ public class ViewMediaExplorer extends ViewPart {
 			try {
     			ILocalMixedMediaDb localDb = Activator.getMediaFactory().getLocalMixedMediaDb(this.local.getIdentifier());
     			IRemoteMixedMediaDb remoteDb = RemoteMixedMediaDbFactory.getExisting(this.remote.getIdentifier());
-    			IMorriganTask task = Activator.getMediaFactory().getSyncMetadataRemoteToLocalTask(localDb, remoteDb);
+    			MorriganTask task = Activator.getMediaFactory().getSyncMetadataRemoteToLocalTask(localDb, remoteDb);
     			TaskJob job = new TaskJob(task);
     			job.schedule();
 			}

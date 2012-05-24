@@ -37,7 +37,7 @@ public class AsyncTasksRegisterTracker implements AsyncTasksRegister {
 	}
 
 	@Override
-	public void scheduleTask (IMorriganTask task) {
+	public void scheduleTask (MorriganTask task) {
 		getService().scheduleTask(task);
 	}
 

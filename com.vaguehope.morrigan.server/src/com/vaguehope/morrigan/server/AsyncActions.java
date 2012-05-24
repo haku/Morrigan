@@ -5,7 +5,7 @@ import com.vaguehope.morrigan.model.media.IMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.tasks.AsyncTasksRegister;
-import com.vaguehope.morrigan.tasks.IMorriganTask;
+import com.vaguehope.morrigan.tasks.MorriganTask;
 
 /**
  * Set of helper functions for interacting
@@ -40,7 +40,7 @@ public class AsyncActions {
 	}
 
 	public void scheduleMmdbScan (final ILocalMixedMediaDb mmdb) {
-		final IMorriganTask task = this.mediaFactory.getLocalMixedMediaDbUpdateTask(mmdb);
+		final MorriganTask task = this.mediaFactory.getLocalMixedMediaDbUpdateTask(mmdb);
 		if (task != null) {
 			this.asyncTasksRegister.scheduleTask(task);
 		}
@@ -50,7 +50,7 @@ public class AsyncActions {
 	}
 
 	public void scheduleRemoteMmdbScan (final IRemoteMixedMediaDb mmdb) {
-		final IMorriganTask task = this.mediaFactory.getRemoteMixedMediaDbUpdateTask(mmdb);
+		final MorriganTask task = this.mediaFactory.getRemoteMixedMediaDbUpdateTask(mmdb);
 		if (task != null) {
 			this.asyncTasksRegister.scheduleTask(task);
 		}
@@ -62,7 +62,7 @@ public class AsyncActions {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	public void syncMetaData (ILocalMixedMediaDb ldb, IRemoteMixedMediaDb rdb) {
-		IMorriganTask task = this.mediaFactory.getSyncMetadataRemoteToLocalTask(ldb, rdb);
+		MorriganTask task = this.mediaFactory.getSyncMetadataRemoteToLocalTask(ldb, rdb);
 		if (task != null) {
 			this.asyncTasksRegister.scheduleTask(task);
 		}

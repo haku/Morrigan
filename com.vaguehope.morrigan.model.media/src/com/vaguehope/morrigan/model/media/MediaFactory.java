@@ -7,7 +7,7 @@ import java.util.Collection;
 import java.util.List;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.tasks.IMorriganTask;
+import com.vaguehope.morrigan.tasks.MorriganTask;
 import com.vaguehope.sqlitewrapper.DbException;
 
 
@@ -65,11 +65,11 @@ public interface MediaFactory {
 	/*
 	 * TODO merge these next two methods?
 	 */
-	IMorriganTask getLocalMixedMediaDbUpdateTask (ILocalMixedMediaDb library);
-	IMorriganTask getRemoteMixedMediaDbUpdateTask (IRemoteMixedMediaDb library);
-	<T extends IMediaItem> IMorriganTask getMediaFileCopyTask (IMediaItemList<T> mediaItemList, List<T> mediaSelection, File targetDirectory);
-	<T extends IMediaItem> IMorriganTask getNewCopyToLocalMmdbTask (IMediaItemList<T> fromList, Collection<T> itemsToCopy, ILocalMixedMediaDb toDb);
-	IMorriganTask getSyncMetadataRemoteToLocalTask (ILocalMixedMediaDb local, IRemoteMixedMediaDb remote);
+	MorriganTask getLocalMixedMediaDbUpdateTask (ILocalMixedMediaDb library);
+	MorriganTask getRemoteMixedMediaDbUpdateTask (IRemoteMixedMediaDb library);
+	<T extends IMediaItem> MorriganTask getMediaFileCopyTask (IMediaItemList<T> mediaItemList, List<T> mediaSelection, File targetDirectory);
+	<T extends IMediaItem> MorriganTask getNewCopyToLocalMmdbTask (IMediaItemList<T> fromList, Collection<T> itemsToCopy, ILocalMixedMediaDb toDb);
+	MorriganTask getSyncMetadataRemoteToLocalTask (ILocalMixedMediaDb local, IRemoteMixedMediaDb remote);
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

@@ -10,7 +10,7 @@ import com.vaguehope.morrigan.gui.jobs.TaskJob;
 import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
-import com.vaguehope.morrigan.tasks.IMorriganTask;
+import com.vaguehope.morrigan.tasks.MorriganTask;
 
 public class DbUpdateAction extends Action implements IWorkbenchAction{
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -61,7 +61,7 @@ public class DbUpdateAction extends Action implements IWorkbenchAction{
 			return;
 		}
 
-		IMorriganTask task;
+		MorriganTask task;
 
 		if (this.itemDb instanceof ILocalMixedMediaDb) {
 			ILocalMixedMediaDb lmmdb = (ILocalMixedMediaDb) this.itemDb;

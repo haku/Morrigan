@@ -62,7 +62,7 @@ import com.vaguehope.morrigan.model.media.DirtyState;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.MediaItemListChangeListener;
-import com.vaguehope.morrigan.tasks.IMorriganTask;
+import com.vaguehope.morrigan.tasks.MorriganTask;
 
 /*
  * TODO Finish extracting generic stuff from MediaTrackListEditor.
@@ -640,7 +640,7 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 			if (dir != null) {
 				MediaItemListEditor.this.lastFileCopyTargetDir = dir;
 
-				IMorriganTask task = Activator.getMediaFactory().getMediaFileCopyTask(getMediaList(), selectedTracks, new File(dir));
+				MorriganTask task = Activator.getMediaFactory().getMediaFileCopyTask(getMediaList(), selectedTracks, new File(dir));
 				TaskJob job = new TaskJob(task);
 				job.schedule();
 			}
