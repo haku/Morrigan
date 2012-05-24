@@ -374,6 +374,7 @@ public class PlayersServlet extends HttpServlet {
 		AbstractFeed.addLink(dw, selfUrl, "self", "text/xml");
 
 		AbstractFeed.addElement(dw, "playerid", p.getId());
+		AbstractFeed.addElement(dw, "playername", p.getName());
 		AbstractFeed.addElement(dw, "playstate", p.getPlayState().getN());
 		AbstractFeed.addElement(dw, "playorder", p.getPlaybackOrder().getN());
 		AbstractFeed.addElement(dw, "queuelength", queueLength);
