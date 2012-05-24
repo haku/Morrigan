@@ -22,6 +22,7 @@ import org.osgi.framework.BundleContext;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.player.PlayerReader;
+import com.vaguehope.morrigan.tasks.AsyncTasksRegister;
 import com.vaguehope.morrigan.wui.MorriganWui;
 
 public class MorriganServer {
@@ -36,7 +37,7 @@ public class MorriganServer {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public MorriganServer (BundleContext context, PlayerReader playerListener, MediaFactory mediaFactory, AsyncActions asyncActions) throws MorriganException {
+	public MorriganServer (BundleContext context, PlayerReader playerListener, MediaFactory mediaFactory, AsyncTasksRegister asyncTasksRegister, AsyncActions asyncActions) throws MorriganException {
 		try {
 			// Config.
 			ServerConfig config = new ServerConfig();
@@ -73,7 +74,7 @@ public class MorriganServer {
 			servletContext.addFilter(filterHolder, "/*", (EnumSet<DispatcherType>) null);
 			servletContext.addServlet(new ServletHolder(new PlayersServlet(playerListener)), PlayersServlet.CONTEXTPATH + "/*");
 			servletContext.addServlet(new ServletHolder(new MlistsServlet(playerListener, mediaFactory, asyncActions)), MlistsServlet.CONTEXTPATH + "/*");
-			servletContext.addServlet(new ServletHolder(new StatusServlet()), StatusServlet.CONTEXTPATH + "/*");
+			servletContext.addServlet(new ServletHolder(new StatusServlet(asyncTasksRegister)), StatusServlet.CONTEXTPATH + "/*");
 
 			// Web UI in WAR file.
 			WebAppContext warContext = WebAppHelper.getWarBundleAsContext(context, MorriganWui.ID, "/");

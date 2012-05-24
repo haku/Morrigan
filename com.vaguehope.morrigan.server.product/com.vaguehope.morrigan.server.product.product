@@ -57,6 +57,7 @@
       <plugin id="com.vaguehope.morrigan.playbackimpl.gs" autoStart="true" startLevel="0" />
       <plugin id="com.vaguehope.morrigan.playbackimpl.vlc" autoStart="true" startLevel="0" />
       <plugin id="com.vaguehope.morrigan.server.boot" autoStart="true" startLevel="0" />
+      <plugin id="com.vaguehope.morrigan.tasks" autoStart="true" startLevel="0" />
       <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="0" />
       <plugin id="org.eclipse.osgi" autoStart="true" startLevel="0" />
    </configurations>
