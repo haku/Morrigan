@@ -21,6 +21,7 @@ import com.vaguehope.morrigan.player.PlayerContainer;
 import com.vaguehope.morrigan.player.PlayerReaderTracker;
 import com.vaguehope.morrigan.server.AsyncActions;
 import com.vaguehope.morrigan.server.MorriganServer;
+import com.vaguehope.morrigan.tasks.AsyncTasksRegisterTracker;
 
 public class Activator implements BundleActivator {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -32,6 +33,7 @@ public class Activator implements BundleActivator {
 	private MorriganServer server;
 	private PlayerReaderTracker playerReaderTracker;
 	private MediaFactoryTracker mediaFactoryTracker;
+	private AsyncTasksRegisterTracker asyncTasksRegisterTracker;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -39,9 +41,10 @@ public class Activator implements BundleActivator {
 	public void start (BundleContext context) throws Exception {
 		this.playerReaderTracker = new PlayerReaderTracker(context);
 		this.mediaFactoryTracker = new MediaFactoryTracker(context);
+		this.asyncTasksRegisterTracker = new AsyncTasksRegisterTracker(context);
 
-		AsyncActions asyncActions = new AsyncActions(this.mediaFactoryTracker);
-		this.server = new MorriganServer(context, this.playerReaderTracker, this.mediaFactoryTracker, asyncActions);
+		AsyncActions asyncActions = new AsyncActions(this.asyncTasksRegisterTracker, this.mediaFactoryTracker);
+		this.server = new MorriganServer(context, this.playerReaderTracker, this.mediaFactoryTracker, this.asyncTasksRegisterTracker, asyncActions);
 		this.server.start();
 
 		context.registerService(PlayerContainer.class, this.playerContainer, null);
@@ -52,6 +55,7 @@ public class Activator implements BundleActivator {
 		this.server.stop();
 		this.mediaFactoryTracker.dispose();
 		this.playerReaderTracker.dispose();
+		this.asyncTasksRegisterTracker.dispose();
 		logger.fine("Morrigan Server stopped.");
 	}
 

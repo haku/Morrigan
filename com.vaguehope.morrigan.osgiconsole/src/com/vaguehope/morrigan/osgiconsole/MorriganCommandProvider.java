@@ -24,7 +24,7 @@ import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlayerReader;
 import com.vaguehope.morrigan.server.AsyncActions;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbHelper;
-import com.vaguehope.morrigan.tasks.AsyncProgressRegister;
+import com.vaguehope.morrigan.tasks.AsyncTasksRegister;
 import com.vaguehope.morrigan.util.ErrorHelper;
 import com.vaguehope.morrigan.util.TimeHelper;
 
@@ -33,14 +33,16 @@ public class MorriganCommandProvider implements CommandProvider {
 
 	private final PlayerReader playerReader;
 	private final MediaFactory mediaFactory;
+	private final AsyncTasksRegister asyncTasksRegister;
 	private final AsyncActions asyncActions;
 	private final CliHelper cliHelper;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public MorriganCommandProvider (PlayerReader playerReader, MediaFactory mediaFactory, AsyncActions asyncActions, CliHelper cliHelper) {
+	public MorriganCommandProvider (PlayerReader playerReader, MediaFactory mediaFactory, AsyncTasksRegister asyncTasksRegister, AsyncActions asyncActions, CliHelper cliHelper) {
 		this.playerReader = playerReader;
 		this.mediaFactory = mediaFactory;
+		this.asyncTasksRegister = asyncTasksRegister;
 		this.asyncActions = asyncActions;
 		this.cliHelper = cliHelper;
 	}
@@ -119,8 +121,8 @@ public class MorriganCommandProvider implements CommandProvider {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	static private void doStat (CommandInterpreter ci) {
-		ci.print(AsyncProgressRegister.reportSummary()); // Has own trailing new line.
+	private void doStat (CommandInterpreter ci) {
+		ci.print(this.asyncTasksRegister.reportSummary()); // Has own trailing new line.
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
