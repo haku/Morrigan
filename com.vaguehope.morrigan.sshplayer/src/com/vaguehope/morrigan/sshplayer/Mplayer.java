@@ -62,7 +62,6 @@ public class Mplayer extends Thread {
 		if (this.canceled.compareAndSet(false, true)) {
 			LOG.info("Cancelling mplayer: " + this.media.getAbsolutePath());
 			if (this.isAlive() && Thread.currentThread().getId() != this.getId()) this.join();
-			LOG.info("Mplayer canceled: " + this.media.getAbsolutePath());
 		}
 		LOG.warning("Mplayer already cancelled.");
 	}
