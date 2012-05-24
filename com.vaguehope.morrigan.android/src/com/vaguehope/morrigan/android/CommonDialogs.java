@@ -63,7 +63,7 @@ public class CommonDialogs {
 				String[] labels = new String[playerList.size()];
 				for (int i = 0; i < playerList.size(); i ++) {
 					PlayerState ps = playerList.get(i);
-					labels[i] = ps.getId() + " " + ps.getPlayState() + ": " + ps.getTitle(); // TODO show player name.
+					labels[i] = ps.getName() + ": " + ps.getPlayState() + " " + ps.getTrackTitle();
 				}
 
 				AlertDialog.Builder builder = new AlertDialog.Builder(context);

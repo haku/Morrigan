@@ -66,34 +66,34 @@ import com.vaguehope.morrigan.android.tasks.SetPlaystateTask.TargetPlayState;
 
 public class PlayerActivity extends Activity implements PlayerStateChangeListener, PlayerQueueChangeListener {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	public static final String SERVER_ID = "serverId"; // int.
 	public static final String PLAYER_ID = "playerId"; // int.
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	ConfigDb configDb;
 	protected ServerReference serverReference = null;
 	protected PlayerReference playerReference = null;
 	protected PlayerState currentState;
 	protected ArtifactListAdaptor<PlayerQueue> queueListAdaptor;
 	protected MlistReference mlistReference = null;
-	
+
 	private AtomicReference<String> lastQuery = new AtomicReference<String>();
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Activity methods.
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		this.configDb = new ConfigDb(this);
-		
+
 		Bundle extras = getIntent().getExtras();
 		int serverId = extras.getInt(SERVER_ID, -1);
 		int playerId = extras.getInt(PLAYER_ID, -1);
-		
+
 		if (serverId >= 0 && playerId >= 0) {
 			this.serverReference = this.configDb.getServer(serverId);
 			this.playerReference = new PlayerReferenceImpl(this.serverReference, playerId);
@@ -101,37 +101,37 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 		else {
 			finish();
 		}
-		
+
 		this.setTitle(this.playerReference.getTitle());
-		
+
 		// TODO check return value.
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-		
+
 		setContentView(R.layout.player);
 		wireGui();
 	}
-	
+
 	@Override
 	protected void onStart() {
 		super.onStart();
-		
+
 		refresh();
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Buttons.
-	
+
 	private void wireGui () {
 		this.queueListAdaptor = new ArtifactListAdaptorImpl<PlayerQueue>(this, R.layout.mlistitemlistrow);
 		ListView lstQueue = (ListView) findViewById(R.id.lstQueue);
 		lstQueue.setAdapter(this.queueListAdaptor);
 		lstQueue.setOnItemClickListener(this.contextMenuItemCickListener);
 		lstQueue.setOnCreateContextMenuListener(this.queueContextMenuListener);
-		
+
 		View tagRow = findViewById(R.id.tagRow);
 		tagRow.setOnClickListener(this.contextMenuClickListener);
 		tagRow.setOnCreateContextMenuListener(this.tagRowContextMenuListener);
-		
+
 		findViewById(R.id.btnPlaypause).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -157,19 +157,19 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 			}
 		});
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Context menus.
-	
+
 	private static final int MENU_CTX_ADDTAG = 7;
 	private static final int MENU_CTX_TAG = 8;
-	
+
 	private static final int MENU_CTX_MOVETOP = 2;
 	private static final int MENU_CTX_MOVEUP = 3;
 	private static final int MENU_CTX_REMOVE = 4;
 	private static final int MENU_CTX_MOVEDOWN = 5;
 	private static final int MENU_CTX_MOVEBOTTOM = 6;
-	
+
 	@Override
 	public boolean onContextItemSelected(MenuItem menuItem) {
 		switch (menuItem.getItemId()) {
@@ -177,7 +177,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 			case MENU_CTX_TAG:
 				onTagRowContextMenu(menuItem);
 				return true;
-			
+
 			case MENU_CTX_MOVETOP:
 			case MENU_CTX_MOVEUP:
 			case MENU_CTX_REMOVE:
@@ -185,29 +185,29 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 			case MENU_CTX_MOVEBOTTOM:
 				onQueueContextMenu(menuItem);
 				return true;
-			
+
 			default:
 				return super.onContextItemSelected(menuItem);
 		}
 	}
-	
+
 	private OnClickListener contextMenuClickListener = new OnClickListener() {
 		@Override
 		public void onClick (View v) {
 			openContextMenu(v);
 		}
 	};
-	
+
 	private OnItemClickListener contextMenuItemCickListener = new OnItemClickListener() {
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 			openContextMenu(view);
 		}
 	};
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Tag stuff.
-	
+
 	private OnCreateContextMenuListener tagRowContextMenuListener = new OnCreateContextMenuListener () {
 		@Override
 		public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
@@ -226,7 +226,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 			}
 		}
 	};
-	
+
 	private void onTagRowContextMenu (MenuItem menuItem) {
 		if (menuItem.getItemId() == MENU_CTX_ADDTAG) {
 			addTag();
@@ -235,7 +235,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 			CommonDialogs.searchMlist(this, this.currentState, menuItem.getTitle().toString());
 		}
 	}
-	
+
 	private void addTag () {
 		if (this.currentState != null) {
 			if (this.currentState.getItem() != null && this.currentState.getItem().getRelativeUrl() != null) { // TODO figure out why item is not null.
@@ -254,10 +254,10 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 			Toast.makeText(this, "No player selected desu~", Toast.LENGTH_SHORT).show();
 		}
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Queue events.
-	
+
 	private OnCreateContextMenuListener queueContextMenuListener = new OnCreateContextMenuListener () {
 		@Override
 		public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
@@ -271,11 +271,11 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 			menu.add(Menu.NONE, MENU_CTX_MOVEBOTTOM, Menu.NONE, "Move bottom");
 		}
 	};
-	
+
 	private void onQueueContextMenu (MenuItem menuItem) {
 		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuItem.getMenuInfo();
 		Artifact item = PlayerActivity.this.queueListAdaptor.getInputData().getArtifactList().get(info.position);
-		
+
 		QueueItemAction action;
 		if (menuItem.getItemId() == MENU_CTX_MOVEUP) action = QueueItemAction.UP;
 		else if (menuItem.getItemId() == MENU_CTX_MOVEDOWN) action = QueueItemAction.DOWN;
@@ -283,19 +283,19 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 		else if (menuItem.getItemId() == MENU_CTX_MOVEBOTTOM) action = QueueItemAction.BOTTOM;
 		else if (menuItem.getItemId() == MENU_CTX_REMOVE) action = QueueItemAction.REMOVE;
 		else throw new IllegalStateException();
-		
+
 		GetPlayerQueueTask queueTask = new GetPlayerQueueTask(this, this.playerReference, this, action, item);
 		queueTask.execute();
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Menu items.
-	
+
 	private static final int MENU_FULLSCREEN = 2;
 	private static final int MENU_DOWNLOAD = 3;
 	private static final int MENU_CLEARQUEUE = 4;
 	private static final int MENU_SHUFFLEQUEUE = 5;
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		boolean result = super.onCreateOptionsMenu(menu);
@@ -305,47 +305,47 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 		menu.add(0, MENU_SHUFFLEQUEUE, 0, R.string.menu_queue_shuffle);
 		return result;
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-			
+
 			case MENU_FULLSCREEN:
 				fullscreen();
 				return true;
-			
+
 			case MENU_DOWNLOAD:
 				downloadCurrentItem();
 				return true;
-			
+
 			case MENU_CLEARQUEUE:
 				new GetPlayerQueueTask(this, this.playerReference, this, QueueAction.CLEAR).execute();
 				return true;
-				
+
 			case MENU_SHUFFLEQUEUE:
 				new GetPlayerQueueTask(this, this.playerReference, this, QueueAction.SHUFFLE).execute();
 				return true;
 		}
-		
+
 		return super.onOptionsItemSelected(item);
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Commands - to be called on the UI thread.
-	
+
 	protected void refresh () {
 		new SetPlaystateTask(this, this.playerReference, this).execute();
 		new GetPlayerQueueTask(this, this.playerReference, this).execute();
 	}
-	
+
 	protected void playpause () {
 		new SetPlaystateTask(this, this.playerReference, TargetPlayState.PLAYPAUSE, this).execute();
 	}
-	
+
 	protected void next () {
 		new SetPlaystateTask(this, this.playerReference, TargetPlayState.NEXT, this).execute();
 	}
-	
+
 	protected void search () {
 		if (this.currentState != null) {
 			if (this.currentState.getListUrl() != null) {
@@ -359,7 +359,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 			Toast.makeText(this, "No player selected desu~", Toast.LENGTH_SHORT).show();
 		}
 	}
-	
+
 	protected void fullscreen () {
 		if (this.currentState != null) {
 			Map<Integer, String> monitors = this.currentState.getMonitors();
@@ -368,7 +368,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 				list.add(monitor.getKey() + ":" + monitor.getValue());
 			}
 			final String[] labels = list.toArray(new String[list.size()]);
-			
+
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setTitle("Full-screen");
 			builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -391,7 +391,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 			Toast.makeText(this, "Not available.", Toast.LENGTH_SHORT).show();
 		}
 	}
-	
+
 	protected void downloadCurrentItem () {
 		MlistItem item = this.currentState.getItem();
 		if (item != null && this.mlistReference != null) {
@@ -401,25 +401,29 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 			Toast.makeText(this, "No item to download desu~", Toast.LENGTH_SHORT).show();
 		}
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	UI updating.
-	
+
 	@Override
 	public void onPlayerStateChange(PlayerState newState) {
 		this.currentState = newState;
-		
+
 		if (newState == null) {
 			finish(); // TODO show a msg here? Retry / Fail dlg?
 		}
 		else {
+			if (newState.getName() != null && newState.getName().length() > 0) {
+				this.setTitle(this.playerReference.getTitle() + ": " + newState.getName());
+			}
+
 			if (newState.getListUrl() != null) {
 				this.mlistReference = new MlistReferenceImpl(newState.getListUrl(), this.serverReference);
 			}
 			else {
 				this.mlistReference = null;
 			}
-			
+
 			TextView txtTitle = (TextView) findViewById(R.id.txtTitle);
 			if (newState.getTrackDuration() > 0) {
 				txtTitle.setText(
@@ -431,7 +435,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 			else {
 				txtTitle.setText(newState.getTrackTitle());
 			}
-			
+
 			TextView txtTags = (TextView) findViewById(R.id.txtTags);
 			String[] tagArr = newState.getTrackTags();
 			if (tagArr != null && tagArr.length > 0) {
@@ -440,7 +444,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 			else {
 				txtTags.setText("(click to add tags)");
 			}
-			
+
 			TextView txtQueue = (TextView) findViewById(R.id.txtQueue);
 			if (newState.getQueueDuration() > 0) {
 				txtQueue.setText(newState.getQueueLength() + " items, "+TimeHelper.formatTimeSeconds(newState.getQueueDuration())+".");
@@ -448,12 +452,12 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 			else {
 				txtQueue.setText(newState.getQueueLength() + " items.");
 			}
-			
+
 			ImageView imgPlaystate = (ImageView) findViewById(R.id.imgPlaystate);
 			imgPlaystate.setImageResource(newState.getImageResource());
 		}
 	}
-	
+
 	@Override
 	public void onPlayerQueueChange(PlayerQueue newQueue) {
 		if (newQueue == null) {
@@ -463,6 +467,6 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
     		this.queueListAdaptor.setInputData(newQueue);
 		}
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

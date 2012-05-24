@@ -27,7 +27,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
@@ -44,15 +43,15 @@ import com.vaguehope.morrigan.android.model.ServerReference;
 
 public class PlayerStateListImpl implements PlayerStateList, ContentHandler {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	private final List<PlayerState> playerStateList = new LinkedList<PlayerState>();
 	private final ServerReference serverReference;
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	public PlayerStateListImpl (InputStream dataIs, ServerReference serverReference) throws SAXException {
 		this.serverReference = serverReference;
-		
+
 		SAXParserFactory spf = SAXParserFactory.newInstance();
         SAXParser sp;
 		try {
@@ -70,29 +69,29 @@ public class PlayerStateListImpl implements PlayerStateList, ContentHandler {
 			throw new SAXException(e);
 		}
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	@Override
 	public List<PlayerState> getPlayersStateList() {
 		return Collections.unmodifiableList(this.playerStateList);
 	}
-	
+
 	@Override
 	public List<? extends Artifact> getArtifactList() {
 		return Collections.unmodifiableList(this.playerStateList);
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	private final Stack<String> stack = new Stack<String>();
 	private StringBuilder currentText;
 	private PlayerStateBasicImpl currentItem;
-	
+
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 		this.stack.push(localName);
-		
+
 		if (this.stack.size() == 2 && localName.equals("entry")) {
 			this.currentItem = new PlayerStateBasicImpl();
 		}
@@ -106,13 +105,13 @@ public class PlayerStateListImpl implements PlayerStateList, ContentHandler {
 				}
 			}
 		}
-		
+
 		// If we need a new StringBuilder, make one.
 		if (this.currentText == null || this.currentText.length() > 0) {
 			this.currentText = new StringBuilder();
 		}
 	}
-	
+
 	@Override
 	public void endElement(String uri, String localName, String qName) throws SAXException {
 		if (this.stack.size() == 2 && localName.equals("entry")) {
@@ -123,6 +122,9 @@ public class PlayerStateListImpl implements PlayerStateList, ContentHandler {
 			int v = Integer.parseInt(this.currentText.toString());
 			this.currentItem.setId(v);
 			this.currentItem.setPlayerReference(new PlayerReferenceImpl(this.serverReference, v));
+		}
+		else if (this.stack.size() == 3 && localName.equals(PlayerStateXmlImpl.PLAYERNAME)) {
+			this.currentItem.setName(this.currentText.toString());
 		}
 		else if (this.stack.size() == 3 && localName.equals(PlayerStateXmlImpl.PLAYSTATE)) {
 			int v = Integer.parseInt(this.currentText.toString());
@@ -159,17 +161,17 @@ public class PlayerStateListImpl implements PlayerStateList, ContentHandler {
 			int v = Integer.parseInt(this.currentText.toString());
 			this.currentItem.setTrackDuration(v);
 		}
-		
+
 		this.stack.pop();
 	}
-	
+
 	@Override
 	public void characters(char[] ch, int start, int length) throws SAXException {
         this.currentText.append( ch, start, length );
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	@Override
 	public void endDocument() throws SAXException { /* UNUSED */ }
 	@Override
@@ -186,18 +188,18 @@ public class PlayerStateListImpl implements PlayerStateList, ContentHandler {
 	public void startDocument() throws SAXException { /* UNUSED */ }
 	@Override
 	public void startPrefixMapping(String prefix, String uri) throws SAXException { /* UNUSED */ }
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	@Override
 	public String getSortKey() {
 		return "1";
 	}
-	
+
 	@Override
 	public int compareTo(ArtifactList another) {
 		return this.getSortKey().compareTo(another.getSortKey());
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
