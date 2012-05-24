@@ -9,7 +9,11 @@ import java.io.OutputStream;
 
 import javax.servlet.http.HttpServletResponse;
 
-public class ServletHelper {
+public final class ServletHelper {
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	private ServletHelper () {}
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	public static void error (HttpServletResponse resp, int status, String msg) throws IOException {
