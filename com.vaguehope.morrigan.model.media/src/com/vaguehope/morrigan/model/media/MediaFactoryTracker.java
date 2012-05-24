@@ -12,7 +12,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.util.tracker.ServiceTracker;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.tasks.IMorriganTask;
+import com.vaguehope.morrigan.tasks.MorriganTask;
 import com.vaguehope.sqlitewrapper.DbException;
 
 public class MediaFactoryTracker implements MediaFactory {
@@ -109,27 +109,27 @@ public class MediaFactoryTracker implements MediaFactory {
 	}
 
 	@Override
-	public IMorriganTask getLocalMixedMediaDbUpdateTask (ILocalMixedMediaDb library) {
+	public MorriganTask getLocalMixedMediaDbUpdateTask (ILocalMixedMediaDb library) {
 		return getService().getLocalMixedMediaDbUpdateTask(library);
 	}
 
 	@Override
-	public IMorriganTask getRemoteMixedMediaDbUpdateTask (IRemoteMixedMediaDb library) {
+	public MorriganTask getRemoteMixedMediaDbUpdateTask (IRemoteMixedMediaDb library) {
 		return getService().getRemoteMixedMediaDbUpdateTask(library);
 	}
 
 	@Override
-	public <T extends IMediaItem> IMorriganTask getMediaFileCopyTask (IMediaItemList<T> mediaItemList, List<T> mediaSelection, File targetDirectory) {
+	public <T extends IMediaItem> MorriganTask getMediaFileCopyTask (IMediaItemList<T> mediaItemList, List<T> mediaSelection, File targetDirectory) {
 		return getService().getMediaFileCopyTask(mediaItemList, mediaSelection, targetDirectory);
 	}
 
 	@Override
-	public <T extends IMediaItem> IMorriganTask getNewCopyToLocalMmdbTask (IMediaItemList<T> fromList, Collection<T> itemsToCopy, ILocalMixedMediaDb toDb) {
+	public <T extends IMediaItem> MorriganTask getNewCopyToLocalMmdbTask (IMediaItemList<T> fromList, Collection<T> itemsToCopy, ILocalMixedMediaDb toDb) {
 		return getService().getNewCopyToLocalMmdbTask(fromList, itemsToCopy, toDb);
 	}
 
 	@Override
-	public IMorriganTask getSyncMetadataRemoteToLocalTask (ILocalMixedMediaDb local, IRemoteMixedMediaDb remote) {
+	public MorriganTask getSyncMetadataRemoteToLocalTask (ILocalMixedMediaDb local, IRemoteMixedMediaDb remote) {
 		return getService().getSyncMetadataRemoteToLocalTask(local, remote);
 	}
 

@@ -12,13 +12,13 @@ import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagClassification;
-import com.vaguehope.morrigan.tasks.IMorriganTask;
+import com.vaguehope.morrigan.tasks.MorriganTask;
 import com.vaguehope.morrigan.tasks.TaskEventListener;
 import com.vaguehope.morrigan.tasks.TaskResult;
 import com.vaguehope.morrigan.tasks.TaskResult.TaskOutcome;
 import com.vaguehope.sqlitewrapper.DbException;
 
-public class SyncMetadataRemoteToLocalTask implements IMorriganTask {
+public class SyncMetadataRemoteToLocalTask implements MorriganTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private final ILocalMixedMediaDb local;

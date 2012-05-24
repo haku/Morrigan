@@ -24,7 +24,7 @@ public class AsyncTasksRegisterImpl implements AsyncTasksRegister {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	public void scheduleTask (final IMorriganTask task) {
+	public void scheduleTask (final MorriganTask task) {
 		final AsyncTaskEventListener taskEventListener = makeTrackedListener();
 		Runnable runnable = new Runnable() {
 			@Override

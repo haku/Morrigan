@@ -27,7 +27,7 @@ import com.vaguehope.morrigan.model.media.internal.db.mmdb.LocalMixedMediaDbHelp
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.LocalMixedMediaDbUpdateTask;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.RemoteMixedMediaDbUpdateTask;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.SyncMetadataRemoteToLocalTask;
-import com.vaguehope.morrigan.tasks.IMorriganTask;
+import com.vaguehope.morrigan.tasks.MorriganTask;
 import com.vaguehope.sqlitewrapper.DbException;
 
 public class MediaFactoryImpl implements MediaFactory {
@@ -113,27 +113,27 @@ public class MediaFactoryImpl implements MediaFactory {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	public IMorriganTask getLocalMixedMediaDbUpdateTask (ILocalMixedMediaDb library) {
+	public MorriganTask getLocalMixedMediaDbUpdateTask (ILocalMixedMediaDb library) {
 		return this.localMixedMediaDbUpdateTaskFactory.manufacture(library);
 	}
 
 	@Override
-	public IMorriganTask getRemoteMixedMediaDbUpdateTask (IRemoteMixedMediaDb library) {
+	public MorriganTask getRemoteMixedMediaDbUpdateTask (IRemoteMixedMediaDb library) {
 		return RemoteMixedMediaDbUpdateTask.FACTORY.manufacture(library);
 	}
 
 	@Override
-	public <T extends IMediaItem> IMorriganTask getMediaFileCopyTask (IMediaItemList<T> mediaItemList, List<T> mediaSelection, File targetDirectory) {
+	public <T extends IMediaItem> MorriganTask getMediaFileCopyTask (IMediaItemList<T> mediaItemList, List<T> mediaSelection, File targetDirectory) {
 		return new MediaFileCopyTask<T>(mediaItemList, mediaSelection, targetDirectory);
 	}
 
 	@Override
-	public <T extends IMediaItem> IMorriganTask getNewCopyToLocalMmdbTask (IMediaItemList<T> fromList, Collection<T> itemsToCopy, ILocalMixedMediaDb toDb) {
+	public <T extends IMediaItem> MorriganTask getNewCopyToLocalMmdbTask (IMediaItemList<T> fromList, Collection<T> itemsToCopy, ILocalMixedMediaDb toDb) {
 		return new CopyToLocalMmdbTask<T>(fromList, itemsToCopy, toDb);
 	}
 
 	@Override
-	public IMorriganTask getSyncMetadataRemoteToLocalTask (ILocalMixedMediaDb local, IRemoteMixedMediaDb remote) {
+	public MorriganTask getSyncMetadataRemoteToLocalTask (ILocalMixedMediaDb local, IRemoteMixedMediaDb remote) {
 		// TODO FIXME use a factory to prevent duplicates.
 		return new SyncMetadataRemoteToLocalTask(local, remote, this);
 	}

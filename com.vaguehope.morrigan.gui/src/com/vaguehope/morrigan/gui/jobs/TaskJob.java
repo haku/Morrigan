@@ -8,16 +8,16 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.swt.widgets.Display;
 
 import com.vaguehope.morrigan.gui.dialogs.RunnableDialog;
-import com.vaguehope.morrigan.tasks.IMorriganTask;
+import com.vaguehope.morrigan.tasks.MorriganTask;
 import com.vaguehope.morrigan.tasks.TaskResult;
 import com.vaguehope.morrigan.tasks.TaskResult.TaskOutcome;
 
 public class TaskJob extends Job {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	private final IMorriganTask task;
+	private final MorriganTask task;
 	
-	public TaskJob (IMorriganTask task) {
+	public TaskJob (MorriganTask task) {
 		super(task.getTitle());
 		this.task = task;
 		setUser(true);

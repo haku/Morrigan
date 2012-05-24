@@ -9,7 +9,7 @@ import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
-import com.vaguehope.morrigan.tasks.IMorriganTask;
+import com.vaguehope.morrigan.tasks.MorriganTask;
 import com.vaguehope.morrigan.tasks.TaskEventListener;
 import com.vaguehope.morrigan.tasks.TaskResult;
 import com.vaguehope.morrigan.tasks.TaskResult.TaskOutcome;
@@ -20,7 +20,7 @@ import com.vaguehope.morrigan.util.ChecksumHelper;
  * 
  * @param <T> the type of the source list.
  */
-public class CopyToLocalMmdbTask<T extends IMediaItem> implements IMorriganTask {
+public class CopyToLocalMmdbTask<T extends IMediaItem> implements MorriganTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private final IMediaItemList<T> fromList;
