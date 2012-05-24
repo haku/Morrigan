@@ -45,45 +45,47 @@ import com.vaguehope.morrigan.android.model.PlayerState;
 
 public class PlayerStateXmlImpl implements PlayerState, MlistItem, ContentHandler {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	public static final String PLAYERID = "playerid";
+	public static final String PLAYERNAME = "playername";
 	public static final String PLAYORDER = "playorder";
 	public static final String PLAYSTATE = "playstate";
 	public static final String PLAYPOSITION = "playposition";
-	
+
 	public static final String TRACKLINKNAME = "track"; // Name of link rel attribute.
 	public static final String TRACKTITLE = "tracktitle";
 	public static final String TRACKFILE = "trackfile";
 	public static final String TRACKFILENAME = "trackfilename";
 	public static final String TRACKDURATION = "trackduration";
-	
+
 	public static final String TRACKHASHCODE = "trackhash";
 	public static final String TRACKENABLED = "trackenabled";
 	public static final String TRACKMISSING = "trackmissing";
-	
+
 	public static final String TRACKSTARTCOUNT = "trackstartcount";
 	public static final String TRACKENDCOUNT = "trackendcount";
 	public static final String TRACKTAG = "tracktag";
-	
+
 	public static final String LISTID = "listid";
 //	public static final String LISTURL = "list"; // Because its a link.
 	public static final String LISTTITLE = "listtitle";
-	
+
 	public static final String QUEUEDURATION = "queueduration";
 	public static final String QUEUELENGTH = "queuelength";
-	
+
 	public static final String MONITOR = "monitor";
 	private static final String MANUAL_TAG = "0";
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	private final PlayerReference playerReference;
-	
+
 	private int playerId;
+	private String playerName;
 	private int playerOrder;
 	private PlayState playerState;
 	private int playerPosition;
-	
+
 	private String trackRelativeUrl;
 	private String trackTitle;
 	private String trackFile;
@@ -95,22 +97,22 @@ public class PlayerStateXmlImpl implements PlayerState, MlistItem, ContentHandle
 	private int trackStartCount;
 	private int trackEndCount;
 	private List<String> trackTags;
-	
+
 	private String listId;
 	private String listUrl;
 	private String listTitle;
-	
+
 	private int queueLength;
 	private long queueDuration;
-	
+
 	Map<Integer, String> monitors;
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	public PlayerStateXmlImpl (InputStream dataIs, PlayerReference playerReference) throws SAXException {
 		this.playerReference = playerReference;
 		this.monitors = new LinkedHashMap<Integer, String>();
-		
+
 		SAXParserFactory spf = SAXParserFactory.newInstance();
 		SAXParser sp;
 		try {
@@ -128,202 +130,207 @@ public class PlayerStateXmlImpl implements PlayerState, MlistItem, ContentHandle
 			throw new SAXException(e);
 		}
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	@Override
-	public PlayerReference getPlayerReference() {
+	public PlayerReference getPlayerReference () {
 		return this.playerReference;
 	}
-	
+
 	@Override
-	public String getTitle() {
+	public String getTitle () {
 		return getTrackTitle();
 	}
-	
+
 	@Override
-	public int getImageResource() {
+	public int getImageResource () {
 		return PlayerStateBasicImpl.getImageResource(getPlayState());
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	@Override
-	public int getId() {
+	public int getId () {
 		return this.playerId;
 	}
-	
+
 	@Override
-	public PlayState getPlayState() {
+	public String getName () {
+		return this.playerName;
+	}
+
+	@Override
+	public PlayState getPlayState () {
 		return this.playerState;
 	}
-	
+
 	@Override
-	public int getPlayOrder() {
+	public int getPlayOrder () {
 		return this.playerOrder;
 	}
-	
+
 	@Override
-	public int getPlayerPosition() {
+	public int getPlayerPosition () {
 		return this.playerPosition;
 	}
-	
+
 	@Override
-	public String getListTitle() {
+	public String getListTitle () {
 		return this.listTitle;
 	}
-	
+
 	@Override
-	public String getListId() {
+	public String getListId () {
 		return this.listId;
 	}
-	
+
 	@Override
-	public String getListUrl() {
+	public String getListUrl () {
 		return this.listUrl;
 	}
-	
+
 	@Override
 	public String getTrackRelativeUrl () {
 		return this.trackRelativeUrl;
 	}
-	
+
 	@Override
-	public String getTrackTitle() {
+	public String getTrackTitle () {
 		return this.trackTitle;
 	}
-	
+
 	@Override
-	public String getTrackFile() {
+	public String getTrackFile () {
 		return this.trackFile;
 	}
-	
+
 	@Override
-	public String getTrackFileName() {
+	public String getTrackFileName () {
 		return this.trackFileName;
 	}
-	
+
 	@Override
-	public int getTrackDuration() {
+	public int getTrackDuration () {
 		return this.trackDuration;
 	}
-	
+
 	@Override
 	public BigInteger getTrackHashCode () {
 		return this.trackHashCode;
 	}
-	
+
 	@Override
-	public boolean getTrackEnabled() {
+	public boolean getTrackEnabled () {
 		return this.trackEnabled;
 	}
-	
+
 	@Override
-	public boolean getTrackMissing() {
+	public boolean getTrackMissing () {
 		return this.trackMissing;
 	}
-	
+
 	@Override
 	public int getTrackStartCount () {
 		return this.trackStartCount;
 	}
-	
+
 	@Override
 	public int getTrackEndCount () {
 		return this.trackEndCount;
 	}
-	
+
 	@Override
 	public String[] getTrackTags () {
 		return this.trackTags == null ? null : this.trackTags.toArray(new String[this.trackTags.size()]);
 	}
-	
+
 	@Override
 	public MlistItem getItem () {
 		return this;
 	}
-	
+
 	@Override
-	public int getQueueLength() {
+	public int getQueueLength () {
 		return this.queueLength;
 	}
-	
+
 	@Override
-	public long getQueueDuration() {
+	public long getQueueDuration () {
 		return this.queueDuration;
 	}
-	
+
 	@Override
-	public Map<Integer, String> getMonitors() {
+	public Map<Integer, String> getMonitors () {
 		return Collections.unmodifiableMap(this.monitors);
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	MlistItem methods.
-	
+
 	@Override
 	public int getType () {
 		return -1;
 	}
-	
+
 	@Override
 	public String getRelativeUrl () {
 		return getTrackRelativeUrl();
 	}
-	
+
 	@Override
 	public String getFileName () {
 		return getTrackFileName();
 	}
-	
+
 	@Override
 	public BigInteger getHashCode () {
 		return getTrackHashCode();
 	}
-	
+
 	@Override
-	public boolean isEnabled() {
+	public boolean isEnabled () {
 		return getTrackEnabled();
 	}
-	
+
 	@Override
-	public boolean isMissing() {
+	public boolean isMissing () {
 		return getTrackMissing();
 	}
-	
+
 	@Override
 	public int getDuration () {
 		return getTrackDuration();
 	}
-	
+
 	@Override
 	public int getStartCount () {
 		return getTrackStartCount();
 	}
-	
+
 	@Override
 	public int getEndCount () {
 		return getTrackEndCount();
 	}
-	
+
 	@Override
 	public String[] getTags () {
 		return getTrackTags();
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	private static final Map<String, String> EMPTY_MAP = Collections.unmodifiableMap(new HashMap<String, String>());
-	
+
 	private final Stack<String> stack = new Stack<String>();
-	private final Stack<Map<String, String>> currentAttributes = new Stack<Map<String,String>>();
+	private final Stack<Map<String, String>> currentAttributes = new Stack<Map<String, String>>();
 	private StringBuilder currentText;
-	
+
 	@Override
-	public void startElement(String uri, String localName, String qName, Attributes attr) throws SAXException {
+	public void startElement (String uri, String localName, String qName, Attributes attr) throws SAXException {
 		this.stack.push(localName);
 		Map<String, String> atMap = EMPTY_MAP;
-		
+
 		if (this.stack.size() == 2 && localName.equals("link")) {
 			String relVal = attr.getValue("rel");
 			if (relVal != null && relVal.equals("list")) {
@@ -341,24 +348,28 @@ public class PlayerStateXmlImpl implements PlayerState, MlistItem, ContentHandle
 		}
 		else if (attr.getLength() > 0 && this.stack.size() == 2 && localName.equals(TRACKTAG)) {
 			atMap = new HashMap<String, String>();
-			for (int i = 0; i < attr.getLength(); i++) atMap.put(attr.getLocalName(i), attr.getValue(i));
+			for (int i = 0; i < attr.getLength(); i++)
+				atMap.put(attr.getLocalName(i), attr.getValue(i));
 		}
-		
+
 		// If we need a new StringBuilder, make one.
 		if (this.currentText == null || this.currentText.length() > 0) {
 			this.currentText = new StringBuilder();
 		}
 		this.currentAttributes.push(atMap);
 	}
-	
+
 	@Override
-	public void endElement(String uri, String localName, String qName) throws SAXException {
+	public void endElement (String uri, String localName, String qName) throws SAXException {
 		Map<String, String> attr = this.currentAttributes.pop();
-		
+
 		if (this.stack.size() == 2) {
 			if (localName.equals(PLAYERID)) {
 				int v = Integer.parseInt(this.currentText.toString());
 				this.playerId = v;
+			}
+			else if (localName.equals(PLAYERNAME)) {
+				this.playerName = this.currentText.toString();
 			}
 			else if (localName.equals(PLAYORDER)) {
 				int v = Integer.parseInt(this.currentText.toString());
@@ -434,34 +445,40 @@ public class PlayerStateXmlImpl implements PlayerState, MlistItem, ContentHandle
 				this.monitors.put(id, desString);
 			}
 		}
-		
+
 		this.stack.pop();
 	}
-	
+
 	@Override
-	public void characters(char[] ch, int start, int length) throws SAXException {
-		this.currentText.append( ch, start, length );
+	public void characters (char[] ch, int start, int length) throws SAXException {
+		this.currentText.append(ch, start, length);
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	@Override
-	public void endDocument() throws SAXException { /* UNUSED */ }
+	public void endDocument () throws SAXException { /* UNUSED */}
+
 	@Override
-	public void endPrefixMapping(String prefix) throws SAXException { /* UNUSED */ }
+	public void endPrefixMapping (String prefix) throws SAXException { /* UNUSED */}
+
 	@Override
-	public void ignorableWhitespace(char[] ch, int start, int length) throws SAXException { /* UNUSED */ }
+	public void ignorableWhitespace (char[] ch, int start, int length) throws SAXException { /* UNUSED */}
+
 	@Override
-	public void processingInstruction(String target, String data) throws SAXException { /* UNUSED */ }
+	public void processingInstruction (String target, String data) throws SAXException { /* UNUSED */}
+
 	@Override
-	public void setDocumentLocator(Locator locator) { /* UNUSED */ }
+	public void setDocumentLocator (Locator locator) { /* UNUSED */}
+
 	@Override
-	public void skippedEntity(String name) throws SAXException { /* UNUSED */ }
+	public void skippedEntity (String name) throws SAXException { /* UNUSED */}
+
 	@Override
-	public void startDocument() throws SAXException { /* UNUSED */ }
+	public void startDocument () throws SAXException { /* UNUSED */}
+
 	@Override
-	public void startPrefixMapping(String prefix, String uri) throws SAXException { /* UNUSED */ }
-	
+	public void startPrefixMapping (String prefix, String uri) throws SAXException { /* UNUSED */}
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
-	

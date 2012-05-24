@@ -21,23 +21,25 @@ import java.util.Map;
 
 public interface PlayerState extends Artifact {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	public PlayerReference getPlayerReference ();
-	
+
 	/**
 	 * Get the player id.
 	 */
 	@Override
 	public int getId ();
-	
+
+	public String getName();
+
 	public PlayState getPlayState ();
 	public int getPlayOrder (); // TODO replace with enum.
 	public int getPlayerPosition ();
-	
+
 	public String getListTitle ();
 	public String getListId ();
 	public String getListUrl ();
-	
+
 	public String getTrackRelativeUrl ();
 	public String getTrackTitle ();
 	public String getTrackFile ();
@@ -49,13 +51,13 @@ public interface PlayerState extends Artifact {
 	public int getTrackStartCount ();
 	public int getTrackEndCount ();
 	public String[] getTrackTags ();
-	
+
 	public MlistItem getItem ();
-	
+
 	public int getQueueLength ();
 	public long getQueueDuration ();
-	
+
 	public Map<Integer, String> getMonitors ();
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -	
+
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

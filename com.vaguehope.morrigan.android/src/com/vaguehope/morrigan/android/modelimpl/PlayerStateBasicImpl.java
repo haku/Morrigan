@@ -26,18 +26,18 @@ import com.vaguehope.morrigan.android.model.PlayerReference;
 import com.vaguehope.morrigan.android.model.PlayerState;
 import com.vaguehope.morrigan.android.model.ServerReference;
 
-
 public class PlayerStateBasicImpl implements PlayerState, PlayerReference, MlistItem {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	private int playerId;
+	private String playerName;
 	private String baseUrl;
 	private PlayerReference playerReference;
-	
+
 	private PlayState playState;
 	private int playOrder;
 	private int playerPosition;
-	
+
 	private String trackRelativeUrl;
 	private String trackTitle;
 	private String trackFile;
@@ -48,287 +48,327 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference, Mlist
 	private boolean trackMissing;
 	private int trackStartCount;
 	private int trackEndCount;
-	
+
 	private String listTitle;
 	private String listId;
 	private String listUrl;
-	
+
 	private int queueLength;
 	private long queueDuration;
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	@Override
-	public String getTitle() {
-		return getTrackTitle();
+	public String getTitle () {
+		String ret = getName();
+		String title = getTrackTitle();
+		if (title != null && title.length() > 0) {
+			ret = ret + ": " + title;
+		}
+		return ret;
 	}
-	
+
 	@Override
-	public int getImageResource() {
+	public int getImageResource () {
 		return getImageResource(getPlayState());
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	public void setPlayerReference(PlayerReference playerReference) {
+
+	public void setPlayerReference (PlayerReference playerReference) {
 		this.playerReference = playerReference;
 	}
+
 	@Override
-	public PlayerReference getPlayerReference() {
+	public PlayerReference getPlayerReference () {
 		return this.playerReference;
 	}
-	
+
 	@Override
-	public int getPlayerId() {
+	public int getPlayerId () {
 		return this.playerId;
 	}
-	
+
 	@Override
-	public ServerReference getServerReference() {
+	public String getName () {
+		return this.playerName;
+	}
+
+	public void setName (String name) {
+		this.playerName = name;
+	}
+
+	@Override
+	public ServerReference getServerReference () {
 		return this.playerReference.getServerReference();
 	}
-	public void setBaseUrl(String baseUrl) {
+
+	public void setBaseUrl (String baseUrl) {
 		this.baseUrl = baseUrl;
 	}
-	
+
 	@Override
-	public String getBaseUrl() {
+	public String getBaseUrl () {
 		return this.baseUrl;
 	}
-	
+
 	@Override
-	public int getId() {
+	public int getId () {
 		return this.playerId;
 	}
-	public void setId(int id) {
+
+	public void setId (int id) {
 		this.playerId = id;
 	}
-	
+
 	@Override
-	public PlayState getPlayState() {
+	public PlayState getPlayState () {
 		return this.playState;
 	}
-	public void setPlayState(PlayState playState) {
+
+	public void setPlayState (PlayState playState) {
 		this.playState = playState;
 	}
 
 	@Override
-	public int getPlayOrder() {
+	public int getPlayOrder () {
 		return this.playOrder;
 	}
-	public void setPlayOrder(int playOrder) {
+
+	public void setPlayOrder (int playOrder) {
 		this.playOrder = playOrder;
 	}
 
 	@Override
-	public int getPlayerPosition() {
+	public int getPlayerPosition () {
 		return this.playerPosition;
 	}
-	public void setPlayerPosition(int playerPosition) {
+
+	public void setPlayerPosition (int playerPosition) {
 		this.playerPosition = playerPosition;
 	}
-	
+
 	@Override
 	public String getTrackRelativeUrl () {
 		return this.trackRelativeUrl;
 	}
+
 	public void setTrackRelativeUrl (String trackRelativeUrl) {
 		this.trackRelativeUrl = trackRelativeUrl;
 	}
-	
+
 	@Override
-	public String getTrackTitle() {
+	public String getTrackTitle () {
 		return this.trackTitle;
 	}
-	public void setTrackTitle(String trackTitle) {
+
+	public void setTrackTitle (String trackTitle) {
 		this.trackTitle = trackTitle;
 	}
 
 	@Override
-	public String getTrackFile() {
+	public String getTrackFile () {
 		return this.trackFile;
 	}
-	public void setTrackFile(String trackFile) {
+
+	public void setTrackFile (String trackFile) {
 		this.trackFile = trackFile;
 	}
-	
+
 	@Override
 	public String getTrackFileName () {
 		return this.trackFileName;
 	}
+
 	public void setTrackFileName (String trackFileName) {
 		this.trackFileName = trackFileName;
 	}
-	
+
 	@Override
-	public int getTrackDuration() {
+	public int getTrackDuration () {
 		return this.trackDuration;
 	}
-	public void setTrackDuration(int trackDuration) {
+
+	public void setTrackDuration (int trackDuration) {
 		this.trackDuration = trackDuration;
 	}
-	
+
 	@Override
 	public BigInteger getTrackHashCode () {
 		return this.trackHashCode;
 	}
+
 	public void setTrackHashCode (BigInteger trackHashCode) {
 		this.trackHashCode = trackHashCode;
 	}
-	
+
 	@Override
-	public boolean getTrackEnabled() {
+	public boolean getTrackEnabled () {
 		return this.trackEnabled;
 	}
-	public void setTrackEnabled(boolean trackEnabled) {
+
+	public void setTrackEnabled (boolean trackEnabled) {
 		this.trackEnabled = trackEnabled;
 	}
-	
+
 	@Override
-	public boolean getTrackMissing() {
+	public boolean getTrackMissing () {
 		return this.trackMissing;
 	}
-	public void setTrackMissing(boolean trackMissing) {
+
+	public void setTrackMissing (boolean trackMissing) {
 		this.trackMissing = trackMissing;
 	}
-	
+
 	@Override
 	public int getTrackStartCount () {
 		return this.trackStartCount;
 	}
+
 	public void setTrackStartCount (int trackStartCount) {
 		this.trackStartCount = trackStartCount;
 	}
-	
+
 	@Override
 	public int getTrackEndCount () {
 		return this.trackEndCount;
 	}
+
 	public void setTrackEndCount (int trackEndCount) {
 		this.trackEndCount = trackEndCount;
 	}
-	
+
 	@Override
 	public String[] getTrackTags () {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("Not implemented.");
 	}
-	
+
 	@Override
-	public String getListTitle() {
+	public String getListTitle () {
 		return this.listTitle;
 	}
-	public void setListTitle(String listTitle) {
+
+	public void setListTitle (String listTitle) {
 		this.listTitle = listTitle;
 	}
 
 	@Override
-	public String getListId() {
+	public String getListId () {
 		return this.listId;
 	}
-	public void setListId(String listId) {
+
+	public void setListId (String listId) {
 		this.listId = listId;
 	}
 
 	@Override
-	public String getListUrl() {
+	public String getListUrl () {
 		return this.listUrl;
 	}
-	public void setListUrl(String listUrl) {
+
+	public void setListUrl (String listUrl) {
 		this.listUrl = listUrl;
 	}
-	
+
 	@Override
 	public MlistItem getItem () {
 		return this;
 	}
-	
+
 	@Override
-	public int getQueueLength() {
+	public int getQueueLength () {
 		return this.queueLength;
 	}
-	public void setQueueLength(int queueLength) {
+
+	public void setQueueLength (int queueLength) {
 		this.queueLength = queueLength;
 	}
-	
+
 	@Override
-	public long getQueueDuration() {
+	public long getQueueDuration () {
 		return this.queueDuration;
 	}
+
 	public void setQueueDuration (long queueDuration) {
 		this.queueDuration = queueDuration;
 	}
-	
+
 	@Override
-	public Map<Integer, String> getMonitors() {
+	public Map<Integer, String> getMonitors () {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("Not implemented.");
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	MlistItem methods.
-	
+
 	@Override
 	public int getType () {
 		return -1;
 	}
-	
+
 	@Override
 	public String getRelativeUrl () {
 		return getTrackRelativeUrl();
 	}
-	
+
 	@Override
 	public String getFileName () {
 		return getTrackFileName();
 	}
-	
+
 	@Override
 	public BigInteger getHashCode () {
 		return getTrackHashCode();
 	}
-	
+
 	@Override
-	public boolean isEnabled() {
+	public boolean isEnabled () {
 		return getTrackEnabled();
 	}
-	
+
 	@Override
-	public boolean isMissing() {
+	public boolean isMissing () {
 		return getTrackMissing();
 	}
-	
+
 	@Override
 	public int getDuration () {
 		return getTrackDuration();
 	}
-	
+
 	@Override
 	public int getStartCount () {
 		return getTrackStartCount();
 	}
-	
+
 	@Override
 	public int getEndCount () {
 		return getTrackEndCount();
 	}
-	
+
 	@Override
 	public String[] getTags () {
 		return null;
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	static public int getImageResource (PlayState playState) {
 		switch (playState) {
-			case STOPPED: return R.drawable.stop;
-			case PLAYING: return R.drawable.play;
-			case PAUSED:  return R.drawable.pause;
-			case LOADING: return R.drawable.db; // TODO find better icon.
-			default: throw new IllegalArgumentException();
+			case STOPPED:
+				return R.drawable.stop;
+			case PLAYING:
+				return R.drawable.play;
+			case PAUSED:
+				return R.drawable.pause;
+			case LOADING:
+				return R.drawable.db; // TODO find better icon.
+			default:
+				throw new IllegalArgumentException();
 		}
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
