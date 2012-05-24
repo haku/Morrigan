@@ -153,7 +153,7 @@ public class Mplayer extends Thread {
 		StringBuilder s = new StringBuilder("cd"); // Start in home directory.
 		s.append(" ; export DISPLAY=:0");
 		s.append(" ; if [[ ! -e .mnmpcmd ]] ; then mkfifo .mnmpcmd ; fi");
-		s.append(" ; mplayer -input file=.mnmpcmd -cache 131072 -identify -fs 'http://localhost:34400/")
+		s.append(" ; mplayer -input file=.mnmpcmd -cache 32768 -cache-min 50 -identify -fs 'http://localhost:34400/")
 				.append(genericFileName(this.media)).append("'");
 		s.append(" ; echo ").append(MplayerStatusReader.MORRIGAN_EOF);
 		return s.toString();
