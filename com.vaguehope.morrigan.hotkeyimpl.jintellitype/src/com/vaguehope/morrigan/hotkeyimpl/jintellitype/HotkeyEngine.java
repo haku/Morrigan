@@ -67,7 +67,7 @@ public class HotkeyEngine implements IHotkeyEngine {
 	}
 	
 	@Override
-	public void finalise() {
+	public void dispose() {
 		teardown();
 		JIntellitype.getInstance().cleanUp();
 	}
