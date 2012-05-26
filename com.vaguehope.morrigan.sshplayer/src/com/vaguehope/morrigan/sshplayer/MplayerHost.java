@@ -8,16 +8,22 @@ public class MplayerHost {
 
 	protected static final Logger LOG = Logger.getLogger(MplayerHost.class.getName());
 
+	private final String name;
 	private final String host;
 	private final int port;
 	private final String user;
 	private final String pass;
 
-	public MplayerHost (String host, int port, String user, String pass) {
+	public MplayerHost (String name, String host, int port, String user, String pass) {
+		this.name = name;
 		this.host = host;
 		this.port = port;
 		this.user = user;
 		this.pass = pass;
+	}
+
+	public String getName () {
+		return this.name;
 	}
 
 	public String getHost () {
