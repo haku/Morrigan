@@ -11,20 +11,20 @@ import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 
-import com.vaguehope.morrigan.player.IPlayerAbstract;
+import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayerRegister;
 
 public class Activator implements BundleActivator {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private MplayerHosts hosts;
-	private Queue<IPlayerAbstract> players;
+	private Queue<Player> players;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
 	public void start (BundleContext context) throws Exception {
-		this.players = new LinkedList<IPlayerAbstract>();
+		this.players = new LinkedList<Player>();
 		this.hosts = new MplayerHosts();
 		this.hosts.load();
 		startPlayerRegisterListener(context);
@@ -74,7 +74,7 @@ public class Activator implements BundleActivator {
 	}
 
 	public void disposePlayers () {
-		IPlayerAbstract p;
+		Player p;
 		while ((p = this.players.poll()) != null) {
 			p.dispose();
 		}

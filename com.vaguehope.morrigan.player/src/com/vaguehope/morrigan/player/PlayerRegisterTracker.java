@@ -48,23 +48,23 @@ public class PlayerRegisterTracker implements PlayerRegister {
 	}
 
 	@Override
-	public void register (IPlayerAbstract target) {
+	public void register (Player target) {
 		getService().register(target);
 	}
 
 	@Override
-	public void unregister (IPlayerAbstract target) {
+	public void unregister (Player target) {
 		getService().unregister(target);
 	}
 
 	@Override
-	public Collection<IPlayerAbstract> getAll () {
+	public Collection<Player> getAll () {
 		PlayerRegister service = getServiceOptional();
-		return (service == null) ? Collections.<IPlayerAbstract>emptyList() : service.getAll();
+		return (service == null) ? Collections.<Player>emptyList() : service.getAll();
 	}
 
 	@Override
-	public IPlayerAbstract get (int i) {
+	public Player get (int i) {
 		PlayerRegister service = getServiceOptional();
 		return (service == null) ? null : service.get(i);
 	}

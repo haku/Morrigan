@@ -6,8 +6,8 @@ public interface PlayerContainer {
 
 	IPlayerEventHandler getEventHandler ();
 
-	void setPlayer (IPlayerAbstract player);
+	void setPlayer (Player player);
 
-	IPlayerAbstract getPlayer ();
+	Player getPlayer ();
 
 }

@@ -30,7 +30,7 @@ import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagClassification;
 import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.LocalMixedMediaDbHelper;
-import com.vaguehope.morrigan.player.IPlayerAbstract;
+import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlayerReader;
 import com.vaguehope.morrigan.server.feedwriters.AbstractFeed;
@@ -232,7 +232,7 @@ public class MlistsServlet extends HttpServlet {
 
 	private void postToMmdb (HttpServletRequest req, HttpServletResponse resp, String action, IMixedMediaDb mmdb) throws IOException {
 		if (action.equals(CMD_PLAY) || action.equals(CMD_QUEUE)) {
-			IPlayerAbstract player = parsePlayer(req, resp);
+			Player player = parsePlayer(req, resp);
 			if (player != null) { // parsePlayer() will write the error msg.
 				resp.setContentType("text/plain");
 				if (action.equals(CMD_PLAY)) {
@@ -260,7 +260,7 @@ public class MlistsServlet extends HttpServlet {
 
 	private void postToMmdbItem (HttpServletRequest req, HttpServletResponse resp, String action, IMixedMediaDb mmdb, IMixedMediaItem item) throws IOException, MorriganException {
 		if (action.equals(CMD_PLAY) || action.equals(CMD_QUEUE)) {
-			IPlayerAbstract player = parsePlayer(req, resp);
+			Player player = parsePlayer(req, resp);
 			if (player != null) { // parsePlayer() will write the error msg.
 				resp.setContentType("text/plain");
 				if (action.equals(CMD_PLAY)) {
@@ -292,7 +292,7 @@ public class MlistsServlet extends HttpServlet {
 		}
 	}
 
-	private IPlayerAbstract parsePlayer (HttpServletRequest req, HttpServletResponse resp) throws IOException {
+	private Player parsePlayer (HttpServletRequest req, HttpServletResponse resp) throws IOException {
 		String playerIdS = req.getParameter("playerid");
 		if (playerIdS == null) {
 			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "HTTP error 400 'playerId' parameter not set desu~");
@@ -311,7 +311,7 @@ public class MlistsServlet extends HttpServlet {
 		AbstractFeed.addElement(dw, "title", "Morrigan media lists desu~");
 		AbstractFeed.addLink(dw, CONTEXTPATH, "self", "text/xml");
 
-		Collection<IPlayerAbstract> players = this.playerListener.getPlayers();
+		Collection<Player> players = this.playerListener.getPlayers();
 
 		// TODO merge 2 loops.
 
@@ -379,7 +379,7 @@ public class MlistsServlet extends HttpServlet {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	static private void printMlistShort (DataWriter dw, MediaListReference listRef, Collection<IPlayerAbstract> players) throws SAXException {
+	static private void printMlistShort (DataWriter dw, MediaListReference listRef, Collection<Player> players) throws SAXException {
 		String fileName = listRef.getIdentifier().substring(listRef.getIdentifier().lastIndexOf(File.separator) + 1);
 
 		AbstractFeed.addElement(dw, "title", listRef.getTitle());
@@ -397,7 +397,7 @@ public class MlistsServlet extends HttpServlet {
 		}
 		AbstractFeed.addLink(dw, CONTEXTPATH + "/" + type + "/" + fileName, "self", "text/xml");
 
-		for (IPlayerAbstract p : players) {
+		for (Player p : players) {
 			AbstractFeed.addLink(dw, "/player/" + p.getId() + "/play/" + fileName, "play", "cmd");
 		}
 	}

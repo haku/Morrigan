@@ -13,7 +13,7 @@ import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
 import com.vaguehope.morrigan.model.media.MediaFactoryTracker;
-import com.vaguehope.morrigan.player.IPlayerAbstract;
+import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.IPlayerEventHandler;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayItem;
@@ -63,7 +63,7 @@ public class Activator implements BundleActivator {
 
 	private final PlayerContainer playerContainer = new PlayerContainer() {
 
-		private IPlayerAbstract player;
+		private Player player;
 
 		@Override
 		public String getName () {
@@ -76,13 +76,13 @@ public class Activator implements BundleActivator {
 		}
 
 		@Override
-		public void setPlayer (IPlayerAbstract player) {
+		public void setPlayer (Player player) {
 			this.player = player;
 			player.setPlaybackOrder(PlaybackOrder.RANDOM);
 		}
 
 		@Override
-		public IPlayerAbstract getPlayer () {
+		public Player getPlayer () {
 			return this.player;
 		}
 
@@ -136,7 +136,7 @@ public class Activator implements BundleActivator {
 	private AtomicReference<PlayState> prevPlayState = new AtomicReference<PlayState>();
 
 	protected void outputStatus () {
-		IPlayerAbstract p = this.playerContainer.getPlayer();
+		Player p = this.playerContainer.getPlayer();
 		PlayState currentState = (p == null ? null : p.getPlayState());
 		if (currentState != this.prevPlayState.get()) {
 			this.prevPlayState.set(currentState);
@@ -144,7 +144,7 @@ public class Activator implements BundleActivator {
 		}
 	}
 
-	private static String getPlayerStateDescription (IPlayerAbstract p) {
+	private static String getPlayerStateDescription (Player p) {
 		if (p != null) {
 			PlayState currentState = p.getPlayState();
 			if (currentState != null) {

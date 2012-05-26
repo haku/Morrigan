@@ -8,12 +8,12 @@ public interface PlayerReader {
 	 * Returns all players.
 	 * Will return at least empty set.
 	 */
-	Collection<IPlayerAbstract> getPlayers ();
+	Collection<Player> getPlayers ();
 
 	/**
 	 * Returns player with ID i.
 	 * Will return null if ID not found.
 	 */
-	IPlayerAbstract getPlayer (int i);
+	Player getPlayer (int i);
 
 }

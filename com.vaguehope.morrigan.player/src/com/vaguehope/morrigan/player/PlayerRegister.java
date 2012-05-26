@@ -5,10 +5,10 @@ import java.util.Collection;
 import com.vaguehope.morrigan.model.Register;
 
 
-public interface PlayerRegister extends Register<IPlayerAbstract> {
+public interface PlayerRegister extends Register<Player> {
 
-	Collection<IPlayerAbstract> getAll ();
-	IPlayerAbstract get (int i);
+	Collection<Player> getAll ();
+	Player get (int i);
 	IPlayerLocal makeLocal (String name, IPlayerEventHandler eventHandler);
 
 }
