@@ -32,8 +32,7 @@ public interface IHotkeyEngine {
 	/**
 	 * This should be called before discarding
 	 * the reference to this implementation.
-	 * TODO FIXME rename to "dispose()".
 	 */
-	void finalise ();
+	void dispose ();
 
 }

@@ -161,7 +161,7 @@ public class HotkeyRegister {
 					e.setListener(this.mainHotkeyListener);
 				}
 				else {
-					e.finalise();
+					e.dispose();
 				}
 			}
 		}
@@ -170,7 +170,7 @@ public class HotkeyRegister {
 
 	private static void clearHotkeyEngine () {
 		IHotkeyEngine e = hotkeyEngine.getAndSet(null);
-		if (e != null) e.finalise();
+		if (e != null) e.dispose();
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
