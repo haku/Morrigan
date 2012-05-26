@@ -112,7 +112,7 @@ public class ViewPicture extends ViewPart {
 	    			ILocalMixedMediaDb mmdb;
 	    			mmdb = Activator.getMediaFactory().getLocalMixedMediaDb(dbpath);
 	    			mmdb.read();
-	    			IMediaPicture item = mmdb.findItemByFilePath(itempath);
+	    			IMediaPicture item = mmdb.getItemByFilePath(itempath);
 
 	    			if (item != null) {
 	    				setInput(mmdb, item);
