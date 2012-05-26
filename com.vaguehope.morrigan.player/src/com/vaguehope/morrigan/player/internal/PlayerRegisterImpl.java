@@ -85,7 +85,7 @@ public class PlayerRegisterImpl implements PlayerRegister {
 
 	@Override
 	public IPlayerLocal makeLocal (String name, IPlayerEventHandler eventHandler) {
-		IPlayerLocal p = new Player(nextIndex(), name, eventHandler, this, this.playbackEngineFactory, this.mediaFactory);
+		IPlayerLocal p = new LocalPlayerImpl(nextIndex(), name, eventHandler, this, this.playbackEngineFactory, this.mediaFactory);
 		Integer i = Integer.valueOf(p.getId());
 		this.localPlayerIds.put(i, i);
 		register(p);
