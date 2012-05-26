@@ -9,6 +9,6 @@ public interface PlayerRegister extends Register<Player> {
 
 	Collection<Player> getAll ();
 	Player get (int i);
-	IPlayerLocal makeLocal (String name, IPlayerEventHandler eventHandler);
+	LocalPlayer makeLocal (String name, IPlayerEventHandler eventHandler);
 
 }

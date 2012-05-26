@@ -47,7 +47,7 @@ import com.vaguehope.morrigan.model.media.IMediaTrackList;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.model.media.IMixedMediaList;
 import com.vaguehope.morrigan.player.IPlayerEventHandler;
-import com.vaguehope.morrigan.player.IPlayerLocal;
+import com.vaguehope.morrigan.player.LocalPlayer;
 import com.vaguehope.morrigan.player.OrderHelper;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayItem;
@@ -110,9 +110,9 @@ public abstract class AbstractPlayerView extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Player.
 
-	private IPlayerLocal _player = null;
+	private LocalPlayer _player = null;
 
-	public synchronized IPlayerLocal getPlayer () {
+	public synchronized LocalPlayer getPlayer () {
 		if (this._player == null) {
 			this._player = PlayerFactory.tryMakePlayer(Activator.getContext(), "Gui", this.eventHandler);
 		}

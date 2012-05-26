@@ -70,7 +70,7 @@ public class PlayerRegisterTracker implements PlayerRegister {
 	}
 
 	@Override
-	public IPlayerLocal makeLocal (String name, IPlayerEventHandler eventHandler) {
+	public LocalPlayer makeLocal (String name, IPlayerEventHandler eventHandler) {
 		return getService().makeLocal(name, eventHandler);
 	}
 
