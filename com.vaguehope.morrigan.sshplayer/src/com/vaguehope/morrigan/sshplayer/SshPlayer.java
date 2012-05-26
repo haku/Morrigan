@@ -9,6 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
+import com.vaguehope.morrigan.model.Register;
 import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
@@ -23,14 +24,16 @@ public class SshPlayer implements IPlayerAbstract {
 
 	private final int playerId;
 	private final MplayerHost host;
+	private final Register<IPlayerAbstract> register;
 
 	private AtomicReference<PlaybackOrder> playbackOrder = new AtomicReference<PlaybackOrder>(PlaybackOrder.SEQUENTIAL);
 	private AtomicReference<Mplayer> mplayer = new AtomicReference<Mplayer>();
 	private AtomicReference<PlayItem> currentItem = new AtomicReference<PlayItem>();
 
-	public SshPlayer (int id, MplayerHost host) {
+	public SshPlayer (int id, MplayerHost host, Register<IPlayerAbstract> register) {
 		this.playerId = id;
 		this.host = host;
+		this.register = register;
 	}
 
 	@Override
@@ -40,12 +43,12 @@ public class SshPlayer implements IPlayerAbstract {
 
 	@Override
 	public void dispose () {
-		// Unused.
+		this.register.unregister(this);
 	}
 
 	@Override
 	public String getName () {
-		return "Ssh(" + this.host.getHost() + ")";
+		return "ssh:" + this.host.getName();
 	}
 
 	@Override
