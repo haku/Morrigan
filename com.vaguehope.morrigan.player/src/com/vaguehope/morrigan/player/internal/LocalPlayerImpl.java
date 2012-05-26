@@ -35,9 +35,6 @@ import com.vaguehope.morrigan.player.OrderHelper;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayItem;
 
-/**
- * TODO rename to LocalPlayerImpl
- */
 public class LocalPlayerImpl implements IPlayerLocal {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
