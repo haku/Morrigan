@@ -4,7 +4,7 @@ public interface PlayerContainer {
 
 	String getName ();
 
-	IPlayerEventHandler getEventHandler ();
+	PlayerEventHandler getEventHandler ();
 
 	void setPlayer (Player player);
 

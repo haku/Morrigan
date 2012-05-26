@@ -14,7 +14,7 @@ import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
 import com.vaguehope.morrigan.model.media.MediaFactoryTracker;
 import com.vaguehope.morrigan.player.Player;
-import com.vaguehope.morrigan.player.IPlayerEventHandler;
+import com.vaguehope.morrigan.player.PlayerEventHandler;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlayerContainer;
@@ -71,7 +71,7 @@ public class Activator implements BundleActivator {
 		}
 
 		@Override
-		public IPlayerEventHandler getEventHandler () {
+		public PlayerEventHandler getEventHandler () {
 			return Activator.this.eventHandler;
 		}
 
@@ -90,7 +90,7 @@ public class Activator implements BundleActivator {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	protected final IPlayerEventHandler eventHandler = new IPlayerEventHandler() {
+	protected final PlayerEventHandler eventHandler = new PlayerEventHandler() {
 
 		@Override
 		public void updateStatus () {
