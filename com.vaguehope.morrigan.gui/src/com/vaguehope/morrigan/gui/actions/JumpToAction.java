@@ -21,7 +21,7 @@ import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackDb;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
-import com.vaguehope.morrigan.player.IPlayerLocal;
+import com.vaguehope.morrigan.player.LocalPlayer;
 import com.vaguehope.morrigan.player.PlayItem;
 
 public class JumpToAction extends Action {
@@ -52,7 +52,7 @@ public class JumpToAction extends Action {
 			return;
 		}
 		final ViewControls viewControls = (ViewControls) view;
-		final IPlayerLocal player;
+		final LocalPlayer player;
 		player = viewControls.getPlayer();
 		
 		IMediaTrackList<? extends IMediaTrack> currentList = this.list != null ? this.list : player.getCurrentList();

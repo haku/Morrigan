@@ -12,7 +12,7 @@ import com.vaguehope.morrigan.engines.playback.PlaybackEngineFactory;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.IPlayerEventHandler;
-import com.vaguehope.morrigan.player.IPlayerLocal;
+import com.vaguehope.morrigan.player.LocalPlayer;
 import com.vaguehope.morrigan.player.PlayerRegister;
 
 public class PlayerRegisterImpl implements PlayerRegister {
@@ -84,8 +84,8 @@ public class PlayerRegisterImpl implements PlayerRegister {
 	}
 
 	@Override
-	public IPlayerLocal makeLocal (String name, IPlayerEventHandler eventHandler) {
-		IPlayerLocal p = new LocalPlayerImpl(nextIndex(), name, eventHandler, this, this.playbackEngineFactory, this.mediaFactory);
+	public LocalPlayer makeLocal (String name, IPlayerEventHandler eventHandler) {
+		LocalPlayer p = new LocalPlayerImpl(nextIndex(), name, eventHandler, this, this.playbackEngineFactory, this.mediaFactory);
 		Integer i = Integer.valueOf(p.getId());
 		this.localPlayerIds.put(i, i);
 		register(p);

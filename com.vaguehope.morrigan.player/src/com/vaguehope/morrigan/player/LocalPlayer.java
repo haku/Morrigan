@@ -2,10 +2,7 @@ package com.vaguehope.morrigan.player;
 
 import org.eclipse.swt.widgets.Composite;
 
-/**
- * TODO rename to LocalPlayer
- */
-public interface IPlayerLocal extends Player {
+public interface LocalPlayer extends Player {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	void addQueueChangeListener(Runnable listener);
