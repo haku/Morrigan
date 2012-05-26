@@ -46,7 +46,7 @@ import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.model.media.IMixedMediaList;
-import com.vaguehope.morrigan.player.IPlayerEventHandler;
+import com.vaguehope.morrigan.player.PlayerEventHandler;
 import com.vaguehope.morrigan.player.LocalPlayer;
 import com.vaguehope.morrigan.player.OrderHelper;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
@@ -125,11 +125,11 @@ public abstract class AbstractPlayerView extends ViewPart {
 		}
 	}
 
-	protected IPlayerEventHandler getEventHandler () {
+	protected PlayerEventHandler getEventHandler () {
 		return this.eventHandler;
 	}
 
-	private final IPlayerEventHandler eventHandler = new IPlayerEventHandler() {
+	private final PlayerEventHandler eventHandler = new PlayerEventHandler() {
 
 		@Override
 		public void updateStatus () {
