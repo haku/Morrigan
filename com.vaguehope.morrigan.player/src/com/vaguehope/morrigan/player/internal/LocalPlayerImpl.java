@@ -38,7 +38,7 @@ import com.vaguehope.morrigan.player.PlayItem;
 /**
  * TODO rename to LocalPlayerImpl
  */
-public class Player implements IPlayerLocal {
+public class LocalPlayerImpl implements IPlayerLocal {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private final int id;
@@ -54,7 +54,7 @@ public class Player implements IPlayerLocal {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Main.
 
-	public Player (int id, String name, IPlayerEventHandler eventHandler,
+	public LocalPlayerImpl (int id, String name, IPlayerEventHandler eventHandler,
 			Register<IPlayerAbstract> register,
 			PlaybackEngineFactory playbackEngineFactory,
 			MediaFactory mediaFactory) {
@@ -652,20 +652,20 @@ public class Player implements IPlayerLocal {
 
 		@Override
 		public void positionChanged(long position) {
-			Player.this._currentPosition = position;
-			Player.this.eventHandler.updateStatus();
+			LocalPlayerImpl.this._currentPosition = position;
+			LocalPlayerImpl.this.eventHandler.updateStatus();
 		}
 
 		@Override
 		public void durationChanged(int duration) {
-			Player.this._currentTrackDuration = duration;
+			LocalPlayerImpl.this._currentTrackDuration = duration;
 
 			if (duration > 0) {
 				PlayItem c = getCurrentItem();
 				if (c != null && c.list != null && c.item != null) {
 					if (c.item.getDuration() != duration) {
 						try {
-							Player.this.logger.fine("setting item duration=" + duration);
+							LocalPlayerImpl.this.logger.fine("setting item duration=" + duration);
 							c.list.setTrackDuration(c.item, duration);
 						} catch (Throwable t) {
 							t.printStackTrace();
@@ -674,7 +674,7 @@ public class Player implements IPlayerLocal {
 				}
 			}
 
-			Player.this.eventHandler.updateStatus();
+			LocalPlayerImpl.this.eventHandler.updateStatus();
 		}
 
 		@Override
@@ -684,12 +684,12 @@ public class Player implements IPlayerLocal {
 
 		@Override
 		public void onEndOfTrack() {
-			Player.this.logger.fine("Player received endOfTrack event.");
+			LocalPlayerImpl.this.logger.fine("Player received endOfTrack event.");
 			// Inc. stats.
 			try {
 				getCurrentItem().list.incTrackEndCnt(getCurrentItem().item);
 			} catch (MorriganException e) {
-				Player.this.eventHandler.asyncThrowable(e);
+				LocalPlayerImpl.this.eventHandler.asyncThrowable(e);
 			}
 
 			// Play next track?
@@ -698,28 +698,28 @@ public class Player implements IPlayerLocal {
 				loadAndStartPlaying(nextItemToPlay);
 			}
 			else {
-				Player.this.logger.info("No more tracks to play.");
-				Player.this.eventHandler.updateStatus();
+				LocalPlayerImpl.this.logger.info("No more tracks to play.");
+				LocalPlayerImpl.this.eventHandler.updateStatus();
 			}
 		}
 
 		@Override
 		public void onError(Exception e) {
-			Player.this.eventHandler.asyncThrowable(e);
+			LocalPlayerImpl.this.eventHandler.asyncThrowable(e);
 		}
 
 		@Override
 		public void onKeyPress(int keyCode) {
 			if (keyCode == SWT.ESC) {
-				Player.this.eventHandler.videoAreaClose();
+				LocalPlayerImpl.this.eventHandler.videoAreaClose();
 			}
 		}
 
 		@Override
 		public void onMouseClick(int button, int clickCount) {
-			Player.this.logger.info("Mouse click "+button+"*"+clickCount);
+			LocalPlayerImpl.this.logger.info("Mouse click "+button+"*"+clickCount);
 			if (clickCount > 1) {
-				Player.this.eventHandler.videoAreaSelected();
+				LocalPlayerImpl.this.eventHandler.videoAreaSelected();
 			}
 		}
 
