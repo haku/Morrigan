@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 
 import com.vaguehope.morrigan.engines.playback.PlaybackEngineFactory;
 import com.vaguehope.morrigan.model.media.MediaFactory;
-import com.vaguehope.morrigan.player.IPlayerAbstract;
+import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.IPlayerEventHandler;
 import com.vaguehope.morrigan.player.IPlayerLocal;
 import com.vaguehope.morrigan.player.PlayerRegister;
@@ -21,7 +21,7 @@ public class PlayerRegisterImpl implements PlayerRegister {
 
 	private final AtomicBoolean alive = new AtomicBoolean(true);
 	private final AtomicInteger next = new AtomicInteger(0);
-	private final ConcurrentMap<Integer, IPlayerAbstract> all = new ConcurrentHashMap<Integer, IPlayerAbstract>();
+	private final ConcurrentMap<Integer, Player> all = new ConcurrentHashMap<Integer, Player>();
 	private final ConcurrentMap<Integer, Integer> localPlayerIds = new ConcurrentHashMap<Integer, Integer>();
 
 	private final PlaybackEngineFactory playbackEngineFactory;
@@ -33,13 +33,13 @@ public class PlayerRegisterImpl implements PlayerRegister {
 	}
 
 	@Override
-	public Collection<IPlayerAbstract> getAll () {
+	public Collection<Player> getAll () {
 		checkAlive();
 		return Collections.unmodifiableCollection(this.all.values());
 	}
 
 	@Override
-	public IPlayerAbstract get (int i) {
+	public Player get (int i) {
 		checkAlive();
 		return this.all.get(Integer.valueOf(i));
 	}
@@ -51,10 +51,10 @@ public class PlayerRegisterImpl implements PlayerRegister {
 	}
 
 	@Override
-	public void register (IPlayerAbstract p) {
+	public void register (Player p) {
 		checkAlive();
 		Integer i = Integer.valueOf(p.getId());
-		IPlayerAbstract prev = this.all.putIfAbsent(i, p);
+		Player prev = this.all.putIfAbsent(i, p);
 		if (prev != null) throw new IllegalStateException("Index " + p.getId() + " already in use by player: " + this.all.get(i).getName());
 	}
 
@@ -62,7 +62,7 @@ public class PlayerRegisterImpl implements PlayerRegister {
 	 * If we made it then it will be disposed.
 	 */
 	@Override
-	public void unregister (IPlayerAbstract p) {
+	public void unregister (Player p) {
 		Integer i = Integer.valueOf(p.getId());
 		this.all.remove(i);
 		this.localPlayerIds.remove(i);
@@ -94,7 +94,7 @@ public class PlayerRegisterImpl implements PlayerRegister {
 
 	public void disposeLocalPlayers () {
 		for (Integer i : this.localPlayerIds.keySet()) {
-			IPlayerAbstract p = this.all.get(i);
+			Player p = this.all.get(i);
 			if (p != null) {
 				LOG.warning("Register having to dispose of local player: " + i);
 				p.dispose();

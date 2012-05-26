@@ -5,7 +5,7 @@ import org.eclipse.swt.widgets.Composite;
 /**
  * TODO rename to LocalPlayer
  */
-public interface IPlayerLocal extends IPlayerAbstract {
+public interface IPlayerLocal extends Player {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	void addQueueChangeListener(Runnable listener);

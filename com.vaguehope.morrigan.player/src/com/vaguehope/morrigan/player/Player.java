@@ -9,10 +9,7 @@ import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 
-/**
- * TODO rename to Player
- */
-public interface IPlayerAbstract {
+public interface Player {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	void dispose();

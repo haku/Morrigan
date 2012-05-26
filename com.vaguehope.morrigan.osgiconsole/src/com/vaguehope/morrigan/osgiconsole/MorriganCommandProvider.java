@@ -18,7 +18,7 @@ import com.vaguehope.morrigan.model.media.IMediaTrackList;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaListReference;
-import com.vaguehope.morrigan.player.IPlayerAbstract;
+import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlayerReader;
@@ -412,12 +412,12 @@ public class MorriganCommandProvider implements CommandProvider {
 		String cmd = args.remove(0);
 		try {
 			int playerId = Integer.parseInt(cmd);
-			IPlayerAbstract player = this.playerReader.getPlayer(playerId);
+			Player player = this.playerReader.getPlayer(playerId);
 			doPlayersPlayer(ci, player, args);
 		}
 		catch (NumberFormatException e) {
 			// If we only have one player, assume the next param is a cmd.
-			IPlayerAbstract player = getOnlyPlayer(ci);
+			Player player = getOnlyPlayer(ci);
 			if (player != null) {
 				args.add(0, cmd);
 				doPlayersPlayer(ci, player, args);
@@ -429,9 +429,9 @@ public class MorriganCommandProvider implements CommandProvider {
 	}
 
 	private void doPlayersList (CommandInterpreter ci) {
-		Collection<IPlayerAbstract> players = this.playerReader.getPlayers();
+		Collection<Player> players = this.playerReader.getPlayers();
 		ci.println("id\tplayer");
-		for (IPlayerAbstract p : players) {
+		for (Player p : players) {
 			ci.print(String.valueOf(p.getId()));
 			ci.print("\t");
 			ci.print(p.getName());
@@ -448,7 +448,7 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 	}
 
-	private void doPlayersPlayer (CommandInterpreter ci, IPlayerAbstract player, List<String> args) {
+	private void doPlayersPlayer (CommandInterpreter ci, Player player, List<String> args) {
 		if (args.size() < 1) {
 			doPlayersPlayerInfo(ci, player);
 			return;
@@ -478,7 +478,7 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 	}
 
-	static private void doPlayersPlayerInfo (CommandInterpreter ci, IPlayerAbstract player) {
+	static private void doPlayersPlayerInfo (CommandInterpreter ci, Player player) {
 		ci.print(player.getName());
 		ci.print(": ");
 		ci.print(player.getPlayState().toString());
@@ -521,7 +521,7 @@ public class MorriganCommandProvider implements CommandProvider {
 		ci.println(")");
 	}
 
-	private void doPlayersPlayerPlay (CommandInterpreter ci, IPlayerAbstract player, List<String> args, boolean addToQueue) {
+	private void doPlayersPlayerPlay (CommandInterpreter ci, Player player, List<String> args, boolean addToQueue) {
 		if (args.size() < 1) {
 			if (addToQueue) {
 				doPlayersPlayerPrintQueue(ci, player);
@@ -582,17 +582,17 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 	}
 
-	static private void doPlayersPlayerPause (CommandInterpreter ci, IPlayerAbstract player) {
+	static private void doPlayersPlayerPause (CommandInterpreter ci, Player player) {
 		player.pausePlaying();
 		ci.println(player.getName() + " player: " + player.getPlayState().toString());
 	}
 
-	static private void doPlayersPlayerStop (CommandInterpreter ci, IPlayerAbstract player) {
+	static private void doPlayersPlayerStop (CommandInterpreter ci, Player player) {
 		player.stopPlaying();
 		ci.println(player.getName() + " player: " + player.getPlayState().toString());
 	}
 
-	static private void doPlayersPlayerNext (CommandInterpreter ci, IPlayerAbstract player) {
+	static private void doPlayersPlayerNext (CommandInterpreter ci, Player player) {
 		player.nextTrack();
 		PlayItem currentItem = player.getCurrentItem();
 		if (currentItem == null) {
@@ -603,7 +603,7 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 	}
 
-	static private void doPlayersPlayerOrder (CommandInterpreter ci, IPlayerAbstract player, List<String> args) {
+	static private void doPlayersPlayerOrder (CommandInterpreter ci, Player player, List<String> args) {
 		if (args.size() < 1) {
 			ci.println(player.getName() + " player order = " + player.getPlaybackOrder().toString() + ".");
 			ci.print("Options:");
@@ -627,7 +627,7 @@ public class MorriganCommandProvider implements CommandProvider {
 		ci.println("Unknown playback order '" + arg + "'.");
 	}
 
-	static private void doPlayersPlayerPrintQueue (CommandInterpreter ci, IPlayerAbstract player) {
+	static private void doPlayersPlayerPrintQueue (CommandInterpreter ci, Player player) {
 		List<PlayItem> queue = player.getQueueList();
 
 		if (queue.size() < 1) {
@@ -648,35 +648,35 @@ public class MorriganCommandProvider implements CommandProvider {
 //	Top-level shortcuts.
 
 	private void doPlay (CommandInterpreter ci, List<String> args) {
-		IPlayerAbstract player = getOnlyPlayer(ci);
+		Player player = getOnlyPlayer(ci);
 		if (player != null) doPlayersPlayerPlay(ci, player, args, false);
 	}
 
 	private void doQueue (CommandInterpreter ci, List<String> args) {
-		IPlayerAbstract player = getOnlyPlayer(ci);
+		Player player = getOnlyPlayer(ci);
 		if (player != null) doPlayersPlayerPlay(ci, player, args, true);
 	}
 
 	private void doPause (CommandInterpreter ci) {
-		IPlayerAbstract player = getOnlyPlayer(ci);
+		Player player = getOnlyPlayer(ci);
 		if (player != null) doPlayersPlayerPause(ci, player);
 	}
 
 	private void doStop (CommandInterpreter ci) {
-		IPlayerAbstract player = getOnlyPlayer(ci);
+		Player player = getOnlyPlayer(ci);
 		if (player != null) doPlayersPlayerStop(ci, player);
 	}
 
 	private void doNext (CommandInterpreter ci) {
-		IPlayerAbstract player = getOnlyPlayer(ci);
+		Player player = getOnlyPlayer(ci);
 		if (player != null) doPlayersPlayerNext(ci, player);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private IPlayerAbstract getOnlyPlayer (CommandInterpreter ci) {
-		Collection<IPlayerAbstract> allPlayers = this.playerReader.getPlayers();
-		IPlayerAbstract player = allPlayers.size() == 1 ? allPlayers.iterator().next() : null;
+	private Player getOnlyPlayer (CommandInterpreter ci) {
+		Collection<Player> allPlayers = this.playerReader.getPlayers();
+		Player player = allPlayers.size() == 1 ? allPlayers.iterator().next() : null;
 		if (player == null) ci.println("There is not only one player, so you may need to specfy the player to use.");
 		return player;
 	}

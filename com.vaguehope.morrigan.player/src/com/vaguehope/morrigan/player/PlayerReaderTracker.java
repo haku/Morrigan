@@ -27,15 +27,15 @@ public class PlayerReaderTracker implements PlayerReader {
 	}
 
 	@Override
-	public Collection<IPlayerAbstract> getPlayers () {
+	public Collection<Player> getPlayers () {
 		checkAlive();
 		PlayerReader service = this.playerReaderTracker.getService();
-		if (service == null) return Collections.<IPlayerAbstract>emptyList();
+		if (service == null) return Collections.<Player>emptyList();
 		return service.getPlayers();
 	}
 
 	@Override
-	public IPlayerAbstract getPlayer (int i) {
+	public Player getPlayer (int i) {
 		checkAlive();
 		PlayerReader service = this.playerReaderTracker.getService();
 		if (service == null) return null;

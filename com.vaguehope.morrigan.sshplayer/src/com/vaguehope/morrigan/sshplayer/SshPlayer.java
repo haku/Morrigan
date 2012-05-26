@@ -13,24 +13,24 @@ import com.vaguehope.morrigan.model.Register;
 import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
-import com.vaguehope.morrigan.player.IPlayerAbstract;
+import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.OrderHelper;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayItem;
 
-public class SshPlayer implements IPlayerAbstract {
+public class SshPlayer implements Player {
 
 	private static final Logger LOG = Logger.getLogger(SshPlayer.class.getName());
 
 	private final int playerId;
 	private final MplayerHost host;
-	private final Register<IPlayerAbstract> register;
+	private final Register<Player> register;
 
 	private AtomicReference<PlaybackOrder> playbackOrder = new AtomicReference<PlaybackOrder>(PlaybackOrder.SEQUENTIAL);
 	private AtomicReference<Mplayer> mplayer = new AtomicReference<Mplayer>();
 	private AtomicReference<PlayItem> currentItem = new AtomicReference<PlayItem>();
 
-	public SshPlayer (int id, MplayerHost host, Register<IPlayerAbstract> register) {
+	public SshPlayer (int id, MplayerHost host, Register<Player> register) {
 		this.playerId = id;
 		this.host = host;
 		this.register = register;

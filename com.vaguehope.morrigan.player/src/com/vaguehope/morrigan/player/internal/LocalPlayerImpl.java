@@ -28,7 +28,7 @@ import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaItemListChangeListener;
-import com.vaguehope.morrigan.player.IPlayerAbstract;
+import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.IPlayerEventHandler;
 import com.vaguehope.morrigan.player.IPlayerLocal;
 import com.vaguehope.morrigan.player.OrderHelper;
@@ -44,7 +44,7 @@ public class LocalPlayerImpl implements IPlayerLocal {
 	protected final Logger logger = Logger.getLogger(this.getClass().getName());
 
 	final IPlayerEventHandler eventHandler;
-	private final Register<IPlayerAbstract> register;
+	private final Register<Player> register;
 	private final PlaybackEngineFactory playbackEngineFactory;
 	private final MediaFactory mediaFactory;
 
@@ -52,7 +52,7 @@ public class LocalPlayerImpl implements IPlayerLocal {
 //	Main.
 
 	public LocalPlayerImpl (int id, String name, IPlayerEventHandler eventHandler,
-			Register<IPlayerAbstract> register,
+			Register<Player> register,
 			PlaybackEngineFactory playbackEngineFactory,
 			MediaFactory mediaFactory) {
 		this.id = id;

@@ -84,14 +84,14 @@ public final class PlayerActivator implements BundleActivator {
 	private final PlayerReader playerListener = new PlayerReader() {
 
 		@Override
-		public Collection<IPlayerAbstract> getPlayers () {
+		public Collection<Player> getPlayers () {
 			PlayerRegisterImpl r = PlayerActivator.this.playerRegister;
-			if (r == null) return Collections.<IPlayerAbstract> emptyList();
+			if (r == null) return Collections.<Player> emptyList();
 			return r.getAll();
 		}
 
 		@Override
-		public IPlayerAbstract getPlayer (int i) {
+		public Player getPlayer (int i) {
 			PlayerRegisterImpl r = PlayerActivator.this.playerRegister;
 			if (r == null) return null;
 			return r.get(i);
