@@ -63,8 +63,7 @@ public interface IMediaItemList<T extends IMediaItem> {
 	void copyItemFile (T item, OutputStream os) throws MorriganException;
 	File copyItemFile (T item, File targetDirectory) throws MorriganException;
 
-	// TODO rename to getItemByFilePath().
-	T findItemByFilePath (String path);
+	T getItemByFilePath (String path);
 
 	List<MediaTagClassification> getTagClassifications () throws MorriganException;
 	void addTagClassification (String classificationName) throws MorriganException;
