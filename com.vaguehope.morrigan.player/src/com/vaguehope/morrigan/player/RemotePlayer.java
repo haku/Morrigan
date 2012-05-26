@@ -1,9 +1,6 @@
 package com.vaguehope.morrigan.player;
 
-/**
- * TODO rename to RemotePlayer
- */
-public interface IPlayerRemote extends Player {
+public interface RemotePlayer extends Player {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	boolean isAvailable ();
