@@ -6,9 +6,9 @@ import java.io.InputStream;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
-import com.vaguehope.morrigan.sshplayer.CliPlayer;
 import com.vaguehope.morrigan.sshplayer.CliPlayerCommand;
 import com.vaguehope.morrigan.sshplayer.CliPlayerCommands;
+import com.vaguehope.morrigan.sshplayer.CliPlayerHelper;
 import com.vaguehope.morrigan.sshplayer.CliStatusReader;
 
 /**
@@ -31,7 +31,7 @@ public enum Mplayer implements CliPlayerCommands {
 		s.append(" ; mplayer -input file=.mnmpcmd -cache 32768 -cache-min 50 -identify -fs 'http://localhost:")
 				.append(CliPlayerCommands.SHARED_PORT)
 				.append("/")
-				.append(genericFileName(media))
+				.append(CliPlayerHelper.genericFileName(media))
 				.append("'");
 		s.append(" ; echo ").append(CliStatusReader.MORRIGAN_EOF);
 		return s.toString();
@@ -51,17 +51,12 @@ public enum Mplayer implements CliPlayerCommands {
 		PAUSE_RESUME {
 			@Override
 			public void exec (Session session, ChannelExec mainChEx) throws JSchException {
-				CliPlayer.execCommand(session, "echo pause > ~/.mnmpcmd"); // Must be a nicer way to do this.
+				CliPlayerHelper.execCommand(session, "echo pause > ~/.mnmpcmd"); // Must be a nicer way to do this.
 			}
 		};
 
 		@Override
 		public abstract void exec (Session session, ChannelExec mainChEx) throws JSchException;
-	}
-
-	private static String genericFileName (File file) {
-		String n = file.getName();
-		return "file" + n.substring(n.lastIndexOf("."));
 	}
 
 }

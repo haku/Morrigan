@@ -129,7 +129,7 @@ public class CliPlayer extends Thread {
 			catch (Exception e) {/* Ignore. */}
 		}
 
-		execCommand(session, this.host.cmds().killCommand());
+		CliPlayerHelper.execCommand(session, this.host.cmds().killCommand());
 		execCh.disconnect();
 	}
 
@@ -137,13 +137,6 @@ public class CliPlayer extends Thread {
 		CliPlayerCommand c = this.cmd.poll();
 		if (c == null) return;
 		c.exec(session, mainChEx);
-	}
-
-	public static void execCommand (Session session, String command) throws JSchException {
-		ChannelExec cmdExCh = (ChannelExec) session.openChannel("exec");
-		cmdExCh.setCommand(command);
-		cmdExCh.connect();
-		cmdExCh.disconnect();
 	}
 
 }
