@@ -79,7 +79,7 @@ public class SshPlayer implements Player {
 		LOG.info("Loading item: " + media.getAbsolutePath());
 
 		stopPlaying();
-		CliPlayer newMp = new CliPlayer(this.host, media, MplayerStatusReaderFactory.INSTANCE);
+		CliPlayer newMp = new CliPlayer(this.host, media, Mplayer.INSTANCE, MplayerStatusReaderFactory.INSTANCE);
 		if (!this.mplayer.compareAndSet(null, newMp)) {
 			LOG.warning("Another thread set the player.  Aborting playback of: " + item);
 			return;
