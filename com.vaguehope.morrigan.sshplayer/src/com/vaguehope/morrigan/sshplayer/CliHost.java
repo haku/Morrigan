@@ -4,9 +4,9 @@ import java.util.logging.Logger;
 
 import com.jcraft.jsch.UserInfo;
 
-public class MplayerHost {
+public class CliHost {
 
-	protected static final Logger LOG = Logger.getLogger(MplayerHost.class.getName());
+	protected static final Logger LOG = Logger.getLogger(CliHost.class.getName());
 
 	private final String name;
 	private final String host;
@@ -14,7 +14,7 @@ public class MplayerHost {
 	private final String user;
 	private final String pass;
 
-	public MplayerHost (String name, String host, int port, String user, String pass) {
+	public CliHost (String name, String host, int port, String user, String pass) {
 		this.name = name;
 		this.host = host;
 		this.port = port;

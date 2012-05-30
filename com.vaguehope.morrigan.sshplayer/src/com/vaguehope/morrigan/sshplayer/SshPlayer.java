@@ -23,14 +23,14 @@ public class SshPlayer implements Player {
 	private static final Logger LOG = Logger.getLogger(SshPlayer.class.getName());
 
 	private final int playerId;
-	private final MplayerHost host;
+	private final CliHost host;
 	private final Register<Player> register;
 
 	private AtomicReference<PlaybackOrder> playbackOrder = new AtomicReference<PlaybackOrder>(PlaybackOrder.SEQUENTIAL);
 	private AtomicReference<CliPlayer> mplayer = new AtomicReference<CliPlayer>();
 	private AtomicReference<PlayItem> currentItem = new AtomicReference<PlayItem>();
 
-	public SshPlayer (int id, MplayerHost host, Register<Player> register) {
+	public SshPlayer (int id, CliHost host, Register<Player> register) {
 		this.playerId = id;
 		this.host = host;
 		this.register = register;

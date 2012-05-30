@@ -29,7 +29,7 @@ public class CliPlayer extends Thread {
 
 	private static final int CONNECT_TIMEOUT = 15000; // 15 seconds.
 
-	private final MplayerHost mplayerHost;
+	private final CliHost mplayerHost;
 	private final File media;
 
 	protected final AtomicBoolean running = new AtomicBoolean(false);
@@ -37,7 +37,7 @@ public class CliPlayer extends Thread {
 	private final Queue<Commands> cmd = new ConcurrentLinkedQueue<Commands>();
 	private final AtomicReference<MplayerStatusReader> status = new AtomicReference<MplayerStatusReader>();
 
-	public CliPlayer (MplayerHost mplayerHost, File media) {
+	public CliPlayer (CliHost mplayerHost, File media) {
 		this.mplayerHost = mplayerHost;
 		this.media = media;
 	}
