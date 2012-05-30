@@ -65,7 +65,7 @@ public class FileServer {
 			}
 			catch (Exception e) {
 				if (!(e instanceof InterruptedException)) {
-					Mplayer.LOG.log(Level.WARNING, "Failed to serve media file.", e);
+					CliPlayer.LOG.log(Level.WARNING, "Failed to serve media file.", e);
 				}
 			}
 		}
