@@ -26,7 +26,7 @@ public class MplayerHosts {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private static final Logger LOG = Logger.getLogger(Mplayer.class.getName());
+	private static final Logger LOG = Logger.getLogger(CliPlayer.class.getName());
 
 	private final String configDir = Config.getConfigDir() + "/sshp";
 	private final AtomicReference<Collection<MplayerHost>> hosts = new AtomicReference<Collection<MplayerHost>>(Collections.<MplayerHost>emptyList());
