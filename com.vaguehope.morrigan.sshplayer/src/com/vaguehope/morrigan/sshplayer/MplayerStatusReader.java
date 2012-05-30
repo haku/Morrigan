@@ -11,8 +11,6 @@ import java.util.logging.Logger;
 
 public class MplayerStatusReader extends Thread implements CliStatusReader {
 
-	static final String MORRIGAN_EOF = "Morrigan-EOF";
-
 	private static final String IDENT_LENGTH = "ID_LENGTH=";
 	private static final String IDENT_EXIT = "ID_EXIT=";
 
