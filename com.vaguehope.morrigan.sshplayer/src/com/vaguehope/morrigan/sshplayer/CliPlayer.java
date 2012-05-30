@@ -29,7 +29,7 @@ public class CliPlayer extends Thread {
 
 	private static final int CONNECT_TIMEOUT = 15000; // 15 seconds.
 
-	private final CliHost mplayerHost;
+	private final CliHost host;
 	private final File media;
 	private final CliStatusReaderFactory statusReaderFactory;
 
@@ -38,8 +38,8 @@ public class CliPlayer extends Thread {
 	private final Queue<Commands> cmd = new ConcurrentLinkedQueue<Commands>();
 	private final AtomicReference<CliStatusReader> status = new AtomicReference<CliStatusReader>();
 
-	public CliPlayer (CliHost mplayerHost, File media, CliStatusReaderFactory statusReaderFactory) {
-		this.mplayerHost = mplayerHost;
+	public CliPlayer (CliHost host, File media, CliStatusReaderFactory statusReaderFactory) {
+		this.host = host;
 		this.media = media;
 		this.statusReaderFactory = statusReaderFactory;
 	}
@@ -56,16 +56,16 @@ public class CliPlayer extends Thread {
 		}
 		finally {
 			CliPlayer.this.running.set(false);
-			LOG.info("Mplayer completed: " + this.media.getAbsolutePath());
+			LOG.info("CliPlayer completed: " + this.media.getAbsolutePath());
 		}
 	}
 
 	public void cancel () throws InterruptedException {
 		if (this.canceled.compareAndSet(false, true)) {
-			LOG.info("Cancelling mplayer: " + this.media.getAbsolutePath());
+			LOG.info("Cancelling CliPlayer: " + this.media.getAbsolutePath());
 			if (this.isAlive() && Thread.currentThread().getId() != this.getId()) this.join();
 		}
-		LOG.warning("Mplayer already cancelled.");
+		LOG.warning("CliPlayer already cancelled.");
 	}
 
 	public boolean isRunning () {
@@ -88,11 +88,11 @@ public class CliPlayer extends Thread {
 
 	protected void runPlaybackSession () throws JSchException, IOException {
 		JSch jsch = new JSch();
-		Session session = jsch.getSession(this.mplayerHost.getUser(), this.mplayerHost.getHost(), this.mplayerHost.getPort());
+		Session session = jsch.getSession(this.host.getUser(), this.host.getHost(), this.host.getPort());
 		Properties config = new Properties();
 		config.put("StrictHostKeyChecking", "no");
 		session.setConfig(config);
-		session.setUserInfo(this.mplayerHost.getUserinfo());
+		session.setUserInfo(this.host.getUserinfo());
 		session.connect();
 		try {
 			runStream(session);
@@ -107,16 +107,16 @@ public class CliPlayer extends Thread {
 		FileServer fs = new FileServer(this.media, 34400);
 		fs.start();
 		try {
-			runMplayer(session);
+			runCliPlayer(session);
 		}
 		finally {
 			fs.stop();
 		}
 	}
 
-	private void runMplayer (Session session) throws JSchException, IOException {
+	private void runCliPlayer (Session session) throws JSchException, IOException {
 		ChannelExec execCh = (ChannelExec) session.openChannel("exec");
-		execCh.setCommand(makeMplayerCommand());
+		execCh.setCommand(makeCliPlayerCommand());
 		execCh.connect(CONNECT_TIMEOUT);
 
 		CliStatusReader statusReader = this.statusReaderFactory.makeNew(execCh.getInputStream());
@@ -151,13 +151,13 @@ public class CliPlayer extends Thread {
 		}
 	}
 
-	private String makeMplayerCommand () {
+	private String makeCliPlayerCommand () {
 		StringBuilder s = new StringBuilder("cd"); // Start in home directory.
 		s.append(" ; export DISPLAY=:0");
 		s.append(" ; if [[ ! -e .mnmpcmd ]] ; then mkfifo .mnmpcmd ; fi");
 		s.append(" ; mplayer -input file=.mnmpcmd -cache 32768 -cache-min 50 -identify -fs 'http://localhost:34400/")
 				.append(genericFileName(this.media)).append("'");
-		s.append(" ; echo ").append(MplayerStatusReader.MORRIGAN_EOF);
+		s.append(" ; echo ").append(CliStatusReader.MORRIGAN_EOF);
 		return s.toString();
 	}
 
