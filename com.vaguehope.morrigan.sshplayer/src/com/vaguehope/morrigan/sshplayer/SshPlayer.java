@@ -13,10 +13,10 @@ import com.vaguehope.morrigan.model.Register;
 import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
-import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.OrderHelper;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayItem;
+import com.vaguehope.morrigan.player.Player;
 
 public class SshPlayer implements Player {
 
@@ -79,7 +79,7 @@ public class SshPlayer implements Player {
 		LOG.info("Loading item: " + media.getAbsolutePath());
 
 		stopPlaying();
-		CliPlayer newMp = new CliPlayer(this.host, media);
+		CliPlayer newMp = new CliPlayer(this.host, media, MplayerStatusReaderFactory.INSTANCE);
 		if (!this.mplayer.compareAndSet(null, newMp)) {
 			LOG.warning("Another thread set the player.  Aborting playback of: " + item);
 			return;
