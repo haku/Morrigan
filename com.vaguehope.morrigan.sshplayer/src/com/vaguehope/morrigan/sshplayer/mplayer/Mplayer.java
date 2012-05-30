@@ -1,4 +1,4 @@
-package com.vaguehope.morrigan.sshplayer;
+package com.vaguehope.morrigan.sshplayer.mplayer;
 
 import java.io.File;
 import java.io.InputStream;
@@ -6,6 +6,10 @@ import java.io.InputStream;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
+import com.vaguehope.morrigan.sshplayer.CliPlayer;
+import com.vaguehope.morrigan.sshplayer.CliPlayerCommand;
+import com.vaguehope.morrigan.sshplayer.CliPlayerCommands;
+import com.vaguehope.morrigan.sshplayer.CliStatusReader;
 
 /**
  * http://www.mplayerhq.hu/DOCS/tech/slave.txt
