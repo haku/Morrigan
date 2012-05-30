@@ -16,4 +16,11 @@ public enum ImplType {
 		return this.cmds;
 	}
 
+	public static ImplType parseType (String type) {
+		if ("mplayer".equalsIgnoreCase(type)) {
+			return MPLAYER;
+		}
+		return null;
+	}
+
 }

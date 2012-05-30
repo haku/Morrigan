@@ -21,6 +21,9 @@ public class CliHosts {
 	private static final String KEY_PASS = "pass";
 	private static final String KEY_USER = "user";
 
+	private static final String KEY_TYPE = "type";
+	private static final String DEFAULT_TYPE = "mplayer";
+
 	private static final String KEY_PORT = "port";
 	private static final int DEFAULT_PORT = 22;
 
@@ -67,12 +70,16 @@ public class CliHosts {
 		String user = propFile.getString(KEY_USER, null);
 		String pass = propFile.getString(KEY_PASS, null);
 		int port = propFile.getInt(KEY_PORT, DEFAULT_PORT);
+		String type = propFile.getString(KEY_TYPE, DEFAULT_TYPE);
 
 		if (name == null || host == null || user == null || pass == null) {
 			throw new NotConfiguredException("Config incomplete: missing name, host, user or pass from '" + file.getAbsolutePath() + "'.");
 		}
 
-		return new CliHost(name, host, port, user, pass, ImplType.MPLAYER);
+		ImplType implType = ImplType.parseType(type);
+		if (type == null) throw new NotConfiguredException("Unknown type: " + type);
+
+		return new CliHost(name, host, port, user, pass, implType);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
