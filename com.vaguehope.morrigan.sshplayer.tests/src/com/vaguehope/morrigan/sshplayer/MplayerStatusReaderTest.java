@@ -6,6 +6,8 @@ import java.io.ByteArrayInputStream;
 
 import org.junit.Test;
 
+import com.vaguehope.morrigan.sshplayer.mplayer.MplayerStatusReader;
+
 public class MplayerStatusReaderTest {
 
 	@Test

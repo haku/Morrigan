@@ -17,6 +17,7 @@ import com.vaguehope.morrigan.player.OrderHelper;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.Player;
+import com.vaguehope.morrigan.sshplayer.mplayer.Mplayer;
 
 public class SshPlayer implements Player {
 

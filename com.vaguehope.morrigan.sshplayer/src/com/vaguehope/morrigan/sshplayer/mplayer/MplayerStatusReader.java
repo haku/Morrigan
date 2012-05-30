@@ -1,4 +1,4 @@
-package com.vaguehope.morrigan.sshplayer;
+package com.vaguehope.morrigan.sshplayer.mplayer;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,6 +8,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import com.vaguehope.morrigan.sshplayer.CliStatusReader;
 
 public class MplayerStatusReader extends Thread implements CliStatusReader {
 
