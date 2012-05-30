@@ -1,4 +1,4 @@
-package com.vaguehope.morrigan.sshplayer;
+package com.vaguehope.morrigan.sshplayer.mplayer;
 
 import static org.junit.Assert.assertEquals;
 
