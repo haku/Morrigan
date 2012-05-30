@@ -22,27 +22,21 @@ public class CliPlayer extends Thread {
 
 	protected static final Logger LOG = Logger.getLogger(CliPlayer.class.getName());
 
-	private enum Commands {
-		TOGGLE_PAUSED
-	}
-
 	private static final int CONNECT_TIMEOUT = 15000; // 15 seconds.
 
 	private final CliHost host;
 	private final File media;
 	private final CliPlayerCommands playerCommands;
-	private final CliStatusReaderFactory statusReaderFactory;
 
 	protected final AtomicBoolean running = new AtomicBoolean(false);
 	protected final AtomicBoolean canceled = new AtomicBoolean(false);
-	private final Queue<Commands> cmd = new ConcurrentLinkedQueue<Commands>();
+	private final Queue<CliPlayerCommand> cmd = new ConcurrentLinkedQueue<CliPlayerCommand>();
 	private final AtomicReference<CliStatusReader> status = new AtomicReference<CliStatusReader>();
 
-	public CliPlayer (CliHost host, File media, CliPlayerCommands playerCommands, CliStatusReaderFactory statusReaderFactory) {
+	public CliPlayer (CliHost host, File media, CliPlayerCommands playerCommands) {
 		this.host = host;
 		this.media = media;
 		this.playerCommands = playerCommands;
-		this.statusReaderFactory = statusReaderFactory;
 	}
 
 	@Override
@@ -74,7 +68,7 @@ public class CliPlayer extends Thread {
 	}
 
 	public void togglePaused () {
-		if (isRunning()) this.cmd.add(Commands.TOGGLE_PAUSED);
+		if (isRunning()) this.cmd.add(this.playerCommands.pauseResumeCommand());
 	}
 
 	public int getCurrentPosition () {
@@ -120,7 +114,7 @@ public class CliPlayer extends Thread {
 		execCh.setCommand(this.playerCommands.startCommand(this.media));
 		execCh.connect(CONNECT_TIMEOUT);
 
-		CliStatusReader statusReader = this.statusReaderFactory.makeNew(execCh.getInputStream());
+		CliStatusReader statusReader = this.playerCommands.makeStatusReader(execCh.getInputStream());
 		statusReader.start();
 		this.status.set(statusReader);
 
@@ -130,29 +124,24 @@ public class CliPlayer extends Thread {
 			if (statusReader.isFinished() || execCh.isEOF() || execCh.isClosed() || !execCh.isConnected()) {
 				break;
 			}
-			procCmd(session);
+			procCmd(session, execCh);
 			try {
 				Thread.sleep(1000L);
 			}
 			catch (Exception e) {/* Ignore. */}
 		}
 
-		exec(session, this.playerCommands.killCommand());
+		execCommand(session, this.playerCommands.killCommand());
 		execCh.disconnect();
 	}
 
-	private void procCmd (Session session) throws JSchException {
-		Commands c = this.cmd.poll();
+	private void procCmd (Session session, ChannelExec mainChEx) throws JSchException {
+		CliPlayerCommand c = this.cmd.poll();
 		if (c == null) return;
-		if (c == Commands.TOGGLE_PAUSED) {
-			exec(session, this.playerCommands.pauseResumeCommand());
-		}
-		else {
-			LOG.warning("Unknown command: " + c);
-		}
+		c.exec(session, mainChEx);
 	}
 
-	private static void exec (Session session, String command) throws JSchException {
+	public static void execCommand (Session session, String command) throws JSchException {
 		ChannelExec cmdExCh = (ChannelExec) session.openChannel("exec");
 		cmdExCh.setCommand(command);
 		cmdExCh.connect();
