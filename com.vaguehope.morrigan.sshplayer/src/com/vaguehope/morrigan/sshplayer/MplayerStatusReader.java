@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class MplayerStatusReader extends Thread {
+public class MplayerStatusReader extends Thread implements CliStatusReader {
 
 	static final String MORRIGAN_EOF = "Morrigan-EOF";
 
@@ -58,14 +58,17 @@ public class MplayerStatusReader extends Thread {
 		}
 	}
 
+	@Override
 	public boolean isFinished () {
 		return this.finished.get();
 	}
 
+	@Override
 	public int getDuration () {
 		return this.duration.get();
 	}
 
+	@Override
 	public int getCurrentPosition () {
 		return this.currentPosition.get();
 	}

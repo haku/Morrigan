@@ -31,15 +31,17 @@ public class CliPlayer extends Thread {
 
 	private final CliHost mplayerHost;
 	private final File media;
+	private final CliStatusReaderFactory statusReaderFactory;
 
 	protected final AtomicBoolean running = new AtomicBoolean(false);
 	protected final AtomicBoolean canceled = new AtomicBoolean(false);
 	private final Queue<Commands> cmd = new ConcurrentLinkedQueue<Commands>();
-	private final AtomicReference<MplayerStatusReader> status = new AtomicReference<MplayerStatusReader>();
+	private final AtomicReference<CliStatusReader> status = new AtomicReference<CliStatusReader>();
 
-	public CliPlayer (CliHost mplayerHost, File media) {
+	public CliPlayer (CliHost mplayerHost, File media, CliStatusReaderFactory statusReaderFactory) {
 		this.mplayerHost = mplayerHost;
 		this.media = media;
+		this.statusReaderFactory = statusReaderFactory;
 	}
 
 	@Override
@@ -75,12 +77,12 @@ public class CliPlayer extends Thread {
 	}
 
 	public int getCurrentPosition () {
-		MplayerStatusReader s = this.status.get();
+		CliStatusReader s = this.status.get();
 		return s == null ? -1 : s.getCurrentPosition();
 	}
 
 	public int getDuration () {
-		MplayerStatusReader s = this.status.get();
+		CliStatusReader s = this.status.get();
 		return s == null ? -1 : s.getDuration();
 	}
 
@@ -117,7 +119,7 @@ public class CliPlayer extends Thread {
 		execCh.setCommand(makeMplayerCommand());
 		execCh.connect(CONNECT_TIMEOUT);
 
-		MplayerStatusReader statusReader = new MplayerStatusReader(execCh.getInputStream());
+		CliStatusReader statusReader = this.statusReaderFactory.makeNew(execCh.getInputStream());
 		statusReader.start();
 		this.status.set(statusReader);
 
