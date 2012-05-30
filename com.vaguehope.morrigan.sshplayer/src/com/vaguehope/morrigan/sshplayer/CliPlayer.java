@@ -17,7 +17,6 @@ import com.jcraft.jsch.Session;
 
 /**
  * References: http://www.jcraft.com/jsch/examples/
- * http://www.mplayerhq.hu/DOCS/tech/slave.txt
  */
 public class CliPlayer extends Thread {
 
@@ -31,6 +30,7 @@ public class CliPlayer extends Thread {
 
 	private final CliHost host;
 	private final File media;
+	private final CliPlayerCommands playerCommands;
 	private final CliStatusReaderFactory statusReaderFactory;
 
 	protected final AtomicBoolean running = new AtomicBoolean(false);
@@ -38,9 +38,10 @@ public class CliPlayer extends Thread {
 	private final Queue<Commands> cmd = new ConcurrentLinkedQueue<Commands>();
 	private final AtomicReference<CliStatusReader> status = new AtomicReference<CliStatusReader>();
 
-	public CliPlayer (CliHost host, File media, CliStatusReaderFactory statusReaderFactory) {
+	public CliPlayer (CliHost host, File media, CliPlayerCommands playerCommands, CliStatusReaderFactory statusReaderFactory) {
 		this.host = host;
 		this.media = media;
+		this.playerCommands = playerCommands;
 		this.statusReaderFactory = statusReaderFactory;
 	}
 
@@ -103,7 +104,7 @@ public class CliPlayer extends Thread {
 	}
 
 	private void runStream (Session session) throws JSchException, IOException {
-		session.setPortForwardingR(34400, "127.0.0.1", 34400); // TODO auto find free port.
+		session.setPortForwardingR(CliPlayerCommands.SHARED_PORT, "127.0.0.1", CliPlayerCommands.SHARED_PORT);
 		FileServer fs = new FileServer(this.media, 34400);
 		fs.start();
 		try {
@@ -116,7 +117,7 @@ public class CliPlayer extends Thread {
 
 	private void runCliPlayer (Session session) throws JSchException, IOException {
 		ChannelExec execCh = (ChannelExec) session.openChannel("exec");
-		execCh.setCommand(makeCliPlayerCommand());
+		execCh.setCommand(this.playerCommands.startCommand(this.media));
 		execCh.connect(CONNECT_TIMEOUT);
 
 		CliStatusReader statusReader = this.statusReaderFactory.makeNew(execCh.getInputStream());
@@ -131,12 +132,12 @@ public class CliPlayer extends Thread {
 			}
 			procCmd(session);
 			try {
-				Thread.sleep(1000);
+				Thread.sleep(1000L);
 			}
 			catch (Exception e) {/* Ignore. */}
 		}
 
-		exec(session, "killall mplayer > /dev/null 2>&1"); // Very blunt.
+		exec(session, this.playerCommands.killCommand());
 		execCh.disconnect();
 	}
 
@@ -144,21 +145,11 @@ public class CliPlayer extends Thread {
 		Commands c = this.cmd.poll();
 		if (c == null) return;
 		if (c == Commands.TOGGLE_PAUSED) {
-			exec(session, "echo pause > ~/.mnmpcmd"); // Must be a nicer way to do this.
+			exec(session, this.playerCommands.pauseResumeCommand());
 		}
 		else {
 			LOG.warning("Unknown command: " + c);
 		}
-	}
-
-	private String makeCliPlayerCommand () {
-		StringBuilder s = new StringBuilder("cd"); // Start in home directory.
-		s.append(" ; export DISPLAY=:0");
-		s.append(" ; if [[ ! -e .mnmpcmd ]] ; then mkfifo .mnmpcmd ; fi");
-		s.append(" ; mplayer -input file=.mnmpcmd -cache 32768 -cache-min 50 -identify -fs 'http://localhost:34400/")
-				.append(genericFileName(this.media)).append("'");
-		s.append(" ; echo ").append(CliStatusReader.MORRIGAN_EOF);
-		return s.toString();
 	}
 
 	private static void exec (Session session, String command) throws JSchException {
@@ -166,11 +157,6 @@ public class CliPlayer extends Thread {
 		cmdExCh.setCommand(command);
 		cmdExCh.connect();
 		cmdExCh.disconnect();
-	}
-
-	private static String genericFileName (File file) {
-		String n = file.getName();
-		return "file" + n.substring(n.lastIndexOf("."));
 	}
 
 }
