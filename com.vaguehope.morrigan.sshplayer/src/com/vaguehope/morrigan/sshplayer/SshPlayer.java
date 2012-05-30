@@ -17,7 +17,6 @@ import com.vaguehope.morrigan.player.OrderHelper;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.Player;
-import com.vaguehope.morrigan.sshplayer.mplayer.Mplayer;
 
 public class SshPlayer implements Player {
 
@@ -28,7 +27,7 @@ public class SshPlayer implements Player {
 	private final Register<Player> register;
 
 	private AtomicReference<PlaybackOrder> playbackOrder = new AtomicReference<PlaybackOrder>(PlaybackOrder.SEQUENTIAL);
-	private AtomicReference<CliPlayer> mplayer = new AtomicReference<CliPlayer>();
+	private AtomicReference<CliPlayer> cliPlayer = new AtomicReference<CliPlayer>();
 	private AtomicReference<PlayItem> currentItem = new AtomicReference<PlayItem>();
 
 	public SshPlayer (int id, CliHost host, Register<Player> register) {
@@ -80,8 +79,8 @@ public class SshPlayer implements Player {
 		LOG.info("Loading item: " + media.getAbsolutePath());
 
 		stopPlaying();
-		CliPlayer newMp = new CliPlayer(this.host, media, Mplayer.INSTANCE);
-		if (!this.mplayer.compareAndSet(null, newMp)) {
+		CliPlayer newMp = new CliPlayer(this.host, media);
+		if (!this.cliPlayer.compareAndSet(null, newMp)) {
 			LOG.warning("Another thread set the player.  Aborting playback of: " + item);
 			return;
 		}
@@ -92,13 +91,13 @@ public class SshPlayer implements Player {
 
 	@Override
 	public void pausePlaying () {
-		CliPlayer m = this.mplayer.get();
+		CliPlayer m = this.cliPlayer.get();
 		if (m != null) m.togglePaused();
 	}
 
 	@Override
 	public void stopPlaying () {
-		CliPlayer mp = this.mplayer.getAndSet(null);
+		CliPlayer mp = this.cliPlayer.getAndSet(null);
 		if (mp != null) {
 			try {
 				mp.cancel();
@@ -119,7 +118,7 @@ public class SshPlayer implements Player {
 
 	@Override
 	public PlayState getPlayState () {
-		CliPlayer m = this.mplayer.get();
+		CliPlayer m = this.cliPlayer.get();
 		if (m == null) return PlayState.Stopped;
 		// TODO what about paused?
 		return m.isRunning() ? PlayState.Playing : PlayState.Stopped;
@@ -138,13 +137,13 @@ public class SshPlayer implements Player {
 
 	@Override
 	public long getCurrentPosition () {
-		CliPlayer m = this.mplayer.get();
+		CliPlayer m = this.cliPlayer.get();
 		return m == null ? -1 : m.getCurrentPosition();
 	}
 
 	@Override
 	public int getCurrentTrackDuration () {
-		CliPlayer m = this.mplayer.get();
+		CliPlayer m = this.cliPlayer.get();
 		return m == null ? -1 : m.getDuration();
 	}
 

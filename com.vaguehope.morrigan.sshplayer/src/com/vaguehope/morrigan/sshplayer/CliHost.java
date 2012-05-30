@@ -3,6 +3,7 @@ package com.vaguehope.morrigan.sshplayer;
 import java.util.logging.Logger;
 
 import com.jcraft.jsch.UserInfo;
+import com.vaguehope.morrigan.sshplayer.mplayer.Mplayer;
 
 public class CliHost {
 
@@ -44,6 +45,10 @@ public class CliHost {
 
 	public UserInfo getUserinfo () {
 		return this.userInfo;
+	}
+
+	public CliPlayerCommands cmds () {
+		return Mplayer.INSTANCE;
 	}
 
 	private final UserInfo userInfo = new UserInfo() {
