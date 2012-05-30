@@ -26,17 +26,15 @@ public class CliPlayer extends Thread {
 
 	private final CliHost host;
 	private final File media;
-	private final CliPlayerCommands playerCommands;
 
 	protected final AtomicBoolean running = new AtomicBoolean(false);
 	protected final AtomicBoolean canceled = new AtomicBoolean(false);
 	private final Queue<CliPlayerCommand> cmd = new ConcurrentLinkedQueue<CliPlayerCommand>();
 	private final AtomicReference<CliStatusReader> status = new AtomicReference<CliStatusReader>();
 
-	public CliPlayer (CliHost host, File media, CliPlayerCommands playerCommands) {
+	public CliPlayer (CliHost host, File media) {
 		this.host = host;
 		this.media = media;
-		this.playerCommands = playerCommands;
 	}
 
 	@Override
@@ -68,7 +66,7 @@ public class CliPlayer extends Thread {
 	}
 
 	public void togglePaused () {
-		if (isRunning()) this.cmd.add(this.playerCommands.pauseResumeCommand());
+		if (isRunning()) this.cmd.add(this.host.cmds().pauseResumeCommand());
 	}
 
 	public int getCurrentPosition () {
@@ -111,10 +109,10 @@ public class CliPlayer extends Thread {
 
 	private void runCliPlayer (Session session) throws JSchException, IOException {
 		ChannelExec execCh = (ChannelExec) session.openChannel("exec");
-		execCh.setCommand(this.playerCommands.startCommand(this.media));
+		execCh.setCommand(this.host.cmds().startCommand(this.media));
 		execCh.connect(CONNECT_TIMEOUT);
 
-		CliStatusReader statusReader = this.playerCommands.makeStatusReader(execCh.getInputStream());
+		CliStatusReader statusReader = this.host.cmds().makeStatusReader(execCh.getInputStream());
 		statusReader.start();
 		this.status.set(statusReader);
 
@@ -131,7 +129,7 @@ public class CliPlayer extends Thread {
 			catch (Exception e) {/* Ignore. */}
 		}
 
-		execCommand(session, this.playerCommands.killCommand());
+		execCommand(session, this.host.cmds().killCommand());
 		execCh.disconnect();
 	}
 
