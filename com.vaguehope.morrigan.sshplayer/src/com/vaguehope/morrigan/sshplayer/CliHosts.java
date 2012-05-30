@@ -72,7 +72,7 @@ public class CliHosts {
 			throw new NotConfiguredException("Config incomplete: missing name, host, user or pass from '" + file.getAbsolutePath() + "'.");
 		}
 
-		return new CliHost(name, host, port, user, pass);
+		return new CliHost(name, host, port, user, pass, ImplType.MPLAYER);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
