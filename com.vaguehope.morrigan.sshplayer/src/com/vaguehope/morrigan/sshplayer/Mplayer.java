@@ -1,6 +1,11 @@
 package com.vaguehope.morrigan.sshplayer;
 
 import java.io.File;
+import java.io.InputStream;
+
+import com.jcraft.jsch.ChannelExec;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Session;
 
 /**
  * http://www.mplayerhq.hu/DOCS/tech/slave.txt
@@ -8,6 +13,11 @@ import java.io.File;
 public enum Mplayer implements CliPlayerCommands {
 
 	INSTANCE;
+
+	@Override
+	public CliStatusReader makeStatusReader (InputStream source) {
+		return new MplayerStatusReader(source);
+	}
 
 	@Override
 	public String startCommand (File media) {
@@ -29,8 +39,20 @@ public enum Mplayer implements CliPlayerCommands {
 	}
 
 	@Override
-	public String pauseResumeCommand () {
-		return "echo pause > ~/.mnmpcmd"; // Must be a nicer way to do this.
+	public CliPlayerCommand pauseResumeCommand () {
+		return Commands.PAUSE_RESUME;
+	}
+
+	private enum Commands implements CliPlayerCommand {
+		PAUSE_RESUME {
+			@Override
+			public void exec (Session session, ChannelExec mainChEx) throws JSchException {
+				CliPlayer.execCommand(session, "echo pause > ~/.mnmpcmd"); // Must be a nicer way to do this.
+			}
+		};
+
+		@Override
+		public abstract void exec (Session session, ChannelExec mainChEx) throws JSchException;
 	}
 
 	private static String genericFileName (File file) {
