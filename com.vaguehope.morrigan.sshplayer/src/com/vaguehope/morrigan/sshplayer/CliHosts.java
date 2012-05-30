@@ -13,7 +13,7 @@ import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.config.FileExtFilter;
 import com.vaguehope.morrigan.util.PropertiesFile;
 
-public class MplayerHosts {
+public class CliHosts {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private static final String KEY_NAME = "name";
@@ -29,12 +29,12 @@ public class MplayerHosts {
 	private static final Logger LOG = Logger.getLogger(CliPlayer.class.getName());
 
 	private final String configDir = Config.getConfigDir() + "/sshp";
-	private final AtomicReference<Collection<MplayerHost>> hosts = new AtomicReference<Collection<MplayerHost>>(Collections.<MplayerHost>emptyList());
+	private final AtomicReference<Collection<CliHost>> hosts = new AtomicReference<Collection<CliHost>>(Collections.<CliHost>emptyList());
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	public void load () throws IOException {
-		List<MplayerHost> list = new ArrayList<MplayerHost>();
+		List<CliHost> list = new ArrayList<CliHost>();
 
 		for (File file : configFiles()) {
 			try {
@@ -48,7 +48,7 @@ public class MplayerHosts {
 		this.hosts.set(list);
 	}
 
-	public Collection<MplayerHost> getHosts () {
+	public Collection<CliHost> getHosts () {
 		return Collections.unmodifiableCollection(this.hosts.get());
 	}
 
@@ -60,7 +60,7 @@ public class MplayerHosts {
 		return dir.listFiles(new FileExtFilter(".properties"));
 	}
 
-	private static MplayerHost readHostFile (File file) throws IOException, NotConfiguredException {
+	private static CliHost readHostFile (File file) throws IOException, NotConfiguredException {
 		PropertiesFile propFile = new PropertiesFile(file.getAbsolutePath());
 		String name = propFile.getString(KEY_NAME, null);
 		String host = propFile.getString(KEY_HOST, null);
@@ -72,7 +72,7 @@ public class MplayerHosts {
 			throw new NotConfiguredException("Config incomplete: missing name, host, user or pass from '" + file.getAbsolutePath() + "'.");
 		}
 
-		return new MplayerHost(name, host, port, user, pass);
+		return new CliHost(name, host, port, user, pass);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

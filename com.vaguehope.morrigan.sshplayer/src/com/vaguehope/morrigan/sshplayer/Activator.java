@@ -17,7 +17,7 @@ import com.vaguehope.morrigan.player.PlayerRegister;
 public class Activator implements BundleActivator {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private MplayerHosts hosts;
+	private CliHosts hosts;
 	private Queue<Player> players;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -25,7 +25,7 @@ public class Activator implements BundleActivator {
 	@Override
 	public void start (BundleContext context) throws Exception {
 		this.players = new LinkedList<Player>();
-		this.hosts = new MplayerHosts();
+		this.hosts = new CliHosts();
 		this.hosts.load();
 		startPlayerRegisterListener(context);
 	}
@@ -66,7 +66,7 @@ public class Activator implements BundleActivator {
 	}
 
 	protected void registerPlayers (PlayerRegister register) {
-		for (MplayerHost host : this.hosts.getHosts()) {
+		for (CliHost host : this.hosts.getHosts()) {
 			SshPlayer player = new SshPlayer(register.nextIndex(), host, register);
 			register.register(player);
 			this.players.add(player);
