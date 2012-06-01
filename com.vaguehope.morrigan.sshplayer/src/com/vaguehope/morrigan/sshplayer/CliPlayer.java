@@ -133,7 +133,7 @@ public class CliPlayer extends Thread {
 		execCh.disconnect();
 	}
 
-	private void procCmd (Session session, ChannelExec mainChEx) throws JSchException {
+	private void procCmd (Session session, ChannelExec mainChEx) throws JSchException, IOException {
 		CliPlayerCommand c = this.cmd.poll();
 		if (c == null) return;
 		c.exec(session, mainChEx);

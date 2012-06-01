@@ -23,4 +23,5 @@ Import-Package: com.jcraft.jsch,
  org.eclipse.jetty.util.component,
  org.osgi.framework
 Export-Package: com.vaguehope.morrigan.sshplayer,
- com.vaguehope.morrigan.sshplayer.mplayer
+ com.vaguehope.morrigan.sshplayer.mplayer,
+ com.vaguehope.morrigan.sshplayer.omxplayer
