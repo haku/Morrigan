@@ -1,4 +1,4 @@
-package com.vaguehope.morrigan.sshplayer.mplayer;
+package com.vaguehope.morrigan.sshplayer.omxplayer;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,25 +12,22 @@ import java.util.logging.Logger;
 import com.vaguehope.morrigan.sshplayer.CliStatusReader;
 import com.vaguehope.morrigan.sshplayer.ParserHelper;
 
-public class MplayerStatusReader extends Thread implements CliStatusReader {
+public class OmxplayerStatusReader extends Thread implements CliStatusReader {
 
-	private static final String IDENT_LENGTH = "ID_LENGTH=";
-	private static final String IDENT_EXIT = "ID_EXIT=";
+	private static final String FIELD_VIDPOS = "V :";
 
-	private static final String FIELD_VIDPOS = "V:";
-
-	private static final Logger LOG = Logger.getLogger(MplayerStatusReader.class.getName());
-
+	private static final Logger LOG = Logger.getLogger(OmxplayerStatusReader.class.getName());
+	
 	private final BufferedReader source;
 	private final AtomicBoolean finished = new AtomicBoolean(false);
 	private final AtomicInteger duration = new AtomicInteger(-1);
 	private final AtomicInteger currentPosition = new AtomicInteger(-1);
 
-	public MplayerStatusReader (InputStream source) {
+	public OmxplayerStatusReader (InputStream source) {
 		this.source = new BufferedReader(new InputStreamReader(source));
 		setDaemon(true);
 	}
-
+	
 	@Override
 	public void run () {
 		try {
@@ -51,14 +48,14 @@ public class MplayerStatusReader extends Thread implements CliStatusReader {
 			}
 		}
 	}
-
+	
 	private void read () throws IOException {
 		String line;
 		while ((line = this.source.readLine()) != null) {
 			if (!procLine(line)) break;
 		}
 	}
-
+	
 	@Override
 	public boolean isFinished () {
 		return this.finished.get();
@@ -81,23 +78,9 @@ public class MplayerStatusReader extends Thread implements CliStatusReader {
 	 */
 	private boolean procLine (String s) {
 		if (s.length() < 1) return true;
-		if (s.startsWith(IDENT_LENGTH)) {
-			readLength(s);
-		}
-		else if (s.startsWith(IDENT_EXIT)) {
-			return false;
-		}
-		else if (s.startsWith(MORRIGAN_EOF)) {
-			return false;
-		}
-		else {
-			readStatusLine(s);
-		}
+		if (s.startsWith(MORRIGAN_EOF)) return false;
+		readStatusLine(s);
 		return true;
-	}
-
-	private void readLength (String s) {
-		this.duration.set(Integer.parseInt(s.substring(IDENT_LENGTH.length(), ParserHelper.findNextNonDigit(s, IDENT_LENGTH.length() + 1))));
 	}
 
 	public void readStatusLine (String s) {

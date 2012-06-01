@@ -1,10 +1,13 @@
 package com.vaguehope.morrigan.sshplayer;
 
 import com.vaguehope.morrigan.sshplayer.mplayer.Mplayer;
+import com.vaguehope.morrigan.sshplayer.omxplayer.Omxplayer;
 
 public enum ImplType {
 
-	MPLAYER(Mplayer.INSTANCE);
+	MPLAYER(Mplayer.INSTANCE),
+	OMXPLAYER(Omxplayer.INSTANCE),
+	;
 
 	private final CliPlayerCommands cmds;
 
@@ -19,6 +22,9 @@ public enum ImplType {
 	public static ImplType parseType (String type) {
 		if ("mplayer".equalsIgnoreCase(type)) {
 			return MPLAYER;
+		}
+		else if ("omxplayer".equalsIgnoreCase(type)) {
+			return OMXPLAYER;
 		}
 		return null;
 	}
