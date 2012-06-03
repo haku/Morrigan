@@ -17,7 +17,7 @@ public class OmxplayerStatusReader extends Thread implements CliStatusReader {
 	private static final String FIELD_VIDPOS = "V :";
 
 	private static final Logger LOG = Logger.getLogger(OmxplayerStatusReader.class.getName());
-	
+
 	private final BufferedReader source;
 	private final AtomicBoolean finished = new AtomicBoolean(false);
 	private final AtomicInteger duration = new AtomicInteger(-1);
@@ -27,7 +27,7 @@ public class OmxplayerStatusReader extends Thread implements CliStatusReader {
 		this.source = new BufferedReader(new InputStreamReader(source));
 		setDaemon(true);
 	}
-	
+
 	@Override
 	public void run () {
 		try {
@@ -48,14 +48,14 @@ public class OmxplayerStatusReader extends Thread implements CliStatusReader {
 			}
 		}
 	}
-	
+
 	private void read () throws IOException {
 		String line;
 		while ((line = this.source.readLine()) != null) {
 			if (!procLine(line)) break;
 		}
 	}
-	
+
 	@Override
 	public boolean isFinished () {
 		return this.finished.get();
