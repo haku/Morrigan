@@ -64,9 +64,8 @@ public class FileServer {
 				// Do not care; its the client's problem.
 			}
 			catch (Exception e) {
-				if (!(e instanceof InterruptedException)) {
-					CliPlayer.LOG.log(Level.WARNING, "Failed to serve media file.", e);
-				}
+				if (e instanceof InterruptedException) return;
+				CliPlayer.LOG.log(Level.WARNING, "Failed to serve media file.", e);
 			}
 		}
 
