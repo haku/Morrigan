@@ -26,8 +26,8 @@ import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagClassification;
 import com.vaguehope.morrigan.model.media.MediaTagType;
-import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayItem;
+import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayerReader;
 import com.vaguehope.morrigan.server.feedwriters.AbstractFeed;
 import com.vaguehope.morrigan.server.feedwriters.XmlHelper;
@@ -268,11 +268,12 @@ public class PlayersServlet extends HttpServlet {
 					String playerNumberRaw = pathParts[0];
 					try {
 						int playerNumber = Integer.parseInt(playerNumberRaw);
-						Player player;
+						Player player = null;
 						try {
 							player = this.playerListener.getPlayer(playerNumber);
 						}
-						catch (IllegalArgumentException e) {
+						catch (IllegalArgumentException e) { /* handled below */ }
+						if (player == null) {
 							ServletHelper.error(resp, HttpServletResponse.SC_NOT_FOUND, playerNumber + " not found desu~");
 							return;
 						}
