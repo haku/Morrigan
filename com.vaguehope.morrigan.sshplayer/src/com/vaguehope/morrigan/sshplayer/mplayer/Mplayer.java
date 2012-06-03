@@ -24,7 +24,7 @@ public enum Mplayer implements CliPlayerCommands {
 	}
 
 	@Override
-	public String startCommand (File media) {
+	public void configureExec (ChannelExec chex, File media) {
 		StringBuilder s = new StringBuilder("cd"); // Start in home directory.
 		s.append(" ; export DISPLAY=:0");
 		s.append(" ; if [[ ! -e .mnmpcmd ]] ; then mkfifo .mnmpcmd ; fi");
@@ -34,7 +34,7 @@ public enum Mplayer implements CliPlayerCommands {
 				.append(CliPlayerHelper.genericFileName(media))
 				.append("'");
 		s.append(" ; echo ").append(CliStatusReader.MORRIGAN_EOF);
-		return s.toString();
+		chex.setCommand(s.toString());
 	}
 
 	@Override
