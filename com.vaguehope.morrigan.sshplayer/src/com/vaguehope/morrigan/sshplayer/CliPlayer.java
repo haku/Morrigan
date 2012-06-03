@@ -109,7 +109,7 @@ public class CliPlayer extends Thread {
 
 	private void runCliPlayer (Session session) throws JSchException, IOException {
 		ChannelExec execCh = (ChannelExec) session.openChannel("exec");
-		execCh.setCommand(this.host.cmds().startCommand(this.media));
+		this.host.cmds().configureExec(execCh, this.media);
 		execCh.connect(CONNECT_TIMEOUT);
 
 		CliStatusReader statusReader = this.host.cmds().makeStatusReader(execCh.getInputStream());
