@@ -20,10 +20,10 @@ import java.util.List;
 
 public interface ArtifactList extends Comparable<ArtifactList> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	public List<? extends Artifact> getArtifactList ();
-	
+
 	public String getSortKey ();
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

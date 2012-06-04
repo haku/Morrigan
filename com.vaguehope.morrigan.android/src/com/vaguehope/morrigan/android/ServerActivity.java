@@ -62,6 +62,7 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 	private ArtifactListGroupImpl artifactListImpl;
 
 	private ServersList serversList;
+	private ErrorsList errorsList;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -124,6 +125,9 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 
 		this.sidebarLayout = (SidebarLayout) findViewById(R.id.serverLayout);
 		this.sidebarLayout.setListener(this.sidebarListener);
+
+		ListView lstErrors = (ListView) findViewById(R.id.lstErrors);
+		this.errorsList = new ErrorsList(this, lstErrors);
 
 		this.artifactListAdaptor = new ArtifactListAdaptorImpl<ArtifactList>(this, R.layout.simplelistrow);
 		this.artifactListImpl = new ArtifactListGroupImpl();
@@ -245,14 +249,14 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 	public void onPlayersChange (PlayerStateList playersState, Exception e) {
 		this.artifactListImpl.addList(LIST_PLAYERS, playersState);
 		this.artifactListAdaptor.notifyDataSetChanged();
-		if (e != null) Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show(); // TODO put in UI.
+		this.errorsList.setError(LIST_PLAYERS, e);
 	}
 
 	@Override
 	public void onMlistsChange (MlistStateList mlistsState, Exception e) {
 		this.artifactListImpl.addList(LIST_MLISTS, mlistsState);
 		this.artifactListAdaptor.notifyDataSetChanged();
-		if (e != null) Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show(); // TODO put in UI.
+		this.errorsList.setError(LIST_MLISTS, e);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

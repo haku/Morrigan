@@ -39,6 +39,12 @@
         android:orientation="vertical" >
 
         <ListView
+            android:id="@+id/lstErrors"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0" />
+
+        <ListView
             android:id="@+id/lstServer"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
