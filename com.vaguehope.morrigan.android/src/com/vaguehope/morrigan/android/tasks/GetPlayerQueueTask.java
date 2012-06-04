@@ -19,8 +19,9 @@ package com.vaguehope.morrigan.android.tasks;
 import java.io.IOException;
 import java.io.InputStream;
 
-
 import org.xml.sax.SAXException;
+
+import android.app.Activity;
 
 import com.vaguehope.morrigan.android.Constants;
 import com.vaguehope.morrigan.android.helper.HttpHelper.HttpCreds;
@@ -30,42 +31,40 @@ import com.vaguehope.morrigan.android.model.PlayerQueueChangeListener;
 import com.vaguehope.morrigan.android.model.PlayerReference;
 import com.vaguehope.morrigan.android.modelimpl.PlayerQueueImpl;
 
-import android.app.Activity;
-
 public class GetPlayerQueueTask extends AbstractTask<PlayerQueue> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	public enum QueueAction {
 		CLEAR, SHUFFLE;
 	}
-	
+
 	public enum QueueItemAction {
 		TOP, UP, REMOVE, DOWN, BOTTOM;
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	protected final PlayerReference playerReference;
 	private final PlayerQueueChangeListener changeListener;
-	
+
 	QueueAction queueAction = null;
 	QueueItemAction queueItemAction = null;
 	Artifact item = null;
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	public GetPlayerQueueTask (Activity activity, PlayerReference playerReference, PlayerQueueChangeListener changeListener) {
 		super(activity);
 		this.playerReference = playerReference;
 		this.changeListener = changeListener;
 	}
-	
+
 	public GetPlayerQueueTask (Activity activity, PlayerReference playerReference, PlayerQueueChangeListener changeListener, QueueAction action) {
 		this(activity, playerReference, changeListener);
 		if (action == null) throw new IllegalArgumentException();
 		this.queueAction = action;
 	}
-	
+
 	public GetPlayerQueueTask (Activity activity, PlayerReference playerReference, PlayerQueueChangeListener changeListener, QueueItemAction action, Artifact item) {
 		this(activity, playerReference, changeListener);
 		if (action == null) throw new IllegalArgumentException();
@@ -73,14 +72,14 @@ public class GetPlayerQueueTask extends AbstractTask<PlayerQueue> {
 		this.queueItemAction = action;
 		this.item = item;
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	@Override
 	protected HttpCreds getCreds () {
 		return this.playerReference.getServerReference();
 	}
-	
+
 	@Override
 	protected String getUrl () {
 		String url = this.playerReference.getBaseUrl().concat(Constants.CONTEXT_PLAYER_QUEUE);
@@ -89,7 +88,7 @@ public class GetPlayerQueueTask extends AbstractTask<PlayerQueue> {
 		}
 		return url;
 	}
-	
+
 	@Override
 	protected String getVerb () {
 		if (this.queueAction != null || this.queueItemAction != null) {
@@ -97,7 +96,7 @@ public class GetPlayerQueueTask extends AbstractTask<PlayerQueue> {
 		}
 		return "GET";
 	}
-	
+
 	@Override
 	protected String getEncodedData () {
 		if (this.queueAction != null) {
@@ -117,23 +116,23 @@ public class GetPlayerQueueTask extends AbstractTask<PlayerQueue> {
 		}
 		return null;
 	}
-	
+
 	@Override
 	protected String getContentType () {
 		return "application/x-www-form-urlencoded";
 	}
-	
+
 	// In background thread:
 	@Override
 	protected PlayerQueue parseStream (InputStream is) throws IOException, SAXException {
 		return new PlayerQueueImpl(is, GetPlayerQueueTask.this.playerReference);
 	}
-	
+
 	// In UI thread:
 	@Override
-	protected void onSuccess (PlayerQueue result) {
-		if (this.changeListener != null) this.changeListener.onPlayerQueueChange(result);
+	protected void onSuccess (PlayerQueue result, Exception exception) {
+		if (this.changeListener != null) this.changeListener.onPlayerQueueChange(result, exception);
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

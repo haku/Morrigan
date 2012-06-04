@@ -71,15 +71,15 @@ import com.vaguehope.morrigan.android.tasks.RunMlistItemActionTask.MlistItemComm
 
 public class MlistActivity extends Activity implements MlistStateChangeListener, MlistItemListChangeListener {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	public static final String SERVER_ID = "serverId"; // int.
 	public static final String MLIST_BASE_URL = "mlistBaseUrl"; // String.
 	public static final String PLAYER_ID = "playerId"; // int.
-	
+
 	public static final String QUERY = "query";
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	ConfigDb configDb;
 	protected ServerReference serverReference = null;
 	protected MlistReference mlistReference = null;
@@ -88,22 +88,22 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 	private MlistItemList currentItemList = null;
 	private String initialQuery = null;
 	protected PlayerReference playerReference;
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Activity methods.
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		this.configDb = new ConfigDb(this);
-		
+
 		Bundle extras = getIntent().getExtras();
 		int serverId = extras.getInt(SERVER_ID, -1);
 		String mlistBaseUrl = extras.getString(MLIST_BASE_URL);
 		int playerId = extras.getInt(PLAYER_ID, -1);
 		this.initialQuery = extras.getString(QUERY);
-		
+
 		if (serverId >= 0 && mlistBaseUrl != null) {
 			this.serverReference = this.configDb.getServer(serverId);
 			this.mlistReference = new MlistReferenceImpl(mlistBaseUrl, this.serverReference);
@@ -111,52 +111,52 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 		else {
 			finish();
 		}
-		
+
 		if (playerId >= 0) {
 			this.playerReference = new PlayerReferenceImpl(this.serverReference, playerId);
 		}
-		
+
 		this.setTitle(this.mlistReference.getBaseUrl());
-		
+
 		// TODO check return value.
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-		
+
 		setContentView(R.layout.mlist);
 		wireGui();
 	}
-	
+
 	@Override
 	protected void onStart() {
 		super.onStart();
-		
+
 		refresh();
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	GUI setup and buttons.
-	
+
 	private void wireGui () {
 		this.mlistItemListAdapter = new ArtifactListAdaptorImpl<MlistItemList>(this, R.layout.mlistitemlistrow);
-		
+
 		ListView lstItems = (ListView) findViewById(R.id.lstItems);
 		lstItems.setAdapter(this.mlistItemListAdapter);
 		lstItems.setOnItemClickListener(this.mlistItemListCickListener);
 		lstItems.setOnCreateContextMenuListener(this.itemsContextMenuListener);
-		
+
 		((ImageButton) findViewById(R.id.btnQueue)).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick (View v) {
 				queueAll();
 			}
 		});
-		
+
 		((ImageButton) findViewById(R.id.btnSearch)).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick (View v) {
 				search();
 			}
 		});
-		
+
 		((ImageButton) findViewById(R.id.btnRefresh)).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick (View v) {
@@ -164,14 +164,14 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 			}
 		});
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	View menu.
-	
+
 	private static final int MENU_SCAN = 1;
 	private static final int MENU_DOWNLOAD = 2;
 	private static final int MENU_SORT = 3;
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		boolean result = super.onCreateOptionsMenu(menu);
@@ -180,65 +180,65 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 		menu.add(0, MENU_SORT, 1, R.string.menu_sort);
 		return result;
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-			
+
 			case MENU_SCAN:
 				scan();
 				return true;
-			
+
 			case MENU_DOWNLOAD:
 				downloadAllInList();
 				return true;
-			
+
 			case MENU_SORT:
 				this.mlistItemListAdapter.getInputData().sort(MlistItemComparators.FILENAME);
 				this.mlistItemListAdapter.notifyDataSetChanged();
 				return true;
 		}
-		
+
 		return super.onOptionsItemSelected(item);
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Context menu.
-	
+
 	private static final int MENU_CTX_PLAY = 1;
 	private static final int MENU_CTX_QUEUE = 2;
 	private static final int MENU_CTX_ADDTAG = 3;
 	private static final int MENU_CTX_TAGS = 5;
 	private static final int MENU_CTX_TAG = 6;
 	private static final int MENU_CTX_DOWNLOAD = 4;
-	
+
 	private OnItemClickListener mlistItemListCickListener = new OnItemClickListener() {
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 			openContextMenu(view);
 		}
 	};
-	
+
 	private OnCreateContextMenuListener itemsContextMenuListener = new OnCreateContextMenuListener () {
 		@Override
 		public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 			AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
 			MlistItem mlistItem = MlistActivity.this.mlistItemListAdapter.getInputData().getMlistItemList().get(info.position);
-			
+
 			LinearLayout header = new LinearLayout(MlistActivity.this);
 			header.setOrientation(LinearLayout.VERTICAL);
 			header.setPadding(10, 10, 10, 10);
-			
+
 			TextView title = new TextView(MlistActivity.this);
 			title.setText(mlistItem.getFileName());
 			title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
 			header.addView(title);
-			
+
 			TextView counts = new TextView(MlistActivity.this);
 			counts.setText(mlistItem.getStartCount() + "/" + mlistItem.getEndCount() + " " + TimeHelper.formatTimeSeconds(mlistItem.getDuration()));
 			counts.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
 			header.addView(counts);
-			
+
 			String[] tarArr = mlistItem.getTags();
 			if (tarArr != null && tarArr.length > 0) {
 				TextView tags = new TextView(MlistActivity.this);
@@ -246,23 +246,23 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 				tags.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
 				header.addView(tags);
 			}
-			
+
 			menu.setHeaderView(header);
 			menu.add(Menu.NONE, MENU_CTX_PLAY, Menu.NONE, "Play now");
 			menu.add(Menu.NONE, MENU_CTX_QUEUE, Menu.NONE, "Queue");
 			menu.add(Menu.NONE, MENU_CTX_ADDTAG, Menu.NONE, "Add tag...");
-			
+
 			if (tarArr != null && tarArr.length > 0) {
 				SubMenu tagMenu = menu.addSubMenu(Menu.NONE, MENU_CTX_TAGS, Menu.NONE, "tags...");
 				for (String tag : tarArr) {
 					tagMenu.add(Menu.NONE, MENU_CTX_TAG, Menu.NONE, tag);
 				}
 			}
-			
+
 			menu.add(Menu.NONE, MENU_CTX_DOWNLOAD, Menu.NONE, "Download");
 		}
 	};
-	
+
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
 		MlistItem mlistItem = null;
@@ -274,16 +274,16 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 				AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
 				mlistItem = MlistActivity.this.mlistItemListAdapter.getInputData().getMlistItemList().get(info.position);
 		}
-		
+
 		switch (item.getItemId()) {
 			case MENU_CTX_PLAY:
 				playItem(mlistItem);
 				return true;
-			
+
 			case MENU_CTX_QUEUE:
 				queueItem(mlistItem);
 				return true;
-				
+
 			case MENU_CTX_ADDTAG:
 				CommonDialogs.addTag(this, this.mlistReference, mlistItem, new Runnable() {
 					@Override
@@ -292,27 +292,27 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 					}
 				});
 				return true;
-				
+
 			case MENU_CTX_TAG:
 				search(item.getTitle().toString());
 				return true;
-				
+
 			case MENU_CTX_DOWNLOAD:
 				DownloadMediaTask task = new DownloadMediaTask(this, this.mlistReference);
 				task.execute(mlistItem);
 				return true;
-			
+
 			default:
 				return super.onContextItemSelected(item);
 		}
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Commands - to be called on the UI thread.
-	
+
 	protected void refresh () {
 		new GetMlistTask(this, this.mlistReference, this).execute();
-		
+
 		String query = null;
 		if (this.currentItemList != null) {
 			query = this.currentItemList.getQuery();
@@ -321,29 +321,29 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 			query = this.initialQuery;
 			this.initialQuery = null;
 		}
-		
+
 		if (query != null) {
 			new GetMlistItemListTask(
 					MlistActivity.this, MlistActivity.this.mlistReference,
 					MlistActivity.this, query).execute();
 		}
 	}
-	
+
 	protected void scan () {
 		new RunMlistActionTask(this, this.mlistReference, MlistCommand.SCAN).execute();
 	}
-	
+
 	protected void search () {
 		if (this.currentState == null) return; // TODO show msg here?
-		
+
 		final AlertDialog.Builder dlgBuilder = new AlertDialog.Builder(this);
 		dlgBuilder.setTitle("Query " + this.currentState.getTitle());
-		
+
 		final EditText editText = new EditText(this);
 		editText.setSelectAllOnFocus(true);
 		if (this.currentItemList != null) editText.setText(this.currentItemList.getQuery());
 		dlgBuilder.setView(editText);
-		
+
 		dlgBuilder.setPositiveButton("Search", new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int whichButton) {
@@ -352,21 +352,21 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 				search(query);
 			}
 		});
-		
+
 		dlgBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int whichButton) {
 				dialog.cancel();
 			}
 		});
-		
+
 		dlgBuilder.show();
 	}
-	
+
 	protected void search (String query) {
 		new GetMlistItemListTask(MlistActivity.this, MlistActivity.this.mlistReference, MlistActivity.this, query).execute();
 	}
-	
+
 	protected void play () {
 		if (this.playerReference == null) {
 			CommonDialogs.doAskWhichPlayer(MlistActivity.this, MlistActivity.this.serverReference, new PlayerSelectedListener () {
@@ -380,17 +380,17 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 			new RunMlistActionTask(this, this.mlistReference, MlistCommand.PLAY, this.playerReference).execute();
 		}
 	}
-	
+
 	protected void queueAll () {
 		int count = this.mlistItemListAdapter.getCount();
 		if (count < 1) {
 			Toast.makeText(this, "No items to queue", Toast.LENGTH_SHORT).show();
 			return;
 		}
-		
+
 		AlertDialog.Builder dlgBuilder = new AlertDialog.Builder(this);
 		dlgBuilder.setMessage("Queue all " + count + " items?");
-		
+
 		dlgBuilder.setPositiveButton("Queue all", new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick (DialogInterface dialog, int which) {
@@ -407,17 +407,17 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 				}
 			}
 		});
-		
+
 		dlgBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int whichButton) {
 				dialog.cancel();
 			}
 		});
-		
+
 		dlgBuilder.show();
 	}
-	
+
 	protected void downloadAllInList () {
 		List<? extends MlistItem> mitems = this.currentItemList.getMlistItemList();
 		if (mitems.size() > 0) {
@@ -427,7 +427,7 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 			Toast.makeText(this, "No items to download desu~", Toast.LENGTH_SHORT).show();
 		}
 	}
-	
+
 	protected void playItem (final MlistItem item) {
 		if (MlistActivity.this.playerReference == null) {
 			CommonDialogs.doAskWhichPlayer(this, this.serverReference, new PlayerSelectedListener () {
@@ -441,7 +441,7 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 			playItem(item, this.playerReference);
 		}
 	}
-	
+
 	protected void queueItem (final MlistItem item) {
 		if (MlistActivity.this.playerReference == null) {
 			CommonDialogs.doAskWhichPlayer(this, this.serverReference, new PlayerSelectedListener () {
@@ -455,17 +455,17 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 			queueItem(item, this.playerReference);
 		}
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	protected void playItem (final MlistItem item, PlayerReference playerRef) {
 		new RunMlistItemActionTask(this, playerRef, this.mlistReference, item, MlistItemCommand.PLAY).execute();
 	}
-	
+
 	protected void queueItem (final MlistItem item, PlayerReference playerRef) {
 		new RunMlistItemActionTask(this, playerRef, this.mlistReference, item, MlistItemCommand.QUEUE).execute();
 	}
-	
+
 	protected void queueItems (final List<? extends MlistItem> list, PlayerReference playerRef) {
 		List<AbstractTask<String>> tasks = new LinkedList<AbstractTask<String>>();
 		for (MlistItem item : list) {
@@ -475,9 +475,9 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 		}
 		new BulkRunner<String>(this, tasks).execute();
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	private void updateTitle () {
 		String title = this.serverReference.getName();
 		if (this.currentState != null && this.currentState.getTitle() != null) {
@@ -488,42 +488,42 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 		}
 		this.setTitle(title);
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	@Override
-	public void onMlistStateChange(MlistState newState) {
+	public void onMlistStateChange(MlistState newState, Exception exception) {
 		this.currentState = newState;
-		
+
 		if (newState == null) {
-			finish(); // TODO show a msg here? Retry / Fail dlg?
+			if (exception != null) Toast.makeText(this, exception.getMessage(), Toast.LENGTH_SHORT).show(); // TODO put in UI.
 		}
 		else {
 			updateTitle();
-			
+
 			TextView txtCount = (TextView) findViewById(R.id.txtTitle);
 			txtCount.setText(newState.getCount() + " items, "
 					+ (newState.isDurationComplete() ? "" : "> ")
 					+ TimeHelper.formatTimeSeconds(newState.getDuration()) + ".");
-			
+
 		}
 	}
-	
+
 	@Override
-	public void onMlistItemListChange(MlistItemList mlistItemList) {
+	public void onMlistItemListChange(MlistItemList mlistItemList, Exception exception) {
 		this.currentItemList = mlistItemList;
-		
+
 		if (mlistItemList == null) {
-			finish(); // TODO show a msg here? Retry / Fail dlg?
+			if (exception != null) Toast.makeText(this, exception.getMessage(), Toast.LENGTH_SHORT).show(); // TODO put in UI.
 		}
 		else {
 			updateTitle();
 			TextView txtSubTitle = (TextView) findViewById(R.id.txtSubTitle);
 			txtSubTitle.setText(mlistItemList.getMlistItemList().size() + " results for '"+mlistItemList.getQuery()+"'.");
-			
+
 			this.mlistItemListAdapter.setInputData(mlistItemList);
 		}
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

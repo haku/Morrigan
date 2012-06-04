@@ -18,11 +18,12 @@ package com.vaguehope.morrigan.android.model;
 
 public interface PlayerQueueChangeListener {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	/**
 	 * This method will always be called in the UI thread.
+	 * @param exception
 	 */
-	public void onPlayerQueueChange (PlayerQueue newQueue);
-	
+	public void onPlayerQueueChange (PlayerQueue newQueue, Exception exception);
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

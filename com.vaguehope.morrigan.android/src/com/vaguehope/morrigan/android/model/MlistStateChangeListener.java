@@ -18,11 +18,12 @@ package com.vaguehope.morrigan.android.model;
 
 public interface MlistStateChangeListener {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	/**
 	 * This method will always be called in the UI thread.
+	 * @param exception
 	 */
-	public void onMlistStateChange (MlistState newState);
-	
+	public void onMlistStateChange (MlistState newState, Exception exception);
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

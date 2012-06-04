@@ -19,8 +19,10 @@ package com.vaguehope.morrigan.android.tasks;
 import java.io.IOException;
 import java.io.InputStream;
 
-
 import org.xml.sax.SAXException;
+
+import android.app.Activity;
+import android.content.Context;
 
 import com.vaguehope.morrigan.android.Constants;
 import com.vaguehope.morrigan.android.helper.HttpHelper.HttpCreds;
@@ -29,57 +31,54 @@ import com.vaguehope.morrigan.android.model.PlayerStateListChangeListener;
 import com.vaguehope.morrigan.android.model.ServerReference;
 import com.vaguehope.morrigan.android.modelimpl.PlayerStateListImpl;
 
-import android.app.Activity;
-import android.content.Context;
-
 public class GetPlayersTask extends AbstractTask<PlayerStateList> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	protected final ServerReference serverReference;
 	private final PlayerStateListChangeListener changedListener;
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	public GetPlayersTask (Context context, ServerReference serverReference, PlayerStateListChangeListener changedListener) {
 		super(context);
 		this.serverReference = serverReference;
 		this.changedListener = changedListener;
 	}
-	
+
 	public GetPlayersTask (Activity activity, ServerReference serverReference, PlayerStateListChangeListener changedListener) {
 		super(activity);
 		this.serverReference = serverReference;
 		this.changedListener = changedListener;
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	@Override
 	protected String getProgressMsg () {
 		return getActivity() == null ? "Fetching player data..." : null; // Only return msg if activity is null.
 	}
-	
+
 	@Override
 	protected HttpCreds getCreds () {
 		return this.serverReference;
 	}
-	
+
 	@Override
 	protected String getUrl () {
 		return this.serverReference.getBaseUrl().concat(Constants.CONTEXT_PLAYERS);
 	}
-	
+
 	// In background thread:
 	@Override
 	protected PlayerStateList parseStream (InputStream is) throws IOException, SAXException {
 		return new PlayerStateListImpl(is, this.serverReference);
 	}
-	
+
 	// In UI thread:
 	@Override
-	protected void onSuccess (PlayerStateList result) {
-		if (this.changedListener != null) this.changedListener.onPlayersChange(result);
+	protected void onSuccess (PlayerStateList result, Exception exception) {
+		if (this.changedListener != null) this.changedListener.onPlayersChange(result, exception);
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

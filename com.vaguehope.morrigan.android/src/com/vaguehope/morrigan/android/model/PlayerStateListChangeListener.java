@@ -18,11 +18,11 @@ package com.vaguehope.morrigan.android.model;
 
 public interface PlayerStateListChangeListener {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	/**
 	 * This method will always be called in the UI thread.
 	 */
-	public void onPlayersChange (PlayerStateList playersState);
-	
+	public void onPlayersChange (PlayerStateList playersState, Exception e);
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
