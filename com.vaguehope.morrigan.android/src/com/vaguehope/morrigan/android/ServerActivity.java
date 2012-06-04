@@ -28,6 +28,7 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.vaguehope.morrigan.android.ServersList.ServerListEventsListener;
 import com.vaguehope.morrigan.android.layouts.SidebarLayout;
 import com.vaguehope.morrigan.android.layouts.SidebarLayout.SidebarListener;
 import com.vaguehope.morrigan.android.model.Artifact;
@@ -40,7 +41,6 @@ import com.vaguehope.morrigan.android.model.PlayerReference;
 import com.vaguehope.morrigan.android.model.PlayerStateList;
 import com.vaguehope.morrigan.android.model.PlayerStateListChangeListener;
 import com.vaguehope.morrigan.android.model.ServerReference;
-import com.vaguehope.morrigan.android.model.ServerReferenceList;
 import com.vaguehope.morrigan.android.modelimpl.ArtifactListAdaptorImpl;
 import com.vaguehope.morrigan.android.modelimpl.ArtifactListGroupImpl;
 import com.vaguehope.morrigan.android.state.ConfigDb;
@@ -60,6 +60,8 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 	ArtifactListAdaptor<ArtifactList> artifactListAdaptor;
 	private ArtifactListGroupImpl artifactListImpl;
 
+	private ServersList serversList;
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
@@ -67,22 +69,16 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 		super.onCreate(savedInstanceState);
 
 		this.configDb = new ConfigDb(this);
+		wireGui();
 
 		Bundle extras = getIntent().getExtras();
 		int serverId = extras.getInt(SERVER_ID, -1);
 		if (serverId >= 0) {
-			this.serverReference = this.configDb.getServer(serverId);
+			setServer(this.configDb.getServer(serverId));
 		}
 		else {
 			finish();
 		}
-		this.setTitle(this.serverReference.getName());
-
-		// TODO check return value.
-		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-
-		setContentView(R.layout.server);
-		wireGui();
 	}
 
 	@Override
@@ -92,10 +88,18 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 		refresh();
 	}
 
+	protected void setServer (ServerReference ref) {
+		this.serverReference = ref;
+		this.setTitle(this.serverReference.getName());
+	}
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	GUI methods.
 
 	private void wireGui () {
+		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS); // TODO check return value.
+		setContentView(R.layout.server);
+
 		this.sidebarLayout = (SidebarLayout) findViewById(R.id.serverLayout);
 		this.sidebarLayout.setListener(this.sidebarListener);
 
@@ -114,11 +118,13 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 		btnSidebar.setOnClickListener(new SidebarLayout.ToggleSidebarListener(this.sidebarLayout));
 
 		ListView lstSidebar = (ListView) findViewById(R.id.lstSidebar);
-		ArtifactListAdaptorImpl<ServerReferenceList> sidebarListAdapter = new ArtifactListAdaptorImpl<ServerReferenceList>(this, R.layout.simplelistrow);
-		sidebarListAdapter.setInputData(this.configDb);
-		lstSidebar.setAdapter(sidebarListAdapter);
-//		lstServers.setOnItemClickListener(this.serversListCickListener);
-//		lstServers.setOnCreateContextMenuListener(this.serversContextMenuListener);
+		this.serversList = new ServersList(this, lstSidebar, this.configDb, new ServerListEventsListener() {
+			@Override
+			public void showServer (ServerReference ref) {
+				setServer(ref);
+				refresh();
+			}
+		});
 	}
 
 	private OnItemClickListener artifactsListCickListener = new OnItemClickListener() {
