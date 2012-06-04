@@ -19,6 +19,7 @@ package com.vaguehope.morrigan.android;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -84,13 +85,23 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 	@Override
 	protected void onStart () {
 		super.onStart();
-
 		refresh();
 	}
+
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	protected void setServer (ServerReference ref) {
 		this.serverReference = ref;
 		this.setTitle(this.serverReference.getName());
+	}
+
+	protected void refresh () {
+		new GetPlayersTask(this, this.serverReference, this).execute();
+		new GetMlistsTask(this, this.serverReference, this).execute();
+	}
+
+	public ServersList getServersList () {
+		return this.serversList;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -118,13 +129,10 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 		btnSidebar.setOnClickListener(new SidebarLayout.ToggleSidebarListener(this.sidebarLayout));
 
 		ListView lstSidebar = (ListView) findViewById(R.id.lstSidebar);
-		this.serversList = new ServersList(this, lstSidebar, this.configDb, new ServerListEventsListener() {
-			@Override
-			public void showServer (ServerReference ref) {
-				setServer(ref);
-				refresh();
-			}
-		});
+		this.serversList = new ServersList(this, lstSidebar, this.configDb, this.serverListEventsListener);
+
+		ImageButton btnAddServer = (ImageButton) findViewById(R.id.btnAddServer);
+		btnAddServer.setOnClickListener(this.btnAddServerClickListener);
 	}
 
 	private OnItemClickListener artifactsListCickListener = new OnItemClickListener() {
@@ -142,9 +150,31 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 		}
 	}
 
+	ServerListEventsListener serverListEventsListener = new ServerListEventsListener() {
+		@Override
+		public void showServer (ServerReference ref) {
+			setServer(ref);
+			refresh();
+		}
+	};
+
+	private OnClickListener btnAddServerClickListener = new OnClickListener () {
+		@Override
+		public void onClick(View v) {
+			getServersList().promptAddServer();
+		}
+	};
+
 	@Override
 	public void onBackPressed () {
 		if (!this.sidebarLayout.closeSidebar()) finish();
+	}
+
+	@Override
+	public boolean onContextItemSelected (MenuItem item) {
+		boolean handled = this.serversList.handleOnContextItemSelected(item);
+		if (!handled) handled = super.onContextItemSelected(item);
+		return handled;
 	}
 
 	private final SidebarListener sidebarListener = new SidebarListener() {
@@ -192,11 +222,6 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 		intent.putExtra(MlistActivity.MLIST_BASE_URL, item.getBaseUrl());
 		intent.putExtra(MlistActivity.QUERY, "*"); // Default to showing results of wild-card search.
 		startActivity(intent);
-	}
-
-	protected void refresh () {
-		new GetPlayersTask(this, this.serverReference, this).execute();
-		new GetMlistsTask(this, this.serverReference, this).execute();
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
