@@ -78,7 +78,7 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 			setServer(this.configDb.getServer(serverId));
 		}
 		else {
-			finish(); // FIXME allow setServer(null);
+			setServer(null);
 		}
 	}
 
@@ -97,12 +97,18 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 
 	protected void setServer (ServerReference ref) {
 		this.serverReference = ref;
-		this.setTitle(this.serverReference.getName());
+		this.setTitle((this.serverReference == null) ? "Morrigan" : this.serverReference.getName());
 	}
 
 	protected void refresh () {
-		new GetPlayersTask(this, this.serverReference, this).execute();
-		new GetMlistsTask(this, this.serverReference, this).execute();
+		if (this.serverReference != null) {
+			new GetPlayersTask(this, this.serverReference, this).execute();
+			new GetMlistsTask(this, this.serverReference, this).execute();
+		}
+		else {
+			onPlayersChange(null, null);
+			onMlistsChange(null, null);
+		}
 	}
 
 	public ServersList getServersList () {
@@ -163,9 +169,9 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 		}
 	};
 
-	private OnClickListener btnAddServerClickListener = new OnClickListener () {
+	private OnClickListener btnAddServerClickListener = new OnClickListener() {
 		@Override
-		public void onClick(View v) {
+		public void onClick (View v) {
 			getServersList().promptAddServer();
 		}
 	};
@@ -232,26 +238,21 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	UI updating.
 
+	private static final String LIST_PLAYERS = "players";
+	private static final String LIST_MLISTS = "mlists";
+
 	@Override
-	public void onPlayersChange (PlayerStateList playersState) {
-		if (playersState == null) {
-			finish(); // FIXME show a msg here? Retry / Fail dlg?
-		}
-		else {
-			this.artifactListImpl.addList("players", playersState);
-			this.artifactListAdaptor.notifyDataSetChanged();
-		}
+	public void onPlayersChange (PlayerStateList playersState, Exception e) {
+		this.artifactListImpl.addList(LIST_PLAYERS, playersState);
+		this.artifactListAdaptor.notifyDataSetChanged();
+		if (e != null) Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show(); // TODO put in UI.
 	}
 
 	@Override
-	public void onMlistsChange (MlistStateList mlistsState) {
-		if (mlistsState == null) {
-			finish(); // FIXME show a msg here? Retry / Fail dlg?
-		}
-		else {
-			this.artifactListImpl.addList("mlists", mlistsState);
-			this.artifactListAdaptor.notifyDataSetChanged();
-		}
+	public void onMlistsChange (MlistStateList mlistsState, Exception e) {
+		this.artifactListImpl.addList(LIST_MLISTS, mlistsState);
+		this.artifactListAdaptor.notifyDataSetChanged();
+		if (e != null) Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show(); // TODO put in UI.
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

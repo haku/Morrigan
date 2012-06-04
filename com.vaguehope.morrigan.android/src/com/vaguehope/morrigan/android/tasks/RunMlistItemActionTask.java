@@ -21,8 +21,10 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
-
 import org.xml.sax.SAXException;
+
+import android.app.Activity;
+import android.widget.Toast;
 
 import com.vaguehope.morrigan.android.Constants;
 import com.vaguehope.morrigan.android.helper.HttpHelper.HttpCreds;
@@ -30,45 +32,42 @@ import com.vaguehope.morrigan.android.model.MlistItem;
 import com.vaguehope.morrigan.android.model.MlistReference;
 import com.vaguehope.morrigan.android.model.PlayerReference;
 
-import android.app.Activity;
-import android.widget.Toast;
-
 public class RunMlistItemActionTask extends AbstractTask<String> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	static public enum MlistItemCommand {
 		PLAY(0), QUEUE(1);
-		
+
 		private int n;
-		
+
 		private MlistItemCommand (int n) {
 			this.n = n;
 		}
-		
+
 		public int getN() {
 			return this.n;
 		}
-		
+
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	private final PlayerReference playerReference;
 	private final MlistReference mlistReference;
 	private final MlistItem mlistItem;
 	private final MlistItemCommand cmd;
 	private final String newTag;
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	public RunMlistItemActionTask (Activity activity, PlayerReference playerReference, MlistReference mlistReference, MlistItem mlistItem, MlistItemCommand cmd) {
 		this(activity, playerReference, mlistReference, mlistItem, cmd, null);
 	}
-	
+
 	public RunMlistItemActionTask (Activity activity, MlistReference mlistReference, MlistItem mlistItem, String newTag) {
 		this(activity, null, mlistReference, mlistItem, null, newTag);
 	}
-	
+
 	private RunMlistItemActionTask (Activity activity, PlayerReference playerReference, MlistReference mlistReference, MlistItem mlistItem, MlistItemCommand cmd, String newTag) {
 		super(activity);
 		this.playerReference = playerReference;
@@ -78,7 +77,7 @@ public class RunMlistItemActionTask extends AbstractTask<String> {
 		this.newTag = newTag;
 	}
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	@Override
 	protected String getProgressMsg () {
 		if (this.cmd != null) {
@@ -95,22 +94,22 @@ public class RunMlistItemActionTask extends AbstractTask<String> {
 			return "Please wait...";
 		}
 	}
-	
+
 	@Override
 	protected HttpCreds getCreds () {
 		return this.mlistReference.getServerReference();
 	}
-	
+
 	@Override
 	protected String getUrl () {
 		return this.mlistReference.getBaseUrl() + Constants.CONTEXT_MLIST_ITEMS + "/" + this.mlistItem.getRelativeUrl();
 	}
-	
+
 	@Override
 	protected String getVerb () {
 		return "POST";
 	}
-	
+
 	@Override
 	protected String getEncodedData () {
 		if (this.cmd != null) {
@@ -119,11 +118,11 @@ public class RunMlistItemActionTask extends AbstractTask<String> {
 				case PLAY:
 					encodedData = encodedData.concat("play");
 					break;
-					
+
 				case QUEUE:
 					encodedData = encodedData.concat("queue");
 					break;
-					
+
 				default: throw new IllegalArgumentException();
 			}
 			encodedData = encodedData.concat("&playerid=" + String.valueOf(this.playerReference.getPlayerId()));
@@ -140,22 +139,27 @@ public class RunMlistItemActionTask extends AbstractTask<String> {
 			throw new IllegalStateException();
 		}
 	}
-	
+
 	@Override
 	protected String getContentType () {
 		return "application/x-www-form-urlencoded";
 	}
-	
+
 	@Override
 	protected String parseStream (InputStream is) throws IOException, SAXException {
 		return parseStreamToString(is);
 	}
-	
+
 	// In UI thread:
 	@Override
-	protected void onSuccess (String result) {
-		if (isShowProgress()) Toast.makeText(getActivity(), result, Toast.LENGTH_SHORT).show();
+	protected void onSuccess (String result, Exception exception) {
+		if (isShowProgress() && result != null) {
+			Toast.makeText(getActivity(), result, Toast.LENGTH_SHORT).show();
+		}
+		if (isShowProgress() && exception != null) {
+			Toast.makeText(getActivity(), exception.getMessage(), Toast.LENGTH_SHORT).show();
+		}
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

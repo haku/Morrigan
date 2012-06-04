@@ -20,8 +20,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
 
-
 import org.xml.sax.SAXException;
+
+import android.app.Activity;
 
 import com.vaguehope.morrigan.android.Constants;
 import com.vaguehope.morrigan.android.helper.HttpHelper.HttpCreds;
@@ -30,44 +31,42 @@ import com.vaguehope.morrigan.android.model.MlistItemListChangeListener;
 import com.vaguehope.morrigan.android.model.MlistReference;
 import com.vaguehope.morrigan.android.modelimpl.MlistItemListImpl;
 
-import android.app.Activity;
-
 public class GetMlistItemListTask extends AbstractTask<MlistItemList> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	private final MlistReference mlistReference;
 	private final MlistItemListChangeListener changedListener;
 	protected final String query;
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	public GetMlistItemListTask (Activity activity, MlistReference mlistReference, MlistItemListChangeListener changedListener) {
 		this(activity, mlistReference, changedListener, null);
 	}
-	
+
 	public GetMlistItemListTask (Activity activity, MlistReference mlistReference, MlistItemListChangeListener changedListener, String query) {
 		super(activity);
 		this.mlistReference = mlistReference;
 		this.changedListener = changedListener;
 		this.query = query;
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	@Override
 	protected String getProgressMsg () {
 		return "Fetching media items...";
 	}
-	
+
 	@Override
 	protected HttpCreds getCreds () {
 		return this.mlistReference.getServerReference();
 	}
-	
+
 	@Override
 	protected String getUrl () {
 		String url = this.mlistReference.getBaseUrl();
-		
+
 		if (this.query != null) {
 			String encodedQuery = URLEncoder.encode(this.query);
 			url = url.concat(Constants.CONTEXT_MLIST_QUERY + "/" + encodedQuery);
@@ -75,20 +74,20 @@ public class GetMlistItemListTask extends AbstractTask<MlistItemList> {
 		else {
 			url = url.concat(Constants.CONTEXT_MLIST_ITEMS);
 		}
-		
+
 		return url;
 	}
-	
+
 	@Override
 	protected MlistItemList parseStream (InputStream is) throws IOException, SAXException {
 		return new MlistItemListImpl(is, GetMlistItemListTask.this.query);
 	}
-	
+
 	// In UI thread:
 	@Override
-	protected void onSuccess (MlistItemList result) {
-		if (this.changedListener != null) this.changedListener.onMlistItemListChange(result);
+	protected void onSuccess (MlistItemList result, Exception exception) {
+		if (this.changedListener != null) this.changedListener.onMlistItemListChange(result, exception);
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

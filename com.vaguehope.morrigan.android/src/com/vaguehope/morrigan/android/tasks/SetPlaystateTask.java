@@ -33,49 +33,49 @@ import com.vaguehope.morrigan.android.modelimpl.PlayerStateXmlImpl;
 
 public class SetPlaystateTask extends AbstractTask<PlayerState> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	public enum TargetPlayState {
 		STOP(0), NEXT(1), PLAYPAUSE(2);
-		
+
 		private int n;
-		
+
 		private TargetPlayState (int n) {
 			this.n = n;
 		}
-		
+
 		public int getN() {
 			return this.n;
 		}
-		
+
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	protected final PlayerReference playerReference;
 	private final PlayerStateChangeListener changeListener;
-	
+
 	private final TargetPlayState targetPlayState;
 	private final int fullscreenMonitor;
 	private final String newTag;
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	public SetPlaystateTask (Activity activity, PlayerReference playerReference, PlayerStateChangeListener changeListener) {
 		this(activity, playerReference, null, -1, null, changeListener);
 	}
-	
+
 	public SetPlaystateTask (Activity activity, PlayerReference playerReference, TargetPlayState targetPlayState, PlayerStateChangeListener changeListener) {
 		this(activity, playerReference, targetPlayState, -1, null, changeListener);
 	}
-	
+
 	public SetPlaystateTask (Activity activity, PlayerReference playerReference, int fullscreenMonitor, PlayerStateChangeListener changeListener) {
 		this(activity, playerReference, null, fullscreenMonitor, null, changeListener);
 	}
-	
+
 	public SetPlaystateTask (Activity activity, PlayerReference playerReference, String newTag, PlayerStateChangeListener changeListener) {
 		this(activity, playerReference, null, -1, newTag, changeListener);
 	}
-	
+
 	private SetPlaystateTask (Activity activity, PlayerReference playerReference, TargetPlayState targetPlayState, int fullscreenMonitor, String newTag, PlayerStateChangeListener changeListener) {
 		super(activity);
 		this.playerReference = playerReference;
@@ -84,21 +84,21 @@ public class SetPlaystateTask extends AbstractTask<PlayerState> {
 		this.newTag = newTag;
 		this.changeListener = changeListener;
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	private String verb = null;
 	private String encodedData = null;
-	
+
 	@Override
 	protected HttpCreds getCreds () {
 		return this.playerReference.getServerReference();
 	}
-	
+
 	@Override
 	protected String getUrl () {
 		String url = this.playerReference.getBaseUrl();
-		
+
 		if (this.targetPlayState != null) {
 			this.verb = "POST";
 			this.encodedData = "action=";
@@ -106,15 +106,15 @@ public class SetPlaystateTask extends AbstractTask<PlayerState> {
 				case PLAYPAUSE:
 					this.encodedData = this.encodedData.concat("playpause");
 					break;
-					
+
 				case NEXT:
 					this.encodedData = this.encodedData.concat("next");
 					break;
-					
+
 				case STOP:
 					this.encodedData = this.encodedData.concat("stop");
 					break;
-					
+
 				default: throw new IllegalArgumentException();
 			}
 		}
@@ -130,36 +130,36 @@ public class SetPlaystateTask extends AbstractTask<PlayerState> {
 			} catch (UnsupportedEncodingException e) { throw new RuntimeException(e); }
 			this.encodedData = "action=addtag&tag=" + encodedTag;
 		}
-		
+
 		return url;
 	}
-	
+
 	@Override
 	protected String getVerb () {
 		return this.verb;
 	}
-	
+
 	@Override
 	protected String getEncodedData () {
 		return this.encodedData;
 	}
-	
+
 	@Override
 	protected String getContentType () {
 		return "application/x-www-form-urlencoded";
 	}
-	
+
 	// In background thread:
 	@Override
 	protected PlayerState parseStream (InputStream is) throws IOException, SAXException {
 		return new PlayerStateXmlImpl(is, this.playerReference);
 	}
-	
+
 	// In UI thread:
 	@Override
-	protected void onSuccess (PlayerState result) {
-		if (this.changeListener != null) this.changeListener.onPlayerStateChange(result);
+	protected void onSuccess (PlayerState result, Exception exception) {
+		if (this.changeListener != null) this.changeListener.onPlayerStateChange(result, exception);
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

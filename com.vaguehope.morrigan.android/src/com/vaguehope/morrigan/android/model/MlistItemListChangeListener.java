@@ -18,11 +18,12 @@ package com.vaguehope.morrigan.android.model;
 
 public interface MlistItemListChangeListener {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	/**
 	 * This method will always be called in the UI thread.
+	 * @param exception
 	 */
-	public void onMlistItemListChange (MlistItemList mlistItemList);
-	
+	public void onMlistItemListChange (MlistItemList mlistItemList, Exception exception);
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

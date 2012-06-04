@@ -406,11 +406,11 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 //	UI updating.
 
 	@Override
-	public void onPlayerStateChange(PlayerState newState) {
+	public void onPlayerStateChange(PlayerState newState, Exception exception) {
 		this.currentState = newState;
 
 		if (newState == null) {
-			finish(); // TODO show a msg here? Retry / Fail dlg?
+			if (exception != null) Toast.makeText(this, exception.getMessage(), Toast.LENGTH_SHORT).show(); // TODO put in UI.
 		}
 		else {
 			if (newState.getName() != null && newState.getName().length() > 0) {
@@ -459,9 +459,9 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 	}
 
 	@Override
-	public void onPlayerQueueChange(PlayerQueue newQueue) {
+	public void onPlayerQueueChange(PlayerQueue newQueue, Exception exception) {
 		if (newQueue == null) {
-			finish(); // TODO show a msg here? Retry / Fail dlg?
+			if (exception != null) Toast.makeText(this, exception.getMessage(), Toast.LENGTH_SHORT).show(); // TODO put in UI.
 		}
 		else {
     		this.queueListAdaptor.setInputData(newQueue);

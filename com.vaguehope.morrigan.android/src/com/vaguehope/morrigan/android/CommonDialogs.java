@@ -46,7 +46,7 @@ public class CommonDialogs {
 	static public void doAskWhichPlayer (final Context context, final ServerReference serverReference, final PlayerSelectedListener listener) {
 		GetPlayersTask task = new GetPlayersTask(context, serverReference, new PlayerStateListChangeListener () {
 			@Override
-			public void onPlayersChange(PlayerStateList playersState) {
+			public void onPlayersChange(PlayerStateList playersState, Exception e) {
 				List<? extends PlayerState> playerList = playersState.getPlayersStateList();
 
 				if (playerList == null || playerList.size() < 1) {

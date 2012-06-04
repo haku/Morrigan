@@ -19,8 +19,9 @@ package com.vaguehope.morrigan.android.tasks;
 import java.io.IOException;
 import java.io.InputStream;
 
-
 import org.xml.sax.SAXException;
+
+import android.app.Activity;
 
 import com.vaguehope.morrigan.android.Constants;
 import com.vaguehope.morrigan.android.helper.HttpHelper.HttpCreds;
@@ -29,45 +30,43 @@ import com.vaguehope.morrigan.android.model.MlistStateListChangeListener;
 import com.vaguehope.morrigan.android.model.ServerReference;
 import com.vaguehope.morrigan.android.modelimpl.MlistStateListImpl;
 
-import android.app.Activity;
-
 public class GetMlistsTask extends AbstractTask<MlistStateList> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	protected final ServerReference serverReference;
 	private final MlistStateListChangeListener changedListener;
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	public GetMlistsTask (Activity activity, ServerReference serverReference, MlistStateListChangeListener changedListener) {
 		super(activity);
 		this.serverReference = serverReference;
 		this.changedListener = changedListener;
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	@Override
 	protected String getUrl () {
 		return this.serverReference.getBaseUrl().concat(Constants.CONTEXT_MLISTS);
 	}
-	
+
 	@Override
 	protected HttpCreds getCreds () {
 		return this.serverReference;
 	}
-	
+
 	// In background thread:
 	@Override
 	protected MlistStateList parseStream (InputStream is) throws IOException, SAXException {
 		return new MlistStateListImpl(is, GetMlistsTask.this.serverReference);
 	}
-	
+
 	// In UI thread:
 	@Override
-	protected void onSuccess (MlistStateList result) {
-		if (this.changedListener != null) this.changedListener.onMlistsChange(result);
+	protected void onSuccess (MlistStateList result, Exception exception) {
+		if (this.changedListener != null) this.changedListener.onMlistsChange(result, exception);
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
