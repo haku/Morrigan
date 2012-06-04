@@ -81,19 +81,20 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	ConfigDb configDb;
+	private ErrorsList errorsList;
 	protected ServerReference serverReference = null;
 	protected MlistReference mlistReference = null;
 	protected ArtifactListAdaptorImpl<MlistItemList> mlistItemListAdapter;
 	private MlistState currentState = null;
 	private MlistItemList currentItemList = null;
-	private String initialQuery = null;
+	private String currentQuery = null;
 	protected PlayerReference playerReference;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Activity methods.
 
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	public void onCreate (Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		this.configDb = new ConfigDb(this);
@@ -102,7 +103,7 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 		int serverId = extras.getInt(SERVER_ID, -1);
 		String mlistBaseUrl = extras.getString(MLIST_BASE_URL);
 		int playerId = extras.getInt(PLAYER_ID, -1);
-		this.initialQuery = extras.getString(QUERY);
+		this.currentQuery = extras.getString(QUERY);
 
 		if (serverId >= 0 && mlistBaseUrl != null) {
 			this.serverReference = this.configDb.getServer(serverId);
@@ -126,9 +127,8 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 	}
 
 	@Override
-	protected void onStart() {
+	protected void onStart () {
 		super.onStart();
-
 		refresh();
 	}
 
@@ -136,6 +136,9 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 //	GUI setup and buttons.
 
 	private void wireGui () {
+		ListView lstErrors = (ListView) findViewById(R.id.lstErrors);
+		this.errorsList = new ErrorsList(this, lstErrors);
+
 		this.mlistItemListAdapter = new ArtifactListAdaptorImpl<MlistItemList>(this, R.layout.mlistitemlistrow);
 
 		ListView lstItems = (ListView) findViewById(R.id.lstItems);
@@ -173,7 +176,7 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 	private static final int MENU_SORT = 3;
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
+	public boolean onCreateOptionsMenu (Menu menu) {
 		boolean result = super.onCreateOptionsMenu(menu);
 		menu.add(0, MENU_SCAN, 0, R.string.menu_scan);
 		menu.add(0, MENU_DOWNLOAD, 1, R.string.menu_download);
@@ -182,7 +185,7 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
+	public boolean onOptionsItemSelected (MenuItem item) {
 		switch (item.getItemId()) {
 
 			case MENU_SCAN:
@@ -214,14 +217,14 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 
 	private OnItemClickListener mlistItemListCickListener = new OnItemClickListener() {
 		@Override
-		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+		public void onItemClick (AdapterView<?> parent, View view, int position, long id) {
 			openContextMenu(view);
 		}
 	};
 
-	private OnCreateContextMenuListener itemsContextMenuListener = new OnCreateContextMenuListener () {
+	private OnCreateContextMenuListener itemsContextMenuListener = new OnCreateContextMenuListener() {
 		@Override
-		public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+		public void onCreateContextMenu (ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 			AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
 			MlistItem mlistItem = MlistActivity.this.mlistItemListAdapter.getInputData().getMlistItemList().get(info.position);
 
@@ -264,7 +267,7 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 	};
 
 	@Override
-	public boolean onContextItemSelected(MenuItem item) {
+	public boolean onContextItemSelected (MenuItem item) {
 		MlistItem mlistItem = null;
 		switch (item.getItemId()) {
 			case MENU_CTX_PLAY:
@@ -312,21 +315,9 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 
 	protected void refresh () {
 		new GetMlistTask(this, this.mlistReference, this).execute();
-
-		String query = null;
-		if (this.currentItemList != null) {
-			query = this.currentItemList.getQuery();
-		}
-		else if (this.initialQuery != null) {
-			query = this.initialQuery;
-			this.initialQuery = null;
-		}
-
-		if (query != null) {
-			new GetMlistItemListTask(
-					MlistActivity.this, MlistActivity.this.mlistReference,
-					MlistActivity.this, query).execute();
-		}
+		new GetMlistItemListTask(
+				MlistActivity.this, MlistActivity.this.mlistReference,
+				MlistActivity.this, this.currentQuery).execute();
 	}
 
 	protected void scan () {
@@ -346,7 +337,7 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 
 		dlgBuilder.setPositiveButton("Search", new DialogInterface.OnClickListener() {
 			@Override
-			public void onClick(DialogInterface dialog, int whichButton) {
+			public void onClick (DialogInterface dialog, int whichButton) {
 				String query = editText.getText().toString().trim();
 				dialog.dismiss();
 				search(query);
@@ -355,7 +346,7 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 
 		dlgBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 			@Override
-			public void onClick(DialogInterface dialog, int whichButton) {
+			public void onClick (DialogInterface dialog, int whichButton) {
 				dialog.cancel();
 			}
 		});
@@ -369,9 +360,9 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 
 	protected void play () {
 		if (this.playerReference == null) {
-			CommonDialogs.doAskWhichPlayer(MlistActivity.this, MlistActivity.this.serverReference, new PlayerSelectedListener () {
+			CommonDialogs.doAskWhichPlayer(MlistActivity.this, MlistActivity.this.serverReference, new PlayerSelectedListener() {
 				@Override
-				public void playerSelected(PlayerState playerState) {
+				public void playerSelected (PlayerState playerState) {
 					new RunMlistActionTask(MlistActivity.this, MlistActivity.this.mlistReference, MlistCommand.PLAY, playerState.getPlayerReference()).execute();
 				}
 			});
@@ -395,9 +386,9 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 			@Override
 			public void onClick (DialogInterface dialog, int which) {
 				if (MlistActivity.this.playerReference == null) {
-					CommonDialogs.doAskWhichPlayer(MlistActivity.this, MlistActivity.this.serverReference, new PlayerSelectedListener () {
+					CommonDialogs.doAskWhichPlayer(MlistActivity.this, MlistActivity.this.serverReference, new PlayerSelectedListener() {
 						@Override
-						public void playerSelected(PlayerState playerState) {
+						public void playerSelected (PlayerState playerState) {
 							queueItems(MlistActivity.this.mlistItemListAdapter.getInputData().getMlistItemList(), playerState.getPlayerReference());
 						}
 					});
@@ -410,7 +401,7 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 
 		dlgBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 			@Override
-			public void onClick(DialogInterface dialog, int whichButton) {
+			public void onClick (DialogInterface dialog, int whichButton) {
 				dialog.cancel();
 			}
 		});
@@ -430,9 +421,9 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 
 	protected void playItem (final MlistItem item) {
 		if (MlistActivity.this.playerReference == null) {
-			CommonDialogs.doAskWhichPlayer(this, this.serverReference, new PlayerSelectedListener () {
+			CommonDialogs.doAskWhichPlayer(this, this.serverReference, new PlayerSelectedListener() {
 				@Override
-				public void playerSelected(PlayerState playerState) {
+				public void playerSelected (PlayerState playerState) {
 					playItem(item, playerState.getPlayerReference());
 				}
 			});
@@ -444,9 +435,9 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 
 	protected void queueItem (final MlistItem item) {
 		if (MlistActivity.this.playerReference == null) {
-			CommonDialogs.doAskWhichPlayer(this, this.serverReference, new PlayerSelectedListener () {
+			CommonDialogs.doAskWhichPlayer(this, this.serverReference, new PlayerSelectedListener() {
 				@Override
-				public void playerSelected(PlayerState playerState) {
+				public void playerSelected (PlayerState playerState) {
 					queueItem(item, playerState.getPlayerReference());
 				}
 			});
@@ -491,36 +482,31 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+	private static final String FEED_MLIST = "mlist";
+	private static final String FEED_ITEMS = "items";
+
 	@Override
-	public void onMlistStateChange(MlistState newState, Exception exception) {
+	public void onMlistStateChange (MlistState newState, Exception exception) {
 		this.currentState = newState;
-
-		if (newState == null) {
-			if (exception != null) Toast.makeText(this, exception.getMessage(), Toast.LENGTH_SHORT).show(); // TODO put in UI.
-		}
-		else {
+		this.errorsList.setError(FEED_MLIST, exception);
+		if (newState != null) {
 			updateTitle();
-
 			TextView txtCount = (TextView) findViewById(R.id.txtTitle);
 			txtCount.setText(newState.getCount() + " items, "
 					+ (newState.isDurationComplete() ? "" : "> ")
 					+ TimeHelper.formatTimeSeconds(newState.getDuration()) + ".");
-
 		}
 	}
 
 	@Override
-	public void onMlistItemListChange(MlistItemList mlistItemList, Exception exception) {
+	public void onMlistItemListChange (MlistItemList mlistItemList, Exception exception) {
 		this.currentItemList = mlistItemList;
-
-		if (mlistItemList == null) {
-			if (exception != null) Toast.makeText(this, exception.getMessage(), Toast.LENGTH_SHORT).show(); // TODO put in UI.
-		}
-		else {
+		this.errorsList.setError(FEED_ITEMS, exception);
+		if (mlistItemList != null) {
+			this.currentQuery = mlistItemList.getQuery();
 			updateTitle();
 			TextView txtSubTitle = (TextView) findViewById(R.id.txtSubTitle);
-			txtSubTitle.setText(mlistItemList.getMlistItemList().size() + " results for '"+mlistItemList.getQuery()+"'.");
-
+			txtSubTitle.setText(mlistItemList.getMlistItemList().size() + " results for '" + mlistItemList.getQuery() + "'.");
 			this.mlistItemListAdapter.setInputData(mlistItemList);
 		}
 	}
