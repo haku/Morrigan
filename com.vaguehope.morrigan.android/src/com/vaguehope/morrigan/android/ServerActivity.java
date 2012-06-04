@@ -45,6 +45,7 @@ import com.vaguehope.morrigan.android.model.ServerReference;
 import com.vaguehope.morrigan.android.modelimpl.ArtifactListAdaptorImpl;
 import com.vaguehope.morrigan.android.modelimpl.ArtifactListGroupImpl;
 import com.vaguehope.morrigan.android.state.ConfigDb;
+import com.vaguehope.morrigan.android.state.Preferences;
 import com.vaguehope.morrigan.android.tasks.GetMlistsTask;
 import com.vaguehope.morrigan.android.tasks.GetPlayersTask;
 
@@ -78,6 +79,9 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 			Bundle extras = getIntent().getExtras();
 			if (extras != null) serverId = extras.getInt(SERVER_ID, -1);
 		}
+		if (serverId < 0) {
+			serverId = Preferences.getCurrentServer(this);
+		}
 		if (serverId >= 0) {
 			setServer(this.configDb.getServer(serverId));
 		}
@@ -96,6 +100,13 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 	@Override
 	protected void onSaveInstanceState (Bundle outState) {
 		outState.putInt(SERVER_ID, this.serverReference.getId());
+		super.onSaveInstanceState(outState);
+	}
+
+	@Override
+	protected void onPause () {
+		Preferences.putCurrentServer(this, this.serverReference.getId());
+		super.onPause();
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
