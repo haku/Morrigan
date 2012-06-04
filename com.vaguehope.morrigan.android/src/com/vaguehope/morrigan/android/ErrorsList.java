@@ -1,6 +1,8 @@
 package com.vaguehope.morrigan.android;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +42,7 @@ public class ErrorsList {
 	private class ErrorList implements ArtifactList {
 
 		private final Map<String, ErrorArtifact> errors = new LinkedHashMap<String, ErrorArtifact>();
+		private List<Artifact> cache;
 
 		public ErrorList () {}
 
@@ -50,11 +53,12 @@ public class ErrorsList {
 			else {
 				this.errors.remove(tag);
 			}
+			this.cache = Collections.unmodifiableList(new ArrayList<Artifact>(new HashSet<Artifact>(this.errors.values())));
 		}
 
 		@Override
 		public List<? extends Artifact> getArtifactList () {
-			return new ArrayList<ErrorArtifact>(this.errors.values());
+			return this.cache;
 		}
 
 		@Override
@@ -90,6 +94,20 @@ public class ErrorsList {
 		@Override
 		public int getImageResource () {
 			return R.drawable.exclamation_red;
+		}
+
+		@Override
+		public boolean equals (Object o) {
+			if (o == null) return false;
+			if (o == this) return true;
+			if (!(o instanceof ErrorArtifact)) return false;
+			ErrorArtifact that = (ErrorArtifact) o;
+			return this.title.equals(that.getTitle());
+		}
+
+		@Override
+		public int hashCode () {
+			return this.title.hashCode();
 		}
 
 	}
