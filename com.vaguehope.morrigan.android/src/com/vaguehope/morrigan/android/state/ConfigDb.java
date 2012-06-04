@@ -16,8 +16,8 @@
 
 package com.vaguehope.morrigan.android.state;
 
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 import android.content.ContentValues;
@@ -89,12 +89,12 @@ public class ConfigDb extends SQLiteOpenHelper implements ServerReferenceList {
 			try {
 				Cursor c = null;
 				try {
-					List<ServerReference> ret = new LinkedList<ServerReference>();
+					List<ServerReference> ret = new ArrayList<ServerReference>();
 
 					c = db.query(true, TBL_HOSTS,
 							new String[] { TBL_HOSTS_ID, TBL_HOSTS_NAME, TBL_HOSTS_URL, TBL_HOSTS_PASS },
 							null, null, null, null,
-							TBL_HOSTS_NAME + " DESC", null);
+							TBL_HOSTS_NAME + " ASC", null);
 
 					if (c.moveToFirst()) {
 						int col_id = c.getColumnIndex(TBL_HOSTS_ID);
@@ -142,8 +142,8 @@ public class ConfigDb extends SQLiteOpenHelper implements ServerReferenceList {
 							new String[] { TBL_HOSTS_ID, TBL_HOSTS_NAME, TBL_HOSTS_URL, TBL_HOSTS_PASS },
 							TBL_HOSTS_ID + "=?", new String[] { String.valueOf(id) },
 							null, null,
-							TBL_HOSTS_NAME + " DESC", null
-							);
+							TBL_HOSTS_NAME + " ASC", null);
+
 					if (c.moveToFirst()) {
 						int col_id = c.getColumnIndex(TBL_HOSTS_ID);
 						int col_name = c.getColumnIndex(TBL_HOSTS_NAME);
