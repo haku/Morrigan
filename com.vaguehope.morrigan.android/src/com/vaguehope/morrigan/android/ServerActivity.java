@@ -72,13 +72,13 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 		this.configDb = new ConfigDb(this);
 		wireGui();
 
-		Bundle extras = getIntent().getExtras();
-		int serverId = extras.getInt(SERVER_ID, -1);
+		int serverId = (savedInstanceState == null) ? -1 : savedInstanceState.getInt(SERVER_ID, -1);
+		if (serverId < 0) serverId = getIntent().getExtras().getInt(SERVER_ID, -1);
 		if (serverId >= 0) {
 			setServer(this.configDb.getServer(serverId));
 		}
 		else {
-			finish();
+			finish(); // FIXME allow setServer(null);
 		}
 	}
 
@@ -86,6 +86,11 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 	protected void onStart () {
 		super.onStart();
 		refresh();
+	}
+
+	@Override
+	protected void onSaveInstanceState (Bundle outState) {
+		outState.putInt(SERVER_ID, this.serverReference.getId());
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -230,7 +235,7 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 	@Override
 	public void onPlayersChange (PlayerStateList playersState) {
 		if (playersState == null) {
-			finish(); // TODO show a msg here? Retry / Fail dlg?
+			finish(); // FIXME show a msg here? Retry / Fail dlg?
 		}
 		else {
 			this.artifactListImpl.addList("players", playersState);
@@ -241,7 +246,7 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 	@Override
 	public void onMlistsChange (MlistStateList mlistsState) {
 		if (mlistsState == null) {
-			finish(); // TODO show a msg here? Retry / Fail dlg?
+			finish(); // FIXME show a msg here? Retry / Fail dlg?
 		}
 		else {
 			this.artifactListImpl.addList("mlists", mlistsState);
