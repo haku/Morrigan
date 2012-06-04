@@ -16,7 +16,16 @@
         <ListView
             android:id="@+id/lstSidebar"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+
+        <ImageButton
+            android:id="@+id/btnAddServer"
+            android:layout_width="fill_parent"
+            android:layout_height="50dip"
+            android:layout_gravity="bottom"
+            android:layout_weight="0"
+            android:src="@drawable/plus" />
     </LinearLayout>
 
     <!-- Note: set background to disable transparency. -->
