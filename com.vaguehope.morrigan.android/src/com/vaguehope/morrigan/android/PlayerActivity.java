@@ -79,6 +79,8 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 	protected ArtifactListAdaptor<PlayerQueue> queueListAdaptor;
 	protected MlistReference mlistReference = null;
 
+	private ErrorsList errorsList;
+
 	private AtomicReference<String> lastQuery = new AtomicReference<String>();
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -122,6 +124,9 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 //	Buttons.
 
 	private void wireGui () {
+		ListView lstErrors = (ListView) findViewById(R.id.lstErrors);
+		this.errorsList = new ErrorsList(this, lstErrors);
+
 		this.queueListAdaptor = new ArtifactListAdaptorImpl<PlayerQueue>(this, R.layout.mlistitemlistrow);
 		ListView lstQueue = (ListView) findViewById(R.id.lstQueue);
 		lstQueue.setAdapter(this.queueListAdaptor);
@@ -405,14 +410,14 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	UI updating.
 
+	private static final String FEED_PLAYER = "player";
+	private static final String FEED_QUEUE = "queue";
+
 	@Override
 	public void onPlayerStateChange(PlayerState newState, Exception exception) {
 		this.currentState = newState;
-
-		if (newState == null) {
-			if (exception != null) Toast.makeText(this, exception.getMessage(), Toast.LENGTH_SHORT).show(); // TODO put in UI.
-		}
-		else {
+		this.errorsList.setError(FEED_PLAYER, exception);
+		if (newState != null) {
 			if (newState.getName() != null && newState.getName().length() > 0) {
 				this.setTitle(this.playerReference.getTitle() + ": " + newState.getName());
 			}
@@ -460,12 +465,8 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 
 	@Override
 	public void onPlayerQueueChange(PlayerQueue newQueue, Exception exception) {
-		if (newQueue == null) {
-			if (exception != null) Toast.makeText(this, exception.getMessage(), Toast.LENGTH_SHORT).show(); // TODO put in UI.
-		}
-		else {
-    		this.queueListAdaptor.setInputData(newQueue);
-		}
+		if (newQueue != null) this.queueListAdaptor.setInputData(newQueue);
+		this.errorsList.setError(FEED_QUEUE, exception);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
