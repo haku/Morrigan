@@ -1,28 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:orientation="vertical"
-	android:layout_width="fill_parent"
-	android:layout_height="fill_parent" >
-	
-	<ListView android:id="@+id/lstServer"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:layout_weight="1" />
-	
-	<TableLayout
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:layout_weight="0"
-		android:layout_gravity="bottom" >
-		<TableRow>
-			
-			<ImageButton android:id="@+id/btnRefresh"
-				android:layout_width="0dip"
-				android:layout_height="50dip"
-				android:layout_weight="1"
-				android:src="@drawable/ic_menu_refresh" />
-			
-		</TableRow>
-	</TableLayout>
-	
-</LinearLayout>
+<com.vaguehope.morrigan.android.layouts.SidebarLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res/com.vaguehope.morrigan.android"
+    android:id="@+id/serverLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:hostView="@id/serverView"
+    app:sidebarView="@id/sidebarView" >
+
+    <LinearLayout
+        android:id="@id/sidebarView"
+        android:layout_width="150dip"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+
+        <ListView
+            android:id="@+id/lstSidebar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </LinearLayout>
+
+    <!-- Note: set background to disable transparency. -->
+
+    <LinearLayout
+        android:id="@id/serverView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/background_dark"
+        android:clickable="true"
+        android:orientation="vertical" >
+
+        <ListView
+            android:id="@+id/lstServer"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <TableLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_weight="0" >
+
+            <TableRow>
+
+                <ImageButton
+                    android:id="@+id/btnSidebar"
+                    android:layout_width="0dip"
+                    android:layout_height="50dip"
+                    android:layout_weight="1"
+                    android:src="@drawable/circledot" />
+
+                <ImageButton
+                    android:id="@+id/btnRefresh"
+                    android:layout_width="0dip"
+                    android:layout_height="50dip"
+                    android:layout_weight="1"
+                    android:src="@drawable/ic_menu_refresh" />
+            </TableRow>
+        </TableLayout>
+    </LinearLayout>
+
+</com.vaguehope.morrigan.android.layouts.SidebarLayout>
