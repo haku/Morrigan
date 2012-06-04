@@ -197,6 +197,17 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 		return handled;
 	}
 
+	@Override
+	public boolean onOptionsItemSelected (MenuItem item) {
+		switch (item.getItemId()) {
+			case 16908332: // android.R.id.home constant only in API v11+ but event still fires in API v8.
+				this.sidebarLayout.toggleSidebar();
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
+		}
+	}
+
 	private final SidebarListener sidebarListener = new SidebarListener() {
 
 		@Override
