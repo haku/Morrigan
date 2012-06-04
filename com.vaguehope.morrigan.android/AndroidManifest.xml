@@ -11,7 +11,7 @@
 	
 	<application android:icon="@drawable/icon" android:label="@string/app_name">
 	
-		<activity android:name=".ServersActivity"
+		<activity android:name=".ServerActivity"
 			android:label="@string/app_name" >
 			
 			<intent-filter>
@@ -20,9 +20,6 @@
 			</intent-filter>
 			
 		</activity>
-		
-		<activity android:name=".ServerActivity"
-			android:label="@string/app_name" />
 		
 		<activity android:name=".PlayerActivity"
 			android:label="@string/app_name" />

@@ -74,12 +74,16 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 		wireGui();
 
 		int serverId = (savedInstanceState == null) ? -1 : savedInstanceState.getInt(SERVER_ID, -1);
-		if (serverId < 0) serverId = getIntent().getExtras().getInt(SERVER_ID, -1);
+		if (serverId < 0) {
+			Bundle extras = getIntent().getExtras();
+			if (extras != null) serverId = extras.getInt(SERVER_ID, -1);
+		}
 		if (serverId >= 0) {
 			setServer(this.configDb.getServer(serverId));
 		}
 		else {
 			setServer(null);
+			this.sidebarLayout.openSidebar();
 		}
 	}
 
@@ -109,6 +113,7 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 		else {
 			onPlayersChange(null, null);
 			onMlistsChange(null, null);
+			this.setProgressBarIndeterminateVisibility(false);
 		}
 	}
 
