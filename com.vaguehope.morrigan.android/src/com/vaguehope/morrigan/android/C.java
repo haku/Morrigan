@@ -16,24 +16,24 @@
 
 package com.vaguehope.morrigan.android;
 
-public class C {
+public interface C {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	public static final String LOGTAG = "Morrigan";
-	
+
+	String LOGTAG = "Morrigan";
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	public static final String USERNAME = "Morrigan-Android";
-	
+
+	String USERNAME = "Morrigan-Android";
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	public static final String CONTEXT_PLAYERS = "/players";
-	public static final String CONTEXT_MLISTS = "/mlists";
-	
-	public static final String CONTEXT_MLIST_ITEMS = "/items";
-	public static final String CONTEXT_MLIST_QUERY = "/query";
-	
-	public static final String CONTEXT_PLAYER_QUEUE = "/queue";
-	
+
+	String CONTEXT_PLAYERS = "/players";
+	String CONTEXT_MLISTS = "/mlists";
+
+	String CONTEXT_MLIST_ITEMS = "/items";
+	String CONTEXT_MLIST_QUERY = "/query";
+
+	String CONTEXT_PLAYER_QUEUE = "/queue";
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
