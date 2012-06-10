@@ -24,7 +24,11 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.view.KeyEvent;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
 import com.vaguehope.morrigan.android.model.MlistItem;
@@ -39,14 +43,14 @@ import com.vaguehope.morrigan.android.tasks.RunMlistItemActionTask;
 public class CommonDialogs {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	static public interface PlayerSelectedListener {
+	public static interface PlayerSelectedListener {
 		public void playerSelected (PlayerState playerState);
 	}
 
-	static public void doAskWhichPlayer (final Context context, final ServerReference serverReference, final PlayerSelectedListener listener) {
-		GetPlayersTask task = new GetPlayersTask(context, serverReference, new PlayerStateListChangeListener () {
+	public static void doAskWhichPlayer (final Context context, final ServerReference serverReference, final PlayerSelectedListener listener) {
+		GetPlayersTask task = new GetPlayersTask(context, serverReference, new PlayerStateListChangeListener() {
 			@Override
-			public void onPlayersChange(PlayerStateList playersState, Exception e) {
+			public void onPlayersChange (PlayerStateList playersState, Exception e) {
 				List<? extends PlayerState> playerList = playersState.getPlayersStateList();
 
 				if (playerList == null || playerList.size() < 1) {
@@ -61,22 +65,17 @@ public class CommonDialogs {
 
 				final List<? extends PlayerState> list = playerList;
 				String[] labels = new String[playerList.size()];
-				for (int i = 0; i < playerList.size(); i ++) {
+				for (int i = 0; i < playerList.size(); i++) {
 					PlayerState ps = playerList.get(i);
 					labels[i] = ps.getName() + ": " + ps.getPlayState() + " " + ps.getTrackTitle();
 				}
 
 				AlertDialog.Builder builder = new AlertDialog.Builder(context);
 				builder.setTitle("Select player");
-				builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						dialog.dismiss();
-					}
-				});
+				builder.setNegativeButton("Cancel", DLG_CANCEL_CLICK_LISTENER);
 				builder.setItems(labels, new DialogInterface.OnClickListener() {
 					@Override
-					public void onClick(DialogInterface dialog, int item) {
+					public void onClick (DialogInterface dialog, int item) {
 						dialog.dismiss();
 						listener.playerSelected(list.get(item));
 					}
@@ -90,11 +89,11 @@ public class CommonDialogs {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	static public void doSearchMlist (final Context context, final PlayerState playerState) {
+	public static void doSearchMlist (final Context context, final PlayerState playerState) {
 		doSearchMlist(context, playerState, null);
 	}
 
-	static public void doSearchMlist (final Context context, final PlayerState playerState, final AtomicReference<String> defaultQuery) {
+	public static void doSearchMlist (final Context context, final PlayerState playerState, final AtomicReference<String> defaultQuery) {
 		if (context == null) throw new IllegalArgumentException();
 		if (playerState == null) throw new IllegalArgumentException();
 
@@ -106,28 +105,25 @@ public class CommonDialogs {
 		if (defaultQuery != null && defaultQuery.get() != null) editText.setText(defaultQuery.get());
 		dlgBuilder.setView(editText);
 
-		dlgBuilder.setPositiveButton("Search", new DialogInterface.OnClickListener() {
+		DialogInterface.OnClickListener doSearchCall = new DialogInterface.OnClickListener() {
 			@Override
-			public void onClick(DialogInterface dialog, int whichButton) {
+			public void onClick (DialogInterface dialog, int whichButton) {
 				String query = editText.getText().toString().trim();
 				dialog.dismiss();
 				if (defaultQuery != null) defaultQuery.set(query); // Save the query for next time.
 				if ("".equals(query)) query = "*"; // Default to searching for wild-card.
 				searchMlist(context, playerState, query);
 			}
-		});
+		};
 
-		dlgBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int whichButton) {
-				dialog.cancel();
-			}
-		});
-
-		dlgBuilder.show();
+		dlgBuilder.setPositiveButton("Search", doSearchCall);
+		dlgBuilder.setNegativeButton("Cancel", DLG_CANCEL_CLICK_LISTENER);
+		AlertDialog dlg = dlgBuilder.create();
+		editText.setOnEditorActionListener(new DlgEnterKeyListener(dlg));
+		dlg.show();
 	}
 
-	static public void searchMlist (Context context, PlayerState playerState, String query) {
+	public static void searchMlist (Context context, PlayerState playerState, String query) {
 		Intent intent = new Intent(context.getApplicationContext(), MlistActivity.class);
 		intent.putExtra(MlistActivity.SERVER_ID, playerState.getPlayerReference().getServerReference().getId());
 		intent.putExtra(MlistActivity.MLIST_BASE_URL, playerState.getListUrl());
@@ -144,25 +140,50 @@ public class CommonDialogs {
 		final EditText editText = new EditText(activity);
 		dlgBuilder.setView(editText);
 
-		dlgBuilder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+		DialogInterface.OnClickListener doAddCall = new DialogInterface.OnClickListener() {
 			@Override
-			public void onClick(DialogInterface dialog, int whichButton) {
+			public void onClick (DialogInterface dialog, int whichButton) {
 				String tag = editText.getText().toString().trim();
 				dialog.dismiss();
 				RunMlistItemActionTask task = new RunMlistItemActionTask(activity, mlistReference, item, tag);
 				task.setOnComplete(afterPost);
 				task.execute();
 			}
-		});
+		};
 
-		dlgBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int whichButton) {
-				dialog.cancel();
+		dlgBuilder.setPositiveButton("Add", doAddCall);
+		dlgBuilder.setNegativeButton("Cancel", DLG_CANCEL_CLICK_LISTENER);
+		AlertDialog dlg = dlgBuilder.create();
+		editText.setOnEditorActionListener(new DlgEnterKeyListener(dlg));
+		dlg.show();
+	}
+
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	protected static final DialogInterface.OnClickListener DLG_CANCEL_CLICK_LISTENER = new DialogInterface.OnClickListener() {
+		@Override
+		public void onClick (DialogInterface dialog, int whichButton) {
+			dialog.cancel();
+		}
+	};
+
+	private static class DlgEnterKeyListener implements OnEditorActionListener {
+
+		private final AlertDialog dlg;
+
+		public DlgEnterKeyListener (AlertDialog dlg) {
+			this.dlg = dlg;
+		}
+
+		@Override
+		public boolean onEditorAction (TextView v, int actionId, KeyEvent event) {
+			if (actionId == EditorInfo.IME_NULL) {
+				this.dlg.getButton(DialogInterface.BUTTON_POSITIVE).dispatchKeyEvent(event);
+				return true;
 			}
-		});
+			return false;
+		}
 
-		dlgBuilder.show();
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
