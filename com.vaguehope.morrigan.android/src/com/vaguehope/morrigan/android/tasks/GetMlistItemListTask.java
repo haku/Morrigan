@@ -24,7 +24,7 @@ import org.xml.sax.SAXException;
 
 import android.app.Activity;
 
-import com.vaguehope.morrigan.android.Constants;
+import com.vaguehope.morrigan.android.C;
 import com.vaguehope.morrigan.android.helper.HttpHelper.HttpCreds;
 import com.vaguehope.morrigan.android.model.MlistItemList;
 import com.vaguehope.morrigan.android.model.MlistItemListChangeListener;
@@ -69,10 +69,10 @@ public class GetMlistItemListTask extends AbstractTask<MlistItemList> {
 
 		if (this.query != null) {
 			String encodedQuery = URLEncoder.encode(this.query);
-			url = url.concat(Constants.CONTEXT_MLIST_QUERY + "/" + encodedQuery);
+			url = url.concat(C.CONTEXT_MLIST_QUERY + "/" + encodedQuery);
 		}
 		else {
-			url = url.concat(Constants.CONTEXT_MLIST_ITEMS);
+			url = url.concat(C.CONTEXT_MLIST_ITEMS);
 		}
 
 		return url;

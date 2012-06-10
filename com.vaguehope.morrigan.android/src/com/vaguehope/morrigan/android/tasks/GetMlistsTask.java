@@ -23,7 +23,7 @@ import org.xml.sax.SAXException;
 
 import android.app.Activity;
 
-import com.vaguehope.morrigan.android.Constants;
+import com.vaguehope.morrigan.android.C;
 import com.vaguehope.morrigan.android.helper.HttpHelper.HttpCreds;
 import com.vaguehope.morrigan.android.model.MlistStateList;
 import com.vaguehope.morrigan.android.model.MlistStateListChangeListener;
@@ -48,7 +48,7 @@ public class GetMlistsTask extends AbstractTask<MlistStateList> {
 
 	@Override
 	protected String getUrl () {
-		return this.serverReference.getBaseUrl().concat(Constants.CONTEXT_MLISTS);
+		return this.serverReference.getBaseUrl().concat(C.CONTEXT_MLISTS);
 	}
 
 	@Override

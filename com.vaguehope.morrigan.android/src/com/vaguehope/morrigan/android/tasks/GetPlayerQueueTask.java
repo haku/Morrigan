@@ -23,7 +23,7 @@ import org.xml.sax.SAXException;
 
 import android.app.Activity;
 
-import com.vaguehope.morrigan.android.Constants;
+import com.vaguehope.morrigan.android.C;
 import com.vaguehope.morrigan.android.helper.HttpHelper.HttpCreds;
 import com.vaguehope.morrigan.android.model.Artifact;
 import com.vaguehope.morrigan.android.model.PlayerQueue;
@@ -82,7 +82,7 @@ public class GetPlayerQueueTask extends AbstractTask<PlayerQueue> {
 
 	@Override
 	protected String getUrl () {
-		String url = this.playerReference.getBaseUrl().concat(Constants.CONTEXT_PLAYER_QUEUE);
+		String url = this.playerReference.getBaseUrl().concat(C.CONTEXT_PLAYER_QUEUE);
 		if (this.item != null) {
 			url = url.concat("/" + this.item.getId());
 		}

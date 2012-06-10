@@ -26,7 +26,7 @@ import org.xml.sax.SAXException;
 import android.app.Activity;
 import android.widget.Toast;
 
-import com.vaguehope.morrigan.android.Constants;
+import com.vaguehope.morrigan.android.C;
 import com.vaguehope.morrigan.android.helper.HttpHelper.HttpCreds;
 import com.vaguehope.morrigan.android.model.MlistItem;
 import com.vaguehope.morrigan.android.model.MlistReference;
@@ -102,7 +102,7 @@ public class RunMlistItemActionTask extends AbstractTask<String> {
 
 	@Override
 	protected String getUrl () {
-		return this.mlistReference.getBaseUrl() + Constants.CONTEXT_MLIST_ITEMS + "/" + this.mlistItem.getRelativeUrl();
+		return this.mlistReference.getBaseUrl() + C.CONTEXT_MLIST_ITEMS + "/" + this.mlistItem.getRelativeUrl();
 	}
 
 	@Override
