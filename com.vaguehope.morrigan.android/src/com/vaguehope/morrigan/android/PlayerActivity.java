@@ -199,7 +199,14 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 	private OnClickListener contextMenuClickListener = new OnClickListener() {
 		@Override
 		public void onClick (View v) {
-			openContextMenu(v);
+			PlayerState state = PlayerActivity.this.currentState;
+			String[] tags = state == null ? null : state.getTrackTags();
+			if (tags == null || tags.length < 1) {
+				addTag();
+			}
+			else {
+				openContextMenu(v);
+			}
 		}
 	};
 
@@ -241,7 +248,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 		}
 	}
 
-	private void addTag () {
+	protected void addTag () {
 		if (this.currentState != null) {
 			if (this.currentState.getItem() != null && this.currentState.getItem().getRelativeUrl() != null) { // TODO figure out why item is not null.
 				CommonDialogs.addTag(this, this.mlistReference, this.currentState.getItem(), new Runnable() {
