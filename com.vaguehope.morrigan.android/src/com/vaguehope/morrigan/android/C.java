@@ -16,7 +16,7 @@
 
 package com.vaguehope.morrigan.android;
 
-public class Constants {
+public class C {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	public static final String LOGTAG = "Morrigan";

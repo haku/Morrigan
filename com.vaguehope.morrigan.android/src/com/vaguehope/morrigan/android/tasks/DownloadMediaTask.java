@@ -32,7 +32,7 @@ import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.vaguehope.morrigan.android.Constants;
+import com.vaguehope.morrigan.android.C;
 import com.vaguehope.morrigan.android.helper.ChecksumHelper;
 import com.vaguehope.morrigan.android.helper.HttpFileDownloadHandler;
 import com.vaguehope.morrigan.android.helper.HttpFileDownloadHandler.DownloadProgressListener;
@@ -119,7 +119,7 @@ public class DownloadMediaTask extends AsyncTask<MlistItem, Integer, String> imp
 		final ByteBuffer byteBuffer = ChecksumHelper.createByteBuffer();
 
 		for (MlistItem item : items) {
-			final String url = this.mlistReference.getBaseUrl() + Constants.CONTEXT_MLIST_ITEMS + "/" + item.getRelativeUrl();
+			final String url = this.mlistReference.getBaseUrl() + C.CONTEXT_MLIST_ITEMS + "/" + item.getRelativeUrl();
 			final File file = new File(dir, item.getFileName());
 			boolean transferComplete = false;
 
@@ -136,7 +136,7 @@ public class DownloadMediaTask extends AsyncTask<MlistItem, Integer, String> imp
 					// If the current file is defiantly not valid delete it.
 					if (!transferComplete || this.cancelled.get()) {
 						if (file.exists() && !fileMatchedItem(file, item, false, byteBuffer)) {
-							Log.i(Constants.LOGTAG, "Deleting incomplete file: " + file.getAbsolutePath());
+							Log.i(C.LOGTAG, "Deleting incomplete file: " + file.getAbsolutePath());
 							file.delete();
 						}
 					}

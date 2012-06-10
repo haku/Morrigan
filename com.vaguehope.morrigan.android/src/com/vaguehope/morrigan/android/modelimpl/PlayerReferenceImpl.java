@@ -16,7 +16,7 @@
 
 package com.vaguehope.morrigan.android.modelimpl;
 
-import com.vaguehope.morrigan.android.Constants;
+import com.vaguehope.morrigan.android.C;
 import com.vaguehope.morrigan.android.R;
 import com.vaguehope.morrigan.android.model.PlayerReference;
 import com.vaguehope.morrigan.android.model.ServerReference;
@@ -35,7 +35,7 @@ public class PlayerReferenceImpl implements PlayerReference {
 		if (serverReference == null) throw new IllegalArgumentException();
 		
 		this.playerId = playerId;
-		this.baseUrl = serverReference.getBaseUrl() + Constants.CONTEXT_PLAYERS + "/" + playerId;
+		this.baseUrl = serverReference.getBaseUrl() + C.CONTEXT_PLAYERS + "/" + playerId;
 		this.serverReference = serverReference;
 		
 		this.title = this.serverReference.getName() + " / player " + this.playerId;

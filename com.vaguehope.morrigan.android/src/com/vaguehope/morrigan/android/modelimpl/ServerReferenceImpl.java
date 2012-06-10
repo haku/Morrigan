@@ -16,7 +16,7 @@
 
 package com.vaguehope.morrigan.android.modelimpl;
 
-import com.vaguehope.morrigan.android.Constants;
+import com.vaguehope.morrigan.android.C;
 import com.vaguehope.morrigan.android.R;
 import com.vaguehope.morrigan.android.model.ServerReference;
 
@@ -83,7 +83,7 @@ public class ServerReferenceImpl implements ServerReference {
 	
 	@Override
 	public String getUser () {
-		return Constants.USERNAME;
+		return C.USERNAME;
 	}
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
