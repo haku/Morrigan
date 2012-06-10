@@ -36,4 +36,8 @@ public interface C {
 	String CONTEXT_PLAYER_QUEUE = "/queue";
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	int PLAYER_REFRESH_SECONDS = 10;
+
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

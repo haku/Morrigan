@@ -87,7 +87,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 //	Activity methods.
 
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	public void onCreate (Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		this.configDb = new ConfigDb(this);
@@ -114,11 +114,23 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 	}
 
 	@Override
-	protected void onStart() {
+	protected void onStart () {
 		super.onStart();
-
-		refresh();
+		this.refreshTimer.start(); // Executes immediately then at fixed interval.
 	}
+
+	@Override
+	protected void onPause () {
+		this.refreshTimer.stop();
+		super.onPause();
+	}
+
+	private final RepeatTimer refreshTimer = new RepeatTimer(C.PLAYER_REFRESH_SECONDS) {
+		@Override
+		public void timer () {
+			refresh();
+		}
+	};
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Buttons.
@@ -139,7 +151,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 
 		findViewById(R.id.btnPlaypause).setOnClickListener(new OnClickListener() {
 			@Override
-			public void onClick(View v) {
+			public void onClick (View v) {
 				playpause();
 			}
 		});
@@ -176,7 +188,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 	private static final int MENU_CTX_MOVEBOTTOM = 6;
 
 	@Override
-	public boolean onContextItemSelected(MenuItem menuItem) {
+	public boolean onContextItemSelected (MenuItem menuItem) {
 		switch (menuItem.getItemId()) {
 			case MENU_CTX_ADDTAG:
 			case MENU_CTX_TAG:
@@ -212,7 +224,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 
 	private OnItemClickListener contextMenuItemCickListener = new OnItemClickListener() {
 		@Override
-		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+		public void onItemClick (AdapterView<?> parent, View view, int position, long id) {
 			openContextMenu(view);
 		}
 	};
@@ -220,9 +232,9 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Tag stuff.
 
-	private OnCreateContextMenuListener tagRowContextMenuListener = new OnCreateContextMenuListener () {
+	private OnCreateContextMenuListener tagRowContextMenuListener = new OnCreateContextMenuListener() {
 		@Override
-		public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+		public void onCreateContextMenu (ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 			PlayerState state = PlayerActivity.this.currentState;
 			if (state != null) {
 				menu.setHeaderTitle(state.getTitle());
@@ -270,9 +282,9 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Queue events.
 
-	private OnCreateContextMenuListener queueContextMenuListener = new OnCreateContextMenuListener () {
+	private OnCreateContextMenuListener queueContextMenuListener = new OnCreateContextMenuListener() {
 		@Override
-		public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+		public void onCreateContextMenu (ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 			AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
 			Artifact item = PlayerActivity.this.queueListAdaptor.getInputData().getArtifactList().get(info.position);
 			menu.setHeaderTitle(item.getTitle());
@@ -289,11 +301,16 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 		Artifact item = PlayerActivity.this.queueListAdaptor.getInputData().getArtifactList().get(info.position);
 
 		QueueItemAction action;
-		if (menuItem.getItemId() == MENU_CTX_MOVEUP) action = QueueItemAction.UP;
-		else if (menuItem.getItemId() == MENU_CTX_MOVEDOWN) action = QueueItemAction.DOWN;
-		else if (menuItem.getItemId() == MENU_CTX_MOVETOP) action = QueueItemAction.TOP;
-		else if (menuItem.getItemId() == MENU_CTX_MOVEBOTTOM) action = QueueItemAction.BOTTOM;
-		else if (menuItem.getItemId() == MENU_CTX_REMOVE) action = QueueItemAction.REMOVE;
+		if (menuItem.getItemId() == MENU_CTX_MOVEUP)
+			action = QueueItemAction.UP;
+		else if (menuItem.getItemId() == MENU_CTX_MOVEDOWN)
+			action = QueueItemAction.DOWN;
+		else if (menuItem.getItemId() == MENU_CTX_MOVETOP)
+			action = QueueItemAction.TOP;
+		else if (menuItem.getItemId() == MENU_CTX_MOVEBOTTOM)
+			action = QueueItemAction.BOTTOM;
+		else if (menuItem.getItemId() == MENU_CTX_REMOVE)
+			action = QueueItemAction.REMOVE;
 		else throw new IllegalStateException();
 
 		GetPlayerQueueTask queueTask = new GetPlayerQueueTask(this, this.playerReference, this, action, item);
@@ -309,7 +326,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 	private static final int MENU_SHUFFLEQUEUE = 5;
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
+	public boolean onCreateOptionsMenu (Menu menu) {
 		boolean result = super.onCreateOptionsMenu(menu);
 		menu.add(0, MENU_FULLSCREEN, 0, R.string.menu_fullscreen).setIcon(R.drawable.display);
 		menu.add(0, MENU_DOWNLOAD, 0, R.string.menu_download);
@@ -319,7 +336,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
+	public boolean onOptionsItemSelected (MenuItem item) {
 		switch (item.getItemId()) {
 
 			case MENU_FULLSCREEN:
@@ -385,13 +402,13 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 			builder.setTitle("Full-screen");
 			builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 				@Override
-				public void onClick(DialogInterface dialog, int which) {
+				public void onClick (DialogInterface dialog, int which) {
 					dialog.dismiss();
 				}
 			});
 			builder.setItems(labels, new DialogInterface.OnClickListener() {
 				@Override
-				public void onClick(DialogInterface dialog, int item) {
+				public void onClick (DialogInterface dialog, int item) {
 					dialog.dismiss();
 					new SetPlaystateTask(PlayerActivity.this, PlayerActivity.this.playerReference, item, PlayerActivity.this).execute();
 				}
@@ -421,7 +438,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 	private static final String FEED_QUEUE = "queue";
 
 	@Override
-	public void onPlayerStateChange(PlayerState newState, Exception exception) {
+	public void onPlayerStateChange (PlayerState newState, Exception exception) {
 		this.currentState = newState;
 		this.errorsList.setError(FEED_PLAYER, exception);
 		if (newState != null) {
@@ -440,8 +457,8 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 			if (newState.getTrackDuration() > 0) {
 				txtTitle.setText(
 						newState.getListTitle() + " / "
-						+ newState.getTrackTitle() + " ("
-						+ TimeHelper.formatTimeSeconds(newState.getTrackDuration()) + ")"
+								+ newState.getTrackTitle() + " ("
+								+ TimeHelper.formatTimeSeconds(newState.getTrackDuration()) + ")"
 						);
 			}
 			else {
@@ -459,7 +476,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 
 			TextView txtQueue = (TextView) findViewById(R.id.txtQueue);
 			if (newState.getQueueDuration() > 0) {
-				txtQueue.setText(newState.getQueueLength() + " items, "+TimeHelper.formatTimeSeconds(newState.getQueueDuration())+".");
+				txtQueue.setText(newState.getQueueLength() + " items, " + TimeHelper.formatTimeSeconds(newState.getQueueDuration()) + ".");
 			}
 			else {
 				txtQueue.setText(newState.getQueueLength() + " items.");
@@ -471,7 +488,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 	}
 
 	@Override
-	public void onPlayerQueueChange(PlayerQueue newQueue, Exception exception) {
+	public void onPlayerQueueChange (PlayerQueue newQueue, Exception exception) {
 		if (newQueue != null) this.queueListAdaptor.setInputData(newQueue);
 		this.errorsList.setError(FEED_QUEUE, exception);
 	}
