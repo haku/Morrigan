@@ -11,8 +11,8 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
     <!-- Versions -->
-    <tycho-version>0.13.0</tycho-version>
-    <junit-version>4.8.2</junit-version>
+    <tycho-version>0.15.0</tycho-version>
+    <jacoco-version>0.5.8.201207111220</jacoco-version>
 
     <!-- Sonar -->
     <sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
@@ -79,6 +79,17 @@
   </repositories>
 
   <build>
+  
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.eclipse.tycho</groupId>
+          <artifactId>tycho-surefire-plugin</artifactId>
+          <version>${tycho-version}</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
     <plugins>
 
       <plugin>
@@ -117,7 +128,7 @@
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.5.7.201204190339</version>
+        <version>${jacoco-version}</version>
         <configuration>
           <destFile>${project.basedir}/../target/jacoco.exec</destFile>
         </configuration>
@@ -125,23 +136,6 @@
           <execution>
             <goals>
               <goal>prepare-agent</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>test</id>
-            <phase>test</phase>
-            <configuration>
-              <testClassesDirectory>${project.build.outputDirectory}</testClassesDirectory>
-            </configuration>
-            <goals>
-              <goal>test</goal>
             </goals>
           </execution>
         </executions>
