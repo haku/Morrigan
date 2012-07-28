@@ -8,4 +8,12 @@
 	</parent>
 	<artifactId>com.vaguehope.morrigan.sshplayer.tests</artifactId>
 	<packaging>eclipse-test-plugin</packaging>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-surefire-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
 </project>
