@@ -16,5 +16,5 @@ Import-Package: com.vaguehope.morrigan.engines.playback,
  org.eclipse.swt.layout,
  org.eclipse.swt.widgets,
  org.osgi.framework;version="1.3.0"
-Eclipse-PlatformFilter: (& (osgi.ws=cocoa) (osgi.os=macosx) (osgi.arch=x86))
+Eclipse-PlatformFilter: (| (& (osgi.ws=gtk) (osgi.os=linux) (osgi.arch=x86)) (& (osgi.ws=cocoa) (osgi.os=macosx) (osgi.arch=x86)))
 Bundle-Activator: com.vaguehope.morrigan.playbackimpl.vlc.Activator
