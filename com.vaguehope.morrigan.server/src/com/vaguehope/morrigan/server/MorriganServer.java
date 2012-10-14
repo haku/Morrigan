@@ -1,13 +1,11 @@
 package com.vaguehope.morrigan.server;
 
-import java.util.EnumSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.Filter;
 
 import org.eclipse.jetty.server.Connector;
-import org.eclipse.jetty.server.DispatcherType;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.bio.SocketConnector;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
@@ -71,14 +69,14 @@ public class MorriganServer {
 
 			// Servlets.
 			ServletContextHandler servletContext = new ServletContextHandler(contexts, "/", ServletContextHandler.SESSIONS);
-			servletContext.addFilter(filterHolder, "/*", (EnumSet<DispatcherType>) null);
+			servletContext.addFilter(filterHolder, "/*", null);
 			servletContext.addServlet(new ServletHolder(new PlayersServlet(playerListener)), PlayersServlet.CONTEXTPATH + "/*");
 			servletContext.addServlet(new ServletHolder(new MlistsServlet(playerListener, mediaFactory, asyncActions)), MlistsServlet.CONTEXTPATH + "/*");
 			servletContext.addServlet(new ServletHolder(new StatusServlet(asyncTasksRegister)), StatusServlet.CONTEXTPATH + "/*");
 
 			// Web UI in WAR file.
 			WebAppContext warContext = WebAppHelper.getWarBundleAsContext(context, MorriganWui.ID, "/");
-			warContext.addFilter(filterHolder, "/*", (EnumSet<DispatcherType>) null);
+			warContext.addFilter(filterHolder, "/*", null);
 			contexts.addHandler(warContext);
 		}
 		catch (Exception e) {
