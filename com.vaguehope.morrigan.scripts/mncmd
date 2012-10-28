@@ -1,0 +1,65 @@
+#!/usr/bin/env ruby
+
+# Commands for keybindings:
+# /home/haku/.rvm/bin/rvm-exec /home/haku/bin/mncmd playpause
+# /home/haku/.rvm/bin/rvm-exec /home/haku/bin/mncmd next
+
+# http://rubydoc.info/gems/rest-client/1.6.7/frames
+require 'rest-client'
+require 'nokogiri'
+require 'awesome_print'
+
+conf = {}
+IO.foreach(File.expand_path('~/.morrigan/server.properties')) do |line|
+  conf[$1.strip] = $2 if line =~ /([^=]*)=(.*)\/\/(.*)/ || line =~ /([^=]*)=(.*)/
+end
+HOST = 'localhost'
+PORT = conf['port'].to_i
+PASS = conf['pass']
+
+players_res = RestClient::Resource.new(
+  "http://#{HOST}:#{PORT}/players",
+  :user => 'mncmd',
+  :password => PASS
+)
+
+PLAY_STATE = {
+  0 => 'stopped',
+  1 => 'playing',
+  2 => 'paused',
+  3 => 'loading'
+}
+
+def as_xml(str)
+  doc = Nokogiri::XML.parse(str)
+  doc.remove_namespaces!
+  return doc
+end
+
+active_player = as_xml(players_res.get).xpath('/feed/entry').find do |d|
+  (d>'playstate').text != '0'
+end
+active_player_id = (active_player>'playerid').text
+
+case ARGV.first
+  when 'info'
+    puts (active_player>'title').text
+  when 'playpause'
+    players_res["#{active_player_id}"].post(:action => 'playpause'){ |response, request, result, &block|
+      if [200].include? response.code
+        puts PLAY_STATE[(as_xml(result.body)>'player playstate').text.to_i]
+      else
+        response.return!(request, result, &block)
+      end
+    }
+  when 'next'
+    players_res["#{active_player_id}"].post(:action => 'next'){ |response, request, result, &block|
+      if [200].include? response.code
+        puts (as_xml(result.body)>'player tracktitle').text
+      else
+        response.return!(request, result, &block)
+      end
+    }
+  else
+    puts "Unknown args: #{ARGV}"
+end

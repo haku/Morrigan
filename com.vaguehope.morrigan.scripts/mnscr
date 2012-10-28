@@ -1,0 +1,89 @@
+#!/usr/bin/env ruby
+# encoding: UTF-8
+require 'ncursesw'
+require 'rest-client'
+require 'nokogiri'
+require 'rufus/scheduler'
+require 'awesome_print'
+
+conf = {}
+IO.foreach(File.expand_path('~/.morrigan/server.properties')) do |line|
+  conf[$1.strip] = $2 if line =~ /([^=]*)=(.*)\/\/(.*)/ || line =~ /([^=]*)=(.*)/
+end
+HOST = 'localhost'
+PORT = conf['port'].to_i
+PASS = conf['pass']
+
+scheduler = Rufus::Scheduler.start_new
+
+@players_res = RestClient::Resource.new(
+  "http://#{HOST}:#{PORT}/players",
+  :user => 'mncmd',
+  :password => PASS
+)
+
+PLAY_STATE = {
+  0 => 'stopped',
+  1 => 'playing',
+  2 => 'paused',
+  3 => 'loading'
+}
+
+def as_xml(str)
+  doc = Nokogiri::XML.parse(str)
+  doc.remove_namespaces!
+  return doc
+end
+
+def get_active_player
+  as_xml(@players_res.get).xpath('/feed/entry').find do |d|
+    (d>'playstate').text != '0'
+  end
+end
+
+def get_player (id)
+  (as_xml(@players_res["#{id}"].get)>'player')
+end
+
+def draw_status(scr)
+  p = get_player(@active_player_id)
+  list_title = (p>'listtitle').text
+  state = PLAY_STATE[(p>'playstate').text.to_i]
+  track_title = (p>'tracktitle').text
+  track_duration = (p>'trackduration').text.to_i
+  track_position = (p>'playposition').text.to_i
+
+  scr.mvaddstr 0, 1, "#{state} | #{list_title}"
+  scr.mvaddstr 1, 1, "#{track_title}"
+  scr.mvaddstr 2, 1, "#{track_position} of #{track_duration}"
+end
+
+@active_player_id = (get_active_player>'playerid').text
+
+begin
+  Ncurses.initscr
+  Ncurses.cbreak           # provide unbuffered input
+  Ncurses.noecho           # turn off input echoing
+  Ncurses.nonl             # turn off newline translation
+  Ncurses.curs_set(0)      # hide cursor
+
+  scr = Ncurses.stdscr
+  scr.intrflush(false)     # turn off flush-on-interrupt
+  scr.keypad(true)         # turn on keypad mode
+
+  scr.mvaddstr 0, 1, "Morrigan..."
+  scheduler.every '5s', :first_in => '0' do
+    Ncurses.erase
+    draw_status(scr)
+    Ncurses.refresh
+  end
+
+  scr.getch                # any key to exit
+
+ensure
+  Ncurses.curs_set(1)
+  Ncurses.echo
+  Ncurses.nocbreak
+  Ncurses.nl
+  Ncurses.endwin
+end
