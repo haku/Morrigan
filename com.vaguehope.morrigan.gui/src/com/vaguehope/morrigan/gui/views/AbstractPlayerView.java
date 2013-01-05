@@ -46,11 +46,11 @@ import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.model.media.IMixedMediaList;
-import com.vaguehope.morrigan.player.PlayerEventHandler;
 import com.vaguehope.morrigan.player.LocalPlayer;
 import com.vaguehope.morrigan.player.OrderHelper;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayItem;
+import com.vaguehope.morrigan.player.PlayerEventHandler;
 import com.vaguehope.morrigan.player.PlayerFactory;
 
 /**
@@ -509,6 +509,10 @@ public abstract class AbstractPlayerView extends ViewPart {
 
 		private final boolean closeShell;
 
+		/**
+		 *
+		 * @param closeShell this will be false if we are responding to the user having already closed the window.
+		 */
 		public RemoveFullScreenRunner (boolean closeShell) {
 			this.closeShell = closeShell;
 		}
