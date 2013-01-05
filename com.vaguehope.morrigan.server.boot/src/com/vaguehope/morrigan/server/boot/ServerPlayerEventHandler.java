@@ -76,7 +76,9 @@ class ServerPlayerEventHandler implements PlayerEventHandler {
 	}
 
 	@Override
-	public void goFullscreen (int monitor) {/* UNUSED */}
+	public void goFullscreen (int monitor) {
+		// TODO
+	}
 
 	@Override
 	public IMediaTrackList<IMediaTrack> getCurrentList () {
