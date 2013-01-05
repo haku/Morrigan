@@ -18,9 +18,9 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 
-import com.vaguehope.morrigan.gui.display.ScreenPainter;
-import com.vaguehope.morrigan.gui.display.ScreenPainter.ScreenType;
 import com.vaguehope.morrigan.gui.views.AbstractPlayerView.FullScreenAction;
+import com.vaguehope.morrigan.screen.ScreenPainter;
+import com.vaguehope.morrigan.screen.ScreenPainter.ScreenType;
 
 public class ViewDisplay extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

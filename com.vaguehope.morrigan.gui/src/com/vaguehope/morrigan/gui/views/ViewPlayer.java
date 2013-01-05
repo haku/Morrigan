@@ -11,9 +11,9 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
 import com.vaguehope.morrigan.gui.Activator;
-import com.vaguehope.morrigan.gui.display.ScreenPainter;
-import com.vaguehope.morrigan.gui.display.ScreenPainter.ScreenType;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
+import com.vaguehope.morrigan.screen.ScreenPainter;
+import com.vaguehope.morrigan.screen.ScreenPainter.ScreenType;
 
 public class ViewPlayer extends AbstractPlayerView {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

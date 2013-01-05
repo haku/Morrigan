@@ -1,4 +1,4 @@
-package com.vaguehope.morrigan.gui.display;
+package com.vaguehope.morrigan.screen;
 
 
 

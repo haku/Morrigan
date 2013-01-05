@@ -28,9 +28,6 @@ import com.vaguehope.morrigan.gui.Activator;
 import com.vaguehope.morrigan.gui.actions.JumpToAction;
 import com.vaguehope.morrigan.gui.dialogs.MorriganMsgDlg;
 import com.vaguehope.morrigan.gui.dialogs.RunnableDialog;
-import com.vaguehope.morrigan.gui.display.FullscreenShell;
-import com.vaguehope.morrigan.gui.display.ScreenPainter;
-import com.vaguehope.morrigan.gui.display.ScreenPainter.TitleProvider;
 import com.vaguehope.morrigan.gui.editors.EditorFactory;
 import com.vaguehope.morrigan.gui.editors.MediaItemDbEditorInput;
 import com.vaguehope.morrigan.gui.editors.MediaItemListEditor;
@@ -52,6 +49,9 @@ import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlayerEventHandler;
 import com.vaguehope.morrigan.player.PlayerFactory;
+import com.vaguehope.morrigan.screen.FullscreenShell;
+import com.vaguehope.morrigan.screen.ScreenPainter;
+import com.vaguehope.morrigan.screen.ScreenPainter.TitleProvider;
 
 /**
  * TODO tidy this class.
