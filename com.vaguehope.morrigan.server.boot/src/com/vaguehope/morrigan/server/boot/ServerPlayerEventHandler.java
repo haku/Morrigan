@@ -15,11 +15,13 @@ import com.vaguehope.morrigan.player.PlayerEventHandler;
 
 class ServerPlayerEventHandler implements PlayerEventHandler {
 
+	private final UiMgr uiMgr;
 	private final Player player;
 
 	private AtomicReference<PlayState> prevPlayState = new AtomicReference<PlayState>();
 
-	public ServerPlayerEventHandler (Player player) {
+	public ServerPlayerEventHandler (UiMgr uiMgr, Player player) {
+		this.uiMgr = uiMgr;
 		this.player = player;
 	}
 
@@ -70,7 +72,7 @@ class ServerPlayerEventHandler implements PlayerEventHandler {
 
 	@Override
 	public Map<Integer, String> getMonitors () {
-		return null;
+		return this.uiMgr.getMonitorNames();
 	}
 
 	@Override

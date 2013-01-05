@@ -21,6 +21,7 @@ public class Activator implements BundleActivator {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private MorriganServer server;
+	private UiMgr uiMgr;
 	private PlayerContainer playerContainer;
 	private PlayerReaderTracker playerReaderTracker;
 	private MediaFactoryTracker mediaFactoryTracker;
@@ -34,7 +35,8 @@ public class Activator implements BundleActivator {
 		this.mediaFactoryTracker = new MediaFactoryTracker(context);
 		this.asyncTasksRegisterTracker = new AsyncTasksRegisterTracker(context);
 
-		this.playerContainer = new ServerPlayerContainer(PlaybackOrder.RANDOM);
+		this.uiMgr = new UiMgr();
+		this.playerContainer = new ServerPlayerContainer(this.uiMgr, PlaybackOrder.RANDOM);
 		AsyncActions asyncActions = new AsyncActions(this.asyncTasksRegisterTracker, this.mediaFactoryTracker);
 		this.server = new MorriganServer(context, this.playerReaderTracker, this.mediaFactoryTracker, this.asyncTasksRegisterTracker, asyncActions);
 		this.server.start();
@@ -47,6 +49,8 @@ public class Activator implements BundleActivator {
 		this.server.stop();
 		this.server = null;
 		this.playerContainer = null;
+		this.uiMgr.dispose();
+		this.uiMgr = null;
 		this.mediaFactoryTracker.dispose();
 		this.playerReaderTracker.dispose();
 		this.asyncTasksRegisterTracker.dispose();
