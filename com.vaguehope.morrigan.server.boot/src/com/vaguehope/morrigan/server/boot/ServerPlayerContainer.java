@@ -7,12 +7,15 @@ import com.vaguehope.morrigan.player.PlayerEventHandler;
 
 class ServerPlayerContainer implements PlayerContainer {
 
+	private final UiMgr uiMgr;
 	private final PlaybackOrder defaultPlaybackOrder;
 
 	private Player player;
 	private ServerPlayerEventHandler eventHandler;
 
-	public ServerPlayerContainer (PlaybackOrder defaultPlaybackOrder) {
+
+	public ServerPlayerContainer (UiMgr uiMgr, PlaybackOrder defaultPlaybackOrder) {
+		this.uiMgr = uiMgr;
 		this.defaultPlaybackOrder = defaultPlaybackOrder;
 	}
 
@@ -25,7 +28,7 @@ class ServerPlayerContainer implements PlayerContainer {
 	@Override
 	public PlayerEventHandler getEventHandler () {
 		if (this.eventHandler == null || this.eventHandler.getPlayer() != this.player) {
-			this.eventHandler = new ServerPlayerEventHandler(this.player);
+			this.eventHandler = new ServerPlayerEventHandler(this.uiMgr, this.player);
 		}
 		return this.eventHandler;
 	}
