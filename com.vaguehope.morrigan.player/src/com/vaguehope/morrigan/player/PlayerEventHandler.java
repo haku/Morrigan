@@ -17,8 +17,14 @@ public interface PlayerEventHandler {
 	 */
 	void updateStatus () ;
 
+	/**
+	 * User double-clicked on the video?
+	 */
 	void videoAreaSelected () ;
 
+	/**
+	 * User pressed escape?
+	 */
 	void videoAreaClose () ;
 
 	void historyChanged () ;
