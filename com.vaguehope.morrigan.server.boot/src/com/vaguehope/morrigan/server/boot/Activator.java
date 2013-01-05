@@ -1,22 +1,12 @@
 package com.vaguehope.morrigan.server.boot;
 
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.eclipse.swt.widgets.Composite;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
-import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
-import com.vaguehope.morrigan.model.media.IMediaTrack;
-import com.vaguehope.morrigan.model.media.IMediaTrackList;
 import com.vaguehope.morrigan.model.media.MediaFactoryTracker;
-import com.vaguehope.morrigan.player.Player;
-import com.vaguehope.morrigan.player.PlayerEventHandler;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
-import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlayerContainer;
 import com.vaguehope.morrigan.player.PlayerReaderTracker;
 import com.vaguehope.morrigan.server.AsyncActions;
@@ -31,6 +21,7 @@ public class Activator implements BundleActivator {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private MorriganServer server;
+	private PlayerContainer playerContainer;
 	private PlayerReaderTracker playerReaderTracker;
 	private MediaFactoryTracker mediaFactoryTracker;
 	private AsyncTasksRegisterTracker asyncTasksRegisterTracker;
@@ -43,6 +34,7 @@ public class Activator implements BundleActivator {
 		this.mediaFactoryTracker = new MediaFactoryTracker(context);
 		this.asyncTasksRegisterTracker = new AsyncTasksRegisterTracker(context);
 
+		this.playerContainer = new ServerPlayerContainer(PlaybackOrder.RANDOM);
 		AsyncActions asyncActions = new AsyncActions(this.asyncTasksRegisterTracker, this.mediaFactoryTracker);
 		this.server = new MorriganServer(context, this.playerReaderTracker, this.mediaFactoryTracker, this.asyncTasksRegisterTracker, asyncActions);
 		this.server.start();
@@ -53,111 +45,12 @@ public class Activator implements BundleActivator {
 	@Override
 	public void stop (BundleContext context) throws Exception {
 		this.server.stop();
+		this.server = null;
+		this.playerContainer = null;
 		this.mediaFactoryTracker.dispose();
 		this.playerReaderTracker.dispose();
 		this.asyncTasksRegisterTracker.dispose();
 		logger.fine("Morrigan Server stopped.");
-	}
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	private final PlayerContainer playerContainer = new PlayerContainer() {
-
-		private Player player;
-
-		@Override
-		public String getName () {
-			return "Server";
-		}
-
-		@Override
-		public PlayerEventHandler getEventHandler () {
-			return Activator.this.eventHandler;
-		}
-
-		@Override
-		public void setPlayer (Player player) {
-			this.player = player;
-			player.setPlaybackOrder(PlaybackOrder.RANDOM);
-		}
-
-		@Override
-		public Player getPlayer () {
-			return this.player;
-		}
-
-	};
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	protected final PlayerEventHandler eventHandler = new PlayerEventHandler() {
-
-		@Override
-		public void updateStatus () {
-			outputStatus();
-		}
-
-		@Override
-		public void asyncThrowable (Throwable t) {
-			logger.log(Level.WARNING, "asyncThrowable", t);
-		}
-
-		@Override
-		public Composite getCurrentMediaFrameParent () {
-			return null;
-		}
-
-		@Override
-		public Map<Integer, String> getMonitors () {
-			return null;
-		}
-
-		@Override
-		public void goFullscreen (int monitor) {/* UNUSED */}
-
-		@Override
-		public IMediaTrackList<IMediaTrack> getCurrentList () {
-			return null;
-		}
-
-		@Override
-		public void currentItemChanged () {/* UNUSED */}
-
-		@Override
-		public void historyChanged () {/* UNUSED */}
-
-		@Override
-		public void videoAreaSelected () {/* UNUSED */}
-
-		@Override
-		public void videoAreaClose () {/* UNUSED */}
-	};
-
-	private AtomicReference<PlayState> prevPlayState = new AtomicReference<PlayState>();
-
-	protected void outputStatus () {
-		Player p = this.playerContainer.getPlayer();
-		PlayState currentState = (p == null ? null : p.getPlayState());
-		if (currentState != this.prevPlayState.get()) {
-			this.prevPlayState.set(currentState);
-			System.out.println(getPlayerStateDescription(p));
-		}
-	}
-
-	private static String getPlayerStateDescription (Player p) {
-		if (p != null) {
-			PlayState currentState = p.getPlayState();
-			if (currentState != null) {
-				PlayItem currentPlayItem = p.getCurrentItem();
-				IMediaTrack currentItem = (currentPlayItem != null ? currentPlayItem.item : null);
-				if (currentItem != null) {
-					return currentState + " " + currentItem + ".";
-				}
-				return currentState + ".";
-			}
-			return "Unknown.";
-		}
-		return "Player unset.";
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
