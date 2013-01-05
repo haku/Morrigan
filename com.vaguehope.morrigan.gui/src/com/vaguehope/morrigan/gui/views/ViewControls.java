@@ -29,10 +29,10 @@ import com.vaguehope.morrigan.gui.actions.MinToTrayAction;
 import com.vaguehope.morrigan.gui.adaptors.ActionListener;
 import com.vaguehope.morrigan.gui.adaptors.DropMenuListener;
 import com.vaguehope.morrigan.gui.dialogs.MorriganMsgDlg;
-import com.vaguehope.morrigan.gui.display.ScreenPainter;
-import com.vaguehope.morrigan.gui.display.ScreenPainter.ScreenType;
 import com.vaguehope.morrigan.gui.helpers.RefreshTimer;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
+import com.vaguehope.morrigan.screen.ScreenPainter;
+import com.vaguehope.morrigan.screen.ScreenPainter.ScreenType;
 import com.vaguehope.morrigan.util.TimeHelper;
 
 public class ViewControls extends AbstractPlayerView implements ISizeProvider {

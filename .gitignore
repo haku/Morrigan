@@ -80,6 +80,11 @@
 /com.vaguehope.morrigan.server.boot/build.xml
 /com.vaguehope.morrigan.server.boot/javaCompiler...args
 
+# /com.vaguehope.morrigan.screen/
+/com.vaguehope.morrigan.screen/bin
+/com.vaguehope.morrigan.screen/build.xml
+/com.vaguehope.morrigan.screen/javaCompiler...args
+
 # /com.vaguehope.morrigan.util/
 /com.vaguehope.morrigan.util/build.xml
 

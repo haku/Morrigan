@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Morrigan Screen
+Bundle-SymbolicName: com.vaguehope.morrigan.screen
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: org.eclipse.swt
+Bundle-Vendor: vaguehope.com
+Export-Package: com.vaguehope.morrigan.screen
+Import-Package: com.vaguehope.morrigan.model.media,
+ com.vaguehope.morrigan.player,
+ com.vaguehope.morrigan.util

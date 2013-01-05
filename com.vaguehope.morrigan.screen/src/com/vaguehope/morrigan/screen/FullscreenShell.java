@@ -1,4 +1,4 @@
-package com.vaguehope.morrigan.gui.display;
+package com.vaguehope.morrigan.screen;
 
 
 import org.eclipse.swt.SWT;
@@ -13,7 +13,7 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 
-import com.vaguehope.morrigan.gui.display.ScreenPainter.ScreenType;
+import com.vaguehope.morrigan.screen.ScreenPainter.ScreenType;
 
 public class FullscreenShell {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -48,13 +48,16 @@
     <module>com.vaguehope.morrigan.playbackimpl.dsj</module>
     <module>com.vaguehope.morrigan.playbackimpl.vlc</module>
 
+    <!-- Shared GUI. -->
+    <module>com.vaguehope.morrigan.screen</module>
+
     <!-- HTTP UI. -->
     <module>com.vaguehope.morrigan.server</module>
     <module>com.vaguehope.morrigan.wui</module>
     <module>com.vaguehope.morrigan.osgiconsole</module>
     <module>com.vaguehope.morrigan.server.boot</module>
 
-    <!-- GUI. -->
+    <!-- RCP GUI. -->
     <module>com.vaguehope.morrigan.gui</module>
 
     <!-- Products. -->
