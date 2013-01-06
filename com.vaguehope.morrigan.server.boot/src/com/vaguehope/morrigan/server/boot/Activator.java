@@ -16,7 +16,7 @@ import com.vaguehope.morrigan.tasks.AsyncTasksRegisterTracker;
 public class Activator implements BundleActivator {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	protected static final Logger logger = Logger.getLogger(Activator.class.getName());
+	private static final Logger logger = Logger.getLogger(Activator.class.getName());
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
