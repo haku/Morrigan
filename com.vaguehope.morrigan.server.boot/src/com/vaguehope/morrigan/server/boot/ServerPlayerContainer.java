@@ -22,6 +22,11 @@ class ServerPlayerContainer implements PlayerContainer {
 		this.defaultPlaybackOrder = defaultPlaybackOrder;
 	}
 
+	public void dispose () {
+		LocalPlayer p = this.player;
+		if (p != null) p.dispose();
+	}
+
 	@Override
 	public String getName () {
 		return "Server";
