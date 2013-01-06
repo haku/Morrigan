@@ -6,6 +6,11 @@ public interface ScreenMgrCallback {
 
 	void handleError (Exception e);
 
+	/**
+	 * Get the screen for when not in FullSreen mode.
+	 */
+	Composite getCurrentScreen ();
+
 	void updateCurrentMediaFrameParent (Composite parent);
 
 }
