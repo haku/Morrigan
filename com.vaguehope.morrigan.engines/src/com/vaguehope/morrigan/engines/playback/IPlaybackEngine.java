@@ -58,7 +58,6 @@ public interface IPlaybackEngine {
 
 	/**
 	 * Set the control where the output video will be shown.
-	 * @param frame a java.awt.Frame object.
 	 */
 	void setVideoFrameParent (Composite frame);
 
