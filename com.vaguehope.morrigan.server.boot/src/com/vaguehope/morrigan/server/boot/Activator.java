@@ -23,7 +23,7 @@ public class Activator implements BundleActivator {
 	private MorriganServer server;
 	private UiMgr uiMgr;
 	private NullScreen nullScreen;
-	private PlayerContainer playerContainer;
+	private ServerPlayerContainer playerContainer;
 	private PlayerReaderTracker playerReaderTracker;
 	private MediaFactoryTracker mediaFactoryTracker;
 	private AsyncTasksRegisterTracker asyncTasksRegisterTracker;
@@ -50,6 +50,7 @@ public class Activator implements BundleActivator {
 	public void stop (BundleContext context) throws Exception {
 		this.server.stop();
 		this.server = null;
+		this.playerContainer.dispose();
 		this.playerContainer = null;
 		this.nullScreen.dispose();
 		this.nullScreen = null;
