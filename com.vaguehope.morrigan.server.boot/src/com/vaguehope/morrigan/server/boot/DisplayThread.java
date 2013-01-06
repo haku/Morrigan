@@ -21,17 +21,17 @@ class DisplayThread extends Thread {
 	@Override
 	public void run () {
 		Display d = makeDisplay();
-		if (d == null) return;
-		this.displayCache.set(d);
-
-		if (d.getThread().getId() != getId()) return;
-
-		setPriority(Math.min(Thread.MAX_PRIORITY, Thread.NORM_PRIORITY + 1));
-		while (!d.isDisposed() && this.displayCache.get() != null) {
-			if (!d.readAndDispatch()) d.sleep();
+		if (d != null) {
+			this.displayCache.set(d);
+			if (d.getThread().getId() == getId()) {
+				setPriority(Math.min(Thread.MAX_PRIORITY, Thread.NORM_PRIORITY + 1));
+				while (!d.isDisposed() && this.displayCache.get() != null) {
+					if (!d.readAndDispatch()) d.sleep();
+				}
+				d.dispose();
+				this.displayCache.set(null);
+			}
 		}
-		d.dispose();
-		this.displayCache.set(null);
 	}
 
 	/**
