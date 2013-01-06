@@ -23,6 +23,10 @@ public class UiMgr {
 		this.displayThread.dispose();
 	}
 
+	public Display getDisplay () {
+		return this.displayThread.getDisplay();
+	}
+
 	public Map<Integer, String> getMonitorNames () {
 		Map<Integer, Monitor> monitors = getMonitors();
 		if (monitors == null) return null;
@@ -41,11 +45,17 @@ public class UiMgr {
 	private volatile long monitorCacheAge = 0;
 	private volatile Map<Integer, Monitor> monitorsCache = null;
 
-	private Map<Integer, Monitor> getMonitors () {
+	public Map<Integer, Monitor> getMonitors () {
 		if (isMonitorCacheExpired()) {
 			updateMonitorCache();
 		}
 		return getMonitorsCache();
+	}
+
+	public Monitor getMonitor (int monitorIndex) {
+		Map<Integer, Monitor> monitors = getMonitors();
+		if (monitors == null) return null;
+		return monitors.get(Integer.valueOf(monitorIndex));
 	}
 
 	protected void setMonitorsCache (Map<Integer, Monitor> mons) {

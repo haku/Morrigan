@@ -10,6 +10,7 @@ import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 
@@ -21,39 +22,47 @@ public class FullscreenShell {
 	final Shell shell;
 	private final ScreenPainter screenPainter;
 	final Runnable onCloseRunnable;
-	
+
 	public FullscreenShell(Shell parent, Monitor mon, Runnable onCloseRunnable) {
-		this.shell = new Shell(parent.getDisplay(), SWT.ON_TOP);
+		this(parent.getDisplay(), parent, mon, onCloseRunnable);
+	}
+
+	public FullscreenShell(Display display, Monitor mon, Runnable onCloseRunnable) {
+		this(display, null, mon, onCloseRunnable);
+	}
+
+	public FullscreenShell(Display display, Shell parent, Monitor mon, Runnable onCloseRunnable) {
+		this.shell = new Shell(display, SWT.ON_TOP);
 		this.onCloseRunnable = onCloseRunnable;
-		
+
 		this.shell.setText("Morrigan Screen");
-		this.shell.setImage(parent.getImage());
+		if (parent != null) this.shell.setImage(parent.getImage());
 		this.shell.setLayout(new FillLayout());
-		
+
 		Point pt = new Point(mon.getBounds().x, mon.getBounds().y);
 		this.shell.setLocation(pt);
 		this.shell.setSize(mon.getBounds().width, mon.getBounds().height);
 		this.shell.setMaximized(true);
 		this.shell.setFullScreen(true);
-		
+
 		this.screenPainter = new ScreenPainter(this.shell, ScreenType.LARGE);
 		this.shell.addPaintListener(this.screenPainter);
-		
+
 		this.shell.addTraverseListener(this.traverseListener);
 		this.shell.addMouseListener(this.mouseListener);
 		this.shell.addShellListener(this.shellListener);
 	}
-	
+
 	public Shell getShell () {
 		return this.shell;
 	}
-	
+
 	public ScreenPainter getScreenPainter() {
 		return this.screenPainter;
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	private TraverseListener traverseListener = new TraverseListener() {
 		@Override
 		public void keyTraversed(TraverseEvent e) {
@@ -64,26 +73,26 @@ public class FullscreenShell {
 			}
 		}
 	};
-	
+
 	private final MouseListener mouseListener = new MouseListener() {
 		@Override
 		public void mouseDoubleClick(MouseEvent e) {
 			FullscreenShell.this.shell.close();
 		}
-		
+
 		@Override
 		public void mouseUp(MouseEvent e) {/* UNUSED */}
 		@Override
 		public void mouseDown(MouseEvent e) {/* UNUSED */}
-		
+
 	};
-	
+
 	private final ShellListener shellListener = new ShellListener() {
 		@Override
 		public void shellClosed(ShellEvent e) {
 			FullscreenShell.this.onCloseRunnable.run();
 		}
-		
+
 		@Override
 		public void shellActivated(ShellEvent e) {/* UNUSED */}
 		@Override
@@ -93,7 +102,7 @@ public class FullscreenShell {
 		@Override
 		public void shellDeiconified(ShellEvent e) {/* UNUSED */}
 	};
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 }
