@@ -2,6 +2,8 @@ package com.vaguehope.morrigan.player;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -15,6 +17,8 @@ import com.vaguehope.morrigan.model.media.MediaFactoryTracker;
 import com.vaguehope.morrigan.player.internal.PlayerRegisterImpl;
 
 public final class PlayerActivator implements BundleActivator {
+
+	private static final Logger logger = Logger.getLogger(PlayerActivator.class.getName());
 
 	protected PlayerRegisterImpl playerRegister;
 	private PlaybackEngineFactoryTracker playbackEngineFactoryTracker;
@@ -71,7 +75,12 @@ public final class PlayerActivator implements BundleActivator {
 	}
 
 	protected void fillPlayerContainer (PlayerContainer container) {
-		container.setPlayer(this.playerRegister.makeLocal(container.getName(), container.getEventHandler()));
+		try {
+			container.setPlayer(this.playerRegister.makeLocal(container.getName(), container.getEventHandler()));
+		}
+		catch (Exception e) {
+			logger.log(Level.WARNING, "Failed to inject player object into container '" + container + "'.", e);
+		}
 	}
 
 	protected void emptyPlayerContainer (PlayerContainer container) {
