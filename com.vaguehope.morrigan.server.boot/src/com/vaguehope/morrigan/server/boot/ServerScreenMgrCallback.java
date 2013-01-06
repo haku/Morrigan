@@ -8,10 +8,18 @@ import com.vaguehope.morrigan.screen.ScreenMgrCallback;
 class ServerScreenMgrCallback implements ScreenMgrCallback {
 
 	private final ServerPlayerEventHandler eventHandler;
+	private final NullScreen nullScreen;
 
-	public ServerScreenMgrCallback (ServerPlayerEventHandler eventHandler) {
+	public ServerScreenMgrCallback (ServerPlayerEventHandler eventHandler, NullScreen nullScreen) {
 		if (eventHandler == null) throw new IllegalArgumentException();
+		if (nullScreen == null) throw new IllegalArgumentException();
 		this.eventHandler = eventHandler;
+		this.nullScreen = nullScreen;
+	}
+
+	@Override
+	public Composite getCurrentScreen () {
+		return this.nullScreen.getScreen();
 	}
 
 	@Override

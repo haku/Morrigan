@@ -28,14 +28,14 @@ class ServerPlayerEventHandler implements PlayerEventHandler {
 
 	private AtomicReference<PlayState> prevPlayState = new AtomicReference<PlayState>();
 
-	public ServerPlayerEventHandler (UiMgr uiMgr, ServerPlayerContainer playerContainer) {
+	public ServerPlayerEventHandler (UiMgr uiMgr, ServerPlayerContainer playerContainer, NullScreen nullScreen) {
 		if (uiMgr == null) throw new IllegalArgumentException();
 		if (playerContainer == null) throw new IllegalArgumentException();
 		this.uiMgr = uiMgr;
 		this.playerContainer = playerContainer;
 		if (this.uiMgr.getDisplay() != null) {
 			this.screenRegister = new ScreenRegister(this.uiMgr.getDisplay(), new PlayerTitleProvider(playerContainer));
-			this.screenMgr = new ScreenMgr(uiMgr.getDisplay(), this.screenRegister, new ServerScreenMgrCallback(this));
+			this.screenMgr = new ScreenMgr(uiMgr.getDisplay(), this.screenRegister, new ServerScreenMgrCallback(this, nullScreen));
 		}
 		else {
 			this.screenRegister = null;
@@ -87,7 +87,7 @@ class ServerPlayerEventHandler implements PlayerEventHandler {
 	@Override
 	public Composite getCurrentMediaFrameParent () {
 		if (this.screenMgr == null) return null;
-		return this.screenMgr.getFullScreenVideoParent();
+		return this.screenMgr.getCurrentVideoParent();
 	}
 
 	@Override

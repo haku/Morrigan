@@ -41,6 +41,12 @@ public class ScreenMgr {
 		runOnUiThread(new RemoveFullScreenRunner(closeShell, this));
 	}
 
+	public Composite getCurrentVideoParent () {
+		Composite fsParent = getFullScreenVideoParent();
+		if (fsParent != null) return fsParent;
+		return this.callback.getCurrentScreen();
+	}
+
 	public Composite getFullScreenVideoParent () {
 		if (!isFullScreen()) return null;
 		return this.fullscreenShell.getShell();
