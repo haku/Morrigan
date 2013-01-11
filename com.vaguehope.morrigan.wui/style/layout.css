@@ -1,0 +1,34 @@
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.controls {
+  left: 0;
+  right: 0;
+  padding: 0.25em;
+}
+
+.player, .statusbar {
+  left: 0;
+  right: 0;
+  margin: 0.25em;
+  border-radius: 0.5em;
+}
+
+.player .pause, .player .next, .player span {
+  margin: 0.25em;
+}
+
+.player .pause, .player .next {
+  width: 2.5em;
+  height: 3em;
+}
+
+.statusbar {
+  text-align: right;
+}
+
+.statusbar span {
+  padding: 0.5em;
+}
