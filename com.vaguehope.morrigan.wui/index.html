@@ -1,131 +1,18 @@
+<!DOCTYPE html>
 <html>
-
-<head>
-
-	<meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0" />
-
-	<!-- TODO Embed local copy of jQuery. -->
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js" ></script>
-
-	<script type="text/javascript" >
-		$(document).ready(function() {
-			getPlayersState();
-		});
-		
-		function getPlayersState () {
-			var statBar = $("#statusbar");
-			var outDiv = $("#playersState");
-			$.ajax({
-				type : "GET",
-				cache : "false",
-				url : "players",
-				dataType : "xml",
-				beforeSend : function () {
-					statBar.text("Fetching...");
-				},
-				success : function (xml) {
-					statBar.text("Rendering...");
-					
-					var entires = $(xml).find('entry');
-					
-					// Set up the areas for each player to live in.
-					var b = Array("");
-					entires.each(function () {
-						b.push("<div id='player");
-						b.push($(this).find('playerid').text());
-						b.push("' ></div>");
-					});
-					outDiv.html(b.join("")); // This should be the last reference to outDiv in this function.
-					
-					// Create the players in the areas created above.
-					entires.each(function () {
-						var id = $(this).find('playerid').text();
-						var state = $(this).find('playstate').text();
-						var tracktitle = $(this).find('tracktitle').text();
-						var listtitle = $(this).find('listtitle').text();
-						
-						var a = new Array("");
-						a.push("<p>");
-						a.push(id);
-						a.push("&nbsp;");
-						a.push("<button type='button' onclick='setPlayerState(");
-						a.push(id);
-						a.push(",\"playpause\")' >play / pause</button>");
-						a.push("&nbsp;");
-						a.push("<button type='button' onclick='setPlayerState(");
-						a.push(id);
-						a.push(",\"next\")' >next</button>");
-						a.push("&nbsp;");
-						a.push("<span id='state' >");
-						a.push(playerStateToLabel(parseInt(state)));
-						a.push("</span>");
-						a.push("&nbsp;:&nbsp;");
-						a.push("<span>");
-						a.push(tracktitle);
-						a.push("</span>");
-						a.push("&nbsp;");
-						a.push("<span>(");
-						a.push(listtitle);
-						a.push(")</span>");
-						a.push("</p>");
-						$("#player" + id).html(a.join(""));
-					});
-					statBar.text("");
-				},
-				error : function (xhr) {
-					statBar.text("Error: " + xhr.statusText);
-				}
-			});
-		}
-		
-		/**
-		 * This assumes that getPlayersState() has been called to create the elements.
-		 */
-		function setPlayerState (id, action) {
-			var outEl = $("#player" + id + " #state");
-			$.ajax({
-				type : "POST",
-				cache : "false",
-				url : "players/" + id,
-				data : "action=" + action,
-				contentTypeString : "application/x-www-form-urlencoded",
-				dataType : "xml",
-				beforeSend : function () {
-					outEl.text("Setting...");
-				},
-				success : function (xml) {
-					getPlayersState(); // Hack to force refresh.
-				},
-				error : function () {
-					outEl.text("Error: " + xhr.statusText);
-				}
-			});
-		}
-		
-		/**
-		 * Argument must be int not String.
-		 */
-		function playerStateToLabel (state) {
-			switch (state) {
-				case 0: return "Stopped";
-				case 1: return "Playing";
-				case 2: return "Paused";
-				case 3: return "Loading";
-				default:  return "Unknown";
-			}
-		}
-		
-	</script>
-
-</head>
-
-<body>
-	
-	<h1>Morrigan desu~</h1>
-	
-	<p><button type="button" onclick="getPlayersState()" >Refresh</button>&nbsp;<span id="statusbar"></span></p>
-	<div id="playersState" >[players]</div>
-	
-</body>
-
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <title>Morrigan</title>
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0" />
+    <link href="style/layout.css" type="text/css" rel="stylesheet">
+    <link href="style/colours.css" type="text/css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script src="js/player.js"></script>
+  </head>
+  <body>
+    <div class="controls">
+      <div class="players"></div>
+      <p class="statusbar"></p>
+    </div>
+  </body>
 </html>
