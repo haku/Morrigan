@@ -105,14 +105,19 @@ Players = {};
       };
       var btnPause = $('<button class="pause">||</button>');
       var btnNext = $('<button class="next">&gt;&gt;|</button>');
+      var btnSearch = $('<button class="search">search</button>');
       btnPause.click(function() {
         playerPause(pid, playerDiv, onStatus);
       });
       btnNext.click(function() {
         playerNext(pid, playerDiv, onStatus);
       });
+      btnSearch.click(function() {
+        showSearch(pid);
+      });
       btnBlock.append(btnPause);
       btnBlock.append(btnNext);
+      btnBlock.append(btnSearch);
     }
 
     var textBlock = $('<div class="block text">');
@@ -213,6 +218,11 @@ Players = {};
         player.tags.push(node.text());
       }
     });
+
+    var listHref = node.find('link[rel="list"]').attr('href');
+    if (listHref) {
+      player.mid = listHref.replace('/mlists/', '');
+    }
 
     return player;
   }
@@ -369,6 +379,45 @@ Players = {};
     item.title = node.find('title').text();
     item.duration = parseInt(node.find('duration').text());
     return item;
+  }
+
+  function showSearch(pid) {
+    var dlg = $('<div class="popup searchdlg">');
+
+    var title = $('<p class="title">');
+    title.text('Search...');
+    dlg.append(title);
+
+    var status = $('<p>');
+    dlg.append(status);
+
+    var close = $('<button class="close">close</button>');
+    dlg.append(close);
+
+    close.click(function() {
+      dlg.remove();
+    });
+
+    getPlayer(pid, function(msg) {
+      status.text(msg);
+    }, function(player) {
+      title.text('Search ' + player.listTitle);
+      var txtSearch = $('<input type="text">');
+      var btnSearch = $('<button>search</button>');
+      status.before(txtSearch);
+      status.before(btnSearch);
+      txtSearch.keyup(function(event) {
+        if (event.keyCode == 13) {
+          btnSearch.click();
+        }
+      });
+      btnSearch.click(function() {
+        window.location.href = '/?mid=' + player.mid + '&tpid=' + player.pid + '&search=' + encodeURIComponent(txtSearch.val());
+      });
+      txtSearch.focus();
+    });
+
+    $('body').append(dlg);
   }
 
 })();

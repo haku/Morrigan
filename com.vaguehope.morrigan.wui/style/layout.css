@@ -25,7 +25,7 @@ body, p, div, span {
   margin: 0.2em;
 }
 
-.player .pause, .player .next, .player span, .mlist span {
+.player button, .player span, .mlist span {
   margin: 0.2em;
 }
 
@@ -38,9 +38,9 @@ body, p, div, span {
   white-space: nowrap;
 }
 
-.player .pause, .player .next {
+.player button {
   height: 3em;
-  width: 40%;
+  width: 30%;
 }
 
 .player .toprow {
@@ -98,12 +98,10 @@ body, p, div, span {
 
 .popup {
   position: fixed;
-  top: 50%;
+  top: 10%;
   left: 50%;
   width: 16em;
-  min-height: 20em;
   margin-left: -8em; /* width/2 */
-  margin-top: -12em; /* height/2 */
   text-align: center;
   border-radius: 0.5em 0.5em 0 0;
 }
@@ -117,7 +115,7 @@ body, p, div, span {
   font-size: 80%;
 }
 
-.popup button, .popup a {
+.popup button, .popup a, .popup input {
   width: 90%;
   min-height: 3em;
   margin: .5em;
@@ -126,6 +124,10 @@ body, p, div, span {
 .popup .link {
   vertical-align: middle;
   line-height: 3em;
+}
+
+.popup input {
+  padding: 0.2em;
 }
 
 /* extra. */
