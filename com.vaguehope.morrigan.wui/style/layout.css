@@ -14,12 +14,12 @@ body {
   right: 0;
   margin: 0.25em;
   border-radius: 0.5em;
+  overflow: hidden;
 }
 
 .player .block {
   display: table-cell;
   vertical-align: middle;
-  white-space: nowrap;
   height: 3em;
   padding: 0.5em;
 }
@@ -28,9 +28,14 @@ body {
   margin: 0.25em;
 }
 
+.player .buttons {
+  white-space: nowrap;
+}
+
 .player .pause, .player .next {
   width: 2.5em;
   height: 3.5em;
+  height: 90%;
 }
 
 .player p {
