@@ -83,7 +83,7 @@
 
     if (detailed === true) {
       $('.title', playerDiv).text(player.trackTitle + ' (' + player.trackDuration + ' seconds)');
-      $('.tagsrow .tags', playerDiv).text('(tags)');
+      $('.tagsrow .tags', playerDiv).text(player.tags.length > 0 ? player.tags.join(', ') : '(no tags)');
     }
     else {
       $('.title', playerDiv).text(player.trackTitle);
@@ -197,9 +197,19 @@
     if (player.listTitle === "null") {
       player.listTitle = "(no list)";
     }
+
     player.trackDuration = parseInt(node.find('trackduration').text());
     player.queueLength = parseInt(node.find('queuelength').text());
     player.queueDuration = parseInt(node.find('queueduration').text());
+
+    player.tags = [];
+    node.find('tracktag').each(function() {
+      var node = $(this);
+      if (node.attr('t') === '0') {
+        player.tags.push(node.text());
+      }
+    });
+
     return player;
   }
 
