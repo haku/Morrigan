@@ -188,11 +188,65 @@
   function makeQueryItem(itemDiv, id) {
     itemDiv.empty();
     var title = $('<p class="title">');
-    itemDiv.append(title);
+    var a = $('<a class="clickable" href="">');
+    a.append(title);
+    itemDiv.append(a);
   }
 
-  function updateQueryItemDisplay(queueDiv, item) {
-    $('.title', queueDiv).text(item.title + ' (' + item.duration + 's)');
+  function updateQueryItemDisplay(itemDiv, item) {
+    $('.title', itemDiv).text(item.title + ' (' + item.duration + 's)');
+    var clickable = $('.clickable', itemDiv);
+    clickable.unbind();
+    clickable.click(function(event) {
+      event.preventDefault();
+      queryItemClicked(item);
+    });
+  }
+
+  function queryItemClicked(item) {
+    var existingMenu = $('.itemmenu');
+    if (existingMenu.size() > 0) {
+      existingMenu.remove();
+    }
+    else {
+      $('body').append(makeItemMenu(item));
+    }
+  }
+
+  function makeItemMenu(item) {
+    var menu = $('<div class="popup itemmenu">');
+
+    var title = $('<p class="title">');
+    title.text(item.title);
+    menu.append(title);
+
+    var stats = $('<p class="stats">');
+    stats.text(item.startCount + '/' + item.endCount + ' ' + item.duration + 's');
+    menu.append(stats);
+
+    var play = $('<button class="play">play</button>');
+    play.attr('disabled', 'true');
+    menu.append(play);
+
+    var enqueue = $('<button class="enqueue">enqueue</button>');
+    enqueue.attr('disabled', 'true');
+    menu.append(enqueue);
+
+    var addTag = $('<button class="addtag">add tag</button>');
+    addTag.attr('disabled', 'true');
+    menu.append(addTag);
+
+    var download = $('<a class="download link">download</a>');
+    download.attr('href', item.url);
+    menu.append(download);
+
+    var close = $('<button class="close">close</button>');
+    close.click(function() {
+      menu.remove();
+    });
+    menu.append(close);
+
+    return menu;
   }
 
   function getQuery(mid, query, onStatus, onItems) {
@@ -208,7 +262,7 @@
       },
       success : function(xml) {
         var itemsNode = $(xml).find('mlist');
-        var items = parseItemsNode(itemsNode);
+        var items = parseItemsNode(itemsNode, mid);
         onItems(items);
         onStatus('Query ' + query + ' updated.');
       },
@@ -218,16 +272,16 @@
     });
   }
 
-  function parseItemsNode(node) {
+  function parseItemsNode(node, mid) {
     var items = [];
     node.find('entry').each(function() {
-      var item = parseItemNode($(this));
+      var item = parseItemNode($(this), mid);
       items.push(item);
     });
     return items;
   }
 
-  function parseItemNode(node) {
+  function parseItemNode(node, mid) {
     var item = {};
     item.relativeUrl = node.find('link[rel="self"]').attr('href');
     item.title = node.find('title').text();
@@ -242,6 +296,8 @@
         item.tags.push(node.text());
       }
     });
+
+    item.url = '/mlists/' +  mid + '/items/' + item.relativeUrl;
 
     return item;
   }

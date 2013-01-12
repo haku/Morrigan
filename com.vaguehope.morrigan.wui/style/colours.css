@@ -6,3 +6,18 @@
   background: Highlight;
   color: HighlightText;
 }
+
+.mediaitems a:link, .mediaitems a:visited, .mediaitems a:active, .mediaitems a:hover {
+  color: inherit;
+}
+
+.mediaitems .item:hover {
+  background: Highlight;
+  color: HighlightText;
+}
+
+.popup {
+  border: 1px solid MenuText;
+  background: Menu;
+  color: MenuText;
+}
