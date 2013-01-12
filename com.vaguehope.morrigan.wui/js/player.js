@@ -62,21 +62,30 @@
       makePlayer(playerDiv, player.pid, detailed);
       playersDiv.append(playerDiv);
     }
-    updatePlayerDisplay(playerDiv, player);
+    updatePlayerDisplay(playerDiv, player, detailed);
   }
 
-  function updatePlayerDisplay(playerDiv, player) {
+  function updatePlayerDisplay(playerDiv, player, detailed) {
     $('.name', playerDiv).text(player.name);
     $('.state', playerDiv).text(player.stateName);
-    $('.title', playerDiv).text(player.trackTitle);
     $('.list', playerDiv).text(player.listTitle);
+
+    if (detailed === true) {
+      $('.title', playerDiv).text(player.trackTitle + ' (' + player.trackDuration + ' seconds)');
+      $('.tagsrow .tags', playerDiv).text('(tags)');
+      $('.queuerow .summary', playerDiv).text(player.queueLength + ' items, ' + player.queueDuration + ' seconds.');
+    }
+    else {
+      $('.title', playerDiv).text(player.trackTitle);
+    }
+
   }
 
   function makePlayer(playerDiv, pid, detailed) {
     playerDiv.empty();
 
     if (detailed === true) {
-      var btnBlock = $('<div class="block">');
+      var btnBlock = $('<div class="block buttons">');
       playerDiv.append(btnBlock);
       var onStatus = function(msg) {
         $('.status', playerDiv).text(msg);
@@ -93,7 +102,7 @@
       btnBlock.append(btnNext);
     }
 
-    var textBlock = $('<div class="block">');
+    var textBlock = $('<div class="block text">');
     playerDiv.append(textBlock);
 
     if (detailed === false) {
@@ -109,6 +118,15 @@
     topRow.append($('<span class="list">'));
     topRow.append($('<span class="status">'));
     mainRow.append($('<span class="title">'));
+
+    if (detailed === true) {
+      var tagsRow = $('<p class="tagsrow">');
+      textBlock.append(tagsRow);
+      tagsRow.append($('<span class="tags">'));
+      var queueRow = $('<p class="queuerow">');
+      textBlock.append(queueRow);
+      queueRow.append($('<span class="summary">'));
+    }
   }
 
   function getPlayers(onStatus, onPlayers) {
@@ -169,20 +187,24 @@
     player.stateName = playerStateToLabel(parseInt(player.state));
     player.trackTitle = node.find('tracktitle').text();
     player.listTitle = node.find('listtitle').text();
-    if (player.listTitle === "null")
+    if (player.listTitle === "null") {
       player.listTitle = "(no list)";
+    }
+    player.trackDuration = parseInt(node.find('trackduration').text());
+    player.queueLength = parseInt(node.find('queuelength').text());
+    player.queueDuration = parseInt(node.find('queueduration').text());
     return player;
   }
 
   function playerPause(pid, playerDiv, onStatus) {
     writePlayerState(pid, 'playpause', onStatus, function(player) {
-      updatePlayerDisplay(playerDiv, player);
+      updatePlayerDisplay(playerDiv, player, true);
     });
   }
 
   function playerNext(pid, playerDiv, onStatus) {
     writePlayerState(pid, 'next', onStatus, function(player) {
-      updatePlayerDisplay(playerDiv, player);
+      updatePlayerDisplay(playerDiv, player, true);
     });
   }
 
