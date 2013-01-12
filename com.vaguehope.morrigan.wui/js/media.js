@@ -205,6 +205,59 @@
     });
   }
 
+  function getQuery(mid, query, onStatus, onItems) {
+    var id = midToId(mid);
+    var encodedQuery = encodeURIComponent(query);
+    $.ajax({
+      type : 'GET',
+      cache : false,
+      url : 'mlists/' + mid + '/query/' + encodedQuery,
+      dataType : 'xml',
+      beforeSend : function() {
+        onStatus('Querying ' + id + '...');
+      },
+      success : function(xml) {
+        var itemsNode = $(xml).find('mlist');
+        var items = parseItemsNode(itemsNode, mid);
+        onItems(items);
+        onStatus('Query ' + query + ' updated.');
+      },
+      error : function(jqXHR, textStatus, errorThrown) {
+        onStatus('Error querying ' + id + ': ' + textStatus);
+      }
+    });
+  }
+
+  function parseItemsNode(node, mid) {
+    var items = [];
+    node.find('entry').each(function() {
+      var item = parseItemNode($(this), mid);
+      items.push(item);
+    });
+    return items;
+  }
+
+  function parseItemNode(node, mid) {
+    var item = {};
+    item.relativeUrl = node.find('link[rel="self"]').attr('href');
+    item.title = node.find('title').text();
+    item.duration = parseInt(node.find('duration').text());
+    item.startCount = parseInt(node.find('startcount').text());
+    item.endCount = parseInt(node.find('endcount').text());
+
+    item.tags = [];
+    node.find('tag').each(function() {
+      var node = $(this);
+      if (node.attr('t') === '0') {
+        item.tags.push(node.text());
+      }
+    });
+
+    item.url = '/mlists/' + mid + '/items/' + item.relativeUrl;
+
+    return item;
+  }
+
   function queryItemClicked(item) {
     var existingMenu = $('.itemmenu');
     if (existingMenu.size() > 0) {
@@ -320,59 +373,6 @@
         onStatus('Error: ' + textStatus);
       }
     });
-  }
-
-  function getQuery(mid, query, onStatus, onItems) {
-    var id = midToId(mid);
-    var encodedQuery = encodeURIComponent(query);
-    $.ajax({
-      type : 'GET',
-      cache : false,
-      url : 'mlists/' + mid + '/query/' + encodedQuery,
-      dataType : 'xml',
-      beforeSend : function() {
-        onStatus('Querying ' + id + '...');
-      },
-      success : function(xml) {
-        var itemsNode = $(xml).find('mlist');
-        var items = parseItemsNode(itemsNode, mid);
-        onItems(items);
-        onStatus('Query ' + query + ' updated.');
-      },
-      error : function(jqXHR, textStatus, errorThrown) {
-        onStatus('Error querying ' + id + ': ' + textStatus);
-      }
-    });
-  }
-
-  function parseItemsNode(node, mid) {
-    var items = [];
-    node.find('entry').each(function() {
-      var item = parseItemNode($(this), mid);
-      items.push(item);
-    });
-    return items;
-  }
-
-  function parseItemNode(node, mid) {
-    var item = {};
-    item.relativeUrl = node.find('link[rel="self"]').attr('href');
-    item.title = node.find('title').text();
-    item.duration = parseInt(node.find('duration').text());
-    item.startCount = parseInt(node.find('startcount').text());
-    item.endCount = parseInt(node.find('endcount').text());
-
-    item.tags = [];
-    node.find('tag').each(function() {
-      var node = $(this);
-      if (node.attr('t') === '0') {
-        item.tags.push(node.text());
-      }
-    });
-
-    item.url = '/mlists/' + mid + '/items/' + item.relativeUrl;
-
-    return item;
   }
 
 })();
