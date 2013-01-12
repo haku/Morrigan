@@ -1,8 +1,12 @@
+/* resets. */
+
 body, p, div, span {
   margin: 0;
   padding: 0;
   font-family: sans-serif;
 }
+
+/* main. */
 
 .player, .mlist {
   left: 0;
@@ -81,6 +85,50 @@ body, p, div, span {
   margin: 0.4em;
   font-size: 80%;
 }
+
+.mediaitems a:link, .mediaitems a:visited, .mediaitems a:active, .mediaitemsa:hover {
+  text-decoration: none;
+}
+
+.mediaitems .item {
+  border-radius: 0.2em;
+}
+
+/* pop-up menu. */
+
+.popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 16em;
+  min-height: 20em;
+  margin-left: -8em; /* width/2 */
+  margin-top: -12em; /* height/2 */
+  text-align: center;
+  border-radius: 0.5em 0.5em 0 0;
+}
+
+.popup .title {
+  margin: 0.2em;
+}
+
+.popup .stats {
+  margin: 0.2em;
+  font-size: 80%;
+}
+
+.popup button, .popup a {
+  width: 90%;
+  height: 3em;
+  margin: .5em;
+}
+
+.popup .link {
+  vertical-align: middle;
+  line-height: 3em;
+}
+
+/* extra. */
 
 .clearfooter {/* Empty space to make main area scroll above footer. */
   float: left;
