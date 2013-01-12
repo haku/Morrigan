@@ -97,29 +97,6 @@ Players = {};
   function makePlayer(playerDiv, pid, detailed) {
     playerDiv.empty();
 
-    if (detailed === true) {
-      var btnBlock = $('<div class="block buttons">');
-      playerDiv.append(btnBlock);
-      var onStatus = function(msg) {
-        $('.status', playerDiv).text(msg);
-      };
-      var btnPause = $('<button class="pause">||</button>');
-      var btnNext = $('<button class="next">&gt;&gt;|</button>');
-      var btnSearch = $('<button class="search">search</button>');
-      btnPause.click(function() {
-        playerPause(pid, playerDiv, onStatus);
-      });
-      btnNext.click(function() {
-        playerNext(pid, playerDiv, onStatus);
-      });
-      btnSearch.click(function() {
-        showSearch(pid);
-      });
-      btnBlock.append(btnPause);
-      btnBlock.append(btnNext);
-      btnBlock.append(btnSearch);
-    }
-
     var textBlock = $('<div class="block text">');
     playerDiv.append(textBlock);
 
@@ -141,7 +118,33 @@ Players = {};
       var tagsRow = $('<p class="tagsrow">');
       textBlock.append(tagsRow);
       tagsRow.append($('<span class="tags">'));
+
+      makeToolbar(playerDiv, pid);
     }
+  }
+
+  function makeToolbar(playerDiv, pid) {
+    var toolbar = $('<div class="toolbar">');
+    $('body').append(toolbar);
+
+    var onStatus = function(msg) {
+      $('.status', playerDiv).text(msg);
+    };
+    var btnPause = $('<button class="pause">||</button>');
+    var btnNext = $('<button class="next">&gt;&gt;|</button>');
+    var btnSearch = $('<button class="search">search</button>');
+    btnPause.click(function() {
+      playerPause(pid, playerDiv, onStatus);
+    });
+    btnNext.click(function() {
+      playerNext(pid, playerDiv, onStatus);
+    });
+    btnSearch.click(function() {
+      showSearch(pid);
+    });
+    toolbar.append(btnPause);
+    toolbar.append(btnNext);
+    toolbar.append(btnSearch);
   }
 
   function getPlayers(onStatus, onPlayers) {
