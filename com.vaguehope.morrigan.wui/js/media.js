@@ -1,6 +1,9 @@
 (function() {
 
+  var DEFAULT_QUERY = '*';
+
   var mlistsStatusBar;
+  var queryStatusBar;
 
   $(document).ready(function() {
     initStatusBars();
@@ -9,6 +12,8 @@
     var pid = UrlParams.params['pid'];
     if (mid) {
       initMlist(mlistsDiv, mid);
+      var itemsDiv = $('.mediaitems');
+      runQuery(itemsDiv, mid, DEFAULT_QUERY);
     }
     else if (!pid) {
       initMlists(mlistsDiv);
@@ -18,6 +23,8 @@
   function initStatusBars() {
     mlistsStatusBar = $('<span>');
     $('.statusbar').append(mlistsStatusBar);
+    queryStatusBar = $('<span>');
+    $('.statusbar').append(queryStatusBar);
   }
 
   function initMlists(mlistsDiv) {
@@ -63,7 +70,7 @@
   function updateMlistDisplay(mlistDiv, mlist, detailed) {
     $('.title', mlistDiv).text(mlist.title);
     if (detailed === true) {
-      $('.stats', mlistDiv).text(mlist.count + ' items, ' + (mlist.durationComplete === true ? '' : 'more than ') + mlist.duration + ' seconds.');
+      $('.stats', mlistDiv).text(mlist.count + ' items, ' + (mlist.durationComplete === true ? '' : 'more than ') + mlist.duration + 's.');
     }
   }
 
@@ -80,10 +87,9 @@
     var mainRow = $('<p class="mainrow">');
     textBlock.append(mainRow);
     mainRow.append($('<span class="title">'));
-    
-    
+
     if (detailed === true) {
-      var statsRow =  $('<p class="statsrow">');
+      var statsRow = $('<p class="statsrow">');
       textBlock.append(statsRow);
       statsRow.append($('<span class="stats">'));
     }
@@ -150,9 +156,94 @@
     mlist.durationComplete = (node.find('durationcomplete').text() === 'true');
     return mlist;
   }
-  
+
   function midToId(mid) {
     return mid.match(/\/(.+?)\./)[1];
+  }
+
+  function runQuery(itemsDiv, mid, query) {
+    itemsDiv.empty();
+    itemsDiv.append($('<p>Running query...</p>'));
+    updateQuery(itemsDiv, mid, query);
+  }
+
+  function updateQuery(itemsDiv, mid, query) {
+    getQuery(mid, query, function(msg) {
+      queryStatusBar.text(msg);
+    }, function(items) {
+      displayQuery(itemsDiv, items);
+    });
+  }
+
+  function displayQuery(itemsDiv, items) {
+    itemsDiv.empty();
+    $.each(items, function(index, item) {
+      itemDiv = $('<div class="item">');
+      makeQueryItem(itemDiv);
+      updateQueryItemDisplay(itemDiv, item);
+      itemsDiv.append(itemDiv);
+    });
+  }
+
+  function makeQueryItem(itemDiv, id) {
+    itemDiv.empty();
+    var title = $('<p class="title">');
+    itemDiv.append(title);
+  }
+
+  function updateQueryItemDisplay(queueDiv, item) {
+    $('.title', queueDiv).text(item.title + ' (' + item.duration + 's)');
+  }
+
+  function getQuery(mid, query, onStatus, onItems) {
+    var id = midToId(mid);
+    var encodedQuery = encodeURIComponent(query);
+    $.ajax({
+      type : 'GET',
+      cache : false,
+      url : 'mlists/' + mid + '/query/' + encodedQuery,
+      dataType : 'xml',
+      beforeSend : function() {
+        onStatus('Querying ' + id + '...');
+      },
+      success : function(xml) {
+        var itemsNode = $(xml).find('mlist');
+        var items = parseItemsNode(itemsNode);
+        onItems(items);
+        onStatus('Query ' + query + ' updated.');
+      },
+      error : function(jqXHR, textStatus, errorThrown) {
+        onStatus('Error querying ' + id + ': ' + textStatus);
+      }
+    });
+  }
+
+  function parseItemsNode(node) {
+    var items = [];
+    node.find('entry').each(function() {
+      var item = parseItemNode($(this));
+      items.push(item);
+    });
+    return items;
+  }
+
+  function parseItemNode(node) {
+    var item = {};
+    item.relativeUrl = node.find('link[rel="self"]').attr('href');
+    item.title = node.find('title').text();
+    item.duration = parseInt(node.find('duration').text());
+    item.startCount = parseInt(node.find('startcount').text());
+    item.endCount = parseInt(node.find('endcount').text());
+
+    item.tags = [];
+    node.find('tag').each(function() {
+      var node = $(this);
+      if (node.attr('t') === '0') {
+        item.tags.push(node.text());
+      }
+    });
+
+    return item;
   }
 
 })();
