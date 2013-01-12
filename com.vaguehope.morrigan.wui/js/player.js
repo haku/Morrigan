@@ -1,4 +1,7 @@
+Players = {};
 (function() {
+
+  Players.getPlayers = getPlayers;
 
   var REFRESH_PLAYERS_SECONDS = 10;
   var REFRESH_QUEUE_SECONDS = 30;
@@ -190,6 +193,7 @@
     var player = {};
     player.pid = node.find('playerid').text();
     player.name = node.find('playername').text();
+    player.title = node.find('title').text();
     player.state = node.find('playstate').text();
     player.stateName = playerStateToLabel(parseInt(player.state));
     player.trackTitle = node.find('tracktitle').text();
