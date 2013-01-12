@@ -20,6 +20,8 @@ body {
   display: table-cell;
   vertical-align: middle;
   white-space: nowrap;
+  height: 3em;
+  padding: 0.5em;
 }
 
 .player .pause, .player .next, .player span {
@@ -37,7 +39,22 @@ body {
 }
 
 .player .toprow {
-	font-size: 85%;
+  font-size: 85%;
+}
+
+.player {
+  position: relative;
+}
+
+.player .details {
+  position: absolute;
+  display: block;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  text-indent: -9999px;
+  z-index: 1000;
 }
 
 .statusbar {

@@ -8,10 +8,21 @@
     statusBar = $('<span>');
     $('.statusbar').append(statusBar);
     var playersDiv = $('.players');
-    initPlayers(playersDiv);
-    setInterval(function() {
-      updatePlayers(playersDiv);
-    }, REFRESH_SECONDS * 1000);
+
+    var pid = UrlParams.params['pid'];
+    if (pid) {
+      initPlayer(playersDiv, pid);
+      setInterval(function() {
+        updatePlayer(playersDiv, pid);
+      }, REFRESH_SECONDS * 1000);
+    }
+    else {
+      initPlayers(playersDiv);
+      setInterval(function() {
+        updatePlayers(playersDiv);
+      }, REFRESH_SECONDS * 1000);
+    }
+
   });
 
   function initPlayers(playersDiv) {
@@ -19,52 +30,75 @@
     updatePlayers(playersDiv);
   }
 
+  function initPlayer(playersDiv, pid) {
+    playersDiv.empty();
+    updatePlayer(playersDiv, pid);
+  }
+
   function updatePlayers(playersDiv) {
     getPlayers(function(msg) {
       statusBar.text(msg);
     }, function(players) {
       $.each(players, function(index, value) {
-        var player = players[index];
-        var playerDivId = 'player' + player.pid;
-        var playerDiv = $('#' + playerDivId, playersDiv);
-        if (playerDiv.size() < 1) {
-          playerDiv = $('<div class="player">');
-          playerDiv.attr('id', playerDivId);
-          makePlayer(playerDiv, player.pid);
-          playersDiv.append(playerDiv);
-        }
-        updatePlayer(playerDiv, player);
+        displayPlayer(playersDiv, players[index], false);
       });
     });
   }
 
-  function updatePlayer(playerDiv, player) {
+  function updatePlayer(playersDiv, pid) {
+    getPlayer(pid, function(msg) {
+      statusBar.text(msg);
+    }, function(player) {
+      displayPlayer(playersDiv, player, true);
+    });
+  }
+
+  function displayPlayer(playersDiv, player, detailed) {
+    var playerDivId = 'player' + player.pid;
+    var playerDiv = $('#' + playerDivId, playersDiv);
+    if (playerDiv.size() < 1) {
+      playerDiv = $('<div class="player">');
+      playerDiv.attr('id', playerDivId);
+      makePlayer(playerDiv, player.pid, detailed);
+      playersDiv.append(playerDiv);
+    }
+    updatePlayerDisplay(playerDiv, player);
+  }
+
+  function updatePlayerDisplay(playerDiv, player) {
     $('.name', playerDiv).text(player.name);
     $('.state', playerDiv).text(player.stateName);
     $('.title', playerDiv).text(player.trackTitle);
     $('.list', playerDiv).text(player.listTitle);
   }
 
-  function makePlayer(playerDiv, pid) {
+  function makePlayer(playerDiv, pid, detailed) {
     playerDiv.empty();
-    var btnBlock = $('<div class="block">');
+
+    if (detailed === true) {
+      var btnBlock = $('<div class="block">');
+      playerDiv.append(btnBlock);
+      var onStatus = function(msg) {
+        $('.status', playerDiv).text(msg);
+      };
+      var btnPause = $('<button class="pause">||</button>');
+      var btnNext = $('<button class="next">&gt;&gt;|</button>');
+      btnPause.click(function() {
+        playerPause(pid, playerDiv, onStatus);
+      });
+      btnNext.click(function() {
+        playerNext(pid, playerDiv, onStatus);
+      });
+      btnBlock.append(btnPause);
+      btnBlock.append(btnNext);
+    }
+
     var textBlock = $('<div class="block">');
-    playerDiv.append(btnBlock);
     playerDiv.append(textBlock);
 
-    var onStatus = function(msg) {
-      $('.status', playerDiv).text(msg);
-    };
-    var btnPause = $('<button class="pause">||</button>');
-    var btnNext = $('<button class="next">&gt;&gt;|</button>');
-    btnPause.click(function() {
-      playerPause(pid, playerDiv, onStatus);
-    });
-    btnNext.click(function() {
-      playerNext(pid, playerDiv, onStatus);
-    });
-    btnBlock.append(btnPause);
-    btnBlock.append(btnNext);
+    if (detailed === false) {
+      playerDiv.append($('<a class="details" href="?pid=' + pid + '">'));
+    }
 
     var topRow = $('<p class="toprow">');
     var mainRow = $('<p class="mainrow">');
@@ -106,6 +140,27 @@
     });
   }
 
+  function getPlayer(pid, onStatus, onPlayer) {
+    $.ajax({
+      type : 'GET',
+      cache : false,
+      url : 'players/' + pid,
+      dataType : 'xml',
+      beforeSend : function() {
+        onStatus('Reading player ' + pid + '...');
+      },
+      success : function(xml) {
+        var playerNode = $(xml).find('player');
+        var player = parsePlayerNode(playerNode);
+        onPlayer(player);
+        onStatus('Player ' + pid + ' updated.');
+      },
+      error : function(jqXHR, textStatus, errorThrown) {
+        onStatus('Error fetching player ' + pid + ': ' + textStatus);
+      }
+    });
+  }
+
   function parsePlayerNode(node) {
     var player = {};
     player.pid = node.find('playerid').text();
@@ -114,19 +169,20 @@
     player.stateName = playerStateToLabel(parseInt(player.state));
     player.trackTitle = node.find('tracktitle').text();
     player.listTitle = node.find('listtitle').text();
-    if (player.listTitle === "null") player.listTitle = "(no list)";
+    if (player.listTitle === "null")
+      player.listTitle = "(no list)";
     return player;
   }
 
   function playerPause(pid, playerDiv, onStatus) {
     writePlayerState(pid, 'playpause', onStatus, function(player) {
-      updatePlayer(playerDiv, player);
+      updatePlayerDisplay(playerDiv, player);
     });
   }
 
   function playerNext(pid, playerDiv, onStatus) {
     writePlayerState(pid, 'next', onStatus, function(player) {
-      updatePlayer(playerDiv, player);
+      updatePlayerDisplay(playerDiv, player);
     });
   }
 
