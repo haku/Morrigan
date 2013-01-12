@@ -16,6 +16,7 @@
       var search = UrlParams.params['search'];
       search = search ? search : DEFAULT_QUERY;
       runQuery(itemsDiv, mid, search);
+      makeToolbar(itemsDiv, mid);
     }
     else if (!pid) {
       initMlists(mlistsDiv);
@@ -256,6 +257,51 @@
     item.url = '/mlists/' + mid + '/items/' + item.relativeUrl;
 
     return item;
+  }
+
+  function makeToolbar(itemsDiv, mid) {
+    var toolbar = $('<div class="toolbar">');
+    $('body').append(toolbar);
+    var btnSearch = $('<button class="search">search</button>');
+    btnSearch.click(function() {
+      showSearch(itemsDiv, mid);
+    });
+    toolbar.append(btnSearch);
+  }
+
+  function showSearch(itemsDiv, mid) {
+    var dlg = $('<div class="popup searchdlg">');
+
+    var title = $('<p class="title">');
+    title.text('Search');
+    dlg.append(title);
+
+    var txtSearch = $('<input type="text">');
+    dlg.append(txtSearch);
+
+    var btnSearch = $('<button>search</button>');
+    dlg.append(btnSearch);
+
+    var close = $('<button class="close">close</button>');
+    dlg.append(close);
+
+    close.click(function() {
+      dlg.remove();
+    });
+
+    txtSearch.keyup(function(event) {
+      if (event.keyCode == 13) {
+        btnSearch.click();
+      }
+    });
+
+    btnSearch.click(function() {
+      runQuery(itemsDiv, mid, txtSearch.val());
+      dlg.remove();
+    });
+
+    $('body').append(dlg);
+    txtSearch.focus();
   }
 
   function queryItemClicked(item) {
