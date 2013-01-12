@@ -1,29 +1,40 @@
 (function() {
 
-  var REFRESH_SECONDS = 5;
+  var REFRESH_PLAYERS_SECONDS = 5;
+  var REFRESH_QUEUE_SECONDS = 15;
 
-  var statusBar;
+  var playersStatusBar;
+  var queueStatusBar;
 
   $(document).ready(function() {
-    statusBar = $('<span>');
-    $('.statusbar').append(statusBar);
+    initStatusBars();
     var playersDiv = $('.players');
-
     var pid = UrlParams.params['pid'];
     if (pid) {
       initPlayer(playersDiv, pid);
+      var queueDiv = $('.queue');
+      initQueue(queueDiv, pid);
       setInterval(function() {
         updatePlayer(playersDiv, pid);
-      }, REFRESH_SECONDS * 1000);
+      }, REFRESH_PLAYERS_SECONDS * 1000);
+      setInterval(function() {
+        updateQueue(queueDiv, pid);
+      }, REFRESH_QUEUE_SECONDS * 1000);
     }
     else {
       initPlayers(playersDiv);
       setInterval(function() {
         updatePlayers(playersDiv);
-      }, REFRESH_SECONDS * 1000);
+      }, REFRESH_PLAYERS_SECONDS * 1000);
     }
-
   });
+
+  function initStatusBars() {
+    playersStatusBar = $('<span>');
+    $('.statusbar').append(playersStatusBar);
+    queueStatusBar = $('<span>');
+    $('.statusbar').append(queueStatusBar);
+  }
 
   function initPlayers(playersDiv) {
     playersDiv.empty();
@@ -37,7 +48,7 @@
 
   function updatePlayers(playersDiv) {
     getPlayers(function(msg) {
-      statusBar.text(msg);
+      playersStatusBar.text(msg);
     }, function(players) {
       $.each(players, function(index, value) {
         displayPlayer(playersDiv, players[index], false);
@@ -47,7 +58,7 @@
 
   function updatePlayer(playersDiv, pid) {
     getPlayer(pid, function(msg) {
-      statusBar.text(msg);
+      playersStatusBar.text(msg);
     }, function(player) {
       displayPlayer(playersDiv, player, true);
     });
@@ -73,7 +84,6 @@
     if (detailed === true) {
       $('.title', playerDiv).text(player.trackTitle + ' (' + player.trackDuration + ' seconds)');
       $('.tagsrow .tags', playerDiv).text('(tags)');
-      $('.queuerow .summary', playerDiv).text(player.queueLength + ' items, ' + player.queueDuration + ' seconds.');
     }
     else {
       $('.title', playerDiv).text(player.trackTitle);
@@ -123,9 +133,6 @@
       var tagsRow = $('<p class="tagsrow">');
       textBlock.append(tagsRow);
       tagsRow.append($('<span class="tags">'));
-      var queueRow = $('<p class="queuerow">');
-      textBlock.append(queueRow);
-      queueRow.append($('<span class="summary">'));
     }
   }
 
@@ -248,6 +255,106 @@
       default:
         return 'Unknown';
     }
+  }
+
+  function initQueue(queueDiv, pid) {
+    queueDiv.empty();
+    updateQueue(queueDiv, pid);
+  }
+
+  function updateQueue(queueDiv, pid) {
+    getQueue(pid, function(msg) {
+      queueStatusBar.text(msg);
+    }, function(queue) {
+      displayQueue(queueDiv, queue);
+    });
+  }
+
+  function displayQueue(queueDiv, queue) {
+    var header = $('.header p', queueDiv);
+    if (header.size() < 1) {
+      var headerDiv = $('.header', queueDiv);
+      if (headerDiv.size() < 1) {
+        headerDiv = $('<div class="header">');
+        queueDiv.append(headerDiv);
+      }
+      header = $('<p>');
+      headerDiv.append(header);
+    }
+    header.text(queue.length + ' items, ' + queue.duration + '.');
+
+    var allItemIds = {};
+    $.each(queue.items, function(index, item) {
+      var itemDivId = 'qitem' + item.id;
+      var itemDiv = $('#' + itemDivId, queueDiv);
+      if (itemDiv.size() < 1) {
+        itemDiv = $('<div class="item">');
+        itemDiv.attr('id', itemDivId);
+        makeQueueItem(itemDiv, item.id);
+        queueDiv.append(itemDiv);
+      }
+      updateQueueItemDisplay(itemDiv, item);
+      allItemIds[item.id] = item.id;
+    });
+    $('.item', queueDiv).each(function() {
+      var item = $(this);
+      var itemId = item.data('id');
+      if (!allItemIds[itemId]) {
+        item.remove();
+      }
+    });
+  }
+
+  function makeQueueItem(itemDiv, id) {
+    itemDiv.empty();
+    itemDiv.data('id', id);
+    var title = $('<p class="title">');
+    itemDiv.append(title);
+  }
+
+  function updateQueueItemDisplay(queueDiv, item) {
+    $('.title', queueDiv).text(item.title);
+  }
+
+  function getQueue(pid, onStatus, onQueue) {
+    $.ajax({
+      type : 'GET',
+      cache : false,
+      url : 'players/' + pid + '/queue',
+      dataType : 'xml',
+      beforeSend : function() {
+        onStatus('Reading queue ' + pid + '...');
+      },
+      success : function(xml) {
+        var queueNode = $(xml).find('queue');
+        var queue = parseQueueNode(queueNode);
+        onQueue(queue);
+        onStatus('Queue ' + pid + ' updated.');
+      },
+      error : function(jqXHR, textStatus, errorThrown) {
+        onStatus('Error fetching queue ' + pid + ': ' + textStatus);
+      }
+    });
+  }
+
+  function parseQueueNode(node) {
+    var queue = {};
+    queue.length = parseInt(node.find('queuelength').text());
+    queue.duration = node.find('queueduration').text();
+    queue.items = [];
+    node.find('entry').each(function() {
+      var item = parseQueueItemNode($(this));
+      queue.items.push(item);
+    });
+    return queue;
+  }
+
+  function parseQueueItemNode(node) {
+    var item = {};
+    item.id = parseInt(node.find('id').text());
+    item.title = node.find('title').text();
+    item.duration = parseInt(node.find('duration').text());
+    return item;
   }
 
 })();

@@ -1,46 +1,42 @@
-body {
+body, p, div, span {
   margin: 0;
   padding: 0;
+  font-family: sans-serif;
 }
 
-.controls {
+.player {
   left: 0;
   right: 0;
-  padding: 0.25em;
-}
-
-.player, .statusbar {
-  left: 0;
-  right: 0;
-  margin: 0.25em;
+  margin: 0.5em 0.5em 0 0.5em;
   border-radius: 0.5em;
   overflow: hidden;
 }
 
+.statusbar {
+  margin: 0.2em;
+}
+
 .player .block {
-  display: table-cell;
   vertical-align: middle;
-  height: 3em;
-  padding: 0.5em;
+  margin: 0.2em;
 }
 
 .player .pause, .player .next, .player span {
-  margin: 0.25em;
+  margin: 0.2em;
 }
 
 .player .buttons {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  text-align: center;
   white-space: nowrap;
 }
 
 .player .pause, .player .next {
-  width: 2.5em;
-  height: 3.5em;
-  height: 90%;
-}
-
-.player p {
-  margin: 0;
-  padding: 0;
+  height: 3em;
+  width: 40%;
 }
 
 .player .toprow {
@@ -64,8 +60,30 @@ body {
 
 .statusbar {
   text-align: right;
+  font-size: 80%;
 }
 
 .statusbar span {
-  padding: 0.5em;
+  margin: 0.5em;
+}
+
+.queue {
+  margin: 0 0.5em 0 0.5em;
+}
+
+.queue .header {
+  border-radius: 0.5em 0.5em 0 0;
+  text-align: center;
+  padding: 0.1em;
+}
+
+.queue .item p {
+  margin: 0.4em;
+  font-size: 80%;
+}
+
+.clearfooter {/* Empty space to make main area scroll above footer. */
+  float: left;
+  clear: both;
+  height: 3em;
 }
