@@ -1,3 +1,8 @@
-.player, .queue .header {
+.player, .mlist, .queue .header {
   background: Menu;
+}
+
+.player:hover, .mlist:hover {
+  background: Highlight;
+  color: HighlightText;
 }

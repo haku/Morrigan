@@ -4,7 +4,7 @@ body, p, div, span {
   font-family: sans-serif;
 }
 
-.player {
+.player, .mlist {
   left: 0;
   right: 0;
   margin: 0.5em 0.5em 0 0.5em;
@@ -16,12 +16,12 @@ body, p, div, span {
   margin: 0.2em;
 }
 
-.player .block {
+.player .block, .mlist .block {
   vertical-align: middle;
   margin: 0.2em;
 }
 
-.player .pause, .player .next, .player span {
+.player .pause, .player .next, .player span, .mlist span {
   margin: 0.2em;
 }
 
@@ -43,11 +43,11 @@ body, p, div, span {
   font-size: 85%;
 }
 
-.player {
+.player, .mlist {
   position: relative;
 }
 
-.player .details {
+.player .details, .mlist .details {
   position: absolute;
   display: block;
   top: 0;
