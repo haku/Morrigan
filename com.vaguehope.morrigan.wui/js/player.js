@@ -1,7 +1,7 @@
 (function() {
 
-  var REFRESH_PLAYERS_SECONDS = 5;
-  var REFRESH_QUEUE_SECONDS = 15;
+  var REFRESH_PLAYERS_SECONDS = 10;
+  var REFRESH_QUEUE_SECONDS = 30;
 
   var playersStatusBar;
   var queueStatusBar;
@@ -9,6 +9,7 @@
   $(document).ready(function() {
     initStatusBars();
     var playersDiv = $('.players');
+    var mid = UrlParams.params['mid'];
     var pid = UrlParams.params['pid'];
     if (pid) {
       initPlayer(playersDiv, pid);
@@ -21,7 +22,7 @@
         updateQueue(queueDiv, pid);
       }, REFRESH_QUEUE_SECONDS * 1000);
     }
-    else {
+    else if (!mid) {
       initPlayers(playersDiv);
       setInterval(function() {
         updatePlayers(playersDiv);
@@ -50,8 +51,8 @@
     getPlayers(function(msg) {
       playersStatusBar.text(msg);
     }, function(players) {
-      $.each(players, function(index, value) {
-        displayPlayer(playersDiv, players[index], false);
+      $.each(players, function(index, player) {
+        displayPlayer(playersDiv, player, false);
       });
     });
   }
@@ -88,7 +89,6 @@
     else {
       $('.title', playerDiv).text(player.trackTitle);
     }
-
   }
 
   function makePlayer(playerDiv, pid, detailed) {
