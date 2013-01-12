@@ -13,7 +13,9 @@
     if (mid) {
       initMlist(mlistsDiv, mid);
       var itemsDiv = $('.mediaitems');
-      runQuery(itemsDiv, mid, DEFAULT_QUERY);
+      var search = UrlParams.params['search'];
+      search = search ? search : DEFAULT_QUERY;
+      runQuery(itemsDiv, mid, search);
     }
     else if (!pid) {
       initMlists(mlistsDiv);
@@ -280,24 +282,30 @@
     var onStatus = function(msg) {
       statusElem.text(msg);
     };
-    Players.getPlayers(onStatus, function(players) {
-      $.each(players, function(index, player) {
-        var play = $('<button>');
-        play.text(player.title);
-        play.click(function() {
-          actionItem(item, player, action, onStatus, onComplete);
+    var tpid = UrlParams.params['tpid'];
+    if (tpid) {
+      actionItem(item, tpid, action, onStatus, onComplete);
+    }
+    else {
+      Players.getPlayers(onStatus, function(players) {
+        $.each(players, function(index, player) {
+          var play = $('<button>');
+          play.text(player.title);
+          play.click(function() {
+            actionItem(item, player.pid, action, onStatus, onComplete);
+          });
+          statusElem.after(play);
         });
-        statusElem.after(play);
       });
-    });
+    }
   }
 
-  function actionItem(item, player, action, onStatus, onComplete) {
+  function actionItem(item, pid, action, onStatus, onComplete) {
     $.ajax({
       type : 'POST',
       cache : false,
       url : item.url,
-      data : 'action=' + action + '&playerid=' + player.pid,
+      data : 'action=' + action + '&playerid=' + pid,
       contentTypeString : 'application/x-www-form-urlencoded',
       dataType : 'text',
       beforeSend : function() {
