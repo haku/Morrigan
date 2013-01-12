@@ -25,22 +25,8 @@ body, p, div, span {
   margin: 0.2em;
 }
 
-.player button, .player span, .mlist span {
+.player span, .mlist span {
   margin: 0.2em;
-}
-
-.player .buttons {
-  position: fixed;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  text-align: center;
-  white-space: nowrap;
-}
-
-.player button {
-  height: 3em;
-  width: 30%;
 }
 
 .player .toprow {
@@ -92,6 +78,23 @@ body, p, div, span {
 
 .mediaitems .item {
   border-radius: 0.2em;
+}
+
+/* tool-bar. */
+
+.toolbar {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.toolbar button {
+  margin: 0.5em;
+  height: 3em;
+  width: 30%;
 }
 
 /* pop-up menu. */
