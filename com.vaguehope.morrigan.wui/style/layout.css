@@ -119,7 +119,7 @@ body, p, div, span {
 
 .popup button, .popup a {
   width: 90%;
-  height: 3em;
+  min-height: 3em;
   margin: .5em;
 }
 

@@ -225,11 +225,9 @@
     menu.append(stats);
 
     var play = $('<button class="play">play</button>');
-    play.attr('disabled', 'true');
     menu.append(play);
 
     var enqueue = $('<button class="enqueue">enqueue</button>');
-    enqueue.attr('disabled', 'true');
     menu.append(enqueue);
 
     var addTag = $('<button class="addtag">add tag</button>');
@@ -241,12 +239,79 @@
     menu.append(download);
 
     var close = $('<button class="close">close</button>');
+    menu.append(close);
+
+    play.click(function() {
+      play.attr('disabled', 'true');
+      enqueue.remove();
+      addTag.remove();
+      download.remove();
+      var status = $('<p>');
+      play.after(status);
+      chosePlayerAndActionItem(item, 'play', status, function() {
+        setTimeout(function() {
+          menu.remove();
+        }, 1000);
+      });
+    });
+
+    enqueue.click(function() {
+      play.remove();
+      enqueue.attr('disabled', 'true');
+      addTag.remove();
+      download.remove();
+      var status = $('<p>');
+      enqueue.after(status);
+      chosePlayerAndActionItem(item, 'queue', status, function() {
+        setTimeout(function() {
+          menu.remove();
+        }, 1000);
+      });
+    });
+
     close.click(function() {
       menu.remove();
     });
-    menu.append(close);
 
     return menu;
+  }
+
+  function chosePlayerAndActionItem(item, action, statusElem, onComplete) {
+    var onStatus = function(msg) {
+      statusElem.text(msg);
+    };
+    Players.getPlayers(onStatus, function(players) {
+      $.each(players, function(index, player) {
+        var play = $('<button>');
+        play.text(player.title);
+        play.click(function() {
+          actionItem(item, player, action, onStatus, onComplete);
+        });
+        statusElem.after(play);
+      });
+    });
+  }
+
+  function actionItem(item, player, action, onStatus, onComplete) {
+    $.ajax({
+      type : 'POST',
+      cache : false,
+      url : item.url,
+      data : 'action=' + action + '&playerid=' + player.pid,
+      contentTypeString : 'application/x-www-form-urlencoded',
+      dataType : 'text',
+      beforeSend : function() {
+        onStatus(action + '-ing...');
+      },
+      success : function(text) {
+        onStatus(text);
+        onComplete();
+      },
+      error : function(jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR, textStatus, errorThrown);
+        onStatus('Error: ' + textStatus);
+      }
+    });
   }
 
   function getQuery(mid, query, onStatus, onItems) {
@@ -297,7 +362,7 @@
       }
     });
 
-    item.url = '/mlists/' +  mid + '/items/' + item.relativeUrl;
+    item.url = '/mlists/' + mid + '/items/' + item.relativeUrl;
 
     return item;
   }
