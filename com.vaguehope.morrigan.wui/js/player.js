@@ -42,9 +42,16 @@
     $('.name', playerDiv).text(player.name);
     $('.state', playerDiv).text(player.stateName);
     $('.title', playerDiv).text(player.trackTitle);
+    $('.list', playerDiv).text(player.listTitle);
   }
 
   function makePlayer(playerDiv, pid) {
+    playerDiv.empty();
+    var btnBlock = $('<div class="block">');
+    var textBlock = $('<div class="block">');
+    playerDiv.append(btnBlock);
+    playerDiv.append(textBlock);
+
     var onStatus = function(msg) {
       $('.status', playerDiv).text(msg);
     };
@@ -56,13 +63,18 @@
     btnNext.click(function() {
       playerNext(pid, playerDiv, onStatus);
     });
-    playerDiv.empty();
-    playerDiv.append(btnPause);
-    playerDiv.append(btnNext);
-    playerDiv.append($('<span class="status">'));
-    playerDiv.append($('<span class="state">'));
-    playerDiv.append($('<span class="name">'));
-    playerDiv.append($('<span class="title">'));
+    btnBlock.append(btnPause);
+    btnBlock.append(btnNext);
+
+    var topRow = $('<p class="toprow">');
+    var mainRow = $('<p class="mainrow">');
+    textBlock.append(topRow);
+    textBlock.append(mainRow);
+    topRow.append($('<span class="name">'));
+    topRow.append($('<span class="state">'));
+    topRow.append($('<span class="list">'));
+    topRow.append($('<span class="status">'));
+    mainRow.append($('<span class="title">'));
   }
 
   function getPlayers(onStatus, onPlayers) {
@@ -102,6 +114,7 @@
     player.stateName = playerStateToLabel(parseInt(player.state));
     player.trackTitle = node.find('tracktitle').text();
     player.listTitle = node.find('listtitle').text();
+    if (player.listTitle === "null") player.listTitle = "(no list)";
     return player;
   }
 
@@ -126,7 +139,7 @@
       contentTypeString : 'application/x-www-form-urlencoded',
       dataType : 'xml',
       beforeSend : function() {
-        onStatus('Player ' + pid + ': ' + action + '-ing...');
+        onStatus(action + '-ing...');
       },
       success : function(xml) {
         var playerNode = $(xml).find('player');
@@ -135,6 +148,7 @@
         onStatus('');
       },
       error : function(jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR, textStatus, errorThrown);
         onStatus('Error: ' + textStatus);
       }
     });

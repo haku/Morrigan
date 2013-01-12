@@ -16,13 +16,28 @@ body {
   border-radius: 0.5em;
 }
 
+.player .block {
+  display: table-cell;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
 .player .pause, .player .next, .player span {
   margin: 0.25em;
 }
 
 .player .pause, .player .next {
   width: 2.5em;
-  height: 3em;
+  height: 3.5em;
+}
+
+.player p {
+  margin: 0;
+  padding: 0;
+}
+
+.player .toprow {
+	font-size: 85%;
 }
 
 .statusbar {
