@@ -83,7 +83,7 @@
     $('.list', playerDiv).text(player.listTitle);
 
     if (detailed === true) {
-      $('.title', playerDiv).text(player.trackTitle + ' (' + player.trackDuration + ' seconds)');
+      $('.title', playerDiv).text(player.trackTitle + ' (' + player.trackDuration + 's)');
       $('.tagsrow .tags', playerDiv).text(player.tags.length > 0 ? player.tags.join(', ') : '(no tags)');
     }
     else {
