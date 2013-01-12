@@ -67,7 +67,7 @@ body, p, div, span {
   margin: 0.5em;
 }
 
-.queue {
+.queue, .mediaitems {
   margin: 0 0.5em 0 0.5em;
 }
 
@@ -77,7 +77,7 @@ body, p, div, span {
   padding: 0.1em;
 }
 
-.queue .item p {
+.queue .item p, .mediaitems .item p {
   margin: 0.4em;
   font-size: 80%;
 }
