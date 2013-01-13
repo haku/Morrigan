@@ -323,6 +323,7 @@ Players = {};
       updateQueueItemDisplay(itemDiv, item);
       allItemIds[item.id] = item.id;
     });
+
     $('.item', queueDiv).each(function() {
       var item = $(this);
       var itemId = item.data('id');
@@ -330,6 +331,18 @@ Players = {};
         item.remove();
       }
     });
+
+    // FIXME I am sure there must be a more efficient way to do this.
+    var currentElements = {};
+    $('.item', queueDiv).each(function() {
+      var item = $(this);
+      currentElements[item.attr('id')] = item;
+    });
+    var newElements = [];
+    $.each(queue.items, function(index, item) {
+      newElements.push(currentElements['qitem' + item.id]);
+    });
+    queueDiv.append(newElements);
   }
 
   function makeQueueItem(itemDiv, id) {
