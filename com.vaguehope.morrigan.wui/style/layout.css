@@ -37,7 +37,7 @@ body, p, div, span {
   position: relative;
 }
 
-.player .details, .mlist .details {
+.player .clickable, .mlist .clickable {
   position: absolute;
   display: block;
   top: 0;
@@ -102,6 +102,7 @@ body, p, div, span {
 
 .popup {
   position: fixed;
+  z-index: 100;
   top: 10%;
   left: 50%;
   width: 16em;
