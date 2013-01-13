@@ -321,7 +321,7 @@ Players = {};
         queueDiv.append(itemDiv);
       }
       updateQueueItemDisplay(itemDiv, item);
-      allItemIds[item.id] = item.id;
+      allItemIds[item.id] = true;
     });
 
     $('.item', queueDiv).each(function() {
