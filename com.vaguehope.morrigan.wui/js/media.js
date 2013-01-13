@@ -122,7 +122,7 @@
         onStatus('Media lists updated.');
       },
       error : function(jqXHR, textStatus, errorThrown) {
-        onStatus('Error fetching media lists: ' + textStatus);
+        onStatus('Error fetching media lists: ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
       }
     });
   }
@@ -144,7 +144,7 @@
         onStatus('Media list ' + id + ' updated.');
       },
       error : function(jqXHR, textStatus, errorThrown) {
-        onStatus('Error fetching media list ' + id + ': ' + textStatus);
+        onStatus('Error fetching media list ' + id + ': ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
       }
     });
   }
@@ -224,7 +224,7 @@
         onStatus('Query ' + query + ' updated.');
       },
       error : function(jqXHR, textStatus, errorThrown) {
-        onStatus('Error querying ' + id + ': ' + textStatus);
+        onStatus('Error querying ' + id + ': ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
       }
     });
   }
@@ -415,8 +415,7 @@
         onComplete();
       },
       error : function(jqXHR, textStatus, errorThrown) {
-        console.log(jqXHR, textStatus, errorThrown);
-        onStatus('Error: ' + textStatus);
+        onStatus('Error: ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
       }
     });
   }
