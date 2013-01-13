@@ -502,6 +502,17 @@ Players = {};
     title.text('Search...');
     dlg.append(title);
 
+    var txtSearch = $('<input type="text">');
+    txtSearch.keyup(function(event) {
+      if (event.keyCode === 13) {
+        btnSearch.click();
+      }
+    });
+    dlg.append(txtSearch);
+
+    var btnSearch = $('<button>search</button>');
+    dlg.append(btnSearch);
+
     var status = $('<p>');
     dlg.append(status);
 
@@ -516,22 +527,13 @@ Players = {};
       status.text(msg);
     }, function(player) {
       title.text('Search ' + player.listTitle);
-      var txtSearch = $('<input type="text">');
-      var btnSearch = $('<button>search</button>');
-      status.before(txtSearch);
-      status.before(btnSearch);
-      txtSearch.keyup(function(event) {
-        if (event.keyCode == 13) {
-          btnSearch.click();
-        }
-      });
       btnSearch.click(function() {
         window.location.href = '/?mid=' + player.mid + '&tpid=' + player.pid + '&search=' + encodeURIComponent(txtSearch.val());
       });
-      txtSearch.focus();
     });
 
     $('body').append(dlg);
+    txtSearch.focus();
   }
 
   function queueItemClicked(queueDiv, queue, item) {
