@@ -88,6 +88,13 @@ Players = {};
     if (detailed === true) {
       $('.title', playerDiv).text(player.trackTitle + ' (' + player.trackDuration + 's)');
       $('.tagsrow .tags', playerDiv).text(player.tags.length > 0 ? player.tags.join(', ') : '(no tags)');
+
+      var menuLink = $('.clickable', playerDiv);
+      menuLink.unbind();
+      menuLink.click(function(event) {
+        event.preventDefault();
+        showPlayerMenu(playerDiv, player);
+      });
     }
     else {
       $('.title', playerDiv).text(player.trackTitle);
@@ -100,8 +107,11 @@ Players = {};
     var textBlock = $('<div class="block text">');
     playerDiv.append(textBlock);
 
-    if (detailed === false) {
-      playerDiv.append($('<a class="details" href="?pid=' + pid + '">'));
+    if (detailed === true) {
+      playerDiv.append($('<a class="clickable" href="">'));
+    }
+    else {
+      playerDiv.append($('<a class="clickable" href="?pid=' + pid + '">'));
     }
 
     var topRow = $('<p class="toprow">');
@@ -227,6 +237,16 @@ Players = {};
       player.mid = listHref.replace('/mlists/', '');
     }
 
+    player.monitors = [];
+    node.find('monitor').each(function() {
+      var monitor = {};
+      var text = $(this).text();
+      var x = text.indexOf(":");
+      monitor.id = text.substring(0, x);
+      monitor.name = text.substring(x + 1);
+      player.monitors.push(monitor);
+    });
+
     return player;
   }
 
@@ -239,6 +259,13 @@ Players = {};
   function playerNext(pid, playerDiv, onStatus) {
     writePlayerState(pid, 'next', onStatus, function(player) {
       updatePlayerDisplay(playerDiv, player, true);
+    });
+  }
+
+  function playerFullscreen(pid, monitor, playerDiv, onStatus, onComplete) {
+    writePlayerState(pid, 'fullscreen&monitor=' + monitor.id, onStatus, function(player) {
+      updatePlayerDisplay(playerDiv, player, true);
+      onComplete();
     });
   }
 
@@ -260,7 +287,6 @@ Players = {};
         onStatus('');
       },
       error : function(jqXHR, textStatus, errorThrown) {
-        console.log(jqXHR, textStatus, errorThrown);
         onStatus('Error: ' + textStatus);
       }
     });
@@ -427,6 +453,46 @@ Players = {};
     item.title = node.find('title').text();
     item.duration = parseInt(node.find('duration').text());
     return item;
+  }
+
+  function showPlayerMenu(playerDiv, player) {
+    var existingMenu = $('.playermenu');
+    if (existingMenu.size() > 0) {
+      existingMenu.remove();
+    }
+    else {
+      $('body').append(makePlayerMenu(playerDiv, player));
+    }
+  }
+
+  function makePlayerMenu(playerDiv, player) {
+    var menu = $('<div class="popup playermenu">');
+    var closeAction = function() {
+      menu.remove();
+    };
+
+    var title = $('<p class="title">');
+    title.text(player.name);
+    menu.append(title);
+
+    $.each(player.monitors, function(index, monitor) {
+      var btn = $('<button>');
+      btn.text('fullscreen ' + monitor.id + ' (' + monitor.name + ')');
+      btn.click(function() {
+        var status = $('<p>');
+        btn.after(status);
+        playerFullscreen(player.pid, monitor, playerDiv, function(msg) {
+          status.text(msg);
+        }, closeAction);
+      });
+      menu.append(btn);
+    });
+
+    var close = $('<button class="close">close</button>');
+    menu.append(close);
+    close.click(closeAction);
+
+    return menu;
   }
 
   function showSearch(pid) {

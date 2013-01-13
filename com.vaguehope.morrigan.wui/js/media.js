@@ -84,7 +84,7 @@
     mlistDiv.append(textBlock);
 
     if (detailed === false) {
-      mlistDiv.append($('<a class="details" href="?mid=' + mid + '">'));
+      mlistDiv.append($('<a class="clickable" href="?mid=' + mid + '">'));
     }
 
     var mainRow = $('<p class="mainrow">');
