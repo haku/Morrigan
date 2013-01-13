@@ -7,11 +7,12 @@
   color: HighlightText;
 }
 
+.queue a:link, .queue a:visited, .queue a:active, .queue a:hover,
 .mediaitems a:link, .mediaitems a:visited, .mediaitems a:active, .mediaitems a:hover {
   color: inherit;
 }
 
-.mediaitems .item:hover {
+.queue .item:hover, .mediaitems .item:hover {
   background: Highlight;
   color: HighlightText;
 }

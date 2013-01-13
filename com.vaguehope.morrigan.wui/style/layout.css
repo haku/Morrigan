@@ -72,11 +72,12 @@ body, p, div, span {
   font-size: 80%;
 }
 
-.mediaitems a:link, .mediaitems a:visited, .mediaitems a:active, .mediaitemsa:hover {
+.queue a:link, .queue a:visited, .queue a:active, .queue a:hover,
+.mediaitems a:link, .mediaitems a:visited, .mediaitems a:active, .mediaitems a:hover {
   text-decoration: none;
 }
 
-.mediaitems .item {
+.queue .item, .mediaitems .item {
   border-radius: 0.2em;
 }
 

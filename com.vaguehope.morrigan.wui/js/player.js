@@ -320,7 +320,7 @@ Players = {};
         makeQueueItem(itemDiv, item.id);
         queueDiv.append(itemDiv);
       }
-      updateQueueItemDisplay(itemDiv, item);
+      updateQueueItemDisplay(queueDiv, queue, itemDiv, item);
       allItemIds[item.id] = true;
     });
 
@@ -349,11 +349,19 @@ Players = {};
     itemDiv.empty();
     itemDiv.data('id', id);
     var title = $('<p class="title">');
-    itemDiv.append(title);
+    var a = $('<a class="clickable" href="">');
+    a.append(title);
+    itemDiv.append(a);
   }
 
-  function updateQueueItemDisplay(queueDiv, item) {
-    $('.title', queueDiv).text(item.title);
+  function updateQueueItemDisplay(queueDiv, queue, itemDiv, item) {
+    $('.title', itemDiv).text(item.title);
+    var clickable = $('.clickable', itemDiv);
+    clickable.unbind();
+    clickable.click(function(event) {
+      event.preventDefault();
+      queueItemClicked(queueDiv, queue, item);
+    });
   }
 
   function getQueue(pid, onStatus, onQueue) {
@@ -367,7 +375,7 @@ Players = {};
       },
       success : function(xml) {
         var queueNode = $(xml).find('queue');
-        var queue = parseQueueNode(queueNode);
+        var queue = parseQueueNode(pid, queueNode);
         onQueue(queue);
         onStatus('Queue ' + pid + ' updated.');
       },
@@ -377,8 +385,32 @@ Players = {};
     });
   }
 
-  function parseQueueNode(node) {
+  function writeQueueItem(queue, item, action, onStatus, onQueue) {
+    $.ajax({
+      type : 'POST',
+      cache : false,
+      url : 'players/' + queue.pid + '/queue/' + item.id,
+      data : 'action=' + action,
+      contentTypeString : 'application/x-www-form-urlencoded',
+      dataType : 'xml',
+      beforeSend : function() {
+        onStatus(action + '-ing...');
+      },
+      success : function(xml) {
+        var queueNode = $(xml).find('queue');
+        var newQueue = parseQueueNode(queue.pid, queueNode);
+        onQueue(newQueue);
+        onStatus('Queue ' + queue.pid + ' updated.');
+      },
+      error : function(jqXHR, textStatus, errorThrown) {
+        onStatus('Error: ' + textStatus);
+      }
+    });
+  }
+
+  function parseQueueNode(pid, node) {
     var queue = {};
+    queue.pid = pid;
     queue.length = parseInt(node.find('queuelength').text());
     queue.duration = node.find('queueduration').text();
     queue.items = [];
@@ -434,6 +466,54 @@ Players = {};
     });
 
     $('body').append(dlg);
+  }
+
+  function queueItemClicked(queueDiv, queue, item) {
+    var existingMenu = $('.itemmenu');
+    if (existingMenu.size() > 0) {
+      existingMenu.remove();
+    }
+    else {
+      $('body').append(makeQueueItemMenu(queueDiv, queue, item));
+    }
+  }
+
+  function makeQueueItemMenu(queueDiv, queue, item) {
+    var menu = $('<div class="popup itemmenu">');
+    var closeAction = function() {
+      menu.remove();
+    };
+
+    var title = $('<p class="title">');
+    title.text(item.title);
+    menu.append(title);
+
+    var actions = ['top', 'up', 'remove', 'down', 'bottom'];
+    $.each(actions, function(index, action) {
+      var btn = $('<button>');
+      btn.text(action);
+      btn.click(function() {
+        var status = $('<p>');
+        btn.after(status);
+        queueMenuItemAction(queueDiv, queue, item, action, status, closeAction);
+      });
+      menu.append(btn);
+    });
+
+    var close = $('<button class="close">close</button>');
+    menu.append(close);
+    close.click(closeAction);
+
+    return menu;
+  }
+
+  function queueMenuItemAction(queueDiv, queue, item, action, statusElem, onComplete) {
+    writeQueueItem(queue, item, action, function(msg) {
+      statusElem.text(msg);
+    }, function(queue) {
+      displayQueue(queueDiv, queue);
+      onComplete();
+    });
   }
 
 })();
