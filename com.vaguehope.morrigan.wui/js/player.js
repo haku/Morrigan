@@ -181,7 +181,7 @@ Players = {};
         onStatus('Players updated.');
       },
       error : function(jqXHR, textStatus, errorThrown) {
-        onStatus('Error fetching players: ' + textStatus);
+        onStatus('Error fetching players: ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
       }
     });
   }
@@ -202,7 +202,7 @@ Players = {};
         onStatus('Player ' + pid + ' updated.');
       },
       error : function(jqXHR, textStatus, errorThrown) {
-        onStatus('Error fetching player ' + pid + ': ' + textStatus);
+        onStatus('Error fetching player ' + pid + ': ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
       }
     });
   }
@@ -287,7 +287,7 @@ Players = {};
         onStatus('');
       },
       error : function(jqXHR, textStatus, errorThrown) {
-        onStatus('Error: ' + textStatus);
+        onStatus('Error: ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
       }
     });
   }
@@ -406,7 +406,7 @@ Players = {};
         onStatus('Queue ' + pid + ' updated.');
       },
       error : function(jqXHR, textStatus, errorThrown) {
-        onStatus('Error fetching queue ' + pid + ': ' + textStatus);
+        onStatus('Error fetching queue ' + pid + ': ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
       }
     });
   }
@@ -429,7 +429,7 @@ Players = {};
         onStatus('Queue ' + queue.pid + ' updated.');
       },
       error : function(jqXHR, textStatus, errorThrown) {
-        onStatus('Error: ' + textStatus);
+        onStatus('Error: ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
       }
     });
   }
