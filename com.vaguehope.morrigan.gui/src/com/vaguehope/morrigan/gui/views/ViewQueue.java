@@ -3,7 +3,6 @@ package com.vaguehope.morrigan.gui.views;
 import java.util.ArrayList;
 import java.util.List;
 
-
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
@@ -28,19 +27,19 @@ import com.vaguehope.morrigan.util.TimeHelper;
 
 public class ViewQueue extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	public static final String ID = "com.vaguehope.morrigan.gui.views.ViewQueue";
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	private volatile boolean isDisposed = false;
 	AbstractPlayerView abstractPlayerView = null;
-	
+
 	@Override
 	public void createPartControl(Composite parent) {
 		makeQueueChangedRrefresher();
 		createLayout(parent);
-		
+
 		IViewPart findView = getSite().getPage().findView(ViewControls.ID); // FIXME can i find AbstractPlayerView?
 		if (findView != null && findView instanceof AbstractPlayerView) {
 			this.abstractPlayerView = (AbstractPlayerView) findView;
@@ -49,43 +48,43 @@ public class ViewQueue extends ViewPart {
 			this.queueChangedRrefresher.run();
 		}
 	}
-	
+
 	@Override
 	public void setFocus() {
 		this.tableViewer.getTable().setFocus();
 	}
-	
+
 	@Override
 	public void dispose() {
 		this.isDisposed = true;
-		
+
 		if (this.abstractPlayerView != null ) {
 			this.abstractPlayerView.getPlayer().removeQueueChangeListener(this.queueChangedRrefresher);
 		}
-		
+
 		this.imageCache.clearCache();
-		
+
 		super.dispose();
 	}
-	
+
 	protected boolean isDisposed () {
 		return this.isDisposed;
 	}
-	
+
 	ViewQueue getThis () {
 		return this;
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	List<PlayItem> queue = null;
-	
+
 	private void setContent (List<PlayItem> queue) {
 		this.queue = queue;
 	}
-	
+
 	RefreshTimer queueChangedRrefresher;
-	
+
 	private void makeQueueChangedRrefresher () {
 		this.queueChangedRrefresher = new RefreshTimer(getSite().getShell().getDisplay(), 1000, new Runnable() {
 			@Override
@@ -97,28 +96,28 @@ public class ViewQueue extends ViewPart {
 			}
 		});
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	GUI stuff.
-	
+
 	ImageCache imageCache = new ImageCache();
 	TableViewer tableViewer;
-	
+
 	private void createLayout (Composite parent) {
 		this.tableViewer = new TableViewer(parent, SWT.MULTI | SWT.V_SCROLL | SWT.FULL_SELECTION);
 		this.tableViewer.setContentProvider(this.contentProvider);
 		this.tableViewer.setLabelProvider(new PlayItemLblProv(this.imageCache));
 		this.tableViewer.setInput(getViewSite()); // use content provider.
 		this.tableViewer.getTable().addKeyListener(this.keyListener);
-		
+
 		getViewSite().getActionBars().getToolBarManager().add(this.moveUpAction);
 		getViewSite().getActionBars().getToolBarManager().add(this.moveDownAction);
 		getViewSite().getActionBars().getToolBarManager().add(this.removeAction);
 		getViewSite().getActionBars().getToolBarManager().add(this.shuffleAction);
 	}
-	
+
 	private int lastQueueSize = 0;
-	
+
 	void bringToTopIfChanged () {
 		int size = this.queue.size();
 		if (size > this.lastQueueSize) {
@@ -131,10 +130,10 @@ public class ViewQueue extends ViewPart {
 		}
 		this.lastQueueSize = size;
 	}
-	
+
 	void updateStatus () {
 		if (isDisposed()) return;
-		
+
 		if (this.queue.size() == 0) {
 			setContentDescription("Queue is empty.");
 		}
@@ -147,47 +146,47 @@ public class ViewQueue extends ViewPart {
 			);
 		}
 	}
-	
+
 	private IStructuredContentProvider contentProvider = new IStructuredContentProvider() {
-		
+
 		@Override
 		public Object[] getElements(Object inputElement) {
 			if (ViewQueue.this.queue!=null) {
 				return ViewQueue.this.queue.toArray();
 			}
-			
+
 			return new String[]{};
 		}
-		
+
 		@Override
 		public void dispose() {/* UNUSED */}
 		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {/* UNUSED */}
-		
+
 	};
-	
+
 	private KeyListener keyListener = new KeyListener() {
-		
+
 		@Override
 		public void keyReleased(KeyEvent e) {
 			if (e.keyCode == SWT.DEL) {
 				ViewQueue.this.removeAction.run();
 			}
 		}
-		
+
 		@Override
 		public void keyPressed(KeyEvent e) {/* UNUSED */}
 	};
-	
-	ArrayList<PlayItem> getSelectedSources () {
+
+	List<PlayItem> getSelectedSources () {
 		ISelection selection = this.tableViewer.getSelection();
-		
+
 		if (selection==null) return null;
 		if (selection.isEmpty()) return null;
-		
+
 		if (selection instanceof IStructuredSelection) {
 			IStructuredSelection iSel = (IStructuredSelection) selection;
-			
+
 			ArrayList<PlayItem> ret = new ArrayList<PlayItem>();
 			for (Object selectedObject : iSel.toList()) {
 				if (selectedObject != null) {
@@ -199,13 +198,13 @@ public class ViewQueue extends ViewPart {
 			}
 			return ret;
 		}
-		
+
 		return null;
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Actions.
-	
+
 	protected IAction moveUpAction = new Action("Move up", Activator.getImageDescriptor("icons/arrow-up.gif")) {
 		@Override
 		public void run() {
@@ -213,7 +212,7 @@ public class ViewQueue extends ViewPart {
 			ViewQueue.this.abstractPlayerView.getPlayer().moveInQueue(getSelectedSources(), false);
 		}
 	};
-	
+
 	protected IAction moveDownAction = new Action("Move down", Activator.getImageDescriptor("icons/arrow-down.gif")) {
 		@Override
 		public void run() {
@@ -221,11 +220,11 @@ public class ViewQueue extends ViewPart {
 			ViewQueue.this.abstractPlayerView.getPlayer().moveInQueue(getSelectedSources(), true);
 		}
 	};
-	
+
 	protected IAction removeAction = new Action("Remove", Activator.getImageDescriptor("icons/minus.gif")) {
 		@Override
 		public void run() {
-			ArrayList<PlayItem> selectedSources = getSelectedSources();
+			List<PlayItem> selectedSources = getSelectedSources();
 			if (selectedSources==null || selectedSources.isEmpty()) {
 				return;
 			}
@@ -234,13 +233,13 @@ public class ViewQueue extends ViewPart {
 			}
 		}
 	};
-	
+
 	protected IAction shuffleAction = new Action ("Shuffle", Activator.getImageDescriptor("icons/question.png")) {
 		@Override
 		public void run() {
 			ViewQueue.this.abstractPlayerView.getPlayer().shuffleQueue();
 		}
 	};
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

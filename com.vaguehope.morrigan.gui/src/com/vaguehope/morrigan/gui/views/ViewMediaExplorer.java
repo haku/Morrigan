@@ -2,6 +2,7 @@ package com.vaguehope.morrigan.gui.views;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.eclipse.core.commands.common.CommandException;
 import org.eclipse.jface.action.Action;
@@ -56,7 +57,7 @@ public class ViewMediaExplorer extends ViewPart {
 
 	private volatile boolean isDisposed = false;
 	TableViewer tableViewer = null;
-	ArrayList<MediaListReference> items = new ArrayList<MediaListReference>();
+	List<MediaListReference> items = new ArrayList<MediaListReference>();
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
