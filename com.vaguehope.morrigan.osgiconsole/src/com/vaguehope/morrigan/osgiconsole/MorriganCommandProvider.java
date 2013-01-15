@@ -478,7 +478,7 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 	}
 
-	static private void doPlayersPlayerInfo (CommandInterpreter ci, Player player) {
+	private static void doPlayersPlayerInfo (CommandInterpreter ci, Player player) {
 		ci.print(player.getName());
 		ci.print(": ");
 		ci.print(player.getPlayState().toString());
@@ -582,17 +582,17 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 	}
 
-	static private void doPlayersPlayerPause (CommandInterpreter ci, Player player) {
+	private static void doPlayersPlayerPause (CommandInterpreter ci, Player player) {
 		player.pausePlaying();
 		ci.println(player.getName() + " player: " + player.getPlayState().toString());
 	}
 
-	static private void doPlayersPlayerStop (CommandInterpreter ci, Player player) {
+	private static void doPlayersPlayerStop (CommandInterpreter ci, Player player) {
 		player.stopPlaying();
 		ci.println(player.getName() + " player: " + player.getPlayState().toString());
 	}
 
-	static private void doPlayersPlayerNext (CommandInterpreter ci, Player player) {
+	private static void doPlayersPlayerNext (CommandInterpreter ci, Player player) {
 		player.nextTrack();
 		PlayItem currentItem = player.getCurrentItem();
 		if (currentItem == null) {
@@ -603,7 +603,7 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 	}
 
-	static private void doPlayersPlayerOrder (CommandInterpreter ci, Player player, List<String> args) {
+	private static void doPlayersPlayerOrder (CommandInterpreter ci, Player player, List<String> args) {
 		if (args.size() < 1) {
 			ci.println(player.getName() + " player order = " + player.getPlaybackOrder().toString() + ".");
 			ci.print("Options:");
@@ -627,7 +627,7 @@ public class MorriganCommandProvider implements CommandProvider {
 		ci.println("Unknown playback order '" + arg + "'.");
 	}
 
-	static private void doPlayersPlayerPrintQueue (CommandInterpreter ci, Player player) {
+	private static void doPlayersPlayerPrintQueue (CommandInterpreter ci, Player player) {
 		List<PlayItem> queue = player.getQueueList();
 
 		if (queue.size() < 1) {

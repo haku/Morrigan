@@ -59,7 +59,7 @@ public final class SqliteHelper {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	static private ThreadLocal<SimpleDateFormat> sqlDate = new ThreadLocal<SimpleDateFormat>() {
+	private static ThreadLocal<SimpleDateFormat> sqlDate = new ThreadLocal<SimpleDateFormat>() {
 		@Override
 		protected SimpleDateFormat initialValue() {
 			return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

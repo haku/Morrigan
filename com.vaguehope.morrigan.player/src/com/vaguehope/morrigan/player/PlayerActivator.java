@@ -45,7 +45,7 @@ public final class PlayerActivator implements BundleActivator {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	PlayerContainers.
 
-	private final static String FILTER = "(objectclass=" + PlayerContainer.class.getName() + ")";
+	private static final String FILTER = "(objectclass=" + PlayerContainer.class.getName() + ")";
 
 	private void startPlayerContainerListener (final BundleContext context) {
 		ServiceListener playerContainerSl = new ServiceListener() {

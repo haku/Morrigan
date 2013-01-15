@@ -304,7 +304,7 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 	
 	private SeekbarPainter seekbarPainter = null;
 	
-	static private class SeekbarPainter implements PaintListener {
+	private static class SeekbarPainter implements PaintListener {
 		
 		private final Canvas canvas;
 		private int n = 0;

@@ -50,7 +50,7 @@ public class VlcHelper {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private final static String TEST_FILE = "/test/test.avi";
+	private static final String TEST_FILE = "/test/test.avi";
 
 	public static void main (String[] args) throws FileNotFoundException {
 		File file = new File(System.getProperty("user.home") + TEST_FILE);

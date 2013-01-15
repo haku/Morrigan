@@ -795,7 +795,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	MediaItem getters.
 
-	static private String local_getAllMediaSql (MediaType mediaType, boolean hideMissing, IDbColumn sort, SortDirection direction, String search) {
+	private static String local_getAllMediaSql (MediaType mediaType, boolean hideMissing, IDbColumn sort, SortDirection direction, String search) {
 		StringBuilder sql = new StringBuilder();
 
 		sql.append(search == null ? _SQL_MEDIAFILES_SELECT : _SQL_MEDIAFILESTAGS_SELECT); // If we are searching need to join tags table.
@@ -863,7 +863,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 		return sqls;
 	}
 
-	static private List<IMixedMediaItem> local_parseRecordSet (ResultSet rs, MixedMediaItemFactory itemFactory) throws SQLException {
+	private static List<IMixedMediaItem> local_parseRecordSet (ResultSet rs, MixedMediaItemFactory itemFactory) throws SQLException {
 		/* Apparently I don't need to preset the size of the array,
 		 * and using the auto-grow feature is more efficient than
 		 * trying to count the length of the record set.

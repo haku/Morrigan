@@ -277,17 +277,17 @@ public final class OrderHelper {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	static private boolean validChoice (IMediaTrack i) {
+	private static boolean validChoice (IMediaTrack i) {
 		return i.isEnabled() && i.isPlayable() && !i.isMissing();
 	}
 
-	static private boolean validChoice (IMediaTrack i, IMediaItem current) {
+	private static boolean validChoice (IMediaTrack i, IMediaItem current) {
 		return i.isEnabled() && i.isPlayable() && !i.isMissing() && i != current;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	static private long dateDiffDays (Date olderDate, Date newerDate) {
+	private static long dateDiffDays (Date olderDate, Date newerDate) {
 		long l = (newerDate.getTime() - olderDate.getTime()) / 86400000;
 		if (l < 1) l = 1;
 		return l;

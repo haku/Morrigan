@@ -44,7 +44,7 @@ public class WebAppHelper {
 	/**
 	 * This should never return null.
 	 */
-	static private Bundle findBundle (BundleContext context, String name) {
+	private static Bundle findBundle (BundleContext context, String name) {
 		for (Bundle bundle : context.getBundles()) {
 			if (bundle.getSymbolicName().equals(name)) return bundle;
 		}

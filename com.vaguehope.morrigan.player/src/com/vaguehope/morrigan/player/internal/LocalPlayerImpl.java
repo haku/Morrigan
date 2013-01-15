@@ -201,7 +201,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	History.
 
-	static private final int HISTORY_LENGTH = 10;
+	private static final int HISTORY_LENGTH = 10;
 
 	private List<PlayItem> _history = new ArrayList<PlayItem>();
 

@@ -42,7 +42,7 @@ public class Activator implements BundleActivator {
 	 * --no-video-title-show
 	 */
 
-	private final static String[] FACTORY_ARGS = {
+	private static final String[] FACTORY_ARGS = {
 		"--no-video-title-show"
 		};
 

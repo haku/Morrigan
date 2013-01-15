@@ -52,7 +52,7 @@ public class EditEntryShell {
 	private boolean exitValue;
 	private String exitText;
 	
-	private final static int SEP = 3;
+	private static final int SEP = 3;
 	
 	private Shell shell;
 	private Text text = null;

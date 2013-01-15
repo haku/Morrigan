@@ -235,7 +235,7 @@ public class HotkeyPref extends PreferencePage implements IWorkbenchPreferencePa
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	static private HotkeyValue getHk (String key) {
+	private static HotkeyValue getHk (String key) {
 		String s = Activator.getDefault().getPreferenceStore().getString(key);
 		if (s != null && s.length() > 0) {
 			return new HotkeyValue(s);

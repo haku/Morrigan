@@ -46,8 +46,8 @@ public final class ScreenSaver {
 
 	private static final long POKE_INTERVAL = 1000 * 60; // 60 seconds.
 
-	static private final Lock lastPokeLock = new ReentrantLock();
-	static private final AtomicLong lastPokeTime = new AtomicLong(0);
+	private static final Lock lastPokeLock = new ReentrantLock();
+	private static final AtomicLong lastPokeTime = new AtomicLong(0);
 
 	public static void pokeScreenSaverProtected () {
 		if (lastPokeTime.get() == 0 || System.currentTimeMillis() - lastPokeTime.get() > POKE_INTERVAL) {

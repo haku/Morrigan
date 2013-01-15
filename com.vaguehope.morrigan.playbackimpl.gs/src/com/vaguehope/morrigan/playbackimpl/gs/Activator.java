@@ -36,7 +36,7 @@ public class Activator implements BundleActivator {
 	 * https://code.google.com/p/gstreamer-java/issues/detail?id=69
 	 */
 
-	private final static AtomicBoolean inited = new AtomicBoolean(false);
+	private static final AtomicBoolean inited = new AtomicBoolean(false);
 
 	public static void init () {
 		boolean r = inited.compareAndSet(false, true);
