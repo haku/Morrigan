@@ -31,7 +31,7 @@ import com.vaguehope.morrigan.android.model.PlayerReference;
 public class RunMlistActionTask extends AbstractTask<String> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	static public enum MlistCommand {
+	public static enum MlistCommand {
 		PLAY(0), QUEUE(1), SCAN(2);
 
 		private int n;

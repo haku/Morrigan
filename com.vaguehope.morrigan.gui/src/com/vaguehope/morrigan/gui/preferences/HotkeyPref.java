@@ -244,23 +244,23 @@ public class HotkeyPref extends PreferencePage implements IWorkbenchPreferencePa
 		return null;
 	}
 
-	static public HotkeyValue getHkShowHide () {
+	public static HotkeyValue getHkShowHide () {
 		return getHk(PREF_HK_SHOWHIDE);
 	}
 
-	static public HotkeyValue getHkStop () {
+	public static HotkeyValue getHkStop () {
 		return getHk(PREF_HK_STOP);
 	}
 
-	static public HotkeyValue getHkPlaypause () {
+	public static HotkeyValue getHkPlaypause () {
 		return getHk(PREF_HK_PLAYPAUSE);
 	}
 
-	static public HotkeyValue getHkNext () {
+	public static HotkeyValue getHkNext () {
 		return getHk(PREF_HK_NEXT);
 	}
 
-	static public HotkeyValue getHkJumpto () {
+	public static HotkeyValue getHkJumpto () {
 		return getHk(PREF_HK_JUMPTO);
 	}
 

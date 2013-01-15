@@ -22,7 +22,7 @@ public class WebAppHelper {
 	/**
 	 * Look up and load a WAR bundle in an OSGI environment.
 	 */
-	static public WebAppContext getWarBundleAsContext (BundleContext context, String warBundleName, String contextPath) throws IOException {
+	public static WebAppContext getWarBundleAsContext (BundleContext context, String warBundleName, String contextPath) throws IOException {
 		Bundle warBundle = findBundle(context, warBundleName);
 		URL fileURL = FileLocator.toFileURL(warBundle.getEntry("/")); // I think org.eclipse.core.runtime must be started before this is called.  Or something like that.
 		File warFile = new File(fileURL.getPath());

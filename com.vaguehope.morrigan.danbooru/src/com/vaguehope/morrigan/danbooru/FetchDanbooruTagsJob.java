@@ -182,7 +182,7 @@ class FetchDanbooruTagsJob extends Job {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	static public MediaTag getMarkerTag (IMediaItemDb<?,?> itemDb, IMixedMediaItem item, MediaTagClassification cls) throws MorriganException {
+	public static MediaTag getMarkerTag (IMediaItemDb<?,?> itemDb, IMixedMediaItem item, MediaTagClassification cls) throws MorriganException {
 		if (itemDb == null) throw new IllegalArgumentException("itemDb == null.");
 		if (item == null) throw new IllegalArgumentException("item == null.");
 		if (cls == null) throw new IllegalArgumentException("cls == null.");
@@ -204,7 +204,7 @@ class FetchDanbooruTagsJob extends Job {
 		return markerTag;
 	}
 
-	static public void updateMarkerTag (IMediaItemDb<?,?> itemDb, IMixedMediaItem item, MediaTagClassification cls, MediaTag markerTag, String newString) throws MorriganException {
+	public static void updateMarkerTag (IMediaItemDb<?,?> itemDb, IMixedMediaItem item, MediaTagClassification cls, MediaTag markerTag, String newString) throws MorriganException {
 		if (itemDb == null) throw new IllegalArgumentException("itemDb == null.");
 		if (item == null) throw new IllegalArgumentException("item == null.");
 		if (cls == null) throw new IllegalArgumentException("cls == null.");

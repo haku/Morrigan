@@ -16,7 +16,7 @@ public class VlcHelper {
 	 * length.
 	 * https://code.google.com/p/vlcj/source/browse/trunk/vlcj/src/test/java/uk/co/caprica/vlcj/test/meta/MetaTest.java
 	 */
-	static public int readFileDuration (final String fpath) {
+	public static int readFileDuration (final String fpath) {
 		int ret = -1;
 		MediaPlayer player = Activator.getFactory().newHeadlessMediaPlayer();
 		try {

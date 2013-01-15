@@ -20,11 +20,11 @@ import com.vaguehope.sqlitewrapper.GenericSqliteLayer.SqlCreateCmd;
 public class SqliteHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	static public SqlCreateCmd generateSql_Create (String tblName, IDbColumn[] columns) {
+	public static SqlCreateCmd generateSql_Create (String tblName, IDbColumn[] columns) {
 		return generateSql_Create(tblName, Arrays.asList(columns));
 	}
 	
-	static public SqlCreateCmd generateSql_Create (String tblName, List<IDbColumn> columns) {
+	public static SqlCreateCmd generateSql_Create (String tblName, List<IDbColumn> columns) {
 		StringBuilder sbExists = new StringBuilder();
 		StringBuilder sbCreate = new StringBuilder();
 		
@@ -69,7 +69,7 @@ public class SqliteHelper {
 	 * Morrigan uses the number method, but terra used strings.
 	 * Using this method allows for backward compatibility.
 	 */
-	static public Date readDate (ResultSet rs, String column) throws SQLException {
+	public static Date readDate (ResultSet rs, String column) throws SQLException {
 		java.sql.Date date = rs.getDate(column);
 		if (date!=null) {
 			long time = date.getTime();

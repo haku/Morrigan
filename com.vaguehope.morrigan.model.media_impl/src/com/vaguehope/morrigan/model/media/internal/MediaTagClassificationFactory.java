@@ -5,7 +5,7 @@ import com.vaguehope.morrigan.model.factory.RecyclingFactory;
 public class MediaTagClassificationFactory extends RecyclingFactory<MediaTagClassificationImpl, Long, String, RuntimeException> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	static public final MediaTagClassificationFactory INSTANCE = new MediaTagClassificationFactory();
+	public static final MediaTagClassificationFactory INSTANCE = new MediaTagClassificationFactory();
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	

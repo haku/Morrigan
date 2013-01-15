@@ -10,7 +10,7 @@ public class ThreadHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	UI Threading.
 	
-	static public void runInUiThread (Widget w, Runnable r) {
+	public static void runInUiThread (Widget w, Runnable r) {
 		if (w.getDisplay().getThread().equals(Thread.currentThread())) {
 			r.run();
 		}

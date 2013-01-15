@@ -355,7 +355,7 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference, Mlist
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	static public int getImageResource (PlayState playState) {
+	public static int getImageResource (PlayState playState) {
 		switch (playState) {
 			case STOPPED:
 				return R.drawable.stop;

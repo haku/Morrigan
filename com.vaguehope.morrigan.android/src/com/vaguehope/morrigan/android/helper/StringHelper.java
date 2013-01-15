@@ -19,7 +19,7 @@ package com.vaguehope.morrigan.android.helper;
 public class StringHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	static public String implode (String[] arr, String sep) {
+	public static String implode (String[] arr, String sep) {
 		if (arr == null) return null;
 		StringBuilder s = new StringBuilder();
 		for (String a : arr) s.append(a).append(sep);
@@ -29,7 +29,7 @@ public class StringHelper {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	static public String substringByTokens (String d, String k0, String k1) {
+	public static String substringByTokens (String d, String k0, String k1) {
 		String ret;
 		int x0;
 		int l;

@@ -242,7 +242,7 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMe
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Static helpers.
 
-	static public Dimension readImageDimensions (File file) throws IOException {
+	public static Dimension readImageDimensions (File file) throws IOException {
 		Dimension ret = null;
 
 		ImageInputStream in = ImageIO.createImageInputStream(file);

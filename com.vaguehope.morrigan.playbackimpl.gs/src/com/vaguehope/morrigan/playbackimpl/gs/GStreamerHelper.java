@@ -15,7 +15,7 @@ public class GStreamerHelper {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	static public int readFileDuration (final String fpath) {
+	public static int readFileDuration (final String fpath) {
 		PlayBin playb = new PlayBin("Metadata");
 		Element fakesink = ElementFactory.make("fakesink", "videosink");
 		playb.setVideoSink(fakesink);

@@ -69,19 +69,19 @@ public class CallPlayMedia extends AbstractHandler {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	static public void playItem (IWorkbenchPage page, IMediaTrackList<? extends IMediaTrack> mediaList) {
+	public static void playItem (IWorkbenchPage page, IMediaTrackList<? extends IMediaTrack> mediaList) {
 		playItem(page, mediaList, null, false);
 	}
 	
-	static public void playItem (IWorkbenchPage page, IMediaTrackList<? extends IMediaTrack> mediaList, boolean addToQueue) {
+	public static void playItem (IWorkbenchPage page, IMediaTrackList<? extends IMediaTrack> mediaList, boolean addToQueue) {
 		playItem(page, mediaList, null, addToQueue);
 	}
 	
-	static public void playItem (IWorkbenchPage page, IMediaTrackList<? extends IMediaTrack> mediaList, IMediaTrack selectedItem) {
+	public static void playItem (IWorkbenchPage page, IMediaTrackList<? extends IMediaTrack> mediaList, IMediaTrack selectedItem) {
 		playItem(page, mediaList, selectedItem, false);
 	}
 	
-	static public void playItem (IWorkbenchPage page, IMediaTrackList<? extends IMediaTrack> mediaList, IMediaTrack selectedItem, boolean addToQueue) {
+	public static void playItem (IWorkbenchPage page, IMediaTrackList<? extends IMediaTrack> mediaList, IMediaTrack selectedItem, boolean addToQueue) {
 		AbstractPlayerView playerView;
 		IViewPart findView = page.findView(ViewControls.ID);
 		

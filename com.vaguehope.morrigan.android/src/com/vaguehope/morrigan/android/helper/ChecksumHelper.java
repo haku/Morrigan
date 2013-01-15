@@ -23,7 +23,7 @@ public class ChecksumHelper {
 	 * just in case.
 	 * TODO find out if MessageDigest is thread-safe.
 	 */
-	static public ThreadLocal<MessageDigest> mdMd5Factory = new ThreadLocal<MessageDigest>() {
+	public static ThreadLocal<MessageDigest> mdMd5Factory = new ThreadLocal<MessageDigest>() {
 		@Override
 		protected MessageDigest initialValue() {
 			try {
@@ -35,11 +35,11 @@ public class ChecksumHelper {
 		}
 	};
 	
-	static public ByteBuffer createByteBuffer () {
+	public static ByteBuffer createByteBuffer () {
 		return ByteBuffer.allocateDirect(BUFFERSIZE);
 	}
 	
-	static public BigInteger generateMd5Checksum (File file, ByteBuffer buffer) throws IOException {
+	public static BigInteger generateMd5Checksum (File file, ByteBuffer buffer) throws IOException {
 		MessageDigest md = mdMd5Factory.get();
 		md.reset();
 		

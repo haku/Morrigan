@@ -6,7 +6,7 @@ import java.util.Map;
 @SuppressWarnings("boxing")
 public class HotkeyKeys {
 	
-	static public final Map<Integer, String> HkKeys = new HashMap<Integer, String>() {
+	public static final Map<Integer, String> HkKeys = new HashMap<Integer, String>() {
 		
 		private static final long serialVersionUID = 2399324929460590297L;
 		

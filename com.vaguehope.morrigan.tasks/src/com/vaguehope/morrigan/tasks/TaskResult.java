@@ -3,7 +3,7 @@ package com.vaguehope.morrigan.tasks;
 public class TaskResult {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	static public enum TaskOutcome {SUCCESS, FAILED, CANCELED}
+	public static enum TaskOutcome {SUCCESS, FAILED, CANCELED}
 	
 	private TaskOutcome outcome;
 	private String errMsg;

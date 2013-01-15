@@ -7,14 +7,14 @@ import java.io.Writer;
 public class ErrorHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	static public String getStackTrace (Throwable t) {
+	public static String getStackTrace (Throwable t) {
 		final Writer writer = new StringWriter();
 		final PrintWriter printWriter = new PrintWriter(writer);
 		t.printStackTrace(printWriter);
 		return writer.toString();
 	}
 	
-	static public String getCauseTrace (Throwable t) {
+	public static String getCauseTrace (Throwable t) {
 		if (t != null) {
 			StringBuilder sb = new StringBuilder();
 			
