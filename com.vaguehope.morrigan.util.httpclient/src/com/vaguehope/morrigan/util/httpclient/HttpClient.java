@@ -12,43 +12,44 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 public class HttpClient {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	static final Logger logger = Logger.getLogger(HttpClient.class.getName());
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	private static final int HTTP_CONNECT_TIMEOUT_SECONDS = 60;
 	private static final int HTTP_READ_TIMEOUT_SECONDS = 600;
 	private static final int DOWNLOADBUFFERSIZE = 8192;
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	private HttpClient() { /* Static helper. */ }
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	/**
 	 * Do a simple GET request.
-	 * @throws HttpStreamHandlerException 
+	 * @throws HttpStreamHandlerException
 	 */
 	public static HttpResponse doHttpRequest(URL url) throws IOException, HttpStreamHandlerException {
 		return doHttpRequest(url, null, null, null, null, null);
 	}
-	
+
 	public static HttpResponse doHttpRequest(URL url, HttpStreamHandler httpStreamHandler) throws IOException, HttpStreamHandlerException {
 		return doHttpRequest(url, null, null, null, null, httpStreamHandler);
 	}
-	
+
 	public static HttpResponse doHttpRequest(URL url, Map<String, String> headers, HttpStreamHandler httpStreamHandler) throws IOException, HttpStreamHandlerException {
 		return doHttpRequest(url, null, null, null, headers, httpStreamHandler);
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param urlString
 	 * @param httpRequestMethod e.g. GET, POST, PUT, DELETE
 	 * @param encodedData e.g. the REST xml body.
@@ -56,34 +57,34 @@ public class HttpClient {
 	 * @param headers e.g. pass in the Etag.
 	 * @return
 	 * @throws IOException
-	 * @throws HttpStreamHandlerException 
+	 * @throws HttpStreamHandlerException
 	 */
 	public static HttpResponse doHttpRequest(URL url, String httpRequestMethod, String encodedData, String contentType, Map<String, String> headers, HttpStreamHandler httpStreamHandler) throws IOException, HttpStreamHandlerException {
 		logger.finest("doHttpRequest(" + (httpRequestMethod==null ? "GET" : httpRequestMethod) + " " + url + "):");
-		
+
 		StringBuilder sb = null;
 		int responseCode = -1;
 		Map<String, List<String>> headerFields = null;
 		String etag = null;
-		
+
 		HttpURLConnection huc = (HttpURLConnection) url.openConnection();
 		huc.setConnectTimeout(HTTP_CONNECT_TIMEOUT_SECONDS * 1000);
 		huc.setReadTimeout(HTTP_READ_TIMEOUT_SECONDS * 1000);
-		
+
 		try {
 			// Set headers before making request.
 			if (headers!=null) {
-				for (String header : headers.keySet()) {
-					huc.setRequestProperty(header, headers.get(header));
+				for (Entry<String, String> entry : headers.entrySet()) {
+					huc.setRequestProperty(entry.getKey(), entry.getValue());
 				}
 			}
-			
+
 			// Any data to send?
 			if (httpRequestMethod!=null) {
 				huc.setDoOutput(true);
 				huc.setRequestMethod(httpRequestMethod);
 				if (contentType!=null) huc.setRequestProperty("Content-Type", contentType);
-				
+
 				OutputStreamWriter out = new OutputStreamWriter(huc.getOutputStream());
 				try {
 					out.write(encodedData);
@@ -92,12 +93,12 @@ public class HttpClient {
 					out.close();
 				}
 			}
-			
+
 			// Start receiving.
 			headerFields = huc.getHeaderFields();
 			etag = huc.getHeaderField("Etag");
 			responseCode = huc.getResponseCode();
-			
+
 			InputStream is = huc.getInputStream();
 			try {
 				if (httpStreamHandler != null) {
@@ -117,7 +118,7 @@ public class HttpClient {
 		finally {
 			huc.disconnect();
 		}
-		
+
 		HttpResponse hr;
 		if (sb == null) {
 			hr = new HttpResponse(responseCode, null, etag, headerFields);
@@ -127,10 +128,10 @@ public class HttpClient {
 		}
 		return hr;
 	}
-	
+
 //	/**
 //	 * TODO This should probably be made more specific, but for now
-//	 * just ignoring mis-matched certificates will do. 
+//	 * just ignoring mis-matched certificates will do.
 //	 * @param hsuc
 //	 */
 //	private void disableSSLCertificateChecking(HttpsURLConnection hsuc) {
@@ -148,7 +149,7 @@ public class HttpClient {
 //					}
 //				}
 //		};
-//		
+//
 //		try {
 //			SSLContext sc = SSLContext.getInstance("SSL");
 //			sc.init(null, trustAllCerts, new java.security.SecureRandom());
@@ -158,7 +159,7 @@ public class HttpClient {
 //		} catch (NoSuchAlgorithmException e) {
 //			e.printStackTrace();
 //		}
-//		
+//
 //		HostnameVerifier hv = new HostnameVerifier() {
 //		    public boolean verify(String urlHostName, SSLSession session) {
 //		        return true;
@@ -166,12 +167,12 @@ public class HttpClient {
 //		};
 //		hsuc.setHostnameVerifier(hv);
 //	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	/**
 	 * TODO remove HttpStreamHandlerException
-	 * 
+	 *
 	 * This will flush the OutputStream.
 	 * This will not close the output stream.
 	 */
@@ -190,7 +191,7 @@ public class HttpClient {
 		};
 		doHttpRequest(url, httpStreamHandler);
 	}
-	
+
 	/**
 	 * TODO remove HttpStreamHandlerException
 	 */
@@ -204,6 +205,6 @@ public class HttpClient {
 			if (os != null) os.close();
 		}
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
