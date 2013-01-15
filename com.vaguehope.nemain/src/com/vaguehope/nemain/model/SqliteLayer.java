@@ -38,27 +38,27 @@ public class SqliteLayer extends GenericSqliteLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	SQL.
 	
-	static private final String SQL_TBL_EVENTS_EXISTS = "SELECT name FROM sqlite_master WHERE name='tbl_events';";
-	static private final String SQL_TBL_EVENTS_CREATE = "CREATE TABLE tbl_events (entry TEXT,date_year INT,date_month INT,date_day INT);";
+	private static final String SQL_TBL_EVENTS_EXISTS = "SELECT name FROM sqlite_master WHERE name='tbl_events';";
+	private static final String SQL_TBL_EVENTS_CREATE = "CREATE TABLE tbl_events (entry TEXT,date_year INT,date_month INT,date_day INT);";
 	
 	private static final String SQL_TBL_EVENTS_COL_ENTRY = "entry";
 	private static final String SQL_TBL_EVENTS_COL_YEAR = "date_year";
 	private static final String SQL_TBL_EVENTS_COL_MONTH = "date_month";
 	private static final String SQL_TBL_EVENTS_COL_DAY = "date_day";
 	
-	static private final String SQL_TBL_EVENTS_Q_ALL =
+	private static final String SQL_TBL_EVENTS_Q_ALL =
 		"SELECT entry,date_year,date_month,date_day FROM tbl_events ORDER BY date_year ASC, date_month ASC, date_day ASC;";
 	
-	static private final String SQL_TBL_EVENTS_Q_EXISTS =
+	private static final String SQL_TBL_EVENTS_Q_EXISTS =
 		"SELECT ROWID FROM tbl_events WHERE date_year=? AND date_month=? AND date_day=?;";
 	
-	static private final String SQL_TBL_EVENTS_ADD =
+	private static final String SQL_TBL_EVENTS_ADD =
 		"INSERT INTO tbl_events (entry,date_year,date_month,date_day) VALUES (?,?,?,?);";
 	
-	static private final String SQL_TBL_EVENTS_UPDATE =
+	private static final String SQL_TBL_EVENTS_UPDATE =
 		"UPDATE tbl_events SET entry=? WHERE date_year=? AND date_month=? AND date_day=?;";
 	
-	static private final String SQL_TBL_EVENTS_DELETE =
+	private static final String SQL_TBL_EVENTS_DELETE =
 		"DELETE FROM tbl_events WHERE date_year=? AND date_month=? AND date_day=?;";
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

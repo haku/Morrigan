@@ -42,7 +42,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	// TODO Any more?
-	private final static String[] SUPPORTED_FORMATS = {"wav", "mp3"};
+	private static final String[] SUPPORTED_FORMATS = {"wav", "mp3"};
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	

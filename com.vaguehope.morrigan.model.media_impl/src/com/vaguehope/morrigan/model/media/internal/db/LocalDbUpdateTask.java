@@ -257,7 +257,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 		return null;
 	}
 
-	abstract protected String[] getItemFileExtensions () throws MorriganException;
+	protected abstract String[] getItemFileExtensions () throws MorriganException;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -556,7 +556,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 
 	}
 
-	abstract protected void mergeItems (Q list, T itemToKeep, T itemToBeRemove) throws MorriganException;
+	protected abstract void mergeItems (Q list, T itemToKeep, T itemToBeRemove) throws MorriganException;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -621,11 +621,11 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 		return null;
 	}
 
-	abstract protected boolean shouldTrackMetaData1 (TaskEventListener taskEventListener, Q library, T item) throws MorriganException;
+	protected abstract boolean shouldTrackMetaData1 (TaskEventListener taskEventListener, Q library, T item) throws MorriganException;
 
-	abstract protected OpResult readTrackMetaData1 (Q library, T item, File file);
+	protected abstract OpResult readTrackMetaData1 (Q library, T item, File file);
 
-	abstract protected void cleanUpAfterTrackMetaData1 ();
+	protected abstract void cleanUpAfterTrackMetaData1 ();
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -664,7 +664,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 		return null;
 	}
 
-	abstract protected void readTrackMetaData2 (Q library, T item, File file) throws Exception;
+	protected abstract void readTrackMetaData2 (Q library, T item, File file) throws Exception;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Helper methods.

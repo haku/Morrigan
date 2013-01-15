@@ -94,7 +94,7 @@ public class CopyToLocalMmdbTask<T extends IMediaItem> implements MorriganTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	// TODO extract this to config?
-	static private File getCheckoutDirectory (ILocalMixedMediaDb db) {
+	private static File getCheckoutDirectory (ILocalMixedMediaDb db) {
 		String configDir = Config.getConfigDir();
 		
 		File coDir = new File(configDir, "checkout");
@@ -114,7 +114,7 @@ public class CopyToLocalMmdbTask<T extends IMediaItem> implements MorriganTask {
 		return dbCoDir;
 	}
 	
-	static private File getCheckoutItemDirectory (File coDir, IMediaItem item) {
+	private static File getCheckoutItemDirectory (File coDir, IMediaItem item) {
 		String srcPath = item.getRemoteLocation();
 		
 		File dir = new File(coDir, ChecksumHelper.md5String(srcPath));

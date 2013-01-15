@@ -320,7 +320,7 @@ public class PlayersServlet extends HttpServlet {
 		AbstractFeed.endFeed(dw);
 	}
 
-	static private void printPlayer (HttpServletResponse resp, Player player) throws IOException, SAXException, MorriganException {
+	private static void printPlayer (HttpServletResponse resp, Player player) throws IOException, SAXException, MorriganException {
 		resp.setContentType("text/xml;charset=utf-8");
 		DataWriter dw = AbstractFeed.startDocument(resp.getWriter(), "player");
 
@@ -329,7 +329,7 @@ public class PlayersServlet extends HttpServlet {
 		AbstractFeed.endDocument(dw, "player");
 	}
 
-	static private void printPlayerQueue (HttpServletResponse resp, Player player) throws IOException, SAXException {
+	private static void printPlayerQueue (HttpServletResponse resp, Player player) throws IOException, SAXException {
 		resp.setContentType("text/xml;charset=utf-8");
 		DataWriter dw = AbstractFeed.startDocument(resp.getWriter(), "queue");
 
@@ -340,7 +340,7 @@ public class PlayersServlet extends HttpServlet {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	static private void printPlayer (DataWriter dw, Player p, int detailLevel) throws SAXException, UnsupportedEncodingException, MorriganException {
+	private static void printPlayer (DataWriter dw, Player p, int detailLevel) throws SAXException, UnsupportedEncodingException, MorriganException {
 		if (detailLevel < 0 || detailLevel > 1) throw new IllegalArgumentException("detailLevel must be 0 or 1, not "+detailLevel+".");
 
 		String listTitle;
@@ -431,7 +431,7 @@ public class PlayersServlet extends HttpServlet {
 		}
 	}
 
-	static private void printQueue (DataWriter dw, Player p) throws SAXException, UnsupportedEncodingException {
+	private static void printQueue (DataWriter dw, Player p) throws SAXException, UnsupportedEncodingException {
 
 		AbstractFeed.addLink(dw, CONTEXTPATH + "/" + p.getId() + "/" + PATH_QUEUE, "self", "text/xml");
 		AbstractFeed.addLink(dw, CONTEXTPATH + "/" + p.getId(), "player", "text/xml");

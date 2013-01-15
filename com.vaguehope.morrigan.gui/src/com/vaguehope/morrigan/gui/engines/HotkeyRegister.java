@@ -151,7 +151,7 @@ public class HotkeyRegister {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	static private final AtomicReference<IHotkeyEngine> hotkeyEngine = new AtomicReference<IHotkeyEngine>(null);
+	private static final AtomicReference<IHotkeyEngine> hotkeyEngine = new AtomicReference<IHotkeyEngine>(null);
 
 	private IHotkeyEngine getHotkeyEngine (boolean create) {
 		if (hotkeyEngine.get() == null && create) {

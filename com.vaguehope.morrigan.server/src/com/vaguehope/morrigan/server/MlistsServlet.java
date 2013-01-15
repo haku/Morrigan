@@ -138,7 +138,7 @@ public class MlistsServlet extends HttpServlet {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	static private enum Verb {
+	private static enum Verb {
 		GET, POST
 	}
 
@@ -330,7 +330,7 @@ public class MlistsServlet extends HttpServlet {
 		AbstractFeed.endFeed(dw);
 	}
 
-	static private void getToMmdb (HttpServletResponse resp, IMixedMediaDb mmdb, String path, String afterPath) throws IOException, SAXException, MorriganException, DbException {
+	private static void getToMmdb (HttpServletResponse resp, IMixedMediaDb mmdb, String path, String afterPath) throws IOException, SAXException, MorriganException, DbException {
 		if (path == null) {
 			printMlistLong(resp, mmdb, false, false);
 		}
@@ -379,7 +379,7 @@ public class MlistsServlet extends HttpServlet {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	static private void printMlistShort (DataWriter dw, MediaListReference listRef, Collection<Player> players) throws SAXException {
+	private static void printMlistShort (DataWriter dw, MediaListReference listRef, Collection<Player> players) throws SAXException {
 		String fileName = listRef.getIdentifier().substring(listRef.getIdentifier().lastIndexOf(File.separator) + 1);
 
 		AbstractFeed.addElement(dw, "title", listRef.getTitle());
@@ -402,15 +402,15 @@ public class MlistsServlet extends HttpServlet {
 		}
 	}
 
-	static private void printMlistLong (HttpServletResponse resp, IMixedMediaDb ml, boolean listSrcs, boolean listItems) throws SAXException, MorriganException, DbException, IOException {
+	private static void printMlistLong (HttpServletResponse resp, IMixedMediaDb ml, boolean listSrcs, boolean listItems) throws SAXException, MorriganException, DbException, IOException {
 		printMlistLong(resp, ml, listSrcs, listItems, null);
 	}
 
-	static private void printMlistLong (HttpServletResponse resp, IMixedMediaDb ml, boolean listSrcs, boolean listItems, String queryString) throws SAXException, MorriganException, DbException, IOException {
+	private static void printMlistLong (HttpServletResponse resp, IMixedMediaDb ml, boolean listSrcs, boolean listItems, String queryString) throws SAXException, MorriganException, DbException, IOException {
 		printMlistLong(resp, ml, listSrcs, listItems, true, queryString); // TODO always include tags?
 	}
 
-	static private void printMlistLong (HttpServletResponse resp, IMixedMediaDb ml, boolean listSrcs, boolean listItems, boolean includeTags, String queryString) throws SAXException, MorriganException, DbException, IOException {
+	private static void printMlistLong (HttpServletResponse resp, IMixedMediaDb ml, boolean listSrcs, boolean listItems, boolean includeTags, String queryString) throws SAXException, MorriganException, DbException, IOException {
 		resp.setContentType("text/xml;charset=utf-8");
 		DataWriter dw = AbstractFeed.startDocument(resp.getWriter(), "mlist");
 

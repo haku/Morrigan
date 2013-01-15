@@ -143,9 +143,9 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 
 	protected final int sep = 3;
 
-	abstract protected void createControls (Composite parent);
-	abstract protected List<Control> populateToolbar (Composite parent);
-	abstract protected void populateContextMenu (List<IContributionItem> menu0, List<IContributionItem> menu1);
+	protected abstract void createControls (Composite parent);
+	protected abstract List<Control> populateToolbar (Composite parent);
+	protected abstract void populateContextMenu (List<IContributionItem> menu0, List<IContributionItem> menu1);
 
 	protected Label lblStatus = null;
 
@@ -460,7 +460,7 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 	/**
 	 * This will be called on the GUI thread.
 	 */
-	abstract protected void listChanged ();
+	protected abstract void listChanged ();
 
 	protected IDoubleClickListener doubleClickListener = new IDoubleClickListener() {
 		@Override
@@ -477,7 +477,7 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 	/**
 	 * This will be called on the GUI thread.
 	 */
-	abstract protected void middleClickEvent (MouseEvent e);
+	protected abstract void middleClickEvent (MouseEvent e);
 
 	protected MouseListener middleClickListener = new MouseListener() {
 		@Override
@@ -503,9 +503,9 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Sorting.
 
-	abstract protected boolean isSortable ();
+	protected abstract boolean isSortable ();
 
-	abstract protected void onSort (final TableViewer table, final TableViewerColumn column, int direction);
+	protected abstract void onSort (final TableViewer table, final TableViewerColumn column, int direction);
 
 	protected SelectionAdapter getSelectionAdapter (final TableViewer table, final TableViewerColumn column) {
 		return new SelectionAdapter() {

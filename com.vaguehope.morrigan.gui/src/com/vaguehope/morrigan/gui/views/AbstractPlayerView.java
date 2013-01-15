@@ -230,9 +230,9 @@ public abstract class AbstractPlayerView extends ViewPart {
 	/**
 	 * This will only ever be called on the UI thread.
 	 */
-	abstract protected void updateStatus ();
+	protected abstract void updateStatus ();
 
-	abstract protected void orderModeChanged (PlaybackOrder order);
+	protected abstract void orderModeChanged (PlaybackOrder order);
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	History.
@@ -320,9 +320,9 @@ public abstract class AbstractPlayerView extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Video frame parent stuff.
 
-	abstract protected void videoParentChanged (Composite newParent);
+	protected abstract void videoParentChanged (Composite newParent);
 
-	abstract protected Composite getSecondaryVideoParent ();
+	protected abstract Composite getSecondaryVideoParent ();
 
 	private Composite localMediaFrameParent;
 
@@ -361,7 +361,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Full screen stuff.
 
-	private final static long MONITOR_CACHE_MAX_AGE = 1000; // 1 second.
+	private static final long MONITOR_CACHE_MAX_AGE = 1000; // 1 second.
 	private long monitorCacheAge = 0;
 	protected Map<Integer, Monitor> _monitorCacheMap = null;
 

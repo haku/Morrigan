@@ -86,7 +86,7 @@ public class JumpToDlg {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private final static int SEP = 3;
+	private static final int SEP = 3;
 
 	private Shell shell = null;
 	Label label = null;

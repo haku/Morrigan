@@ -40,7 +40,7 @@ public class UiMgr {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private final static long MONITOR_CACHE_MAX_AGE_MILLIS = 1000; // 1 second.
+	private static final long MONITOR_CACHE_MAX_AGE_MILLIS = 1000; // 1 second.
 
 	private volatile long monitorCacheAge = 0;
 	private volatile Map<Integer, Monitor> monitorsCache = null;

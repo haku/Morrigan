@@ -33,7 +33,7 @@ import com.vaguehope.morrigan.android.R;
 public class SidebarLayout extends ViewGroup {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private final static int SLIDE_DURATION = 300; // 0.3 seconds?
+	private static final int SLIDE_DURATION = 300; // 0.3 seconds?
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	properties.
