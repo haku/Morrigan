@@ -3,13 +3,16 @@ package com.vaguehope.morrigan.gui.helpers;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Monitor;
 
-public class MonitorHelper {
+public final class MonitorHelper {
+
+	private MonitorHelper () {}
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	/**
-	 * Horrifying method to 'refresh' a cached monitor object.
-	 * This is useful in case the display configuration has been changed,
-	 * for example after screen's resolution has been changed.
+	 * Horrifying method to 'refresh' a cached monitor object. This is useful in
+	 * case the display configuration has been changed, for example after
+	 * screen's resolution has been changed.
 	 */
 	public static Monitor refreshMonitor (Display d, Monitor m) {
 		for (int i = 0; i < d.getMonitors().length; i++) {
@@ -20,6 +23,6 @@ public class MonitorHelper {
 		}
 		throw new IllegalArgumentException("Monitor " + m + " does not exist.");
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

@@ -13,7 +13,10 @@ import java.security.NoSuchAlgorithmException;
 import java.util.zip.CRC32;
 import java.util.zip.CheckedInputStream;
 
-public class ChecksumHelper {
+public final class ChecksumHelper {
+
+	private ChecksumHelper () {}
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	public static long generateCrc32Checksum (String filepath) throws IOException {

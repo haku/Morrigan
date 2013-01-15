@@ -6,13 +6,16 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 
-public class FileHelper {
+public final class FileHelper {
+
+	private FileHelper () {}
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	public static void copyFile(File sourceFile, File destFile) throws IOException {
 		copyFile(sourceFile, destFile, false);
 	}
-	
+
 	public static void copyFile(File srcFile, File dstFile, boolean overWrite) throws IOException {
 		if (dstFile.exists()) {
 			if (!overWrite) {
@@ -21,18 +24,18 @@ public class FileHelper {
 		} else {
 			dstFile.createNewFile();
 		}
-		
+
 		FileChannel srcChannel = null;
 		FileChannel dstChannel = null;
-		
+
 		try {
 			boolean transferDone = false;
 			int chunkSizeMb = 64;
-			
+
 			while (!transferDone) {
 				srcChannel = new FileInputStream(srcFile).getChannel();
 				dstChannel = new FileOutputStream(dstFile).getChannel();
-				
+
 				try {
 					int maxCount = (chunkSizeMb * 1024 * 1024) - (32 * 1024);
 					long size = srcChannel.size();
@@ -55,7 +58,7 @@ public class FileHelper {
 					else {
 						throw e;
 					}
-					
+
 				}
 			}
 		}
@@ -68,6 +71,6 @@ public class FileHelper {
 			}
 		}
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

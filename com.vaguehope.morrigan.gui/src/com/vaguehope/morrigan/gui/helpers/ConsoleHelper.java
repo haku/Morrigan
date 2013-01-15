@@ -5,7 +5,10 @@ import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
 
-public class ConsoleHelper {
+public final class ConsoleHelper {
+
+	private ConsoleHelper () {}
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	public static void showConsole () {
@@ -26,10 +29,10 @@ public class ConsoleHelper {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	static private Object messageConsoleStreamLock = new Object();
-	static private MessageConsoleStream messageConsoleStream = null;
+	private static Object messageConsoleStreamLock = new Object();
+	private static MessageConsoleStream messageConsoleStream = null;
 
-	static private MessageConsoleStream getMessageConsoleStream () {
+	private static MessageConsoleStream getMessageConsoleStream () {
 		synchronized (messageConsoleStreamLock) {
 			if (messageConsoleStream == null) {
 				messageConsole = getMessageConsole();
@@ -40,10 +43,10 @@ public class ConsoleHelper {
 		return messageConsoleStream;
 	}
 
-	static private Object messageConsoleLock = new Object();
-	static private MessageConsole messageConsole;
+	private static Object messageConsoleLock = new Object();
+	private static MessageConsole messageConsole;
 
-	static private MessageConsole getMessageConsole () {
+	private static MessageConsole getMessageConsole () {
 		synchronized (messageConsoleLock) {
 			if (messageConsole == null) {
 				messageConsole = new MessageConsole("Morrigan", null);

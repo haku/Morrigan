@@ -9,10 +9,13 @@ import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
 
 /**
- * TODO move this to internal package.
- * TODO make one big enum based on an interface?
+ * TODO move this to internal package. TODO make one big enum based on an
+ * interface?
  */
-public class OrderHelper {
+public final class OrderHelper {
+
+	private OrderHelper () {}
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	// TODO move to own class next to IPlayerAbstact that uses it.
@@ -21,28 +24,28 @@ public class OrderHelper {
 
 		SEQUENTIAL(0) {
 			@Override
-			public String toString() {
+			public String toString () {
 				return "sequential";
 			}
 		},
 
 		RANDOM(1) {
 			@Override
-			public String toString() {
+			public String toString () {
 				return "random";
 			}
 		},
 
 		BYSTARTCOUNT(2) {
 			@Override
-			public String toString() {
+			public String toString () {
 				return "by start-count";
 			}
 		},
 
 		BYLASTPLAYED(3) {
 			@Override
-			public String toString() {
+			public String toString () {
 				return "by last-played";
 			}
 		};
@@ -53,7 +56,7 @@ public class OrderHelper {
 			this.n = n;
 		}
 
-		public int getN() {
+		public int getN () {
 			return this.n;
 		}
 
@@ -110,7 +113,8 @@ public class OrderHelper {
 		if (track != null && mediaTracks.contains(track)) {
 			i = mediaTracks.indexOf(track) + 1;
 
-		} else {
+		}
+		else {
 			// With no other info, might as well start at the beginning.
 			i = 0;
 		}
@@ -155,7 +159,7 @@ public class OrderHelper {
 		for (IMediaTrack i : mediaTracks) {
 			if (validChoice(i, current)) {
 				x--;
-				if (x<=0) {
+				if (x <= 0) {
 					return i;
 				}
 			}
@@ -237,7 +241,8 @@ public class OrderHelper {
 			if (validChoice(i, current)) {
 				if (i.getDateLastPlayed() != null) {
 					sumAgeDays = sumAgeDays + dateDiffDays(i.getDateLastPlayed(), now);
-				} else {
+				}
+				else {
 					sumAgeDays = sumAgeDays + maxAgeDays;
 				}
 			}
@@ -252,7 +257,8 @@ public class OrderHelper {
 			if (validChoice(i, current)) {
 				if (i.getDateLastPlayed() != null) {
 					targetIndex = targetIndex - dateDiffDays(i.getDateLastPlayed(), now);
-				} else {
+				}
+				else {
 					targetIndex = targetIndex - maxAgeDays;
 				}
 				if (targetIndex <= 0) {

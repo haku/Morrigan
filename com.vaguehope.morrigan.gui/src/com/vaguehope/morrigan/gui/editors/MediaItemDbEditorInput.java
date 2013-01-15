@@ -1,8 +1,6 @@
 package com.vaguehope.morrigan.gui.editors;
 
 
-import org.eclipse.ui.IMemento;
-
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
@@ -12,15 +10,10 @@ import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
  */
 public class MediaItemDbEditorInput extends MediaItemListEditorInput<IMediaItemDb<? extends IMediaItemStorageLayer<? extends IMediaItem>, ? extends IMediaItem>> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	public MediaItemDbEditorInput(IMediaItemDb<? extends IMediaItemStorageLayer<? extends IMediaItem>, ? extends IMediaItem> mediaList) {
 		super(mediaList);
 	}
-	
-	@Override
-	public void saveState(IMemento memento) {
-		super.saveState(memento);
-	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
