@@ -4,11 +4,11 @@ import java.io.File;
 
 public interface IHotkeyEngine {
 
-	static final int MORRIGAN_HK_SHOWHIDE = 90;
-	static final int MORRIGAN_HK_STOP = 100;
-	static final int MORRIGAN_HK_PLAYPAUSE = 101;
-	static final int MORRIGAN_HK_NEXT = 102;
-	static final int MORRIGAN_HK_JUMPTO = 110;
+	int MORRIGAN_HK_SHOWHIDE = 90;
+	int MORRIGAN_HK_STOP = 100;
+	int MORRIGAN_HK_PLAYPAUSE = 101;
+	int MORRIGAN_HK_NEXT = 102;
+	int MORRIGAN_HK_JUMPTO = 110;
 
 	/**
 	 * Returns the description of this engine.

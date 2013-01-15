@@ -20,7 +20,7 @@ import com.vaguehope.nemain.model.NemainDate;
 import com.vaguehope.nemain.model.NemainEvent;
 
 public interface CalendarCellEditEventHandler {
-	
-	public void editBtnClicked (NemainDate date, NemainEvent event, boolean anual);
-	
+
+	void editBtnClicked (NemainDate date, NemainEvent event, boolean anual);
+
 }

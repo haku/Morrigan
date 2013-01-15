@@ -38,16 +38,16 @@ public class HttpHelper {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	static public interface HttpStreamHandler<T extends Exception> {
+	public interface HttpStreamHandler<T extends Exception> {
 
-		public void handleStream (InputStream is, int contentLength) throws IOException, T;
+		void handleStream (InputStream is, int contentLength) throws IOException, T;
 
 	}
 
-	static public interface HttpCreds {
+	public interface HttpCreds {
 
-		public String getUser ();
-		public String getPass ();
+		String getUser ();
+		String getPass ();
 
 	}
 

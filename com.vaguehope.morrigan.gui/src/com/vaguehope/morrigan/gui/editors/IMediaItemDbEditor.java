@@ -6,10 +6,10 @@ import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
 
 public interface IMediaItemDbEditor<S extends IMediaItemStorageLayer<T>, T extends IMediaItem> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	// TODO add more methods?
-	
-	public IMediaItemDb<S,T> getMediaList ();
-	
+
+	IMediaItemDb<S,T> getMediaList ();
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

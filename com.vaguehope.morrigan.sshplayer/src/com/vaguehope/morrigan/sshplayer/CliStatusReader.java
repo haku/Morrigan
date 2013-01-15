@@ -2,7 +2,7 @@ package com.vaguehope.morrigan.sshplayer;
 
 public interface CliStatusReader {
 
-	static final String MORRIGAN_EOF = "Morrigan-EOF";
+	String MORRIGAN_EOF = "Morrigan-EOF";
 
 	void start ();
 
