@@ -119,7 +119,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 		return this._player;
 	}
 
-	private void disposePlayer () {
+	private synchronized void disposePlayer () {
 		if (this._player != null) {
 			this._player.dispose();
 		}
