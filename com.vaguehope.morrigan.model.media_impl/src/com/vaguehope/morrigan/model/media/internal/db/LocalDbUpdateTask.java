@@ -101,7 +101,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 	@Override
 	public TaskResult run (TaskEventListener taskEventListener) {
 		TaskResult ret = null;
-		List<T> changedItems = new LinkedList<T>();
+		List<T> changedItems = new ArrayList<T>();
 
 		try {
 			taskEventListener.onStart();
@@ -189,7 +189,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 			return new TaskResult(TaskOutcome.FAILED, "Failed to retrieve list of media sources.", e);
 		}
 
-		List<File> filesToAdd = new LinkedList<File>();
+		List<File> filesToAdd = new ArrayList<File>();
 		int filesAdded = 0;
 
 		if (sources != null) {
