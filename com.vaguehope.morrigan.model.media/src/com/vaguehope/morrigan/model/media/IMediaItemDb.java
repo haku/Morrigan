@@ -12,7 +12,7 @@ import com.vaguehope.sqlitewrapper.DbException;
 public interface IMediaItemDb<S extends IMediaItemStorageLayer<T>, T extends IMediaItem> extends IMediaItemList<T> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public interface SortChangeListener {
+	interface SortChangeListener {
 		void sortChanged (IDbColumn sort, SortDirection direction);
 	}
 
