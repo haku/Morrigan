@@ -9,13 +9,16 @@ import java.nio.channels.FileChannel;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-public class ChecksumHelper {
+public final class ChecksumHelper {
+
+	private ChecksumHelper () {}
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	public static final int BUFFERSIZE = 8192;
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	/**
 	 * MessageDigest.getInstance("MD5") can take up to a second,
 	 * so using this to cache it and improve performance.
@@ -34,27 +37,27 @@ public class ChecksumHelper {
 			}
 		}
 	};
-	
+
 	public static ByteBuffer createByteBuffer () {
 		return ByteBuffer.allocateDirect(BUFFERSIZE);
 	}
-	
+
 	public static BigInteger generateMd5Checksum (File file, ByteBuffer buffer) throws IOException {
 		MessageDigest md = mdMd5Factory.get();
 		md.reset();
-		
+
 		FileInputStream is = null;
 		try {
 			is = new FileInputStream(file);
 			FileChannel fc = is.getChannel();
-			
+
 			while (fc.position() < fc.size()) {
 				buffer.clear();
 				fc.read(buffer);
 				buffer.flip();
 				md.update(buffer);
 			}
-			
+
 			BigInteger bi = new BigInteger(1, md.digest());
 			return bi;
 		}
@@ -62,6 +65,6 @@ public class ChecksumHelper {
 			if (is != null) is.close();
 		}
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

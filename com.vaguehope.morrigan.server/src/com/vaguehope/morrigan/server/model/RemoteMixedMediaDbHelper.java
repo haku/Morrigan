@@ -15,7 +15,10 @@ import com.vaguehope.morrigan.model.media.internal.MediaListReferenceImpl;
 import com.vaguehope.morrigan.model.media.internal.db.MediaItemDbConfig;
 
 
-public class RemoteMixedMediaDbHelper {
+public final class RemoteMixedMediaDbHelper {
+
+	private RemoteMixedMediaDbHelper () {}
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	public static String getFullPathToMmdb (String fileName) {

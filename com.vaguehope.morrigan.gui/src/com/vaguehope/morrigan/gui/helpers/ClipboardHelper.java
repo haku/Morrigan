@@ -5,13 +5,15 @@ import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.widgets.Display;
 
-public class ClipboardHelper {
-	
+public final class ClipboardHelper {
+
+	private ClipboardHelper () {}
+
 	public static void setText (String text) {
 		Clipboard clipboard = new Clipboard(Display.getCurrent());
 		TextTransfer textTransfer = TextTransfer.getInstance();
-		clipboard.setContents(new String[]{text}, new Transfer[]{textTransfer});
-        clipboard.dispose();
+		clipboard.setContents(new String[] { text }, new Transfer[] { textTransfer });
+		clipboard.dispose();
 	}
-	
+
 }

@@ -13,7 +13,10 @@ import com.vaguehope.morrigan.util.httpclient.HttpClient;
 import com.vaguehope.morrigan.util.httpclient.HttpResponse;
 import com.vaguehope.morrigan.util.httpclient.HttpStreamHandlerException;
 
-public class Danbooru {
+public final class Danbooru {
+
+	private Danbooru () {}
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	public static String[] getTags (String md5) throws IOException, MorriganException, HttpStreamHandlerException {

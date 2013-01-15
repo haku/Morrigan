@@ -13,29 +13,32 @@ import com.vaguehope.sqlitewrapper.GenericSqliteLayer.SqlCreateCmd;
 
 /*
  * Totally generic SQLite helper methods.
- * 
+ *
  * TODO put somewhere more generic?
- * 
+ *
  */
-public class SqliteHelper {
+public final class SqliteHelper {
+
+	private SqliteHelper () {}
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	public static SqlCreateCmd generateSql_Create (String tblName, IDbColumn[] columns) {
 		return generateSql_Create(tblName, Arrays.asList(columns));
 	}
-	
+
 	public static SqlCreateCmd generateSql_Create (String tblName, List<IDbColumn> columns) {
 		StringBuilder sbExists = new StringBuilder();
 		StringBuilder sbCreate = new StringBuilder();
-		
+
 		sbExists.append("SELECT name FROM sqlite_master WHERE name='");
 		sbExists.append(tblName);
 		sbExists.append("';");
-		
+
 		sbCreate.append("CREATE TABLE ");
 		sbCreate.append(tblName);
 		sbCreate.append("(");
-		
+
 		boolean first = true;
 		for (IDbColumn c : columns) {
 			if (first) {
@@ -47,22 +50,22 @@ public class SqliteHelper {
 			sbCreate.append(" ");
 			sbCreate.append(c.getSqlType());
 		}
-		
+
 		sbCreate.append(");");
-		
-		
+
+
 		return new SqlCreateCmd(sbExists.toString(), sbCreate.toString());
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	static private ThreadLocal<SimpleDateFormat> sqlDate = new ThreadLocal<SimpleDateFormat>() {
 		@Override
 		protected SimpleDateFormat initialValue() {
 			return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		}
 	};
-	
+
 	/**
 	 * This method will read the date from the DB
 	 * weather it was stored as a number or a string.
@@ -76,16 +79,16 @@ public class SqliteHelper {
 			if (time > 100000) { // If the date was stored old-style, we get back the year :S.
 				return new Date(time);
 			}
-			
+
 			String s = rs.getString(column);
 			try {
 				Date d = sqlDate.get().parse(s);
 				return d;
 			} catch (Exception e) {/*Can't really do anything with this error anyway.*/}
 		}
-		
+
 		return null;
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

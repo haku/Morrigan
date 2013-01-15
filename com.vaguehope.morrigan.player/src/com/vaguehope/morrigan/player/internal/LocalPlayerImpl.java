@@ -28,12 +28,12 @@ import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaItemListChangeListener;
-import com.vaguehope.morrigan.player.Player;
-import com.vaguehope.morrigan.player.PlayerEventHandler;
 import com.vaguehope.morrigan.player.LocalPlayer;
 import com.vaguehope.morrigan.player.OrderHelper;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayItem;
+import com.vaguehope.morrigan.player.Player;
+import com.vaguehope.morrigan.player.PlayerEventHandler;
 
 public class LocalPlayerImpl implements LocalPlayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -324,7 +324,9 @@ public class LocalPlayerImpl implements LocalPlayer {
 		synchronized (this._queue) {
 			List<PlayItem> ret = new ArrayList<PlayItem>(this._queue.size());
 			if (!toBottom) ret.addAll(items);
-			for (PlayItem item : this._queue) if (!items.contains(item)) ret.add(item);
+			for (PlayItem item : this._queue) {
+				if (!items.contains(item)) ret.add(item);
+			}
 			if (toBottom) ret.addAll(items);
 			this.setQueueList(ret);
 		}
@@ -398,7 +400,9 @@ public class LocalPlayerImpl implements LocalPlayer {
 	public PlayItem getQueueItemById (int itemId) {
 		// TODO Is there a better way to do this?
 		Map<Integer, PlayItem> q = new HashMap<Integer, PlayItem>();
-		for (PlayItem item : this._queue) q.put(Integer.valueOf(item.id), item);
+		for (PlayItem item : this._queue) {
+			q.put(Integer.valueOf(item.id), item);
+		}
 		return q.get(Integer.valueOf(itemId));
 	}
 

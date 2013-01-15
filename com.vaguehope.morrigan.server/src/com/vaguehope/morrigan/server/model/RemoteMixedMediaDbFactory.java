@@ -9,12 +9,13 @@ import com.vaguehope.morrigan.model.media.internal.db.MediaItemDbConfig;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.MixedMediaSqliteLayerFactory;
 import com.vaguehope.sqlitewrapper.DbException;
 
-public class RemoteMixedMediaDbFactory {
+public final class RemoteMixedMediaDbFactory {
+
+	private RemoteMixedMediaDbFactory () {}
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private static final InnerFactory INSTANCE = new InnerFactory();
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private static class InnerFactory extends RecyclingFactory<IRemoteMixedMediaDb, MediaItemDbConfig, RemoteHostDetails, MorriganException> {
 
