@@ -5,6 +5,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
@@ -16,18 +17,18 @@ import com.vaguehope.morrigan.model.media.internal.db.MediaItemDbConfig;
 
 public class RemoteMixedMediaDbHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	public static String getFullPathToMmdb (String fileName) {
 		File dir = Config.getMmdbDir();
 		String file = dir.getPath() + File.separator + fileName;
-		
+
 		if (!file.toLowerCase().endsWith(Config.MMDB_REMOTE_FILE_EXT)) {
 			file = file.concat(Config.MMDB_REMOTE_FILE_EXT);
 		}
-		
+
 		return file;
 	}
-	
+
 	public static IRemoteMixedMediaDb createRemoteMmdb (String mmdbUrl, String pass) throws MorriganException, MalformedURLException {
 		URL url = new URL(mmdbUrl);
 		// FIXME better naming?
@@ -36,20 +37,20 @@ public class RemoteMixedMediaDbHelper {
 		RemoteHostDetails details = new RemoteHostDetails(url, pass);
 		return RemoteMixedMediaDbFactory.getNew(file, details);
 	}
-	
+
 	public static boolean isRemoteMmdbFile (String filePath) {
 		return (filePath.toLowerCase().endsWith(Config.MMDB_REMOTE_FILE_EXT));
 	}
-	
-	public static ArrayList<MediaListReference> getAllRemoteMmdb () {
+
+	public static List<MediaListReference> getAllRemoteMmdb () {
 		ArrayList<MediaListReference> ret = new ArrayList<MediaListReference>();
-		
+
 		File dir = Config.getMmdbDir();
 		File [] files = dir.listFiles();
-		
+
 		// empty dir?
 		if (files == null || files.length < 1 ) return ret;
-		
+
 		for (File file : files) {
 			String absolutePath = file.getAbsolutePath();
 			if (isRemoteMmdbFile(absolutePath)) {
@@ -57,38 +58,38 @@ public class RemoteMixedMediaDbHelper {
 				ret.add(newItem);
 			}
 		}
-		
+
 		Collections.sort(ret);
-		
+
 		return ret;
 	}
-	
+
 	public static String getRemoteMmdbTitle (MediaItemDbConfig config) {
 		String ret = getRemoteMmdbTitle(config.getFilePath());
-		
+
 		if (config.getFilter() != null) {
 			ret = ret + "{" + config.getFilter() + "}";
 		}
-		
+
 		return ret;
 	}
-	
+
 	public static String getRemoteMmdbTitle (String filePath) {
 		String ret = filePath;
 		int x;
-		
+
 		x = ret.lastIndexOf(File.separator);
 		if (x > 0) {
 			ret = ret.substring(x+1);
 		}
-		
+
 		x = ret.lastIndexOf(Config.MMDB_REMOTE_FILE_EXT);
 		if (x > 0) {
 			ret = ret.substring(0, x);
 		}
-		
+
 		return ret;
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

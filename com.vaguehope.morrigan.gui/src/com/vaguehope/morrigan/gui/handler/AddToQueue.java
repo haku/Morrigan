@@ -1,7 +1,6 @@
 package com.vaguehope.morrigan.gui.handler;
 
-import java.util.ArrayList;
-
+import java.util.List;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -24,18 +23,18 @@ import com.vaguehope.morrigan.player.PlayItem;
 
 public class AddToQueue  extends AbstractHandler {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	public static final String ID = "com.vaguehope.morrigan.gui.handler.AddToQueue";
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		// FIXME work out how to pass parameters correctly.
-		
+
 		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindow(event);
 		IWorkbenchPage page = window.getActivePage();
-		
+
 		IViewPart findView = page.findView(ViewControls.ID);
 		if (findView == null) {
 			try {
@@ -44,11 +43,11 @@ public class AddToQueue  extends AbstractHandler {
 				new MorriganMsgDlg(e).open();
 			}
 		}
-		
+
 		if (findView != null) {
 			IMediaTrackList<? extends IMediaTrack> list;
-			ArrayList<? extends IMediaTrack> selectedTracks;
-			
+			List<? extends IMediaTrack> selectedTracks;
+
 			IEditorPart activeEditor = page.getActiveEditor();
 			if (activeEditor instanceof MediaTrackListEditor<?,?>) {
 				MediaTrackListEditor<?,?> editor = (MediaTrackListEditor<?,?>) activeEditor;
@@ -64,9 +63,9 @@ public class AddToQueue  extends AbstractHandler {
 				new MorriganMsgDlg("Error: invalid active editor.").open();
 				return null;
 			}
-			
+
 			AbstractPlayerView playerView = (AbstractPlayerView) findView;
-			
+
 			if (selectedTracks != null) {
 				for (IMediaTrack track : selectedTracks) {
 					if (track.isPlayable()) { // Don't queue things we can't play.
@@ -79,9 +78,9 @@ public class AddToQueue  extends AbstractHandler {
 		else {
 			new MorriganMsgDlg("Error: failed to find ViewControls.").open();
 		}
-		
+
 		return null;
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

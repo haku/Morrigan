@@ -564,7 +564,7 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 		return null;
 	}
 
-	public ArrayList<S> getSelectedItems () {
+	public List<S> getSelectedItems () {
 		ISelection selection = this.editTable.getSelection();
 
 		if (selection==null || selection.isEmpty()) return null;
@@ -627,7 +627,7 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 	protected IAction copyToAction = new Action("Copy to...") {
 		@Override
 		public void run () {
-			ArrayList<S> selectedTracks = getSelectedItems();
+			List<S> selectedTracks = getSelectedItems();
 
 			DirectoryDialog dlg = new DirectoryDialog(getSite().getShell());
 			dlg.setText("Copy Files...");
@@ -652,7 +652,7 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 		public void run() {
 			String newLine = System.getProperty("line.separator");
 			StringBuffer sb = new StringBuffer();
-			ArrayList<S> items = getSelectedItems();
+			List<S> items = getSelectedItems();
 			for (S item : items) {
 				sb.append(item.getFilepath());
 				if (items.size() > 1) sb.append(newLine);
