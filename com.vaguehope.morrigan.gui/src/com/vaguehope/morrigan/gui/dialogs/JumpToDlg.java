@@ -38,56 +38,56 @@ import com.vaguehope.sqlitewrapper.DbException;
 
 public class JumpToDlg {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	private static final int MAX_RESULTS = 100;
-	
+
 	private static volatile WeakReference<JumpToDlg> openDlg = null;
 	private static volatile Object dlgOpenLock = new Object();
 	private static volatile boolean dlgOpen = false;
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	final Shell parent;
 	private final IMediaTrackDb<?,? extends IMediaTrack> mediaDb;
-	
+
 	private IMediaTrack returnValue = null;
 	private List<? extends IMediaTrack> returnList = null;
 	private String returnFilter = null;
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	public JumpToDlg (Shell parent, IMediaTrackDb<?,? extends IMediaTrack> mediaDb) {
 		this.parent = parent;
 		if (mediaDb == null) throw new IllegalArgumentException("mediaDb can not be null.");
 		this.mediaDb = mediaDb;
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	public IMediaTrack getReturnItem () {
 		return this.returnValue;
 	}
-	
+
 	public List<? extends IMediaTrack> getReturnList () {
 		return this.returnList;
 	}
-	
+
 	public String getReturnFilter() {
 		return this.returnFilter;
 	}
-	
+
 	public int getKeyMask() {
 		return this.keyMask;
 	}
-	
+
 	public void setKeyMask(int keyMask) {
 		this.keyMask = keyMask;
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	private final static int SEP = 3;
-	
+
 	private Shell shell = null;
 	Label label = null;
 	Text text = null;
@@ -98,9 +98,9 @@ public class JumpToDlg {
 	Button btnShuffleAll = null;
 	Button btnOpenView = null;
 	private Button btnCancel = null;
-	
+
 	private int keyMask = 0;
-	
+
 	public void open () {
 		synchronized (dlgOpenLock) {
 			if (dlgOpen) {
@@ -114,16 +114,16 @@ public class JumpToDlg {
 			}
 			dlgOpen = true;
 		}
-		
+
 		// Create window.
 		this.shell = new Shell(this.parent.getDisplay(), SWT.TITLE | SWT.CLOSE | SWT.APPLICATION_MODAL | SWT.RESIZE | SWT.ON_TOP);
 		this.shell.setImage(this.parent.getImage());
 		this.shell.setText("Jump to - Morrigan");
-		
+
 		// Create form layout.
 		FormData formData;
 		this.shell.setLayout(new FormLayout());
-		
+
 		this.label = new Label(this.shell, SWT.CENTER);
 		this.text = new Text(this.shell, SWT.SINGLE | SWT.CENTER | SWT.BORDER);
 		this.tableViewer =  new TableViewer(this.shell, SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION);
@@ -133,22 +133,22 @@ public class JumpToDlg {
 		this.btnShuffleAll = new Button(this.shell, SWT.PUSH);
 		this.btnOpenView = new Button(this.shell, SWT.PUSH);
 		this.btnCancel = new Button(this.shell, SWT.PUSH);
-		
+
 		this.shell.setDefaultButton(this.btnPlay);
 		this.shell.addTraverseListener(this.traverseListener);
-		
+
 		formData = new FormData();
 		formData.left = new FormAttachment(0, SEP);
 		formData.top = new FormAttachment(0, SEP);
 		formData.right = new FormAttachment(100, -SEP);
 		this.label.setLayoutData(formData);
-		
+
 		formData = new FormData();
 		formData.left = new FormAttachment(0, SEP);
 		formData.top = new FormAttachment(this.label, SEP);
 		formData.right = new FormAttachment(100, -SEP);
 		this.text.setLayoutData(formData);
-		
+
 		formData = new FormData();
 		formData.left = new FormAttachment(0, SEP);
 		formData.top = new FormAttachment(this.text, SEP);
@@ -157,79 +157,79 @@ public class JumpToDlg {
 		formData.width = 600;
 		formData.height = 300;
 		this.tableViewer.getTable().setLayoutData(formData);
-		
+
 		this.btnOpenView.setText("Open view");
 		formData = new FormData();
 		formData.right = new FormAttachment(100, -SEP);
 		formData.bottom = new FormAttachment(100, -SEP);
 		this.btnOpenView.setLayoutData(formData);
-		
+
 		this.btnShuffleAll.setText("Shuffle and enqueue");
 		formData = new FormData();
 		formData.right = new FormAttachment(this.btnOpenView, -SEP);
 		formData.bottom = new FormAttachment(100, -SEP);
 		this.btnShuffleAll.setLayoutData(formData);
-		
+
 		this.btnPlay.setText("Play");
 		formData = new FormData();
 		formData.right = new FormAttachment(this.btnShuffleAll, -SEP);
 		formData.bottom = new FormAttachment(100, -SEP);
 		this.btnPlay.setLayoutData(formData);
-		
+
 		this.btnEnqueue.setText("Enqueue");
 		formData = new FormData();
 		formData.right = new FormAttachment(this.btnPlay, -SEP);
 		formData.bottom = new FormAttachment(100, -SEP);
 		this.btnEnqueue.setLayoutData(formData);
-		
+
 		this.btnReveal.setText("Reveal");
 		formData = new FormData();
 		formData.right = new FormAttachment(this.btnEnqueue, -SEP);
 		formData.bottom = new FormAttachment(100, -SEP);
 		this.btnReveal.setLayoutData(formData);
-		
+
 		this.btnCancel.setText("Cancel");
 		formData = new FormData();
 		formData.left = new FormAttachment(0, SEP);
 		formData.bottom = new FormAttachment(100, -SEP);
 		this.btnCancel.setLayoutData(formData);
-		
+
 		this.label.setText("Search:");
-		
+
 		this.text.addVerifyListener(this.textChangeListener);
 		this.text.addTraverseListener(this.textTraverseListener);
-		
+
 		this.tableViewer.setContentProvider(this.contentProvider);
 		this.tableViewer.setLabelProvider(this.labelProvider);
 		this.tableViewer.setInput(this.shell);
 		this.tableViewer.getTable().addTraverseListener(this.listTraverseListener);
-		
+
 		this.btnPlay.addSelectionListener(this.buttonListener);
 		this.btnEnqueue.addSelectionListener(this.buttonListener);
 		this.btnReveal.addSelectionListener(this.buttonListener);
 		this.btnShuffleAll.addSelectionListener(this.buttonListener);
 		this.btnOpenView.addSelectionListener(this.buttonListener);
 		this.btnCancel.addSelectionListener(this.buttonListener);
-		
+
 		this.shell.pack();
-		
+
 		// Work out which screen to show the dlg on.
 		Point mouse = MouseInfo.getPointerInfo().getLocation();
 		for (Monitor m : this.parent.getDisplay().getMonitors()) {
 			Rectangle b = m.getBounds();
 			if (mouse.x >= b.x && mouse.x <= b.x + b.width
 					&& mouse.y >= b.y && mouse.y <= b.y + b.width) {
-				
+
 				Rectangle bounds = m.getBounds ();
 				Rectangle rect = this.shell.getBounds ();
 				int x = bounds.x + (bounds.width - rect.width) / 2;
 				int y = bounds.y + (bounds.height - rect.height) / 2;
 				this.shell.setLocation (x, y);
-				
+
 				break;
 			}
 		}
-		
+
 		// Read saved query string.
 		String s = PreferenceHelper.getLastJumpToDlgQuery();
 		if (s != null && s.length() > 0) {
@@ -237,10 +237,10 @@ public class JumpToDlg {
 			this.text.setSelection(0, this.text.getText().length());
 			this.textChangeListener.verifyText(null);
 		}
-		
+
 		// Save dlg object for next time.
 		openDlg = new WeakReference<JumpToDlg>(this);
-		
+
 		// Show the dlg.
 		this.shell.open();
 		this.shell.setFocus();
@@ -251,18 +251,18 @@ public class JumpToDlg {
 				display.sleep();
 			}
 		}
-		
+
 		synchronized (dlgOpenLock) {
 			dlgOpen = false;
 		}
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	public void remoteClose () {
 		leaveDlg(false, 0);
 	}
-	
+
 	void leaveDlg (boolean ok, int mask) {
 		if (ok) {
 			this.returnValue = getSelectedItem();
@@ -270,37 +270,37 @@ public class JumpToDlg {
 			this.returnFilter = this.text.getText();
 		}
 		setKeyMask(mask);
-		
+
 		// Save query string.
 		PreferenceHelper.setLastJumpToDlgQuery(this.text.getText());
-		
+
 		this.shell.close();
 	}
-	
+
 	private TraverseListener traverseListener = new TraverseListener() {
 		@Override
 		public void keyTraversed(TraverseEvent e) {
 			switch (e.detail) {
-				
+
 				case SWT.TRAVERSE_RETURN:
 					e.detail = SWT.TRAVERSE_NONE;
 					e.doit = false;
 					leaveDlg(true, e.stateMask);
 					break;
-					
+
 				case SWT.TRAVERSE_ESCAPE:
 					e.detail = SWT.TRAVERSE_NONE;
 					e.doit = false;
 					leaveDlg(false, e.stateMask);
 					break;
-				
+
 				default:
 					break;
-					
+
 			}
 		}
 	};
-	
+
 	private TraverseListener textTraverseListener = new TraverseListener() {
 		@Override
 		public void keyTraversed(TraverseEvent e) {
@@ -314,25 +314,25 @@ public class JumpToDlg {
 						JumpToDlg.this.tableViewer.getTable().setFocus();
 					}
 					break;
-				
+
 				case SWT.TRAVERSE_ESCAPE:
 					e.detail = SWT.TRAVERSE_NONE;
 					e.doit = false;
 					leaveDlg(false, e.stateMask);
 					break;
-				
+
 				default:
 					break;
-					
+
 			}
 		}
 	};
-	
+
 	private TraverseListener listTraverseListener = new TraverseListener() {
 		@Override
 		public void keyTraversed(TraverseEvent e) {
 			switch (e.detail) {
-				
+
 				case SWT.TRAVERSE_ARROW_PREVIOUS:
 					if (JumpToDlg.this.tableViewer.getTable().getSelectionIndex() == 0) {
 						e.detail = SWT.TRAVERSE_NONE;
@@ -340,20 +340,20 @@ public class JumpToDlg {
 						JumpToDlg.this.text.setFocus();
 					}
 					break;
-				
+
 				case SWT.TRAVERSE_ESCAPE:
 					e.detail = SWT.TRAVERSE_NONE;
 					e.doit = false;
 					leaveDlg(false, e.stateMask);
 					break;
-				
+
 				default:
 					break;
-				
+
 			}
 		}
 	};
-	
+
 	private SelectionListener buttonListener = new SelectionAdapter() {
 		@Override
 		public void widgetSelected(SelectionEvent e) {
@@ -377,14 +377,14 @@ public class JumpToDlg {
 			}
 		}
 	};
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	private IMediaTrack getSelectedItem () {
 		ISelection selection = this.tableViewer.getSelection();
 		if (selection==null) return null;
 		if (selection.isEmpty()) return null;
-		
+
 		if (selection instanceof IStructuredSelection) {
 			IStructuredSelection iSel = (IStructuredSelection) selection;
 			Object o = iSel.toList().get(0);
@@ -393,22 +393,22 @@ public class JumpToDlg {
 				return i;
 			}
 		}
-		
+
 		return null;
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	List<? extends IMediaTrack> searchResults = null;
-	
+
 	private IStructuredContentProvider contentProvider = new IStructuredContentProvider() {
 		@Override
 		public Object[] getElements(Object inputElement) {
 			if (JumpToDlg.this.searchResults != null) {
 				return JumpToDlg.this.searchResults.toArray();
-				
+
 			}
-			
+
 			return new String[]{};
 		}
 		@Override
@@ -416,7 +416,7 @@ public class JumpToDlg {
 		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {/* UNUSED */}
 	};
-	
+
 	private ILabelProvider labelProvider = new LabelProvider() {
 		@Override
 		public String getText(Object element) {
@@ -426,13 +426,13 @@ public class JumpToDlg {
 			return null;
 		}
 	};
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	Object searchLock = new Object();
 	volatile boolean searchRunning = false;
 	volatile boolean searchDirty = false;
-	
+
 	/**
 	 * Text changed event handler.
 	 */
@@ -442,11 +442,11 @@ public class JumpToDlg {
 			updateSearchResults();
 		}
 	};
-	
+
 	void updateSearchResults () {
 		updateSearchResults(false);
 	}
-	
+
 	void updateSearchResults (boolean force) {
 		synchronized (this.searchLock) {
 			if (!this.searchRunning || force) {
@@ -457,7 +457,7 @@ public class JumpToDlg {
 			}
 		}
 	}
-	
+
 	/**
 	 * Async task so we can read the complete text from the
 	 * input box.
@@ -471,7 +471,7 @@ public class JumpToDlg {
 			}
 		}
 	};
-	
+
 	/**
 	 * Run the search in a daemon thread.  Call query again if
 	 * input has changed while the search was running.
@@ -488,13 +488,13 @@ public class JumpToDlg {
 							if (JumpToDlg.this.label.isDisposed() || JumpToDlg.this.tableViewer.getTable().isDisposed()) return;
 							JumpToDlg.this.label.setText(JumpToDlg.this.searchResults.size() + " results.");
 							JumpToDlg.this.tableViewer.refresh();
-							
+
 							if (JumpToDlg.this.tableViewer.getTable().getItemCount() > 0) {
 								JumpToDlg.this.tableViewer.getTable().setSelection(0);
 							}
 						}
 					});
-				
+
 				} else {
 					JumpToDlg.this.parent.getDisplay().asyncExec(new Runnable() {
 						@Override
@@ -507,7 +507,7 @@ public class JumpToDlg {
 						}
 					});
 				}
-				
+
 				synchronized (JumpToDlg.this.searchLock) {
 					if (JumpToDlg.this.searchDirty) {
 						updateSearchResults(true);
@@ -521,14 +521,14 @@ public class JumpToDlg {
 		t.setDaemon(true);
 		t.start();
 	}
-	
+
 	/**
 	 * Do the actual searching.
 	 * @param query
 	 */
 	boolean doSearch (String query) {
 		if (query == null || query.length() < 1) return false;
-		
+
 		try {
 			List<? extends IMediaTrack> res = this.mediaDb.simpleSearch(query, MAX_RESULTS);
 			if (res != null && res.size() > 0) {
@@ -539,19 +539,9 @@ public class JumpToDlg {
 		catch (DbException e) {
 			e.printStackTrace();
 		}
-		
+
 		return false;
 	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-//	private static List<PlayItem> makePlayItems (IMediaTrackDb<?,?,? extends IMediaTrack> mediaDb, List<? extends IMediaTrack> tracks) {
-//		List<PlayItem> ret = new ArrayList<PlayItem>(tracks.size());
-//		for (IMediaTrack track : tracks) {
-//			ret.add(new PlayItem(mediaDb, track));
-//		}
-//		return ret;
-//	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
