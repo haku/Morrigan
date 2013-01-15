@@ -3,6 +3,7 @@ package com.vaguehope.morrigan.model.media.internal.db;
 import java.io.File;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -291,7 +292,7 @@ implements IMediaItemDb<S, T> {
 		saveSortToDbInNewThread();
 	}
 
-	private List<SortChangeListener> _sortChangeListeners = new ArrayList<SortChangeListener>();
+	private List<SortChangeListener> _sortChangeListeners = Collections.synchronizedList(new ArrayList<SortChangeListener>());
 
 	private void callSortChangedListeners (IDbColumn sort, SortDirection direction) {
 		for (SortChangeListener l : this._sortChangeListeners) {
