@@ -77,7 +77,7 @@ public class CliHosts {
 		}
 
 		ImplType implType = ImplType.parseType(type);
-		if (type == null) throw new NotConfiguredException("Unknown type: " + type);
+		if (implType == null) throw new NotConfiguredException("Unknown type: " + type);
 
 		return new CliHost(name, host, port, user, pass, implType);
 	}
