@@ -194,37 +194,38 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 
 		if (sources != null) {
 			Queue<File> dirs = new LinkedList<File>();
-			for (String source : sources)
+			for (String source : sources) {
 				dirs.add(new File(source));
+			}
 
-					while (!dirs.isEmpty()) {
+			while (!dirs.isEmpty()) {
+				if (taskEventListener.isCanceled()) break;
+				File dirItem = dirs.poll();
+				taskEventListener.subTask("(" + filesToAdd.size() + ") Scanning " + dirItem.getAbsolutePath());
+
+				File[] arrFiles = dirItem.listFiles();
+				if (arrFiles != null) {
+					for (File file : arrFiles) {
 						if (taskEventListener.isCanceled()) break;
-						File dirItem = dirs.poll();
-						taskEventListener.subTask("(" + filesToAdd.size() + ") Scanning " + dirItem.getAbsolutePath());
 
-						File[] arrFiles = dirItem.listFiles();
-						if (arrFiles != null) {
-							for (File file : arrFiles) {
-								if (taskEventListener.isCanceled()) break;
-
-								if (file.isDirectory()) {
-									dirs.add(file);
-								}
-								else if (file.isFile()) {
-									String ext = file.getName();
-									ext = ext.substring(ext.lastIndexOf(".") + 1).toLowerCase();
-									if (supportedFormats.contains(ext)) {
-										if (!this.itemList.hasFile(file)) {
-											filesToAdd.add(file);
-										}
-									}
+						if (file.isDirectory()) {
+							dirs.add(file);
+						}
+						else if (file.isFile()) {
+							String ext = file.getName();
+							ext = ext.substring(ext.lastIndexOf('.') + 1).toLowerCase();
+							if (supportedFormats.contains(ext)) {
+								if (!this.itemList.hasFile(file)) {
+									filesToAdd.add(file);
 								}
 							}
 						}
-						else {
-							taskEventListener.logMsg(this.itemList.getListName(), "Failed to read directory: " + dirItem.getAbsolutePath());
-						}
 					}
+				}
+				else {
+					taskEventListener.logMsg(this.itemList.getListName(), "Failed to read directory: " + dirItem.getAbsolutePath());
+				}
+			}
 		} // End directory scanning.
 
 		if (filesToAdd.size() > 0) {
@@ -663,7 +664,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 		return null;
 	}
 
-	abstract protected void readTrackMetaData2 (Q library, T item, File file) throws Throwable;
+	abstract protected void readTrackMetaData2 (Q library, T item, File file) throws Exception;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Helper methods.
