@@ -11,6 +11,10 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 
+import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
+import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
+import org.jaudiotagger.tag.TagException;
+
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine;
 import com.vaguehope.morrigan.engines.playback.PlaybackEngineFactory;
@@ -158,7 +162,7 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMe
 		}
 		else { // Type is unknown - determine type and call self.
 			String ext = item.getFilepath();
-			ext = ext.substring(ext.lastIndexOf(".") + 1).toLowerCase();
+			ext = ext.substring(ext.lastIndexOf('.') + 1).toLowerCase();
 
 			if (this.ext_track.containsKey(ext)) {
 				library.setItemMediaType(item, MediaType.TRACK);
@@ -226,7 +230,7 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMe
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	protected void readTrackMetaData2 (ILocalMixedMediaDb list, IMixedMediaItem item, File file) throws Throwable {
+	protected void readTrackMetaData2 (ILocalMixedMediaDb list, IMixedMediaItem item, File file) throws IOException, TagException, ReadOnlyFileException, InvalidAudioFrameException, MorriganException {
 		if (item.getMediaType() == MediaType.TRACK) {
 			TrackTagHelper.readTrackTags(list, item, file);
 		}
