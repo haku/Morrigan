@@ -18,7 +18,7 @@ public class ScreenSaver {
 	private static final String FILE = "/usr/bin/gnome-screensaver-command";
 	private static final String CMD = FILE + " --poke";
 	
-	static public boolean pokeScreenSaver () throws IOException {
+	public static boolean pokeScreenSaver () throws IOException {
 		File file = new File(FILE);
 		if (file.exists()) {
     		Process proc = null;
@@ -47,7 +47,7 @@ public class ScreenSaver {
 	static private final Lock lastPokeLock = new ReentrantLock();
 	static private final AtomicLong lastPokeTime = new AtomicLong(0);
 	
-	static public void pokeScreenSaverProtected () {
+	public static void pokeScreenSaverProtected () {
 		if (lastPokeTime.get() == 0 || System.currentTimeMillis() - lastPokeTime.get() > POKE_INTERVAL) {
 			lastPokeLock.lock();
 			try {

@@ -241,7 +241,7 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb implements IRemoteM
 		return targetFile;
 	}
 
-	static public URL getRemoteItemUrl (RemoteMixedMediaDb rmmdb, IMixedMediaItem mlt) throws MorriganException {
+	public static URL getRemoteItemUrl (RemoteMixedMediaDb rmmdb, IMixedMediaItem mlt) throws MorriganException {
 		String serverUrlString;
 		try {
 			serverUrlString = rmmdb.getDbLayer().getProp(DBKEY_SERVERURL); // e.g. http://localhost:8080/mlists/REMOTEMMDB/localhost_8080_wui.remote.db3

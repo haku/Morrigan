@@ -8,11 +8,11 @@ import org.eclipse.ui.console.MessageConsoleStream;
 public class ConsoleHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	static public void showConsole () {
+	public static void showConsole () {
 		ConsolePlugin.getDefault().getConsoleManager().showConsoleView(getMessageConsole());
 	}
 
-	static public void appendToConsole (String topic, String s) {
+	public static void appendToConsole (String topic, String s) {
 		// TODO create separate consoles for each topic?
 
 		StringBuilder sb = new StringBuilder();

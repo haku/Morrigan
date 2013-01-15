@@ -22,7 +22,7 @@ public class TrayHelper {
 	/**
 	 * This method must be called on the UI thread.
 	 */
-	static public boolean minToTray (final IWorkbenchWindow window, boolean force) {
+	public static boolean minToTray (final IWorkbenchWindow window, boolean force) {
 		if (!GeneralPref.getMinToTray() && !force) {
 			return false;
 		}
@@ -110,7 +110,7 @@ public class TrayHelper {
 	/**
 	 * This method must be called on the UI thread.
 	 */
-	static public void hideShowWindow (final IWorkbenchWindow window) {
+	public static void hideShowWindow (final IWorkbenchWindow window) {
 //		if (window.getShell().getDisplay().getActiveShell() != null) { // This does not work with multiple windows.
 		if (window.getShell().isVisible()) {
 			minToTray(window, true);

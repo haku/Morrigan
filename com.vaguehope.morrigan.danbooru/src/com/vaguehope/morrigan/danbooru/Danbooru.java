@@ -16,7 +16,7 @@ import com.vaguehope.morrigan.util.httpclient.HttpStreamHandlerException;
 public class Danbooru {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	static public String[] getTags (String md5) throws IOException, MorriganException, HttpStreamHandlerException {
+	public static String[] getTags (String md5) throws IOException, MorriganException, HttpStreamHandlerException {
 		String surl = "http://danbooru.donmai.us/post/index.xml?" + getAuthString() + "tags=md5:" + md5;
 		URL url = new URL(surl);
 		HttpResponse response = HttpClient.doHttpRequest(url);
@@ -43,7 +43,7 @@ public class Danbooru {
 	 * @throws MorriganException
 	 * @throws HttpStreamHandlerException
 	 */
-	static public Map<String, String[]> getTags (Collection<String> md5s) throws IOException, MorriganException, HttpStreamHandlerException {
+	public static Map<String, String[]> getTags (Collection<String> md5s) throws IOException, MorriganException, HttpStreamHandlerException {
 		StringBuilder urlString = new StringBuilder();
 		urlString.append("http://danbooru.donmai.us/post/index.xml?" + getAuthString() + "tags=md5:");
 		boolean first = true;
@@ -92,7 +92,7 @@ public class Danbooru {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	static public String substringByTokens (String d, String k0, String k1) {
+	public static String substringByTokens (String d, String k0, String k1) {
 		String ret;
 		int x0;
 		int l;

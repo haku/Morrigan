@@ -843,7 +843,7 @@ implements IMediaItemDb<S, T> {
 	/**
 	 * This pairs with SEARCH_ESC.
 	 */
-	static public String escapeSearch (String term) {
+	public static String escapeSearch (String term) {
 		String q = term.replace("'", "''");
 		q = q.replace(" ", "*");
 		q = q.replace("\\", "\\\\");

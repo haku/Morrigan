@@ -16,7 +16,7 @@ public class XmlHelper {
 		}
 	};
 	
-	static public DateFormat getIso8601UtcDateFormatter () {
+	public static DateFormat getIso8601UtcDateFormatter () {
 		return Iso8601Utc.get();
 	}
 	

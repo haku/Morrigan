@@ -9,11 +9,11 @@ import java.nio.channels.FileChannel;
 public class FileHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	static public void copyFile(File sourceFile, File destFile) throws IOException {
+	public static void copyFile(File sourceFile, File destFile) throws IOException {
 		copyFile(sourceFile, destFile, false);
 	}
 	
-	static public void copyFile(File srcFile, File dstFile, boolean overWrite) throws IOException {
+	public static void copyFile(File srcFile, File dstFile, boolean overWrite) throws IOException {
 		if (dstFile.exists()) {
 			if (!overWrite) {
 				throw new IllegalArgumentException("Target file already exists.");

@@ -34,7 +34,7 @@ public enum PlayState {
 		return this.n;
 	}
 	
-	static public PlayState parseN (int number) {
+	public static PlayState parseN (int number) {
 		switch (number) {
 			case 0: return STOPPED;
 			case 1: return PLAYING;

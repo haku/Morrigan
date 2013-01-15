@@ -16,7 +16,7 @@ import java.util.zip.CheckedInputStream;
 public class ChecksumHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	static public long generateCrc32Checksum (String filepath) throws IOException {
+	public static long generateCrc32Checksum (String filepath) throws IOException {
 		FileInputStream fis;
 		BufferedInputStream bis;
 		CheckedInputStream cis;
@@ -50,7 +50,7 @@ public class ChecksumHelper {
 	 * just in case.
 	 * TODO find out if MessageDigest is thread-safe.
 	 */
-	static public ThreadLocal<MessageDigest> mdMd5Factory = new ThreadLocal<MessageDigest>() {
+	public static ThreadLocal<MessageDigest> mdMd5Factory = new ThreadLocal<MessageDigest>() {
 		@Override
 		protected MessageDigest initialValue() {
 			try {
@@ -64,15 +64,15 @@ public class ChecksumHelper {
 
 	public static final int BUFFERSIZE = 1024 * 64; // 64kb.
 
-	static public byte[] createBuffer () {
+	public static byte[] createBuffer () {
 		return new byte[BUFFERSIZE];
 	}
 
-	static public BigInteger generateMd5Checksum (File file) throws IOException {
+	public static BigInteger generateMd5Checksum (File file) throws IOException {
 		return generateMd5Checksum(file, createBuffer());
 	}
 
-	static public BigInteger generateMd5Checksum (File file, byte[] buffer) throws IOException {
+	public static BigInteger generateMd5Checksum (File file, byte[] buffer) throws IOException {
 		MessageDigest md = mdMd5Factory.get();
 		md.reset();
 
@@ -94,11 +94,11 @@ public class ChecksumHelper {
 		}
 	}
 
-	static public ByteBuffer createByteBuffer () {
+	public static ByteBuffer createByteBuffer () {
 		return ByteBuffer.allocateDirect(BUFFERSIZE);
 	}
 
-	static public BigInteger generateMd5Checksum (File file, ByteBuffer buffer) throws IOException {
+	public static BigInteger generateMd5Checksum (File file, ByteBuffer buffer) throws IOException {
 		MessageDigest md = mdMd5Factory.get();
 		md.reset();
 
@@ -124,7 +124,7 @@ public class ChecksumHelper {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	static public String md5String(String text) {
+	public static String md5String(String text) {
 		MessageDigest md = mdMd5Factory.get();
 		md.reset();
 

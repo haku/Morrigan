@@ -19,7 +19,7 @@ package com.vaguehope.morrigan.android.helper;
 public class TimeHelper {
 	
 	@SuppressWarnings("boxing")
-	static public String formatTimeSeconds (long seconds) {
+	public static String formatTimeSeconds (long seconds) {
 //		String s = "0" + x % 60;
 //		s = s.substring(s.length()-2);
 //		int m = (int) Math.floor(x/60f);

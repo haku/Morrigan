@@ -29,7 +29,7 @@ public interface IMixedMediaItem extends IMediaTrack, IMediaPicture {
 			return getHumanName();
 		}
 
-		static public MediaType parseInt (int n) {
+		public static MediaType parseInt (int n) {
 			switch (n) {
 				case 0: return UNKNOWN;
 				case 1: return TRACK;

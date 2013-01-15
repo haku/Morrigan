@@ -172,11 +172,11 @@ public class NemainDate {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	static public NemainDate daysAfterDate (NemainDate ref_date, int nDays) {
+	public static NemainDate daysAfterDate (NemainDate ref_date, int nDays) {
 		return daysAfterDate(ref_date.getYear(), ref_date.getMonth(), ref_date.getDay(), nDays);
 	}
 	
-	static public NemainDate daysAfterDate (int ref_year, int ref_month, int ref_day, int nDays) {
+	public static NemainDate daysAfterDate (int ref_year, int ref_month, int ref_day, int nDays) {
 		Calendar cal = Calendar.getInstance();
 		cal.clear();
 		cal.set(ref_year, ref_month - 1, ref_day);
@@ -186,22 +186,22 @@ public class NemainDate {
 	
 //	- - -
 	
-	static public boolean isDateOnOrAfter (NemainDate query_date, NemainDate ref_date) {
+	public static boolean isDateOnOrAfter (NemainDate query_date, NemainDate ref_date) {
 		return isDateOnOrAfter(query_date.getYear(), query_date.getMonth(), query_date.getDay(),
 				ref_date.getYear(), ref_date.getMonth(), ref_date.getDay());
 	}
 	
-	static public boolean isDateOnOrAfter (NemainDate query_date, int ref_year, int ref_month, int ref_day) {
+	public static boolean isDateOnOrAfter (NemainDate query_date, int ref_year, int ref_month, int ref_day) {
 		return isDateOnOrAfter(query_date.getYear(), query_date.getMonth(), query_date.getDay(),
 				ref_year, ref_month, ref_day);
 	}
 	
-	static public boolean isDateOnOrAfter (int query_year, int query_month, int query_day, NemainDate ref_date) {
+	public static boolean isDateOnOrAfter (int query_year, int query_month, int query_day, NemainDate ref_date) {
 		return isDateOnOrAfter(query_year, query_month, query_day,
 				ref_date.getYear(), ref_date.getMonth(), ref_date.getDay());
 	}
 	
-	static public boolean isDateOnOrAfter (int query_year, int query_month, int query_day, int ref_year, int ref_month, int ref_day) {
+	public static boolean isDateOnOrAfter (int query_year, int query_month, int query_day, int ref_year, int ref_month, int ref_day) {
 		if (query_year == 0) return true; // Is an annual event, so always in the future.
 		
 		if (query_year > ref_year) return true;

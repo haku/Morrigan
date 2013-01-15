@@ -31,7 +31,7 @@ public abstract class AbstractFeed {
 	private static final String FEED = "feed";
 	private static final String FEEDNS = "http://www.w3.org/2005/Atom";
 	
-	static public DataWriter startFeed (PrintWriter out) throws SAXException {
+	public static DataWriter startFeed (PrintWriter out) throws SAXException {
 		AttributesImpl atts = new AttributesImpl();
 		atts.addAttribute("", "xmlns", "", CDATA, FEEDNS);
 		DataWriter dw = startDocument(out, FEED, atts);
@@ -39,21 +39,21 @@ public abstract class AbstractFeed {
 		return dw;
 	}
 	
-	static public void endFeed (DataWriter dw) throws SAXException {
+	public static void endFeed (DataWriter dw) throws SAXException {
 		endDocument(dw, FEED);
 	}
 	
 //	-  -  -  -  -  -  -  -  -  -  -  -
 	
-	static public DataWriter startDocument (PrintWriter out) throws SAXException {
+	public static DataWriter startDocument (PrintWriter out) throws SAXException {
 		return startDocument(out, null, null);
 	}
 	
-	static public DataWriter startDocument (PrintWriter out, String mainElement) throws SAXException {
+	public static DataWriter startDocument (PrintWriter out, String mainElement) throws SAXException {
 		return startDocument(out, mainElement, null);
 	}
 	
-	static public DataWriter startDocument (PrintWriter out, String mainElement, AttributesImpl atts) throws SAXException {
+	public static DataWriter startDocument (PrintWriter out, String mainElement, AttributesImpl atts) throws SAXException {
 		DataWriter dw = new DataWriter(out);
 		
 		// TODO set UTF-8 in header.
@@ -72,30 +72,30 @@ public abstract class AbstractFeed {
 		return dw;
 	}
 	
-	static public void endDocument (DataWriter dw) throws SAXException {
+	public static void endDocument (DataWriter dw) throws SAXException {
 		endDocument(dw, null);
 	}
 	
-	static public void endDocument (DataWriter dw, String mainElement) throws SAXException {
+	public static void endDocument (DataWriter dw, String mainElement) throws SAXException {
 		if (mainElement != null) dw.endElement(mainElement);
 		dw.endDocument();
 	}
 	
 //	-  -  -  -  -  -  -  -  -  -  -  -
 	
-	static public void addElement (DataWriter dw, String newElement, int i) throws SAXException {
+	public static void addElement (DataWriter dw, String newElement, int i) throws SAXException {
 		addElement(dw, newElement, String.valueOf(i));
 	}
 	
-	static public void addElement (DataWriter dw, String newElement, long l) throws SAXException {
+	public static void addElement (DataWriter dw, String newElement, long l) throws SAXException {
 		addElement(dw, newElement, String.valueOf(l));
 	}
 	
-	static public void addElement (DataWriter dw, String newElement, String textContent) throws SAXException {
+	public static void addElement (DataWriter dw, String newElement, String textContent) throws SAXException {
 		dw.dataElement(newElement, textContent);
 	}
 	
-	static public void addElement (DataWriter dw, String newElement, String textContent, String[][] attrs) throws SAXException {
+	public static void addElement (DataWriter dw, String newElement, String textContent, String[][] attrs) throws SAXException {
 		AttributesImpl atts = new AttributesImpl();
 		for (String[] attr : attrs) {
 			String key = attr[0];
@@ -106,11 +106,11 @@ public abstract class AbstractFeed {
 		dw.dataElement("", newElement, null, atts, textContent);
 	}
 	
-	static public void addLink (DataWriter dw, String href, String rel) throws SAXException {
+	public static void addLink (DataWriter dw, String href, String rel) throws SAXException {
 		addLink(dw, href, rel, null);
 	}
 	
-	static public void addLink (DataWriter dw, String href, String rel, String type) throws SAXException {
+	public static void addLink (DataWriter dw, String href, String rel, String type) throws SAXException {
 		AttributesImpl atts = new AttributesImpl();
 		
 		if (rel != null) {
@@ -128,7 +128,7 @@ public abstract class AbstractFeed {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	static public String filenameFromPath (String path) {
+	public static String filenameFromPath (String path) {
 		return path.substring(path.lastIndexOf(File.separator) + 1);
 	}
 	
