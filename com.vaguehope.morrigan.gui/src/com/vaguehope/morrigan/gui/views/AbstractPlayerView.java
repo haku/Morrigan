@@ -8,6 +8,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -38,6 +40,7 @@ import com.vaguehope.morrigan.gui.helpers.ClipboardHelper;
 import com.vaguehope.morrigan.gui.helpers.MonitorHelper;
 import com.vaguehope.morrigan.gui.helpers.RefreshTimer;
 import com.vaguehope.morrigan.gui.helpers.TrayHelper;
+import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
@@ -58,6 +61,8 @@ import com.vaguehope.morrigan.screen.ScreenPainter.TitleProvider;
  */
 public abstract class AbstractPlayerView extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	protected final Logger logger = Logger.getLogger(this.getClass().getName());
 
 	private volatile boolean isDisposed = false;
 
@@ -701,8 +706,8 @@ public abstract class AbstractPlayerView extends ViewPart {
 		try {
 			Activator.getHotkeyRegister().addHotkeyListener(this.hotkeyListener);
 		}
-		catch (Throwable t) {
-			t.printStackTrace();
+		catch (MorriganException e) {
+			this.logger.log(Level.WARNING, "Failed to add hotkey listener.", e);
 		}
 	}
 
@@ -710,8 +715,8 @@ public abstract class AbstractPlayerView extends ViewPart {
 		try {
 			Activator.getHotkeyRegister().removeHotkeyListener(this.hotkeyListener);
 		}
-		catch (Throwable t) {
-			t.printStackTrace();
+		catch (MorriganException e) {
+			this.logger.log(Level.WARNING, "Failed to remove hotkey listener.", e);
 		}
 	}
 

@@ -55,14 +55,13 @@ public class HotkeyPref extends PreferencePage implements IWorkbenchPreferencePa
 	// Read data.
 	private void initialize () {
 		try {
-
 			this.hkShowhide.setValue(getHkShowHide());
 			this.hkStop.setValue(getHkStop());
 			this.hkPlaypause.setValue(getHkPlaypause());
 			this.hkNext.setValue(getHkNext());
 			this.hkJumpto.setValue(getHkJumpto());
-
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			new MorriganMsgDlg(e).open();
 		}
 	}
@@ -106,8 +105,9 @@ public class HotkeyPref extends PreferencePage implements IWorkbenchPreferencePa
 
 		try {
 			Activator.getHotkeyRegister().readConfig(true);
-		} catch (Throwable t) {
-			getShell().getDisplay().asyncExec(new RunnableDialog(t));
+		}
+		catch (Exception e) {
+			getShell().getDisplay().asyncExec(new RunnableDialog(e));
 			return false;
 		}
 

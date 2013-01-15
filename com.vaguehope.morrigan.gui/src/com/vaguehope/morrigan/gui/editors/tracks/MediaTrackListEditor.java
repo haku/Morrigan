@@ -3,6 +3,10 @@ package com.vaguehope.morrigan.gui.editors.tracks;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.NotEnabledException;
+import org.eclipse.core.commands.NotHandledException;
+import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ColumnPixelData;
@@ -28,22 +32,22 @@ import com.vaguehope.morrigan.model.media.IMediaTrackList;
 public abstract class MediaTrackListEditor<T extends IMediaTrackList<S>, S extends IMediaTrack> extends MediaItemListEditor<T, S> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Column definitions.
-	
-	public final MediaColumn 
+
+	public final MediaColumn
 		COL_FILE =       new MediaColumn("file",        new ColumnWeightData(100),            new FileLblProv(this.getImageCache()) );
-	public final MediaColumn 
+	public final MediaColumn
 		COL_COUNTS =     new MediaColumn("counts",      new ColumnPixelData( 70, true, true), new CountsLblProv(),             SWT.CENTER);
-	public final MediaColumn 
+	public final MediaColumn
 		COL_ADDED =      new MediaColumn("added",       new ColumnPixelData(140, true, true), new DateAddedLblProv()           );
-	public final MediaColumn 
+	public final MediaColumn
 		COL_LASTPLAYED = new MediaColumn("last played", new ColumnPixelData(140, true, true), new DateLastPlayerLblProv()      );
-	public final MediaColumn 
+	public final MediaColumn
 		COL_HASH =       new MediaColumn("hash",        new ColumnPixelData( 90, true, true), new HashcodeLblProv(),           SWT.CENTER);
-	public final MediaColumn 
+	public final MediaColumn
 		COL_MODIFIED =   new MediaColumn("modified",    new ColumnPixelData(140, true, true), new DateLastModifiedLblProv()    );
-	public final MediaColumn 
+	public final MediaColumn
 		COL_DURATION =   new MediaColumn("duration",    new ColumnPixelData( 60, true, true), new DurationLblProv(),           SWT.RIGHT);
-	
+
 	public final MediaColumn[] COLS = new MediaColumn[] {
 		this.COL_FILE,
 		this.COL_COUNTS,
@@ -53,7 +57,7 @@ public abstract class MediaTrackListEditor<T extends IMediaTrackList<S>, S exten
 		this.COL_MODIFIED,
 		this.COL_DURATION
 	};
-	
+
 	@Override
 	protected List<MediaColumn> getColumns() {
 		List<MediaColumn> l = new LinkedList<MediaColumn>();
@@ -62,15 +66,15 @@ public abstract class MediaTrackListEditor<T extends IMediaTrackList<S>, S exten
 		}
 		return l;
 	}
-	
+
 	@Override
 	protected boolean isColumnVisible(MediaColumn col) {
 		return MediaListPref.getColPref(this, col);
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Menus and Actions.
-	
+
 //	protected MenuManager getAddToMenu () {
 //		final MenuManager menu = new MenuManager("Add to playlist...");
 //		menu.addMenuListener(new IMenuListener () {
@@ -92,18 +96,28 @@ public abstract class MediaTrackListEditor<T extends IMediaTrackList<S>, S exten
 //		menu.setRemoveAllWhenShown(true);
 //		return menu;
 //	}
-	
+
 	protected IAction addToQueueAction = new Action("Enqueue") {
 		@Override
 		public void run() {
 			IHandlerService handlerService = (IHandlerService) getSite().getService(IHandlerService.class);
 			try {
 				handlerService.executeCommand(AddToQueue.ID, null);
-			} catch (Throwable t) {
-				new MorriganMsgDlg(t).open();
+			}
+			catch (ExecutionException e) {
+				new MorriganMsgDlg(e).open();
+			}
+			catch (NotDefinedException e) {
+				new MorriganMsgDlg(e).open();
+			}
+			catch (NotEnabledException e) {
+				new MorriganMsgDlg(e).open();
+			}
+			catch (NotHandledException e) {
+				new MorriganMsgDlg(e).open();
 			}
 		}
 	};
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
