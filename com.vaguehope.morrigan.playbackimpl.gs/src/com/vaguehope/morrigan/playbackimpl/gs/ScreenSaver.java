@@ -21,7 +21,7 @@ public final class ScreenSaver {
 	private static final String CMD = FILE + " --poke";
 
 	public static boolean pokeScreenSaver () throws IOException {
-		File file = new File(FILE);
+		File file = new File(FILE); // FIXME search $PATH?
 		if (file.exists()) {
 			Process proc = null;
 			try {
