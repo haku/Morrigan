@@ -225,9 +225,9 @@ public class PlaybackEngine implements IPlaybackEngine {
 			this.logger.fine("this.hasVideo=" + this.hasVideo.get());
 			reparentVideo(this.hasVideo.get() ? this.m_videoParent : null, false);
 		}
-		catch (Throwable t) {
+		catch (Exception e) { // NOSONAR Report any error while loading files.
 			setStateAndCallListener(PlayState.Stopped);
-			throw new PlaybackException("Failed to load '"+this.m_filepath+"'.", t);
+			throw new PlaybackException("Failed to load '"+this.m_filepath+"'.", e);
 		}
 		finally {
 			this.playLock.unlock();

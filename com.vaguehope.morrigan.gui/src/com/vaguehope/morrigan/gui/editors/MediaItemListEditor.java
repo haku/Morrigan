@@ -599,9 +599,9 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 				for (S track : getSelectedItems()) {
 					try {
 						removeItem(track);
-					} catch (Throwable t) {
-						// TODO something more useful here.
-						t.printStackTrace();
+					}
+					catch (MorriganException e) {
+						new MorriganMsgDlg(e).open();
 					}
 				}
 			}
@@ -614,9 +614,9 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 			for (S track : getSelectedItems()) {
 				try {
 					getEditorInput().getMediaList().setItemEnabled(track, !track.isEnabled());
-				} catch (Throwable t) {
-					// TODO something more useful here.
-					t.printStackTrace();
+				}
+				catch (MorriganException e) {
+					new MorriganMsgDlg(e).open();
 				}
 			}
 		}

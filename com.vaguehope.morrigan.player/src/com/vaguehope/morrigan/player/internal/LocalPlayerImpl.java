@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -513,8 +514,9 @@ public class LocalPlayerImpl implements LocalPlayer {
 					public void run() {
 						try {
 							item.list.incTrackStartCnt(item.item);
-						} catch (Throwable t) {
-							t.printStackTrace();
+						}
+						catch (MorriganException e) {
+							LocalPlayerImpl.this.logger.log(Level.WARNING, "Failed to increment track count.", e);
 						}
 					}
 				};
@@ -668,8 +670,9 @@ public class LocalPlayerImpl implements LocalPlayer {
 						try {
 							LocalPlayerImpl.this.logger.fine("setting item duration=" + duration);
 							c.list.setTrackDuration(c.item, duration);
-						} catch (Throwable t) {
-							t.printStackTrace();
+						}
+						catch (MorriganException e) {
+							LocalPlayerImpl.this.logger.log(Level.WARNING, "Failed to update track duration.", e);
 						}
 					}
 				}
