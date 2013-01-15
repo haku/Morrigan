@@ -426,7 +426,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 		return (this.playbackEngine != null);
 	}
 
-	synchronized private IPlaybackEngine getPlaybackEngine (boolean create) {
+	private synchronized IPlaybackEngine getPlaybackEngine (boolean create) {
 		if (this.playbackEngine == null && create) {
 			this.playbackEngine = this.playbackEngineFactory.newPlaybackEngine();
 			if (this.playbackEngine == null) throw new RuntimeException("Failed to create playback engine instance.");

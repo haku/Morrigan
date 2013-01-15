@@ -76,10 +76,10 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	abstract public String getType ();
+	public abstract String getType ();
 
 	@Override
-	abstract public String getSerial ();
+	public abstract String getSerial ();
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Dirty state and event listeners.
@@ -87,7 +87,7 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 	private volatile DirtyState dirtyState = DirtyState.CLEAN;
 	protected final List<MediaItemListChangeListener> changeEventListeners = Collections.synchronizedList(new ArrayList<MediaItemListChangeListener>());
 
-	abstract public boolean isCanBeDirty ();
+	public abstract boolean isCanBeDirty ();
 
 	@Override
 	public void setDirtyState (final DirtyState state) {

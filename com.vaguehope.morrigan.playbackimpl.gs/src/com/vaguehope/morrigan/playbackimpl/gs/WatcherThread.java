@@ -15,7 +15,7 @@ public class WatcherThread extends Thread {
 	
 	protected final Logger logger = Logger.getLogger(this.getClass().getName());
 	
-	final private AtomicBoolean watchThreadStop = new AtomicBoolean(false);
+	private final AtomicBoolean watchThreadStop = new AtomicBoolean(false);
 	
 	private int lastPositionSec = -1;
 	private int lastDurationSec = -1;

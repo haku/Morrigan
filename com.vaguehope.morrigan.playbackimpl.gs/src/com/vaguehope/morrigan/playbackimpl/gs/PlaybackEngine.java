@@ -485,8 +485,8 @@ public class PlaybackEngine implements IPlaybackEngine {
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
-	final private Lock watchThreadLock = new ReentrantLock();
-	final private AtomicReference<WatcherThread> watchThread = new AtomicReference<WatcherThread>(null);
+	private final Lock watchThreadLock = new ReentrantLock();
+	private final AtomicReference<WatcherThread> watchThread = new AtomicReference<WatcherThread>(null);
 	
 	private void startWatcherThread () {
 		this.logger.entering(this.getClass().getName(), "startWatcherThread");
