@@ -2,13 +2,13 @@ package com.vaguehope.sqlitewrapper;
 
 public interface IGenericDbLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	public abstract void dispose();
-	
-	public abstract String getDbFilePath();
-	
-	public abstract void commitOrRollBack() throws DbException;
-	public abstract void rollback() throws DbException;
-	
+
+	void dispose();
+
+	String getDbFilePath();
+
+	void commitOrRollBack() throws DbException;
+	void rollback() throws DbException;
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

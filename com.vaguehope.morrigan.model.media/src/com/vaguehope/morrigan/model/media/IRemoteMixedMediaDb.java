@@ -10,7 +10,7 @@ import com.vaguehope.sqlitewrapper.DbException;
 public interface IRemoteMixedMediaDb extends IMixedMediaDb {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	static final String TYPE = "REMOTEMMDB";
+	String TYPE = "REMOTEMMDB";
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

@@ -23,7 +23,7 @@ import com.vaguehope.nemain.model.NemainEvent;
 
 
 public interface CalendarPlotDataSource {
-	
-	public List<NemainEvent> getCalendarEvents (NemainDate firstDate, int dayCount);
-	
+
+	List<NemainEvent> getCalendarEvents (NemainDate firstDate, int dayCount);
+
 }

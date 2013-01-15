@@ -572,7 +572,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 //	Complex actions.
 
 	public interface OrderChangedListener {
-		public void orderChanged (PlaybackOrder newOrder);
+		void orderChanged (PlaybackOrder newOrder);
 	}
 
 	protected class OrderSelectAction extends Action {
