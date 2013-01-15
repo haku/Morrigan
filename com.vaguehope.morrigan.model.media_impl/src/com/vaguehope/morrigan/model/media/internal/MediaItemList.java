@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -22,7 +21,6 @@ import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.MediaItemListChangeListener;
 import com.vaguehope.morrigan.util.FileHelper;
 
-
 public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemList<T> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -33,13 +31,14 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 
 	private final String listId;
 	private final String listName;
-	private final List<T> mediaTracks = new ArrayList<T>();
+	private final List<T> mediaTracks = Collections.synchronizedList(new ArrayList<T>());
 
 	/**
-	 * listId must be unique.  It will be used to identify
-	 * the matching editor.
-	 * @param listId a unique ID.
-	 * @param listName a human-readable title for this list.
+	 * listId must be unique. It will be used to identify the matching editor.
+	 * @param listId
+	 *            a unique ID.
+	 * @param listName
+	 *            a human-readable title for this list.
 	 */
 	protected MediaItemList (String listId, String listName) {
 		if (listId == null) throw new IllegalArgumentException("listId can not be null.");
@@ -85,8 +84,8 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Dirty state and event listeners.
 
-	private DirtyState dirtyState = DirtyState.CLEAN;
-	final protected List<MediaItemListChangeListener> changeEventListeners = new LinkedList<MediaItemListChangeListener>();
+	private volatile DirtyState dirtyState = DirtyState.CLEAN;
+	protected final List<MediaItemListChangeListener> changeEventListeners = Collections.synchronizedList(new ArrayList<MediaItemListChangeListener>());
 
 	abstract public boolean isCanBeDirty ();
 
@@ -115,26 +114,26 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 		this.changeEventListeners.remove(listener);
 	}
 
-	private final MediaItemListChangeListener changeCaller = new MediaItemListChangeListener () {
+	private final MediaItemListChangeListener changeCaller = new MediaItemListChangeListener() {
 
 		@Override
-		public void eventMessage(String msg) {
-			if (MediaItemList.this.logger.isLoggable(Level.FINEST)) MediaItemList.this.logger.finest(getListName() +  " eventMessage=" + msg);
+		public void eventMessage (String msg) {
+			if (MediaItemList.this.logger.isLoggable(Level.FINEST)) MediaItemList.this.logger.finest(getListName() + " eventMessage=" + msg);
 			for (MediaItemListChangeListener listener : MediaItemList.this.changeEventListeners) {
 				listener.eventMessage(msg);
 			}
 		}
 
 		@Override
-		public void dirtyStateChanged(DirtyState oldState, DirtyState newState) {
-			if (MediaItemList.this.logger.isLoggable(Level.FINEST)) MediaItemList.this.logger.finest(getListName() +  " oldState=" + oldState + " newState=" + newState);
+		public void dirtyStateChanged (DirtyState oldState, DirtyState newState) {
+			if (MediaItemList.this.logger.isLoggable(Level.FINEST)) MediaItemList.this.logger.finest(getListName() + " oldState=" + oldState + " newState=" + newState);
 			for (MediaItemListChangeListener listener : MediaItemList.this.changeEventListeners) {
 				listener.dirtyStateChanged(oldState, newState);
 			}
 		}
 
 		@Override
-		public void mediaListRead() {
+		public void mediaListRead () {
 			if (MediaItemList.this.logger.isLoggable(Level.FINEST)) MediaItemList.this.logger.finest(getListName());
 			for (MediaItemListChangeListener listener : MediaItemList.this.changeEventListeners) {
 				listener.mediaListRead();
@@ -142,32 +141,32 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 		}
 
 		@Override
-		public void mediaItemsAdded(IMediaItem... items) {
-			if (MediaItemList.this.logger.isLoggable(Level.FINEST)) MediaItemList.this.logger.finest(getListName() +  " " + Arrays.toString(items));
+		public void mediaItemsAdded (IMediaItem... items) {
+			if (MediaItemList.this.logger.isLoggable(Level.FINEST)) MediaItemList.this.logger.finest(getListName() + " " + Arrays.toString(items));
 			for (MediaItemListChangeListener listener : MediaItemList.this.changeEventListeners) {
 				listener.mediaItemsAdded(items);
 			}
 		}
 
 		@Override
-		public void mediaItemsRemoved(IMediaItem... items) {
-			if (MediaItemList.this.logger.isLoggable(Level.FINEST)) MediaItemList.this.logger.finest(getListName() +  " " + Arrays.toString(items));
+		public void mediaItemsRemoved (IMediaItem... items) {
+			if (MediaItemList.this.logger.isLoggable(Level.FINEST)) MediaItemList.this.logger.finest(getListName() + " " + Arrays.toString(items));
 			for (MediaItemListChangeListener listener : MediaItemList.this.changeEventListeners) {
 				listener.mediaItemsRemoved(items);
 			}
 		}
 
 		@Override
-		public void mediaItemsUpdated(IMediaItem... items) {
-			if (MediaItemList.this.logger.isLoggable(Level.FINEST)) MediaItemList.this.logger.finest(getListName() +  " " + Arrays.toString(items));
+		public void mediaItemsUpdated (IMediaItem... items) {
+			if (MediaItemList.this.logger.isLoggable(Level.FINEST)) MediaItemList.this.logger.finest(getListName() + " " + Arrays.toString(items));
 			for (MediaItemListChangeListener listener : MediaItemList.this.changeEventListeners) {
 				listener.mediaItemsUpdated(items);
 			}
 		}
 
 		@Override
-		public void mediaItemsForceReadRequired(IMediaItem... items) {
-			if (MediaItemList.this.logger.isLoggable(Level.FINEST)) MediaItemList.this.logger.finest(getListName() +  " " + Arrays.toString(items));
+		public void mediaItemsForceReadRequired (IMediaItem... items) {
+			if (MediaItemList.this.logger.isLoggable(Level.FINEST)) MediaItemList.this.logger.finest(getListName() + " " + Arrays.toString(items));
 			for (MediaItemListChangeListener listener : MediaItemList.this.changeEventListeners) {
 				listener.mediaItemsForceReadRequired(items);
 			}
@@ -193,7 +192,7 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 	 * Returns an unmodifiable list of the playlist items.
 	 */
 	@Override
-	public List<T> getMediaItems() {
+	public List<T> getMediaItems () {
 		return Collections.unmodifiableList(this.mediaTracks);
 	}
 
@@ -206,32 +205,25 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 	}
 
 	/**
-	 * 
-	 * @param newTracks
-	 * @return items that are removed.
-	 */
-	protected List<T> replaceList (List<T> newTracks) {
-		List<T> ret = updateList(this.mediaTracks, newTracks);
-		setDirtyState(DirtyState.DIRTY);
-		return ret;
-	}
-
-	/**
-	 * Use this variant when you are about to to re-query the DB anyway
-	 * and don't want to do two successive updates.
+	 * Use this variant when you are about to to re-query the DB anyway and
+	 * don't want to do two successive updates.
 	 * @param newTracks
 	 * @return items that are removed.
 	 */
 	protected List<T> replaceListWithoutSetDirty (List<T> newTracks) {
-		return updateList(this.mediaTracks, newTracks, false);
+		synchronized (this.mediaTracks) {
+			return updateList(this.mediaTracks, newTracks, false);
+		}
 	}
 
 	@Override
 	public void addItem (T track) {
-		if (allowDuplicateEntries() || !this.mediaTracks.contains(track)) {
-			this.mediaTracks.add(track);
-			getChangeEventCaller().mediaItemsAdded(track);
-			setDirtyState(DirtyState.DIRTY);
+		synchronized (this.mediaTracks) {
+			if (allowDuplicateEntries() || !this.mediaTracks.contains(track)) {
+				this.mediaTracks.add(track);
+				getChangeEventCaller().mediaItemsAdded(track);
+				setDirtyState(DirtyState.DIRTY);
+			}
 		}
 	}
 
@@ -240,9 +232,11 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 	 */
 	@Override
 	public void removeItem (T track) throws MorriganException {
-		this.mediaTracks.remove(track);
-		getChangeEventCaller().mediaItemsRemoved(track);
-		setDirtyState(DirtyState.DIRTY);
+		synchronized (this.mediaTracks) {
+			this.mediaTracks.remove(track);
+			getChangeEventCaller().mediaItemsRemoved(track);
+			setDirtyState(DirtyState.DIRTY);
+		}
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -318,15 +312,16 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 				+ mi.getFilepath().substring(mi.getFilepath().lastIndexOf(File.separatorChar) + 1));
 
 		if (!targetFile.exists()) {
-			System.err.println("Copying '"+mi.getFilepath()+"' to '"+targetFile.getAbsolutePath()+"'...");
+			System.err.println("Copying '" + mi.getFilepath() + "' to '" + targetFile.getAbsolutePath() + "'...");
 			try {
 				FileHelper.copyFile(new File(mi.getFilepath()), targetFile);
-			} catch (IOException e) {
+			}
+			catch (IOException e) {
 				throw new MorriganException(e);
 			}
 		}
 		else {
-			System.err.println("Skipping '"+targetFile.getAbsolutePath()+"' as it already exists.");
+			System.err.println("Skipping '" + targetFile.getAbsolutePath() + "' as it already exists.");
 		}
 
 		return targetFile;
@@ -337,7 +332,7 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 
 	@Override
 	public T getItemByFilePath (String path) {
-		Map<String, T> map = new HashMap<String, T>();
+		Map<String, T> map = new HashMap<String, T>(this.mediaTracks.size());
 		for (T item : this.mediaTracks) {
 			map.put(item.getFilepath(), item);
 		}
@@ -348,79 +343,66 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 
 	@Override
 	public String toString () {
-		return this.listName + " ("+this.mediaTracks.size()+" items)";
+		return this.listName + " (" + this.mediaTracks.size() + " items)";
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Typed helper methods.
-
-	public List<T> updateList (List<T> keepList, List<T> freshList) {
-		return updateList(keepList, freshList, true);
-	}
+//	Static helper methods.
 
 	/**
-	 * Update keepList without replacing any equivalent
-	 * objects.  Instead copy the data from the new
-	 * object the old one.  This is to work around how
-	 * a GUI list uses a data provider.
-	 * 
+	 * Update keepList without replacing any equivalent objects. Instead copy
+	 * the data from the new object the old one. This is to work around how a
+	 * GUI list uses a data provider.
+	 *
 	 * @param keepList
 	 * @param freshList
 	 * @return items that were removed from keepList.
 	 */
-	public List<T> updateList (List<T> keepList, List<T> freshList, boolean updateKeepList) {
+	protected static <T extends IMediaItem> List<T> updateList (List<T> keepList, List<T> freshList, boolean updateKeepList) {
 		List<T> finalList = new ArrayList<T>();
 
-		synchronized (keepList) {
-			synchronized (freshList) {
+		// This block takes no time.
+		Map<String, T> keepMap = new HashMap<String, T>(keepList.size());
+		for (T e : keepList) {
+			keepMap.put(e.getFilepath(), e);
+		}
 
-				// This block takes no time.
-				Map<String,T> keepMap = new HashMap<String,T>(keepList.size());
-				for (T e : keepList) {
-					keepMap.put(e.getFilepath(), e);
-				}
-
-				// This block is very quick.
-				for (T newItem : freshList) {
-					T oldItem = keepMap.get(newItem.getFilepath());
-					if (oldItem != null) {
-						if (oldItem != newItem) oldItem.setFromMediaItem(newItem);
-						finalList.add(oldItem);
-					} else {
-						finalList.add(newItem);
-					}
-				}
-
-				// System.err.println("Replacing " + keepList.size() + " items with " + finalList.size() + " items.");
-
-				/* Create a new list and populate it with the
-				 * items removed.
-				 */
-				List<T> removedItems = new ArrayList<T>();
-				keepMap = new HashMap<String,T>(keepList.size());
-				for (T e : finalList) {
-					keepMap.put(e.getFilepath(), e);
-				}
-				for (T e : keepList) {
-					if (!keepMap.containsKey(e.getFilepath())) {
-						removedItems.add(e);
-					}
-				}
-
-				// System.err.println("Removed " + removedItems.size() + " items.");
-
-				/* Update the keep list.  We need to modify
-				 * the passed in list, not return a new one.
-				 * This block takes no time.
-				 */
-				if (updateKeepList) {
-					keepList.clear();
-					keepList.addAll(finalList);
-				}
-
-				return removedItems;
+		// This block is very quick.
+		for (T newItem : freshList) {
+			T oldItem = keepMap.get(newItem.getFilepath());
+			if (oldItem != null) {
+				if (oldItem != newItem) oldItem.setFromMediaItem(newItem);
+				finalList.add(oldItem);
+			}
+			else {
+				finalList.add(newItem);
 			}
 		}
+
+		/*
+		 * Create a new list and populate it with the items removed.
+		 */
+		List<T> removedItems = new ArrayList<T>();
+		keepMap = new HashMap<String, T>(keepList.size());
+		for (T e : finalList) {
+			keepMap.put(e.getFilepath(), e);
+		}
+		for (T e : keepList) {
+			if (!keepMap.containsKey(e.getFilepath())) {
+				removedItems.add(e);
+			}
+		}
+
+		/*
+		 * Update the keep list. We need to modify the passed in list, not
+		 * return a new one. This block takes no time.
+		 */
+		if (updateKeepList) {
+			keepList.clear();
+			keepList.addAll(finalList);
+		}
+
+		return removedItems;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

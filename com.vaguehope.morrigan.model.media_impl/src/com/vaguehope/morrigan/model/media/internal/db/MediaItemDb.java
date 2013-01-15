@@ -5,7 +5,6 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -262,9 +261,9 @@ implements IMediaItemDb<S, T> {
 	@Override
 	public List<T> getAllDbEntries () throws DbException {
 		// Now that MediaItem classes are shared via factory, this may no longer be needed.
-		ArrayList<T> copyOfMainList = new ArrayList<T>(getMediaItems());
+		List<T> copyOfMainList = new ArrayList<T>(getMediaItems());
 		List<T> allList = this.dbLayer.getAllMedia(this.dbLayer.getDefaultSortColumn(), SortDirection.ASC, false);
-		updateList(copyOfMainList, allList);
+		updateList(copyOfMainList, allList, true);
 		return copyOfMainList;
 	}
 
@@ -754,7 +753,7 @@ implements IMediaItemDb<S, T> {
 	 */
 	@Override
 	public List<T> addFiles (List<File> files) throws MorriganException, DbException {
-		List<T> ret = new LinkedList<T>();
+		List<T> ret = new ArrayList<T>();
 		boolean[] res = this.dbLayer.addFiles(files);
 		for (int i = 0; i < files.size(); i++) {
 			if (res[i]) {
