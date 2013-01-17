@@ -185,7 +185,7 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMe
 				try {
 					this.playbackEngine = this.playbackEngineFactory.newPlaybackEngine();
 				}
-				catch (Throwable e) {
+				catch (Exception e) { // NOSONAR misconfiguration could easily cause newPlaybackEngine() to throw, so be cautious.
 					return new OpResult("Failed to create playback engine instance.", e, true);
 				}
 			}
@@ -194,9 +194,8 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMe
 				int d = this.playbackEngine.readFileDuration(item.getFilepath());
 				if (d > 0) list.setTrackDuration(item, d);
 			}
-			catch (Throwable t) {
-				// FIXME log this somewhere useful.
-				return new OpResult("Error while reading metadata for '" + item.getFilepath() + "'.", t);
+			catch (Exception e) { // NOSONAR strange errors reading files should be reported to the user.
+				return new OpResult("Error while reading metadata for '" + item.getFilepath() + "'.", e);
 			}
 
 			return null;
@@ -208,9 +207,8 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMe
 					list.setPictureWidthAndHeight(item, d.width, d.height);
 				}
 			}
-			catch (Throwable t) {
-				// FIXME log this somewhere useful.
-				return new OpResult("Error while reading metadata for '" + item.getFilepath() + "'.", t);
+			catch (Exception e) { // NOSONAR strange errors reading files should be reported to the user.
+				return new OpResult("Error while reading metadata for '" + item.getFilepath() + "'.", e);
 			}
 
 			return null;
