@@ -35,10 +35,9 @@ public class MorriganServer {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public MorriganServer (BundleContext context, PlayerReader playerListener, MediaFactory mediaFactory, AsyncTasksRegister asyncTasksRegister, AsyncActions asyncActions) throws MorriganException {
+	public MorriganServer (BundleContext context, ServerConfig config, PlayerReader playerListener, MediaFactory mediaFactory, AsyncTasksRegister asyncTasksRegister, AsyncActions asyncActions) throws MorriganException {
 		try {
 			// Config.
-			ServerConfig config = new ServerConfig();
 			this.serverPort = config.getServerPort();
 
 			// Jetty server instance.
