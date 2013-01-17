@@ -33,14 +33,15 @@ public class Activator extends AbstractUIPlugin {
 
 	@Override
 	public void start(BundleContext bundleContext) throws Exception {
+		if (Activator.plugin != null || Activator.context != null) throw new IllegalStateException("Bundle is already started.");
+		Activator.plugin = this;
+		Activator.context = bundleContext;
+
 		super.start(bundleContext);
 
 		this.mediaFactoryTracker = new MediaFactoryTracker(bundleContext);
 		this.hotkeyEngineFactoryTracker = new HotkeyEngineFactoryTracker(bundleContext);
 		this.hotkeyRegister = new HotkeyRegister(this.hotkeyEngineFactoryTracker);
-
-		Activator.plugin = this;
-		Activator.context = bundleContext;
 	}
 
 	@Override
