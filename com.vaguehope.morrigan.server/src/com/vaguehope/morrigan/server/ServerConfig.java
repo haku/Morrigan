@@ -21,7 +21,7 @@ public class ServerConfig implements AuthChecker {
 	private static final String DEFAULT_PASS = "Morrigan";
 
 	private static final String KEY_PLAYBACKORDER = "order";
-	private static final PlaybackOrder DEFAULT_PLAYBACKORDER = PlaybackOrder.STOP;
+	private static final PlaybackOrder DEFAULT_PLAYBACKORDER = PlaybackOrder.MANUAL;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

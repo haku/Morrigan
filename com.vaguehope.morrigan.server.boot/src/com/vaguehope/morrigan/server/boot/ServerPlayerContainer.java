@@ -55,7 +55,7 @@ class ServerPlayerContainer implements PlayerContainer {
 		}
 		catch (IOException e) {
 			this.logger.log(Level.WARNING, "Failed to read playback order from config.", e);
-			player.setPlaybackOrder(PlaybackOrder.STOP);
+			player.setPlaybackOrder(PlaybackOrder.MANUAL);
 		}
 	}
 

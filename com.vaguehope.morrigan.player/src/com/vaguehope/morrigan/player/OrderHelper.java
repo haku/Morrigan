@@ -50,7 +50,7 @@ public final class OrderHelper {
 			}
 		},
 
-		STOP(4) {
+		MANUAL(4) {
 			@Override
 			public String toString () {
 				return "manual";
@@ -124,7 +124,7 @@ public final class OrderHelper {
 			case BYLASTPLAYED:
 				return getNextTrackByLastPlayedDate(list, track);
 
-			case STOP:
+			case MANUAL:
 				return null;
 
 			default:
