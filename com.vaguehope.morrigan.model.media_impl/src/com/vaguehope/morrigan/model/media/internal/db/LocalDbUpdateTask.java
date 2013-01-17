@@ -37,19 +37,19 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 
 	protected class OpResult {
 
-		private final Throwable t;
+		private final Exception e;
 		private final String msg;
 		private final boolean faital;
 
-		public OpResult (String msg, Throwable t) {
+		public OpResult (String msg, Exception e) {
 			this.msg = msg;
-			this.t = t;
+			this.e = e;
 			this.faital = false;
 		}
 
-		public OpResult (String msg, Throwable t, boolean faital) {
+		public OpResult (String msg, Exception e, boolean faital) {
 			this.msg = msg;
-			this.t = t;
+			this.e = e;
 			this.faital = faital;
 		}
 
@@ -57,8 +57,8 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 			return this.msg;
 		}
 
-		public Throwable getThrowable () {
-			return this.t;
+		public Exception getException () {
+			return this.e;
 		}
 
 		public boolean isFaital () {
@@ -154,8 +154,8 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 				}
 			}
 		}
-		catch (Throwable t) {
-			ret = new TaskResult(TaskOutcome.FAILED, "Throwable while updating.", t);
+		catch (Exception e) {
+			ret = new TaskResult(TaskOutcome.FAILED, "Error while updating.", e);
 		}
 
 		this.setFinished();
@@ -294,9 +294,8 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 						taskEventListener.logMsg(this.itemList.getListName(), "[FOUND] " + mi.getFilepath());
 						this.itemList.setItemMissing(mi, false);
 					}
-					catch (Throwable t) {
-						// FIXME log this somewhere useful.
-						taskEventListener.logMsg(this.itemList.getListName(), "Throwable while marking file as found '" + mi.getFilepath() + "': " + t.getMessage());
+					catch (Exception e) {
+						taskEventListener.logError(this.itemList.getListName(), "Error while marking file as found '" + mi.getFilepath() + "': " + e.getMessage(), e);
 					}
 				}
 
@@ -316,10 +315,8 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 					try {
 						this.itemList.setItemDateLastModified(mi, new Date(lastModified));
 					}
-					catch (Throwable t) {
-						// FIXME log this somewhere useful.
-						taskEventListener.logMsg(this.itemList.getListName(), "Throwable while writing file last modified date '" + mi.getFilepath() + "': " + t.getMessage());
-						t.printStackTrace();
+					catch (Exception e) {
+						taskEventListener.logError(this.itemList.getListName(), "Error while writing file last modified date '" + mi.getFilepath() + "': " + e.getMessage(), e);
 					}
 
 					changedItems.add(mi);
@@ -334,20 +331,16 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 					try {
 						hash = ChecksumHelper.generateMd5Checksum(file, byteBuffer); // This is slow.
 					}
-					catch (Throwable t) {
-						// FIXME log this somewhere useful.
-						taskEventListener.logMsg(this.itemList.getListName(), "Throwable while generating checksum for '" + mi.getFilepath() + ": " + t.getMessage());
-						t.printStackTrace();
+					catch (Exception e) {
+						taskEventListener.logError(this.itemList.getListName(), "Error while generating checksum for '" + mi.getFilepath() + ": " + e.getMessage(), e);
 					}
 
 					if (hash != null && !hash.equals(BigInteger.ZERO)) {
 						try {
 							this.itemList.setItemHashCode(mi, hash);
 						}
-						catch (Throwable t) {
-							// FIXME log this somewhere useful.
-							taskEventListener.logMsg(this.itemList.getListName(), "Throwable while setting hash code for '" + mi.getFilepath() + "' to '" + hash + "': " + t.getMessage());
-							t.printStackTrace();
+						catch (Exception e) {
+							taskEventListener.logError(this.itemList.getListName(), "Error while setting hash code for '" + mi.getFilepath() + "' to '" + hash + "': " + e.getMessage(), e);
 						}
 					}
 
@@ -359,9 +352,8 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 						taskEventListener.logMsg(this.itemList.getListName(), "[MISSING] " + mi.getFilepath());
 						this.itemList.setItemMissing(mi, true);
 					}
-					catch (Throwable t) {
-						// FIXME log this somewhere useful.
-						taskEventListener.logMsg(this.itemList.getListName(), "Throwable while marking file as missing '" + mi.getFilepath() + "': " + t.getMessage());
+					catch (Exception e) {
+						taskEventListener.logError(this.itemList.getListName(), "Error while marking file as missing '" + mi.getFilepath() + "': " + e.getMessage(), e);
 					}
 				}
 			}
@@ -580,11 +572,10 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 							OpResult ret = readTrackMetaData1(this.itemList, mi, file);
 							if (ret != null) {
 								if (ret.isFaital()) {
-									throw ret.getThrowable();
+									throw ret.getException();
 								}
 
-								// FIXME log this somewhere useful.
-								taskEventListener.logError(this.itemList.getListName(), "Error while reading metadata for '" + mi.getFilepath() + "'.", ret.getThrowable());
+								taskEventListener.logError(this.itemList.getListName(), "Error while reading metadata for '" + mi.getFilepath() + "'.", ret.getException());
 
 								// Tag track as unreadable.
 								//library.markAsUnreadabled(mi); // FIXME what if the user wants to try again?
@@ -604,15 +595,15 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 				}
 			} // End file metadata scanning.
 		}
-		catch (Throwable t) {
-			throw new MorriganException("Faital error while reading metadata.", t);
+		catch (Exception e) {
+			throw new MorriganException("Faital error while reading metadata.", e);
 		}
 		finally {
 			try {
 				cleanUpAfterTrackMetaData1();
 			}
-			catch (Throwable t) {
-				t.printStackTrace();
+			catch (Exception e) {
+				taskEventListener.logError(this.itemList.getListName(), "Failed to clean up after track-metadata-1.", e);
 			}
 		}
 
@@ -646,9 +637,8 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 					readTrackMetaData2(this.itemList, mlt, file);
 				}
 			}
-			catch (Throwable t) {
-				taskEventListener.logError(this.itemList.getListName(), "Error while reading more metadata for '" + mlt.getFilepath() + "'.", t);
-				t.printStackTrace();
+			catch (Exception e) {
+				taskEventListener.logError(this.itemList.getListName(), "Error while reading more metadata for '" + mlt.getFilepath() + "'.", e);
 			}
 
 			n++;
