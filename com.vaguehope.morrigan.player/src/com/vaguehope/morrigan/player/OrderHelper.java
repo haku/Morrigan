@@ -48,7 +48,15 @@ public final class OrderHelper {
 			public String toString () {
 				return "by last-played";
 			}
-		};
+		},
+
+		STOP(4) {
+			@Override
+			public String toString () {
+				return "manual";
+			}
+		}
+		;
 
 		private int n;
 
@@ -58,6 +66,15 @@ public final class OrderHelper {
 
 		public int getN () {
 			return this.n;
+		}
+
+		public static String joinLabels (String sep) {
+			PlaybackOrder[] a = values();
+			StringBuilder b = new StringBuilder(a[0].toString());
+			for (int i = 1; i < a.length; i++) {
+				b.append(sep).append(a[i].toString());
+			}
+			return b.toString();
 		}
 
 	}
@@ -96,6 +113,9 @@ public final class OrderHelper {
 
 			case BYLASTPLAYED:
 				return getNextTrackByLastPlayedDate(list, track);
+
+			case STOP:
+				return null;
 
 			default:
 				throw new IllegalArgumentException();
