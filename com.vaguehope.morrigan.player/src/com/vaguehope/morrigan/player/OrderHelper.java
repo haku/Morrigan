@@ -88,6 +88,16 @@ public final class OrderHelper {
 		throw new IllegalArgumentException("Unknown order mode toString: " + s);
 	}
 
+	public static PlaybackOrder forceParsePlaybackOrder (String s) {
+		String arg = s.toLowerCase();
+		for (PlaybackOrder o : PlaybackOrder.values()) {
+			if (o.toString().toLowerCase().contains(arg)) {
+				return o;
+			}
+		}
+		return null;
+	}
+
 	public static PlaybackOrder parsePlaybackOrderByName (String s) {
 		for (PlaybackOrder o : PlaybackOrder.values()) {
 			if (s.equals(o.name())) return o;

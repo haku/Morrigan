@@ -6,11 +6,11 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
 import com.vaguehope.morrigan.model.media.MediaFactoryTracker;
-import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayerContainer;
 import com.vaguehope.morrigan.player.PlayerReaderTracker;
 import com.vaguehope.morrigan.server.AsyncActions;
 import com.vaguehope.morrigan.server.MorriganServer;
+import com.vaguehope.morrigan.server.ServerConfig;
 import com.vaguehope.morrigan.tasks.AsyncTasksRegisterTracker;
 
 public class Activator implements BundleActivator {
@@ -36,11 +36,12 @@ public class Activator implements BundleActivator {
 		this.mediaFactoryTracker = new MediaFactoryTracker(context);
 		this.asyncTasksRegisterTracker = new AsyncTasksRegisterTracker(context);
 
+		ServerConfig config = new ServerConfig();
 		this.uiMgr = new UiMgr();
 		this.nullScreen = new NullScreen(this.uiMgr);
-		this.playerContainer = new ServerPlayerContainer(this.uiMgr, this.nullScreen, PlaybackOrder.RANDOM);
+		this.playerContainer = new ServerPlayerContainer(this.uiMgr, this.nullScreen, config);
 		AsyncActions asyncActions = new AsyncActions(this.asyncTasksRegisterTracker, this.mediaFactoryTracker);
-		this.server = new MorriganServer(context, this.playerReaderTracker, this.mediaFactoryTracker, this.asyncTasksRegisterTracker, asyncActions);
+		this.server = new MorriganServer(context, config, this.playerReaderTracker, this.mediaFactoryTracker, this.asyncTasksRegisterTracker, asyncActions);
 		this.server.start();
 
 		context.registerService(PlayerContainer.class, this.playerContainer, null);
