@@ -83,6 +83,7 @@ Players = {};
   function updatePlayerDisplay(playerDiv, player, detailed) {
     $('.name', playerDiv).text(player.name);
     $('.state', playerDiv).text(player.stateName);
+    $('.order', playerDiv).text(player.playOrderTitle);
     $('.list', playerDiv).text(player.listTitle);
 
     if (detailed === true) {
@@ -120,6 +121,7 @@ Players = {};
     textBlock.append(mainRow);
     topRow.append($('<span class="name">'));
     topRow.append($('<span class="state">'));
+    topRow.append($('<span class="order">'));
     topRow.append($('<span class="list">'));
     topRow.append($('<span class="status">'));
     mainRow.append($('<span class="title">'));
@@ -214,6 +216,10 @@ Players = {};
     player.title = node.find('title').text();
     player.state = node.find('playstate').text();
     player.stateName = playerStateToLabel(parseInt(player.state));
+
+    player.playOrder = node.find('playorder').text();
+    player.playOrderTitle = node.find('playordertitle').text();
+
     player.trackTitle = node.find('tracktitle').text();
     player.listTitle = node.find('listtitle').text();
     if (player.listTitle === "null") {
