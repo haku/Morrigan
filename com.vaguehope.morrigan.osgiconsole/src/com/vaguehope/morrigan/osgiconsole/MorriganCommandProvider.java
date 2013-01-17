@@ -18,9 +18,9 @@ import com.vaguehope.morrigan.model.media.IMediaTrackList;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaListReference;
-import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayItem;
+import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayerReader;
 import com.vaguehope.morrigan.server.AsyncActions;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbHelper;
@@ -63,7 +63,7 @@ public class MorriganCommandProvider implements CommandProvider {
 				"\tmn [player|p] 0 [play|queue] [<q1> [<q2>]]\n" +
 				"\tmn [player|p] 0 [queue|q] clear\n" +
 				"\tmn [player|p] 0 [pause|stop|next]\n" +
-				"\tmn [player|p] 0 [order|o] [<order>]\n" +
+				"\tmn [player|p] 0 [order|o] [" + PlaybackOrder.joinLabels("|") + "]\n" +
 				"\tmn play [<q1> [<q2>]]\n" +
 				"\tmn [queue|q] [<q1> [<q2>]|clear]\n" +
 				"\tmn [pause|stop|s|next|n]\n" +
