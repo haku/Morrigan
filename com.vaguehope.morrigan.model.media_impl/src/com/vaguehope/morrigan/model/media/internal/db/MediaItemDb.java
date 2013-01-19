@@ -160,12 +160,6 @@ implements IMediaItemDb<S, T> {
 		return super.getMediaItems();
 	}
 
-	@Override
-	public T getItemByFilePath (String path) {
-		if (!isRead()) throw new IllegalStateException("DB has not been loaded.");
-		return super.getItemByFilePath(path);
-	}
-
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private boolean firstRead = true;
