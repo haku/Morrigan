@@ -13,9 +13,9 @@ public class MediaListReferenceImpl implements MediaListReference {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	public MediaListReferenceImpl (MediaListType type, String identifier, String title) {
-		if (this.type == null) throw new IllegalArgumentException("type is required.");
-		if (this.identifier == null) throw new IllegalArgumentException("identifier is required.");
-		if (this.title == null) throw new IllegalArgumentException("title is required.");
+		if (type == null) throw new IllegalArgumentException("type is required.");
+		if (identifier == null) throw new IllegalArgumentException("identifier is required.");
+		if (title == null) throw new IllegalArgumentException("title is required.");
 		this.type = type;
 		this.identifier = identifier;
 		this.title = title;
