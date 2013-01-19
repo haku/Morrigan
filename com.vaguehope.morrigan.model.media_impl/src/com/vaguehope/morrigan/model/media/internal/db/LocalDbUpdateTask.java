@@ -4,7 +4,6 @@ import java.io.File;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -169,11 +168,11 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 
 	private TaskResult scanLibraryDirectories (TaskEventListener taskEventListener) throws DbException, MorriganException {
 		taskEventListener.subTask("Scanning sources");
-		long startTime = System.currentTimeMillis();
+		final long startTime = System.currentTimeMillis();
 
-		List<String> supportedFormats;
+		Set<String> supportedFormats;
 		try {
-			supportedFormats = Arrays.asList(getItemFileExtensions());
+			supportedFormats = getItemFileExtensions();
 		}
 		catch (MorriganException e) {
 			taskEventListener.done();
@@ -257,7 +256,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 		return null;
 	}
 
-	protected abstract String[] getItemFileExtensions () throws MorriganException;
+	protected abstract Set<String> getItemFileExtensions () throws MorriganException;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

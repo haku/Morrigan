@@ -3,9 +3,10 @@ package com.vaguehope.morrigan.model.media.internal.db.mmdb;
 import java.awt.Dimension;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -74,30 +75,25 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMe
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private Map<String, Void> ext_track;
-	private Map<String, Void> ext_picture;
+	private Set<String> trackExts;
+	private Set<String> pictureExts;
 
 	@Override
-	protected String[] getItemFileExtensions () throws MorriganException {
-		String[] mediaFileTypes = Config.getMediaFileTypes();
-		String[] pictureFileTypes = Config.getPictureFileTypes();
-
-		this.ext_track = new HashMap<String, Void>();
-		this.ext_picture = new HashMap<String, Void>();
-
-		String[] ret = new String[mediaFileTypes.length + pictureFileTypes.length];
-		int i = 0;
-		for (String a : mediaFileTypes) {
-			ret[i] = a;
-			i++;
-			this.ext_track.put(a, null);
+	protected Set<String> getItemFileExtensions () throws MorriganException {
+		this.trackExts = new HashSet<String>();
+		for (String a : Config.getMediaFileTypes()) {
+			this.trackExts.add(a);
 		}
-		for (String a : pictureFileTypes) {
-			ret[i] = a;
-			i++;
-			this.ext_picture.put(a, null);
+
+		this.pictureExts = new HashSet<String>();
+		for (String a : Config.getPictureFileTypes()) {
+			this.pictureExts.add(a);
 		}
-		return ret;
+
+		Set<String> ret = new HashSet<String>();
+		ret.addAll(this.trackExts);
+		ret.addAll(this.pictureExts);
+		return Collections.unmodifiableSet(ret);
 	}
 
 	@Override
@@ -164,11 +160,11 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMe
 			String ext = item.getFilepath();
 			ext = ext.substring(ext.lastIndexOf('.') + 1).toLowerCase();
 
-			if (this.ext_track.containsKey(ext)) {
+			if (this.trackExts.contains(ext)) {
 				library.setItemMediaType(item, MediaType.TRACK);
 				return shouldTrackMetaData1(taskEventListener, library, item);
 			}
-			if (this.ext_picture.containsKey(ext)) {
+			if (this.pictureExts.contains(ext)) {
 				library.setItemMediaType(item, MediaType.PICTURE);
 				return shouldTrackMetaData1(taskEventListener, library, item);
 			}
