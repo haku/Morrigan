@@ -16,6 +16,7 @@ import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
+import com.vaguehope.morrigan.model.media.MediaAlbum;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaListReference;
 import com.vaguehope.morrigan.player.OrderHelper;
@@ -59,6 +60,7 @@ public class MorriganCommandProvider implements CommandProvider {
 				"\tmn [media|m] [add|a] <dir> <q1>\n" +
 				"\tmn [media|m] [update|u] <q1>\n" +
 				"\tmn [media|m] [sync|s] <remote q1> <local q1>\n" +
+				"\tmn [media|m] albums <q1>\n" +
 				"\tmn [media|m] <q1> [<q2>]\n" +
 				"\tmn [players|player|p]\n" +
 				"\tmn [player|p] 0 [play|queue] [<q1> [<q2>]]\n" +
@@ -149,6 +151,9 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 		else if (cmd.equals("s") || cmd.equals("sync")) {
 			doMediaSync(ci, args);
+		}
+		else if (cmd.equals("albums")) {
+			doMediaAlbums(ci, args);
 		}
 		else {
 			String q1 = cmd;
@@ -398,6 +403,41 @@ public class MorriganCommandProvider implements CommandProvider {
 			}
 			catch (MorriganException e) {
 				ci.println(ErrorHelper.getCauseTrace(e));
+			}
+		}
+	}
+
+	private void doMediaAlbums (CommandInterpreter ci, List<String> args) {
+		if (args.size() < 1) {
+			ci.println("No query parameter.");
+		}
+		else {
+			String q1 = args.get(0);
+			List<PlayItem> results = null;
+			try {
+				results = this.cliHelper.queryForPlayableItems(q1, null, 2);
+			}
+			catch (MorriganException e) {
+				ci.println(ErrorHelper.getCauseTrace(e));
+				return;
+			}
+
+			if (results == null || results.size() != 1) {
+				ci.println("Query '" + q1 + "' did not return only one result.");
+			}
+			else {
+				IMediaTrackList<? extends IMediaTrack> list = results.get(0).list;
+				try {
+					Collection<MediaAlbum> albums = list.getAlbums();
+					ci.println("Albums: (" + albums.size() + ")");
+					for (MediaAlbum album : albums) {
+						ci.println(" " + album.getName() + " (" + list.getAlbumItems(album).size() + ")");
+					}
+				}
+				catch (MorriganException e) {
+					ci.println(ErrorHelper.getCauseTrace(e));
+					return;
+				}
 			}
 		}
 	}

@@ -3,6 +3,7 @@ package com.vaguehope.morrigan.model.media;
 import java.io.File;
 import java.io.OutputStream;
 import java.math.BigInteger;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -76,6 +77,20 @@ public interface IMediaItemList<T extends IMediaItem> {
 	void moveTags (IDbItem fromItem, IDbItem toItem) throws MorriganException;
 	void removeTag (MediaTag mt) throws MorriganException;
 	void clearTags (IDbItem item) throws MorriganException;
+
+	/**
+	 * Returns existing album if it already exists.
+	 * Name is case-insensitive.
+	 */
+	MediaAlbum createAlbum (String name) throws MorriganException;
+	Collection<MediaAlbum> getAlbums () throws MorriganException;
+	Collection<T> getAlbumItems (MediaAlbum album) throws MorriganException;
+	/**
+	 * Will have no effect if already in album.
+	 */
+	void addToAlbum (MediaAlbum album, IDbItem item) throws MorriganException;
+	void removeFromAlbum (MediaAlbum album, IDbItem item) throws MorriganException;
+	void removeFromAllAlbums (IDbItem item) throws MorriganException;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -15,11 +16,11 @@ import com.vaguehope.morrigan.model.db.IDbItem;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMixedMediaItemStorageLayer;
+import com.vaguehope.morrigan.model.media.MediaAlbum;
 import com.vaguehope.morrigan.model.media.internal.db.MediaSqliteLayer;
 import com.vaguehope.morrigan.model.media.internal.db.SqliteHelper;
 import com.vaguehope.morrigan.util.GeneratedString;
 import com.vaguehope.sqlitewrapper.DbException;
-
 
 public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixedMediaItem> implements IMixedMediaItemStorageLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -96,8 +97,13 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 		+ " distinct m.id AS id,m.type AS type,file,md5,added,modified,enabled,missing,remloc,startcnt,endcnt,lastplay,duration,width,height"
 		+ " FROM tbl_mediafiles AS m LEFT OUTER JOIN tbl_tags ON m.id=tbl_tags.mf_id";
 
+	private static final String _SQL_MEDIAFILESALBUMS_SELECT = // TODO FIXME is this the same as _SQL_MEDIAFILES_SELECT?
+		"SELECT"
+		+ " distinct m.id AS id,m.type AS type,file,md5,added,modified,enabled,missing,remloc,startcnt,endcnt,lastplay,duration,width,height"
+		+ " FROM tbl_mediafiles AS m";
+
 	private static final String _SQL_WHERE =
-		" WHERE";
+			" WHERE";
 
 	private static final String _SQL_AND =
 		" AND";
@@ -107,6 +113,9 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 
 	private static final String _SQL_MEDIAFILESTAGS_WHERTYPE =
 		" m.type=?";
+
+	private static final String _SQL_MEDIAFILESALBUMS_WHEREALBUM =
+		" m.id = tbl_album_items.mf_id AND tbl_album_items.album_id = ?";
 
 	private static final String _SQL_MEDIAFILES_WHERENOTMISSING =
 		" (missing<>1 OR missing is NULL)";
@@ -264,7 +273,6 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 
 	protected List<IMixedMediaItem> local_getAllMedia (MediaType mediaType, IDbColumn sort, SortDirection direction, boolean hideMissing) throws SQLException, ClassNotFoundException {
 		String sql = local_getAllMediaSql(mediaType, hideMissing, sort, direction, null);
-		ResultSet rs;
 
 		List<IMixedMediaItem> ret;
 		PreparedStatement ps = getDbCon().prepareStatement(sql);
@@ -272,7 +280,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 			if (mediaType != MediaType.UNKNOWN) {
 				ps.setInt(1, mediaType.getN());
 			}
-			rs = ps.executeQuery();
+			ResultSet rs = ps.executeQuery();
 			try {
 				ret = local_parseRecordSet(rs, this.itemFactory);
 			} finally {
@@ -374,6 +382,48 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 			ps.close();
 		}
 
+		return ret;
+	}
+
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Album readers.
+
+	protected Collection<IMixedMediaItem> local_getAlbumItems (MediaType mediaType, MediaAlbum album) throws SQLException, ClassNotFoundException {
+		List<IMixedMediaItem> ret;
+
+		StringBuilder sql = new StringBuilder();
+		sql.append(_SQL_MEDIAFILESALBUMS_SELECT);
+		sql.append(",").append(SQL_TBL_ALBUM_ITEMS);
+		sql.append(_SQL_WHERE);
+		if (mediaType != MediaType.UNKNOWN) {
+			sql.append(_SQL_MEDIAFILESTAGS_WHERTYPE); // type param.
+			sql.append(_SQL_AND);
+		}
+		sql.append(_SQL_MEDIAFILESALBUMS_WHEREALBUM); // album_id param.
+		sql.append(_SQL_AND);
+		sql.append(_SQL_MEDIAFILES_WHERENOTMISSING);
+		sql.append(_SQL_ORDERBYREPLACE.replace("{COL}", SQL_TBL_MEDIAFILES_COL_FILE.getName()).replace("{DIR}", "ASC"));
+
+		PreparedStatement ps = getDbCon().prepareStatement(sql.toString());
+		try {
+			if (mediaType != MediaType.UNKNOWN) {
+				ps.setInt(1, mediaType.getN());
+				ps.setLong(2, album.getDbRowId());
+			}
+			else {
+				ps.setLong(1, album.getDbRowId());
+			}
+			ResultSet rs = ps.executeQuery();
+			try {
+				ret = local_parseRecordSet(rs, this.itemFactory);
+			}
+			finally {
+				rs.close();
+			}
+		}
+		finally {
+			ps.close();
+		}
 		return ret;
 	}
 
@@ -869,12 +919,9 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 		 * trying to count the length of the record set.
 		 */
 		List<IMixedMediaItem> ret = new ArrayList<IMixedMediaItem>();
-
 		while (rs.next()) {
-			IMixedMediaItem mi = createMediaItem(rs, itemFactory);
-			ret.add(mi);
+			ret.add(createMediaItem(rs, itemFactory));
 		}
-
 		return ret;
 	}
 
