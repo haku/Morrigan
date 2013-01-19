@@ -20,6 +20,7 @@ import org.osgi.framework.BundleContext;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.player.PlayerReader;
+import com.vaguehope.morrigan.server.util.WebAppHelper;
 import com.vaguehope.morrigan.tasks.AsyncTasksRegister;
 import com.vaguehope.morrigan.wui.MorriganWui;
 
