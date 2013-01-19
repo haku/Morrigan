@@ -133,6 +133,8 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 				ret = updateTrackMetadata2(taskEventListener, 25, changedItems);
 			}
 
+			// TODO scan for albums?
+
 //			if (ret == null) {
 //				 TODO : vacuum DB?
 //			}
