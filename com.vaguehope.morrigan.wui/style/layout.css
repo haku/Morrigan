@@ -6,6 +6,21 @@ body, p, div, span {
   font-family: sans-serif;
 }
 
+/* tabs */
+
+.tabs {
+  padding: 0.2em 1em;
+}
+
+.tabs a {
+  margin: 0.2em 0.5em;
+}
+/* status */
+
+.statusbar {
+  margin: 0.2em;
+}
+
 /* main. */
 
 .player, .mlist {
@@ -14,10 +29,6 @@ body, p, div, span {
   margin: 0.5em 0.5em 0 0.5em;
   border-radius: 0.5em;
   overflow: hidden;
-}
-
-.statusbar {
-  margin: 0.2em;
 }
 
 .player .block, .mlist .block {
@@ -79,6 +90,30 @@ body, p, div, span {
 
 .queue .item, .mediaitems .item {
   border-radius: 0.2em;
+}
+
+/* albums */
+
+.mediaitems .album {
+  float: left;
+  margin: 0.5em;
+  width: 6em;
+  height: 9em;
+  border-radius: 0.2em;
+  overflow: hidden;
+}
+
+.mediaitems .album .cover {
+  display: inline-block;
+  width: 5em;
+  height: 5em;
+  margin: 0.5em 0.5em 0 0.5em;
+}
+
+.mediaitems .album .title {
+  margin: 0 0.2em 0.2em 0.2em;
+  text-align: center;
+  font-size: 80%;
 }
 
 /* tool-bar. */

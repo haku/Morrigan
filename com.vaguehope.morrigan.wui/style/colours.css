@@ -17,6 +17,14 @@
   color: HighlightText;
 }
 
+.mediaitems .album {
+  background: Menu;
+}
+
+.mediaitems .album:hover {
+  background: Highlight;
+}
+
 .popup {
   border: 1px solid MenuText;
   background: Menu;
