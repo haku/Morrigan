@@ -124,6 +124,9 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMe
 			list.moveTags(itemToBeRemove, itemToKeep);
 		}
 
+		// Remove will fail if in any album.
+		list.removeFromAllAlbums(itemToBeRemove);
+
 		if (itemToKeep.getDuration() <= 0 && itemToBeRemove.getDuration() > 0) {
 			list.setTrackDuration(itemToKeep, itemToBeRemove.getDuration());
 		}

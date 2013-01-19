@@ -20,6 +20,7 @@ import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
+import com.vaguehope.morrigan.model.media.MediaAlbum;
 import com.vaguehope.morrigan.tasks.MorriganTask;
 import com.vaguehope.morrigan.tasks.TaskEventListener;
 import com.vaguehope.morrigan.tasks.TaskResult;
@@ -115,22 +116,27 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 
 			if (ret == null) {
 				// Check known files exist and update metadata.
-				ret = updateLibraryMetadata(taskEventListener, 25, changedItems);
+				ret = updateLibraryMetadata(taskEventListener, 40, changedItems);
 			}
 
 			if (ret == null) {
 				// Check for duplicate items and merge matching items.
-				checkForDuplicates(taskEventListener, 25);
+				checkForDuplicates(taskEventListener, 15);
 			}
 
 			if (ret == null) {
 				// Read track duration.
-				ret = updateTrackMetadata1(taskEventListener, 25, changedItems);
+				ret = updateTrackMetadata1(taskEventListener, 20, changedItems);
 			}
 
 			if (ret == null) {
 				// Read track tags duration.
-				ret = updateTrackMetadata2(taskEventListener, 25, changedItems);
+				ret = updateTrackMetadata2(taskEventListener, 20, changedItems);
+			}
+
+			if (ret == null) {
+				// Scan for albums.
+				ret = updateAlbums(taskEventListener, 5);
 			}
 
 			// TODO scan for albums?
@@ -656,6 +662,85 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 	}
 
 	protected abstract void readTrackMetaData2 (Q library, T item, File file) throws Exception;
+
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	private TaskResult updateAlbums (TaskEventListener taskEventListener, int prgTotal) {
+		List<String> sources = null;
+		try {
+			sources = this.itemList.getSources();
+		}
+		catch (MorriganException e) {
+			taskEventListener.done();
+			return new TaskResult(TaskOutcome.FAILED, "Failed to retrieve list of media sources.", e);
+		}
+		List<File> albumDirs = new ArrayList<File>();
+		if (sources != null) {
+			Queue<File> dirs = new LinkedList<File>();
+			for (String source : sources) {
+				dirs.add(new File(source));
+			}
+			while (!dirs.isEmpty()) {
+				if (taskEventListener.isCanceled()) break;
+				File dirItem = dirs.poll();
+				taskEventListener.subTask("Album searching " + dirItem.getAbsolutePath());
+
+				File[] arrFiles = dirItem.listFiles();
+				if (arrFiles != null) {
+					for (File file : arrFiles) {
+						if (taskEventListener.isCanceled()) break;
+						if (file.isDirectory()) {
+							if (isDirectoryAnAlbum(file)) {
+								albumDirs.add(file);
+							}
+							else {
+								dirs.add(file);
+							}
+						}
+					}
+				}
+				else {
+					taskEventListener.logMsg(this.itemList.getListName(), "Failed to read directory: " + dirItem.getAbsolutePath());
+				}
+			}
+		}
+		if (!albumDirs.isEmpty()) {
+			int progress = 0;
+			int n = 0;
+			int N = albumDirs.size();
+			try {
+				for (File dir : albumDirs) {
+					if (taskEventListener.isCanceled()) break;
+					MediaAlbum album = this.itemList.createAlbum(dir.getName());
+					for (File file : dir.listFiles()) {
+						if (this.itemList.hasFile(file)) {
+							T item = this.itemList.getByFile(file);
+							this.itemList.addToAlbum(album, item);
+						}
+					}
+
+					n++;
+					int p = N > 0 ? (n * prgTotal) / N : 0;
+					if (p > progress) {
+						taskEventListener.worked(p - progress);
+						progress = p;
+					}
+				}
+			}
+			catch (MorriganException e) {
+				return new TaskResult(TaskOutcome.FAILED, "Failed to update albums.", e);
+			}
+			catch (DbException e) {
+				return new TaskResult(TaskOutcome.FAILED, "Failed to update albums.", e);
+			}
+		}
+		return null;
+	}
+
+	private static boolean isDirectoryAnAlbum (File dir) {
+		File marker = new File(dir, ".album");
+		return marker.exists() && marker.isFile();
+	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Helper methods.

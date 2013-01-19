@@ -3,6 +3,7 @@ package com.vaguehope.morrigan.model.media.internal.db;
 import java.io.File;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -17,6 +18,7 @@ import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayerChangeListener;
+import com.vaguehope.morrigan.model.media.MediaAlbum;
 import com.vaguehope.morrigan.model.media.MediaItemListChangeListener;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagClassification;
@@ -705,6 +707,69 @@ implements IMediaItemDb<S, T> {
 	public void addTagClassification (String classificationName) throws MorriganException {
 		try {
 			this.dbLayer.addTagClassification(classificationName);
+		}
+		catch (DbException e) {
+			throw new MorriganException(e);
+		}
+	}
+
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Albums.
+
+	@Override
+	public MediaAlbum createAlbum (String name) throws MorriganException {
+		try {
+			return this.dbLayer.createAlbum(name);
+		}
+		catch (DbException e) {
+			throw new MorriganException(e);
+		}
+	}
+
+	@Override
+	public Collection<MediaAlbum> getAlbums () throws MorriganException {
+		try {
+			return this.dbLayer.getAlbums();
+		}
+		catch (DbException e) {
+			throw new MorriganException(e);
+		}
+	}
+
+	@Override
+	public Collection<T> getAlbumItems (MediaAlbum album) throws MorriganException {
+		try {
+			return this.dbLayer.getAlbumItems(album);
+		}
+		catch (DbException e) {
+			throw new MorriganException(e);
+		}
+	}
+
+	@Override
+	public void addToAlbum (MediaAlbum album, IDbItem item) throws MorriganException {
+		try {
+			this.dbLayer.addToAlbum(album, item);
+		}
+		catch (DbException e) {
+			throw new MorriganException(e);
+		}
+	}
+
+	@Override
+	public void removeFromAlbum (MediaAlbum album, IDbItem item) throws MorriganException {
+		try {
+			this.dbLayer.removeFromAlbum(album, item);
+		}
+		catch (DbException e) {
+			throw new MorriganException(e);
+		}
+	}
+
+	@Override
+	public void removeFromAllAlbums (IDbItem item) throws MorriganException {
+		try {
+			this.dbLayer.removeFromAllAlbums(item);
 		}
 		catch (DbException e) {
 			throw new MorriganException(e);

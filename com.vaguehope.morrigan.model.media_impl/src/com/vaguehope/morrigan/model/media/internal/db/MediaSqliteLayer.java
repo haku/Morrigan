@@ -13,14 +13,15 @@ import com.vaguehope.morrigan.model.db.IDbItem;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayerChangeListener;
+import com.vaguehope.morrigan.model.media.MediaAlbum;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagClassification;
 import com.vaguehope.morrigan.model.media.MediaTagType;
+import com.vaguehope.morrigan.model.media.internal.MediaAlbumImpl;
 import com.vaguehope.morrigan.model.media.internal.MediaTagClassificationFactory;
 import com.vaguehope.morrigan.model.media.internal.MediaTagImpl;
 import com.vaguehope.sqlitewrapper.DbException;
 import com.vaguehope.sqlitewrapper.GenericSqliteLayer;
-
 
 public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqliteLayer implements IMediaItemStorageLayer<T> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -178,6 +179,54 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Public methods for albums.
+
+	@Override
+	public Collection<MediaAlbum> getAlbums () throws DbException {
+		try {
+			return local_getAlbums();
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+
+	@Override
+	public MediaAlbum createAlbum (String name) throws DbException {
+		try {
+			return local_createAlbum(name);
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+
+	@Override
+	public void addToAlbum (MediaAlbum album, IDbItem item) throws DbException {
+		try {
+			local_addToAlbum(album, item);
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+
+	@Override
+	public void removeFromAlbum (MediaAlbum album, IDbItem item) throws DbException {
+		try {
+			local_removeFromAlbum(album, item);
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+
+	@Override
+	public void removeFromAllAlbums (IDbItem item) throws DbException {
+		try {
+			local_removeFromAllAlbums(item);
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Public methods for Sources.
 
 	@Override
@@ -250,7 +299,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	private static final String SQL_TBL_TAGS_COL_CLSROWID = "cls_id";
 
 	/* - - - - - - - - - - - - - - - -
-	 * tbl_tag_class
+	 * tbl_tag_cls
 	 */
 
 	private static final String SQL_TBL_TAGCLS_EXISTS =
@@ -264,6 +313,44 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 
 	private static final String SQL_TBL_TAGCLS_COL_ROWID = "id";
 	private static final String SQL_TBL_TAGCLS_COL_CLS = "cls";
+
+	/* - - - - - - - - - - - - - - - -
+	 * tbl_albums
+	 */
+
+	private static final String SQL_TBL_ALBUMS_EXISTS =
+		"SELECT name FROM sqlite_master WHERE name='tbl_albums';";
+
+	private static final String SQL_TBL_ALBUMS_CREATE =
+		"CREATE TABLE tbl_albums (" +
+		"id INTEGER PRIMARY KEY AUTOINCREMENT," +
+		"name VARCHAR(255) NOT NULL COLLATE NOCASE UNIQUE" +
+		");";
+
+	private static final String SQL_TBL_ALBUMS_COL_ROWID = "id";
+	private static final String SQL_TBL_ALBUMS_COL_NAME = "name";
+
+	/* - - - - - - - - - - - - - - - -
+	 * tbl_album_items
+	 */
+
+	protected static final String SQL_TBL_ALBUM_ITEMS = "tbl_album_items";
+
+	private static final String SQL_TBL_ALBUM_ITEMS_EXISTS =
+		"SELECT name FROM sqlite_master WHERE name='tbl_album_items';";
+
+	private static final String SQL_TBL_ALBUM_ITEMS_CREATE =
+		"CREATE TABLE tbl_album_items (" +
+		"id INTEGER PRIMARY KEY AUTOINCREMENT," +
+		"album_id INT," +
+		"mf_id INT," +
+		"FOREIGN KEY(album_id) REFERENCES tbl_albums(id) ON DELETE RESTRICT ON UPDATE RESTRICT," +
+		"FOREIGN KEY(mf_id) REFERENCES tbl_mediafiles(id) ON DELETE RESTRICT ON UPDATE RESTRICT" +
+		");";
+
+//	private static final String SQL_TBL_ALBUM_ITEMS_COL_ROWID = "id";
+//	private static final String SQL_TBL_ALBUM_ITEMS_COL_ALBUMROWID = "album_id";
+//	private static final String SQL_TBL_ALBUM_ITEMS_COL_MEDIAFILEROWID = "mf_id";
 
 	/* - - - - - - - - - - - - - - - -
 	 * tbl_sources.
@@ -337,6 +424,33 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		"SELECT id,cls FROM tbl_tag_cls WHERE id=?;";
 
 	/* - - - - - - - - - - - - - - - -
+	 * albums.
+	 */
+
+	private static final String SQL_TBL_ALBUMS_Q_ALL = // TODO include album size.
+		"SELECT a.id,a.name" +
+		" FROM tbl_albums AS a" +
+		" ORDER BY a.name ASC;";
+
+	private static final String SQL_TBL_ALBUMS_Q_GET =
+		"SELECT a.id,a.name FROM tbl_albums AS a WHERE name=?;";
+
+	private static final String SQL_TBL_ALBUM_ITEMS_Q_HAS =
+		"SELECT id FROM tbl_album_items WHERE album_id=? AND mf_id=?;";
+
+	private static final String SQL_TBL_ALBUMS_ADD =
+		"INSERT INTO tbl_albums (name) VALUES (?);";
+
+	private static final String SQL_TBL_ALBUM_ITEMS_ADD =
+		"INSERT INTO tbl_album_items (album_id,mf_id) VALUES (?,?);";
+
+	private static final String SQL_TBL_ALBUM_ITEMS_REMOVE =
+		"DELETE FROM tbl_album_items WHERE album_id=? AND mf_id=?";
+
+	private static final String SQL_TBL_ALBUM_ITEMS_REMOVE_FROM_ALL =
+		"DELETE FROM tbl_album_items WHERE mf_id=?";
+
+	/* - - - - - - - - - - - - - - - -
 	 * tbl_sources.
 	 */
 
@@ -363,6 +477,10 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 
 		l.add(new SqlCreateCmd(SQL_TBL_TAGS_EXISTS, SQL_TBL_TAGS_CREATE));
 		l.add(new SqlCreateCmd("SELECT name FROM sqlite_master WHERE name='tags_idx';", "CREATE INDEX tags_idx ON tbl_tags(mf_id,tag);")); // TODO extract strings.
+
+		l.add(new SqlCreateCmd(SQL_TBL_ALBUMS_EXISTS, SQL_TBL_ALBUMS_CREATE));
+		l.add(new SqlCreateCmd(SQL_TBL_ALBUM_ITEMS_EXISTS, SQL_TBL_ALBUM_ITEMS_CREATE));
+		// TODO any indexes required?
 
 		l.add(new SqlCreateCmd(SQL_TBL_SOURCES_EXISTS, SQL_TBL_SOURCES_CREATE));
 
@@ -514,12 +632,10 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	}
 
 	private boolean local_hasTags (long mf_rowId) throws SQLException, ClassNotFoundException {
-		ResultSet rs;
 		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_TAGS_Q_HASANY);
-
 		try {
 			ps.setLong(1, mf_rowId);
-			rs = ps.executeQuery();
+			ResultSet rs = ps.executeQuery();
 			try {
 				if (rs.next()) {
 					return true;
@@ -539,7 +655,6 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		if (mtc != null) {
 			return local_hasTag(mf_rowId, tag, type, mtc.getDbRowId());
 		}
-
 		return local_hasTag(mf_rowId, tag, type, 0);
 	}
 
@@ -551,7 +666,6 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 			sql = SQL_TBL_TAGS_Q_HASTAG_CLSNULL;
 		}
 
-		ResultSet rs;
 		PreparedStatement ps = getDbCon().prepareStatement(sql);
 		try {
 			ps.setLong(1, mf_rowId);
@@ -560,7 +674,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 			if (cls_rowid > 0 ) {
 				ps.setLong(4, cls_rowid);
 			}
-			rs = ps.executeQuery();
+			ResultSet rs = ps.executeQuery();
 			try {
 				if (rs.next()) {
 					return true;
@@ -578,12 +692,11 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 
 	private List<MediaTag> local_getTags(long mf_rowId) throws SQLException, ClassNotFoundException, DbException {
 		List<MediaTag> ret = new ArrayList<MediaTag>();
-		ResultSet rs;
 		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_TAGS_Q_ALL);
 
 		try {
 			ps.setLong(1, mf_rowId);
-			rs = ps.executeQuery();
+			ResultSet rs = ps.executeQuery();
 			try {
 				while (rs.next()) {
 					long rowId = rs.getLong(SQL_TBL_TAGS_COL_ROWID);
@@ -608,8 +721,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	}
 
 	private MediaTagClassification local_addTagClassification (String classificationName) throws SQLException, ClassNotFoundException, DbException {
-		PreparedStatement ps;
-		ps = getDbCon().prepareStatement(SQL_TBL_TAGCLS_ADD);
+		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_TAGCLS_ADD);
 		int n;
 		try {
 			ps.setString(1, classificationName);
@@ -706,6 +818,130 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		}
 
 		return ret;
+	}
+
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//	Private methods for albums.
+
+	private Collection<MediaAlbum> local_getAlbums () throws SQLException, ClassNotFoundException {
+		Statement stat = getDbCon().createStatement();
+		try {
+			ResultSet rs = stat.executeQuery(SQL_TBL_ALBUMS_Q_ALL);
+			try {
+				List<MediaAlbum> ret = new ArrayList<MediaAlbum>();
+				while (rs.next()) {
+					long rowId = rs.getLong(SQL_TBL_ALBUMS_COL_ROWID);
+					String name = rs.getString(SQL_TBL_ALBUMS_COL_NAME);
+					ret.add(new MediaAlbumImpl(rowId, name));
+				}
+				return ret;
+			}
+			finally {
+				rs.close();
+			}
+		}
+		finally {
+			stat.close();
+		}
+	}
+
+	private MediaAlbum local_createAlbum (String name) throws DbException, SQLException, ClassNotFoundException {
+		MediaAlbum album = local_getAlbum(name);
+		if (album != null) return album;
+		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_ALBUMS_ADD);
+		try {
+			ps.setString(1, name);
+			int n = ps.executeUpdate();
+			if (n < 1) throw new DbException("No update occured for createAlbum('" + name + "').");
+		}
+		finally {
+			ps.close();
+		}
+		album = local_getAlbum(name);
+		if (album == null) throw new DbException("Failed to find album that was just created: '" + name + "'.");
+		return album;
+	}
+
+	private MediaAlbum local_getAlbum (String qName) throws SQLException, ClassNotFoundException {
+		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_ALBUMS_Q_GET);
+		try {
+			ps.setString(1, qName);
+			ResultSet rs = ps.executeQuery();
+			try {
+				if (!rs.next()) {
+					return null;
+				}
+				long rowId = rs.getLong(SQL_TBL_ALBUMS_COL_ROWID);
+				String name = rs.getString(SQL_TBL_ALBUMS_COL_NAME);
+				return new MediaAlbumImpl(rowId, name);
+			}
+			finally {
+				rs.close();
+			}
+		}
+		finally {
+			ps.close();
+		}
+	}
+
+	private boolean local_albumHasItem (MediaAlbum album, IDbItem item) throws SQLException, ClassNotFoundException {
+		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_ALBUM_ITEMS_Q_HAS);
+		try {
+			ps.setLong(1, album.getDbRowId());
+			ps.setLong(2, item.getDbRowId());
+			ResultSet rs = ps.executeQuery();
+			try {
+				if (rs.next()) {
+					return true;
+				}
+				return false;
+			}
+			finally {
+				rs.close();
+			}
+		}
+		finally {
+			ps.close();
+		}
+	}
+
+	private void local_addToAlbum (MediaAlbum album, IDbItem item) throws SQLException, ClassNotFoundException, DbException {
+		if (local_albumHasItem(album, item)) return;
+		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_ALBUM_ITEMS_ADD);
+		try {
+			ps.setLong(1, album.getDbRowId());
+			ps.setLong(2, item.getDbRowId());
+			int n = ps.executeUpdate();
+			if (n < 1) throw new DbException("No update occured for addToAlbum(" + album.getDbRowId() + "," + item.getDbRowId() + ").");
+		}
+		finally {
+			ps.close();
+		}
+	}
+
+	private void local_removeFromAlbum (MediaAlbum album, IDbItem item) throws SQLException, ClassNotFoundException, DbException {
+		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_ALBUM_ITEMS_REMOVE);
+		try {
+			ps.setLong(1, album.getDbRowId());
+			ps.setLong(2, item.getDbRowId());
+			int n = ps.executeUpdate();
+			if (n < 1) throw new DbException("No update occured for removeFromAlbum(" + album.getDbRowId() + "," + item.getDbRowId() + ").");
+		}
+		finally {
+			ps.close();
+		}
+	}
+
+	private void local_removeFromAllAlbums (IDbItem item) throws SQLException, ClassNotFoundException, DbException {
+		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_ALBUM_ITEMS_REMOVE_FROM_ALL);
+		try {
+			ps.setLong(1, item.getDbRowId());
+			int n = ps.executeUpdate();
+			if (n < 1) throw new DbException("No update occured for removeFromAllAlbums(" + item.getDbRowId() + ").");
+		}
+		finally {
+			ps.close();
+		}
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

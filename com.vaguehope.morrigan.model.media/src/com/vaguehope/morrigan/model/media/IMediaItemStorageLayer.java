@@ -2,6 +2,7 @@ package com.vaguehope.morrigan.model.media;
 
 import java.io.File;
 import java.math.BigInteger;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -61,6 +62,20 @@ public interface IMediaItemStorageLayer<T extends IMediaItem> extends IGenericDb
 	void removeTag (MediaTag tag) throws DbException;
 	void clearTags (IDbItem item) throws DbException;
 
+	/**
+	 * Returns existing album if it already exists.
+	 * Name is case-insensitive.
+	 */
+	MediaAlbum createAlbum (String name) throws DbException;
+	Collection<MediaAlbum> getAlbums () throws DbException;
+	Collection<T> getAlbumItems (MediaAlbum album) throws DbException;
+	/**
+	 * Will have no effect if already in album.
+	 */
+	void addToAlbum (MediaAlbum album, IDbItem item) throws DbException;
+	void removeFromAlbum (MediaAlbum album, IDbItem item) throws DbException;
+	void removeFromAllAlbums (IDbItem item) throws DbException;
+
 	List<IDbColumn> getMediaTblColumns ();
 
 	/**
@@ -81,7 +96,7 @@ public interface IMediaItemStorageLayer<T extends IMediaItem> extends IGenericDb
 	boolean[] addFiles (List<File> files) throws DbException;
 
 	/**
-	 * 
+	 *
 	 * @param file
 	 * @return true if the file needed to be added.
 	 * @throws DbException
@@ -89,7 +104,7 @@ public interface IMediaItemStorageLayer<T extends IMediaItem> extends IGenericDb
 	boolean addFile(File file) throws DbException;
 
 	/**
-	 * 
+	 *
 	 * @param filepath
 	 * @param lastModified
 	 * @return true if the file needed to be added.
