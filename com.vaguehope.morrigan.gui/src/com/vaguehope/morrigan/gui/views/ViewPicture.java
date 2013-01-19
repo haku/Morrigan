@@ -157,7 +157,7 @@ public class ViewPicture extends ViewPart {
 					return;
 				}
 
-				IMixedMediaItemDbEditor<?,?> editor = (IMixedMediaItemDbEditor<?,?>) part;
+				IMixedMediaItemDbEditor editor = (IMixedMediaItemDbEditor) part;
 				IMediaItemDb<?,? extends IMediaPicture> list = editor.getMediaList();
 
 				if (selection instanceof IStructuredSelection) {

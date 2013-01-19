@@ -47,7 +47,7 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb implements IRemoteM
 	/**
 	 * Connect to existing DB.
 	 */
-	public RemoteMixedMediaDb (String dbName, MediaItemDbConfig config, IMixedMediaStorageLayer<IMixedMediaItem> localDbLayer) throws DbException {
+	public RemoteMixedMediaDb (String dbName, MediaItemDbConfig config, IMixedMediaStorageLayer localDbLayer) throws DbException {
 		super(dbName, config, localDbLayer); // TODO expose search term.
 		readCacheDate();
 	}
@@ -55,7 +55,7 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb implements IRemoteM
 	/**
 	 * Create a fresh DB.
 	 */
-	public RemoteMixedMediaDb (String dbName, MediaItemDbConfig config, RemoteHostDetails details, IMixedMediaStorageLayer<IMixedMediaItem> localDbLayer) throws DbException {
+	public RemoteMixedMediaDb (String dbName, MediaItemDbConfig config, RemoteHostDetails details, IMixedMediaStorageLayer localDbLayer) throws DbException {
 		super(dbName, config, localDbLayer); // TODO expose search term.
 		URL url = details.getUrl();
 

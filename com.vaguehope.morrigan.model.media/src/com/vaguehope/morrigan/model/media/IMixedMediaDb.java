@@ -9,7 +9,7 @@ import com.vaguehope.sqlitewrapper.DbException;
 public interface IMixedMediaDb
 		extends
 		IMixedMediaList<IMixedMediaItem>,
-		IMediaTrackDb<IMixedMediaStorageLayer<IMixedMediaItem>, IMixedMediaItem> {
+		IMediaTrackDb<IMixedMediaStorageLayer, IMixedMediaItem> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	void setDefaultMediaType (MediaType mediaType) throws MorriganException;

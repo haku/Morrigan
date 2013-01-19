@@ -1,6 +1,7 @@
 package com.vaguehope.morrigan.model.media;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -9,7 +10,7 @@ import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
 import com.vaguehope.sqlitewrapper.DbException;
 
 
-public interface IMixedMediaStorageLayer<T extends IMixedMediaItem> extends IMediaItemStorageLayer<T> {
+public interface IMixedMediaStorageLayer extends IMediaItemStorageLayer<IMixedMediaItem> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Read methods.
 
@@ -23,11 +24,13 @@ public interface IMixedMediaStorageLayer<T extends IMixedMediaItem> extends IMed
 	List<IMixedMediaItem> getMedia (MediaType mediaType, IDbColumn sort, SortDirection direction, boolean hideMissing, String search, String searchEsc) throws DbException;
 	List<IMixedMediaItem> simpleSearchMedia (MediaType mediaType, String term, String esc, int maxResults) throws DbException;
 
+	Collection<IMixedMediaItem> getAlbumItems (MediaType mediaType, MediaAlbum album) throws DbException;
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Setters for generic MediaItem.
 
 	/**
-	 * 
+	 *
 	 * @param file
 	 * @return true if the file needed to be added.
 	 * @throws DbException
@@ -35,7 +38,7 @@ public interface IMixedMediaStorageLayer<T extends IMixedMediaItem> extends IMed
 	boolean addFile (MediaType mediaType, File file) throws DbException;
 
 	/**
-	 * 
+	 *
 	 * @param filepath
 	 * @param lastModified
 	 * @return true if the file needed to be added.
