@@ -1,4 +1,4 @@
-package com.vaguehope.morrigan.server;
+package com.vaguehope.morrigan.server.util;
 
 import java.io.File;
 import java.io.IOException;
