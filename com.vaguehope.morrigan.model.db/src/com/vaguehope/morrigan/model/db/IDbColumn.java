@@ -1,5 +1,6 @@
 package com.vaguehope.morrigan.model.db;
 
+//TODO remove 'I'.
 public interface IDbColumn {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
