@@ -7,16 +7,23 @@
 
   $(document).ready(function() {
     initStatusBars();
+    initTabs();
     var mlistsDiv = $('.mlists');
     var mid = UrlParams.params['mid'];
     var pid = UrlParams.params['pid'];
     if (mid) {
       initMlist(mlistsDiv, mid);
       var itemsDiv = $('.mediaitems');
-      var search = UrlParams.params['search'];
-      search = search ? search : DEFAULT_QUERY;
-      runQuery(itemsDiv, mid, search);
-      makeToolbar(itemsDiv, mid);
+      var view = UrlParams.params['view'];
+      if (view === 'albums') {
+        showAlbums(itemsDiv, mid);
+      }
+      else {
+        var search = UrlParams.params['search'];
+        search = search ? search : DEFAULT_QUERY;
+        runQuery(itemsDiv, mid, search);
+        makeToolbar(itemsDiv, mid);
+      }
     }
     else if (!pid) {
       initMlists(mlistsDiv);
@@ -28,6 +35,15 @@
     $('.statusbar').append(mlistsStatusBar);
     queryStatusBar = $('<span>');
     $('.statusbar').append(queryStatusBar);
+  }
+
+  function initTabs() {
+    var items = $('<a>items</a>');
+    items.attr('href', UrlParams.withoutParam('view'));
+    $('.tabs').append(items);
+    var albums = $('<a href="?view=albums">albums</a>');
+    albums.attr('href', UrlParams.withParam('view', 'albums'));
+    $('.tabs').append(albums);
   }
 
   function initMlists(mlistsDiv) {
@@ -418,6 +434,90 @@
         onStatus('Error: ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
       }
     });
+  }
+
+  function showAlbums(itemsDiv, mid) {
+    itemsDiv.empty();
+    itemsDiv.append($('<p>Fetching albums...</p>'));
+    updateAlbums(itemsDiv, mid);
+  }
+
+  function updateAlbums(itemsDiv, mid) {
+    getAlbums(mid, function(msg) {
+      queryStatusBar.text(msg);
+    }, function(albums) {
+      displayAlbums(itemsDiv, albums);
+    });
+  }
+
+  function displayAlbums(itemsDiv, albums) {
+    itemsDiv.empty();
+    $.each(albums, function(index, album) {
+      albumDiv = $('<div class="album">');
+      makeAlbumItem(albumDiv);
+      updateAlbumItemDisplay(albumDiv, album);
+      itemsDiv.append(albumDiv);
+    });
+  }
+
+  function makeAlbumItem(albumDiv, id) {
+    albumDiv.empty();
+    var a = $('<a class="clickable" href="">');
+    var pic = $('<img class="cover">');
+    a.append(pic);
+    var title = $('<p class="title">');
+    a.append(title);
+    albumDiv.append(a);
+  }
+
+  function updateAlbumItemDisplay(albumDiv, album) {
+    $('.title', albumDiv).text(album.name);
+    $('.cover', albumDiv).attr('src', album.coverUrl);
+    var clickable = $('.clickable', albumDiv);
+    clickable.unbind();
+    clickable.click(function(event) {
+      event.preventDefault();
+      console.log('TODO: album clicked', album);
+    });
+  }
+
+  function getAlbums(mid, onStatus, onAlbums) {
+    var id = midToId(mid);
+    $.ajax({
+      type : 'GET',
+      cache : false,
+      url : 'mlists/' + mid + '/albums',
+      dataType : 'xml',
+      beforeSend : function() {
+        onStatus('Fetching ' + id + '...');
+      },
+      success : function(xml) {
+        var albumsNode = $(xml).find('albums');
+        var albums = parseAlbumsNode(albumsNode, mid);
+        onAlbums(albums);
+        onStatus('Albums updated.');
+      },
+      error : function(jqXHR, textStatus, errorThrown) {
+        onStatus('Error fetching albums ' + id + ': ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
+      }
+    });
+  }
+
+  function parseAlbumsNode(node, mid) {
+    var albums = [];
+    node.find('entry').each(function() {
+      var album = parseAlbumNode($(this), mid);
+      albums.push(album);
+    });
+    return albums;
+  }
+
+  function parseAlbumNode(node, mid) {
+    var album = {};
+    album.name = node.find('name').text();
+    album.coverRelativeUrl = node.find('link[rel="cover"]').attr('href');
+    if (album.coverRelativeUrl) album.coverUrl = '/mlists/' + mid + '/items/' + album.coverRelativeUrl;
+    return album;
   }
 
 })();
