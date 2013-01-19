@@ -47,7 +47,7 @@ public class CliHelper {
 		// Second search case-insensitive, but still exact.
 		if (matches.size() < 1) {
 			for (MediaListReference i : items) {
-				if (i.getTitle().toLowerCase().equals(query1.toLowerCase())) matches.add(i);
+				if (i.getTitle().equalsIgnoreCase(query1)) matches.add(i);
 			}
 		}
 
