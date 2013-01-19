@@ -33,7 +33,7 @@ import com.vaguehope.morrigan.model.media.internal.db.mmdb.LocalMixedMediaDbHelp
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlayerReader;
-import com.vaguehope.morrigan.server.feedwriters.AbstractFeed;
+import com.vaguehope.morrigan.server.feedwriters.FeedHelper;
 import com.vaguehope.morrigan.server.feedwriters.XmlHelper;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbFactory;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbHelper;
@@ -306,10 +306,10 @@ public class MlistsServlet extends HttpServlet {
 
 	private void printMlistList (HttpServletResponse resp) throws IOException, SAXException {
 		resp.setContentType("text/xml;charset=utf-8");
-		DataWriter dw = AbstractFeed.startFeed(resp.getWriter());
+		DataWriter dw = FeedHelper.startFeed(resp.getWriter());
 
-		AbstractFeed.addElement(dw, "title", "Morrigan media lists desu~");
-		AbstractFeed.addLink(dw, CONTEXTPATH, "self", "text/xml");
+		FeedHelper.addElement(dw, "title", "Morrigan media lists desu~");
+		FeedHelper.addLink(dw, CONTEXTPATH, "self", "text/xml");
 
 		Collection<Player> players = this.playerListener.getPlayers();
 
@@ -327,7 +327,7 @@ public class MlistsServlet extends HttpServlet {
 			dw.endElement("entry");
 		}
 
-		AbstractFeed.endFeed(dw);
+		FeedHelper.endFeed(dw);
 	}
 
 	private static void getToMmdb (HttpServletResponse resp, IMixedMediaDb mmdb, String path, String afterPath) throws IOException, SAXException, MorriganException, DbException {
@@ -382,7 +382,7 @@ public class MlistsServlet extends HttpServlet {
 	private static void printMlistShort (DataWriter dw, MediaListReference listRef, Collection<Player> players) throws SAXException {
 		String fileName = listRef.getIdentifier().substring(listRef.getIdentifier().lastIndexOf(File.separator) + 1);
 
-		AbstractFeed.addElement(dw, "title", listRef.getTitle());
+		FeedHelper.addElement(dw, "title", listRef.getTitle());
 
 		String type;
 		switch (listRef.getType()) {
@@ -395,10 +395,10 @@ public class MlistsServlet extends HttpServlet {
 			default:
 				throw new IllegalArgumentException("Can not list type '" + listRef.getType() + "' desu~");
 		}
-		AbstractFeed.addLink(dw, CONTEXTPATH + "/" + type + "/" + fileName, "self", "text/xml");
+		FeedHelper.addLink(dw, CONTEXTPATH + "/" + type + "/" + fileName, "self", "text/xml");
 
 		for (Player p : players) {
-			AbstractFeed.addLink(dw, "/player/" + p.getId() + "/play/" + fileName, "play", "cmd");
+			FeedHelper.addLink(dw, "/player/" + p.getId() + "/play/" + fileName, "play", "cmd");
 		}
 	}
 
@@ -412,7 +412,7 @@ public class MlistsServlet extends HttpServlet {
 
 	private static void printMlistLong (HttpServletResponse resp, IMixedMediaDb ml, boolean listSrcs, boolean listItems, boolean includeTags, String queryString) throws SAXException, MorriganException, DbException, IOException {
 		resp.setContentType("text/xml;charset=utf-8");
-		DataWriter dw = AbstractFeed.startDocument(resp.getWriter(), "mlist");
+		DataWriter dw = FeedHelper.startDocument(resp.getWriter(), "mlist");
 
 		ml.read();
 
@@ -426,7 +426,7 @@ public class MlistsServlet extends HttpServlet {
 
 		String listFile;
 		try {
-			listFile = URLEncoder.encode(AbstractFeed.filenameFromPath(ml.getListId()), "UTF-8");
+			listFile = URLEncoder.encode(FeedHelper.filenameFromPath(ml.getListId()), "UTF-8");
 		}
 		catch (UnsupportedEncodingException e) {
 			throw new RuntimeException(e);
@@ -448,16 +448,16 @@ public class MlistsServlet extends HttpServlet {
 		}
 
 		String pathToSelf = CONTEXTPATH + "/" + ml.getType() + "/" + listFile;
-		AbstractFeed.addLink(dw, pathToSelf, "self", "text/xml");
-		if (!listItems) AbstractFeed.addLink(dw, pathToSelf + "/" + PATH_ITEMS, PATH_ITEMS, "text/xml");
-		AbstractFeed.addLink(dw, pathToSelf + "/" + PATH_SRC, PATH_SRC, "text/xml");
+		FeedHelper.addLink(dw, pathToSelf, "self", "text/xml");
+		if (!listItems) FeedHelper.addLink(dw, pathToSelf + "/" + PATH_ITEMS, PATH_ITEMS, "text/xml");
+		FeedHelper.addLink(dw, pathToSelf + "/" + PATH_SRC, PATH_SRC, "text/xml");
 
 		if (listSrcs) {
 			List<String> src;
 			src = ml.getSources();
 
 			for (String s : src) {
-				AbstractFeed.addElement(dw, "src", s);
+				FeedHelper.addElement(dw, "src", s);
 			}
 		}
 
@@ -465,7 +465,7 @@ public class MlistsServlet extends HttpServlet {
 			for (IMixedMediaItem mi : items) {
 				dw.startElement("entry");
 
-				AbstractFeed.addElement(dw, "title", mi.getTitle());
+				FeedHelper.addElement(dw, "title", mi.getTitle());
 
 				String file;
 				try {
@@ -474,36 +474,36 @@ public class MlistsServlet extends HttpServlet {
 				catch (UnsupportedEncodingException e) {
 					throw new RuntimeException(e);
 				}
-				AbstractFeed.addLink(dw, file, "self"); // Path is relative to this feed.
+				FeedHelper.addLink(dw, file, "self"); // Path is relative to this feed.
 
 				if (mi.getDateAdded() != null) {
-					AbstractFeed.addElement(dw, "dateadded", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateAdded()));
+					FeedHelper.addElement(dw, "dateadded", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateAdded()));
 				}
 				if (mi.getDateLastModified() != null) {
-					AbstractFeed.addElement(dw, "datelastmodified", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateLastModified()));
+					FeedHelper.addElement(dw, "datelastmodified", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateLastModified()));
 				}
-				AbstractFeed.addElement(dw, "type", mi.getMediaType().getN());
-				if (mi.getHashcode() != null && !BigInteger.ZERO.equals(mi.getHashcode())) AbstractFeed.addElement(dw, "hash", mi.getHashcode().toString(16));
-				AbstractFeed.addElement(dw, "enabled", Boolean.toString(mi.isEnabled()));
-				AbstractFeed.addElement(dw, "missing", Boolean.toString(mi.isMissing()));
+				FeedHelper.addElement(dw, "type", mi.getMediaType().getN());
+				if (mi.getHashcode() != null && !BigInteger.ZERO.equals(mi.getHashcode())) FeedHelper.addElement(dw, "hash", mi.getHashcode().toString(16));
+				FeedHelper.addElement(dw, "enabled", Boolean.toString(mi.isEnabled()));
+				FeedHelper.addElement(dw, "missing", Boolean.toString(mi.isMissing()));
 
 				if (mi.getMediaType() == MediaType.TRACK) {
-					AbstractFeed.addElement(dw, "duration", mi.getDuration());
-					AbstractFeed.addElement(dw, "startcount", mi.getStartCount());
-					AbstractFeed.addElement(dw, "endcount", mi.getEndCount());
+					FeedHelper.addElement(dw, "duration", mi.getDuration());
+					FeedHelper.addElement(dw, "startcount", mi.getStartCount());
+					FeedHelper.addElement(dw, "endcount", mi.getEndCount());
 					if (mi.getDateLastPlayed() != null) {
-						AbstractFeed.addElement(dw, "datelastplayed", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateLastPlayed()));
+						FeedHelper.addElement(dw, "datelastplayed", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateLastPlayed()));
 					}
 				}
 				else if (mi.getMediaType() == MediaType.PICTURE) {
-					AbstractFeed.addElement(dw, "width", mi.getWidth());
-					AbstractFeed.addElement(dw, "height", mi.getHeight());
+					FeedHelper.addElement(dw, "width", mi.getWidth());
+					FeedHelper.addElement(dw, "height", mi.getHeight());
 				}
 
 				if (includeTags) {
 					List<MediaTag> tags = ml.getTags(mi);
 					for (MediaTag tag : tags) {
-						AbstractFeed.addElement(dw, "tag", tag.getTag(), new String[][] {
+						FeedHelper.addElement(dw, "tag", tag.getTag(), new String[][] {
 								{ "t", String.valueOf(tag.getType().getIndex()) },
 								{ "c", tag.getClassification() == null ? "" : tag.getClassification().getClassification() }
 						});
@@ -514,7 +514,7 @@ public class MlistsServlet extends HttpServlet {
 			}
 		}
 
-		AbstractFeed.endDocument(dw, "mlist");
+		FeedHelper.endDocument(dw, "mlist");
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

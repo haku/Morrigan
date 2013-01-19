@@ -29,7 +29,7 @@ import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayerReader;
-import com.vaguehope.morrigan.server.feedwriters.AbstractFeed;
+import com.vaguehope.morrigan.server.feedwriters.FeedHelper;
 import com.vaguehope.morrigan.server.feedwriters.XmlHelper;
 import com.vaguehope.morrigan.util.TimeHelper;
 
@@ -305,10 +305,10 @@ public class PlayersServlet extends HttpServlet {
 
 	private void printPlayersList (HttpServletResponse resp) throws IOException, SAXException, MorriganException {
 		resp.setContentType("text/xml;charset=utf-8");
-		DataWriter dw = AbstractFeed.startFeed(resp.getWriter());
+		DataWriter dw = FeedHelper.startFeed(resp.getWriter());
 
-		AbstractFeed.addElement(dw, "title", "Morrigan players desu~");
-		AbstractFeed.addLink(dw, CONTEXTPATH, "self", "text/xml");
+		FeedHelper.addElement(dw, "title", "Morrigan players desu~");
+		FeedHelper.addLink(dw, CONTEXTPATH, "self", "text/xml");
 
 		Collection<Player> players = this.playerListener.getPlayers();
 		for (Player p : players) {
@@ -317,25 +317,25 @@ public class PlayersServlet extends HttpServlet {
 			dw.endElement("entry");
 		}
 
-		AbstractFeed.endFeed(dw);
+		FeedHelper.endFeed(dw);
 	}
 
 	private static void printPlayer (HttpServletResponse resp, Player player) throws IOException, SAXException, MorriganException {
 		resp.setContentType("text/xml;charset=utf-8");
-		DataWriter dw = AbstractFeed.startDocument(resp.getWriter(), "player");
+		DataWriter dw = FeedHelper.startDocument(resp.getWriter(), "player");
 
 		printPlayer(dw, player, 1);
 
-		AbstractFeed.endDocument(dw, "player");
+		FeedHelper.endDocument(dw, "player");
 	}
 
 	private static void printPlayerQueue (HttpServletResponse resp, Player player) throws IOException, SAXException {
 		resp.setContentType("text/xml;charset=utf-8");
-		DataWriter dw = AbstractFeed.startDocument(resp.getWriter(), "queue");
+		DataWriter dw = FeedHelper.startDocument(resp.getWriter(), "queue");
 
 		printQueue(dw, player);
 
-		AbstractFeed.endDocument(dw, "queue");
+		FeedHelper.endDocument(dw, "queue");
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -350,7 +350,7 @@ public class PlayersServlet extends HttpServlet {
 		if (currentList != null) {
 			listTitle = currentList.getListName();
 			listId = currentList.getListId();
-			listUrl = MlistsServlet.CONTEXTPATH + "/" + currentList.getType() + "/" + URLEncoder.encode(AbstractFeed.filenameFromPath(currentList.getListId()), "UTF-8");
+			listUrl = MlistsServlet.CONTEXTPATH + "/" + currentList.getType() + "/" + URLEncoder.encode(FeedHelper.filenameFromPath(currentList.getListId()), "UTF-8");
 		}
 		else {
 			listTitle = NULL;
@@ -364,22 +364,22 @@ public class PlayersServlet extends HttpServlet {
 		int queueLength = p.getQueueList().size();
 		DurationData queueDuration = p.getQueueTotalDuration();
 
-		AbstractFeed.addElement(dw, "title", "p" + p.getId() + ":" + p.getPlayState().toString() + ":" + trackTitle);
+		FeedHelper.addElement(dw, "title", "p" + p.getId() + ":" + p.getPlayState().toString() + ":" + trackTitle);
 		String selfUrl = CONTEXTPATH + "/" + p.getId();
-		AbstractFeed.addLink(dw, selfUrl, "self", "text/xml");
+		FeedHelper.addLink(dw, selfUrl, "self", "text/xml");
 
-		AbstractFeed.addElement(dw, "playerid", p.getId());
-		AbstractFeed.addElement(dw, "playername", p.getName());
-		AbstractFeed.addElement(dw, "playstate", p.getPlayState().getN());
-		AbstractFeed.addElement(dw, "playorder", p.getPlaybackOrder().getN());
-		AbstractFeed.addElement(dw, "playordertitle", p.getPlaybackOrder().toString());
-		AbstractFeed.addElement(dw, "queuelength", queueLength);
-		AbstractFeed.addElement(dw, "queueduration", queueDuration.getDuration());
-		AbstractFeed.addLink(dw, selfUrl + "/" + PATH_QUEUE, "queue", "text/xml");
-		AbstractFeed.addElement(dw, "listtitle", listTitle);
-		AbstractFeed.addElement(dw, "listid", listId);
-		if (listUrl != null) AbstractFeed.addLink(dw, listUrl, "list", "text/xml");
-		AbstractFeed.addElement(dw, "tracktitle", trackTitle);
+		FeedHelper.addElement(dw, "playerid", p.getId());
+		FeedHelper.addElement(dw, "playername", p.getName());
+		FeedHelper.addElement(dw, "playstate", p.getPlayState().getN());
+		FeedHelper.addElement(dw, "playorder", p.getPlaybackOrder().getN());
+		FeedHelper.addElement(dw, "playordertitle", p.getPlaybackOrder().toString());
+		FeedHelper.addElement(dw, "queuelength", queueLength);
+		FeedHelper.addElement(dw, "queueduration", queueDuration.getDuration());
+		FeedHelper.addLink(dw, selfUrl + "/" + PATH_QUEUE, "queue", "text/xml");
+		FeedHelper.addElement(dw, "listtitle", listTitle);
+		FeedHelper.addElement(dw, "listid", listId);
+		if (listUrl != null) FeedHelper.addLink(dw, listUrl, "list", "text/xml");
+		FeedHelper.addElement(dw, "tracktitle", trackTitle);
 
 		if (detailLevel == 1) {
 			String trackLink = null;
@@ -395,26 +395,26 @@ public class PlayersServlet extends HttpServlet {
 				filepath = NULL;
 			}
 
-			if (trackLink != null) AbstractFeed.addLink(dw, trackLink, "track");
+			if (trackLink != null) FeedHelper.addLink(dw, trackLink, "track");
 
-			AbstractFeed.addElement(dw, "trackfile", filepath);
-			AbstractFeed.addElement(dw, "trackfilename", filename);
-			AbstractFeed.addElement(dw, "playposition", p.getCurrentPosition());
-			AbstractFeed.addElement(dw, "trackduration", p.getCurrentTrackDuration());
+			FeedHelper.addElement(dw, "trackfile", filepath);
+			FeedHelper.addElement(dw, "trackfilename", filename);
+			FeedHelper.addElement(dw, "playposition", p.getCurrentPosition());
+			FeedHelper.addElement(dw, "trackduration", p.getCurrentTrackDuration());
 
 			if (currentItem != null && currentItem.item != null) {
 				IMediaTrack item = currentItem.item;
-				if (item.getHashcode() != null) AbstractFeed.addElement(dw, "trackhash", item.getHashcode().toString(16));
-				AbstractFeed.addElement(dw, "trackenabled", Boolean.toString(currentItem.item.isEnabled()));
-				AbstractFeed.addElement(dw, "trackmissing", Boolean.toString(currentItem.item.isMissing()));
-				AbstractFeed.addElement(dw, "trackstartcount", String.valueOf(currentItem.item.getStartCount()));
-				AbstractFeed.addElement(dw, "trackendcount", String.valueOf(currentItem.item.getEndCount()));
+				if (item.getHashcode() != null) FeedHelper.addElement(dw, "trackhash", item.getHashcode().toString(16));
+				FeedHelper.addElement(dw, "trackenabled", Boolean.toString(currentItem.item.isEnabled()));
+				FeedHelper.addElement(dw, "trackmissing", Boolean.toString(currentItem.item.isMissing()));
+				FeedHelper.addElement(dw, "trackstartcount", String.valueOf(currentItem.item.getStartCount()));
+				FeedHelper.addElement(dw, "trackendcount", String.valueOf(currentItem.item.getEndCount()));
 
 				if (currentList != null) {
 					List<MediaTag> tags = currentList.getTags(item);
 					if (tags != null) {
 						for (MediaTag tag : tags) {
-							AbstractFeed.addElement(dw, "tracktag", tag.getTag(), new String[][] {
+							FeedHelper.addElement(dw, "tracktag", tag.getTag(), new String[][] {
 								{"t", String.valueOf(tag.getType().getIndex())},
 								{"c", tag.getClassification() == null ? "" : tag.getClassification().getClassification()}
 							});
@@ -426,7 +426,7 @@ public class PlayersServlet extends HttpServlet {
 			Map<Integer, String> mons = p.getMonitors();
 			if (mons != null) {
 				for (Entry<Integer, String> mon : mons.entrySet()) {
-					AbstractFeed.addElement(dw, "monitor", mon.getKey() + ":" + mon.getValue());
+					FeedHelper.addElement(dw, "monitor", mon.getKey() + ":" + mon.getValue());
 				}
 			}
 		}
@@ -434,16 +434,16 @@ public class PlayersServlet extends HttpServlet {
 
 	private static void printQueue (DataWriter dw, Player p) throws SAXException, UnsupportedEncodingException {
 
-		AbstractFeed.addLink(dw, CONTEXTPATH + "/" + p.getId() + "/" + PATH_QUEUE, "self", "text/xml");
-		AbstractFeed.addLink(dw, CONTEXTPATH + "/" + p.getId(), "player", "text/xml");
+		FeedHelper.addLink(dw, CONTEXTPATH + "/" + p.getId() + "/" + PATH_QUEUE, "self", "text/xml");
+		FeedHelper.addLink(dw, CONTEXTPATH + "/" + p.getId(), "player", "text/xml");
 
 		int queueLength = p.getQueueList().size();
 		DurationData queueDuration = p.getQueueTotalDuration();
 		String queueDurationString = (queueDuration.isComplete() ? "" : "more than ") +
 				TimeHelper.formatTimeSeconds(queueDuration.getDuration());
 
-		AbstractFeed.addElement(dw, "queuelength", queueLength);
-		AbstractFeed.addElement(dw, "queueduration", queueDurationString); // FIXME make parsasble.
+		FeedHelper.addElement(dw, "queuelength", queueLength);
+		FeedHelper.addElement(dw, "queueduration", queueDurationString); // FIXME make parsasble.
 
 		List<PlayItem> queueList = p.getQueueList();
 		for (PlayItem playItem : queueList) {
@@ -452,32 +452,32 @@ public class PlayersServlet extends HttpServlet {
 
 			dw.startElement("entry");
 
-			AbstractFeed.addElement(dw, "title", playItem.toString());
+			FeedHelper.addElement(dw, "title", playItem.toString());
 
-			String listFile = URLEncoder.encode(AbstractFeed.filenameFromPath(list.getListId()), "UTF-8");
-			AbstractFeed.addLink(dw, listFile, "list", "text/xml");
+			String listFile = URLEncoder.encode(FeedHelper.filenameFromPath(list.getListId()), "UTF-8");
+			FeedHelper.addLink(dw, listFile, "list", "text/xml");
 
-			AbstractFeed.addElement(dw, "id", playItem.id);
+			FeedHelper.addElement(dw, "id", playItem.id);
 
 			if (mi != null) {
 				String file = URLEncoder.encode(mi.getFilepath(), "UTF-8");
-				AbstractFeed.addLink(dw, file, "item");
+				FeedHelper.addLink(dw, file, "item");
 
 				if (mi.getDateAdded() != null) {
-					AbstractFeed.addElement(dw, "dateadded", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateAdded()));
+					FeedHelper.addElement(dw, "dateadded", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateAdded()));
 				}
 				if (mi.getDateLastModified() != null) {
-					AbstractFeed.addElement(dw, "datelastmodified", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateLastModified()));
+					FeedHelper.addElement(dw, "datelastmodified", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateLastModified()));
 				}
-				AbstractFeed.addElement(dw, "type", MediaType.TRACK.getN());
-				if (mi.getHashcode() != null && !BigInteger.ZERO.equals(mi.getHashcode())) AbstractFeed.addElement(dw, "hash", mi.getHashcode().toString(16));
-				AbstractFeed.addElement(dw, "enabled", Boolean.toString(mi.isEnabled()));
-				AbstractFeed.addElement(dw, "missing", Boolean.toString(mi.isMissing()));
-				AbstractFeed.addElement(dw, "duration", mi.getDuration());
-				AbstractFeed.addElement(dw, "startcount", mi.getStartCount());
-				AbstractFeed.addElement(dw, "endcount", mi.getEndCount());
+				FeedHelper.addElement(dw, "type", MediaType.TRACK.getN());
+				if (mi.getHashcode() != null && !BigInteger.ZERO.equals(mi.getHashcode())) FeedHelper.addElement(dw, "hash", mi.getHashcode().toString(16));
+				FeedHelper.addElement(dw, "enabled", Boolean.toString(mi.isEnabled()));
+				FeedHelper.addElement(dw, "missing", Boolean.toString(mi.isMissing()));
+				FeedHelper.addElement(dw, "duration", mi.getDuration());
+				FeedHelper.addElement(dw, "startcount", mi.getStartCount());
+				FeedHelper.addElement(dw, "endcount", mi.getEndCount());
 				if (mi.getDateLastPlayed() != null) {
-					AbstractFeed.addElement(dw, "datelastplayed", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateLastPlayed()));
+					FeedHelper.addElement(dw, "datelastplayed", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateLastPlayed()));
 				}
 			}
 
