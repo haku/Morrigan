@@ -1,5 +1,6 @@
 package com.vaguehope.morrigan.model.media.internal.db.mmdb;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -13,6 +14,7 @@ import com.vaguehope.morrigan.model.media.IMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMixedMediaStorageLayer;
+import com.vaguehope.morrigan.model.media.MediaAlbum;
 import com.vaguehope.morrigan.model.media.internal.MediaPictureListHelper;
 import com.vaguehope.morrigan.model.media.internal.MediaTrackListHelper;
 import com.vaguehope.morrigan.model.media.internal.db.MediaItemDb;
@@ -87,6 +89,16 @@ public abstract class AbstractMixedMediaDb
 	@Override
 	public List<IMixedMediaItem> simpleSearchMedia(MediaType mediaType, String term, int maxResults) throws DbException {
 		return getDbLayer().simpleSearchMedia(mediaType, escapeSearch(term), SEARCH_ESC, maxResults);
+	}
+
+	@Override
+	public Collection<IMixedMediaItem> getAlbumItems (MediaType mediaType, MediaAlbum album) throws MorriganException {
+		try {
+			return getDbLayer().getAlbumItems(mediaType, album);
+		}
+		catch (DbException e) {
+			throw new MorriganException(e);
+		}
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
