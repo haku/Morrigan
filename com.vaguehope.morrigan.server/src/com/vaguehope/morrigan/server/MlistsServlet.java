@@ -33,10 +33,10 @@ import com.vaguehope.morrigan.model.media.internal.db.mmdb.LocalMixedMediaDbHelp
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlayerReader;
-import com.vaguehope.morrigan.server.feedwriters.FeedHelper;
-import com.vaguehope.morrigan.server.feedwriters.XmlHelper;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbFactory;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbHelper;
+import com.vaguehope.morrigan.server.util.FeedHelper;
+import com.vaguehope.morrigan.server.util.XmlHelper;
 import com.vaguehope.sqlitewrapper.DbException;
 
 /**

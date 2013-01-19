@@ -20,7 +20,7 @@ import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagType;
-import com.vaguehope.morrigan.server.feedwriters.XmlHelper;
+import com.vaguehope.morrigan.server.util.XmlHelper;
 import com.vaguehope.morrigan.tasks.TaskEventListener;
 import com.vaguehope.sqlitewrapper.DbException;
 
