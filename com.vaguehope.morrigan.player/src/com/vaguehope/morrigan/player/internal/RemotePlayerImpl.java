@@ -57,7 +57,7 @@ public class RemotePlayerImpl implements RemotePlayer {
 
 	@Override
 	public boolean isAvailable() {
-		throw new RuntimeException("Not implemented.");
+		throw new UnsupportedOperationException("Not implemented.");
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -69,82 +69,82 @@ public class RemotePlayerImpl implements RemotePlayer {
 
 	@Override
 	public void loadAndStartPlaying(IMediaTrackList<? extends IMediaTrack> list) {
-		throw new RuntimeException("Not implemented.");
+		throw new UnsupportedOperationException("Not implemented.");
 	}
 
 	@Override
 	public void loadAndStartPlaying(IMediaTrackList<? extends IMediaTrack> list, IMediaTrack track) {
-		throw new RuntimeException("Not implemented.");
+		throw new UnsupportedOperationException("Not implemented.");
 	}
 
 	@Override
 	public void loadAndStartPlaying(PlayItem item) {
-		throw new RuntimeException("Not implemented.");
+		throw new UnsupportedOperationException("Not implemented.");
 	}
 
 	@Override
 	public void pausePlaying() {
-		throw new RuntimeException("Not implemented.");
+		throw new UnsupportedOperationException("Not implemented.");
 	}
 
 	@Override
 	public void stopPlaying() {
-		throw new RuntimeException("Not implemented.");
+		throw new UnsupportedOperationException("Not implemented.");
 	}
 
 	@Override
 	public void nextTrack() {
-		throw new RuntimeException("Not implemented.");
+		throw new UnsupportedOperationException("Not implemented.");
 	}
 
 	@Override
 	public PlayState getPlayState() {
-		throw new RuntimeException("Not implemented.");
+		throw new UnsupportedOperationException("Not implemented.");
 	}
 
 	@Override
 	public PlayItem getCurrentItem() {
-		throw new RuntimeException("Not implemented.");
+		throw new UnsupportedOperationException("Not implemented.");
 	}
 
 	@Override
 	public IMediaTrackList<? extends IMediaTrack> getCurrentList() {
-		throw new RuntimeException("Not implemented.");
+		throw new UnsupportedOperationException("Not implemented.");
 	}
 
 	@Override
 	public long getCurrentPosition() {
-		throw new RuntimeException("Not implemented.");
+		throw new UnsupportedOperationException("Not implemented.");
 	}
 
 	@Override
 	public int getCurrentTrackDuration() {
-		throw new RuntimeException("Not implemented.");
+		throw new UnsupportedOperationException("Not implemented.");
 	}
 
 	@Override
 	public void seekTo(double d) {
-		throw new RuntimeException("Not implemented.");
+		throw new UnsupportedOperationException("Not implemented.");
 	}
 
 	@Override
 	public PlaybackOrder getPlaybackOrder() {
-		throw new RuntimeException("Not implemented.");
+		throw new UnsupportedOperationException("Not implemented.");
 	}
 
 	@Override
 	public void setPlaybackOrder(PlaybackOrder order) {
-		throw new RuntimeException("Not implemented.");
+		throw new UnsupportedOperationException("Not implemented.");
 	}
 
 	@Override
 	public List<PlayItem> getHistory() {
-		throw new RuntimeException("Not implemented.");
+		throw new UnsupportedOperationException("Not implemented.");
 	}
 
 	@Override
 	public void addToQueue(PlayItem item) {
-		throw new RuntimeException("Not implemented.");
+		throw new UnsupportedOperationException("Not implemented.");
 	}
 
 	@Override
@@ -154,17 +154,17 @@ public class RemotePlayerImpl implements RemotePlayer {
 
 	@Override
 	public void removeFromQueue(PlayItem item) {
-		throw new RuntimeException("Not implemented.");
+		throw new UnsupportedOperationException("Not implemented.");
 	}
 
 	@Override
 	public void clearQueue() {
-		throw new RuntimeException("Not implemented.");
+		throw new UnsupportedOperationException("Not implemented.");
 	}
 
 	@Override
 	public void moveInQueue(List<PlayItem> items, boolean moveDown) {
-		throw new RuntimeException("Not implemented.");
+		throw new UnsupportedOperationException("Not implemented.");
 	}
 
 	@Override
@@ -179,7 +179,7 @@ public class RemotePlayerImpl implements RemotePlayer {
 
 	@Override
 	public List<PlayItem> getQueueList() {
-		throw new RuntimeException("Not implemented.");
+		throw new UnsupportedOperationException("Not implemented.");
 	}
 
 	@Override
@@ -189,7 +189,7 @@ public class RemotePlayerImpl implements RemotePlayer {
 
 	@Override
 	public DurationData getQueueTotalDuration() {
-		throw new RuntimeException("Not implemented.");
+		throw new UnsupportedOperationException("Not implemented.");
 	}
 
 	@Override
