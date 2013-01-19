@@ -1,10 +1,7 @@
 package com.vaguehope.morrigan.model.factory;
 
 import java.lang.ref.WeakReference;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -79,24 +76,6 @@ public abstract class RecyclingFactory<T extends Object, K extends Object, P ext
 		}
 
 		return ret;
-	}
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	public synchronized void disposeAll () {
-		Set<Entry<K,WeakReference<T>>> products = new HashSet<Entry<K, WeakReference<T>>>(this.cache.entrySet());
-
-		for (Entry<K, WeakReference<T>> entry : products) {
-			T product = entry.getValue().get();
-			if (product != null) {
-				disposeProduct(product);
-				this.cache.remove(entry.getKey());
-			}
-		}
-	}
-
-	protected void disposeProduct (T product) {
-		throw new IllegalArgumentException("Not implemented.");
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
