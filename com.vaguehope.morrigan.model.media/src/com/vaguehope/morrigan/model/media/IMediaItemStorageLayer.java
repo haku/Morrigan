@@ -57,7 +57,7 @@ public interface IMediaItemStorageLayer<T extends IMediaItem> extends IGenericDb
 	List<MediaTag> getTags (IDbItem item) throws DbException;
 	boolean addTag (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) throws DbException;
 	boolean addTag (IDbItem item, String tag, MediaTagType type, String mtc) throws DbException;
-	void moveTags (IDbItem from_item, IDbItem to_item) throws DbException;
+	void moveTags (IDbItem fromItem, IDbItem toItem) throws DbException;
 	void removeTag (MediaTag tag) throws DbException;
 	void clearTags (IDbItem item) throws DbException;
 

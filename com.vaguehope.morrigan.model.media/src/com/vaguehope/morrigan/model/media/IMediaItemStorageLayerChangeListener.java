@@ -19,7 +19,7 @@ public interface IMediaItemStorageLayerChangeListener<T extends IMediaItem> {
 	void mediaItemUpdated (String filePath);
 
 	void mediaItemTagAdded (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc);
-	void mediaItemTagsMoved (IDbItem from_item, IDbItem to_item);
+	void mediaItemTagsMoved (IDbItem fromItem, IDbItem toItem);
 	void mediaItemTagRemoved (MediaTag tag);
 	void mediaItemTagsCleared (IDbItem item);
 
