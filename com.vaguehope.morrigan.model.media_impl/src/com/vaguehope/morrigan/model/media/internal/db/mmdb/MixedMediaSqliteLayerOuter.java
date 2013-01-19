@@ -18,7 +18,7 @@ import com.vaguehope.morrigan.model.media.internal.Defaults;
 import com.vaguehope.morrigan.util.StringHelper;
 import com.vaguehope.sqlitewrapper.DbException;
 
-public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner implements IMixedMediaStorageLayer<IMixedMediaItem> {
+public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner implements IMixedMediaStorageLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private final Logger logger = Logger.getLogger(this.getClass().getName());
@@ -111,9 +111,15 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 
 	@Override
 	public Collection<IMixedMediaItem> getAlbumItems (MediaAlbum album) throws DbException {
+		return getAlbumItems(MediaType.UNKNOWN, album);
+	}
+
+	@Override
+	public Collection<IMixedMediaItem> getAlbumItems (MediaType mediaType, MediaAlbum album) throws DbException {
 		try {
-			return local_getAlbumItems(MediaType.UNKNOWN, album);
-		} catch (Exception e) {
+			return local_getAlbumItems(mediaType, album);
+		}
+		catch (Exception e) {
 			throw new DbException(e);
 		}
 	}
