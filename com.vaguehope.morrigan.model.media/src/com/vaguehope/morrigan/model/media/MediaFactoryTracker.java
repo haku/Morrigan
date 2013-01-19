@@ -36,8 +36,7 @@ public class MediaFactoryTracker implements MediaFactory {
 
 	private MediaFactory getServiceOptional () {
 		checkAlive();
-		MediaFactory service = this.playerReaderTracker.getService();
-		return service;
+		return this.playerReaderTracker.getService();
 	}
 
 	private MediaFactory getService () {
