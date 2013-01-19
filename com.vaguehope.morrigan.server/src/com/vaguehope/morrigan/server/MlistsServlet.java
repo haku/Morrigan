@@ -24,14 +24,15 @@ import com.vaguehope.morrigan.model.media.IMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
+import com.vaguehope.morrigan.model.media.MediaAlbum;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaListReference;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagClassification;
 import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.LocalMixedMediaDbHelper;
-import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayItem;
+import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayerReader;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbFactory;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbHelper;
@@ -57,6 +58,10 @@ import com.vaguehope.sqlitewrapper.DbException;
  * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 action=queue&playerid=0
  * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 action=addtag&tag=foo
  *
+ *  GET /mlists/LOCALMMDB/example.local.db3/albums
+ * POST /mlists/LOCALMMDB/example.local.db3/albums/somealbum action=play&playerid=0
+ * POST /mlists/LOCALMMDB/example.local.db3/albums/somealbum action=queue&playerid=0
+ *
  *  GET /mlists/LOCALMMDB/example.local.db3/query/example
  * </pre>
  */
@@ -65,8 +70,9 @@ public class MlistsServlet extends HttpServlet {
 
 	public static final String CONTEXTPATH = "/mlists";
 
-	public static final String PATH_ITEMS = "items";
 	public static final String PATH_SRC = "src";
+	public static final String PATH_ITEMS = "items";
+	public static final String PATH_ALBUMS = "albums";
 	public static final String PATH_QUERY = "query";
 
 	public static final String CMD_NEWMMDB = "newmmdb";
@@ -339,22 +345,17 @@ public class MlistsServlet extends HttpServlet {
 				// Request to fetch media file.
 				String filepath = URLDecoder.decode(afterPath, "UTF-8");
 				if (mmdb.hasFile(filepath)) {
-					// First see if we have the file locally to send.
+					IMixedMediaItem item = mmdb.getByFile(filepath);
+					boolean asDownload = item.getMediaType() == MediaType.TRACK;
 					File file = new File(filepath);
 					if (file.exists()) {
-						ServletHelper.returnFile(file, resp);
+						ServletHelper.returnFile(file, resp, asDownload);
 					}
 					else {
-						// Then see if the MMDB can find the file somewhere?
-						IMixedMediaItem item = mmdb.getByFile(filepath);
-						if (item != null) {
-							ServletHelper.prepForReturnFile(item.getTitle(), 0, resp); // TODO pass through length?
-							mmdb.copyItemFile(item, resp.getOutputStream());
-							resp.flushBuffer();
-						}
-						else { // OK give up - no idea where this file is supposed to be.
-							ServletHelper.error(resp, HttpServletResponse.SC_NOT_FOUND, "HTTP error 404 '" + filepath + "' in list but not availabe desu~");
-						}
+						String name = asDownload ? item.getTitle() : null;
+						ServletHelper.prepForReturnFile(name, 0, resp); // TODO pass through length?
+						mmdb.copyItemFile(item, resp.getOutputStream());
+						resp.flushBuffer();
 					}
 				}
 				else {
@@ -367,6 +368,9 @@ public class MlistsServlet extends HttpServlet {
 		}
 		else if (path.equals(PATH_SRC)) {
 			printMlistLong(resp, mmdb, true, false);
+		}
+		else if (path.equals(PATH_ALBUMS)) {
+			printAlbums(resp, mmdb);
 		}
 		else if (path.equals(PATH_QUERY) && afterPath != null && afterPath.length() > 0) {
 			String query = URLDecoder.decode(afterPath, "UTF-8");
@@ -411,10 +415,9 @@ public class MlistsServlet extends HttpServlet {
 	}
 
 	private static void printMlistLong (HttpServletResponse resp, IMixedMediaDb ml, boolean listSrcs, boolean listItems, boolean includeTags, String queryString) throws SAXException, MorriganException, DbException, IOException {
+		ml.read();
 		resp.setContentType("text/xml;charset=utf-8");
 		DataWriter dw = FeedHelper.startDocument(resp.getWriter(), "mlist");
-
-		ml.read();
 
 		List<IMixedMediaItem> items;
 		if (queryString != null) {
@@ -450,13 +453,11 @@ public class MlistsServlet extends HttpServlet {
 		String pathToSelf = CONTEXTPATH + "/" + ml.getType() + "/" + listFile;
 		FeedHelper.addLink(dw, pathToSelf, "self", "text/xml");
 		if (!listItems) FeedHelper.addLink(dw, pathToSelf + "/" + PATH_ITEMS, PATH_ITEMS, "text/xml");
+		FeedHelper.addLink(dw, pathToSelf + "/" + PATH_ALBUMS, PATH_ALBUMS, "text/xml");
 		FeedHelper.addLink(dw, pathToSelf + "/" + PATH_SRC, PATH_SRC, "text/xml");
 
 		if (listSrcs) {
-			List<String> src;
-			src = ml.getSources();
-
-			for (String s : src) {
+			for (String s : ml.getSources()) {
 				FeedHelper.addElement(dw, "src", s);
 			}
 		}
@@ -467,14 +468,7 @@ public class MlistsServlet extends HttpServlet {
 
 				FeedHelper.addElement(dw, "title", mi.getTitle());
 
-				String file;
-				try {
-					file = URLEncoder.encode(mi.getFilepath(), "UTF-8");
-				}
-				catch (UnsupportedEncodingException e) {
-					throw new RuntimeException(e);
-				}
-				FeedHelper.addLink(dw, file, "self"); // Path is relative to this feed.
+				FeedHelper.addLink(dw, fileLink(mi), "self"); // Path is relative to this feed.
 
 				if (mi.getDateAdded() != null) {
 					FeedHelper.addElement(dw, "dateadded", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateAdded()));
@@ -515,6 +509,36 @@ public class MlistsServlet extends HttpServlet {
 		}
 
 		FeedHelper.endDocument(dw, "mlist");
+	}
+
+	private static void printAlbums (HttpServletResponse resp, IMixedMediaDb ml) throws SAXException, IOException, MorriganException {
+		ml.read();
+		resp.setContentType("text/xml;charset=utf-8");
+		DataWriter dw = FeedHelper.startDocument(resp.getWriter(), "mlist");
+		for (MediaAlbum album : ml.getAlbums()) {
+			dw.startElement("entry");
+			FeedHelper.addElement(dw, "name", album.getName());
+
+			Collection<IMixedMediaItem> pics = ml.getAlbumItems(MediaType.PICTURE, album); // TODO set max result count.
+			if (pics != null && pics.size() >= 1) {
+				IMixedMediaItem pic = pics.iterator().next();
+				FeedHelper.addLink(dw, PATH_ITEMS + '/' + fileLink(pic), "cover");
+			}
+
+			dw.endElement("entry");
+		}
+		FeedHelper.endDocument(dw, "mlist");
+	}
+
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	private static String fileLink (IMixedMediaItem mi) {
+		try {
+			return URLEncoder.encode(mi.getFilepath(), "UTF-8");
+		}
+		catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
