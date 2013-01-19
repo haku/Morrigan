@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.xml.sax.SAXException;
 
 import com.megginson.sax.DataWriter;
-import com.vaguehope.morrigan.server.feedwriters.AbstractFeed;
+import com.vaguehope.morrigan.server.feedwriters.FeedHelper;
 import com.vaguehope.morrigan.tasks.AsyncTasksRegister;
 
 /**
@@ -49,19 +49,19 @@ public class StatusServlet extends HttpServlet {
 
 	private void printTaskStatusList (HttpServletResponse resp) throws IOException, SAXException {
 		resp.setContentType("text/xml;charset=utf-8");
-		DataWriter dw = AbstractFeed.startFeed(resp.getWriter());
+		DataWriter dw = FeedHelper.startFeed(resp.getWriter());
 
-		AbstractFeed.addElement(dw, "title", "Morrigan task status desu~");
-		AbstractFeed.addLink(dw, CONTEXTPATH, "self", "text/xml");
+		FeedHelper.addElement(dw, "title", "Morrigan task status desu~");
+		FeedHelper.addLink(dw, CONTEXTPATH, "self", "text/xml");
 
 		String[] reports = this.asyncTasksRegister.reportIndiviually();
 		for (String r : reports) {
 			dw.startElement("entry");
-			AbstractFeed.addElement(dw, "summary", r);
+			FeedHelper.addElement(dw, "summary", r);
 			dw.endElement("entry");
 		}
 
-		AbstractFeed.endFeed(dw);
+		FeedHelper.endFeed(dw);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
