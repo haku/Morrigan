@@ -59,8 +59,8 @@ import com.vaguehope.sqlitewrapper.DbException;
  * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 action=addtag&tag=foo
  *
  *  GET /mlists/LOCALMMDB/example.local.db3/albums
- * POST /mlists/LOCALMMDB/example.local.db3/albums/somealbum action=play&playerid=0
- * POST /mlists/LOCALMMDB/example.local.db3/albums/somealbum action=queue&playerid=0
+ * POST /mlists/LOCALMMDB/example.local.db3/albums/somealbum action=play&playerid=0 // TODO
+ * POST /mlists/LOCALMMDB/example.local.db3/albums/somealbum action=queue&playerid=0 // TODO
  *
  *  GET /mlists/LOCALMMDB/example.local.db3/query/example
  * </pre>
@@ -514,7 +514,7 @@ public class MlistsServlet extends HttpServlet {
 	private static void printAlbums (HttpServletResponse resp, IMixedMediaDb ml) throws SAXException, IOException, MorriganException {
 		ml.read();
 		resp.setContentType("text/xml;charset=utf-8");
-		DataWriter dw = FeedHelper.startDocument(resp.getWriter(), "mlist");
+		DataWriter dw = FeedHelper.startDocument(resp.getWriter(), "albums");
 		for (MediaAlbum album : ml.getAlbums()) {
 			dw.startElement("entry");
 			FeedHelper.addElement(dw, "name", album.getName());
@@ -522,12 +522,12 @@ public class MlistsServlet extends HttpServlet {
 			Collection<IMixedMediaItem> pics = ml.getAlbumItems(MediaType.PICTURE, album); // TODO set max result count.
 			if (pics != null && pics.size() >= 1) {
 				IMixedMediaItem pic = pics.iterator().next();
-				FeedHelper.addLink(dw, PATH_ITEMS + '/' + fileLink(pic), "cover");
+				FeedHelper.addLink(dw, fileLink(pic), "cover");
 			}
 
 			dw.endElement("entry");
 		}
-		FeedHelper.endDocument(dw, "mlist");
+		FeedHelper.endDocument(dw, "albums");
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
