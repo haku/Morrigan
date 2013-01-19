@@ -1,5 +1,6 @@
 package com.vaguehope.morrigan.model.media;
 
+import java.util.Collection;
 import java.util.List;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
@@ -19,6 +20,8 @@ public interface IMixedMediaDb
 	MediaType getDefaultMediaType ();
 
 	List<IMixedMediaItem> simpleSearchMedia (MediaType mediaType, String term, int maxResults) throws DbException;
+
+	Collection<IMixedMediaItem> getAlbumItems (MediaType mediaType, MediaAlbum album) throws MorriganException;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
