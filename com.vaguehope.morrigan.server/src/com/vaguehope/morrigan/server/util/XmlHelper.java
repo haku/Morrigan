@@ -1,4 +1,4 @@
-package com.vaguehope.morrigan.server.feedwriters;
+package com.vaguehope.morrigan.server.util;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

@@ -29,8 +29,8 @@ import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayerReader;
-import com.vaguehope.morrigan.server.feedwriters.FeedHelper;
-import com.vaguehope.morrigan.server.feedwriters.XmlHelper;
+import com.vaguehope.morrigan.server.util.FeedHelper;
+import com.vaguehope.morrigan.server.util.XmlHelper;
 import com.vaguehope.morrigan.util.TimeHelper;
 
 /**

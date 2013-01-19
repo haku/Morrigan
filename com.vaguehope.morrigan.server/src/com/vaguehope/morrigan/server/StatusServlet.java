@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.xml.sax.SAXException;
 
 import com.megginson.sax.DataWriter;
-import com.vaguehope.morrigan.server.feedwriters.FeedHelper;
+import com.vaguehope.morrigan.server.util.FeedHelper;
 import com.vaguehope.morrigan.tasks.AsyncTasksRegister;
 
 /**
