@@ -27,11 +27,16 @@ public final class ServletHelper {
 
 	private static final int UPLOADBUFFERSIZE = 8192;
 
+	/**
+	 * @param name if specified then the client will be hinted that this is a download.
+	 */
 	public static void prepForReturnFile (String name, long length, HttpServletResponse response) {
 		response.reset();
-		response.setContentType("application/octet-stream");
-		response.addHeader("Content-Description", "File Transfer");
-		if (name != null) response.addHeader("Content-Disposition", "attachment; filename=\"" + name + "\"");
+		if (name != null) {
+			response.setContentType("application/octet-stream");
+			response.addHeader("Content-Description", "File Transfer");
+			response.addHeader("Content-Disposition", "attachment; filename=\"" + name + "\"");
+		}
 		response.addHeader("Content-Transfer-Encoding", "binary");
 		response.addHeader("Expires", "0");
 		response.addHeader("Cache-Control", "must-revalidate, post-check=0, pre-check=0");
@@ -40,10 +45,15 @@ public final class ServletHelper {
 	}
 
 	public static void returnFile (File file, HttpServletResponse response) throws IOException {
-		BufferedInputStream is = null;
+		returnFile(file, response, true);
+	}
+
+	public static void returnFile (File file, HttpServletResponse response, boolean asDownload) throws IOException {
+		InputStream is = null;
 		try {
 			is = new BufferedInputStream(new FileInputStream(file));
-			returnFile(is, file.getName(), file.length(), response);
+			String name = asDownload ? file.getName() : null;
+			returnFile(is, name, file.length(), response);
 		}
 		finally {
 			if (is != null) is.close();
