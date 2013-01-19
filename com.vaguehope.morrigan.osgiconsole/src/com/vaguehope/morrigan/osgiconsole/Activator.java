@@ -19,7 +19,7 @@ public class Activator implements BundleActivator  {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	public void start(BundleContext context) throws Exception {
+	public void start(BundleContext context) {
 		this.playerReaderTracker = new PlayerReaderTracker(context);
 		this.mediaFactoryTracker = new MediaFactoryTracker(context);
 		this.asyncTasksRegisterTracker = new AsyncTasksRegisterTracker(context);
@@ -31,7 +31,7 @@ public class Activator implements BundleActivator  {
 	}
 
 	@Override
-	public void stop(BundleContext context) throws Exception {
+	public void stop(BundleContext context) {
 		this.asyncTasksRegisterTracker.dispose();
 		this.mediaFactoryTracker.dispose();
 		this.playerReaderTracker.dispose();
