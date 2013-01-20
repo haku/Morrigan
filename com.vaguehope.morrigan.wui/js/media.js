@@ -405,7 +405,7 @@
       Players.getPlayers(onStatus, function(players) {
         $.each(players, function(index, player) {
           var play = $('<button>');
-          play.text(player.title);
+          play.text(player.name + ' (' + player.stateName + ')');
           play.click(function() {
             actionItem(item, player.pid, action, onStatus, onComplete);
           });
@@ -569,7 +569,6 @@
       enqueue.attr('disabled', 'true');
       var status = $('<p>');
       enqueue.after(status);
-      console.log('q', item);
       chosePlayerAndActionItem(item, 'queue', status, function() {
         setTimeout(function() {
           menu.remove();
