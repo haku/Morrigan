@@ -7,11 +7,11 @@
 
   $(document).ready(function() {
     initStatusBars();
-    initTabs();
     var mlistsDiv = $('.mlists');
     var mid = UrlParams.params['mid'];
     var pid = UrlParams.params['pid'];
     if (mid) {
+      initTabs();
       initMlist(mlistsDiv, mid);
       var itemsDiv = $('.mediaitems');
       var view = UrlParams.params['view'];
