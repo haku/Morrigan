@@ -17,10 +17,6 @@
   color: HighlightText;
 }
 
-.mediaitems .album {
-  background: Menu;
-}
-
 .mediaitems .album:hover {
   background: Highlight;
 }
