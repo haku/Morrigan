@@ -477,7 +477,7 @@
     clickable.unbind();
     clickable.click(function(event) {
       event.preventDefault();
-      console.log('TODO: album clicked', album);
+      albumItemClicked(album);
     });
   }
 
@@ -515,9 +515,71 @@
   function parseAlbumNode(node, mid) {
     var album = {};
     album.name = node.find('name').text();
+    album.relativeUrl = node.find('link[rel="self"]').attr('href');
+    if (album.relativeUrl) album.url = '/mlists/' + mid + '/albums/' + album.relativeUrl;
     album.coverRelativeUrl = node.find('link[rel="cover"]').attr('href');
     if (album.coverRelativeUrl) album.coverUrl = '/mlists/' + mid + '/items/' + album.coverRelativeUrl;
     return album;
+  }
+
+  function albumItemClicked(item) {
+    var existingMenu = $('.albummenu');
+    if (existingMenu.size() > 0) {
+      existingMenu.remove();
+    }
+    else {
+      $('body').append(makeAlbumMenu(item));
+    }
+  }
+
+  function makeAlbumMenu(item) {
+    var menu = $('<div class="popup albummenu">');
+
+    // TODO cover.
+
+    var title = $('<p class="title">');
+    title.text(item.name);
+    menu.append(title);
+
+    var play = $('<button class="play">play</button>');
+    menu.append(play);
+
+    var enqueue = $('<button class="enqueue">enqueue</button>');
+    menu.append(enqueue);
+
+    var close = $('<button class="close">close</button>');
+    menu.append(close);
+
+    play.click(function() {
+      play.attr('disabled', 'true');
+      enqueue.remove();
+      var status = $('<p>');
+      play.after(status);
+      chosePlayerAndActionItem(item, 'play', status, function() {
+        setTimeout(function() {
+          menu.remove();
+        }, 1000);
+      });
+    });
+
+    enqueue.click(function() {
+      play.remove();
+      enqueue.attr('disabled', 'true');
+      var status = $('<p>');
+      enqueue.after(status);
+      console.log('q', item);
+      chosePlayerAndActionItem(item, 'queue', status, function() {
+        setTimeout(function() {
+          menu.remove();
+        }, 1000);
+      });
+    });
+
+    close.click(function() {
+      menu.remove();
+    });
+
+    return menu;
   }
 
 })();
