@@ -1,5 +1,6 @@
 package com.vaguehope.morrigan.server.boot;
 
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.swt.SWT;
@@ -20,6 +21,12 @@ class DisplayThread extends Thread {
 
 	@Override
 	public void run () {
+		// FIXME do not create a Display if RCP is present but not as quick to start up as we are.
+		try { // FIXME this is a nasty hack around.
+			Thread.sleep(TimeUnit.SECONDS.toMillis(15));
+		}
+		catch (InterruptedException e) {/* Do not care. */}
+
 		Display d = makeDisplay();
 		if (d != null) {
 			this.displayCache.set(d);
