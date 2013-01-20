@@ -535,7 +535,9 @@
   function makeAlbumMenu(item) {
     var menu = $('<div class="popup albummenu">');
 
-    // TODO cover.
+    var pic = $('<img class="cover">');
+    pic.attr('src', item.coverUrl);
+    menu.append(pic);
 
     var title = $('<p class="title">');
     title.text(item.name);
