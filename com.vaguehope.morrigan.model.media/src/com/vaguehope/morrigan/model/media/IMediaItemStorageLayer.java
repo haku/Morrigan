@@ -67,6 +67,7 @@ public interface IMediaItemStorageLayer<T extends IMediaItem> extends IGenericDb
 	 * Name is case-insensitive.
 	 */
 	MediaAlbum createAlbum (String name) throws DbException;
+	void removeAlbum (MediaAlbum album) throws DbException;
 	Collection<MediaAlbum> getAlbums () throws DbException;
 	Collection<T> getAlbumItems (MediaAlbum album) throws DbException;
 	/**

@@ -704,13 +704,15 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 				}
 			}
 		}
-		if (!albumDirs.isEmpty()) {
-			int progress = 0;
-			int n = 0;
-			int N = albumDirs.size();
-			try {
+		try {
+			taskEventListener.subTask("Found " + albumDirs.size() + " albums");
+			if (!albumDirs.isEmpty()) {
+				int progress = 0;
+				int n = 0;
+				int N = albumDirs.size();
 				for (File dir : albumDirs) {
 					if (taskEventListener.isCanceled()) break;
+					taskEventListener.subTask("Album " + dir.getAbsolutePath());
 					MediaAlbum album = this.itemList.createAlbum(dir.getName());
 					for (File file : dir.listFiles()) {
 						if (this.itemList.hasFile(file)) {
@@ -718,7 +720,6 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 							this.itemList.addToAlbum(album, item);
 						}
 					}
-
 					n++;
 					int p = N > 0 ? (n * prgTotal) / N : 0;
 					if (p > progress) {
@@ -727,12 +728,25 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 					}
 				}
 			}
-			catch (MorriganException e) {
-				return new TaskResult(TaskOutcome.FAILED, "Failed to update albums.", e);
+			taskEventListener.subTask("Checking for removed albums");
+			for (MediaAlbum album : this.itemList.getAlbums()) {
+				if (taskEventListener.isCanceled()) break;
+				for (T item : this.itemList.getAlbumItems(album)) {
+					if (!isDirectoryAnAlbum(new File(item.getFilepath()).getParentFile())) {
+						this.itemList.removeFromAlbum(album, item);
+					}
+				}
+				if (this.itemList.getAlbumItems(album).size() < 1) {
+					this.itemList.removeAlbum(album);
+				}
+				// TODO track prg here.
 			}
-			catch (DbException e) {
-				return new TaskResult(TaskOutcome.FAILED, "Failed to update albums.", e);
-			}
+		}
+		catch (MorriganException e) {
+			return new TaskResult(TaskOutcome.FAILED, "Failed to update albums.", e);
+		}
+		catch (DbException e) {
+			return new TaskResult(TaskOutcome.FAILED, "Failed to update albums.", e);
 		}
 		return null;
 	}
