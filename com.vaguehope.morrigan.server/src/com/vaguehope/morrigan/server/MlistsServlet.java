@@ -6,6 +6,7 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -60,8 +61,9 @@ import com.vaguehope.sqlitewrapper.DbException;
  * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 action=addtag&tag=foo
  *
  *  GET /mlists/LOCALMMDB/example.local.db3/albums
- * POST /mlists/LOCALMMDB/example.local.db3/albums/somealbum action=play&playerid=0 // TODO
- * POST /mlists/LOCALMMDB/example.local.db3/albums/somealbum action=queue&playerid=0 // TODO
+ *  GET /mlists/LOCALMMDB/example.local.db3/albums/somealbum
+ * POST /mlists/LOCALMMDB/example.local.db3/albums/somealbum action=play&playerid=0
+ * POST /mlists/LOCALMMDB/example.local.db3/albums/somealbum action=queue&playerid=0
  *
  *  GET /mlists/LOCALMMDB/example.local.db3/query/example
  * </pre>
@@ -232,6 +234,16 @@ public class MlistsServlet extends HttpServlet {
 				ServletHelper.error(resp, HttpServletResponse.SC_NOT_FOUND, "HTTP error 404 file '" + filepath + "' not found in MMDB '" + mmdb.getListName() + "' desu~");
 			}
 		}
+		else if (path != null && path.equals(PATH_ALBUMS) && afterPath != null && afterPath.length() > 0) {
+			String albumName = URLDecoder.decode(afterPath, "UTF-8");
+			MediaAlbum album = mmdb.getAlbum(albumName);
+			if (album != null) {
+				postToMmdbAlbum(req, resp, action, mmdb, album);
+			}
+			else {
+				ServletHelper.error(resp, HttpServletResponse.SC_NOT_FOUND, "HTTP error 404 unknown album '" + albumName + "' desu~");
+			}
+		}
 		else {
 			postToMmdb(req, resp, action, mmdb);
 		}
@@ -292,6 +304,36 @@ public class MlistsServlet extends HttpServlet {
 			}
 			else {
 				ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "'tag' parameter not set desu~");
+			}
+		}
+		else {
+			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "HTTP error 400 '" + action + "' is not a valid action parameter desu~");
+		}
+	}
+
+	private void postToMmdbAlbum (HttpServletRequest req, HttpServletResponse resp, String action, IMixedMediaDb mmdb, MediaAlbum album) throws IOException, MorriganException {
+		if (action.equals(CMD_PLAY) || action.equals(CMD_QUEUE)) {
+			Player player = parsePlayer(req, resp);
+			if (player != null) { // parsePlayer() will write the error msg.
+				resp.setContentType("text/plain");
+				Collection<IMixedMediaItem> tracks = mmdb.getAlbumItems(MediaType.TRACK, album);
+				List<PlayItem> trackPlayItems = new ArrayList<PlayItem>();
+				for (IMixedMediaItem track : tracks) {
+					trackPlayItems.add(new PlayItem(mmdb, track));
+				}
+				if (action.equals(CMD_PLAY)) {
+					player.addToQueue(trackPlayItems);
+					player.moveInQueueEnd(trackPlayItems, false);
+					player.nextTrack();
+					resp.getWriter().println("Album playing desu~");
+				}
+				else if (action.equals(CMD_QUEUE)) {
+					player.addToQueue(trackPlayItems);
+					resp.getWriter().println("Album added to queue desu~");
+				}
+				else {
+					throw new IllegalArgumentException("The world has exploded desu~.");
+				}
 			}
 		}
 		else {
@@ -374,7 +416,19 @@ public class MlistsServlet extends HttpServlet {
 			printMlistLong(resp, mmdb, true, false);
 		}
 		else if (path.equals(PATH_ALBUMS)) {
-			printAlbums(resp, mmdb);
+			if (afterPath != null && afterPath.length() > 0) {
+				String albumName = URLDecoder.decode(afterPath, "UTF-8");
+				MediaAlbum album = mmdb.getAlbum(albumName);
+				if (album != null) {
+					printAlbum(resp, mmdb, album);
+				}
+				else {
+					ServletHelper.error(resp, HttpServletResponse.SC_NOT_FOUND, "HTTP error 404 unknown album '" + albumName + "' desu~");
+				}
+			}
+			else {
+				printAlbums(resp, mmdb);
+			}
 		}
 		else if (path.equals(PATH_QUERY) && afterPath != null && afterPath.length() > 0) {
 			String query = URLDecoder.decode(afterPath, "UTF-8");
@@ -521,17 +575,28 @@ public class MlistsServlet extends HttpServlet {
 		DataWriter dw = FeedHelper.startDocument(resp.getWriter(), "albums");
 		for (MediaAlbum album : ml.getAlbums()) {
 			dw.startElement("entry");
-			FeedHelper.addElement(dw, "name", album.getName());
-
-			Collection<IMixedMediaItem> pics = ml.getAlbumItems(MediaType.PICTURE, album); // TODO set max result count.
-			if (pics != null && pics.size() >= 1) {
-				IMixedMediaItem pic = pics.iterator().next();
-				FeedHelper.addLink(dw, fileLink(pic), "cover");
-			}
-
+			printAlbumBody(dw, ml, album);
 			dw.endElement("entry");
 		}
 		FeedHelper.endDocument(dw, "albums");
+	}
+
+	private static void printAlbum (HttpServletResponse resp, IMixedMediaDb ml, MediaAlbum album) throws SAXException, IOException, MorriganException {
+		ml.read();
+		resp.setContentType("text/xml;charset=utf-8");
+		DataWriter dw = FeedHelper.startDocument(resp.getWriter(), "album");
+		printAlbumBody(dw, ml, album);
+		FeedHelper.endDocument(dw, "album");
+	}
+
+	public static void printAlbumBody (DataWriter dw, IMixedMediaDb ml, MediaAlbum album) throws SAXException, MorriganException {
+		FeedHelper.addElement(dw, "name", album.getName());
+		FeedHelper.addLink(dw, fileLink(album), "self");
+		Collection<IMixedMediaItem> pics = ml.getAlbumItems(MediaType.PICTURE, album); // TODO set max result count.
+		if (pics != null && pics.size() >= 1) {
+			IMixedMediaItem pic = pics.iterator().next();
+			FeedHelper.addLink(dw, fileLink(pic), "cover");
+		}
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -539,6 +604,15 @@ public class MlistsServlet extends HttpServlet {
 	private static String fileLink (IMixedMediaItem mi) {
 		try {
 			return URLEncoder.encode(mi.getFilepath(), "UTF-8");
+		}
+		catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private static String fileLink (MediaAlbum album) {
+		try {
+			return URLEncoder.encode(album.getName(), "UTF-8");
 		}
 		catch (UnsupportedEncodingException e) {
 			throw new RuntimeException(e);
