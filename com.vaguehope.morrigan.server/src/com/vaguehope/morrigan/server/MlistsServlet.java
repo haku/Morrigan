@@ -8,6 +8,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -189,7 +190,7 @@ public class MlistsServlet extends HttpServlet {
 							postToMmdb(req, resp, action, mmdb, subPath, afterSubPath);
 						}
 						else {
-							getToMmdb(resp, mmdb, subPath, afterSubPath);
+							getToMmdb(req, resp, mmdb, subPath, afterSubPath);
 						}
 					}
 					else {
@@ -336,7 +337,7 @@ public class MlistsServlet extends HttpServlet {
 		FeedHelper.endFeed(dw);
 	}
 
-	private static void getToMmdb (HttpServletResponse resp, IMixedMediaDb mmdb, String path, String afterPath) throws IOException, SAXException, MorriganException, DbException {
+	private static void getToMmdb (HttpServletRequest req, HttpServletResponse resp, IMixedMediaDb mmdb, String path, String afterPath) throws IOException, SAXException, MorriganException, DbException {
 		if (path == null) {
 			printMlistLong(resp, mmdb, false, false);
 		}
@@ -349,9 +350,12 @@ public class MlistsServlet extends HttpServlet {
 					boolean asDownload = item.getMediaType() == MediaType.TRACK;
 					File file = new File(filepath);
 					if (file.exists()) {
+						if (ServletHelper.checkCanReturn304(file.lastModified(), req, resp)) return;
 						ServletHelper.returnFile(file, resp, asDownload);
 					}
 					else {
+						long lastModified = System.currentTimeMillis() - TimeUnit.HOURS.toMillis(1); // Falsify.
+						if (ServletHelper.checkCanReturn304(lastModified, req, resp)) return;
 						String name = asDownload ? item.getTitle() : null;
 						ServletHelper.prepForReturnFile(name, 0, resp); // TODO pass through length?
 						mmdb.copyItemFile(item, resp.getOutputStream());

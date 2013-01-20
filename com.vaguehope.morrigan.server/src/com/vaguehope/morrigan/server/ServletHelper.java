@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 public final class ServletHelper {
@@ -26,11 +27,29 @@ public final class ServletHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private static final int UPLOADBUFFERSIZE = 8192;
+	//private static final long DEFAULT_ASSET_EXPIRY_SECONDS = TimeUnit.HOURS.toSeconds(1);
+
+	/**
+	 * Returns true if 304 was returned and no further processing is needed.
+	 */
+	public static boolean checkCanReturn304 (long lastModified, HttpServletRequest req, HttpServletResponse resp) {
+		long time = req.getDateHeader("If-Modified-Since");
+		if (time < 0) return false;
+		if (time < lastModified) return false;
+
+		resp.reset();
+		resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+		return true;
+	}
+
+	public static void prepForReturnFile (String name, long length, HttpServletResponse response) {
+		prepForReturnFile(name, length, System.currentTimeMillis(), response);
+	}
 
 	/**
 	 * @param name if specified then the client will be hinted that this is a download.
 	 */
-	public static void prepForReturnFile (String name, long length, HttpServletResponse response) {
+	public static void prepForReturnFile (String name, long length, long lastModified, HttpServletResponse response) {
 		response.reset();
 		if (name != null) {
 			response.setContentType("application/octet-stream");
@@ -38,8 +57,8 @@ public final class ServletHelper {
 			response.addHeader("Content-Disposition", "attachment; filename=\"" + name + "\"");
 		}
 		response.addHeader("Content-Transfer-Encoding", "binary");
-		response.addHeader("Expires", "0");
-		response.addHeader("Cache-Control", "must-revalidate, post-check=0, pre-check=0");
+		response.setDateHeader("Last-Modified", lastModified);
+		//response.addHeader("Cache-Control", "max-age=" + DEFAULT_ASSET_EXPIRY_SECONDS);
 		response.addHeader("Pragma", "public");
 		if (length > 0) response.addHeader("Content-Length", String.valueOf(length));
 	}
@@ -49,21 +68,20 @@ public final class ServletHelper {
 	}
 
 	public static void returnFile (File file, HttpServletResponse response, boolean asDownload) throws IOException {
-		InputStream is = null;
+		InputStream is = new BufferedInputStream(new FileInputStream(file));
 		try {
-			is = new BufferedInputStream(new FileInputStream(file));
 			String name = asDownload ? file.getName() : null;
-			returnFile(is, name, file.length(), response);
+			returnFile(is, name, file.length(), file.lastModified(), response);
 		}
 		finally {
-			if (is != null) is.close();
+			is.close();
 		}
 	}
 
-	public static void returnFile (InputStream is, String name, long length, HttpServletResponse response) throws IOException {
-		prepForReturnFile(name, length, response);
+	public static void returnFile (InputStream is, String name, long length, long lastModified, HttpServletResponse response) throws IOException {
+		prepForReturnFile(name, length, lastModified, response);
 		OutputStream os = null;
-		try { // FIXME this could be done better?
+		try {
 			os = response.getOutputStream();
 			byte[] buffer = new byte[UPLOADBUFFERSIZE];
 			int bytesRead;
@@ -71,7 +89,6 @@ public final class ServletHelper {
 				os.write(buffer, 0, bytesRead);
 			}
 			os.flush();
-
 			response.flushBuffer();
 		}
 		finally {
