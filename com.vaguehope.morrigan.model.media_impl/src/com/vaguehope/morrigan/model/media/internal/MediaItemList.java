@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,7 +32,7 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 
 	private final String listId;
 	private final String listName;
-	private final List<T> mediaTracks = Collections.synchronizedList(new ArrayList<T>());
+	private final List<T> mediaTracks = new CopyOnWriteArrayList<T>();
 
 	/**
 	 * listId must be unique. It will be used to identify the matching editor.
@@ -51,7 +52,9 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 	@Override
 	public void dispose () {
 		this.changeEventListeners.clear();
-		this.mediaTracks.clear();
+		synchronized (this.mediaTracks) {
+			this.mediaTracks.clear();
+		}
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -185,7 +188,9 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 
 	@Override
 	public int getCount () {
-		return this.mediaTracks.size();
+		synchronized (this.mediaTracks) {
+			return this.mediaTracks.size();
+		}
 	}
 
 	/**
@@ -193,7 +198,9 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 	 */
 	@Override
 	public List<T> getMediaItems () {
-		return Collections.unmodifiableList(this.mediaTracks);
+		synchronized (this.mediaTracks) {
+			return Collections.unmodifiableList(this.mediaTracks);
+		}
 	}
 
 	protected void setMediaTracks (List<T> newMediaTracks) {
@@ -218,34 +225,32 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 
 	@Override
 	public void addItem (T track) {
+		boolean diritied = false;
 		synchronized (this.mediaTracks) {
 			if (allowDuplicateEntries() || !this.mediaTracks.contains(track)) {
 				this.mediaTracks.add(track);
 				getChangeEventCaller().mediaItemsAdded(track);
-				setDirtyState(DirtyState.DIRTY);
+				diritied = true;
 			}
 		}
+		if (diritied) setDirtyState(DirtyState.DIRTY);
 	}
 
-	/**
-	 * @throws MorriganException
-	 */
 	@Override
 	public void removeItem (T track) throws MorriganException {
+		boolean diritied = false;
 		synchronized (this.mediaTracks) {
 			this.mediaTracks.remove(track);
 			getChangeEventCaller().mediaItemsRemoved(track);
-			setDirtyState(DirtyState.DIRTY);
+			diritied = true;
 		}
+		if (diritied) setDirtyState(DirtyState.DIRTY);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Update methods.  Use these for data that is to be persisted.
 //	These methods are sub-classed where persistence is needed.
 
-	/**
-	 * @throws MorriganException
-	 */
 	@Override
 	public void setItemDateAdded (T track, Date date) throws MorriganException {
 		track.setDateAdded(date);
@@ -253,9 +258,6 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 		setDirtyState(DirtyState.METADATA);
 	}
 
-	/**
-	 * @throws MorriganException
-	 */
 	@Override
 	public void setItemHashCode (T track, BigInteger hashcode) throws MorriganException {
 		track.setHashcode(hashcode);
@@ -263,9 +265,6 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 		setDirtyState(DirtyState.METADATA);
 	}
 
-	/**
-	 * @throws MorriganException
-	 */
 	@Override
 	public void setItemDateLastModified (T track, Date date) throws MorriganException {
 		track.setDateLastModified(date);
@@ -273,9 +272,6 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 		setDirtyState(DirtyState.METADATA);
 	}
 
-	/**
-	 * @throws MorriganException
-	 */
 	@Override
 	public void setItemEnabled (T track, boolean value) throws MorriganException {
 		track.setEnabled(value);
@@ -283,9 +279,6 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 		setDirtyState(DirtyState.METADATA);
 	}
 
-	/**
-	 * @throws MorriganException
-	 */
 	@Override
 	public void setItemMissing (T track, boolean value) throws MorriganException {
 		track.setMissing(value);
@@ -331,7 +324,7 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 
 	@Override
 	public String toString () {
-		return this.listName + " (" + this.mediaTracks.size() + " items)";
+		return this.listName + " (" + getCount() + " items)";
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
