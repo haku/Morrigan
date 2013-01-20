@@ -81,6 +81,10 @@ public interface IMediaItemList<T extends IMediaItem> {
 	 * Name is case-insensitive.
 	 */
 	MediaAlbum createAlbum (String name) throws MorriganException;
+	/**
+	 * Get album, or null if not found.
+	 */
+	MediaAlbum getAlbum (String name) throws MorriganException;
 	void removeAlbum (MediaAlbum album) throws MorriganException;
 	Collection<MediaAlbum> getAlbums () throws MorriganException;
 	Collection<T> getAlbumItems (MediaAlbum album) throws MorriganException;
