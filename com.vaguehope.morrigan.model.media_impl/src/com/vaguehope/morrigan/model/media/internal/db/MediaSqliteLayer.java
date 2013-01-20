@@ -200,6 +200,15 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	}
 
 	@Override
+	public MediaAlbum getAlbum (String name) throws DbException {
+		try {
+			return local_getAlbum(name);
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+
+	@Override
 	public void removeAlbum (MediaAlbum album) throws DbException {
 		try {
 			local_removeAlbum(album);
@@ -880,6 +889,9 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		}
 	}
 
+	/**
+	 * Get album, or null if not found.
+	 */
 	private MediaAlbum local_getAlbum (String qName) throws SQLException, ClassNotFoundException {
 		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_ALBUMS_Q_GET);
 		try {
