@@ -721,6 +721,16 @@ implements IMediaItemDb<S, T> {
 	}
 
 	@Override
+	public void removeAlbum (MediaAlbum album) throws MorriganException {
+		try {
+			this.dbLayer.removeAlbum(album);
+		}
+		catch (DbException e) {
+			throw new MorriganException(e);
+		}
+	}
+
+	@Override
 	public Collection<MediaAlbum> getAlbums () throws MorriganException {
 		try {
 			return this.dbLayer.getAlbums();

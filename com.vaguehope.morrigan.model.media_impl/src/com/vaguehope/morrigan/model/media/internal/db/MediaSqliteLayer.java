@@ -200,6 +200,15 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	}
 
 	@Override
+	public void removeAlbum (MediaAlbum album) throws DbException {
+		try {
+			local_removeAlbum(album);
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+
+	@Override
 	public void addToAlbum (MediaAlbum album, IDbItem item) throws DbException {
 		try {
 			local_addToAlbum(album, item);
@@ -441,6 +450,9 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	private static final String SQL_TBL_ALBUMS_ADD =
 		"INSERT INTO tbl_albums (name) VALUES (?);";
 
+	private static final String SQL_TBL_ALBUMS_REMOVE =
+		"DELETE FROM tbl_albums WHERE id=?;";
+
 	private static final String SQL_TBL_ALBUM_ITEMS_ADD =
 		"INSERT INTO tbl_album_items (album_id,mf_id) VALUES (?,?);";
 
@@ -582,15 +594,13 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	}
 
 	private void local_moveTags (IDbItem from_item, IDbItem to_item) throws SQLException, ClassNotFoundException, DbException {
-		PreparedStatement ps;
-		ps = getDbCon().prepareStatement(SQL_TBL_TAGS_MOVE);
-		int n;
+		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_TAGS_MOVE);
 		try {
 			ps.setLong(1, to_item.getDbRowId());
 			ps.setLong(2, from_item.getDbRowId());
 
-			n = ps.executeUpdate();
-			if (n<1) throw new DbException("No update occured for moveTags('"+from_item+"' to '"+to_item+"').");
+			int n = ps.executeUpdate();
+			if (n < 1) throw new DbException("No update occured for moveTags('" + from_item + "' to '" + to_item + "').");
 
 			this.changeCaller.mediaItemTagsMoved(from_item, to_item);
 		}
@@ -600,13 +610,11 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	}
 
 	private void local_removeTag(MediaTag tag) throws SQLException, ClassNotFoundException, DbException {
-		PreparedStatement ps;
-		ps = getDbCon().prepareStatement(SQL_TBL_TAGS_REMOVE);
-		int n;
+		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_TAGS_REMOVE);
 		try {
 			ps.setLong(1, tag.getDbRowId());
-			n = ps.executeUpdate();
-			if (n<1) throw new DbException("No update occured.");
+			int n = ps.executeUpdate();
+			if (n < 1) throw new DbException("No update occured.");
 
 			this.changeCaller.mediaItemTagRemoved(tag);
 		}
@@ -616,13 +624,11 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	}
 
 	private void local_clearTags(IDbItem item) throws SQLException, ClassNotFoundException, DbException {
-		PreparedStatement ps;
-		ps = getDbCon().prepareStatement(SQL_TBL_TAGS_CLEAR);
-		int n;
+		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_TAGS_CLEAR);
 		try {
 			ps.setLong(1, item.getDbRowId());
-			n = ps.executeUpdate();
-			if (n<1) throw new DbException("No update occured for clearTags('"+item+"').");
+			int n = ps.executeUpdate();
+			if (n < 1) throw new DbException("No update occured for clearTags('" + item + "').");
 
 			this.changeCaller.mediaItemTagsCleared(item);
 		}
@@ -860,6 +866,18 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		album = local_getAlbum(name);
 		if (album == null) throw new DbException("Failed to find album that was just created: '" + name + "'.");
 		return album;
+	}
+
+	private void local_removeAlbum (MediaAlbum album) throws DbException, SQLException, ClassNotFoundException {
+		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_ALBUMS_REMOVE);
+		try {
+			ps.setLong(1, album.getDbRowId());
+			int n = ps.executeUpdate();
+			if (n < 1) throw new DbException("No update occured.");
+		}
+		finally {
+			ps.close();
+		}
 	}
 
 	private MediaAlbum local_getAlbum (String qName) throws SQLException, ClassNotFoundException {
