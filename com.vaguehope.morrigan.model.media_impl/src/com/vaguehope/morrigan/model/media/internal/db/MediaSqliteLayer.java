@@ -236,9 +236,9 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	}
 
 	@Override
-	public void removeFromAllAlbums (IDbItem item) throws DbException {
+	public int removeFromAllAlbums (IDbItem item) throws DbException {
 		try {
-			local_removeFromAllAlbums(item);
+			return local_removeFromAllAlbums(item);
 		} catch (Exception e) {
 			throw new DbException(e);
 		}
@@ -962,12 +962,11 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		}
 	}
 
-	private void local_removeFromAllAlbums (IDbItem item) throws SQLException, ClassNotFoundException, DbException {
+	private int local_removeFromAllAlbums (IDbItem item) throws SQLException, ClassNotFoundException {
 		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_ALBUM_ITEMS_REMOVE_FROM_ALL);
 		try {
 			ps.setLong(1, item.getDbRowId());
-			int n = ps.executeUpdate();
-			if (n < 1) throw new DbException("No update occured for removeFromAllAlbums(" + item.getDbRowId() + ").");
+			return ps.executeUpdate();
 		}
 		finally {
 			ps.close();

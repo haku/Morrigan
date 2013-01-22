@@ -781,9 +781,9 @@ implements IMediaItemDb<S, T> {
 	}
 
 	@Override
-	public void removeFromAllAlbums (IDbItem item) throws MorriganException {
+	public int removeFromAllAlbums (IDbItem item) throws MorriganException {
 		try {
-			this.dbLayer.removeFromAllAlbums(item);
+			return this.dbLayer.removeFromAllAlbums(item);
 		}
 		catch (DbException e) {
 			throw new MorriganException(e);

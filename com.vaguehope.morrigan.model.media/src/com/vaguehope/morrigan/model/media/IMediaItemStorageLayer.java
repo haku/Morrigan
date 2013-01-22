@@ -79,7 +79,10 @@ public interface IMediaItemStorageLayer<T extends IMediaItem> extends IGenericDb
 	 */
 	void addToAlbum (MediaAlbum album, IDbItem item) throws DbException;
 	void removeFromAlbum (MediaAlbum album, IDbItem item) throws DbException;
-	void removeFromAllAlbums (IDbItem item) throws DbException;
+	/**
+	 * Returns number of items removed.
+	 */
+	int removeFromAllAlbums (IDbItem item) throws DbException;
 
 	List<IDbColumn> getMediaTblColumns ();
 

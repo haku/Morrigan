@@ -93,7 +93,10 @@ public interface IMediaItemList<T extends IMediaItem> {
 	 */
 	void addToAlbum (MediaAlbum album, IDbItem item) throws MorriganException;
 	void removeFromAlbum (MediaAlbum album, IDbItem item) throws MorriganException;
-	void removeFromAllAlbums (IDbItem item) throws MorriganException;
+	/**
+	 * Returns number of items removed.
+	 */
+	int removeFromAllAlbums (IDbItem item) throws MorriganException;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
