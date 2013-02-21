@@ -82,17 +82,6 @@
 			<fileset dir="${buildDirectory}/${buildLabel}" includes="*.zip" />
 		</move>
 
-		<!-- Augment build outputs. -->
-		<antcall target="zip_win32" >
-			<reference refid="${archivePrefix}" />
-		</antcall>
-		<antcall target="zip_linux" >
-			<reference refid="${archivePrefix}" />
-		</antcall>
-		<antcall target="zip_mac"   >
-			<reference refid="${archivePrefix}" />
-		</antcall>
-
 		<!-- Move to final output dir. -->
 		<move todir="${outputDirectory}">
 			<fileset dir="${procDirectory}" includes="*.zip" />
@@ -100,38 +89,6 @@
 
 		<!-- Delete proc dir. -->
 		<delete dir="${procDirectory}" />
-	</target>
-
-	<target name="zip_win32" depends="setprop" >
-		<fileset dir="${procDirectory}" id="zipfiles" >
-			<include name="*win32*.zip" />
-		</fileset>
-		<pathconvert pathsep="" property="zipfile" refid="zipfiles" />
-		<echo message="zipfile=${zipfile}" />
-	</target>
-
-	<target name="zip_linux" depends="setprop" >
-		<fileset dir="${procDirectory}" id="zipfiles" >
-			<include name="*linux*.zip" />
-		</fileset>
-		<pathconvert pathsep="" property="zipfile" refid="zipfiles" />
-		<echo message="zipfile=${zipfile}" />
-
-		<zip destfile="${zipfile}" update="true" whenempty="fail" >
-			<zipfileset dir="rootfiles"
-						includes="morrigan.sh"
-						fullpath="${archivePrefix}/morrigan.sh"
-						filemode="755"
-			/>
-		</zip>
-	</target>
-
-	<target name="zip_mac" depends="setprop" >
-		<fileset dir="${procDirectory}" id="zipfiles" >
-			<include name="*macosx*.zip" />
-		</fileset>
-		<pathconvert pathsep="" property="zipfile" refid="zipfiles" />
-		<echo message="zipfile=${zipfile}" />
 	</target>
 
 </project>
