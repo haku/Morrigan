@@ -32,6 +32,9 @@ public interface IMediaItemList<T extends IMediaItem> {
 	void removeChangeEventListener (MediaItemListChangeListener listener);
 	MediaItemListChangeListener getChangeEventCaller ();
 
+	/**
+	 * May returns -1 if no data is available.
+	 */
 	int getCount ();
 	List<T> getMediaItems();
 

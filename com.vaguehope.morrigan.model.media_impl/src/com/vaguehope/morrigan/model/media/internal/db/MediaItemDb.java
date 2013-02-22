@@ -150,7 +150,7 @@ implements IMediaItemDb<S, T> {
 
 	@Override
 	public int getCount () {
-		if (!isRead()) throw new IllegalStateException("DB has not been loaded.");
+		if (!isRead()) return -1;
 		return super.getCount();
 	}
 
