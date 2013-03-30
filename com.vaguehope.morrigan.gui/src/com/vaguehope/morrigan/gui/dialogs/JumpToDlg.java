@@ -39,7 +39,7 @@ import com.vaguehope.sqlitewrapper.DbException;
 public class JumpToDlg {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private static final int MAX_RESULTS = 100;
+	private static final int MAX_RESULTS = 200;
 
 	private static volatile WeakReference<JumpToDlg> openDlg = null;
 	private static volatile Object dlgOpenLock = new Object();
