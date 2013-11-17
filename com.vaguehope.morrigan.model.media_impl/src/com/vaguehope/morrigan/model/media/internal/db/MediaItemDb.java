@@ -46,7 +46,7 @@ implements IMediaItemDb<S, T> {
 	private final MediaItemDbConfig config;
 	private final String escapedSearchTerm;
 
-	private S dbLayer;
+	private final S dbLayer;
 	private IDbColumn librarySort;
 	private SortDirection librarySortDirection;
 
@@ -56,7 +56,7 @@ implements IMediaItemDb<S, T> {
 	 * TODO FIXME merge libraryName and searchTerm to match return value of
 	 * getSerial().
 	 */
-	protected MediaItemDb (String listName, MediaItemDbConfig config, S dbLayer) {
+	protected MediaItemDb (final String listName, final MediaItemDbConfig config, final S dbLayer) {
 		super(dbLayer.getDbFilePath(), listName);
 
 		this.config = config;
@@ -103,13 +103,13 @@ implements IMediaItemDb<S, T> {
 	 */
 
 	@Override
-	public void addChangeEventListener (MediaItemListChangeListener listener) {
+	public void addChangeEventListener (final MediaItemListChangeListener listener) {
 		if (this.changeEventListeners.size() == 0) this.dbLayer.addChangeListener(this.storageChangeListener);
 		super.addChangeEventListener(listener);
 	}
 
 	@Override
-	public void removeChangeEventListener (MediaItemListChangeListener listener) {
+	public void removeChangeEventListener (final MediaItemListChangeListener listener) {
 		super.removeChangeEventListener(listener);
 		if (this.changeEventListeners.size() == 0) this.dbLayer.removeChangeListener(this.storageChangeListener);
 	}
@@ -277,7 +277,7 @@ implements IMediaItemDb<S, T> {
 	}
 
 	@Override
-	public void setSort (IDbColumn sort, SortDirection direction) throws MorriganException {
+	public void setSort (final IDbColumn sort, final SortDirection direction) throws MorriganException {
 		this.librarySort = sort;
 		this.librarySortDirection = direction;
 
@@ -287,21 +287,21 @@ implements IMediaItemDb<S, T> {
 		saveSortToDbInNewThread();
 	}
 
-	private List<SortChangeListener> _sortChangeListeners = Collections.synchronizedList(new ArrayList<SortChangeListener>());
+	private final List<SortChangeListener> _sortChangeListeners = Collections.synchronizedList(new ArrayList<SortChangeListener>());
 
-	private void callSortChangedListeners (IDbColumn sort, SortDirection direction) {
+	private void callSortChangedListeners (final IDbColumn sort, final SortDirection direction) {
 		for (SortChangeListener l : this._sortChangeListeners) {
 			l.sortChanged(sort, direction);
 		}
 	}
 
 	@Override
-	public void registerSortChangeListener (SortChangeListener scl) {
+	public void registerSortChangeListener (final SortChangeListener scl) {
 		this._sortChangeListeners.add(scl);
 	}
 
 	@Override
-	public void unregisterSortChangeListener (SortChangeListener scl) {
+	public void unregisterSortChangeListener (final SortChangeListener scl) {
 		this._sortChangeListeners.remove(scl);
 	}
 
@@ -352,86 +352,86 @@ implements IMediaItemDb<S, T> {
 //	Queries.
 
 	@Override
-	public boolean hasFile (String filepath) throws MorriganException, DbException {
+	public boolean hasFile (final String filepath) throws MorriganException, DbException {
 		return this.dbLayer.hasFile(filepath);
 	}
 
 	@Override
-	public boolean hasFile (File file) throws MorriganException, DbException {
+	public boolean hasFile (final File file) throws MorriganException, DbException {
 		return this.dbLayer.hasFile(file);
 	}
 
 	@Override
-	public T getByFile (File file) throws DbException {
+	public T getByFile (final File file) throws DbException {
 		return this.dbLayer.getByFile(file);
 	}
 
 	@Override
-	public T getByFile (String filepath) throws DbException {
+	public T getByFile (final String filepath) throws DbException {
 		return this.dbLayer.getByFile(filepath);
 	}
 
 	@Override
-	public List<T> simpleSearch (String term, int maxResults) throws DbException {
+	public List<T> simpleSearch (final String term, final int maxResults) throws DbException {
 		return this.dbLayer.simpleSearch(escapeSearch(term), SEARCH_ESC, maxResults);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	DB events.
 
-	private IMediaItemStorageLayerChangeListener<T> storageChangeListener = new IMediaItemStorageLayerChangeListener<T>() {
+	private final IMediaItemStorageLayerChangeListener<T> storageChangeListener = new IMediaItemStorageLayerChangeListener<T>() {
 
 		@Override
-		public void eventMessage (String msg) {
+		public void eventMessage (final String msg) {
 			getChangeEventCaller().eventMessage(msg);
 		}
 
 		@Override
-		public void propertySet (String key, String value) { /* Unused. */}
+		public void propertySet (final String key, final String value) { /* Unused. */}
 
 		@Override
-		public void mediaItemAdded (String filePath) {
+		public void mediaItemAdded (final String filePath) {
 			getChangeEventCaller().mediaItemsAdded((IMediaItem[]) null); // TODO pass-through actual item?
 		}
 
 		@Override
-		public void mediaItemsAdded (List<File> filePaths) {
+		public void mediaItemsAdded (final List<File> filePaths) {
 			getChangeEventCaller().mediaItemsAdded((IMediaItem[]) null); // TODO pass-through actual item?
 		}
 
 		@Override
-		public void mediaItemRemoved (String filePath) {
+		public void mediaItemRemoved (final String filePath) {
 			getChangeEventCaller().mediaItemsRemoved((IMediaItem[]) null); // TODO pass-through actual item?
 		}
 
 		@Override
-		public void mediaItemUpdated (String filePath) {
+		public void mediaItemUpdated (final String filePath) {
 			getChangeEventCaller().mediaItemsUpdated((IMediaItem[]) null); // TODO pass-through actual item?
 		}
 
 		@Override
-		public void mediaItemTagAdded (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) {
+		public void mediaItemTagAdded (final IDbItem item, final String tag, final MediaTagType type, final MediaTagClassification mtc) {
 			if (MediaItemDb.this.getConfig().getFilter() != null) { // TODO make more specific?
 				getChangeEventCaller().mediaItemsForceReadRequired((IMediaItem[]) null); // TODO pass-through actual item?
 			}
 		}
 
 		@Override
-		public void mediaItemTagsMoved (IDbItem from_item, IDbItem to_item) {
+		public void mediaItemTagsMoved (final IDbItem from_item, final IDbItem to_item) {
 			if (MediaItemDb.this.getConfig().getFilter() != null) { // TODO make more specific?
 				getChangeEventCaller().mediaItemsForceReadRequired((IMediaItem[]) null); // TODO pass-through actual item?
 			}
 		}
 
 		@Override
-		public void mediaItemTagRemoved (MediaTag tag) {
+		public void mediaItemTagRemoved (final MediaTag tag) {
 			if (MediaItemDb.this.getConfig().getFilter() != null) { // TODO make more specific?
 				getChangeEventCaller().mediaItemsForceReadRequired((IMediaItem[]) null); // TODO pass-through actual item?
 			}
 		}
 
 		@Override
-		public void mediaItemTagsCleared (IDbItem item) {
+		public void mediaItemTagsCleared (final IDbItem item) {
 			if (MediaItemDb.this.getConfig().getFilter() != null) { // TODO make more specific?
 				getChangeEventCaller().mediaItemsForceReadRequired((IMediaItem[]) null); // TODO pass-through actual item?
 			}
@@ -443,7 +443,7 @@ implements IMediaItemDb<S, T> {
 //	Updating tracks.
 
 	@Override
-	public void setItemDateAdded (T track, Date date) throws MorriganException {
+	public void setItemDateAdded (final T track, final Date date) throws MorriganException {
 		super.setItemDateAdded(track, date);
 		try {
 			this.dbLayer.setDateAdded(track.getFilepath(), date);
@@ -454,7 +454,7 @@ implements IMediaItemDb<S, T> {
 	}
 
 	@Override
-	public void removeItem (T track) throws MorriganException {
+	public void removeItem (final T track) throws MorriganException {
 		try {
 			_removeMediaTrack(track);
 		}
@@ -468,7 +468,7 @@ implements IMediaItemDb<S, T> {
 	 * class is sub-classed and removeMediaTrack() overridden.
 	 * @throws DbException
 	 */
-	private void _removeMediaTrack (T track) throws MorriganException, DbException {
+	private void _removeMediaTrack (final T track) throws MorriganException, DbException {
 		super.removeItem(track);
 
 		// Remove track.
@@ -488,7 +488,7 @@ implements IMediaItemDb<S, T> {
 	}
 
 	@Override
-	public void setItemHashCode (T track, BigInteger hashcode) throws MorriganException {
+	public void setItemHashCode (final T track, final BigInteger hashcode) throws MorriganException {
 		super.setItemHashCode(track, hashcode);
 		try {
 			this.dbLayer.setHashcode(track.getFilepath(), hashcode);
@@ -499,7 +499,7 @@ implements IMediaItemDb<S, T> {
 	}
 
 	@Override
-	public void setItemDateLastModified (T track, Date date) throws MorriganException {
+	public void setItemDateLastModified (final T track, final Date date) throws MorriganException {
 		super.setItemDateLastModified(track, date);
 		try {
 			this.dbLayer.setDateLastModified(track.getFilepath(), date);
@@ -510,7 +510,7 @@ implements IMediaItemDb<S, T> {
 	}
 
 	@Override
-	public void setItemEnabled (T track, boolean value) throws MorriganException {
+	public void setItemEnabled (final T track, final boolean value) throws MorriganException {
 		super.setItemEnabled(track, value);
 		try {
 			this.dbLayer.setEnabled(track.getFilepath(), value);
@@ -521,7 +521,7 @@ implements IMediaItemDb<S, T> {
 	}
 
 	@Override
-	public void setItemMissing (T track, boolean value) throws MorriganException {
+	public void setItemMissing (final T track, final boolean value) throws MorriganException {
 		super.setItemMissing(track, value);
 		try {
 			this.dbLayer.setMissing(track.getFilepath(), value);
@@ -532,7 +532,7 @@ implements IMediaItemDb<S, T> {
 	}
 
 	@Override
-	public void setRemoteLocation (T track, String remoteLocation) throws MorriganException {
+	public void setRemoteLocation (final T track, final String remoteLocation) throws MorriganException {
 		track.setRemoteLocation(remoteLocation);
 		try {
 			this.dbLayer.setRemoteLocation(track.getFilepath(), remoteLocation);
@@ -543,7 +543,7 @@ implements IMediaItemDb<S, T> {
 	}
 
 	@Override
-	public void persistTrackData (T track) throws MorriganException {
+	public void persistTrackData (final T track) throws MorriganException {
 		try {
 			this.dbLayer.setHashcode(track.getFilepath(), track.getHashcode());
 			if (track.getDateAdded() != null) this.dbLayer.setDateAdded(track.getFilepath(), track.getDateAdded());
@@ -575,7 +575,7 @@ implements IMediaItemDb<S, T> {
 	}
 
 	@Override
-	public void addSource (String source) throws MorriganException {
+	public void addSource (final String source) throws MorriganException {
 		try {
 			this.dbLayer.addSource(source);
 		}
@@ -585,7 +585,7 @@ implements IMediaItemDb<S, T> {
 	}
 
 	@Override
-	public void removeSource (String source) throws MorriganException {
+	public void removeSource (final String source) throws MorriganException {
 		try {
 			this.dbLayer.removeSource(source);
 		}
@@ -598,7 +598,7 @@ implements IMediaItemDb<S, T> {
 //	Tags.
 
 	@Override
-	public boolean hasTags (IDbItem item) throws MorriganException {
+	public boolean hasTags (final IDbItem item) throws MorriganException {
 		try {
 			return this.dbLayer.hasTags(item);
 		}
@@ -608,7 +608,7 @@ implements IMediaItemDb<S, T> {
 	}
 
 	@Override
-	public boolean hasTag (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) throws MorriganException {
+	public boolean hasTag (final IDbItem item, final String tag, final MediaTagType type, final MediaTagClassification mtc) throws MorriganException {
 		try {
 			return this.dbLayer.hasTag(item, tag, type, mtc);
 		}
@@ -618,7 +618,7 @@ implements IMediaItemDb<S, T> {
 	}
 
 	@Override
-	public List<MediaTag> getTags (IDbItem item) throws MorriganException {
+	public List<MediaTag> getTags (final IDbItem item) throws MorriganException {
 		try {
 			return this.dbLayer.getTags(item);
 		}
@@ -628,7 +628,7 @@ implements IMediaItemDb<S, T> {
 	}
 
 	@Override
-	public void addTag (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) throws MorriganException {
+	public void addTag (final IDbItem item, final String tag, final MediaTagType type, final MediaTagClassification mtc) throws MorriganException {
 		try {
 			this.dbLayer.addTag(item, tag, type, mtc);
 		}
@@ -638,7 +638,7 @@ implements IMediaItemDb<S, T> {
 	}
 
 	@Override
-	public void addTag (IDbItem item, String tag, MediaTagType type, String mtc) throws MorriganException {
+	public void addTag (final IDbItem item, final String tag, final MediaTagType type, final String mtc) throws MorriganException {
 		try {
 			this.dbLayer.addTag(item, tag, type, mtc);
 		}
@@ -648,7 +648,7 @@ implements IMediaItemDb<S, T> {
 	}
 
 	@Override
-	public void moveTags (IDbItem from_item, IDbItem to_item) throws MorriganException {
+	public void moveTags (final IDbItem from_item, final IDbItem to_item) throws MorriganException {
 		try {
 			this.dbLayer.moveTags(from_item, to_item);
 		}
@@ -658,7 +658,7 @@ implements IMediaItemDb<S, T> {
 	}
 
 	@Override
-	public void removeTag (MediaTag mt) throws MorriganException {
+	public void removeTag (final MediaTag mt) throws MorriganException {
 		try {
 			this.dbLayer.removeTag(mt);
 		}
@@ -668,7 +668,7 @@ implements IMediaItemDb<S, T> {
 	}
 
 	@Override
-	public void clearTags (IDbItem item) throws MorriganException {
+	public void clearTags (final IDbItem item) throws MorriganException {
 		try {
 			this.dbLayer.clearTags(item);
 		}
@@ -688,7 +688,7 @@ implements IMediaItemDb<S, T> {
 	}
 
 	@Override
-	public MediaTagClassification getTagClassification (String classificationName) throws MorriganException {
+	public MediaTagClassification getTagClassification (final String classificationName) throws MorriganException {
 		try {
 			return this.dbLayer.getTagClassification(classificationName);
 		}
@@ -698,7 +698,7 @@ implements IMediaItemDb<S, T> {
 	}
 
 	@Override
-	public void addTagClassification (String classificationName) throws MorriganException {
+	public void addTagClassification (final String classificationName) throws MorriganException {
 		try {
 			this.dbLayer.addTagClassification(classificationName);
 		}
@@ -711,7 +711,7 @@ implements IMediaItemDb<S, T> {
 //	Albums.
 
 	@Override
-	public MediaAlbum createAlbum (String name) throws MorriganException {
+	public MediaAlbum createAlbum (final String name) throws MorriganException {
 		try {
 			return this.dbLayer.createAlbum(name);
 		}
@@ -721,7 +721,7 @@ implements IMediaItemDb<S, T> {
 	}
 
 	@Override
-	public MediaAlbum getAlbum (String name) throws MorriganException {
+	public MediaAlbum getAlbum (final String name) throws MorriganException {
 		try {
 			return this.dbLayer.getAlbum(name);
 		}
@@ -731,7 +731,7 @@ implements IMediaItemDb<S, T> {
 	}
 
 	@Override
-	public void removeAlbum (MediaAlbum album) throws MorriganException {
+	public void removeAlbum (final MediaAlbum album) throws MorriganException {
 		try {
 			this.dbLayer.removeAlbum(album);
 		}
@@ -751,7 +751,7 @@ implements IMediaItemDb<S, T> {
 	}
 
 	@Override
-	public Collection<T> getAlbumItems (MediaAlbum album) throws MorriganException {
+	public Collection<T> getAlbumItems (final MediaAlbum album) throws MorriganException {
 		try {
 			return this.dbLayer.getAlbumItems(album);
 		}
@@ -761,7 +761,7 @@ implements IMediaItemDb<S, T> {
 	}
 
 	@Override
-	public void addToAlbum (MediaAlbum album, IDbItem item) throws MorriganException {
+	public void addToAlbum (final MediaAlbum album, final IDbItem item) throws MorriganException {
 		try {
 			this.dbLayer.addToAlbum(album, item);
 		}
@@ -771,7 +771,7 @@ implements IMediaItemDb<S, T> {
 	}
 
 	@Override
-	public void removeFromAlbum (MediaAlbum album, IDbItem item) throws MorriganException {
+	public void removeFromAlbum (final MediaAlbum album, final IDbItem item) throws MorriganException {
 		try {
 			this.dbLayer.removeFromAlbum(album, item);
 		}
@@ -781,7 +781,7 @@ implements IMediaItemDb<S, T> {
 	}
 
 	@Override
-	public int removeFromAllAlbums (IDbItem item) throws MorriganException {
+	public int removeFromAllAlbums (final IDbItem item) throws MorriganException {
 		try {
 			return this.dbLayer.removeFromAllAlbums(item);
 		}
@@ -796,12 +796,12 @@ implements IMediaItemDb<S, T> {
 	private static final String TAG_UNREADABLE = "UNREADABLE";
 
 	@Override
-	public boolean isMarkedAsUnreadable (T mi) throws MorriganException {
+	public boolean isMarkedAsUnreadable (final T mi) throws MorriganException {
 		return hasTag(mi, TAG_UNREADABLE, MediaTagType.AUTOMATIC, null);
 	}
 
 	@Override
-	public void markAsUnreadabled (T mi) throws MorriganException {
+	public void markAsUnreadabled (final T mi) throws MorriganException {
 		setItemEnabled(mi, false);
 		addTag(mi, TAG_UNREADABLE, MediaTagType.AUTOMATIC, (MediaTagClassificationImpl) null);
 	}
@@ -815,7 +815,7 @@ implements IMediaItemDb<S, T> {
 	 * @throws DbException
 	 */
 	@Override
-	public T addFile (File file) throws MorriganException, DbException {
+	public T addFile (final File file) throws MorriganException, DbException {
 		T track = null;
 		boolean added = this.dbLayer.addFile(file);
 		if (added) {
@@ -831,7 +831,7 @@ implements IMediaItemDb<S, T> {
 	 * are ignored.
 	 */
 	@Override
-	public List<T> addFiles (List<File> files) throws MorriganException, DbException {
+	public List<T> addFiles (final List<File> files) throws MorriganException, DbException {
 		List<T> ret = new ArrayList<T>();
 		boolean[] res = this.dbLayer.addFiles(files);
 		for (int i = 0; i < files.size(); i++) {
@@ -862,7 +862,7 @@ implements IMediaItemDb<S, T> {
 	 * @throws DbException
 	 */
 	@Override
-	public void completeBulkUpdate (boolean thereWereErrors) throws MorriganException, DbException {
+	public void completeBulkUpdate (final boolean thereWereErrors) throws MorriganException, DbException {
 		try {
 			List<T> removed = replaceListWithoutSetDirty(this._changedItems);
 			if (!thereWereErrors) {
@@ -881,7 +881,7 @@ implements IMediaItemDb<S, T> {
 	}
 
 	@Override
-	public T updateItem (T mi) throws MorriganException, DbException {
+	public T updateItem (final T mi) throws MorriganException, DbException {
 		if (this._changedItems == null) {
 			throw new IllegalArgumentException("updateItem() can only be called after beginBulkUpdate() and before completeBulkUpdate().");
 		}
@@ -922,14 +922,12 @@ implements IMediaItemDb<S, T> {
 	/**
 	 * This pairs with SEARCH_ESC.
 	 */
-	public static String escapeSearch (String term) {
+	public static String escapeSearch (final String term) {
 		String q = term.replace("'", "''");
-		q = q.replace(" ", "*");
 		q = q.replace("\\", "\\\\");
 		q = q.replace("%", "\\%");
 		q = q.replace("_", "\\_");
 		q = q.replace("*", "%");
-
 		return q;
 	}
 
