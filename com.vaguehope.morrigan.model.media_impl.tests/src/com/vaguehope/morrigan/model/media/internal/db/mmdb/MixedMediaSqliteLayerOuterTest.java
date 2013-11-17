@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -81,8 +82,9 @@ public class MixedMediaSqliteLayerOuterTest {
 		getItemByFilepath(actual, expectedWithTag.getFilepath());
 	}
 
+	@Ignore("OR keyword not yet implemented")
 	@Test
-	public void itSearchesUsingMultipleTermsForItemsByNameOrTag () throws Exception {
+	public void itSearchesUsingMultipleTermsForItemsByNameOrTagUsingOrKeyword () throws Exception {
 		final String term1 = "some_awesome_band_desu";
 		final String term2 = "some_other_thing";
 		final IMixedMediaItem expectedWithTerm1InName = mockMediaFile(term1);
@@ -90,7 +92,7 @@ public class MixedMediaSqliteLayerOuterTest {
 		final IMixedMediaItem expectedWithTerm1InTag = mockMediaFileWithTag("watcha " + term1 + " noise");
 		final IMixedMediaItem expectedWithTerm2InTag = mockMediaFileWithTag("foo " + term2 + " bar");
 
-		final List<IMixedMediaItem> actual = runSearch("  " + term1 + " " + term2 + " ");
+		final List<IMixedMediaItem> actual = runSearch("  " + term1 + " OR " + term2 + " ");
 
 		assertEquals(4, actual.size());
 		getItemByFilepath(actual, expectedWithTerm1InName.getFilepath());
