@@ -106,9 +106,6 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 	private static final String _SQL_WHERE =
 			" WHERE";
 
-	private static final String _SQL_OR =
-			" OR";
-
 	private static final String _SQL_AND =
 		" AND";
 
@@ -356,7 +353,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 		if (mediaType != MediaType.UNKNOWN) sql += _SQL_MEDIAFILESTAGS_WHERTYPE + _SQL_AND;
 		sql += " ( ";
 		for (int i = 0; i < terms.size(); i++) {
-			if (i > 0) sql += _SQL_OR;
+			if (i > 0) sql += _SQL_AND;
 			sql += _SQL_MEDIAFILESTAGS_WHERESEARCH_MATCHER;
 		}
 		sql += " ) ";
