@@ -23,15 +23,15 @@ import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 public class MixedMediaItemFactory {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private RecyclingFactory2<MixedMediaItem, String, RuntimeException> factory = new RecyclingFactory2<MixedMediaItem, String, RuntimeException> (true) {
+	private final RecyclingFactory2<MixedMediaItem, String, RuntimeException> factory = new RecyclingFactory2<MixedMediaItem, String, RuntimeException> (true) {
 
 		@Override
-		protected boolean isValidProduct(MixedMediaItem product) {
+		protected boolean isValidProduct(final MixedMediaItem product) {
 			return true;
 		}
 
 		@Override
-		protected MixedMediaItem makeNewProduct(String material) {
+		protected MixedMediaItem makeNewProduct(final String material) {
 			return newItem(material);
 		}
 
@@ -39,18 +39,18 @@ public class MixedMediaItemFactory {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	protected MixedMediaItemFactory () {
+	public MixedMediaItemFactory () {
 //		System.err.println("new MixedMediaItemFactory()");
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public IMixedMediaItem getNewMediaItem (String filePath) {
+	public IMixedMediaItem getNewMediaItem (final String filePath) {
 		if (filePath == null) return newItem(null); // We can not cache these. :(
 		return this.factory.manufacture(filePath);
 	}
 
-	static MixedMediaItem newItem (String filePath) {
+	static MixedMediaItem newItem (final String filePath) {
 //		System.err.println("new MixedMediaItem("+filePath+")");
 		MixedMediaItem item = new MixedMediaItem(filePath);
 		return item;

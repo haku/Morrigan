@@ -28,7 +28,7 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors.
 
-	protected MixedMediaSqliteLayerOuter (String dbFilePath, boolean autoCommit, MixedMediaItemFactory itemFactory) throws DbException {
+	public MixedMediaSqliteLayerOuter (final String dbFilePath, final boolean autoCommit, final MixedMediaItemFactory itemFactory) throws DbException {
 		super(dbFilePath, autoCommit, itemFactory);
 		this.itemFactory = itemFactory;
 	}
@@ -51,7 +51,7 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	private MediaType defaultMediaType = Defaults.MEDIA_ASPECT;
 
 	@Override
-	public void setDefaultMediaType (MediaType mediaType) {
+	public void setDefaultMediaType (final MediaType mediaType) {
 		this.defaultMediaType = mediaType;
 	}
 	@Override
@@ -60,27 +60,27 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	}
 
 	@Override
-	public List<IMixedMediaItem> getAllMedia (IDbColumn sort, SortDirection direction, boolean hideMissing) throws DbException {
+	public List<IMixedMediaItem> getAllMedia (final IDbColumn sort, final SortDirection direction, final boolean hideMissing) throws DbException {
 		return getMedia(MediaType.UNKNOWN, sort, direction, hideMissing);
 	}
 
 	@Override
-	public List<IMixedMediaItem> getMedia(IDbColumn sort, SortDirection direction, boolean hideMissing) throws DbException {
+	public List<IMixedMediaItem> getMedia(final IDbColumn sort, final SortDirection direction, final boolean hideMissing) throws DbException {
 		return getMedia(getDefaultMediaType(), sort, direction, hideMissing);
 	}
 
 	@Override
-	public List<IMixedMediaItem> getMedia(IDbColumn sort, SortDirection direction, boolean hideMissing, String search, String searchEsc) throws DbException {
+	public List<IMixedMediaItem> getMedia(final IDbColumn sort, final SortDirection direction, final boolean hideMissing, final String search, final String searchEsc) throws DbException {
 		return getMedia(getDefaultMediaType(), sort, direction, hideMissing, search, searchEsc);
 	}
 
 	@Override
-	public List<IMixedMediaItem> simpleSearch(String term, String esc, int maxResults) throws DbException {
+	public List<IMixedMediaItem> simpleSearch(final String term, final String esc, final int maxResults) throws DbException {
 		return simpleSearchMedia(getDefaultMediaType(), term, esc, maxResults);
 	}
 
 	@Override
-	public List<IMixedMediaItem> getMedia(MediaType mediaType, IDbColumn sort, SortDirection direction, boolean hideMissing) throws DbException {
+	public List<IMixedMediaItem> getMedia(final MediaType mediaType, final IDbColumn sort, final SortDirection direction, final boolean hideMissing) throws DbException {
 		try {
 			return local_getAllMedia(mediaType, sort, direction, hideMissing);
 		} catch (Exception e) {
@@ -89,7 +89,7 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	}
 
 	@Override
-	public List<IMixedMediaItem> getMedia(MediaType mediaType, IDbColumn sort, SortDirection direction, boolean hideMissing, String search, String searchEsc) throws DbException {
+	public List<IMixedMediaItem> getMedia(final MediaType mediaType, final IDbColumn sort, final SortDirection direction, final boolean hideMissing, final String search, final String searchEsc) throws DbException {
 		try {
 			return local_getAllMedia(mediaType, sort, direction, hideMissing, search, searchEsc);
 		} catch (Exception e) {
@@ -98,7 +98,7 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	}
 
 	@Override
-	public List<IMixedMediaItem> simpleSearchMedia(MediaType mediaType, String term, String esc, int maxResults) throws DbException {
+	public List<IMixedMediaItem> simpleSearchMedia(final MediaType mediaType, final String term, final String esc, final int maxResults) throws DbException {
 		try {
 			return local_simpleSearch(mediaType, term, esc, maxResults);
 		} catch (Exception e) {
@@ -110,12 +110,12 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 //	Album readers.
 
 	@Override
-	public Collection<IMixedMediaItem> getAlbumItems (MediaAlbum album) throws DbException {
+	public Collection<IMixedMediaItem> getAlbumItems (final MediaAlbum album) throws DbException {
 		return getAlbumItems(MediaType.UNKNOWN, album);
 	}
 
 	@Override
-	public Collection<IMixedMediaItem> getAlbumItems (MediaType mediaType, MediaAlbum album) throws DbException {
+	public Collection<IMixedMediaItem> getAlbumItems (final MediaType mediaType, final MediaAlbum album) throws DbException {
 		try {
 			return local_getAlbumItems(mediaType, album);
 		}
@@ -128,7 +128,7 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 //	Media queries.
 
 	@Override
-	public boolean hasFile(File file) throws DbException {
+	public boolean hasFile(final File file) throws DbException {
 		try {
 			return local_hasFile(file.getAbsolutePath());
 		} catch (Exception e) {
@@ -137,7 +137,7 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	}
 
 	@Override
-	public boolean hasFile(String filePath) throws DbException {
+	public boolean hasFile(final String filePath) throws DbException {
 		try {
 			return local_hasFile(filePath);
 		} catch (Exception e) {
@@ -146,7 +146,7 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	}
 
 	@Override
-	public IMixedMediaItem getByFile(File file) throws DbException {
+	public IMixedMediaItem getByFile(final File file) throws DbException {
 		try {
 			return local_getByFile(file.getAbsolutePath());
 		} catch (Exception e) {
@@ -155,7 +155,7 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	}
 
 	@Override
-	public IMixedMediaItem getByFile(String filePath) throws DbException {
+	public IMixedMediaItem getByFile(final String filePath) throws DbException {
 		try {
 			return local_getByFile(filePath);
 		} catch (Exception e) {
@@ -167,17 +167,17 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 //	Media adders and removers.
 
 	@Override
-	public boolean addFile(File file) throws DbException {
+	public boolean addFile(final File file) throws DbException {
 		return addFile(MediaType.UNKNOWN, file);
 	}
 
 	@Override
-	public boolean addFile(String filepath, long lastModified) throws DbException {
+	public boolean addFile(final String filepath, final long lastModified) throws DbException {
 		return addFile(MediaType.UNKNOWN, filepath, lastModified);
 	}
 
 	@Override
-	public boolean addFile (MediaType mediaType, File file) throws DbException {
+	public boolean addFile (final MediaType mediaType, final File file) throws DbException {
 		try {
 			return local_addTrack(mediaType, file.getAbsolutePath(), file.lastModified());
 		}
@@ -188,7 +188,7 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	}
 
 	@Override
-	public boolean addFile (MediaType mediaType, String filepath, long lastModified) throws DbException {
+	public boolean addFile (final MediaType mediaType, final String filepath, final long lastModified) throws DbException {
 		try {
 			return local_addTrack(mediaType, filepath, lastModified);
 		}
@@ -199,7 +199,7 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	}
 
 	@Override
-	public boolean[] addFiles(List<File> files) throws DbException {
+	public boolean[] addFiles(final List<File> files) throws DbException {
 		try {
 			return local_addFiles(files);
 		}
@@ -210,7 +210,7 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	}
 
 	@Override
-	public int removeFile (String sfile) throws DbException {
+	public int removeFile (final String sfile) throws DbException {
 		try {
 			return local_removeTrack(sfile);
 		} catch (Exception e) {
@@ -219,7 +219,7 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	}
 
 	@Override
-	public int removeFile (IDbItem dbItem) throws DbException {
+	public int removeFile (final IDbItem dbItem) throws DbException {
 		try {
 			return local_removeTrack(dbItem);
 		} catch (Exception e) {
@@ -231,7 +231,7 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 //	MediaItem setters.
 
 	@Override
-	public void setDateAdded (String sfile, Date date) throws DbException {
+	public void setDateAdded (final String sfile, final Date date) throws DbException {
 		try {
 			local_setDateAdded(sfile, date);
 		} catch (Exception e) {
@@ -240,7 +240,7 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	}
 
 	@Override
-	public void setHashcode (String sfile, BigInteger hashcode) throws DbException {
+	public void setHashcode (final String sfile, final BigInteger hashcode) throws DbException {
 		try {
 			local_setHashCode(sfile, hashcode);
 		} catch (Exception e) {
@@ -249,7 +249,7 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	}
 
 	@Override
-	public void setDateLastModified (String sfile, Date date) throws DbException {
+	public void setDateLastModified (final String sfile, final Date date) throws DbException {
 		try {
 			local_setDateLastModified(sfile, date);
 		} catch (Exception e) {
@@ -258,7 +258,7 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	}
 
 	@Override
-	public void setEnabled (String sfile, boolean value) throws DbException {
+	public void setEnabled (final String sfile, final boolean value) throws DbException {
 		try {
 			local_setEnabled(sfile, value);
 		} catch (Exception e) {
@@ -267,7 +267,7 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	}
 
 	@Override
-	public void setMissing (String sfile, boolean value) throws DbException {
+	public void setMissing (final String sfile, final boolean value) throws DbException {
 		try {
 			local_setMissing(sfile, value);
 		} catch (Exception e) {
@@ -276,7 +276,7 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	}
 
 	@Override
-	public void setRemoteLocation (String sfile, String remoteLocation) throws DbException {
+	public void setRemoteLocation (final String sfile, final String remoteLocation) throws DbException {
 		try {
 			local_setRemoteLocation(sfile, remoteLocation);
 		} catch (Exception e) {
@@ -288,7 +288,7 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 //	MixedMediaItem setters.
 
 	@Override
-	public void setItemMediaType(String sfile, MediaType newType) throws DbException {
+	public void setItemMediaType(final String sfile, final MediaType newType) throws DbException {
 		try {
 			local_setItemMediaType(sfile, newType);
 		} catch (Exception e) {
@@ -300,7 +300,7 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 //	MediaTrack setters.
 
 	@Override
-	public void incTrackPlayed (String sfile) throws DbException {
+	public void incTrackPlayed (final String sfile) throws DbException {
 		try {
 			local_trackPlayed(sfile, 1, new Date());
 		} catch (Exception e) {
@@ -309,7 +309,7 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	}
 
 	@Override
-	public void incTrackFinished (String sfile) throws DbException {
+	public void incTrackFinished (final String sfile) throws DbException {
 		try {
 			local_incTrackEndCnt(sfile, 1);
 		} catch (Exception e) {
@@ -318,7 +318,7 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	}
 
 	@Override
-	public void incTrackStartCnt (String sfile, long n) throws DbException {
+	public void incTrackStartCnt (final String sfile, final long n) throws DbException {
 		try {
 			local_incTrackStartCnt(sfile, n);
 		} catch (Exception e) {
@@ -327,7 +327,7 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	}
 
 	@Override
-	public void setTrackStartCnt (String sfile, long n) throws DbException {
+	public void setTrackStartCnt (final String sfile, final long n) throws DbException {
 		try {
 			local_setTrackStartCnt(sfile, n);
 		} catch (Exception e) {
@@ -336,7 +336,7 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	}
 
 	@Override
-	public void incTrackEndCnt (String sfile, long n) throws DbException {
+	public void incTrackEndCnt (final String sfile, final long n) throws DbException {
 		try {
 			local_incTrackEndCnt(sfile, n);
 		} catch (Exception e) {
@@ -345,7 +345,7 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	}
 
 	@Override
-	public void setTrackEndCnt (String sfile, long n) throws DbException {
+	public void setTrackEndCnt (final String sfile, final long n) throws DbException {
 		try {
 			local_setTrackEndCnt(sfile, n);
 		} catch (Exception e) {
@@ -354,7 +354,7 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	}
 
 	@Override
-	public void setDateLastPlayed (String sfile, Date date) throws DbException {
+	public void setDateLastPlayed (final String sfile, final Date date) throws DbException {
 		try {
 			local_setDateLastPlayed(sfile, date);
 		} catch (Exception e) {
@@ -363,7 +363,7 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	}
 
 	@Override
-	public void setTrackDuration (String sfile, int duration) throws DbException {
+	public void setTrackDuration (final String sfile, final int duration) throws DbException {
 		try {
 			local_setTrackDuration(sfile, duration);
 		} catch (Exception e) {
@@ -375,7 +375,7 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 //	MediaPic setters.
 
 	@Override
-	public void setDimensions (String sfile, int width, int height) throws DbException {
+	public void setDimensions (final String sfile, final int width, final int height) throws DbException {
 		try {
 			local_setDimensions(sfile, width, height);
 		} catch (Exception e) {
@@ -386,7 +386,7 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	public IMixedMediaItem getNewT(String filePath) {
+	public IMixedMediaItem getNewT(final String filePath) {
 		return this.itemFactory.getNewMediaItem(filePath);
 	}
 

@@ -24,14 +24,14 @@ public abstract class GenericSqliteLayer implements IGenericDbLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors.
 
-	protected GenericSqliteLayer (String dbFilePath, boolean autoCommit) throws DbException {
+	protected GenericSqliteLayer (final String dbFilePath, final boolean autoCommit) throws DbException {
 		this.dbFilePath = dbFilePath;
 		this.autoCommit = autoCommit;
 
 		try {
 			initDatabaseTables();
 		} catch (Exception e) {
-			throw new DbException(e);
+			throw new DbException("Failed to initialise database tables for db '" + dbFilePath + "'.", e);
 		}
 	}
 
@@ -65,8 +65,9 @@ public abstract class GenericSqliteLayer implements IGenericDbLayer {
 
 	private Connection makeConnection() throws ClassNotFoundException, SQLException {
 		Class.forName(DRIVER_CLASS);
-		String url = "jdbc:sqlite:/" + this.dbFilePath;
+		final String url = "jdbc:sqlite:/" + this.dbFilePath;
 		Connection con = DriverManager.getConnection(url);
+		if (con == null) throw new IllegalStateException("DriverManager returned null connection object for " + url + ".");
 
 		// Setup environment.
 		Statement stmt = con.createStatement();
@@ -76,12 +77,12 @@ public abstract class GenericSqliteLayer implements IGenericDbLayer {
 			try {
 				rs.next();
 				int fk = rs.getInt(1);
-				if (fk != 1) throw new UnsupportedOperationException("Call had no effect: " + PRAGMA_FK_SET + " (v="+fk+")");
+				if (fk != 1) throw new UnsupportedOperationException("Call had no effect: " + PRAGMA_FK_SET + " (v=" + fk + ")");
 			} finally { rs.close(); }
 		} finally { stmt.close(); }
 
 		con.setAutoCommit(this.autoCommit);
-//		System.err.println("AutoCommit=" + this.dbConnection.getAutoCommit() + " for '"+getDbFilePath()+"'.");
+//		System.err.println("AutoCommit=" + con.getAutoCommit() + " for '" + this.dbFilePath + "'.");
 
 		return con;
 	}
@@ -169,7 +170,7 @@ public abstract class GenericSqliteLayer implements IGenericDbLayer {
 		private final String tblExistsSql;
 		private final String tblCreateSql;
 
-		public SqlCreateCmd (String tblExistsSql, String tblCreateSql) {
+		public SqlCreateCmd (final String tblExistsSql, final String tblCreateSql) {
 			this.tblExistsSql = tblExistsSql;
 			this.tblCreateSql = tblCreateSql;
 		}
