@@ -14,12 +14,12 @@ import com.vaguehope.morrigan.gui.helpers.TrayHelper;
 
 public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
-	public ApplicationWorkbenchWindowAdvisor(IWorkbenchWindowConfigurer configurer) {
+	public ApplicationWorkbenchWindowAdvisor(final IWorkbenchWindowConfigurer configurer) {
 		super(configurer);
 	}
 
 	@Override
-	public ActionBarAdvisor createActionBarAdvisor(IActionBarConfigurer configurer) {
+	public ActionBarAdvisor createActionBarAdvisor(final IActionBarConfigurer configurer) {
 		return new ApplicationActionBarAdvisor(configurer);
 	}
 
@@ -32,18 +32,18 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		configurer.setShowStatusLine(true);
 		configurer.setShowProgressIndicator(true);
 	}
-	
+
 	@Override
 	public void postWindowOpen() {
 		super.postWindowOpen();
-		
+
 		getWindowConfigurer().getWindow().getShell().addListener(SWT.Iconify, new Listener() {
 			@SuppressWarnings("synthetic-access")
 			@Override
-			public void handleEvent(Event event) {
+			public void handleEvent(final Event event) {
 				TrayHelper.minToTray(getWindowConfigurer().getWindow(), false);
 			}
 		});
 	}
-	
+
 }
