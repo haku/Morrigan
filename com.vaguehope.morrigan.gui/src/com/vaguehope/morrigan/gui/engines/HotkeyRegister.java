@@ -48,6 +48,13 @@ public class HotkeyRegister {
 		}
 	}
 
+	/**
+	 * @param id one of IHotkeyEngine.MORRIGAN_HK_*
+	 */
+	public void sendHotkeyEvent(final int id) {
+		this.mainHotkeyListener.onKeyPress(id);
+	}
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private final AtomicBoolean configRead = new AtomicBoolean(false);
