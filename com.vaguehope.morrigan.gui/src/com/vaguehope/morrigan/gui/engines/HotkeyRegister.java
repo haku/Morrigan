@@ -28,19 +28,19 @@ public class HotkeyRegister {
 
 	protected final ConcurrentMap<IHotkeyListener, Object> hotkeyListeners = new ConcurrentHashMap<IHotkeyListener, Object>();
 
-	public HotkeyRegister (HotkeyEngineFactory hotkeyEngineFactory) {
+	public HotkeyRegister (final HotkeyEngineFactory hotkeyEngineFactory) {
 		this.hotkeyEngineFactory = hotkeyEngineFactory;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public void addHotkeyListener (IHotkeyListener listener) throws MorriganException {
+	public void addHotkeyListener (final IHotkeyListener listener) throws MorriganException {
 		this.hotkeyListeners.put(listener, listener);
 		logger.fine("Hotkey listener registered: '"+listener+"'.");
 		readConfig(false);
 	}
 
-	public void removeHotkeyListener (IHotkeyListener listener) throws MorriganException {
+	public void removeHotkeyListener (final IHotkeyListener listener) throws MorriganException {
 		this.hotkeyListeners.remove(listener);
 		if (this.hotkeyListeners.size() < 1) {
 			clearConfig();
@@ -54,7 +54,7 @@ public class HotkeyRegister {
 	private final List<Integer> registeredHotkeys = new ArrayList<Integer>();
 
 	@SuppressWarnings("boxing")
-	public void readConfig (boolean force) throws MorriganException {
+	public void readConfig (final boolean force) throws MorriganException {
 		if (!this.configRead.compareAndSet(false, true) & !force) {
 			logger.fine("Hotkey config already read, skipping.");
 			return;
@@ -153,7 +153,7 @@ public class HotkeyRegister {
 
 	private static final AtomicReference<IHotkeyEngine> hotkeyEngine = new AtomicReference<IHotkeyEngine>(null);
 
-	private IHotkeyEngine getHotkeyEngine (boolean create) {
+	private IHotkeyEngine getHotkeyEngine (final boolean create) {
 		if (hotkeyEngine.get() == null && create) {
 			IHotkeyEngine e = this.hotkeyEngineFactory.newHotkeyEngine();
 			if (e != null) {
@@ -175,12 +175,12 @@ public class HotkeyRegister {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private IHotkeyListener mainHotkeyListener = new IHotkeyListener () {
+	private final IHotkeyListener mainHotkeyListener = new IHotkeyListener () {
 
 		private WeakReference<IHotkeyListener> lastIHotkeyListenerUsed = null;
 
 		@Override
-		public void onKeyPress(int id) {
+		public void onKeyPress(final int id) {
 			List<IHotkeyListener> answers = new ArrayList<IHotkeyListener>();
 
 			IHotkeyListener last = null;
@@ -223,7 +223,7 @@ public class HotkeyRegister {
 		}
 
 		@Override
-		public CanDo canDoKeyPress(int id) {
+		public CanDo canDoKeyPress(final int id) {
 			return CanDo.NO;
 		}
 
