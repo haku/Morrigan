@@ -101,7 +101,7 @@ public class JumpToDlg {
 
 	private int keyMask = 0;
 
-	public void open () {
+	public JumpType open () {
 		synchronized (dlgOpenLock) {
 			if (dlgOpen) {
 				if (openDlg != null) {
@@ -110,7 +110,7 @@ public class JumpToDlg {
 						j.remoteClose();
 					}
 				}
-				return;
+				return JumpType.NULL;
 			}
 			dlgOpen = true;
 		}
@@ -255,6 +255,8 @@ public class JumpToDlg {
 		synchronized (dlgOpenLock) {
 			dlgOpen = false;
 		}
+
+		return JumpType.fromDlg(this);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

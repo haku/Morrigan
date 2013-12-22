@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.swt.SWT;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
@@ -43,55 +42,60 @@ public class JumpToAction extends Action {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	public void run() {
+	public void run () {
 		final IViewPart view = this.workbenchWindow.getActivePage().findView(ViewControls.ID);
 		if (!(view instanceof ViewControls)) {
 			this.workbenchWindow.getShell().getDisplay().asyncExec(new RunnableDialog("Failed to find ViewControls in workbench window."));
 			return;
 		}
 		final ViewControls viewControls = (ViewControls) view;
-		final LocalPlayer player;
-		player = viewControls.getPlayer();
+		final LocalPlayer player = viewControls.getPlayer();
 
-		IMediaTrackList<? extends IMediaTrack> currentList = this.list != null ? this.list : player.getCurrentList();
-		if (currentList == null || !(currentList instanceof IMediaTrackDb<?,?>)) return;
-		IMediaTrackDb<?,?> currentDb = (IMediaTrackDb<?,?>) currentList;
+		final IMediaTrackList<? extends IMediaTrack> currentList = this.list != null ? this.list : player.getCurrentList();
+		if (currentList == null || !(currentList instanceof IMediaTrackDb<?, ?>)) return;
+		final IMediaTrackDb<?, ?> currentDb = (IMediaTrackDb<?, ?>) currentList;
 
-		JumpToDlg dlg = new JumpToDlg(this.workbenchWindow.getShell(), (IMediaTrackDb<?,?>) currentList);
-		dlg.open();
-		IMediaTrack item = dlg.getReturnItem();
-		if (item != null) {
-			if ((dlg.getKeyMask() & SWT.ALT) != 0 && dlg.getReturnList() != null) {
-				if ((dlg.getKeyMask() & SWT.SHIFT) != 0 && (dlg.getKeyMask() & SWT.CONTROL) != 0) {
-					String filter = dlg.getReturnFilter();
-					try {
-						MediaItemDbEditorInput input = EditorFactory.getMmdbInput(currentDb.getDbPath(), filter);
-						this.workbenchWindow.getActivePage().openEditor(input, LocalMixedMediaDbEditor.ID);
-					}
-					catch (MorriganException e) {
-						this.workbenchWindow.getShell().getDisplay().asyncExec(new RunnableDialog(e));
-					} catch (PartInitException e) {
-						this.workbenchWindow.getShell().getDisplay().asyncExec(new RunnableDialog(e));
-					}
-				}
-				else {
-					List<IMediaTrack> shuffeledList = new ArrayList<IMediaTrack>(dlg.getReturnList());
-					Collections.shuffle(shuffeledList);
-					for (IMediaTrack track : shuffeledList) {
-						player.addToQueue(new PlayItem(currentList, track));
-					}
-				}
-			}
-			else if ((dlg.getKeyMask() & SWT.SHIFT) != 0 && (dlg.getKeyMask() & SWT.CONTROL) != 0) {
+		final JumpToDlg dlg = new JumpToDlg(this.workbenchWindow.getShell(), (IMediaTrackDb<?, ?>) currentList);
+		switch (dlg.open()) {
+			case PLAY_NOW:
+				player.loadAndStartPlaying(currentList, dlg.getReturnItem());
+				break;
+			case ENQUEUE:
+				player.addToQueue(new PlayItem(currentList, dlg.getReturnItem()));
+				break;
+			case REVEAL:
 				// TODO extract revealItemInLists() and do not go via ViewControls.
-				viewControls.revealItemInLists(currentList, item);
-			}
-			else if ((dlg.getKeyMask() & SWT.SHIFT) != 0 || (dlg.getKeyMask() & SWT.CONTROL) != 0) {
-				player.addToQueue(new PlayItem(currentList, item));
-			}
-			else {
-				player.loadAndStartPlaying(currentList, item);
-			}
+				viewControls.revealItemInLists(currentList, dlg.getReturnItem());
+				break;
+			case SHUFFLE_AND_ENQUEUE:
+				shuffleAndEnqueue(player, currentList, dlg);
+				break;
+			case OPEN_VIEW:
+				openFilteredView(currentDb, dlg.getReturnFilter());
+				break;
+			default:
+				break;
+		}
+	}
+
+	private static void shuffleAndEnqueue (final LocalPlayer player, final IMediaTrackList<? extends IMediaTrack> currentList, final JumpToDlg dlg) {
+		final List<IMediaTrack> shuffeledList = new ArrayList<IMediaTrack>(dlg.getReturnList());
+		Collections.shuffle(shuffeledList);
+		for (final IMediaTrack track : shuffeledList) {
+			player.addToQueue(new PlayItem(currentList, track));
+		}
+	}
+
+	private void openFilteredView (final IMediaTrackDb<?, ?> currentDb, final String filter) {
+		try {
+			MediaItemDbEditorInput input = EditorFactory.getMmdbInput(currentDb.getDbPath(), filter);
+			this.workbenchWindow.getActivePage().openEditor(input, LocalMixedMediaDbEditor.ID);
+		}
+		catch (MorriganException e) {
+			this.workbenchWindow.getShell().getDisplay().asyncExec(new RunnableDialog(e));
+		}
+		catch (PartInitException e) {
+			this.workbenchWindow.getShell().getDisplay().asyncExec(new RunnableDialog(e));
 		}
 	}
 
