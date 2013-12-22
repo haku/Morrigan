@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.SWT;
 import org.eclipse.ui.IViewPart;
@@ -26,24 +25,24 @@ import com.vaguehope.morrigan.player.PlayItem;
 
 public class JumpToAction extends Action {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	private final IWorkbenchWindow workbenchWindow;
 	private final IMediaTrackList<? extends IMediaTrack> list;
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	public JumpToAction (IWorkbenchWindow workbenchWindow) {
+
+	public JumpToAction (final IWorkbenchWindow workbenchWindow) {
 		this(workbenchWindow, null);
 	}
-	
-	public JumpToAction (IWorkbenchWindow workbenchWindow, IMediaTrackList<? extends IMediaTrack> list) {
+
+	public JumpToAction (final IWorkbenchWindow workbenchWindow, final IMediaTrackList<? extends IMediaTrack> list) {
 		super("Jump to...");
 		this.workbenchWindow = workbenchWindow;
 		this.list = list;
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	@Override
 	public void run() {
 		final IViewPart view = this.workbenchWindow.getActivePage().findView(ViewControls.ID);
@@ -54,11 +53,11 @@ public class JumpToAction extends Action {
 		final ViewControls viewControls = (ViewControls) view;
 		final LocalPlayer player;
 		player = viewControls.getPlayer();
-		
+
 		IMediaTrackList<? extends IMediaTrack> currentList = this.list != null ? this.list : player.getCurrentList();
 		if (currentList == null || !(currentList instanceof IMediaTrackDb<?,?>)) return;
 		IMediaTrackDb<?,?> currentDb = (IMediaTrackDb<?,?>) currentList;
-		
+
 		JumpToDlg dlg = new JumpToDlg(this.workbenchWindow.getShell(), (IMediaTrackDb<?,?>) currentList);
 		dlg.open();
 		IMediaTrack item = dlg.getReturnItem();
@@ -96,6 +95,6 @@ public class JumpToAction extends Action {
 			}
 		}
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
