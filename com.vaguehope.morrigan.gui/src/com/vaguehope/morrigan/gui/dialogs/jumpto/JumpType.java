@@ -21,18 +21,18 @@ public enum JumpType {
 		return this.keyDes;
 	}
 
-	public static JumpType fromDlg (final JumpToDlg dlg) {
-		if (dlg.getReturnItem() == null) return NULL;
-		if ((dlg.getKeyMask() & SWT.ALT) != 0 && dlg.getReturnList() != null) {
-			if ((dlg.getKeyMask() & SWT.SHIFT) != 0 && (dlg.getKeyMask() & SWT.CONTROL) != 0) {
-				return OPEN_VIEW;
-			}
+	public static JumpType fromStateMask (final int stateMask) {
+		final boolean ctrl = (stateMask & SWT.CONTROL) != 0;
+		final boolean alt = (stateMask & SWT.ALT) != 0;
+		final boolean shift = (stateMask & SWT.SHIFT) != 0;
+		if (alt) {
+			if (shift && ctrl) return OPEN_VIEW;
 			return SHUFFLE_AND_ENQUEUE;
 		}
-		else if ((dlg.getKeyMask() & SWT.SHIFT) != 0 && (dlg.getKeyMask() & SWT.CONTROL) != 0) {
+		else if (shift && ctrl) {
 			return REVEAL;
 		}
-		else if ((dlg.getKeyMask() & SWT.SHIFT) != 0 || (dlg.getKeyMask() & SWT.CONTROL) != 0) {
+		else if (shift || ctrl) {
 			return ENQUEUE;
 		}
 		else {
