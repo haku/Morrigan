@@ -9,7 +9,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -32,8 +34,11 @@ import com.vaguehope.morrigan.gui.dialogs.RunnableDialog;
 import com.vaguehope.morrigan.gui.helpers.MonitorHelper;
 import com.vaguehope.morrigan.gui.helpers.UiThreadHelper;
 import com.vaguehope.morrigan.gui.preferences.PreferenceHelper;
+import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackDb;
+import com.vaguehope.morrigan.model.media.MediaTag;
+import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.sqlitewrapper.DbException;
 
 public class JumpToDlg implements Dismissable {
@@ -97,6 +102,7 @@ public class JumpToDlg implements Dismissable {
 	private Label label = null;
 	private Text text = null;
 	private TableViewer tableViewer = null;
+	private Label tags = null;
 	private Button btnPlay = null;
 	private Button btnEnqueue = null;
 	private Button btnReveal = null;
@@ -130,6 +136,7 @@ public class JumpToDlg implements Dismissable {
 		this.label = new Label(this.shell, SWT.CENTER);
 		this.text = new Text(this.shell, SWT.SINGLE | SWT.CENTER | SWT.BORDER);
 		this.tableViewer = new TableViewer(this.shell, SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION);
+		this.tags = new Label(this.shell, SWT.CENTER); // SWT.WRAP breaks centre :(
 		this.btnPlay = new Button(this.shell, SWT.PUSH);
 		this.btnEnqueue = new Button(this.shell, SWT.PUSH);
 		this.btnReveal = new Button(this.shell, SWT.PUSH);
@@ -156,10 +163,17 @@ public class JumpToDlg implements Dismissable {
 		formData.left = new FormAttachment(0, SEP);
 		formData.top = new FormAttachment(this.text, SEP);
 		formData.right = new FormAttachment(100, -SEP);
-		formData.bottom = new FormAttachment(this.btnPlay, -SEP);
+		formData.bottom = new FormAttachment(this.tags, -SEP);
 		formData.width = 600;
 		formData.height = 300;
 		this.tableViewer.getTable().setLayoutData(formData);
+
+		formData = new FormData();
+		formData.left = new FormAttachment(0, SEP);
+		formData.top = new FormAttachment(this.tableViewer.getTable(), SEP);
+		formData.right = new FormAttachment(100, -SEP);
+		formData.bottom = new FormAttachment(this.btnPlay, -SEP);
+		this.tags.setLayoutData(formData);
 
 		this.btnOpenView.setText("Open view");
 		formData = new FormData();
@@ -204,6 +218,7 @@ public class JumpToDlg implements Dismissable {
 
 		this.tableViewer.setContentProvider(ArrayContentProvider.getInstance());
 		this.tableViewer.getTable().addTraverseListener(new TableWithTextBoxAboveTraverseListener(this.tableViewer, this.text, this));
+		this.tableViewer.addSelectionChangedListener(this.itemSelectedListener);
 
 		this.btnPlay.addSelectionListener(new JumpSelectionAdaptor(this, JumpType.PLAY_NOW));
 		this.btnEnqueue.addSelectionListener(new JumpSelectionAdaptor(this, JumpType.ENQUEUE));
@@ -315,7 +330,10 @@ public class JumpToDlg implements Dismissable {
 	}
 
 	private IMediaTrack getSelectedItem () {
-		final ISelection selection = this.tableViewer.getSelection();
+		return selectionToItem(this.tableViewer.getSelection());
+	}
+
+	protected static IMediaTrack selectionToItem (final ISelection selection) {
 		if (selection == null) return null;
 		if (selection.isEmpty()) return null;
 		if (selection instanceof IStructuredSelection) {
@@ -338,7 +356,10 @@ public class JumpToDlg implements Dismissable {
 		if (results != null && results.size() > 0) {
 			this.label.setText(results.size() + " results.");
 			this.tableViewer.setInput(results);
-			if (this.tableViewer.getTable().getItemCount() > 0) this.tableViewer.getTable().setSelection(0);
+			if (this.tableViewer.getTable().getItemCount() > 0) {
+				this.tableViewer.getTable().setSelection(0);
+				this.tableViewer.setSelection(this.tableViewer.getSelection());
+			}
 		}
 		else if (this.text.getCharCount() > 0) {
 			this.label.setText("No results for query.");
@@ -346,6 +367,10 @@ public class JumpToDlg implements Dismissable {
 		else {
 			this.label.setText("Search:");
 		}
+	}
+
+	protected void showTags (final String msg) {
+		this.tags.setText(msg);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -358,22 +383,31 @@ public class JumpToDlg implements Dismissable {
 		}
 	};
 
-	private final Object searchLock = new Object();
+	private final ISelectionChangedListener itemSelectedListener = new ISelectionChangedListener() {
+		@Override
+		public void selectionChanged (final SelectionChangedEvent event) {
+			final IMediaTrack item = selectionToItem(event.getSelection());
+			if (item != null) requestTags(item);
+		}
+	};
+
 	private SearchRunner searchRunner;
 
 	/**
 	 * Only call on UI thread.
 	 */
 	protected void requestSearch () {
-		synchronized (this.searchLock) {
-			if (this.searchRunner == null) {
-				this.searchRunner = new SearchRunner(this);
-				final Thread t = new Thread(this.searchRunner);
-				t.setDaemon(true);
-				t.start();
-			}
-			this.searchRunner.request();
+		if (this.searchRunner == null) {
+			this.searchRunner = new SearchRunner(this);
+			final Thread t = new Thread(this.searchRunner);
+			t.setDaemon(true);
+			t.start();
 		}
+		this.searchRunner.requestSearch();
+	}
+
+	protected void requestTags (final IMediaTrack item) {
+		this.searchRunner.requestTags(item);
 	}
 
 	private static class SearchRunner implements Runnable {
@@ -386,8 +420,12 @@ public class JumpToDlg implements Dismissable {
 			this.queue = new LinkedBlockingQueue<Object>(1);
 		}
 
-		public void request() {
+		public void requestSearch () {
 			this.queue.offer(Boolean.TRUE);
+		}
+
+		public void requestTags (final IMediaTrack item) {
+			this.queue.offer(item);
 		}
 
 		@Override
@@ -395,25 +433,31 @@ public class JumpToDlg implements Dismissable {
 			try {
 				runAndThrow();
 			}
-			catch (final DbException e) {
+			catch (final Exception e) { // NOSONAR report all errors to user.
 				this.dlg.getParent().getDisplay().asyncExec(new RunnableDialog(e));
 			}
 //			System.err.println("Thread " + Thread.currentThread().getId() + " over.");
 		}
 
-		private void runAndThrow () throws DbException {
+		private void runAndThrow () throws DbException, MorriganException {
 			while (this.dlg.isAlive()) {
 				try {
-					if (this.queue.poll(15, TimeUnit.SECONDS) != null) {
+					final Object item = this.queue.poll(15, TimeUnit.SECONDS);
+					if (item == null) continue;
+					if (item instanceof IMediaTrack) {
+						final List<MediaTag> tags = this.dlg.getMediaDb().getTags((IMediaTrack) item);
+						this.dlg.getParent().getDisplay().syncExec(new ShowTags(this.dlg, tags));
+					}
+					else {
 						final List<? extends IMediaTrack> results = doSearch(this.dlg);
 						this.dlg.getParent().getDisplay().syncExec(new SetSearchResults(this.dlg, results));
 					}
 				}
-				catch (InterruptedException e) { /* ignore. */}
+				catch (final InterruptedException e) { /* ignore. */}
 			}
 		}
 
-		protected static List<? extends IMediaTrack> doSearch (final JumpToDlg dlg) throws DbException {
+		private static List<? extends IMediaTrack> doSearch (final JumpToDlg dlg) throws DbException {
 			final String query = UiThreadHelper.callForResult(dlg.getParent().getDisplay(), new Callable<String>() {
 				@Override
 				public String call () {
@@ -440,6 +484,28 @@ public class JumpToDlg implements Dismissable {
 		@Override
 		public void run () {
 			this.dlg.setSearchResults(this.results);
+		}
+	}
+
+	private static class ShowTags implements Runnable {
+
+		private final JumpToDlg dlg;
+		private final List<MediaTag> tags;
+
+		public ShowTags (final JumpToDlg dlg, final List<MediaTag> tags) {
+			this.dlg = dlg;
+			this.tags = tags;
+		}
+
+		@Override
+		public void run () {
+			final StringBuilder s = new StringBuilder();
+			for (final MediaTag tag : this.tags) {
+				if (tag.getType() != MediaTagType.MANUAL) continue;
+				if (s.length() > 0) s.append(", ");
+				s.append(tag.getTag());
+			}
+			this.dlg.showTags(s.toString());
 		}
 	}
 
