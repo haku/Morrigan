@@ -16,9 +16,9 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IViewPart;
 
 import com.vaguehope.morrigan.gui.actions.DbUpdateAction;
-import com.vaguehope.morrigan.gui.actions.JumpToAction;
 import com.vaguehope.morrigan.gui.adaptors.ActionListener;
 import com.vaguehope.morrigan.gui.dialogs.MorriganMsgDlg;
+import com.vaguehope.morrigan.gui.dialogs.jumpto.JumpToAction;
 import com.vaguehope.morrigan.gui.views.ViewLibraryProperties;
 import com.vaguehope.morrigan.gui.views.ViewTagEditor;
 import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;

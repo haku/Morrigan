@@ -1,4 +1,4 @@
-package com.vaguehope.morrigan.gui.actions;
+package com.vaguehope.morrigan.gui.dialogs.jumpto;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,7 +10,6 @@ import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 
-import com.vaguehope.morrigan.gui.dialogs.JumpToDlg;
 import com.vaguehope.morrigan.gui.dialogs.RunnableDialog;
 import com.vaguehope.morrigan.gui.editors.EditorFactory;
 import com.vaguehope.morrigan.gui.editors.MediaItemDbEditorInput;
