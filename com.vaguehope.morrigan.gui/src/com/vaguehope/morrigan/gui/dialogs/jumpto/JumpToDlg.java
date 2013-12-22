@@ -1,4 +1,4 @@
-package com.vaguehope.morrigan.gui.dialogs;
+package com.vaguehope.morrigan.gui.dialogs.jumpto;
 
 import java.awt.MouseInfo;
 import java.awt.Point;
