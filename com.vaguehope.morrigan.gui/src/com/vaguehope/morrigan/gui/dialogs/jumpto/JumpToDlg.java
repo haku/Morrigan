@@ -2,18 +2,15 @@ package com.vaguehope.morrigan.gui.dialogs.jumpto;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
+import java.util.concurrent.Callable;
 
-import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.events.VerifyEvent;
@@ -27,13 +24,16 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import com.vaguehope.morrigan.gui.dialogs.Dismissable;
+import com.vaguehope.morrigan.gui.dialogs.RunnableDialog;
+import com.vaguehope.morrigan.gui.helpers.UiThreadHelper;
 import com.vaguehope.morrigan.gui.preferences.PreferenceHelper;
 import com.vaguehope.morrigan.gui.util.MonitorHelper;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackDb;
 import com.vaguehope.sqlitewrapper.DbException;
 
-public class JumpToDlg {
+public class JumpToDlg implements Dismissable {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private static final int MAX_RESULTS = 200;
@@ -44,15 +44,17 @@ public class JumpToDlg {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	final Shell parent;
-	private final IMediaTrackDb<?,? extends IMediaTrack> mediaDb;
+	private final Shell parent;
+	private final IMediaTrackDb<?, ? extends IMediaTrack> mediaDb;
 
+	private JumpType resultAction;
 	private IMediaTrack returnItem = null;
 	private String returnFilter = null;
+	private List<? extends IMediaTrack> searchResults = null;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public JumpToDlg (final Shell parent, final IMediaTrackDb<?,? extends IMediaTrack> mediaDb) {
+	public JumpToDlg (final Shell parent, final IMediaTrackDb<?, ? extends IMediaTrack> mediaDb) {
 		this.parent = parent;
 		if (mediaDb == null) throw new IllegalArgumentException("mediaDb can not be null.");
 		this.mediaDb = mediaDb;
@@ -68,8 +70,16 @@ public class JumpToDlg {
 		return this.searchResults;
 	}
 
-	public String getReturnFilter() {
+	public String getReturnFilter () {
 		return this.returnFilter;
+	}
+
+	protected Shell getParent () {
+		return this.parent;
+	}
+
+	protected IMediaTrackDb<?, ? extends IMediaTrack> getMediaDb () {
+		return this.mediaDb;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -77,25 +87,23 @@ public class JumpToDlg {
 	private static final int SEP = 3;
 
 	private Shell shell = null;
-	Label label = null;
-	Text text = null;
-	TableViewer tableViewer = null;
-	Button btnPlay = null;
-	Button btnEnqueue = null;
-	Button btnReveal = null;
-	Button btnShuffleAll = null;
-	Button btnOpenView = null;
+	private Label label = null;
+	private Text text = null;
+	private TableViewer tableViewer = null;
+	private Button btnPlay = null;
+	private Button btnEnqueue = null;
+	private Button btnReveal = null;
+	private Button btnShuffleAll = null;
+	private Button btnOpenView = null;
 	private Button btnCancel = null;
-
-	private JumpType resultAction;
 
 	public JumpType open () {
 		synchronized (dlgOpenLock) {
 			if (dlgOpen) {
 				if (openDlg != null) {
-					JumpToDlg j = openDlg.get();
+					final JumpToDlg j = openDlg.get();
 					if (j != null) {
-						j.remoteClose();
+						j.dismiss();
 					}
 				}
 				return JumpType.NULL;
@@ -114,7 +122,7 @@ public class JumpToDlg {
 
 		this.label = new Label(this.shell, SWT.CENTER);
 		this.text = new Text(this.shell, SWT.SINGLE | SWT.CENTER | SWT.BORDER);
-		this.tableViewer =  new TableViewer(this.shell, SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION);
+		this.tableViewer = new TableViewer(this.shell, SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION);
 		this.btnPlay = new Button(this.shell, SWT.PUSH);
 		this.btnEnqueue = new Button(this.shell, SWT.PUSH);
 		this.btnReveal = new Button(this.shell, SWT.PUSH);
@@ -185,25 +193,23 @@ public class JumpToDlg {
 		this.label.setText("Search:");
 
 		this.text.addVerifyListener(this.textChangeListener);
-		this.text.addTraverseListener(this.textTraverseListener);
+		this.text.addTraverseListener(new TextWithTableBelowTraverseListener(this.tableViewer, this));
 
-		this.tableViewer.setContentProvider(this.contentProvider);
-		this.tableViewer.setLabelProvider(this.labelProvider);
-		this.tableViewer.setInput(this.shell);
-		this.tableViewer.getTable().addTraverseListener(this.listTraverseListener);
+		this.tableViewer.setContentProvider(ArrayContentProvider.getInstance());
+		this.tableViewer.getTable().addTraverseListener(new TableWithTextBoxAboveTraverseListener(this.tableViewer, this.text, this));
 
-		this.btnPlay.addSelectionListener(this.buttonListener);
-		this.btnEnqueue.addSelectionListener(this.buttonListener);
-		this.btnReveal.addSelectionListener(this.buttonListener);
-		this.btnShuffleAll.addSelectionListener(this.buttonListener);
-		this.btnOpenView.addSelectionListener(this.buttonListener);
-		this.btnCancel.addSelectionListener(this.buttonListener);
+		this.btnPlay.addSelectionListener(new JumpSelectionAdaptor(this, JumpType.PLAY_NOW));
+		this.btnEnqueue.addSelectionListener(new JumpSelectionAdaptor(this, JumpType.ENQUEUE));
+		this.btnReveal.addSelectionListener(new JumpSelectionAdaptor(this, JumpType.REVEAL));
+		this.btnShuffleAll.addSelectionListener(new JumpSelectionAdaptor(this, JumpType.SHUFFLE_AND_ENQUEUE));
+		this.btnOpenView.addSelectionListener(new JumpSelectionAdaptor(this, JumpType.OPEN_VIEW));
+		this.btnCancel.addSelectionListener(new JumpSelectionAdaptor(this, JumpType.NULL));
 
 		this.shell.pack();
 		MonitorHelper.moveShellToActiveMonitor(this.shell);
 
 		// Read saved query string.
-		String s = PreferenceHelper.getLastJumpToDlgQuery();
+		final String s = PreferenceHelper.getLastJumpToDlgQuery();
 		if (s != null && s.length() > 0) {
 			this.text.setText(s);
 			this.text.setSelection(0, this.text.getText().length());
@@ -217,7 +223,7 @@ public class JumpToDlg {
 		this.shell.open();
 		this.shell.setFocus();
 		this.shell.forceActive();
-		Display display = this.parent.getDisplay();
+		final Display display = this.parent.getDisplay();
 		while (!this.shell.isDisposed()) {
 			if (!display.readAndDispatch()) {
 				display.sleep();
@@ -233,11 +239,12 @@ public class JumpToDlg {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public void remoteClose () {
+	@Override
+	public void dismiss () {
 		leaveDlg(JumpType.NULL);
 	}
 
-	void leaveDlg (final JumpType action) {
+	protected void leaveDlg (final JumpType action) {
 		this.returnItem = getSelectedItem();
 		this.returnFilter = this.text.getText();
 
@@ -259,266 +266,177 @@ public class JumpToDlg {
 
 	private final TraverseListener traverseListener = new TraverseListener() {
 		@Override
-		public void keyTraversed(final TraverseEvent e) {
+		public void keyTraversed (final TraverseEvent e) {
 			switch (e.detail) {
-
 				case SWT.TRAVERSE_RETURN:
 					e.detail = SWT.TRAVERSE_NONE;
 					e.doit = false;
 					leaveDlg(JumpType.fromStateMask(e.stateMask));
 					break;
-
 				case SWT.TRAVERSE_ESCAPE:
 					e.detail = SWT.TRAVERSE_NONE;
 					e.doit = false;
 					leaveDlg(JumpType.NULL);
 					break;
-
 				default:
 					break;
-
 			}
 		}
 	};
 
-	private final TraverseListener textTraverseListener = new TraverseListener() {
+	private static class JumpSelectionAdaptor extends SelectionAdapter {
+
+		private final JumpToDlg dlg;
+		private final JumpType jumpType;
+
+		public JumpSelectionAdaptor (final JumpToDlg dlg, final JumpType jumpType) {
+			this.dlg = dlg;
+			this.jumpType = jumpType;
+		}
+
 		@Override
-		public void keyTraversed(final TraverseEvent e) {
-			switch (e.detail) {
-
-				case SWT.TRAVERSE_ARROW_NEXT:
-					if (e.keyCode == SWT.ARROW_DOWN && JumpToDlg.this.tableViewer.getTable().getItemCount() > 0) {
-						e.detail = SWT.TRAVERSE_NONE;
-						e.doit = false;
-						JumpToDlg.this.tableViewer.getTable().setSelection(0);
-						JumpToDlg.this.tableViewer.getTable().setFocus();
-					}
-					break;
-
-				case SWT.TRAVERSE_ESCAPE:
-					e.detail = SWT.TRAVERSE_NONE;
-					e.doit = false;
-					leaveDlg(JumpType.NULL);
-					break;
-
-				default:
-					break;
-
-			}
+		public void widgetSelected (final SelectionEvent e) {
+			this.dlg.leaveDlg(this.jumpType);
 		}
-	};
-
-	private final TraverseListener listTraverseListener = new TraverseListener() {
-		@Override
-		public void keyTraversed(final TraverseEvent e) {
-			switch (e.detail) {
-
-				case SWT.TRAVERSE_ARROW_PREVIOUS:
-					if (JumpToDlg.this.tableViewer.getTable().getSelectionIndex() == 0) {
-						e.detail = SWT.TRAVERSE_NONE;
-						e.doit = false;
-						JumpToDlg.this.text.setFocus();
-					}
-					break;
-
-				case SWT.TRAVERSE_ESCAPE:
-					e.detail = SWT.TRAVERSE_NONE;
-					e.doit = false;
-					leaveDlg(JumpType.NULL);
-					break;
-
-				default:
-					break;
-
-			}
-		}
-	};
-
-	private final SelectionListener buttonListener = new SelectionAdapter() {
-		@Override
-		public void widgetSelected(final SelectionEvent e) {
-			if (e.widget == JumpToDlg.this.btnPlay) {
-				leaveDlg(JumpType.PLAY_NOW);
-			}
-			else if (e.widget == JumpToDlg.this.btnEnqueue) {
-				leaveDlg(JumpType.ENQUEUE);
-			}
-			else if (e.widget == JumpToDlg.this.btnReveal) {
-				leaveDlg(JumpType.REVEAL);
-			}
-			else if (e.widget == JumpToDlg.this.btnShuffleAll) {
-				leaveDlg(JumpType.SHUFFLE_AND_ENQUEUE);
-			}
-			else if (e.widget == JumpToDlg.this.btnOpenView) {
-				leaveDlg(JumpType.OPEN_VIEW);
-			}
-			else {
-				leaveDlg(JumpType.NULL);
-			}
-		}
-	};
+	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private IMediaTrack getSelectedItem () {
-		ISelection selection = this.tableViewer.getSelection();
-		if (selection==null) return null;
-		if (selection.isEmpty()) return null;
+	protected String getSearchText () {
+		if (this.text.isDisposed()) return null;
+		return this.text.getText();
+	}
 
+	private IMediaTrack getSelectedItem () {
+		final ISelection selection = this.tableViewer.getSelection();
+		if (selection == null) return null;
+		if (selection.isEmpty()) return null;
 		if (selection instanceof IStructuredSelection) {
-			IStructuredSelection iSel = (IStructuredSelection) selection;
-			Object o = iSel.toList().get(0);
+			final IStructuredSelection iSel = (IStructuredSelection) selection;
+			final Object o = iSel.toList().get(0);
 			if (o instanceof IMediaTrack) {
-				IMediaTrack i = (IMediaTrack) o;
+				final IMediaTrack i = (IMediaTrack) o;
 				return i;
 			}
 		}
-
 		return null;
 	}
 
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	volatile List<? extends IMediaTrack> searchResults = null;
-
-	private final IStructuredContentProvider contentProvider = new IStructuredContentProvider() {
-		@Override
-		public Object[] getElements(final Object inputElement) {
-			if (JumpToDlg.this.searchResults != null) {
-				return JumpToDlg.this.searchResults.toArray();
-			}
-			return new String[]{};
-		}
-		@Override
-		public void dispose() {/* UNUSED */}
-		@Override
-		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {/* UNUSED */}
-	};
-
-	private final ILabelProvider labelProvider = new LabelProvider() {
-		@Override
-		public String getText(final Object element) {
-			if (element  != null) {
-				return element.toString();
-			}
-			return null;
-		}
-	};
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	Object searchLock = new Object();
-	volatile boolean searchRunning = false;
-	volatile boolean searchDirty = false;
-
 	/**
-	 * Text changed event handler.
+	 * Call on UI thread.
 	 */
-	private final VerifyListener textChangeListener = new VerifyListener() {
-		@Override
-		public void verifyText(final VerifyEvent e) {
-			updateSearchResults();
+	protected void setSearchResults (final List<? extends IMediaTrack> results) {
+		this.searchResults = results;
+		if (this.label.isDisposed() || this.tableViewer.getTable().isDisposed()) return;
+		if (results != null && results.size() > 0) {
+			this.label.setText(results.size() + " results.");
+			this.tableViewer.setInput(results);
+			if (this.tableViewer.getTable().getItemCount() > 0) this.tableViewer.getTable().setSelection(0);
 		}
-	};
-
-	void updateSearchResults () {
-		updateSearchResults(false);
+		else if (this.text.getCharCount() > 0) {
+			this.label.setText("No results for query.");
+		}
+		else {
+			this.label.setText("Search:");
+		}
 	}
 
-	void updateSearchResults (final boolean force) {
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	private final Object searchLock = new Object();
+	private volatile boolean searchRunning = false;
+	private volatile boolean searchDirty = false;
+
+	private final VerifyListener textChangeListener = new VerifyListener() {
+		@Override
+		public void verifyText (final VerifyEvent e) {
+			if (e == null || e.text == null || e.text.length() < 1) return;
+			requestSearch();
+		}
+	};
+
+	protected void requestSearch () {
 		synchronized (this.searchLock) {
-			if (!this.searchRunning || force) {
-				this.parent.getDisplay().asyncExec(this.updateSearchResults);
+			if (!this.searchRunning) {
+				final Thread t = new Thread(new SearchRunner(this));
+				t.setDaemon(true);
+				t.start();
 				this.searchRunning = true;
-			} else {
+				this.searchDirty = false;
+			}
+			else {
 				this.searchDirty = true;
 			}
 		}
 	}
 
 	/**
-	 * Async task so we can read the complete text from the
-	 * input box.
-	 * Run on UI thread.
+	 * @return true if should search again, false if should not search again.
 	 */
-	private final Runnable updateSearchResults = new Runnable() {
-		@Override
-		public void run() {
-			if (!JumpToDlg.this.text.isDisposed()) {
-				updateSearchResults(JumpToDlg.this.text.getText());
-			}
-		}
-	};
-
-	/**
-	 * Run the search in a daemon thread.  Call query again if
-	 * input has changed while the search was running.
-	 * @param query
-	 */
-	void updateSearchResults (final String query) {
-		Thread t = new Thread() {
-			@Override
-			public void run() {
-				if (doSearch(query)) {
-					JumpToDlg.this.parent.getDisplay().asyncExec(new Runnable() {
-						@Override
-						public void run() {
-							if (JumpToDlg.this.label.isDisposed() || JumpToDlg.this.tableViewer.getTable().isDisposed()) return;
-							JumpToDlg.this.label.setText(JumpToDlg.this.searchResults.size() + " results.");
-							JumpToDlg.this.tableViewer.refresh();
-
-							if (JumpToDlg.this.tableViewer.getTable().getItemCount() > 0) {
-								JumpToDlg.this.tableViewer.getTable().setSelection(0);
-							}
-						}
-					});
-
-				} else {
-					JumpToDlg.this.parent.getDisplay().asyncExec(new Runnable() {
-						@Override
-						public void run() {
-							if (JumpToDlg.this.text.getText().length() > 0) {
-								JumpToDlg.this.label.setText("No results for query.");
-							} else {
-								JumpToDlg.this.label.setText("Search:");
-							}
-						}
-					});
-				}
-
-				synchronized (JumpToDlg.this.searchLock) {
-					if (JumpToDlg.this.searchDirty) {
-						updateSearchResults(true);
-						JumpToDlg.this.searchDirty = false;
-					} else {
-						JumpToDlg.this.searchRunning = false;
-					}
-				}
-			}
-		};
-		t.setDaemon(true);
-		t.start();
-	}
-
-	/**
-	 * Do the actual searching.
-	 * @param query
-	 */
-	boolean doSearch (final String query) {
-		if (query == null || query.length() < 1) return false;
-
-		try {
-			List<? extends IMediaTrack> res = this.mediaDb.simpleSearch(query, MAX_RESULTS);
-			if (res != null && res.size() > 0) {
-				this.searchResults = res;
+	protected boolean checkAndSetSearchAgainOrSearchOver () {
+		synchronized (this.searchLock) {
+			if (this.searchDirty) {
+				this.searchDirty = false;
 				return true;
 			}
+			this.searchRunning = false;
+			return false;
 		}
-		catch (DbException e) {
-			e.printStackTrace();
+	}
+
+	private static class SearchRunner implements Runnable {
+
+		private final JumpToDlg dlg;
+
+		public SearchRunner (final JumpToDlg dlg) {
+			this.dlg = dlg;
 		}
 
-		return false;
+		@Override
+		public void run () {
+			try {
+				runAndThrow();
+			}
+			catch (final DbException e) {
+				this.dlg.getParent().getDisplay().asyncExec(new RunnableDialog(e));
+			}
+		}
+
+		private void runAndThrow () throws DbException {
+			while (true) {
+				final List<? extends IMediaTrack> results = doSearch(this.dlg);
+				this.dlg.getParent().getDisplay().asyncExec(new SetSearchResults(this.dlg, results));
+				if (!this.dlg.checkAndSetSearchAgainOrSearchOver()) break;
+			}
+		}
+
+		protected static List<? extends IMediaTrack> doSearch (final JumpToDlg dlg) throws DbException {
+			final String query = UiThreadHelper.callForResult(dlg.getParent().getDisplay(), new Callable<String>() {
+				@Override
+				public String call () {
+					return dlg.getSearchText();
+				}
+			});
+			if (query == null || query.length() < 1) return null;
+			return dlg.getMediaDb().simpleSearch(query, MAX_RESULTS);
+		}
+
+	}
+
+	private static class SetSearchResults implements Runnable {
+
+		private final JumpToDlg dlg;
+		private final List<? extends IMediaTrack> results;
+
+		public SetSearchResults (final JumpToDlg dlg, final List<? extends IMediaTrack> results) {
+			this.dlg = dlg;
+			this.results = results;
+		}
+
+		@Override
+		public void run () {
+			this.dlg.setSearchResults(this.results);
+		}
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
