@@ -56,7 +56,7 @@ public class JumpToDlg {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public JumpToDlg (Shell parent, IMediaTrackDb<?,? extends IMediaTrack> mediaDb) {
+	public JumpToDlg (final Shell parent, final IMediaTrackDb<?,? extends IMediaTrack> mediaDb) {
 		this.parent = parent;
 		if (mediaDb == null) throw new IllegalArgumentException("mediaDb can not be null.");
 		this.mediaDb = mediaDb;
@@ -80,7 +80,7 @@ public class JumpToDlg {
 		return this.keyMask;
 	}
 
-	public void setKeyMask(int keyMask) {
+	public void setKeyMask(final int keyMask) {
 		this.keyMask = keyMask;
 	}
 
@@ -263,7 +263,7 @@ public class JumpToDlg {
 		leaveDlg(false, 0);
 	}
 
-	void leaveDlg (boolean ok, int mask) {
+	void leaveDlg (final boolean ok, final int mask) {
 		if (ok) {
 			this.returnValue = getSelectedItem();
 			this.returnList = this.searchResults;
@@ -277,9 +277,9 @@ public class JumpToDlg {
 		this.shell.close();
 	}
 
-	private TraverseListener traverseListener = new TraverseListener() {
+	private final TraverseListener traverseListener = new TraverseListener() {
 		@Override
-		public void keyTraversed(TraverseEvent e) {
+		public void keyTraversed(final TraverseEvent e) {
 			switch (e.detail) {
 
 				case SWT.TRAVERSE_RETURN:
@@ -301,9 +301,9 @@ public class JumpToDlg {
 		}
 	};
 
-	private TraverseListener textTraverseListener = new TraverseListener() {
+	private final TraverseListener textTraverseListener = new TraverseListener() {
 		@Override
-		public void keyTraversed(TraverseEvent e) {
+		public void keyTraversed(final TraverseEvent e) {
 			switch (e.detail) {
 
 				case SWT.TRAVERSE_ARROW_NEXT:
@@ -328,9 +328,9 @@ public class JumpToDlg {
 		}
 	};
 
-	private TraverseListener listTraverseListener = new TraverseListener() {
+	private final TraverseListener listTraverseListener = new TraverseListener() {
 		@Override
-		public void keyTraversed(TraverseEvent e) {
+		public void keyTraversed(final TraverseEvent e) {
 			switch (e.detail) {
 
 				case SWT.TRAVERSE_ARROW_PREVIOUS:
@@ -354,9 +354,9 @@ public class JumpToDlg {
 		}
 	};
 
-	private SelectionListener buttonListener = new SelectionAdapter() {
+	private final SelectionListener buttonListener = new SelectionAdapter() {
 		@Override
-		public void widgetSelected(SelectionEvent e) {
+		public void widgetSelected(final SelectionEvent e) {
 			if (e.widget == JumpToDlg.this.btnPlay) {
 				leaveDlg(true, 0);
 			}
@@ -401,9 +401,9 @@ public class JumpToDlg {
 
 	List<? extends IMediaTrack> searchResults = null;
 
-	private IStructuredContentProvider contentProvider = new IStructuredContentProvider() {
+	private final IStructuredContentProvider contentProvider = new IStructuredContentProvider() {
 		@Override
-		public Object[] getElements(Object inputElement) {
+		public Object[] getElements(final Object inputElement) {
 			if (JumpToDlg.this.searchResults != null) {
 				return JumpToDlg.this.searchResults.toArray();
 
@@ -414,12 +414,12 @@ public class JumpToDlg {
 		@Override
 		public void dispose() {/* UNUSED */}
 		@Override
-		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {/* UNUSED */}
+		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {/* UNUSED */}
 	};
 
-	private ILabelProvider labelProvider = new LabelProvider() {
+	private final ILabelProvider labelProvider = new LabelProvider() {
 		@Override
-		public String getText(Object element) {
+		public String getText(final Object element) {
 			if (element  != null) {
 				return element.toString();
 			}
@@ -436,9 +436,9 @@ public class JumpToDlg {
 	/**
 	 * Text changed event handler.
 	 */
-	private VerifyListener textChangeListener = new VerifyListener() {
+	private final VerifyListener textChangeListener = new VerifyListener() {
 		@Override
-		public void verifyText(VerifyEvent e) {
+		public void verifyText(final VerifyEvent e) {
 			updateSearchResults();
 		}
 	};
@@ -447,7 +447,7 @@ public class JumpToDlg {
 		updateSearchResults(false);
 	}
 
-	void updateSearchResults (boolean force) {
+	void updateSearchResults (final boolean force) {
 		synchronized (this.searchLock) {
 			if (!this.searchRunning || force) {
 				this.parent.getDisplay().asyncExec(this.updateSearchResults);
@@ -463,7 +463,7 @@ public class JumpToDlg {
 	 * input box.
 	 * Run on UI thread.
 	 */
-	private Runnable updateSearchResults = new Runnable() {
+	private final Runnable updateSearchResults = new Runnable() {
 		@Override
 		public void run() {
 			if (!JumpToDlg.this.text.isDisposed()) {
@@ -526,7 +526,7 @@ public class JumpToDlg {
 	 * Do the actual searching.
 	 * @param query
 	 */
-	boolean doSearch (String query) {
+	boolean doSearch (final String query) {
 		if (query == null || query.length() < 1) return false;
 
 		try {

@@ -1,18 +1,18 @@
 package com.vaguehope.morrigan.gui.dialogs;
 
 public class RunnableDialog implements Runnable {
-	
+
 	private String s;
 	private Throwable t;
-	
-	public RunnableDialog (String s) {
+
+	public RunnableDialog (final String s) {
 		this.s = s;
 	}
-	
-	public RunnableDialog (Throwable t) {
+
+	public RunnableDialog (final Throwable t) {
 		this.t = t;
 	}
-	
+
 	@Override
 	public void run() {
 		if (this.s!=null) {
@@ -23,5 +23,5 @@ public class RunnableDialog implements Runnable {
 			new MorriganMsgDlg("null").open();
 		}
 	}
-	
+
 }
