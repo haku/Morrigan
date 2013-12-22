@@ -1,7 +1,5 @@
 package com.vaguehope.morrigan.gui.dialogs.jumpto;
 
-import java.awt.MouseInfo;
-import java.awt.Point;
 import java.lang.ref.WeakReference;
 import java.util.List;
 
@@ -20,18 +18,17 @@ import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import com.vaguehope.morrigan.gui.preferences.PreferenceHelper;
+import com.vaguehope.morrigan.gui.util.MonitorHelper;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackDb;
 import com.vaguehope.sqlitewrapper.DbException;
@@ -203,23 +200,7 @@ public class JumpToDlg {
 		this.btnCancel.addSelectionListener(this.buttonListener);
 
 		this.shell.pack();
-
-		// Work out which screen to show the dlg on.
-		Point mouse = MouseInfo.getPointerInfo().getLocation();
-		for (Monitor m : this.parent.getDisplay().getMonitors()) {
-			Rectangle b = m.getBounds();
-			if (mouse.x >= b.x && mouse.x <= b.x + b.width
-					&& mouse.y >= b.y && mouse.y <= b.y + b.width) {
-
-				Rectangle bounds = m.getBounds ();
-				Rectangle rect = this.shell.getBounds ();
-				int x = bounds.x + (bounds.width - rect.width) / 2;
-				int y = bounds.y + (bounds.height - rect.height) / 2;
-				this.shell.setLocation (x, y);
-
-				break;
-			}
-		}
+		MonitorHelper.moveShellToActiveMonitor(this.shell);
 
 		// Read saved query string.
 		String s = PreferenceHelper.getLastJumpToDlgQuery();
