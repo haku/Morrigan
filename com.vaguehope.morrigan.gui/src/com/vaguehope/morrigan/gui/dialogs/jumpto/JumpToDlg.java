@@ -26,9 +26,9 @@ import org.eclipse.swt.widgets.Text;
 
 import com.vaguehope.morrigan.gui.dialogs.Dismissable;
 import com.vaguehope.morrigan.gui.dialogs.RunnableDialog;
+import com.vaguehope.morrigan.gui.helpers.MonitorHelper;
 import com.vaguehope.morrigan.gui.helpers.UiThreadHelper;
 import com.vaguehope.morrigan.gui.preferences.PreferenceHelper;
-import com.vaguehope.morrigan.gui.util.MonitorHelper;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackDb;
 import com.vaguehope.sqlitewrapper.DbException;
