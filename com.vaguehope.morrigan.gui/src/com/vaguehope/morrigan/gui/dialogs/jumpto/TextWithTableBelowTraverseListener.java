@@ -25,6 +25,7 @@ class TextWithTableBelowTraverseListener implements TraverseListener {
 					e.detail = SWT.TRAVERSE_NONE;
 					e.doit = false;
 					this.tableViewer.getTable().setSelection(0);
+					this.tableViewer.setSelection(this.tableViewer.getSelection());
 					this.tableViewer.getTable().setFocus();
 				}
 				break;
