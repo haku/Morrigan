@@ -2,7 +2,10 @@ package com.vaguehope.morrigan.gui.dialogs.jumpto;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ISelection;
@@ -80,6 +83,10 @@ public class JumpToDlg implements Dismissable {
 
 	protected IMediaTrackDb<?, ? extends IMediaTrack> getMediaDb () {
 		return this.mediaDb;
+	}
+
+	protected boolean isAlive () {
+		return !this.shell.isDisposed();
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -343,10 +350,6 @@ public class JumpToDlg implements Dismissable {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private final Object searchLock = new Object();
-	private volatile boolean searchRunning = false;
-	private volatile boolean searchDirty = false;
-
 	private final VerifyListener textChangeListener = new VerifyListener() {
 		@Override
 		public void verifyText (final VerifyEvent e) {
@@ -355,41 +358,36 @@ public class JumpToDlg implements Dismissable {
 		}
 	};
 
-	protected void requestSearch () {
-		synchronized (this.searchLock) {
-			if (!this.searchRunning) {
-				final Thread t = new Thread(new SearchRunner(this));
-				t.setDaemon(true);
-				t.start();
-				this.searchRunning = true;
-				this.searchDirty = false;
-			}
-			else {
-				this.searchDirty = true;
-			}
-		}
-	}
+	private final Object searchLock = new Object();
+	private SearchRunner searchRunner;
 
 	/**
-	 * @return true if should search again, false if should not search again.
+	 * Only call on UI thread.
 	 */
-	protected boolean checkAndSetSearchAgainOrSearchOver () {
+	protected void requestSearch () {
 		synchronized (this.searchLock) {
-			if (this.searchDirty) {
-				this.searchDirty = false;
-				return true;
+			if (this.searchRunner == null) {
+				this.searchRunner = new SearchRunner(this);
+				final Thread t = new Thread(this.searchRunner);
+				t.setDaemon(true);
+				t.start();
 			}
-			this.searchRunning = false;
-			return false;
+			this.searchRunner.request();
 		}
 	}
 
 	private static class SearchRunner implements Runnable {
 
 		private final JumpToDlg dlg;
+		private final BlockingQueue<Object> queue;
 
 		public SearchRunner (final JumpToDlg dlg) {
 			this.dlg = dlg;
+			this.queue = new LinkedBlockingQueue<Object>(1);
+		}
+
+		public void request() {
+			this.queue.offer(Boolean.TRUE);
 		}
 
 		@Override
@@ -400,13 +398,18 @@ public class JumpToDlg implements Dismissable {
 			catch (final DbException e) {
 				this.dlg.getParent().getDisplay().asyncExec(new RunnableDialog(e));
 			}
+//			System.err.println("Thread " + Thread.currentThread().getId() + " over.");
 		}
 
 		private void runAndThrow () throws DbException {
-			while (true) {
-				final List<? extends IMediaTrack> results = doSearch(this.dlg);
-				this.dlg.getParent().getDisplay().asyncExec(new SetSearchResults(this.dlg, results));
-				if (!this.dlg.checkAndSetSearchAgainOrSearchOver()) break;
+			while (this.dlg.isAlive()) {
+				try {
+					if (this.queue.poll(15, TimeUnit.SECONDS) != null) {
+						final List<? extends IMediaTrack> results = doSearch(this.dlg);
+						this.dlg.getParent().getDisplay().syncExec(new SetSearchResults(this.dlg, results));
+					}
+				}
+				catch (InterruptedException e) { /* ignore. */}
 			}
 		}
 
@@ -418,6 +421,7 @@ public class JumpToDlg implements Dismissable {
 				}
 			});
 			if (query == null || query.length() < 1) return null;
+//			System.err.println("t=" + Thread.currentThread().getId() + " q=" + query);
 			return dlg.getMediaDb().simpleSearch(query, MAX_RESULTS);
 		}
 
