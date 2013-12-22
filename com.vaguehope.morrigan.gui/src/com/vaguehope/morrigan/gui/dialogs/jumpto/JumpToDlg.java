@@ -50,8 +50,7 @@ public class JumpToDlg {
 	final Shell parent;
 	private final IMediaTrackDb<?,? extends IMediaTrack> mediaDb;
 
-	private IMediaTrack returnValue = null;
-	private List<? extends IMediaTrack> returnList = null;
+	private IMediaTrack returnItem = null;
 	private String returnFilter = null;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -65,23 +64,15 @@ public class JumpToDlg {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	public IMediaTrack getReturnItem () {
-		return this.returnValue;
+		return this.returnItem;
 	}
 
-	public List<? extends IMediaTrack> getReturnList () {
-		return this.returnList;
+	public List<? extends IMediaTrack> getSearchResults () {
+		return this.searchResults;
 	}
 
 	public String getReturnFilter() {
 		return this.returnFilter;
-	}
-
-	public int getKeyMask() {
-		return this.keyMask;
-	}
-
-	public void setKeyMask(final int keyMask) {
-		this.keyMask = keyMask;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -99,7 +90,7 @@ public class JumpToDlg {
 	Button btnOpenView = null;
 	private Button btnCancel = null;
 
-	private int keyMask = 0;
+	private JumpType resultAction;
 
 	public JumpType open () {
 		synchronized (dlgOpenLock) {
@@ -256,22 +247,28 @@ public class JumpToDlg {
 			dlgOpen = false;
 		}
 
-		return JumpType.fromDlg(this);
+		return this.resultAction;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	public void remoteClose () {
-		leaveDlg(false, 0);
+		leaveDlg(JumpType.NULL);
 	}
 
-	void leaveDlg (final boolean ok, final int mask) {
-		if (ok) {
-			this.returnValue = getSelectedItem();
-			this.returnList = this.searchResults;
-			this.returnFilter = this.text.getText();
+	void leaveDlg (final JumpType action) {
+		this.returnItem = getSelectedItem();
+		this.returnFilter = this.text.getText();
+
+		if (this.returnItem == null) {
+			this.resultAction = JumpType.NULL;
 		}
-		setKeyMask(mask);
+		else if ((action == JumpType.OPEN_VIEW || action == JumpType.SHUFFLE_AND_ENQUEUE) && this.searchResults == null) {
+			this.resultAction = JumpType.NULL;
+		}
+		else {
+			this.resultAction = action;
+		}
 
 		// Save query string.
 		PreferenceHelper.setLastJumpToDlgQuery(this.text.getText());
@@ -287,13 +284,13 @@ public class JumpToDlg {
 				case SWT.TRAVERSE_RETURN:
 					e.detail = SWT.TRAVERSE_NONE;
 					e.doit = false;
-					leaveDlg(true, e.stateMask);
+					leaveDlg(JumpType.fromStateMask(e.stateMask));
 					break;
 
 				case SWT.TRAVERSE_ESCAPE:
 					e.detail = SWT.TRAVERSE_NONE;
 					e.doit = false;
-					leaveDlg(false, e.stateMask);
+					leaveDlg(JumpType.NULL);
 					break;
 
 				default:
@@ -320,7 +317,7 @@ public class JumpToDlg {
 				case SWT.TRAVERSE_ESCAPE:
 					e.detail = SWT.TRAVERSE_NONE;
 					e.doit = false;
-					leaveDlg(false, e.stateMask);
+					leaveDlg(JumpType.NULL);
 					break;
 
 				default:
@@ -346,7 +343,7 @@ public class JumpToDlg {
 				case SWT.TRAVERSE_ESCAPE:
 					e.detail = SWT.TRAVERSE_NONE;
 					e.doit = false;
-					leaveDlg(false, e.stateMask);
+					leaveDlg(JumpType.NULL);
 					break;
 
 				default:
@@ -360,22 +357,22 @@ public class JumpToDlg {
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
 			if (e.widget == JumpToDlg.this.btnPlay) {
-				leaveDlg(true, 0);
+				leaveDlg(JumpType.PLAY_NOW);
 			}
 			else if (e.widget == JumpToDlg.this.btnEnqueue) {
-				leaveDlg(true, SWT.CONTROL);
+				leaveDlg(JumpType.ENQUEUE);
 			}
 			else if (e.widget == JumpToDlg.this.btnReveal) {
-				leaveDlg(true, SWT.CONTROL | SWT.SHIFT);
+				leaveDlg(JumpType.REVEAL);
 			}
 			else if (e.widget == JumpToDlg.this.btnShuffleAll) {
-				leaveDlg(true, SWT.ALT);
+				leaveDlg(JumpType.SHUFFLE_AND_ENQUEUE);
 			}
 			else if (e.widget == JumpToDlg.this.btnOpenView) {
-				leaveDlg(true, SWT.CONTROL | SWT.SHIFT | SWT.ALT);
+				leaveDlg(JumpType.OPEN_VIEW);
 			}
 			else {
-				leaveDlg(false, 0);
+				leaveDlg(JumpType.NULL);
 			}
 		}
 	};
@@ -401,16 +398,14 @@ public class JumpToDlg {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	List<? extends IMediaTrack> searchResults = null;
+	volatile List<? extends IMediaTrack> searchResults = null;
 
 	private final IStructuredContentProvider contentProvider = new IStructuredContentProvider() {
 		@Override
 		public Object[] getElements(final Object inputElement) {
 			if (JumpToDlg.this.searchResults != null) {
 				return JumpToDlg.this.searchResults.toArray();
-
 			}
-
 			return new String[]{};
 		}
 		@Override

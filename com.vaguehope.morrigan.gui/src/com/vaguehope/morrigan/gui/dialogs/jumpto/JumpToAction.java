@@ -79,7 +79,7 @@ public class JumpToAction extends Action {
 	}
 
 	private static void shuffleAndEnqueue (final LocalPlayer player, final IMediaTrackList<? extends IMediaTrack> currentList, final JumpToDlg dlg) {
-		final List<IMediaTrack> shuffeledList = new ArrayList<IMediaTrack>(dlg.getReturnList());
+		final List<IMediaTrack> shuffeledList = new ArrayList<IMediaTrack>(dlg.getSearchResults());
 		Collections.shuffle(shuffeledList);
 		for (final IMediaTrack track : shuffeledList) {
 			player.addToQueue(new PlayItem(currentList, track));
