@@ -19,7 +19,7 @@ public interface IMediaItemStorageLayer<T extends IMediaItem> extends IGenericDb
 
 		private final int n;
 
-		SortDirection (int n) {
+		SortDirection (final int n) {
 			this.n = n;
 		}
 
@@ -27,7 +27,7 @@ public interface IMediaItemStorageLayer<T extends IMediaItem> extends IGenericDb
 			return this.n;
 		}
 
-		public static SortDirection parseN (int n) {
+		public static SortDirection parseN (final int n) {
 			switch (n) {
 				case 0: return ASC;
 				case 1: return DESC;
@@ -123,12 +123,12 @@ public interface IMediaItemStorageLayer<T extends IMediaItem> extends IGenericDb
 	int removeFile(String sfile) throws DbException;
 	int removeFile (IDbItem dbItem) throws DbException;
 
-	void setDateAdded(String sfile, Date date) throws DbException;
-	void setHashcode(String sfile, BigInteger hashcode) throws DbException;
-	void setDateLastModified(String sfile, Date date) throws DbException;
-	void setEnabled(String sfile, boolean value) throws DbException;
-	void setMissing(String sfile, boolean value) throws DbException;
-	void setRemoteLocation(String sfile, String remoteLocation) throws DbException;
+	void setDateAdded(IMediaItem item, Date date) throws DbException;
+	void setHashcode(IMediaItem item, BigInteger hashcode) throws DbException;
+	void setDateLastModified(IMediaItem item, Date date) throws DbException;
+	void setEnabled(IMediaItem item, boolean value) throws DbException;
+	void setMissing(IMediaItem item, boolean value) throws DbException;
+	void setRemoteLocation(IMediaItem item, String remoteLocation) throws DbException;
 
 	T getNewT(String filePath);
 

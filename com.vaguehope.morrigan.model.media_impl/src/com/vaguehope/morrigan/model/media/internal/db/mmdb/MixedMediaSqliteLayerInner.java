@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
 
 import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.db.IDbItem;
+import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMixedMediaItemStorageLayer;
@@ -592,23 +593,23 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	MediaItem setters.
 
-	protected void local_setDateAdded (final String sfile, final Date date) throws Exception, ClassNotFoundException {
+	protected void local_setDateAdded (final IMediaItem item, final Date date) throws Exception, ClassNotFoundException {
 		PreparedStatement ps;
 
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETDATEADDED);
 		int n;
 		try {
 			ps.setDate(1, new java.sql.Date(date.getTime()));
-			ps.setString(2, sfile);
+			ps.setString(2, item.getFilepath());
 			n = ps.executeUpdate();
 		} finally {
 			ps.close();
 		}
-		if (n<1) throw new DbException("No update occured for local_setDateAdded('"+sfile+"','"+date+"').");
-		getChangeEventCaller().mediaItemUpdated(sfile);
+		if (n < 1) throw new DbException("No update occured for local_setDateAdded('" + item + "','" + date + "').");
+		getChangeEventCaller().mediaItemUpdated(item);
 	}
 
-	protected void local_setHashCode (final String sfile, final BigInteger hashcode) throws SQLException, ClassNotFoundException, DbException {
+	protected void local_setHashCode (final IMediaItem item, final BigInteger hashcode) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps;
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETHASHCODE);
 		int n;
@@ -619,98 +620,98 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 			else {
 				ps.setNull(1, java.sql.Types.BLOB);
 			}
-			ps.setString(2, sfile);
+			ps.setString(2, item.getFilepath());
 			n = ps.executeUpdate();
 		} finally {
 			ps.close();
 		}
-		if (n<1) throw new DbException("No update occured for local_setHashCode('"+sfile+"','"+hashcode+"').");
-		getChangeEventCaller().mediaItemUpdated(sfile);
+		if (n < 1) throw new DbException("No update occured for local_setHashCode('" + item + "','" + hashcode + "').");
+		getChangeEventCaller().mediaItemUpdated(item);
 	}
 
-	protected void local_setDateLastModified (final String sfile, final Date date) throws SQLException, ClassNotFoundException, DbException {
+	protected void local_setDateLastModified (final IMediaItem item, final Date date) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps;
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETDMODIFIED);
 		int n;
 		try {
 			ps.setDate(1, new java.sql.Date(date.getTime()));
-			ps.setString(2, sfile);
+			ps.setString(2, item.getFilepath());
 			n = ps.executeUpdate();
 		} finally {
 			ps.close();
 		}
-		if (n<1) throw new DbException("No update occured for local_setDateLastModified('"+sfile+"','"+date+"').");
-		getChangeEventCaller().mediaItemUpdated(sfile);
+		if (n < 1) throw new DbException("No update occured for local_setDateLastModified('" + item + "','" + date + "').");
+		getChangeEventCaller().mediaItemUpdated(item);
 	}
 
-	protected void local_setEnabled (final String sfile, final boolean value) throws SQLException, ClassNotFoundException, DbException {
+	protected void local_setEnabled (final IMediaItem item, final boolean value) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps;
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETENABLED);
 		int n;
 		try {
 			ps.setInt(1, value ? 1 : 0);
-			ps.setString(2, sfile);
+			ps.setString(2, item.getFilepath());
 			n = ps.executeUpdate();
 		} finally {
 			ps.close();
 		}
-		if (n<1) throw new DbException("No update occured for local_setEnabled('"+sfile+"','"+value+"').");
-		getChangeEventCaller().mediaItemUpdated(sfile);
+		if (n < 1) throw new DbException("No update occured for local_setEnabled('" + item + "','" + value + "').");
+		getChangeEventCaller().mediaItemUpdated(item);
 	}
 
-	protected void local_setMissing (final String sfile, final boolean value) throws SQLException, ClassNotFoundException, DbException {
+	protected void local_setMissing (final IMediaItem item, final boolean value) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps;
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETMISSING);
 		int n;
 		try {
 			ps.setInt(1, value ? 1 : 0);
-			ps.setString(2, sfile);
+			ps.setString(2, item.getFilepath());
 			n = ps.executeUpdate();
 		} finally {
 			ps.close();
 		}
-		if (n<1) throw new DbException("No update occured for local_setMissing('"+sfile+"','"+value+"').");
-		getChangeEventCaller().mediaItemUpdated(sfile);
+		if (n < 1) throw new DbException("No update occured for local_setMissing('" + item + "','" + value + "').");
+		getChangeEventCaller().mediaItemUpdated(item);
 	}
 
-	protected void local_setRemoteLocation(final String sfile, final String remoteLocation) throws SQLException, ClassNotFoundException, DbException {
+	protected void local_setRemoteLocation(final IMediaItem item, final String remoteLocation) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps;
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETREMLOC);
 		int n;
 		try {
 			ps.setString(1, remoteLocation);
-			ps.setString(2, sfile);
+			ps.setString(2, item.getFilepath());
 			n = ps.executeUpdate();
 		} finally {
 			ps.close();
 		}
-		if (n<1) throw new DbException("No update occured for local_setRemoteLocation('"+sfile+"','"+remoteLocation+"').");
-		getChangeEventCaller().mediaItemUpdated(sfile);
+		if (n<1) throw new DbException("No update occured for local_setRemoteLocation('"+item+"','"+remoteLocation+"').");
+		getChangeEventCaller().mediaItemUpdated(item);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	MixedMediaItem setters.
 
-	protected void local_setItemMediaType(final String sfile, final MediaType newType) throws DbException, SQLException, ClassNotFoundException {
+	protected void local_setItemMediaType(final IMediaItem item, final MediaType newType) throws DbException, SQLException, ClassNotFoundException {
 		PreparedStatement ps;
 
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETTYPE);
 		int n;
 		try {
 			ps.setInt(1, newType.getN());
-			ps.setString(2, sfile);
+			ps.setString(2, item.getFilepath());
 			n = ps.executeUpdate();
 		} finally {
 			ps.close();
 		}
 		if (n<1) throw new DbException("No update occured.");
-		getChangeEventCaller().mediaItemUpdated(sfile);
+		getChangeEventCaller().mediaItemUpdated(item);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	MediaTrack setters.
 
-	protected void local_trackPlayed (final String sfile, final long x, final Date date) throws DbException, SQLException, ClassNotFoundException {
+	protected void local_trackPlayed (final IMediaItem item, final long x, final Date date) throws DbException, SQLException, ClassNotFoundException {
 		PreparedStatement ps;
 
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_TRACKPLAYED);
@@ -718,127 +719,127 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 		try {
 			ps.setLong(1, x);
 			ps.setDate(2, new java.sql.Date(date.getTime()));
-			ps.setString(3, sfile);
+			ps.setString(3, item.getFilepath());
 			n = ps.executeUpdate();
 		} finally {
 			ps.close();
 		}
 		if (n<1) throw new DbException("No update occured.");
-		getChangeEventCaller().mediaItemUpdated(sfile);
+		getChangeEventCaller().mediaItemUpdated(item);
 	}
 
-	protected void local_incTrackStartCnt (final String sfile, final long x) throws SQLException, ClassNotFoundException, DbException {
+	protected void local_incTrackStartCnt (final IMediaItem item, final long x) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps;
 
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_INCSTART);
 		int n;
 		try {
 			ps.setLong(1, x);
-			ps.setString(2, sfile);
+			ps.setString(2, item.getFilepath());
 			n = ps.executeUpdate();
 		} finally {
 			ps.close();
 		}
 		if (n<1) throw new DbException("No update occured.");
-		getChangeEventCaller().mediaItemUpdated(sfile);
+		getChangeEventCaller().mediaItemUpdated(item);
 	}
 
-	protected void local_setTrackStartCnt (final String sfile, final long x) throws SQLException, ClassNotFoundException, DbException {
+	protected void local_setTrackStartCnt (final IMediaItem item, final long x) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps;
 
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETSTART);
 		int n;
 		try {
 			ps.setLong(1, x);
-			ps.setString(2, sfile);
+			ps.setString(2, item.getFilepath());
 			n = ps.executeUpdate();
 		} finally {
 			ps.close();
 		}
 		if (n<1) throw new DbException("No update occured.");
-		getChangeEventCaller().mediaItemUpdated(sfile);
+		getChangeEventCaller().mediaItemUpdated(item);
 	}
 
-	protected void local_setDateLastPlayed (final String sfile, final Date date) throws SQLException, ClassNotFoundException, DbException {
+	protected void local_setDateLastPlayed (final IMediaItem item, final Date date) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps;
 
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETDATELASTPLAYED);
 		int n;
 		try {
 			ps.setDate(1, new java.sql.Date(date.getTime()));
-			ps.setString(2, sfile);
+			ps.setString(2, item.getFilepath());
 			n = ps.executeUpdate();
 		} finally {
 			ps.close();
 		}
 		if (n<1) throw new DbException("No update occured.");
-		getChangeEventCaller().mediaItemUpdated(sfile);
+		getChangeEventCaller().mediaItemUpdated(item);
 	}
 
-	protected void local_incTrackEndCnt (final String sfile, final long x) throws SQLException, ClassNotFoundException, DbException {
+	protected void local_incTrackEndCnt (final IMediaItem item, final long x) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps;
 
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_INCEND);
 		int n;
 		try {
 			ps.setLong(1, x);
-			ps.setString(2, sfile);
+			ps.setString(2, item.getFilepath());
 			n = ps.executeUpdate();
 		} finally {
 			ps.close();
 		}
 		if (n<1) throw new DbException("No update occured.");
-		getChangeEventCaller().mediaItemUpdated(sfile);
+		getChangeEventCaller().mediaItemUpdated(item);
 	}
 
-	protected void local_setTrackEndCnt (final String sfile, final long x) throws SQLException, ClassNotFoundException, DbException {
+	protected void local_setTrackEndCnt (final IMediaItem item, final long x) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps;
 
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETEND);
 		int n;
 		try {
 			ps.setLong(1, x);
-			ps.setString(2, sfile);
+			ps.setString(2, item.getFilepath());
 			n = ps.executeUpdate();
 		} finally {
 			ps.close();
 		}
 		if (n<1) throw new DbException("No update occured.");
-		getChangeEventCaller().mediaItemUpdated(sfile);
+		getChangeEventCaller().mediaItemUpdated(item);
 	}
 
-	protected void local_setTrackDuration (final String sfile, final int duration) throws SQLException, ClassNotFoundException, DbException {
+	protected void local_setTrackDuration (final IMediaItem item, final int duration) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps;
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETDURATION);
 		int n;
 		try {
 			ps.setInt(1, duration);
-			ps.setString(2, sfile);
+			ps.setString(2, item.getFilepath());
 			n = ps.executeUpdate();
 		} finally {
 			ps.close();
 		}
 		if (n<1) throw new DbException("No update occured.");
-		getChangeEventCaller().mediaItemUpdated(sfile);
+		getChangeEventCaller().mediaItemUpdated(item);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	MediaPic setters.
 
-	protected void local_setDimensions(final String sfile, final int width, final int height) throws SQLException, ClassNotFoundException, DbException {
+	protected void local_setDimensions(final IMediaItem item, final int width, final int height) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps;
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETDIMENSIONS);
 		int n;
 		try {
 			ps.setInt(1, width);
 			ps.setInt(2, height);
-			ps.setString(3, sfile);
+			ps.setString(3, item.getFilepath());
 			n = ps.executeUpdate();
 		} finally {
 			ps.close();
 		}
-		if (n<1) throw new DbException("No update occured for setRemoteLocation('"+sfile+"','"+width+"','"+height+"').");
-		getChangeEventCaller().mediaItemUpdated(sfile);
+		if (n < 1) throw new DbException("No update occured for setRemoteLocation('" + item + "','" + width + "','" + height + "').");
+		getChangeEventCaller().mediaItemUpdated(item);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -49,7 +49,7 @@ public interface IMixedMediaStorageLayer extends IMediaItemStorageLayer<IMixedMe
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Setters for MixedMediaItem.
 
-	void setItemMediaType(String sfile, MediaType newType) throws DbException;
+	void setItemMediaType(IMediaItem item, MediaType newType) throws DbException;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Setters for MediaTrack.
@@ -59,20 +59,20 @@ public interface IMixedMediaStorageLayer extends IMediaItemStorageLayer<IMixedMe
 	 * @param sfile
 	 * @throws DbException
 	 */
-	void incTrackPlayed (String sfile) throws DbException;
+	void incTrackPlayed (IMediaItem item) throws DbException;
 
-	void incTrackFinished (String sfile) throws DbException;
-	void incTrackStartCnt (String sfile, long n) throws DbException;
-	void setTrackStartCnt (String sfile, long n) throws DbException;
-	void incTrackEndCnt (String sfile, long n) throws DbException;
-	void setTrackEndCnt (String sfile, long n) throws DbException;
-	void setDateLastPlayed (String sfile, Date date) throws DbException;
-	void setTrackDuration (String sfile, int duration) throws DbException;
+	void incTrackFinished (IMediaItem item) throws DbException;
+	void incTrackStartCnt (IMediaItem item, long n) throws DbException;
+	void setTrackStartCnt (IMediaItem item, long n) throws DbException;
+	void incTrackEndCnt (IMediaItem item, long n) throws DbException;
+	void setTrackEndCnt (IMediaItem item, long n) throws DbException;
+	void setDateLastPlayed (IMediaItem item, Date date) throws DbException;
+	void setTrackDuration (IMediaItem item, int duration) throws DbException;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Setters for MediaPicture.
 
-	void setDimensions (String sfile, int width, int height) throws DbException;
+	void setDimensions (IMediaItem item, int width, int height) throws DbException;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

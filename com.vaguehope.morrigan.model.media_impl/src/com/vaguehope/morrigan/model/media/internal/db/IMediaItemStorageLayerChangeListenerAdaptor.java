@@ -55,9 +55,9 @@ class IMediaItemStorageLayerChangeListenerAdaptor<T extends IMediaItem> implemen
 	}
 
 	@Override
-	public void mediaItemUpdated (final String filePath) {
+	public void mediaItemUpdated (final IMediaItem item) {
 		for (IMediaItemStorageLayerChangeListener<T> l : this.changeListeners) {
-			l.mediaItemUpdated(filePath);
+			l.mediaItemUpdated(item);
 		}
 	}
 
