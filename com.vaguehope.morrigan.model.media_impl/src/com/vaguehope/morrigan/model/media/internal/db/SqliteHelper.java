@@ -10,7 +10,6 @@ import java.util.List;
 import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.sqlitewrapper.GenericSqliteLayer.SqlCreateCmd;
 
-
 /*
  * Totally generic SQLite helper methods.
  *
@@ -43,7 +42,8 @@ public final class SqliteHelper {
 		for (IDbColumn c : columns) {
 			if (first) {
 				first = false;
-			} else {
+			}
+			else {
 				sbCreate.append(",");
 			}
 			sbCreate.append(c.getName());
@@ -53,7 +53,6 @@ public final class SqliteHelper {
 
 		sbCreate.append(");");
 
-
 		return new SqlCreateCmd(sbExists.toString(), sbCreate.toString());
 	}
 
@@ -61,20 +60,19 @@ public final class SqliteHelper {
 
 	private static ThreadLocal<SimpleDateFormat> sqlDate = new ThreadLocal<SimpleDateFormat>() {
 		@Override
-		protected SimpleDateFormat initialValue() {
+		protected SimpleDateFormat initialValue () {
 			return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		}
 	};
 
 	/**
-	 * This method will read the date from the DB
-	 * weather it was stored as a number or a string.
-	 * Morrigan uses the number method, but terra used strings.
-	 * Using this method allows for backward compatibility.
+	 * This method will read the date from the DB weather it was stored as a
+	 * number or a string. Morrigan uses the number method, but terra used
+	 * strings. Using this method allows for backward compatibility.
 	 */
 	public static Date readDate (ResultSet rs, String column) throws SQLException {
 		java.sql.Date date = rs.getDate(column);
-		if (date!=null) {
+		if (date != null) {
 			long time = date.getTime();
 			if (time > 100000) { // If the date was stored old-style, we get back the year :S.
 				return new Date(time);

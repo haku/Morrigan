@@ -15,10 +15,10 @@ import com.vaguehope.morrigan.tasks.TaskResult;
 import com.vaguehope.morrigan.tasks.TaskResult.TaskOutcome;
 import com.vaguehope.morrigan.util.ChecksumHelper;
 
-
 /**
- *
- * @param <T> the type of the source list.
+ * 
+ * @param <T>
+ *            the type of the source list.
  */
 public class CopyToLocalMmdbTask<T extends IMediaItem> implements MorriganTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -36,12 +36,12 @@ public class CopyToLocalMmdbTask<T extends IMediaItem> implements MorriganTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	public String getTitle() {
+	public String getTitle () {
 		return "Copy " + this.itemsToCopy.size() + " items from " + this.fromList.getListName() + " to " + this.toDb.getListName();
 	}
 
 	@Override
-	public TaskResult run(TaskEventListener taskEventListener) {
+	public TaskResult run (TaskEventListener taskEventListener) {
 		TaskResult ret = null;
 
 		try {
@@ -59,19 +59,19 @@ public class CopyToLocalMmdbTask<T extends IMediaItem> implements MorriganTask {
 
 				File coItemDir = getCheckoutItemDirectory(coDir, item);
 				File coFile = this.fromList.copyItemFile(item, coItemDir);
-	    		if (!coFile.exists()) throw new FileNotFoundException("After fetching '"+item.getRemoteLocation()+"' can't find '"+coFile.getAbsolutePath()+"'.");
+				if (!coFile.exists()) throw new FileNotFoundException("After fetching '" + item.getRemoteLocation() + "' can't find '" + coFile.getAbsolutePath() + "'.");
 
-	    		// TODO FIXME re-write remote path with URL we fetched it from?  Perhaps this should be returned from copyItemFile()?
+				// TODO FIXME re-write remote path with URL we fetched it from?  Perhaps this should be returned from copyItemFile()?
 
-	    		// TODO these next few methods should really be combined into a single method in MediaItemDb.
-	    		if (this.toDb.getDbLayer().hasFile(coFile)) {
-	    			this.toDb.getDbLayer().removeFile(coFile.getAbsolutePath());
-	    		}
-	    		IMixedMediaItem addedItem = this.toDb.addFile(coFile);
-	    		addedItem.setFromMediaItem(item);
-	    		this.toDb.persistTrackData(addedItem);
+				// TODO these next few methods should really be combined into a single method in MediaItemDb.
+				if (this.toDb.getDbLayer().hasFile(coFile)) {
+					this.toDb.getDbLayer().removeFile(coFile.getAbsolutePath());
+				}
+				IMixedMediaItem addedItem = this.toDb.addFile(coFile);
+				addedItem.setFromMediaItem(item);
+				this.toDb.persistTrackData(addedItem);
 
-	    		taskEventListener.worked(1);
+				taskEventListener.worked(1);
 			}
 
 			if (taskEventListener.isCanceled()) {
@@ -100,14 +100,14 @@ public class CopyToLocalMmdbTask<T extends IMediaItem> implements MorriganTask {
 		File coDir = new File(configDir, "checkout");
 		if (!coDir.exists()) {
 			if (!coDir.mkdir()) {
-				throw new RuntimeException("Failed to mkdir '"+coDir.getAbsolutePath()+"'.");
+				throw new RuntimeException("Failed to mkdir '" + coDir.getAbsolutePath() + "'.");
 			}
 		}
 
 		File dbCoDir = new File(coDir, db.getListName());
 		if (!dbCoDir.exists()) {
 			if (!dbCoDir.mkdir()) {
-				throw new RuntimeException("Failed to mkdir '"+dbCoDir.getAbsolutePath()+"'.");
+				throw new RuntimeException("Failed to mkdir '" + dbCoDir.getAbsolutePath() + "'.");
 			}
 		}
 
@@ -120,7 +120,7 @@ public class CopyToLocalMmdbTask<T extends IMediaItem> implements MorriganTask {
 		File dir = new File(coDir, ChecksumHelper.md5String(srcPath));
 		if (!dir.exists()) {
 			if (!dir.mkdir()) {
-				throw new RuntimeException("Failed to mkdir '"+dir.getAbsolutePath()+"'.");
+				throw new RuntimeException("Failed to mkdir '" + dir.getAbsolutePath() + "'.");
 			}
 		}
 

@@ -3,7 +3,6 @@ package com.vaguehope.morrigan.model.media.internal.db.mmdb;
 import com.vaguehope.morrigan.model.factory.RecyclingFactory2;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 
-
 /**
  * This object will be responsible for all caching of item instances
  * so that we don't have to have crazy stuff in other parts of the
@@ -23,15 +22,15 @@ import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 public class MixedMediaItemFactory {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private final RecyclingFactory2<MixedMediaItem, String, RuntimeException> factory = new RecyclingFactory2<MixedMediaItem, String, RuntimeException> (true) {
+	private final RecyclingFactory2<MixedMediaItem, String, RuntimeException> factory = new RecyclingFactory2<MixedMediaItem, String, RuntimeException>(true) {
 
 		@Override
-		protected boolean isValidProduct(final MixedMediaItem product) {
+		protected boolean isValidProduct (final MixedMediaItem product) {
 			return true;
 		}
 
 		@Override
-		protected MixedMediaItem makeNewProduct(final String material) {
+		protected MixedMediaItem makeNewProduct (final String material) {
 			return newItem(material);
 		}
 

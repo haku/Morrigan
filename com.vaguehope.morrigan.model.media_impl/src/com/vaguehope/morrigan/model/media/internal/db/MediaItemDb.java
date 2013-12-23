@@ -28,8 +28,8 @@ import com.vaguehope.morrigan.model.media.internal.MediaTagClassificationImpl;
 import com.vaguehope.sqlitewrapper.DbException;
 
 public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends IMediaItem>
-extends MediaItemList<T>
-implements IMediaItemDb<S, T> {
+		extends MediaItemList<T>
+		implements IMediaItemDb<S, T> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	public static final boolean HIDEMISSING = true; // TODO link this to GUI?
@@ -387,7 +387,9 @@ implements IMediaItemDb<S, T> {
 		}
 
 		@Override
-		public void propertySet (final String key, final String value) { /* Unused. */}
+		public void propertySet (final String key, final String value) {
+			// Unused.
+		}
 
 		@Override
 		public void mediaItemAdded (final String filePath) {
