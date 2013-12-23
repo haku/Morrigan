@@ -27,7 +27,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors.
 
-	protected MediaSqliteLayer (String dbFilePath, boolean autoCommit) throws DbException {
+	protected MediaSqliteLayer (final String dbFilePath, final boolean autoCommit) throws DbException {
 		super(dbFilePath, autoCommit);
 	}
 
@@ -37,13 +37,13 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	private final IMediaItemStorageLayerChangeListener<T> changeCaller = new IMediaItemStorageLayerChangeListenerAdaptor<T>(this.changeListeners);
 
 	@Override
-	public void addChangeListener(IMediaItemStorageLayerChangeListener<T> listener) {
+	public void addChangeListener(final IMediaItemStorageLayerChangeListener<T> listener) {
 		// TODO rewrite this to use a map instead?
 		if (!this.changeListeners.contains(listener)) this.changeListeners.add(listener);
 	}
 
 	@Override
-	public void removeChangeListener(IMediaItemStorageLayerChangeListener<T> listener) {
+	public void removeChangeListener(final IMediaItemStorageLayerChangeListener<T> listener) {
 		this.changeListeners.remove(listener);
 	}
 
@@ -57,7 +57,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 //	Public methods for persisted props.
 
 	@Override
-	public void setProp (String key, String value) throws DbException {
+	public void setProp (final String key, final String value) throws DbException {
 		try {
 			local_setProp(key, value);
 		} catch (Exception e) {
@@ -66,7 +66,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	}
 
 	@Override
-	public String getProp (String key) throws DbException {
+	public String getProp (final String key) throws DbException {
 		try {
 			return local_getProp(key);
 		} catch (IllegalArgumentException e) {
@@ -80,7 +80,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 //	Public methods for tags.
 
 	@Override
-	public boolean hasTags (IDbItem item) throws DbException {
+	public boolean hasTags (final IDbItem item) throws DbException {
 		try {
 			return local_hasTags(item.getDbRowId());
 		} catch (Exception e) {
@@ -89,7 +89,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	}
 
 	@Override
-	public boolean hasTag (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) throws DbException {
+	public boolean hasTag (final IDbItem item, final String tag, final MediaTagType type, final MediaTagClassification mtc) throws DbException {
 		try {
 			return local_hasTag(item.getDbRowId(), tag, type, mtc);
 		} catch (Exception e) {
@@ -98,7 +98,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	}
 
 	@Override
-	public List<MediaTag> getTags (IDbItem item) throws DbException {
+	public List<MediaTag> getTags (final IDbItem item) throws DbException {
 		try {
 			return local_getTags(item.getDbRowId());
 		} catch (Exception e) {
@@ -116,7 +116,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	}
 
 	@Override
-	public boolean addTag (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) throws DbException {
+	public boolean addTag (final IDbItem item, final String tag, final MediaTagType type, final MediaTagClassification mtc) throws DbException {
 		try {
 			return local_addTag(item, tag, type, mtc);
 		} catch (Exception e) {
@@ -125,7 +125,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	}
 
 	@Override
-	public boolean addTag (IDbItem item, String tag, MediaTagType type, String mtc) throws DbException {
+	public boolean addTag (final IDbItem item, final String tag, final MediaTagType type, final String mtc) throws DbException {
 		try {
 			return local_addTag(item, tag, type, mtc);
 		} catch (Exception e) {
@@ -134,7 +134,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	}
 
 	@Override
-	public void moveTags (IDbItem from_item, IDbItem to_item) throws DbException {
+	public void moveTags (final IDbItem from_item, final IDbItem to_item) throws DbException {
 		try {
 			local_moveTags(from_item, to_item);
 		} catch (Exception e) {
@@ -143,7 +143,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	}
 
 	@Override
-	public void removeTag (MediaTag tag) throws DbException {
+	public void removeTag (final MediaTag tag) throws DbException {
 		try {
 			local_removeTag(tag);
 		} catch (Exception e) {
@@ -152,7 +152,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	}
 
 	@Override
-	public void clearTags (IDbItem item) throws DbException {
+	public void clearTags (final IDbItem item) throws DbException {
 		try {
 			local_clearTags(item);
 		} catch (Exception e) {
@@ -161,7 +161,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	}
 
 	@Override
-	public void addTagClassification (String classificationName) throws DbException {
+	public void addTagClassification (final String classificationName) throws DbException {
 		try {
 			local_addTagClassification(classificationName);
 		} catch (Exception e) {
@@ -170,7 +170,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	}
 
 	@Override
-	public MediaTagClassification getTagClassification(String classificationName) throws DbException {
+	public MediaTagClassification getTagClassification(final String classificationName) throws DbException {
 		try {
 			return local_getTagClassification(classificationName);
 		} catch (Exception e) {
@@ -191,7 +191,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	}
 
 	@Override
-	public MediaAlbum createAlbum (String name) throws DbException {
+	public MediaAlbum createAlbum (final String name) throws DbException {
 		try {
 			return local_createAlbum(name);
 		} catch (Exception e) {
@@ -200,7 +200,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	}
 
 	@Override
-	public MediaAlbum getAlbum (String name) throws DbException {
+	public MediaAlbum getAlbum (final String name) throws DbException {
 		try {
 			return local_getAlbum(name);
 		} catch (Exception e) {
@@ -209,7 +209,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	}
 
 	@Override
-	public void removeAlbum (MediaAlbum album) throws DbException {
+	public void removeAlbum (final MediaAlbum album) throws DbException {
 		try {
 			local_removeAlbum(album);
 		} catch (Exception e) {
@@ -218,7 +218,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	}
 
 	@Override
-	public void addToAlbum (MediaAlbum album, IDbItem item) throws DbException {
+	public void addToAlbum (final MediaAlbum album, final IDbItem item) throws DbException {
 		try {
 			local_addToAlbum(album, item);
 		} catch (Exception e) {
@@ -227,7 +227,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	}
 
 	@Override
-	public void removeFromAlbum (MediaAlbum album, IDbItem item) throws DbException {
+	public void removeFromAlbum (final MediaAlbum album, final IDbItem item) throws DbException {
 		try {
 			local_removeFromAlbum(album, item);
 		} catch (Exception e) {
@@ -236,7 +236,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	}
 
 	@Override
-	public int removeFromAllAlbums (IDbItem item) throws DbException {
+	public int removeFromAllAlbums (final IDbItem item) throws DbException {
 		try {
 			return local_removeFromAllAlbums(item);
 		} catch (Exception e) {
@@ -257,7 +257,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	}
 
 	@Override
-	public void addSource (String source) throws DbException {
+	public void addSource (final String source) throws DbException {
 		try {
 			local_addSource(source);
 		} catch (Exception e) {
@@ -266,7 +266,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	}
 
 	@Override
-	public void removeSource (String source) throws DbException {
+	public void removeSource (final String source) throws DbException {
 		try {
 			local_removeSource(source);
 		} catch (Exception e) {
@@ -511,7 +511,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Private methods for persisted props.
 
-	private void local_setProp (String key, String value) throws SQLException, ClassNotFoundException, DbException {
+	private void local_setProp (final String key, final String value) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps = null;
 		int n;
 
@@ -538,7 +538,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		}
 	}
 
-	private String local_getProp (String key) throws SQLException, ClassNotFoundException {
+	private String local_getProp (final String key) throws SQLException, ClassNotFoundException {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
@@ -563,7 +563,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Private methods for tags.
 
-	private boolean local_addTag (IDbItem item, String tag, MediaTagType type, String cls_name) throws SQLException, ClassNotFoundException, DbException {
+	private boolean local_addTag (final IDbItem item, final String tag, final MediaTagType type, final String cls_name) throws SQLException, ClassNotFoundException, DbException {
 		MediaTagClassification mtc = null;
 		if (cls_name != null && !cls_name.isEmpty()) {
 			mtc = local_getTagClassification(cls_name);
@@ -572,7 +572,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		return local_addTag(item, tag, type, mtc);
 	}
 
-	private boolean local_addTag (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) throws SQLException, ClassNotFoundException, DbException {
+	private boolean local_addTag (final IDbItem item, final String tag, final MediaTagType type, final MediaTagClassification mtc) throws SQLException, ClassNotFoundException, DbException {
 		if (local_hasTag(item.getDbRowId(), tag, type, mtc)) {
 			return false;
 		}
@@ -602,7 +602,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		}
 	}
 
-	private void local_moveTags (IDbItem from_item, IDbItem to_item) throws SQLException, ClassNotFoundException, DbException {
+	private void local_moveTags (final IDbItem from_item, final IDbItem to_item) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_TAGS_MOVE);
 		try {
 			ps.setLong(1, to_item.getDbRowId());
@@ -618,7 +618,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		}
 	}
 
-	private void local_removeTag(MediaTag tag) throws SQLException, ClassNotFoundException, DbException {
+	private void local_removeTag(final MediaTag tag) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_TAGS_REMOVE);
 		try {
 			ps.setLong(1, tag.getDbRowId());
@@ -632,7 +632,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		}
 	}
 
-	private void local_clearTags(IDbItem item) throws SQLException, ClassNotFoundException, DbException {
+	private void local_clearTags(final IDbItem item) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_TAGS_CLEAR);
 		try {
 			ps.setLong(1, item.getDbRowId());
@@ -646,7 +646,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		}
 	}
 
-	private boolean local_hasTags (long mf_rowId) throws SQLException, ClassNotFoundException {
+	private boolean local_hasTags (final long mf_rowId) throws SQLException, ClassNotFoundException {
 		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_TAGS_Q_HASANY);
 		try {
 			ps.setLong(1, mf_rowId);
@@ -666,14 +666,14 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		}
 	}
 
-	private boolean local_hasTag (long mf_rowId, String tag, MediaTagType type, MediaTagClassification mtc) throws SQLException, ClassNotFoundException {
+	private boolean local_hasTag (final long mf_rowId, final String tag, final MediaTagType type, final MediaTagClassification mtc) throws SQLException, ClassNotFoundException {
 		if (mtc != null) {
 			return local_hasTag(mf_rowId, tag, type, mtc.getDbRowId());
 		}
 		return local_hasTag(mf_rowId, tag, type, 0);
 	}
 
-	private boolean local_hasTag (long mf_rowId, String tag, MediaTagType type, long cls_rowid) throws SQLException, ClassNotFoundException {
+	private boolean local_hasTag (final long mf_rowId, final String tag, final MediaTagType type, final long cls_rowid) throws SQLException, ClassNotFoundException {
 		String sql;
 		if (cls_rowid > 0 ) {
 			sql = SQL_TBL_TAGS_Q_HASTAG;
@@ -705,7 +705,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		}
 	}
 
-	private List<MediaTag> local_getTags(long mf_rowId) throws SQLException, ClassNotFoundException, DbException {
+	private List<MediaTag> local_getTags(final long mf_rowId) throws SQLException, ClassNotFoundException, DbException {
 		List<MediaTag> ret = new ArrayList<MediaTag>();
 		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_TAGS_Q_ALL);
 
@@ -735,7 +735,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		return ret;
 	}
 
-	private MediaTagClassification local_addTagClassification (String classificationName) throws SQLException, ClassNotFoundException, DbException {
+	private MediaTagClassification local_addTagClassification (final String classificationName) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_TAGCLS_ADD);
 		int n;
 		try {
@@ -766,7 +766,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		return ret;
 	}
 
-	private MediaTagClassification local_getTagClassification (long clsRowId) throws DbException, SQLException, ClassNotFoundException {
+	private MediaTagClassification local_getTagClassification (final long clsRowId) throws DbException, SQLException, ClassNotFoundException {
 		PreparedStatement ps;
 		ResultSet rs;
 		List<MediaTagClassification> ret;
@@ -793,7 +793,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		}
 	}
 
-	private MediaTagClassification local_getTagClassification (String classificationName) throws SQLException, ClassNotFoundException, DbException {
+	private MediaTagClassification local_getTagClassification (final String classificationName) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps;
 		ResultSet rs;
 		List<MediaTagClassification> ret;
@@ -820,7 +820,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		}
 	}
 
-	private static List<MediaTagClassification> local_getTagClassification_parseRecordSet (ResultSet rs) throws SQLException {
+	private static List<MediaTagClassification> local_getTagClassification_parseRecordSet (final ResultSet rs) throws SQLException {
 		List<MediaTagClassification> ret = new ArrayList<MediaTagClassification>();
 
 		while (rs.next()) {
@@ -860,7 +860,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		}
 	}
 
-	private MediaAlbum local_createAlbum (String name) throws DbException, SQLException, ClassNotFoundException {
+	private MediaAlbum local_createAlbum (final String name) throws DbException, SQLException, ClassNotFoundException {
 		MediaAlbum album = local_getAlbum(name);
 		if (album != null) return album;
 		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_ALBUMS_ADD);
@@ -877,7 +877,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		return album;
 	}
 
-	private void local_removeAlbum (MediaAlbum album) throws DbException, SQLException, ClassNotFoundException {
+	private void local_removeAlbum (final MediaAlbum album) throws DbException, SQLException, ClassNotFoundException {
 		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_ALBUMS_REMOVE);
 		try {
 			ps.setLong(1, album.getDbRowId());
@@ -892,7 +892,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	/**
 	 * Get album, or null if not found.
 	 */
-	private MediaAlbum local_getAlbum (String qName) throws SQLException, ClassNotFoundException {
+	private MediaAlbum local_getAlbum (final String qName) throws SQLException, ClassNotFoundException {
 		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_ALBUMS_Q_GET);
 		try {
 			ps.setString(1, qName);
@@ -914,7 +914,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		}
 	}
 
-	private boolean local_albumHasItem (MediaAlbum album, IDbItem item) throws SQLException, ClassNotFoundException {
+	private boolean local_albumHasItem (final MediaAlbum album, final IDbItem item) throws SQLException, ClassNotFoundException {
 		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_ALBUM_ITEMS_Q_HAS);
 		try {
 			ps.setLong(1, album.getDbRowId());
@@ -935,7 +935,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		}
 	}
 
-	private void local_addToAlbum (MediaAlbum album, IDbItem item) throws SQLException, ClassNotFoundException, DbException {
+	private void local_addToAlbum (final MediaAlbum album, final IDbItem item) throws SQLException, ClassNotFoundException, DbException {
 		if (local_albumHasItem(album, item)) return;
 		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_ALBUM_ITEMS_ADD);
 		try {
@@ -949,7 +949,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		}
 	}
 
-	private void local_removeFromAlbum (MediaAlbum album, IDbItem item) throws SQLException, ClassNotFoundException, DbException {
+	private void local_removeFromAlbum (final MediaAlbum album, final IDbItem item) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_ALBUM_ITEMS_REMOVE);
 		try {
 			ps.setLong(1, album.getDbRowId());
@@ -962,7 +962,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		}
 	}
 
-	private int local_removeFromAllAlbums (IDbItem item) throws SQLException, ClassNotFoundException {
+	private int local_removeFromAllAlbums (final IDbItem item) throws SQLException, ClassNotFoundException {
 		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_ALBUM_ITEMS_REMOVE_FROM_ALL);
 		try {
 			ps.setLong(1, item.getDbRowId());
@@ -995,7 +995,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		return ret;
 	}
 
-	private void local_addSource (String source) throws SQLException, ClassNotFoundException, DbException {
+	private void local_addSource (final String source) throws SQLException, ClassNotFoundException, DbException {
 		int n;
 		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_SOURCES_ADD);
 		try {
@@ -1007,7 +1007,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		if (n<1) throw new DbException("No update occured for addSource('"+source+"').");
 	}
 
-	private void local_removeSource (String source) throws SQLException, ClassNotFoundException, DbException {
+	private void local_removeSource (final String source) throws SQLException, ClassNotFoundException, DbException {
 		int n;
 		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_SOURCES_REMOVE);
 		try {

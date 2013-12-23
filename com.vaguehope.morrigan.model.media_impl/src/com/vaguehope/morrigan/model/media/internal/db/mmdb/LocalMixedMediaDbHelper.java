@@ -14,7 +14,6 @@ import com.vaguehope.morrigan.model.media.internal.MediaListReferenceImpl;
 import com.vaguehope.morrigan.model.media.internal.db.MediaItemDbConfig;
 import com.vaguehope.sqlitewrapper.DbException;
 
-
 public final class LocalMixedMediaDbHelper {
 
 	private LocalMixedMediaDbHelper () {}
@@ -37,7 +36,8 @@ public final class LocalMixedMediaDbHelper {
 		ILocalMixedMediaDb l;
 		try {
 			l = LocalMixedMediaDbFactory.getMain(file);
-		} catch (DbException e) {
+		}
+		catch (DbException e) {
 			throw new MorriganException(e);
 		}
 		return l;
@@ -48,7 +48,7 @@ public final class LocalMixedMediaDbHelper {
 			File file = new File(filePath);
 			if (file.exists()) return true;
 			file = new File(Config.getMmdbDir(), filePath);
-			if (file.exists())  return true;
+			if (file.exists()) return true;
 		}
 		return false;
 	}
@@ -57,10 +57,10 @@ public final class LocalMixedMediaDbHelper {
 		List<MediaListReference> ret = new ArrayList<MediaListReference>();
 
 		File dir = Config.getMmdbDir();
-		File [] files = dir.listFiles();
+		File[] files = dir.listFiles();
 
 		// empty dir?
-		if (files == null || files.length < 1 ) return ret;
+		if (files == null || files.length < 1) return ret;
 
 		for (File file : files) {
 			String absolutePath = file.getAbsolutePath();
@@ -91,7 +91,7 @@ public final class LocalMixedMediaDbHelper {
 
 		x = ret.lastIndexOf(File.separator);
 		if (x > 0) {
-			ret = ret.substring(x+1);
+			ret = ret.substring(x + 1);
 		}
 
 		x = ret.lastIndexOf(Config.MMDB_LOCAL_FILE_EXT);

@@ -27,7 +27,7 @@ public class SyncMetadataRemoteToLocalTask implements MorriganTask {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public SyncMetadataRemoteToLocalTask (ILocalMixedMediaDb local, IRemoteMixedMediaDb remote, MediaFactory mediaFactory) {
+	public SyncMetadataRemoteToLocalTask (final ILocalMixedMediaDb local, final IRemoteMixedMediaDb remote, final MediaFactory mediaFactory) {
 		this.local = local;
 		this.remote = remote;
 		this.mediaFactory = mediaFactory;
@@ -42,7 +42,7 @@ public class SyncMetadataRemoteToLocalTask implements MorriganTask {
 	}
 
 	@Override
-	public TaskResult run (TaskEventListener taskEventListener) {
+	public TaskResult run (final TaskEventListener taskEventListener) {
 		taskEventListener.onStart();
 		TaskResult ret;
 		try {
@@ -104,7 +104,7 @@ public class SyncMetadataRemoteToLocalTask implements MorriganTask {
 		return ret;
 	}
 
-	private static void syncMediaItems (final ILocalMixedMediaDb ldb, IRemoteMixedMediaDb rdb, IMixedMediaItem remoteItem, IMixedMediaItem localItem) throws MorriganException {
+	private static void syncMediaItems (final ILocalMixedMediaDb ldb, final IRemoteMixedMediaDb rdb, final IMixedMediaItem remoteItem, final IMixedMediaItem localItem) throws MorriganException {
 		if (remoteItem.getStartCount() > localItem.getStartCount()) {
 			ldb.setTrackStartCnt(localItem, remoteItem.getStartCount());
 		}

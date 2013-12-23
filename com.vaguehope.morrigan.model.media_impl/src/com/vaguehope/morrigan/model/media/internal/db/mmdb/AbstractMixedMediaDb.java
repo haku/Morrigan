@@ -21,18 +21,18 @@ import com.vaguehope.morrigan.model.media.internal.db.MediaItemDb;
 import com.vaguehope.morrigan.model.media.internal.db.MediaItemDbConfig;
 import com.vaguehope.sqlitewrapper.DbException;
 
-
 public abstract class AbstractMixedMediaDb
 		extends MediaItemDb<IMixedMediaStorageLayer, IMixedMediaItem>
 		implements IMixedMediaDb {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	protected AbstractMixedMediaDb (String listName, MediaItemDbConfig config, IMixedMediaStorageLayer dbLayer) {
+	protected AbstractMixedMediaDb (final String listName, final MediaItemDbConfig config, final IMixedMediaStorageLayer dbLayer) {
 		super(listName, config, dbLayer);
 
 		try {
 			readDefaultMediaTypeFromDb();
-		} catch (DbException e) {
+		}
+		catch (DbException e) {
 			e.printStackTrace();
 		}
 	}
@@ -41,12 +41,12 @@ public abstract class AbstractMixedMediaDb
 //	Default MediaType.
 
 	@Override
-	public void setDefaultMediaType (MediaType mediaType) throws MorriganException {
+	public void setDefaultMediaType (final MediaType mediaType) throws MorriganException {
 		setDefaultMediaType(mediaType, true);
 	}
 
 	@Override
-	public void setDefaultMediaType (MediaType mediaType, boolean saveToDb) throws MorriganException {
+	public void setDefaultMediaType (final MediaType mediaType, final boolean saveToDb) throws MorriganException {
 		this.getDbLayer().setDefaultMediaType(mediaType);
 		updateRead();
 		if (saveToDb) saveDefaultMediaTypeToDbInNewThread();
@@ -62,10 +62,11 @@ public abstract class AbstractMixedMediaDb
 	private void saveDefaultMediaTypeToDbInNewThread () {
 		new Thread() {
 			@Override
-			public void run() {
+			public void run () {
 				try {
 					saveDefaultMediaTypeToDb();
-				} catch (DbException e) {
+				}
+				catch (DbException e) {
 					e.printStackTrace();
 				}
 			}
@@ -79,20 +80,20 @@ public abstract class AbstractMixedMediaDb
 	private void readDefaultMediaTypeFromDb () throws DbException {
 		String s = getDbLayer().getProp(KEY_DEFAULTMEDIATYPE);
 		if (s != null) {
-    		MediaType mt = MediaType.parseInt(Integer.parseInt(s));
-    		this.getDbLayer().setDefaultMediaType(mt);
+			MediaType mt = MediaType.parseInt(Integer.parseInt(s));
+			this.getDbLayer().setDefaultMediaType(mt);
 		}
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	public List<IMixedMediaItem> simpleSearchMedia(MediaType mediaType, String term, int maxResults) throws DbException {
+	public List<IMixedMediaItem> simpleSearchMedia (final MediaType mediaType, final String term, final int maxResults) throws DbException {
 		return getDbLayer().simpleSearchMedia(mediaType, escapeSearch(term), SEARCH_ESC, maxResults);
 	}
 
 	@Override
-	public Collection<IMixedMediaItem> getAlbumItems (MediaType mediaType, MediaAlbum album) throws MorriganException {
+	public Collection<IMixedMediaItem> getAlbumItems (final MediaType mediaType, final MediaAlbum album) throws MorriganException {
 		try {
 			return getDbLayer().getAlbumItems(mediaType, album);
 		}
@@ -104,7 +105,7 @@ public abstract class AbstractMixedMediaDb
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	public void setItemMediaType(IMixedMediaItem item, MediaType newType) throws MorriganException {
+	public void setItemMediaType (final IMixedMediaItem item, final MediaType newType) throws MorriganException {
 
 		if (item.getMediaType() != newType) {
 			if (newType == getDefaultMediaType()) {
@@ -120,97 +121,107 @@ public abstract class AbstractMixedMediaDb
 		this.setDirtyState(DirtyState.METADATA);
 		try {
 			this.getDbLayer().setItemMediaType(item.getFilepath(), newType);
-		} catch (DbException e) {
+		}
+		catch (DbException e) {
 			throw new MorriganException(e);
 		}
 	}
 
 	@Override
-	public void incTrackStartCnt (IMediaTrack track, long n) throws MorriganException {
+	public void incTrackStartCnt (final IMediaTrack track, final long n) throws MorriganException {
 		MediaTrackListHelper.incTrackStartCnt(this, track, n);
 		try {
 			this.getDbLayer().incTrackStartCnt(track.getFilepath(), n);
-		} catch (DbException e) {
+		}
+		catch (DbException e) {
 			throw new MorriganException(e);
 		}
 	}
 
 	@Override
-	public void incTrackEndCnt (IMediaTrack track, long n) throws MorriganException {
+	public void incTrackEndCnt (final IMediaTrack track, final long n) throws MorriganException {
 		MediaTrackListHelper.incTrackEndCnt(this, track, n);
 		try {
 			this.getDbLayer().incTrackEndCnt(track.getFilepath(), n);
-		} catch (DbException e) {
+		}
+		catch (DbException e) {
 			throw new MorriganException(e);
 		}
 	}
 
 	@Override
-	public void setTrackDateLastPlayed (IMediaTrack track, Date date) throws MorriganException {
+	public void setTrackDateLastPlayed (final IMediaTrack track, final Date date) throws MorriganException {
 		MediaTrackListHelper.setDateLastPlayed(this, track, date);
 		try {
 			this.getDbLayer().setDateLastPlayed(track.getFilepath(), date);
-		} catch (DbException e) {
+		}
+		catch (DbException e) {
 			throw new MorriganException(e);
 		}
 	}
 
 	@Override
-	public void incTrackStartCnt(IMediaTrack track) throws MorriganException {
+	public void incTrackStartCnt (final IMediaTrack track) throws MorriganException {
 		MediaTrackListHelper.incTrackStartCnt(this, track);
 		try {
 			this.getDbLayer().incTrackPlayed(track.getFilepath());
-		} catch (DbException e) {
+		}
+		catch (DbException e) {
 			throw new MorriganException(e);
 		}
 	}
 
 	@Override
-	public void incTrackEndCnt(IMediaTrack track) throws MorriganException {
+	public void incTrackEndCnt (final IMediaTrack track) throws MorriganException {
 		MediaTrackListHelper.incTrackEndCnt(this, track);
 		try {
 			this.getDbLayer().incTrackFinished(track.getFilepath());
-		} catch (DbException e) {
+		}
+		catch (DbException e) {
 			throw new MorriganException(e);
 		}
 	}
 
 	@Override
-	public void setTrackStartCnt(IMediaTrack track, long n) throws MorriganException {
+	public void setTrackStartCnt (final IMediaTrack track, final long n) throws MorriganException {
 		MediaTrackListHelper.setTrackStartCnt(this, track, n);
 		try {
 			this.getDbLayer().setTrackStartCnt(track.getFilepath(), n);
-		} catch (DbException e) {
+		}
+		catch (DbException e) {
 			throw new MorriganException(e);
 		}
 	}
 
 	@Override
-	public void setTrackEndCnt(IMediaTrack track, long n) throws MorriganException {
+	public void setTrackEndCnt (final IMediaTrack track, final long n) throws MorriganException {
 		MediaTrackListHelper.setTrackEndCnt(this, track, n);
 		try {
 			this.getDbLayer().setTrackEndCnt(track.getFilepath(), n);
-		} catch (DbException e) {
+		}
+		catch (DbException e) {
 			throw new MorriganException(e);
 		}
 	}
 
 	@Override
-	public void setTrackDuration(IMediaTrack track, int duration) throws MorriganException {
+	public void setTrackDuration (final IMediaTrack track, final int duration) throws MorriganException {
 		MediaTrackListHelper.setTrackDuration(this, track, duration);
 		try {
 			this.getDbLayer().setTrackDuration(track.getFilepath(), duration);
-		} catch (DbException e) {
+		}
+		catch (DbException e) {
 			throw new MorriganException(e);
 		}
 	}
 
 	@Override
-	public void setPictureWidthAndHeight(IMediaPicture item, int width, int height) throws MorriganException {
+	public void setPictureWidthAndHeight (final IMediaPicture item, final int width, final int height) throws MorriganException {
 		MediaPictureListHelper.setPictureWidthAndHeight(this, item, width, height);
 		try {
 			this.getDbLayer().setDimensions(item.getFilepath(), width, height);
-		} catch (DbException e) {
+		}
+		catch (DbException e) {
 			throw new MorriganException(e);
 		}
 	}
@@ -218,21 +229,21 @@ public abstract class AbstractMixedMediaDb
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	public DurationData getTotalDuration() {
+	public DurationData getTotalDuration () {
 		return MediaTrackListHelper.getTotalDuration(this.getMediaItems());
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	protected IDbColumn parseColumnFromName(String name) {
+	protected IDbColumn parseColumnFromName (final String name) {
 		return MixedMediaSqliteLayerInner.parseColumnFromName(name);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	public void persistTrackData(IMixedMediaItem item) throws MorriganException {
+	public void persistTrackData (final IMixedMediaItem item) throws MorriganException {
 		super.persistTrackData(item);
 
 		try {
