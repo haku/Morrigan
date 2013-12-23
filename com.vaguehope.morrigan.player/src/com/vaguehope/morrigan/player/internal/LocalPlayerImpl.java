@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -48,6 +49,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 	private final Register<Player> register;
 	private final PlaybackEngineFactory playbackEngineFactory;
 	private final MediaFactory mediaFactory;
+	private final ExecutorService executorService;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Main.
@@ -55,13 +57,15 @@ public class LocalPlayerImpl implements LocalPlayer {
 	public LocalPlayerImpl (final int id, final String name, final PlayerEventHandler eventHandler,
 			final Register<Player> register,
 			final PlaybackEngineFactory playbackEngineFactory,
-			final MediaFactory mediaFactory) {
+			final MediaFactory mediaFactory,
+			final ExecutorService executorService) {
 		this.id = id;
 		this.name = name;
 		this.eventHandler = eventHandler;
 		this.register = register;
 		this.playbackEngineFactory = playbackEngineFactory;
 		this.mediaFactory = mediaFactory;
+		this.executorService = executorService;
 	}
 
 	@Override
@@ -509,9 +513,9 @@ public class LocalPlayerImpl implements LocalPlayer {
 				this.logger.fine("Started to play '" + item.item.getTitle() + "'...");
 
 				// Put DB stuff in DB thread.
-				Thread bgthread = new Thread() {
+				this.executorService.submit(new Runnable() {
 					@Override
-					public void run() {
+					public void run () {
 						try {
 							item.list.incTrackStartCnt(item.item);
 						}
@@ -519,9 +523,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 							LocalPlayerImpl.this.logger.log(Level.WARNING, "Failed to increment track count.", e);
 						}
 					}
-				};
-				bgthread.setDaemon(true);
-				bgthread.start();
+				});
 
 				/* This was useful at some point, but leaving it disabled for now.
 				 * Will put it back if it proves needed.
