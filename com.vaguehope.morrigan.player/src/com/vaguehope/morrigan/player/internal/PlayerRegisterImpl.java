@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
@@ -26,10 +27,12 @@ public class PlayerRegisterImpl implements PlayerRegister {
 
 	private final PlaybackEngineFactory playbackEngineFactory;
 	private final MediaFactory mediaFactory;
+	private final ExecutorService executorService;
 
-	public PlayerRegisterImpl (final PlaybackEngineFactory playbackEngineFactory, final MediaFactory mediaFactory) {
+	public PlayerRegisterImpl (final PlaybackEngineFactory playbackEngineFactory, final MediaFactory mediaFactory, final ExecutorService executorService) {
 		this.playbackEngineFactory = playbackEngineFactory;
 		this.mediaFactory = mediaFactory;
+		this.executorService = executorService;
 	}
 
 	@Override
@@ -85,7 +88,7 @@ public class PlayerRegisterImpl implements PlayerRegister {
 
 	@Override
 	public LocalPlayer makeLocal (final String name, final PlayerEventHandler eventHandler) {
-		LocalPlayer p = new LocalPlayerImpl(nextIndex(), name, eventHandler, this, this.playbackEngineFactory, this.mediaFactory);
+		LocalPlayer p = new LocalPlayerImpl(nextIndex(), name, eventHandler, this, this.playbackEngineFactory, this.mediaFactory, this.executorService);
 		Integer i = Integer.valueOf(p.getId());
 		this.localPlayerIds.put(i, i);
 		register(p);
