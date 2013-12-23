@@ -16,7 +16,7 @@ public interface IMediaItemStorageLayerChangeListener<T extends IMediaItem> {
 	void mediaItemAdded (String filePath);
 	void mediaItemsAdded (List<File> filePaths);
 	void mediaItemRemoved (String filePath);
-	void mediaItemUpdated (String filePath);
+	void mediaItemUpdated (IMediaItem item);
 
 	void mediaItemTagAdded (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc);
 	void mediaItemTagsMoved (IDbItem fromItem, IDbItem toItem);

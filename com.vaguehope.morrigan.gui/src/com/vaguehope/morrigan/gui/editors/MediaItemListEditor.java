@@ -409,17 +409,32 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 
 		@Override
 		public void mediaItemsAdded (final IMediaItem... items) {
-			MediaItemListEditor.this.listChangeRrefresher.run();
+			updateListItems(items);
 		}
 
 		@Override
 		public void mediaItemsRemoved (final IMediaItem... items) {
-			MediaItemListEditor.this.listChangeRrefresher.run();
+			updateListItems(items);
 		}
 
 		@Override
 		public void mediaItemsUpdated (final IMediaItem... items) {
-			MediaItemListEditor.this.listChangeRrefresher.run();
+			updateListItems(items);
+		}
+
+		private void updateListItems (final IMediaItem... items) {
+			if (items != null) {
+				getSite().getShell().getDisplay().asyncExec(new Runnable() {
+					@Override
+					public void run () {
+						MediaItemListEditor.this.editTable.update(items, null);
+					}
+				});
+			}
+			else {
+				System.err.println("Warning: full UI list refresh unnecessarily requested.");
+				MediaItemListEditor.this.listChangeRrefresher.run();
+			}
 		}
 
 		@Override
@@ -494,8 +509,8 @@ public abstract class MediaItemListEditor<T extends IMediaItemList<S>, S extends
 				middleClickEvent(e);
 			}
 		}
-		@Override public void mouseDown (MouseEvent e) { /* Unused. */ }
-		@Override public void mouseDoubleClick (MouseEvent e) { /* Unused. */ }
+		@Override public void mouseDown (final MouseEvent e) { /* Unused. */ }
+		@Override public void mouseDoubleClick (final MouseEvent e) { /* Unused. */ }
 	};
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -407,8 +407,8 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 		}
 
 		@Override
-		public void mediaItemUpdated (final String filePath) {
-			getChangeEventCaller().mediaItemsUpdated((IMediaItem[]) null); // TODO pass-through actual item?
+		public void mediaItemUpdated (final IMediaItem item) {
+			getChangeEventCaller().mediaItemsUpdated(item);
 		}
 
 		@Override
@@ -448,7 +448,7 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	public void setItemDateAdded (final T track, final Date date) throws MorriganException {
 		super.setItemDateAdded(track, date);
 		try {
-			this.dbLayer.setDateAdded(track.getFilepath(), date);
+			this.dbLayer.setDateAdded(track, date);
 		}
 		catch (DbException e) {
 			throw new MorriganException(e);
@@ -493,7 +493,7 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	public void setItemHashCode (final T track, final BigInteger hashcode) throws MorriganException {
 		super.setItemHashCode(track, hashcode);
 		try {
-			this.dbLayer.setHashcode(track.getFilepath(), hashcode);
+			this.dbLayer.setHashcode(track, hashcode);
 		}
 		catch (DbException e) {
 			throw new MorriganException(e);
@@ -504,7 +504,7 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	public void setItemDateLastModified (final T track, final Date date) throws MorriganException {
 		super.setItemDateLastModified(track, date);
 		try {
-			this.dbLayer.setDateLastModified(track.getFilepath(), date);
+			this.dbLayer.setDateLastModified(track, date);
 		}
 		catch (DbException e) {
 			throw new MorriganException(e);
@@ -515,7 +515,7 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	public void setItemEnabled (final T track, final boolean value) throws MorriganException {
 		super.setItemEnabled(track, value);
 		try {
-			this.dbLayer.setEnabled(track.getFilepath(), value);
+			this.dbLayer.setEnabled(track, value);
 		}
 		catch (DbException e) {
 			throw new MorriganException(e);
@@ -526,7 +526,7 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	public void setItemMissing (final T track, final boolean value) throws MorriganException {
 		super.setItemMissing(track, value);
 		try {
-			this.dbLayer.setMissing(track.getFilepath(), value);
+			this.dbLayer.setMissing(track, value);
 		}
 		catch (DbException e) {
 			throw new MorriganException(e);
@@ -537,7 +537,7 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	public void setRemoteLocation (final T track, final String remoteLocation) throws MorriganException {
 		track.setRemoteLocation(remoteLocation);
 		try {
-			this.dbLayer.setRemoteLocation(track.getFilepath(), remoteLocation);
+			this.dbLayer.setRemoteLocation(track, remoteLocation);
 		}
 		catch (DbException e) {
 			throw new MorriganException(e);
@@ -547,12 +547,12 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	@Override
 	public void persistTrackData (final T track) throws MorriganException {
 		try {
-			this.dbLayer.setHashcode(track.getFilepath(), track.getHashcode());
-			if (track.getDateAdded() != null) this.dbLayer.setDateAdded(track.getFilepath(), track.getDateAdded());
-			if (track.getDateLastModified() != null) this.dbLayer.setDateLastModified(track.getFilepath(), track.getDateLastModified());
-			this.dbLayer.setRemoteLocation(track.getFilepath(), track.getRemoteLocation());
-			this.dbLayer.setEnabled(track.getFilepath(), track.isEnabled());
-			this.dbLayer.setMissing(track.getFilepath(), track.isMissing());
+			this.dbLayer.setHashcode(track, track.getHashcode());
+			if (track.getDateAdded() != null) this.dbLayer.setDateAdded(track, track.getDateAdded());
+			if (track.getDateLastModified() != null) this.dbLayer.setDateLastModified(track, track.getDateLastModified());
+			this.dbLayer.setRemoteLocation(track, track.getRemoteLocation());
+			this.dbLayer.setEnabled(track, track.isEnabled());
+			this.dbLayer.setMissing(track, track.isMissing());
 		}
 		catch (DbException e) {
 			throw new MorriganException(e);

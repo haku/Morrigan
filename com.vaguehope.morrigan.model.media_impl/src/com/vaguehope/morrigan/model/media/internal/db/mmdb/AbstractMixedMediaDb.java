@@ -120,7 +120,7 @@ public abstract class AbstractMixedMediaDb
 		getChangeEventCaller().mediaItemsUpdated(item);
 		this.setDirtyState(DirtyState.METADATA);
 		try {
-			this.getDbLayer().setItemMediaType(item.getFilepath(), newType);
+			this.getDbLayer().setItemMediaType(item, newType);
 		}
 		catch (DbException e) {
 			throw new MorriganException(e);
@@ -131,7 +131,7 @@ public abstract class AbstractMixedMediaDb
 	public void incTrackStartCnt (final IMediaTrack track, final long n) throws MorriganException {
 		MediaTrackListHelper.incTrackStartCnt(this, track, n);
 		try {
-			this.getDbLayer().incTrackStartCnt(track.getFilepath(), n);
+			this.getDbLayer().incTrackStartCnt(track, n);
 		}
 		catch (DbException e) {
 			throw new MorriganException(e);
@@ -142,7 +142,7 @@ public abstract class AbstractMixedMediaDb
 	public void incTrackEndCnt (final IMediaTrack track, final long n) throws MorriganException {
 		MediaTrackListHelper.incTrackEndCnt(this, track, n);
 		try {
-			this.getDbLayer().incTrackEndCnt(track.getFilepath(), n);
+			this.getDbLayer().incTrackEndCnt(track, n);
 		}
 		catch (DbException e) {
 			throw new MorriganException(e);
@@ -153,7 +153,7 @@ public abstract class AbstractMixedMediaDb
 	public void setTrackDateLastPlayed (final IMediaTrack track, final Date date) throws MorriganException {
 		MediaTrackListHelper.setDateLastPlayed(this, track, date);
 		try {
-			this.getDbLayer().setDateLastPlayed(track.getFilepath(), date);
+			this.getDbLayer().setDateLastPlayed(track, date);
 		}
 		catch (DbException e) {
 			throw new MorriganException(e);
@@ -164,7 +164,7 @@ public abstract class AbstractMixedMediaDb
 	public void incTrackStartCnt (final IMediaTrack track) throws MorriganException {
 		MediaTrackListHelper.incTrackStartCnt(this, track);
 		try {
-			this.getDbLayer().incTrackPlayed(track.getFilepath());
+			this.getDbLayer().incTrackPlayed(track);
 		}
 		catch (DbException e) {
 			throw new MorriganException(e);
@@ -175,7 +175,7 @@ public abstract class AbstractMixedMediaDb
 	public void incTrackEndCnt (final IMediaTrack track) throws MorriganException {
 		MediaTrackListHelper.incTrackEndCnt(this, track);
 		try {
-			this.getDbLayer().incTrackFinished(track.getFilepath());
+			this.getDbLayer().incTrackFinished(track);
 		}
 		catch (DbException e) {
 			throw new MorriganException(e);
@@ -186,7 +186,7 @@ public abstract class AbstractMixedMediaDb
 	public void setTrackStartCnt (final IMediaTrack track, final long n) throws MorriganException {
 		MediaTrackListHelper.setTrackStartCnt(this, track, n);
 		try {
-			this.getDbLayer().setTrackStartCnt(track.getFilepath(), n);
+			this.getDbLayer().setTrackStartCnt(track, n);
 		}
 		catch (DbException e) {
 			throw new MorriganException(e);
@@ -197,7 +197,7 @@ public abstract class AbstractMixedMediaDb
 	public void setTrackEndCnt (final IMediaTrack track, final long n) throws MorriganException {
 		MediaTrackListHelper.setTrackEndCnt(this, track, n);
 		try {
-			this.getDbLayer().setTrackEndCnt(track.getFilepath(), n);
+			this.getDbLayer().setTrackEndCnt(track, n);
 		}
 		catch (DbException e) {
 			throw new MorriganException(e);
@@ -208,7 +208,7 @@ public abstract class AbstractMixedMediaDb
 	public void setTrackDuration (final IMediaTrack track, final int duration) throws MorriganException {
 		MediaTrackListHelper.setTrackDuration(this, track, duration);
 		try {
-			this.getDbLayer().setTrackDuration(track.getFilepath(), duration);
+			this.getDbLayer().setTrackDuration(track, duration);
 		}
 		catch (DbException e) {
 			throw new MorriganException(e);
@@ -219,7 +219,7 @@ public abstract class AbstractMixedMediaDb
 	public void setPictureWidthAndHeight (final IMediaPicture item, final int width, final int height) throws MorriganException {
 		MediaPictureListHelper.setPictureWidthAndHeight(this, item, width, height);
 		try {
-			this.getDbLayer().setDimensions(item.getFilepath(), width, height);
+			this.getDbLayer().setDimensions(item, width, height);
 		}
 		catch (DbException e) {
 			throw new MorriganException(e);
@@ -247,14 +247,14 @@ public abstract class AbstractMixedMediaDb
 		super.persistTrackData(item);
 
 		try {
-			this.getDbLayer().setItemMediaType(item.getFilepath(), item.getMediaType());
+			this.getDbLayer().setItemMediaType(item, item.getMediaType());
 
-			this.getDbLayer().setTrackStartCnt(item.getFilepath(), item.getStartCount());
-			this.getDbLayer().setTrackEndCnt(item.getFilepath(), item.getEndCount());
-			this.getDbLayer().setTrackDuration(item.getFilepath(), item.getDuration());
-			if (item.getDateLastPlayed() != null) this.getDbLayer().setDateLastPlayed(item.getFilepath(), item.getDateLastPlayed());
+			this.getDbLayer().setTrackStartCnt(item, item.getStartCount());
+			this.getDbLayer().setTrackEndCnt(item, item.getEndCount());
+			this.getDbLayer().setTrackDuration(item, item.getDuration());
+			if (item.getDateLastPlayed() != null) this.getDbLayer().setDateLastPlayed(item, item.getDateLastPlayed());
 
-			this.getDbLayer().setDimensions(item.getFilepath(), item.getWidth(), item.getHeight());
+			this.getDbLayer().setDimensions(item, item.getWidth(), item.getHeight());
 		}
 		catch (DbException e) {
 			throw new MorriganException(e);
