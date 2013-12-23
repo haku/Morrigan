@@ -10,9 +10,9 @@ import java.util.logging.Logger;
 
 import com.vaguehope.morrigan.engines.playback.PlaybackEngineFactory;
 import com.vaguehope.morrigan.model.media.MediaFactory;
+import com.vaguehope.morrigan.player.LocalPlayer;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayerEventHandler;
-import com.vaguehope.morrigan.player.LocalPlayer;
 import com.vaguehope.morrigan.player.PlayerRegister;
 
 public class PlayerRegisterImpl implements PlayerRegister {
@@ -27,7 +27,7 @@ public class PlayerRegisterImpl implements PlayerRegister {
 	private final PlaybackEngineFactory playbackEngineFactory;
 	private final MediaFactory mediaFactory;
 
-	public PlayerRegisterImpl (PlaybackEngineFactory playbackEngineFactory, MediaFactory mediaFactory) {
+	public PlayerRegisterImpl (final PlaybackEngineFactory playbackEngineFactory, final MediaFactory mediaFactory) {
 		this.playbackEngineFactory = playbackEngineFactory;
 		this.mediaFactory = mediaFactory;
 	}
@@ -39,7 +39,7 @@ public class PlayerRegisterImpl implements PlayerRegister {
 	}
 
 	@Override
-	public Player get (int i) {
+	public Player get (final int i) {
 		checkAlive();
 		return this.all.get(Integer.valueOf(i));
 	}
@@ -51,7 +51,7 @@ public class PlayerRegisterImpl implements PlayerRegister {
 	}
 
 	@Override
-	public void register (Player p) {
+	public void register (final Player p) {
 		checkAlive();
 		Integer i = Integer.valueOf(p.getId());
 		Player prev = this.all.putIfAbsent(i, p);
@@ -62,7 +62,7 @@ public class PlayerRegisterImpl implements PlayerRegister {
 	 * If we made it then it will be disposed.
 	 */
 	@Override
-	public void unregister (Player p) {
+	public void unregister (final Player p) {
 		Integer i = Integer.valueOf(p.getId());
 		this.all.remove(i);
 		this.localPlayerIds.remove(i);
@@ -84,7 +84,7 @@ public class PlayerRegisterImpl implements PlayerRegister {
 	}
 
 	@Override
-	public LocalPlayer makeLocal (String name, PlayerEventHandler eventHandler) {
+	public LocalPlayer makeLocal (final String name, final PlayerEventHandler eventHandler) {
 		LocalPlayer p = new LocalPlayerImpl(nextIndex(), name, eventHandler, this, this.playbackEngineFactory, this.mediaFactory);
 		Integer i = Integer.valueOf(p.getId());
 		this.localPlayerIds.put(i, i);

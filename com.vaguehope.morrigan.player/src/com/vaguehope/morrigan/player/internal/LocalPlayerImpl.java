@@ -52,10 +52,10 @@ public class LocalPlayerImpl implements LocalPlayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Main.
 
-	public LocalPlayerImpl (int id, String name, PlayerEventHandler eventHandler,
-			Register<Player> register,
-			PlaybackEngineFactory playbackEngineFactory,
-			MediaFactory mediaFactory) {
+	public LocalPlayerImpl (final int id, final String name, final PlayerEventHandler eventHandler,
+			final Register<Player> register,
+			final PlaybackEngineFactory playbackEngineFactory,
+			final MediaFactory mediaFactory) {
 		this.id = id;
 		this.name = name;
 		this.eventHandler = eventHandler;
@@ -87,7 +87,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Current selection.
 
-	private Object _currentItemLock = new Object();
+	private final Object _currentItemLock = new Object();
 	private PlayItem _currentItem = null;
 
 	/**
@@ -95,7 +95,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 	 * Must call this with list a null before this
 	 * object is disposed so as to remove listener.
 	 */
-	private void setCurrentItem (PlayItem item) {
+	private void setCurrentItem (final PlayItem item) {
 		synchronized (this._currentItemLock) {
 			if (this._currentItem != null && this._currentItem.list != null) {
 				this._currentItem.list.removeChangeEventListener(this.listChangedRunnable);
@@ -115,25 +115,25 @@ public class LocalPlayerImpl implements LocalPlayer {
 		}
 	}
 
-	private MediaItemListChangeListener listChangedRunnable = new MediaItemListChangeListener () {
+	private final MediaItemListChangeListener listChangedRunnable = new MediaItemListChangeListener () {
 
 		@Override
-		public void mediaItemsRemoved (IMediaItem... items) {
+		public void mediaItemsRemoved (final IMediaItem... items) {
 			validateHistory(); // TODO should this be scheduled / rate limited?
 		}
 
 		@Override
-		public void eventMessage(String msg) { /* Unused. */ }
+		public void eventMessage(final String msg) { /* Unused. */ }
 		@Override
 		public void mediaListRead() { /* Unused. */ }
 		@Override
-		public void dirtyStateChanged (DirtyState oldState, DirtyState newState) { /* Unused. */ }
+		public void dirtyStateChanged (final DirtyState oldState, final DirtyState newState) { /* Unused. */ }
 		@Override
-		public void mediaItemsAdded (IMediaItem... items) { /* Unused. */ }
+		public void mediaItemsAdded (final IMediaItem... items) { /* Unused. */ }
 		@Override
-		public void mediaItemsUpdated (IMediaItem... items) { /* Unused. */ }
+		public void mediaItemsUpdated (final IMediaItem... items) { /* Unused. */ }
 		@Override
-		public void mediaItemsForceReadRequired(IMediaItem... items) { /* Unused. */ }
+		public void mediaItemsForceReadRequired(final IMediaItem... items) { /* Unused. */ }
 	};
 
 	@Override
@@ -168,7 +168,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 	}
 
 	@Override
-	public void setPlaybackOrder (PlaybackOrder order) {
+	public void setPlaybackOrder (final PlaybackOrder order) {
 		this._playbackOrder = order;
 	}
 
@@ -204,14 +204,14 @@ public class LocalPlayerImpl implements LocalPlayer {
 
 	private static final int HISTORY_LENGTH = 10;
 
-	private List<PlayItem> _history = new ArrayList<PlayItem>();
+	private final List<PlayItem> _history = new ArrayList<PlayItem>();
 
 	@Override
 	public List<PlayItem> getHistory () {
 		return Collections.unmodifiableList(this._history);
 	}
 
-	private void addToHistory (PlayItem item) {
+	private void addToHistory (final PlayItem item) {
 		synchronized (this._history) {
 			if (this._history.contains(item)) {
 				this._history.remove(item);
@@ -244,25 +244,25 @@ public class LocalPlayerImpl implements LocalPlayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Queue.
 
-	private AtomicInteger _queueId = new AtomicInteger(0);
-	private List<PlayItem> _queue = new ArrayList<PlayItem>();
-	private List<Runnable> _queueChangeListeners = new ArrayList<Runnable>();
+	private final AtomicInteger _queueId = new AtomicInteger(0);
+	private final List<PlayItem> _queue = new ArrayList<PlayItem>();
+	private final List<Runnable> _queueChangeListeners = new ArrayList<Runnable>();
 
-	private void validateQueueItemBeforeAdd (PlayItem item) {
+	private void validateQueueItemBeforeAdd (final PlayItem item) {
 		if (item.item != null && !item.item.isPlayable()) throw new IllegalArgumentException("item is not playable.");
 		if (item.id >= 0) throw new IllegalArgumentException("item can not already have id.");
 		item.id = this._queueId.getAndIncrement();
 	}
 
 	@Override
-	public void addToQueue (PlayItem item) {
+	public void addToQueue (final PlayItem item) {
 		validateQueueItemBeforeAdd(item);
 		this._queue.add(item);
 		callQueueChangedListeners();
 	}
 
 	@Override
-	public void addToQueue(List<PlayItem> items) {
+	public void addToQueue(final List<PlayItem> items) {
 		for (PlayItem item : items) {
 			validateQueueItemBeforeAdd(item);
 		}
@@ -271,7 +271,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 	}
 
 	@Override
-	public void removeFromQueue (PlayItem item) {
+	public void removeFromQueue (final PlayItem item) {
 		this._queue.remove(item);
 		callQueueChangedListeners();
 	}
@@ -283,7 +283,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 	}
 
 	@Override
-	public void moveInQueue (List<PlayItem> items, boolean moveDown) {
+	public void moveInQueue (final List<PlayItem> items, final boolean moveDown) {
 		synchronized (this._queue) {
 			if (items == null || items.isEmpty()) return;
 
@@ -320,7 +320,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 	}
 
 	@Override
-	public void moveInQueueEnd (List<PlayItem> items, boolean toBottom) {
+	public void moveInQueueEnd (final List<PlayItem> items, final boolean toBottom) {
 		// TODO This could probably be done better.
 		synchronized (this._queue) {
 			List<PlayItem> ret = new ArrayList<PlayItem>(this._queue.size());
@@ -364,7 +364,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 	}
 
 	@Override
-	public void setQueueList(List<PlayItem> items) {
+	public void setQueueList(final List<PlayItem> items) {
 		// TODO make thread safe.
 		synchronized (this._queue) {
 			this._queue.clear();
@@ -398,7 +398,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 	}
 
 	@Override
-	public PlayItem getQueueItemById (int itemId) {
+	public PlayItem getQueueItemById (final int itemId) {
 		// TODO Is there a better way to do this?
 		Map<Integer, PlayItem> q = new HashMap<Integer, PlayItem>();
 		for (PlayItem item : this._queue) {
@@ -408,12 +408,12 @@ public class LocalPlayerImpl implements LocalPlayer {
 	}
 
 	@Override
-	public void addQueueChangeListener (Runnable listener) {
+	public void addQueueChangeListener (final Runnable listener) {
 		this._queueChangeListeners.add(listener);
 	}
 
 	@Override
-	public void removeQueueChangeListener (Runnable listener) {
+	public void removeQueueChangeListener (final Runnable listener) {
 		this._queueChangeListeners.remove(listener);
 	}
 
@@ -427,7 +427,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 		return (this.playbackEngine != null);
 	}
 
-	private synchronized IPlaybackEngine getPlaybackEngine (boolean create) {
+	private synchronized IPlaybackEngine getPlaybackEngine (final boolean create) {
 		if (this.playbackEngine == null && create) {
 			this.playbackEngine = this.playbackEngineFactory.newPlaybackEngine();
 			if (this.playbackEngine == null) throw new RuntimeException("Failed to create playback engine instance.");
@@ -464,7 +464,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 	 * For UI handlers to call.
 	 */
 	@Override
-	public void loadAndStartPlaying (IMediaTrackList<? extends IMediaTrack> list) {
+	public void loadAndStartPlaying (final IMediaTrackList<? extends IMediaTrack> list) {
 		IMediaTrack nextTrack = OrderHelper.getNextTrack(list, null, this._playbackOrder);
 		loadAndStartPlaying(list, nextTrack);
 	}
@@ -473,7 +473,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 	 * For UI handlers to call.
 	 */
 	@Override
-	public void loadAndStartPlaying (IMediaTrackList<? extends IMediaTrack> list, IMediaTrack track) {
+	public void loadAndStartPlaying (final IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack track) {
 		if (track == null) throw new NullPointerException();
 		loadAndStartPlaying(new PlayItem(list, track));
 	}
@@ -592,7 +592,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 	}
 
 	@Override
-	public void seekTo (double d) {
+	public void seekTo (final double d) {
 		try {
 			internal_seekTo(d);
 		} catch (MorriganException e) {
@@ -642,7 +642,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 		}
 	}
 
-	protected void internal_seekTo (double d) throws MorriganException {
+	protected void internal_seekTo (final double d) throws MorriganException {
 		IPlaybackEngine eng = getPlaybackEngine(false);
 		if (eng!=null) {
 			synchronized (eng) {
@@ -651,16 +651,16 @@ public class LocalPlayerImpl implements LocalPlayer {
 		}
 	}
 
-	private IPlaybackStatusListener playbackStatusListener = new IPlaybackStatusListener () {
+	private final IPlaybackStatusListener playbackStatusListener = new IPlaybackStatusListener () {
 
 		@Override
-		public void positionChanged(long position) {
+		public void positionChanged(final long position) {
 			LocalPlayerImpl.this._currentPosition = position;
 			LocalPlayerImpl.this.eventHandler.updateStatus();
 		}
 
 		@Override
-		public void durationChanged(int duration) {
+		public void durationChanged(final int duration) {
 			LocalPlayerImpl.this._currentTrackDuration = duration;
 
 			if (duration > 0) {
@@ -682,7 +682,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 		}
 
 		@Override
-		public void statusChanged(PlayState state) {
+		public void statusChanged(final PlayState state) {
 			/* UNUSED */
 		}
 
@@ -708,19 +708,19 @@ public class LocalPlayerImpl implements LocalPlayer {
 		}
 
 		@Override
-		public void onError(Exception e) {
+		public void onError(final Exception e) {
 			LocalPlayerImpl.this.eventHandler.asyncThrowable(e);
 		}
 
 		@Override
-		public void onKeyPress(int keyCode) {
+		public void onKeyPress(final int keyCode) {
 			if (keyCode == SWT.ESC) {
 				LocalPlayerImpl.this.eventHandler.videoAreaClose();
 			}
 		}
 
 		@Override
-		public void onMouseClick(int button, int clickCount) {
+		public void onMouseClick(final int button, final int clickCount) {
 			LocalPlayerImpl.this.logger.info("Mouse click "+button+"*"+clickCount);
 			if (clickCount > 1) {
 				LocalPlayerImpl.this.eventHandler.videoAreaSelected();
@@ -730,7 +730,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 	};
 
 	@Override
-	public void setVideoFrameParent(Composite cmfp) {
+	public void setVideoFrameParent(final Composite cmfp) {
 		IPlaybackEngine engine = getPlaybackEngine(false);
 		synchronized (engine) {
 			engine.setVideoFrameParent(cmfp);
@@ -745,7 +745,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 	}
 
 	@Override
-	public void goFullscreen(int monitor) {
+	public void goFullscreen(final int monitor) {
 		this.eventHandler.goFullscreen(monitor);
 	}
 

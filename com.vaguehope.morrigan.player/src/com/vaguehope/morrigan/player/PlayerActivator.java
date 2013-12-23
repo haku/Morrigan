@@ -25,7 +25,7 @@ public final class PlayerActivator implements BundleActivator {
 	private MediaFactoryTracker mediaFactoryTracker;
 
 	@Override
-	public void start (BundleContext context) throws Exception {
+	public void start (final BundleContext context) throws Exception {
 		this.playbackEngineFactoryTracker = new PlaybackEngineFactoryTracker(context);
 		this.mediaFactoryTracker = new MediaFactoryTracker(context);
 		this.playerRegister = new PlayerRegisterImpl(this.playbackEngineFactoryTracker, this.mediaFactoryTracker);
@@ -36,7 +36,7 @@ public final class PlayerActivator implements BundleActivator {
 	}
 
 	@Override
-	public void stop (BundleContext context) throws Exception {
+	public void stop (final BundleContext context) throws Exception {
 		this.playerRegister.dispose();
 		this.mediaFactoryTracker.dispose();
 		this.playbackEngineFactoryTracker.dispose();
@@ -50,7 +50,7 @@ public final class PlayerActivator implements BundleActivator {
 	private void startPlayerContainerListener (final BundleContext context) {
 		ServiceListener playerContainerSl = new ServiceListener() {
 			@Override
-			public void serviceChanged (ServiceEvent ev) {
+			public void serviceChanged (final ServiceEvent ev) {
 				switch (ev.getType()) {
 					case ServiceEvent.REGISTERED:
 						fillPlayerContainer((PlayerContainer) context.getService(ev.getServiceReference()));
@@ -74,7 +74,7 @@ public final class PlayerActivator implements BundleActivator {
 		}
 	}
 
-	protected void fillPlayerContainer (PlayerContainer container) {
+	protected void fillPlayerContainer (final PlayerContainer container) {
 		try {
 			container.setPlayer(this.playerRegister.makeLocal(container.getName(), container.getEventHandler()));
 		}
@@ -83,7 +83,7 @@ public final class PlayerActivator implements BundleActivator {
 		}
 	}
 
-	protected void emptyPlayerContainer (PlayerContainer container) {
+	protected void emptyPlayerContainer (final PlayerContainer container) {
 		this.playerRegister.unregister(container.getPlayer());
 	}
 
@@ -100,7 +100,7 @@ public final class PlayerActivator implements BundleActivator {
 		}
 
 		@Override
-		public Player getPlayer (int i) {
+		public Player getPlayer (final int i) {
 			PlayerRegisterImpl r = PlayerActivator.this.playerRegister;
 			if (r == null) return null;
 			return r.get(i);
