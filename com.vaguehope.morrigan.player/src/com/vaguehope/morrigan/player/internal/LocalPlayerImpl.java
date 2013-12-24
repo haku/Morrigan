@@ -518,6 +518,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 					public void run () {
 						try {
 							item.list.incTrackStartCnt(item.item);
+							LocalPlayerImpl.this.eventHandler.currentItemChanged();
 						}
 						catch (MorriganException e) {
 							LocalPlayerImpl.this.logger.log(Level.WARNING, "Failed to increment track count.", e);
