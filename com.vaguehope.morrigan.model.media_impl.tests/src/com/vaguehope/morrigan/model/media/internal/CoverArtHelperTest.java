@@ -29,6 +29,13 @@ public class CoverArtHelperTest {
 	}
 
 	@Test
+	public void itReturnsFirstPicInDirInNoBetterOptions () throws Exception {
+		File cover = this.tmp.newFile("foobar.jpg");
+		this.tmp.newFile("goobar.jpg");
+		assertEquals(cover, CoverArtHelper.findCoverArt(this.item));
+	}
+
+	@Test
 	public void itFindsCoverWithSameNameButJpgExt () throws Exception {
 		givenCoverNoise();
 		this.tmp.newFile("testItem thumb.jpg");
@@ -80,24 +87,28 @@ public class CoverArtHelperTest {
 
 	@Test
 	public void itFindsCoverCalledCover () throws Exception {
+		givenNoise();
 		final File cover = this.tmp.newFile("cover.jpg");
 		assertEquals(cover, CoverArtHelper.findCoverArt(this.item));
 	}
 
 	@Test
 	public void itFindsCoverCalledCoverMixedCase () throws Exception {
+		givenNoise();
 		final File cover = this.tmp.newFile("coVeR.jpg");
 		assertEquals(cover, CoverArtHelper.findCoverArt(this.item));
 	}
 
 	@Test
 	public void itFindsCoverCalledAlbum () throws Exception {
+		givenNoise();
 		final File cover = this.tmp.newFile("album.jpg");
 		assertEquals(cover, CoverArtHelper.findCoverArt(this.item));
 	}
 
 	@Test
 	public void itFindsCoverCalledFolderOverCover () throws Exception {
+		givenNoise();
 		this.tmp.newFile("cover.jpg");
 		this.tmp.newFile("album.jpg");
 		final File cover = this.tmp.newFile("folder.jpg");
@@ -105,11 +116,16 @@ public class CoverArtHelperTest {
 	}
 
 	private void givenCoverNoise () throws IOException {
+		givenNoise();
 		for (final String ext : new String[] { "jpg", "png", "gif" }) {
 			for (final String name : new String[] { "cover", "album", "folder" }) {
 				this.tmp.newFile(name + "." + ext);
 			}
 		}
+	}
+
+	private void givenNoise () throws IOException {
+		this.tmp.newFile("something.jpg");
 	}
 
 	private static class testItem extends MediaItem {
