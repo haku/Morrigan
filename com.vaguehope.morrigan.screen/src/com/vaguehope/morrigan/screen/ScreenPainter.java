@@ -3,6 +3,7 @@ package com.vaguehope.morrigan.screen;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
@@ -147,7 +148,7 @@ public class ScreenPainter implements PaintListener {
 	private static Rectangle drawTextHCen (final PaintEvent e, final int x, final int top, final String text) {
 		final Point textSize = e.gc.textExtent(text);
 		final int _left = x - (textSize.x / 2);
-		e.gc.drawText(text, _left, top, SWT.TRANSPARENT);
+		drawText(e, text, _left, top);
 		return new Rectangle(_left, top, textSize.x, textSize.y);
 	}
 
@@ -159,7 +160,7 @@ public class ScreenPainter implements PaintListener {
 			final int _left = x - (textSize.x / 2);
 			final int _top = y + (textSize.y) * i - (textSize.y * text.length) / 2;
 
-			e.gc.drawText(text[i], _left, _top, SWT.TRANSPARENT);
+			drawText(e, text[i], _left, _top);
 
 			if (ret.x > _left) ret.x = _left;
 			if (ret.y > _top) ret.y = _top;
@@ -173,6 +174,17 @@ public class ScreenPainter implements PaintListener {
 	private static Rectangle drawTextHVCen (final PaintEvent e, final int x, final int y, final String text) {
 		final String[] split = text.split("\n");
 		return drawTextHVCen(e, x, y, split);
+	}
+
+	private static void drawText (final PaintEvent e, final String text, final int x, final int y) {
+		final Color savedFg = e.gc.getForeground();
+		e.gc.setForeground(e.gc.getBackground());
+		e.gc.drawText(text, x - 1, y - 1, SWT.DRAW_TRANSPARENT);
+		e.gc.drawText(text, x + 1, y - 1, SWT.DRAW_TRANSPARENT);
+		e.gc.drawText(text, x - 1, y + 1, SWT.DRAW_TRANSPARENT);
+		e.gc.drawText(text, x + 1, y + 1, SWT.DRAW_TRANSPARENT);
+		e.gc.setForeground(savedFg);
+		e.gc.drawText(text, x, y, SWT.DRAW_TRANSPARENT);
 	}
 
 	public static void drawImageScaled (final PaintEvent e, final Rectangle clientArea, final Image image) {
