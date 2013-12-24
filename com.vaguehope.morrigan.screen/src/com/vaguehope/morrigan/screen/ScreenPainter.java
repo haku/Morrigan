@@ -31,7 +31,7 @@ public class ScreenPainter implements PaintListener {
 	private final ScreenType screenType;
 	private TitleProvider titleProvider = null;
 
-	public ScreenPainter(Canvas canvas, ScreenType type) {
+	public ScreenPainter(final Canvas canvas, final ScreenType type) {
 		this.canvas = canvas;
 		this.screenType = type;
 
@@ -39,7 +39,7 @@ public class ScreenPainter implements PaintListener {
 		canvas.setForeground(canvas.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 	}
 
-	public void setTitleProvider (TitleProvider titleProvider) {
+	public void setTitleProvider (final TitleProvider titleProvider) {
 		this.titleProvider = titleProvider;
 	}
 
@@ -57,7 +57,7 @@ public class ScreenPainter implements PaintListener {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	public void paintControl(PaintEvent e) {
+	public void paintControl(final PaintEvent e) {
 		Rectangle clientArea = this.canvas.getClientArea();
 
 		if (this.screenType != ScreenType.TINY) {
@@ -123,14 +123,14 @@ public class ScreenPainter implements PaintListener {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private static Rectangle drawTextHCen (PaintEvent e, int x, int top, String text) {
+	private static Rectangle drawTextHCen (final PaintEvent e, final int x, final int top, final String text) {
 		Point textSize = e.gc.textExtent(text);
 		int _left = x - (textSize.x / 2);
 		e.gc.drawText(text, _left, top, SWT.TRANSPARENT);
 		return new Rectangle(_left, top, textSize.x, textSize.y);
 	}
 
-	private static Rectangle drawTextHVCen (PaintEvent e, int x, int y, String... text) {
+	private static Rectangle drawTextHVCen (final PaintEvent e, final int x, final int y, final String... text) {
 		Rectangle ret = new Rectangle(x, y, 0, 0);
 
 		for (int i=0; i < text.length; i++) {
@@ -149,7 +149,7 @@ public class ScreenPainter implements PaintListener {
 		return ret;
 	}
 
-	private static Rectangle drawTextHVCen (PaintEvent e, int x, int y, String text) {
+	private static Rectangle drawTextHVCen (final PaintEvent e, final int x, final int y, final String text) {
 		String[] split = text.split("\n");
 		return drawTextHVCen(e, x, y, split);
 	}
