@@ -13,7 +13,7 @@ public class MixedMediaItem extends MediaItem implements IMixedMediaItem {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors - protected so only siblings can create instances.
 
-	protected MixedMediaItem (String filePath) {
+	protected MixedMediaItem (final String filePath) {
 		super(filePath);
 	}
 
@@ -31,7 +31,7 @@ public class MixedMediaItem extends MediaItem implements IMixedMediaItem {
 	}
 
 	@Override
-	public boolean setMediaType (MediaType newType) {
+	public boolean setMediaType (final MediaType newType) {
 		if (this.type != newType) {
 			this.type = newType;
 			return true;
@@ -58,7 +58,7 @@ public class MixedMediaItem extends MediaItem implements IMixedMediaItem {
 	}
 
 	@Override
-	public boolean setDuration (int duration) {
+	public boolean setDuration (final int duration) {
 		if (this.duration != duration) {
 			this.duration = duration;
 			return true;
@@ -72,7 +72,7 @@ public class MixedMediaItem extends MediaItem implements IMixedMediaItem {
 	}
 
 	@Override
-	public boolean setStartCount (long startCount) {
+	public boolean setStartCount (final long startCount) {
 		if (this.startCount != startCount) {
 			this.startCount = startCount;
 			return true;
@@ -86,7 +86,7 @@ public class MixedMediaItem extends MediaItem implements IMixedMediaItem {
 	}
 
 	@Override
-	public boolean setEndCount (long endCount) {
+	public boolean setEndCount (final long endCount) {
 		if (this.endCount != endCount) {
 			this.endCount = endCount;
 			return true;
@@ -100,7 +100,7 @@ public class MixedMediaItem extends MediaItem implements IMixedMediaItem {
 	}
 
 	@Override
-	public boolean setDateLastPlayed (Date dateLastPlayed) {
+	public boolean setDateLastPlayed (final Date dateLastPlayed) {
 		if (!EqualHelper.areEqual(this.dateLastPlayed, dateLastPlayed)) {
 			this.dateLastPlayed = dateLastPlayed;
 			return true;
@@ -125,7 +125,7 @@ public class MixedMediaItem extends MediaItem implements IMixedMediaItem {
 	}
 
 	@Override
-	public boolean setWidth (int width) {
+	public boolean setWidth (final int width) {
 		if (this.width != width) {
 			this.width = width;
 			return true;
@@ -139,7 +139,7 @@ public class MixedMediaItem extends MediaItem implements IMixedMediaItem {
 	}
 
 	@Override
-	public boolean setHeight (int height) {
+	public boolean setHeight (final int height) {
 		if (this.height != height) {
 			this.height = height;
 			return true;
@@ -162,7 +162,7 @@ public class MixedMediaItem extends MediaItem implements IMixedMediaItem {
 		this.setHeight(0);
 	}
 
-	private boolean _setFromMediaTrack (IMediaTrack mt) {
+	private boolean _setFromMediaTrack (final IMediaTrack mt) {
 		boolean b =
 				this.setDuration(mt.getDuration())
 						| this.setStartCount(mt.getStartCount())
@@ -172,14 +172,14 @@ public class MixedMediaItem extends MediaItem implements IMixedMediaItem {
 	}
 
 	@Override
-	public boolean setFromMediaTrack (IMediaTrack mt) {
+	public boolean setFromMediaTrack (final IMediaTrack mt) {
 		boolean b =
 				this.setFromMediaItem(mt)
 						| _setFromMediaTrack(mt);
 		return b;
 	}
 
-	private boolean _setFromMediaPicture (IMediaPicture mp) {
+	private boolean _setFromMediaPicture (final IMediaPicture mp) {
 		boolean b =
 				this.setWidth(mp.getWidth())
 						| this.setHeight(mp.getHeight());
@@ -187,7 +187,7 @@ public class MixedMediaItem extends MediaItem implements IMixedMediaItem {
 	}
 
 	@Override
-	public boolean setFromMediaPicture (IMediaPicture mp) {
+	public boolean setFromMediaPicture (final IMediaPicture mp) {
 		boolean b =
 				this.setFromMediaItem(mp)
 						| _setFromMediaPicture(mp);
@@ -195,7 +195,7 @@ public class MixedMediaItem extends MediaItem implements IMixedMediaItem {
 	}
 
 	@Override
-	public boolean setFromMediaMixedItem (IMixedMediaItem mmi) {
+	public boolean setFromMediaMixedItem (final IMixedMediaItem mmi) {
 		boolean b =
 				this.setFromMediaItem(mmi)
 						| _setFromMediaTrack(mmi)
@@ -205,7 +205,7 @@ public class MixedMediaItem extends MediaItem implements IMixedMediaItem {
 	}
 
 	@Override
-	public boolean setFromMediaItem (IMediaItem mi) {
+	public boolean setFromMediaItem (final IMediaItem mi) {
 		boolean ret = super.setFromMediaItem(mi);
 
 		if (mi instanceof IMixedMediaItem) {
