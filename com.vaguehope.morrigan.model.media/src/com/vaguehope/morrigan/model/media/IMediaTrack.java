@@ -1,5 +1,6 @@
 package com.vaguehope.morrigan.model.media;
 
+import java.io.File;
 import java.util.Date;
 
 public interface IMediaTrack extends IMediaItem {
@@ -24,6 +25,13 @@ public interface IMediaTrack extends IMediaItem {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	boolean setFromMediaTrack (IMediaTrack mt);
+
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	/**
+	 * @return File path to cover art or null.
+	 */
+	File findCoverArt();
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

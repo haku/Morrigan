@@ -1,6 +1,11 @@
 package com.vaguehope.morrigan.gui;
 
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
@@ -24,6 +29,7 @@ public class Activator extends AbstractUIPlugin {
 	private MediaFactoryTracker mediaFactoryTracker;
 	private HotkeyEngineFactoryTracker hotkeyEngineFactoryTracker;
 	private HotkeyRegister hotkeyRegister;
+	private ExecutorService executorService;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -32,7 +38,7 @@ public class Activator extends AbstractUIPlugin {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	public void start(BundleContext bundleContext) throws Exception {
+	public void start(final BundleContext bundleContext) throws Exception {
 		if (Activator.plugin != null || Activator.context != null) throw new IllegalStateException("Bundle is already started.");
 		Activator.plugin = this;
 		Activator.context = bundleContext;
@@ -42,13 +48,15 @@ public class Activator extends AbstractUIPlugin {
 		this.mediaFactoryTracker = new MediaFactoryTracker(bundleContext);
 		this.hotkeyEngineFactoryTracker = new HotkeyEngineFactoryTracker(bundleContext);
 		this.hotkeyRegister = new HotkeyRegister(this.hotkeyEngineFactoryTracker);
+		this.executorService = new ThreadPoolExecutor(0, 1, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
 	}
 
 	@Override
-	public void stop(BundleContext bundleContext) throws Exception {
+	public void stop(final BundleContext bundleContext) throws Exception {
 		Activator.context = null;
 		Activator.plugin = null;
 
+		this.executorService.shutdownNow();
 		this.hotkeyEngineFactoryTracker.dispose();
 		this.mediaFactoryTracker.dispose();
 
@@ -74,7 +82,7 @@ public class Activator extends AbstractUIPlugin {
 	 * @param path the path
 	 * @return the image descriptor
 	 */
-	public static ImageDescriptor getImageDescriptor(String path) {
+	public static ImageDescriptor getImageDescriptor(final String path) {
 		return imageDescriptorFromPlugin(PLUGIN_ID, path);
 	}
 
@@ -88,6 +96,10 @@ public class Activator extends AbstractUIPlugin {
 
 	public static HotkeyRegister getHotkeyRegister () {
 		return getDefault().hotkeyRegister;
+	}
+
+	public static ExecutorService getExecutorService () {
+		return getDefault().executorService;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

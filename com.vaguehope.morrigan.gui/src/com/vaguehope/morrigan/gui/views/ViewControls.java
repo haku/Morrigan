@@ -60,6 +60,7 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 	@Override
 	public void dispose() {
 		getPlayer().removeQueueChangeListener(this.queueChangedRrefresher);
+		disposeControls();
 		disposeIcons();
 		super.dispose();
 	}
@@ -96,6 +97,7 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 	private Button btnOrderMode;
 	Button btnQueue;
 	private Canvas videoParent;
+	private ScreenPainter screenPainter;
 
 	private void makeIcons () {
 		this.iconPlay = Activator.getImageDescriptor("icons/play.gif").createImage();
@@ -174,6 +176,7 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		Button btnFindInList = new Button(parent, SWT.PUSH);
 		Button btnJumpTo = new Button(parent, SWT.PUSH);
 		this.videoParent = new Canvas(parent, SWT.NONE);
+		this.screenPainter = new ScreenPainter(this.videoParent, ScreenType.TINY);
 		this.btnOrderMode = new Button(parent, SWT.PUSH);
 		Button btnFullscreen = new Button(parent, SWT.PUSH);
 		Button btnPref = new Button(parent, SWT.PUSH);
@@ -268,8 +271,9 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		formData.width = 80;
 		this.videoParent.setLayoutData(formData);
 		this.videoParent.setLayout(new FillLayout());
-		this.videoParent.addPaintListener(new ScreenPainter(this.videoParent, ScreenType.TINY));
+		this.videoParent.addPaintListener(this.screenPainter);
 		setLocalMediaFrameParent(this.videoParent);
+		registerScreenPainter(this.screenPainter);
 
 		formData = new FormData();
 		formData.top = new FormAttachment(btnStop, SEP);
@@ -283,6 +287,10 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 
 		this.preferedHeight = SEP + btnStop.computeSize(SWT.DEFAULT, SWT.DEFAULT).y + SEP
 				+ seekBarHeight + SEP;
+	}
+
+	private void disposeControls () {
+		unregisterScreenPainter(this.screenPainter);
 	}
 
 	@Override
