@@ -1,7 +1,5 @@
 package com.vaguehope.morrigan.screen;
 
-
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
@@ -31,7 +29,7 @@ public class ScreenPainter implements PaintListener {
 	private final ScreenType screenType;
 	private TitleProvider titleProvider = null;
 
-	public ScreenPainter(final Canvas canvas, final ScreenType type) {
+	public ScreenPainter (final Canvas canvas, final ScreenType type) {
 		this.canvas = canvas;
 		this.screenType = type;
 
@@ -46,7 +44,7 @@ public class ScreenPainter implements PaintListener {
 	public void redrawTitle () {
 		if (!this.canvas.isDisposed()) this.canvas.getShell().getDisplay().asyncExec(new Runnable() {
 			@Override
-			public void run() {
+			public void run () {
 				if (!ScreenPainter.this.canvas.isDisposed()) {
 					ScreenPainter.this.canvas.redraw();
 				}
@@ -57,67 +55,63 @@ public class ScreenPainter implements PaintListener {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	public void paintControl(final PaintEvent e) {
-		Rectangle clientArea = this.canvas.getClientArea();
+	public void paintControl (final PaintEvent e) {
+		final Rectangle clientArea = this.canvas.getClientArea();
+		final Point centre = new Point(clientArea.width / 2, clientArea.height / 2);
+		final PlayItem item = this.titleProvider != null ? this.titleProvider.getItem() : null;
 
-		if (this.screenType != ScreenType.TINY) {
-			PlayItem item = this.titleProvider.getItem();
-			Point centre = new Point(clientArea.width/2, clientArea.height/2);
+		if (this.screenType == ScreenType.TINY) {
+			drawTextHVCen(e, centre.x, centre.y, "[ M ]");
+		}
+		else if (item != null && item.item != null) {
+			Font font = e.gc.getFont();
+			Font font2;
+			Font font3;
 
-			String text;
+			FontData fontData = e.gc.getFont().getFontData()[0];
+			if (this.screenType == ScreenType.LARGE) {
+				font2 = new Font(e.gc.getDevice(), fontData.getName(),
+						fontData.getHeight() * 2, fontData.getStyle());
+				font3 = new Font(e.gc.getDevice(), fontData.getName(),
+						fontData.getHeight() * 3, fontData.getStyle());
 
-			if (item != null && item.item != null) {
-				Font font = e.gc.getFont();
-				Font font2;
-				Font font3;
-
-				FontData fontData = e.gc.getFont().getFontData()[0];
-				if (this.screenType == ScreenType.LARGE) {
-					font2 = new Font(e.gc.getDevice(), fontData.getName(),
-							fontData.getHeight() * 2, fontData.getStyle());
-					font3 = new Font(e.gc.getDevice(), fontData.getName(),
-							fontData.getHeight() * 3, fontData.getStyle());
-
-				} else {
-					font2 = new Font(e.gc.getDevice(), fontData);
-					font3 = new Font(e.gc.getDevice(), fontData.getName(),
-							(int)(fontData.getHeight() * 1.5f), fontData.getStyle());
-				}
-
-				text = item.item.getTitle();
-				text = text.substring(0, text.lastIndexOf("."));
-				text = text.replace(" - ", "\n");
-				e.gc.setFont(font3);
-				Rectangle rect = drawTextHVCen(e, centre.x, centre.y, text);
-
-				text = item.item.getStartCount() + " / " + item.item.getEndCount();
-				if (item.item.getDuration() > 0) {
-					text = text + "   " + TimeHelper.formatTimeSeconds(item.item.getDuration());
-				}
-				e.gc.setFont(font2);
-				Rectangle rect2 = drawTextHCen(e, centre.x, rect.y + rect.height, text);
-
-				if (item.list != null) {
-					text = "(" + item.list.getListName() + ")";
-					Point textSize = e.gc.textExtent(text);
-					drawTextHCen(e, centre.x, rect.y - textSize.y, text);
-				}
-
-				e.gc.setFont(font);
-
-				if (this.screenType == ScreenType.LARGE) {
-					text = item.item.getFilepath();
-					drawTextHCen(e, centre.x, rect2.y + rect2.height, text);
-				}
-
-				font2.dispose();
-				font3.dispose();
-
-			} else {
-				text = "[ Morrigan ]";
-				drawTextHVCen(e, centre.x, centre.y, text);
+			}
+			else {
+				font2 = new Font(e.gc.getDevice(), fontData);
+				font3 = new Font(e.gc.getDevice(), fontData.getName(),
+						(int) (fontData.getHeight() * 1.5f), fontData.getStyle());
 			}
 
+			String title = item.item.getTitle();
+			title = title.substring(0, title.lastIndexOf("."));
+			title = title.replace(" - ", "\n");
+			e.gc.setFont(font3);
+			Rectangle rect = drawTextHVCen(e, centre.x, centre.y, title);
+
+			String counts = item.item.getStartCount() + " / " + item.item.getEndCount();
+			if (item.item.getDuration() > 0) {
+				counts = counts + "   " + TimeHelper.formatTimeSeconds(item.item.getDuration());
+			}
+			e.gc.setFont(font2);
+			Rectangle rect2 = drawTextHCen(e, centre.x, rect.y + rect.height, counts);
+
+			if (item.list != null) {
+				String listName = "(" + item.list.getListName() + ")";
+				Point textSize = e.gc.textExtent(listName);
+				drawTextHCen(e, centre.x, rect.y - textSize.y, listName);
+			}
+
+			e.gc.setFont(font);
+
+			if (this.screenType == ScreenType.LARGE) {
+				drawTextHCen(e, centre.x, rect2.y + rect2.height, item.item.getFilepath());
+			}
+
+			font2.dispose();
+			font3.dispose();
+		}
+		else {
+			drawTextHVCen(e, centre.x, centre.y, "[ Morrigan ]");
 		}
 	}
 
@@ -133,7 +127,7 @@ public class ScreenPainter implements PaintListener {
 	private static Rectangle drawTextHVCen (final PaintEvent e, final int x, final int y, final String... text) {
 		Rectangle ret = new Rectangle(x, y, 0, 0);
 
-		for (int i=0; i < text.length; i++) {
+		for (int i = 0; i < text.length; i++) {
 			Point textSize = e.gc.textExtent(text[i]);
 			int _left = x - (textSize.x / 2);
 			int _top = y + (textSize.y) * i - (textSize.y * text.length) / 2;
