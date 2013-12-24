@@ -16,7 +16,7 @@ class ScreenRegister implements ScreenPainterRegister {
 	private final TitleProvider titleProvider;
 	private final List<ScreenPainter> _titlePainters = Collections.synchronizedList(new ArrayList<ScreenPainter>());
 
-	public ScreenRegister (Display display, TitleProvider titleProvider) {
+	public ScreenRegister (final Display display, final TitleProvider titleProvider) {
 		if (display == null) throw new IllegalArgumentException();
 		if (titleProvider == null) throw new IllegalArgumentException();
 		this.display = display;
@@ -39,7 +39,7 @@ class ScreenRegister implements ScreenPainterRegister {
 	}
 
 	@Override
-	public void registerScreenPainter (ScreenPainter p) {
+	public void registerScreenPainter (final ScreenPainter p) {
 		if (p == null) throw new NullPointerException();
 
 		p.setTitleProvider(this.titleProvider);
@@ -47,7 +47,7 @@ class ScreenRegister implements ScreenPainterRegister {
 	}
 
 	@Override
-	public void unregisterScreenPainter (ScreenPainter p) {
+	public void unregisterScreenPainter (final ScreenPainter p) {
 		this._titlePainters.remove(p);
 		p.setTitleProvider(null);
 	}
