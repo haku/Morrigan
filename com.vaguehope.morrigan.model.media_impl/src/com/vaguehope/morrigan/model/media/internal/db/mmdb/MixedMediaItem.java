@@ -1,5 +1,6 @@
 package com.vaguehope.morrigan.model.media.internal.db.mmdb;
 
+import java.io.File;
 import java.util.Date;
 
 import com.vaguehope.morrigan.model.helper.EqualHelper;
@@ -7,6 +8,7 @@ import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaPicture;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
+import com.vaguehope.morrigan.model.media.internal.CoverArtHelper;
 import com.vaguehope.morrigan.model.media.internal.MediaItem;
 
 public class MixedMediaItem extends MediaItem implements IMixedMediaItem {
@@ -106,6 +108,11 @@ public class MixedMediaItem extends MediaItem implements IMixedMediaItem {
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public File findCoverArt () {
+		return CoverArtHelper.findCoverArt(this);
 	}
 
 //	-  -  -  -  -  -  -  -  -

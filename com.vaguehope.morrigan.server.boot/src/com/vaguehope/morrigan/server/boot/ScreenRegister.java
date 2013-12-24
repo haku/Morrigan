@@ -43,6 +43,7 @@ class ScreenRegister implements ScreenPainterRegister {
 		if (p == null) throw new NullPointerException();
 
 		p.setTitleProvider(this.titleProvider);
+//		p.setCoverArtProvider(coverArtProvider); TODO
 		this._titlePainters.add(p);
 	}
 

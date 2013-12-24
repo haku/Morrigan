@@ -52,6 +52,7 @@ import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlayerEventHandler;
 import com.vaguehope.morrigan.player.PlayerFactory;
+import com.vaguehope.morrigan.screen.CoverArtProvider;
 import com.vaguehope.morrigan.screen.FullscreenShell;
 import com.vaguehope.morrigan.screen.ScreenPainter;
 import com.vaguehope.morrigan.screen.ScreenPainter.TitleProvider;
@@ -71,6 +72,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 
 	@Override
 	public void createPartControl (final Composite parent) {
+		makeTitleProviders();
 		makeHistoryRefresher();
 		makeActions();
 		setupHotkeys();
@@ -81,6 +83,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 		this.isDisposed = true;
 		disposePlayer();
 		finaliseHotkeys();
+		disposeTitleProviders();
 		super.dispose();
 	}
 
@@ -296,6 +299,16 @@ public abstract class AbstractPlayerView extends ViewPart {
 //	Title provider.
 
 	private final List<ScreenPainter> _titlePainters = new ArrayList<ScreenPainter>();
+	private CoverArtProvider coverArtProvider;
+
+	private void makeTitleProviders () {
+		disposeTitleProviders();
+		this.coverArtProvider = new CoverArtProvider(getSite().getShell().getDisplay(), Activator.getExecutorService());
+	}
+
+	private void disposeTitleProviders () {
+		if (this.coverArtProvider != null) this.coverArtProvider.dispose();
+	}
 
 	void updateTitle () {
 		for (ScreenPainter sp : this._titlePainters) {
@@ -305,8 +318,8 @@ public abstract class AbstractPlayerView extends ViewPart {
 
 	public void registerScreenPainter (final ScreenPainter p) {
 		if (p == null) throw new NullPointerException();
-
 		p.setTitleProvider(this.titleProvider);
+		p.setCoverArtProvider(this.coverArtProvider);
 		this._titlePainters.add(p);
 	}
 
