@@ -85,11 +85,23 @@ public class CoverArtProvider {
 
 		@Override
 		public void run () {
+			final TrackImage currentTi = this.currentImage.get();
+			if(currentTi != null && currentTi.forTrack(this.track)) {
+				this.onImagedLoaded.run();
+				return;
+			}
+
 			final File file = this.track.findCoverArt();
-			if (file == null) return;
-			System.err.println("Loading art for " + this.track + ": " + file + " ...");
-			final Image image = new Image(this.display, file.getAbsolutePath());
-			final TrackImage freshTi = new TrackImage(this.track, image);
+			final TrackImage freshTi;
+			if (file != null) {
+				System.err.println("Loading art for " + this.track + ": " + file + " ...");
+				final Image image = new Image(this.display, file.getAbsolutePath());
+				freshTi = new TrackImage(this.track, image);
+			}
+			else {
+				freshTi = null;
+			}
+
 			final TrackImage oldTi = this.currentImage.getAndSet(freshTi);
 			this.onImagedLoaded.run();
 			if(oldTi != null) oldTi.dispose();
