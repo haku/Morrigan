@@ -85,6 +85,15 @@ public class CoverArtProvider {
 
 		@Override
 		public void run () {
+			try {
+				runUnsafe();
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		public void runUnsafe () {
 			final TrackImage currentTi = this.currentImage.get();
 			if(currentTi != null && currentTi.forTrack(this.track)) {
 				this.onImagedLoaded.run();
@@ -106,6 +115,7 @@ public class CoverArtProvider {
 			this.onImagedLoaded.run();
 			if(oldTi != null) oldTi.dispose();
 		}
+
 	}
 
 }
