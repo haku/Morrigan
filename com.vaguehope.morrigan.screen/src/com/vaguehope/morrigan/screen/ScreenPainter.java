@@ -132,7 +132,7 @@ public class ScreenPainter implements PaintListener {
 			counts = counts + "   " + TimeHelper.formatTimeSeconds(item.item.getDuration());
 		}
 		e.gc.setFont(font2);
-		final Rectangle rect2 = drawTextHCen(e, centre.x, rect.y + rect.height, counts);
+		drawTextHCen(e, centre.x, rect.y + rect.height, counts);
 
 		if (item.list != null) {
 			final String listName = "(" + item.list.getListName() + ")";
@@ -141,10 +141,6 @@ public class ScreenPainter implements PaintListener {
 		}
 
 		e.gc.setFont(font);
-
-		if (this.screenType == ScreenType.LARGE) {
-			drawTextHCen(e, centre.x, rect2.y + rect2.height, item.item.getFilepath());
-		}
 
 		font2.dispose();
 		font3.dispose();
