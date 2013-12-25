@@ -29,10 +29,9 @@ public class CoverArtHelperTest {
 	}
 
 	@Test
-	public void itReturnsFirstPicInDirInNoBetterOptions () throws Exception {
-		File cover = this.tmp.newFile("foobar.jpg");
-		this.tmp.newFile("goobar.jpg");
-		assertEquals(cover, CoverArtHelper.findCoverArt(this.item));
+	public void itReturnsNullWhenNoBetterOptions () throws Exception {
+		givenNoise();
+		assertEquals(null, CoverArtHelper.findCoverArt(this.item));
 	}
 
 	@Test

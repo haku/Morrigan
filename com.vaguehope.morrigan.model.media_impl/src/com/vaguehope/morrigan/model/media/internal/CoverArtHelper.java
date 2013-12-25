@@ -23,7 +23,6 @@ public class CoverArtHelper {
 		Arrays.sort(imgNames);
 
 		if (imgNames.length < 1) return null;
-		if (imgNames.length == 1) return new File(dir, imgNames[0]);
 
 		for (final String imgName : imgNames) {
 			if (fileBaseName(imgName).equals(baseName)) return new File(dir, imgName);
@@ -49,7 +48,7 @@ public class CoverArtHelper {
 			}
 		}
 
-		return new File(dir, imgNames[0]);
+		return null;
 	}
 
 	private static String fileBaseName (final File file) {
