@@ -55,7 +55,7 @@ class ScreenRegister implements ScreenPainterRegister {
 
 	protected void redrawAll () {
 		for (ScreenPainter sp : this._titlePainters) {
-			sp.redrawTitle();
+			sp.redrawAsync();
 		}
 	}
 
