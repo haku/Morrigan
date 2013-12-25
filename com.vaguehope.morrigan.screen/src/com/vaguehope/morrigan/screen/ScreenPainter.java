@@ -134,7 +134,7 @@ public class ScreenPainter implements PaintListener {
 		e.gc.setFont(font2);
 		drawTextHCen(e, centre.x, rect.y + rect.height, counts);
 
-		if (item.list != null) {
+		if (this.screenType != ScreenType.LARGE && item.list != null) {
 			final String listName = "(" + item.list.getListName() + ")";
 			final Point textSize = e.gc.textExtent(listName);
 			drawTextHCen(e, centre.x, rect.y - textSize.y, listName);
