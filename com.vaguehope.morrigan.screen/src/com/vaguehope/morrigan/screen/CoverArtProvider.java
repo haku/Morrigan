@@ -34,6 +34,7 @@ public class CoverArtProvider {
 		final TrackImage ti = this.currentImage.get();
 		if (ti != null && ti.forTrack(track)) return ti.image;
 
+		System.err.println("request arted: " + track);
 		this.executorService.submit(new ImageLoader(track, this.currentImage, onImagedLoaded, this.display));
 		return null;
 	}
@@ -60,7 +61,7 @@ public class CoverArtProvider {
 		}
 
 		public boolean forTrack(final IMediaTrack t) {
-			return (this.track.equals(t) && !this.image.isDisposed());
+			return (this.track.equals(t) && (this.image == null || !this.image.isDisposed()));
 		}
 
 		public void dispose () {
@@ -108,7 +109,7 @@ public class CoverArtProvider {
 				freshTi = new TrackImage(this.track, image);
 			}
 			else {
-				freshTi = null;
+				freshTi = new TrackImage(this.track, null);
 			}
 
 			final TrackImage oldTi = this.currentImage.getAndSet(freshTi);
