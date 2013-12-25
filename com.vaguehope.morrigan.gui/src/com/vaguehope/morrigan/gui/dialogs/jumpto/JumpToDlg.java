@@ -370,6 +370,7 @@ public class JumpToDlg implements Dismissable {
 	}
 
 	protected void showTags (final String msg) {
+		if (this.tags.isDisposed()) return;
 		this.tags.setText(msg);
 	}
 
