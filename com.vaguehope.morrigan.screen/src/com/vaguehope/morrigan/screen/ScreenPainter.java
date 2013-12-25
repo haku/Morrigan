@@ -50,21 +50,28 @@ public class ScreenPainter implements PaintListener {
 		this.coverArtProvider = coverArtProvider;
 	}
 
-	public void redrawTitle () {
-		if (!this.canvas.isDisposed()) this.canvas.getShell().getDisplay().asyncExec(new Runnable() {
-			@Override
-			public void run () {
-				if (!ScreenPainter.this.canvas.isDisposed()) {
-					ScreenPainter.this.canvas.redraw();
-				}
-			}
-		});
+	public void redrawAsync () {
+		if (this.canvas.isDisposed()) return;
+		this.canvas.getDisplay().asyncExec(this.redrawRunnable);
 	}
 
-	private final Runnable redrawTitleRunnable = new Runnable() {
+	public void redrawSync () {
+		if (this.canvas.isDisposed()) return;
+		this.canvas.getDisplay().syncExec(this.redrawRunnable);
+	}
+
+	private final Runnable redrawRunnable = new Runnable() {
 		@Override
 		public void run () {
-			redrawTitle();
+			if (ScreenPainter.this.canvas.isDisposed()) return;
+			ScreenPainter.this.canvas.redraw();
+		}
+	};
+
+	private final Runnable redrawSyncRunnable = new Runnable() {
+		@Override
+		public void run () {
+			redrawSync();
 		}
 	};
 
@@ -78,7 +85,7 @@ public class ScreenPainter implements PaintListener {
 
 		if (item != null && item.item != null) {
 			if (this.coverArtProvider != null) {
-				final Image image = this.coverArtProvider.getImage(item.item, this.redrawTitleRunnable);
+				final Image image = this.coverArtProvider.getImage(item.item, this.redrawSyncRunnable);
 				if (image != null) {
 					if (!image.isDisposed()) {
 						drawImageScaled(e, clientArea, image);

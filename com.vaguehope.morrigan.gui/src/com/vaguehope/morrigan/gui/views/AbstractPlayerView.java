@@ -312,7 +312,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 
 	void updateTitle () {
 		for (ScreenPainter sp : this._titlePainters) {
-			sp.redrawTitle();
+			sp.redrawAsync();
 		}
 	}
 
