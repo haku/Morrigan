@@ -104,11 +104,9 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 		+ " distinct m.id AS id,m.type AS type,file,md5,added,modified,enabled,missing,remloc,startcnt,endcnt,lastplay,duration,width,height"
 		+ " FROM tbl_mediafiles AS m";
 
-	private static final String _SQL_WHERE =
-			" WHERE";
-
-	private static final String _SQL_AND =
-		" AND";
+	private static final String _SQL_WHERE = " WHERE";
+	private static final String _SQL_AND = " AND";
+	private static final String _SQL_OR = " OR";
 
 	private static final String _SQL_MEDIAFILES_WHERTYPE =
 		" type=?";
@@ -341,13 +339,13 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 	/**
 	 * Querying for type UNKNOWN will return all types (i.e. wild-card).
 	 */
-	protected List<IMixedMediaItem> local_simpleSearch (final MediaType mediaType, final String term, final String esc, final int maxResults) throws SQLException, ClassNotFoundException {
+	protected List<IMixedMediaItem> local_simpleSearch (final MediaType mediaType, final String allTerms, final String esc, final int maxResults) throws SQLException, ClassNotFoundException {
 		PreparedStatement ps;
 		ResultSet rs;
 		List<IMixedMediaItem> ret;
 
 		final List<String> terms = new ArrayList<String>();
-		for (final String subTerm : SEARCH_TERM_SPLIT.split(term)) {
+		for (final String subTerm : SEARCH_TERM_SPLIT.split(allTerms)) {
 			if (subTerm != null && subTerm.length() > 0) terms.add(subTerm);
 			if (terms.size() >= MAX_SEARCH_TERMS) break;
 		}
@@ -357,7 +355,16 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 		if (mediaType != MediaType.UNKNOWN) sql += _SQL_MEDIAFILESTAGS_WHERTYPE + _SQL_AND;
 		sql += " ( ";
 		for (int i = 0; i < terms.size(); i++) {
-			if (i > 0) sql += _SQL_AND;
+			final String term = terms.get(i);
+			if (i > 0) {
+				if ("OR".equals(term)) {
+					sql += _SQL_OR;
+					continue;
+				}
+				else if (!"OR".equals(terms.get(i - 1))) {
+					sql += _SQL_AND;
+				}
+			}
 			if (term.startsWith("f~")) {
 				sql += _SQL_MEDIAFILES_WHERES_FILE;
 			}
@@ -381,19 +388,20 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 		try {
 			int parmIn = 1;
 			if (mediaType != MediaType.UNKNOWN) ps.setInt(parmIn++, mediaType.getN());
-			for (final String subTerm : terms) {
+			for (final String term : terms) {
+				if ("OR".equals(term)) continue;
 				if (term.startsWith("f~") || term.startsWith("t~")) {
-					ps.setString(parmIn++, "%" + subTerm.substring(2) + "%");
+					ps.setString(parmIn++, "%" + term.substring(2) + "%");
 					ps.setString(parmIn++, esc);
 				}
 				else if (term.startsWith("t=")) {
-					ps.setString(parmIn++, subTerm.substring(2));
+					ps.setString(parmIn++, term.substring(2));
 					ps.setString(parmIn++, esc);
 				}
 				else {
-					ps.setString(parmIn++, "%" + subTerm + "%");
+					ps.setString(parmIn++, "%" + term + "%");
 					ps.setString(parmIn++, esc);
-					ps.setString(parmIn++, "%" + subTerm + "%");
+					ps.setString(parmIn++, "%" + term + "%");
 					ps.setString(parmIn++, esc);
 				}
 			}
