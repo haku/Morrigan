@@ -351,35 +351,35 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 		}
 		if (terms.size() < 1) return new ArrayList<IMixedMediaItem>();
 
-		String sql = _SQL_MEDIAFILESTAGS_SELECT + _SQL_WHERE;
-		if (mediaType != MediaType.UNKNOWN) sql += _SQL_MEDIAFILESTAGS_WHERTYPE + _SQL_AND;
-		sql += " ( ";
+		final StringBuilder sql = new StringBuilder().append(_SQL_MEDIAFILESTAGS_SELECT).append(_SQL_WHERE);
+		if (mediaType != MediaType.UNKNOWN) sql.append(_SQL_MEDIAFILESTAGS_WHERTYPE).append(_SQL_AND);
+		sql.append(" ( ");
 		for (int i = 0; i < terms.size(); i++) {
 			final String term = terms.get(i);
 			if (i > 0) {
 				if ("OR".equals(term)) {
-					sql += _SQL_OR;
+					sql.append(_SQL_OR);
 					continue;
 				}
 				else if (!"OR".equals(terms.get(i - 1))) {
-					sql += _SQL_AND;
+					sql.append(_SQL_AND);
 				}
 			}
 			if (term.startsWith("f~")) {
-				sql += _SQL_MEDIAFILES_WHERES_FILE;
+				sql.append(_SQL_MEDIAFILES_WHERES_FILE);
 			}
 			else if (term.startsWith("t~") || term.startsWith("t=")) {
-				sql += _SQL_MEDIAFILES_WHERES_TAG;
+				sql.append(_SQL_MEDIAFILES_WHERES_TAG);
 			}
 			else {
-				sql += _SQL_MEDIAFILES_WHERES_FILEORTAG;
+				sql.append(_SQL_MEDIAFILES_WHERES_FILEORTAG);
 			}
 		}
-		sql += " ) ";
-		sql += _SQL_MEDIAFILESTAGS_WHERESEARCH_ANDEXTRA;
+		sql.append(" ) ");
+		sql.append(_SQL_MEDIAFILESTAGS_WHERESEARCH_ANDEXTRA);
 
 		try {
-			ps = getDbCon().prepareStatement(sql);
+			ps = getDbCon().prepareStatement(sql.toString());
 		}
 		catch (SQLException e) {
 			throw new SQLException("Failed to compile query (sql='" + sql + "').", e);
