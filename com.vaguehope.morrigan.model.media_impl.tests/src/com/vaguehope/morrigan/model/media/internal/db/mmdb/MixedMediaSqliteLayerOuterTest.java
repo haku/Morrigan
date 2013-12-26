@@ -76,7 +76,6 @@ public class MixedMediaSqliteLayerOuterTest {
 		getItemByFilepath(actual, expectedWithTag.getFilepath());
 	}
 
-	@Ignore("OR keyword not yet implemented")
 	@Test
 	public void itSearchesUsingMultipleTermsForItemsByNameOrTagUsingOrKeyword () throws Exception {
 		final String term1 = "some_awesome_band_desu";
