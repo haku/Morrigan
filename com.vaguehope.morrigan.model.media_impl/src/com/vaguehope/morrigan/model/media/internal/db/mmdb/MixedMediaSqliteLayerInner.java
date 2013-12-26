@@ -128,11 +128,14 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 	private static final String _SQL_MEDIAFILES_WHEREFILEEQ =
 		" file = ?";
 
-	private static final String _SQL_MEDIAFILES_WHERESEARCHTAGS =
-		" (file LIKE ? ESCAPE ? OR tag LIKE ? ESCAPE ?)";
+	private static final String _SQL_MEDIAFILES_WHERES_FILE =
+			" (file LIKE ? ESCAPE ?)";
 
-	private static final String _SQL_MEDIAFILESTAGS_WHERESEARCH_MATCHER =
-			" (file LIKE ? ESCAPE ? OR tag LIKE ? ESCAPE ?)";
+	private static final String _SQL_MEDIAFILES_WHERES_TAG =
+			" (tag LIKE ? ESCAPE ?)";
+
+	private static final String _SQL_MEDIAFILES_WHERES_FILEORTAG =
+		" (file LIKE ? ESCAPE ? OR tag LIKE ? ESCAPE ?)";
 
 	private static final String _SQL_MEDIAFILESTAGS_WHERESEARCH_ANDEXTRA =
 		" AND (missing<>1 OR missing is NULL) AND (enabled<>0 OR enabled is NULL)"
@@ -355,7 +358,15 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 		sql += " ( ";
 		for (int i = 0; i < terms.size(); i++) {
 			if (i > 0) sql += _SQL_AND;
-			sql += _SQL_MEDIAFILESTAGS_WHERESEARCH_MATCHER;
+			if (term.startsWith("f~")) {
+				sql += _SQL_MEDIAFILES_WHERES_FILE;
+			}
+			else if (term.startsWith("t~") || term.startsWith("t=")) {
+				sql += _SQL_MEDIAFILES_WHERES_TAG;
+			}
+			else {
+				sql += _SQL_MEDIAFILES_WHERES_FILEORTAG;
+			}
 		}
 		sql += " ) ";
 		sql += _SQL_MEDIAFILESTAGS_WHERESEARCH_ANDEXTRA;
@@ -371,10 +382,20 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 			int parmIn = 1;
 			if (mediaType != MediaType.UNKNOWN) ps.setInt(parmIn++, mediaType.getN());
 			for (final String subTerm : terms) {
-				ps.setString(parmIn++, "%" + subTerm + "%");
-				ps.setString(parmIn++, esc);
-				ps.setString(parmIn++, "%" + subTerm + "%");
-				ps.setString(parmIn++, esc);
+				if (term.startsWith("f~") || term.startsWith("t~")) {
+					ps.setString(parmIn++, "%" + subTerm.substring(2) + "%");
+					ps.setString(parmIn++, esc);
+				}
+				else if (term.startsWith("t=")) {
+					ps.setString(parmIn++, subTerm.substring(2));
+					ps.setString(parmIn++, esc);
+				}
+				else {
+					ps.setString(parmIn++, "%" + subTerm + "%");
+					ps.setString(parmIn++, esc);
+					ps.setString(parmIn++, "%" + subTerm + "%");
+					ps.setString(parmIn++, esc);
+				}
 			}
 
 			if (maxResults > 0) ps.setMaxRows(maxResults);
@@ -868,31 +889,9 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 		}
 		if (search != null) {
 			if (hideMissing || mediaType != MediaType.UNKNOWN) sql.append(_SQL_AND);
-			sql.append(_SQL_MEDIAFILES_WHERESEARCHTAGS);
+			sql.append(_SQL_MEDIAFILES_WHERES_FILEORTAG);
 		}
 		sql.append(_SQL_ORDERBYREPLACE);
-
-//		if (mediaType == MediaType.UNKNOWN) {
-//			if (hideMissing) {
-//				sql.append(_SQL_WHERE);
-//				sql.append(_SQL_MEDIAFILES_WHERENOTMISSING);
-//				sql.append(_SQL_ORDERBYREPLACE);
-//			} else {
-//				sql.append(_SQL_ORDERBYREPLACE);
-//			}
-//		}
-//		else {
-//			if (hideMissing) {
-//				sql.append(_SQL_WHERE);
-//				sql.append(_SQL_MEDIAFILES_WHERTYPE);
-//				sql.append(_SQL_AND);
-//				sql.append(_SQL_MEDIAFILES_WHERENOTMISSING);
-//				sql.append(_SQL_ORDERBYREPLACE);
-//			} else {
-//
-//				sql.append(_SQL_ORDERBYREPLACE);
-//			}
-//		}
 
 		String sqls = sql.toString();
 
