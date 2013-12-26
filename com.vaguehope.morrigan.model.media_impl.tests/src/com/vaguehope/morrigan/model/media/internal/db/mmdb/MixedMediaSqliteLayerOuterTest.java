@@ -64,6 +64,19 @@ public class MixedMediaSqliteLayerOuterTest {
 	}
 
 	@Test
+	public void itSearchesForSingleItemByNameAndTag () throws Exception {
+		final String term1 = "foobar";
+		final String term2 = "desu";
+		mockMediaFileWithNameFragmentAndTag("watcha", term2);
+		mockMediaFileWithNameFragmentAndTag(term1, "something");
+		final IMixedMediaItem expected = mockMediaFileWithNameFragmentAndTag(term1, term2);
+
+		assertSingleResult(expected, runSearch(term1 + " " + term2));
+		assertSingleResult(expected, runSearch(term1 + "\t" + term2));
+		assertSingleResult(expected, runSearch(term1 + "　" + term2)); // Ideographic Space.
+	}
+
+	@Test
 	public void itSearchesForItemsByNameOrTag () throws Exception {
 		final String term = "some_awesome_band_desu";
 		final IMixedMediaItem expectedWithName = mockMediaFileWithNameContaining(term);
@@ -121,6 +134,17 @@ public class MixedMediaSqliteLayerOuterTest {
 		assertSingleResult(expectedWithTermAsTag, runSearch("t=" + term));
 	}
 
+	@Test
+	public void itSearchesForSingleItemByNameAndTagSpecifically () throws Exception {
+		final String term1 = "foobar";
+		final String term2 = "desu";
+		mockMediaFileWithNameFragmentAndTag("watcha", term2);
+		mockMediaFileWithNameFragmentAndTag(term1, "something");
+		final IMixedMediaItem expected = mockMediaFileWithNameFragmentAndTag(term1, term2);
+
+		assertSingleResult(expected, runSearch("f~"+ term1 + " t=" + term2));
+	}
+
 	@Ignore("Quotes not yet implemented")
 	@Test
 	public void itCanJustPartialMatchFileNameQuoted () throws Exception {
@@ -141,7 +165,11 @@ public class MixedMediaSqliteLayerOuterTest {
 	}
 
 	private IMixedMediaItem mockMediaFileWithTag (final String tag) throws Exception {
-		final IMixedMediaItem item = mockMediaFileWithNameContaining("tagged");
+		return mockMediaFileWithNameFragmentAndTag("tagged", tag);
+	}
+
+	private IMixedMediaItem mockMediaFileWithNameFragmentAndTag (final String nameFragment, final String tag) throws Exception {
+		final IMixedMediaItem item = mockMediaFileWithNameContaining(nameFragment);
 		this.undertest.addTag(item, tag, MediaTagType.MANUAL, (MediaTagClassification) null);
 		return item;
 	}

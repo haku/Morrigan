@@ -334,7 +334,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 	}
 
 	private static final int MAX_SEARCH_TERMS = 10;
-	private static final Pattern SEARCH_TERM_SPLIT = Pattern.compile(" +");
+	private static final Pattern SEARCH_TERM_SPLIT = Pattern.compile("(?:\\s|　)+");
 
 	/**
 	 * Querying for type UNKNOWN will return all types (i.e. wild-card).
