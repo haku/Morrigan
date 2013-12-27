@@ -1,12 +1,13 @@
 package com.vaguehope.morrigan.server.boot;
 
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Monitor;
+import org.eclipse.swt.widgets.Display;
 
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
@@ -23,24 +24,28 @@ class ServerPlayerEventHandler implements PlayerEventHandler {
 
 	private final UiMgr uiMgr;
 	private final ServerPlayerContainer playerContainer;
-	private final ScreenRegister screenRegister;
-	private final ScreenMgr screenMgr;
+	private final NullScreen nullScreen;
+	private final ExecutorService executorService;
 
-	private AtomicReference<PlayState> prevPlayState = new AtomicReference<PlayState>();
+	private ScreenRegister screenRegister;
+	private ScreenMgr screenMgr;
 
-	public ServerPlayerEventHandler (UiMgr uiMgr, ServerPlayerContainer playerContainer, NullScreen nullScreen) {
+	private final AtomicReference<PlayState> prevPlayState = new AtomicReference<PlayState>();
+
+
+	public ServerPlayerEventHandler (final UiMgr uiMgr, final ServerPlayerContainer playerContainer, final NullScreen nullScreen, final ExecutorService executorService) {
 		if (uiMgr == null) throw new IllegalArgumentException();
 		if (playerContainer == null) throw new IllegalArgumentException();
+		if (nullScreen == null) throw new IllegalArgumentException();
+		if (executorService == null) throw new IllegalArgumentException();
 		this.uiMgr = uiMgr;
 		this.playerContainer = playerContainer;
-		if (this.uiMgr.getDisplay() != null) {
-			this.screenRegister = new ScreenRegister(this.uiMgr.getDisplay(), new PlayerTitleProvider(playerContainer));
-			this.screenMgr = new ScreenMgr(uiMgr.getDisplay(), this.screenRegister, new ServerScreenMgrCallback(this, nullScreen));
-		}
-		else {
-			this.screenRegister = null;
-			this.screenMgr = null;
-		}
+		this.nullScreen = nullScreen;
+		this.executorService = executorService;
+	}
+
+	public synchronized void dispose() {
+		if (this.screenRegister != null) this.screenRegister.dispose();
 	}
 
 	public LocalPlayer getPlayer () {
@@ -56,7 +61,7 @@ class ServerPlayerEventHandler implements PlayerEventHandler {
 		}
 	}
 
-	private static String getPlayerStateDescription (Player p) {
+	private static String getPlayerStateDescription (final Player p) {
 		if (p != null) {
 			PlayState currentState = p.getPlayState();
 			if (currentState != null) {
@@ -72,6 +77,19 @@ class ServerPlayerEventHandler implements PlayerEventHandler {
 		return "Player unset.";
 	}
 
+	private synchronized ScreenMgr getScreenMgr() {
+		if (this.screenMgr == null) {
+			final Display display = this.uiMgr.getDisplay();
+			if (display != null) {
+				if (this.screenRegister == null) {
+					this.screenRegister = new ScreenRegister(display, new PlayerTitleProvider(this.playerContainer), this.executorService);
+				}
+				this.screenMgr = new ScreenMgr(display, this.screenRegister, new ServerScreenMgrCallback(this, this.nullScreen));
+			}
+		}
+		return this.screenMgr;
+	}
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
@@ -80,14 +98,15 @@ class ServerPlayerEventHandler implements PlayerEventHandler {
 	}
 
 	@Override
-	public void asyncThrowable (Throwable t) {
+	public void asyncThrowable (final Throwable t) {
 		logger.log(Level.WARNING, "asyncThrowable", t);
 	}
 
 	@Override
 	public Composite getCurrentMediaFrameParent () {
-		if (this.screenMgr == null) return null;
-		return this.screenMgr.getCurrentVideoParent();
+		final ScreenMgr sm = getScreenMgr();
+		if (sm == null) return null;
+		return sm.getCurrentVideoParent();
 	}
 
 	@Override
@@ -96,10 +115,13 @@ class ServerPlayerEventHandler implements PlayerEventHandler {
 	}
 
 	@Override
-	public void goFullscreen (int monitorIndex) {
-		if (this.screenMgr == null) return;
-		Monitor monitor = this.uiMgr.getMonitor(monitorIndex);
-		this.screenMgr.goFullScreenSafe(monitor);
+	public void goFullscreen (final int monitorIndex) {
+		final ScreenMgr sm = getScreenMgr();
+		if (sm == null) {
+			logger.log(Level.WARNING, "Can not go full screen as UI not avaible.");
+			return;
+		}
+		this.screenMgr.goFullScreenSafe(this.uiMgr.getMonitor(monitorIndex));
 	}
 
 	@Override

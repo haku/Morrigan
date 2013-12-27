@@ -1,5 +1,9 @@
 package com.vaguehope.morrigan.server.boot;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import org.osgi.framework.BundleActivator;
@@ -27,19 +31,21 @@ public class Activator implements BundleActivator {
 	private PlayerReaderTracker playerReaderTracker;
 	private MediaFactoryTracker mediaFactoryTracker;
 	private AsyncTasksRegisterTracker asyncTasksRegisterTracker;
+	private ExecutorService executorService;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	public void start (BundleContext context) throws Exception {
+	public void start (final BundleContext context) throws Exception {
 		this.playerReaderTracker = new PlayerReaderTracker(context);
 		this.mediaFactoryTracker = new MediaFactoryTracker(context);
 		this.asyncTasksRegisterTracker = new AsyncTasksRegisterTracker(context);
+		this.executorService = new ThreadPoolExecutor(0, 1, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
 
 		ServerConfig config = new ServerConfig();
 		this.uiMgr = new UiMgr();
 		this.nullScreen = new NullScreen(this.uiMgr);
-		this.playerContainer = new ServerPlayerContainer(this.uiMgr, this.nullScreen, config);
+		this.playerContainer = new ServerPlayerContainer(this.uiMgr, this.nullScreen, config, this.executorService);
 		AsyncActions asyncActions = new AsyncActions(this.asyncTasksRegisterTracker, this.mediaFactoryTracker);
 		this.server = new MorriganServer(context, config, this.playerReaderTracker, this.mediaFactoryTracker, this.asyncTasksRegisterTracker, asyncActions);
 		this.server.start();
@@ -48,7 +54,7 @@ public class Activator implements BundleActivator {
 	}
 
 	@Override
-	public void stop (BundleContext context) throws Exception {
+	public void stop (final BundleContext context) throws Exception {
 		this.server.stop();
 		this.server = null;
 		this.playerContainer.dispose();
@@ -57,6 +63,8 @@ public class Activator implements BundleActivator {
 		this.nullScreen = null;
 		this.uiMgr.dispose();
 		this.uiMgr = null;
+		this.executorService.shutdownNow();
+		this.executorService = null;
 		this.mediaFactoryTracker.dispose();
 		this.playerReaderTracker.dispose();
 		this.asyncTasksRegisterTracker.dispose();
