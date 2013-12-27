@@ -53,7 +53,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 	private String filepath = null;
 	protected Composite videoFrameParent = null;
 	private IPlaybackStatusListener listener = null;
-	private PlayState playbackState = PlayState.Stopped;
+	private PlayState playbackState = PlayState.STOPPED;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructor.
@@ -215,7 +215,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 	
 	private void _loadTrack () throws PlaybackException {
 		try {
-			_callStateListener(PlayState.Loading);
+			_callStateListener(PlayState.LOADING);
 			boolean firstLoad = (this.dsMovie==null);
 			
 			this.logger.fine("dsj.PlaybackEngine firstLoad=" + firstLoad);
@@ -242,7 +242,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 			_reparentVideo();
 		}
 		catch (Exception e) {
-			_callStateListener(PlayState.Stopped);
+			_callStateListener(PlayState.STOPPED);
 			throw new PlaybackException("Failed to load '"+this.filepath+"'.", e);
 		}
 	}
@@ -272,14 +272,14 @@ public class PlaybackEngine implements IPlaybackEngine {
 			}
 			
 			_startWatcherThread();
-			_callStateListener(PlayState.Playing);
+			_callStateListener(PlayState.PLAYING);
 		}
 	}
 	
 	private void _pauseTrack () {
 		if (this.dsMovie!=null) {
 			this.dsMovie.pause();
-			_callStateListener(PlayState.Paused);
+			_callStateListener(PlayState.PAUSED);
 			_setScreenSaverActive(true);
 		}
 	}
@@ -288,7 +288,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 		if (this.dsMovie!=null) {
 			_setScreenSaverActive(false);
 			this.dsMovie.play();
-			_callStateListener(PlayState.Playing);
+			_callStateListener(PlayState.PLAYING);
 		}
 	}
 	
@@ -297,7 +297,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 		_stopWatcherThread();
 		if (this.dsMovie!=null) {
 			this.dsMovie.stop();
-			_callStateListener(PlayState.Stopped);
+			_callStateListener(PlayState.STOPPED);
 			_setScreenSaverActive(true);
 		}
 	}
@@ -490,7 +490,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 				
 				if (PlaybackEngine.this.dsMovie!=null) {
 					int measuredPosition = PlaybackEngine.this.dsMovie.getTime();
-					if (getPlaybackState() == PlayState.Playing && measuredPosition == this.lastMeasuredPosition) {
+					if (getPlaybackState() == PlayState.PLAYING && measuredPosition == this.lastMeasuredPosition) {
 						PlaybackEngine.this.logger.fine("dsj.PlaybackEngine Prompting playback...");
 						PlaybackEngine.this.dsMovie.play();
 					}
@@ -517,7 +517,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 	}
 	
 	protected  void _callOnEndOfTrackHandler () {
-		_callStateListener(PlayState.Stopped);
+		_callStateListener(PlayState.STOPPED);
 		if (this.listener!=null) {
 			this.listener.onEndOfTrack();
 		}

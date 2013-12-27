@@ -128,19 +128,19 @@ public class ViewPlayer extends AbstractPlayerView {
 		if (isDisposed()) return;
 		
 		switch (getPlayer().getPlayState()) {
-			case Playing:
+			case PLAYING:
 				setTitleImage(this.iconPlay);
 				break;
 				
-			case Paused:
+			case PAUSED:
 				setTitleImage(this.iconPause);
 				break;
 				
-			case Loading:
+			case LOADING:
 				setTitleImage(this.iconPlay); // FIXME new icon?
 				break;
 				
-			case Stopped:
+			case STOPPED:
 				setTitleImage(this.iconStop);
 				break;
 				

@@ -374,19 +374,19 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		String verb;
 
 		switch (getPlayer().getPlayState()) {
-			case Playing:
+			case PLAYING:
 				verb = "Playing";
 				break;
 
-			case Paused:
+			case PAUSED:
 				verb = "Paused";
 				break;
 
-			case Loading:
+			case LOADING:
 				verb = "Loading";
 				break;
 
-			case Stopped:
+			case STOPPED:
 				verb = "Stopped";
 				break;
 
