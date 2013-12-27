@@ -12,12 +12,12 @@ public class ScreenMgr {
 
 	private FullscreenShell fullscreenShell = null;
 
-	public ScreenMgr (Display display, ScreenPainterRegister register, ScreenMgrCallback callback) {
-		this.register = register;
+	public ScreenMgr (final Display display, final ScreenPainterRegister register, final ScreenMgrCallback callback) {
 		if (display == null) throw new IllegalArgumentException("Display is required.");
 		if (register == null) throw new IllegalArgumentException("Register is required.");
 		if (callback == null) throw new IllegalArgumentException("Callback is required.");
 		this.display = display;
+		this.register = register;
 		this.callback = callback;
 	}
 
@@ -28,7 +28,7 @@ public class ScreenMgr {
 	/**
 	 * Null monitor clears full screen.
 	 */
-	public void goFullScreenSafe (Monitor mon) {
+	public void goFullScreenSafe (final Monitor mon) {
 		if (mon != null) {
 			runOnUiThread(new GoFullScreenRunner(mon, null, this));
 		}
@@ -37,7 +37,7 @@ public class ScreenMgr {
 		}
 	}
 
-	public void removeFullScreenSafe (boolean closeShell) {
+	public void removeFullScreenSafe (final boolean closeShell) {
 		runOnUiThread(new RemoveFullScreenRunner(closeShell, this));
 	}
 
@@ -52,7 +52,7 @@ public class ScreenMgr {
 		return this.fullscreenShell.getShell();
 	}
 
-	void handleError (Exception e) {
+	void handleError (final Exception e) {
 		this.callback.handleError(e);
 	}
 
@@ -72,7 +72,7 @@ public class ScreenMgr {
 		return this.callback;
 	}
 
-	void setFullscreenShell (FullscreenShell fullscreenShell) {
+	void setFullscreenShell (final FullscreenShell fullscreenShell) {
 		this.fullscreenShell = fullscreenShell;
 	}
 
@@ -80,7 +80,7 @@ public class ScreenMgr {
 		return this.fullscreenShell;
 	}
 
-	private void runOnUiThread (Runnable r) {
+	private void runOnUiThread (final Runnable r) {
 		if (Thread.currentThread().getId() == this.display.getThread().getId()) {
 			r.run();
 		}

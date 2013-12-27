@@ -1,6 +1,7 @@
 package com.vaguehope.morrigan.server.boot;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -16,21 +17,27 @@ class ServerPlayerContainer implements PlayerContainer {
 	private final UiMgr uiMgr;
 	private final NullScreen nullScreen;
 	private final ServerConfig config;
+	private final ExecutorService executorService;
 	private final Logger logger = Logger.getLogger(this.getClass().getName());
 
 	private LocalPlayer player;
 	private ServerPlayerEventHandler eventHandler;
 
-	public ServerPlayerContainer (UiMgr uiMgr, NullScreen nullScreen, ServerConfig config) {
-		this.nullScreen = nullScreen;
+	public ServerPlayerContainer (final UiMgr uiMgr, final NullScreen nullScreen, final ServerConfig config, final ExecutorService executorService) {
 		if (uiMgr == null) throw new IllegalArgumentException();
+		if (nullScreen == null) throw new IllegalArgumentException();
+		if (config == null) throw new IllegalArgumentException();
+		if (executorService == null) throw new IllegalArgumentException();
 		this.uiMgr = uiMgr;
+		this.nullScreen = nullScreen;
 		this.config = config;
+		this.executorService = executorService;
 	}
 
 	public void dispose () {
 		LocalPlayer p = this.player;
 		if (p != null) p.dispose();
+		if (this.eventHandler != null) this.eventHandler.dispose();
 	}
 
 	@Override
@@ -41,13 +48,13 @@ class ServerPlayerContainer implements PlayerContainer {
 	@Override
 	public PlayerEventHandler getEventHandler () {
 		if (this.eventHandler == null) {
-			this.eventHandler = new ServerPlayerEventHandler(this.uiMgr, this, this.nullScreen);
+			this.eventHandler = new ServerPlayerEventHandler(this.uiMgr, this, this.nullScreen, this.executorService);
 		}
 		return this.eventHandler;
 	}
 
 	@Override
-	public void setPlayer (Player player) {
+	public void setPlayer (final Player player) {
 		if (!(player instanceof LocalPlayer)) throw new IllegalArgumentException("Only LocalPlayer supported.");
 		this.player = (LocalPlayer) player;
 		try {
