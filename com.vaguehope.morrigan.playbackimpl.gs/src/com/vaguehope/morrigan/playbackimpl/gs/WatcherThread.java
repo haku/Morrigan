@@ -76,7 +76,7 @@ public class WatcherThread extends Thread {
 			}
 			
 			// Poke screen saver.
-			if (this.engine.hasVideo.get() && this.engine.m_playbackState == PlayState.Playing) {
+			if (this.engine.hasVideo.get() && this.engine.m_playbackState == PlayState.PLAYING) {
 				ScreenSaver.pokeScreenSaverProtected();
 			}
 		}

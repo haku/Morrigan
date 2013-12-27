@@ -49,7 +49,7 @@ public class PlaybackEngine  implements IPlaybackEngine {
 	private String filepath = null;
 	Composite videoFrameParent = null;
 	private IPlaybackStatusListener listener = null;
-	private PlayState playbackState = PlayState.Stopped;
+	private PlayState playbackState = PlayState.STOPPED;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructor.
@@ -238,7 +238,7 @@ public class PlaybackEngine  implements IPlaybackEngine {
 	}
 	
 	private void _loadTrack () throws PlaybackException {
-		callStateListener(PlayState.Loading);
+		callStateListener(PlayState.LOADING);
 		
 		try {
 			if (this.mediaPlayer != null) finalisePlayback();
@@ -395,10 +395,10 @@ public class PlaybackEngine  implements IPlaybackEngine {
 				}
 				
 			} else if (event instanceof StartEvent) {
-				callStateListener(PlayState.Playing);
+				callStateListener(PlayState.PLAYING);
 				
 			} else if (event instanceof StopEvent) {
-				callStateListener(PlayState.Stopped);
+				callStateListener(PlayState.STOPPED);
 				
 			} else if (event instanceof FormatChangeEvent) {
 				FormatChangeEvent ev = (FormatChangeEvent) event;

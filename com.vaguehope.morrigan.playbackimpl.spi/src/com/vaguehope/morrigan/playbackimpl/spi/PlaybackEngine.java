@@ -30,7 +30,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 	
 	private String filepath = null;
 	private IPlaybackStatusListener listener = null;
-	private PlayState playbackState = PlayState.Stopped;
+	private PlayState playbackState = PlayState.STOPPED;
 	
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructor.
@@ -214,12 +214,12 @@ public class PlaybackEngine implements IPlaybackEngine {
 	
 	private void playTrack () throws IOException, LineUnavailableException {
 		// Play now.
-		callStateListener(PlayState.Playing);
+		callStateListener(PlayState.PLAYING);
 		
         rawplay(decodedFormat, din); // Blocks during playback.
         in.close();
         
-        callStateListener(PlayState.Stopped);
+        callStateListener(PlayState.STOPPED);
 	}
 	
 	private void rawplay(AudioFormat targetFormat, AudioInputStream din) throws IOException, LineUnavailableException {

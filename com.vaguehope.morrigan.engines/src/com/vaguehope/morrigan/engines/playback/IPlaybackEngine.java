@@ -7,11 +7,11 @@ import org.eclipse.swt.widgets.Composite;
 public interface IPlaybackEngine {
 
 	public enum PlayState {
-		Stopped(0), Playing(1), Paused(2), Loading(3);
+		STOPPED(0), PLAYING(1), PAUSED(2), LOADING(3);
 
-		private int n;
+		private final int n;
 
-		private PlayState (int n) {
+		private PlayState (final int n) {
 			this.n = n;
 		}
 

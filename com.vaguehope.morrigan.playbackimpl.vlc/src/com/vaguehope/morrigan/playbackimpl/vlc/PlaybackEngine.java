@@ -48,7 +48,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 	private String m_filepath = null;
 	protected Composite m_videoParent = null;
 	private IPlaybackStatusListener m_listener = null;
-	PlayState m_playbackState = PlayState.Stopped;
+	PlayState m_playbackState = PlayState.STOPPED;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructor.
@@ -202,7 +202,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 
 		this.playLock.lock();
 		try {
-			setStateAndCallListener(PlayState.Loading);
+			setStateAndCallListener(PlayState.LOADING);
 			EmbeddedMediaPlayer player = this.playerRef.get();
 			this.logger.fine("firstLoad=" + (player == null));
 			if (player == null) {
@@ -226,7 +226,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 			reparentVideo(this.hasVideo.get() ? this.m_videoParent : null, false);
 		}
 		catch (Exception e) { // NOSONAR Report any error while loading files.
-			setStateAndCallListener(PlayState.Stopped);
+			setStateAndCallListener(PlayState.STOPPED);
 			throw new PlaybackException("Failed to load '"+this.m_filepath+"'.", e);
 		}
 		finally {
@@ -276,7 +276,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 							player.setVideoSurface(videoSurface);
 
 							// If video is playing, put it back again...
-							if (seek && (player.isPlaying() || getPlaybackState() == PlayState.Paused )) {
+							if (seek && (player.isPlaying() || getPlaybackState() == PlayState.PAUSED )) {
 								PlaybackEngine.this.logger.fine("Restarting playback...");
 								long time = player.getTime();
 								player.stop();
@@ -332,15 +332,15 @@ public class PlaybackEngine implements IPlaybackEngine {
 
 		@Override
 		public void stopped(MediaPlayer mediaPlayer) {
-			setStateAndCallListener(PlayState.Stopped);
+			setStateAndCallListener(PlayState.STOPPED);
 		}
 		@Override
 		public void playing(MediaPlayer mediaPlayer) {
-			setStateAndCallListener(PlayState.Playing);
+			setStateAndCallListener(PlayState.PLAYING);
 		}
 		@Override
 		public void paused(MediaPlayer mediaPlayer) {
-			setStateAndCallListener(PlayState.Paused);
+			setStateAndCallListener(PlayState.PAUSED);
 		}
 
 		@Override
@@ -418,7 +418,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 			EmbeddedMediaPlayer player = this.playerRef.get();
 			if (player != null) {
 				player.setPause(true);
-				setStateAndCallListener(PlayState.Paused);
+				setStateAndCallListener(PlayState.PAUSED);
 			}
 		}
 		finally {
@@ -435,7 +435,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 				 * May change it if it causes issues.
 				 */
 				player.play();
-				setStateAndCallListener(PlayState.Playing);
+				setStateAndCallListener(PlayState.PLAYING);
 			}
 		}
 		finally {
@@ -450,7 +450,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 			EmbeddedMediaPlayer player = this.playerRef.get();
 			if (player != null) {
 				player.stop();
-				setStateAndCallListener(PlayState.Stopped);
+				setStateAndCallListener(PlayState.STOPPED);
 			}
 		}
 		finally {
@@ -474,7 +474,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 //	Listener helper methods.
 
 	private void callOnEndOfTrackHandler () {
-		setStateAndCallListener(PlayState.Stopped);
+		setStateAndCallListener(PlayState.STOPPED);
 		if (this.m_listener!=null) this.m_listener.onEndOfTrack();
 	}
 

@@ -741,10 +741,10 @@ public abstract class AbstractPlayerView extends ViewPart {
 			boolean isPaused = false;
 			if (getPlayer().isPlaybackEngineReady()) {
 				PlayState playbackState = getPlayer().getPlayState();
-				if (playbackState == PlayState.Playing) {
+				if (playbackState == PlayState.PLAYING) {
 					isPlaying = true;
 				}
-				else if (playbackState == PlayState.Paused) {
+				else if (playbackState == PlayState.PAUSED) {
 					isPaused = true;
 				}
 			}

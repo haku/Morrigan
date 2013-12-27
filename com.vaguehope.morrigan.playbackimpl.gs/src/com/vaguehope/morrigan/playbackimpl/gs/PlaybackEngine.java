@@ -51,7 +51,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 	private String m_filepath = null;
 	protected Composite m_videoParent = null;
 	private IPlaybackStatusListener m_listener = null;
-	PlayState m_playbackState = PlayState.Stopped;
+	PlayState m_playbackState = PlayState.STOPPED;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructor.
@@ -202,7 +202,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 
 		this.playLock.lock();
 		try {
-			setStateAndCallListener(PlayState.Loading);
+			setStateAndCallListener(PlayState.LOADING);
 			boolean firstLoad = (this.playbin == null);
 			this.logger.fine("firstLoad=" + firstLoad);
 			if (firstLoad) {
@@ -226,7 +226,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 			this.logger.fine("Input file set.");
 		}
 		catch (Exception e) { // NOSONAR Report any error while loading files.
-			setStateAndCallListener(PlayState.Stopped);
+			setStateAndCallListener(PlayState.STOPPED);
 			throw new PlaybackException("Failed to load '"+this.m_filepath+"'.", e);
 		}
 		finally {
@@ -364,19 +364,19 @@ public class PlaybackEngine implements IPlaybackEngine {
 			if (source == PlaybackEngine.this.playbin) {
 				switch (current) {
 				case NULL:
-					setStateAndCallListener(PlayState.Stopped);
+					setStateAndCallListener(PlayState.STOPPED);
 					break;
 
 				case PLAYING:
-					setStateAndCallListener(PlayState.Playing);
+					setStateAndCallListener(PlayState.PLAYING);
 					break;
 
 				case PAUSED:
-					setStateAndCallListener(PlayState.Paused);
+					setStateAndCallListener(PlayState.PAUSED);
 					break;
 
 				case READY:
-					setStateAndCallListener(PlayState.Stopped); // TODO add "Loaded" to enum?
+					setStateAndCallListener(PlayState.STOPPED); // TODO add "Loaded" to enum?
 					break;
 
 				}
@@ -420,7 +420,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 
 				this.logger.fine("calling playbin.setState(PLAYING)...");
 				this.playbin.setState(State.PLAYING);
-				setStateAndCallListener(PlayState.Playing);
+				setStateAndCallListener(PlayState.PLAYING);
 
 				if (this.hasVideo.get()) {
 					// FIXME How to stop more than one of these starting?
@@ -447,7 +447,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 		try {
 			if (this.playbin!=null) {
 				this.playbin.setState(State.PAUSED);
-				setStateAndCallListener(PlayState.Paused);
+				setStateAndCallListener(PlayState.PAUSED);
 			}
 		}
 		finally {
@@ -460,7 +460,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 		try {
 			if (this.playbin != null) {
 				this.playbin.setState(State.PLAYING);
-				setStateAndCallListener(PlayState.Playing);
+				setStateAndCallListener(PlayState.PLAYING);
 			}
 		}
 		finally {
@@ -475,7 +475,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 			stopWatcherThread();
 			if (this.playbin != null) {
 				this.playbin.setState(State.NULL);
-				setStateAndCallListener(PlayState.Stopped);
+				setStateAndCallListener(PlayState.STOPPED);
 			}
 		}
 		finally {
@@ -554,7 +554,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 //	Listener helper methods.
 
 	private void callOnEndOfTrackHandler () {
-		setStateAndCallListener(PlayState.Stopped);
+		setStateAndCallListener(PlayState.STOPPED);
 		if (this.m_listener!=null) this.m_listener.onEndOfTrack();
 	}
 

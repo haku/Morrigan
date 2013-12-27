@@ -119,9 +119,9 @@ public class SshPlayer implements Player {
 	@Override
 	public PlayState getPlayState () {
 		CliPlayer m = this.cliPlayer.get();
-		if (m == null) return PlayState.Stopped;
+		if (m == null) return PlayState.STOPPED;
 		// TODO what about paused?
-		return m.isRunning() ? PlayState.Playing : PlayState.Stopped;
+		return m.isRunning() ? PlayState.PLAYING : PlayState.STOPPED;
 	}
 
 	@Override

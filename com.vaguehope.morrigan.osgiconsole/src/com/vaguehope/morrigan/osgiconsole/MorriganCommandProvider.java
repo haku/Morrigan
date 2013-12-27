@@ -568,10 +568,10 @@ public class MorriganCommandProvider implements CommandProvider {
 				doPlayersPlayerPrintQueue(ci, player);
 			}
 			else {
-				if (player.getPlayState() == PlayState.Paused) {
+				if (player.getPlayState() == PlayState.PAUSED) {
 					doPlayersPlayerPause(ci, player);
 				}
-				else if (player.getPlayState() == PlayState.Playing) {
+				else if (player.getPlayState() == PlayState.PLAYING) {
 					ci.println("Already playing.");
 				}
 				else {

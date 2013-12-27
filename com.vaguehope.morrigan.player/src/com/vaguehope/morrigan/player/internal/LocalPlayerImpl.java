@@ -581,7 +581,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 		if (eng!=null) {
 			return eng.getPlaybackState();
 		}
-		return PlayState.Stopped;
+		return PlayState.STOPPED;
 	}
 
 	@Override
@@ -609,13 +609,13 @@ public class LocalPlayerImpl implements LocalPlayer {
 		if (eng!=null) {
 			synchronized (eng) {
 				PlayState playbackState = eng.getPlaybackState();
-				if (playbackState == PlayState.Paused) {
+				if (playbackState == PlayState.PAUSED) {
 					eng.resumePlaying();
 				}
-				else if (playbackState == PlayState.Playing) {
+				else if (playbackState == PlayState.PLAYING) {
 					eng.pausePlaying();
 				}
-				else if (playbackState == PlayState.Stopped) {
+				else if (playbackState == PlayState.STOPPED) {
 					loadAndStartPlaying(getCurrentItem());
 				}
 				else {
