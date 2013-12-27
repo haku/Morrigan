@@ -196,36 +196,39 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 			return new TaskResult(TaskOutcome.FAILED, "Failed to retrieve list of media sources.", e);
 		}
 
-		List<File> filesToAdd = new ArrayList<File>();
+		final List<File> filesToAdd = new ArrayList<File>();
 		int filesAdded = 0;
 
 		if (sources != null) {
-			Queue<File> dirs = new LinkedList<File>();
-			for (String source : sources) {
+			final Queue<File> dirs = new LinkedList<File>();
+			for (final String source : sources) {
 				dirs.add(new File(source));
 			}
 
 			while (!dirs.isEmpty()) {
 				if (taskEventListener.isCanceled()) break;
-				File dirItem = dirs.poll();
+				final File dirItem = dirs.poll();
 				taskEventListener.subTask("(" + filesToAdd.size() + ") Scanning " + dirItem.getAbsolutePath());
 
-				File[] arrFiles = dirItem.listFiles();
+				final File[] arrFiles = dirItem.listFiles();
 				if (arrFiles != null) {
-					for (File file : arrFiles) {
+					for (final File file : arrFiles) {
 						if (taskEventListener.isCanceled()) break;
 
-						if (file.isDirectory()) {
-							dirs.add(file);
-						}
-						else if (file.isFile()) {
-							String ext = file.getName();
-							ext = ext.substring(ext.lastIndexOf('.') + 1).toLowerCase();
-							if (supportedFormats.contains(ext)) {
-								if (!this.itemList.hasFile(file)) {
+						if (file.canRead()) {
+							if (file.isDirectory()) {
+								dirs.add(file);
+							}
+							else if (file.isFile()) {
+								String ext = file.getName();
+								ext = ext.substring(ext.lastIndexOf('.') + 1).toLowerCase();
+								if (supportedFormats.contains(ext) && !this.itemList.hasFile(file)) {
 									filesToAdd.add(file);
 								}
 							}
+						}
+						else {
+							taskEventListener.logMsg(this.itemList.getListName(), "Can not read: " + file.getAbsolutePath());
 						}
 					}
 				}
