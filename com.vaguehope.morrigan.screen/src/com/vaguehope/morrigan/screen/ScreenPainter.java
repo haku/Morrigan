@@ -121,15 +121,13 @@ public class ScreenPainter implements PaintListener {
 					(int) (fontData.getHeight() * 1.5f), fontData.getStyle());
 		}
 
-		String title = item.item.getTitle();
-		title = title.substring(0, title.lastIndexOf("."));
-		title = title.replace(" - ", "\n");
+		final String title = formatTitle(item.item.getTitle());
 		e.gc.setFont(font3);
 		final Rectangle rect = drawTextHVCen(e, centre.x, centre.y, title);
 
 		String counts = item.item.getStartCount() + " / " + item.item.getEndCount();
 		if (item.item.getDuration() > 0) {
-			counts = counts + "   " + TimeHelper.formatTimeSeconds(item.item.getDuration());
+			counts = counts + "     " + TimeHelper.formatTimeSeconds(item.item.getDuration());
 		}
 		e.gc.setFont(font2);
 		drawTextHCen(e, centre.x, rect.y + rect.height, counts);
@@ -144,6 +142,18 @@ public class ScreenPainter implements PaintListener {
 
 		font2.dispose();
 		font3.dispose();
+	}
+
+	private static String formatTitle (final String title) {
+		return title.substring(0, title.lastIndexOf("."))
+				.replace("_", " ")
+				.replace(" - ", "\n")
+				.replace(" ー ", "\n")
+				.replace(" (", "\n(")
+				.replace(" [", "\n[")
+				.replace(" {", "\n{")
+				.replace("【", "\n【")
+				.replace("『", "\n『");
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
