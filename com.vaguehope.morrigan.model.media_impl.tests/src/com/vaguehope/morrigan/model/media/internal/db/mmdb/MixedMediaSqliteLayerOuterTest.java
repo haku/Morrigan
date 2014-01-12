@@ -58,7 +58,7 @@ public class MixedMediaSqliteLayerOuterTest {
 	@Test
 	public void itSearchesForSingleItemByTag () throws Exception {
 		final String tag = "some_media_tag_" + System.nanoTime();
-		final IMixedMediaItem expected = mockMediaFileWithTag(tag);
+		final IMixedMediaItem expected = mockMediaFileWithTags(tag);
 
 		assertSingleResult(expected, runSearch(tag));
 	}
@@ -67,9 +67,9 @@ public class MixedMediaSqliteLayerOuterTest {
 	public void itSearchesForSingleItemByNameAndTag () throws Exception {
 		final String term1 = "foobar";
 		final String term2 = "desu";
-		mockMediaFileWithNameFragmentAndTag("watcha", term2);
-		mockMediaFileWithNameFragmentAndTag(term1, "something");
-		final IMixedMediaItem expected = mockMediaFileWithNameFragmentAndTag(term1, term2);
+		mockMediaFileWithNameFragmentAndTags("watcha", term2);
+		mockMediaFileWithNameFragmentAndTags(term1, "something");
+		final IMixedMediaItem expected = mockMediaFileWithNameFragmentAndTags(term1, term2);
 
 		assertSingleResult(expected, runSearch(term1 + " " + term2));
 		assertSingleResult(expected, runSearch(term1 + "\t" + term2));
@@ -80,7 +80,7 @@ public class MixedMediaSqliteLayerOuterTest {
 	public void itSearchesForItemsByNameOrTag () throws Exception {
 		final String term = "some_awesome_band_desu";
 		final IMixedMediaItem expectedWithName = mockMediaFileWithNameContaining(term);
-		final IMixedMediaItem expectedWithTag = mockMediaFileWithTag("watcha " + term + " noise");
+		final IMixedMediaItem expectedWithTag = mockMediaFileWithTags("watcha " + term + " noise");
 
 		final List<IMixedMediaItem> actual = runSearch(term);
 
@@ -95,8 +95,8 @@ public class MixedMediaSqliteLayerOuterTest {
 		final String term2 = "some_other_thing";
 		final IMixedMediaItem expectedWithTerm1InName = mockMediaFileWithNameContaining(term1);
 		final IMixedMediaItem expectedWithTerm2InName = mockMediaFileWithNameContaining(term2);
-		final IMixedMediaItem expectedWithTerm1InTag = mockMediaFileWithTag("watcha " + term1 + " noise");
-		final IMixedMediaItem expectedWithTerm2InTag = mockMediaFileWithTag("foo " + term2 + " bar");
+		final IMixedMediaItem expectedWithTerm1InTag = mockMediaFileWithTags("watcha " + term1 + " noise");
+		final IMixedMediaItem expectedWithTerm2InTag = mockMediaFileWithTags("foo " + term2 + " bar");
 
 		final List<IMixedMediaItem> actual = runSearch("  " + term1 + " OR " + term2 + " ");
 
@@ -111,7 +111,7 @@ public class MixedMediaSqliteLayerOuterTest {
 	public void itCanJustPartialMatchFileName () throws Exception {
 		final String term = "some_awesome_band_desu";
 		final IMixedMediaItem expectedWithTermInName = mockMediaFileWithNameContaining(term);
-		mockMediaFileWithTag("watcha " + term + " noise");
+		mockMediaFileWithTags("watcha " + term + " noise");
 
 		assertSingleResult(expectedWithTermInName, runSearch("f~" + term));
 	}
@@ -120,7 +120,7 @@ public class MixedMediaSqliteLayerOuterTest {
 	public void itCanJustPartialMatchTag () throws Exception {
 		final String term = "some_awesome_band_desu";
 		mockMediaFileWithNameContaining(term);
-		final IMixedMediaItem expectedWithTermInTag = mockMediaFileWithTag("watcha " + term + " noise");
+		final IMixedMediaItem expectedWithTermInTag = mockMediaFileWithTags("watcha " + term + " noise");
 
 		assertSingleResult(expectedWithTermInTag, runSearch("t~" + term));
 	}
@@ -128,8 +128,8 @@ public class MixedMediaSqliteLayerOuterTest {
 	@Test
 	public void itCanJustExactlyMatchTag () throws Exception {
 		final String term = "pl_desu";
-		final IMixedMediaItem expectedWithTermAsTag = mockMediaFileWithTag(term);
-		mockMediaFileWithTag("watcha " + term + " noise");
+		final IMixedMediaItem expectedWithTermAsTag = mockMediaFileWithTags(term);
+		mockMediaFileWithTags("watcha " + term + " noise");
 
 		assertSingleResult(expectedWithTermAsTag, runSearch("t=" + term));
 	}
@@ -138,11 +138,37 @@ public class MixedMediaSqliteLayerOuterTest {
 	public void itSearchesForSingleItemByNameAndTagSpecifically () throws Exception {
 		final String term1 = "foobar";
 		final String term2 = "desu";
-		mockMediaFileWithNameFragmentAndTag("watcha", term2);
-		mockMediaFileWithNameFragmentAndTag(term1, "something");
-		final IMixedMediaItem expected = mockMediaFileWithNameFragmentAndTag(term1, term2);
+		mockMediaFileWithNameFragmentAndTags("watcha", term2);
+		mockMediaFileWithNameFragmentAndTags(term1, "something");
+		final IMixedMediaItem expected = mockMediaFileWithNameFragmentAndTags(term1, term2);
 
 		assertSingleResult(expected, runSearch("f~"+ term1 + " t=" + term2));
+	}
+
+	@Test
+	public void itSearchesForItemsThatMatchTwoTags () throws Exception {
+		final IMixedMediaItem expectedWithTags = mockMediaFileWithTags(
+				"some_awesome_band_desu",
+				"happy_track_nyan~"
+		);
+
+		final List<IMixedMediaItem> actual = runSearch("some_awesome_band_desu happy_track_nyan~");
+
+		assertEquals(1, actual.size());
+		getItemByFilepath(actual, expectedWithTags.getFilepath());
+	}
+
+	@Test
+	public void itSearchesForItemsThatMatchTwoExplicitTags () throws Exception {
+		final IMixedMediaItem expectedWithTags = mockMediaFileWithTags(
+				"some_awesome_band_desu",
+				"happy_track_nyan~"
+				);
+
+		final List<IMixedMediaItem> actual = runSearch("t=some_awesome_band_desu t=happy_track_nyan~");
+
+		assertEquals(1, actual.size());
+		getItemByFilepath(actual, expectedWithTags.getFilepath());
 	}
 
 	@Ignore("Quotes not yet implemented")
@@ -150,7 +176,7 @@ public class MixedMediaSqliteLayerOuterTest {
 	public void itCanJustPartialMatchFileNameQuoted () throws Exception {
 		final String term = "some awesome band desu";
 		final IMixedMediaItem expectedWithTermInName = mockMediaFileWithNameContaining(term);
-		mockMediaFileWithTag("watcha " + term + " noise");
+		mockMediaFileWithTags("watcha " + term + " noise");
 
 		assertSingleResult(expectedWithTermInName, runSearch("f~'" + term + "'"));
 		assertSingleResult(expectedWithTermInName, runSearch("f~\"" + term + "\""));
@@ -164,13 +190,15 @@ public class MixedMediaSqliteLayerOuterTest {
 		assertEquals(10, all.size());
 	}
 
-	private IMixedMediaItem mockMediaFileWithTag (final String tag) throws Exception {
-		return mockMediaFileWithNameFragmentAndTag("tagged", tag);
+	private IMixedMediaItem mockMediaFileWithTags (final String... tags) throws Exception {
+		return mockMediaFileWithNameFragmentAndTags("tagged", tags);
 	}
 
-	private IMixedMediaItem mockMediaFileWithNameFragmentAndTag (final String nameFragment, final String tag) throws Exception {
+	private IMixedMediaItem mockMediaFileWithNameFragmentAndTags (final String nameFragment, final String... tags) throws Exception {
 		final IMixedMediaItem item = mockMediaFileWithNameContaining(nameFragment);
-		this.undertest.addTag(item, tag, MediaTagType.MANUAL, (MediaTagClassification) null);
+		for (String tag : tags) {
+			this.undertest.addTag(item, tag, MediaTagType.MANUAL, (MediaTagClassification) null);
+		}
 		return item;
 	}
 

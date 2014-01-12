@@ -101,10 +101,13 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 		}
 	}
 
+	/**
+	 * Querying for type UNKNOWN will return all types (i.e. wild-card).
+	 */
 	@Override
 	public List<IMixedMediaItem> simpleSearchMedia (final MediaType mediaType, final String term, final String esc, final int maxResults) throws DbException {
 		try {
-			return local_simpleSearch(mediaType, term, esc, maxResults);
+			return SearchParser.parseSearch(mediaType, term, esc).execute(getDbCon(), this.itemFactory, maxResults);
 		}
 		catch (Exception e) {
 			throw new DbException(e);
