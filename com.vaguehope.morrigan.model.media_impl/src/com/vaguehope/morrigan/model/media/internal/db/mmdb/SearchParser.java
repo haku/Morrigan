@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import com.vaguehope.morrigan.model.db.IDbColumn;
+import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
 
@@ -17,9 +19,12 @@ class SearchParser {
 	private static final Pattern SEARCH_TERM_SPLIT = Pattern.compile("(?:\\s|　)+");
 
 	private static final String _SQL_MEDIAFILES_SELECT =
-			"SELECT"
-					+ " id,file,type,md5,added,modified,enabled,missing,remloc,startcnt,endcnt,lastplay,duration,width,height"
+			"SELECT id,file,type,md5,added,modified,enabled,missing,remloc,startcnt,endcnt,lastplay,duration,width,height"
 					+ " FROM tbl_mediafiles";
+
+	private static final String _SQL_WHERE = " WHERE";
+	private static final String _SQL_AND = " AND";
+	private static final String _SQL_OR = " OR";
 
 	private static final String _SQL_MEDIAFILES_WHERTYPE =
 			" type=?";
@@ -33,53 +38,97 @@ class SearchParser {
 	private static final String _SQL_MEDIAFILES_WHERES_FILEORTAG =
 			" (file LIKE ? ESCAPE ? OR id IN (SELECT mf_id FROM tbl_tags WHERE tag LIKE ? ESCAPE ?))";
 
-	private static final String _SQL_MEDIAFILESTAGS_WHERESEARCH_ANDEXTRA =
-			" AND (missing<>1 OR missing is NULL) AND (enabled<>0 OR enabled is NULL)"
-					+ " ORDER BY lastplay DESC, endcnt DESC, startcnt DESC, file COLLATE NOCASE ASC;";
+	private static final String _SQL_MEDIAFILES_WHERENOTMISSING =
+			" (missing<>1 OR missing is NULL)";
 
-	private static final String _SQL_WHERE = " WHERE";
-	private static final String _SQL_AND = " AND";
-	private static final String _SQL_OR = " OR";
+	private static final String _SQL_MEDIAFILES_WHEREENABLED =
+			" (enabled<>0 OR enabled is NULL)";
+
+	private static final String _SQL_MEDIAFILES_SEARCHORDERBY =
+			" ORDER BY lastplay DESC, endcnt DESC, startcnt DESC, file COLLATE NOCASE ASC";
 
 	private SearchParser () {
 		throw new AssertionError();
 	}
 
+	/**
+	 * Excludes missing and disabled. Ordered by lastplay, endcnt, startcnt,
+	 * file.
+	 */
 	public static Search parseSearch (final MediaType mediaType, final String allTerms, final String esc) {
+		return parseSearch(mediaType, null, null, true, true, allTerms, esc);
+	}
+
+	public static Search parseSearch (final MediaType mediaType,
+			final IDbColumn sort, final SortDirection direction,
+			final boolean excludeMissing, final boolean excludeDisabled) {
+		return parseSearch(mediaType, sort, direction, excludeMissing, excludeDisabled, null, null);
+	}
+
+	public static Search parseSearch (final MediaType mediaType,
+			final IDbColumn sort, final SortDirection direction,
+			final boolean excludeMissing, final boolean excludeDisabled,
+			final String allTerms, final String esc) {
+		if (sort == null ^ direction == null) throw new IllegalArgumentException("Must specify both or neith of sort and direction.");
+
+		final StringBuilder sql = new StringBuilder(_SQL_MEDIAFILES_SELECT);
+		final List<String> terms = splitTerms(allTerms);
+		appendWhere(sql, mediaType, excludeMissing, excludeDisabled, terms);
+		if (sort != null && direction != null) {
+			sql.append(" ORDER BY ").append(sort.getName()).append(direction.getSql());
+		}
+		else {
+			sql.append(_SQL_MEDIAFILES_SEARCHORDERBY);
+		}
+		sql.append(";");
+		return new Search(sql.toString(), mediaType, terms, esc);
+	}
+
+	private static List<String> splitTerms (final String allTerms) {
 		final List<String> terms = new ArrayList<String>();
+		if (allTerms == null) return terms;
 		for (final String subTerm : SEARCH_TERM_SPLIT.split(allTerms)) {
 			if (subTerm != null && subTerm.length() > 0) terms.add(subTerm);
 			if (terms.size() >= MAX_SEARCH_TERMS) break;
 		}
-		if (terms.size() < 1) throw new IllegalArgumentException("No search terms specified.");
+		return terms;
+	}
 
-		final StringBuilder sql = new StringBuilder().append(_SQL_MEDIAFILES_SELECT).append(_SQL_WHERE);
-		if (mediaType != MediaType.UNKNOWN) sql.append(_SQL_MEDIAFILES_WHERTYPE).append(_SQL_AND);
-		sql.append(" ( ");
-		for (int i = 0; i < terms.size(); i++) {
-			final String term = terms.get(i);
-			if (i > 0) {
-				if ("OR".equals(term)) {
-					sql.append(_SQL_OR);
-					continue;
+	private static void appendWhere (final StringBuilder sql, final MediaType mediaType, final boolean excludeMissing, final boolean excludeDisabled, final List<String> terms) {
+		if (mediaType == MediaType.UNKNOWN && terms.size() < 1 && !excludeMissing && !excludeDisabled) return;
+
+		sql.append(_SQL_WHERE);
+		if (mediaType != MediaType.UNKNOWN) sql.append(_SQL_MEDIAFILES_WHERTYPE);
+
+		if (terms.size() > 0) {
+			sql.append(_SQL_AND);
+			sql.append(" ( ");
+			for (int i = 0; i < terms.size(); i++) {
+				final String term = terms.get(i);
+				if (i > 0) {
+					if ("OR".equals(term)) {
+						sql.append(_SQL_OR);
+						continue;
+					}
+					else if (!"OR".equals(terms.get(i - 1))) {
+						sql.append(_SQL_AND);
+					}
 				}
-				else if (!"OR".equals(terms.get(i - 1))) {
-					sql.append(_SQL_AND);
+				if (term.startsWith("f~")) {
+					sql.append(_SQL_MEDIAFILES_WHERES_FILE);
+				}
+				else if (term.startsWith("t~") || term.startsWith("t=")) {
+					sql.append(_SQL_MEDIAFILES_WHERES_TAG);
+				}
+				else {
+					sql.append(_SQL_MEDIAFILES_WHERES_FILEORTAG);
 				}
 			}
-			if (term.startsWith("f~")) {
-				sql.append(_SQL_MEDIAFILES_WHERES_FILE);
-			}
-			else if (term.startsWith("t~") || term.startsWith("t=")) {
-				sql.append(_SQL_MEDIAFILES_WHERES_TAG);
-			}
-			else {
-				sql.append(_SQL_MEDIAFILES_WHERES_FILEORTAG);
-			}
+			sql.append(" ) ");
 		}
-		sql.append(" ) ");
-		sql.append(_SQL_MEDIAFILESTAGS_WHERESEARCH_ANDEXTRA);
-		return new Search(sql.toString(), mediaType, terms, esc);
+
+		if (excludeMissing) sql.append(_SQL_AND).append(_SQL_MEDIAFILES_WHERENOTMISSING);
+		if (excludeDisabled) sql.append(_SQL_AND).append(_SQL_MEDIAFILES_WHEREENABLED);
 	}
 
 	public static class Search {
@@ -103,6 +152,10 @@ class SearchParser {
 			catch (final SQLException e) {
 				throw new SQLException("Failed to compile query (sql='" + this.sql + "').", e);
 			}
+		}
+
+		public List<IMixedMediaItem> execute (final Connection con, final MixedMediaItemFactory itemFactory) throws SQLException {
+			return execute(con, itemFactory, -1);
 		}
 
 		public List<IMixedMediaItem> execute (final Connection con, final MixedMediaItemFactory itemFactory, final int maxResults) throws SQLException {
