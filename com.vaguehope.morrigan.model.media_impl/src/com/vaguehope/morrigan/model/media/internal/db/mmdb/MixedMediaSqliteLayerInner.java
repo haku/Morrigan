@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.db.IDbItem;
@@ -106,7 +105,6 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 
 	private static final String _SQL_WHERE = " WHERE";
 	private static final String _SQL_AND = " AND";
-	private static final String _SQL_OR = " OR";
 
 	private static final String _SQL_MEDIAFILES_WHERTYPE =
 		" type=?";
@@ -126,18 +124,8 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 	private static final String _SQL_MEDIAFILES_WHEREFILEEQ =
 		" file = ?";
 
-	private static final String _SQL_MEDIAFILES_WHERES_FILE =
-			" (file LIKE ? ESCAPE ?)";
-
-	private static final String _SQL_MEDIAFILES_WHERES_TAG =
-			" (tag LIKE ? ESCAPE ?)";
-
 	private static final String _SQL_MEDIAFILES_WHERES_FILEORTAG =
 		" (file LIKE ? ESCAPE ? OR tag LIKE ? ESCAPE ?)";
-
-	private static final String _SQL_MEDIAFILESTAGS_WHERESEARCH_ANDEXTRA =
-		" AND (missing<>1 OR missing is NULL) AND (enabled<>0 OR enabled is NULL)"
-		+ " ORDER BY lastplay DESC, endcnt DESC, startcnt DESC, file COLLATE NOCASE ASC;";
 
 //	-  -  -  -  -  -  -  -  -  -  -  -
 //	Adding and removing tracks.
@@ -330,95 +318,6 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 			ps.close();
 		}
 
-		return ret;
-	}
-
-	private static final int MAX_SEARCH_TERMS = 10;
-	private static final Pattern SEARCH_TERM_SPLIT = Pattern.compile("(?:\\s|　)+");
-
-	/**
-	 * Querying for type UNKNOWN will return all types (i.e. wild-card).
-	 */
-	protected List<IMixedMediaItem> local_simpleSearch (final MediaType mediaType, final String allTerms, final String esc, final int maxResults) throws SQLException, ClassNotFoundException {
-		PreparedStatement ps;
-		ResultSet rs;
-		List<IMixedMediaItem> ret;
-
-		final List<String> terms = new ArrayList<String>();
-		for (final String subTerm : SEARCH_TERM_SPLIT.split(allTerms)) {
-			if (subTerm != null && subTerm.length() > 0) terms.add(subTerm);
-			if (terms.size() >= MAX_SEARCH_TERMS) break;
-		}
-		if (terms.size() < 1) return new ArrayList<IMixedMediaItem>();
-
-		final StringBuilder sql = new StringBuilder().append(_SQL_MEDIAFILESTAGS_SELECT).append(_SQL_WHERE);
-		if (mediaType != MediaType.UNKNOWN) sql.append(_SQL_MEDIAFILESTAGS_WHERTYPE).append(_SQL_AND);
-		sql.append(" ( ");
-		for (int i = 0; i < terms.size(); i++) {
-			final String term = terms.get(i);
-			if (i > 0) {
-				if ("OR".equals(term)) {
-					sql.append(_SQL_OR);
-					continue;
-				}
-				else if (!"OR".equals(terms.get(i - 1))) {
-					sql.append(_SQL_AND);
-				}
-			}
-			if (term.startsWith("f~")) {
-				sql.append(_SQL_MEDIAFILES_WHERES_FILE);
-			}
-			else if (term.startsWith("t~") || term.startsWith("t=")) {
-				sql.append(_SQL_MEDIAFILES_WHERES_TAG);
-			}
-			else {
-				sql.append(_SQL_MEDIAFILES_WHERES_FILEORTAG);
-			}
-		}
-		sql.append(" ) ");
-		sql.append(_SQL_MEDIAFILESTAGS_WHERESEARCH_ANDEXTRA);
-
-		try {
-			ps = getDbCon().prepareStatement(sql.toString());
-		}
-		catch (SQLException e) {
-			throw new SQLException("Failed to compile query (sql='" + sql + "').", e);
-		}
-
-		try {
-			int parmIn = 1;
-			if (mediaType != MediaType.UNKNOWN) ps.setInt(parmIn++, mediaType.getN());
-			for (final String term : terms) {
-				if ("OR".equals(term)) continue;
-				if (term.startsWith("f~") || term.startsWith("t~")) {
-					ps.setString(parmIn++, "%" + term.substring(2) + "%");
-					ps.setString(parmIn++, esc);
-				}
-				else if (term.startsWith("t=")) {
-					ps.setString(parmIn++, term.substring(2));
-					ps.setString(parmIn++, esc);
-				}
-				else {
-					ps.setString(parmIn++, "%" + term + "%");
-					ps.setString(parmIn++, esc);
-					ps.setString(parmIn++, "%" + term + "%");
-					ps.setString(parmIn++, esc);
-				}
-			}
-
-			if (maxResults > 0) ps.setMaxRows(maxResults);
-
-			rs = ps.executeQuery();
-			try {
-				ret = local_parseRecordSet(rs, this.itemFactory);
-			}
-			finally {
-				rs.close();
-			}
-		}
-		finally {
-			ps.close();
-		}
 		return ret;
 	}
 
@@ -928,19 +827,15 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 		return sqls;
 	}
 
-	private static List<IMixedMediaItem> local_parseRecordSet (final ResultSet rs, final MixedMediaItemFactory itemFactory) throws SQLException {
-		/* Apparently I don't need to preset the size of the array,
-		 * and using the auto-grow feature is more efficient than
-		 * trying to count the length of the record set.
-		 */
-		List<IMixedMediaItem> ret = new ArrayList<IMixedMediaItem>();
+	protected static List<IMixedMediaItem> local_parseRecordSet (final ResultSet rs, final MixedMediaItemFactory itemFactory) throws SQLException {
+		final List<IMixedMediaItem> ret = new ArrayList<IMixedMediaItem>();
 		while (rs.next()) {
 			ret.add(createMediaItem(rs, itemFactory));
 		}
 		return ret;
 	}
 
-	static protected IMixedMediaItem createMediaItem (final ResultSet rs, final MixedMediaItemFactory itemFactory) throws SQLException {
+	protected static IMixedMediaItem createMediaItem (final ResultSet rs, final MixedMediaItemFactory itemFactory) throws SQLException {
 		String filePath = rs.getString(SQL_TBL_MEDIAFILES_COL_FILE.getName());
 		IMixedMediaItem mi = itemFactory.getNewMediaItem(filePath);
 
