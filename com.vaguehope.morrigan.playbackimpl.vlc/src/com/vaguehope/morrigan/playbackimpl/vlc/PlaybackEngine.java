@@ -485,6 +485,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 
 	void callPositionListener(long position) {
 		if (this.m_listener != null) this.m_listener.positionChanged(position);
+		if (this.hasVideo.get()) ScreenSaver.poke();
 	}
 
 	void callDurationListener(int duration) {
