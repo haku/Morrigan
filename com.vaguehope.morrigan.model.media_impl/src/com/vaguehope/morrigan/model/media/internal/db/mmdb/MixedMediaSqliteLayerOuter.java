@@ -84,7 +84,7 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	@Override
 	public List<IMixedMediaItem> getMedia (final MediaType mediaType, final IDbColumn sort, final SortDirection direction, final boolean hideMissing) throws DbException {
 		try {
-			return local_getAllMedia(mediaType, sort, direction, hideMissing);
+			return SearchParser.parseSearch(mediaType, sort, direction, hideMissing, false).execute(getDbCon(), this.itemFactory);
 		}
 		catch (Exception e) {
 			throw new DbException(e);
@@ -94,7 +94,7 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	@Override
 	public List<IMixedMediaItem> getMedia (final MediaType mediaType, final IDbColumn sort, final SortDirection direction, final boolean hideMissing, final String search, final String searchEsc) throws DbException {
 		try {
-			return local_getAllMedia(mediaType, sort, direction, hideMissing, search, searchEsc);
+			return SearchParser.parseSearch(mediaType, sort, direction, hideMissing, false, search, searchEsc).execute(getDbCon(), this.itemFactory);
 		}
 		catch (Exception e) {
 			throw new DbException(e);

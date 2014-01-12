@@ -93,11 +93,6 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
     	+ ",width,height"
     	+ " FROM tbl_mediafiles";
 
-	private static final String _SQL_MEDIAFILESTAGS_SELECT =
-		"SELECT"
-		+ " distinct m.id AS id,m.type AS type,file,md5,added,modified,enabled,missing,remloc,startcnt,endcnt,lastplay,duration,width,height"
-		+ " FROM tbl_mediafiles AS m LEFT OUTER JOIN tbl_tags ON m.id=tbl_tags.mf_id";
-
 	private static final String _SQL_MEDIAFILESALBUMS_SELECT = // TODO FIXME is this the same as _SQL_MEDIAFILES_SELECT?
 		"SELECT"
 		+ " distinct m.id AS id,m.type AS type,file,md5,added,modified,enabled,missing,remloc,startcnt,endcnt,lastplay,duration,width,height"
@@ -105,9 +100,6 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 
 	private static final String _SQL_WHERE = " WHERE";
 	private static final String _SQL_AND = " AND";
-
-	private static final String _SQL_MEDIAFILES_WHERTYPE =
-		" type=?";
 
 	private static final String _SQL_MEDIAFILESTAGS_WHERTYPE =
 		" m.type=?";
@@ -123,9 +115,6 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 
 	private static final String _SQL_MEDIAFILES_WHEREFILEEQ =
 		" file = ?";
-
-	private static final String _SQL_MEDIAFILES_WHERES_FILEORTAG =
-		" (file LIKE ? ESCAPE ? OR tag LIKE ? ESCAPE ?)";
 
 //	-  -  -  -  -  -  -  -  -  -  -  -
 //	Adding and removing tracks.
@@ -259,66 +248,6 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 		l.add(0, SqliteHelper.generateSql_Create(SQL_TBL_MEDIAFILES_NAME, SQL_TBL_MEDIAFILES_COLS));
 
 		return l;
-	}
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	MediaItem getters.
-
-	protected List<IMixedMediaItem> local_getAllMedia (final MediaType mediaType, final IDbColumn sort, final SortDirection direction, final boolean hideMissing) throws SQLException, ClassNotFoundException {
-		String sql = local_getAllMediaSql(mediaType, hideMissing, sort, direction, null);
-
-		List<IMixedMediaItem> ret;
-		PreparedStatement ps = getDbCon().prepareStatement(sql);
-		try {
-			if (mediaType != MediaType.UNKNOWN) {
-				ps.setInt(1, mediaType.getN());
-			}
-			ResultSet rs = ps.executeQuery();
-			try {
-				ret = local_parseRecordSet(rs, this.itemFactory);
-			} finally {
-				rs.close();
-			}
-		} finally {
-			ps.close();
-		}
-
-		return ret;
-	}
-
-	protected List<IMixedMediaItem> local_getAllMedia (final MediaType mediaType, final IDbColumn sort, final SortDirection direction, final boolean hideMissing, final String search, final String searchEsc) throws SQLException, ClassNotFoundException {
-		String sql = local_getAllMediaSql(mediaType, hideMissing, sort, direction, search);
-		ResultSet rs;
-
-		List<IMixedMediaItem> ret;
-		PreparedStatement ps = getDbCon().prepareStatement(sql);
-		int n = 1;
-		try {
-			if (mediaType != MediaType.UNKNOWN) {
-				ps.setInt(n, mediaType.getN());
-				n++;
-			}
-			if (search != null) {
-				ps.setString(n, "%" + search + "%");
-				n++;
-				ps.setString(n, searchEsc);
-				n++;
-				ps.setString(n, "%" + search + "%");
-				n++;
-				ps.setString(n, searchEsc);
-				n++;
-			}
-			rs = ps.executeQuery();
-			try {
-				ret = local_parseRecordSet(rs, this.itemFactory);
-			} finally {
-				rs.close();
-			}
-		} finally {
-			ps.close();
-		}
-
-		return ret;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -780,52 +709,6 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	MediaItem getters.
-
-	private static String local_getAllMediaSql (final MediaType mediaType, final boolean hideMissing, final IDbColumn sort, final SortDirection direction, final String search) {
-		StringBuilder sql = new StringBuilder();
-
-		sql.append(search == null ? _SQL_MEDIAFILES_SELECT : _SQL_MEDIAFILESTAGS_SELECT); // If we are searching need to join tags table.
-
-		if (hideMissing || mediaType != MediaType.UNKNOWN) sql.append(_SQL_WHERE);
-		if (mediaType != MediaType.UNKNOWN) {
-			sql.append(search == null ? _SQL_MEDIAFILES_WHERTYPE : _SQL_MEDIAFILESTAGS_WHERTYPE); // Type has prefix of 'm' when joining tags DB.
-		}
-		if (hideMissing) {
-			if (mediaType != MediaType.UNKNOWN) sql.append(_SQL_AND);
-			sql.append(_SQL_MEDIAFILES_WHERENOTMISSING);
-		}
-		if (search != null) {
-			if (hideMissing || mediaType != MediaType.UNKNOWN) sql.append(_SQL_AND);
-			sql.append(_SQL_MEDIAFILES_WHERES_FILEORTAG);
-		}
-		sql.append(_SQL_ORDERBYREPLACE);
-
-		String sqls = sql.toString();
-
-		switch (direction) {
-			case ASC:
-				sqls = sqls.replace("{DIR}", "ASC");
-				break;
-
-			case DESC:
-				sqls = sqls.replace("{DIR}", "DESC");
-				break;
-
-			default:
-				throw new IllegalArgumentException();
-
-		}
-
-		String sortTerm = sort.getName();
-		if (sort.getSortOpts() != null) {
-			sortTerm = sortTerm.concat(sort.getSortOpts());
-		}
-		sqls = sqls.replace("{COL}", sortTerm);
-
-//		System.err.println("sqls=" + sqls);
-
-		return sqls;
-	}
 
 	protected static List<IMixedMediaItem> local_parseRecordSet (final ResultSet rs, final MixedMediaItemFactory itemFactory) throws SQLException {
 		final List<IMixedMediaItem> ret = new ArrayList<IMixedMediaItem>();
