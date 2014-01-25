@@ -8,7 +8,7 @@ public enum PlayerSorter implements Comparator<Player> {
 	ID {
 		@Override
 		public int compare (final Player p1, final Player p2) {
-			return p2.getId() - p1.getId();
+			return p1.getId() - p2.getId();
 		}
 	};
 
