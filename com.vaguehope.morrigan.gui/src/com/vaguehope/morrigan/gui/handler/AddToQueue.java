@@ -29,7 +29,7 @@ public class AddToQueue  extends AbstractHandler {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	public Object execute(ExecutionEvent event) throws ExecutionException {
+	public Object execute(final ExecutionEvent event) throws ExecutionException {
 		// FIXME work out how to pass parameters correctly.
 
 		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindow(event);
@@ -70,7 +70,7 @@ public class AddToQueue  extends AbstractHandler {
 				for (IMediaTrack track : selectedTracks) {
 					if (track.isPlayable()) { // Don't queue things we can't play.
 						PlayItem item = new PlayItem(list, track);
-						playerView.getPlayer().addToQueue(item);
+						playerView.getPlayer().getQueue().addToQueue(item);
 					}
 				}
 			}

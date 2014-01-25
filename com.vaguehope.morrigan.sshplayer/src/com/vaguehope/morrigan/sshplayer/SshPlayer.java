@@ -10,13 +10,14 @@ import java.util.logging.Logger;
 
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import com.vaguehope.morrigan.model.Register;
-import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
+import com.vaguehope.morrigan.player.DefaultPlayerQueue;
 import com.vaguehope.morrigan.player.OrderHelper;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.Player;
+import com.vaguehope.morrigan.player.PlayerQueue;
 
 public class SshPlayer implements Player {
 
@@ -25,15 +26,17 @@ public class SshPlayer implements Player {
 	private final int playerId;
 	private final CliHost host;
 	private final Register<Player> register;
+	private final DefaultPlayerQueue queue;
 
-	private AtomicReference<PlaybackOrder> playbackOrder = new AtomicReference<PlaybackOrder>(PlaybackOrder.SEQUENTIAL);
-	private AtomicReference<CliPlayer> cliPlayer = new AtomicReference<CliPlayer>();
-	private AtomicReference<PlayItem> currentItem = new AtomicReference<PlayItem>();
+	private final AtomicReference<PlaybackOrder> playbackOrder = new AtomicReference<PlaybackOrder>(PlaybackOrder.SEQUENTIAL);
+	private final AtomicReference<CliPlayer> cliPlayer = new AtomicReference<CliPlayer>();
+	private final AtomicReference<PlayItem> currentItem = new AtomicReference<PlayItem>();
 
-	public SshPlayer (int id, CliHost host, Register<Player> register) {
+	public SshPlayer (final int id, final CliHost host, final Register<Player> register) {
 		this.playerId = id;
 		this.host = host;
 		this.register = register;
+		this.queue = new DefaultPlayerQueue();
 	}
 
 	@Override
@@ -57,19 +60,19 @@ public class SshPlayer implements Player {
 	}
 
 	@Override
-	public void loadAndStartPlaying (IMediaTrackList<? extends IMediaTrack> list) {
+	public void loadAndStartPlaying (final IMediaTrackList<? extends IMediaTrack> list) {
 		IMediaTrack nextTrack = OrderHelper.getNextTrack(list, null, this.playbackOrder.get());
 		loadAndStartPlaying(list, nextTrack);
 	}
 
 	@Override
-	public void loadAndStartPlaying (IMediaTrackList<? extends IMediaTrack> list, IMediaTrack track) {
+	public void loadAndStartPlaying (final IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack track) {
 		if (track == null) throw new NullPointerException();
 		loadAndStartPlaying(new PlayItem(list, track));
 	}
 
 	@Override
-	public void loadAndStartPlaying (PlayItem item) {
+	public void loadAndStartPlaying (final PlayItem item) {
 		File media = new File(item.item.getFilepath());
 		if (!media.exists()) {
 			// TODO report to some status line.
@@ -148,7 +151,7 @@ public class SshPlayer implements Player {
 	}
 
 	@Override
-	public void seekTo (double d) {
+	public void seekTo (final double d) {
 		LOG.info("TODO: seek: " + d);
 	}
 
@@ -158,7 +161,7 @@ public class SshPlayer implements Player {
 	}
 
 	@Override
-	public void setPlaybackOrder (PlaybackOrder order) {
+	public void setPlaybackOrder (final PlaybackOrder order) {
 		this.playbackOrder.set(order);
 	}
 
@@ -168,67 +171,8 @@ public class SshPlayer implements Player {
 	}
 
 	@Override
-	public void addToQueue (PlayItem item) {
-		LOG.info("TODO: add to queue: " + item);
-	}
-
-	@Override
-	public void addToQueue (List<PlayItem> items) {
-		LOG.info("TODO: add to queue: " + items);
-	}
-
-	@Override
-	public void removeFromQueue (PlayItem item) {
-		LOG.info("TODO: remove from queue: " + item);
-	}
-
-	@Override
-	public void clearQueue () {
-		LOG.info("TODO: clear queue");
-	}
-
-	@Override
-	public void moveInQueue (List<PlayItem> items, boolean moveDown) {
-		LOG.info("TODO: move in queue");
-	}
-
-	@Override
-	public void moveInQueueEnd (List<PlayItem> items, boolean toBottom) {
-		LOG.info("TODO: move to end of queue");
-	}
-
-	@Override
-	public List<PlayItem> getQueueList () {
-		return Collections.emptyList();
-	}
-
-	@Override
-	public void setQueueList (List<PlayItem> items) {
-		LOG.info("TODO: set queue list");
-	}
-
-	@Override
-	public void shuffleQueue () {
-		LOG.info("TODO: shuffle queue");
-	}
-
-	@Override
-	public DurationData getQueueTotalDuration () {
-		return new DurationData() {
-			@Override
-			public boolean isComplete () {
-				return true;
-			}
-			@Override
-			public long getDuration () {
-				return 0;
-			}
-		};
-	}
-
-	@Override
-	public PlayItem getQueueItemById (int id) {
-		return null;
+	public PlayerQueue getQueue () {
+		return this.queue;
 	}
 
 	@Override
@@ -237,7 +181,7 @@ public class SshPlayer implements Player {
 	}
 
 	@Override
-	public void goFullscreen (int monitor) {
+	public void goFullscreen (final int monitor) {
 		LOG.info("TODO: todo go full screen?");
 	}
 

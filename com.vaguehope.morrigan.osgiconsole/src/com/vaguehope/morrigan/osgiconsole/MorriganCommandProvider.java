@@ -554,9 +554,9 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 
 		ci.print("\tqueue: ");
-		ci.print(String.valueOf(player.getQueueList().size()));
+		ci.print(String.valueOf(player.getQueue().getQueueList().size()));
 		ci.print(" items (");
-		DurationData d = player.getQueueTotalDuration();
+		DurationData d = player.getQueue().getQueueTotalDuration();
 		if (!d.isComplete()) ci.print(("more than "));
 		ci.print(TimeHelper.formatTimeSeconds(d.getDuration()));
 		ci.println(")");
@@ -586,7 +586,7 @@ public class MorriganCommandProvider implements CommandProvider {
 			}
 		}
 		else if (addToQueue && args.size() == 1 && args.get(0).equals("clear")) {
-			player.clearQueue();
+			player.getQueue().clearQueue();
 			ci.println("Queue for " + player.getName() + " player cleared.");
 		}
 		else {
@@ -606,7 +606,7 @@ public class MorriganCommandProvider implements CommandProvider {
 			}
 			else if (results.size() == 1) {
 				if (addToQueue) {
-					player.addToQueue(results.get(0));
+					player.getQueue().addToQueue(results.get(0));
 					ci.println("Enqueued '" + results.get(0).toString() + "'.");
 				}
 				else {
@@ -667,14 +667,14 @@ public class MorriganCommandProvider implements CommandProvider {
 	}
 
 	private static void doPlayersPlayerPrintQueue (CommandInterpreter ci, Player player) {
-		List<PlayItem> queue = player.getQueueList();
+		List<PlayItem> queue = player.getQueue().getQueueList();
 
 		if (queue.size() < 1) {
 			ci.println("Queue for " + player.getName() + " player is empty.");
 			return;
 		}
 
-		DurationData duration = player.getQueueTotalDuration();
+		DurationData duration = player.getQueue().getQueueTotalDuration();
 		ci.println(player.getName() + " player has " + queue.size()
 				+ " items totaling " + (duration.isComplete() ? "" : " more than ")
 				+ TimeHelper.formatTimeSeconds(duration.getDuration()) + " in its queue.");

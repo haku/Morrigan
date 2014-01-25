@@ -52,14 +52,14 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		makeControls(parent);
 
 		makeQueueRefresher();
-		getPlayer().addQueueChangeListener(this.queueChangedRrefresher);
+		getPlayer().getQueue().addQueueChangeListener(this.queueChangedRrefresher);
 
 		getEventHandler().updateStatus();
 	}
 
 	@Override
 	public void dispose() {
-		getPlayer().removeQueueChangeListener(this.queueChangedRrefresher);
+		getPlayer().getQueue().removeQueueChangeListener(this.queueChangedRrefresher);
 		disposeControls();
 		disposeIcons();
 		super.dispose();
@@ -440,7 +440,7 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		this.queueChangedRrefresher = new RefreshTimer(getSite().getShell().getDisplay(), 5000, new Runnable() {
 			@Override
 			public void run() {
-				int size = getPlayer().getQueueList().size();
+				int size = getPlayer().getQueue().getQueueList().size();
 				if (size > 0) {
 					ViewControls.this.btnQueue.setText("(" + size + ")");
 
