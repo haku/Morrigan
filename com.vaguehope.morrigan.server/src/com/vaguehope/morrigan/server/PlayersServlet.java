@@ -210,11 +210,11 @@ public class PlayersServlet extends HttpServlet {
 			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "'action' parameter not set desu~");
 		}
 		else if (act.equals(CMD_CLEAR)) {
-			player.clearQueue();
+			player.getQueue().clearQueue();
 			printPlayerQueue(resp, player);
 		}
 		else if (act.equals(CMD_SHUFFLE)) {
-			player.shuffleQueue();
+			player.getQueue().shuffleQueue();
 			printPlayerQueue(resp, player);
 		}
 		else {
@@ -228,16 +228,16 @@ public class PlayersServlet extends HttpServlet {
 			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "'action' parameter not set desu~");
 		}
 		else if (act.equals(CMD_UP) || act.equals(CMD_DOWN) || act.equals(CMD_REMOVE) || act.equals(CMD_TOP) || act.equals(CMD_BOTTOM)) {
-			PlayItem queueItem = player.getQueueItemById(item);
+			PlayItem queueItem = player.getQueue().getQueueItemById(item);
 			if (queueItem != null) {
 				if (act.equals(CMD_REMOVE)) {
-					player.removeFromQueue(queueItem);
+					player.getQueue().removeFromQueue(queueItem);
 				}
 				else if (act.equals(CMD_TOP) || act.equals(CMD_BOTTOM)) {
-					player.moveInQueueEnd(Arrays.asList(queueItem), act.equals(CMD_BOTTOM));
+					player.getQueue().moveInQueueEnd(Arrays.asList(queueItem), act.equals(CMD_BOTTOM));
 				}
 				else if (act.equals(CMD_UP) || act.equals(CMD_DOWN)) {
-					player.moveInQueue(Arrays.asList(queueItem), act.equals(CMD_DOWN));
+					player.getQueue().moveInQueue(Arrays.asList(queueItem), act.equals(CMD_DOWN));
 				}
 				else {
 					throw new IllegalStateException("Out of cheese desu~.");
@@ -361,8 +361,8 @@ public class PlayersServlet extends HttpServlet {
 		PlayItem currentItem = p.getCurrentItem();
 		String trackTitle = (currentItem != null && currentItem.item != null) ? currentItem.item.getTitle() : "(empty)";
 
-		int queueLength = p.getQueueList().size();
-		DurationData queueDuration = p.getQueueTotalDuration();
+		int queueLength = p.getQueue().getQueueList().size();
+		DurationData queueDuration = p.getQueue().getQueueTotalDuration();
 
 		FeedHelper.addElement(dw, "title", "p" + p.getId() + ":" + p.getPlayState().toString() + ":" + trackTitle);
 		String selfUrl = CONTEXTPATH + "/" + p.getId();
@@ -437,15 +437,15 @@ public class PlayersServlet extends HttpServlet {
 		FeedHelper.addLink(dw, CONTEXTPATH + "/" + p.getId() + "/" + PATH_QUEUE, "self", "text/xml");
 		FeedHelper.addLink(dw, CONTEXTPATH + "/" + p.getId(), "player", "text/xml");
 
-		int queueLength = p.getQueueList().size();
-		DurationData queueDuration = p.getQueueTotalDuration();
+		int queueLength = p.getQueue().getQueueList().size();
+		DurationData queueDuration = p.getQueue().getQueueTotalDuration();
 		String queueDurationString = (queueDuration.isComplete() ? "" : "more than ") +
 				TimeHelper.formatTimeSeconds(queueDuration.getDuration());
 
 		FeedHelper.addElement(dw, "queuelength", queueLength);
 		FeedHelper.addElement(dw, "queueduration", queueDurationString); // FIXME make parsasble.
 
-		List<PlayItem> queueList = p.getQueueList();
+		List<PlayItem> queueList = p.getQueue().getQueueList();
 		for (PlayItem playItem : queueList) {
 			final IMediaTrackList<? extends IMediaTrack> list = playItem.list;
 			final IMediaTrack mi = playItem.item;

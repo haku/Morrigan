@@ -43,8 +43,8 @@ public class ViewQueue extends ViewPart {
 		IViewPart findView = getSite().getPage().findView(ViewControls.ID); // FIXME can i find AbstractPlayerView?
 		if (findView != null && findView instanceof AbstractPlayerView) {
 			this.abstractPlayerView = (AbstractPlayerView) findView;
-			setContent(this.abstractPlayerView.getPlayer().getQueueList());
-			this.abstractPlayerView.getPlayer().addQueueChangeListener(this.queueChangedRrefresher);
+			setContent(this.abstractPlayerView.getPlayer().getQueue().getQueueList());
+			this.abstractPlayerView.getPlayer().getQueue().addQueueChangeListener(this.queueChangedRrefresher);
 			this.queueChangedRrefresher.run();
 		}
 	}
@@ -59,7 +59,7 @@ public class ViewQueue extends ViewPart {
 		this.isDisposed = true;
 
 		if (this.abstractPlayerView != null ) {
-			this.abstractPlayerView.getPlayer().removeQueueChangeListener(this.queueChangedRrefresher);
+			this.abstractPlayerView.getPlayer().getQueue().removeQueueChangeListener(this.queueChangedRrefresher);
 		}
 
 		this.imageCache.clearCache();
@@ -138,7 +138,7 @@ public class ViewQueue extends ViewPart {
 			setContentDescription("Queue is empty.");
 		}
 		else {
-			DurationData d = this.abstractPlayerView.getPlayer().getQueueTotalDuration();
+			DurationData d = this.abstractPlayerView.getPlayer().getQueue().getQueueTotalDuration();
 			setContentDescription(
 					this.queue.size() + " items"
 					+ " totaling " + (d.isComplete() ? "" : "more than ") +
@@ -209,7 +209,7 @@ public class ViewQueue extends ViewPart {
 		@Override
 		public void run() {
 			ViewQueue.this.queueChangedRrefresher.reset();
-			ViewQueue.this.abstractPlayerView.getPlayer().moveInQueue(getSelectedSources(), false);
+			ViewQueue.this.abstractPlayerView.getPlayer().getQueue().moveInQueue(getSelectedSources(), false);
 		}
 	};
 
@@ -217,7 +217,7 @@ public class ViewQueue extends ViewPart {
 		@Override
 		public void run() {
 			ViewQueue.this.queueChangedRrefresher.reset();
-			ViewQueue.this.abstractPlayerView.getPlayer().moveInQueue(getSelectedSources(), true);
+			ViewQueue.this.abstractPlayerView.getPlayer().getQueue().moveInQueue(getSelectedSources(), true);
 		}
 	};
 
@@ -229,7 +229,7 @@ public class ViewQueue extends ViewPart {
 				return;
 			}
 			for (PlayItem item : selectedSources) {
-				ViewQueue.this.abstractPlayerView.getPlayer().removeFromQueue(item);
+				ViewQueue.this.abstractPlayerView.getPlayer().getQueue().removeFromQueue(item);
 			}
 		}
 	};
@@ -237,7 +237,7 @@ public class ViewQueue extends ViewPart {
 	protected IAction shuffleAction = new Action ("Shuffle", Activator.getImageDescriptor("icons/question.png")) {
 		@Override
 		public void run() {
-			ViewQueue.this.abstractPlayerView.getPlayer().shuffleQueue();
+			ViewQueue.this.abstractPlayerView.getPlayer().getQueue().shuffleQueue();
 		}
 	};
 

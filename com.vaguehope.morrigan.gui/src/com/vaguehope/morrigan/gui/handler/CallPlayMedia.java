@@ -97,7 +97,7 @@ public class CallPlayMedia extends AbstractHandler {
 			playerView = (AbstractPlayerView) findView;
 			if (selectedItem == null) {
 				if (addToQueue) {
-					playerView.getPlayer().addToQueue(new PlayItem(mediaList, null));
+					playerView.getPlayer().getQueue().addToQueue(new PlayItem(mediaList, null));
 				}
 				else {
 					playerView.getPlayer().loadAndStartPlaying(mediaList);
@@ -105,7 +105,7 @@ public class CallPlayMedia extends AbstractHandler {
 			}
 			else {
 				if (addToQueue) {
-					playerView.getPlayer().addToQueue(new PlayItem(mediaList, selectedItem));
+					playerView.getPlayer().getQueue().addToQueue(new PlayItem(mediaList, selectedItem));
 				}
 				else {
 					playerView.getPlayer().loadAndStartPlaying(mediaList, selectedItem);

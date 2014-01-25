@@ -259,7 +259,7 @@ public class MlistsServlet extends HttpServlet {
 					resp.getWriter().println("MMDB playing desu~");
 				}
 				else if (action.equals(CMD_QUEUE)) {
-					player.addToQueue(new PlayItem(mmdb, null));
+					player.getQueue().addToQueue(new PlayItem(mmdb, null));
 					resp.getWriter().println("MMDB added to queue desu~");
 				}
 				else {
@@ -287,7 +287,7 @@ public class MlistsServlet extends HttpServlet {
 					resp.getWriter().println("Item playing desu~");
 				}
 				else if (action.equals(CMD_QUEUE)) {
-					player.addToQueue(new PlayItem(mmdb, item));
+					player.getQueue().addToQueue(new PlayItem(mmdb, item));
 					resp.getWriter().println("Item added to queue desu~");
 				}
 				else {
@@ -322,13 +322,13 @@ public class MlistsServlet extends HttpServlet {
 					trackPlayItems.add(new PlayItem(mmdb, track));
 				}
 				if (action.equals(CMD_PLAY)) {
-					player.addToQueue(trackPlayItems);
-					player.moveInQueueEnd(trackPlayItems, false);
+					player.getQueue().addToQueue(trackPlayItems);
+					player.getQueue().moveInQueueEnd(trackPlayItems, false);
 					player.nextTrack();
 					resp.getWriter().println("Album playing desu~");
 				}
 				else if (action.equals(CMD_QUEUE)) {
-					player.addToQueue(trackPlayItems);
+					player.getQueue().addToQueue(trackPlayItems);
 					resp.getWriter().println("Album added to queue desu~");
 				}
 				else {

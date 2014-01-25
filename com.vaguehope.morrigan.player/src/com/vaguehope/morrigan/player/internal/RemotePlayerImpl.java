@@ -4,11 +4,11 @@ import java.util.List;
 import java.util.Map;
 
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
-import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayItem;
+import com.vaguehope.morrigan.player.PlayerQueue;
 import com.vaguehope.morrigan.player.RemotePlayer;
 
 public class RemotePlayerImpl implements RemotePlayer {
@@ -21,189 +21,140 @@ public class RemotePlayerImpl implements RemotePlayer {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public RemotePlayerImpl (int id, String name, String remoteHost, int remotePlayerId) {
+	public RemotePlayerImpl (final int id, final String name, final String remoteHost, final int remotePlayerId) {
 		this.id = id;
 		this.name = name;
 		this.remoteHost = remoteHost;
 		this.remotePlayerId = remotePlayerId;
 
 	}
+
 	@Override
-	public void dispose() {
+	public void dispose () {
 		// Unused.
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	public int getId() {
+	public int getId () {
 		return this.id;
 	}
 
 	@Override
-	public String getName() {
+	public String getName () {
 		return this.name;
 	}
 
 	@Override
-	public String getRemoteHost() {
+	public String getRemoteHost () {
 		return this.remoteHost;
 	}
 
 	@Override
-	public int getRemotePlayerId() {
+	public int getRemotePlayerId () {
 		return this.remotePlayerId;
 	}
 
 	@Override
-	public boolean isAvailable() {
+	public boolean isAvailable () {
 		throw new UnsupportedOperationException("Not implemented.");
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	public boolean isPlaybackEngineReady() {
+	public boolean isPlaybackEngineReady () {
 		return false;
 	}
 
 	@Override
-	public void loadAndStartPlaying(IMediaTrackList<? extends IMediaTrack> list) {
+	public void loadAndStartPlaying (final IMediaTrackList<? extends IMediaTrack> list) {
 		throw new UnsupportedOperationException("Not implemented.");
 	}
 
 	@Override
-	public void loadAndStartPlaying(IMediaTrackList<? extends IMediaTrack> list, IMediaTrack track) {
+	public void loadAndStartPlaying (final IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack track) {
 		throw new UnsupportedOperationException("Not implemented.");
 	}
 
 	@Override
-	public void loadAndStartPlaying(PlayItem item) {
+	public void loadAndStartPlaying (final PlayItem item) {
 		throw new UnsupportedOperationException("Not implemented.");
 	}
 
 	@Override
-	public void pausePlaying() {
+	public void pausePlaying () {
 		throw new UnsupportedOperationException("Not implemented.");
 	}
 
 	@Override
-	public void stopPlaying() {
+	public void stopPlaying () {
 		throw new UnsupportedOperationException("Not implemented.");
 	}
 
 	@Override
-	public void nextTrack() {
+	public void nextTrack () {
 		throw new UnsupportedOperationException("Not implemented.");
 	}
 
 	@Override
-	public PlayState getPlayState() {
+	public PlayState getPlayState () {
 		throw new UnsupportedOperationException("Not implemented.");
 	}
 
 	@Override
-	public PlayItem getCurrentItem() {
+	public PlayItem getCurrentItem () {
 		throw new UnsupportedOperationException("Not implemented.");
 	}
 
 	@Override
-	public IMediaTrackList<? extends IMediaTrack> getCurrentList() {
+	public IMediaTrackList<? extends IMediaTrack> getCurrentList () {
 		throw new UnsupportedOperationException("Not implemented.");
 	}
 
 	@Override
-	public long getCurrentPosition() {
+	public long getCurrentPosition () {
 		throw new UnsupportedOperationException("Not implemented.");
 	}
 
 	@Override
-	public int getCurrentTrackDuration() {
+	public int getCurrentTrackDuration () {
 		throw new UnsupportedOperationException("Not implemented.");
 	}
 
 	@Override
-	public void seekTo(double d) {
+	public void seekTo (final double d) {
 		throw new UnsupportedOperationException("Not implemented.");
 	}
 
 	@Override
-	public PlaybackOrder getPlaybackOrder() {
+	public PlaybackOrder getPlaybackOrder () {
 		throw new UnsupportedOperationException("Not implemented.");
 	}
 
 	@Override
-	public void setPlaybackOrder(PlaybackOrder order) {
+	public void setPlaybackOrder (final PlaybackOrder order) {
 		throw new UnsupportedOperationException("Not implemented.");
 	}
 
 	@Override
-	public List<PlayItem> getHistory() {
+	public List<PlayItem> getHistory () {
 		throw new UnsupportedOperationException("Not implemented.");
 	}
 
 	@Override
-	public void addToQueue(PlayItem item) {
+	public PlayerQueue getQueue () {
 		throw new UnsupportedOperationException("Not implemented.");
 	}
 
 	@Override
-	public void addToQueue(List<PlayItem> item) {
+	public Map<Integer, String> getMonitors () {
 		throw new UnsupportedOperationException("Not implemented.");
 	}
 
 	@Override
-	public void removeFromQueue(PlayItem item) {
-		throw new UnsupportedOperationException("Not implemented.");
-	}
-
-	@Override
-	public void clearQueue() {
-		throw new UnsupportedOperationException("Not implemented.");
-	}
-
-	@Override
-	public void moveInQueue(List<PlayItem> items, boolean moveDown) {
-		throw new UnsupportedOperationException("Not implemented.");
-	}
-
-	@Override
-	public void moveInQueueEnd(List<PlayItem> items, boolean toBottom) {
-		throw new UnsupportedOperationException("Not implemented.");
-	}
-
-	@Override
-	public void shuffleQueue() {
-		throw new UnsupportedOperationException("Not implemented.");
-	}
-
-	@Override
-	public List<PlayItem> getQueueList() {
-		throw new UnsupportedOperationException("Not implemented.");
-	}
-
-	@Override
-	public void setQueueList(List<PlayItem> items) {
-		throw new UnsupportedOperationException("Not implemented.");
-	}
-
-	@Override
-	public DurationData getQueueTotalDuration() {
-		throw new UnsupportedOperationException("Not implemented.");
-	}
-
-	@Override
-	public PlayItem getQueueItemById(int itemId) {
-		throw new UnsupportedOperationException("Not implemented.");
-	}
-
-	@Override
-	public Map<Integer, String> getMonitors() {
-		throw new UnsupportedOperationException("Not implemented.");
-	}
-
-	@Override
-	public void goFullscreen(int monitor) {
+	public void goFullscreen (final int monitor) {
 		throw new UnsupportedOperationException("Not implemented.");
 	}
 

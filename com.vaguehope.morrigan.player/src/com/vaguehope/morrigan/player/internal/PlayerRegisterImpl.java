@@ -12,7 +12,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
 import com.vaguehope.morrigan.engines.playback.PlaybackEngineFactory;
-import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.player.LocalPlayer;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayerEventHandler;
@@ -28,12 +27,10 @@ public class PlayerRegisterImpl implements PlayerRegister {
 	private final ConcurrentMap<Integer, Integer> localPlayerIds = new ConcurrentHashMap<Integer, Integer>();
 
 	private final PlaybackEngineFactory playbackEngineFactory;
-	private final MediaFactory mediaFactory;
 	private final ExecutorService executorService;
 
-	public PlayerRegisterImpl (final PlaybackEngineFactory playbackEngineFactory, final MediaFactory mediaFactory, final ExecutorService executorService) {
+	public PlayerRegisterImpl (final PlaybackEngineFactory playbackEngineFactory, final ExecutorService executorService) {
 		this.playbackEngineFactory = playbackEngineFactory;
-		this.mediaFactory = mediaFactory;
 		this.executorService = executorService;
 	}
 
@@ -92,7 +89,7 @@ public class PlayerRegisterImpl implements PlayerRegister {
 
 	@Override
 	public LocalPlayer makeLocal (final String name, final PlayerEventHandler eventHandler) {
-		LocalPlayer p = new LocalPlayerImpl(nextIndex(), name, eventHandler, this, this.playbackEngineFactory, this.mediaFactory, this.executorService);
+		LocalPlayer p = new LocalPlayerImpl(nextIndex(), name, eventHandler, this, this.playbackEngineFactory, this.executorService);
 		Integer i = Integer.valueOf(p.getId());
 		this.localPlayerIds.put(i, i);
 		register(p);

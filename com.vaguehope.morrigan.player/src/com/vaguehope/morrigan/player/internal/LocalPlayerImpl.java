@@ -4,11 +4,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -24,18 +22,18 @@ import com.vaguehope.morrigan.engines.playback.PlaybackException;
 import com.vaguehope.morrigan.model.Register;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DirtyState;
-import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
-import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaItemListChangeListener;
+import com.vaguehope.morrigan.player.DefaultPlayerQueue;
 import com.vaguehope.morrigan.player.LocalPlayer;
 import com.vaguehope.morrigan.player.OrderHelper;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayerEventHandler;
+import com.vaguehope.morrigan.player.PlayerQueue;
 
 public class LocalPlayerImpl implements LocalPlayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -48,8 +46,8 @@ public class LocalPlayerImpl implements LocalPlayer {
 	final PlayerEventHandler eventHandler;
 	private final Register<Player> register;
 	private final PlaybackEngineFactory playbackEngineFactory;
-	private final MediaFactory mediaFactory;
 	private final ExecutorService executorService;
+	private final PlayerQueue queue;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Main.
@@ -57,15 +55,14 @@ public class LocalPlayerImpl implements LocalPlayer {
 	public LocalPlayerImpl (final int id, final String name, final PlayerEventHandler eventHandler,
 			final Register<Player> register,
 			final PlaybackEngineFactory playbackEngineFactory,
-			final MediaFactory mediaFactory,
 			final ExecutorService executorService) {
 		this.id = id;
 		this.name = name;
 		this.eventHandler = eventHandler;
 		this.register = register;
 		this.playbackEngineFactory = playbackEngineFactory;
-		this.mediaFactory = mediaFactory;
 		this.executorService = executorService;
+		this.queue = new DefaultPlayerQueue();
 	}
 
 	@Override
@@ -177,16 +174,14 @@ public class LocalPlayerImpl implements LocalPlayer {
 	}
 
 	PlayItem getNextItemToPlay () {
-		PlayItem nextItem = null;
+		final PlayItem queueItem = this.queue.takeFromQueue();
+		if (queueItem != null) return queueItem;
 
-		if (isQueueHasItem()) {
-			nextItem = readFromQueue();
-		}
-		else if (getCurrentItem() != null && getCurrentItem().list != null) {
+		if (getCurrentItem() != null && getCurrentItem().list != null) {
 			if (getCurrentItem().item != null) {
 				IMediaTrack nextTrack = OrderHelper.getNextTrack(getCurrentItem().list, getCurrentItem().item, this._playbackOrder);
 				if (nextTrack != null) {
-					nextItem = new PlayItem(getCurrentItem().list, nextTrack);
+					return new PlayItem(getCurrentItem().list, nextTrack);
 				}
 			}
 		}
@@ -195,12 +190,12 @@ public class LocalPlayerImpl implements LocalPlayer {
 			if (currentList != null) {
 				IMediaTrack nextTrack = OrderHelper.getNextTrack(currentList, null, this._playbackOrder);
 				if (nextTrack != null) {
-					nextItem = new PlayItem(currentList, nextTrack);
+					return new PlayItem(currentList, nextTrack);
 				}
 			}
 		}
 
-		return nextItem;
+		return null;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -248,177 +243,9 @@ public class LocalPlayerImpl implements LocalPlayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Queue.
 
-	private final AtomicInteger _queueId = new AtomicInteger(0);
-	private final List<PlayItem> _queue = new ArrayList<PlayItem>();
-	private final List<Runnable> _queueChangeListeners = new ArrayList<Runnable>();
-
-	private void validateQueueItemBeforeAdd (final PlayItem item) {
-		if (item.item != null && !item.item.isPlayable()) throw new IllegalArgumentException("item is not playable.");
-		if (item.id >= 0) throw new IllegalArgumentException("item can not already have id.");
-		item.id = this._queueId.getAndIncrement();
-	}
-
 	@Override
-	public void addToQueue (final PlayItem item) {
-		validateQueueItemBeforeAdd(item);
-		this._queue.add(item);
-		callQueueChangedListeners();
-	}
-
-	@Override
-	public void addToQueue(final List<PlayItem> items) {
-		for (PlayItem item : items) {
-			validateQueueItemBeforeAdd(item);
-		}
-		this._queue.addAll(items);
-		callQueueChangedListeners();
-	}
-
-	@Override
-	public void removeFromQueue (final PlayItem item) {
-		this._queue.remove(item);
-		callQueueChangedListeners();
-	}
-
-	@Override
-	public void clearQueue () {
-		this._queue.clear();
-		callQueueChangedListeners();
-	}
-
-	@Override
-	public void moveInQueue (final List<PlayItem> items, final boolean moveDown) {
-		synchronized (this._queue) {
-			if (items == null || items.isEmpty()) return;
-
-			for (int i = (moveDown ? this._queue.size() - 1 : 0);
-			(moveDown ? i >= 0 : i < this._queue.size());
-			i = i + (moveDown ? -1 : 1)
-			) {
-				if (items.contains(this._queue.get(i))) {
-					int j;
-					if (moveDown) {
-						if (i == this._queue.size() - 1 ) {
-							j = -1;
-						} else {
-							j = i + 1;
-						}
-					} else {
-						if (i == 0) {
-							j = -1;
-						} else {
-							j = i - 1;
-						}
-					}
-					if (j != -1 && !items.contains(this._queue.get(j))) {
-						PlayItem a = this._queue.get(i);
-						PlayItem b = this._queue.get(j);
-						this._queue.set(i, b);
-						this._queue.set(j, a);
-					}
-				}
-			}
-
-			callQueueChangedListeners();
-		}
-	}
-
-	@Override
-	public void moveInQueueEnd (final List<PlayItem> items, final boolean toBottom) {
-		// TODO This could probably be done better.
-		synchronized (this._queue) {
-			List<PlayItem> ret = new ArrayList<PlayItem>(this._queue.size());
-			if (!toBottom) ret.addAll(items);
-			for (PlayItem item : this._queue) {
-				if (!items.contains(item)) ret.add(item);
-			}
-			if (toBottom) ret.addAll(items);
-			this.setQueueList(ret);
-		}
-	}
-
-	private boolean isQueueHasItem () {
-		synchronized (this._queue) {
-			return !this._queue.isEmpty();
-		}
-	}
-
-	private PlayItem readFromQueue () {
-		synchronized (this._queue) {
-			if (!this._queue.isEmpty()) {
-				PlayItem item = this._queue.remove(0);
-				callQueueChangedListeners();
-				return item;
-			}
-
-			return null;
-		}
-	}
-
-	private void callQueueChangedListeners () {
-		// TODO upgrade to use RunHelper.
-		for (Runnable r : this._queueChangeListeners) {
-			r.run();
-		}
-	}
-
-	@Override
-	public List<PlayItem> getQueueList () {
-		return Collections.unmodifiableList(this._queue);
-	}
-
-	@Override
-	public void setQueueList(final List<PlayItem> items) {
-		// TODO make thread safe.
-		synchronized (this._queue) {
-			this._queue.clear();
-			this._queue.addAll(items);
-		}
-		callQueueChangedListeners();
-	}
-
-	@Override
-	public void shuffleQueue() {
-		synchronized (this._queue) {
-			Collections.shuffle(this._queue);
-		}
-		callQueueChangedListeners();
-	}
-
-	@Override
-	public DurationData getQueueTotalDuration () {
-		boolean complete = true;
-		long duration = 0;
-
-		for (PlayItem pi : this._queue) {
-			if (pi.item != null && pi.item.getDuration() > 0) {
-				duration = duration + pi.item.getDuration();
-			} else {
-				complete = false;
-			}
-		}
-
-		return this.mediaFactory.getNewDurationData(duration, complete);
-	}
-
-	@Override
-	public PlayItem getQueueItemById (final int itemId) {
-		// TODO Is there a better way to do this?
-		Map<Integer, PlayItem> q = new HashMap<Integer, PlayItem>();
-		for (PlayItem item : this._queue) {
-			q.put(Integer.valueOf(item.id), item);
-		}
-		return q.get(Integer.valueOf(itemId));
-	}
-
-	@Override
-	public void addQueueChangeListener (final Runnable listener) {
-		this._queueChangeListeners.add(listener);
-	}
-
-	@Override
-	public void removeQueueChangeListener (final Runnable listener) {
-		this._queueChangeListeners.remove(listener);
+	public PlayerQueue getQueue () {
+		return this.queue;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

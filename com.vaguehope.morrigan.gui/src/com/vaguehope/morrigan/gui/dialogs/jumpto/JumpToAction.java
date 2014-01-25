@@ -61,7 +61,7 @@ public class JumpToAction extends Action {
 				player.loadAndStartPlaying(currentList, dlg.getReturnItem());
 				break;
 			case ENQUEUE:
-				player.addToQueue(new PlayItem(currentList, dlg.getReturnItem()));
+				player.getQueue().addToQueue(new PlayItem(currentList, dlg.getReturnItem()));
 				break;
 			case REVEAL:
 				// TODO extract revealItemInLists() and do not go via ViewControls.
@@ -82,7 +82,7 @@ public class JumpToAction extends Action {
 		final List<IMediaTrack> shuffeledList = new ArrayList<IMediaTrack>(dlg.getSearchResults());
 		Collections.shuffle(shuffeledList);
 		for (final IMediaTrack track : shuffeledList) {
-			player.addToQueue(new PlayItem(currentList, track));
+			player.getQueue().addToQueue(new PlayItem(currentList, track));
 		}
 	}
 
