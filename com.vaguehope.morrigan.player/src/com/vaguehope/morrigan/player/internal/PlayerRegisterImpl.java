@@ -1,7 +1,9 @@
 package com.vaguehope.morrigan.player.internal;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutorService;
@@ -38,7 +40,9 @@ public class PlayerRegisterImpl implements PlayerRegister {
 	@Override
 	public Collection<Player> getAll () {
 		checkAlive();
-		return Collections.unmodifiableCollection(this.all.values());
+		final List<Player> l = new ArrayList<Player>(this.all.values());
+		Collections.sort(l, PlayerSorter.ID);
+		return Collections.unmodifiableCollection(l);
 	}
 
 	@Override
