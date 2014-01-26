@@ -1,6 +1,7 @@
 (function() {
 
   var DEFAULT_QUERY = '*';
+  var SUCCESS_WAIT_MILLIS = 500;
 
   var mlistsStatusBar;
   var queryStatusBar;
@@ -372,7 +373,7 @@
       chosePlayerAndActionItem(items, 'queue', status, function() {
         setTimeout(function() {
           menu.remove();
-        }, 1000);
+        }, SUCCESS_WAIT_MILLIS);
       });
     });
 
@@ -421,7 +422,7 @@
       chosePlayerAndActionItem(item, 'play', status, function() {
         setTimeout(function() {
           menu.remove();
-        }, 1000);
+        }, SUCCESS_WAIT_MILLIS);
       });
     });
 
@@ -435,7 +436,7 @@
       chosePlayerAndActionItem(item, 'queue', status, function() {
         setTimeout(function() {
           menu.remove();
-        }, 1000);
+        }, SUCCESS_WAIT_MILLIS);
       });
     });
 
@@ -627,7 +628,7 @@
       chosePlayerAndActionItem(item, 'play', status, function() {
         setTimeout(function() {
           menu.remove();
-        }, 1000);
+        }, SUCCESS_WAIT_MILLIS);
       });
     });
 
@@ -639,7 +640,7 @@
       chosePlayerAndActionItem(item, 'queue', status, function() {
         setTimeout(function() {
           menu.remove();
-        }, 1000);
+        }, SUCCESS_WAIT_MILLIS);
       });
     });
 
