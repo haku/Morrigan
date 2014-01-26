@@ -19,7 +19,6 @@ public final class OrderHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	// TODO move to own class next to IPlayerAbstact that uses it.
-	// TODO add "STOP" entry to not auto-advance.
 	public static enum PlaybackOrder {
 
 		SEQUENTIAL(0) {
@@ -60,7 +59,7 @@ public final class OrderHelper {
 
 		private int n;
 
-		private PlaybackOrder (int n) {
+		private PlaybackOrder (final int n) {
 			this.n = n;
 		}
 
@@ -68,7 +67,7 @@ public final class OrderHelper {
 			return this.n;
 		}
 
-		public static String joinLabels (String sep) {
+		public static String joinLabels (final String sep) {
 			PlaybackOrder[] a = values();
 			StringBuilder b = new StringBuilder(a[0].toString());
 			for (int i = 1; i < a.length; i++) {
@@ -81,14 +80,14 @@ public final class OrderHelper {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public static PlaybackOrder parsePlaybackOrder (String s) {
+	public static PlaybackOrder parsePlaybackOrder (final String s) {
 		for (PlaybackOrder o : PlaybackOrder.values()) {
 			if (s.equals(o.toString())) return o;
 		}
 		throw new IllegalArgumentException("Unknown order mode toString: " + s);
 	}
 
-	public static PlaybackOrder forceParsePlaybackOrder (String s) {
+	public static PlaybackOrder forceParsePlaybackOrder (final String s) {
 		String arg = s.toLowerCase();
 		for (PlaybackOrder o : PlaybackOrder.values()) {
 			if (o.toString().toLowerCase().contains(arg)) {
@@ -98,7 +97,7 @@ public final class OrderHelper {
 		return null;
 	}
 
-	public static PlaybackOrder parsePlaybackOrderByName (String s) {
+	public static PlaybackOrder parsePlaybackOrderByName (final String s) {
 		for (PlaybackOrder o : PlaybackOrder.values()) {
 			if (s.equals(o.name())) return o;
 		}
@@ -108,7 +107,7 @@ public final class OrderHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	// TODO take into account disabled and missing tracks.
-	public static IMediaTrack getNextTrack (IMediaTrackList<? extends IMediaTrack> list, IMediaTrack track, PlaybackOrder mode) {
+	public static IMediaTrack getNextTrack (final IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack track, final PlaybackOrder mode) {
 		if (list.getCount() <= 0) return null;
 
 		switch (mode) {
@@ -135,7 +134,7 @@ public final class OrderHelper {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private static IMediaTrack getNextTrackSequencial (IMediaTrackList<? extends IMediaTrack> list, IMediaItem track) {
+	private static IMediaTrack getNextTrackSequencial (final IMediaTrackList<? extends IMediaTrack> list, final IMediaItem track) {
 		IMediaTrack ret = null;
 		List<? extends IMediaTrack> mediaTracks = list.getMediaItems();
 
@@ -173,7 +172,7 @@ public final class OrderHelper {
 		return ret;
 	}
 
-	private static IMediaTrack getNextTrackRandom (IMediaTrackList<? extends IMediaTrack> list, IMediaItem current) {
+	private static IMediaTrack getNextTrackRandom (final IMediaTrackList<? extends IMediaTrack> list, final IMediaItem current) {
 		Random generator = new Random();
 		List<? extends IMediaTrack> mediaTracks = list.getMediaItems();
 
@@ -198,7 +197,7 @@ public final class OrderHelper {
 		throw new RuntimeException("Failed to find next track.  This should not happen.");
 	}
 
-	private static IMediaTrack getNextTrackByStartCount (IMediaTrackList<? extends IMediaTrack> list, IMediaItem current) {
+	private static IMediaTrack getNextTrackByStartCount (final IMediaTrackList<? extends IMediaTrack> list, final IMediaItem current) {
 		IMediaTrack ret = null;
 		List<? extends IMediaTrack> tracks = list.getMediaItems();
 
@@ -244,7 +243,7 @@ public final class OrderHelper {
 		return ret;
 	}
 
-	private static IMediaTrack getNextTrackByLastPlayedDate (IMediaTrackList<? extends IMediaTrack> list, IMediaTrack current) {
+	private static IMediaTrack getNextTrackByLastPlayedDate (final IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack current) {
 		IMediaTrack ret = null;
 		List<? extends IMediaTrack> tracks = list.getMediaItems();
 		Date now = new Date();
@@ -307,17 +306,17 @@ public final class OrderHelper {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private static boolean validChoice (IMediaTrack i) {
+	private static boolean validChoice (final IMediaTrack i) {
 		return i.isEnabled() && i.isPlayable() && !i.isMissing();
 	}
 
-	private static boolean validChoice (IMediaTrack i, IMediaItem current) {
+	private static boolean validChoice (final IMediaTrack i, final IMediaItem current) {
 		return i.isEnabled() && i.isPlayable() && !i.isMissing() && i != current;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private static long dateDiffDays (Date olderDate, Date newerDate) {
+	private static long dateDiffDays (final Date olderDate, final Date newerDate) {
 		long l = (newerDate.getTime() - olderDate.getTime()) / 86400000;
 		if (l < 1) l = 1;
 		return l;
