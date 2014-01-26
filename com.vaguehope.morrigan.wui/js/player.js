@@ -432,11 +432,11 @@ Players = {};
     });
   }
 
-  function writeQueueItem(queue, item, action, onStatus, onQueue) {
+  function writeQueueItem(pid, item, action, onStatus, onQueue) {
     $.ajax({
       type : 'POST',
       cache : false,
-      url : 'players/' + queue.pid + '/queue/' + item.id,
+      url : 'players/' + pid + '/queue' + (item ? '/' + item.id : ''),
       data : 'action=' + action,
       contentTypeString : 'application/x-www-form-urlencoded',
       dataType : 'xml',
@@ -445,9 +445,9 @@ Players = {};
       },
       success : function(xml) {
         var queueNode = $(xml).find('queue');
-        var newQueue = parseQueueNode(queue.pid, queueNode);
+        var newQueue = parseQueueNode(pid, queueNode);
         onQueue(newQueue);
-        onStatus('Queue ' + queue.pid + ' updated.');
+        onStatus('Queue ' + pid + ' updated.');
       },
       error : function(jqXHR, textStatus, errorThrown) {
         onStatus('Error: ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
@@ -496,10 +496,15 @@ Players = {};
     title.text(player.name);
     menu.append(title);
 
+    var queueBtns = [];
+    var fullscreenBtns = [];
+
     // Add play order button.
     var orderBtn = $('<button>playback order</button>');
     orderBtn.click(function() {
       orderBtn.attr('disabled', 'true');
+      removeAll(queueBtns);
+      removeAll(fullscreenBtns);
       $.each(PLAYBACK_ORDERS, function(index, order) {
         var btn = $('<button>');
         btn.text(order.title);
@@ -515,6 +520,20 @@ Players = {};
     });
     menu.append(orderBtn);
 
+    // Add queue buttons.
+    var queueActions = ['clear', 'shuffle'];
+    $.each(queueActions, function(index, action) {
+      var btn = $('<button>' + action + ' queue</button>');
+      btn.click(function() {
+        var status = $('<p>');
+        btn.after(status);
+        var queueDiv = $('.queue'); // TODO avoid this.
+        queueMenuItemAction(queueDiv, player.pid, null, action, status, closeAction);
+      });
+      menu.append(btn);
+      queueBtns.push(btn);
+    });
+
     // Add full screen buttons.
     $.each(player.monitors, function(index, monitor) {
       var btn = $('<button>');
@@ -527,6 +546,7 @@ Players = {};
         }, closeAction);
       });
       menu.append(btn);
+      fullscreenBtns.push(btn);
     });
 
     var close = $('<button class="close">close</button>');
@@ -604,7 +624,7 @@ Players = {};
       btn.click(function() {
         var status = $('<p>');
         btn.after(status);
-        queueMenuItemAction(queueDiv, queue, item, action, status, closeAction);
+        queueMenuItemAction(queueDiv, queue.pid, item, action, status, closeAction);
       });
       menu.append(btn);
     });
@@ -616,13 +636,19 @@ Players = {};
     return menu;
   }
 
-  function queueMenuItemAction(queueDiv, queue, item, action, statusElem, onComplete) {
-    writeQueueItem(queue, item, action, function(msg) {
+  function queueMenuItemAction(queueDiv, pid, item, action, statusElem, onComplete) {
+    writeQueueItem(pid, item, action, function(msg) {
       statusElem.text(msg);
     }, function(queue) {
       displayQueue(queueDiv, queue);
       onComplete();
     });
+  }
+
+  function removeAll(elems) {
+      $.each(elems, function(index, elem) {
+        elem.remove();
+      });
   }
 
 })();
