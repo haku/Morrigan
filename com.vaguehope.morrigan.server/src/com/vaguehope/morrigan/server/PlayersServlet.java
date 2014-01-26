@@ -26,6 +26,8 @@ import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagClassification;
 import com.vaguehope.morrigan.model.media.MediaTagType;
+import com.vaguehope.morrigan.player.OrderHelper;
+import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayerReader;
@@ -66,6 +68,7 @@ public class PlayersServlet extends HttpServlet {
 	private static final String CMD_PLAYPAUSE = "playpause";
 	private static final String CMD_NEXT = "next";
 	private static final String CMD_STOP = "stop";
+	private static final String CMD_PLAYBACKORDER = "playbackorder";
 	private static final String CMD_FULLSCREEN = "fullscreen";
 	private static final String CMD_ADDTAG = "addtag";
 
@@ -90,14 +93,14 @@ public class PlayersServlet extends HttpServlet {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public PlayersServlet (PlayerReader playerListener) {
+	public PlayersServlet (final PlayerReader playerListener) {
 		this.playerListener = playerListener;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
 		try {
 			writeResponse(req, resp);
 		}
@@ -110,7 +113,7 @@ public class PlayersServlet extends HttpServlet {
 	}
 
 	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
 		try {
 			String requestURI = req.getRequestURI();
 			String reqPath = requestURI.startsWith(CONTEXTPATH) ? requestURI.substring(CONTEXTPATH.length()) : requestURI;
@@ -153,7 +156,7 @@ public class PlayersServlet extends HttpServlet {
 		}
 	}
 
-	private void postToPlayer (HttpServletRequest req, HttpServletResponse resp, Player player) throws IOException, SAXException, MorriganException {
+	private void postToPlayer (final HttpServletRequest req, final HttpServletResponse resp, final Player player) throws IOException, SAXException, MorriganException {
 		String act = req.getParameter("action");
 		if (act == null) {
 			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "'action' parameter not set desu~");
@@ -169,6 +172,17 @@ public class PlayersServlet extends HttpServlet {
 		else if (act.equals(CMD_STOP)) {
 			player.stopPlaying();
 			writeResponse(req, resp);
+		}
+		else if (act.equals(CMD_PLAYBACKORDER)) {
+			final String orderRaw = req.getParameter("order");
+			if (orderRaw != null && orderRaw.length() > 0) {
+				final PlaybackOrder order = OrderHelper.parsePlaybackOrder(orderRaw);
+				player.setPlaybackOrder(order);
+				writeResponse(req, resp);
+			}
+			else {
+				ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "'order' parameter not set desu~");
+			}
 		}
 		else if (act.equals(CMD_FULLSCREEN)) {
 			String monitorString = req.getParameter("monitor");
@@ -204,7 +218,7 @@ public class PlayersServlet extends HttpServlet {
 		}
 	}
 
-	private static void postToQueue (HttpServletRequest req, HttpServletResponse resp, Player player) throws IOException, SAXException {
+	private static void postToQueue (final HttpServletRequest req, final HttpServletResponse resp, final Player player) throws IOException, SAXException {
 		String act = req.getParameter("action");
 		if (act == null) {
 			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "'action' parameter not set desu~");
@@ -222,7 +236,7 @@ public class PlayersServlet extends HttpServlet {
 		}
 	}
 
-	private static void postToQueue (HttpServletRequest req, HttpServletResponse resp, Player player, int item) throws IOException, SAXException {
+	private static void postToQueue (final HttpServletRequest req, final HttpServletResponse resp, final Player player, final int item) throws IOException, SAXException {
 		String act = req.getParameter("action");
 		if (act == null) {
 			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "'action' parameter not set desu~");
@@ -253,7 +267,7 @@ public class PlayersServlet extends HttpServlet {
 		}
 	}
 
-	private void writeResponse (HttpServletRequest req, HttpServletResponse resp) throws IOException, SAXException, MorriganException {
+	private void writeResponse (final HttpServletRequest req, final HttpServletResponse resp) throws IOException, SAXException, MorriganException {
 		String requestURI = req.getRequestURI();
 		String reqPath = requestURI.startsWith(CONTEXTPATH) ? requestURI.substring(CONTEXTPATH.length()) : requestURI;
 
@@ -303,7 +317,7 @@ public class PlayersServlet extends HttpServlet {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private void printPlayersList (HttpServletResponse resp) throws IOException, SAXException, MorriganException {
+	private void printPlayersList (final HttpServletResponse resp) throws IOException, SAXException, MorriganException {
 		resp.setContentType("text/xml;charset=utf-8");
 		DataWriter dw = FeedHelper.startFeed(resp.getWriter());
 
@@ -320,7 +334,7 @@ public class PlayersServlet extends HttpServlet {
 		FeedHelper.endFeed(dw);
 	}
 
-	private static void printPlayer (HttpServletResponse resp, Player player) throws IOException, SAXException, MorriganException {
+	private static void printPlayer (final HttpServletResponse resp, final Player player) throws IOException, SAXException, MorriganException {
 		resp.setContentType("text/xml;charset=utf-8");
 		DataWriter dw = FeedHelper.startDocument(resp.getWriter(), "player");
 
@@ -329,7 +343,7 @@ public class PlayersServlet extends HttpServlet {
 		FeedHelper.endDocument(dw, "player");
 	}
 
-	private static void printPlayerQueue (HttpServletResponse resp, Player player) throws IOException, SAXException {
+	private static void printPlayerQueue (final HttpServletResponse resp, final Player player) throws IOException, SAXException {
 		resp.setContentType("text/xml;charset=utf-8");
 		DataWriter dw = FeedHelper.startDocument(resp.getWriter(), "queue");
 
@@ -340,7 +354,7 @@ public class PlayersServlet extends HttpServlet {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private static void printPlayer (DataWriter dw, Player p, int detailLevel) throws SAXException, UnsupportedEncodingException, MorriganException {
+	private static void printPlayer (final DataWriter dw, final Player p, final int detailLevel) throws SAXException, UnsupportedEncodingException, MorriganException {
 		if (detailLevel < 0 || detailLevel > 1) throw new IllegalArgumentException("detailLevel must be 0 or 1, not "+detailLevel+".");
 
 		String listTitle;
@@ -432,7 +446,7 @@ public class PlayersServlet extends HttpServlet {
 		}
 	}
 
-	private static void printQueue (DataWriter dw, Player p) throws SAXException, UnsupportedEncodingException {
+	private static void printQueue (final DataWriter dw, final Player p) throws SAXException, UnsupportedEncodingException {
 
 		FeedHelper.addLink(dw, CONTEXTPATH + "/" + p.getId() + "/" + PATH_QUEUE, "self", "text/xml");
 		FeedHelper.addLink(dw, CONTEXTPATH + "/" + p.getId(), "player", "text/xml");

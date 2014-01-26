@@ -6,6 +6,14 @@ Players = {};
   var REFRESH_PLAYERS_SECONDS = 10;
   var REFRESH_QUEUE_SECONDS = 30;
 
+  var PLAYBACK_ORDERS = [
+    {id: "SEQUENTIAL",   title: "sequential"},
+    {id: "RANDOM",       title: "random"},
+    {id: "BYSTARTCOUNT", title: "by start-count"},
+    {id: "BYLASTPLAYED", title: "by last-played"},
+    {id: "MANUAL",       title: "manual"}
+  ];
+
   var playersStatusBar;
   var queueStatusBar;
 
@@ -268,6 +276,13 @@ Players = {};
     });
   }
 
+  function playerPlaybackOrder(pid, order, playerDiv, onStatus, onComplete) {
+    writePlayerState(pid, 'playbackorder&order=' + order.id, onStatus, function(player) {
+      updatePlayerDisplay(playerDiv, player, true);
+      onComplete();
+    });
+  }
+
   function playerFullscreen(pid, monitor, playerDiv, onStatus, onComplete) {
     writePlayerState(pid, 'fullscreen&monitor=' + monitor.id, onStatus, function(player) {
       updatePlayerDisplay(playerDiv, player, true);
@@ -481,6 +496,26 @@ Players = {};
     title.text(player.name);
     menu.append(title);
 
+    // Add play order button.
+    var orderBtn = $('<button>playback order</button>');
+    orderBtn.click(function() {
+      orderBtn.attr('disabled', 'true');
+      $.each(PLAYBACK_ORDERS, function(index, order) {
+        var btn = $('<button>');
+        btn.text(order.title);
+        btn.click(function() {
+          var status = $('<p>');
+          btn.after(status);
+          playerPlaybackOrder(player.pid, order, playerDiv, function(msg) {
+            status.text(msg);
+          }, closeAction);
+        });
+        orderBtn.after(btn);
+      });
+    });
+    menu.append(orderBtn);
+
+    // Add full screen buttons.
     $.each(player.monitors, function(index, monitor) {
       var btn = $('<button>');
       btn.text('fullscreen ' + monitor.id + ' (' + monitor.name + ')');
