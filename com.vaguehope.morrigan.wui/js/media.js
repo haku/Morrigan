@@ -202,6 +202,7 @@
       updateQueryItemDisplay(itemDiv, item);
       itemsDiv.append(itemDiv);
     });
+    updateAllItemsButton(items);
   }
 
   function makeQueryItem(itemDiv, id) {
@@ -219,6 +220,14 @@
     clickable.click(function(event) {
       event.preventDefault();
       queryItemClicked(item);
+    });
+  }
+
+  function updateAllItemsButton(items) {
+    var btnAll = $('.allItems');
+    btnAll.unbind();
+    btnAll.click(function() {
+      queryAllItemsClicked(items);
     });
   }
 
@@ -278,6 +287,10 @@
   function makeToolbar(itemsDiv, mid) {
     var toolbar = $('<div class="toolbar">');
     $('body').append(toolbar);
+
+    var btnAll = $('<button class="allItems">all</button>');
+    toolbar.append(btnAll);
+
     var btnSearch = $('<button class="search">search</button>');
     btnSearch.click(function() {
       showSearch(itemsDiv, mid);
@@ -320,6 +333,16 @@
     txtSearch.focus();
   }
 
+  function queryAllItemsClicked(items) {
+    var existingMenu = $('.itemmenu');
+    if (existingMenu.size() > 0) {
+      existingMenu.remove();
+    }
+    else {
+      $('body').append(makeAllItemsMenu(items));
+    }
+  }
+
   function queryItemClicked(item) {
     var existingMenu = $('.itemmenu');
     if (existingMenu.size() > 0) {
@@ -328,6 +351,36 @@
     else {
       $('body').append(makeItemMenu(item));
     }
+  }
+
+  function makeAllItemsMenu(items) {
+    var menu = $('<div class="popup itemmenu">');
+    
+    var title = $('<p class="title">');
+    title.text(items.length + 'items');
+    menu.append(title);
+
+    var enqueue = $('<button class="enqueue">enqueue</button>');
+    menu.append(enqueue);
+
+    var close = $('<button class="close">close</button>');
+    menu.append(close);
+
+    enqueue.click(function() {
+      var status = $('<p>');
+      enqueue.after(status);
+      chosePlayerAndActionItem(items, 'queue', status, function() {
+        setTimeout(function() {
+          menu.remove();
+        }, 1000);
+      });
+    });
+
+    close.click(function() {
+      menu.remove();
+    });
+
+    return menu;
   }
 
   function makeItemMenu(item) {
@@ -416,10 +469,9 @@
   }
 
   function actionItem(item, pid, action, onStatus, onComplete) {
-    $.ajax({
+    var params = {
       type : 'POST',
       cache : false,
-      url : item.url,
       data : 'action=' + action + '&playerid=' + pid,
       contentTypeString : 'application/x-www-form-urlencoded',
       dataType : 'text',
@@ -433,7 +485,22 @@
       error : function(jqXHR, textStatus, errorThrown) {
         onStatus('Error: ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
       }
-    });
+    };
+
+    if ($.isArray(item)) {
+      params.error = function(jqXHR, textStatus, errorThrown) {
+        params.error();
+        return;
+      };
+      $.each(item, function(index, i) {
+        params.url = i.url;
+        $.ajax(params);
+      });
+    }
+    else {
+      params.url = item.url;
+      $.ajax(params);
+    }
   }
 
   function showAlbums(itemsDiv, mid) {
