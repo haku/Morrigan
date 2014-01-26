@@ -118,18 +118,34 @@ public abstract class AbstractPlayerView extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Player.
 
-	private LocalPlayer _player = null;
+	private final Object[] playerFactoryLock = new Object[] {};
+	private LocalPlayer player = null; // TODO does this need to be volatile?
 
-	public synchronized LocalPlayer getPlayer () {
-		if (this._player == null) {
-			this._player = PlayerFactory.tryMakePlayer(Activator.getContext(), "Gui", this.eventHandler);
+	/*
+	 * TODO
+	 * Some mechanism for selecting an existing player.
+	 * Perhaps allow user to choose one only before window creates one?
+	 * Or can only be switched when stopped? (later feature)
+	 * What if player gets disposed? (e.g. DLNA renderer goes away?
+	 * Could check if player is disposed during each call to getPlayer()?
+	 * Once it is disposed, clear player reference?
+	 */
+
+	public LocalPlayer getPlayer () {
+		synchronized (this.playerFactoryLock) {
+			if (this.player == null) {
+				this.player = PlayerFactory.tryMakePlayer(Activator.getContext(), "Gui", this.eventHandler);
+			}
+			return this.player;
 		}
-		return this._player;
 	}
 
-	private synchronized void disposePlayer () {
-		if (this._player != null) {
-			this._player.dispose();
+	private void disposePlayer () {
+		synchronized (this.playerFactoryLock) {
+			if (this.player != null) {
+				this.player.dispose();
+				this.player = null;
+			}
 		}
 	}
 
