@@ -3,8 +3,8 @@ Players = {};
 
   Players.getPlayers = getPlayers;
 
-  var REFRESH_PLAYERS_SECONDS = 10;
-  var REFRESH_QUEUE_SECONDS = 30;
+  var REFRESH_PLAYERS_SECONDS = 5;
+  var REFRESH_QUEUE_SECONDS = 15;
 
   var PLAYBACK_ORDERS = [
     {id: "SEQUENTIAL",   title: "sequential"},
