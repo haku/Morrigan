@@ -358,7 +358,7 @@
     var menu = $('<div class="popup itemmenu">');
     
     var title = $('<p class="title">');
-    title.text(items.length + 'items');
+    title.text(items.length + ' items');
     menu.append(title);
 
     var enqueue = $('<button class="enqueue">enqueue</button>');
