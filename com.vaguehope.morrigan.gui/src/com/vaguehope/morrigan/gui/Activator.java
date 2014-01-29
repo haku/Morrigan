@@ -15,6 +15,7 @@ import com.vaguehope.morrigan.engines.hotkey.HotkeyEngineFactoryTracker;
 import com.vaguehope.morrigan.gui.engines.HotkeyRegister;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaFactoryTracker;
+import com.vaguehope.morrigan.player.PlayerRegisterTracker;
 
 public class Activator extends AbstractUIPlugin {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -29,6 +30,7 @@ public class Activator extends AbstractUIPlugin {
 	private MediaFactoryTracker mediaFactoryTracker;
 	private HotkeyEngineFactoryTracker hotkeyEngineFactoryTracker;
 	private HotkeyRegister hotkeyRegister;
+	private PlayerRegisterTracker playerRegisterTracker;
 	private ExecutorService executorService;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -48,6 +50,7 @@ public class Activator extends AbstractUIPlugin {
 		this.mediaFactoryTracker = new MediaFactoryTracker(bundleContext);
 		this.hotkeyEngineFactoryTracker = new HotkeyEngineFactoryTracker(bundleContext);
 		this.hotkeyRegister = new HotkeyRegister(this.hotkeyEngineFactoryTracker);
+		this.playerRegisterTracker = new PlayerRegisterTracker(bundleContext);
 		this.executorService = new ThreadPoolExecutor(0, 1, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
 	}
 
@@ -57,6 +60,7 @@ public class Activator extends AbstractUIPlugin {
 		Activator.plugin = null;
 
 		this.executorService.shutdownNow();
+		this.playerRegisterTracker.dispose();
 		this.hotkeyEngineFactoryTracker.dispose();
 		this.mediaFactoryTracker.dispose();
 
@@ -96,6 +100,10 @@ public class Activator extends AbstractUIPlugin {
 
 	public static HotkeyRegister getHotkeyRegister () {
 		return getDefault().hotkeyRegister;
+	}
+
+	public static PlayerRegisterTracker getPlayerRegister () {
+		return getDefault().playerRegisterTracker;
 	}
 
 	public static ExecutorService getExecutorService () {

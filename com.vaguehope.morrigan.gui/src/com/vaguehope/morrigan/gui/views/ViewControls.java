@@ -27,10 +27,13 @@ import org.eclipse.ui.console.IConsoleConstants;
 import com.vaguehope.morrigan.gui.Activator;
 import com.vaguehope.morrigan.gui.actions.MinToTrayAction;
 import com.vaguehope.morrigan.gui.adaptors.ActionListener;
+import com.vaguehope.morrigan.gui.adaptors.ChangePlayerMenuManager;
 import com.vaguehope.morrigan.gui.adaptors.DropMenuListener;
 import com.vaguehope.morrigan.gui.dialogs.MorriganMsgDlg;
 import com.vaguehope.morrigan.gui.helpers.RefreshTimer;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
+import com.vaguehope.morrigan.player.Player;
+import com.vaguehope.morrigan.player.PlayerLifeCycleListener;
 import com.vaguehope.morrigan.screen.ScreenPainter;
 import com.vaguehope.morrigan.screen.ScreenPainter.ScreenType;
 import com.vaguehope.morrigan.util.TimeHelper;
@@ -52,18 +55,32 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		makeControls(parent);
 
 		makeQueueRefresher();
-		getPlayer().getQueue().addQueueChangeListener(this.queueChangedRrefresher);
+		addPlayerLifeCycleListener(this.playerLifeCycleListener);
 
 		getEventHandler().updateStatus();
 	}
 
 	@Override
 	public void dispose() {
-		getPlayer().getQueue().removeQueueChangeListener(this.queueChangedRrefresher);
+		removePlayerLifeCycleListener(this.playerLifeCycleListener);
 		disposeControls();
 		disposeIcons();
 		super.dispose();
 	}
+
+	private final PlayerLifeCycleListener playerLifeCycleListener = new PlayerLifeCycleListener() {
+
+		@Override
+		public void playerCreated (final Player player) {
+			player.getQueue().addQueueChangeListener(ViewControls.this.queueChangedRrefresher);
+		}
+
+		@Override
+		public void playerDisposed (final Player player) {
+			player.getQueue().removeQueueChangeListener(ViewControls.this.queueChangedRrefresher);
+		}
+
+	};
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -141,11 +158,12 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		fullscreenMenuMgr.add(this.showDisplayViewAction);
 		this.menuFullscreen = fullscreenMenuMgr.createContextMenu(parent);
 
-		MenuManager prefMenuMgr = new MenuManager();
+		final MenuManager prefMenuMgr = new MenuManager();
 		prefMenuMgr.add(ActionFactory.OPEN_NEW_WINDOW.create(getSite().getWorkbenchWindow()));
 		prefMenuMgr.add(new MinToTrayAction(getSite().getWorkbenchWindow()));
+		prefMenuMgr.add(ChangePlayerMenuManager.create(this));
 		prefMenuMgr.add(new Separator());
-		MenuManager showViewMenuMgr =  new MenuManager("Show view", "showView");
+		final MenuManager showViewMenuMgr =  new MenuManager("Show view", "showView");
 		showViewMenuMgr.add(new ShowViewAction(ViewMediaExplorer.ID, "Media Explorer", Activator.getImageDescriptor("icons/library.gif")));
 		showViewMenuMgr.add(new ShowViewAction(ViewDisplay.ID, "Display", Activator.getImageDescriptor("icons/display.gif")));
 		showViewMenuMgr.add(new ShowViewAction(ViewQueue.ID, "Queue", Activator.getImageDescriptor("icons/queue.gif")));
@@ -400,11 +418,18 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 			verb = verb + " " + TimeHelper.formatTimeSeconds(getPlayer().getCurrentPosition());
 			if (getPlayer().getCurrentTrackDuration() > 0) {
 				verb = verb + " of " + TimeHelper.formatTimeSeconds(getPlayer().getCurrentTrackDuration());
-
 				this.seekbarPainter.setProgress((int) getPlayer().getCurrentPosition(), getPlayer().getCurrentTrackDuration());
 			}
+			else {
+				this.seekbarPainter.setProgress(0, 1);
+			}
+		}
+		else {
+			this.seekbarPainter.setProgress(0, 1);
 		}
 		this.lblStatus.setText(verb + ".");
+
+		orderModeChanged(getPlayer().getPlaybackOrder());
 
 		if (getPlayer().getCurrentItem() != null && getPlayer().getCurrentItem().item != null) {
 			getSite().getShell().setText(getPlayer().getCurrentItem().item.toString());

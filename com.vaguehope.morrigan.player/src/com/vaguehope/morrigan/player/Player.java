@@ -12,11 +12,16 @@ public interface Player {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	void dispose();
+	boolean isDisposed();
 
 	int getId();
 	String getName();
 
+	/**
+	 * If this returns true then ok to call setVideoFrameParent();
+	 */
 	boolean isPlaybackEngineReady();
+
 	void loadAndStartPlaying(IMediaTrackList<? extends IMediaTrack> list);
 	void loadAndStartPlaying(IMediaTrackList<? extends IMediaTrack> list, IMediaTrack track);
 	void loadAndStartPlaying(final PlayItem item);
