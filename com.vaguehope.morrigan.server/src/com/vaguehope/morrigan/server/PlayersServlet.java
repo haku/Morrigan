@@ -176,7 +176,7 @@ public class PlayersServlet extends HttpServlet {
 		else if (act.equals(CMD_PLAYBACKORDER)) {
 			final String orderRaw = req.getParameter("order");
 			if (orderRaw != null && orderRaw.length() > 0) {
-				final PlaybackOrder order = OrderHelper.parsePlaybackOrder(orderRaw);
+				final PlaybackOrder order = OrderHelper.parsePlaybackOrderByName(orderRaw);
 				player.setPlaybackOrder(order);
 				writeResponse(req, resp);
 			}
