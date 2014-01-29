@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -48,6 +49,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 	private final PlaybackEngineFactory playbackEngineFactory;
 	private final ExecutorService executorService;
 	private final PlayerQueue queue;
+	private final AtomicBoolean alive = new AtomicBoolean(true);
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Main.
@@ -67,9 +69,16 @@ public class LocalPlayerImpl implements LocalPlayer {
 
 	@Override
 	public void dispose () {
-		this.register.unregister(this);
-		setCurrentItem(null);
-		finalisePlaybackEngine();
+		if (this.alive.compareAndSet(true, false)) {
+			this.register.unregister(this);
+			setCurrentItem(null);
+			finalisePlaybackEngine();
+		}
+	}
+
+	@Override
+	public boolean isDisposed () {
+		return !this.alive.get();
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -83,6 +92,14 @@ public class LocalPlayerImpl implements LocalPlayer {
 	@Override
 	public String getName() {
 		return this.name;
+	}
+
+	@Override
+	public String toString () {
+		return new StringBuilder("LocalPlayerImpl{")
+				.append(this.id)
+				.append(", ").append(this.name)
+				.append("}").toString();
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

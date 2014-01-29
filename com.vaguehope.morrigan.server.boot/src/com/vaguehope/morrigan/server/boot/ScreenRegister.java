@@ -33,6 +33,7 @@ class ScreenRegister implements ScreenPainterRegister {
 	}
 
 	public void updateTitle () {
+		if (this.display.isDisposed()) return;
 		if (Thread.currentThread().getId() == this.display.getThread().getId()) {
 			redrawAll();
 		}

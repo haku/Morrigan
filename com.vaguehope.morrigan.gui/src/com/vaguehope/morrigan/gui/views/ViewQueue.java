@@ -23,6 +23,8 @@ import com.vaguehope.morrigan.gui.helpers.ImageCache;
 import com.vaguehope.morrigan.gui.helpers.RefreshTimer;
 import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.player.PlayItem;
+import com.vaguehope.morrigan.player.Player;
+import com.vaguehope.morrigan.player.PlayerLifeCycleListener;
 import com.vaguehope.morrigan.util.TimeHelper;
 
 public class ViewQueue extends ViewPart {
@@ -36,16 +38,14 @@ public class ViewQueue extends ViewPart {
 	AbstractPlayerView abstractPlayerView = null;
 
 	@Override
-	public void createPartControl(Composite parent) {
+	public void createPartControl(final Composite parent) {
 		makeQueueChangedRrefresher();
 		createLayout(parent);
 
 		IViewPart findView = getSite().getPage().findView(ViewControls.ID); // FIXME can i find AbstractPlayerView?
 		if (findView != null && findView instanceof AbstractPlayerView) {
 			this.abstractPlayerView = (AbstractPlayerView) findView;
-			setContent(this.abstractPlayerView.getPlayer().getQueue().getQueueList());
-			this.abstractPlayerView.getPlayer().getQueue().addQueueChangeListener(this.queueChangedRrefresher);
-			this.queueChangedRrefresher.run();
+			this.abstractPlayerView.addPlayerLifeCycleListener(this.playerLifeCycleListener);
 		}
 	}
 
@@ -57,13 +57,8 @@ public class ViewQueue extends ViewPart {
 	@Override
 	public void dispose() {
 		this.isDisposed = true;
-
-		if (this.abstractPlayerView != null ) {
-			this.abstractPlayerView.getPlayer().getQueue().removeQueueChangeListener(this.queueChangedRrefresher);
-		}
-
+		this.abstractPlayerView.removePlayerLifeCycleListener(this.playerLifeCycleListener);
 		this.imageCache.clearCache();
-
 		super.dispose();
 	}
 
@@ -75,11 +70,29 @@ public class ViewQueue extends ViewPart {
 		return this;
 	}
 
+	private final PlayerLifeCycleListener playerLifeCycleListener = new PlayerLifeCycleListener() {
+
+		@Override
+		public void playerCreated (final Player player) {
+			setContent(ViewQueue.this.abstractPlayerView.getPlayer().getQueue().getQueueList());
+			ViewQueue.this.abstractPlayerView.getPlayer().getQueue().addQueueChangeListener(ViewQueue.this.queueChangedRrefresher);
+			ViewQueue.this.queueChangedRrefresher.run();
+		}
+
+		@Override
+		public void playerDisposed (final Player player) {
+			if (ViewQueue.this.abstractPlayerView != null ) {
+				ViewQueue.this.abstractPlayerView.getPlayer().getQueue().removeQueueChangeListener(ViewQueue.this.queueChangedRrefresher);
+			}
+		}
+
+	};
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	List<PlayItem> queue = null;
 
-	private void setContent (List<PlayItem> queue) {
+	private void setContent (final List<PlayItem> queue) {
 		this.queue = queue;
 	}
 
@@ -103,7 +116,7 @@ public class ViewQueue extends ViewPart {
 	ImageCache imageCache = new ImageCache();
 	TableViewer tableViewer;
 
-	private void createLayout (Composite parent) {
+	private void createLayout (final Composite parent) {
 		this.tableViewer = new TableViewer(parent, SWT.MULTI | SWT.V_SCROLL | SWT.FULL_SELECTION);
 		this.tableViewer.setContentProvider(this.contentProvider);
 		this.tableViewer.setLabelProvider(new PlayItemLblProv(this.imageCache));
@@ -147,10 +160,10 @@ public class ViewQueue extends ViewPart {
 		}
 	}
 
-	private IStructuredContentProvider contentProvider = new IStructuredContentProvider() {
+	private final IStructuredContentProvider contentProvider = new IStructuredContentProvider() {
 
 		@Override
-		public Object[] getElements(Object inputElement) {
+		public Object[] getElements(final Object inputElement) {
 			if (ViewQueue.this.queue!=null) {
 				return ViewQueue.this.queue.toArray();
 			}
@@ -161,21 +174,21 @@ public class ViewQueue extends ViewPart {
 		@Override
 		public void dispose() {/* UNUSED */}
 		@Override
-		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {/* UNUSED */}
+		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {/* UNUSED */}
 
 	};
 
-	private KeyListener keyListener = new KeyListener() {
+	private final KeyListener keyListener = new KeyListener() {
 
 		@Override
-		public void keyReleased(KeyEvent e) {
+		public void keyReleased(final KeyEvent e) {
 			if (e.keyCode == SWT.DEL) {
 				ViewQueue.this.removeAction.run();
 			}
 		}
 
 		@Override
-		public void keyPressed(KeyEvent e) {/* UNUSED */}
+		public void keyPressed(final KeyEvent e) {/* UNUSED */}
 	};
 
 	List<PlayItem> getSelectedSources () {

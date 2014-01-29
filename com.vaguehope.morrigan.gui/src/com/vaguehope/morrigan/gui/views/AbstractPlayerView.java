@@ -8,6 +8,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,6 +42,7 @@ import com.vaguehope.morrigan.gui.helpers.ClipboardHelper;
 import com.vaguehope.morrigan.gui.helpers.MonitorHelper;
 import com.vaguehope.morrigan.gui.helpers.RefreshTimer;
 import com.vaguehope.morrigan.gui.helpers.TrayHelper;
+import com.vaguehope.morrigan.gui.helpers.UiThreadHelper;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
@@ -50,8 +53,9 @@ import com.vaguehope.morrigan.player.LocalPlayer;
 import com.vaguehope.morrigan.player.OrderHelper;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayItem;
+import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayerEventHandler;
-import com.vaguehope.morrigan.player.PlayerFactory;
+import com.vaguehope.morrigan.player.PlayerLifeCycleListener;
 import com.vaguehope.morrigan.screen.CoverArtProvider;
 import com.vaguehope.morrigan.screen.FullscreenShell;
 import com.vaguehope.morrigan.screen.ScreenPainter;
@@ -120,6 +124,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 
 	private final Object[] playerFactoryLock = new Object[] {};
 	private LocalPlayer player = null; // TODO does this need to be volatile?
+	private final Set<PlayerLifeCycleListener> playerLifeCycleListeners = Collections.newSetFromMap(new ConcurrentHashMap<PlayerLifeCycleListener, Boolean>());
 
 	/*
 	 * TODO
@@ -131,10 +136,19 @@ public abstract class AbstractPlayerView extends ViewPart {
 	 * Once it is disposed, clear player reference?
 	 */
 
+	public boolean isCurrentPlayer(final Player p) {
+		synchronized (this.playerFactoryLock) {
+			if (p == null) return this.player == null;
+			if (this.player == null) return false;
+			return p.getId() == this.player.getId();
+		}
+	}
+
 	public LocalPlayer getPlayer () {
 		synchronized (this.playerFactoryLock) {
 			if (this.player == null) {
-				this.player = PlayerFactory.tryMakePlayer(Activator.getContext(), "Gui", this.eventHandler);
+				this.player = Activator.getPlayerRegister().makeLocal("Gui", this.eventHandler);
+				callPlayerCreatedListeners(this.player);
 			}
 			return this.player;
 		}
@@ -143,9 +157,51 @@ public abstract class AbstractPlayerView extends ViewPart {
 	private void disposePlayer () {
 		synchronized (this.playerFactoryLock) {
 			if (this.player != null) {
+				callPlayerDisposedListeners(this.player);
 				this.player.dispose();
 				this.player = null;
 			}
+		}
+	}
+
+	/**
+	 * Pass null to reset.
+	 */
+	public void changePlayer (final Player newPlayer) {
+		synchronized (this.playerFactoryLock) {
+			if (this.player != null && newPlayer != null && this.player.getId() == newPlayer.getId()) throw new IllegalArgumentException("Can not replace player with self.");
+			disposePlayer();
+			if (newPlayer != null) {
+				this.player = Activator.getPlayerRegister().makeLocalProxy(newPlayer, this.eventHandler);
+				callPlayerCreatedListeners(this.player);
+			}
+		}
+		this.eventHandler.updateStatus();
+	}
+
+	private void callPlayerCreatedListeners (final Player p) {
+		for (final PlayerLifeCycleListener l : this.playerLifeCycleListeners) {
+			l.playerCreated(p);
+		}
+	}
+
+	private void callPlayerDisposedListeners (final Player p) {
+		for (final PlayerLifeCycleListener l : this.playerLifeCycleListeners) {
+			l.playerDisposed(p);
+		}
+	}
+
+	public void addPlayerLifeCycleListener (final PlayerLifeCycleListener listener) {
+		synchronized (this.playerFactoryLock) {
+			this.playerLifeCycleListeners.add(listener);
+			if (this.player != null) listener.playerCreated(this.player);
+		}
+	}
+
+	public void removePlayerLifeCycleListener (final PlayerLifeCycleListener listener) {
+		synchronized (this.playerFactoryLock) {
+			this.playerLifeCycleListeners.remove(listener);
+			listener.playerDisposed(this.player);
 		}
 	}
 
@@ -167,7 +223,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 
 		@Override
 		public void currentItemChanged () {
-			getSite().getShell().getDisplay().asyncExec(new Runnable() {
+			UiThreadHelper.tryAsyncExec(getSite(), new Runnable() {
 				@Override
 				public void run () {
 					updateTitle();

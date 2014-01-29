@@ -12,7 +12,7 @@ public class PlayerRegisterTracker implements PlayerRegister {
 	private final AtomicBoolean alive = new AtomicBoolean(true);
 	private final ServiceTracker<PlayerRegister, PlayerRegister> tracker;
 
-	public PlayerRegisterTracker (BundleContext context) {
+	public PlayerRegisterTracker (final BundleContext context) {
 		this.tracker = new ServiceTracker<PlayerRegister, PlayerRegister>(context, PlayerRegister.class, null);
 		this.tracker.open();
 	}
@@ -48,12 +48,12 @@ public class PlayerRegisterTracker implements PlayerRegister {
 	}
 
 	@Override
-	public void register (Player target) {
+	public void register (final Player target) {
 		getService().register(target);
 	}
 
 	@Override
-	public void unregister (Player target) {
+	public void unregister (final Player target) {
 		getService().unregister(target);
 	}
 
@@ -64,14 +64,24 @@ public class PlayerRegisterTracker implements PlayerRegister {
 	}
 
 	@Override
-	public Player get (int i) {
+	public Player get (final int i) {
 		PlayerRegister service = getServiceOptional();
 		return (service == null) ? null : service.get(i);
 	}
 
 	@Override
-	public LocalPlayer makeLocal (String name, PlayerEventHandler eventHandler) {
+	public LocalPlayer makeLocal (final String name, final PlayerEventHandler eventHandler) {
 		return getService().makeLocal(name, eventHandler);
+	}
+
+	@Override
+	public LocalPlayer makeLocalProxy (final Player player, final PlayerEventHandler eventHandler) {
+		return getService().makeLocalProxy(player, eventHandler);
+	}
+	@Override
+	public String toString () {
+		if (!this.alive.get()) return "PlayerRegisterTracker(dead)";
+		return "PlayerRegisterTracker(" + getServiceOptional() + ")";
 	}
 
 }

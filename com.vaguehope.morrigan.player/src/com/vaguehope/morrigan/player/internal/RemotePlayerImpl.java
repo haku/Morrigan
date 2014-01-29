@@ -2,6 +2,7 @@ package com.vaguehope.morrigan.player.internal;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
@@ -18,6 +19,7 @@ public class RemotePlayerImpl implements RemotePlayer {
 	private final String name;
 	private final String remoteHost;
 	private final int remotePlayerId;
+	private final AtomicBoolean alive = new AtomicBoolean(true);
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -31,7 +33,12 @@ public class RemotePlayerImpl implements RemotePlayer {
 
 	@Override
 	public void dispose () {
-		// Unused.
+		this.alive.set(false);
+	}
+
+	@Override
+	public boolean isDisposed () {
+		return !this.alive.get();
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

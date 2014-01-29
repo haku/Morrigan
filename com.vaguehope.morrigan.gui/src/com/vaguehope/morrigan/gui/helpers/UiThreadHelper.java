@@ -4,6 +4,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IWorkbenchPartSite;
 
 public final class UiThreadHelper {
 
@@ -46,6 +48,15 @@ public final class UiThreadHelper {
 			return this.ref.get();
 		}
 
+	}
+
+	public static void tryAsyncExec (final IWorkbenchPartSite site, final Runnable runnable) {
+		if (site == null) return;
+		final Shell shell = site.getShell();
+		if (shell == null) return;
+		final Display display = shell.getDisplay();
+		if (display == null) return;
+		display.asyncExec(runnable);
 	}
 
 }

@@ -4,9 +4,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
@@ -24,14 +25,14 @@ public class PlayerRegisterImpl implements PlayerRegister {
 	private final AtomicBoolean alive = new AtomicBoolean(true);
 	private final AtomicInteger next = new AtomicInteger(0);
 	private final ConcurrentMap<Integer, Player> all = new ConcurrentHashMap<Integer, Player>();
-	private final ConcurrentMap<Integer, Integer> localPlayerIds = new ConcurrentHashMap<Integer, Integer>();
+	private final Set<Integer> localPlayerIds = Collections.newSetFromMap(new ConcurrentHashMap<Integer, Boolean>());
 
 	private final PlaybackEngineFactory playbackEngineFactory;
-	private final ExecutorService executorService;
+	private final ScheduledExecutorService scheduledExecutorService;
 
-	public PlayerRegisterImpl (final PlaybackEngineFactory playbackEngineFactory, final ExecutorService executorService) {
+	public PlayerRegisterImpl (final PlaybackEngineFactory playbackEngineFactory, final ScheduledExecutorService scheduledExecutorService) {
 		this.playbackEngineFactory = playbackEngineFactory;
-		this.executorService = executorService;
+		this.scheduledExecutorService = scheduledExecutorService;
 	}
 
 	@Override
@@ -89,16 +90,20 @@ public class PlayerRegisterImpl implements PlayerRegister {
 
 	@Override
 	public LocalPlayer makeLocal (final String name, final PlayerEventHandler eventHandler) {
-		LocalPlayer p = new LocalPlayerImpl(nextIndex(), name, eventHandler, this, this.playbackEngineFactory, this.executorService);
-		Integer i = Integer.valueOf(p.getId());
-		this.localPlayerIds.put(i, i);
+		LocalPlayer p = new LocalPlayerImpl(nextIndex(), name, eventHandler, this, this.playbackEngineFactory, this.scheduledExecutorService);
+		this.localPlayerIds.add(Integer.valueOf(p.getId()));
 		register(p);
 		return p;
 	}
 
+	@Override
+	public LocalPlayer makeLocalProxy (final Player player, final PlayerEventHandler eventHandler) {
+		return new LocalProxyPlayer(player, eventHandler, this.scheduledExecutorService);
+	}
+
 	public void disposeLocalPlayers () {
-		for (Integer i : this.localPlayerIds.keySet()) {
-			Player p = this.all.get(i);
+		for (final Integer i : this.localPlayerIds) {
+			final Player p = this.all.get(i);
 			if (p != null) {
 				LOG.warning("Register having to dispose of local player: " + i);
 				p.dispose();

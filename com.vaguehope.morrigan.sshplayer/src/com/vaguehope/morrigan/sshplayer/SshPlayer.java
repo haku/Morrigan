@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,6 +29,7 @@ public class SshPlayer implements Player {
 	private final Register<Player> register;
 	private final DefaultPlayerQueue queue;
 
+	private final AtomicBoolean alive = new AtomicBoolean(true);
 	private final AtomicReference<PlaybackOrder> playbackOrder = new AtomicReference<PlaybackOrder>(PlaybackOrder.SEQUENTIAL);
 	private final AtomicReference<CliPlayer> cliPlayer = new AtomicReference<CliPlayer>();
 	private final AtomicReference<PlayItem> currentItem = new AtomicReference<PlayItem>();
@@ -46,7 +48,14 @@ public class SshPlayer implements Player {
 
 	@Override
 	public void dispose () {
-		this.register.unregister(this);
+		if (this.alive.compareAndSet(true, false)) {
+			this.register.unregister(this);
+		}
+	}
+
+	@Override
+	public boolean isDisposed () {
+		return !this.alive.get();
 	}
 
 	@Override

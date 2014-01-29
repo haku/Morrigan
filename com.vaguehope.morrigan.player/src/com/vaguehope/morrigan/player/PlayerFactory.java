@@ -3,6 +3,7 @@ package com.vaguehope.morrigan.player;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 
+@Deprecated
 public final class PlayerFactory {
 
 	private PlayerFactory () {}
