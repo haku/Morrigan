@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 import com.vaguehope.morrigan.engines.playback.PlaybackEngineFactory;
 import com.vaguehope.morrigan.player.LocalPlayer;
 import com.vaguehope.morrigan.player.Player;
-import com.vaguehope.morrigan.player.PlayerEventHandler;
+import com.vaguehope.morrigan.player.LocalPlayerSupport;
 import com.vaguehope.morrigan.player.PlayerRegister;
 
 public class PlayerRegisterImpl implements PlayerRegister {
@@ -89,16 +89,16 @@ public class PlayerRegisterImpl implements PlayerRegister {
 	}
 
 	@Override
-	public LocalPlayer makeLocal (final String name, final PlayerEventHandler eventHandler) {
-		LocalPlayer p = new LocalPlayerImpl(nextIndex(), name, eventHandler, this, this.playbackEngineFactory, this.executorService);
+	public LocalPlayer makeLocal (final String name, final LocalPlayerSupport localPlayerSupport) {
+		LocalPlayer p = new LocalPlayerImpl(nextIndex(), name, localPlayerSupport, this, this.playbackEngineFactory, this.executorService);
 		this.localPlayerIds.add(Integer.valueOf(p.getId()));
 		register(p);
 		return p;
 	}
 
 	@Override
-	public LocalPlayer makeLocalProxy (final Player player, final PlayerEventHandler eventHandler) {
-		return new LocalProxyPlayer(player, eventHandler);
+	public LocalPlayer makeLocalProxy (final Player player, final LocalPlayerSupport localPlayerSupport) {
+		return new LocalProxyPlayer(player, localPlayerSupport);
 	}
 
 	public void disposeLocalPlayers () {

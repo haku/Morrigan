@@ -9,7 +9,7 @@ import com.vaguehope.morrigan.player.LocalPlayer;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayerContainer;
-import com.vaguehope.morrigan.player.PlayerEventHandler;
+import com.vaguehope.morrigan.player.LocalPlayerSupport;
 import com.vaguehope.morrigan.server.ServerConfig;
 
 class ServerPlayerContainer implements PlayerContainer {
@@ -21,7 +21,7 @@ class ServerPlayerContainer implements PlayerContainer {
 	private final Logger logger = Logger.getLogger(this.getClass().getName());
 
 	private LocalPlayer player;
-	private ServerPlayerEventHandler eventHandler;
+	private ServerPlayerEventHandler localPlayerSupport;
 
 	public ServerPlayerContainer (final UiMgr uiMgr, final NullScreen nullScreen, final ServerConfig config, final ExecutorService executorService) {
 		if (uiMgr == null) throw new IllegalArgumentException();
@@ -37,7 +37,7 @@ class ServerPlayerContainer implements PlayerContainer {
 	public void dispose () {
 		LocalPlayer p = this.player;
 		if (p != null) p.dispose();
-		if (this.eventHandler != null) this.eventHandler.dispose();
+		if (this.localPlayerSupport != null) this.localPlayerSupport.dispose();
 	}
 
 	@Override
@@ -46,18 +46,18 @@ class ServerPlayerContainer implements PlayerContainer {
 	}
 
 	@Override
-	public PlayerEventHandler getEventHandler () {
-		if (this.eventHandler == null) {
-			this.eventHandler = new ServerPlayerEventHandler(this.uiMgr, this, this.nullScreen, this.executorService);
+	public LocalPlayerSupport getLocalPlayerSupport () {
+		if (this.localPlayerSupport == null) {
+			this.localPlayerSupport = new ServerPlayerEventHandler(this.uiMgr, this, this.nullScreen, this.executorService);
 		}
-		return this.eventHandler;
+		return this.localPlayerSupport;
 	}
 
 	@Override
 	public void setPlayer (final Player player) {
 		if (!(player instanceof LocalPlayer)) throw new IllegalArgumentException("Only LocalPlayer supported.");
 		this.player = (LocalPlayer) player;
-		this.player.addEventListener(this.eventHandler);
+		this.player.addEventListener(this.localPlayerSupport);
 		try {
 			player.setPlaybackOrder(this.config.getPlaybackOrder());
 		}

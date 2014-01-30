@@ -4,7 +4,7 @@ public interface PlayerContainer {
 
 	String getName ();
 
-	PlayerEventHandler getEventHandler ();
+	LocalPlayerSupport getLocalPlayerSupport ();
 
 	void setPlayer (Player player);
 

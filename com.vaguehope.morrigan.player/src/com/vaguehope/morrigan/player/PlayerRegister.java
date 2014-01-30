@@ -9,7 +9,7 @@ public interface PlayerRegister extends Register<Player> {
 
 	Collection<Player> getAll ();
 	Player get (int i);
-	LocalPlayer makeLocal (String name, PlayerEventHandler eventHandler);
-	LocalPlayer makeLocalProxy(Player player, PlayerEventHandler eventHandler);
+	LocalPlayer makeLocal (String name, LocalPlayerSupport localPlayerSupport);
+	LocalPlayer makeLocalProxy(Player player, LocalPlayerSupport localPlayerSupport);
 
 }

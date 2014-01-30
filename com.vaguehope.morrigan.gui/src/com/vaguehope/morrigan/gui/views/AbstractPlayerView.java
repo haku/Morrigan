@@ -55,7 +55,7 @@ import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.Player.PlayerEventListener;
-import com.vaguehope.morrigan.player.PlayerEventHandler;
+import com.vaguehope.morrigan.player.LocalPlayerSupport;
 import com.vaguehope.morrigan.player.PlayerLifeCycleListener;
 import com.vaguehope.morrigan.screen.CoverArtProvider;
 import com.vaguehope.morrigan.screen.FullscreenShell;
@@ -209,7 +209,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 		}
 	}
 
-	protected PlayerEventHandler getEventHandler () {
+	protected LocalPlayerSupport getLocalPlayerSupport () {
 		return this.eventHandler;
 	}
 
@@ -237,7 +237,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 
 	};
 
-	private final PlayerEventHandler eventHandler = new PlayerEventHandler() {
+	private final LocalPlayerSupport eventHandler = new LocalPlayerSupport() {
 
 		@Override
 		public void historyChanged () {

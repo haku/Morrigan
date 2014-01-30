@@ -33,7 +33,7 @@ import com.vaguehope.morrigan.player.OrderHelper;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.Player;
-import com.vaguehope.morrigan.player.PlayerEventHandler;
+import com.vaguehope.morrigan.player.LocalPlayerSupport;
 import com.vaguehope.morrigan.player.PlayerEventListenerCaller;
 import com.vaguehope.morrigan.player.PlayerQueue;
 
@@ -45,7 +45,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 
 	protected final Logger logger = Logger.getLogger(this.getClass().getName());
 
-	final PlayerEventHandler eventHandler;
+	final LocalPlayerSupport localPlayerSupport;
 	private final Register<Player> register;
 	private final PlaybackEngineFactory playbackEngineFactory;
 	private final ExecutorService executorService;
@@ -55,13 +55,13 @@ public class LocalPlayerImpl implements LocalPlayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Main.
 
-	public LocalPlayerImpl (final int id, final String name, final PlayerEventHandler eventHandler,
+	public LocalPlayerImpl (final int id, final String name, final LocalPlayerSupport localPlayerSupport,
 			final Register<Player> register,
 			final PlaybackEngineFactory playbackEngineFactory,
 			final ExecutorService executorService) {
 		this.id = id;
 		this.name = name;
-		this.eventHandler = eventHandler;
+		this.localPlayerSupport = localPlayerSupport;
 		this.register = register;
 		this.playbackEngineFactory = playbackEngineFactory;
 		this.executorService = executorService;
@@ -175,7 +175,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 			ret = currentItem.list;
 		}
 		else {
-			ret = this.eventHandler.getCurrentList();
+			ret = this.localPlayerSupport.getCurrentList();
 		}
 
 		return ret;
@@ -242,7 +242,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 			if (this._history.size() > HISTORY_LENGTH) {
 				this._history.remove(this._history.size()-1);
 			}
-			this.eventHandler.historyChanged();
+			this.localPlayerSupport.historyChanged();
 		}
 	}
 
@@ -258,7 +258,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 			}
 
 			if (changed) {
-				this.eventHandler.historyChanged();
+				this.localPlayerSupport.historyChanged();
 			}
 		}
 	}
@@ -368,7 +368,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 				setCurrentItem(item);
 
 				engine.setFile(item.item.getFilepath());
-				engine.setVideoFrameParent(this.eventHandler.getCurrentMediaFrameParent());
+				engine.setVideoFrameParent(this.localPlayerSupport.getCurrentMediaFrameParent());
 				engine.loadTrack();
 				engine.startPlaying();
 
@@ -399,7 +399,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 			} // END synchronized.
 		}
 		catch (Exception e) {
-			this.eventHandler.asyncThrowable(e);
+			this.localPlayerSupport.asyncThrowable(e);
 		}
 
 		this.listeners.currentItemChanged(item);
@@ -413,7 +413,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 		try {
 			internal_pausePlaying();
 		} catch (MorriganException e) {
-			this.eventHandler.asyncThrowable(e);
+			this.localPlayerSupport.asyncThrowable(e);
 		}
 	}
 
@@ -425,7 +425,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 		try {
 			internal_stopPlaying();
 		} catch (MorriganException e) {
-			this.eventHandler.asyncThrowable(e);
+			this.localPlayerSupport.asyncThrowable(e);
 		}
 	}
 
@@ -462,7 +462,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 		try {
 			internal_seekTo(d);
 		} catch (MorriganException e) {
-			this.eventHandler.asyncThrowable(e);
+			this.localPlayerSupport.asyncThrowable(e);
 		}
 	}
 
@@ -482,7 +482,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 					loadAndStartPlaying(getCurrentItem());
 				}
 				else {
-					this.eventHandler.asyncThrowable(new PlaybackException("Don't know what to do.  Playstate=" + playbackState + "."));
+					this.localPlayerSupport.asyncThrowable(new PlaybackException("Don't know what to do.  Playstate=" + playbackState + "."));
 				}
 			} // END synchronized.
 			this.listeners.playStateChanged(getPlayState());
@@ -559,7 +559,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 			try {
 				getCurrentItem().list.incTrackEndCnt(getCurrentItem().item);
 			} catch (MorriganException e) {
-				LocalPlayerImpl.this.eventHandler.asyncThrowable(e);
+				LocalPlayerImpl.this.localPlayerSupport.asyncThrowable(e);
 			}
 
 			// Play next track?
@@ -575,13 +575,13 @@ public class LocalPlayerImpl implements LocalPlayer {
 
 		@Override
 		public void onError(final Exception e) {
-			LocalPlayerImpl.this.eventHandler.asyncThrowable(e);
+			LocalPlayerImpl.this.localPlayerSupport.asyncThrowable(e);
 		}
 
 		@Override
 		public void onKeyPress(final int keyCode) {
 			if (keyCode == SWT.ESC) {
-				LocalPlayerImpl.this.eventHandler.videoAreaClose();
+				LocalPlayerImpl.this.localPlayerSupport.videoAreaClose();
 			}
 		}
 
@@ -589,7 +589,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 		public void onMouseClick(final int button, final int clickCount) {
 			LocalPlayerImpl.this.logger.info("Mouse click "+button+"*"+clickCount);
 			if (clickCount > 1) {
-				LocalPlayerImpl.this.eventHandler.videoAreaSelected();
+				LocalPlayerImpl.this.localPlayerSupport.videoAreaSelected();
 			}
 		}
 
@@ -607,12 +607,12 @@ public class LocalPlayerImpl implements LocalPlayer {
 
 	@Override
 	public Map<Integer, String> getMonitors() {
-		return this.eventHandler.getMonitors();
+		return this.localPlayerSupport.getMonitors();
 	}
 
 	@Override
 	public void goFullscreen(final int monitor) {
-		this.eventHandler.goFullscreen(monitor);
+		this.localPlayerSupport.goFullscreen(monitor);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
