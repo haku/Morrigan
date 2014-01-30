@@ -31,7 +31,9 @@ import com.vaguehope.morrigan.gui.adaptors.ChangePlayerMenuManager;
 import com.vaguehope.morrigan.gui.adaptors.DropMenuListener;
 import com.vaguehope.morrigan.gui.dialogs.MorriganMsgDlg;
 import com.vaguehope.morrigan.gui.helpers.RefreshTimer;
+import com.vaguehope.morrigan.player.LocalPlayer;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
+import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayerLifeCycleListener;
 import com.vaguehope.morrigan.screen.ScreenPainter;
@@ -389,36 +391,33 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 	protected void updateStatus() {
 		if (isDisposed()) return;
 
-		String verb;
-
-		switch (getPlayer().getPlayState()) {
+		final LocalPlayer player = getPlayer();
+		final StringBuilder msg = new StringBuilder();
+		switch (player.getPlayState()) {
 			case PLAYING:
-				verb = "Playing";
+				msg.append("Playing");
 				break;
-
 			case PAUSED:
-				verb = "Paused";
+				msg.append("Paused");
 				break;
-
 			case LOADING:
-				verb = "Loading";
+				msg.append("Loading");
 				break;
-
 			case STOPPED:
-				verb = "Stopped";
+				msg.append("Stopped");
 				break;
-
 			default:
-				verb = "Unknown";
+				msg.append("Unknown");
 				break;
-
 		}
 
-		if (getPlayer().getCurrentPosition() >= 0) {
-			verb = verb + " " + TimeHelper.formatTimeSeconds(getPlayer().getCurrentPosition());
-			if (getPlayer().getCurrentTrackDuration() > 0) {
-				verb = verb + " of " + TimeHelper.formatTimeSeconds(getPlayer().getCurrentTrackDuration());
-				this.seekbarPainter.setProgress((int) getPlayer().getCurrentPosition(), getPlayer().getCurrentTrackDuration());
+		final long currentPosition = player.getCurrentPosition();
+		if (currentPosition >= 0) {
+			final int currentTrackDuration = player.getCurrentTrackDuration();
+			msg.append(" ").append(TimeHelper.formatTimeSeconds(currentPosition));
+			if (currentTrackDuration > 0) {
+				msg.append(" of ").append(TimeHelper.formatTimeSeconds(currentTrackDuration));
+				this.seekbarPainter.setProgress((int) currentPosition, currentTrackDuration);
 			}
 			else {
 				this.seekbarPainter.setProgress(0, 1);
@@ -427,12 +426,15 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		else {
 			this.seekbarPainter.setProgress(0, 1);
 		}
-		this.lblStatus.setText(verb + ".");
+		if (player.isProxy()) msg.append(" @ ").append(player.getName());
+		msg.append(".");
+		this.lblStatus.setText(msg.toString());
 
-		orderModeChanged(getPlayer().getPlaybackOrder());
+		orderModeChanged(player.getPlaybackOrder());
 
-		if (getPlayer().getCurrentItem() != null && getPlayer().getCurrentItem().item != null) {
-			getSite().getShell().setText(getPlayer().getCurrentItem().item.toString());
+		final PlayItem currentItem = player.getCurrentItem();
+		if (currentItem != null && currentItem.item != null) {
+			getSite().getShell().setText(currentItem.item.toString());
 		} else {
 			getSite().getShell().setText("Morrigan");
 		}

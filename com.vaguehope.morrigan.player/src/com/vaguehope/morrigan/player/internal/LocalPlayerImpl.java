@@ -95,6 +95,11 @@ public class LocalPlayerImpl implements LocalPlayer {
 	}
 
 	@Override
+	public boolean isProxy () {
+		return false;
+	}
+
+	@Override
 	public String toString () {
 		return new StringBuilder("LocalPlayerImpl{")
 				.append(this.id)
