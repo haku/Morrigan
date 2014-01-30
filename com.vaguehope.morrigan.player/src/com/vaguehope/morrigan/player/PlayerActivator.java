@@ -18,6 +18,7 @@ import org.osgi.framework.ServiceReference;
 
 import com.vaguehope.morrigan.engines.playback.PlaybackEngineFactoryTracker;
 import com.vaguehope.morrigan.player.internal.PlayerRegisterImpl;
+import com.vaguehope.morrigan.util.DaemonThreadFactory;
 
 public final class PlayerActivator implements BundleActivator {
 
@@ -30,7 +31,7 @@ public final class PlayerActivator implements BundleActivator {
 	@Override
 	public void start (final BundleContext context) throws Exception {
 		this.playbackEngineFactoryTracker = new PlaybackEngineFactoryTracker(context);
-		this.executorService = new ThreadPoolExecutor(0, 1, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+		this.executorService = new ThreadPoolExecutor(0, 1, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), new DaemonThreadFactory("player"));
 		this.playerRegister = new PlayerRegisterImpl(this.playbackEngineFactoryTracker, this.executorService);
 
 		startPlayerContainerListener(context);

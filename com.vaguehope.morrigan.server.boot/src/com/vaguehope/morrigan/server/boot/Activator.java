@@ -16,6 +16,7 @@ import com.vaguehope.morrigan.server.AsyncActions;
 import com.vaguehope.morrigan.server.MorriganServer;
 import com.vaguehope.morrigan.server.ServerConfig;
 import com.vaguehope.morrigan.tasks.AsyncTasksRegisterTracker;
+import com.vaguehope.morrigan.util.DaemonThreadFactory;
 
 public class Activator implements BundleActivator {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -40,7 +41,7 @@ public class Activator implements BundleActivator {
 		this.playerReaderTracker = new PlayerReaderTracker(context);
 		this.mediaFactoryTracker = new MediaFactoryTracker(context);
 		this.asyncTasksRegisterTracker = new AsyncTasksRegisterTracker(context);
-		this.executorService = new ThreadPoolExecutor(0, 1, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+		this.executorService = new ThreadPoolExecutor(0, 1, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), new DaemonThreadFactory("srvboot"));
 
 		ServerConfig config = new ServerConfig();
 		this.uiMgr = new UiMgr();
