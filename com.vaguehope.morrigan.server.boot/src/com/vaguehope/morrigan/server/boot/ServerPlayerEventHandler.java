@@ -17,10 +17,10 @@ import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.Player.PlayerEventListener;
-import com.vaguehope.morrigan.player.PlayerEventHandler;
+import com.vaguehope.morrigan.player.LocalPlayerSupport;
 import com.vaguehope.morrigan.screen.ScreenMgr;
 
-class ServerPlayerEventHandler implements PlayerEventListener, PlayerEventHandler {
+class ServerPlayerEventHandler implements PlayerEventListener, LocalPlayerSupport {
 
 	private static final Logger logger = Logger.getLogger(ServerPlayerEventHandler.class.getName());
 

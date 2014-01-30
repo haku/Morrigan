@@ -70,13 +70,13 @@ public class PlayerRegisterTracker implements PlayerRegister {
 	}
 
 	@Override
-	public LocalPlayer makeLocal (final String name, final PlayerEventHandler eventHandler) {
-		return getService().makeLocal(name, eventHandler);
+	public LocalPlayer makeLocal (final String name, final LocalPlayerSupport localPlayerSupport) {
+		return getService().makeLocal(name, localPlayerSupport);
 	}
 
 	@Override
-	public LocalPlayer makeLocalProxy (final Player player, final PlayerEventHandler eventHandler) {
-		return getService().makeLocalProxy(player, eventHandler);
+	public LocalPlayer makeLocalProxy (final Player player, final LocalPlayerSupport localPlayerSupport) {
+		return getService().makeLocalProxy(player, localPlayerSupport);
 	}
 	@Override
 	public String toString () {

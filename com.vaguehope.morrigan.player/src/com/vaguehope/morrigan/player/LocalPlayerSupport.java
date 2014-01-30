@@ -7,7 +7,7 @@ import org.eclipse.swt.widgets.Composite;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
 
-public interface PlayerEventHandler {
+public interface LocalPlayerSupport {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	/**

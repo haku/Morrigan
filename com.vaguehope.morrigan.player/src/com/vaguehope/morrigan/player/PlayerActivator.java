@@ -79,7 +79,7 @@ public final class PlayerActivator implements BundleActivator {
 
 	protected void fillPlayerContainer (final PlayerContainer container) {
 		try {
-			container.setPlayer(this.playerRegister.makeLocal(container.getName(), container.getEventHandler()));
+			container.setPlayer(this.playerRegister.makeLocal(container.getName(), container.getLocalPlayerSupport()));
 		}
 		catch (Exception e) {
 			logger.log(Level.WARNING, "Failed to inject player object into container '" + container + "'.", e);

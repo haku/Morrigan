@@ -14,7 +14,7 @@ import com.vaguehope.morrigan.player.LocalPlayer;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.Player;
-import com.vaguehope.morrigan.player.PlayerEventHandler;
+import com.vaguehope.morrigan.player.LocalPlayerSupport;
 import com.vaguehope.morrigan.player.PlayerQueue;
 
 /**
@@ -27,15 +27,15 @@ public class LocalProxyPlayer implements LocalPlayer {
 	private final int refId;
 	private final String refName;
 	private final AtomicReference<Player> ref = new AtomicReference<Player>();
-	private final PlayerEventHandler eventHandler;
+	private final LocalPlayerSupport localPlayerSupport;
 
-	public LocalProxyPlayer (final Player player, final PlayerEventHandler eventHandler) {
+	public LocalProxyPlayer (final Player player, final LocalPlayerSupport eventHandler) {
 		if (player == null) throw new IllegalArgumentException("Player can not be null.");
 		this.refId = player.getId();
 		this.refName = player.getName();
 		this.ref.set(player);
-		this.eventHandler = eventHandler;
-		this.eventHandler.historyChanged(); // undefined --> empty list.
+		this.localPlayerSupport = eventHandler;
+		this.localPlayerSupport.historyChanged(); // undefined --> empty list.
 	}
 
 	@Override
