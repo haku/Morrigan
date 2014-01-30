@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
@@ -28,11 +28,11 @@ public class PlayerRegisterImpl implements PlayerRegister {
 	private final Set<Integer> localPlayerIds = Collections.newSetFromMap(new ConcurrentHashMap<Integer, Boolean>());
 
 	private final PlaybackEngineFactory playbackEngineFactory;
-	private final ScheduledExecutorService scheduledExecutorService;
+	private final ExecutorService executorService;
 
-	public PlayerRegisterImpl (final PlaybackEngineFactory playbackEngineFactory, final ScheduledExecutorService scheduledExecutorService) {
+	public PlayerRegisterImpl (final PlaybackEngineFactory playbackEngineFactory, final ExecutorService executorService) {
 		this.playbackEngineFactory = playbackEngineFactory;
-		this.scheduledExecutorService = scheduledExecutorService;
+		this.executorService = executorService;
 	}
 
 	@Override
@@ -90,7 +90,7 @@ public class PlayerRegisterImpl implements PlayerRegister {
 
 	@Override
 	public LocalPlayer makeLocal (final String name, final PlayerEventHandler eventHandler) {
-		LocalPlayer p = new LocalPlayerImpl(nextIndex(), name, eventHandler, this, this.playbackEngineFactory, this.scheduledExecutorService);
+		LocalPlayer p = new LocalPlayerImpl(nextIndex(), name, eventHandler, this, this.playbackEngineFactory, this.executorService);
 		this.localPlayerIds.add(Integer.valueOf(p.getId()));
 		register(p);
 		return p;
@@ -98,7 +98,7 @@ public class PlayerRegisterImpl implements PlayerRegister {
 
 	@Override
 	public LocalPlayer makeLocalProxy (final Player player, final PlayerEventHandler eventHandler) {
-		return new LocalProxyPlayer(player, eventHandler, this.scheduledExecutorService);
+		return new LocalProxyPlayer(player, eventHandler);
 	}
 
 	public void disposeLocalPlayers () {

@@ -54,6 +54,7 @@ import com.vaguehope.morrigan.player.OrderHelper;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.Player;
+import com.vaguehope.morrigan.player.Player.PlayerEventListener;
 import com.vaguehope.morrigan.player.PlayerEventHandler;
 import com.vaguehope.morrigan.player.PlayerLifeCycleListener;
 import com.vaguehope.morrigan.screen.CoverArtProvider;
@@ -148,6 +149,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 		synchronized (this.playerFactoryLock) {
 			if (this.player == null) {
 				this.player = Activator.getPlayerRegister().makeLocal("Gui", this.eventHandler);
+				this.player.addEventListener(this.playerEventListener);
 				callPlayerCreatedListeners(this.player);
 			}
 			return this.player;
@@ -158,6 +160,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 		synchronized (this.playerFactoryLock) {
 			if (this.player != null) {
 				callPlayerDisposedListeners(this.player);
+				this.player.removeEventListener(this.playerEventListener);
 				this.player.dispose();
 				this.player = null;
 			}
@@ -173,10 +176,11 @@ public abstract class AbstractPlayerView extends ViewPart {
 			disposePlayer();
 			if (newPlayer != null) {
 				this.player = Activator.getPlayerRegister().makeLocalProxy(newPlayer, this.eventHandler);
+				this.player.addEventListener(this.playerEventListener);
 				callPlayerCreatedListeners(this.player);
 			}
 		}
-		this.eventHandler.updateStatus();
+		callUpdateStatus();
 	}
 
 	private void callPlayerCreatedListeners (final Player p) {
@@ -209,26 +213,35 @@ public abstract class AbstractPlayerView extends ViewPart {
 		return this.eventHandler;
 	}
 
-	private final PlayerEventHandler eventHandler = new PlayerEventHandler() {
+	private final PlayerEventListener playerEventListener = new PlayerEventListener() {
 
 		@Override
-		public void updateStatus () {
-			getSite().getShell().getDisplay().asyncExec(AbstractPlayerView.this.updateStatusRunable);
+		public void positionChanged (final long newPosition, final int duration) {
+			callUpdateStatus();
 		}
+
+		@Override
+		public void playStateChanged (final PlayState newPlayState) {
+			callUpdateStatus();
+		}
+
+		@Override
+		public void playOrderChanged (final PlaybackOrder newPlaybackOrder) {
+			callUpdateStatus();
+		}
+
+		@Override
+		public void currentItemChanged (final PlayItem newItem) {
+			callUpdateTitle();
+		}
+
+	};
+
+	private final PlayerEventHandler eventHandler = new PlayerEventHandler() {
 
 		@Override
 		public void historyChanged () {
 			AbstractPlayerView.this.historyChangedRrefresher.run();
-		}
-
-		@Override
-		public void currentItemChanged () {
-			UiThreadHelper.tryAsyncExec(getSite(), new Runnable() {
-				@Override
-				public void run () {
-					updateTitle();
-				}
-			});
 		}
 
 		@Override
@@ -297,12 +310,27 @@ public abstract class AbstractPlayerView extends ViewPart {
 
 	};
 
-	Runnable updateStatusRunable = new Runnable() {
+	private final Runnable updateStatusRunable = new Runnable() {
 		@Override
 		public void run () {
 			updateStatus();
 		}
 	};
+
+	private final Runnable updateTitleRunable = new Runnable() {
+		@Override
+		public void run () {
+			updateTitle();
+		}
+	};
+
+	protected void callUpdateStatus () {
+		UiThreadHelper.tryAsyncExec(getSite(), AbstractPlayerView.this.updateStatusRunable);
+	}
+
+	protected void callUpdateTitle () {
+		UiThreadHelper.tryAsyncExec(getSite(), AbstractPlayerView.this.updateTitleRunable);
+	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Abstract methods.

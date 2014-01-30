@@ -69,6 +69,16 @@ public class SshPlayer implements Player {
 	}
 
 	@Override
+	public void addEventListener (final PlayerEventListener listener) {
+		// TODO
+	}
+
+	@Override
+	public void removeEventListener (final PlayerEventListener listener) {
+		// TODO
+	}
+
+	@Override
 	public void loadAndStartPlaying (final IMediaTrackList<? extends IMediaTrack> list) {
 		IMediaTrack nextTrack = OrderHelper.getNextTrack(list, null, this.playbackOrder.get());
 		loadAndStartPlaying(list, nextTrack);

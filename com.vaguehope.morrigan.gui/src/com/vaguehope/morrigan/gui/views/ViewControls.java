@@ -59,7 +59,7 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		makeQueueRefresher();
 		addPlayerLifeCycleListener(this.playerLifeCycleListener);
 
-		getEventHandler().updateStatus();
+		callUpdateStatus();
 	}
 
 	@Override

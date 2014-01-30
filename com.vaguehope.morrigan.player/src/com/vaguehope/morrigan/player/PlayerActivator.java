@@ -2,8 +2,10 @@ package com.vaguehope.morrigan.player;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -23,15 +25,13 @@ public final class PlayerActivator implements BundleActivator {
 
 	protected PlayerRegisterImpl playerRegister;
 	private PlaybackEngineFactoryTracker playbackEngineFactoryTracker;
-	private ScheduledExecutorService scheduledExecutorService;
+	private ExecutorService executorService;
 
 	@Override
 	public void start (final BundleContext context) throws Exception {
 		this.playbackEngineFactoryTracker = new PlaybackEngineFactoryTracker(context);
-		this.scheduledExecutorService = new ScheduledThreadPoolExecutor(1);
-		// TODO this can probably change back when LocalProxyPlayer stops polling.
-//		this.scheduledExecutorService = new ThreadPoolExecutor(0, 1, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
-		this.playerRegister = new PlayerRegisterImpl(this.playbackEngineFactoryTracker, this.scheduledExecutorService);
+		this.executorService = new ThreadPoolExecutor(0, 1, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+		this.playerRegister = new PlayerRegisterImpl(this.playbackEngineFactoryTracker, this.executorService);
 
 		startPlayerContainerListener(context);
 		context.registerService(PlayerReader.class, this.playerListener, null);
@@ -41,7 +41,7 @@ public final class PlayerActivator implements BundleActivator {
 	@Override
 	public void stop (final BundleContext context) throws Exception {
 		this.playerRegister.dispose();
-		this.scheduledExecutorService.shutdownNow();
+		this.executorService.shutdownNow();
 		this.playbackEngineFactoryTracker.dispose();
 	}
 
