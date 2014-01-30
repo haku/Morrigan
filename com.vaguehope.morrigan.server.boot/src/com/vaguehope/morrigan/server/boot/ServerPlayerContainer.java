@@ -57,6 +57,7 @@ class ServerPlayerContainer implements PlayerContainer {
 	public void setPlayer (final Player player) {
 		if (!(player instanceof LocalPlayer)) throw new IllegalArgumentException("Only LocalPlayer supported.");
 		this.player = (LocalPlayer) player;
+		this.player.addEventListener(this.eventHandler);
 		try {
 			player.setPlaybackOrder(this.config.getPlaybackOrder());
 		}

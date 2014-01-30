@@ -3,9 +3,6 @@ package com.vaguehope.morrigan.player.internal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.swt.widgets.Composite;
@@ -31,35 +28,19 @@ public class LocalProxyPlayer implements LocalPlayer {
 	private final String refName;
 	private final AtomicReference<Player> ref = new AtomicReference<Player>();
 	private final PlayerEventHandler eventHandler;
-	private final ScheduledFuture<?> scheduledFuture;
 
-	public LocalProxyPlayer (final Player player, final PlayerEventHandler eventHandler, final ScheduledExecutorService scheduledExecutorService) {
+	public LocalProxyPlayer (final Player player, final PlayerEventHandler eventHandler) {
 		if (player == null) throw new IllegalArgumentException("Player can not be null.");
 		this.refId = player.getId();
 		this.refName = player.getName();
 		this.ref.set(player);
 		this.eventHandler = eventHandler;
-		this.scheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(new Runnable() {
-			private PlayItem lastItem;
-
-			@Override
-			public void run () {
-				final PlayItem currentItem = getCurrentItem();
-				if (this.lastItem != currentItem) {
-					this.lastItem = currentItem;
-					eventHandler.currentItemChanged();
-				}
-				eventHandler.updateStatus(); // TODO Player needs addListener() and removeListener().
-			}
-		}, 1, 1, TimeUnit.SECONDS);
 		this.eventHandler.historyChanged(); // undefined --> empty list.
 	}
 
 	@Override
 	public void dispose () {
-		if (this.ref.getAndSet(null) != null) {
-			this.scheduledFuture.cancel(false);
-		}
+		this.ref.set(null);
 	}
 
 	private Player getRef () {
@@ -109,6 +90,20 @@ public class LocalProxyPlayer implements LocalPlayer {
 		final Player p = getRef();
 		if (p == null) return false;
 		return p.isPlaybackEngineReady();
+	}
+
+	@Override
+	public void addEventListener (final PlayerEventListener listener) {
+		final Player p = getRef();
+		if (p == null) return;
+		p.addEventListener(listener);
+	}
+
+	@Override
+	public void removeEventListener (final PlayerEventListener listener) {
+		final Player p = getRef();
+		if (p == null) return;
+		p.removeEventListener(listener);
 	}
 
 	@Override

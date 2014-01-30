@@ -11,13 +11,6 @@ public interface PlayerEventHandler {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	/**
-	 * Called when:
-	 * - position changed.
-	 * - track changed.
-	 */
-	void updateStatus () ;
-
-	/**
 	 * User double-clicked on the video?
 	 */
 	void videoAreaSelected () ;
@@ -28,8 +21,6 @@ public interface PlayerEventHandler {
 	void videoAreaClose () ;
 
 	void historyChanged () ;
-
-	void currentItemChanged () ;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

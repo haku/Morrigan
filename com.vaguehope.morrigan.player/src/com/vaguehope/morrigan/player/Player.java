@@ -46,5 +46,25 @@ public interface Player {
 	Map<Integer, String> getMonitors ();
 	void goFullscreen (int monitor);
 
+	public interface PlayerEventListener {
+
+		void playOrderChanged (PlaybackOrder newPlaybackOrder);
+		/**
+		 * Either the item is now a different item, or a property on the item has changed.
+		 * May be called with null to indicate no item or an unknown item.
+		 */
+		void currentItemChanged (PlayItem newItem);
+		void playStateChanged(PlayState newPlayState);
+		/**
+		 * Called when either position or duration change.
+		 * Both in seconds.
+		 */
+		void positionChanged(long newPosition, int duration);
+
+	}
+
+	void addEventListener(PlayerEventListener listener);
+	void removeEventListener(PlayerEventListener listener);
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

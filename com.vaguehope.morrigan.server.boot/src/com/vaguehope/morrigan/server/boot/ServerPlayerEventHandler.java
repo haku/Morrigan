@@ -13,12 +13,14 @@ import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
 import com.vaguehope.morrigan.player.LocalPlayer;
+import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.Player;
+import com.vaguehope.morrigan.player.Player.PlayerEventListener;
 import com.vaguehope.morrigan.player.PlayerEventHandler;
 import com.vaguehope.morrigan.screen.ScreenMgr;
 
-class ServerPlayerEventHandler implements PlayerEventHandler {
+class ServerPlayerEventHandler implements PlayerEventListener, PlayerEventHandler {
 
 	private static final Logger logger = Logger.getLogger(ServerPlayerEventHandler.class.getName());
 
@@ -93,9 +95,27 @@ class ServerPlayerEventHandler implements PlayerEventHandler {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	public void updateStatus () {
+	public void playOrderChanged (final PlaybackOrder newPlaybackOrder) {
 		outputStatus();
 	}
+
+	@Override
+	public void currentItemChanged (final PlayItem newItem) {
+		outputStatus();
+		if (this.screenRegister != null) this.screenRegister.updateTitle();
+	}
+
+	@Override
+	public void playStateChanged (final PlayState newPlayState) {
+		outputStatus();
+	}
+
+	@Override
+	public void positionChanged (final long newPosition, final int duration) {
+		outputStatus();
+	}
+
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
 	public void asyncThrowable (final Throwable t) {
@@ -130,12 +150,6 @@ class ServerPlayerEventHandler implements PlayerEventHandler {
 	}
 
 	@Override
-	public void currentItemChanged () {
-		if (this.screenRegister == null) return;
-		this.screenRegister.updateTitle();
-	}
-
-	@Override
 	public void historyChanged () {/* UNUSED */}
 
 	@Override
@@ -143,4 +157,5 @@ class ServerPlayerEventHandler implements PlayerEventHandler {
 
 	@Override
 	public void videoAreaClose () {/* UNUSED */}
+
 }

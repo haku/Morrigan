@@ -34,6 +34,7 @@ import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayerEventHandler;
+import com.vaguehope.morrigan.player.PlayerEventListenerCaller;
 import com.vaguehope.morrigan.player.PlayerQueue;
 
 public class LocalPlayerImpl implements LocalPlayer {
@@ -134,7 +135,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 				}
 			}
 
-			this.eventHandler.currentItemChanged();
+			this.listeners.currentItemChanged(item);
 		}
 	}
 
@@ -306,6 +307,19 @@ public class LocalPlayerImpl implements LocalPlayer {
 		}
 	}
 
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	protected final PlayerEventListenerCaller listeners = new PlayerEventListenerCaller();
+
+	@Override
+	public void addEventListener (final PlayerEventListener listener) {
+		this.listeners.addEventListener(listener);
+	}
+
+	@Override
+	public void removeEventListener (final PlayerEventListener listener) {
+		this.listeners.removeEventListener(listener);
+	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Playback management.
@@ -367,7 +381,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 					public void run () {
 						try {
 							item.list.incTrackStartCnt(item.item);
-							LocalPlayerImpl.this.eventHandler.currentItemChanged();
+							LocalPlayerImpl.this.listeners.currentItemChanged(item);
 						}
 						catch (MorriganException e) {
 							LocalPlayerImpl.this.logger.log(Level.WARNING, "Failed to increment track count.", e);
@@ -388,7 +402,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 			this.eventHandler.asyncThrowable(e);
 		}
 
-		this.eventHandler.updateStatus();
+		this.listeners.currentItemChanged(item);
 	}
 
 	/**
@@ -471,7 +485,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 					this.eventHandler.asyncThrowable(new PlaybackException("Don't know what to do.  Playstate=" + playbackState + "."));
 				}
 			} // END synchronized.
-			this.eventHandler.updateStatus();
+			this.listeners.playStateChanged(getPlayState());
 		}
 	}
 
@@ -485,12 +499,12 @@ public class LocalPlayerImpl implements LocalPlayer {
 		 * just to call stop on it.
 		 */
 		IPlaybackEngine eng = getPlaybackEngine(false);
-		if (eng!=null) {
+		if (eng != null) {
 			synchronized (eng) {
 				eng.stopPlaying();
 				eng.unloadFile();
 			}
-			this.eventHandler.updateStatus();
+			this.listeners.playStateChanged(PlayState.STOPPED);
 		}
 	}
 
@@ -508,7 +522,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 		@Override
 		public void positionChanged(final long position) {
 			LocalPlayerImpl.this._currentPosition = position;
-			LocalPlayerImpl.this.eventHandler.updateStatus();
+			LocalPlayerImpl.this.listeners.positionChanged(position, getCurrentTrackDuration());
 		}
 
 		@Override
@@ -530,7 +544,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 				}
 			}
 
-			LocalPlayerImpl.this.eventHandler.updateStatus();
+			LocalPlayerImpl.this.listeners.positionChanged(getCurrentPosition(), duration);
 		}
 
 		@Override
@@ -555,7 +569,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 			}
 			else {
 				LocalPlayerImpl.this.logger.info("No more tracks to play.");
-				LocalPlayerImpl.this.eventHandler.updateStatus();
+				LocalPlayerImpl.this.listeners.currentItemChanged(null);
 			}
 		}
 
