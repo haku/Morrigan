@@ -16,6 +16,7 @@ import com.vaguehope.morrigan.gui.engines.HotkeyRegister;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaFactoryTracker;
 import com.vaguehope.morrigan.player.PlayerRegisterTracker;
+import com.vaguehope.morrigan.util.DaemonThreadFactory;
 
 public class Activator extends AbstractUIPlugin {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -51,7 +52,7 @@ public class Activator extends AbstractUIPlugin {
 		this.hotkeyEngineFactoryTracker = new HotkeyEngineFactoryTracker(bundleContext);
 		this.hotkeyRegister = new HotkeyRegister(this.hotkeyEngineFactoryTracker);
 		this.playerRegisterTracker = new PlayerRegisterTracker(bundleContext);
-		this.executorService = new ThreadPoolExecutor(0, 1, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+		this.executorService = new ThreadPoolExecutor(0, 1, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), new DaemonThreadFactory("gui"));
 	}
 
 	@Override
