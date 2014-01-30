@@ -93,6 +93,11 @@ public class LocalProxyPlayer implements LocalPlayer {
 	}
 
 	@Override
+	public boolean isProxy () {
+		return true;
+	}
+
+	@Override
 	public boolean isDisposed () {
 		final Player p = getRef();
 		if (p == null) return false;

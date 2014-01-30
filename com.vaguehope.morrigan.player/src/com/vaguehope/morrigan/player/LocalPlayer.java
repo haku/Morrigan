@@ -7,5 +7,7 @@ public interface LocalPlayer extends Player {
 
 	void setVideoFrameParent(Composite cmfp);
 
+	boolean isProxy();
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
