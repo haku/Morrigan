@@ -433,8 +433,8 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		orderModeChanged(player.getPlaybackOrder());
 
 		final PlayItem currentItem = player.getCurrentItem();
-		if (currentItem != null && currentItem.item != null) {
-			getSite().getShell().setText(currentItem.item.toString());
+		if (currentItem != null && currentItem.hasTrack()) {
+			getSite().getShell().setText(currentItem.getTrack().toString());
 		} else {
 			getSite().getShell().setText("Morrigan");
 		}

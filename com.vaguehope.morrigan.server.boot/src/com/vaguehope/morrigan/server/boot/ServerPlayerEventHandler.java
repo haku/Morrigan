@@ -68,10 +68,8 @@ class ServerPlayerEventHandler implements PlayerEventListener, LocalPlayerSuppor
 			PlayState currentState = p.getPlayState();
 			if (currentState != null) {
 				PlayItem currentPlayItem = p.getCurrentItem();
-				IMediaTrack currentItem = (currentPlayItem != null ? currentPlayItem.item : null);
-				if (currentItem != null) {
-					return currentState + " " + currentItem + ".";
-				}
+				final IMediaTrack track = (currentPlayItem != null ? currentPlayItem.getTrack() : null);
+				if (track != null) return currentState + " " + track + ".";
 				return currentState + ".";
 			}
 			return "Unknown.";

@@ -199,8 +199,8 @@ public class PlayersServlet extends HttpServlet {
 			String tag = req.getParameter("tag");
 			if (tag != null && tag.length() > 0) {
 				PlayItem currentItem = player.getCurrentItem();
-				IMediaTrack item = currentItem != null ? currentItem.item : null;
-				IMediaTrackList<? extends IMediaTrack> list = currentItem != null ? currentItem.list : null;
+				final IMediaTrack item = currentItem != null ? currentItem.getTrack() : null;
+				final IMediaTrackList<? extends IMediaTrack> list = currentItem != null ? currentItem.getList() : null;
 				if (item != null && list != null) {
 					list.addTag(item, tag, MediaTagType.MANUAL, (MediaTagClassification)null);
 					writeResponse(req, resp);
@@ -373,7 +373,7 @@ public class PlayersServlet extends HttpServlet {
 		}
 
 		PlayItem currentItem = p.getCurrentItem();
-		String trackTitle = (currentItem != null && currentItem.item != null) ? currentItem.item.getTitle() : "(empty)";
+		String trackTitle = (currentItem != null && currentItem.hasTrack()) ? currentItem.getTrack().getTitle() : "(empty)";
 
 		int queueLength = p.getQueue().getQueueList().size();
 		DurationData queueDuration = p.getQueue().getQueueTotalDuration();
@@ -399,10 +399,10 @@ public class PlayersServlet extends HttpServlet {
 			String trackLink = null;
 			String filename;
 			String filepath;
-			if (currentItem != null && currentItem.item != null) {
-				trackLink = URLEncoder.encode(currentItem.item.getFilepath(), "UTF-8");
-				filename = currentItem.item.getTitle(); // FIXME This is a hack :s .
-				filepath = currentItem.item.getFilepath();
+			if (currentItem != null && currentItem.hasTrack()) {
+				trackLink = URLEncoder.encode(currentItem.getTrack().getFilepath(), "UTF-8");
+				filename = currentItem.getTrack().getTitle(); // FIXME This is a hack :s .
+				filepath = currentItem.getTrack().getFilepath();
 			}
 			else {
 				filename = NULL;
@@ -416,16 +416,16 @@ public class PlayersServlet extends HttpServlet {
 			FeedHelper.addElement(dw, "playposition", p.getCurrentPosition());
 			FeedHelper.addElement(dw, "trackduration", p.getCurrentTrackDuration());
 
-			if (currentItem != null && currentItem.item != null) {
-				IMediaTrack item = currentItem.item;
-				if (item.getHashcode() != null) FeedHelper.addElement(dw, "trackhash", item.getHashcode().toString(16));
-				FeedHelper.addElement(dw, "trackenabled", Boolean.toString(currentItem.item.isEnabled()));
-				FeedHelper.addElement(dw, "trackmissing", Boolean.toString(currentItem.item.isMissing()));
-				FeedHelper.addElement(dw, "trackstartcount", String.valueOf(currentItem.item.getStartCount()));
-				FeedHelper.addElement(dw, "trackendcount", String.valueOf(currentItem.item.getEndCount()));
+			if (currentItem != null && currentItem.hasTrack()) {
+				final IMediaTrack track = currentItem.getTrack();
+				if (track.getHashcode() != null) FeedHelper.addElement(dw, "trackhash", track.getHashcode().toString(16));
+				FeedHelper.addElement(dw, "trackenabled", Boolean.toString(track.isEnabled()));
+				FeedHelper.addElement(dw, "trackmissing", Boolean.toString(track.isMissing()));
+				FeedHelper.addElement(dw, "trackstartcount", String.valueOf(track.getStartCount()));
+				FeedHelper.addElement(dw, "trackendcount", String.valueOf(track.getEndCount()));
 
 				if (currentList != null) {
-					List<MediaTag> tags = currentList.getTags(item);
+					List<MediaTag> tags = currentList.getTags(track);
 					if (tags != null) {
 						for (MediaTag tag : tags) {
 							FeedHelper.addElement(dw, "tracktag", tag.getTag(), new String[][] {
@@ -461,8 +461,8 @@ public class PlayersServlet extends HttpServlet {
 
 		List<PlayItem> queueList = p.getQueue().getQueueList();
 		for (PlayItem playItem : queueList) {
-			final IMediaTrackList<? extends IMediaTrack> list = playItem.list;
-			final IMediaTrack mi = playItem.item;
+			final IMediaTrackList<? extends IMediaTrack> list = playItem.getList();
+			final IMediaTrack mi = playItem.getTrack();
 
 			dw.startElement("entry");
 
@@ -471,7 +471,7 @@ public class PlayersServlet extends HttpServlet {
 			String listFile = URLEncoder.encode(FeedHelper.filenameFromPath(list.getListId()), "UTF-8");
 			FeedHelper.addLink(dw, listFile, "list", "text/xml");
 
-			FeedHelper.addElement(dw, "id", playItem.id);
+			FeedHelper.addElement(dw, "id", playItem.getId());
 
 			if (mi != null) {
 				String file = URLEncoder.encode(mi.getFilepath(), "UTF-8");

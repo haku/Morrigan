@@ -109,19 +109,30 @@ public abstract class AbstractPlayer implements Player {
 
 	@Override
 	public void loadAndStartPlaying (final IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack track) {
-		final IMediaTrack nextTrack = track != null ? track : OrderHelper.getNextTrack(list, null, getPlaybackOrder());
-		loadAndStartPlaying(new PlayItem(list, nextTrack));
+		loadAndStartPlaying(new PlayItem(list, track));
 	}
 
 	@Override
 	public void loadAndStartPlaying (final PlayItem item) {
 		checkAlive();
+		if (item == null) throw new IllegalArgumentException("PlayItem can not be null.");
+
+		PlayItem pi = item;
+		if (!pi.hasTrack()) {
+			final IMediaTrack track = OrderHelper.getNextTrack(pi.getList(), null, getPlaybackOrder());
+			if (track == null) return;
+			pi = pi.withTrack(track);
+		}
+
+		loadAndStartPlayingTrack(pi);
+	}
+
+	private void loadAndStartPlayingTrack (final PlayItem item) {
+		if (item == null) throw new IllegalArgumentException("PlayItem can not be null.");
+		if (!item.hasTrack()) throw new IllegalArgumentException("Item must have a track.");
+		if (!item.getTrack().isPlayable()) throw new IllegalArgumentException("Item is not playable: '" + item.getTrack().getFilepath() + "'.");
 		try {
-			if (item == null) throw new IllegalArgumentException("PlayItem can not be null.");
-			if (item.item == null) throw new IllegalArgumentException("PlayItem item can not be null.");
-			if (item.list == null) throw new IllegalArgumentException("PlayItem list can not be null.");
-			if (!item.item.isPlayable()) throw new IllegalArgumentException("Item is not playable: '" + item.item.getFilepath() + "'.");
-			final File file = new File(item.item.getFilepath());
+			final File file = new File(item.getTrack().getFilepath());
 			if (!file.exists()) throw new FileNotFoundException(file.getAbsolutePath());
 			synchronized (this.loadLock) {
 				loadAndStartPlaying(item, file);

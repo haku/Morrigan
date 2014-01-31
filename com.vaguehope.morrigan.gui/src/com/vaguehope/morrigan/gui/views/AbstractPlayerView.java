@@ -369,12 +369,12 @@ public abstract class AbstractPlayerView extends ViewPart {
 
 		public HistoryAction (final PlayItem item) {
 			this.item = item;
-			setText(item.item.getTitle());
+			setText(item.getTrack().getTitle());
 		}
 
 		@Override
 		public void run () {
-			getPlayer().loadAndStartPlaying(this.item.list, this.item.item);
+			getPlayer().loadAndStartPlaying(this.item);
 		}
 
 	}
@@ -759,8 +759,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 		public void run () {
 			PlayItem currentItem = getPlayer().getCurrentItem();
 			if (currentItem != null) {
-				ClipboardHelper.setText(currentItem.item.getFilepath());
-
+				ClipboardHelper.setText(currentItem.getTrack().getFilepath());
 			}
 			else {
 				new MorriganMsgDlg("No track loaded desu~.").open();
@@ -774,11 +773,9 @@ public abstract class AbstractPlayerView extends ViewPart {
 	protected IAction findInListAction = new Action("Find in list") {
 		@Override
 		public void run () {
-			if (getPlayer().getCurrentItem() != null
-					&& getPlayer().getCurrentItem().list != null
-					&& getPlayer().getCurrentItem().item != null) {
-				PlayItem currentItem = getPlayer().getCurrentItem();
-				revealItemInLists(currentItem.list, currentItem.item);
+			final PlayItem item = getPlayer().getCurrentItem();
+			if (item != null && item.isComplete()) {
+				revealItemInLists(item.getList(), item.getTrack());
 			}
 		}
 	};

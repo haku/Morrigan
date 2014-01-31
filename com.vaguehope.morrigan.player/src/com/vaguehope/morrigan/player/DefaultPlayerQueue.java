@@ -21,9 +21,8 @@ public class DefaultPlayerQueue implements PlayerQueue {
 	public DefaultPlayerQueue () {}
 
 	private void validateQueueItemBeforeAdd (final PlayItem item) {
-		if (item.item != null && !item.item.isPlayable()) throw new IllegalArgumentException("item is not playable.");
-		if (item.id >= 0) throw new IllegalArgumentException("item can not already have id.");
-		item.id = this.queueId.getAndIncrement();
+		if (item.hasTrack() && !item.getTrack().isPlayable()) throw new IllegalArgumentException("item is not playable.");
+		item.setId(this.queueId.getAndIncrement());
 	}
 
 	@Override
@@ -155,8 +154,8 @@ public class DefaultPlayerQueue implements PlayerQueue {
 		long duration = 0;
 		synchronized (this.queue) {
 			for (final PlayItem pi : this.queue) {
-				if (pi.item != null && pi.item.getDuration() > 0) {
-					duration = duration + pi.item.getDuration();
+				if (pi.hasTrack() && pi.getTrack().getDuration() > 0) {
+					duration = duration + pi.getTrack().getDuration();
 				}
 				else {
 					complete = false;
@@ -172,7 +171,7 @@ public class DefaultPlayerQueue implements PlayerQueue {
 		final Map<Integer, PlayItem> q = new HashMap<Integer, PlayItem>();
 		synchronized (this.queue) {
 			for (final PlayItem item : this.queue) {
-				q.put(Integer.valueOf(item.id), item);
+				q.put(Integer.valueOf(item.getId()), item);
 			}
 			return q.get(Integer.valueOf(itemId));
 		}

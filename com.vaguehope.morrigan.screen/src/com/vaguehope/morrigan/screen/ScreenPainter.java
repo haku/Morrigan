@@ -83,15 +83,15 @@ public class ScreenPainter implements PaintListener {
 		final Point centre = new Point(clientArea.width / 2, clientArea.height / 2);
 		final PlayItem item = this.titleProvider != null ? this.titleProvider.getItem() : null;
 
-		if (item != null && item.item != null) {
+		if (item != null && item.hasTrack()) {
 			if (this.coverArtProvider != null) {
-				final Image image = this.coverArtProvider.getImage(item.item, this.redrawSyncRunnable);
+				final Image image = this.coverArtProvider.getImage(item.getTrack(), this.redrawSyncRunnable);
 				if (image != null) {
 					if (!image.isDisposed()) {
 						drawImageScaled(e, clientArea, image);
 					}
 					else {
-						System.err.println("Warning: cover image for '" + item.item + "' already disposed.");
+						System.err.println("Warning: cover image for '" + item.getTrack() + "' already disposed.");
 					}
 				}
 			}
@@ -121,19 +121,19 @@ public class ScreenPainter implements PaintListener {
 					(int) (fontData.getHeight() * 1.5f), fontData.getStyle());
 		}
 
-		final String title = formatTitle(item.item.getTitle());
+		final String title = formatTitle(item.getTrack().getTitle());
 		e.gc.setFont(font3);
 		final Rectangle rect = drawTextHVCen(e, centre.x, centre.y, title);
 
-		String counts = item.item.getStartCount() + " / " + item.item.getEndCount();
-		if (item.item.getDuration() > 0) {
-			counts = counts + "     " + TimeHelper.formatTimeSeconds(item.item.getDuration());
+		String counts = item.getTrack().getStartCount() + " / " + item.getTrack().getEndCount();
+		if (item.getTrack().getDuration() > 0) {
+			counts = counts + "     " + TimeHelper.formatTimeSeconds(item.getTrack().getDuration());
 		}
 		e.gc.setFont(font2);
 		drawTextHCen(e, centre.x, rect.y + rect.height, counts);
 
-		if (this.screenType != ScreenType.LARGE && item.list != null) {
-			final String listName = "(" + item.list.getListName() + ")";
+		if (this.screenType != ScreenType.LARGE && item.hasList()) {
+			final String listName = "(" + item.getList().getListName() + ")";
 			final Point textSize = e.gc.textExtent(listName);
 			drawTextHCen(e, centre.x, rect.y - textSize.y, listName);
 		}
