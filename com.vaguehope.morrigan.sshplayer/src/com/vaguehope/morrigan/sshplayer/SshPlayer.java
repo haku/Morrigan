@@ -4,63 +4,33 @@ import java.io.File;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
-import com.vaguehope.morrigan.model.Register;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
-import com.vaguehope.morrigan.player.DefaultPlayerQueue;
-import com.vaguehope.morrigan.player.OrderHelper;
-import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
+import com.vaguehope.morrigan.player.AbstractPlayer;
 import com.vaguehope.morrigan.player.PlayItem;
-import com.vaguehope.morrigan.player.Player;
-import com.vaguehope.morrigan.player.PlayerQueue;
+import com.vaguehope.morrigan.player.PlayerRegister;
 
-public class SshPlayer implements Player {
+public class SshPlayer extends AbstractPlayer {
 
 	private static final Logger LOG = Logger.getLogger(SshPlayer.class.getName());
 
-	private final int playerId;
 	private final CliHost host;
-	private final Register<Player> register;
-	private final DefaultPlayerQueue queue;
-
-	private final AtomicBoolean alive = new AtomicBoolean(true);
-	private final AtomicReference<PlaybackOrder> playbackOrder = new AtomicReference<PlaybackOrder>(PlaybackOrder.SEQUENTIAL);
 	private final AtomicReference<CliPlayer> cliPlayer = new AtomicReference<CliPlayer>();
 	private final AtomicReference<PlayItem> currentItem = new AtomicReference<PlayItem>();
 
-	public SshPlayer (final int id, final CliHost host, final Register<Player> register) {
-		this.playerId = id;
+	public SshPlayer (final int id, final CliHost host, final PlayerRegister register) {
+		super(id, "ssh:" + host.getName(), register);
 		this.host = host;
-		this.register = register;
-		this.queue = new DefaultPlayerQueue();
 	}
 
 	@Override
-	public int getId () {
-		return this.playerId;
-	}
-
-	@Override
-	public void dispose () {
-		if (this.alive.compareAndSet(true, false)) {
-			this.register.unregister(this);
-		}
-	}
-
-	@Override
-	public boolean isDisposed () {
-		return !this.alive.get();
-	}
-
-	@Override
-	public String getName () {
-		return "ssh:" + this.host.getName();
+	protected void onDispose () {
+		System.err.println("Disposed player: " + toString());
 	}
 
 	@Override
@@ -69,39 +39,11 @@ public class SshPlayer implements Player {
 	}
 
 	@Override
-	public void addEventListener (final PlayerEventListener listener) {
-		// TODO
-	}
-
-	@Override
-	public void removeEventListener (final PlayerEventListener listener) {
-		// TODO
-	}
-
-	@Override
-	public void loadAndStartPlaying (final IMediaTrackList<? extends IMediaTrack> list) {
-		IMediaTrack nextTrack = OrderHelper.getNextTrack(list, null, this.playbackOrder.get());
-		loadAndStartPlaying(list, nextTrack);
-	}
-
-	@Override
-	public void loadAndStartPlaying (final IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack track) {
-		if (track == null) throw new NullPointerException();
-		loadAndStartPlaying(new PlayItem(list, track));
-	}
-
-	@Override
-	public void loadAndStartPlaying (final PlayItem item) {
-		File media = new File(item.getTrack().getFilepath());
-		if (!media.exists()) {
-			// TODO report to some status line.
-			LOG.warning("File not found: " + media.getAbsolutePath());
-			return;
-		}
-		LOG.info("Loading item: " + media.getAbsolutePath());
+	protected void loadAndStartPlaying (final PlayItem item, final File file) throws Exception {
+		LOG.info("Loading item: " + file.getAbsolutePath());
 
 		stopPlaying();
-		CliPlayer newMp = new CliPlayer(this.host, media);
+		final CliPlayer newMp = new CliPlayer(this.host, file);
 		if (!this.cliPlayer.compareAndSet(null, newMp)) {
 			LOG.warning("Another thread set the player.  Aborting playback of: " + item);
 			return;
@@ -175,23 +117,8 @@ public class SshPlayer implements Player {
 	}
 
 	@Override
-	public PlaybackOrder getPlaybackOrder () {
-		return this.playbackOrder.get();
-	}
-
-	@Override
-	public void setPlaybackOrder (final PlaybackOrder order) {
-		this.playbackOrder.set(order);
-	}
-
-	@Override
 	public List<PlayItem> getHistory () {
 		return Collections.emptyList();
-	}
-
-	@Override
-	public PlayerQueue getQueue () {
-		return this.queue;
 	}
 
 	@Override
