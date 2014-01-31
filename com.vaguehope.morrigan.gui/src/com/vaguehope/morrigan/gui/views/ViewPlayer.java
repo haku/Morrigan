@@ -12,6 +12,7 @@ import org.eclipse.swt.widgets.Composite;
 
 import com.vaguehope.morrigan.gui.Activator;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
+import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.screen.ScreenPainter;
 import com.vaguehope.morrigan.screen.ScreenPainter.ScreenType;
 
@@ -149,8 +150,9 @@ public class ViewPlayer extends AbstractPlayerView {
 
 		}
 
-		if (getPlayer().getCurrentItem() != null && getPlayer().getCurrentItem().item != null) {
-			setContentDescription("Playing: " + getPlayer().getCurrentPosition() + " : " + getPlayer().getCurrentItem().toString());
+		final PlayItem item = getPlayer().getCurrentItem();
+		if (item != null && item.hasTrack()) {
+			setContentDescription("Playing: " + getPlayer().getCurrentPosition() + " : " + item.toString());
 		} else {
 			setContentDescription("Idle.");
 		}

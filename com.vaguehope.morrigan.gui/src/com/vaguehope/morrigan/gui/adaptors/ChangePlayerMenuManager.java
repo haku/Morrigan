@@ -44,7 +44,7 @@ public class ChangePlayerMenuManager {
 			if (p == null) return "(new player)";
 			String label = p.getName();
 			final PlayItem item = p.getCurrentItem();
-			if (item != null && item.item != null) label += ": " + item.item.getTitle();
+			if (item != null && item.hasTrack()) label += ": " + item.getTrack().getTitle();
 			return label;
 		}
 

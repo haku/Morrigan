@@ -92,7 +92,7 @@ public class SshPlayer implements Player {
 
 	@Override
 	public void loadAndStartPlaying (final PlayItem item) {
-		File media = new File(item.item.getFilepath());
+		File media = new File(item.getTrack().getFilepath());
 		if (!media.exists()) {
 			// TODO report to some status line.
 			LOG.warning("File not found: " + media.getAbsolutePath());
@@ -154,7 +154,7 @@ public class SshPlayer implements Player {
 	@Override
 	public IMediaTrackList<? extends IMediaTrack> getCurrentList () {
 		PlayItem item = this.currentItem.get();
-		return item == null ? null : item.list;
+		return item == null ? null : item.getList();
 	}
 
 	@Override

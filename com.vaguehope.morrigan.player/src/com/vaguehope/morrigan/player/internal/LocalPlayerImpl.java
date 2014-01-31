@@ -77,18 +77,15 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 	 */
 	private void setCurrentItem (final PlayItem item) {
 		synchronized (this._currentItemLock) {
-			if (this._currentItem != null && this._currentItem.list != null) {
-				this._currentItem.list.removeChangeEventListener(this.listChangedRunnable);
+			if (this._currentItem != null && this._currentItem.hasList()) {
+				this._currentItem.getList().removeChangeEventListener(this.listChangedRunnable);
 			}
 
 			this._currentItem = item;
 
-			if (this._currentItem != null && this._currentItem.list != null) {
-				this._currentItem.list.addChangeEventListener(this.listChangedRunnable);
-
-				if (this._currentItem.item != null) {
-					addToHistory(this._currentItem);
-				}
+			if (this._currentItem != null && this._currentItem.hasList()) {
+				this._currentItem.getList().addChangeEventListener(this.listChangedRunnable);
+				if (this._currentItem.hasTrack()) addToHistory(this._currentItem);
 			}
 
 			getListeners().currentItemChanged(item);
@@ -127,8 +124,8 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 		IMediaTrackList<? extends IMediaTrack> ret = null;
 
 		PlayItem currentItem = getCurrentItem();
-		if (currentItem != null && currentItem.list != null) {
-			ret = currentItem.list;
+		if (currentItem != null && currentItem.hasList()) {
+			ret = currentItem.getList();
 		}
 		else {
 			ret = this.localPlayerSupport.getCurrentList();
@@ -144,11 +141,11 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 		final PlayItem queueItem = this.getQueue().takeFromQueue();
 		if (queueItem != null) return queueItem;
 
-		if (getCurrentItem() != null && getCurrentItem().list != null) {
-			if (getCurrentItem().item != null) {
-				IMediaTrack nextTrack = OrderHelper.getNextTrack(getCurrentItem().list, getCurrentItem().item, getPlaybackOrder());
+		if (getCurrentItem() != null && getCurrentItem().hasList()) {
+			if (getCurrentItem().hasTrack()) {
+				IMediaTrack nextTrack = OrderHelper.getNextTrack(getCurrentItem().getList(), getCurrentItem().getTrack(), getPlaybackOrder());
 				if (nextTrack != null) {
-					return new PlayItem(getCurrentItem().list, nextTrack);
+					return new PlayItem(getCurrentItem().getList(), nextTrack);
 				}
 			}
 		}
@@ -195,7 +192,7 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 			boolean changed = false;
 
 			for (int i = this._history.size() - 1; i >= 0; i--) {
-				if (!this._history.get(i).list.getMediaItems().contains(this._history.get(i).item)) {
+				if (!this._history.get(i).getList().getMediaItems().contains(this._history.get(i).getTrack())) {
 					this._history.remove(this._history.get(i));
 					changed = true;
 				}
@@ -253,23 +250,23 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 	protected void loadAndStartPlaying (final PlayItem item, final File file) throws MorriganException {
 		IPlaybackEngine engine = getPlaybackEngine(true);
 		synchronized (engine) {
-			this.logger.fine("Loading '" + item.item.getTitle() + "'...");
+			this.logger.fine("Loading '" + item.getTrack().getTitle() + "'...");
 			setCurrentItem(item);
 
-			engine.setFile(item.item.getFilepath());
+			engine.setFile(item.getTrack().getFilepath());
 			engine.setVideoFrameParent(this.localPlayerSupport.getCurrentMediaFrameParent());
 			engine.loadTrack();
 			engine.startPlaying();
 
 			this._currentTrackDuration = engine.getDuration();
-			this.logger.fine("Started to play '" + item.item.getTitle() + "'...");
+			this.logger.fine("Started to play '" + item.getTrack().getTitle() + "'...");
 
 			// Put DB stuff in DB thread.
 			this.executorService.submit(new Runnable() {
 				@Override
 				public void run () {
 					try {
-						item.list.incTrackStartCnt(item.item);
+						item.getList().incTrackStartCnt(item.getTrack());
 						getListeners().currentItemChanged(item);
 					}
 					catch (MorriganException e) {
@@ -414,11 +411,11 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 
 			if (duration > 0) {
 				PlayItem c = getCurrentItem();
-				if (c != null && c.list != null && c.item != null) {
-					if (c.item.getDuration() != duration) {
+				if (c != null && c.isComplete()) {
+					if (c.getTrack().getDuration() != duration) {
 						try {
 							LocalPlayerImpl.this.logger.fine("setting item duration=" + duration);
-							c.list.setTrackDuration(c.item, duration);
+							c.getList().setTrackDuration(c.getTrack(), duration);
 						}
 						catch (MorriganException e) {
 							LocalPlayerImpl.this.logger.log(Level.WARNING, "Failed to update track duration.", e);
@@ -440,7 +437,7 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 			LocalPlayerImpl.this.logger.fine("Player received endOfTrack event.");
 			// Inc. stats.
 			try {
-				getCurrentItem().list.incTrackEndCnt(getCurrentItem().item);
+				getCurrentItem().getList().incTrackEndCnt(getCurrentItem().getTrack());
 			} catch (MorriganException e) {
 				getListeners().onException(e);
 			}

@@ -172,9 +172,9 @@ public class MorriganCommandProvider implements CommandProvider {
 				ci.println("No results for query '" + q1 + "' '" + q2 + "'.");
 			}
 			else if (results.size() == 1) {
-				IMediaTrackList<? extends IMediaTrack> list = results.get(0).list;
+				IMediaTrackList<? extends IMediaTrack> list = results.get(0).getList();
 				ci.println("Query match: " + list);
-				if (results.get(0).list instanceof ILocalMixedMediaDb) {
+				if (results.get(0).getList() instanceof ILocalMixedMediaDb) {
 					ILocalMixedMediaDb mmdb = (ILocalMixedMediaDb) list;
 					if (q2 != null && q2.length() > 0) {
 						// run query q2.
@@ -313,7 +313,7 @@ public class MorriganCommandProvider implements CommandProvider {
 			ci.println("Query '" + q1 + "' did not return only one result.");
 		}
 		else {
-			IMediaTrackList<? extends IMediaTrack> list = results.get(0).list;
+			IMediaTrackList<? extends IMediaTrack> list = results.get(0).getList();
 			if (list instanceof ILocalMixedMediaDb) {
 				ILocalMixedMediaDb mmdb = (ILocalMixedMediaDb) list;
 				try {
@@ -352,7 +352,7 @@ public class MorriganCommandProvider implements CommandProvider {
 				ci.println("Query '" + q1 + "' did not return only one result.");
 			}
 			else {
-				IMediaTrackList<? extends IMediaTrack> list = results.get(0).list;
+				IMediaTrackList<? extends IMediaTrack> list = results.get(0).getList();
 				if (list instanceof ILocalMixedMediaDb) {
 					this.asyncActions.scheduleMmdbScan((ILocalMixedMediaDb) list);
 					ci.println("Scan scheduled.  Use 'mn st' to track progress.");
@@ -385,8 +385,8 @@ public class MorriganCommandProvider implements CommandProvider {
 					ci.println("Query '" + lq1 + "' did not return only one result.");
 				}
 				else {
-					IMediaTrackList<? extends IMediaTrack> rl = rq1Pi.get(0).list;
-					IMediaTrackList<? extends IMediaTrack> ll = lq1Pi.get(0).list;
+					IMediaTrackList<? extends IMediaTrack> rl = rq1Pi.get(0).getList();
+					IMediaTrackList<? extends IMediaTrack> ll = lq1Pi.get(0).getList();
 					if (!(rl instanceof IRemoteMixedMediaDb)) {
 						ci.println("DB '" + rq1 + "' is not a remote DB.");
 					}
@@ -426,7 +426,7 @@ public class MorriganCommandProvider implements CommandProvider {
 				ci.println("Query '" + q1 + "' did not return only one result.");
 			}
 			else {
-				IMediaTrackList<? extends IMediaTrack> list = results.get(0).list;
+				IMediaTrackList<? extends IMediaTrack> list = results.get(0).getList();
 				try {
 					Collection<MediaAlbum> albums = list.getAlbums();
 					ci.println("Albums: (" + albums.size() + ")");
@@ -480,9 +480,9 @@ public class MorriganCommandProvider implements CommandProvider {
 			ci.print(p.getPlayState());
 
 			PlayItem currentItem = p.getCurrentItem();
-			if (currentItem != null && currentItem.item != null) {
+			if (currentItem != null && currentItem.hasTrack()) {
 				ci.print(" ");
-				ci.print(currentItem.item.getTitle());
+				ci.print(currentItem.getTrack().getTitle());
 			}
 
 			ci.println();
@@ -529,7 +529,7 @@ public class MorriganCommandProvider implements CommandProvider {
 		ci.println();
 
 		PlayItem currentItem = player.getCurrentItem();
-		IMediaTrack item = (currentItem != null && currentItem.item != null) ? currentItem.item : null;
+		IMediaTrack item = (currentItem != null && currentItem.hasTrack()) ? currentItem.getTrack() : null;
 		ci.print("\t item: ");
 		if (item != null) {
 			ci.print(item.getTitle());
@@ -640,7 +640,7 @@ public class MorriganCommandProvider implements CommandProvider {
 			ci.println(player.getName() + " player: " + player.getPlayState().toString());
 		}
 		else {
-			ci.println(player.getName() + " player: " + currentItem.item.getTitle());
+			ci.println(player.getName() + " player: " + currentItem.getTrack().getTitle());
 		}
 	}
 

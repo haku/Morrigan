@@ -36,16 +36,16 @@ public class PlayItemLblProv implements ILabelProvider {
 		if (element instanceof PlayItem) {
 			PlayItem item = (PlayItem) element;
 			
-			if (item.list == null) {
+			if (!item.hasList()) {
 				return null;
 			}
-			else if (item.item == null) {
+			else if (!item.hasTrack()) {
 				return this.imageCache.readImage("icons/db.png");
 			}
-			else if (!item.item.isEnabled()) {
+			else if (!item.getTrack().isEnabled()) {
 				return this.imageCache.readImage("icons/noentry-red.png");
 			}
-			else if (item.item.getHashcode() == null || item.item.getHashcode().equals(BigInteger.ZERO)) {
+			else if (item.getTrack().getHashcode() == null || item.getTrack().getHashcode().equals(BigInteger.ZERO)) {
 				return this.imageCache.readImage("icons/exclamation-red.png");
 			}
 			else {
