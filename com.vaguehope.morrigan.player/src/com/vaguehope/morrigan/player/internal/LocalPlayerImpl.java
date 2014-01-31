@@ -1,13 +1,11 @@
 package com.vaguehope.morrigan.player.internal;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -20,92 +18,50 @@ import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import com.vaguehope.morrigan.engines.playback.IPlaybackStatusListener;
 import com.vaguehope.morrigan.engines.playback.PlaybackEngineFactory;
 import com.vaguehope.morrigan.engines.playback.PlaybackException;
-import com.vaguehope.morrigan.model.Register;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DirtyState;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
 import com.vaguehope.morrigan.model.media.MediaItemListChangeListener;
-import com.vaguehope.morrigan.player.DefaultPlayerQueue;
+import com.vaguehope.morrigan.player.AbstractPlayer;
 import com.vaguehope.morrigan.player.LocalPlayer;
 import com.vaguehope.morrigan.player.LocalPlayerSupport;
 import com.vaguehope.morrigan.player.OrderHelper;
-import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayItem;
-import com.vaguehope.morrigan.player.Player;
-import com.vaguehope.morrigan.player.PlayerEventListenerCaller;
-import com.vaguehope.morrigan.player.PlayerQueue;
+import com.vaguehope.morrigan.player.PlayerRegister;
 
-public class LocalPlayerImpl implements LocalPlayer {
+public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	private final int id;
-	private final String name;
 
 	protected final Logger logger = Logger.getLogger(this.getClass().getName());
 
 	final LocalPlayerSupport localPlayerSupport;
-	private final Register<Player> register;
 	private final PlaybackEngineFactory playbackEngineFactory;
 	private final ExecutorService executorService;
-	private final PlayerQueue queue;
-	private final AtomicBoolean alive = new AtomicBoolean(true);
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Main.
 
 	public LocalPlayerImpl (final int id, final String name, final LocalPlayerSupport localPlayerSupport,
-			final Register<Player> register,
+			final PlayerRegister register,
 			final PlaybackEngineFactory playbackEngineFactory,
 			final ExecutorService executorService) {
-		this.id = id;
-		this.name = name;
+		super(id, name, register);
 		this.localPlayerSupport = localPlayerSupport;
-		this.register = register;
 		this.playbackEngineFactory = playbackEngineFactory;
 		this.executorService = executorService;
-		this.queue = new DefaultPlayerQueue();
 	}
 
 	@Override
-	public void dispose () {
-		if (this.alive.compareAndSet(true, false)) {
-			this.register.unregister(this);
-			setCurrentItem(null);
-			finalisePlaybackEngine();
-		}
-	}
-
-	@Override
-	public boolean isDisposed () {
-		return !this.alive.get();
-	}
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	ID.
-
-	@Override
-	public int getId() {
-		return this.id;
-	}
-
-	@Override
-	public String getName() {
-		return this.name;
+	protected void onDispose () {
+		setCurrentItem(null);
+		finalisePlaybackEngine();
 	}
 
 	@Override
 	public boolean isProxy () {
 		return false;
-	}
-
-	@Override
-	public String toString () {
-		return new StringBuilder("LocalPlayerImpl{")
-				.append(this.id)
-				.append(", ").append(this.name)
-				.append("}").toString();
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -135,7 +91,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 				}
 			}
 
-			this.listeners.currentItemChanged(item);
+			getListeners().currentItemChanged(item);
 		}
 	}
 
@@ -184,26 +140,13 @@ public class LocalPlayerImpl implements LocalPlayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Track order methods.
 
-	private PlaybackOrder _playbackOrder = PlaybackOrder.SEQUENTIAL;
-
-	@Override
-	public PlaybackOrder getPlaybackOrder () {
-		return this._playbackOrder;
-	}
-
-	@Override
-	public void setPlaybackOrder (final PlaybackOrder order) {
-		this._playbackOrder = order;
-		this.listeners.playOrderChanged(order);
-	}
-
 	PlayItem getNextItemToPlay () {
-		final PlayItem queueItem = this.queue.takeFromQueue();
+		final PlayItem queueItem = this.getQueue().takeFromQueue();
 		if (queueItem != null) return queueItem;
 
 		if (getCurrentItem() != null && getCurrentItem().list != null) {
 			if (getCurrentItem().item != null) {
-				IMediaTrack nextTrack = OrderHelper.getNextTrack(getCurrentItem().list, getCurrentItem().item, this._playbackOrder);
+				IMediaTrack nextTrack = OrderHelper.getNextTrack(getCurrentItem().list, getCurrentItem().item, getPlaybackOrder());
 				if (nextTrack != null) {
 					return new PlayItem(getCurrentItem().list, nextTrack);
 				}
@@ -212,7 +155,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 		else {
 			IMediaTrackList<? extends IMediaTrack> currentList = getCurrentList();
 			if (currentList != null) {
-				IMediaTrack nextTrack = OrderHelper.getNextTrack(currentList, null, this._playbackOrder);
+				IMediaTrack nextTrack = OrderHelper.getNextTrack(currentList, null, getPlaybackOrder());
 				if (nextTrack != null) {
 					return new PlayItem(currentList, nextTrack);
 				}
@@ -265,14 +208,6 @@ public class LocalPlayerImpl implements LocalPlayer {
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Queue.
-
-	@Override
-	public PlayerQueue getQueue () {
-		return this.queue;
-	}
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Playback engine.
 
 	IPlaybackEngine playbackEngine = null;
@@ -309,101 +244,48 @@ public class LocalPlayerImpl implements LocalPlayer {
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	protected final PlayerEventListenerCaller listeners = new PlayerEventListenerCaller();
-
-	@Override
-	public void addEventListener (final PlayerEventListener listener) {
-		this.listeners.addEventListener(listener);
-	}
-
-	@Override
-	public void removeEventListener (final PlayerEventListener listener) {
-		this.listeners.removeEventListener(listener);
-	}
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Playback management.
 
 	long _currentPosition = -1; // In seconds.
 	int _currentTrackDuration = -1; // In seconds.
 
-	/**
-	 * For UI handlers to call.
-	 */
 	@Override
-	public void loadAndStartPlaying (final IMediaTrackList<? extends IMediaTrack> list) {
-		IMediaTrack nextTrack = OrderHelper.getNextTrack(list, null, this._playbackOrder);
-		loadAndStartPlaying(list, nextTrack);
-	}
+	protected void loadAndStartPlaying (final PlayItem item, final File file) throws MorriganException {
+		IPlaybackEngine engine = getPlaybackEngine(true);
+		synchronized (engine) {
+			this.logger.fine("Loading '" + item.item.getTitle() + "'...");
+			setCurrentItem(item);
 
-	/**
-	 * For UI handlers to call.
-	 */
-	@Override
-	public void loadAndStartPlaying (final IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack track) {
-		if (track == null) throw new NullPointerException();
-		loadAndStartPlaying(new PlayItem(list, track));
-	}
+			engine.setFile(item.item.getFilepath());
+			engine.setVideoFrameParent(this.localPlayerSupport.getCurrentMediaFrameParent());
+			engine.loadTrack();
+			engine.startPlaying();
 
-	/**
-	 * For UI handlers to call.
-	 */
-	@Override
-	public void loadAndStartPlaying (final PlayItem item) {
-		try {
-			if (item.list == null) throw new IllegalArgumentException("PlayItem list can not be null.");
+			this._currentTrackDuration = engine.getDuration();
+			this.logger.fine("Started to play '" + item.item.getTitle() + "'...");
 
-			if (item.item == null) {
-				item.item = OrderHelper.getNextTrack(item.list, null, this._playbackOrder);
-			}
-
-			if (!item.item.isPlayable()) throw new IllegalArgumentException("Item is not playable: '"+item.item.getFilepath()+"'.");
-
-			File file = new File(item.item.getFilepath());
-			if (!file.exists()) throw new FileNotFoundException(item.item.getFilepath());
-
-			IPlaybackEngine engine = getPlaybackEngine(true);
-			synchronized (engine) {
-				this.logger.fine("Loading '" + item.item.getTitle() + "'...");
-				setCurrentItem(item);
-
-				engine.setFile(item.item.getFilepath());
-				engine.setVideoFrameParent(this.localPlayerSupport.getCurrentMediaFrameParent());
-				engine.loadTrack();
-				engine.startPlaying();
-
-				this._currentTrackDuration = engine.getDuration();
-				this.logger.fine("Started to play '" + item.item.getTitle() + "'...");
-
-				// Put DB stuff in DB thread.
-				this.executorService.submit(new Runnable() {
-					@Override
-					public void run () {
-						try {
-							item.list.incTrackStartCnt(item.item);
-							LocalPlayerImpl.this.listeners.currentItemChanged(item);
-						}
-						catch (MorriganException e) {
-							LocalPlayerImpl.this.logger.log(Level.WARNING, "Failed to increment track count.", e);
-						}
+			// Put DB stuff in DB thread.
+			this.executorService.submit(new Runnable() {
+				@Override
+				public void run () {
+					try {
+						item.list.incTrackStartCnt(item.item);
+						getListeners().currentItemChanged(item);
 					}
-				});
+					catch (MorriganException e) {
+						LocalPlayerImpl.this.logger.log(Level.WARNING, "Failed to increment track count.", e);
+					}
+				}
+			});
 
-				/* This was useful at some point, but leaving it disabled for now.
-				 * Will put it back if it proves needed.
-				 */
+			/* This was useful at some point, but leaving it disabled for now.
+			 * Will put it back if it proves needed.
+			 */
 //				if (item.item.getDuration() <= 0 && Player.this._currentTrackDuration > 0) {
 //					item.list.setTrackDuration(item.item, Player.this._currentTrackDuration);
 //				}
 
-			} // END synchronized.
-		}
-		catch (Exception e) {
-			this.localPlayerSupport.asyncThrowable(e);
-		}
-
-		this.listeners.currentItemChanged(item);
+		} // END synchronized.
 	}
 
 	/**
@@ -414,7 +296,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 		try {
 			internal_pausePlaying();
 		} catch (MorriganException e) {
-			this.localPlayerSupport.asyncThrowable(e);
+			getListeners().onException(e);
 		}
 	}
 
@@ -426,7 +308,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 		try {
 			internal_stopPlaying();
 		} catch (MorriganException e) {
-			this.localPlayerSupport.asyncThrowable(e);
+			getListeners().onException(e);
 		}
 	}
 
@@ -463,7 +345,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 		try {
 			internal_seekTo(d);
 		} catch (MorriganException e) {
-			this.localPlayerSupport.asyncThrowable(e);
+			getListeners().onException(e);
 		}
 	}
 
@@ -483,10 +365,10 @@ public class LocalPlayerImpl implements LocalPlayer {
 					loadAndStartPlaying(getCurrentItem());
 				}
 				else {
-					this.localPlayerSupport.asyncThrowable(new PlaybackException("Don't know what to do.  Playstate=" + playbackState + "."));
+					getListeners().onException(new PlaybackException("Don't know what to do.  Playstate=" + playbackState + "."));
 				}
 			} // END synchronized.
-			this.listeners.playStateChanged(getPlayState());
+			this.getListeners().playStateChanged(getPlayState());
 		}
 	}
 
@@ -505,7 +387,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 				eng.stopPlaying();
 				eng.unloadFile();
 			}
-			this.listeners.playStateChanged(PlayState.STOPPED);
+			getListeners().playStateChanged(PlayState.STOPPED);
 		}
 	}
 
@@ -523,7 +405,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 		@Override
 		public void positionChanged(final long position) {
 			LocalPlayerImpl.this._currentPosition = position;
-			LocalPlayerImpl.this.listeners.positionChanged(position, getCurrentTrackDuration());
+			getListeners().positionChanged(position, getCurrentTrackDuration());
 		}
 
 		@Override
@@ -545,7 +427,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 				}
 			}
 
-			LocalPlayerImpl.this.listeners.positionChanged(getCurrentPosition(), duration);
+			getListeners().positionChanged(getCurrentPosition(), duration);
 		}
 
 		@Override
@@ -560,7 +442,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 			try {
 				getCurrentItem().list.incTrackEndCnt(getCurrentItem().item);
 			} catch (MorriganException e) {
-				LocalPlayerImpl.this.localPlayerSupport.asyncThrowable(e);
+				getListeners().onException(e);
 			}
 
 			// Play next track?
@@ -570,13 +452,13 @@ public class LocalPlayerImpl implements LocalPlayer {
 			}
 			else {
 				LocalPlayerImpl.this.logger.info("No more tracks to play.");
-				LocalPlayerImpl.this.listeners.currentItemChanged(null);
+				getListeners().currentItemChanged(null);
 			}
 		}
 
 		@Override
 		public void onError(final Exception e) {
-			LocalPlayerImpl.this.localPlayerSupport.asyncThrowable(e);
+			getListeners().onException(e);
 		}
 
 		@Override

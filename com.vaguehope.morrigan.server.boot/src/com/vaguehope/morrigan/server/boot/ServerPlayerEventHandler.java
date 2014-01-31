@@ -13,11 +13,11 @@ import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
 import com.vaguehope.morrigan.player.LocalPlayer;
+import com.vaguehope.morrigan.player.LocalPlayerSupport;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.Player.PlayerEventListener;
-import com.vaguehope.morrigan.player.LocalPlayerSupport;
 import com.vaguehope.morrigan.screen.ScreenMgr;
 
 class ServerPlayerEventHandler implements PlayerEventListener, LocalPlayerSupport {
@@ -118,8 +118,8 @@ class ServerPlayerEventHandler implements PlayerEventListener, LocalPlayerSuppor
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	public void asyncThrowable (final Throwable t) {
-		logger.log(Level.WARNING, "asyncThrowable", t);
+	public void onException (final Exception e) {
+		logger.log(Level.WARNING, "asyncThrowable", e);
 	}
 
 	@Override

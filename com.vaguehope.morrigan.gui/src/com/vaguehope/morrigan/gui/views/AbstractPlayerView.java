@@ -238,6 +238,12 @@ public abstract class AbstractPlayerView extends ViewPart {
 			callUpdateTitle();
 		}
 
+		@Override
+		public void onException (final Exception e) {
+			System.err.println("Async Throwable: " + e);
+			getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));
+		}
+
 	};
 
 	private final LocalPlayerSupport eventHandler = new LocalPlayerSupport() {
@@ -245,12 +251,6 @@ public abstract class AbstractPlayerView extends ViewPart {
 		@Override
 		public void historyChanged () {
 			AbstractPlayerView.this.historyChangedRrefresher.run();
-		}
-
-		@Override
-		public void asyncThrowable (final Throwable t) {
-			System.err.println("Async Throwable: " + t.getMessage());
-			getSite().getShell().getDisplay().asyncExec(new RunnableDialog(t));
 		}
 
 		@SuppressWarnings("unchecked")

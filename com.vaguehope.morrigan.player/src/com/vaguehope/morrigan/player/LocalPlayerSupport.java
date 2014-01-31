@@ -24,10 +24,6 @@ public interface LocalPlayerSupport {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	void asyncThrowable (Throwable t) ;
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
 	IMediaTrackList<IMediaTrack> getCurrentList () ;
 
 	Composite getCurrentMediaFrameParent () ;
