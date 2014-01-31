@@ -4,7 +4,6 @@ import com.vaguehope.morrigan.model.helper.EqualHelper;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
 
-
 // TODO add interface to refer to this class with.
 public class PlayItem {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -16,11 +15,11 @@ public class PlayItem {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public PlayItem (IMediaTrackList<? extends IMediaTrack> list, IMediaTrack item) {
+	public PlayItem (final IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack item) {
 		this(list, item, -1);
 	}
 
-	public PlayItem (IMediaTrackList<? extends IMediaTrack> list, IMediaTrack item, int id) {
+	public PlayItem (final IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack item, final int id) {
 		this.list = list;
 		this.item = item;
 		this.id = id;
@@ -29,7 +28,7 @@ public class PlayItem {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	public String toString() {
+	public String toString () {
 		if (this.item == null) {
 			return this.list.getListName();
 		}
@@ -40,19 +39,19 @@ public class PlayItem {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	public boolean equals (Object obj) {
-		if ( obj == null ) return false;
-		if ( this == obj ) return true;
-		if ( !(obj instanceof PlayItem) ) return false;
-		PlayItem that = (PlayItem)obj;
+	public boolean equals (final Object obj) {
+		if (obj == null) return false;
+		if (this == obj) return true;
+		if (!(obj instanceof PlayItem)) return false;
+		PlayItem that = (PlayItem) obj;
 
 		return EqualHelper.areEqual(this.list, that.list)
-			&& EqualHelper.areEqual(this.item, that.item)
-			&& this.id == that.id;
+				&& EqualHelper.areEqual(this.item, that.item)
+				&& this.id == that.id;
 	}
 
 	@Override
-	public int hashCode() {
+	public int hashCode () {
 		int hash = 1;
 		hash = hash * 31 + (this.list == null ? 0 : this.list.hashCode());
 		hash = hash * 31 + (this.item == null ? 0 : this.item.hashCode());
