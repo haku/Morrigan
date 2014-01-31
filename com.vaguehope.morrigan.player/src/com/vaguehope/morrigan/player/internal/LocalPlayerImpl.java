@@ -29,11 +29,11 @@ import com.vaguehope.morrigan.model.media.IMediaTrackList;
 import com.vaguehope.morrigan.model.media.MediaItemListChangeListener;
 import com.vaguehope.morrigan.player.DefaultPlayerQueue;
 import com.vaguehope.morrigan.player.LocalPlayer;
+import com.vaguehope.morrigan.player.LocalPlayerSupport;
 import com.vaguehope.morrigan.player.OrderHelper;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.Player;
-import com.vaguehope.morrigan.player.LocalPlayerSupport;
 import com.vaguehope.morrigan.player.PlayerEventListenerCaller;
 import com.vaguehope.morrigan.player.PlayerQueue;
 
@@ -194,6 +194,7 @@ public class LocalPlayerImpl implements LocalPlayer {
 	@Override
 	public void setPlaybackOrder (final PlaybackOrder order) {
 		this._playbackOrder = order;
+		this.listeners.playOrderChanged(order);
 	}
 
 	PlayItem getNextItemToPlay () {

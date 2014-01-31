@@ -50,12 +50,12 @@ import com.vaguehope.morrigan.model.media.IMediaTrackList;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.model.media.IMixedMediaList;
 import com.vaguehope.morrigan.player.LocalPlayer;
+import com.vaguehope.morrigan.player.LocalPlayerSupport;
 import com.vaguehope.morrigan.player.OrderHelper;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.Player.PlayerEventListener;
-import com.vaguehope.morrigan.player.LocalPlayerSupport;
 import com.vaguehope.morrigan.player.PlayerLifeCycleListener;
 import com.vaguehope.morrigan.screen.CoverArtProvider;
 import com.vaguehope.morrigan.screen.FullscreenShell;
@@ -228,6 +228,9 @@ public abstract class AbstractPlayerView extends ViewPart {
 		@Override
 		public void playOrderChanged (final PlaybackOrder newPlaybackOrder) {
 			callUpdateStatus();
+			for (final OrderSelectAction o : getOrderMenuActions()) {
+				o.setChecked(o.getMode() == newPlaybackOrder);
+			}
 		}
 
 		@Override
@@ -667,14 +670,8 @@ public abstract class AbstractPlayerView extends ViewPart {
 	protected IAction jumpToAction;
 
 	private void makeActions () {
-		// Order menu.
-		for (PlaybackOrder o : PlaybackOrder.values()) {
-			OrderSelectAction a = new OrderSelectAction(o, new OrderChangedListener() {
-				@Override
-				public void orderChanged (final PlaybackOrder newOrder) {
-					orderModeChanged(newOrder);
-				}
-			});
+		for (final PlaybackOrder o : PlaybackOrder.values()) {
+			final OrderSelectAction a = new OrderSelectAction(o);
 			if (getPlayer().getPlaybackOrder() == o) a.setChecked(true);
 			this.orderMenuActions.add(a);
 		}
@@ -689,27 +686,22 @@ public abstract class AbstractPlayerView extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Complex actions.
 
-	public interface OrderChangedListener {
-		void orderChanged (PlaybackOrder newOrder);
-	}
-
 	protected class OrderSelectAction extends Action {
 
 		private final PlaybackOrder mode;
-		private final OrderChangedListener orderChangedListener;
 
-		public OrderSelectAction (final PlaybackOrder mode, final OrderChangedListener orderChangedListener) {
+		public OrderSelectAction (final PlaybackOrder mode) {
 			super(mode.toString(), AS_RADIO_BUTTON);
 			this.mode = mode;
-			this.orderChangedListener = orderChangedListener;
+		}
+
+		public PlaybackOrder getMode () {
+			return this.mode;
 		}
 
 		@Override
 		public void run () {
-			if (isChecked()) {
-				getPlayer().setPlaybackOrder(this.mode);
-				this.orderChangedListener.orderChanged(this.mode);
-			}
+			if (isChecked()) getPlayer().setPlaybackOrder(this.mode);
 		}
 
 	}
