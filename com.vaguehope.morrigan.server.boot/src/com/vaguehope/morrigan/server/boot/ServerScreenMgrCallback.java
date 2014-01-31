@@ -10,7 +10,7 @@ class ServerScreenMgrCallback implements ScreenMgrCallback {
 	private final ServerPlayerEventHandler eventHandler;
 	private final NullScreen nullScreen;
 
-	public ServerScreenMgrCallback (ServerPlayerEventHandler eventHandler, NullScreen nullScreen) {
+	public ServerScreenMgrCallback (final ServerPlayerEventHandler eventHandler, final NullScreen nullScreen) {
 		if (eventHandler == null) throw new IllegalArgumentException();
 		if (nullScreen == null) throw new IllegalArgumentException();
 		this.eventHandler = eventHandler;
@@ -23,7 +23,7 @@ class ServerScreenMgrCallback implements ScreenMgrCallback {
 	}
 
 	@Override
-	public void updateCurrentMediaFrameParent (Composite parent) {
+	public void updateCurrentMediaFrameParent (final Composite parent) {
 		LocalPlayer player = this.eventHandler.getPlayer();
 		if (player != null && player.isPlaybackEngineReady()) {
 			player.setVideoFrameParent(parent);
@@ -31,8 +31,8 @@ class ServerScreenMgrCallback implements ScreenMgrCallback {
 	}
 
 	@Override
-	public void handleError (Exception e) {
-		this.eventHandler.asyncThrowable(e);
+	public void handleError (final Exception e) {
+		this.eventHandler.onException(e);
 	}
 
 }

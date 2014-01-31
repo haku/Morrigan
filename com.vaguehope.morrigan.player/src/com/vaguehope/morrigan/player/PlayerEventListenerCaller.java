@@ -48,4 +48,11 @@ public class PlayerEventListenerCaller implements PlayerEventListener {
 		}
 	}
 
+	@Override
+	public void onException (final Exception e) {
+		for (final PlayerEventListener l : this.watchers) {
+			l.onException(e);
+		}
+	}
+
 }

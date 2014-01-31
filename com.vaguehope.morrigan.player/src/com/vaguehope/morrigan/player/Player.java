@@ -61,6 +61,11 @@ public interface Player {
 		 */
 		void positionChanged(long newPosition, int duration);
 
+		/**
+		 * Called when errors occur during play back.
+		 */
+		void onException (Exception e);
+
 	}
 
 	void addEventListener(PlayerEventListener listener);
