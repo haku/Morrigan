@@ -2,7 +2,7 @@ package com.vaguehope.morrigan.player;
 
 import com.vaguehope.morrigan.model.media.DurationData;
 
-class DurationDataImpl implements DurationData {
+public class DurationDataImpl implements DurationData {
 
 	private final long duration;
 	private final boolean complete;

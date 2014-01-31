@@ -6,6 +6,9 @@ import com.vaguehope.morrigan.model.media.DurationData;
 
 public interface PlayerQueue {
 
+	/**
+	 * May return null.
+	 */
 	PlayItem takeFromQueue();
 
 	void addToQueue(PlayItem item);
@@ -20,6 +23,9 @@ public interface PlayerQueue {
 	void setQueueList (List<PlayItem> items);
 	void shuffleQueue ();
 	DurationData getQueueTotalDuration();
+	/**
+	 * May return null.
+	 */
 	PlayItem getQueueItemById (int id);
 
 	void addQueueChangeListener(Runnable listener);
