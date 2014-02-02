@@ -1,5 +1,6 @@
 package com.vaguehope.morrigan.gui.dialogs.jumpto;
 
+import java.awt.event.KeyEvent;
 import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -235,7 +236,6 @@ public class JumpToDlg implements Dismissable {
 		if (s != null && s.length() > 0) {
 			this.text.setText(s);
 			this.text.setSelection(0, this.text.getText().length());
-			this.textChangeListener.verifyText(null);
 		}
 
 		// Save dlg object for next time.
@@ -379,7 +379,10 @@ public class JumpToDlg implements Dismissable {
 	private final VerifyListener textChangeListener = new VerifyListener() {
 		@Override
 		public void verifyText (final VerifyEvent e) {
-			if (e == null || e.text == null || e.text.length() < 1) return;
+			if (e == null) return;
+			if ((e.text == null || e.text.length() < 1)
+					&& e.keyCode != KeyEvent.VK_BACK_SPACE
+					&& e.keyCode != KeyEvent.VK_DELETE) return;
 			requestSearch();
 		}
 	};
