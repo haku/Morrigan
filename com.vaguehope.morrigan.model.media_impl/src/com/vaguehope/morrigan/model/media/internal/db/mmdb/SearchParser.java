@@ -98,10 +98,18 @@ class SearchParser {
 		if (mediaType == MediaType.UNKNOWN && terms.size() < 1 && !excludeMissing && !excludeDisabled) return;
 
 		sql.append(_SQL_WHERE);
-		if (mediaType != MediaType.UNKNOWN) sql.append(_SQL_MEDIAFILES_WHERTYPE);
+		boolean needAnd = false;
+
+		if (mediaType != MediaType.UNKNOWN) {
+			if (needAnd) sql.append(_SQL_AND);
+			needAnd = true;
+			sql.append(_SQL_MEDIAFILES_WHERTYPE);
+		}
 
 		if (terms.size() > 0) {
-			sql.append(_SQL_AND);
+			if (needAnd) sql.append(_SQL_AND);
+			needAnd = true;
+
 			sql.append(" ( ");
 			for (int i = 0; i < terms.size(); i++) {
 				final String term = terms.get(i);
@@ -127,8 +135,17 @@ class SearchParser {
 			sql.append(" ) ");
 		}
 
-		if (excludeMissing) sql.append(_SQL_AND).append(_SQL_MEDIAFILES_WHERENOTMISSING);
-		if (excludeDisabled) sql.append(_SQL_AND).append(_SQL_MEDIAFILES_WHEREENABLED);
+		if (excludeMissing) {
+			if (needAnd) sql.append(_SQL_AND);
+			needAnd = true;
+			sql.append(_SQL_MEDIAFILES_WHERENOTMISSING);
+		}
+
+		if (excludeDisabled) {
+			if (needAnd) sql.append(_SQL_AND);
+			needAnd = true;
+			sql.append(_SQL_MEDIAFILES_WHEREENABLED);
+		}
 	}
 
 	public static class Search {
