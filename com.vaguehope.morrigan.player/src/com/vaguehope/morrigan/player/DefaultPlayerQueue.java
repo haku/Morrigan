@@ -125,6 +125,13 @@ public class DefaultPlayerQueue implements PlayerQueue {
 	}
 
 	@Override
+	public int size () {
+		synchronized (this.queue) {
+			return this.queue.size();
+		}
+	}
+
+	@Override
 	public List<PlayItem> getQueueList () {
 		synchronized (this.queue) {
 			return Collections.unmodifiableList(this.queue);
