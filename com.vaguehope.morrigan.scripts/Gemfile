@@ -1,0 +1,7 @@
+source 'https://rubygems.org'
+
+gem 'awesome_print'
+gem 'ncursesw'
+gem 'nokogiri'
+gem 'rest-client'
+gem 'rufus'
