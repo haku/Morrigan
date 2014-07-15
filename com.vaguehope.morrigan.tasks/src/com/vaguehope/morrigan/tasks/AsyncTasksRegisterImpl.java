@@ -17,7 +17,7 @@ public class AsyncTasksRegisterImpl implements AsyncTasksRegister {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public AsyncTasksRegisterImpl (ExecutorService executor) {
+	public AsyncTasksRegisterImpl (final ExecutorService executor) {
 		this.executor = executor;
 	}
 
@@ -25,6 +25,7 @@ public class AsyncTasksRegisterImpl implements AsyncTasksRegister {
 
 	@Override
 	public void scheduleTask (final MorriganTask task) {
+		if (task == null) throw new IllegalArgumentException();
 		final AsyncTaskEventListener taskEventListener = makeTrackedListener();
 		Runnable runnable = new Runnable() {
 			@Override
@@ -42,7 +43,7 @@ public class AsyncTasksRegisterImpl implements AsyncTasksRegister {
 		return l;
 	}
 
-	private void trackListener (AsyncTaskEventListener listener) {
+	private void trackListener (final AsyncTaskEventListener listener) {
 		clean();
 		this.listeners.add(listener);
 	}
