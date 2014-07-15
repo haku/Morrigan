@@ -47,6 +47,11 @@ public enum ImmutableEmptyPlayerQueue implements PlayerQueue {
 	}
 
 	@Override
+	public int size () {
+		return 0;
+	}
+
+	@Override
 	public List<PlayItem> getQueueList () {
 		return Collections.emptyList();
 	}

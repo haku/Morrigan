@@ -19,6 +19,7 @@ public interface PlayerQueue {
 	void moveInQueue(List<PlayItem> items, boolean moveDown);
 	void moveInQueueEnd(List<PlayItem> items, boolean toBottom);
 
+	int size();
 	List<PlayItem> getQueueList();
 	void setQueueList (List<PlayItem> items);
 	void shuffleQueue ();
