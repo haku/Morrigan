@@ -1,0 +1,49 @@
+#!/bin/bash
+set -eu
+
+mndir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+echo "Morrigan directory: $mndir"
+
+pgname="MorriganSshUI"
+echo "plugin: $pgname"
+
+giturl="https://github.com/haku/$pgname.git"
+echo "git: $giturl"
+
+srcdir="$mndir/src"
+mkdir -p "$srcdir"
+pushd "$srcdir"
+  if ! [ -d "$pgname" ] ; then
+   git clone "$giturl"
+  else
+  pushd "$pgname/"
+    git pull
+  popd
+  fi
+  pushd "$pgname/"
+    mvn clean package
+  popd
+popd
+
+jar=("$srcdir/$pgname/target/"*.jar)
+echo "jar: $jar"
+cp -v "$jar" "./plugins/"
+
+jarname="$(basename "$jar")"
+echo "jar name: $jarname"
+
+conf="./configuration/config.ini"
+echo "config: $conf"
+
+if ! [ -e "$conf" ] ; then
+  echo "File not found: $conf"
+  exit 1
+fi
+
+if ! grep -q "$jarname" "$conf" ; then
+  sed "-i.$(date +'%Y%m%d-%H%M%S').bak" "/^osgi.bundles=/s/$/,reference\\\\:file\\\\:$jarname@4\\\\:start/" "$conf"
+else
+  echo "$conf already contains $jarname."
+fi
+
+echo "done."
