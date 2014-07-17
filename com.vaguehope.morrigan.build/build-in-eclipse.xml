@@ -82,6 +82,11 @@
 			<fileset dir="${buildDirectory}/${buildLabel}" includes="*.zip" />
 		</move>
 
+		<!-- Augment build outputs. -->
+		<antcall target="zip_linux" >
+			<reference refid="${archivePrefix}" />
+		</antcall>
+
 		<!-- Move to final output dir. -->
 		<move todir="${outputDirectory}">
 			<fileset dir="${procDirectory}" includes="*.zip" />
@@ -89,6 +94,21 @@
 
 		<!-- Delete proc dir. -->
 		<delete dir="${procDirectory}" />
+	</target>
+
+	<target name="zip_linux" depends="setprop" >
+		<fileset dir="${procDirectory}" id="zipfiles" >
+			<include name="*linux*.zip" />
+		</fileset>
+		<pathconvert pathsep="" property="zipfile" refid="zipfiles" />
+		<echo message="zipfile=${zipfile}" />
+
+		<zip destfile="${zipfile}" update="true" whenempty="fail" >
+			<zipfileset dir="rootfiles"
+						includes="install_plugin"
+						fullpath="${archivePrefix}/install_plugin"
+						filemode="755" />
+		</zip>
 	</target>
 
 </project>
