@@ -83,8 +83,17 @@
 		</move>
 
 		<!-- Augment build outputs. -->
-		<antcall target="zip_linux" >
+		<antcall target="add_scipts_to_zip" >
 			<reference refid="${archivePrefix}" />
+			<param name="zipNamePattern" value="*linux*.x86.zip"/>
+		</antcall>
+		<antcall target="add_scipts_to_zip" >
+			<reference refid="${archivePrefix}" />
+			<param name="zipNamePattern" value="*linux*.x86_64.zip"/>
+		</antcall>
+		<antcall target="add_scipts_to_zip" >
+			<reference refid="${archivePrefix}" />
+			<param name="zipNamePattern" value="*macosx*.x86.zip"/>
 		</antcall>
 
 		<!-- Move to final output dir. -->
@@ -96,9 +105,9 @@
 		<delete dir="${procDirectory}" />
 	</target>
 
-	<target name="zip_linux" depends="setprop" >
+	<target name="add_scipts_to_zip" depends="setprop" >
 		<fileset dir="${procDirectory}" id="zipfiles" >
-			<include name="*linux*.zip" />
+			<include name="${zipNamePattern}" />
 		</fileset>
 		<pathconvert pathsep="" property="zipfile" refid="zipfiles" />
 		<echo message="zipfile=${zipfile}" />
