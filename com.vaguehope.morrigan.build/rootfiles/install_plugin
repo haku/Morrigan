@@ -12,7 +12,7 @@ if [ "$#" -lt 1 ] || [ "$#" -gt 1 ] ; then print_help ; fi
 
 arg_name="$1"
 if [ "$arg_name" == "sshui" ] ; then
-  pgname="MorriganSshUI"
+  bname="com.vaguehope.morrigan.sshui"
 else
   echo "Unknown plugin: $arg_name"
   print_help
@@ -21,33 +21,18 @@ fi
 mndir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 echo "Morrigan directory: $mndir"
 
-echo "plugin: $pgname"
-giturl="https://github.com/haku/$pgname.git"
-echo "git: $giturl"
+jarname="$(curl --silent "http://karasu.vaguehope.com/plugins.rhtml" | grep "$bname" | head -n 1)"
+if [ -z "$jarname" ] ; then
+  echo "Not found in plugin list: $bname"
+  exit 1
+fi
 
-srcdir="$mndir/src"
-mkdir -p "$srcdir"
-pushd "$srcdir"
-  if ! [ -d "$pgname" ] ; then
-   git clone "$giturl"
-  else
-  pushd "$pgname/"
-    git pull
-  popd
-  fi
-  pushd "$pgname/"
-    mvn clean package
-  popd
-popd
+jarurl="http://karasu.vaguehope.com/$jarname"
+jarlocal="$mndir/plugins/$jarname"
+echo "Downloading $jarurl --> $jarlocal"
+curl "$jarurl" -o "$jarlocal"
 
-jar=("$srcdir/$pgname/target/"*.jar)
-echo "jar: $jar"
-cp -v "$jar" "./plugins/"
-
-jarname="$(basename "$jar")"
-echo "jar name: $jarname"
-
-conf="./configuration/config.ini"
+conf="$mndir/configuration/config.ini"
 echo "config: $conf"
 
 if ! [ -e "$conf" ] ; then
