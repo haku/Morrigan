@@ -224,6 +224,7 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	 */
 	@Override
 	public void forceRead () throws MorriganException {
+		// TODO FIXME Lol these next 2 lines are not thread safe.
 		this.firstRead = true;
 		read();
 	}
