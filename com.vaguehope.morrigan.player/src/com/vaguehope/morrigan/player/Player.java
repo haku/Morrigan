@@ -33,8 +33,16 @@ public interface Player {
 	PlayItem getCurrentItem();
 	IMediaTrackList<? extends IMediaTrack> getCurrentList();
 
+	/**
+	 * Return -1 if not playing.
+	 */
 	long getCurrentPosition();
+
+	/**
+	 * Return -1 if not playing.
+	 */
 	int getCurrentTrackDuration();
+
 	void seekTo(double d);
 
 	PlaybackOrder getPlaybackOrder();
