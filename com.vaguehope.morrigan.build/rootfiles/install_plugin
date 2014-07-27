@@ -22,31 +22,38 @@ else
 fi
 
 mndir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-echo "Morrigan directory: $mndir"
+echo "Morrigan: $mndir"
+echo "Bundle: $bname"
 
-jarname="$(curl --silent "http://karasu.vaguehope.com/plugins.rhtml" | grep "$bname" | head -n 1)"
-if [ -z "$jarname" ] ; then
+rjarname="$(curl --silent "http://karasu.vaguehope.com/plugins.rhtml" | grep "$bname" | head -n 1)"
+if [ -z "$rjarname" ] ; then
   echo "Not found in plugin list: $bname"
   exit 1
 fi
 
-jarurl="http://karasu.vaguehope.com/$jarname"
-jarlocal="$mndir/plugins/$jarname"
-echo "Downloading $jarurl --> $jarlocal"
-curl "$jarurl" -o "$jarlocal"
+jarurl="http://karasu.vaguehope.com/$rjarname"
+mkdir -p "$mndir/tmp/"
+jartmp="$mndir/tmp/$rjarname"
+echo -e "Downloading:\n  $jarurl\n  --> $jartmp"
+curl "$jarurl" -o "$jartmp"
+
+ljarname="$bname.jar"
+jarlocal="$mndir/plugins/$ljarname"
+echo -e "Moveing:\n  $jartmp\n  --> $jarlocal"
+mv "$jartmp" "$jarlocal"
 
 conf="$mndir/configuration/config.ini"
-echo "config: $conf"
+echo "Config: $conf"
 
 if ! [ -e "$conf" ] ; then
   echo "File not found: $conf"
   exit 1
 fi
 
-if ! grep -q "$jarname" "$conf" ; then
-  sed "-i.$(date +'%Y%m%d-%H%M%S').bak" "/^osgi.bundles=/s/$/,reference\\\\:file\\\\:$jarname@4\\\\:start/" "$conf"
+if ! grep -q "$ljarname" "$conf" ; then
+  sed "-i.$(date +'%Y%m%d-%H%M%S').bak" "/^osgi.bundles=/s/$/,reference\\\\:file\\\\:$ljarname@4\\\\:start/" "$conf"
 else
-  echo "$conf already contains $jarname."
+  echo "$conf already contains $ljarname."
 fi
 
 echo "done."
