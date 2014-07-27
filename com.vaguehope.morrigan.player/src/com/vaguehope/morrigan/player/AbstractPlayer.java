@@ -53,7 +53,7 @@ public abstract class AbstractPlayer implements Player {
 		if (!this.alive.get()) throw new IllegalStateException("Player is disposed: " + toString());
 	}
 
-	public PlayerEventListenerCaller getListeners () {
+	public PlayerEventListener getListeners () {
 		return this.listeners;
 	}
 
