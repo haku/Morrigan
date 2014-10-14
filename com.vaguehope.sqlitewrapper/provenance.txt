@@ -1,1 +1,1 @@
-5fa420d75512d78ba9b08143ddca61b7 sqlite-jdbc-3.7.2.jar http://www.xerial.org/maven/repository/artifact/org/xerial/sqlite-jdbc/3.7.2/sqlite-jdbc-3.7.2.jar
+b3096910949e3c78469975f4312fe9d3 sqlite-jdbc-3.8.6.jar http://central.maven.org/maven2/org/xerial/sqlite-jdbc/3.8.6/sqlite-jdbc-3.8.6.jar
