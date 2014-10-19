@@ -710,13 +710,19 @@ public abstract class AbstractPlayerView extends ViewPart {
 
 		public static final String ID = "com.vaguehope.morrigan.gui.FullScreenAction";
 
+		private final int index;
 		private final Monitor mon;
 
-		public FullScreenAction (final int i, final Monitor mon) {
-			super("Full screen on " + i, AS_CHECK_BOX);
+		public FullScreenAction (final int index, final Monitor mon) {
+			super("Full screen on " + index, AS_CHECK_BOX);
 			this.setId(ID);
 			this.setImageDescriptor(Activator.getImageDescriptor("icons/display.gif"));
+			this.index = index;
 			this.mon = mon;
+		}
+
+		public int getIndex () {
+			return this.index;
 		}
 
 		public Monitor getMonitor () {

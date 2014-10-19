@@ -1,6 +1,7 @@
 package com.vaguehope.morrigan.gui.views;
 
 import java.util.Collection;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IContributionItem;
@@ -51,6 +52,8 @@ public class ViewDisplay extends ViewPart {
 				}
 			});
 		}
+
+		checkIfStartFullScreen();
 	}
 
 	@Override
@@ -91,6 +94,31 @@ public class ViewDisplay extends ViewPart {
 			tbm.add(a);
 		}
 		tbm.update(true);
+	}
+
+	private static AtomicBoolean startedFulscreen = new AtomicBoolean(false);
+	private static final String START_FULLSCREEN_ENV = "FULLSCREEN";
+
+	private void checkIfStartFullScreen () {
+		if (startedFulscreen.compareAndSet(false, true)) {
+			final String envRaw = System.getenv(START_FULLSCREEN_ENV);
+			if (envRaw != null && envRaw.length() > 0) {
+				try {
+					final int env = Integer.parseInt(envRaw);
+					for (final FullScreenAction a : this.viewControls.getFullScreenActions()) {
+						if (env == a.getIndex()) {
+							a.run();
+							System.err.println("Started fullscreen on " + env + ".");
+							return;
+						}
+					}
+					System.err.println("Unfound " + START_FULLSCREEN_ENV + " value: " + envRaw);
+				}
+				catch (final NumberFormatException e) {
+					System.err.println("invalid " + START_FULLSCREEN_ENV + " value: " + envRaw);
+				}
+			}
+		}
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
