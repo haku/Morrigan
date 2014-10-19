@@ -25,7 +25,6 @@ import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
@@ -43,6 +42,11 @@ import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.sqlitewrapper.DbException;
 
 public class JumpToDlg implements Dismissable {
+
+	public interface JumpToListener {
+		void jumpTo(final JumpToDlg dlg, final JumpType type);
+	}
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private static final int MAX_RESULTS = 200;
@@ -55,18 +59,19 @@ public class JumpToDlg implements Dismissable {
 
 	private final Shell parent;
 	private final IMediaTrackDb<?, ? extends IMediaTrack> mediaDb;
+	private final JumpToListener listener;
 
-	private JumpType resultAction;
 	private IMediaTrack returnItem = null;
 	private String returnFilter = null;
 	private List<? extends IMediaTrack> searchResults = null;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public JumpToDlg (final Shell parent, final IMediaTrackDb<?, ? extends IMediaTrack> mediaDb) {
+	public JumpToDlg (final Shell parent, final IMediaTrackDb<?, ? extends IMediaTrack> mediaDb, final JumpToListener listener) {
 		this.parent = parent;
 		if (mediaDb == null) throw new IllegalArgumentException("mediaDb can not be null.");
 		this.mediaDb = mediaDb;
+		this.listener = listener;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -111,7 +116,7 @@ public class JumpToDlg implements Dismissable {
 	private Button btnOpenView = null;
 	private Button btnCancel = null;
 
-	public JumpType open () {
+	public void open () {
 		synchronized (dlgOpenLock) {
 			if (dlgOpen) {
 				if (openDlg != null) {
@@ -120,7 +125,8 @@ public class JumpToDlg implements Dismissable {
 						j.dismiss();
 					}
 				}
-				return JumpType.NULL;
+				this.listener.jumpTo(this, JumpType.NULL);
+				return;
 			}
 			dlgOpen = true;
 		}
@@ -245,18 +251,6 @@ public class JumpToDlg implements Dismissable {
 		this.shell.open();
 		this.shell.setFocus();
 		this.shell.forceActive();
-		final Display display = this.parent.getDisplay();
-		while (!this.shell.isDisposed()) {
-			if (!display.readAndDispatch()) {
-				display.sleep();
-			}
-		}
-
-		synchronized (dlgOpenLock) {
-			dlgOpen = false;
-		}
-
-		return this.resultAction;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -269,21 +263,20 @@ public class JumpToDlg implements Dismissable {
 	protected void leaveDlg (final JumpType action) {
 		this.returnItem = getSelectedItem();
 		this.returnFilter = this.text.getText();
-
+		PreferenceHelper.setLastJumpToDlgQuery(this.returnFilter); // Save query string.
+		this.shell.close();
+		synchronized (dlgOpenLock) {
+			dlgOpen = false;
+		}
 		if (this.returnItem == null) {
-			this.resultAction = JumpType.NULL;
+			this.listener.jumpTo(this, JumpType.NULL);
 		}
 		else if ((action == JumpType.OPEN_VIEW || action == JumpType.SHUFFLE_AND_ENQUEUE) && this.searchResults == null) {
-			this.resultAction = JumpType.NULL;
+			this.listener.jumpTo(this, JumpType.NULL);
 		}
 		else {
-			this.resultAction = action;
+			this.listener.jumpTo(this, action);
 		}
-
-		// Save query string.
-		PreferenceHelper.setLastJumpToDlgQuery(this.text.getText());
-
-		this.shell.close();
 	}
 
 	private final TraverseListener traverseListener = new TraverseListener() {
