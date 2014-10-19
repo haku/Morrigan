@@ -10,6 +10,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 
 import com.vaguehope.morrigan.gui.dialogs.RunnableDialog;
+import com.vaguehope.morrigan.gui.dialogs.jumpto.JumpToDlg.JumpToListener;
 import com.vaguehope.morrigan.gui.editors.EditorFactory;
 import com.vaguehope.morrigan.gui.editors.MediaItemDbEditorInput;
 import com.vaguehope.morrigan.gui.editors.mmdb.LocalMixedMediaDbEditor;
@@ -55,27 +56,31 @@ public class JumpToAction extends Action {
 		if (currentList == null || !(currentList instanceof IMediaTrackDb<?, ?>)) return;
 		final IMediaTrackDb<?, ?> currentDb = (IMediaTrackDb<?, ?>) currentList;
 
-		final JumpToDlg dlg = new JumpToDlg(this.workbenchWindow.getShell(), (IMediaTrackDb<?, ?>) currentList);
-		switch (dlg.open()) {
-			case PLAY_NOW:
-				player.loadAndStartPlaying(currentList, dlg.getReturnItem());
-				break;
-			case ENQUEUE:
-				player.getQueue().addToQueue(new PlayItem(currentList, dlg.getReturnItem()));
-				break;
-			case REVEAL:
-				// TODO extract revealItemInLists() and do not go via ViewControls.
-				viewControls.revealItemInLists(currentList, dlg.getReturnItem());
-				break;
-			case SHUFFLE_AND_ENQUEUE:
-				shuffleAndEnqueue(player, currentList, dlg);
-				break;
-			case OPEN_VIEW:
-				openFilteredView(currentDb, dlg.getReturnFilter());
-				break;
-			default:
-				break;
-		}
+		new JumpToDlg(this.workbenchWindow.getShell(), (IMediaTrackDb<?, ?>) currentList, new JumpToListener() {
+			@Override
+			public void jumpTo (final JumpToDlg dlg, final JumpType type) {
+				switch (type) {
+					case PLAY_NOW:
+						player.loadAndStartPlaying(currentList, dlg.getReturnItem());
+						break;
+					case ENQUEUE:
+						player.getQueue().addToQueue(new PlayItem(currentList, dlg.getReturnItem()));
+						break;
+					case REVEAL:
+						// TODO extract revealItemInLists() and do not go via ViewControls.
+						viewControls.revealItemInLists(currentList, dlg.getReturnItem());
+						break;
+					case SHUFFLE_AND_ENQUEUE:
+						shuffleAndEnqueue(player, currentList, dlg);
+						break;
+					case OPEN_VIEW:
+						openFilteredView(currentDb, dlg.getReturnFilter());
+						break;
+					default:
+						break;
+				}
+			}
+		}).open();
 	}
 
 	private static void shuffleAndEnqueue (final LocalPlayer player, final IMediaTrackList<? extends IMediaTrack> currentList, final JumpToDlg dlg) {
