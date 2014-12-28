@@ -90,12 +90,12 @@ public abstract class AbstractMixedMediaDb
 
 	@Override
 	public List<IMixedMediaItem> simpleSearchMedia (final MediaType mediaType, final String term, final int maxResults) throws DbException {
-		return getDbLayer().simpleSearchMedia(mediaType, escapeSearch(term), SEARCH_ESC, maxResults);
+		return getDbLayer().simpleSearchMedia(mediaType, term, maxResults);
 	}
 
 	@Override
 	public List<IMixedMediaItem> simpleSearchMedia (final MediaType mediaType, final String term, final int maxResults, final IDbColumn[] sortColumns, final SortDirection[] sortDirections) throws DbException {
-		return getDbLayer().simpleSearchMedia(mediaType, escapeSearch(term), SEARCH_ESC, maxResults, sortColumns, sortDirections);
+		return getDbLayer().simpleSearchMedia(mediaType, term, maxResults, sortColumns, sortDirections);
 	}
 
 	@Override
