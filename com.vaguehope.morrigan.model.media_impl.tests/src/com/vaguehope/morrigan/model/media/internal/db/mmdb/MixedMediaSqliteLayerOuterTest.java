@@ -15,6 +15,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
@@ -52,14 +53,20 @@ public class MixedMediaSqliteLayerOuterTest {
 
 	@Test
 	public void itReturnsAllItems () throws Exception {
-		final List<IMixedMediaItem> actual = this.undertest.getAllMedia(IMixedMediaItemStorageLayer.SQL_TBL_MEDIAFILES_COL_FILE, SortDirection.ASC, false);
+		final List<IMixedMediaItem> actual = this.undertest.getAllMedia(
+				new IDbColumn[] { IMixedMediaItemStorageLayer.SQL_TBL_MEDIAFILES_COL_FILE },
+				new SortDirection[] { SortDirection.ASC },
+				false);
 		assertEquals(this.expectedAllItems, actual);
 	}
 
 	@Test
 	public void itReturnsTrackItemsWhenDefaultTypeIsTrack () throws Exception {
 		this.undertest.setDefaultMediaType(MediaType.TRACK);
-		final List<IMixedMediaItem> actual = this.undertest.getMedia(IMixedMediaItemStorageLayer.SQL_TBL_MEDIAFILES_COL_FILE, SortDirection.ASC, false);
+		final List<IMixedMediaItem> actual = this.undertest.getMedia(
+				new IDbColumn[] { IMixedMediaItemStorageLayer.SQL_TBL_MEDIAFILES_COL_FILE },
+				new SortDirection[] { SortDirection.ASC },
+				false);
 		final List<IMixedMediaItem> expected = filterItemsByType(this.expectedAllItems, MediaType.TRACK);
 		assertEquals(expected, actual);
 	}
@@ -67,7 +74,10 @@ public class MixedMediaSqliteLayerOuterTest {
 	@Test
 	public void itReturnsPictureItemsWhenDefaultTypeIsPicture () throws Exception {
 		this.undertest.setDefaultMediaType(MediaType.PICTURE);
-		final List<IMixedMediaItem> actual = this.undertest.getMedia(IMixedMediaItemStorageLayer.SQL_TBL_MEDIAFILES_COL_FILE, SortDirection.ASC, false);
+		final List<IMixedMediaItem> actual = this.undertest.getMedia(
+				new IDbColumn[] { IMixedMediaItemStorageLayer.SQL_TBL_MEDIAFILES_COL_FILE },
+				new SortDirection[] { SortDirection.ASC },
+				false);
 		final List<IMixedMediaItem> expected = filterItemsByType(this.expectedAllItems, MediaType.PICTURE);
 		assertEquals(expected, actual);
 	}
@@ -202,7 +212,10 @@ public class MixedMediaSqliteLayerOuterTest {
 				"some_awesome_band_desu",
 				"happy_track_nyan~");
 
-		final List<IMixedMediaItem> actual = this.undertest.getMedia(IMixedMediaItemStorageLayer.SQL_TBL_MEDIAFILES_COL_FILE, SortDirection.ASC, true,
+		final List<IMixedMediaItem> actual = this.undertest.getMedia(
+				new IDbColumn[] { IMixedMediaItemStorageLayer.SQL_TBL_MEDIAFILES_COL_FILE },
+				new SortDirection[] { SortDirection.ASC },
+				true,
 				MediaItemDb.escapeSearch("t=some_awesome_band_desu t=happy_track_nyan~"), MediaItemDb.SEARCH_ESC);
 		assertSingleResult(expectedWithTags, actual);
 	}
@@ -224,7 +237,10 @@ public class MixedMediaSqliteLayerOuterTest {
 					i % 2 == 0 ? MediaType.TRACK : MediaType.PICTURE,
 					"noise_" + i);
 		}
-		final List<IMixedMediaItem> all = this.undertest.getAllMedia(IMixedMediaItemStorageLayer.SQL_TBL_MEDIAFILES_COL_FILE, SortDirection.ASC, false);
+		final List<IMixedMediaItem> all = this.undertest.getAllMedia(
+				new IDbColumn[] { IMixedMediaItemStorageLayer.SQL_TBL_MEDIAFILES_COL_FILE },
+				new SortDirection[] { SortDirection.ASC },
+				false);
 		assertEquals(10, all.size());
 	}
 
