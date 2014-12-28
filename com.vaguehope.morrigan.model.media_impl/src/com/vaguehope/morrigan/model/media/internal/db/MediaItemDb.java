@@ -601,6 +601,16 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 //	Tags.
 
 	@Override
+	public List<MediaTag> getTopTags (final int countLimit) throws MorriganException {
+		try {
+			return this.dbLayer.getTopTags(countLimit);
+		}
+		catch (DbException e) {
+			throw new MorriganException(e);
+		}
+	}
+
+	@Override
 	public boolean hasTags (final IDbItem item) throws MorriganException {
 		try {
 			return this.dbLayer.hasTags(item);

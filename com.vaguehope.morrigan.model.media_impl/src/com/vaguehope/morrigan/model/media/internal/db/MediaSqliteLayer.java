@@ -80,6 +80,15 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 //	Public methods for tags.
 
 	@Override
+	public List<MediaTag> getTopTags (final int countLimit) throws DbException {
+		try {
+			return local_getTopTags(countLimit);
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+
+	@Override
 	public boolean hasTags (final IDbItem item) throws DbException {
 		try {
 			return local_hasTags(item.getDbRowId());
@@ -402,6 +411,13 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	 * tags.
 	 */
 
+	private static final String SQL_TBL_TAGS_Q_TOP =
+		"SELECT count(*) as freq,t.id,t.tag,t.type,t.cls_id,c.cls" +
+		" FROM tbl_tags AS t LEFT OUTER JOIN tbl_tag_cls AS c ON t.cls_id=c.id" +
+		" WHERE t.type=?" +
+		" GROUP BY t.tag" +
+		" ORDER BY freq DESC, t.type ASC, c.cls ASC, t.tag ASC;";
+
 	private static final String SQL_TBL_TAGS_ADD =
 		"INSERT INTO tbl_tags (mf_id,tag,type,cls_id) VALUES (?,?,?,?);";
 
@@ -705,34 +721,56 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		}
 	}
 
-	private List<MediaTag> local_getTags(final long mf_rowId) throws SQLException, ClassNotFoundException, DbException {
-		List<MediaTag> ret = new ArrayList<MediaTag>();
-		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_TAGS_Q_ALL);
+	private List<MediaTag> local_getTopTags (final int countLimit) throws SQLException, ClassNotFoundException, DbException {
+		final List<MediaTag> ret = new ArrayList<MediaTag>();
+		final PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_TAGS_Q_TOP);
 
 		try {
-			ps.setLong(1, mf_rowId);
-			ResultSet rs = ps.executeQuery();
-			try {
-				while (rs.next()) {
-					long rowId = rs.getLong(SQL_TBL_TAGS_COL_ROWID);
-					String tag = rs.getString(SQL_TBL_TAGS_COL_TAG);
-					int type = rs.getInt(SQL_TBL_TAGS_COL_TYPE);
-					long clsRowId = rs.getLong(SQL_TBL_TAGS_COL_CLSROWID);
-
-					MediaTagType mtt = MediaTagType.getFromIndex(type);
-					MediaTagClassification mtc = local_getTagClassification(clsRowId);
-
-					MediaTag mt = new MediaTagImpl(rowId, tag, mtt, mtc);
-					ret.add(mt);
-				}
-			} finally {
-				rs.close();
-			}
-		} finally {
+			ps.setInt(1, MediaTagType.MANUAL.getIndex()); // Force this as including automatic tags makes no sense.
+			ps.setMaxRows(countLimit);
+			final ResultSet rs = ps.executeQuery();
+			local_readTags(rs, ret);
+		}
+		finally {
 			ps.close();
 		}
 
 		return ret;
+	}
+
+	private List<MediaTag> local_getTags(final long mf_rowId) throws SQLException, ClassNotFoundException, DbException {
+		final List<MediaTag> ret = new ArrayList<MediaTag>();
+		final PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_TAGS_Q_ALL);
+
+		try {
+			ps.setLong(1, mf_rowId);
+			final ResultSet rs = ps.executeQuery();
+			local_readTags(rs, ret);
+		}
+		finally {
+			ps.close();
+		}
+
+		return ret;
+	}
+
+	private void local_readTags (final ResultSet rs, final List<MediaTag> ret) throws SQLException, DbException, ClassNotFoundException {
+		try {
+			while (rs.next()) {
+				final long rowId = rs.getLong(SQL_TBL_TAGS_COL_ROWID);
+				final String tag = rs.getString(SQL_TBL_TAGS_COL_TAG);
+				final int type = rs.getInt(SQL_TBL_TAGS_COL_TYPE);
+				final long clsRowId = rs.getLong(SQL_TBL_TAGS_COL_CLSROWID);
+
+				final MediaTagType mtt = MediaTagType.getFromIndex(type);
+				final MediaTagClassification mtc = local_getTagClassification(clsRowId);
+
+				final MediaTag mt = new MediaTagImpl(rowId, tag, mtt, mtc);
+				ret.add(mt);
+			}
+		} finally {
+			rs.close();
+		}
 	}
 
 	private MediaTagClassification local_addTagClassification (final String classificationName) throws SQLException, ClassNotFoundException, DbException {
