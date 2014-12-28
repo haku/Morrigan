@@ -8,6 +8,7 @@ import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DirtyState;
 import com.vaguehope.morrigan.model.media.DurationData;
+import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
 import com.vaguehope.morrigan.model.media.IMediaPicture;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMixedMediaDb;
@@ -90,6 +91,11 @@ public abstract class AbstractMixedMediaDb
 	@Override
 	public List<IMixedMediaItem> simpleSearchMedia (final MediaType mediaType, final String term, final int maxResults) throws DbException {
 		return getDbLayer().simpleSearchMedia(mediaType, escapeSearch(term), SEARCH_ESC, maxResults);
+	}
+
+	@Override
+	public List<IMixedMediaItem> simpleSearchMedia (final MediaType mediaType, final String term, final int maxResults, final IDbColumn[] sortColumns, final SortDirection[] sortDirections) throws DbException {
+		return getDbLayer().simpleSearchMedia(mediaType, escapeSearch(term), SEARCH_ESC, maxResults, sortColumns, sortDirections);
 	}
 
 	@Override

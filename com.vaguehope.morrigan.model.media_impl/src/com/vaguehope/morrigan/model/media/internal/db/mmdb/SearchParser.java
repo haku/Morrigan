@@ -59,23 +59,33 @@ class SearchParser {
 		return parseSearch(mediaType, null, null, true, true, allTerms, esc);
 	}
 
+	public static Search parseSearch (final MediaType mediaType, final String allTerms, final String esc,
+			final IDbColumn[] sort, final SortDirection[] direction) {
+		return parseSearch(mediaType, sort, direction, true, true, allTerms, esc);
+	}
+
 	public static Search parseSearch (final MediaType mediaType,
-			final IDbColumn sort, final SortDirection direction,
+			final IDbColumn[] sort, final SortDirection[] direction,
 			final boolean excludeMissing, final boolean excludeDisabled) {
 		return parseSearch(mediaType, sort, direction, excludeMissing, excludeDisabled, null, null);
 	}
 
 	public static Search parseSearch (final MediaType mediaType,
-			final IDbColumn sort, final SortDirection direction,
+			final IDbColumn[] sorts, final SortDirection[] directions,
 			final boolean excludeMissing, final boolean excludeDisabled,
 			final String allTerms, final String esc) {
-		if (sort == null ^ direction == null) throw new IllegalArgumentException("Must specify both or neith of sort and direction.");
+		if (sorts == null ^ directions == null) throw new IllegalArgumentException("Must specify both or neith of sort and direction.");
+		if (sorts != null && directions != null && sorts.length != directions.length) throw new IllegalArgumentException("Sorts and directions must be same length.");
 
 		final StringBuilder sql = new StringBuilder(_SQL_MEDIAFILES_SELECT);
 		final List<String> terms = splitTerms(allTerms);
 		appendWhere(sql, mediaType, excludeMissing, excludeDisabled, terms);
-		if (sort != null && direction != null) {
-			sql.append(" ORDER BY ").append(sort.getName()).append(direction.getSql());
+		if (sorts != null && directions != null && sorts.length > 0 && directions.length > 0) {
+			sql.append(" ORDER BY ");
+			for (int i = 0; i < sorts.length; i++) {
+				if (i > 0) sql.append(",");
+				sql.append(sorts[i].getName()).append(directions[i].getSql());
+			}
 		}
 		else {
 			sql.append(_SQL_MEDIAFILES_SEARCHORDERBY);

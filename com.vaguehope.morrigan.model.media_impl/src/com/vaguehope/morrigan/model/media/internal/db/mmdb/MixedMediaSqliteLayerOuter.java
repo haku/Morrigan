@@ -62,18 +62,18 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	}
 
 	@Override
-	public List<IMixedMediaItem> getAllMedia (final IDbColumn sort, final SortDirection direction, final boolean hideMissing) throws DbException {
-		return getMedia(MediaType.UNKNOWN, sort, direction, hideMissing);
+	public List<IMixedMediaItem> getAllMedia (final IDbColumn[] sorts, final SortDirection[] directions, final boolean hideMissing) throws DbException {
+		return getMedia(MediaType.UNKNOWN, sorts, directions, hideMissing);
 	}
 
 	@Override
-	public List<IMixedMediaItem> getMedia (final IDbColumn sort, final SortDirection direction, final boolean hideMissing) throws DbException {
-		return getMedia(getDefaultMediaType(), sort, direction, hideMissing);
+	public List<IMixedMediaItem> getMedia (final IDbColumn[] sorts, final SortDirection[] directions, final boolean hideMissing) throws DbException {
+		return getMedia(getDefaultMediaType(), sorts, directions, hideMissing);
 	}
 
 	@Override
-	public List<IMixedMediaItem> getMedia (final IDbColumn sort, final SortDirection direction, final boolean hideMissing, final String search, final String searchEsc) throws DbException {
-		return getMedia(getDefaultMediaType(), sort, direction, hideMissing, search, searchEsc);
+	public List<IMixedMediaItem> getMedia (final IDbColumn[] sorts, final SortDirection[] directions, final boolean hideMissing, final String search, final String searchEsc) throws DbException {
+		return getMedia(getDefaultMediaType(), sorts, directions, hideMissing, search, searchEsc);
 	}
 
 	@Override
@@ -82,9 +82,14 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	}
 
 	@Override
-	public List<IMixedMediaItem> getMedia (final MediaType mediaType, final IDbColumn sort, final SortDirection direction, final boolean hideMissing) throws DbException {
+	public List<IMixedMediaItem> simpleSearch (final String term, final String esc, final int maxResults, final IDbColumn[] sorts, final SortDirection[] directions) throws DbException {
+		return simpleSearchMedia(getDefaultMediaType(), term, esc, maxResults, sorts, directions);
+	}
+
+	@Override
+	public List<IMixedMediaItem> getMedia (final MediaType mediaType, final IDbColumn[] sorts, final SortDirection[] directions, final boolean hideMissing) throws DbException {
 		try {
-			return SearchParser.parseSearch(mediaType, sort, direction, hideMissing, false).execute(getDbCon(), this.itemFactory);
+			return SearchParser.parseSearch(mediaType, sorts, directions, hideMissing, false).execute(getDbCon(), this.itemFactory);
 		}
 		catch (Exception e) {
 			throw new DbException(e);
@@ -92,9 +97,9 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	}
 
 	@Override
-	public List<IMixedMediaItem> getMedia (final MediaType mediaType, final IDbColumn sort, final SortDirection direction, final boolean hideMissing, final String search, final String searchEsc) throws DbException {
+	public List<IMixedMediaItem> getMedia (final MediaType mediaType, final IDbColumn[] sorts, final SortDirection[] directions, final boolean hideMissing, final String search, final String searchEsc) throws DbException {
 		try {
-			return SearchParser.parseSearch(mediaType, sort, direction, hideMissing, false, search, searchEsc).execute(getDbCon(), this.itemFactory);
+			return SearchParser.parseSearch(mediaType, sorts, directions, hideMissing, false, search, searchEsc).execute(getDbCon(), this.itemFactory);
 		}
 		catch (Exception e) {
 			throw new DbException(e);
@@ -108,6 +113,16 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	public List<IMixedMediaItem> simpleSearchMedia (final MediaType mediaType, final String term, final String esc, final int maxResults) throws DbException {
 		try {
 			return SearchParser.parseSearch(mediaType, term, esc).execute(getDbCon(), this.itemFactory, maxResults);
+		}
+		catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+
+	@Override
+	public List<IMixedMediaItem> simpleSearchMedia (final MediaType mediaType, final String term, final String esc, final int maxResults, final IDbColumn[] sortColumn, final SortDirection[] sortDirection) throws DbException {
+		try {
+			return SearchParser.parseSearch(mediaType, term, esc, sortColumn, sortDirection).execute(getDbCon(), this.itemFactory, maxResults);
 		}
 		catch (Exception e) {
 			throw new DbException(e);

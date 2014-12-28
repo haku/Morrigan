@@ -20,9 +20,10 @@ public interface IMixedMediaStorageLayer extends IMediaItemStorageLayer<IMixedMe
 	void setDefaultMediaType (MediaType mediaType);
 	MediaType getDefaultMediaType();
 
-	List<IMixedMediaItem> getMedia (MediaType mediaType, IDbColumn sort, SortDirection direction, boolean hideMissing) throws DbException;
-	List<IMixedMediaItem> getMedia (MediaType mediaType, IDbColumn sort, SortDirection direction, boolean hideMissing, String search, String searchEsc) throws DbException;
+	List<IMixedMediaItem> getMedia (MediaType mediaType, IDbColumn[] sorts, SortDirection[] directions, boolean hideMissing) throws DbException;
+	List<IMixedMediaItem> getMedia (MediaType mediaType, IDbColumn[] sorts, SortDirection[] directions, boolean hideMissing, String search, String searchEsc) throws DbException;
 	List<IMixedMediaItem> simpleSearchMedia (MediaType mediaType, String term, String esc, int maxResults) throws DbException;
+	List<IMixedMediaItem> simpleSearchMedia (MediaType mediaType, String term, String esc, int maxResults, IDbColumn[] sortColumn, SortDirection[] sortDirection) throws DbException;
 
 	Collection<IMixedMediaItem> getAlbumItems (MediaType mediaType, MediaAlbum album) throws DbException;
 

@@ -3,7 +3,9 @@ package com.vaguehope.morrigan.model.media;
 import java.util.Collection;
 import java.util.List;
 
+import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
+import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
 import com.vaguehope.sqlitewrapper.DbException;
 
@@ -20,6 +22,7 @@ public interface IMixedMediaDb
 	MediaType getDefaultMediaType ();
 
 	List<IMixedMediaItem> simpleSearchMedia (MediaType mediaType, String term, int maxResults) throws DbException;
+	List<IMixedMediaItem> simpleSearchMedia (MediaType mediaType, String term, int maxResults, IDbColumn[] sortColumns, SortDirection[] sortDirections) throws DbException;
 
 	Collection<IMixedMediaItem> getAlbumItems (MediaType mediaType, MediaAlbum album) throws MorriganException;
 

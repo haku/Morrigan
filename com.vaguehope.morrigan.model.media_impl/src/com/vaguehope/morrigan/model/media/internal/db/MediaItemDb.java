@@ -192,10 +192,16 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 		List<T> allMedia;
 		long t0 = System.currentTimeMillis();
 		if (this.escapedSearchTerm != null) {
-			allMedia = this.dbLayer.getMedia(this.librarySort, this.librarySortDirection, HIDEMISSING, this.escapedSearchTerm, SEARCH_ESC);
+			allMedia = this.dbLayer.getMedia(
+					new IDbColumn[] { this.librarySort },
+					new SortDirection[] { this.librarySortDirection },
+					HIDEMISSING, this.escapedSearchTerm, SEARCH_ESC);
 		}
 		else {
-			allMedia = this.dbLayer.getMedia(this.librarySort, this.librarySortDirection, HIDEMISSING);
+			allMedia = this.dbLayer.getMedia(
+					new IDbColumn[] { this.librarySort },
+					new SortDirection[] { this.librarySortDirection },
+					HIDEMISSING);
 		}
 		long l0 = System.currentTimeMillis() - t0;
 
@@ -259,7 +265,10 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	public List<T> getAllDbEntries () throws DbException {
 		// Now that MediaItem classes are shared via factory, this may no longer be needed.
 		List<T> copyOfMainList = new ArrayList<T>(getMediaItems());
-		List<T> allList = this.dbLayer.getAllMedia(this.dbLayer.getDefaultSortColumn(), SortDirection.ASC, false);
+		List<T> allList = this.dbLayer.getAllMedia(
+				new IDbColumn[] { this.dbLayer.getDefaultSortColumn() },
+				new SortDirection[] { SortDirection.ASC },
+				false);
 		updateList(copyOfMainList, allList, true);
 		return copyOfMainList;
 	}
@@ -375,6 +384,11 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	@Override
 	public List<T> simpleSearch (final String term, final int maxResults) throws DbException {
 		return this.dbLayer.simpleSearch(escapeSearch(term), SEARCH_ESC, maxResults);
+	}
+
+	@Override
+	public List<T> simpleSearch (final String term, final int maxResults, final IDbColumn[] sortColumns, final SortDirection[] sortDirections) throws DbException {
+		return this.dbLayer.simpleSearch(escapeSearch(term), SEARCH_ESC, maxResults, sortColumns, sortDirections);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
