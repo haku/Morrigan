@@ -62,6 +62,7 @@ public interface IMediaItemStorageLayer<T extends IMediaItem> extends IGenericDb
 	List<MediaTagClassification> getTagClassifications () throws DbException;
 	void addTagClassification (String classificationName) throws DbException;
 	MediaTagClassification getTagClassification (String classificationName) throws DbException;
+	List<MediaTag> getTopTags (int countLimit) throws DbException;
 	boolean hasTags (IDbItem item) throws DbException;
 	boolean hasTag (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) throws DbException;
 	List<MediaTag> getTags (IDbItem item) throws DbException;
