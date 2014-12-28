@@ -10,7 +10,6 @@ import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -22,7 +21,6 @@ import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMixedMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.MediaTagClassification;
 import com.vaguehope.morrigan.model.media.MediaTagType;
-import com.vaguehope.morrigan.model.media.internal.db.MediaItemDb;
 import com.vaguehope.sqlitewrapper.DbException;
 
 public class MixedMediaSqliteLayerOuterTest {
@@ -152,6 +150,14 @@ public class MixedMediaSqliteLayerOuterTest {
 	}
 
 	@Test
+	public void itCanMatchFileNameWithSpecialChars () throws Exception {
+		final String term = "awesome'\"*%_\\band";
+		mockMediaFileWithTags("watcha " + term + " noise");
+
+		assertSingleResult(mockMediaTrackWithNameContaining(term), runSearch("f~" + term));
+	}
+
+	@Test
 	public void itCanJustPartialMatchTag () throws Exception {
 		final String term = "some_awesome_band_desu";
 		mockMediaTrackWithNameContaining(term);
@@ -216,19 +222,31 @@ public class MixedMediaSqliteLayerOuterTest {
 				new IDbColumn[] { IMixedMediaItemStorageLayer.SQL_TBL_MEDIAFILES_COL_FILE },
 				new SortDirection[] { SortDirection.ASC },
 				true,
-				MediaItemDb.escapeSearch("t=some_awesome_band_desu t=happy_track_nyan~"), MediaItemDb.SEARCH_ESC);
+				"t=some_awesome_band_desu t=happy_track_nyan~");
 		assertSingleResult(expectedWithTags, actual);
 	}
 
-	@Ignore("Quotes not yet implemented")
+	@Test
+	public void itCanPartialMatchFileNameQuoted () throws Exception {
+		final String term = "some awesome? band desu";
+
+		final String term1 = term.replace('?', '"');
+		assertSingleResult(mockMediaTrackWithNameContaining(term1), runSearch("'" + term1 + "'"));
+
+		final String term2 = term.replace('?', '\'');
+		assertSingleResult(mockMediaTrackWithNameContaining(term2), runSearch("\"" + term2 + "\""));
+	}
+
 	@Test
 	public void itCanJustPartialMatchFileNameQuoted () throws Exception {
-		final String term = "some awesome band desu";
-		final IMixedMediaItem expectedWithTermInName = mockMediaTrackWithNameContaining(term);
+		final String term = "some awesome? band desu";
 		mockMediaFileWithTags("watcha " + term + " noise");
 
-		assertSingleResult(expectedWithTermInName, runSearch("f~'" + term + "'"));
-		assertSingleResult(expectedWithTermInName, runSearch("f~\"" + term + "\""));
+		final String term1 = term.replace('?', '"');
+		assertSingleResult(mockMediaTrackWithNameContaining(term1), runSearch("f~'" + term1 + "'"));
+
+		final String term2 = term.replace('?', '\'');
+		assertSingleResult(mockMediaTrackWithNameContaining(term2), runSearch("f~\"" + term2 + "\""));
 	}
 
 	private void addNoiseToDb () throws Exception {
@@ -272,9 +290,7 @@ public class MixedMediaSqliteLayerOuterTest {
 	}
 
 	private List<IMixedMediaItem> runSearch (final String term) throws DbException {
-		return this.undertest.simpleSearchMedia(MediaType.TRACK,
-				MediaItemDb.escapeSearch(term),
-				MediaItemDb.SEARCH_ESC, 10);
+		return this.undertest.simpleSearchMedia(MediaType.TRACK, term, 10);
 	}
 
 	private static void assertSingleResult (final IMixedMediaItem expected, final List<IMixedMediaItem> actual) {

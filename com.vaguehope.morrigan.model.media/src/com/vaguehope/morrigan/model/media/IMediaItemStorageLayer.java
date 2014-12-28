@@ -103,14 +103,14 @@ public interface IMediaItemStorageLayer<T extends IMediaItem> extends IGenericDb
 
 	List<T> getAllMedia (IDbColumn[] sorts, SortDirection[] directions, boolean hideMissing) throws DbException;
 	List<T> getMedia (IDbColumn[] sorts, SortDirection[] directions, boolean hideMissing) throws DbException;
-	List<T> getMedia (IDbColumn[] sorts, SortDirection[] directions, boolean hideMissing, String search, String searchEsc) throws DbException;
+	List<T> getMedia (IDbColumn[] sorts, SortDirection[] directions, boolean hideMissing, String search) throws DbException;
 
 	boolean hasFile (File file) throws DbException;
 	boolean hasFile (String filePath) throws DbException;
 	T getByFile (File file) throws DbException;
 	T getByFile (String filePath) throws DbException;
-	List<T> simpleSearch(String term, String esc, int maxResults) throws DbException;
-	List<T> simpleSearch(String term, String esc, int maxResults, IDbColumn[] sorts, SortDirection[] directions) throws DbException;
+	List<T> simpleSearch(String term, int maxResults) throws DbException;
+	List<T> simpleSearch(String term, int maxResults, IDbColumn[] sorts, SortDirection[] directions) throws DbException;
 
 	boolean[] addFiles (List<File> files) throws DbException;
 

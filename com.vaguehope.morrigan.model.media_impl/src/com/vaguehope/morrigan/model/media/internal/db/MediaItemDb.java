@@ -34,17 +34,12 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 
 	public static final boolean HIDEMISSING = true; // TODO link this to GUI?
 
-	/**
-	 * This pairs with escapeSearch().
-	 */
-	public static final String SEARCH_ESC = "\\";
-
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private final Logger logger = Logger.getLogger(this.getClass().getName());
 
 	private final MediaItemDbConfig config;
-	private final String escapedSearchTerm;
+	private final String searchTerm;
 
 	private final S dbLayer;
 	private IDbColumn librarySort;
@@ -66,10 +61,10 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 		this.librarySortDirection = SortDirection.ASC;
 
 		if (config.getFilter() != null) {
-			this.escapedSearchTerm = escapeSearch(config.getFilter());
+			this.searchTerm = config.getFilter();
 		}
 		else {
-			this.escapedSearchTerm = null;
+			this.searchTerm = null;
 		}
 
 		try {
@@ -130,8 +125,8 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 		return this.dbLayer;
 	}
 
-	public String getEscapedSearchTerm () {
-		return this.escapedSearchTerm;
+	public String getSearchTerm () {
+		return this.searchTerm;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -191,11 +186,11 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 
 		List<T> allMedia;
 		long t0 = System.currentTimeMillis();
-		if (this.escapedSearchTerm != null) {
+		if (this.searchTerm != null) {
 			allMedia = this.dbLayer.getMedia(
 					new IDbColumn[] { this.librarySort },
 					new SortDirection[] { this.librarySortDirection },
-					HIDEMISSING, this.escapedSearchTerm, SEARCH_ESC);
+					HIDEMISSING, this.searchTerm);
 		}
 		else {
 			allMedia = this.dbLayer.getMedia(
@@ -383,12 +378,12 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 
 	@Override
 	public List<T> simpleSearch (final String term, final int maxResults) throws DbException {
-		return this.dbLayer.simpleSearch(escapeSearch(term), SEARCH_ESC, maxResults);
+		return this.dbLayer.simpleSearch(term, maxResults);
 	}
 
 	@Override
 	public List<T> simpleSearch (final String term, final int maxResults, final IDbColumn[] sortColumns, final SortDirection[] sortDirections) throws DbException {
-		return this.dbLayer.simpleSearch(escapeSearch(term), SEARCH_ESC, maxResults, sortColumns, sortDirections);
+		return this.dbLayer.simpleSearch(term, maxResults, sortColumns, sortDirections);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -942,20 +937,6 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 		if (this._changedItems != null) this._changedItems.add(mi);
 
 		return ret;
-	}
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	/**
-	 * This pairs with SEARCH_ESC.
-	 */
-	public static String escapeSearch (final String term) {
-		String q = term.replace("'", "''");
-		q = q.replace("\\", "\\\\");
-		q = q.replace("%", "\\%");
-		q = q.replace("_", "\\_");
-		q = q.replace("*", "%");
-		return q;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

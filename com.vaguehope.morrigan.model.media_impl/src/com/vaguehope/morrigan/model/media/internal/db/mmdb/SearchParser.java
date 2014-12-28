@@ -6,17 +6,19 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
+import com.vaguehope.morrigan.util.StringHelper;
 
 class SearchParser {
 
 	private static final int MAX_SEARCH_TERMS = 10;
-	private static final Pattern SEARCH_TERM_SPLIT = Pattern.compile("(?:\\s|　)+");
+	private static final Pattern SEARCH_TERM_FINDER = Pattern.compile("([^\\s　]*\"[^\"]+\"[^\\s　]*|[^\\s　]*'[^']+'[^\\s　]*|[^\\s　]+)");
 
 	private static final String _SQL_MEDIAFILES_SELECT =
 			"SELECT id,file,type,md5,added,modified,enabled,missing,remloc,startcnt,endcnt,lastplay,duration,width,height"
@@ -55,25 +57,25 @@ class SearchParser {
 	 * Excludes missing and disabled. Ordered by lastplay, endcnt, startcnt,
 	 * file.
 	 */
-	public static Search parseSearch (final MediaType mediaType, final String allTerms, final String esc) {
-		return parseSearch(mediaType, null, null, true, true, allTerms, esc);
+	public static Search parseSearch (final MediaType mediaType, final String allTerms) {
+		return parseSearch(mediaType, null, null, true, true, allTerms);
 	}
 
-	public static Search parseSearch (final MediaType mediaType, final String allTerms, final String esc,
+	public static Search parseSearch (final MediaType mediaType, final String allTerms,
 			final IDbColumn[] sort, final SortDirection[] direction) {
-		return parseSearch(mediaType, sort, direction, true, true, allTerms, esc);
+		return parseSearch(mediaType, sort, direction, true, true, allTerms);
 	}
 
 	public static Search parseSearch (final MediaType mediaType,
 			final IDbColumn[] sort, final SortDirection[] direction,
 			final boolean excludeMissing, final boolean excludeDisabled) {
-		return parseSearch(mediaType, sort, direction, excludeMissing, excludeDisabled, null, null);
+		return parseSearch(mediaType, sort, direction, excludeMissing, excludeDisabled, null);
 	}
 
 	public static Search parseSearch (final MediaType mediaType,
 			final IDbColumn[] sorts, final SortDirection[] directions,
 			final boolean excludeMissing, final boolean excludeDisabled,
-			final String allTerms, final String esc) {
+			final String allTerms) {
 		if (sorts == null ^ directions == null) throw new IllegalArgumentException("Must specify both or neith of sort and direction.");
 		if (sorts != null && directions != null && sorts.length != directions.length) throw new IllegalArgumentException("Sorts and directions must be same length.");
 
@@ -91,16 +93,20 @@ class SearchParser {
 			sql.append(_SQL_MEDIAFILES_SEARCHORDERBY);
 		}
 		sql.append(";");
-		return new Search(sql.toString(), mediaType, terms, esc);
+		return new Search(sql.toString(), mediaType, terms);
 	}
 
 	private static List<String> splitTerms (final String allTerms) {
 		final List<String> terms = new ArrayList<String>();
 		if (allTerms == null) return terms;
-		for (final String subTerm : SEARCH_TERM_SPLIT.split(allTerms)) {
-			if (subTerm != null && subTerm.length() > 0) terms.add(subTerm);
+
+		final Matcher m = SEARCH_TERM_FINDER.matcher(allTerms);
+		while (m.find()) {
+			final String g = m.group(1);
+			if (g != null && g.length() > 0) terms.add(g);
 			if (terms.size() >= MAX_SEARCH_TERMS) break;
 		}
+
 		return terms;
 	}
 
@@ -163,13 +169,11 @@ class SearchParser {
 		private final String sql;
 		private final MediaType mediaType;
 		private final List<String> terms;
-		private final String esc;
 
-		public Search (final String sql, final MediaType mediaType, final List<String> terms, final String esc) {
+		public Search (final String sql, final MediaType mediaType, final List<String> terms) {
 			this.sql = sql;
 			this.mediaType = mediaType;
 			this.terms = terms;
-			this.esc = esc;
 		}
 
 		private PreparedStatement prepare (final Connection con) throws SQLException {
@@ -193,18 +197,19 @@ class SearchParser {
 				for (final String term : this.terms) {
 					if ("OR".equals(term)) continue;
 					if (term.startsWith("f~") || term.startsWith("t~")) {
-						ps.setString(parmIn++, "%" + term.substring(2) + "%");
-						ps.setString(parmIn++, this.esc);
+						ps.setString(parmIn++, "%" + escapeSearch(StringHelper.removeEndQuotes(term.substring(2))) + "%");
+						ps.setString(parmIn++, SEARCH_ESC);
 					}
 					else if (term.startsWith("t=")) {
-						ps.setString(parmIn++, term.substring(2));
-						ps.setString(parmIn++, this.esc);
+						ps.setString(parmIn++, escapeSearch(StringHelper.removeEndQuotes(term.substring(2))));
+						ps.setString(parmIn++, SEARCH_ESC);
 					}
 					else {
-						ps.setString(parmIn++, "%" + term + "%");
-						ps.setString(parmIn++, this.esc);
-						ps.setString(parmIn++, "%" + term + "%");
-						ps.setString(parmIn++, this.esc);
+						final String escapedTerm = escapeSearch(StringHelper.removeEndQuotes(term));
+						ps.setString(parmIn++, "%" + escapedTerm + "%");
+						ps.setString(parmIn++, SEARCH_ESC);
+						ps.setString(parmIn++, "%" + escapedTerm + "%");
+						ps.setString(parmIn++, SEARCH_ESC);
 					}
 				}
 				if (maxResults > 0) ps.setMaxRows(maxResults);
@@ -227,11 +232,27 @@ class SearchParser {
 					.append("sql=" + this.sql)
 					.append(", mediaType=" + this.mediaType)
 					.append(", terms=" + this.terms)
-					.append(", esc=" + this.esc)
 					.append("}")
 					.toString();
 		}
 
+	}
+
+	/**
+	 * This pairs with escapeSearch().
+	 */
+	protected static final String SEARCH_ESC = "\\";
+
+	/**
+	 * This pairs with SEARCH_ESC.
+	 */
+	protected static String escapeSearch (final String term) {
+		String q = term;
+		q = q.replace("\\", "\\\\");
+		q = q.replace("%", "\\%");
+		q = q.replace("_", "\\_");
+		q = q.replace("*", "%");
+		return q;
 	}
 
 }

@@ -72,18 +72,18 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	}
 
 	@Override
-	public List<IMixedMediaItem> getMedia (final IDbColumn[] sorts, final SortDirection[] directions, final boolean hideMissing, final String search, final String searchEsc) throws DbException {
-		return getMedia(getDefaultMediaType(), sorts, directions, hideMissing, search, searchEsc);
+	public List<IMixedMediaItem> getMedia (final IDbColumn[] sorts, final SortDirection[] directions, final boolean hideMissing, final String search) throws DbException {
+		return getMedia(getDefaultMediaType(), sorts, directions, hideMissing, search);
 	}
 
 	@Override
-	public List<IMixedMediaItem> simpleSearch (final String term, final String esc, final int maxResults) throws DbException {
-		return simpleSearchMedia(getDefaultMediaType(), term, esc, maxResults);
+	public List<IMixedMediaItem> simpleSearch (final String term, final int maxResults) throws DbException {
+		return simpleSearchMedia(getDefaultMediaType(), term, maxResults);
 	}
 
 	@Override
-	public List<IMixedMediaItem> simpleSearch (final String term, final String esc, final int maxResults, final IDbColumn[] sorts, final SortDirection[] directions) throws DbException {
-		return simpleSearchMedia(getDefaultMediaType(), term, esc, maxResults, sorts, directions);
+	public List<IMixedMediaItem> simpleSearch (final String term, final int maxResults, final IDbColumn[] sorts, final SortDirection[] directions) throws DbException {
+		return simpleSearchMedia(getDefaultMediaType(), term, maxResults, sorts, directions);
 	}
 
 	@Override
@@ -97,9 +97,9 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	}
 
 	@Override
-	public List<IMixedMediaItem> getMedia (final MediaType mediaType, final IDbColumn[] sorts, final SortDirection[] directions, final boolean hideMissing, final String search, final String searchEsc) throws DbException {
+	public List<IMixedMediaItem> getMedia (final MediaType mediaType, final IDbColumn[] sorts, final SortDirection[] directions, final boolean hideMissing, final String search) throws DbException {
 		try {
-			return SearchParser.parseSearch(mediaType, sorts, directions, hideMissing, false, search, searchEsc).execute(getDbCon(), this.itemFactory);
+			return SearchParser.parseSearch(mediaType, sorts, directions, hideMissing, false, search).execute(getDbCon(), this.itemFactory);
 		}
 		catch (Exception e) {
 			throw new DbException(e);
@@ -110,9 +110,9 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	 * Querying for type UNKNOWN will return all types (i.e. wild-card).
 	 */
 	@Override
-	public List<IMixedMediaItem> simpleSearchMedia (final MediaType mediaType, final String term, final String esc, final int maxResults) throws DbException {
+	public List<IMixedMediaItem> simpleSearchMedia (final MediaType mediaType, final String term, final int maxResults) throws DbException {
 		try {
-			return SearchParser.parseSearch(mediaType, term, esc).execute(getDbCon(), this.itemFactory, maxResults);
+			return SearchParser.parseSearch(mediaType, term).execute(getDbCon(), this.itemFactory, maxResults);
 		}
 		catch (Exception e) {
 			throw new DbException(e);
@@ -120,9 +120,9 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	}
 
 	@Override
-	public List<IMixedMediaItem> simpleSearchMedia (final MediaType mediaType, final String term, final String esc, final int maxResults, final IDbColumn[] sortColumn, final SortDirection[] sortDirection) throws DbException {
+	public List<IMixedMediaItem> simpleSearchMedia (final MediaType mediaType, final String term, final int maxResults, final IDbColumn[] sortColumn, final SortDirection[] sortDirection) throws DbException {
 		try {
-			return SearchParser.parseSearch(mediaType, term, esc, sortColumn, sortDirection).execute(getDbCon(), this.itemFactory, maxResults);
+			return SearchParser.parseSearch(mediaType, term, sortColumn, sortDirection).execute(getDbCon(), this.itemFactory, maxResults);
 		}
 		catch (Exception e) {
 			throw new DbException(e);
