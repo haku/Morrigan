@@ -592,14 +592,22 @@ public class MlistsServlet extends HttpServlet {
 	public static void printAlbumBody (DataWriter dw, IMixedMediaDb ml, MediaAlbum album) throws SAXException, MorriganException {
 		FeedHelper.addElement(dw, "name", album.getName());
 		FeedHelper.addLink(dw, fileLink(album), "self");
-		Collection<IMixedMediaItem> pics = ml.getAlbumItems(MediaType.PICTURE, album); // TODO set max result count.
-		if (pics != null && pics.size() >= 1) {
-			IMixedMediaItem pic = pics.iterator().next();
-			FeedHelper.addLink(dw, fileLink(pic), "cover");
+		final File artFile = ml.findAlbumCoverArt(album);
+		if (artFile != null) {
+			FeedHelper.addLink(dw, fileLink(artFile), "cover");
 		}
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	private static String fileLink (File f) {
+		try {
+			return URLEncoder.encode(f.getAbsolutePath(), "UTF-8");
+		}
+		catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
 	private static String fileLink (IMixedMediaItem mi) {
 		try {
