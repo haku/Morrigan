@@ -1,5 +1,6 @@
 package com.vaguehope.morrigan.model.media.internal.db.mmdb;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -16,6 +17,7 @@ import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMixedMediaStorageLayer;
 import com.vaguehope.morrigan.model.media.MediaAlbum;
+import com.vaguehope.morrigan.model.media.internal.CoverArtHelper;
 import com.vaguehope.morrigan.model.media.internal.MediaPictureListHelper;
 import com.vaguehope.morrigan.model.media.internal.MediaTrackListHelper;
 import com.vaguehope.morrigan.model.media.internal.db.MediaItemDb;
@@ -106,6 +108,11 @@ public abstract class AbstractMixedMediaDb
 		catch (DbException e) {
 			throw new MorriganException(e);
 		}
+	}
+
+	@Override
+	public File findAlbumCoverArt (final MediaAlbum album) throws MorriganException {
+		return CoverArtHelper.findCoverArt(getAlbumItems(MediaType.PICTURE, album)); // FIXME set max result count for getAlbumItems().
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

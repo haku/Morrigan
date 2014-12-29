@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -121,6 +123,27 @@ public class CoverArtHelperTest {
 		assertEquals(cover, CoverArtHelper.findCoverArt(this.item));
 	}
 
+	@Test
+	public void itFindsCoverForAlbum () throws Exception {
+		Collection<IMediaItem> albumPics = new LinkedHashSet<IMediaItem>();
+		albumPics.add(new TestItem(givenNoise().getAbsolutePath()));
+
+		final File cover = this.tmp.newFile("cover.jpg");
+		albumPics.add(new TestItem(cover.getAbsolutePath()));
+
+		assertEquals(cover, CoverArtHelper.findCoverArt(albumPics));
+	}
+
+	@Test
+	public void itFindsCoverForAlbumByFallingBackToFirstPic () throws Exception {
+		Collection<IMediaItem> albumPics = new LinkedHashSet<IMediaItem>();
+
+		final File cover = this.tmp.newFile("somethinG.jPg");
+		albumPics.add(new TestItem(cover.getAbsolutePath()));
+
+		assertEquals(cover, CoverArtHelper.findCoverArt(albumPics));
+	}
+
 	private void givenCoverNoise () throws IOException {
 		givenNoise();
 		for (final String ext : new String[] { "jpg", "png", "gif" }) {
@@ -130,8 +153,8 @@ public class CoverArtHelperTest {
 		}
 	}
 
-	private void givenNoise () throws IOException {
-		this.tmp.newFile("something.jpg");
+	private File givenNoise () throws IOException {
+		return this.tmp.newFile("something.jpg");
 	}
 
 	private static class TestItem extends MediaItem {
