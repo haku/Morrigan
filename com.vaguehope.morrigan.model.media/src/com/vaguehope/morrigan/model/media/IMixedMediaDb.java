@@ -1,5 +1,6 @@
 package com.vaguehope.morrigan.model.media;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.List;
 
@@ -25,6 +26,10 @@ public interface IMixedMediaDb
 	List<IMixedMediaItem> simpleSearchMedia (MediaType mediaType, String term, int maxResults, IDbColumn[] sortColumns, SortDirection[] sortDirections) throws DbException;
 
 	Collection<IMixedMediaItem> getAlbumItems (MediaType mediaType, MediaAlbum album) throws MorriganException;
+	/**
+	 * @return File path to cover art or null.
+	 */
+	File findAlbumCoverArt(MediaAlbum album) throws MorriganException;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

@@ -2,7 +2,10 @@ package com.vaguehope.morrigan.model.media.internal;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 
 import com.vaguehope.morrigan.model.media.IMediaItem;
@@ -61,6 +64,34 @@ public class CoverArtHelper {
 		}
 
 		return null;
+	}
+
+	public static File findCoverArt (final Collection<? extends IMediaItem> possiblePics) {
+		if (possiblePics instanceof List) return findCoverArt((List<? extends IMediaItem>) possiblePics);
+		return findCoverArt(new ArrayList<IMediaItem>(possiblePics));
+	}
+
+	public static File findCoverArt (final List<? extends IMediaItem> possiblePics) {
+		if (possiblePics == null || possiblePics.size() < 1) return null;
+
+		final List<String> paths = new ArrayList<String>(possiblePics.size());
+		for (final IMediaItem possiblePic : possiblePics) {
+			paths.add(possiblePic.getFilepath());
+		}
+
+		final List<String> lcaseBaseNames = new ArrayList<String>(possiblePics.size());
+		for (final String path : paths) {
+			lcaseBaseNames.add(fileBaseName(new File(path).getName()).toLowerCase(Locale.UK));
+		}
+
+		// Conventional name for entire directory.
+		for (final String name : DIR_FILE_NAMES) {
+			for (int i = 0; i < paths.size(); i++) {
+				if (lcaseBaseNames.get(i).startsWith(name)) return new File(paths.get(i));
+			}
+		}
+
+		return new File(paths.get(0));
 	}
 
 	private static String fileBaseName (final File file) {
