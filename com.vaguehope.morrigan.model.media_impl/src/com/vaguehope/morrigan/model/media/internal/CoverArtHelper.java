@@ -16,32 +16,44 @@ public class CoverArtHelper {
 	}
 
 	public static File findCoverArt (final IMediaItem item) {
-		final File file = new File(item.getFilepath());
-		final File dir = file.getParentFile();
-		final String baseName = fileBaseName(file);
+		return findCoverArt(new File(item.getFilepath()));
+	}
+
+	public static File findCoverArt (final File file) {
+		final File dir = file.isDirectory() ? file : file.getParentFile();
+
+		final String baseName = file.isFile() ? fileBaseName(file) : null;
 		final String[] imgNames = dir.list(ImgFilenameFilter.INSTANCE);
 		Arrays.sort(imgNames);
 
 		if (imgNames.length < 1) return null;
 
-		for (final String imgName : imgNames) {
-			if (fileBaseName(imgName).equals(baseName)) return new File(dir, imgName);
+		// Same name but with different extension.
+		if (baseName != null) {
+			for (final String imgName : imgNames) {
+				if (fileBaseName(imgName).equals(baseName)) return new File(dir, imgName);
+			}
 		}
 
-		final String lcaseBaseName = baseName.toLowerCase(Locale.UK);
+		// Make lower case names without extensions of all the images.
 		final String[] lcaseImgBaseNames = new String[imgNames.length];
 		for (int i = 0; i < imgNames.length; i++) {
 			lcaseImgBaseNames[i] = fileBaseName(imgNames[i].toLowerCase(Locale.UK));
 		}
 
-		for (int i = 0; i < imgNames.length; i++) {
-			if (lcaseImgBaseNames[i].equals(lcaseBaseName)) return new File(dir, imgNames[i]);
+		if (baseName != null) {
+			final String lcaseBaseName = baseName.toLowerCase(Locale.UK);
+			// Same name but with different case and extension.
+			for (int i = 0; i < imgNames.length; i++) {
+				if (lcaseImgBaseNames[i].equals(lcaseBaseName)) return new File(dir, imgNames[i]);
+			}
+			// Image starts with the same name but with different case.
+			for (int i = 0; i < imgNames.length; i++) {
+				if (lcaseImgBaseNames[i].startsWith(lcaseBaseName)) return new File(dir, imgNames[i]);
+			}
 		}
 
-		for (int i = 0; i < imgNames.length; i++) {
-			if (lcaseImgBaseNames[i].startsWith(lcaseBaseName)) return new File(dir, imgNames[i]);
-		}
-
+		// Conventional name for entire directory.
 		for (final String name : DIR_FILE_NAMES) {
 			for (int i = 0; i < imgNames.length; i++) {
 				if (lcaseImgBaseNames[i].startsWith(name)) return new File(dir, imgNames[i]);
