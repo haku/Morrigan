@@ -20,7 +20,7 @@ public class CoverArtHelperTest {
 
 	@Before
 	public void before () throws Exception {
-		this.item = new testItem(this.tmp.newFile("testItem.ogg").getAbsolutePath());
+		this.item = new TestItem(this.tmp.newFile("testItem.ogg").getAbsolutePath());
 	}
 
 	@Test
@@ -32,6 +32,13 @@ public class CoverArtHelperTest {
 	public void itReturnsNullWhenNoBetterOptions () throws Exception {
 		givenNoise();
 		assertEquals(null, CoverArtHelper.findCoverArt(this.item));
+	}
+
+	@Test
+	public void itFindsCoverForDirectory () throws Exception {
+		givenNoise();
+		final File cover = this.tmp.newFile("cover.jpg");
+		assertEquals(cover, CoverArtHelper.findCoverArt(this.tmp.getRoot()));
 	}
 
 	@Test
@@ -127,9 +134,9 @@ public class CoverArtHelperTest {
 		this.tmp.newFile("something.jpg");
 	}
 
-	private static class testItem extends MediaItem {
+	private static class TestItem extends MediaItem {
 
-		public testItem (final String filePath) {
+		public TestItem (final String filePath) {
 			super(filePath);
 		}
 
