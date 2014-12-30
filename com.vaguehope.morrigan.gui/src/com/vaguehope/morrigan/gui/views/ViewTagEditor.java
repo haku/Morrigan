@@ -403,43 +403,47 @@ public class ViewTagEditor extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	void procAddTag () {
-		if (this.editedItemDb != null && this.editedItem != null) {
-			final String text = this.txtNewTag.getText();
-			if (text.length() > 0) {
-				try {
-					boolean refreshRequired = false;
+		final String text = this.txtNewTag.getText();
+		if (text.length() <= 0) return;
 
-					if (this.editedItems != null && this.editedItems.size() > 1) { // Bulk action.
-						final MorriganMsgDlg dlg = new MorriganMsgDlg(
-								String.format("Add tag '%s' to %s items?", text, this.editedItems.size()),
-								MorriganMsgDlg.YESNO);
-						dlg.open();
-						if (dlg.getReturnCode() == Window.OK) {
-							for (final IMediaItem item : this.editedItems) {
-								this.editedItemDb.addTag(item, text, MediaTagType.MANUAL, (MediaTagClassification) null);
-							}
-							refreshRequired = true;
-						}
-					}
-					else if (this.editedItem != null) { // Single action.
-						this.editedItemDb.addTag(this.editedItem, text, MediaTagType.MANUAL, (MediaTagClassification) null);
-						refreshRequired = true;
-					}
+		if (this.editedItemDb == null) {
+			new MorriganMsgDlg("No DB selected.").open();
+			return;
+		}
 
-					if (refreshRequired) {
-						this.tableViewer.refresh();
-						this.txtNewTag.setSelection(0, text.length());
-						this.txtNewTag.setFocus();
+		if (this.editedItem == null && (this.editedItems == null || this.editedItems.size() <= 1)) {
+			new MorriganMsgDlg("No items selected.").open();
+			return;
+		}
+
+		try {
+			boolean refreshRequired = false;
+
+			if (this.editedItems != null && this.editedItems.size() > 1) { // Bulk action.
+				final MorriganMsgDlg dlg = new MorriganMsgDlg(
+						String.format("Add tag '%s' to %s items?", text, this.editedItems.size()),
+						MorriganMsgDlg.YESNO);
+				dlg.open();
+				if (dlg.getReturnCode() == Window.OK) {
+					for (final IMediaItem item : this.editedItems) {
+						this.editedItemDb.addTag(item, text, MediaTagType.MANUAL, (MediaTagClassification) null);
 					}
-				}
-				catch (MorriganException e) {
-					getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));
+					refreshRequired = true;
 				}
 			}
+			else if (this.editedItem != null) { // Single action.
+				this.editedItemDb.addTag(this.editedItem, text, MediaTagType.MANUAL, (MediaTagClassification) null);
+				refreshRequired = true;
+			}
 
+			if (refreshRequired) {
+				this.tableViewer.refresh();
+				this.txtNewTag.setSelection(0, text.length());
+				this.txtNewTag.setFocus();
+			}
 		}
-		else {
-			new MorriganMsgDlg("No item selected to add tag to.").open();
+		catch (MorriganException e) {
+			getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));
 		}
 	}
 
