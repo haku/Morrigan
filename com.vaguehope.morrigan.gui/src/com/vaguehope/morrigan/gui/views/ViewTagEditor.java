@@ -226,7 +226,7 @@ public class ViewTagEditor extends ViewPart {
 			this.editedItems = null;
 		}
 
-		this.btnAddTag.setEnabled(this.editedItem != null);
+		this.btnAddTag.setEnabled(this.editedItem != null || this.editedItems.size() > 1);
 		this.btnRemoveTag.setEnabled(this.editedItem != null);
 		this.readTagsAction.setEnabled(this.editedItem != null);
 
@@ -404,13 +404,33 @@ public class ViewTagEditor extends ViewPart {
 
 	void procAddTag () {
 		if (this.editedItemDb != null && this.editedItem != null) {
-			String text = this.txtNewTag.getText();
+			final String text = this.txtNewTag.getText();
 			if (text.length() > 0) {
 				try {
-					this.editedItemDb.addTag(this.editedItem, text, MediaTagType.MANUAL, (MediaTagClassification) null);
-					this.tableViewer.refresh();
-					this.txtNewTag.setSelection(0, text.length());
-					this.txtNewTag.setFocus();
+					boolean refreshRequired = false;
+
+					if (this.editedItems != null && this.editedItems.size() > 1) { // Bulk action.
+						final MorriganMsgDlg dlg = new MorriganMsgDlg(
+								String.format("Add tag '%s' to %s items?", text, this.editedItems.size()),
+								MorriganMsgDlg.YESNO);
+						dlg.open();
+						if (dlg.getReturnCode() == Window.OK) {
+							for (final IMediaItem item : this.editedItems) {
+								this.editedItemDb.addTag(item, text, MediaTagType.MANUAL, (MediaTagClassification) null);
+							}
+							refreshRequired = true;
+						}
+					}
+					else if (this.editedItem != null) { // Single action.
+						this.editedItemDb.addTag(this.editedItem, text, MediaTagType.MANUAL, (MediaTagClassification) null);
+						refreshRequired = true;
+					}
+
+					if (refreshRequired) {
+						this.tableViewer.refresh();
+						this.txtNewTag.setSelection(0, text.length());
+						this.txtNewTag.setFocus();
+					}
 				}
 				catch (MorriganException e) {
 					getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));
