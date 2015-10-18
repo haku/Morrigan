@@ -377,6 +377,11 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	}
 
 	@Override
+	public T getByHashcode (final BigInteger hashcode) throws DbException {
+		return this.dbLayer.getByHashcode(hashcode);
+	}
+
+	@Override
 	public List<T> simpleSearch (final String term, final int maxResults) throws DbException {
 		return this.dbLayer.simpleSearch(term, maxResults);
 	}
