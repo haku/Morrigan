@@ -1,0 +1,14 @@
+#!/bin/bash
+set -eu
+
+eclipse="$HOME/opt/eclipse-indigo/eclipse"
+echo "eclipse: $eclipse"
+
+workspace="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+echo "workspace: $workspace"
+
+$eclipse \
+  -noSplash \
+  -application org.eclipse.ant.core.antRunner \
+  -data "$workspace" \
+  -buildfile "$workspace/com.vaguehope.morrigan.build/build-in-eclipse.xml"
