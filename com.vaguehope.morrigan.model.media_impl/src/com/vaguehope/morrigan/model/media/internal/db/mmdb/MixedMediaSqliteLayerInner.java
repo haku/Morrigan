@@ -116,6 +116,9 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 	private static final String _SQL_MEDIAFILES_WHEREFILEEQ =
 		" file = ?";
 
+	private static final String _SQL_MEDIAFILES_WHEREHASHCODEEQ =
+		" md5 = ?";
+
 //	-  -  -  -  -  -  -  -  -  -  -  -
 //	Adding and removing tracks.
 
@@ -342,6 +345,31 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 
 		if (res.size() == 1) return res.get(0);
 		throw new IllegalArgumentException("File not found '"+filePath+"' (results count = "+res.size()+").");
+	}
+
+	protected IMixedMediaItem local_getByHashcode (final BigInteger hashcode) throws SQLException, ClassNotFoundException {
+		PreparedStatement ps;
+		ResultSet rs;
+		List<IMixedMediaItem> res;
+
+		String sql = _SQL_MEDIAFILES_SELECT + _SQL_WHERE + _SQL_MEDIAFILES_WHEREHASHCODEEQ;
+		ps = getDbCon().prepareStatement(sql);
+		try {
+			ps.setBytes(1, hashcode.toByteArray());
+			ps.setMaxRows(2); // Ask for 2 so we know if there is more than 1.
+
+			rs = ps.executeQuery();
+			try {
+				res = local_parseRecordSet(rs, this.itemFactory);
+			} finally {
+				rs.close();
+			}
+		} finally {
+			ps.close();
+		}
+
+		if (res.size() == 1) return res.get(0);
+		throw new IllegalArgumentException("File not found '" + hashcode.toString(16) + "' (results count = " + res.size() + ").");
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

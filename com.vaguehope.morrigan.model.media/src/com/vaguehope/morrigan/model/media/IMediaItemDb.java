@@ -1,6 +1,7 @@
 package com.vaguehope.morrigan.model.media;
 
 import java.io.File;
+import java.math.BigInteger;
 import java.util.List;
 
 import com.vaguehope.morrigan.model.db.IDbColumn;
@@ -31,6 +32,7 @@ public interface IMediaItemDb<S extends IMediaItemStorageLayer<T>, T extends IMe
 	List<T> getAllDbEntries () throws DbException;
 	T getByFile (File file) throws DbException;
 	T getByFile (String filepath) throws DbException;
+	T getByHashcode (BigInteger hashcode) throws DbException;
 
 	T addFile (File file) throws MorriganException, DbException;
 	boolean hasFile (String filepath) throws MorriganException, DbException;

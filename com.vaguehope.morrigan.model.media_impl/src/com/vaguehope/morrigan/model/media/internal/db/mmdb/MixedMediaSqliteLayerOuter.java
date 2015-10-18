@@ -190,6 +190,16 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 		}
 	}
 
+	@Override
+	public IMixedMediaItem getByHashcode (final BigInteger hashcode) throws DbException {
+		try {
+			return local_getByHashcode(hashcode);
+		}
+		catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Media adders and removers.
 
