@@ -126,7 +126,11 @@ public class SyncMetadataRemoteToLocalTask implements MorriganTask {
 			ldb.setItemEnabled(localItem, remoteItem.isEnabled());
 		}
 
-		List<MediaTag> rTags = rdb.getTags(remoteItem);
+		if (localItem.getDuration() <= 0 && remoteItem.getDuration() > 0) {
+			ldb.setTrackDuration(localItem, remoteItem.getDuration());
+		}
+
+		final List<MediaTag> rTags = rdb.getTags(remoteItem);
 		if (rTags != null && rTags.size() > 0) {
 			for (MediaTag rTag : rTags) {
 				MediaTagClassification cls = rTag.getClassification();
