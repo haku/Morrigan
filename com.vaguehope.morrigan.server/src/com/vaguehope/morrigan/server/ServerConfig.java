@@ -20,6 +20,9 @@ public class ServerConfig implements AuthChecker {
 	private static final String KEY_PASS = "pass";
 	private static final String DEFAULT_PASS = "Morrigan";
 
+	private static final String KEY_PLAYER_ENABLED = "player";
+	private static final String DEFAULT_PLAYER_ENABLED = Boolean.TRUE.toString();
+
 	private static final String KEY_PLAYBACKORDER = "order";
 	private static final PlaybackOrder DEFAULT_PLAYBACKORDER = PlaybackOrder.MANUAL;
 
@@ -35,27 +38,31 @@ public class ServerConfig implements AuthChecker {
 		return this.propFile.getInt(KEY_PORT, DEFAULT_PORT);
 	}
 
-	public boolean verifyPassword (String passToTest) throws IOException {
+	public boolean verifyPassword (final String passToTest) throws IOException {
 		// TODO use bcrypt.
-		String pass = this.propFile.getString(KEY_PASS, DEFAULT_PASS);
+		final String pass = this.propFile.getString(KEY_PASS, DEFAULT_PASS);
 		return pass.equals(passToTest);
 	}
 
 	public PlaybackOrder getPlaybackOrder () throws IOException {
-		PlaybackOrder o = OrderHelper.forceParsePlaybackOrder(this.propFile.getString(KEY_PLAYBACKORDER, DEFAULT_PLAYBACKORDER.toString()));
+		final PlaybackOrder o = OrderHelper.forceParsePlaybackOrder(this.propFile.getString(KEY_PLAYBACKORDER, DEFAULT_PLAYBACKORDER.toString()));
 		if (o != null) return o;
 		return DEFAULT_PLAYBACKORDER;
+	}
+
+	public boolean isServerPlayerEnabled () throws IOException {
+		return Boolean.parseBoolean(this.propFile.getString(KEY_PLAYER_ENABLED, DEFAULT_PLAYER_ENABLED));
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	AuthChecker
 
 	@Override
-	public boolean verifyAuth (String passToTest) {
+	public boolean verifyAuth (final String passToTest) {
 		try {
 			return verifyPassword(passToTest);
 		}
-		catch (IOException e) {
+		catch (final IOException e) {
 			this.logger.log(Level.WARNING, "Failed to verify password.", e);
 			return false;
 		}
