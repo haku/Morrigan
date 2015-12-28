@@ -43,22 +43,31 @@ public class Activator implements BundleActivator {
 		this.asyncTasksRegisterTracker = new AsyncTasksRegisterTracker(context);
 		this.executorService = new ThreadPoolExecutor(0, 1, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), new DaemonThreadFactory("srvboot"));
 
-		ServerConfig config = new ServerConfig();
+		final ServerConfig config = new ServerConfig();
 		this.uiMgr = new UiMgr();
 		this.nullScreen = new NullScreen(this.uiMgr);
-		this.playerContainer = new ServerPlayerContainer(this.uiMgr, this.nullScreen, config, this.executorService);
-		AsyncActions asyncActions = new AsyncActions(this.asyncTasksRegisterTracker, this.mediaFactoryTracker);
+
+		if (config.isServerPlayerEnabled()) {
+			this.playerContainer = new ServerPlayerContainer(this.uiMgr, this.nullScreen, config, this.executorService);
+		}
+		else {
+			logger.info("Server player disabled.");
+		}
+
+		final AsyncActions asyncActions = new AsyncActions(this.asyncTasksRegisterTracker, this.mediaFactoryTracker);
 		this.server = new MorriganServer(context, config, this.playerReaderTracker, this.mediaFactoryTracker, this.asyncTasksRegisterTracker, asyncActions);
 		this.server.start();
 
-		context.registerService(PlayerContainer.class, this.playerContainer, null);
+		if (this.playerContainer != null) {
+			context.registerService(PlayerContainer.class, this.playerContainer, null);
+		}
 	}
 
 	@Override
 	public void stop (final BundleContext context) throws Exception {
 		this.server.stop();
 		this.server = null;
-		this.playerContainer.dispose();
+		if (this.playerContainer != null) this.playerContainer.dispose();
 		this.playerContainer = null;
 		this.nullScreen.dispose();
 		this.nullScreen = null;
