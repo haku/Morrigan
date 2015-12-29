@@ -11,9 +11,9 @@ public interface PlayerReader {
 	Collection<Player> getPlayers ();
 
 	/**
-	 * Returns player with ID i.
+	 * Returns player with ID id.
 	 * Will return null if ID not found.
 	 */
-	Player getPlayer (int i);
+	Player getPlayer (String id);
 
 }

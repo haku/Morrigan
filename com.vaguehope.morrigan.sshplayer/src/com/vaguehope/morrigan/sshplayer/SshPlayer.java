@@ -23,7 +23,7 @@ public class SshPlayer extends AbstractPlayer {
 	private final AtomicReference<CliPlayer> cliPlayer = new AtomicReference<CliPlayer>();
 	private final AtomicReference<PlayItem> currentItem = new AtomicReference<PlayItem>();
 
-	public SshPlayer (final int id, final CliHost host, final PlayerRegister register) {
+	public SshPlayer (final String id, final CliHost host, final PlayerRegister register) {
 		super(id, "ssh:" + host.getName(), register);
 		this.host = host;
 	}

@@ -12,7 +12,7 @@ import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 
 public abstract class AbstractPlayer implements Player {
 
-	private final int id;
+	private final String id;
 	private final String name;
 	private final Register<Player> register;
 	private final AtomicBoolean alive = new AtomicBoolean(true);
@@ -21,7 +21,7 @@ public abstract class AbstractPlayer implements Player {
 	private final PlayerEventListenerCaller listeners = new PlayerEventListenerCaller();
 	private final AtomicReference<PlaybackOrder> playbackOrder = new AtomicReference<PlaybackOrder>(PlaybackOrder.SEQUENTIAL);
 
-	public AbstractPlayer (final int id, final String name, final PlayerRegister register) {
+	public AbstractPlayer (final String id, final String name, final PlayerRegister register) {
 		this.id = id;
 		this.name = name;
 		this.register = register;
@@ -58,7 +58,7 @@ public abstract class AbstractPlayer implements Player {
 	}
 
 	@Override
-	public int getId () {
+	public String getId () {
 		return this.id;
 	}
 

@@ -450,9 +450,8 @@ public class MorriganCommandProvider implements CommandProvider {
 			return;
 		}
 
-		String cmd = args.remove(0);
+		String playerId = args.remove(0);
 		try {
-			int playerId = Integer.parseInt(cmd);
 			Player player = this.playerReader.getPlayer(playerId);
 			doPlayersPlayer(ci, player, args);
 		}
@@ -460,11 +459,11 @@ public class MorriganCommandProvider implements CommandProvider {
 			// If we only have one player, assume the next param is a cmd.
 			Player player = getOnlyPlayer(ci);
 			if (player != null) {
-				args.add(0, cmd);
+				args.add(0, playerId);
 				doPlayersPlayer(ci, player, args);
 			}
 			else {
-				ci.println("Unknown player ID '" + cmd + "'.");
+				ci.println("Unknown player ID '" + playerId + "'.");
 			}
 		}
 	}

@@ -342,12 +342,11 @@ public class MlistsServlet extends HttpServlet {
 	}
 
 	private Player parsePlayer (final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-		String playerIdS = req.getParameter("playerid");
-		if (playerIdS == null) {
+		String playerId = req.getParameter("playerid");
+		if (playerId == null) {
 			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "HTTP error 400 'playerId' parameter not set desu~");
 			return null;
 		}
-		int playerId = Integer.parseInt(playerIdS);
 		return this.playerListener.getPlayer(playerId);
 	}
 

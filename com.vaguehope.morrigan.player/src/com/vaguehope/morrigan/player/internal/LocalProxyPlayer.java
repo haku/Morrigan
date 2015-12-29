@@ -24,7 +24,7 @@ import com.vaguehope.morrigan.player.PlayerQueue;
  */
 public class LocalProxyPlayer implements LocalPlayer {
 
-	private final int refId;
+	private final String refId;
 	private final String refName;
 	private final AtomicReference<Player> ref = new AtomicReference<Player>();
 	private final LocalPlayerSupport localPlayerSupport;
@@ -62,7 +62,7 @@ public class LocalProxyPlayer implements LocalPlayer {
 	}
 
 	@Override
-	public int getId () {
+	public String getId () {
 		return this.refId;
 	}
 

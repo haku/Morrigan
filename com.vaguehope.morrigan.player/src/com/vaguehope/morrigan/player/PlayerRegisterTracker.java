@@ -64,9 +64,9 @@ public class PlayerRegisterTracker implements PlayerRegister {
 	}
 
 	@Override
-	public Player get (final int i) {
+	public Player get (final String id) {
 		PlayerRegister service = getServiceOptional();
-		return (service == null) ? null : service.get(i);
+		return (service == null) ? null : service.get(id);
 	}
 
 	@Override
