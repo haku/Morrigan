@@ -37,7 +37,6 @@
       <plugin id="com.vaguehope.morrigan.screen"/>
       <plugin id="com.vaguehope.morrigan.server"/>
       <plugin id="com.vaguehope.morrigan.server.boot"/>
-      <plugin id="com.vaguehope.morrigan.sshplayer"/>
       <plugin id="com.vaguehope.morrigan.tasks"/>
       <plugin id="com.vaguehope.morrigan.util"/>
       <plugin id="com.vaguehope.morrigan.util.httpclient"/>
