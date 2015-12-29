@@ -173,9 +173,6 @@ Players = {};
       cache : false,
       url : 'players',
       dataType : 'xml',
-      beforeSend : function() {
-        onStatus('Reading players...');
-      },
       success : function(xml) {
         var players = [];
         var entires = $(xml).find('entry');
@@ -188,7 +185,7 @@ Players = {};
           return a.pid - b.pid;
         });
         onPlayers(players);
-        onStatus('Players updated.');
+        onStatus('');
       },
       error : function(jqXHR, textStatus, errorThrown) {
         onStatus('Error fetching players: ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
@@ -202,14 +199,11 @@ Players = {};
       cache : false,
       url : 'players/' + pid,
       dataType : 'xml',
-      beforeSend : function() {
-        onStatus('Reading player ' + pid + '...');
-      },
       success : function(xml) {
         var playerNode = $(xml).find('player');
         var player = parsePlayerNode(playerNode);
         onPlayer(player);
-        onStatus('Player ' + pid + ' updated.');
+        onStatus('');
       },
       error : function(jqXHR, textStatus, errorThrown) {
         onStatus('Error fetching player ' + pid + ': ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
@@ -417,14 +411,11 @@ Players = {};
       cache : false,
       url : 'players/' + pid + '/queue',
       dataType : 'xml',
-      beforeSend : function() {
-        onStatus('Reading queue ' + pid + '...');
-      },
       success : function(xml) {
         var queueNode = $(xml).find('queue');
         var queue = parseQueueNode(pid, queueNode);
         onQueue(queue);
-        onStatus('Queue ' + pid + ' updated.');
+        onStatus('');
       },
       error : function(jqXHR, textStatus, errorThrown) {
         onStatus('Error fetching queue ' + pid + ': ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));

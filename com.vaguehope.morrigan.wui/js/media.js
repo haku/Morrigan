@@ -138,7 +138,7 @@
           return a.mid - b.mid;
         });
         onMlists(mlists);
-        onStatus('Media lists updated.');
+        onStatus('');
       },
       error : function(jqXHR, textStatus, errorThrown) {
         onStatus('Error fetching media lists: ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
@@ -160,7 +160,7 @@
         var mlistNode = $(xml).find('mlist');
         var mlist = parseMlistNode(mlistNode);
         onMlist(mlist);
-        onStatus('Media list ' + id + ' updated.');
+        onStatus('');
       },
       error : function(jqXHR, textStatus, errorThrown) {
         onStatus('Error fetching media list ' + id + ': ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
@@ -250,7 +250,7 @@
         var itemsNode = $(xml).find('mlist');
         var items = parseItemsNode(itemsNode, mid);
         onItems(items);
-        onStatus('Query ' + query + ' updated.');
+        onStatus('');
       },
       error : function(jqXHR, textStatus, errorThrown) {
         onStatus('Error querying ' + id + ': ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
