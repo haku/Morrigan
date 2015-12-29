@@ -12,7 +12,7 @@ public class PlayerReaderTracker implements PlayerReader {
 	private final AtomicBoolean alive = new AtomicBoolean(true);
 	private final ServiceTracker<PlayerReader, PlayerReader> playerReaderTracker;
 
-	public PlayerReaderTracker (BundleContext context) {
+	public PlayerReaderTracker (final BundleContext context) {
 		this.playerReaderTracker = new ServiceTracker<PlayerReader, PlayerReader>(context, PlayerReader.class, null);
 		this.playerReaderTracker.open();
 	}
@@ -35,11 +35,11 @@ public class PlayerReaderTracker implements PlayerReader {
 	}
 
 	@Override
-	public Player getPlayer (int i) {
+	public Player getPlayer (final String id) {
 		checkAlive();
 		PlayerReader service = this.playerReaderTracker.getService();
 		if (service == null) return null;
-		return service.getPlayer(i);
+		return service.getPlayer(id);
 	}
 
 }

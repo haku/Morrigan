@@ -14,7 +14,7 @@ public interface Player {
 	void dispose();
 	boolean isDisposed();
 
-	int getId();
+	String getId();
 	String getName();
 
 	/**

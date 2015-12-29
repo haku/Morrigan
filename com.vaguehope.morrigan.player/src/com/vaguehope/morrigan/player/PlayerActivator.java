@@ -104,10 +104,10 @@ public final class PlayerActivator implements BundleActivator {
 		}
 
 		@Override
-		public Player getPlayer (final int i) {
+		public Player getPlayer (final String id) {
 			PlayerRegisterImpl r = PlayerActivator.this.playerRegister;
 			if (r == null) return null;
-			return r.get(i);
+			return r.get(id);
 		}
 
 	};

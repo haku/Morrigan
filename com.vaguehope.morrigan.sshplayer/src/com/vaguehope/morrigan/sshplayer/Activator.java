@@ -23,7 +23,7 @@ public class Activator implements BundleActivator {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	public void start (BundleContext context) throws Exception {
+	public void start (final BundleContext context) throws Exception {
 		this.players = new LinkedList<Player>();
 		this.hosts = new CliHosts();
 		this.hosts.load();
@@ -31,7 +31,7 @@ public class Activator implements BundleActivator {
 	}
 
 	@Override
-	public void stop (BundleContext context) throws Exception {
+	public void stop (final BundleContext context) throws Exception {
 		disposePlayers();
 	}
 
@@ -42,7 +42,7 @@ public class Activator implements BundleActivator {
 	private void startPlayerRegisterListener (final BundleContext context) {
 		ServiceListener playerContainerSl = new ServiceListener() {
 			@Override
-			public void serviceChanged (ServiceEvent ev) {
+			public void serviceChanged (final ServiceEvent ev) {
 				switch (ev.getType()) {
 					case ServiceEvent.REGISTERED:
 						registerPlayers((PlayerRegister) context.getService(ev.getServiceReference()));
@@ -65,9 +65,9 @@ public class Activator implements BundleActivator {
 		}
 	}
 
-	protected void registerPlayers (PlayerRegister register) {
+	protected void registerPlayers (final PlayerRegister register) {
 		for (CliHost host : this.hosts.getHosts()) {
-			SshPlayer player = new SshPlayer(register.nextIndex(), host, register);
+			SshPlayer player = new SshPlayer(String.valueOf(register.nextIndex()), host, register);
 			register.register(player);
 			this.players.add(player);
 		}

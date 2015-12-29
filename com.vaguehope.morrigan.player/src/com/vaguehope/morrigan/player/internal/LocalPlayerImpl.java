@@ -43,7 +43,7 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Main.
 
-	public LocalPlayerImpl (final int id, final String name, final LocalPlayerSupport localPlayerSupport,
+	public LocalPlayerImpl (final String id, final String name, final LocalPlayerSupport localPlayerSupport,
 			final PlayerRegister register,
 			final PlaybackEngineFactory playbackEngineFactory,
 			final ExecutorService executorService) {

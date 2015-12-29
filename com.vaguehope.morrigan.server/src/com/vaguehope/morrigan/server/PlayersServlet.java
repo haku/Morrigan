@@ -125,7 +125,7 @@ public class PlayersServlet extends HttpServlet {
 				String path = reqPath.startsWith(ROOTPATH) ? reqPath.substring(ROOTPATH.length()) : reqPath;
 				if (path.length() > 0) {
 					String[] pathParts = path.split("/");
-					int playerId = Integer.parseInt(pathParts[0]);
+					String playerId = pathParts[0];
 					Player player = this.playerListener.getPlayer(playerId);
 					if (pathParts.length == 1) {
 						postToPlayer(req, resp, player);
@@ -279,35 +279,24 @@ public class PlayersServlet extends HttpServlet {
 			if (path.length() > 0) {
 				String[] pathParts = path.split("/");
 				if (pathParts.length >= 1) {
-					String playerNumberRaw = pathParts[0];
-					try {
-						int playerNumber = Integer.parseInt(playerNumberRaw);
-						Player player = null;
-						try {
-							player = this.playerListener.getPlayer(playerNumber);
-						}
-						catch (IllegalArgumentException e) { /* handled below */ }
-						if (player == null) {
-							ServletHelper.error(resp, HttpServletResponse.SC_NOT_FOUND, playerNumber + " not found desu~");
-							return;
-						}
+					String playerId = pathParts[0];
+					Player player = this.playerListener.getPlayer(playerId);
+					if (player == null) {
+						ServletHelper.error(resp, HttpServletResponse.SC_NOT_FOUND, playerId + " not found desu~");
+						return;
+					}
 
-						if (pathParts.length >= 2) {
-							String subPath = pathParts[1];
-							if (subPath.equals(PATH_QUEUE)) {
-								printPlayerQueue(resp, player);
-							}
-							else {
-								ServletHelper.error(resp, HttpServletResponse.SC_NOT_FOUND, "'" + subPath + "' not found desu~");
-							}
+					if (pathParts.length >= 2) {
+						String subPath = pathParts[1];
+						if (subPath.equals(PATH_QUEUE)) {
+							printPlayerQueue(resp, player);
 						}
 						else {
-							printPlayer(resp, player);
+							ServletHelper.error(resp, HttpServletResponse.SC_NOT_FOUND, "'" + subPath + "' not found desu~");
 						}
-
 					}
-					catch (NumberFormatException e) {
-						ServletHelper.error(resp, HttpServletResponse.SC_NOT_FOUND, "'" + reqPath + "' desu~ (could not parse '"+playerNumberRaw+"' as a player.)");
+					else {
+						printPlayer(resp, player);
 					}
 				}
 			}

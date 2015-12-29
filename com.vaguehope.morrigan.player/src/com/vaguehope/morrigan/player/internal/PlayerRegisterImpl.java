@@ -14,8 +14,8 @@ import java.util.logging.Logger;
 
 import com.vaguehope.morrigan.engines.playback.PlaybackEngineFactory;
 import com.vaguehope.morrigan.player.LocalPlayer;
-import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.LocalPlayerSupport;
+import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayerRegister;
 
 public class PlayerRegisterImpl implements PlayerRegister {
@@ -24,8 +24,8 @@ public class PlayerRegisterImpl implements PlayerRegister {
 
 	private final AtomicBoolean alive = new AtomicBoolean(true);
 	private final AtomicInteger next = new AtomicInteger(0);
-	private final ConcurrentMap<Integer, Player> all = new ConcurrentHashMap<Integer, Player>();
-	private final Set<Integer> localPlayerIds = Collections.newSetFromMap(new ConcurrentHashMap<Integer, Boolean>());
+	private final ConcurrentMap<String, Player> all = new ConcurrentHashMap<String, Player>();
+	private final Set<String> localPlayerIds = Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>());
 
 	private final PlaybackEngineFactory playbackEngineFactory;
 	private final ExecutorService executorService;
@@ -44,9 +44,9 @@ public class PlayerRegisterImpl implements PlayerRegister {
 	}
 
 	@Override
-	public Player get (final int i) {
+	public Player get (final String id) {
 		checkAlive();
-		return this.all.get(Integer.valueOf(i));
+		return this.all.get(id);
 	}
 
 	@Override
@@ -58,9 +58,8 @@ public class PlayerRegisterImpl implements PlayerRegister {
 	@Override
 	public void register (final Player p) {
 		checkAlive();
-		Integer i = Integer.valueOf(p.getId());
-		Player prev = this.all.putIfAbsent(i, p);
-		if (prev != null) throw new IllegalStateException("Index " + p.getId() + " already in use by player: " + this.all.get(i).getName());
+		Player prev = this.all.putIfAbsent(p.getId(), p);
+		if (prev != null) throw new IllegalStateException("Index " + p.getId() + " already in use by player: " + prev.getName());
 	}
 
 	/**
@@ -68,9 +67,8 @@ public class PlayerRegisterImpl implements PlayerRegister {
 	 */
 	@Override
 	public void unregister (final Player p) {
-		Integer i = Integer.valueOf(p.getId());
-		this.all.remove(i);
-		this.localPlayerIds.remove(i);
+		this.all.remove(p.getId());
+		this.localPlayerIds.remove(p.getId());
 		if (this.all.containsValue(p)) throw new IllegalStateException("Player " + p.getName() + " was registered under a different ID and could not be unregistered.");
 	}
 
@@ -90,8 +88,8 @@ public class PlayerRegisterImpl implements PlayerRegister {
 
 	@Override
 	public LocalPlayer makeLocal (final String name, final LocalPlayerSupport localPlayerSupport) {
-		LocalPlayer p = new LocalPlayerImpl(nextIndex(), name, localPlayerSupport, this, this.playbackEngineFactory, this.executorService);
-		this.localPlayerIds.add(Integer.valueOf(p.getId()));
+		LocalPlayer p = new LocalPlayerImpl(String.valueOf(nextIndex()), name, localPlayerSupport, this, this.playbackEngineFactory, this.executorService);
+		this.localPlayerIds.add(p.getId());
 		register(p);
 		return p;
 	}
@@ -102,10 +100,10 @@ public class PlayerRegisterImpl implements PlayerRegister {
 	}
 
 	public void disposeLocalPlayers () {
-		for (final Integer i : this.localPlayerIds) {
-			final Player p = this.all.get(i);
+		for (final String id : this.localPlayerIds) {
+			final Player p = this.all.get(id);
 			if (p != null) {
-				LOG.warning("Register having to dispose of local player: " + i);
+				LOG.warning("Register having to dispose of local player: " + id);
 				p.dispose();
 			}
 		}
