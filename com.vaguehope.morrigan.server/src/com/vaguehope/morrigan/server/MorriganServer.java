@@ -37,7 +37,7 @@ public class MorriganServer {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public MorriganServer (BundleContext context, ServerConfig config, PlayerReader playerListener, MediaFactory mediaFactory, AsyncTasksRegister asyncTasksRegister, AsyncActions asyncActions) throws MorriganException {
+	public MorriganServer (final BundleContext context, final ServerConfig config, final PlayerReader playerListener, final MediaFactory mediaFactory, final AsyncTasksRegister asyncTasksRegister, final AsyncActions asyncActions) throws MorriganException {
 		try {
 			// Config.
 			this.serverPort = config.getServerPort();
@@ -74,6 +74,7 @@ public class MorriganServer {
 			servletContext.addServlet(new ServletHolder(new PlayersServlet(playerListener)), PlayersServlet.CONTEXTPATH + "/*");
 			servletContext.addServlet(new ServletHolder(new MlistsServlet(playerListener, mediaFactory, asyncActions)), MlistsServlet.CONTEXTPATH + "/*");
 			servletContext.addServlet(new ServletHolder(new StatusServlet(asyncTasksRegister)), StatusServlet.CONTEXTPATH + "/*");
+			servletContext.addServlet(new ServletHolder(new HostInfoServlet()), HostInfoServlet.CONTEXTPATH + "/*");
 
 			// Web UI in WAR file.
 			WebAppContext warContext = WebAppHelper.getWarBundleAsContext(context, MorriganWui.ID, "/");
@@ -103,38 +104,38 @@ public class MorriganServer {
 		return this.serverPort;
 	}
 
-	public void setOnStopRunnable (Runnable r) {
+	public void setOnStopRunnable (final Runnable r) {
 		this.onStopRunnable = r;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Jetty Server listener.
 
-	private Listener lifeCycleListener = new Listener() {
+	private final Listener lifeCycleListener = new Listener() {
 
 		@Override
-		public void lifeCycleStarting (LifeCycle lc) {
+		public void lifeCycleStarting (final LifeCycle lc) {
 			getLogger().fine("Server starting...");
 		}
 
 		@Override
-		public void lifeCycleStarted (LifeCycle lc) {
+		public void lifeCycleStarted (final LifeCycle lc) {
 			getLogger().info("Server started and listening on port " + getServerPort() + ".");
 		}
 
 		@Override
-		public void lifeCycleStopping (LifeCycle lc) {
+		public void lifeCycleStopping (final LifeCycle lc) {
 			getLogger().fine("Server stopping...");
 		}
 
 		@Override
-		public void lifeCycleStopped (LifeCycle lc) {
+		public void lifeCycleStopped (final LifeCycle lc) {
 			getLogger().info("Server stopped.");
 			callOnStopRunnable();
 		}
 
 		@Override
-		public void lifeCycleFailure (LifeCycle lc, Throwable t) {
+		public void lifeCycleFailure (final LifeCycle lc, final Throwable t) {
 			getLogger().log(Level.WARNING, "Server failed.", t);
 			callOnStopRunnable();
 		}
