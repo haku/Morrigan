@@ -62,7 +62,9 @@
       mlistsStatusBar.text(msg);
     }, function(mlists) {
       $.each(mlists, function(index, mlist) {
-        displayMlist(mlistsDiv, mlist, false);
+        if (mlist.type !== "remote") {
+          displayMlist(mlistsDiv, mlist, false);
+        }
       });
     });
   }
@@ -170,6 +172,7 @@
     var mlist = {};
     mlist.mid = node.find('link[rel="self"]').attr('href').replace('/mlists/', '');
     mlist.id = midToId(mlist.mid);
+    mlist.type = node.attr('type');
     mlist.title = node.find('title').text();
     mlist.count = parseInt(node.find('count').text());
     mlist.duration = parseInt(node.find('duration').text());
