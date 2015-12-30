@@ -18,11 +18,11 @@ package com.vaguehope.morrigan.android.model;
 
 public interface PlayerReference extends Artifact {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	public int getPlayerId ();
+
+	public String getPlayerId ();
 	public String getBaseUrl ();
-	
+
 	public ServerReference getServerReference ();
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

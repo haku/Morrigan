@@ -80,7 +80,7 @@ public class PlayerStateXmlImpl implements PlayerState, MlistItem, ContentHandle
 
 	private final PlayerReference playerReference;
 
-	private int playerId;
+	private String playerId;
 	private String playerName;
 	private int playerOrder;
 	private PlayState playerState;
@@ -109,7 +109,7 @@ public class PlayerStateXmlImpl implements PlayerState, MlistItem, ContentHandle
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public PlayerStateXmlImpl (InputStream dataIs, PlayerReference playerReference) throws SAXException {
+	public PlayerStateXmlImpl (final InputStream dataIs, final PlayerReference playerReference) throws SAXException {
 		this.playerReference = playerReference;
 		this.monitors = new LinkedHashMap<Integer, String>();
 
@@ -151,7 +151,7 @@ public class PlayerStateXmlImpl implements PlayerState, MlistItem, ContentHandle
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	public int getId () {
+	public String getId () {
 		return this.playerId;
 	}
 
@@ -327,7 +327,7 @@ public class PlayerStateXmlImpl implements PlayerState, MlistItem, ContentHandle
 	private StringBuilder currentText;
 
 	@Override
-	public void startElement (String uri, String localName, String qName, Attributes attr) throws SAXException {
+	public void startElement (final String uri, final String localName, final String qName, final Attributes attr) throws SAXException {
 		this.stack.push(localName);
 		Map<String, String> atMap = EMPTY_MAP;
 
@@ -360,13 +360,12 @@ public class PlayerStateXmlImpl implements PlayerState, MlistItem, ContentHandle
 	}
 
 	@Override
-	public void endElement (String uri, String localName, String qName) throws SAXException {
+	public void endElement (final String uri, final String localName, final String qName) throws SAXException {
 		Map<String, String> attr = this.currentAttributes.pop();
 
 		if (this.stack.size() == 2) {
 			if (localName.equals(PLAYERID)) {
-				int v = Integer.parseInt(this.currentText.toString());
-				this.playerId = v;
+				this.playerId = this.currentText.toString();
 			}
 			else if (localName.equals(PLAYERNAME)) {
 				this.playerName = this.currentText.toString();
@@ -450,7 +449,7 @@ public class PlayerStateXmlImpl implements PlayerState, MlistItem, ContentHandle
 	}
 
 	@Override
-	public void characters (char[] ch, int start, int length) throws SAXException {
+	public void characters (final char[] ch, final int start, final int length) throws SAXException {
 		this.currentText.append(ch, start, length);
 	}
 
@@ -460,25 +459,25 @@ public class PlayerStateXmlImpl implements PlayerState, MlistItem, ContentHandle
 	public void endDocument () throws SAXException { /* UNUSED */}
 
 	@Override
-	public void endPrefixMapping (String prefix) throws SAXException { /* UNUSED */}
+	public void endPrefixMapping (final String prefix) throws SAXException { /* UNUSED */}
 
 	@Override
-	public void ignorableWhitespace (char[] ch, int start, int length) throws SAXException { /* UNUSED */}
+	public void ignorableWhitespace (final char[] ch, final int start, final int length) throws SAXException { /* UNUSED */}
 
 	@Override
-	public void processingInstruction (String target, String data) throws SAXException { /* UNUSED */}
+	public void processingInstruction (final String target, final String data) throws SAXException { /* UNUSED */}
 
 	@Override
-	public void setDocumentLocator (Locator locator) { /* UNUSED */}
+	public void setDocumentLocator (final Locator locator) { /* UNUSED */}
 
 	@Override
-	public void skippedEntity (String name) throws SAXException { /* UNUSED */}
+	public void skippedEntity (final String name) throws SAXException { /* UNUSED */}
 
 	@Override
 	public void startDocument () throws SAXException { /* UNUSED */}
 
 	@Override
-	public void startPrefixMapping (String prefix, String uri) throws SAXException { /* UNUSED */}
+	public void startPrefixMapping (final String prefix, final String uri) throws SAXException { /* UNUSED */}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

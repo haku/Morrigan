@@ -25,10 +25,10 @@ import com.vaguehope.morrigan.android.model.MlistItem;
 
 public class MlistItemBasicImpl implements MlistItem {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	private String title;
 	private int type;
-	private int id;
+	private String id;
 	private String relativeUrl;
 	private BigInteger hashCode;
 	private boolean enabled;
@@ -37,9 +37,9 @@ public class MlistItemBasicImpl implements MlistItem {
 	private int startCount;
 	private int endCount;
 	private String[] tags;
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	@Override
 	public String getTitle() {
 		if (this.duration > 0) {
@@ -47,20 +47,20 @@ public class MlistItemBasicImpl implements MlistItem {
 		}
 		return this.title;
 	}
-	
+
 	public String getTrackTitle() {
 		return this.title;
 	}
-	
-	public void setTrackTitle(String title) {
+
+	public void setTrackTitle(final String title) {
 		this.title = title;
 	}
-	
+
 	@Override
 	public String getFileName () {
 		return this.title; // TODO name this more explicitly?
 	}
-	
+
 	@Override
 	public int getImageResource() {
 		if (isMissing()) {
@@ -74,86 +74,86 @@ public class MlistItemBasicImpl implements MlistItem {
 		}
 		return R.drawable.circledot;
 	}
-	
+
 	@Override
 	public int getType() {
 		return this.type;
 	}
-	public void setType(int type) {
+	public void setType(final int type) {
 		this.type = type;
 	}
-	
+
 	@Override
-	public int getId () {
+	public String getId () {
 		return this.id;
 	}
-	public void setId (int id) {
+	public void setId (final String id) {
 		this.id = id;
 	}
-	
+
 	@Override
 	public String getRelativeUrl() {
 		return this.relativeUrl;
 	}
-	public void setRelativeUrl(String url) {
+	public void setRelativeUrl(final String url) {
 		this.relativeUrl = url;
 	}
-	
+
 	@Override
 	public BigInteger getHashCode () {
 		return this.hashCode;
 	}
-	public void setHashCode (BigInteger hashCode) {
+	public void setHashCode (final BigInteger hashCode) {
 		this.hashCode = hashCode;
 	}
-	
+
 	@Override
 	public boolean isEnabled () {
 		return this.enabled;
 	}
-	public void setEnabled(boolean enabled) {
+	public void setEnabled(final boolean enabled) {
 		this.enabled = enabled;
 	}
-	
+
 	@Override
 	public boolean isMissing () {
 		return this.missing;
 	}
-	public void setMissing(boolean missing) {
+	public void setMissing(final boolean missing) {
 		this.missing = missing;
 	}
-	
+
 	@Override
 	public int getDuration() {
 		return this.duration;
 	}
-	public void setDuration(int duration) {
+	public void setDuration(final int duration) {
 		this.duration = duration;
 	}
-	
+
 	@Override
 	public int getStartCount() {
 		return this.startCount;
 	}
-	public void setStartCount(int startCount) {
+	public void setStartCount(final int startCount) {
 		this.startCount = startCount;
 	}
-	
+
 	@Override
 	public int getEndCount() {
 		return this.endCount;
 	}
-	public void setEndCount(int endCount) {
+	public void setEndCount(final int endCount) {
 		this.endCount = endCount;
 	}
-	
+
 	@Override
 	public String[] getTags () {
 		return this.tags;
 	}
-	public void setTags (String[] tags) {
+	public void setTags (final String[] tags) {
 		this.tags = tags;
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

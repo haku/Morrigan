@@ -28,7 +28,7 @@ public interface PlayerState extends Artifact {
 	 * Get the player id.
 	 */
 	@Override
-	public int getId ();
+	public String getId ();
 
 	public String getName();
 

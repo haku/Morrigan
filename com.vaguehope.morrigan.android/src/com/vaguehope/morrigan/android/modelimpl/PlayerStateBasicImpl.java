@@ -29,7 +29,7 @@ import com.vaguehope.morrigan.android.model.ServerReference;
 public class PlayerStateBasicImpl implements PlayerState, PlayerReference, MlistItem {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private int playerId;
+	private String playerId;
 	private String playerName;
 	private String baseUrl;
 	private PlayerReference playerReference;
@@ -75,7 +75,7 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference, Mlist
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public void setPlayerReference (PlayerReference playerReference) {
+	public void setPlayerReference (final PlayerReference playerReference) {
 		this.playerReference = playerReference;
 	}
 
@@ -85,7 +85,7 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference, Mlist
 	}
 
 	@Override
-	public int getPlayerId () {
+	public String getPlayerId () {
 		return this.playerId;
 	}
 
@@ -94,7 +94,7 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference, Mlist
 		return this.playerName;
 	}
 
-	public void setName (String name) {
+	public void setName (final String name) {
 		this.playerName = name;
 	}
 
@@ -103,7 +103,7 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference, Mlist
 		return this.playerReference.getServerReference();
 	}
 
-	public void setBaseUrl (String baseUrl) {
+	public void setBaseUrl (final String baseUrl) {
 		this.baseUrl = baseUrl;
 	}
 
@@ -113,11 +113,11 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference, Mlist
 	}
 
 	@Override
-	public int getId () {
+	public String getId () {
 		return this.playerId;
 	}
 
-	public void setId (int id) {
+	public void setId (final String id) {
 		this.playerId = id;
 	}
 
@@ -126,7 +126,7 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference, Mlist
 		return this.playState;
 	}
 
-	public void setPlayState (PlayState playState) {
+	public void setPlayState (final PlayState playState) {
 		this.playState = playState;
 	}
 
@@ -135,7 +135,7 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference, Mlist
 		return this.playOrder;
 	}
 
-	public void setPlayOrder (int playOrder) {
+	public void setPlayOrder (final int playOrder) {
 		this.playOrder = playOrder;
 	}
 
@@ -144,7 +144,7 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference, Mlist
 		return this.playerPosition;
 	}
 
-	public void setPlayerPosition (int playerPosition) {
+	public void setPlayerPosition (final int playerPosition) {
 		this.playerPosition = playerPosition;
 	}
 
@@ -153,7 +153,7 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference, Mlist
 		return this.trackRelativeUrl;
 	}
 
-	public void setTrackRelativeUrl (String trackRelativeUrl) {
+	public void setTrackRelativeUrl (final String trackRelativeUrl) {
 		this.trackRelativeUrl = trackRelativeUrl;
 	}
 
@@ -162,7 +162,7 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference, Mlist
 		return this.trackTitle;
 	}
 
-	public void setTrackTitle (String trackTitle) {
+	public void setTrackTitle (final String trackTitle) {
 		this.trackTitle = trackTitle;
 	}
 
@@ -171,7 +171,7 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference, Mlist
 		return this.trackFile;
 	}
 
-	public void setTrackFile (String trackFile) {
+	public void setTrackFile (final String trackFile) {
 		this.trackFile = trackFile;
 	}
 
@@ -180,7 +180,7 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference, Mlist
 		return this.trackFileName;
 	}
 
-	public void setTrackFileName (String trackFileName) {
+	public void setTrackFileName (final String trackFileName) {
 		this.trackFileName = trackFileName;
 	}
 
@@ -189,7 +189,7 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference, Mlist
 		return this.trackDuration;
 	}
 
-	public void setTrackDuration (int trackDuration) {
+	public void setTrackDuration (final int trackDuration) {
 		this.trackDuration = trackDuration;
 	}
 
@@ -198,7 +198,7 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference, Mlist
 		return this.trackHashCode;
 	}
 
-	public void setTrackHashCode (BigInteger trackHashCode) {
+	public void setTrackHashCode (final BigInteger trackHashCode) {
 		this.trackHashCode = trackHashCode;
 	}
 
@@ -207,7 +207,7 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference, Mlist
 		return this.trackEnabled;
 	}
 
-	public void setTrackEnabled (boolean trackEnabled) {
+	public void setTrackEnabled (final boolean trackEnabled) {
 		this.trackEnabled = trackEnabled;
 	}
 
@@ -216,7 +216,7 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference, Mlist
 		return this.trackMissing;
 	}
 
-	public void setTrackMissing (boolean trackMissing) {
+	public void setTrackMissing (final boolean trackMissing) {
 		this.trackMissing = trackMissing;
 	}
 
@@ -225,7 +225,7 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference, Mlist
 		return this.trackStartCount;
 	}
 
-	public void setTrackStartCount (int trackStartCount) {
+	public void setTrackStartCount (final int trackStartCount) {
 		this.trackStartCount = trackStartCount;
 	}
 
@@ -234,7 +234,7 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference, Mlist
 		return this.trackEndCount;
 	}
 
-	public void setTrackEndCount (int trackEndCount) {
+	public void setTrackEndCount (final int trackEndCount) {
 		this.trackEndCount = trackEndCount;
 	}
 
@@ -249,7 +249,7 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference, Mlist
 		return this.listTitle;
 	}
 
-	public void setListTitle (String listTitle) {
+	public void setListTitle (final String listTitle) {
 		this.listTitle = listTitle;
 	}
 
@@ -258,7 +258,7 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference, Mlist
 		return this.listId;
 	}
 
-	public void setListId (String listId) {
+	public void setListId (final String listId) {
 		this.listId = listId;
 	}
 
@@ -267,7 +267,7 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference, Mlist
 		return this.listUrl;
 	}
 
-	public void setListUrl (String listUrl) {
+	public void setListUrl (final String listUrl) {
 		this.listUrl = listUrl;
 	}
 
@@ -281,7 +281,7 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference, Mlist
 		return this.queueLength;
 	}
 
-	public void setQueueLength (int queueLength) {
+	public void setQueueLength (final int queueLength) {
 		this.queueLength = queueLength;
 	}
 
@@ -290,7 +290,7 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference, Mlist
 		return this.queueDuration;
 	}
 
-	public void setQueueDuration (long queueDuration) {
+	public void setQueueDuration (final long queueDuration) {
 		this.queueDuration = queueDuration;
 	}
 
@@ -355,7 +355,7 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference, Mlist
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public static int getImageResource (PlayState playState) {
+	public static int getImageResource (final PlayState playState) {
 		switch (playState) {
 			case STOPPED:
 				return R.drawable.stop;

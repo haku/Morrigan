@@ -19,29 +19,6 @@ package com.vaguehope.morrigan.android;
 import java.util.LinkedList;
 import java.util.List;
 
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.os.Bundle;
-import android.util.TypedValue;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.SubMenu;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.View.OnCreateContextMenuListener;
-import android.view.Window;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
-
 import com.vaguehope.morrigan.android.CommonDialogs.PlayerSelectedListener;
 import com.vaguehope.morrigan.android.helper.StringHelper;
 import com.vaguehope.morrigan.android.helper.TimeHelper;
@@ -69,6 +46,29 @@ import com.vaguehope.morrigan.android.tasks.RunMlistActionTask.MlistCommand;
 import com.vaguehope.morrigan.android.tasks.RunMlistItemActionTask;
 import com.vaguehope.morrigan.android.tasks.RunMlistItemActionTask.MlistItemCommand;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.os.Bundle;
+import android.util.TypedValue;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.SubMenu;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.View.OnCreateContextMenuListener;
+import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+
 public class MlistActivity extends Activity implements MlistStateChangeListener, MlistItemListChangeListener {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -94,18 +94,18 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 //	Activity methods.
 
 	@Override
-	public void onCreate (Bundle savedInstanceState) {
+	public void onCreate (final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		this.configDb = new ConfigDb(this);
 
 		Bundle extras = getIntent().getExtras();
-		int serverId = extras.getInt(SERVER_ID, -1);
+		String serverId = extras.getString(SERVER_ID);
 		String mlistBaseUrl = extras.getString(MLIST_BASE_URL);
-		int playerId = extras.getInt(PLAYER_ID, -1);
+		String playerId = extras.getString(PLAYER_ID);
 		this.currentQuery = extras.getString(QUERY);
 
-		if (serverId >= 0 && mlistBaseUrl != null) {
+		if (serverId != null && mlistBaseUrl != null) {
 			this.serverReference = this.configDb.getServer(serverId);
 			this.mlistReference = new MlistReferenceImpl(mlistBaseUrl, this.serverReference);
 		}
@@ -113,7 +113,7 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 			finish();
 		}
 
-		if (playerId >= 0) {
+		if (playerId != null) {
 			this.playerReference = new PlayerReferenceImpl(this.serverReference, playerId);
 		}
 
@@ -148,21 +148,21 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 
 		((ImageButton) findViewById(R.id.btnQueue)).setOnClickListener(new OnClickListener() {
 			@Override
-			public void onClick (View v) {
+			public void onClick (final View v) {
 				queueAll();
 			}
 		});
 
 		((ImageButton) findViewById(R.id.btnSearch)).setOnClickListener(new OnClickListener() {
 			@Override
-			public void onClick (View v) {
+			public void onClick (final View v) {
 				search();
 			}
 		});
 
 		((ImageButton) findViewById(R.id.btnRefresh)).setOnClickListener(new OnClickListener() {
 			@Override
-			public void onClick (View v) {
+			public void onClick (final View v) {
 				refresh();
 			}
 		});
@@ -176,7 +176,7 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 	private static final int MENU_SORT = 3;
 
 	@Override
-	public boolean onCreateOptionsMenu (Menu menu) {
+	public boolean onCreateOptionsMenu (final Menu menu) {
 		boolean result = super.onCreateOptionsMenu(menu);
 		menu.add(0, MENU_SCAN, 0, R.string.menu_scan);
 		menu.add(0, MENU_DOWNLOAD, 1, R.string.menu_download);
@@ -185,7 +185,7 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 	}
 
 	@Override
-	public boolean onOptionsItemSelected (MenuItem item) {
+	public boolean onOptionsItemSelected (final MenuItem item) {
 		switch (item.getItemId()) {
 
 			case MENU_SCAN:
@@ -215,16 +215,16 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 	private static final int MENU_CTX_TAG = 6;
 	private static final int MENU_CTX_DOWNLOAD = 4;
 
-	private OnItemClickListener mlistItemListCickListener = new OnItemClickListener() {
+	private final OnItemClickListener mlistItemListCickListener = new OnItemClickListener() {
 		@Override
-		public void onItemClick (AdapterView<?> parent, View view, int position, long id) {
+		public void onItemClick (final AdapterView<?> parent, final View view, final int position, final long id) {
 			openContextMenu(view);
 		}
 	};
 
-	private OnCreateContextMenuListener itemsContextMenuListener = new OnCreateContextMenuListener() {
+	private final OnCreateContextMenuListener itemsContextMenuListener = new OnCreateContextMenuListener() {
 		@Override
-		public void onCreateContextMenu (ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+		public void onCreateContextMenu (final ContextMenu menu, final View v, final ContextMenuInfo menuInfo) {
 			AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
 			MlistItem mlistItem = MlistActivity.this.mlistItemListAdapter.getInputData().getMlistItemList().get(info.position);
 
@@ -267,7 +267,7 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 	};
 
 	@Override
-	public boolean onContextItemSelected (MenuItem item) {
+	public boolean onContextItemSelected (final MenuItem item) {
 		MlistItem mlistItem = null;
 		switch (item.getItemId()) {
 			case MENU_CTX_PLAY:
@@ -337,7 +337,7 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 
 		dlgBuilder.setPositiveButton("Search", new DialogInterface.OnClickListener() {
 			@Override
-			public void onClick (DialogInterface dialog, int whichButton) {
+			public void onClick (final DialogInterface dialog, final int whichButton) {
 				String query = editText.getText().toString().trim();
 				dialog.dismiss();
 				search(query);
@@ -346,7 +346,7 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 
 		dlgBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 			@Override
-			public void onClick (DialogInterface dialog, int whichButton) {
+			public void onClick (final DialogInterface dialog, final int whichButton) {
 				dialog.cancel();
 			}
 		});
@@ -354,7 +354,7 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 		dlgBuilder.show();
 	}
 
-	protected void search (String query) {
+	protected void search (final String query) {
 		new GetMlistItemListTask(MlistActivity.this, MlistActivity.this.mlistReference, MlistActivity.this, query).execute();
 	}
 
@@ -362,7 +362,7 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 		if (this.playerReference == null) {
 			CommonDialogs.doAskWhichPlayer(MlistActivity.this, MlistActivity.this.serverReference, new PlayerSelectedListener() {
 				@Override
-				public void playerSelected (PlayerState playerState) {
+				public void playerSelected (final PlayerState playerState) {
 					new RunMlistActionTask(MlistActivity.this, MlistActivity.this.mlistReference, MlistCommand.PLAY, playerState.getPlayerReference()).execute();
 				}
 			});
@@ -384,11 +384,11 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 
 		dlgBuilder.setPositiveButton("Queue all", new DialogInterface.OnClickListener() {
 			@Override
-			public void onClick (DialogInterface dialog, int which) {
+			public void onClick (final DialogInterface dialog, final int which) {
 				if (MlistActivity.this.playerReference == null) {
 					CommonDialogs.doAskWhichPlayer(MlistActivity.this, MlistActivity.this.serverReference, new PlayerSelectedListener() {
 						@Override
-						public void playerSelected (PlayerState playerState) {
+						public void playerSelected (final PlayerState playerState) {
 							queueItems(MlistActivity.this.mlistItemListAdapter.getInputData().getMlistItemList(), playerState.getPlayerReference());
 						}
 					});
@@ -401,7 +401,7 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 
 		dlgBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 			@Override
-			public void onClick (DialogInterface dialog, int whichButton) {
+			public void onClick (final DialogInterface dialog, final int whichButton) {
 				dialog.cancel();
 			}
 		});
@@ -423,7 +423,7 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 		if (MlistActivity.this.playerReference == null) {
 			CommonDialogs.doAskWhichPlayer(this, this.serverReference, new PlayerSelectedListener() {
 				@Override
-				public void playerSelected (PlayerState playerState) {
+				public void playerSelected (final PlayerState playerState) {
 					playItem(item, playerState.getPlayerReference());
 				}
 			});
@@ -437,7 +437,7 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 		if (MlistActivity.this.playerReference == null) {
 			CommonDialogs.doAskWhichPlayer(this, this.serverReference, new PlayerSelectedListener() {
 				@Override
-				public void playerSelected (PlayerState playerState) {
+				public void playerSelected (final PlayerState playerState) {
 					queueItem(item, playerState.getPlayerReference());
 				}
 			});
@@ -449,15 +449,15 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	protected void playItem (final MlistItem item, PlayerReference playerRef) {
+	protected void playItem (final MlistItem item, final PlayerReference playerRef) {
 		new RunMlistItemActionTask(this, playerRef, this.mlistReference, item, MlistItemCommand.PLAY).execute();
 	}
 
-	protected void queueItem (final MlistItem item, PlayerReference playerRef) {
+	protected void queueItem (final MlistItem item, final PlayerReference playerRef) {
 		new RunMlistItemActionTask(this, playerRef, this.mlistReference, item, MlistItemCommand.QUEUE).execute();
 	}
 
-	protected void queueItems (final List<? extends MlistItem> list, PlayerReference playerRef) {
+	protected void queueItems (final List<? extends MlistItem> list, final PlayerReference playerRef) {
 		List<AbstractTask<String>> tasks = new LinkedList<AbstractTask<String>>();
 		for (MlistItem item : list) {
 			RunMlistItemActionTask task = new RunMlistItemActionTask(this, playerRef, this.mlistReference, item, MlistItemCommand.QUEUE);
@@ -486,7 +486,7 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 	private static final String FEED_ITEMS = "items";
 
 	@Override
-	public void onMlistStateChange (MlistState newState, Exception exception) {
+	public void onMlistStateChange (final MlistState newState, final Exception exception) {
 		this.currentState = newState;
 		this.errorsList.setError(FEED_MLIST, exception);
 		if (newState != null) {
@@ -499,7 +499,7 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 	}
 
 	@Override
-	public void onMlistItemListChange (MlistItemList mlistItemList, Exception exception) {
+	public void onMlistItemListChange (final MlistItemList mlistItemList, final Exception exception) {
 		this.currentItemList = mlistItemList;
 		this.errorsList.setError(FEED_ITEMS, exception);
 		if (mlistItemList != null) {

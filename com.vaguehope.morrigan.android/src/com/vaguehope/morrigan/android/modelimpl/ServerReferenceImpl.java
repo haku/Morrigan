@@ -22,69 +22,69 @@ import com.vaguehope.morrigan.android.model.ServerReference;
 
 public class ServerReferenceImpl implements ServerReference {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	private int dbId;
+
+	private final String dbId;
 	private final String name;
 	private final String baseUrl;
 	private final String pass;
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	public ServerReferenceImpl (String name, String baseUrl, String pass) {
-		this(Integer.MIN_VALUE, name, baseUrl, pass);
+
+	public ServerReferenceImpl (final String name, final String baseUrl, final String pass) {
+		this(null, name, baseUrl, pass);
 	}
-	
-	public ServerReferenceImpl (int dbId, String name, String baseUrl, String pass) {
+
+	public ServerReferenceImpl (final String dbId, final String name, final String baseUrl, final String pass) {
 		this.dbId = dbId;
 		this.name = name;
 		this.baseUrl = baseUrl;
 		this.pass = pass;
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	ServerReference methods.
-	
+
 	@Override
 	public String getName () {
 		return this.name;
 	}
-	
+
 	@Override
 	public String getBaseUrl () {
 		return this.baseUrl;
 	}
-	
+
 	@Override
 	public String getPass () {
 		return this.pass;
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Artifact methods.
-	
+
 	@Override
-	public int getId () {
-		if (this.dbId == Integer.MIN_VALUE) throw new IllegalStateException("ID not set.");
+	public String getId () {
+		if (this.dbId == null) throw new IllegalStateException("ID not set.");
 		return this.dbId;
 	}
-	
+
 	@Override
 	public String getTitle () {
 		return getName();
 	}
-	
+
 	@Override
 	public int getImageResource () {
 		return R.drawable.db;
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	HttpCreds methods.
-	
+
 	@Override
 	public String getUser () {
 		return C.USERNAME;
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

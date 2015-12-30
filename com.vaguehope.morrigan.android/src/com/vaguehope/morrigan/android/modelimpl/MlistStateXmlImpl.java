@@ -26,68 +26,68 @@ import com.vaguehope.morrigan.android.model.MlistState;
 
 public class MlistStateXmlImpl extends XmlParser implements MlistState {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	public static final String TITLE = "title";
 	public static final String COUNT = "count";
 	public static final String DURATION = "duration";
 	public static final String DURATIONCOMPLETE = "durationcomplete";
-	
-	public final static String[] nodes = new String[] { 
+
+	public final static String[] nodes = new String[] {
 		TITLE,
 		COUNT,
 		DURATION,
 		DURATIONCOMPLETE
 		};
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	private final MlistReference mlistReference;
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	public MlistStateXmlImpl (String xmlString, MlistReference mlistReference) throws SAXException {
+
+	public MlistStateXmlImpl (final String xmlString, final MlistReference mlistReference) throws SAXException {
 		super(xmlString, nodes, mlistReference.getServerReference());
 		this.mlistReference = mlistReference;
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	@Override
-	public int getId() {
+	public String getId() {
 		throw new UnsupportedOperationException("Not used.");
 	}
-	
+
 	@Override
 	public int getImageResource() {
 		return R.drawable.db;
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	@Override
 	public MlistReference getMlistReference () {
 		return this.mlistReference;
 	}
-	
+
 	@Override
 	public String getTitle() {
 		return this.getNode(TITLE);
 	}
-	
+
 	@Override
 	public int getCount() {
 		return this.getNodeInt(COUNT);
 	}
-	
+
 	@Override
 	public long getDuration() {
 		return this.getNodeLong(DURATION);
 	}
-	
+
 	@Override
 	public boolean isDurationComplete() {
 		return this.getNodeBoolean(DURATIONCOMPLETE);
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

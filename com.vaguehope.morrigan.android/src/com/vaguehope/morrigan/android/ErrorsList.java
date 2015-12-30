@@ -7,13 +7,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import android.content.Context;
-import android.widget.ListView;
-
 import com.vaguehope.morrigan.android.model.Artifact;
 import com.vaguehope.morrigan.android.model.ArtifactList;
 import com.vaguehope.morrigan.android.model.ArtifactListAdaptor;
 import com.vaguehope.morrigan.android.modelimpl.ArtifactListAdaptorImpl;
+
+import android.content.Context;
+import android.widget.ListView;
 
 public class ErrorsList {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -23,7 +23,7 @@ public class ErrorsList {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public ErrorsList (Context context, ListView listView) {
+	public ErrorsList (final Context context, final ListView listView) {
 		this.errorList = new ErrorList();
 		this.listAdapter = new ArtifactListAdaptorImpl<ErrorList>(context, R.layout.simplelistrow);
 		this.listAdapter.setInputData(this.errorList);
@@ -32,7 +32,7 @@ public class ErrorsList {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public void setError (String tag, Exception e) {
+	public void setError (final String tag, final Exception e) {
 		this.errorList.putError(tag, e);
 		this.listAdapter.notifyDataSetChanged();
 	}
@@ -46,7 +46,7 @@ public class ErrorsList {
 
 		public ErrorList () {}
 
-		public void putError (String tag, Exception e) {
+		public void putError (final String tag, final Exception e) {
 			if (e != null) {
 				this.errors.put(tag, new ErrorArtifact(e));
 			}
@@ -67,7 +67,7 @@ public class ErrorsList {
 		}
 
 		@Override
-		public int compareTo (ArtifactList another) {
+		public int compareTo (final ArtifactList another) {
 			return this.getSortKey().compareTo(another.getSortKey());
 		}
 
@@ -77,13 +77,13 @@ public class ErrorsList {
 
 		private final String title;
 
-		public ErrorArtifact (Exception e) {
+		public ErrorArtifact (final Exception e) {
 			this.title = e.getMessage();
 		}
 
 		@Override
-		public int getId () {
-			return 0;
+		public String getId () {
+			return "";
 		}
 
 		@Override
@@ -97,7 +97,7 @@ public class ErrorsList {
 		}
 
 		@Override
-		public boolean equals (Object o) {
+		public boolean equals (final Object o) {
 			if (o == null) return false;
 			if (o == this) return true;
 			if (!(o instanceof ErrorArtifact)) return false;

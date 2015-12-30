@@ -42,7 +42,7 @@ import com.vaguehope.morrigan.android.model.PlayerReference;
 
 public class PlayerQueueImpl implements PlayerQueue, ContentHandler {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	private static final String ENTRY = "entry";
 	private static final String TITLE = "title";
 	private static final String LISTREL = "list";
@@ -54,17 +54,17 @@ public class PlayerQueueImpl implements PlayerQueue, ContentHandler {
 	private static final String DURATION = "duration";
 	private static final String STARTCOUNT = "startcount";
 	private static final String ENDCOUNT = "endcount";
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	private final List<Artifact> artifactList = new LinkedList<Artifact>();
 	private final PlayerReference playerReference;
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	public PlayerQueueImpl (InputStream dataIs, PlayerReference playerReference) throws SAXException {
+
+	public PlayerQueueImpl (final InputStream dataIs, final PlayerReference playerReference) throws SAXException {
 		this.playerReference = playerReference;
-		
+
 		SAXParserFactory spf = SAXParserFactory.newInstance();
         SAXParser sp;
 		try {
@@ -82,34 +82,34 @@ public class PlayerQueueImpl implements PlayerQueue, ContentHandler {
 			throw new SAXException(e);
 		}
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	@Override
 	public List<? extends Artifact> getArtifactList() {
 		return Collections.unmodifiableList(this.artifactList);
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	private final Stack<String> stack = new Stack<String>();
 	private StringBuilder currentText;
-	
+
 	private String currentTitle = null;
 	private String currentListRelativeUrl = null;
 	private String currentItemRelativeUrl = null;
-	private int currentId;
+	private String currentId;
 	private BigInteger currentHash = null;
 	private boolean currentEnabled;
 	private boolean currentMissing;
 	private int currentDuration;
 	private int currentStartCount;
 	private int currentEndCount;
-	
+
 	@Override
-	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+	public void startElement(final String uri, final String localName, final String qName, final Attributes attributes) throws SAXException {
 		this.stack.push(localName);
-		
+
 		if (this.stack.size() == 2 && localName.equals(ENTRY)) {
 			this.currentTitle = null;
 			this.currentListRelativeUrl = null;
@@ -130,15 +130,15 @@ public class PlayerQueueImpl implements PlayerQueue, ContentHandler {
 				}
 			}
 		}
-		
+
 		// If we need a new StringBuilder, make one.
 		if (this.currentText == null || this.currentText.length() > 0) {
 			this.currentText = new StringBuilder();
 		}
 	}
-	
+
 	@Override
-	public void endElement(String uri, String localName, String qName) throws SAXException {
+	public void endElement(final String uri, final String localName, final String qName) throws SAXException {
 		if (this.stack.size() == 2 && localName.equals(ENTRY)) {
 			if (this.currentItemRelativeUrl != null) {
 				MlistItemBasicImpl item = new MlistItemBasicImpl();
@@ -159,7 +159,7 @@ public class PlayerQueueImpl implements PlayerQueue, ContentHandler {
 				list.setTitle(this.currentTitle);
 				list.setBaseUrl(this.playerReference.getServerReference().getBaseUrl() + this.currentListRelativeUrl);
 				list.setId(this.currentId);
-				
+
 				this.artifactList.add(list);
 			}
 		}
@@ -167,8 +167,7 @@ public class PlayerQueueImpl implements PlayerQueue, ContentHandler {
 			this.currentTitle = this.currentText.toString();
 		}
 		else if (this.stack.size() == 3 && localName.equals(ID)) {
-			int v = Integer.parseInt(this.currentText.toString());
-			this.currentId = v;
+			this.currentId = this.currentText.toString();
 		}
 		else if (this.stack.size() == 3 && localName.equals(HASH)) {
 			BigInteger v = new BigInteger(this.currentText.toString(), 16);
@@ -177,7 +176,7 @@ public class PlayerQueueImpl implements PlayerQueue, ContentHandler {
 		else if (this.stack.size() == 3 && localName.equals(ENABLED)) {
 			boolean v = Boolean.parseBoolean(this.currentText.toString());
 			this.currentEnabled = v;
-			
+
 		}
 		else if (this.stack.size() == 3 && localName.equals(MISSING)) {
 			boolean v = Boolean.parseBoolean(this.currentText.toString());
@@ -195,46 +194,46 @@ public class PlayerQueueImpl implements PlayerQueue, ContentHandler {
 			int v = Integer.parseInt(this.currentText.toString());
 			this.currentEndCount = v;
 		}
-		
+
 		this.stack.pop();
 	}
-	
-	
+
+
 	@Override
-	public void characters(char[] ch, int start, int length) throws SAXException {
+	public void characters(final char[] ch, final int start, final int length) throws SAXException {
         this.currentText.append( ch, start, length );
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	@Override
 	public void endDocument() throws SAXException { /* UNUSED */ }
 	@Override
-	public void endPrefixMapping(String prefix) throws SAXException { /* UNUSED */ }
+	public void endPrefixMapping(final String prefix) throws SAXException { /* UNUSED */ }
 	@Override
-	public void ignorableWhitespace(char[] ch, int start, int length) throws SAXException { /* UNUSED */ }
+	public void ignorableWhitespace(final char[] ch, final int start, final int length) throws SAXException { /* UNUSED */ }
 	@Override
-	public void processingInstruction(String target, String data) throws SAXException { /* UNUSED */ }
+	public void processingInstruction(final String target, final String data) throws SAXException { /* UNUSED */ }
 	@Override
-	public void setDocumentLocator(Locator locator) { /* UNUSED */ }
+	public void setDocumentLocator(final Locator locator) { /* UNUSED */ }
 	@Override
-	public void skippedEntity(String name) throws SAXException { /* UNUSED */ }
+	public void skippedEntity(final String name) throws SAXException { /* UNUSED */ }
 	@Override
 	public void startDocument() throws SAXException { /* UNUSED */ }
 	@Override
-	public void startPrefixMapping(String prefix, String uri) throws SAXException { /* UNUSED */ }
-	
+	public void startPrefixMapping(final String prefix, final String uri) throws SAXException { /* UNUSED */ }
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	@Override
 	public String getSortKey() {
 		return ""; // This should never be relevant.
 	}
-	
+
 	@Override
-	public int compareTo(ArtifactList another) {
+	public int compareTo(final ArtifactList another) {
 		return this.getSortKey().compareTo(another.getSortKey());
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

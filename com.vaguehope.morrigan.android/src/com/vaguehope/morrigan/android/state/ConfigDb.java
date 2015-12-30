@@ -20,17 +20,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import android.content.ContentValues;
-import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
-
 import com.vaguehope.morrigan.android.model.Artifact;
 import com.vaguehope.morrigan.android.model.ArtifactList;
 import com.vaguehope.morrigan.android.model.ServerReference;
 import com.vaguehope.morrigan.android.model.ServerReferenceList;
 import com.vaguehope.morrigan.android.modelimpl.ServerReferenceImpl;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 
 public class ConfigDb extends SQLiteOpenHelper implements ServerReferenceList {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -56,17 +56,17 @@ public class ConfigDb extends SQLiteOpenHelper implements ServerReferenceList {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public ConfigDb (Context context) {
+	public ConfigDb (final Context context) {
 		super(context, DB_NAME, null, DB_VERSION);
 	}
 
 	@Override
-	public void onCreate (SQLiteDatabase db) {
+	public void onCreate (final SQLiteDatabase db) {
 		db.execSQL(TBL_HOSTS_CREATE);
 	}
 
 	@Override
-	public void onUpgrade (SQLiteDatabase db, int oldVersion, int newVersion) {
+	public void onUpgrade (final SQLiteDatabase db, final int oldVersion, final int newVersion) {
 		if (oldVersion <= 1) {
 			db.execSQL("ALTER TABLE " + TBL_HOSTS + " ADD COLUMN " + TBL_HOSTS_NAME + " text;");
 		}
@@ -103,7 +103,7 @@ public class ConfigDb extends SQLiteOpenHelper implements ServerReferenceList {
 						int col_pass = c.getColumnIndex(TBL_HOSTS_PASS);
 
 						do {
-							int id = c.getInt(col_id);
+							String id = c.getString(col_id);
 							String name = c.getString(col_name);
 							String url = c.getString(col_url);
 							String pass = c.getString(col_pass);
@@ -128,8 +128,8 @@ public class ConfigDb extends SQLiteOpenHelper implements ServerReferenceList {
 		}
 	}
 
-	public ServerReference getServer (int id) {
-		if (id < 0) throw new IllegalArgumentException("id is < 0.");
+	public ServerReference getServer (final String id) {
+		if (id == null) throw new IllegalArgumentException("id is null.");
 
 		SQLiteDatabase db = null;
 		try {
@@ -140,7 +140,7 @@ public class ConfigDb extends SQLiteOpenHelper implements ServerReferenceList {
 				try {
 					c = db.query(true, TBL_HOSTS,
 							new String[] { TBL_HOSTS_ID, TBL_HOSTS_NAME, TBL_HOSTS_URL, TBL_HOSTS_PASS },
-							TBL_HOSTS_ID + "=?", new String[] { String.valueOf(id) },
+							TBL_HOSTS_ID + "=?", new String[] { id },
 							null, null,
 							TBL_HOSTS_NAME + " ASC", null);
 
@@ -150,7 +150,7 @@ public class ConfigDb extends SQLiteOpenHelper implements ServerReferenceList {
 						int col_url = c.getColumnIndex(TBL_HOSTS_URL);
 						int col_pass = c.getColumnIndex(TBL_HOSTS_PASS);
 
-						int inId = c.getInt(col_id);
+						String inId = c.getString(col_id);
 						String name = c.getString(col_name);
 						String url = c.getString(col_url);
 						String pass = c.getString(col_pass);
@@ -172,7 +172,7 @@ public class ConfigDb extends SQLiteOpenHelper implements ServerReferenceList {
 		}
 	}
 
-	public void addServer (ServerReference sr) {
+	public void addServer (final ServerReference sr) {
 		if (sr.getName() == null || sr.getName().length() < 1) throw new IllegalArgumentException("Illegal name.");
 		if (sr.getBaseUrl() == null || sr.getBaseUrl().length() < 1) throw new IllegalArgumentException("Illegal baseUrl.");
 
@@ -198,7 +198,7 @@ public class ConfigDb extends SQLiteOpenHelper implements ServerReferenceList {
 		}
 	}
 
-	public void updateServer (ServerReference sr) {
+	public void updateServer (final ServerReference sr) {
 		ContentValues values = new ContentValues();
 		values.put(TBL_HOSTS_NAME, sr.getName());
 		values.put(TBL_HOSTS_URL, sr.getBaseUrl());
@@ -221,7 +221,7 @@ public class ConfigDb extends SQLiteOpenHelper implements ServerReferenceList {
 		}
 	}
 
-	public boolean removeServer (ServerReference sr) {
+	public boolean removeServer (final ServerReference sr) {
 		if (!(sr instanceof ServerReferenceImpl)) {
 			throw new IllegalArgumentException("sr must be instanceof ServerReferenceImpl");
 		}
@@ -257,7 +257,7 @@ public class ConfigDb extends SQLiteOpenHelper implements ServerReferenceList {
 	}
 
 	@Override
-	public int compareTo (ArtifactList another) {
+	public int compareTo (final ArtifactList another) {
 		return this.getSortKey().compareTo(another.getSortKey());
 	}
 

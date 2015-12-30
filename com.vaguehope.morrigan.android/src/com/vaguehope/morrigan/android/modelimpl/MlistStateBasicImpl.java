@@ -23,91 +23,91 @@ import com.vaguehope.morrigan.android.model.ServerReference;
 
 public class MlistStateBasicImpl implements MlistState, MlistReference {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	private String baseUrl;
 	private ServerReference serverReference;
-	
-	private int id;
+
+	private String id;
 	private String title;
 	private int count;
 	private long duration;
 	private boolean durationComplete;
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	@Override
 	public ServerReference getServerReference() {
 		return this.serverReference;
 	}
-	
-	public void setServerReference(ServerReference serverReference) {
+
+	public void setServerReference(final ServerReference serverReference) {
 		this.serverReference = serverReference;
 	}
-	
+
 	@Override
 	public MlistReference getMlistReference() {
 		return this;
 	}
-	
+
 	@Override
 	public String getBaseUrl() {
 		return this.baseUrl;
 	}
-	
-	public void setBaseUrl(String baseUrl) {
+
+	public void setBaseUrl(final String baseUrl) {
 		this.baseUrl = baseUrl;
 	}
-	
+
 	@Override
-	public int getId() {
+	public String getId() {
 		return this.id;
 	}
-	
-	public void setId(int id) {
+
+	public void setId(final String id) {
 		this.id = id;
 	}
-	
-	
+
+
 	@Override
 	public String getTitle() {
 		return this.title;
 	}
-	
-	public void setTitle(String title) {
+
+	public void setTitle(final String title) {
 		this.title = title;
 	}
-	
+
 	@Override
 	public int getImageResource() {
 		return R.drawable.db;
 	}
-	
+
 	@Override
 	public int getCount() {
 		return this.count;
 	}
-	
-	public void setCount(int count) {
+
+	public void setCount(final int count) {
 		this.count = count;
 	}
-	
+
 	@Override
 	public long getDuration() {
 		return this.duration;
 	}
-	
-	public void setDuration(long duration) {
+
+	public void setDuration(final long duration) {
 		this.duration = duration;
 	}
-	
-	public void setDurationComplete(boolean durationComplete) {
+
+	public void setDurationComplete(final boolean durationComplete) {
 		this.durationComplete = durationComplete;
 	}
-	
+
 	@Override
 	public boolean isDurationComplete() {
 		return this.durationComplete;
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

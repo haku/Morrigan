@@ -22,25 +22,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicReference;
 
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.os.Bundle;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.View.OnCreateContextMenuListener;
-import android.view.Window;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
-
 import com.vaguehope.morrigan.android.helper.StringHelper;
 import com.vaguehope.morrigan.android.helper.TimeHelper;
 import com.vaguehope.morrigan.android.model.Artifact;
@@ -64,6 +45,25 @@ import com.vaguehope.morrigan.android.tasks.GetPlayerQueueTask.QueueItemAction;
 import com.vaguehope.morrigan.android.tasks.SetPlaystateTask;
 import com.vaguehope.morrigan.android.tasks.SetPlaystateTask.TargetPlayState;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.View.OnCreateContextMenuListener;
+import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+
 public class PlayerActivity extends Activity implements PlayerStateChangeListener, PlayerQueueChangeListener {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -81,22 +81,22 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 
 	private ErrorsList errorsList;
 
-	private AtomicReference<String> lastQuery = new AtomicReference<String>();
+	private final AtomicReference<String> lastQuery = new AtomicReference<String>();
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Activity methods.
 
 	@Override
-	public void onCreate (Bundle savedInstanceState) {
+	public void onCreate (final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		this.configDb = new ConfigDb(this);
 
 		Bundle extras = getIntent().getExtras();
-		int serverId = extras.getInt(SERVER_ID, -1);
-		int playerId = extras.getInt(PLAYER_ID, -1);
+		String serverId = extras.getString(SERVER_ID);
+		String playerId = extras.getString(PLAYER_ID);
 
-		if (serverId >= 0 && playerId >= 0) {
+		if (serverId != null && playerId != null) {
 			this.serverReference = this.configDb.getServer(serverId);
 			this.playerReference = new PlayerReferenceImpl(this.serverReference, playerId);
 		}
@@ -151,25 +151,25 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 
 		findViewById(R.id.btnPlaypause).setOnClickListener(new OnClickListener() {
 			@Override
-			public void onClick (View v) {
+			public void onClick (final View v) {
 				playpause();
 			}
 		});
 		findViewById(R.id.btnNext).setOnClickListener(new OnClickListener() {
 			@Override
-			public void onClick (View v) {
+			public void onClick (final View v) {
 				next();
 			}
 		});
 		findViewById(R.id.btnSearch).setOnClickListener(new OnClickListener() {
 			@Override
-			public void onClick (View v) {
+			public void onClick (final View v) {
 				search();
 			}
 		});
 		findViewById(R.id.btnRefresh).setOnClickListener(new OnClickListener() {
 			@Override
-			public void onClick (View v) {
+			public void onClick (final View v) {
 				refresh();
 			}
 		});
@@ -188,7 +188,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 	private static final int MENU_CTX_MOVEBOTTOM = 6;
 
 	@Override
-	public boolean onContextItemSelected (MenuItem menuItem) {
+	public boolean onContextItemSelected (final MenuItem menuItem) {
 		switch (menuItem.getItemId()) {
 			case MENU_CTX_ADDTAG:
 			case MENU_CTX_TAG:
@@ -208,9 +208,9 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 		}
 	}
 
-	private OnClickListener contextMenuClickListener = new OnClickListener() {
+	private final OnClickListener contextMenuClickListener = new OnClickListener() {
 		@Override
-		public void onClick (View v) {
+		public void onClick (final View v) {
 			PlayerState state = PlayerActivity.this.currentState;
 			String[] tags = state == null ? null : state.getTrackTags();
 			if (tags == null || tags.length < 1) {
@@ -222,9 +222,9 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 		}
 	};
 
-	private OnItemClickListener contextMenuItemCickListener = new OnItemClickListener() {
+	private final OnItemClickListener contextMenuItemCickListener = new OnItemClickListener() {
 		@Override
-		public void onItemClick (AdapterView<?> parent, View view, int position, long id) {
+		public void onItemClick (final AdapterView<?> parent, final View view, final int position, final long id) {
 			openContextMenu(view);
 		}
 	};
@@ -232,9 +232,9 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Tag stuff.
 
-	private OnCreateContextMenuListener tagRowContextMenuListener = new OnCreateContextMenuListener() {
+	private final OnCreateContextMenuListener tagRowContextMenuListener = new OnCreateContextMenuListener() {
 		@Override
-		public void onCreateContextMenu (ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+		public void onCreateContextMenu (final ContextMenu menu, final View v, final ContextMenuInfo menuInfo) {
 			PlayerState state = PlayerActivity.this.currentState;
 			if (state != null) {
 				menu.setHeaderTitle(state.getTitle());
@@ -251,7 +251,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 		}
 	};
 
-	private void onTagRowContextMenu (MenuItem menuItem) {
+	private void onTagRowContextMenu (final MenuItem menuItem) {
 		if (menuItem.getItemId() == MENU_CTX_ADDTAG) {
 			addTag();
 		}
@@ -282,9 +282,9 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Queue events.
 
-	private OnCreateContextMenuListener queueContextMenuListener = new OnCreateContextMenuListener() {
+	private final OnCreateContextMenuListener queueContextMenuListener = new OnCreateContextMenuListener() {
 		@Override
-		public void onCreateContextMenu (ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+		public void onCreateContextMenu (final ContextMenu menu, final View v, final ContextMenuInfo menuInfo) {
 			AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
 			Artifact item = PlayerActivity.this.queueListAdaptor.getInputData().getArtifactList().get(info.position);
 			menu.setHeaderTitle(item.getTitle());
@@ -296,7 +296,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 		}
 	};
 
-	private void onQueueContextMenu (MenuItem menuItem) {
+	private void onQueueContextMenu (final MenuItem menuItem) {
 		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuItem.getMenuInfo();
 		Artifact item = PlayerActivity.this.queueListAdaptor.getInputData().getArtifactList().get(info.position);
 
@@ -326,7 +326,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 	private static final int MENU_SHUFFLEQUEUE = 5;
 
 	@Override
-	public boolean onCreateOptionsMenu (Menu menu) {
+	public boolean onCreateOptionsMenu (final Menu menu) {
 		boolean result = super.onCreateOptionsMenu(menu);
 		menu.add(0, MENU_FULLSCREEN, 0, R.string.menu_fullscreen).setIcon(R.drawable.display);
 		menu.add(0, MENU_DOWNLOAD, 0, R.string.menu_download);
@@ -336,7 +336,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 	}
 
 	@Override
-	public boolean onOptionsItemSelected (MenuItem item) {
+	public boolean onOptionsItemSelected (final MenuItem item) {
 		switch (item.getItemId()) {
 
 			case MENU_FULLSCREEN:
@@ -402,13 +402,13 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 			builder.setTitle("Full-screen");
 			builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 				@Override
-				public void onClick (DialogInterface dialog, int which) {
+				public void onClick (final DialogInterface dialog, final int which) {
 					dialog.dismiss();
 				}
 			});
 			builder.setItems(labels, new DialogInterface.OnClickListener() {
 				@Override
-				public void onClick (DialogInterface dialog, int item) {
+				public void onClick (final DialogInterface dialog, final int item) {
 					dialog.dismiss();
 					new SetPlaystateTask(PlayerActivity.this, PlayerActivity.this.playerReference, item, PlayerActivity.this).execute();
 				}
@@ -438,7 +438,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 	private static final String FEED_QUEUE = "queue";
 
 	@Override
-	public void onPlayerStateChange (PlayerState newState, Exception exception) {
+	public void onPlayerStateChange (final PlayerState newState, final Exception exception) {
 		this.currentState = newState;
 		this.errorsList.setError(FEED_PLAYER, exception);
 		if (newState != null) {
@@ -488,7 +488,7 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 	}
 
 	@Override
-	public void onPlayerQueueChange (PlayerQueue newQueue, Exception exception) {
+	public void onPlayerQueueChange (final PlayerQueue newQueue, final Exception exception) {
 		if (newQueue != null) this.queueListAdaptor.setInputData(newQueue);
 		this.errorsList.setError(FEED_QUEUE, exception);
 	}

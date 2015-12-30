@@ -11,16 +11,21 @@ public final class Preferences {
 
 	private Preferences () {}
 
-	public static void putCurrentServer (Context context, int serverId) {
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-		Editor edit = prefs.edit();
-		edit.putInt(CURRENT_SERVER, serverId);
+	public static void putCurrentServer (final Context context, final String serverId) {
+		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		final Editor edit = prefs.edit();
+		edit.putString(CURRENT_SERVER, serverId);
 		edit.commit();
 	}
 
-	public static int getCurrentServer (Context context) {
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-		return prefs.getInt(CURRENT_SERVER, -1);
+	public static String getCurrentServer (final Context context) {
+		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		try {
+			return prefs.getString(CURRENT_SERVER, null);
+		}
+		catch (final ClassCastException e) {
+			return "" + prefs.getInt(CURRENT_SERVER, -1);
+		}
 	}
 
 }

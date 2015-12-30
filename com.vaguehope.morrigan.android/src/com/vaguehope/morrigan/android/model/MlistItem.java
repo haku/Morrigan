@@ -20,26 +20,26 @@ import java.math.BigInteger;
 
 public interface MlistItem extends Artifact {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	@Override
 	public String getTitle ();
 	@Override
 	public int getImageResource ();
-	
+
 	public int getType ();
 	@Override
-	public int getId ();
+	public String getId ();
 	public String getRelativeUrl ();
 	public String getFileName ();
 	public BigInteger getHashCode ();
 	public boolean isEnabled ();
 	public boolean isMissing ();
-	
+
 	public int getDuration ();
 	public int getStartCount ();
 	public int getEndCount ();
-	
+
 	public String[] getTags ();
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

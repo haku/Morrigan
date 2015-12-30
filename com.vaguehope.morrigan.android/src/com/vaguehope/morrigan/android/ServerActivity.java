@@ -16,19 +16,6 @@
 
 package com.vaguehope.morrigan.android;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.os.Bundle;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.Window;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ImageButton;
-import android.widget.ListView;
-import android.widget.Toast;
-
 import com.vaguehope.morrigan.android.ServersList.ServerListEventsListener;
 import com.vaguehope.morrigan.android.layouts.SidebarLayout;
 import com.vaguehope.morrigan.android.layouts.SidebarLayout.SidebarListener;
@@ -49,6 +36,19 @@ import com.vaguehope.morrigan.android.state.Preferences;
 import com.vaguehope.morrigan.android.tasks.GetMlistsTask;
 import com.vaguehope.morrigan.android.tasks.GetPlayersTask;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ImageButton;
+import android.widget.ListView;
+import android.widget.Toast;
+
 public class ServerActivity extends Activity implements PlayerStateListChangeListener, MlistStateListChangeListener {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -68,21 +68,21 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	public void onCreate (Bundle savedInstanceState) {
+	public void onCreate (final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		this.configDb = new ConfigDb(this);
 		wireGui();
 
-		int serverId = (savedInstanceState == null) ? -1 : savedInstanceState.getInt(SERVER_ID, -1);
-		if (serverId < 0) {
+		String serverId = (savedInstanceState == null) ? null : savedInstanceState.getString(SERVER_ID);
+		if (serverId == null) {
 			Bundle extras = getIntent().getExtras();
-			if (extras != null) serverId = extras.getInt(SERVER_ID, -1);
+			if (extras != null) serverId = extras.getString(SERVER_ID);
 		}
-		if (serverId < 0) {
+		if (serverId == null) {
 			serverId = Preferences.getCurrentServer(this);
 		}
-		if (serverId >= 0) {
+		if (serverId != null) {
 			setServer(this.configDb.getServer(serverId));
 		}
 		else {
@@ -98,8 +98,8 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 	}
 
 	@Override
-	protected void onSaveInstanceState (Bundle outState) {
-		outState.putInt(SERVER_ID, this.serverReference.getId());
+	protected void onSaveInstanceState (final Bundle outState) {
+		outState.putString(SERVER_ID, this.serverReference.getId());
 		super.onSaveInstanceState(outState);
 	}
 
@@ -111,7 +111,7 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	protected void setServer (ServerReference ref) {
+	protected void setServer (final ServerReference ref) {
 		this.serverReference = ref;
 		this.setTitle((this.serverReference == null) ? "Morrigan" : this.serverReference.getName());
 	}
@@ -166,9 +166,9 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 		btnAddServer.setOnClickListener(this.btnAddServerClickListener);
 	}
 
-	private OnItemClickListener artifactsListCickListener = new OnItemClickListener() {
+	private final OnItemClickListener artifactsListCickListener = new OnItemClickListener() {
 		@Override
-		public void onItemClick (AdapterView<?> parent, View view, int position, long id) {
+		public void onItemClick (final AdapterView<?> parent, final View view, final int position, final long id) {
 			Artifact item = ServerActivity.this.artifactListAdaptor.getInputData().getArtifactList().get(position);
 			showArtifactActivity(item);
 		}
@@ -176,22 +176,22 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 
 	class BtnRefresh_OnClick implements OnClickListener {
 		@Override
-		public void onClick (View v) {
+		public void onClick (final View v) {
 			refresh();
 		}
 	}
 
 	ServerListEventsListener serverListEventsListener = new ServerListEventsListener() {
 		@Override
-		public void showServer (ServerReference ref) {
+		public void showServer (final ServerReference ref) {
 			setServer(ref);
 			refresh();
 		}
 	};
 
-	private OnClickListener btnAddServerClickListener = new OnClickListener() {
+	private final OnClickListener btnAddServerClickListener = new OnClickListener() {
 		@Override
-		public void onClick (View v) {
+		public void onClick (final View v) {
 			getServersList().promptAddServer();
 		}
 	};
@@ -202,14 +202,14 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 	}
 
 	@Override
-	public boolean onContextItemSelected (MenuItem item) {
+	public boolean onContextItemSelected (final MenuItem item) {
 		boolean handled = this.serversList.handleOnContextItemSelected(item);
 		if (!handled) handled = super.onContextItemSelected(item);
 		return handled;
 	}
 
 	@Override
-	public boolean onOptionsItemSelected (MenuItem item) {
+	public boolean onOptionsItemSelected (final MenuItem item) {
 		switch (item.getItemId()) {
 			case 16908332: // android.R.id.home constant only in API v11+ but event still fires in API v8.
 				this.sidebarLayout.toggleSidebar();
@@ -222,22 +222,22 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 	private final SidebarListener sidebarListener = new SidebarListener() {
 
 		@Override
-		public boolean onContentTouchedWhenOpening (SidebarLayout sidebar) {
+		public boolean onContentTouchedWhenOpening (final SidebarLayout sidebar) {
 			sidebar.closeSidebar();
 			return true;
 		}
 
 		@Override
-		public void onSidebarOpened (SidebarLayout sidebar) {/* Unused. */}
+		public void onSidebarOpened (final SidebarLayout sidebar) {/* Unused. */}
 
 		@Override
-		public void onSidebarClosed (SidebarLayout sidebar) {/* Unused. */}
+		public void onSidebarClosed (final SidebarLayout sidebar) {/* Unused. */}
 	};
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Commands - to be called on the UI thread.
 
-	protected void showArtifactActivity (Artifact item) {
+	protected void showArtifactActivity (final Artifact item) {
 		if (item instanceof PlayerReference) {
 			PlayerReference pr = (PlayerReference) item;
 			showArtifactActivity(pr);
@@ -251,14 +251,14 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 		}
 	}
 
-	protected void showArtifactActivity (PlayerReference item) {
+	protected void showArtifactActivity (final PlayerReference item) {
 		Intent intent = new Intent(getApplicationContext(), PlayerActivity.class);
 		intent.putExtra(MlistActivity.SERVER_ID, this.serverReference.getId());
 		intent.putExtra(PlayerActivity.PLAYER_ID, item.getPlayerId());
 		startActivity(intent);
 	}
 
-	protected void showArtifactActivity (MlistReference item) {
+	protected void showArtifactActivity (final MlistReference item) {
 		Intent intent = new Intent(getApplicationContext(), MlistActivity.class);
 		intent.putExtra(MlistActivity.SERVER_ID, this.serverReference.getId());
 		intent.putExtra(MlistActivity.MLIST_BASE_URL, item.getBaseUrl());
@@ -273,14 +273,14 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 	private static final String LIST_MLISTS = "mlists";
 
 	@Override
-	public void onPlayersChange (PlayerStateList playersState, Exception e) {
+	public void onPlayersChange (final PlayerStateList playersState, final Exception e) {
 		this.artifactListImpl.addList(LIST_PLAYERS, playersState);
 		this.artifactListAdaptor.notifyDataSetChanged();
 		this.errorsList.setError(LIST_PLAYERS, e);
 	}
 
 	@Override
-	public void onMlistsChange (MlistStateList mlistsState, Exception e) {
+	public void onMlistsChange (final MlistStateList mlistsState, final Exception e) {
 		this.artifactListImpl.addList(LIST_MLISTS, mlistsState);
 		this.artifactListAdaptor.notifyDataSetChanged();
 		this.errorsList.setError(LIST_MLISTS, e);

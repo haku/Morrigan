@@ -23,44 +23,44 @@ import com.vaguehope.morrigan.android.model.ServerReference;
 
 public class PlayerReferenceImpl implements PlayerReference {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	private final int playerId;
+
+	private final String playerId;
 	private final String baseUrl;
 	private final ServerReference serverReference;
 	private final String title;
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	public PlayerReferenceImpl (ServerReference serverReference, int playerId) {
+
+	public PlayerReferenceImpl (final ServerReference serverReference, final String playerId) {
 		if (serverReference == null) throw new IllegalArgumentException();
-		
+
 		this.playerId = playerId;
 		this.baseUrl = serverReference.getBaseUrl() + C.CONTEXT_PLAYERS + "/" + playerId;
 		this.serverReference = serverReference;
-		
+
 		this.title = this.serverReference.getName() + " / player " + this.playerId;
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	PlayerReference
-	
+
 	@Override
-	public int getPlayerId() {
+	public String getPlayerId() {
 		return this.playerId;
 	}
-	
+
 	@Override
 	public String getBaseUrl() {
 		return this.baseUrl;
 	}
-	
+
 	@Override
 	public ServerReference getServerReference() {
 		return this.serverReference;
 	}
 
 	@Override
-	public int getId () {
+	public String getId () {
 		return getPlayerId();
 	}
 
@@ -73,6 +73,6 @@ public class PlayerReferenceImpl implements PlayerReference {
 	public int getImageResource () {
 		return R.drawable.play;
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

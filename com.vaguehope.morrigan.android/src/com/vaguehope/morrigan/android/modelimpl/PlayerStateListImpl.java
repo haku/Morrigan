@@ -49,7 +49,7 @@ public class PlayerStateListImpl implements PlayerStateList, ContentHandler {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public PlayerStateListImpl (InputStream dataIs, ServerReference serverReference) throws SAXException {
+	public PlayerStateListImpl (final InputStream dataIs, final ServerReference serverReference) throws SAXException {
 		this.serverReference = serverReference;
 
 		SAXParserFactory spf = SAXParserFactory.newInstance();
@@ -89,7 +89,7 @@ public class PlayerStateListImpl implements PlayerStateList, ContentHandler {
 	private PlayerStateBasicImpl currentItem;
 
 	@Override
-	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+	public void startElement(final String uri, final String localName, final String qName, final Attributes attributes) throws SAXException {
 		this.stack.push(localName);
 
 		if (this.stack.size() == 2 && localName.equals("entry")) {
@@ -113,13 +113,13 @@ public class PlayerStateListImpl implements PlayerStateList, ContentHandler {
 	}
 
 	@Override
-	public void endElement(String uri, String localName, String qName) throws SAXException {
+	public void endElement(final String uri, final String localName, final String qName) throws SAXException {
 		if (this.stack.size() == 2 && localName.equals("entry")) {
 			this.playerStateList.add(this.currentItem);
 			this.currentItem = null;
 		}
 		else if (this.stack.size() == 3 && localName.equals(PlayerStateXmlImpl.PLAYERID)) {
-			int v = Integer.parseInt(this.currentText.toString());
+			String v = this.currentText.toString();
 			this.currentItem.setId(v);
 			this.currentItem.setPlayerReference(new PlayerReferenceImpl(this.serverReference, v));
 		}
@@ -166,7 +166,7 @@ public class PlayerStateListImpl implements PlayerStateList, ContentHandler {
 	}
 
 	@Override
-	public void characters(char[] ch, int start, int length) throws SAXException {
+	public void characters(final char[] ch, final int start, final int length) throws SAXException {
         this.currentText.append( ch, start, length );
 	}
 
@@ -175,19 +175,19 @@ public class PlayerStateListImpl implements PlayerStateList, ContentHandler {
 	@Override
 	public void endDocument() throws SAXException { /* UNUSED */ }
 	@Override
-	public void endPrefixMapping(String prefix) throws SAXException { /* UNUSED */ }
+	public void endPrefixMapping(final String prefix) throws SAXException { /* UNUSED */ }
 	@Override
-	public void ignorableWhitespace(char[] ch, int start, int length) throws SAXException { /* UNUSED */ }
+	public void ignorableWhitespace(final char[] ch, final int start, final int length) throws SAXException { /* UNUSED */ }
 	@Override
-	public void processingInstruction(String target, String data) throws SAXException { /* UNUSED */ }
+	public void processingInstruction(final String target, final String data) throws SAXException { /* UNUSED */ }
 	@Override
-	public void setDocumentLocator(Locator locator) { /* UNUSED */ }
+	public void setDocumentLocator(final Locator locator) { /* UNUSED */ }
 	@Override
-	public void skippedEntity(String name) throws SAXException { /* UNUSED */ }
+	public void skippedEntity(final String name) throws SAXException { /* UNUSED */ }
 	@Override
 	public void startDocument() throws SAXException { /* UNUSED */ }
 	@Override
-	public void startPrefixMapping(String prefix, String uri) throws SAXException { /* UNUSED */ }
+	public void startPrefixMapping(final String prefix, final String uri) throws SAXException { /* UNUSED */ }
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -197,7 +197,7 @@ public class PlayerStateListImpl implements PlayerStateList, ContentHandler {
 	}
 
 	@Override
-	public int compareTo(ArtifactList another) {
+	public int compareTo(final ArtifactList another) {
 		return this.getSortKey().compareTo(another.getSortKey());
 	}
 
