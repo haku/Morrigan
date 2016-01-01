@@ -260,16 +260,18 @@ public class MlistsServlet extends HttpServlet {
 		}
 	}
 
-	private void postToMmdb (final HttpServletRequest req, final HttpServletResponse resp, final String action, final IMixedMediaDb mmdb) throws IOException {
+	private void postToMmdb (final HttpServletRequest req, final HttpServletResponse resp, final String action, final IMixedMediaDb mmdb) throws IOException, MorriganException {
 		if (action.equals(CMD_PLAY) || action.equals(CMD_QUEUE)) {
 			Player player = parsePlayer(req, resp);
 			if (player != null) { // parsePlayer() will write the error msg.
 				resp.setContentType("text/plain");
 				if (action.equals(CMD_PLAY)) {
+					mmdb.read();
 					player.loadAndStartPlaying(mmdb);
 					resp.getWriter().println("MMDB playing desu~");
 				}
 				else if (action.equals(CMD_QUEUE)) {
+					mmdb.read();
 					player.getQueue().addToQueue(new PlayItem(mmdb, null));
 					resp.getWriter().println("MMDB added to queue desu~");
 				}
@@ -294,10 +296,12 @@ public class MlistsServlet extends HttpServlet {
 			if (player != null) { // parsePlayer() will write the error msg.
 				resp.setContentType("text/plain");
 				if (action.equals(CMD_PLAY)) {
+					mmdb.read();
 					player.loadAndStartPlaying(mmdb, item);
 					resp.getWriter().println("Item playing desu~");
 				}
 				else if (action.equals(CMD_QUEUE)) {
+					mmdb.read();
 					player.getQueue().addToQueue(new PlayItem(mmdb, item));
 					resp.getWriter().println("Item added to queue desu~");
 				}
@@ -326,6 +330,7 @@ public class MlistsServlet extends HttpServlet {
 		if (action.equals(CMD_PLAY) || action.equals(CMD_QUEUE)) {
 			Player player = parsePlayer(req, resp);
 			if (player != null) { // parsePlayer() will write the error msg.
+				mmdb.read();
 				resp.setContentType("text/plain");
 				Collection<IMixedMediaItem> tracks = mmdb.getAlbumItems(MediaType.TRACK, album);
 				List<PlayItem> trackPlayItems = new ArrayList<PlayItem>();
