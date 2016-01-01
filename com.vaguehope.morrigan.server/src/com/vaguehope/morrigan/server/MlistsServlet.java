@@ -40,6 +40,7 @@ import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbFactory;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbHelper;
 import com.vaguehope.morrigan.server.util.FeedHelper;
 import com.vaguehope.morrigan.server.util.XmlHelper;
+import com.vaguehope.morrigan.util.StringHelper;
 import com.vaguehope.sqlitewrapper.DbException;
 
 /**
@@ -52,12 +53,16 @@ import com.vaguehope.sqlitewrapper.DbException;
  *  GET /mlists/LOCALMMDB/example.local.db3/src
  * POST /mlists/LOCALMMDB/example.local.db3 action=play&playerid=0
  * POST /mlists/LOCALMMDB/example.local.db3 action=queue&playerid=0
+ * POST /mlists/LOCALMMDB/example.local.db3 filter=myview&action=play&playerid=0
+ * POST /mlists/LOCALMMDB/example.local.db3 filter=myview&action=queue&playerid=0
  * POST /mlists/LOCALMMDB/example.local.db3 action=scan
  *
  *  GET /mlists/LOCALMMDB/example.local.db3/items
  *  GET /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3
  * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 action=play&playerid=0
  * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 action=queue&playerid=0
+ * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 filter=myview&action=play&playerid=0
+ * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 filter=myview&action=queue&playerid=0
  * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 action=addtag&tag=foo
  *
  *  GET /mlists/LOCALMMDB/example.local.db3/albums
@@ -77,6 +82,11 @@ public class MlistsServlet extends HttpServlet {
 	public static final String PATH_ITEMS = "items";
 	public static final String PATH_ALBUMS = "albums";
 	public static final String PATH_QUERY = "query";
+
+	private static final String PARAM_ACTION = "action";
+	private static final String PARAM_PLAYERID = "playerid";
+	private static final String PARAM_TAG = "tag";
+	private static final String PARAM_FILTER = "filter";
 
 	public static final String CMD_NEWMMDB = "newmmdb";
 	public static final String CMD_SCAN = "scan";
@@ -126,7 +136,7 @@ public class MlistsServlet extends HttpServlet {
 	@Override
 	protected void doPost (final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
 		try {
-			String act = req.getParameter("action");
+			String act = req.getParameter(PARAM_ACTION);
 			if (act == null) {
 				ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "HTTP Error 400 'action' parameter not set desu~");
 			}
@@ -173,14 +183,15 @@ public class MlistsServlet extends HttpServlet {
 				if (pathParts.length >= 2) {
 					String type = pathParts[0];
 					if (type.equals(ILocalMixedMediaDb.TYPE) || type.equals(IRemoteMixedMediaDb.TYPE)) {
-						IMixedMediaDb mmdb;
+						final String filter = StringHelper.trimToNull(req.getParameter(PARAM_FILTER));
+						final IMixedMediaDb mmdb;
 						if (type.equals(ILocalMixedMediaDb.TYPE)) {
 							String f = LocalMixedMediaDbHelper.getFullPathToMmdb(pathParts[1]);
-							mmdb = this.mediaFactory.getLocalMixedMediaDb(f);
+							mmdb = this.mediaFactory.getLocalMixedMediaDb(f, filter);
 						}
 						else if (type.equals(IRemoteMixedMediaDb.TYPE)) {
 							String f = RemoteMixedMediaDbHelper.getFullPathToMmdb(pathParts[1]);
-							mmdb = RemoteMixedMediaDbFactory.getExisting(f);
+							mmdb = RemoteMixedMediaDbFactory.getExisting(f, filter);
 						}
 						else {
 							throw new IllegalArgumentException("Out of cheese desu~.  Please reinstall universe and reboot desu~.");
@@ -296,7 +307,7 @@ public class MlistsServlet extends HttpServlet {
 			}
 		}
 		else if (action.equals(CMD_ADDTAG)) {
-			String tag = req.getParameter("tag");
+			String tag = req.getParameter(PARAM_TAG);
 			if (tag != null && tag.length() > 0) {
 				mmdb.addTag(item, tag, MediaTagType.MANUAL, (MediaTagClassification) null);
 				resp.setContentType("text/plain");
@@ -342,7 +353,7 @@ public class MlistsServlet extends HttpServlet {
 	}
 
 	private Player parsePlayer (final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-		String playerId = req.getParameter("playerid");
+		String playerId = req.getParameter(PARAM_PLAYERID);
 		if (playerId == null) {
 			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "HTTP error 400 'playerId' parameter not set desu~");
 			return null;

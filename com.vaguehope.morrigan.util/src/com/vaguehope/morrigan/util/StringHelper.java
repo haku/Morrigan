@@ -4,11 +4,8 @@ import java.util.Collection;
 import java.util.regex.Pattern;
 
 public class StringHelper {
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private StringHelper () { /* UNUSED */ }
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	private StringHelper () { /* UNUSED */}
 
 	public static <T> String joinCollection (final Collection<T> collection, final String delim) {
 		StringBuilder sb = new StringBuilder();
@@ -28,5 +25,10 @@ public class StringHelper {
 		return END_QUOTES.matcher(s).replaceAll("");
 	}
 
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static String trimToNull (final String s) {
+		if (s == null) return null;
+		final String ts = s.trim();
+		return ts.length() > 0 ? ts : null;
+	}
+
 }
