@@ -194,11 +194,11 @@
     getQuery(mid, query, function(msg) {
       queryStatusBar.text(msg);
     }, function(items) {
-      displayQuery(itemsDiv, items);
+      displayQuery(mid, query, itemsDiv, items);
     });
   }
 
-  function displayQuery(itemsDiv, items) {
+  function displayQuery(mid, query, itemsDiv, items) {
     itemsDiv.empty();
     $.each(items, function(index, item) {
       itemDiv = $('<div class="item">');
@@ -206,7 +206,7 @@
       updateQueryItemDisplay(itemDiv, item);
       itemsDiv.append(itemDiv);
     });
-    updateAllItemsButton(items);
+    updateAllItemsButton(mid, query, items);
   }
 
   function makeQueryItem(itemDiv, id) {
@@ -227,11 +227,11 @@
     });
   }
 
-  function updateAllItemsButton(items) {
+  function updateAllItemsButton(mid, query, items) {
     var btnAll = $('.allItems');
     btnAll.unbind();
     btnAll.click(function() {
-      queryAllItemsClicked(items);
+      queryAllItemsClicked(mid, query, items);
     });
   }
 
@@ -337,13 +337,13 @@
     txtSearch.focus();
   }
 
-  function queryAllItemsClicked(items) {
+  function queryAllItemsClicked(mid, query, items) {
     var existingMenu = $('.itemmenu');
     if (existingMenu.size() > 0) {
       existingMenu.remove();
     }
     else {
-      $('body').append(makeAllItemsMenu(items));
+      $('body').append(makeAllItemsMenu(mid, query, items));
     }
   }
 
@@ -357,23 +357,44 @@
     }
   }
 
-  function makeAllItemsMenu(items) {
+  function makeAllItemsMenu(mid, query, items) {
     var menu = $('<div class="popup itemmenu">');
-    
+
     var title = $('<p class="title">');
     title.text(items.length + ' items');
     menu.append(title);
 
-    var enqueue = $('<button class="enqueue">enqueue</button>');
-    menu.append(enqueue);
+    var enqueueItems = $('<button class="enqueue">enqueue items</button>');
+    menu.append(enqueueItems);
+    
+    var enqueueView = $('<button class="enqueue">enqueue view</button>');
+    menu.append(enqueueView);
 
     var close = $('<button class="close">close</button>');
     menu.append(close);
 
-    enqueue.click(function() {
+    enqueueItems.click(function() {
+      enqueueItems.attr('disabled', 'true');
+      enqueueView.remove();
       var status = $('<p>');
-      enqueue.after(status);
+      enqueueItems.after(status);
       chosePlayerAndActionItem(items, 'queue', status, function() {
+        setTimeout(function() {
+          menu.remove();
+        }, SUCCESS_WAIT_MILLIS);
+      });
+    });
+
+    enqueueView.click(function() {
+      enqueueItems.remove();
+      enqueueView.attr('disabled', 'true');
+      var status = $('<p>');
+      enqueueView.after(status);
+      var action = 'queue';
+      if (query && query.length > 0 && query !== DEFAULT_QUERY) {
+        action += '&filter=' + encodeURIComponent(query); // nasty hack.
+      }
+      chosePlayerAndActionItem({url: '/mlists/' + mid}, action, status, function() {
         setTimeout(function() {
           menu.remove();
         }, SUCCESS_WAIT_MILLIS);
@@ -493,10 +514,10 @@
 
     if ($.isArray(item)) {
       params.error = function(jqXHR, textStatus, errorThrown) {
-        params.error();
+        params.error(); // FIXME wat?
         return;
       };
-      $.each(item, function(index, i) {
+      $.each(item, function(index, i) { // FIXME How does this not go odd?  Should be cloning params?
         params.url = i.url;
         $.ajax(params);
       });
