@@ -119,8 +119,12 @@ public abstract class AbstractPlayer implements Player {
 
 		PlayItem pi = item;
 		if (!pi.hasTrack()) {
+			// TODO FIXME what if Playback Order is MANUAL?
 			final IMediaTrack track = OrderHelper.getNextTrack(pi.getList(), null, getPlaybackOrder());
-			if (track == null) return;
+			if (track == null) {
+				System.err.println("Failed to fill in track: " + pi);
+				return;
+			}
 			pi = pi.withTrack(track);
 		}
 
