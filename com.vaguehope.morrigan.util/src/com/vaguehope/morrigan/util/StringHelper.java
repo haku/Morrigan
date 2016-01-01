@@ -31,4 +31,12 @@ public class StringHelper {
 		return ts.length() > 0 ? ts : null;
 	}
 
+	/**
+	 * Will not return null.
+	 */
+	public static String trimToEmpty (final String s) {
+		if (s == null) return "";
+		return s.trim();
+	}
+
 }

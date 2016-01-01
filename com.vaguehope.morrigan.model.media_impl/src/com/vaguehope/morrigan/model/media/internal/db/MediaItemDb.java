@@ -125,6 +125,7 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 		return this.dbLayer;
 	}
 
+	@Override
 	public String getSearchTerm () {
 		return this.searchTerm;
 	}

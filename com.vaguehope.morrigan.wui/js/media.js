@@ -151,7 +151,7 @@
     $.ajax({
       type : 'GET',
       cache : false,
-      url : 'mlists/' + mid,
+      url : 'mlists/' + mid + '?view=' + encodeURIComponent(UrlParams.params['listview'] || ''),
       dataType : 'xml',
       beforeSend : function() {
         onStatus('Reading media list ' + id + '...');
@@ -241,7 +241,7 @@
     $.ajax({
       type : 'GET',
       cache : false,
-      url : 'mlists/' + mid + '/query/' + encodedQuery,
+      url : 'mlists/' + mid + '/query/' + encodedQuery + '?view=' + encodeURIComponent(UrlParams.params['listview'] || ''),
       dataType : 'xml',
       beforeSend : function() {
         onStatus('Querying ' + id + '...');
@@ -392,7 +392,7 @@
       enqueueView.after(status);
       var action = 'queue';
       if (query && query.length > 0 && query !== DEFAULT_QUERY) {
-        action += '&filter=' + encodeURIComponent(query); // nasty hack.
+        action += '&view=' + encodeURIComponent(query); // nasty hack.
       }
       chosePlayerAndActionItem({url: '/mlists/' + mid}, action, status, function() {
         setTimeout(function() {
@@ -497,7 +497,7 @@
     var params = {
       type : 'POST',
       cache : false,
-      data : 'action=' + action + '&playerid=' + pid,
+      data : 'action=' + action + '&playerid=' + pid + '&view=' + encodeURIComponent(UrlParams.params['listview'] || ''),
       contentTypeString : 'application/x-www-form-urlencoded',
       dataType : 'text',
       beforeSend : function() {
@@ -578,7 +578,7 @@
     $.ajax({
       type : 'GET',
       cache : false,
-      url : 'mlists/' + mid + '/albums',
+      url : 'mlists/' + mid + '/albums?view=' + encodeURIComponent(UrlParams.params['listview'] || ''),
       dataType : 'xml',
       beforeSend : function() {
         onStatus('Fetching ' + id + '...');

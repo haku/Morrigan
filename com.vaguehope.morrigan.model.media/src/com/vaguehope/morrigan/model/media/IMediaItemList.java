@@ -21,6 +21,7 @@ public interface IMediaItemList<T extends IMediaItem> {
 
 	String getType ();
 	String getSerial (); // TODO rename to something more helpful?
+	String getSearchTerm ();
 
 	DirtyState getDirtyState ();
 	void setDirtyState (DirtyState state);

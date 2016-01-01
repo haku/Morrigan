@@ -86,7 +86,7 @@ public class MlistsServlet extends HttpServlet {
 	private static final String PARAM_ACTION = "action";
 	private static final String PARAM_PLAYERID = "playerid";
 	private static final String PARAM_TAG = "tag";
-	private static final String PARAM_FILTER = "filter";
+	private static final String PARAM_VIEW = "view";
 
 	public static final String CMD_NEWMMDB = "newmmdb";
 	public static final String CMD_SCAN = "scan";
@@ -183,7 +183,7 @@ public class MlistsServlet extends HttpServlet {
 				if (pathParts.length >= 2) {
 					String type = pathParts[0];
 					if (type.equals(ILocalMixedMediaDb.TYPE) || type.equals(IRemoteMixedMediaDb.TYPE)) {
-						final String filter = StringHelper.trimToNull(req.getParameter(PARAM_FILTER));
+						final String filter = StringHelper.trimToNull(req.getParameter(PARAM_VIEW));
 						final IMixedMediaDb mmdb;
 						if (type.equals(ILocalMixedMediaDb.TYPE)) {
 							String f = LocalMixedMediaDbHelper.getFullPathToMmdb(pathParts[1]);

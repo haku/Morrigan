@@ -245,6 +245,9 @@ Players = {};
       player.mid = listHref.replace('/mlists/', '');
     }
 
+    var listView = node.find('listview').text();
+    if (listView && listView.length > 0) player.listView = listView;
+
     player.monitors = [];
     node.find('monitor').each(function() {
       var monitor = {};
@@ -580,7 +583,9 @@ Players = {};
     }, function(player) {
       title.text('Search ' + player.listTitle);
       btnSearch.click(function() {
-        window.location.href = '/?mid=' + player.mid + '&tpid=' + player.pid + '&search=' + encodeURIComponent(txtSearch.val());
+        var href = '/?mid=' + player.mid + '&tpid=' + player.pid + '&search=' + encodeURIComponent(txtSearch.val());
+        if (player.listView) href += '&listview=' + encodeURIComponent(player.listView);
+        window.location.href = href;
       });
     });
 

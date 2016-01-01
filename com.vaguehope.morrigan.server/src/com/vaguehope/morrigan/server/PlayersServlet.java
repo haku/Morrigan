@@ -33,6 +33,7 @@ import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayerReader;
 import com.vaguehope.morrigan.server.util.FeedHelper;
 import com.vaguehope.morrigan.server.util.XmlHelper;
+import com.vaguehope.morrigan.util.StringHelper;
 import com.vaguehope.morrigan.util.TimeHelper;
 
 /**
@@ -346,19 +347,22 @@ public class PlayersServlet extends HttpServlet {
 	private static void printPlayer (final DataWriter dw, final Player p, final int detailLevel) throws SAXException, UnsupportedEncodingException, MorriganException {
 		if (detailLevel < 0 || detailLevel > 1) throw new IllegalArgumentException("detailLevel must be 0 or 1, not "+detailLevel+".");
 
-		String listTitle;
-		String listId;
-		String listUrl;
+		final String listTitle;
+		final String listId;
+		final String listUrl;
+		final String listView;
 		IMediaTrackList<? extends IMediaTrack> currentList = p.getCurrentList();
 		if (currentList != null) {
 			listTitle = currentList.getListName();
 			listId = currentList.getListId();
 			listUrl = MlistsServlet.CONTEXTPATH + "/" + currentList.getType() + "/" + URLEncoder.encode(FeedHelper.filenameFromPath(currentList.getListId()), "UTF-8");
+			listView = StringHelper.trimToEmpty(currentList.getSearchTerm());
 		}
 		else {
 			listTitle = NULL;
 			listId = NULL;
 			listUrl = null;
+			listView = "";
 		}
 
 		PlayItem currentItem = p.getCurrentItem();
@@ -382,6 +386,7 @@ public class PlayersServlet extends HttpServlet {
 		FeedHelper.addElement(dw, "listtitle", listTitle);
 		FeedHelper.addElement(dw, "listid", listId);
 		if (listUrl != null) FeedHelper.addLink(dw, listUrl, "list", "text/xml");
+		FeedHelper.addElement(dw, "listview", listView);
 		FeedHelper.addElement(dw, "tracktitle", trackTitle);
 
 		if (detailLevel == 1) {
