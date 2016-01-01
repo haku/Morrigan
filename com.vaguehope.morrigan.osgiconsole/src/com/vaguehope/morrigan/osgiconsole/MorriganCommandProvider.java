@@ -541,8 +541,8 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 
 		IMediaTrackList<? extends IMediaTrack> currentList = player.getCurrentList();
+		ci.print("\t list: ");
 		if (currentList != null) {
-			ci.print("\t list: ");
 			ci.print(currentList.getListName());
 			ci.print(" (");
 			ci.print(String.valueOf(currentList.getCount()));
