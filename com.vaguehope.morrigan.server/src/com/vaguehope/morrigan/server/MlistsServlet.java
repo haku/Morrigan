@@ -53,16 +53,16 @@ import com.vaguehope.sqlitewrapper.DbException;
  *  GET /mlists/LOCALMMDB/example.local.db3/src
  * POST /mlists/LOCALMMDB/example.local.db3 action=play&playerid=0
  * POST /mlists/LOCALMMDB/example.local.db3 action=queue&playerid=0
- * POST /mlists/LOCALMMDB/example.local.db3 filter=myview&action=play&playerid=0
- * POST /mlists/LOCALMMDB/example.local.db3 filter=myview&action=queue&playerid=0
+ * POST /mlists/LOCALMMDB/example.local.db3 view=myview&action=play&playerid=0
+ * POST /mlists/LOCALMMDB/example.local.db3 view=myview&action=queue&playerid=0
  * POST /mlists/LOCALMMDB/example.local.db3 action=scan
  *
  *  GET /mlists/LOCALMMDB/example.local.db3/items
  *  GET /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3
  * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 action=play&playerid=0
  * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 action=queue&playerid=0
- * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 filter=myview&action=play&playerid=0
- * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 filter=myview&action=queue&playerid=0
+ * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 view=myview&action=play&playerid=0
+ * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 view=myview&action=queue&playerid=0
  * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 action=addtag&tag=foo
  *
  *  GET /mlists/LOCALMMDB/example.local.db3/albums
