@@ -106,7 +106,6 @@ public final class OrderHelper {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	// TODO take into account disabled and missing tracks.
 	public static IMediaTrack getNextTrack (final IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack track, final PlaybackOrder mode) {
 		if (list.getCount() <= 0) return null;
 
