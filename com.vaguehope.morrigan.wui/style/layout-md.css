@@ -1,0 +1,5 @@
+.mdl-layout__drawer .mdl-navigation .mdl-navigation__link {
+  display: flex !important;
+  flex-direction: row;
+  align-items: center;
+}
