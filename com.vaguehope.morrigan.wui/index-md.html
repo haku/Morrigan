@@ -9,6 +9,7 @@
     <script src="https://storage.googleapis.com/code.getmdl.io/1.0.6/material.min.js"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script src="js/api.js"></script>
     <script src="js/index-md.js"></script>
   </head>
   <body>
@@ -37,65 +38,42 @@
       </div>
     </header>
     <div class="mdl-layout__drawer">
-      <span class="mdl-layout-title">Morrigan</span>
-      <nav class="mdl-navigation">
-        <a class="mdl-navigation__link" href="">
-          <span class="mdl-button mdl-js-button mdl-button--icon">
-            <i class="material-icons">pause</i>
-          </span>
-          Living Room
-        </a>
-        <a class="mdl-navigation__link" href="">
-          <span class="mdl-button mdl-js-button mdl-button--icon">
-            <i class="material-icons">stop</i>
-          </span>
-          GUI
-        </a>
-        <a class="mdl-navigation__link" href="">
-          <span class="mdl-button mdl-js-button mdl-button--icon">
-            <i class="material-icons">play_arrow</i>
-          </span>
-          Kitchen
-        </a>
-        <a class="mdl-navigation__link" href="">
-          <span class="mdl-button mdl-js-button mdl-button--icon">
-            <i class="material-icons">stop</i>
-          </span>
-          Server
-        </a>
+      <span class="mdl-layout-title" id="drawer_title">Morrigan</span>
+      <nav class="mdl-navigation" id="players_list">
+        <!-- Players added here. -->
       </nav>
     </div>
     <main class="mdl-layout__content">
     <section class="mdl-layout__tab-panel is-active" id="fixed-tab-1">
       <div class="page-content" style="padding: 0 1em">
-        <h5 style="margin-bottom: 0;">Joe Blogs - Some Album - 01 - Track 01.mp3 (233s)</h5>
+        <h5 style="margin-bottom: 0;">Joe Blogs - Some Album - 01 - Track 01.mp3 (2:33)</h5>
         <ul style="margin: 0; padding: 0; list-style: none;">
           <li>upbeat, gentle, 320cbr</li>
           <li>23 items, 1:51:12</li>
         </ul>
         <ol style="margin: 0; list-style: disc; padding-left: 1em;">
-          <li>Joe Blogs - Some Album - 02 - Track 02.mp3 (218s)</li>
-          <li>Joe Blogs - Some Album - 03 - Track 03.mp3 (225s)</li>
-          <li>Joe Blogs - Some Album - 04 - Track 04.mp3 (236s)</li>
-          <li>Joe Blogs - Some Album - 05 - Track 05.mp3 (229s)</li>
-          <li>Joe Blogs - Some Album - 06 - Track 06.mp3 (132s)</li>
-          <li>Joe Blogs - Some Album - 07 - Track 07.mp3 (183s)</li>
-          <li>Joe Blogs - Some Album - 08 - Track 08.mp3 (242s)</li>
-          <li>Joe Blogs - Some Album - 09 - Track 09.mp3 (261s)</li>
-          <li>Joe Blogs - Some Album - 10 - Track 10.mp3 (213s)</li>
-          <li>Joe Blogs - Some Album - 11 - Track 11.mp3 (203s)</li>
-          <li>John Smith - This Thing I Made Music About - 01 - 01.mp3 (187s)</li>
-          <li>John Smith - This Thing I Made Music About - 02 - 02.mp3 (278s)</li>
-          <li>John Smith - This Thing I Made Music About - 03 - 03.mp3 (226s)</li>
-          <li>John Smith - This Thing I Made Music About - 04 - 04.mp3 (261s)</li>
-          <li>John Smith - This Thing I Made Music About - 05 - 05.mp3 (194s)</li>
-          <li>John Smith - This Thing I Made Music About - 06 - 06.mp3 (190s)</li>
-          <li>John Smith - This Thing I Made Music About - 07 - 07.mp3 (200s)</li>
-          <li>John Smith - This Thing I Made Music About - 08 - 08.mp3 (235s)</li>
-          <li>John Smith - This Thing I Made Music About - 09 - 09.mp3 (279s)</li>
-          <li>John Smith - This Thing I Made Music About - 10 - 10.mp3 (192s)</li>
-          <li>John Smith - This Thing I Made Music About - 11 - 11.mp3 (216s)</li>
-          <li>John Smith - This Thing I Made Music About - 12 - 12.mp3 (214s)</li>
+          <li>Joe Blogs - Some Album - 02 - Track 02.mp3 (2:18)</li>
+          <li>Joe Blogs - Some Album - 03 - Track 03.mp3 (2:25)</li>
+          <li>Joe Blogs - Some Album - 04 - Track 04.mp3 (2:36)</li>
+          <li>Joe Blogs - Some Album - 05 - Track 05.mp3 (2:29)</li>
+          <li>Joe Blogs - Some Album - 06 - Track 06.mp3 (1:32)</li>
+          <li>Joe Blogs - Some Album - 07 - Track 07.mp3 (1:83)</li>
+          <li>Joe Blogs - Some Album - 08 - Track 08.mp3 (2:42)</li>
+          <li>Joe Blogs - Some Album - 09 - Track 09.mp3 (2:61)</li>
+          <li>Joe Blogs - Some Album - 10 - Track 10.mp3 (2:13)</li>
+          <li>Joe Blogs - Some Album - 11 - Track 11.mp3 (2:03)</li>
+          <li>John Smith - This Thing I Made Music About - 01 - 01.mp3 (1:87)</li>
+          <li>John Smith - This Thing I Made Music About - 02 - 02.mp3 (2:78)</li>
+          <li>John Smith - This Thing I Made Music About - 03 - 03.mp3 (2:26)</li>
+          <li>John Smith - This Thing I Made Music About - 04 - 04.mp3 (2:61)</li>
+          <li>John Smith - This Thing I Made Music About - 05 - 05.mp3 (1:94)</li>
+          <li>John Smith - This Thing I Made Music About - 06 - 06.mp3 (1:90)</li>
+          <li>John Smith - This Thing I Made Music About - 07 - 07.mp3 (2:00)</li>
+          <li>John Smith - This Thing I Made Music About - 08 - 08.mp3 (2:35)</li>
+          <li>John Smith - This Thing I Made Music About - 09 - 09.mp3 (2:79)</li>
+          <li>John Smith - This Thing I Made Music About - 10 - 10.mp3 (1:92)</li>
+          <li>John Smith - This Thing I Made Music About - 11 - 11.mp3 (2:16)</li>
+          <li>John Smith - This Thing I Made Music About - 12 - 12.mp3 (2:14)</li>
         </ol>
       </div>
     </section>
