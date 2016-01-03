@@ -16,7 +16,7 @@
   <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header mdl-layout--fixed-tabs">
     <header class="mdl-layout__header">
       <div class="mdl-layout__header-row">
-        <span class="mdl-layout-title">Kitchen (myserver)</span>
+        <span class="mdl-layout-title" id="player_name">Player Name (host_name)</span>
         <div class="mdl-layout-spacer"></div>
         <button id="demo-menu-lower-right" class="mdl-button mdl-js-button mdl-button--icon">
           <i class="material-icons">more_vert</i>
@@ -30,7 +30,7 @@
       <div class="mdl-layout__tab-bar mdl-js-ripple-effect">
         <a href="#fixed-tab-1" class="mdl-layout__tab is-active">
           <span class="mdl-button mdl-js-button mdl-button--icon">
-            <i class="material-icons">play_arrow</i>
+            <i class="material-icons" id="queue_tab_icon">stop</i>
           </span>
           Queue
         </a>
@@ -46,10 +46,10 @@
     <main class="mdl-layout__content">
     <section class="mdl-layout__tab-panel is-active" id="fixed-tab-1">
       <div class="page-content" style="padding: 0 1em">
-        <h5 style="margin-bottom: 0;">Joe Blogs - Some Album - 01 - Track 01.mp3 (2:33)</h5>
+        <h5 style="margin-bottom: 0;" id="track_title">(track title)</h5>
         <ul style="margin: 0; padding: 0; list-style: none;">
-          <li>upbeat, gentle, 320cbr</li>
-          <li>23 items, 1:51:12</li>
+          <li id="track_tags">(tags)</li>
+          <li id="queue_info">(queue info)</li>
         </ul>
         <ol style="margin: 0; list-style: disc; padding-left: 1em;">
           <li>Joe Blogs - Some Album - 02 - Track 02.mp3 (2:18)</li>
