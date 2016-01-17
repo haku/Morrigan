@@ -146,4 +146,66 @@ MnApi = {};
     });
   }
 
+  MnApi.getQueue = function(pid, onStatus, onQueue) {
+    $.ajax({
+      type : 'GET',
+      cache : false,
+      url : 'players/' + pid + '/queue',
+      dataType : 'xml',
+      success : function(xml) {
+        var queueNode = $(xml).find('queue');
+        var queue = parseQueueNode(pid, queueNode);
+        onQueue(queue);
+        onStatus('');
+      },
+      error : function(jqXHR, textStatus, errorThrown) {
+        onStatus('Error fetching queue ' + pid + ': ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
+      }
+    });
+  }
+
+  MnApi.writeQueueItem = function(pid, item, action, onStatus, onQueue) {
+    $.ajax({
+      type : 'POST',
+      cache : false,
+      url : 'players/' + pid + '/queue' + (item ? '/' + item.id : ''),
+      data : 'action=' + action,
+      contentTypeString : 'application/x-www-form-urlencoded',
+      dataType : 'xml',
+      beforeSend : function() {
+        onStatus(action + '-ing...');
+      },
+      success : function(xml) {
+        var queueNode = $(xml).find('queue');
+        var newQueue = parseQueueNode(pid, queueNode);
+        onQueue(newQueue);
+        onStatus('Queue ' + pid + ' updated.');
+      },
+      error : function(jqXHR, textStatus, errorThrown) {
+        onStatus('Error: ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
+      }
+    });
+  }
+
+  function parseQueueNode(pid, node) {
+    var queue = {};
+    queue.pid = pid;
+    queue.length = parseInt(node.find('queuelength').text());
+    queue.duration = node.find('queueduration').text();
+    queue.items = [];
+    node.find('entry').each(function() {
+      var item = parseQueueItemNode($(this));
+      queue.items.push(item);
+    });
+    return queue;
+  }
+
+  function parseQueueItemNode(node) {
+    var item = {};
+    item.id = parseInt(node.find('id').text());
+    item.title = node.find('title').text();
+    item.duration = parseInt(node.find('duration').text());
+    return item;
+  }
+
 })();

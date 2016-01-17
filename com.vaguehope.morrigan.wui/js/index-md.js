@@ -28,11 +28,11 @@
   }
 
   function startPoller() {
+    fetchAndDisplayPlayers();
     setInterval(function() {
       fetchAndDisplayPlayers();
       fetchAndDisplayPlayer();
     }, REFRESH_PLAYERS_SECONDS * 1000);
-    fetchAndDisplayPlayers();
   }
 
   function fetchAndDisplayPlayers() {
@@ -88,7 +88,71 @@
     //$('.list', playerDiv).text(player.listTitle);
     $('#track_title').text(player.trackTitle + ' (' + player.trackDuration + 's)');
     $('#track_tags').text(player.tags.length > 0 ? player.tags.join(', ') : '(no tags)');
-    $('#queue_info').text(player.queueLength + ' items, ' + player.queueDuration);
+    $('#queue_info').text(player.queueLength + ' items, ' + player.queueDuration + 's');
+
+    fetchAndDisplayQueue(); // TODO only do this if queue in player has changed.
+  }
+
+  function fetchAndDisplayQueue() {
+    if (!selectedPlayerPid) return;
+    MnApi.getQueue(selectedPlayerPid, function(msg) {
+      if (msg && msg.length > 0) console.log(msg);
+    }, displayQueue);
+  }
+
+  function displayQueue(queue) {
+    var queueList = $('#queue_list');
+    var allItemIds = {};
+
+    $.each(queue.items, function(index, item) {
+      var domId = 'qitem' + item.id;
+      var itemEl = $('#' + domId, queueList);
+      if (itemEl.size() < 1) {
+        itemEl = makeQueueItem(item.id, domId);
+        queueList.append(itemEl);
+      }
+      updateQueueItem(item, itemEl);
+      allItemIds[item.id] = true;
+    });
+
+    $('.item', queueList).each(function() {
+      var item = $(this);
+      var itemId = item.data('id');
+      if (!allItemIds[itemId]) {
+        item.remove();
+      }
+    });
+
+    // For order of elements by appending them again in the right order.
+    // FIXME I am sure there must be a more efficient way to do this.
+    var currentElements = {};
+    $('.item', queueList).each(function() {
+      var item = $(this);
+      currentElements[item.attr('id')] = item;
+    });
+    var newElements = [];
+    $.each(queue.items, function(index, item) {
+      newElements.push(currentElements['qitem' + item.id]);
+    });
+    queueList.append(newElements);
+  }
+
+  function makeQueueItem(itemId, domId) {
+    var itemEl = $('<li class="item">');
+    itemEl.attr('id', domId);
+    itemEl.data('id', itemId);
+    itemEl.append($('<a class="clickable title" href="">'));
+    return itemEl;
+  }
+
+  function updateQueueItem(item, itemEl) {
+    $('.title', itemEl).text(item.title);
+    var clickable = $('.clickable', itemEl);
+    clickable.unbind();
+    clickable.click(function(event) {
+      event.preventDefault();
+      console.log('clicked', item);
+    });
   }
 
 })();

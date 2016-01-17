@@ -3,3 +3,12 @@
   flex-direction: row;
   align-items: center;
 }
+
+#queue_list a:link, #queue_list a:visited, #queue_list a:active, #queue_list a:hover {
+  text-decoration: none;
+  color: inherit;
+}
+#queue_list .item:hover {
+  background: Highlight;
+  color: HighlightText;
+}
