@@ -22,7 +22,9 @@
       else {
         var search = UrlParams.params['search'];
         search = search ? search : DEFAULT_QUERY;
-        runQuery(itemsDiv, mid, search);
+        var column = UrlParams.params['search_column'];
+        var order = UrlParams.params['search_order'];
+        runQuery(itemsDiv, mid, search, column, order);
         makeToolbar(itemsDiv, mid);
       }
     }
@@ -184,14 +186,14 @@
     return mid.match(/\/(.+?)\./)[1];
   }
 
-  function runQuery(itemsDiv, mid, query) {
+  function runQuery(itemsDiv, mid, query, sortColumn, sortOrder) {
     itemsDiv.empty();
     itemsDiv.append($('<p>Running query...</p>'));
-    updateQuery(itemsDiv, mid, query);
+    updateQuery(itemsDiv, mid, query, sortColumn, sortOrder);
   }
 
-  function updateQuery(itemsDiv, mid, query) {
-    getQuery(mid, query, function(msg) {
+  function updateQuery(itemsDiv, mid, query, sortColumn, sortOrder) {
+    getQuery(mid, query, sortColumn, sortOrder, function(msg) {
       queryStatusBar.text(msg);
     }, function(items) {
       displayQuery(mid, query, itemsDiv, items);
@@ -235,13 +237,17 @@
     });
   }
 
-  function getQuery(mid, query, onStatus, onItems) {
+  function getQuery(mid, query, sortColumn, sortOrder, onStatus, onItems) {
     var id = midToId(mid);
-    var encodedQuery = encodeURIComponent(query);
+
+    var url = 'mlists/' + mid + '/query/' + encodeURIComponent(query) + '?view=' + encodeURIComponent(UrlParams.params['listview'] || '');
+    if (sortColumn) url += "&column=" + sortColumn;
+    if (sortOrder) url += "&order=" + sortOrder;
+
     $.ajax({
       type : 'GET',
       cache : false,
-      url : 'mlists/' + mid + '/query/' + encodedQuery + '?view=' + encodeURIComponent(UrlParams.params['listview'] || ''),
+      url : url,
       dataType : 'xml',
       beforeSend : function() {
         onStatus('Querying ' + id + '...');
@@ -312,6 +318,24 @@
     var txtSearch = $('<input type="text">');
     dlg.append(txtSearch);
 
+    var sortColumn = $('<select>');
+    $.each(['date_last_played', 'path', 'date_added', 'start_count', 'end_count', 'duration'], function(index, column) {
+      var opt = $('<option>');
+      opt.text(column);
+      opt.attr('value', column)
+      sortColumn.append(opt);
+    });
+    dlg.append(sortColumn);
+
+    var sortOrder = $('<select>');
+    $.each(['desc', 'asc'], function(index, order) {
+      var opt = $('<option>');
+      opt.text(order);
+      opt.attr('value', order)
+      sortOrder.append(opt);
+    });
+    dlg.append(sortOrder);
+
     var btnSearch = $('<button>search</button>');
     dlg.append(btnSearch);
 
@@ -329,7 +353,7 @@
     });
 
     btnSearch.click(function() {
-      runQuery(itemsDiv, mid, txtSearch.val());
+      runQuery(itemsDiv, mid, txtSearch.val(), sortColumn.val(), sortOrder.val());
       dlg.remove();
     });
 

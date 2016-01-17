@@ -159,7 +159,7 @@ body, p, div, span {
   font-size: 80%;
 }
 
-.popup button, .popup a, .popup input {
+.popup button, .popup a, .popup input, .popup select {
   width: 90%;
   min-height: 3em;
   margin: .5em;

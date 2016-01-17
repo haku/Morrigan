@@ -19,12 +19,15 @@ import javax.servlet.http.HttpServletResponse;
 import org.xml.sax.SAXException;
 
 import com.megginson.sax.DataWriter;
+import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
+import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
 import com.vaguehope.morrigan.model.media.IMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.IMixedMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaAlbum;
 import com.vaguehope.morrigan.model.media.MediaFactory;
@@ -71,6 +74,7 @@ import com.vaguehope.sqlitewrapper.DbException;
  * POST /mlists/LOCALMMDB/example.local.db3/albums/somealbum action=queue&playerid=0
  *
  *  GET /mlists/LOCALMMDB/example.local.db3/query/example
+ *  GET /mlists/LOCALMMDB/example.local.db3/query/example?column=foo&order=asc
  * </pre>
  */
 public class MlistsServlet extends HttpServlet {
@@ -87,6 +91,8 @@ public class MlistsServlet extends HttpServlet {
 	private static final String PARAM_PLAYERID = "playerid";
 	private static final String PARAM_TAG = "tag";
 	private static final String PARAM_VIEW = "view";
+	private static final String PARAM_COLUMN = "column";
+	private static final String PARAM_ORDER = "order";
 
 	public static final String CMD_NEWMMDB = "newmmdb";
 	public static final String CMD_SCAN = "scan";
@@ -122,13 +128,13 @@ public class MlistsServlet extends HttpServlet {
 		try {
 			processRequest(Verb.GET, req, resp, null);
 		}
-		catch (DbException e) {
+		catch (final DbException e) {
 			throw new ServletException(e);
 		}
-		catch (SAXException e) {
+		catch (final SAXException e) {
 			throw new ServletException(e);
 		}
-		catch (MorriganException e) {
+		catch (final MorriganException e) {
 			throw new ServletException(e);
 		}
 	}
@@ -136,7 +142,7 @@ public class MlistsServlet extends HttpServlet {
 	@Override
 	protected void doPost (final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
 		try {
-			String act = req.getParameter(PARAM_ACTION);
+			final String act = req.getParameter(PARAM_ACTION);
 			if (act == null) {
 				ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "HTTP Error 400 'action' parameter not set desu~");
 			}
@@ -144,13 +150,13 @@ public class MlistsServlet extends HttpServlet {
 				processRequest(Verb.POST, req, resp, act);
 			}
 		}
-		catch (DbException e) {
+		catch (final DbException e) {
 			throw new ServletException(e);
 		}
-		catch (SAXException e) {
+		catch (final SAXException e) {
 			throw new ServletException(e);
 		}
-		catch (MorriganException e) {
+		catch (final MorriganException e) {
 			throw new ServletException(e);
 		}
 	}
@@ -165,8 +171,8 @@ public class MlistsServlet extends HttpServlet {
 	 * Param action will not be null when verb==POST.
 	 */
 	private void processRequest (final Verb verb, final HttpServletRequest req, final HttpServletResponse resp, final String action) throws IOException, DbException, SAXException, MorriganException {
-		String requestURI = req.getRequestURI();
-		String reqPath = requestURI.startsWith(CONTEXTPATH) ? requestURI.substring(CONTEXTPATH.length()) : requestURI;
+		final String requestURI = req.getRequestURI();
+		final String reqPath = requestURI.startsWith(CONTEXTPATH) ? requestURI.substring(CONTEXTPATH.length()) : requestURI;
 
 		if (reqPath == null || reqPath.length() < 1 || reqPath.equals(ROOTPATH)) {
 			if (verb == Verb.POST) {
@@ -177,28 +183,28 @@ public class MlistsServlet extends HttpServlet {
 			}
 		}
 		else {
-			String path = reqPath.startsWith(ROOTPATH) ? reqPath.substring(ROOTPATH.length()) : reqPath;
+			final String path = reqPath.startsWith(ROOTPATH) ? reqPath.substring(ROOTPATH.length()) : reqPath;
 			if (path.length() > 0) {
-				String[] pathParts = path.split("/");
+				final String[] pathParts = path.split("/");
 				if (pathParts.length >= 2) {
-					String type = pathParts[0];
+					final String type = pathParts[0];
 					if (type.equals(ILocalMixedMediaDb.TYPE) || type.equals(IRemoteMixedMediaDb.TYPE)) {
 						final String filter = StringHelper.trimToNull(req.getParameter(PARAM_VIEW));
 						final IMixedMediaDb mmdb;
 						if (type.equals(ILocalMixedMediaDb.TYPE)) {
-							String f = LocalMixedMediaDbHelper.getFullPathToMmdb(pathParts[1]);
+							final String f = LocalMixedMediaDbHelper.getFullPathToMmdb(pathParts[1]);
 							mmdb = this.mediaFactory.getLocalMixedMediaDb(f, filter);
 						}
 						else if (type.equals(IRemoteMixedMediaDb.TYPE)) {
-							String f = RemoteMixedMediaDbHelper.getFullPathToMmdb(pathParts[1]);
+							final String f = RemoteMixedMediaDbHelper.getFullPathToMmdb(pathParts[1]);
 							mmdb = RemoteMixedMediaDbFactory.getExisting(f, filter);
 						}
 						else {
 							throw new IllegalArgumentException("Out of cheese desu~.  Please reinstall universe and reboot desu~.");
 						}
 
-						String subPath = pathParts.length >= 3 ? pathParts[2] : null;
-						String afterSubPath = pathParts.length >= 4 ? pathParts[3] : null;
+						final String subPath = pathParts.length >= 3 ? pathParts[2] : null;
+						final String afterSubPath = pathParts.length >= 4 ? pathParts[3] : null;
 						if (verb == Verb.POST) {
 							postToMmdb(req, resp, action, mmdb, subPath, afterSubPath);
 						}
@@ -231,9 +237,9 @@ public class MlistsServlet extends HttpServlet {
 
 	private void postToMmdb (final HttpServletRequest req, final HttpServletResponse resp, final String action, final IMixedMediaDb mmdb, final String path, final String afterPath) throws IOException, MorriganException, DbException {
 		if (path != null && path.equals(PATH_ITEMS) && afterPath != null && afterPath.length() > 0) {
-			String filepath = URLDecoder.decode(afterPath, "UTF-8");
+			final String filepath = URLDecoder.decode(afterPath, "UTF-8");
 			if (mmdb.hasFile(filepath)) {
-				IMixedMediaItem item = mmdb.getByFile(filepath);
+				final IMixedMediaItem item = mmdb.getByFile(filepath);
 				if (item != null) {
 					postToMmdbItem(req, resp, action, mmdb, item);
 				}
@@ -246,8 +252,8 @@ public class MlistsServlet extends HttpServlet {
 			}
 		}
 		else if (path != null && path.equals(PATH_ALBUMS) && afterPath != null && afterPath.length() > 0) {
-			String albumName = URLDecoder.decode(afterPath, "UTF-8");
-			MediaAlbum album = mmdb.getAlbum(albumName);
+			final String albumName = URLDecoder.decode(afterPath, "UTF-8");
+			final MediaAlbum album = mmdb.getAlbum(albumName);
 			if (album != null) {
 				postToMmdbAlbum(req, resp, action, mmdb, album);
 			}
@@ -262,7 +268,7 @@ public class MlistsServlet extends HttpServlet {
 
 	private void postToMmdb (final HttpServletRequest req, final HttpServletResponse resp, final String action, final IMixedMediaDb mmdb) throws IOException, MorriganException {
 		if (action.equals(CMD_PLAY) || action.equals(CMD_QUEUE)) {
-			Player player = parsePlayer(req, resp);
+			final Player player = parsePlayer(req, resp);
 			if (player != null) { // parsePlayer() will write the error msg.
 				resp.setContentType("text/plain");
 				if (action.equals(CMD_PLAY)) {
@@ -292,7 +298,7 @@ public class MlistsServlet extends HttpServlet {
 
 	private void postToMmdbItem (final HttpServletRequest req, final HttpServletResponse resp, final String action, final IMixedMediaDb mmdb, final IMixedMediaItem item) throws IOException, MorriganException {
 		if (action.equals(CMD_PLAY) || action.equals(CMD_QUEUE)) {
-			Player player = parsePlayer(req, resp);
+			final Player player = parsePlayer(req, resp);
 			if (player != null) { // parsePlayer() will write the error msg.
 				resp.setContentType("text/plain");
 				if (action.equals(CMD_PLAY)) {
@@ -311,7 +317,7 @@ public class MlistsServlet extends HttpServlet {
 			}
 		}
 		else if (action.equals(CMD_ADDTAG)) {
-			String tag = req.getParameter(PARAM_TAG);
+			final String tag = req.getParameter(PARAM_TAG);
 			if (tag != null && tag.length() > 0) {
 				mmdb.addTag(item, tag, MediaTagType.MANUAL, (MediaTagClassification) null);
 				resp.setContentType("text/plain");
@@ -328,13 +334,13 @@ public class MlistsServlet extends HttpServlet {
 
 	private void postToMmdbAlbum (final HttpServletRequest req, final HttpServletResponse resp, final String action, final IMixedMediaDb mmdb, final MediaAlbum album) throws IOException, MorriganException {
 		if (action.equals(CMD_PLAY) || action.equals(CMD_QUEUE)) {
-			Player player = parsePlayer(req, resp);
+			final Player player = parsePlayer(req, resp);
 			if (player != null) { // parsePlayer() will write the error msg.
 				mmdb.read();
 				resp.setContentType("text/plain");
-				Collection<IMixedMediaItem> tracks = mmdb.getAlbumItems(MediaType.TRACK, album);
-				List<PlayItem> trackPlayItems = new ArrayList<PlayItem>();
-				for (IMixedMediaItem track : tracks) {
+				final Collection<IMixedMediaItem> tracks = mmdb.getAlbumItems(MediaType.TRACK, album);
+				final List<PlayItem> trackPlayItems = new ArrayList<PlayItem>();
+				for (final IMixedMediaItem track : tracks) {
 					trackPlayItems.add(new PlayItem(mmdb, track));
 				}
 				if (action.equals(CMD_PLAY)) {
@@ -358,7 +364,7 @@ public class MlistsServlet extends HttpServlet {
 	}
 
 	private Player parsePlayer (final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-		String playerId = req.getParameter(PARAM_PLAYERID);
+		final String playerId = req.getParameter(PARAM_PLAYERID);
 		if (playerId == null) {
 			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "HTTP error 400 'playerId' parameter not set desu~");
 			return null;
@@ -370,22 +376,22 @@ public class MlistsServlet extends HttpServlet {
 
 	private void printMlistList (final HttpServletResponse resp) throws IOException, SAXException {
 		resp.setContentType("text/xml;charset=utf-8");
-		DataWriter dw = FeedHelper.startFeed(resp.getWriter());
+		final DataWriter dw = FeedHelper.startFeed(resp.getWriter());
 
 		FeedHelper.addElement(dw, "title", "Morrigan media lists desu~");
 		FeedHelper.addLink(dw, CONTEXTPATH, "self", "text/xml");
 
-		Collection<Player> players = this.playerListener.getPlayers();
+		final Collection<Player> players = this.playerListener.getPlayers();
 
 		// TODO merge 2 loops.
 
-		for (MediaListReference listRef : this.mediaFactory.getAllLocalMixedMediaDbs()) {
+		for (final MediaListReference listRef : this.mediaFactory.getAllLocalMixedMediaDbs()) {
 			FeedHelper.startElement(dw, "entry", new String[][] { { "type", "local" } });
 			printMlistShort(dw, listRef, players);
 			dw.endElement("entry");
 		}
 
-		for (MediaListReference listRef : RemoteMixedMediaDbHelper.getAllRemoteMmdb()) {
+		for (final MediaListReference listRef : RemoteMixedMediaDbHelper.getAllRemoteMmdb()) {
 			FeedHelper.startElement(dw, "entry", new String[][] { { "type", "remote" } });
 			printMlistShort(dw, listRef, players);
 			dw.endElement("entry");
@@ -401,19 +407,19 @@ public class MlistsServlet extends HttpServlet {
 		else if (path.equals(PATH_ITEMS)) {
 			if (afterPath != null && afterPath.length() > 0) {
 				// Request to fetch media file.
-				String filepath = URLDecoder.decode(afterPath, "UTF-8");
+				final String filepath = URLDecoder.decode(afterPath, "UTF-8");
 				if (mmdb.hasFile(filepath)) {
-					IMixedMediaItem item = mmdb.getByFile(filepath);
-					boolean asDownload = item.getMediaType() == MediaType.TRACK;
-					File file = new File(filepath);
+					final IMixedMediaItem item = mmdb.getByFile(filepath);
+					final boolean asDownload = item.getMediaType() == MediaType.TRACK;
+					final File file = new File(filepath);
 					if (file.exists()) {
 						if (ServletHelper.checkCanReturn304(file.lastModified(), req, resp)) return;
 						ServletHelper.returnFile(file, resp, asDownload);
 					}
 					else {
-						long lastModified = System.currentTimeMillis() - TimeUnit.HOURS.toMillis(1); // Falsify.
+						final long lastModified = System.currentTimeMillis() - TimeUnit.HOURS.toMillis(1); // Falsify.
 						if (ServletHelper.checkCanReturn304(lastModified, req, resp)) return;
-						String name = asDownload ? item.getTitle() : null;
+						final String name = asDownload ? item.getTitle() : null;
 						ServletHelper.prepForReturnFile(name, 0, resp); // TODO pass through length?
 						mmdb.copyItemFile(item, resp.getOutputStream());
 						resp.flushBuffer();
@@ -432,8 +438,8 @@ public class MlistsServlet extends HttpServlet {
 		}
 		else if (path.equals(PATH_ALBUMS)) {
 			if (afterPath != null && afterPath.length() > 0) {
-				String albumName = URLDecoder.decode(afterPath, "UTF-8");
-				MediaAlbum album = mmdb.getAlbum(albumName);
+				final String albumName = URLDecoder.decode(afterPath, "UTF-8");
+				final MediaAlbum album = mmdb.getAlbum(albumName);
 				if (album != null) {
 					printAlbum(resp, mmdb, album);
 				}
@@ -446,18 +452,67 @@ public class MlistsServlet extends HttpServlet {
 			}
 		}
 		else if (path.equals(PATH_QUERY) && afterPath != null && afterPath.length() > 0) {
-			String query = URLDecoder.decode(afterPath, "UTF-8");
-			printMlistLong(resp, mmdb, false, true, query);
+			final String query = URLDecoder.decode(afterPath, "UTF-8");
+			final IDbColumn[] sortColumns = parseSortColumns(req);
+			final SortDirection[] sortDirections = parseSortOrder(req);
+			printMlistLong(resp, mmdb, false, true, query, sortColumns, sortDirections);
 		}
 		else {
 			ServletHelper.error(resp, HttpServletResponse.SC_NOT_FOUND, "HTTP error 404 unknown path '" + path + "' desu~");
 		}
 	}
 
+	private enum SortColumn {
+		PATH(IMixedMediaItemStorageLayer.SQL_TBL_MEDIAFILES_COL_FILE),
+		DATE_ADDED(IMixedMediaItemStorageLayer.SQL_TBL_MEDIAFILES_COL_DADDED),
+		DATE_LAST_PLAYED(IMixedMediaItemStorageLayer.SQL_TBL_MEDIAFILES_COL_DLASTPLAY),
+		START_COUNT(IMixedMediaItemStorageLayer.SQL_TBL_MEDIAFILES_COL_STARTCNT),
+		END_COUNT(IMixedMediaItemStorageLayer.SQL_TBL_MEDIAFILES_COL_ENDCNT),
+		DURATION(IMixedMediaItemStorageLayer.SQL_TBL_MEDIAFILES_COL_DURATION),
+		;
+
+		private final String apiName;
+		private final IDbColumn column;
+
+		private SortColumn (final IDbColumn column) {
+			this.apiName = StringHelper.downcase(this.name());
+			this.column = column;
+		}
+
+		public String getApiName () {
+			return this.apiName;
+		}
+
+		public IDbColumn getColumn () {
+			return this.column;
+		}
+	}
+
+	private static IDbColumn[] parseSortColumns (final HttpServletRequest req) {
+		final String raw = StringHelper.downcase(StringHelper.trimToNull(req.getParameter(PARAM_COLUMN)));
+		for (final SortColumn sortColumn : SortColumn.values()) {
+			if (sortColumn.getApiName().equals(raw)) {
+				return new IDbColumn[] { sortColumn.getColumn() }; // TODO append additional.
+			}
+		}
+		return null;
+	}
+
+	private static SortDirection[] parseSortOrder (final HttpServletRequest req) {
+		final String raw = StringHelper.downcase(StringHelper.trimToNull(req.getParameter(PARAM_ORDER)));
+		if ("asc".equals(raw)) {
+			return new SortDirection[] { SortDirection.ASC };
+		}
+		else if ("desc".equals(raw)) {
+			return new SortDirection[] { SortDirection.DESC };
+		}
+		return null;
+	}
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private static void printMlistShort (final DataWriter dw, final MediaListReference listRef, final Collection<Player> players) throws SAXException {
-		String fileName = listRef.getIdentifier().substring(listRef.getIdentifier().lastIndexOf(File.separator) + 1);
+		final String fileName = listRef.getIdentifier().substring(listRef.getIdentifier().lastIndexOf(File.separator) + 1);
 
 		FeedHelper.addElement(dw, "title", listRef.getTitle());
 
@@ -474,27 +529,27 @@ public class MlistsServlet extends HttpServlet {
 		}
 		FeedHelper.addLink(dw, CONTEXTPATH + "/" + type + "/" + fileName, "self", "text/xml");
 
-		for (Player p : players) {
+		for (final Player p : players) {
 			FeedHelper.addLink(dw, "/player/" + p.getId() + "/play/" + fileName, "play", "cmd");
 		}
 	}
 
 	private static void printMlistLong (final HttpServletResponse resp, final IMixedMediaDb ml, final boolean listSrcs, final boolean listItems) throws SAXException, MorriganException, DbException, IOException {
-		printMlistLong(resp, ml, listSrcs, listItems, null);
+		printMlistLong(resp, ml, listSrcs, listItems, null, null, null);
 	}
 
-	private static void printMlistLong (final HttpServletResponse resp, final IMixedMediaDb ml, final boolean listSrcs, final boolean listItems, final String queryString) throws SAXException, MorriganException, DbException, IOException {
-		printMlistLong(resp, ml, listSrcs, listItems, true, queryString); // TODO always include tags?
+	private static void printMlistLong (final HttpServletResponse resp, final IMixedMediaDb ml, final boolean listSrcs, final boolean listItems, final String queryString, final IDbColumn[] sortColumns, final SortDirection[] sortDirections) throws SAXException, MorriganException, DbException, IOException {
+		printMlistLong(resp, ml, listSrcs, listItems, true, queryString, sortColumns, sortDirections);
 	}
 
-	private static void printMlistLong (final HttpServletResponse resp, final IMixedMediaDb ml, final boolean listSrcs, final boolean listItems, final boolean includeTags, final String queryString) throws SAXException, MorriganException, DbException, IOException {
+	private static void printMlistLong (final HttpServletResponse resp, final IMixedMediaDb ml, final boolean listSrcs, final boolean listItems, final boolean includeTags, final String queryString, final IDbColumn[] sortColumns, final SortDirection[] sortDirections) throws SAXException, MorriganException, DbException, IOException {
 		ml.read();
 		resp.setContentType("text/xml;charset=utf-8");
-		DataWriter dw = FeedHelper.startDocument(resp.getWriter(), "mlist");
+		final DataWriter dw = FeedHelper.startDocument(resp.getWriter(), "mlist");
 
 		List<IMixedMediaItem> items;
 		if (queryString != null) {
-			items = ml.simpleSearch(queryString, MAX_RESULTS);
+			items = ml.simpleSearch(queryString, MAX_RESULTS, sortColumns, sortDirections);
 		}
 		else {
 			items = ml.getMediaItems();
@@ -504,7 +559,7 @@ public class MlistsServlet extends HttpServlet {
 		try {
 			listFile = URLEncoder.encode(FeedHelper.filenameFromPath(ml.getListId()), "UTF-8");
 		}
-		catch (UnsupportedEncodingException e) {
+		catch (final UnsupportedEncodingException e) {
 			throw new RuntimeException(e);
 		}
 
@@ -514,7 +569,7 @@ public class MlistsServlet extends HttpServlet {
 
 		// TODO calculate these values from query results.
 		if (queryString == null) {
-			DurationData totalDuration = ml.getTotalDuration();
+			final DurationData totalDuration = ml.getTotalDuration();
 			dw.dataElement("duration", String.valueOf(totalDuration.getDuration()));
 			dw.dataElement("durationcomplete", String.valueOf(totalDuration.isComplete()));
 
@@ -523,20 +578,20 @@ public class MlistsServlet extends HttpServlet {
 			dw.dataElement("sortdirection", ml.getSortDirection().toString());
 		}
 
-		String pathToSelf = CONTEXTPATH + "/" + ml.getType() + "/" + listFile;
+		final String pathToSelf = CONTEXTPATH + "/" + ml.getType() + "/" + listFile;
 		FeedHelper.addLink(dw, pathToSelf, "self", "text/xml");
 		if (!listItems) FeedHelper.addLink(dw, pathToSelf + "/" + PATH_ITEMS, PATH_ITEMS, "text/xml");
 		FeedHelper.addLink(dw, pathToSelf + "/" + PATH_ALBUMS, PATH_ALBUMS, "text/xml");
 		FeedHelper.addLink(dw, pathToSelf + "/" + PATH_SRC, PATH_SRC, "text/xml");
 
 		if (listSrcs) {
-			for (String s : ml.getSources()) {
+			for (final String s : ml.getSources()) {
 				FeedHelper.addElement(dw, "src", s);
 			}
 		}
 
 		if (listItems) {
-			for (IMixedMediaItem mi : items) {
+			for (final IMixedMediaItem mi : items) {
 				dw.startElement("entry");
 
 				FeedHelper.addElement(dw, "title", mi.getTitle());
@@ -568,8 +623,8 @@ public class MlistsServlet extends HttpServlet {
 				}
 
 				if (includeTags) {
-					List<MediaTag> tags = ml.getTags(mi);
-					for (MediaTag tag : tags) {
+					final List<MediaTag> tags = ml.getTags(mi);
+					for (final MediaTag tag : tags) {
 						FeedHelper.addElement(dw, "tag", tag.getTag(), new String[][] {
 								{ "t", String.valueOf(tag.getType().getIndex()) },
 								{ "c", tag.getClassification() == null ? "" : tag.getClassification().getClassification() }
@@ -587,8 +642,8 @@ public class MlistsServlet extends HttpServlet {
 	private static void printAlbums (final HttpServletResponse resp, final IMixedMediaDb ml) throws SAXException, IOException, MorriganException {
 		ml.read();
 		resp.setContentType("text/xml;charset=utf-8");
-		DataWriter dw = FeedHelper.startDocument(resp.getWriter(), "albums");
-		for (MediaAlbum album : ml.getAlbums()) {
+		final DataWriter dw = FeedHelper.startDocument(resp.getWriter(), "albums");
+		for (final MediaAlbum album : ml.getAlbums()) {
 			dw.startElement("entry");
 			printAlbumBody(dw, ml, album);
 			dw.endElement("entry");
@@ -599,7 +654,7 @@ public class MlistsServlet extends HttpServlet {
 	private static void printAlbum (final HttpServletResponse resp, final IMixedMediaDb ml, final MediaAlbum album) throws SAXException, IOException, MorriganException {
 		ml.read();
 		resp.setContentType("text/xml;charset=utf-8");
-		DataWriter dw = FeedHelper.startDocument(resp.getWriter(), "album");
+		final DataWriter dw = FeedHelper.startDocument(resp.getWriter(), "album");
 		printAlbumBody(dw, ml, album);
 		FeedHelper.endDocument(dw, "album");
 	}
@@ -619,7 +674,7 @@ public class MlistsServlet extends HttpServlet {
 		try {
 			return URLEncoder.encode(f.getAbsolutePath(), "UTF-8");
 		}
-		catch (UnsupportedEncodingException e) {
+		catch (final UnsupportedEncodingException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -628,7 +683,7 @@ public class MlistsServlet extends HttpServlet {
 		try {
 			return URLEncoder.encode(mi.getFilepath(), "UTF-8");
 		}
-		catch (UnsupportedEncodingException e) {
+		catch (final UnsupportedEncodingException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -637,7 +692,7 @@ public class MlistsServlet extends HttpServlet {
 		try {
 			return URLEncoder.encode(album.getName(), "UTF-8");
 		}
-		catch (UnsupportedEncodingException e) {
+		catch (final UnsupportedEncodingException e) {
 			throw new RuntimeException(e);
 		}
 	}

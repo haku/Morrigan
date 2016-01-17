@@ -565,6 +565,24 @@ Players = {};
     });
     dlg.append(txtSearch);
 
+    var sortColumn = $('<select>');
+    $.each(['date_last_played', 'path', 'date_added', 'start_count', 'end_count', 'duration'], function(index, column) {
+      var opt = $('<option>');
+      opt.text(column);
+      opt.attr('value', column)
+      sortColumn.append(opt);
+    });
+    dlg.append(sortColumn);
+
+    var sortOrder = $('<select>');
+    $.each(['desc', 'asc'], function(index, order) {
+      var opt = $('<option>');
+      opt.text(order);
+      opt.attr('value', order)
+      sortOrder.append(opt);
+    });
+    dlg.append(sortOrder);
+
     var btnSearch = $('<button>search</button>');
     dlg.append(btnSearch);
 
@@ -583,8 +601,15 @@ Players = {};
     }, function(player) {
       title.text('Search ' + player.listTitle);
       btnSearch.click(function() {
+        if (!player.mid) {
+          alert("No list selected.");
+          return;
+        }
+
         var href = '/?mid=' + player.mid + '&tpid=' + player.pid + '&search=' + encodeURIComponent(txtSearch.val());
         if (player.listView) href += '&listview=' + encodeURIComponent(player.listView);
+        href += "&search_column=" + sortColumn.val();
+        href += "&search_order=" + sortOrder.val();
         window.location.href = href;
       });
     });

@@ -1,6 +1,7 @@
 package com.vaguehope.morrigan.util;
 
 import java.util.Collection;
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 public class StringHelper {
@@ -37,6 +38,11 @@ public class StringHelper {
 	public static String trimToEmpty (final String s) {
 		if (s == null) return "";
 		return s.trim();
+	}
+
+	public static String downcase(final String s) {
+		if (s == null) return null;
+		return s.toLowerCase(Locale.ENGLISH);
 	}
 
 }
