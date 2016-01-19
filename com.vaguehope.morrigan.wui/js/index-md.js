@@ -8,6 +8,10 @@
   $(document).ready(function() {
     updatePageTitle();
     startPoller();
+    setDbTabToDbs();
+
+    $('#fixed_tab_queue').click(function(){$('#footer').show()});
+    $('#fixed_tab_db').click(function(){$('#footer').hide()});
   });
 
   function updatePageTitle() {
@@ -153,6 +157,92 @@
       event.preventDefault();
       console.log('clicked', item);
     });
+  }
+
+// DB tab.
+
+  function setDbTabToDbs() {
+    MnApi.getDbs(function(msg) {
+      if (msg && msg.length > 0) console.log(msg);
+    }, displayDbs);
+
+    $('#db_title').text('Fetching...');
+    $('#db_list').empty();
+    // TODO show spinner.
+  }
+
+  function setDbTabToSearch(mid, view, query, sortColumn, sortOrder) {
+    query ? $('#db_query').val(query) : query = $('#db_query').val();
+    sortColumn ? $('#db_sort_column').val(sortColumn) : sortColumn = $('#db_sort_column').val();
+    sortOrder ? $('#db_sort_order').val(sortOrder) : sortOrder = $('#db_sort_order').val();
+
+    MnApi.getQuery(mid, view, query, sortColumn, sortOrder, function(msg) {
+      if (msg && msg.length > 0) console.log(msg);
+    }, displayResults);
+
+    $('#db_title').text('Fetching...');
+    $('#db_list').empty();
+    // TODO show spinner.
+
+    $('#db_go_back').unbind().click(function(){setDbTabToDbs()});
+    $('#db_query').unbind().keyup(function(event){if (event.keyCode == 13) {setDbTabToSearch(mid, view)}});
+    $('#db_sort_column').unbind().change(function(){setDbTabToSearch(mid, view)});
+    $('#db_sort_order').unbind().change(function(){setDbTabToSearch(mid, view)});
+    $('#db_sort_options').show();
+  }
+
+  function displayDbs(dbs) {
+    $('#db_title').text(dbs.length + ' DBs');
+    $('#db_sort_options').hide();
+
+    var dbList = $('#db_list');
+    dbList.empty();
+    $.each(dbs, function(index, db) {
+      if (db.type === "remote") return true;
+      dbList.append(makeDbItem(db));
+    });
+  }
+
+  function makeDbItem(db) {
+    var a = $('<a class="clickable title" href="">');
+    a.text(db.title);
+
+    var el = $('<li class="item">');
+    el.append(a);
+
+    a.unbind();
+    a.click(function(event) {
+      event.preventDefault();
+      setDbTabToSearch(db.mid);
+    });
+
+    return el;
+  }
+
+  function displayResults(results) {
+    $('#db_title').text(results.length + ' items');
+
+    var dbList = $('#db_list');
+    dbList.empty();
+    $.each(results, function(index, result) {
+      dbList.append(makeResultItem(result));
+    });
+  }
+
+  function makeResultItem(res) {
+    var a = $('<a class="clickable title" href="">');
+    a.text(res.title + ' (' + res.duration + 's)');
+
+    var el = $('<li class="item">');
+    el.append(a);
+
+    a.unbind();
+    a.click(function(event) {
+      event.preventDefault();
+      console.log(res);
+    });
+
+    return el;
   }
 
 })();

@@ -1,14 +1,27 @@
+/* Side menu item icon position fix. */
 .mdl-layout__drawer .mdl-navigation .mdl-navigation__link {
   display: flex !important;
   flex-direction: row;
   align-items: center;
 }
 
-#queue_list a:link, #queue_list a:visited, #queue_list a:active, #queue_list a:hover {
+/* Remove padding after textfields. */
+.mdl-textfield {
+  padding-bottom: 0;
+}
+.mdl-textfield__label:after {
+   bottom: 0;
+}
+
+/* List items. */
+.clickable_list a {
+  display: block;
+}
+.clickable_list a:link, .clickable_list a:visited, .clickable_list a:active, .clickable_list a:hover {
   text-decoration: none;
   color: inherit;
 }
-#queue_list .item:hover {
+.clickable_list .item:hover {
   background: Highlight;
   color: HighlightText;
 }
