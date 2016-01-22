@@ -3,7 +3,7 @@
   var REFRESH_PLAYERS_SECONDS = 5;
   var HOST_NAME;
 
-  var selectedPlayerPid;
+  var selectedPlayer;
 
   $(document).ready(function() {
     updatePageTitle();
@@ -12,6 +12,7 @@
 
     $('#fixed_tab_queue').click(function(){$('#footer').show()});
     $('#fixed_tab_db').click(function(){$('#footer').hide()});
+    wireFooter();
   });
 
   function updatePageTitle() {
@@ -39,6 +40,8 @@
     }, REFRESH_PLAYERS_SECONDS * 1000);
   }
 
+// Sidebar.
+
   function fetchAndDisplayPlayers() {
     MnApi.getPlayers(function(msg) {
       if (msg && msg.length > 0) console.log(msg);
@@ -47,7 +50,7 @@
 
   function displayPlayers(players) {
     $.each(players, function(index, player) {
-      if (!selectedPlayerPid) setSelectedPlayer(player); // TODO also if player gone.
+      if (!selectedPlayer) setSelectedPlayer(player); // TODO also if player gone.
 
       var playerElem = $('#player_' + player.pid);
       if (playerElem.size() < 1) {
@@ -73,14 +76,48 @@
     // TODO remove gone players.
   }
 
+// Footer.
+
+  function wireFooter() {
+    $('#footer_search').click(footerSearchClicked);
+    $('#footer_pause').click(footerPauseClicked);
+    $('#footer_next').click(footerNextClicked);
+  }
+
+  function footerSearchClicked() {
+    if (selectedPlayer && selectedPlayer.mid) {
+      setDbTabToSearch(selectedPlayer.mid, selectedPlayer.listView);
+      $('#fixed_tab_db span').click();
+      $('#db_query').focus();
+    }
+  }
+
+  function footerPauseClicked() {
+    if (selectedPlayer) {
+      MnApi.playerPause(selectedPlayer.pid, function(msg) {
+        if (msg && msg.length > 0) console.log(msg);
+      }, displayPlayer);
+    }
+  }
+
+  function footerNextClicked() {
+    if (selectedPlayer) {
+      MnApi.playerNext(selectedPlayer.pid, function(msg) {
+        if (msg && msg.length > 0) console.log(msg);
+      }, displayPlayer);
+    }
+  }
+
+// Player tab.
+
   function setSelectedPlayer(player) {
-    selectedPlayerPid = player.pid;
+    selectedPlayer = player;
     fetchAndDisplayPlayer();
   }
 
   function fetchAndDisplayPlayer() {
-    if (!selectedPlayerPid) return;
-    MnApi.getPlayer(selectedPlayerPid, function(msg) {
+    if (!selectedPlayer) return;
+    MnApi.getPlayer(selectedPlayer.pid, function(msg) {
       if (msg && msg.length > 0) console.log(msg);
     }, displayPlayer);
   }
@@ -98,8 +135,8 @@
   }
 
   function fetchAndDisplayQueue() {
-    if (!selectedPlayerPid) return;
-    MnApi.getQueue(selectedPlayerPid, function(msg) {
+    if (!selectedPlayer) return;
+    MnApi.getQueue(selectedPlayer.pid, function(msg) {
       if (msg && msg.length > 0) console.log(msg);
     }, displayQueue);
   }
