@@ -10,8 +10,7 @@
     startPoller();
     setDbTabToDbs();
 
-    $('#fixed_tab_queue').click(function(){$('#footer').show()});
-    $('#fixed_tab_db').click(function(){$('#footer').hide()});
+    wireTabs();
     wireFooter();
   });
 
@@ -106,6 +105,32 @@
         if (msg && msg.length > 0) console.log(msg);
       }, displayPlayer);
     }
+  }
+
+// Tabs.
+
+  function wireTabs() {
+    var footer = $('#footer');
+    var playbackOrder = $('#mnu_playback_order');
+    var clearQueue = $('#mnu_clear_queue');
+    var shuffleQueue = $('#mnu_shuffle_queue');
+    var addAll = $('#mnu_add_all');
+
+    $('#fixed_tab_queue').click(function() {
+      footer.show();
+      playbackOrder.show();
+      clearQueue.show();
+      shuffleQueue.show();
+      addAll.hide();
+    });
+
+    $('#fixed_tab_db').click(function() {
+      footer.hide();
+      playbackOrder.hide();
+      clearQueue.hide();
+      shuffleQueue.hide();
+      addAll.show();
+    });
   }
 
 // Player tab.
