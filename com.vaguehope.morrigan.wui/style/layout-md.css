@@ -25,3 +25,32 @@
   background: Highlight;
   color: HighlightText;
 }
+
+/* pop-up menu. */
+.popup {
+  position: fixed;
+  z-index: 100;
+  top: 10%;
+  left: 50%;
+  width: 16em;
+  margin-left: -8em; /* width/2 */
+  text-align: center;
+  border-radius: 0.5em 0.5em 0 0;
+
+  border: 1px solid MenuText;
+  background: Menu;
+  color: MenuText;
+}
+.popup .title {
+  margin: 0.2em;
+  line-height: 1.2;
+}
+.popup .stats {
+  margin: 0.2em;
+  font-size: 80%;
+}
+.popup button {
+  width: 90%;
+  min-height: 3em;
+  margin: .5em;
+}

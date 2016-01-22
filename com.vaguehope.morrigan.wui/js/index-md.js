@@ -339,10 +339,24 @@
     a.unbind();
     a.click(function(event) {
       event.preventDefault();
-      console.log(res);
+      showItemMenu(res);
     });
 
     return el;
+  }
+
+  function showItemMenu(item) {
+    var menu = $('#item_menu');
+    $('.title', menu).text(item.title);
+    $('.stats', menu).text(item.startCount + '/' + item.endCount + ' ' + item.duration + 's');
+    $('.enqueue', menu).unbind().click(function(event) {
+      if (!selectedPlayer) return;
+      MnApi.enqueueItems(item, selectedPlayer.listView, selectedPlayer.pid, onStatus, function(msg) {
+        console.log(msg);
+        menu.hide();
+      });
+    });
+    menu.show();
   }
 
 })();
