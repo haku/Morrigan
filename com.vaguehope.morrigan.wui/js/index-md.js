@@ -4,6 +4,9 @@
   var HOST_NAME;
 
   var selectedPlayer;
+  var currentDbMid;
+  var currentDbQuery;
+  var currentDbResults;
 
   $(document).ready(function() {
     updatePageTitle();
@@ -39,12 +42,14 @@
     }, REFRESH_PLAYERS_SECONDS * 1000);
   }
 
+  function onStatus(msg) {
+    if (msg && msg.length > 0) console.log(msg);
+  }
+
 // Sidebar.
 
   function fetchAndDisplayPlayers() {
-    MnApi.getPlayers(function(msg) {
-      if (msg && msg.length > 0) console.log(msg);
-    }, displayPlayers);
+    MnApi.getPlayers(onStatus, displayPlayers);
   }
 
   function displayPlayers(players) {
@@ -92,36 +97,32 @@
   }
 
   function footerPauseClicked() {
-    if (selectedPlayer) {
-      MnApi.playerPause(selectedPlayer.pid, function(msg) {
-        if (msg && msg.length > 0) console.log(msg);
-      }, displayPlayer);
-    }
+    if (!selectedPlayer) return;
+    MnApi.playerPause(selectedPlayer.pid, onStatus, displayPlayer);
   }
 
   function footerNextClicked() {
-    if (selectedPlayer) {
-      MnApi.playerNext(selectedPlayer.pid, function(msg) {
-        if (msg && msg.length > 0) console.log(msg);
-      }, displayPlayer);
-    }
+    if (!selectedPlayer) return;
+     MnApi.playerNext(selectedPlayer.pid, onStatus, displayPlayer);
   }
 
-// Tabs.
+// Tabs and menu.
 
   function wireTabs() {
     var footer = $('#footer');
     var playbackOrder = $('#mnu_playback_order');
     var clearQueue = $('#mnu_clear_queue');
     var shuffleQueue = $('#mnu_shuffle_queue');
-    var addAll = $('#mnu_add_all');
+    var enqueueAll = $('#mnu_enqueue_all');
+    var enqueueView = $('#mnu_enqueue_view');
 
     $('#fixed_tab_queue').click(function() {
       footer.show();
       playbackOrder.show();
       clearQueue.show();
       shuffleQueue.show();
-      addAll.hide();
+      enqueueAll.hide();
+      enqueueView.hide();
     });
 
     $('#fixed_tab_db').click(function() {
@@ -129,7 +130,43 @@
       playbackOrder.hide();
       clearQueue.hide();
       shuffleQueue.hide();
-      addAll.show();
+      enqueueAll.show();
+      enqueueView.show();
+    });
+
+    playbackOrder.click(playbackOrderClicked);
+    clearQueue.click(clearQueueClicked);
+    shuffleQueue.click(shuffleQueueClicked);
+    enqueueAll.click(enqueueAllClicked);
+    enqueueView.click(enqueueViewClicked);
+  }
+
+  function playbackOrderClicked() {
+    if (!selectedPlayer) return;
+    // TODO
+  }
+
+  function clearQueueClicked() {
+    if (!selectedPlayer) return;
+    MnApi.writeQueueItem(selectedPlayer.pid, null, 'clear', onStatus, displayQueue);
+  }
+
+  function shuffleQueueClicked() {
+    if (!selectedPlayer) return;
+    MnApi.writeQueueItem(selectedPlayer.pid, null, 'shuffle', onStatus, displayQueue);
+  }
+
+  function enqueueAllClicked() {
+    if (!currentDbResults || !selectedPlayer) return;
+    MnApi.enqueueItems(currentDbResults, selectedPlayer.listView, selectedPlayer.pid, onStatus, function(msg) {
+      console.log(msg);
+    });
+  }
+
+  function enqueueViewClicked() {
+    if (!currentDbMid || !currentDbQuery || !currentDbResults || !selectedPlayer) return;
+    MnApi.enqueueView(currentDbMid, currentDbQuery, selectedPlayer.pid, onStatus, function(msg) {
+      console.log(msg);
     });
   }
 
@@ -142,9 +179,7 @@
 
   function fetchAndDisplayPlayer() {
     if (!selectedPlayer) return;
-    MnApi.getPlayer(selectedPlayer.pid, function(msg) {
-      if (msg && msg.length > 0) console.log(msg);
-    }, displayPlayer);
+    MnApi.getPlayer(selectedPlayer.pid, onStatus, displayPlayer);
   }
 
   function displayPlayer(player) {
@@ -161,9 +196,7 @@
 
   function fetchAndDisplayQueue() {
     if (!selectedPlayer) return;
-    MnApi.getQueue(selectedPlayer.pid, function(msg) {
-      if (msg && msg.length > 0) console.log(msg);
-    }, displayQueue);
+    MnApi.getQueue(selectedPlayer.pid, onStatus, displayQueue);
   }
 
   function displayQueue(queue) {
@@ -224,10 +257,11 @@
 // DB tab.
 
   function setDbTabToDbs() {
-    MnApi.getDbs(function(msg) {
-      if (msg && msg.length > 0) console.log(msg);
-    }, displayDbs);
+    currentDbMid = null;
+    currentDbQuery = null;
+    currentDbResults = null;
 
+    MnApi.getDbs(onStatus, displayDbs);
     $('#db_title').text('Fetching...');
     $('#db_list').empty();
     // TODO show spinner.
@@ -238,9 +272,11 @@
     sortColumn ? $('#db_sort_column').val(sortColumn) : sortColumn = $('#db_sort_column').val();
     sortOrder ? $('#db_sort_order').val(sortOrder) : sortOrder = $('#db_sort_order').val();
 
-    MnApi.getQuery(mid, view, query, sortColumn, sortOrder, function(msg) {
-      if (msg && msg.length > 0) console.log(msg);
-    }, displayResults);
+    currentDbMid = mid;
+    currentDbQuery = query;
+    currentDbResults = null;
+
+    MnApi.getQuery(mid, view, query, sortColumn, sortOrder, onStatus, displayResults);
 
     $('#db_title').text('Fetching...');
     $('#db_list').empty();
@@ -282,6 +318,8 @@
   }
 
   function displayResults(results) {
+    currentDbResults = results;
+
     $('#db_title').text(results.length + ' items');
 
     var dbList = $('#db_list');

@@ -342,4 +342,47 @@ MnApi = {};
     return mid.match(/\/(.+?)\./)[1];
   }
 
+  MnApi.enqueueItems = function(items, view, pid, onStatus, onComplete) {
+    actionItem(items, view, pid, 'queue', onStatus, onComplete);
+  }
+
+  MnApi.enqueueView = function(mid, view, pid, onStatus, onComplete) {
+    actionItem({url: '/mlists/' + mid}, view, pid, 'queue', onStatus, onComplete);
+  }
+
+  function actionItem(item, view, pid, action, onStatus, onComplete) {
+    var data = 'action=' + action + '&playerid=' + pid;
+    if (view) data += '&view=' + encodeURIComponent(view);
+
+    var params = {
+      type : 'POST',
+      cache : false,
+      data : data,
+      contentTypeString : 'application/x-www-form-urlencoded',
+      dataType : 'text',
+      beforeSend : function() {
+        onStatus(action + '-ing...');
+      },
+      success : function(text) {
+        onStatus('');
+        onComplete(text);
+      },
+      error : function(jqXHR, textStatus, errorThrown) {
+        onStatus('Error: ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
+      }
+    };
+
+    if ($.isArray(item)) {
+      $.each(item, function(index, i) {
+        var p = jQuery.extend({}, params);
+        p.url = i.url;
+        $.ajax(p);
+      });
+    }
+    else {
+      params.url = item.url;
+      $.ajax(params);
+    }
+  }
+
 })();
