@@ -250,8 +250,24 @@
     clickable.unbind();
     clickable.click(function(event) {
       event.preventDefault();
-      console.log('clicked', item);
+      showQueueItemMenu(item);
     });
+  }
+
+  function showQueueItemMenu(item) {
+    var menu = $('#queue_item_menu');
+    $('.title', menu).text(item.title);
+    $.each(['top', 'up', 'remove', 'down', 'bottom'], function(index, action) {
+      $('.' + action, menu).unbind().click(function() {
+        if (!selectedPlayer) return;
+        MnApi.writeQueueItem(selectedPlayer.pid, item, action, onStatus, displayQueue);
+        menu.hide();
+      });
+    });
+    $('.close', menu).unbind().click(function(event) {
+      menu.hide();
+    });
+    menu.show();
   }
 
 // DB tab.
@@ -339,14 +355,14 @@
     a.unbind();
     a.click(function(event) {
       event.preventDefault();
-      showItemMenu(res);
+      showDbItemMenu(res);
     });
 
     return el;
   }
 
-  function showItemMenu(item) {
-    var menu = $('#item_menu');
+  function showDbItemMenu(item) {
+    var menu = $('#db_item_menu');
     $('.title', menu).text(item.title);
     $('.stats', menu).text(item.startCount + '/' + item.endCount + ' ' + item.duration + 's');
     $('.enqueue', menu).unbind().click(function(event) {
@@ -355,6 +371,9 @@
         console.log(msg);
         menu.hide();
       });
+    });
+    $('.close', menu).unbind().click(function(event) {
+      menu.hide();
     });
     menu.show();
   }
