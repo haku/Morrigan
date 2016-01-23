@@ -17,7 +17,14 @@
   <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header mdl-layout--fixed-tabs">
     <header class="mdl-layout__header">
       <div class="mdl-layout__header-row">
-        <span class="mdl-layout-title" id="player_name">Player Name (host_name)</span>
+        <div>
+          <span class="mdl-layout-title" id="player_name">(No player selected)</span>
+          <span class="subtitle">
+            <span id="subtitle_list_name">-</span>
+            <span>|</span>
+            <span id="subtitle_playback_order">-</span>
+          </span>
+        </div>
         <div class="mdl-layout-spacer"></div>
         <button id="demo-menu-lower-right" class="mdl-button mdl-js-button mdl-button--icon">
           <i class="material-icons">more_vert</i>
@@ -28,6 +35,13 @@
           <li class="mdl-menu__item" id="mnu_shuffle_queue">Shuffle Queue</li>
           <li class="mdl-menu__item" id="mnu_enqueue_all" style="display: none;">Enqueue All</li>
           <li class="mdl-menu__item" id="mnu_enqueue_view" style="display: none;">Enqueue View</li>
+        </ul>
+        <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="mnu_playback_order">
+          <li class="mdl-menu__item" id="mnu_playback_order_sequential">Sequential</li>
+          <li class="mdl-menu__item" id="mnu_playback_order_random">Random</li>
+          <li class="mdl-menu__item" id="mnu_playback_order_bystartcount">By Start-Count</li>
+          <li class="mdl-menu__item" id="mnu_playback_order_bylastplayed">By Last-Played</li>
+          <li class="mdl-menu__item" id="mnu_playback_order_manual">Manual</li>
         </ul>
       </div>
       <div class="mdl-layout__tab-bar mdl-js-ripple-effect">

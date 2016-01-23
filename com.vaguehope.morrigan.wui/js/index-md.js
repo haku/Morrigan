@@ -13,7 +13,7 @@
     startPoller();
     setDbTabToDbs();
 
-    wireTabs();
+    wireTabsAndMenus();
     wireFooter();
   });
 
@@ -108,7 +108,7 @@
 
 // Tabs and menu.
 
-  function wireTabs() {
+  function wireTabsAndMenus() {
     var footer = $('#footer');
     var playbackOrder = $('#mnu_playback_order');
     var clearQueue = $('#mnu_clear_queue');
@@ -134,16 +134,17 @@
       enqueueView.show();
     });
 
-    playbackOrder.click(playbackOrderClicked);
     clearQueue.click(clearQueueClicked);
     shuffleQueue.click(shuffleQueueClicked);
     enqueueAll.click(enqueueAllClicked);
     enqueueView.click(enqueueViewClicked);
-  }
 
-  function playbackOrderClicked() {
-    if (!selectedPlayer) return;
-    // TODO
+    $.each(MnApi.PLAYBACK_ORDERS, function(index, order) {
+      $('#mnu_playback_order_' + order.id.toLowerCase()).click(function() {
+        if (!selectedPlayer) return;
+        MnApi.playerPlaybackOrder(selectedPlayer.pid, order, onStatus, displayPlayer);
+      });
+    });
   }
 
   function clearQueueClicked() {
@@ -185,8 +186,8 @@
   function displayPlayer(player) {
     $('#player_name').text(player.name + ' (' + HOST_NAME + ')');
     $('#queue_tab_icon').text(player.stateIcon);
-    //$('.order', playerDiv).text(player.playOrderTitle);
-    //$('.list', playerDiv).text(player.listTitle);
+    $('#subtitle_list_name').text(player.listTitle);
+    $('#subtitle_playback_order').text(MnApi.PLAYBACK_ORDERS[player.playOrder]['title']);
     $('#track_title').text(player.trackTitle + ' (' + player.trackDuration + 's)');
     $('#track_tags').text(player.tags.length > 0 ? player.tags.join(', ') : '(no tags)');
     $('#queue_info').text(player.queueLength + ' items, ' + player.queueDuration + 's');

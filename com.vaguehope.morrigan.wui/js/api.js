@@ -59,7 +59,7 @@ MnApi = {};
     player.stateName = PLAYER_STATE_NAMES[parseInt(player.state)];
     player.stateIcon = PLAYER_STATE_ICONS[parseInt(player.state)];
 
-    player.playOrder = node.find('playorder').text();
+    player.playOrder = parseInt(node.find('playorder').text(), 10);
     player.playOrderTitle = node.find('playordertitle').text();
 
     player.trackTitle = node.find('tracktitle').text();
@@ -110,11 +110,11 @@ MnApi = {};
   }
 
   MnApi.PLAYBACK_ORDERS = [
-    {id: "SEQUENTIAL",   title: "sequential"},
-    {id: "RANDOM",       title: "random"},
-    {id: "BYSTARTCOUNT", title: "by start-count"},
-    {id: "BYLASTPLAYED", title: "by last-played"},
-    {id: "MANUAL",       title: "manual"}
+    {id: "SEQUENTIAL",   title: "Sequential"},
+    {id: "RANDOM",       title: "Random"},
+    {id: "BYSTARTCOUNT", title: "By Start-Count"},
+    {id: "BYLASTPLAYED", title: "By Last-Played"},
+    {id: "MANUAL",       title: "Manual"}
   ];
 
   MnApi.playerPlaybackOrder = function(pid, order, onStatus, onPlayer) {
