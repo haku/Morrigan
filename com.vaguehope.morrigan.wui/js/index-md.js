@@ -53,31 +53,52 @@
   }
 
   function displayPlayers(players) {
-    $.each(players, function(index, player) {
-      if (!selectedPlayer) setSelectedPlayer(player); // TODO also if player gone.
+    var allPlayerIds = [];
+    var allPlayerDomIds = [];
+    var playersList = $('#players_list');
 
-      var playerElem = $('#player_' + player.pid);
+    $.each(players, function(index, player) {
+      allPlayerIds.push(player.pid);
+      var domId = 'player_' + player.pid;
+      allPlayerDomIds.push(domId);
+
+      var playerElem = $('#' + domId);
       if (playerElem.size() < 1) {
         playerElem = $(
-          '<a class="mdl-navigation__link" href="">'
+          '<a class="mdl-navigation__link player" href="">'
           + '<span class="mdl-button mdl-js-button mdl-button--icon">'
           + '<i class="material-icons">stop</i>'
           + '</span>'
           + '<span class="name">Name</span>'
           + '</a>');
-        playerElem.attr('id', 'player_' + player.pid);
+        playerElem.attr('id', domId);
         playerElem.unbind().click(function(event) {
           event.preventDefault();
           setSelectedPlayer(player);
           $('.mdl-layout__drawer').removeClass('is-visible');
           $('.mdl-layout__obfuscator').removeClass('is-visible');
         });
-        $('#players_list').append(playerElem);
+        playersList.append(playerElem);
       }
+
       $('.name', playerElem).text(player.name);
       $('.material-icons', playerElem).text(player.stateIcon);
     });
-    // TODO remove gone players.
+
+    $('.player', playersList).each(function(index, player) {
+      if ($.inArray(player.id, allPlayerDomIds) < 0) player.remove();
+    });
+
+    if (selectedPlayer && $.inArray(selectedPlayer.pid, allPlayerIds) < 0) selectedPlayer = null;
+    if (!selectedPlayer) {
+      $.each(players, function(index, player) {
+        if (player.state === 1) {
+          setSelectedPlayer(player);
+          return false;
+        }
+      });
+    }
+    if (!selectedPlayer && players.length > 0) setSelectedPlayer(players[0]);
   }
 
 // Footer.
