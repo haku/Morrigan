@@ -188,9 +188,9 @@
     $('#queue_tab_icon').text(player.stateIcon);
     $('#subtitle_list_name').text(player.listTitle);
     $('#subtitle_playback_order').text(MnApi.PLAYBACK_ORDERS[player.playOrder]['title']);
-    $('#track_title').text(player.trackTitle + ' (' + player.trackDuration + 's)');
+    $('#track_title').text(player.trackTitle + ' (' + MnApi.formatSeconds(player.trackDuration) + ')');
     $('#track_tags').text(player.tags.length > 0 ? player.tags.join(', ') : '(no tags)');
-    $('#queue_info').text(player.queueLength + ' items, ' + player.queueDuration + 's');
+    $('#queue_info').text(player.queueLength + ' items, ' + MnApi.formatSeconds(player.queueDuration));
 
     fetchAndDisplayQueue(); // TODO only do this if queue in player has changed.
   }
@@ -348,7 +348,7 @@
 
   function makeResultItem(res) {
     var a = $('<a class="clickable title" href="">');
-    a.text(res.title + ' (' + res.duration + 's)');
+    a.text(res.title + ' (' + MnApi.formatSeconds(res.duration) + ')');
 
     var el = $('<li class="item">');
     el.append(a);
@@ -365,7 +365,7 @@
   function showDbItemMenu(item) {
     var menu = $('#db_item_menu');
     $('.title', menu).text(item.title);
-    $('.stats', menu).text(item.startCount + '/' + item.endCount + ' ' + item.duration + 's');
+    $('.stats', menu).text(item.startCount + '/' + item.endCount + ' ' + MnApi.formatSeconds(item.duration));
     $('.enqueue', menu).unbind().click(function(event) {
       if (!selectedPlayer) return;
       MnApi.enqueueItems(item, selectedPlayer.listView, selectedPlayer.pid, onStatus, function(msg) {

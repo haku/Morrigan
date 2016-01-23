@@ -385,4 +385,17 @@ MnApi = {};
     }
   }
 
+// --- Util ---
+
+  MnApi.formatSeconds = function(s) {
+    if (s < 1) return '0:00';
+    if (s >= 3600) return parseInt(s / 3600) + ':' + zeroPad(parseInt((s % 3600) / 60)) + ':' + zeroPad(s % 60);
+    return parseInt((s % 3600) / 60) + ':' + zeroPad(s % 60);
+  }
+
+  function zeroPad(s) {
+    if (s < 10) return '0' + s;
+    return s;
+  }
+
 })();
