@@ -4,23 +4,137 @@
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
     <title>Morrigan</title>
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0">
-    <link href="style/layout.css" type="text/css" rel="stylesheet">
-    <link href="style/colours.css" type="text/css" rel="stylesheet">
+    <link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.6/material.brown-light_green.min.css" />
+    <link rel="stylesheet" href="style/layout-md.css" />
+    <script src="https://storage.googleapis.com/code.getmdl.io/1.0.6/material.min.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-    <script src="js/urlparams.js"></script>
     <script src="js/errorhelper.js"></script>
-    <script src="js/main.js"></script>
-    <script src="js/player.js"></script>
-    <script src="js/media.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/index-md.js"></script>
   </head>
-  <!-- TODO show /status ? -->
   <body>
-    <div class="players"></div>
-    <div class="mlists"></div>
-    <div class="tabs"></div>
-    <div class="statusbar"></div>
-    <div class="queue"></div>
-    <div class="mediaitems"></div>
-    <div class="clearfooter"></div>
+  <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header mdl-layout--fixed-tabs">
+    <header class="mdl-layout__header">
+      <div class="mdl-layout__header-row">
+        <div>
+          <span class="mdl-layout-title" id="player_name">(No player selected)</span>
+          <span class="subtitle">
+            <span id="subtitle_list_name">-</span>
+            <span>|</span>
+            <span id="subtitle_playback_order">-</span>
+          </span>
+        </div>
+        <div class="mdl-layout-spacer"></div>
+        <button id="demo-menu-lower-right" class="mdl-button mdl-js-button mdl-button--icon">
+          <i class="material-icons">more_vert</i>
+        </button>
+        <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="demo-menu-lower-right">
+          <li class="mdl-menu__item" id="mnu_playback_order">Playback Order</li>
+          <li class="mdl-menu__item" id="mnu_clear_queue">Clear Queue</li>
+          <li class="mdl-menu__item" id="mnu_shuffle_queue">Shuffle Queue</li>
+          <li class="mdl-menu__item" id="mnu_enqueue_all" style="display: none;">Enqueue All</li>
+          <li class="mdl-menu__item" id="mnu_enqueue_view" style="display: none;">Enqueue View</li>
+        </ul>
+        <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="mnu_playback_order">
+          <li class="mdl-menu__item" id="mnu_playback_order_sequential">Sequential</li>
+          <li class="mdl-menu__item" id="mnu_playback_order_random">Random</li>
+          <li class="mdl-menu__item" id="mnu_playback_order_bystartcount">By Start-Count</li>
+          <li class="mdl-menu__item" id="mnu_playback_order_bylastplayed">By Last-Played</li>
+          <li class="mdl-menu__item" id="mnu_playback_order_manual">Manual</li>
+        </ul>
+      </div>
+      <div class="mdl-layout__tab-bar mdl-js-ripple-effect">
+        <a href="#fixed-tab-queue" class="mdl-layout__tab is-active" id="fixed_tab_queue">
+          <span class="mdl-button mdl-js-button mdl-button--icon">
+            <i class="material-icons" id="queue_tab_icon">stop</i>
+          </span>
+          Queue
+        </a>
+        <a href="#fixed-tab-db" class="mdl-layout__tab" id="fixed_tab_db">DBs</a>
+      </div>
+    </header>
+    <div class="mdl-layout__drawer">
+      <span class="mdl-layout-title" id="drawer_title">Morrigan</span>
+      <nav class="mdl-navigation" id="players_list">
+        <!-- Players added here. -->
+      </nav>
+    </div>
+    <main class="mdl-layout__content">
+    <section class="mdl-layout__tab-panel is-active" id="fixed-tab-queue">
+      <div class="page-content" style="padding: 0 1em">
+        <h5 style="margin-bottom: 0;" id="track_title">(track title)</h5>
+        <ul style="margin: 0; padding: 0; list-style: none;">
+          <li id="track_tags">(tags)</li>
+          <li id="queue_info">(queue info)</li>
+        </ul>
+        <ol style="margin: 0; list-style: disc; padding-left: 1em;" class="clickable_list" id="queue_list">
+        </ol>
+      </div>
+    </section>
+    <section class="mdl-layout__tab-panel" id="fixed-tab-db">
+      <div class="page-content" style="padding: 0 1em">
+        <span id="db_sort_options">
+          <button class="mdl-button mdl-js-button mdl-button--icon" style="margin-right: 1em;" id="db_go_back">
+            <i class="material-icons">arrow_back</i>
+          </button>
+          <div class="mdl-textfield mdl-js-textfield" style="width: 15em;">
+            <input class="mdl-textfield__input" type="text" id="db_query">
+            <label class="mdl-textfield__label" for="db_query">Search...</label>
+          </div>
+          <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style="width: 10em;">
+            <select class="mdl-textfield__input" id="db_sort_column">
+              <option value="date_last_played">date_last_played</option>
+              <option value="path">path</option>
+              <option value="date_added">date_added</option>
+              <option value="start_count">start_count</option>
+              <option value="end_count">end_count</option>
+              <option value="duration">duration</option>
+            </select>
+          </div>
+          <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style="width: 6em;">
+          <select class="mdl-textfield__input" id="db_sort_order">
+            <option value="desc">desc</option>
+            <option value="asc">asc</option>
+          </select>
+          </div>
+        </span>
+        <h5 style="margin-bottom: 0;" id="db_title">(db title)</h5>
+        <ol style="margin: 0; list-style: disc; padding-left: 1em;" class="clickable_list" id="db_list">
+        </ol>
+      </div>
+    </section>
+    </main>
+    <footer class="mdl-mini-footer" style="padding: 1em;" id="footer">
+      <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored" id="footer_search">
+        <i class="material-icons">search</i>
+      </button>
+      <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored" id="footer_pause">
+        <i class="material-icons">pause</i>
+      </button>
+      <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored" id="footer_next">
+        <i class="material-icons">skip_next</i>
+      </button>
+    </div>
+    </footer>
+  </div>
+
+  <div class="popup" style="display: none;" id="queue_item_menu">
+    <p class="title"></p>
+    <button class="top">Top</button>
+    <button class="up">Up</button>
+    <button class="remove">Remove</button>
+    <button class="down">Down</button>
+    <button class="bottom">Bottom</button>
+    <button class="close">Close</button>
+  </div>
+
+  <div class="popup" style="display: none;" id="db_item_menu">
+    <p class="title"></p>
+    <p class="stats"></p>
+    <button class="enqueue">Enqueue</button>
+    <button class="close">Close</button>
+  </div>
+
   </body>
 </html>
