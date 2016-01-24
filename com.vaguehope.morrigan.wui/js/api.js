@@ -373,11 +373,14 @@ MnApi = {};
     };
 
     if ($.isArray(item)) {
-      $.each(item, function(index, i) {
+      var queue = item.slice();
+      function f() {
+        if (queue.length === 0) return;
         var p = jQuery.extend({}, params);
-        p.url = i.url;
-        $.ajax(p);
-      });
+        p.url = queue.shift().url;
+        $.ajax(p).then(f);
+      };
+      f();
     }
     else {
       params.url = item.url;
