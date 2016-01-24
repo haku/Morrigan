@@ -226,7 +226,7 @@
     var allItemIds = {};
 
     $.each(queue.items, function(index, item) {
-      var domId = 'qitem' + item.id;
+      var domId = 'q' + item.id;
       var itemEl = $('#' + domId, queueList);
       if (itemEl.size() < 1) {
         itemEl = makeQueueItem(item.id, domId);
@@ -244,18 +244,15 @@
       }
     });
 
-    // For order of elements by appending them again in the right order.
-    // FIXME I am sure there must be a more efficient way to do this.
-    var currentElements = {};
-    $('.item', queueList).each(function() {
-      var item = $(this);
-      currentElements[item.attr('id')] = item;
-    });
-    var newElements = [];
+
+    // Force order of queue elements.
+    var idToIndex = {};
     $.each(queue.items, function(index, item) {
-      newElements.push(currentElements['qitem' + item.id]);
+      idToIndex['q' + item.id] = index;
     });
-    queueList.append(newElements);
+    $('.item', queueList).sort(function(a, b) {
+      return idToIndex[a.id] - idToIndex[b.id];
+    }).appendTo(queueList);
   }
 
   function makeQueueItem(itemId, domId) {
