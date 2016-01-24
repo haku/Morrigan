@@ -26,6 +26,9 @@ header .subtitle span {
 /* List items. */
 .clickable_list a {
   display: block;
+  line-height: 0.5em;
+  padding-top: 0.3em;
+  padding-bottom: 0.3em;
 }
 .clickable_list a:link, .clickable_list a:visited, .clickable_list a:active, .clickable_list a:hover {
   text-decoration: none;
