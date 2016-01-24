@@ -1,3 +1,41 @@
+/* Dark colours. */
+body {
+  background-color: #000;
+  color: #fff;
+}
+.mdl-layout__drawer {
+  background-color: #222;
+  color: #fff;
+}
+.mdl-layout__drawer .mdl-navigation .mdl-navigation__link {
+  color: #fff;
+}
+.mdl-layout__drawer .mdl-navigation .mdl-navigation__link:hover {
+  background-color: #000;
+}
+.mdl-menu__outline {
+  background-color: #222;
+}
+.mdl-menu__item {
+  color: #fff;
+}
+.mdl-menu__item:hover {
+  background-color: #000;
+}
+.mdl-textfield__input {
+  background-color: #000;
+  border-bottom-color: #fff;
+}
+.mdl-textfield__label {
+  color: #aaa;
+}
+.mdl-textfield__label:after {
+  background-color: #B2FF59;
+}
+.mdl-button {
+  color: #fff;
+}
+
 /* Side menu item icon position fix. */
 .mdl-layout__drawer .mdl-navigation .mdl-navigation__link {
   display: flex !important;
@@ -47,12 +85,10 @@ header .subtitle span {
   left: 50%;
   width: 16em;
   margin-left: -8em; /* width/2 */
+  padding: 1em;
   text-align: center;
-  border-radius: 0.5em 0.5em 0 0;
 
-  border: 1px solid MenuText;
-  background: Menu;
-  color: MenuText;
+  background: #222;
 }
 .popup .title {
   margin: 0.2em;
@@ -62,8 +98,35 @@ header .subtitle span {
   margin: 0.2em;
   font-size: 80%;
 }
+.popup .separator {
+  display: block;
+  margin: 1em;
+}
+.popup .separator:after {
+  content: '';
+  height: 2px;
+  position: absolute;
+  display: block;
+  left: 0;
+  width: 100%;
+  background-color: #B2FF59;
+}
 .popup button {
   width: 90%;
   min-height: 3em;
-  margin: .5em;
+  margin: 1em .5em;
+}
+#popup-obfuscator {
+  background-color: transparent;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  z-index: 4;
+  visibility: hidden;
+}
+#popup-obfuscator.is-visible {
+  background-color: rgba(0,0,0,.5);
+  visibility: visible;
 }

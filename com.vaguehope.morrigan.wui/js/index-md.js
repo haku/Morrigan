@@ -46,6 +46,19 @@
     if (msg && msg.length > 0) console.log(msg);
   }
 
+  function showPopup(popup) {
+    $('#popup-obfuscator').addClass('is-visible').one('click', function(event) {
+      hidePopup(popup);
+      return false;
+    });
+    popup.show();
+  }
+
+  function hidePopup(popup) {
+    popup.hide();
+    $('#popup-obfuscator').removeClass('is-visible');
+  }
+
 // Sidebar.
 
   function fetchAndDisplayPlayers() {
@@ -280,13 +293,10 @@
       $('.' + action, menu).unbind().click(function() {
         if (!selectedPlayer) return;
         MnApi.writeQueueItem(selectedPlayer.pid, item, action, onStatus, displayQueue);
-        menu.hide();
+        hidePopup(menu);
       });
     });
-    $('.close', menu).unbind().click(function(event) {
-      menu.hide();
-    });
-    menu.show();
+    showPopup(menu);
   }
 
 // DB tab.
@@ -388,13 +398,11 @@
       if (!selectedPlayer) return;
       MnApi.enqueueItems(item, selectedPlayer.listView, selectedPlayer.pid, onStatus, function(msg) {
         console.log(msg);
-        menu.hide();
+        hidePopup(menu);
+        fetchAndDisplayQueue();
       });
     });
-    $('.close', menu).unbind().click(function(event) {
-      menu.hide();
-    });
-    menu.show();
+    showPopup(menu);
   }
 
 })();

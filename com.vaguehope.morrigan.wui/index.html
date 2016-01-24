@@ -121,20 +121,22 @@
 
   <div class="popup" style="display: none;" id="queue_item_menu">
     <p class="title"></p>
-    <button class="top">Top</button>
-    <button class="up">Up</button>
-    <button class="remove">Remove</button>
-    <button class="down">Down</button>
-    <button class="bottom">Bottom</button>
-    <button class="close">Close</button>
+    <span class="separator"></span>
+    <button class="mdl-button mdl-js-button mdl-js-ripple-effect top">Top</button>
+    <button class="mdl-button mdl-js-button mdl-js-ripple-effect up">Up</button>
+    <button class="mdl-button mdl-js-button mdl-js-ripple-effect remove">Remove</button>
+    <button class="mdl-button mdl-js-button mdl-js-ripple-effect down">Down</button>
+    <button class="mdl-button mdl-js-button mdl-js-ripple-effect bottom">Bottom</button>
   </div>
 
   <div class="popup" style="display: none;" id="db_item_menu">
     <p class="title"></p>
     <p class="stats"></p>
-    <button class="enqueue">Enqueue</button>
-    <button class="close">Close</button>
+    <span class="separator"></span>
+    <button class="mdl-button mdl-js-button mdl-js-ripple-effect enqueue">Enqueue</button>
   </div>
+
+  <div id="popup-obfuscator"></div>
 
   </body>
 </html>
