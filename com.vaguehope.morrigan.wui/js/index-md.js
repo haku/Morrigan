@@ -333,15 +333,17 @@
   }
 
   function displayDbs(dbs) {
-    $('#db_title').text(dbs.length + ' DBs');
-    $('#db_sort_options').hide();
-
     var dbList = $('#db_list');
     dbList.empty();
+    var count = 0;
     $.each(dbs, function(index, db) {
       if (db.type === "remote") return true;
       dbList.append(makeDbItem(db));
+      count += 1;
     });
+
+    $('#db_sort_options').hide();
+    $('#db_title').text(count + ' DBs');
   }
 
   function makeDbItem(db) {
