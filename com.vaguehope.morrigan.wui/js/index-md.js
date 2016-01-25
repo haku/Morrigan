@@ -103,13 +103,11 @@
     });
 
     if (selectedPlayer && $.inArray(selectedPlayer.pid, allPlayerIds) < 0) selectedPlayer = null;
-    if (!selectedPlayer) {
-      $.each(players, function(index, player) {
-        if (player.state === 1) {
-          setSelectedPlayer(player);
-          return false;
-        }
-      });
+    if (!selectedPlayer && players.length > 1) {
+      var sortedPlayers = players.sort();
+      var PRIORITY = [3,0,2,1] // stopped, playing, paused, loading.
+      sortedPlayers.sort(function(a, b) {return PRIORITY[a.state] - PRIORITY[b.state]});
+      setSelectedPlayer(sortedPlayers[0]);
     }
     if (!selectedPlayer && players.length > 0) setSelectedPlayer(players[0]);
   }

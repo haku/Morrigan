@@ -55,9 +55,9 @@ MnApi = {};
     player.pid = node.find('playerid').text();
     player.name = node.find('playername').text();
     player.title = node.find('title').text();
-    player.state = node.find('playstate').text();
-    player.stateName = PLAYER_STATE_NAMES[parseInt(player.state)];
-    player.stateIcon = PLAYER_STATE_ICONS[parseInt(player.state)];
+    player.state = parseInt(node.find('playstate').text(), 10);
+    player.stateName = PLAYER_STATE_NAMES[parseInt(player.state, 10)];
+    player.stateIcon = PLAYER_STATE_ICONS[parseInt(player.state, 10)];
 
     player.playOrder = parseInt(node.find('playorder').text(), 10);
     player.playOrderTitle = node.find('playordertitle').text();
@@ -68,9 +68,9 @@ MnApi = {};
       player.listTitle = "(no list)";
     }
 
-    player.trackDuration = parseInt(node.find('trackduration').text());
-    player.queueLength = parseInt(node.find('queuelength').text());
-    player.queueDuration = parseInt(node.find('queueduration').text());
+    player.trackDuration = parseInt(node.find('trackduration').text(), 10);
+    player.queueLength = parseInt(node.find('queuelength').text(), 10);
+    player.queueDuration = parseInt(node.find('queueduration').text(), 10);
 
     player.tags = [];
     node.find('tracktag').each(function() {
@@ -194,7 +194,7 @@ MnApi = {};
   function parseQueueNode(pid, node) {
     var queue = {};
     queue.pid = pid;
-    queue.length = parseInt(node.find('queuelength').text());
+    queue.length = parseInt(node.find('queuelength').text(), 10);
     queue.duration = node.find('queueduration').text();
     queue.items = [];
     node.find('entry').each(function() {
@@ -206,9 +206,9 @@ MnApi = {};
 
   function parseQueueItemNode(node) {
     var item = {};
-    item.id = parseInt(node.find('id').text());
+    item.id = parseInt(node.find('id').text(), 10);
     item.title = node.find('title').text();
-    item.duration = parseInt(node.find('duration').text());
+    item.duration = parseInt(node.find('duration').text(), 10);
     return item;
   }
 
@@ -273,8 +273,8 @@ MnApi = {};
     mlist.id = midToId(mlist.mid);
     mlist.type = node.attr('type');
     mlist.title = node.find('title').text();
-    mlist.count = parseInt(node.find('count').text());
-    mlist.duration = parseInt(node.find('duration').text());
+    mlist.count = parseInt(node.find('count').text(), 10);
+    mlist.duration = parseInt(node.find('duration').text(), 10);
     mlist.durationComplete = (node.find('durationcomplete').text() === 'true');
     return mlist;
   }
@@ -321,9 +321,9 @@ MnApi = {};
     var item = {};
     item.relativeUrl = node.find('link[rel="self"]').attr('href');
     item.title = node.find('title').text();
-    item.duration = parseInt(node.find('duration').text());
-    item.startCount = parseInt(node.find('startcount').text());
-    item.endCount = parseInt(node.find('endcount').text());
+    item.duration = parseInt(node.find('duration').text(), 10);
+    item.startCount = parseInt(node.find('startcount').text(), 10);
+    item.endCount = parseInt(node.find('endcount').text(), 10);
 
     item.tags = [];
     node.find('tag').each(function() {
