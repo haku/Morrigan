@@ -392,6 +392,7 @@
     var menu = $('#db_item_menu');
     $('.title', menu).text(item.title);
     $('.stats', menu).text(item.startCount + '/' + item.endCount + ' ' + MnApi.formatSeconds(item.duration));
+    $('.tags', menu).text(item.tags.join(', '));
     $('.enqueue', menu).unbind().click(function(event) {
       if (!selectedPlayer) return;
       MnApi.enqueueItems(item, selectedPlayer.listView, selectedPlayer.pid, onStatus, function(msg) {

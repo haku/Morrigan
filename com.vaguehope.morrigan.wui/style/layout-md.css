@@ -91,11 +91,11 @@ header .subtitle span {
   background: #222;
 }
 .popup .title {
-  margin: 0.2em;
+  margin: 0;
   line-height: 1.2;
 }
-.popup .stats {
-  margin: 0.2em;
+.popup .stats, .popup .tags {
+  margin: 0;
   font-size: 80%;
 }
 .popup .separator {
