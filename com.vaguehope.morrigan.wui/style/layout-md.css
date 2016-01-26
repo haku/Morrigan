@@ -53,9 +53,19 @@ header .subtitle span {
   margin-right: 0.2em;
 }
 
-/* Remove padding after textfields. */
+/* Undo upcase. */
+.mdl-button, .mdl-layout__tab {
+  text-transform: none;
+}
+
+/* Remove padding around textfields. */
 .mdl-textfield {
-  padding-bottom: 0;
+  padding: 0;
+}
+.mdl-textfield__label {
+  top: 0;
+  left: 0;
+  padding-top: 0.2em;
 }
 .mdl-textfield__label:after {
    bottom: 0;
@@ -84,6 +94,9 @@ header .subtitle span {
   top: 10%;
   left: 50%;
   width: 16em;
+  max-height: 70%;
+  overflow-x: hidden;
+  overflow-y: auto;
   margin-left: -8em; /* width/2 */
   padding: 1em;
   text-align: center;
@@ -111,10 +124,25 @@ header .subtitle span {
   width: 100%;
   background-color: #B2FF59;
 }
-.popup button {
+.popup > button, .popup > .row {
   width: 90%;
   min-height: 3em;
   margin: 1em .5em;
+}
+.popup .mdl-textfield {
+  width: 90%;
+  margin: 1em .5em;
+}
+.popup > .row {
+  position: relative;
+}
+.popup > .row > .pri {
+  position: absolute;
+  left: 0;
+}
+.popup > .row > .aux {
+  position: absolute;
+  right: 0;
 }
 #popup-obfuscator {
   background-color: transparent;

@@ -74,7 +74,7 @@
     </section>
     <section class="mdl-layout__tab-panel" id="fixed-tab-db">
       <div class="page-content" style="padding: 0 1em">
-        <span id="db_sort_options">
+        <div id="db_sort_options" style="padding-top: 1em;">
           <button class="mdl-button mdl-js-button mdl-button--icon" style="margin-right: 1em;" id="db_go_back">
             <i class="material-icons">arrow_back</i>
           </button>
@@ -98,7 +98,7 @@
             <option value="asc">asc</option>
           </select>
           </div>
-        </span>
+        </div>
         <h5 style="margin-bottom: 0;" id="db_title">(db title)</h5>
         <ol style="margin: 0; list-style: disc; padding-left: 1em;" class="clickable_list" id="db_list">
         </ol>
@@ -136,6 +136,16 @@
     <p class="tags"></p>
     <span class="separator"></span>
     <button class="mdl-button mdl-js-button mdl-js-ripple-effect enqueue">Enqueue</button>
+    <button class="mdl-button mdl-js-button mdl-js-ripple-effect edit_tags">Tags</button>
+  </div>
+
+  <div class="popup" style="display: none;" id="tag_editor">
+    <p class="title"></p>
+    <span class="separator"></span>
+    <div class="mdl-textfield mdl-js-textfield">
+      <input class="mdl-textfield__input" type="text" id="new_tag">
+      <label class="mdl-textfield__label" for="new_tag">New tag</label>
+    </div>
   </div>
 
   <div id="popup-obfuscator"></div>

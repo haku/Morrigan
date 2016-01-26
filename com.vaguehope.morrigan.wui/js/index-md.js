@@ -403,7 +403,32 @@
         fetchAndDisplayQueue();
       });
     });
+    $('.edit_tags', menu).unbind().click(function(event) {
+      hidePopup(menu);
+      showTagEditor(item);
+    });
     showPopup(menu);
+  }
+
+  function showTagEditor(item) {
+    var dlg = $('#tag_editor');
+    $('.title', dlg).text(item.title);
+
+    $('.row', dlg).remove();
+    $.each(item.tags, function(index, tag) {
+      var search = $('<button class="mdl-button mdl-js-button mdl-js-ripple-effect pri">');
+      search.text(tag);
+
+      var remove = $('<button class="mdl-button mdl-js-button mdl-js-ripple-effect aux"><i class="material-icons">delete</i></button>');
+
+      var row = $('<div class="row">');
+      row.append(search);
+      row.append(remove);
+
+      dlg.append(row);
+    });
+
+    showPopup(dlg);
   }
 
 })();
