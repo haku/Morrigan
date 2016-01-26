@@ -67,6 +67,7 @@ import com.vaguehope.sqlitewrapper.DbException;
  * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 view=myview&action=play&playerid=0
  * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 view=myview&action=queue&playerid=0
  * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 action=addtag&tag=foo
+ * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 action=rmtag&tag=foo
  *
  *  GET /mlists/LOCALMMDB/example.local.db3/albums
  *  GET /mlists/LOCALMMDB/example.local.db3/albums/somealbum
@@ -99,6 +100,7 @@ public class MlistsServlet extends HttpServlet {
 	public static final String CMD_PLAY = "play";
 	public static final String CMD_QUEUE = "queue";
 	public static final String CMD_ADDTAG = "addtag";
+	public static final String CMD_RMTAG = "rmtag";
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -322,6 +324,30 @@ public class MlistsServlet extends HttpServlet {
 				mmdb.addTag(item, tag, MediaTagType.MANUAL, (MediaTagClassification) null);
 				resp.setContentType("text/plain");
 				resp.getWriter().println("Tag '" + tag + "' added desu~");
+			}
+			else {
+				ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "'tag' parameter not set desu~");
+			}
+		}
+		else if (action.equals(CMD_RMTAG)) {
+			final String tag = req.getParameter(PARAM_TAG);
+			if (tag != null && tag.length() > 0) {
+				final List<MediaTag> tags = mmdb.getTags(item);
+				boolean found = false;
+				for (final MediaTag mt : tags) {
+					if (mt.getType() == MediaTagType.MANUAL && mt.getClassification() == null && tag.equals(mt.getTag())) {
+						mmdb.removeTag(mt);
+						found = true;
+						break;
+					}
+				}
+				if (found) {
+					resp.setContentType("text/plain");
+					resp.getWriter().println("Tag '" + tag + "' removed desu~");
+				}
+				else {
+					ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "tag '" + tag + "' not found desu~");
+				}
 			}
 			else {
 				ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "'tag' parameter not set desu~");

@@ -445,6 +445,13 @@
 
       var remove = $('<button class="mdl-button mdl-js-button mdl-js-ripple-effect aux"><i class="material-icons">delete</i></button>');
       remove.unbind().click(function() {
+        if (window.confirm("Tag: " + tag + "\n\nRemove?")) {
+          MnApi.rmTag(item, tag, onStatus, function(msg) {
+            console.log(msg);
+            item.tags = jQuery.grep(item.tags, function(val){return val != tag});
+            showTagEditor(item); // TODO be less lazy.
+          });
+        }
       });
 
       var row = $('<div class="row">');

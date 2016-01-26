@@ -361,6 +361,10 @@ MnApi = {};
     actionItem(item, 'addtag', 'tag=' + tag, onStatus, onComplete);
   };
 
+  MnApi.rmTag = function(item, tag, onStatus, onComplete) {
+    actionItem(item, 'rmtag', 'tag=' + tag, onStatus, onComplete);
+  };
+
   function actionItem(item, action, args, onStatus, onComplete) {
     var data = 'action=' + action;
     if (args) data += '&' + args;
