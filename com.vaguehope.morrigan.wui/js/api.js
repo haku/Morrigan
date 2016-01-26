@@ -298,7 +298,7 @@ MnApi = {};
       },
       success : function(xml) {
         var itemsNode = $(xml).find('mlist');
-        var items = parseItemsNode(itemsNode, mid);
+        var items = parseItemsNode(itemsNode, mid, view);
         onItems(items);
         onStatus('');
       },
@@ -308,22 +308,25 @@ MnApi = {};
     });
   }
 
-  function parseItemsNode(node, mid) {
+  function parseItemsNode(node, mid, view) {
     var items = [];
     node.find('entry').each(function() {
-      var item = parseItemNode($(this), mid);
+      var item = parseItemNode($(this), mid, view);
       items.push(item);
     });
     return items;
   }
 
-  function parseItemNode(node, mid) {
-    var item = {};
-    item.relativeUrl = node.find('link[rel="self"]').attr('href');
-    item.title = node.find('title').text();
-    item.duration = parseInt(node.find('duration').text(), 10);
-    item.startCount = parseInt(node.find('startcount').text(), 10);
-    item.endCount = parseInt(node.find('endcount').text(), 10);
+  function parseItemNode(node, mid, view) {
+    var item = {
+      mid: mid,
+      view: view,
+      relativeUrl: node.find('link[rel="self"]').attr('href'),
+      title: node.find('title').text(),
+      duration: parseInt(node.find('duration').text(), 10),
+      startCount: parseInt(node.find('startcount').text(), 10),
+      endCount: parseInt(node.find('endcount').text(), 10)
+    };
 
     item.tags = [];
     node.find('tag').each(function() {

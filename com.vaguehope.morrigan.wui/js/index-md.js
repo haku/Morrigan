@@ -310,10 +310,16 @@
     // TODO show spinner.
   }
 
-  function setDbTabToSearch(mid, view, query, sortColumn, sortOrder) {
-    query ? $('#db_query').val(query) : query = $('#db_query').val();
-    sortColumn ? $('#db_sort_column').val(sortColumn) : sortColumn = $('#db_sort_column').val();
-    sortOrder ? $('#db_sort_order').val(sortOrder) : sortOrder = $('#db_sort_order').val();
+  function setDbTabToSearch(mid, view, query) {
+    if (query) {
+      $('#db_query').val(query).parent().addClass('is-dirty'); // https://github.com/google/material-design-lite/issues/903
+    }
+    else {
+      query = $('#db_query').val();
+    }
+
+    var sortColumn = $('#db_sort_column').val();
+    var sortOrder = $('#db_sort_order').val();
 
     currentDbMid = mid;
     currentDbQuery = query;
@@ -414,12 +420,26 @@
     var dlg = $('#tag_editor');
     $('.title', dlg).text(item.title);
 
+    var newTag = $('#new_tag', dlg);
+    newTag.unbind().keyup(function(event) {
+      if (event.keyCode == 13) {
+        console.log('TODO addTag', newTag.val());
+      }
+    });
+
     $('.row', dlg).remove();
     $.each(item.tags, function(index, tag) {
       var search = $('<button class="mdl-button mdl-js-button mdl-js-ripple-effect pri">');
       search.text(tag);
+      search.unbind().click(function() {
+        setDbTabToSearch(item.mid, item.view, tag);
+        hidePopup(dlg);
+        $('#fixed_tab_db span').click();
+      });
 
       var remove = $('<button class="mdl-button mdl-js-button mdl-js-ripple-effect aux"><i class="material-icons">delete</i></button>');
+      remove.unbind().click(function() {
+      });
 
       var row = $('<div class="row">');
       row.append(search);
