@@ -346,16 +346,24 @@ MnApi = {};
   }
 
   MnApi.enqueueItems = function(items, view, pid, onStatus, onComplete) {
-    actionItem(items, view, pid, 'queue', onStatus, onComplete);
-  }
+    var args = 'playerid=' + pid;
+    if (view) args += '&view=' + encodeURIComponent(view);
+    actionItem(items, 'queue', args, onStatus, onComplete);
+  };
 
   MnApi.enqueueView = function(mid, view, pid, onStatus, onComplete) {
-    actionItem({url: '/mlists/' + mid}, view, pid, 'queue', onStatus, onComplete);
-  }
+    var args = 'playerid=' + pid;
+    if (view) args += '&view=' + encodeURIComponent(view);
+    actionItem({url: '/mlists/' + mid}, 'queue', args, onStatus, onComplete);
+  };
 
-  function actionItem(item, view, pid, action, onStatus, onComplete) {
-    var data = 'action=' + action + '&playerid=' + pid;
-    if (view) data += '&view=' + encodeURIComponent(view);
+  MnApi.addTag = function(item, tag, onStatus, onComplete) {
+    actionItem(item, 'addtag', 'tag=' + tag, onStatus, onComplete);
+  };
+
+  function actionItem(item, action, args, onStatus, onComplete) {
+    var data = 'action=' + action;
+    if (args) data += '&' + args;
 
     var params = {
       type : 'POST',

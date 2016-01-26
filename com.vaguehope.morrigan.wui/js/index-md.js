@@ -423,7 +423,13 @@
     var newTag = $('#new_tag', dlg);
     newTag.unbind().keyup(function(event) {
       if (event.keyCode == 13) {
-        console.log('TODO addTag', newTag.val());
+        var tag = newTag.val();
+        MnApi.addTag(item, tag, onStatus, function(msg) {
+          console.log(msg);
+          item.tags.unshift(tag);
+          showTagEditor(item); // TODO be less lazy.
+          newTag.val('').focus();
+        });
       }
     });
 
