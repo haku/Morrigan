@@ -5,8 +5,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.vaguehope.morrigan.config.Config;
-import com.vaguehope.morrigan.player.OrderHelper;
-import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.util.PropertiesFile;
 
 public class ServerConfig implements AuthChecker {
@@ -22,9 +20,6 @@ public class ServerConfig implements AuthChecker {
 
 	private static final String KEY_PLAYER_ENABLED = "player";
 	private static final String DEFAULT_PLAYER_ENABLED = Boolean.TRUE.toString();
-
-	private static final String KEY_PLAYBACKORDER = "order";
-	private static final PlaybackOrder DEFAULT_PLAYBACKORDER = PlaybackOrder.MANUAL;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -42,12 +37,6 @@ public class ServerConfig implements AuthChecker {
 		// TODO use bcrypt.
 		final String pass = this.propFile.getString(KEY_PASS, DEFAULT_PASS);
 		return pass.equals(passToTest);
-	}
-
-	public PlaybackOrder getPlaybackOrder () throws IOException {
-		final PlaybackOrder o = OrderHelper.forceParsePlaybackOrder(this.propFile.getString(KEY_PLAYBACKORDER, DEFAULT_PLAYBACKORDER.toString()));
-		if (o != null) return o;
-		return DEFAULT_PLAYBACKORDER;
 	}
 
 	public boolean isServerPlayerEnabled () throws IOException {

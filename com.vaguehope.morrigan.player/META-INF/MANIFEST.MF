@@ -6,7 +6,8 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: com.vaguehope.morrigan.player.PlayerActivator
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: com.vaguehope.morrigan.player
-Import-Package: com.vaguehope.morrigan.engines,
+Import-Package: com.vaguehope.morrigan.config,
+ com.vaguehope.morrigan.engines,
  com.vaguehope.morrigan.engines.common,
  com.vaguehope.morrigan.engines.playback,
  com.vaguehope.morrigan.model,

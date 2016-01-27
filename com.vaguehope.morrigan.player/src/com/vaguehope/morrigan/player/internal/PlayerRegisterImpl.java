@@ -17,6 +17,7 @@ import com.vaguehope.morrigan.player.LocalPlayer;
 import com.vaguehope.morrigan.player.LocalPlayerSupport;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayerRegister;
+import com.vaguehope.morrigan.player.PlayerStateStorage;
 
 public class PlayerRegisterImpl implements PlayerRegister {
 
@@ -28,10 +29,12 @@ public class PlayerRegisterImpl implements PlayerRegister {
 	private final Set<String> localPlayerIds = Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>());
 
 	private final PlaybackEngineFactory playbackEngineFactory;
+	private final PlayerStateStorage stateStorage;
 	private final ExecutorService executorService;
 
-	public PlayerRegisterImpl (final PlaybackEngineFactory playbackEngineFactory, final ExecutorService executorService) {
+	public PlayerRegisterImpl (final PlaybackEngineFactory playbackEngineFactory, final PlayerStateStorage stateStorage, final ExecutorService executorService) {
 		this.playbackEngineFactory = playbackEngineFactory;
+		this.stateStorage = stateStorage;
 		this.executorService = executorService;
 	}
 
@@ -88,7 +91,8 @@ public class PlayerRegisterImpl implements PlayerRegister {
 
 	@Override
 	public LocalPlayer makeLocal (final String name, final LocalPlayerSupport localPlayerSupport) {
-		LocalPlayer p = new LocalPlayerImpl(String.valueOf(nextIndex()), name, localPlayerSupport, this, this.playbackEngineFactory, this.executorService);
+		final LocalPlayer p = new LocalPlayerImpl(String.valueOf(nextIndex()), name, localPlayerSupport, this, this.playbackEngineFactory, this.executorService);
+		this.stateStorage.readState(p);
 		this.localPlayerIds.add(p.getId());
 		register(p);
 		return p;

@@ -45,4 +45,12 @@ public class StringHelper {
 		return s.toLowerCase(Locale.ENGLISH);
 	}
 
+	public static boolean blank (final String s) {
+		return s == null || s.trim().length() < 1;
+	}
+
+	public static boolean notBlank (final String s) {
+		return s != null && s.trim().length() > 0;
+	}
+
 }

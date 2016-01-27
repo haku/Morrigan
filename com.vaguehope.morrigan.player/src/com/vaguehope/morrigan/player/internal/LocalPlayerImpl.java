@@ -68,14 +68,15 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 //	Current selection.
 
 	private final Object _currentItemLock = new Object();
-	private PlayItem _currentItem = null;
+	private volatile PlayItem _currentItem = null;
 
 	/**
 	 * This is called at the start of each track.
-	 * Must call this with list a null before this
+	 * Must call this with a null before this
 	 * object is disposed so as to remove listener.
 	 */
-	private void setCurrentItem (final PlayItem item) {
+	@Override
+	public void setCurrentItem (final PlayItem item) {
 		synchronized (this._currentItemLock) {
 			if (this._currentItem != null && this._currentItem.hasList()) {
 				this._currentItem.getList().removeChangeEventListener(this.listChangedRunnable);
@@ -268,6 +269,7 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 					try {
 						item.getList().incTrackStartCnt(item.getTrack());
 						getListeners().currentItemChanged(item);
+						saveState();
 					}
 					catch (MorriganException e) {
 						LocalPlayerImpl.this.logger.log(Level.WARNING, "Failed to increment track count.", e);
@@ -347,26 +349,24 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 	}
 
 	private void internal_pausePlaying () throws MorriganException {
-		// Don't go and make a player engine instance.
-		IPlaybackEngine eng = getPlaybackEngine(false);
-		if (eng!=null) {
-			synchronized (eng) {
-				PlayState playbackState = eng.getPlaybackState();
-				if (playbackState == PlayState.PAUSED) {
-					eng.resumePlaying();
-				}
-				else if (playbackState == PlayState.PLAYING) {
-					eng.pausePlaying();
-				}
-				else if (playbackState == PlayState.STOPPED) {
-					loadAndStartPlaying(getCurrentItem());
-				}
-				else {
-					getListeners().onException(new PlaybackException("Don't know what to do.  Playstate=" + playbackState + "."));
-				}
-			} // END synchronized.
-			this.getListeners().playStateChanged(getPlayState());
-		}
+		final IPlaybackEngine eng = getPlaybackEngine(true);
+		synchronized (eng) {
+			PlayState playbackState = eng.getPlaybackState();
+			if (playbackState == PlayState.PAUSED) {
+				eng.resumePlaying();
+			}
+			else if (playbackState == PlayState.PLAYING) {
+				eng.pausePlaying();
+			}
+			else if (playbackState == PlayState.STOPPED) {
+				final PlayItem ci = getCurrentItem();
+				if (ci != null) loadAndStartPlaying(ci);
+			}
+			else {
+				getListeners().onException(new PlaybackException("Don't know what to do.  Playstate=" + playbackState + "."));
+			}
+		} // END synchronized.
+		this.getListeners().playStateChanged(getPlayState());
 	}
 
 	/**

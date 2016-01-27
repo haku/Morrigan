@@ -1,15 +1,12 @@
 package com.vaguehope.morrigan.server.boot;
 
-import java.io.IOException;
 import java.util.concurrent.ExecutorService;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.vaguehope.morrigan.player.LocalPlayer;
-import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
+import com.vaguehope.morrigan.player.LocalPlayerSupport;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayerContainer;
-import com.vaguehope.morrigan.player.LocalPlayerSupport;
 import com.vaguehope.morrigan.server.ServerConfig;
 
 class ServerPlayerContainer implements PlayerContainer {
@@ -58,13 +55,6 @@ class ServerPlayerContainer implements PlayerContainer {
 		if (!(player instanceof LocalPlayer)) throw new IllegalArgumentException("Only LocalPlayer supported.");
 		this.player = (LocalPlayer) player;
 		this.player.addEventListener(this.localPlayerSupport);
-		try {
-			player.setPlaybackOrder(this.config.getPlaybackOrder());
-		}
-		catch (IOException e) {
-			this.logger.log(Level.WARNING, "Failed to read playback order from config.", e);
-			player.setPlaybackOrder(PlaybackOrder.MANUAL);
-		}
 	}
 
 	public LocalPlayer getLocalPlayer () {

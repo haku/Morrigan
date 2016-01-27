@@ -30,6 +30,7 @@ public interface Player {
 	void nextTrack();
 	PlayState getPlayState();
 
+	void setCurrentItem(PlayItem item);
 	PlayItem getCurrentItem();
 	IMediaTrackList<? extends IMediaTrack> getCurrentList();
 

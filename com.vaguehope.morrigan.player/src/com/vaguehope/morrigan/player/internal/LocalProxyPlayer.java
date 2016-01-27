@@ -156,6 +156,13 @@ public class LocalProxyPlayer implements LocalPlayer {
 	}
 
 	@Override
+	public void setCurrentItem (final PlayItem item) {
+		final Player p = getRef();
+		if (p == null) return;
+		p.setCurrentItem(item);
+	}
+
+	@Override
 	public PlayItem getCurrentItem () {
 		final Player p = getRef();
 		if (p == null) return null;

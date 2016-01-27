@@ -34,6 +34,7 @@ public abstract class AbstractPlayer implements Player {
 				this.register.unregister(this);
 			}
 			finally {
+				saveState();
 				onDispose();
 			}
 		}
@@ -51,6 +52,13 @@ public abstract class AbstractPlayer implements Player {
 
 	protected void checkAlive () {
 		if (!this.alive.get()) throw new IllegalStateException("Player is disposed: " + toString());
+	}
+
+	/**
+	 * A hint.  May be handled asynchronously.
+	 */
+	protected void saveState () {
+		PlayerStateStorage.writeState(this);
 	}
 
 	public PlayerEventListener getListeners () {
