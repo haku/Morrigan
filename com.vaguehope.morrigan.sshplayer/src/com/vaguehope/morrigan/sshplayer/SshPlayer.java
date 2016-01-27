@@ -89,6 +89,11 @@ public class SshPlayer extends AbstractPlayer {
 	}
 
 	@Override
+	public void setCurrentItem (final PlayItem item) {
+		this.currentItem.set(item);
+	}
+
+	@Override
 	public PlayItem getCurrentItem () {
 		return this.currentItem.get();
 	}
