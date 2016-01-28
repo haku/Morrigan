@@ -351,7 +351,7 @@ public class PlayersServlet extends HttpServlet {
 		final String listId;
 		final String listUrl;
 		final String listView;
-		IMediaTrackList<? extends IMediaTrack> currentList = p.getCurrentList();
+		final IMediaTrackList<? extends IMediaTrack> currentList = p.getCurrentList();
 		if (currentList != null) {
 			listTitle = currentList.getListName();
 			listId = currentList.getListId();
@@ -428,6 +428,10 @@ public class PlayersServlet extends HttpServlet {
 							});
 						}
 					}
+
+					dw.startElement("track");
+					MlistsServlet.fillInMediaItem(dw, currentList, track, true);
+					dw.endElement("track");
 				}
 			}
 

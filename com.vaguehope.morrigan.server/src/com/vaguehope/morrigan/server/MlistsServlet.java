@@ -23,7 +23,11 @@ import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
+import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
+import com.vaguehope.morrigan.model.media.IMediaPicture;
+import com.vaguehope.morrigan.model.media.IMediaTrack;
+import com.vaguehope.morrigan.model.media.IMediaTrackList;
 import com.vaguehope.morrigan.model.media.IMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
@@ -619,50 +623,57 @@ public class MlistsServlet extends HttpServlet {
 		if (listItems) {
 			for (final IMixedMediaItem mi : items) {
 				dw.startElement("entry");
-
-				FeedHelper.addElement(dw, "title", mi.getTitle());
-
-				FeedHelper.addLink(dw, fileLink(mi), "self"); // Path is relative to this feed.
-
-				if (mi.getDateAdded() != null) {
-					FeedHelper.addElement(dw, "dateadded", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateAdded()));
-				}
-				if (mi.getDateLastModified() != null) {
-					FeedHelper.addElement(dw, "datelastmodified", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateLastModified()));
-				}
-				FeedHelper.addElement(dw, "type", mi.getMediaType().getN());
-				if (mi.getHashcode() != null && !BigInteger.ZERO.equals(mi.getHashcode())) FeedHelper.addElement(dw, "hash", mi.getHashcode().toString(16));
-				FeedHelper.addElement(dw, "enabled", Boolean.toString(mi.isEnabled()));
-				FeedHelper.addElement(dw, "missing", Boolean.toString(mi.isMissing()));
-
-				if (mi.getMediaType() == MediaType.TRACK) {
-					FeedHelper.addElement(dw, "duration", mi.getDuration());
-					FeedHelper.addElement(dw, "startcount", mi.getStartCount());
-					FeedHelper.addElement(dw, "endcount", mi.getEndCount());
-					if (mi.getDateLastPlayed() != null) {
-						FeedHelper.addElement(dw, "datelastplayed", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateLastPlayed()));
-					}
-				}
-				else if (mi.getMediaType() == MediaType.PICTURE) {
-					FeedHelper.addElement(dw, "width", mi.getWidth());
-					FeedHelper.addElement(dw, "height", mi.getHeight());
-				}
-
-				if (includeTags) {
-					final List<MediaTag> tags = ml.getTags(mi);
-					for (final MediaTag tag : tags) {
-						FeedHelper.addElement(dw, "tag", tag.getTag(), new String[][] {
-								{ "t", String.valueOf(tag.getType().getIndex()) },
-								{ "c", tag.getClassification() == null ? "" : tag.getClassification().getClassification() }
-						});
-					}
-				}
-
+				fillInMediaItem(dw, ml, mi, includeTags);
 				dw.endElement("entry");
 			}
 		}
 
 		FeedHelper.endDocument(dw, "mlist");
+	}
+
+	static void fillInMediaItem (final DataWriter dw, final IMediaTrackList<? extends IMediaTrack> ml, final IMediaItem mi, final boolean includeTags) throws SAXException, MorriganException {
+		FeedHelper.addElement(dw, "title", mi.getTitle());
+
+		FeedHelper.addLink(dw, fileLink(mi), "self"); // Path is relative to this feed.
+
+		if (mi.getDateAdded() != null) {
+			FeedHelper.addElement(dw, "dateadded", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateAdded()));
+		}
+		if (mi.getDateLastModified() != null) {
+			FeedHelper.addElement(dw, "datelastmodified", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateLastModified()));
+		}
+
+		if (mi instanceof IMixedMediaItem) {
+			FeedHelper.addElement(dw, "type", ((IMixedMediaItem) mi).getMediaType().getN());
+		}
+		if (mi.getHashcode() != null && !BigInteger.ZERO.equals(mi.getHashcode())) FeedHelper.addElement(dw, "hash", mi.getHashcode().toString(16));
+		FeedHelper.addElement(dw, "enabled", Boolean.toString(mi.isEnabled()));
+		FeedHelper.addElement(dw, "missing", Boolean.toString(mi.isMissing()));
+
+		if (mi instanceof IMediaTrack) {
+			final IMediaTrack track = (IMediaTrack) mi;
+			FeedHelper.addElement(dw, "duration", track.getDuration());
+			FeedHelper.addElement(dw, "startcount", track.getStartCount());
+			FeedHelper.addElement(dw, "endcount", track.getEndCount());
+			if (track.getDateLastPlayed() != null) {
+				FeedHelper.addElement(dw, "datelastplayed", XmlHelper.getIso8601UtcDateFormatter().format(track.getDateLastPlayed()));
+			}
+		}
+		else if (mi instanceof IMediaPicture) {
+			final IMediaPicture pic = (IMediaPicture) mi;
+			FeedHelper.addElement(dw, "width", pic.getWidth());
+			FeedHelper.addElement(dw, "height", pic.getHeight());
+		}
+
+		if (includeTags) {
+			final List<MediaTag> tags = ml.getTags(mi);
+			for (final MediaTag tag : tags) {
+				FeedHelper.addElement(dw, "tag", tag.getTag(), new String[][] {
+						{ "t", String.valueOf(tag.getType().getIndex()) },
+						{ "c", tag.getClassification() == null ? "" : tag.getClassification().getClassification() }
+				});
+			}
+		}
 	}
 
 	private static void printAlbums (final HttpServletResponse resp, final IMixedMediaDb ml) throws SAXException, IOException, MorriganException {
@@ -705,7 +716,7 @@ public class MlistsServlet extends HttpServlet {
 		}
 	}
 
-	private static String fileLink (final IMixedMediaItem mi) {
+	private static String fileLink (final IMediaItem mi) {
 		try {
 			return URLEncoder.encode(mi.getFilepath(), "UTF-8");
 		}

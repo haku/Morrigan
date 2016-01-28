@@ -142,6 +142,7 @@
 
   function wireTabsAndMenus() {
     var footer = $('#footer');
+    var tags = $('#mnu_tags');
     var playbackOrder = $('#mnu_playback_order');
     var clearQueue = $('#mnu_clear_queue');
     var shuffleQueue = $('#mnu_shuffle_queue');
@@ -150,6 +151,7 @@
 
     $('#fixed_tab_queue').click(function() {
       footer.show();
+      tags.show();
       playbackOrder.show();
       clearQueue.show();
       shuffleQueue.show();
@@ -159,6 +161,7 @@
 
     $('#fixed_tab_db').click(function() {
       footer.hide();
+      tags.hide();
       playbackOrder.hide();
       clearQueue.hide();
       shuffleQueue.hide();
@@ -166,6 +169,7 @@
       enqueueView.show();
     });
 
+    tags.click(tagsClicked);
     clearQueue.click(clearQueueClicked);
     shuffleQueue.click(shuffleQueueClicked);
     enqueueAll.click(enqueueAllClicked);
@@ -177,6 +181,11 @@
         MnApi.playerPlaybackOrder(selectedPlayer.pid, order, onStatus, displayPlayer);
       });
     });
+  }
+
+  function tagsClicked() {
+      if (!selectedPlayer || !selectedPlayer.item) return;
+      showTagEditor(selectedPlayer.item);
   }
 
   function clearQueueClicked() {
@@ -216,6 +225,10 @@
   }
 
   function displayPlayer(player) {
+    if (selectedPlayer.pid === player.pid && player.item) {
+      selectedPlayer = player; // Upgrade to add details.
+    }
+
     $('#player_name').text(player.name + ' (' + HOST_NAME + ')');
     $('#queue_tab_icon').text(player.stateIcon);
     $('#subtitle_list_name').text(player.listTitle);

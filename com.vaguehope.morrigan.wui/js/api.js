@@ -88,6 +88,11 @@ MnApi = {};
     var listView = node.find('listview').text();
     if (listView && listView.length > 0) player.listView = listView;
 
+    var trackNode = node.find('track');
+    if (trackNode.length > 0) {
+      player.item = parseItemNode($(trackNode[0]), player.mid, listView);
+    }
+
     player.monitors = [];
     node.find('monitor').each(function() {
       var monitor = {};
