@@ -87,7 +87,7 @@
         playerElem.attr('id', domId);
         playerElem.unbind().click(function(event) {
           event.preventDefault();
-          setSelectedPlayer(player);
+          setSelectedPlayerByUser(player);
           $('.mdl-layout__drawer').removeClass('is-visible');
           $('.mdl-layout__obfuscator').removeClass('is-visible');
         });
@@ -103,6 +103,17 @@
     });
 
     if (selectedPlayer && $.inArray(selectedPlayer.pid, allPlayerIds) < 0) selectedPlayer = null;
+    if (!selectedPlayer && players.length > 1) {
+      var pid = localStorage.selectedPlayerPid;
+      if (pid) {
+        $.each(players, function(index, player) {
+          if (pid === player.pid) {
+            setSelectedPlayer(player);
+            return false;
+          }
+        });
+      }
+    }
     if (!selectedPlayer && players.length > 1) {
       var sortedPlayers = players.sort();
       var PRIORITY = [3,0,2,1] // stopped, playing, paused, loading.
@@ -217,6 +228,11 @@
   function setSelectedPlayer(player) {
     selectedPlayer = player;
     fetchAndDisplayPlayer();
+  }
+
+  function setSelectedPlayerByUser(player) {
+    setSelectedPlayer(player);
+    localStorage.selectedPlayerPid = player.pid;
   }
 
   function fetchAndDisplayPlayer() {
