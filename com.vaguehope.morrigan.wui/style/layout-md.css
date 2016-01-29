@@ -125,6 +125,7 @@ header .subtitle span {
   background-color: #B2FF59;
 }
 .popup > button, .popup > .row {
+  display: inline-block;
   width: 90%;
   min-height: 3em;
   margin: 1em .5em;
@@ -143,6 +144,16 @@ header .subtitle span {
 .popup > .row > .aux {
   position: absolute;
   right: 0;
+}
+.popup > .row > .left {
+  position: absolute;
+  left: 0;
+  width: 40%;
+}
+.popup > .row > .right {
+  position: absolute;
+  right: 0;
+  width: 40%;
 }
 #popup-obfuscator {
   background-color: transparent;

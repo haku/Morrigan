@@ -125,11 +125,15 @@
   <div class="popup" style="display: none;" id="queue_item_menu">
     <p class="title"></p>
     <span class="separator"></span>
-    <button class="mdl-button mdl-js-button mdl-js-ripple-effect top">Top</button>
-    <button class="mdl-button mdl-js-button mdl-js-ripple-effect up">Up</button>
+    <div class="row">
+      <button class="mdl-button mdl-js-button mdl-js-ripple-effect left up"><i class="material-icons">arrow_upward</i></button>
+      <button class="mdl-button mdl-js-button mdl-js-ripple-effect right top"><i class="material-icons">vertical_align_top</i></button>
+    </div>
+    <div class="row">
+      <button class="mdl-button mdl-js-button mdl-js-ripple-effect left down"><i class="material-icons">arrow_downward</i></button>
+      <button class="mdl-button mdl-js-button mdl-js-ripple-effect right bottom"><i class="material-icons">vertical_align_bottom</i></button>
+    </div>
     <button class="mdl-button mdl-js-button mdl-js-ripple-effect remove">Remove</button>
-    <button class="mdl-button mdl-js-button mdl-js-ripple-effect down">Down</button>
-    <button class="mdl-button mdl-js-button mdl-js-ripple-effect bottom">Bottom</button>
   </div>
 
   <div class="popup" style="display: none;" id="db_item_menu">
