@@ -7,6 +7,11 @@ import com.vaguehope.morrigan.model.media.DurationData;
 public interface PlayerQueue {
 
 	/**
+	 * Increments every time queue changes.
+	 */
+	long getVersion ();
+
+	/**
 	 * May return null.
 	 */
 	PlayItem takeFromQueue();

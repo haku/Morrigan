@@ -4,6 +4,8 @@
   var HOST_NAME;
 
   var selectedPlayer;
+  var lastQueuePid;
+  var lastQueueVersion;
   var currentDbMid;
   var currentDbQuery;
   var currentDbResults;
@@ -253,7 +255,7 @@
     $('#track_tags').text(player.tags.length > 0 ? player.tags.join(', ') : '(no tags)');
     $('#queue_info').text(player.queueLength + ' items, ' + MnApi.formatSeconds(player.queueDuration));
 
-    fetchAndDisplayQueue(); // TODO only do this if queue in player has changed.
+    if (lastQueuePid !== player.pid || lastQueueVersion !== player.queueVersion) fetchAndDisplayQueue();
   }
 
   function fetchAndDisplayQueue() {
@@ -284,7 +286,6 @@
       }
     });
 
-
     // Force order of queue elements.
     var idToIndex = {};
     $.each(queue.items, function(index, item) {
@@ -293,6 +294,10 @@
     $('.item', queueList).sort(function(a, b) {
       return idToIndex[a.id] - idToIndex[b.id];
     }).appendTo(queueList);
+
+    // Remember.
+    lastQueuePid = queue.pid;
+    lastQueueVersion = queue.version;
   }
 
   function makeQueueItem(itemId, domId) {

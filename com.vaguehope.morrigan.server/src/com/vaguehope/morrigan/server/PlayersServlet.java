@@ -365,14 +365,15 @@ public class PlayersServlet extends HttpServlet {
 			listView = "";
 		}
 
-		PlayItem currentItem = p.getCurrentItem();
-		String trackTitle = (currentItem != null && currentItem.hasTrack()) ? currentItem.getTrack().getTitle() : "(empty)";
+		final PlayItem currentItem = p.getCurrentItem();
+		final String trackTitle = (currentItem != null && currentItem.hasTrack()) ? currentItem.getTrack().getTitle() : "(empty)";
 
-		int queueLength = p.getQueue().getQueueList().size();
-		DurationData queueDuration = p.getQueue().getQueueTotalDuration();
+		final long queueVersion = p.getQueue().getVersion();
+		final int queueLength = p.getQueue().getQueueList().size();
+		final DurationData queueDuration = p.getQueue().getQueueTotalDuration();
 
 		FeedHelper.addElement(dw, "title", "p" + p.getId() + ":" + p.getPlayState().toString() + ":" + trackTitle);
-		String selfUrl = CONTEXTPATH + "/" + p.getId();
+		final String selfUrl = CONTEXTPATH + "/" + p.getId();
 		FeedHelper.addLink(dw, selfUrl, "self", "text/xml");
 
 		FeedHelper.addElement(dw, "playerid", p.getId());
@@ -380,6 +381,7 @@ public class PlayersServlet extends HttpServlet {
 		FeedHelper.addElement(dw, "playstate", p.getPlayState().getN());
 		FeedHelper.addElement(dw, "playorder", p.getPlaybackOrder().getN());
 		FeedHelper.addElement(dw, "playordertitle", p.getPlaybackOrder().toString());
+		FeedHelper.addElement(dw, "queueversion", queueVersion);
 		FeedHelper.addElement(dw, "queuelength", queueLength);
 		FeedHelper.addElement(dw, "queueduration", queueDuration.getDuration());
 		FeedHelper.addLink(dw, selfUrl + "/" + PATH_QUEUE, "queue", "text/xml");
@@ -390,15 +392,16 @@ public class PlayersServlet extends HttpServlet {
 		FeedHelper.addElement(dw, "tracktitle", trackTitle);
 
 		if (detailLevel == 1) {
-			String trackLink = null;
-			String filename;
-			String filepath;
+			final String trackLink;
+			final String filename;
+			final String filepath;
 			if (currentItem != null && currentItem.hasTrack()) {
 				trackLink = URLEncoder.encode(currentItem.getTrack().getFilepath(), "UTF-8");
 				filename = currentItem.getTrack().getTitle(); // FIXME This is a hack :s .
 				filepath = currentItem.getTrack().getFilepath();
 			}
 			else {
+				trackLink = null;
 				filename = NULL;
 				filepath = NULL;
 			}
@@ -419,9 +422,9 @@ public class PlayersServlet extends HttpServlet {
 				FeedHelper.addElement(dw, "trackendcount", String.valueOf(track.getEndCount()));
 
 				if (currentList != null) {
-					List<MediaTag> tags = currentList.getTags(track);
+					final List<MediaTag> tags = currentList.getTags(track);
 					if (tags != null) {
-						for (MediaTag tag : tags) {
+						for (final MediaTag tag : tags) {
 							FeedHelper.addElement(dw, "tracktag", tag.getTag(), new String[][] {
 								{"t", String.valueOf(tag.getType().getIndex())},
 								{"c", tag.getClassification() == null ? "" : tag.getClassification().getClassification()}
@@ -435,9 +438,9 @@ public class PlayersServlet extends HttpServlet {
 				}
 			}
 
-			Map<Integer, String> mons = p.getMonitors();
+			final Map<Integer, String> mons = p.getMonitors();
 			if (mons != null) {
-				for (Entry<Integer, String> mon : mons.entrySet()) {
+				for (final Entry<Integer, String> mon : mons.entrySet()) {
 					FeedHelper.addElement(dw, "monitor", mon.getKey() + ":" + mon.getValue());
 				}
 			}
@@ -445,20 +448,21 @@ public class PlayersServlet extends HttpServlet {
 	}
 
 	private static void printQueue (final DataWriter dw, final Player p) throws SAXException, UnsupportedEncodingException {
-
 		FeedHelper.addLink(dw, CONTEXTPATH + "/" + p.getId() + "/" + PATH_QUEUE, "self", "text/xml");
 		FeedHelper.addLink(dw, CONTEXTPATH + "/" + p.getId(), "player", "text/xml");
 
-		int queueLength = p.getQueue().getQueueList().size();
-		DurationData queueDuration = p.getQueue().getQueueTotalDuration();
-		String queueDurationString = (queueDuration.isComplete() ? "" : "more than ") +
+		final long queueVersion = p.getQueue().getVersion();
+		final int queueLength = p.getQueue().getQueueList().size();
+		final DurationData queueDuration = p.getQueue().getQueueTotalDuration();
+		final String queueDurationString = (queueDuration.isComplete() ? "" : "more than ") +
 				TimeHelper.formatTimeSeconds(queueDuration.getDuration());
 
+		FeedHelper.addElement(dw, "queueversion", queueVersion);
 		FeedHelper.addElement(dw, "queuelength", queueLength);
 		FeedHelper.addElement(dw, "queueduration", queueDurationString); // FIXME make parsasble.
 
-		List<PlayItem> queueList = p.getQueue().getQueueList();
-		for (PlayItem playItem : queueList) {
+		final List<PlayItem> queueList = p.getQueue().getQueueList();
+		for (final PlayItem playItem : queueList) {
 			final IMediaTrackList<? extends IMediaTrack> list = playItem.getList();
 			final IMediaTrack mi = playItem.getTrack();
 

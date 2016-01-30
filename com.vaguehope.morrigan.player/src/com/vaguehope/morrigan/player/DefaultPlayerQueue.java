@@ -9,16 +9,23 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import com.vaguehope.morrigan.model.media.DurationData;
 
 public class DefaultPlayerQueue implements PlayerQueue {
 
+	private final AtomicLong version = new AtomicLong(0L);
 	private final AtomicInteger queueId = new AtomicInteger(0);
 	private final List<PlayItem> queue = new CopyOnWriteArrayList<PlayItem>();
 	private final Set<Runnable> queueChangeListeners = Collections.synchronizedSet(new HashSet<Runnable>());
 
 	public DefaultPlayerQueue () {}
+
+	@Override
+	public long getVersion () {
+		return this.version.get();
+	}
 
 	private void validateQueueItemBeforeAdd (final PlayItem item) {
 		if (item.hasTrack() && !item.getTrack().isPlayable()) throw new IllegalArgumentException("item is not playable.");
@@ -116,6 +123,8 @@ public class DefaultPlayerQueue implements PlayerQueue {
 	}
 
 	private void callQueueChangedListeners () {
+		this.version.incrementAndGet();
+
 		// TODO upgrade to use RunHelper.
 		synchronized (this.queueChangeListeners) {
 			for (final Runnable r : this.queueChangeListeners) {

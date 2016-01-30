@@ -12,6 +12,11 @@ public enum ImmutableEmptyPlayerQueue implements PlayerQueue {
 	INSTANCE;
 
 	@Override
+	public long getVersion () {
+		return 1L;
+	}
+
+	@Override
 	public PlayItem takeFromQueue () {
 		return null;
 	}

@@ -62,13 +62,14 @@ MnApi = {};
     player.playOrder = parseInt(node.find('playorder').text(), 10);
     player.playOrderTitle = node.find('playordertitle').text();
 
-    player.trackTitle = node.find('tracktitle').text();
     player.listTitle = node.find('listtitle').text();
     if (player.listTitle === "null") {
       player.listTitle = "(no list)";
     }
-
+    player.trackTitle = node.find('tracktitle').text();
     player.trackDuration = parseInt(node.find('trackduration').text(), 10);
+
+    player.queueVersion = parseInt(node.find('queueversion').text(), 10);
     player.queueLength = parseInt(node.find('queuelength').text(), 10);
     player.queueDuration = parseInt(node.find('queueduration').text(), 10);
 
@@ -199,6 +200,7 @@ MnApi = {};
   function parseQueueNode(pid, node) {
     var queue = {};
     queue.pid = pid;
+    queue.version = parseInt(node.find('queueversion').text(), 10);
     queue.length = parseInt(node.find('queuelength').text(), 10);
     queue.duration = node.find('queueduration').text();
     queue.items = [];
