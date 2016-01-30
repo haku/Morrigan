@@ -35,6 +35,9 @@ body {
 .mdl-button {
   color: #fff;
 }
+.mdl-slider__background-lower {
+  background: #B2FF59;
+}
 
 /* Side menu item icon position fix. */
 .mdl-layout__drawer .mdl-navigation .mdl-navigation__link {
@@ -85,6 +88,11 @@ header .subtitle span {
 .clickable_list .item:hover {
   background: Highlight;
   color: HighlightText;
+}
+
+#queue_tab_content p {
+  margin: 0;
+  padding: 0;
 }
 
 /* pop-up menu. */

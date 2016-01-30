@@ -67,7 +67,7 @@ MnApi = {};
       player.listTitle = "(no list)";
     }
     player.trackTitle = node.find('tracktitle').text();
-    player.trackDuration = parseInt(node.find('trackduration').text(), 10);
+    player.position = parseInt(node.find('playposition').text(), 10);
 
     player.queueVersion = parseInt(node.find('queueversion').text(), 10);
     player.queueLength = parseInt(node.find('queuelength').text(), 10);

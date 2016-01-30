@@ -251,9 +251,23 @@
     $('#queue_tab_icon').text(player.stateIcon);
     $('#subtitle_list_name').text(player.listTitle);
     $('#subtitle_playback_order').text(MnApi.PLAYBACK_ORDERS[player.playOrder]['title']);
-    $('#track_title').text(player.trackTitle + ' (' + MnApi.formatSeconds(player.trackDuration) + ')');
+    $('#track_title').text(player.trackTitle);
     $('#track_tags').text(player.tags.length > 0 ? player.tags.join(', ') : '(no tags)');
     $('#queue_info').text(player.queueLength + ' items, ' + MnApi.formatSeconds(player.queueDuration));
+
+    var sldVal, sldMax, sldTxt;
+    if (player.position >= 0 && player.item && player.item.duration > 0) {
+      sldVal = player.position;
+      sldMax = player.item.duration;
+      sldTxt = MnApi.formatSeconds(sldVal) + ' / ' +  MnApi.formatSeconds(sldMax);
+    }
+    else {
+      sldVal = 0;
+      sldMax = 100;
+      sldTxt = '0:00 / 0:00';
+    }
+    $('#track_progress').attr('max', sldMax).get(0).MaterialSlider.change(sldVal);
+    $('#track_time').text(sldTxt);
 
     if (lastQueuePid !== player.pid || lastQueueVersion !== player.queueVersion) fetchAndDisplayQueue();
   }
@@ -346,7 +360,7 @@
 
   function setDbTabToSearch(mid, view, query) {
     if (query) {
-      $('#db_query').val(query).parent().addClass('is-dirty'); // https://github.com/google/material-design-lite/issues/903
+      $('#db_query').val(query).parent().addClass('is-dirty'); // FIXME https://github.com/google/material-design-lite/issues/903
     }
     else {
       query = $('#db_query').val();

@@ -63,19 +63,23 @@
     </div>
     <main class="mdl-layout__content">
     <section class="mdl-layout__tab-panel is-active" id="fixed-tab-queue">
-      <div class="page-content" style="padding: 0 1em">
+      <div id="queue_tab_content" class="page-content" style="padding: 0 1em">
         <h5 style="margin-bottom: 0;" id="track_title">(track title)</h5>
-        <ul style="margin: 0; padding: 0; list-style: none;">
-          <li id="track_tags">(tags)</li>
-          <li id="queue_info">(queue info)</li>
-        </ul>
+        <p id="track_tags">(tags)</p>
+        <p style="width: 100%; display: flex; flex-direction: row;">
+          <span style="flex-grow: 2; align-self: center;">
+            <input id="track_progress" class="mdl-slider mdl-js-slider" type="range" min="0" max="100" value="0">
+          </span>
+          <span id="track_time" style="flex-grow: 0; align-self: center;">0:00 / 0:00</span>
+        </p>
+        <p id="queue_info">(queue info)</p>
         <ol style="margin: 0; list-style: disc; padding-left: 1em;" class="clickable_list" id="queue_list">
         </ol>
         <div style="height: 2em;"></div>
       </div>
     </section>
     <section class="mdl-layout__tab-panel" id="fixed-tab-db">
-      <div class="page-content" style="padding: 0 1em">
+      <div id="db_tab_content" class="page-content" style="padding: 0 1em">
         <div id="db_sort_options" style="padding-top: 1em;">
           <button class="mdl-button mdl-js-button mdl-button--icon" style="margin-right: 1em;" id="db_go_back">
             <i class="material-icons">arrow_back</i>
