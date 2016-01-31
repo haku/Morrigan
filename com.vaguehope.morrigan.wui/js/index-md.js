@@ -323,7 +323,10 @@
   }
 
   function updateQueueItem(item, itemEl) {
-    $('.title', itemEl).text(item.title);
+    var title = item.title;
+    if (item.duration > 0) title += ' (' + MnApi.formatSeconds(item.duration) + ')';
+    $('.title', itemEl).text(title);
+
     var clickable = $('.clickable', itemEl);
     clickable.unbind();
     clickable.click(function(event) {
