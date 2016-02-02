@@ -475,6 +475,14 @@
         fetchAndDisplayQueue();
       });
     });
+    $('.enqueue_top', menu).unbind().click(function(event) {
+      if (!selectedPlayer) return;
+      MnApi.enqueueItemsTop(item, selectedPlayer.listView, selectedPlayer.pid, onStatus, function(msg) {
+        console.log(msg);
+        hidePopup(menu);
+        fetchAndDisplayQueue();
+      });
+    });
     $('.edit_tags', menu).unbind().click(function(event) {
       hidePopup(menu);
       showTagEditor(item);

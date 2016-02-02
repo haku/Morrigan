@@ -32,6 +32,16 @@ public enum ImmutableEmptyPlayerQueue implements PlayerQueue {
 	}
 
 	@Override
+	public void addToQueueTop (final PlayItem item) {
+		// NOOP.
+	}
+
+	@Override
+	public void addToQueueTop (final List<PlayItem> items) {
+		// NOOP.
+	}
+
+	@Override
 	public void removeFromQueue (final PlayItem item) {
 		// NOOP.
 	}

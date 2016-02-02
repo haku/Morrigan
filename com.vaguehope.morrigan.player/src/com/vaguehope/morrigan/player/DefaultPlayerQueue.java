@@ -49,6 +49,22 @@ public class DefaultPlayerQueue implements PlayerQueue {
 	}
 
 	@Override
+	public void addToQueueTop (final PlayItem item) {
+		validateQueueItemBeforeAdd(item);
+		this.queue.add(0, item);
+		callQueueChangedListeners();
+	}
+
+	@Override
+	public void addToQueueTop (final List<PlayItem> items) {
+		for (final PlayItem item : items) {
+			validateQueueItemBeforeAdd(item);
+		}
+		this.queue.addAll(0, items);
+		callQueueChangedListeners();
+	}
+
+	@Override
 	public void removeFromQueue (final PlayItem item) {
 		this.queue.remove(item);
 		callQueueChangedListeners();

@@ -17,7 +17,9 @@ public interface PlayerQueue {
 	PlayItem takeFromQueue();
 
 	void addToQueue(PlayItem item);
-	void addToQueue(List<PlayItem> item);
+	void addToQueue(List<PlayItem> items);
+	void addToQueueTop(PlayItem item);
+	void addToQueueTop(List<PlayItem> items);
 	void removeFromQueue(PlayItem item);
 	void clearQueue();
 

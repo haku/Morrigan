@@ -143,25 +143,21 @@ header .subtitle span {
   margin: 1em .5em;
 }
 .popup > .row {
-  position: relative;
+  display: inline-flex;
+  flex-direction: row;
+}
+.popup > .row > * {
+  align-self: center;
 }
 .popup > .row > .pri {
-  position: absolute;
-  left: 0;
+  flex-grow: 2;
 }
 .popup > .row > .aux {
-  position: absolute;
-  right: 0;
+  flex-grow: 0;
 }
-.popup > .row > .left {
-  position: absolute;
-  left: 0;
-  width: 40%;
-}
+.popup > .row > .left,
 .popup > .row > .right {
-  position: absolute;
-  right: 0;
-  width: 40%;
+  flex-grow: 1;
 }
 #popup-obfuscator {
   background-color: transparent;

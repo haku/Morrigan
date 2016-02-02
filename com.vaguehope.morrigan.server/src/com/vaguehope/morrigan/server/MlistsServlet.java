@@ -103,6 +103,7 @@ public class MlistsServlet extends HttpServlet {
 	public static final String CMD_SCAN = "scan";
 	public static final String CMD_PLAY = "play";
 	public static final String CMD_QUEUE = "queue";
+	public static final String CMD_QUEUE_TOP = "queue_top";
 	public static final String CMD_ADDTAG = "addtag";
 	public static final String CMD_RMTAG = "rmtag";
 
@@ -273,19 +274,22 @@ public class MlistsServlet extends HttpServlet {
 	}
 
 	private void postToMmdb (final HttpServletRequest req, final HttpServletResponse resp, final String action, final IMixedMediaDb mmdb) throws IOException, MorriganException {
-		if (action.equals(CMD_PLAY) || action.equals(CMD_QUEUE)) {
+		if (action.equals(CMD_PLAY) || action.equals(CMD_QUEUE) || action.equals(CMD_QUEUE_TOP)) {
 			final Player player = parsePlayer(req, resp);
 			if (player != null) { // parsePlayer() will write the error msg.
 				resp.setContentType("text/plain");
+				mmdb.read();
 				if (action.equals(CMD_PLAY)) {
-					mmdb.read();
 					player.loadAndStartPlaying(mmdb);
 					resp.getWriter().println("MMDB playing desu~");
 				}
 				else if (action.equals(CMD_QUEUE)) {
-					mmdb.read();
 					player.getQueue().addToQueue(new PlayItem(mmdb, null));
 					resp.getWriter().println("MMDB added to queue desu~");
+				}
+				else if (action.equals(CMD_QUEUE_TOP)) {
+					player.getQueue().addToQueueTop(new PlayItem(mmdb, null));
+					resp.getWriter().println("MMDB added to queue top desu~");
 				}
 				else {
 					throw new IllegalArgumentException("The world has exploded desu~.");
@@ -303,19 +307,22 @@ public class MlistsServlet extends HttpServlet {
 	}
 
 	private void postToMmdbItem (final HttpServletRequest req, final HttpServletResponse resp, final String action, final IMixedMediaDb mmdb, final IMixedMediaItem item) throws IOException, MorriganException {
-		if (action.equals(CMD_PLAY) || action.equals(CMD_QUEUE)) {
+		if (action.equals(CMD_PLAY) || action.equals(CMD_QUEUE) || action.equals(CMD_QUEUE_TOP)) {
 			final Player player = parsePlayer(req, resp);
 			if (player != null) { // parsePlayer() will write the error msg.
 				resp.setContentType("text/plain");
+				mmdb.read();
 				if (action.equals(CMD_PLAY)) {
-					mmdb.read();
 					player.loadAndStartPlaying(mmdb, item);
 					resp.getWriter().println("Item playing desu~");
 				}
 				else if (action.equals(CMD_QUEUE)) {
-					mmdb.read();
 					player.getQueue().addToQueue(new PlayItem(mmdb, item));
 					resp.getWriter().println("Item added to queue desu~");
+				}
+				else if (action.equals(CMD_QUEUE_TOP)) {
+					player.getQueue().addToQueueTop(new PlayItem(mmdb, item));
+					resp.getWriter().println("Item added to queue top desu~");
 				}
 				else {
 					throw new IllegalArgumentException("The world has exploded desu~.");
@@ -363,7 +370,7 @@ public class MlistsServlet extends HttpServlet {
 	}
 
 	private void postToMmdbAlbum (final HttpServletRequest req, final HttpServletResponse resp, final String action, final IMixedMediaDb mmdb, final MediaAlbum album) throws IOException, MorriganException {
-		if (action.equals(CMD_PLAY) || action.equals(CMD_QUEUE)) {
+		if (action.equals(CMD_PLAY) || action.equals(CMD_QUEUE) || action.equals(CMD_QUEUE_TOP)) {
 			final Player player = parsePlayer(req, resp);
 			if (player != null) { // parsePlayer() will write the error msg.
 				mmdb.read();
@@ -382,6 +389,10 @@ public class MlistsServlet extends HttpServlet {
 				else if (action.equals(CMD_QUEUE)) {
 					player.getQueue().addToQueue(trackPlayItems);
 					resp.getWriter().println("Album added to queue desu~");
+				}
+				else if (action.equals(CMD_QUEUE_TOP)) {
+					player.getQueue().addToQueueTop(trackPlayItems);
+					resp.getWriter().println("Album added to queue top desu~");
 				}
 				else {
 					throw new IllegalArgumentException("The world has exploded desu~.");

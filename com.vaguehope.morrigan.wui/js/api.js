@@ -362,6 +362,12 @@ MnApi = {};
     actionItem(items, 'queue', args, onStatus, onComplete);
   };
 
+  MnApi.enqueueItemsTop = function(items, view, pid, onStatus, onComplete) {
+    var args = 'playerid=' + pid;
+    if (view) args += '&view=' + encodeURIComponent(view);
+    actionItem(items, 'queue_top', args, onStatus, onComplete);
+  };
+
   MnApi.enqueueView = function(mid, view, pid, onStatus, onComplete) {
     var args = 'playerid=' + pid;
     if (view) args += '&view=' + encodeURIComponent(view);
