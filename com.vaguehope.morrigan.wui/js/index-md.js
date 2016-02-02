@@ -1,5 +1,6 @@
 (function() {
 
+  var LONG_CLICK_MILLIS = 2000;
   var REFRESH_PLAYERS_SECONDS = 5;
   var HOST_NAME;
 
@@ -131,6 +132,15 @@
     $('#footer_search').click(footerSearchClicked);
     $('#footer_pause').click(footerPauseClicked);
     $('#footer_next').click(footerNextClicked);
+
+    var pressTimer;
+    $("#footer_pause").mouseup(function(){
+      clearTimeout(pressTimer);
+      return false;
+    }).mousedown(function(){
+      pressTimer = window.setTimeout(footerPauseLongClicked, LONG_CLICK_MILLIS);
+      return false;
+    });
   }
 
   function footerSearchClicked() {
@@ -144,6 +154,11 @@
   function footerPauseClicked() {
     if (!selectedPlayer) return;
     MnApi.playerPause(selectedPlayer.pid, onStatus, displayPlayer);
+  }
+
+  function footerPauseLongClicked() {
+    if (!selectedPlayer) return;
+    MnApi.playerStop(selectedPlayer.pid, onStatus, displayPlayer);
   }
 
   function footerNextClicked() {

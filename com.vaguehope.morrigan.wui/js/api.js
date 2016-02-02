@@ -111,6 +111,10 @@ MnApi = {};
     writePlayerState(pid, 'playpause', onStatus, onPlayer);
   }
 
+  MnApi.playerStop = function(pid, onStatus, onPlayer) {
+    writePlayerState(pid, 'stop', onStatus, onPlayer);
+  }
+
   MnApi.playerNext = function(pid, onStatus, onPlayer) {
     writePlayerState(pid, 'next', onStatus, onPlayer);
   }
