@@ -77,7 +77,7 @@ header .subtitle span {
 /* List items. */
 .clickable_list a {
   display: block;
-  line-height: 0.5em;
+  line-height: 1.3em;
   padding-top: 0.3em;
   padding-bottom: 0.3em;
 }
