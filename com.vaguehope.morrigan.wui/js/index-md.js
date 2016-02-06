@@ -45,6 +45,10 @@
     }, REFRESH_PLAYERS_SECONDS * 1000);
   }
 
+  function showToast(msg) {
+    document.querySelector('.mdl-js-snackbar').MaterialSnackbar.showSnackbar({message: msg});
+  }
+
   function onStatus(msg) {
     if (msg && msg.length > 0) console.log(msg);
   }
@@ -159,6 +163,7 @@
   function footerPauseLongClicked() {
     if (!selectedPlayer) return;
     MnApi.playerStop(selectedPlayer.pid, onStatus, displayPlayer);
+    showToast('Stopping...');
   }
 
   function footerNextClicked() {
@@ -231,6 +236,7 @@
     MnApi.enqueueItems(currentDbResults, selectedPlayer.listView, selectedPlayer.pid, onStatus, function(msg) {
       console.log(msg);
     });
+    showToast('Enqueueing items...');
   }
 
   function enqueueViewClicked() {
