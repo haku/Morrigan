@@ -233,7 +233,8 @@
 
   function enqueueAllClicked() {
     if (!currentDbResults || !selectedPlayer) return;
-    MnApi.enqueueItems(currentDbResults, selectedPlayer.listView, selectedPlayer.pid, onStatus, function(msg) {
+    var enabledResults = jQuery.grep(currentDbResults, function(item){return item.enabled});
+    MnApi.enqueueItems(enabledResults, selectedPlayer.listView, selectedPlayer.pid, onStatus, function(msg) {
       console.log(msg);
     });
     showToast('Enqueueing items...');
@@ -455,6 +456,7 @@
   function makeResultItem(res) {
     var a = $('<a class="clickable title" href="">');
     a.text(res.title + ' (' + MnApi.formatSeconds(res.duration) + ')');
+    if (!res.enabled) a.addClass('disabled');
 
     var el = $('<li class="item">');
     el.append(a);
@@ -462,17 +464,18 @@
     a.unbind();
     a.click(function(event) {
       event.preventDefault();
-      showDbItemMenu(res);
+      showDbItemMenu(res, a);
     });
 
     return el;
   }
 
-  function showDbItemMenu(item) {
+  function showDbItemMenu(item, anchorEl) {
     var menu = $('#db_item_menu');
     $('.title', menu).text(item.title);
     $('.stats', menu).text(item.startCount + '/' + item.endCount + ' ' + MnApi.formatSeconds(item.duration));
     $('.tags', menu).text(item.tags.join(', '));
+
     $('.enqueue', menu).unbind().click(function(event) {
       if (!selectedPlayer) return;
       MnApi.enqueueItems(item, selectedPlayer.listView, selectedPlayer.pid, onStatus, function(msg) {
@@ -481,6 +484,7 @@
         fetchAndDisplayQueue();
       });
     });
+
     $('.enqueue_top', menu).unbind().click(function(event) {
       if (!selectedPlayer) return;
       MnApi.enqueueItemsTop(item, selectedPlayer.listView, selectedPlayer.pid, onStatus, function(msg) {
@@ -489,10 +493,30 @@
         fetchAndDisplayQueue();
       });
     });
+
     $('.edit_tags', menu).unbind().click(function(event) {
       hidePopup(menu);
       showTagEditor(item);
     });
+
+    $('.set_enabled', menu).setVisibility(!item.enabled).click(function(event) {
+      MnApi.setEnabled(item, true, onStatus, function(msg) {
+        console.log(msg);
+        item.enabled = true;
+        anchorEl.removeClass('disabled');
+      });
+      hidePopup(menu);
+    });
+
+    $('.set_disabled', menu).setVisibility(item.enabled).click(function(event) {
+      MnApi.setEnabled(item, false, onStatus, function(msg) {
+        console.log(msg);
+        item.enabled = false;
+        anchorEl.addClass('disabled');
+      });
+      hidePopup(menu);
+    });
+
     showPopup(menu);
   }
 

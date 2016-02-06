@@ -28,7 +28,7 @@ public interface IMediaItemDb<S extends IMediaItemStorageLayer<T>, T extends IMe
 	void removeSource (String source) throws MorriganException;
 
 	List<T> simpleSearch (String term, int maxResults) throws DbException;
-	List<T> simpleSearch (String term, int maxResults, IDbColumn[] sortColumns, SortDirection[] sortDirections) throws DbException;
+	List<T> simpleSearch (String term, int maxResults, IDbColumn[] sortColumns, SortDirection[] sortDirections, boolean includeDisabled) throws DbException;
 	List<T> getAllDbEntries () throws DbException;
 	T getByFile (File file) throws DbException;
 	T getByFile (String filepath) throws DbException;

@@ -82,8 +82,8 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	}
 
 	@Override
-	public List<IMixedMediaItem> simpleSearch (final String term, final int maxResults, final IDbColumn[] sorts, final SortDirection[] directions) throws DbException {
-		return simpleSearchMedia(getDefaultMediaType(), term, maxResults, sorts, directions);
+	public List<IMixedMediaItem> simpleSearch (final String term, final int maxResults, final IDbColumn[] sorts, final SortDirection[] directions, final boolean includeDisabled) throws DbException {
+		return simpleSearchMedia(getDefaultMediaType(), term, maxResults, sorts, directions, includeDisabled);
 	}
 
 	@Override
@@ -120,9 +120,9 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	}
 
 	@Override
-	public List<IMixedMediaItem> simpleSearchMedia (final MediaType mediaType, final String term, final int maxResults, final IDbColumn[] sortColumn, final SortDirection[] sortDirection) throws DbException {
+	public List<IMixedMediaItem> simpleSearchMedia (final MediaType mediaType, final String term, final int maxResults, final IDbColumn[] sortColumn, final SortDirection[] sortDirection, final boolean includeDisabled) throws DbException {
 		try {
-			return SearchParser.parseSearch(mediaType, term, sortColumn, sortDirection).execute(getDbCon(), this.itemFactory, maxResults);
+			return SearchParser.parseSearch(mediaType, sortColumn, sortDirection, true, !includeDisabled, term).execute(getDbCon(), this.itemFactory, maxResults);
 		}
 		catch (Exception e) {
 			throw new DbException(e);

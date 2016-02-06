@@ -111,7 +111,7 @@ public interface IMediaItemStorageLayer<T extends IMediaItem> extends IGenericDb
 	T getByFile (String filePath) throws DbException;
 	T getByHashcode (BigInteger hashcode) throws DbException;
 	List<T> simpleSearch(String term, int maxResults) throws DbException;
-	List<T> simpleSearch(String term, int maxResults, IDbColumn[] sorts, SortDirection[] directions) throws DbException;
+	List<T> simpleSearch(String term, int maxResults, IDbColumn[] sorts, SortDirection[] directions, boolean includeDisabled) throws DbException;
 
 	boolean[] addFiles (List<File> files) throws DbException;
 

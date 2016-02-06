@@ -72,6 +72,7 @@ import com.vaguehope.sqlitewrapper.DbException;
  * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 view=myview&action=queue&playerid=0
  * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 action=addtag&tag=foo
  * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 action=rmtag&tag=foo
+ * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 action=set_enabled&enabled=true
  *
  *  GET /mlists/LOCALMMDB/example.local.db3/albums
  *  GET /mlists/LOCALMMDB/example.local.db3/albums/somealbum
@@ -98,6 +99,8 @@ public class MlistsServlet extends HttpServlet {
 	private static final String PARAM_VIEW = "view";
 	private static final String PARAM_COLUMN = "column";
 	private static final String PARAM_ORDER = "order";
+	private static final String PARAM_INCLUDE_DISABLED = "includedisabled";
+	private static final String PARAM_ENABLED = "enabled";
 
 	public static final String CMD_NEWMMDB = "newmmdb";
 	public static final String CMD_SCAN = "scan";
@@ -106,6 +109,7 @@ public class MlistsServlet extends HttpServlet {
 	public static final String CMD_QUEUE_TOP = "queue_top";
 	public static final String CMD_ADDTAG = "addtag";
 	public static final String CMD_RMTAG = "rmtag";
+	public static final String CMD_SET_ENABLED = "set_enabled";
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -364,6 +368,17 @@ public class MlistsServlet extends HttpServlet {
 				ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "'tag' parameter not set desu~");
 			}
 		}
+		else if (action.equals(CMD_SET_ENABLED)) {
+			final Boolean enab = ServletHelper.readParamBoolean(req, PARAM_ENABLED);
+			if (enab != null) {
+				mmdb.setItemEnabled(item, enab);
+				resp.setContentType("text/plain");
+				resp.getWriter().println("enabled=" + enab + " set desu~");
+			}
+			else {
+				ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid or missing " + PARAM_ENABLED + " param.");
+			}
+		}
 		else {
 			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "HTTP error 400 '" + action + "' is not a valid action parameter desu~");
 		}
@@ -496,7 +511,8 @@ public class MlistsServlet extends HttpServlet {
 			final String query = URLDecoder.decode(afterPath, "UTF-8");
 			final IDbColumn[] sortColumns = parseSortColumns(req);
 			final SortDirection[] sortDirections = parseSortOrder(req);
-			printMlistLong(resp, mmdb, false, true, query, sortColumns, sortDirections);
+			final boolean includeDisabled = ServletHelper.readParamBoolean(req, PARAM_INCLUDE_DISABLED, false);
+			printMlistLong(resp, mmdb, false, true, query, sortColumns, sortDirections, includeDisabled);
 		}
 		else {
 			ServletHelper.error(resp, HttpServletResponse.SC_NOT_FOUND, "HTTP error 404 unknown path '" + path + "' desu~");
@@ -576,21 +592,25 @@ public class MlistsServlet extends HttpServlet {
 	}
 
 	private static void printMlistLong (final HttpServletResponse resp, final IMixedMediaDb ml, final boolean listSrcs, final boolean listItems) throws SAXException, MorriganException, DbException, IOException {
-		printMlistLong(resp, ml, listSrcs, listItems, null, null, null);
+		printMlistLong(resp, ml, listSrcs, listItems, null, null, null, false);
 	}
 
-	private static void printMlistLong (final HttpServletResponse resp, final IMixedMediaDb ml, final boolean listSrcs, final boolean listItems, final String queryString, final IDbColumn[] sortColumns, final SortDirection[] sortDirections) throws SAXException, MorriganException, DbException, IOException {
-		printMlistLong(resp, ml, listSrcs, listItems, true, queryString, sortColumns, sortDirections);
+	private static void printMlistLong (final HttpServletResponse resp, final IMixedMediaDb ml, final boolean listSrcs, final boolean listItems,
+			final String queryString, final IDbColumn[] sortColumns, final SortDirection[] sortDirections, final boolean includeDisabled)
+					throws SAXException, MorriganException, DbException, IOException {
+		printMlistLong(resp, ml, listSrcs, listItems, true, queryString, sortColumns, sortDirections, includeDisabled);
 	}
 
-	private static void printMlistLong (final HttpServletResponse resp, final IMixedMediaDb ml, final boolean listSrcs, final boolean listItems, final boolean includeTags, final String queryString, final IDbColumn[] sortColumns, final SortDirection[] sortDirections) throws SAXException, MorriganException, DbException, IOException {
+	private static void printMlistLong (final HttpServletResponse resp, final IMixedMediaDb ml, final boolean listSrcs, final boolean listItems,
+			final boolean includeTags, final String queryString, final IDbColumn[] sortColumns, final SortDirection[] sortDirections, final boolean includeDisabled)
+					throws SAXException, MorriganException, DbException, IOException {
 		ml.read();
 		resp.setContentType("text/xml;charset=utf-8");
 		final DataWriter dw = FeedHelper.startDocument(resp.getWriter(), "mlist");
 
 		List<IMixedMediaItem> items;
 		if (queryString != null) {
-			items = ml.simpleSearch(queryString, MAX_RESULTS, sortColumns, sortDirections);
+			items = ml.simpleSearch(queryString, MAX_RESULTS, sortColumns, sortDirections, includeDisabled);
 		}
 		else {
 			items = ml.getMediaItems();

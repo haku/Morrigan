@@ -85,6 +85,10 @@ header .subtitle span {
   text-decoration: none;
   color: inherit;
 }
+.clickable_list a.disabled {
+  text-decoration: line-through;
+  color: #aaa;
+}
 .clickable_list .item:hover {
   background: Highlight;
   color: HighlightText;

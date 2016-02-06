@@ -6,3 +6,7 @@ ErrorHelper = {};
   };
 
 })();
+
+jQuery.fn.setVisibility = function(visibility) {
+  return this.css('visibility', visibility ? 'visible' : 'hidden');
+};

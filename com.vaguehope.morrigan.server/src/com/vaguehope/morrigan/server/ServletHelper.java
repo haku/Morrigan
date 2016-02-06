@@ -10,6 +10,8 @@ import java.io.OutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.vaguehope.morrigan.util.StringHelper;
+
 public final class ServletHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -17,7 +19,7 @@ public final class ServletHelper {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public static void error (HttpServletResponse resp, int status, String msg) throws IOException {
+	public static void error (final HttpServletResponse resp, final int status, final String msg) throws IOException {
 		resp.reset();
 		resp.setStatus(status);
 		resp.setContentType("text/plain");
@@ -32,7 +34,7 @@ public final class ServletHelper {
 	/**
 	 * Returns true if 304 was returned and no further processing is needed.
 	 */
-	public static boolean checkCanReturn304 (long lastModified, HttpServletRequest req, HttpServletResponse resp) {
+	public static boolean checkCanReturn304 (final long lastModified, final HttpServletRequest req, final HttpServletResponse resp) {
 		long time = req.getDateHeader("If-Modified-Since");
 		if (time < 0) return false;
 		if (time < lastModified) return false;
@@ -42,14 +44,14 @@ public final class ServletHelper {
 		return true;
 	}
 
-	public static void prepForReturnFile (String name, long length, HttpServletResponse response) {
+	public static void prepForReturnFile (final String name, final long length, final HttpServletResponse response) {
 		prepForReturnFile(name, length, System.currentTimeMillis(), response);
 	}
 
 	/**
 	 * @param name if specified then the client will be hinted that this is a download.
 	 */
-	public static void prepForReturnFile (String name, long length, long lastModified, HttpServletResponse response) {
+	public static void prepForReturnFile (final String name, final long length, final long lastModified, final HttpServletResponse response) {
 		response.reset();
 		if (name != null) {
 			response.setContentType("application/octet-stream");
@@ -63,11 +65,11 @@ public final class ServletHelper {
 		if (length > 0) response.addHeader("Content-Length", String.valueOf(length));
 	}
 
-	public static void returnFile (File file, HttpServletResponse response) throws IOException {
+	public static void returnFile (final File file, final HttpServletResponse response) throws IOException {
 		returnFile(file, response, true);
 	}
 
-	public static void returnFile (File file, HttpServletResponse response, boolean asDownload) throws IOException {
+	public static void returnFile (final File file, final HttpServletResponse response, final boolean asDownload) throws IOException {
 		InputStream is = new BufferedInputStream(new FileInputStream(file));
 		try {
 			String name = asDownload ? file.getName() : null;
@@ -78,7 +80,7 @@ public final class ServletHelper {
 		}
 	}
 
-	public static void returnFile (InputStream is, String name, long length, long lastModified, HttpServletResponse response) throws IOException {
+	public static void returnFile (final InputStream is, final String name, final long length, final long lastModified, final HttpServletResponse response) throws IOException {
 		prepForReturnFile(name, length, lastModified, response);
 		OutputStream os = null;
 		try {
@@ -95,6 +97,25 @@ public final class ServletHelper {
 			if (os != null) os.close();
 		}
 
+	}
+
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	public static boolean readParamBoolean (final HttpServletRequest req, final String name, final boolean defRet) {
+		Boolean b = readParamBoolean(req, name);
+		if (b != null) return b;
+		return defRet;
+	}
+
+	public static Boolean readParamBoolean (final HttpServletRequest req, final String name) {
+		final String raw = StringHelper.downcase(StringHelper.trimToNull(req.getParameter(name)));
+		if ("true".equals(raw)) {
+			return true;
+		}
+		else if ("false".equals(raw)) {
+			return false;
+		}
+		return null;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

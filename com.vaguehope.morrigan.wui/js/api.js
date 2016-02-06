@@ -298,6 +298,7 @@ MnApi = {};
     if (view) url += '&view=' + encodeURIComponent(view);
     if (sortColumn) url += "&column=" + sortColumn;
     if (sortOrder) url += "&order=" + sortOrder;
+    url += "&includedisabled=true";
 
     $.ajax({
       type : 'GET',
@@ -336,7 +337,8 @@ MnApi = {};
       title: node.find('title').text(),
       duration: parseInt(node.find('duration').text(), 10),
       startCount: parseInt(node.find('startcount').text(), 10),
-      endCount: parseInt(node.find('endcount').text(), 10)
+      endCount: parseInt(node.find('endcount').text(), 10),
+      enabled: node.find('enabled').text() == "true"
     };
 
     item.tags = [];
@@ -380,6 +382,10 @@ MnApi = {};
 
   MnApi.rmTag = function(item, tag, onStatus, onComplete) {
     actionItem(item, 'rmtag', 'tag=' + tag, onStatus, onComplete);
+  };
+
+  MnApi.setEnabled = function(item, enabled, onStatus, onComplete) {
+    actionItem(item, 'set_enabled', 'enabled=' + enabled, onStatus, onComplete);
   };
 
   function actionItem(item, action, args, onStatus, onComplete) {

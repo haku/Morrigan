@@ -388,8 +388,8 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	}
 
 	@Override
-	public List<T> simpleSearch (final String term, final int maxResults, final IDbColumn[] sortColumns, final SortDirection[] sortDirections) throws DbException {
-		return this.dbLayer.simpleSearch(term, maxResults, sortColumns, sortDirections);
+	public List<T> simpleSearch (final String term, final int maxResults, final IDbColumn[] sortColumns, final SortDirection[] sortDirections, final boolean includeDisabled) throws DbException {
+		return this.dbLayer.simpleSearch(term, maxResults, sortColumns, sortDirections, includeDisabled);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

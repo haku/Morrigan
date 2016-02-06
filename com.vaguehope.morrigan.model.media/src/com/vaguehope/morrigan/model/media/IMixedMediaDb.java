@@ -23,7 +23,7 @@ public interface IMixedMediaDb
 	MediaType getDefaultMediaType ();
 
 	List<IMixedMediaItem> simpleSearchMedia (MediaType mediaType, String term, int maxResults) throws DbException;
-	List<IMixedMediaItem> simpleSearchMedia (MediaType mediaType, String term, int maxResults, IDbColumn[] sortColumns, SortDirection[] sortDirections) throws DbException;
+	List<IMixedMediaItem> simpleSearchMedia (MediaType mediaType, String term, int maxResults, IDbColumn[] sortColumns, SortDirection[] sortDirections, boolean includeDisabled) throws DbException;
 
 	Collection<IMixedMediaItem> getAlbumItems (MediaType mediaType, MediaAlbum album) throws MorriganException;
 	/**
