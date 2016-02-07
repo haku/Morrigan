@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.vaguehope.morrigan.model.db.IDbItem;
+import com.vaguehope.morrigan.model.helper.EqualHelper;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayerChangeListener;
@@ -147,6 +148,15 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	}
 
 	@Override
+	public boolean addTag (final IDbItem item, final String tag, final MediaTagType type, final String mtc, final Date modified, final boolean deleted) throws DbException {
+		try {
+			return local_addTag(item, tag, type, mtc, false, modified, deleted);
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+
+	@Override
 	public void moveTags (final IDbItem from_item, final IDbItem to_item) throws DbException {
 		try {
 			local_moveTags(from_item, to_item);
@@ -158,7 +168,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	@Override
 	public void removeTag (final MediaTag tag) throws DbException {
 		try {
-			local_removeTag(tag);
+			local_setTagDeleted(tag, tag, true, new Date());
 		} catch (Exception e) {
 			throw new DbException(e);
 		}
@@ -427,16 +437,13 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		" ORDER BY freq DESC, t.type ASC, c.cls ASC, t.tag ASC;";
 
 	private static final String SQL_TBL_TAGS_ADD =
-		"INSERT INTO tbl_tags (mf_id,tag,type,cls_id,modified) VALUES (?,?,?,?,?);";
+		"INSERT INTO tbl_tags (mf_id,tag,type,cls_id,modified,deleted) VALUES (?,?,?,?,?,?);";
 
 	private static final String SQL_TBL_TAGS_MOVE =
 		"UPDATE tbl_tags SET mf_id=? WHERE mf_id=?;";
 
-	private static final String SQL_TBL_TAGS_REMOVE =
-		"UPDATE tbl_tags SET deleted=1,modified=? WHERE id=?;";
-
-	private static final String SQL_TBL_TAGS_REINSTATE =
-		"UPDATE tbl_tags SET deleted=0,modified=? WHERE id=?;";
+	private static final String SQL_TBL_TAGS_SET_DELETED =
+		"UPDATE tbl_tags SET deleted=?,modified=? WHERE id=?;";
 
 	private static final String SQL_TBL_TAGS_CLEAR =
 		"DELETE FROM tbl_tags WHERE mf_id=?;";
@@ -600,48 +607,83 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Private methods for tags.
 
-	private boolean local_addTag (final IDbItem item, final String tag, final MediaTagType type, final String cls_name) throws SQLException, ClassNotFoundException, DbException {
+	private boolean local_addTag (final IDbItem item, final String tag, final MediaTagType type, final String clsName) throws SQLException, ClassNotFoundException, DbException {
+		return local_addTag(item, tag, type, clsName, true, null, false);
+	}
+
+	private boolean local_addTag (final IDbItem item, final String tag, final MediaTagType type, final String clsName, final boolean dateNow, final Date modified, final boolean deleted) throws SQLException, ClassNotFoundException, DbException {
 		MediaTagClassification mtc = null;
-		if (cls_name != null && !cls_name.isEmpty()) {
-			mtc = local_getTagClassification(cls_name);
-			if (mtc == null) mtc = local_addTagClassification(cls_name);
+		if (clsName != null && !clsName.isEmpty()) {
+			mtc = local_getTagClassification(clsName);
+			if (mtc == null) mtc = local_addTagClassification(clsName);
 		}
-		return local_addTag(item, tag, type, mtc);
+		return local_addTag(item, tag, type, mtc, dateNow, modified, deleted);
 	}
 
 	private boolean local_addTag (final IDbItem item, final String tag, final MediaTagType type, final MediaTagClassification mtc) throws SQLException, ClassNotFoundException, DbException {
+		return local_addTag(item, tag, type, mtc, true, null, false);
+	}
+
+	private boolean local_addTag (final IDbItem item, final String tag, final MediaTagType type, final MediaTagClassification mtc, final boolean dateNow, final Date modified, final boolean deleted) throws SQLException, ClassNotFoundException, DbException {
+		if (dateNow && modified != null) throw new IllegalArgumentException("if dateNow modified must be null.");
+		if (dateNow && deleted) throw new IllegalArgumentException("if dateNow can not be deleted.");
+
 		final List<MediaTag> existing = local_hasTag(item.getDbRowId(), tag, type, mtc);
 
-		// If any not deleted, nothing to do.
-		for (final MediaTag t : existing) {
-			if (!t.isDeleted()) return false;
+		// Simple add.  modified MUST be null and deleted MUST be false.
+		if (dateNow) {
+			for (final MediaTag t : existing) {
+				// If any not deleted, nothing to do.
+				if (!t.isDeleted()) return false;
+			}
+
+			// Reinstate first item, if any.
+			for (final MediaTag t : existing) {
+				local_setTagDeleted(item, t, false, new Date());
+				return true;
+			}
+		}
+		else {
+			for (final MediaTag t : existing) {
+				if (!EqualHelper.areEqual(t.getModified(), modified) || !t.isDeleted() == deleted) {
+					local_setTagDeleted(item, t, deleted, modified);
+				}
+				return true;
+			}
 		}
 
-		// Reinstate first item, if any.
-		for (final MediaTag t : existing) {
-			local_reinstateTag(item, t);
-			return true;
-		}
-
-		PreparedStatement ps;
-		ps = getDbCon().prepareStatement(SQL_TBL_TAGS_ADD);
-		int n;
+		final PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_TAGS_ADD);
 		try {
 			ps.setLong(1, item.getDbRowId());
 			ps.setString(2, tag);
 			ps.setInt(3, type.getIndex());
+
 			if (mtc != null) {
 				ps.setLong(4, mtc.getDbRowId());
 			}
 			else {
 				ps.setNull(4, java.sql.Types.INTEGER);
 			}
-			ps.setDate(5, new java.sql.Date(System.currentTimeMillis())); // modified.
-			n = ps.executeUpdate();
-			if (n<1) throw new DbException("No update occured.");
 
+			if (dateNow) {
+				ps.setDate(5, new java.sql.Date(System.currentTimeMillis()));
+			}
+			else if (modified != null) {
+				ps.setDate(5, new java.sql.Date(modified.getTime()));
+			}
+			else {
+				ps.setNull(5, java.sql.Types.DATE);
+			}
+
+			if (deleted) {
+				ps.setInt(6, 1);
+			}
+			else {
+				ps.setNull(6, java.sql.Types.INTEGER);
+			}
+
+			if (ps.executeUpdate() < 1) throw new DbException("No update occured.");
 			this.changeCaller.mediaItemTagAdded(item, tag, type, mtc);
-
 			return true;
 		}
 		finally {
@@ -665,26 +707,20 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		}
 	}
 
-	private void local_removeTag(final MediaTag tag) throws SQLException, ClassNotFoundException, DbException {
-		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_TAGS_REMOVE);
+	private void local_setTagDeleted(final IDbItem item, final MediaTag tag, final boolean deleted, final Date modified) throws SQLException, ClassNotFoundException, DbException {
+		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_TAGS_SET_DELETED);
 		try {
-			ps.setDate(1, new java.sql.Date(System.currentTimeMillis()));
-			ps.setLong(2, tag.getDbRowId());
-			int n = ps.executeUpdate();
-			if (n < 1) throw new DbException("No update occured.");
+			ps.setInt(1, deleted ? 1 : 0);
 
-			this.changeCaller.mediaItemTagRemoved(tag);
-		}
-		finally {
-			ps.close();
-		}
-	}
+			if (modified != null) {
+				ps.setDate(2, new java.sql.Date(modified.getTime()));
+			}
+			else {
+				ps.setNull(2, java.sql.Types.DATE);
+			}
 
-	private void local_reinstateTag(final IDbItem item, final MediaTag tag) throws SQLException, ClassNotFoundException, DbException {
-		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_TAGS_REINSTATE);
-		try {
-			ps.setDate(1, new java.sql.Date(System.currentTimeMillis()));
-			ps.setLong(2, tag.getDbRowId());
+			ps.setLong(3, tag.getDbRowId());
+
 			int n = ps.executeUpdate();
 			if (n < 1) throw new DbException("No update occured.");
 

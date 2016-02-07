@@ -3,11 +3,9 @@ package com.vaguehope.morrigan.server.feedreader;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.Stack;
 
 import org.xml.sax.Attributes;
@@ -18,46 +16,57 @@ import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
-import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.server.util.XmlHelper;
 import com.vaguehope.morrigan.tasks.TaskEventListener;
+import com.vaguehope.morrigan.util.StringHelper;
 import com.vaguehope.sqlitewrapper.DbException;
 
 public class MixedMediaDbFeedParser extends DefaultHandler {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	private final IRemoteMixedMediaDb rmmdb;
 	private final TaskEventListener taskEventListener;
 	private final Stack<String> stack;
-	
-	MixedMediaDbFeedParser(IRemoteMixedMediaDb rmmdb, TaskEventListener taskEventListener) {
+
+	MixedMediaDbFeedParser(final IRemoteMixedMediaDb rmmdb, final TaskEventListener taskEventListener) {
 		this.taskEventListener = taskEventListener;
 		this.stack = new Stack<String>();
-		this.rmmdb = rmmdb; 
+		this.rmmdb = rmmdb;
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
+	private static class TagAttrs {
+		final MediaTagType type;
+		final String cls;
+		final Date modified;
+		final boolean deleted;
+		public TagAttrs (final MediaTagType type, final String cls, final Date modified, final boolean deleted) {
+			this.type = type;
+			this.cls = cls;
+			this.modified = modified;
+			this.deleted = deleted;
+		}
+	}
+
 	private long entryCount = 0;
 	private long entriesProcessed = 0;
 	private int progress = 0;
-	
+
 	private IMixedMediaItem currentItem;
 	private StringBuilder currentText;
-	
-	private List<String> tagValues = new LinkedList<String>();
-	private List<MediaTagType> tagTypes = new LinkedList<MediaTagType>();
-	private List<String> tagClasses = new LinkedList<String>();
-	
+
+	private final List<String> tagValues = new ArrayList<String>();
+	private final List<TagAttrs> tagAttrs = new ArrayList<TagAttrs>();
+
 	@Override
-	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+	public void startElement(final String uri, final String localName, final String qName, final Attributes attributes) throws SAXException {
 		this.stack.push(localName);
 		if (this.stack.size() == 2 && localName.equals("entry")) {
 			this.currentItem = this.rmmdb.getDbLayer().getNewT(null);
 			this.tagValues.clear();
-			this.tagTypes.clear();
-			this.tagClasses.clear();
+			this.tagAttrs.clear();
 		}
 		else if (this.stack.size() == 3 && localName.equals("link")) {
 			String relVal = attributes.getValue("rel");
@@ -75,21 +84,26 @@ public class MixedMediaDbFeedParser extends DefaultHandler {
 			}
 		}
 		else if (this.stack.size() == 3 && localName.equals("tag")) {
-			String typeString = attributes.getValue("t");
-			MediaTagType type = typeString == null ? null : MediaTagType.getFromIndex(Integer.parseInt(typeString));
-			this.tagTypes.add(type);
-			String classString = attributes.getValue("c");
-			this.tagClasses.add(classString);
+			final String typeString = attributes.getValue("t");
+			final String cls = StringHelper.trimToNull(attributes.getValue("c"));
+			final String modifiedString = StringHelper.trimToNull(attributes.getValue("m"));
+			final String deletedString = StringHelper.trimToNull(attributes.getValue("d"));
+
+			final MediaTagType type = typeString == null ? null : MediaTagType.getFromIndex(Integer.parseInt(typeString));
+			final Date modified = modifiedString == null ? null : new Date(Long.parseLong(modifiedString));
+			final boolean deleted = "true".equalsIgnoreCase(deletedString);
+
+			this.tagAttrs.add(new TagAttrs(type, cls, modified, deleted));
 		}
-		
+
 		// If we need a new StringBuilder, make one.
 		if (this.currentText == null || this.currentText.length() > 0) {
 			this.currentText = new StringBuilder();
 		}
 	}
-	
+
 	@Override
-	public void endElement(String uri, String localName, String qName) throws SAXException {
+	public void endElement(final String uri, final String localName, final String qName) throws SAXException {
 		if (this.stack.size() == 2 && localName.equals("count")) {
 			this.entryCount = Long.parseLong(this.currentText.toString());
 		}
@@ -99,45 +113,15 @@ public class MixedMediaDbFeedParser extends DefaultHandler {
 				IMixedMediaItem realItem = this.rmmdb.updateItem(this.currentItem);
 				if (realItem.getDbRowId() < 0) throw new IllegalStateException("Can not add tags without DB row id for '"+realItem+"'.");
 				if (this.tagValues.size() > 0) {
-					if (this.tagValues.size() != this.tagTypes.size() || this.tagValues.size() != this.tagClasses.size()) {
+					if (this.tagValues.size() != this.tagAttrs.size()) {
     					throw new IllegalArgumentException("Unbalanced tag lists.");
     				}
-					
-					// TODO what about removing deleted tags?
-					List<MediaTag> oldTags = this.rmmdb.getTags(realItem);
-					if (oldTags.size() > 0) {
-						Set<String> newTags = new HashSet<String>(this.tagValues);
-						List<MediaTag> tagsToRemove = null;
-						
-						for (MediaTag tag : oldTags) {
-							if (!newTags.contains(tag.getTag())) {
-								if (tagsToRemove == null) tagsToRemove = new LinkedList<MediaTag>();
-								tagsToRemove.add(tag);
-							}
-							// TODO What about partial matches with same tag but different class/type?
-						}
-						
-						if (tagsToRemove != null) {
-							// TODO remove tags from [realItem].
-							StringBuilder logMsg = new StringBuilder();
-							logMsg.append("Remove tags from ");
-							logMsg.append(realItem.getTitle());
-							logMsg.append(":");
-							for (MediaTag tag : tagsToRemove) {
-								logMsg.append(" ");
-								logMsg.append(tag);
-							}
-							this.taskEventListener.logMsg(this.rmmdb.getListName(), logMsg.toString());
-						}
-					}
-					
-					// Add new tags.  AddTag() has an implicit duplication check.
+
+					// addTag() will update modified/deleted flags as needed.
 					for (int i = 0; i < this.tagValues.size(); i++) {
-    					String value = this.tagValues.get(i);
-    					MediaTagType type = this.tagTypes.get(i);
-    					String classString = this.tagClasses.get(i);
-    					if (classString != null && classString.length() < 1) classString = null;
-    					this.rmmdb.addTag(realItem, value, type, classString);
+    					final String value = this.tagValues.get(i);
+    					final TagAttrs attrs = this.tagAttrs.get(i);
+    					this.rmmdb.addTag(realItem, value, attrs.type, attrs.cls, attrs.modified, attrs.deleted);
     				}
 				}
 			}
@@ -147,7 +131,7 @@ public class MixedMediaDbFeedParser extends DefaultHandler {
 			catch (DbException e) {
 				throw new SAXException(e);
 			}
-			
+
 			if (this.taskEventListener != null) {
 				this.entriesProcessed++;
 				int p = (int) ((this.entriesProcessed * 100) / this.entryCount);
@@ -225,27 +209,27 @@ public class MixedMediaDbFeedParser extends DefaultHandler {
 			String v = this.currentText.toString();
 			this.tagValues.add(v);
 		}
-		
+
 		this.stack.pop();
 	} // endElement().
-	
+
 	@Override
-	public void characters(char[] ch, int start, int length) {
+	public void characters(final char[] ch, final int start, final int length) {
 		this.currentText.append( ch, start, length );
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	private static String flattenStack (Stack<String> stack) {
+
+	private static String flattenStack (final Stack<String> stack) {
 		StringBuilder sb = new StringBuilder();
-		
+
 		for (String s : stack) {
 			sb.append(s);
 			sb.append('/');
 		}
-		
+
 		return sb.toString();
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

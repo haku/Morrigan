@@ -686,6 +686,16 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	}
 
 	@Override
+	public void addTag (final IDbItem item, final String tag, final MediaTagType type, final String mtc, final Date modified, final boolean deleted) throws MorriganException {
+		try {
+			this.dbLayer.addTag(item, tag, type, mtc, modified, deleted);
+		}
+		catch (DbException e) {
+			throw new MorriganException(e);
+		}
+	}
+
+	@Override
 	public void moveTags (final IDbItem from_item, final IDbItem to_item) throws MorriganException {
 		try {
 			this.dbLayer.moveTags(from_item, to_item);

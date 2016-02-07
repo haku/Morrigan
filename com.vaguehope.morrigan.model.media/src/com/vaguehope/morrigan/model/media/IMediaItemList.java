@@ -78,6 +78,7 @@ public interface IMediaItemList<T extends IMediaItem> {
 	List<MediaTag> getTagsIncludingDeleted (IDbItem item) throws MorriganException;
 	void addTag (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) throws MorriganException;
 	void addTag (IDbItem item, String tag, MediaTagType type, String mtc) throws MorriganException;
+	void addTag (IDbItem item, String tag, MediaTagType type, String mtc, Date modified, boolean deleted) throws MorriganException;
 	void moveTags (IDbItem fromItem, IDbItem toItem) throws MorriganException;
 	void removeTag (MediaTag mt) throws MorriganException;
 	void clearTags (IDbItem item) throws MorriganException;

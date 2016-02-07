@@ -65,6 +65,7 @@ import com.vaguehope.sqlitewrapper.DbException;
  * POST /mlists/LOCALMMDB/example.local.db3 action=scan
  *
  *  GET /mlists/LOCALMMDB/example.local.db3/items
+ *  GET /mlists/LOCALMMDB/example.local.db3/items?includeddeletedtags=true
  *  GET /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3
  * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 action=play&playerid=0
  * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 action=queue&playerid=0
@@ -80,6 +81,7 @@ import com.vaguehope.sqlitewrapper.DbException;
  * POST /mlists/LOCALMMDB/example.local.db3/albums/somealbum action=queue&playerid=0
  *
  *  GET /mlists/LOCALMMDB/example.local.db3/query/example
+ *  GET /mlists/LOCALMMDB/example.local.db3/query/example?includedisabled=true
  *  GET /mlists/LOCALMMDB/example.local.db3/query/example?column=foo&order=asc
  * </pre>
  */
@@ -93,6 +95,7 @@ public class MlistsServlet extends HttpServlet {
 	public static final String PATH_ALBUMS = "albums";
 	public static final String PATH_QUERY = "query";
 
+	public static final String PARAM_INCLUDE_DELETED_TAGS = "includeddeletedtags";
 	private static final String PARAM_ACTION = "action";
 	private static final String PARAM_PLAYERID = "playerid";
 	private static final String PARAM_TAG = "tag";
@@ -458,7 +461,7 @@ public class MlistsServlet extends HttpServlet {
 
 	private static void getToMmdb (final HttpServletRequest req, final HttpServletResponse resp, final IMixedMediaDb mmdb, final String path, final String afterPath) throws IOException, SAXException, MorriganException, DbException {
 		if (path == null) {
-			printMlistLong(resp, mmdb, false, false);
+			printMlistLong(resp, mmdb, false, false, false);
 		}
 		else if (path.equals(PATH_ITEMS)) {
 			if (afterPath != null && afterPath.length() > 0) {
@@ -486,11 +489,12 @@ public class MlistsServlet extends HttpServlet {
 				}
 			}
 			else {
-				printMlistLong(resp, mmdb, false, true);
+				boolean includeDeletedTags = ServletHelper.readParamBoolean(req, PARAM_INCLUDE_DELETED_TAGS, false);
+				printMlistLong(resp, mmdb, false, true, includeDeletedTags);
 			}
 		}
 		else if (path.equals(PATH_SRC)) {
-			printMlistLong(resp, mmdb, true, false);
+			printMlistLong(resp, mmdb, true, false, false);
 		}
 		else if (path.equals(PATH_ALBUMS)) {
 			if (afterPath != null && afterPath.length() > 0) {
@@ -512,7 +516,7 @@ public class MlistsServlet extends HttpServlet {
 			final IDbColumn[] sortColumns = parseSortColumns(req);
 			final SortDirection[] sortDirections = parseSortOrder(req);
 			final boolean includeDisabled = ServletHelper.readParamBoolean(req, PARAM_INCLUDE_DISABLED, false);
-			printMlistLong(resp, mmdb, false, true, query, sortColumns, sortDirections, includeDisabled);
+			printMlistLong(resp, mmdb, false, true, false, query, sortColumns, sortDirections, includeDisabled);
 		}
 		else {
 			ServletHelper.error(resp, HttpServletResponse.SC_NOT_FOUND, "HTTP error 404 unknown path '" + path + "' desu~");
@@ -591,17 +595,17 @@ public class MlistsServlet extends HttpServlet {
 		}
 	}
 
-	private static void printMlistLong (final HttpServletResponse resp, final IMixedMediaDb ml, final boolean listSrcs, final boolean listItems) throws SAXException, MorriganException, DbException, IOException {
-		printMlistLong(resp, ml, listSrcs, listItems, null, null, null, false);
+	private static void printMlistLong (final HttpServletResponse resp, final IMixedMediaDb ml, final boolean listSrcs, final boolean listItems, final boolean includeDeletedTags) throws SAXException, MorriganException, DbException, IOException {
+		printMlistLong(resp, ml, listSrcs, listItems, includeDeletedTags, null, null, null, false);
 	}
 
-	private static void printMlistLong (final HttpServletResponse resp, final IMixedMediaDb ml, final boolean listSrcs, final boolean listItems,
+	private static void printMlistLong (final HttpServletResponse resp, final IMixedMediaDb ml, final boolean listSrcs, final boolean listItems, final boolean includeDeletedTags,
 			final String queryString, final IDbColumn[] sortColumns, final SortDirection[] sortDirections, final boolean includeDisabled)
 					throws SAXException, MorriganException, DbException, IOException {
-		printMlistLong(resp, ml, listSrcs, listItems, true, queryString, sortColumns, sortDirections, includeDisabled);
+		printMlistLong(resp, ml, listSrcs, listItems, includeDeletedTags, true, queryString, sortColumns, sortDirections, includeDisabled);
 	}
 
-	private static void printMlistLong (final HttpServletResponse resp, final IMixedMediaDb ml, final boolean listSrcs, final boolean listItems,
+	private static void printMlistLong (final HttpServletResponse resp, final IMixedMediaDb ml, final boolean listSrcs, final boolean listItems, final boolean includeDeletedTags,
 			final boolean includeTags, final String queryString, final IDbColumn[] sortColumns, final SortDirection[] sortDirections, final boolean includeDisabled)
 					throws SAXException, MorriganException, DbException, IOException {
 		ml.read();
@@ -654,7 +658,7 @@ public class MlistsServlet extends HttpServlet {
 		if (listItems) {
 			for (final IMixedMediaItem mi : items) {
 				dw.startElement("entry");
-				fillInMediaItem(dw, ml, mi, includeTags);
+				fillInMediaItem(dw, ml, mi, includeTags, includeDeletedTags);
 				dw.endElement("entry");
 			}
 		}
@@ -662,7 +666,7 @@ public class MlistsServlet extends HttpServlet {
 		FeedHelper.endDocument(dw, "mlist");
 	}
 
-	static void fillInMediaItem (final DataWriter dw, final IMediaTrackList<? extends IMediaTrack> ml, final IMediaItem mi, final boolean includeTags) throws SAXException, MorriganException {
+	static void fillInMediaItem (final DataWriter dw, final IMediaTrackList<? extends IMediaTrack> ml, final IMediaItem mi, final boolean includeTags, final boolean includeDeletedTags) throws SAXException, MorriganException {
 		FeedHelper.addElement(dw, "title", mi.getTitle());
 
 		FeedHelper.addLink(dw, fileLink(mi), "self"); // Path is relative to this feed.
@@ -697,12 +701,23 @@ public class MlistsServlet extends HttpServlet {
 		}
 
 		if (includeTags) {
-			final List<MediaTag> tags = ml.getTags(mi);
-			for (final MediaTag tag : tags) {
-				FeedHelper.addElement(dw, "tag", tag.getTag(), new String[][] {
+			if (includeDeletedTags) {
+				for (final MediaTag tag : ml.getTagsIncludingDeleted(mi)) {
+					FeedHelper.addElement(dw, "tag", tag.getTag(), new String[][] {
+						{ "t", String.valueOf(tag.getType().getIndex()) },
+						{ "c", tag.getClassification() == null ? "" : tag.getClassification().getClassification() },
+						{ "m", tag.getModified() == null || tag.getModified().getTime() < 1L ? "" : String.valueOf(tag.getModified().getTime()) },
+						{ "d", String.valueOf(tag.isDeleted()) }
+					});
+				}
+			}
+			else {
+				for (final MediaTag tag : ml.getTags(mi)) {
+					FeedHelper.addElement(dw, "tag", tag.getTag(), new String[][] {
 						{ "t", String.valueOf(tag.getType().getIndex()) },
 						{ "c", tag.getClassification() == null ? "" : tag.getClassification().getClassification() }
-				});
+					});
+				}
 			}
 		}
 	}

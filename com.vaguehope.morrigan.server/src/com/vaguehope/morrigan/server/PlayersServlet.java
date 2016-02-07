@@ -433,7 +433,7 @@ public class PlayersServlet extends HttpServlet {
 					}
 
 					dw.startElement("track");
-					MlistsServlet.fillInMediaItem(dw, currentList, track, true);
+					MlistsServlet.fillInMediaItem(dw, currentList, track, true, false);
 					dw.endElement("track");
 				}
 			}

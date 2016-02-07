@@ -30,9 +30,9 @@ import com.vaguehope.sqlitewrapper.DbException;
 
 public class MixedMediaDbFeedReader implements HttpStreamHandler {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	private static final String USERNAME = "Morrigan-GUI";
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	/**
@@ -42,9 +42,9 @@ public class MixedMediaDbFeedReader implements HttpStreamHandler {
 	public static void read (final IRemoteMixedMediaDb mmdb, final TaskEventListener taskEventListener) throws MorriganException {
 		if (taskEventListener != null) taskEventListener.onStart();
 		if (taskEventListener != null) taskEventListener.beginTask("Updating " + mmdb.getListName(), 100);
-		
+
 		try {
-			String surl = mmdb.getUrl().toString() + "/" + MlistsServlet.PATH_ITEMS;
+			final String surl = mmdb.getUrl().toString() + "/" + MlistsServlet.PATH_ITEMS + "?" + MlistsServlet.PARAM_INCLUDE_DELETED_TAGS + "=true";
 			URL url = new URL(surl);
 			Map<String, String> headers = new HashMap<String, String>();
 			addAuthHeader(headers, USERNAME, mmdb.getPass());
@@ -66,26 +66,26 @@ public class MixedMediaDbFeedReader implements HttpStreamHandler {
 		} catch (DbException e) {
 			throw new MorriganException(e);
 		}
-		
+
 		if (taskEventListener!=null) taskEventListener.done();
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	private final IRemoteMixedMediaDb mmdb;
 	private final TaskEventListener taskEventListener;
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	private MixedMediaDbFeedReader (IRemoteMixedMediaDb mmdb, TaskEventListener taskEventListener) {
+
+	private MixedMediaDbFeedReader (final IRemoteMixedMediaDb mmdb, final TaskEventListener taskEventListener) {
 		this.mmdb = mmdb;
 		this.taskEventListener = taskEventListener;
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	@Override
-	public void handleStream(InputStream is) throws IOException, HttpStreamHandlerException {
+	public void handleStream(final InputStream is) throws IOException, HttpStreamHandlerException {
 		boolean thereWereErrors = true;
 		IRemoteMixedMediaDb transClone = null;
 		try {
@@ -140,12 +140,12 @@ public class MixedMediaDbFeedReader implements HttpStreamHandler {
 			}
 		}
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	private static void addAuthHeader (Map<String, String> headers, String user, String pass) {
+
+	private static void addAuthHeader (final Map<String, String> headers, final String user, final String pass) {
 		headers.put(Http.HEADER_AUTHORISATION, Http.HEADER_AUTHORISATION_PREFIX + B64Code.encode(user + ":" + pass));
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
