@@ -449,7 +449,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		"DELETE FROM tbl_tags WHERE mf_id=?;";
 
 	private static final String SQL_TBL_TAGS_Q_HASANY =
-		"SELECT id FROM tbl_tags WHERE mf_id=? AND (t.deleted IS NULL OR t.deleted!=1);";
+		"SELECT id FROM tbl_tags WHERE mf_id=? AND (deleted IS NULL OR deleted!=1);";
 
 	// TODO is there a nice way to merge these two?
 	private static final String SQL_TBL_TAGS_Q_ALL =
