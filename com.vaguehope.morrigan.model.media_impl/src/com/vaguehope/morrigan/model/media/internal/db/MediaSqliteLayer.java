@@ -7,6 +7,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import com.vaguehope.morrigan.model.db.IDbItem;
@@ -100,16 +101,19 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	@Override
 	public boolean hasTag (final IDbItem item, final String tag, final MediaTagType type, final MediaTagClassification mtc) throws DbException {
 		try {
-			return local_hasTag(item.getDbRowId(), tag, type, mtc);
+			for (final MediaTag t : local_hasTag(item.getDbRowId(), tag, type, mtc)) {
+				if (!t.isDeleted()) return true;
+			}
+			return false;
 		} catch (Exception e) {
 			throw new DbException(e);
 		}
 	}
 
 	@Override
-	public List<MediaTag> getTags (final IDbItem item) throws DbException {
+	public List<MediaTag> getTags (final IDbItem item, final boolean includeDelete) throws DbException {
 		try {
-			return local_getTags(item.getDbRowId());
+			return local_getTags(item.getDbRowId(), includeDelete);
 		} catch (Exception e) {
 			throw new DbException(e);
 		}
@@ -315,6 +319,8 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		"tag VARCHAR(100)," +
 		"type INT," +
 		"cls_id INT," +
+		"modified DATETIME," +
+		"deleted INT(1)," +
 		"FOREIGN KEY(mf_id) REFERENCES tbl_mediafiles(id) ON DELETE RESTRICT ON UPDATE RESTRICT," +
 		"FOREIGN KEY(cls_id) REFERENCES tbl_tag_cls(id) ON DELETE RESTRICT ON UPDATE RESTRICT" +
 		");";
@@ -324,6 +330,8 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	private static final String SQL_TBL_TAGS_COL_TAG = "tag";
 	private static final String SQL_TBL_TAGS_COL_TYPE = "type";
 	private static final String SQL_TBL_TAGS_COL_CLSROWID = "cls_id";
+	private static final String SQL_TBL_TAGS_COL_MODIFIED = "modified";
+	private static final String SQL_TBL_TAGS_COL_DELETED = "deleted";
 
 	/* - - - - - - - - - - - - - - - -
 	 * tbl_tag_cls
@@ -412,38 +420,51 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	 */
 
 	private static final String SQL_TBL_TAGS_Q_TOP =
-		"SELECT count(*) as freq,t.id,t.tag,t.type,t.cls_id,c.cls" +
+		"SELECT count(*) as freq,t.id,t.tag,t.type,t.cls_id,t.modified,t.deleted,c.cls" +
 		" FROM tbl_tags AS t LEFT OUTER JOIN tbl_tag_cls AS c ON t.cls_id=c.id" +
-		" WHERE t.type=?" +
+		" WHERE t.type=? AND (t.deleted IS NULL OR t.deleted!=1)" +
 		" GROUP BY t.tag" +
 		" ORDER BY freq DESC, t.type ASC, c.cls ASC, t.tag ASC;";
 
 	private static final String SQL_TBL_TAGS_ADD =
-		"INSERT INTO tbl_tags (mf_id,tag,type,cls_id) VALUES (?,?,?,?);";
+		"INSERT INTO tbl_tags (mf_id,tag,type,cls_id,modified) VALUES (?,?,?,?,?);";
 
 	private static final String SQL_TBL_TAGS_MOVE =
 		"UPDATE tbl_tags SET mf_id=? WHERE mf_id=?;";
 
 	private static final String SQL_TBL_TAGS_REMOVE =
-		"DELETE FROM tbl_tags WHERE id=?;";
+		"UPDATE tbl_tags SET deleted=1,modified=? WHERE id=?;";
+
+	private static final String SQL_TBL_TAGS_REINSTATE =
+		"UPDATE tbl_tags SET deleted=0,modified=? WHERE id=?;";
 
 	private static final String SQL_TBL_TAGS_CLEAR =
 		"DELETE FROM tbl_tags WHERE mf_id=?;";
 
 	private static final String SQL_TBL_TAGS_Q_HASANY =
-		"SELECT id FROM tbl_tags WHERE mf_id=?;";
+		"SELECT id FROM tbl_tags WHERE mf_id=? AND (t.deleted IS NULL OR t.deleted!=1);";
 
+	// TODO is there a nice way to merge these two?
 	private static final String SQL_TBL_TAGS_Q_ALL =
-		"SELECT t.id,t.tag,t.type,t.cls_id,c.cls" +
+		"SELECT t.id,t.tag,t.type,t.cls_id,t.modified,t.deleted,c.cls" +
+		" FROM tbl_tags AS t LEFT OUTER JOIN tbl_tag_cls AS c ON t.cls_id=c.id" +
+		" WHERE t.mf_id=? AND (t.deleted IS NULL OR t.deleted!=1)" +
+		" ORDER BY t.type ASC, c.cls ASC, t.tag ASC;";
+	private static final String SQL_TBL_TAGS_Q_ALL_INC_DELETED =
+		"SELECT t.id,t.tag,t.type,t.cls_id,t.modified,t.deleted,c.cls" +
 		" FROM tbl_tags AS t LEFT OUTER JOIN tbl_tag_cls AS c ON t.cls_id=c.id" +
 		" WHERE t.mf_id=?" +
 		" ORDER BY t.type ASC, c.cls ASC, t.tag ASC;";
 
 	private static final String SQL_TBL_TAGS_Q_HASTAG =
-		"SELECT id FROM tbl_tags WHERE mf_id=? AND tag=? AND type=? AND cls_id=?;";
+		"SELECT t.id,t.tag,t.type,t.cls_id,t.modified,t.deleted,c.cls" +
+		" FROM tbl_tags AS t LEFT OUTER JOIN tbl_tag_cls AS c ON t.cls_id=c.id" +
+		" WHERE mf_id=? AND tag=? AND type=? AND cls_id=?;";
 
 	private static final String SQL_TBL_TAGS_Q_HASTAG_CLSNULL =
-		"SELECT id FROM tbl_tags WHERE mf_id=? AND tag=? AND type=? AND cls_id IS NULL;";
+		"SELECT t.id,t.tag,t.type,t.cls_id,t.modified,t.deleted,c.cls" +
+		" FROM tbl_tags AS t LEFT OUTER JOIN tbl_tag_cls AS c ON t.cls_id=c.id" +
+		" WHERE mf_id=? AND tag=? AND type=? AND cls_id IS NULL;";
 
 	private static final String SQL_TBL_TAGCLS_ADD =
 		"INSERT INTO tbl_tag_cls (cls) VALUES (?);";
@@ -589,8 +610,17 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	}
 
 	private boolean local_addTag (final IDbItem item, final String tag, final MediaTagType type, final MediaTagClassification mtc) throws SQLException, ClassNotFoundException, DbException {
-		if (local_hasTag(item.getDbRowId(), tag, type, mtc)) {
-			return false;
+		final List<MediaTag> existing = local_hasTag(item.getDbRowId(), tag, type, mtc);
+
+		// If any not deleted, nothing to do.
+		for (final MediaTag t : existing) {
+			if (!t.isDeleted()) return false;
+		}
+
+		// Reinstate first item, if any.
+		for (final MediaTag t : existing) {
+			local_reinstateTag(item, t);
+			return true;
 		}
 
 		PreparedStatement ps;
@@ -606,6 +636,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 			else {
 				ps.setNull(4, java.sql.Types.INTEGER);
 			}
+			ps.setDate(5, new java.sql.Date(System.currentTimeMillis())); // modified.
 			n = ps.executeUpdate();
 			if (n<1) throw new DbException("No update occured.");
 
@@ -637,11 +668,27 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	private void local_removeTag(final MediaTag tag) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_TAGS_REMOVE);
 		try {
-			ps.setLong(1, tag.getDbRowId());
+			ps.setDate(1, new java.sql.Date(System.currentTimeMillis()));
+			ps.setLong(2, tag.getDbRowId());
 			int n = ps.executeUpdate();
 			if (n < 1) throw new DbException("No update occured.");
 
 			this.changeCaller.mediaItemTagRemoved(tag);
+		}
+		finally {
+			ps.close();
+		}
+	}
+
+	private void local_reinstateTag(final IDbItem item, final MediaTag tag) throws SQLException, ClassNotFoundException, DbException {
+		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_TAGS_REINSTATE);
+		try {
+			ps.setDate(1, new java.sql.Date(System.currentTimeMillis()));
+			ps.setLong(2, tag.getDbRowId());
+			int n = ps.executeUpdate();
+			if (n < 1) throw new DbException("No update occured.");
+
+			this.changeCaller.mediaItemTagAdded(item, tag.getTag(), tag.getType(), tag.getClassification());
 		}
 		finally {
 			ps.close();
@@ -682,14 +729,14 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		}
 	}
 
-	private boolean local_hasTag (final long mf_rowId, final String tag, final MediaTagType type, final MediaTagClassification mtc) throws SQLException, ClassNotFoundException {
+	private List<MediaTag> local_hasTag (final long mf_rowId, final String tag, final MediaTagType type, final MediaTagClassification mtc) throws SQLException, ClassNotFoundException, DbException {
 		if (mtc != null) {
 			return local_hasTag(mf_rowId, tag, type, mtc.getDbRowId());
 		}
 		return local_hasTag(mf_rowId, tag, type, 0);
 	}
 
-	private boolean local_hasTag (final long mf_rowId, final String tag, final MediaTagType type, final long cls_rowid) throws SQLException, ClassNotFoundException {
+	private List<MediaTag> local_hasTag (final long mf_rowId, final String tag, final MediaTagType type, final long cls_rowid) throws SQLException, ClassNotFoundException, DbException {
 		String sql;
 		if (cls_rowid > 0 ) {
 			sql = SQL_TBL_TAGS_Q_HASTAG;
@@ -707,10 +754,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 			}
 			ResultSet rs = ps.executeQuery();
 			try {
-				if (rs.next()) {
-					return true;
-				}
-				return false;
+				return local_readTags(rs);
 			}
 			finally {
 				rs.close();
@@ -722,53 +766,54 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	}
 
 	private List<MediaTag> local_getTopTags (final int countLimit) throws SQLException, ClassNotFoundException, DbException {
-		final List<MediaTag> ret = new ArrayList<MediaTag>();
 		final PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_TAGS_Q_TOP);
-
 		try {
 			ps.setInt(1, MediaTagType.MANUAL.getIndex()); // Force this as including automatic tags makes no sense.
 			ps.setMaxRows(countLimit);
 			final ResultSet rs = ps.executeQuery();
-			local_readTags(rs, ret);
+			return local_readTags(rs);
 		}
 		finally {
 			ps.close();
 		}
-
-		return ret;
 	}
 
-	private List<MediaTag> local_getTags(final long mf_rowId) throws SQLException, ClassNotFoundException, DbException {
-		final List<MediaTag> ret = new ArrayList<MediaTag>();
-		final PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_TAGS_Q_ALL);
-
+	private List<MediaTag> local_getTags(final long mf_rowId, final boolean includeDeleted) throws SQLException, ClassNotFoundException, DbException {
+		final PreparedStatement ps = getDbCon().prepareStatement(includeDeleted ? SQL_TBL_TAGS_Q_ALL_INC_DELETED : SQL_TBL_TAGS_Q_ALL);
 		try {
 			ps.setLong(1, mf_rowId);
 			final ResultSet rs = ps.executeQuery();
-			local_readTags(rs, ret);
+			return local_readTags(rs);
 		}
 		finally {
 			ps.close();
 		}
-
-		return ret;
 	}
 
-	private void local_readTags (final ResultSet rs, final List<MediaTag> ret) throws SQLException, DbException, ClassNotFoundException {
+	private List<MediaTag> local_readTags (final ResultSet rs) throws SQLException, DbException, ClassNotFoundException {
 		try {
+			List<MediaTag> ret = null;
+
 			while (rs.next()) {
 				final long rowId = rs.getLong(SQL_TBL_TAGS_COL_ROWID);
 				final String tag = rs.getString(SQL_TBL_TAGS_COL_TAG);
 				final int type = rs.getInt(SQL_TBL_TAGS_COL_TYPE);
 				final long clsRowId = rs.getLong(SQL_TBL_TAGS_COL_CLSROWID);
+				final Date modified = SqliteHelper.readDate(rs, SQL_TBL_TAGS_COL_MODIFIED);
+				final boolean deleted = rs.getInt(SQL_TBL_TAGS_COL_DELETED) == 1; // default to false.
 
 				final MediaTagType mtt = MediaTagType.getFromIndex(type);
 				final MediaTagClassification mtc = local_getTagClassification(clsRowId);
 
-				final MediaTag mt = new MediaTagImpl(rowId, tag, mtt, mtc);
+				final MediaTag mt = new MediaTagImpl(rowId, tag, mtt, mtc, modified, deleted);
+
+				if (ret == null) ret = new ArrayList<MediaTag>();
 				ret.add(mt);
 			}
-		} finally {
+
+			return ret != null ? ret : Collections.<MediaTag>emptyList();
+		}
+		finally {
 			rs.close();
 		}
 	}

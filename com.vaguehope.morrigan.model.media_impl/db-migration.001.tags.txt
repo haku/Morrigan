@@ -1,0 +1,2 @@
+ALTER TABLE tbl_tags ADD COLUMN modified DATETIME;
+ALTER TABLE tbl_tags ADD COLUMN deleted INT(1);

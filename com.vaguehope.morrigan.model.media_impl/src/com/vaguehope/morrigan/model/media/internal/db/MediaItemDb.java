@@ -648,7 +648,17 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	@Override
 	public List<MediaTag> getTags (final IDbItem item) throws MorriganException {
 		try {
-			return this.dbLayer.getTags(item);
+			return this.dbLayer.getTags(item, false);
+		}
+		catch (DbException e) {
+			throw new MorriganException(e);
+		}
+	}
+
+	@Override
+	public List<MediaTag> getTagsIncludingDeleted (final IDbItem item) throws MorriganException {
+		try {
+			return this.dbLayer.getTags(item, true);
 		}
 		catch (DbException e) {
 			throw new MorriganException(e);

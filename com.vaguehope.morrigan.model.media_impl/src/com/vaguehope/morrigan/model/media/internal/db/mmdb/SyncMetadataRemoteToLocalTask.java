@@ -130,6 +130,11 @@ public class SyncMetadataRemoteToLocalTask implements MorriganTask {
 			ldb.setTrackDuration(localItem, remoteItem.getDuration());
 		}
 
+		/*
+		 * TODO FIXME
+		 * make use of getTagsIncludingDelete / isDeleted / getModified for better sync behaviour.
+		 */
+
 		final List<MediaTag> rTags = rdb.getTags(remoteItem);
 		if (rTags != null && rTags.size() > 0) {
 			for (MediaTag rTag : rTags) {

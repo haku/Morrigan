@@ -65,7 +65,7 @@ public interface IMediaItemStorageLayer<T extends IMediaItem> extends IGenericDb
 	List<MediaTag> getTopTags (int countLimit) throws DbException;
 	boolean hasTags (IDbItem item) throws DbException;
 	boolean hasTag (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) throws DbException;
-	List<MediaTag> getTags (IDbItem item) throws DbException;
+	List<MediaTag> getTags (IDbItem item, boolean includeDelete) throws DbException;
 	boolean addTag (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) throws DbException;
 	boolean addTag (IDbItem item, String tag, MediaTagType type, String mtc) throws DbException;
 	void moveTags (IDbItem fromItem, IDbItem toItem) throws DbException;
