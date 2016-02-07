@@ -118,10 +118,13 @@ header .subtitle span {
 .popup .title {
   margin: 0;
   line-height: 1.2;
+  margin-bottom: 0.5em;
 }
 .popup .stats, .popup .tags {
   margin: 0;
   font-size: 80%;
+  line-height: normal;
+  margin-bottom: 0.5em;
 }
 .popup .separator {
   display: block;
@@ -141,6 +144,11 @@ header .subtitle span {
   width: 90%;
   min-height: 3em;
   margin: 1em .5em;
+}
+.popup button {
+  line-height: normal;
+  height: inherit;
+  min-height: 36px; /* From MD height. */
 }
 .popup .mdl-textfield {
   width: 90%;
