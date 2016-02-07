@@ -12,11 +12,12 @@ import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagClassification;
+import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.tasks.MorriganTask;
 import com.vaguehope.morrigan.tasks.TaskEventListener;
 import com.vaguehope.morrigan.tasks.TaskResult;
 import com.vaguehope.morrigan.tasks.TaskResult.TaskOutcome;
-import com.vaguehope.sqlitewrapper.DbException;
+import com.vaguehope.morrigan.util.Objs;
 
 public class SyncMetadataRemoteToLocalTask implements MorriganTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -52,8 +53,8 @@ public class SyncMetadataRemoteToLocalTask implements MorriganTask {
 				// FIXME add getByHashcode() to local DB.
 				// Build list of all hashed local items.
 				final Map<BigInteger, IMixedMediaItem> localItems = new HashMap<BigInteger, IMixedMediaItem>();
-				for (IMixedMediaItem localItem : trans.getAllDbEntries()) {
-					BigInteger hashcode = localItem.getHashcode();
+				for (final IMixedMediaItem localItem : trans.getAllDbEntries()) {
+					final BigInteger hashcode = localItem.getHashcode();
 					if (hashcode != null && !BigInteger.ZERO.equals(hashcode)) localItems.put(hashcode, localItem);
 				}
 
@@ -61,12 +62,12 @@ public class SyncMetadataRemoteToLocalTask implements MorriganTask {
 				final List<IMixedMediaItem> remoteItems = this.remote.getAllDbEntries();
 
 				// Describe what we are doing.
-				String taskTitle = "Synchronising metadata from " + this.remote.getListName() + " to " + this.local.getListName() + ".";
+				final String taskTitle = "Synchronising metadata from " + this.remote.getListName() + " to " + this.local.getListName() + ".";
 				taskEventListener.beginTask(taskTitle, remoteItems.size()); // Work total is number of remote items.
 
 				// For each remote item, see if there is a local item to update.
-				for (IMixedMediaItem remoteItem : remoteItems) {
-					BigInteger hashcode = remoteItem.getHashcode();
+				for (final IMixedMediaItem remoteItem : remoteItems) {
+					final BigInteger hashcode = remoteItem.getHashcode();
 					if (hashcode != null && !BigInteger.ZERO.equals(hashcode)) {
 						final IMixedMediaItem localItem = localItems.get(hashcode);
 						if (localItem != null) {
@@ -94,10 +95,7 @@ public class SyncMetadataRemoteToLocalTask implements MorriganTask {
 				trans.dispose();
 			}
 		}
-		catch (DbException e) {
-			ret = new TaskResult(TaskOutcome.FAILED, "Throwable while sync metadata.", e);
-		}
-		catch (MorriganException e) {
+		catch (final Exception e) {
 			ret = new TaskResult(TaskOutcome.FAILED, "Throwable while sync metadata.", e);
 		}
 
@@ -130,20 +128,76 @@ public class SyncMetadataRemoteToLocalTask implements MorriganTask {
 			ldb.setTrackDuration(localItem, remoteItem.getDuration());
 		}
 
-		/*
-		 * TODO FIXME
-		 * make use of getTagsIncludingDelete / isDeleted / getModified for better sync behaviour.
-		 */
-
-		final List<MediaTag> rTags = rdb.getTags(remoteItem);
+		final List<MediaTag> rTags = rdb.getTagsIncludingDeleted(remoteItem);
 		if (rTags != null && rTags.size() > 0) {
-			for (MediaTag rTag : rTags) {
-				MediaTagClassification cls = rTag.getClassification();
-				String clsString = cls == null ? null : cls.getClassification();
-				ldb.addTag(localItem, rTag.getTag(), rTag.getType(), clsString);
+			// Index local tags.
+			final List<MediaTag> lTagList = ldb.getTagsIncludingDeleted(localItem);
+			final Map<TagKey, MediaTag> lTags = new HashMap<TagKey, MediaTag>(lTagList.size());
+			for (final MediaTag lTag : lTagList) {
+				lTags.put(new TagKey(lTag), lTag);
+			}
+
+			// Compare each remote tag to is local, if exists.
+			for (final MediaTag rTag : rTags) {
+				final MediaTag lTag = lTags.get(new TagKey(rTag));
+
+				// If we have never seen this tag before, add if not deleted.
+				if (lTag == null) {
+					if (!rTag.isDeleted()) {
+						addTag(ldb, localItem, rTag);
+					}
+					continue;
+				}
+
+				// If both deleted, then we are in agreement (don't care about matching modified dates).
+				if (lTag.isDeleted() == rTag.isDeleted()) continue;
+
+				// So we don't match, but for safety can only merge if both sides have dates.
+				if (lTag.getModified() == null || rTag.getModified() == null) continue;
+				if (lTag.getModified().getTime() < 1 || rTag.getModified().getTime() < 1) continue;
+
+				// Nothing to do if local is newer or same age.
+				if (lTag.getModified().getTime() >= rTag.getModified().getTime()) continue;
+
+				addTag(ldb, localItem, rTag);
 			}
 		}
 	}
 
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	private static void addTag (final ILocalMixedMediaDb db, final IMixedMediaItem item, final MediaTag tag) throws MorriganException {
+		final MediaTagClassification cls = tag.getClassification();
+		final String rCls = cls == null ? null : cls.getClassification();
+		db.addTag(item, tag.getTag(), tag.getType(), rCls, tag.getModified(), tag.isDeleted());
+	}
+
+	private static class TagKey {
+
+		private final String tag;
+		private final MediaTagType type;
+		private final String cls;
+
+		public TagKey (final MediaTag tag) {
+			this.tag = tag.getTag();
+			this.type = tag.getType();
+			this.cls = tag.getClassification() != null ? tag.getClassification().getClassification() : null;
+		}
+
+		@Override
+		public int hashCode () {
+			return Objs.hash(this.tag, this.type, this.cls);
+		}
+
+		@Override
+		public boolean equals (final Object obj) {
+			if (obj == this) return true;
+			if (obj == null) return false;
+			if (getClass() != obj.getClass()) return false;
+			final TagKey that = (TagKey) obj;
+			return Objs.equals(this.tag, that.tag)
+					&& Objs.equals(this.type, that.type)
+					&& Objs.equals(this.cls, that.cls);
+		}
+
+	}
+
 }
