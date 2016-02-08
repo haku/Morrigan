@@ -61,6 +61,17 @@ header .subtitle span {
   text-transform: none;
 }
 
+/* Fix infuriating tab panels sharing the same scroll. */
+.mdl-layout__tab-panel {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
 /* Remove padding around textfields. */
 .mdl-textfield {
   padding: 0;
