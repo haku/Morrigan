@@ -29,7 +29,18 @@ public class AsyncTasksRegisterImpl implements AsyncTasksRegister {
 		final Runnable runnable = new Runnable() {
 			@Override
 			public void run () {
-				task.run(taskEventListener);
+				final TaskResult result = task.run(taskEventListener);
+				switch (result.getOutcome()) {
+					case CANCELED:
+						taskEventListener.logMsg("Result", "cancelled.");
+						break;
+					case FAILED:
+						taskEventListener.logError("Failed", result.getErrMsg(), result.getErrThr());
+						break;
+					case SUCCESS:
+					default:
+				}
+				taskEventListener.done();
 			}
 		};
 		final Future<?> future = this.executor.submit(runnable);

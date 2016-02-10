@@ -2,43 +2,35 @@ package com.vaguehope.morrigan.tasks;
 
 public class TaskResult {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	public static enum TaskOutcome {SUCCESS, FAILED, CANCELED}
-	
-	private TaskOutcome outcome;
-	private String errMsg;
-	private Throwable errThr;
-	
-	public TaskResult (TaskOutcome outcome) {
-		this.outcome = outcome;
+
+	private final TaskOutcome outcome;
+	private final String errMsg;
+	private final Throwable errThr;
+
+	public TaskResult (final TaskOutcome outcome) {
+		this(outcome, null, null);
 	}
-	
-	public TaskResult (TaskOutcome outcome, String errMsg, Throwable errThr) {
+
+	public TaskResult (final TaskOutcome outcome, final String errMsg, final Throwable errThr) {
+		if (outcome == null) throw new IllegalArgumentException("Outcome can not be null.");
 		this.outcome = outcome;
 		this.errMsg = errMsg;
 		this.errThr = errThr;
 	}
-	
-	public void setOutcome(TaskOutcome outcome) {
-		this.outcome = outcome;
-	}
+
 	public TaskOutcome getOutcome() {
 		return this.outcome;
 	}
-	
-	public void setErrMsg(String errMsg) {
-		this.errMsg = errMsg;
-	}
+
 	public String getErrMsg() {
 		return this.errMsg;
 	}
-	
-	public void setErrThr(Throwable errThr) {
-		this.errThr = errThr;
-	}
+
 	public Throwable getErrThr() {
 		return this.errThr;
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

@@ -21,21 +21,21 @@ public class AsyncTaskEventListener implements TaskEventListener {
 	 * 1 = started.
 	 * 2 = complete.
 	 */
-	private AtomicInteger lifeCycle = new AtomicInteger(0);
+	private final AtomicInteger lifeCycle = new AtomicInteger(0);
 
-	private AtomicInteger progressWorked = new AtomicInteger(0);
-	private AtomicInteger progressTotal = new AtomicInteger(0);
-	private AtomicBoolean cancelled = new AtomicBoolean(false);
+	private final AtomicInteger progressWorked = new AtomicInteger(0);
+	private final AtomicInteger progressTotal = new AtomicInteger(0);
+	private final AtomicBoolean cancelled = new AtomicBoolean(false);
 
-	private AtomicReference<String> taskName = new AtomicReference<String>(null);
-	private AtomicReference<String> subtaskName = new AtomicReference<String>(null);
+	private final AtomicReference<String> taskName = new AtomicReference<String>(null);
+	private final AtomicReference<String> subtaskName = new AtomicReference<String>(null);
 
-	private AtomicReference<String> lastMsg = new AtomicReference<String>(null);
-	private AtomicReference<String> lastErr = new AtomicReference<String>(null);
+	private final AtomicReference<String> lastMsg = new AtomicReference<String>(null);
+	private final AtomicReference<String> lastErr = new AtomicReference<String>(null);
 
-	private AtomicLong endTime = new AtomicLong();
+	private final AtomicLong endTime = new AtomicLong();
 
-	private AtomicReference<Future<?>> future = new AtomicReference<Future<?>>();
+	private final AtomicReference<Future<?>> future = new AtomicReference<Future<?>>();
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -87,7 +87,7 @@ public class AsyncTaskEventListener implements TaskEventListener {
 		return s.toString();
 	}
 
-	public void setFuture (Future<?> future) {
+	public void setFuture (final Future<?> future) {
 		if (!this.future.compareAndSet(null, future)) {
 			throw new IllegalStateException("Future has already been set.");
 		}
@@ -114,23 +114,23 @@ public class AsyncTaskEventListener implements TaskEventListener {
 	}
 
 	@Override
-	public void logMsg (String topic, String s) {
+	public void logMsg (final String topic, final String s) {
 		this.lastMsg.set(topic + ": " + s);
 	}
 
 	@Override
-	public void logError (String topic, String s, Throwable t) {
+	public void logError (final String topic, final String s, final Throwable t) {
 		this.lastErr.set(topic + ": " + s + "\n" + ErrorHelper.getCauseTrace(t));
 	}
 
 	@Override
-	public void beginTask (String name, int totalWork) {
+	public void beginTask (final String name, final int totalWork) {
 		this.taskName.set(name);
 		this.progressTotal.set(totalWork);
 	}
 
 	@Override
-	public void subTask (String name) {
+	public void subTask (final String name) {
 		this.subtaskName.set(name);
 	}
 
@@ -138,9 +138,6 @@ public class AsyncTaskEventListener implements TaskEventListener {
 	public void done () {
 		if (this.lifeCycle.compareAndSet(1, 2)) {
 			this.endTime.set(System.currentTimeMillis());
-		}
-		else {
-			throw new IllegalStateException("Failed to mark task as complete; current state=" + this.lifeCycle.get() + ".");
 		}
 	}
 
@@ -150,7 +147,7 @@ public class AsyncTaskEventListener implements TaskEventListener {
 	}
 
 	@Override
-	public void worked (int work) {
+	public void worked (final int work) {
 		this.progressWorked.addAndGet(work);
 	}
 
