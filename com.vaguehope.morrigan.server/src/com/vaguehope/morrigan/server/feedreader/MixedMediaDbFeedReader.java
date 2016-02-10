@@ -12,7 +12,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.eclipse.jetty.util.B64Code;
 import org.xml.sax.SAXException;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
@@ -21,7 +20,6 @@ import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.server.MlistsServlet;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbFactory;
 import com.vaguehope.morrigan.tasks.TaskEventListener;
-import com.vaguehope.morrigan.util.httpclient.Http;
 import com.vaguehope.morrigan.util.httpclient.HttpClient;
 import com.vaguehope.morrigan.util.httpclient.HttpResponse;
 import com.vaguehope.morrigan.util.httpclient.HttpStreamHandler;
@@ -29,10 +27,6 @@ import com.vaguehope.morrigan.util.httpclient.HttpStreamHandlerException;
 import com.vaguehope.sqlitewrapper.DbException;
 
 public class MixedMediaDbFeedReader implements HttpStreamHandler {
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	private static final String USERNAME = "Morrigan-GUI";
-
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	/**
@@ -47,7 +41,7 @@ public class MixedMediaDbFeedReader implements HttpStreamHandler {
 			final String surl = mmdb.getUrl().toString() + "/" + MlistsServlet.PATH_ITEMS + "?" + MlistsServlet.PARAM_INCLUDE_DELETED_TAGS + "=true";
 			URL url = new URL(surl);
 			Map<String, String> headers = new HashMap<String, String>();
-			addAuthHeader(headers, USERNAME, mmdb.getPass());
+			Auth.addTo(headers, url, mmdb.getPass());
 			HttpResponse response = HttpClient.doHttpRequest(url, headers, new MixedMediaDbFeedReader(mmdb, taskEventListener));
 			if (response.getCode() != 200) {
 				throw new MorriganException("After fetching remote MMDB response code was " + response.getCode() + " (expected 200).");
@@ -139,12 +133,6 @@ public class MixedMediaDbFeedReader implements HttpStreamHandler {
 				}
 			}
 		}
-	}
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	private static void addAuthHeader (final Map<String, String> headers, final String user, final String pass) {
-		headers.put(Http.HEADER_AUTHORISATION, Http.HEADER_AUTHORISATION_PREFIX + B64Code.encode(user + ":" + pass));
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

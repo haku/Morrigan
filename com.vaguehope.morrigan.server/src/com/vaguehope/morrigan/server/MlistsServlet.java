@@ -629,6 +629,7 @@ public class MlistsServlet extends HttpServlet {
 		}
 
 		dw.dataElement("title", ml.getListName());
+		dw.dataElement("uuid", ml.getUuid().toString());
 		if (queryString != null) dw.dataElement("query", queryString);
 		dw.dataElement("count", String.valueOf(items.size()));
 

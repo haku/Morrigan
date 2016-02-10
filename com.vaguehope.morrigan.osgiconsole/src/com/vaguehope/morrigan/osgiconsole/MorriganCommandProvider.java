@@ -25,9 +25,11 @@ import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayerReader;
 import com.vaguehope.morrigan.server.AsyncActions;
+import com.vaguehope.morrigan.server.model.PullRemoteToLocal;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbHelper;
 import com.vaguehope.morrigan.tasks.AsyncTasksRegister;
 import com.vaguehope.morrigan.util.ErrorHelper;
+import com.vaguehope.morrigan.util.StringHelper;
 import com.vaguehope.morrigan.util.TimeHelper;
 
 public class MorriganCommandProvider implements CommandProvider {
@@ -41,7 +43,7 @@ public class MorriganCommandProvider implements CommandProvider {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public MorriganCommandProvider (PlayerReader playerReader, MediaFactory mediaFactory, AsyncTasksRegister asyncTasksRegister, AsyncActions asyncActions, CliHelper cliHelper) {
+	public MorriganCommandProvider (final PlayerReader playerReader, final MediaFactory mediaFactory, final AsyncTasksRegister asyncTasksRegister, final AsyncActions asyncActions, final CliHelper cliHelper) {
 		this.playerReader = playerReader;
 		this.mediaFactory = mediaFactory;
 		this.asyncTasksRegister = asyncTasksRegister;
@@ -60,6 +62,7 @@ public class MorriganCommandProvider implements CommandProvider {
 				"\tmn [media|m] [add|a] <dir> <q1>\n" +
 				"\tmn [media|m] [update|u] <q1>\n" +
 				"\tmn [media|m] [sync|s] <remote q1> <local q1>\n" +
+				"\tmn [media|m] [pull|p] <local q1> <remote URL>\n" +
 				"\tmn [media|m] albums <q1>\n" +
 				"\tmn [media|m] <q1> [<q2>]\n" +
 				"\tmn [players|player|p]\n" +
@@ -77,7 +80,7 @@ public class MorriganCommandProvider implements CommandProvider {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public void _mn (CommandInterpreter ci) {
+	public void _mn (final CommandInterpreter ci) {
 		List<String> args = new LinkedList<String>();
 		String arg = null;
 		while ((arg = ci.nextArgument()) != null) {
@@ -124,13 +127,13 @@ public class MorriganCommandProvider implements CommandProvider {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private void doStat (CommandInterpreter ci) {
+	private void doStat (final CommandInterpreter ci) {
 		ci.print(this.asyncTasksRegister.reportSummary()); // Has own trailing new line.
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private void doMedia (CommandInterpreter ci, List<String> args) {
+	private void doMedia (final CommandInterpreter ci, final List<String> args) {
 		if (args.size() < 1) {
 			doMediaList(ci);
 			return;
@@ -151,6 +154,9 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 		else if (cmd.equals("s") || cmd.equals("sync")) {
 			doMediaSync(ci, args);
+		}
+		else if (cmd.equals("p") || cmd.equals("pull")) {
+			doMediaPull(ci, args);
 		}
 		else if (cmd.equals("albums")) {
 			doMediaAlbums(ci, args);
@@ -238,7 +244,7 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 	}
 
-	private void doMediaList (CommandInterpreter ci) {
+	private void doMediaList (final CommandInterpreter ci) {
 		List<MediaListReference> items = new LinkedList<MediaListReference>();
 		items.addAll(this.mediaFactory.getAllLocalMixedMediaDbs());
 		items.addAll(RemoteMixedMediaDbHelper.getAllRemoteMmdb());
@@ -247,7 +253,7 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 	}
 
-	private void doMediaCreate (CommandInterpreter ci, List<String> args) {
+	private void doMediaCreate (final CommandInterpreter ci, final List<String> args) {
 		if (args.size() >= 1) {
 			if ("remote".equals(args.get(0)) || "r".equals(args.get(0))) {
 				if (args.size() >= 3) {
@@ -285,7 +291,7 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 	}
 
-	private void doMediaAdd (CommandInterpreter ci, List<String> args) {
+	private void doMediaAdd (final CommandInterpreter ci, final List<String> args) {
 		if (args.size() < 2) {
 			ci.println("Not enough arguments.");
 			return;
@@ -333,7 +339,7 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 	}
 
-	private void doMediaScan (CommandInterpreter ci, List<String> args) {
+	private void doMediaScan (final CommandInterpreter ci, final List<String> args) {
 		if (args.size() < 1) {
 			ci.println("No query parameter.");
 		}
@@ -368,7 +374,7 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 	}
 
-	private void doMediaSync (CommandInterpreter ci, List<String> args) {
+	private void doMediaSync (final CommandInterpreter ci, final List<String> args) {
 		if (args.size() < 2) {
 			ci.println("Must specify a remote and a local DB.");
 		}
@@ -407,7 +413,40 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 	}
 
-	private void doMediaAlbums (CommandInterpreter ci, List<String> args) {
+	private void doMediaPull (final CommandInterpreter ci, final List<String> args) {
+		if (args.size() < 2) {
+			ci.println("Must specify a local DB and a remote URL.");
+		}
+		else {
+			final String lq1 = args.get(0);
+			final String remoteUrl = args.get(1);
+			try {
+				final List<PlayItem> lq1Pi = this.cliHelper.queryForPlayableItems(lq1, null, 2);
+				if (lq1Pi == null || lq1Pi.size() != 1) {
+					ci.println("Query '" + lq1 + "' did not return only one result.");
+				}
+				else if (StringHelper.blank(remoteUrl)) {
+					ci.println("remoteUrl was blank.");
+				}
+				else {
+					final IMediaTrackList<? extends IMediaTrack> ll = lq1Pi.get(0).getList();
+					if (!(ll instanceof ILocalMixedMediaDb)) {
+						ci.println("DB '" + lq1 + "' is not a local DB.");
+					}
+					else {
+						final ILocalMixedMediaDb ldb = (ILocalMixedMediaDb) ll;
+						this.asyncTasksRegister.scheduleTask(new PullRemoteToLocal(ldb, remoteUrl, this.mediaFactory, this.asyncTasksRegister));
+						ci.println("Pull scheduled.  Use 'mn st' to track progress.");
+					}
+				}
+			}
+			catch (final MorriganException e) {
+				ci.println(ErrorHelper.getCauseTrace(e));
+			}
+		}
+	}
+
+	private void doMediaAlbums (final CommandInterpreter ci, final List<String> args) {
 		if (args.size() < 1) {
 			ci.println("No query parameter.");
 		}
@@ -444,7 +483,7 @@ public class MorriganCommandProvider implements CommandProvider {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private void doPlayers (CommandInterpreter ci, List<String> args) {
+	private void doPlayers (final CommandInterpreter ci, final List<String> args) {
 		if (args.size() < 1) {
 			doPlayersList(ci);
 			return;
@@ -468,7 +507,7 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 	}
 
-	private void doPlayersList (CommandInterpreter ci) {
+	private void doPlayersList (final CommandInterpreter ci) {
 		Collection<Player> players = this.playerReader.getPlayers();
 		ci.println("id\tplayer");
 		for (Player p : players) {
@@ -488,7 +527,7 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 	}
 
-	private void doPlayersPlayer (CommandInterpreter ci, Player player, List<String> args) {
+	private void doPlayersPlayer (final CommandInterpreter ci, final Player player, final List<String> args) {
 		if (args.size() < 1) {
 			doPlayersPlayerInfo(ci, player);
 			return;
@@ -518,7 +557,7 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 	}
 
-	private static void doPlayersPlayerInfo (CommandInterpreter ci, Player player) {
+	private static void doPlayersPlayerInfo (final CommandInterpreter ci, final Player player) {
 		ci.print(player.getName());
 		ci.print(": ");
 		ci.print(player.getPlayState().toString());
@@ -561,7 +600,7 @@ public class MorriganCommandProvider implements CommandProvider {
 		ci.println(")");
 	}
 
-	private void doPlayersPlayerPlay (CommandInterpreter ci, Player player, List<String> args, boolean addToQueue) {
+	private void doPlayersPlayerPlay (final CommandInterpreter ci, final Player player, final List<String> args, final boolean addToQueue) {
 		if (args.size() < 1) {
 			if (addToQueue) {
 				doPlayersPlayerPrintQueue(ci, player);
@@ -622,17 +661,17 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 	}
 
-	private static void doPlayersPlayerPause (CommandInterpreter ci, Player player) {
+	private static void doPlayersPlayerPause (final CommandInterpreter ci, final Player player) {
 		player.pausePlaying();
 		ci.println(player.getName() + " player: " + player.getPlayState().toString());
 	}
 
-	private static void doPlayersPlayerStop (CommandInterpreter ci, Player player) {
+	private static void doPlayersPlayerStop (final CommandInterpreter ci, final Player player) {
 		player.stopPlaying();
 		ci.println(player.getName() + " player: " + player.getPlayState().toString());
 	}
 
-	private static void doPlayersPlayerNext (CommandInterpreter ci, Player player) {
+	private static void doPlayersPlayerNext (final CommandInterpreter ci, final Player player) {
 		player.nextTrack();
 		PlayItem currentItem = player.getCurrentItem();
 		if (currentItem == null) {
@@ -643,7 +682,7 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 	}
 
-	private static void doPlayersPlayerOrder (CommandInterpreter ci, Player player, List<String> args) {
+	private static void doPlayersPlayerOrder (final CommandInterpreter ci, final Player player, final List<String> args) {
 		if (args.size() < 1) {
 			ci.println(player.getName() + " player order = " + player.getPlaybackOrder().toString() + ".");
 			ci.print("Options:");
@@ -665,7 +704,7 @@ public class MorriganCommandProvider implements CommandProvider {
 		ci.println("Unknown playback order '" + args.get(0) + "'.");
 	}
 
-	private static void doPlayersPlayerPrintQueue (CommandInterpreter ci, Player player) {
+	private static void doPlayersPlayerPrintQueue (final CommandInterpreter ci, final Player player) {
 		List<PlayItem> queue = player.getQueue().getQueueList();
 
 		if (queue.size() < 1) {
@@ -685,34 +724,34 @@ public class MorriganCommandProvider implements CommandProvider {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Top-level shortcuts.
 
-	private void doPlay (CommandInterpreter ci, List<String> args) {
+	private void doPlay (final CommandInterpreter ci, final List<String> args) {
 		Player player = getOnlyPlayer(ci);
 		if (player != null) doPlayersPlayerPlay(ci, player, args, false);
 	}
 
-	private void doQueue (CommandInterpreter ci, List<String> args) {
+	private void doQueue (final CommandInterpreter ci, final List<String> args) {
 		Player player = getOnlyPlayer(ci);
 		if (player != null) doPlayersPlayerPlay(ci, player, args, true);
 	}
 
-	private void doPause (CommandInterpreter ci) {
+	private void doPause (final CommandInterpreter ci) {
 		Player player = getOnlyPlayer(ci);
 		if (player != null) doPlayersPlayerPause(ci, player);
 	}
 
-	private void doStop (CommandInterpreter ci) {
+	private void doStop (final CommandInterpreter ci) {
 		Player player = getOnlyPlayer(ci);
 		if (player != null) doPlayersPlayerStop(ci, player);
 	}
 
-	private void doNext (CommandInterpreter ci) {
+	private void doNext (final CommandInterpreter ci) {
 		Player player = getOnlyPlayer(ci);
 		if (player != null) doPlayersPlayerNext(ci, player);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private Player getOnlyPlayer (CommandInterpreter ci) {
+	private Player getOnlyPlayer (final CommandInterpreter ci) {
 		Collection<Player> allPlayers = this.playerReader.getPlayers();
 		Player player = allPlayers.size() == 1 ? allPlayers.iterator().next() : null;
 		if (player == null) ci.println("There is not only one player, so you may need to specfy the player to use.");

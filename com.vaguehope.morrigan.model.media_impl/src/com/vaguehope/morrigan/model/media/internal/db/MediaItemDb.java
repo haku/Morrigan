@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import com.vaguehope.morrigan.model.db.IDbColumn;
@@ -25,6 +26,7 @@ import com.vaguehope.morrigan.model.media.MediaTagClassification;
 import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.model.media.internal.MediaItemList;
 import com.vaguehope.morrigan.model.media.internal.MediaTagClassificationImpl;
+import com.vaguehope.morrigan.util.StringHelper;
 import com.vaguehope.sqlitewrapper.DbException;
 
 public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends IMediaItem>
@@ -154,6 +156,29 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	public List<T> getMediaItems () {
 		if (!isRead()) throw new IllegalStateException("DB has not been loaded.");
 		return super.getMediaItems();
+	}
+
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	private static final String KEY_UUID = "UUID";
+
+	@Override
+	public synchronized UUID getUuid () {
+		try {
+			{
+				final String uuid = this.dbLayer.getProp(KEY_UUID);
+				if (StringHelper.notBlank(uuid)) return UUID.fromString(uuid);
+			}
+			{
+				this.dbLayer.setProp(KEY_UUID, UUID.randomUUID().toString());
+				final String uuid = this.dbLayer.getProp(KEY_UUID);
+				if (StringHelper.notBlank(uuid)) return UUID.fromString(uuid);
+			}
+			throw new IllegalStateException("UUID I just wrote to the DB is not there. :(");
+		}
+		catch (DbException e) {
+			throw new IllegalStateException(e.toString(), e);
+		}
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

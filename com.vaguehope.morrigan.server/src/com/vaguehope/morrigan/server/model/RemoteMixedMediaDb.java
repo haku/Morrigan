@@ -47,7 +47,7 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb implements IRemoteM
 	/**
 	 * Connect to existing DB.
 	 */
-	public RemoteMixedMediaDb (String dbName, MediaItemDbConfig config, IMixedMediaStorageLayer localDbLayer) throws DbException {
+	public RemoteMixedMediaDb (final String dbName, final MediaItemDbConfig config, final IMixedMediaStorageLayer localDbLayer) throws DbException {
 		super(dbName, config, localDbLayer); // TODO expose search term.
 		readCacheDate();
 	}
@@ -55,20 +55,11 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb implements IRemoteM
 	/**
 	 * Create a fresh DB.
 	 */
-	public RemoteMixedMediaDb (String dbName, MediaItemDbConfig config, RemoteHostDetails details, IMixedMediaStorageLayer localDbLayer) throws DbException {
+	public RemoteMixedMediaDb (final String dbName, final MediaItemDbConfig config, final RemoteHostDetails details, final IMixedMediaStorageLayer localDbLayer) throws DbException {
 		super(dbName, config, localDbLayer); // TODO expose search term.
-		URL url = details.getUrl();
 
-		String s = getDbLayer().getProp(DBKEY_SERVERURL);
-		if (s == null) {
-			setUrl(url);
-			this.logger.fine("Set DBKEY_SERVERURL=" + url.toExternalForm() + " in " + getDbLayer().getDbFilePath());
-
-		} else if (!s.equals(url.toExternalForm())) {
-			throw new IllegalArgumentException("serverUrl does not match localDbLayer ('"+url.toExternalForm()+"' != '"+s+"' in '"+getDbLayer().getDbFilePath()+"').");
-		}
-
-		setPass(details.getPass());
+		setUrl(details.getUrl());
+		setPass(details.getPass() != null ? details.getPass() : "");
 		readCacheDate();
 	}
 
@@ -105,7 +96,7 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb implements IRemoteM
 	}
 
 	@Override
-	public void setUrl (URL url) throws DbException {
+	public void setUrl (final URL url) throws DbException {
 		getDbLayer().setProp(DBKEY_SERVERURL, url.toExternalForm());
 	}
 
@@ -115,7 +106,7 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb implements IRemoteM
 	}
 
 	@Override
-	public void setPass (String pass) throws DbException {
+	public void setPass (final String pass) throws DbException {
 		getDbLayer().setProp(DBKEY_PASS, pass);
 	}
 
@@ -131,7 +122,7 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb implements IRemoteM
 		return this.taskEventListener;
 	}
 	@Override
-	public void setTaskEventListener(TaskEventListener taskEventListener) {
+	public void setTaskEventListener(final TaskEventListener taskEventListener) {
 		this.taskEventListener = taskEventListener;
 	}
 
@@ -183,7 +174,7 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb implements IRemoteM
 //	Actions.
 
 	@Override
-	public void copyItemFile (IMixedMediaItem item, OutputStream os) throws MorriganException {
+	public void copyItemFile (final IMixedMediaItem item, final OutputStream os) throws MorriganException {
 		URL itemUrl = getRemoteItemUrl(this, item);
 		this.logger.fine("Fetching '" + itemUrl + "' to '" + item.getFilepath() + "'...");
 		try {
@@ -206,7 +197,7 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb implements IRemoteM
 	}
 
 	@Override
-	public File copyItemFile (IMixedMediaItem mlt, File targetDirectory) throws MorriganException {
+	public File copyItemFile (final IMixedMediaItem mlt, final File targetDirectory) throws MorriganException {
 		if (!targetDirectory.isDirectory()) {
 			throw new IllegalArgumentException("targetDirectory must be a directory.");
 		}
@@ -241,7 +232,7 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb implements IRemoteM
 		return targetFile;
 	}
 
-	public static URL getRemoteItemUrl (RemoteMixedMediaDb rmmdb, IMixedMediaItem mlt) throws MorriganException {
+	private static URL getRemoteItemUrl (final RemoteMixedMediaDb rmmdb, final IMixedMediaItem mlt) throws MorriganException {
 		String serverUrlString;
 		try {
 			serverUrlString = rmmdb.getDbLayer().getProp(DBKEY_SERVERURL); // e.g. http://localhost:8080/mlists/REMOTEMMDB/localhost_8080_wui.remote.db3
@@ -273,72 +264,72 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb implements IRemoteM
 //	Item metadata modifiers.
 
 	@Override
-	public void incTrackStartCnt (IMediaTrack track, long n) throws MorriganException {
+	public void incTrackStartCnt (final IMediaTrack track, final long n) throws MorriganException {
 		throw new NotImplementedException();
 	}
 
 	@Override
-	public void incTrackEndCnt (IMediaTrack track, long n) throws MorriganException {
+	public void incTrackEndCnt (final IMediaTrack track, final long n) throws MorriganException {
 		throw new NotImplementedException();
 	}
 
 	@Override
-	public void setItemDateAdded (IMixedMediaItem track, Date date) throws MorriganException {
+	public void setItemDateAdded (final IMixedMediaItem track, final Date date) throws MorriganException {
 		throw new NotImplementedException();
 	}
 
 	@Override
-	public void setTrackDateLastPlayed (IMediaTrack track, Date date) throws MorriganException {
+	public void setTrackDateLastPlayed (final IMediaTrack track, final Date date) throws MorriganException {
 		throw new NotImplementedException();
 	}
 
 	@Override
-	public void removeItem (IMixedMediaItem track) throws MorriganException {
+	public void removeItem (final IMixedMediaItem track) throws MorriganException {
 		throw new NotImplementedException();
 	}
 
 	@Override
-	public void incTrackStartCnt(IMediaTrack track) throws MorriganException {
+	public void incTrackStartCnt(final IMediaTrack track) throws MorriganException {
 		throw new NotImplementedException();
 	}
 
 	@Override
-	public void incTrackEndCnt(IMediaTrack track) throws MorriganException {
+	public void incTrackEndCnt(final IMediaTrack track) throws MorriganException {
 		throw new NotImplementedException();
 	}
 
 	@Override
-	public void setTrackStartCnt(IMediaTrack item, long n) throws MorriganException {
+	public void setTrackStartCnt(final IMediaTrack item, final long n) throws MorriganException {
 		throw new NotImplementedException();
 	}
 
 	@Override
-	public void setTrackEndCnt(IMediaTrack item, long n) throws MorriganException {
+	public void setTrackEndCnt(final IMediaTrack item, final long n) throws MorriganException {
 		throw new NotImplementedException();
 	}
 
 	@Override
-	public void setTrackDuration(IMediaTrack track, int duration) throws MorriganException {
+	public void setTrackDuration(final IMediaTrack track, final int duration) throws MorriganException {
 		throw new NotImplementedException();
 	}
 
 	@Override
-	public void setItemHashCode(IMixedMediaItem track, BigInteger hashcode) throws MorriganException {
+	public void setItemHashCode(final IMixedMediaItem track, final BigInteger hashcode) throws MorriganException {
 		throw new NotImplementedException();
 	}
 
 	@Override
-	public void setItemDateLastModified(IMixedMediaItem track, Date date) throws MorriganException {
+	public void setItemDateLastModified(final IMixedMediaItem track, final Date date) throws MorriganException {
 		throw new NotImplementedException();
 	}
 
 	@Override
-	public void setItemEnabled(IMixedMediaItem track, boolean value) throws MorriganException {
+	public void setItemEnabled(final IMixedMediaItem track, final boolean value) throws MorriganException {
 		throw new NotImplementedException();
 	}
 
 	@Override
-	public void setItemMissing(IMixedMediaItem track, boolean value) throws MorriganException {
+	public void setItemMissing(final IMixedMediaItem track, final boolean value) throws MorriganException {
 		throw new NotImplementedException();
 	}
 
@@ -346,12 +337,12 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb implements IRemoteM
 //	DB property modifiers.
 
 	@Override
-	public void addSource (String source) throws MorriganException {
+	public void addSource (final String source) throws MorriganException {
 		throw new NotImplementedException ("Not implemented.");
 	}
 
 	@Override
-	public void removeSource (String source) throws MorriganException {
+	public void removeSource (final String source) throws MorriganException {
 		throw new NotImplementedException("Not implemented.");
 	}
 

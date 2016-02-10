@@ -6,6 +6,7 @@ import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import com.vaguehope.morrigan.model.db.IDbItem;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
@@ -18,6 +19,7 @@ public interface IMediaItemList<T extends IMediaItem> {
 
 	String getListId ();
 	String getListName ();
+	UUID getUuid ();
 
 	String getType ();
 	String getSerial (); // TODO rename to something more helpful?
