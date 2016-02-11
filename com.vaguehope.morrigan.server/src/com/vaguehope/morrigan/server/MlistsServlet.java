@@ -63,6 +63,7 @@ import com.vaguehope.sqlitewrapper.DbException;
  * POST /mlists/LOCALMMDB/example.local.db3 view=myview&action=play&playerid=0
  * POST /mlists/LOCALMMDB/example.local.db3 view=myview&action=queue&playerid=0
  * POST /mlists/LOCALMMDB/example.local.db3 action=scan
+ * POST /mlists/LOCALMMDB/example.local.db3 action=pull&remote=someremote
  *
  *  GET /mlists/LOCALMMDB/example.local.db3/items
  *  GET /mlists/LOCALMMDB/example.local.db3/items?includeddeletedtags=true
@@ -104,9 +105,11 @@ public class MlistsServlet extends HttpServlet {
 	private static final String PARAM_ORDER = "order";
 	private static final String PARAM_INCLUDE_DISABLED = "includedisabled";
 	private static final String PARAM_ENABLED = "enabled";
+	private static final String PARAM_REMOTE = "remote";
 
 	public static final String CMD_NEWMMDB = "newmmdb";
 	public static final String CMD_SCAN = "scan";
+	public static final String CMD_PULL = "pull";
 	public static final String CMD_PLAY = "play";
 	public static final String CMD_QUEUE = "queue";
 	public static final String CMD_QUEUE_TOP = "queue_top";
@@ -280,7 +283,7 @@ public class MlistsServlet extends HttpServlet {
 		}
 	}
 
-	private void postToMmdb (final HttpServletRequest req, final HttpServletResponse resp, final String action, final IMixedMediaDb mmdb) throws IOException, MorriganException {
+	private void postToMmdb (final HttpServletRequest req, final HttpServletResponse resp, final String action, final IMixedMediaDb mmdb) throws IOException, MorriganException, DbException {
 		if (action.equals(CMD_PLAY) || action.equals(CMD_QUEUE) || action.equals(CMD_QUEUE_TOP)) {
 			final Player player = parsePlayer(req, resp);
 			if (player != null) { // parsePlayer() will write the error msg.
@@ -307,6 +310,17 @@ public class MlistsServlet extends HttpServlet {
 			this.asyncActions.scheduleMmdbScan(mmdb);
 			resp.setContentType("text/plain");
 			resp.getWriter().println("Scan scheduled desu~");
+		}
+		else if (action.equals(CMD_PULL)) {
+			final String remote = req.getParameter(PARAM_REMOTE);
+			if (StringHelper.notBlank(remote)) {
+				this.asyncActions.scheduleMmdbPull((ILocalMixedMediaDb) mmdb, remote);
+				resp.setContentType("text/plain");
+				resp.getWriter().println("Pull scheduled desu~");
+			}
+			else {
+				ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "'remote' parameter not set desu~");
+			}
 		}
 		else {
 			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "HTTP error 400 '" + action + "' is not a valid action parameter desu~");
@@ -649,6 +663,10 @@ public class MlistsServlet extends HttpServlet {
 		if (!listItems) FeedHelper.addLink(dw, pathToSelf + "/" + PATH_ITEMS, PATH_ITEMS, "text/xml");
 		FeedHelper.addLink(dw, pathToSelf + "/" + PATH_ALBUMS, PATH_ALBUMS, "text/xml");
 		FeedHelper.addLink(dw, pathToSelf + "/" + PATH_SRC, PATH_SRC, "text/xml");
+
+		for (final String remote : ml.getRemotes().keySet()) {
+			FeedHelper.addElement(dw, "remote", remote);
+		}
 
 		if (listSrcs) {
 			for (final String s : ml.getSources()) {
