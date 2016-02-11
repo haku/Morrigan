@@ -646,6 +646,8 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 
 	@Override
 	public void addRemote (final String name, final URI uri) throws DbException {
+		if (StringHelper.blank(name)) throw new IllegalArgumentException("Name must not be blank.");
+		if (uri == null) throw new IllegalArgumentException("URI must not be null.");
 		this.dbLayer.setProp(REMOTE_PROP_KEY_PREFIX + name, uri.toString());
 	}
 
