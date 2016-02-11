@@ -2,7 +2,9 @@ package com.vaguehope.morrigan.model.media;
 
 import java.io.File;
 import java.math.BigInteger;
+import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
@@ -26,6 +28,11 @@ public interface IMediaItemDb<S extends IMediaItemStorageLayer<T>, T extends IMe
 	List<String> getSources () throws MorriganException;
 	void addSource (String source) throws MorriganException;
 	void removeSource (String source) throws MorriganException;
+
+	void addRemote(String name, URI uri) throws DbException;
+	void rmRemote(String name) throws DbException;
+	URI getRemote(String name) throws DbException;
+	Map<String, URI> getRemotes() throws DbException;
 
 	List<T> simpleSearch (String term, int maxResults) throws DbException;
 	List<T> simpleSearch (String term, int maxResults, IDbColumn[] sortColumns, SortDirection[] sortDirections, boolean includeDisabled) throws DbException;

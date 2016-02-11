@@ -53,4 +53,9 @@ public class StringHelper {
 		return s != null && s.trim().length() > 0;
 	}
 
+	public static String removeStart (final String s, final String remove) {
+		if (s.startsWith(remove)) return s.substring(remove.length());
+		return s;
+	}
+
 }

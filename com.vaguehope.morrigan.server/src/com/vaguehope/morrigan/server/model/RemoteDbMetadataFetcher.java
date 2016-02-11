@@ -2,6 +2,7 @@ package com.vaguehope.morrigan.server.model;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,15 +25,15 @@ import com.vaguehope.morrigan.util.httpclient.HttpStreamHandlerException;
 
 public class RemoteDbMetadataFetcher {
 
-	private final String remoteUrl;
+	private final URI remoteUri;
 	private Document doc;
 
-	public RemoteDbMetadataFetcher (final String remoteUrl) {
-		this.remoteUrl = remoteUrl;
+	public RemoteDbMetadataFetcher (final URI remoteUri) {
+		this.remoteUri = remoteUri;
 	}
 
 	public void fetch () throws IOException, HttpStreamHandlerException {
-		final URL url = new URL(this.remoteUrl);
+		final URL url = this.remoteUri.toURL();
 		final XmlParser parser = new XmlParser();
 		final Map<String, String> headers = new HashMap<String, String>();
 		Auth.addTo(headers, url);

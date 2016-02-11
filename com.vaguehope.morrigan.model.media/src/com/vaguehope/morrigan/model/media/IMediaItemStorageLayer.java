@@ -5,6 +5,7 @@ import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.db.IDbItem;
@@ -54,6 +55,7 @@ public interface IMediaItemStorageLayer<T extends IMediaItem> extends IGenericDb
 
 	void setProp (String key, String value) throws DbException;
 	String getProp (String key) throws DbException;
+	Map<String, String> getProps() throws DbException;
 
 	List<String> getSources () throws DbException;
 	void addSource (String source) throws DbException;

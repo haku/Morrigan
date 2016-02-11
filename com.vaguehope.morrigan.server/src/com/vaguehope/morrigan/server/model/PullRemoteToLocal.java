@@ -1,6 +1,6 @@
 package com.vaguehope.morrigan.server.model;
 
-import java.net.URL;
+import java.net.URI;
 import java.util.UUID;
 
 import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
@@ -15,21 +15,21 @@ import com.vaguehope.morrigan.tasks.TaskResult.TaskOutcome;
 public class PullRemoteToLocal implements MorriganTask {
 
 	private final ILocalMixedMediaDb ldb;
-	private final String remoteUrl;
+	private final URI remoteUri;
 	private final MediaFactory mediaFactory;
 	private final AsyncTasksRegister asyncTasksRegister;
 
-	public PullRemoteToLocal (final ILocalMixedMediaDb localDb, final String remoteUrl,
+	public PullRemoteToLocal (final ILocalMixedMediaDb localDb, final URI remoteUri,
 			final MediaFactory mediaFactory, final AsyncTasksRegister asyncTasksRegister) {
 		this.ldb = localDb;
-		this.remoteUrl = remoteUrl;
+		this.remoteUri = remoteUri;
 		this.mediaFactory = mediaFactory;
 		this.asyncTasksRegister = asyncTasksRegister;
 	}
 
 	@Override
 	public String getTitle () {
-		return String.format("Pull %s <-- %s", this.ldb.getListName(), this.remoteUrl);
+		return String.format("Pull %s <-- %s", this.ldb.getListName(), this.remoteUri);
 	}
 
 	@Override
@@ -38,13 +38,13 @@ public class PullRemoteToLocal implements MorriganTask {
 		taskEventListener.beginTask(getTitle(), 1);
 		try {
 			taskEventListener.subTask("Fetching UUID");
-			final RemoteDbMetadataFetcher metadata = new RemoteDbMetadataFetcher(this.remoteUrl);
+			final RemoteDbMetadataFetcher metadata = new RemoteDbMetadataFetcher(this.remoteUri);
 			metadata.fetch();
 			final UUID uuid = metadata.getUuid();
 
 			taskEventListener.subTask("Fetching metadata");
 			final String file = RemoteMixedMediaDbHelper.getFullPathToMmdb(uuid.toString());
-			final RemoteHostDetails details = new RemoteHostDetails(new URL(this.remoteUrl));
+			final RemoteHostDetails details = new RemoteHostDetails(this.remoteUri.toURL());
 			final IRemoteMixedMediaDb rdb = RemoteMixedMediaDbFactory.getNew(file, details);
 
 			taskEventListener.subTask("Fetching DB");

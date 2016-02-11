@@ -2,11 +2,16 @@ package com.vaguehope.morrigan.model.media.internal.db;
 
 import java.io.File;
 import java.math.BigInteger;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -635,6 +640,43 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 		catch (DbException e) {
 			throw new MorriganException(e);
 		}
+	}
+
+	private static final String REMOTE_PROP_KEY_PREFIX = "REMOTE_";
+
+	@Override
+	public void addRemote (final String name, final URI uri) throws DbException {
+		this.dbLayer.setProp(REMOTE_PROP_KEY_PREFIX + name, uri.toString());
+	}
+
+	@Override
+	public void rmRemote (final String name) throws DbException {
+		this.dbLayer.setProp(REMOTE_PROP_KEY_PREFIX + name, null);
+	}
+
+	@Override
+	public URI getRemote (final String name) throws DbException {
+		final String prop = this.dbLayer.getProp(REMOTE_PROP_KEY_PREFIX + name);
+		try {
+			return new URI(prop);
+		}
+		catch (final URISyntaxException e) {
+			throw new DbException("Remote " + name + " is invalid URI: " + prop, e);
+		}
+	}
+
+	@Override
+	public Map<String, URI> getRemotes () throws DbException {
+		final Map<String, URI> ret = new LinkedHashMap<String, URI>();
+		for (final Entry<String, String> prop : this.dbLayer.getProps().entrySet()) {
+			if (prop.getKey().startsWith(REMOTE_PROP_KEY_PREFIX)) try {
+				ret.put(StringHelper.removeStart(prop.getKey(), REMOTE_PROP_KEY_PREFIX), new URI(prop.getValue()));
+			}
+			catch (final URISyntaxException e) {
+				throw new DbException("Remote " + prop.getKey() + " is invalid URI: " + prop.getValue(), e);
+			}
+		}
+		return ret;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

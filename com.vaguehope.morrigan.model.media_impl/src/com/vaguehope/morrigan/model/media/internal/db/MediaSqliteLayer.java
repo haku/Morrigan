@@ -8,7 +8,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.vaguehope.morrigan.model.db.IDbItem;
 import com.vaguehope.morrigan.model.helper.EqualHelper;
@@ -71,6 +73,17 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	public String getProp (final String key) throws DbException {
 		try {
 			return local_getProp(key);
+		} catch (IllegalArgumentException e) {
+			return null;
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+
+	@Override
+	public Map<String, String> getProps () throws DbException {
+		try {
+			return local_getProps();
 		} catch (IllegalArgumentException e) {
 			return null;
 		} catch (Exception e) {
@@ -313,6 +326,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		"value VARCHAR(1000)" +
 		");";
 
+	private static final String SQL_TBL_PROP_COL_KEY = "key";
 	private static final String SQL_TBL_PROP_COL_VALUE = "value";
 
 	/* - - - - - - - - - - - - - - - -
@@ -419,11 +433,15 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	private static final String SQL_TBL_PROP_Q_GET =
 		"SELECT value FROM tbl_prop WHERE key=?";
 
+	private static final String SQL_TBL_PROP_Q_GET_ALL =
+			"SELECT key,value FROM tbl_prop";
+
 	private static final String SQL_TBL_PROP_Q_INSERT =
 		"INSERT INTO tbl_prop (key,value) VALUES (?,?)";
-
 	private static final String SQL_TBL_PROP_Q_UPDATE =
 		"UPDATE tbl_prop SET value=? WHERE key=?";
+	private static final String SQL_TBL_PROP_Q_RM =
+		"DELETE FROM tbl_prop WHERE key=?";
 
 	/* - - - - - - - - - - - - - - - -
 	 * tags.
@@ -557,50 +575,70 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 
 	private void local_setProp (final String key, final String value) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps = null;
-		int n;
-
 		try {
-			try {
-				local_getProp(key);
-				ps = getDbCon().prepareStatement(SQL_TBL_PROP_Q_UPDATE);
-				ps.setString(1, value);
-				ps.setString(2, key);
-
-			} catch (IllegalArgumentException e) {
-				ps = getDbCon().prepareStatement(SQL_TBL_PROP_Q_INSERT);
-				ps.setString(1, key);
-				ps.setString(2, value);
+			if (value != null) {
+				try {
+					local_getProp(key);
+					ps = getDbCon().prepareStatement(SQL_TBL_PROP_Q_UPDATE);
+					ps.setString(1, value);
+					ps.setString(2, key);
+				}
+				catch (final IllegalArgumentException e) {
+					ps = getDbCon().prepareStatement(SQL_TBL_PROP_Q_INSERT);
+					ps.setString(1, key);
+					ps.setString(2, value);
+				}
+				if (ps.executeUpdate() < 1) throw new DbException("No update occured.");
 			}
-
-			n = ps.executeUpdate();
-			if (n<1) throw new DbException("No update occured.");
-
+			else {
+				ps = getDbCon().prepareStatement(SQL_TBL_PROP_Q_RM);
+				ps.setString(1, key);
+				ps.executeUpdate();
+			}
 			this.changeCaller.propertySet(key, value);
 		}
 		finally {
-			if (ps!=null) ps.close();
+			if (ps != null) ps.close();
 		}
 	}
 
 	private String local_getProp (final String key) throws SQLException, ClassNotFoundException {
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-
+		final PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_PROP_Q_GET);
 		try {
-			ps = getDbCon().prepareStatement(SQL_TBL_PROP_Q_GET);
 			ps.setString(1, key);
-			rs = ps.executeQuery();
-
-			if (!rs.next()) { // True if there are rows in the result.
-				throw new IllegalArgumentException("Did not find key '"+key+"'.");
+			final ResultSet rs = ps.executeQuery();
+			try {
+				if (!rs.next()) { // True if there are rows in the result.
+					throw new IllegalArgumentException("Did not find key '" + key + "'.");
+				}
+				return rs.getString(SQL_TBL_PROP_COL_VALUE);
 			}
+			finally {
+				rs.close();
+			}
+		}
+		finally {
+			ps.close();
+		}
+	}
 
-			String value = rs.getString(SQL_TBL_PROP_COL_VALUE);
-			return value;
-
-		} finally {
-			if (rs != null) rs.close();
-			if (ps != null) ps.close();
+	private Map<String, String> local_getProps () throws SQLException, ClassNotFoundException {
+		final PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_PROP_Q_GET_ALL);
+		try {
+			final ResultSet rs = ps.executeQuery();
+			try {
+				final Map<String, String> ret = new LinkedHashMap<String, String>();
+				while (rs.next()) {
+					ret.put(rs.getString(SQL_TBL_PROP_COL_KEY), rs.getString(SQL_TBL_PROP_COL_VALUE));
+				}
+				return ret;
+			}
+			finally {
+				rs.close();
+			}
+		}
+		finally {
+			ps.close();
 		}
 	}
 

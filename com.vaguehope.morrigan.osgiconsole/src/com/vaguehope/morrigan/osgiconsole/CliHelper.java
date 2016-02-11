@@ -1,5 +1,8 @@
 package com.vaguehope.morrigan.osgiconsole;
 
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -7,6 +10,7 @@ import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackDb;
+import com.vaguehope.morrigan.model.media.IMediaTrackList;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaListReference;
@@ -14,23 +18,75 @@ import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbFactory;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbHelper;
+import com.vaguehope.morrigan.util.StringHelper;
 import com.vaguehope.sqlitewrapper.DbException;
 
 public class CliHelper {
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private final MediaFactory mediaFactory;
 
-	public CliHelper (MediaFactory mediaFactory) {
+	public CliHelper (final MediaFactory mediaFactory) {
 		this.mediaFactory = mediaFactory;
 	}
 
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public void checkArgs (final List<String> args, final int expectedCount) throws ArgException {
+		if (args.size() < expectedCount) {
+			throw new ArgException("Not enough arguments.");
+		}
+	}
+
+	public String argNotBlank (final String arg) throws ArgException {
+		if (StringHelper.blank(arg)) {
+			throw new ArgException("remoteUrl was blank.");
+		}
+		return arg;
+	}
+
+	public URI argUri (final String arg) throws ArgException {
+		try {
+			return new URI(argNotBlank(arg));
+		}
+		catch (URISyntaxException e) {
+			throw new ArgException("Invalid URI: " + arg);
+		}
+	}
+
+	public File argLocalDir (final String arg) throws ArgException {
+		final File dir = new File(arg);
+		if (!dir.exists()) {
+			throw new ArgException("Directory '" + dir.getAbsolutePath() + "' not found.");
+		}
+		return dir;
+	}
+
+	public IMediaTrackList<? extends IMediaTrack> argQ1 (final String arg) throws ArgException, MorriganException {
+		final List<PlayItem> lq1Pi = queryForPlayableItems(arg, null, 2);
+		if (lq1Pi == null || lq1Pi.size() != 1) {
+			throw new ArgException("Query '" + arg + "' did not return only one result.");
+		}
+		return lq1Pi.get(0).getList();
+	}
+
+	public ILocalMixedMediaDb argLocalQ1 (final String arg) throws ArgException, MorriganException {
+		final IMediaTrackList<? extends IMediaTrack> ll = argQ1(arg);
+		if (!(ll instanceof ILocalMixedMediaDb)) {
+			throw new ArgException("DB '" + arg + "' is not a local DB.");
+		}
+		return (ILocalMixedMediaDb) ll;
+	}
+
+	public IRemoteMixedMediaDb argRemoteQ1 (final String arg) throws ArgException, MorriganException {
+		final IMediaTrackList<? extends IMediaTrack> ll = argQ1(arg);
+		if (!(ll instanceof IRemoteMixedMediaDb)) {
+			throw new ArgException("DB '" + arg + "' is not a remote DB.");
+		}
+		return (IRemoteMixedMediaDb) ll;
+	}
 
 	/**
 	 * TODO Make this method able to take all sorts if user input.
 	 */
-	public List<PlayItem> queryForPlayableItems (String query1, String query2, int maxResults) throws MorriganException {
+	public List<PlayItem> queryForPlayableItems (final String query1, final String query2, final int maxResults) throws MorriganException {
 		List<PlayItem> ret = new LinkedList<PlayItem>();
 
 		List<MediaListReference> items = new LinkedList<MediaListReference>();
@@ -72,7 +128,7 @@ public class CliHelper {
 			 * FIXME this will load the DB (if its not already loaded), which is excessive if we are
 			 * just going to show some search results.
 			 */
-			IMediaTrackDb<?,? extends IMediaTrack> db = mediaListReferenceToReadTrackDb(explorerItem);
+			IMediaTrackDb<?, ? extends IMediaTrack> db = mediaListReferenceToReadTrackDb(explorerItem);
 
 			if (query2 == null) {
 				ret.add(new PlayItem(db, null));
@@ -81,7 +137,10 @@ public class CliHelper {
 				List<? extends IMediaTrack> results;
 				try {
 					results = db.simpleSearch(query2, maxResults);
-				} catch (DbException e) { throw new MorriganException(e); }
+				}
+				catch (DbException e) {
+					throw new MorriganException(e);
+				}
 
 				for (IMediaTrack result : results) {
 					if (ret.size() >= maxResults) break;
@@ -94,14 +153,15 @@ public class CliHelper {
 		return ret;
 	}
 
-	public IMediaTrackDb<?,? extends IMediaTrack> mediaListReferenceToReadTrackDb (MediaListReference item) throws MorriganException {
-		IMediaTrackDb<?,? extends IMediaTrack> ret = null;
+	public IMediaTrackDb<?, ? extends IMediaTrack> mediaListReferenceToReadTrackDb (final MediaListReference item) throws MorriganException {
+		IMediaTrackDb<?, ? extends IMediaTrack> ret = null;
 
 		if (item.getType() == MediaListReference.MediaListType.LOCALMMDB) {
 			ILocalMixedMediaDb mmdb;
 			try {
 				mmdb = this.mediaFactory.getLocalMixedMediaDb(item.getIdentifier());
-			} catch (DbException e) {
+			}
+			catch (DbException e) {
 				throw new MorriganException(e);
 			}
 			mmdb.read();
