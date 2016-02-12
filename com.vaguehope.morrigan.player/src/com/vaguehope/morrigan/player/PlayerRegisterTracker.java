@@ -43,8 +43,8 @@ public class PlayerRegisterTracker implements PlayerRegister {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	public int nextIndex () {
-		return getService().nextIndex();
+	public String nextIndex (final String prefix) {
+		return getService().nextIndex(prefix);
 	}
 
 	@Override

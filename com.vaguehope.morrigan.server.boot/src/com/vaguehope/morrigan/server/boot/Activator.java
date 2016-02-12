@@ -48,7 +48,7 @@ public class Activator implements BundleActivator {
 		this.nullScreen = new NullScreen(this.uiMgr);
 
 		if (config.isServerPlayerEnabled()) {
-			this.playerContainer = new ServerPlayerContainer(this.uiMgr, this.nullScreen, config, this.executorService);
+			this.playerContainer = new ServerPlayerContainer(this.uiMgr, this.nullScreen, this.executorService);
 		}
 		else {
 			logger.info("Server player disabled.");

@@ -1,33 +1,27 @@
 package com.vaguehope.morrigan.server.boot;
 
 import java.util.concurrent.ExecutorService;
-import java.util.logging.Logger;
 
 import com.vaguehope.morrigan.player.LocalPlayer;
 import com.vaguehope.morrigan.player.LocalPlayerSupport;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayerContainer;
-import com.vaguehope.morrigan.server.ServerConfig;
 
 class ServerPlayerContainer implements PlayerContainer {
 
 	private final UiMgr uiMgr;
 	private final NullScreen nullScreen;
-	private final ServerConfig config;
 	private final ExecutorService executorService;
-	private final Logger logger = Logger.getLogger(this.getClass().getName());
 
 	private LocalPlayer player;
 	private ServerPlayerEventHandler localPlayerSupport;
 
-	public ServerPlayerContainer (final UiMgr uiMgr, final NullScreen nullScreen, final ServerConfig config, final ExecutorService executorService) {
+	public ServerPlayerContainer (final UiMgr uiMgr, final NullScreen nullScreen, final ExecutorService executorService) {
 		if (uiMgr == null) throw new IllegalArgumentException();
 		if (nullScreen == null) throw new IllegalArgumentException();
-		if (config == null) throw new IllegalArgumentException();
 		if (executorService == null) throw new IllegalArgumentException();
 		this.uiMgr = uiMgr;
 		this.nullScreen = nullScreen;
-		this.config = config;
 		this.executorService = executorService;
 	}
 
@@ -35,6 +29,11 @@ class ServerPlayerContainer implements PlayerContainer {
 		LocalPlayer p = this.player;
 		if (p != null) p.dispose();
 		if (this.localPlayerSupport != null) this.localPlayerSupport.dispose();
+	}
+
+	@Override
+	public String getPrefix () {
+		return "s";
 	}
 
 	@Override

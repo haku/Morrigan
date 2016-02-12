@@ -24,7 +24,7 @@ public class PlayerRegisterImpl implements PlayerRegister {
 	private static final Logger LOG = Logger.getLogger(PlayerRegisterImpl.class.getName());
 
 	private final AtomicBoolean alive = new AtomicBoolean(true);
-	private final AtomicInteger next = new AtomicInteger(0);
+	private final ConcurrentMap<String, AtomicInteger> nexts = new ConcurrentHashMap<String, AtomicInteger>();
 	private final ConcurrentMap<String, Player> all = new ConcurrentHashMap<String, Player>();
 	private final Set<String> localPlayerIds = Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>());
 
@@ -53,9 +53,17 @@ public class PlayerRegisterImpl implements PlayerRegister {
 	}
 
 	@Override
-	public int nextIndex () {
+	public String nextIndex (final String prefix) {
 		checkAlive();
-		return this.next.getAndIncrement();
+
+		AtomicInteger next = this.nexts.get(prefix);
+		if (next == null) {
+			final AtomicInteger newNext = new AtomicInteger(0);
+			final AtomicInteger prevNext = this.nexts.putIfAbsent(prefix, newNext);
+			next = prevNext != null ? prevNext : newNext;
+		}
+
+		return prefix + next.getAndIncrement();
 	}
 
 	@Override
@@ -91,7 +99,11 @@ public class PlayerRegisterImpl implements PlayerRegister {
 
 	@Override
 	public LocalPlayer makeLocal (final String name, final LocalPlayerSupport localPlayerSupport) {
-		final LocalPlayer p = new LocalPlayerImpl(String.valueOf(nextIndex()), name, localPlayerSupport, this, this.playbackEngineFactory, this.executorService);
+		return makeLocal("", name, localPlayerSupport);
+	}
+
+	public LocalPlayer makeLocal (final String prefix, final String name, final LocalPlayerSupport localPlayerSupport) {
+		final LocalPlayer p = new LocalPlayerImpl(nextIndex(prefix), name, localPlayerSupport, this, this.playbackEngineFactory, this.executorService);
 		this.stateStorage.readState(p);
 		this.localPlayerIds.add(p.getId());
 		register(p);
