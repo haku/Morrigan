@@ -13,6 +13,7 @@ import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.internal.db.SqliteHelper;
 import com.vaguehope.morrigan.util.StringHelper;
 
 class SearchParser {
@@ -197,19 +198,19 @@ class SearchParser {
 				for (final String term : this.terms) {
 					if ("OR".equals(term)) continue;
 					if (term.startsWith("f~") || term.startsWith("t~")) {
-						ps.setString(parmIn++, "%" + escapeSearch(StringHelper.removeEndQuotes(term.substring(2))) + "%");
-						ps.setString(parmIn++, SEARCH_ESC);
+						ps.setString(parmIn++, "%" + SqliteHelper.escapeSearch(StringHelper.removeEndQuotes(term.substring(2))) + "%");
+						ps.setString(parmIn++, SqliteHelper.SEARCH_ESC);
 					}
 					else if (term.startsWith("t=")) {
-						ps.setString(parmIn++, escapeSearch(StringHelper.removeEndQuotes(term.substring(2))));
-						ps.setString(parmIn++, SEARCH_ESC);
+						ps.setString(parmIn++, SqliteHelper.escapeSearch(StringHelper.removeEndQuotes(term.substring(2))));
+						ps.setString(parmIn++, SqliteHelper.SEARCH_ESC);
 					}
 					else {
-						final String escapedTerm = escapeSearch(StringHelper.removeEndQuotes(term));
+						final String escapedTerm = SqliteHelper.escapeSearch(StringHelper.removeEndQuotes(term));
 						ps.setString(parmIn++, "%" + escapedTerm + "%");
-						ps.setString(parmIn++, SEARCH_ESC);
+						ps.setString(parmIn++, SqliteHelper.SEARCH_ESC);
 						ps.setString(parmIn++, "%" + escapedTerm + "%");
-						ps.setString(parmIn++, SEARCH_ESC);
+						ps.setString(parmIn++, SqliteHelper.SEARCH_ESC);
 					}
 				}
 				if (maxResults > 0) ps.setMaxRows(maxResults);
@@ -236,23 +237,6 @@ class SearchParser {
 					.toString();
 		}
 
-	}
-
-	/**
-	 * This pairs with escapeSearch().
-	 */
-	protected static final String SEARCH_ESC = "\\";
-
-	/**
-	 * This pairs with SEARCH_ESC.
-	 */
-	protected static String escapeSearch (final String term) {
-		String q = term;
-		q = q.replace("\\", "\\\\");
-		q = q.replace("%", "\\%");
-		q = q.replace("_", "\\_");
-		q = q.replace("*", "%");
-		return q;
 	}
 
 }

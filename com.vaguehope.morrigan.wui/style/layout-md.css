@@ -196,3 +196,16 @@ header .subtitle span {
   background-color: rgba(0,0,0,.5);
   visibility: visible;
 }
+
+/* Autocomplete. */
+.ui-autocomplete {
+  z-index: 100;
+  overflow-x: hidden;
+  overflow-y: auto;
+  max-width: 15em;
+  max-height: 20em;
+}
+.ui-autocomplete .ui-menu-item {
+  padding-top: 1em;
+  padding-bottom: 1em;
+}

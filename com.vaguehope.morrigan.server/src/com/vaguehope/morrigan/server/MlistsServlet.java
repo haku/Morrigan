@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.jetty.util.ajax.JSON;
 import org.xml.sax.SAXException;
 
 import com.megginson.sax.DataWriter;
@@ -65,6 +66,8 @@ import com.vaguehope.sqlitewrapper.DbException;
  * POST /mlists/LOCALMMDB/example.local.db3 action=scan
  * POST /mlists/LOCALMMDB/example.local.db3 action=pull&remote=someremote
  *
+ *  GET /mlists/LOCALMMDB/example.local.db3/tags?term=foo
+ *
  *  GET /mlists/LOCALMMDB/example.local.db3/items
  *  GET /mlists/LOCALMMDB/example.local.db3/items?includeddeletedtags=true
  *  GET /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3
@@ -92,10 +95,12 @@ public class MlistsServlet extends HttpServlet {
 	public static final String CONTEXTPATH = "/mlists";
 
 	public static final String PATH_SRC = "src";
+	public static final String PATH_TAGS = "tags";
 	public static final String PATH_ITEMS = "items";
 	public static final String PATH_ALBUMS = "albums";
 	public static final String PATH_QUERY = "query";
 
+	public static final String PARAM_TERM = "term";
 	public static final String PARAM_INCLUDE_DELETED_TAGS = "includeddeletedtags";
 	private static final String PARAM_ACTION = "action";
 	private static final String PARAM_PLAYERID = "playerid";
@@ -503,12 +508,22 @@ public class MlistsServlet extends HttpServlet {
 				}
 			}
 			else {
-				boolean includeDeletedTags = ServletHelper.readParamBoolean(req, PARAM_INCLUDE_DELETED_TAGS, false);
+				final boolean includeDeletedTags = ServletHelper.readParamBoolean(req, PARAM_INCLUDE_DELETED_TAGS, false);
 				printMlistLong(resp, mmdb, false, true, includeDeletedTags);
 			}
 		}
 		else if (path.equals(PATH_SRC)) {
 			printMlistLong(resp, mmdb, true, false, false);
+		}
+		else if (path.equals(PATH_TAGS)) {
+			final String term = StringHelper.trimToEmpty(req.getParameter(PARAM_TERM));
+			final List<MediaTag> tags = mmdb.tagSearch(term, 10);
+			final String[] arr = new String[tags.size()];
+			for (int i = 0; i < tags.size(); i++) {
+				arr[i] = tags.get(i).getTag();
+			}
+			resp.setContentType("application/json");
+			resp.getWriter().println(JSON.toString(arr));
 		}
 		else if (path.equals(PATH_ALBUMS)) {
 			if (afterPath != null && afterPath.length() > 0) {

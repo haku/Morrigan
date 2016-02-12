@@ -22,11 +22,11 @@ public final class SqliteHelper {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public static SqlCreateCmd generateSql_Create (String tblName, IDbColumn[] columns) {
+	public static SqlCreateCmd generateSql_Create (final String tblName, final IDbColumn[] columns) {
 		return generateSql_Create(tblName, Arrays.asList(columns));
 	}
 
-	public static SqlCreateCmd generateSql_Create (String tblName, List<IDbColumn> columns) {
+	public static SqlCreateCmd generateSql_Create (final String tblName, final List<IDbColumn> columns) {
 		StringBuilder sbExists = new StringBuilder();
 		StringBuilder sbCreate = new StringBuilder();
 
@@ -70,7 +70,7 @@ public final class SqliteHelper {
 	 * number or a string. Morrigan uses the number method, but terra used
 	 * strings. Using this method allows for backward compatibility.
 	 */
-	public static Date readDate (ResultSet rs, String column) throws SQLException {
+	public static Date readDate (final ResultSet rs, final String column) throws SQLException {
 		java.sql.Date date = rs.getDate(column);
 		if (date != null) {
 			long time = date.getTime();
@@ -89,4 +89,22 @@ public final class SqliteHelper {
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	/**
+	 * This pairs with escapeSearch().
+	 */
+	public static final String SEARCH_ESC = "\\";
+
+	/**
+	 * This pairs with SEARCH_ESC.
+	 */
+	public static String escapeSearch (final String term) {
+		String q = term;
+		q = q.replace("\\", "\\\\");
+		q = q.replace("%", "\\%");
+		q = q.replace("_", "\\_");
+		q = q.replace("*", "%");
+		return q;
+	}
+
 }

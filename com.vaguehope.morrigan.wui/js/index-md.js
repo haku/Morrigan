@@ -525,7 +525,7 @@
     $('.title', dlg).text(item.title);
 
     var newTag = $('#new_tag', dlg);
-    newTag.unbind().keyup(function(event) {
+    newTag.off('keyup').on('keyup', function(event) {
       if (event.keyCode == 13) {
         var tag = newTag.val();
         MnApi.addTag(item, tag, onStatus, function(msg) {
@@ -536,6 +536,15 @@
         });
       }
     });
+
+    if (!newTag.hasClass('ui-autocomplete-input')) {
+      newTag.autocomplete({
+        source: function(req, resp) {
+          $.getJSON('/mlists/' + currentDbMid + '/tags?term=' + encodeURIComponent(req.term), resp);
+        },
+        minLength: 1
+      });
+    }
 
     $('.row', dlg).remove();
     $.each(item.tags, function(index, tag) {

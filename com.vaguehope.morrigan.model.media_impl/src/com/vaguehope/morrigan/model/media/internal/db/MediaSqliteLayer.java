@@ -104,6 +104,15 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	}
 
 	@Override
+	public List<MediaTag> tagSearch (final String prefix, final int resLimit) throws DbException {
+		try {
+			return local_tagSearch(prefix, resLimit);
+		} catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+
+	@Override
 	public boolean hasTags (final IDbItem item) throws DbException {
 		try {
 			return local_hasTags(item.getDbRowId());
@@ -451,6 +460,13 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		"SELECT count(*) as freq,t.id,t.tag,t.type,t.cls_id,t.modified,t.deleted,c.cls" +
 		" FROM tbl_tags AS t LEFT OUTER JOIN tbl_tag_cls AS c ON t.cls_id=c.id" +
 		" WHERE t.type=? AND (t.deleted IS NULL OR t.deleted!=1)" +
+		" GROUP BY t.tag" +
+		" ORDER BY freq DESC, t.type ASC, c.cls ASC, t.tag ASC;";
+
+	private static final String SQL_TBL_TAGS_SEARCH =
+		"SELECT count(*) as freq,t.id,t.tag,t.type,t.cls_id,t.modified,t.deleted,c.cls" +
+		" FROM tbl_tags AS t LEFT OUTER JOIN tbl_tag_cls AS c ON t.cls_id=c.id" +
+		" WHERE t.type=? AND (t.deleted IS NULL OR t.deleted!=1) AND tag LIKE ? ESCAPE ?" +
 		" GROUP BY t.tag" +
 		" ORDER BY freq DESC, t.type ASC, c.cls ASC, t.tag ASC;";
 
@@ -844,6 +860,21 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		try {
 			ps.setInt(1, MediaTagType.MANUAL.getIndex()); // Force this as including automatic tags makes no sense.
 			ps.setMaxRows(countLimit);
+			final ResultSet rs = ps.executeQuery();
+			return local_readTags(rs);
+		}
+		finally {
+			ps.close();
+		}
+	}
+
+	private List<MediaTag> local_tagSearch (final String prefix, final int resLimit) throws SQLException, ClassNotFoundException, DbException {
+		final PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_TAGS_SEARCH);
+		try {
+			ps.setInt(1, MediaTagType.MANUAL.getIndex()); // Force this as including automatic tags makes no sense.
+			ps.setString(2, SqliteHelper.escapeSearch(prefix) + "%");
+			ps.setString(3, SqliteHelper.SEARCH_ESC);
+			ps.setMaxRows(resLimit);
 			final ResultSet rs = ps.executeQuery();
 			return local_readTags(rs);
 		}
