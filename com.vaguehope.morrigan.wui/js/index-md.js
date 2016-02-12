@@ -214,6 +214,12 @@
         MnApi.playerPlaybackOrder(selectedPlayer.pid, order, onStatus, displayPlayer);
       });
     });
+
+    var fetchTags = function(req, resp) {
+      $.getJSON('/mlists/' + currentDbMid + '/tags?term=' + encodeURIComponent(req.term), resp);
+    };
+    $('#tag_editor #new_tag').autocomplete({source: fetchTags, minLength: 1});
+    $('#db_query').autocomplete({source: fetchTags, minLength: 1});
   }
 
   function tagsClicked() {
@@ -405,7 +411,7 @@
     // TODO show spinner.
 
     $('#db_go_back').unbind().click(function(){setDbTabToDbs()});
-    $('#db_query').unbind().keyup(function(event){if (event.keyCode == 13) {setDbTabToSearch(mid, view)}});
+    $('#db_query').off('keyup').on('keyup', function(event){if (event.keyCode == 13) {setDbTabToSearch(mid, view)}});
     $('#db_sort_column').unbind().change(function(){setDbTabToSearch(mid, view)});
     $('#db_sort_order').unbind().change(function(){setDbTabToSearch(mid, view)});
     $('#db_sort_options').show();
@@ -536,15 +542,6 @@
         });
       }
     });
-
-    if (!newTag.hasClass('ui-autocomplete-input')) {
-      newTag.autocomplete({
-        source: function(req, resp) {
-          $.getJSON('/mlists/' + currentDbMid + '/tags?term=' + encodeURIComponent(req.term), resp);
-        },
-        minLength: 1
-      });
-    }
 
     $('.row', dlg).remove();
     $.each(item.tags, function(index, tag) {
