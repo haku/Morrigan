@@ -250,7 +250,8 @@ public abstract class AbstractPlayerView extends ViewPart {
 
 		@Override
 		public void historyChanged () {
-			AbstractPlayerView.this.historyChangedRrefresher.run();
+			final Runnable r = AbstractPlayerView.this.historyChangedRrefresher;
+			if (r != null) r.run();
 		}
 
 		@SuppressWarnings("unchecked")
