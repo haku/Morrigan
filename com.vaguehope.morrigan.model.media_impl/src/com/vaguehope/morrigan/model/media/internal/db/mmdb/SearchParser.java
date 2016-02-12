@@ -36,10 +36,10 @@ class SearchParser {
 			" (file LIKE ? ESCAPE ?)";
 
 	private static final String _SQL_MEDIAFILES_WHERES_TAG =
-			" (id IN (SELECT mf_id FROM tbl_tags WHERE tag LIKE ? ESCAPE ?))";
+			" (id IN (SELECT mf_id FROM tbl_tags WHERE tag LIKE ? ESCAPE ? AND (deleted IS NULL OR deleted!=1)))";
 
 	private static final String _SQL_MEDIAFILES_WHERES_FILEORTAG =
-			" (file LIKE ? ESCAPE ? OR id IN (SELECT mf_id FROM tbl_tags WHERE tag LIKE ? ESCAPE ?))";
+			" (file LIKE ? ESCAPE ? OR id IN (SELECT mf_id FROM tbl_tags WHERE tag LIKE ? ESCAPE ? AND (deleted IS NULL OR deleted!=1)))";
 
 	private static final String _SQL_MEDIAFILES_WHERENOTMISSING =
 			" (missing<>1 OR missing is NULL)";
