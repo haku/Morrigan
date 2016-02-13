@@ -215,11 +215,8 @@
       });
     });
 
-    var fetchTags = function(req, resp) {
-      $.getJSON('/mlists/' + currentDbMid + '/tags?term=' + encodeURIComponent(req.term), resp);
-    };
-    $('#tag_editor #new_tag').autocomplete({source: fetchTags, minLength: 1});
-    $('#db_query').autocomplete({source: fetchTags, minLength: 1});
+    setupTagAutocomplete($('#db_query'));
+    setupTagAutocomplete($('#new_tag'));
   }
 
   function tagsClicked() {
@@ -251,6 +248,37 @@
     MnApi.enqueueView(currentDbMid, currentDbQuery, selectedPlayer.pid, onStatus, function(msg) {
       console.log(msg);
     });
+  }
+
+  function setupTagAutocomplete(el) {
+    var source = function(req, resp) {
+      $.ajax({
+        dataType: "json",
+        url: '/mlists/' + currentDbMid + '/tags?term=' + encodeURIComponent(req.term),
+        success: function(data) {
+          if (!el.data('sent')) {
+            resp(data);
+          }
+          else {
+            resp();
+          }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+          onStatus('Error fetching tags: ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
+          resp();
+        }
+      });
+    }
+    el.autocomplete({source: source, minLength: 1});
+  }
+
+  function onAutocompleteKeyup(event) {
+    if (event.keyCode == 13) {
+      $(event.target).autocomplete('close').data('sent', true);
+    }
+    else {
+      $(event.target).data('sent', false);
+    }
   }
 
 // Player tab.
@@ -411,7 +439,12 @@
     // TODO show spinner.
 
     $('#db_go_back').unbind().click(function(){setDbTabToDbs()});
-    $('#db_query').off('keyup').on('keyup', function(event){if (event.keyCode == 13) {setDbTabToSearch(mid, view)}});
+    $('#db_query').off('keyup').on('keyup', function(event) {
+      onAutocompleteKeyup(event);
+      if (event.keyCode == 13) {
+        setDbTabToSearch(mid, view);
+      }
+    });
     $('#db_sort_column').unbind().change(function(){setDbTabToSearch(mid, view)});
     $('#db_sort_order').unbind().change(function(){setDbTabToSearch(mid, view)});
     $('#db_sort_options').show();
@@ -532,6 +565,7 @@
 
     var newTag = $('#new_tag', dlg);
     newTag.off('keyup').on('keyup', function(event) {
+      onAutocompleteKeyup(event);
       if (event.keyCode == 13) {
         var tag = newTag.val();
         MnApi.addTag(item, tag, onStatus, function(msg) {
