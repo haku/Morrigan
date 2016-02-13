@@ -60,6 +60,13 @@ public interface MediaFactory {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+	Collection<MediaListReference> getExternalDbs();
+	IMixedMediaDb getExternalDb(String id);
+	void addExternalDb(IMixedMediaDb db);
+	void removeExternalDb(String id);
+
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 	DurationData getNewDurationData (long duration, boolean complete);
 
 	/*

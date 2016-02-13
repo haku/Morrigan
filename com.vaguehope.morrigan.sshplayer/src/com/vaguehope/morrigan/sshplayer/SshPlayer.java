@@ -39,7 +39,8 @@ public class SshPlayer extends AbstractPlayer {
 	}
 
 	@Override
-	protected void loadAndStartPlaying (final PlayItem item, final File file) throws Exception {
+	protected void loadAndPlay (final PlayItem item) throws Exception {
+		final File file = new File(item.getTrack().getFilepath());
 		LOG.info("Loading item: " + file.getAbsolutePath());
 
 		stopPlaying();

@@ -6,13 +6,7 @@ import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.tasks.TaskEventListener;
 import com.vaguehope.sqlitewrapper.DbException;
 
-
 public interface IRemoteMixedMediaDb extends IMixedMediaDb {
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	String TYPE = "REMOTEMMDB";
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	URL getUrl() throws DbException;
 	void setUrl(URL url) throws DbException;
@@ -32,5 +26,4 @@ public interface IRemoteMixedMediaDb extends IMixedMediaDb {
 	TaskEventListener getTaskEventListener();
 	void setTaskEventListener(TaskEventListener taskEventListener);
 
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

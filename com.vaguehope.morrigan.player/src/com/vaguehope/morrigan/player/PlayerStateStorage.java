@@ -105,9 +105,9 @@ public class PlayerStateStorage {
 	}
 
 	private static void appendPlayItem (final Writer w, final PlayItem item) throws IOException {
-		if (item.hasList()) w.append(item.getList().getSerial());
+		if (item != null && item.hasList()) w.append(item.getList().getSerial());
 		w.append("\n");
-		if (item.hasTrack()) {
+		if (item != null && item.hasTrack()) {
 			w.append(item.getTrack().getFilepath()).append("\n");
 			w.append(item.getTrack().getHashcode().toString(16)).append("\n");
 		}

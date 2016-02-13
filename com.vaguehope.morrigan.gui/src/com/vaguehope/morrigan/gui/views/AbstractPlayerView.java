@@ -44,11 +44,11 @@ import com.vaguehope.morrigan.gui.helpers.RefreshTimer;
 import com.vaguehope.morrigan.gui.helpers.TrayHelper;
 import com.vaguehope.morrigan.gui.helpers.UiThreadHelper;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.model.media.IMixedMediaList;
+import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 import com.vaguehope.morrigan.player.LocalPlayer;
 import com.vaguehope.morrigan.player.LocalPlayerSupport;
 import com.vaguehope.morrigan.player.OrderHelper;
@@ -792,7 +792,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 
 	public void revealItemInLists (final IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack item) {
 		try {
-			if (list.getType().equals(ILocalMixedMediaDb.TYPE)) {
+			if (list.getType().equals(MediaListType.LOCALMMDB.toString())) {
 				MediaItemDbEditorInput input = EditorFactory.getMmdbInputBySerial(list.getSerial());
 				getViewSite().getWorkbenchWindow().getActivePage().openEditor(input, LocalMixedMediaDbEditor.ID);
 			}

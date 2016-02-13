@@ -33,5 +33,10 @@ public interface IMediaTrack extends IMediaItem {
 	 */
 	File findCoverArt();
 
+	/**
+	 * May return null;
+	 */
+	String getCoverArtRemoteLocation();
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

@@ -10,8 +10,18 @@ import com.vaguehope.morrigan.model.db.IDbItem;
 public interface IMediaItem extends IDbItem {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+	/**
+	 * File size in bytes.
+	 */
+	long getFileSize ();
+
 	String getFilepath ();
 	boolean setFilepath (String filePath);
+
+	/**
+	 * May return null.
+	 */
+	String getMimeType ();
 
 	Date getDateAdded();
 	boolean setDateAdded(Date dateAdded);
@@ -30,6 +40,11 @@ public interface IMediaItem extends IDbItem {
 
 	String getRemoteLocation();
 	boolean setRemoteLocation(String remoteLocation);
+
+	/**
+	 * May return null.
+	 */
+	String getRemoteId ();
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

@@ -115,6 +115,11 @@ public class MixedMediaItem extends MediaItem implements IMixedMediaItem {
 		return CoverArtHelper.findCoverArt(this);
 	}
 
+	@Override
+	public String getCoverArtRemoteLocation () {
+		return null;
+	}
+
 //	-  -  -  -  -  -  -  -  -
 //	IMediaPicture.
 

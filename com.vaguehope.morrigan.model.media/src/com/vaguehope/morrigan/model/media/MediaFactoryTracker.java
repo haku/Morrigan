@@ -20,7 +20,7 @@ public class MediaFactoryTracker implements MediaFactory {
 	private final AtomicBoolean alive = new AtomicBoolean(true);
 	private final ServiceTracker<MediaFactory, MediaFactory> playerReaderTracker;
 
-	public MediaFactoryTracker (BundleContext context) {
+	public MediaFactoryTracker (final BundleContext context) {
 		this.playerReaderTracker = new ServiceTracker<MediaFactory, MediaFactory>(context, MediaFactory.class, null);
 		this.playerReaderTracker.open();
 	}
@@ -52,32 +52,32 @@ public class MediaFactoryTracker implements MediaFactory {
 	}
 
 	@Override
-	public ILocalMixedMediaDb createLocalMixedMediaDb (String name) throws MorriganException {
+	public ILocalMixedMediaDb createLocalMixedMediaDb (final String name) throws MorriganException {
 		return getService().createLocalMixedMediaDb(name);
 	}
 
 	@Override
-	public ILocalMixedMediaDb getLocalMixedMediaDb (String fullFilePath) throws DbException {
+	public ILocalMixedMediaDb getLocalMixedMediaDb (final String fullFilePath) throws DbException {
 		return getService().getLocalMixedMediaDb(fullFilePath);
 	}
 
 	@Override
-	public ILocalMixedMediaDb getLocalMixedMediaDb (String fullFilePath, String searchTerm) throws DbException {
+	public ILocalMixedMediaDb getLocalMixedMediaDb (final String fullFilePath, final String searchTerm) throws DbException {
 		return getService().getLocalMixedMediaDb(fullFilePath, searchTerm);
 	}
 
 	@Override
-	public ILocalMixedMediaDb getLocalMixedMediaDbBySerial (String serial) throws DbException {
+	public ILocalMixedMediaDb getLocalMixedMediaDbBySerial (final String serial) throws DbException {
 		return getService().getLocalMixedMediaDbBySerial(serial);
 	}
 
 	@Override
-	public ILocalMixedMediaDb getLocalMixedMediaDbTransactional (ILocalMixedMediaDb lmmdb) throws DbException {
+	public ILocalMixedMediaDb getLocalMixedMediaDbTransactional (final ILocalMixedMediaDb lmmdb) throws DbException {
 		return getService().getLocalMixedMediaDbTransactional(lmmdb);
 	}
 
 	@Override
-	public IMediaItemDb<?, ?> getMediaItemDbTransactional (IMediaItemDb<?, ?> db) throws DbException {
+	public IMediaItemDb<?, ?> getMediaItemDbTransactional (final IMediaItemDb<?, ?> db) throws DbException {
 		return getService().getMediaItemDbTransactional(db);
 	}
 
@@ -88,52 +88,72 @@ public class MediaFactoryTracker implements MediaFactory {
 	}
 
 	@Override
-	public IRemoteMixedMediaDb createRemoteMixedMediaDb (String mmdbUrl) {
+	public IRemoteMixedMediaDb createRemoteMixedMediaDb (final String mmdbUrl) {
 		return getService().createRemoteMixedMediaDb(mmdbUrl);
 	}
 
 	@Override
-	public IRemoteMixedMediaDb getRemoteMixedMediaDb (String dbName) {
+	public IRemoteMixedMediaDb getRemoteMixedMediaDb (final String dbName) {
 		return getService().getRemoteMixedMediaDb(dbName);
 	}
 
 	@Override
-	public IRemoteMixedMediaDb getRemoteMixedMediaDb (String dbName, URL url) {
+	public IRemoteMixedMediaDb getRemoteMixedMediaDb (final String dbName, final URL url) {
 		return getService().getRemoteMixedMediaDb(dbName, url);
 	}
 
 	@Override
-	public DurationData getNewDurationData (long duration, boolean complete) {
+	public Collection<MediaListReference> getExternalDbs () {
+		return getService().getExternalDbs();
+	}
+
+	@Override
+	public IMixedMediaDb getExternalDb (final String id) {
+		return getService().getExternalDb(id);
+	}
+
+	@Override
+	public void addExternalDb (final IMixedMediaDb db) {
+		getService().addExternalDb(db);
+	}
+
+	@Override
+	public void removeExternalDb (final String id) {
+		getService().removeExternalDb(id);
+	}
+
+	@Override
+	public DurationData getNewDurationData (final long duration, final boolean complete) {
 		return getService().getNewDurationData(duration, complete);
 	}
 
 	@Override
-	public MorriganTask getLocalMixedMediaDbUpdateTask (ILocalMixedMediaDb library) {
+	public MorriganTask getLocalMixedMediaDbUpdateTask (final ILocalMixedMediaDb library) {
 		return getService().getLocalMixedMediaDbUpdateTask(library);
 	}
 
 	@Override
-	public MorriganTask getRemoteMixedMediaDbUpdateTask (IRemoteMixedMediaDb library) {
+	public MorriganTask getRemoteMixedMediaDbUpdateTask (final IRemoteMixedMediaDb library) {
 		return getService().getRemoteMixedMediaDbUpdateTask(library);
 	}
 
 	@Override
-	public <T extends IMediaItem> MorriganTask getMediaFileCopyTask (IMediaItemList<T> mediaItemList, List<T> mediaSelection, File targetDirectory) {
+	public <T extends IMediaItem> MorriganTask getMediaFileCopyTask (final IMediaItemList<T> mediaItemList, final List<T> mediaSelection, final File targetDirectory) {
 		return getService().getMediaFileCopyTask(mediaItemList, mediaSelection, targetDirectory);
 	}
 
 	@Override
-	public <T extends IMediaItem> MorriganTask getNewCopyToLocalMmdbTask (IMediaItemList<T> fromList, Collection<T> itemsToCopy, ILocalMixedMediaDb toDb) {
+	public <T extends IMediaItem> MorriganTask getNewCopyToLocalMmdbTask (final IMediaItemList<T> fromList, final Collection<T> itemsToCopy, final ILocalMixedMediaDb toDb) {
 		return getService().getNewCopyToLocalMmdbTask(fromList, itemsToCopy, toDb);
 	}
 
 	@Override
-	public MorriganTask getSyncMetadataRemoteToLocalTask (ILocalMixedMediaDb local, IRemoteMixedMediaDb remote) {
+	public MorriganTask getSyncMetadataRemoteToLocalTask (final ILocalMixedMediaDb local, final IRemoteMixedMediaDb remote) {
 		return getService().getSyncMetadataRemoteToLocalTask(local, remote);
 	}
 
 	@Override
-	public void readTrackTags (IMediaItemDb<?, ?> itemDb, IMediaTrack mlt, File file) throws IOException, MorriganException {
+	public void readTrackTags (final IMediaItemDb<?, ?> itemDb, final IMediaTrack mlt, final File file) throws IOException, MorriganException {
 		getService().readTrackTags(itemDb, mlt, file);
 	}
 

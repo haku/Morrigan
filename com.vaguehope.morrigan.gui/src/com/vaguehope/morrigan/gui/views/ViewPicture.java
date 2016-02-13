@@ -52,6 +52,7 @@ import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.IMediaPicture;
+import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 
 public class ViewPicture extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -63,7 +64,7 @@ public class ViewPicture extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	public void createPartControl(Composite parent) {
+	public void createPartControl(final Composite parent) {
 		createLayout(parent);
 		initSelectionListener();
 	}
@@ -88,19 +89,19 @@ public class ViewPicture extends ViewPart {
 	private static final String KEY_ITEM = "ITEM";
 
 	@Override
-	public void saveState(IMemento memento) {
+	public void saveState(final IMemento memento) {
 		super.saveState(memento);
 
 		memento.putBoolean(KEY_TIMER, isTimerEnabled());
 
-		if (this.editedItemDb != null && this.editedItemDb.getType().equals(ILocalMixedMediaDb.TYPE)) {
+		if (this.editedItemDb != null && this.editedItemDb.getType().equals(MediaListType.LOCALMMDB.toString())) {
 			memento.putString(KEY_DB, this.editedItemDb.getDbPath());
 			memento.putString(KEY_ITEM, this.editedItem.getFilepath());
 		}
 	}
 
 	@Override
-	public void init(IViewSite site, IMemento memento) throws PartInitException {
+	public void init(final IViewSite site, final IMemento memento) throws PartInitException {
 		super.init(site, memento);
 
 		if (memento != null) {
@@ -149,9 +150,9 @@ public class ViewPicture extends ViewPart {
 
 	volatile boolean listenToSelectionListener = true;
 
-	private ISelectionListener selectionListener = new ISelectionListener() {
+	private final ISelectionListener selectionListener = new ISelectionListener() {
 		@Override
-		public void selectionChanged(IWorkbenchPart part, ISelection selection) {
+		public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 			if (ViewPicture.this.listenToSelectionListener && part instanceof IMixedMediaItemDbEditor) {
 				if (selection==null || selection.isEmpty()) {
 					return;
@@ -184,7 +185,7 @@ public class ViewPicture extends ViewPart {
 	IMediaItemDb<?,? extends IMediaPicture> editedItemDb = null;
 	IMediaPicture editedItem = null;
 
-	public void setInput (IMediaItemDb<?,? extends IMediaPicture> editedMediaList, List<? extends IMediaPicture> selection) {
+	public void setInput (final IMediaItemDb<?,? extends IMediaPicture> editedMediaList, final List<? extends IMediaPicture> selection) {
 		IMediaPicture item = null;
 		if (selection != null && selection.size() > 0) {
 			if (selection.size() == 1) {
@@ -196,7 +197,7 @@ public class ViewPicture extends ViewPart {
 		}
 	}
 
-	public void setInput (IMediaItemDb<?,? extends IMediaPicture> editedMediaList, IMediaPicture item) {
+	public void setInput (final IMediaItemDb<?,? extends IMediaPicture> editedMediaList, final IMediaPicture item) {
 		if (this.editedItemDb != editedMediaList || this.editedItem != item) {
 			this.editedItem = item;
 
@@ -227,7 +228,7 @@ public class ViewPicture extends ViewPart {
 		}
 	}
 
-	private void createLayout (Composite parent) {
+	private void createLayout (final Composite parent) {
 		parent.setLayout(new FillLayout());
 
 		this.pictureCanvas = new Canvas(parent, SWT.NONE);
@@ -251,9 +252,9 @@ public class ViewPicture extends ViewPart {
 		}
 	}
 
-	private KeyListener keyListener = new KeyListener() {
+	private final KeyListener keyListener = new KeyListener() {
 		@Override
-		public void keyReleased(KeyEvent e) {
+		public void keyReleased(final KeyEvent e) {
 			if (e.keyCode == SWT.ARROW_RIGHT || e.keyCode == SWT.ARROW_DOWN || e.keyCode == SWT.PAGE_DOWN
 					|| e.character == ' ' || e.character == 'n' || e.character == 'f' || e.character == '\r') {
 				nextPicture(1);
@@ -275,7 +276,7 @@ public class ViewPicture extends ViewPart {
 			}
 		}
 		@Override
-		public void keyPressed(KeyEvent e) {/* UNUSED */}
+		public void keyPressed(final KeyEvent e) {/* UNUSED */}
 	};
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -286,14 +287,14 @@ public class ViewPicture extends ViewPart {
 		private final IMediaPicture item;
 		private final Display display;
 
-		public LoadPictureJob (Display display, IMediaPicture item) {
+		public LoadPictureJob (final Display display, final IMediaPicture item) {
 			super("Loading picture");
 			this.display = display;
 			this.item = item;
 		}
 
 		@Override
-		protected IStatus run(IProgressMonitor monitor) {
+		protected IStatus run(final IProgressMonitor monitor) {
 			if (this.item != null ) {
 				if (this.item.isEnabled()) {
 					if (ViewPicture.this.pictureImage != null) throw new IllegalArgumentException();
@@ -312,12 +313,12 @@ public class ViewPicture extends ViewPart {
 
 	class UpdatePictureJob extends UIJob {
 
-		public UpdatePictureJob (Display jobDisplay) {
+		public UpdatePictureJob (final Display jobDisplay) {
 			super(jobDisplay, "Update picture");
 		}
 
 		@Override
-		public IStatus runInUIThread(IProgressMonitor monitor) {
+		public IStatus runInUIThread(final IProgressMonitor monitor) {
 			ViewPicture.this.pictureLastChanged = System.currentTimeMillis();
 
 			if (!ViewPicture.this.pictureCanvas.isDisposed()) {
@@ -366,9 +367,9 @@ public class ViewPicture extends ViewPart {
 		}
 	}
 
-	private PaintListener picturePainter = new PaintListener () {
+	private final PaintListener picturePainter = new PaintListener () {
 		@Override
-		public void paintControl(PaintEvent e) {
+		public void paintControl(final PaintEvent e) {
 			if (ViewPicture.this.pictureImage != null) {
 				Rectangle srcBounds = ViewPicture.this.pictureImage.getBounds();
 				Rectangle dstBounds = ViewPicture.this.pictureCanvas.getClientArea();
@@ -401,7 +402,7 @@ public class ViewPicture extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Control methods.
 
-	protected void nextPicture (int x) {
+	protected void nextPicture (final int x) {
 		if (this.editedItemDb != null && this.editedItem != null) {
 			List<? extends IMediaPicture> dbEntries = this.editedItemDb.getMediaItems();
 			int current = dbEntries.indexOf(this.editedItem);
@@ -458,7 +459,7 @@ public class ViewPicture extends ViewPart {
 
 	protected void revealItemInList () throws PartInitException, MorriganException {
 		if (this.editedItemDb != null && this.editedItem != null) {
-			if (this.editedItemDb.getType().equals(ILocalMixedMediaDb.TYPE)) {
+			if (this.editedItemDb.getType().equals(MediaListType.LOCALMMDB.toString())) {
 				this.listenToSelectionListener = false;
 				try {
 					MediaItemDbEditorInput input = EditorFactory.getMmdbInputBySerial(this.editedItemDb.getSerial());
@@ -486,8 +487,8 @@ public class ViewPicture extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Scheduler.
 
-	private Timer timer = new Timer();
-	private AtomicReference<TimerTask> changeTimer = new AtomicReference<TimerTask>();
+	private final Timer timer = new Timer();
+	private final AtomicReference<TimerTask> changeTimer = new AtomicReference<TimerTask>();
 
 	void startTimer () {
 		ChangeTask t = new ChangeTask();
@@ -594,7 +595,7 @@ public class ViewPicture extends ViewPart {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private static IMediaPicture getRandomItem (List<? extends IMediaPicture> dbEntries, IMediaPicture current) {
+	private static IMediaPicture getRandomItem (final List<? extends IMediaPicture> dbEntries, final IMediaPicture current) {
 		List<IMediaPicture> list = new LinkedList<IMediaPicture>();
 		for (IMediaPicture mi : dbEntries) {
 			if (mi.isEnabled() && !mi.isMissing() && mi != current && mi.isPicture()) {

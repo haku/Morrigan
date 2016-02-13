@@ -248,7 +248,12 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 	int _currentTrackDuration = -1; // In seconds.
 
 	@Override
-	protected void loadAndStartPlaying (final PlayItem item, final File file) throws MorriganException {
+	protected void loadAndPlay (final PlayItem item) throws MorriganException {
+		// TODO FIXME Might be passed a remote file, but not supported yet.
+		// To check it is a valid local file.
+		final File file = new File(item.getTrack().getFilepath());
+		if (!file.exists()) throw new MorriganException("File not found for item " + item + ": " + file.getAbsolutePath());
+
 		IPlaybackEngine engine = getPlaybackEngine(true);
 		synchronized (engine) {
 			this.logger.fine("Loading '" + item.getTrack().getTitle() + "'...");

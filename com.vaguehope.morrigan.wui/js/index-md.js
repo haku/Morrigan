@@ -493,8 +493,11 @@
   }
 
   function makeResultItem(res) {
+    var title = res.title;
+    if (res.duration > 0) title += ' (' + MnApi.formatSeconds(res.duration) + ')';
+
     var a = $('<a class="clickable title" href="">');
-    a.text(res.title + ' (' + MnApi.formatSeconds(res.duration) + ')');
+    a.text(title);
     if (!res.enabled) a.addClass('disabled');
 
     var el = $('<li class="item">');

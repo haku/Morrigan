@@ -396,9 +396,9 @@ public class PlayersServlet extends HttpServlet {
 			final String filename;
 			final String filepath;
 			if (currentItem != null && currentItem.hasTrack()) {
-				trackLink = URLEncoder.encode(currentItem.getTrack().getFilepath(), "UTF-8");
+				trackLink = MlistsServlet.fileLink(currentItem.getTrack());
 				filename = currentItem.getTrack().getTitle(); // FIXME This is a hack :s .
-				filepath = currentItem.getTrack().getFilepath();
+				filepath = StringHelper.notBlank(currentItem.getTrack().getFilepath()) ? currentItem.getTrack().getFilepath() : NULL;
 			}
 			else {
 				trackLink = null;
@@ -476,8 +476,7 @@ public class PlayersServlet extends HttpServlet {
 			FeedHelper.addElement(dw, "id", playItem.getId());
 
 			if (mi != null) {
-				String file = URLEncoder.encode(mi.getFilepath(), "UTF-8");
-				FeedHelper.addLink(dw, file, "item");
+				FeedHelper.addLink(dw, MlistsServlet.fileLink(mi), "item");
 
 				if (mi.getDateAdded() != null) {
 					FeedHelper.addElement(dw, "dateadded", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateAdded()));

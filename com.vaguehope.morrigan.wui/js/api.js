@@ -255,7 +255,6 @@ MnApi = {};
   }
 
   MnApi.getDb = function(mid, view, onStatus, onDb) {
-    var id = midToId(mid);
     var url = 'mlists/' + mid;
     if (view) url += '?view=' + encodeURIComponent(view);
     $.ajax({
@@ -264,7 +263,7 @@ MnApi = {};
       url : url,
       dataType : 'xml',
       beforeSend : function() {
-        onStatus('Reading DB ' + id + '...');
+        onStatus('Reading DB ' + mid + '...');
       },
       success : function(xml) {
         var mlistNode = $(xml).find('mlist');
@@ -273,7 +272,7 @@ MnApi = {};
         onStatus('');
       },
       error : function(jqXHR, textStatus, errorThrown) {
-        onStatus('Error fetching media list ' + id + ': ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
+        onStatus('Error fetching media list ' + mid + ': ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
       }
     });
   }
@@ -281,7 +280,6 @@ MnApi = {};
   function parseMlistNode(node) {
     var mlist = {};
     mlist.mid = node.find('link[rel="self"]').attr('href').replace('/mlists/', '');
-    mlist.id = midToId(mlist.mid);
     mlist.type = node.attr('type');
     mlist.title = node.find('title').text();
     mlist.count = parseInt(node.find('count').text(), 10);
@@ -291,8 +289,6 @@ MnApi = {};
   }
 
   MnApi.getQuery = function(mid, view, query, sortColumn, sortOrder, onStatus, onItems) {
-    var id = midToId(mid);
-
     if (!query || query.length < 1) query = '*';
     var url = 'mlists/' + mid + '/query/' + encodeURIComponent(query) + '?';
     if (view) url += '&view=' + encodeURIComponent(view);
@@ -306,7 +302,7 @@ MnApi = {};
       url : url,
       dataType : 'xml',
       beforeSend : function() {
-        onStatus('Querying ' + id + ' view=' + view + ' query=' + query + ' col=' + sortColumn + ' order=' + sortOrder + ' ...');
+        onStatus('Querying ' + mid + ' view=' + view + ' query=' + query + ' col=' + sortColumn + ' order=' + sortOrder + ' ...');
       },
       success : function(xml) {
         var itemsNode = $(xml).find('mlist');
@@ -315,7 +311,7 @@ MnApi = {};
         onStatus('');
       },
       error : function(jqXHR, textStatus, errorThrown) {
-        onStatus('Error querying ' + id + ': ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
+        onStatus('Error querying ' + mid + ': ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
       }
     });
   }
@@ -352,10 +348,6 @@ MnApi = {};
     item.url = '/mlists/' + mid + '/items/' + item.relativeUrl;
 
     return item;
-  }
-
-  function midToId(mid) {
-    return mid.match(/\/(.+?)\./)[1];
   }
 
   MnApi.enqueueItems = function(items, view, pid, onStatus, onComplete) {

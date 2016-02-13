@@ -8,6 +8,7 @@ import com.vaguehope.morrigan.gui.Activator;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
+import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbFactory;
 import com.vaguehope.sqlitewrapper.DbException;
 
@@ -27,16 +28,16 @@ public class EditorFactory implements IElementFactory {
 	 * called multiple times. (issues with restoring navigation history)
 	 */
 	@Override
-	public IAdaptable createElement (IMemento memento) {
+	public IAdaptable createElement (final IMemento memento) {
 		MediaItemListEditorInput<?> input = null;
 
 		String type = memento.getString(KEY_TYPE);
 
 		try {
-			if (type.equals(ILocalMixedMediaDb.TYPE)) {
+			if (type.equals(MediaListType.LOCALMMDB.toString())) {
 				input = getMmdbInput(memento);
 			}
-			else if (type.equals(IRemoteMixedMediaDb.TYPE)) {
+			else if (type.equals(MediaListType.REMOTEMMDB.toString())) {
 				input = getRemoteMmdbInput(memento);
 			}
 			else {
@@ -60,11 +61,11 @@ public class EditorFactory implements IElementFactory {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Local MixedMediaDb.
 
-	public static MediaItemDbEditorInput getMmdbInput (String dbFilePath) throws MorriganException {
+	public static MediaItemDbEditorInput getMmdbInput (final String dbFilePath) throws MorriganException {
 		return getMmdbInput(dbFilePath, null);
 	}
 
-	public static MediaItemDbEditorInput getMmdbInput (String dbFilePath, String filter) throws MorriganException {
+	public static MediaItemDbEditorInput getMmdbInput (final String dbFilePath, final String filter) throws MorriganException {
 		ILocalMixedMediaDb l;
 		try {
 			l = Activator.getMediaFactory().getLocalMixedMediaDb(dbFilePath, filter);
@@ -75,7 +76,7 @@ public class EditorFactory implements IElementFactory {
 		return new MediaItemDbEditorInput(l);
 	}
 
-	public static MediaItemDbEditorInput getMmdbInputBySerial (String serial) throws MorriganException {
+	public static MediaItemDbEditorInput getMmdbInputBySerial (final String serial) throws MorriganException {
 		ILocalMixedMediaDb l;
 		try {
 			l = Activator.getMediaFactory().getLocalMixedMediaDbBySerial(serial);
@@ -86,7 +87,7 @@ public class EditorFactory implements IElementFactory {
 		return new MediaItemDbEditorInput(l);
 	}
 
-	public static MediaItemDbEditorInput getMmdbInput (IMemento memento) throws MorriganException {
+	public static MediaItemDbEditorInput getMmdbInput (final IMemento memento) throws MorriganException {
 		String serial = memento.getString(KEY_SERIAL);
 		return getMmdbInputBySerial(serial);
 	}
@@ -94,22 +95,22 @@ public class EditorFactory implements IElementFactory {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Remote MixedMediaDb.
 
-	public static MediaItemDbEditorInput getRemoteMmdbInput (String dbFilePath) throws MorriganException {
+	public static MediaItemDbEditorInput getRemoteMmdbInput (final String dbFilePath) throws MorriganException {
 		IRemoteMixedMediaDb ml = RemoteMixedMediaDbFactory.getExisting(dbFilePath);
 		return new MediaItemDbEditorInput(ml);
 	}
 
-	public static MediaItemDbEditorInput getRemoteMmdbInput (String dbFilePath, String filter) throws MorriganException {
+	public static MediaItemDbEditorInput getRemoteMmdbInput (final String dbFilePath, final String filter) throws MorriganException {
 		IRemoteMixedMediaDb ml = RemoteMixedMediaDbFactory.getExisting(dbFilePath, filter);
 		return new MediaItemDbEditorInput(ml);
 	}
 
-	public static MediaItemDbEditorInput getRemoteMmdbInputBySerial (String serial) throws MorriganException {
+	public static MediaItemDbEditorInput getRemoteMmdbInputBySerial (final String serial) throws MorriganException {
 		IRemoteMixedMediaDb ml = RemoteMixedMediaDbFactory.getExistingBySerial(serial);
 		return new MediaItemDbEditorInput(ml);
 	}
 
-	public static MediaItemDbEditorInput getRemoteMmdbInput (IMemento memento) throws MorriganException {
+	public static MediaItemDbEditorInput getRemoteMmdbInput (final IMemento memento) throws MorriganException {
 		String serial = memento.getString(KEY_SERIAL);
 		return getRemoteMmdbInputBySerial(serial);
 	}

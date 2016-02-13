@@ -17,6 +17,7 @@ import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.model.media.IMixedMediaStorageLayer;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
+import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 import com.vaguehope.morrigan.model.media.internal.db.MediaItemDbConfig;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.AbstractMixedMediaDb;
 import com.vaguehope.morrigan.server.MlistsServlet;
@@ -114,7 +115,7 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb implements IRemoteM
 
 	@Override
 	public String getType() {
-		return TYPE;
+		return MediaListType.REMOTEMMDB.toString();
 	}
 
 	@Override

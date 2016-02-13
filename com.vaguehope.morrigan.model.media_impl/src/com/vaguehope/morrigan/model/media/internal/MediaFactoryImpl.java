@@ -3,8 +3,11 @@ package com.vaguehope.morrigan.model.media.internal;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
 import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
@@ -18,9 +21,11 @@ import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
+import com.vaguehope.morrigan.model.media.IMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaListReference;
+import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.CopyToLocalMmdbTask;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.LocalMixedMediaDbFactory;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.LocalMixedMediaDbHelper;
@@ -76,7 +81,7 @@ public class MediaFactoryImpl implements MediaFactory {
 
 	@Override
 	public IMediaItemDb<?, ?> getMediaItemDbTransactional (final IMediaItemDb<?, ?> db) throws DbException {
-		if (ILocalMixedMediaDb.TYPE.equals(db.getType())) {
+		if (MediaListType.LOCALMMDB.toString().equals(db.getType())) {
 			return LocalMixedMediaDbFactory.getTransactional(db.getDbPath());
 		}
 		throw new IllegalArgumentException("Can't create transactional connection to DB of type '" + db.getType() + "'.");
@@ -102,6 +107,34 @@ public class MediaFactoryImpl implements MediaFactory {
 	@Override
 	public IRemoteMixedMediaDb getRemoteMixedMediaDb (final String dbName, final URL url) {
 		throw new IllegalArgumentException("See server package.");
+	}
+
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	private final Map<String, IMixedMediaDb> externalDbs = new ConcurrentSkipListMap<String, IMixedMediaDb>();
+
+	@Override
+	public Collection<MediaListReference> getExternalDbs () {
+		final List<MediaListReference> ret = new ArrayList<MediaListReference>();
+		for (IMixedMediaDb db : this.externalDbs.values()) {
+			ret.add(new MediaListReferenceImpl(MediaListType.EXTMMDB, db.getListId(), db.getListName()));
+		}
+		return ret;
+	}
+
+	@Override
+	public IMixedMediaDb getExternalDb (final String id) {
+		return this.externalDbs.get(id);
+	}
+
+	@Override
+	public void addExternalDb (final IMixedMediaDb db) {
+		this.externalDbs.put(db.getListId(), db);
+	}
+
+	@Override
+	public void removeExternalDb (final String id) {
+		this.externalDbs.remove(id);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

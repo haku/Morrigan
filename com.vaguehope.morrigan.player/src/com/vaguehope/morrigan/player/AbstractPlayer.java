@@ -9,6 +9,7 @@ import com.vaguehope.morrigan.model.Register;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
+import com.vaguehope.morrigan.util.StringHelper;
 
 public abstract class AbstractPlayer implements Player {
 
@@ -111,17 +112,17 @@ public abstract class AbstractPlayer implements Player {
 	}
 
 	@Override
-	public void loadAndStartPlaying (final IMediaTrackList<? extends IMediaTrack> list) {
+	public final void loadAndStartPlaying (final IMediaTrackList<? extends IMediaTrack> list) {
 		loadAndStartPlaying(list, null);
 	}
 
 	@Override
-	public void loadAndStartPlaying (final IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack track) {
+	public final void loadAndStartPlaying (final IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack track) {
 		loadAndStartPlaying(new PlayItem(list, track));
 	}
 
 	@Override
-	public void loadAndStartPlaying (final PlayItem item) {
+	public final void loadAndStartPlaying (final PlayItem item) {
 		checkAlive();
 		if (item == null) throw new IllegalArgumentException("PlayItem can not be null.");
 
@@ -139,15 +140,21 @@ public abstract class AbstractPlayer implements Player {
 		loadAndStartPlayingTrack(pi);
 	}
 
-	private void loadAndStartPlayingTrack (final PlayItem item) {
+	private final void loadAndStartPlayingTrack (final PlayItem item) {
 		if (item == null) throw new IllegalArgumentException("PlayItem can not be null.");
 		if (!item.hasTrack()) throw new IllegalArgumentException("Item must have a track.");
 		if (!item.getTrack().isPlayable()) throw new IllegalArgumentException("Item is not playable: '" + item.getTrack().getFilepath() + "'.");
 		try {
-			final File file = new File(item.getTrack().getFilepath());
-			if (!file.exists()) throw new FileNotFoundException(file.getAbsolutePath());
+			if (StringHelper.notBlank(item.getTrack().getFilepath())) {
+				final File file = new File(item.getTrack().getFilepath());
+				if (!file.exists()) throw new FileNotFoundException(file.getAbsolutePath());
+			}
+			else if (StringHelper.blank(item.getTrack().getRemoteLocation())) {
+				throw new FileNotFoundException("Track has no filepath or remote location: " + item.getTrack());
+			}
+
 			synchronized (this.loadLock) {
-				loadAndStartPlaying(item, file);
+				loadAndPlay(item);
 				this.listeners.currentItemChanged(item);
 			}
 		}
@@ -161,6 +168,6 @@ public abstract class AbstractPlayer implements Player {
 	 * Already synchronised.
 	 * PlayItem has been validated.
 	 */
-	protected abstract void loadAndStartPlaying (PlayItem item, File file) throws Exception;
+	protected abstract void loadAndPlay (PlayItem item) throws Exception;
 
 }

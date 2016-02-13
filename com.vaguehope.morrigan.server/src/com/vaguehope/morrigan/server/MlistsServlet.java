@@ -33,10 +33,10 @@ import com.vaguehope.morrigan.model.media.IMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMixedMediaItemStorageLayer;
-import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaAlbum;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaListReference;
+import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagClassification;
 import com.vaguehope.morrigan.model.media.MediaTagType;
@@ -210,32 +210,32 @@ public class MlistsServlet extends HttpServlet {
 				final String[] pathParts = path.split("/");
 				if (pathParts.length >= 2) {
 					final String type = pathParts[0];
-					if (type.equals(ILocalMixedMediaDb.TYPE) || type.equals(IRemoteMixedMediaDb.TYPE)) {
-						final String filter = StringHelper.trimToNull(req.getParameter(PARAM_VIEW));
-						final IMixedMediaDb mmdb;
-						if (type.equals(ILocalMixedMediaDb.TYPE)) {
-							final String f = LocalMixedMediaDbHelper.getFullPathToMmdb(pathParts[1]);
-							mmdb = this.mediaFactory.getLocalMixedMediaDb(f, filter);
-						}
-						else if (type.equals(IRemoteMixedMediaDb.TYPE)) {
-							final String f = RemoteMixedMediaDbHelper.getFullPathToMmdb(pathParts[1]);
-							mmdb = RemoteMixedMediaDbFactory.getExisting(f, filter);
-						}
-						else {
-							throw new IllegalArgumentException("Out of cheese desu~.  Please reinstall universe and reboot desu~.");
-						}
+					final String filter = StringHelper.trimToNull(req.getParameter(PARAM_VIEW));
 
-						final String subPath = pathParts.length >= 3 ? pathParts[2] : null;
-						final String afterSubPath = pathParts.length >= 4 ? pathParts[3] : null;
-						if (verb == Verb.POST) {
-							postToMmdb(req, resp, action, mmdb, subPath, afterSubPath);
-						}
-						else {
-							getToMmdb(req, resp, mmdb, subPath, afterSubPath);
-						}
+					final IMixedMediaDb mmdb;
+					if (type.equals(MediaListType.LOCALMMDB.toString())) {
+						final String f = LocalMixedMediaDbHelper.getFullPathToMmdb(pathParts[1]);
+						mmdb = this.mediaFactory.getLocalMixedMediaDb(f, filter);
+					}
+					else if (type.equals(MediaListType.REMOTEMMDB.toString())) {
+						final String f = RemoteMixedMediaDbHelper.getFullPathToMmdb(pathParts[1]);
+						mmdb = RemoteMixedMediaDbFactory.getExisting(f, filter);
+					}
+					else if (type.equals(MediaListType.EXTMMDB.toString())) {
+						mmdb = this.mediaFactory.getExternalDb(pathParts[1]);
 					}
 					else {
 						ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "Unknown type '" + type + "' desu~.");
+						return;
+					}
+
+					final String subPath = pathParts.length >= 3 ? pathParts[2] : null;
+					final String afterSubPath = pathParts.length >= 4 ? pathParts[3] : null;
+					if (verb == Verb.POST) {
+						postToMmdb(req, resp, action, mmdb, subPath, afterSubPath);
+					}
+					else {
+						getToMmdb(req, resp, mmdb, subPath, afterSubPath);
 					}
 				}
 				else {
@@ -469,8 +469,15 @@ public class MlistsServlet extends HttpServlet {
 			dw.endElement("entry");
 		}
 
-		for (final MediaListReference listRef : RemoteMixedMediaDbHelper.getAllRemoteMmdb()) {
-			FeedHelper.startElement(dw, "entry", new String[][] { { "type", "remote" } });
+		// TODO decided what to do about these.
+//		for (final MediaListReference listRef : RemoteMixedMediaDbHelper.getAllRemoteMmdb()) {
+//			FeedHelper.startElement(dw, "entry", new String[][] { { "type", "remote" } });
+//			printMlistShort(dw, listRef, players);
+//			dw.endElement("entry");
+//		}
+
+		for (final MediaListReference listRef : this.mediaFactory.getExternalDbs()) {
+			FeedHelper.startElement(dw, "entry", new String[][] { { "type", "ext" } });
 			printMlistShort(dw, listRef, players);
 			dw.endElement("entry");
 		}
@@ -602,25 +609,18 @@ public class MlistsServlet extends HttpServlet {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private static void printMlistShort (final DataWriter dw, final MediaListReference listRef, final Collection<Player> players) throws SAXException {
-		final String fileName = listRef.getIdentifier().substring(listRef.getIdentifier().lastIndexOf(File.separator) + 1);
+		final String id;
+		if (listRef.getIdentifier().contains("/")) {
+			id = listRef.getIdentifier().substring(listRef.getIdentifier().lastIndexOf("/") + 1);
+		}
+		else {
+			id = listRef.getIdentifier();
+		}
 
 		FeedHelper.addElement(dw, "title", listRef.getTitle());
-
-		String type;
-		switch (listRef.getType()) {
-			case LOCALMMDB:
-				type = ILocalMixedMediaDb.TYPE;
-				break;
-			case REMOTEMMDB:
-				type = IRemoteMixedMediaDb.TYPE;
-				break;
-			default:
-				throw new IllegalArgumentException("Can not list type '" + listRef.getType() + "' desu~");
-		}
-		FeedHelper.addLink(dw, CONTEXTPATH + "/" + type + "/" + fileName, "self", "text/xml");
-
+		FeedHelper.addLink(dw, CONTEXTPATH + "/" + listRef.getType().toString() + "/" + id, "self", "text/xml");
 		for (final Player p : players) {
-			FeedHelper.addLink(dw, "/player/" + p.getId() + "/play/" + fileName, "play", "cmd");
+			FeedHelper.addLink(dw, "/player/" + p.getId() + "/play/" + id, "play", "cmd");
 		}
 	}
 
@@ -796,9 +796,11 @@ public class MlistsServlet extends HttpServlet {
 		}
 	}
 
-	private static String fileLink (final IMediaItem mi) {
+	public static String fileLink (final IMediaItem mi) {
 		try {
-			return URLEncoder.encode(mi.getFilepath(), "UTF-8");
+			if (StringHelper.notBlank(mi.getRemoteId())) return URLEncoder.encode(mi.getRemoteId(), "UTF-8");
+			if (StringHelper.notBlank(mi.getFilepath())) return URLEncoder.encode(mi.getFilepath(), "UTF-8");
+			return "";
 		}
 		catch (final UnsupportedEncodingException e) {
 			throw new RuntimeException(e);
