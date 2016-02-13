@@ -67,7 +67,7 @@ public class Activator implements BundleActivator {
 
 	protected void registerPlayers (final PlayerRegister register) {
 		for (CliHost host : this.hosts.getHosts()) {
-			SshPlayer player = new SshPlayer(String.valueOf(register.nextIndex()), host, register);
+			SshPlayer player = new SshPlayer(register.nextIndex("h"), host, register);
 			register.register(player);
 			this.players.add(player);
 		}
