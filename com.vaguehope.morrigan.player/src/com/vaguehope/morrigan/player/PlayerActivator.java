@@ -2,9 +2,7 @@ package com.vaguehope.morrigan.player;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,15 +26,19 @@ public final class PlayerActivator implements BundleActivator {
 	protected PlayerRegisterImpl playerRegister;
 	private PlaybackEngineFactoryTracker playbackEngineFactoryTracker;
 	private MediaFactoryTracker mediaFactoryTracker;
-	private ExecutorService executorService;
+	private ScheduledThreadPoolExecutor scheduledExecutor;
 
 	@Override
 	public void start (final BundleContext context) throws Exception {
 		this.playbackEngineFactoryTracker = new PlaybackEngineFactoryTracker(context);
 		this.mediaFactoryTracker = new MediaFactoryTracker(context);
 
-		this.executorService = new ThreadPoolExecutor(0, 1, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), new DaemonThreadFactory("player"));
-		this.playerRegister = new PlayerRegisterImpl(this.playbackEngineFactoryTracker, new PlayerStateStorage(this.mediaFactoryTracker), this.executorService);
+		this.scheduledExecutor = new ScheduledThreadPoolExecutor(1, new DaemonThreadFactory("player"));
+		this.scheduledExecutor.setKeepAliveTime(1, TimeUnit.MINUTES);
+		this.scheduledExecutor.allowCoreThreadTimeOut(true);
+
+		this.playerRegister = new PlayerRegisterImpl(this.playbackEngineFactoryTracker,
+				new PlayerStateStorage(this.mediaFactoryTracker, this.scheduledExecutor), this.scheduledExecutor);
 
 		startPlayerContainerListener(context);
 		context.registerService(PlayerReader.class, this.playerListener, null);
@@ -45,8 +47,15 @@ public final class PlayerActivator implements BundleActivator {
 
 	@Override
 	public void stop (final BundleContext context) throws Exception {
-		this.playerRegister.dispose();
-		this.executorService.shutdownNow();
+		if (this.playerRegister != null) {
+			this.playerRegister.dispose();
+			this.playerRegister = null;
+		}
+
+		if (this.scheduledExecutor != null) {
+			this.scheduledExecutor.shutdownNow();
+			this.scheduledExecutor = null;
+		}
 
 		if (this.playbackEngineFactoryTracker != null) {
 			this.playbackEngineFactoryTracker.dispose();

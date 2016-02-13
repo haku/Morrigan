@@ -12,6 +12,8 @@ import java.io.Writer;
 import java.math.BigInteger;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -20,20 +22,24 @@ import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaFactory;
+import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.util.StringHelper;
 import com.vaguehope.sqlitewrapper.DbException;
 
 public class PlayerStateStorage {
 
+	private static final int RESTORE_DELAY_SECONDS = 10;
 	private static final String DIR_NAME = "playerstate";
 	private static final Logger LOG = Logger.getLogger(PlayerStateStorage.class.getName());
 
 	private final Map<String, IMixedMediaDb> listCache = new ConcurrentHashMap<String, IMixedMediaDb>();
 	private final MediaFactory mf;
+	private final ScheduledExecutorService schEx;
 
-	public PlayerStateStorage (final MediaFactory mf) {
+	public PlayerStateStorage (final MediaFactory mf, final ScheduledExecutorService schEx) {
 		this.mf = mf;
+		this.schEx = schEx;
 	}
 
 	public static void writeState (final Player player) {
@@ -63,7 +69,18 @@ public class PlayerStateStorage {
 
 	}
 
-	public void readState (final Player player) {
+	public void requestReadState (final Player player) {
+		this.schEx.schedule(new Runnable() {
+			@Override
+			public void run () {
+				readState(player);
+			}
+		}, RESTORE_DELAY_SECONDS, TimeUnit.SECONDS);
+	}
+
+	protected void readState (final Player player) {
+		if (player.isDisposed()) return;
+
 		final File file = getFile(player.getId());
 		if (!file.exists()) return;
 
@@ -76,18 +93,20 @@ public class PlayerStateStorage {
 
 				this.listCache.clear();
 
-				final PlayItem currentItem = readPlayItem(r);
+				final PlayItem currentItem = readPlayItem(readLines(r));
 				if (currentItem != null) player.setCurrentItem(currentItem);
 
 				while (true) {
-					final PlayItem item = readPlayItem(r);
-					if (item == null) break;
-					player.getQueue().addToQueue(item);
+					final String[] lines = readLines(r);
+					if (lines == null) break;
+					final PlayItem item = readPlayItem(lines);
+					if (item != null) player.getQueue().addToQueue(item);
 				}
 			}
 			finally {
 				r.close();
 			}
+			LOG.info("Restorted state for player " + player.getId() + ".");
 		}
 		catch (final Exception e) {
 			LOG.log(Level.WARNING, "Failed to read state for player " + player.getId(), e);
@@ -105,10 +124,16 @@ public class PlayerStateStorage {
 	}
 
 	private static void appendPlayItem (final Writer w, final PlayItem item) throws IOException {
-		if (item != null && item.hasList()) w.append(item.getList().getSerial());
+		if (item != null && item.hasList()) w.append(item.getList().getType()).append(":").append(item.getList().getSerial());
 		w.append("\n");
 		if (item != null && item.hasTrack()) {
-			w.append(item.getTrack().getFilepath()).append("\n");
+			if (StringHelper.notBlank(item.getTrack().getFilepath())) {
+				w.append(item.getTrack().getFilepath());
+			}
+			else if (StringHelper.notBlank(item.getTrack().getRemoteId())) {
+				w.append(item.getTrack().getRemoteId());
+			}
+			w.append("\n");
 			w.append(item.getTrack().getHashcode().toString(16)).append("\n");
 		}
 		else {
@@ -117,23 +142,61 @@ public class PlayerStateStorage {
 		}
 	}
 
-	private PlayItem readPlayItem (final BufferedReader r) throws IOException, DbException, MorriganException {
-		final String listSerial = r.readLine();
-		final String trackFilePath = r.readLine();
-		final String trackHash = r.readLine();
+	private static String[] readLines (final BufferedReader r) throws IOException {
+		final String[] lines = new String[3];
+		for (int i = 0; i < 3; i++) {
+			lines[i] = r.readLine();
+			if (lines[i] == null) return null;
+		}
+		return lines;
+	}
 
-		if (StringHelper.blank(listSerial)) return null;
+	private PlayItem readPlayItem (final String[] lines) throws DbException, MorriganException {
+		if (lines == null) return null;
+
+		final String listTypeAndSerial = lines[0];
+		final String trackFilePath = lines[1];
+		final String trackHash = lines[2];
+
+		if (StringHelper.blank(listTypeAndSerial)) return null;
 		if (StringHelper.blank(trackFilePath) && StringHelper.blank(trackHash)) return null;
+
+		final MediaListType listType;
+		final String listSerial;
+		if (listTypeAndSerial.contains(":")) {
+			final String[] split = listTypeAndSerial.split(":", 2);
+			listType = MediaListType.valueOf(split[0]);
+			listSerial = split[1];
+		}
+		else {
+			listType = MediaListType.LOCALMMDB;
+			listSerial = listTypeAndSerial;
+		}
 
 		IMixedMediaDb list = this.listCache.get(listSerial);
 		if (list == null) {
-			list = this.mf.getLocalMixedMediaDbBySerial(listSerial);
-			if (list == null) {
-				LOG.warning("Unknown list: " + listSerial);
-				return null;
+			switch (listType) {
+				case LOCALMMDB:
+					list = this.mf.getLocalMixedMediaDbBySerial(listSerial);
+					if (list == null) {
+						LOG.warning("Unknown list: " + listSerial);
+						return null;
+					}
+					list.read();
+					this.listCache.put(listSerial, list);
+					break;
+				case EXTMMDB:
+					list = this.mf.getExternalDb(listSerial);
+					if (list == null) {
+						LOG.warning("Unknown list: " + listSerial);
+						return null;
+					}
+					this.listCache.put(listSerial, list);
+					break;
+				default:
+					LOG.warning("Unsupported list type: " + listType);
+					return null;
 			}
-			list.read();
-			this.listCache.put(listSerial, list);
 		}
 
 		IMediaTrack track = list.getByFile(trackFilePath);
