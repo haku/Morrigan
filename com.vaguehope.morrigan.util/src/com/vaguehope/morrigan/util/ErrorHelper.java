@@ -10,35 +10,43 @@ public final class ErrorHelper {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public static String getStackTrace (Throwable t) {
+	public static String getStackTrace (final Throwable t) {
 		final Writer writer = new StringWriter();
 		final PrintWriter printWriter = new PrintWriter(writer);
 		t.printStackTrace(printWriter);
 		return writer.toString();
 	}
 
-	public static String getCauseTrace (Throwable t) {
-		if (t != null) {
-			StringBuilder sb = new StringBuilder();
+	public static String getCauseTrace (final Throwable t) {
+		return causeTrace(t, "\n\ncaused by:\n   ", false);
+	}
 
-			boolean first = true;
-			Throwable c = t;
-			while (true) {
-				if (!first) sb.append("\n\ncaused by:\n   ");
-				first = false;
+	public static String oneLineCauseTrace (final Throwable t) {
+		return causeTrace(t, " > ", true);
+	}
 
-				sb.append(c.getClass().getName());
-				sb.append(": ");
-				sb.append(c.getMessage());
+	private static String causeTrace (final Throwable t, final String joiner, final boolean includeLineNumbers) {
+		if (t == null) return "Unable to display error message as Throwable object is null.";
 
-				c = c.getCause();
-				if (c==null) break;
+		final StringBuilder sb = new StringBuilder();
+		boolean first = true;
+		Throwable c = t;
+		while (c != null) {
+			if (!first) sb.append(joiner);
+			sb.append(String.valueOf(c));
+
+			if (includeLineNumbers) {
+				final StackTraceElement[] st = c.getStackTrace();
+				if (st != null && st.length > 0) {
+					final StackTraceElement e = st[0];
+					sb.append(" (").append(e.getFileName()).append(":").append(e.getLineNumber()).append(")");
+				}
 			}
 
-			return sb.toString();
+			c = c.getCause();
+			first = false;
 		}
-
-		return "Unable to display error message as Throwable object is null.";
+		return sb.toString();
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
