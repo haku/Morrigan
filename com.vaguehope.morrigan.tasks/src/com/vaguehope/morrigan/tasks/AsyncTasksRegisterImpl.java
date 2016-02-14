@@ -1,7 +1,6 @@
 package com.vaguehope.morrigan.tasks;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -79,8 +78,8 @@ public class AsyncTasksRegisterImpl implements AsyncTasksRegister {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private void clean () {
-		for (final Iterator<AsyncTaskEventListener> ittr = this.listeners.iterator(); ittr.hasNext();) {
-			if (ittr.next().isExpired()) ittr.remove();
+		for (AsyncTaskEventListener l : this.listeners) {
+			if (l.isExpired()) this.listeners.remove(l);
 		}
 	}
 
