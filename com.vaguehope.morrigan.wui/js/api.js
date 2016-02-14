@@ -3,7 +3,7 @@ MnApi = {};
 
 // --- Players ---
 
-  MnApi.getPlayers = function(onStatus, onPlayers) {
+  MnApi.getPlayers = function(msgHandler, onPlayers) {
     $.ajax({
       type : 'GET',
       cache : false,
@@ -21,15 +21,15 @@ MnApi = {};
           return a.pid - b.pid;
         });
         onPlayers(players);
-        onStatus('');
+        msgHandler.onInfo('');
       },
       error : function(jqXHR, textStatus, errorThrown) {
-        onStatus('Error fetching players: ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
+        msgHandler.onError('Error fetching players: ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
       }
     });
   }
 
-  MnApi.getPlayer = function(pid, onStatus, onPlayer) {
+  MnApi.getPlayer = function(pid, msgHandler, onPlayer) {
     $.ajax({
       type : 'GET',
       cache : false,
@@ -39,10 +39,10 @@ MnApi = {};
         var playerNode = $(xml).find('player');
         var player = parsePlayerNode(playerNode);
         onPlayer(player);
-        onStatus('');
+        msgHandler.onInfo('');
       },
       error : function(jqXHR, textStatus, errorThrown) {
-        onStatus('Error fetching player ' + pid + ': ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
+        msgHandler.onError('Error fetching player ' + pid + ': ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
       }
     });
   }
@@ -107,16 +107,16 @@ MnApi = {};
     return player;
   }
 
-  MnApi.playerPause = function(pid, onStatus, onPlayer) {
-    writePlayerState(pid, 'playpause', onStatus, onPlayer);
+  MnApi.playerPause = function(pid, msgHandler, onPlayer) {
+    writePlayerState(pid, 'playpause', msgHandler, onPlayer);
   }
 
-  MnApi.playerStop = function(pid, onStatus, onPlayer) {
-    writePlayerState(pid, 'stop', onStatus, onPlayer);
+  MnApi.playerStop = function(pid, msgHandler, onPlayer) {
+    writePlayerState(pid, 'stop', msgHandler, onPlayer);
   }
 
-  MnApi.playerNext = function(pid, onStatus, onPlayer) {
-    writePlayerState(pid, 'next', onStatus, onPlayer);
+  MnApi.playerNext = function(pid, msgHandler, onPlayer) {
+    writePlayerState(pid, 'next', msgHandler, onPlayer);
   }
 
   MnApi.PLAYBACK_ORDERS = [
@@ -127,15 +127,15 @@ MnApi = {};
     {id: "MANUAL",       title: "Manual"}
   ];
 
-  MnApi.playerPlaybackOrder = function(pid, order, onStatus, onPlayer) {
-    writePlayerState(pid, 'playbackorder&order=' + order.id, onStatus, onPlayer);
+  MnApi.playerPlaybackOrder = function(pid, order, msgHandler, onPlayer) {
+    writePlayerState(pid, 'playbackorder&order=' + order.id, msgHandler, onPlayer);
   }
 
-  MnApi.playerFullscreen = function(pid, monitor, onStatus, onPlayer) {
-    writePlayerState(pid, 'fullscreen&monitor=' + monitor.id, onStatus, onPlayer);
+  MnApi.playerFullscreen = function(pid, monitor, msgHandler, onPlayer) {
+    writePlayerState(pid, 'fullscreen&monitor=' + monitor.id, msgHandler, onPlayer);
   }
 
-  function writePlayerState(pid, action, onStatus, onPlayer) {
+  function writePlayerState(pid, action, msgHandler, onPlayer) {
     $.ajax({
       type : 'POST',
       cache : false,
@@ -144,23 +144,23 @@ MnApi = {};
       contentTypeString : 'application/x-www-form-urlencoded',
       dataType : 'xml',
       beforeSend : function() {
-        onStatus(action + '-ing...');
+        msgHandler.onInfo(action + '-ing...');
       },
       success : function(xml) {
         var playerNode = $(xml).find('player');
         var player = parsePlayerNode(playerNode);
         onPlayer(player);
-        onStatus('');
+        msgHandler.onInfo('');
       },
       error : function(jqXHR, textStatus, errorThrown) {
-        onStatus('Error: ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
+        msgHandler.onError('Error: ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
       }
     });
   }
 
 // --- Queue ---
 
-  MnApi.getQueue = function(pid, onStatus, onQueue) {
+  MnApi.getQueue = function(pid, msgHandler, onQueue) {
     $.ajax({
       type : 'GET',
       cache : false,
@@ -170,15 +170,15 @@ MnApi = {};
         var queueNode = $(xml).find('queue');
         var queue = parseQueueNode(pid, queueNode);
         onQueue(queue);
-        onStatus('');
+        msgHandler.onInfo('');
       },
       error : function(jqXHR, textStatus, errorThrown) {
-        onStatus('Error fetching queue ' + pid + ': ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
+        msgHandler.onError('Error fetching queue ' + pid + ': ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
       }
     });
   }
 
-  MnApi.writeQueueItem = function(pid, item, action, onStatus, onQueue) {
+  MnApi.writeQueueItem = function(pid, item, action, msgHandler, onQueue) {
     $.ajax({
       type : 'POST',
       cache : false,
@@ -187,16 +187,16 @@ MnApi = {};
       contentTypeString : 'application/x-www-form-urlencoded',
       dataType : 'xml',
       beforeSend : function() {
-        onStatus(action + '-ing...');
+        msgHandler.onInfo(action + '-ing...');
       },
       success : function(xml) {
         var queueNode = $(xml).find('queue');
         var newQueue = parseQueueNode(pid, queueNode);
         onQueue(newQueue);
-        onStatus('Queue ' + pid + ' updated.');
+        msgHandler.onInfo('Queue ' + pid + ' updated.');
       },
       error : function(jqXHR, textStatus, errorThrown) {
-        onStatus('Error: ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
+        msgHandler.onError('Error: ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
       }
     });
   }
@@ -225,14 +225,14 @@ MnApi = {};
 
 // --- DBs ---
 
-  MnApi.getDbs = function(onStatus, onDbs) {
+  MnApi.getDbs = function(msgHandler, onDbs) {
     $.ajax({
       type : 'GET',
       cache : false,
       url : 'mlists',
       dataType : 'xml',
       beforeSend : function() {
-        onStatus('Reading DBs...');
+        msgHandler.onInfo('Reading DBs...');
       },
       success : function(xml) {
         var mlists = [];
@@ -246,15 +246,15 @@ MnApi = {};
           return a.mid - b.mid;
         });
         onDbs(mlists);
-        onStatus('');
+        msgHandler.onInfo('');
       },
       error : function(jqXHR, textStatus, errorThrown) {
-        onStatus('Error fetching media lists: ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
+        msgHandler.onError('Error fetching media lists: ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
       }
     });
   }
 
-  MnApi.getDb = function(mid, view, onStatus, onDb) {
+  MnApi.getDb = function(mid, view, msgHandler, onDb) {
     var url = 'mlists/' + mid;
     if (view) url += '?view=' + encodeURIComponent(view);
     $.ajax({
@@ -263,16 +263,16 @@ MnApi = {};
       url : url,
       dataType : 'xml',
       beforeSend : function() {
-        onStatus('Reading DB ' + mid + '...');
+        msgHandler.onInfo('Reading DB ' + mid + '...');
       },
       success : function(xml) {
         var mlistNode = $(xml).find('mlist');
         var mlist = parseMlistNode(mlistNode);
         onDb(mlist);
-        onStatus('');
+        msgHandler.onInfo('');
       },
       error : function(jqXHR, textStatus, errorThrown) {
-        onStatus('Error fetching media list ' + mid + ': ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
+        msgHandler.onError('Error fetching media list ' + mid + ': ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
       }
     });
   }
@@ -288,7 +288,7 @@ MnApi = {};
     return mlist;
   }
 
-  MnApi.getQuery = function(mid, view, query, sortColumn, sortOrder, onStatus, onItems) {
+  MnApi.getQuery = function(mid, view, query, sortColumn, sortOrder, msgHandler, onItems) {
     if (!query || query.length < 1) query = '*';
     var url = 'mlists/' + mid + '/query/' + encodeURIComponent(query) + '?';
     if (view) url += '&view=' + encodeURIComponent(view);
@@ -302,16 +302,16 @@ MnApi = {};
       url : url,
       dataType : 'xml',
       beforeSend : function() {
-        onStatus('Querying ' + mid + ' view=' + view + ' query=' + query + ' col=' + sortColumn + ' order=' + sortOrder + ' ...');
+        msgHandler.onInfo('Querying ' + mid + ' view=' + view + ' query=' + query + ' col=' + sortColumn + ' order=' + sortOrder + ' ...');
       },
       success : function(xml) {
         var itemsNode = $(xml).find('mlist');
         var items = parseItemsNode(itemsNode, mid, view);
         onItems(items);
-        onStatus('');
+        msgHandler.onInfo('');
       },
       error : function(jqXHR, textStatus, errorThrown) {
-        onStatus('Error querying ' + mid + ': ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
+        msgHandler.onError('Error querying ' + mid + ': ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
       }
     });
   }
@@ -350,37 +350,37 @@ MnApi = {};
     return item;
   }
 
-  MnApi.enqueueItems = function(items, view, pid, onStatus, onComplete) {
+  MnApi.enqueueItems = function(items, view, pid, msgHandler, onComplete) {
     var args = 'playerid=' + pid;
     if (view) args += '&view=' + encodeURIComponent(view);
-    actionItem(items, 'queue', args, onStatus, onComplete);
+    actionItem(items, 'queue', args, msgHandler, onComplete);
   };
 
-  MnApi.enqueueItemsTop = function(items, view, pid, onStatus, onComplete) {
+  MnApi.enqueueItemsTop = function(items, view, pid, msgHandler, onComplete) {
     var args = 'playerid=' + pid;
     if (view) args += '&view=' + encodeURIComponent(view);
-    actionItem(items, 'queue_top', args, onStatus, onComplete);
+    actionItem(items, 'queue_top', args, msgHandler, onComplete);
   };
 
-  MnApi.enqueueView = function(mid, view, pid, onStatus, onComplete) {
+  MnApi.enqueueView = function(mid, view, pid, msgHandler, onComplete) {
     var args = 'playerid=' + pid;
     if (view) args += '&view=' + encodeURIComponent(view);
-    actionItem({url: '/mlists/' + mid}, 'queue', args, onStatus, onComplete);
+    actionItem({url: '/mlists/' + mid}, 'queue', args, msgHandler, onComplete);
   };
 
-  MnApi.addTag = function(item, tag, onStatus, onComplete) {
-    actionItem(item, 'addtag', 'tag=' + tag, onStatus, onComplete);
+  MnApi.addTag = function(item, tag, msgHandler, onComplete) {
+    actionItem(item, 'addtag', 'tag=' + tag, msgHandler, onComplete);
   };
 
-  MnApi.rmTag = function(item, tag, onStatus, onComplete) {
-    actionItem(item, 'rmtag', 'tag=' + tag, onStatus, onComplete);
+  MnApi.rmTag = function(item, tag, msgHandler, onComplete) {
+    actionItem(item, 'rmtag', 'tag=' + tag, msgHandler, onComplete);
   };
 
-  MnApi.setEnabled = function(item, enabled, onStatus, onComplete) {
-    actionItem(item, 'set_enabled', 'enabled=' + enabled, onStatus, onComplete);
+  MnApi.setEnabled = function(item, enabled, msgHandler, onComplete) {
+    actionItem(item, 'set_enabled', 'enabled=' + enabled, msgHandler, onComplete);
   };
 
-  function actionItem(item, action, args, onStatus, onComplete) {
+  function actionItem(item, action, args, msgHandler, onComplete) {
     var data = 'action=' + action;
     if (args) data += '&' + args;
 
@@ -391,14 +391,14 @@ MnApi = {};
       contentTypeString : 'application/x-www-form-urlencoded',
       dataType : 'text',
       beforeSend : function() {
-        onStatus(action + '-ing...');
+        msgHandler.onInfo(action + '-ing...');
       },
       success : function(text) {
-        onStatus('');
+        msgHandler.onInfo('');
         onComplete(text);
       },
       error : function(jqXHR, textStatus, errorThrown) {
-        onStatus('Error: ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
+        msgHandler.onError('Error: ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
       }
     };
 

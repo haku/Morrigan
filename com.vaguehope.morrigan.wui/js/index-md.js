@@ -46,12 +46,22 @@
   }
 
   function showToast(msg) {
-    document.querySelector('.mdl-js-snackbar').MaterialSnackbar.showSnackbar({message: msg});
+    document.querySelector('.mdl-js-snackbar').MaterialSnackbar.showSnackbar({message: msg, timeout: 10000});
   }
 
-  function onStatus(msg) {
-    if (msg && msg.length > 0) console.log(msg);
-  }
+  var msgHandler = {
+    onInfo: function(msg) {
+      if (msg && msg.length > 0) {
+        console.log(msg);
+      }
+    },
+    onError: function(msg) {
+      if (msg && msg.length > 0) {
+        console.log(msg);
+        showToast(msg);
+      }
+    }
+  };
 
   function showPopup(popup) {
     $('#popup-obfuscator').addClass('is-visible').one('click', function(event) {
@@ -69,7 +79,7 @@
 // Sidebar.
 
   function fetchAndDisplayPlayers() {
-    MnApi.getPlayers(onStatus, displayPlayers);
+    MnApi.getPlayers(msgHandler, displayPlayers);
   }
 
   function displayPlayers(players) {
@@ -157,18 +167,18 @@
 
   function footerPauseClicked() {
     if (!selectedPlayer) return;
-    MnApi.playerPause(selectedPlayer.pid, onStatus, displayPlayer);
+    MnApi.playerPause(selectedPlayer.pid, msgHandler, displayPlayer);
   }
 
   function footerPauseLongClicked() {
     if (!selectedPlayer) return;
-    MnApi.playerStop(selectedPlayer.pid, onStatus, displayPlayer);
+    MnApi.playerStop(selectedPlayer.pid, msgHandler, displayPlayer);
     showToast('Stopping...');
   }
 
   function footerNextClicked() {
     if (!selectedPlayer) return;
-     MnApi.playerNext(selectedPlayer.pid, onStatus, displayPlayer);
+     MnApi.playerNext(selectedPlayer.pid, msgHandler, displayPlayer);
   }
 
 // Tabs and menu.
@@ -211,7 +221,7 @@
     $.each(MnApi.PLAYBACK_ORDERS, function(index, order) {
       $('#mnu_playback_order_' + order.id.toLowerCase()).click(function() {
         if (!selectedPlayer) return;
-        MnApi.playerPlaybackOrder(selectedPlayer.pid, order, onStatus, displayPlayer);
+        MnApi.playerPlaybackOrder(selectedPlayer.pid, order, msgHandler, displayPlayer);
       });
     });
 
@@ -226,18 +236,18 @@
 
   function clearQueueClicked() {
     if (!selectedPlayer) return;
-    MnApi.writeQueueItem(selectedPlayer.pid, null, 'clear', onStatus, displayQueue);
+    MnApi.writeQueueItem(selectedPlayer.pid, null, 'clear', msgHandler, displayQueue);
   }
 
   function shuffleQueueClicked() {
     if (!selectedPlayer) return;
-    MnApi.writeQueueItem(selectedPlayer.pid, null, 'shuffle', onStatus, displayQueue);
+    MnApi.writeQueueItem(selectedPlayer.pid, null, 'shuffle', msgHandler, displayQueue);
   }
 
   function enqueueAllClicked() {
     if (!currentDbResults || !selectedPlayer) return;
     var enabledResults = jQuery.grep(currentDbResults, function(item){return item.enabled});
-    MnApi.enqueueItems(enabledResults, selectedPlayer.listView, selectedPlayer.pid, onStatus, function(msg) {
+    MnApi.enqueueItems(enabledResults, selectedPlayer.listView, selectedPlayer.pid, msgHandler, function(msg) {
       console.log(msg);
     });
     showToast('Enqueueing items...');
@@ -245,7 +255,7 @@
 
   function enqueueViewClicked() {
     if (!currentDbMid || !currentDbQuery || !currentDbResults || !selectedPlayer) return;
-    MnApi.enqueueView(currentDbMid, currentDbQuery, selectedPlayer.pid, onStatus, function(msg) {
+    MnApi.enqueueView(currentDbMid, currentDbQuery, selectedPlayer.pid, msgHandler, function(msg) {
       console.log(msg);
     });
   }
@@ -264,7 +274,7 @@
           }
         },
         error: function(jqXHR, textStatus, errorThrown) {
-          onStatus('Error fetching tags: ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
+          msgHandler.onError('Error fetching tags: ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
           resp();
         }
       });
@@ -295,7 +305,7 @@
 
   function fetchAndDisplayPlayer() {
     if (!selectedPlayer) return;
-    MnApi.getPlayer(selectedPlayer.pid, onStatus, displayPlayer);
+    MnApi.getPlayer(selectedPlayer.pid, msgHandler, displayPlayer);
   }
 
   function displayPlayer(player) {
@@ -330,7 +340,7 @@
 
   function fetchAndDisplayQueue() {
     if (!selectedPlayer) return;
-    MnApi.getQueue(selectedPlayer.pid, onStatus, displayQueue);
+    MnApi.getQueue(selectedPlayer.pid, msgHandler, displayQueue);
   }
 
   function displayQueue(queue) {
@@ -397,7 +407,7 @@
     $.each(['top', 'up', 'remove', 'down', 'bottom'], function(index, action) {
       $('.' + action, menu).unbind().click(function() {
         if (!selectedPlayer) return;
-        MnApi.writeQueueItem(selectedPlayer.pid, item, action, onStatus, displayQueue);
+        MnApi.writeQueueItem(selectedPlayer.pid, item, action, msgHandler, displayQueue);
         hidePopup(menu);
       });
     });
@@ -411,7 +421,7 @@
     currentDbQuery = null;
     currentDbResults = null;
 
-    MnApi.getDbs(onStatus, displayDbs);
+    MnApi.getDbs(msgHandler, displayDbs);
     $('#db_title').text('Fetching...');
     $('#db_list').empty();
     // TODO show spinner.
@@ -432,7 +442,7 @@
     currentDbQuery = query;
     currentDbResults = null;
 
-    MnApi.getQuery(mid, view, query, sortColumn, sortOrder, onStatus, displayResults);
+    MnApi.getQuery(mid, view, query, sortColumn, sortOrder, msgHandler, displayResults);
 
     $('#db_title').text('Fetching...');
     $('#db_list').empty();
@@ -520,7 +530,7 @@
 
     $('.enqueue', menu).unbind().click(function(event) {
       if (!selectedPlayer) return;
-      MnApi.enqueueItems(item, selectedPlayer.listView, selectedPlayer.pid, onStatus, function(msg) {
+      MnApi.enqueueItems(item, selectedPlayer.listView, selectedPlayer.pid, msgHandler, function(msg) {
         console.log(msg);
         hidePopup(menu);
         fetchAndDisplayQueue();
@@ -529,7 +539,7 @@
 
     $('.enqueue_top', menu).unbind().click(function(event) {
       if (!selectedPlayer) return;
-      MnApi.enqueueItemsTop(item, selectedPlayer.listView, selectedPlayer.pid, onStatus, function(msg) {
+      MnApi.enqueueItemsTop(item, selectedPlayer.listView, selectedPlayer.pid, msgHandler, function(msg) {
         console.log(msg);
         hidePopup(menu);
         fetchAndDisplayQueue();
@@ -542,7 +552,7 @@
     });
 
     $('.set_enabled', menu).setVisibility(!item.enabled).click(function(event) {
-      MnApi.setEnabled(item, true, onStatus, function(msg) {
+      MnApi.setEnabled(item, true, msgHandler, function(msg) {
         console.log(msg);
         item.enabled = true;
         anchorEl.removeClass('disabled');
@@ -551,7 +561,7 @@
     });
 
     $('.set_disabled', menu).setVisibility(item.enabled).click(function(event) {
-      MnApi.setEnabled(item, false, onStatus, function(msg) {
+      MnApi.setEnabled(item, false, msgHandler, function(msg) {
         console.log(msg);
         item.enabled = false;
         anchorEl.addClass('disabled');
@@ -571,7 +581,7 @@
       onAutocompleteKeyup(event);
       if (event.keyCode == 13) {
         var tag = newTag.val();
-        MnApi.addTag(item, tag, onStatus, function(msg) {
+        MnApi.addTag(item, tag, msgHandler, function(msg) {
           console.log(msg);
           item.tags.unshift(tag);
           showTagEditor(item); // TODO be less lazy.
@@ -593,7 +603,7 @@
       var remove = $('<button class="mdl-button mdl-js-button mdl-js-ripple-effect aux"><i class="material-icons">delete</i></button>');
       remove.unbind().click(function() {
         if (window.confirm("Tag: " + tag + "\n\nRemove?")) {
-          MnApi.rmTag(item, tag, onStatus, function(msg) {
+          MnApi.rmTag(item, tag, msgHandler, function(msg) {
             console.log(msg);
             item.tags = jQuery.grep(item.tags, function(val){return val != tag});
             showTagEditor(item); // TODO be less lazy.

@@ -39,6 +39,11 @@ body {
   background: #B2FF59;
 }
 
+/* Fix snackbar going off screen */
+.mdl-snackbar {
+  margin-right: 0;
+}
+
 /* Side menu item icon position fix. */
 .mdl-layout__drawer .mdl-navigation .mdl-navigation__link {
   display: flex !important;
