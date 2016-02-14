@@ -164,7 +164,7 @@ public class PlayerStateStorage {
 		final MediaListType listType;
 		final String listSerial;
 		if (listTypeAndSerial.contains("|")) {
-			final String[] split = listTypeAndSerial.split("|", 2);
+			final String[] split = listTypeAndSerial.split("\\|", 2);
 			listType = MediaListType.valueOf(split[0]);
 			listSerial = split[1];
 		}
