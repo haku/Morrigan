@@ -370,11 +370,11 @@ MnApi = {};
   };
 
   MnApi.addTag = function(item, tag, msgHandler, onComplete) {
-    actionItem(item, 'addtag', 'tag=' + tag, msgHandler, onComplete);
+    actionItem(item, 'addtag', 'tag=' + encodeURIComponent(tag), msgHandler, onComplete);
   };
 
   MnApi.rmTag = function(item, tag, msgHandler, onComplete) {
-    actionItem(item, 'rmtag', 'tag=' + tag, msgHandler, onComplete);
+    actionItem(item, 'rmtag', 'tag=' + encodeURIComponent(tag), msgHandler, onComplete);
   };
 
   MnApi.setEnabled = function(item, enabled, msgHandler, onComplete) {
