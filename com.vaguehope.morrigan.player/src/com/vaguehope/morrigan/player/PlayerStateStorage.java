@@ -124,7 +124,7 @@ public class PlayerStateStorage {
 	}
 
 	private static void appendPlayItem (final Writer w, final PlayItem item) throws IOException {
-		if (item != null && item.hasList()) w.append(item.getList().getType()).append(":").append(item.getList().getSerial());
+		if (item != null && item.hasList()) w.append(item.getList().getType()).append("|").append(item.getList().getSerial());
 		w.append("\n");
 		if (item != null && item.hasTrack()) {
 			if (StringHelper.notBlank(item.getTrack().getFilepath())) {
@@ -163,8 +163,8 @@ public class PlayerStateStorage {
 
 		final MediaListType listType;
 		final String listSerial;
-		if (listTypeAndSerial.contains(":")) {
-			final String[] split = listTypeAndSerial.split(":", 2);
+		if (listTypeAndSerial.contains("|")) {
+			final String[] split = listTypeAndSerial.split("|", 2);
 			listType = MediaListType.valueOf(split[0]);
 			listSerial = split[1];
 		}
