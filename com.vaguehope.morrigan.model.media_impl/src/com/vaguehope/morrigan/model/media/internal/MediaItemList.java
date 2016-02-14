@@ -81,6 +81,9 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 	@Override
 	public abstract String getType ();
 
+	/**
+	 * May contain a :, e.g. "/some/path.db:filter".
+	 */
 	@Override
 	public abstract String getSerial ();
 
