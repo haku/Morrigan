@@ -625,6 +625,7 @@
             console.log(msg);
             item.tags = jQuery.grep(item.tags, function(val){return val != tag});
             showTagEditor(item); // TODO be less lazy.
+            if (newTag.val().length < 1) newTag.val(tag).focus();
           });
         }
       });
