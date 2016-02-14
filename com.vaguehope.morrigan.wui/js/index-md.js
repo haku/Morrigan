@@ -321,17 +321,32 @@
     $('#track_tags').text(player.tags.length > 0 ? player.tags.join(', ') : '(no tags)');
     $('#queue_info').text(player.queueLength + ' items, ' + MnApi.formatSeconds(player.queueDuration));
 
-    var sldVal, sldMax, sldTxt;
-    if (player.position >= 0 && player.item && player.item.duration > 0) {
-      sldVal = player.position;
-      sldMax = player.item.duration;
-      sldTxt = MnApi.formatSeconds(sldVal) + ' / ' +  MnApi.formatSeconds(sldMax);
+    var pos, dur, sldTxt, sldVal, sldMax;
+
+    pos = player.position;
+    if (!pos || pos < 0) pos = 0;
+
+    if (player.item) dur = player.item.duration;
+    if (!dur || dur <= 0) dur = player.duration;
+    if (!dur || dur < 0) dur = 0;
+
+    if (pos > 0) {
+      sldTxt = MnApi.formatSeconds(pos);
+      if (dur > 0) sldTxt += ' / ' +  MnApi.formatSeconds(dur);
+    }
+    else {
+      sldTxt = '-:--';
+    }
+
+    if (pos > 0 && dur > 0) {
+      sldVal = pos;
+      sldMax = dur;
     }
     else {
       sldVal = 0;
       sldMax = 100;
-      sldTxt = '0:00 / 0:00';
     }
+
     $('#track_progress').attr('max', sldMax).get(0).MaterialSlider.change(sldVal);
     $('#track_time').text(sldTxt);
 
