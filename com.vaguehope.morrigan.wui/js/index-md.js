@@ -10,6 +10,7 @@
   var currentDbMid;
   var currentDbQuery;
   var currentDbResults;
+  var tagAutocompleteMid;
 
   $(document).ready(function() {
     updatePageTitle();
@@ -264,7 +265,7 @@
     var source = function(req, resp) {
       $.ajax({
         dataType: "json",
-        url: '/mlists/' + currentDbMid + '/tags?term=' + encodeURIComponent(req.term),
+        url: '/mlists/' + tagAutocompleteMid + '/tags?term=' + encodeURIComponent(req.term),
         success: function(data) {
           if (!el.data('sent')) {
             resp(data);
@@ -604,6 +605,8 @@
         });
       }
     });
+
+    tagAutocompleteMid = item.mid;
 
     $('.row', dlg).remove();
     $.each(item.tags, function(index, tag) {
