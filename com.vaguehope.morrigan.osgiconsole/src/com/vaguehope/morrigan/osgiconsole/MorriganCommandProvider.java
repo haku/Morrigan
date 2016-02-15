@@ -16,6 +16,7 @@ import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
+import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
@@ -32,6 +33,7 @@ import com.vaguehope.morrigan.server.model.PullRemoteToLocal;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbHelper;
 import com.vaguehope.morrigan.tasks.AsyncTasksRegister;
 import com.vaguehope.morrigan.util.ErrorHelper;
+import com.vaguehope.morrigan.util.StringHelper;
 import com.vaguehope.morrigan.util.TimeHelper;
 import com.vaguehope.sqlitewrapper.DbException;
 
@@ -92,6 +94,9 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 		catch (final ArgException e) {
 			ci.println(e.getMessage());
+		}
+		catch (final RuntimeException e) {
+			ci.println(ErrorHelper.getStackTrace(e));
 		}
 		catch (final Exception e) {
 			ci.println(ErrorHelper.getCauseTrace(e));
@@ -158,60 +163,46 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 
 		final String cmd = args.remove(0);
-		if (cmd.equals("list")) {
-			doMediaList(ci);
+		if (args.size() > 0) {
+			if (cmd.equals("u") || cmd.equals("update")) {
+				doMediaScan(ci, args);
+				return;
+			}
+			else if (cmd.equals("c") || cmd.equals("create")) {
+				doMediaCreate(ci, args);
+				return;
+			}
+			else if (cmd.equals("a") || cmd.equals("add")) {
+				doMediaAdd(ci, args);
+				return;
+			}
+			else if (cmd.equals("s") || cmd.equals("sync")) {
+				doMediaSync(ci, args);
+				return;
+			}
+			else if (cmd.equals("r") || cmd.equals("remote")) {
+				doMediaRemote(ci, args);
+				return;
+			}
+			else if (cmd.equals("p") || cmd.equals("pull")) {
+				doMediaPull(ci, args);
+				return;
+			}
+			else if (cmd.equals("albums")) {
+				doMediaAlbums(ci, args);
+				return;
+			}
 		}
-		else if (cmd.equals("u") || cmd.equals("update")) {
-			doMediaScan(ci, args);
-		}
-		else if (cmd.equals("c") || cmd.equals("create")) {
-			doMediaCreate(ci, args);
-		}
-		else if (cmd.equals("a") || cmd.equals("add")) {
-			doMediaAdd(ci, args);
-		}
-		else if (cmd.equals("s") || cmd.equals("sync")) {
-			doMediaSync(ci, args);
-		}
-		else if (cmd.equals("r") || cmd.equals("remote")) {
-			doMediaRemote(ci, args);
-		}
-		else if (cmd.equals("p") || cmd.equals("pull")) {
-			doMediaPull(ci, args);
-		}
-		else if (cmd.equals("albums")) {
-			doMediaAlbums(ci, args);
-		}
-		else {
-			final String q1 = cmd;
-			final String q2 = args.size() >= 1 ? args.get(0) : null;
 
-			List<PlayItem> results = this.cliHelper.queryForPlayableItems(q1, q2, 10);
-
-			if (results == null || results.size() < 1) {
-				ci.println("No results for query '" + q1 + "' '" + q2 + "'.");
-			}
-			else if (results.size() == 1) {
-				printListInfo(ci, q1, q2, results.get(0).getList());
-			}
-			else {
-				ci.println("Results for query:");
-				for (final PlayItem pi : results) {
-					ci.println(" > " + pi.toString());
-				}
-			}
-		}
+		printListInfo(ci, cmd, args);
 	}
 
-private void printListInfo (final CommandInterpreter ci, final String q1, final String q2, final IMediaTrackList<? extends IMediaTrack> list) throws MorriganException, DbException {
-	List<PlayItem> results;
-	ci.println("Query match: " + list);
-	if (list instanceof ILocalMixedMediaDb) {
-		final ILocalMixedMediaDb mmdb = (ILocalMixedMediaDb) list;
-		if (q2 != null && q2.length() > 0) {
-			// run query q2.
-			results = this.cliHelper.queryForPlayableItems(q1, q2, 10);
+	private void printListInfo (final CommandInterpreter ci, final String q1, final List<String> args) throws MorriganException, DbException, ArgException {
+		final IMediaTrackList<? extends IMediaTrack> list = this.cliHelper.argQ1(q1);
 
+		final String q2 = args.size() > 0 ? args.get(0) : null;
+		if (StringHelper.notBlank(q2)) {
+			final List<PlayItem> results = this.cliHelper.queryForPlayableItems(q1, q2, 10);
 			if (results == null || results.size() < 1) {
 				ci.println("No results for query '" + q1 + "' '" + q2 + "'.");
 			}
@@ -221,37 +212,34 @@ private void printListInfo (final CommandInterpreter ci, final String q1, final 
 					ci.println(" > " + pi.toString());
 				}
 			}
+			return;
 		}
-		else { // Print DB info.
-			final DurationData d = mmdb.getTotalDuration();
-			ci.print(" ");
-			ci.print(String.valueOf(mmdb.getCount()));
-			ci.print(" items totaling ");
-			if (!d.isComplete()) ci.print("more than ");
-			ci.print(TimeHelper.formatTimeSeconds(d.getDuration()));
-			ci.println(".");
 
-			final long queryTime = mmdb.getDurationOfLastRead();
-			if (queryTime > 0) {
-				ci.print(" Query took ");
-				ci.print(TimeHelper.formatTimeMiliseconds(queryTime));
-				ci.println(" seconds.");
-			}
+		final DurationData d = list.getTotalDuration();
+		ci.print(" ");
+		ci.print(String.valueOf(list.getCount()));
+		ci.print(" items totaling ");
+		if (!d.isComplete()) ci.print("more than ");
+		ci.print(TimeHelper.formatTimeSeconds(d.getDuration()));
+		ci.println(".");
 
-			for (final String s : mmdb.getSources()) {
+		final long queryTime = list.getDurationOfLastRead();
+		if (queryTime > 0) {
+			ci.print(" Query took ");
+			ci.print(TimeHelper.formatTimeMiliseconds(queryTime));
+			ci.println(" seconds.");
+		}
+
+		if (list instanceof IMediaItemDb) {
+			final IMediaItemDb<?, ?> db = (IMediaItemDb<?, ?>) list;
+			for (final String s : db.getSources()) {
 				ci.println(" src > " + s);
 			}
-
-			for (final Entry<String, URI> r : mmdb.getRemotes().entrySet()) {
+			for (final Entry<String, URI> r : db.getRemotes().entrySet()) {
 				ci.println(" remote > " + r.getKey() + " " + r.getValue());
 			}
 		}
 	}
-	else {
-		// TODO its no ILocalMixedMediaDb.
-		ci.println("TODO query types other than ILocalMixedMediaDb.");
-	}
-}
 
 	private void doMediaList (final CommandInterpreter ci) {
 		final List<MediaListReference> items = new LinkedList<MediaListReference>();

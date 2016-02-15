@@ -659,6 +659,7 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	@Override
 	public URI getRemote (final String name) throws DbException {
 		final String prop = this.dbLayer.getProp(REMOTE_PROP_KEY_PREFIX + name);
+		if (StringHelper.blank(prop)) return null;
 		try {
 			return new URI(prop);
 		}
