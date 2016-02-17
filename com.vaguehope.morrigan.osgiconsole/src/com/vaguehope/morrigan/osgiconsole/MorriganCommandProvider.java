@@ -336,7 +336,7 @@ public class MorriganCommandProvider implements CommandProvider {
 			remoteUri = this.cliHelper.argUri(args.get(1));
 		}
 
-		this.asyncTasksRegister.scheduleTask(new PullRemoteToLocal(ldb, remoteUri, this.mediaFactory, this.asyncTasksRegister));
+		this.asyncTasksRegister.scheduleTask(new PullRemoteToLocal(ldb, remoteUri, this.mediaFactory));
 		ci.println("Pull from " + remote + " scheduled.  Use 'mn st' to track progress.");
 	}
 

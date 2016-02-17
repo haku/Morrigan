@@ -75,7 +75,7 @@ public class AsyncActions {
 	public void scheduleMmdbPull (final ILocalMixedMediaDb db, final String remote) throws DbException {
 		final URI remoteUri = db.getRemote(remote);
 		if (remoteUri == null) throw new IllegalArgumentException("Invalid remote name: " + remote);
-		this.asyncTasksRegister.scheduleTask(new PullRemoteToLocal(db, remoteUri, this.mediaFactory, this.asyncTasksRegister));
+		this.asyncTasksRegister.scheduleTask(new PullRemoteToLocal(db, remoteUri, this.mediaFactory));
 	}
 
 }
