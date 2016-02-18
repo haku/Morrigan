@@ -104,7 +104,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	}
 
 	@Override
-	public List<MediaTag> tagSearch (final String prefix, final int resLimit) throws DbException {
+	public Map<String, MediaTag> tagSearch (final String prefix, final int resLimit) throws DbException {
 		try {
 			return local_tagSearch(prefix, resLimit);
 		} catch (Exception e) {
@@ -868,7 +868,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		}
 	}
 
-	private List<MediaTag> local_tagSearch (final String prefix, final int resLimit) throws SQLException, ClassNotFoundException, DbException {
+	private Map<String, MediaTag> local_tagSearch (final String prefix, final int resLimit) throws SQLException, ClassNotFoundException, DbException {
 		final PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_TAGS_SEARCH);
 		try {
 			ps.setInt(1, MediaTagType.MANUAL.getIndex()); // Force this as including automatic tags makes no sense.
@@ -876,7 +876,19 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 			ps.setString(3, SqliteHelper.SEARCH_ESC);
 			ps.setMaxRows(resLimit);
 			final ResultSet rs = ps.executeQuery();
-			return local_readTags(rs);
+			try {
+				Map<String, MediaTag> ret = null;
+				while (rs.next()) {
+					final MediaTag mt = local_readTag(rs);
+					final int freq = rs.getInt("freq");
+					if (ret == null) ret = new LinkedHashMap<String, MediaTag>();
+					ret.put(String.format("%s (%s)", mt.getTag(), freq), mt);
+				}
+				return ret != null ? ret : Collections.<String, MediaTag>emptyMap();
+			}
+			finally {
+				rs.close();
+			}
 		}
 		finally {
 			ps.close();
@@ -898,29 +910,30 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	private List<MediaTag> local_readTags (final ResultSet rs) throws SQLException, DbException, ClassNotFoundException {
 		try {
 			List<MediaTag> ret = null;
-
 			while (rs.next()) {
-				final long rowId = rs.getLong(SQL_TBL_TAGS_COL_ROWID);
-				final String tag = rs.getString(SQL_TBL_TAGS_COL_TAG);
-				final int type = rs.getInt(SQL_TBL_TAGS_COL_TYPE);
-				final long clsRowId = rs.getLong(SQL_TBL_TAGS_COL_CLSROWID);
-				final Date modified = SqliteHelper.readDate(rs, SQL_TBL_TAGS_COL_MODIFIED);
-				final boolean deleted = rs.getInt(SQL_TBL_TAGS_COL_DELETED) == 1; // default to false.
-
-				final MediaTagType mtt = MediaTagType.getFromIndex(type);
-				final MediaTagClassification mtc = local_getTagClassification(clsRowId);
-
-				final MediaTag mt = new MediaTagImpl(rowId, tag, mtt, mtc, modified, deleted);
-
+				final MediaTag mt = local_readTag(rs);
 				if (ret == null) ret = new ArrayList<MediaTag>();
 				ret.add(mt);
 			}
-
 			return ret != null ? ret : Collections.<MediaTag>emptyList();
 		}
 		finally {
 			rs.close();
 		}
+	}
+
+	private MediaTag local_readTag (final ResultSet rs) throws SQLException, DbException, ClassNotFoundException {
+		final long rowId = rs.getLong(SQL_TBL_TAGS_COL_ROWID);
+		final String tag = rs.getString(SQL_TBL_TAGS_COL_TAG);
+		final int type = rs.getInt(SQL_TBL_TAGS_COL_TYPE);
+		final long clsRowId = rs.getLong(SQL_TBL_TAGS_COL_CLSROWID);
+		final Date modified = SqliteHelper.readDate(rs, SQL_TBL_TAGS_COL_MODIFIED);
+		final boolean deleted = rs.getInt(SQL_TBL_TAGS_COL_DELETED) == 1; // default to false.
+
+		final MediaTagType mtt = MediaTagType.getFromIndex(type);
+		final MediaTagClassification mtc = local_getTagClassification(clsRowId);
+
+		return new MediaTagImpl(rowId, tag, mtt, mtc, modified, deleted);
 	}
 
 	private MediaTagClassification local_addTagClassification (final String classificationName) throws SQLException, ClassNotFoundException, DbException {

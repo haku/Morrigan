@@ -8,7 +8,10 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletException;
@@ -524,10 +527,14 @@ public class MlistsServlet extends HttpServlet {
 		}
 		else if (path.equals(PATH_TAGS)) {
 			final String term = StringHelper.trimToEmpty(req.getParameter(PARAM_TERM));
-			final List<MediaTag> tags = mmdb.tagSearch(term, 10);
-			final String[] arr = new String[tags.size()];
-			for (int i = 0; i < tags.size(); i++) {
-				arr[i] = tags.get(i).getTag();
+			final Map<String, MediaTag> tags = mmdb.tagSearch(term, 10);
+			final Map[] arr = new Map[tags.size()];
+			int i = 0;
+			for (final Entry<String, MediaTag> tag : tags.entrySet()) {
+				final Map<String, String> m = new HashMap<String, String>(2);
+				m.put("label", tag.getKey());
+				m.put("value", tag.getValue().getTag());
+				arr[i++] = m;
 			}
 			resp.setContentType("application/json");
 			resp.getWriter().println(JSON.toString(arr));
