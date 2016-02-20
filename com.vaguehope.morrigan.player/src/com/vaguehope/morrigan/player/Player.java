@@ -44,6 +44,9 @@ public interface Player {
 	 */
 	int getCurrentTrackDuration();
 
+	/**
+	 * Takes a percentage of duration.
+	 */
 	void seekTo(double d);
 
 	PlaybackOrder getPlaybackOrder();
