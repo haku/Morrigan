@@ -49,7 +49,9 @@ public class PlayerStateStorage {
 
 			final Writer w = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tmpFile), "UTF-8"));
 			try {
-				w.append(player.getPlaybackOrder().name()).append("\n");
+				w.append(player.getPlaybackOrder().name())
+						.append("|").append(String.valueOf(player.getCurrentPosition()))
+						.append("\n");
 				appendPlayItem(w, player.getCurrentItem());
 				for (final PlayItem item : player.getQueue().getQueueList()) {
 					appendPlayItem(w, item);
@@ -87,9 +89,27 @@ public class PlayerStateStorage {
 		try {
 			final BufferedReader r = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
 			try {
-				final String orderRaw = r.readLine();
-				final PlaybackOrder order = StringHelper.notBlank(orderRaw) ? OrderHelper.parsePlaybackOrderByName(orderRaw) : null;
-				if (order != null) player.setPlaybackOrder(order);
+				final String line = r.readLine();
+				if (line == null) return;
+				final String[] lineParts = line.split("\\|");
+
+				if (lineParts.length >= 1) {
+					final String rawOrder = lineParts[0];
+					if (StringHelper.notBlank(rawOrder)) {
+						final PlaybackOrder order = OrderHelper.parsePlaybackOrderByName(rawOrder);
+						if (order != null) player.setPlaybackOrder(order);
+					}
+				}
+
+				if (lineParts.length >= 2) {
+					final String rawPosition = lineParts[1];
+					if (StringHelper.notBlank(rawPosition)) {
+						final long position = Long.parseLong(rawPosition);
+						if (position > 0) {
+							LOG.info("TODO restore position: " + position);
+						}
+					}
+				}
 
 				this.listCache.clear();
 
