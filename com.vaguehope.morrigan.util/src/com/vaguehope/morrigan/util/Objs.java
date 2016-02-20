@@ -10,6 +10,10 @@ public final class Objs {
 		return (a == b) || (a != null && a.equals(b));
 	}
 
+	public static int hash (final Object obj) {
+		return obj != null ? obj.hashCode() : 0;
+	}
+
 	public static int hash (final Object... values) {
 		return Arrays.hashCode(values);
 	}
