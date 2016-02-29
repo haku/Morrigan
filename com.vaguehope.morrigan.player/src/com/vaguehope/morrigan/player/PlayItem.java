@@ -1,14 +1,15 @@
 package com.vaguehope.morrigan.player;
 
-import com.vaguehope.morrigan.model.helper.EqualHelper;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
+import com.vaguehope.morrigan.util.Objs;
 
 /**
  * Will always have at least a list or an track.
  */
 public class PlayItem {
 
+	private final PlayItemType type;
 	private final IMediaTrackList<? extends IMediaTrack> list;
 	private final IMediaTrack track;
 	private int id = Integer.MIN_VALUE;
@@ -18,8 +19,20 @@ public class PlayItem {
 	 */
 	public PlayItem (final IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack track) {
 		if (list == null && track == null) throw new IllegalArgumentException("At least one of list and track must be specified.");
+		this.type = PlayItemType.PLAYABLE;
 		this.list = list;
 		this.track = track;
+	}
+
+	protected PlayItem (final PlayItemType type) {
+		if (!type.isPseudo()) throw new IllegalArgumentException("Not a meta type: " + type);
+		this.type = type;
+		this.list = null;
+		this.track = null;
+	}
+
+	public PlayItemType getType () {
+		return this.type;
 	}
 
 	/**
@@ -62,6 +75,8 @@ public class PlayItem {
 	}
 
 	public PlayItem withTrack(final IMediaTrack newTrack) {
+		if (this.type.isPseudo()) throw new IllegalArgumentException("Can not add track to pseudo item.");
+
 		final PlayItem pi = new PlayItem(this.list, newTrack);
 		pi.id = this.id;
 		return pi;
@@ -69,6 +84,7 @@ public class PlayItem {
 
 	@Override
 	public String toString () {
+		if (this.type.isPseudo()) return type.toString();
 		if (this.track == null) return this.list.getListName();
 		return this.list.getListName() + "/" + this.track.getTitle();
 	}
@@ -80,18 +96,15 @@ public class PlayItem {
 		if (!(obj instanceof PlayItem)) return false;
 		PlayItem that = (PlayItem) obj;
 
-		return EqualHelper.areEqual(this.list, that.list)
-				&& EqualHelper.areEqual(this.track, that.track)
-				&& this.id == that.id;
+		return Objs.equals(this.type, that.type)
+				&& this.id == that.id
+				&& Objs.equals(this.list, that.list)
+				&& Objs.equals(this.track, that.track);
 	}
 
 	@Override
 	public int hashCode () {
-		int hash = 1;
-		hash = hash * 31 + (this.list == null ? 0 : this.list.hashCode());
-		hash = hash * 31 + (this.track == null ? 0 : this.track.hashCode());
-		hash = hash * 31 + this.id;
-		return hash;
+		return Objs.hash(this.type, this.list, this.track, this.id);
 	}
 
 }

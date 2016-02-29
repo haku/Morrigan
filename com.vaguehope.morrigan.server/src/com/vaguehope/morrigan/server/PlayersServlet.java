@@ -29,6 +29,7 @@ import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.player.OrderHelper;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayItem;
+import com.vaguehope.morrigan.player.PlayItemType;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayerReader;
 import com.vaguehope.morrigan.server.util.FeedHelper;
@@ -75,6 +76,7 @@ public class PlayersServlet extends HttpServlet {
 
 	private static final String CMD_CLEAR = "clear";
 	private static final String CMD_SHUFFLE = "shuffle";
+	private static final String CMD_ADD_STOP_TOP = "add_stop_top";
 	private static final String CMD_TOP = "top";
 	private static final String CMD_UP = "up";
 	private static final String CMD_REMOVE = "remove";
@@ -230,6 +232,10 @@ public class PlayersServlet extends HttpServlet {
 		}
 		else if (act.equals(CMD_SHUFFLE)) {
 			player.getQueue().shuffleQueue();
+			printPlayerQueue(resp, player);
+		}
+		else if (act.equals(CMD_ADD_STOP_TOP)) {
+			player.getQueue().addToQueueTop(player.getQueue().makeMetaItem(PlayItemType.STOP));
 			printPlayerQueue(resp, player);
 		}
 		else {
@@ -451,31 +457,26 @@ public class PlayersServlet extends HttpServlet {
 		FeedHelper.addLink(dw, CONTEXTPATH + "/" + p.getId() + "/" + PATH_QUEUE, "self", "text/xml");
 		FeedHelper.addLink(dw, CONTEXTPATH + "/" + p.getId(), "player", "text/xml");
 
-		final long queueVersion = p.getQueue().getVersion();
-		final int queueLength = p.getQueue().getQueueList().size();
+		FeedHelper.addElement(dw, "queueversion", p.getQueue().getVersion());
+		FeedHelper.addElement(dw, "queuelength", p.getQueue().getQueueList().size());
+
 		final DurationData queueDuration = p.getQueue().getQueueTotalDuration();
 		final String queueDurationString = (queueDuration.isComplete() ? "" : "more than ") +
 				TimeHelper.formatTimeSeconds(queueDuration.getDuration());
-
-		FeedHelper.addElement(dw, "queueversion", queueVersion);
-		FeedHelper.addElement(dw, "queuelength", queueLength);
 		FeedHelper.addElement(dw, "queueduration", queueDurationString); // FIXME make parsasble.
 
-		final List<PlayItem> queueList = p.getQueue().getQueueList();
-		for (final PlayItem playItem : queueList) {
-			final IMediaTrackList<? extends IMediaTrack> list = playItem.getList();
-			final IMediaTrack mi = playItem.getTrack();
-
+		for (final PlayItem playItem : p.getQueue().getQueueList()) {
 			dw.startElement("entry");
-
 			FeedHelper.addElement(dw, "title", playItem.toString());
-
-			String listFile = URLEncoder.encode(FeedHelper.filenameFromPath(list.getListId()), "UTF-8");
-			FeedHelper.addLink(dw, listFile, "list", "text/xml");
-
 			FeedHelper.addElement(dw, "id", playItem.getId());
 
-			if (mi != null) {
+			if (playItem.hasList()) {
+				final String listFile = URLEncoder.encode(FeedHelper.filenameFromPath(playItem.getList().getListId()), "UTF-8");
+				FeedHelper.addLink(dw, listFile, "list", "text/xml");
+			}
+
+			if (playItem.hasTrack()) {
+				final IMediaTrack mi = playItem.getTrack();
 				FeedHelper.addLink(dw, MlistsServlet.fileLink(mi), "item");
 
 				if (mi.getDateAdded() != null) {
@@ -495,7 +496,6 @@ public class PlayersServlet extends HttpServlet {
 					FeedHelper.addElement(dw, "datelastplayed", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateLastPlayed()));
 				}
 			}
-
 
 			dw.endElement("entry");
 		}

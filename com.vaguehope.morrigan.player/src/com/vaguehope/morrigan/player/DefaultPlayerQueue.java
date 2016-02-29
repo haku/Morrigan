@@ -27,6 +27,16 @@ public class DefaultPlayerQueue implements PlayerQueue {
 		return this.version.get();
 	}
 
+	@Override
+	public PlayItem makeMetaItem (final PlayItemType type) {
+		switch (type) {
+			case STOP:
+				return new PlayItem(PlayItemType.STOP);
+			default:
+				throw new IllegalArgumentException("Not a meta type: " + type);
+		}
+	}
+
 	private void validateQueueItemBeforeAdd (final PlayItem item) {
 		if (item.hasTrack() && !item.getTrack().isPlayable()) throw new IllegalArgumentException("item is not playable.");
 		item.setId(this.queueId.getAndIncrement());

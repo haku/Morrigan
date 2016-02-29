@@ -16,6 +16,8 @@ public interface PlayerQueue {
 	 */
 	PlayItem takeFromQueue();
 
+	PlayItem makeMetaItem(PlayItemType type);
+
 	void addToQueue(PlayItem item);
 	void addToQueue(List<PlayItem> items);
 	void addToQueueTop(PlayItem item);

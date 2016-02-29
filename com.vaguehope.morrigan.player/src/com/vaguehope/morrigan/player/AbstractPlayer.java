@@ -126,6 +126,16 @@ public abstract class AbstractPlayer implements Player {
 		checkAlive();
 		if (item == null) throw new IllegalArgumentException("PlayItem can not be null.");
 
+		if (item.getType().isPseudo()) {
+			switch (item.getType()) {
+				case STOP:
+					stopPlaying();
+					return;
+				default:
+					throw new IllegalArgumentException("Do not know how to handle meta type: " + item.getType());
+			}
+		}
+
 		PlayItem pi = item;
 		if (!pi.hasTrack()) {
 			// TODO FIXME what if Playback Order is MANUAL?
