@@ -114,7 +114,7 @@ public class PlayerStateStorage {
 				this.listCache.clear();
 
 				final PlayItem currentItem = readPlayItem(readLines(r));
-				if (currentItem != null) player.setCurrentItem(currentItem);
+				if (currentItem != null && player.getCurrentItem() == null) player.setCurrentItem(currentItem);
 
 				while (true) {
 					final String[] lines = readLines(r);
