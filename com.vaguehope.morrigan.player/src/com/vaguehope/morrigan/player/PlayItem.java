@@ -31,6 +31,12 @@ public class PlayItem {
 		this.track = null;
 	}
 
+	private PlayItem (final PlayItemType type, final IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack track) {
+		this.type = type;
+		this.list = list;
+		this.track = track;
+	}
+
 	public PlayItemType getType () {
 		return this.type;
 	}
@@ -74,6 +80,10 @@ public class PlayItem {
 		return this.id;
 	}
 
+	public PlayItem withoutId() {
+		return new PlayItem(this.type, this.list, this.track);
+	}
+
 	public PlayItem withTrack(final IMediaTrack newTrack) {
 		if (this.type.isPseudo()) throw new IllegalArgumentException("Can not add track to pseudo item.");
 
@@ -84,7 +94,7 @@ public class PlayItem {
 
 	@Override
 	public String toString () {
-		if (this.type.isPseudo()) return type.toString();
+		if (this.type.isPseudo()) return this.type.toString();
 		if (this.track == null) return this.list.getListName();
 		return this.list.getListName() + "/" + this.track.getTitle();
 	}
