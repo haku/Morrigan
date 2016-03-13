@@ -144,21 +144,35 @@ public class PlayerStateStorage {
 	}
 
 	private static void appendPlayItem (final Writer w, final PlayItem item) throws IOException {
-		if (item != null && item.hasList()) w.append(item.getList().getType()).append("|").append(item.getList().getSerial());
-		w.append("\n");
-		if (item != null && item.hasTrack()) {
-			if (StringHelper.notBlank(item.getTrack().getFilepath())) {
-				w.append(item.getTrack().getFilepath());
-			}
-			else if (StringHelper.notBlank(item.getTrack().getRemoteId())) {
-				w.append(item.getTrack().getRemoteId());
-			}
+		if (item == null) {
 			w.append("\n");
-			w.append(item.getTrack().getHashcode().toString(16)).append("\n");
+			w.append("\n");
+			w.append("\n");
+		}
+		else if (item.getType().isPseudo()) {
+			w.append(item.getType().name()).append("\n");
+			w.append("\n");
+			w.append("\n");
 		}
 		else {
+			if (item.hasList()) {
+				w.append(item.getList().getType()).append("|").append(item.getList().getSerial());
+			}
 			w.append("\n");
-			w.append("\n");
+			if (item.hasTrack()) {
+				if (StringHelper.notBlank(item.getTrack().getFilepath())) {
+					w.append(item.getTrack().getFilepath());
+				}
+				else if (StringHelper.notBlank(item.getTrack().getRemoteId())) {
+					w.append(item.getTrack().getRemoteId());
+				}
+				w.append("\n");
+				w.append(item.getTrack().getHashcode().toString(16)).append("\n");
+			}
+			else {
+				w.append("\n");
+				w.append("\n");
+			}
 		}
 	}
 
@@ -174,11 +188,16 @@ public class PlayerStateStorage {
 	private PlayItem readPlayItem (final String[] lines) throws DbException, MorriganException {
 		if (lines == null) return null;
 
-		final String listTypeAndSerial = lines[0];
+		final String listTypeAndSerialOrPseudoType = lines[0];
 		final String trackFilePath = lines[1];
 		final String trackHash = lines[2];
 
-		if (StringHelper.blank(listTypeAndSerial)) return null;
+		if (StringHelper.blank(listTypeAndSerialOrPseudoType)) return null;
+
+		final PlayItemType type = PlayItemType.parse(listTypeAndSerialOrPseudoType);
+		if (type != null) return new PlayItem(type);
+
+		final String listTypeAndSerial = listTypeAndSerialOrPseudoType;
 		if (StringHelper.blank(trackFilePath) && StringHelper.blank(trackHash)) return null;
 
 		final MediaListType listType;
