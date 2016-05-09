@@ -419,8 +419,7 @@
     $('.title', itemEl).text(title);
 
     var clickable = $('.clickable', itemEl);
-    clickable.unbind();
-    clickable.click(function(event) {
+    clickable.unbind().click(function(event) {
       event.preventDefault();
       showQueueItemMenu(item);
     });
@@ -506,8 +505,7 @@
     var el = $('<li class="item">');
     el.append(a);
 
-    a.unbind();
-    a.click(function(event) {
+    a.unbind().click(function(event) {
       event.preventDefault();
       setDbTabToSearch(db.mid);
     });
@@ -538,8 +536,7 @@
     var el = $('<li class="item">');
     el.append(a);
 
-    a.unbind();
-    a.click(function(event) {
+    a.unbind().click(function(event) {
       event.preventDefault();
       showDbItemMenu(res, a);
     });
@@ -576,7 +573,7 @@
       showTagEditor(item);
     });
 
-    $('.set_enabled', menu).setVisibility(!item.enabled).click(function(event) {
+    $('.set_enabled', menu).setVisibility(!item.enabled).unbind().click(function(event) {
       MnApi.setEnabled(item, true, msgHandler, function(msg) {
         console.log(msg);
         item.enabled = true;
@@ -585,7 +582,7 @@
       hidePopup(menu);
     });
 
-    $('.set_disabled', menu).setVisibility(item.enabled).click(function(event) {
+    $('.set_disabled', menu).setVisibility(item.enabled).unbind().click(function(event) {
       MnApi.setEnabled(item, false, msgHandler, function(msg) {
         console.log(msg);
         item.enabled = false;
