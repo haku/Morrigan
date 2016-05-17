@@ -571,8 +571,8 @@
     var a = $('<a class="clickable" href="">');
 
     var pic = $('<img class="cover">');
-    if (album.coverUrl) {
-      pic.attr('src', album.coverUrl);
+    if (album.resizedCoverUrl) {
+      pic.attr('src', album.resizedCoverUrl);
     }
     else {
       pic.addClass('nocover');

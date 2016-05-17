@@ -393,6 +393,7 @@ MnApi = {};
 
     album.url = '/mlists/' + mid + '/albums/' + album.relativeUrl;
     if (album.coverRelativeUrl) album.coverUrl = '/mlists/' + mid + '/items/' + album.coverRelativeUrl;
+    if (album.coverUrl) album.resizedCoverUrl = album.coverUrl + '?resize=200'; // TODO make param?
 
     return album;
   }

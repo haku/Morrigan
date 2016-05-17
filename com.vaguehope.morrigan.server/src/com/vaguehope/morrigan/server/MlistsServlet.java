@@ -50,6 +50,7 @@ import com.vaguehope.morrigan.player.PlayerReader;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbFactory;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbHelper;
 import com.vaguehope.morrigan.server.util.FeedHelper;
+import com.vaguehope.morrigan.server.util.ImageResizer;
 import com.vaguehope.morrigan.server.util.XmlHelper;
 import com.vaguehope.morrigan.util.StringHelper;
 import com.vaguehope.sqlitewrapper.DbException;
@@ -74,6 +75,7 @@ import com.vaguehope.sqlitewrapper.DbException;
  *  GET /mlists/LOCALMMDB/example.local.db3/items
  *  GET /mlists/LOCALMMDB/example.local.db3/items?includeddeletedtags=true
  *  GET /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3
+ *  GET /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3?resize=128
  * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 action=play&playerid=0
  * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 action=queue&playerid=0
  * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 view=myview&action=play&playerid=0
@@ -105,6 +107,7 @@ public class MlistsServlet extends HttpServlet {
 
 	public static final String PARAM_TERM = "term";
 	public static final String PARAM_INCLUDE_DELETED_TAGS = "includeddeletedtags";
+	private static final String PARAM_RESIZE = "resize";
 	private static final String PARAM_ACTION = "action";
 	private static final String PARAM_PLAYERID = "playerid";
 	private static final String PARAM_TAG = "tag";
@@ -502,6 +505,14 @@ public class MlistsServlet extends HttpServlet {
 					final File file = new File(filepath);
 					if (file.exists()) {
 						if (ServletHelper.checkCanReturn304(file.lastModified(), req, resp)) return;
+
+						final Integer resize = ServletHelper.readParamInteger(req, PARAM_RESIZE);
+						if (resize != null) {
+							final File resizedFile = ImageResizer.resizeFile(file, resize);
+							ServletHelper.returnFile(resizedFile, resp, asDownload);
+							return;
+						}
+
 						ServletHelper.returnFile(file, resp, asDownload);
 					}
 					else {
