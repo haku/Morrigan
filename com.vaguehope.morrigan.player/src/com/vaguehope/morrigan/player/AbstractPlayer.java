@@ -20,7 +20,7 @@ public abstract class AbstractPlayer implements Player {
 	private final Object[] loadLock = new Object[] {};
 	private final PlayerQueue queue = new DefaultPlayerQueue();
 	private final PlayerEventListenerCaller listeners = new PlayerEventListenerCaller();
-	private final AtomicReference<PlaybackOrder> playbackOrder = new AtomicReference<PlaybackOrder>(PlaybackOrder.SEQUENTIAL);
+	private final AtomicReference<PlaybackOrder> playbackOrder = new AtomicReference<PlaybackOrder>(PlaybackOrder.MANUAL);
 
 	public AbstractPlayer (final String id, final String name, final PlayerRegister register) {
 		this.id = id;
