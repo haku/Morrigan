@@ -115,6 +115,32 @@ header .subtitle span {
   padding: 0;
 }
 
+.clickable_list .album {
+  float: left;
+  width: 7em;
+  height: 9em;
+  border-radius: 0.2em;
+  overflow: hidden;
+  text-align: center;
+}
+.clickable_list .album .cover {
+  max-width: 6em;
+  max-height: 5em;
+  margin: 0.5em 0.5em 0 0.5em;
+}
+.clickable_list .album .cover.nocover {
+  width: 6em;
+  height: 5em;
+}
+.clickable_list .album .title {
+  margin: 0 0.2em 0.2em 0.2em;
+  font-size: 80%;
+}
+.clickable_list .album:hover {
+  background: Highlight;
+  color: HighlightText;
+}
+
 /* pop-up menu. */
 .popup {
   position: fixed;

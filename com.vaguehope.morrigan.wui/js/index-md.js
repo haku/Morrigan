@@ -481,7 +481,20 @@
     });
     $('#db_sort_column').unbind().change(function(){setDbTabToSearch(mid, view)});
     $('#db_sort_order').unbind().change(function(){setDbTabToSearch(mid, view)});
+    $('#db_go_albums').unbind().click(function(){setDbTabToAlbums(mid, view)});
     $('#db_sort_options').show();
+  }
+
+  function setDbTabToAlbums(mid, view) {
+    currentDbMid = mid;
+    currentDbQuery = null;
+    currentDbResults = null;
+
+    MnApi.getAlbums(mid, view, msgHandler, displayAlbums);
+
+    $('#db_title').text('Fetching...');
+    $('#db_list').empty();
+    // TODO show spinner.
   }
 
   function displayDbs(dbs) {
@@ -544,6 +557,43 @@
     return el;
   }
 
+  function displayAlbums(albums) {
+    $('#db_title').text(albums.length + ' albums');
+
+    var dbList = $('#db_list');
+    dbList.empty();
+    $.each(albums, function(index, album) {
+      dbList.append(makeAlbumItem(album));
+    });
+  }
+
+  function makeAlbumItem(album) {
+    var a = $('<a class="clickable" href="">');
+
+    var pic = $('<img class="cover">');
+    if (album.coverUrl) {
+      pic.attr('src', album.coverUrl);
+    }
+    else {
+      pic.addClass('nocover');
+    }
+    a.append(pic);
+
+    var title = $('<p class="title">');
+    title.text(album.title);
+    a.append(title);
+
+    var el = $('<li class="album">');
+    el.append(a);
+
+    a.unbind().click(function(event) {
+      event.preventDefault();
+      showDbAlbumMenu(album, a);
+    });
+
+    return el;
+  }
+
   function showDbItemMenu(item, anchorEl) {
     var menu = $('#db_item_menu');
     $('.title', menu).text(item.title);
@@ -592,6 +642,10 @@
     });
 
     showPopup(menu);
+  }
+
+  function showDbAlbumMenu(album, anchorEl) {
+    alert('album ' + album.title);
   }
 
   function showTagEditor(item) {

@@ -351,6 +351,51 @@ MnApi = {};
     return item;
   }
 
+  MnApi.getAlbums = function(mid, view, msgHandler, onAlbums) {
+    $.ajax({
+      type : 'GET',
+      cache : false,
+      url : 'mlists/' + mid + '/albums?view=' + encodeURIComponent(view),
+      dataType : 'xml',
+      beforeSend : function() {
+        msgHandler.onInfo('Fetching ' + mid + ' view=' + view + ' ...');
+      },
+      success : function(xml) {
+        var albumsNode = $(xml).find('albums');
+        var albums = parseAlbumsNode(albumsNode, mid, view);
+        onAlbums(albums);
+        msgHandler.onInfo('');
+      },
+      error : function(jqXHR, textStatus, errorThrown) {
+        msgHandler.onError('Error fetching albums ' + mid + ': ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
+      }
+    });
+  }
+
+  function parseAlbumsNode(node, mid, view) {
+    var albums = [];
+    node.find('entry').each(function() {
+      var album = parseAlbumNode($(this), mid, view);
+      albums.push(album);
+    });
+    return albums;
+  }
+
+  function parseAlbumNode(node, mid, view) {
+    var album = {
+      mid: mid,
+      view: view,
+      title: node.find('name').text(),
+      relativeUrl: node.find('link[rel="self"]').attr('href'),
+      coverRelativeUrl: node.find('link[rel="cover"]').attr('href'),
+    };
+
+    album.url = '/mlists/' + mid + '/albums/' + album.relativeUrl;
+    if (album.coverRelativeUrl) album.coverUrl = '/mlists/' + mid + '/items/' + album.coverRelativeUrl;
+
+    return album;
+  }
+
   MnApi.enqueueItems = function(items, view, pid, msgHandler, onComplete) {
     var args = 'playerid=' + pid;
     if (view) args += '&view=' + encodeURIComponent(view);
