@@ -786,6 +786,7 @@ public class MlistsServlet extends HttpServlet {
 	public static void printAlbumBody (final DataWriter dw, final IMixedMediaDb ml, final MediaAlbum album) throws SAXException, MorriganException {
 		FeedHelper.addElement(dw, "name", album.getName());
 		FeedHelper.addLink(dw, fileLink(album), "self");
+		FeedHelper.addElement(dw, "trackcount", album.getTrackCount());
 		final File artFile = ml.findAlbumCoverArt(album);
 		if (artFile != null) {
 			FeedHelper.addLink(dw, fileLink(artFile), "cover");

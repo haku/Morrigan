@@ -6,4 +6,6 @@ public interface MediaAlbum extends IDbItem {
 
 	String getName();
 
+	int getTrackCount ();
+
 }

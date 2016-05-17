@@ -645,7 +645,29 @@
   }
 
   function showDbAlbumMenu(album, anchorEl) {
-    alert('album ' + album.title);
+    var menu = $('#db_album_menu');
+    $('.title', menu).text(album.title);
+    $('.stats', menu).text(album.trackCount + ' tracks');
+
+    $('.enqueue', menu).unbind().click(function(event) {
+      if (!selectedPlayer) return;
+      MnApi.enqueueItems(album, selectedPlayer.listView, selectedPlayer.pid, msgHandler, function(msg) {
+        console.log(msg);
+        hidePopup(menu);
+        fetchAndDisplayQueue();
+      });
+    });
+
+    $('.enqueue_top', menu).unbind().click(function(event) {
+      if (!selectedPlayer) return;
+      MnApi.enqueueItemsTop(album, selectedPlayer.listView, selectedPlayer.pid, msgHandler, function(msg) {
+        console.log(msg);
+        hidePopup(menu);
+        fetchAndDisplayQueue();
+      });
+    });
+
+    showPopup(menu);
   }
 
   function showTagEditor(item) {

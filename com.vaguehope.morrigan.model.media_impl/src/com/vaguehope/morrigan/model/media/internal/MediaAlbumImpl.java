@@ -6,10 +6,12 @@ public class MediaAlbumImpl implements MediaAlbum {
 
 	private final long dbRowId;
 	private final String name;
+	private final int trackCount;
 
-	public MediaAlbumImpl (long dbRowId, String name) {
+	public MediaAlbumImpl (final long dbRowId, final String name, final int trackCount) {
 		this.dbRowId = dbRowId;
 		this.name = name;
+		this.trackCount = trackCount;
 	}
 
 	@Override
@@ -18,13 +20,18 @@ public class MediaAlbumImpl implements MediaAlbum {
 	}
 
 	@Override
-	public boolean setDbRowId (long dbRowId) {
+	public boolean setDbRowId (final long dbRowId) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public String getName () {
 		return this.name;
+	}
+
+	@Override
+	public int getTrackCount () {
+		return this.trackCount;
 	}
 
 }

@@ -17,6 +17,7 @@ import com.vaguehope.morrigan.model.helper.EqualHelper;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayerChangeListener;
+import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.MediaAlbum;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagClassification;
@@ -523,13 +524,18 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	 * albums.
 	 */
 
-	private static final String SQL_TBL_ALBUMS_Q_ALL = // TODO include album size.
-		"SELECT a.id,a.name" +
-		" FROM tbl_albums AS a" +
+	private static final String SQL_TBL_ALBUMS_Q_ALL =
+		"SELECT a.id,a.name,count(i.mf_id) AS track_count" +
+		" FROM tbl_albums AS a, tbl_album_items AS i, tbl_mediafiles AS m" +
+		" WHERE a.id=i.album_id AND i.mf_id=m.id AND m.type=" + MediaType.TRACK.getN() +
+		" GROUP BY a.id" +
 		" ORDER BY a.name ASC;";
 
 	private static final String SQL_TBL_ALBUMS_Q_GET =
-		"SELECT a.id,a.name FROM tbl_albums AS a WHERE name=?;";
+		"SELECT a.id,a.name,count(i.mf_id) AS track_count" +
+		" FROM tbl_albums AS a, tbl_album_items AS i, tbl_mediafiles AS m" +
+		" WHERE name=? AND a.id=i.album_id AND i.mf_id=m.id AND m.type=1" + MediaType.TRACK.getN() +
+		" GROUP BY a.id;";
 
 	private static final String SQL_TBL_ALBUM_ITEMS_Q_HAS =
 		"SELECT id FROM tbl_album_items WHERE album_id=? AND mf_id=?;";
@@ -1048,7 +1054,8 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 				while (rs.next()) {
 					long rowId = rs.getLong(SQL_TBL_ALBUMS_COL_ROWID);
 					String name = rs.getString(SQL_TBL_ALBUMS_COL_NAME);
-					ret.add(new MediaAlbumImpl(rowId, name));
+					int trackCount = rs.getInt("track_count");
+					ret.add(new MediaAlbumImpl(rowId, name, trackCount));
 				}
 				return ret;
 			}
@@ -1104,7 +1111,8 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 				}
 				long rowId = rs.getLong(SQL_TBL_ALBUMS_COL_ROWID);
 				String name = rs.getString(SQL_TBL_ALBUMS_COL_NAME);
-				return new MediaAlbumImpl(rowId, name);
+				int trackCount = rs.getInt("track_count");
+				return new MediaAlbumImpl(rowId, name, trackCount);
 			}
 			finally {
 				rs.close();

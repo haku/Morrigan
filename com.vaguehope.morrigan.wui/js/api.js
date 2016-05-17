@@ -386,6 +386,7 @@ MnApi = {};
       mid: mid,
       view: view,
       title: node.find('name').text(),
+      trackCount: node.find('trackcount').text(),
       relativeUrl: node.find('link[rel="self"]').attr('href'),
       coverRelativeUrl: node.find('link[rel="cover"]').attr('href'),
     };
