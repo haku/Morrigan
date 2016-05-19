@@ -551,7 +551,12 @@
 
     a.unbind().click(function(event) {
       event.preventDefault();
-      showDbItemMenu(res, a);
+      if (res.remoteId) {
+        setDbTabToSearch(res.mid, res.view, res.remoteId);
+      }
+      else {
+        showDbItemMenu(res, a);
+      }
     });
 
     return el;

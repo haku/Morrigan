@@ -330,13 +330,21 @@ MnApi = {};
     var item = {
       mid: mid,
       view: view,
-      relativeUrl: node.find('link[rel="self"]').attr('href'),
       title: node.find('title').text(),
       duration: parseInt(node.find('duration').text(), 10),
       startCount: parseInt(node.find('startcount').text(), 10),
       endCount: parseInt(node.find('endcount').text(), 10),
       enabled: node.find('enabled').text() == "true"
     };
+
+    var href = node.find('link[rel="self"]').attr('href');
+    var dhref = href ? decodeURIComponent(href) : null;
+    if (dhref && dhref.startsWith('id=')) {
+      item.remoteId = dhref;
+    }
+    else {
+      item.relativeUrl = href;
+    }
 
     item.tags = [];
     node.find('tag').each(function() {
