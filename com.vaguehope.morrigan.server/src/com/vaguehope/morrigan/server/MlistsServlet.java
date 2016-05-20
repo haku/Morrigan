@@ -105,7 +105,8 @@ public class MlistsServlet extends HttpServlet {
 	public static final String PATH_ALBUMS = "albums";
 	public static final String PATH_QUERY = "query";
 
-	public static final String PARAM_TERM = "term";
+	static final String PARAM_TERM = "term";
+	private static final String PARAM_COUNT = "count";
 	public static final String PARAM_INCLUDE_DELETED_TAGS = "includeddeletedtags";
 	private static final String PARAM_RESIZE = "resize";
 	private static final String PARAM_ACTION = "action";
@@ -538,7 +539,9 @@ public class MlistsServlet extends HttpServlet {
 		}
 		else if (path.equals(PATH_TAGS)) {
 			final String term = StringHelper.trimToEmpty(req.getParameter(PARAM_TERM));
-			final Map<String, MediaTag> tags = mmdb.tagSearch(term, 10);
+			Integer count = ServletHelper.readParamInteger(req, PARAM_COUNT);
+			if (count == null || count < 1) count = 10;
+			final Map<String, MediaTag> tags = mmdb.tagSearch(term, count);
 			final Map[] arr = new Map[tags.size()];
 			int i = 0;
 			for (final Entry<String, MediaTag> tag : tags.entrySet()) {

@@ -481,8 +481,21 @@
     });
     $('#db_sort_column').unbind().change(function(){setDbTabToSearch(mid, view)});
     $('#db_sort_order').unbind().change(function(){setDbTabToSearch(mid, view)});
+    $('#db_go_tags').unbind().click(function(){setDbTabToTags(mid, view)});
     $('#db_go_albums').unbind().click(function(){setDbTabToAlbums(mid, view)});
     $('#db_sort_options').show();
+  }
+
+  function setDbTabToTags(mid, view) {
+    currentDbMid = mid;
+    currentDbQuery = null;
+    currentDbResults = null;
+
+    MnApi.getTags(mid, view, msgHandler, displayTags);
+
+    $('#db_title').text('Fetching...');
+    $('#db_list').empty();
+    // TODO show spinner.
   }
 
   function setDbTabToAlbums(mid, view) {
@@ -557,6 +570,31 @@
       else {
         showDbItemMenu(res, a);
       }
+    });
+
+    return el;
+  }
+
+  function displayTags(tags) {
+    $('#db_title').text(tags.length + ' tags');
+
+    var dbList = $('#db_list');
+    dbList.empty();
+    $.each(tags, function(index, tag) {
+      dbList.append(makeTagItem(tag));
+    });
+  }
+
+  function makeTagItem(tag) {
+    var a = $('<a class="clickable title" href="">');
+    a.text(tag.title);
+
+    var el = $('<li class="item">');
+    el.append(a);
+
+    a.unbind().click(function(event) {
+      event.preventDefault();
+      setDbTabToSearch(tag.mid, tag.view, tag.value);
     });
 
     return el;

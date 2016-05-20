@@ -366,7 +366,7 @@ MnApi = {};
       url : 'mlists/' + mid + '/albums?view=' + encodeURIComponent(view),
       dataType : 'xml',
       beforeSend : function() {
-        msgHandler.onInfo('Fetching ' + mid + ' view=' + view + ' ...');
+        msgHandler.onInfo('Fetching albums ' + mid + ' view=' + view + ' ...');
       },
       success : function(xml) {
         var albumsNode = $(xml).find('albums');
@@ -404,6 +404,33 @@ MnApi = {};
     if (album.coverUrl) album.resizedCoverUrl = album.coverUrl + '?resize=200'; // TODO make param?
 
     return album;
+  }
+
+  MnApi.getTags = function(mid, view, msgHandler, onTags) {
+    $.ajax({
+      type : 'GET',
+      cache : false,
+      url : 'mlists/' + mid + '/tags?count=100&view=' + encodeURIComponent(view),
+      dataType : 'json',
+      beforeSend : function() {
+        msgHandler.onInfo('Fetching tags ' + mid + ' view=' + view + ' ...');
+      },
+      success : function(json) {
+        var tags = $.map(json, function(val, i) {
+          return {
+            mid: mid,
+            view: view,
+            title: val.label,
+            value: val.value,
+          };
+        });
+        onTags(tags);
+        msgHandler.onInfo('');
+      },
+      error : function(jqXHR, textStatus, errorThrown) {
+        msgHandler.onError('Error fetching tags ' + mid + ': ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
+      }
+    });
   }
 
   MnApi.enqueueItems = function(items, view, pid, msgHandler, onComplete) {
