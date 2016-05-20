@@ -41,13 +41,20 @@
   function startPoller() {
     fetchAndDisplayPlayers();
     setInterval(function() {
-      fetchAndDisplayPlayers();
-      fetchAndDisplayPlayer();
+      try {
+        fetchAndDisplayPlayers();
+        fetchAndDisplayPlayer();
+      }
+      catch (e) {
+        console.log('Update failed.', e);
+      }
     }, REFRESH_PLAYERS_SECONDS * 1000);
   }
 
   function showToast(msg) {
-    document.querySelector('.mdl-js-snackbar').MaterialSnackbar.showSnackbar({message: msg, timeout: 10000});
+    var bar = $('.mdl-js-snackbar');
+    if (bar.length > 0) bar = bar.get(0).MaterialSnackbar;
+    if (bar) bar.showSnackbar({message: msg, timeout: 10000});
   }
 
   var msgHandler = {
