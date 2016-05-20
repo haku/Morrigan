@@ -96,6 +96,7 @@ header .subtitle span {
   line-height: 1.3em;
   padding-top: 0.3em;
   padding-bottom: 0.3em;
+  font-weight: normal;
 }
 .clickable_list a:link, .clickable_list a:visited, .clickable_list a:active, .clickable_list a:hover {
   text-decoration: none;
