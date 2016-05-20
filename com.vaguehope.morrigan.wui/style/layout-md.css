@@ -135,6 +135,7 @@ header .subtitle span {
 .clickable_list .album .title {
   margin: 0 0.2em 0.2em 0.2em;
   font-size: 80%;
+  line-height: 1.3;
 }
 .clickable_list .album:hover {
   background: Highlight;
