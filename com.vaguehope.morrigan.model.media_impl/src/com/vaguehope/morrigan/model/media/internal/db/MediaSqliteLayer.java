@@ -532,9 +532,11 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		" ORDER BY a.name ASC;";
 
 	private static final String SQL_TBL_ALBUMS_Q_GET =
-		"SELECT a.id,a.name,count(i.mf_id) AS track_count" +
-		" FROM tbl_albums AS a, tbl_album_items AS i, tbl_mediafiles AS m" +
-		" WHERE name=? AND a.id=i.album_id AND i.mf_id=m.id AND m.type=1" + MediaType.TRACK.getN() +
+		"SELECT a.id,a.name,count(m.id) AS track_count" +
+		" FROM tbl_albums AS a" +
+		" LEFT OUTER JOIN tbl_album_items AS i ON a.id=i.album_id" +
+		" LEFT OUTER JOIN (SELECT m.id,m.type FROM tbl_mediafiles AS m WHERE m.type=" + MediaType.TRACK.getN() + ") AS m ON i.mf_id=m.id" +
+		" WHERE a.name=?" +
 		" GROUP BY a.id;";
 
 	private static final String SQL_TBL_ALBUM_ITEMS_Q_HAS =
