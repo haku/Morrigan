@@ -1,5 +1,6 @@
 package com.vaguehope.morrigan.server;
 
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -7,6 +8,8 @@ import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.bio.SocketConnector;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
+import org.eclipse.jetty.server.session.HashSessionManager;
+import org.eclipse.jetty.server.session.SessionHandler;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -15,6 +18,7 @@ import org.eclipse.jetty.util.component.LifeCycle.Listener;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.osgi.framework.BundleContext;
 
+import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.player.PlayerReader;
@@ -58,6 +62,17 @@ public class MorriganServer {
 //			sslConnector.setPort(8443);
 //			this.server.addConnector(sslConnector);
 
+			final HashSessionManager sessionManager = new HashSessionManager();
+			sessionManager.setStoreDirectory(Config.getSessionDir());
+			sessionManager.setIdleSavePeriod(300);
+			sessionManager.setUsingCookies(true);
+			sessionManager.setMaxCookieAge((int) TimeUnit.DAYS.toSeconds(30));
+			sessionManager.setRefreshCookieAge((int) TimeUnit.DAYS.toSeconds(1));
+			sessionManager.setSessionCookie("XSESSIONID");
+
+			final SessionHandler sessionHandler = new SessionHandler();
+			sessionHandler.setSessionManager(sessionManager);
+
 			final FilterHolder authFilterHolder = new FilterHolder(new AuthFilter(config));
 
 			// This will hold all our servlets and webapps.
@@ -66,6 +81,7 @@ public class MorriganServer {
 
 			// Servlets.
 			final ServletContextHandler servletContext = new ServletContextHandler(contexts, "/", ServletContextHandler.SESSIONS);
+			servletContext.setSessionHandler(sessionHandler);
 			servletContext.addFilter(authFilterHolder, "/*", null);
 			servletContext.addServlet(new ServletHolder(new PlayersServlet(playerListener)), PlayersServlet.CONTEXTPATH + "/*");
 			servletContext.addServlet(new ServletHolder(new MlistsServlet(playerListener, mediaFactory, asyncActions)), MlistsServlet.CONTEXTPATH + "/*");
@@ -74,6 +90,7 @@ public class MorriganServer {
 
 			// Web UI in WAR file.
 			final WebAppContext warContext = WebAppHelper.getWarBundleAsContext(context, MorriganWui.ID, "/");
+			warContext.setSessionHandler(sessionHandler);
 			warContext.addFilter(authFilterHolder, "/*", null);
 			contexts.addHandler(warContext);
 		}

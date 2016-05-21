@@ -124,5 +124,19 @@ public class Config {
 		return f;
 	}
 
+	//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	private static final String SESSION_DIR = "/sessions";
+
+	public static File getSessionDir () {
+		final File f = new File(getConfigDir() + SESSION_DIR);
+		if (!f.exists()) {
+			if (!f.mkdirs()) {
+				throw new RuntimeException("Failed to create direactory '" + f.getAbsolutePath() + "'.");
+			}
+		}
+		return f;
+	}
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

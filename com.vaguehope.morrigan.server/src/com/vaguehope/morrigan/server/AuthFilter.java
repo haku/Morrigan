@@ -11,6 +11,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.eclipse.jetty.util.B64Code;
 
@@ -46,6 +47,13 @@ public class AuthFilter implements Filter {
 		final HttpServletRequest req = (HttpServletRequest) request;
 		final HttpServletResponse resp = (HttpServletResponse) response;
 
+		final HttpSession session = req.getSession(false);
+		final Object isLoggedIn = session != null ? session.getAttribute("is_logged_in") : null;
+		if ("true".equals(isLoggedIn)) {
+			chain.doFilter(request, response);
+			return;
+		}
+
 		// Request basic auth.
 		String authHeader64 = req.getHeader(Http.HEADER_AUTHORISATION);
 		if (authHeader64 == null
@@ -67,6 +75,8 @@ public class AuthFilter implements Filter {
 			send401(resp);
 			return;
 		}
+
+		req.getSession(true).setAttribute("is_logged_in", "true");
 
 		chain.doFilter(request, response);
 	}
