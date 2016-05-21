@@ -3,8 +3,6 @@ package com.vaguehope.morrigan.server;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.servlet.Filter;
-
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.bio.SocketConnector;
@@ -48,7 +46,7 @@ public class MorriganServer {
 			this.server.addLifeCycleListener(this.lifeCycleListener);
 
 			// HTTP connector.
-			Connector connector = new SocketConnector();
+			final Connector connector = new SocketConnector();
 			connector.setPort(this.getServerPort());
 			this.server.addConnector(connector);
 
@@ -60,28 +58,26 @@ public class MorriganServer {
 //			sslConnector.setPort(8443);
 //			this.server.addConnector(sslConnector);
 
-			// Auth filter to control access.
-			Filter authFilter = new AuthFilter(config);
-			FilterHolder filterHolder = new FilterHolder(authFilter);
+			final FilterHolder authFilterHolder = new FilterHolder(new AuthFilter(config));
 
 			// This will hold all our servlets and webapps.
-			ContextHandlerCollection contexts = new ContextHandlerCollection();
+			final ContextHandlerCollection contexts = new ContextHandlerCollection();
 			this.server.setHandler(contexts);
 
 			// Servlets.
-			ServletContextHandler servletContext = new ServletContextHandler(contexts, "/", ServletContextHandler.SESSIONS);
-			servletContext.addFilter(filterHolder, "/*", null);
+			final ServletContextHandler servletContext = new ServletContextHandler(contexts, "/", ServletContextHandler.SESSIONS);
+			servletContext.addFilter(authFilterHolder, "/*", null);
 			servletContext.addServlet(new ServletHolder(new PlayersServlet(playerListener)), PlayersServlet.CONTEXTPATH + "/*");
 			servletContext.addServlet(new ServletHolder(new MlistsServlet(playerListener, mediaFactory, asyncActions)), MlistsServlet.CONTEXTPATH + "/*");
 			servletContext.addServlet(new ServletHolder(new StatusServlet(asyncTasksRegister)), StatusServlet.CONTEXTPATH + "/*");
 			servletContext.addServlet(new ServletHolder(new HostInfoServlet()), HostInfoServlet.CONTEXTPATH + "/*");
 
 			// Web UI in WAR file.
-			WebAppContext warContext = WebAppHelper.getWarBundleAsContext(context, MorriganWui.ID, "/");
-			warContext.addFilter(filterHolder, "/*", null);
+			final WebAppContext warContext = WebAppHelper.getWarBundleAsContext(context, MorriganWui.ID, "/");
+			warContext.addFilter(authFilterHolder, "/*", null);
 			contexts.addHandler(warContext);
 		}
-		catch (Exception e) {
+		catch (final Exception e) {
 			throw new MorriganException("Failed to configure and start server.", e);
 		}
 	}
