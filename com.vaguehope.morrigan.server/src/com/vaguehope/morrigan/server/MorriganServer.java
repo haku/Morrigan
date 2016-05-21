@@ -1,14 +1,12 @@
 package com.vaguehope.morrigan.server;
 
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.bio.SocketConnector;
-import org.eclipse.jetty.server.session.HashSessionManager;
-import org.eclipse.jetty.server.session.SessionHandler;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.component.LifeCycle;
@@ -16,7 +14,6 @@ import org.eclipse.jetty.util.component.LifeCycle.Listener;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.osgi.framework.BundleContext;
 
-import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.player.PlayerReader;
@@ -37,7 +34,10 @@ public class MorriganServer {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public MorriganServer (final BundleContext context, final ServerConfig config, final PlayerReader playerListener, final MediaFactory mediaFactory, final AsyncTasksRegister asyncTasksRegister, final AsyncActions asyncActions) throws MorriganException {
+	public MorriganServer (final BundleContext context, final ServerConfig config,
+			final PlayerReader playerListener, final MediaFactory mediaFactory,
+			final AsyncTasksRegister asyncTasksRegister, final AsyncActions asyncActions,
+			final ScheduledExecutorService schEs) throws MorriganException {
 		try {
 			// Config.
 			this.serverPort = config.getServerPort();
@@ -60,23 +60,9 @@ public class MorriganServer {
 //			sslConnector.setPort(8443);
 //			this.server.addConnector(sslConnector);
 
-			final HashSessionManager sessionManager = new HashSessionManager();
-			sessionManager.setStoreDirectory(Config.getSessionDir());
-			sessionManager.setIdleSavePeriod(300);
-			sessionManager.setUsingCookies(true);
-			sessionManager.setMaxCookieAge((int) TimeUnit.DAYS.toSeconds(30));
-			sessionManager.setMaxInactiveInterval((int) TimeUnit.DAYS.toSeconds(30));
-			sessionManager.setRefreshCookieAge((int) TimeUnit.DAYS.toSeconds(1));
-			sessionManager.setLazyLoad(true);
-			sessionManager.setSessionCookie("XSESSIONID");
-
-			final SessionHandler sessionHandler = new SessionHandler();
-			sessionHandler.setSessionManager(sessionManager);
-
-			final FilterHolder authFilterHolder = new FilterHolder(new AuthFilter(config));
+			final FilterHolder authFilterHolder = new FilterHolder(new AuthFilter(config, schEs));
 
 			final WebAppContext warContext = WebAppHelper.getWarBundleAsContext(context, MorriganWui.ID, "/");
-			warContext.setSessionHandler(sessionHandler);
 			warContext.addFilter(authFilterHolder, "/*", null);
 			warContext.addServlet(new ServletHolder(new PlayersServlet(playerListener)), PlayersServlet.CONTEXTPATH + "/*");
 			warContext.addServlet(new ServletHolder(new MlistsServlet(playerListener, mediaFactory, asyncActions)), MlistsServlet.CONTEXTPATH + "/*");

@@ -1,7 +1,9 @@
 package com.vaguehope.morrigan.server.boot;
 
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
@@ -33,6 +35,7 @@ public class Activator implements BundleActivator {
 	private MediaFactoryTracker mediaFactoryTracker;
 	private AsyncTasksRegisterTracker asyncTasksRegisterTracker;
 	private ExecutorService executorService;
+	private ScheduledExecutorService scheduledExecutorService;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -42,6 +45,7 @@ public class Activator implements BundleActivator {
 		this.mediaFactoryTracker = new MediaFactoryTracker(context);
 		this.asyncTasksRegisterTracker = new AsyncTasksRegisterTracker(context);
 		this.executorService = new ThreadPoolExecutor(0, 1, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), new DaemonThreadFactory("srvboot"));
+		this.scheduledExecutorService = Executors.newScheduledThreadPool(1);
 
 		final ServerConfig config = new ServerConfig();
 		this.uiMgr = new UiMgr();
@@ -55,7 +59,7 @@ public class Activator implements BundleActivator {
 		}
 
 		final AsyncActions asyncActions = new AsyncActions(this.asyncTasksRegisterTracker, this.mediaFactoryTracker);
-		this.server = new MorriganServer(context, config, this.playerReaderTracker, this.mediaFactoryTracker, this.asyncTasksRegisterTracker, asyncActions);
+		this.server = new MorriganServer(context, config, this.playerReaderTracker, this.mediaFactoryTracker, this.asyncTasksRegisterTracker, asyncActions, this.scheduledExecutorService);
 		this.server.start();
 
 		if (this.playerContainer != null) {
@@ -75,6 +79,8 @@ public class Activator implements BundleActivator {
 		this.uiMgr = null;
 		this.executorService.shutdownNow();
 		this.executorService = null;
+		this.scheduledExecutorService.shutdownNow();
+		this.scheduledExecutorService = null;
 		this.mediaFactoryTracker.dispose();
 		this.playerReaderTracker.dispose();
 		this.asyncTasksRegisterTracker.dispose();

@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -130,4 +131,16 @@ public final class ServletHelper {
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	public static Cookie findCookie (final HttpServletRequest req, final String name) {
+		final Cookie[] cookies = req.getCookies();
+		if (cookies == null) return null;
+
+		for (final Cookie cookie : cookies) {
+			if (name.equals(cookie.getName())) return cookie;
+		}
+
+		return null;
+	}
+
 }
