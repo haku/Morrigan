@@ -360,10 +360,12 @@ MnApi = {};
   }
 
   MnApi.getAlbums = function(mid, view, msgHandler, onAlbums) {
+    var url = 'mlists/' + mid + '/albums';
+    if (view) url += '?view=' + encodeURIComponent(view);
     $.ajax({
       type : 'GET',
       cache : false,
-      url : 'mlists/' + mid + '/albums?view=' + encodeURIComponent(view),
+      url : url,
       dataType : 'xml',
       beforeSend : function() {
         msgHandler.onInfo('Fetching albums ' + mid + ' view=' + view + ' ...');
@@ -407,10 +409,12 @@ MnApi = {};
   }
 
   MnApi.getTags = function(mid, view, msgHandler, onTags) {
+    var url = 'mlists/' + mid + '/tags?count=100';
+    if (view) url += '&view=' + encodeURIComponent(view);
     $.ajax({
       type : 'GET',
       cache : false,
-      url : 'mlists/' + mid + '/tags?count=100&view=' + encodeURIComponent(view),
+      url : url,
       dataType : 'json',
       beforeSend : function() {
         msgHandler.onInfo('Fetching tags ' + mid + ' view=' + view + ' ...');
