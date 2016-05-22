@@ -4,7 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
@@ -12,29 +15,21 @@ import java.util.regex.Pattern;
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.util.LruCache;
 
-/**
- * TODO cron clean old token files.
- */
 public class AuthMgr {
 
 	private static final Pattern UUID_PATTERN = Pattern.compile("^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$");
-	private static final long DEFAULT_TOKEN_MAX_FRESH_SECONDS = TimeUnit.DAYS.toSeconds(1);
 
 	private final File sessionDir;
-	private final long maxTokenAgeSeconds;
-	private final long maxTokenFreshSeconds;
 
 	private final Map<String, Long> cache = Collections.synchronizedMap(new LruCache<String, Long>(100));
+	private final ConcurrentMap<String, Long> refreshed = new ConcurrentHashMap<String, Long>();
 
 	enum TokenValidity {
-		INVALID, FRESH, REFRESHED
+		INVALID, FRESH, REFRESH_REQUEST
 	}
 
-	public AuthMgr (final int maxTokenAgeSeconds, final ScheduledExecutorService schEs) {
+	public AuthMgr (final ScheduledExecutorService schEs) {
 		this.sessionDir = Config.getSessionDir();
-		this.maxTokenAgeSeconds = maxTokenAgeSeconds;
-		this.maxTokenFreshSeconds = maxTokenAgeSeconds < DEFAULT_TOKEN_MAX_FRESH_SECONDS ? maxTokenAgeSeconds : DEFAULT_TOKEN_MAX_FRESH_SECONDS;
-
 		schEs.scheduleWithFixedDelay(new Runnable() {
 			@Override
 			public void run () {
@@ -49,12 +44,19 @@ public class AuthMgr {
 	}
 
 	public void cleanUpTokens () {
-		final File[] files = this.sessionDir.listFiles();
-		if (files == null) return;
 		final long nowMillis = System.currentTimeMillis();
-		for (final File file : files) {
-			final long ageSeconds = TimeUnit.MILLISECONDS.toSeconds(nowMillis - file.lastModified());
-			if (ageSeconds > this.maxTokenAgeSeconds) file.delete();
+
+		final File[] files = this.sessionDir.listFiles();
+		if (files != null) {
+			for (final File file : files) {
+				if (nowMillis - file.lastModified() > Auth.MAX_TOKEN_AGE_MILLIS) file.delete();
+			}
+		}
+
+		for (final Entry<String, Long> entry : this.refreshed.entrySet()) {
+			if (nowMillis - entry.getValue() > Auth.REFRESH_LOCK_INTERVAL_MILLIS) {
+				this.refreshed.remove(entry.getKey(), entry.getValue());
+			}
 		}
 	}
 
@@ -71,31 +73,36 @@ public class AuthMgr {
 
 		final long nowMillis = System.currentTimeMillis();
 
-		// In cache and fresh?
+		// In cache?
 		final Long cachedLastModifiedMillis = this.cache.get(token);
 		if (cachedLastModifiedMillis != null) {
-			final long ageSeconds = TimeUnit.MILLISECONDS.toSeconds(nowMillis - cachedLastModifiedMillis);
-			if (ageSeconds < this.maxTokenFreshSeconds) return TokenValidity.FRESH;
-			this.cache.remove(token);
+			return isTokenAgeValid(token, nowMillis - cachedLastModifiedMillis, nowMillis);
 		}
 
 		// Exists on disc?
 		final File file = new File(this.sessionDir, token);
 		if (!file.exists()) return TokenValidity.INVALID;
 
-		// Valid?
+		// Read from disc.
 		final long lastModifiedMillis = file.lastModified();
-		final long ageSeconds = TimeUnit.MILLISECONDS.toSeconds(nowMillis - lastModifiedMillis);
-		if (ageSeconds > this.maxTokenAgeSeconds) return TokenValidity.INVALID;
+		this.cache.put(token, lastModifiedMillis);
 
-		// Refresh?
-		if (ageSeconds > this.maxTokenFreshSeconds) {
-			if (!file.setLastModified(nowMillis)) throw new IOException("Failed to update token file timestamp: " + file);
-			this.cache.put(token, nowMillis);
-			return TokenValidity.REFRESHED;
+		return isTokenAgeValid(token, nowMillis - lastModifiedMillis, nowMillis);
+	}
+
+	private TokenValidity isTokenAgeValid (final String token, final long ageMillis, final long nowMillis) {
+		if (ageMillis > Auth.MAX_TOKEN_AGE_MILLIS) return TokenValidity.INVALID;
+
+		if (ageMillis > Auth.MAX_TOKEN_FRESH_MILLIS) {
+			final Long lastRefreshedMillis = this.refreshed.get(token);
+			if (lastRefreshedMillis == null) {
+				if (this.refreshed.putIfAbsent(token, nowMillis) == null) return TokenValidity.REFRESH_REQUEST;
+			}
+			else if (nowMillis - lastRefreshedMillis > Auth.REFRESH_LOCK_INTERVAL_MILLIS) {
+				if (this.refreshed.replace(token, lastRefreshedMillis, nowMillis)) return TokenValidity.REFRESH_REQUEST;
+			}
 		}
 
-		this.cache.put(token, lastModifiedMillis);
 		return TokenValidity.FRESH;
 	}
 

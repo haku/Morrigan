@@ -21,24 +21,15 @@ import com.vaguehope.morrigan.util.httpclient.Http;
 
 public class AuthFilter implements Filter {
 
-	private static final int MAX_TOKEN_AGE_SECONDS = (int) TimeUnit.DAYS.toSeconds(30);
-	private static final String TOKEN_COOKIE_NAME = "MORRIGANTOKEN";
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
 	private static final Logger logger = Logger.getLogger(AuthFilter.class.getName());
 
 	private final AuthChecker authChecker;
 	private final AuthMgr authMgr;
 
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
 	public AuthFilter (final AuthChecker authChecker, final ScheduledExecutorService schEs) {
 		this.authChecker = authChecker;
-		this.authMgr = new AuthMgr(MAX_TOKEN_AGE_SECONDS, schEs);
+		this.authMgr = new AuthMgr(schEs);
 	}
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
 	public void init (final FilterConfig arg0) throws ServletException {
@@ -55,10 +46,10 @@ public class AuthFilter implements Filter {
 		final HttpServletRequest req = (HttpServletRequest) request;
 		final HttpServletResponse resp = (HttpServletResponse) response;
 
-		final Cookie tokenCookie = ServletHelper.findCookie(req, TOKEN_COOKIE_NAME);
+		final Cookie tokenCookie = ServletHelper.findCookie(req, Auth.TOKEN_COOKIE_NAME);
 		if (tokenCookie != null) {
 			switch (this.authMgr.isValidToken(tokenCookie.getValue())) {
-				case REFRESHED:
+				case REFRESH_REQUEST:
 					setTokenCookie(resp);
 				case FRESH:
 					chain.doFilter(request, response);
@@ -106,8 +97,8 @@ public class AuthFilter implements Filter {
 
 	private void setTokenCookie (final HttpServletResponse resp) throws IOException {
 		final String token = this.authMgr.newToken();
-		final Cookie cookie = new Cookie(TOKEN_COOKIE_NAME, token);
-		cookie.setMaxAge(MAX_TOKEN_AGE_SECONDS);
+		final Cookie cookie = new Cookie(Auth.TOKEN_COOKIE_NAME, token);
+		cookie.setMaxAge((int) TimeUnit.MILLISECONDS.toSeconds(Auth.MAX_TOKEN_AGE_MILLIS));
 		cookie.setPath("/");
 		resp.addCookie(cookie);
 	}
