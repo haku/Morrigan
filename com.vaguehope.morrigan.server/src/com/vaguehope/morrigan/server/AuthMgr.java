@@ -22,10 +22,18 @@ public class AuthMgr {
 	private final File sessionDir;
 
 	private final Map<String, Long> cache = Collections.synchronizedMap(new LruCache<String, Long>(100));
+	private final ConcurrentMap<String, Long> eden = new ConcurrentHashMap<String, Long>();
 	private final ConcurrentMap<String, Long> refreshed = new ConcurrentHashMap<String, Long>();
 
 	enum TokenValidity {
-		INVALID, FRESH, REFRESH_REQUEST
+		INVALID(false), FRESH(true), REFRESH_REQUEST(true);
+		private final boolean accessAllowed;
+		private TokenValidity (final boolean accessAllowed) {
+			this.accessAllowed = accessAllowed;
+		}
+		public boolean isAccessAllowed () {
+			return this.accessAllowed;
+		}
 	}
 
 	public AuthMgr (final ScheduledExecutorService schEs) {
@@ -41,6 +49,17 @@ public class AuthMgr {
 				}
 			}
 		}, 0, 1, TimeUnit.DAYS);
+		schEs.scheduleWithFixedDelay(new Runnable() {
+			@Override
+			public void run () {
+				try {
+					cleanUpEdenTokens();
+				}
+				catch (final Exception e) {
+					e.printStackTrace(); // FIXME
+				}
+			}
+		}, 0, 5, TimeUnit.MINUTES);
 	}
 
 	public void cleanUpTokens () {
@@ -60,9 +79,18 @@ public class AuthMgr {
 		}
 	}
 
+	public void cleanUpEdenTokens () {
+		final long nowMillis = System.currentTimeMillis();
+		for (final Entry<String, Long> entry : this.eden.entrySet()) {
+			if (nowMillis - entry.getValue() > Auth.MAX_EDEN_AGE_MILLIS) {
+				this.eden.remove(entry.getKey(), entry.getValue());
+			}
+		}
+	}
+
 	public String newToken () throws IOException {
 		final String token = UUID.randomUUID().toString();
-		new File(this.sessionDir, token).createNewFile();
+		this.eden.put(token, System.currentTimeMillis());
 		return token;
 	}
 
@@ -77,6 +105,17 @@ public class AuthMgr {
 		final Long cachedLastModifiedMillis = this.cache.get(token);
 		if (cachedLastModifiedMillis != null) {
 			return isTokenAgeValid(token, nowMillis - cachedLastModifiedMillis, nowMillis);
+		}
+
+		// Eden token?
+		final Long edenTokenCreated = this.eden.get(token);
+		if (edenTokenCreated != null) {
+			final TokenValidity validity = isTokenAgeValid(token, nowMillis - edenTokenCreated, nowMillis);
+			if (validity.isAccessAllowed()) {
+				new File(this.sessionDir, token).createNewFile();
+				this.eden.remove(token);
+			}
+			return validity;
 		}
 
 		// Exists on disc?
