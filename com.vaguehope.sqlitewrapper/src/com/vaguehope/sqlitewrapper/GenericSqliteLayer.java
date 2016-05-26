@@ -30,6 +30,7 @@ public abstract class GenericSqliteLayer implements IGenericDbLayer {
 
 		try {
 			initDatabaseTables();
+			if (!autoCommit) commitOrRollBack();
 		} catch (Exception e) {
 			throw new DbException("Failed to initialise database tables for db '" + dbFilePath + "'.", e);
 		}
@@ -61,7 +62,7 @@ public abstract class GenericSqliteLayer implements IGenericDbLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	DB connection.
 
-	private Connection dbConnection = null;
+	private Connection dbConnection = null; // FIXME should be thread local?
 
 	private Connection makeConnection() throws ClassNotFoundException, SQLException {
 		Class.forName(DRIVER_CLASS);
