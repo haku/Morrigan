@@ -22,6 +22,7 @@ import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMixedMediaDb;
+import com.vaguehope.morrigan.model.media.IMixedMediaStorageLayer;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaListReference;
@@ -30,6 +31,7 @@ import com.vaguehope.morrigan.model.media.internal.db.mmdb.CopyToLocalMmdbTask;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.LocalMixedMediaDbFactory;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.LocalMixedMediaDbHelper;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.LocalMixedMediaDbUpdateTask;
+import com.vaguehope.morrigan.model.media.internal.db.mmdb.MixedMediaSqliteLayerFactory;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.RemoteMixedMediaDbUpdateTask;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.SyncMetadataRemoteToLocalTask;
 import com.vaguehope.morrigan.tasks.MorriganTask;
@@ -72,12 +74,13 @@ public class MediaFactoryImpl implements MediaFactory {
 		return LocalMixedMediaDbFactory.getMainBySerial(serial);
 	}
 
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 	@Override
 	public ILocalMixedMediaDb getLocalMixedMediaDbTransactional (final ILocalMixedMediaDb lmmdb) throws DbException {
 		return LocalMixedMediaDbFactory.getTransactional(lmmdb.getDbPath());
 	}
 
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
 	public IMediaItemDb<?, ?> getMediaItemDbTransactional (final IMediaItemDb<?, ?> db) throws DbException {
@@ -111,6 +114,13 @@ public class MediaFactoryImpl implements MediaFactory {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+	@Override
+	public IMixedMediaStorageLayer getStorageLayer (final String filepath) throws DbException {
+		return MixedMediaSqliteLayerFactory.getTransactional(filepath);
+	}
+
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 	private final Map<String, IMixedMediaDb> externalDbs = new ConcurrentSkipListMap<String, IMixedMediaDb>();
 
 	@Override
@@ -133,8 +143,8 @@ public class MediaFactoryImpl implements MediaFactory {
 	}
 
 	@Override
-	public void removeExternalDb (final String id) {
-		this.externalDbs.remove(id);
+	public IMixedMediaDb removeExternalDb (final String id) {
+		return this.externalDbs.remove(id);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

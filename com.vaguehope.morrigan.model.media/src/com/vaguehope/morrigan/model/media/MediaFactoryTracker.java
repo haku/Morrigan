@@ -103,6 +103,11 @@ public class MediaFactoryTracker implements MediaFactory {
 	}
 
 	@Override
+	public IMixedMediaStorageLayer getStorageLayer (final String filepath) throws DbException {
+		return getService().getStorageLayer(filepath);
+	}
+
+	@Override
 	public Collection<MediaListReference> getExternalDbs () {
 		return getService().getExternalDbs();
 	}
@@ -118,8 +123,8 @@ public class MediaFactoryTracker implements MediaFactory {
 	}
 
 	@Override
-	public void removeExternalDb (final String id) {
-		getService().removeExternalDb(id);
+	public IMixedMediaDb removeExternalDb (final String id) {
+		return getService().removeExternalDb(id);
 	}
 
 	@Override

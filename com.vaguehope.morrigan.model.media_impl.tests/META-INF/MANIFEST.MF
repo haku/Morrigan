@@ -5,7 +5,7 @@ Bundle-SymbolicName: com.vaguehope.morrigan.model.media_impl.tests
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: vaguehope.com
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Require-Bundle: org.junit4;bundle-version="[4.0.0,5.0.0)",
+Require-Bundle: org.junit;bundle-version="[4.0.0,5.0.0)",
  com.vaguehope.morrigan.model.media_impl;bundle-version="1.0.0"
 Import-Package: com.vaguehope.morrigan.model,
  com.vaguehope.morrigan.model.db,

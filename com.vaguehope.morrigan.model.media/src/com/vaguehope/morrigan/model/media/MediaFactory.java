@@ -42,12 +42,12 @@ public interface MediaFactory {
 	 */
 	ILocalMixedMediaDb getLocalMixedMediaDbBySerial (String serial) throws DbException;
 
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 	/**
 	 * Create an new instance with transactional behaviour.
 	 */
 	ILocalMixedMediaDb getLocalMixedMediaDbTransactional (ILocalMixedMediaDb lmmdb) throws DbException;
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	IMediaItemDb<?,?> getMediaItemDbTransactional (IMediaItemDb<?,?> db) throws DbException;
 
@@ -60,10 +60,14 @@ public interface MediaFactory {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+	IMixedMediaStorageLayer getStorageLayer (String filepath) throws DbException;
+
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 	Collection<MediaListReference> getExternalDbs();
 	IMixedMediaDb getExternalDb(String id);
 	void addExternalDb(IMixedMediaDb db);
-	void removeExternalDb(String id);
+	IMixedMediaDb removeExternalDb(String id);
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
