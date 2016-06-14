@@ -79,7 +79,7 @@ public class Config {
 	private static final String PROP_MEDIA_TYPES = "morrigan.media.types";
 	private static final String PROP_MEDIA_PICTURE_TYPES = "morrigan.media.pictures.types";
 
-	private static final String DEFAULT_MEDIA_TYPES = "mp3|ogg|wma|wmv|avi|mpg|mpeg|ac3|mp4|wav|ra|mpga|mkv|ogm|mpc|m4a|flv|rmvb|aac|m4v|flac";
+	private static final String DEFAULT_MEDIA_TYPES = "mp3|ogg|wma|wmv|avi|mpg|mpeg|ac3|mp4|wav|ra|mpga|mkv|oga|ogm|mpc|m4a|flv|rmvb|aac|m4v|flac|webm";
 	private static final String DEFAULT_MEDIA_PICTURE_TYPES = "jpg|jpeg|png|gif";
 
 	/**
