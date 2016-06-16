@@ -37,7 +37,7 @@ public class CliHelper {
 
 	public String argNotBlank (final String arg) throws ArgException {
 		if (StringHelper.blank(arg)) {
-			throw new ArgException("remoteUrl was blank.");
+			throw new ArgException("arg was blank.");
 		}
 		return arg;
 	}
