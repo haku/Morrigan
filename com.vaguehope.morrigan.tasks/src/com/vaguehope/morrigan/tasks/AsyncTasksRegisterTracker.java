@@ -1,5 +1,7 @@
 package com.vaguehope.morrigan.tasks;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.osgi.framework.BundleContext;
@@ -10,7 +12,7 @@ public class AsyncTasksRegisterTracker implements AsyncTasksRegister {
 	private final AtomicBoolean alive = new AtomicBoolean(true);
 	private final ServiceTracker<AsyncTasksRegister, AsyncTasksRegister> tracker;
 
-	public AsyncTasksRegisterTracker (BundleContext context) {
+	public AsyncTasksRegisterTracker (final BundleContext context) {
 		this.tracker = new ServiceTracker<AsyncTasksRegister, AsyncTasksRegister>(context, AsyncTasksRegister.class, null);
 		this.tracker.open();
 	}
@@ -37,8 +39,8 @@ public class AsyncTasksRegisterTracker implements AsyncTasksRegister {
 	}
 
 	@Override
-	public void scheduleTask (MorriganTask task) {
-		getService().scheduleTask(task);
+	public AsyncTask scheduleTask (final MorriganTask task) {
+		return getService().scheduleTask(task);
 	}
 
 	@Override
@@ -53,6 +55,10 @@ public class AsyncTasksRegisterTracker implements AsyncTasksRegister {
 		return service == null ? new String[]{} : service.reportIndiviually();
 	}
 
-
+	@Override
+	public Collection<AsyncTask> tasks () {
+		final AsyncTasksRegister service = getServiceOptional();
+		return service == null ? Collections.<AsyncTask>emptySet() : service.tasks();
+	}
 
 }

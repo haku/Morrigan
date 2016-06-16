@@ -11,6 +11,7 @@ import org.xml.sax.SAXException;
 
 import com.megginson.sax.DataWriter;
 import com.vaguehope.morrigan.server.util.FeedHelper;
+import com.vaguehope.morrigan.tasks.AsyncTask;
 import com.vaguehope.morrigan.tasks.AsyncTasksRegister;
 
 /**
@@ -30,14 +31,14 @@ public class StatusServlet extends HttpServlet {
 
 	private final AsyncTasksRegister asyncTasksRegister;
 
-	public StatusServlet (AsyncTasksRegister asyncTasksRegister) {
+	public StatusServlet (final AsyncTasksRegister asyncTasksRegister) {
 		this.asyncTasksRegister = asyncTasksRegister;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	protected void doGet (HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	protected void doGet (final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
 		try {
 			printTaskStatusList(resp);
 		} catch (SAXException e) {
@@ -47,17 +48,25 @@ public class StatusServlet extends HttpServlet {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private void printTaskStatusList (HttpServletResponse resp) throws IOException, SAXException {
+	private void printTaskStatusList (final HttpServletResponse resp) throws IOException, SAXException {
 		resp.setContentType("text/xml;charset=utf-8");
 		DataWriter dw = FeedHelper.startFeed(resp.getWriter());
 
 		FeedHelper.addElement(dw, "title", "Morrigan task status desu~");
 		FeedHelper.addLink(dw, CONTEXTPATH, "self", "text/xml");
 
-		String[] reports = this.asyncTasksRegister.reportIndiviually();
-		for (String r : reports) {
+		for (AsyncTask t : this.asyncTasksRegister.tasks()) {
 			dw.startElement("entry");
-			FeedHelper.addElement(dw, "summary", r);
+			FeedHelper.addElement(dw, "id", t.id());
+			FeedHelper.addElement(dw, "title", t.title());
+			FeedHelper.addElement(dw, "state", t.state().toString());
+			FeedHelper.addElement(dw, "subtask", t.subtask());
+			FeedHelper.addElement(dw, "lastMsg", t.lastMsg());
+			FeedHelper.addElement(dw, "lastErr", t.lastErr());
+			FeedHelper.addElement(dw, "progressWorked", t.progressWorked());
+			FeedHelper.addElement(dw, "progressTotal", t.progressTotal());
+			FeedHelper.addElement(dw, "successful", t.successful());
+			FeedHelper.addElement(dw, "summary", t.summary());
 			dw.endElement("entry");
 		}
 

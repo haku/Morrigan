@@ -1,6 +1,7 @@
 package com.vaguehope.morrigan.tasks;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -22,7 +23,7 @@ public class AsyncTasksRegisterImpl implements AsyncTasksRegister {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	public void scheduleTask (final MorriganTask task) {
+	public AsyncTask scheduleTask (final MorriganTask task) {
 		if (task == null) throw new IllegalArgumentException();
 		final AsyncTaskEventListener taskEventListener = makeTrackedListener();
 		final Runnable runnable = new Runnable() {
@@ -44,6 +45,8 @@ public class AsyncTasksRegisterImpl implements AsyncTasksRegister {
 		};
 		final Future<?> future = this.executor.submit(runnable);
 		taskEventListener.setFuture(future);
+
+		return taskEventListener;
 	}
 
 	private AsyncTaskEventListener makeTrackedListener () {
@@ -73,6 +76,16 @@ public class AsyncTasksRegisterImpl implements AsyncTasksRegister {
 			ret.add(l.summarise());
 		}
 		return ret.toArray(new String[ret.size()]);
+	}
+
+	@Override
+	public Collection<AsyncTask> tasks () {
+		clean();
+		final Collection<AsyncTask> ret = new ArrayList<AsyncTask>();
+		for (final AsyncTaskEventListener l : this.listeners) {
+			ret.add(l);
+		}
+		return ret;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

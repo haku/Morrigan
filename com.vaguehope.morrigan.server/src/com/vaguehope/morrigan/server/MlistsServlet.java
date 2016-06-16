@@ -52,6 +52,7 @@ import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbHelper;
 import com.vaguehope.morrigan.server.util.FeedHelper;
 import com.vaguehope.morrigan.server.util.ImageResizer;
 import com.vaguehope.morrigan.server.util.XmlHelper;
+import com.vaguehope.morrigan.tasks.AsyncTask;
 import com.vaguehope.morrigan.util.StringHelper;
 import com.vaguehope.sqlitewrapper.DbException;
 
@@ -319,16 +320,18 @@ public class MlistsServlet extends HttpServlet {
 			}
 		}
 		else if (action.equals(CMD_SCAN)) {
-			this.asyncActions.scheduleMmdbScan(mmdb);
+			AsyncTask at = this.asyncActions.scheduleMmdbScan(mmdb);
 			resp.setContentType("text/plain");
 			resp.getWriter().println("Scan scheduled desu~");
+			resp.getWriter().println("id=" + at.id());
 		}
 		else if (action.equals(CMD_PULL)) {
 			final String remote = req.getParameter(PARAM_REMOTE);
 			if (StringHelper.notBlank(remote)) {
-				this.asyncActions.scheduleMmdbPull((ILocalMixedMediaDb) mmdb, remote);
+				AsyncTask at = this.asyncActions.scheduleMmdbPull((ILocalMixedMediaDb) mmdb, remote);
 				resp.setContentType("text/plain");
 				resp.getWriter().println("Pull scheduled desu~");
+				resp.getWriter().println("id=" + at.id());
 			}
 			else {
 				ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "'remote' parameter not set desu~");

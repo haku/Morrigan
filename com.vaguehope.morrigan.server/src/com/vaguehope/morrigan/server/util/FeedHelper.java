@@ -95,6 +95,10 @@ public final class FeedHelper {
 		addElement(dw, newElement, String.valueOf(l));
 	}
 
+	public static void addElement (final DataWriter dw, final String newElement, final Boolean b) throws SAXException {
+		addElement(dw, newElement, b != null ? String.valueOf(b) : "");
+	}
+
 	public static void addElement (final DataWriter dw, final String newElement, final String textContent) throws SAXException {
 		dw.dataElement(newElement, textContent);
 	}

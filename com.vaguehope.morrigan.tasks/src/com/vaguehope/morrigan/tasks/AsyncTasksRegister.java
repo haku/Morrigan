@@ -1,11 +1,15 @@
 package com.vaguehope.morrigan.tasks;
 
+import java.util.Collection;
+
 public interface AsyncTasksRegister {
 
-	void scheduleTask (MorriganTask task);
+	AsyncTask scheduleTask (MorriganTask task);
 
 	String reportSummary ();
 
 	String[] reportIndiviually ();
+
+	Collection<AsyncTask> tasks();
 
 }
