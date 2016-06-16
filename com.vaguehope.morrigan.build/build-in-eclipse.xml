@@ -117,6 +117,10 @@
 						includes="install_plugin"
 						fullpath="${archivePrefix}/install_plugin"
 						filemode="755" />
+			<zipfileset dir="rootfiles"
+						includes="mndb"
+						fullpath="${archivePrefix}/mndb"
+						filemode="755" />
 		</zip>
 	</target>
 

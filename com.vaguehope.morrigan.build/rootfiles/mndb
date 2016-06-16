@@ -1,0 +1,48 @@
+#!/bin/bash
+set -eu
+
+print_help() {
+  echo "Usage:"
+  echo "  $0 dump <db-name> > file.xml"
+  echo "  $0 pull <db-name> <remote-name>"
+  exit 1
+}
+
+if [ "$#" -lt 2 ] || [ "$#" -gt 3 ] ; then print_help ; fi
+
+cmd="$1"
+db_name="$2"
+remote_name="${3:-}"
+
+props=$(< "$HOME/.morrigan/server.properties")
+user="u"
+host="localhost"
+passwd="$(echo "$props" | awk -F= '/^pass=/ {print $2}')"
+port="$(echo "$props" | awk -F= '/^port=/ {print $2}')"
+db_uri="http://${user}:${passwd}@${host}:${port}/mlists/LOCALMMDB/${db_name}.local.db3"
+
+do_dump() {
+  items_uri="${db_uri}/items?includeddeletedtags=true"
+  curl --silent "$items_uri"
+}
+
+do_pull() {
+  if [ -z "$remote_name" ] ; then print_help ; fi
+  res="$(curl --silent -d "action=pull&remote=${remote_name}" "$db_uri")"
+  task_id="$(echo "$res" | awk -F= '/^id=/ {print $2}')"
+  echo "task_id=${task_id}"
+  # TODO poll task for result.
+}
+
+case "$cmd" in
+  dump)
+    do_dump
+    ;;
+  pull)
+    do_pull
+    ;;
+  *)
+    echo "Unknown cmd: $cmd" >&2
+    exit 1
+    ;;
+esac
