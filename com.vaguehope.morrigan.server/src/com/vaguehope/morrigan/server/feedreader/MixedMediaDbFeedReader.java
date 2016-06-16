@@ -1,9 +1,14 @@
 package com.vaguehope.morrigan.server.feedreader;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.SocketException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,14 +43,23 @@ public class MixedMediaDbFeedReader implements HttpStreamHandler {
 		if (taskEventListener != null) taskEventListener.beginTask("Updating " + mmdb.getListName(), 100);
 
 		try {
-			final String surl = mmdb.getUrl().toString() + "/" + MlistsServlet.PATH_ITEMS + "?" + MlistsServlet.PARAM_INCLUDE_DELETED_TAGS + "=true";
-			URL url = new URL(surl);
-			Map<String, String> headers = new HashMap<String, String>();
-			Auth.addTo(headers, url, mmdb.getPass());
-			HttpResponse response = HttpClient.doHttpRequest(url, headers, new MixedMediaDbFeedReader(mmdb, taskEventListener));
-			if (response.getCode() != 200) {
-				throw new MorriganException("After fetching remote MMDB response code was " + response.getCode() + " (expected 200).");
+			final URI baseUri = mmdb.getUri();
+			final HttpStreamHandler feedReader = new MixedMediaDbFeedReader(mmdb, taskEventListener);
+
+			if ("http".equalsIgnoreCase(baseUri.getScheme())) {
+				final URI uri = new URI(baseUri + "/" + MlistsServlet.PATH_ITEMS
+						+ "?" + MlistsServlet.PARAM_INCLUDE_DELETED_TAGS + "=true");
+				readHttp(mmdb, uri, feedReader);
 			}
+			else if ("file".equalsIgnoreCase(baseUri.getScheme())) {
+				readFile(baseUri, feedReader);
+			}
+			else {
+				throw new MorriganException("Unsuported scheme: " + baseUri);
+			}
+		}
+		catch (final URISyntaxException e) {
+			throw new MorriganException("Invalid URI: " + e.getInput(), e);
 		}
 		catch (IOException e) {
 			if (e instanceof UnknownHostException) {
@@ -62,6 +76,34 @@ public class MixedMediaDbFeedReader implements HttpStreamHandler {
 		}
 
 		if (taskEventListener!=null) taskEventListener.done();
+	}
+
+	private static void readHttp (final IRemoteMixedMediaDb mmdb, final URI uri, final HttpStreamHandler feedReader) throws DbException, IOException, HttpStreamHandlerException, MalformedURLException, MorriganException {
+		final Map<String, String> headers = new HashMap<String, String>();
+		Auth.addTo(headers, uri, mmdb.getPass());
+		final HttpResponse response = HttpClient.doHttpRequest(uri.toURL(), headers, feedReader);
+		if (response.getCode() != 200) {
+			throw new MorriganException("After fetching remote MMDB response code was " + response.getCode() + " (expected 200).");
+		}
+	}
+
+	private static void readFile (final URI uri, final HttpStreamHandler feedReader) throws MorriganException, IOException, HttpStreamHandlerException {
+		final File file;
+		try {
+			file = new File(uri);
+		}
+		catch (final IllegalArgumentException e) {
+			throw new MorriganException("Failed to convert URI to File: " + uri, e);
+		}
+		if (!file.exists()) throw new MorriganException("File not found: " + file.getAbsolutePath());
+
+		final InputStream is = new FileInputStream(file);
+		try {
+			feedReader.handleStream(new BufferedInputStream(is));
+		}
+		finally {
+			is.close();
+		}
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

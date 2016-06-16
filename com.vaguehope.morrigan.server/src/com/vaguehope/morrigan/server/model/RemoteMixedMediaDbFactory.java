@@ -23,17 +23,17 @@ public final class RemoteMixedMediaDbFactory {
 		}
 
 		@Override
-		protected boolean isValidProduct (IRemoteMixedMediaDb product) {
+		protected boolean isValidProduct (final IRemoteMixedMediaDb product) {
 			return true;
 		}
 
 		@Override
-		protected IRemoteMixedMediaDb makeNewProduct (MediaItemDbConfig material) throws MorriganException {
+		protected IRemoteMixedMediaDb makeNewProduct (final MediaItemDbConfig material) throws MorriganException {
 			return makeNewProduct(material, null);
 		}
 
 		@Override
-		protected IRemoteMixedMediaDb makeNewProduct (MediaItemDbConfig material, RemoteHostDetails config) throws MorriganException {
+		protected IRemoteMixedMediaDb makeNewProduct (final MediaItemDbConfig material, final RemoteHostDetails config) throws MorriganException {
 			IRemoteMixedMediaDb ret = null;
 			if (config != null) {
 				try {
@@ -65,31 +65,31 @@ public final class RemoteMixedMediaDbFactory {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public static IRemoteMixedMediaDb getNew (String fullFilePath, RemoteHostDetails details) throws MorriganException {
+	public static IRemoteMixedMediaDb getNew (final String fullFilePath, final RemoteHostDetails details) throws MorriganException {
 		MediaItemDbConfig config = new MediaItemDbConfig(fullFilePath, null);
 		return INSTANCE.manufacture(config, details);
 	}
 
-	public static IRemoteMixedMediaDb getExisting (String fullFilePath) throws MorriganException {
+	public static IRemoteMixedMediaDb getExisting (final String fullFilePath) throws MorriganException {
 		MediaItemDbConfig config = new MediaItemDbConfig(fullFilePath, null);
 		return INSTANCE.manufacture(config);
 	}
 
-	public static IRemoteMixedMediaDb getExisting (String fullFilePath, String filter) throws MorriganException {
+	public static IRemoteMixedMediaDb getExisting (final String fullFilePath, final String filter) throws MorriganException {
 		MediaItemDbConfig config = new MediaItemDbConfig(fullFilePath, filter);
 		return INSTANCE.manufacture(config);
 	}
 
-	public static IRemoteMixedMediaDb getExistingBySerial (String serial) throws MorriganException {
+	public static IRemoteMixedMediaDb getExistingBySerial (final String serial) throws MorriganException {
 		MediaItemDbConfig config = new MediaItemDbConfig(serial);
 		return INSTANCE.manufacture(config);
 	}
 
-	public static IRemoteMixedMediaDb getTransactionalClone (IRemoteMixedMediaDb rmmdb) throws DbException {
+	public static IRemoteMixedMediaDb getTransactionalClone (final IRemoteMixedMediaDb rmmdb) throws DbException {
 		String title = RemoteMixedMediaDbHelper.getRemoteMmdbTitle(rmmdb.getDbPath());
 		MediaItemDbConfig config = new MediaItemDbConfig(rmmdb.getDbPath(), null);
 		IMixedMediaStorageLayer storage = MixedMediaSqliteLayerFactory.getTransactional(rmmdb.getDbPath());
-		RemoteHostDetails details = new RemoteHostDetails(rmmdb.getUrl(), rmmdb.getPass());
+		RemoteHostDetails details = new RemoteHostDetails(rmmdb.getUri(), rmmdb.getPass());
 		return new RemoteMixedMediaDb(title, config, details, storage);
 	}
 

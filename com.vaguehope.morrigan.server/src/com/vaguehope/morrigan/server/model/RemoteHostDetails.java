@@ -1,23 +1,23 @@
 package com.vaguehope.morrigan.server.model;
 
-import java.net.URL;
+import java.net.URI;
 
 public class RemoteHostDetails {
 
-	private final URL url;
+	private final URI uri;
 	private final String pass;
 
-	public RemoteHostDetails (final URL url) {
-		this(url, null);
+	public RemoteHostDetails (final URI uri) {
+		this(uri, null);
 	}
 
-	public RemoteHostDetails (final URL url, final String pass) {
-		this.url = url;
+	public RemoteHostDetails (final URI uri, final String pass) {
+		this.uri = uri;
 		this.pass = pass;
 	}
 
-	public URL getUrl () {
-		return this.url;
+	public URI getUri () {
+		return this.uri;
 	}
 
 	public String getPass () {

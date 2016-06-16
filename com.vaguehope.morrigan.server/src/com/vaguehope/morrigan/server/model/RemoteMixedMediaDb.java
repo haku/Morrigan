@@ -6,6 +6,8 @@ import java.io.OutputStream;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.SocketException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.Date;
@@ -59,7 +61,7 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb implements IRemoteM
 	public RemoteMixedMediaDb (final String dbName, final MediaItemDbConfig config, final RemoteHostDetails details, final IMixedMediaStorageLayer localDbLayer) throws DbException {
 		super(dbName, config, localDbLayer); // TODO expose search term.
 
-		setUrl(details.getUrl());
+		setUri(details.getUri());
 		setPass(details.getPass() != null ? details.getPass() : "");
 		readCacheDate();
 	}
@@ -86,19 +88,19 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb implements IRemoteM
 	}
 
 	@Override
-	public URL getUrl() throws DbException {
-		String sUrl = getDbLayer().getProp(DBKEY_SERVERURL);
+	public URI getUri() throws DbException {
+		final String sUrl = getDbLayer().getProp(DBKEY_SERVERURL);
 		try {
-			return new URL(sUrl);
+			return new URI(sUrl);
 		}
-		catch (MalformedURLException e) {
+		catch (final URISyntaxException e) {
 			throw new DbException("URL in DB is malformed: " + sUrl, e);
 		}
 	}
 
 	@Override
-	public void setUrl (final URL url) throws DbException {
-		getDbLayer().setProp(DBKEY_SERVERURL, url.toExternalForm());
+	public void setUri (final URI uri) throws DbException {
+		getDbLayer().setProp(DBKEY_SERVERURL, uri.toString());
 	}
 
 	@Override

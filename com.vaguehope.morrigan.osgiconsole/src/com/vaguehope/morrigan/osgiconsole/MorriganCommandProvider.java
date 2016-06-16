@@ -2,8 +2,8 @@ package com.vaguehope.morrigan.osgiconsole;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -103,7 +103,7 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 	}
 
-	public void mnUnsafe (final CommandInterpreter ci) throws MorriganException, IOException, ArgException, DbException {
+	public void mnUnsafe (final CommandInterpreter ci) throws MorriganException, IOException, ArgException, DbException, URISyntaxException {
 		final List<String> args = new LinkedList<String>();
 		String arg = null;
 		while ((arg = ci.nextArgument()) != null) {
@@ -156,7 +156,7 @@ public class MorriganCommandProvider implements CommandProvider {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private void doMedia (final CommandInterpreter ci, final List<String> args) throws MorriganException, MalformedURLException, ArgException, DbException {
+	private void doMedia (final CommandInterpreter ci, final List<String> args) throws MorriganException, ArgException, DbException, URISyntaxException {
 		if (args.size() < 1) {
 			doMediaList(ci);
 			return;
@@ -250,13 +250,13 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 	}
 
-	private void doMediaCreate (final CommandInterpreter ci, final List<String> args) throws MalformedURLException, MorriganException {
+	private void doMediaCreate (final CommandInterpreter ci, final List<String> args) throws MorriganException, URISyntaxException {
 		if (args.size() >= 1) {
 			if ("remote".equals(args.get(0)) || "r".equals(args.get(0))) {
 				if (args.size() >= 3) {
-					final String url = args.get(1);
+					final String uri = args.get(1);
 					final String pass = args.get(2);
-					final IRemoteMixedMediaDb db = RemoteMixedMediaDbHelper.createRemoteMmdb(url, pass);
+					final IRemoteMixedMediaDb db = RemoteMixedMediaDbHelper.createRemoteMmdb(uri, pass);
 					ci.println("Created MMDB '" + db.getListName() + "'.");
 				}
 				else {
@@ -333,7 +333,8 @@ public class MorriganCommandProvider implements CommandProvider {
 		final String remote = this.cliHelper.argNotBlank(args.get(1));
 		URI remoteUri = ldb.getRemote(remote);
 		if (remoteUri == null) {
-			remoteUri = this.cliHelper.argUri(args.get(1));
+			ci.println("Remote '" + remote + "' not found, assuming its a URI...");
+			remoteUri = this.cliHelper.argUri(remote);
 		}
 
 		this.asyncTasksRegister.scheduleTask(new PullRemoteToLocal(ldb, remoteUri, this.mediaFactory));

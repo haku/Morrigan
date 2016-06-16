@@ -1,6 +1,6 @@
 package com.vaguehope.morrigan.server.feedreader;
 
-import java.net.URL;
+import java.net.URI;
 import java.util.Map;
 
 import org.eclipse.jetty.util.B64Code;
@@ -12,12 +12,12 @@ public class Auth {
 
 	private static final String USERNAME = "Morrigan";
 
-	public static void addTo (final Map<String, String> headers, final URL url) {
-		addTo(headers, url, null);
+	public static void addTo (final Map<String, String> headers, final URI uri) {
+		addTo(headers, uri, null);
 	}
 
-	public static void addTo (final Map<String, String> headers, final URL url, final String passwd) {
-		final String userInfo = url.getUserInfo();
+	public static void addTo (final Map<String, String> headers, final URI uri, final String passwd) {
+		final String userInfo = uri.getUserInfo();
 		if (StringHelper.notBlank(userInfo)) {
 			final int x = userInfo.indexOf(':');
 			if (x >= 0) {
