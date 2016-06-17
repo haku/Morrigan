@@ -8,26 +8,50 @@ shopt -s failglob
 # openssl req -x509 -days 365 -new -subj "/C=XX/ST=X/L=X/O=X/OU=X/CN=${HOST}" -key "${HOST}-private.pem" -out "${HOST}-public.pem"
 # cp "${HOST}-public.pem" ~/Dropbox/Apps/morrigan/
 
+log() {
+  echo $(date +'%Y%m%d-%H%M%S') $@
+}
+
+mtime() {
+  if [ -e "$1" ] ; then
+    stat -c %Y "$1"
+  else
+    echo 0
+  fi
+}
+
 HOST="$(hostname)"
+
+mn_cfg_dir="$HOME/.morrigan"
+dropbox_dir="$HOME/Dropbox/Apps/morrigan"
 
 mndbs=( "$HOME"/opt/morrigan*/mndb )
 mndb="${mndbs[0]}"
 if ! [ -e "$mndb" ] ; then
-  echo "Not found: $mndb"
+  log "Not found: $mndb"
   exit 1
 fi
 
-db_files=( "$HOME/.morrigan/mmdb/"*.local.db3 )
-keys=( "$HOME/Dropbox/Apps/morrigan/"*-public.pem )
+db_files=( "$mn_cfg_dir/mmdb/"*.local.db3 )
+keys=( "$dropbox_dir/"*-public.pem )
 
 for db_file in "${db_files[@]}" ; do
   db_basename="$(basename "$db_file")"
   db_name="${db_basename%.local.db3}"
-  out="$HOME/Dropbox/Apps/morrigan/${HOST}-${db_name}.xml.cms"
-  echo "$db_name > $out ..."
-  $mndb dump "$db_name" \
-    | gzip \
-    | openssl cms -encrypt -binary -aes256 -outform der -out "$out" "${keys[@]}"
+  out="$dropbox_dir/${HOST}-${db_name}.xml.cms"
+
+  db_mtime="$(mtime "$db_file")"
+  out_mtime="$(mtime "$out")"
+
+  if [ $db_mtime -gt $out_mtime ] ; then
+    log "$db_name > $out ..."
+    $mndb dump "$db_name" \
+      | gzip \
+      | openssl cms -encrypt -binary -aes256 -outform der -out "$out" "${keys[@]}"
+  else
+    log "$db_name unchanged."
+  fi
+
 done
 
-echo "done."
+log "done."
