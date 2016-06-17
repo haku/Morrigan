@@ -11,5 +11,6 @@ public interface AsyncTasksRegister {
 	String[] reportIndiviually ();
 
 	Collection<AsyncTask> tasks();
+	AsyncTask task(String id);
 
 }

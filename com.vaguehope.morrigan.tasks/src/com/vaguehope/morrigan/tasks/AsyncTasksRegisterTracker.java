@@ -61,4 +61,10 @@ public class AsyncTasksRegisterTracker implements AsyncTasksRegister {
 		return service == null ? Collections.<AsyncTask>emptySet() : service.tasks();
 	}
 
+	@Override
+	public AsyncTask task (final String id) {
+		final AsyncTasksRegister service = getServiceOptional();
+		return service == null ? null : service.task(id);
+	}
+
 }

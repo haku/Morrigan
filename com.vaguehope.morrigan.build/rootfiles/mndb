@@ -21,7 +21,8 @@ user="u"
 host="localhost"
 passwd="$(echo "$props" | awk -F= '/^pass=/ {print $2}')"
 port="$(echo "$props" | awk -F= '/^port=/ {print $2}')"
-db_uri="http://${user}:${passwd}@${host}:${port}/mlists/LOCALMMDB/${db_name}.local.db3"
+mn_uri="http://${user}:${passwd}@${host}:${port}" # TODO don't leak passwd via process args.
+db_uri="$mn_uri/mlists/LOCALMMDB/${db_name}.local.db3"
 
 do_dump() {
   items_uri="${db_uri}/items?includeddeletedtags=true"
@@ -37,8 +38,24 @@ do_pull() {
   if [ -z "$remote_name" ] ; then print_help ; fi
   res="$(curl --silent -d "action=pull&remote=${remote_name}" "$db_uri")"
   task_id="$(echo "$res" | awk -F= '/^id=/ {print $2}')"
-  echo "task_id=${task_id}"
-  # TODO poll task for result.
+  echo "Waiting for task ${task_id} ..."
+  task_uri="$mn_uri/status/$task_id"
+  res=""
+  while true ; do
+    res="$(curl --silent "$task_uri")"
+    state="$(echo "$res" | awk 'match($0, /<state>([^<]+)<\/state>/, a) {print a[1]}')"
+    if [ "$state" = "COMPLETE" ] ; then break ; fi
+    echo -n '.'
+    sleep 5
+  done
+  successful="$(echo "$res" | awk 'match($0, /<successful>([^<]+)<\/successful>/, a) {print a[1]}')"
+  if [ "$successful" = "true" ] ; then
+    echo "Success."
+  else
+    err="$(echo "$res" | awk 'match($0, /<lastErr>([^<]+)<\/lastErr>/, a) {print a[1]}')"
+    echo "Failed: $err"
+    exit 1
+  fi
 }
 
 case "$cmd" in

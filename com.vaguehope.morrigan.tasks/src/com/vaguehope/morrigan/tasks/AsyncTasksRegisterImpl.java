@@ -88,6 +88,17 @@ public class AsyncTasksRegisterImpl implements AsyncTasksRegister {
 		return ret;
 	}
 
+	/**
+	 * TODO make more efficient by using a Map?
+	 */
+	@Override
+	public AsyncTask task (final String id) {
+		for (final AsyncTaskEventListener l : this.listeners) {
+			if (id.equals(l.id())) return l;
+		}
+		return null;
+	}
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private void clean () {
