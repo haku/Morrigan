@@ -1,5 +1,6 @@
 #!/bin/bash
-set -eu
+set -eu -o pipefail
+shopt -s failglob
 
 # Generate keys:
 # cd ~/.morrigan/keys
@@ -25,6 +26,7 @@ for db_file in "${db_files[@]}" ; do
   out="$HOME/Dropbox/Apps/morrigan/${HOST}-${db_name}.xml.cms"
   echo "$db_name > $out ..."
   $mndb dump "$db_name" \
+    | gzip \
     | openssl cms -encrypt -binary -aes256 -outform der -out "$out" "${keys[@]}"
 done
 

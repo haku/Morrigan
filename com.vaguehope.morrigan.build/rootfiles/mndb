@@ -1,5 +1,6 @@
 #!/bin/bash
-set -eu
+set -eu -o pipefail
+shopt -s failglob
 
 print_help() {
   echo "Usage:"
