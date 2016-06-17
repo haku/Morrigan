@@ -51,7 +51,6 @@ for db_file in "${db_files[@]}" ; do
   else
     log "$db_name unchanged."
   fi
-
 done
 
 log "done."
