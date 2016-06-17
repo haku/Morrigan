@@ -121,6 +121,10 @@
 						includes="mndb"
 						fullpath="${archivePrefix}/mndb"
 						filemode="755" />
+			<zipfileset dir="rootfiles"
+						includes="mn-dump-dropbox"
+						fullpath="${archivePrefix}/mn-dump-dropbox"
+						filemode="755" />
 		</zip>
 	</target>
 
