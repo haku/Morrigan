@@ -5,6 +5,7 @@ shopt -s failglob
 print_help() {
   echo "Usage:"
   echo "  $0 dump <db-name> > file.xml"
+  echo "  $0 remotes <db-name>"
   echo "  $0 pull <db-name> <remote-name>"
   exit 1
 }
@@ -27,6 +28,11 @@ do_dump() {
   curl --silent "$items_uri"
 }
 
+do_remotes() {
+  res="$(curl --silent "$db_uri")"
+  echo "$res" | awk 'match($0, /<remote>([^<]+)<\/remote>/, a) {print a[1]}'
+}
+
 do_pull() {
   if [ -z "$remote_name" ] ; then print_help ; fi
   res="$(curl --silent -d "action=pull&remote=${remote_name}" "$db_uri")"
@@ -38,6 +44,9 @@ do_pull() {
 case "$cmd" in
   dump)
     do_dump
+    ;;
+  remotes)
+    do_remotes
     ;;
   pull)
     do_pull

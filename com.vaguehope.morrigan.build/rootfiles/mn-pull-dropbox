@@ -1,0 +1,89 @@
+#!/bin/bash
+set -eu -o pipefail
+shopt -s failglob
+
+log() {
+  echo $(date +'%Y%m%d-%H%M%S') $@
+}
+
+mtime() {
+  if [ -e "$1" ] ; then
+    stat -c %Y "$1"
+  else
+    echo 0
+  fi
+}
+
+# search string, the array.
+containsElement() {
+  local e
+  for e in "${@:2}"; do [[ "$e" == "$1" ]] && return 0; done
+  return 1
+}
+
+
+HOST="$(hostname)"
+
+mn_cfg_dir="$HOME/.morrigan"
+dropbox_dir="$HOME/Dropbox/Apps/morrigan"
+remotes_dir="$mn_cfg_dir/remotes"
+mkdir -p "$remotes_dir"
+
+public_key="$dropbox_dir/${HOST}-public.pem"
+private_key="$mn_cfg_dir/keys/${HOST}-private.pem"
+
+mndbs=( "$HOME"/opt/morrigan*/mndb )
+mndb="${mndbs[0]}"
+if ! [ -e "$mndb" ] ; then
+  log "Not found: $mndb"
+  exit 1
+fi
+
+updated_remotes=()
+
+dump_files=( "$dropbox_dir/"*.cms )
+for dump_file in "${dump_files[@]}" ; do
+  dump_name="$(basename "$dump_file")"
+
+  remote_name="$(basename ${dump_file%.cms})"
+  remote_file="$remotes_dir/$remote_name"
+  remote_tmp_file="${remote_file}.tmp"
+
+  dump_mtime="$(mtime "$dump_file")"
+  remote_mtime="$(mtime "$remote_file")"
+
+  if [ $dump_mtime -gt $remote_mtime ] ; then
+    log "$dump_name > $remote_name ..."
+    openssl cms -decrypt -inform der \
+      -in "$dump_file" \
+      -recip "$public_key" \
+      -inkey "$private_key" \
+      | gunzip > "$remote_tmp_file"
+    mv "$remote_tmp_file" "$remote_file"
+    updated_remotes+=("${remote_name%.xml}")
+  else
+    log "$dump_name unchanged."
+  fi
+done
+
+if [ ${#updated_remotes[@]} -gt 0 ] ; then
+  log "Updated remotes: ${updated_remotes[@]}"
+
+  db_files=( "$mn_cfg_dir/mmdb/"*.local.db3 )
+  for db_file in "${db_files[@]}" ; do
+    db_basename="$(basename "$db_file")"
+    db_name="${db_basename%.local.db3}"
+
+    db_remotes="$($mndb remotes "$db_name")"
+    while read db_remote ; do
+      if [ -z "$db_remote" ] ; then continue ; fi
+
+      if containsElement "$db_remote" "${updated_remotes[@]}" ; then
+        log "pulling $db_name $db_remote ..."
+        $mndb pull "$db_name" "$db_remote"
+      fi
+    done < <(echo "$db_remotes")
+  done
+fi
+
+log "done."
