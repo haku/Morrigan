@@ -125,6 +125,10 @@
 						includes="mn-dump-dropbox"
 						fullpath="${archivePrefix}/mn-dump-dropbox"
 						filemode="755" />
+			<zipfileset dir="rootfiles"
+						includes="mn-pull-dropbox"
+						fullpath="${archivePrefix}/mn-pull-dropbox"
+						filemode="755" />
 		</zip>
 	</target>
 
