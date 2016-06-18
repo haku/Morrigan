@@ -23,8 +23,10 @@ import com.vaguehope.morrigan.gui.helpers.ImageCache;
 import com.vaguehope.morrigan.gui.helpers.RefreshTimer;
 import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.player.PlayItem;
+import com.vaguehope.morrigan.player.PlayItemType;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayerLifeCycleListener;
+import com.vaguehope.morrigan.player.PlayerQueue;
 import com.vaguehope.morrigan.util.TimeHelper;
 
 public class ViewQueue extends ViewPart {
@@ -127,6 +129,7 @@ public class ViewQueue extends ViewPart {
 		getViewSite().getActionBars().getToolBarManager().add(this.moveDownAction);
 		getViewSite().getActionBars().getToolBarManager().add(this.removeAction);
 		getViewSite().getActionBars().getToolBarManager().add(this.shuffleAction);
+		getViewSite().getActionBars().getToolBarManager().add(this.addStopTopAction);
 	}
 
 	private int lastQueueSize = 0;
@@ -251,6 +254,14 @@ public class ViewQueue extends ViewPart {
 		@Override
 		public void run() {
 			ViewQueue.this.abstractPlayerView.getPlayer().getQueue().shuffleQueue();
+		}
+	};
+
+	protected IAction addStopTopAction = new Action ("Stop After", Activator.getImageDescriptor("icons/stop.gif")) {
+		@Override
+		public void run() {
+			final PlayerQueue queue = ViewQueue.this.abstractPlayerView.getPlayer().getQueue();
+			queue.addToQueueTop(queue.makeMetaItem(PlayItemType.STOP));
 		}
 	};
 
