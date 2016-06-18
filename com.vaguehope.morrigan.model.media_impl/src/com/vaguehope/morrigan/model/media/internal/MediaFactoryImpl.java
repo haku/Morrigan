@@ -60,11 +60,13 @@ public class MediaFactoryImpl implements MediaFactory {
 
 	@Override
 	public ILocalMixedMediaDb getLocalMixedMediaDb (final String fullFilePath) throws DbException {
+		if (!new File(fullFilePath).isFile()) throw new DbException("File not found: " + fullFilePath);
 		return LocalMixedMediaDbFactory.getMain(fullFilePath);
 	}
 
 	@Override
 	public ILocalMixedMediaDb getLocalMixedMediaDb (final String fullFilePath, final String filter) throws DbException {
+		if (!new File(fullFilePath).isFile()) throw new DbException("File not found: " + fullFilePath);
 		if (filter == null || filter.length() < 1) return getLocalMixedMediaDb(fullFilePath);
 		return LocalMixedMediaDbFactory.getView(fullFilePath, filter);
 	}
