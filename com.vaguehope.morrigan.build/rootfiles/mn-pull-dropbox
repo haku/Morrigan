@@ -29,7 +29,7 @@ dropbox_dir="$HOME/Dropbox/Apps/morrigan"
 remotes_dir="$mn_cfg_dir/remotes"
 mkdir -p "$remotes_dir"
 
-public_key="$dropbox_dir/${HOST}-public.pem"
+public_key="$mn_cfg_dir/keys/${HOST}-public.pem"
 private_key="$mn_cfg_dir/keys/${HOST}-private.pem"
 
 mndbs=( "$HOME"/opt/morrigan*/mndb )
