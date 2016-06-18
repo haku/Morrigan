@@ -196,10 +196,15 @@ public class DefaultPlayerQueue implements PlayerQueue {
 		long duration = 0;
 		synchronized (this.queue) {
 			for (final PlayItem pi : this.queue) {
-				if (pi.hasTrack() && pi.getTrack().getDuration() > 0) {
-					duration = duration + pi.getTrack().getDuration();
+				if (pi.hasTrack()) {
+					if (pi.getTrack().getDuration() > 0) {
+						duration += pi.getTrack().getDuration();
+					}
+					else {
+						complete = false;
+					}
 				}
-				else {
+				else if (pi.hasList()) {
 					complete = false;
 				}
 			}
