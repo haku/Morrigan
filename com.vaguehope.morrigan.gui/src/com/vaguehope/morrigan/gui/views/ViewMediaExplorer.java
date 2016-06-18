@@ -45,7 +45,6 @@ import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaListReference;
 import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbFactory;
-import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbHelper;
 import com.vaguehope.morrigan.tasks.MorriganTask;
 
 public class ViewMediaExplorer extends ViewPart {
@@ -189,7 +188,7 @@ public class ViewMediaExplorer extends ViewPart {
 	private void makeContent () {
 		this.items.clear();
 		this.items.addAll(Activator.getMediaFactory().getAllLocalMixedMediaDbs());
-		this.items.addAll(RemoteMixedMediaDbHelper.getAllRemoteMmdb());
+//		this.items.addAll(RemoteMixedMediaDbHelper.getAllRemoteMmdb());
 	}
 
 	ImageCache imageCache = new ImageCache();
