@@ -13,6 +13,7 @@ public interface IMixedMediaItemStorageLayer extends IMediaItemStorageLayer<IMix
 	IDbColumn SQL_TBL_MEDIAFILES_COL_DADDED    = new DbColumn("added",     "date added",    "DATETIME", "?");
 	IDbColumn SQL_TBL_MEDIAFILES_COL_DMODIFIED = new DbColumn("modified",  "date modified", "DATETIME", "?");
 	IDbColumn SQL_TBL_MEDIAFILES_COL_ENABLED   = new DbColumn("enabled",   null,            "INT(1)",   "1");
+	IDbColumn SQL_TBL_MEDIAFILES_COL_ENABLEDMODIFIED = new DbColumn("enabledmodified",   null,            "DATETIME",   null);
 	IDbColumn SQL_TBL_MEDIAFILES_COL_MISSING   = new DbColumn("missing",   null,            "INT(1)",   "0");
 	IDbColumn SQL_TBL_MEDIAFILES_COL_REMLOC    = new DbColumn("remloc",    null,            "VARCHAR(1000)", "''");
 

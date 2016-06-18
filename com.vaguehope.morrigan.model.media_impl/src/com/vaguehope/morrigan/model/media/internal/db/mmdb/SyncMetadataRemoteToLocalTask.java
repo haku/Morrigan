@@ -120,8 +120,10 @@ public class SyncMetadataRemoteToLocalTask implements MorriganTask {
 			ldb.setTrackDateLastPlayed(localItem, remoteItem.getDateLastPlayed());
 		}
 
-		if (remoteItem.isEnabled() != localItem.isEnabled()) {
-			ldb.setItemEnabled(localItem, remoteItem.isEnabled());
+		final long rEnabledMod = remoteItem.enabledLastModified() != null && remoteItem.enabledLastModified().getTime() > 0L ? remoteItem.enabledLastModified().getTime() : 0L;
+		final long lEnabledMod = localItem.enabledLastModified() != null && localItem.enabledLastModified().getTime() > 0L ? localItem.enabledLastModified().getTime() : 0L;
+		if (remoteItem.isEnabled() != localItem.isEnabled() && rEnabledMod >= lEnabledMod) {
+			ldb.setItemEnabled(localItem, remoteItem.isEnabled(), remoteItem.enabledLastModified());
 		}
 
 		if (localItem.getDuration() <= 0 && remoteItem.getDuration() > 0) {

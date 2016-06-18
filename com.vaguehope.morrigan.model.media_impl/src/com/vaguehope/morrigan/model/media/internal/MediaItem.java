@@ -33,6 +33,7 @@ public abstract class MediaItem implements IMediaItem {
 	private BigInteger hashcode = HASHCODE_DEFAULT;
 	private Date dateLastModified = null;
 	private boolean enabled = ENABLED_DEFAULT;
+	private Date enabledLastModified = null;
 	private boolean missing = MISSING_DEFAULT;
 
 	@Override
@@ -118,9 +119,22 @@ public abstract class MediaItem implements IMediaItem {
 		return this.enabled;
 	}
 	@Override
+	public Date enabledLastModified () {
+		return this.enabledLastModified;
+	}
+	@Override
 	public boolean setEnabled(final boolean enabled) {
 		if (this.enabled != enabled) {
 			this.enabled = enabled;
+			return true;
+		}
+		return false;
+	}
+	@Override
+	public boolean setEnabled (final boolean enabled, final Date lastModified) {
+		if (this.enabled != enabled || !Objs.equals(this.enabledLastModified, lastModified)) {
+			this.enabled = enabled;
+			this.enabledLastModified = lastModified;
 			return true;
 		}
 		return false;
@@ -207,7 +221,7 @@ public abstract class MediaItem implements IMediaItem {
 		this.setDateAdded(null);
 		this.setHashcode(HASHCODE_DEFAULT);
 		this.setDateLastModified(null);
-		this.setEnabled(ENABLED_DEFAULT);
+		this.setEnabled(ENABLED_DEFAULT, null);
 		this.setMissing(MISSING_DEFAULT);
 		this.setDbRowId(DBROWID_DEFAULT);
 		this.setRemoteLocation(null);
@@ -220,7 +234,7 @@ public abstract class MediaItem implements IMediaItem {
     		| this.setDateAdded(mi.getDateAdded())
     		| this.setHashcode(mi.getHashcode())
     		| this.setDateLastModified(mi.getDateLastModified())
-    		| this.setEnabled(mi.isEnabled())
+    		| this.setEnabled(mi.isEnabled(), mi.enabledLastModified())
     		| this.setMissing(mi.isMissing())
     		| this.setDbRowId(mi.getDbRowId())
     		| this.setRemoteLocation(mi.getRemoteLocation());

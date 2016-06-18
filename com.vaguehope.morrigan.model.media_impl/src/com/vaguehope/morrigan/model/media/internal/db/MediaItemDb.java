@@ -569,6 +569,17 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	}
 
 	@Override
+	public void setItemEnabled (final T track, final boolean value, final Date lastModified) throws MorriganException {
+		super.setItemEnabled(track, value, lastModified);
+		try {
+			this.dbLayer.setEnabled(track, value, lastModified);
+		}
+		catch (DbException e) {
+			throw new MorriganException(e);
+		}
+	}
+
+	@Override
 	public void setItemMissing (final T track, final boolean value) throws MorriganException {
 		super.setItemMissing(track, value);
 		try {
@@ -597,7 +608,7 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 			if (track.getDateAdded() != null) this.dbLayer.setDateAdded(track, track.getDateAdded());
 			if (track.getDateLastModified() != null) this.dbLayer.setDateLastModified(track, track.getDateLastModified());
 			this.dbLayer.setRemoteLocation(track, track.getRemoteLocation());
-			this.dbLayer.setEnabled(track, track.isEnabled());
+			this.dbLayer.setEnabled(track, track.isEnabled(), track.enabledLastModified());
 			this.dbLayer.setMissing(track, track.isMissing());
 		}
 		catch (DbException e) {

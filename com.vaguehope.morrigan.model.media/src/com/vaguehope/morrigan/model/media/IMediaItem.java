@@ -33,7 +33,12 @@ public interface IMediaItem extends IDbItem {
 	boolean setDateLastModified(Date lastModified);
 
 	boolean isEnabled();
+	/**
+	 * May return null.
+	 */
+	Date enabledLastModified();
 	boolean setEnabled(boolean enabled);
+	boolean setEnabled(boolean enabled, Date lastModified);
 
 	boolean isMissing();
 	boolean setMissing(boolean missing);

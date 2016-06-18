@@ -302,7 +302,17 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	@Override
 	public void setEnabled (final IMediaItem item, final boolean value) throws DbException {
 		try {
-			local_setEnabled(item, value);
+			local_setEnabled(item, value, true, null);
+		}
+		catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+
+	@Override
+	public void setEnabled (final IMediaItem item, final boolean value, final Date lastModified) throws DbException {
+		try {
+			local_setEnabled(item, value, false, lastModified);
 		}
 		catch (Exception e) {
 			throw new DbException(e);

@@ -283,6 +283,13 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 	}
 
 	@Override
+	public void setItemEnabled (final T track, final boolean value, final Date lastModified) throws MorriganException {
+		track.setEnabled(value, lastModified);
+		getChangeEventCaller().mediaItemsUpdated(track);
+		setDirtyState(DirtyState.METADATA);
+	}
+
+	@Override
 	public void setItemMissing (final T track, final boolean value) throws MorriganException {
 		track.setMissing(value);
 		getChangeEventCaller().mediaItemsUpdated(track);

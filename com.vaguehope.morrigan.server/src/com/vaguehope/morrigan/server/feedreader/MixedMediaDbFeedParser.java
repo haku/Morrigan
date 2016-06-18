@@ -57,6 +57,7 @@ public class MixedMediaDbFeedParser extends DefaultHandler {
 	private IMixedMediaItem currentItem;
 	private StringBuilder currentText;
 
+	private Date enabledLastModified;
 	private final List<String> tagValues = new ArrayList<String>();
 	private final List<TagAttrs> tagAttrs = new ArrayList<TagAttrs>();
 
@@ -65,6 +66,7 @@ public class MixedMediaDbFeedParser extends DefaultHandler {
 		this.stack.push(localName);
 		if (this.stack.size() == 2 && localName.equals("entry")) {
 			this.currentItem = this.rmmdb.getDbLayer().getNewT(null);
+			this.enabledLastModified = null;
 			this.tagValues.clear();
 			this.tagAttrs.clear();
 		}
@@ -82,6 +84,10 @@ public class MixedMediaDbFeedParser extends DefaultHandler {
 					}
 				}
 			}
+		}
+		else if (this.stack.size() == 3 && localName.equals("enabled")) {
+			final String enabledLastModifiedString = StringHelper.trimToNull(attributes.getValue("m"));
+			this.enabledLastModified = enabledLastModifiedString == null ? null : new Date(Long.parseLong(enabledLastModifiedString));
 		}
 		else if (this.stack.size() == 3 && localName.equals("tag")) {
 			final String typeString = attributes.getValue("t");
@@ -174,7 +180,7 @@ public class MixedMediaDbFeedParser extends DefaultHandler {
 		}
 		else if (this.stack.size() == 3 && localName.equals("enabled")) {
 			boolean v = Boolean.parseBoolean(this.currentText.toString().trim());
-			this.currentItem.setEnabled(v);
+			this.currentItem.setEnabled(v, this.enabledLastModified);
 		}
 		else if (this.stack.size() == 3 && localName.equals("missing")) {
 			boolean v = Boolean.parseBoolean(this.currentText.toString().trim());

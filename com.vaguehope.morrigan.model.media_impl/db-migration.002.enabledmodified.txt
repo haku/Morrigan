@@ -1,0 +1,1 @@
+ALTER TABLE tbl_mediafiles ADD COLUMN enabledmodified DATETIME;

@@ -143,6 +143,7 @@ public interface IMediaItemStorageLayer<T extends IMediaItem> extends IGenericDb
 	void setHashcode(IMediaItem item, BigInteger hashcode) throws DbException;
 	void setDateLastModified(IMediaItem item, Date date) throws DbException;
 	void setEnabled(IMediaItem item, boolean value) throws DbException;
+	void setEnabled(IMediaItem item, boolean value, Date lastModified) throws DbException;
 	void setMissing(IMediaItem item, boolean value) throws DbException;
 	void setRemoteLocation(IMediaItem item, String remoteLocation) throws DbException;
 

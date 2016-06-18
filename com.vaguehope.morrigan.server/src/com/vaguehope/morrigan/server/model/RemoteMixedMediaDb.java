@@ -332,6 +332,11 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb implements IRemoteM
 	}
 
 	@Override
+	public void setItemEnabled (final IMixedMediaItem item, final boolean value, final Date lastModified) throws MorriganException {
+		throw new NotImplementedException();
+	}
+
+	@Override
 	public void setItemMissing(final IMixedMediaItem track, final boolean value) throws MorriganException {
 		throw new NotImplementedException();
 	}

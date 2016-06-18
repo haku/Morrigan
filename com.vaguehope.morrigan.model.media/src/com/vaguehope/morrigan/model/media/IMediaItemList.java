@@ -60,6 +60,7 @@ public interface IMediaItemList<T extends IMediaItem> {
 	void setItemHashCode (T item, BigInteger hashcode) throws MorriganException;
 	void setItemDateLastModified (T item, Date date) throws MorriganException;
 	void setItemEnabled (T item, boolean value) throws MorriganException;
+	void setItemEnabled (T item, boolean value, Date lastModified) throws MorriganException;
 	void setItemMissing (T item, boolean value) throws MorriganException;
 	void setRemoteLocation (T track, String remoteLocation) throws MorriganException;
 	void persistTrackData (T track) throws MorriganException;

@@ -22,7 +22,7 @@ class SearchParser {
 	private static final Pattern SEARCH_TERM_FINDER = Pattern.compile("([^\\s　]*\"[^\"]+\"[^\\s　]*|[^\\s　]*'[^']+'[^\\s　]*|[^\\s　]+)");
 
 	private static final String _SQL_MEDIAFILES_SELECT =
-			"SELECT id,file,type,md5,added,modified,enabled,missing,remloc,startcnt,endcnt,lastplay,duration,width,height"
+			"SELECT id,file,type,md5,added,modified,enabled,enabledmodified,missing,remloc,startcnt,endcnt,lastplay,duration,width,height"
 					+ " FROM tbl_mediafiles";
 
 	private static final String _SQL_WHERE = " WHERE";
