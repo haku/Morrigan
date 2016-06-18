@@ -26,23 +26,23 @@ db_uri="$mn_uri/mlists/LOCALMMDB/${db_name}.local.db3"
 
 do_dump() {
   items_uri="${db_uri}/items?includeddeletedtags=true"
-  curl --silent "$items_uri"
+  curl --fail --silent "$items_uri"
 }
 
 do_remotes() {
-  res="$(curl --silent "$db_uri")"
+  res="$(curl --fail --silent "$db_uri")"
   echo "$res" | awk 'match($0, /<remote>([^<]+)<\/remote>/, a) {print a[1]}'
 }
 
 do_pull() {
   if [ -z "$remote_name" ] ; then print_help ; fi
-  res="$(curl --silent -d "action=pull&remote=${remote_name}" "$db_uri")"
+  res="$(curl --fail --silent -d "action=pull&remote=${remote_name}" "$db_uri")"
   task_id="$(echo "$res" | awk -F= '/^id=/ {print $2}')"
   echo "Waiting for task ${task_id} ..."
   task_uri="$mn_uri/status/$task_id"
   res=""
   while true ; do
-    res="$(curl --silent "$task_uri")"
+    res="$(curl --fail --silent "$task_uri")"
     state="$(echo "$res" | awk 'match($0, /<state>([^<]+)<\/state>/, a) {print a[1]}')"
     if [ "$state" = "COMPLETE" ] ; then break ; fi
     echo -n '.'
