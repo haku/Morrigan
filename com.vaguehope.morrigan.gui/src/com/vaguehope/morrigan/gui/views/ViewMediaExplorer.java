@@ -115,7 +115,7 @@ public class ViewMediaExplorer extends ViewPart {
 
 	private void addToolbar () {
 		getViewSite().getActionBars().getToolBarManager().add(new NewMixedDbAction(getViewSite().getWorkbenchWindow()));
-		getViewSite().getActionBars().getToolBarManager().add(new NewRemoteMixedDbAction(getViewSite().getWorkbenchWindow()));
+//		getViewSite().getActionBars().getToolBarManager().add(new NewRemoteMixedDbAction(getViewSite().getWorkbenchWindow()));
 	}
 
 	private void makeContextMenu () {
