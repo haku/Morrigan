@@ -22,6 +22,7 @@ containsElement() {
 }
 
 
+DIR="$(dirname "$(readlink -f -- "$0")")"
 HOST="$(hostname)"
 
 mn_cfg_dir="$HOME/.morrigan"
@@ -32,8 +33,7 @@ mkdir -p "$remotes_dir"
 public_key="$mn_cfg_dir/keys/${HOST}-public.pem"
 private_key="$mn_cfg_dir/keys/${HOST}-private.pem"
 
-mndbs=( "$HOME"/opt/morrigan*/mndb )
-mndb="${mndbs[0]}"
+mndb="$DIR/mndb"
 if ! [ -e "$mndb" ] ; then
   log "Not found: $mndb"
   exit 1

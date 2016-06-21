@@ -5,6 +5,7 @@ shopt -s failglob
 # Generate keys:
 # cd ~/.morrigan/keys
 # openssl genpkey -out "${HOST}-private.pem" -outform PEM -algorithm RSA -pkeyopt rsa_keygen_bits:4096
+# chmod 400 "${HOST}-private.pem"
 # openssl req -x509 -days 365 -new -subj "/C=XX/ST=X/L=X/O=X/OU=X/CN=${HOST}" -key "${HOST}-private.pem" -out "${HOST}-public.pem"
 
 log() {
@@ -19,13 +20,13 @@ mtime() {
   fi
 }
 
+DIR="$(dirname "$(readlink -f -- "$0")")"
 HOST="$(hostname)"
 
 mn_cfg_dir="$HOME/.morrigan"
 dropbox_dir="$HOME/Dropbox/Apps/morrigan"
 
-mndbs=( "$HOME"/opt/morrigan*/mndb )
-mndb="${mndbs[0]}"
+mndb="$DIR/mndb"
 if ! [ -e "$mndb" ] ; then
   log "Not found: $mndb"
   exit 1
