@@ -344,6 +344,7 @@ MnApi = {};
     }
     else {
       item.relativeUrl = href;
+      item.url = '/mlists/' + mid + '/items/' + item.relativeUrl;
     }
 
     item.tags = [];
@@ -353,8 +354,6 @@ MnApi = {};
         item.tags.push(node.text());
       }
     });
-
-    item.url = '/mlists/' + mid + '/items/' + item.relativeUrl;
 
     return item;
   }

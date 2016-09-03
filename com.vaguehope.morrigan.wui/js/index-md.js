@@ -263,7 +263,7 @@
 
   function enqueueAllClicked() {
     if (!currentDbResults || !selectedPlayer) return;
-    var enabledResults = jQuery.grep(currentDbResults, function(item){return item.enabled});
+    var enabledResults = jQuery.grep(currentDbResults, function(item){return item.enabled && item.url});
     MnApi.enqueueItems(enabledResults, selectedPlayer.listView, selectedPlayer.pid, msgHandler, function(msg) {
       console.log(msg);
     });
@@ -271,7 +271,7 @@
   }
 
   function enqueueViewClicked() {
-    if (!currentDbMid || !currentDbQuery || !currentDbResults || !selectedPlayer) return;
+    if (!currentDbMid || !currentDbResults || !selectedPlayer) return;
     MnApi.enqueueView(currentDbMid, currentDbQuery, selectedPlayer.pid, msgHandler, function(msg) {
       console.log(msg);
     });
