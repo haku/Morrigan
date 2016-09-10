@@ -26,23 +26,35 @@ db_uri="$mn_uri/mlists/LOCALMMDB/${db_name}.local.db3"
 
 do_dump() {
   items_uri="${db_uri}/items?includeddeletedtags=true"
-  curl --fail --silent "$items_uri"
+  if ! curl --fail --silent "$items_uri" ; then
+    echo "Morrigan API request failed." >&2
+    exit 1
+  fi
 }
 
 do_remotes() {
-  res="$(curl --fail --silent "$db_uri")"
+  if ! res="$(curl --fail --silent "$db_uri")" ; then
+    echo "Morrigan API request failed." >&2
+    exit 1
+  fi
   echo "$res" | awk 'match($0, /<remote>([^<]+)<\/remote>/, a) {print a[1]}'
 }
 
 do_pull() {
   if [ -z "$remote_name" ] ; then print_help ; fi
-  res="$(curl --fail --silent -d "action=pull&remote=${remote_name}" "$db_uri")"
+  if ! res="$(curl --fail --silent -d "action=pull&remote=${remote_name}" "$db_uri")" ; then
+    echo "Morrigan API request failed." >&2
+    exit 1
+  fi
   task_id="$(echo "$res" | awk -F= '/^id=/ {print $2}')"
   echo "Waiting for task ${task_id} ..."
   task_uri="$mn_uri/status/$task_id"
   res=""
   while true ; do
-    res="$(curl --fail --silent "$task_uri")"
+    if ! res="$(curl --fail --silent "$task_uri")" ; then
+      echo "Morrigan API request failed." >&2
+      exit 1
+    fi
     state="$(echo "$res" | awk 'match($0, /<state>([^<]+)<\/state>/, a) {print a[1]}')"
     if [ "$state" = "COMPLETE" ] ; then break ; fi
     echo -n '.'
