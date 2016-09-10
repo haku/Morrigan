@@ -39,6 +39,7 @@ for db_file in "${db_files[@]}" ; do
   db_basename="$(basename "$db_file")"
   db_name="${db_basename%.local.db3}"
   out="$dropbox_dir/${HOST}-${db_name}.xml.cms"
+  out_tmp="$(mktemp).xml.cms"
 
   db_mtime="$(mtime "$db_file")"
   out_mtime="$(mtime "$out")"
@@ -47,7 +48,8 @@ for db_file in "${db_files[@]}" ; do
     log "$db_name > $out ..."
     $mndb dump "$db_name" \
       | gzip \
-      | openssl cms -encrypt -binary -aes256 -outform der -out "$out" "${keys[@]}"
+      | openssl cms -encrypt -binary -aes256 -outform der -out "$out_tmp" "${keys[@]}"
+    mv "$out_tmp" "$out"
   else
     log "$db_name unchanged."
   fi
