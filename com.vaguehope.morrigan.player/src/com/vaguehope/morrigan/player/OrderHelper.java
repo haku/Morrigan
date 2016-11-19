@@ -68,8 +68,8 @@ public final class OrderHelper {
 		}
 
 		public static String joinLabels (final String sep) {
-			PlaybackOrder[] a = values();
-			StringBuilder b = new StringBuilder(a[0].toString());
+			final PlaybackOrder[] a = values();
+			final StringBuilder b = new StringBuilder(a[0].toString());
 			for (int i = 1; i < a.length; i++) {
 				b.append(sep).append(a[i].toString());
 			}
@@ -81,15 +81,15 @@ public final class OrderHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	public static PlaybackOrder parsePlaybackOrder (final String s) {
-		for (PlaybackOrder o : PlaybackOrder.values()) {
+		for (final PlaybackOrder o : PlaybackOrder.values()) {
 			if (s.equals(o.toString())) return o;
 		}
 		throw new IllegalArgumentException("Unknown order mode toString: " + s);
 	}
 
 	public static PlaybackOrder forceParsePlaybackOrder (final String s) {
-		String arg = s.toLowerCase();
-		for (PlaybackOrder o : PlaybackOrder.values()) {
+		final String arg = s.toLowerCase();
+		for (final PlaybackOrder o : PlaybackOrder.values()) {
 			if (o.toString().toLowerCase().contains(arg)) {
 				return o;
 			}
@@ -98,7 +98,7 @@ public final class OrderHelper {
 	}
 
 	public static PlaybackOrder parsePlaybackOrderByName (final String s) {
-		for (PlaybackOrder o : PlaybackOrder.values()) {
+		for (final PlaybackOrder o : PlaybackOrder.values()) {
 			if (s.equals(o.name())) return o;
 		}
 		throw new IllegalArgumentException("Unknown order mode name: " + s);
@@ -135,7 +135,7 @@ public final class OrderHelper {
 
 	private static IMediaTrack getNextTrackSequencial (final IMediaTrackList<? extends IMediaTrack> list, final IMediaItem track) {
 		IMediaTrack ret = null;
-		List<? extends IMediaTrack> mediaTracks = list.getMediaItems();
+		final List<? extends IMediaTrack> mediaTracks = list.getMediaItems();
 
 		int i;
 		if (track != null && mediaTracks.contains(track)) {
@@ -172,11 +172,11 @@ public final class OrderHelper {
 	}
 
 	private static IMediaTrack getNextTrackRandom (final IMediaTrackList<? extends IMediaTrack> list, final IMediaItem current) {
-		Random generator = new Random();
-		List<? extends IMediaTrack> mediaTracks = list.getMediaItems();
+		final Random generator = new Random();
+		final List<? extends IMediaTrack> mediaTracks = list.getMediaItems();
 
 		int n = 0;
-		for (IMediaTrack i : mediaTracks) {
+		for (final IMediaTrack i : mediaTracks) {
 			if (validChoice(i, current)) {
 				n++;
 			}
@@ -184,7 +184,7 @@ public final class OrderHelper {
 		if (n == 0) return null;
 
 		long x = Math.round(generator.nextDouble() * n);
-		for (IMediaTrack i : mediaTracks) {
+		for (final IMediaTrack i : mediaTracks) {
 			if (validChoice(i, current)) {
 				x--;
 				if (x <= 0) {
@@ -198,11 +198,11 @@ public final class OrderHelper {
 
 	private static IMediaTrack getNextTrackByStartCount (final IMediaTrackList<? extends IMediaTrack> list, final IMediaItem current) {
 		IMediaTrack ret = null;
-		List<? extends IMediaTrack> tracks = list.getMediaItems();
+		final List<? extends IMediaTrack> tracks = list.getMediaItems();
 
 		// Find highest play count.
 		long maxPlayCount = -1;
-		for (IMediaTrack i : tracks) {
+		for (final IMediaTrack i : tracks) {
 			if (i.getStartCount() > maxPlayCount && validChoice(i, current)) {
 				maxPlayCount = i.getStartCount();
 			}
@@ -214,18 +214,18 @@ public final class OrderHelper {
 
 		// Find sum of all selection indicies.
 		long selIndexSum = 0;
-		for (IMediaTrack i : tracks) {
+		for (final IMediaTrack i : tracks) {
 			if (validChoice(i, current)) {
 				selIndexSum = selIndexSum + (maxPlayCount - i.getStartCount());
 			}
 		}
 
 		// Generate target selection index.
-		Random generator = new Random();
+		final Random generator = new Random();
 		long targetIndex = Math.round(generator.nextDouble() * selIndexSum);
 
 		// Find the target item.
-		for (IMediaTrack i : tracks) {
+		for (final IMediaTrack i : tracks) {
 			if (validChoice(i, current)) {
 				targetIndex = targetIndex - (maxPlayCount - i.getStartCount());
 				if (targetIndex <= 0) {
@@ -244,13 +244,13 @@ public final class OrderHelper {
 
 	private static IMediaTrack getNextTrackByLastPlayedDate (final IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack current) {
 		IMediaTrack ret = null;
-		List<? extends IMediaTrack> tracks = list.getMediaItems();
-		Date now = new Date();
+		final List<? extends IMediaTrack> tracks = list.getMediaItems();
+		final Date now = new Date();
 
 		// Find oldest date.
 		Date maxAge = new Date();
 		int n = 0;
-		for (IMediaTrack i : tracks) {
+		for (final IMediaTrack i : tracks) {
 			if (validChoice(i, current)) {
 				if (i.getDateLastPlayed() != null && i.getDateLastPlayed().before(maxAge)) {
 					maxAge = i.getDateLastPlayed();
@@ -261,11 +261,11 @@ public final class OrderHelper {
 		if (n == 0) { // No playable items.
 			return null;
 		}
-		long maxAgeDays = dateDiffDays(maxAge, now);
+		final long maxAgeDays = dateDiffDays(maxAge, now);
 
 		// Build sum of all selection-indicies in units of days.
 		long sumAgeDays = 0;
-		for (IMediaTrack i : tracks) {
+		for (final IMediaTrack i : tracks) {
 			if (validChoice(i, current)) {
 				if (i.getDateLastPlayed() != null) {
 					sumAgeDays = sumAgeDays + dateDiffDays(i.getDateLastPlayed(), now);
@@ -277,11 +277,11 @@ public final class OrderHelper {
 		}
 
 		// Generate target selection index.
-		Random generator = new Random();
+		final Random generator = new Random();
 		long targetIndex = Math.round(generator.nextDouble() * sumAgeDays);
 
 		// Find the target item.
-		for (IMediaTrack i : tracks) {
+		for (final IMediaTrack i : tracks) {
 			if (validChoice(i, current)) {
 				if (i.getDateLastPlayed() != null) {
 					targetIndex = targetIndex - dateDiffDays(i.getDateLastPlayed(), now);
