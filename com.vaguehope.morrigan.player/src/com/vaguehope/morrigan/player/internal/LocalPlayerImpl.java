@@ -28,6 +28,7 @@ import com.vaguehope.morrigan.player.AbstractPlayer;
 import com.vaguehope.morrigan.player.LocalPlayer;
 import com.vaguehope.morrigan.player.LocalPlayerSupport;
 import com.vaguehope.morrigan.player.OrderHelper;
+import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlayerRegister;
 
@@ -142,23 +143,25 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 		final PlayItem queueItem = this.getQueue().takeFromQueue();
 		if (queueItem != null) return queueItem;
 
-		if (getCurrentItem() != null && getCurrentItem().hasList()) {
-			if (getCurrentItem().hasTrack()) {
-				final IMediaTrack nextTrack = OrderHelper.getNextTrack(getCurrentItem().getList(), getCurrentItem().getTrack(), getPlaybackOrder());
-				if (nextTrack != null) {
-					return new PlayItem(getCurrentItem().getList(), nextTrack);
-				}
+		final PlayItem currentItem = getCurrentItem();
+		final PlaybackOrder playbackOrder = getPlaybackOrder();
+
+		if (currentItem != null && currentItem.isComplete()) {
+			final IMediaTrack nextTrack = OrderHelper.getNextTrack(currentItem.getList(), currentItem.getTrack(), playbackOrder);
+			if (nextTrack != null) {
+				return new PlayItem(currentItem.getList(), nextTrack);
 			}
+			this.logger.info(String.format("OrderHelper.getNextTrack(%s,%s,%s) == null.",
+					currentItem.getList(), currentItem.getTrack(), playbackOrder));
 		}
-		else {
-			final IMediaTrackList<? extends IMediaTrack> currentList = getCurrentList();
-			if (currentList != null) {
-				final IMediaTrack nextTrack = OrderHelper.getNextTrack(currentList, null, getPlaybackOrder());
-				if (nextTrack != null) {
-					return new PlayItem(currentList, nextTrack);
-				}
-			}
+
+		final IMediaTrackList<? extends IMediaTrack> currentList = getCurrentList();
+		final IMediaTrack nextTrack = OrderHelper.getNextTrack(currentList, null, playbackOrder);
+		if (nextTrack != null) {
+			return new PlayItem(currentList, nextTrack);
 		}
+		this.logger.info(String.format("OrderHelper.getNextTrack(%s,%s,%s) == null.",
+				currentList, null, playbackOrder));
 
 		return null;
 	}
