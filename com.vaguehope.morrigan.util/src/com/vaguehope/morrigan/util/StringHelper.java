@@ -9,9 +9,9 @@ public class StringHelper {
 	private StringHelper () { /* UNUSED */}
 
 	public static <T> String joinCollection (final Collection<T> collection, final String delim) {
-		StringBuilder sb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 
-		for (T i : collection) {
+		for (final T i : collection) {
 			sb.append(i.toString());
 			sb.append(delim);
 		}
@@ -56,6 +56,11 @@ public class StringHelper {
 	public static String removeStart (final String s, final String remove) {
 		if (s.startsWith(remove)) return s.substring(remove.length());
 		return s;
+	}
+
+	public static boolean sameButDifferentCase (final String a, final String b) {
+		if (Objs.equals(a, b)) return false;
+		return a != null && a.equalsIgnoreCase(b);
 	}
 
 }

@@ -42,8 +42,8 @@ public interface IMediaItemDb<S extends IMediaItemStorageLayer<T>, T extends IMe
 	T getByHashcode (BigInteger hashcode) throws DbException;
 
 	T addFile (File file) throws MorriganException, DbException;
-	boolean hasFile (String filepath) throws MorriganException, DbException;
-	boolean hasFile (File file) throws MorriganException, DbException;
+	FileExistance hasFile (String filepath) throws MorriganException, DbException;
+	FileExistance hasFile (File file) throws MorriganException, DbException;
 	List<T> addFiles (List<File> files) throws MorriganException, DbException;
 
 	IDbColumn getSort ();

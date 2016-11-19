@@ -13,6 +13,7 @@ import java.util.List;
 
 import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.db.IDbItem;
+import com.vaguehope.morrigan.model.media.FileExistance;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
@@ -123,8 +124,8 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 //	-  -  -  -  -  -  -  -  -  -  -  -
 //	Adding and removing tracks.
 
-	private static final String SQL_TBL_MEDIAFILES_Q_EXISTS =
-		"SELECT count(*) FROM tbl_mediafiles WHERE file=? COLLATE NOCASE;";
+	private static final String SQL_TBL_MEDIAFILES_Q_MISSING =
+		"SELECT missing FROM tbl_mediafiles WHERE file=?;";
 
 //	TODO move to helper / where DbColumn is defined?
 	// WARNING: consuming code assumes the order of parameters in the generated SQL.
@@ -172,6 +173,10 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 
 //	-  -  -  -  -  -  -  -  -  -  -  -
 //	Setting MediaItem data.
+
+	private static final String SQL_TBL_MEDIAFILES_SETFILE =
+		"UPDATE tbl_mediafiles SET file=?" +
+		" WHERE file=?;";
 
 	private static final String SQL_TBL_MEDIAFILES_SETDATEADDED =
 		"UPDATE tbl_mediafiles SET added=?" +
@@ -299,28 +304,26 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Media queries.
 
-	protected boolean local_hasFile (final String filePath) throws SQLException, ClassNotFoundException {
-		PreparedStatement ps;
-		ResultSet rs;
-
-		int n;
-		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_Q_EXISTS);
+	protected FileExistance local_hasFile (final String filePath) throws SQLException, ClassNotFoundException, DbException {
+		final PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_Q_MISSING);
 		try {
 			ps.setString(1, filePath);
-			rs = ps.executeQuery();
+			final ResultSet rs = ps.executeQuery();
 			try {
-				n = 0;
 				if (rs.next()) {
-					n = rs.getInt(1);
+					final boolean missing = rs.getInt(1) == 1; // default to false.
+					if (rs.next()) throw new DbException(String.format("Path %s in DB more than once.", filePath));
+					return missing ? FileExistance.MISSING : FileExistance.EXISTS;
 				}
-			} finally {
+				return FileExistance.UNKNOWN;
+			}
+			finally {
 				rs.close();
 			}
-		} finally {
+		}
+		finally {
 			ps.close();
 		}
-
-		return (n > 0);
 	}
 
 	protected IMixedMediaItem local_getByFile (final String filePath) throws SQLException, ClassNotFoundException {
@@ -380,7 +383,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 		PreparedStatement ps;
 
 		int n;
-		if (!local_hasFile(filePath)) {
+		if (!local_hasFile(filePath).isKnown()) {
 			String sql = this.sqlTblMediaFilesAdd.toString();
 			ps = getDbCon().prepareStatement(sql);
 			try {
@@ -403,39 +406,84 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 		return false;
 	}
 
-	protected boolean[] local_addFiles (final List<File> files) throws SQLException, ClassNotFoundException {
-		PreparedStatement ps;
-		int[] n;
+	protected boolean[] local_addFiles (final List<File> filesToAdd) throws SQLException, ClassNotFoundException, DbException {
+		final boolean[] ret = new boolean[filesToAdd.size()];
+		final List<File> unknownFiles = new ArrayList<File>(filesToAdd.size());
 
-		String sql = this.sqlTblMediaFilesAdd.toString();
-		ps = getDbCon().prepareStatement(sql);
+		for (int i = 0; i < filesToAdd.size(); i++) {
+			final File file = filesToAdd.get(i);
+
+			if (file == null) throw new IllegalArgumentException("File can not be null.");
+
+			final String filePath = file.getAbsolutePath();
+			if (filePath == null || filePath.isEmpty()) throw new IllegalArgumentException("filePath is null or empty: " + filePath);
+
+			switch (local_hasFile(filePath)) {
+				case UNKNOWN:
+					unknownFiles.add(file);
+					break;
+				case MISSING:
+					// A long long time ago, I thought it would be a good idea to make the file column NOCASE.
+					// This means if a path changes case, the new file can not be inserted along side the old one.
+					// Hopefully it will not happen to often, so not worried about performance.
+					local_renameFile(filePath, filePath);
+					ret[i] = true;
+					unknownFiles.add(null); // Placeholder.
+					break;
+				default:
+					ret[i] = false;
+					unknownFiles.add(null); // Placeholder.
+					break;
+			}
+		}
+
+		if (filesToAdd.size() != unknownFiles.size()) throw new IllegalStateException("filesToAdd.size() != unknownFiles.size()");
+
+		final PreparedStatement ps = getDbCon().prepareStatement(this.sqlTblMediaFilesAdd.toString());
 		try {
-			for (File file : files) {
-				if (file == null) throw new IllegalArgumentException("File can not be null.");
-
-				String filePath = file.getAbsolutePath();
-				if (filePath == null || filePath.isEmpty()) throw new IllegalArgumentException("filePath is null or empty: " + filePath);
-
-				if (!local_hasFile(filePath)) {
-					// WARNING: this assumes the order of parameters in the above SQL.
-					ps.setString(1, filePath);
-					ps.setInt(2, MediaType.UNKNOWN.getN());
-					ps.setDate(3, new java.sql.Date(new Date().getTime()));
-					ps.setDate(4, new java.sql.Date(file.lastModified()));
-					ps.addBatch();
-				}
+			for (final File file : unknownFiles) {
+				if (file == null) continue; // Ignore placeholders.
+				// WARNING: this assumes the order of parameters in the above SQL.
+				ps.setString(1, file.getAbsolutePath());
+				ps.setInt(2, MediaType.UNKNOWN.getN());
+				ps.setDate(3, new java.sql.Date(new Date().getTime()));
+				ps.setDate(4, new java.sql.Date(file.lastModified()));
+				ps.addBatch();
 			}
 
-			n = ps.executeBatch();
+			final int[] batchRes = ps.executeBatch();
 
-			boolean[] b = new boolean[n.length];
-			final List<File> added = new ArrayList<File>();
-			for (int i = 0; i < n.length; i++) {
-				b[i] = (n[i] > 0 || n[i] == Statement.SUCCESS_NO_INFO);
-				if (b[i]) added.add(files.get(i));
+			final List<File> addedFiles = new ArrayList<File>();
+			int ri = 0;
+
+			for (int fi = 0; fi < unknownFiles.size(); fi++) {
+				final File file = unknownFiles.get(fi);
+				if (file == null) continue;
+
+				final int result = batchRes[ri];
+				ri++;
+
+				final boolean successfullyAdded = (result > 0 || result == Statement.SUCCESS_NO_INFO);
+				if (successfullyAdded) addedFiles.add(file);
+				ret[fi] = successfullyAdded;
 			}
-			getChangeEventCaller().mediaItemsAdded(added);
-			return b;
+
+			getChangeEventCaller().mediaItemsAdded(addedFiles);
+
+			return ret;
+		}
+		finally {
+			ps.close();
+		}
+	}
+
+	protected void local_renameFile (final String oldPath, final String newPath) throws SQLException, ClassNotFoundException, DbException {
+		final PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETFILE);
+		try {
+			ps.setString(1, newPath);
+			ps.setString(2, oldPath);
+			final int n = ps.executeUpdate();
+			if (n < 1) throw new DbException("No update occured for local_renameFile('" + oldPath + "','" + newPath + "').");
 		}
 		finally {
 			ps.close();
@@ -454,7 +502,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 			ps.close();
 		}
 
-		if (ret == 1) getChangeEventCaller().mediaItemRemoved(sfile);
+		if (ret > 0) getChangeEventCaller().mediaItemRemoved(sfile);
 
 		return ret;
 	}
@@ -471,7 +519,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 			ps.close();
 		}
 
-		if (ret == 1) getChangeEventCaller().mediaItemRemoved(null); // FIXME pass a useful parameter here.
+		if (ret > 0) getChangeEventCaller().mediaItemRemoved(null); // FIXME pass a useful parameter here.
 
 		return ret;
 	}

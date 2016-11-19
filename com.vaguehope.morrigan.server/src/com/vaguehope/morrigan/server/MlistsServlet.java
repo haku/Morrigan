@@ -268,7 +268,7 @@ public class MlistsServlet extends HttpServlet {
 	private void postToMmdb (final HttpServletRequest req, final HttpServletResponse resp, final String action, final IMixedMediaDb mmdb, final String path, final String afterPath) throws IOException, MorriganException, DbException {
 		if (path != null && path.equals(PATH_ITEMS) && afterPath != null && afterPath.length() > 0) {
 			final String filepath = URLDecoder.decode(afterPath, "UTF-8");
-			if (mmdb.hasFile(filepath)) {
+			if (mmdb.hasFile(filepath).isKnown()) {
 				final IMixedMediaItem item = mmdb.getByFile(filepath);
 				if (item != null) {
 					postToMmdbItem(req, resp, action, mmdb, item);
@@ -503,7 +503,7 @@ public class MlistsServlet extends HttpServlet {
 			if (afterPath != null && afterPath.length() > 0) {
 				// Request to fetch media file.
 				final String filepath = URLDecoder.decode(afterPath, "UTF-8");
-				if (mmdb.hasFile(filepath)) {
+				if (mmdb.hasFile(filepath).isKnown()) {
 					final IMixedMediaItem item = mmdb.getByFile(filepath);
 					final boolean asDownload = item.getMediaType() == MediaType.TRACK;
 					final File file = new File(filepath);

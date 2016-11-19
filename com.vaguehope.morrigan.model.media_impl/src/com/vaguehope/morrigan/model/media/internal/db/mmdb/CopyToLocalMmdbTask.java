@@ -16,7 +16,7 @@ import com.vaguehope.morrigan.tasks.TaskResult.TaskOutcome;
 import com.vaguehope.morrigan.util.ChecksumHelper;
 
 /**
- * 
+ *
  * @param <T>
  *            the type of the source list.
  */
@@ -27,7 +27,7 @@ public class CopyToLocalMmdbTask<T extends IMediaItem> implements MorriganTask {
 	private final Collection<T> itemsToCopy;
 	private final ILocalMixedMediaDb toDb;
 
-	public CopyToLocalMmdbTask (IMediaItemList<T> fromList, Collection<T> itemsToCopy, ILocalMixedMediaDb toDb) {
+	public CopyToLocalMmdbTask (final IMediaItemList<T> fromList, final Collection<T> itemsToCopy, final ILocalMixedMediaDb toDb) {
 		this.fromList = fromList;
 		this.itemsToCopy = itemsToCopy;
 		this.toDb = toDb;
@@ -41,7 +41,7 @@ public class CopyToLocalMmdbTask<T extends IMediaItem> implements MorriganTask {
 	}
 
 	@Override
-	public TaskResult run (TaskEventListener taskEventListener) {
+	public TaskResult run (final TaskEventListener taskEventListener) {
 		TaskResult ret = null;
 
 		try {
@@ -64,7 +64,7 @@ public class CopyToLocalMmdbTask<T extends IMediaItem> implements MorriganTask {
 				// TODO FIXME re-write remote path with URL we fetched it from?  Perhaps this should be returned from copyItemFile()?
 
 				// TODO these next few methods should really be combined into a single method in MediaItemDb.
-				if (this.toDb.getDbLayer().hasFile(coFile)) {
+				if (this.toDb.getDbLayer().hasFile(coFile).isKnown()) {
 					this.toDb.getDbLayer().removeFile(coFile.getAbsolutePath());
 				}
 				IMixedMediaItem addedItem = this.toDb.addFile(coFile);
@@ -94,7 +94,7 @@ public class CopyToLocalMmdbTask<T extends IMediaItem> implements MorriganTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	// TODO extract this to config?
-	private static File getCheckoutDirectory (ILocalMixedMediaDb db) {
+	private static File getCheckoutDirectory (final ILocalMixedMediaDb db) {
 		String configDir = Config.getConfigDir();
 
 		File coDir = new File(configDir, "checkout");
@@ -114,7 +114,7 @@ public class CopyToLocalMmdbTask<T extends IMediaItem> implements MorriganTask {
 		return dbCoDir;
 	}
 
-	private static File getCheckoutItemDirectory (File coDir, IMediaItem item) {
+	private static File getCheckoutItemDirectory (final File coDir, final IMediaItem item) {
 		String srcPath = item.getRemoteLocation();
 
 		File dir = new File(coDir, ChecksumHelper.md5String(srcPath));

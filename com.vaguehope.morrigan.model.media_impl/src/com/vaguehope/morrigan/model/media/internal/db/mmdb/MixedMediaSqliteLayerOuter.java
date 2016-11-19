@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 
 import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.db.IDbItem;
+import com.vaguehope.morrigan.model.media.FileExistance;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
@@ -151,7 +152,7 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 //	Media queries.
 
 	@Override
-	public boolean hasFile (final File file) throws DbException {
+	public FileExistance hasFile (final File file) throws DbException {
 		try {
 			return local_hasFile(file.getAbsolutePath());
 		}
@@ -161,7 +162,7 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	}
 
 	@Override
-	public boolean hasFile (final String filePath) throws DbException {
+	public FileExistance hasFile (final String filePath) throws DbException {
 		try {
 			return local_hasFile(filePath);
 		}

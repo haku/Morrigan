@@ -109,8 +109,8 @@ public interface IMediaItemStorageLayer<T extends IMediaItem> extends IGenericDb
 	List<T> getMedia (IDbColumn[] sorts, SortDirection[] directions, boolean hideMissing) throws DbException;
 	List<T> getMedia (IDbColumn[] sorts, SortDirection[] directions, boolean hideMissing, String search) throws DbException;
 
-	boolean hasFile (File file) throws DbException;
-	boolean hasFile (String filePath) throws DbException;
+	FileExistance hasFile (File file) throws DbException;
+	FileExistance hasFile (String filePath) throws DbException;
 	T getByFile (File file) throws DbException;
 	T getByFile (String filePath) throws DbException;
 	T getByHashcode (BigInteger hashcode) throws DbException;

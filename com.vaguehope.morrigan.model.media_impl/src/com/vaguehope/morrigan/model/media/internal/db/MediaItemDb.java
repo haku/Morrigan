@@ -19,6 +19,7 @@ import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.db.IDbItem;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DirtyState;
+import com.vaguehope.morrigan.model.media.FileExistance;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
@@ -388,12 +389,12 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 //	Queries.
 
 	@Override
-	public boolean hasFile (final String filepath) throws MorriganException, DbException {
+	public FileExistance hasFile (final String filepath) throws MorriganException, DbException {
 		return this.dbLayer.hasFile(filepath);
 	}
 
 	@Override
-	public boolean hasFile (final File file) throws MorriganException, DbException {
+	public FileExistance hasFile (final File file) throws MorriganException, DbException {
 		return this.dbLayer.hasFile(file);
 	}
 
