@@ -39,6 +39,7 @@
     <module>com.vaguehope.morrigan.model.media_impl.tests</module>
     <module>com.vaguehope.morrigan.config</module>
     <module>com.vaguehope.morrigan.player</module>
+    <module>com.vaguehope.morrigan.player.tests</module>
 
     <!-- Hotkey engines. -->
     <module>com.vaguehope.morrigan.hotkeyimpl.jintellitype</module>

@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Random;
 
 import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
-import com.vaguehope.morrigan.model.media.IMediaTrackList;
 
 /**
  * TODO move this to internal package. TODO make one big enum based on an
@@ -106,8 +106,8 @@ public final class OrderHelper {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public static IMediaTrack getNextTrack (final IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack track, final PlaybackOrder mode) {
-		if (list.getCount() <= 0) return null;
+	public static IMediaTrack getNextTrack (final IMediaItemList<? extends IMediaTrack> list, final IMediaTrack track, final PlaybackOrder mode) {
+		if (list == null || list.getCount() <= 0) return null;
 
 		switch (mode) {
 			case SEQUENTIAL:
@@ -133,7 +133,7 @@ public final class OrderHelper {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private static IMediaTrack getNextTrackSequencial (final IMediaTrackList<? extends IMediaTrack> list, final IMediaItem track) {
+	private static IMediaTrack getNextTrackSequencial (final IMediaItemList<? extends IMediaTrack> list, final IMediaItem track) {
 		IMediaTrack ret = null;
 		final List<? extends IMediaTrack> mediaTracks = list.getMediaItems();
 
@@ -171,7 +171,7 @@ public final class OrderHelper {
 		return ret;
 	}
 
-	private static IMediaTrack getNextTrackRandom (final IMediaTrackList<? extends IMediaTrack> list, final IMediaItem current) {
+	private static IMediaTrack getNextTrackRandom (final IMediaItemList<? extends IMediaTrack> list, final IMediaItem current) {
 		final Random generator = new Random();
 		final List<? extends IMediaTrack> mediaTracks = list.getMediaItems();
 
@@ -196,7 +196,7 @@ public final class OrderHelper {
 		throw new RuntimeException("Failed to find next track.  This should not happen.");
 	}
 
-	private static IMediaTrack getNextTrackByStartCount (final IMediaTrackList<? extends IMediaTrack> list, final IMediaItem current) {
+	private static IMediaTrack getNextTrackByStartCount (final IMediaItemList<? extends IMediaTrack> list, final IMediaItem current) {
 		IMediaTrack ret = null;
 		final List<? extends IMediaTrack> tracks = list.getMediaItems();
 
@@ -242,7 +242,7 @@ public final class OrderHelper {
 		return ret;
 	}
 
-	private static IMediaTrack getNextTrackByLastPlayedDate (final IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack current) {
+	private static IMediaTrack getNextTrackByLastPlayedDate (final IMediaItemList<? extends IMediaTrack> list, final IMediaTrack current) {
 		IMediaTrack ret = null;
 		final List<? extends IMediaTrack> tracks = list.getMediaItems();
 		final Date now = new Date();
