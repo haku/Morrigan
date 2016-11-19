@@ -124,7 +124,7 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 	public IMediaTrackList<? extends IMediaTrack> getCurrentList () {
 		IMediaTrackList<? extends IMediaTrack> ret = null;
 
-		PlayItem currentItem = getCurrentItem();
+		final PlayItem currentItem = getCurrentItem();
 		if (currentItem != null && currentItem.hasList()) {
 			ret = currentItem.getList();
 		}
@@ -144,16 +144,16 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 
 		if (getCurrentItem() != null && getCurrentItem().hasList()) {
 			if (getCurrentItem().hasTrack()) {
-				IMediaTrack nextTrack = OrderHelper.getNextTrack(getCurrentItem().getList(), getCurrentItem().getTrack(), getPlaybackOrder());
+				final IMediaTrack nextTrack = OrderHelper.getNextTrack(getCurrentItem().getList(), getCurrentItem().getTrack(), getPlaybackOrder());
 				if (nextTrack != null) {
 					return new PlayItem(getCurrentItem().getList(), nextTrack);
 				}
 			}
 		}
 		else {
-			IMediaTrackList<? extends IMediaTrack> currentList = getCurrentList();
+			final IMediaTrackList<? extends IMediaTrack> currentList = getCurrentList();
 			if (currentList != null) {
-				IMediaTrack nextTrack = OrderHelper.getNextTrack(currentList, null, getPlaybackOrder());
+				final IMediaTrack nextTrack = OrderHelper.getNextTrack(currentList, null, getPlaybackOrder());
 				if (nextTrack != null) {
 					return new PlayItem(currentList, nextTrack);
 				}
@@ -233,7 +233,7 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 		if (eng!=null) {
 			try {
 				eng.stopPlaying();
-			} catch (PlaybackException e) {
+			} catch (final PlaybackException e) {
 				e.printStackTrace();
 			}
 			eng.unloadFile();
@@ -254,7 +254,7 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 		final File file = new File(item.getTrack().getFilepath());
 		if (!file.exists()) throw new MorriganException("File not found for item " + item + ": " + file.getAbsolutePath());
 
-		IPlaybackEngine engine = getPlaybackEngine(true);
+		final IPlaybackEngine engine = getPlaybackEngine(true);
 		synchronized (engine) {
 			this.logger.fine("Loading '" + item.getTrack().getTitle() + "'...");
 			setCurrentItem(item);
@@ -276,7 +276,7 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 						getListeners().currentItemChanged(item);
 						saveState();
 					}
-					catch (MorriganException e) {
+					catch (final MorriganException e) {
 						LocalPlayerImpl.this.logger.log(Level.WARNING, "Failed to increment track count.", e);
 					}
 				}
@@ -299,7 +299,7 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 	public void pausePlaying () {
 		try {
 			internal_pausePlaying();
-		} catch (MorriganException e) {
+		} catch (final MorriganException e) {
 			getListeners().onException(e);
 		}
 	}
@@ -311,14 +311,14 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 	public void stopPlaying () {
 		try {
 			internal_stopPlaying();
-		} catch (MorriganException e) {
+		} catch (final MorriganException e) {
 			getListeners().onException(e);
 		}
 	}
 
 	@Override
 	public void nextTrack () {
-		PlayItem nextItemToPlay = getNextItemToPlay();
+		final PlayItem nextItemToPlay = getNextItemToPlay();
 		if (nextItemToPlay != null) {
 //			stopPlaying(); // Is this really needed?
 			loadAndStartPlaying(nextItemToPlay);
@@ -327,7 +327,7 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 
 	@Override
 	public PlayState getPlayState () {
-		IPlaybackEngine eng = getPlaybackEngine(false);
+		final IPlaybackEngine eng = getPlaybackEngine(false);
 		if (eng!=null) {
 			return eng.getPlaybackState();
 		}
@@ -348,7 +348,7 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 	public void seekTo (final double d) {
 		try {
 			internal_seekTo(d);
-		} catch (MorriganException e) {
+		} catch (final MorriganException e) {
 			getListeners().onException(e);
 		}
 	}
@@ -356,7 +356,7 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 	private void internal_pausePlaying () throws MorriganException {
 		final IPlaybackEngine eng = getPlaybackEngine(true);
 		synchronized (eng) {
-			PlayState playbackState = eng.getPlaybackState();
+			final PlayState playbackState = eng.getPlaybackState();
 			if (playbackState == PlayState.PAUSED) {
 				eng.resumePlaying();
 			}
@@ -383,7 +383,7 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 		/* Don't go and make a player engine instance
 		 * just to call stop on it.
 		 */
-		IPlaybackEngine eng = getPlaybackEngine(false);
+		final IPlaybackEngine eng = getPlaybackEngine(false);
 		if (eng != null) {
 			synchronized (eng) {
 				eng.stopPlaying();
@@ -394,7 +394,7 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 	}
 
 	protected void internal_seekTo (final double d) throws MorriganException {
-		IPlaybackEngine eng = getPlaybackEngine(false);
+		final IPlaybackEngine eng = getPlaybackEngine(false);
 		if (eng!=null) {
 			synchronized (eng) {
 				eng.seekTo(d);
@@ -415,14 +415,14 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 			LocalPlayerImpl.this._currentTrackDuration = duration;
 
 			if (duration > 0) {
-				PlayItem c = getCurrentItem();
+				final PlayItem c = getCurrentItem();
 				if (c != null && c.isComplete()) {
 					if (c.getTrack().getDuration() != duration) {
 						try {
 							LocalPlayerImpl.this.logger.fine("setting item duration=" + duration);
 							c.getList().setTrackDuration(c.getTrack(), duration);
 						}
-						catch (MorriganException e) {
+						catch (final MorriganException e) {
 							LocalPlayerImpl.this.logger.log(Level.WARNING, "Failed to update track duration.", e);
 						}
 					}
@@ -443,12 +443,12 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 			// Inc. stats.
 			try {
 				getCurrentItem().getList().incTrackEndCnt(getCurrentItem().getTrack());
-			} catch (MorriganException e) {
+			} catch (final MorriganException e) {
 				getListeners().onException(e);
 			}
 
 			// Play next track?
-			PlayItem nextItemToPlay = getNextItemToPlay();
+			final PlayItem nextItemToPlay = getNextItemToPlay();
 			if (nextItemToPlay != null) {
 				loadAndStartPlaying(nextItemToPlay);
 			}
@@ -482,7 +482,7 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 
 	@Override
 	public void setVideoFrameParent(final Composite cmfp) {
-		IPlaybackEngine engine = getPlaybackEngine(false);
+		final IPlaybackEngine engine = getPlaybackEngine(false);
 		synchronized (engine) {
 			engine.setVideoFrameParent(cmfp);
 		}
