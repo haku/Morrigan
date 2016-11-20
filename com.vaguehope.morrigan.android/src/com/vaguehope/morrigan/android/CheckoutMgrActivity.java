@@ -1,27 +1,30 @@
 package com.vaguehope.morrigan.android;
 
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemLongClickListener;
-import android.widget.ArrayAdapter;
-import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.ListView;
-
 import com.vaguehope.morrigan.android.helper.DialogHelper;
 import com.vaguehope.morrigan.android.helper.DialogHelper.Listener;
 import com.vaguehope.morrigan.android.helper.StringHelper;
 import com.vaguehope.morrigan.android.model.ServerReference;
 import com.vaguehope.morrigan.android.state.Checkout;
 import com.vaguehope.morrigan.android.state.ConfigDb;
+
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 
 public class CheckoutMgrActivity extends Activity {
 
@@ -40,6 +43,9 @@ public class CheckoutMgrActivity extends Activity {
 		lstCheckouts.setAdapter(this.checkoutsAdapter);
 		lstCheckouts.setOnItemClickListener(this.checkoutsListCickListener);
 		lstCheckouts.setOnItemLongClickListener(this.checkoutsListLongCickListener);
+
+		final Button btnSyncNow = (Button) findViewById(R.id.btnSyncNow);
+		btnSyncNow.setOnClickListener(this.syncNowClickListener);
 
 		reloadCheckouts();
 	}
@@ -78,6 +84,13 @@ public class CheckoutMgrActivity extends Activity {
 		public boolean onItemLongClick (final AdapterView<?> parent, final View view, final int position, final long id) {
 			askDeleteCheckout(getCheckoutsAdapter().getItem(position));
 			return true;
+		}
+	};
+
+	private final OnClickListener syncNowClickListener = new OnClickListener() {
+		@Override
+		public void onClick (final View v) {
+			askSyncNow();
 		}
 	};
 
@@ -206,6 +219,19 @@ public class CheckoutMgrActivity extends Activity {
 			this.bldr.show();
 		}
 
+	}
+
+	protected void askSyncNow () {
+		DialogHelper.askYesNo(this, "Sync now?", "Sync", "Cancel", new Runnable() {
+			@Override
+			public void run () {
+				startSync();
+			}
+		});
+	}
+
+	protected void startSync () {
+		startService(new Intent(this, SyncCheckoutsService.class));
 	}
 
 }
