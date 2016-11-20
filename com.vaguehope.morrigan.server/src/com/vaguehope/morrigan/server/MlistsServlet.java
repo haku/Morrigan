@@ -91,6 +91,8 @@ import com.vaguehope.sqlitewrapper.DbException;
  * POST /mlists/LOCALMMDB/example.local.db3/albums/somealbum action=queue&playerid=0
  *
  *  GET /mlists/LOCALMMDB/example.local.db3/query/example
+ *  GET /mlists/LOCALMMDB/example.local.db3/query/example?maxresults=0         // No limit.
+ *  GET /mlists/LOCALMMDB/example.local.db3/query/example?maxresults=500
  *  GET /mlists/LOCALMMDB/example.local.db3/query/example?includedisabled=true
  *  GET /mlists/LOCALMMDB/example.local.db3/query/example?column=foo&order=asc
  * </pre>
@@ -116,6 +118,7 @@ public class MlistsServlet extends HttpServlet {
 	private static final String PARAM_VIEW = "view";
 	private static final String PARAM_COLUMN = "column";
 	private static final String PARAM_ORDER = "order";
+	private static final String PARAM_MAXRESULTS = "maxresults";
 	private static final String PARAM_INCLUDE_DISABLED = "includedisabled";
 	private static final String PARAM_ENABLED = "enabled";
 	private static final String PARAM_REMOTE = "remote";
@@ -135,7 +138,7 @@ public class MlistsServlet extends HttpServlet {
 	private static final long serialVersionUID = 2754601524882233866L;
 
 	private static final String ROOTPATH = "/";
-	private static final int MAX_RESULTS = 250;
+	private static final int DEFAULT_MAX_QUERY_RESULTS = 250;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -320,7 +323,7 @@ public class MlistsServlet extends HttpServlet {
 			}
 		}
 		else if (action.equals(CMD_SCAN)) {
-			AsyncTask at = this.asyncActions.scheduleMmdbScan(mmdb);
+			final AsyncTask at = this.asyncActions.scheduleMmdbScan(mmdb);
 			resp.setContentType("text/plain");
 			resp.getWriter().println("Scan scheduled desu~");
 			resp.getWriter().println("id=" + at.id());
@@ -328,7 +331,7 @@ public class MlistsServlet extends HttpServlet {
 		else if (action.equals(CMD_PULL)) {
 			final String remote = req.getParameter(PARAM_REMOTE);
 			if (StringHelper.notBlank(remote)) {
-				AsyncTask at = this.asyncActions.scheduleMmdbPull((ILocalMixedMediaDb) mmdb, remote);
+				final AsyncTask at = this.asyncActions.scheduleMmdbPull((ILocalMixedMediaDb) mmdb, remote);
 				resp.setContentType("text/plain");
 				resp.getWriter().println("Pull scheduled desu~");
 				resp.getWriter().println("id=" + at.id());
@@ -497,7 +500,7 @@ public class MlistsServlet extends HttpServlet {
 
 	private static void getToMmdb (final HttpServletRequest req, final HttpServletResponse resp, final IMixedMediaDb mmdb, final String path, final String afterPath) throws IOException, SAXException, MorriganException, DbException {
 		if (path == null) {
-			printMlistLong(resp, mmdb, false, false, false);
+			printMlistLong(resp, mmdb, IncludeSrcs.NO, IncludeItems.NO, IncludeTags.NO);
 		}
 		else if (path.equals(PATH_ITEMS)) {
 			if (afterPath != null && afterPath.length() > 0) {
@@ -534,11 +537,12 @@ public class MlistsServlet extends HttpServlet {
 			}
 			else {
 				final boolean includeDeletedTags = ServletHelper.readParamBoolean(req, PARAM_INCLUDE_DELETED_TAGS, false);
-				printMlistLong(resp, mmdb, false, true, includeDeletedTags);
+				printMlistLong(resp, mmdb, IncludeSrcs.NO, IncludeItems.YES,
+						includeDeletedTags ? IncludeTags.YES_INCLUDING_DELETED : IncludeTags.YES);
 			}
 		}
 		else if (path.equals(PATH_SRC)) {
-			printMlistLong(resp, mmdb, true, false, false);
+			printMlistLong(resp, mmdb, IncludeSrcs.YES, IncludeItems.NO, IncludeTags.NO);
 		}
 		else if (path.equals(PATH_TAGS)) {
 			final String term = StringHelper.trimToEmpty(req.getParameter(PARAM_TERM));
@@ -575,8 +579,10 @@ public class MlistsServlet extends HttpServlet {
 			final String query = URLDecoder.decode(afterPath, "UTF-8");
 			final IDbColumn[] sortColumns = parseSortColumns(req);
 			final SortDirection[] sortDirections = parseSortOrder(req);
+			final int maxResults = ServletHelper.readParamInteger(req, PARAM_MAXRESULTS, DEFAULT_MAX_QUERY_RESULTS);
 			final boolean includeDisabled = ServletHelper.readParamBoolean(req, PARAM_INCLUDE_DISABLED, false);
-			printMlistLong(resp, mmdb, false, true, false, query, sortColumns, sortDirections, includeDisabled);
+			printMlistLong(resp, mmdb, IncludeSrcs.NO, IncludeItems.YES, IncludeTags.YES,
+					query, maxResults, sortColumns, sortDirections, includeDisabled);
 		}
 		else {
 			ServletHelper.error(resp, HttpServletResponse.SC_NOT_FOUND, "HTTP error 404 unknown path '" + path + "' desu~");
@@ -648,18 +654,28 @@ public class MlistsServlet extends HttpServlet {
 		}
 	}
 
-	private static void printMlistLong (final HttpServletResponse resp, final IMixedMediaDb ml, final boolean listSrcs, final boolean listItems, final boolean includeDeletedTags) throws SAXException, MorriganException, DbException, IOException {
-		printMlistLong(resp, ml, listSrcs, listItems, includeDeletedTags, null, null, null, false);
+	private enum IncludeSrcs {
+		NO, YES;
 	}
 
-	private static void printMlistLong (final HttpServletResponse resp, final IMixedMediaDb ml, final boolean listSrcs, final boolean listItems, final boolean includeDeletedTags,
-			final String queryString, final IDbColumn[] sortColumns, final SortDirection[] sortDirections, final boolean includeDisabled)
+	private enum IncludeItems {
+		NO, YES;
+	}
+
+	enum IncludeTags {
+		NO, YES, YES_INCLUDING_DELETED;
+	}
+
+	private static void printMlistLong (final HttpServletResponse resp, final IMixedMediaDb ml,
+			final IncludeSrcs includeSrcs, final IncludeItems includeItems, final IncludeTags includeTags)
 					throws SAXException, MorriganException, DbException, IOException {
-		printMlistLong(resp, ml, listSrcs, listItems, includeDeletedTags, true, queryString, sortColumns, sortDirections, includeDisabled);
+		printMlistLong(resp, ml, includeSrcs, includeItems, includeTags, null, 0, null, null, false);
 	}
 
-	private static void printMlistLong (final HttpServletResponse resp, final IMixedMediaDb ml, final boolean listSrcs, final boolean listItems, final boolean includeDeletedTags,
-			final boolean includeTags, final String queryString, final IDbColumn[] sortColumns, final SortDirection[] sortDirections, final boolean includeDisabled)
+	private static void printMlistLong (final HttpServletResponse resp, final IMixedMediaDb ml,
+			final IncludeSrcs includeSrcs, final IncludeItems includeItems, final IncludeTags includeTags,
+			final String queryString, final int maxQueryResults,
+			final IDbColumn[] sortColumns, final SortDirection[] sortDirections, final boolean includeDisabled)
 					throws SAXException, MorriganException, DbException, IOException {
 		ml.read();
 		resp.setContentType("text/xml;charset=utf-8");
@@ -667,7 +683,7 @@ public class MlistsServlet extends HttpServlet {
 
 		List<IMixedMediaItem> items;
 		if (queryString != null) {
-			items = ml.simpleSearch(queryString, MAX_RESULTS, sortColumns, sortDirections, includeDisabled);
+			items = ml.simpleSearch(queryString, maxQueryResults, sortColumns, sortDirections, includeDisabled);
 		}
 		else {
 			items = ml.getMediaItems();
@@ -699,7 +715,7 @@ public class MlistsServlet extends HttpServlet {
 
 		final String pathToSelf = CONTEXTPATH + "/" + ml.getType() + "/" + listFile;
 		FeedHelper.addLink(dw, pathToSelf, "self", "text/xml");
-		if (!listItems) FeedHelper.addLink(dw, pathToSelf + "/" + PATH_ITEMS, PATH_ITEMS, "text/xml");
+		if (includeItems == IncludeItems.NO) FeedHelper.addLink(dw, pathToSelf + "/" + PATH_ITEMS, PATH_ITEMS, "text/xml");
 		FeedHelper.addLink(dw, pathToSelf + "/" + PATH_ALBUMS, PATH_ALBUMS, "text/xml");
 		FeedHelper.addLink(dw, pathToSelf + "/" + PATH_SRC, PATH_SRC, "text/xml");
 
@@ -707,16 +723,16 @@ public class MlistsServlet extends HttpServlet {
 			FeedHelper.addElement(dw, "remote", remote);
 		}
 
-		if (listSrcs) {
+		if (includeSrcs == IncludeSrcs.YES) {
 			for (final String s : ml.getSources()) {
 				FeedHelper.addElement(dw, "src", s);
 			}
 		}
 
-		if (listItems) {
+		if (includeItems == IncludeItems.YES) {
 			for (final IMixedMediaItem mi : items) {
 				dw.startElement("entry");
-				fillInMediaItem(dw, ml, mi, includeTags, includeDeletedTags);
+				fillInMediaItem(dw, ml, mi, includeTags);
 				dw.endElement("entry");
 			}
 		}
@@ -724,7 +740,7 @@ public class MlistsServlet extends HttpServlet {
 		FeedHelper.endDocument(dw, "mlist");
 	}
 
-	static void fillInMediaItem (final DataWriter dw, final IMediaTrackList<? extends IMediaTrack> ml, final IMediaItem mi, final boolean includeTags, final boolean includeDeletedTags) throws SAXException, MorriganException {
+	static void fillInMediaItem (final DataWriter dw, final IMediaTrackList<? extends IMediaTrack> ml, final IMediaItem mi, final IncludeTags includeTags) throws SAXException, MorriganException {
 		FeedHelper.addElement(dw, "title", mi.getTitle());
 
 		FeedHelper.addLink(dw, fileLink(mi), "self"); // Path is relative to this feed.
@@ -760,24 +776,22 @@ public class MlistsServlet extends HttpServlet {
 			FeedHelper.addElement(dw, "height", pic.getHeight());
 		}
 
-		if (includeTags) {
-			if (includeDeletedTags) {
-				for (final MediaTag tag : ml.getTagsIncludingDeleted(mi)) {
-					FeedHelper.addElement(dw, "tag", tag.getTag(), new String[][] {
-						{ "t", String.valueOf(tag.getType().getIndex()) },
-						{ "c", tag.getClassification() == null ? "" : tag.getClassification().getClassification() },
-						{ "m", tag.getModified() == null || tag.getModified().getTime() < 1L ? "" : String.valueOf(tag.getModified().getTime()) },
-						{ "d", String.valueOf(tag.isDeleted()) }
-					});
-				}
+		if (includeTags == IncludeTags.YES_INCLUDING_DELETED) {
+			for (final MediaTag tag : ml.getTagsIncludingDeleted(mi)) {
+				FeedHelper.addElement(dw, "tag", tag.getTag(), new String[][] {
+					{ "t", String.valueOf(tag.getType().getIndex()) },
+					{ "c", tag.getClassification() == null ? "" : tag.getClassification().getClassification() },
+					{ "m", tag.getModified() == null || tag.getModified().getTime() < 1L ? "" : String.valueOf(tag.getModified().getTime()) },
+					{ "d", String.valueOf(tag.isDeleted()) }
+				});
 			}
-			else {
-				for (final MediaTag tag : ml.getTags(mi)) {
-					FeedHelper.addElement(dw, "tag", tag.getTag(), new String[][] {
-						{ "t", String.valueOf(tag.getType().getIndex()) },
-						{ "c", tag.getClassification() == null ? "" : tag.getClassification().getClassification() }
-					});
-				}
+		}
+		else if (includeTags == IncludeTags.YES) {
+			for (final MediaTag tag : ml.getTags(mi)) {
+				FeedHelper.addElement(dw, "tag", tag.getTag(), new String[][] {
+					{ "t", String.valueOf(tag.getType().getIndex()) },
+					{ "c", tag.getClassification() == null ? "" : tag.getClassification().getClassification() }
+				});
 			}
 		}
 	}

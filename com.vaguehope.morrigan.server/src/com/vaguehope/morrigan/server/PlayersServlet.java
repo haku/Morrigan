@@ -32,6 +32,7 @@ import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlayItemType;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayerReader;
+import com.vaguehope.morrigan.server.MlistsServlet.IncludeTags;
 import com.vaguehope.morrigan.server.util.FeedHelper;
 import com.vaguehope.morrigan.server.util.XmlHelper;
 import com.vaguehope.morrigan.util.StringHelper;
@@ -439,7 +440,7 @@ public class PlayersServlet extends HttpServlet {
 					}
 
 					dw.startElement("track");
-					MlistsServlet.fillInMediaItem(dw, currentList, track, true, false);
+					MlistsServlet.fillInMediaItem(dw, currentList, track, IncludeTags.YES);
 					dw.endElement("track");
 				}
 			}

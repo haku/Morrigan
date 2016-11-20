@@ -119,6 +119,12 @@ public final class ServletHelper {
 		return null;
 	}
 
+	public static int readParamInteger (final HttpServletRequest req, final String name, final int defVal) {
+		final Integer ret = readParamInteger(req, name);
+		if (ret != null) return ret.intValue();
+		return defVal;
+	}
+
 	public static Integer readParamInteger (final HttpServletRequest req, final String name) {
 		final String raw = StringHelper.trimToNull(req.getParameter(name));
 		if (raw == null) return null;
