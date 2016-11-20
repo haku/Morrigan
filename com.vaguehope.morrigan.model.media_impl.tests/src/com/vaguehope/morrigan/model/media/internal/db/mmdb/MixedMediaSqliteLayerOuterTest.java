@@ -141,7 +141,7 @@ public class MixedMediaSqliteLayerOuterTest {
 	}
 
 	@Test
-	public void itCanJustPartialMatchFileName () throws Exception {
+	public void itSearchesForJustPartialMatchFileName () throws Exception {
 		final String term = "some_awesome_band_desu";
 		final IMixedMediaItem expectedWithTermInName = mockMediaTrackWithNameContaining(term);
 		mockMediaFileWithTags("watcha " + term + " noise");
@@ -150,7 +150,7 @@ public class MixedMediaSqliteLayerOuterTest {
 	}
 
 	@Test
-	public void itCanMatchFileNameWithSpecialChars () throws Exception {
+	public void itSearchesForMatchFileNameWithSpecialChars () throws Exception {
 		final String term = "awesome'\"*%_\\band";
 		mockMediaFileWithTags("watcha " + term + " noise");
 
@@ -158,7 +158,7 @@ public class MixedMediaSqliteLayerOuterTest {
 	}
 
 	@Test
-	public void itCanJustPartialMatchTag () throws Exception {
+	public void itSearchesForJustPartialMatchTag () throws Exception {
 		final String term = "some_awesome_band_desu";
 		mockMediaTrackWithNameContaining(term);
 		final IMixedMediaItem expectedWithTermInTag = mockMediaFileWithTags("watcha " + term + " noise");
@@ -167,7 +167,7 @@ public class MixedMediaSqliteLayerOuterTest {
 	}
 
 	@Test
-	public void itCanJustExactlyMatchTag () throws Exception {
+	public void itSearchesForJustExactlyMatchTag () throws Exception {
 		final String term = "pl_desu";
 		final IMixedMediaItem expectedWithTermAsTag = mockMediaFileWithTags(term);
 		mockMediaFileWithTags("watcha " + term + " noise");
@@ -227,7 +227,7 @@ public class MixedMediaSqliteLayerOuterTest {
 	}
 
 	@Test
-	public void itCanPartialMatchFileNameQuoted () throws Exception {
+	public void itSearchesForPartialMatchFileNameQuoted () throws Exception {
 		final String term = "some awesome? band desu";
 
 		final String term1 = term.replace('?', '"');
@@ -238,7 +238,7 @@ public class MixedMediaSqliteLayerOuterTest {
 	}
 
 	@Test
-	public void itCanJustPartialMatchFileNameQuoted () throws Exception {
+	public void itSearchesForJustPartialMatchFileNameQuoted () throws Exception {
 		final String term = "some awesome? band desu";
 		mockMediaFileWithTags("watcha " + term + " noise");
 
