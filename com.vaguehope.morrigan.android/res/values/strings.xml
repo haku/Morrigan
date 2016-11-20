@@ -9,5 +9,9 @@
 	<string name="menu_sort">sort</string>
 	<string name="menu_queue_clear">clear queue</string>
 	<string name="menu_queue_shuffle">shuffle queue</string>
-	
+
+	<string name="dialog_general_error">Error:</string>
+	<string name="dialog_general_btn_yes">Yes</string>
+	<string name="dialog_general_btn_no">No</string>
+
 </resources>

@@ -42,6 +42,13 @@ public class ServerReferenceImpl implements ServerReference {
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	@Override
+	public String getUiTitle () {
+		return getName();
+	}
+
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	ServerReference methods.
 
 	@Override
