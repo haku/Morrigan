@@ -103,7 +103,8 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:layout_weight="0" >
+        android:layout_weight="0"
+        style="?android:attr/buttonBarButtonStyle" >
 
         <TableRow>
 
@@ -112,28 +113,32 @@
                 android:layout_width="0dp"
                 android:layout_height="80dp"
                 android:layout_weight="1"
-                android:src="@drawable/pause" />
+                android:src="@drawable/pause"
+                style="?android:attr/buttonBarButtonStyle" />
 
             <ImageButton
                 android:id="@+id/btnNext"
                 android:layout_width="0dp"
                 android:layout_height="80dp"
                 android:layout_weight="1"
-                android:src="@drawable/next" />
+                android:src="@drawable/next"
+                style="?android:attr/buttonBarButtonStyle" />
 
             <ImageButton
                 android:id="@+id/btnSearch"
                 android:layout_width="0dp"
                 android:layout_height="80dp"
                 android:layout_weight="1"
-                android:src="@drawable/search" />
+                android:src="@drawable/search"
+                style="?android:attr/buttonBarButtonStyle" />
 
             <ImageButton
                 android:id="@+id/btnRefresh"
                 android:layout_width="0dp"
                 android:layout_height="80dp"
                 android:layout_weight="1"
-                android:src="@drawable/ic_menu_refresh" />
+                android:src="@drawable/ic_menu_refresh"
+                style="?android:attr/buttonBarButtonStyle" />
         </TableRow>
     </TableLayout>
 

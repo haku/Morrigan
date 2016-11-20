@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+	<group android:id="@+id/group_popupmenu">
+
+		<item
+			android:id="@+id/checkoutmgr"
+			android:icon="@drawable/pref"
+			android:title="Checkout Manager"
+			android:showAsAction="always"/>
+
+	</group>
+</menu>

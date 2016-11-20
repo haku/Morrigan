@@ -20,17 +20,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.vaguehope.morrigan.android.model.Artifact;
-import com.vaguehope.morrigan.android.model.ArtifactList;
-import com.vaguehope.morrigan.android.model.ServerReference;
-import com.vaguehope.morrigan.android.model.ServerReferenceList;
-import com.vaguehope.morrigan.android.modelimpl.ServerReferenceImpl;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import com.vaguehope.morrigan.android.model.Artifact;
+import com.vaguehope.morrigan.android.model.ArtifactList;
+import com.vaguehope.morrigan.android.model.ServerReference;
+import com.vaguehope.morrigan.android.model.ServerReferenceList;
+import com.vaguehope.morrigan.android.modelimpl.ServerReferenceImpl;
 
 public class ConfigDb extends SQLiteOpenHelper implements ServerReferenceList {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -40,7 +40,7 @@ public class ConfigDb extends SQLiteOpenHelper implements ServerReferenceList {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public static final String TBL_HOSTS = "hosts";
+	private static final String TBL_HOSTS = "hosts";
 	private static final String TBL_HOSTS_ID = "_id";
 	private static final String TBL_HOSTS_NAME = "name";
 	private static final String TBL_HOSTS_URL = "url";

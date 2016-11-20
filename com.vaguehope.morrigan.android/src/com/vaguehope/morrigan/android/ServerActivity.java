@@ -16,6 +16,21 @@
 
 package com.vaguehope.morrigan.android;
 
+import android.app.ActionBar;
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ImageButton;
+import android.widget.ListView;
+import android.widget.Toast;
+
 import com.vaguehope.morrigan.android.ServersList.ServerListEventsListener;
 import com.vaguehope.morrigan.android.layouts.SidebarLayout;
 import com.vaguehope.morrigan.android.layouts.SidebarLayout.SidebarListener;
@@ -35,19 +50,6 @@ import com.vaguehope.morrigan.android.state.ConfigDb;
 import com.vaguehope.morrigan.android.state.Preferences;
 import com.vaguehope.morrigan.android.tasks.GetMlistsTask;
 import com.vaguehope.morrigan.android.tasks.GetPlayersTask;
-
-import android.app.Activity;
-import android.content.Intent;
-import android.os.Bundle;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.Window;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ImageButton;
-import android.widget.ListView;
-import android.widget.Toast;
 
 public class ServerActivity extends Activity implements PlayerStateListChangeListener, MlistStateListChangeListener {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -139,6 +141,10 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS); // TODO check return value.
 		setContentView(R.layout.server);
 
+		final ActionBar ab = getActionBar();
+		ab.setDisplayShowHomeEnabled(true);
+		ab.setHomeButtonEnabled(true);
+
 		this.sidebarLayout = (SidebarLayout) findViewById(R.id.serverLayout);
 		this.sidebarLayout.setListener(this.sidebarListener);
 
@@ -209,10 +215,19 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 	}
 
 	@Override
+	public boolean onCreateOptionsMenu (final Menu menu) {
+		getMenuInflater().inflate(R.menu.servermenu, menu);
+		return true;
+	}
+
+	@Override
 	public boolean onOptionsItemSelected (final MenuItem item) {
 		switch (item.getItemId()) {
-			case 16908332: // android.R.id.home constant only in API v11+ but event still fires in API v8.
+			case android.R.id.home:
 				this.sidebarLayout.toggleSidebar();
+				return true;
+			case R.id.checkoutmgr:
+				startActivity(new Intent(getApplicationContext(), CheckoutMgrActivity.class));
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);

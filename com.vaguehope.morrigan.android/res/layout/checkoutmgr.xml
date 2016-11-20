@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:orientation="vertical">
+
+	<LinearLayout
+		android:id="@+id/checkoutActions"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_alignParentBottom="true"
+		android:orientation="horizontal"
+		style="?android:attr/buttonBarStyle">
+
+		<Button
+			android:id="@+id/btnA"
+			android:text="A"
+			android:layout_width="0dip"
+			android:layout_height="50dip"
+			android:layout_weight="1"
+			style="?android:attr/buttonBarButtonStyle" />
+
+		<Button
+			android:id="@+id/btnB"
+			android:text="B"
+			android:layout_width="0dip"
+			android:layout_height="50dip"
+			android:layout_weight="1"
+			style="?android:attr/buttonBarButtonStyle" />
+
+	</LinearLayout>
+
+	<ListView
+		android:id="@+id/listCheckouts"
+		android:layout_width="match_parent"
+		android:layout_height="0dip"
+		android:layout_alignParentTop="true"
+		android:layout_above="@id/checkoutActions" />
+
+</RelativeLayout>

@@ -11,7 +11,8 @@
         android:id="@id/sidebarView"
         android:layout_width="150dip"
         android:layout_height="match_parent"
-        android:orientation="vertical" >
+        android:orientation="vertical"
+        style="?android:attr/buttonBarButtonStyle" >
 
         <ListView
             android:id="@+id/lstSidebar"
@@ -25,7 +26,8 @@
             android:layout_height="50dip"
             android:layout_gravity="bottom"
             android:layout_weight="0"
-            android:src="@drawable/plus" />
+            android:src="@drawable/plus"
+            style="?android:attr/buttonBarButtonStyle" />
     </LinearLayout>
 
     <!-- Note: set background to disable transparency. -->
@@ -54,7 +56,8 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:layout_weight="0" >
+            android:layout_weight="0"
+            style="?android:attr/buttonBarStyle" >
 
             <TableRow>
 
@@ -63,14 +66,16 @@
                     android:layout_width="0dip"
                     android:layout_height="50dip"
                     android:layout_weight="1"
-                    android:src="@drawable/circledot" />
+                    android:src="@drawable/circledot"
+                    style="?android:attr/buttonBarButtonStyle" />
 
                 <ImageButton
                     android:id="@+id/btnRefresh"
                     android:layout_width="0dip"
                     android:layout_height="50dip"
                     android:layout_weight="1"
-                    android:src="@drawable/ic_menu_refresh" />
+                    android:src="@drawable/ic_menu_refresh"
+                    style="?android:attr/buttonBarButtonStyle" />
             </TableRow>
         </TableLayout>
     </LinearLayout>
