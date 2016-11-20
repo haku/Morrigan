@@ -130,19 +130,21 @@ class SearchParser {
 			sql.append(" ( ");
 			for (int i = 0; i < terms.size(); i++) {
 				final String term = terms.get(i);
-				if (i > 0) {
-					if ("OR".equals(term)) {
-						sql.append(_SQL_OR);
-						continue;
-					}
-					else if (!"OR".equals(terms.get(i - 1))) {
-						sql.append(_SQL_AND);
-					}
+
+				if ("OR".equals(term)) {
+					if (i == 0 || i >= terms.size() - 1) continue; // Ignore leading and trailing ORs.
+					sql.append(_SQL_OR);
+					continue;
 				}
-				if (term.startsWith("f~")) {
+
+				if (i > 0 && !"OR".equals(terms.get(i - 1))) { // Not the first term and not following an OR.
+					sql.append(_SQL_AND);
+				}
+
+				if (isFileMatchPartial(term)) {
 					sql.append(_SQL_MEDIAFILES_WHERES_FILE);
 				}
-				else if (term.startsWith("t~") || term.startsWith("t=")) {
+				else if (isTagMatchPartial(term) || isTagMatchExact(term)) {
 					sql.append(_SQL_MEDIAFILES_WHERES_TAG);
 				}
 				else {
@@ -163,6 +165,35 @@ class SearchParser {
 			needAnd = true;
 			sql.append(_SQL_MEDIAFILES_WHEREENABLED);
 		}
+	}
+
+	protected static boolean isFileMatchPartial (final String term) {
+		return term.startsWith("f~") || term.startsWith("F~");
+	}
+
+	protected static boolean isTagMatchPartial (final String term) {
+		return term.startsWith("t~") || term.startsWith("T~");
+	}
+
+	protected static boolean isTagMatchExact (final String term) {
+		return term.startsWith("t=") || term.startsWith("T=");
+	}
+
+	protected static String anchoredOrWildcardEnds (final String term) {
+		String ret = term;
+		if (ret.startsWith("^")) {
+			ret = ret.substring(1);
+		}
+		else {
+			ret = "%" + ret;
+		}
+		if (ret.endsWith("$")) {
+			ret = ret.substring(0, ret.length() - 1);
+		}
+		else {
+			ret = ret + "%";
+		}
+		return ret;
 	}
 
 	public static class Search {
@@ -197,11 +228,11 @@ class SearchParser {
 				if (this.mediaType != MediaType.UNKNOWN) ps.setInt(parmIn++, this.mediaType.getN());
 				for (final String term : this.terms) {
 					if ("OR".equals(term)) continue;
-					if (term.startsWith("f~") || term.startsWith("t~")) {
-						ps.setString(parmIn++, "%" + SqliteHelper.escapeSearch(StringHelper.removeEndQuotes(term.substring(2))) + "%");
+					if (isFileMatchPartial(term) || isTagMatchPartial(term)) {
+						ps.setString(parmIn++, anchoredOrWildcardEnds(SqliteHelper.escapeSearch(StringHelper.removeEndQuotes(term.substring(2)))));
 						ps.setString(parmIn++, SqliteHelper.SEARCH_ESC);
 					}
-					else if (term.startsWith("t=")) {
+					else if (isTagMatchExact(term)) {
 						ps.setString(parmIn++, SqliteHelper.escapeSearch(StringHelper.removeEndQuotes(term.substring(2))));
 						ps.setString(parmIn++, SqliteHelper.SEARCH_ESC);
 					}
