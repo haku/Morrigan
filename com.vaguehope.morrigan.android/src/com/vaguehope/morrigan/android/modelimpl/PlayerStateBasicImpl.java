@@ -43,6 +43,7 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference, Mlist
 	private String trackFile;
 	private String trackFileName;
 	private int trackDuration;
+	private long trackFileSize;
 	private BigInteger trackHashCode;
 	private boolean trackEnabled;
 	private boolean trackMissing;
@@ -193,6 +194,14 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference, Mlist
 		this.trackDuration = trackDuration;
 	}
 
+	public long getTrackFileSize () {
+		return this.trackFileSize;
+	}
+
+	public void setTrackFileSize (final long trackFileSize) {
+		this.trackFileSize = trackFileSize;
+	}
+
 	@Override
 	public BigInteger getTrackHashCode () {
 		return this.trackHashCode;
@@ -316,6 +325,11 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference, Mlist
 	@Override
 	public String getFileName () {
 		return getTrackFileName();
+	}
+
+	@Override
+	public long getFileSize () {
+		return getTrackFileSize();
 	}
 
 	@Override

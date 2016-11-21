@@ -30,6 +30,7 @@ public class MlistItemBasicImpl implements MlistItem {
 	private int type;
 	private String id;
 	private String relativeUrl;
+	private long fileSize;
 	private BigInteger hashCode;
 	private boolean enabled;
 	private boolean missing;
@@ -97,6 +98,14 @@ public class MlistItemBasicImpl implements MlistItem {
 	}
 	public void setRelativeUrl(final String url) {
 		this.relativeUrl = url;
+	}
+
+	@Override
+	public long getFileSize () {
+		return this.fileSize;
+	}
+	public void setFileSize (final long fileSize) {
+		this.fileSize = fileSize;
 	}
 
 	@Override

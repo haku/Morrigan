@@ -47,35 +47,36 @@ public class MlistItemListImpl implements MlistItemList, ContentHandler {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private static final String ENTRY = "entry";
-	
+
 	private static final String LINK = "link";
 	private static final String REL = "rel";
 	private static final String SELF = "self";
 	private static final String HREF = "href";
-	
+
 	public static final String TITLE = "title";
 	public static final String TYPE = "type";
 	public static final String DURATION = "duration";
 	public static final String STARTCOUNT = "startcount";
 	public static final String ENDCOUNT = "endcount";
+	public static final String FILESIZE = "filesize";
 	public static final String HASHCODE = "hash";
 	public static final String ENABLED = "enabled";
 	public static final String MISSING = "missing";
 	public static final String TAG = "tag";
-	
+
 	private static final String MANUAL_TAG = "0";
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	private final List<MlistItem> mlistItemList = new LinkedList<MlistItem>();
-	
+
 	private final String query;
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	public MlistItemListImpl (InputStream dataIs, String query) throws SAXException {
+
+	public MlistItemListImpl (final InputStream dataIs, final String query) throws SAXException {
 		this.query = query;
-		
+
 		SAXParserFactory spf = SAXParserFactory.newInstance();
         SAXParser sp;
 		try {
@@ -93,44 +94,44 @@ public class MlistItemListImpl implements MlistItemList, ContentHandler {
 			throw new SAXException(e);
 		}
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	@Override
 	public List<? extends MlistItem> getMlistItemList() {
 		return Collections.unmodifiableList(this.mlistItemList);
 	}
-	
+
 	@Override
 	public List<? extends Artifact> getArtifactList() {
 		return Collections.unmodifiableList(this.mlistItemList);
 	}
-	
+
 	@Override
 	public String getQuery() {
 		return this.query;
 	}
-	
+
 	@Override
-	public void sort (Comparator<MlistItem> comparator) {
+	public void sort (final Comparator<MlistItem> comparator) {
 		Collections.sort(this.mlistItemList, comparator);
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	private static final Map<String, String> EMPTY_MAP = Collections.unmodifiableMap(new HashMap<String, String>());
-	
+
 	private final Stack<String> stack = new Stack<String>();
 	private final Stack<Map<String, String>> currentAttributes = new Stack<Map<String,String>>();
 	private StringBuilder currentText;
 	private MlistItemBasicImpl currentItem;
 	private List<String> currentTags;
-	
+
 	@Override
-	public void startElement(String uri, String localName, String qName, Attributes attr) throws SAXException {
+	public void startElement(final String uri, final String localName, final String qName, final Attributes attr) throws SAXException {
 		this.stack.push(localName);
 		Map<String, String> atMap = EMPTY_MAP;
-		
+
 		if (this.stack.size() == 2 && localName.equals(ENTRY)) {
 			this.currentItem = new MlistItemBasicImpl();
 		}
@@ -147,18 +148,18 @@ public class MlistItemListImpl implements MlistItemList, ContentHandler {
 			atMap = new HashMap<String, String>();
 			for (int i = 0; i < attr.getLength(); i++) atMap.put(attr.getLocalName(i), attr.getValue(i));
 		}
-		
+
 		// If we need a new StringBuilder, make one.
 		if (this.currentText == null || this.currentText.length() > 0) {
 			this.currentText = new StringBuilder();
 		}
 		this.currentAttributes.push(atMap);
 	}
-	
+
 	@Override
-	public void endElement(String uri, String localName, String qName) throws SAXException {
+	public void endElement(final String uri, final String localName, final String qName) throws SAXException {
 		Map<String, String> attr = this.currentAttributes.pop();
-		
+
 		if (this.stack.size() == 2 && localName.equals(ENTRY)) {
 			if (this.currentTags != null) {
 				this.currentItem.setTags(this.currentTags.toArray(new String[this.currentTags.size()]));
@@ -186,6 +187,10 @@ public class MlistItemListImpl implements MlistItemList, ContentHandler {
 			int v = Integer.parseInt(this.currentText.toString());
 			this.currentItem.setEndCount(v);
 		}
+		else if (this.stack.size() == 3 && localName.equals(FILESIZE)) {
+			long v = Long.parseLong(this.currentText.toString());
+			this.currentItem.setFileSize(v);
+		}
 		else if (this.stack.size() == 3 && localName.equals(HASHCODE)) {
 			BigInteger v = new BigInteger(this.currentText.toString(), 16);
 			this.currentItem.setHashCode(v);
@@ -204,45 +209,45 @@ public class MlistItemListImpl implements MlistItemList, ContentHandler {
 				this.currentTags.add(this.currentText.toString());
 			}
 		}
-		
+
 		this.stack.pop();
 	}
-	
+
 	@Override
-	public void characters(char[] ch, int start, int length) throws SAXException {
+	public void characters(final char[] ch, final int start, final int length) throws SAXException {
 		this.currentText.append( ch, start, length );
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	@Override
 	public void endDocument() throws SAXException { /* UNUSED */ }
 	@Override
-	public void endPrefixMapping(String prefix) throws SAXException { /* UNUSED */ }
+	public void endPrefixMapping(final String prefix) throws SAXException { /* UNUSED */ }
 	@Override
-	public void ignorableWhitespace(char[] ch, int start, int length) throws SAXException { /* UNUSED */ }
+	public void ignorableWhitespace(final char[] ch, final int start, final int length) throws SAXException { /* UNUSED */ }
 	@Override
-	public void processingInstruction(String target, String data) throws SAXException { /* UNUSED */ }
+	public void processingInstruction(final String target, final String data) throws SAXException { /* UNUSED */ }
 	@Override
-	public void setDocumentLocator(Locator locator) { /* UNUSED */ }
+	public void setDocumentLocator(final Locator locator) { /* UNUSED */ }
 	@Override
-	public void skippedEntity(String name) throws SAXException { /* UNUSED */ }
+	public void skippedEntity(final String name) throws SAXException { /* UNUSED */ }
 	@Override
 	public void startDocument() throws SAXException { /* UNUSED */ }
 	@Override
-	public void startPrefixMapping(String prefix, String uri) throws SAXException { /* UNUSED */ }
-	
+	public void startPrefixMapping(final String prefix, final String uri) throws SAXException { /* UNUSED */ }
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	@Override
 	public String getSortKey() {
 		return ""; // This should never be relevant.
 	}
-	
+
 	@Override
-	public int compareTo(ArtifactList another) {
+	public int compareTo(final ArtifactList another) {
 		return this.getSortKey().compareTo(another.getSortKey());
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

@@ -48,6 +48,7 @@ public class PlayerQueueImpl implements PlayerQueue, ContentHandler {
 	private static final String LISTREL = "list";
 	private static final String ITEMREL = "item";
 	private static final String ID = "id";
+	private static final String FILESIZE = "filesize";
 	private static final String HASH = "hash";
 	private static final String ENABLED = "enabled";
 	private static final String MISSING = "missing";
@@ -99,6 +100,7 @@ public class PlayerQueueImpl implements PlayerQueue, ContentHandler {
 	private String currentListRelativeUrl = null;
 	private String currentItemRelativeUrl = null;
 	private String currentId;
+	private long currentFileSize;
 	private BigInteger currentHash = null;
 	private boolean currentEnabled;
 	private boolean currentMissing;
@@ -146,6 +148,7 @@ public class PlayerQueueImpl implements PlayerQueue, ContentHandler {
 				item.setRelativeUrl(this.currentItemRelativeUrl);
 				item.setType(1); // TODO reference an enum?
 				item.setId(this.currentId);
+				item.setFileSize(this.currentFileSize);
 				item.setHashCode(this.currentHash);
 				item.setEnabled(this.currentEnabled);
 				item.setMissing(this.currentMissing);
@@ -169,6 +172,10 @@ public class PlayerQueueImpl implements PlayerQueue, ContentHandler {
 		else if (this.stack.size() == 3 && localName.equals(ID)) {
 			this.currentId = this.currentText.toString();
 		}
+		else if (this.stack.size() == 3 && localName.equals(FILESIZE)) {
+			long v = Long.parseLong(this.currentText.toString());
+			this.currentFileSize = v;
+		}
 		else if (this.stack.size() == 3 && localName.equals(HASH)) {
 			BigInteger v = new BigInteger(this.currentText.toString(), 16);
 			this.currentHash = v;
@@ -176,7 +183,6 @@ public class PlayerQueueImpl implements PlayerQueue, ContentHandler {
 		else if (this.stack.size() == 3 && localName.equals(ENABLED)) {
 			boolean v = Boolean.parseBoolean(this.currentText.toString());
 			this.currentEnabled = v;
-
 		}
 		else if (this.stack.size() == 3 && localName.equals(MISSING)) {
 			boolean v = Boolean.parseBoolean(this.currentText.toString());

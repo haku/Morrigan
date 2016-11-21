@@ -755,6 +755,7 @@ public class MlistsServlet extends HttpServlet {
 		if (mi instanceof IMixedMediaItem) {
 			FeedHelper.addElement(dw, "type", ((IMixedMediaItem) mi).getMediaType().getN());
 		}
+		FeedHelper.addElement(dw, "filesize", mi.getFileSize());
 		if (mi.getHashcode() != null && !BigInteger.ZERO.equals(mi.getHashcode())) FeedHelper.addElement(dw, "hash", mi.getHashcode().toString(16));
 		FeedHelper.addElement(dw, "enabled", Boolean.toString(mi.isEnabled()), new String[][] {
 			{ "m", mi.enabledLastModified() == null || mi.enabledLastModified().getTime() < 1L ? "" : String.valueOf(mi.enabledLastModified().getTime()) },

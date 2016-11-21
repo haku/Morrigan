@@ -58,6 +58,7 @@ public class PlayerStateXmlImpl implements PlayerState, MlistItem, ContentHandle
 	public static final String TRACKFILENAME = "trackfilename";
 	public static final String TRACKDURATION = "trackduration";
 
+	public static final String TRACKFILESIZE = "trackfilesize";
 	public static final String TRACKHASHCODE = "trackhash";
 	public static final String TRACKENABLED = "trackenabled";
 	public static final String TRACKMISSING = "trackmissing";
@@ -91,6 +92,7 @@ public class PlayerStateXmlImpl implements PlayerState, MlistItem, ContentHandle
 	private String trackFile;
 	private String trackFileName;
 	private int trackDuration;
+	private long trackFileSize;
 	private BigInteger trackHashCode;
 	private boolean trackEnabled;
 	private boolean trackMissing;
@@ -215,6 +217,10 @@ public class PlayerStateXmlImpl implements PlayerState, MlistItem, ContentHandle
 		return this.trackDuration;
 	}
 
+	public long getTrackFileSize () {
+		return this.trackFileSize;
+	}
+
 	@Override
 	public BigInteger getTrackHashCode () {
 		return this.trackHashCode;
@@ -281,6 +287,11 @@ public class PlayerStateXmlImpl implements PlayerState, MlistItem, ContentHandle
 	@Override
 	public String getFileName () {
 		return getTrackFileName();
+	}
+
+	@Override
+	public long getFileSize () {
+		return getTrackFileSize();
 	}
 
 	@Override
@@ -394,6 +405,10 @@ public class PlayerStateXmlImpl implements PlayerState, MlistItem, ContentHandle
 			else if (localName.equals(TRACKDURATION)) {
 				int v = Integer.parseInt(this.currentText.toString());
 				this.trackDuration = v;
+			}
+			else if (localName.equals(TRACKFILESIZE)) {
+				long v = Long.parseLong(this.currentText.toString());
+				this.trackFileSize = v;
 			}
 			else if (localName.equals(TRACKHASHCODE)) {
 				BigInteger v = new BigInteger(this.currentText.toString(), 16);

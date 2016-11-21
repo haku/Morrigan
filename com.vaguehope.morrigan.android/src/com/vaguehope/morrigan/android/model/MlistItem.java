@@ -31,6 +31,7 @@ public interface MlistItem extends Artifact {
 	public String getId ();
 	public String getRelativeUrl ();
 	public String getFileName ();
+	public long getFileSize ();
 	public BigInteger getHashCode ();
 	public boolean isEnabled ();
 	public boolean isMissing ();
