@@ -25,7 +25,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
@@ -37,23 +36,23 @@ import com.vaguehope.morrigan.android.model.ServerReference;
 
 public class XmlParser implements ContentHandler {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	public static final String XMLSTART = "<?xml";
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	private final ServerReference serverReference;
-	private Map<String, String> nodes = new HashMap<String, String>();
-	
+	private final Map<String, String> nodes = new HashMap<String, String>();
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	public XmlParser (String data, String[] nodes, ServerReference serverReference) throws SAXException {
+
+	public XmlParser (final String data, final String[] nodes, final ServerReference serverReference) throws SAXException {
 		this.serverReference = serverReference;
-		
+
 		for (String node : nodes) {
 			this.nodes.put(node, null);
 		}
-		
+
 		String xml;
 		if (data.startsWith(XMLSTART)) {
 			xml = data;
@@ -64,7 +63,7 @@ public class XmlParser implements ContentHandler {
 		else {
 			throw new SAXException("Data does not contain XML.");
 		}
-		
+
 		SAXParserFactory spf = SAXParserFactory.newInstance();
         SAXParser sp;
 		try {
@@ -82,92 +81,92 @@ public class XmlParser implements ContentHandler {
 			throw new SAXException(e);
 		}
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	public boolean hasNode (String node) {
+
+	public boolean hasNode (final String node) {
 		return this.nodes.keySet().contains(node);
 	}
-	
-	public String getNode (String node) {
+
+	public String getNode (final String node) {
 		return this.nodes.get(node);
 	}
-	
-	public int getNodeInt (String node) {
+
+	public int getNodeInt (final String node) {
 		String s = this.nodes.get(node);
 		if (s == null) return -1;
 		int i = Integer.parseInt(s);
 		return i;
 	}
-	
-	public long getNodeLong (String node) {
+
+	public long getNodeLong (final String node) {
 		String s = this.nodes.get(node);
 		if (s == null) return -1;
 		long l = Long.parseLong(s);
 		return l;
 	}
-	
-	public boolean getNodeBoolean (String node) {
+
+	public boolean getNodeBoolean (final String node) {
 		String s = this.nodes.get(node);
 		boolean b = Boolean.parseBoolean(s);
 		return b;
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	private final Stack<String> stack = new Stack<String>();
 	private StringBuilder currentText;
-	
+
 	@Override
-	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+	public void startElement(final String uri, final String localName, final String qName, final Attributes attributes) throws SAXException {
 		this.stack.push(localName);
-		
+
 		if (localName.equals("link")) {
 			String relVal = attributes.getValue("rel");
 			if (relVal != null) {
 				String hrefVal = attributes.getValue("href");
 				if (hrefVal != null && hrefVal.length() > 0) {
-					this.nodes.put(relVal, this.serverReference.getBaseUrl() + hrefVal);
+					this.nodes.put(relVal, hrefVal);
 				}
 			}
 		}
-		
+
 		// If we need a new StringBuilder, make one.
 		if (this.currentText == null || this.currentText.length() > 0) {
 			this.currentText = new StringBuilder();
 		}
 	}
-	
+
 	@Override
-	public void endElement(String uri, String localName, String qName) throws SAXException {
+	public void endElement(final String uri, final String localName, final String qName) throws SAXException {
 		this.nodes.put(localName, this.currentText.toString());
-		
+
 		this.stack.pop();
 	}
-	
+
 	@Override
-	public void characters (char[] ch, int start, int length) throws SAXException {
+	public void characters (final char[] ch, final int start, final int length) throws SAXException {
         this.currentText.append( ch, start, length );
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	@Override
 	public void endDocument() throws SAXException { /* UNUSED */ }
 	@Override
-	public void endPrefixMapping(String prefix) throws SAXException { /* UNUSED */ }
+	public void endPrefixMapping(final String prefix) throws SAXException { /* UNUSED */ }
 	@Override
-	public void ignorableWhitespace(char[] ch, int start, int length) throws SAXException { /* UNUSED */ }
+	public void ignorableWhitespace(final char[] ch, final int start, final int length) throws SAXException { /* UNUSED */ }
 	@Override
-	public void processingInstruction(String target, String data) throws SAXException { /* UNUSED */ }
+	public void processingInstruction(final String target, final String data) throws SAXException { /* UNUSED */ }
 	@Override
-	public void setDocumentLocator(Locator locator) { /* UNUSED */ }
+	public void setDocumentLocator(final Locator locator) { /* UNUSED */ }
 	@Override
-	public void skippedEntity(String name) throws SAXException { /* UNUSED */ }
+	public void skippedEntity(final String name) throws SAXException { /* UNUSED */ }
 	@Override
 	public void startDocument() throws SAXException { /* UNUSED */ }
 	@Override
-	public void startPrefixMapping(String prefix, String uri) throws SAXException { /* UNUSED */ }
-	
+	public void startPrefixMapping(final String prefix, final String uri) throws SAXException { /* UNUSED */ }
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

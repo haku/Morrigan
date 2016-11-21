@@ -1,11 +1,6 @@
 package com.vaguehope.morrigan.android;
 
-import com.vaguehope.morrigan.android.helper.DialogHelper;
-import com.vaguehope.morrigan.android.helper.DialogHelper.Listener;
-import com.vaguehope.morrigan.android.helper.StringHelper;
-import com.vaguehope.morrigan.android.model.ServerReference;
-import com.vaguehope.morrigan.android.state.Checkout;
-import com.vaguehope.morrigan.android.state.ConfigDb;
+import java.util.ArrayList;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -25,6 +20,17 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+
+import com.vaguehope.morrigan.android.helper.DialogHelper;
+import com.vaguehope.morrigan.android.helper.DialogHelper.Listener;
+import com.vaguehope.morrigan.android.helper.StringHelper;
+import com.vaguehope.morrigan.android.model.MlistState;
+import com.vaguehope.morrigan.android.model.MlistStateList;
+import com.vaguehope.morrigan.android.model.MlistStateListChangeListener;
+import com.vaguehope.morrigan.android.model.ServerReference;
+import com.vaguehope.morrigan.android.state.Checkout;
+import com.vaguehope.morrigan.android.state.ConfigDb;
+import com.vaguehope.morrigan.android.tasks.GetMlistsTask;
 
 public class CheckoutMgrActivity extends Activity {
 
@@ -102,8 +108,19 @@ public class CheckoutMgrActivity extends Activity {
 		return this.checkoutsAdapter;
 	}
 
+	private void askChooseDb (final ServerReference host, final Listener<MlistState> listener) {
+		final Context context = this;
+		new GetMlistsTask(context, host, new MlistStateListChangeListener() {
+			@Override
+			public void onMlistsChange (final MlistStateList result, final Exception e) {
+				if (e != null) DialogHelper.alert(CheckoutMgrActivity.this, e);
+				if (result != null) DialogHelper.askItem(context, "Select DB", new ArrayList<MlistState>(result.getMlistStateList()), listener);
+			}
+		}).execute();
+	}
+
 	private void askAddCheckout () {
-		DialogHelper.askItem(this, "Select server", this.configDb.getHosts(), new Listener<ServerReference>() {
+		DialogHelper.askItem(this, "Select Server", this.configDb.getHosts(), new Listener<ServerReference>() {
 			@Override
 			public void onAnswer (final ServerReference answer) {
 				askAddCheckout(answer);
@@ -112,13 +129,22 @@ public class CheckoutMgrActivity extends Activity {
 	}
 
 	protected void askAddCheckout (final ServerReference host) {
+		askChooseDb(host, new Listener<MlistState>() {
+			@Override
+			public void onAnswer (final MlistState answer) {
+				askAddCheckout(host, answer);
+			}
+		});
+	}
+
+	protected void askAddCheckout (final ServerReference host, final MlistState db) {
 		final CheckoutDlg dlg = new CheckoutDlg(this, host);
 		dlg.getBldr().setPositiveButton("Add", new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick (final DialogInterface dialog, final int whichButton) {
 				if (!dlg.isFilledIn()) return;
 				dialog.dismiss();
-				getConfigDb().addCheckout(new Checkout(host.getId(), dlg.getQuery(), dlg.getLocalDir()));
+				getConfigDb().addCheckout(new Checkout(null, host.getId(), db.getRelativePath(), dlg.getQuery(), dlg.getLocalDir()));
 				reloadCheckouts();
 			}
 		});
@@ -137,13 +163,25 @@ public class CheckoutMgrActivity extends Activity {
 			return;
 		}
 
+		if (StringHelper.isEmpty(checkout.getDbRelativePath())) {
+			askChooseDb(host, new Listener<MlistState>() {
+				@Override
+				public void onAnswer (final MlistState answer) {
+					askEditCheckout(checkout.withDbRelativePath(answer.getRelativePath()));
+				}
+			});
+			return;
+		}
+
 		final CheckoutDlg dlg = new CheckoutDlg(this, host, checkout);
 		dlg.getBldr().setPositiveButton("Update", new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick (final DialogInterface dialog, final int whichButton) {
 				if (!dlg.isFilledIn()) return;
 				dialog.dismiss();
-				getConfigDb().updateCheckout(new Checkout(checkout.getId(), checkout.getHostId(), dlg.getQuery(), dlg.getLocalDir()));
+				getConfigDb().updateCheckout(checkout
+						.withQuery(dlg.getQuery())
+						.withLocalDir(dlg.getLocalDir()));
 				reloadCheckouts();
 			}
 		});

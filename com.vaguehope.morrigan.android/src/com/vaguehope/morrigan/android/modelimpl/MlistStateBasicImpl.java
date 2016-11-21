@@ -28,6 +28,7 @@ public class MlistStateBasicImpl implements MlistState, MlistReference {
 	private ServerReference serverReference;
 
 	private String id;
+	private String relativePath;
 	private String title;
 	private int count;
 	private long duration;
@@ -67,6 +68,14 @@ public class MlistStateBasicImpl implements MlistState, MlistReference {
 		this.id = id;
 	}
 
+	public void setRelativePath (final String relativePath) {
+		this.relativePath = relativePath;
+	}
+
+	@Override
+	public String getRelativePath () {
+		return this.relativePath;
+	}
 
 	@Override
 	public String getTitle() {
@@ -107,6 +116,11 @@ public class MlistStateBasicImpl implements MlistState, MlistReference {
 	@Override
 	public boolean isDurationComplete() {
 		return this.durationComplete;
+	}
+
+	@Override
+	public String getUiTitle () {
+		return this.title;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

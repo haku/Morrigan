@@ -22,6 +22,7 @@ import java.io.InputStream;
 import org.xml.sax.SAXException;
 
 import android.app.Activity;
+import android.content.Context;
 
 import com.vaguehope.morrigan.android.C;
 import com.vaguehope.morrigan.android.helper.HttpHelper.HttpCreds;
@@ -38,8 +39,14 @@ public class GetMlistsTask extends AbstractTask<MlistStateList> {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public GetMlistsTask (Activity activity, ServerReference serverReference, MlistStateListChangeListener changedListener) {
+	public GetMlistsTask (final Activity activity, final ServerReference serverReference, final MlistStateListChangeListener changedListener) {
 		super(activity);
+		this.serverReference = serverReference;
+		this.changedListener = changedListener;
+	}
+
+	public GetMlistsTask (final Context context, final ServerReference serverReference, final MlistStateListChangeListener changedListener) {
+		super(context);
 		this.serverReference = serverReference;
 		this.changedListener = changedListener;
 	}
@@ -58,13 +65,13 @@ public class GetMlistsTask extends AbstractTask<MlistStateList> {
 
 	// In background thread:
 	@Override
-	protected MlistStateList parseStream (InputStream is) throws IOException, SAXException {
+	protected MlistStateList parseStream (final InputStream is) throws IOException, SAXException {
 		return new MlistStateListImpl(is, GetMlistsTask.this.serverReference);
 	}
 
 	// In UI thread:
 	@Override
-	protected void onSuccess (MlistStateList result, Exception exception) {
+	protected void onSuccess (final MlistStateList result, final Exception exception) {
 		if (this.changedListener != null) this.changedListener.onMlistsChange(result, exception);
 	}
 

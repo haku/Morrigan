@@ -27,12 +27,13 @@ import com.vaguehope.morrigan.android.model.MlistState;
 public class MlistStateXmlImpl extends XmlParser implements MlistState {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public static final String TITLE = "title";
-	public static final String COUNT = "count";
-	public static final String DURATION = "duration";
-	public static final String DURATIONCOMPLETE = "durationcomplete";
+	private static final String SELF = "self";
+	private static final String TITLE = "title";
+	private static final String COUNT = "count";
+	private static final String DURATION = "duration";
+	private static final String DURATIONCOMPLETE = "durationcomplete";
 
-	public final static String[] nodes = new String[] {
+	private final static String[] nodes = new String[] {
 		TITLE,
 		COUNT,
 		DURATION,
@@ -70,6 +71,11 @@ public class MlistStateXmlImpl extends XmlParser implements MlistState {
 	}
 
 	@Override
+	public String getRelativePath () {
+		return this.getNode(SELF);
+	}
+
+	@Override
 	public String getTitle() {
 		return this.getNode(TITLE);
 	}
@@ -90,4 +96,10 @@ public class MlistStateXmlImpl extends XmlParser implements MlistState {
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	@Override
+	public String getUiTitle () {
+		return getTitle();
+	}
+
 }

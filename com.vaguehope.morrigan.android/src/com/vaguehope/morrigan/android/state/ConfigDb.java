@@ -25,7 +25,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
+import com.vaguehope.morrigan.android.C;
 import com.vaguehope.morrigan.android.model.Artifact;
 import com.vaguehope.morrigan.android.model.ArtifactList;
 import com.vaguehope.morrigan.android.model.ServerReference;
@@ -36,7 +38,7 @@ public class ConfigDb extends SQLiteOpenHelper implements ServerReferenceList {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private static final String DB_NAME = "config";
-	private static final int DB_VERSION = 3;
+	private static final int DB_VERSION = 5;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -57,6 +59,7 @@ public class ConfigDb extends SQLiteOpenHelper implements ServerReferenceList {
 	private static final String TBL_CHECKOUTS = "checkouts";
 	private static final String TBL_CHECKOUTS_ID = "_id";
 	private static final String TBL_CHECKOUTS_HOST_ID = "host_id";
+	private static final String TBL_CHECKOUTS_DB_REL_PATH = "db_rel_path";
 	private static final String TBL_CHECKOUTS_QUERY = "query";
 	private static final String TBL_CHECKOUTS_LOCAL_DIR = "local_dir";
 
@@ -64,6 +67,7 @@ public class ConfigDb extends SQLiteOpenHelper implements ServerReferenceList {
 			"CREATE TABLE " + TBL_CHECKOUTS + " ("
 					+ TBL_CHECKOUTS_ID + " integer primary key autoincrement,"
 					+ TBL_CHECKOUTS_HOST_ID + " integer,"
+					+ TBL_CHECKOUTS_DB_REL_PATH + " text,"
 					+ TBL_CHECKOUTS_QUERY + " text,"
 					+ TBL_CHECKOUTS_LOCAL_DIR + " text"
 					+ ");";
@@ -81,11 +85,15 @@ public class ConfigDb extends SQLiteOpenHelper implements ServerReferenceList {
 
 	@Override
 	public void onUpgrade (final SQLiteDatabase db, final int oldVersion, final int newVersion) {
+		Log.i(C.LOGTAG, String.format("Upgrading DB from version %d to %d...", oldVersion, newVersion));
 		if (oldVersion <= 1) {
 			db.execSQL("ALTER TABLE " + TBL_HOSTS + " ADD COLUMN " + TBL_HOSTS_NAME + " text;");
 		}
 		if (oldVersion <= 2) {
 			db.execSQL(TBL_CHECKOUTS_CREATE);
+		}
+		if (oldVersion <= 4) {
+			db.execSQL("ALTER TABLE " + TBL_CHECKOUTS + " ADD COLUMN " + TBL_CHECKOUTS_DB_REL_PATH + " text;");
 		}
 	}
 
@@ -281,6 +289,7 @@ public class ConfigDb extends SQLiteOpenHelper implements ServerReferenceList {
 		final ContentValues values = new ContentValues();
 		if (checkout.getId() != null) values.put(TBL_CHECKOUTS_ID, checkout.getId());
 		values.put(TBL_CHECKOUTS_HOST_ID, checkout.getHostId());
+		values.put(TBL_CHECKOUTS_DB_REL_PATH, checkout.getDbRelativePath());
 		values.put(TBL_CHECKOUTS_QUERY, checkout.getQuery());
 		values.put(TBL_CHECKOUTS_LOCAL_DIR, checkout.getLocalDir());
 		return values;
@@ -311,7 +320,7 @@ public class ConfigDb extends SQLiteOpenHelper implements ServerReferenceList {
 			db.beginTransaction();
 			try {
 				final Cursor c = db.query(true, TBL_CHECKOUTS,
-						new String[] { TBL_CHECKOUTS_ID, TBL_CHECKOUTS_HOST_ID, TBL_CHECKOUTS_QUERY, TBL_CHECKOUTS_LOCAL_DIR },
+						new String[] { TBL_CHECKOUTS_ID, TBL_CHECKOUTS_HOST_ID, TBL_CHECKOUTS_DB_REL_PATH, TBL_CHECKOUTS_QUERY, TBL_CHECKOUTS_LOCAL_DIR },
 						null, null, null, null,
 						TBL_CHECKOUTS_ID + " ASC", null);
 				try {
@@ -319,14 +328,16 @@ public class ConfigDb extends SQLiteOpenHelper implements ServerReferenceList {
 					if (c.moveToFirst()) {
 						final int colId = c.getColumnIndex(TBL_CHECKOUTS_ID);
 						final int colHostId = c.getColumnIndex(TBL_CHECKOUTS_HOST_ID);
+						final int colDbRelPath = c.getColumnIndex(TBL_CHECKOUTS_DB_REL_PATH);
 						final int colQuery = c.getColumnIndex(TBL_CHECKOUTS_QUERY);
 						final int colLocalDir = c.getColumnIndex(TBL_CHECKOUTS_LOCAL_DIR);
 						do {
 							final String id = c.getString(colId);
 							final String hostId = c.getString(colHostId);
+							final String dbRelPath = c.getString(colDbRelPath);
 							final String query = c.getString(colQuery);
 							final String localDir = c.getString(colLocalDir);
-							ret.add(new Checkout(id, hostId, query, localDir));
+							ret.add(new Checkout(id, hostId, dbRelPath, query, localDir));
 						}
 						while (c.moveToNext());
 					}

@@ -16,17 +16,21 @@
 
 package com.vaguehope.morrigan.android.model;
 
-public interface MlistState extends Artifact {
+import com.vaguehope.morrigan.android.helper.Titleable;
+
+public interface MlistState extends Artifact, Titleable {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	public MlistReference getMlistReference ();
-	
+
+	public String getRelativePath ();
+
 	@Override
 	public String getTitle ();
-	
+
 	public int getCount ();
 	public long getDuration ();
 	public boolean isDurationComplete ();
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

@@ -4,16 +4,14 @@ public class Checkout {
 
 	private final String id;
 	private final String hostId;
+	private final String dbRelativePath;
 	private final String query;
 	private final String localDir;
 
-	public Checkout (final String hostId, final String query, final String localDir) {
-		this(null, hostId, query, localDir);
-	}
-
-	public Checkout (final String id, final String hostId, final String query, final String localDir) {
+	public Checkout (final String id, final String hostId, final String dbRelativePath, final String query, final String localDir) {
 		this.id = id;
 		this.hostId = hostId;
+		this.dbRelativePath = dbRelativePath;
 		this.query = query;
 		this.localDir = localDir;
 	}
@@ -26,6 +24,10 @@ public class Checkout {
 		return this.hostId;
 	}
 
+	public String getDbRelativePath () {
+		return this.dbRelativePath;
+	}
+
 	public String getQuery () {
 		return this.query;
 	}
@@ -36,11 +38,23 @@ public class Checkout {
 
 	@Override
 	public String toString () {
-		return String.format("%s\n%s", this.query, this.localDir);
+		return String.format("%s\n%s\n%s", this.dbRelativePath, this.query, this.localDir);
 	}
 
 	public Checkout withHostId (final String newHostId) {
-		return new Checkout(this.id, newHostId, this.query, this.localDir);
+		return new Checkout(this.id, newHostId, this.dbRelativePath, this.query, this.localDir);
+	}
+
+	public Checkout withDbRelativePath (final String newDbRelativePath) {
+		return new Checkout(this.id, this.hostId, newDbRelativePath, this.query, this.localDir);
+	}
+
+	public Checkout withQuery (final String newQuery) {
+		return new Checkout(this.id, this.hostId, this.dbRelativePath, newQuery, this.localDir);
+	}
+
+	public Checkout withLocalDir (final String newLocalDir) {
+		return new Checkout(this.id, this.hostId, this.dbRelativePath, this.query, newLocalDir);
 	}
 
 }
