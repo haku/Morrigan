@@ -2,10 +2,6 @@ package com.vaguehope.morrigan.android;
 
 import java.util.List;
 
-import com.vaguehope.morrigan.android.helper.ExceptionHelper;
-import com.vaguehope.morrigan.android.state.Checkout;
-import com.vaguehope.morrigan.android.state.ConfigDb;
-
 import android.app.Notification;
 import android.app.Notification.Builder;
 import android.app.NotificationManager;
@@ -13,15 +9,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import com.vaguehope.morrigan.android.helper.ExceptionHelper;
+import com.vaguehope.morrigan.android.state.Checkout;
+import com.vaguehope.morrigan.android.state.ConfigDb;
+
 public class SyncCheckoutsService extends AwakeService {
 
-	private final int notificationId;
 	private ConfigDb configDb;
 	private NotificationManager notifMgr;
 
 	public SyncCheckoutsService () {
 		super("SyncCheckoutsService");
-		this.notificationId = (int) (System.currentTimeMillis()); // Probably unique.
 	}
 
 	@Override
@@ -33,11 +31,13 @@ public class SyncCheckoutsService extends AwakeService {
 	@Override
 	protected void doWork (final Intent i) {
 		this.notifMgr = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		final int notificationId = (int) (System.currentTimeMillis()); // Probably unique.
+
 		final Builder notif = makeNotif("Sync starting...");
-		updateNotif(notif);
+		updateNotif(notificationId, notif);
 		String result = "Unknown result.";
 		try {
-			doSyncs(notif);
+			doSyncs(notificationId, notif);
 			result = "Finished.";
 		}
 		catch (final Exception e) {
@@ -45,7 +45,7 @@ public class SyncCheckoutsService extends AwakeService {
 			result = ExceptionHelper.veryShortMessage(e);
 		}
 		finally {
-			updateNotifResult(notif, result);
+			updateNotifResult(notificationId, notif, result);
 		}
 	}
 
@@ -58,35 +58,35 @@ public class SyncCheckoutsService extends AwakeService {
 				.setOngoing(true);
 	}
 
-	private void updateNotif (final Builder notif, final String msg) {
-		updateNotif(notif.setContentText(msg));
+	private void updateNotif (final int notificationId, final Builder notif, final String msg) {
+		updateNotif(notificationId, notif.setContentText(msg));
 	}
 
-	private void updateNotifProgress (final Builder notif, final int max, final int progress) {
-		updateNotif(notif.setProgress(max, progress, false));
+	private void updateNotifProgress (final int notificationId, final Builder notif, final int max, final int progress) {
+		updateNotif(notificationId, notif.setProgress(max, progress, false));
 	}
 
-	private void updateNotifResult (final Builder notif, final String msg) {
-		updateNotif(notif.setOngoing(false)
+	private void updateNotifResult (final int notificationId, final Builder notif, final String msg) {
+		updateNotif(notificationId, notif.setOngoing(false)
 				.setProgress(0, 0, false)
 				.setContentText(msg));
 	}
 
-	private void updateNotif (final Builder notif) {
-		this.notifMgr.notify(this.notificationId, notif.getNotification());
+	private void updateNotif (final int notificationId, final Builder notif) {
+		this.notifMgr.notify(notificationId, notif.getNotification());
 	}
 
-	private void doSyncs (final Builder notif) {
+	private void doSyncs (final int notificationId, final Builder notif) {
 		final List<Checkout> checkouts = this.configDb.getCheckouts();
 		for (final Checkout checkout : checkouts) {
-			syncCheckout(checkout, notif);
+			syncCheckout(checkout, notificationId, notif);
 		}
 	}
 
-	private void syncCheckout (final Checkout checkout, final Builder notif) {
-		updateNotif(notif, checkout.getQuery());
+	private void syncCheckout (final Checkout checkout, final int notificationId, final Builder notif) {
+		updateNotif(notificationId, notif, checkout.getQuery());
 		for (int i = 0; i < 10; i++) {
-			updateNotifProgress(notif, 10, i);
+			updateNotifProgress(notificationId, notif, 10, i);
 			try {
 				Thread.sleep(1000L);
 			}
