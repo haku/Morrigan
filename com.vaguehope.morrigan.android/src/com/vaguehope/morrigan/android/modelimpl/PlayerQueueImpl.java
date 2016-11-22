@@ -19,6 +19,7 @@ package com.vaguehope.morrigan.android.modelimpl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.text.ParseException;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -116,6 +117,14 @@ public class PlayerQueueImpl implements PlayerQueue, ContentHandler {
 			this.currentTitle = null;
 			this.currentListRelativeUrl = null;
 			this.currentItemRelativeUrl = null;
+			this.currentId = null;
+			this.currentFileSize = 0;
+			this.currentHash = null;
+			this.currentEnabled = false;
+			this.currentMissing = true;
+			this.currentDuration = 0;
+			this.currentStartCount = 0;
+			this.currentEndCount = 0;
 		}
 		else if (this.stack.size() == 3 && localName.equals("link")) {
 			String relVal = attributes.getValue("rel");

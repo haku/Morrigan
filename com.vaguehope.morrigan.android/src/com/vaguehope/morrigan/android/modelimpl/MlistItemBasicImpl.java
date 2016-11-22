@@ -31,6 +31,7 @@ public class MlistItemBasicImpl implements MlistItem {
 	private String id;
 	private String relativeUrl;
 	private long fileSize;
+	private long lastModified;
 	private BigInteger hashCode;
 	private boolean enabled;
 	private boolean missing;
@@ -106,6 +107,14 @@ public class MlistItemBasicImpl implements MlistItem {
 	}
 	public void setFileSize (final long fileSize) {
 		this.fileSize = fileSize;
+	}
+
+	@Override
+	public long getLastModified () {
+		return this.lastModified;
+	}
+	public void setLastModified (final long lastModified) {
+		this.lastModified = lastModified;
 	}
 
 	@Override

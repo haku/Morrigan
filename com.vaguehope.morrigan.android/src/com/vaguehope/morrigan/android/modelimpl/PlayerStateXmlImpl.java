@@ -295,6 +295,11 @@ public class PlayerStateXmlImpl implements PlayerState, MlistItem, ContentHandle
 	}
 
 	@Override
+	public long getLastModified () {
+		throw new UnsupportedOperationException("Not implemented.");
+	}
+
+	@Override
 	public BigInteger getHashCode () {
 		return getTrackHashCode();
 	}

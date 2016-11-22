@@ -19,6 +19,7 @@ package com.vaguehope.morrigan.android.modelimpl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.text.ParseException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -38,6 +39,7 @@ import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
+import com.vaguehope.morrigan.android.helper.TimeHelper;
 import com.vaguehope.morrigan.android.model.Artifact;
 import com.vaguehope.morrigan.android.model.ArtifactList;
 import com.vaguehope.morrigan.android.model.MlistItem;
@@ -59,6 +61,7 @@ public class MlistItemListImpl implements MlistItemList, ContentHandler {
 	public static final String STARTCOUNT = "startcount";
 	public static final String ENDCOUNT = "endcount";
 	public static final String FILESIZE = "filesize";
+	public static final String LASTMODIFIED = "datelastmodified";
 	public static final String HASHCODE = "hash";
 	public static final String ENABLED = "enabled";
 	public static final String MISSING = "missing";
@@ -190,6 +193,15 @@ public class MlistItemListImpl implements MlistItemList, ContentHandler {
 		else if (this.stack.size() == 3 && localName.equals(FILESIZE)) {
 			long v = Long.parseLong(this.currentText.toString());
 			this.currentItem.setFileSize(v);
+		}
+		else if (this.stack.size() == 3 && localName.equals(LASTMODIFIED)) {
+			try {
+				final long v = TimeHelper.parseXmlDate(this.currentText.toString());
+				this.currentItem.setLastModified(v);
+			}
+			catch (ParseException e) {
+				throw new SAXException(e.toString(), e);
+			}
 		}
 		else if (this.stack.size() == 3 && localName.equals(HASHCODE)) {
 			BigInteger v = new BigInteger(this.currentText.toString(), 16);

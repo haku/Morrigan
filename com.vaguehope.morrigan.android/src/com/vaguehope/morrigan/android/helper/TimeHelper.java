@@ -16,20 +16,40 @@
 
 package com.vaguehope.morrigan.android.helper;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
+
 public final class TimeHelper {
 
 	private TimeHelper () {}
 
 	@SuppressWarnings("boxing")
-	public static String formatTimeSeconds (long seconds) {
+	public static String formatTimeSeconds (final long seconds) {
 		if (seconds >= 3600) {
 			return String.format("%d:%02d:%02d", seconds / 3600, (seconds % 3600) / 60, (seconds % 60));
 		}
 		return String.format("%d:%02d", (seconds % 3600) / 60, (seconds % 60));
 	}
 
-	public static String formatTimeMiliseconds (long miliseconds) {
+	public static String formatTimeMiliseconds (final long miliseconds) {
 		return String.valueOf(miliseconds / 1000f);
+	}
+
+	private static ThreadLocal<SimpleDateFormat> ISO_8601_UTC = new ThreadLocal<SimpleDateFormat>() {
+		@Override
+		protected SimpleDateFormat initialValue () {
+			final SimpleDateFormat a = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+			a.setTimeZone(TimeZone.getTimeZone("UTC"));
+			return a;
+		}
+	};
+
+	public static long parseXmlDate (final String date) throws ParseException {
+		final Date d = ISO_8601_UTC.get().parse(date);
+		if (d == null) return 0L;
+		return d.getTime();
 	}
 
 }
