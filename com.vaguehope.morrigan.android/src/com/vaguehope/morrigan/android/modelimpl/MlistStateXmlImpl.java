@@ -17,12 +17,15 @@
 package com.vaguehope.morrigan.android.modelimpl;
 
 
+import java.util.List;
+
 import org.xml.sax.SAXException;
 
 import com.vaguehope.morrigan.android.R;
 import com.vaguehope.morrigan.android.helper.XmlParser;
 import com.vaguehope.morrigan.android.model.MlistReference;
 import com.vaguehope.morrigan.android.model.MlistState;
+import com.vaguehope.morrigan.android.model.ServerReference;
 
 public class MlistStateXmlImpl extends XmlParser implements MlistState {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -45,6 +48,11 @@ public class MlistStateXmlImpl extends XmlParser implements MlistState {
 	private final MlistReference mlistReference;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	public MlistStateXmlImpl (final String xmlString, final ServerReference host) throws SAXException {
+		super(xmlString, nodes, host);
+		this.mlistReference = null;
+	}
 
 	public MlistStateXmlImpl (final String xmlString, final MlistReference mlistReference) throws SAXException {
 		super(xmlString, nodes, mlistReference.getServerReference());
@@ -93,6 +101,11 @@ public class MlistStateXmlImpl extends XmlParser implements MlistState {
 	@Override
 	public boolean isDurationComplete() {
 		return this.getNodeBoolean(DURATIONCOMPLETE);
+	}
+
+	@Override
+	public List<String> getSrcs () {
+		return getRepeatingNode("src");
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

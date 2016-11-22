@@ -16,6 +16,8 @@
 
 package com.vaguehope.morrigan.android.modelimpl;
 
+import java.util.List;
+
 import com.vaguehope.morrigan.android.R;
 import com.vaguehope.morrigan.android.model.MlistReference;
 import com.vaguehope.morrigan.android.model.MlistState;
@@ -116,6 +118,11 @@ public class MlistStateBasicImpl implements MlistState, MlistReference {
 	@Override
 	public boolean isDurationComplete() {
 		return this.durationComplete;
+	}
+
+	@Override
+	public List<String> getSrcs () {
+		throw new UnsupportedOperationException("Not implemented.");
 	}
 
 	@Override

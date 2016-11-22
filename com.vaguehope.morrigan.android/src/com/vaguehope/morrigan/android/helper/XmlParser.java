@@ -17,7 +17,9 @@
 package com.vaguehope.morrigan.android.helper;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
@@ -43,6 +45,7 @@ public class XmlParser implements ContentHandler {
 
 	private final ServerReference serverReference;
 	private final Map<String, String> nodes = new HashMap<String, String>();
+	private final Map<String, List<String>> repeatingNodes = new HashMap<String, List<String>>();
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -112,6 +115,10 @@ public class XmlParser implements ContentHandler {
 		return b;
 	}
 
+	public List<String> getRepeatingNode (final String node) {
+		return this.repeatingNodes.get(node);
+	}
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private final Stack<String> stack = new Stack<String>();
@@ -138,8 +145,19 @@ public class XmlParser implements ContentHandler {
 	}
 
 	@Override
-	public void endElement(final String uri, final String localName, final String qName) throws SAXException {
-		this.nodes.put(localName, this.currentText.toString());
+	public void endElement (final String uri, final String localName, final String qName) throws SAXException {
+		final String newText = this.currentText.toString();
+		final String prev = this.nodes.put(localName, newText);
+
+		if (prev != null) {
+			List<String> list = this.repeatingNodes.get(localName);
+			if (list == null) {
+				list = new ArrayList<String>();
+				this.repeatingNodes.put(localName, list);
+				list.add(prev);
+			}
+			list.add(newText);
+		}
 
 		this.stack.pop();
 	}

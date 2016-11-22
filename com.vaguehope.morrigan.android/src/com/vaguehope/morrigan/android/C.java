@@ -31,6 +31,7 @@ public interface C {
 	String CONTEXT_MLISTS = "/mlists";
 
 	String CONTEXT_MLIST_ITEMS = "/items";
+	String CONTEXT_MLIST_SRC = "/src";
 	String CONTEXT_MLIST_QUERY = "/query";
 
 	String CONTEXT_PLAYER_QUEUE = "/queue";

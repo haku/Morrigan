@@ -16,6 +16,8 @@
 
 package com.vaguehope.morrigan.android.model;
 
+import java.util.List;
+
 import com.vaguehope.morrigan.android.helper.Titleable;
 
 public interface MlistState extends Artifact, Titleable {
@@ -31,6 +33,8 @@ public interface MlistState extends Artifact, Titleable {
 	public int getCount ();
 	public long getDuration ();
 	public boolean isDurationComplete ();
+
+	public List<String> getSrcs ();
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
