@@ -6,6 +6,7 @@ import java.util.Date;
 
 import com.vaguehope.morrigan.model.helper.EqualHelper;
 import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.util.MimeType;
 import com.vaguehope.morrigan.util.Objs;
 
 
@@ -64,15 +65,10 @@ public abstract class MediaItem implements IMediaItem {
 	private boolean setFilepathIfNotSet (final String filepath) {
 		if (this.filepath == null && !EqualHelper.areEqual(this.filepath, filepath)) {
 			this.filepath = filepath;
-			updateTitle();
+			updateTitleAndMimeType();
 			return true;
 		}
 		return false;
-	}
-
-	@Override
-	public String getMimeType () {
-		return null;
 	}
 
 	@Override
@@ -197,21 +193,31 @@ public abstract class MediaItem implements IMediaItem {
 //	Secondary attributes.
 
 	private String title = null;
+	private MimeType mimeType = null;
 
-	private void updateTitle () {
-		int x = this.filepath.lastIndexOf(File.separator);
-		if (x>0) {
-			this.title = this.filepath.substring(x+1);
+	private void updateTitleAndMimeType () {
+		final int x = this.filepath.lastIndexOf(File.separator);
+		if (x > 0) {
+			this.title = this.filepath.substring(x + 1);
 		}
 		else {
 			this.title = this.filepath;
 		}
+
+		this.mimeType = MimeType.identify(this.filepath);
 	}
 
 	@Override
 	public String getTitle () {
 		return this.title;
 	}
+
+	@Override
+	public String getMimeType () {
+		if (this.mimeType == null) return null;
+		return this.mimeType.getMimeType();
+	}
+
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Mass setter.

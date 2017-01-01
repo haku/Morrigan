@@ -63,4 +63,9 @@ public class StringHelper {
 		return a != null && a.equalsIgnoreCase(b);
 	}
 
+	public static boolean startsWithIgnoreCase (final String s, final String start) {
+		if (s == null) return start == null;
+		return s.toLowerCase(Locale.ENGLISH).startsWith(start.toLowerCase(Locale.ENGLISH));
+	}
+
 }

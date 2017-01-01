@@ -76,7 +76,8 @@ import com.vaguehope.sqlitewrapper.DbException;
  *  GET /mlists/LOCALMMDB/example.local.db3/items
  *  GET /mlists/LOCALMMDB/example.local.db3/items?includeddeletedtags=true
  *  GET /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3
- *  GET /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3?resize=128
+ *  GET /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp4?transcode=audio_only
+ *  GET /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.jpg?resize=128
  * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 action=play&playerid=0
  * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 action=queue&playerid=0
  * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 view=myview&action=play&playerid=0
@@ -95,6 +96,7 @@ import com.vaguehope.sqlitewrapper.DbException;
  *  GET /mlists/LOCALMMDB/example.local.db3/query/example?maxresults=500
  *  GET /mlists/LOCALMMDB/example.local.db3/query/example?includedisabled=true
  *  GET /mlists/LOCALMMDB/example.local.db3/query/example?column=foo&order=asc
+ *  GET /mlists/LOCALMMDB/example.local.db3/query/example?transcode=audio_only
  * </pre>
  */
 public class MlistsServlet extends HttpServlet {
@@ -120,6 +122,7 @@ public class MlistsServlet extends HttpServlet {
 	private static final String PARAM_ORDER = "order";
 	private static final String PARAM_MAXRESULTS = "maxresults";
 	private static final String PARAM_INCLUDE_DISABLED = "includedisabled";
+	private static final String PARAM_TRANSCODE = "transcode";
 	private static final String PARAM_ENABLED = "enabled";
 	private static final String PARAM_REMOTE = "remote";
 
@@ -145,6 +148,7 @@ public class MlistsServlet extends HttpServlet {
 	private final PlayerReader playerListener;
 	private final MediaFactory mediaFactory;
 	private final AsyncActions asyncActions;
+	private final Transcoder transcoder;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -152,6 +156,7 @@ public class MlistsServlet extends HttpServlet {
 		this.playerListener = playerListener;
 		this.mediaFactory = mediaFactory;
 		this.asyncActions = asyncActions;
+		this.transcoder = new Transcoder();
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -498,7 +503,7 @@ public class MlistsServlet extends HttpServlet {
 		FeedHelper.endFeed(dw);
 	}
 
-	private static void getToMmdb (final HttpServletRequest req, final HttpServletResponse resp, final IMixedMediaDb mmdb, final String path, final String afterPath) throws IOException, SAXException, MorriganException, DbException {
+	private void getToMmdb (final HttpServletRequest req, final HttpServletResponse resp, final IMixedMediaDb mmdb, final String path, final String afterPath) throws IOException, SAXException, MorriganException, DbException {
 		if (path == null) {
 			printMlistLong(resp, mmdb, IncludeSrcs.NO, IncludeItems.NO, IncludeTags.NO);
 		}
@@ -512,6 +517,12 @@ public class MlistsServlet extends HttpServlet {
 					final File file = new File(filepath);
 					if (file.exists()) {
 						if (ServletHelper.checkCanReturn304(file.lastModified(), req, resp)) return;
+
+						final String transcode = StringHelper.trimToNull(req.getParameter(PARAM_TRANSCODE));
+						if (Transcoder.transcodeRequired(item, transcode)) {
+							this.transcoder.transcode(file, Transcoder.transcodedTitle(item, transcode), resp);
+							return;
+						}
 
 						final Integer resize = ServletHelper.readParamInteger(req, PARAM_RESIZE);
 						if (resize != null) {
@@ -581,8 +592,9 @@ public class MlistsServlet extends HttpServlet {
 			final SortDirection[] sortDirections = parseSortOrder(req);
 			final int maxResults = ServletHelper.readParamInteger(req, PARAM_MAXRESULTS, DEFAULT_MAX_QUERY_RESULTS);
 			final boolean includeDisabled = ServletHelper.readParamBoolean(req, PARAM_INCLUDE_DISABLED, false);
+			final String transcode = StringHelper.trimToNull(req.getParameter(PARAM_TRANSCODE));
 			printMlistLong(resp, mmdb, IncludeSrcs.NO, IncludeItems.YES, IncludeTags.YES,
-					query, maxResults, sortColumns, sortDirections, includeDisabled);
+					query, maxResults, sortColumns, sortDirections, includeDisabled, transcode);
 		}
 		else {
 			ServletHelper.error(resp, HttpServletResponse.SC_NOT_FOUND, "HTTP error 404 unknown path '" + path + "' desu~");
@@ -669,13 +681,14 @@ public class MlistsServlet extends HttpServlet {
 	private static void printMlistLong (final HttpServletResponse resp, final IMixedMediaDb ml,
 			final IncludeSrcs includeSrcs, final IncludeItems includeItems, final IncludeTags includeTags)
 					throws SAXException, MorriganException, DbException, IOException {
-		printMlistLong(resp, ml, includeSrcs, includeItems, includeTags, null, 0, null, null, false);
+		printMlistLong(resp, ml, includeSrcs, includeItems, includeTags, null, 0, null, null, false, null);
 	}
 
 	private static void printMlistLong (final HttpServletResponse resp, final IMixedMediaDb ml,
 			final IncludeSrcs includeSrcs, final IncludeItems includeItems, final IncludeTags includeTags,
 			final String queryString, final int maxQueryResults,
-			final IDbColumn[] sortColumns, final SortDirection[] sortDirections, final boolean includeDisabled)
+			final IDbColumn[] sortColumns, final SortDirection[] sortDirections, final boolean includeDisabled,
+			final String transcode)
 					throws SAXException, MorriganException, DbException, IOException {
 		ml.read();
 		resp.setContentType("text/xml;charset=utf-8");
@@ -732,7 +745,7 @@ public class MlistsServlet extends HttpServlet {
 		if (includeItems == IncludeItems.YES) {
 			for (final IMixedMediaItem mi : items) {
 				dw.startElement("entry");
-				fillInMediaItem(dw, ml, mi, includeTags);
+				fillInMediaItem(dw, ml, mi, includeTags, transcode);
 				dw.endElement("entry");
 			}
 		}
@@ -740,10 +753,16 @@ public class MlistsServlet extends HttpServlet {
 		FeedHelper.endDocument(dw, "mlist");
 	}
 
-	static void fillInMediaItem (final DataWriter dw, final IMediaTrackList<? extends IMediaTrack> ml, final IMediaItem mi, final IncludeTags includeTags) throws SAXException, MorriganException {
-		FeedHelper.addElement(dw, "title", mi.getTitle());
-
-		FeedHelper.addLink(dw, fileLink(mi), "self"); // Path is relative to this feed.
+	static void fillInMediaItem (final DataWriter dw, final IMediaTrackList<? extends IMediaTrack> ml, final IMediaItem mi,
+			final IncludeTags includeTags, final String transcode) throws SAXException, MorriganException {
+		String title = mi.getTitle();
+		String fileLink = fileLink(mi);
+		if (Transcoder.transcodeRequired(mi, transcode)) {
+			title = Transcoder.transcodedTitle(mi, transcode);
+			fileLink += "?" + PARAM_TRANSCODE + "=" + transcode;
+		}
+		FeedHelper.addElement(dw, "title", title);
+		FeedHelper.addLink(dw, fileLink, "self"); // Path is relative to this feed.
 
 		if (mi.getDateAdded() != null) {
 			FeedHelper.addElement(dw, "dateadded", XmlHelper.getIso8601UtcDateFormatter().format(mi.getDateAdded()));
@@ -756,6 +775,7 @@ public class MlistsServlet extends HttpServlet {
 			FeedHelper.addElement(dw, "type", ((IMixedMediaItem) mi).getMediaType().getN());
 		}
 		FeedHelper.addElement(dw, "filesize", mi.getFileSize());
+		if (mi.getMimeType() != null) FeedHelper.addElement(dw, "mimetype", mi.getMimeType());
 		if (mi.getHashcode() != null && !BigInteger.ZERO.equals(mi.getHashcode())) FeedHelper.addElement(dw, "hash", mi.getHashcode().toString(16));
 		FeedHelper.addElement(dw, "enabled", Boolean.toString(mi.isEnabled()), new String[][] {
 			{ "m", mi.enabledLastModified() == null || mi.enabledLastModified().getTime() < 1L ? "" : String.valueOf(mi.enabledLastModified().getTime()) },
