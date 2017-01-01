@@ -38,7 +38,7 @@ public class ConfigDb extends SQLiteOpenHelper implements ServerReferenceList {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private static final String DB_NAME = "config";
-	private static final int DB_VERSION = 5;
+	private static final int DB_VERSION = 6;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -62,6 +62,7 @@ public class ConfigDb extends SQLiteOpenHelper implements ServerReferenceList {
 	private static final String TBL_CHECKOUTS_DB_REL_PATH = "db_rel_path";
 	private static final String TBL_CHECKOUTS_QUERY = "query";
 	private static final String TBL_CHECKOUTS_LOCAL_DIR = "local_dir";
+	private static final String TBL_CHECKOUTS_STATUS = "status";
 
 	private static final String TBL_CHECKOUTS_CREATE =
 			"CREATE TABLE " + TBL_CHECKOUTS + " ("
@@ -70,6 +71,7 @@ public class ConfigDb extends SQLiteOpenHelper implements ServerReferenceList {
 					+ TBL_CHECKOUTS_DB_REL_PATH + " text,"
 					+ TBL_CHECKOUTS_QUERY + " text,"
 					+ TBL_CHECKOUTS_LOCAL_DIR + " text"
+					+ TBL_CHECKOUTS_STATUS + " text"
 					+ ");";
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -94,6 +96,9 @@ public class ConfigDb extends SQLiteOpenHelper implements ServerReferenceList {
 		}
 		if (oldVersion <= 4) {
 			db.execSQL("ALTER TABLE " + TBL_CHECKOUTS + " ADD COLUMN " + TBL_CHECKOUTS_DB_REL_PATH + " text;");
+		}
+		if (oldVersion <= 5) {
+			db.execSQL("ALTER TABLE " + TBL_CHECKOUTS + " ADD COLUMN " + TBL_CHECKOUTS_STATUS + " text;");
 		}
 	}
 
@@ -292,6 +297,7 @@ public class ConfigDb extends SQLiteOpenHelper implements ServerReferenceList {
 		values.put(TBL_CHECKOUTS_DB_REL_PATH, checkout.getDbRelativePath());
 		values.put(TBL_CHECKOUTS_QUERY, checkout.getQuery());
 		values.put(TBL_CHECKOUTS_LOCAL_DIR, checkout.getLocalDir());
+		values.put(TBL_CHECKOUTS_STATUS, checkout.getStatus());
 		return values;
 	}
 
@@ -320,28 +326,12 @@ public class ConfigDb extends SQLiteOpenHelper implements ServerReferenceList {
 			db.beginTransaction();
 			try {
 				final Cursor c = db.query(true, TBL_CHECKOUTS,
-						new String[] { TBL_CHECKOUTS_ID, TBL_CHECKOUTS_HOST_ID, TBL_CHECKOUTS_DB_REL_PATH, TBL_CHECKOUTS_QUERY, TBL_CHECKOUTS_LOCAL_DIR },
+						new String[] { TBL_CHECKOUTS_ID, TBL_CHECKOUTS_HOST_ID, TBL_CHECKOUTS_DB_REL_PATH,
+								TBL_CHECKOUTS_QUERY, TBL_CHECKOUTS_LOCAL_DIR, TBL_CHECKOUTS_STATUS },
 						null, null, null, null,
 						TBL_CHECKOUTS_ID + " ASC", null);
 				try {
-					final List<Checkout> ret = new ArrayList<Checkout>();
-					if (c.moveToFirst()) {
-						final int colId = c.getColumnIndex(TBL_CHECKOUTS_ID);
-						final int colHostId = c.getColumnIndex(TBL_CHECKOUTS_HOST_ID);
-						final int colDbRelPath = c.getColumnIndex(TBL_CHECKOUTS_DB_REL_PATH);
-						final int colQuery = c.getColumnIndex(TBL_CHECKOUTS_QUERY);
-						final int colLocalDir = c.getColumnIndex(TBL_CHECKOUTS_LOCAL_DIR);
-						do {
-							final String id = c.getString(colId);
-							final String hostId = c.getString(colHostId);
-							final String dbRelPath = c.getString(colDbRelPath);
-							final String query = c.getString(colQuery);
-							final String localDir = c.getString(colLocalDir);
-							ret.add(new Checkout(id, hostId, dbRelPath, query, localDir));
-						}
-						while (c.moveToNext());
-					}
-					return Collections.unmodifiableList(ret);
+					return readCheckouts(c);
 				}
 				finally {
 					c.close();
@@ -354,6 +344,57 @@ public class ConfigDb extends SQLiteOpenHelper implements ServerReferenceList {
 		finally {
 			db.close();
 		}
+	}
+
+	public Checkout getCheckout (final String id) {
+		final SQLiteDatabase db = this.getReadableDatabase();
+		try {
+			db.beginTransaction();
+			try {
+				final Cursor c = db.query(true, TBL_CHECKOUTS,
+						new String[] { TBL_CHECKOUTS_ID, TBL_CHECKOUTS_HOST_ID, TBL_CHECKOUTS_DB_REL_PATH,
+						TBL_CHECKOUTS_QUERY, TBL_CHECKOUTS_LOCAL_DIR, TBL_CHECKOUTS_STATUS },
+						TBL_CHECKOUTS_ID + "=?", new String[] { id },
+						null, null,
+						TBL_CHECKOUTS_ID + " ASC", null);
+				try {
+					final List<Checkout> r = readCheckouts(c);
+					return r.size() > 0 ? r.get(0) : null;
+				}
+				finally {
+					c.close();
+				}
+			}
+			finally {
+				db.endTransaction();
+			}
+		}
+		finally {
+			db.close();
+		}
+	}
+
+	private List<Checkout> readCheckouts (final Cursor c) {
+		final List<Checkout> ret = new ArrayList<Checkout>();
+		if (c.moveToFirst()) {
+			final int colId = c.getColumnIndex(TBL_CHECKOUTS_ID);
+			final int colHostId = c.getColumnIndex(TBL_CHECKOUTS_HOST_ID);
+			final int colDbRelPath = c.getColumnIndex(TBL_CHECKOUTS_DB_REL_PATH);
+			final int colQuery = c.getColumnIndex(TBL_CHECKOUTS_QUERY);
+			final int colLocalDir = c.getColumnIndex(TBL_CHECKOUTS_LOCAL_DIR);
+			final int colStatus = c.getColumnIndex(TBL_CHECKOUTS_STATUS);
+			do {
+				final String id = c.getString(colId);
+				final String hostId = c.getString(colHostId);
+				final String dbRelPath = c.getString(colDbRelPath);
+				final String query = c.getString(colQuery);
+				final String localDir = c.getString(colLocalDir);
+				final String status = c.getString(colStatus);
+				ret.add(new Checkout(id, hostId, dbRelPath, query, localDir, status));
+			}
+			while (c.moveToNext());
+		}
+		return Collections.unmodifiableList(ret);
 	}
 
 	public void updateCheckout (final Checkout checkout) {

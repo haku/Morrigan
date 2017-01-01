@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import android.app.Notification;
@@ -14,7 +16,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import com.vaguehope.morrigan.android.helper.DialogHelper.Listener;
 import com.vaguehope.morrigan.android.helper.ExceptionHelper;
+import com.vaguehope.morrigan.android.helper.FileHelper;
 import com.vaguehope.morrigan.android.helper.FormaterHelper;
 import com.vaguehope.morrigan.android.helper.HttpFileDownloadHandler.DownloadProgressListener;
 import com.vaguehope.morrigan.android.model.MlistItem;
@@ -96,7 +100,16 @@ public class SyncCheckoutsService extends AwakeService {
 	private void doSyncs (final int notificationId, final Builder notif) throws IOException {
 		final List<Checkout> checkouts = this.configDb.getCheckouts();
 		for (final Checkout checkout : checkouts) {
-			syncCheckout(checkout, notificationId, notif);
+			try {
+				syncCheckout(checkout, notificationId, notif);
+			}
+			catch (final Exception e) {
+				this.configDb.updateCheckout(this.configDb.getCheckout(checkout.getId()).withStatus(e.toString()));
+
+				if (e instanceof RuntimeException) throw (RuntimeException) e;
+				if (e instanceof IOException) throw (IOException) e;
+				throw new IllegalStateException(e.toString(), e);
+			}
 		}
 	}
 
@@ -118,14 +131,19 @@ public class SyncCheckoutsService extends AwakeService {
 		final List<String> srcs = dbSrcs.getSrcs();
 
 		final List<ToCopy> toCopy = new ArrayList<ToCopy>();
+		final Set<File> allFiles = new HashSet<File>(items.size());
 		for (final MlistItem item : items) {
 			final File localFile = new File(localDir, removeSrc(URLDecoder.decode(item.getRelativeUrl(), "UTF-8"), srcs));
 			if (!localFile.exists() || localFile.lastModified() < item.getLastModified()) {
 				toCopy.add(new ToCopy(item, localFile));
 			}
+			allFiles.add(localFile);
 		}
 
-		if (localDir.getFreeSpace() < totalTransferSize(toCopy)) throw new IOException("Not enough space on device.");
+		final long spaceAfterCopy = localDir.getFreeSpace() - totalTransferSize(toCopy);
+		if (spaceAfterCopy < 1) throw new IOException(String.format(
+				"Not enough space on device: %s short.",
+				FormaterHelper.readableFileSize(Math.abs(spaceAfterCopy))));
 
 		final SyncDlPrgListnr prgLstnr = new SyncDlPrgListnr(notificationId, notif, toCopy);
 		for (final ToCopy i : toCopy) {
@@ -137,7 +155,19 @@ public class SyncCheckoutsService extends AwakeService {
 			prgLstnr.itemComplete(i);
 		}
 
-		// TODO stash result in DB.
+		final List<File> toDelete = new ArrayList<File>();
+		FileHelper.recursiveList(localDir, new Listener<File>() {
+			@Override
+			public void onAnswer (final File file) {
+				if (!allFiles.contains(file)) toDelete.add(file);
+			}
+		});
+
+		String status = String.format("Transfered %s items (%s).",
+				prgLstnr.getTransferedItems(),
+				FormaterHelper.readableFileSize(prgLstnr.getTransferedItemBytes()));
+		if (toDelete.size() > 0) status += String.format("  %s files to delete.", toDelete.size());
+		this.configDb.updateCheckout(this.configDb.getCheckout(checkout.getId()).withStatus(status));
 	}
 
 	private static long totalSize (final List<? extends MlistItem> items) {
@@ -160,8 +190,9 @@ public class SyncCheckoutsService extends AwakeService {
 		String matchedSrc = null;
 		for (final String src : srcs) {
 			if (path.startsWith(src)) {
-				if (matchedSrc != null) throw new IllegalStateException("Patch matches multiple srcs: " + path);
-				matchedSrc = src;
+				if (matchedSrc == null || matchedSrc.length() < src.length()) {
+					matchedSrc = src;
+				}
 			}
 		}
 		if (matchedSrc == null) throw new IllegalStateException("Path does not match any srcs: " + path);
@@ -211,6 +242,14 @@ public class SyncCheckoutsService extends AwakeService {
 		public void itemComplete(final ToCopy i) {
 			this.transferedItems += 1;
 			this.transferedItemBytes += i.getItem().getFileSize();
+		}
+
+		public long getTransferedItems () {
+			return this.transferedItems;
+		}
+
+		public long getTransferedItemBytes () {
+			return this.transferedItemBytes;
 		}
 
 		@Override

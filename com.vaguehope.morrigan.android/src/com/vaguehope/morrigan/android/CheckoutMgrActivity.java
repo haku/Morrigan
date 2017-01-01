@@ -144,7 +144,7 @@ public class CheckoutMgrActivity extends Activity {
 			public void onClick (final DialogInterface dialog, final int whichButton) {
 				if (!dlg.isFilledIn()) return;
 				dialog.dismiss();
-				getConfigDb().addCheckout(new Checkout(null, host.getId(), db.getRelativePath(), dlg.getQuery(), dlg.getLocalDir()));
+				getConfigDb().addCheckout(new Checkout(null, host.getId(), db.getRelativePath(), dlg.getQuery(), dlg.getLocalDir(), ""));
 				reloadCheckouts();
 			}
 		});
