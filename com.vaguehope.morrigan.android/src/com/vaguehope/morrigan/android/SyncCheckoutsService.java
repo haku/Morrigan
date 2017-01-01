@@ -107,7 +107,7 @@ public class SyncCheckoutsService extends AwakeService {
 		if (!localDir.exists() && !localDir.mkdirs()) throw new IOException("Failed to create '" + localDir.getAbsolutePath() + "'.");
 
 		final ServerReference host = this.configDb.getServer(checkout.getHostId());
-		final MlistItemList itemList = MnApi.fetchDbItems(host, checkout.getDbRelativePath(), checkout.getQuery());
+		final MlistItemList itemList = MnApi.fetchDbItems(host, checkout.getDbRelativePath(), checkout.getQuery(), "audio_only"); // TODO unhardcode this.
 		final List<? extends MlistItem> items = itemList.getMlistItemList();
 
 		final long totalSize = totalSize(items);
