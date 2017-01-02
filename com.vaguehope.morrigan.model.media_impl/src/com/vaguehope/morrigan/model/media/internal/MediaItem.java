@@ -39,7 +39,7 @@ public abstract class MediaItem implements IMediaItem {
 
 	@Override
 	public long getFileSize () {
-		return new File(this.filepath).length();
+		return getFile().length();
 	}
 
 	@Override
@@ -65,7 +65,7 @@ public abstract class MediaItem implements IMediaItem {
 	private boolean setFilepathIfNotSet (final String filepath) {
 		if (this.filepath == null && !EqualHelper.areEqual(this.filepath, filepath)) {
 			this.filepath = filepath;
-			updateTitleAndMimeType();
+			updateFilepathBasedThings();
 			return true;
 		}
 		return false;
@@ -192,10 +192,13 @@ public abstract class MediaItem implements IMediaItem {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Secondary attributes.
 
+	private File file = null;
 	private String title = null;
 	private MimeType mimeType = null;
 
-	private void updateTitleAndMimeType () {
+	private void updateFilepathBasedThings () {
+		this.file = new File(this.filepath);
+
 		final int x = this.filepath.lastIndexOf(File.separator);
 		if (x > 0) {
 			this.title = this.filepath.substring(x + 1);
@@ -205,6 +208,11 @@ public abstract class MediaItem implements IMediaItem {
 		}
 
 		this.mimeType = MimeType.identify(this.filepath);
+	}
+
+	@Override
+	public File getFile () {
+		return this.file;
 	}
 
 	@Override

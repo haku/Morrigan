@@ -19,11 +19,7 @@ public class Config {
 
 	public static File getPlDir () {
 		File f = new File(getConfigDir() + PL_DIR);
-		if (!f.exists()) {
-			if (!f.mkdirs()) {
-				throw new RuntimeException("Failed to create direactory '"+f.getAbsolutePath()+"'.");
-			}
-		}
+		mkdir(f);
 		return f;
 	}
 
@@ -35,11 +31,7 @@ public class Config {
 
 	public static File getLibDir () {
 		File f = new File(getConfigDir() + LIB_DIR);
-		if (!f.exists()) {
-			if (!f.mkdirs()) {
-				throw new RuntimeException("Failed to create direactory '"+f.getAbsolutePath()+"'.");
-			}
-		}
+		mkdir(f);
 		return f;
 	}
 
@@ -50,11 +42,7 @@ public class Config {
 
 	public static File getGalleryDir () {
 		File f = new File(getConfigDir() + GALLERY_DIR);
-		if (!f.exists()) {
-			if (!f.mkdirs()) {
-				throw new RuntimeException("Failed to create direactory '"+f.getAbsolutePath()+"'.");
-			}
-		}
+		mkdir(f);
 		return f;
 	}
 
@@ -66,11 +54,7 @@ public class Config {
 
 	public static File getMmdbDir () {
 		File f = new File(getConfigDir() + MMDB_DIR);
-		if (!f.exists()) {
-			if (!f.mkdirs()) {
-				throw new RuntimeException("Failed to create direactory '"+f.getAbsolutePath()+"'.");
-			}
-		}
+		mkdir(f);
 		return f;
 	}
 
@@ -116,27 +100,32 @@ public class Config {
 
 	public static File getResizedDir () {
 		final File f = new File(getConfigDir() + RESIZED_DIR);
-		if (!f.exists()) {
-			if (!f.mkdirs()) {
-				throw new RuntimeException("Failed to create direactory '" + f.getAbsolutePath() + "'.");
-			}
-		}
+		mkdir(f);
 		return f;
 	}
 
-	//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	private static final String TRANSCODED_DIR = "/transcoded";
+
+	public static File getTranscodedDir () {
+		final File f = new File(getConfigDir() + TRANSCODED_DIR);
+		mkdir(f);
+		return f;
+	}
 
 	private static final String SESSION_DIR = "/sessions";
 
 	public static File getSessionDir () {
 		final File f = new File(getConfigDir() + SESSION_DIR);
+		mkdir(f);
+		return f;
+	}
+
+	private static void mkdir (final File f) {
 		if (!f.exists()) {
 			if (!f.mkdirs()) {
 				throw new RuntimeException("Failed to create direactory '" + f.getAbsolutePath() + "'.");
 			}
 		}
-		return f;
 	}
 
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

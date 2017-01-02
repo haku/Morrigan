@@ -71,9 +71,12 @@ public final class ServletHelper {
 	}
 
 	public static void returnFile (final File file, final HttpServletResponse response, final boolean asDownload) throws IOException {
+		returnFile(file, response, asDownload ? file.getName() : null);
+	}
+
+	public static void returnFile (final File file, final HttpServletResponse response, final String name) throws IOException {
 		InputStream is = new BufferedInputStream(new FileInputStream(file));
 		try {
-			String name = asDownload ? file.getName() : null;
 			returnFile(is, name, file.length(), file.lastModified(), response);
 		}
 		finally {

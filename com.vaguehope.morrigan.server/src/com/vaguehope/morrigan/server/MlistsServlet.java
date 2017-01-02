@@ -85,6 +85,7 @@ import com.vaguehope.sqlitewrapper.DbException;
  * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 action=addtag&tag=foo
  * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 action=rmtag&tag=foo
  * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 action=set_enabled&enabled=true
+ * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp4?transcode=audio_only action=transcode
  *
  *  GET /mlists/LOCALMMDB/example.local.db3/albums
  *  GET /mlists/LOCALMMDB/example.local.db3/albums/somealbum
@@ -135,6 +136,7 @@ public class MlistsServlet extends HttpServlet {
 	public static final String CMD_ADDTAG = "addtag";
 	public static final String CMD_RMTAG = "rmtag";
 	public static final String CMD_SET_ENABLED = "set_enabled";
+	public static final String CMD_TRANSCODE = "transcode";
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -419,6 +421,15 @@ public class MlistsServlet extends HttpServlet {
 				ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid or missing " + PARAM_ENABLED + " param.");
 			}
 		}
+		else if (action.equals(CMD_TRANSCODE)) {
+			final String transcode = StringHelper.trimToNull(req.getParameter(PARAM_TRANSCODE));
+			if (transcode != null) {
+				this.transcoder.transcodeToFile(item.getFile(), transcode);
+			}
+			else {
+				ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid or missing " + PARAM_TRANSCODE + " param.");
+			}
+		}
 		else {
 			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "HTTP error 400 '" + action + "' is not a valid action parameter desu~");
 		}
@@ -514,14 +525,20 @@ public class MlistsServlet extends HttpServlet {
 				if (mmdb.hasFile(filepath).isKnown()) {
 					final IMixedMediaItem item = mmdb.getByFile(filepath);
 					final boolean asDownload = item.getMediaType() == MediaType.TRACK;
-					final File file = new File(filepath);
+					final File file = item.getFile();
 					if (file.exists()) {
 						if (ServletHelper.checkCanReturn304(file.lastModified(), req, resp)) return;
 
 						final String transcode = StringHelper.trimToNull(req.getParameter(PARAM_TRANSCODE));
-						if (Transcoder.transcodeRequired(item, transcode)) {
-							this.transcoder.transcode(file, Transcoder.transcodedTitle(item, transcode), resp);
-							return;
+						if (transcode != null) {
+    						final File transcodedFile = Transcoder.transcodedFile(file, transcode);
+    						if (transcodedFile.exists()) {
+    							ServletHelper.returnFile(transcodedFile, resp, Transcoder.transcodedTitle(item, transcode));
+    						}
+    						else {
+    							ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "HTTP error 400 '" + filepath + "' has not been transcoded desu~");
+    						}
+    						return;
 						}
 
 						final Integer resize = ServletHelper.readParamInteger(req, PARAM_RESIZE);
@@ -756,12 +773,20 @@ public class MlistsServlet extends HttpServlet {
 	static void fillInMediaItem (final DataWriter dw, final IMediaTrackList<? extends IMediaTrack> ml, final IMediaItem mi,
 			final IncludeTags includeTags, final String transcode) throws SAXException, MorriganException {
 		String title = mi.getTitle();
+		long fileSize = mi.getFileSize();
 		String fileLink = fileLink(mi);
+
 		if (Transcoder.transcodeRequired(mi, transcode)) {
 			title = Transcoder.transcodedTitle(mi, transcode);
+
+			final File transcodedFile = Transcoder.transcodedFile(mi.getFile(), transcode);
+			fileSize = transcodedFile.exists() ? transcodedFile.length() : 0L;
+
 			fileLink += "?" + PARAM_TRANSCODE + "=" + transcode;
 		}
+
 		FeedHelper.addElement(dw, "title", title);
+		if (fileSize > 0) FeedHelper.addElement(dw, "filesize", fileSize);
 		FeedHelper.addLink(dw, fileLink, "self"); // Path is relative to this feed.
 
 		if (mi.getDateAdded() != null) {
@@ -774,7 +799,6 @@ public class MlistsServlet extends HttpServlet {
 		if (mi instanceof IMixedMediaItem) {
 			FeedHelper.addElement(dw, "type", ((IMixedMediaItem) mi).getMediaType().getN());
 		}
-		FeedHelper.addElement(dw, "filesize", mi.getFileSize());
 		if (mi.getMimeType() != null) FeedHelper.addElement(dw, "mimetype", mi.getMimeType());
 		if (mi.getHashcode() != null && !BigInteger.ZERO.equals(mi.getHashcode())) FeedHelper.addElement(dw, "hash", mi.getHashcode().toString(16));
 		FeedHelper.addElement(dw, "enabled", Boolean.toString(mi.isEnabled()), new String[][] {

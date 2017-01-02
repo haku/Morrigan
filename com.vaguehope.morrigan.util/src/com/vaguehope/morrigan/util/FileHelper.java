@@ -10,13 +10,11 @@ public final class FileHelper {
 
 	private FileHelper () {}
 
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	public static void copyFile(File sourceFile, File destFile) throws IOException {
+	public static void copyFile(final File sourceFile, final File destFile) throws IOException {
 		copyFile(sourceFile, destFile, false);
 	}
 
-	public static void copyFile(File srcFile, File dstFile, boolean overWrite) throws IOException {
+	public static void copyFile(final File srcFile, final File dstFile, final boolean overWrite) throws IOException {
 		if (dstFile.exists()) {
 			if (!overWrite) {
 				throw new IllegalArgumentException("Target file already exists.");
@@ -72,5 +70,11 @@ public final class FileHelper {
 		}
 	}
 
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public static void rename (final File from, final File to) throws IOException {
+		if (!from.renameTo(to)) {
+			throw new IOException("Failed to rename '" + from.getAbsolutePath()
+					+ "' to '" + to.getAbsolutePath() + "'.");
+		}
+	}
+
 }

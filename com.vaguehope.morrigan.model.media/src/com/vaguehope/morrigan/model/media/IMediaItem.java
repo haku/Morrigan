@@ -1,5 +1,6 @@
 package com.vaguehope.morrigan.model.media;
 
+import java.io.File;
 import java.math.BigInteger;
 import java.util.Date;
 
@@ -17,6 +18,7 @@ public interface IMediaItem extends IDbItem {
 
 	String getFilepath ();
 	boolean setFilepath (String filePath);
+	File getFile ();
 
 	/**
 	 * May return null.

@@ -2,8 +2,11 @@ package com.vaguehope.morrigan.server;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -18,8 +21,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.http.HttpStatus;
 
+import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.util.ChecksumHelper;
 import com.vaguehope.morrigan.util.ExceptionHelper;
+import com.vaguehope.morrigan.util.FileHelper;
 import com.vaguehope.morrigan.util.IoHelper;
 import com.vaguehope.morrigan.util.MimeType;
 import com.vaguehope.morrigan.util.MnLogger;
@@ -62,23 +68,67 @@ public class Transcoder {
 		}
 	}
 
-	public void transcode (final File file, final String name, final HttpServletResponse resp) throws IOException {
-		if (!file.exists()) {
-			resp.sendError(HttpStatus.BAD_REQUEST_400, "File not found: " + file.getAbsolutePath());
-			return;
+	public static File transcodedFile (final File inFile, final String transcode) {
+		if (TRANSCODE_AUDIO_ONLY.equals(transcode)) {
+			return new File(Config.getTranscodedDir(), ChecksumHelper.md5String(inFile.getAbsolutePath()) + "_" + transcode);
+		}
+		else {
+			throw new IllegalArgumentException("Unsupported transcode: " + transcode);
+		}
+	}
+
+	public void transcodeToFile (final File inFile, final String transcode) throws IOException {
+		final File outFile = transcodedFile(inFile, transcode);
+		final File ftmp = File.createTempFile(outFile.getName(), ".tmp", outFile.getParentFile());
+		try {
+			final OutputStream output = new FileOutputStream(ftmp);
+			try {
+				transcode(inFile, output);
+			}
+			finally {
+				output.close();
+			}
+			FileHelper.rename(ftmp, outFile);
+		}
+		finally {
+			if (ftmp.exists()) ftmp.delete();
+		}
+	}
+
+	public void transcodeToResponse (final File inFile, final String name, final HttpServletResponse resp) throws IOException {
+		try {
+			resp.setContentType(MimeType.MP3.getMimeType());
+			resp.addHeader("Content-Description", "File Transfer");
+			resp.addHeader("Content-Disposition", "attachment; filename=\"" + name + "\"");
+			resp.addHeader("Content-Transfer-Encoding", "binary");
+			resp.setDateHeader("Last-Modified", inFile.lastModified());
+			resp.addHeader("Pragma", "public");
+
+			transcode(inFile, resp.getOutputStream());
+		}
+		catch (FileNotFoundException e) {
+			resp.sendError(HttpStatus.BAD_REQUEST_400, e.toString());
+		}
+		catch (IllegalStateException e) {
+			resp.sendError(HttpStatus.SERVICE_UNAVAILABLE_503, e.toString());
+		}
+	}
+
+	private void transcode (final File inFile, final OutputStream output) throws IOException {
+		if (!inFile.exists()) {
+			throw new FileNotFoundException("File not found: " + inFile.getAbsolutePath());
 		}
 
 		while (true) {
 			final int n = this.inProgress.get();
 			if (n > MAX_IN_PROGRESS_TRANSCODES) {
-				resp.sendError(HttpStatus.SERVICE_UNAVAILABLE_503, "Overloaded.");
-				LOG.w("Rejected transcode as overloaded: {0}", file.getAbsolutePath());
-				return;
+				LOG.w("Rejected transcode as overloaded: {0}", inFile.getAbsolutePath());
+				throw new IllegalStateException("Overloaded."); // TODO Better exception class.
 			}
 			if (this.inProgress.compareAndSet(n, n + 1)) break;
 		}
 		try {
-			runTranscode(file, name, resp);
+			runTranscode(inFile, output);
 		}
 		catch (final Exception e) {
 			LOG.w("Transcode failed.", e);
@@ -90,22 +140,15 @@ public class Transcoder {
 		}
 	}
 
-	private void runTranscode (final File file, final String name, final HttpServletResponse resp) throws IOException {
+	private void runTranscode (final File inFile, final OutputStream output) throws IOException {
 		Future<List<String>> errFuture = null;
 		boolean procShouldBeRunning = true;
-		final Process p = makeProcess(file).start();
+		final Process p = makeProcess(inFile).start();
 		try {
 			try {
 				errFuture = this.es.submit(new ErrReader(p));
 
-				resp.setContentType(MimeType.MP3.getMimeType());
-				resp.addHeader("Content-Description", "File Transfer");
-				resp.addHeader("Content-Disposition", "attachment; filename=\"" + name + "\"");
-				resp.addHeader("Content-Transfer-Encoding", "binary");
-				resp.setDateHeader("Last-Modified", file.lastModified());
-				resp.addHeader("Pragma", "public");
-
-				final long bytesSend = IoHelper.copy(p.getInputStream(), resp.getOutputStream());
+				final long bytesSend = IoHelper.copy(p.getInputStream(), output);
 				LOG.i("Transcode complete, served {0} bytes.", bytesSend);
 			}
 			catch (final IOException e) {
