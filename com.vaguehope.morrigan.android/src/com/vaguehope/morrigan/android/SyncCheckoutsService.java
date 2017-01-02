@@ -2,6 +2,7 @@ package com.vaguehope.morrigan.android;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -120,24 +121,17 @@ public class SyncCheckoutsService extends AwakeService {
 		if (!localDir.exists() && !localDir.mkdirs()) throw new IOException("Failed to create '" + localDir.getAbsolutePath() + "'.");
 
 		final ServerReference host = this.configDb.getServer(checkout.getHostId());
-		final MlistItemList itemList = MnApi.fetchDbItems(host, checkout.getDbRelativePath(), checkout.getQuery(), "audio_only"); // TODO unhardcode this.
-		final List<? extends MlistItem> items = itemList.getMlistItemList();
-
-		final long totalSize = totalSize(items);
-		updateNotifProgress(notificationId, notif, String.format("Checking %s items (%s) ...",
-				items.size(), FormaterHelper.readableFileSize(totalSize)));
+		List<? extends MlistItem> items = fetchListOfItems(checkout, host);
+		updateNotifProgress(notificationId, notif, String.format("Checking %s items...", items.size()));
 
 		final MlistState dbSrcs = MnApi.fetchDbSrcs(host, checkout.getDbRelativePath());
 		final List<String> srcs = dbSrcs.getSrcs();
+		List<ToCopy> toCopy = findToCopy(localDir, items, srcs);
 
-		final List<ToCopy> toCopy = new ArrayList<ToCopy>();
-		final Set<File> allFiles = new HashSet<File>(items.size());
-		for (final MlistItem item : items) {
-			final File localFile = new File(localDir, removeSrc(URLDecoder.decode(item.getRelativeUrl(), "UTF-8"), srcs));
-			if (!localFile.exists() || localFile.lastModified() < item.getLastModified()) {
-				toCopy.add(new ToCopy(item, localFile));
-			}
-			allFiles.add(localFile);
+		final int transcodedCount = requestTranscodes(checkout, notificationId, notif, host, toCopy);
+		if (transcodedCount > 0) {
+			items = fetchListOfItems(checkout, host);
+			toCopy = findToCopy(localDir, items, srcs);
 		}
 
 		final long spaceAfterCopy = localDir.getFreeSpace() - totalTransferSize(toCopy);
@@ -145,6 +139,57 @@ public class SyncCheckoutsService extends AwakeService {
 				"Not enough space on device: %s short.",
 				FormaterHelper.readableFileSize(Math.abs(spaceAfterCopy))));
 
+		final SyncDlPrgListnr prgLstnr = downloadFiles(checkout, notificationId, notif, host, toCopy);
+
+		final Set<File> allLocalFiles = findAllLocalFiles(toCopy);
+		final List<File> toDelete = findToDelete(localDir, allLocalFiles);
+
+		storeResult(checkout, prgLstnr, toDelete);
+	}
+
+	private List<? extends MlistItem> fetchListOfItems (final Checkout checkout, final ServerReference host) throws IOException {
+		final MlistItemList itemList = MnApi.fetchDbItems(host, checkout.getDbRelativePath(), checkout.getQuery(), "audio_only"); // TODO unhardcode this.
+		return itemList.getMlistItemList();
+	}
+
+	private List<ToCopy> findToCopy (final File localDir, final List<? extends MlistItem> items, final List<String> srcs) throws UnsupportedEncodingException {
+		final List<ToCopy> ret = new ArrayList<ToCopy>();
+		for (final MlistItem item : items) {
+			final File localFile = new File(localDir, removeSrc(URLDecoder.decode(item.getRelativeUrl(), "UTF-8"), srcs));
+			if (!localFile.exists() || localFile.lastModified() < item.getLastModified()) {
+				ret.add(new ToCopy(item, localFile));
+			}
+		}
+		return ret;
+	}
+
+	private Set<File> findAllLocalFiles (final List<ToCopy> toCopy) {
+		final Set<File> ret = new HashSet<File>(toCopy.size());
+		for (ToCopy i : toCopy) {
+			ret.add(i.getLocalFile());
+		}
+		return ret;
+	}
+
+	private int requestTranscodes (final Checkout checkout, final int notificationId, final Builder notif, final ServerReference host, final List<ToCopy> toCopy) throws IOException {
+		final List<MlistItem> toTranscode = new ArrayList<MlistItem>();
+		for (final ToCopy i : toCopy) {
+			if (i.getItem().getFileSize() < 1) {
+				toTranscode.add(i.getItem());
+			}
+		}
+		int transcodedCount = 0;
+		for (final MlistItem i : toTranscode) {
+			updateNotifProgress(notificationId, notif, String.format("transcoding %s of %s",
+					transcodedCount, toTranscode.size()),
+					toTranscode.size(), transcodedCount);
+			MnApi.postToFile(host, checkout.getDbRelativePath(), i, "transcode");
+			transcodedCount += 1;
+		}
+		return transcodedCount;
+	}
+
+	private SyncDlPrgListnr downloadFiles (final Checkout checkout, final int notificationId, final Builder notif, final ServerReference host, final List<ToCopy> toCopy) throws IOException {
 		final SyncDlPrgListnr prgLstnr = new SyncDlPrgListnr(notificationId, notif, toCopy);
 		for (final ToCopy i : toCopy) {
 			final File dir = i.getLocalFile().getParentFile();
@@ -154,7 +199,10 @@ public class SyncCheckoutsService extends AwakeService {
 			i.getLocalFile().setLastModified(i.getItem().getLastModified());
 			prgLstnr.itemComplete(i);
 		}
+		return prgLstnr;
+	}
 
+	private List<File> findToDelete (final File localDir, final Set<File> allFiles) throws IOException {
 		final List<File> toDelete = new ArrayList<File>();
 		FileHelper.recursiveList(localDir, new Listener<File>() {
 			@Override
@@ -162,20 +210,15 @@ public class SyncCheckoutsService extends AwakeService {
 				if (!allFiles.contains(file)) toDelete.add(file);
 			}
 		});
+		return toDelete;
+	}
 
+	private void storeResult (final Checkout checkout, final SyncDlPrgListnr prgLstnr, final List<File> toDelete) {
 		String status = String.format("Transfered %s items (%s).",
 				prgLstnr.getTransferedItems(),
 				FormaterHelper.readableFileSize(prgLstnr.getTransferedItemBytes()));
 		if (toDelete.size() > 0) status += String.format("  %s files to delete.", toDelete.size());
 		this.configDb.updateCheckout(this.configDb.getCheckout(checkout.getId()).withStatus(status));
-	}
-
-	private static long totalSize (final List<? extends MlistItem> items) {
-		long total = 0;
-		for (final MlistItem i : items) {
-			total += i.getFileSize();
-		}
-		return total;
 	}
 
 	protected static long totalTransferSize (final List<ToCopy> list) {
@@ -229,7 +272,6 @@ public class SyncCheckoutsService extends AwakeService {
 
 		private long transferedItems = 0;
 		private long transferedItemBytes = 0;
-		private final long currentFileSize = 0;
 		private long updatedNanos = System.nanoTime();
 
 		public SyncDlPrgListnr (final int notificationId, final Builder notif, final List<ToCopy> toCopy) {
