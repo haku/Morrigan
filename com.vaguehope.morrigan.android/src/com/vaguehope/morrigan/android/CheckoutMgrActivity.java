@@ -1,6 +1,9 @@
 package com.vaguehope.morrigan.android;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -50,8 +53,8 @@ public class CheckoutMgrActivity extends Activity {
 		lstCheckouts.setOnItemClickListener(this.checkoutsListCickListener);
 		lstCheckouts.setOnItemLongClickListener(this.checkoutsListLongCickListener);
 
-		final Button btnSyncNow = (Button) findViewById(R.id.btnSyncNow);
-		btnSyncNow.setOnClickListener(this.syncNowClickListener);
+		((Button) findViewById(R.id.btnSyncServer)).setOnClickListener(this.syncServerClickListener);
+		((Button) findViewById(R.id.btnSyncAll)).setOnClickListener(this.syncAllClickListener);
 
 		reloadCheckouts();
 	}
@@ -93,10 +96,17 @@ public class CheckoutMgrActivity extends Activity {
 		}
 	};
 
-	private final OnClickListener syncNowClickListener = new OnClickListener() {
+	private final OnClickListener syncServerClickListener = new OnClickListener() {
 		@Override
 		public void onClick (final View v) {
-			askSyncNow();
+			askSyncServer();
+		}
+	};
+
+	private final OnClickListener syncAllClickListener = new OnClickListener() {
+		@Override
+		public void onClick (final View v) {
+			askSyncAll();
 		}
 	};
 
@@ -259,17 +269,38 @@ public class CheckoutMgrActivity extends Activity {
 
 	}
 
-	protected void askSyncNow () {
-		DialogHelper.askYesNo(this, "Sync now?", "Sync", "Cancel", new Runnable() {
+	protected void askSyncServer () {
+		Map<String, ServerReference> allHosts = new HashMap<String, ServerReference>();
+		for (ServerReference h : this.configDb.getHosts()) {
+			allHosts.put(h.getId(), h);
+		}
+
+		final Map<String, ServerReference> usedHosts = new TreeMap<String, ServerReference>();
+		for (Checkout co : this.configDb.getCheckouts()) {
+			usedHosts.put(co.getHostId(), allHosts.get(co.getHostId()));
+		}
+
+		DialogHelper.askItem(this, "Select Server to sync", new ArrayList<ServerReference>(usedHosts.values()), new Listener<ServerReference>() {
 			@Override
-			public void run () {
-				startSync();
+			public void onAnswer (final ServerReference answer) {
+				startSync(answer.getId());
 			}
 		});
 	}
 
-	protected void startSync () {
-		startService(new Intent(this, SyncCheckoutsService.class));
+	protected void askSyncAll () {
+		DialogHelper.askYesNo(this, "Sync all hosts now?", "Sync", "Cancel", new Runnable() {
+			@Override
+			public void run () {
+				startSync(null);
+			}
+		});
+	}
+
+	protected void startSync (final String hostId) {
+		final Intent i = new Intent(this, SyncCheckoutsService.class);
+		if (hostId != null) i.putExtra(SyncCheckoutsService.EXTRA_HOST_SYNC, hostId);
+		startService(i);
 	}
 
 }

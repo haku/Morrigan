@@ -31,6 +31,8 @@ import com.vaguehope.morrigan.android.state.ConfigDb;
 
 public class SyncCheckoutsService extends AwakeService {
 
+	public static final String EXTRA_HOST_SYNC = C.PACKAGE_PREFIX + "host_to_sync";
+
 	private ConfigDb configDb;
 	private NotificationManager notifMgr;
 
@@ -51,7 +53,7 @@ public class SyncCheckoutsService extends AwakeService {
 		final Builder notif = makeNotif(notificationId);
 		String result = "Unknown result.";
 		try {
-			doSyncs(notificationId, notif);
+			doSyncs(notificationId, notif, i.getExtras().getString(EXTRA_HOST_SYNC));
 			result = "Finished.";
 		}
 		catch (final Exception e) {
@@ -98,9 +100,11 @@ public class SyncCheckoutsService extends AwakeService {
 		this.notifMgr.notify(notificationId, notif.getNotification());
 	}
 
-	private void doSyncs (final int notificationId, final Builder notif) throws IOException {
+	private void doSyncs (final int notificationId, final Builder notif, final String hostId) throws IOException {
 		final List<Checkout> checkouts = this.configDb.getCheckouts();
 		for (final Checkout checkout : checkouts) {
+			if (hostId != null && !hostId.equals(checkout.getHostId())) continue;
+
 			try {
 				syncCheckout(checkout, notificationId, notif);
 			}

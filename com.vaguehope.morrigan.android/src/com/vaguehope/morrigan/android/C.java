@@ -17,15 +17,11 @@
 package com.vaguehope.morrigan.android;
 
 public interface C {
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+	String PACKAGE_PREFIX = "com.vaguehope.morrigan.android.";
 	String LOGTAG = "Morrigan";
 
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
 	String USERNAME = "Morrigan-Android";
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	String CONTEXT_PLAYERS = "/players";
 	String CONTEXT_MLISTS = "/mlists";
@@ -36,9 +32,6 @@ public interface C {
 
 	String CONTEXT_PLAYER_QUEUE = "/queue";
 
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
 	int PLAYER_REFRESH_SECONDS = 10;
 
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

@@ -15,16 +15,16 @@
 		style="?android:attr/buttonBarStyle">
 
 		<Button
-			android:id="@+id/btnA"
-			android:text="A"
+			android:id="@+id/btnSyncServer"
+			android:text="Sync Server"
 			android:layout_width="0dip"
 			android:layout_height="50dip"
 			android:layout_weight="1"
 			style="?android:attr/buttonBarButtonStyle" />
 
 		<Button
-			android:id="@+id/btnSyncNow"
-			android:text="Sync Now"
+			android:id="@+id/btnSyncAll"
+			android:text="Sync All"
 			android:layout_width="0dip"
 			android:layout_height="50dip"
 			android:layout_weight="1"
