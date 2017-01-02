@@ -73,4 +73,13 @@ public class StringHelper {
 		return s.toLowerCase(Locale.ENGLISH).endsWith(end.toLowerCase(Locale.ENGLISH));
 	}
 
+	/**
+	 * Returns 2 element array or null.
+	 */
+	public static String[] splitOnce (final String s, final char sep) {
+		final int x = s.indexOf(sep);
+		if (x < 0) return null;
+		return new String[] { s.substring(0, x), s.substring(x + 1) };
+	}
+
 }

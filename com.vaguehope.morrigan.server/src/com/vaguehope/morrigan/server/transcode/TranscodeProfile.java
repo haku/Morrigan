@@ -1,6 +1,7 @@
 package com.vaguehope.morrigan.server.transcode;
 
 import java.io.File;
+import java.io.IOException;
 
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.media.IMediaItem;
@@ -13,10 +14,10 @@ public abstract class TranscodeProfile {
 	/**
 	 * Returns null if no transcode is required.
 	 */
-	public static TranscodeProfile forFile (final IMediaItem item, final String transcode) {
+	public static TranscodeProfile forFile (final IMediaItem item, final String transcode) throws IOException {
 		if (Transcoder.TRANSCODE_AUDIO_ONLY.equals(transcode)) {
 			if (MimeType.MP4.getMimeType().equalsIgnoreCase(item.getMimeType())) {
-				return new Mp4ToM4aTranscode(item, transcode);
+				return new Mp4StreamExtract(item, transcode);
 			}
 			else if (StringHelper.startsWithIgnoreCase(item.getMimeType(), "video")) {
 				return new GenericMp3Transcode(item, transcode);
@@ -38,6 +39,10 @@ public abstract class TranscodeProfile {
 
 	public IMediaItem getItem () {
 		return this.item;
+	}
+
+	public MimeType getMimeType () {
+		return this.mimeType;
 	}
 
 	public String getTranscodedTitle () {

@@ -351,7 +351,7 @@ public class PlayersServlet extends HttpServlet {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private static void printPlayer (final DataWriter dw, final Player p, final int detailLevel) throws SAXException, UnsupportedEncodingException, MorriganException {
+	private static void printPlayer (final DataWriter dw, final Player p, final int detailLevel) throws SAXException, MorriganException, IOException {
 		if (detailLevel < 0 || detailLevel > 1) throw new IllegalArgumentException("detailLevel must be 0 or 1, not "+detailLevel+".");
 
 		final String listTitle;

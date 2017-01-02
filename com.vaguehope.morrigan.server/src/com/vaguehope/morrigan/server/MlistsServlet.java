@@ -775,7 +775,7 @@ public class MlistsServlet extends HttpServlet {
 	}
 
 	static void fillInMediaItem (final DataWriter dw, final IMediaTrackList<? extends IMediaTrack> ml, final IMediaItem mi,
-			final IncludeTags includeTags, final String transcode) throws SAXException, MorriganException {
+			final IncludeTags includeTags, final String transcode) throws SAXException, MorriganException, IOException {
 		String title = mi.getTitle();
 		long fileSize = mi.getFileSize();
 		String fileLink = fileLink(mi);

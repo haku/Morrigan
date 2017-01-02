@@ -6,16 +6,16 @@ import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.util.MimeType;
 import com.vaguehope.morrigan.util.StringHelper;
 
-public class Mp4ToM4aTranscode extends TranscodeProfile {
+public class Mp4ToMp3Transcode extends TranscodeProfile {
 
-	public Mp4ToM4aTranscode (final IMediaItem item, final String transcode) {
-		super(item, transcode, MimeType.M4A);
+	public Mp4ToMp3Transcode (final IMediaItem item, final String transcode) {
+		super(item, transcode, MimeType.MP3);
 	}
 
 	@Override
 	public String[] transcodeCmd (final File outputFile) {
-		if (!StringHelper.endsWithIgnoreCase(outputFile.getName(), "." + MimeType.M4A.getExt())) {
-			throw new IllegalArgumentException("Output file must end with .m4a: " + outputFile.getName());
+		if (!StringHelper.endsWithIgnoreCase(outputFile.getName(), "." + MimeType.MP3.getExt())) {
+			throw new IllegalArgumentException("Output file must end with .mp3: " + outputFile.getName());
 		}
 
 		return new String[]{
