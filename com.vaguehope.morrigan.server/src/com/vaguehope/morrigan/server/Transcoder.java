@@ -70,7 +70,7 @@ public class Transcoder {
 
 	public static File transcodedFile (final File inFile, final String transcode) {
 		if (TRANSCODE_AUDIO_ONLY.equals(transcode)) {
-			return new File(Config.getTranscodedDir(), ChecksumHelper.md5String(inFile.getAbsolutePath()) + "_" + transcode);
+			return new File(Config.getTranscodedDir(), ChecksumHelper.md5String(inFile.getAbsolutePath()) + "_" + transcode + "." + MimeType.MP3.getExt());
 		}
 		else {
 			throw new IllegalArgumentException("Unsupported transcode: " + transcode);
