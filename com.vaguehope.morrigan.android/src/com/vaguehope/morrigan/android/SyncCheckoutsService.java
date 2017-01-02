@@ -126,17 +126,21 @@ public class SyncCheckoutsService extends AwakeService {
 		if (!localDir.exists() && !localDir.mkdirs()) throw new IOException("Failed to create '" + localDir.getAbsolutePath() + "'.");
 
 		final ServerReference host = this.configDb.getServer(checkout.getHostId());
+		updateNotifProgress(notificationId, notif, "Fetching list of items...");
 		List<? extends MlistItem> items = fetchListOfItems(checkout, host);
 		updateNotifProgress(notificationId, notif, String.format("Checking %s items...", items.size()));
 
 		final MlistState dbSrcs = MnApi.fetchDbSrcs(host, checkout.getDbRelativePath());
 		final List<String> srcs = dbSrcs.getSrcs();
-		List<ToCopy> toCopy = findToCopy(localDir, items, srcs);
+		List<ItemAndFile> allItemsAndLocalFiles = computeLocalFiles(localDir, items, srcs);
+		List<ItemAndFile> toCopy = computeRequireDownloading(allItemsAndLocalFiles);
 
 		final int transcodedCount = requestTranscodes(checkout, notificationId, notif, host, toCopy);
 		if (transcodedCount > 0) {
+			updateNotifProgress(notificationId, notif, "Refreshing list of items...");
 			items = fetchListOfItems(checkout, host);
-			toCopy = findToCopy(localDir, items, srcs);
+			allItemsAndLocalFiles = computeLocalFiles(localDir, items, srcs);
+			toCopy = computeRequireDownloading(allItemsAndLocalFiles);
 		}
 
 		final long spaceAfterCopy = localDir.getFreeSpace() - totalTransferSize(toCopy);
@@ -146,8 +150,7 @@ public class SyncCheckoutsService extends AwakeService {
 
 		final SyncDlPrgListnr prgLstnr = downloadFiles(checkout, notificationId, notif, host, toCopy);
 
-		final Set<File> allLocalFiles = findAllLocalFiles(toCopy);
-		final List<File> toDelete = findToDelete(localDir, allLocalFiles);
+		final List<File> toDelete = findToDelete(localDir, allItemsAndLocalFiles);
 
 		storeResult(checkout, prgLstnr, toDelete);
 	}
@@ -157,30 +160,30 @@ public class SyncCheckoutsService extends AwakeService {
 		return itemList.getMlistItemList();
 	}
 
-	private List<ToCopy> findToCopy (final File localDir, final List<? extends MlistItem> items, final List<String> srcs) throws UnsupportedEncodingException {
-		final List<ToCopy> ret = new ArrayList<ToCopy>();
+	private List<ItemAndFile> computeLocalFiles (final File localDir, final List<? extends MlistItem> items, final List<String> srcs) throws UnsupportedEncodingException {
+		final List<ItemAndFile> ret = new ArrayList<ItemAndFile>();
 		for (final MlistItem item : items) {
 			final String urlWithoutSrc = removeSrc(URLDecoder.decode(item.getRelativeUrl(), "UTF-8"), srcs);
 			final File urlFile = new File(localDir, urlWithoutSrc);
 			final File localFile = new File(urlFile.getParent(), item.getFileName());
-			if (!localFile.exists() || localFile.lastModified() < item.getLastModified()) {
-				ret.add(new ToCopy(item, localFile));
+			ret.add(new ItemAndFile(item, localFile));
+		}
+		return ret;
+	}
+
+	private List<ItemAndFile> computeRequireDownloading (final List<ItemAndFile> items) throws UnsupportedEncodingException {
+		final List<ItemAndFile> ret = new ArrayList<ItemAndFile>();
+		for (final ItemAndFile i : items) {
+			if (!i.getLocalFile().exists() || i.getLocalFile().lastModified() < i.getItem().getLastModified()) {
+				ret.add(i);
 			}
 		}
 		return ret;
 	}
 
-	private Set<File> findAllLocalFiles (final List<ToCopy> toCopy) {
-		final Set<File> ret = new HashSet<File>(toCopy.size());
-		for (final ToCopy i : toCopy) {
-			ret.add(i.getLocalFile());
-		}
-		return ret;
-	}
-
-	private int requestTranscodes (final Checkout checkout, final int notificationId, final Builder notif, final ServerReference host, final List<ToCopy> toCopy) throws IOException {
+	private int requestTranscodes (final Checkout checkout, final int notificationId, final Builder notif, final ServerReference host, final List<ItemAndFile> toCopy) throws IOException {
 		final List<MlistItem> toTranscode = new ArrayList<MlistItem>();
-		for (final ToCopy i : toCopy) {
+		for (final ItemAndFile i : toCopy) {
 			if (i.getItem().getFileSize() < 1) {
 				toTranscode.add(i.getItem());
 			}
@@ -196,9 +199,9 @@ public class SyncCheckoutsService extends AwakeService {
 		return transcodedCount;
 	}
 
-	private SyncDlPrgListnr downloadFiles (final Checkout checkout, final int notificationId, final Builder notif, final ServerReference host, final List<ToCopy> toCopy) throws IOException {
+	private SyncDlPrgListnr downloadFiles (final Checkout checkout, final int notificationId, final Builder notif, final ServerReference host, final List<ItemAndFile> toCopy) throws IOException {
 		final SyncDlPrgListnr prgLstnr = new SyncDlPrgListnr(notificationId, notif, toCopy);
-		for (final ToCopy i : toCopy) {
+		for (final ItemAndFile i : toCopy) {
 			final File dir = i.getLocalFile().getParentFile();
 			if (!dir.exists() && !dir.mkdirs()) throw new IOException("Failed to create '" + dir.getAbsolutePath() + "'.");
 
@@ -209,12 +212,17 @@ public class SyncCheckoutsService extends AwakeService {
 		return prgLstnr;
 	}
 
-	private List<File> findToDelete (final File localDir, final Set<File> allFiles) throws IOException {
+	private List<File> findToDelete (final File localDir, final List<ItemAndFile> allItemsAndLocalFiles) throws IOException {
+		final Set<File> localFiles = new HashSet<File>(allItemsAndLocalFiles.size());
+		for (final ItemAndFile i : allItemsAndLocalFiles) {
+			localFiles.add(i.getLocalFile());
+		}
+
 		final List<File> toDelete = new ArrayList<File>();
 		FileHelper.recursiveList(localDir, new Listener<File>() {
 			@Override
 			public void onAnswer (final File file) {
-				if (!allFiles.contains(file)) toDelete.add(file);
+				if (!localFiles.contains(file)) toDelete.add(file);
 			}
 		});
 		return toDelete;
@@ -228,9 +236,9 @@ public class SyncCheckoutsService extends AwakeService {
 		this.configDb.updateCheckout(this.configDb.getCheckout(checkout.getId()).withStatus(status));
 	}
 
-	protected static long totalTransferSize (final List<ToCopy> list) {
+	protected static long totalTransferSize (final List<ItemAndFile> list) {
 		long total = 0;
-		for (final ToCopy i : list) {
+		for (final ItemAndFile i : list) {
 			total += i.getItem().getFileSize();
 		}
 		return total;
@@ -249,12 +257,12 @@ public class SyncCheckoutsService extends AwakeService {
 		return path.substring(matchedSrc.length() + 1);
 	}
 
-	private static class ToCopy {
+	private static class ItemAndFile {
 
 		private final MlistItem item;
 		private final File localFile;
 
-		public ToCopy (final MlistItem item, final File localFile) {
+		public ItemAndFile (final MlistItem item, final File localFile) {
 			this.item = item;
 			this.localFile = localFile;
 		}
@@ -274,21 +282,21 @@ public class SyncCheckoutsService extends AwakeService {
 
 		private final int notificationId;
 		private final Builder notif;
-		private final List<ToCopy> toCopy;
+		private final List<ItemAndFile> toCopy;
 		private final long totalTransferSize;
 
 		private long transferedItems = 0;
 		private long transferedItemBytes = 0;
 		private long updatedNanos = System.nanoTime();
 
-		public SyncDlPrgListnr (final int notificationId, final Builder notif, final List<ToCopy> toCopy) {
+		public SyncDlPrgListnr (final int notificationId, final Builder notif, final List<ItemAndFile> toCopy) {
 			this.notificationId = notificationId;
 			this.notif = notif;
 			this.toCopy = toCopy;
 			this.totalTransferSize = totalTransferSize(toCopy);
 		}
 
-		public void itemComplete(final ToCopy i) {
+		public void itemComplete(final ItemAndFile i) {
 			this.transferedItems += 1;
 			this.transferedItemBytes += i.getItem().getFileSize();
 		}
