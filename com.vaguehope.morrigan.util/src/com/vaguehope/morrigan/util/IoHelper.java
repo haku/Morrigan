@@ -19,4 +19,14 @@ public class IoHelper {
 		return total;
 	}
 
+	public static long drainStream (final InputStream is) throws IOException {
+		final byte[] buffer = new byte[BUFFER_SIZE];
+		long total = 0;
+		int read = 0;
+		while ((read = is.read(buffer)) != -1) {
+			total += read;
+		}
+		return total;
+	}
+
 }

@@ -49,6 +49,8 @@ import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayerReader;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbFactory;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbHelper;
+import com.vaguehope.morrigan.server.transcode.TranscodeProfile;
+import com.vaguehope.morrigan.server.transcode.Transcoder;
 import com.vaguehope.morrigan.server.util.FeedHelper;
 import com.vaguehope.morrigan.server.util.ImageResizer;
 import com.vaguehope.morrigan.server.util.XmlHelper;
@@ -424,7 +426,8 @@ public class MlistsServlet extends HttpServlet {
 		else if (action.equals(CMD_TRANSCODE)) {
 			final String transcode = StringHelper.trimToNull(req.getParameter(PARAM_TRANSCODE));
 			if (transcode != null) {
-				this.transcoder.transcodeToFile(item.getFile(), transcode);
+				final TranscodeProfile tProfile = TranscodeProfile.forFile(item, transcode);
+				this.transcoder.transcodeToFile(tProfile);
 			}
 			else {
 				ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid or missing " + PARAM_TRANSCODE + " param.");
@@ -531,14 +534,15 @@ public class MlistsServlet extends HttpServlet {
 
 						final String transcode = StringHelper.trimToNull(req.getParameter(PARAM_TRANSCODE));
 						if (transcode != null) {
-    						final File transcodedFile = Transcoder.transcodedFile(file, transcode);
-    						if (transcodedFile.exists()) {
-    							ServletHelper.returnFile(transcodedFile, resp, Transcoder.transcodedTitle(item, transcode));
-    						}
-    						else {
-    							ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "HTTP error 400 '" + filepath + "' has not been transcoded desu~");
-    						}
-    						return;
+							final TranscodeProfile tProfile = TranscodeProfile.forFile(item, transcode);
+							final File transcodedFile = tProfile.getCacheFile();
+							if (transcodedFile.exists()) {
+								ServletHelper.returnFile(transcodedFile, resp, tProfile.getTranscodedTitle());
+							}
+							else {
+								ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "HTTP error 400 '" + filepath + "' has not been transcoded desu~");
+							}
+							return;
 						}
 
 						final Integer resize = ServletHelper.readParamInteger(req, PARAM_RESIZE);
@@ -776,10 +780,11 @@ public class MlistsServlet extends HttpServlet {
 		long fileSize = mi.getFileSize();
 		String fileLink = fileLink(mi);
 
-		if (Transcoder.transcodeRequired(mi, transcode)) {
-			title = Transcoder.transcodedTitle(mi, transcode);
+		final TranscodeProfile tProfile = TranscodeProfile.forFile(mi, transcode);
+		if (tProfile != null) {
+			title = tProfile.getTranscodedTitle();
 
-			final File transcodedFile = Transcoder.transcodedFile(mi.getFile(), transcode);
+			final File transcodedFile = tProfile.getCacheFile();
 			fileSize = transcodedFile.exists() ? transcodedFile.length() : 0L;
 
 			fileLink += "?" + PARAM_TRANSCODE + "=" + transcode;

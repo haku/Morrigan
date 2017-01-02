@@ -1,12 +1,10 @@
-package com.vaguehope.morrigan.server;
+package com.vaguehope.morrigan.server.transcode;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -17,23 +15,14 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.servlet.http.HttpServletResponse;
-
-import org.eclipse.jetty.http.HttpStatus;
-
-import com.vaguehope.morrigan.config.Config;
-import com.vaguehope.morrigan.model.media.IMediaItem;
-import com.vaguehope.morrigan.util.ChecksumHelper;
 import com.vaguehope.morrigan.util.ExceptionHelper;
 import com.vaguehope.morrigan.util.FileHelper;
 import com.vaguehope.morrigan.util.IoHelper;
-import com.vaguehope.morrigan.util.MimeType;
 import com.vaguehope.morrigan.util.MnLogger;
-import com.vaguehope.morrigan.util.StringHelper;
 
 public class Transcoder {
 
-	private static final String TRANSCODE_AUDIO_ONLY = "audio_only";
+	static final String TRANSCODE_AUDIO_ONLY = "audio_only";
 
 	private static final int SHUTDOWN_TIMEOUT_SECONDS = 5;
 	private static final int ERR_HISTORY_LINES = 100;
@@ -48,73 +37,10 @@ public class Transcoder {
 		this.es = Executors.newCachedThreadPool();
 	}
 
-	public static boolean transcodeRequired (final IMediaItem item, final String transcode) {
-		if (transcode == null) return false;
+	public void transcodeToFile (final TranscodeProfile tProfile) throws IOException {
+		if (tProfile == null) throw new IllegalArgumentException("tProfile can not be null.");
 
-		if (TRANSCODE_AUDIO_ONLY.equals(transcode)) {
-			return StringHelper.startsWithIgnoreCase(item.getMimeType(), "video");
-		}
-		else {
-			throw new IllegalArgumentException("Unsupported transcode: " + transcode);
-		}
-	}
-
-	public static String transcodedTitle (final IMediaItem item, final String transcode) {
-		if (TRANSCODE_AUDIO_ONLY.equals(transcode)) {
-			return item.getTitle() + "." + MimeType.MP3.getExt();
-		}
-		else {
-			throw new IllegalArgumentException("Unsupported transcode: " + transcode);
-		}
-	}
-
-	public static File transcodedFile (final File inFile, final String transcode) {
-		if (TRANSCODE_AUDIO_ONLY.equals(transcode)) {
-			return new File(Config.getTranscodedDir(), ChecksumHelper.md5String(inFile.getAbsolutePath()) + "_" + transcode + "." + MimeType.MP3.getExt());
-		}
-		else {
-			throw new IllegalArgumentException("Unsupported transcode: " + transcode);
-		}
-	}
-
-	public void transcodeToFile (final File inFile, final String transcode) throws IOException {
-		final File outFile = transcodedFile(inFile, transcode);
-		final File ftmp = File.createTempFile(outFile.getName(), ".tmp", outFile.getParentFile());
-		try {
-			final OutputStream output = new FileOutputStream(ftmp);
-			try {
-				transcode(inFile, output);
-			}
-			finally {
-				output.close();
-			}
-			FileHelper.rename(ftmp, outFile);
-		}
-		finally {
-			if (ftmp.exists()) ftmp.delete();
-		}
-	}
-
-	public void transcodeToResponse (final File inFile, final String name, final HttpServletResponse resp) throws IOException {
-		try {
-			resp.setContentType(MimeType.MP3.getMimeType());
-			resp.addHeader("Content-Description", "File Transfer");
-			resp.addHeader("Content-Disposition", "attachment; filename=\"" + name + "\"");
-			resp.addHeader("Content-Transfer-Encoding", "binary");
-			resp.setDateHeader("Last-Modified", inFile.lastModified());
-			resp.addHeader("Pragma", "public");
-
-			transcode(inFile, resp.getOutputStream());
-		}
-		catch (FileNotFoundException e) {
-			resp.sendError(HttpStatus.BAD_REQUEST_400, e.toString());
-		}
-		catch (IllegalStateException e) {
-			resp.sendError(HttpStatus.SERVICE_UNAVAILABLE_503, e.toString());
-		}
-	}
-
-	private void transcode (final File inFile, final OutputStream output) throws IOException {
+		final File inFile = tProfile.getItem().getFile();
 		if (!inFile.exists()) {
 			throw new FileNotFoundException("File not found: " + inFile.getAbsolutePath());
 		}
@@ -127,11 +53,21 @@ public class Transcoder {
 			}
 			if (this.inProgress.compareAndSet(n, n + 1)) break;
 		}
+
 		try {
-			runTranscode(inFile, output);
+			final File outFile = tProfile.getCacheFile();
+			final File ftmp = File.createTempFile(outFile.getName(), tProfile.getTmpFileExt(), outFile.getParentFile());
+			try {
+				runTranscodeCmd(tProfile, ftmp);
+				FileHelper.rename(ftmp, outFile);
+			}
+			finally {
+				if (ftmp.exists()) ftmp.delete();
+			}
 		}
 		catch (final Exception e) {
 			LOG.w("Transcode failed.", e);
+			if (e instanceof RuntimeException) throw (RuntimeException) e;
 			if (e instanceof IOException) throw (IOException) e;
 			throw new IOException(e.toString(), e);
 		}
@@ -140,16 +76,20 @@ public class Transcoder {
 		}
 	}
 
-	private void runTranscode (final File inFile, final OutputStream output) throws IOException {
+	private void runTranscodeCmd (final TranscodeProfile tProfile, final File outputFile) throws IOException {
 		Future<List<String>> errFuture = null;
 		boolean procShouldBeRunning = true;
-		final Process p = makeProcess(inFile).start();
+		final Process p = makeProcess(tProfile, outputFile).start();
 		try {
 			try {
 				errFuture = this.es.submit(new ErrReader(p));
-
-				final long bytesSend = IoHelper.copy(p.getInputStream(), output);
-				LOG.i("Transcode complete, served {0} bytes.", bytesSend);
+				final long stdOutByteCount = IoHelper.drainStream(p.getInputStream());
+				if (stdOutByteCount < 1) {
+					LOG.i("Transcode complete, output is {0} bytes.", outputFile.length());
+				}
+				else {
+					LOG.w("Unexpected std out from transcode command: {0} bytes.", stdOutByteCount);
+				}
 			}
 			catch (final IOException e) {
 				if (ExceptionHelper.causedBy(e, IOException.class, "Connection reset by peer")) {
@@ -176,20 +116,9 @@ public class Transcoder {
 		}
 	}
 
-	private static ProcessBuilder makeProcess (final File file) {
-		final ProcessBuilder pb = new ProcessBuilder(
-				"ffmpeg",
-				"-hide_banner",
-				"-nostats",
-				// "-seekable", "1", // Only needed when input is HTTP and not a local file.
-				"-fflags", "+genpts",
-				"-threads", "0",
-				"-i", file.getAbsolutePath(),
-				"-vn",
-				"-b:a", "320k",
-				"-f", "mp3",
-				"-");
-		LOG.i("cmd: {0}", pb.command());
+	private static ProcessBuilder makeProcess (final TranscodeProfile tProfile, final File outputFile) {
+		final ProcessBuilder pb = new ProcessBuilder(tProfile.transcodeCmd(outputFile));
+		LOG.i("{0} cmd: {1}", tProfile.getClass().getSimpleName(), pb.command());
 		return pb;
 	}
 

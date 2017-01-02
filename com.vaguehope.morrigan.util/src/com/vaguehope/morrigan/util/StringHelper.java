@@ -68,4 +68,9 @@ public class StringHelper {
 		return s.toLowerCase(Locale.ENGLISH).startsWith(start.toLowerCase(Locale.ENGLISH));
 	}
 
+	public static boolean endsWithIgnoreCase (final String s, final String end) {
+		if (s == null) return end == null;
+		return s.toLowerCase(Locale.ENGLISH).endsWith(end.toLowerCase(Locale.ENGLISH));
+	}
+
 }
