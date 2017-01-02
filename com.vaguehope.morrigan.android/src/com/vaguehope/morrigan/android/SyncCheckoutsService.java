@@ -53,7 +53,8 @@ public class SyncCheckoutsService extends AwakeService {
 		final Builder notif = makeNotif(notificationId);
 		String result = "Unknown result.";
 		try {
-			doSyncs(notificationId, notif, i.getExtras().getString(EXTRA_HOST_SYNC));
+			final String hostToSync = i.getExtras() != null ? i.getExtras().getString(EXTRA_HOST_SYNC) : null;
+			doSyncs(notificationId, notif, hostToSync);
 			result = "Finished.";
 		}
 		catch (final Exception e) {
@@ -159,7 +160,9 @@ public class SyncCheckoutsService extends AwakeService {
 	private List<ToCopy> findToCopy (final File localDir, final List<? extends MlistItem> items, final List<String> srcs) throws UnsupportedEncodingException {
 		final List<ToCopy> ret = new ArrayList<ToCopy>();
 		for (final MlistItem item : items) {
-			final File localFile = new File(localDir, removeSrc(URLDecoder.decode(item.getRelativeUrl(), "UTF-8"), srcs));
+			final String urlWithoutSrc = removeSrc(URLDecoder.decode(item.getRelativeUrl(), "UTF-8"), srcs);
+			final File urlFile = new File(localDir, urlWithoutSrc);
+			final File localFile = new File(urlFile.getParent(), item.getFileName());
 			if (!localFile.exists() || localFile.lastModified() < item.getLastModified()) {
 				ret.add(new ToCopy(item, localFile));
 			}
@@ -169,7 +172,7 @@ public class SyncCheckoutsService extends AwakeService {
 
 	private Set<File> findAllLocalFiles (final List<ToCopy> toCopy) {
 		final Set<File> ret = new HashSet<File>(toCopy.size());
-		for (ToCopy i : toCopy) {
+		for (final ToCopy i : toCopy) {
 			ret.add(i.getLocalFile());
 		}
 		return ret;
