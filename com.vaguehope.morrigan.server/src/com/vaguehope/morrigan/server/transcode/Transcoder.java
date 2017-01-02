@@ -84,12 +84,14 @@ public class Transcoder {
 			try {
 				errFuture = this.es.submit(new ErrReader(p));
 				final long stdOutByteCount = IoHelper.drainStream(p.getInputStream());
+				final long outputLength = outputFile.length();
 				if (stdOutByteCount < 1) {
-					LOG.i("Transcode complete, output is {0} bytes.", outputFile.length());
+					LOG.i("Transcode complete, output is {0} bytes.", outputLength);
 				}
 				else {
 					LOG.w("Unexpected std out from transcode command: {0} bytes.", stdOutByteCount);
 				}
+				if (outputLength < 1) throw new IOException("Output file length invalid: " + outputLength);
 			}
 			catch (final IOException e) {
 				if (ExceptionHelper.causedBy(e, IOException.class, "Connection reset by peer")) {
@@ -105,13 +107,14 @@ public class Transcoder {
 			try {
 				final int result = waitFor(p, SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
 				if (procShouldBeRunning && result != 0 && errFuture != null) {
-					LOG.i("ffmpeg result: {0}", result);
+					LOG.i("Transcode cmd result: {0}", result);
 					logErr(errFuture);
+					throw new IOException("Transcode failed: cmd result=" + result);
 				}
 			}
 			catch (final IllegalThreadStateException e) {
-				LOG.w("ffmpeg did not stop when requested.");
 				if (errFuture != null) logErr(errFuture);
+				throw new IOException("Transcode cmd did not stop when requested.");
 			}
 		}
 	}
