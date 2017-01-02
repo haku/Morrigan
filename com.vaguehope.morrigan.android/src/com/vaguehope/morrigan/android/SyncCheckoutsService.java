@@ -18,6 +18,7 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.vaguehope.morrigan.android.helper.DialogHelper.Listener;
+import com.vaguehope.morrigan.android.helper.ArrayHelper;
 import com.vaguehope.morrigan.android.helper.ExceptionHelper;
 import com.vaguehope.morrigan.android.helper.FileHelper;
 import com.vaguehope.morrigan.android.helper.FormaterHelper;
@@ -232,7 +233,10 @@ public class SyncCheckoutsService extends AwakeService {
 		String status = String.format("Transfered %s items (%s).",
 				prgLstnr.getTransferedItems(),
 				FormaterHelper.readableFileSize(prgLstnr.getTransferedItemBytes()));
-		if (toDelete.size() > 0) status += String.format("  %s files to delete.", toDelete.size());
+		if (toDelete.size() > 0) {
+			status += String.format("  %s files to delete.", toDelete.size());
+			status += "\n  " + ArrayHelper.join(toDelete.subList(0, Math.min(10, toDelete.size())), "\n  ");
+		}
 		this.configDb.updateCheckout(this.configDb.getCheckout(checkout.getId()).withStatus(status));
 	}
 
