@@ -35,7 +35,7 @@ public class Ffprobe {
 			while ((line = reader.readLine()) != null) {
 				final String[] parts = StringHelper.splitOnce(line, '=');
 				if (parts != null && parts[0].endsWith(keySuffex)) {
-					values.add(parts[1].toLowerCase(Locale.ENGLISH));
+					values.add(StringHelper.removeEndQuotes(parts[1]).toLowerCase(Locale.ENGLISH));
 				}
 			}
 			return values;
