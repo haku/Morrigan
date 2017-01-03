@@ -11,11 +11,17 @@ import com.vaguehope.morrigan.util.StringHelper;
 public class Mp4StreamExtract extends TranscodeProfile {
 
 	public Mp4StreamExtract (final IMediaItem item, final String transcode) throws IOException {
-		super(item, transcode, findAudioStreamType(item));
+		super(item, transcode, findAudioStreamType(item, transcode));
 	}
 
-	private static MimeType findAudioStreamType (final IMediaItem item) throws IOException {
-		// TODO cache ffprobe results?
+	private static MimeType findAudioStreamType (final IMediaItem item, final String transcode) throws IOException {
+		if (cacheFile(item, transcode, MimeType.M4A).exists()) {
+			return MimeType.M4A;
+		}
+		else if (cacheFile(item, transcode, MimeType.MP3).exists()) {
+			return MimeType.MP3;
+		}
+
 		final Set<String> codecs = Ffprobe.streamCodecs(item.getFile());
 		if (codecs.contains("aac")) {
 			return MimeType.M4A;
@@ -23,7 +29,8 @@ public class Mp4StreamExtract extends TranscodeProfile {
 		else if (codecs.contains("mp3")) {
 			return MimeType.MP3;
 		}
-		throw new IllegalArgumentException("No known audio stream type: " + codecs);
+
+		throw new IllegalStateException("No known audio stream type: " + codecs);
 	}
 
 	@Override

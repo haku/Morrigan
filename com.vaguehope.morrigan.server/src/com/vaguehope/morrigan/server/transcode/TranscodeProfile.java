@@ -50,9 +50,13 @@ public abstract class TranscodeProfile {
 	}
 
 	public File getCacheFile () {
+		return cacheFile(this.item, this.transcode, this.mimeType);
+	}
+
+	protected static File cacheFile (final IMediaItem item, final String transcode, final MimeType mimeType) {
 		return new File(Config.getTranscodedDir(),
-				ChecksumHelper.md5String(this.item.getFile().getAbsolutePath())
-				+ "_" + this.transcode + "." + this.mimeType.getExt());
+				ChecksumHelper.md5String(item.getFile().getAbsolutePath())
+				+ "_" + transcode + "." + mimeType.getExt());
 	}
 
 	/**
