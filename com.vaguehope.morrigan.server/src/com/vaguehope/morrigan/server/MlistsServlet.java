@@ -55,6 +55,7 @@ import com.vaguehope.morrigan.server.util.FeedHelper;
 import com.vaguehope.morrigan.server.util.ImageResizer;
 import com.vaguehope.morrigan.server.util.XmlHelper;
 import com.vaguehope.morrigan.tasks.AsyncTask;
+import com.vaguehope.morrigan.util.MnLogger;
 import com.vaguehope.morrigan.util.StringHelper;
 import com.vaguehope.sqlitewrapper.DbException;
 
@@ -147,6 +148,8 @@ public class MlistsServlet extends HttpServlet {
 	private static final String ROOTPATH = "/";
 	private static final int DEFAULT_MAX_QUERY_RESULTS = 250;
 
+	private static final MnLogger LOG = MnLogger.make(MlistsServlet.class);
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private final PlayerReader playerListener;
@@ -170,14 +173,8 @@ public class MlistsServlet extends HttpServlet {
 		try {
 			processRequest(Verb.GET, req, resp, null);
 		}
-		catch (final DbException e) {
-			throw new ServletException(e);
-		}
-		catch (final SAXException e) {
-			throw new ServletException(e);
-		}
-		catch (final MorriganException e) {
-			throw new ServletException(e);
+		catch (final Exception e) {
+			logAndWrap(e, resp);
 		}
 	}
 
@@ -192,15 +189,16 @@ public class MlistsServlet extends HttpServlet {
 				processRequest(Verb.POST, req, resp, act);
 			}
 		}
-		catch (final DbException e) {
-			throw new ServletException(e);
+		catch (final Exception e) {
+			logAndWrap(e, resp);
 		}
-		catch (final SAXException e) {
-			throw new ServletException(e);
+	}
+
+	private void logAndWrap (final Exception e, final HttpServletResponse resp) throws ServletException {
+		if (resp.isCommitted()) {
+			LOG.e("Error while writing committed response.", e);
 		}
-		catch (final MorriganException e) {
-			throw new ServletException(e);
-		}
+		throw new ServletException(e);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
