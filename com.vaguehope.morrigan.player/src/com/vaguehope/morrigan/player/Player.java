@@ -23,12 +23,30 @@ public interface Player {
 	 */
 	boolean isPlaybackEngineReady();
 
+	/**
+	 * May be async.
+	 */
 	void loadAndStartPlaying(IMediaTrackList<? extends IMediaTrack> list);
+
+	/**
+	 * May be async.
+	 */
 	void loadAndStartPlaying(IMediaTrackList<? extends IMediaTrack> list, IMediaTrack track);
+
+	/**
+	 * May be async.
+	 */
 	void loadAndStartPlaying(final PlayItem item);
+
 	void pausePlaying();
+
 	void stopPlaying();
+
+	/**
+	 * May be async.
+	 */
 	void nextTrack();
+
 	PlayState getPlayState();
 
 	void setCurrentItem(PlayItem item);

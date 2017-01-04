@@ -2,6 +2,11 @@ package com.vaguehope.morrigan.player;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -13,7 +18,6 @@ import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.transcode.Transcode;
 import com.vaguehope.morrigan.player.transcode.TranscodeProfile;
 import com.vaguehope.morrigan.player.transcode.Transcoder;
-import com.vaguehope.morrigan.util.Listener;
 import com.vaguehope.morrigan.util.MnLogger;
 import com.vaguehope.morrigan.util.StringHelper;
 
@@ -25,7 +29,7 @@ public abstract class AbstractPlayer implements Player {
 	private final String name;
 	private final Register<Player> register;
 	private final AtomicBoolean alive = new AtomicBoolean(true);
-	private final Object[] loadLock = new Object[] {};
+	private final ExecutorService loadEs;
 	private final PlayerQueue queue = new DefaultPlayerQueue();
 	private final PlayerEventListenerCaller listeners = new PlayerEventListenerCaller();
 	private final AtomicReference<PlaybackOrder> playbackOrder = new AtomicReference<PlaybackOrder>(PlaybackOrder.MANUAL);
@@ -39,6 +43,7 @@ public abstract class AbstractPlayer implements Player {
 		this.id = id;
 		this.name = name;
 		this.register = register;
+		this.loadEs = new ThreadPoolExecutor(0, 1, 10L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
 	}
 
 	@Override
@@ -50,6 +55,7 @@ public abstract class AbstractPlayer implements Player {
 			finally {
 				saveState();
 				onDispose();
+				this.loadEs.shutdown();
 				this.transcoder.dispose();
 			}
 		}
@@ -198,10 +204,11 @@ public abstract class AbstractPlayer implements Player {
 		getListeners().playStateChanged(getPlayState());
 	}
 
-	private final void loadAndStartPlayingTrack (final PlayItem item) {
+	private final Future<?> loadAndStartPlayingTrack (final PlayItem item) {
 		if (item == null) throw new IllegalArgumentException("PlayItem can not be null.");
 		if (!item.hasTrack()) throw new IllegalArgumentException("Item must have a track.");
 		if (!item.getTrack().isPlayable()) throw new IllegalArgumentException("Item is not playable: '" + item.getTrack().getFilepath() + "'.");
+
 		try {
 			if (StringHelper.notBlank(item.getTrack().getFilepath())) {
 				final File file = new File(item.getTrack().getFilepath());
@@ -211,46 +218,38 @@ public abstract class AbstractPlayer implements Player {
 				throw new FileNotFoundException("Track has no filepath or remote location: " + item.getTrack());
 			}
 
-			synchronized (this.loadLock) {
-				markLoadingState(true);
-				this.listeners.currentItemChanged(item);
+			markLoadingState(true);
+		}
+		catch (final Exception e) { // NOSONAR reporting exceptions.
+			this.listeners.onException(e);
+		}
 
-				final TranscodeProfile tProfile = getTranscode().profileForItem(item.getTrack());
-				if (tProfile != null) {
-					this.transcoder.transcodeToFileAsync(tProfile, new Listener<Exception>() {
-						@Override
-						public void onAnswer (final Exception transcodeEx) {
-							if (transcodeEx == null) {
-								try {
-									loadAndPlay(item, tProfile.getCacheFile());
-								}
-								catch (Exception e) {
-									AbstractPlayer.this.listeners.onException(e);
-								}
-								finally {
-									markLoadingState(false);
-								}
-							}
-							else {
-								AbstractPlayer.this.listeners.onException(transcodeEx);
-								markLoadingState(false);
-							}
-						}
-					});
-				}
-				else {
+		return this.loadEs.submit(new Runnable() {
+			@Override
+			public void run () {
+				try {
+					markLoadingState(true);
 					try {
-						loadAndPlay(item, null);
+						AbstractPlayer.this.listeners.currentItemChanged(item);
+
+						File altFile = null;
+						final TranscodeProfile tProfile = getTranscode().profileForItem(item.getTrack());
+						if (tProfile != null) {
+							AbstractPlayer.this.transcoder.transcodeToFile(tProfile);
+							altFile = tProfile.getCacheFile();
+						}
+
+						loadAndPlay(item, altFile);
 					}
 					finally {
 						markLoadingState(false);
 					}
 				}
+				catch (final Exception e) { // NOSONAR reporting exceptions.
+					AbstractPlayer.this.listeners.onException(e);
+				}
 			}
-		}
-		catch (final Exception e) { // NOSONAR reporting exceptions.
-			this.listeners.onException(e);
-		}
+		});
 	}
 
 	/**
