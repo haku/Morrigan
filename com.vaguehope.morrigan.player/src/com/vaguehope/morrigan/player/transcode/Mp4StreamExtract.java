@@ -1,4 +1,4 @@
-package com.vaguehope.morrigan.server.transcode;
+package com.vaguehope.morrigan.player.transcode;
 
 import java.io.File;
 import java.io.IOException;
