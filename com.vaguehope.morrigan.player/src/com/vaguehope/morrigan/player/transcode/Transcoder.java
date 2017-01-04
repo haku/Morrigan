@@ -11,7 +11,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -39,8 +39,8 @@ public class Transcoder {
 		// TODO replace with async / shutdown?
 		this.es = new ThreadPoolExecutor(
 				0, MAX_IN_PROGRESS_TRANSCODES * 2,
-                60L, TimeUnit.SECONDS,
-                new SynchronousQueue<Runnable>());
+				60L, TimeUnit.SECONDS,
+				new LinkedBlockingQueue<Runnable>());
 	}
 
 	private void checkAlive () {
@@ -52,9 +52,9 @@ public class Transcoder {
 		this.es.shutdown();
 	}
 
-	public void transcodeToFileAsync (final TranscodeProfile tProfile, final Listener<Exception> onComplete) throws IOException {
+	public Future<?> transcodeToFileAsync (final TranscodeProfile tProfile, final Listener<Exception> onComplete) throws IOException {
 		checkAlive();
-		this.es.submit(new Runnable() {
+		return this.es.submit(new Runnable() {
 			@Override
 			public void run () {
 				try {
