@@ -47,6 +47,7 @@ import com.vaguehope.morrigan.model.media.internal.db.mmdb.LocalMixedMediaDbHelp
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayerReader;
+import com.vaguehope.morrigan.player.transcode.Transcode;
 import com.vaguehope.morrigan.player.transcode.TranscodeProfile;
 import com.vaguehope.morrigan.player.transcode.Transcoder;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbFactory;
@@ -424,7 +425,7 @@ public class MlistsServlet extends HttpServlet {
 		else if (action.equals(CMD_TRANSCODE)) {
 			final String transcode = StringHelper.trimToNull(req.getParameter(PARAM_TRANSCODE));
 			if (transcode != null) {
-				final TranscodeProfile tProfile = TranscodeProfile.forFile(item, transcode);
+				final TranscodeProfile tProfile = Transcode.parse(transcode).profileForItem(item);
 				this.transcoder.transcodeToFile(tProfile);
 			}
 			else {
@@ -532,7 +533,7 @@ public class MlistsServlet extends HttpServlet {
 
 						final String transcode = StringHelper.trimToNull(req.getParameter(PARAM_TRANSCODE));
 						if (transcode != null) {
-							final TranscodeProfile tProfile = TranscodeProfile.forFile(item, transcode);
+							final TranscodeProfile tProfile = Transcode.parse(transcode).profileForItem(item);
 							final File transcodedFile = tProfile.getCacheFile();
 							if (transcodedFile.exists()) {
 								ServletHelper.returnFile(transcodedFile, resp, tProfile.getTranscodedTitle());
@@ -778,7 +779,7 @@ public class MlistsServlet extends HttpServlet {
 		long fileSize = mi.getFileSize();
 		String fileLink = fileLink(mi);
 
-		final TranscodeProfile tProfile = TranscodeProfile.forFile(mi, transcode);
+		final TranscodeProfile tProfile = Transcode.parse(transcode).profileForItem(mi);
 		if (tProfile != null) {
 			title = tProfile.getTranscodedTitle();
 

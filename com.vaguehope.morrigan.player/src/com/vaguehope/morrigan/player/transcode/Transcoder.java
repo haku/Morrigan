@@ -22,8 +22,6 @@ import com.vaguehope.morrigan.util.MnLogger;
 
 public class Transcoder {
 
-	static final String TRANSCODE_AUDIO_ONLY = "audio_only";
-
 	private static final int SHUTDOWN_TIMEOUT_SECONDS = 5;
 	private static final int ERR_HISTORY_LINES = 100;
 	private static final int MAX_IN_PROGRESS_TRANSCODES = 3;
@@ -34,7 +32,7 @@ public class Transcoder {
 	private final ExecutorService es;
 
 	public Transcoder () {
-		this.es = Executors.newCachedThreadPool();
+		this.es = Executors.newCachedThreadPool(); // TODO replace with async / shutdown?
 	}
 
 	public void transcodeToFile (final TranscodeProfile tProfile) throws IOException {

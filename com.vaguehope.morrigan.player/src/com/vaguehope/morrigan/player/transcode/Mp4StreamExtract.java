@@ -10,11 +10,11 @@ import com.vaguehope.morrigan.util.StringHelper;
 
 public class Mp4StreamExtract extends TranscodeProfile {
 
-	public Mp4StreamExtract (final IMediaItem item, final String transcode) throws IOException {
+	public Mp4StreamExtract (final IMediaItem item, final Transcode transcode) throws IOException {
 		super(item, transcode, findAudioStreamType(item, transcode));
 	}
 
-	private static MimeType findAudioStreamType (final IMediaItem item, final String transcode) throws IOException {
+	private static MimeType findAudioStreamType (final IMediaItem item, final Transcode transcode) throws IOException {
 		if (cacheFile(item, transcode, MimeType.M4A).exists()) {
 			return MimeType.M4A;
 		}

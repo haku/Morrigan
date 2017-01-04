@@ -7,7 +7,7 @@ import com.vaguehope.morrigan.util.MimeType;
 
 public class GenericMp3Transcode extends TranscodeProfile {
 
-	public GenericMp3Transcode (final IMediaItem item, final String transcode) {
+	public GenericMp3Transcode (final IMediaItem item, final Transcode transcode) {
 		super(item, transcode, MimeType.MP3);
 	}
 
