@@ -18,6 +18,7 @@ import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.Player.PlayerEventListener;
+import com.vaguehope.morrigan.player.transcode.Transcode;
 import com.vaguehope.morrigan.screen.ScreenMgr;
 
 class ServerPlayerEventHandler implements PlayerEventListener, LocalPlayerSupport {
@@ -94,6 +95,11 @@ class ServerPlayerEventHandler implements PlayerEventListener, LocalPlayerSuppor
 
 	@Override
 	public void playOrderChanged (final PlaybackOrder newPlaybackOrder) {
+		outputStatus();
+	}
+
+	@Override
+	public void transcodeChanged (final Transcode newTranscode) {
 		outputStatus();
 	}
 

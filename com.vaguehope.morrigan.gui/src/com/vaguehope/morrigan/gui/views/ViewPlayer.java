@@ -11,7 +11,6 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
 import com.vaguehope.morrigan.gui.Activator;
-import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.screen.ScreenPainter;
 import com.vaguehope.morrigan.screen.ScreenPainter.ScreenType;
@@ -158,8 +157,6 @@ public class ViewPlayer extends AbstractPlayerView {
 		}
 	}
 
-	@Override
-	protected void orderModeChanged(final PlaybackOrder order) {/* UNUSED */}
 	@Override
 	protected void videoParentChanged(final Composite newParent) {/* UNUSED */}
 	@Override

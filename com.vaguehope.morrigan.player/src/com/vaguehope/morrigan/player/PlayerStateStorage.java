@@ -24,6 +24,7 @@ import com.vaguehope.morrigan.model.media.IMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
+import com.vaguehope.morrigan.player.transcode.Transcode;
 import com.vaguehope.morrigan.util.StringHelper;
 import com.vaguehope.sqlitewrapper.DbException;
 
@@ -51,6 +52,7 @@ public class PlayerStateStorage {
 			try {
 				w.append(player.getPlaybackOrder().name())
 						.append("|").append(String.valueOf(player.getCurrentPosition()))
+						.append("|").append(String.valueOf(player.getTranscode().getSymbolicName()))
 						.append("\n");
 				appendPlayItem(w, player.getCurrentItem());
 				for (final PlayItem item : player.getQueue().getQueueList()) {
@@ -108,6 +110,13 @@ public class PlayerStateStorage {
 						if (position > 0) {
 							LOG.info("TODO restore position: " + position);
 						}
+					}
+				}
+
+				if (lineParts.length >= 3) {
+					final String rawTranscode = lineParts[2];
+					if (rawTranscode != null) {
+						player.setTranscode(Transcode.parse(rawTranscode.trim()));
 					}
 				}
 

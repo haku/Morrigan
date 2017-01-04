@@ -57,6 +57,7 @@ import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.Player.PlayerEventListener;
 import com.vaguehope.morrigan.player.PlayerLifeCycleListener;
+import com.vaguehope.morrigan.player.transcode.Transcode;
 import com.vaguehope.morrigan.screen.CoverArtProvider;
 import com.vaguehope.morrigan.screen.FullscreenShell;
 import com.vaguehope.morrigan.screen.ScreenPainter;
@@ -234,6 +235,14 @@ public abstract class AbstractPlayerView extends ViewPart {
 		}
 
 		@Override
+		public void transcodeChanged(final Transcode newTranscode) {
+			callUpdateStatus();
+			for (final TranscodeSelectAction o : getTranscodeMenuActions()) {
+				o.setChecked(o.getTranscode() == newTranscode);
+			}
+		};
+
+		@Override
 		public void currentItemChanged (final PlayItem newItem) {
 			callUpdateTitle();
 		}
@@ -343,8 +352,6 @@ public abstract class AbstractPlayerView extends ViewPart {
 	 * This will only ever be called on the UI thread.
 	 */
 	protected abstract void updateStatus ();
-
-	protected abstract void orderModeChanged (PlaybackOrder order);
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	History.
@@ -668,6 +675,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 //	Making actions.
 
 	private final List<OrderSelectAction> orderMenuActions = new ArrayList<OrderSelectAction>();
+	private final List<TranscodeSelectAction> transcodeMenuActions = new ArrayList<TranscodeSelectAction>();
 	protected IAction jumpToAction;
 
 	private void makeActions () {
@@ -677,11 +685,21 @@ public abstract class AbstractPlayerView extends ViewPart {
 			this.orderMenuActions.add(a);
 		}
 
+		for (final Transcode t : Transcode.values()) {
+			final TranscodeSelectAction a = new TranscodeSelectAction(t);
+			if (getPlayer().getTranscode() == t) a.setChecked(true);
+			this.transcodeMenuActions.add(a);
+		}
+
 		this.jumpToAction = new JumpToAction(getSite().getWorkbenchWindow());
 	}
 
 	protected List<OrderSelectAction> getOrderMenuActions () {
 		return this.orderMenuActions;
+	}
+
+	public List<TranscodeSelectAction> getTranscodeMenuActions () {
+		return this.transcodeMenuActions;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -703,6 +721,26 @@ public abstract class AbstractPlayerView extends ViewPart {
 		@Override
 		public void run () {
 			if (isChecked()) getPlayer().setPlaybackOrder(this.mode);
+		}
+
+	}
+
+	protected class TranscodeSelectAction extends Action {
+
+		private final Transcode transcode;
+
+		public TranscodeSelectAction (final Transcode transcode) {
+			super(transcode.toString(), AS_RADIO_BUTTON);
+			this.transcode = transcode;
+		}
+
+		public Transcode getTranscode () {
+			return this.transcode;
+		}
+
+		@Override
+		public void run () {
+			if (isChecked()) getPlayer().setTranscode(this.transcode);
 		}
 
 	}

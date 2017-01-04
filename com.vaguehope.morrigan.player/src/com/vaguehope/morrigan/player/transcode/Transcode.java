@@ -7,6 +7,12 @@ import com.vaguehope.morrigan.util.MimeType;
 import com.vaguehope.morrigan.util.StringHelper;
 
 public enum Transcode {
+	NONE("", "No Transcode") {
+		@Override
+		public TranscodeProfile profileForItem (final IMediaItem item) throws IOException {
+			return null;
+		}
+	},
 	AUDIO_ONLY("audio_only", "Audio Only") {
 		@Override
 		public TranscodeProfile profileForItem (final IMediaItem item) throws IOException {
@@ -16,12 +22,6 @@ public enum Transcode {
 			else if (StringHelper.startsWithIgnoreCase(item.getMimeType(), "video")) {
 				return new GenericMp3Transcode(item, this);
 			}
-			return null;
-		}
-	},
-	NONE("", "None") {
-		@Override
-		public TranscodeProfile profileForItem (final IMediaItem item) throws IOException {
 			return null;
 		}
 	};

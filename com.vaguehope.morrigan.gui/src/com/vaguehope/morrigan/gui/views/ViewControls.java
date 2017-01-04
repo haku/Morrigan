@@ -36,6 +36,7 @@ import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayerLifeCycleListener;
+import com.vaguehope.morrigan.player.transcode.Transcode;
 import com.vaguehope.morrigan.screen.ScreenPainter;
 import com.vaguehope.morrigan.screen.ScreenPainter.ScreenType;
 import com.vaguehope.morrigan.util.TimeHelper;
@@ -108,12 +109,14 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 	private int preferedHeight = -1;
 
 	private Menu menuOrderMode;
+	private Menu menuTranscode;
 	private Menu menuFullscreen;
 	private Menu menuPref;
 
 	private Button btnPlayPause;
 	private Label lblStatus;
 	private Button btnOrderMode;
+	private Button btnTranscode;
 	Button btnQueue;
 	private Canvas videoParent;
 	private ScreenPainter screenPainter;
@@ -152,6 +155,12 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 			orderModeMenuMgr.add(a);
 		}
 		this.menuOrderMode = orderModeMenuMgr.createContextMenu(parent);
+
+		MenuManager transcodeModeMenuMgr = new MenuManager();
+		for (final TranscodeSelectAction a : getTranscodeMenuActions()) {
+			transcodeModeMenuMgr.add(a);
+		}
+		this.menuTranscode = transcodeModeMenuMgr.createContextMenu(parent);
 
 		MenuManager fullscreenMenuMgr = new MenuManager();
 		for (final FullScreenAction a : getFullScreenActions()) {
@@ -198,6 +207,7 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		this.videoParent = new Canvas(parent, SWT.NONE);
 		this.screenPainter = new ScreenPainter(this.videoParent, ScreenType.TINY);
 		this.btnOrderMode = new Button(parent, SWT.PUSH);
+		this.btnTranscode = new Button(parent, SWT.PUSH);
 		Button btnFullscreen = new Button(parent, SWT.PUSH);
 		Button btnPref = new Button(parent, SWT.PUSH);
 		this.btnQueue = new Button(parent, SWT.PUSH);
@@ -257,10 +267,18 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		this.btnOrderMode.setText(getPlayer().getPlaybackOrder().toString());
 		formData = new FormData();
 		formData.top = new FormAttachment(0, SEP);
-		formData.right = new FormAttachment(this.btnQueue, -SEP);
+		formData.right = new FormAttachment(this.btnTranscode, -SEP);
 		formData.bottom = new FormAttachment(seekbar, -SEP);
 		this.btnOrderMode.setLayoutData(formData);
 		this.btnOrderMode.addSelectionListener(new DropMenuListener(this.btnOrderMode, this.menuOrderMode));
+
+		this.btnTranscode.setText(getPlayer().getTranscode().toString());
+		formData = new FormData();
+		formData.top = new FormAttachment(0, SEP);
+		formData.right = new FormAttachment(this.btnQueue, -SEP);
+		formData.bottom = new FormAttachment(seekbar, -SEP);
+		this.btnTranscode.setLayoutData(formData);
+		this.btnTranscode.addSelectionListener(new DropMenuListener(this.btnTranscode, this.menuTranscode));
 
 		this.btnQueue.setImage(this.iconQueue);
 		formData = new FormData();
@@ -431,6 +449,7 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		this.lblStatus.setText(msg.toString());
 
 		orderModeChanged(player.getPlaybackOrder());
+		transcodeChanged(player.getTranscode());
 
 		final PlayItem currentItem = player.getCurrentItem();
 		if (currentItem != null && currentItem.hasTrack()) {
@@ -440,10 +459,14 @@ public class ViewControls extends AbstractPlayerView implements ISizeProvider {
 		}
 	}
 
-	@Override
 	protected void orderModeChanged(final PlaybackOrder order) {
 		this.btnOrderMode.setText(order.toString());
 		this.btnOrderMode.getParent().layout();
+	}
+
+	protected void transcodeChanged(final Transcode transcode) {
+		this.btnTranscode.setText(transcode.toString());
+		this.btnTranscode.getParent().layout();
 	}
 
 	@Override

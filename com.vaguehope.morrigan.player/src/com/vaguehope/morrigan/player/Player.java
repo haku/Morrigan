@@ -7,6 +7,7 @@ import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
+import com.vaguehope.morrigan.player.transcode.Transcode;
 
 public interface Player {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -52,6 +53,15 @@ public interface Player {
 	PlaybackOrder getPlaybackOrder();
 	void setPlaybackOrder(PlaybackOrder order);
 
+	/**
+	 * Can not be null;
+	 */
+	Transcode getTranscode();
+	/**
+	 * Can not be null;
+	 */
+	void setTranscode(Transcode transcode);
+
 	List<PlayItem> getHistory();
 	PlayerQueue getQueue();
 
@@ -61,6 +71,7 @@ public interface Player {
 	public interface PlayerEventListener {
 
 		void playOrderChanged (PlaybackOrder newPlaybackOrder);
+		void transcodeChanged (Transcode newTranscode);
 		/**
 		 * Either the item is now a different item, or a property on the item has changed.
 		 * May be called with null to indicate no item or an unknown item.

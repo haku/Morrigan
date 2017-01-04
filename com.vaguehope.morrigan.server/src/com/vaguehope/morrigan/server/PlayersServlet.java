@@ -28,6 +28,7 @@ import com.vaguehope.morrigan.model.media.MediaTagClassification;
 import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.player.OrderHelper;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
+import com.vaguehope.morrigan.player.transcode.Transcode;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlayItemType;
 import com.vaguehope.morrigan.player.Player;
@@ -72,6 +73,7 @@ public class PlayersServlet extends HttpServlet {
 	private static final String CMD_NEXT = "next";
 	private static final String CMD_STOP = "stop";
 	private static final String CMD_PLAYBACKORDER = "playbackorder";
+	private static final String CMD_TRANSCODE = "transcode";
 	private static final String CMD_FULLSCREEN = "fullscreen";
 	private static final String CMD_ADDTAG = "addtag";
 
@@ -182,6 +184,17 @@ public class PlayersServlet extends HttpServlet {
 			if (orderRaw != null && orderRaw.length() > 0) {
 				final PlaybackOrder order = OrderHelper.parsePlaybackOrderByName(orderRaw);
 				player.setPlaybackOrder(order);
+				writeResponse(req, resp);
+			}
+			else {
+				ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "'order' parameter not set desu~");
+			}
+		}
+		else if (act.equals(CMD_TRANSCODE)) {
+			final String transcodeRaw = req.getParameter("transcode");
+			if (transcodeRaw != null && transcodeRaw.length() > 0) {
+				final Transcode transcode = Transcode.parse(transcodeRaw);
+				player.setTranscode(transcode);
 				writeResponse(req, resp);
 			}
 			else {
@@ -388,6 +401,8 @@ public class PlayersServlet extends HttpServlet {
 		FeedHelper.addElement(dw, "playstate", p.getPlayState().getN());
 		FeedHelper.addElement(dw, "playorder", p.getPlaybackOrder().getN());
 		FeedHelper.addElement(dw, "playordertitle", p.getPlaybackOrder().toString());
+		FeedHelper.addElement(dw, "transcode", p.getTranscode().getSymbolicName());
+		FeedHelper.addElement(dw, "transcodetitle", p.getTranscode().toString());
 		FeedHelper.addElement(dw, "queueversion", queueVersion);
 		FeedHelper.addElement(dw, "queuelength", queueLength);
 		FeedHelper.addElement(dw, "queueduration", queueDuration.getDuration());

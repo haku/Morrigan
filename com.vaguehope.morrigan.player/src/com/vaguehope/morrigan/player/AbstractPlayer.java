@@ -5,10 +5,15 @@ import java.io.FileNotFoundException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
+import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import com.vaguehope.morrigan.model.Register;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
+import com.vaguehope.morrigan.player.transcode.Transcode;
+import com.vaguehope.morrigan.player.transcode.TranscodeProfile;
+import com.vaguehope.morrigan.player.transcode.Transcoder;
+import com.vaguehope.morrigan.util.Listener;
 import com.vaguehope.morrigan.util.StringHelper;
 
 public abstract class AbstractPlayer implements Player {
@@ -21,6 +26,9 @@ public abstract class AbstractPlayer implements Player {
 	private final PlayerQueue queue = new DefaultPlayerQueue();
 	private final PlayerEventListenerCaller listeners = new PlayerEventListenerCaller();
 	private final AtomicReference<PlaybackOrder> playbackOrder = new AtomicReference<PlaybackOrder>(PlaybackOrder.MANUAL);
+	private final AtomicReference<Transcode> transcode = new AtomicReference<Transcode>(Transcode.NONE);
+	private final Transcoder transcoder = new Transcoder();
+	private volatile boolean loadingTrack = false;
 
 	public AbstractPlayer (final String id, final String name, final PlayerRegister register) {
 		this.id = id;
@@ -37,6 +45,7 @@ public abstract class AbstractPlayer implements Player {
 			finally {
 				saveState();
 				onDispose();
+				this.transcoder.dispose();
 			}
 		}
 	}
@@ -112,6 +121,18 @@ public abstract class AbstractPlayer implements Player {
 	}
 
 	@Override
+	public void setTranscode (final Transcode transcode) {
+		if (transcode == null) throw new IllegalArgumentException("Transcode can not be null.");
+		this.transcode.set(transcode);
+		this.listeners.transcodeChanged(transcode);
+	}
+
+	@Override
+	public Transcode getTranscode () {
+		return this.transcode.get();
+	}
+
+	@Override
 	public final void loadAndStartPlaying (final IMediaTrackList<? extends IMediaTrack> list) {
 		loadAndStartPlaying(list, null);
 	}
@@ -150,6 +171,19 @@ public abstract class AbstractPlayer implements Player {
 		loadAndStartPlayingTrack(pi);
 	}
 
+	@Override
+	public final PlayState getPlayState () {
+		if (this.loadingTrack) return PlayState.LOADING;
+		return getEnginePlayState();
+	}
+
+	public abstract PlayState getEnginePlayState ();
+
+	private void markLoadingState(final boolean isLoading) {
+		this.loadingTrack = isLoading;
+		getListeners().playStateChanged(getPlayState());
+	}
+
 	private final void loadAndStartPlayingTrack (final PlayItem item) {
 		if (item == null) throw new IllegalArgumentException("PlayItem can not be null.");
 		if (!item.hasTrack()) throw new IllegalArgumentException("Item must have a track.");
@@ -164,8 +198,40 @@ public abstract class AbstractPlayer implements Player {
 			}
 
 			synchronized (this.loadLock) {
-				loadAndPlay(item);
+				markLoadingState(true);
 				this.listeners.currentItemChanged(item);
+
+				final TranscodeProfile tProfile = getTranscode().profileForItem(item.getTrack());
+				if (tProfile != null) {
+					this.transcoder.transcodeToFileAsync(tProfile, new Listener<Exception>() {
+						@Override
+						public void onAnswer (final Exception transcodeEx) {
+							if (transcodeEx == null) {
+								try {
+									loadAndPlay(item, tProfile.getCacheFile());
+								}
+								catch (Exception e) {
+									AbstractPlayer.this.listeners.onException(e);
+								}
+								finally {
+									markLoadingState(false);
+								}
+							}
+							else {
+								AbstractPlayer.this.listeners.onException(transcodeEx);
+								markLoadingState(false);
+							}
+						}
+					});
+				}
+				else {
+					try {
+						loadAndPlay(item, null);
+					}
+					finally {
+						markLoadingState(false);
+					}
+				}
 			}
 		}
 		catch (final Exception e) { // NOSONAR reporting exceptions.
@@ -178,6 +244,6 @@ public abstract class AbstractPlayer implements Player {
 	 * Already synchronised.
 	 * PlayItem has been validated.
 	 */
-	protected abstract void loadAndPlay (PlayItem item) throws Exception;
+	protected abstract void loadAndPlay (PlayItem item, File altFile) throws Exception;
 
 }

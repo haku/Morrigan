@@ -160,11 +160,11 @@ public class MlistsServlet extends HttpServlet {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public MlistsServlet (final PlayerReader playerListener, final MediaFactory mediaFactory, final AsyncActions asyncActions) {
+	public MlistsServlet (final PlayerReader playerListener, final MediaFactory mediaFactory, final AsyncActions asyncActions, final Transcoder transcoder) {
 		this.playerListener = playerListener;
 		this.mediaFactory = mediaFactory;
 		this.asyncActions = asyncActions;
-		this.transcoder = new Transcoder();
+		this.transcoder = transcoder;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -14,6 +14,7 @@ import org.osgi.framework.BundleContext;
 import com.vaguehope.morrigan.model.media.MediaFactoryTracker;
 import com.vaguehope.morrigan.player.PlayerContainer;
 import com.vaguehope.morrigan.player.PlayerReaderTracker;
+import com.vaguehope.morrigan.player.transcode.Transcoder;
 import com.vaguehope.morrigan.server.AsyncActions;
 import com.vaguehope.morrigan.server.MorriganServer;
 import com.vaguehope.morrigan.server.ServerConfig;
@@ -34,6 +35,7 @@ public class Activator implements BundleActivator {
 	private PlayerReaderTracker playerReaderTracker;
 	private MediaFactoryTracker mediaFactoryTracker;
 	private AsyncTasksRegisterTracker asyncTasksRegisterTracker;
+	private Transcoder transcoder;
 	private ExecutorService executorService;
 	private ScheduledExecutorService scheduledExecutorService;
 
@@ -44,6 +46,7 @@ public class Activator implements BundleActivator {
 		this.playerReaderTracker = new PlayerReaderTracker(context);
 		this.mediaFactoryTracker = new MediaFactoryTracker(context);
 		this.asyncTasksRegisterTracker = new AsyncTasksRegisterTracker(context);
+		this.transcoder = new Transcoder();
 		this.executorService = new ThreadPoolExecutor(0, 1, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), new DaemonThreadFactory("srvboot"));
 		this.scheduledExecutorService = Executors.newScheduledThreadPool(1);
 
@@ -59,7 +62,7 @@ public class Activator implements BundleActivator {
 		}
 
 		final AsyncActions asyncActions = new AsyncActions(this.asyncTasksRegisterTracker, this.mediaFactoryTracker);
-		this.server = new MorriganServer(context, config, this.playerReaderTracker, this.mediaFactoryTracker, this.asyncTasksRegisterTracker, asyncActions, this.scheduledExecutorService);
+		this.server = new MorriganServer(context, config, this.playerReaderTracker, this.mediaFactoryTracker, this.asyncTasksRegisterTracker, asyncActions, this.transcoder, this.scheduledExecutorService);
 		this.server.start();
 
 		if (this.playerContainer != null) {
@@ -84,6 +87,7 @@ public class Activator implements BundleActivator {
 		this.mediaFactoryTracker.dispose();
 		this.playerReaderTracker.dispose();
 		this.asyncTasksRegisterTracker.dispose();
+		this.transcoder.dispose();
 		logger.fine("Morrigan Server stopped.");
 	}
 

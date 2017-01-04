@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.Player.PlayerEventListener;
+import com.vaguehope.morrigan.player.transcode.Transcode;
 
 public class PlayerEventListenerCaller implements PlayerEventListener {
 
@@ -45,6 +46,13 @@ public class PlayerEventListenerCaller implements PlayerEventListener {
 	public void playOrderChanged (final PlaybackOrder newPlaybackOrder) {
 		for (final PlayerEventListener l : this.watchers) {
 			l.playOrderChanged(newPlaybackOrder);
+		}
+	}
+
+	@Override
+	public void transcodeChanged (final Transcode newTranscode) {
+		for (final PlayerEventListener l : this.watchers) {
+			l.transcodeChanged(newTranscode);
 		}
 	}
 

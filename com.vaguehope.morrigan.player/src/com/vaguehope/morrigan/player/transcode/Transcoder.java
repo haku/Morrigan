@@ -10,15 +10,18 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.vaguehope.morrigan.util.ExceptionHelper;
 import com.vaguehope.morrigan.util.FileHelper;
 import com.vaguehope.morrigan.util.IoHelper;
+import com.vaguehope.morrigan.util.Listener;
 import com.vaguehope.morrigan.util.MnLogger;
+import com.vaguehope.morrigan.util.StringHelper;
 
 public class Transcoder {
 
@@ -30,18 +33,55 @@ public class Transcoder {
 
 	private final AtomicInteger inProgress = new AtomicInteger(0);
 	private final ExecutorService es;
+	private volatile boolean alive = true;
 
 	public Transcoder () {
-		this.es = Executors.newCachedThreadPool(); // TODO replace with async / shutdown?
+		// TODO replace with async / shutdown?
+		this.es = new ThreadPoolExecutor(
+				0, MAX_IN_PROGRESS_TRANSCODES * 2,
+                60L, TimeUnit.SECONDS,
+                new SynchronousQueue<Runnable>());
+	}
+
+	private void checkAlive () {
+		if (!this.alive) throw new IllegalStateException("Transcoder instance is dead.");
+	}
+
+	public void dispose () {
+		this.alive = false;
+		this.es.shutdown();
+	}
+
+	public void transcodeToFileAsync (final TranscodeProfile tProfile, final Listener<Exception> onComplete) throws IOException {
+		checkAlive();
+		this.es.submit(new Runnable() {
+			@Override
+			public void run () {
+				try {
+					transcodeToFile(tProfile);
+					onComplete.onAnswer(null);
+				}
+				catch (final Exception e) {
+					onComplete.onAnswer(e);
+				}
+			}
+		});
 	}
 
 	public void transcodeToFile (final TranscodeProfile tProfile) throws IOException {
+		checkAlive();
 		if (tProfile == null) throw new IllegalArgumentException("tProfile can not be null.");
 
 		final File inFile = tProfile.getItem().getFile();
 		if (!inFile.exists()) {
+			if (StringHelper.notBlank(tProfile.getItem().getRemoteLocation())) {
+				throw new UnsupportedOperationException("TODO implement transcode of remote files.");
+			}
 			throw new FileNotFoundException("File not found: " + inFile.getAbsolutePath());
 		}
+
+		final File outFile = tProfile.getCacheFile();
+		if (outFile.exists() && outFile.lastModified() >= inFile.lastModified()) return;
 
 		while (true) {
 			final int n = this.inProgress.get();
@@ -53,7 +93,6 @@ public class Transcoder {
 		}
 
 		try {
-			final File outFile = tProfile.getCacheFile();
 			final File ftmp = File.createTempFile(outFile.getName(), tProfile.getTmpFileExt(), outFile.getParentFile());
 			try {
 				runTranscodeCmd(tProfile, ftmp);
