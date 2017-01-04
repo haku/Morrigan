@@ -196,6 +196,7 @@
     var tags = $('#mnu_tags');
     var stopAfter = $('#mnu_stop_after');
     var playbackOrder = $('#mnu_playback_order');
+    var transcode = $('#mnu_transcode');
     var clearQueue = $('#mnu_clear_queue');
     var shuffleQueue = $('#mnu_shuffle_queue');
     var enqueueAll = $('#mnu_enqueue_all');
@@ -206,6 +207,7 @@
       tags.show();
       stopAfter.show();
       playbackOrder.show();
+      transcode.show();
       clearQueue.show();
       shuffleQueue.show();
       enqueueAll.hide();
@@ -217,6 +219,7 @@
       tags.hide();
       stopAfter.hide();
       playbackOrder.hide();
+      transcode.hide();
       clearQueue.hide();
       shuffleQueue.hide();
       enqueueAll.show();
@@ -237,12 +240,12 @@
       });
     });
 
-    $.each(MnApi.TRANSCODES, function(index, transcode) {
+    $.each(MnApi.TRANSCODES, function(index, tc) {
       var li = $('<li class="mdl-menu__item">');
-      li.text(transcode.title);
+      li.text(tc.title);
       li.click(function() {
         if (!selectedPlayer) return;
-        MnApi.playerTranscode(selectedPlayer.pid, transcode, msgHandler, displayPlayer);
+        MnApi.playerTranscode(selectedPlayer.pid, tc, msgHandler, displayPlayer);
       });
       $('#submnu_transcode').append(li);
     });
