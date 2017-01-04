@@ -73,7 +73,7 @@ public class PlayerStateStorage {
 
 	}
 
-	public void requestReadState (final Player player) {
+	public void requestReadState (final AbstractPlayer player) {
 		this.schEx.schedule(new Runnable() {
 			@Override
 			public void run () {
@@ -82,11 +82,14 @@ public class PlayerStateStorage {
 		}, RESTORE_DELAY_SECONDS, TimeUnit.SECONDS);
 	}
 
-	protected void readState (final Player player) {
+	protected void readState (final AbstractPlayer player) {
 		if (player.isDisposed()) return;
 
 		final File file = getFile(player.getId());
-		if (!file.exists()) return;
+		if (!file.exists()) {
+			player.markStateRestoreAttempted();
+			return;
+		}
 
 		try {
 			final BufferedReader r = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
@@ -139,6 +142,9 @@ public class PlayerStateStorage {
 		}
 		catch (final Exception e) {
 			LOG.log(Level.WARNING, "Failed to read state for player " + player.getId(), e);
+		}
+		finally {
+			player.markStateRestoreAttempted();
 		}
 	}
 

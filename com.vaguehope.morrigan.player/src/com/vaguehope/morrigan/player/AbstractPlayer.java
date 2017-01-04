@@ -14,9 +14,12 @@ import com.vaguehope.morrigan.player.transcode.Transcode;
 import com.vaguehope.morrigan.player.transcode.TranscodeProfile;
 import com.vaguehope.morrigan.player.transcode.Transcoder;
 import com.vaguehope.morrigan.util.Listener;
+import com.vaguehope.morrigan.util.MnLogger;
 import com.vaguehope.morrigan.util.StringHelper;
 
 public abstract class AbstractPlayer implements Player {
+
+	private static final MnLogger LOG = MnLogger.make(AbstractPlayer.class);
 
 	private final String id;
 	private final String name;
@@ -28,6 +31,8 @@ public abstract class AbstractPlayer implements Player {
 	private final AtomicReference<PlaybackOrder> playbackOrder = new AtomicReference<PlaybackOrder>(PlaybackOrder.MANUAL);
 	private final AtomicReference<Transcode> transcode = new AtomicReference<Transcode>(Transcode.NONE);
 	private final Transcoder transcoder = new Transcoder();
+
+	private volatile boolean stateRestoreAttempted = false;
 	private volatile boolean loadingTrack = false;
 
 	public AbstractPlayer (final String id, final String name, final PlayerRegister register) {
@@ -64,11 +69,20 @@ public abstract class AbstractPlayer implements Player {
 		if (!this.alive.get()) throw new IllegalStateException("Player is disposed: " + toString());
 	}
 
+	protected void markStateRestoreAttempted () {
+		this.stateRestoreAttempted = true;
+	}
+
 	/**
 	 * A hint.  May be handled asynchronously.
 	 */
 	protected void saveState () {
-		PlayerStateStorage.writeState(this);
+		if (this.stateRestoreAttempted) {
+			PlayerStateStorage.writeState(this);
+		}
+		else {
+			LOG.w("Not saving player state as a restore has not yet been attempted.");
+		}
 	}
 
 	public PlayerEventListener getListeners () {

@@ -103,7 +103,7 @@ public class PlayerRegisterImpl implements PlayerRegister {
 	}
 
 	public LocalPlayer makeLocal (final String prefix, final String name, final LocalPlayerSupport localPlayerSupport) {
-		final LocalPlayer p = new LocalPlayerImpl(nextIndex(prefix), name, localPlayerSupport, this, this.playbackEngineFactory, this.executorService);
+		final LocalPlayerImpl p = new LocalPlayerImpl(nextIndex(prefix), name, localPlayerSupport, this, this.playbackEngineFactory, this.executorService);
 		this.stateStorage.requestReadState(p);
 		this.localPlayerIds.add(p.getId());
 		register(p);
