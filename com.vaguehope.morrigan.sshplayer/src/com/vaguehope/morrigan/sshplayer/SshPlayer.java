@@ -39,8 +39,8 @@ public class SshPlayer extends AbstractPlayer {
 	}
 
 	@Override
-	protected void loadAndPlay (final PlayItem item) throws Exception {
-		final File file = new File(item.getTrack().getFilepath());
+	protected void loadAndPlay (final PlayItem item, final File altFile) {
+		final File file = altFile != null ? altFile : new File(item.getTrack().getFilepath());
 		LOG.info("Loading item: " + file.getAbsolutePath());
 
 		stopPlaying();
@@ -82,7 +82,7 @@ public class SshPlayer extends AbstractPlayer {
 	}
 
 	@Override
-	public PlayState getPlayState () {
+	public PlayState getEnginePlayState () {
 		CliPlayer m = this.cliPlayer.get();
 		if (m == null) return PlayState.STOPPED;
 		// TODO what about paused?
