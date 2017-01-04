@@ -192,7 +192,7 @@ public class PlayersServlet extends HttpServlet {
 		}
 		else if (act.equals(CMD_TRANSCODE)) {
 			final String transcodeRaw = req.getParameter("transcode");
-			if (transcodeRaw != null && transcodeRaw.length() > 0) {
+			if (transcodeRaw != null) {
 				final Transcode transcode = Transcode.parse(transcodeRaw);
 				player.setTranscode(transcode);
 				writeResponse(req, resp);

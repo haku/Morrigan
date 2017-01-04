@@ -62,6 +62,9 @@ MnApi = {};
     player.playOrder = parseInt(node.find('playorder').text(), 10);
     player.playOrderTitle = node.find('playordertitle').text();
 
+    player.transcode = node.find('transcode').text();
+    player.transcodeTitle = node.find('transcodetitle').text();
+
     player.listTitle = node.find('listtitle').text();
     if (player.listTitle === "null") {
       player.listTitle = "(no list)";
@@ -128,8 +131,17 @@ MnApi = {};
     {id: "MANUAL",       title: "Manual"}
   ];
 
+  MnApi.TRANSCODES = [
+    {id: "",           title: "No Transcode"},
+    {id: "audio_only", title: "Audio Only"}
+  ];
+
   MnApi.playerPlaybackOrder = function(pid, order, msgHandler, onPlayer) {
     writePlayerState(pid, 'playbackorder&order=' + order.id, msgHandler, onPlayer);
+  }
+
+  MnApi.playerTranscode = function(pid, transcode, msgHandler, onPlayer) {
+    writePlayerState(pid, 'transcode&transcode=' + transcode.id, msgHandler, onPlayer);
   }
 
   MnApi.playerFullscreen = function(pid, monitor, msgHandler, onPlayer) {

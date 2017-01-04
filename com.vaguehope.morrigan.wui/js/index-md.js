@@ -237,6 +237,16 @@
       });
     });
 
+    $.each(MnApi.TRANSCODES, function(index, transcode) {
+      var li = $('<li class="mdl-menu__item">');
+      li.text(transcode.title);
+      li.click(function() {
+        if (!selectedPlayer) return;
+        MnApi.playerTranscode(selectedPlayer.pid, transcode, msgHandler, displayPlayer);
+      });
+      $('#submnu_transcode').append(li);
+    });
+
     setupTagAutocomplete($('#db_query'), function(){return currentDbMid});
     setupTagAutocomplete($('#new_tag'), function(){return tagEditorMid});
   }
@@ -334,6 +344,7 @@
     $('#queue_tab_icon').text(player.stateIcon);
     $('#subtitle_list_name').text(player.listTitle);
     $('#subtitle_playback_order').text(MnApi.PLAYBACK_ORDERS[player.playOrder]['title']);
+    $('#subtitle_transcode').text(player.transcodeTitle);
     $('#track_title').text(player.trackTitle);
     $('#track_tags').text(player.tags.length > 0 ? player.tags.join(', ') : '(no tags)');
     $('#queue_info').text(player.queueLength + ' items, ' + MnApi.formatSeconds(player.queueDuration));
