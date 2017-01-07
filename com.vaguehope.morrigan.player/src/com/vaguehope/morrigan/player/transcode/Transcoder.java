@@ -156,7 +156,7 @@ public class Transcoder {
 		}
 	}
 
-	private static ProcessBuilder makeProcess (final TranscodeProfile tProfile, final File outputFile) {
+	private static ProcessBuilder makeProcess (final TranscodeProfile tProfile, final File outputFile) throws IOException {
 		final ProcessBuilder pb = new ProcessBuilder(tProfile.transcodeCmd(outputFile));
 		LOG.i("{0} cmd: {1}", tProfile.getClass().getSimpleName(), pb.command());
 		return pb;

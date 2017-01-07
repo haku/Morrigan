@@ -1,6 +1,8 @@
 package com.vaguehope.morrigan.player.transcode;
 
 import java.io.File;
+import java.io.IOException;
+
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.util.ChecksumHelper;
@@ -53,6 +55,6 @@ public abstract class TranscodeProfile {
 	/**
 	 * Cmd must write to cache file.
 	 */
-	public abstract String[] transcodeCmd (File outputFile);
+	public abstract String[] transcodeCmd (File outputFile) throws IOException;
 
 }

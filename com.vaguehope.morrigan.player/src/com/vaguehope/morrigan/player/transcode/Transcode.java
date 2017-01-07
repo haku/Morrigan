@@ -1,7 +1,6 @@
 package com.vaguehope.morrigan.player.transcode;
 
 import java.io.IOException;
-
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.util.MimeType;
 import com.vaguehope.morrigan.util.StringHelper;
@@ -20,7 +19,34 @@ public enum Transcode {
 				return new Mp4StreamExtract(item, this);
 			}
 			else if (StringHelper.startsWithIgnoreCase(item.getMimeType(), "video")) {
-				return new GenericMp3Transcode(item, this);
+				return new AudioOnlyMp3Transcode(item, this);
+			}
+			return null;
+		}
+	},
+	MP4_COMPATIBLE("mp4_compatible", "MP4 Compatible") {
+		@Override
+		public TranscodeProfile profileForItem (final IMediaItem item) throws IOException {
+			if (MimeType.MP4.getMimeType().equalsIgnoreCase(item.getMimeType())) {
+				// Use existence of cache file to reduce calls to ffprobe.
+				if (Mp4CompatibleTranscode.cacheFileMp4(item, this).exists()
+						|| Ffprobe.has10BitColour(item.getFile())) {
+					return new Mp4CompatibleTranscode(item, this);
+				}
+				return null;
+			}
+			else if (MimeType.M4A.getMimeType().equalsIgnoreCase(item.getMimeType())) {
+				return null;
+			}
+			else if (MimeType.MP3.getMimeType().equalsIgnoreCase(item.getMimeType())) {
+				// Assume anything that can play MP4 can also play MP3.
+				return null;
+			}
+			else if (StringHelper.startsWithIgnoreCase(item.getMimeType(), "video")) {
+				return new Mp4CompatibleTranscode(item, this);
+			}
+			else if (StringHelper.startsWithIgnoreCase(item.getMimeType(), "audio")) {
+				return new AudioOnlyM4aTranscode(item, this);
 			}
 			return null;
 		}

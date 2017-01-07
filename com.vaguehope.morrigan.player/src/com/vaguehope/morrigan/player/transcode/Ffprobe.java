@@ -18,6 +18,19 @@ public class Ffprobe {
 		return codecs;
 	}
 
+	public static boolean has10BitColour(final File inFile) throws IOException {
+		for (final String profile : streamProfiles(inFile)) {
+			if (profile.endsWith(" 10")) return true;
+		}
+		return false;
+	}
+
+	public static Set<String> streamProfiles(final File inFile) throws IOException {
+		final Set<String> profiles = runFfprobeStreams(inFile, ".profile");
+		if (profiles.size() < 1) throw new IOException("ffprobe found no profiles in file: " + inFile.getAbsolutePath());
+		return profiles;
+	}
+
 	private static Set<String> runFfprobeStreams (final File inFile, final String keySuffex) throws IOException {
 		final ProcessBuilder pb = new ProcessBuilder(new String[] {
 				"ffprobe",
