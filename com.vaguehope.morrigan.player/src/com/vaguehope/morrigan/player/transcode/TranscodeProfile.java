@@ -40,9 +40,15 @@ public abstract class TranscodeProfile {
 	}
 
 	protected static File cacheFile (final IMediaItem item, final Transcode transcode, final MimeType mimeType) {
-		return new File(Config.getTranscodedDir(),
-				ChecksumHelper.md5String(item.getFile().getAbsolutePath())
-				+ "_" + transcode.getSymbolicName() + "." + mimeType.getExt());
+		return cacheFile(cacheFileNameWithoutExtension(item, transcode), mimeType);
+	}
+
+	protected static File cacheFile (final String nameWithoutExtension, final MimeType mimeType) {
+		return new File(Config.getTranscodedDir(), nameWithoutExtension + "." + mimeType.getExt());
+	}
+
+	protected static String cacheFileNameWithoutExtension (final IMediaItem item, final Transcode transcode) {
+		return ChecksumHelper.md5String(item.getFile().getAbsolutePath()) + "_" + transcode.getSymbolicName();
 	}
 
 	/**

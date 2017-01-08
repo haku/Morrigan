@@ -15,11 +15,8 @@ public enum Transcode {
 	AUDIO_ONLY("audio_only", "Audio Only") {
 		@Override
 		public TranscodeProfile profileForItem (final IMediaItem item) throws IOException {
-			if (MimeType.MP4.getMimeType().equalsIgnoreCase(item.getMimeType())) {
-				return new Mp4StreamExtract(item, this);
-			}
-			else if (StringHelper.startsWithIgnoreCase(item.getMimeType(), "video")) {
-				return new AudioOnlyMp3Transcode(item, this);
+			if (StringHelper.startsWithIgnoreCase(item.getMimeType(), "video")) {
+				return new AudioStreamExtractOrTranscode(item, this);
 			}
 			return null;
 		}
