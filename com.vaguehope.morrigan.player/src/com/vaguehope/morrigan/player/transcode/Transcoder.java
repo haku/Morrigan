@@ -116,14 +116,23 @@ public class Transcoder {
 	private void runTranscodeCmd (final TranscodeProfile tProfile, final File outputFile) throws IOException {
 		Future<List<String>> errFuture = null;
 		boolean procShouldBeRunning = true;
-		final Process p = makeProcess(tProfile, outputFile).start();
+
+		final long buildStartNanos = System.nanoTime();
+		final ProcessBuilder pb = makeProcess(tProfile, outputFile);
+		final long runStartNanos = System.nanoTime();
+		final Process p = pb.start();
 		try {
 			try {
 				errFuture = this.es.submit(new ErrReader(p));
 				final long stdOutByteCount = IoHelper.drainStream(p.getInputStream());
+				final long endNanos = System.nanoTime();
+
 				final long outputLength = outputFile.length();
 				if (stdOutByteCount < 1) {
-					LOG.i("Transcode complete, output is {0} bytes.", outputLength);
+					LOG.i("Transcode complete: build={0}ms run={1}ms output={2}b.",
+							TimeUnit.NANOSECONDS.toMillis(runStartNanos - buildStartNanos),
+							TimeUnit.NANOSECONDS.toMillis(endNanos - runStartNanos),
+							outputLength);
 				}
 				else {
 					LOG.w("Unexpected std out from transcode command: {0} bytes.", stdOutByteCount);
