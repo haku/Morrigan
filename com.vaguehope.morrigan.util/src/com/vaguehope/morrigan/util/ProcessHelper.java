@@ -25,6 +25,8 @@ public class ProcessHelper {
 	}
 
 	public static void runAndWait (final String[] cmd, final Listener<String> onLine) throws IOException {
+		Exception exception = null;
+
 		final ProcessBuilder pb = new ProcessBuilder(cmd);
 		pb.redirectErrorStream(true);
 		final Process p = pb.start();
@@ -40,17 +42,28 @@ public class ProcessHelper {
 				IoHelper.closeQuietly(reader);
 			}
 		}
+		catch (final Exception e) {
+			exception = e;
+		}
 		finally {
 			p.destroy();
 			try {
 				final int result = waitFor(p, SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
-				if (result != 0) {
-					throw new IOException("Process failed: cmd " + Arrays.toString(cmd) + " result=" + result);
+				if (result != 0 && exception == null) {
+					throw new IOException("Process failed: cmd=" + Arrays.toString(cmd) + " result=" + result);
 				}
 			}
 			catch (final IllegalThreadStateException e) {
-				throw new IOException("Process did not stop when requested: " + Arrays.toString(cmd));
+				if (exception == null) {
+					throw new IOException("Process did not stop when requested: " + Arrays.toString(cmd));
+				}
 			}
+		}
+
+		if (exception != null) {
+			if (exception instanceof RuntimeException) throw (RuntimeException) exception;
+			if (exception instanceof IOException) throw (IOException) exception;
+			throw new IOException(exception.toString(), exception);
 		}
 	}
 
