@@ -40,7 +40,9 @@ public class AudioOnlyM4aTranscode extends TranscodeProfile {
 
 		cmd.add("-vn");
 
-		if (Ffprobe.streamCodecs(getItem().getFile()).contains("aac")) {
+		final FfprobeInfo info = Ffprobe.inspect(getItem().getFile());
+
+		if (info.getCodecs().contains("aac")) {
 			cmd.add("-acodec");
 			cmd.add("copy");
 		}

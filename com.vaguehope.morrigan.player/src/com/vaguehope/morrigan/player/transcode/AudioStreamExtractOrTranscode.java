@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.util.MimeType;
 import com.vaguehope.morrigan.util.StringHelper;
@@ -22,7 +20,7 @@ public class AudioStreamExtractOrTranscode extends TranscodeProfile {
 			if (cacheFile(nameWithoutExtension, type).exists()) return type;
 		}
 
-		if (Ffprobe.streamCodecs(item.getFile()).contains("aac")) {
+		if (Ffprobe.inspect(item.getFile()).getCodecs().contains("aac")) {
 			return MimeType.M4A;
 		}
 
@@ -55,9 +53,9 @@ public class AudioStreamExtractOrTranscode extends TranscodeProfile {
 
 		cmd.add("-vn");
 
-		final Set<String> codecs = Ffprobe.streamCodecs(getItem().getFile());
+		final FfprobeInfo info = Ffprobe.inspect(getItem().getFile());
 
-		if (codecs.contains("aac")) {
+		if (info.getCodecs().contains("aac")) {
 			if (getMimeType() != MimeType.M4A) {
 				throw new IllegalStateException("Found AAC stream, so expected mime type to be M4A, not: " + getMimeType());
 			}
@@ -68,7 +66,7 @@ public class AudioStreamExtractOrTranscode extends TranscodeProfile {
 			cmd.add("-movflags");
 			cmd.add("+faststart");
 		}
-		else if (codecs.contains("mp3")) {
+		else if (info.getCodecs().contains("mp3")) {
 			if (getMimeType() != MimeType.MP3) {
 				throw new IllegalStateException("Found MP3 stream, so expected mime type to be MP3, not: " + getMimeType());
 			}

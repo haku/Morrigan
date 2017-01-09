@@ -27,7 +27,7 @@ public enum Transcode {
 			if (MimeType.MP4.getMimeType().equalsIgnoreCase(item.getMimeType())) {
 				// Use existence of cache file to reduce calls to ffprobe.
 				if (Mp4CompatibleTranscode.cacheFileMp4(item, this).exists()
-						|| Ffprobe.has10BitColour(item.getFile())) {
+						|| Ffprobe.inspect(item.getFile()).has10BitColour()) {
 					return new Mp4CompatibleTranscode(item, this);
 				}
 				return null;

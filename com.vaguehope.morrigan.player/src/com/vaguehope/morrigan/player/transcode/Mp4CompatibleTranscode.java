@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.util.MimeType;
 import com.vaguehope.morrigan.util.StringHelper;
@@ -43,9 +41,9 @@ public class Mp4CompatibleTranscode extends TranscodeProfile {
 		cmd.add("-i");
 		cmd.add(getItem().getFile().getAbsolutePath());
 
-		final Set<String> codecs = Ffprobe.streamCodecs(getItem().getFile());
+		final FfprobeInfo info = Ffprobe.inspect(getItem().getFile());
 
-		if (codecs.contains("h264") && !Ffprobe.has10BitColour(getItem().getFile())) {
+		if (info.getCodecs().contains("h264") && !info.has10BitColour()) {
 			cmd.add("-vcodec");
 			cmd.add("copy");
 		}
@@ -64,7 +62,7 @@ public class Mp4CompatibleTranscode extends TranscodeProfile {
 			cmd.add("23");
 		}
 
-		if (codecs.contains("aac")) {
+		if (info.getCodecs().contains("aac")) {
 			cmd.add("-acodec");
 			cmd.add("copy");
 		}
