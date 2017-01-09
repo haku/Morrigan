@@ -29,9 +29,12 @@ public class FfprobeParser implements Listener<String> {
 		}
 		else if (parts[0].endsWith(".duration")) {
 			try {
-				final double seconds = Double.parseDouble(StringHelper.removeEndQuotes(parts[1]));
-				final long millis = (long) (seconds * 1000d);
-				if (this.durationMillis == null || millis > this.durationMillis) this.durationMillis = millis;
+				final String val = StringHelper.removeEndQuotes(parts[1]);
+				if (!"N/A".equalsIgnoreCase(val)) {
+					final double seconds = Double.parseDouble(val);
+					final long millis = (long) (seconds * 1000d);
+					if (this.durationMillis == null || millis > this.durationMillis) this.durationMillis = millis;
+				}
 			}
 			catch (final NumberFormatException e) {
 				LOG.w("Failed to parse {0}: {1}", line, e.toString());
