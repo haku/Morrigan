@@ -24,7 +24,7 @@ import com.vaguehope.morrigan.model.media.IMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
-import com.vaguehope.morrigan.player.transcode.Transcode;
+import com.vaguehope.morrigan.transcode.Transcode;
 import com.vaguehope.morrigan.util.StringHelper;
 import com.vaguehope.sqlitewrapper.DbException;
 

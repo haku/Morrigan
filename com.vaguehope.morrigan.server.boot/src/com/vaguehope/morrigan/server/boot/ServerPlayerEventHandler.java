@@ -18,7 +18,7 @@ import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.Player.PlayerEventListener;
-import com.vaguehope.morrigan.player.transcode.Transcode;
+import com.vaguehope.morrigan.transcode.Transcode;
 import com.vaguehope.morrigan.screen.ScreenMgr;
 
 class ServerPlayerEventHandler implements PlayerEventListener, LocalPlayerSupport {

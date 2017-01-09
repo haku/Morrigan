@@ -1,4 +1,4 @@
-package com.vaguehope.morrigan.player.transcode;
+package com.vaguehope.morrigan.transcode;
 
 import java.io.IOException;
 import com.vaguehope.morrigan.model.media.IMediaItem;

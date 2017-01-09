@@ -47,9 +47,9 @@ import com.vaguehope.morrigan.model.media.internal.db.mmdb.LocalMixedMediaDbHelp
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayerReader;
-import com.vaguehope.morrigan.player.transcode.Transcode;
-import com.vaguehope.morrigan.player.transcode.TranscodeProfile;
-import com.vaguehope.morrigan.player.transcode.Transcoder;
+import com.vaguehope.morrigan.transcode.Transcode;
+import com.vaguehope.morrigan.transcode.TranscodeProfile;
+import com.vaguehope.morrigan.transcode.Transcoder;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbFactory;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbHelper;
 import com.vaguehope.morrigan.server.util.FeedHelper;

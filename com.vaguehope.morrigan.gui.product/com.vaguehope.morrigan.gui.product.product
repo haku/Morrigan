@@ -60,6 +60,7 @@ Image &quot;The Morrígan&quot; by Louis le Brocquy used under the Creative Comm
       <plugin id="com.vaguehope.morrigan.server"/>
       <plugin id="com.vaguehope.morrigan.server.boot"/>
       <plugin id="com.vaguehope.morrigan.tasks"/>
+      <plugin id="com.vaguehope.morrigan.transcode"/>
       <plugin id="com.vaguehope.morrigan.util"/>
       <plugin id="com.vaguehope.morrigan.util.httpclient"/>
       <plugin id="com.vaguehope.morrigan.wui"/>

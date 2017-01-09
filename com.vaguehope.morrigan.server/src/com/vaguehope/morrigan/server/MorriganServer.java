@@ -17,7 +17,7 @@ import org.osgi.framework.BundleContext;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.player.PlayerReader;
-import com.vaguehope.morrigan.player.transcode.Transcoder;
+import com.vaguehope.morrigan.transcode.Transcoder;
 import com.vaguehope.morrigan.server.util.JettyLogger;
 import com.vaguehope.morrigan.server.util.WebAppHelper;
 import com.vaguehope.morrigan.tasks.AsyncTasksRegister;

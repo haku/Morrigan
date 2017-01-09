@@ -38,6 +38,7 @@
     <module>com.vaguehope.morrigan.model.media_impl</module>
     <module>com.vaguehope.morrigan.model.media_impl.tests</module>
     <module>com.vaguehope.morrigan.config</module>
+    <module>com.vaguehope.morrigan.transcode</module>
     <module>com.vaguehope.morrigan.player</module>
     <module>com.vaguehope.morrigan.player.tests</module>
 

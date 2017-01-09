@@ -57,7 +57,7 @@ import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.Player.PlayerEventListener;
 import com.vaguehope.morrigan.player.PlayerLifeCycleListener;
-import com.vaguehope.morrigan.player.transcode.Transcode;
+import com.vaguehope.morrigan.transcode.Transcode;
 import com.vaguehope.morrigan.screen.CoverArtProvider;
 import com.vaguehope.morrigan.screen.FullscreenShell;
 import com.vaguehope.morrigan.screen.ScreenPainter;

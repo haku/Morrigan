@@ -36,7 +36,7 @@ import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayerLifeCycleListener;
-import com.vaguehope.morrigan.player.transcode.Transcode;
+import com.vaguehope.morrigan.transcode.Transcode;
 import com.vaguehope.morrigan.screen.ScreenPainter;
 import com.vaguehope.morrigan.screen.ScreenPainter.ScreenType;
 import com.vaguehope.morrigan.util.TimeHelper;

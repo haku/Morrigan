@@ -14,7 +14,7 @@ import org.osgi.framework.BundleContext;
 import com.vaguehope.morrigan.model.media.MediaFactoryTracker;
 import com.vaguehope.morrigan.player.PlayerContainer;
 import com.vaguehope.morrigan.player.PlayerReaderTracker;
-import com.vaguehope.morrigan.player.transcode.Transcoder;
+import com.vaguehope.morrigan.transcode.Transcoder;
 import com.vaguehope.morrigan.server.AsyncActions;
 import com.vaguehope.morrigan.server.MorriganServer;
 import com.vaguehope.morrigan.server.ServerConfig;

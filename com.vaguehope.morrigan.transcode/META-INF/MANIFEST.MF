@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Morrigan Player
+Bundle-SymbolicName: com.vaguehope.morrigan.transcode
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: com.vaguehope.morrigan.transcode
+Import-Package: com.vaguehope.morrigan.config,
+ com.vaguehope.morrigan.model.media,
+ com.vaguehope.morrigan.util
+Bundle-Vendor: vaguehope.com

@@ -1,4 +1,4 @@
-package com.vaguehope.morrigan.player.transcode;
+package com.vaguehope.morrigan.transcode;
 
 import java.util.LinkedHashSet;
 import java.util.Locale;
