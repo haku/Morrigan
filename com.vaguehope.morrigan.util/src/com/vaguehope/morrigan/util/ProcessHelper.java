@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -44,11 +45,11 @@ public class ProcessHelper {
 			try {
 				final int result = waitFor(p, SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
 				if (result != 0) {
-					throw new IOException("Process failed: cmd " + cmd + " result=" + result);
+					throw new IOException("Process failed: cmd " + Arrays.toString(cmd) + " result=" + result);
 				}
 			}
 			catch (final IllegalThreadStateException e) {
-				throw new IOException("Process did not stop when requested: " + cmd);
+				throw new IOException("Process did not stop when requested: " + Arrays.toString(cmd));
 			}
 		}
 	}
