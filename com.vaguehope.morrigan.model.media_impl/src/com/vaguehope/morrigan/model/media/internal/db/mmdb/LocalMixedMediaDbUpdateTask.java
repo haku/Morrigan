@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -28,6 +29,7 @@ import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.internal.TrackTagHelper;
 import com.vaguehope.morrigan.model.media.internal.db.LocalDbUpdateTask;
 import com.vaguehope.morrigan.tasks.TaskEventListener;
+import com.vaguehope.morrigan.transcode.Ffprobe;
 import com.vaguehope.sqlitewrapper.DbException;
 
 public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMediaDb, IMixedMediaItem> {
@@ -190,10 +192,17 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMe
 			}
 
 			try {
-				// TODO measure using Ffprobe.
-
-				int d = this.playbackEngine.readFileDuration(item.getFilepath());
-				if (d > 0) list.setTrackDuration(item, d);
+				int dSeconds = 0;
+				if (Ffprobe.isAvailable()) {
+					final Long dMillis = Ffprobe.inspect(item.getFile()).getDurationMillis();
+					if (dMillis != null) {
+						dSeconds = (int) TimeUnit.MILLISECONDS.toSeconds(dMillis);
+					}
+				}
+				else {
+					dSeconds = this.playbackEngine.readFileDuration(item.getFilepath());
+				}
+				if (dSeconds > 0) list.setTrackDuration(item, dSeconds);
 			}
 			catch (Exception e) { // NOSONAR strange errors reading files should be reported to the user.
 				return new OpResult("Error while reading metadata for '" + item.getFilepath() + "'.", e);
