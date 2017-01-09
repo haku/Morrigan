@@ -39,19 +39,19 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMe
 		private final PlaybackEngineFactory playbackEngineFactory;
 		private final MediaFactory mediaFactory;
 
-		public Factory (PlaybackEngineFactory playbackEngineFactory, MediaFactory mediaFactory) {
+		public Factory (final PlaybackEngineFactory playbackEngineFactory, final MediaFactory mediaFactory) {
 			super(false);
 			this.playbackEngineFactory = playbackEngineFactory;
 			this.mediaFactory = mediaFactory;
 		}
 
 		@Override
-		protected boolean isValidProduct (LocalMixedMediaDbUpdateTask product) {
+		protected boolean isValidProduct (final LocalMixedMediaDbUpdateTask product) {
 			return !product.isFinished();
 		}
 
 		@Override
-		protected LocalMixedMediaDbUpdateTask makeNewProduct (ILocalMixedMediaDb material) {
+		protected LocalMixedMediaDbUpdateTask makeNewProduct (final ILocalMixedMediaDb material) {
 			return new LocalMixedMediaDbUpdateTask(material, this.playbackEngineFactory, this.mediaFactory);
 		}
 
@@ -62,14 +62,14 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMe
 	private final PlaybackEngineFactory playbackEngineFactory;
 	private final MediaFactory mediaFactory;
 
-	protected LocalMixedMediaDbUpdateTask (ILocalMixedMediaDb library, PlaybackEngineFactory playbackEngineFactory, MediaFactory mediaFactory) {
+	protected LocalMixedMediaDbUpdateTask (final ILocalMixedMediaDb library, final PlaybackEngineFactory playbackEngineFactory, final MediaFactory mediaFactory) {
 		super(library);
 		this.playbackEngineFactory = playbackEngineFactory;
 		this.mediaFactory = mediaFactory;
 	}
 
 	@Override
-	protected ILocalMixedMediaDb getTransactional (ILocalMixedMediaDb itemList) throws DbException {
+	protected ILocalMixedMediaDb getTransactional (final ILocalMixedMediaDb itemList) throws DbException {
 		return this.mediaFactory.getLocalMixedMediaDbTransactional(itemList);
 	}
 
@@ -97,7 +97,7 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMe
 	}
 
 	@Override
-	protected void mergeItems (ILocalMixedMediaDb list, IMixedMediaItem itemToKeep, IMixedMediaItem itemToBeRemove) throws MorriganException {
+	protected void mergeItems (final ILocalMixedMediaDb list, final IMixedMediaItem itemToKeep, final IMixedMediaItem itemToBeRemove) throws MorriganException {
 		list.incTrackStartCnt(itemToKeep, itemToBeRemove.getStartCount());
 		list.incTrackEndCnt(itemToKeep, itemToBeRemove.getEndCount());
 
@@ -146,7 +146,7 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMe
 	private IPlaybackEngine playbackEngine = null;
 
 	@Override
-	protected boolean shouldTrackMetaData1 (TaskEventListener taskEventListener, ILocalMixedMediaDb library, IMixedMediaItem item) throws MorriganException {
+	protected boolean shouldTrackMetaData1 (final TaskEventListener taskEventListener, final ILocalMixedMediaDb library, final IMixedMediaItem item) throws MorriganException {
 		if (item.getMediaType() == MediaType.TRACK) {
 			if (item.getDuration() <= 0) {
 				if (!library.isMarkedAsUnreadable(item)) {
@@ -178,7 +178,7 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMe
 	}
 
 	@Override
-	protected OpResult readTrackMetaData1 (ILocalMixedMediaDb list, IMixedMediaItem item, File file) {
+	protected OpResult readTrackMetaData1 (final ILocalMixedMediaDb list, final IMixedMediaItem item, final File file) {
 		if (item.getMediaType() == MediaType.TRACK) {
 			if (this.playbackEngine == null) {
 				try {
@@ -190,6 +190,8 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMe
 			}
 
 			try {
+				// TODO measure using Ffprobe.
+
 				int d = this.playbackEngine.readFileDuration(item.getFilepath());
 				if (d > 0) list.setTrackDuration(item, d);
 			}
@@ -227,7 +229,7 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMe
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	protected void readTrackMetaData2 (ILocalMixedMediaDb list, IMixedMediaItem item, File file) throws IOException, TagException, ReadOnlyFileException, InvalidAudioFrameException, MorriganException {
+	protected void readTrackMetaData2 (final ILocalMixedMediaDb list, final IMixedMediaItem item, final File file) throws IOException, TagException, ReadOnlyFileException, InvalidAudioFrameException, MorriganException {
 		if (item.getMediaType() == MediaType.TRACK) {
 			TrackTagHelper.readTrackTags(list, item, file);
 		}
@@ -239,7 +241,7 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMe
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Static helpers.
 
-	public static Dimension readImageDimensions (File file) throws IOException {
+	public static Dimension readImageDimensions (final File file) throws IOException {
 		Dimension ret = null;
 
 		ImageInputStream in = ImageIO.createImageInputStream(file);
