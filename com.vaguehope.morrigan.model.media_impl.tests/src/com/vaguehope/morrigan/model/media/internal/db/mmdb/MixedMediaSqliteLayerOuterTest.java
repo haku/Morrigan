@@ -2,8 +2,6 @@ package com.vaguehope.morrigan.model.media.internal.db.mmdb;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,15 +24,13 @@ import com.vaguehope.sqlitewrapper.DbException;
 public class MixedMediaSqliteLayerOuterTest {
 
 	@Rule public TemporaryFolder tmp = new TemporaryFolder();
-	private File dbFile;
 	private List<IMixedMediaItem> expectedAllItems;
 
 	private MixedMediaSqliteLayerOuter undertest;
 
 	@Before
 	public void before () throws Exception {
-		this.dbFile = this.tmp.newFile("testdb.db3");
-		this.undertest = new MixedMediaSqliteLayerOuter(this.dbFile.getAbsolutePath(), true, new MixedMediaItemFactory());
+		this.undertest = new MixedMediaSqliteLayerOuter(":memory:", true, new MixedMediaItemFactory());
 		this.expectedAllItems = new ArrayList<IMixedMediaItem>();
 		addNoiseToDb();
 	}
@@ -42,11 +38,6 @@ public class MixedMediaSqliteLayerOuterTest {
 	@After
 	public void after () {
 		if (this.undertest != null) this.undertest.dispose();
-	}
-
-	@Test
-	public void itCreatesDb () throws Exception {
-		assertTrue(this.dbFile.exists());
 	}
 
 	@Test

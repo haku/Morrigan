@@ -66,7 +66,15 @@ public abstract class GenericSqliteLayer implements IGenericDbLayer {
 
 	private Connection makeConnection() throws ClassNotFoundException, SQLException {
 		Class.forName(DRIVER_CLASS);
-		final String url = "jdbc:sqlite:/" + this.dbFilePath;
+
+		final String url;
+		if (":memory:".equalsIgnoreCase(this.dbFilePath)) {
+			url = "jdbc:sqlite::memory:";
+		}
+		else {
+			url = "jdbc:sqlite:/" + this.dbFilePath;
+		}
+
 		Connection con = DriverManager.getConnection(url);
 		if (con == null) throw new IllegalStateException("DriverManager returned null connection object for " + url + ".");
 

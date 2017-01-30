@@ -16,10 +16,10 @@ public class TestMixedMediaDb extends LocalMixedMediaDb {
 
 	private final AtomicInteger newTrackCounter = new AtomicInteger(0);
 
-	public TestMixedMediaDb (final File dbFile) throws DbException, MorriganException {
-		super(dbFile.getName(),
-				new MediaItemDbConfig(dbFile.getAbsolutePath(), null),
-				new MixedMediaSqliteLayerOuter(dbFile.getAbsolutePath(), true, new MixedMediaItemFactory()));
+	public TestMixedMediaDb () throws DbException, MorriganException {
+		super("testdb",
+				new MediaItemDbConfig("testdb", null),
+				new MixedMediaSqliteLayerOuter(":memory:", true, new MixedMediaItemFactory()));
 		read();
 	}
 
