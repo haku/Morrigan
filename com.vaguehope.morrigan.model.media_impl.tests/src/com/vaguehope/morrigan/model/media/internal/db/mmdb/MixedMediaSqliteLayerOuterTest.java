@@ -309,6 +309,60 @@ public class MixedMediaSqliteLayerOuterTest {
 		assertSingleResult(mockMediaTrackWithNameContaining(term2), runSearch("f~\"" + term2 + "\""));
 	}
 
+	@Test
+	public void itSearchesPathWithEscapedSingleQuotes () throws Exception {
+		final String path = "some \"awesome' band\" desu";
+		final String search = "f~'some \"awesome\\' band\" desu'";
+
+		final IMixedMediaItem expected = mockMediaTrackWithNameContaining(path);
+		assertSingleResult(expected, runSearch(search));
+	}
+
+	@Test
+	public void itSearchesPathWithEscapedDoubleQuotes () throws Exception {
+		final String path = "some 'awesome\" band' desu";
+		final String search = "f~\"some 'awesome\\\" band' desu\"";
+
+		final IMixedMediaItem expected = mockMediaTrackWithNameContaining(path);
+		assertSingleResult(expected, runSearch(search));
+	}
+
+	@Test
+	public void itSearchesTagWithEscapedSingleQuote () throws Exception {
+		final String tag = "some media' tag ";
+		final String search = "t=some' media\\' tag '";
+
+		final IMixedMediaItem expected = mockMediaFileWithTags(tag);
+		assertSingleResult(expected, runSearch(search));
+	}
+
+	@Test
+	public void itSearchesTagWithEscapedSingleQuote2 () throws Exception {
+		final String tag = "some \\\"media' tag ";
+		final String search = "t=some' \\\"media\\' tag '";
+
+		final IMixedMediaItem expected = mockMediaFileWithTags(tag);
+		assertSingleResult(expected, runSearch(search));
+	}
+
+	@Test
+	public void itSearchesTagWithEscapedDoubleQuote () throws Exception {
+		final String tag = "some media\" tag ";
+		final String search = "t=some\" media\\\" tag \"";
+
+		final IMixedMediaItem expected = mockMediaFileWithTags(tag);
+		assertSingleResult(expected, runSearch(search));
+	}
+
+	@Test
+	public void itSearchesTagWithEscapedDoubleQuote2 () throws Exception {
+		final String tag = "some \\'media\" tag ";
+		final String search = "t=some\" \\'media\\\" tag \"";
+
+		final IMixedMediaItem expected = mockMediaFileWithTags(tag);
+		assertSingleResult(expected, runSearch(search));
+	}
+
 	private void addNoiseToDb () throws Exception {
 		for (int i = 0; i < 10; i++) {
 			mockMediaFileWithNameContaining(
