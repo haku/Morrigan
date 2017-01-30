@@ -297,6 +297,7 @@
         url: '/mlists/' + midSup() + '/tags?term=' + encodeURIComponent(req.term),
         success: function(data) {
           if (!el.data('sent')) {
+            fillInTagSearches(data);
             resp(data);
           }
           else {
@@ -310,6 +311,28 @@
       });
     }
     el.autocomplete({source: source, minLength: 1});
+  }
+
+  function fillInTagSearches(data) {
+    $.each(data, function(index, item) {
+      var val = item['value'];
+      var quote;
+      if (val.indexOf(' ') >= 0) {
+        if (val.indexOf('"') >= 0) {
+          if (val.indexOf("'") >= 0) {
+            val = val.replace("'", "\\'");
+          }
+          quote = "'";
+        }
+        else {
+          quote = '"';
+        }
+      }
+      else {
+        quote = '';
+      }
+      item['value'] = 't=' + quote + val + quote;
+    });
   }
 
   function onAutocompleteKeyup(event) {
