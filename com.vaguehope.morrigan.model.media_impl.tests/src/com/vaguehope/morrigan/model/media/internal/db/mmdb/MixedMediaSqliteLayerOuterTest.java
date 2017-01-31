@@ -165,10 +165,30 @@ public class MixedMediaSqliteLayerOuterTest {
 
 	@Test
 	public void itSearchesForMatchFileNameWithSpecialChars () throws Exception {
-		final String term = "awesome'\"*%_\\band";
+		final String term = "awesome'\"*%_\\)(band";
+
+		// Noise:
 		mockMediaFileWithTags("watcha " + term + " noise");
 
-		assertSingleResult(mockMediaTrackWithNameContaining(term), runSearch("f~" + term));
+		final IMixedMediaItem expected = mockMediaTrackWithNameContaining(term);
+		assertSingleResult(expected, runSearch("f~" + term));
+	}
+
+	@Test
+	public void itSearchesForMatchTagWithSpecialChars () throws Exception {
+		final String tag = "awesome'\"*%_\\)(band";
+
+		// Noise:
+		mockMediaFileWithTags("watcha " + tag + " noise");
+		mockMediaFileWithTags("watcha awesome'\"*%_\\", ")(band noise");
+		mockMediaFileWithTags("watcha awesome'\"*%_\\)", "(band noise");
+		mockMediaFileWithTags("watcha awesome'\"*%_\\)(", "band noise");
+		mockMediaFileWithTags("watcha awesome", "'\"*%_\\)(band noise");
+		mockMediaFileWithTags("watcha awesome'", "\"*%_\\)(band noise");
+		mockMediaFileWithTags("watcha awesome'\"", "*%_\\)(band noise");
+
+		final IMixedMediaItem expected = mockMediaFileWithTags(tag);
+		assertSingleResult(expected, runSearch("t=" + tag));
 	}
 
 	@Test
@@ -361,6 +381,55 @@ public class MixedMediaSqliteLayerOuterTest {
 
 		final IMixedMediaItem expected = mockMediaFileWithTags(tag);
 		assertSingleResult(expected, runSearch(search));
+	}
+
+	@Test
+	public void itSearchesUsingMultipleTermsAndBrackets () throws Exception {
+		final String search = "(t=bar OR t=foo) f~some_folder";
+
+		final IMixedMediaItem expected1 = mockMediaFileWithNameFragmentAndTags("some_folder", "foo");
+		final IMixedMediaItem expected2 = mockMediaFileWithNameFragmentAndTags("some_folder", "bar");
+
+		// Noise:
+		mockMediaFileWithNameFragmentAndTags("other_folder", "foo");
+		mockMediaFileWithNameFragmentAndTags("other_folder", "bar");
+
+		// Verify:
+		assertSingleResult(expected1, runSearch("t=foo f~some_folder"));
+		assertSingleResult(expected2, runSearch("t=bar f~some_folder"));
+
+		final List<IMixedMediaItem> actual = runSearch(search);
+		assertEquals(2, actual.size());
+		getItemByFilepath(actual, expected1.getFilepath());
+		getItemByFilepath(actual, expected2.getFilepath());
+	}
+
+	@Test
+	public void itSearchesWithoutCrashingWithUnbalancedOpenBracket () throws Exception {
+		final String mediaNameFragment = "some_media_file_" + System.nanoTime();
+		final IMixedMediaItem expected = mockMediaTrackWithNameContaining(mediaNameFragment);
+		assertSingleResult(expected, runSearch("(" + mediaNameFragment));
+	}
+
+	@Test
+	public void itSearchesWithoutCrashingWithUnbalancedOpenBracketAndLeadingOr () throws Exception {
+		final String mediaNameFragment = "some_media_file_" + System.nanoTime();
+		final IMixedMediaItem expected = mockMediaTrackWithNameContaining(mediaNameFragment);
+		assertSingleResult(expected, runSearch("( OR " + mediaNameFragment));
+	}
+
+	@Test
+	public void itSearchesWithoutCrashingWithUnbalancedCloseBracket () throws Exception {
+		final String mediaNameFragment = "some_media_file_" + System.nanoTime();
+		final IMixedMediaItem expected = mockMediaTrackWithNameContaining(mediaNameFragment);
+		assertSingleResult(expected, runSearch(mediaNameFragment + ")"));
+	}
+
+	@Test
+	public void itSearchesWithoutCrashingWithUnbalancedCloseBracketAndTrailingOr () throws Exception {
+		final String mediaNameFragment = "some_media_file_" + System.nanoTime();
+		final IMixedMediaItem expected = mockMediaTrackWithNameContaining(mediaNameFragment);
+		assertSingleResult(expected, runSearch(mediaNameFragment + " OR )"));
 	}
 
 	private void addNoiseToDb () throws Exception {

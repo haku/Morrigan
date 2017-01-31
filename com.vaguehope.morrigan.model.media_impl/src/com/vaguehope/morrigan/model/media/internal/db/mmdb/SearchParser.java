@@ -21,11 +21,19 @@ class SearchParser {
 
 	private static final Pattern SEARCH_TERM_FINDER = Pattern.compile(
 			"("
-			+ "[^\\s　]*\"([^\"\\\\]*(\\\\[^\"])*(\\\\\")?)+\"[^\\s　]*"
+			+ "^\\("
 			+ "|"
-			+ "[^\\s　]*'([^'\\\\]*(\\\\[^'])*(\\\\')?)+'[^\\s　]*"
+			+ "[\\s　]\\("
 			+ "|"
-			+ "[^\\s　]+"
+			+ "\\)$"
+			+ "|"
+			+ "\\)[\\s　]"
+			+ "|"
+			+ "[^\\s　]*\"([^\"\\\\]*(\\\\[^\"])*(\\\\\")?)+\"([^\\s　\\)]|(\\)[^\\s　]))*"
+			+ "|"
+			+ "[^\\s　]*'([^'\\\\]*(\\\\[^'])*(\\\\')?)+'([^\\s　\\)]|(\\)[^\\s　]))*"
+			+ "|"
+			+ "([^\\s　\\)]|(\\)[^\\s　]))+"
 			+ ")");
 
 	private static final Pattern PAIRED_QUOTES_FINDER = Pattern.compile(
@@ -119,9 +127,12 @@ class SearchParser {
 
 		final Matcher m = SEARCH_TERM_FINDER.matcher(allTerms);
 		while (m.find()) {
-			final String g = m.group(1);
-			if (g != null && g.length() > 0) terms.add(g);
-			if (terms.size() >= MAX_SEARCH_TERMS) break;
+			String g = m.group(1);
+			if (g != null) {
+				g = g.trim();
+				if (g.length() > 0) terms.add(g);
+				if (terms.size() >= MAX_SEARCH_TERMS) break;
+			}
 		}
 
 		return terms;
@@ -144,17 +155,36 @@ class SearchParser {
 			needAnd = true;
 
 			sql.append(" ( ");
+			int openBrackets = 0;
 			for (int i = 0; i < terms.size(); i++) {
 				final String term = terms.get(i);
 
 				if ("OR".equals(term)) {
 					if (i == 0 || i >= terms.size() - 1) continue; // Ignore leading and trailing ORs.
+					if ("(".equals(terms.get(i - 1))) continue; // Ignore OR right after (.
+					if (")".equals(terms.get(i + 1))) continue; // Ignore OR right before ).
 					sql.append(_SQL_OR);
 					continue;
 				}
+				if ("(".equals(term)) {
+					sql.append(" ( ");
+					openBrackets += 1;
+					continue;
+				}
+				if (")".equals(term)) {
+					if (openBrackets > 0) {
+						sql.append(" ) ");
+						openBrackets -= 1;
+					}
+					continue;
+				}
 
-				if (i > 0 && !"OR".equals(terms.get(i - 1))) { // Not the first term and not following an OR.
-					sql.append(_SQL_AND);
+				if (i > 0) {
+					final String prevTerm = terms.get(i - 1);
+					// Not the first term and not following an OR.
+					if (!"OR".equals(prevTerm) && !"(".equals(prevTerm)) {
+						sql.append(_SQL_AND);
+					}
 				}
 
 				if (isFileMatchPartial(term)) {
@@ -167,6 +197,12 @@ class SearchParser {
 					sql.append(_SQL_MEDIAFILES_WHERES_FILEORTAG);
 				}
 			}
+
+			// Tidy any unclosed brackets.
+			for (int i = 0; i < openBrackets; i++) {
+				sql.append(" ) ");
+			}
+
 			sql.append(" ) ");
 		}
 
@@ -270,6 +306,8 @@ class SearchParser {
 				if (this.mediaType != MediaType.UNKNOWN) ps.setInt(parmIn++, this.mediaType.getN());
 				for (final String term : this.terms) {
 					if ("OR".equals(term)) continue;
+					if ("(".equals(term)) continue;
+					if (")".equals(term)) continue;
 					if (isFileMatchPartial(term) || isTagMatchPartial(term)) {
 						ps.setString(parmIn++, anchoredOrWildcardEnds(SqliteHelper.escapeSearch(unquote(term.substring(2)))));
 						ps.setString(parmIn++, SqliteHelper.SEARCH_ESC);
