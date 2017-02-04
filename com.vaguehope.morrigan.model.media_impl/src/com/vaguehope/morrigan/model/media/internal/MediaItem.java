@@ -38,11 +38,6 @@ public abstract class MediaItem implements IMediaItem {
 	private boolean missing = MISSING_DEFAULT;
 
 	@Override
-	public long getFileSize () {
-		return getFile().length();
-	}
-
-	@Override
 	public String getFilepath () {
 		return this.filepath;
 	}
@@ -193,11 +188,13 @@ public abstract class MediaItem implements IMediaItem {
 //	Secondary attributes.
 
 	private File file = null;
+	private long fileSize = -1;
 	private String title = null;
 	private MimeType mimeType = null;
 
 	private void updateFilepathBasedThings () {
 		this.file = new File(this.filepath);
+		this.fileSize = -1;
 
 		final int x = this.filepath.lastIndexOf(File.separator);
 		if (x > 0) {
@@ -213,6 +210,12 @@ public abstract class MediaItem implements IMediaItem {
 	@Override
 	public File getFile () {
 		return this.file;
+	}
+
+	@Override
+	public long getFileSize () {
+		if (this.fileSize < 0) this.fileSize = getFile().length();
+		return this.fileSize;
 	}
 
 	@Override
