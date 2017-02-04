@@ -1,1 +1,1 @@
-b3096910949e3c78469975f4312fe9d3 sqlite-jdbc-3.8.6.jar http://central.maven.org/maven2/org/xerial/sqlite-jdbc/3.8.6/sqlite-jdbc-3.8.6.jar
+b3096910949e3c78469975f4312fe9d3 sqlite-jdbc-3.16.1.jar http://central.maven.org/maven2/org/xerial/sqlite-jdbc/3.16.1/sqlite-jdbc-3.16.1.jar

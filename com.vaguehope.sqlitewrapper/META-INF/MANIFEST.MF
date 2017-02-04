@@ -5,6 +5,6 @@ Bundle-SymbolicName: com.vaguehope.sqlitewrapper
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: .,
- lib/sqlite-jdbc-3.8.6.jar
+ lib/sqlite-jdbc-3.16.1.jar
 Export-Package: com.vaguehope.sqlitewrapper
 Bundle-Vendor: vaguehope.com
