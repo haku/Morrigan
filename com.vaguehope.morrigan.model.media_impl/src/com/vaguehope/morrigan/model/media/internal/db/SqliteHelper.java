@@ -70,7 +70,31 @@ public final class SqliteHelper {
 	 * number or a string. Morrigan uses the number method, but terra used
 	 * strings. Using this method allows for backward compatibility.
 	 */
+	@Deprecated
 	public static Date readDate (final ResultSet rs, final String column) throws SQLException {
+		java.sql.Date date = rs.getDate(column);
+		if (date != null) {
+			long time = date.getTime();
+			if (time > 100000) { // If the date was stored old-style, we get back the year :S.
+				return new Date(time);
+			}
+
+			String s = rs.getString(column);
+			try {
+				Date d = sqlDate.get().parse(s);
+				return d;
+			} catch (Exception e) {/*Can't really do anything with this error anyway.*/}
+		}
+
+		return null;
+	}
+
+	/**
+	 * This method will read the date from the DB weather it was stored as a
+	 * number or a string. Morrigan uses the number method, but terra used
+	 * strings. Using this method allows for backward compatibility.
+	 */
+	public static Date readDate (final ResultSet rs, final int column) throws SQLException {
 		java.sql.Date date = rs.getDate(column);
 		if (date != null) {
 			long time = date.getTime();

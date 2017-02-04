@@ -256,6 +256,10 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 		// Insert at beginning as latter tables will have keys pointing to this one.
 		l.add(0, SqliteHelper.generateSql_Create(SQL_TBL_MEDIAFILES_NAME, SQL_TBL_MEDIAFILES_COLS));
 
+		// TODO Add indexes...
+//		l.add(new SqlCreateCmd("SELECT name FROM sqlite_master WHERE name='foobar';",
+//				"CREATE UNIQUE INDEX ..."));
+
 		return l;
 	}
 
@@ -799,16 +803,55 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	MediaItem getters.
 
+	private static class ColumnIndexes {
+		final int colFile;
+		final int colType;
+		final int colAdded;
+		final int colMd5;
+		final int colModified;
+		final int colEnabled;
+		final int colEnabledModified;
+		final int colMissing;
+		final int colId;
+		final int colRemLoc;
+		final int colStartCount;
+		final int colEndCount;
+		final int colDuration;
+		final int colLastPlay;
+		final int colWidth;
+		final int colHeight;
+
+		public ColumnIndexes (final ResultSet rs) throws SQLException {
+			this.colFile = rs.findColumn(SQL_TBL_MEDIAFILES_COL_FILE.getName());
+			this.colType = rs.findColumn(SQL_TBL_MEDIAFILES_COL_TYPE.getName());
+			this.colAdded = rs.findColumn(SQL_TBL_MEDIAFILES_COL_DADDED.getName());
+			this.colMd5 = rs.findColumn(SQL_TBL_MEDIAFILES_COL_MD5.getName());
+			this.colModified = rs.findColumn(SQL_TBL_MEDIAFILES_COL_DMODIFIED.getName());
+			this.colEnabled = rs.findColumn(SQL_TBL_MEDIAFILES_COL_ENABLED.getName());
+			this.colEnabledModified = rs.findColumn(SQL_TBL_MEDIAFILES_COL_ENABLEDMODIFIED.getName());
+			this.colMissing = rs.findColumn(SQL_TBL_MEDIAFILES_COL_MISSING.getName());
+			this.colId = rs.findColumn(SQL_TBL_MEDIAFILES_COL_ID.getName());
+			this.colRemLoc = rs.findColumn(SQL_TBL_MEDIAFILES_COL_REMLOC.getName());
+			this.colStartCount = rs.findColumn(SQL_TBL_MEDIAFILES_COL_STARTCNT.getName());
+			this.colEndCount = rs.findColumn(SQL_TBL_MEDIAFILES_COL_ENDCNT.getName());
+			this.colDuration = rs.findColumn(SQL_TBL_MEDIAFILES_COL_DURATION.getName());
+			this.colLastPlay = rs.findColumn(SQL_TBL_MEDIAFILES_COL_DLASTPLAY.getName());
+			this.colWidth = rs.findColumn(SQL_TBL_MEDIAFILES_COL_WIDTH.getName());
+			this.colHeight = rs.findColumn(SQL_TBL_MEDIAFILES_COL_HEIGHT.getName());
+		}
+	}
+
 	protected static List<IMixedMediaItem> local_parseRecordSet (final ResultSet rs, final MixedMediaItemFactory itemFactory) throws SQLException {
 		final List<IMixedMediaItem> ret = new ArrayList<IMixedMediaItem>();
+		final ColumnIndexes indexes = new ColumnIndexes(rs);
 		while (rs.next()) {
-			ret.add(createMediaItem(rs, itemFactory));
+			ret.add(createMediaItem(rs, indexes, itemFactory));
 		}
 		return ret;
 	}
 
-	protected static IMixedMediaItem createMediaItem (final ResultSet rs, final MixedMediaItemFactory itemFactory) throws SQLException {
-		String filePath = rs.getString(SQL_TBL_MEDIAFILES_COL_FILE.getName());
+	protected static IMixedMediaItem createMediaItem (final ResultSet rs, final ColumnIndexes indexes, final MixedMediaItemFactory itemFactory) throws SQLException {
+		String filePath = rs.getString(indexes.colFile);
 		IMixedMediaItem mi = itemFactory.getNewMediaItem(filePath);
 
 		/* The object returned by the itemFactory may not be fresh.
@@ -817,27 +860,27 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 		 * Not using .reset() as that would not be thread safe.
 		 */
 
-		int i = rs.getInt(SQL_TBL_MEDIAFILES_COL_TYPE.getName());
+		int i = rs.getInt(indexes.colType);
 		MediaType t = MediaType.parseInt(i);
 		mi.setMediaType(t);
 
-		mi.setDateAdded(SqliteHelper.readDate(rs, SQL_TBL_MEDIAFILES_COL_DADDED.getName()));
+		mi.setDateAdded(SqliteHelper.readDate(rs, indexes.colAdded));
 
-		byte[] bytes = rs.getBytes(SQL_TBL_MEDIAFILES_COL_MD5.getName());
+		byte[] bytes = rs.getBytes(indexes.colMd5);
 		mi.setHashcode(bytes == null ? null : new BigInteger(bytes));
 
-		mi.setDateLastModified(SqliteHelper.readDate(rs, SQL_TBL_MEDIAFILES_COL_DMODIFIED.getName()));
-		mi.setEnabled(rs.getInt(SQL_TBL_MEDIAFILES_COL_ENABLED.getName()) != 0, // default to true.
-				SqliteHelper.readDate(rs, SQL_TBL_MEDIAFILES_COL_ENABLEDMODIFIED.getName()));
-		mi.setMissing(rs.getInt(SQL_TBL_MEDIAFILES_COL_MISSING.getName()) == 1); // default to false.
-		mi.setDbRowId(rs.getLong(SQL_TBL_MEDIAFILES_COL_ID.getName()));
-		mi.setRemoteLocation(rs.getString(SQL_TBL_MEDIAFILES_COL_REMLOC.getName()));
+		mi.setDateLastModified(SqliteHelper.readDate(rs, indexes.colModified));
+		mi.setEnabled(rs.getInt(indexes.colEnabled) != 0, // default to true.
+				SqliteHelper.readDate(rs, indexes.colEnabledModified));
+		mi.setMissing(rs.getInt(indexes.colMissing) == 1); // default to false.
+		mi.setDbRowId(rs.getLong(indexes.colId));
+		mi.setRemoteLocation(rs.getString(indexes.colRemLoc));
 
 		if (t == MediaType.TRACK) {
-			mi.setStartCount(rs.getLong(SQL_TBL_MEDIAFILES_COL_STARTCNT.getName()));
-			mi.setEndCount(rs.getLong(SQL_TBL_MEDIAFILES_COL_ENDCNT.getName()));
-			mi.setDuration(rs.getInt(SQL_TBL_MEDIAFILES_COL_DURATION.getName()));
-			mi.setDateLastPlayed(SqliteHelper.readDate(rs, SQL_TBL_MEDIAFILES_COL_DLASTPLAY.getName()));
+			mi.setStartCount(rs.getLong(indexes.colStartCount));
+			mi.setEndCount(rs.getLong(indexes.colEndCount));
+			mi.setDuration(rs.getInt(indexes.colDuration));
+			mi.setDateLastPlayed(SqliteHelper.readDate(rs, indexes.colLastPlay));
 		}
 		else {
 			mi.setStartCount(0); // TODO extract constant for default value.
@@ -847,8 +890,8 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 		}
 
 		if (t == MediaType.PICTURE) {
-			mi.setWidth(rs.getInt(SQL_TBL_MEDIAFILES_COL_WIDTH.getName()));
-			mi.setHeight(rs.getInt(SQL_TBL_MEDIAFILES_COL_HEIGHT.getName()));
+			mi.setWidth(rs.getInt(indexes.colWidth));
+			mi.setHeight(rs.getInt(indexes.colHeight));
 		}
 		else {
 			mi.setWidth(0); // TODO extract constant for default value.
