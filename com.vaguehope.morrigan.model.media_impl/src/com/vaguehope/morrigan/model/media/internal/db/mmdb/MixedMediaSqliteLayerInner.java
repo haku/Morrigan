@@ -843,9 +843,12 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 
 	protected static List<IMixedMediaItem> local_parseRecordSet (final ResultSet rs, final MixedMediaItemFactory itemFactory) throws SQLException {
 		final List<IMixedMediaItem> ret = new ArrayList<IMixedMediaItem>();
-		final ColumnIndexes indexes = new ColumnIndexes(rs);
-		while (rs.next()) {
-			ret.add(createMediaItem(rs, indexes, itemFactory));
+		if (rs.next()) {
+			final ColumnIndexes indexes = new ColumnIndexes(rs);
+			do {
+				ret.add(createMediaItem(rs, indexes, itemFactory));
+			}
+			while (rs.next());
 		}
 		return ret;
 	}
