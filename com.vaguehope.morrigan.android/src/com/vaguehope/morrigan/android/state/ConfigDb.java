@@ -70,7 +70,7 @@ public class ConfigDb extends SQLiteOpenHelper implements ServerReferenceList {
 					+ TBL_CHECKOUTS_HOST_ID + " integer,"
 					+ TBL_CHECKOUTS_DB_REL_PATH + " text,"
 					+ TBL_CHECKOUTS_QUERY + " text,"
-					+ TBL_CHECKOUTS_LOCAL_DIR + " text"
+					+ TBL_CHECKOUTS_LOCAL_DIR + " text,"
 					+ TBL_CHECKOUTS_STATUS + " text"
 					+ ");";
 
@@ -83,6 +83,7 @@ public class ConfigDb extends SQLiteOpenHelper implements ServerReferenceList {
 	@Override
 	public void onCreate (final SQLiteDatabase db) {
 		db.execSQL(TBL_HOSTS_CREATE);
+		db.execSQL(TBL_CHECKOUTS_CREATE);
 	}
 
 	@Override
