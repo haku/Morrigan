@@ -101,13 +101,13 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 
 	@Override
 	protected void onSaveInstanceState (final Bundle outState) {
-		outState.putString(SERVER_ID, this.serverReference.getId());
+		if (this.serverReference != null) outState.putString(SERVER_ID, this.serverReference.getId());
 		super.onSaveInstanceState(outState);
 	}
 
 	@Override
 	protected void onPause () {
-		Preferences.putCurrentServer(this, this.serverReference.getId());
+		if (this.serverReference != null) Preferences.putCurrentServer(this, this.serverReference.getId());
 		super.onPause();
 	}
 
