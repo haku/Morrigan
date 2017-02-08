@@ -7,10 +7,13 @@ import java.util.TreeMap;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -118,43 +121,54 @@ public class CheckoutMgrActivity extends Activity {
 		return this.checkoutsAdapter;
 	}
 
-	private void askChooseDb (final ServerReference host, final Listener<MlistState> listener) {
-		final Context context = this;
+	private static void askChooseAHost (final Context context, final ConfigDb configDb, final Listener<ServerReference> listener) {
+		DialogHelper.askItem(context, "Select Server", configDb.getHosts(), new Listener<ServerReference>() {
+			@Override
+			public void onAnswer (final ServerReference answer) {
+				listener.onAnswer(answer);
+			}
+		});
+	}
+
+	private static void askChooseADb (final Context context, final ServerReference host, final Listener<MlistState> listener) {
 		new GetMlistsTask(context, host, new MlistStateListChangeListener() {
 			@Override
 			public void onMlistsChange (final MlistStateList result, final Exception e) {
-				if (e != null) DialogHelper.alert(CheckoutMgrActivity.this, e);
+				if (e != null) DialogHelper.alert(context, e);
 				if (result != null) DialogHelper.askItem(context, "Select DB", new ArrayList<MlistState>(result.getMlistStateList()), listener);
 			}
 		}).execute();
 	}
 
 	private void askAddCheckout () {
-		DialogHelper.askItem(this, "Select Server", this.configDb.getHosts(), new Listener<ServerReference>() {
+		askChooseAHost(this, this.configDb, new Listener<ServerReference>() {
 			@Override
 			public void onAnswer (final ServerReference answer) {
-				askAddCheckout(answer);
+				askAddCheckoutForHost(answer);
 			}
 		});
 	}
 
-	protected void askAddCheckout (final ServerReference host) {
-		askChooseDb(host, new Listener<MlistState>() {
+	protected void askAddCheckoutForHost (final ServerReference host) {
+		askChooseADb(this, host, new Listener<MlistState>() {
 			@Override
-			public void onAnswer (final MlistState answer) {
-				askAddCheckout(host, answer);
+			public void onAnswer (final MlistState db) {
+				askAddCheckoutForHostAndDb(host, db);
 			}
 		});
 	}
 
-	protected void askAddCheckout (final ServerReference host, final MlistState db) {
-		final CheckoutDlg dlg = new CheckoutDlg(this, host);
+	protected void askAddCheckoutForHostAndDb (final ServerReference host, final MlistState db) {
+		final CheckoutDlg dlg = new CheckoutDlg(this, this.configDb, host, db.getRelativePath());
 		dlg.getBldr().setPositiveButton("Add", new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick (final DialogInterface dialog, final int whichButton) {
 				if (!dlg.isFilledIn()) return;
 				dialog.dismiss();
-				getConfigDb().addCheckout(new Checkout(null, host.getId(), db.getRelativePath(), dlg.getQuery(), dlg.getLocalDir(), ""));
+				getConfigDb().addCheckout(new Checkout(null,
+						dlg.getHostId(), dlg.getDbRelativePath(),
+						dlg.getQuery(), dlg.getLocalDir(),
+						""));
 				reloadCheckouts();
 			}
 		});
@@ -174,7 +188,7 @@ public class CheckoutMgrActivity extends Activity {
 		}
 
 		if (StringHelper.isEmpty(checkout.getDbRelativePath())) {
-			askChooseDb(host, new Listener<MlistState>() {
+			askChooseADb(this, host, new Listener<MlistState>() {
 				@Override
 				public void onAnswer (final MlistState answer) {
 					askEditCheckout(checkout.withDbRelativePath(answer.getRelativePath()));
@@ -183,13 +197,15 @@ public class CheckoutMgrActivity extends Activity {
 			return;
 		}
 
-		final CheckoutDlg dlg = new CheckoutDlg(this, host, checkout);
+		final CheckoutDlg dlg = new CheckoutDlg(this, this.configDb, host, checkout);
 		dlg.getBldr().setPositiveButton("Update", new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick (final DialogInterface dialog, final int whichButton) {
 				if (!dlg.isFilledIn()) return;
 				dialog.dismiss();
 				getConfigDb().updateCheckout(checkout
+						.withHostId(dlg.getHostId())
+						.withDbRelativePath(dlg.getDbRelativePath())
 						.withQuery(dlg.getQuery())
 						.withLocalDir(dlg.getLocalDir()));
 				reloadCheckouts();
@@ -210,31 +226,49 @@ public class CheckoutMgrActivity extends Activity {
 
 	private static class CheckoutDlg {
 
+		private final Context context;
+		private final ConfigDb configDb;
 		private final AlertDialog.Builder bldr;
+		private AlertDialog dialog;
+		private final Button btnServerAndDb;
+		private String selectedHostId;
+		private String selectedDbRelativePath;
 		private final EditText txtQuery;
 		private final EditText txtLocalDir;
 
-		public CheckoutDlg (final Context context, final ServerReference host) {
-			this(context, host, null);
+		public CheckoutDlg (final Context context, final ConfigDb configDb, final ServerReference host, final String dbRelativePath) {
+			this(context, configDb, host, dbRelativePath, null, null);
 		}
 
-		public CheckoutDlg (final Context context, final ServerReference host, final Checkout checkout) {
+		public CheckoutDlg (final Context context, final ConfigDb configDb, final ServerReference host, final Checkout checkout) {
+			this(context, configDb, host, checkout.getDbRelativePath(), checkout.getQuery(), checkout.getLocalDir());
+		}
+
+		public CheckoutDlg (final Context context, final ConfigDb configDb, final ServerReference host, final String dbRelativePath, final String query, final String localDir) {
+			this.context = context;
+			this.configDb = configDb;
+
 			this.bldr = new AlertDialog.Builder(context);
 			this.bldr.setTitle(String.format("%s Checkout", host.getName()));
 
+			this.btnServerAndDb = new Button(context);
+			this.btnServerAndDb.setOnClickListener(this.btnServerAndDbOnClickListener);
+
 			this.txtQuery = new EditText(context);
 			this.txtQuery.setHint("query");
+			this.txtQuery.addTextChangedListener(this.textWatcher);
 
 			this.txtLocalDir = new EditText(context);
 			this.txtLocalDir.setHint("local directory");
+			this.txtLocalDir.addTextChangedListener(this.textWatcher);
 
-			if (checkout != null) {
-				this.txtQuery.setText(checkout.getQuery());
-				this.txtLocalDir.setText(checkout.getLocalDir());
-			}
+			setSelctedHostAndDb(host, dbRelativePath);
+			if (query != null) this.txtQuery.setText(query);
+			if (localDir != null) this.txtLocalDir.setText(localDir);
 
 			final LinearLayout layout = new LinearLayout(context);
 			layout.setOrientation(LinearLayout.VERTICAL);
+			layout.addView(this.btnServerAndDb);
 			layout.addView(this.txtQuery);
 			layout.addView(this.txtLocalDir);
 			this.bldr.setView(layout);
@@ -247,12 +281,60 @@ public class CheckoutMgrActivity extends Activity {
 			});
 		}
 
+		private void setSelctedHostAndDb (final ServerReference host, final String dbRelativePath) {
+			this.selectedHostId = host.getId();
+			this.selectedDbRelativePath = dbRelativePath;
+			this.btnServerAndDb.setText(String.format("%s\n%s",
+					host.getName(),
+					dbRelativePath));
+		}
+
+		private final TextWatcher textWatcher = new TextWatcher() {
+			@Override
+			public void afterTextChanged (final Editable s) {
+				if (CheckoutDlg.this.dialog == null) return;
+				CheckoutDlg.this.dialog.getButton(Dialog.BUTTON_POSITIVE).setEnabled(isFilledIn());
+			}
+			@Override
+			public void onTextChanged (final CharSequence s, final int start, final int before, final int count) {}
+			@Override
+			public void beforeTextChanged (final CharSequence s, final int start, final int count, final int after) {}
+		};
+
+		private final OnClickListener btnServerAndDbOnClickListener = new OnClickListener() {
+			@Override
+			public void onClick (final View v) {
+				askChooseAHost(CheckoutDlg.this.context, CheckoutDlg.this.configDb, new Listener<ServerReference>() {
+					@Override
+					public void onAnswer (final ServerReference host) {
+						askChooseADb(CheckoutDlg.this.context, host, new Listener<MlistState>() {
+							@Override
+							public void onAnswer (final MlistState db) {
+								setSelctedHostAndDb(host, db.getRelativePath());
+							}
+						});
+					}
+				});
+			}
+		};
+
 		public AlertDialog.Builder getBldr () {
 			return this.bldr;
 		}
 
 		public boolean isFilledIn () {
-			return !StringHelper.isEmpty(getQuery()) && !StringHelper.isEmpty(getLocalDir());
+			return StringHelper.notEmpty(this.selectedHostId)
+					&& StringHelper.notEmpty(this.selectedDbRelativePath)
+					&& StringHelper.notEmpty(getQuery())
+					&& StringHelper.notEmpty(getLocalDir());
+		}
+
+		public String getHostId () {
+			return this.selectedHostId;
+		}
+
+		public String getDbRelativePath () {
+			return this.selectedDbRelativePath;
 		}
 
 		public String getQuery () {
@@ -264,7 +346,8 @@ public class CheckoutMgrActivity extends Activity {
 		}
 
 		public void show () {
-			this.bldr.show();
+			this.dialog = this.bldr.show();
+			this.textWatcher.afterTextChanged(null);
 		}
 
 	}

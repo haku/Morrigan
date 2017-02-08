@@ -10,6 +10,10 @@ public class StringHelper {
 		return s == null || s.isEmpty();
 	}
 
+	public static boolean notEmpty (final String s) {
+		return s != null && !s.isEmpty();
+	}
+
 	public static String implode (String[] arr, String sep) {
 		if (arr == null) return null;
 		StringBuilder s = new StringBuilder();
