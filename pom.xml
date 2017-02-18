@@ -27,6 +27,7 @@
 
     <!-- Util. -->
     <module>com.vaguehope.morrigan.util</module>
+    <module>com.vaguehope.morrigan.util.tests</module>
     <module>com.vaguehope.morrigan.util.httpclient</module>
 
     <module>com.vaguehope.morrigan.tasks</module>

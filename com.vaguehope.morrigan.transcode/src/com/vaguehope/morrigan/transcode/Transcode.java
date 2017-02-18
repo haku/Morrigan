@@ -2,33 +2,35 @@ package com.vaguehope.morrigan.transcode;
 
 import java.io.IOException;
 import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.IMediaTrack;
+import com.vaguehope.morrigan.model.media.IMediaTrackList;
 import com.vaguehope.morrigan.util.MimeType;
 import com.vaguehope.morrigan.util.StringHelper;
 
 public enum Transcode {
 	NONE("", "No Transcode") {
 		@Override
-		public TranscodeProfile profileForItem (final IMediaItem item) throws IOException {
+		public TranscodeProfile profileForItem (final IMediaTrackList<? extends IMediaTrack> list, final IMediaItem item) throws IOException {
 			return null;
 		}
 	},
 	AUDIO_ONLY("audio_only", "Audio Only") {
 		@Override
-		public TranscodeProfile profileForItem (final IMediaItem item) throws IOException {
+		public TranscodeProfile profileForItem (final IMediaTrackList<? extends IMediaTrack> list, final IMediaItem item) throws IOException {
 			if (StringHelper.startsWithIgnoreCase(item.getMimeType(), "video")) {
-				return new AudioStreamExtractOrTranscode(item, this);
+				return new AudioStreamExtractOrTranscode(list, item, this);
 			}
 			return null;
 		}
 	},
 	MP4_COMPATIBLE("mp4_compatible", "MP4 Compatible") {
 		@Override
-		public TranscodeProfile profileForItem (final IMediaItem item) throws IOException {
+		public TranscodeProfile profileForItem (final IMediaTrackList<? extends IMediaTrack> list, final IMediaItem item) throws IOException {
 			if (MimeType.MP4.getMimeType().equalsIgnoreCase(item.getMimeType())) {
 				// Use existence of cache file to reduce calls to ffprobe.
 				if (Mp4CompatibleTranscode.cacheFileMp4(item, this).exists()
 						|| Ffprobe.inspect(item.getFile()).has10BitColour()) {
-					return new Mp4CompatibleTranscode(item, this);
+					return new Mp4CompatibleTranscode(list, item, this);
 				}
 				return null;
 			}
@@ -40,10 +42,10 @@ public enum Transcode {
 				return null;
 			}
 			else if (StringHelper.startsWithIgnoreCase(item.getMimeType(), "video")) {
-				return new Mp4CompatibleTranscode(item, this);
+				return new Mp4CompatibleTranscode(list, item, this);
 			}
 			else if (StringHelper.startsWithIgnoreCase(item.getMimeType(), "audio")) {
-				return new AudioOnlyM4aTranscode(item, this);
+				return new AudioOnlyM4aTranscode(list, item, this);
 			}
 			return null;
 		}
@@ -69,7 +71,7 @@ public enum Transcode {
 	/**
 	 * Returns null if no transcode is required.
 	 */
-	public abstract TranscodeProfile profileForItem (final IMediaItem item) throws IOException;
+	public abstract TranscodeProfile profileForItem (IMediaTrackList<? extends IMediaTrack> list, final IMediaItem item) throws IOException;
 
 	/**
 	 * Never returns null.

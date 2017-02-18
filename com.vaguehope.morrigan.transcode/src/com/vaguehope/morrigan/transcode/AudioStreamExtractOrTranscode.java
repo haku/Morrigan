@@ -5,13 +5,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import com.vaguehope.morrigan.model.media.IMediaItem;
+import com.vaguehope.morrigan.model.media.IMediaTrack;
+import com.vaguehope.morrigan.model.media.IMediaTrackList;
 import com.vaguehope.morrigan.util.MimeType;
 import com.vaguehope.morrigan.util.StringHelper;
 
 public class AudioStreamExtractOrTranscode extends TranscodeProfile {
 
-	public AudioStreamExtractOrTranscode (final IMediaItem item, final Transcode transcode) throws IOException {
-		super(item, transcode, findAudioStreamType(item, transcode));
+	public AudioStreamExtractOrTranscode (final IMediaTrackList<? extends IMediaTrack> list, final IMediaItem item, final Transcode transcode) throws IOException {
+		super(list, item, transcode, findAudioStreamType(item, transcode));
 	}
 
 	private static MimeType findAudioStreamType (final IMediaItem item, final Transcode transcode) throws IOException {
@@ -47,6 +49,14 @@ public class AudioStreamExtractOrTranscode extends TranscodeProfile {
 
 		cmd.add("-threads");
 		cmd.add("0");
+
+		final Long trimEnd = getTrimEndTimeSeconds();
+		if (trimEnd != null) {
+			cmd.add("-ss");
+			cmd.add("0");
+			cmd.add("-to");
+			cmd.add(String.valueOf(trimEnd));
+		}
 
 		cmd.add("-i");
 		cmd.add(getItem().getFile().getAbsolutePath());

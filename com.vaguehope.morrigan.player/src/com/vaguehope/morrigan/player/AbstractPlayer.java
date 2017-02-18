@@ -233,7 +233,7 @@ public abstract class AbstractPlayer implements Player {
 						AbstractPlayer.this.listeners.currentItemChanged(item);
 
 						File altFile = null;
-						final TranscodeProfile tProfile = getTranscode().profileForItem(item.getTrack());
+						final TranscodeProfile tProfile = getTranscode().profileForItem(item.getList(), item.getTrack());
 						if (tProfile != null) {
 							AbstractPlayer.this.transcoder.transcodeToFile(tProfile);
 							altFile = tProfile.getCacheFile();

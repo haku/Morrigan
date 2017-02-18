@@ -425,7 +425,7 @@ public class MlistsServlet extends HttpServlet {
 		else if (action.equals(CMD_TRANSCODE)) {
 			final String transcode = StringHelper.trimToNull(req.getParameter(PARAM_TRANSCODE));
 			if (transcode != null) {
-				final TranscodeProfile tProfile = Transcode.parse(transcode).profileForItem(item);
+				final TranscodeProfile tProfile = Transcode.parse(transcode).profileForItem(mmdb, item);
 				this.transcoder.transcodeToFile(tProfile);
 			}
 			else {
@@ -533,7 +533,7 @@ public class MlistsServlet extends HttpServlet {
 
 						final String transcode = StringHelper.trimToNull(req.getParameter(PARAM_TRANSCODE));
 						if (transcode != null) {
-							final TranscodeProfile tProfile = Transcode.parse(transcode).profileForItem(item);
+							final TranscodeProfile tProfile = Transcode.parse(transcode).profileForItem(mmdb, item);
 							final File transcodedFile = tProfile.getCacheFile();
 							if (transcodedFile.exists()) {
 								ServletHelper.returnFile(transcodedFile, resp, tProfile.getTranscodedTitle());
@@ -779,7 +779,7 @@ public class MlistsServlet extends HttpServlet {
 		long fileSize = mi.getFileSize();
 		String fileLink = fileLink(mi);
 
-		final TranscodeProfile tProfile = Transcode.parse(transcode).profileForItem(mi);
+		final TranscodeProfile tProfile = Transcode.parse(transcode).profileForItem(ml, mi);
 		if (tProfile != null) {
 			title = tProfile.getTranscodedTitle();
 
