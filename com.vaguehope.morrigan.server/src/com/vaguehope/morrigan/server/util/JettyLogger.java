@@ -14,8 +14,8 @@ public class JettyLogger implements Logger {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	public Logger getLogger (final String arg0) {
-		return null;
+	public Logger getLogger (final String name) {
+		return this;
 	}
 
 	@Override

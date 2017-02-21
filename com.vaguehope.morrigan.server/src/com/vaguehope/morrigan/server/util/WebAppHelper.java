@@ -17,7 +17,7 @@ public class WebAppHelper {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	
 	private static final String JETTY_WEBDEFAULT_PATH = "org/eclipse/jetty/webapp/webdefault.xml";
-	private static final String JETTY_WEBAPP_BUNDLE_NAME = "org.eclipse.jetty.webapp";
+	private static final String JETTY_WEBAPP_BUNDLE_NAME = "com.vaguehope.morrigan.jetty";
 	
 	/**
 	 * Look up and load a WAR bundle in an OSGI environment.
