@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="morrigan" uid="com.vaguehope.morrigan.gui.product" id="com.vaguehope.morrigan.gui.product" application="com.vaguehope.morrigan.gui.application" useFeatures="false" includeLaunchers="true">
+<product name="morrigan" uid="com.vaguehope.morrigan.gui.product" id="com.vaguehope.morrigan.gui.product" application="com.vaguehope.morrigan.gui.application" version="1" useFeatures="true" includeLaunchers="true">
 
    <aboutInfo>
       <image path="/com.vaguehope.morrigan.gui/graphics/crow-full.png"/>
@@ -40,103 +40,24 @@ Image &quot;The Morrígan&quot; by Louis le Brocquy used under the Creative Comm
    </vm>
 
    <plugins>
-      <plugin id="com.ibm.icu"/>
-      <plugin id="com.vaguehope.morrigan.config"/>
-      <plugin id="com.vaguehope.morrigan.danbooru"/>
-      <plugin id="com.vaguehope.morrigan.engines"/>
-      <plugin id="com.vaguehope.morrigan.gui"/>
-      <plugin id="com.vaguehope.morrigan.hotkeyimpl.jintellitype" os="win32" ws="win32" arch="x86" />
-      <plugin id="com.vaguehope.morrigan.hotkeyimpl.jxgrabkey" os="linux" ws="gtk" arch="x86" />
-      <plugin id="com.vaguehope.morrigan.jetty"/>
-      <plugin id="com.vaguehope.morrigan.model"/>
-      <plugin id="com.vaguehope.morrigan.model.db"/>
-      <plugin id="com.vaguehope.morrigan.model.media"/>
-      <plugin id="com.vaguehope.morrigan.model.media_impl"/>
-      <plugin id="com.vaguehope.morrigan.osgiconsole"/>
-      <plugin id="com.vaguehope.morrigan.playbackimpl.vlc" />
-      <plugin id="com.vaguehope.morrigan.player"/>
-      <plugin id="com.vaguehope.morrigan.screen"/>
-      <plugin id="com.vaguehope.morrigan.server"/>
-      <plugin id="com.vaguehope.morrigan.server.boot"/>
-      <plugin id="com.vaguehope.morrigan.tasks"/>
-      <plugin id="com.vaguehope.morrigan.transcode"/>
-      <plugin id="com.vaguehope.morrigan.util"/>
-      <plugin id="com.vaguehope.morrigan.util.httpclient"/>
-      <plugin id="com.vaguehope.morrigan.wui"/>
-      <plugin id="com.vaguehope.nemain"/>
-      <plugin id="com.vaguehope.sqlitewrapper"/>
-      <plugin id="javax.servlet"/>
-      <plugin id="org.eclipse.compare.core"/>
-      <plugin id="org.eclipse.core.commands"/>
-      <plugin id="org.eclipse.core.contenttype"/>
-      <plugin id="org.eclipse.core.databinding"/>
-      <plugin id="org.eclipse.core.databinding.observable"/>
-      <plugin id="org.eclipse.core.databinding.property"/>
-      <plugin id="org.eclipse.core.expressions"/>
-      <plugin id="org.eclipse.core.filesystem"/>
-      <plugin id="org.eclipse.core.filesystem.linux.x86" fragment="true" os="linux" ws="gtk" arch="x86" />
-      <plugin id="org.eclipse.core.filesystem.linux.x86_64" fragment="true" os="linux" ws="gtk" arch="x86_64" />
-      <plugin id="org.eclipse.core.filesystem.macosx" fragment="true" os="macosx" ws="cocoa" arch="x86" />
-      <plugin id="org.eclipse.core.filesystem.win32.x86" fragment="true" os="win32" ws="win32" arch="x86" />
-      <plugin id="org.eclipse.core.jobs"/>
-      <plugin id="org.eclipse.core.runtime"/>
-      <plugin id="org.eclipse.core.runtime.compatibility.registry" fragment="true"/>
-      <plugin id="org.eclipse.core.variables"/>
-      <plugin id="org.eclipse.ecf"/>
-      <plugin id="org.eclipse.ecf.filetransfer"/>
-      <plugin id="org.eclipse.ecf.identity"/>
-      <plugin id="org.eclipse.ecf.provider.filetransfer"/>
-      <plugin id="org.eclipse.ecf.provider.filetransfer.ssl" fragment="true"/>
-      <plugin id="org.eclipse.ecf.ssl" fragment="true"/>
-      <plugin id="org.eclipse.equinox.app"/>
-      <plugin id="org.eclipse.equinox.common"/>
-      <plugin id="org.eclipse.equinox.p2.core"/>
-      <plugin id="org.eclipse.equinox.p2.engine"/>
-      <plugin id="org.eclipse.equinox.p2.metadata"/>
-      <plugin id="org.eclipse.equinox.p2.metadata.repository"/>
-      <plugin id="org.eclipse.equinox.p2.repository"/>
-      <plugin id="org.eclipse.equinox.preferences"/>
-      <plugin id="org.eclipse.equinox.registry"/>
-      <plugin id="org.eclipse.equinox.security"/>
-      <plugin id="org.eclipse.equinox.security.macosx" fragment="true" os="macosx" ws="cocoa" arch="x86" />
-      <plugin id="org.eclipse.equinox.security.win32.x86" fragment="true" os="win32" ws="win32" arch="x86" />
-      <plugin id="org.eclipse.help"/>
-      <plugin id="org.eclipse.jetty.continuation"/>
-      <plugin id="org.eclipse.jetty.http"/>
-      <plugin id="org.eclipse.jetty.io"/>
-      <plugin id="org.eclipse.jetty.security"/>
-      <plugin id="org.eclipse.jetty.server"/>
-      <plugin id="org.eclipse.jetty.servlet"/>
-      <plugin id="org.eclipse.jetty.util"/>
-      <plugin id="org.eclipse.jetty.webapp"/>
-      <plugin id="org.eclipse.jetty.xml"/>
-      <plugin id="org.eclipse.jface"/>
-      <plugin id="org.eclipse.jface.databinding"/>
-      <plugin id="org.eclipse.jface.text"/>
-      <plugin id="org.eclipse.osgi"/>
-      <plugin id="org.eclipse.osgi.services"/>
-      <plugin id="org.eclipse.swt"/>
-      <plugin id="org.eclipse.swt.cocoa.macosx" fragment="true" os="macosx" ws="cocoa" arch="x86" />
-      <plugin id="org.eclipse.swt.gtk.linux.x86" fragment="true" os="linux" ws="gtk" arch="x86" />
-      <plugin id="org.eclipse.swt.gtk.linux.x86_64" fragment="true" os="linux" ws="gtk" arch="x86_64" />
-      <plugin id="org.eclipse.swt.win32.win32.x86" fragment="true" os="win32" ws="win32" arch="x86" />
-      <plugin id="org.eclipse.text"/>
-      <plugin id="org.eclipse.ui"/>
-      <plugin id="org.eclipse.ui.console"/>
-      <plugin id="org.eclipse.ui.ide"/>
-      <plugin id="org.eclipse.ui.win32" fragment="true" os="win32" ws="win32" arch="x86" />
-      <plugin id="org.eclipse.ui.workbench"/>
-      <plugin id="org.eclipse.ui.workbench.texteditor"/>
    </plugins>
 
+   <features>
+      <feature id="com.vaguehope.morrigan.gui.feature"/>
+      <feature id="org.eclipse.rcp"/>
+      <feature id="org.eclipse.emf.common"/>
+      <feature id="org.eclipse.emf.ecore"/>
+      <feature id="org.eclipse.platform"/>
+   </features>
+
    <configurations>
-      <plugin id="com.vaguehope.morrigan.player" autoStart="true" startLevel="0" />
       <plugin id="com.vaguehope.morrigan.hotkeyimpl.jintellitype" autoStart="true" startLevel="0" />
       <plugin id="com.vaguehope.morrigan.hotkeyimpl.jxgrabkey" autoStart="true" startLevel="0" />
       <plugin id="com.vaguehope.morrigan.model.media_impl" autoStart="true" startLevel="0" />
       <plugin id="com.vaguehope.morrigan.playbackimpl.dsj" autoStart="true" startLevel="0" />
       <plugin id="com.vaguehope.morrigan.playbackimpl.gs" autoStart="true" startLevel="0" />
       <plugin id="com.vaguehope.morrigan.playbackimpl.vlc" autoStart="true" startLevel="0" />
+      <plugin id="com.vaguehope.morrigan.player" autoStart="true" startLevel="0" />
       <plugin id="com.vaguehope.morrigan.tasks" autoStart="true" startLevel="0" />
       <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="0" />
    </configurations>
