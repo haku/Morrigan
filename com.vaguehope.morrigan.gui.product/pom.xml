@@ -1,11 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>com.vaguehope.morrigan</groupId>
-    <artifactId>morrigan</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
-  </parent>  
-  <artifactId>com.vaguehope.morrigan.gui.product</artifactId>
-  <packaging>eclipse-application</packaging>
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.vaguehope.morrigan</groupId>
+		<artifactId>morrigan</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+	</parent>
+	<artifactId>com.vaguehope.morrigan.gui.product</artifactId>
+	<packaging>eclipse-application</packaging>
+
+	<build>
+		<plugins>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.8</version>
+				<executions>
+					<execution>
+						<id>attach-artifact</id>
+						<phase>package</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target>
+								<property name="build_project_dir" value="${basedir}/../com.vaguehope.morrigan.build"/>
+								<property name="target_dir" value="${basedir}/target"/>
+								<property name="archive_prefix" value="morrigan"/>
+								<ant antfile="${build_project_dir}/postproc-tycho-product.xml">
+									<target name="postproc" />
+								</ant>
+							</target>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+		</plugins>
+	</build>
+
 </project>

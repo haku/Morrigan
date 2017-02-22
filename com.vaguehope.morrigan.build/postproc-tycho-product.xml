@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<project name="postproc-tycho-product">
+
+	<target name="postproc">
+		<echo message="build_project_dir: ${build_project_dir}" />
+		<echo message="target_dir: ${target_dir}" />
+		<echo message="archive_prefix: ${archive_prefix}" />
+
+		<!-- TODO Fix root dir name. -->
+
+		<antcall target="add_files_to_zip" >
+			<param name="zipNamePattern" value="*linux*.x86.zip"/>
+		</antcall>
+
+		<antcall target="add_files_to_zip" >
+			<param name="zipNamePattern" value="*linux*.x86_64.zip"/>
+		</antcall>
+
+		<antcall target="add_files_to_zip" >
+			<param name="zipNamePattern" value="*macosx*.x86.zip"/>
+		</antcall>
+
+	</target>
+
+	<target name="add_files_to_zip">
+		<fileset dir="${target_dir}" id="zipfiles" >
+			<include name="${zipNamePattern}" />
+		</fileset>
+		<pathconvert pathsep="" property="zipfile" refid="zipfiles" />
+		<echo message="zipfile=${zipfile}" />
+
+		<property name="wipdir" value="target/wip" />
+		<unzip src="${zipfile}" dest="${wipdir}" />
+		<move file="${wipdir}/eclipse" tofile="${wipdir}/${archive_prefix}" />
+
+		<copy todir="${wipdir}/${archive_prefix}" flatten="true">
+			<fileset dir="${build_project_dir}/rootfiles" />
+			<file file="${archive_prefix}.ini" />
+		</copy>
+
+		<move file="${zipfile}" todir="target/prepost/" />
+
+		<zip destfile="${zipfile}" duplicate="preserve">
+			<zipfileset
+					dir="${wipdir}/${archive_prefix}"
+					prefix="${archive_prefix}"
+					filemode="755">
+				<include name="${archive_prefix}" />
+				<include name="install_plugin" />
+				<include name="mndb" />
+				<include name="mn-dump-dropbox" />
+				<include name="mn-pull-dropbox" />
+			</zipfileset>
+			<fileset dir="${wipdir}" />
+		</zip>
+
+		<delete dir="${wipdir}"/>
+	</target>
+	
+</project>
