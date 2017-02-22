@@ -71,7 +71,7 @@ public class AuthFilter implements Filter {
 
 		// Verify password.
 		authHeader64 = authHeader64.substring(Http.HEADER_AUTHORISATION_PREFIX.length());
-		final String authHeader = B64Code.decode(authHeader64, null);
+		final String authHeader = B64Code.decode(authHeader64, (String) null);
 		final int x = authHeader.indexOf(":");
 		final String user = authHeader.substring(0, x);
 		final String pass = authHeader.substring(x + 1);
