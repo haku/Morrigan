@@ -250,8 +250,8 @@
       $('#submnu_transcode').append(li);
     });
 
-    setupTagAutocomplete($('#db_query'), function(){return currentDbMid});
-    setupTagAutocomplete($('#new_tag'), function(){return tagEditorMid});
+    setupTagAutocomplete($('#db_query'), true, function(){return currentDbMid});
+    setupTagAutocomplete($('#new_tag'), false, function(){return tagEditorMid});
   }
 
   function tagsClicked() {
@@ -290,14 +290,14 @@
     });
   }
 
-  function setupTagAutocomplete(el, midSup) {
+  function setupTagAutocomplete(el, isSearch, midSup) {
     var source = function(req, resp) {
       $.ajax({
         dataType: "json",
         url: '/mlists/' + midSup() + '/tags?term=' + encodeURIComponent(req.term),
         success: function(data) {
           if (!el.data('sent')) {
-            fillInTagSearches(data);
+            if (isSearch) fillInTagSearches(data);
             resp(data);
           }
           else {
