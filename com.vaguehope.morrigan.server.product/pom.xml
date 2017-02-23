@@ -28,6 +28,7 @@
 								<property name="build_project_dir" value="${basedir}/../com.vaguehope.morrigan.build"/>
 								<property name="target_dir" value="${basedir}/target"/>
 								<property name="archive_prefix" value="morriganserver"/>
+								<property name="remove_product_from_ini" value="true"/>
 								<ant antfile="${build_project_dir}/postproc-tycho-product.xml">
 									<target name="postproc" />
 								</ant>

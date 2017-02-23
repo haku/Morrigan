@@ -32,6 +32,7 @@
 		<property name="wipdir" value="target/wip" />
 		<unzip src="${zipfile}" dest="${wipdir}" />
 		<move file="${wipdir}/eclipse" tofile="${wipdir}/${archive_prefix}" />
+		<antcall target="remove_product_from_ini" />
 
 		<copy todir="${wipdir}/${archive_prefix}" flatten="true">
 			<fileset dir="${build_project_dir}/rootfiles" />
@@ -55,6 +56,20 @@
 		</zip>
 
 		<delete dir="${wipdir}"/>
+	</target>
+
+	<target name="remove_product_from_ini" if="remove_product_from_ini">
+		<echo message="Removeing product reference from config.ini ..." />
+		<property name="cfgfile" value="${wipdir}/${archive_prefix}/configuration/config.ini" />
+		<property name="cfgtmpfile" value="${cfgfile}.tmp" />
+		<copy file="${cfgfile}" tofile="${cfgtmpfile}">
+			<filterchain>
+				<linecontainsregexp negate="true">
+					<regexp pattern="^eclipse\.product=.*$"/>
+				</linecontainsregexp>
+			</filterchain>
+		</copy>
+		<move file="${cfgtmpfile}" tofile="${cfgfile}"/>
 	</target>
 	
 </project>
