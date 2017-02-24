@@ -18,6 +18,7 @@
     setDbTabToDbs();
 
     wireTabsAndMenus();
+    wirePlayerTab();
     wireFooter();
   });
 
@@ -346,6 +347,39 @@
 
 // Player tab.
 
+
+  function wirePlayerTab() {
+    var sldJ = $('#track_progress');
+    var sld = sldJ.get(0);
+    var dlg = $('#seek_dlg');
+    var dlgSldJ = $('.seek_slider', dlg);
+    var dlgSld = dlgSldJ.get(0);
+
+    var time = $('.seek_time', dlg);
+    var dlgSldOnChange = function () {
+      time.text(MnApi.formatSeconds(dlgSld.value));
+    }
+    dlgSld.addEventListener('input', dlgSldOnChange);
+
+    var sldOnClick = function() {
+      dlgSldJ.attr('max', sldJ.attr('max'));
+      dlgSld.MaterialSlider.change(sld.value);
+      dlgSldOnChange();
+      showPopup(dlg);
+    }
+    sldJ.click(sldOnClick);
+    sld.addEventListener('touchend', sldOnClick);
+    sld.addEventListener('mdl-componentupgraded', function() {
+      sld.parentElement.click(sldOnClick);
+    });
+
+    $('button.goto', dlg).unbind().click(function() {
+      var position = dlgSld.value;
+      MnApi.playerSeek(selectedPlayer.pid, position, msgHandler, displayPlayer);
+      hidePopup(dlg);
+    });
+  }
+
   function setSelectedPlayer(player) {
     selectedPlayer = player;
     fetchAndDisplayPlayer();
@@ -401,7 +435,8 @@
       sldMax = 100;
     }
 
-    $('#track_progress').attr('max', sldMax).get(0).MaterialSlider.change(sldVal);
+    var sld = $('#track_progress').attr('max', sldMax).get(0).MaterialSlider;
+    if (sld) sld.change(sldVal);
     $('#track_time').text(sldTxt);
 
     if (lastQueuePid !== player.pid || lastQueueVersion !== player.queueVersion) fetchAndDisplayQueue();

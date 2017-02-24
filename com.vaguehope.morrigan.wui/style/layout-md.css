@@ -159,6 +159,12 @@ header .subtitle span {
 
   background: #222;
 }
+.popup.fullwidth {
+  left: 0;
+  right: 0;
+  width: initial;
+  margin: 0;
+}
 .popup .title {
   margin: 0;
   line-height: 1.2;
@@ -189,6 +195,10 @@ header .subtitle span {
   min-height: 3em;
   margin: 1em .5em;
 }
+.popup > .fullwidth {
+  width: 100%;
+  margin: 0;
+}
 .popup button {
   line-height: normal;
   height: inherit;
@@ -197,6 +207,9 @@ header .subtitle span {
 .popup .mdl-textfield {
   width: 90%;
   margin: 1em .5em;
+}
+.popup .mdl-slider__container {
+  width: 100%;
 }
 .popup > .row {
   display: inline-flex;

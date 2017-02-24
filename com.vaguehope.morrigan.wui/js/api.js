@@ -136,6 +136,10 @@ MnApi = {};
     {id: "audio_only", title: "Audio Only"}
   ];
 
+  MnApi.playerSeek = function(pid, position, msgHandler, onPlayer) {
+    writePlayerState(pid, 'seek&position=' + position, msgHandler, onPlayer);
+  }
+
   MnApi.playerPlaybackOrder = function(pid, order, msgHandler, onPlayer) {
     writePlayerState(pid, 'playbackorder&order=' + order.id, msgHandler, onPlayer);
   }

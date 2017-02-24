@@ -65,6 +65,7 @@ public interface Player {
 
 	/**
 	 * Takes a percentage of duration.
+	 * @param d a double where 0 <= d <= 1.
 	 */
 	void seekTo(double d);
 

@@ -72,6 +72,7 @@ public class PlayersServlet extends HttpServlet {
 	private static final String CMD_PLAYPAUSE = "playpause";
 	private static final String CMD_NEXT = "next";
 	private static final String CMD_STOP = "stop";
+	private static final String CMD_SEEK = "seek";
 	private static final String CMD_PLAYBACKORDER = "playbackorder";
 	private static final String CMD_TRANSCODE = "transcode";
 	private static final String CMD_FULLSCREEN = "fullscreen";
@@ -178,6 +179,18 @@ public class PlayersServlet extends HttpServlet {
 		else if (act.equals(CMD_STOP)) {
 			player.stopPlaying();
 			writeResponse(req, resp);
+		}
+		else if (act.equals(CMD_SEEK)) {
+			final String positionRaw = req.getParameter("position");
+			if (positionRaw != null && positionRaw.length() > 0) {
+				final double position = Double.parseDouble(positionRaw); // TODO handle ex?
+				final int duration = player.getCurrentTrackDuration();
+				player.seekTo(position / duration); // WTF was I thinking when I wrote this API?
+				writeResponse(req, resp);
+			}
+			else {
+				ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "'position' parameter not set desu~");
+			}
 		}
 		else if (act.equals(CMD_PLAYBACKORDER)) {
 			final String orderRaw = req.getParameter("order");
