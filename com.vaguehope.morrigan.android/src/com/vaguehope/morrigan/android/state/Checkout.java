@@ -1,5 +1,9 @@
 package com.vaguehope.morrigan.android.state;
 
+import java.util.Map;
+
+import com.vaguehope.morrigan.android.model.ServerReference;
+
 public class Checkout {
 
 	private final String id;
@@ -44,7 +48,16 @@ public class Checkout {
 
 	@Override
 	public String toString () {
-		return String.format("%s\n%s\n%s\n%s", this.dbRelativePath, this.query, this.localDir, this.status);
+		return String.format("%s\n%s\n%s\n%s",
+				this.dbRelativePath,
+				this.query, this.localDir, this.status);
+	}
+
+	public String toString (final Map<String, ServerReference> hosts) {
+		final ServerReference host = hosts.get(this.hostId);
+		return String.format("%s:%s\n%s\n%s\n%s",
+				host != null ? host.getName() : this.hostId, this.dbRelativePath,
+				this.query, this.localDir, this.status);
 	}
 
 	public Checkout withHostId (final String newHostId) {

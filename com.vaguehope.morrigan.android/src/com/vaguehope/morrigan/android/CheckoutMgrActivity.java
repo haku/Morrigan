@@ -26,7 +26,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-
 import com.vaguehope.morrigan.android.helper.DialogHelper;
 import com.vaguehope.morrigan.android.helper.DialogHelper.Listener;
 import com.vaguehope.morrigan.android.helper.StringHelper;
@@ -35,12 +34,14 @@ import com.vaguehope.morrigan.android.model.MlistStateList;
 import com.vaguehope.morrigan.android.model.MlistStateListChangeListener;
 import com.vaguehope.morrigan.android.model.ServerReference;
 import com.vaguehope.morrigan.android.state.Checkout;
+import com.vaguehope.morrigan.android.state.CheckoutAdapter;
 import com.vaguehope.morrigan.android.state.ConfigDb;
 import com.vaguehope.morrigan.android.tasks.GetMlistsTask;
 
 public class CheckoutMgrActivity extends Activity {
 
 	private ConfigDb configDb;
+	private final Map<String, ServerReference> allHosts = new HashMap<String, ServerReference>();
 	private ArrayAdapter<Checkout> checkoutsAdapter;
 
 	@Override
@@ -49,7 +50,7 @@ public class CheckoutMgrActivity extends Activity {
 		this.configDb = new ConfigDb(this);
 		setContentView(R.layout.checkoutmgr);
 
-		this.checkoutsAdapter = new ArrayAdapter<Checkout>(this, android.R.layout.simple_list_item_1);
+		this.checkoutsAdapter = new CheckoutAdapter(this, this.allHosts);
 
 		final ListView lstCheckouts = (ListView) findViewById(R.id.lstCheckouts);
 		lstCheckouts.setAdapter(this.checkoutsAdapter);
@@ -80,6 +81,10 @@ public class CheckoutMgrActivity extends Activity {
 	}
 
 	protected void reloadCheckouts () {
+		for (final ServerReference h : this.configDb.getHosts()) {
+			this.allHosts.put(h.getId(), h);
+		}
+
 		this.checkoutsAdapter.clear();
 		this.checkoutsAdapter.addAll(this.configDb.getCheckouts());
 	}
