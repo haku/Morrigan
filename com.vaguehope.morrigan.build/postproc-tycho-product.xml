@@ -10,14 +10,17 @@
 
 		<antcall target="add_files_to_zip" >
 			<param name="zipNamePattern" value="*linux*.x86.zip"/>
+			<param name="ini_file_arch" value="linux.x86"/>
 		</antcall>
 
 		<antcall target="add_files_to_zip" >
 			<param name="zipNamePattern" value="*linux*.x86_64.zip"/>
+			<param name="ini_file_arch" value="linux.x86_64"/>
 		</antcall>
 
 		<antcall target="add_files_to_zip" >
 			<param name="zipNamePattern" value="*macosx*.x86.zip"/>
+			<param name="ini_file_arch" value="macosx.x86"/>
 		</antcall>
 
 	</target>
@@ -36,8 +39,8 @@
 
 		<copy todir="${wipdir}/${archive_prefix}" flatten="true">
 			<fileset dir="${build_project_dir}/rootfiles" />
-			<file file="${archive_prefix}.ini" />
 		</copy>
+		<copy file="${archive_prefix}.${ini_file_arch}.ini" tofile="${wipdir}/${archive_prefix}/${archive_prefix}.ini" />
 
 		<move file="${zipfile}" todir="target/prepost/" />
 
