@@ -1,11 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>com.vaguehope.morrigan</groupId>
-    <artifactId>morrigan</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
-  </parent>  
-  <artifactId>com.vaguehope.morrigan.model.media_impl</artifactId>
-  <packaging>eclipse-plugin</packaging>
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.vaguehope.morrigan</groupId>
+		<artifactId>morrigan</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+	</parent>
+	<artifactId>com.vaguehope.morrigan.model.media_impl</artifactId>
+	<packaging>eclipse-plugin</packaging>
+
+	<repositories>
+		<repository>
+			<id>jaudiotagger-repository</id>
+			<url>https://dl.bintray.com/ijabz/maven</url>
+		</repository>
+	</repositories>
+
+	<build>
+		<plugins>
+
+			<!-- https://maven.apache.org/plugins/maven-dependency-plugin/copy-mojo.html -->
+			<!-- https://maven.apache.org/plugins/maven-dependency-plugin/examples/copying-artifacts.html -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.8</version>
+				<executions>
+					<execution>
+						<id>copy</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+
+								<artifactItem>
+									<groupId>net.jthink</groupId>
+									<artifactId>jaudiotagger</artifactId>
+									<version>2.2.5</version>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+								</artifactItem>
+
+							</artifactItems>
+							<outputDirectory>${basedir}/lib</outputDirectory>
+							<overWriteReleases>false</overWriteReleases>
+							<overWriteSnapshots>true</overWriteSnapshots>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+		</plugins>
+	</build>
+
 </project>
