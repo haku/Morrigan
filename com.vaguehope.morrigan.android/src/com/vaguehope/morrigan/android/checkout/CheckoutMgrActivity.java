@@ -1,4 +1,4 @@
-package com.vaguehope.morrigan.android;
+package com.vaguehope.morrigan.android.checkout;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,6 +26,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+
+import com.vaguehope.morrigan.android.R;
 import com.vaguehope.morrigan.android.helper.DialogHelper;
 import com.vaguehope.morrigan.android.helper.DialogHelper.Listener;
 import com.vaguehope.morrigan.android.helper.StringHelper;

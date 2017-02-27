@@ -32,6 +32,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.vaguehope.morrigan.android.ServersList.ServerListEventsListener;
+import com.vaguehope.morrigan.android.checkout.CheckoutMgrActivity;
 import com.vaguehope.morrigan.android.layouts.SidebarLayout;
 import com.vaguehope.morrigan.android.layouts.SidebarLayout.SidebarListener;
 import com.vaguehope.morrigan.android.model.Artifact;

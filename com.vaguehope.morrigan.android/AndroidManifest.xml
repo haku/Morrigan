@@ -43,11 +43,11 @@
 		<activity android:name=".MlistActivity"
 			android:label="@string/app_name" />
 
-		<activity android:name=".CheckoutMgrActivity"
+		<activity android:name=".checkout.CheckoutMgrActivity"
 			android:label="@string/app_name" />
 		
 		<service
-			android:name=".SyncCheckoutsService"
+			android:name=".checkout.SyncCheckoutsService"
 			android:label="Morrigan Sync Service" />
 
 	</application>

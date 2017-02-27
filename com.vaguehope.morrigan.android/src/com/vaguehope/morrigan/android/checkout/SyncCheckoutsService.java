@@ -1,4 +1,4 @@
-package com.vaguehope.morrigan.android;
+package com.vaguehope.morrigan.android.checkout;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,6 +18,11 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.vaguehope.morrigan.android.helper.DialogHelper.Listener;
+import com.vaguehope.morrigan.android.AwakeService;
+import com.vaguehope.morrigan.android.C;
+import com.vaguehope.morrigan.android.MnApi;
+import com.vaguehope.morrigan.android.R;
+import com.vaguehope.morrigan.android.R.drawable;
 import com.vaguehope.morrigan.android.helper.ArrayHelper;
 import com.vaguehope.morrigan.android.helper.ExceptionHelper;
 import com.vaguehope.morrigan.android.helper.FileHelper;
