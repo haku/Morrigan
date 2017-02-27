@@ -41,6 +41,9 @@ public interface IMediaItemDb<S extends IMediaItemStorageLayer<T>, T extends IMe
 	T getByFile (String filepath) throws DbException;
 	T getByHashcode (BigInteger hashcode) throws DbException;
 
+	/**
+	 * Note: returned item will be missing DB rowId.
+	 */
 	T addFile (File file) throws MorriganException, DbException;
 	FileExistance hasFile (String filepath) throws MorriganException, DbException;
 	FileExistance hasFile (File file) throws MorriganException, DbException;
