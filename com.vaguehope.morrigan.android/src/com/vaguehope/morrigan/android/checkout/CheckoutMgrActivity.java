@@ -1,8 +1,12 @@
 package com.vaguehope.morrigan.android.checkout;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import android.app.Activity;
@@ -76,6 +80,9 @@ public class CheckoutMgrActivity extends Activity {
 		switch (item.getItemId()) {
 			case R.id.newcheckout:
 				askAddCheckout();
+				return true;
+			case R.id.cleanold:
+				askCleanOld();
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);
@@ -357,6 +364,40 @@ public class CheckoutMgrActivity extends Activity {
 			this.textWatcher.afterTextChanged(null);
 		}
 
+	}
+
+	private void askCleanOld () {
+		final Set<String> excessFiles;
+		try {
+			excessFiles = CheckoutIndex.findExcessFiles(this, this.configDb.getCheckouts());
+		}
+		catch (final IOException e) {
+			DialogHelper.alert(this, e);
+			return;
+		}
+
+		final List<TitleableFile> items = new ArrayList<TitleableFile>(excessFiles.size());
+		for (final String path : excessFiles) {
+			items.add(new TitleableFile(path));
+		}
+
+		DialogHelper.askItems(this, "Select to Delete (" + items.size() + ")", items, new Listener<Set<TitleableFile>>() {
+			@Override
+			public void onAnswer (final Set<TitleableFile> toDelete) {
+				deleteFiles(toDelete);
+			}
+		});
+	}
+
+	protected void deleteFiles (final Set<TitleableFile> items) {
+		for (final TitleableFile item : items) {
+			final File file = item.getFile();
+			if (!file.delete()) {
+				DialogHelper.alert(this, "Failed to delete: " + file.getAbsolutePath());
+				break;
+			}
+		}
+		DialogHelper.alert(this, "Deleted " + items.size() + " items.");
 	}
 
 	protected void askSyncServer () {

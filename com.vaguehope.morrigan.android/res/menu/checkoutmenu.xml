@@ -7,5 +7,10 @@
 			android:title="New Checkout"
 			android:showAsAction="always"/>
 
+		<item
+			android:id="@+id/cleanold"
+			android:title="Clean"
+			android:showAsAction="always"/>
+
 	</group>
 </menu>

@@ -22,8 +22,6 @@ import com.vaguehope.morrigan.android.AwakeService;
 import com.vaguehope.morrigan.android.C;
 import com.vaguehope.morrigan.android.MnApi;
 import com.vaguehope.morrigan.android.R;
-import com.vaguehope.morrigan.android.R.drawable;
-import com.vaguehope.morrigan.android.helper.ArrayHelper;
 import com.vaguehope.morrigan.android.helper.ExceptionHelper;
 import com.vaguehope.morrigan.android.helper.FileHelper;
 import com.vaguehope.morrigan.android.helper.FormaterHelper;
@@ -149,15 +147,15 @@ public class SyncCheckoutsService extends AwakeService {
 			toCopy = computeRequireDownloading(allItemsAndLocalFiles);
 		}
 
+		CheckoutIndex.write(this, checkout, allItemsAndLocalFiles);
+
 		final long spaceAfterCopy = localDir.getFreeSpace() - totalTransferSize(toCopy);
 		if (spaceAfterCopy < 1) throw new IOException(String.format(
 				"Not enough space on device: %s short.",
 				FormaterHelper.readableFileSize(Math.abs(spaceAfterCopy))));
 
 		final SyncDlPrgListnr prgLstnr = downloadFiles(checkout, notificationId, notif, host, toCopy);
-
 		final List<File> toDelete = findToDelete(localDir, allItemsAndLocalFiles);
-
 		storeResult(checkout, prgLstnr, toDelete);
 	}
 
@@ -240,7 +238,6 @@ public class SyncCheckoutsService extends AwakeService {
 				FormaterHelper.readableFileSize(prgLstnr.getTransferedItemBytes()));
 		if (toDelete.size() > 0) {
 			status += String.format("  %s files to delete.", toDelete.size());
-			status += "\n  " + ArrayHelper.join(toDelete.subList(0, Math.min(10, toDelete.size())), "\n  ");
 		}
 		this.configDb.updateCheckout(this.configDb.getCheckout(checkout.getId()).withStatus(status));
 	}
@@ -264,25 +261,6 @@ public class SyncCheckoutsService extends AwakeService {
 		}
 		if (matchedSrc == null) throw new IllegalStateException("Path does not match any srcs: " + path);
 		return path.substring(matchedSrc.length() + 1);
-	}
-
-	private static class ItemAndFile {
-
-		private final MlistItem item;
-		private final File localFile;
-
-		public ItemAndFile (final MlistItem item, final File localFile) {
-			this.item = item;
-			this.localFile = localFile;
-		}
-
-		public MlistItem getItem () {
-			return this.item;
-		}
-
-		public File getLocalFile () {
-			return this.localFile;
-		}
 	}
 
 	private final class SyncDlPrgListnr implements DownloadProgressListener {
