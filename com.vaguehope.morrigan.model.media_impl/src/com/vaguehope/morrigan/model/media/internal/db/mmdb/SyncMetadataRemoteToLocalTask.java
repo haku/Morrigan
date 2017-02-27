@@ -152,16 +152,16 @@ public class SyncMetadataRemoteToLocalTask implements MorriganTask {
 				}
 
 				// If both deleted, then we are in agreement (don't care about matching modified dates).
-				if (lTag.isDeleted() == rTag.isDeleted()) continue;
+				if (lTag.isDeleted() && rTag.isDeleted()) continue;
 
-				// So we don't match, but for safety can only merge if both sides have dates.
-				if (lTag.getModified() == null || rTag.getModified() == null) continue;
-				if (lTag.getModified().getTime() < 1 || rTag.getModified().getTime() < 1) continue;
-
-				// Nothing to do if local is newer or same age.
-				if (lTag.getModified().getTime() >= rTag.getModified().getTime()) continue;
-
-				addTag(ldb, localItem, rTag);
+				// If remote tag is explicitly more recently modified than local tag, add it.
+				final long lModified = lTag.getModified() != null && lTag.getModified().getTime() > 0
+						? lTag.getModified().getTime() : 0L;
+				final long rModified = rTag.getModified() != null && rTag.getModified().getTime() > 0
+						? rTag.getModified().getTime() : 0L;
+				if (rModified > lModified) {
+					addTag(ldb, localItem, rTag);
+				}
 			}
 		}
 	}
