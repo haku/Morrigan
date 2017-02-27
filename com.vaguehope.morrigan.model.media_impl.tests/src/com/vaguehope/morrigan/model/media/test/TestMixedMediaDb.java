@@ -24,7 +24,12 @@ public class TestMixedMediaDb extends LocalMixedMediaDb {
 	}
 
 	public IMixedMediaItem addTestTrack() throws MorriganException, DbException {
-		final IMixedMediaItem track = addFile(new File(String.format("some_media_file_%s.ext", this.newTrackCounter.getAndIncrement())));
+		return addTestTrack(new File(String.format("some_media_file_%s.ext", this.newTrackCounter.getAndIncrement())));
+	}
+
+	public IMixedMediaItem addTestTrack (final File file) throws MorriganException, DbException {
+		addFile(file);
+		final IMixedMediaItem track = getByFile(file); // Workaround so dbRowId is filled in.
 		setItemMediaType(track, MediaType.TRACK);
 		return track;
 	}
