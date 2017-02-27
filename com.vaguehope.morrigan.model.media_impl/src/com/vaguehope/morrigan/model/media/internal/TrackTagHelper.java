@@ -26,45 +26,45 @@ public final class TrackTagHelper {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public static void readTrackTags (IMediaItemDb<?, ?> itemDb, IMediaTrack mlt, File file) throws IOException, TagException, ReadOnlyFileException, InvalidAudioFrameException, MorriganException {
+	public static void readTrackTags (final IMediaItemDb<?, ?> itemDb, final IMediaTrack mlt, final File file) throws IOException, TagException, ReadOnlyFileException, InvalidAudioFrameException, MorriganException {
 		AudioFile af;
 
 		try {
 			af = AudioFileIO.read(file);
 		}
-		catch (CannotReadVideoException t) {
+		catch (final CannotReadVideoException t) {
 			// Do nothing.
 			return;
 		}
-		catch (CannotReadException t) {
+		catch (final CannotReadException t) {
 			// Do nothing.
 			return;
 		}
 
 //		AudioHeader ah = af.getAudioHeader(); // TODO do something with this?
 
-		Tag tag = af.getTag();
+		final Tag tag = af.getTag();
 		if (tag == null) {
 			return;
 		}
 
-		Iterator<TagField> fields;
+		final Iterator<TagField> fields;
 		try {
 			fields = tag.getFields();
 		}
-		catch (UnsupportedOperationException t) {
+		catch (final UnsupportedOperationException t) {
 			// Do nothing.
 			return;
 		}
 
 		while (fields.hasNext()) {
-			TagField tagField = fields.next();
+			final TagField tagField = fields.next();
 			if (!tagField.isEmpty() && !tagField.isBinary()) {
 
 				if (tagField instanceof TagTextField) {
-					TagTextField tagTextField = (TagTextField) tagField;
+					final TagTextField tagTextField = (TagTextField) tagField;
 
-					String tagFieldString = tagTextField.getContent();
+					final String tagFieldString = tagTextField.getContent();
 					if (tagFieldString != null && tagFieldString.length() > 0) {
 						String tagId = tagTextField.getId();
 						if (tagId != null && tagId.length() < 1) tagId = null;
