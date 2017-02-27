@@ -54,8 +54,6 @@ public class AudioStreamExtractOrTranscode extends TranscodeProfile {
 		if (trimEnd != null) {
 			cmd.add("-ss");
 			cmd.add("0");
-			cmd.add("-to");
-			cmd.add(String.valueOf(trimEnd));
 		}
 
 		cmd.add("-i");
@@ -94,6 +92,11 @@ public class AudioStreamExtractOrTranscode extends TranscodeProfile {
 
 			cmd.add("-f");
 			cmd.add("mp3");
+		}
+
+		if (trimEnd != null) {
+			cmd.add("-to");
+			cmd.add(String.valueOf(trimEnd));
 		}
 
 		cmd.add(outputFile.getAbsolutePath());
