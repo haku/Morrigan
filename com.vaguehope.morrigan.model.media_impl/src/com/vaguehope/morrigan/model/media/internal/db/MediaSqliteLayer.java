@@ -946,17 +946,14 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 
 	private MediaTagClassification local_addTagClassification (final String classificationName) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_TAGCLS_ADD);
-		int n;
 		try {
 			ps.setString(1, classificationName);
-			n = ps.executeUpdate();
+			final int n = ps.executeUpdate();
+			if (n < 1) throw new DbException("No update occured for addTagClassification('" + classificationName + "').");
+			return local_getTagClassification(classificationName);
 		} finally {
 			ps.close();
 		}
-		if (n<1) throw new DbException("No update occured for addTagClassification('"+classificationName+"').");
-
-		MediaTagClassification ret = local_getTagClassification(classificationName);
-		return ret;
 	}
 
 	private List<MediaTagClassification> local_getTagClassifications () throws SQLException, ClassNotFoundException {
