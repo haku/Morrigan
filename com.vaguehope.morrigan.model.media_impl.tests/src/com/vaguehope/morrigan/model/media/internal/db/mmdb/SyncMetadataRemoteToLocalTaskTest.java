@@ -2,8 +2,10 @@ package com.vaguehope.morrigan.model.media.internal.db.mmdb;
 
 import static org.junit.Assert.assertEquals;
 
+import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import org.junit.Assert;
@@ -24,6 +26,8 @@ import com.vaguehope.morrigan.tasks.TaskResult.TaskOutcome;
 
 public class SyncMetadataRemoteToLocalTaskTest {
 
+	private static final Random RND = new Random(System.currentTimeMillis());
+
 	private TestMixedMediaDb local;
 	private TestRemoteDb remote;
 	private SyncMetadataRemoteToLocalTask underTest;
@@ -36,6 +40,23 @@ public class SyncMetadataRemoteToLocalTaskTest {
 		final MediaFactory mediaFactory = new MediaFactoryImpl(null);
 		this.underTest = new SyncMetadataRemoteToLocalTask(this.local, this.remote, mediaFactory);
 		this.eventListener = new AsyncTaskEventListener();
+		addNoise(this.local);
+		addNoise(this.remote);
+	}
+
+	private void addNoise (final TestMixedMediaDb db) throws Exception {
+		final int itemCount = RND.nextInt(5);
+		for (int i = 0; i < itemCount; i++) {
+			final IMixedMediaItem item = db.addTestTrack();
+			final int tagCount = RND.nextInt(5);
+			for (int x = 0; x < tagCount; x++) {
+				new Tag(rndString(), MediaTagType.AUTOMATIC, rndString(), RND.nextBoolean()).addTo(db, item);
+			}
+		}
+	}
+
+	private String rndString () {
+		return new BigInteger(RND.nextInt(32) + 32, RND).toString(32);
 	}
 
 	private void runSync () throws Throwable {
@@ -115,7 +136,8 @@ public class SyncMetadataRemoteToLocalTaskTest {
 	}
 
 	private String summariseTag (final MediaTag t) {
-		return summariseTag(t.getTag(), t.getType(), t.getClassification().getClassification(), t.getModified().getTime(), t.isDeleted());
+		return summariseTag(t.getTag(), t.getType(), t.getClassification().getClassification(),
+				t.getModified() != null ? t.getModified().getTime() : 0L, t.isDeleted());
 	}
 
 	private String summariseTag (final Tag t) {

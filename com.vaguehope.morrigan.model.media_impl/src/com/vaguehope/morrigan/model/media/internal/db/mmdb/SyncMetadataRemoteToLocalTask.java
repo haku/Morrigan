@@ -185,6 +185,11 @@ public class SyncMetadataRemoteToLocalTask implements MorriganTask {
 		}
 
 		@Override
+		public String toString () {
+			return String.format("{%s|%s|%s}", this.tag, this.type.getIndex(), this.cls);
+		}
+
+		@Override
 		public int hashCode () {
 			return Objs.hash(this.tag, this.type, this.cls);
 		}

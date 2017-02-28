@@ -3,26 +3,19 @@ package com.vaguehope.morrigan.model.media.internal;
 import com.vaguehope.morrigan.model.factory.RecyclingFactory;
 
 public class MediaTagClassificationFactory extends RecyclingFactory<MediaTagClassificationImpl, Long, String, RuntimeException> {
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	public static final MediaTagClassificationFactory INSTANCE = new MediaTagClassificationFactory();
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	protected MediaTagClassificationFactory() {
+
+	public MediaTagClassificationFactory() {
 		super(true);
 	}
-	
+
 	@Override
-	protected boolean isValidProduct(MediaTagClassificationImpl product) {
+	protected boolean isValidProduct(final MediaTagClassificationImpl product) {
 		return true;
 	}
-	
-	@SuppressWarnings("boxing")
+
 	@Override
-	protected MediaTagClassificationImpl makeNewProduct(Long material, String config) {
+	protected MediaTagClassificationImpl makeNewProduct(final Long material, final String config) {
 		return new MediaTagClassificationImpl(material, config);
 	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 }

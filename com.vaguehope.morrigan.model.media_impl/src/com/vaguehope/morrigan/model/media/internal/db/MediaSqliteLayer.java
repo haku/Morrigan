@@ -1026,18 +1026,15 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		}
 	}
 
-	private static List<MediaTagClassification> local_getTagClassification_parseRecordSet (final ResultSet rs) throws SQLException {
-		List<MediaTagClassification> ret = new ArrayList<MediaTagClassification>();
+	private final MediaTagClassificationFactory tagClsFactory = new MediaTagClassificationFactory();
 
+	private List<MediaTagClassification> local_getTagClassification_parseRecordSet (final ResultSet rs) throws SQLException {
+		final List<MediaTagClassification> ret = new ArrayList<MediaTagClassification>();
 		while (rs.next()) {
-			long rowId = rs.getLong(SQL_TBL_TAGCLS_COL_ROWID);
-			String clsName = rs.getString(SQL_TBL_TAGCLS_COL_CLS);
-
-			@SuppressWarnings("boxing")
-			MediaTagClassification mtc = MediaTagClassificationFactory.INSTANCE.manufacture(rowId, clsName);
-			ret.add(mtc);
+			final long rowId = rs.getLong(SQL_TBL_TAGCLS_COL_ROWID);
+			final String clsName = rs.getString(SQL_TBL_TAGCLS_COL_CLS);
+			ret.add(this.tagClsFactory.manufacture(rowId, clsName));
 		}
-
 		return ret;
 	}
 

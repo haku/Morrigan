@@ -18,8 +18,7 @@ public class TestMixedMediaDb extends LocalMixedMediaDb {
 
 	private static final Random RND = new Random(System.currentTimeMillis());
 	private static final AtomicInteger newDbCounter = new AtomicInteger(0);
-
-	private final AtomicInteger newTrackCounter = new AtomicInteger(0);
+	private static final AtomicInteger newTrackCounter = new AtomicInteger(0);
 
 	public TestMixedMediaDb () throws DbException, MorriganException {
 		this("testDb");
@@ -35,17 +34,17 @@ public class TestMixedMediaDb extends LocalMixedMediaDb {
 	}
 
 	public IMixedMediaItem addTestTrack() throws MorriganException, DbException {
-		final int n = this.newTrackCounter.getAndIncrement();
+		final int n = newTrackCounter.getAndIncrement();
 		return addTestTrack(new File(String.format("some_media_file_%s.ext", n)),
 				BigInteger.TEN.add(BigInteger.valueOf(n)));
 	}
 
 	public IMixedMediaItem addTestTrack (final File file) throws MorriganException, DbException {
-		return addTestTrack(file, new BigInteger(8, RND));
+		return addTestTrack(file, new BigInteger(128, RND));
 	}
 
 	public IMixedMediaItem addTestTrack (final BigInteger hashCode) throws MorriganException, DbException {
-		return addTestTrack(new File(String.format("some_media_file_%s.ext", this.newTrackCounter.getAndIncrement())), hashCode);
+		return addTestTrack(new File(String.format("some_media_file_%s.ext", newTrackCounter.getAndIncrement())), hashCode);
 	}
 
 	public IMixedMediaItem addTestTrack (final File file, final BigInteger hashCode) throws MorriganException, DbException {
