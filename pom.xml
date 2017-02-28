@@ -60,6 +60,7 @@
 
     <!-- HTTP UI. -->
     <module>com.vaguehope.morrigan.server</module>
+    <module>com.vaguehope.morrigan.server.tests</module>
     <module>com.vaguehope.morrigan.wui</module>
     <module>com.vaguehope.morrigan.osgiconsole</module>
     <module>com.vaguehope.morrigan.server.boot</module>

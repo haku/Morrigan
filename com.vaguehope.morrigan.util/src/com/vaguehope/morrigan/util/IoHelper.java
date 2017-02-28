@@ -1,6 +1,8 @@
 package com.vaguehope.morrigan.util;
 
 import java.io.Closeable;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -26,6 +28,17 @@ public class IoHelper {
 			total += read;
 		}
 		return total;
+	}
+
+	public static void write (final InputStream is, final File file) throws IOException {
+		final OutputStream os = new FileOutputStream(file);
+		try {
+			copy(is, os);
+		}
+		finally {
+			closeQuietly(is);
+			closeQuietly(os);
+		}
 	}
 
 	public static long drainStream (final InputStream is) throws IOException {

@@ -1,0 +1,43 @@
+<?xml version="1.0" standalone="yes"?>
+
+<mlist>
+ <title>library</title>
+ <uuid>e388f2cb-c6d3-4308-a4ca-ea5b72c0396f</uuid>
+ <count>1</count>
+ <duration>337</duration>
+ <durationcomplete>true</durationcomplete>
+ <defaulttype>1</defaulttype>
+ <sortcolumn>date added</sortcolumn>
+ <sortdirection>ASC</sortdirection>
+ <link rel="self" type="text/xml" href="/mlists/LOCALMMDB/library.local.db3"/>
+ <link rel="albums" type="text/xml" href="/mlists/LOCALMMDB/library.local.db3/albums"/>
+ <link rel="src" type="text/xml" href="/mlists/LOCALMMDB/library.local.db3/src"/>
+ <remote>server1-a</remote>
+ <remote>server2-b</remote>
+ <remote>server3-c</remote>
+ <entry>
+  <title>Some Artist - Some Track.ogg</title>
+  <filesize>7575894</filesize>
+  <link rel="self" href="%2Fhome%2Fmedia%2Fmusic%2FSome+Artist+-+Some+Track.ogg"/>
+  <dateadded>2008-04-25T11:00:06.000Z</dateadded>
+  <datelastmodified>2008-01-19T18:19:36.000Z</datelastmodified>
+  <type>1</type>
+  <mimetype>audio/ogg</mimetype>
+  <hash>892fde64e2af9ac6390e35b2af05326b</hash>
+  <enabled m="">true</enabled>
+  <missing>false</missing>
+  <duration>337</duration>
+  <startcount>49</startcount>
+  <endcount>36</endcount>
+  <datelastplayed>2016-10-08T07:12:45.439Z</datelastplayed>
+  <tag t="0" c="" m="" d="false">My Tag</tag>
+  <tag t="0" c="" m="1488299277000" d="false">My Other Tag</tag>
+  <tag t="0" c="" m="1488299156000" d="true">My Deleted Tag</tag>
+  <tag t="1" c="ALBUM" m="1486169231000" d="false">Some Album</tag>
+  <tag t="1" c="ARTIST" m="1486169231000" d="false">Some Artist</tag>
+  <tag t="1" c="LYRICS" m="1486169231000" d="false">Lyrics line 1
+Lyrics line 2
+Lyrics line 3</tag>
+ </entry>
+</mlist>
+

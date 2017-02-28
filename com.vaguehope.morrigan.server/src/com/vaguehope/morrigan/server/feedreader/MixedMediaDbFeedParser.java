@@ -100,7 +100,7 @@ public class MixedMediaDbFeedParser extends DefaultHandler {
 			final String deletedString = StringHelper.trimToNull(attributes.getValue("d"));
 
 			final MediaTagType type = typeString == null ? null : MediaTagType.getFromIndex(Integer.parseInt(typeString));
-			final Date modified = modifiedString == null ? null : new Date(Long.parseLong(modifiedString));
+			final Date modified = StringHelper.blank(modifiedString) ? null : new Date(Long.parseLong(modifiedString));
 			final boolean deleted = "true".equalsIgnoreCase(deletedString);
 
 			this.tagAttrs.add(new TagAttrs(type, cls, modified, deleted));

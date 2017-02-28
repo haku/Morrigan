@@ -1,20 +1,13 @@
 package com.vaguehope.morrigan.model.media.internal.db.mmdb;
 
-import static org.junit.Assert.assertEquals;
-
 import java.math.BigInteger;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Random;
-import java.util.Set;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.model.media.MediaFactory;
-import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.model.media.internal.MediaFactoryImpl;
 import com.vaguehope.morrigan.model.media.test.Tag;
@@ -120,32 +113,7 @@ public class SyncMetadataRemoteToLocalTaskTest {
 		remoteTag.addTo(this.remote, rTrack);
 
 		runSync();
-		assertTags(this.local.getTagsIncludingDeleted(lTrack), expectedLocalTagAfterMerge);
-	}
-
-	private void assertTags (final List<MediaTag> actual, final Tag... expected) {
-		final Set<String> actualSummary = new HashSet<String>();
-		for (final MediaTag a : actual) {
-			actualSummary.add(summariseTag(a));
-		}
-		final Set<String> expectedSummary = new HashSet<String>();
-		for (final Tag e : expected) {
-			if (e != null) expectedSummary.add(summariseTag(e));
-		}
-		assertEquals(expectedSummary, actualSummary);
-	}
-
-	private String summariseTag (final MediaTag t) {
-		return summariseTag(t.getTag(), t.getType(), t.getClassification().getClassification(),
-				t.getModified() != null ? t.getModified().getTime() : 0L, t.isDeleted());
-	}
-
-	private String summariseTag (final Tag t) {
-		return summariseTag(t.getTag(), t.getType(), t.getCls(), t.getModified(), t.isDeleted());
-	}
-
-	private String summariseTag (final String tag, final MediaTagType type, final String cls, final long modified, final boolean deleted) {
-		return String.format("{%s|%s|%s|%s|%s}", tag, type, cls, modified, deleted);
+		Tag.assertTags(this.local.getTagsIncludingDeleted(lTrack), expectedLocalTagAfterMerge);
 	}
 
 }

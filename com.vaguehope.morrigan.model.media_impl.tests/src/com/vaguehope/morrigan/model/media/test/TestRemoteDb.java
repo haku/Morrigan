@@ -9,32 +9,31 @@ import com.vaguehope.sqlitewrapper.DbException;
 
 public class TestRemoteDb extends TestMixedMediaDb implements IRemoteMixedMediaDb {
 
+	private URI uri;
+	private String pass;
+
 	public TestRemoteDb () throws DbException, MorriganException {
 		super("testRemoteDb");
 	}
 
 	@Override
 	public URI getUri () throws DbException {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Not implemented.");
+		return this.uri;
 	}
 
 	@Override
 	public void setUri (final URI uri) throws DbException {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Not implemented.");
+		this.uri = uri;
 	}
 
 	@Override
 	public String getPass () throws DbException {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Not implemented.");
+		return this.pass;
 	}
 
 	@Override
 	public void setPass (final String pass) throws DbException {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Not implemented.");
+		this.pass = pass;
 	}
 
 	@Override

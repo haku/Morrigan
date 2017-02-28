@@ -1,0 +1,20 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Morrigan Player tests
+Bundle-SymbolicName: com.vaguehope.morrigan.server.tests
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: vaguehope.com
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: org.junit;bundle-version="[4.0.0,5.0.0)",
+ com.vaguehope.morrigan.server,
+ com.vaguehope.morrigan.model,
+ com.vaguehope.morrigan.model.db,
+ com.vaguehope.morrigan.model.media,
+ com.vaguehope.morrigan.model.media_impl,
+ com.vaguehope.morrigan.model.media_impl.tests,
+ com.vaguehope.morrigan.tasks,
+ com.vaguehope.morrigan.util,
+ com.vaguehope.sqlitewrapper
+Import-Package: org.osgi.framework
+Bundle-ClassPath: fixtures/,
+ .
