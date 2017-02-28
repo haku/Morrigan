@@ -17,6 +17,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
@@ -130,11 +131,15 @@ public class MixedMediaDbFeedReader implements HttpStreamHandler {
 			transClone.readFromCache();
 			transClone.beginBulkUpdate();
 			try {
-				SAXParserFactory factory = SAXParserFactory.newInstance();
+				final InputSource inputSource = new InputSource(is);
+				inputSource.setEncoding("UTF-8");
+
+				final MixedMediaDbFeedParser handler = new MixedMediaDbFeedParser(transClone, this.taskEventListener);
+
+				final SAXParserFactory factory = SAXParserFactory.newInstance();
 				factory.setNamespaceAware(true);
 				factory.setValidating(true);
-				SAXParser parser = factory.newSAXParser();
-				parser.parse(is, new MixedMediaDbFeedParser(transClone, this.taskEventListener));
+				factory.newSAXParser().parse(inputSource, handler);
 			}
 			catch (SAXException e) {
 				throw new HttpStreamHandlerException(e);
