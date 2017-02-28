@@ -68,8 +68,8 @@ public abstract class GenericSqliteLayer implements IGenericDbLayer {
 		Class.forName(DRIVER_CLASS);
 
 		final String url;
-		if (":memory:".equalsIgnoreCase(this.dbFilePath)) {
-			url = "jdbc:sqlite::memory:";
+		if (this.dbFilePath.startsWith(":memory:") || this.dbFilePath.startsWith("file:")) {
+			url = "jdbc:sqlite:" + this.dbFilePath;
 		}
 		else {
 			url = "jdbc:sqlite:/" + this.dbFilePath;

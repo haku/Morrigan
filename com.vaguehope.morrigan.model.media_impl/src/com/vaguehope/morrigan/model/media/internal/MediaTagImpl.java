@@ -76,6 +76,16 @@ public class MediaTagImpl implements MediaTag {
 		sb.append(getType().getShortName());
 		sb.append("]");
 
+		if (this.modified != null) {
+			sb.append(" [");
+			sb.append(this.modified);
+			sb.append("]");
+		}
+
+		if (this.deleted) {
+			sb.append(" [DELETED]");
+		}
+
 		return sb.toString();
 	}
 

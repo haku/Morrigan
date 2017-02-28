@@ -155,9 +155,9 @@ public class SyncMetadataRemoteToLocalTask implements MorriganTask {
 				if (lTag.isDeleted() && rTag.isDeleted()) continue;
 
 				// If remote tag is explicitly more recently modified than local tag, add it.
-				final long lModified = lTag.getModified() != null && lTag.getModified().getTime() > 0
+				final long lModified = lTag.getModified() != null && lTag.getModified().getTime() > 0L
 						? lTag.getModified().getTime() : 0L;
-				final long rModified = rTag.getModified() != null && rTag.getModified().getTime() > 0
+				final long rModified = rTag.getModified() != null && rTag.getModified().getTime() > 0L
 						? rTag.getModified().getTime() : 0L;
 				if (rModified > lModified) {
 					addTag(ldb, localItem, rTag);
@@ -168,8 +168,8 @@ public class SyncMetadataRemoteToLocalTask implements MorriganTask {
 
 	private static void addTag (final ILocalMixedMediaDb db, final IMixedMediaItem item, final MediaTag tag) throws MorriganException {
 		final MediaTagClassification cls = tag.getClassification();
-		final String rCls = cls == null ? null : cls.getClassification();
-		db.addTag(item, tag.getTag(), tag.getType(), rCls, tag.getModified(), tag.isDeleted());
+		final String clsString = cls == null ? null : cls.getClassification();
+		db.addTag(item, tag.getTag(), tag.getType(), clsString, tag.getModified(), tag.isDeleted());
 	}
 
 	private static class TagKey {
