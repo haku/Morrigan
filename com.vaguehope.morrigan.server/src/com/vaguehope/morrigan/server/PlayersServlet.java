@@ -107,39 +107,39 @@ public class PlayersServlet extends HttpServlet {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+	protected void doGet (final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
 		try {
 			writeResponse(req, resp);
 		}
-		catch (SAXException e) {
+		catch (final SAXException e) {
 			throw new ServletException(e);
 		}
-		catch (MorriganException e) {
+		catch (final MorriganException e) {
 			throw new ServletException(e);
 		}
 	}
 
 	@Override
-	protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+	protected void doPost (final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
 		try {
-			String requestURI = req.getRequestURI();
-			String reqPath = requestURI.startsWith(CONTEXTPATH) ? requestURI.substring(CONTEXTPATH.length()) : requestURI;
+			final String requestURI = req.getRequestURI();
+			final String reqPath = requestURI.startsWith(CONTEXTPATH) ? requestURI.substring(CONTEXTPATH.length()) : requestURI;
 
 			if (reqPath == null || reqPath.length() < 1 || reqPath.equals(ROOTPATH)) { // POST to root.
 				ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid POST request desu~");
 			}
 			else {
-				String path = reqPath.startsWith(ROOTPATH) ? reqPath.substring(ROOTPATH.length()) : reqPath;
+				final String path = reqPath.startsWith(ROOTPATH) ? reqPath.substring(ROOTPATH.length()) : reqPath;
 				if (path.length() > 0) {
-					String[] pathParts = path.split("/");
-					String playerId = pathParts[0];
-					Player player = this.playerListener.getPlayer(playerId);
+					final String[] pathParts = path.split("/");
+					final String playerId = pathParts[0];
+					final Player player = this.playerListener.getPlayer(playerId);
 					if (pathParts.length == 1) {
 						postToPlayer(req, resp, player);
 					}
 					else if (pathParts.length >= 2 && PATH_QUEUE.equals(pathParts[1])) {
 						if (pathParts.length >= 3) {
-							int item = Integer.parseInt(pathParts[2]);
+							final int item = Integer.parseInt(pathParts[2]);
 							postToQueue(req, resp, player, item);
 						}
 						else {
@@ -147,24 +147,24 @@ public class PlayersServlet extends HttpServlet {
 						}
 					}
 					else {
-						ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid POST request to player "+player.getId()+": '"+path+"' desu~");
+						ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid POST request to player " + player.getId() + ": '" + path + "' desu~");
 					}
 				}
 				else {
-					ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid POST request to '"+path+"' desu~");
+					ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid POST request to '" + path + "' desu~");
 				}
 			}
 		}
-		catch (SAXException e) {
+		catch (final SAXException e) {
 			throw new ServletException(e);
 		}
-		catch (MorriganException e) {
+		catch (final MorriganException e) {
 			throw new ServletException(e);
 		}
 	}
 
 	private void postToPlayer (final HttpServletRequest req, final HttpServletResponse resp, final Player player) throws IOException, SAXException, MorriganException {
-		String act = req.getParameter("action");
+		final String act = req.getParameter("action");
 		if (act == null) {
 			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "'action' parameter not set desu~");
 		}
@@ -215,9 +215,9 @@ public class PlayersServlet extends HttpServlet {
 			}
 		}
 		else if (act.equals(CMD_FULLSCREEN)) {
-			String monitorString = req.getParameter("monitor");
+			final String monitorString = req.getParameter("monitor");
 			if (monitorString != null && monitorString.length() > 0) {
-				int monitorId = Integer.parseInt(monitorString);
+				final int monitorId = Integer.parseInt(monitorString);
 				player.goFullscreen(monitorId);
 				writeResponse(req, resp);
 			}
@@ -226,13 +226,13 @@ public class PlayersServlet extends HttpServlet {
 			}
 		}
 		else if (act.equals(CMD_ADDTAG)) {
-			String tag = req.getParameter("tag");
+			final String tag = req.getParameter("tag");
 			if (tag != null && tag.length() > 0) {
-				PlayItem currentItem = player.getCurrentItem();
+				final PlayItem currentItem = player.getCurrentItem();
 				final IMediaTrack item = currentItem != null ? currentItem.getTrack() : null;
 				final IMediaTrackList<? extends IMediaTrack> list = currentItem != null ? currentItem.getList() : null;
 				if (item != null && list != null) {
-					list.addTag(item, tag, MediaTagType.MANUAL, (MediaTagClassification)null);
+					list.addTag(item, tag, MediaTagType.MANUAL, (MediaTagClassification) null);
 					writeResponse(req, resp);
 				}
 				else {
@@ -244,12 +244,12 @@ public class PlayersServlet extends HttpServlet {
 			}
 		}
 		else {
-			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "invalid 'action' parameter '"+act+"' desu~");
+			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "invalid 'action' parameter '" + act + "' desu~");
 		}
 	}
 
 	private static void postToQueue (final HttpServletRequest req, final HttpServletResponse resp, final Player player) throws IOException, SAXException {
-		String act = req.getParameter("action");
+		final String act = req.getParameter("action");
 		if (act == null) {
 			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "'action' parameter not set desu~");
 		}
@@ -266,17 +266,17 @@ public class PlayersServlet extends HttpServlet {
 			printPlayerQueue(resp, player);
 		}
 		else {
-			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "invalid 'action' parameter '"+act+"' desu~");
+			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "invalid 'action' parameter '" + act + "' desu~");
 		}
 	}
 
 	private static void postToQueue (final HttpServletRequest req, final HttpServletResponse resp, final Player player, final int item) throws IOException, SAXException {
-		String act = req.getParameter("action");
+		final String act = req.getParameter("action");
 		if (act == null) {
 			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "'action' parameter not set desu~");
 		}
 		else if (act.equals(CMD_UP) || act.equals(CMD_DOWN) || act.equals(CMD_REMOVE) || act.equals(CMD_TOP) || act.equals(CMD_BOTTOM)) {
-			PlayItem queueItem = player.getQueue().getQueueItemById(item);
+			final PlayItem queueItem = player.getQueue().getQueueItemById(item);
 			if (queueItem != null) {
 				if (act.equals(CMD_REMOVE)) {
 					player.getQueue().removeFromQueue(queueItem);
@@ -293,35 +293,35 @@ public class PlayersServlet extends HttpServlet {
 				printPlayerQueue(resp, player);
 			}
 			else {
-				ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "item '"+item+"' not found desu~");
+				ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "item '" + item + "' not found desu~");
 			}
 		}
 		else {
-			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "invalid 'action' parameter '"+act+"' desu~");
+			ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "invalid 'action' parameter '" + act + "' desu~");
 		}
 	}
 
 	private void writeResponse (final HttpServletRequest req, final HttpServletResponse resp) throws IOException, SAXException, MorriganException {
-		String requestURI = req.getRequestURI();
-		String reqPath = requestURI.startsWith(CONTEXTPATH) ? requestURI.substring(CONTEXTPATH.length()) : requestURI;
+		final String requestURI = req.getRequestURI();
+		final String reqPath = requestURI.startsWith(CONTEXTPATH) ? requestURI.substring(CONTEXTPATH.length()) : requestURI;
 
 		if (reqPath == null || reqPath.length() < 1 || reqPath.equals(ROOTPATH)) {
 			printPlayersList(resp);
 		}
 		else {
-			String path = reqPath.substring(ROOTPATH.length()); // Expecting path = '0' or '0/queue'.
+			final String path = reqPath.substring(ROOTPATH.length()); // Expecting path = '0' or '0/queue'.
 			if (path.length() > 0) {
-				String[] pathParts = path.split("/");
+				final String[] pathParts = path.split("/");
 				if (pathParts.length >= 1) {
-					String playerId = pathParts[0];
-					Player player = this.playerListener.getPlayer(playerId);
+					final String playerId = pathParts[0];
+					final Player player = this.playerListener.getPlayer(playerId);
 					if (player == null) {
 						ServletHelper.error(resp, HttpServletResponse.SC_NOT_FOUND, playerId + " not found desu~");
 						return;
 					}
 
 					if (pathParts.length >= 2) {
-						String subPath = pathParts[1];
+						final String subPath = pathParts[1];
 						if (subPath.equals(PATH_QUEUE)) {
 							printPlayerQueue(resp, player);
 						}
@@ -342,13 +342,13 @@ public class PlayersServlet extends HttpServlet {
 
 	private void printPlayersList (final HttpServletResponse resp) throws IOException, SAXException, MorriganException {
 		resp.setContentType("text/xml;charset=utf-8");
-		DataWriter dw = FeedHelper.startFeed(resp.getWriter());
+		final DataWriter dw = FeedHelper.startFeed(resp.getWriter());
 
 		FeedHelper.addElement(dw, "title", "Morrigan players desu~");
 		FeedHelper.addLink(dw, CONTEXTPATH, "self", "text/xml");
 
-		Collection<Player> players = this.playerListener.getPlayers();
-		for (Player p : players) {
+		final Collection<Player> players = this.playerListener.getPlayers();
+		for (final Player p : players) {
 			dw.startElement("entry");
 			printPlayer(dw, p, 0);
 			dw.endElement("entry");
@@ -359,7 +359,7 @@ public class PlayersServlet extends HttpServlet {
 
 	private static void printPlayer (final HttpServletResponse resp, final Player player) throws IOException, SAXException, MorriganException {
 		resp.setContentType("text/xml;charset=utf-8");
-		DataWriter dw = FeedHelper.startDocument(resp.getWriter(), "player");
+		final DataWriter dw = FeedHelper.startDocument(resp.getWriter(), "player");
 
 		printPlayer(dw, player, 1);
 
@@ -368,7 +368,7 @@ public class PlayersServlet extends HttpServlet {
 
 	private static void printPlayerQueue (final HttpServletResponse resp, final Player player) throws IOException, SAXException {
 		resp.setContentType("text/xml;charset=utf-8");
-		DataWriter dw = FeedHelper.startDocument(resp.getWriter(), "queue");
+		final DataWriter dw = FeedHelper.startDocument(resp.getWriter(), "queue");
 
 		printQueue(dw, player);
 
@@ -378,7 +378,7 @@ public class PlayersServlet extends HttpServlet {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private static void printPlayer (final DataWriter dw, final Player p, final int detailLevel) throws SAXException, MorriganException, IOException {
-		if (detailLevel < 0 || detailLevel > 1) throw new IllegalArgumentException("detailLevel must be 0 or 1, not "+detailLevel+".");
+		if (detailLevel < 0 || detailLevel > 1) throw new IllegalArgumentException("detailLevel must be 0 or 1, not " + detailLevel + ".");
 
 		final String listTitle;
 		final String listId;
