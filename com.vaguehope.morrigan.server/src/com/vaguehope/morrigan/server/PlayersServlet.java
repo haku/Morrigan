@@ -32,6 +32,7 @@ import com.vaguehope.morrigan.transcode.Transcode;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlayItemType;
 import com.vaguehope.morrigan.player.Player;
+import com.vaguehope.morrigan.player.PlayerFinder;
 import com.vaguehope.morrigan.player.PlayerReader;
 import com.vaguehope.morrigan.server.MlistsServlet.IncludeTags;
 import com.vaguehope.morrigan.server.util.FeedHelper;
@@ -60,6 +61,9 @@ import com.vaguehope.morrigan.util.TimeHelper;
  * POST /players/0/queue/0 action=remove
  * POST /players/0/queue/0 action=down
  * POST /players/0/queue/0 action=bottom
+ *
+ * POST /players/auto action=playapuse
+ * POST /players/auto action=next
  * </pre>
  */
 public class PlayersServlet extends HttpServlet {
@@ -67,6 +71,7 @@ public class PlayersServlet extends HttpServlet {
 
 	public static final String CONTEXTPATH = "/players";
 
+	private static final String PLAYER_AUTO = "auto";
 	public static final String PATH_QUEUE = "queue";
 
 	private static final String CMD_PLAYPAUSE = "playpause";
@@ -106,10 +111,19 @@ public class PlayersServlet extends HttpServlet {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+	private Player getPlayerById (final String playerId) {
+		if (PLAYER_AUTO.equalsIgnoreCase(playerId)) {
+			return PlayerFinder.guessActivePlayer(this.playerListener.getPlayers());
+		}
+		else {
+			return this.playerListener.getPlayer(playerId);
+		}
+	}
+
 	@Override
 	protected void doGet (final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
 		try {
-			writeResponse(req, resp);
+			writeResponse(req, resp, null);
 		}
 		catch (final SAXException e) {
 			throw new ServletException(e);
@@ -133,7 +147,13 @@ public class PlayersServlet extends HttpServlet {
 				if (path.length() > 0) {
 					final String[] pathParts = path.split("/");
 					final String playerId = pathParts[0];
-					final Player player = this.playerListener.getPlayer(playerId);
+
+					final Player player = getPlayerById(playerId);
+					if (player == null) {
+						ServletHelper.error(resp, HttpServletResponse.SC_NOT_FOUND, playerId + " not found desu~");
+						return;
+					}
+
 					if (pathParts.length == 1) {
 						postToPlayer(req, resp, player);
 					}
@@ -170,15 +190,15 @@ public class PlayersServlet extends HttpServlet {
 		}
 		else if (act.equals(CMD_PLAYPAUSE)) {
 			player.pausePlaying();
-			writeResponse(req, resp);
+			writeResponse(req, resp, player);
 		}
 		else if (act.equals(CMD_NEXT)) {
 			player.nextTrack();
-			writeResponse(req, resp);
+			writeResponse(req, resp, player);
 		}
 		else if (act.equals(CMD_STOP)) {
 			player.stopPlaying();
-			writeResponse(req, resp);
+			writeResponse(req, resp, player);
 		}
 		else if (act.equals(CMD_SEEK)) {
 			final String positionRaw = req.getParameter("position");
@@ -186,7 +206,7 @@ public class PlayersServlet extends HttpServlet {
 				final double position = Double.parseDouble(positionRaw); // TODO handle ex?
 				final int duration = player.getCurrentTrackDuration();
 				player.seekTo(position / duration); // WTF was I thinking when I wrote this API?
-				writeResponse(req, resp);
+				writeResponse(req, resp, player);
 			}
 			else {
 				ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "'position' parameter not set desu~");
@@ -197,7 +217,7 @@ public class PlayersServlet extends HttpServlet {
 			if (orderRaw != null && orderRaw.length() > 0) {
 				final PlaybackOrder order = OrderHelper.parsePlaybackOrderByName(orderRaw);
 				player.setPlaybackOrder(order);
-				writeResponse(req, resp);
+				writeResponse(req, resp, player);
 			}
 			else {
 				ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "'order' parameter not set desu~");
@@ -208,7 +228,7 @@ public class PlayersServlet extends HttpServlet {
 			if (transcodeRaw != null) {
 				final Transcode transcode = Transcode.parse(transcodeRaw);
 				player.setTranscode(transcode);
-				writeResponse(req, resp);
+				writeResponse(req, resp, player);
 			}
 			else {
 				ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "'order' parameter not set desu~");
@@ -219,7 +239,7 @@ public class PlayersServlet extends HttpServlet {
 			if (monitorString != null && monitorString.length() > 0) {
 				final int monitorId = Integer.parseInt(monitorString);
 				player.goFullscreen(monitorId);
-				writeResponse(req, resp);
+				writeResponse(req, resp, player);
 			}
 			else {
 				ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "'fullscreen' parameter not set desu~");
@@ -233,7 +253,7 @@ public class PlayersServlet extends HttpServlet {
 				final IMediaTrackList<? extends IMediaTrack> list = currentItem != null ? currentItem.getList() : null;
 				if (item != null && list != null) {
 					list.addTag(item, tag, MediaTagType.MANUAL, (MediaTagClassification) null);
-					writeResponse(req, resp);
+					writeResponse(req, resp, player);
 				}
 				else {
 					ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "no list or item to add tag to desu~");
@@ -301,7 +321,7 @@ public class PlayersServlet extends HttpServlet {
 		}
 	}
 
-	private void writeResponse (final HttpServletRequest req, final HttpServletResponse resp) throws IOException, SAXException, MorriganException {
+	private void writeResponse (final HttpServletRequest req, final HttpServletResponse resp, final Player foundPlayer) throws IOException, SAXException, MorriganException {
 		final String requestURI = req.getRequestURI();
 		final String reqPath = requestURI.startsWith(CONTEXTPATH) ? requestURI.substring(CONTEXTPATH.length()) : requestURI;
 
@@ -314,7 +334,7 @@ public class PlayersServlet extends HttpServlet {
 				final String[] pathParts = path.split("/");
 				if (pathParts.length >= 1) {
 					final String playerId = pathParts[0];
-					final Player player = this.playerListener.getPlayer(playerId);
+					final Player player = foundPlayer != null ? foundPlayer : getPlayerById(playerId);
 					if (player == null) {
 						ServletHelper.error(resp, HttpServletResponse.SC_NOT_FOUND, playerId + " not found desu~");
 						return;
