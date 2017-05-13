@@ -31,12 +31,14 @@ This repository contains software from third-parties that are licensed, distribu
 Libraries
 ---------
 
-| [Rich Client Platform](http://wiki.eclipse.org/index.php/Rich_Client_Platform)        | Eclipse Public License.                                              |
-| [sqlite-jdbc](https://code.google.com/p/sqlite-jdbc)                                  | The Apache Software License, Version 2.0.                            |
-| [jetty](http://jetty.codehaus.org/jetty/)                                             | The Apache Software License, Version 2.0.                            |
+| Library                                                                              | Licence                                                              |
+| -------                                                                              | -------                                                              |
+| [Rich Client Platform](http://wiki.eclipse.org/index.php/Rich_Client_Platform)       | Eclipse Public License.                                              |
+| [sqlite-jdbc](https://code.google.com/p/sqlite-jdbc)                                 | The Apache Software License, Version 2.0.                            |
+| [jetty](http://jetty.codehaus.org/jetty/)                                            | The Apache Software License, Version 2.0.                            |
 | [Direct Show Java Wrapper (Windows only)](http://www.humatic.de/htools/dsj.htm)      | The library is free for use in non-commercial projects.              |
 | [gstreamer-java (Linux only)](http://code.google.com/p/gstreamer-java)               | GNU Lesser General Public License.                                   |
 | [jintellitype (Windows only)](http://melloware.com/products/jintellitype/index.html) | The Apache Software License, Version 2.0.                            |
 | [jxgrabkey (Linux only)](http://sourceforge.net/projects/jxgrabkey)                  | GNU Library or "Lesser" General Public License version 3.0 (LGPLv3). |
 | [vlcj (OSX only)](http://code.google.com/p/vlcj/)                                    | GNU GPL v3                                                           |
-| [ jaudiotagger](http://www.jthink.net/jaudiotagger/)                                  | [http://www.gnu.org/copyleft/lesser.html LGPL]                       |
+| [ jaudiotagger](http://www.jthink.net/jaudiotagger/)                                 | [http://www.gnu.org/copyleft/lesser.html LGPL]                       |
