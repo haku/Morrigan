@@ -1,0 +1,11 @@
+#!/bin/bash
+set -eu
+
+DIR="$(dirname "$(readlink -f -- "$0")")"
+mndb="$DIR/mndb"
+if ! [ -e "$mndb" ] ; then
+  log "Not found: $mndb"
+  exit 1
+fi
+
+$mndb playpause

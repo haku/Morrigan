@@ -53,6 +53,8 @@
 				<include name="install_plugin" />
 				<include name="mndb" />
 				<include name="mn-dump-dropbox" />
+				<include name="mn-next" />
+				<include name="mn-playpause" />
 				<include name="mn-pull-dropbox" />
 			</zipfileset>
 			<fileset dir="${wipdir}" />
