@@ -21,6 +21,8 @@ public class ServerConfig implements AuthChecker {
 	private static final String KEY_PLAYER_ENABLED = "player";
 	private static final String DEFAULT_PLAYER_ENABLED = Boolean.TRUE.toString();
 
+	private static final String KEY_BINDIP = "bindip";
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	protected final Logger logger = Logger.getLogger(this.getClass().getName());
@@ -41,6 +43,10 @@ public class ServerConfig implements AuthChecker {
 
 	public boolean isServerPlayerEnabled () throws IOException {
 		return Boolean.parseBoolean(this.propFile.getString(KEY_PLAYER_ENABLED, DEFAULT_PLAYER_ENABLED));
+	}
+
+	public String getBindIp () throws IOException {
+		return this.propFile.getString(KEY_BINDIP, null);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
