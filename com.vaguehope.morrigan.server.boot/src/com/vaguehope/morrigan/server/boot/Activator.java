@@ -11,22 +11,20 @@ import java.util.logging.Logger;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
+import com.vaguehope.morrigan.config.Bundles;
 import com.vaguehope.morrigan.model.media.MediaFactoryTracker;
 import com.vaguehope.morrigan.player.PlayerContainer;
 import com.vaguehope.morrigan.player.PlayerReaderTracker;
-import com.vaguehope.morrigan.transcode.Transcoder;
 import com.vaguehope.morrigan.server.AsyncActions;
 import com.vaguehope.morrigan.server.MorriganServer;
 import com.vaguehope.morrigan.server.ServerConfig;
 import com.vaguehope.morrigan.tasks.AsyncTasksRegisterTracker;
+import com.vaguehope.morrigan.transcode.Transcoder;
 import com.vaguehope.morrigan.util.DaemonThreadFactory;
 
 public class Activator implements BundleActivator {
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private static final Logger logger = Logger.getLogger(Activator.class.getName());
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private MorriganServer server;
 	private UiMgr uiMgr;
@@ -39,8 +37,6 @@ public class Activator implements BundleActivator {
 	private ExecutorService executorService;
 	private ScheduledExecutorService scheduledExecutorService;
 
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
 	@Override
 	public void start (final BundleContext context) throws Exception {
 		this.playerReaderTracker = new PlayerReaderTracker(context);
@@ -50,10 +46,10 @@ public class Activator implements BundleActivator {
 		this.executorService = new ThreadPoolExecutor(0, 1, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), new DaemonThreadFactory("srvboot"));
 		this.scheduledExecutorService = Executors.newScheduledThreadPool(1);
 
-		final ServerConfig config = new ServerConfig();
-		this.uiMgr = new UiMgr();
+		this.uiMgr = new UiMgr(Bundles.GUI.isPresent(context));
 		this.nullScreen = new NullScreen(this.uiMgr);
 
+		final ServerConfig config = new ServerConfig();
 		if (config.isServerPlayerEnabled()) {
 			this.playerContainer = new ServerPlayerContainer(this.uiMgr, this.nullScreen, this.executorService);
 		}
@@ -91,5 +87,4 @@ public class Activator implements BundleActivator {
 		logger.fine("Morrigan Server stopped.");
 	}
 
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

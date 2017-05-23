@@ -5,7 +5,8 @@ Bundle-SymbolicName: com.vaguehope.morrigan.server.boot;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: com.vaguehope.morrigan.server.boot.Activator
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: com.vaguehope.morrigan.engines.playback,
+Import-Package: com.vaguehope.morrigan.config,
+ com.vaguehope.morrigan.engines.playback,
  com.vaguehope.morrigan.model.exceptions,
  com.vaguehope.morrigan.model.media,
  com.vaguehope.morrigan.player,

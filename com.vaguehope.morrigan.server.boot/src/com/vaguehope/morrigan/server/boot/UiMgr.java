@@ -14,8 +14,8 @@ public class UiMgr {
 
 	private final DisplayThread displayThread;
 
-	public UiMgr () {
-		this.displayThread = new DisplayThread();
+	public UiMgr (final boolean guiPresent) {
+		this.displayThread = new DisplayThread(guiPresent);
 		this.displayThread.start();
 	}
 
@@ -52,13 +52,13 @@ public class UiMgr {
 		return getMonitorsCache();
 	}
 
-	public Monitor getMonitor (int monitorIndex) {
+	public Monitor getMonitor (final int monitorIndex) {
 		Map<Integer, Monitor> monitors = getMonitors();
 		if (monitors == null) return null;
 		return monitors.get(Integer.valueOf(monitorIndex));
 	}
 
-	protected void setMonitorsCache (Map<Integer, Monitor> mons) {
+	protected void setMonitorsCache (final Map<Integer, Monitor> mons) {
 		this.monitorsCache = (mons == null ? null : Collections.unmodifiableMap(new LinkedHashMap<Integer, Monitor>(mons)));
 		this.monitorCacheAge = System.currentTimeMillis();
 	}
