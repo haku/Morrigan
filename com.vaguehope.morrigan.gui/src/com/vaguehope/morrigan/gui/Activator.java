@@ -8,15 +8,18 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-
+import com.vaguehope.morrigan.config.Bundles;
 import com.vaguehope.morrigan.engines.hotkey.HotkeyEngineFactory;
 import com.vaguehope.morrigan.engines.hotkey.HotkeyEngineFactoryTracker;
 import com.vaguehope.morrigan.gui.engines.HotkeyRegister;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaFactoryTracker;
 import com.vaguehope.morrigan.player.PlayerRegisterTracker;
+import com.vaguehope.morrigan.server.ServerConfig;
 import com.vaguehope.morrigan.util.DaemonThreadFactory;
+import com.vaguehope.morrigan.util.MnLogger;
 
 public class Activator extends AbstractUIPlugin {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -24,6 +27,8 @@ public class Activator extends AbstractUIPlugin {
 	public static final String PLUGIN_ID = "com.vaguehope.morrigan.gui";
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	private static final MnLogger LOG = MnLogger.make(Activator.class);
 
 	private static BundleContext context;
 	private static Activator plugin;
@@ -53,6 +58,8 @@ public class Activator extends AbstractUIPlugin {
 		this.hotkeyRegister = new HotkeyRegister(this.hotkeyEngineFactoryTracker);
 		this.playerRegisterTracker = new PlayerRegisterTracker(bundleContext);
 		this.executorService = new ThreadPoolExecutor(0, 1, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), new DaemonThreadFactory("gui"));
+
+		autostartServer(context);
 	}
 
 	@Override
@@ -112,4 +119,22 @@ public class Activator extends AbstractUIPlugin {
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	private static void autostartServer (final BundleContext context) {
+		try {
+			if (!new ServerConfig().isAutoStart()) return;
+
+			final Bundle b = Bundles.SERVER_BOOT.getBundle(context);
+			if (b == null) {
+				LOG.e("Server bundle not found.");
+				return;
+			}
+
+			b.start();
+		}
+		catch (final Exception e) {
+			LOG.e("Failed to autostart server.", e);
+		}
+	}
+
 }

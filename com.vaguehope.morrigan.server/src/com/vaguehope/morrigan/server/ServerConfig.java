@@ -23,6 +23,9 @@ public class ServerConfig implements AuthChecker {
 
 	private static final String KEY_BINDIP = "bindip";
 
+	private static final String KEY_AUTOSTART = "autostart";
+	private static final String DEFAULT_AUTOSTART = Boolean.FALSE.toString();
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	protected final Logger logger = Logger.getLogger(this.getClass().getName());
@@ -49,6 +52,9 @@ public class ServerConfig implements AuthChecker {
 		return this.propFile.getString(KEY_BINDIP, null);
 	}
 
+	public boolean isAutoStart () throws IOException {
+		return Boolean.parseBoolean(this.propFile.getString(KEY_AUTOSTART, DEFAULT_AUTOSTART));
+	}
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	AuthChecker
 
