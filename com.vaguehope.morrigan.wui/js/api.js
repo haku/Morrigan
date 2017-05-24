@@ -59,7 +59,7 @@ MnApi = {};
     player.stateName = PLAYER_STATE_NAMES[parseInt(player.state, 10)];
     player.stateIcon = PLAYER_STATE_ICONS[parseInt(player.state, 10)];
 
-    player.playOrder = parseInt(node.find('playorder').text(), 10);
+    player.playOrderId = node.find('playorderid').text();
     player.playOrderTitle = node.find('playordertitle').text();
 
     player.transcode = node.find('transcode').text();
@@ -130,6 +130,15 @@ MnApi = {};
     {id: "BYLASTPLAYED", title: "By Last-Played"},
     {id: "MANUAL",       title: "Manual"}
   ];
+
+  var idToPlaybackOrder = {};
+  $.each(MnApi.PLAYBACK_ORDERS, function(index, order) {
+    idToPlaybackOrder[order.id] = order;
+  });
+
+  MnApi.playbackOrderFromId = function(id) {
+    return idToPlaybackOrder[id];
+  };
 
   MnApi.TRANSCODES = [
     {id: "",           title: "No Transcode"},

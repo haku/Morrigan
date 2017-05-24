@@ -432,7 +432,7 @@ public class PlayersServlet extends HttpServlet {
 		FeedHelper.addElement(dw, "playerid", p.getId());
 		FeedHelper.addElement(dw, "playername", p.getName());
 		FeedHelper.addElement(dw, "playstate", p.getPlayState().getN());
-		FeedHelper.addElement(dw, "playorder", p.getPlaybackOrder().getN());
+		FeedHelper.addElement(dw, "playorderid", p.getPlaybackOrder().name());
 		FeedHelper.addElement(dw, "playordertitle", p.getPlaybackOrder().toString());
 		FeedHelper.addElement(dw, "transcode", p.getTranscode().getSymbolicName());
 		FeedHelper.addElement(dw, "transcodetitle", p.getTranscode().toString());

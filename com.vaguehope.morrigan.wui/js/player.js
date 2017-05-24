@@ -219,7 +219,6 @@ Players = {};
     player.state = node.find('playstate').text();
     player.stateName = playerStateToLabel(parseInt(player.state));
 
-    player.playOrder = node.find('playorder').text();
     player.playOrderTitle = node.find('playordertitle').text();
 
     player.trackTitle = node.find('tracktitle').text();

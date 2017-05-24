@@ -21,51 +21,41 @@ public final class OrderHelper {
 	// TODO move to own class next to IPlayerAbstact that uses it.
 	public static enum PlaybackOrder {
 
-		SEQUENTIAL(0) {
+		SEQUENTIAL() {
 			@Override
 			public String toString () {
 				return "sequential";
 			}
 		},
 
-		RANDOM(1) {
+		RANDOM() {
 			@Override
 			public String toString () {
 				return "random";
 			}
 		},
 
-		BYSTARTCOUNT(2) {
+		BYSTARTCOUNT() {
 			@Override
 			public String toString () {
 				return "by start-count";
 			}
 		},
 
-		BYLASTPLAYED(3) {
+		BYLASTPLAYED() {
 			@Override
 			public String toString () {
 				return "by last-played";
 			}
 		},
 
-		MANUAL(4) {
+		MANUAL() {
 			@Override
 			public String toString () {
 				return "manual";
 			}
 		}
 		;
-
-		private int n;
-
-		private PlaybackOrder (final int n) {
-			this.n = n;
-		}
-
-		public int getN () {
-			return this.n;
-		}
 
 		public static String joinLabels (final String sep) {
 			final PlaybackOrder[] a = values();
@@ -79,13 +69,6 @@ public final class OrderHelper {
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	public static PlaybackOrder parsePlaybackOrder (final String s) {
-		for (final PlaybackOrder o : PlaybackOrder.values()) {
-			if (s.equals(o.toString())) return o;
-		}
-		throw new IllegalArgumentException("Unknown order mode toString: " + s);
-	}
 
 	public static PlaybackOrder forceParsePlaybackOrder (final String s) {
 		final String arg = s.toLowerCase();

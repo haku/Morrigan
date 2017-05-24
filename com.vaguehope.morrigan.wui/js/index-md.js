@@ -403,7 +403,7 @@
     $('#player_name').text(player.name + ' (' + HOST_NAME + ')');
     $('#queue_tab_icon').text(player.stateIcon);
     $('#subtitle_list_name').text(player.listTitle);
-    $('#subtitle_playback_order').text(MnApi.PLAYBACK_ORDERS[player.playOrder]['title']);
+    $('#subtitle_playback_order').text(MnApi.playbackOrderFromId(player.playOrderId)['title']);
     $('#subtitle_transcode').text(player.transcodeTitle);
     $('#track_title').text(player.trackTitle);
     $('#track_tags').text(player.tags.length > 0 ? player.tags.join(', ') : '(no tags)');
