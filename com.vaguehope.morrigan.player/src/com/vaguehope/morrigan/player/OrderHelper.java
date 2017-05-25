@@ -1,18 +1,34 @@
 package com.vaguehope.morrigan.player;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
+import com.vaguehope.morrigan.model.db.IDbColumn;
+import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
+import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
+import com.vaguehope.morrigan.model.media.IMixedMediaDb;
+import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
+import com.vaguehope.morrigan.model.media.IMixedMediaItemStorageLayer;
+import com.vaguehope.morrigan.model.media.MediaTag;
+import com.vaguehope.morrigan.model.media.MediaTagType;
+import com.vaguehope.sqlitewrapper.DbException;
 
 /**
  * TODO move this to internal package. TODO make one big enum based on an
  * interface?
  */
 public final class OrderHelper {
+
+	private static final int FOLLOWTAGS_MAX_RESULTS_PER_TAG_SEARCH = 200;
+	private static final long FOLLOWTAGS_MIN_TIME_SINCE_LAST_PLAYED_MILLIS = TimeUnit.DAYS.toMillis(1);
 
 	private OrderHelper () {}
 
@@ -49,12 +65,19 @@ public final class OrderHelper {
 			}
 		},
 
+		FOLLOWTAGS() {
+			@Override
+			public String toString () {
+				return "follow tags";
+			}
+		},
+
 		MANUAL() {
 			@Override
 			public String toString () {
 				return "manual";
 			}
-		}
+		},
 		;
 
 		public static String joinLabels (final String sep) {
@@ -104,6 +127,9 @@ public final class OrderHelper {
 
 			case BYLASTPLAYED:
 				return getNextTrackByLastPlayedDate(list, track);
+
+			case FOLLOWTAGS:
+				return getNextTrackFollowTags(list, track);
 
 			case MANUAL:
 				return null;
@@ -226,8 +252,10 @@ public final class OrderHelper {
 	}
 
 	private static IMediaTrack getNextTrackByLastPlayedDate (final IMediaItemList<? extends IMediaTrack> list, final IMediaTrack current) {
-		IMediaTrack ret = null;
-		final List<? extends IMediaTrack> tracks = list.getMediaItems();
+		return getNextTrackByLastPlayedDate(list.getMediaItems(), current);
+	}
+
+	private static IMediaTrack getNextTrackByLastPlayedDate (final Collection<? extends IMediaTrack> tracks, final IMediaTrack current) {
 		final Date now = new Date();
 
 		// Find oldest date.
@@ -264,6 +292,7 @@ public final class OrderHelper {
 		long targetIndex = Math.round(generator.nextDouble() * sumAgeDays);
 
 		// Find the target item.
+		IMediaTrack ret = null;
 		for (final IMediaTrack i : tracks) {
 			if (validChoice(i, current)) {
 				if (i.getDateLastPlayed() != null) {
@@ -284,6 +313,64 @@ public final class OrderHelper {
 		}
 
 		return ret;
+	}
+
+	private static IMediaTrack getNextTrackFollowTags (final IMediaItemList<? extends IMediaTrack> list, final IMediaTrack current) {
+		try {
+			return getNextTrackFollowTagsOrThrow(list, current);
+		}
+		catch (final MorriganException e) {
+			throw new IllegalStateException(e);
+		}
+		catch (final DbException e) {
+			throw new IllegalStateException(e);
+		}
+	}
+
+	private static IMediaTrack getNextTrackFollowTagsOrThrow (final IMediaItemList<? extends IMediaTrack> list, final IMediaTrack current) throws MorriganException, DbException {
+		// Can not follow tags if no current item.
+		if (current == null) return getNextTrackByLastPlayedDate(list, current);
+
+		if (!(list instanceof IMixedMediaDb)) throw new IllegalArgumentException("Only DB lists supported.");
+		final IMixedMediaDb db = (IMixedMediaDb) list;
+
+		final List<MediaTag> currentTags = db.getTags(current);
+		// TODO make this part of getTags()?
+		for (final Iterator<MediaTag> ittr = currentTags.iterator(); ittr.hasNext();) {
+			if (ittr.next().getType() != MediaTagType.MANUAL) ittr.remove();
+		}
+
+		// TODO make this try and use the same tag as list time if possible?
+		// Perhaps be sticky to one tag until the choices don't look so good,
+		// then getNextTrackByLastPlayedDate() across all the candidates?
+		Collections.shuffle(currentTags);
+
+		for (final MediaTag tag : currentTags) {
+			final List<? extends IMediaTrack> itemsWithTag = db.simpleSearchMedia(
+					MediaType.TRACK,
+					String.format("t=\"%s\"", tag.getTag()),
+					FOLLOWTAGS_MAX_RESULTS_PER_TAG_SEARCH,
+					new IDbColumn[] {
+					IMixedMediaItemStorageLayer.SQL_TBL_MEDIAFILES_COL_DLASTPLAY,
+					},
+					new SortDirection[] { SortDirection.ASC },
+					false);
+
+			for (final Iterator<? extends IMediaTrack> ittr = itemsWithTag.iterator(); ittr.hasNext();) {
+				final Date d = ittr.next().getDateLastPlayed();
+				if (d == null) continue;
+				if (System.currentTimeMillis() - d.getTime() < FOLLOWTAGS_MIN_TIME_SINCE_LAST_PLAYED_MILLIS) ittr.remove();
+			}
+
+			if (itemsWithTag.size() > 0) {
+				// byLastPlayedDate() handles not selecting current again.
+				final IMediaTrack item = getNextTrackByLastPlayedDate(itemsWithTag, current);
+				if (item != null) return item;
+			}
+		}
+
+		// Fall back if no tags to follow.
+		return getNextTrackByLastPlayedDate(list, current);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -2,7 +2,9 @@ package com.vaguehope.morrigan.model.media.test;
 
 import java.io.File;
 import java.math.BigInteger;
+import java.util.Date;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
@@ -52,6 +54,10 @@ public class TestMixedMediaDb extends LocalMixedMediaDb {
 		final IMixedMediaItem track = getByFile(file); // Workaround so dbRowId is filled in.
 		setItemMediaType(track, MediaType.TRACK);
 		setItemHashCode(track, hashCode);
+
+		final Date lastPlayed = new Date(System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(RND.nextInt(144000)));
+		setTrackDateLastPlayed(track, lastPlayed);
+
 		return track;
 	}
 

@@ -128,6 +128,7 @@ MnApi = {};
     {id: "RANDOM",       title: "Random"},
     {id: "BYSTARTCOUNT", title: "By Start-Count"},
     {id: "BYLASTPLAYED", title: "By Last-Played"},
+    {id: "FOLLOWTAGS",   title: "Follow Tags"},
     {id: "MANUAL",       title: "Manual"}
   ];
 

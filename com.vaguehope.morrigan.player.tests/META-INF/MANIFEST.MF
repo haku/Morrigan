@@ -11,6 +11,7 @@ Require-Bundle: org.junit;bundle-version="[4.0.0,5.0.0)",
  com.vaguehope.morrigan.model.media_impl
 Import-Package: com.vaguehope.morrigan.model,
  com.vaguehope.morrigan.model.db,
+ com.vaguehope.morrigan.model.exceptions,
  com.vaguehope.morrigan.model.media,
  com.vaguehope.sqlitewrapper,
  org.osgi.framework

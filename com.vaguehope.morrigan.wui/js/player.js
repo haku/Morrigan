@@ -11,6 +11,7 @@ Players = {};
     {id: "RANDOM",       title: "random"},
     {id: "BYSTARTCOUNT", title: "by start-count"},
     {id: "BYLASTPLAYED", title: "by last-played"},
+    {id: "FOLLOWTAGS",   title: "follow tags"},
     {id: "MANUAL",       title: "manual"}
   ];
 
