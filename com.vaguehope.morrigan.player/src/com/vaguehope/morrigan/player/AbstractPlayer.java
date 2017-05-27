@@ -31,7 +31,10 @@ public abstract class AbstractPlayer implements Player {
 	private final ExecutorService loadEs;
 	private final PlayerQueue queue = new DefaultPlayerQueue();
 	private final PlayerEventListenerCaller listeners = new PlayerEventListenerCaller();
+
+	private final OrderHelper orderHelper = new OrderHelper();
 	private final AtomicReference<PlaybackOrder> playbackOrder = new AtomicReference<PlaybackOrder>(PlaybackOrder.MANUAL);
+
 	private final AtomicReference<Transcode> transcode = new AtomicReference<Transcode>(Transcode.NONE);
 	private final Transcoder transcoder = new Transcoder();
 
@@ -134,6 +137,10 @@ public abstract class AbstractPlayer implements Player {
 		this.listeners.playOrderChanged(order);
 	}
 
+	protected OrderHelper getOrderHelper () {
+		return this.orderHelper;
+	}
+
 	@Override
 	public PlaybackOrder getPlaybackOrder () {
 		return this.playbackOrder.get();
@@ -179,7 +186,7 @@ public abstract class AbstractPlayer implements Player {
 		PlayItem pi = item;
 		if (!pi.hasTrack()) {
 			// TODO FIXME what if Playback Order is MANUAL?
-			final IMediaTrack track = OrderHelper.getNextTrack(pi.getList(), null, getPlaybackOrder());
+			final IMediaTrack track = this.orderHelper .getNextTrack(pi.getList(), null, getPlaybackOrder());
 			if (track == null) {
 				System.err.println("Failed to fill in track: " + pi);
 				return;

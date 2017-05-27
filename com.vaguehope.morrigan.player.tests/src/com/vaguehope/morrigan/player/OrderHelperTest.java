@@ -20,23 +20,25 @@ public class OrderHelperTest {
 
 	private final Random random = new Random();
 	private TestMixedMediaDb testDb;
+	private OrderHelper undertest;
 
 	@Before
 	public void before () throws Exception {
 		this.testDb = new TestMixedMediaDb();
+		this.undertest = new OrderHelper();
 	}
 
 	@Test
 	public void itPicksTheOneTrackWhenThereIsOnlyOneTrackByLastPlayed () throws Exception {
 		final IMixedMediaItem expected = this.testDb.addTestTrack();
-		final IMediaTrack actual = OrderHelper.getNextTrack(this.testDb, null, PlaybackOrder.BYLASTPLAYED);
+		final IMediaTrack actual = this.undertest.getNextTrack(this.testDb, null, PlaybackOrder.BYLASTPLAYED);
 		assertSame(expected, actual);
 	}
 
 	@Test
 	public void FollowTagsReturnsNullIfNoOtherTracksToChoose () throws Exception {
 		final IMixedMediaItem expected = this.testDb.addTestTrack();
-		final IMediaTrack actual = OrderHelper.getNextTrack(this.testDb, null, PlaybackOrder.FOLLOWTAGS);
+		final IMediaTrack actual = this.undertest.getNextTrack(this.testDb, null, PlaybackOrder.FOLLOWTAGS);
 		assertSame(expected, actual);
 	}
 
@@ -44,7 +46,7 @@ public class OrderHelperTest {
 	public void itPicksTheOneTrackWhenThereIsOnlyOneTrackFollowTags () throws Exception {
 		final IMixedMediaItem current = this.testDb.addTestTrack();
 		final IMixedMediaItem expected = this.testDb.addTestTrack();
-		final IMediaTrack actual = OrderHelper.getNextTrack(this.testDb, current, PlaybackOrder.FOLLOWTAGS);
+		final IMediaTrack actual = this.undertest.getNextTrack(this.testDb, current, PlaybackOrder.FOLLOWTAGS);
 		assertSame(expected, actual);
 	}
 
@@ -63,7 +65,7 @@ public class OrderHelperTest {
 		addTag("foobar", current, expected, tooRecentlyPlayed);
 		addRandomTags(current, expected, tooRecentlyPlayed);
 
-		final IMediaTrack actual = OrderHelper.getNextTrack(this.testDb, current, PlaybackOrder.FOLLOWTAGS);
+		final IMediaTrack actual = this.undertest.getNextTrack(this.testDb, current, PlaybackOrder.FOLLOWTAGS);
 		assertSame(expected, actual);
 	}
 
@@ -81,7 +83,7 @@ public class OrderHelperTest {
 		final IMixedMediaItem expected = this.testDb.addTestTrack();
 		setTimeAgoLastPlayed(expected, 100000, TimeUnit.DAYS);
 
-		final IMediaTrack actual = OrderHelper.getNextTrack(this.testDb, current, PlaybackOrder.FOLLOWTAGS);
+		final IMediaTrack actual = this.undertest.getNextTrack(this.testDb, current, PlaybackOrder.FOLLOWTAGS);
 		assertSame(expected, actual);
 	}
 

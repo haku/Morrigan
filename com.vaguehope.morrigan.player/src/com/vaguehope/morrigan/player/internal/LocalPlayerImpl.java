@@ -27,7 +27,6 @@ import com.vaguehope.morrigan.model.media.MediaItemListChangeListener;
 import com.vaguehope.morrigan.player.AbstractPlayer;
 import com.vaguehope.morrigan.player.LocalPlayer;
 import com.vaguehope.morrigan.player.LocalPlayerSupport;
-import com.vaguehope.morrigan.player.OrderHelper;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayerRegister;
@@ -147,7 +146,7 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 		final PlaybackOrder playbackOrder = getPlaybackOrder();
 
 		if (currentItem != null && currentItem.isComplete()) {
-			final IMediaTrack nextTrack = OrderHelper.getNextTrack(currentItem.getList(), currentItem.getTrack(), playbackOrder);
+			final IMediaTrack nextTrack = getOrderHelper().getNextTrack(currentItem.getList(), currentItem.getTrack(), playbackOrder);
 			if (nextTrack != null) {
 				return new PlayItem(currentItem.getList(), nextTrack);
 			}
@@ -156,7 +155,7 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 		}
 
 		final IMediaTrackList<? extends IMediaTrack> currentList = getCurrentList();
-		final IMediaTrack nextTrack = OrderHelper.getNextTrack(currentList, null, playbackOrder);
+		final IMediaTrack nextTrack = getOrderHelper().getNextTrack(currentList, null, playbackOrder);
 		if (nextTrack != null) {
 			return new PlayItem(currentList, nextTrack);
 		}

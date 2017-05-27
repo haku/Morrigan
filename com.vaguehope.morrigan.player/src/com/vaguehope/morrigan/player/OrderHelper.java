@@ -22,15 +22,13 @@ import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.util.MnLogger;
 import com.vaguehope.sqlitewrapper.DbException;
 
-public final class OrderHelper {
+public class OrderHelper {
 
 	private static final int FOLLOWTAGS_MAX_RESULTS_PER_TAG_SEARCH = 200;
 	private static final long FOLLOWTAGS_MIN_TIME_SINCE_LAST_PLAYED_MILLIS = TimeUnit.DAYS.toMillis(1);
 	private static final MnLogger LOG = MnLogger.make(OrderHelper.class);
 
-	private OrderHelper () {}
-
-	public static IMediaTrack getNextTrack (final IMediaItemList<? extends IMediaTrack> list, final IMediaTrack track, final PlaybackOrder mode) {
+	public IMediaTrack getNextTrack (final IMediaItemList<? extends IMediaTrack> list, final IMediaTrack track, final PlaybackOrder mode) {
 		if (list == null || list.getCount() <= 0) return null;
 
 		switch (mode) {
