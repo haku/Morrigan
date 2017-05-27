@@ -1,5 +1,6 @@
 package com.vaguehope.morrigan.player;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -19,6 +20,7 @@ import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMixedMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagType;
+import com.vaguehope.morrigan.util.LimitedRecentSet;
 import com.vaguehope.morrigan.util.MnLogger;
 import com.vaguehope.sqlitewrapper.DbException;
 
@@ -26,7 +28,10 @@ public class OrderResolver {
 
 	private static final int FOLLOWTAGS_MAX_RESULTS_PER_TAG_SEARCH = 200;
 	private static final long FOLLOWTAGS_MIN_TIME_SINCE_LAST_PLAYED_MILLIS = TimeUnit.DAYS.toMillis(1);
+	private static final int FOLLOWTAGS_MAX_TAG_HISTORY = 3;
 	private static final MnLogger LOG = MnLogger.make(OrderResolver.class);
+
+	private final LimitedRecentSet<String> recentlyFollowedTags = new LimitedRecentSet<String>(FOLLOWTAGS_MAX_TAG_HISTORY);
 
 	public IMediaTrack getNextTrack (final IMediaItemList<? extends IMediaTrack> list, final IMediaTrack track, final PlaybackOrder mode) {
 		if (list == null || list.getCount() <= 0) return null;
@@ -229,7 +234,7 @@ public class OrderResolver {
 		return ret;
 	}
 
-	private static IMediaTrack getNextTrackFollowTags (final IMediaItemList<? extends IMediaTrack> list, final IMediaTrack current) {
+	private IMediaTrack getNextTrackFollowTags (final IMediaItemList<? extends IMediaTrack> list, final IMediaTrack current) {
 		try {
 			return getNextTrackFollowTagsOrThrow(list, current);
 		}
@@ -241,31 +246,33 @@ public class OrderResolver {
 		}
 	}
 
-	private static IMediaTrack getNextTrackFollowTagsOrThrow (final IMediaItemList<? extends IMediaTrack> list, final IMediaTrack current) throws MorriganException, DbException {
+	private IMediaTrack getNextTrackFollowTagsOrThrow (final IMediaItemList<? extends IMediaTrack> list, final IMediaTrack current) throws MorriganException, DbException {
 		// Can not follow tags if no current item.
 		if (current == null) return getNextTrackByLastPlayedDate(list, current);
 
 		if (!(list instanceof IMixedMediaDb)) throw new IllegalArgumentException("Only DB lists supported.");
 		final IMixedMediaDb db = (IMixedMediaDb) list;
 
-		final List<MediaTag> currentTags = db.getTags(current);
-		// TODO make this part of getTags()?
-		for (final Iterator<MediaTag> ittr = currentTags.iterator(); ittr.hasNext();) {
-			if (ittr.next().getType() != MediaTagType.MANUAL) ittr.remove();
+		final List<String> currentItemsTags = manualTagsAsStrings(db.getTags(current));
+		final List<String> tagsToSearchForInOrder = new ArrayList<String>();
+		synchronized (this.recentlyFollowedTags) {
+			for (String lastTag : this.recentlyFollowedTags) {
+				if (currentItemsTags.contains(lastTag)) {
+					tagsToSearchForInOrder.add(lastTag);
+					currentItemsTags.remove(lastTag);
+				}
+			}
 		}
+		Collections.shuffle(currentItemsTags);
+		tagsToSearchForInOrder.addAll(currentItemsTags);
 
-		// TODO make this try and use the same tag as list time if possible?
-		// Perhaps be sticky to one tag until the choices don't look so good,
-		// then getNextTrackByLastPlayedDate() across all the candidates?
-		Collections.shuffle(currentTags);
-
-		for (final MediaTag tag : currentTags) {
+		for (final String tag : tagsToSearchForInOrder) {
 			final List<? extends IMediaTrack> itemsWithTag = db.simpleSearchMedia(
 					MediaType.TRACK,
-					String.format("t=\"%s\"", tag.getTag()),
+					String.format("t=\"%s\"", tag),
 					FOLLOWTAGS_MAX_RESULTS_PER_TAG_SEARCH,
 					new IDbColumn[] {
-					IMixedMediaItemStorageLayer.SQL_TBL_MEDIAFILES_COL_DLASTPLAY,
+						IMixedMediaItemStorageLayer.SQL_TBL_MEDIAFILES_COL_DLASTPLAY,
 					},
 					new SortDirection[] { SortDirection.ASC },
 					false);
@@ -280,7 +287,8 @@ public class OrderResolver {
 				// byLastPlayedDate() handles not selecting current again.
 				final IMediaTrack item = getNextTrackByLastPlayedDate(itemsWithTag, current);
 				if (item != null) {
-					LOG.i("{0} => {1}", tag.getTag(), item.getTitle());
+					LOG.i("{0} => {1}", tag, item.getTitle());
+					this.recentlyFollowedTags.push(tag);
 					return item;
 				}
 			}
@@ -288,6 +296,14 @@ public class OrderResolver {
 
 		// Fall back if no tags to follow.
 		return getNextTrackByLastPlayedDate(list, current);
+	}
+
+	private List<String> manualTagsAsStrings (final List<MediaTag> tags) {
+		final List<String> ret = new ArrayList<String>(tags.size());
+		for (final MediaTag tag : tags) {
+			if (tag.getType() == MediaTagType.MANUAL) ret.add(tag.getTag());
+		}
+		return ret;
 	}
 
 	private static boolean validChoice (final IMediaTrack i) {

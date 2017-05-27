@@ -87,6 +87,38 @@ public class OrderResolverTest {
 		assertSame(expected, actual);
 	}
 
+	@Test
+	public void itFollowsTheSameTagAsBeforeIfPossible () throws Exception {
+		addRandomTracks();
+
+		final IMixedMediaItem current = this.testDb.addTestTrack();
+		setTimeAgoLastPlayed(current, 2, TimeUnit.MINUTES);
+
+		final IMixedMediaItem next1 = this.testDb.addTestTrack();
+		setTimeAgoLastPlayed(next1, 2, TimeUnit.DAYS);
+
+		addTag("foobar", current, next1);
+		addTag("batbif", next1);
+		addRandomTags(current, next1);
+
+		final IMediaTrack actual1 = this.undertest.getNextTrack(this.testDb, current, PlaybackOrder.FOLLOWTAGS);
+		assertSame(next1, actual1);
+		setTimeAgoLastPlayed(next1, 2, TimeUnit.MINUTES);
+
+		final IMixedMediaItem next2 = this.testDb.addTestTrack();
+		setTimeAgoLastPlayed(next2, 2, TimeUnit.DAYS);
+		addTag("foobar", next2);
+		addRandomTags(next2);
+
+		final IMixedMediaItem notNext = this.testDb.addTestTrack();
+		setTimeAgoLastPlayed(notNext, 2, TimeUnit.DAYS);
+		addTag("batbif", notNext);
+		addRandomTags(notNext);
+
+		final IMediaTrack actual2 = this.undertest.getNextTrack(this.testDb, next1, PlaybackOrder.FOLLOWTAGS);
+		assertSame(next2, actual2);
+	}
+
 	private void setTimeAgoLastPlayed (final IMixedMediaItem toRecentlyPlayed, final int time, final TimeUnit unit) throws MorriganException {
 		this.testDb.setTrackDateLastPlayed(toRecentlyPlayed, new Date(System.currentTimeMillis() - unit.toMillis(time)));
 	}
