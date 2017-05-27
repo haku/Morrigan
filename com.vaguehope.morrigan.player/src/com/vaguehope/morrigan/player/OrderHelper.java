@@ -19,6 +19,7 @@ import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMixedMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagType;
+import com.vaguehope.morrigan.util.MnLogger;
 import com.vaguehope.sqlitewrapper.DbException;
 
 /**
@@ -29,6 +30,7 @@ public final class OrderHelper {
 
 	private static final int FOLLOWTAGS_MAX_RESULTS_PER_TAG_SEARCH = 200;
 	private static final long FOLLOWTAGS_MIN_TIME_SINCE_LAST_PLAYED_MILLIS = TimeUnit.DAYS.toMillis(1);
+	private static final MnLogger LOG = MnLogger.make(OrderHelper.class);
 
 	private OrderHelper () {}
 
@@ -365,7 +367,10 @@ public final class OrderHelper {
 			if (itemsWithTag.size() > 0) {
 				// byLastPlayedDate() handles not selecting current again.
 				final IMediaTrack item = getNextTrackByLastPlayedDate(itemsWithTag, current);
-				if (item != null) return item;
+				if (item != null) {
+					LOG.i("{0} => {1}", tag.getTag(), item.getTitle());
+					return item;
+				}
 			}
 		}
 
