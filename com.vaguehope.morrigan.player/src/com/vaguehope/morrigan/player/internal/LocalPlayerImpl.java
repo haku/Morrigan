@@ -146,20 +146,20 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 		final PlaybackOrder playbackOrder = getPlaybackOrder();
 
 		if (currentItem != null && currentItem.isComplete()) {
-			final IMediaTrack nextTrack = getOrderHelper().getNextTrack(currentItem.getList(), currentItem.getTrack(), playbackOrder);
+			final IMediaTrack nextTrack = getOrderResolver().getNextTrack(currentItem.getList(), currentItem.getTrack(), playbackOrder);
 			if (nextTrack != null) {
 				return new PlayItem(currentItem.getList(), nextTrack);
 			}
-			this.logger.info(String.format("OrderHelper.getNextTrack(%s,%s,%s) == null.",
+			this.logger.info(String.format("OrderResolver.getNextTrack(%s,%s,%s) == null.",
 					currentItem.getList(), currentItem.getTrack(), playbackOrder));
 		}
 
 		final IMediaTrackList<? extends IMediaTrack> currentList = getCurrentList();
-		final IMediaTrack nextTrack = getOrderHelper().getNextTrack(currentList, null, playbackOrder);
+		final IMediaTrack nextTrack = getOrderResolver().getNextTrack(currentList, null, playbackOrder);
 		if (nextTrack != null) {
 			return new PlayItem(currentList, nextTrack);
 		}
-		this.logger.info(String.format("OrderHelper.getNextTrack(%s,%s,%s) == null.",
+		this.logger.info(String.format("OrderResolver.getNextTrack(%s,%s,%s) == null.",
 				currentList, null, playbackOrder));
 
 		return null;

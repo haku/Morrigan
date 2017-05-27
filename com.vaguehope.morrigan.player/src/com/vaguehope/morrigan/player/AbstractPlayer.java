@@ -32,7 +32,7 @@ public abstract class AbstractPlayer implements Player {
 	private final PlayerQueue queue = new DefaultPlayerQueue();
 	private final PlayerEventListenerCaller listeners = new PlayerEventListenerCaller();
 
-	private final OrderHelper orderHelper = new OrderHelper();
+	private final OrderResolver orderHelper = new OrderResolver();
 	private final AtomicReference<PlaybackOrder> playbackOrder = new AtomicReference<PlaybackOrder>(PlaybackOrder.MANUAL);
 
 	private final AtomicReference<Transcode> transcode = new AtomicReference<Transcode>(Transcode.NONE);
@@ -137,7 +137,7 @@ public abstract class AbstractPlayer implements Player {
 		this.listeners.playOrderChanged(order);
 	}
 
-	protected OrderHelper getOrderHelper () {
+	protected OrderResolver getOrderResolver () {
 		return this.orderHelper;
 	}
 

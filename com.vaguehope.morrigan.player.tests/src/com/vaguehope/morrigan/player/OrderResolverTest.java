@@ -16,16 +16,16 @@ import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.model.media.test.TestMixedMediaDb;
 import com.vaguehope.sqlitewrapper.DbException;
 
-public class OrderHelperTest {
+public class OrderResolverTest {
 
 	private final Random random = new Random();
 	private TestMixedMediaDb testDb;
-	private OrderHelper undertest;
+	private OrderResolver undertest;
 
 	@Before
 	public void before () throws Exception {
 		this.testDb = new TestMixedMediaDb();
-		this.undertest = new OrderHelper();
+		this.undertest = new OrderResolver();
 	}
 
 	@Test
