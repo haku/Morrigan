@@ -22,10 +22,6 @@ import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.util.MnLogger;
 import com.vaguehope.sqlitewrapper.DbException;
 
-/**
- * TODO move this to internal package. TODO make one big enum based on an
- * interface?
- */
 public final class OrderHelper {
 
 	private static final int FOLLOWTAGS_MAX_RESULTS_PER_TAG_SEARCH = 200;
@@ -33,86 +29,6 @@ public final class OrderHelper {
 	private static final MnLogger LOG = MnLogger.make(OrderHelper.class);
 
 	private OrderHelper () {}
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	// TODO move to own class next to IPlayerAbstact that uses it.
-	public static enum PlaybackOrder {
-
-		SEQUENTIAL() {
-			@Override
-			public String toString () {
-				return "sequential";
-			}
-		},
-
-		RANDOM() {
-			@Override
-			public String toString () {
-				return "random";
-			}
-		},
-
-		BYSTARTCOUNT() {
-			@Override
-			public String toString () {
-				return "by start-count";
-			}
-		},
-
-		BYLASTPLAYED() {
-			@Override
-			public String toString () {
-				return "by last-played";
-			}
-		},
-
-		FOLLOWTAGS() {
-			@Override
-			public String toString () {
-				return "follow tags";
-			}
-		},
-
-		MANUAL() {
-			@Override
-			public String toString () {
-				return "manual";
-			}
-		},
-		;
-
-		public static String joinLabels (final String sep) {
-			final PlaybackOrder[] a = values();
-			final StringBuilder b = new StringBuilder(a[0].toString());
-			for (int i = 1; i < a.length; i++) {
-				b.append(sep).append(a[i].toString());
-			}
-			return b.toString();
-		}
-
-	}
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	public static PlaybackOrder forceParsePlaybackOrder (final String s) {
-		final String arg = s.toLowerCase();
-		for (final PlaybackOrder o : PlaybackOrder.values()) {
-			if (o.toString().toLowerCase().contains(arg)) {
-				return o;
-			}
-		}
-		return null;
-	}
-
-	public static PlaybackOrder parsePlaybackOrderByName (final String s) {
-		for (final PlaybackOrder o : PlaybackOrder.values()) {
-			if (s.equals(o.name())) return o;
-		}
-		throw new IllegalArgumentException("Unknown order mode name: " + s);
-	}
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	public static IMediaTrack getNextTrack (final IMediaItemList<? extends IMediaTrack> list, final IMediaTrack track, final PlaybackOrder mode) {
 		if (list == null || list.getCount() <= 0) return null;
@@ -141,8 +57,6 @@ public final class OrderHelper {
 
 		}
 	}
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private static IMediaTrack getNextTrackSequencial (final IMediaItemList<? extends IMediaTrack> list, final IMediaItem track) {
 		IMediaTrack ret = null;
@@ -378,8 +292,6 @@ public final class OrderHelper {
 		return getNextTrackByLastPlayedDate(list, current);
 	}
 
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
 	private static boolean validChoice (final IMediaTrack i) {
 		return i.isEnabled() && i.isPlayable() && !i.isMissing();
 	}
@@ -388,13 +300,10 @@ public final class OrderHelper {
 		return i.isEnabled() && i.isPlayable() && !i.isMissing() && i != current;
 	}
 
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
 	private static long dateDiffDays (final Date olderDate, final Date newerDate) {
 		long l = (newerDate.getTime() - olderDate.getTime()) / 86400000;
 		if (l < 1) l = 1;
 		return l;
 	}
 
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

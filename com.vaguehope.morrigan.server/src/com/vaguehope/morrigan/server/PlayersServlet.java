@@ -26,11 +26,10 @@ import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagClassification;
 import com.vaguehope.morrigan.model.media.MediaTagType;
-import com.vaguehope.morrigan.player.OrderHelper;
-import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.transcode.Transcode;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlayItemType;
+import com.vaguehope.morrigan.player.PlaybackOrder;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayerFinder;
 import com.vaguehope.morrigan.player.PlayerReader;
@@ -215,7 +214,7 @@ public class PlayersServlet extends HttpServlet {
 		else if (act.equals(CMD_PLAYBACKORDER)) {
 			final String orderRaw = req.getParameter("order");
 			if (orderRaw != null && orderRaw.length() > 0) {
-				final PlaybackOrder order = OrderHelper.parsePlaybackOrderByName(orderRaw);
+				final PlaybackOrder order = PlaybackOrder.parsePlaybackOrderByName(orderRaw);
 				player.setPlaybackOrder(order);
 				writeResponse(req, resp, player);
 			}

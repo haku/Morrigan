@@ -51,9 +51,8 @@ import com.vaguehope.morrigan.model.media.IMixedMediaList;
 import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 import com.vaguehope.morrigan.player.LocalPlayer;
 import com.vaguehope.morrigan.player.LocalPlayerSupport;
-import com.vaguehope.morrigan.player.OrderHelper;
-import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayItem;
+import com.vaguehope.morrigan.player.PlaybackOrder;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.Player.PlayerEventListener;
 import com.vaguehope.morrigan.player.PlayerLifeCycleListener;
@@ -109,7 +108,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 		if (memento != null) {
 			String modeName = memento.getString(KEY_ORDERMODE);
 			if (modeName != null) {
-				getPlayer().setPlaybackOrder(OrderHelper.parsePlaybackOrderByName(modeName));
+				getPlayer().setPlaybackOrder(PlaybackOrder.parsePlaybackOrderByName(modeName));
 			}
 		}
 	}

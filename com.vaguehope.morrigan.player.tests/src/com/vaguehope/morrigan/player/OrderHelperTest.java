@@ -14,7 +14,6 @@ import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.model.media.test.TestMixedMediaDb;
-import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.sqlitewrapper.DbException;
 
 public class OrderHelperTest {

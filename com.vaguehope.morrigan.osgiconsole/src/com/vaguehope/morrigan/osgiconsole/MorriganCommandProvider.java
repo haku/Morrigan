@@ -23,9 +23,8 @@ import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaAlbum;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaListReference;
-import com.vaguehope.morrigan.player.OrderHelper;
-import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayItem;
+import com.vaguehope.morrigan.player.PlaybackOrder;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayerReader;
 import com.vaguehope.morrigan.server.AsyncActions;
@@ -560,7 +559,7 @@ public class MorriganCommandProvider implements CommandProvider {
 			return;
 		}
 
-		final PlaybackOrder po = OrderHelper.forceParsePlaybackOrder(args.get(0));
+		final PlaybackOrder po = PlaybackOrder.forceParsePlaybackOrder(args.get(0));
 		if (po != null) {
 			player.setPlaybackOrder(po);
 			ci.println("Playback order set to '" + po.toString() + "' for " + player.getName() + " player.");

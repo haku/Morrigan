@@ -28,8 +28,8 @@ import com.vaguehope.morrigan.player.AbstractPlayer;
 import com.vaguehope.morrigan.player.LocalPlayer;
 import com.vaguehope.morrigan.player.LocalPlayerSupport;
 import com.vaguehope.morrigan.player.OrderHelper;
-import com.vaguehope.morrigan.player.OrderHelper.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayItem;
+import com.vaguehope.morrigan.player.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayerRegister;
 
 public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
