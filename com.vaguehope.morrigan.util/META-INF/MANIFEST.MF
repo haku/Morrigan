@@ -6,3 +6,9 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: com.vaguehope.morrigan.util
 Bundle-Vendor: vaguehope.com
+Bundle-ClassPath: .,
+ lib/logback-classic-1.1.2.jar,
+ lib/logback-core-1.1.2.jar,
+ lib/slf4j-api-1.7.7.jar,
+ lib/jcl-over-slf4j-1.7.7.jar,
+ lib/jul-to-slf4j-1.7.7.jar

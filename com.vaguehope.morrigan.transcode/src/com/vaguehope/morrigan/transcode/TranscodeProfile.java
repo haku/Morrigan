@@ -82,7 +82,7 @@ public abstract class TranscodeProfile {
 			return trimEnd;
 		}
 
-		LOG.w("Invalid trim_end: {0}", raw);
+		LOG.w("Invalid trim_end: {}", raw);
 		return null;
 	}
 

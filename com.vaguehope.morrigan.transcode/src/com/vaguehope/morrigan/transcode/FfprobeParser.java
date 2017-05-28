@@ -37,7 +37,7 @@ public class FfprobeParser implements Listener<String> {
 				}
 			}
 			catch (final NumberFormatException e) {
-				LOG.w("Failed to parse {0}: {1}", line, e.toString());
+				LOG.w("Failed to parse {}: {}", line, e.toString());
 			}
 		}
 	}

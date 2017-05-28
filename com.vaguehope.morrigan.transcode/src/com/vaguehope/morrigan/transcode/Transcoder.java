@@ -86,7 +86,7 @@ public class Transcoder {
 		while (true) {
 			final int n = this.inProgress.get();
 			if (n > MAX_IN_PROGRESS_TRANSCODES) {
-				LOG.w("Rejected transcode as overloaded: {0}", inFile.getAbsolutePath());
+				LOG.w("Rejected transcode as overloaded: {}", inFile.getAbsolutePath());
 				throw new IllegalStateException("Overloaded."); // TODO Better exception class.
 			}
 			if (this.inProgress.compareAndSet(n, n + 1)) break;
@@ -129,13 +129,13 @@ public class Transcoder {
 
 				final long outputLength = outputFile.length();
 				if (stdOutByteCount < 1) {
-					LOG.i("Transcode complete: build={0}ms run={1}ms output={2}b.",
+					LOG.i("Transcode complete: build={}ms run={}ms output={}b.",
 							TimeUnit.NANOSECONDS.toMillis(runStartNanos - buildStartNanos),
 							TimeUnit.NANOSECONDS.toMillis(endNanos - runStartNanos),
 							outputLength);
 				}
 				else {
-					LOG.w("Unexpected std out from transcode command: {0} bytes.", stdOutByteCount);
+					LOG.w("Unexpected std out from transcode command: {} bytes.", stdOutByteCount);
 				}
 				if (outputLength < 1) throw new IOException("Output file length invalid: " + outputLength);
 			}
@@ -153,7 +153,7 @@ public class Transcoder {
 			try {
 				final int result = waitFor(p, SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
 				if (procShouldBeRunning && result != 0 && errFuture != null) {
-					LOG.i("Transcode cmd result: {0}", result);
+					LOG.i("Transcode cmd result: {}", result);
 					logErr(errFuture);
 					throw new IOException("Transcode failed: cmd result=" + result);
 				}
@@ -167,7 +167,7 @@ public class Transcoder {
 
 	private static ProcessBuilder makeProcess (final TranscodeProfile tProfile, final File outputFile) throws IOException {
 		final ProcessBuilder pb = new ProcessBuilder(tProfile.transcodeCmd(outputFile));
-		LOG.i("{0} cmd: {1}", tProfile.getClass().getSimpleName(), pb.command());
+		LOG.i("{} cmd: {}", tProfile.getClass().getSimpleName(), pb.command());
 		return pb;
 	}
 
@@ -193,7 +193,7 @@ public class Transcoder {
 	private static void logErr (final Future<List<String>> errFuture) {
 		try {
 			for (final String line : errFuture.get()) {
-				LOG.i("ffmpeg: {0}", line);
+				LOG.i("ffmpeg: {}", line);
 			}
 		}
 		catch (InterruptedException e) {

@@ -304,7 +304,7 @@ public class OrderResolver {
 				// byLastPlayedDate() handles not selecting current again.
 				final IMediaTrack item = getNextTrackByLastPlayedDate(itemsWithTag, current);
 				if (item != null) {
-					LOG.i("{0} => {1}", tag, item.getTitle());
+					LOG.i("{} => {}", tag, item.getTitle());
 					this.recentlyFollowedTags.push(tag);
 					return item;
 				}
