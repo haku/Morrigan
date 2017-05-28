@@ -253,18 +253,35 @@ public class OrderResolver {
 		if (!(list instanceof IMixedMediaDb)) throw new IllegalArgumentException("Only DB lists supported.");
 		final IMixedMediaDb db = (IMixedMediaDb) list;
 
+		final Random rnd = new Random();
+
+		final List<String> highPri = new ArrayList<String>();
+		final List<String> lowPri = new ArrayList<String>();
+
 		final List<String> currentItemsTags = manualTagsAsStrings(db.getTags(current));
-		final List<String> tagsToSearchForInOrder = new ArrayList<String>();
+
 		synchronized (this.recentlyFollowedTags) {
 			for (String lastTag : this.recentlyFollowedTags) {
 				if (currentItemsTags.contains(lastTag)) {
-					tagsToSearchForInOrder.add(lastTag);
+					if (this.recentlyFollowedTags.frequency(lastTag) < 10 + rnd.nextInt(10)) {
+						if (rnd.nextBoolean()) {
+							highPri.add(lastTag);
+						}
+						else {
+							lowPri.add(lastTag);
+						}
+					}
 					currentItemsTags.remove(lastTag);
 				}
 			}
 		}
+
 		Collections.shuffle(currentItemsTags);
+
+		final List<String> tagsToSearchForInOrder = new ArrayList<String>();
+		tagsToSearchForInOrder.addAll(highPri);
 		tagsToSearchForInOrder.addAll(currentItemsTags);
+		tagsToSearchForInOrder.addAll(lowPri);
 
 		for (final String tag : tagsToSearchForInOrder) {
 			final List<? extends IMediaTrack> itemsWithTag = db.simpleSearchMedia(
@@ -293,6 +310,8 @@ public class OrderResolver {
 				}
 			}
 		}
+
+		LOG.i("Jump.");
 
 		// Fall back if no tags to follow.
 		return getNextTrackByLastPlayedDate(list, current);

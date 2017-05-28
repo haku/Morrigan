@@ -42,4 +42,20 @@ public class LimitedRecentSetTest {
 		assertEquals(Arrays.asList("a", "c", "b"), this.undertest.all());
 	}
 
+	@Test
+	public void itTracksFrequency () throws Exception {
+		this.undertest.push("a");
+		this.undertest.push("a");
+		this.undertest.push("b");
+		this.undertest.push("c");
+		this.undertest.push("d");
+		this.undertest.push("c");
+		this.undertest.push("c");
+		this.undertest.push("a");
+		assertEquals(1, this.undertest.frequency("a")); // Pushed off bottom.
+		assertEquals(0, this.undertest.frequency("b")); // Pushed off bottom.
+		assertEquals(3, this.undertest.frequency("c"));
+		assertEquals(1, this.undertest.frequency("d"));
+	}
+
 }

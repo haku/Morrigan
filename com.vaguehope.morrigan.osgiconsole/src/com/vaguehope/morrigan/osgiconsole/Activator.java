@@ -19,19 +19,28 @@ public class Activator implements BundleActivator  {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
-	public void start(BundleContext context) {
+	public void start(final BundleContext context) {
 		this.playerReaderTracker = new PlayerReaderTracker(context);
 		this.mediaFactoryTracker = new MediaFactoryTracker(context);
 		this.asyncTasksRegisterTracker = new AsyncTasksRegisterTracker(context);
 
-		AsyncActions asyncActions = new AsyncActions(this.asyncTasksRegisterTracker, this.mediaFactoryTracker);
-		CliHelper cliHelper = new CliHelper(this.mediaFactoryTracker);
-		MorriganCommandProvider commandProvider = new MorriganCommandProvider(this.playerReaderTracker, this.mediaFactoryTracker, this.asyncTasksRegisterTracker, asyncActions, cliHelper);
-		context.registerService(CommandProvider.class.getName(), commandProvider, null);
+		final AsyncActions asyncActions = new AsyncActions(this.asyncTasksRegisterTracker, this.mediaFactoryTracker);
+		final CliHelper cliHelper = new CliHelper(this.mediaFactoryTracker);
+
+		context.registerService(CommandProvider.class.getName(),
+				new MorriganCommandProvider(
+						this.playerReaderTracker,
+						this.mediaFactoryTracker,
+						this.asyncTasksRegisterTracker,
+						asyncActions,
+						cliHelper), null);
+
+		context.registerService(CommandProvider.class.getName(),
+				new TestingCommandProvider(cliHelper), null);
 	}
 
 	@Override
-	public void stop(BundleContext context) {
+	public void stop(final BundleContext context) {
 		this.asyncTasksRegisterTracker.dispose();
 		this.mediaFactoryTracker.dispose();
 		this.playerReaderTracker.dispose();
