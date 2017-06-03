@@ -2,6 +2,7 @@
 
   var LONG_CLICK_MILLIS = 2000;
   var REFRESH_PLAYERS_SECONDS = 5;
+  var SNACKBAR_SHOW_MILLIS = 10000;
   var HOST_NAME;
 
   var selectedPlayer;
@@ -52,10 +53,18 @@
     }, REFRESH_PLAYERS_SECONDS * 1000);
   }
 
+  var shackbarVisible = false;
   function showToast(msg) {
+    if (shackbarVisible === true) return;
+
     var bar = $('.mdl-js-snackbar');
     if (bar.length > 0) bar = bar.get(0).MaterialSnackbar;
-    if (bar) bar.showSnackbar({message: msg, timeout: 10000});
+    if (bar) bar.showSnackbar({message: msg, timeout: SNACKBAR_SHOW_MILLIS});
+
+    shackbarVisible = true;
+    setTimeout(function(){
+      shackbarVisible = false;
+    }, SNACKBAR_SHOW_MILLIS);
   }
 
   var msgHandler = {
