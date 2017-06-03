@@ -10,6 +10,9 @@ public interface IMediaTrack extends IMediaItem {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+	/**
+	 * In seconds.
+	 */
 	int getDuration();
 	boolean setDuration(int duration);
 
