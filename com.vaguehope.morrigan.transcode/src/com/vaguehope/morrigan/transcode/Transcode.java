@@ -23,6 +23,17 @@ public enum Transcode {
 			return null;
 		}
 	},
+	MP3_ONLY("mp3_only", "MP3 Only") {
+		@Override
+		public TranscodeProfile profileForItem (final IMediaTrackList<? extends IMediaTrack> list, final IMediaItem item) throws IOException {
+			if (MimeType.MP3.getMimeType().equalsIgnoreCase(item.getMimeType())) {
+				return null;
+			}
+			else {
+				return new Mp3OnlyTranscode(list, item, this);
+			}
+		}
+	},
 	MP4_COMPATIBLE("mp4_compatible", "MP4 Compatible") {
 		@Override
 		public TranscodeProfile profileForItem (final IMediaTrackList<? extends IMediaTrack> list, final IMediaItem item) throws IOException {
