@@ -5,6 +5,7 @@ import java.util.Date;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagClassification;
 import com.vaguehope.morrigan.model.media.MediaTagType;
+import com.vaguehope.morrigan.util.ThreadSafeDateFormatter;
 
 public class MediaTagImpl implements MediaTag {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -62,6 +63,8 @@ public class MediaTagImpl implements MediaTag {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+	private static final ThreadSafeDateFormatter DATE_FORMATTER = new ThreadSafeDateFormatter("yyyyMMdd-HHmm");
+
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder(getTag());
@@ -78,7 +81,7 @@ public class MediaTagImpl implements MediaTag {
 
 		if (this.modified != null) {
 			sb.append(" [");
-			sb.append(this.modified);
+			sb.append(DATE_FORMATTER.get().format(this.modified));
 			sb.append("]");
 		}
 
