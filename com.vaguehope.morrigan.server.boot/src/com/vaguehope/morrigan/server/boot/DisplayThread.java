@@ -15,6 +15,7 @@ class DisplayThread extends Thread {
 	private volatile boolean alive = true;
 
 	public DisplayThread (final boolean guiPresent) {
+		super("psudoUI");
 		this.guiPresent = guiPresent;
 	}
 
