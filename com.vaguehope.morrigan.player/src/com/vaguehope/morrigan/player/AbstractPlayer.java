@@ -15,8 +15,8 @@ import com.vaguehope.morrigan.model.Register;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
 import com.vaguehope.morrigan.transcode.Transcode;
-import com.vaguehope.morrigan.transcode.Transcoder;
 import com.vaguehope.morrigan.transcode.TranscodeProfile;
+import com.vaguehope.morrigan.transcode.Transcoder;
 import com.vaguehope.morrigan.util.MnLogger;
 import com.vaguehope.morrigan.util.StringHelper;
 
@@ -124,6 +124,14 @@ public abstract class AbstractPlayer implements Player {
 	@Override
 	public void removeEventListener (final PlayerEventListener listener) {
 		this.listeners.removeEventListener(listener);
+	}
+
+	@Override
+	public final int getCurrentTrackDuration () {
+		final PlayItem item = getCurrentItem();
+		final IMediaTrack track = item != null && item.hasTrack() ? item.getTrack() : null;
+		final int trackDuration = track != null ? track.getDuration() : -1;
+		return trackDuration > 0 ? trackDuration : getCurrentTrackDurationFromRenderer();
 	}
 
 	@Override

@@ -343,7 +343,7 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 	}
 
 	@Override
-	public int getCurrentTrackDuration () {
+	public int getCurrentTrackDurationFromRenderer () {
 		return this._currentTrackDuration;
 	}
 

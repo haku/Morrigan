@@ -12,11 +12,11 @@ import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
 import com.vaguehope.morrigan.player.LocalPlayer;
 import com.vaguehope.morrigan.player.LocalPlayerSupport;
-import com.vaguehope.morrigan.transcode.Transcode;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlaybackOrder;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayerQueue;
+import com.vaguehope.morrigan.transcode.Transcode;
 
 /**
  * FIXME
@@ -187,8 +187,15 @@ public class LocalProxyPlayer implements LocalPlayer {
 	@Override
 	public int getCurrentTrackDuration () {
 		final Player p = getRef();
-		if (p == null) return 0;
+		if (p == null) return -1;
 		return p.getCurrentTrackDuration();
+	}
+
+	@Override
+	public int getCurrentTrackDurationFromRenderer () {
+		final Player p = getRef();
+		if (p == null) return -1;
+		return p.getCurrentTrackDurationFromRenderer();
 	}
 
 	@Override

@@ -112,7 +112,7 @@ public class SshPlayer extends AbstractPlayer {
 	}
 
 	@Override
-	public int getCurrentTrackDuration () {
+	public int getCurrentTrackDurationFromRenderer () {
 		CliPlayer m = this.cliPlayer.get();
 		return m == null ? -1 : m.getDuration();
 	}
