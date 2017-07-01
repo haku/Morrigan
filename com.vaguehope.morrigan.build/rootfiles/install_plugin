@@ -38,20 +38,14 @@ if [ -n "$arg_jar" ] ; then
     exit 1
   fi
 else
-  rjarname="$(curl --silent "http://karasu.vaguehope.com/plugins.rhtml" | grep "$bname" | head -n 1)"
-  if [ -z "$rjarname" ] ; then
-    echo "Not found in plugin list: $bname"
+  extrajar="extras/$bname-*.jar"
+  if [ -e "$extrajar" ] ; then
+    echo "Jar: $extrajar"
+    cp "$extrajar" "$jarlocal"
+  else
+    echo "Not found: $extrajar"
     exit 1
   fi
-
-  jarurl="http://karasu.vaguehope.com/$rjarname"
-  mkdir -p "$mndir/tmp/"
-  jartmp="$mndir/tmp/$rjarname"
-  echo -e "Downloading:\n  $jarurl\n  --> $jartmp"
-  curl "$jarurl" -o "$jartmp"
-
-  echo -e "Moveing:\n  $jartmp\n  --> $jarlocal"
-  mv "$jartmp" "$jarlocal"
 fi
 
 conf="$mndir/configuration/config.ini"
