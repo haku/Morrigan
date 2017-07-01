@@ -584,7 +584,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 
 						final File file = new File(mi.getFilepath());
 						if (file.exists()) {
-							final OpResult ret = readTrackMetaData1(this.itemList, mi, file);
+							final OpResult ret = readTrackMetaData1(taskEventListener, this.itemList, mi, file);
 							if (ret != null) {
 								if (ret.isFaital()) {
 									throw ret.getException();
@@ -629,7 +629,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 
 	protected abstract boolean shouldTrackMetaData1 (TaskEventListener taskEventListener, Q library, T item) throws MorriganException;
 
-	protected abstract OpResult readTrackMetaData1 (Q library, T item, File file);
+	protected abstract OpResult readTrackMetaData1 (TaskEventListener taskEventListener, Q library, T item, File file);
 
 	protected abstract void cleanUpAfterTrackMetaData1 ();
 
