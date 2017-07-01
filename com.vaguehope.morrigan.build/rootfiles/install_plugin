@@ -38,7 +38,7 @@ if [ -n "$arg_jar" ] ; then
     exit 1
   fi
 else
-  extrajar="extras/$bname-*.jar"
+  extrajar=("extras/$bname-"*.jar)
   if [ -e "$extrajar" ] ; then
     echo "Jar: $extrajar"
     cp "$extrajar" "$jarlocal"
