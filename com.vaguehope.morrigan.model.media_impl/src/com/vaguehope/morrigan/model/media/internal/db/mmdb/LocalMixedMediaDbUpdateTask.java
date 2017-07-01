@@ -180,7 +180,7 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMe
 	}
 
 	@Override
-	protected OpResult readTrackMetaData1 (final TaskEventListener taskEventListener, final ILocalMixedMediaDb list, final IMixedMediaItem item, final File file) {
+	protected OpResult readTrackMetaData1 (final ILocalMixedMediaDb list, final IMixedMediaItem item, final File file) {
 		if (item.getMediaType() == MediaType.TRACK) {
 			if (this.playbackEngine == null) {
 				try {
@@ -194,14 +194,9 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMe
 			try {
 				int dSeconds = 0;
 				if (Ffprobe.isAvailable()) {
-					try {
-						final Long dMillis = Ffprobe.inspect(item.getFile()).getDurationMillis();
-						if (dMillis != null) {
-							dSeconds = (int) TimeUnit.MILLISECONDS.toSeconds(dMillis);
-						}
-					}
-					catch (final IOException e) {
-						taskEventListener.logError(list.getListName(), "Failed to read metadata " + item.getFile().getAbsolutePath() + ": " + e, e);
+					final Long dMillis = Ffprobe.inspect(item.getFile()).getDurationMillis();
+					if (dMillis != null) {
+						dSeconds = (int) TimeUnit.MILLISECONDS.toSeconds(dMillis);
 					}
 				}
 				else {
