@@ -1,6 +1,5 @@
 (function() {
 
-  var LONG_CLICK_MILLIS = 2000;
   var REFRESH_PLAYERS_SECONDS = 5;
   var SNACKBAR_SHOW_MILLIS = 10000;
   var HOST_NAME;
@@ -162,17 +161,8 @@
 
   function wireFooter() {
     $('#footer_search').click(footerSearchClicked);
-    $('#footer_pause').click(footerPauseClicked);
+    ClickHelper.setupLongClick($("#footer_pause"), footerPauseClicked, footerPauseLongClicked);
     $('#footer_next').click(footerNextClicked);
-
-    var pressTimer;
-    $("#footer_pause").mouseup(function(){
-      clearTimeout(pressTimer);
-      return false;
-    }).mousedown(function(){
-      pressTimer = window.setTimeout(footerPauseLongClicked, LONG_CLICK_MILLIS);
-      return false;
-    });
   }
 
   function footerSearchClicked() {

@@ -7,6 +7,35 @@ ErrorHelper = {};
 
 })();
 
+ClickHelper = {};
+(function() {
+
+  var LONG_CLICK_MILLIS = 2000;
+
+  ClickHelper.setupLongClick = function(element, onClick, onLongClick) {
+    var pressTimer;
+    var longClicked = false;
+
+    element.bind('pointerup', function(ev){
+      clearTimeout(pressTimer);
+      return false;
+    })
+    .bind('pointerdown', function(ev){
+      longClicked = false;
+      pressTimer = window.setTimeout(function() {
+        longClicked = true;
+        onLongClick();
+      }, LONG_CLICK_MILLIS);
+      return false;
+    })
+    .click(function(){
+      if (longClicked) return;
+      onClick();
+    });
+  };
+
+})();
+
 jQuery.fn.setVisibility = function(visibility) {
   return this.css('visibility', visibility ? 'visible' : 'hidden');
 };
