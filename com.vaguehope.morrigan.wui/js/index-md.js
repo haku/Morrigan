@@ -718,7 +718,8 @@
   function showDbItemMenu(item, anchorEl) {
     var menu = $('#db_item_menu');
     $('.title', menu).text(item.title);
-    $('.stats', menu).text(item.startCount + '/' + item.endCount + ' ' + MnApi.formatSeconds(item.duration));
+    $('.stats.l0', menu).text(item.startCount + '/' + item.endCount + ' ' + MnApi.formatSeconds(item.duration));
+    $('.stats.l1', menu).text(item.dateLastPlayed);
     $('.tags', menu).text(item.tags.join(', '));
 
     $('.enqueue', menu).unbind().click(function(event) {

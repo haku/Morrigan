@@ -361,7 +361,8 @@ MnApi = {};
       duration: parseInt(node.find('duration').text(), 10),
       startCount: parseInt(node.find('startcount').text(), 10),
       endCount: parseInt(node.find('endcount').text(), 10),
-      enabled: node.find('enabled').text() == "true"
+      enabled: node.find('enabled').text() == "true",
+      dateLastPlayed: node.find('datelastplayed').text(),
     };
 
     var href = node.find('link[rel="self"]').attr('href');
