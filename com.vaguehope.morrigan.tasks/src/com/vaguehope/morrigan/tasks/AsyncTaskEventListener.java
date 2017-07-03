@@ -1,5 +1,6 @@
 package com.vaguehope.morrigan.tasks;
 
+import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -10,11 +11,13 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import com.vaguehope.morrigan.util.ErrorHelper;
 import com.vaguehope.morrigan.util.StringHelper;
+import com.vaguehope.morrigan.util.ThreadSafeDateFormatter;
 
 public class AsyncTaskEventListener implements TaskEventListener, AsyncTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private static final long EXPIRY_AGE = 30 * 60 * 1000L; // 30 minutes.
+	private static final ThreadSafeDateFormatter DATE_FORMATTER = new ThreadSafeDateFormatter("HH:mm");
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -32,6 +35,7 @@ public class AsyncTaskEventListener implements TaskEventListener, AsyncTask {
 	private final AtomicReference<String> lastMsg = new AtomicReference<String>(null);
 	private final AtomicReference<String> lastErr = new AtomicReference<String>(null);
 
+	private final AtomicLong startTime = new AtomicLong();
 	private final AtomicLong endTime = new AtomicLong();
 
 	private final AtomicReference<Future<?>> future = new AtomicReference<Future<?>>();
@@ -41,7 +45,9 @@ public class AsyncTaskEventListener implements TaskEventListener, AsyncTask {
 	public String summarise () {
 		StringBuilder s = new StringBuilder();
 
-		s.append('[').append(this.lifeCycle.get()).append(']');
+		s.append('[').append(this.lifeCycle.get()).append(' ')
+				.append(DATE_FORMATTER.get().format(new Date(this.startTime.get())))
+				.append(']');
 
 		int P = this.progressTotal.get();
 		if (this.lifeCycle.get() == TaskState.RUNNING && P > 0) {
@@ -103,6 +109,7 @@ public class AsyncTaskEventListener implements TaskEventListener, AsyncTask {
 		if (!this.lifeCycle.compareAndSet(TaskState.UNSTARTED, TaskState.RUNNING)) {
 			throw new IllegalStateException("Failed to mark task as running; current state=" + this.lifeCycle.get() + ".");
 		}
+		this.startTime.set(System.currentTimeMillis());
 	}
 
 	@Override
