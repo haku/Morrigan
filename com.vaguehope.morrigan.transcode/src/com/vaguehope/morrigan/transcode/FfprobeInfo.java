@@ -1,6 +1,5 @@
 package com.vaguehope.morrigan.transcode;
 
-import java.io.IOException;
 import java.util.Set;
 
 public class FfprobeInfo {
@@ -23,7 +22,7 @@ public class FfprobeInfo {
 		return this.profiles;
 	}
 
-	public boolean has10BitColour () throws IOException {
+	public boolean has10BitColour () {
 		for (final String profile : this.profiles) {
 			if (profile.endsWith(" 10")) return true;
 		}
