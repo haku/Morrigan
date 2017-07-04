@@ -29,6 +29,10 @@ public class Transcoder {
 	private static final int ERR_HISTORY_LINES = 100;
 	private static final int MAX_IN_PROGRESS_TRANSCODES = 3;
 
+	// Allow 5% difference, or 10 seconds, which ever is longer.
+	private static final double TRANSCODE_DURATION_MAX_DIFFERENCE_RATIO = 0.05d;
+	private static final long TRANSCODE_DURATION_MAX_DIFFERENCE_SECONDS = 10;
+
 	private static final MnLogger LOG = MnLogger.make(Transcoder.class);
 
 	private final AtomicInteger inProgress = new AtomicInteger(0);
@@ -80,9 +84,11 @@ public class Transcoder {
 			throw new FileNotFoundException("File not found: " + inFile.getAbsolutePath());
 		}
 
+		// Already transcoded?  Use cache.
 		final File outFile = tProfile.getCacheFile();
 		if (outFile.exists() && outFile.lastModified() >= inFile.lastModified()) return;
 
+		// Max parallel locking.
 		while (true) {
 			final int n = this.inProgress.get();
 			if (n > MAX_IN_PROGRESS_TRANSCODES) {
@@ -92,10 +98,34 @@ public class Transcoder {
 			if (this.inProgress.compareAndSet(n, n + 1)) break;
 		}
 
+		// Check we have the input file duration.
+		long inFileDurationSeconds = tProfile.getItem().getDuration();
+		if (inFileDurationSeconds < 1) {
+			LOG.w("DB duration missing: {}", tProfile.getItem());
+			final Long inFileDurationMillis = Ffprobe.inspect(inFile).getDurationMillis();
+			if (inFileDurationMillis == null || inFileDurationMillis < 1) throw new IOException("Invalid file duration: " + inFile.getAbsolutePath());
+			inFileDurationSeconds = TimeUnit.MILLISECONDS.toSeconds(inFileDurationMillis);
+		}
+
 		try {
 			final File ftmp = File.createTempFile(outFile.getName(), tProfile.getTmpFileExt(), outFile.getParentFile());
 			try {
 				runTranscodeCmd(tProfile, ftmp);
+
+				// Validate transcode output.
+				final Long outFileDurationMillis = Ffprobe.inspect(ftmp).getDurationMillis();
+				if (outFileDurationMillis == null || outFileDurationMillis < 1) {
+					throw new IOException("Transcode resulted in invalid file duration: " + inFile.getAbsolutePath());
+				}
+				final long outFileDurationSeconds = TimeUnit.MILLISECONDS.toSeconds(outFileDurationMillis);
+				final long maxDifferenceSeconds = Math.max(
+						(long) (inFileDurationSeconds * TRANSCODE_DURATION_MAX_DIFFERENCE_RATIO),
+						TRANSCODE_DURATION_MAX_DIFFERENCE_SECONDS);
+				if (Math.abs(inFileDurationSeconds - outFileDurationSeconds) > maxDifferenceSeconds ) {
+					throw new IOException(String.format("Transcode resulted in invalid file duration, in=%ss out=%ss maxDelta=%ss: %s",
+							inFileDurationSeconds, outFileDurationSeconds, maxDifferenceSeconds, inFile.getAbsolutePath()));
+				}
+
 				FileHelper.rename(ftmp, outFile);
 			}
 			finally {

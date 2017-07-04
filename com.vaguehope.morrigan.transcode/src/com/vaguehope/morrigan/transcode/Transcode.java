@@ -1,7 +1,7 @@
 package com.vaguehope.morrigan.transcode;
 
 import java.io.IOException;
-import com.vaguehope.morrigan.model.media.IMediaItem;
+
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
 import com.vaguehope.morrigan.util.MimeType;
@@ -10,13 +10,13 @@ import com.vaguehope.morrigan.util.StringHelper;
 public enum Transcode {
 	NONE("", "No Transcode") {
 		@Override
-		public TranscodeProfile profileForItem (final IMediaTrackList<? extends IMediaTrack> list, final IMediaItem item) throws IOException {
+		public TranscodeProfile profileForItem (final IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack item) throws IOException {
 			return null;
 		}
 	},
 	AUDIO_ONLY("audio_only", "Audio Only") {
 		@Override
-		public TranscodeProfile profileForItem (final IMediaTrackList<? extends IMediaTrack> list, final IMediaItem item) throws IOException {
+		public TranscodeProfile profileForItem (final IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack item) throws IOException {
 			if (StringHelper.startsWithIgnoreCase(item.getMimeType(), "video")) {
 				return new AudioStreamExtractOrTranscode(list, item, this);
 			}
@@ -25,18 +25,16 @@ public enum Transcode {
 	},
 	MP3_ONLY("mp3_only", "MP3 Only") {
 		@Override
-		public TranscodeProfile profileForItem (final IMediaTrackList<? extends IMediaTrack> list, final IMediaItem item) throws IOException {
+		public TranscodeProfile profileForItem (final IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack item) throws IOException {
 			if (MimeType.MP3.getMimeType().equalsIgnoreCase(item.getMimeType())) {
 				return null;
 			}
-			else {
-				return new Mp3OnlyTranscode(list, item, this);
-			}
+			return new Mp3OnlyTranscode(list, item, this);
 		}
 	},
 	MP4_COMPATIBLE("mp4_compatible", "MP4 Compatible") {
 		@Override
-		public TranscodeProfile profileForItem (final IMediaTrackList<? extends IMediaTrack> list, final IMediaItem item) throws IOException {
+		public TranscodeProfile profileForItem (final IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack item) throws IOException {
 			if (MimeType.MP4.getMimeType().equalsIgnoreCase(item.getMimeType())) {
 				// Use existence of cache file to reduce calls to ffprobe.
 				if (Mp4CompatibleTranscode.cacheFileMp4(item, this).exists()
@@ -82,7 +80,7 @@ public enum Transcode {
 	/**
 	 * Returns null if no transcode is required.
 	 */
-	public abstract TranscodeProfile profileForItem (IMediaTrackList<? extends IMediaTrack> list, final IMediaItem item) throws IOException;
+	public abstract TranscodeProfile profileForItem (IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack item) throws IOException;
 
 	/**
 	 * Never returns null.

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
@@ -12,7 +13,7 @@ import com.vaguehope.morrigan.util.StringHelper;
 
 public class AudioStreamExtractOrTranscode extends TranscodeProfile {
 
-	public AudioStreamExtractOrTranscode (final IMediaTrackList<? extends IMediaTrack> list, final IMediaItem item, final Transcode transcode) throws IOException {
+	public AudioStreamExtractOrTranscode (final IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack item, final Transcode transcode) throws IOException {
 		super(list, item, transcode, findAudioStreamType(item, transcode));
 	}
 

@@ -774,19 +774,27 @@ public class MlistsServlet extends HttpServlet {
 	}
 
 	static void fillInMediaItem (final DataWriter dw, final IMediaTrackList<? extends IMediaTrack> ml, final IMediaItem mi,
-			final IncludeTags includeTags, final String transcode) throws SAXException, MorriganException, IOException {
+			final IncludeTags includeTags, final String transcodeStr) throws SAXException, MorriganException, IOException {
 		String title = mi.getTitle();
 		long fileSize = mi.getFileSize();
 		String fileLink = fileLink(mi);
 
-		final TranscodeProfile tProfile = Transcode.parse(transcode).profileForItem(ml, mi);
-		if (tProfile != null) {
-			title = tProfile.getTranscodedTitle();
+		final Transcode transcode = Transcode.parse(transcodeStr);
+		if (transcode != Transcode.NONE) {
+			if (mi instanceof IMediaTrack) {
+				final TranscodeProfile tProfile = transcode.profileForItem(ml, (IMediaTrack) mi);
+				if (tProfile != null) {
+					title = tProfile.getTranscodedTitle();
 
-			final File transcodedFile = tProfile.getCacheFile();
-			fileSize = transcodedFile.exists() ? transcodedFile.length() : 0L;
+					final File transcodedFile = tProfile.getCacheFile();
+					fileSize = transcodedFile.exists() ? transcodedFile.length() : 0L;
 
-			fileLink += "?" + PARAM_TRANSCODE + "=" + transcode;
+					fileLink += "?" + PARAM_TRANSCODE + "=" + transcode;
+				}
+			}
+			else {
+				throw new IllegalArgumentException("Can not transcode non IMediaTrack: " + mi);
+			}
 		}
 
 		FeedHelper.addElement(dw, "title", title);

@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import com.vaguehope.morrigan.model.media.IMediaItem;
+
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
 import com.vaguehope.morrigan.util.MimeType;
@@ -12,7 +12,7 @@ import com.vaguehope.morrigan.util.StringHelper;
 
 public class AudioOnlyM4aTranscode extends TranscodeProfile {
 
-	public AudioOnlyM4aTranscode (final IMediaTrackList<? extends IMediaTrack> list, final IMediaItem item, final Transcode transcode) {
+	public AudioOnlyM4aTranscode (final IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack item, final Transcode transcode) {
 		super(list, item, transcode, MimeType.M4A);
 	}
 

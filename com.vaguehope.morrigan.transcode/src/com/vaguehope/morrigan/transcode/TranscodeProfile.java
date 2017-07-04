@@ -22,11 +22,11 @@ public abstract class TranscodeProfile {
 	private static final MnLogger LOG = MnLogger.make(TranscodeProfile.class);
 
 	private final IMediaTrackList<? extends IMediaTrack> list;
-	private final IMediaItem item;
+	private final IMediaTrack item;
 	private final Transcode transcode;
 	private final MimeType mimeType;
 
-	protected TranscodeProfile (final IMediaTrackList<? extends IMediaTrack> list, final IMediaItem item, final Transcode transcode, final MimeType mimeType) {
+	protected TranscodeProfile (final IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack item, final Transcode transcode, final MimeType mimeType) {
 		if (item == null) throw new IllegalArgumentException("Item required.");
 		if (transcode == null) throw new IllegalArgumentException("Transcode required.");
 		if (mimeType == null) throw new IllegalArgumentException("MimeType required.");
@@ -36,7 +36,7 @@ public abstract class TranscodeProfile {
 		this.mimeType = mimeType;
 	}
 
-	public IMediaItem getItem () {
+	public IMediaTrack getItem () {
 		return this.item;
 	}
 
