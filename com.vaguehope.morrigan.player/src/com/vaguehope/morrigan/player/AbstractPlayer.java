@@ -194,7 +194,7 @@ public abstract class AbstractPlayer implements Player {
 		PlayItem pi = item;
 		if (!pi.hasTrack()) {
 			// TODO FIXME what if Playback Order is MANUAL?
-			final IMediaTrack track = this.orderHelper .getNextTrack(pi.getList(), null, getPlaybackOrder());
+			final IMediaTrack track = this.orderHelper.getNextTrack(pi.getList(), null, getPlaybackOrder());
 			if (track == null) {
 				System.err.println("Failed to fill in track: " + pi);
 				return;
@@ -235,6 +235,7 @@ public abstract class AbstractPlayer implements Player {
 			markLoadingState(true);
 		}
 		catch (final Exception e) { // NOSONAR reporting exceptions.
+			getQueue().addToQueueTop(item);
 			this.listeners.onException(e);
 		}
 
@@ -260,6 +261,7 @@ public abstract class AbstractPlayer implements Player {
 					}
 				}
 				catch (final Exception e) { // NOSONAR reporting exceptions.
+					getQueue().addToQueueTop(item);
 					AbstractPlayer.this.listeners.onException(e);
 				}
 			}
