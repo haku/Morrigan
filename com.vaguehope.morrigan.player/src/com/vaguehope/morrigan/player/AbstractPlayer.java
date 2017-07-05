@@ -17,6 +17,7 @@ import com.vaguehope.morrigan.model.media.IMediaTrackList;
 import com.vaguehope.morrigan.transcode.Transcode;
 import com.vaguehope.morrigan.transcode.TranscodeProfile;
 import com.vaguehope.morrigan.transcode.Transcoder;
+import com.vaguehope.morrigan.util.DaemonThreadFactory;
 import com.vaguehope.morrigan.util.MnLogger;
 import com.vaguehope.morrigan.util.StringHelper;
 
@@ -45,7 +46,7 @@ public abstract class AbstractPlayer implements Player {
 		this.id = id;
 		this.name = name;
 		this.register = register;
-		this.loadEs = new ThreadPoolExecutor(0, 1, 10L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+		this.loadEs = new ThreadPoolExecutor(0, 1, 10L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), new DaemonThreadFactory("pload"));
 	}
 
 	@Override
