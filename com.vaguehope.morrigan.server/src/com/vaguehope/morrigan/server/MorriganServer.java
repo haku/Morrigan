@@ -11,16 +11,17 @@ import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.component.LifeCycle;
 import org.eclipse.jetty.util.component.LifeCycle.Listener;
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.osgi.framework.BundleContext;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.player.PlayerReader;
-import com.vaguehope.morrigan.transcode.Transcoder;
 import com.vaguehope.morrigan.server.util.JettyLogger;
 import com.vaguehope.morrigan.server.util.WebAppHelper;
 import com.vaguehope.morrigan.tasks.AsyncTasksRegister;
+import com.vaguehope.morrigan.transcode.Transcoder;
 import com.vaguehope.morrigan.wui.MorriganWui;
 
 public class MorriganServer {
@@ -44,9 +45,13 @@ public class MorriganServer {
 			// Config.
 			this.serverPort = config.getServerPort();
 
+			final QueuedThreadPool threadPool = new QueuedThreadPool();
+			threadPool.setName("jty");
+
 			// Jetty server instance.
 			org.eclipse.jetty.util.log.Log.setLog(new JettyLogger()); // Fix noisy logging.
 			this.server = new Server();
+			this.server.setThreadPool(threadPool);
 			this.server.addLifeCycleListener(this.lifeCycleListener);
 
 			// HTTP connector.
