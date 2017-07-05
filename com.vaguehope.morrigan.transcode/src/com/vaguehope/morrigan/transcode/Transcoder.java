@@ -144,6 +144,8 @@ public class Transcoder {
 	}
 
 	private void runTranscodeCmd (final TranscodeProfile tProfile, final File outputFile) throws IOException {
+		LOG.i("{} {} --> {}", tProfile.getClass().getSimpleName(), tProfile.getItem().getMimeType(), tProfile.getMimeType().getMimeType());
+
 		Future<List<String>> errFuture = null;
 		boolean procShouldBeRunning = true;
 
@@ -183,7 +185,7 @@ public class Transcoder {
 			try {
 				final int result = waitFor(p, SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
 				if (procShouldBeRunning && result != 0 && errFuture != null) {
-					LOG.i("Transcode cmd result: {}", result);
+					LOG.w("Transcode cmd result: {}", result);
 					logErr(errFuture);
 					throw new IOException("Transcode failed: cmd result=" + result);
 				}
@@ -197,7 +199,7 @@ public class Transcoder {
 
 	private static ProcessBuilder makeProcess (final TranscodeProfile tProfile, final File outputFile) throws IOException {
 		final ProcessBuilder pb = new ProcessBuilder(tProfile.transcodeCmd(outputFile));
-		LOG.i("{} cmd: {}", tProfile.getClass().getSimpleName(), pb.command());
+		LOG.i("cmd: {}", pb.command());
 		return pb;
 	}
 
@@ -223,7 +225,7 @@ public class Transcoder {
 	private static void logErr (final Future<List<String>> errFuture) {
 		try {
 			for (final String line : errFuture.get()) {
-				LOG.i("ffmpeg: {}", line);
+				LOG.w("ffmpeg: {}", line);
 			}
 		}
 		catch (InterruptedException e) {
