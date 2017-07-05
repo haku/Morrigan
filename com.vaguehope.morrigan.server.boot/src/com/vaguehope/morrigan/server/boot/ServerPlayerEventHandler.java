@@ -18,8 +18,8 @@ import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlaybackOrder;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.Player.PlayerEventListener;
-import com.vaguehope.morrigan.transcode.Transcode;
 import com.vaguehope.morrigan.screen.ScreenMgr;
+import com.vaguehope.morrigan.transcode.Transcode;
 
 class ServerPlayerEventHandler implements PlayerEventListener, LocalPlayerSupport {
 
@@ -56,19 +56,21 @@ class ServerPlayerEventHandler implements PlayerEventListener, LocalPlayerSuppor
 	}
 
 	private void outputStatus () {
-		Player player = this.playerContainer.getPlayer();
-		PlayState currentState = (player == null ? null : player.getPlayState());
+		final Player player = this.playerContainer.getPlayer();
+		final PlayState currentState = (player == null ? null : player.getPlayState());
 		if (currentState != this.prevPlayState.get()) {
 			this.prevPlayState.set(currentState);
-			System.out.println(getPlayerStateDescription(player));
+			logger.log(Level.INFO, getPlayerStateDescription(player));
 		}
 	}
 
 	private static String getPlayerStateDescription (final Player p) {
 		if (p != null) {
-			PlayState currentState = p.getPlayState();
+			final PlayState currentState = p.getPlayState();
+			if (currentState == PlayState.LOADING) return currentState + "...";
+
 			if (currentState != null) {
-				PlayItem currentPlayItem = p.getCurrentItem();
+				final PlayItem currentPlayItem = p.getCurrentItem();
 				final IMediaTrack track = (currentPlayItem != null ? currentPlayItem.getTrack() : null);
 				if (track != null) return currentState + " " + track + ".";
 				return currentState + ".";
