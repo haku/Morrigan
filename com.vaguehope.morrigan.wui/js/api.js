@@ -142,9 +142,10 @@ MnApi = {};
   };
 
   MnApi.TRANSCODES = [
-    {id: "",           title: "No Transcode"},
-    {id: "audio_only", title: "Audio Only"},
-    {id: "mp3_only",   title: "MP3 Only"},
+    {id: "",                  title: "No Transcode"},
+    {id: "audio_only",        title: "Audio Only"},
+    {id: "common_audio_only", title: "Common Audio Only"},
+    {id: "mp3_only",          title: "MP3 Only"},
   ];
 
   MnApi.playerSeek = function(pid, position, msgHandler, onPlayer) {

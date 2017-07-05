@@ -1,6 +1,11 @@
 package com.vaguehope.morrigan.transcode;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Set;
 
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
@@ -18,9 +23,19 @@ public enum Transcode {
 		@Override
 		public TranscodeProfile profileForItem (final IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack item) throws IOException {
 			if (StringHelper.startsWithIgnoreCase(item.getMimeType(), "video")) {
-				return new AudioStreamExtractOrTranscode(list, item, this);
+				return new AudioStreamExtractOrTranscode(list, item, this, MimeType.MP3, COMMON_AUDIO_TYPES);
 			}
 			return null;
+		}
+	},
+	COMMON_AUDIO_ONLY("common_audio_only", "Common Audio Only") {
+		@Override
+		public TranscodeProfile profileForItem (final IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack item) throws IOException {
+			final String itemMimeType = item.getMimeType();
+			final String itemMimeTypeLower = itemMimeType != null ? itemMimeType.toLowerCase(Locale.ENGLISH) : null;
+
+			if (COMMON_AUDIO_TYPES_STRINGS.contains(itemMimeTypeLower)) return null;
+			return new AudioStreamExtractOrTranscode(list, item, this, MimeType.MP3, COMMON_AUDIO_TYPES);
 		}
 	},
 	MP3_ONLY("mp3_only", "MP3 Only") {
@@ -29,7 +44,7 @@ public enum Transcode {
 			if (MimeType.MP3.getMimeType().equalsIgnoreCase(item.getMimeType())) {
 				return null;
 			}
-			return new Mp3OnlyTranscode(list, item, this);
+			return new AudioStreamExtractOrTranscode(list, item, this, MimeType.MP3);
 		}
 	},
 	MP4_COMPATIBLE("mp4_compatible", "MP4 Compatible") {
@@ -54,11 +69,23 @@ public enum Transcode {
 				return new Mp4CompatibleTranscode(list, item, this);
 			}
 			else if (StringHelper.startsWithIgnoreCase(item.getMimeType(), "audio")) {
-				return new AudioOnlyM4aTranscode(list, item, this);
+				return new AudioStreamExtractOrTranscode(list, item, this, MimeType.M4A);
 			}
 			return null;
 		}
 	};
+
+	protected static final Set<MimeType> COMMON_AUDIO_TYPES = Collections.unmodifiableSet(EnumSet.of(
+			MimeType.MP3, MimeType.M4A, MimeType.OGG, MimeType.OGA, MimeType.FLAC, MimeType.WAV));
+
+	protected static final Set<String> COMMON_AUDIO_TYPES_STRINGS;
+	static {
+		final Set<String> s = new HashSet<String>();
+		for (final MimeType mt : COMMON_AUDIO_TYPES) {
+			s.add(mt.getMimeType().toLowerCase(Locale.ENGLISH));
+		}
+		COMMON_AUDIO_TYPES_STRINGS = Collections.unmodifiableSet(s);
+	}
 
 	private final String symbolicName;
 	private final String uiName;
