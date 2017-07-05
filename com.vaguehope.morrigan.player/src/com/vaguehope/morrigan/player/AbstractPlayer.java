@@ -82,7 +82,7 @@ public abstract class AbstractPlayer implements Player {
 	}
 
 	/**
-	 * A hint.  May be handled asynchronously.
+	 * A hint. May be handled asynchronously.
 	 */
 	protected void saveState () {
 		if (this.stateRestoreAttempted) {
@@ -213,7 +213,7 @@ public abstract class AbstractPlayer implements Player {
 
 	public abstract PlayState getEnginePlayState ();
 
-	private void markLoadingState(final boolean isLoading) {
+	private void markLoadingState (final boolean isLoading) {
 		this.loadingTrack = isLoading;
 		getListeners().playStateChanged(getPlayState());
 	}
@@ -235,7 +235,7 @@ public abstract class AbstractPlayer implements Player {
 			markLoadingState(true);
 		}
 		catch (final Exception e) { // NOSONAR reporting exceptions.
-			getQueue().addToQueueTop(item);
+			rollbackToTopOfQueue(item);
 			this.listeners.onException(e);
 		}
 
@@ -261,11 +261,16 @@ public abstract class AbstractPlayer implements Player {
 					}
 				}
 				catch (final Exception e) { // NOSONAR reporting exceptions.
-					getQueue().addToQueueTop(item);
+					rollbackToTopOfQueue(item);
 					AbstractPlayer.this.listeners.onException(e);
 				}
 			}
 		});
+	}
+
+	private void rollbackToTopOfQueue (final PlayItem item) {
+		if (item.equals(getCurrentItem())) return;
+		getQueue().addToQueueTop(item);
 	}
 
 	/**
