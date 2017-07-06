@@ -529,6 +529,29 @@
     // TODO show spinner.
   }
 
+  function restoreSavedSearch(mid) {
+    var prevQuery = JSON.parse(localStorage['query:' + mid] || '{}');
+
+    var query = prevQuery.query;
+    if (typeof(query) != "undefined") {
+      $('#db_query').val(query).parent().addClass('is-dirty'); // FIXME https://github.com/google/material-design-lite/issues/903
+    }
+
+    var sortColumn = prevQuery.sortColumn;
+    if (sortColumn) $('#db_sort_column').val(sortColumn);
+
+    var sortOrder = prevQuery.sortOrder;
+    if (sortOrder) $('#db_sort_order').val(sortOrder);
+  }
+
+  function writeSavedSearch() {
+    localStorage['query:' + currentDbMid] = JSON.stringify({
+      query: $('#db_query').val(),
+      sortColumn: $('#db_sort_column').val(),
+      sortOrder: $('#db_sort_order').val(),
+    });
+  }
+
   function setDbTabToSearch(mid, view, query) {
     if (query) {
       $('#db_query').val(query).parent().addClass('is-dirty'); // FIXME https://github.com/google/material-design-lite/issues/903
@@ -543,6 +566,7 @@
     currentDbMid = mid;
     currentDbQuery = query;
     currentDbResults = null;
+    writeSavedSearch();
 
     MnApi.getQuery(mid, view, query, sortColumn, sortOrder, msgHandler, displayResults);
 
@@ -611,6 +635,7 @@
 
     a.unbind().click(function(event) {
       event.preventDefault();
+      restoreSavedSearch(db.mid);
       setDbTabToSearch(db.mid);
     });
 
