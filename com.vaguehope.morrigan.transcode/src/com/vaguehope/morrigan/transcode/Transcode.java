@@ -110,14 +110,27 @@ public enum Transcode {
 	public abstract TranscodeProfile profileForItem (IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack item) throws IOException;
 
 	/**
+	 * Case-insensitive.
 	 * Never returns null.
 	 */
 	public static Transcode parse (final String str) {
-		if (str == null) return NONE;
+		final Transcode t = parseOrNull(str);
+		if (t != null) return t;
+		throw new IllegalArgumentException("Unknown transcode: " + str);
+	}
+
+	/**
+	 * Case-insensitive.
+	 */
+	public static Transcode parseOrNull (final String str) {
+		if (StringHelper.blank(str)) return NONE;
 		for (final Transcode t : values()) {
 			if (t.symbolicName.equalsIgnoreCase(str)) return t;
 		}
-		throw new IllegalArgumentException("Unsupported transcode: " + str);
+		for (final Transcode t : values()) {
+			if (t.uiName.equalsIgnoreCase(str)) return t;
+		}
+		return null;
 	}
 
 }

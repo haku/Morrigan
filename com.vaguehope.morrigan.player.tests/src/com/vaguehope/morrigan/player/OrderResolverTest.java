@@ -121,7 +121,27 @@ public class OrderResolverTest {
 		assertSame(next2, actual2);
 	}
 
-	private void setTimeAgoLastPlayed (final IMixedMediaItem toRecentlyPlayed, final int time, final TimeUnit unit) throws MorriganException {
+	@Test
+	public void itFollowsTracksByTagsSimulation () throws Exception {
+		addRandomTracks();
+
+		for (int i = 0; i < 200; i++) {
+			final IMixedMediaItem track = this.testDb.addTestTrack();
+			for (int j = 0; j < 3; j++) {
+				addTag("tag_" + this.random.nextInt(20), track);
+			}
+			addRandomTags(track);
+		}
+
+		final OrderResolver or = new OrderResolver();
+		IMediaTrack track = null;
+		for (int i = 0; i < 100; i++) {
+			track = or.getNextTrack(this.testDb, track, PlaybackOrder.FOLLOWTAGS);
+			setTimeAgoLastPlayed(track, 5, TimeUnit.SECONDS);
+		}
+	}
+
+	private void setTimeAgoLastPlayed (final IMediaTrack toRecentlyPlayed, final int time, final TimeUnit unit) throws MorriganException {
 		this.testDb.setTrackDateLastPlayed(toRecentlyPlayed, new Date(System.currentTimeMillis() - unit.toMillis(time)));
 	}
 

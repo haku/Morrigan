@@ -1,5 +1,6 @@
 package com.vaguehope.morrigan.util;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.regex.Pattern;
@@ -8,16 +9,25 @@ public class StringHelper {
 
 	private StringHelper () { /* UNUSED */}
 
-	public static <T> String joinCollection (final Collection<T> collection, final String delim) {
+	public static <T> String join (final T[] c, final String delim) {
+		return join(Arrays.asList(c), delim);
+	}
+
+	public static <T> String join (final Iterable<T> c, final String delim) {
 		final StringBuilder sb = new StringBuilder();
 
-		for (final T i : collection) {
+		for (final T i : c) {
 			sb.append(i.toString());
 			sb.append(delim);
 		}
 		sb.delete(sb.length() - delim.length(), sb.length());
 
 		return sb.toString();
+	}
+
+	@Deprecated
+	public static <T> String joinCollection (final Collection<T> collection, final String delim) {
+		return join(collection, delim);
 	}
 
 	private static final Pattern END_QUOTES = Pattern.compile("^['\"]+|['\"]+$");

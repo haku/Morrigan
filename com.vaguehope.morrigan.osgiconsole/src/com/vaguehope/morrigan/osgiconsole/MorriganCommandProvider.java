@@ -31,6 +31,7 @@ import com.vaguehope.morrigan.server.AsyncActions;
 import com.vaguehope.morrigan.server.model.PullRemoteToLocal;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbHelper;
 import com.vaguehope.morrigan.tasks.AsyncTasksRegister;
+import com.vaguehope.morrigan.transcode.Transcode;
 import com.vaguehope.morrigan.util.ErrorHelper;
 import com.vaguehope.morrigan.util.StringHelper;
 import com.vaguehope.morrigan.util.TimeHelper;
@@ -76,7 +77,8 @@ public class MorriganCommandProvider implements CommandProvider {
 				"\tmn [player|p] 0 [play|queue] [<q1> [<q2>]]\n" +
 				"\tmn [player|p] 0 [queue|q] clear\n" +
 				"\tmn [player|p] 0 [pause|stop|next]\n" +
-				"\tmn [player|p] 0 [order|o] [" + PlaybackOrder.joinLabels("|") + "]\n" +
+				"\tmn [player|p] 0 [order|o] [" + StringHelper.join(PlaybackOrder.values(), "|") + "]\n" +
+				"\tmn [player|p] 0 [transcode|t] [" + StringHelper.join(Transcode.values(), "|") + "]\n" +
 				"\tmn play [<q1> [<q2>]]\n" +
 				"\tmn [queue|q] [<q1> [<q2>]|clear]\n" +
 				"\tmn [pause|stop|s|next|n]\n" +
@@ -422,6 +424,9 @@ public class MorriganCommandProvider implements CommandProvider {
 		else if (cmd.equals("o") || cmd.equals("order")) {
 			doPlayersPlayerOrder(ci, player, args);
 		}
+		else if (cmd.equals("t") || cmd.equals("transcode")) {
+			doPlayersPlayerTranscode(ci, player, args);
+		}
 		else {
 			ci.println("Unknown command '" + cmd + "'.");
 		}
@@ -434,6 +439,9 @@ public class MorriganCommandProvider implements CommandProvider {
 		ci.print(" (");
 		ci.print(player.getPlaybackOrder().toString());
 		ci.print(")");
+		ci.print(" [");
+		ci.print(player.getTranscode().toString());
+		ci.print("]");
 		ci.println();
 
 		final PlayItem currentItem = player.getCurrentItem();
@@ -566,6 +574,28 @@ public class MorriganCommandProvider implements CommandProvider {
 			return;
 		}
 		ci.println("Unknown playback order '" + args.get(0) + "'.");
+	}
+
+	private static void doPlayersPlayerTranscode (final CommandInterpreter ci, final Player player, final List<String> args) {
+		if (args.size() < 1) {
+			ci.println(player.getName() + " player transcode = " + player.getTranscode().toString() + ".");
+			ci.print("Options:");
+			for (final Transcode i : Transcode.values()) {
+				ci.print(" '");
+				ci.print(i.getSymbolicName());
+				ci.print("'");
+			}
+			ci.println();
+			return;
+		}
+
+		final Transcode tr = Transcode.parseOrNull(args.get(0));
+		if (tr != null) {
+			player.setTranscode(tr);
+			ci.println("Transcode set to '" + tr.toString() + "' for " + player.getName() + " player.");
+			return;
+		}
+		ci.println("Unknown transcode '" + args.get(0) + "'.");
 	}
 
 	private static void doPlayersPlayerPrintQueue (final CommandInterpreter ci, final Player player) {

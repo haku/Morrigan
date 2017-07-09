@@ -7,15 +7,16 @@ Bundle-Activator: com.vaguehope.morrigan.osgiconsole.Activator
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: com.vaguehope.morrigan.engines.playback,
+ com.vaguehope.morrigan.model.db,
  com.vaguehope.morrigan.model.exceptions,
  com.vaguehope.morrigan.model.factory,
  com.vaguehope.morrigan.model.helper,
- com.vaguehope.morrigan.model.db,
  com.vaguehope.morrigan.model.media,
  com.vaguehope.morrigan.player,
  com.vaguehope.morrigan.server,
  com.vaguehope.morrigan.server.model,
  com.vaguehope.morrigan.tasks,
+ com.vaguehope.morrigan.transcode,
  com.vaguehope.morrigan.util,
  com.vaguehope.sqlitewrapper,
  org.eclipse.osgi.framework.console;version="1.1.0",
