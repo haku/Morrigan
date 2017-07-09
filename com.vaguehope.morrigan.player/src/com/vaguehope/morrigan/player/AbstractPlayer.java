@@ -142,8 +142,10 @@ public abstract class AbstractPlayer implements Player {
 
 	@Override
 	public void setPlaybackOrder (final PlaybackOrder order) {
-		this.playbackOrder.set(order);
+		if (order == null) throw new IllegalArgumentException("Order can not be null.");
+		final PlaybackOrder old = this.playbackOrder.getAndSet(order);
 		this.listeners.playOrderChanged(order);
+		if (order != old) saveState();
 	}
 
 	protected OrderResolver getOrderResolver () {
@@ -158,8 +160,9 @@ public abstract class AbstractPlayer implements Player {
 	@Override
 	public void setTranscode (final Transcode transcode) {
 		if (transcode == null) throw new IllegalArgumentException("Transcode can not be null.");
-		this.transcode.set(transcode);
+		final Transcode old = this.transcode.getAndSet(transcode);
 		this.listeners.transcodeChanged(transcode);
+		if (transcode != old) saveState();
 	}
 
 	@Override
