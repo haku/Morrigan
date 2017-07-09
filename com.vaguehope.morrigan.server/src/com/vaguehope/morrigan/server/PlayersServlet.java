@@ -48,8 +48,10 @@ import com.vaguehope.morrigan.util.TimeHelper;
  * POST /players/0 action=playpause
  * POST /players/0 action=next
  * POST /players/0 action=stop
+ * POST /players/0 action=seek&position=123.45
+ * POST /players/0 action=playbackorder&order=random
+ * POST /players/0 action=transcode&transcode=audio_only
  * POST /players/0 action=fullscreen&monitor=0
- *
  * POST /players/0 action=addtag&tag=foo
  *
  *  GET /players/0/queue
