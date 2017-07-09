@@ -128,7 +128,10 @@ public class AudioStreamExtractOrTranscode extends TranscodeProfile {
 
 	public AudioStreamExtractOrTranscode (final IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack item,
 			final Transcode transcode, final MimeType fallbackType, final MimeType... otherTypes) throws IOException {
-		this(list, item, transcode, fallbackType, EnumSet.copyOf(Arrays.asList(otherTypes)));
+		this(list, item, transcode, fallbackType,
+				otherTypes.length > 0
+				? EnumSet.copyOf(Arrays.asList(otherTypes))
+				: EnumSet.noneOf(MimeType.class));
 	}
 
 	public AudioStreamExtractOrTranscode (final IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack item,
