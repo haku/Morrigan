@@ -86,7 +86,10 @@ public class Transcoder {
 
 		// Already transcoded?  Use cache.
 		final File outFile = tProfile.getCacheFile();
-		if (outFile.exists() && outFile.lastModified() >= inFile.lastModified()) return;
+		if (outFile.exists() && outFile.lastModified() > inFile.lastModified()) {
+			FileHelper.freshenLastModified(outFile, 5, TimeUnit.DAYS);
+			return;
+		}
 
 		// Max parallel locking.
 		while (true) {

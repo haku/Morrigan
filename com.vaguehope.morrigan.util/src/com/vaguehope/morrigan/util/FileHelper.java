@@ -2,24 +2,27 @@ package com.vaguehope.morrigan.util;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+import java.util.concurrent.TimeUnit;
 
 public final class FileHelper {
 
 	private FileHelper () {}
 
-	public static void copyFile(final File sourceFile, final File destFile) throws IOException {
+	public static void copyFile (final File sourceFile, final File destFile) throws IOException {
 		copyFile(sourceFile, destFile, false);
 	}
 
-	public static void copyFile(final File srcFile, final File dstFile, final boolean overWrite) throws IOException {
+	public static void copyFile (final File srcFile, final File dstFile, final boolean overWrite) throws IOException {
 		if (dstFile.exists()) {
 			if (!overWrite) {
 				throw new IllegalArgumentException("Target file already exists.");
 			}
-		} else {
+		}
+		else {
 			dstFile.createNewFile();
 		}
 
@@ -56,7 +59,6 @@ public final class FileHelper {
 					else {
 						throw e;
 					}
-
 				}
 			}
 		}
@@ -75,6 +77,13 @@ public final class FileHelper {
 			throw new IOException("Failed to rename '" + from.getAbsolutePath()
 					+ "' to '" + to.getAbsolutePath() + "'.");
 		}
+	}
+
+	public static void freshenLastModified (final File f, final long unlessOlderThan, final TimeUnit timeUnit) throws IOException {
+		if (!f.exists()) throw new FileNotFoundException(f.getAbsolutePath());
+		final long now = System.currentTimeMillis();
+		if (now - f.lastModified() < timeUnit.toMillis(unlessOlderThan)) return;
+		if (!f.setLastModified(now)) throw new IOException("Failed to touch file: " + f.getAbsolutePath());
 	}
 
 }
