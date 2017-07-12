@@ -16,7 +16,7 @@ public class FileHelperTest {
 
 	@Test
 	public void itFreshensOldFile () throws Exception {
-		final File f = this.tmp.newFile();
+		final File f = this.tmp.newFile("a");
 
 		long lastMod = nowMillis() - TimeUnit.HOURS.toMillis(11);
 		assertTrue(f.setLastModified(lastMod));
@@ -28,7 +28,7 @@ public class FileHelperTest {
 
 	@Test
 	public void itDoesNotFreshenNewFile () throws Exception {
-		final File f = this.tmp.newFile();
+		final File f = this.tmp.newFile("a");
 
 		long lastMod = nowMillis() - TimeUnit.HOURS.toMillis(9);
 		assertTrue(f.setLastModified(lastMod));
