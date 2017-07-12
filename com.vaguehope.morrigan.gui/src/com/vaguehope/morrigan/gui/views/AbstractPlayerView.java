@@ -10,8 +10,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -56,11 +54,12 @@ import com.vaguehope.morrigan.player.PlaybackOrder;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.Player.PlayerEventListener;
 import com.vaguehope.morrigan.player.PlayerLifeCycleListener;
-import com.vaguehope.morrigan.transcode.Transcode;
 import com.vaguehope.morrigan.screen.CoverArtProvider;
 import com.vaguehope.morrigan.screen.FullscreenShell;
 import com.vaguehope.morrigan.screen.ScreenPainter;
 import com.vaguehope.morrigan.screen.ScreenPainter.TitleProvider;
+import com.vaguehope.morrigan.transcode.Transcode;
+import com.vaguehope.morrigan.util.MnLogger;
 
 /**
  * TODO tidy this class.
@@ -68,7 +67,7 @@ import com.vaguehope.morrigan.screen.ScreenPainter.TitleProvider;
 public abstract class AbstractPlayerView extends ViewPart {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	protected final Logger logger = Logger.getLogger(this.getClass().getName());
+	private static final MnLogger LOG = MnLogger.make(AbstractPlayerView.class);
 
 	private volatile boolean isDisposed = false;
 
@@ -248,7 +247,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 
 		@Override
 		public void onException (final Exception e) {
-			System.err.println("Async Throwable: " + e);
+			LOG.e("Unhandled throwable.", e);
 			getSite().getShell().getDisplay().asyncExec(new RunnableDialog(e));
 		}
 
@@ -853,7 +852,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 			Activator.getHotkeyRegister().addHotkeyListener(this.hotkeyListener);
 		}
 		catch (MorriganException e) {
-			this.logger.log(Level.WARNING, "Failed to add hotkey listener.", e);
+			LOG.e("Failed to add hotkey listener.", e);
 		}
 	}
 
@@ -862,7 +861,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 			Activator.getHotkeyRegister().removeHotkeyListener(this.hotkeyListener);
 		}
 		catch (MorriganException e) {
-			this.logger.log(Level.WARNING, "Failed to remove hotkey listener.", e);
+			LOG.e("Failed to remove hotkey listener.", e);
 		}
 	}
 
@@ -969,7 +968,7 @@ public abstract class AbstractPlayerView extends ViewPart {
 								getPlayer().nextTrack();
 							}
 							catch (Exception e) {
-								e.printStackTrace();
+								AbstractPlayerView.this.playerEventListener.onException(e);
 							}
 						}
 					});

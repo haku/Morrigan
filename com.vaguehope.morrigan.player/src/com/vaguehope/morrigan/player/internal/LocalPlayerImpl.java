@@ -6,8 +6,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -30,11 +28,12 @@ import com.vaguehope.morrigan.player.LocalPlayerSupport;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayerRegister;
+import com.vaguehope.morrigan.util.MnLogger;
 
 public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	protected final Logger logger = Logger.getLogger(this.getClass().getName());
+	private static final MnLogger LOG = MnLogger.make(LocalPlayerImpl.class);
 
 	final LocalPlayerSupport localPlayerSupport;
 	private final PlaybackEngineFactory playbackEngineFactory;
@@ -150,8 +149,8 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 			if (nextTrack != null) {
 				return new PlayItem(currentItem.getList(), nextTrack);
 			}
-			this.logger.info(String.format("OrderResolver.getNextTrack(%s,%s,%s) == null.",
-					currentItem.getList(), currentItem.getTrack(), playbackOrder));
+			LOG.i("OrderResolver.getNextTrack({},{},{}) == null.",
+					currentItem.getList(), currentItem.getTrack(), playbackOrder);
 		}
 
 		final IMediaTrackList<? extends IMediaTrack> currentList = getCurrentList();
@@ -159,8 +158,8 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 		if (nextTrack != null) {
 			return new PlayItem(currentList, nextTrack);
 		}
-		this.logger.info(String.format("OrderResolver.getNextTrack(%s,%s,%s) == null.",
-				currentList, null, playbackOrder));
+		LOG.i("OrderResolver.getNextTrack({},{},{}) == null.",
+				currentList, null, playbackOrder);
 
 		return null;
 	}
@@ -235,8 +234,9 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 		if (eng!=null) {
 			try {
 				eng.stopPlaying();
-			} catch (final PlaybackException e) {
-				e.printStackTrace();
+			}
+			catch (final PlaybackException e) {
+				LOG.e("Failed top stop playback.", e);
 			}
 			eng.unloadFile();
 			eng.finalise();
@@ -259,7 +259,7 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 
 		final IPlaybackEngine engine = getPlaybackEngine(true);
 		synchronized (engine) {
-			this.logger.fine("Loading '" + item.getTrack().getTitle() + "'...");
+			LOG.d("Loading '{}'...", item.getTrack().getTitle());
 			setCurrentItem(item);
 
 			engine.setFile(file.getAbsolutePath());
@@ -268,7 +268,7 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 			engine.startPlaying();
 
 			this._currentTrackDuration = engine.getDuration();
-			this.logger.fine("Started to play '" + item.getTrack().getTitle() + "'...");
+			LOG.d("Started to play '{}'...", item.getTrack().getTitle());
 
 			// Put DB stuff in DB thread.
 			this.executorService.submit(new Runnable() {
@@ -280,7 +280,7 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 						saveState();
 					}
 					catch (final MorriganException e) {
-						LocalPlayerImpl.this.logger.log(Level.WARNING, "Failed to increment track count.", e);
+						LOG.e("Failed to increment track count.", e);
 					}
 				}
 			});
@@ -422,11 +422,11 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 				if (c != null && c.isComplete()) {
 					if (c.getTrack().getDuration() != duration) {
 						try {
-							LocalPlayerImpl.this.logger.fine("setting item duration=" + duration);
+							LOG.d("setting item duration={}.", duration);
 							c.getList().setTrackDuration(c.getTrack(), duration);
 						}
 						catch (final MorriganException e) {
-							LocalPlayerImpl.this.logger.log(Level.WARNING, "Failed to update track duration.", e);
+							LOG.e("Failed to update track duration.", e);
 						}
 					}
 				}
@@ -442,7 +442,7 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 
 		@Override
 		public void onEndOfTrack() {
-			LocalPlayerImpl.this.logger.fine("Player received endOfTrack event.");
+			LOG.d("Player received endOfTrack event.");
 			// Inc. stats.
 			try {
 				getCurrentItem().getList().incTrackEndCnt(getCurrentItem().getTrack());
@@ -456,7 +456,7 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 				loadAndStartPlaying(nextItemToPlay);
 			}
 			else {
-				LocalPlayerImpl.this.logger.info("No more tracks to play.");
+				LOG.i("No more tracks to play.");
 				getListeners().currentItemChanged(null);
 			}
 		}
@@ -475,7 +475,7 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 
 		@Override
 		public void onMouseClick(final int button, final int clickCount) {
-			LocalPlayerImpl.this.logger.info("Mouse click "+button+"*"+clickCount);
+			LOG.i("Mouse click {}*{}.", button, clickCount);
 			if (clickCount > 1) {
 				LocalPlayerImpl.this.localPlayerSupport.videoAreaSelected();
 			}

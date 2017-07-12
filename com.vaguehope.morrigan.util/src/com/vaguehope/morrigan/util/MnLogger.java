@@ -44,4 +44,9 @@ public class MnLogger {
 		this.logger.info(msg, args);
 	}
 
+	public void d (final String msg, final Object... args) {
+		if (!this.logger.isDebugEnabled()) return;
+		this.logger.debug(msg, args);
+	}
+
 }
