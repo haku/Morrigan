@@ -274,7 +274,7 @@ public abstract class AbstractPlayer implements Player {
 
 	private void rollbackToTopOfQueue (final PlayItem item) {
 		if (item.equals(getCurrentItem())) return;
-		getQueue().addToQueueTop(item);
+		getQueue().addToQueueTop(item.withoutId());
 	}
 
 	/**
