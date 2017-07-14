@@ -11,7 +11,6 @@ import com.vaguehope.morrigan.engines.hotkey.HotkeyValue;
 import com.vaguehope.morrigan.engines.hotkey.IHotkeyEngine;
 import com.vaguehope.morrigan.engines.hotkey.IHotkeyListener;
 
-
 public class HotkeyEngine implements IHotkeyEngine {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -31,10 +30,10 @@ public class HotkeyEngine implements IHotkeyEngine {
 	}
 
 	@Override
-	public void setClassPath(File[] classPath) { /* UNUSED */ }
+	public void setClassPath (final File[] classPath) { /* UNUSED */}
 
 	@Override
-	public void registerHotkey(int id, HotkeyValue value) throws HotkeyException {
+	public void registerHotkey (final int id, final HotkeyValue value) throws HotkeyException {
 		loadSo();
 		setup();
 
@@ -53,18 +52,18 @@ public class HotkeyEngine implements IHotkeyEngine {
 	}
 
 	@Override
-	public void unregisterHotkey(int id) throws HotkeyException {
+	public void unregisterHotkey (final int id) throws HotkeyException {
 		if (!this.soLoaded || !this.haveSetup) return;
 		JXGrabKey.getInstance().unregisterHotKey(id);
 	}
 
 	@Override
-	public void setListener(IHotkeyListener listener) {
+	public void setListener (final IHotkeyListener listener) {
 		this.listener = listener;
 	}
 
 	@Override
-	public void dispose() {
+	public void dispose () {
 		teardown();
 	}
 
@@ -90,15 +89,15 @@ public class HotkeyEngine implements IHotkeyEngine {
 		this.haveSetup = false;
 	}
 
-	private HotkeyListener hotkeyListener = new jxgrabkey.HotkeyListener(){
+	private final HotkeyListener hotkeyListener = new jxgrabkey.HotkeyListener() {
 		@Override
-		public void onHotkey(int hotkey_idx) {
+		public void onHotkey (final int hotkey_idx) {
 			callListener(hotkey_idx);
 		}
 	};
 
-	protected void callListener(int id) {
-		if (this.listener!=null) {
+	protected void callListener (final int id) {
+		if (this.listener != null) {
 			this.listener.onKeyPress(id);
 		}
 	}
