@@ -42,7 +42,7 @@ public class Activator implements BundleActivator {
 		this.playerReaderTracker = new PlayerReaderTracker(context);
 		this.mediaFactoryTracker = new MediaFactoryTracker(context);
 		this.asyncTasksRegisterTracker = new AsyncTasksRegisterTracker(context);
-		this.transcoder = new Transcoder();
+		this.transcoder = new Transcoder("srv");
 		this.executorService = new ThreadPoolExecutor(0, 1, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), new DaemonThreadFactory("srvboot"));
 		this.scheduledExecutorService = Executors.newScheduledThreadPool(1);
 

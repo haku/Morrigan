@@ -16,6 +16,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.vaguehope.morrigan.util.DaemonThreadFactory;
 import com.vaguehope.morrigan.util.ExceptionHelper;
 import com.vaguehope.morrigan.util.FileHelper;
 import com.vaguehope.morrigan.util.IoHelper;
@@ -39,12 +40,13 @@ public class Transcoder {
 	private final ExecutorService es;
 	private volatile boolean alive = true;
 
-	public Transcoder () {
+	public Transcoder (final String name) {
 		// TODO replace with async / shutdown?
 		this.es = new ThreadPoolExecutor(
 				0, MAX_IN_PROGRESS_TRANSCODES * 2,
 				60L, TimeUnit.SECONDS,
-				new LinkedBlockingQueue<Runnable>());
+				new LinkedBlockingQueue<Runnable>(),
+				new DaemonThreadFactory(name + "-tr"));
 	}
 
 	private void checkAlive () {

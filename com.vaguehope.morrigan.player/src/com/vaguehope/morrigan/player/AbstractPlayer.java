@@ -37,7 +37,7 @@ public abstract class AbstractPlayer implements Player {
 	private final AtomicReference<PlaybackOrder> playbackOrder = new AtomicReference<PlaybackOrder>(PlaybackOrder.MANUAL);
 
 	private final AtomicReference<Transcode> transcode = new AtomicReference<Transcode>(Transcode.NONE);
-	private final Transcoder transcoder = new Transcoder();
+	private final Transcoder transcoder;
 
 	private volatile boolean stateRestoreAttempted = false;
 	private volatile boolean loadingTrack = false;
@@ -47,6 +47,7 @@ public abstract class AbstractPlayer implements Player {
 		this.name = name;
 		this.register = register;
 		this.loadEs = new ThreadPoolExecutor(0, 1, 10L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), new DaemonThreadFactory("pload"));
+		this.transcoder = new Transcoder(id);
 	}
 
 	@Override

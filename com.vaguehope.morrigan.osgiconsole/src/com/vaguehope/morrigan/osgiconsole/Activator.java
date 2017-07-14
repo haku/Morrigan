@@ -25,7 +25,7 @@ public class Activator implements BundleActivator  {
 		this.playerReaderTracker = new PlayerReaderTracker(context);
 		this.mediaFactoryTracker = new MediaFactoryTracker(context);
 		this.asyncTasksRegisterTracker = new AsyncTasksRegisterTracker(context);
-		this.transcoder = new Transcoder();
+		this.transcoder = new Transcoder("con");
 
 		final AsyncActions asyncActions = new AsyncActions(this.asyncTasksRegisterTracker, this.mediaFactoryTracker);
 		final CliHelper cliHelper = new CliHelper(this.mediaFactoryTracker);
