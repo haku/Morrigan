@@ -56,7 +56,7 @@ public class Transcoder {
 		this.es.shutdown();
 	}
 
-	public Future<?> transcodeToFileAsync (final TranscodeProfile tProfile, final Listener<Exception> onComplete) throws IOException {
+	public Future<?> transcodeToFileAsync (final TranscodeProfile tProfile, final Listener<Exception> onComplete) {
 		checkAlive();
 		return this.es.submit(new Runnable() {
 			@Override

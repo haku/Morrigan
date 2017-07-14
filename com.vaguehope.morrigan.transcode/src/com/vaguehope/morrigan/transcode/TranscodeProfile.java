@@ -67,7 +67,7 @@ public abstract class TranscodeProfile {
 	/**
 	 * Includes leading dot.
 	 */
-	public String getTmpFileExt () {
+	protected String getTmpFileExt () {
 		return "." + this.mimeType.getExt();
 	}
 
@@ -107,6 +107,6 @@ public abstract class TranscodeProfile {
 	/**
 	 * Cmd must write to cache file.
 	 */
-	public abstract String[] transcodeCmd (File outputFile) throws IOException;
+	protected abstract String[] transcodeCmd (File outputFile) throws IOException;
 
 }
