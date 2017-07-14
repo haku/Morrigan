@@ -30,6 +30,7 @@ import com.vaguehope.morrigan.player.PlayerReader;
 import com.vaguehope.morrigan.server.AsyncActions;
 import com.vaguehope.morrigan.server.model.PullRemoteToLocal;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbHelper;
+import com.vaguehope.morrigan.tasks.AsyncTask;
 import com.vaguehope.morrigan.tasks.AsyncTasksRegister;
 import com.vaguehope.morrigan.transcode.Transcode;
 import com.vaguehope.morrigan.util.ErrorHelper;
@@ -83,6 +84,7 @@ public class MorriganCommandProvider implements CommandProvider {
 				"\tmn [queue|q] [<q1> [<q2>]|clear]\n" +
 				"\tmn [pause|stop|s|next|n]\n" +
 				"\tmn st\n" +
+				"\tmn st [stop|s] <number>\n" +
 				"\tNOTE 1: <q1> = list, <q2> = item in <q1>.\n" +
 				"\tNOTE 2: Only omit player ID when there is only one player.\n";
 	}
@@ -117,7 +119,7 @@ public class MorriganCommandProvider implements CommandProvider {
 
 		final String cmd = args.remove(0);
 		if (cmd.equals("st")) {
-			doStat(ci);
+			doStat(ci, args);
 		}
 		else if (cmd.equals("m") || cmd.equals("media")) {
 			doMedia(ci, args);
@@ -151,8 +153,43 @@ public class MorriganCommandProvider implements CommandProvider {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private void doStat (final CommandInterpreter ci) {
-		ci.print(this.asyncTasksRegister.reportSummary()); // Has own trailing new line.
+	private void doStat (final CommandInterpreter ci, final List<String> args) {
+		if (args.size() < 1) {
+			ci.print(this.asyncTasksRegister.reportSummary()); // Has own trailing new line.
+			return;
+		}
+
+		final String cmd = args.remove(0);
+		if (args.size() > 0) {
+			if (cmd.equals("s") || cmd.equals("stop")) {
+				if (args.size() < 1) {
+					ci.println("Task number required.");
+					return;
+				}
+
+				final String rawNumber = args.remove(0);
+				final int number;
+				try {
+					number = Integer.parseInt(rawNumber);
+				}
+				catch (final NumberFormatException e) {
+					ci.println("Not a number: " + rawNumber);
+					return;
+				}
+
+				for (final AsyncTask task : this.asyncTasksRegister.tasks()) {
+					if (task.number() == number) {
+						task.cancel();
+						ci.println("Cancelled: " + task.title());
+						return;
+					}
+				}
+				ci.println("Task not found: " + number);
+			}
+			else {
+				ci.println("Unknown command: " + cmd);
+			}
+		}
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

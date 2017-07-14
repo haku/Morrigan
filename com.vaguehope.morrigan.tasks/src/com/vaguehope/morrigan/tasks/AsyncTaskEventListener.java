@@ -16,11 +16,13 @@ import com.vaguehope.morrigan.util.ThreadSafeDateFormatter;
 public class AsyncTaskEventListener implements TaskEventListener, AsyncTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+	private static final AtomicInteger TASK_NUMBER = new AtomicInteger(0);
 	private static final long EXPIRY_AGE = 30 * 60 * 1000L; // 30 minutes.
 	private static final ThreadSafeDateFormatter DATE_FORMATTER = new ThreadSafeDateFormatter("HH:mm");
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+	private final int number = TASK_NUMBER.getAndIncrement();
 	private final String id = UUID.randomUUID().toString();
 
 	private final AtomicReference<TaskState> lifeCycle = new AtomicReference<TaskState>(TaskState.UNSTARTED);
@@ -43,9 +45,10 @@ public class AsyncTaskEventListener implements TaskEventListener, AsyncTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	public String summarise () {
-		StringBuilder s = new StringBuilder();
-
-		s.append('[').append(this.lifeCycle.get()).append(' ')
+		final StringBuilder s = new StringBuilder()
+				.append(this.number)
+				.append(" [")
+				.append(this.lifeCycle.get()).append(' ')
 				.append(DATE_FORMATTER.get().format(new Date(this.startTime.get())))
 				.append(']');
 
@@ -91,6 +94,7 @@ public class AsyncTaskEventListener implements TaskEventListener, AsyncTask {
 		}
 	}
 
+	@Override
 	public void cancel () {
 		this.cancelled.set(true);
 	}
@@ -150,6 +154,10 @@ public class AsyncTaskEventListener implements TaskEventListener, AsyncTask {
 		this.progressWorked.addAndGet(work);
 	}
 
+	@Override
+	public int number () {
+		return this.number;
+	}
 	@Override
 	public String id () {
 		return this.id;
