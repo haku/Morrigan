@@ -33,6 +33,8 @@ import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbHelper;
 import com.vaguehope.morrigan.tasks.AsyncTask;
 import com.vaguehope.morrigan.tasks.AsyncTasksRegister;
 import com.vaguehope.morrigan.transcode.Transcode;
+import com.vaguehope.morrigan.transcode.TranscodeTask;
+import com.vaguehope.morrigan.transcode.Transcoder;
 import com.vaguehope.morrigan.util.ErrorHelper;
 import com.vaguehope.morrigan.util.StringHelper;
 import com.vaguehope.morrigan.util.TimeHelper;
@@ -45,14 +47,17 @@ public class MorriganCommandProvider implements CommandProvider {
 	private final MediaFactory mediaFactory;
 	private final AsyncTasksRegister asyncTasksRegister;
 	private final AsyncActions asyncActions;
+	private final Transcoder transcoder;
 	private final CliHelper cliHelper;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public MorriganCommandProvider (final PlayerReader playerReader, final MediaFactory mediaFactory, final AsyncTasksRegister asyncTasksRegister, final AsyncActions asyncActions, final CliHelper cliHelper) {
+	public MorriganCommandProvider (final PlayerReader playerReader, final MediaFactory mediaFactory, final AsyncTasksRegister asyncTasksRegister,
+			final Transcoder transcoder, final AsyncActions asyncActions, final CliHelper cliHelper) {
 		this.playerReader = playerReader;
 		this.mediaFactory = mediaFactory;
 		this.asyncTasksRegister = asyncTasksRegister;
+		this.transcoder = transcoder;
 		this.asyncActions = asyncActions;
 		this.cliHelper = cliHelper;
 	}
@@ -85,6 +90,7 @@ public class MorriganCommandProvider implements CommandProvider {
 				"\tmn [pause|stop|s|next|n]\n" +
 				"\tmn st\n" +
 				"\tmn st [stop|s] <number>\n" +
+				"\tmn transcode <q1> <profile> <max files>\n" +
 				"\tNOTE 1: <q1> = list, <q2> = item in <q1>.\n" +
 				"\tNOTE 2: Only omit player ID when there is only one player.\n";
 	}
@@ -141,6 +147,9 @@ public class MorriganCommandProvider implements CommandProvider {
 		}
 		else if (cmd.equals("n") || cmd.equals("next")) {
 			doNext(ci);
+		}
+		else if (cmd.equals("transcode")) {
+			doTranscode(ci, args);
 		}
 		else if (cmd.equals("h") || cmd.equals("help")) {
 			ci.print(this.getHelp()); // already ends with new line.
@@ -676,6 +685,25 @@ public class MorriganCommandProvider implements CommandProvider {
 	private void doNext (final CommandInterpreter ci) {
 		final Player player = getOnlyPlayer(ci);
 		if (player != null) doPlayersPlayerNext(ci, player);
+	}
+
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	private void doTranscode (final CommandInterpreter ci, final List<String> args) throws ArgException, MorriganException {
+		this.cliHelper.checkArgs(args, 3);
+
+		final IMediaTrackList<? extends IMediaTrack> q1 = this.cliHelper.argQ1(args.get(0));
+
+		final Transcode tr = Transcode.parseOrNull(args.get(1));
+		if (tr == null) {
+			ci.println("Unknown transcode: " + args.get(1));
+			return;
+		}
+
+		final Integer maxNumber = this.cliHelper.argPositiveInt(args.get(2));
+
+		this.asyncTasksRegister.scheduleTask(new TranscodeTask(this.transcoder, tr, q1, maxNumber));
+		ci.println(String.format("Transcoding %s to %s scheduled.  Use 'mn st' to track progress.", q1.getListName(), tr));
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

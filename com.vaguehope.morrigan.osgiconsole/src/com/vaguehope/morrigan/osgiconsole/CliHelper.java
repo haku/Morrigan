@@ -42,6 +42,17 @@ public class CliHelper {
 		return arg;
 	}
 
+	public int argPositiveInt (final String arg) throws ArgException {
+		try {
+			final int n = Integer.parseInt(arg);
+			if (n < 0) throw new ArgException("Less than 0: " + arg);
+			return n;
+		}
+		catch (final NumberFormatException e) {
+			throw new ArgException("Not a number: " + arg);
+		}
+	}
+
 	public URI argUri (final String arg) throws ArgException {
 		try {
 			return new URI(argNotBlank(arg));
