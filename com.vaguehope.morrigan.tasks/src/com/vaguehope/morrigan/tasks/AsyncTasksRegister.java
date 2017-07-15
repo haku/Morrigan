@@ -1,6 +1,6 @@
 package com.vaguehope.morrigan.tasks;
 
-import java.util.Collection;
+import java.util.List;
 
 public interface AsyncTasksRegister {
 
@@ -10,7 +10,7 @@ public interface AsyncTasksRegister {
 
 	String[] reportIndiviually ();
 
-	Collection<AsyncTask> tasks();
+	List<AsyncTask> tasks();
 	AsyncTask task(String id);
 
 }

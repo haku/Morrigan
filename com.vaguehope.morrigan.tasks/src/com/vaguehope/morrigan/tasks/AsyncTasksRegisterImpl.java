@@ -1,7 +1,6 @@
 package com.vaguehope.morrigan.tasks;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -79,9 +78,9 @@ public class AsyncTasksRegisterImpl implements AsyncTasksRegister {
 	}
 
 	@Override
-	public Collection<AsyncTask> tasks () {
+	public List<AsyncTask> tasks () {
 		clean();
-		final Collection<AsyncTask> ret = new ArrayList<AsyncTask>();
+		final List<AsyncTask> ret = new ArrayList<AsyncTask>();
 		for (final AsyncTaskEventListener l : this.listeners) {
 			ret.add(l);
 		}

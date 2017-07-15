@@ -1,7 +1,7 @@
 package com.vaguehope.morrigan.tasks;
 
-import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.osgi.framework.BundleContext;
@@ -56,9 +56,9 @@ public class AsyncTasksRegisterTracker implements AsyncTasksRegister {
 	}
 
 	@Override
-	public Collection<AsyncTask> tasks () {
+	public List<AsyncTask> tasks () {
 		final AsyncTasksRegister service = getServiceOptional();
-		return service == null ? Collections.<AsyncTask>emptySet() : service.tasks();
+		return service == null ? Collections.<AsyncTask>emptyList() : service.tasks();
 	}
 
 	@Override
