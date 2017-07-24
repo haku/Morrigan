@@ -112,6 +112,11 @@ public class Transcoder {
 			inFileDurationSeconds = TimeUnit.MILLISECONDS.toSeconds(inFileDurationMillis);
 		}
 
+		final Long trimEndTimeSeconds = tProfile.getTrimEndTimeSeconds();
+		if (trimEndTimeSeconds != null && trimEndTimeSeconds > 0 && trimEndTimeSeconds < inFileDurationSeconds) {
+			inFileDurationSeconds = trimEndTimeSeconds;
+		}
+
 		try {
 			final File ftmp = File.createTempFile(outFile.getName(), tProfile.getTmpFileExt(), outFile.getParentFile());
 			try {

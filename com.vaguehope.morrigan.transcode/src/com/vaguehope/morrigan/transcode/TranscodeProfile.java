@@ -61,6 +61,7 @@ public abstract class TranscodeProfile {
 	}
 
 	protected static String cacheFileNameWithoutExtension (final IMediaItem item, final Transcode transcode) {
+		// TODO use better hash?
 		return ChecksumHelper.md5String(item.getFile().getAbsolutePath()) + "_" + transcode.getSymbolicName();
 	}
 
@@ -71,6 +72,9 @@ public abstract class TranscodeProfile {
 		return "." + this.mimeType.getExt();
 	}
 
+	/**
+	 * Stop time in seconds relative to start of file.
+	 */
 	protected Long getTrimEndTimeSeconds () {
 		if (this.list == null) return null;
 

@@ -41,6 +41,12 @@ public class Mp4CompatibleTranscode extends TranscodeProfile {
 		cmd.add("-fflags");
 		cmd.add("+genpts");
 
+		final Long trimEnd = getTrimEndTimeSeconds();
+		if (trimEnd != null) {
+			cmd.add("-ss");
+			cmd.add("0");
+		}
+
 		cmd.add("-i");
 		cmd.add(getItem().getFile().getAbsolutePath());
 
@@ -79,6 +85,11 @@ public class Mp4CompatibleTranscode extends TranscodeProfile {
 
 		cmd.add("-movflags");
 		cmd.add("+faststart");
+
+		if (trimEnd != null) {
+			cmd.add("-to");
+			cmd.add(String.valueOf(trimEnd));
+		}
 
 		cmd.add(outputFile.getAbsolutePath());
 
