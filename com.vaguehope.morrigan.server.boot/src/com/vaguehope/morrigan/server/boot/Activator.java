@@ -44,7 +44,7 @@ public class Activator implements BundleActivator {
 		this.asyncTasksRegisterTracker = new AsyncTasksRegisterTracker(context);
 		this.transcoder = new Transcoder("srv");
 		this.executorService = new ThreadPoolExecutor(0, 1, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), new DaemonThreadFactory("srvboot"));
-		this.scheduledExecutorService = Executors.newScheduledThreadPool(1);
+		this.scheduledExecutorService = Executors.newScheduledThreadPool(1, new DaemonThreadFactory("srvsch"));
 
 		this.uiMgr = new UiMgr(Bundles.GUI.isPresent(context));
 		this.nullScreen = new NullScreen(this.uiMgr);
