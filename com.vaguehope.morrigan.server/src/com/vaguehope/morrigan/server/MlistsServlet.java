@@ -789,7 +789,7 @@ public class MlistsServlet extends HttpServlet {
 					final File transcodedFile = tProfile.getCacheFile();
 					fileSize = transcodedFile.exists() ? transcodedFile.length() : 0L;
 
-					fileLink += "?" + PARAM_TRANSCODE + "=" + transcode;
+					fileLink += "?" + PARAM_TRANSCODE + "=" + transcode.getSymbolicName();
 				}
 			}
 			else {
