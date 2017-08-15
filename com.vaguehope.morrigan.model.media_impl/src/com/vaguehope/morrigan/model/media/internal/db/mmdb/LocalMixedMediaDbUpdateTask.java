@@ -199,9 +199,11 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMe
 						dSeconds = (int) TimeUnit.MILLISECONDS.toSeconds(dMillis);
 					}
 				}
-				else {
+
+				if (dSeconds < 1) {
 					dSeconds = this.playbackEngine.readFileDuration(item.getFilepath());
 				}
+
 				if (dSeconds > 0) list.setTrackDuration(item, dSeconds);
 			}
 			catch (Exception e) { // NOSONAR strange errors reading files should be reported to the user.
