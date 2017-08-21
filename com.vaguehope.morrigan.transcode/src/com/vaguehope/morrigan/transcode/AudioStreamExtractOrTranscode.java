@@ -68,6 +68,12 @@ public class AudioStreamExtractOrTranscode extends TranscodeProfile {
 		},
 		FLAC("flac", MimeType.FLAC) {
 			@Override
+			public void extract (final List<String> cmd) {
+				cmd.add("-c:a");
+				cmd.add("flac");
+			}
+
+			@Override
 			public void transcode (final List<String> cmd) {
 				cmd.add("-c:a");
 				cmd.add("flac");
