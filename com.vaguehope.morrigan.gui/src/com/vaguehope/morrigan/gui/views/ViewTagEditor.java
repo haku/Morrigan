@@ -2,7 +2,6 @@ package com.vaguehope.morrigan.gui.views;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.jface.action.Action;
@@ -198,7 +197,7 @@ public class ViewTagEditor extends ViewPart {
 
 	public void setInput (final IMediaItemDb<?, ?> editedMediaList, final IMediaItem item) {
 		if (item != null) {
-			List<IMediaItem> list = new LinkedList<IMediaItem>();
+			List<IMediaItem> list = new ArrayList<IMediaItem>();
 			list.add(item);
 			setInput(editedMediaList, list);
 		}
@@ -212,12 +211,12 @@ public class ViewTagEditor extends ViewPart {
 			if (selection.size() == 1) {
 				setContentDescription(selection.get(0).getTitle());
 				this.editedItem = selection.get(0);
-				this.editedItems = new LinkedList<IMediaItem>(selection);
+				this.editedItems = new ArrayList<IMediaItem>(selection);
 			}
 			else {
 				setContentDescription(selection.size() + " items selected.");
 				this.editedItem = null;
-				this.editedItems = new LinkedList<IMediaItem>(selection);
+				this.editedItems = new ArrayList<IMediaItem>(selection);
 			}
 		}
 		else {
@@ -226,7 +225,7 @@ public class ViewTagEditor extends ViewPart {
 			this.editedItems = null;
 		}
 
-		this.btnAddTag.setEnabled(this.editedItem != null || this.editedItems.size() > 1);
+		this.btnAddTag.setEnabled(this.editedItem != null || (this.editedItems != null && this.editedItems.size() > 1));
 		this.btnRemoveTag.setEnabled(this.editedItem != null);
 		this.readTagsAction.setEnabled(this.editedItem != null);
 
@@ -448,7 +447,7 @@ public class ViewTagEditor extends ViewPart {
 	}
 
 	void procRemoveTag () {
-		List<MediaTag> selMts = new LinkedList<MediaTag>();
+		List<MediaTag> selMts = new ArrayList<MediaTag>();
 
 		ISelection selection = this.tableViewer.getSelection();
 		if (selection instanceof IStructuredSelection) {
