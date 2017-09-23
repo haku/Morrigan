@@ -2,6 +2,12 @@
 	<group android:id="@+id/group_popupmenu">
 
 		<item
+			android:id="@+id/playback"
+			android:icon="@drawable/play"
+			android:title="Playback"
+			android:showAsAction="always"/>
+
+		<item
 			android:id="@+id/checkoutmgr"
 			android:icon="@drawable/pref"
 			android:title="Checkout Manager"

@@ -47,6 +47,7 @@ import com.vaguehope.morrigan.android.model.PlayerStateListChangeListener;
 import com.vaguehope.morrigan.android.model.ServerReference;
 import com.vaguehope.morrigan.android.modelimpl.ArtifactListAdaptorImpl;
 import com.vaguehope.morrigan.android.modelimpl.ArtifactListGroupImpl;
+import com.vaguehope.morrigan.android.playback.PlaybackActivity;
 import com.vaguehope.morrigan.android.state.ConfigDb;
 import com.vaguehope.morrigan.android.state.Preferences;
 import com.vaguehope.morrigan.android.tasks.GetMlistsTask;
@@ -226,6 +227,9 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 		switch (item.getItemId()) {
 			case android.R.id.home:
 				this.sidebarLayout.toggleSidebar();
+				return true;
+			case R.id.playback:
+				startActivity(new Intent(getApplicationContext(), PlaybackActivity.class));
 				return true;
 			case R.id.checkoutmgr:
 				startActivity(new Intent(getApplicationContext(), CheckoutMgrActivity.class));

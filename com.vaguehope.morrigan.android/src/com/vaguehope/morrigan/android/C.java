@@ -20,6 +20,7 @@ public interface C {
 
 	String PACKAGE_PREFIX = "com.vaguehope.morrigan.android.";
 	String LOGTAG = "Morrigan";
+	String TAG = LOGTAG;
 
 	String USERNAME = "Morrigan-Android";
 
@@ -33,5 +34,8 @@ public interface C {
 	String CONTEXT_PLAYER_QUEUE = "/queue";
 
 	int PLAYER_REFRESH_SECONDS = 10;
+
+	// Playback.
+	int SERVICE_CONNECT_TIMEOUT_SECONDS = 5;
 
 }
