@@ -12,7 +12,7 @@ public class PlaybackClient {
 
 	private final LogWrapper log = new LogWrapper();
 	private final Context context;
-	private Runnable serviceIsReady = null;
+	private Runnable serviceIsReadyListener = null;
 	private Playbacker boundService;
 	private boolean boundToService = false;
 
@@ -20,11 +20,11 @@ public class PlaybackClient {
 		this(context, name, null);
 	}
 
-	public PlaybackClient (final Context context, final String name, final Runnable serviceIsReady) {
+	public PlaybackClient (final Context context, final String name, final Runnable serviceIsReadyListener) {
 		this.context = context;
 		this.log.setPrefix(name);
-		this.serviceIsReady = serviceIsReady;
-		bindServiceService();
+		this.serviceIsReadyListener = serviceIsReadyListener;
+		startAndBindServiceService();
 	}
 
 	public void dispose () {
@@ -39,7 +39,7 @@ public class PlaybackClient {
 	}
 
 	public void clearReadyListener () {
-		this.serviceIsReady = null;
+		this.serviceIsReadyListener = null;
 	}
 
 	public Playbacker getService () {
@@ -51,14 +51,14 @@ public class PlaybackClient {
 	}
 
 	protected void callServiceReadyListener () {
-		if (this.serviceIsReady != null) this.serviceIsReady.run();
+		if (this.serviceIsReadyListener != null) this.serviceIsReadyListener.run();
 	}
 
 	protected void setBoundServiceService (final Playbacker boundServiceService) {
 		this.boundService = boundServiceService;
 	}
 
-	private final ServiceConnection mServiceServiceConnection = new ServiceConnection() {
+	private final ServiceConnection serviceConnection = new ServiceConnection() {
 
 		@Override
 		public void onServiceConnected (final ComponentName className, final IBinder service) {
@@ -74,13 +74,15 @@ public class PlaybackClient {
 			// Because it is running in our same process, we should never
 			// see this happen.
 			setBoundServiceService(null);
-			getLog().w("ServiceService unexpectadly disconnected.");
+			getLog().w("Service unexpectadly disconnected.");
 		}
 
 	};
 
-	private void bindServiceService () {
-		this.boundToService = this.context.bindService(new Intent(this.context, PlaybackService.class), this.mServiceServiceConnection, Context.BIND_AUTO_CREATE);
+	private void startAndBindServiceService () {
+		final Intent intent = new Intent(this.context, PlaybackService.class);
+		this.context.startService(intent);
+		this.boundToService = this.context.bindService(intent, this.serviceConnection, Context.BIND_AUTO_CREATE);
 		if (!this.boundToService) {
 			this.log.e("Failed to bind to PlaybackService.  Expect further errors.");
 		}
@@ -89,7 +91,7 @@ public class PlaybackClient {
 	private void unbindServiceService () {
 		if (this.boundToService && this.boundService != null) {
 			try {
-				this.context.unbindService(this.mServiceServiceConnection);
+				this.context.unbindService(this.serviceConnection);
 			}
 			catch (final Exception e) {
 				this.log.e("Exception caught in unbindServiceService().", e);

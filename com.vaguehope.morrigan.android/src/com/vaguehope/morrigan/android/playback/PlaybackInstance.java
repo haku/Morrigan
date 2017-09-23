@@ -10,7 +10,9 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import android.app.Notification;
 import android.app.Notification.Builder;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
@@ -29,7 +31,6 @@ public class PlaybackInstance implements Playbacker {
 	private final MessageHandler messageHandler;
 
 	private final NotificationManager notifMgr;
-	private int notificationId;
 	private Builder notif;
 
 	private final List<QueueItem> queue = new CopyOnWriteArrayList<QueueItem>();
@@ -49,28 +50,37 @@ public class PlaybackInstance implements Playbacker {
 	 */
 	public void dispose () {
 		unloadPlayback();
-		this.notifMgr.cancel(this.notificationId);
+		this.notifMgr.cancel(PlaybackCodes.PLAYBACK_NOTIFICATION_ID);
 	}
 
 	// Notification.
 
 	private void makeNotif () {
-		this.notificationId = (int) (System.currentTimeMillis()); // Probably unique.
-
-		final String title = "Morrigan Player";
-		final String subTitle = "Ready";
+		final Intent showPlaybackI = new Intent(this.context, PlaybackActivity.class)
+				.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+		final PendingIntent showPlaybackPi = PendingIntent.getActivity(this.context, PlaybackCodes.SHOW_UI, showPlaybackI, PendingIntent.FLAG_CANCEL_CURRENT);
 
 		this.notif = new Notification.Builder(this.context)
+				.setContentIntent(showPlaybackPi)
 				.setSmallIcon(R.drawable.stop)
-				.setContentTitle(title)
-				.setContentText(subTitle)
-				.setTicker(subTitle)
-				.setOngoing(true);
+				.setContentTitle("Morrigan Player")
+				.setOngoing(true)
+				.addAction(android.R.drawable.ic_menu_close_clear_cancel, "Exit",
+						PlaybackBroadcastReceiver.makePendingIntent(this.context, PlaybackCodes.EXIT))
+				.addAction(R.drawable.pause, "Pause",
+						PlaybackBroadcastReceiver.makePendingIntent(this.context, PlaybackCodes.PLAY_PAUSE))
+				.addAction(R.drawable.next, "Next",
+						PlaybackBroadcastReceiver.makePendingIntent(this.context, PlaybackCodes.NEXT));
 		showNotif();
 	}
 
 	private void updateNotifTitle (final CharSequence msg) {
 		this.notif.setContentTitle(msg);
+		showNotif();
+	}
+
+	private void updateNotifSubtitle (final CharSequence msg) {
+		this.notif.setContentText(msg);
 		showNotif();
 	}
 
@@ -100,7 +110,15 @@ public class PlaybackInstance implements Playbacker {
 	}
 
 	private void showNotif () {
-		this.notifMgr.notify(this.notificationId, this.notif.getNotification());
+		this.notifMgr.notify(PlaybackCodes.PLAYBACK_NOTIFICATION_ID, this.notif.getNotification());
+	}
+
+	int getNotificationId () {
+		return PlaybackCodes.PLAYBACK_NOTIFICATION_ID;
+	}
+
+	Notification getNotif () {
+		return this.notif.getNotification();
 	}
 
 	// Watchers.
@@ -108,6 +126,10 @@ public class PlaybackInstance implements Playbacker {
 	@Override
 	public void addPlaybackListener (final PlaybackWatcher watcher) {
 		this.playbackWatchers.add(watcher);
+
+		final Message msg = this.messageHandler.obtainMessage(Msgs.NOTIFY_NEW_WATCHER.ordinal());
+		msg.obj = watcher;
+		msg.sendToTarget();
 	}
 
 	@Override
@@ -124,6 +146,7 @@ public class PlaybackInstance implements Playbacker {
 
 	@Override
 	public void notifyQueueChanged () {
+		updateNotifSubtitle(String.format("%s items in queue.", this.queue.size()));
 		this.playbackWatcherDispatcher.queueChanged();
 	}
 
@@ -139,6 +162,18 @@ public class PlaybackInstance implements Playbacker {
 	}
 
 	// Public playback.
+
+	public void onBroadcastAction (final int actionCode) {
+		switch (actionCode) {
+			case PlaybackCodes.PLAY_PAUSE:
+				playPausePlayback();
+				break;
+			case PlaybackCodes.NEXT:
+				gotoNextItem();
+				break;
+			default:
+		}
+	}
 
 	@Override
 	public void playPausePlayback () {
@@ -160,7 +195,8 @@ public class PlaybackInstance implements Playbacker {
 	private enum Msgs {
 		PLAY_PAUSE,
 		STOP,
-		GOTO_NEXT_ITEM;
+		GOTO_NEXT_ITEM,
+		NOTIFY_NEW_WATCHER;
 		public static final Msgs values[] = values(); // Optimisation to avoid new array every time.
 	}
 
@@ -181,6 +217,9 @@ public class PlaybackInstance implements Playbacker {
 
 	protected void msgOnMainThread (final Message msg) {
 		final Msgs m = Msgs.values[msg.what];
+		final Object obj = msg.obj;
+		msg.recycle();
+
 		LOG.i("msg.what=%s", m);
 		try {
 			switch (m) {
@@ -192,6 +231,9 @@ public class PlaybackInstance implements Playbacker {
 					break;
 				case GOTO_NEXT_ITEM:
 					startPlayingNextItem();
+					break;
+				case NOTIFY_NEW_WATCHER:
+					notifyNewWatcher((PlaybackWatcher) obj);
 					break;
 				default:
 			}
@@ -331,6 +373,23 @@ public class PlaybackInstance implements Playbacker {
 
 		updateNotifStopIcon();
 		this.playbackWatcherDispatcher.playbackStopped();
+	}
+
+	private void notifyNewWatcher (final PlaybackWatcher w) {
+		w.queueChanged();
+
+		final QueueItem item = this.currentItem;
+		if (item != null) w.playbackLoading(item);
+
+		if (isMediaPlayerPlaying()) {
+			w.playbackPlaying();
+		}
+		else if (isMediaPlayerPaused()) {
+			w.playbackPaused();
+		}
+		else {
+			w.playbackStopped();
+		}
 	}
 
 }

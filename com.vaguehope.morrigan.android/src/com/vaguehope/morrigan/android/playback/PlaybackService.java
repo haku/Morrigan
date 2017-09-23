@@ -3,7 +3,9 @@ package com.vaguehope.morrigan.android.playback;
 import java.util.List;
 
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Binder;
 import android.os.IBinder;
 
@@ -14,12 +16,20 @@ public class PlaybackService extends Service implements Playbacker {
 	public void onCreate () {
 		super.onCreate();
 		instanceStart();
+		registerBroadcastReceiver();
 	}
 
 	@Override
 	public void onDestroy () {
+		unregisterBroadcastReceiver();
 		instanceStop();
 		super.onDestroy();
+	}
+
+	@Override
+	public int onStartCommand (final Intent intent, final int flags, final int startId) {
+		super.onStartCommand(intent, flags, startId);
+		return START_STICKY;
 	}
 
 	@Override
@@ -41,10 +51,38 @@ public class PlaybackService extends Service implements Playbacker {
 
 	private void instanceStart () {
 		this.playbackInstance = new PlaybackInstance(this);
+		startForeground(
+				this.playbackInstance.getNotificationId(),
+				this.playbackInstance.getNotif());
 	}
 
 	private void instanceStop () {
 		this.playbackInstance.dispose();
+	}
+
+	// Broadcasts.
+
+	private BroadcastReceiver receiver;
+
+	private void registerBroadcastReceiver () {
+		this.receiver = new PlaybackBroadcastReceiver(this);
+		final IntentFilter filter = new IntentFilter();
+		filter.addAction(PlaybackCodes.ACTION_PLAYBACK);
+		registerReceiver(this.receiver, filter);
+	}
+
+	private void unregisterBroadcastReceiver () {
+		unregisterReceiver(this.receiver);
+	}
+
+	public void onBroadcastAction (final int actionCode) {
+		switch (actionCode) {
+			case PlaybackCodes.EXIT:
+				stopSelf();
+				break;
+			default:
+				this.playbackInstance.onBroadcastAction(actionCode);
+		}
 	}
 
 	// Methods.

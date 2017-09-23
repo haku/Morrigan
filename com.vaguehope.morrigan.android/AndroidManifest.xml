@@ -37,9 +37,6 @@
 			</intent-filter>
 		</activity>
 
-		<activity android:name="com.vaguehope.morrigan.android.playback.PlaybackActivity"
-			android:label="@string/app_name" />
-
 		<activity android:name=".PlayerActivity"
 			android:label="@string/app_name" />
 
@@ -48,10 +45,13 @@
 
 		<activity android:name=".checkout.CheckoutMgrActivity"
 			android:label="@string/app_name" />
-		
 		<service
 			android:name=".checkout.SyncCheckoutsService"
 			android:label="Morrigan Sync Service" />
+
+		<activity android:name=".playback.PlaybackActivity"
+			android:label="@string/app_name"
+			android:launchMode="singleTop" />
 		<service
 			android:name=".playback.PlaybackService"
 			android:label="Morrigan Playback Service" />

@@ -87,14 +87,12 @@ public class PlaybackActivity extends Activity {
 					 * the DB service before then, it will NPE.
 					 */
 					getPlaybacker().addPlaybackListener(getPlaybackWatcher());
-					refreshUi();
 					getLog().d("Playback service bound.");
 				}
 			});
 		}
 		else { // because we stop listening in onPause(), we must resume if the user comes back.
 			this.bndPb.getService().addPlaybackListener(getPlaybackWatcher());
-			refreshUi();
 			LOG.d("Playback service rebound.");
 		}
 	}

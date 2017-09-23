@@ -229,7 +229,8 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 				this.sidebarLayout.toggleSidebar();
 				return true;
 			case R.id.playback:
-				startActivity(new Intent(getApplicationContext(), PlaybackActivity.class));
+				startActivity(new Intent(getApplicationContext(), PlaybackActivity.class)
+						.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP));
 				return true;
 			case R.id.checkoutmgr:
 				startActivity(new Intent(getApplicationContext(), CheckoutMgrActivity.class));
