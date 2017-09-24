@@ -20,7 +20,6 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -32,7 +31,6 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.vaguehope.morrigan.android.ServersList.ServerListEventsListener;
-import com.vaguehope.morrigan.android.checkout.CheckoutMgrActivity;
 import com.vaguehope.morrigan.android.layouts.SidebarLayout;
 import com.vaguehope.morrigan.android.layouts.SidebarLayout.SidebarListener;
 import com.vaguehope.morrigan.android.model.Artifact;
@@ -47,7 +45,6 @@ import com.vaguehope.morrigan.android.model.PlayerStateListChangeListener;
 import com.vaguehope.morrigan.android.model.ServerReference;
 import com.vaguehope.morrigan.android.modelimpl.ArtifactListAdaptorImpl;
 import com.vaguehope.morrigan.android.modelimpl.ArtifactListGroupImpl;
-import com.vaguehope.morrigan.android.playback.PlaybackActivity;
 import com.vaguehope.morrigan.android.state.ConfigDb;
 import com.vaguehope.morrigan.android.state.Preferences;
 import com.vaguehope.morrigan.android.tasks.GetMlistsTask;
@@ -217,23 +214,10 @@ public class ServerActivity extends Activity implements PlayerStateListChangeLis
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu (final Menu menu) {
-		getMenuInflater().inflate(R.menu.servermenu, menu);
-		return true;
-	}
-
-	@Override
 	public boolean onOptionsItemSelected (final MenuItem item) {
 		switch (item.getItemId()) {
 			case android.R.id.home:
 				this.sidebarLayout.toggleSidebar();
-				return true;
-			case R.id.playback:
-				startActivity(new Intent(getApplicationContext(), PlaybackActivity.class)
-						.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP));
-				return true;
-			case R.id.checkoutmgr:
-				startActivity(new Intent(getApplicationContext(), CheckoutMgrActivity.class));
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);

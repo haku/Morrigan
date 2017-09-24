@@ -1,0 +1,14 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+	<group android:id="@+id/group_popupmenu">
+
+		<item
+			android:id="@+id/checkoutmgr"
+			android:icon="@drawable/library_remote"
+			android:title="Checkout Manager"/>
+
+		<item
+			android:id="@+id/remotecontrol"
+			android:title="Remote Control"/>
+
+	</group>
+</menu>

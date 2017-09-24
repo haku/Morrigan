@@ -3,6 +3,7 @@ package com.vaguehope.morrigan.android.playback;
 import java.lang.ref.WeakReference;
 import java.util.List;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
@@ -24,6 +25,8 @@ import android.widget.TextView;
 
 import com.vaguehope.morrigan.android.ErrorsList;
 import com.vaguehope.morrigan.android.R;
+import com.vaguehope.morrigan.android.ServerActivity;
+import com.vaguehope.morrigan.android.checkout.CheckoutMgrActivity;
 import com.vaguehope.morrigan.android.helper.LogWrapper;
 import com.vaguehope.morrigan.android.playback.Playbacker.PlaybackWatcher;
 
@@ -43,7 +46,6 @@ public class PlaybackActivity extends Activity {
 	@Override
 	public void onCreate (final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.playbackactivity);
 		this.messageHandler = new MessageHandler(this);
 		wireGui();
 	}
@@ -123,6 +125,12 @@ public class PlaybackActivity extends Activity {
 	// GUI wiring.
 
 	private void wireGui () {
+		setContentView(R.layout.playbackactivity);
+
+		final ActionBar ab = getActionBar();
+		ab.setDisplayShowHomeEnabled(true);
+		ab.setHomeButtonEnabled(true);
+
 		final ListView lstErrors = (ListView) findViewById(R.id.lstErrors);
 		this.errorsList = new ErrorsList(this, lstErrors);
 
@@ -165,6 +173,31 @@ public class PlaybackActivity extends Activity {
 				next();
 			}
 		});
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu (final Menu menu) {
+		getMenuInflater().inflate(R.menu.playbackmenu, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected (final MenuItem item) {
+		switch (item.getItemId()) {
+			case android.R.id.home:
+				// TODO use this?
+				return true;
+			case R.id.remotecontrol:
+				startActivity(new Intent(getApplicationContext(), ServerActivity.class)
+						.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP));
+				return true;
+			case R.id.checkoutmgr:
+				startActivity(new Intent(getApplicationContext(), CheckoutMgrActivity.class)
+						.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP));
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
+		}
 	}
 
 	protected PlaybackWatcher getPlaybackWatcher () {
@@ -239,24 +272,29 @@ public class PlaybackActivity extends Activity {
 				refreshUi();
 				break;
 			case PLAYBACK_LOADING:
-				PlaybackActivity.this.imgPlaystate.setImageResource(R.drawable.next);
+				setIcon(R.drawable.next);
 				final QueueItem item = (QueueItem) obj;
 				this.txtTitle.setText(item.getTitle());
 				break;
 			case PLAYBACK_PLAYING:
-				PlaybackActivity.this.imgPlaystate.setImageResource(R.drawable.play);
+				setIcon(R.drawable.play);
 				break;
 			case PLAYBACK_PAUSED:
-				PlaybackActivity.this.imgPlaystate.setImageResource(R.drawable.pause);
+				setIcon(R.drawable.pause);
 				break;
 			case PLAYBACK_STOPPED:
-				PlaybackActivity.this.imgPlaystate.setImageResource(R.drawable.stop);
+				setIcon(R.drawable.stop);
 				break;
 			case PLAYBACK_ERROR:
-				PlaybackActivity.this.imgPlaystate.setImageResource(R.drawable.exclamation_red);
+				setIcon(R.drawable.exclamation_red);
 				break;
 			default:
 		}
+	}
+
+	private void setIcon (final int resId) {
+		getActionBar().setIcon(resId);
+		PlaybackActivity.this.imgPlaystate.setImageResource(resId);
 	}
 
 	private void refreshUi () {
