@@ -8,9 +8,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.view.ColumnTitleStrip;
+import android.support.v4.view.ColumnTitleStrip.ColumnClickListener;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup.LayoutParams;
 
 import com.vaguehope.morrigan.android.R;
 import com.vaguehope.morrigan.android.ServerActivity;
@@ -24,6 +27,7 @@ public class PlaybackActivity extends FragmentActivity {
 
 	private MessageHandler messageHandler;
 	private ViewPager viewPager;
+	private ColumnTitleStrip columnTitleStrip;
 
 	// Activity life-cycle.
 
@@ -40,6 +44,19 @@ public class PlaybackActivity extends FragmentActivity {
 		final ActionBar ab = getActionBar();
 		ab.setDisplayShowHomeEnabled(true);
 		ab.setHomeButtonEnabled(true);
+		ab.setDisplayShowTitleEnabled(false);
+		ab.setDisplayShowCustomEnabled(true);
+
+		this.columnTitleStrip = new ColumnTitleStrip(ab.getThemedContext());
+		this.columnTitleStrip.setViewPager(this.viewPager);
+		this.columnTitleStrip.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+		this.columnTitleStrip.setColumnClickListener(new ColumnClickListener() {
+			@Override
+			public void onColumnTitleClick (final int position) {
+				PlaybackActivity.this.viewPager.setCurrentItem(position);
+			}
+		});
+		ab.setCustomView(this.columnTitleStrip);
 	}
 
 	@Override
