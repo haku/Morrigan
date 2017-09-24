@@ -69,12 +69,12 @@ public class PlayerFragment extends Fragment {
 
 	// Playback service.
 
-	private PlaybackClient bndPb;
+	private MediaClient bndPb;
 
 	private void resumeDb () {
 		if (this.bndPb == null) {
 			LOG.d("Binding playback service...");
-			this.bndPb = new PlaybackClient(getActivity(), LOG.getPrefix(), new Runnable() {
+			this.bndPb = new MediaClient(getActivity(), LOG.getPrefix(), new Runnable() {
 				@Override
 				public void run () {
 					/*
@@ -99,9 +99,9 @@ public class PlayerFragment extends Fragment {
 
 	private void suspendDb () {
 		// We might be pausing before the callback has come.
-		final Playbacker pb = this.bndPb.getService();
+		final MediaServices pb = this.bndPb.getService();
 		if (pb != null) { // We might be pausing before the callback has come.
-			pb.removePlaybackListener(this.playbackWatcher);
+			pb.getPlaybacker().removePlaybackListener(this.playbackWatcher);
 		}
 		else { // If we have not even had the callback yet, cancel it.
 			this.bndPb.clearReadyListener();
@@ -114,9 +114,9 @@ public class PlayerFragment extends Fragment {
 	}
 
 	protected Playbacker getPlaybacker () {
-		final PlaybackClient d = this.bndPb;
+		final MediaClient d = this.bndPb;
 		if (d == null) return null;
-		return d.getService();
+		return d.getService().getPlaybacker();
 	}
 
 	// Fragment callbacks.

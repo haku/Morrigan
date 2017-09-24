@@ -8,19 +8,19 @@ import android.os.IBinder;
 
 import com.vaguehope.morrigan.android.helper.LogWrapper;
 
-public class PlaybackClient {
+public class MediaClient {
 
 	private final LogWrapper log = new LogWrapper();
 	private final Context context;
 	private Runnable serviceIsReadyListener = null;
-	private Playbacker boundService;
+	private MediaServices boundService;
 	private boolean boundToService = false;
 
-	public PlaybackClient (final Context context, final String name) {
+	public MediaClient (final Context context, final String name) {
 		this(context, name, null);
 	}
 
-	public PlaybackClient (final Context context, final String name, final Runnable serviceIsReadyListener) {
+	public MediaClient (final Context context, final String name, final Runnable serviceIsReadyListener) {
 		this.context = context;
 		this.log.setPrefix(name);
 		this.serviceIsReadyListener = serviceIsReadyListener;
@@ -42,7 +42,7 @@ public class PlaybackClient {
 		this.serviceIsReadyListener = null;
 	}
 
-	public Playbacker getService () {
+	public MediaServices getService () {
 		return this.boundService;
 	}
 
@@ -54,7 +54,7 @@ public class PlaybackClient {
 		if (this.serviceIsReadyListener != null) this.serviceIsReadyListener.run();
 	}
 
-	protected void setBoundServiceService (final Playbacker boundServiceService) {
+	protected void setBoundServiceService (final MediaServices boundServiceService) {
 		this.boundService = boundServiceService;
 	}
 
@@ -62,8 +62,8 @@ public class PlaybackClient {
 
 		@Override
 		public void onServiceConnected (final ComponentName className, final IBinder service) {
-			setBoundServiceService(((PlaybackService.LocalBinder) service).getService());
-			if (getService() == null) getLog().e("Got service call back, but mBoundServiceService==null.  Expect further errors.");
+			setBoundServiceService(((MediaService.LocalBinder) service).getService());
+			if (getService() == null) getLog().e("Got service call back, but boundService==null.  Expect further errors.");
 			callServiceReadyListener();
 		}
 
@@ -80,7 +80,7 @@ public class PlaybackClient {
 	};
 
 	private void startAndBindServiceService () {
-		final Intent intent = new Intent(this.context, PlaybackService.class);
+		final Intent intent = new Intent(this.context, MediaService.class);
 		this.context.startService(intent);
 		this.boundToService = this.context.bindService(intent, this.serviceConnection, Context.BIND_AUTO_CREATE);
 		if (!this.boundToService) {

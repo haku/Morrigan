@@ -14,9 +14,9 @@ public class PlaybackBroadcastReceiver extends BroadcastReceiver {
 
 	private static final LogWrapper LOG = new LogWrapper("PAR");
 
-	private final PlaybackService playbackService;
+	private final MediaService playbackService;
 
-	public PlaybackBroadcastReceiver (final PlaybackService playbackService) {
+	public PlaybackBroadcastReceiver (final MediaService playbackService) {
 		this.playbackService = playbackService;
 	}
 

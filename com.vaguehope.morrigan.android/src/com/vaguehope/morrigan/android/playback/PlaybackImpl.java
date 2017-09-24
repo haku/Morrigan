@@ -23,7 +23,7 @@ import android.os.PowerManager;
 import com.vaguehope.morrigan.android.R;
 import com.vaguehope.morrigan.android.helper.LogWrapper;
 
-public class PlaybackInstance implements Playbacker {
+public class PlaybackImpl implements Playbacker {
 
 	private static final LogWrapper LOG = new LogWrapper("PI");
 
@@ -37,7 +37,7 @@ public class PlaybackInstance implements Playbacker {
 	private final Set<PlaybackWatcher> playbackWatchers = new CopyOnWriteArraySet<PlaybackWatcher>();
 	private final PlaybackWatcherDispatcher playbackWatcherDispatcher = new PlaybackWatcherDispatcher(this.playbackWatchers);
 
-	public PlaybackInstance (final Context context) {
+	public PlaybackImpl (final Context context) {
 		this.context = context;
 		this.messageHandler = new MessageHandler(this);
 
@@ -202,15 +202,15 @@ public class PlaybackInstance implements Playbacker {
 
 	private static class MessageHandler extends Handler {
 
-		private final WeakReference<PlaybackInstance> parentRef;
+		private final WeakReference<PlaybackImpl> parentRef;
 
-		public MessageHandler (final PlaybackInstance parent) {
-			this.parentRef = new WeakReference<PlaybackInstance>(parent);
+		public MessageHandler (final PlaybackImpl parent) {
+			this.parentRef = new WeakReference<PlaybackImpl>(parent);
 		}
 
 		@Override
 		public void handleMessage (final Message msg) {
-			final PlaybackInstance parent = this.parentRef.get();
+			final PlaybackImpl parent = this.parentRef.get();
 			if (parent != null) parent.msgOnMainThread(msg);
 		}
 	}

@@ -38,8 +38,8 @@
 			</intent-filter>
 		</activity>
 		<service
-			android:name=".playback.PlaybackService"
-			android:label="Morrigan Playback Service" />
+			android:name=".playback.MediaService"
+			android:label="Morrigan Media Service" />
 
 		<activity
 			android:name=".checkout.CheckoutMgrActivity"

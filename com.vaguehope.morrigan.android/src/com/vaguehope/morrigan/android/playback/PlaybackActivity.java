@@ -79,12 +79,12 @@ public class PlaybackActivity extends FragmentActivity {
 
 	// Playback service.
 
-	private PlaybackClient bndPb;
+	private MediaClient bndPb;
 
 	private void resumeDb () {
 		if (this.bndPb == null) {
 			LOG.d("Binding playback service...");
-			this.bndPb = new PlaybackClient(this, LOG.getPrefix(), new Runnable() {
+			this.bndPb = new MediaClient(this, LOG.getPrefix(), new Runnable() {
 				@Override
 				public void run () {
 					/*
@@ -99,16 +99,16 @@ public class PlaybackActivity extends FragmentActivity {
 			});
 		}
 		else { // because we stop listening in onPause(), we must resume if the user comes back.
-			this.bndPb.getService().addPlaybackListener(this.playbackWatcher);
+			this.bndPb.getService().getPlaybacker().addPlaybackListener(this.playbackWatcher);
 			LOG.d("Playback service rebound.");
 		}
 	}
 
 	private void suspendDb () {
 		// We might be pausing before the callback has come.
-		final Playbacker pb = this.bndPb.getService();
+		final MediaServices pb = this.bndPb.getService();
 		if (pb != null) {
-			pb.removePlaybackListener(this.playbackWatcher);
+			pb.getPlaybacker().removePlaybackListener(this.playbackWatcher);
 		}
 		else {
 			// If we have not even had the callback yet, cancel it.
@@ -122,9 +122,9 @@ public class PlaybackActivity extends FragmentActivity {
 	}
 
 	protected Playbacker getPlaybacker () {
-		final PlaybackClient d = this.bndPb;
+		final MediaClient d = this.bndPb;
 		if (d == null) return null;
-		return d.getService();
+		return d.getService().getPlaybacker();
 	}
 
 	// GUI wiring.
