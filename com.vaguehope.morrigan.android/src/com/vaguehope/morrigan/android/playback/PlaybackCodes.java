@@ -6,9 +6,12 @@ public interface PlaybackCodes {
 
 	String ACTION_PLAYBACK = "com.vaguehope.morrigan.PLAYBACK";
 
-	int EXIT = 100;
-	int SHOW_UI = 101;
-	int PLAY_PAUSE = 102;
-	int NEXT = 103;
+	int ACTION_EXIT = 100;
+	int ACTION_SHOW_UI = 101;
+	int ACTION_PLAY_PAUSE = 102;
+	int ACTION_NEXT = 103;
+
+	int BROWSE_MEDIA_REQUEST_CODE = 34687; // TODO do this better.
+	int MENU_REMOVE = 2001;
 
 }

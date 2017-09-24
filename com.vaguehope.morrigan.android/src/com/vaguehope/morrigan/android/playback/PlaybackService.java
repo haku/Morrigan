@@ -77,7 +77,7 @@ public class PlaybackService extends Service implements Playbacker {
 
 	public void onBroadcastAction (final int actionCode) {
 		switch (actionCode) {
-			case PlaybackCodes.EXIT:
+			case PlaybackCodes.ACTION_EXIT:
 				stopSelf();
 				break;
 			default:

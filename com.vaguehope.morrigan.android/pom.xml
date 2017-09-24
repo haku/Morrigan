@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.vaguehope</groupId>
+	<artifactId>com.vaguehope.morrigan.android</artifactId>
+	<version>1-SNAPSHOT</version>
+
+	<build>
+		<plugins>
+
+			<!-- https://maven.apache.org/plugins/maven-dependency-plugin/copy-mojo.html -->
+			<!-- https://maven.apache.org/plugins/maven-dependency-plugin/examples/copying-artifacts.html -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.8</version>
+				<executions>
+					<execution>
+						<id>copy</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+
+								<!-- via maven-android-sdk-deployer. -->
+								<artifactItem>
+									<groupId>android.support</groupId>
+									<artifactId>compatibility-v4</artifactId>
+									<version>21.0.3</version>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+								</artifactItem>
+
+							</artifactItems>
+							<outputDirectory>${basedir}/libs</outputDirectory>
+							<overWriteReleases>false</overWriteReleases>
+							<overWriteSnapshots>true</overWriteSnapshots>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.8</version>
+				<executions>
+					<execution>
+						<id>ant-build</id>
+						<phase>package</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target>
+								<property name="build.compiler" value="extJavac"/>
+
+								<property
+									name="sdk.dir"
+									value="${env.ANDROID_HOME}" />
+								<echo message="sdk.dir=${sdk.dir}" />
+
+								<echo message="Cleaning..." />
+								<ant antfile="${basedir}/build.xml">
+									<target name="clean" />
+								</ant>
+
+								<echo message="Building debug..." />
+								<ant antfile="${basedir}/build.xml">
+									<target name="debug" />
+								</ant>
+							</target>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+		</plugins>
+	</build>
+
+</project>
+

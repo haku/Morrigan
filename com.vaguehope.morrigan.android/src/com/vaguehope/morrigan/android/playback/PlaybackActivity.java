@@ -1,45 +1,29 @@
 package com.vaguehope.morrigan.android.playback;
 
 import java.lang.ref.WeakReference;
-import java.util.List;
 
 import android.app.ActionBar;
-import android.app.Activity;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.View.OnCreateContextMenuListener;
-import android.view.View.OnLongClickListener;
-import android.widget.AdapterView;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.TextView;
 
-import com.vaguehope.morrigan.android.ErrorsList;
 import com.vaguehope.morrigan.android.R;
 import com.vaguehope.morrigan.android.ServerActivity;
 import com.vaguehope.morrigan.android.checkout.CheckoutMgrActivity;
 import com.vaguehope.morrigan.android.helper.LogWrapper;
 import com.vaguehope.morrigan.android.playback.Playbacker.PlaybackWatcher;
 
-public class PlaybackActivity extends Activity {
+public class PlaybackActivity extends FragmentActivity {
 
 	private static final LogWrapper LOG = new LogWrapper("PA");
 
 	private MessageHandler messageHandler;
-	private ErrorsList errorsList;
-	private QueueAdapter queueAdaptor;
-	private TextView txtTitle;
-	private TextView txtQueue;
-	private ImageView imgPlaystate;
+	private ViewPager viewPager;
 
 	// Activity life-cycle.
 
@@ -47,7 +31,15 @@ public class PlaybackActivity extends Activity {
 	public void onCreate (final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		this.messageHandler = new MessageHandler(this);
-		wireGui();
+		setContentView(R.layout.playback_activity);
+
+		final SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(), this);
+		this.viewPager = (ViewPager) findViewById(R.id.viewpager);
+		this.viewPager.setAdapter(sectionsPagerAdapter);
+
+		final ActionBar ab = getActionBar();
+		ab.setDisplayShowHomeEnabled(true);
+		ab.setHomeButtonEnabled(true);
 	}
 
 	@Override
@@ -68,10 +60,6 @@ public class PlaybackActivity extends Activity {
 		super.onDestroy();
 	}
 
-	protected static LogWrapper getLog () {
-		return LOG;
-	}
-
 	// Playback service.
 
 	private PlaybackClient bndPb;
@@ -88,13 +76,13 @@ public class PlaybackActivity extends Activity {
 					 * (i.e., after it exits this thread). if we try to talk to
 					 * the DB service before then, it will NPE.
 					 */
-					getPlaybacker().addPlaybackListener(getPlaybackWatcher());
-					getLog().d("Playback service bound.");
+					getPlaybacker().addPlaybackListener(PlaybackActivity.this.playbackWatcher);
+					LOG.d("Playback service bound.");
 				}
 			});
 		}
 		else { // because we stop listening in onPause(), we must resume if the user comes back.
-			this.bndPb.getService().addPlaybackListener(getPlaybackWatcher());
+			this.bndPb.getService().addPlaybackListener(this.playbackWatcher);
 			LOG.d("Playback service rebound.");
 		}
 	}
@@ -103,7 +91,7 @@ public class PlaybackActivity extends Activity {
 		// We might be pausing before the callback has come.
 		final Playbacker pb = this.bndPb.getService();
 		if (pb != null) {
-			pb.removePlaybackListener(getPlaybackWatcher());
+			pb.removePlaybackListener(this.playbackWatcher);
 		}
 		else {
 			// If we have not even had the callback yet, cancel it.
@@ -116,64 +104,13 @@ public class PlaybackActivity extends Activity {
 		if (this.bndPb != null) this.bndPb.dispose();
 	}
 
-	public Playbacker getPlaybacker () {
+	protected Playbacker getPlaybacker () {
 		final PlaybackClient d = this.bndPb;
 		if (d == null) return null;
 		return d.getService();
 	}
 
 	// GUI wiring.
-
-	private void wireGui () {
-		setContentView(R.layout.playbackactivity);
-
-		final ActionBar ab = getActionBar();
-		ab.setDisplayShowHomeEnabled(true);
-		ab.setHomeButtonEnabled(true);
-
-		final ListView lstErrors = (ListView) findViewById(R.id.lstErrors);
-		this.errorsList = new ErrorsList(this, lstErrors);
-
-		this.queueAdaptor = new QueueAdapter(this);
-		final ListView lstQueue = (ListView) findViewById(R.id.lstQueue);
-		lstQueue.setAdapter(this.queueAdaptor);
-//		lstQueue.setOnItemClickListener(...);
-		lstQueue.setOnCreateContextMenuListener(this.queueContextMenuListener);
-
-		final View tagRow = findViewById(R.id.tagRow);
-//		tagRow.setOnClickListener(this.contextMenuClickListener);
-//		tagRow.setOnCreateContextMenuListener(this.tagRowContextMenuListener);
-
-		this.txtTitle = (TextView) findViewById(R.id.txtTitle);
-		this.txtQueue = (TextView) findViewById(R.id.txtQueue);
-		this.imgPlaystate = (ImageView) findViewById(R.id.imgPlaystate);
-
-		findViewById(R.id.btnSearch).setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick (final View v) {
-				search();
-			}
-		});
-		findViewById(R.id.btnPlaypause).setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick (final View v) {
-				playpause();
-			}
-		});
-		findViewById(R.id.btnPlaypause).setOnLongClickListener(new OnLongClickListener() {
-			@Override
-			public boolean onLongClick (final View v) {
-				stop();
-				return true;
-			}
-		});
-		findViewById(R.id.btnNext).setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick (final View v) {
-				next();
-			}
-		});
-	}
 
 	@Override
 	public boolean onCreateOptionsMenu (final Menu menu) {
@@ -200,16 +137,7 @@ public class PlaybackActivity extends Activity {
 		}
 	}
 
-	protected PlaybackWatcher getPlaybackWatcher () {
-		return this.playbackWatcher;
-	}
-
-	private final PlaybackWatcher playbackWatcher = new PlaybackWatcher() {
-		@Override
-		public void queueChanged () {
-			PlaybackActivity.this.messageHandler.sendEmptyMessage(Msgs.QUEUE_CHANGED.ordinal());
-		}
-
+	private final PlaybackWatcher playbackWatcher = new PlaybackWatcherAdapter() {
 		@Override
 		public void playbackLoading (final QueueItem item) {
 			final Message msg = PlaybackActivity.this.messageHandler.obtainMessage(Msgs.PLAYBACK_LOADING.ordinal());
@@ -239,7 +167,6 @@ public class PlaybackActivity extends Activity {
 	};
 
 	protected enum Msgs {
-		QUEUE_CHANGED,
 		PLAYBACK_LOADING,
 		PLAYBACK_PLAYING,
 		PLAYBACK_PAUSED,
@@ -265,16 +192,11 @@ public class PlaybackActivity extends Activity {
 
 	protected void msgOnUiThread (final Message msg) {
 		final Msgs m = Msgs.values[msg.what];
-		final Object obj = msg.obj;
+//		final Object obj = msg.obj;
 		msg.recycle();
 		switch (m) {
-			case QUEUE_CHANGED:
-				refreshUi();
-				break;
 			case PLAYBACK_LOADING:
 				setIcon(R.drawable.next);
-				final QueueItem item = (QueueItem) obj;
-				this.txtTitle.setText(item.getTitle());
 				break;
 			case PLAYBACK_PLAYING:
 				setIcon(R.drawable.play);
@@ -294,93 +216,12 @@ public class PlaybackActivity extends Activity {
 
 	private void setIcon (final int resId) {
 		getActionBar().setIcon(resId);
-		PlaybackActivity.this.imgPlaystate.setImageResource(resId);
-	}
-
-	private void refreshUi () {
-		final Playbacker pb = getPlaybacker();
-		if (pb != null) {
-			final List<QueueItem> items = pb.getQueue();
-			this.queueAdaptor.setInputData(items);
-			this.txtQueue.setText(items.size() + " items.");
-		}
-		else {
-			LOG.w("Failed to refresh queue as playback service was not bound.");
-		}
-	}
-
-	// Queue.
-
-	private static final int MENU_CTX_REMOVE = 1;
-
-	private final OnCreateContextMenuListener queueContextMenuListener = new OnCreateContextMenuListener() {
-		@Override
-		public void onCreateContextMenu (final ContextMenu menu, final View v, final ContextMenuInfo menuInfo) {
-			final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-			final QueueItem item = PlaybackActivity.this.queueAdaptor.getQueueItem(info.position);
-			menu.setHeaderTitle(item.getTitle());
-			menu.add(Menu.NONE, MENU_CTX_REMOVE, Menu.NONE, "Remove");
-		}
-	};
-
-	@Override
-	public boolean onContextItemSelected (final MenuItem menuItem) {
-		switch (menuItem.getItemId()) {
-			case MENU_CTX_REMOVE:
-				final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuItem.getMenuInfo();
-				final Playbacker pb = getPlaybacker();
-				if (pb != null) {
-					pb.getQueue().remove(info.position);
-					pb.notifyQueueChanged();
-				}
-				return true;
-			default:
-				return super.onContextItemSelected(menuItem);
-		}
-	}
-
-	// Buttons.
-
-	private static final int REQUEST_CODE = 10; // TODO do this better.
-
-	protected void search () {
-		final Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
-		startActivityForResult(intent, REQUEST_CODE);
-	}
-
-	protected void playpause () {
-		final Playbacker pb = getPlaybacker();
-		if (pb != null) {
-			pb.playPausePlayback();
-		}
-	}
-
-	protected void stop () {
-		final Playbacker pb = getPlaybacker();
-		if (pb != null) {
-			pb.stopPlayback();
-		}
-	}
-
-	protected void next () {
-		final Playbacker pb = getPlaybacker();
-		if (pb != null) {
-			pb.gotoNextItem();
-		}
 	}
 
 	@Override
-	protected void onActivityResult (final int requestCode, final int resultCode, final Intent data) {
-		if (resultCode == RESULT_OK && requestCode == 10) {
-			final Uri mediaUri = data.getData();
-			final Playbacker pb = getPlaybacker();
-			if (pb != null) {
-				QueueItem item = new QueueItem(this, mediaUri);
-				pb.getQueue().add(item);
-				pb.notifyQueueChanged();
-				LOG.i("Added to queue: %s", item);
-			}
-		}
+	public void onActivityResult (final int requestCode, final int resultCode, final Intent data) {
+		LOG.i("onActivityResult: requestCode=%s resultCode=%s", requestCode, resultCode);
+		super.onActivityResult(requestCode, resultCode, data);
 	}
 
 }

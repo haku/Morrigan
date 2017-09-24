@@ -58,7 +58,7 @@ public class PlaybackInstance implements Playbacker {
 	private void makeNotif () {
 		final Intent showPlaybackI = new Intent(this.context, PlaybackActivity.class)
 				.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-		final PendingIntent showPlaybackPi = PendingIntent.getActivity(this.context, PlaybackCodes.SHOW_UI, showPlaybackI, PendingIntent.FLAG_CANCEL_CURRENT);
+		final PendingIntent showPlaybackPi = PendingIntent.getActivity(this.context, PlaybackCodes.ACTION_SHOW_UI, showPlaybackI, PendingIntent.FLAG_CANCEL_CURRENT);
 
 		this.notif = new Notification.Builder(this.context)
 				.setContentIntent(showPlaybackPi)
@@ -66,11 +66,11 @@ public class PlaybackInstance implements Playbacker {
 				.setContentTitle("Morrigan Player")
 				.setOngoing(true)
 				.addAction(android.R.drawable.ic_menu_close_clear_cancel, "Exit",
-						PlaybackBroadcastReceiver.makePendingIntent(this.context, PlaybackCodes.EXIT))
+						PlaybackBroadcastReceiver.makePendingIntent(this.context, PlaybackCodes.ACTION_EXIT))
 				.addAction(R.drawable.pause, "Pause",
-						PlaybackBroadcastReceiver.makePendingIntent(this.context, PlaybackCodes.PLAY_PAUSE))
+						PlaybackBroadcastReceiver.makePendingIntent(this.context, PlaybackCodes.ACTION_PLAY_PAUSE))
 				.addAction(R.drawable.next, "Next",
-						PlaybackBroadcastReceiver.makePendingIntent(this.context, PlaybackCodes.NEXT));
+						PlaybackBroadcastReceiver.makePendingIntent(this.context, PlaybackCodes.ACTION_NEXT));
 		showNotif();
 	}
 
@@ -165,10 +165,10 @@ public class PlaybackInstance implements Playbacker {
 
 	public void onBroadcastAction (final int actionCode) {
 		switch (actionCode) {
-			case PlaybackCodes.PLAY_PAUSE:
+			case PlaybackCodes.ACTION_PLAY_PAUSE:
 				playPausePlayback();
 				break;
-			case PlaybackCodes.NEXT:
+			case PlaybackCodes.ACTION_NEXT:
 				gotoNextItem();
 				break;
 			default:
