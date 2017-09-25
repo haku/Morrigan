@@ -141,6 +141,9 @@ public class PlaybackActivity extends FragmentActivity {
 			case android.R.id.home:
 				// TODO use this?
 				return true;
+			case R.id.preferences:
+				startActivity(new Intent(this, MnPreferenceActivity.class));
+				return true;
 			case R.id.remotecontrol:
 				startActivity(new Intent(getApplicationContext(), ServerActivity.class)
 						.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP));

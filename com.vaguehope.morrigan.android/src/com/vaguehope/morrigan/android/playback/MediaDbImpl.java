@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+import org.json.JSONException;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -19,14 +21,12 @@ import com.vaguehope.morrigan.android.helper.LogWrapper;
 
 public class MediaDbImpl implements MediaDb {
 
-	private static final LogWrapper LOG = new LogWrapper("MDI");
+	protected static final LogWrapper LOG = new LogWrapper("MDI");
 
 	private static final String DB_NAME = "media";
-	private static final int DB_VERSION = 1;
+	private static final int DB_VERSION = 2;
 
 	private static class DatabaseHelper extends SQLiteOpenHelper {
-
-		private final LogWrapper log = new LogWrapper("DBH");
 
 		DatabaseHelper (final Context context) {
 			super(context, DB_NAME, null, DB_VERSION);
@@ -41,7 +41,10 @@ public class MediaDbImpl implements MediaDb {
 
 		@Override
 		public void onUpgrade (final SQLiteDatabase db, final int oldVersion, final int newVersion) {
-			this.log.w("Upgrading database from version %d to %d...", oldVersion, newVersion);
+			LOG.w("Upgrading database from version %d to %d...", oldVersion, newVersion);
+			if (oldVersion < 2) { // NOSONAR not a magic number.
+				addColumn(db, TBL_MD, TBL_MD_SOURCES, "test");
+			}
 		}
 
 		@Override
@@ -49,8 +52,13 @@ public class MediaDbImpl implements MediaDb {
 			super.onOpen(db);
 			if (!db.isReadOnly()) {
 				db.execSQL("PRAGMA foreign_keys=ON;");
-				this.log.i("foreign_keys=ON");
+				LOG.i("foreign_keys=ON");
 			}
+		}
+
+		private static void addColumn (final SQLiteDatabase db, final String table, final String column, final String type) {
+			LOG.w("Adding column %s to table %s...", column, table);
+			db.execSQL("ALTER TABLE " + table + " ADD COLUMN " + column + " " + type + ";");
 		}
 
 	}
@@ -77,10 +85,12 @@ public class MediaDbImpl implements MediaDb {
 	private static final String TBL_MD = "md";
 	private static final String TBL_MD_ID = "_id";
 	private static final String TBL_MD_NAME = "name";
+	private static final String TBL_MD_SOURCES = "sources";
 
 	private static final String TBL_MD_CREATE = "create table " + TBL_MD + " ("
 			+ TBL_MD_ID + " integer primary key autoincrement,"
 			+ TBL_MD_NAME + " text,"
+			+ TBL_MD_SOURCES + " text,"
 			+ "UNIQUE(" + TBL_MD_NAME + ") ON CONFLICT ABORT"
 			+ ");";
 
@@ -151,7 +161,7 @@ public class MediaDbImpl implements MediaDb {
 
 	private Collection<DbMetadata> queryDbs (final String where, final String[] whereArgs, final int numberOf) {
 		final Cursor c = this.mDb.query(true, TBL_MD,
-				new String[] { TBL_MD_ID, TBL_MD_NAME },
+				new String[] { TBL_MD_ID, TBL_MD_NAME, TBL_MD_SOURCES },
 				where, whereArgs,
 				null, null,
 				TBL_MD_ID + " ASC",
@@ -160,17 +170,22 @@ public class MediaDbImpl implements MediaDb {
 			if (c != null && c.moveToFirst()) {
 				final int colId = c.getColumnIndex(TBL_MD_ID);
 				final int colName = c.getColumnIndex(TBL_MD_NAME);
+				final int colSources = c.getColumnIndex(TBL_MD_SOURCES);
 
 				final List<DbMetadata> ret = new ArrayList<DbMetadata>();
 				do {
 					final long id = c.getLong(colId);
 					final String name = c.getString(colName);
-					ret.add(new DbMetadata(id, name));
+					final String sources = c.getString(colSources);
+					ret.add(new DbMetadata(id, name, sources));
 				}
 				while (c.moveToNext());
 				return ret;
 			}
 			return Collections.EMPTY_LIST;
+		}
+		catch (final JSONException e) {
+			throw new IllegalStateException("Invalid JSON found in DB.", e);
 		}
 		finally {
 			IoHelper.closeQuietly(c);

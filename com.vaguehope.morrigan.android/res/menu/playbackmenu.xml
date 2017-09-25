@@ -2,6 +2,11 @@
 	<group android:id="@+id/group_popupmenu">
 
 		<item
+			android:id="@+id/preferences"
+			android:icon="@drawable/pref"
+			android:title="Preferences"/>
+
+		<item
 			android:id="@+id/checkoutmgr"
 			android:icon="@drawable/library_remote"
 			android:title="Checkout Manager"/>
