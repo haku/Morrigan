@@ -106,6 +106,10 @@ public final class DialogHelper {
 		askString(context, msg, null, false, true, onString);
 	}
 
+	public static void askString (final Context context, final String msg, final String oldValue, final Listener<String> onString) {
+		askString(context, msg, oldValue, false, true, onString);
+	}
+
 	// FIXME tidy this method signature.
 	public static void askString (final Context context, final String msg,
 			final String oldValue, final boolean multiLine, final boolean spellCheck,

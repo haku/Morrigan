@@ -10,6 +10,7 @@ public interface MediaDb {
 	DbMetadata newDb (String name);
 	Collection<DbMetadata> getDbs ();
 	DbMetadata getDb (long dbId);
+	void updateDb(DbMetadata dbMetadata);
 	void deleteDb(DbMetadata dbMetadata);
 
 	void addMedia (long dbId, Collection<MediaItem> items);

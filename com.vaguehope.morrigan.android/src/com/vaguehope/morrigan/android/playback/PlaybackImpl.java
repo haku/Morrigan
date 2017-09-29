@@ -217,9 +217,6 @@ public class PlaybackImpl implements Playbacker {
 
 	protected void msgOnMainThread (final Message msg) {
 		final Msgs m = Msgs.values[msg.what];
-		final Object obj = msg.obj;
-		msg.recycle();
-
 		LOG.i("msg.what=%s", m);
 		try {
 			switch (m) {
@@ -233,7 +230,7 @@ public class PlaybackImpl implements Playbacker {
 					startPlayingNextItem();
 					break;
 				case NOTIFY_NEW_WATCHER:
-					notifyNewWatcher((PlaybackWatcher) obj);
+					notifyNewWatcher((PlaybackWatcher) msg.obj);
 					break;
 				default:
 			}

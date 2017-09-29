@@ -193,6 +193,25 @@ public class MediaDbImpl implements MediaDb {
 	}
 
 	@Override
+	public void updateDb (final DbMetadata dbMetadata) {
+		final ContentValues values = new ContentValues();
+		values.put(TBL_MD_NAME, dbMetadata.getName());
+		values.put(TBL_MD_SOURCES, dbMetadata.getSourcesJson().toString());
+
+		this.mDb.beginTransaction();
+		try {
+			final int affected = this.mDb.update(TBL_MD, values, TBL_MD_ID + "=?", new String[] { String.valueOf(dbMetadata.getId()) });
+			if (affected > 1) throw new IllegalStateException("Updating media row " + dbMetadata.getId() + " affected " + affected + " rows, expected 1.");
+			if (affected < 1) LOG.w("Updating media row %s affected %s rows, expected 1.", dbMetadata.getId(), affected);
+			this.mDb.setTransactionSuccessful();
+		}
+		finally {
+			this.mDb.endTransaction();
+		}
+
+	}
+
+	@Override
 	public void deleteDb (final DbMetadata dbMetadata) {
 		this.mDb.beginTransaction();
 		try {

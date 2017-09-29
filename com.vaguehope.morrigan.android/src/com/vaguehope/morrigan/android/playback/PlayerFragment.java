@@ -225,14 +225,12 @@ public class PlayerFragment extends Fragment {
 
 	protected void msgOnUiThread (final Message msg) {
 		final Msgs m = Msgs.values[msg.what];
-		final Object obj = msg.obj;
-		msg.recycle();
 		switch (m) {
 			case QUEUE_CHANGED:
 				refreshQueue();
 				break;
 			case PLAYBACK_LOADING:
-				final QueueItem item = (QueueItem) obj;
+				final QueueItem item = (QueueItem) msg.obj;
 				this.txtTitle.setText(item.getTitle());
 				break;
 			default:

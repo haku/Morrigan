@@ -39,8 +39,8 @@ public class DbMetadata {
 	}
 
 	public JSONArray getSourcesJson () {
-		JSONArray arr = new JSONArray();
-		for (Uri source : this.sources) {
+		final JSONArray arr = new JSONArray();
+		for (final Uri source : this.sources) {
 			arr.put(source.toString());
 		}
 		return arr;
@@ -52,11 +52,32 @@ public class DbMetadata {
 	}
 
 	private static List<Uri> parseSources (final JSONArray arr) throws JSONException {
-		List<Uri> ret = new ArrayList<Uri>();
+		final List<Uri> ret = new ArrayList<Uri>();
 		for (int i = 0; i < arr.length(); i++) {
 			ret.add(Uri.parse(arr.getString(i)));
 		}
 		return ret;
+	}
+
+	@Override
+	public String toString () {
+		return String.format("DB{%s, %s}", this.id, this.name);
+	}
+
+	public DbMetadata withName (final String newName) {
+		return new DbMetadata(this.id, newName, this.sources);
+	}
+
+	public DbMetadata withSource(final Uri sourceToAdd) {
+		final ArrayList<Uri> l = new ArrayList<Uri>(this.sources);
+		l.add(sourceToAdd);
+		return new DbMetadata(this.id, this.name, l);
+	}
+
+	public DbMetadata withoutSource(final Uri sourceToAdd) {
+		final ArrayList<Uri> l = new ArrayList<Uri>(this.sources);
+		l.remove(sourceToAdd);
+		return new DbMetadata(this.id, this.name, l);
 	}
 
 }

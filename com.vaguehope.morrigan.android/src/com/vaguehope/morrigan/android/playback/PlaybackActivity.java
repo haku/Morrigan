@@ -212,8 +212,6 @@ public class PlaybackActivity extends FragmentActivity {
 
 	protected void msgOnUiThread (final Message msg) {
 		final Msgs m = Msgs.values[msg.what];
-//		final Object obj = msg.obj;
-		msg.recycle();
 		switch (m) {
 			case PLAYBACK_LOADING:
 				setIcon(R.drawable.next);
