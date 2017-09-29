@@ -64,11 +64,15 @@ public class PlaybackImpl implements Playbacker {
 				.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 		final PendingIntent showPlaybackPi = PendingIntent.getActivity(this.context, PlaybackCodes.ACTION_SHOW_UI, showPlaybackI, PendingIntent.FLAG_CANCEL_CURRENT);
 
+		// TODO make custom notification.
+		// https://stackoverflow.com/questions/27673943/notification-action-button-not-clickable-in-lock-screen
+
 		this.notif = new Notification.Builder(this.context)
 				.setContentIntent(showPlaybackPi)
 				.setSmallIcon(R.drawable.stop)
 				.setContentTitle("Morrigan Player")
 				.setOngoing(true)
+				.setVisibility(Notification.VISIBILITY_PUBLIC)
 				.addAction(android.R.drawable.ic_menu_close_clear_cancel, "Exit",
 						PlaybackBroadcastReceiver.makePendingIntent(this.context, PlaybackCodes.ACTION_EXIT))
 				.addAction(R.drawable.pause, "Pause",
