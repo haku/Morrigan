@@ -28,6 +28,7 @@ public interface Playbacker {
 		void playbackPaused();
 		void playbackStopped();
 		void playbackError();
+		void exitRequested();
 	}
 
 }

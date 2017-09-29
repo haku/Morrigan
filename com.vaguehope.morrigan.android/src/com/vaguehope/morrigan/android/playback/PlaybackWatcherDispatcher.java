@@ -54,4 +54,11 @@ public class PlaybackWatcherDispatcher implements PlaybackWatcher {
 		}
 	}
 
+	@Override
+	public void exitRequested () {
+		for (final PlaybackWatcher w : this.playbackWatchers) {
+			w.exitRequested();
+		}
+	}
+
 }

@@ -22,4 +22,7 @@ public abstract class PlaybackWatcherAdapter implements PlaybackWatcher {
 	@Override
 	public void playbackError () {}
 
+	@Override
+	public void exitRequested () {}
+
 }

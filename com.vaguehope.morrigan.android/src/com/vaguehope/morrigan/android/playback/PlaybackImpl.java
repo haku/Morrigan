@@ -53,6 +53,10 @@ public class PlaybackImpl implements Playbacker {
 		this.notifMgr.cancel(PlaybackCodes.PLAYBACK_NOTIFICATION_ID);
 	}
 
+	protected PlaybackWatcherDispatcher getPlaybackWatcherDispatcher () {
+		return this.playbackWatcherDispatcher;
+	}
+
 	// Notification.
 
 	private void makeNotif () {

@@ -184,6 +184,11 @@ public class PlaybackActivity extends FragmentActivity {
 		public void playbackError () {
 			PlaybackActivity.this.messageHandler.sendEmptyMessage(Msgs.PLAYBACK_ERROR.ordinal());
 		}
+
+		@Override
+		public void exitRequested () {
+			finish();
+		}
 	};
 
 	protected enum Msgs {

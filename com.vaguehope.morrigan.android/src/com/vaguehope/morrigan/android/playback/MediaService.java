@@ -80,6 +80,7 @@ public class MediaService extends Service implements MediaServices {
 		switch (actionCode) {
 			case PlaybackCodes.ACTION_EXIT:
 				stopSelf();
+				this.playbackInstance.getPlaybackWatcherDispatcher().exitRequested();
 				break;
 			default:
 				this.playbackInstance.onBroadcastAction(actionCode);
