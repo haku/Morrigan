@@ -10,6 +10,7 @@ public class MediaItem {
 	private final Uri uri;
 	private final String title;
 	private final long sizeBytes;
+	private final long timeFileLastModified;
 	private final BigInteger fileHash;
 	private final long timeAddedMillis;
 	private final long timeLastPlayedMillis;
@@ -17,14 +18,20 @@ public class MediaItem {
 	private final int endCount;
 	private final long durationMillis;
 
+	public MediaItem (final Uri uri, final String title,
+			final long sizeBytes, final long timeFileLastModified, final long timeAddedMillis) {
+		this(-1, uri, title, sizeBytes, timeFileLastModified, null, timeAddedMillis, -1, 0, 0, -1);
+	}
+
 	public MediaItem (final long rowId, final Uri uri, final String title,
-			final long sizeBytes, final BigInteger fileHash,
+			final long sizeBytes, final long timeFileLastModified, final BigInteger fileHash,
 			final long timeAddedMillis, final long timeLastPlayedMillis,
 			final int startCount, final int endCount, final long durationMillis) {
 		this.rowId = rowId;
 		this.uri = uri;
 		this.title = title;
 		this.sizeBytes = sizeBytes;
+		this.timeFileLastModified = timeFileLastModified;
 		this.fileHash = fileHash;
 		this.timeAddedMillis = timeAddedMillis;
 		this.timeLastPlayedMillis = timeLastPlayedMillis;
@@ -47,6 +54,10 @@ public class MediaItem {
 
 	public long getsizeBytes () {
 		return this.sizeBytes;
+	}
+
+	public long getTimeFileLastModified () {
+		return this.timeFileLastModified;
 	}
 
 	public BigInteger getFileHash () {

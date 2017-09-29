@@ -50,6 +50,12 @@ public class MediaSourcesPrefFragment extends MnPreferenceFragment {
 		newDb.setOnPreferenceClickListener(this.newDbClickListener);
 		getPreferenceScreen().addPreference(newDb);
 
+		final Preference rescanDbs = new Preference(getActivity());
+		rescanDbs.setTitle("Rescan DBs...");
+		rescanDbs.setIcon(R.drawable.search);
+		rescanDbs.setOnPreferenceClickListener(this.rescanDbsClickListener);
+		getPreferenceScreen().addPreference(rescanDbs);
+
 		for (final DbMetadata db : getMediaDb().getDbs()) {
 			final PreferenceCategory group = new PreferenceCategory(getActivity());
 			group.setIcon(R.drawable.db);
@@ -68,6 +74,14 @@ public class MediaSourcesPrefFragment extends MnPreferenceFragment {
 		@Override
 		public boolean onPreferenceClick (final Preference preference) {
 			promptCreateNewDb();
+			return true;
+		}
+	};
+
+	private final OnPreferenceClickListener rescanDbsClickListener = new OnPreferenceClickListener() {
+		@Override
+		public boolean onPreferenceClick (final Preference preference) {
+			getActivity().startService(new Intent(getActivity(), RescanDbsService.class));
 			return true;
 		}
 	};

@@ -24,7 +24,7 @@ public class MediaDbImpl implements MediaDb {
 	protected static final LogWrapper LOG = new LogWrapper("MDI");
 
 	private static final String DB_NAME = "media";
-	private static final int DB_VERSION = 2;
+	private static final int DB_VERSION = 3;
 
 	private static class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -43,7 +43,10 @@ public class MediaDbImpl implements MediaDb {
 		public void onUpgrade (final SQLiteDatabase db, final int oldVersion, final int newVersion) {
 			LOG.w("Upgrading database from version %d to %d...", oldVersion, newVersion);
 			if (oldVersion < 2) { // NOSONAR not a magic number.
-				addColumn(db, TBL_MD, TBL_MD_SOURCES, "test");
+				addColumn(db, TBL_MD, TBL_MD_SOURCES, "text");
+			}
+			if (oldVersion < 3) { // NOSONAR not a magic number.
+				addColumn(db, TBL_MF, TBL_MF_TIME_LAST_MODIFIED, "integer");
 			}
 		}
 
@@ -100,6 +103,7 @@ public class MediaDbImpl implements MediaDb {
 	protected static final String TBL_MF_URI = "uri";
 	protected static final String TBL_MF_TITLE = "title";
 	protected static final String TBL_MF_SIZE = "size";
+	protected static final String TBL_MF_TIME_LAST_MODIFIED = "modified_millis";
 	protected static final String TBL_MF_HASH = "hash";
 	protected static final String TBL_MF_TIME_ADDED_MILLIS = "added_millis";
 	protected static final String TBL_MF_TIME_LAST_PLAYED_MILLIS = "last_played_millis";
@@ -113,6 +117,7 @@ public class MediaDbImpl implements MediaDb {
 			+ TBL_MF_URI + " text,"
 			+ TBL_MF_TITLE + " text,"
 			+ TBL_MF_SIZE + " integer,"
+			+ TBL_MF_TIME_LAST_MODIFIED + " integer,"
 			+ TBL_MF_HASH + " blob,"
 			+ TBL_MF_TIME_ADDED_MILLIS + " integer,"
 			+ TBL_MF_TIME_LAST_PLAYED_MILLIS + " integer,"
@@ -232,7 +237,8 @@ public class MediaDbImpl implements MediaDb {
 		values.put(TBL_MF_URI, item.getUri().toString());
 		values.put(TBL_MF_TITLE, item.getTitle());
 		values.put(TBL_MF_SIZE, item.getsizeBytes());
-		values.put(TBL_MF_HASH, item.getFileHash().toByteArray());
+		values.put(TBL_MF_TIME_LAST_MODIFIED, item.getTimeFileLastModified());
+		if (item.getFileHash() != null) values.put(TBL_MF_HASH, item.getFileHash().toByteArray());
 		values.put(TBL_MF_TIME_ADDED_MILLIS, item.getTimeAddedMillis());
 		values.put(TBL_MF_TIME_LAST_PLAYED_MILLIS, item.getTimeLastPlayedMillis());
 		values.put(TBL_MF_START_COUNT, item.getStartCount());
@@ -283,6 +289,7 @@ public class MediaDbImpl implements MediaDb {
 						TBL_MF_URI,
 						TBL_MF_TITLE,
 						TBL_MF_SIZE,
+						TBL_MF_TIME_LAST_MODIFIED,
 						TBL_MF_HASH,
 						TBL_MF_TIME_ADDED_MILLIS,
 						TBL_MF_TIME_LAST_PLAYED_MILLIS,
@@ -338,7 +345,7 @@ public class MediaDbImpl implements MediaDb {
 		final Cursor c = getMfCursor(
 				TBL_MF_URI + "=?",
 				new String[] { uri.toString() },
-				null, 2);
+				null, 1);
 		try {
 			if (c != null && c.moveToFirst()) {
 				return true;
