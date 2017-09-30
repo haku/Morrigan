@@ -70,7 +70,8 @@ public class MediaDbImpl implements MediaDb {
 	private final DatabaseHelper mDbHelper;
 	private final SQLiteDatabase mDb;
 
-	private final Set<MediaChangeListener> mediaChangeListeners = new CopyOnWriteArraySet<MediaChangeListener>();
+	private final Set<MediaWatcher> mediaWatchers = new CopyOnWriteArraySet<MediaWatcher>();
+	private final MediaWatcherDispatcher mediaWatcherDispatcher = new MediaWatcherDispatcher(this.mediaWatchers);
 
 	public MediaDbImpl (final Context context) {
 		this.context = context;
@@ -147,6 +148,7 @@ public class MediaDbImpl implements MediaDb {
 			this.mDb.endTransaction();
 		}
 
+		this.mediaWatcherDispatcher.librariesChanged();
 		return getDb(newId);
 	}
 
@@ -203,30 +205,37 @@ public class MediaDbImpl implements MediaDb {
 		values.put(TBL_MD_NAME, dbMetadata.getName());
 		values.put(TBL_MD_SOURCES, dbMetadata.getSourcesJson().toString());
 
+		boolean success = false;
 		this.mDb.beginTransaction();
 		try {
 			final int affected = this.mDb.update(TBL_MD, values, TBL_MD_ID + "=?", new String[] { String.valueOf(dbMetadata.getId()) });
 			if (affected > 1) throw new IllegalStateException("Updating media row " + dbMetadata.getId() + " affected " + affected + " rows, expected 1.");
 			if (affected < 1) LOG.w("Updating media row %s affected %s rows, expected 1.", dbMetadata.getId(), affected);
 			this.mDb.setTransactionSuccessful();
+			success = true;
 		}
 		finally {
 			this.mDb.endTransaction();
 		}
 
+		if (success) this.mediaWatcherDispatcher.librariesChanged();
 	}
 
 	@Override
 	public void deleteDb (final DbMetadata dbMetadata) {
+		boolean success = false;
 		this.mDb.beginTransaction();
 		try {
 			this.mDb.delete(TBL_MD, TBL_MD_ID + "=?",
 					new String[] { String.valueOf(dbMetadata.getId()) });
 			this.mDb.setTransactionSuccessful();
+			success = true;
 		}
 		finally {
 			this.mDb.endTransaction();
 		}
+
+		if (success) this.mediaWatcherDispatcher.librariesChanged();
 	}
 
 	// Add and query media.
@@ -358,13 +367,14 @@ public class MediaDbImpl implements MediaDb {
 	}
 
 	@Override
-	public void addMediaChangeListener (final MediaChangeListener listener) {
-		this.mediaChangeListeners.add(listener);
+	public void addMediaWatcher (final MediaWatcher watcher) {
+		this.mediaWatchers.add(watcher);
+		watcher.librariesChanged();
 	}
 
 	@Override
-	public void removeMediaChangeListener (final MediaChangeListener listener) {
-		this.mediaChangeListeners.remove(listener);
+	public void removeMediaWatcher (final MediaWatcher watcher) {
+		this.mediaWatchers.remove(watcher);
 	}
 
 }

@@ -18,8 +18,8 @@ public interface MediaDb {
 	Cursor getAllMediaCursor (long dbId, SortColumn sortColumn, SortDirection sortDirection);
 	boolean hasMediaUri(Uri uri);
 
-	void addMediaChangeListener(MediaChangeListener listener);
-	void removeMediaChangeListener(MediaChangeListener listener);
+	void addMediaWatcher(MediaWatcher watcher);
+	void removeMediaWatcher(MediaWatcher watcher);
 
 	enum SortColumn {
 		PATH,
@@ -35,8 +35,8 @@ public interface MediaDb {
 		DESC;
 	}
 
-	interface MediaChangeListener {
-
+	interface MediaWatcher {
+		void librariesChanged();
 	}
 
 }

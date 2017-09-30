@@ -33,7 +33,6 @@ public class PlayerFragment extends Fragment {
 	private static final LogWrapper LOG = new LogWrapper("PF");
 
 	private MessageHandler messageHandler;
-	private PlaybackActivity hostActivity;
 
 	private QueueAdapter queueAdaptor;
 	private TextView txtTitle;
@@ -41,7 +40,6 @@ public class PlayerFragment extends Fragment {
 
 	@Override
 	public View onCreateView (final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
-		this.hostActivity = (PlaybackActivity) getActivity();
 		this.messageHandler = new MessageHandler(this);
 
 		final View rootView = inflater.inflate(R.layout.playback_player, container, false);
@@ -144,7 +142,7 @@ public class PlayerFragment extends Fragment {
 	// GUI.
 
 	private void wireGui (final View rootView) {
-		this.queueAdaptor = new QueueAdapter(this.hostActivity);
+		this.queueAdaptor = new QueueAdapter(getActivity());
 		final ListView lstQueue = (ListView) rootView.findViewById(R.id.lstQueue);
 		lstQueue.setAdapter(this.queueAdaptor);
 //		lstQueue.setOnItemClickListener(...);
