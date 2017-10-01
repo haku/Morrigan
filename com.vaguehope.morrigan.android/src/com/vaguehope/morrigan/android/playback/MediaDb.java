@@ -16,6 +16,7 @@ public interface MediaDb {
 	void addMedia (long libraryId, Collection<MediaItem> items);
 	void updateMedia(long libraryId, Collection<MediaItem> items);
 	Cursor getAllMediaCursor (long libraryId, SortColumn sortColumn, SortDirection sortDirection);
+	MediaItem getMediaItem(long rowId);
 	boolean hasMediaUri(long libraryId, Uri uri);
 
 	void addMediaWatcher(MediaWatcher watcher);

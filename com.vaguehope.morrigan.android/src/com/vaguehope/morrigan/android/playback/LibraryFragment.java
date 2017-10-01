@@ -16,6 +16,8 @@ import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.PopupMenu;
@@ -129,6 +131,12 @@ public class LibraryFragment extends Fragment {
 		if (this.bndMc != null) this.bndMc.dispose();
 	}
 
+	protected Playbacker getPlaybacker () {
+		final MediaClient d = this.bndMc;
+		if (d == null) return null;
+		return d.getService().getPlaybacker();
+	}
+
 	protected MediaDb getMediaDb () {
 		final MediaClient d = this.bndMc;
 		if (d == null) return null;
@@ -149,6 +157,7 @@ public class LibraryFragment extends Fragment {
 
 		this.mediaList = (ListView) rootView.findViewById(R.id.mediaList);
 		this.mediaList.setAdapter(this.adapter);
+		this.mediaList.setOnItemClickListener(this.mediaListOnItemClickListener);
 	}
 
 	protected MediaWatcher getMediaWatcher () {
@@ -205,7 +214,30 @@ public class LibraryFragment extends Fragment {
 		}
 	};
 
-	private void onLibrariesChanged() {
+	private final OnItemClickListener mediaListOnItemClickListener = new OnItemClickListener() {
+		@Override
+		public void onItemClick (final AdapterView<?> parent, final View view, final int position, final long id) {
+			MediaItem mediaItem = getMediaDb().getMediaItem(id);
+			if (mediaItem != null) {
+				addMediaItemToQueue(mediaItem);
+			}
+			else {
+				LOG.w("Item %s not found in DB.", id);
+			}
+		}
+	};
+
+	private void addMediaItemToQueue (final MediaItem mediaItem) {
+		final Playbacker pb = getPlaybacker();
+		if (pb != null) {
+			QueueItem item = new QueueItem(getActivity(), mediaItem.getUri());
+			pb.getQueue().add(item);
+			pb.notifyQueueChanged();
+			LOG.i("Added to queue: %s", item);
+		}
+	}
+
+	private void onLibrariesChanged () {
 		this.allLibraries = getMediaDb().getLibraries();
 
 		final PopupMenu newMenu = new PopupMenu(getActivity(), LibraryFragment.this.btnLibrary);

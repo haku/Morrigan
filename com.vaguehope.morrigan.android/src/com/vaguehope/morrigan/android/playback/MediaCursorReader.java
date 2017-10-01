@@ -1,15 +1,83 @@
 package com.vaguehope.morrigan.android.playback;
 
+import java.math.BigInteger;
+
 import android.database.Cursor;
+import android.net.Uri;
 
 public class MediaCursorReader {
 
+	private int colUri = -1;
 	private int colTitle = -1;
+	private int colSize = -1;
+	private int colLastModified = -1;
+	private int colHash = -1;
+	private int colAddedMillis = -1;
+	private int colLastPlayedMillis = -1;
+	private int colStartCount = -1;
+	private int colEndCount = -1;
+	private int colDurationMillis = -1;
+
+	public Uri readUri (final Cursor c) {
+		if (c == null) return null;
+		if (this.colUri < 0) this.colUri = c.getColumnIndexOrThrow(MediaDbImpl.TBL_MF_URI);
+		return Uri.parse(c.getString(this.colUri));
+	}
 
 	public String readTitle (final Cursor c) {
 		if (c == null) return null;
 		if (this.colTitle < 0) this.colTitle = c.getColumnIndexOrThrow(MediaDbImpl.TBL_MF_TITLE);
 		return c.getString(this.colTitle);
+	}
+
+	public long readSizeBytes (final Cursor c) {
+		if (c == null) return -1;
+		if (this.colSize < 0) this.colSize = c.getColumnIndexOrThrow(MediaDbImpl.TBL_MF_SIZE);
+		return c.getLong(this.colSize);
+	}
+
+	public long readFileLastModified (final Cursor c) {
+		if (c == null) return -1;
+		if (this.colLastModified < 0) this.colLastModified = c.getColumnIndexOrThrow(MediaDbImpl.TBL_MF_TIME_LAST_MODIFIED);
+		return c.getLong(this.colLastModified);
+	}
+
+	public BigInteger readFileHash (final Cursor c) {
+		if (c == null) return null;
+		if (this.colHash < 0) this.colHash = c.getColumnIndexOrThrow(MediaDbImpl.TBL_MF_HASH);
+		final byte[] blob = c.getBlob(this.colHash);
+		if (blob == null || blob.length < 1) return null;
+		return new BigInteger(blob);
+	}
+
+	public long readTimeAddedMillis (final Cursor c) {
+		if (c == null) return -1;
+		if (this.colAddedMillis < 0) this.colAddedMillis = c.getColumnIndexOrThrow(MediaDbImpl.TBL_MF_TIME_ADDED_MILLIS);
+		return c.getLong(this.colAddedMillis);
+	}
+
+	public long readLastPlayedMillis (final Cursor c) {
+		if (c == null) return -1;
+		if (this.colLastPlayedMillis < 0) this.colLastPlayedMillis = c.getColumnIndexOrThrow(MediaDbImpl.TBL_MF_TIME_LAST_PLAYED_MILLIS);
+		return c.getLong(this.colLastPlayedMillis);
+	}
+
+	public int readStartCount (final Cursor c) {
+		if (c == null) return -1;
+		if (this.colStartCount < 0) this.colStartCount = c.getColumnIndexOrThrow(MediaDbImpl.TBL_MF_START_COUNT);
+		return c.getInt(this.colStartCount);
+	}
+
+	public int readEndCount (final Cursor c) {
+		if (c == null) return -1;
+		if (this.colEndCount < 0) this.colEndCount = c.getColumnIndexOrThrow(MediaDbImpl.TBL_MF_END_COUNT);
+		return c.getInt(this.colEndCount);
+	}
+
+	public long readDurationMillis (final Cursor c) {
+		if (c == null) return -1;
+		if (this.colDurationMillis < 0) this.colDurationMillis = c.getColumnIndexOrThrow(MediaDbImpl.TBL_MF_DURATION_MILLIS);
+		return c.getLong(this.colDurationMillis);
 	}
 
 }
