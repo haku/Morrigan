@@ -133,7 +133,7 @@ public class MediaDbImpl implements MediaDb {
 			+ TBL_MF_DBID + "," + TBL_MF_URI + "," + TBL_MF_TITLE + "," + TBL_MF_HASH + ");";
 
 	@Override
-	public DbMetadata newDb (final String name) {
+	public LibraryMetadata newLibrary (final String name) {
 		final ContentValues values = new ContentValues();
 		values.put(TBL_MD_NAME, name);
 
@@ -149,24 +149,24 @@ public class MediaDbImpl implements MediaDb {
 		}
 
 		this.mediaWatcherDispatcher.librariesChanged();
-		return getDb(newId);
+		return getLibrary(newId);
 	}
 
 	@Override
-	public Collection<DbMetadata> getDbs () {
+	public Collection<LibraryMetadata> getLibraries () {
 		return queryDbs(null, null, 0);
 	}
 
 	@Override
-	public DbMetadata getDb (final long dbId) {
-		if (dbId < 0) throw new IllegalArgumentException("dbId must be >=0: dbId=" + dbId);
-		final Collection<DbMetadata> dbs = queryDbs(TBL_MD_ID + "=?", new String[] { String.valueOf(dbId) }, 2);
+	public LibraryMetadata getLibrary (final long libraryId) {
+		if (libraryId < 0) throw new IllegalArgumentException("libraryId must be >=0: libraryId=" + libraryId);
+		final Collection<LibraryMetadata> dbs = queryDbs(TBL_MD_ID + "=?", new String[] { String.valueOf(libraryId) }, 2);
 		if (dbs.size() < 1) return null;
-		if (dbs.size() > 1) throw new IllegalStateException("Multiple DBs with id: " + dbId);
+		if (dbs.size() > 1) throw new IllegalStateException("Multiple DBs with id: " + libraryId);
 		return dbs.iterator().next();
 	}
 
-	private Collection<DbMetadata> queryDbs (final String where, final String[] whereArgs, final int numberOf) {
+	private Collection<LibraryMetadata> queryDbs (final String where, final String[] whereArgs, final int numberOf) {
 		final Cursor c = this.mDb.query(true, TBL_MD,
 				new String[] { TBL_MD_ID, TBL_MD_NAME, TBL_MD_SOURCES },
 				where, whereArgs,
@@ -179,12 +179,12 @@ public class MediaDbImpl implements MediaDb {
 				final int colName = c.getColumnIndex(TBL_MD_NAME);
 				final int colSources = c.getColumnIndex(TBL_MD_SOURCES);
 
-				final List<DbMetadata> ret = new ArrayList<DbMetadata>();
+				final List<LibraryMetadata> ret = new ArrayList<LibraryMetadata>();
 				do {
 					final long id = c.getLong(colId);
 					final String name = c.getString(colName);
 					final String sources = c.getString(colSources);
-					ret.add(new DbMetadata(id, name, sources));
+					ret.add(new LibraryMetadata(id, name, sources));
 				}
 				while (c.moveToNext());
 				return ret;
@@ -200,7 +200,7 @@ public class MediaDbImpl implements MediaDb {
 	}
 
 	@Override
-	public void updateDb (final DbMetadata dbMetadata) {
+	public void updateLibrary (final LibraryMetadata dbMetadata) {
 		final ContentValues values = new ContentValues();
 		values.put(TBL_MD_NAME, dbMetadata.getName());
 		values.put(TBL_MD_SOURCES, dbMetadata.getSourcesJson().toString());
@@ -222,7 +222,7 @@ public class MediaDbImpl implements MediaDb {
 	}
 
 	@Override
-	public void deleteDb (final DbMetadata dbMetadata) {
+	public void deleteLibrary (final LibraryMetadata dbMetadata) {
 		boolean success = false;
 		this.mDb.beginTransaction();
 		try {
@@ -240,9 +240,9 @@ public class MediaDbImpl implements MediaDb {
 
 	// Add and query media.
 
-	private static void copyMediaItemToContentValues (final long dbId, final MediaItem item, final ContentValues values) {
+	private static void copyMediaItemToContentValues (final long libraryId, final MediaItem item, final ContentValues values) {
 		values.clear();
-		values.put(TBL_MF_DBID, dbId);
+		values.put(TBL_MF_DBID, libraryId);
 		values.put(TBL_MF_URI, item.getUri().toString());
 		values.put(TBL_MF_TITLE, item.getTitle());
 		values.put(TBL_MF_SIZE, item.getsizeBytes());
@@ -256,12 +256,12 @@ public class MediaDbImpl implements MediaDb {
 	}
 
 	@Override
-	public void addMedia (final long dbId, final Collection<MediaItem> items) {
+	public void addMedia (final long libraryId, final Collection<MediaItem> items) {
 		this.mDb.beginTransaction();
 		try {
 			final ContentValues values = new ContentValues();
 			for (final MediaItem item : items) {
-				copyMediaItemToContentValues(dbId, item, values);
+				copyMediaItemToContentValues(libraryId, item, values);
 				final long newId = this.mDb.insert(TBL_MF, null, values);
 				if (newId < 0) throw new IllegalStateException("Adding media failed: id=" + newId);
 			}
@@ -273,12 +273,12 @@ public class MediaDbImpl implements MediaDb {
 	}
 
 	@Override
-	public void updateMedia (final long dbId, final Collection<MediaItem> items) {
+	public void updateMedia (final long libraryId, final Collection<MediaItem> items) {
 		this.mDb.beginTransaction();
 		try {
 			final ContentValues values = new ContentValues();
 			for (final MediaItem item : items) {
-				copyMediaItemToContentValues(dbId, item, values);
+				copyMediaItemToContentValues(libraryId, item, values);
 				final int affected = this.mDb.update(TBL_MF, values, TBL_MF_ID + "=?", new String[] { String.valueOf(item.getRowId()) });
 				if (affected > 1) throw new IllegalStateException("Updating media row " + item.getRowId() + " affected " + affected + " rows, expected 1.");
 				if (affected < 1) LOG.w("Updating media row %s affected %s rows, expected 1.", item.getRowId(), affected);
@@ -342,18 +342,18 @@ public class MediaDbImpl implements MediaDb {
 	}
 
 	@Override
-	public Cursor getAllMediaCursor (final long dbId, final SortColumn sortColumn, final SortDirection sortDirection) {
+	public Cursor getAllMediaCursor (final long libraryId, final SortColumn sortColumn, final SortDirection sortDirection) {
 		return getMfCursor(
 				TBL_MF_DBID + "=?",
-				new String[] { String.valueOf(dbId) },
+				new String[] { String.valueOf(libraryId) },
 				toMfSortColumn(sortColumn) + " " + toSortDirection(sortDirection), -1);
 	}
 
 	@Override
-	public boolean hasMediaUri (final Uri uri) {
+	public boolean hasMediaUri (final long libraryId, final Uri uri) {
 		final Cursor c = getMfCursor(
-				TBL_MF_URI + "=?",
-				new String[] { uri.toString() },
+				TBL_MF_DBID + "=? AND " + TBL_MF_URI + "=?",
+				new String[] { String.valueOf(libraryId), uri.toString() },
 				null, 1);
 		try {
 			if (c != null && c.moveToFirst()) {

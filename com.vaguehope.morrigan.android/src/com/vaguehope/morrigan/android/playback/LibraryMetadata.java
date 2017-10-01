@@ -10,17 +10,17 @@ import org.json.JSONTokener;
 
 import android.net.Uri;
 
-public class DbMetadata {
+public class LibraryMetadata {
 
 	private final long id;
 	private final String name;
 	private final List<Uri> sources;
 
-	public DbMetadata (final long id, final String name, final String sourcesJson) throws JSONException {
+	public LibraryMetadata (final long id, final String name, final String sourcesJson) throws JSONException {
 		this(id, name, parseSources(sourcesJson));
 	}
 
-	public DbMetadata (final long id, final String name, final List<Uri> sources) {
+	public LibraryMetadata (final long id, final String name, final List<Uri> sources) {
 		this.id = id;
 		this.name = name;
 		this.sources = sources;
@@ -61,23 +61,23 @@ public class DbMetadata {
 
 	@Override
 	public String toString () {
-		return String.format("DB{%s, %s}", this.id, this.name);
+		return String.format("Library{%s, %s}", this.id, this.name);
 	}
 
-	public DbMetadata withName (final String newName) {
-		return new DbMetadata(this.id, newName, this.sources);
+	public LibraryMetadata withName (final String newName) {
+		return new LibraryMetadata(this.id, newName, this.sources);
 	}
 
-	public DbMetadata withSource(final Uri sourceToAdd) {
+	public LibraryMetadata withSource(final Uri sourceToAdd) {
 		final ArrayList<Uri> l = new ArrayList<Uri>(this.sources);
 		l.add(sourceToAdd);
-		return new DbMetadata(this.id, this.name, l);
+		return new LibraryMetadata(this.id, this.name, l);
 	}
 
-	public DbMetadata withoutSource(final Uri sourceToAdd) {
+	public LibraryMetadata withoutSource(final Uri sourceToAdd) {
 		final ArrayList<Uri> l = new ArrayList<Uri>(this.sources);
 		l.remove(sourceToAdd);
-		return new DbMetadata(this.id, this.name, l);
+		return new LibraryMetadata(this.id, this.name, l);
 	}
 
 }

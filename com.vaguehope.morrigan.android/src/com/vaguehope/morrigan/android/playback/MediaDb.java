@@ -7,16 +7,16 @@ import android.net.Uri;
 
 public interface MediaDb {
 
-	DbMetadata newDb (String name);
-	Collection<DbMetadata> getDbs ();
-	DbMetadata getDb (long dbId);
-	void updateDb(DbMetadata dbMetadata);
-	void deleteDb(DbMetadata dbMetadata);
+	LibraryMetadata newLibrary (String name);
+	Collection<LibraryMetadata> getLibraries ();
+	LibraryMetadata getLibrary (long libraryId);
+	void updateLibrary(LibraryMetadata libraryMetadata);
+	void deleteLibrary(LibraryMetadata libraryMetadata);
 
-	void addMedia (long dbId, Collection<MediaItem> items);
-	void updateMedia(long dbId, Collection<MediaItem> items);
-	Cursor getAllMediaCursor (long dbId, SortColumn sortColumn, SortDirection sortDirection);
-	boolean hasMediaUri(Uri uri);
+	void addMedia (long libraryId, Collection<MediaItem> items);
+	void updateMedia(long libraryId, Collection<MediaItem> items);
+	Cursor getAllMediaCursor (long libraryId, SortColumn sortColumn, SortDirection sortDirection);
+	boolean hasMediaUri(long libraryId, Uri uri);
 
 	void addMediaWatcher(MediaWatcher watcher);
 	void removeMediaWatcher(MediaWatcher watcher);

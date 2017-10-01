@@ -31,7 +31,7 @@ public class LibraryFragment extends Fragment {
 
 	private MessageHandler messageHandler;
 
-	private ArrayAdapter<DbMetadata> librariesAdaptor;
+	private ArrayAdapter<LibraryMetadata> librariesAdaptor;
 	private Spinner librariesSelector;
 	private ListView mediaList;
 	private MediaListCursorAdapter adapter;
@@ -126,7 +126,7 @@ public class LibraryFragment extends Fragment {
 	private void wireGui (final View rootView, final ViewGroup container) {
 		this.adapter = new MediaListCursorAdapter(container.getContext());
 
-		this.librariesAdaptor = new ArrayAdapter<DbMetadata>(container.getContext(), android.R.layout.simple_list_item_1);
+		this.librariesAdaptor = new ArrayAdapter<LibraryMetadata>(container.getContext(), android.R.layout.simple_list_item_1);
 
 		this.librariesSelector = (Spinner) rootView.findViewById(R.id.librariesSelector);
 		this.librariesSelector.setAdapter(this.librariesAdaptor);
@@ -184,7 +184,7 @@ public class LibraryFragment extends Fragment {
 	}
 
 	private void refreshLibraries () {
-		final Collection<DbMetadata> dbs = getMediaDb().getDbs();
+		final Collection<LibraryMetadata> dbs = getMediaDb().getLibraries();
 		this.librariesAdaptor.clear();
 		this.librariesAdaptor.addAll(dbs);
 	}
@@ -193,7 +193,7 @@ public class LibraryFragment extends Fragment {
 
 		@Override
 		public void onItemSelected (final AdapterView<?> parent, final View view, final int position, final long id) {
-			final DbMetadata library = LibraryFragment.this.librariesAdaptor.getItem(position);
+			final LibraryMetadata library = LibraryFragment.this.librariesAdaptor.getItem(position);
 			setCurrentLibrary(library);
 		}
 
@@ -202,9 +202,9 @@ public class LibraryFragment extends Fragment {
 
 	};
 
-	private DbMetadata currentLibrary;
+	private LibraryMetadata currentLibrary;
 
-	private void setCurrentLibrary (final DbMetadata library) {
+	private void setCurrentLibrary (final LibraryMetadata library) {
 		this.currentLibrary = library;
 		reloadLibrary();
 	}
@@ -216,11 +216,11 @@ public class LibraryFragment extends Fragment {
 	private static class LoadLibrary extends AsyncTask<Void, Void, Result<Cursor>> {
 
 		private final LibraryFragment host;
-		private final DbMetadata library;
+		private final LibraryMetadata library;
 		private final SortColumn sortColumn;
 		private final SortDirection sortDirection;
 
-		public LoadLibrary (final LibraryFragment host, final DbMetadata library, final SortColumn sortColumn, final SortDirection sortDirection) {
+		public LoadLibrary (final LibraryFragment host, final LibraryMetadata library, final SortColumn sortColumn, final SortDirection sortDirection) {
 			this.host = host;
 			this.library = library;
 			this.sortColumn = sortColumn;

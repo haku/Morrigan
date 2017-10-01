@@ -44,54 +44,54 @@ public class MediaSourcesPrefFragment extends MnPreferenceFragment {
 	private void refreshList () {
 		getPreferenceScreen().removeAll();
 
-		final Preference newDb = new Preference(getActivity());
-		newDb.setTitle("New Media DB...");
-		newDb.setIcon(R.drawable.plus);
-		newDb.setOnPreferenceClickListener(this.newDbClickListener);
-		getPreferenceScreen().addPreference(newDb);
+		final Preference newLibrary = new Preference(getActivity());
+		newLibrary.setTitle("New Media Library...");
+		newLibrary.setIcon(R.drawable.plus);
+		newLibrary.setOnPreferenceClickListener(this.newLibraryClickListener);
+		getPreferenceScreen().addPreference(newLibrary);
 
-		final Preference rescanDbs = new Preference(getActivity());
-		rescanDbs.setTitle("Rescan DBs...");
-		rescanDbs.setIcon(R.drawable.search);
-		rescanDbs.setOnPreferenceClickListener(this.rescanDbsClickListener);
-		getPreferenceScreen().addPreference(rescanDbs);
+		final Preference rescanLibraries = new Preference(getActivity());
+		rescanLibraries.setTitle("Rescan Libraries...");
+		rescanLibraries.setIcon(R.drawable.search);
+		rescanLibraries.setOnPreferenceClickListener(this.rescanLibrariesClickListener);
+		getPreferenceScreen().addPreference(rescanLibraries);
 
-		for (final DbMetadata db : getMediaDb().getDbs()) {
+		for (final LibraryMetadata library : getMediaDb().getLibraries()) {
 			final PreferenceCategory group = new PreferenceCategory(getActivity());
 			group.setIcon(R.drawable.db);
-			group.setTitle(db.getName());
+			group.setTitle(library.getName());
 			getPreferenceScreen().addPreference(group);
 
-			for (final Uri source : db.getSources()) {
-				group.addPreference(new ExistingSourcePreference(getActivity(), db, source));
+			for (final Uri source : library.getSources()) {
+				group.addPreference(new ExistingSourcePreference(getActivity(), library, source));
 			}
-			group.addPreference(new AddSourceClickListener(getActivity(), db));
-			group.addPreference(new RenameDbClickListener(getActivity(), db));
+			group.addPreference(new AddSourceClickListener(getActivity(), library));
+			group.addPreference(new RenameLibraryClickListener(getActivity(), library));
 		}
 	}
 
-	private final OnPreferenceClickListener newDbClickListener = new OnPreferenceClickListener() {
+	private final OnPreferenceClickListener newLibraryClickListener = new OnPreferenceClickListener() {
 		@Override
 		public boolean onPreferenceClick (final Preference preference) {
-			promptCreateNewDb();
+			promptCreateNewLibrary();
 			return true;
 		}
 	};
 
-	private final OnPreferenceClickListener rescanDbsClickListener = new OnPreferenceClickListener() {
+	private final OnPreferenceClickListener rescanLibrariesClickListener = new OnPreferenceClickListener() {
 		@Override
 		public boolean onPreferenceClick (final Preference preference) {
-			getActivity().startService(new Intent(getActivity(), RescanDbsService.class));
+			getActivity().startService(new Intent(getActivity(), RescanLibrariesService.class));
 			return true;
 		}
 	};
 
-	protected void promptCreateNewDb () {
-		DialogHelper.askString(getActivity(), "Name for new DB:", new Listener<String>() {
+	protected void promptCreateNewLibrary () {
+		DialogHelper.askString(getActivity(), "Name for new library:", new Listener<String>() {
 			@Override
 			public void onAnswer (final String name) {
 				if (StringHelper.notEmpty(name)) {
-					getMediaDb().newDb(name);
+					getMediaDb().newLibrary(name);
 					refreshList();
 				}
 			}
@@ -100,11 +100,11 @@ public class MediaSourcesPrefFragment extends MnPreferenceFragment {
 
 	private class AddSourceClickListener extends Preference implements OnPreferenceClickListener {
 
-		private final DbMetadata db;
+		private final LibraryMetadata libraryMetadata;
 
-		public AddSourceClickListener (final Context context, final DbMetadata db) {
+		public AddSourceClickListener (final Context context, final LibraryMetadata libraryMetadata) {
 			super(context);
-			this.db = db;
+			this.libraryMetadata = libraryMetadata;
 			setTitle("Add Source...");
 			setIcon(R.drawable.plus);
 			setOnPreferenceClickListener(this);
@@ -128,8 +128,8 @@ public class MediaSourcesPrefFragment extends MnPreferenceFragment {
 						return;
 					}
 
-					LOG.i("Adding source '%s' to DB %s.", uri, AddSourceClickListener.this.db);
-					getMediaDb().updateDb(AddSourceClickListener.this.db.withSource(uri));
+					LOG.i("Adding source '%s' to library %s.", uri, AddSourceClickListener.this.libraryMetadata);
+					getMediaDb().updateLibrary(AddSourceClickListener.this.libraryMetadata.withSource(uri));
 					refreshList();
 				}
 			}));
@@ -138,25 +138,25 @@ public class MediaSourcesPrefFragment extends MnPreferenceFragment {
 
 	}
 
-	private class RenameDbClickListener extends Preference implements OnPreferenceClickListener {
+	private class RenameLibraryClickListener extends Preference implements OnPreferenceClickListener {
 
-		private final DbMetadata db;
+		private final LibraryMetadata libraryMetadata;
 
-		public RenameDbClickListener (final Context context, final DbMetadata db) {
+		public RenameLibraryClickListener (final Context context, final LibraryMetadata libraryMetadata) {
 			super(context);
-			this.db = db;
-			setTitle("Rename DB...");
+			this.libraryMetadata = libraryMetadata;
+			setTitle("Rename Library...");
 			setIcon(android.R.drawable.ic_menu_edit);
 			setOnPreferenceClickListener(this);
 		}
 
 		@Override
 		public boolean onPreferenceClick (final Preference preference) {
-			DialogHelper.askString(getActivity(), "Rename " + this.db.getName() + ":", this.db.getName(), new Listener<String>() {
+			DialogHelper.askString(getActivity(), "Rename " + this.libraryMetadata.getName() + ":", this.libraryMetadata.getName(), new Listener<String>() {
 				@Override
 				public void onAnswer (final String name) {
 					if (StringHelper.notEmpty(name)) {
-						getMediaDb().updateDb(RenameDbClickListener.this.db.withName(name));
+						getMediaDb().updateLibrary(RenameLibraryClickListener.this.libraryMetadata.withName(name));
 						refreshList();
 					}
 				}
@@ -168,12 +168,12 @@ public class MediaSourcesPrefFragment extends MnPreferenceFragment {
 
 	private class ExistingSourcePreference extends Preference implements OnLongClickListener {
 
-		private final DbMetadata db;
+		private final LibraryMetadata libraryMetadata;
 		private final Uri source;
 
-		public ExistingSourcePreference (final Context context, final DbMetadata db, final Uri source) {
+		public ExistingSourcePreference (final Context context, final LibraryMetadata libraryMetadata, final Uri source) {
 			super(context);
-			this.db = db;
+			this.libraryMetadata = libraryMetadata;
 			this.source = source;
 
 			final DocumentFile file = DocumentFile.fromTreeUri(context, source);
@@ -187,8 +187,8 @@ public class MediaSourcesPrefFragment extends MnPreferenceFragment {
 			DialogHelper.askYesNo(getContext(), "Remove source " + getTitle() + "?\n\n" + this.source, new Runnable() {
 				@Override
 				public void run () {
-					LOG.i("Removing source '%s' from DB %s.", ExistingSourcePreference.this.source, ExistingSourcePreference.this.db);
-					getMediaDb().updateDb(ExistingSourcePreference.this.db.withoutSource(ExistingSourcePreference.this.source));
+					LOG.i("Removing source '%s' from library %s.", ExistingSourcePreference.this.source, ExistingSourcePreference.this.libraryMetadata);
+					getMediaDb().updateLibrary(ExistingSourcePreference.this.libraryMetadata.withoutSource(ExistingSourcePreference.this.source));
 					refreshList();
 				}
 			});

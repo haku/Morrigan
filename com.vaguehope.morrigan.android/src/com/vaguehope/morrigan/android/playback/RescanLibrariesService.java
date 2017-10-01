@@ -20,14 +20,14 @@ import com.vaguehope.morrigan.android.R;
 import com.vaguehope.morrigan.android.helper.ExceptionHelper;
 import com.vaguehope.morrigan.android.helper.LogWrapper;
 
-public class RescanDbsService extends MediaBindingAwakeService {
+public class RescanLibrariesService extends MediaBindingAwakeService {
 
 	protected static final LogWrapper LOG = new LogWrapper("RDS");
 
 	private NotificationManager notifMgr;
 
-	public RescanDbsService () {
-		super("RescanDbsService", LOG);
+	public RescanLibrariesService () {
+		super("RescanLibrariesService", LOG);
 	}
 
 	@Override
@@ -91,31 +91,31 @@ public class RescanDbsService extends MediaBindingAwakeService {
 	}
 
 	private void doScans (final int notificationId, final Builder notif) {
-		final Collection<DbMetadata> dbs = getMediaDb().getDbs();
-		for (final DbMetadata db : dbs) {
+		final Collection<LibraryMetadata> libraries = getMediaDb().getLibraries();
+		for (final LibraryMetadata library : libraries) {
 			// TODO check if cancelled.
 
-			scanDb(db, notificationId, notif);
+			scanLibrary(library, notificationId, notif);
 		}
 	}
 
-	private void scanDb (final DbMetadata db, final int notificationId, final Builder notif) {
-		updateNotifTitle(notificationId, notif, "Scanning " + db.getName());
+	private void scanLibrary (final LibraryMetadata library, final int notificationId, final Builder notif) {
+		updateNotifTitle(notificationId, notif, "Scanning " + library.getName());
 
-		for (final Uri source : db.getSources()) {
+		for (final Uri source : library.getSources()) {
 			// TODO check if cancelled.
 
-			scanSourceForNewMedia(source, db, notificationId, notif);
+			scanSourceForNewMedia(source, library, notificationId, notif);
 		}
 
 		// TODO scan and verify existing media items, update metadata, etc.
 	}
 
-	private void scanSourceForNewMedia (final Uri source, final DbMetadata db, final int notificationId, final Builder notif) {
+	private void scanSourceForNewMedia (final Uri source, final LibraryMetadata library, final int notificationId, final Builder notif) {
 		LOG.i("Scanning: %s", source);
 		final MediaDb mediaDb = getMediaDb();
 
-		final List<MediaItem> mediaToAddToDb = new ArrayList<MediaItem>();
+		final List<MediaItem> mediaToAddToLibrary = new ArrayList<MediaItem>();
 		final Queue<DocumentFile> dirs = new LinkedList<DocumentFile>();
 		int newItemCount = 0;
 
@@ -141,12 +141,12 @@ public class RescanDbsService extends MediaBindingAwakeService {
 					dirs.add(file);
 				}
 				else if (file.isFile()) {
-					final MediaItem newItem = makeNewMediaItem(mediaDb, file);
+					final MediaItem newItem = makeNewMediaItem(mediaDb, library, file);
 					if (newItem != null) {
 						LOG.i("New file: %s", file.getUri());
 
-						mediaToAddToDb.add(newItem);
-						if (mediaToAddToDb.size() >= 100) addMediaToDb(mediaDb, db, mediaToAddToDb);
+						mediaToAddToLibrary.add(newItem);
+						if (mediaToAddToLibrary.size() >= 100) addMediaToLibrary(mediaDb, library, mediaToAddToLibrary);
 
 						newItemCount += 1;
 						updateNotifProgress(notificationId, notif, "Found " + newItemCount + " new items");
@@ -157,14 +157,14 @@ public class RescanDbsService extends MediaBindingAwakeService {
 				}
 			}
 		}
-		addMediaToDb(mediaDb, db, mediaToAddToDb);
+		addMediaToLibrary(mediaDb, library, mediaToAddToLibrary);
 		LOG.i("Total items added: %s", newItemCount);
 	}
 
-	private static void addMediaToDb (final MediaDb mediaDb, final DbMetadata db, final List<MediaItem> items) {
+	private static void addMediaToLibrary (final MediaDb mediaDb, final LibraryMetadata library, final List<MediaItem> items) {
 		if (items.size() > 0) {
-			LOG.i("Adding %s items to DB %s...", items.size(), db.getId());
-			mediaDb.addMedia(db.getId(), items);
+			LOG.i("Adding %s items to library %s...", items.size(), library.getId());
+			mediaDb.addMedia(library.getId(), items);
 		}
 		items.clear();
 	}
@@ -175,9 +175,10 @@ public class RescanDbsService extends MediaBindingAwakeService {
 	}
 
 	/**
-	 * Returns null if already present in DB or not a supported media file.
+	 * Returns null if already present in library or not a supported media file.
+	 * @param library
 	 */
-	private static MediaItem makeNewMediaItem (final MediaDb mediaDb, final DocumentFile file) {
+	private static MediaItem makeNewMediaItem (final MediaDb mediaDb, final LibraryMetadata library, final DocumentFile file) {
 		final String type = file.getType();
 		if (!SUPPORTED_TYPES.contains(type) && !type.startsWith("audio")) {
 			LOG.i("Not audio: %s %s", file.getUri(), type);
@@ -191,7 +192,7 @@ public class RescanDbsService extends MediaBindingAwakeService {
 			LOG.i("Not readable: %s", file.getUri());
 			return null;
 		}
-		if (mediaDb.hasMediaUri(file.getUri())) return null;
+		if (mediaDb.hasMediaUri(library.getId(), file.getUri())) return null;
 		return new MediaItem(file.getUri(), file.getName(), file.length(), file.lastModified(), System.currentTimeMillis());
 	}
 
