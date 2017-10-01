@@ -44,17 +44,17 @@ public class MediaSourcesPrefFragment extends MnPreferenceFragment {
 	private void refreshList () {
 		getPreferenceScreen().removeAll();
 
-		final Preference newLibrary = new Preference(getActivity());
-		newLibrary.setTitle("New Media Library...");
-		newLibrary.setIcon(R.drawable.plus);
-		newLibrary.setOnPreferenceClickListener(this.newLibraryClickListener);
-		getPreferenceScreen().addPreference(newLibrary);
-
 		final Preference rescanLibraries = new Preference(getActivity());
 		rescanLibraries.setTitle("Rescan Libraries...");
 		rescanLibraries.setIcon(R.drawable.search);
 		rescanLibraries.setOnPreferenceClickListener(this.rescanLibrariesClickListener);
 		getPreferenceScreen().addPreference(rescanLibraries);
+
+		final Preference newLibrary = new Preference(getActivity());
+		newLibrary.setTitle("New Media Library...");
+		newLibrary.setIcon(R.drawable.plus);
+		newLibrary.setOnPreferenceClickListener(this.newLibraryClickListener);
+		getPreferenceScreen().addPreference(newLibrary);
 
 		for (final LibraryMetadata library : getMediaDb().getLibraries()) {
 			final PreferenceCategory group = new PreferenceCategory(getActivity());
