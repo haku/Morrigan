@@ -291,6 +291,28 @@ public class MediaDbImpl implements MediaDb {
 		}
 	}
 
+	@Override
+	public void setFileMetadata (final long rowId, final long fileSize, final long fileLastModifiedMillis, final BigInteger hash) {
+		final ContentValues values = new ContentValues();
+		values.put(TBL_MF_SIZE, fileSize);
+		values.put(TBL_MF_TIME_LAST_MODIFIED, fileLastModifiedMillis);
+		values.put(TBL_MF_HASH, hash.toByteArray());
+		updateMediaFileRow(rowId, values);
+	}
+
+	private void updateMediaFileRow (final long rowId, final ContentValues values) {
+		this.mDb.beginTransaction();
+		try {
+			final int affected = this.mDb.update(TBL_MF, values, TBL_MF_ID + "=?", new String[] { String.valueOf(rowId) });
+			if (affected > 1) throw new IllegalStateException("Updating media row " + rowId + " affected " + affected + " rows, expected 1.");
+			if (affected < 1) LOG.w("Updating media row %s affected %s rows, expected 1.", rowId, affected);
+			this.mDb.setTransactionSuccessful();
+		}
+		finally {
+			this.mDb.endTransaction();
+		}
+	}
+
 	private Cursor getMfCursor (final String where, final String[] whereArgs, final String orderBy, final int numberOf) {
 		return this.mDb.query(true, TBL_MF,
 				new String[] {

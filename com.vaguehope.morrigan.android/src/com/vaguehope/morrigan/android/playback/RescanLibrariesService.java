@@ -1,5 +1,8 @@
 package com.vaguehope.morrigan.android.playback;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -13,12 +16,17 @@ import android.app.Notification.Builder;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.support.v4.provider.DocumentFile;
 
 import com.vaguehope.morrigan.android.R;
+import com.vaguehope.morrigan.android.helper.ChecksumHelper;
 import com.vaguehope.morrigan.android.helper.ExceptionHelper;
+import com.vaguehope.morrigan.android.helper.IoHelper;
 import com.vaguehope.morrigan.android.helper.LogWrapper;
+import com.vaguehope.morrigan.android.playback.MediaDb.SortColumn;
+import com.vaguehope.morrigan.android.playback.MediaDb.SortDirection;
 
 public class RescanLibrariesService extends MediaBindingAwakeService {
 
@@ -58,8 +66,8 @@ public class RescanLibrariesService extends MediaBindingAwakeService {
 	}
 
 	private Builder makeNotif () {
-		final String title = "Scanning Media";
-		final String subTitle = "Scan starting...";
+		final String title = "Updating Libraries";
+		final String subTitle = "Starting...";
 		return new Notification.Builder(this)
 				.setSmallIcon(R.drawable.search)
 				.setContentTitle(title)
@@ -90,36 +98,31 @@ public class RescanLibrariesService extends MediaBindingAwakeService {
 		this.notifMgr.notify(notificationId, notif.getNotification());
 	}
 
-	private void doScans (final int notificationId, final Builder notif) {
+	private void doScans (final int notificationId, final Builder notif) throws IOException {
 		final Collection<LibraryMetadata> libraries = getMediaDb().getLibraries();
 		for (final LibraryMetadata library : libraries) {
 			// TODO check if cancelled.
-
-			scanLibrary(library, notificationId, notif);
+			scanForNewMedia(library, notificationId, notif);
+			updateMetadataForKnowItems(library, notificationId, notif);
 		}
 	}
 
-	private void scanLibrary (final LibraryMetadata library, final int notificationId, final Builder notif) {
-		updateNotifTitle(notificationId, notif, "Scanning " + library.getName());
-
+	private void scanForNewMedia (final LibraryMetadata library, final int notificationId, final Builder notif) {
+		updateNotifTitle(notificationId, notif, "Updating Library: " + library.getName());
 		for (final Uri source : library.getSources()) {
 			// TODO check if cancelled.
-
 			scanSourceForNewMedia(source, library, notificationId, notif);
 		}
-
-		// TODO scan and verify existing media items, update metadata, etc.
 	}
 
 	private void scanSourceForNewMedia (final Uri source, final LibraryMetadata library, final int notificationId, final Builder notif) {
-		LOG.i("Scanning: %s", source);
-		final MediaDb mediaDb = getMediaDb();
+		LOG.i("Scanning source: %s", source);
+		updateNotifProgress(notificationId, notif, "Scanning for new files...");
 
+		final MediaDb mediaDb = getMediaDb();
 		final List<MediaItem> mediaToAddToLibrary = new ArrayList<MediaItem>();
 		final Queue<DocumentFile> dirs = new LinkedList<DocumentFile>();
 		int newItemCount = 0;
-
-		updateNotifProgress(notificationId, notif, "Scanning for new files...");
 
 		final DocumentFile root = DocumentFile.fromTreeUri(this, source);
 		dirs.add(root);
@@ -194,6 +197,80 @@ public class RescanLibrariesService extends MediaBindingAwakeService {
 		}
 		if (mediaDb.hasMediaUri(library.getId(), file.getUri())) return null;
 		return new MediaItem(file.getUri(), file.getName(), file.length(), file.lastModified(), System.currentTimeMillis());
+	}
+
+	private void updateMetadataForKnowItems (final LibraryMetadata library, final int notificationId, final Builder notif) throws IOException {
+		updateNotifProgress(notificationId, notif, "Checking for expired metadata...");
+
+		final MediaDb mediaDb = getMediaDb();
+		final List<ItemToUpdate> itemsToHash = new ArrayList<ItemToUpdate>();
+
+		final Cursor c = mediaDb.getAllMediaCursor(library.getId(), SortColumn.PATH, SortDirection.ASC);
+		try {
+			if (c != null && c.moveToFirst()) {
+				final MediaCursorReader reader = new MediaCursorReader();
+				do {
+					// TODO check if cancelled.
+
+					final long id = reader.readId(c);
+					final Uri uri = reader.readUri(c);
+					final DocumentFile file = DocumentFile.fromSingleUri(this, uri);
+					if (file.exists()) {
+						final BigInteger libFileHash = reader.readFileHash(c);
+						final long libSizeBytes = reader.readSizeBytes(c);
+						final long libLastModified = reader.readFileLastModified(c);
+						if (libFileHash == null || libSizeBytes != file.length() || libLastModified != file.lastModified()) {
+							itemsToHash.add(new ItemToUpdate(id, uri));
+						}
+					}
+					else {
+						// TODO handle missing files.
+					}
+				}
+				while (c.moveToNext());
+			}
+		}
+		finally {
+			IoHelper.closeQuietly(c);
+		}
+
+		LOG.i("Checksums to calculate: %s", itemsToHash.size());
+		updateNotifProgress(notificationId, notif, "Calculating checksums...");
+		int i = 0;
+		final byte[] buffer = ChecksumHelper.createBuffer();
+		for (final ItemToUpdate item : itemsToHash) {
+			// TODO check if cancelled.
+
+			updateFileHash(item.id, item.uri, buffer);
+
+			i += 1;
+			updateNotifProgress(notificationId, notif,
+					"Calculated " + i + " of " + itemsToHash.size() + " checksums...",
+					itemsToHash.size(), i);
+		}
+	}
+
+	private static final class ItemToUpdate {
+		final long id;
+		final Uri uri;
+
+		public ItemToUpdate (final long id, final Uri uri) {
+			this.id = id;
+			this.uri = uri;
+		}
+	}
+
+	private void updateFileHash (final long id, final Uri uri, final byte[] buffer) throws IOException {
+		final InputStream is = getContentResolver().openInputStream(uri);
+		try {
+			final BigInteger hash = ChecksumHelper.generateMd5Checksum(is, buffer);
+			LOG.i("%s %s", hash.toString(16), uri);
+			final DocumentFile file = DocumentFile.fromSingleUri(this, uri);
+			getMediaDb().setFileMetadata(id, file.length(), file.lastModified(), hash);
+		}
+		finally {
+			IoHelper.closeQuietly(is);
+		}
 	}
 
 }

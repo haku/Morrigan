@@ -41,8 +41,8 @@
 			android:name=".playback.MediaService"
 			android:label="Morrigan Media Service" />
 		<service
-			android:name=".playback.RescanDbsService"
-			android:label="Morrigan Scan DB Service" />
+			android:name=".playback.RescanLibrariesService"
+			android:label="Morrigan Update Libraries Service" />
 
 		<activity
 			android:name=".playback.MnPreferenceActivity"

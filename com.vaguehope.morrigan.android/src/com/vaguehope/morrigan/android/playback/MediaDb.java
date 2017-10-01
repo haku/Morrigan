@@ -1,5 +1,6 @@
 package com.vaguehope.morrigan.android.playback;
 
+import java.math.BigInteger;
 import java.util.Collection;
 
 import android.database.Cursor;
@@ -15,6 +16,8 @@ public interface MediaDb {
 
 	void addMedia (long libraryId, Collection<MediaItem> items);
 	void updateMedia(long libraryId, Collection<MediaItem> items);
+	void setFileMetadata(long rowId, long fileSize, long fileLastModifiedMillis, BigInteger hash);
+
 	Cursor getAllMediaCursor (long libraryId, SortColumn sortColumn, SortDirection sortDirection);
 	MediaItem getMediaItem(long rowId);
 	boolean hasMediaUri(long libraryId, Uri uri);

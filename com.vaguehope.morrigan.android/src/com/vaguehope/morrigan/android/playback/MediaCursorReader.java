@@ -7,6 +7,7 @@ import android.net.Uri;
 
 public class MediaCursorReader {
 
+	private int colId = -1;
 	private int colUri = -1;
 	private int colTitle = -1;
 	private int colSize = -1;
@@ -17,6 +18,12 @@ public class MediaCursorReader {
 	private int colStartCount = -1;
 	private int colEndCount = -1;
 	private int colDurationMillis = -1;
+
+	public long readId (final Cursor c) {
+		if (c == null) return -1;
+		if (this.colId < 0) this.colId = c.getColumnIndexOrThrow(MediaDbImpl.TBL_MF_ID);
+		return c.getLong(this.colId);
+	}
 
 	public Uri readUri (final Cursor c) {
 		if (c == null) return null;
