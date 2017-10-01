@@ -10,13 +10,15 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Spinner;
+import android.widget.PopupMenu;
 
 import com.vaguehope.morrigan.android.R;
 import com.vaguehope.morrigan.android.helper.LogWrapper;
@@ -29,16 +31,32 @@ public class LibraryFragment extends Fragment {
 
 	private static final LogWrapper LOG = new LogWrapper("LF");
 
+	private static final int MENU_LIBRARY_ID_START = 1100;
+	private static final int MENU_LIBRARY_COLUMN_START = 1200;
+	private static final int MENU_LIBRARY_DIRECTION_START = 1300;
+
+	// Intent params.
+	private int fragmentPosition;
+
 	private MessageHandler messageHandler;
 
-	private ArrayAdapter<LibraryMetadata> librariesAdaptor;
-	private Spinner librariesSelector;
+	private Button btnLibrary;
 	private ListView mediaList;
+
 	private MediaListCursorAdapter adapter;
 	private ScrollState scrollState;
 
+	private Collection<LibraryMetadata> allLibraries;
+	private PopupMenu libraryMenu;
+	private LibraryMetadata currentLibrary;
+	private SortColumn currentSortColumn = SortColumn.PATH;
+	private SortDirection currentSortDirection = SortDirection.ASC;
+
 	@Override
 	public View onCreateView (final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
+		this.fragmentPosition = getArguments().getInt(SectionsPagerAdapter.ARG_FRAGMENT_POSITION, -1);
+		if (this.fragmentPosition < 0) throw new IllegalArgumentException("Missing fragmentPosition.");
+
 		this.messageHandler = new MessageHandler(this);
 
 		final View rootView = inflater.inflate(R.layout.playback_library, container, false);
@@ -126,12 +144,8 @@ public class LibraryFragment extends Fragment {
 	private void wireGui (final View rootView, final ViewGroup container) {
 		this.adapter = new MediaListCursorAdapter(container.getContext());
 
-		this.librariesAdaptor = new ArrayAdapter<LibraryMetadata>(container.getContext(), android.R.layout.simple_list_item_1);
-
-		this.librariesSelector = (Spinner) rootView.findViewById(R.id.librariesSelector);
-		this.librariesSelector.setAdapter(this.librariesAdaptor);
-		this.librariesSelector.setOnItemSelectedListener(this.librarySelectedListener);
-		this.librariesSelector.setSelection(0);
+		this.btnLibrary = (Button) rootView.findViewById(R.id.btnLibrary);
+		this.btnLibrary.setOnClickListener(this.btnLibraryOnClickListener);
 
 		this.mediaList = (ListView) rootView.findViewById(R.id.mediaList);
 		this.mediaList.setAdapter(this.adapter);
@@ -173,7 +187,7 @@ public class LibraryFragment extends Fragment {
 		final Msgs m = Msgs.values[msg.what];
 		switch (m) {
 			case LIBRARIES_CHANGED:
-				refreshLibraries();
+				onLibrariesChanged();
 				break;
 			case LIBRARY_CHANGED:
 				// TODO check is the selected library that changed?
@@ -183,34 +197,93 @@ public class LibraryFragment extends Fragment {
 		}
 	}
 
-	private void refreshLibraries () {
-		final Collection<LibraryMetadata> dbs = getMediaDb().getLibraries();
-		this.librariesAdaptor.clear();
-		this.librariesAdaptor.addAll(dbs);
-	}
-
-	private final OnItemSelectedListener librarySelectedListener = new OnItemSelectedListener() {
-
+	private final OnClickListener btnLibraryOnClickListener = new OnClickListener() {
 		@Override
-		public void onItemSelected (final AdapterView<?> parent, final View view, final int position, final long id) {
-			final LibraryMetadata library = LibraryFragment.this.librariesAdaptor.getItem(position);
-			setCurrentLibrary(library);
+		public void onClick (final View v) {
+			final PopupMenu menu = LibraryFragment.this.libraryMenu;
+			if (menu != null) menu.show();
 		}
-
-		@Override
-		public void onNothingSelected (final AdapterView<?> parent) {}
-
 	};
 
-	private LibraryMetadata currentLibrary;
+	private void onLibrariesChanged() {
+		this.allLibraries = getMediaDb().getLibraries();
+
+		final PopupMenu newMenu = new PopupMenu(getActivity(), LibraryFragment.this.btnLibrary);
+		for (final LibraryMetadata library : this.allLibraries) {
+			final MenuItem item = newMenu.getMenu().add(Menu.NONE, MENU_LIBRARY_ID_START + (int) library.getId(), Menu.NONE, library.getName());
+			item.setCheckable(true);
+			item.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+				@Override
+				public boolean onMenuItemClick (final MenuItem item) {
+					setCurrentLibrary(library);
+					return true;
+				}
+			});
+		}
+		for (final SortColumn s : SortColumn.values()) {
+			final MenuItem item = newMenu.getMenu().add(Menu.NONE, MENU_LIBRARY_COLUMN_START + s.ordinal(), Menu.NONE, s.toString());
+			item.setCheckable(true);
+			item.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+				@Override
+				public boolean onMenuItemClick (final MenuItem item) {
+					setSortColumn(s);
+					return true;
+				}
+			});
+		}
+		for (final SortDirection s : SortDirection.values()) {
+			final MenuItem item = newMenu.getMenu().add(Menu.NONE, MENU_LIBRARY_DIRECTION_START + s.ordinal(), Menu.NONE, s.toString());
+			item.setCheckable(true);
+			item.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+				@Override
+				public boolean onMenuItemClick (final MenuItem item) {
+					setSortDirection(s);
+					return true;
+				}
+			});
+		}
+		this.libraryMenu = newMenu;
+
+		if (this.currentLibrary == null) {
+			setCurrentLibrary(this.allLibraries.iterator().next());
+		}
+	}
 
 	private void setCurrentLibrary (final LibraryMetadata library) {
+		setCurrentLibrary(library, this.currentSortColumn, this.currentSortDirection);
+	}
+
+	protected void setSortColumn (final SortColumn sortColumn) {
+		setCurrentLibrary(this.currentLibrary, sortColumn, this.currentSortDirection);
+	}
+
+	protected void setSortDirection (final SortDirection sortDirection) {
+		setCurrentLibrary(this.currentLibrary, this.currentSortColumn, sortDirection);
+	}
+
+	private void setCurrentLibrary (final LibraryMetadata library, final SortColumn sortColumn, final SortDirection sortDirection) {
 		this.currentLibrary = library;
+		this.currentSortColumn = sortColumn;
+		this.currentSortDirection = sortDirection;
+
 		reloadLibrary();
+
+		((PlaybackActivity) getActivity()).getSectionsPagerAdapter().setPageTitle(this.fragmentPosition, library.getName());
+		this.btnLibrary.setText(library.getName());
+
+		final PopupMenu menu = this.libraryMenu;
+		if (menu != null) {
+			for (int i = 0; i < menu.getMenu().size(); i++) {
+				final MenuItem item = menu.getMenu().getItem(i);
+				item.setChecked(item.getItemId() == MENU_LIBRARY_ID_START + library.getId()
+						|| item.getItemId() == MENU_LIBRARY_COLUMN_START + sortColumn.ordinal()
+						|| item.getItemId() == MENU_LIBRARY_DIRECTION_START + sortDirection.ordinal());
+			}
+		}
 	}
 
 	private void reloadLibrary () {
-		new LoadLibrary(this, this.currentLibrary, SortColumn.PATH, SortDirection.ASC).execute(); // TODO OnExecutor?
+		new LoadLibrary(this, this.currentLibrary, this.currentSortColumn, this.currentSortDirection).execute(); // TODO OnExecutor?
 	}
 
 	private static class LoadLibrary extends AsyncTask<Void, Void, Result<Cursor>> {

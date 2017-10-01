@@ -1,28 +1,47 @@
 package com.vaguehope.morrigan.android.playback;
 
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.util.SparseArray;
+
+import com.vaguehope.morrigan.android.helper.StringHelper;
 
 public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
-	private final PlaybackActivity host;
+	protected static final String ARG_FRAGMENT_POSITION = "fragment_position";
 
-	public SectionsPagerAdapter (final FragmentManager fm, final PlaybackActivity host) {
+	private final SparseArray<String> pageTitles = new SparseArray<String>();
+
+	public SectionsPagerAdapter (final FragmentManager fm) {
 		super(fm);
-		this.host = host;
+	}
+
+	public void setPageTitle(final int position, final String title) {
+		this.pageTitles.put(position, title);
+		notifyDataSetChanged();
 	}
 
 	@Override
 	public Fragment getItem (final int argPosition) {
+		final Fragment fragment;
+		final Bundle args = new Bundle();
+		args.putInt(SectionsPagerAdapter.ARG_FRAGMENT_POSITION, argPosition);
+
 		switch (argPosition) {
 			case 0:
-				return new PlayerFragment();
+				fragment = new PlayerFragment();
+				break;
 			case 1:
-				return new LibraryFragment();
+				fragment = new LibraryFragment();
+				break;
 			default:
 				throw new IllegalArgumentException("Unknown page.");
 		}
+
+		fragment.setArguments(args);
+		return fragment;
 	}
 
 	@Override
@@ -32,6 +51,9 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
 	@Override
 	public CharSequence getPageTitle (final int argPosition) {
+		final String title = this.pageTitles.get(argPosition);
+		if (StringHelper.notEmpty(title)) return title;
+
 		switch (argPosition) {
 			case 0:
 				return "Player";

@@ -27,6 +27,7 @@ public class PlaybackActivity extends FragmentActivity {
 
 	private MessageHandler messageHandler;
 	private ViewPager viewPager;
+	private SectionsPagerAdapter sectionsPagerAdapter;
 	private ColumnTitleStrip columnTitleStrip;
 
 	// Activity life-cycle.
@@ -37,9 +38,9 @@ public class PlaybackActivity extends FragmentActivity {
 		this.messageHandler = new MessageHandler(this);
 		setContentView(R.layout.playback_activity);
 
-		final SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(), this);
+		this.sectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 		this.viewPager = (ViewPager) findViewById(R.id.viewpager);
-		this.viewPager.setAdapter(sectionsPagerAdapter);
+		this.viewPager.setAdapter(this.sectionsPagerAdapter);
 
 		final ActionBar ab = getActionBar();
 		ab.setDisplayShowHomeEnabled(true);
@@ -125,6 +126,10 @@ public class PlaybackActivity extends FragmentActivity {
 		final MediaClient d = this.bndPb;
 		if (d == null) return null;
 		return d.getService().getPlaybacker();
+	}
+
+	protected SectionsPagerAdapter getSectionsPagerAdapter() {
+		return this.sectionsPagerAdapter;
 	}
 
 	// GUI wiring.
