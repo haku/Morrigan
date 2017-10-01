@@ -25,6 +25,7 @@ import com.vaguehope.morrigan.android.helper.ChecksumHelper;
 import com.vaguehope.morrigan.android.helper.ExceptionHelper;
 import com.vaguehope.morrigan.android.helper.IoHelper;
 import com.vaguehope.morrigan.android.helper.LogWrapper;
+import com.vaguehope.morrigan.android.playback.MediaDb.Presence;
 import com.vaguehope.morrigan.android.playback.MediaDb.SortColumn;
 import com.vaguehope.morrigan.android.playback.MediaDb.SortDirection;
 
@@ -120,10 +121,11 @@ public class RescanLibrariesService extends MediaBindingAwakeService {
 		updateNotifProgress(notificationId, notif, "Scanning for new files...");
 
 		final MediaDb mediaDb = getMediaDb();
-		final List<MediaItem> mediaToAddToLibrary = new ArrayList<MediaItem>();
-		final Queue<DocumentFile> dirs = new LinkedList<DocumentFile>();
-		int newItemCount = 0;
 
+		final List<MediaItem> toAdd = new ArrayList<MediaItem>();
+		final List<Long> toMarkAsFound = new ArrayList<Long>();
+
+		final Queue<DocumentFile> dirs = new LinkedList<DocumentFile>();
 		final DocumentFile root = DocumentFile.fromTreeUri(this, source);
 		dirs.add(root);
 
@@ -144,32 +146,37 @@ public class RescanLibrariesService extends MediaBindingAwakeService {
 					dirs.add(file);
 				}
 				else if (file.isFile()) {
-					final MediaItem newItem = makeNewMediaItem(mediaDb, library, file);
-					if (newItem != null) {
-						LOG.i("New file: %s", file.getUri());
+					if (!isValidMediaFile(file)) continue;
 
-						mediaToAddToLibrary.add(newItem);
-						if (mediaToAddToLibrary.size() >= 100) addMediaToLibrary(mediaDb, library, mediaToAddToLibrary);
-
-						newItemCount += 1;
-						updateNotifProgress(notificationId, notif, "Found " + newItemCount + " new items");
+					final Presence presence = mediaDb.hasMediaUri(library.getId(), file.getUri());
+					if (presence == Presence.UNKNOWN) {
+						LOG.i("New: %s", file.getUri());
+						toAdd.add(makeMediaItem(file));
 					}
+					else if (presence == Presence.MISSING) {
+						LOG.i("Restored: %s", file.getUri());
+						toMarkAsFound.add(mediaDb.getMediaRowId(library.getId(), file.getUri()));
+					}
+
+					updateNotifProgress(notificationId, notif,
+							String.format("Found %s new items, %s restored items...",
+									toAdd.size(), toMarkAsFound.size()));
 				}
 				else {
 					LOG.w("Do not know how to read: %s", file.getUri());
 				}
 			}
 		}
-		addMediaToLibrary(mediaDb, library, mediaToAddToLibrary);
-		LOG.i("Total items added: %s", newItemCount);
+
+		addMediaToLibrary(mediaDb, library, toAdd, toMarkAsFound);
 	}
 
-	private static void addMediaToLibrary (final MediaDb mediaDb, final LibraryMetadata library, final List<MediaItem> items) {
-		if (items.size() > 0) {
-			LOG.i("Adding %s items to library %s...", items.size(), library.getId());
-			mediaDb.addMedia(library.getId(), items);
-		}
-		items.clear();
+	private static void addMediaToLibrary (final MediaDb mediaDb, final LibraryMetadata library, final List<MediaItem> toAdd, final List<Long> toMarkAsFound) {
+		LOG.i("Adding %s items to library %s...", toAdd.size(), library.getId());
+		mediaDb.addMedia(library.getId(), toAdd);
+
+		LOG.i("Marking %s items as found...", toMarkAsFound.size());
+		mediaDb.setFilesExist(toMarkAsFound, true);
 	}
 
 	private static final Set<String> SUPPORTED_TYPES = new HashSet<String>();
@@ -177,25 +184,24 @@ public class RescanLibrariesService extends MediaBindingAwakeService {
 		SUPPORTED_TYPES.add("application/ogg");
 	}
 
-	/**
-	 * Returns null if already present in library or not a supported media file.
-	 * @param library
-	 */
-	private static MediaItem makeNewMediaItem (final MediaDb mediaDb, final LibraryMetadata library, final DocumentFile file) {
+	private static boolean isValidMediaFile (final DocumentFile file) {
 		final String type = file.getType();
 		if (!SUPPORTED_TYPES.contains(type) && !type.startsWith("audio")) {
 			LOG.i("Not audio: %s %s", file.getUri(), type);
-			return null;
+			return false;
 		}
 		if (!file.exists()) {
 			LOG.i("Not exists: %s", file.getUri());
-			return null;
+			return false;
 		}
 		if (!file.canRead()) {
 			LOG.i("Not readable: %s", file.getUri());
-			return null;
+			return false;
 		}
-		if (mediaDb.hasMediaUri(library.getId(), file.getUri())) return null;
+		return true;
+	}
+
+	private static MediaItem makeMediaItem (final DocumentFile file) {
 		return new MediaItem(file.getUri(), file.getName(), file.length(), file.lastModified(), System.currentTimeMillis());
 	}
 
@@ -204,6 +210,7 @@ public class RescanLibrariesService extends MediaBindingAwakeService {
 
 		final MediaDb mediaDb = getMediaDb();
 		final List<ItemToUpdate> itemsToHash = new ArrayList<ItemToUpdate>();
+		final List<Long> toMarkAsMissing = new ArrayList<Long>();
 
 		final Cursor c = mediaDb.getAllMediaCursor(library.getId(), SortColumn.PATH, SortDirection.ASC);
 		try {
@@ -224,7 +231,7 @@ public class RescanLibrariesService extends MediaBindingAwakeService {
 						}
 					}
 					else {
-						// TODO handle missing files.
+						toMarkAsMissing.add(id);
 					}
 				}
 				while (c.moveToNext());
@@ -233,6 +240,9 @@ public class RescanLibrariesService extends MediaBindingAwakeService {
 		finally {
 			IoHelper.closeQuietly(c);
 		}
+
+		LOG.i("Marking files missing: %s", toMarkAsMissing.size());
+		mediaDb.setFilesExist(toMarkAsMissing, false);
 
 		LOG.i("Checksums to calculate: %s", itemsToHash.size());
 		updateNotifProgress(notificationId, notif, "Calculating checksums...");

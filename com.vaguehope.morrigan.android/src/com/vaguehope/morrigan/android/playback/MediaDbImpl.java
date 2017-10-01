@@ -25,7 +25,7 @@ public class MediaDbImpl implements MediaDb {
 	protected static final LogWrapper LOG = new LogWrapper("MDI");
 
 	private static final String DB_NAME = "media";
-	private static final int DB_VERSION = 3;
+	private static final int DB_VERSION = 4;
 
 	private static class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -48,6 +48,9 @@ public class MediaDbImpl implements MediaDb {
 			}
 			if (oldVersion < 3) { // NOSONAR not a magic number.
 				addColumn(db, TBL_MF, TBL_MF_TIME_LAST_MODIFIED, "integer");
+			}
+			if (oldVersion < 4) { // NOSONAR not a magic number.
+				addColumn(db, TBL_MF, TBL_MF_MISSING, "integer");
 			}
 		}
 
@@ -103,6 +106,7 @@ public class MediaDbImpl implements MediaDb {
 	protected static final String TBL_MF_ID = "_id";
 	private static final String TBL_MF_DBID = "dbid";
 	protected static final String TBL_MF_URI = "uri";
+	protected static final String TBL_MF_MISSING = "missing";
 	protected static final String TBL_MF_TITLE = "title";
 	protected static final String TBL_MF_SIZE = "size";
 	protected static final String TBL_MF_TIME_LAST_MODIFIED = "modified_millis";
@@ -117,6 +121,7 @@ public class MediaDbImpl implements MediaDb {
 			+ TBL_MF_ID + " integer primary key autoincrement,"
 			+ TBL_MF_DBID + " integer,"
 			+ TBL_MF_URI + " text,"
+			+ TBL_MF_MISSING + " integer,"
 			+ TBL_MF_TITLE + " text,"
 			+ TBL_MF_SIZE + " integer,"
 			+ TBL_MF_TIME_LAST_MODIFIED + " integer,"
@@ -292,24 +297,53 @@ public class MediaDbImpl implements MediaDb {
 	}
 
 	@Override
+	public void setFilesExist (final Collection<Long> rowIds, final boolean fileExists) {
+		final ContentValues cv = new ContentValues();
+		if (fileExists) {
+			cv.putNull(TBL_MF_MISSING);
+		}
+		else {
+			cv.put(TBL_MF_MISSING, 1);
+		}
+
+		final Collection<RowIdAndValues> values = new ArrayList<MediaDbImpl.RowIdAndValues>(rowIds.size());
+		for (Long rowId : rowIds) {
+			values.add(new RowIdAndValues(rowId, cv));
+		}
+
+		updateMediaFileRow(values);
+	}
+
+	@Override
 	public void setFileMetadata (final long rowId, final long fileSize, final long fileLastModifiedMillis, final BigInteger hash) {
 		final ContentValues values = new ContentValues();
 		values.put(TBL_MF_SIZE, fileSize);
 		values.put(TBL_MF_TIME_LAST_MODIFIED, fileLastModifiedMillis);
 		values.put(TBL_MF_HASH, hash.toByteArray());
-		updateMediaFileRow(rowId, values);
+		updateMediaFileRow(Collections.singleton(new RowIdAndValues(rowId, values)));
 	}
 
-	private void updateMediaFileRow (final long rowId, final ContentValues values) {
+	private void updateMediaFileRow (final Collection<RowIdAndValues> values) {
 		this.mDb.beginTransaction();
 		try {
-			final int affected = this.mDb.update(TBL_MF, values, TBL_MF_ID + "=?", new String[] { String.valueOf(rowId) });
-			if (affected > 1) throw new IllegalStateException("Updating media row " + rowId + " affected " + affected + " rows, expected 1.");
-			if (affected < 1) LOG.w("Updating media row %s affected %s rows, expected 1.", rowId, affected);
+			for (final RowIdAndValues rv : values) {
+				final int affected = this.mDb.update(TBL_MF, rv.values, TBL_MF_ID + "=?", new String[] { String.valueOf(rv.rowId) });
+				if (affected > 1) throw new IllegalStateException("Updating media row " + rv.rowId + " affected " + affected + " rows, expected 1.");
+				if (affected < 1) LOG.w("Updating media row %s affected %s rows, expected 1.", rv.rowId, affected);
+			}
 			this.mDb.setTransactionSuccessful();
 		}
 		finally {
 			this.mDb.endTransaction();
+		}
+	}
+
+	private static class RowIdAndValues {
+		final long rowId;
+		final ContentValues values;
+		public RowIdAndValues (final long rowId, final ContentValues values) {
+			this.rowId = rowId;
+			this.values = values;
 		}
 	}
 
@@ -319,6 +353,7 @@ public class MediaDbImpl implements MediaDb {
 						TBL_MF_ID,
 						TBL_MF_DBID,
 						TBL_MF_URI,
+						TBL_MF_MISSING,
 						TBL_MF_TITLE,
 						TBL_MF_SIZE,
 						TBL_MF_TIME_LAST_MODIFIED,
@@ -367,7 +402,7 @@ public class MediaDbImpl implements MediaDb {
 	@Override
 	public Cursor getAllMediaCursor (final long libraryId, final SortColumn sortColumn, final SortDirection sortDirection) {
 		return getMfCursor(
-				TBL_MF_DBID + "=?",
+				TBL_MF_DBID + "=? AND " + TBL_MF_MISSING + " IS NULL",
 				new String[] { String.valueOf(libraryId) },
 				toMfSortColumn(sortColumn) + " " + toSortDirection(sortDirection), -1);
 	}
@@ -411,16 +446,35 @@ public class MediaDbImpl implements MediaDb {
 	}
 
 	@Override
-	public boolean hasMediaUri (final long libraryId, final Uri uri) {
+	public Presence hasMediaUri (final long libraryId, final Uri uri) {
 		final Cursor c = getMfCursor(
 				TBL_MF_DBID + "=? AND " + TBL_MF_URI + "=?",
 				new String[] { String.valueOf(libraryId), uri.toString() },
 				null, 1);
 		try {
 			if (c != null && c.moveToFirst()) {
-				return true;
+				final int colMissing = c.getColumnIndex(TBL_MF_MISSING);
+				return c.isNull(colMissing) ? Presence.PRESENT : Presence.MISSING;
 			}
-			return false;
+			return Presence.UNKNOWN;
+		}
+		finally {
+			IoHelper.closeQuietly(c);
+		}
+	}
+
+	@Override
+	public long getMediaRowId (final long libraryId, final Uri uri) {
+		final Cursor c = getMfCursor(
+				TBL_MF_DBID + "=? AND " + TBL_MF_URI + "=?",
+				new String[] { String.valueOf(libraryId), uri.toString() },
+				null, 1);
+		try {
+			if (c != null && c.moveToFirst()) {
+				final int colId = c.getColumnIndex(TBL_MF_ID);
+				return c.getLong(colId);
+			}
+			return -1;
 		}
 		finally {
 			IoHelper.closeQuietly(c);

@@ -16,14 +16,31 @@ public interface MediaDb {
 
 	void addMedia (long libraryId, Collection<MediaItem> items);
 	void updateMedia(long libraryId, Collection<MediaItem> items);
+	void setFilesExist(Collection<Long> rowId, boolean fileExists);
 	void setFileMetadata(long rowId, long fileSize, long fileLastModifiedMillis, BigInteger hash);
 
 	Cursor getAllMediaCursor (long libraryId, SortColumn sortColumn, SortDirection sortDirection);
 	MediaItem getMediaItem(long rowId);
-	boolean hasMediaUri(long libraryId, Uri uri);
+	Presence hasMediaUri(long libraryId, Uri uri);
+	long getMediaRowId(long libraryId, Uri uri);
 
 	void addMediaWatcher(MediaWatcher watcher);
 	void removeMediaWatcher(MediaWatcher watcher);
+
+	enum Presence {
+		/**
+		 * File exists.
+		 */
+		PRESENT,
+		/**
+		 * File used to exist, now marked as missing.
+		 */
+		MISSING,
+		/**
+		 * File is not known.
+		 */
+		UNKNOWN;
+	}
 
 	enum SortColumn {
 		PATH,
