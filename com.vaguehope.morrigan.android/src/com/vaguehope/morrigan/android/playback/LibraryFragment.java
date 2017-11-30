@@ -276,7 +276,7 @@ public class LibraryFragment extends Fragment {
 		}
 		this.libraryMenu = newMenu;
 
-		if (this.currentLibrary == null) {
+		if (this.currentLibrary == null && this.allLibraries.size() > 0) {
 			setCurrentLibrary(this.allLibraries.iterator().next());
 		}
 	}
