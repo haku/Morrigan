@@ -14,6 +14,7 @@ import android.view.View.OnLongClickListener;
 import com.vaguehope.morrigan.android.R;
 import com.vaguehope.morrigan.android.helper.ActivityResultTracker;
 import com.vaguehope.morrigan.android.helper.ActivityResultTracker.ActivityResultCallback;
+import com.vaguehope.morrigan.android.helper.ContentHelper;
 import com.vaguehope.morrigan.android.helper.DialogHelper;
 import com.vaguehope.morrigan.android.helper.DialogHelper.Listener;
 import com.vaguehope.morrigan.android.helper.LogWrapper;
@@ -122,7 +123,15 @@ public class MediaSourcesPrefFragment extends MnPreferenceFragment {
 					final Uri uri = data.getData();
 					if (uri == null) return;
 
+					getContext().getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
 					final DocumentFile file = DocumentFile.fromTreeUri(getActivity(), uri);
+					if (file.getName() == null) {
+						DialogHelper.alert(getActivity(), "Failed to resolve: " + uri);
+						ContentHelper.logPermissions(getContext(), LOG);
+						return;
+					}
+
 					if (!file.isDirectory()) {
 						DialogHelper.alert(getActivity(), "Not a directory: " + file.getName());
 						return;
@@ -177,9 +186,18 @@ public class MediaSourcesPrefFragment extends MnPreferenceFragment {
 			this.source = source;
 
 			final DocumentFile file = DocumentFile.fromTreeUri(context, source);
-			setTitle(file.getName());
+			if (file.getName() == null) {
+				LOG.w("Failed to resolve: " + source);
+				ContentHelper.logPermissions(getContext(), LOG);
+				setTitle("(Unresolveable)");
+				setIcon(R.drawable.exclamation_red);
+			}
+			else {
+				setTitle(file.getName());
+				setIcon(R.drawable.circledot);
+			}
+
 			setSummary(source.toString());
-			setIcon(R.drawable.circledot);
 		}
 
 		@Override
