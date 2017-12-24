@@ -94,6 +94,15 @@ public class MnPreferenceActivity extends PreferenceActivity {
 
 	protected void addOnMediaDbBound(final Runnable listener) {
 		this.onDbBoundListeners.add(listener);
+
+		// If already bound, run listener now.
+		final MediaClient mc = this.bndPb;
+		if (mc != null) {
+			final MediaServices ms = mc.getService();
+			if (ms != null) {
+				listener.run();
+			}
+		}
 	}
 
 	protected void removeOnMediaDbBound(final Runnable listener) {
@@ -101,7 +110,7 @@ public class MnPreferenceActivity extends PreferenceActivity {
 	}
 
 	private void runOnDbBoundListeners () {
-		for (Runnable r : MnPreferenceActivity.this.onDbBoundListeners) {
+		for (final Runnable r : MnPreferenceActivity.this.onDbBoundListeners) {
 			r.run();
 		}
 	}
