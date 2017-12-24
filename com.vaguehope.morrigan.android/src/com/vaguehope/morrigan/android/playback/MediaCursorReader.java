@@ -2,6 +2,8 @@ package com.vaguehope.morrigan.android.playback;
 
 import java.math.BigInteger;
 
+import com.vaguehope.morrigan.android.playback.MediaDb.Presence;
+
 import android.database.Cursor;
 import android.net.Uri;
 
@@ -9,6 +11,7 @@ public class MediaCursorReader {
 
 	private int colId = -1;
 	private int colUri = -1;
+	private int colMissing = -1;
 	private int colTitle = -1;
 	private int colSize = -1;
 	private int colLastModified = -1;
@@ -29,6 +32,12 @@ public class MediaCursorReader {
 		if (c == null) return null;
 		if (this.colUri < 0) this.colUri = c.getColumnIndexOrThrow(MediaDbImpl.TBL_MF_URI);
 		return Uri.parse(c.getString(this.colUri));
+	}
+
+	public Presence readMissing (final Cursor c) {
+		if (c == null) throw new IllegalArgumentException("c can not be null.");
+		if (this.colMissing < 0) this.colMissing = c.getColumnIndexOrThrow(MediaDbImpl.TBL_MF_MISSING);
+		return c.isNull(this.colMissing) ? Presence.PRESENT : Presence.MISSING;
 	}
 
 	public String readTitle (final Cursor c) {

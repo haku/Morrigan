@@ -22,6 +22,7 @@ import android.support.v4.provider.DocumentFile;
 
 import com.vaguehope.morrigan.android.R;
 import com.vaguehope.morrigan.android.helper.ChecksumHelper;
+import com.vaguehope.morrigan.android.helper.ContentHelper;
 import com.vaguehope.morrigan.android.helper.ExceptionHelper;
 import com.vaguehope.morrigan.android.helper.IoHelper;
 import com.vaguehope.morrigan.android.helper.LogWrapper;
@@ -101,11 +102,14 @@ public class RescanLibrariesService extends MediaBindingAwakeService {
 	}
 
 	private void doScans (final int notificationId, final Builder notif) throws IOException {
+		ContentHelper.logPermissions(this, LOG);
+
 		final Collection<LibraryMetadata> libraries = getMediaDb().getLibraries();
 		for (final LibraryMetadata library : libraries) {
 			// TODO check if cancelled.
 			scanForNewMedia(library, notificationId, notif);
 			updateMetadataForKnowItems(library, notificationId, notif);
+			findAndMergeDuplicates(library, notificationId, notif);
 		}
 	}
 
@@ -128,6 +132,7 @@ public class RescanLibrariesService extends MediaBindingAwakeService {
 
 		final Queue<DocumentFile> dirs = new LinkedList<DocumentFile>();
 		final DocumentFile root = DocumentFile.fromTreeUri(this, source);
+		if (root.getName() == null) throw new IllegalStateException("Failed to resolve: " + source);
 		dirs.add(root);
 
 		while (!dirs.isEmpty()) {
@@ -175,7 +180,7 @@ public class RescanLibrariesService extends MediaBindingAwakeService {
 	}
 
 	private static void addMediaToLibrary (final MediaDb mediaDb, final LibraryMetadata library, final List<MediaItem> toAdd, final List<Long> toMarkAsFound) {
-		LOG.i("Adding %s items to library %s...", toAdd.size(), library.getId());
+		LOG.i("Adding %s new items to library %s...", toAdd.size(), library.getId());
 		mediaDb.addMedia(library.getId(), toAdd);
 
 		LOG.i("Marking %s items as found...", toMarkAsFound.size());
@@ -212,7 +217,7 @@ public class RescanLibrariesService extends MediaBindingAwakeService {
 		updateNotifProgress(notificationId, notif, "Checking for expired metadata...");
 
 		final MediaDb mediaDb = getMediaDb();
-		final List<ItemToUpdate> itemsToHash = new ArrayList<ItemToUpdate>();
+		final List<IdUri> itemsToHash = new ArrayList<IdUri>();
 		final List<Long> toMarkAsMissing = new ArrayList<Long>();
 
 		final Cursor c = mediaDb.getAllMediaCursor(library.getId(), SortColumn.PATH, SortDirection.ASC);
@@ -230,7 +235,7 @@ public class RescanLibrariesService extends MediaBindingAwakeService {
 						final long libSizeBytes = reader.readSizeBytes(c);
 						final long libLastModified = reader.readFileLastModified(c);
 						if (libFileHash == null || libSizeBytes != file.length() || libLastModified != file.lastModified()) {
-							itemsToHash.add(new ItemToUpdate(id, uri));
+							itemsToHash.add(new IdUri(id, uri));
 						}
 					}
 					else {
@@ -251,7 +256,7 @@ public class RescanLibrariesService extends MediaBindingAwakeService {
 		updateNotifProgress(notificationId, notif, "Calculating checksums...");
 		int i = 0;
 		final byte[] buffer = ChecksumHelper.createBuffer();
-		for (final ItemToUpdate item : itemsToHash) {
+		for (final IdUri item : itemsToHash) {
 			// TODO check if cancelled.
 
 			updateFileHash(item.id, item.uri, buffer);
@@ -263,14 +268,157 @@ public class RescanLibrariesService extends MediaBindingAwakeService {
 		}
 	}
 
-	private static final class ItemToUpdate {
+	private void findAndMergeDuplicates (final LibraryMetadata library, final int notificationId, final Builder notif) throws IOException {
+		LOG.i("Finding duplicates...");
+		final MediaDb mediaDb = getMediaDb();
+		final Cursor c = mediaDb.findDuplicates(library.getId());
+		try {
+			if (c != null && c.moveToFirst()) {
+				final MediaCursorReader reader = new MediaCursorReader();
+				Group group = new Group();
+				do {
+					// TODO check if cancelled.
+
+					final long id = reader.readId(c);
+					final Uri uri = reader.readUri(c);
+					final IdUri item = new IdUri(id, uri);
+
+					final BigInteger hash = reader.readFileHash(c);
+
+					final Presence missing = reader.readMissing(c);
+					final boolean exists = missing != Presence.MISSING; // Default to exists.
+
+					if (group.canAddHash(hash)) {
+						group.add(item, hash, exists);
+					}
+					else {
+						resolveDuplicateGroup(group);
+						group = new Group();
+						group.add(item, hash, exists);
+					}
+				}
+				while (c.moveToNext());
+
+				// Do not forget the last one.
+				if (group.size() > 0) {
+					resolveDuplicateGroup(group);
+				}
+			}
+		}
+		finally {
+			IoHelper.closeQuietly(c);
+		}
+	}
+
+	private void resolveDuplicateGroup (final Group group) {
+		if (group.size() < 2) {
+			throw new IllegalStateException("Duplicate group has only one item: " + group);
+		}
+
+		if (group.existantCount() > 1) {
+			LOG.i("Multiple existant: %s", group.existant());
+			return;
+		}
+
+		if (group.existantCount() < 1) {
+			LOG.d("None existant: %s", group.missing());
+			return;
+		}
+
+		if (group.existantCount() != 1) {
+			throw new IllegalStateException("Group should only contain one existant: " + group);
+		}
+		if (group.missingCount() < 1) {
+			throw new IllegalStateException("Group should contain at least one missing: " + group);
+		}
+
+		final IdUri existant = group.existant().get(0);
+		LOG.d("Mergeble: %s << %s", existant, group.missing());
+
+		final MediaDb mediaDb = getMediaDb();
+		final long destRowId = existant.id;
+		final Collection<Long> fromRowIds = new ArrayList<Long>();
+		for (final IdUri m : group.missing()) {
+			fromRowIds.add(m.id);
+		}
+
+		LOG.i("Merging %s << %s...", destRowId, fromRowIds);
+		mediaDb.mergeItems(destRowId, fromRowIds);
+	}
+
+	private static final class IdUri {
 		final long id;
 		final Uri uri;
 
-		public ItemToUpdate (final long id, final Uri uri) {
+		public IdUri (final long id, final Uri uri) {
+			if (id < 0) throw new IllegalArgumentException("id must be >= 0.");
+			if (uri == null) throw new IllegalArgumentException("uri must not be null.");
 			this.id = id;
 			this.uri = uri;
 		}
+
+		@Override
+		public String toString () {
+			return String.format("{%s: %s}", this.id, this.uri);
+		}
+	}
+
+	private static final class Group {
+		private BigInteger groupHash;
+		private final List<IdUri> existant = new ArrayList<IdUri>();
+		private final List<IdUri> missing = new ArrayList<IdUri>();
+
+		public boolean canAddHash(final BigInteger hash) {
+			if (hash == null) throw new IllegalArgumentException("hash can not be null.");
+			return this.groupHash == null || this.groupHash.equals(hash);
+		}
+
+		public void add(final IdUri item, final BigInteger hash, final boolean exists) {
+			if (item == null) throw new IllegalArgumentException("item can not be null.");
+			if (hash == null) throw new IllegalArgumentException("hash can not be null.");
+
+			if (this.groupHash != null) {
+				if (!this.groupHash.equals(hash)) {
+					throw new IllegalArgumentException("Can not add item with different hash.");
+				}
+			}
+			else {
+				this.groupHash = hash;
+			}
+
+			if (exists) {
+				this.existant.add(item);
+			}
+			else {
+				this.missing.add(item);
+			}
+		}
+
+		public int size () {
+			return this.existant.size() + this.missing.size();
+		}
+
+		public int existantCount () {
+			return this.existant.size();
+		}
+
+		public int missingCount () {
+			return this.missing.size();
+		}
+
+		public List<IdUri> existant () {
+			return this.existant;
+		}
+
+		public List<IdUri> missing () {
+			return this.missing;
+		}
+
+		@Override
+		public String toString () {
+			return String.format("Group{%s, %s}", this.existant, this.missing);
+		}
+
 	}
 
 	private void updateFileHash (final long id, final Uri uri, final byte[] buffer) throws IOException {

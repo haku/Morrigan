@@ -307,7 +307,7 @@ public class MediaDbImpl implements MediaDb {
 		}
 
 		final Collection<RowIdAndValues> values = new ArrayList<MediaDbImpl.RowIdAndValues>(rowIds.size());
-		for (Long rowId : rowIds) {
+		for (final Long rowId : rowIds) {
 			values.add(new RowIdAndValues(rowId, cv));
 		}
 
@@ -478,6 +478,48 @@ public class MediaDbImpl implements MediaDb {
 		}
 		finally {
 			IoHelper.closeQuietly(c);
+		}
+	}
+
+	// SELECT uri FROM mf WHERE hash IN (
+	//   SELECT hash FROM mf GROUP BY hash HAVING count(*)>1
+	// ) ORDER BY hash ASC;
+	@Override
+	public Cursor findDuplicates (final long libraryId) {
+		final String where = TBL_MF_DBID + "=? AND " + TBL_MF_HASH + " IN ("
+				+ "SELECT " + TBL_MF_HASH + " FROM " + TBL_MF
+				+ " WHERE " + TBL_MF_DBID + "=?"
+				+ " GROUP BY " + TBL_MF_HASH + " HAVING count(*)>1"
+				+ ")";
+		final String[] whereArgs = new String[] { String.valueOf(libraryId), String.valueOf(libraryId) };
+		final String order = TBL_MF_HASH + " ASC";
+		return getMfCursor(where, whereArgs, order, 0);
+	}
+
+	@Override
+	public void mergeItems (final long destRowId, final Collection<Long> fromRowIds) {
+		this.mDb.beginTransaction();
+		try {
+			// TODO
+			LOG.i("TODO mergeItems(%s, %s)", destRowId, fromRowIds);
+
+			// Read items.
+
+			// Merge:
+			// Date Added.
+			// Date Last Played.
+			// Tags.
+			// Item enabled.
+			// Start Count.
+			// End Count.
+
+			// Write dest.
+			// Rm from.
+
+			this.mDb.setTransactionSuccessful();
+		}
+		finally {
+			this.mDb.endTransaction();
 		}
 	}
 

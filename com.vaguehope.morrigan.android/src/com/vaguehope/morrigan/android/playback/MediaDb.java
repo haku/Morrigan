@@ -24,6 +24,9 @@ public interface MediaDb {
 	Presence hasMediaUri(long libraryId, Uri uri);
 	long getMediaRowId(long libraryId, Uri uri);
 
+	Cursor findDuplicates(long libraryId);
+	void mergeItems(long destRowId, Collection<Long> fromRowIds);
+
 	void addMediaWatcher(MediaWatcher watcher);
 	void removeMediaWatcher(MediaWatcher watcher);
 
