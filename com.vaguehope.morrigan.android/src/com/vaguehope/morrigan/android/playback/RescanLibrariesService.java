@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
-import android.app.Notification;
-import android.app.Notification.Builder;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationCompat.Builder;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
@@ -31,7 +31,7 @@ import com.vaguehope.morrigan.android.playback.MediaDb.SortDirection;
 
 public class RescanLibrariesService extends MediaBindingAwakeService {
 
-	protected static final LogWrapper LOG = new LogWrapper("RDS");
+	protected static final LogWrapper LOG = new LogWrapper("RLS");
 
 	private NotificationManager notifMgr;
 
@@ -62,6 +62,7 @@ public class RescanLibrariesService extends MediaBindingAwakeService {
 			result = ExceptionHelper.veryShortMessage(e);
 		}
 		finally {
+			LOG.i("Scan result: %s", result);
 			updateNotifResult(notificationId, notif, result);
 		}
 	}
@@ -69,7 +70,7 @@ public class RescanLibrariesService extends MediaBindingAwakeService {
 	private Builder makeNotif () {
 		final String title = "Updating Libraries";
 		final String subTitle = "Starting...";
-		return new Notification.Builder(this)
+		return new NotificationCompat.Builder(this)
 				.setSmallIcon(R.drawable.search)
 				.setContentTitle(title)
 				.setContentText(subTitle)
@@ -96,7 +97,7 @@ public class RescanLibrariesService extends MediaBindingAwakeService {
 	}
 
 	private void updateNotif (final int notificationId, final Builder notif) {
-		this.notifMgr.notify(notificationId, notif.getNotification());
+		this.notifMgr.notify(notificationId, notif.build());
 	}
 
 	private void doScans (final int notificationId, final Builder notif) throws IOException {
@@ -158,9 +159,11 @@ public class RescanLibrariesService extends MediaBindingAwakeService {
 						toMarkAsFound.add(mediaDb.getMediaRowId(library.getId(), file.getUri()));
 					}
 
-					updateNotifProgress(notificationId, notif,
-							String.format("Found %s new items, %s restored items...",
-									toAdd.size(), toMarkAsFound.size()));
+					if (toAdd.size() > 0) {
+						updateNotifProgress(notificationId, notif,
+								String.format("Found %s new items, %s restored items...",
+										toAdd.size(), toMarkAsFound.size()));
+					}
 				}
 				else {
 					LOG.w("Do not know how to read: %s", file.getUri());
