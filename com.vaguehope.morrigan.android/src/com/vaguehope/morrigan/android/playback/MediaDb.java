@@ -15,9 +15,11 @@ public interface MediaDb {
 	void deleteLibrary(LibraryMetadata libraryMetadata);
 
 	void addMedia (long libraryId, Collection<MediaItem> items);
-	void updateMedia(long libraryId, Collection<MediaItem> items);
+	void updateMedia(Collection<MediaItem> items);
 	void setFilesExist(Collection<Long> rowId, boolean fileExists);
 	void setFileMetadata(long rowId, long fileSize, long fileLastModifiedMillis, BigInteger hash);
+	void rmMediaItems (Collection<MediaItem> items);
+	void rmMediaItemRows (Collection<Long> rowIds);
 
 	Cursor getAllMediaCursor (long libraryId, SortColumn sortColumn, SortDirection sortDirection);
 	MediaItem getMediaItem(long rowId);

@@ -107,6 +107,8 @@ public class RescanLibrariesService extends MediaBindingAwakeService {
 		final Collection<LibraryMetadata> libraries = getMediaDb().getLibraries();
 		for (final LibraryMetadata library : libraries) {
 			// TODO check if cancelled.
+
+			LOG.i("Updating library: %s (id=%s)", library.getName(), library.getId());
 			scanForNewMedia(library, notificationId, notif);
 			updateMetadataForKnowItems(library, notificationId, notif);
 			findAndMergeDuplicates(library, notificationId, notif);

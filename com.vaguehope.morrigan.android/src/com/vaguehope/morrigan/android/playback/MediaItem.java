@@ -52,7 +52,7 @@ public class MediaItem {
 		return this.title;
 	}
 
-	public long getsizeBytes () {
+	public long getSizeBytes () {
 		return this.sizeBytes;
 	}
 
@@ -90,4 +90,27 @@ public class MediaItem {
 				this.rowId, this.title, this.uri);
 	}
 
+	public MediaItem withTimeAdded(final long newTimeAddedMillis) {
+		return new MediaItem(this.rowId, this.uri, this.title, this.sizeBytes,
+				this.timeFileLastModified, this.fileHash, newTimeAddedMillis, this.timeLastPlayedMillis,
+				this.startCount, this.endCount, this.durationMillis);
+	}
+
+	public MediaItem withTimeLastPlayed(final long newTimeLastPlayedMillis) {
+		return new MediaItem(this.rowId, this.uri, this.title, this.sizeBytes,
+				this.timeFileLastModified, this.fileHash, this.timeAddedMillis, newTimeLastPlayedMillis,
+				this.startCount, this.endCount, this.durationMillis);
+	}
+
+	public MediaItem withStartCount(final int newStartCount) {
+		return new MediaItem(this.rowId, this.uri, this.title, this.sizeBytes,
+				this.timeFileLastModified, this.fileHash, this.timeAddedMillis, this.timeLastPlayedMillis,
+				newStartCount, this.endCount, this.durationMillis);
+	}
+
+	public MediaItem withEndCount(final int newEndCount) {
+		return new MediaItem(this.rowId, this.uri, this.title, this.sizeBytes,
+				this.timeFileLastModified, this.fileHash, this.timeAddedMillis, this.timeLastPlayedMillis,
+				this.startCount, newEndCount, this.durationMillis);
+	}
 }

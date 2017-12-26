@@ -131,7 +131,7 @@ public class MediaDbImpl implements MediaDb {
 			+ TBL_MF_START_COUNT + " integer,"
 			+ TBL_MF_END_COUNT + " integer,"
 			+ TBL_MF_DURATION_MILLIS + " integer,"
-			+ "UNIQUE(" + TBL_MF_URI + ") ON CONFLICT ABORT"
+			+ "UNIQUE(" + TBL_MF_DBID + "," + TBL_MF_URI + ") ON CONFLICT ABORT"
 			+ ");";
 
 	private static final String TBL_MF_INDEX = TBL_MF + "_idx";
@@ -246,12 +246,10 @@ public class MediaDbImpl implements MediaDb {
 
 	// Add and query media.
 
-	private static void copyMediaItemToContentValues (final long libraryId, final MediaItem item, final ContentValues values) {
-		values.clear();
-		values.put(TBL_MF_DBID, libraryId);
+	private static void copyMediaItemToContentValues (final MediaItem item, final ContentValues values) {
 		values.put(TBL_MF_URI, item.getUri().toString());
 		values.put(TBL_MF_TITLE, item.getTitle());
-		values.put(TBL_MF_SIZE, item.getsizeBytes());
+		values.put(TBL_MF_SIZE, item.getSizeBytes());
 		values.put(TBL_MF_TIME_LAST_MODIFIED, item.getTimeFileLastModified());
 		if (item.getFileHash() != null) values.put(TBL_MF_HASH, item.getFileHash().toByteArray());
 		values.put(TBL_MF_TIME_ADDED_MILLIS, item.getTimeAddedMillis());
@@ -267,7 +265,12 @@ public class MediaDbImpl implements MediaDb {
 		try {
 			final ContentValues values = new ContentValues();
 			for (final MediaItem item : items) {
-				copyMediaItemToContentValues(libraryId, item, values);
+				if (item.getRowId() >= 0) throw new IllegalArgumentException("MediaItem already has rowId.");
+
+				values.clear();
+				values.put(TBL_MF_DBID, libraryId);
+				copyMediaItemToContentValues(item, values);
+
 				final long newId = this.mDb.insert(TBL_MF, null, values);
 				if (newId < 0) throw new IllegalStateException("Adding media failed: id=" + newId);
 			}
@@ -279,12 +282,15 @@ public class MediaDbImpl implements MediaDb {
 	}
 
 	@Override
-	public void updateMedia (final long libraryId, final Collection<MediaItem> items) {
+	public void updateMedia (final Collection<MediaItem> items) {
 		this.mDb.beginTransaction();
 		try {
 			final ContentValues values = new ContentValues();
 			for (final MediaItem item : items) {
-				copyMediaItemToContentValues(libraryId, item, values);
+				if (item.getRowId() < 0) throw new IllegalArgumentException("MediaItem missing rowId.");
+
+				values.clear();
+				copyMediaItemToContentValues(item, values);
 				final int affected = this.mDb.update(TBL_MF, values, TBL_MF_ID + "=?", new String[] { String.valueOf(item.getRowId()) });
 				if (affected > 1) throw new IllegalStateException("Updating media row " + item.getRowId() + " affected " + affected + " rows, expected 1.");
 				if (affected < 1) LOG.w("Updating media row %s affected %s rows, expected 1.", item.getRowId(), affected);
@@ -344,6 +350,42 @@ public class MediaDbImpl implements MediaDb {
 		public RowIdAndValues (final long rowId, final ContentValues values) {
 			this.rowId = rowId;
 			this.values = values;
+		}
+	}
+
+	@Override
+	public void rmMediaItems (final Collection<MediaItem> items) {
+		this.mDb.beginTransaction();
+		try {
+			for (final MediaItem item : items) {
+				if (item.getRowId() < 0) throw new IllegalArgumentException("MediaItem missing rowId.");
+
+				final int affected = this.mDb.delete(TBL_MF, TBL_MF_ID + "=?", new String[] { String.valueOf(item.getRowId()) });
+				if (affected > 1) throw new IllegalStateException("Updating media row " + item.getRowId() + " affected " + affected + " rows, expected 1.");
+				if (affected < 1) LOG.w("Updating media row %s affected %s rows, expected 1.", item.getRowId(), affected);
+			}
+			this.mDb.setTransactionSuccessful();
+		}
+		finally {
+			this.mDb.endTransaction();
+		}
+	}
+
+	@Override
+	public void rmMediaItemRows (final Collection<Long> rowIds) {
+		this.mDb.beginTransaction();
+		try {
+			for (final Long rowId : rowIds) {
+				if (rowId < 0) throw new IllegalArgumentException("MediaItem missing rowId.");
+
+				final int affected = this.mDb.delete(TBL_MF, TBL_MF_ID + "=?", new String[] { String.valueOf(rowId) });
+				if (affected > 1) throw new IllegalStateException("Updating media row " + rowId + " affected " + affected + " rows, expected 1.");
+				if (affected < 1) LOG.w("Updating media row %s affected %s rows, expected 1.", rowId, affected);
+			}
+			this.mDb.setTransactionSuccessful();
+		}
+		finally {
+			this.mDb.endTransaction();
 		}
 	}
 
@@ -482,13 +524,13 @@ public class MediaDbImpl implements MediaDb {
 	}
 
 	// SELECT uri FROM mf WHERE hash IN (
-	//   SELECT hash FROM mf GROUP BY hash HAVING count(*)>1
+	//   SELECT hash FROM mf WHERE hash IS NOT NULL GROUP BY hash HAVING count(*)>1
 	// ) ORDER BY hash ASC;
 	@Override
 	public Cursor findDuplicates (final long libraryId) {
 		final String where = TBL_MF_DBID + "=? AND " + TBL_MF_HASH + " IN ("
 				+ "SELECT " + TBL_MF_HASH + " FROM " + TBL_MF
-				+ " WHERE " + TBL_MF_DBID + "=?"
+				+ " WHERE " + TBL_MF_DBID + "=? AND " + TBL_MF_HASH + " IS NOT NULL"
 				+ " GROUP BY " + TBL_MF_HASH + " HAVING count(*)>1"
 				+ ")";
 		final String[] whereArgs = new String[] { String.valueOf(libraryId), String.valueOf(libraryId) };
@@ -500,21 +542,43 @@ public class MediaDbImpl implements MediaDb {
 	public void mergeItems (final long destRowId, final Collection<Long> fromRowIds) {
 		this.mDb.beginTransaction();
 		try {
+			final MediaItem destItem = getMediaItem(destRowId);
+
 			// TODO
-			LOG.i("TODO mergeItems(%s, %s)", destRowId, fromRowIds);
-
-			// Read items.
-
-			// Merge:
-			// Date Added.
-			// Date Last Played.
 			// Tags.
 			// Item enabled.
-			// Start Count.
-			// End Count.
 
-			// Write dest.
-			// Rm from.
+			long earliestTimeAddedMillis = destItem.getTimeAddedMillis();
+			long latestTimeLastPlayedMillis = destItem.getTimeLastPlayedMillis();
+			int totalStartCount = destItem.getStartCount();
+			int totalEndCount = destItem.getEndCount();
+
+			if (totalStartCount < 0) totalStartCount = 0;
+			if (totalEndCount < 0) totalEndCount = 0;
+
+			for (final Long fromRowId : fromRowIds) {
+				final MediaItem fromItem = getMediaItem(fromRowId);
+
+				if (fromItem.getTimeAddedMillis() > 0 && earliestTimeAddedMillis > fromItem.getTimeAddedMillis()) {
+					earliestTimeAddedMillis = fromItem.getTimeAddedMillis();
+				}
+
+				if (fromItem.getTimeLastPlayedMillis() > 0 && latestTimeLastPlayedMillis < fromItem.getTimeLastPlayedMillis()) {
+					latestTimeLastPlayedMillis = fromItem.getTimeLastPlayedMillis();
+				}
+
+				if (fromItem.getStartCount() > 0) totalStartCount += fromItem.getStartCount();
+				if (fromItem.getEndCount() > 0) totalEndCount += fromItem.getEndCount();
+			}
+
+			final MediaItem newItem = destItem
+					.withTimeAdded(earliestTimeAddedMillis)
+					.withTimeLastPlayed(latestTimeLastPlayedMillis)
+					.withStartCount(totalStartCount)
+					.withEndCount(totalEndCount);
+			updateMedia(Collections.singleton(newItem));
+
+			rmMediaItemRows(fromRowIds);
 
 			this.mDb.setTransactionSuccessful();
 		}
