@@ -2,9 +2,7 @@ package com.vaguehope.morrigan.android.playback;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import android.app.Notification;
@@ -22,27 +20,31 @@ import android.os.PowerManager;
 
 import com.vaguehope.morrigan.android.R;
 import com.vaguehope.morrigan.android.helper.LogWrapper;
+import com.vaguehope.morrigan.android.playback.MediaDb.MediaWatcher;
 
 public class PlaybackImpl implements Playbacker {
 
 	private static final LogWrapper LOG = new LogWrapper("PI");
 
 	private final Context context;
+	private final MediaDb mediaDb;
 	private final MessageHandler messageHandler;
 
 	private final NotificationManager notifMgr;
 	private Builder notif;
 
-	private final List<QueueItem> queue = new CopyOnWriteArrayList<QueueItem>();
 	private final Set<PlaybackWatcher> playbackWatchers = new CopyOnWriteArraySet<PlaybackWatcher>();
 	private final PlaybackWatcherDispatcher playbackWatcherDispatcher = new PlaybackWatcherDispatcher(this.playbackWatchers);
 
-	public PlaybackImpl (final Context context) {
+	public PlaybackImpl (final Context context, final MediaDb mediaDb) {
 		this.context = context;
+		this.mediaDb = mediaDb;
 		this.messageHandler = new MessageHandler(this);
 
 		this.notifMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 		makeNotif();
+
+		mediaDb.addMediaWatcher(this.queueWatcher);
 	}
 
 	/**
@@ -50,6 +52,7 @@ public class PlaybackImpl implements Playbacker {
 	 */
 	public void dispose () {
 		unloadPlayback();
+		this.mediaDb.removeMediaWatcher(this.queueWatcher);
 		this.notifMgr.cancel(PlaybackCodes.PLAYBACK_NOTIFICATION_ID);
 	}
 
@@ -147,22 +150,17 @@ public class PlaybackImpl implements Playbacker {
 
 	// Queue.
 
-	@Override
-	public List<QueueItem> getQueue () {
-		return this.queue;
-	}
-
-	@Override
-	public void notifyQueueChanged () {
-		updateNotifSubtitle(String.format("%s items in queue.", this.queue.size()));
-		this.playbackWatcherDispatcher.queueChanged();
-	}
+	private final MediaWatcher queueWatcher = new MediaWatcherAdapter() {
+		@Override
+		public void queueChanged () {
+			final long size = PlaybackImpl.this.mediaDb.getQueueSize();
+			updateNotifSubtitle(String.format("%s items in queue.", size));
+		}
+	};
 
 	private QueueItem takeFromQueue () {
 		try {
-			final QueueItem item = this.queue.remove(0);
-			notifyQueueChanged();
-			return item;
+			return this.mediaDb.getFirstQueueItem();
 		}
 		catch (final IndexOutOfBoundsException e) {
 			return null;
@@ -381,8 +379,6 @@ public class PlaybackImpl implements Playbacker {
 	}
 
 	private void notifyNewWatcher (final PlaybackWatcher w) {
-		w.queueChanged();
-
 		final QueueItem item = this.currentItem;
 		if (item != null) w.playbackLoading(item);
 

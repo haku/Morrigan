@@ -6,7 +6,7 @@ import android.net.Uri;
 
 public class UriHelper {
 
-	public static CharSequence getFileName (final Uri item) {
+	public static String getFileName (final Uri item) {
 		if (item == null) return "null";
 
 		final List<String> parts = item.getPathSegments();

@@ -2,6 +2,7 @@ package com.vaguehope.morrigan.android.playback;
 
 import java.lang.ref.WeakReference;
 import java.util.Collection;
+import java.util.Collections;
 
 import android.database.Cursor;
 import android.os.AsyncTask;
@@ -100,13 +101,13 @@ public class LibraryFragment extends Fragment {
 					 * (i.e., after it exits this thread). if we try to talk to
 					 * the DB service before then, it will NPE.
 					 */
-					getMediaDb().addMediaWatcher(getMediaWatcher());
+					getMediaDb().addMediaWatcher(LibraryFragment.this.mediaWatcher);
 					LOG.d("Service bound.");
 				}
 			});
 		}
 		else if (getMediaDb() != null) { // because we stop listening in onPause(), we must resume if the user comes back.
-			getMediaDb().addMediaWatcher(getMediaWatcher());
+			getMediaDb().addMediaWatcher(this.mediaWatcher);
 			LOG.d("Service rebound.");
 		}
 		else {
@@ -118,7 +119,7 @@ public class LibraryFragment extends Fragment {
 		// We might be pausing before the callback has come.
 		final MediaServices ms = this.bndMc.getService();
 		if (ms != null) { // We might be pausing before the callback has come.
-			ms.getMediaDb().removeMediaWatcher(getMediaWatcher());
+			ms.getMediaDb().removeMediaWatcher(this.mediaWatcher);
 		}
 		else { // If we have not even had the callback yet, cancel it.
 			this.bndMc.clearReadyListener();
@@ -158,10 +159,6 @@ public class LibraryFragment extends Fragment {
 		this.mediaList = (ListView) rootView.findViewById(R.id.mediaList);
 		this.mediaList.setAdapter(this.adapter);
 		this.mediaList.setOnItemClickListener(this.mediaListOnItemClickListener);
-	}
-
-	protected MediaWatcher getMediaWatcher () {
-		return this.mediaWatcher;
 	}
 
 	private final MediaWatcher mediaWatcher = new MediaWatcherAdapter() {
@@ -217,7 +214,7 @@ public class LibraryFragment extends Fragment {
 	private final OnItemClickListener mediaListOnItemClickListener = new OnItemClickListener() {
 		@Override
 		public void onItemClick (final AdapterView<?> parent, final View view, final int position, final long id) {
-			MediaItem mediaItem = getMediaDb().getMediaItem(id);
+			final MediaItem mediaItem = getMediaDb().getMediaItem(id);
 			if (mediaItem != null) {
 				addMediaItemToQueue(mediaItem);
 			}
@@ -230,9 +227,8 @@ public class LibraryFragment extends Fragment {
 	private void addMediaItemToQueue (final MediaItem mediaItem) {
 		final Playbacker pb = getPlaybacker();
 		if (pb != null) {
-			QueueItem item = new QueueItem(getActivity(), mediaItem.getUri());
-			pb.getQueue().add(item);
-			pb.notifyQueueChanged();
+			final QueueItem item = new QueueItem(getActivity(), mediaItem.getUri());
+			getMediaDb().addToQueue(Collections.singleton(item));
 			LOG.i("Added to queue: %s", item);
 		}
 	}

@@ -8,6 +8,23 @@ import android.net.Uri;
 
 public interface MediaDb {
 
+	void addToQueue(Collection<QueueItem> items);
+	void removeFromQueue(Collection<QueueItem> items);
+	void removeFromQueueById(Collection<Long> itemIds);
+
+	long getQueueSize ();
+	Cursor getQueueCursor();
+	QueueItem getFirstQueueItem();
+	QueueItem getQueueItemById(long rowId);
+
+//	void moveQueueItemToPosition(final QueueItem item, final long newPosition);
+	void moveQueueItem(long rowId, MoveAction action);
+
+	enum MoveAction {
+		UP,
+		DOWN;
+	}
+
 	LibraryMetadata newLibrary (String name);
 	Collection<LibraryMetadata> getLibraries ();
 	LibraryMetadata getLibrary (long libraryId);
@@ -62,6 +79,7 @@ public interface MediaDb {
 	}
 
 	interface MediaWatcher {
+		void queueChanged();
 		void librariesChanged();
 	}
 

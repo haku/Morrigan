@@ -1,8 +1,6 @@
 package com.vaguehope.morrigan.android.playback;
 
 import java.io.File;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
@@ -16,17 +14,31 @@ public class QueueItem {
 	private static final String SCHEME_FILE = "file";
 	private static final String SCHEME_CONTENT = "content";
 
-	private static final AtomicInteger ID_GENERATOR = new AtomicInteger();
-
-	private final int queueId;
+	private final long rowId;
+	private final long position;
 	private final Uri uri;
+	private final String title;
+	private final long sizeBytes;
+	private final long durationMillis;
 
-	private final CharSequence title;
-	private long sizeBytes;
-	private long durationMillis;
+	public QueueItem (
+			final long rowId,
+			final long position,
+			final Uri uri,
+			final String title,
+			final long sizeBytes,
+			final long durationMillis) {
+		this.rowId = rowId;
+		this.position = position;
+		this.uri = uri;
+		this.title = title;
+		this.sizeBytes = sizeBytes;
+		this.durationMillis = durationMillis;
+	}
 
 	public QueueItem (final Context context, final Uri uri) {
-		this.queueId = ID_GENERATOR.incrementAndGet();
+		this.rowId = -1;
+		this.position = -1;
 		this.uri = uri;
 
 		if (uri == null) {
@@ -68,15 +80,19 @@ public class QueueItem {
 		}
 	}
 
-	public int getQueueId () {
-		return this.queueId;
+	public long getRowId () {
+		return this.rowId;
+	}
+
+	public long getPosition () {
+		return this.position;
 	}
 
 	public Uri getUri () {
 		return this.uri;
 	}
 
-	public CharSequence getTitle () {
+	public String getTitle () {
 		return this.title;
 	}
 
@@ -90,8 +106,8 @@ public class QueueItem {
 
 	@Override
 	public String toString () {
-		return String.format("%s{\"%s\", %s, %sb, %sms}",
-				this.queueId, this.title, this.uri, this.sizeBytes, this.durationMillis);
+		return String.format("%s{%s, \"%s\", %s, %sb, %sms}",
+				this.rowId, this.position, this.title, this.uri, this.sizeBytes, this.durationMillis);
 	}
 
 }

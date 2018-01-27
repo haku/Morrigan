@@ -1,11 +1,12 @@
 package com.vaguehope.morrigan.android.playback;
 
 import java.lang.ref.WeakReference;
-import java.util.List;
-
+import java.util.Collections;
 import android.app.Activity;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -21,11 +22,15 @@ import android.view.View.OnCreateContextMenuListener;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.vaguehope.morrigan.android.R;
 import com.vaguehope.morrigan.android.helper.LogWrapper;
+import com.vaguehope.morrigan.android.helper.Result;
+import com.vaguehope.morrigan.android.playback.MediaDb.MediaWatcher;
+import com.vaguehope.morrigan.android.playback.MediaDb.MoveAction;
 import com.vaguehope.morrigan.android.playback.Playbacker.PlaybackWatcher;
 
 public class PlayerFragment extends Fragment {
@@ -34,16 +39,20 @@ public class PlayerFragment extends Fragment {
 
 	private MessageHandler messageHandler;
 
-	private QueueAdapter queueAdaptor;
+	private ListView queueList;
+
 	private TextView txtTitle;
 	private TextView txtQueue;
+
+	private QueueCursorAdapter adapter;
+	private ScrollState scrollState;
 
 	@Override
 	public View onCreateView (final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
 		this.messageHandler = new MessageHandler(this);
 
 		final View rootView = inflater.inflate(R.layout.playback_player, container, false);
-		wireGui(rootView);
+		wireGui(rootView, container);
 		return rootView;
 	}
 
@@ -67,12 +76,12 @@ public class PlayerFragment extends Fragment {
 
 	// Playback service.
 
-	private MediaClient bndPb;
+	private MediaClient bndMc;
 
 	private void resumeDb () {
-		if (this.bndPb == null) {
+		if (this.bndMc == null) {
 			LOG.d("Binding playback service...");
-			this.bndPb = new MediaClient(getActivity(), LOG.getPrefix(), new Runnable() {
+			this.bndMc = new MediaClient(getActivity(), LOG.getPrefix(), new Runnable() {
 				@Override
 				public void run () {
 					/*
@@ -81,12 +90,14 @@ public class PlayerFragment extends Fragment {
 					 * (i.e., after it exits this thread). if we try to talk to
 					 * the DB service before then, it will NPE.
 					 */
+					getMediaDb().addMediaWatcher(PlayerFragment.this.mediaWatcher);
 					getPlaybacker().addPlaybackListener(PlayerFragment.this.playbackWatcher);
 					LOG.d("Playback service bound.");
 				}
 			});
 		}
 		else if (getPlaybacker() != null) { // because we stop listening in onPause(), we must resume if the user comes back.
+			getMediaDb().addMediaWatcher(this.mediaWatcher);
 			getPlaybacker().addPlaybackListener(this.playbackWatcher);
 			LOG.d("Playback service rebound.");
 		}
@@ -97,24 +108,36 @@ public class PlayerFragment extends Fragment {
 
 	private void suspendDb () {
 		// We might be pausing before the callback has come.
-		final MediaServices pb = this.bndPb.getService();
-		if (pb != null) { // We might be pausing before the callback has come.
-			pb.getPlaybacker().removePlaybackListener(this.playbackWatcher);
+		final MediaServices ms = this.bndMc.getService();
+		if (ms != null) { // We might be pausing before the callback has come.
+			ms.getPlaybacker().removePlaybackListener(this.playbackWatcher);
+			ms.getMediaDb().removeMediaWatcher(this.mediaWatcher);
 		}
 		else { // If we have not even had the callback yet, cancel it.
-			this.bndPb.clearReadyListener();
+			this.bndMc.clearReadyListener();
 		}
 		LOG.d("Playback service released.");
 	}
 
 	private void disposeDb () {
-		if (this.bndPb != null) this.bndPb.dispose();
+		if (this.adapter != null) this.adapter.dispose();
+		if (this.bndMc != null) this.bndMc.dispose();
 	}
 
 	protected Playbacker getPlaybacker () {
-		final MediaClient d = this.bndPb;
+		final MediaClient d = this.bndMc;
 		if (d == null) return null;
 		return d.getService().getPlaybacker();
+	}
+
+	protected MediaDb getMediaDb () {
+		final MediaClient d = this.bndMc;
+		if (d == null) return null;
+		return d.getService().getMediaDb();
+	}
+
+	protected QueueCursorAdapter getAdapter () {
+		return this.adapter;
 	}
 
 	// Fragment callbacks.
@@ -130,9 +153,14 @@ public class PlayerFragment extends Fragment {
 	@Override
 	public boolean onContextItemSelected (final MenuItem menuItem) {
 		switch (menuItem.getItemId()) {
+			case PlaybackCodes.MENU_MOVE_UP:
+				moveQueueItemUpById(((AdapterView.AdapterContextMenuInfo) menuItem.getMenuInfo()).id);
+				return true;
+			case PlaybackCodes.MENU_MOVE_DOWN:
+				moveQueueItemDownById(((AdapterView.AdapterContextMenuInfo) menuItem.getMenuInfo()).id);
+				return true;
 			case PlaybackCodes.MENU_REMOVE:
-				final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuItem.getMenuInfo();
-				removeFromQueueByPosition(info.position);
+				removeFromQueueById(((AdapterView.AdapterContextMenuInfo) menuItem.getMenuInfo()).id);
 				return true;
 			default:
 				return super.onContextItemSelected(menuItem);
@@ -141,12 +169,13 @@ public class PlayerFragment extends Fragment {
 
 	// GUI.
 
-	private void wireGui (final View rootView) {
-		this.queueAdaptor = new QueueAdapter(getActivity());
-		final ListView lstQueue = (ListView) rootView.findViewById(R.id.lstQueue);
-		lstQueue.setAdapter(this.queueAdaptor);
-//		lstQueue.setOnItemClickListener(...);
-		lstQueue.setOnCreateContextMenuListener(this.queueContextMenuListener);
+	private void wireGui (final View rootView, final ViewGroup container) {
+		this.adapter = new QueueCursorAdapter(container.getContext());
+
+		this.queueList = (ListView) rootView.findViewById(R.id.lstQueue);
+		this.queueList.setAdapter(this.adapter);
+		this.queueList.setOnItemClickListener(this.queueItemClickListener);
+		this.queueList.setOnCreateContextMenuListener(this.queueContextMenuListener);
 
 		final View tagRow = rootView.findViewById(R.id.tagRow);
 //		tagRow.setOnClickListener(this.contextMenuClickListener);
@@ -182,16 +211,14 @@ public class PlayerFragment extends Fragment {
 		});
 	}
 
-	protected PlaybackWatcher getPlaybackWatcher () {
-		return this.playbackWatcher;
-	}
-
-	private final PlaybackWatcher playbackWatcher = new PlaybackWatcherAdapter() {
+	private final MediaWatcher mediaWatcher = new MediaWatcherAdapter() {
 		@Override
 		public void queueChanged () {
 			PlayerFragment.this.messageHandler.sendEmptyMessage(Msgs.QUEUE_CHANGED.ordinal());
 		}
+	};
 
+	private final PlaybackWatcher playbackWatcher = new PlaybackWatcherAdapter() {
 		@Override
 		public void playbackLoading (final QueueItem item) {
 			final Message msg = PlayerFragment.this.messageHandler.obtainMessage(Msgs.PLAYBACK_LOADING.ordinal());
@@ -225,7 +252,7 @@ public class PlayerFragment extends Fragment {
 		final Msgs m = Msgs.values[msg.what];
 		switch (m) {
 			case QUEUE_CHANGED:
-				refreshQueue();
+				reloadQueue();
 				break;
 			case PLAYBACK_LOADING:
 				final QueueItem item = (QueueItem) msg.obj;
@@ -235,46 +262,129 @@ public class PlayerFragment extends Fragment {
 		}
 	}
 
-	private void refreshQueue () {
-		final Playbacker pb = getPlaybacker();
-		if (pb != null) {
-			final List<QueueItem> items = pb.getQueue();
-			this.queueAdaptor.setInputData(items);
-			this.txtQueue.setText(items.size() + " items.");
+	// Queue.
+
+	private void reloadQueue () {
+		new LoadQueue(this).execute(); // TODO OnExecutor?
+	}
+
+	private static class LoadQueue extends AsyncTask<Void, Void, Result<Cursor>> {
+
+		private final PlayerFragment host;
+
+		public LoadQueue (final PlayerFragment host) {
+			this.host = host;
 		}
-		else {
-			LOG.w("Failed to refresh queue as playback service was not bound.");
+
+		@Override
+		protected void onPreExecute () {
+			// TODO show progress indicator.
+		}
+
+		@Override
+		protected Result<Cursor> doInBackground (final Void... params) {
+			try {
+				final MediaDb db = this.host.getMediaDb();
+				if (db != null) {
+					final Cursor cursor = db.getQueueCursor();
+					return new Result<Cursor>(cursor);
+				}
+				return new Result<Cursor>(new IllegalStateException("Failed to refresh queue as DB was not bound."));
+			}
+			catch (final Exception e) { // NOSONAR needed to report errors.
+				return new Result<Cursor>(e);
+			}
+		}
+
+		@Override
+		protected void onPostExecute (final Result<Cursor> result) {
+			if (result.isSuccess()) {
+				this.host.saveScrollIfNotSaved();
+				this.host.getAdapter().changeCursor(result.getData());
+				LOG.d("Refreshed queue cursor.");
+				this.host.restoreScroll();
+			}
+			else {
+				LOG.w("Failed to refresh column.", result.getE());
+			}
+			// TODO hide progress indicator.
+		}
+
+	}
+
+	// Queue scrolling.
+
+	private ScrollState getCurrentScroll () {
+		return ScrollState.from(this.queueList);
+	}
+
+	private void saveScroll () {
+		final ScrollState newState = getCurrentScroll();
+		if (newState != null) {
+			this.scrollState = newState;
+			LOG.d("Saved scroll: %s", this.scrollState);
 		}
 	}
 
-	// Queue.
+	private void saveScrollIfNotSaved () {
+		if (this.scrollState != null) return;
+		saveScroll();
+	}
+
+	private void restoreScroll () {
+		if (this.scrollState == null) return;
+		this.scrollState.applyTo(this.queueList);
+		LOG.d("Restored scroll: %s", this.scrollState);
+		this.scrollState = null;
+	}
+
 
 	private void addUriToQueue (final Uri mediaUri) {
 		final Playbacker pb = getPlaybacker();
 		if (pb != null) {
-			QueueItem item = new QueueItem(getActivity(), mediaUri);
-			pb.getQueue().add(item);
-			pb.notifyQueueChanged();
+			final QueueItem item = new QueueItem(getActivity(), mediaUri);
+			getMediaDb().addToQueue(Collections.singleton(item));
 			LOG.i("Added to queue: %s", item);
 		}
 	}
+
+	private final OnItemClickListener queueItemClickListener = new OnItemClickListener() {
+		@Override
+		public void onItemClick (final AdapterView<?> parent, final View view, final int position, final long id) {
+			// TODO make queue item dlg.
+			// TODO move top / move bottom.
+			parent.showContextMenuForChild(view);
+		}
+	};
 
 	private final OnCreateContextMenuListener queueContextMenuListener = new OnCreateContextMenuListener() {
 		@Override
 		public void onCreateContextMenu (final ContextMenu menu, final View v, final ContextMenuInfo menuInfo) {
 			final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-			final QueueItem item = PlayerFragment.this.queueAdaptor.getQueueItem(info.position);
+			final QueueItem item = getMediaDb().getQueueItemById(info.id);
 			menu.setHeaderTitle(item.getTitle());
+			menu.add(Menu.NONE, PlaybackCodes.MENU_MOVE_UP, Menu.NONE, "Move Up");
+			menu.add(Menu.NONE, PlaybackCodes.MENU_MOVE_DOWN, Menu.NONE, "Move Down");
 			menu.add(Menu.NONE, PlaybackCodes.MENU_REMOVE, Menu.NONE, "Remove");
 		}
 	};
 
-	private void removeFromQueueByPosition (final int position) {
-		final Playbacker pb = getPlaybacker();
-		if (pb != null) {
-			pb.getQueue().remove(position);
-			pb.notifyQueueChanged();
-		}
+	private void moveQueueItemUpById (final long itemId) {
+		final MediaDb db = getMediaDb();
+		if (db == null) return;
+		db.moveQueueItem(itemId, MoveAction.UP);
+	}
+
+	private void moveQueueItemDownById (final long itemId) {
+		final MediaDb db = getMediaDb();
+		if (db == null) return;
+		db.moveQueueItem(itemId, MoveAction.DOWN);
+	}
+
+	private void removeFromQueueById (final long itemId) {
+		final MediaDb db = getMediaDb();
+		if (db == null) return;
+		db.removeFromQueueById(Collections.singleton(itemId));
 	}
 
 	// Buttons.

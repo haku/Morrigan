@@ -13,6 +13,7 @@ import org.json.JSONException;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
@@ -25,7 +26,7 @@ public class MediaDbImpl implements MediaDb {
 	protected static final LogWrapper LOG = new LogWrapper("MDI");
 
 	private static final String DB_NAME = "media";
-	private static final int DB_VERSION = 4;
+	private static final int DB_VERSION = 5;
 
 	private static class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -35,6 +36,8 @@ public class MediaDbImpl implements MediaDb {
 
 		@Override
 		public void onCreate (final SQLiteDatabase db) {
+			db.execSQL(TBL_QU_CREATE);
+			db.execSQL(TBL_QU_POS_TRIGGER);
 			db.execSQL(TBL_MD_CREATE);
 			db.execSQL(TBL_MF_CREATE);
 			db.execSQL(TBL_MF_CREATE_INDEX);
@@ -51,6 +54,10 @@ public class MediaDbImpl implements MediaDb {
 			}
 			if (oldVersion < 4) { // NOSONAR not a magic number.
 				addColumn(db, TBL_MF, TBL_MF_MISSING, "integer");
+			}
+			if (oldVersion < 5) { // NOSONAR not a magic number.
+				db.execSQL(TBL_QU_CREATE);
+				db.execSQL(TBL_QU_POS_TRIGGER);
 			}
 		}
 
@@ -88,7 +95,33 @@ public class MediaDbImpl implements MediaDb {
 		this.mDbHelper.close();
 	}
 
-	// Create and delete databases.
+	// Queue.
+
+	private static final String TBL_QU = "qu";
+	protected static final String TBL_QU_ID = "_id";
+	protected static final String TBL_QU_POSITION = "pos";
+	protected static final String TBL_QU_URI = "uri";
+	protected static final String TBL_QU_TITLE = "title";
+	protected static final String TBL_QU_SIZE = "size";
+	protected static final String TBL_QU_DURATION_MILLIS = "duration_millis";
+
+	private static final String TBL_QU_CREATE = "CREATE TABLE " + TBL_QU + " ("
+			+ TBL_QU_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+			+ TBL_QU_POSITION + " INTEGER,"
+			+ TBL_QU_URI + " TEXT,"
+			+ TBL_QU_TITLE + " TEXT,"
+			+ TBL_QU_SIZE + " INTEGER,"
+			+ TBL_QU_DURATION_MILLIS + " INTEGER,"
+			+ "UNIQUE(" + TBL_QU_POSITION + ") ON CONFLICT ABORT"
+			+ ");";
+
+	private static final String TBL_QU_POS_TRIGGER = "CREATE TRIGGER qu_set_pos AFTER INSERT ON " + TBL_QU
+			+ " BEGIN"
+			+ " UPDATE " + TBL_QU + " SET " + TBL_QU_POSITION + "=NEW." + TBL_QU_ID
+			+ " WHERE " + TBL_QU_ID + "=NEW." + TBL_QU_ID + ";"
+			+ " END;";
+
+	// Create and delete libraries.
 
 	private static final String TBL_MD = "md";
 	private static final String TBL_MD_ID = "_id";
@@ -137,6 +170,234 @@ public class MediaDbImpl implements MediaDb {
 	private static final String TBL_MF_INDEX = TBL_MF + "_idx";
 	private static final String TBL_MF_CREATE_INDEX = "CREATE INDEX " + TBL_MF_INDEX + " ON " + TBL_MF + "("
 			+ TBL_MF_DBID + "," + TBL_MF_URI + "," + TBL_MF_TITLE + "," + TBL_MF_HASH + ");";
+
+//	Queue methods.
+
+	private static void copyQueueItemToContentValues (final QueueItem item, final ContentValues values) {
+		// Do not include ID or position.
+		values.put(TBL_QU_URI, item.getUri().toString());
+		values.put(TBL_QU_TITLE, item.getTitle());
+		values.put(TBL_QU_SIZE, item.getSizeBytes());
+		values.put(TBL_QU_DURATION_MILLIS, item.getDurationMillis());
+	}
+
+	@Override
+	public void addToQueue (final Collection<QueueItem> items) {
+		this.mDb.beginTransaction();
+		try {
+			final ContentValues values = new ContentValues();
+			for (final QueueItem item : items) {
+				if (item.getRowId() >= 0) throw new IllegalArgumentException("QueueItem already has rowId.");
+				if (item.getPosition() >= 0) throw new IllegalArgumentException("QueueItem already has position.");
+
+				values.clear();
+				copyQueueItemToContentValues(item, values);
+
+				final long newId = this.mDb.insert(TBL_QU, null, values);
+				if (newId < 0) throw new IllegalStateException("Adding queue item failed: id=" + newId);
+			}
+			this.mDb.setTransactionSuccessful();
+		}
+		finally {
+			this.mDb.endTransaction();
+		}
+		this.mediaWatcherDispatcher.queueChanged();
+	}
+
+	@Override
+	public void removeFromQueue (final Collection<QueueItem> items) {
+		final Collection<Long> ids = new ArrayList<Long>(items.size());
+		for (final QueueItem item : items) {
+			ids.add(item.getRowId());
+		}
+		removeFromQueueById(ids);
+	}
+
+	@Override
+	public void removeFromQueueById (final Collection<Long> rowIds) {
+		this.mDb.beginTransaction();
+		try {
+			for (final Long rowId : rowIds) {
+				if (rowId == null || rowId < 0) throw new IllegalArgumentException("Invalid rowId: " + rowId);
+
+				final int affected = this.mDb.delete(TBL_QU, TBL_QU_ID + "=?", new String[] { String.valueOf(rowId) });
+				if (affected > 1) throw new IllegalStateException("Updating queue row " + rowId + " affected " + affected + " rows, expected 1.");
+				if (affected < 1) LOG.w("Updating queue row %s affected %s rows, expected 1.", rowId, affected);
+			}
+			this.mDb.setTransactionSuccessful();
+		}
+		finally {
+			this.mDb.endTransaction();
+		}
+		this.mediaWatcherDispatcher.queueChanged();
+	}
+
+	@Override
+	public long getQueueSize () {
+		return DatabaseUtils.queryNumEntries(this.mDb, TBL_QU);
+	}
+
+	private Cursor getQuCursor (final String where, final String[] whereArgs, final String orderBy, final int numberOf) {
+		return this.mDb.query(true, TBL_QU,
+				new String[] {
+						TBL_QU_ID,
+						TBL_QU_POSITION,
+						TBL_QU_URI,
+						TBL_QU_TITLE,
+						TBL_QU_SIZE,
+						TBL_QU_DURATION_MILLIS },
+				where, whereArgs,
+				null, null,
+				orderBy,
+				numberOf > 0 ? String.valueOf(numberOf) : null);
+	}
+
+	@Override
+	public Cursor getQueueCursor () {
+		return getQuCursor(null, null, TBL_QU_POSITION + " ASC", -1);
+	}
+
+	@Override
+	public QueueItem getFirstQueueItem () {
+		final Cursor c = getQuCursor(null, null, TBL_QU_POSITION + " ASC", 1);
+		return readFirstQueueItemFromCursor(c);
+	}
+
+	@Override
+	public QueueItem getQueueItemById (final long rowId) {
+		final Cursor c = getQuCursor(TBL_QU_ID + "=?", new String[] { String.valueOf(rowId) }, null, 1);
+		return readFirstQueueItemFromCursor(c);
+	}
+
+	private QueueItem readFirstQueueItemFromCursor (final Cursor c) {
+		try {
+			if (c != null && c.moveToFirst()) {
+				final QueueCursorReader reader = new QueueCursorReader();
+				final long rowId = reader.readId(c);
+				final long position = reader.readPosition(c);
+				final Uri uri = reader.readUri(c);
+				final String title = reader.readTitle(c);
+				final long sizeBytes = reader.readSizeBytes(c);
+				final long durationMillis = reader.readDurationMillis(c);
+				return new QueueItem(rowId,
+						position,
+						uri,
+						title,
+						sizeBytes,
+						durationMillis);
+			}
+			return null;
+		}
+		finally {
+			IoHelper.closeQuietly(c);
+		}
+	}
+
+//	@Override
+//	public void moveQueueItemToPosition (final QueueItem item, final long newPosition) {
+//		this.mDb.beginTransaction();
+//		try {
+//			moveQueueItemToPosition(item.getRowId(), newPosition);
+//			this.mDb.setTransactionSuccessful();
+//		}
+//		finally {
+//			this.mDb.endTransaction();
+//		}
+//		this.mediaWatcherDispatcher.queueChanged();
+//	}
+
+//	WARNING:
+//	moveQueueItemToPosition() can set position high than the next auto-increment value of _id.
+//	This will break things.
+
+//	private void moveQueueItemToPosition (final long rowId, final long newPosition) {
+//		// SQLite checks uniqueness constraint after every row, not after the UPDATE. :(
+//
+//		this.mDb.execSQL(
+//				"UPDATE " + TBL_QU
+//				+ " SET " + TBL_QU_POSITION + "= - (" + TBL_QU_POSITION + "+1)"
+//				+ " WHERE " + TBL_QU_POSITION + ">=?",
+//				new String[] { String.valueOf(newPosition) });
+//
+//		this.mDb.execSQL(
+//				"UPDATE " + TBL_QU
+//				+ " SET " + TBL_QU_POSITION + "= - " + TBL_QU_POSITION
+//				+ " WHERE " + TBL_QU_POSITION + "<0");
+//
+//		final ContentValues values = new ContentValues();
+//		values.put(TBL_QU_POSITION, newPosition);
+//		final int affected = this.mDb.update(TBL_QU, values, TBL_QU_ID + "=?", new String[] { String.valueOf(rowId) });
+//		if (affected > 1) throw new IllegalStateException("Updating queue row " + rowId + " affected " + affected + " rows, expected 1.");
+//		if (affected < 1) LOG.w("Updating queue row %s affected %s rows, expected 1.", rowId, affected);
+//	}
+
+	private void setPositionByPosition (final long oldPosition, final long newPosition) {
+		final ContentValues values = new ContentValues();
+		values.put(TBL_QU_POSITION, newPosition);
+		final int affected = this.mDb.update(TBL_QU, values, TBL_QU_POSITION + "=?", new String[] { String.valueOf(oldPosition) });
+		if (affected > 1) throw new IllegalStateException("Updating queue row with position " + oldPosition + " affected " + affected + " rows, expected 1.");
+		if (affected < 1) LOG.w("Updating queue row with position %s affected %s rows, expected 1.", oldPosition, affected);
+	}
+
+	private void swapPositions (final long a, final long b) {
+		setPositionByPosition(a, -a);
+		setPositionByPosition(b, a);
+		setPositionByPosition(-a, b);
+	}
+
+	@Override
+	public void moveQueueItem (final long rowId, final MoveAction action) {
+		final String comparison;
+		final String sortDirection;
+		switch (action) {
+			case UP:
+				comparison = "<";
+				sortDirection = "DESC";
+				break;
+			case DOWN:
+				comparison = ">";
+				sortDirection = "ASC";
+				break;
+			default:
+				throw new IllegalArgumentException("Unknown action.");
+		}
+
+		this.mDb.beginTransaction();
+		try {
+			final Long oldPosition = readPositionFromCursor(
+					getQuCursor(TBL_QU_ID + "=?", new String[] { String.valueOf(rowId) }, null, 1));
+			if (oldPosition == null) throw new IllegalArgumentException("rowId not found: "+ rowId);
+
+			final Long newPosition = readPositionFromCursor(
+					getQuCursor(TBL_QU_POSITION + comparison + "?",
+							new String[] { String.valueOf(oldPosition) },
+							TBL_QU_POSITION + " " + sortDirection, 1));
+			if (newPosition == null) return;
+
+			swapPositions(oldPosition, newPosition);
+
+			this.mDb.setTransactionSuccessful();
+		}
+		finally {
+			this.mDb.endTransaction();
+		}
+		this.mediaWatcherDispatcher.queueChanged();
+	}
+
+	private Long readPositionFromCursor (final Cursor c) {
+		try {
+			if (c != null && c.moveToFirst()) {
+				final QueueCursorReader reader = new QueueCursorReader();
+				return reader.readPosition(c);
+			}
+			return null;
+		}
+		finally {
+			IoHelper.closeQuietly(c);
+		}
+	}
+
+//	Library methods.
 
 	@Override
 	public LibraryMetadata newLibrary (final String name) {
@@ -590,6 +851,7 @@ public class MediaDbImpl implements MediaDb {
 	@Override
 	public void addMediaWatcher (final MediaWatcher watcher) {
 		this.mediaWatchers.add(watcher);
+		watcher.queueChanged();
 		watcher.librariesChanged();
 	}
 

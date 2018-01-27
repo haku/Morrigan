@@ -13,6 +13,13 @@ public class MediaWatcherDispatcher implements MediaWatcher {
 	}
 
 	@Override
+	public void queueChanged () {
+		for (final MediaWatcher w : this.watchers) {
+			w.queueChanged();
+		}
+	}
+
+	@Override
 	public void librariesChanged () {
 		for (final MediaWatcher w : this.watchers) {
 			w.librariesChanged();

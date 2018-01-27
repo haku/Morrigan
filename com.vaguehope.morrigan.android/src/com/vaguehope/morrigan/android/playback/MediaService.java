@@ -45,12 +45,12 @@ public class MediaService extends Service implements MediaServices {
 
 	// Instance.
 
-	private PlaybackImpl playbackInstance;
 	private MediaDbImpl mediaDbImpl;
+	private PlaybackImpl playbackInstance;
 
 	private void instanceStart () {
-		this.playbackInstance = new PlaybackImpl(this);
 		this.mediaDbImpl = new MediaDbImpl(this);
+		this.playbackInstance = new PlaybackImpl(this, this.mediaDbImpl);
 		startForeground(
 				this.playbackInstance.getNotificationId(),
 				this.playbackInstance.getNotif());

@@ -13,13 +13,6 @@ public class PlaybackWatcherDispatcher implements PlaybackWatcher {
 	}
 
 	@Override
-	public void queueChanged () {
-		for (final PlaybackWatcher w : this.playbackWatchers) {
-			w.queueChanged();
-		}
-	}
-
-	@Override
 	public void playbackLoading (final QueueItem item) {
 		for (final PlaybackWatcher w : this.playbackWatchers) {
 			w.playbackLoading(item);
