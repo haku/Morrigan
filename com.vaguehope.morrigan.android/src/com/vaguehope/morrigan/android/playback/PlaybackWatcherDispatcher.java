@@ -48,6 +48,13 @@ public class PlaybackWatcherDispatcher implements PlaybackWatcher {
 	}
 
 	@Override
+	public void playOrderChanged () {
+		for (final PlaybackWatcher w : this.playbackWatchers) {
+			w.playOrderChanged();
+		}
+	}
+
+	@Override
 	public void exitRequested () {
 		for (final PlaybackWatcher w : this.playbackWatchers) {
 			w.exitRequested();

@@ -6,6 +6,9 @@ public interface Playbacker {
 	void stopPlayback();
 	void gotoNextItem();
 
+	PlayOrder getPlayOrder();
+	void setPlayOrder(PlayOrder newOrder);
+
 	void addPlaybackListener (PlaybackWatcher watcher);
 	void removePlaybackListener (PlaybackWatcher watcher);
 
@@ -15,7 +18,13 @@ public interface Playbacker {
 		void playbackPaused();
 		void playbackStopped();
 		void playbackError();
+		void playOrderChanged();
 		void exitRequested();
+	}
+
+	enum PlayOrder {
+		QUEUE_ONLY,
+		RANDOM,
 	}
 
 }

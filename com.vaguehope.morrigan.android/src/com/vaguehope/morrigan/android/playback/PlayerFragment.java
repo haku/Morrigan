@@ -231,10 +231,16 @@ public class PlayerFragment extends Fragment {
 			msg.obj = item;
 			msg.sendToTarget();
 		}
+
+		@Override
+		public void playOrderChanged () {
+			PlayerFragment.this.messageHandler.sendEmptyMessage(Msgs.PLAYORDER_CHANGED.ordinal());
+		}
 	};
 
 	protected enum Msgs {
 		QUEUE_CHANGED,
+		PLAYORDER_CHANGED,
 		PLAYBACK_LOADING;
 		public static final Msgs values[] = values(); // Optimisation to avoid new array every time.
 	}
@@ -259,6 +265,10 @@ public class PlayerFragment extends Fragment {
 		switch (m) {
 			case QUEUE_CHANGED:
 				reloadQueue();
+				redrawQueueStatus();
+				break;
+			case PLAYORDER_CHANGED:
+				redrawQueueStatus();
 				break;
 			case PLAYBACK_LOADING:
 				final QueueItem item = (QueueItem) msg.obj;
@@ -269,6 +279,13 @@ public class PlayerFragment extends Fragment {
 	}
 
 	// Queue.
+
+	private void redrawQueueStatus () {
+		this.txtQueue.setText(String.format(
+				"%s items in queue, %s.",
+				getMediaDb().getQueueSize(),
+				getPlaybacker().getPlayOrder()));
+	}
 
 	private void reloadQueue () {
 		new LoadQueue(this).execute(); // TODO OnExecutor?

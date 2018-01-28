@@ -36,6 +36,11 @@ public class QueueItem {
 		this.durationMillis = durationMillis;
 	}
 
+	public QueueItem (final Context context, final MediaItem mi) {
+		// TODO could do a much better job here.
+		this(context, mi.getUri());
+	}
+
 	public QueueItem (final Context context, final Uri uri) {
 		this.rowId = -1;
 		this.position = -1;

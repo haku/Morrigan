@@ -242,7 +242,7 @@ public class LibraryFragment extends Fragment {
 	private void addMediaItemToQueue (final MediaItem mediaItem) {
 		final Playbacker pb = getPlaybacker();
 		if (pb != null) {
-			final QueueItem item = new QueueItem(getActivity(), mediaItem.getUri());
+			final QueueItem item = new QueueItem(getActivity(), mediaItem);
 			getMediaDb().addToQueue(Collections.singleton(item));
 			LOG.i("Added to queue: %s", item);
 		}

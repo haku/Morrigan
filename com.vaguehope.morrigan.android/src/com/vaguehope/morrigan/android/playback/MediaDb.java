@@ -17,7 +17,6 @@ public interface MediaDb {
 	QueueItem getFirstQueueItem();
 	QueueItem getQueueItemById(long rowId);
 
-//	void moveQueueItemToPosition(final QueueItem item, final long newPosition);
 	void moveQueueItem(long rowId, MoveAction action);
 	void moveQueueItemToEnd(long rowId, MoveAction action);
 
@@ -44,6 +43,8 @@ public interface MediaDb {
 	MediaItem getMediaItem(long rowId);
 	Presence hasMediaUri(long libraryId, Uri uri);
 	long getMediaRowId(long libraryId, Uri uri);
+
+	MediaItem randomMediaItem();
 
 	Cursor findDuplicates(long libraryId);
 	void mergeItems(long destRowId, Collection<Long> fromRowIds);

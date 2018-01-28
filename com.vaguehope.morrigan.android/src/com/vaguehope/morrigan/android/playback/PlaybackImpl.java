@@ -11,12 +11,15 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.os.Handler;
 import android.os.Message;
 import android.os.PowerManager;
+import android.preference.PreferenceManager;
 
 import com.vaguehope.morrigan.android.R;
 import com.vaguehope.morrigan.android.helper.LogWrapper;
@@ -24,11 +27,14 @@ import com.vaguehope.morrigan.android.playback.MediaDb.MediaWatcher;
 
 public class PlaybackImpl implements Playbacker {
 
+	private static final String PREF_PLAYORDER = "playorder";
+
 	private static final LogWrapper LOG = new LogWrapper("PI");
 
 	private final Context context;
 	private final MediaDb mediaDb;
 	private final MessageHandler messageHandler;
+	private final SharedPreferences sharedPreferences;
 
 	private final NotificationManager notifMgr;
 	private Builder notif;
@@ -40,6 +46,7 @@ public class PlaybackImpl implements Playbacker {
 		this.context = context;
 		this.mediaDb = mediaDb;
 		this.messageHandler = new MessageHandler(this);
+		this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
 		this.notifMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 		makeNotif();
@@ -153,18 +160,36 @@ public class PlaybackImpl implements Playbacker {
 	private final MediaWatcher queueWatcher = new MediaWatcherAdapter() {
 		@Override
 		public void queueChanged () {
-			final long size = PlaybackImpl.this.mediaDb.getQueueSize();
-			updateNotifSubtitle(String.format("%s items in queue.", size));
+			redrawNotifSubtitle();
 		}
 	};
 
-	private QueueItem takeFromQueue () {
-		try {
-			return this.mediaDb.getFirstQueueItem();
+	private void redrawNotifSubtitle () {
+		updateNotifSubtitle(String.format(
+				"%s items in queue, %s.",
+				PlaybackImpl.this.mediaDb.getQueueSize(),
+				getPlayOrder()));
+	}
+
+	private QueueItem takeNextItemToPlay () {
+		final QueueItem fromQueue = this.mediaDb.getFirstQueueItem();
+		if (fromQueue != null) return fromQueue;
+
+		final MediaItem mediaItem;
+		switch (getPlayOrder()) {
+			case RANDOM:
+				mediaItem = this.mediaDb.randomMediaItem();
+				break;
+			case QUEUE_ONLY:
+			default:
+				mediaItem = null;
 		}
-		catch (final IndexOutOfBoundsException e) {
-			return null;
+
+		if (mediaItem != null) {
+			return new QueueItem(this.context, mediaItem);
 		}
+
+		return null;
 	}
 
 	// Public playback.
@@ -194,6 +219,32 @@ public class PlaybackImpl implements Playbacker {
 	@Override
 	public void gotoNextItem () {
 		this.messageHandler.sendEmptyMessage(Msgs.GOTO_NEXT_ITEM.ordinal());
+	}
+
+	private volatile PlayOrder playOrder;
+
+	@Override
+	public PlayOrder getPlayOrder () {
+		if (this.playOrder == null) {
+			final String fromPref = this.sharedPreferences.getString(PREF_PLAYORDER, null);
+			if (fromPref != null) {
+				this.playOrder = PlayOrder.valueOf(fromPref);
+			}
+			else {
+				this.playOrder = PlayOrder.QUEUE_ONLY;
+			}
+		}
+		return this.playOrder;
+	}
+
+	@Override
+	public void setPlayOrder (final PlayOrder newOrder) {
+		final Editor edit = this.sharedPreferences.edit();
+		edit.putString(PREF_PLAYORDER, newOrder.name());
+		edit.commit();
+		this.playOrder = newOrder;
+		this.playbackWatcherDispatcher.playOrderChanged();
+		redrawNotifSubtitle();
 	}
 
 	// Messages.
@@ -304,7 +355,7 @@ public class PlaybackImpl implements Playbacker {
 		}
 		else {
 			QueueItem item = this.currentItem;
-			if (item == null) item = takeFromQueue();
+			if (item == null) item = takeNextItemToPlay();
 			if (item == null) return;
 
 			setCurrentItem(item);
@@ -313,7 +364,7 @@ public class PlaybackImpl implements Playbacker {
 	}
 
 	private void startPlayingNextItem () throws IOException {
-		final QueueItem item = takeFromQueue();
+		final QueueItem item = takeNextItemToPlay();
 		if (item == null) return;
 
 		setCurrentItem(item);

@@ -20,6 +20,9 @@ public abstract class PlaybackWatcherAdapter implements PlaybackWatcher {
 	public void playbackError () {}
 
 	@Override
+	public void playOrderChanged () {}
+
+	@Override
 	public void exitRequested () {}
 
 }

@@ -2,6 +2,22 @@
 	<group android:id="@+id/group_popupmenu">
 
 		<item
+			android:id="@+id/playorder"
+			android:title="Play Order...">
+
+			<menu>
+				<item
+					android:id="@+id/playorder_queue_only"
+					android:title="Queue Only"
+					android:checkable="true"/>
+				<item
+					android:id="@+id/playorder_random"
+					android:title="Random"
+					android:checkable="true"/>
+			</menu>
+		</item>
+
+		<item
 			android:id="@+id/preferences"
 			android:icon="@drawable/pref"
 			android:title="Preferences"/>

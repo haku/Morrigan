@@ -766,9 +766,14 @@ public class MediaDbImpl implements MediaDb {
 				TBL_MF_ID + "=?",
 				new String[] { String.valueOf(rowId) },
 				null, 1);
+		return readFirstMediaItemFromCursor(c);
+	}
+
+	private MediaItem readFirstMediaItemFromCursor (final Cursor c) {
 		try {
 			if (c != null && c.moveToFirst()) {
 				final MediaCursorReader reader = new MediaCursorReader();
+				final long rowId = reader.readId(c);
 				final Uri uri = reader.readUri(c);
 				final String title = reader.readTitle(c);
 				final long sizeBytes = reader.readSizeBytes(c);
@@ -832,6 +837,15 @@ public class MediaDbImpl implements MediaDb {
 		finally {
 			IoHelper.closeQuietly(c);
 		}
+	}
+
+	@Override
+	public MediaItem randomMediaItem () {
+		final Cursor c = getMfCursor(
+				TBL_MF_ID + " IN (SELECT " + TBL_MF_ID + " FROM " + TBL_MF + " ORDER BY RANDOM() LIMIT 1)",
+				null,
+				null, 1);
+		return readFirstMediaItemFromCursor(c);
 	}
 
 	// SELECT uri FROM mf WHERE hash IN (

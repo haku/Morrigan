@@ -13,12 +13,14 @@ import android.support.v4.view.ColumnTitleStrip.ColumnClickListener;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.ViewGroup.LayoutParams;
 
 import com.vaguehope.morrigan.android.R;
 import com.vaguehope.morrigan.android.ServerActivity;
 import com.vaguehope.morrigan.android.checkout.CheckoutMgrActivity;
 import com.vaguehope.morrigan.android.helper.LogWrapper;
+import com.vaguehope.morrigan.android.playback.Playbacker.PlayOrder;
 import com.vaguehope.morrigan.android.playback.Playbacker.PlaybackWatcher;
 
 public class PlaybackActivity extends FragmentActivity {
@@ -141,10 +143,39 @@ public class PlaybackActivity extends FragmentActivity {
 	}
 
 	@Override
+	public boolean onPrepareOptionsMenu (final Menu menu) {
+		final int id;
+		switch (getPlaybacker().getPlayOrder()) {
+			case QUEUE_ONLY:
+				id = R.id.playorder_queue_only;
+				break;
+			case RANDOM:
+				id = R.id.playorder_random;
+				break;
+			default:
+				throw new IllegalStateException("Unknown playback order.");
+		}
+
+		final SubMenu playorderMenu = menu.findItem(R.id.playorder).getSubMenu();
+		for (int i = 0; i < playorderMenu.size(); i++) {
+			final MenuItem item = playorderMenu.getItem(i);
+			item.setChecked(item.getItemId() == id);
+		}
+
+		return true;
+	}
+
+	@Override
 	public boolean onOptionsItemSelected (final MenuItem item) {
 		switch (item.getItemId()) {
 			case android.R.id.home:
 				// TODO use this?
+				return true;
+			case R.id.playorder_queue_only:
+				getPlaybacker().setPlayOrder(PlayOrder.QUEUE_ONLY);
+				return true;
+			case R.id.playorder_random:
+				getPlaybacker().setPlayOrder(PlayOrder.RANDOM);
 				return true;
 			case R.id.preferences:
 				startActivity(new Intent(this, MnPreferenceActivity.class));
