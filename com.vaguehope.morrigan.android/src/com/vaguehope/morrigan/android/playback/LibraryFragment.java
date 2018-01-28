@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,8 +21,11 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.PopupMenu;
+import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
 
 import com.vaguehope.morrigan.android.R;
 import com.vaguehope.morrigan.android.helper.LogWrapper;
@@ -43,6 +47,7 @@ public class LibraryFragment extends Fragment {
 
 	private MessageHandler messageHandler;
 
+	private EditText txtSearch;
 	private Button btnLibrary;
 	private ListView mediaList;
 
@@ -152,6 +157,16 @@ public class LibraryFragment extends Fragment {
 
 	private void wireGui (final View rootView, final ViewGroup container) {
 		this.adapter = new MediaListCursorAdapter(container.getContext());
+
+		this.txtSearch = (EditText) rootView.findViewById(R.id.txtSearch);
+		this.txtSearch.setImeActionLabel("Search", KeyEvent.KEYCODE_ENTER);
+		this.txtSearch.setOnEditorActionListener(new OnEditorActionListener() {
+			@Override
+			public boolean onEditorAction (final TextView v, final int actionId, final KeyEvent event) {
+				reloadLibrary();
+				return true;
+			}
+		});
 
 		this.btnLibrary = (Button) rootView.findViewById(R.id.btnLibrary);
 		this.btnLibrary.setOnClickListener(this.btnLibraryOnClickListener);
@@ -327,19 +342,27 @@ public class LibraryFragment extends Fragment {
 	}
 
 	private void reloadLibrary () {
-		new LoadLibrary(this, this.currentLibrary, this.currentSortColumn, this.currentSortDirection).execute(); // TODO OnExecutor?
+		final String query = this.txtSearch.getText().toString().trim();
+		new LoadLibrary(this, this.currentLibrary, query, this.currentSortColumn, this.currentSortDirection).execute(); // TODO OnExecutor?
 	}
 
 	private static class LoadLibrary extends AsyncTask<Void, Void, Result<Cursor>> {
 
 		private final LibraryFragment host;
 		private final LibraryMetadata library;
+		private final String query;
 		private final SortColumn sortColumn;
 		private final SortDirection sortDirection;
 
-		public LoadLibrary (final LibraryFragment host, final LibraryMetadata library, final SortColumn sortColumn, final SortDirection sortDirection) {
+		public LoadLibrary (
+				final LibraryFragment host,
+				final LibraryMetadata library,
+				final String query,
+				final SortColumn sortColumn,
+				final SortDirection sortDirection) {
 			this.host = host;
 			this.library = library;
+			this.query = query;
 			this.sortColumn = sortColumn;
 			this.sortDirection = sortDirection;
 		}
@@ -354,7 +377,7 @@ public class LibraryFragment extends Fragment {
 			try {
 				final MediaDb db = this.host.getMediaDb();
 				if (db != null) {
-					final Cursor cursor = db.getAllMediaCursor(this.library.getId(), this.sortColumn, this.sortDirection);
+					final Cursor cursor = db.searchMediaCursor(this.library.getId(), this.query, this.sortColumn, this.sortDirection);
 					return new Result<Cursor>(cursor);
 				}
 				return new Result<Cursor>(new IllegalStateException("Failed to refresh column as DB was not bound."));

@@ -40,6 +40,7 @@ public interface MediaDb {
 	void rmMediaItemRows (Collection<Long> rowIds);
 
 	Cursor getAllMediaCursor (long libraryId, SortColumn sortColumn, SortDirection sortDirection);
+	Cursor searchMediaCursor (long libraryId, String query, SortColumn sortColumn, SortDirection sortDirection);
 	MediaItem getMediaItem(long rowId);
 	Presence hasMediaUri(long libraryId, Uri uri);
 	long getMediaRowId(long libraryId, Uri uri);

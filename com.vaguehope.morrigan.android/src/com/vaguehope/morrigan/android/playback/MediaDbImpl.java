@@ -20,6 +20,7 @@ import android.net.Uri;
 
 import com.vaguehope.morrigan.android.helper.IoHelper;
 import com.vaguehope.morrigan.android.helper.LogWrapper;
+import com.vaguehope.morrigan.android.helper.StringHelper;
 
 public class MediaDbImpl implements MediaDb {
 
@@ -743,6 +744,23 @@ public class MediaDbImpl implements MediaDb {
 	}
 
 	@Override
+	public Cursor searchMediaCursor (final long libraryId, final String query, final SortColumn sortColumn, final SortDirection sortDirection) {
+		if (StringHelper.isEmpty(query)) return getAllMediaCursor(libraryId, sortColumn, sortDirection);
+
+		final String sql = TBL_MF_DBID + "=?"
+				+ " AND " + TBL_MF_MISSING + " IS NULL"
+				+ " AND " + TBL_MF_TITLE + " LIKE ? ESCAPE ? COLLATE NOCASE";
+
+		final String[] args = new String[] {
+				String.valueOf(libraryId),
+				"%" + escapeSearch(query) + "%",
+				SEARCH_ESC };
+
+		return getMfCursor(sql, args,
+				toMfSortColumn(sortColumn) + " " + toSortDirection(sortDirection), -1);
+	}
+
+	@Override
 	public MediaItem getMediaItem (final long rowId) {
 		final Cursor c = getMfCursor(
 				TBL_MF_ID + "=?",
@@ -890,6 +908,22 @@ public class MediaDbImpl implements MediaDb {
 	@Override
 	public void removeMediaWatcher (final MediaWatcher watcher) {
 		this.mediaWatchers.remove(watcher);
+	}
+
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	private static final String SEARCH_ESC = "\\";
+
+	/**
+	 * This pairs with SEARCH_ESC.
+	 */
+	private static String escapeSearch (final String term) {
+		String q = term.replace("'", "''");
+		q = q.replace("\\", "\\\\");
+		q = q.replace("%", "\\%");
+		q = q.replace("_", "\\_");
+		q = q.replace("*", "%");
+		return q;
 	}
 
 }
