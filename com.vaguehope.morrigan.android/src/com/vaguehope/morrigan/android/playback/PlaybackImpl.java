@@ -2,6 +2,7 @@ package com.vaguehope.morrigan.android.playback;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -409,6 +410,10 @@ public class PlaybackImpl implements Playbacker {
 			success = true;
 			updateNotifPlayIcon();
 			this.playbackWatcherDispatcher.playbackPlaying();
+
+			if (item.hasRowId()) {
+				this.mediaDb.removeFromQueue(Collections.singleton(item));
+			}
 		}
 		finally {
 			if (!success) {

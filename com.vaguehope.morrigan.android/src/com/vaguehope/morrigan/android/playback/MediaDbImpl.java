@@ -188,8 +188,8 @@ public class MediaDbImpl implements MediaDb {
 		try {
 			final ContentValues values = new ContentValues();
 			for (final QueueItem item : items) {
-				if (item.getRowId() >= 0) throw new IllegalArgumentException("QueueItem already has rowId.");
-				if (item.getPosition() >= 0) throw new IllegalArgumentException("QueueItem already has position.");
+				if (item.hasRowId()) throw new IllegalArgumentException("QueueItem already has rowId.");
+				if (item.hasPosition()) throw new IllegalArgumentException("QueueItem already has position.");
 
 				values.clear();
 				copyQueueItemToContentValues(item, values);

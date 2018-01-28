@@ -1,6 +1,7 @@
 package com.vaguehope.morrigan.android.playback;
 
 import java.io.File;
+
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
@@ -85,8 +86,16 @@ public class QueueItem {
 		}
 	}
 
+	public boolean hasRowId () {
+		return this.rowId >= 0;
+	}
+
 	public long getRowId () {
 		return this.rowId;
+	}
+
+	public boolean hasPosition () {
+		return this.position >= 0;
 	}
 
 	public long getPosition () {
