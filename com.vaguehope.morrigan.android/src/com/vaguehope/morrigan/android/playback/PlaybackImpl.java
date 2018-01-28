@@ -17,6 +17,7 @@ import android.content.SharedPreferences.Editor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
 import android.os.PowerManager;
@@ -29,6 +30,7 @@ import com.vaguehope.morrigan.android.playback.MediaDb.MediaWatcher;
 public class PlaybackImpl implements Playbacker {
 
 	private static final String PREF_PLAYORDER = "playorder";
+	private static final String PREF_CURRENT_ITEM = "current_item";
 
 	private static final LogWrapper LOG = new LogWrapper("PI");
 
@@ -53,6 +55,7 @@ public class PlaybackImpl implements Playbacker {
 		makeNotif();
 
 		mediaDb.addMediaWatcher(this.queueWatcher);
+		restoreCurrentItem();
 	}
 
 	/**
@@ -248,6 +251,21 @@ public class PlaybackImpl implements Playbacker {
 		redrawNotifSubtitle();
 	}
 
+	private void saveCurrentItem () {
+		final String uri = this.currentItem != null ? this.currentItem.getUri().toString() : null;
+		final Editor edit = this.sharedPreferences.edit();
+		edit.putString(PREF_CURRENT_ITEM, uri);
+		edit.commit();
+	}
+
+	private void restoreCurrentItem () {
+		final String fromPref = this.sharedPreferences.getString(PREF_CURRENT_ITEM, null);
+		if (fromPref != null) {
+			final Uri uri = Uri.parse(fromPref);
+			setCurrentItem(new QueueItem(this.context, uri));
+		}
+	}
+
 	// Messages.
 
 	private enum Msgs {
@@ -411,6 +429,7 @@ public class PlaybackImpl implements Playbacker {
 			updateNotifPlayIcon();
 			this.playbackWatcherDispatcher.playbackPlaying();
 
+			saveCurrentItem();
 			if (item.hasRowId()) {
 				this.mediaDb.removeFromQueue(Collections.singleton(item));
 			}
