@@ -293,43 +293,75 @@ public class MediaDbImpl implements MediaDb {
 		}
 	}
 
-//	@Override
-//	public void moveQueueItemToPosition (final QueueItem item, final long newPosition) {
-//		this.mDb.beginTransaction();
-//		try {
-//			moveQueueItemToPosition(item.getRowId(), newPosition);
-//			this.mDb.setTransactionSuccessful();
-//		}
-//		finally {
-//			this.mDb.endTransaction();
-//		}
-//		this.mediaWatcherDispatcher.queueChanged();
-//	}
+//	SQLite checks uniqueness constraint after every row, not after the UPDATE. :(
 
-//	WARNING:
-//	moveQueueItemToPosition() can set position high than the next auto-increment value of _id.
-//	This will break things.
+	@Override
+	public void moveQueueItemToEnd (final long rowId, final MoveAction action) {
+		this.mDb.beginTransaction();
+		try {
+			final Long oldPosition = readPositionFromCursor(
+					getQuCursor(TBL_QU_ID + "=?", new String[] { String.valueOf(rowId) }, null, 1));
+			if (oldPosition == null) throw new IllegalArgumentException("rowId not found: "+ rowId);
 
-//	private void moveQueueItemToPosition (final long rowId, final long newPosition) {
-//		// SQLite checks uniqueness constraint after every row, not after the UPDATE. :(
-//
-//		this.mDb.execSQL(
-//				"UPDATE " + TBL_QU
-//				+ " SET " + TBL_QU_POSITION + "= - (" + TBL_QU_POSITION + "+1)"
-//				+ " WHERE " + TBL_QU_POSITION + ">=?",
-//				new String[] { String.valueOf(newPosition) });
-//
-//		this.mDb.execSQL(
-//				"UPDATE " + TBL_QU
-//				+ " SET " + TBL_QU_POSITION + "= - " + TBL_QU_POSITION
-//				+ " WHERE " + TBL_QU_POSITION + "<0");
-//
-//		final ContentValues values = new ContentValues();
-//		values.put(TBL_QU_POSITION, newPosition);
-//		final int affected = this.mDb.update(TBL_QU, values, TBL_QU_ID + "=?", new String[] { String.valueOf(rowId) });
-//		if (affected > 1) throw new IllegalStateException("Updating queue row " + rowId + " affected " + affected + " rows, expected 1.");
-//		if (affected < 1) LOG.w("Updating queue row %s affected %s rows, expected 1.", rowId, affected);
-//	}
+			final String sortDirection;
+			switch (action) {
+				case UP:
+					sortDirection = "ASC";
+					break;
+				case DOWN:
+					sortDirection = "DESC";
+					break;
+				default:
+					throw new IllegalArgumentException("Unknown action.");
+			}
+			final Long newPosition = readPositionFromCursor(
+					getQuCursor(null, null,
+							TBL_QU_POSITION + " " + sortDirection, 1));
+			if (newPosition == null) throw new IllegalArgumentException("End position not found.");
+
+			rollQueueItems(oldPosition, newPosition);
+			this.mDb.setTransactionSuccessful();
+		}
+		finally {
+			this.mDb.endTransaction();
+		}
+		this.mediaWatcherDispatcher.queueChanged();
+	}
+
+	private void rollQueueItems (final long fromPos, final long toPos) {
+		if (fromPos == toPos) return;
+
+		setPositionByPosition(fromPos, -toPos);
+
+		final long offset;
+		final long minPosToRoll;
+		final long maxPosToRoll;
+		if (fromPos > toPos) { // bottom item goes to top.
+			offset = 1;
+			minPosToRoll = toPos;
+			maxPosToRoll = fromPos - 1;
+		}
+		else { // Top item goes to bottom.
+			offset = -1;
+			minPosToRoll = fromPos + 1;
+			maxPosToRoll = toPos;
+		}
+		this.mDb.execSQL(
+				"UPDATE " + TBL_QU
+				+ " SET " + TBL_QU_POSITION + "= - (" + TBL_QU_POSITION + "+?)"
+				+ " WHERE " + TBL_QU_POSITION + ">=?"
+				+ " AND " + TBL_QU_POSITION + "<=?",
+				new String[] {
+						String.valueOf(offset),
+						String.valueOf(minPosToRoll),
+						String.valueOf(maxPosToRoll) });
+
+		// Flip all negatives.
+		this.mDb.execSQL(
+				"UPDATE " + TBL_QU
+				+ " SET " + TBL_QU_POSITION + "= - " + TBL_QU_POSITION
+				+ " WHERE " + TBL_QU_POSITION + "<0");
+	}
 
 	private void setPositionByPosition (final long oldPosition, final long newPosition) {
 		final ContentValues values = new ContentValues();

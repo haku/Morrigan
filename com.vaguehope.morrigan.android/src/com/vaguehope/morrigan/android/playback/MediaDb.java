@@ -19,6 +19,7 @@ public interface MediaDb {
 
 //	void moveQueueItemToPosition(final QueueItem item, final long newPosition);
 	void moveQueueItem(long rowId, MoveAction action);
+	void moveQueueItemToEnd(long rowId, MoveAction action);
 
 	enum MoveAction {
 		UP,

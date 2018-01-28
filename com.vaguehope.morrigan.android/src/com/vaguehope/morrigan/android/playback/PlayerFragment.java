@@ -153,6 +153,12 @@ public class PlayerFragment extends Fragment {
 	@Override
 	public boolean onContextItemSelected (final MenuItem menuItem) {
 		switch (menuItem.getItemId()) {
+			case PlaybackCodes.MENU_MOVE_TOP:
+				moveQueueItemTopById(((AdapterView.AdapterContextMenuInfo) menuItem.getMenuInfo()).id);
+				return true;
+			case PlaybackCodes.MENU_MOVE_BOTTOM:
+				moveQueueItemBottomById(((AdapterView.AdapterContextMenuInfo) menuItem.getMenuInfo()).id);
+				return true;
 			case PlaybackCodes.MENU_MOVE_UP:
 				moveQueueItemUpById(((AdapterView.AdapterContextMenuInfo) menuItem.getMenuInfo()).id);
 				return true;
@@ -363,11 +369,25 @@ public class PlayerFragment extends Fragment {
 			final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
 			final QueueItem item = getMediaDb().getQueueItemById(info.id);
 			menu.setHeaderTitle(item.getTitle());
+			menu.add(Menu.NONE, PlaybackCodes.MENU_MOVE_TOP, Menu.NONE, "Move Top");
 			menu.add(Menu.NONE, PlaybackCodes.MENU_MOVE_UP, Menu.NONE, "Move Up");
 			menu.add(Menu.NONE, PlaybackCodes.MENU_MOVE_DOWN, Menu.NONE, "Move Down");
+			menu.add(Menu.NONE, PlaybackCodes.MENU_MOVE_BOTTOM, Menu.NONE, "Move Bottom");
 			menu.add(Menu.NONE, PlaybackCodes.MENU_REMOVE, Menu.NONE, "Remove");
 		}
 	};
+
+	private void moveQueueItemTopById (final long itemId) {
+		final MediaDb db = getMediaDb();
+		if (db == null) return;
+		db.moveQueueItemToEnd(itemId, MoveAction.UP);
+	}
+
+	private void moveQueueItemBottomById (final long itemId) {
+		final MediaDb db = getMediaDb();
+		if (db == null) return;
+		db.moveQueueItemToEnd(itemId, MoveAction.DOWN);
+	}
 
 	private void moveQueueItemUpById (final long itemId) {
 		final MediaDb db = getMediaDb();

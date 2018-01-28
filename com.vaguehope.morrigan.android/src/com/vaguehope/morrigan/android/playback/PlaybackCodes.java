@@ -18,5 +18,7 @@ public interface PlaybackCodes {
 	int MENU_REMOVE = 2001;
 	int MENU_MOVE_UP = 2002;
 	int MENU_MOVE_DOWN = 2003;
+	int MENU_MOVE_TOP = 2004;
+	int MENU_MOVE_BOTTOM = 2005;
 
 }
