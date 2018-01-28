@@ -236,6 +236,16 @@ public class LibraryFragment extends Fragment {
 	private void onLibrariesChanged () {
 		this.allLibraries = getMediaDb().getLibraries();
 
+		makeLibraryMenu();
+
+		LOG.i("menu reset %s %s", this.currentLibrary, this.allLibraries.size());
+
+		if (this.currentLibrary == null && this.allLibraries.size() > 0) {
+			setCurrentLibrary(this.allLibraries.iterator().next());
+		}
+	}
+
+	private void makeLibraryMenu () {
 		final PopupMenu newMenu = new PopupMenu(getActivity(), LibraryFragment.this.btnLibrary);
 		for (final LibraryMetadata library : this.allLibraries) {
 			final MenuItem item = newMenu.getMenu().add(Menu.NONE, MENU_LIBRARY_ID_START + (int) library.getId(), Menu.NONE, library.getName());
@@ -271,11 +281,25 @@ public class LibraryFragment extends Fragment {
 			});
 		}
 		this.libraryMenu = newMenu;
+		updateLibraryMenuSelections();
+	}
 
-		if (this.currentLibrary == null && this.allLibraries.size() > 0) {
-			setCurrentLibrary(this.allLibraries.iterator().next());
+	private void updateLibraryMenuSelections () {
+		final LibraryMetadata library = this.currentLibrary;
+		final SortColumn sortColumn = this.currentSortColumn;
+		final SortDirection sortDirection = this.currentSortDirection;
+		final PopupMenu menu = this.libraryMenu;
+		if (library == null || sortColumn == null || sortDirection == null || menu == null) return;
+
+		for (int i = 0; i < menu.getMenu().size(); i++) {
+			final MenuItem item = menu.getMenu().getItem(i);
+			item.setChecked(item.getItemId() == MENU_LIBRARY_ID_START + library.getId()
+					|| item.getItemId() == MENU_LIBRARY_COLUMN_START + sortColumn.ordinal()
+					|| item.getItemId() == MENU_LIBRARY_DIRECTION_START + sortDirection.ordinal());
 		}
 	}
+
+
 
 	private void setCurrentLibrary (final LibraryMetadata library) {
 		setCurrentLibrary(library, this.currentSortColumn, this.currentSortDirection);
@@ -299,15 +323,7 @@ public class LibraryFragment extends Fragment {
 		((PlaybackActivity) getActivity()).getSectionsPagerAdapter().setPageTitle(this.fragmentPosition, library.getName());
 		this.btnLibrary.setText(library.getName());
 
-		final PopupMenu menu = this.libraryMenu;
-		if (menu != null) {
-			for (int i = 0; i < menu.getMenu().size(); i++) {
-				final MenuItem item = menu.getMenu().getItem(i);
-				item.setChecked(item.getItemId() == MENU_LIBRARY_ID_START + library.getId()
-						|| item.getItemId() == MENU_LIBRARY_COLUMN_START + sortColumn.ordinal()
-						|| item.getItemId() == MENU_LIBRARY_DIRECTION_START + sortDirection.ordinal());
-			}
-		}
+		updateLibraryMenuSelections();
 	}
 
 	private void reloadLibrary () {
