@@ -30,7 +30,8 @@ import com.vaguehope.morrigan.android.playback.MediaDb.MediaWatcher;
 public class PlaybackImpl implements Playbacker {
 
 	private static final String PREF_PLAYORDER = "playorder";
-	private static final String PREF_CURRENT_ITEM = "current_item";
+	private static final String PREF_CURRENT_LIBRARY_ID = "current_library_id";
+	private static final String PREF_CURRENT_ITEM_URI = "current_item_uri";
 
 	private static final LogWrapper LOG = new LogWrapper("PI");
 
@@ -179,10 +180,20 @@ public class PlaybackImpl implements Playbacker {
 		final QueueItem fromQueue = this.mediaDb.getFirstQueueItem();
 		if (fromQueue != null) return fromQueue;
 
+		final QueueItem prevItem = this.currentItem;
+		final long currentLibId = prevItem != null && prevItem.hasLibraryId()
+				? prevItem.getLibraryId()
+				: -1;
+
 		final MediaItem mediaItem;
 		switch (getPlayOrder()) {
 			case RANDOM:
-				mediaItem = this.mediaDb.randomMediaItem();
+				if (currentLibId >= 0) {
+					mediaItem = this.mediaDb.randomMediaItem(currentLibId);
+				}
+				else {
+					mediaItem = null;
+				}
 				break;
 			case QUEUE_ONLY:
 			default:
@@ -252,21 +263,33 @@ public class PlaybackImpl implements Playbacker {
 	}
 
 	private void saveCurrentItem () {
+		final Long libId = this.currentItem != null && this.currentItem.hasLibraryId()
+				? this.currentItem.getLibraryId()
+				: null;
 		final String uri = this.currentItem != null ? this.currentItem.getUri().toString() : null;
+
 		final Editor edit = this.sharedPreferences.edit();
-		edit.putString(PREF_CURRENT_ITEM, uri);
+		if (libId != null) {
+			edit.putLong(PREF_CURRENT_LIBRARY_ID, libId);
+		}
+		else {
+			edit.remove(PREF_CURRENT_LIBRARY_ID);
+		}
+		edit.putString(PREF_CURRENT_ITEM_URI, uri);
 		edit.commit();
 	}
 
 	private void restoreCurrentItem () {
-		final String fromPref = this.sharedPreferences.getString(PREF_CURRENT_ITEM, null);
-		if (fromPref != null) {
+		final long prefLibId = this.sharedPreferences.getLong(PREF_CURRENT_LIBRARY_ID, -1);
+		final String prefUri = this.sharedPreferences.getString(PREF_CURRENT_ITEM_URI, null);
+
+		if (prefUri != null) {
 			try {
-				final Uri uri = Uri.parse(fromPref);
-				setCurrentItem(new QueueItem(this.context, uri));
+				final Uri uri = Uri.parse(prefUri);
+				setCurrentItem(new QueueItem(this.context, prefLibId, uri));
 			}
 			catch (final Exception e) {
-				LOG.e("Failed to restore current item: " + fromPref, e);
+				LOG.e("Failed to restore current item: " + prefLibId + ":" + prefUri, e);
 			}
 		}
 	}

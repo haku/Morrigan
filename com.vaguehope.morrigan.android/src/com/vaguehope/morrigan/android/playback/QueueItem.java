@@ -17,6 +17,7 @@ public class QueueItem {
 
 	private final long rowId;
 	private final long position;
+	private final long libraryId;
 	private final Uri uri;
 	private final String title;
 	private final long sizeBytes;
@@ -25,12 +26,14 @@ public class QueueItem {
 	public QueueItem (
 			final long rowId,
 			final long position,
+			final long libraryId,
 			final Uri uri,
 			final String title,
 			final long sizeBytes,
 			final long durationMillis) {
 		this.rowId = rowId;
 		this.position = position;
+		this.libraryId = libraryId;
 		this.uri = uri;
 		this.title = title;
 		this.sizeBytes = sizeBytes;
@@ -39,12 +42,17 @@ public class QueueItem {
 
 	public QueueItem (final Context context, final MediaItem mi) {
 		// TODO could do a much better job here.
-		this(context, mi.getUri());
+		this(context, mi.getLibraryId(), mi.getUri());
 	}
 
 	public QueueItem (final Context context, final Uri uri) {
+		this(context, -1, uri);
+	}
+
+	public QueueItem (final Context context, final long libraryId, final Uri uri) {
 		this.rowId = -1;
 		this.position = -1;
+		this.libraryId = libraryId;
 		this.uri = uri;
 
 		if (uri == null) {
@@ -100,6 +108,14 @@ public class QueueItem {
 
 	public long getPosition () {
 		return this.position;
+	}
+
+	public boolean hasLibraryId () {
+		return this.libraryId >= 0;
+	}
+
+	public long getLibraryId () {
+		return this.libraryId;
 	}
 
 	public Uri getUri () {

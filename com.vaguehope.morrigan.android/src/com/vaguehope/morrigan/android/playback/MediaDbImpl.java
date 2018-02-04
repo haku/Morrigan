@@ -27,7 +27,7 @@ public class MediaDbImpl implements MediaDb {
 	protected static final LogWrapper LOG = new LogWrapper("MDI");
 
 	private static final String DB_NAME = "media";
-	private static final int DB_VERSION = 5;
+	private static final int DB_VERSION = 6;
 
 	private static class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -59,6 +59,9 @@ public class MediaDbImpl implements MediaDb {
 			if (oldVersion < 5) { // NOSONAR not a magic number.
 				db.execSQL(TBL_QU_CREATE);
 				db.execSQL(TBL_QU_POS_TRIGGER);
+			}
+			if (oldVersion < 6) { // NOSONAR not a magic number.
+				addColumn(db, TBL_QU, TBL_QU_DBID, "integer");
 			}
 		}
 
@@ -101,6 +104,7 @@ public class MediaDbImpl implements MediaDb {
 	private static final String TBL_QU = "qu";
 	protected static final String TBL_QU_ID = "_id";
 	protected static final String TBL_QU_POSITION = "pos";
+	protected static final String TBL_QU_DBID = "dbid";
 	protected static final String TBL_QU_URI = "uri";
 	protected static final String TBL_QU_TITLE = "title";
 	protected static final String TBL_QU_SIZE = "size";
@@ -109,6 +113,7 @@ public class MediaDbImpl implements MediaDb {
 	private static final String TBL_QU_CREATE = "CREATE TABLE " + TBL_QU + " ("
 			+ TBL_QU_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
 			+ TBL_QU_POSITION + " INTEGER,"
+			+ TBL_QU_DBID + " INTEGER,"
 			+ TBL_QU_URI + " TEXT,"
 			+ TBL_QU_TITLE + " TEXT,"
 			+ TBL_QU_SIZE + " INTEGER,"
@@ -138,7 +143,7 @@ public class MediaDbImpl implements MediaDb {
 
 	private static final String TBL_MF = "mf";
 	protected static final String TBL_MF_ID = "_id";
-	private static final String TBL_MF_DBID = "dbid";
+	protected static final String TBL_MF_DBID = "dbid";
 	protected static final String TBL_MF_URI = "uri";
 	protected static final String TBL_MF_MISSING = "missing";
 	protected static final String TBL_MF_TITLE = "title";
@@ -176,6 +181,7 @@ public class MediaDbImpl implements MediaDb {
 
 	private static void copyQueueItemToContentValues (final QueueItem item, final ContentValues values) {
 		// Do not include ID or position.
+		values.put(TBL_QU_DBID, item.getLibraryId());
 		values.put(TBL_QU_URI, item.getUri().toString());
 		values.put(TBL_QU_TITLE, item.getTitle());
 		values.put(TBL_QU_SIZE, item.getSizeBytes());
@@ -243,6 +249,7 @@ public class MediaDbImpl implements MediaDb {
 				new String[] {
 						TBL_QU_ID,
 						TBL_QU_POSITION,
+						TBL_QU_DBID,
 						TBL_QU_URI,
 						TBL_QU_TITLE,
 						TBL_QU_SIZE,
@@ -276,12 +283,14 @@ public class MediaDbImpl implements MediaDb {
 				final QueueCursorReader reader = new QueueCursorReader();
 				final long rowId = reader.readId(c);
 				final long position = reader.readPosition(c);
+				final long libId = reader.readLibId(c);
 				final Uri uri = reader.readUri(c);
 				final String title = reader.readTitle(c);
 				final long sizeBytes = reader.readSizeBytes(c);
 				final long durationMillis = reader.readDurationMillis(c);
 				return new QueueItem(rowId,
 						position,
+						libId,
 						uri,
 						title,
 						sizeBytes,
@@ -554,15 +563,16 @@ public class MediaDbImpl implements MediaDb {
 	}
 
 	@Override
-	public void addMedia (final long libraryId, final Collection<MediaItem> items) {
+	public void addMedia (final Collection<MediaItem> items) {
 		this.mDb.beginTransaction();
 		try {
 			final ContentValues values = new ContentValues();
 			for (final MediaItem item : items) {
 				if (item.getRowId() >= 0) throw new IllegalArgumentException("MediaItem already has rowId.");
+				if (item.getLibraryId() < 0) throw new IllegalArgumentException("MediaItem missing libraryId.");
 
 				values.clear();
-				values.put(TBL_MF_DBID, libraryId);
+				values.put(TBL_MF_DBID, item.getLibraryId());
 				copyMediaItemToContentValues(item, values);
 
 				final long newId = this.mDb.insert(TBL_MF, null, values);
@@ -774,6 +784,7 @@ public class MediaDbImpl implements MediaDb {
 			if (c != null && c.moveToFirst()) {
 				final MediaCursorReader reader = new MediaCursorReader();
 				final long rowId = reader.readId(c);
+				final long libId = reader.readLibraryId(c);
 				final Uri uri = reader.readUri(c);
 				final String title = reader.readTitle(c);
 				final long sizeBytes = reader.readSizeBytes(c);
@@ -785,6 +796,7 @@ public class MediaDbImpl implements MediaDb {
 				final int endCount = reader.readEndCount(c);
 				final long durationMillis = reader.readDurationMillis(c);
 				return new MediaItem(rowId,
+						libId,
 						uri,
 						title,
 						sizeBytes,
@@ -840,10 +852,13 @@ public class MediaDbImpl implements MediaDb {
 	}
 
 	@Override
-	public MediaItem randomMediaItem () {
+	public MediaItem randomMediaItem (final long libraryId) {
 		final Cursor c = getMfCursor(
-				TBL_MF_ID + " IN (SELECT " + TBL_MF_ID + " FROM " + TBL_MF + " ORDER BY RANDOM() LIMIT 1)",
-				null,
+				TBL_MF_ID + " IN (SELECT " + TBL_MF_ID
+				+ " FROM " + TBL_MF
+				+ " WHERE " + TBL_MF_DBID + "=?"
+				+ " ORDER BY RANDOM() LIMIT 1)",
+				new String[] { String.valueOf(libraryId) },
 				null, 1);
 		return readFirstMediaItemFromCursor(c);
 	}

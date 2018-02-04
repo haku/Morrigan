@@ -10,6 +10,7 @@ import android.net.Uri;
 public class MediaCursorReader {
 
 	private int colId = -1;
+	private int colLibraryId = -1;
 	private int colUri = -1;
 	private int colMissing = -1;
 	private int colTitle = -1;
@@ -26,6 +27,12 @@ public class MediaCursorReader {
 		if (c == null) return -1;
 		if (this.colId < 0) this.colId = c.getColumnIndexOrThrow(MediaDbImpl.TBL_MF_ID);
 		return c.getLong(this.colId);
+	}
+
+	public long readLibraryId (final Cursor c) {
+		if (c == null) return -1;
+		if (this.colLibraryId < 0) this.colLibraryId = c.getColumnIndexOrThrow(MediaDbImpl.TBL_MF_DBID);
+		return c.getLong(this.colLibraryId);
 	}
 
 	public Uri readUri (final Cursor c) {

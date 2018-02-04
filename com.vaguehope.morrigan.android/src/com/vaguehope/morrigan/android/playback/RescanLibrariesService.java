@@ -159,7 +159,7 @@ public class RescanLibrariesService extends MediaBindingAwakeService {
 					final Presence presence = mediaDb.hasMediaUri(library.getId(), file.getUri());
 					if (presence == Presence.UNKNOWN) {
 						LOG.i("New: %s", file.getUri());
-						toAdd.add(makeMediaItem(file));
+						toAdd.add(makeMediaItem(library, file));
 					}
 					else if (presence == Presence.MISSING) {
 						LOG.i("Restored: %s", file.getUri());
@@ -183,7 +183,7 @@ public class RescanLibrariesService extends MediaBindingAwakeService {
 
 	private static void addMediaToLibrary (final MediaDb mediaDb, final LibraryMetadata library, final List<MediaItem> toAdd, final List<Long> toMarkAsFound) {
 		LOG.i("Adding %s new items to library %s...", toAdd.size(), library.getId());
-		mediaDb.addMedia(library.getId(), toAdd);
+		mediaDb.addMedia(toAdd);
 
 		LOG.i("Marking %s items as found...", toMarkAsFound.size());
 		mediaDb.setFilesExist(toMarkAsFound, true);
@@ -211,8 +211,9 @@ public class RescanLibrariesService extends MediaBindingAwakeService {
 		return true;
 	}
 
-	private static MediaItem makeMediaItem (final DocumentFile file) {
-		return new MediaItem(file.getUri(), file.getName(), file.length(), file.lastModified(), System.currentTimeMillis());
+	private static MediaItem makeMediaItem (final LibraryMetadata library, final DocumentFile file) {
+		return new MediaItem(library.getId(),
+				file.getUri(), file.getName(), file.length(), file.lastModified(), System.currentTimeMillis());
 	}
 
 	private void updateMetadataForKnowItems (final LibraryMetadata library, final int notificationId, final Builder notif) throws IOException {

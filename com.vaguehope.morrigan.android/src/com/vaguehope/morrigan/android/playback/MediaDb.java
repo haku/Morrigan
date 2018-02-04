@@ -31,7 +31,7 @@ public interface MediaDb {
 	void updateLibrary(LibraryMetadata libraryMetadata);
 	void deleteLibrary(LibraryMetadata libraryMetadata);
 
-	void addMedia (long libraryId, Collection<MediaItem> items);
+	void addMedia (Collection<MediaItem> items);
 	void updateMedia(Collection<MediaItem> items);
 	void setFilesExist(Collection<Long> rowId, boolean fileExists);
 	void setFileMetadata(long rowId, long fileSize, long fileLastModifiedMillis, BigInteger hash);
@@ -44,7 +44,7 @@ public interface MediaDb {
 	Presence hasMediaUri(long libraryId, Uri uri);
 	long getMediaRowId(long libraryId, Uri uri);
 
-	MediaItem randomMediaItem();
+	MediaItem randomMediaItem(long libraryId);
 
 	Cursor findDuplicates(long libraryId);
 	void mergeItems(long destRowId, Collection<Long> fromRowIds);

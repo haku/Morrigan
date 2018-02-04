@@ -7,6 +7,7 @@ public class QueueCursorReader {
 
 	private int colId = -1;
 	private int colPos = -1;
+	private int colLibId = -1;
 	private int colUri = -1;
 	private int colTitle = -1;
 	private int colSize = -1;
@@ -22,6 +23,12 @@ public class QueueCursorReader {
 		if (c == null) return -1;
 		if (this.colPos < 0) this.colPos = c.getColumnIndexOrThrow(MediaDbImpl.TBL_QU_POSITION);
 		return c.getLong(this.colPos);
+	}
+
+	public long readLibId (final Cursor c) {
+		if (c == null) return -1;
+		if (this.colLibId < 0) this.colLibId = c.getColumnIndexOrThrow(MediaDbImpl.TBL_QU_DBID);
+		return c.getLong(this.colLibId);
 	}
 
 	public Uri readUri (final Cursor c) {

@@ -7,6 +7,7 @@ import android.net.Uri;
 public class MediaItem {
 
 	private final long rowId;
+	private final long libraryId;
 	private final Uri uri;
 	private final String title;
 	private final long sizeBytes;
@@ -18,16 +19,17 @@ public class MediaItem {
 	private final int endCount;
 	private final long durationMillis;
 
-	public MediaItem (final Uri uri, final String title,
+	public MediaItem (final long libraryId, final Uri uri, final String title,
 			final long sizeBytes, final long timeFileLastModified, final long timeAddedMillis) {
-		this(-1, uri, title, sizeBytes, timeFileLastModified, null, timeAddedMillis, -1, 0, 0, -1);
+		this(-1, libraryId, uri, title, sizeBytes, timeFileLastModified, null, timeAddedMillis, -1, 0, 0, -1);
 	}
 
-	public MediaItem (final long rowId, final Uri uri, final String title,
+	public MediaItem (final long rowId, final long libraryId, final Uri uri, final String title,
 			final long sizeBytes, final long timeFileLastModified, final BigInteger fileHash,
 			final long timeAddedMillis, final long timeLastPlayedMillis,
 			final int startCount, final int endCount, final long durationMillis) {
 		this.rowId = rowId;
+		this.libraryId = libraryId;
 		this.uri = uri;
 		this.title = title;
 		this.sizeBytes = sizeBytes;
@@ -38,6 +40,10 @@ public class MediaItem {
 		this.startCount = startCount;
 		this.endCount = endCount;
 		this.durationMillis = durationMillis;
+	}
+
+	public long getLibraryId () {
+		return this.libraryId;
 	}
 
 	public long getRowId () {
@@ -91,25 +97,25 @@ public class MediaItem {
 	}
 
 	public MediaItem withTimeAdded(final long newTimeAddedMillis) {
-		return new MediaItem(this.rowId, this.uri, this.title, this.sizeBytes,
+		return new MediaItem(this.rowId, this.libraryId, this.uri, this.title, this.sizeBytes,
 				this.timeFileLastModified, this.fileHash, newTimeAddedMillis, this.timeLastPlayedMillis,
 				this.startCount, this.endCount, this.durationMillis);
 	}
 
 	public MediaItem withTimeLastPlayed(final long newTimeLastPlayedMillis) {
-		return new MediaItem(this.rowId, this.uri, this.title, this.sizeBytes,
+		return new MediaItem(this.rowId, this.libraryId, this.uri, this.title, this.sizeBytes,
 				this.timeFileLastModified, this.fileHash, this.timeAddedMillis, newTimeLastPlayedMillis,
 				this.startCount, this.endCount, this.durationMillis);
 	}
 
 	public MediaItem withStartCount(final int newStartCount) {
-		return new MediaItem(this.rowId, this.uri, this.title, this.sizeBytes,
+		return new MediaItem(this.rowId, this.libraryId, this.uri, this.title, this.sizeBytes,
 				this.timeFileLastModified, this.fileHash, this.timeAddedMillis, this.timeLastPlayedMillis,
 				newStartCount, this.endCount, this.durationMillis);
 	}
 
 	public MediaItem withEndCount(final int newEndCount) {
-		return new MediaItem(this.rowId, this.uri, this.title, this.sizeBytes,
+		return new MediaItem(this.rowId, this.libraryId, this.uri, this.title, this.sizeBytes,
 				this.timeFileLastModified, this.fileHash, this.timeAddedMillis, this.timeLastPlayedMillis,
 				this.startCount, newEndCount, this.durationMillis);
 	}
