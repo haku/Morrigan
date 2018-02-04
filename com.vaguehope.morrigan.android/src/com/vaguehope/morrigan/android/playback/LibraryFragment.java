@@ -26,6 +26,7 @@ import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
+import android.widget.Toast;
 
 import com.vaguehope.morrigan.android.R;
 import com.vaguehope.morrigan.android.helper.LogWrapper;
@@ -245,6 +246,7 @@ public class LibraryFragment extends Fragment {
 			final QueueItem item = new QueueItem(getActivity(), mediaItem);
 			getMediaDb().addToQueue(Collections.singleton(item));
 			LOG.i("Added to queue: %s", item);
+			Toast.makeText(getActivity(), String.format("Enqueued:\n%s", item.getTitle()), Toast.LENGTH_SHORT).show();
 		}
 	}
 
