@@ -17,7 +17,6 @@ import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
-
 import com.vaguehope.morrigan.android.helper.IoHelper;
 import com.vaguehope.morrigan.android.helper.LogWrapper;
 import com.vaguehope.morrigan.android.helper.StringHelper;
@@ -373,6 +372,14 @@ public class MediaDbImpl implements MediaDb {
 				+ " WHERE " + TBL_QU_POSITION + "<0");
 	}
 
+	private void setPositionByRowId (final long rowId, final long newPosition) {
+		final ContentValues values = new ContentValues();
+		values.put(TBL_QU_POSITION, newPosition);
+		final int affected = this.mDb.update(TBL_QU, values, TBL_QU_ID + "=?", new String[] { String.valueOf(rowId) });
+		if (affected > 1) throw new IllegalStateException("Updating queue row with ID " + rowId + " affected " + affected + " rows, expected 1.");
+		if (affected < 1) LOG.w("Updating queue row with ID %s affected %s rows, expected 1.", rowId, affected);
+	}
+
 	private void setPositionByPosition (final long oldPosition, final long newPosition) {
 		final ContentValues values = new ContentValues();
 		values.put(TBL_QU_POSITION, newPosition);
@@ -437,6 +444,65 @@ public class MediaDbImpl implements MediaDb {
 		finally {
 			IoHelper.closeQuietly(c);
 		}
+	}
+
+	@Override
+	public void clearQueue () {
+		this.mDb.beginTransaction();
+		try {
+			this.mDb.delete(TBL_QU, null, null);
+			this.mDb.setTransactionSuccessful();
+		}
+		finally {
+			this.mDb.endTransaction();
+		}
+		this.mediaWatcherDispatcher.queueChanged();
+	}
+
+	@Override
+	public void shuffleQueue () {
+		this.mDb.beginTransaction();
+		try {
+			final List<Long> rowIds = new ArrayList<Long>();
+			final List<Long> positions = new ArrayList<Long>();
+
+			final Cursor c = getQuCursor(null, null, null, -1);
+			try {
+				if (c != null && c.moveToFirst()) {
+					final QueueCursorReader reader = new QueueCursorReader();
+					do {
+						final long rowId = reader.readId(c);
+						final long position = reader.readPosition(c);
+						rowIds.add(rowId);
+						positions.add(position);
+					}
+					while (c.moveToNext());
+				}
+			}
+			finally {
+				IoHelper.closeQuietly(c);
+			}
+
+			Collections.shuffle(positions);
+
+			for (int i = 0; i < rowIds.size(); i++) {
+				final Long rowId = rowIds.get(i);
+				final Long position = positions.get(i);
+				setPositionByRowId(rowId, -position);
+			}
+
+			// Flip all negatives.
+			this.mDb.execSQL(
+					"UPDATE " + TBL_QU
+					+ " SET " + TBL_QU_POSITION + "= - " + TBL_QU_POSITION
+					+ " WHERE " + TBL_QU_POSITION + "<0");
+
+			this.mDb.setTransactionSuccessful();
+		}
+		finally {
+			this.mDb.endTransaction();
+		}
+		this.mediaWatcherDispatcher.queueChanged();
 	}
 
 //	Library methods.

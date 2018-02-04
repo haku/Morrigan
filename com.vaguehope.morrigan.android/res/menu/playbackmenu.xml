@@ -16,6 +16,20 @@
 					android:checkable="true"/>
 			</menu>
 		</item>
+		
+		<item
+			android:id="@+id/queue"
+			android:title="Queue...">
+
+			<menu>
+				<item
+					android:id="@+id/queue_shuffle"
+					android:title="Shuffle Queue"/>
+				<item
+					android:id="@+id/queue_clear"
+					android:title="Clear Queue"/>
+			</menu>
+		</item>
 
 		<item
 			android:id="@+id/preferences"

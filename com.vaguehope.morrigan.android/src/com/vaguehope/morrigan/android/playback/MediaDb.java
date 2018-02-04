@@ -25,6 +25,9 @@ public interface MediaDb {
 		DOWN;
 	}
 
+	void clearQueue();
+	void shuffleQueue();
+
 	LibraryMetadata newLibrary (String name);
 	Collection<LibraryMetadata> getLibraries ();
 	LibraryMetadata getLibrary (long libraryId);

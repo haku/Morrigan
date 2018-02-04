@@ -130,6 +130,12 @@ public class PlaybackActivity extends FragmentActivity {
 		return d.getService().getPlaybacker();
 	}
 
+	protected MediaDb getMediaDb () {
+		final MediaClient d = this.bndPb;
+		if (d == null) return null;
+		return d.getService().getMediaDb();
+	}
+
 	protected SectionsPagerAdapter getSectionsPagerAdapter() {
 		return this.sectionsPagerAdapter;
 	}
@@ -176,6 +182,12 @@ public class PlaybackActivity extends FragmentActivity {
 				return true;
 			case R.id.playorder_random:
 				getPlaybacker().setPlayOrder(PlayOrder.RANDOM);
+				return true;
+			case R.id.queue_shuffle:
+				getMediaDb().shuffleQueue();
+				return true;
+			case R.id.queue_clear:
+				getMediaDb().clearQueue();
 				return true;
 			case R.id.preferences:
 				startActivity(new Intent(this, MnPreferenceActivity.class));
