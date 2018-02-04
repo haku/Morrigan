@@ -261,8 +261,13 @@ public class PlaybackImpl implements Playbacker {
 	private void restoreCurrentItem () {
 		final String fromPref = this.sharedPreferences.getString(PREF_CURRENT_ITEM, null);
 		if (fromPref != null) {
-			final Uri uri = Uri.parse(fromPref);
-			setCurrentItem(new QueueItem(this.context, uri));
+			try {
+				final Uri uri = Uri.parse(fromPref);
+				setCurrentItem(new QueueItem(this.context, uri));
+			}
+			catch (final Exception e) {
+				LOG.e("Failed to restore current item: " + fromPref, e);
+			}
 		}
 	}
 
