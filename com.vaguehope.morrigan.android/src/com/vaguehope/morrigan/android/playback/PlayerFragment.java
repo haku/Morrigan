@@ -31,6 +31,7 @@ import com.vaguehope.morrigan.android.helper.LogWrapper;
 import com.vaguehope.morrigan.android.helper.Result;
 import com.vaguehope.morrigan.android.playback.MediaDb.MediaWatcher;
 import com.vaguehope.morrigan.android.playback.MediaDb.MoveAction;
+import com.vaguehope.morrigan.android.playback.MediaDb.QueueEnd;
 import com.vaguehope.morrigan.android.playback.Playbacker.PlaybackWatcher;
 
 public class PlayerFragment extends Fragment {
@@ -366,7 +367,7 @@ public class PlayerFragment extends Fragment {
 		final Playbacker pb = getPlaybacker();
 		if (pb != null) {
 			final QueueItem item = new QueueItem(getActivity(), mediaUri);
-			getMediaDb().addToQueue(Collections.singleton(item));
+			getMediaDb().addToQueue(Collections.singleton(item), QueueEnd.TAIL);
 			LOG.i("Added to queue: %s", item);
 		}
 	}

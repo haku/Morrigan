@@ -188,7 +188,7 @@ public class MediaDbImpl implements MediaDb {
 	}
 
 	@Override
-	public void addToQueue (final Collection<QueueItem> items) {
+	public void addToQueue (final Collection<QueueItem> items, final QueueEnd end) {
 		this.mDb.beginTransaction();
 		try {
 			final ContentValues values = new ContentValues();
@@ -201,6 +201,10 @@ public class MediaDbImpl implements MediaDb {
 
 				final long newId = this.mDb.insert(TBL_QU, null, values);
 				if (newId < 0) throw new IllegalStateException("Adding queue item failed: id=" + newId);
+
+				if (end == QueueEnd.HEAD) {
+					moveQueueItemToEndInternal(newId, MoveAction.UP);
+				}
 			}
 			this.mDb.setTransactionSuccessful();
 		}
@@ -308,33 +312,37 @@ public class MediaDbImpl implements MediaDb {
 	public void moveQueueItemToEnd (final long rowId, final MoveAction action) {
 		this.mDb.beginTransaction();
 		try {
-			final Long oldPosition = readPositionFromCursor(
-					getQuCursor(TBL_QU_ID + "=?", new String[] { String.valueOf(rowId) }, null, 1));
-			if (oldPosition == null) throw new IllegalArgumentException("rowId not found: "+ rowId);
-
-			final String sortDirection;
-			switch (action) {
-				case UP:
-					sortDirection = "ASC";
-					break;
-				case DOWN:
-					sortDirection = "DESC";
-					break;
-				default:
-					throw new IllegalArgumentException("Unknown action.");
-			}
-			final Long newPosition = readPositionFromCursor(
-					getQuCursor(null, null,
-							TBL_QU_POSITION + " " + sortDirection, 1));
-			if (newPosition == null) throw new IllegalArgumentException("End position not found.");
-
-			rollQueueItems(oldPosition, newPosition);
+			moveQueueItemToEndInternal(rowId, action);
 			this.mDb.setTransactionSuccessful();
 		}
 		finally {
 			this.mDb.endTransaction();
 		}
 		this.mediaWatcherDispatcher.queueChanged();
+	}
+
+	private void moveQueueItemToEndInternal (final long rowId, final MoveAction action) {
+		final Long oldPosition = readPositionFromCursor(
+				getQuCursor(TBL_QU_ID + "=?", new String[] { String.valueOf(rowId) }, null, 1));
+		if (oldPosition == null) throw new IllegalArgumentException("rowId not found: "+ rowId);
+
+		final String sortDirection;
+		switch (action) {
+			case UP:
+				sortDirection = "ASC";
+				break;
+			case DOWN:
+				sortDirection = "DESC";
+				break;
+			default:
+				throw new IllegalArgumentException("Unknown action.");
+		}
+		final Long newPosition = readPositionFromCursor(
+				getQuCursor(null, null,
+						TBL_QU_POSITION + " " + sortDirection, 1));
+		if (newPosition == null) throw new IllegalArgumentException("End position not found.");
+
+		rollQueueItems(oldPosition, newPosition);
 	}
 
 	private void rollQueueItems (final long fromPos, final long toPos) {

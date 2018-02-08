@@ -20,6 +20,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -32,6 +33,7 @@ import com.vaguehope.morrigan.android.R;
 import com.vaguehope.morrigan.android.helper.LogWrapper;
 import com.vaguehope.morrigan.android.helper.Result;
 import com.vaguehope.morrigan.android.playback.MediaDb.MediaWatcher;
+import com.vaguehope.morrigan.android.playback.MediaDb.QueueEnd;
 import com.vaguehope.morrigan.android.playback.MediaDb.SortColumn;
 import com.vaguehope.morrigan.android.playback.MediaDb.SortDirection;
 
@@ -175,6 +177,7 @@ public class LibraryFragment extends Fragment {
 		this.mediaList = (ListView) rootView.findViewById(R.id.mediaList);
 		this.mediaList.setAdapter(this.adapter);
 		this.mediaList.setOnItemClickListener(this.mediaListOnItemClickListener);
+		this.mediaList.setOnItemLongClickListener(this.mediaListOnItemLongClickListener);
 	}
 
 	private final MediaWatcher mediaWatcher = new MediaWatcherAdapter() {
@@ -240,14 +243,42 @@ public class LibraryFragment extends Fragment {
 		}
 	};
 
+	private final OnItemLongClickListener mediaListOnItemLongClickListener = new OnItemLongClickListener() {
+		@Override
+		public boolean onItemLongClick (final AdapterView<?> parent, final View view, final int position, final long id) {
+			final MediaItem mediaItem = getMediaDb().getMediaItem(id);
+			if (mediaItem != null) {
+				showItemMenu(mediaItem, view);
+			}
+			else {
+				LOG.w("Item %s not found in DB.", id);
+			}
+			return true;
+		}
+	};
+
 	private void addMediaItemToQueue (final MediaItem mediaItem) {
 		final Playbacker pb = getPlaybacker();
 		if (pb != null) {
 			final QueueItem item = new QueueItem(getActivity(), mediaItem);
-			getMediaDb().addToQueue(Collections.singleton(item));
+			getMediaDb().addToQueue(Collections.singleton(item), QueueEnd.TAIL);
 			LOG.i("Added to queue: %s", item);
 			Toast.makeText(getActivity(), String.format("Enqueued:\n%s", item.getTitle()), Toast.LENGTH_SHORT).show();
 		}
+	}
+
+	private void showItemMenu (final MediaItem mediaItem, final View itemView) {
+		final PopupMenu menu = new PopupMenu(getActivity(), itemView);
+		final MenuItem mi = menu.getMenu().add(Menu.NONE, Menu.NONE, Menu.NONE, "Enqueue Top");
+		mi.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+			@Override
+			public boolean onMenuItemClick (final MenuItem item) {
+				final QueueItem queueItem = new QueueItem(getActivity(), mediaItem);
+				getMediaDb().addToQueue(Collections.singleton(queueItem), QueueEnd.HEAD);
+				return true;
+			}
+		});
+		menu.show();
 	}
 
 	private void onLibrariesChanged () {

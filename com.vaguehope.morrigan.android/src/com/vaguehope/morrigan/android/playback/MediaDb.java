@@ -8,7 +8,7 @@ import android.net.Uri;
 
 public interface MediaDb {
 
-	void addToQueue(Collection<QueueItem> items);
+	void addToQueue(Collection<QueueItem> items, QueueEnd end);
 	void removeFromQueue(Collection<QueueItem> items);
 	void removeFromQueueById(Collection<Long> itemIds);
 
@@ -19,6 +19,11 @@ public interface MediaDb {
 
 	void moveQueueItem(long rowId, MoveAction action);
 	void moveQueueItemToEnd(long rowId, MoveAction action);
+
+	enum QueueEnd {
+		HEAD,
+		TAIL;
+	}
 
 	enum MoveAction {
 		UP,
