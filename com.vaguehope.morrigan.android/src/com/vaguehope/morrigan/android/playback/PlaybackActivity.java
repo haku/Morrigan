@@ -19,6 +19,7 @@ import android.view.ViewGroup.LayoutParams;
 import com.vaguehope.morrigan.android.R;
 import com.vaguehope.morrigan.android.ServerActivity;
 import com.vaguehope.morrigan.android.checkout.CheckoutMgrActivity;
+import com.vaguehope.morrigan.android.helper.DialogHelper;
 import com.vaguehope.morrigan.android.helper.LogWrapper;
 import com.vaguehope.morrigan.android.playback.Playbacker.PlayOrder;
 import com.vaguehope.morrigan.android.playback.Playbacker.PlaybackWatcher;
@@ -184,10 +185,10 @@ public class PlaybackActivity extends FragmentActivity {
 				getPlaybacker().setPlayOrder(PlayOrder.RANDOM);
 				return true;
 			case R.id.queue_shuffle:
-				getMediaDb().shuffleQueue();
+				askShuffleQueue();
 				return true;
 			case R.id.queue_clear:
-				getMediaDb().clearQueue();
+				askClearQueue();
 				return true;
 			case R.id.preferences:
 				startActivity(new Intent(this, MnPreferenceActivity.class));
@@ -203,6 +204,24 @@ public class PlaybackActivity extends FragmentActivity {
 			default:
 				return super.onOptionsItemSelected(item);
 		}
+	}
+
+	private void askShuffleQueue () {
+		DialogHelper.askYesNo(this, "Shuffle queue?", "Shuffle", "Cancel", new Runnable() {
+			@Override
+			public void run () {
+				getMediaDb().shuffleQueue();
+			}
+		});
+	}
+
+	private void askClearQueue () {
+		DialogHelper.askYesNo(this, "Clear queue?", "Clear", "Cancel", new Runnable() {
+			@Override
+			public void run () {
+				getMediaDb().clearQueue();
+			}
+		});
 	}
 
 	private final PlaybackWatcher playbackWatcher = new PlaybackWatcherAdapter() {
