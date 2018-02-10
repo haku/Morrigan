@@ -831,16 +831,26 @@ public class MediaDbImpl implements MediaDb {
 	public Cursor searchMediaCursor (final long libraryId, final String query, final SortColumn sortColumn, final SortDirection sortDirection) {
 		if (StringHelper.isEmpty(query)) return getAllMediaCursor(libraryId, sortColumn, sortDirection);
 
-		final String sql = TBL_MF_DBID + "=?"
-				+ " AND " + TBL_MF_MISSING + " IS NULL"
-				+ " AND " + TBL_MF_TITLE + " LIKE ? ESCAPE ? COLLATE NOCASE";
+		final StringBuilder sql = new StringBuilder();
+		final List<String> args = new ArrayList<String>();
 
-		final String[] args = new String[] {
-				String.valueOf(libraryId),
-				"%" + escapeSearch(query) + "%",
-				SEARCH_ESC };
+		sql.append(TBL_MF_DBID + "=?");
+		args.add(String.valueOf(libraryId));
 
-		return getMfCursor(sql, args,
+		sql.append(" AND " + TBL_MF_MISSING + " IS NULL");
+
+		if (query.startsWith("~")) {
+			sql.append(" AND " + TBL_MF_URI + " LIKE ? ESCAPE ? COLLATE NOCASE");
+			args.add("%" + escapeSearch(query.substring(1)) + "%");
+			args.add(SEARCH_ESC);
+		}
+		else {
+			sql.append(" AND " + TBL_MF_TITLE + " LIKE ? ESCAPE ? COLLATE NOCASE");
+			args.add("%" + escapeSearch(query) + "%");
+			args.add(SEARCH_ESC);
+		}
+
+		return getMfCursor(sql.toString(), args.toArray(new String[args.size()]),
 				toMfSortColumn(sortColumn) + " " + toSortDirection(sortDirection), -1);
 	}
 
