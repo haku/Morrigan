@@ -55,6 +55,7 @@ public class LibraryFragment extends Fragment {
 	private MessageHandler messageHandler;
 
 	private EditText txtSearch;
+	private TextView txtResultsInfo;
 	private Button btnLibrary;
 	private ListView mediaList;
 
@@ -179,6 +180,8 @@ public class LibraryFragment extends Fragment {
 				return true;
 			}
 		});
+
+		this.txtResultsInfo = (TextView) rootView.findViewById(R.id.txtResultsInfo);
 
 		this.btnLibrary = (Button) rootView.findViewById(R.id.btnLibrary);
 		this.btnLibrary.setOnClickListener(this.btnLibraryOnClickListener);
@@ -371,8 +374,6 @@ public class LibraryFragment extends Fragment {
 		}
 	}
 
-
-
 	private void setCurrentLibrary (final LibraryMetadata library) {
 		setCurrentLibrary(library, this.currentSortColumn, this.currentSortDirection);
 	}
@@ -469,6 +470,7 @@ public class LibraryFragment extends Fragment {
 				this.host.getAdapter().changeCursor(result.getData());
 				LOG.d("Refreshed library cursor.");
 				this.host.restoreScroll();
+				this.host.txtResultsInfo.setText(String.format("%s items.", result.getData().getCount()));
 			}
 			else {
 				LOG.w("Failed to refresh column.", result.getE());
