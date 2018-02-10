@@ -283,21 +283,7 @@ public class MediaDbImpl implements MediaDb {
 	private QueueItem readFirstQueueItemFromCursor (final Cursor c) {
 		try {
 			if (c != null && c.moveToFirst()) {
-				final QueueCursorReader reader = new QueueCursorReader();
-				final long rowId = reader.readId(c);
-				final long position = reader.readPosition(c);
-				final long libId = reader.readLibId(c);
-				final Uri uri = reader.readUri(c);
-				final String title = reader.readTitle(c);
-				final long sizeBytes = reader.readSizeBytes(c);
-				final long durationMillis = reader.readDurationMillis(c);
-				return new QueueItem(rowId,
-						position,
-						libId,
-						uri,
-						title,
-						sizeBytes,
-						durationMillis);
+				return new QueueCursorReader().readItem(c);
 			}
 			return null;
 		}
@@ -866,31 +852,7 @@ public class MediaDbImpl implements MediaDb {
 	private MediaItem readFirstMediaItemFromCursor (final Cursor c) {
 		try {
 			if (c != null && c.moveToFirst()) {
-				final MediaCursorReader reader = new MediaCursorReader();
-				final long rowId = reader.readId(c);
-				final long libId = reader.readLibraryId(c);
-				final Uri uri = reader.readUri(c);
-				final String title = reader.readTitle(c);
-				final long sizeBytes = reader.readSizeBytes(c);
-				final long timeFileLastModified = reader.readFileLastModified(c);
-				final BigInteger fileHash = reader.readFileHash(c);
-				final long timeAddedMillis = reader.readTimeAddedMillis(c);
-				final long timeLastPlayedMillis = reader.readLastPlayedMillis(c);
-				final int startCount = reader.readStartCount(c);
-				final int endCount = reader.readEndCount(c);
-				final long durationMillis = reader.readDurationMillis(c);
-				return new MediaItem(rowId,
-						libId,
-						uri,
-						title,
-						sizeBytes,
-						timeFileLastModified,
-						fileHash,
-						timeAddedMillis,
-						timeLastPlayedMillis,
-						startCount,
-						endCount,
-						durationMillis);
+				return new MediaCursorReader().readItem(c);
 			}
 			return null;
 		}

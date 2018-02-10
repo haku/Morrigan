@@ -14,6 +14,7 @@ import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
+import android.view.Window;
 import android.view.ViewGroup.LayoutParams;
 
 import com.vaguehope.morrigan.android.R;
@@ -38,6 +39,7 @@ public class PlaybackActivity extends FragmentActivity {
 	@Override
 	public void onCreate (final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		this.messageHandler = new MessageHandler(this);
 		setContentView(R.layout.playback_activity);
 
@@ -222,6 +224,16 @@ public class PlaybackActivity extends FragmentActivity {
 				getMediaDb().clearQueue();
 			}
 		});
+	}
+
+	private int progressIndicatorCounter = 0;
+
+	/**
+	 * Only call on UI thread.
+	 */
+	protected void progressIndicator (final boolean inProgress) {
+		this.progressIndicatorCounter += (inProgress ? 1 : -1);
+		setProgressBarIndeterminateVisibility(this.progressIndicatorCounter > 0);
 	}
 
 	private final PlaybackWatcher playbackWatcher = new PlaybackWatcherAdapter() {

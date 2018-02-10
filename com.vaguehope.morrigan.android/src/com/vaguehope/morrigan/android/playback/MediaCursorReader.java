@@ -103,4 +103,31 @@ public class MediaCursorReader {
 		return c.getLong(this.colDurationMillis);
 	}
 
+	public MediaItem readItem (final Cursor c) {
+		final long rowId = readId(c);
+		final long libId = readLibraryId(c);
+		final Uri uri = readUri(c);
+		final String title = readTitle(c);
+		final long sizeBytes = readSizeBytes(c);
+		final long timeFileLastModified = readFileLastModified(c);
+		final BigInteger fileHash = readFileHash(c);
+		final long timeAddedMillis = readTimeAddedMillis(c);
+		final long timeLastPlayedMillis = readLastPlayedMillis(c);
+		final int startCount = readStartCount(c);
+		final int endCount = readEndCount(c);
+		final long durationMillis = readDurationMillis(c);
+		return new MediaItem(rowId,
+				libId,
+				uri,
+				title,
+				sizeBytes,
+				timeFileLastModified,
+				fileHash,
+				timeAddedMillis,
+				timeLastPlayedMillis,
+				startCount,
+				endCount,
+				durationMillis);
+	}
+
 }

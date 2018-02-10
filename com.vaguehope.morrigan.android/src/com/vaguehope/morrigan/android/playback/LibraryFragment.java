@@ -1,6 +1,7 @@
 package com.vaguehope.morrigan.android.playback;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -30,6 +31,7 @@ import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
 import com.vaguehope.morrigan.android.R;
+import com.vaguehope.morrigan.android.helper.IoHelper;
 import com.vaguehope.morrigan.android.helper.LogWrapper;
 import com.vaguehope.morrigan.android.helper.Result;
 import com.vaguehope.morrigan.android.playback.MediaDb.MediaWatcher;
@@ -41,6 +43,7 @@ public class LibraryFragment extends Fragment {
 
 	private static final LogWrapper LOG = new LogWrapper("LF");
 
+	private static final int MENU_LIBRARY_ENQUEUE_ALL = 1050;
 	private static final int MENU_LIBRARY_ID_START = 1100;
 	private static final int MENU_LIBRARY_COLUMN_START = 1200;
 	private static final int MENU_LIBRARY_DIRECTION_START = 1300;
@@ -48,6 +51,7 @@ public class LibraryFragment extends Fragment {
 	// Intent params.
 	private int fragmentPosition;
 
+	private PlaybackActivity playbackActivity;
 	private MessageHandler messageHandler;
 
 	private EditText txtSearch;
@@ -68,6 +72,7 @@ public class LibraryFragment extends Fragment {
 		this.fragmentPosition = getArguments().getInt(SectionsPagerAdapter.ARG_FRAGMENT_POSITION, -1);
 		if (this.fragmentPosition < 0) throw new IllegalArgumentException("Missing fragmentPosition.");
 
+		this.playbackActivity = (PlaybackActivity) getActivity();
 		this.messageHandler = new MessageHandler(this);
 
 		final View rootView = inflater.inflate(R.layout.playback_library, container, false);
@@ -91,6 +96,10 @@ public class LibraryFragment extends Fragment {
 	public void onDestroy () {
 		disposeDb();
 		super.onDestroy();
+	}
+
+	private PlaybackActivity getPlaybackActivity() {
+		return this.playbackActivity;
 	}
 
 	// Service.
@@ -295,6 +304,18 @@ public class LibraryFragment extends Fragment {
 
 	private void makeLibraryMenu () {
 		final PopupMenu newMenu = new PopupMenu(getActivity(), LibraryFragment.this.btnLibrary);
+
+		{
+			final MenuItem item = newMenu.getMenu().add(Menu.NONE, MENU_LIBRARY_ENQUEUE_ALL, Menu.NONE, "Enqueue All");
+			item.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+				@Override
+				public boolean onMenuItemClick (final MenuItem item) {
+					enqueueAllSearchResults();
+					return true;
+				}
+			});
+		}
+
 		for (final LibraryMetadata library : this.allLibraries) {
 			final MenuItem item = newMenu.getMenu().add(Menu.NONE, MENU_LIBRARY_ID_START + (int) library.getId(), Menu.NONE, library.getName());
 			item.setCheckable(true);
@@ -306,6 +327,7 @@ public class LibraryFragment extends Fragment {
 				}
 			});
 		}
+
 		for (final SortColumn s : SortColumn.values()) {
 			final MenuItem item = newMenu.getMenu().add(Menu.NONE, MENU_LIBRARY_COLUMN_START + s.ordinal(), Menu.NONE, s.toString());
 			item.setCheckable(true);
@@ -317,6 +339,7 @@ public class LibraryFragment extends Fragment {
 				}
 			});
 		}
+
 		for (final SortDirection s : SortDirection.values()) {
 			final MenuItem item = newMenu.getMenu().add(Menu.NONE, MENU_LIBRARY_DIRECTION_START + s.ordinal(), Menu.NONE, s.toString());
 			item.setCheckable(true);
@@ -328,6 +351,7 @@ public class LibraryFragment extends Fragment {
 				}
 			});
 		}
+
 		this.libraryMenu = newMenu;
 		updateLibraryMenuSelections();
 	}
@@ -375,34 +399,52 @@ public class LibraryFragment extends Fragment {
 	}
 
 	private void reloadLibrary () {
-		final String query = this.txtSearch.getText().toString().trim();
-		new LoadLibrary(this, this.currentLibrary, query, this.currentSortColumn, this.currentSortDirection).execute(); // TODO OnExecutor?
+		new LoadLibrary(this, makePendingSearchCursor()).execute(); // TODO OnExecutor?
 	}
 
-	private static class LoadLibrary extends AsyncTask<Void, Void, Result<Cursor>> {
+	private void enqueueAllSearchResults () {
+		new EnqueueAllSearchResults(this, makePendingSearchCursor()).execute(); // TODO OnExecutor?
+	}
 
-		private final LibraryFragment host;
-		private final LibraryMetadata library;
-		private final String query;
-		private final SortColumn sortColumn;
-		private final SortDirection sortDirection;
+	private PendingSearchCursor makePendingSearchCursor () {
+		final String query = this.txtSearch.getText().toString().trim();
+		return new PendingSearchCursor(this.currentLibrary, query, this.currentSortColumn, this.currentSortDirection);
+	}
 
-		public LoadLibrary (
-				final LibraryFragment host,
-				final LibraryMetadata library,
-				final String query,
-				final SortColumn sortColumn,
-				final SortDirection sortDirection) {
-			this.host = host;
+	private static class PendingSearchCursor {
+
+		final LibraryMetadata library;
+		final String query;
+		final SortColumn sortColumn;
+		final SortDirection sortDirection;
+
+		public PendingSearchCursor (final LibraryMetadata library, final String query, final SortColumn sortColumn, final SortDirection sortDirection) {
 			this.library = library;
 			this.query = query;
 			this.sortColumn = sortColumn;
 			this.sortDirection = sortDirection;
 		}
 
+		private Cursor makeCursor (final MediaDb db) {
+			return db.searchMediaCursor(this.library.getId(), this.query, this.sortColumn, this.sortDirection);
+		}
+	}
+
+	private static class LoadLibrary extends AsyncTask<Void, Void, Result<Cursor>> {
+
+		private final LibraryFragment host;
+		private final PendingSearchCursor pendingSearchCursor;
+
+		public LoadLibrary (
+				final LibraryFragment host,
+				final PendingSearchCursor pendingSearchCursor) {
+			this.host = host;
+			this.pendingSearchCursor = pendingSearchCursor;
+		}
+
 		@Override
 		protected void onPreExecute () {
-			// TODO show progress indicator.
+			this.host.getPlaybackActivity().progressIndicator(true);
 		}
 
 		@Override
@@ -410,7 +452,7 @@ public class LibraryFragment extends Fragment {
 			try {
 				final MediaDb db = this.host.getMediaDb();
 				if (db != null) {
-					final Cursor cursor = db.searchMediaCursor(this.library.getId(), this.query, this.sortColumn, this.sortDirection);
+					final Cursor cursor = this.pendingSearchCursor.makeCursor(db);
 					return new Result<Cursor>(cursor);
 				}
 				return new Result<Cursor>(new IllegalStateException("Failed to refresh column as DB was not bound."));
@@ -431,7 +473,75 @@ public class LibraryFragment extends Fragment {
 			else {
 				LOG.w("Failed to refresh column.", result.getE());
 			}
-			// TODO hide progress indicator.
+			this.host.getPlaybackActivity().progressIndicator(false);
+		}
+
+	}
+	private static class EnqueueAllSearchResults extends AsyncTask<Void, Void, Result<Integer>> {
+
+		private final LibraryFragment host;
+		private final PendingSearchCursor pendingSearchCursor;
+
+		public EnqueueAllSearchResults (
+				final LibraryFragment host,
+				final PendingSearchCursor pendingSearchCursor) {
+			this.host = host;
+			this.pendingSearchCursor = pendingSearchCursor;
+		}
+
+		@Override
+		protected void onPreExecute () {
+			this.host.getPlaybackActivity().progressIndicator(true);
+		}
+
+		@Override
+		protected Result<Integer> doInBackground (final Void... params) {
+			try {
+				final MediaDb db = this.host.getMediaDb();
+				if (db != null) {
+					final Collection<QueueItem> queueItems;
+					final Cursor cursor = this.pendingSearchCursor.makeCursor(db);
+					try {
+						queueItems = new ArrayList<QueueItem>(cursor.getCount());
+						if (cursor.moveToFirst()) {
+							final MediaCursorReader reader = new MediaCursorReader();
+							do {
+								// TODO This is perhaps the way it should be done?
+								// But ATM it is not needed and less efficient.
+								//final MediaItem mediaItem = reader.readItem(cursor);
+								//final QueueItem queueItem = new QueueItem(activity, mediaItem);
+								final QueueItem queueItem = new QueueItem(this.host.getActivity(),
+										this.pendingSearchCursor.library.getId(), reader.readUri(cursor));
+								queueItems.add(queueItem);
+							}
+							while (cursor.moveToNext());
+						}
+					}
+					finally {
+						IoHelper.closeQuietly(cursor);
+					}
+					db.addToQueue(queueItems, QueueEnd.TAIL);
+					return new Result<Integer>(queueItems.size());
+				}
+				return new Result<Integer>(new IllegalStateException("Failed to add to queue as DB was not bound."));
+			}
+			catch (final Exception e) { // NOSONAR needed to report errors.
+				return new Result<Integer>(e);
+			}
+		}
+
+		@Override
+		protected void onPostExecute (final Result<Integer> result) {
+			if (result.isSuccess()) {
+				LOG.d("All search results added to queue.");
+				Toast.makeText(this.host.getActivity(),
+						String.format("Added %s items to queue.", result.getData()),
+						Toast.LENGTH_SHORT).show();
+			}
+			else {
+				LOG.w("Failed to add search results to queue.", result.getE());
+			}
+			this.host.getPlaybackActivity().progressIndicator(false);
 		}
 
 	}

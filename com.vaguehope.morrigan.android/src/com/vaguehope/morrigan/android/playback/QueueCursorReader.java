@@ -55,4 +55,21 @@ public class QueueCursorReader {
 		return c.getLong(this.colDurationMillis);
 	}
 
+	public QueueItem readItem (final Cursor c) {
+		final long rowId = readId(c);
+		final long position = readPosition(c);
+		final long libId = readLibId(c);
+		final Uri uri = readUri(c);
+		final String title = readTitle(c);
+		final long sizeBytes = readSizeBytes(c);
+		final long durationMillis = readDurationMillis(c);
+		return new QueueItem(rowId,
+				position,
+				libId,
+				uri,
+				title,
+				sizeBytes,
+				durationMillis);
+	}
+
 }
