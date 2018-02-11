@@ -6,7 +6,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore.Audio.AudioColumns;
-
 import com.vaguehope.morrigan.android.helper.IoHelper;
 import com.vaguehope.morrigan.android.helper.UriHelper;
 
@@ -43,6 +42,10 @@ public class QueueItem {
 	public QueueItem (final Context context, final MediaItem mi) {
 		// TODO could do a much better job here.
 		this(context, mi.getLibraryId(), mi.getUri());
+	}
+
+	public QueueItem (final Context context, final QueueItemType type) {
+		this(context, -1, type.toUri());
 	}
 
 	public QueueItem (final Context context, final Uri uri) {
@@ -88,6 +91,11 @@ public class QueueItem {
 			this.title = UriHelper.getFileName(uri);
 			this.sizeBytes = new File(uri.getPath()).length();
 			this.durationMillis = -1;
+		}
+		else if (QueueItemType.SCHEME.equals(uri.getScheme())) {
+			this.title = QueueItemType.parseTitle(uri);
+			this.sizeBytes = 0L;
+			this.durationMillis = 0L;
 		}
 		else {
 			throw new IllegalArgumentException("Unknown resource type: " + uri);

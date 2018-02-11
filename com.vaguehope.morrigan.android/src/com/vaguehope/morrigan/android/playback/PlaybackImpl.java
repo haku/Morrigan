@@ -331,7 +331,7 @@ public class PlaybackImpl implements Playbacker {
 					unloadPlayback();
 					break;
 				case GOTO_NEXT_ITEM:
-					startPlayingNextItem();
+					startPlaying(takeNextItemToPlay());
 					break;
 				case NOTIFY_NEW_WATCHER:
 					notifyNewWatcher((PlaybackWatcher) msg.obj);
@@ -401,18 +401,28 @@ public class PlaybackImpl implements Playbacker {
 			this.playbackWatcherDispatcher.playbackPlaying();
 		}
 		else {
-			QueueItem item = this.currentItem;
-			if (item == null) item = takeNextItemToPlay();
-			if (item == null) return;
-
-			setCurrentItem(item);
-			loadAndPlayCurrentItem();
+			startPlaying(this.currentItem);
 		}
 	}
 
-	private void startPlayingNextItem () throws IOException {
-		final QueueItem item = takeNextItemToPlay();
+	private void startPlaying (final QueueItem firstTry) throws IOException {
+		QueueItem item = firstTry;
+		if (item == null) item = takeNextItemToPlay();
 		if (item == null) return;
+
+		final QueueItemType itemType = QueueItemType.parseUri(item.getUri());
+		if (itemType != null) {
+			switch (itemType) {
+				case STOP:
+					stopPlayback();
+					if (item.hasRowId()) {
+						this.mediaDb.removeFromQueue(Collections.singleton(item));
+					}
+					return;
+				default:
+					throw new IllegalStateException("Do not know how to handle type: " + itemType);
+			}
+		}
 
 		setCurrentItem(item);
 		loadAndPlayCurrentItem();

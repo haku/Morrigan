@@ -13,6 +13,7 @@ import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,7 +24,9 @@ import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Button;
 import android.widget.ListView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import com.vaguehope.morrigan.android.R;
@@ -44,6 +47,7 @@ public class PlayerFragment extends Fragment {
 
 	private TextView txtTitle;
 	private TextView txtQueue;
+	private View btnPlayPause;
 
 	private QueueCursorAdapter adapter;
 	private ScrollState scrollState;
@@ -197,16 +201,17 @@ public class PlayerFragment extends Fragment {
 				search();
 			}
 		});
-		rootView.findViewById(R.id.btnPlaypause).setOnClickListener(new OnClickListener() {
+		this.btnPlayPause = rootView.findViewById(R.id.btnPlaypause);
+		this.btnPlayPause.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick (final View v) {
 				playpause();
 			}
 		});
-		rootView.findViewById(R.id.btnPlaypause).setOnLongClickListener(new OnLongClickListener() {
+		this.btnPlayPause.setOnLongClickListener(new OnLongClickListener() {
 			@Override
 			public boolean onLongClick (final View v) {
-				stop();
+				showStopMenu();
 				return true;
 			}
 		});
@@ -451,6 +456,38 @@ public class PlayerFragment extends Fragment {
 		if (pb != null) {
 			pb.gotoNextItem();
 		}
+	}
+
+	private void stopAfter () {
+		final Playbacker pb = getPlaybacker();
+		if (pb != null) {
+			final QueueItem item = new QueueItem(getActivity(), QueueItemType.STOP);
+			getMediaDb().addToQueue(Collections.singleton(item), QueueEnd.HEAD);
+		}
+	}
+
+	private void showStopMenu () {
+		final PopupMenu menu = new PopupMenu(getActivity(), this.btnPlayPause);
+
+		menu.getMenu().add(Menu.NONE, Menu.NONE, Menu.NONE, "Stop")
+		.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+			@Override
+			public boolean onMenuItemClick (final MenuItem item) {
+				stop();
+				return true;
+			}
+		});
+
+		menu.getMenu().add(Menu.NONE, Menu.NONE, Menu.NONE, "Stop After")
+		.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+			@Override
+			public boolean onMenuItemClick (final MenuItem item) {
+				stopAfter();
+				return true;
+			}
+		});
+
+		menu.show();
 	}
 
 }
