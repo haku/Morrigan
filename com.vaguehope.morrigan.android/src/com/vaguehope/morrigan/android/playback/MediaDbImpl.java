@@ -191,6 +191,8 @@ public class MediaDbImpl implements MediaDb {
 	public void addToQueue (final Collection<QueueItem> items, final QueueEnd end) {
 		this.mDb.beginTransaction();
 		try {
+			final List<Long> addedIds = end == QueueEnd.HEAD ? new ArrayList<Long>() : null;
+
 			final ContentValues values = new ContentValues();
 			for (final QueueItem item : items) {
 				if (item.hasRowId()) throw new IllegalArgumentException("QueueItem already has rowId.");
@@ -202,10 +204,15 @@ public class MediaDbImpl implements MediaDb {
 				final long newId = this.mDb.insert(TBL_QU, null, values);
 				if (newId < 0) throw new IllegalStateException("Adding queue item failed: id=" + newId);
 
-				if (end == QueueEnd.HEAD) {
-					moveQueueItemToEndInternal(newId, MoveAction.UP);
+				if (addedIds != null) addedIds.add(newId);
+			}
+
+			if (addedIds != null) {
+				for (int i = addedIds.size() - 1; i >= 0; i--) {
+					moveQueueItemToEndInternal(addedIds.get(i), MoveAction.UP);
 				}
 			}
+
 			this.mDb.setTransactionSuccessful();
 		}
 		finally {

@@ -4,6 +4,8 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
+import java.util.TreeMap;
 
 import android.database.Cursor;
 import android.os.AsyncTask;
@@ -11,6 +13,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.view.ActionMode;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,9 +22,9 @@ import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -187,9 +190,10 @@ public class LibraryFragment extends Fragment {
 		this.btnLibrary.setOnClickListener(this.btnLibraryOnClickListener);
 
 		this.mediaList = (ListView) rootView.findViewById(R.id.mediaList);
-		this.mediaList.setAdapter(this.adapter);
+		this.mediaList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+		this.mediaList.setMultiChoiceModeListener(this.mediaListMultiChoiceModeListener);
 		this.mediaList.setOnItemClickListener(this.mediaListOnItemClickListener);
-		this.mediaList.setOnItemLongClickListener(this.mediaListOnItemLongClickListener);
+		this.mediaList.setAdapter(this.adapter);
 	}
 
 	private final MediaWatcher mediaWatcher = new MediaWatcherAdapter() {
@@ -242,6 +246,67 @@ public class LibraryFragment extends Fragment {
 		}
 	};
 
+	private final MultiChoiceModeListener mediaListMultiChoiceModeListener = new MultiChoiceModeListener() {
+
+		private final Map<Integer, Long> selectedIds = new TreeMap<Integer, Long>();
+
+		@Override
+		public boolean onCreateActionMode (final ActionMode mode, final Menu menu) {
+			menu.add("Enqueue Top").setOnMenuItemClickListener(new EnqueueActionListener(
+					this.selectedIds.values(), QueueEnd.HEAD, mode));
+			menu.add("Enqueue").setOnMenuItemClickListener(new EnqueueActionListener(
+					this.selectedIds.values(), QueueEnd.TAIL, mode));
+			return true;
+		}
+
+		@Override
+		public boolean onPrepareActionMode (final ActionMode mode, final Menu menu) {
+			return false;
+		}
+
+		@Override
+		public boolean onActionItemClicked (final ActionMode mode, final MenuItem item) {
+			return false; // Items have their only click handlers.
+		}
+
+		@Override
+		public void onDestroyActionMode (final ActionMode mode) {
+			this.selectedIds.clear();
+		}
+
+		@Override
+		public void onItemCheckedStateChanged (final ActionMode mode, final int position, final long id, final boolean checked) {
+			if (checked) {
+				this.selectedIds.put(position, id);
+			}
+			else {
+				this.selectedIds.remove(position);
+			}
+			mode.setTitle(String.format("%s items", this.selectedIds.size()));
+		}
+	};
+
+	private class EnqueueActionListener implements OnMenuItemClickListener {
+
+		private final Collection<Long> selectedIds;
+		private final QueueEnd end;
+		private final ActionMode mode;
+
+		public EnqueueActionListener (final Collection<Long> collection, final QueueEnd end, final ActionMode mode) {
+			this.selectedIds = collection;
+			this.end = end;
+			this.mode = mode;
+		}
+
+		@Override
+		public boolean onMenuItemClick (final MenuItem item) {
+			addMediaIdsToQueue(this.selectedIds, this.end);
+			this.mode.finish();
+			return true;
+		}
+
+	}
+
 	private final OnItemClickListener mediaListOnItemClickListener = new OnItemClickListener() {
 		@Override
 		public void onItemClick (final AdapterView<?> parent, final View view, final int position, final long id) {
@@ -255,42 +320,28 @@ public class LibraryFragment extends Fragment {
 		}
 	};
 
-	private final OnItemLongClickListener mediaListOnItemLongClickListener = new OnItemLongClickListener() {
-		@Override
-		public boolean onItemLongClick (final AdapterView<?> parent, final View view, final int position, final long id) {
-			final MediaItem mediaItem = getMediaDb().getMediaItem(id);
+	private void addMediaIdsToQueue (final Collection<Long> mediaIds, final QueueEnd end) {
+		final MediaDb db = getMediaDb();
+		final Collection<QueueItem> queueItems = new ArrayList<QueueItem>(mediaIds.size());
+		for (final Long mediaId : mediaIds) {
+			final MediaItem mediaItem = db.getMediaItem(mediaId);
 			if (mediaItem != null) {
-				showItemMenu(mediaItem, view);
+				queueItems.add(new QueueItem(getActivity(), mediaItem));
 			}
 			else {
-				LOG.w("Item %s not found in DB.", id);
+				LOG.w("Item %s not found in DB.", mediaId);
 			}
-			return true;
 		}
-	};
-
-	private void addMediaItemToQueue (final MediaItem mediaItem) {
-		final Playbacker pb = getPlaybacker();
-		if (pb != null) {
-			final QueueItem item = new QueueItem(getActivity(), mediaItem);
-			getMediaDb().addToQueue(Collections.singleton(item), QueueEnd.TAIL);
-			LOG.i("Added to queue: %s", item);
-			Toast.makeText(getActivity(), String.format("Enqueued:\n%s", item.getTitle()), Toast.LENGTH_SHORT).show();
-		}
+		db.addToQueue(queueItems, end);
+		LOG.i("Added %s items to queue.", queueItems.size());
+		Toast.makeText(getActivity(), String.format("Enqueued %s items.", queueItems.size()), Toast.LENGTH_SHORT).show();
 	}
 
-	private void showItemMenu (final MediaItem mediaItem, final View itemView) {
-		final PopupMenu menu = new PopupMenu(getActivity(), itemView);
-		final MenuItem mi = menu.getMenu().add(Menu.NONE, Menu.NONE, Menu.NONE, "Enqueue Top");
-		mi.setOnMenuItemClickListener(new OnMenuItemClickListener() {
-			@Override
-			public boolean onMenuItemClick (final MenuItem item) {
-				final QueueItem queueItem = new QueueItem(getActivity(), mediaItem);
-				getMediaDb().addToQueue(Collections.singleton(queueItem), QueueEnd.HEAD);
-				return true;
-			}
-		});
-		menu.show();
+	private void addMediaItemToQueue (final MediaItem mediaItem) {
+		final QueueItem item = new QueueItem(getActivity(), mediaItem);
+		getMediaDb().addToQueue(Collections.singleton(item), QueueEnd.TAIL);
+		LOG.i("Added to queue: %s", item);
+		Toast.makeText(getActivity(), String.format("Enqueued:\n%s", item.getTitle()), Toast.LENGTH_SHORT).show();
 	}
 
 	private void onLibrariesChanged () {
