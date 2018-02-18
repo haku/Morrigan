@@ -4,12 +4,14 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.json.JSONException;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -26,7 +28,7 @@ public class MediaDbImpl implements MediaDb {
 	protected static final LogWrapper LOG = new LogWrapper("MDI");
 
 	private static final String DB_NAME = "media";
-	private static final int DB_VERSION = 6;
+	private static final int DB_VERSION = 7;
 
 	private static class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -41,6 +43,7 @@ public class MediaDbImpl implements MediaDb {
 			db.execSQL(TBL_MD_CREATE);
 			db.execSQL(TBL_MF_CREATE);
 			db.execSQL(TBL_MF_CREATE_INDEX);
+			db.execSQL(TBL_TG_CREATE);
 		}
 
 		@Override
@@ -61,6 +64,9 @@ public class MediaDbImpl implements MediaDb {
 			}
 			if (oldVersion < 6) { // NOSONAR not a magic number.
 				addColumn(db, TBL_QU, TBL_QU_DBID, "integer");
+			}
+			if (oldVersion < 7) { // NOSONAR not a magic number.
+				db.execSQL(TBL_TG_CREATE);
 			}
 		}
 
@@ -126,7 +132,7 @@ public class MediaDbImpl implements MediaDb {
 			+ " WHERE " + TBL_QU_ID + "=NEW." + TBL_QU_ID + ";"
 			+ " END;";
 
-	// Create and delete libraries.
+	// Libraries.
 
 	private static final String TBL_MD = "md";
 	private static final String TBL_MD_ID = "_id";
@@ -175,6 +181,31 @@ public class MediaDbImpl implements MediaDb {
 	private static final String TBL_MF_INDEX = TBL_MF + "_idx";
 	private static final String TBL_MF_CREATE_INDEX = "CREATE INDEX " + TBL_MF_INDEX + " ON " + TBL_MF + "("
 			+ TBL_MF_DBID + "," + TBL_MF_URI + "," + TBL_MF_TITLE + "," + TBL_MF_HASH + ");";
+
+	// Tags.
+
+	private static final String TBL_TG = "tg";
+	protected static final String TBL_TG_ID = "_id";
+	protected static final String TBL_TG_MFID = "mfid";
+	protected static final String TBL_TG_TAG = "tag";
+	protected static final String TBL_TG_CLS = "cls";
+	protected static final String TBL_TG_TYPE = "typ";
+	protected static final String TBL_TG_MODIFIED = "mod";
+	protected static final String TBL_TG_DELETED = "del";
+
+	private static final String TBL_TG_CREATE = "create table " + TBL_TG + " ("
+			+ TBL_TG_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+			+ TBL_TG_MFID + " INTEGER,"
+			+ TBL_TG_TAG + " TEXT,"
+			+ TBL_TG_CLS + " TEXT,"
+			+ TBL_TG_TYPE + " INTEGER,"
+			+ TBL_TG_MODIFIED + " INTEGER,"
+			+ TBL_TG_DELETED + " INTEGER,"
+			+ "FOREIGN KEY(" + TBL_TG_MFID + ")"
+					+ " REFERENCES " + TBL_MF + "(" + TBL_MF_ID + ")"
+					+ " ON DELETE RESTRICT ON UPDATE RESTRICT,"
+			+ "UNIQUE(" + TBL_TG_MFID + "," + TBL_TG_TAG + "," + TBL_TG_CLS + "," + TBL_TG_TYPE + ") ON CONFLICT ABORT"
+			+ ");";
 
 //	Queue methods.
 
@@ -916,6 +947,118 @@ public class MediaDbImpl implements MediaDb {
 		return readFirstMediaItemFromCursor(c);
 	}
 
+	private Cursor getTgCursor (final String where, final String[] whereArgs, final String orderBy, final int numberOf) {
+		return this.mDb.query(true, TBL_TG,
+				new String[] {
+						TBL_TG_ID,
+						TBL_TG_MFID,
+						TBL_TG_TAG,
+						TBL_TG_CLS,
+						TBL_TG_TYPE,
+						TBL_TG_MODIFIED,
+						TBL_TG_DELETED },
+				where, whereArgs,
+				null, null,
+				orderBy,
+				numberOf > 0 ? String.valueOf(numberOf) : null);
+	}
+
+	private Collection<MediaTag> readTags (final Long mfRowId) {
+		final Cursor c = getTgCursor(
+				TBL_TG_MFID + "=?",
+				new String[]{ String.valueOf(mfRowId) },
+				TBL_TG_TAG + " ASC",
+				-1);
+		try {
+			if (c != null && c.moveToFirst()) {
+				final Collection<MediaTag> tags = new ArrayList<MediaTag>();
+				final TagCursorReader reader = new TagCursorReader();
+				do {
+					tags.add(reader.readItem(c));
+				}
+				while (c.moveToNext());
+				return tags;
+			}
+			return Collections.emptyList();
+		}
+		finally {
+			IoHelper.closeQuietly(c);
+		}
+	}
+
+	@Override
+	public Map<Long, Collection<MediaTag>> readTags (final Collection<Long> mfRowIds) {
+		final Map<Long, Collection<MediaTag>> ret = new LinkedHashMap<Long, Collection<MediaTag>>();
+		for (final Long mfRowId : mfRowIds) {
+			ret.put(mfRowId, readTags(mfRowId));
+		}
+		return ret;
+	}
+
+	private MediaTag readTag (final Long mfRowId, final String tag, final String cls, final int type) {
+		final Cursor c = getTgCursor(
+				TBL_TG_MFID + "=? AND " + TBL_TG_TAG + "=? AND " + TBL_TG_CLS + "=? AND " + TBL_TG_TYPE + "=?",
+				new String[]{ String.valueOf(mfRowId), tag, cls, String.valueOf(type) },
+				TBL_TG_TAG + " ASC",
+				-1);
+		try {
+			if (c != null && c.moveToFirst()) {
+				return new TagCursorReader().readItem(c);
+			}
+			return null;
+		}
+		finally {
+			IoHelper.closeQuietly(c);
+		}
+	}
+
+	@Override
+	public void appendTags (final Map<Long, Collection<MediaTag>> mfRowIdToTags) {
+		this.mDb.beginTransaction();
+		try {
+			final ContentValues values = new ContentValues();
+			for (final Entry<Long, Collection<MediaTag>> entry : mfRowIdToTags.entrySet()) {
+				final Long mfRowId = entry.getKey();
+				final Collection<MediaTag> newTags = entry.getValue();
+
+				for (final MediaTag newTag : newTags) {
+					values.clear();
+
+					final MediaTag existingTag = readTag(mfRowId, newTag.getTag(), newTag.getCls(), newTag.getType().getNumber());
+					if (existingTag != null) {
+						if (existingTag.getModified() > newTag.getModified()) {
+							return;
+						}
+
+						// Update existing tag.
+						values.put(TBL_TG_MODIFIED, newTag.getModified());
+						putBool(newTag.isDeleted(), TBL_TG_DELETED, values);
+
+						final int affected = this.mDb.update(TBL_TG, values, TBL_TG_ID + "=?", new String[] { String.valueOf(existingTag.getRowId()) });
+						if (affected > 1) throw new IllegalStateException("Updating tag row with ID " + existingTag.getRowId() + " affected " + affected + " rows, expected 1.");
+						if (affected < 1) LOG.w("Updating tag row with ID %s affected %s rows, expected 1.", existingTag.getRowId(), affected);
+					}
+					else {
+						// Insert new tag.
+						values.put(TBL_TG_MFID, mfRowId);
+						values.put(TBL_TG_TAG, newTag.getTag());
+						values.put(TBL_TG_CLS, newTag.getCls());
+						values.put(TBL_TG_TYPE, newTag.getType().getNumber());
+						values.put(TBL_TG_MODIFIED, newTag.getModified());
+						putBool(newTag.isDeleted(), TBL_TG_DELETED, values);
+
+						final long newId = this.mDb.insert(TBL_TG, null, values);
+						if (newId < 0) throw new IllegalStateException("Adding tag failed: id=" + newId);
+					}
+				}
+			}
+			this.mDb.setTransactionSuccessful();
+		}
+		finally {
+			this.mDb.endTransaction();
+		}
+	}
+
 	// SELECT uri FROM mf WHERE hash IN (
 	//   SELECT hash FROM mf WHERE hash IS NOT NULL GROUP BY hash HAVING count(*)>1
 	// ) ORDER BY hash ASC;
@@ -962,6 +1105,8 @@ public class MediaDbImpl implements MediaDb {
 
 				if (fromItem.getStartCount() > 0) totalStartCount += fromItem.getStartCount();
 				if (fromItem.getEndCount() > 0) totalEndCount += fromItem.getEndCount();
+
+				// TODO merge tags.
 			}
 
 			final MediaItem newItem = destItem
@@ -990,6 +1135,17 @@ public class MediaDbImpl implements MediaDb {
 	@Override
 	public void removeMediaWatcher (final MediaWatcher watcher) {
 		this.mediaWatchers.remove(watcher);
+	}
+
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	private void putBool (final boolean bool, final String column, final ContentValues values) {
+		if (bool) {
+			values.putNull(column);
+		}
+		else {
+			values.put(column, 1);
+		}
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

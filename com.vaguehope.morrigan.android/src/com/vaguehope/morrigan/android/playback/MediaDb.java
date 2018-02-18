@@ -2,6 +2,7 @@ package com.vaguehope.morrigan.android.playback;
 
 import java.math.BigInteger;
 import java.util.Collection;
+import java.util.Map;
 
 import android.database.Cursor;
 import android.net.Uri;
@@ -53,6 +54,10 @@ public interface MediaDb {
 	long getMediaRowId(long libraryId, Uri uri);
 
 	MediaItem randomMediaItem(long libraryId);
+
+	// Map of rowId to new tags.
+	Map<Long, Collection<MediaTag>> readTags (Collection<Long> mfRowIds);
+	void appendTags (Map<Long, Collection<MediaTag>> mfRowIdToTags);
 
 	Cursor findDuplicates(long libraryId);
 	void mergeItems(long destRowId, Collection<Long> fromRowIds);
