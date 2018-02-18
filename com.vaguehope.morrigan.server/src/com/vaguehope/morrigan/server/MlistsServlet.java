@@ -56,6 +56,7 @@ import com.vaguehope.morrigan.server.util.FeedHelper;
 import com.vaguehope.morrigan.server.util.ImageResizer;
 import com.vaguehope.morrigan.server.util.XmlHelper;
 import com.vaguehope.morrigan.tasks.AsyncTask;
+import com.vaguehope.morrigan.util.ChecksumCache;
 import com.vaguehope.morrigan.util.MnLogger;
 import com.vaguehope.morrigan.util.StringHelper;
 import com.vaguehope.sqlitewrapper.DbException;
@@ -777,6 +778,7 @@ public class MlistsServlet extends HttpServlet {
 			final IncludeTags includeTags, final String transcodeStr) throws SAXException, MorriganException, IOException {
 		String title = mi.getTitle();
 		long fileSize = mi.getFileSize();
+		BigInteger fileHash = mi.getHashcode();
 		String fileLink = fileLink(mi);
 
 		final Transcode transcode = Transcode.parse(transcodeStr);
@@ -788,6 +790,7 @@ public class MlistsServlet extends HttpServlet {
 
 					final File transcodedFile = tProfile.getCacheFile();
 					fileSize = transcodedFile.exists() ? transcodedFile.length() : 0L;
+					fileHash = transcodedFile.exists() ? ChecksumCache.readHash(transcodedFile) : null;
 
 					fileLink += "?" + PARAM_TRANSCODE + "=" + transcode.getSymbolicName();
 				}
@@ -812,7 +815,7 @@ public class MlistsServlet extends HttpServlet {
 			FeedHelper.addElement(dw, "type", ((IMixedMediaItem) mi).getMediaType().getN());
 		}
 		if (mi.getMimeType() != null) FeedHelper.addElement(dw, "mimetype", mi.getMimeType());
-		if (mi.getHashcode() != null && !BigInteger.ZERO.equals(mi.getHashcode())) FeedHelper.addElement(dw, "hash", mi.getHashcode().toString(16));
+		if (fileHash != null && !BigInteger.ZERO.equals(fileHash)) FeedHelper.addElement(dw, "hash", fileHash.toString(16));
 		FeedHelper.addElement(dw, "enabled", Boolean.toString(mi.isEnabled()), new String[][] {
 			{ "m", mi.enabledLastModified() == null || mi.enabledLastModified().getTime() < 1L ? "" : String.valueOf(mi.enabledLastModified().getTime()) },
 		});

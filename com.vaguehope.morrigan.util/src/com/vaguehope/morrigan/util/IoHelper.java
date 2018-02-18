@@ -1,11 +1,17 @@
 package com.vaguehope.morrigan.util;
 
+import java.io.ByteArrayInputStream;
 import java.io.Closeable;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.charset.Charset;
 
 public class IoHelper {
 
@@ -38,6 +44,31 @@ public class IoHelper {
 		finally {
 			closeQuietly(is);
 			closeQuietly(os);
+		}
+	}
+
+	public static void write (final String data, final File file) throws IOException {
+		write(new ByteArrayInputStream(data.getBytes("UTF-8")), file);
+	}
+
+	/**
+	 * Returns null if file does not exist.
+	 */
+	public static String readAsString (final File file) throws IOException {
+		try {
+			final FileInputStream stream = new FileInputStream(file);
+			try {
+				final FileChannel fc = stream.getChannel();
+				final MappedByteBuffer bb = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
+				/* Instead of using default, pass in a decoder. */
+				return Charset.defaultCharset().decode(bb).toString();
+			}
+			finally {
+				stream.close();
+			}
+		}
+		catch (final FileNotFoundException e) {
+			return null;
 		}
 	}
 
