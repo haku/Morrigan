@@ -14,6 +14,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import com.vaguehope.morrigan.android.helper.FileHelper;
+import com.vaguehope.morrigan.android.helper.IoHelper;
+import com.vaguehope.morrigan.android.playback.MediaTag;
+import com.vaguehope.morrigan.android.playback.MediaTagType;
 import com.vaguehope.morrigan.android.C;
 import com.vaguehope.morrigan.android.helper.DialogHelper.Listener;
 import com.vaguehope.morrigan.android.state.Checkout;
@@ -48,16 +51,18 @@ public class CheckoutIndex {
 	public static void write (final Context context, final Checkout checkout, final List<ItemAndFile> itemsAndFiles) throws IOException {
 		final File file = getIndexFile(context, checkout);
 		final File tmpFile = new File(file.getAbsolutePath() + ".tmp");
-		final JsonWriter writer = new JsonWriter(new OutputStreamWriter(new FileOutputStream(tmpFile), "UTF-8"));
+		final OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(tmpFile), "UTF-8");
 		try {
+			final JsonWriter writer = new JsonWriter(osw);
 			writer.beginArray();
 			for (final ItemAndFile iaf : itemsAndFiles) {
 				writeEntry(writer, iaf);
 			}
 			writer.endArray();
+			writer.close(); // Do not throw validation exception if writing fails.
 		}
 		finally {
-			writer.close();
+			IoHelper.closeQuietly(osw);
 		}
 		if (!tmpFile.renameTo(file)) {
 			throw new IOException("Rename failed: " + tmpFile.getAbsolutePath() + " --> " + file.getAbsolutePath());
@@ -96,14 +101,22 @@ public class CheckoutIndex {
 	private static void writeEntry (final JsonWriter writer, final ItemAndFile itemAndFile) throws IOException {
 		writer.beginObject();
 		writer.name("path").value(itemAndFile.getLocalFile().getAbsolutePath());
-		writer.name("hash").value(itemAndFile.getItem().getHashCode().toString(16).toLowerCase(Locale.ENGLISH));
+		if (itemAndFile.getItem().getHashCode() != null) {
+			writer.name("hash").value(itemAndFile.getItem().getHashCode().toString(16).toLowerCase(Locale.ENGLISH));
+		}
 		writer.name("startcount").value(itemAndFile.getItem().getStartCount());
 		writer.name("endcount").value(itemAndFile.getItem().getEndCount());
 		writer.name("lastplayed").value(itemAndFile.getItem().getLastPlayed());
 
 		writer.name("tags").beginArray();
-		for (final String tag : itemAndFile.getItem().getTags()) {
-			writer.value(tag);
+		for (final MediaTag tag : itemAndFile.getItem().getTags()) {
+			writer.beginObject();
+			writer.name("t").value(tag.getTag());
+			writer.name("c").value(tag.getCls());
+			writer.name("y").value(tag.getType().getNumber());
+			writer.name("m").value(tag.getModified());
+			writer.name("d").value(tag.isDeleted());
+			writer.endObject();
 		}
 		writer.endArray();
 
@@ -116,7 +129,7 @@ public class CheckoutIndex {
 		long startCount = -1;
 		long endCount = -1;
 		long lastPlayed = -1;
-		List<String> tags = new ArrayList<String>();
+		List<MediaTag> tags = new ArrayList<MediaTag>();
 
 		reader.beginObject();
 		while (reader.hasNext()) {
@@ -137,11 +150,7 @@ public class CheckoutIndex {
 				lastPlayed = reader.nextLong();
 			}
 			else if (name.equals("tags")) {
-				reader.beginArray();
-				while (reader.hasNext()) {
-					tags.add(reader.nextString());
-				}
-				reader.endArray();
+				readTags(reader, tags);
 			}
 			else {
 				reader.skipValue();
@@ -150,6 +159,43 @@ public class CheckoutIndex {
 		reader.endObject();
 
 		return new IndexEntry(path, hash, startCount, endCount, lastPlayed, tags);
+	}
+
+	private static void readTags (final JsonReader reader, final List<MediaTag> tags) throws IOException {
+		reader.beginArray();
+		while (reader.hasNext()) {
+			String tag = null;
+			String cls = null;
+			MediaTagType type = null;
+			long modified = -1;
+			boolean deleted = false;
+
+			reader.beginObject();
+			while (reader.hasNext()) {
+				final String name = reader.nextName();
+				if (name.equals("t")) {
+					tag = reader.nextString();
+				}
+				else if (name.equals("c")) {
+					cls = reader.nextString();
+				}
+				else if (name.equals("y")) {
+					type = MediaTagType.getFromNumber(reader.nextInt());
+				}
+				else if (name.equals("m")) {
+					modified = reader.nextLong();
+				}
+				else if (name.equals("d")) {
+					deleted = reader.nextBoolean();
+				}
+			}
+			reader.endObject();
+
+			if (tag != null) {
+				tags.add(new MediaTag(tag, cls, type, modified, deleted));
+			}
+		}
+		reader.endArray();
 	}
 
 }

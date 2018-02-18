@@ -51,7 +51,11 @@ public interface MediaDb {
 	Cursor searchMediaCursor (long libraryId, String query, SortColumn sortColumn, SortDirection sortDirection);
 	MediaItem getMediaItem(long rowId);
 	Presence hasMediaUri(long libraryId, Uri uri);
+	/**
+	 * URI is unique per library.
+	 */
 	long getMediaRowId(long libraryId, Uri uri);
+	long[] getMediaRowIds(long libraryId, BigInteger hash);
 
 	MediaItem randomMediaItem(long libraryId);
 

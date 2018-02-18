@@ -16,13 +16,13 @@
 
 package com.vaguehope.morrigan.android;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.vaguehope.morrigan.android.helper.StringHelper;
 import com.vaguehope.morrigan.android.helper.TimeHelper;
 import com.vaguehope.morrigan.android.model.Artifact;
 import com.vaguehope.morrigan.android.model.ArtifactListAdaptor;
@@ -37,6 +37,7 @@ import com.vaguehope.morrigan.android.model.ServerReference;
 import com.vaguehope.morrigan.android.modelimpl.ArtifactListAdaptorImpl;
 import com.vaguehope.morrigan.android.modelimpl.MlistReferenceImpl;
 import com.vaguehope.morrigan.android.modelimpl.PlayerReferenceImpl;
+import com.vaguehope.morrigan.android.playback.MediaTag;
 import com.vaguehope.morrigan.android.state.ConfigDb;
 import com.vaguehope.morrigan.android.tasks.DownloadMediaTask;
 import com.vaguehope.morrigan.android.tasks.GetPlayerQueueTask;
@@ -212,8 +213,8 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 		@Override
 		public void onClick (final View v) {
 			PlayerState state = PlayerActivity.this.currentState;
-			String[] tags = state == null ? null : state.getTrackTags();
-			if (tags == null || tags.length < 1) {
+			Collection<MediaTag> tags = state == null ? null : state.getTrackTags();
+			if (tags == null || tags.size() < 1) {
 				addTag();
 			}
 			else {
@@ -240,8 +241,8 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 				menu.setHeaderTitle(state.getTitle());
 				menu.add(Menu.NONE, MENU_CTX_ADDTAG, Menu.NONE, "Add tag...");
 				if (state.getTrackTags() != null) {
-					for (String tag : state.getTrackTags()) {
-						menu.add(Menu.NONE, MENU_CTX_TAG, Menu.NONE, tag);
+					for (MediaTag tag : state.getTrackTags()) {
+						menu.add(Menu.NONE, MENU_CTX_TAG, Menu.NONE, tag.getTag());
 					}
 				}
 			}
@@ -466,9 +467,15 @@ public class PlayerActivity extends Activity implements PlayerStateChangeListene
 			}
 
 			TextView txtTags = (TextView) findViewById(R.id.txtTags);
-			String[] tagArr = newState.getTrackTags();
-			if (tagArr != null && tagArr.length > 0) {
-				txtTags.setText(StringHelper.implode(tagArr, ", ")); // TODO set max length?
+			final Collection<MediaTag> tagCol = newState.getTrackTags();
+			if (tagCol != null && tagCol.size() > 0) {
+				final StringBuilder str = new StringBuilder();
+				for (final MediaTag tag : tagCol) {
+					if (str.length() > 0) str.append(", ");
+					str.append(tag.getTag());
+					if (tag.isDeleted()) str.append("(d)");
+				}
+				txtTags.setText(str.toString()); // TODO set max length?
 			}
 			else {
 				txtTags.setText("(click to add tags)");

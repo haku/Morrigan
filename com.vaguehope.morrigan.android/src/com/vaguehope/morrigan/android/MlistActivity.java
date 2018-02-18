@@ -16,11 +16,11 @@
 
 package com.vaguehope.morrigan.android;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
 import com.vaguehope.morrigan.android.CommonDialogs.PlayerSelectedListener;
-import com.vaguehope.morrigan.android.helper.StringHelper;
 import com.vaguehope.morrigan.android.helper.TimeHelper;
 import com.vaguehope.morrigan.android.model.MlistItem;
 import com.vaguehope.morrigan.android.model.MlistItemList;
@@ -35,6 +35,7 @@ import com.vaguehope.morrigan.android.modelimpl.ArtifactListAdaptorImpl;
 import com.vaguehope.morrigan.android.modelimpl.MlistItemComparators;
 import com.vaguehope.morrigan.android.modelimpl.MlistReferenceImpl;
 import com.vaguehope.morrigan.android.modelimpl.PlayerReferenceImpl;
+import com.vaguehope.morrigan.android.playback.MediaTag;
 import com.vaguehope.morrigan.android.state.ConfigDb;
 import com.vaguehope.morrigan.android.tasks.AbstractTask;
 import com.vaguehope.morrigan.android.tasks.BulkRunner;
@@ -242,10 +243,17 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 			counts.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
 			header.addView(counts);
 
-			String[] tarArr = mlistItem.getTags();
-			if (tarArr != null && tarArr.length > 0) {
+			final Collection<MediaTag> tagCol = mlistItem.getTags();
+			if (tagCol != null && tagCol.size() > 0) {
+				final StringBuilder str = new StringBuilder();
+				for (final MediaTag tag : tagCol) {
+					if (str.length() > 0) str.append(", ");
+					str.append(tag.getTag());
+					if (tag.isDeleted()) str.append("(d)");
+				}
+
 				TextView tags = new TextView(MlistActivity.this);
-				tags.setText(StringHelper.implode(tarArr, ", ")); // TODO set max length?
+				tags.setText(str.toString()); // TODO set max length?
 				tags.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
 				header.addView(tags);
 			}
@@ -255,10 +263,10 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 			menu.add(Menu.NONE, MENU_CTX_QUEUE, Menu.NONE, "Queue");
 			menu.add(Menu.NONE, MENU_CTX_ADDTAG, Menu.NONE, "Add tag...");
 
-			if (tarArr != null && tarArr.length > 0) {
+			if (tagCol != null && tagCol.size() > 0) {
 				SubMenu tagMenu = menu.addSubMenu(Menu.NONE, MENU_CTX_TAGS, Menu.NONE, "tags...");
-				for (String tag : tarArr) {
-					tagMenu.add(Menu.NONE, MENU_CTX_TAG, Menu.NONE, tag);
+				for (MediaTag tag : tagCol) {
+					tagMenu.add(Menu.NONE, MENU_CTX_TAG, Menu.NONE, tag.getTag());
 				}
 			}
 

@@ -1,7 +1,10 @@
 package com.vaguehope.morrigan.android.playback;
 
 import java.lang.ref.WeakReference;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
@@ -24,7 +27,6 @@ import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
@@ -46,6 +48,7 @@ public class PlayerFragment extends Fragment {
 	private ListView queueList;
 
 	private TextView txtTitle;
+	private TextView txtTags;
 	private TextView txtQueue;
 	private View btnPlayPause;
 
@@ -193,6 +196,7 @@ public class PlayerFragment extends Fragment {
 //		tagRow.setOnCreateContextMenuListener(this.tagRowContextMenuListener);
 
 		this.txtTitle = (TextView) rootView.findViewById(R.id.txtTitle);
+		this.txtTags = (TextView) rootView.findViewById(R.id.txtTags);
 		this.txtQueue = (TextView) rootView.findViewById(R.id.txtQueue);
 
 		rootView.findViewById(R.id.btnSearch).setOnClickListener(new OnClickListener() {
@@ -278,9 +282,36 @@ public class PlayerFragment extends Fragment {
 				break;
 			case PLAYBACK_LOADING:
 				final QueueItem item = (QueueItem) msg.obj;
-				this.txtTitle.setText(item.getTitle());
+				redrawCurrentItem(item);
 				break;
 			default:
+		}
+	}
+
+	private void redrawCurrentItem (final QueueItem queueItem) {
+		this.txtTitle.setText(queueItem.getTitle());
+
+		if (queueItem.hasLibraryId()) {
+			final long mediaRowId = getMediaDb().getMediaRowId(queueItem.getLibraryId(), queueItem.getUri());
+			if (mediaRowId >= 0) {
+				final Map<Long, Collection<MediaTag>> tagMap = getMediaDb().readTags(Collections.singleton(mediaRowId));
+				final Collection<MediaTag> tags = tagMap.get(mediaRowId);
+				if (tags.size() > 0) {
+					final StringBuilder str = new StringBuilder();
+					for (final MediaTag tag : tags) {
+						if (str.length() > 0) str.append(", ");
+						str.append(tag.getTag());
+						if (tag.isDeleted()) str.append("(d)");
+					}
+					this.txtTags.setText(str.toString());
+				}
+				else {
+					this.txtTags.setText("(no tags)");
+				}
+			}
+		}
+		else {
+			this.txtTags.setText("(item not in library)");
 		}
 	}
 

@@ -1,7 +1,10 @@
 package com.vaguehope.morrigan.android.checkout;
 
+import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
+
+import com.vaguehope.morrigan.android.playback.MediaTag;
 
 public class IndexEntry {
 
@@ -10,7 +13,7 @@ public class IndexEntry {
 	private final long startCount;
 	private final long endCount;
 	private final long lastPlayed;
-	private final List<String> tags;
+	private final List<MediaTag> tags;
 
 	public IndexEntry (
 			final String localPath,
@@ -18,7 +21,7 @@ public class IndexEntry {
 			final long startCount,
 			final long endCount,
 			final long lastPlayed,
-			final List<String> tags) {
+			final List<MediaTag> tags) {
 		this.localPath = localPath;
 		this.hash = hash;
 		this.startCount = startCount;
@@ -34,8 +37,9 @@ public class IndexEntry {
 		return this.localPath;
 	}
 
-	public String getHash () {
-		return this.hash;
+	public BigInteger getHash () {
+		if (this.hash == null) return null;
+		return new BigInteger(this.hash, 16);
 	}
 
 	public long getStartCount () {
@@ -53,7 +57,7 @@ public class IndexEntry {
 		return this.lastPlayed;
 	}
 
-	public List<String> getTags () {
+	public List<MediaTag> getTags () {
 		return Collections.unmodifiableList(this.tags);
 	}
 

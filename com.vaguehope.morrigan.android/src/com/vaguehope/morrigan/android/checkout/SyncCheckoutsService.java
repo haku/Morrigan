@@ -160,7 +160,7 @@ public class SyncCheckoutsService extends AwakeService {
 	}
 
 	private List<? extends MlistItem> fetchListOfItems (final Checkout checkout, final ServerReference host) throws IOException {
-		final MlistItemList itemList = MnApi.fetchDbItems(host, checkout.getDbRelativePath(), checkout.getQuery(), "audio_only"); // TODO unhardcode this.
+		final MlistItemList itemList = MnApi.fetchDbItems(host, checkout.getDbRelativePath(), checkout.getQuery(), "audio_only", true); // TODO unhardcode this.
 		return itemList.getMlistItemList();
 	}
 

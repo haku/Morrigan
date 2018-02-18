@@ -55,6 +55,7 @@ public class TagCursorReader {
 	}
 
 	public MediaTag readItem (final Cursor c) {
+		if (c == null) return null;
 		return new MediaTag(readId(c), readTag(c), readCls(c), readType(c), readModified(c), readDeleted(c));
 	}
 

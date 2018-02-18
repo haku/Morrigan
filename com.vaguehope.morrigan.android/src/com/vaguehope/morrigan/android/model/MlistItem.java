@@ -17,6 +17,9 @@
 package com.vaguehope.morrigan.android.model;
 
 import java.math.BigInteger;
+import java.util.Collection;
+
+import com.vaguehope.morrigan.android.playback.MediaTag;
 
 public interface MlistItem extends Artifact {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -42,7 +45,7 @@ public interface MlistItem extends Artifact {
 	public int getStartCount ();
 	public int getEndCount ();
 
-	public String[] getTags ();
+	public Collection<MediaTag> getTags ();
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

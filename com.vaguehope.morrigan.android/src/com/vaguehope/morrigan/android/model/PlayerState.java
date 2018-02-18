@@ -17,7 +17,10 @@
 package com.vaguehope.morrigan.android.model;
 
 import java.math.BigInteger;
+import java.util.Collection;
 import java.util.Map;
+
+import com.vaguehope.morrigan.android.playback.MediaTag;
 
 public interface PlayerState extends Artifact {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -50,7 +53,7 @@ public interface PlayerState extends Artifact {
 	public boolean getTrackMissing();
 	public int getTrackStartCount ();
 	public int getTrackEndCount ();
-	public String[] getTrackTags ();
+	public Collection<MediaTag> getTrackTags ();
 
 	public MlistItem getItem ();
 

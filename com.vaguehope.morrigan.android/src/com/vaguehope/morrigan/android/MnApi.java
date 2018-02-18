@@ -24,10 +24,11 @@ public class MnApi {
 
 	private MnApi () {}
 
-	public static MlistItemList fetchDbItems (final ServerReference host, final String dbRelativePath, final String query, final String transcode) throws IOException {
+	public static MlistItemList fetchDbItems (final ServerReference host, final String dbRelativePath, final String query, final String transcode, final boolean includeDeletedTags) throws IOException {
 		final String url = host.getBaseUrl() + dbRelativePath + C.CONTEXT_MLIST_QUERY + "/" + URLEncoder.encode(query)
 				+ "?maxresults=0"
-				+ (transcode != null ? "&transcode=" + transcode : "");
+				+ (transcode != null ? "&transcode=" + transcode : "")
+				+ (includeDeletedTags ? "&includeddeletedtags=true" : "");
 		try {
 			final AtomicReference<MlistItemList> res = new AtomicReference<MlistItemList>();
 			HttpHelper.getUrlContent(url, "GET", null, null,

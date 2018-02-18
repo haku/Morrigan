@@ -104,6 +104,7 @@ public class MediaCursorReader {
 	}
 
 	public MediaItem readItem (final Cursor c) {
+		if (c == null) return null;
 		final long rowId = readId(c);
 		final long libId = readLibraryId(c);
 		final Uri uri = readUri(c);

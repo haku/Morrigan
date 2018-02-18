@@ -16,8 +16,12 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
+import android.database.sqlite.SQLiteCursor;
+import android.database.sqlite.SQLiteCursorDriver;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteQuery;
 import android.net.Uri;
 import com.vaguehope.morrigan.android.helper.IoHelper;
 import com.vaguehope.morrigan.android.helper.LogWrapper;
@@ -936,6 +940,40 @@ public class MediaDbImpl implements MediaDb {
 	}
 
 	@Override
+	public long[] getMediaRowIds (final long libraryId, final BigInteger hash) {
+		if (hash == null) throw new IllegalArgumentException("hash is required.");
+
+		final String query = "SELECT " + TBL_MF_ID + " FROM " + TBL_MF + " WHERE "
+				+ TBL_MF_DBID + "=? AND " + TBL_MF_HASH + "=?";
+		final CursorFactory cursorFactory = new CursorFactory() {
+			@Override
+			public Cursor newCursor (final SQLiteDatabase db, final SQLiteCursorDriver masterQuery, final String editTable, final SQLiteQuery query) {
+				query.bindLong(1, libraryId);
+				query.bindBlob(2, hash.toByteArray());
+				return new SQLiteCursor(masterQuery, editTable, query);
+			}
+		};
+		final Cursor c = this.mDb.rawQueryWithFactory(cursorFactory, query, null, null);
+		try {
+			final MediaCursorReader reader = new MediaCursorReader();
+			final long[] ret = new long[c.getCount()];
+			int i = 0;
+			if (c != null && c.moveToFirst()) {
+				do {
+					ret[i] = reader.readId(c);
+					i++;
+				}
+				while (c.moveToNext());
+			}
+			if (i < ret.length) throw new IllegalStateException("Expected query to return " + ret.length + " items, but only read " + i + ".");
+			return ret;
+		}
+		finally {
+			IoHelper.closeQuietly(c);
+		}
+	}
+
+	@Override
 	public MediaItem randomMediaItem (final long libraryId) {
 		final Cursor c = getMfCursor(
 				TBL_MF_ID + " IN (SELECT " + TBL_MF_ID
@@ -995,7 +1033,7 @@ public class MediaDbImpl implements MediaDb {
 		return ret;
 	}
 
-	private MediaTag readTag (final Long mfRowId, final String tag, final String cls, final int type) {
+	private MediaTag readTag (final long mfRowId, final String tag, final String cls, final int type) {
 		final Cursor c = getTgCursor(
 				TBL_TG_MFID + "=? AND " + TBL_TG_TAG + "=? AND " + TBL_TG_CLS + "=? AND " + TBL_TG_TYPE + "=?",
 				new String[]{ String.valueOf(mfRowId), tag, cls, String.valueOf(type) },
@@ -1018,44 +1056,62 @@ public class MediaDbImpl implements MediaDb {
 		try {
 			final ContentValues values = new ContentValues();
 			for (final Entry<Long, Collection<MediaTag>> entry : mfRowIdToTags.entrySet()) {
-				final Long mfRowId = entry.getKey();
+				final long mfRowId = entry.getKey();
 				final Collection<MediaTag> newTags = entry.getValue();
+				if (newTags.size() < 1) throw new IllegalArgumentException("Empty tag list for mfRowId: " + mfRowId);
 
 				for (final MediaTag newTag : newTags) {
 					values.clear();
-
-					final MediaTag existingTag = readTag(mfRowId, newTag.getTag(), newTag.getCls(), newTag.getType().getNumber());
-					if (existingTag != null) {
-						if (existingTag.getModified() > newTag.getModified()) {
-							return;
-						}
-
-						// Update existing tag.
-						values.put(TBL_TG_MODIFIED, newTag.getModified());
-						putBool(newTag.isDeleted(), TBL_TG_DELETED, values);
-
-						final int affected = this.mDb.update(TBL_TG, values, TBL_TG_ID + "=?", new String[] { String.valueOf(existingTag.getRowId()) });
-						if (affected > 1) throw new IllegalStateException("Updating tag row with ID " + existingTag.getRowId() + " affected " + affected + " rows, expected 1.");
-						if (affected < 1) LOG.w("Updating tag row with ID %s affected %s rows, expected 1.", existingTag.getRowId(), affected);
-					}
-					else {
-						// Insert new tag.
-						values.put(TBL_TG_MFID, mfRowId);
-						values.put(TBL_TG_TAG, newTag.getTag());
-						values.put(TBL_TG_CLS, newTag.getCls());
-						values.put(TBL_TG_TYPE, newTag.getType().getNumber());
-						values.put(TBL_TG_MODIFIED, newTag.getModified());
-						putBool(newTag.isDeleted(), TBL_TG_DELETED, values);
-
-						final long newId = this.mDb.insert(TBL_TG, null, values);
-						if (newId < 0) throw new IllegalStateException("Adding tag failed: id=" + newId);
-					}
+					appendTag(values, mfRowId, newTag);
 				}
 			}
 			this.mDb.setTransactionSuccessful();
 		}
 		finally {
 			this.mDb.endTransaction();
+		}
+	}
+
+	private void appendTag (final ContentValues values, final long mfRowId, final MediaTag newTag) {
+		final MediaTag existingTag = readTag(mfRowId, newTag.getTag(), newTag.getCls(), newTag.getType().getNumber());
+		if (existingTag != null) {
+			if (existingTag.hasModified() && newTag.hasModified()
+					&& existingTag.getModified() > newTag.getModified()) {
+				return;
+			}
+
+			if (existingTag.equalValue(newTag)) {
+				return;
+			}
+
+			// Update existing tag.
+			values.put(TBL_TG_MODIFIED, newTag.getModified());
+			putDeleted(newTag.isDeleted(), TBL_TG_DELETED, values);
+
+			final int affected = this.mDb.update(TBL_TG, values, TBL_TG_ID + "=?", new String[] { String.valueOf(existingTag.getRowId()) });
+			if (affected > 1) throw new IllegalStateException("Updating tag row with ID " + existingTag.getRowId() + " affected " + affected + " rows, expected 1.");
+			if (affected < 1) LOG.w("Updating tag row with ID %s affected %s rows, expected 1.", existingTag.getRowId(), affected);
+		}
+		else {
+			// Insert new tag.
+			values.put(TBL_TG_MFID, mfRowId);
+			values.put(TBL_TG_TAG, newTag.getTag());
+			values.put(TBL_TG_CLS, newTag.getCls());
+			values.put(TBL_TG_TYPE, newTag.getType().getNumber());
+			values.put(TBL_TG_MODIFIED, newTag.getModified());
+			putDeleted(newTag.isDeleted(), TBL_TG_DELETED, values);
+
+			final long newId = this.mDb.insert(TBL_TG, null, values);
+			if (newId < 0) throw new IllegalStateException("Adding tag failed: id=" + newId);
+		}
+	}
+
+	private void putDeleted (final boolean deleted, final String column, final ContentValues values) {
+		if (deleted) {
+			values.put(column, 1);
+		}
+		else {
+			values.putNull(column);
 		}
 	}
 
@@ -1135,17 +1191,6 @@ public class MediaDbImpl implements MediaDb {
 	@Override
 	public void removeMediaWatcher (final MediaWatcher watcher) {
 		this.mediaWatchers.remove(watcher);
-	}
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	private void putBool (final boolean bool, final String column, final ContentValues values) {
-		if (bool) {
-			values.putNull(column);
-		}
-		else {
-			values.put(column, 1);
-		}
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

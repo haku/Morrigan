@@ -5,9 +5,11 @@ import java.io.InputStream;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
@@ -21,6 +23,8 @@ import android.net.Uri;
 import android.support.v4.provider.DocumentFile;
 
 import com.vaguehope.morrigan.android.R;
+import com.vaguehope.morrigan.android.checkout.CheckoutIndex;
+import com.vaguehope.morrigan.android.checkout.IndexEntry;
 import com.vaguehope.morrigan.android.helper.ChecksumHelper;
 import com.vaguehope.morrigan.android.helper.ContentHelper;
 import com.vaguehope.morrigan.android.helper.ExceptionHelper;
@@ -29,6 +33,8 @@ import com.vaguehope.morrigan.android.helper.LogWrapper;
 import com.vaguehope.morrigan.android.playback.MediaDb.Presence;
 import com.vaguehope.morrigan.android.playback.MediaDb.SortColumn;
 import com.vaguehope.morrigan.android.playback.MediaDb.SortDirection;
+import com.vaguehope.morrigan.android.state.Checkout;
+import com.vaguehope.morrigan.android.state.ConfigDb;
 
 public class RescanLibrariesService extends MediaBindingAwakeService {
 
@@ -112,6 +118,7 @@ public class RescanLibrariesService extends MediaBindingAwakeService {
 			scanForNewMedia(library, notificationId, notif);
 			updateMetadataForKnowItems(library, notificationId, notif);
 			findAndMergeDuplicates(library, notificationId, notif);
+			importMetadataFromCheckouts(library, notificationId, notif);
 		}
 	}
 
@@ -347,6 +354,36 @@ public class RescanLibrariesService extends MediaBindingAwakeService {
 
 		LOG.i("Merging %s << %s...", destRowId, fromRowIds);
 		mediaDb.mergeItems(destRowId, fromRowIds);
+	}
+
+	private void importMetadataFromCheckouts (final LibraryMetadata library, final int notificationId, final Builder notif) throws IOException {
+		LOG.i("Importing metadata from checkouts...");
+		updateNotifProgress(notificationId, notif, "Importing from checkouts...");
+
+		final MediaDb mediaDb = getMediaDb();
+		final ConfigDb configDb = new ConfigDb(this);
+
+		final Map<Long, Collection<MediaTag>> tagsToAppend = new HashMap<Long, Collection<MediaTag>>();
+		for (final Checkout checkout : configDb.getCheckouts()) {
+			final Set<IndexEntry> index = CheckoutIndex.read(this, checkout);
+			for (final IndexEntry entry : index) {
+				if (entry.getHash() != null) {
+					final long[] mfRowIds = mediaDb.getMediaRowIds(library.getId(), entry.getHash());
+					for (final long mfRowId : mfRowIds) {
+						tagsToAppend.put(mfRowId, entry.getTags());
+					}
+				}
+				else {
+					LOG.w("Checkout index entry missing hash: %s", entry.getLocalPath());
+				}
+			}
+		}
+
+		LOG.i("Appending tags to %s items...", tagsToAppend.size());
+		updateNotifProgress(notificationId, notif, "Appending tags...");
+		final long startTime = System.currentTimeMillis();
+		mediaDb.appendTags(tagsToAppend);
+		LOG.i("Append tags to %s items in %sms.", tagsToAppend.size(), System.currentTimeMillis() - startTime);
 	}
 
 	private static final class IdUri {

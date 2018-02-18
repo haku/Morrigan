@@ -19,11 +19,11 @@ package com.vaguehope.morrigan.android.modelimpl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
@@ -42,6 +42,8 @@ import com.vaguehope.morrigan.android.model.MlistItem;
 import com.vaguehope.morrigan.android.model.PlayState;
 import com.vaguehope.morrigan.android.model.PlayerReference;
 import com.vaguehope.morrigan.android.model.PlayerState;
+import com.vaguehope.morrigan.android.playback.MediaTag;
+import com.vaguehope.morrigan.android.playback.MediaTagType;
 
 public class PlayerStateXmlImpl implements PlayerState, MlistItem, ContentHandler {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -98,7 +100,7 @@ public class PlayerStateXmlImpl implements PlayerState, MlistItem, ContentHandle
 	private boolean trackMissing;
 	private int trackStartCount;
 	private int trackEndCount;
-	private List<String> trackTags;
+	private Collection<MediaTag> trackTags;
 
 	private String listId;
 	private String listUrl;
@@ -247,8 +249,8 @@ public class PlayerStateXmlImpl implements PlayerState, MlistItem, ContentHandle
 	}
 
 	@Override
-	public String[] getTrackTags () {
-		return this.trackTags == null ? null : this.trackTags.toArray(new String[this.trackTags.size()]);
+	public Collection<MediaTag> getTrackTags () {
+		return this.trackTags;
 	}
 
 	@Override
@@ -334,7 +336,7 @@ public class PlayerStateXmlImpl implements PlayerState, MlistItem, ContentHandle
 	}
 
 	@Override
-	public String[] getTags () {
+	public Collection<MediaTag> getTags () {
 		return getTrackTags();
 	}
 
@@ -440,10 +442,18 @@ public class PlayerStateXmlImpl implements PlayerState, MlistItem, ContentHandle
 				this.trackEndCount = v;
 			}
 			else if (localName.equals(TRACKTAG)) {
-				if (MANUAL_TAG.equals(attr.get("t")) && "".equals(attr.get("c"))) {
-					if (this.trackTags == null) this.trackTags = new LinkedList<String>();
-					this.trackTags.add(this.currentText.toString());
-				}
+				final String tag = this.currentText.toString();
+				final String t = attr.get("t");
+				final String cls = attr.get("c");
+				final String m = attr.get("m");
+				final String d = attr.get("d");
+				final MediaTagType type = MediaTagType.getFromNumber(Integer.parseInt(t));
+				final long modified = m != null ? Long.parseLong(m) : -1;
+				final boolean deleted = Boolean.parseBoolean(d);
+				final MediaTag mediaTag = new MediaTag(tag, cls, type, modified, deleted);
+
+				if (this.trackTags == null) this.trackTags = new LinkedList<MediaTag>();
+				this.trackTags.add(mediaTag);
 			}
 			else if (localName.equals(LISTID)) {
 				this.listId = this.currentText.toString();

@@ -17,6 +17,8 @@
 package com.vaguehope.morrigan.android.modelimpl;
 
 import java.math.BigInteger;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 
 import com.vaguehope.morrigan.android.R;
@@ -25,6 +27,7 @@ import com.vaguehope.morrigan.android.model.PlayState;
 import com.vaguehope.morrigan.android.model.PlayerReference;
 import com.vaguehope.morrigan.android.model.PlayerState;
 import com.vaguehope.morrigan.android.model.ServerReference;
+import com.vaguehope.morrigan.android.playback.MediaTag;
 
 public class PlayerStateBasicImpl implements PlayerState, PlayerReference, MlistItem {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -248,7 +251,7 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference, Mlist
 	}
 
 	@Override
-	public String[] getTrackTags () {
+	public Collection<MediaTag> getTrackTags () {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("Not implemented.");
 	}
@@ -372,8 +375,8 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference, Mlist
 	}
 
 	@Override
-	public String[] getTags () {
-		return null;
+	public Collection<MediaTag> getTags () {
+		return Collections.emptyList();
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

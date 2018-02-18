@@ -56,6 +56,7 @@ public class QueueCursorReader {
 	}
 
 	public QueueItem readItem (final Cursor c) {
+		if (c == null) return null;
 		final long rowId = readId(c);
 		final long position = readPosition(c);
 		final long libId = readLibId(c);

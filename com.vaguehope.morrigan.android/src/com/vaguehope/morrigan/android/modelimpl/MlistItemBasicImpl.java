@@ -17,10 +17,12 @@
 package com.vaguehope.morrigan.android.modelimpl;
 
 import java.math.BigInteger;
+import java.util.Collection;
 
 import com.vaguehope.morrigan.android.R;
 import com.vaguehope.morrigan.android.helper.TimeHelper;
 import com.vaguehope.morrigan.android.model.MlistItem;
+import com.vaguehope.morrigan.android.playback.MediaTag;
 
 
 public class MlistItemBasicImpl implements MlistItem {
@@ -39,7 +41,7 @@ public class MlistItemBasicImpl implements MlistItem {
 	private int duration;
 	private int startCount;
 	private int endCount;
-	private String[] tags;
+	private Collection<MediaTag> tags;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -175,10 +177,10 @@ public class MlistItemBasicImpl implements MlistItem {
 	}
 
 	@Override
-	public String[] getTags () {
+	public Collection<MediaTag> getTags () {
 		return this.tags;
 	}
-	public void setTags (final String[] tags) {
+	public void setTags (final Collection<MediaTag> tags) {
 		this.tags = tags;
 	}
 

@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.text.ParseException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -44,6 +45,8 @@ import com.vaguehope.morrigan.android.model.Artifact;
 import com.vaguehope.morrigan.android.model.ArtifactList;
 import com.vaguehope.morrigan.android.model.MlistItem;
 import com.vaguehope.morrigan.android.model.MlistItemList;
+import com.vaguehope.morrigan.android.playback.MediaTag;
+import com.vaguehope.morrigan.android.playback.MediaTagType;
 
 public class MlistItemListImpl implements MlistItemList, ContentHandler {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -67,8 +70,6 @@ public class MlistItemListImpl implements MlistItemList, ContentHandler {
 	public static final String ENABLED = "enabled";
 	public static final String MISSING = "missing";
 	public static final String TAG = "tag";
-
-	private static final String MANUAL_TAG = "0";
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -129,7 +130,7 @@ public class MlistItemListImpl implements MlistItemList, ContentHandler {
 	private final Stack<Map<String, String>> currentAttributes = new Stack<Map<String,String>>();
 	private StringBuilder currentText;
 	private MlistItemBasicImpl currentItem;
-	private List<String> currentTags;
+	private Collection<MediaTag> currentTags;
 
 	@Override
 	public void startElement(final String uri, final String localName, final String qName, final Attributes attr) throws SAXException {
@@ -166,7 +167,7 @@ public class MlistItemListImpl implements MlistItemList, ContentHandler {
 
 		if (this.stack.size() == 2 && localName.equals(ENTRY)) {
 			if (this.currentTags != null) {
-				this.currentItem.setTags(this.currentTags.toArray(new String[this.currentTags.size()]));
+				this.currentItem.setTags(this.currentTags);
 				this.currentTags = null;
 			}
 			this.mlistItemList.add(this.currentItem);
@@ -226,10 +227,18 @@ public class MlistItemListImpl implements MlistItemList, ContentHandler {
 			this.currentItem.setMissing(v);
 		}
 		else if (this.stack.size() == 3 && localName.equals(TAG)) {
-			if (MANUAL_TAG.equals(attr.get("t")) && "".equals(attr.get("c"))) {
-				if (this.currentTags == null) this.currentTags = new LinkedList<String>();
-				this.currentTags.add(this.currentText.toString());
-			}
+			final String tag = this.currentText.toString();
+			final String t = attr.get("t");
+			final String cls = attr.get("c");
+			final String m = attr.get("m");
+			final String d = attr.get("d");
+			final MediaTagType type = MediaTagType.getFromNumber(Integer.parseInt(t));
+			final long modified = m != null ? Long.parseLong(m) : -1;
+			final boolean deleted = Boolean.parseBoolean(d);
+			final MediaTag mediaTag = new MediaTag(tag, cls, type, modified, deleted);
+
+			if (this.currentTags == null) this.currentTags = new LinkedList<MediaTag>();
+			this.currentTags.add(mediaTag);
 		}
 
 		this.stack.pop();
