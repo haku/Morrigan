@@ -62,6 +62,7 @@ public class MlistItemListImpl implements MlistItemList, ContentHandler {
 	public static final String ENDCOUNT = "endcount";
 	public static final String FILESIZE = "filesize";
 	public static final String LASTMODIFIED = "datelastmodified";
+	public static final String LASTPLAYED = "datelastplayed";
 	public static final String HASHCODE = "hash";
 	public static final String ENABLED = "enabled";
 	public static final String MISSING = "missing";
@@ -200,6 +201,15 @@ public class MlistItemListImpl implements MlistItemList, ContentHandler {
 				this.currentItem.setLastModified(v);
 			}
 			catch (ParseException e) {
+				throw new SAXException(e.toString(), e);
+			}
+		}
+		else if (this.stack.size() == 3 && localName.equals(LASTPLAYED)) {
+			try {
+				final long v = TimeHelper.parseXmlDate(this.currentText.toString());
+				this.currentItem.setLastPlayed(v);
+			}
+			catch (final ParseException e) {
 				throw new SAXException(e.toString(), e);
 			}
 		}

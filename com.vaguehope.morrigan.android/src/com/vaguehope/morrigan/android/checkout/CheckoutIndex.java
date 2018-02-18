@@ -6,10 +6,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import com.vaguehope.morrigan.android.helper.FileHelper;
 import com.vaguehope.morrigan.android.C;
@@ -24,9 +26,11 @@ import android.util.Log;
 public class CheckoutIndex {
 
 	public static Set<String> findExcessFiles (final Context context, final List<Checkout> checkouts) throws IOException {
-		final Set<String> index = new HashSet<String>();
+		final Set<String> indexPaths = new HashSet<String>();
 		for (final Checkout checkout : checkouts) {
-			index.addAll(read(context, checkout));
+			for (final IndexEntry ie : read(context, checkout)) {
+				indexPaths.add(ie.getPath());
+			}
 		}
 		final Set<String> excessFiles = new LinkedHashSet<String>();
 		for (final Checkout checkout : checkouts) {
@@ -34,7 +38,7 @@ public class CheckoutIndex {
 				@Override
 				public void onAnswer (final File file) {
 					final String path = file.getAbsolutePath();
-					if (!index.contains(path)) excessFiles.add(path);
+					if (!indexPaths.contains(path)) excessFiles.add(path);
 				}
 			});
 		}
@@ -61,7 +65,7 @@ public class CheckoutIndex {
 		Log.i(C.LOGTAG, "Wrote index: " + file.getAbsolutePath());
 	}
 
-	public static Set<String> read (final Context context, final Checkout checkout) throws IOException {
+	public static Set<IndexEntry> read (final Context context, final Checkout checkout) throws IOException {
 		final File file = getIndexFile(context, checkout);
 		if (!file.exists()) {
 			Log.w(C.LOGTAG, "Index not found: " + file.getAbsolutePath());
@@ -70,10 +74,10 @@ public class CheckoutIndex {
 
 		final JsonReader reader = new JsonReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
 		try {
-			final Set<String> ret = new HashSet<String>();
+			final Set<IndexEntry> ret = new HashSet<IndexEntry>();
 			reader.beginArray();
 			while (reader.hasNext()) {
-				final String entry = readEntry(reader);
+				final IndexEntry entry = readEntry(reader);
 				if (entry != null) ret.add(entry);
 			}
 			reader.endArray();
@@ -92,23 +96,60 @@ public class CheckoutIndex {
 	private static void writeEntry (final JsonWriter writer, final ItemAndFile itemAndFile) throws IOException {
 		writer.beginObject();
 		writer.name("path").value(itemAndFile.getLocalFile().getAbsolutePath());
+		writer.name("hash").value(itemAndFile.getItem().getHashCode().toString(16).toLowerCase(Locale.ENGLISH));
+		writer.name("startcount").value(itemAndFile.getItem().getStartCount());
+		writer.name("endcount").value(itemAndFile.getItem().getEndCount());
+		writer.name("lastplayed").value(itemAndFile.getItem().getLastPlayed());
+
+		writer.name("tags").beginArray();
+		for (final String tag : itemAndFile.getItem().getTags()) {
+			writer.value(tag);
+		}
+		writer.endArray();
+
 		writer.endObject();
 	}
 
-	private static String readEntry (final JsonReader reader) throws IOException {
-		String ret = null;
+	private static IndexEntry readEntry (final JsonReader reader) throws IOException {
+		String path = null;
+		String hash = null;
+		long startCount = -1;
+		long endCount = -1;
+		long lastPlayed = -1;
+		List<String> tags = new ArrayList<String>();
+
 		reader.beginObject();
 		while (reader.hasNext()) {
 			final String name = reader.nextName();
 			if (name.equals("path")) {
-				ret = reader.nextString();
+				path = reader.nextString();
+			}
+			else if (name.equals("hash")) {
+				hash = reader.nextString();
+			}
+			else if (name.equals("startcount")) {
+				startCount = reader.nextLong();
+			}
+			else if (name.equals("endcount")) {
+				endCount = reader.nextLong();
+			}
+			else if (name.equals("lastplayed")) {
+				lastPlayed = reader.nextLong();
+			}
+			else if (name.equals("tags")) {
+				reader.beginArray();
+				while (reader.hasNext()) {
+					tags.add(reader.nextString());
+				}
+				reader.endArray();
 			}
 			else {
 				reader.skipValue();
 			}
 		}
 		reader.endObject();
-		return ret;
+
+		return new IndexEntry(path, hash, startCount, endCount, lastPlayed, tags);
 	}
 
 }
