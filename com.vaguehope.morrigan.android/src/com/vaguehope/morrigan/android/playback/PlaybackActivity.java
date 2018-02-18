@@ -153,8 +153,11 @@ public class PlaybackActivity extends FragmentActivity {
 
 	@Override
 	public boolean onPrepareOptionsMenu (final Menu menu) {
+		final Playbacker pb = getPlaybacker();
+		if (pb == null) return false;
+
 		final int id;
-		switch (getPlaybacker().getPlayOrder()) {
+		switch (pb.getPlayOrder()) {
 			case QUEUE_ONLY:
 				id = R.id.playorder_queue_only;
 				break;
