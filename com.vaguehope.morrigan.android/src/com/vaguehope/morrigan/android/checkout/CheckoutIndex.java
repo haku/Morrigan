@@ -29,7 +29,7 @@ public class CheckoutIndex {
 		final Set<String> indexPaths = new HashSet<String>();
 		for (final Checkout checkout : checkouts) {
 			for (final IndexEntry ie : read(context, checkout)) {
-				indexPaths.add(ie.getPath());
+				indexPaths.add(ie.getLocalPath());
 			}
 		}
 		final Set<String> excessFiles = new LinkedHashSet<String>();

@@ -5,7 +5,7 @@ import java.util.List;
 
 public class IndexEntry {
 
-	private final String path;
+	private final String localPath;
 	private final String hash;
 	private final long startCount;
 	private final long endCount;
@@ -13,13 +13,13 @@ public class IndexEntry {
 	private final List<String> tags;
 
 	public IndexEntry (
-			final String path,
+			final String localPath,
 			final String hash,
 			final long startCount,
 			final long endCount,
 			final long lastPlayed,
 			final List<String> tags) {
-		this.path = path;
+		this.localPath = localPath;
 		this.hash = hash;
 		this.startCount = startCount;
 		this.endCount = endCount;
@@ -27,8 +27,11 @@ public class IndexEntry {
 		this.tags = tags;
 	}
 
-	public String getPath () {
-		return this.path;
+	/**
+	 * Path of checked out file on this device.
+	 */
+	public String getLocalPath () {
+		return this.localPath;
 	}
 
 	public String getHash () {
