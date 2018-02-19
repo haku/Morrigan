@@ -16,10 +16,10 @@ import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnCreateContextMenuListener;
@@ -308,6 +308,9 @@ public class PlayerFragment extends Fragment {
 				else {
 					this.txtTags.setText("(no tags)");
 				}
+			}
+			else {
+				this.txtTags.setText("(item missing from library)");
 			}
 		}
 		else {
