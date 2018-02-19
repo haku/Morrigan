@@ -1088,7 +1088,7 @@ public class MediaDbImpl implements MediaDb {
 		final MediaTag existingTag = readTag(mfRowId, newTag.getTag(), newTag.getCls(), newTag.getType().getNumber());
 		if (existingTag != null) {
 			if (existingTag.hasModified() && newTag.hasModified()
-					&& existingTag.getModified() > newTag.getModified()) {
+					&& existingTag.getModified() >= newTag.getModified()) {
 				return;
 			}
 
