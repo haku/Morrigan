@@ -1064,17 +1064,24 @@ public class MediaDbImpl implements MediaDb {
 				final long mfRowId = entry.getKey();
 				final Collection<MediaTag> newTags = entry.getValue();
 				if (newTags.size() < 1) throw new IllegalArgumentException("Empty tag list for mfRowId: " + mfRowId);
-
-				for (final MediaTag newTag : newTags) {
-					values.clear();
-					appendTag(values, mfRowId, newTag);
-				}
+				appendTags(values, mfRowId, newTags);
 			}
 			this.mDb.setTransactionSuccessful();
 		}
 		finally {
 			this.mDb.endTransaction();
 		}
+	}
+
+	private void appendTags (final ContentValues values, final long mfRowId, final Collection<MediaTag> newTags) {
+		for (final MediaTag newTag : newTags) {
+			values.clear();
+			appendTag(values, mfRowId, newTag);
+		}
+	}
+
+	private void appendTags (final long mfRowId, final Collection<MediaTag> newTags) {
+		appendTags(new ContentValues(), mfRowId, newTags);
 	}
 
 	private void appendTag (final ContentValues values, final long mfRowId, final MediaTag newTag) {
@@ -1141,9 +1148,7 @@ public class MediaDbImpl implements MediaDb {
 		try {
 			final MediaItem destItem = getMediaItem(destRowId);
 
-			// TODO
-			// Tags.
-			// Item enabled.
+			// TODO Merge item enabled?
 
 			long earliestTimeAddedMillis = destItem.getTimeAddedMillis();
 			long latestTimeLastPlayedMillis = destItem.getTimeLastPlayedMillis();
@@ -1152,6 +1157,8 @@ public class MediaDbImpl implements MediaDb {
 
 			if (totalStartCount < 0) totalStartCount = 0;
 			if (totalEndCount < 0) totalEndCount = 0;
+
+			final Collection<MediaTag> tagsToAdd = new ArrayList<MediaTag>();
 
 			for (final Long fromRowId : fromRowIds) {
 				final MediaItem fromItem = getMediaItem(fromRowId);
@@ -1167,7 +1174,7 @@ public class MediaDbImpl implements MediaDb {
 				if (fromItem.getStartCount() > 0) totalStartCount += fromItem.getStartCount();
 				if (fromItem.getEndCount() > 0) totalEndCount += fromItem.getEndCount();
 
-				// TODO merge tags.
+				tagsToAdd.addAll(readTags(fromRowId));
 			}
 
 			final MediaItem newItem = destItem
@@ -1176,6 +1183,7 @@ public class MediaDbImpl implements MediaDb {
 					.withStartCount(totalStartCount)
 					.withEndCount(totalEndCount);
 			updateMedia(Collections.singleton(newItem));
+			appendTags(destRowId, tagsToAdd);
 
 			rmMediaItemRows(fromRowIds);
 
