@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.json.JSONException;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -23,6 +24,7 @@ import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQuery;
 import android.net.Uri;
+
 import com.vaguehope.morrigan.android.helper.IoHelper;
 import com.vaguehope.morrigan.android.helper.LogWrapper;
 import com.vaguehope.morrigan.android.helper.StringHelper;
@@ -778,15 +780,18 @@ public class MediaDbImpl implements MediaDb {
 	}
 
 	@Override
-	public void rmMediaItemRows (final Collection<Long> rowIds) {
+	public void rmMediaItemRows (final Collection<Long> mfRowIds) {
 		this.mDb.beginTransaction();
 		try {
-			for (final Long rowId : rowIds) {
-				if (rowId < 0) throw new IllegalArgumentException("MediaItem missing rowId.");
+			for (final Long mfRowId : mfRowIds) {
+				if (mfRowId < 0) throw new IllegalArgumentException("MediaItem missing rowId.");
 
-				final int affected = this.mDb.delete(TBL_MF, TBL_MF_ID + "=?", new String[] { String.valueOf(rowId) });
-				if (affected > 1) throw new IllegalStateException("Updating media row " + rowId + " affected " + affected + " rows, expected 1.");
-				if (affected < 1) LOG.w("Updating media row %s affected %s rows, expected 1.", rowId, affected);
+				this.mDb.delete(TBL_TG, TBL_TG_MFID + "=?", new String[] { String.valueOf(mfRowId) });
+				// Can not meaningfully validate this.
+
+				final int affected = this.mDb.delete(TBL_MF, TBL_MF_ID + "=?", new String[] { String.valueOf(mfRowId) });
+				if (affected > 1) throw new IllegalStateException("Deleting media row " + mfRowId + " affected " + affected + " rows, expected 1.");
+				if (affected < 1) LOG.w("Updating media row %s affected %s rows, expected 1.", mfRowId, affected);
 			}
 			this.mDb.setTransactionSuccessful();
 		}
