@@ -4,6 +4,7 @@ import java.lang.ref.WeakReference;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.util.TreeMap;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -14,6 +15,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.view.ActionMode;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
@@ -25,6 +27,7 @@ import android.view.View.OnClickListener;
 import android.view.View.OnCreateContextMenuListener;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
+import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
@@ -173,9 +176,6 @@ public class PlayerFragment extends Fragment {
 			case PlaybackCodes.MENU_MOVE_DOWN:
 				moveQueueItemDownById(((AdapterView.AdapterContextMenuInfo) menuItem.getMenuInfo()).id);
 				return true;
-			case PlaybackCodes.MENU_REMOVE:
-				removeFromQueueById(((AdapterView.AdapterContextMenuInfo) menuItem.getMenuInfo()).id);
-				return true;
 			default:
 				return super.onContextItemSelected(menuItem);
 		}
@@ -190,6 +190,8 @@ public class PlayerFragment extends Fragment {
 		this.queueList.setAdapter(this.adapter);
 		this.queueList.setOnItemClickListener(this.queueItemClickListener);
 		this.queueList.setOnCreateContextMenuListener(this.queueContextMenuListener);
+		this.queueList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+		this.queueList.setMultiChoiceModeListener(this.queueListMultiChoiceModeListener);
 
 		final View tagRow = rootView.findViewById(R.id.tagRow);
 //		tagRow.setOnClickListener(this.contextMenuClickListener);
@@ -430,7 +432,50 @@ public class PlayerFragment extends Fragment {
 			menu.add(Menu.NONE, PlaybackCodes.MENU_MOVE_UP, Menu.NONE, "Move Up");
 			menu.add(Menu.NONE, PlaybackCodes.MENU_MOVE_DOWN, Menu.NONE, "Move Down");
 			menu.add(Menu.NONE, PlaybackCodes.MENU_MOVE_BOTTOM, Menu.NONE, "Move Bottom");
-			menu.add(Menu.NONE, PlaybackCodes.MENU_REMOVE, Menu.NONE, "Remove");
+		}
+	};
+
+	private final MultiChoiceModeListener queueListMultiChoiceModeListener = new MultiChoiceModeListener() {
+
+		private final Map<Integer, Long> selectedIds = new TreeMap<Integer, Long>();
+
+		@Override
+		public boolean onCreateActionMode (final ActionMode mode, final Menu menu) {
+			menu.add("Remove").setOnMenuItemClickListener(new OnMenuItemClickListener() {
+				@Override
+				public boolean onMenuItemClick (final MenuItem item) {
+					removeFromQueueById(selectedIds.values());
+					mode.finish();
+					return true;
+				}
+			});
+			return true;
+		}
+
+		@Override
+		public boolean onPrepareActionMode (final ActionMode mode, final Menu menu) {
+			return false;
+		}
+
+		@Override
+		public boolean onActionItemClicked (final ActionMode mode, final MenuItem item) {
+			return false; // Items have their only click handlers.
+		}
+
+		@Override
+		public void onDestroyActionMode (final ActionMode mode) {
+			this.selectedIds.clear();
+		}
+
+		@Override
+		public void onItemCheckedStateChanged (final ActionMode mode, final int position, final long id, final boolean checked) {
+			if (checked) {
+				this.selectedIds.put(position, id);
+			}
+			else {
+				this.selectedIds.remove(position);
+			}
+			mode.setTitle(String.format("%s items", this.selectedIds.size()));
 		}
 	};
 
@@ -458,10 +503,10 @@ public class PlayerFragment extends Fragment {
 		db.moveQueueItem(itemId, MoveAction.DOWN);
 	}
 
-	private void removeFromQueueById (final long itemId) {
+	private void removeFromQueueById (final Collection<Long> itemIds) {
 		final MediaDb db = getMediaDb();
 		if (db == null) return;
-		db.removeFromQueueById(Collections.singleton(itemId));
+		db.removeFromQueueById(itemIds);
 	}
 
 	// Buttons.

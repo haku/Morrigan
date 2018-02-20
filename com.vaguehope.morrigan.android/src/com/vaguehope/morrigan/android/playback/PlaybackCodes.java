@@ -15,7 +15,6 @@ public interface PlaybackCodes {
 	int BROWSE_MEDIA_REQUEST_CODE = 34600;
 	int MEDIA_SOURCE_PREF_REQUEST_CODE = 98900;
 
-	int MENU_REMOVE = 2001;
 	int MENU_MOVE_UP = 2002;
 	int MENU_MOVE_DOWN = 2003;
 	int MENU_MOVE_TOP = 2004;
