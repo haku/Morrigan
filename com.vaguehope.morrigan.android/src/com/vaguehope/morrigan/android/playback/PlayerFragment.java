@@ -37,6 +37,7 @@ import android.widget.TextView;
 import com.vaguehope.morrigan.android.R;
 import com.vaguehope.morrigan.android.helper.LogWrapper;
 import com.vaguehope.morrigan.android.helper.Result;
+import com.vaguehope.morrigan.android.helper.StringHelper;
 import com.vaguehope.morrigan.android.playback.MediaDb.MediaWatcher;
 import com.vaguehope.morrigan.android.playback.MediaDb.MoveAction;
 import com.vaguehope.morrigan.android.playback.MediaDb.QueueEnd;
@@ -302,7 +303,7 @@ public class PlayerFragment extends Fragment {
 					final StringBuilder str = new StringBuilder();
 					for (final MediaTag tag : tags) {
 						if (str.length() > 0) str.append(", ");
-						str.append(tag.getTag());
+						str.append(StringHelper.maxLength(StringHelper.firstLineWithElipse(tag.getTag()), 100));
 						if (tag.isDeleted()) str.append("(d)");
 					}
 					this.txtTags.setText(str.toString());

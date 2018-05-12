@@ -2,6 +2,8 @@ package com.vaguehope.morrigan.android.helper;
 
 public class StringHelper {
 
+	private static final String ELIPSE = "...";
+
 	private StringHelper () {
 		throw new AssertionError();
 	}
@@ -14,7 +16,18 @@ public class StringHelper {
 		return s != null && !s.isEmpty();
 	}
 
-	public static String implode (String[] arr, String sep) {
+	public static String maxLength(final String s, final int len) {
+		if (s.length() < len) return s;
+		return s.substring(0, len - ELIPSE.length()) + ELIPSE;
+	}
+
+	public static String firstLineWithElipse(final String s) {
+		if (s == null) return s;
+		final int x = s.indexOf('\n');
+		return x >= 0 ? s.substring(0, x) + ELIPSE : s;
+	}
+
+	public static String implode (final String[] arr, final String sep) {
 		if (arr == null) return null;
 		StringBuilder s = new StringBuilder();
 		for (String a : arr) s.append(a).append(sep);
@@ -22,7 +35,7 @@ public class StringHelper {
 		return s.toString();
 	}
 
-	public static String substringByTokens (String d, String k0, String k1) {
+	public static String substringByTokens (final String d, final String k0, final String k1) {
 		String ret;
 		int x0;
 		int l;
