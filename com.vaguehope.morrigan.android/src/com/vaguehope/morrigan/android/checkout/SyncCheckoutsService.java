@@ -17,11 +17,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.vaguehope.morrigan.android.helper.DialogHelper.Listener;
 import com.vaguehope.morrigan.android.AwakeService;
 import com.vaguehope.morrigan.android.C;
 import com.vaguehope.morrigan.android.MnApi;
 import com.vaguehope.morrigan.android.R;
+import com.vaguehope.morrigan.android.helper.DialogHelper.Listener;
 import com.vaguehope.morrigan.android.helper.ExceptionHelper;
 import com.vaguehope.morrigan.android.helper.FileHelper;
 import com.vaguehope.morrigan.android.helper.FormaterHelper;
@@ -159,12 +159,12 @@ public class SyncCheckoutsService extends AwakeService {
 		storeResult(checkout, prgLstnr, toDelete);
 	}
 
-	private List<? extends MlistItem> fetchListOfItems (final Checkout checkout, final ServerReference host) throws IOException {
+	private static List<? extends MlistItem> fetchListOfItems (final Checkout checkout, final ServerReference host) throws IOException {
 		final MlistItemList itemList = MnApi.fetchDbItems(host, checkout.getDbRelativePath(), checkout.getQuery(), "audio_only", true); // TODO unhardcode this.
 		return itemList.getMlistItemList();
 	}
 
-	private List<ItemAndFile> computeLocalFiles (final File localDir, final List<? extends MlistItem> items, final List<String> srcs) throws UnsupportedEncodingException {
+	private static List<ItemAndFile> computeLocalFiles (final File localDir, final List<? extends MlistItem> items, final List<String> srcs) throws UnsupportedEncodingException {
 		final List<ItemAndFile> ret = new ArrayList<ItemAndFile>();
 		for (final MlistItem item : items) {
 			final String urlWithoutSrc = removeSrc(URLDecoder.decode(item.getRelativeUrl(), "UTF-8"), srcs);
@@ -175,10 +175,12 @@ public class SyncCheckoutsService extends AwakeService {
 		return ret;
 	}
 
-	private List<ItemAndFile> computeRequireDownloading (final List<ItemAndFile> items) throws UnsupportedEncodingException {
+	private static List<ItemAndFile> computeRequireDownloading (final List<ItemAndFile> items) {
 		final List<ItemAndFile> ret = new ArrayList<ItemAndFile>();
 		for (final ItemAndFile i : items) {
-			if (!i.getLocalFile().exists() || i.getLocalFile().lastModified() < i.getItem().getLastModified()) {
+			if (!i.getLocalFile().exists()
+					|| i.getLocalFile().lastModified() < i.getItem().getLastModified()
+					|| i.getLocalFile().length() != i.getItem().getFileSize()) {
 				ret.add(i);
 			}
 		}
@@ -216,7 +218,7 @@ public class SyncCheckoutsService extends AwakeService {
 		return prgLstnr;
 	}
 
-	private List<File> findToDelete (final File localDir, final List<ItemAndFile> allItemsAndLocalFiles) throws IOException {
+	private static List<File> findToDelete (final File localDir, final List<ItemAndFile> allItemsAndLocalFiles) throws IOException {
 		final Set<File> localFiles = new HashSet<File>(allItemsAndLocalFiles.size());
 		for (final ItemAndFile i : allItemsAndLocalFiles) {
 			localFiles.add(i.getLocalFile());
