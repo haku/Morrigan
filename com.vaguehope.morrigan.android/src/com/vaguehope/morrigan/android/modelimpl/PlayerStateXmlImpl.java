@@ -306,6 +306,11 @@ public class PlayerStateXmlImpl implements PlayerState, MlistItem, ContentHandle
 	}
 
 	@Override
+	public BigInteger getOriginalHashCode () {
+		return getTrackHashCode(); // FIXME Currently player is always the original hash.
+	}
+
+	@Override
 	public BigInteger getHashCode () {
 		return getTrackHashCode();
 	}

@@ -363,14 +363,21 @@ public class RescanLibrariesService extends MediaBindingAwakeService {
 		final MediaDb mediaDb = getMediaDb();
 		final ConfigDb configDb = new ConfigDb(this);
 
+		final Map<Long, BigInteger> originalHashesToAdd = new HashMap<Long, BigInteger>();
 		final Map<Long, Collection<MediaTag>> tagsToAppend = new HashMap<Long, Collection<MediaTag>>();
+
 		for (final Checkout checkout : configDb.getCheckouts()) {
 			final Set<IndexEntry> index = CheckoutIndex.read(this, checkout);
 			for (final IndexEntry entry : index) {
 				if (entry.getHash() != null) {
 					final long[] mfRowIds = mediaDb.getMediaRowIds(library.getId(), entry.getHash());
 					for (final long mfRowId : mfRowIds) {
-						tagsToAppend.put(mfRowId, entry.getTags());
+						if (entry.getOHash() != null) {
+							originalHashesToAdd.put(mfRowId, entry.getOHash());
+						}
+						if (entry.hasTags()) {
+							tagsToAppend.put(mfRowId, entry.getTags());
+						}
 					}
 				}
 				else {
@@ -379,11 +386,17 @@ public class RescanLibrariesService extends MediaBindingAwakeService {
 			}
 		}
 
+		LOG.i("Appending original hashes to %s items...", originalHashesToAdd.size());
+		updateNotifProgress(notificationId, notif, "Appending original hashes...");
+		final long startTime1 = System.currentTimeMillis();
+		mediaDb.updateOriginalHashes(originalHashesToAdd);
+		LOG.i("Append original hashes to %s items in %sms.", originalHashesToAdd.size(), System.currentTimeMillis() - startTime1);
+
 		LOG.i("Appending tags to %s items...", tagsToAppend.size());
 		updateNotifProgress(notificationId, notif, "Appending tags...");
-		final long startTime = System.currentTimeMillis();
+		final long startTime2 = System.currentTimeMillis();
 		mediaDb.appendTags(tagsToAppend);
-		LOG.i("Append tags to %s items in %sms.", tagsToAppend.size(), System.currentTimeMillis() - startTime);
+		LOG.i("Append tags to %s items in %sms.", tagsToAppend.size(), System.currentTimeMillis() - startTime2);
 	}
 
 	private static final class IdUri {

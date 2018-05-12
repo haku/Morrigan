@@ -37,6 +37,7 @@ public interface MlistItem extends Artifact {
 	public long getFileSize ();
 	public long getLastModified ();
 	public long getLastPlayed ();
+	public BigInteger getOriginalHashCode ();
 	public BigInteger getHashCode ();
 	public boolean isEnabled ();
 	public boolean isMissing ();

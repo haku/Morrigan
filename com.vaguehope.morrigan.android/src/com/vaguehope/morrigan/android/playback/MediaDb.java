@@ -61,6 +61,7 @@ public interface MediaDb {
 
 	// Map of rowId to new tags.
 	Map<Long, Collection<MediaTag>> readTags (Collection<Long> mfRowIds);
+	void updateOriginalHashes (Map<Long, BigInteger> mfRowIdToOriginalHash);
 	void appendTags (Map<Long, Collection<MediaTag>> mfRowIdToTags);
 
 	Cursor findDuplicates(long libraryId);

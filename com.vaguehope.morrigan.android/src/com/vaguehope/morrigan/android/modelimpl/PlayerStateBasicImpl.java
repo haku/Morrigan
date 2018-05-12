@@ -345,6 +345,11 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference, Mlist
 	}
 
 	@Override
+	public BigInteger getOriginalHashCode () {
+		return getTrackHashCode(); // FIXME Currently player is always the original hash.
+	}
+
+	@Override
 	public BigInteger getHashCode () {
 		return getTrackHashCode();
 	}

@@ -12,6 +12,7 @@ public class MediaItem {
 	private final String title;
 	private final long sizeBytes;
 	private final long timeFileLastModified;
+	private final BigInteger fileOriginalHash;
 	private final BigInteger fileHash;
 	private final long timeAddedMillis;
 	private final long timeLastPlayedMillis;
@@ -21,11 +22,11 @@ public class MediaItem {
 
 	public MediaItem (final long libraryId, final Uri uri, final String title,
 			final long sizeBytes, final long timeFileLastModified, final long timeAddedMillis) {
-		this(-1, libraryId, uri, title, sizeBytes, timeFileLastModified, null, timeAddedMillis, -1, 0, 0, -1);
+		this(-1, libraryId, uri, title, sizeBytes, timeFileLastModified, null, null, timeAddedMillis, -1, 0, 0, -1);
 	}
 
 	public MediaItem (final long rowId, final long libraryId, final Uri uri, final String title,
-			final long sizeBytes, final long timeFileLastModified, final BigInteger fileHash,
+			final long sizeBytes, final long timeFileLastModified, final BigInteger fileOriginalHash, final BigInteger fileHash,
 			final long timeAddedMillis, final long timeLastPlayedMillis,
 			final int startCount, final int endCount, final long durationMillis) {
 		this.rowId = rowId;
@@ -34,6 +35,7 @@ public class MediaItem {
 		this.title = title;
 		this.sizeBytes = sizeBytes;
 		this.timeFileLastModified = timeFileLastModified;
+		this.fileOriginalHash = fileOriginalHash;
 		this.fileHash = fileHash;
 		this.timeAddedMillis = timeAddedMillis;
 		this.timeLastPlayedMillis = timeLastPlayedMillis;
@@ -64,6 +66,10 @@ public class MediaItem {
 
 	public long getTimeFileLastModified () {
 		return this.timeFileLastModified;
+	}
+
+	public BigInteger getFileOriginalHash () {
+		return this.fileOriginalHash;
 	}
 
 	public BigInteger getFileHash () {
@@ -98,25 +104,25 @@ public class MediaItem {
 
 	public MediaItem withTimeAdded(final long newTimeAddedMillis) {
 		return new MediaItem(this.rowId, this.libraryId, this.uri, this.title, this.sizeBytes,
-				this.timeFileLastModified, this.fileHash, newTimeAddedMillis, this.timeLastPlayedMillis,
+				this.timeFileLastModified, this.fileOriginalHash, this.fileHash, newTimeAddedMillis, this.timeLastPlayedMillis,
 				this.startCount, this.endCount, this.durationMillis);
 	}
 
 	public MediaItem withTimeLastPlayed(final long newTimeLastPlayedMillis) {
 		return new MediaItem(this.rowId, this.libraryId, this.uri, this.title, this.sizeBytes,
-				this.timeFileLastModified, this.fileHash, this.timeAddedMillis, newTimeLastPlayedMillis,
+				this.timeFileLastModified, this.fileOriginalHash, this.fileHash, this.timeAddedMillis, newTimeLastPlayedMillis,
 				this.startCount, this.endCount, this.durationMillis);
 	}
 
 	public MediaItem withStartCount(final int newStartCount) {
 		return new MediaItem(this.rowId, this.libraryId, this.uri, this.title, this.sizeBytes,
-				this.timeFileLastModified, this.fileHash, this.timeAddedMillis, this.timeLastPlayedMillis,
+				this.timeFileLastModified, this.fileOriginalHash, this.fileHash, this.timeAddedMillis, this.timeLastPlayedMillis,
 				newStartCount, this.endCount, this.durationMillis);
 	}
 
 	public MediaItem withEndCount(final int newEndCount) {
 		return new MediaItem(this.rowId, this.libraryId, this.uri, this.title, this.sizeBytes,
-				this.timeFileLastModified, this.fileHash, this.timeAddedMillis, this.timeLastPlayedMillis,
+				this.timeFileLastModified, this.fileOriginalHash, this.fileHash, this.timeAddedMillis, this.timeLastPlayedMillis,
 				this.startCount, newEndCount, this.durationMillis);
 	}
 }

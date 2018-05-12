@@ -101,6 +101,9 @@ public class CheckoutIndex {
 	private static void writeEntry (final JsonWriter writer, final ItemAndFile itemAndFile) throws IOException {
 		writer.beginObject();
 		writer.name("path").value(itemAndFile.getLocalFile().getAbsolutePath());
+		if (itemAndFile.getItem().getOriginalHashCode() != null) {
+			writer.name("ohash").value(itemAndFile.getItem().getOriginalHashCode().toString(16).toLowerCase(Locale.ENGLISH));
+		}
 		if (itemAndFile.getItem().getHashCode() != null) {
 			writer.name("hash").value(itemAndFile.getItem().getHashCode().toString(16).toLowerCase(Locale.ENGLISH));
 		}
@@ -125,6 +128,7 @@ public class CheckoutIndex {
 
 	private static IndexEntry readEntry (final JsonReader reader) throws IOException {
 		String path = null;
+		String ohash = null;
 		String hash = null;
 		long startCount = -1;
 		long endCount = -1;
@@ -139,6 +143,9 @@ public class CheckoutIndex {
 			}
 			else if (name.equals("hash")) {
 				hash = reader.nextString();
+			}
+			else if (name.equals("ohash")) {
+				ohash = reader.nextString();
 			}
 			else if (name.equals("startcount")) {
 				startCount = reader.nextLong();
@@ -158,7 +165,7 @@ public class CheckoutIndex {
 		}
 		reader.endObject();
 
-		return new IndexEntry(path, hash, startCount, endCount, lastPlayed, tags);
+		return new IndexEntry(path, ohash, hash, startCount, endCount, lastPlayed, tags);
 	}
 
 	private static void readTags (final JsonReader reader, final List<MediaTag> tags) throws IOException {

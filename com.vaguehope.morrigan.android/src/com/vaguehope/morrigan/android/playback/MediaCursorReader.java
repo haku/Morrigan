@@ -16,6 +16,7 @@ public class MediaCursorReader {
 	private int colTitle = -1;
 	private int colSize = -1;
 	private int colLastModified = -1;
+	private int colOriginalHash = -1;
 	private int colHash = -1;
 	private int colAddedMillis = -1;
 	private int colLastPlayedMillis = -1;
@@ -65,6 +66,14 @@ public class MediaCursorReader {
 		return c.getLong(this.colLastModified);
 	}
 
+	public BigInteger readFileOriginalHash (final Cursor c) {
+		if (c == null) return null;
+		if (this.colOriginalHash < 0) this.colOriginalHash = c.getColumnIndexOrThrow(MediaDbImpl.TBL_MF_OHASH);
+		final byte[] blob = c.getBlob(this.colOriginalHash);
+		if (blob == null || blob.length < 1) return null;
+		return new BigInteger(blob);
+	}
+
 	public BigInteger readFileHash (final Cursor c) {
 		if (c == null) return null;
 		if (this.colHash < 0) this.colHash = c.getColumnIndexOrThrow(MediaDbImpl.TBL_MF_HASH);
@@ -111,6 +120,7 @@ public class MediaCursorReader {
 		final String title = readTitle(c);
 		final long sizeBytes = readSizeBytes(c);
 		final long timeFileLastModified = readFileLastModified(c);
+		final BigInteger fileOriginalHash = readFileOriginalHash(c);
 		final BigInteger fileHash = readFileHash(c);
 		final long timeAddedMillis = readTimeAddedMillis(c);
 		final long timeLastPlayedMillis = readLastPlayedMillis(c);
@@ -123,6 +133,7 @@ public class MediaCursorReader {
 				title,
 				sizeBytes,
 				timeFileLastModified,
+				fileOriginalHash,
 				fileHash,
 				timeAddedMillis,
 				timeLastPlayedMillis,

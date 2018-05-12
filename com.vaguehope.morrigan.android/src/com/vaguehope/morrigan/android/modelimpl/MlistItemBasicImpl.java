@@ -35,6 +35,7 @@ public class MlistItemBasicImpl implements MlistItem {
 	private long fileSize;
 	private long lastModified;
 	private long lastPlayed;
+	private BigInteger originalHashCode;
 	private BigInteger hashCode;
 	private boolean enabled;
 	private boolean missing;
@@ -134,6 +135,14 @@ public class MlistItemBasicImpl implements MlistItem {
 	}
 	public void setHashCode (final BigInteger hashCode) {
 		this.hashCode = hashCode;
+	}
+
+	@Override
+	public BigInteger getOriginalHashCode () {
+		return this.originalHashCode;
+	}
+	public void setOriginalHashCode (final BigInteger originalHashCode) {
+		this.originalHashCode = originalHashCode;
 	}
 
 	@Override

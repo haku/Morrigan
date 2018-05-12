@@ -9,6 +9,7 @@ import com.vaguehope.morrigan.android.playback.MediaTag;
 public class IndexEntry {
 
 	private final String localPath;
+	private final String ohash;
 	private final String hash;
 	private final long startCount;
 	private final long endCount;
@@ -17,12 +18,14 @@ public class IndexEntry {
 
 	public IndexEntry (
 			final String localPath,
+			final String ohash,
 			final String hash,
 			final long startCount,
 			final long endCount,
 			final long lastPlayed,
 			final List<MediaTag> tags) {
 		this.localPath = localPath;
+		this.ohash = ohash;
 		this.hash = hash;
 		this.startCount = startCount;
 		this.endCount = endCount;
@@ -35,6 +38,11 @@ public class IndexEntry {
 	 */
 	public String getLocalPath () {
 		return this.localPath;
+	}
+
+	public BigInteger getOHash () {
+		if (this.ohash == null) return null;
+		return new BigInteger(this.ohash, 16);
 	}
 
 	public BigInteger getHash () {
@@ -55,6 +63,10 @@ public class IndexEntry {
 	 */
 	public long getLastPlayed () {
 		return this.lastPlayed;
+	}
+
+	public boolean hasTags () {
+		return this.tags != null && this.tags.size() > 0;
 	}
 
 	public List<MediaTag> getTags () {

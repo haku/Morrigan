@@ -34,7 +34,7 @@ public class MediaDbImpl implements MediaDb {
 	protected static final LogWrapper LOG = new LogWrapper("MDI");
 
 	private static final String DB_NAME = "media";
-	private static final int DB_VERSION = 7;
+	private static final int DB_VERSION = 8;
 
 	private static class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -73,6 +73,9 @@ public class MediaDbImpl implements MediaDb {
 			}
 			if (oldVersion < 7) { // NOSONAR not a magic number.
 				db.execSQL(TBL_TG_CREATE);
+			}
+			if (oldVersion < 8) { // NOSONAR not a magic number.
+				addColumn(db, TBL_MF, TBL_MF_OHASH, "blob");
 			}
 		}
 
@@ -160,6 +163,7 @@ public class MediaDbImpl implements MediaDb {
 	protected static final String TBL_MF_TITLE = "title";
 	protected static final String TBL_MF_SIZE = "size";
 	protected static final String TBL_MF_TIME_LAST_MODIFIED = "modified_millis";
+	protected static final String TBL_MF_OHASH = "ohash";
 	protected static final String TBL_MF_HASH = "hash";
 	protected static final String TBL_MF_TIME_ADDED_MILLIS = "added_millis";
 	protected static final String TBL_MF_TIME_LAST_PLAYED_MILLIS = "last_played_millis";
@@ -175,6 +179,7 @@ public class MediaDbImpl implements MediaDb {
 			+ TBL_MF_TITLE + " text,"
 			+ TBL_MF_SIZE + " integer,"
 			+ TBL_MF_TIME_LAST_MODIFIED + " integer,"
+			+ TBL_MF_OHASH + " blob,"
 			+ TBL_MF_HASH + " blob,"
 			+ TBL_MF_TIME_ADDED_MILLIS + " integer,"
 			+ TBL_MF_TIME_LAST_PLAYED_MILLIS + " integer,"
@@ -186,7 +191,7 @@ public class MediaDbImpl implements MediaDb {
 
 	private static final String TBL_MF_INDEX = TBL_MF + "_idx";
 	private static final String TBL_MF_CREATE_INDEX = "CREATE INDEX " + TBL_MF_INDEX + " ON " + TBL_MF + "("
-			+ TBL_MF_DBID + "," + TBL_MF_URI + "," + TBL_MF_TITLE + "," + TBL_MF_HASH + ");";
+			+ TBL_MF_DBID + "," + TBL_MF_URI + "," + TBL_MF_TITLE + "," + TBL_MF_OHASH + "," + TBL_MF_HASH + ");";
 
 	// Tags.
 
@@ -658,6 +663,7 @@ public class MediaDbImpl implements MediaDb {
 		values.put(TBL_MF_TITLE, item.getTitle());
 		values.put(TBL_MF_SIZE, item.getSizeBytes());
 		values.put(TBL_MF_TIME_LAST_MODIFIED, item.getTimeFileLastModified());
+		if (item.getFileOriginalHash() != null) values.put(TBL_MF_OHASH, item.getFileOriginalHash().toByteArray());
 		if (item.getFileHash() != null) values.put(TBL_MF_HASH, item.getFileHash().toByteArray());
 		values.put(TBL_MF_TIME_ADDED_MILLIS, item.getTimeAddedMillis());
 		values.put(TBL_MF_TIME_LAST_PLAYED_MILLIS, item.getTimeLastPlayedMillis());
@@ -810,6 +816,7 @@ public class MediaDbImpl implements MediaDb {
 						TBL_MF_TITLE,
 						TBL_MF_SIZE,
 						TBL_MF_TIME_LAST_MODIFIED,
+						TBL_MF_OHASH,
 						TBL_MF_HASH,
 						TBL_MF_TIME_ADDED_MILLIS,
 						TBL_MF_TIME_LAST_PLAYED_MILLIS,
@@ -949,12 +956,13 @@ public class MediaDbImpl implements MediaDb {
 		if (hash == null) throw new IllegalArgumentException("hash is required.");
 
 		final String query = "SELECT " + TBL_MF_ID + " FROM " + TBL_MF + " WHERE "
-				+ TBL_MF_DBID + "=? AND " + TBL_MF_HASH + "=?";
+				+ TBL_MF_DBID + "=? AND (" + TBL_MF_OHASH + "=? OR " + TBL_MF_HASH + "=?)";
 		final CursorFactory cursorFactory = new CursorFactory() {
 			@Override
 			public Cursor newCursor (final SQLiteDatabase db, final SQLiteCursorDriver masterQuery, final String editTable, final SQLiteQuery query) {
 				query.bindLong(1, libraryId);
 				query.bindBlob(2, hash.toByteArray());
+				query.bindBlob(3, hash.toByteArray());
 				return new SQLiteCursor(masterQuery, editTable, query);
 			}
 		};
@@ -1052,6 +1060,30 @@ public class MediaDbImpl implements MediaDb {
 		}
 		finally {
 			IoHelper.closeQuietly(c);
+		}
+	}
+
+	@Override
+	public void updateOriginalHashes (final Map<Long, BigInteger> mfRowIdToOriginalHash) {
+		this.mDb.beginTransaction();
+		try {
+			final ContentValues values = new ContentValues();
+
+			for (final Entry<Long, BigInteger> entry : mfRowIdToOriginalHash.entrySet()) {
+				final long mfRowId = entry.getKey();
+				final BigInteger newOriginalHash = entry.getValue();
+
+				values.clear();
+				values.put(TBL_MF_OHASH, newOriginalHash.toByteArray());
+
+				final int affected = this.mDb.update(TBL_MF, values, TBL_TG_ID + "=?", new String[] { String.valueOf(mfRowId) });
+				if (affected > 1) throw new IllegalStateException("Updating original hash row with ID " + mfRowId + " affected " + affected + " rows, expected 1.");
+				if (affected < 1) LOG.w("Updating original hash row with ID %s affected %s rows, expected 1.", mfRowId, affected);
+			}
+			this.mDb.setTransactionSuccessful();
+		}
+		finally {
+			this.mDb.endTransaction();
 		}
 	}
 
