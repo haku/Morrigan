@@ -23,6 +23,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQuery;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
 import com.vaguehope.morrigan.android.helper.IoHelper;
@@ -807,9 +808,16 @@ public class MediaDbImpl implements MediaDb {
 	}
 
 	private Cursor getMfCursor (final String where, final String[] whereArgs, final String orderBy, final int numberOf) {
-		return this.mDb.query(true, TBL_MF,
+		final SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
+		qb.setTables(TBL_MF);
+		return getMfCursor(qb, where, whereArgs, orderBy, numberOf);
+	}
+
+	private Cursor getMfCursor (final SQLiteQueryBuilder qb, final String where, final String[] whereArgs, final String orderBy, final int numberOf) {
+		qb.setDistinct(true);
+		return qb.query(this.mDb,
 				new String[] {
-						TBL_MF_ID,
+						TBL_MF + "." + TBL_MF_ID,
 						TBL_MF_DBID,
 						TBL_MF_URI,
 						TBL_MF_MISSING,
@@ -885,12 +893,24 @@ public class MediaDbImpl implements MediaDb {
 			args.add(SEARCH_ESC);
 		}
 		else {
-			sql.append(" AND " + TBL_MF_TITLE + " LIKE ? ESCAPE ? COLLATE NOCASE");
+			sql.append(" AND (");
+
+			sql.append(TBL_MF_TITLE + " LIKE ? ESCAPE ? COLLATE NOCASE");
 			args.add("%" + escapeSearch(query) + "%");
 			args.add(SEARCH_ESC);
+
+			sql.append(" OR ");
+
+			sql.append(TBL_TG_TAG + " LIKE ? ESCAPE ? COLLATE NOCASE");
+			args.add("%" + escapeSearch(query) + "%");
+			args.add(SEARCH_ESC);
+
+			sql.append(")");
 		}
 
-		return getMfCursor(sql.toString(), args.toArray(new String[args.size()]),
+		final SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
+		qb.setTables(TBL_MF + " INNER JOIN " + TBL_TG + " ON " + TBL_MF + "." + TBL_MF_ID + " = " + TBL_TG_MFID);
+		return getMfCursor(qb, sql.toString(), args.toArray(new String[args.size()]),
 				toMfSortColumn(sortColumn) + " " + toSortDirection(sortDirection), -1);
 	}
 
@@ -903,7 +923,7 @@ public class MediaDbImpl implements MediaDb {
 		return readFirstMediaItemFromCursor(c);
 	}
 
-	private MediaItem readFirstMediaItemFromCursor (final Cursor c) {
+	private static MediaItem readFirstMediaItemFromCursor (final Cursor c) {
 		try {
 			if (c != null && c.moveToFirst()) {
 				return new MediaCursorReader().readItem(c);
