@@ -778,7 +778,8 @@ public class MlistsServlet extends HttpServlet {
 			final IncludeTags includeTags, final String transcodeStr) throws SAXException, MorriganException, IOException {
 		String title = mi.getTitle();
 		long fileSize = mi.getFileSize();
-		BigInteger fileHash = mi.getHashcode();
+		final BigInteger originalFileHash = mi.getHashcode();
+		BigInteger fileHash = originalFileHash;
 		String fileLink = fileLink(mi);
 
 		final Transcode transcode = Transcode.parse(transcodeStr);
@@ -815,6 +816,7 @@ public class MlistsServlet extends HttpServlet {
 			FeedHelper.addElement(dw, "type", ((IMixedMediaItem) mi).getMediaType().getN());
 		}
 		if (mi.getMimeType() != null) FeedHelper.addElement(dw, "mimetype", mi.getMimeType());
+		if (originalFileHash != null && !BigInteger.ZERO.equals(originalFileHash)) FeedHelper.addElement(dw, "originalhash", originalFileHash.toString(16));
 		if (fileHash != null && !BigInteger.ZERO.equals(fileHash)) FeedHelper.addElement(dw, "hash", fileHash.toString(16));
 		FeedHelper.addElement(dw, "enabled", Boolean.toString(mi.isEnabled()), new String[][] {
 			{ "m", mi.enabledLastModified() == null || mi.enabledLastModified().getTime() < 1L ? "" : String.valueOf(mi.enabledLastModified().getTime()) },
