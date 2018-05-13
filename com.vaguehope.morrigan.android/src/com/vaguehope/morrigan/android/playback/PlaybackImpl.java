@@ -7,7 +7,6 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import android.app.Notification;
-import android.app.Notification.Builder;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -22,6 +21,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationCompat.Builder;
 
 import com.vaguehope.morrigan.android.R;
 import com.vaguehope.morrigan.android.helper.LogWrapper;
@@ -82,12 +83,12 @@ public class PlaybackImpl implements Playbacker {
 		// TODO make custom notification.
 		// https://stackoverflow.com/questions/27673943/notification-action-button-not-clickable-in-lock-screen
 
-		this.notif = new Notification.Builder(this.context)
+		this.notif = new NotificationCompat.Builder(this.context)
 				.setContentIntent(showPlaybackPi)
 				.setSmallIcon(R.drawable.stop)
 				.setContentTitle("Morrigan Player")
 				.setOngoing(true)
-				.setVisibility(Notification.VISIBILITY_PUBLIC)
+				.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
 				.addAction(android.R.drawable.ic_menu_close_clear_cancel, "Exit",
 						PlaybackBroadcastReceiver.makePendingIntent(this.context, PlaybackCodes.ACTION_EXIT))
 				.addAction(R.drawable.pause, "Pause",
@@ -133,7 +134,7 @@ public class PlaybackImpl implements Playbacker {
 	}
 
 	private void showNotif () {
-		this.notifMgr.notify(PlaybackCodes.PLAYBACK_NOTIFICATION_ID, this.notif.getNotification());
+		this.notifMgr.notify(PlaybackCodes.PLAYBACK_NOTIFICATION_ID, this.notif.build());
 	}
 
 	int getNotificationId () {
@@ -141,7 +142,7 @@ public class PlaybackImpl implements Playbacker {
 	}
 
 	Notification getNotif () {
-		return this.notif.getNotification();
+		return this.notif.build();
 	}
 
 	// Watchers.
