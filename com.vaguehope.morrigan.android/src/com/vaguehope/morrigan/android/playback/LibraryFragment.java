@@ -444,8 +444,10 @@ public class LibraryFragment extends Fragment {
 
 		reloadLibrary();
 
-		((PlaybackActivity) getActivity()).getSectionsPagerAdapter().setPageTitle(this.fragmentPosition, library.getName());
-		this.btnLibrary.setText(library.getName());
+		if (library != null) {
+			((PlaybackActivity) getActivity()).getSectionsPagerAdapter().setPageTitle(this.fragmentPosition, library.getName());
+			this.btnLibrary.setText(library.getName());
+		}
 
 		updateLibraryMenuSelections();
 	}
