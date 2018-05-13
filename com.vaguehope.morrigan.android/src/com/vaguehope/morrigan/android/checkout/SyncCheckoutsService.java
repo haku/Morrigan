@@ -15,7 +15,6 @@ import android.app.Notification.Builder;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import com.vaguehope.morrigan.android.AwakeService;
 import com.vaguehope.morrigan.android.C;
@@ -26,6 +25,7 @@ import com.vaguehope.morrigan.android.helper.ExceptionHelper;
 import com.vaguehope.morrigan.android.helper.FileHelper;
 import com.vaguehope.morrigan.android.helper.FormaterHelper;
 import com.vaguehope.morrigan.android.helper.HttpFileDownloadHandler.DownloadProgressListener;
+import com.vaguehope.morrigan.android.helper.LogWrapper;
 import com.vaguehope.morrigan.android.model.MlistItem;
 import com.vaguehope.morrigan.android.model.MlistItemList;
 import com.vaguehope.morrigan.android.model.MlistState;
@@ -36,6 +36,8 @@ import com.vaguehope.morrigan.android.state.ConfigDb;
 public class SyncCheckoutsService extends AwakeService {
 
 	public static final String EXTRA_HOST_SYNC = C.PACKAGE_PREFIX + "host_to_sync";
+
+	private static final LogWrapper LOG = new LogWrapper("SCS");
 
 	private ConfigDb configDb;
 	private NotificationManager notifMgr;
@@ -62,7 +64,7 @@ public class SyncCheckoutsService extends AwakeService {
 			result = "Finished.";
 		}
 		catch (final Exception e) {
-			Log.e(C.LOGTAG, "Sync failed.", e);
+			LOG.e("Sync failed.", e);
 			result = ExceptionHelper.veryShortMessage(e);
 		}
 		finally {
@@ -121,9 +123,11 @@ public class SyncCheckoutsService extends AwakeService {
 				throw new IllegalStateException(e.toString(), e);
 			}
 		}
+		LOG.i("Finished syncing %s checkouts.", checkouts.size());
 	}
 
 	private void syncCheckout (final Checkout checkout, final int notificationId, final Builder notif) throws IOException {
+		LOG.i("Syncing CO %s: %s", checkout.getId(), checkout.getQuery());
 		updateNotifTitle(notificationId, notif, checkout.getQuery());
 
 		final File localDir = new File(checkout.getLocalDir());
@@ -132,19 +136,24 @@ public class SyncCheckoutsService extends AwakeService {
 		final ServerReference host = this.configDb.getServer(checkout.getHostId());
 		updateNotifProgress(notificationId, notif, "Fetching list of items...");
 		List<? extends MlistItem> items = fetchListOfItems(checkout, host);
+		LOG.i("Fetched list of %s items.", items.size());
 		updateNotifProgress(notificationId, notif, String.format("Checking %s items...", items.size()));
 
 		final MlistState dbSrcs = MnApi.fetchDbSrcs(host, checkout.getDbRelativePath());
 		final List<String> srcs = dbSrcs.getSrcs();
 		List<ItemAndFile> allItemsAndLocalFiles = computeLocalFiles(localDir, items, srcs);
 		List<ItemAndFile> toCopy = computeRequireDownloading(allItemsAndLocalFiles);
+		LOG.i("Identified %s of %s items to download.", toCopy.size(), allItemsAndLocalFiles.size());
 
 		final int transcodedCount = requestTranscodes(checkout, notificationId, notif, host, toCopy);
 		if (transcodedCount > 0) {
+			LOG.i("Transcoded %s items.", transcodedCount);
 			updateNotifProgress(notificationId, notif, "Refreshing list of items...");
 			items = fetchListOfItems(checkout, host);
+			LOG.i("Re-fetched list of %s items.", items.size());
 			allItemsAndLocalFiles = computeLocalFiles(localDir, items, srcs);
 			toCopy = computeRequireDownloading(allItemsAndLocalFiles);
+			LOG.i("Identified %s of %s items to download.", toCopy.size(), allItemsAndLocalFiles.size());
 		}
 
 		CheckoutIndex.write(this, checkout, allItemsAndLocalFiles);
@@ -155,7 +164,9 @@ public class SyncCheckoutsService extends AwakeService {
 				FormaterHelper.readableFileSize(Math.abs(spaceAfterCopy))));
 
 		final SyncDlPrgListnr prgLstnr = downloadFiles(checkout, notificationId, notif, host, toCopy);
+		LOG.i("Downloaded %s items (%s bytes).", prgLstnr.getTransferedItems(), prgLstnr.getTransferedItemBytes());
 		final List<File> toDelete = findToDelete(localDir, allItemsAndLocalFiles);
+		LOG.i("Identified %s items that might need deleting.", toDelete.size());
 		storeResult(checkout, prgLstnr, toDelete);
 	}
 
@@ -178,9 +189,10 @@ public class SyncCheckoutsService extends AwakeService {
 	private static List<ItemAndFile> computeRequireDownloading (final List<ItemAndFile> items) {
 		final List<ItemAndFile> ret = new ArrayList<ItemAndFile>();
 		for (final ItemAndFile i : items) {
+			// Comparing file size here does not work because repeat transcodes may produce different sized output,
+			// yet they should be considered equivalent.
 			if (!i.getLocalFile().exists()
-					|| i.getLocalFile().lastModified() < i.getItem().getLastModified()
-					|| i.getLocalFile().length() != i.getItem().getFileSize()) {
+					|| i.getLocalFile().lastModified() < i.getItem().getLastModified()) {
 				ret.add(i);
 			}
 		}
@@ -211,9 +223,25 @@ public class SyncCheckoutsService extends AwakeService {
 			final File dir = i.getLocalFile().getParentFile();
 			if (!dir.exists() && !dir.mkdirs()) throw new IOException("Failed to create '" + dir.getAbsolutePath() + "'.");
 
-			MnApi.downloadFile(host, checkout.getDbRelativePath(), i.getItem(), i.getLocalFile(), prgLstnr);
-			i.getLocalFile().setLastModified(i.getItem().getLastModified());
-			prgLstnr.itemComplete(i);
+			final File tempFile = File.createTempFile("_" + i.getLocalFile().getName(), ".part", i.getLocalFile().getParentFile());
+			try {
+				MnApi.downloadFile(host, checkout.getDbRelativePath(), i.getItem(), tempFile, prgLstnr);
+				if (!tempFile.renameTo(i.getLocalFile())) {
+					throw new IOException(String.format("Failed to move '%s' to '%s'.",
+							tempFile.getAbsolutePath(), i.getLocalFile().getAbsolutePath()));
+				}
+				if (!i.getLocalFile().setLastModified(i.getItem().getLastModified())) {
+					LOG.w("Failed to set last modified on file '%s.'", i.getLocalFile().getAbsolutePath());
+				}
+				LOG.i("Downloaded: %s", i.getLocalFile().getAbsolutePath());
+				prgLstnr.itemComplete(i);
+			}
+			finally {
+				if (tempFile.exists()) {
+					LOG.w("Cleaning up abandoned temporary file: %s", tempFile.getAbsolutePath());
+					tempFile.delete();
+				}
+			}
 		}
 		return prgLstnr;
 	}
