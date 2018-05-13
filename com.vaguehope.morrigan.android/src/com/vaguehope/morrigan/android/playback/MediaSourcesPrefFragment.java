@@ -1,5 +1,8 @@
 package com.vaguehope.morrigan.android.playback;
 
+import java.io.File;
+
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -17,6 +20,7 @@ import com.vaguehope.morrigan.android.helper.ActivityResultTracker.ActivityResul
 import com.vaguehope.morrigan.android.helper.ContentHelper;
 import com.vaguehope.morrigan.android.helper.DialogHelper;
 import com.vaguehope.morrigan.android.helper.DialogHelper.Listener;
+import com.vaguehope.morrigan.android.helper.FileHelper;
 import com.vaguehope.morrigan.android.helper.LogWrapper;
 import com.vaguehope.morrigan.android.helper.StringHelper;
 
@@ -42,7 +46,7 @@ public class MediaSourcesPrefFragment extends MnPreferenceFragment {
 		refreshList();
 	}
 
-	private void refreshList () {
+	protected void refreshList () {
 		getPreferenceScreen().removeAll();
 
 		final Preference rescanLibraries = new Preference(getActivity());
@@ -113,36 +117,71 @@ public class MediaSourcesPrefFragment extends MnPreferenceFragment {
 
 		@Override
 		public boolean onPreferenceClick (final Preference preference) {
-			final Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-
-			startActivityForResult(intent, MediaSourcesPrefFragment.this.activityResultTracker.registerCallback(new ActivityResultCallback() {
-				@Override
-				public void onActivityResult (final int resultCode, final Intent data) {
-					if (data == null) return;
-
-					final Uri uri = data.getData();
-					if (uri == null) return;
-
-					getContext().getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-					final DocumentFile file = DocumentFile.fromTreeUri(getActivity(), uri);
-					if (file.getName() == null) {
-						DialogHelper.alert(getActivity(), "Failed to resolve: " + uri);
-						ContentHelper.logPermissions(getContext(), LOG);
-						return;
+			try {
+				final Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+				startActivityForResult(intent, MediaSourcesPrefFragment.this.activityResultTracker.registerCallback(new ActivityResultCallback() {
+					@Override
+					public void onActivityResult (final int resultCode, final Intent data) {
+						verifyAndAddDocumentTreeUri(data);
 					}
+				}));
+				return true;
+			}
+			catch (final ActivityNotFoundException e) {
+				DialogHelper.askString(getContext(), "Enter directory path:", "/sdcard/", false, false, new Listener<String>() {
+					@Override
+					public void onAnswer (final String path) {
+						verifyAndAddStringPath(path);
+					}});
+				return true;
+			}
+		}
 
-					if (!file.isDirectory()) {
-						DialogHelper.alert(getActivity(), "Not a directory: " + file.getName());
-						return;
-					}
+		protected void verifyAndAddDocumentTreeUri (final Intent data) {
+			if (data == null) return;
 
-					LOG.i("Adding source '%s' to library %s.", uri, AddSourceClickListener.this.libraryMetadata);
-					getMediaDb().updateLibrary(AddSourceClickListener.this.libraryMetadata.withSource(uri));
-					refreshList();
-				}
-			}));
-			return true;
+			final Uri uri = data.getData();
+			if (uri == null) return;
+
+			getContext().getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+			final DocumentFile file = DocumentFile.fromTreeUri(getActivity(), uri);
+			if (file.getName() == null) {
+				DialogHelper.alert(getActivity(), "Failed to resolve: " + uri);
+				ContentHelper.logPermissions(getContext(), LOG);
+				return;
+			}
+
+			if (!file.isDirectory()) {
+				DialogHelper.alert(getActivity(), "Not a directory: " + file.getName());
+				return;
+			}
+
+			addUri(uri);
+		}
+
+		protected void verifyAndAddStringPath (final String path) {
+			if (StringHelper.isEmpty(path)) return;
+
+			final File file = new File(path);
+
+			if (!file.exists()) {
+				DialogHelper.alert(getActivity(), "Does not exist: " + file.getName());
+				return;
+			}
+
+			if (!file.isDirectory()) {
+				DialogHelper.alert(getActivity(), "Not a directory: " + file.getName());
+				return;
+			}
+
+			addUri(Uri.fromFile(file));
+		}
+
+		private void addUri (final Uri uri) {
+			LOG.i("Adding source '%s' to library %s.", uri, AddSourceClickListener.this.libraryMetadata);
+			getMediaDb().updateLibrary(AddSourceClickListener.this.libraryMetadata.withSource(uri));
+			refreshList();
 		}
 
 	}
@@ -185,7 +224,7 @@ public class MediaSourcesPrefFragment extends MnPreferenceFragment {
 			this.libraryMetadata = libraryMetadata;
 			this.source = source;
 
-			final DocumentFile file = DocumentFile.fromTreeUri(context, source);
+			final DocumentFile file = FileHelper.dirUriToDocumentFile(context, source);
 			if (file.getName() == null) {
 				LOG.w("Failed to resolve: " + source);
 				ContentHelper.logPermissions(getContext(), LOG);

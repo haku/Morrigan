@@ -13,13 +13,13 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationCompat.Builder;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationCompat.Builder;
 import android.support.v4.provider.DocumentFile;
 
 import com.vaguehope.morrigan.android.R;
@@ -28,6 +28,7 @@ import com.vaguehope.morrigan.android.checkout.IndexEntry;
 import com.vaguehope.morrigan.android.helper.ChecksumHelper;
 import com.vaguehope.morrigan.android.helper.ContentHelper;
 import com.vaguehope.morrigan.android.helper.ExceptionHelper;
+import com.vaguehope.morrigan.android.helper.FileHelper;
 import com.vaguehope.morrigan.android.helper.IoHelper;
 import com.vaguehope.morrigan.android.helper.LogWrapper;
 import com.vaguehope.morrigan.android.playback.MediaDb.Presence;
@@ -140,7 +141,7 @@ public class RescanLibrariesService extends MediaBindingAwakeService {
 		final List<Long> toMarkAsFound = new ArrayList<Long>();
 
 		final Queue<DocumentFile> dirs = new LinkedList<DocumentFile>();
-		final DocumentFile root = DocumentFile.fromTreeUri(this, source);
+		final DocumentFile root = FileHelper.dirUriToDocumentFile(this, source);
 		if (root.getName() == null) throw new IllegalStateException("Failed to resolve: " + source);
 		dirs.add(root);
 
@@ -239,7 +240,7 @@ public class RescanLibrariesService extends MediaBindingAwakeService {
 
 					final long id = reader.readId(c);
 					final Uri uri = reader.readUri(c);
-					final DocumentFile file = DocumentFile.fromSingleUri(this, uri);
+					final DocumentFile file = FileHelper.fileUriToDocumentFile(this, uri);
 					if (file.exists()) {
 						final BigInteger libFileHash = reader.readFileHash(c);
 						final long libSizeBytes = reader.readSizeBytes(c);
@@ -479,7 +480,7 @@ public class RescanLibrariesService extends MediaBindingAwakeService {
 		try {
 			final BigInteger hash = ChecksumHelper.generateMd5Checksum(is, buffer);
 			LOG.i("%s %s", hash.toString(16), uri);
-			final DocumentFile file = DocumentFile.fromSingleUri(this, uri);
+			final DocumentFile file = FileHelper.fileUriToDocumentFile(this, uri);
 			getMediaDb().setFileMetadata(id, file.length(), file.lastModified(), hash);
 		}
 		finally {
