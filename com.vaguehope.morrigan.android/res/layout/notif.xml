@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:internal="http://schemas.android.com/apk/prv/res/android"
+	android:id="@+id/status_bar_latest_event_content"
+	android:layout_width="match_parent"
+	android:layout_height="64dp"
+	internal:layout_maxHeight="64dp"
+	internal:layout_minHeight="64dp"
+	android:background="#000000">
+
+	<ImageView
+		android:id="@+id/notification_icon"
+		android:layout_width="24dp"
+		android:layout_height="24dp"
+		android:padding="10dp"
+		android:layout_alignParentLeft="true"
+		android:layout_alignParentTop="true"
+		android:scaleType="center"
+		android:src="@drawable/stop" />
+
+	<LinearLayout
+		android:id="@+id/button_row"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal"
+		android:layout_alignParentLeft="true"
+		android:layout_below="@id/notification_icon">
+
+		<ImageButton
+			android:id="@+id/close"
+			android:layout_width="0dp"
+			android:layout_height="40dp"
+			android:layout_weight="1"
+			android:scaleType="centerInside"
+			android:src="@android:drawable/ic_menu_close_clear_cancel" />
+
+		<ImageButton
+			android:id="@+id/pause"
+			android:layout_width="0dp"
+			android:layout_height="40dp"
+			android:layout_weight="2"
+			android:scaleType="centerInside"
+			android:src="@drawable/pause" />
+
+		<ImageButton
+			android:id="@+id/next"
+			android:layout_width="0dp"
+			android:layout_height="40dp"
+			android:layout_weight="2"
+			android:scaleType="centerInside"
+			android:src="@drawable/next" />
+
+	</LinearLayout>
+
+	<TextView
+		android:id="@+id/subtitle"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_alignParentTop="true"
+		android:layout_alignParentRight="true"
+		android:layout_above="@id/button_row"
+		android:layout_marginLeft="2dp"
+		android:paddingTop="2dp"
+		android:paddingBottom="2dp"
+		android:singleLine="true"
+		android:text="123"
+		android:textColor="#aaaaaa" />
+
+	<TextView
+		android:id="@+id/title"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_toRightOf="@id/notification_icon"
+		android:layout_alignParentTop="true"
+		android:layout_toLeftOf="@id/subtitle"
+		android:layout_above="@id/button_row"
+		android:layout_marginLeft="2dp"
+		android:paddingTop="2dp"
+		android:paddingBottom="2dp"
+		android:ellipsize="marquee"
+		android:singleLine="true"
+		android:text="Loading..."
+		android:textColor="#ffffff" />
+
+</RelativeLayout>

@@ -23,6 +23,7 @@ import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.Builder;
+import android.widget.RemoteViews;
 
 import com.vaguehope.morrigan.android.R;
 import com.vaguehope.morrigan.android.helper.LogWrapper;
@@ -43,6 +44,7 @@ public class PlaybackImpl implements Playbacker {
 
 	private final NotificationManager notifMgr;
 	private Builder notif;
+	private RemoteViews notifRemoteViews;
 
 	private final Set<PlaybackWatcher> playbackWatchers = new CopyOnWriteArraySet<PlaybackWatcher>();
 	private final PlaybackWatcherDispatcher playbackWatcherDispatcher = new PlaybackWatcherDispatcher(this.playbackWatchers);
@@ -83,54 +85,61 @@ public class PlaybackImpl implements Playbacker {
 		// TODO make custom notification.
 		// https://stackoverflow.com/questions/27673943/notification-action-button-not-clickable-in-lock-screen
 
+		this.notifRemoteViews = new RemoteViews(this.context.getPackageName(), R.layout.notif);
+		this.notifRemoteViews.setOnClickPendingIntent(R.id.close,
+				PlaybackBroadcastReceiver.makePendingIntent(this.context, PlaybackCodes.ACTION_EXIT));
+		this.notifRemoteViews.setOnClickPendingIntent(R.id.pause,
+				PlaybackBroadcastReceiver.makePendingIntent(this.context, PlaybackCodes.ACTION_PLAY_PAUSE));
+		this.notifRemoteViews.setOnClickPendingIntent(R.id.next,
+				PlaybackBroadcastReceiver.makePendingIntent(this.context, PlaybackCodes.ACTION_NEXT));
+
 		this.notif = new NotificationCompat.Builder(this.context)
 				.setContentIntent(showPlaybackPi)
 				.setSmallIcon(R.drawable.stop)
 				.setContentTitle("Morrigan Player")
 				.setOngoing(true)
 				.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-				.addAction(android.R.drawable.ic_menu_close_clear_cancel, "Exit",
-						PlaybackBroadcastReceiver.makePendingIntent(this.context, PlaybackCodes.ACTION_EXIT))
-				.addAction(R.drawable.pause, "Pause",
-						PlaybackBroadcastReceiver.makePendingIntent(this.context, PlaybackCodes.ACTION_PLAY_PAUSE))
-				.addAction(R.drawable.next, "Next",
-						PlaybackBroadcastReceiver.makePendingIntent(this.context, PlaybackCodes.ACTION_NEXT));
+				.setContent(this.notifRemoteViews);
+
 		showNotif();
 	}
 
 	private void updateNotifTitle (final CharSequence msg) {
 		this.notif.setContentTitle(msg);
+		this.notifRemoteViews.setTextViewText(R.id.title, msg);
 		showNotif();
 	}
 
 	private void updateNotifSubtitle (final CharSequence msg) {
 		this.notif.setContentText(msg);
+		this.notifRemoteViews.setTextViewText(R.id.subtitle, msg);
+		showNotif();
+	}
+
+	private void updateNotifSmallIcon (final int iconRes) {
+		this.notif.setSmallIcon(iconRes);
+		this.notifRemoteViews.setImageViewResource(R.id.notification_icon, iconRes);
 		showNotif();
 	}
 
 	private void updateNotifLoadingIcon () {
-		this.notif.setSmallIcon(R.drawable.next); // TODO better icon?
-		showNotif();
+		updateNotifSmallIcon(R.drawable.next); // TODO better icon?
 	}
 
 	private void updateNotifPlayIcon () {
-		this.notif.setSmallIcon(R.drawable.play);
-		showNotif();
+		updateNotifSmallIcon(R.drawable.play);
 	}
 
 	private void updateNotifPauseIcon () {
-		this.notif.setSmallIcon(R.drawable.pause);
-		showNotif();
+		updateNotifSmallIcon(R.drawable.pause);
 	}
 
 	private void updateNotifStopIcon () {
-		this.notif.setSmallIcon(R.drawable.stop);
-		showNotif();
+		updateNotifSmallIcon(R.drawable.stop);
 	}
 
 	private void updateNotifErrorIcon () {
-		this.notif.setSmallIcon(R.drawable.exclamation_red);
-		showNotif();
+		updateNotifSmallIcon(R.drawable.exclamation_red);
 	}
 
 	private void showNotif () {
@@ -171,10 +180,8 @@ public class PlaybackImpl implements Playbacker {
 	};
 
 	private void redrawNotifSubtitle () {
-		updateNotifSubtitle(String.format(
-				"%s items in queue, %s.",
-				PlaybackImpl.this.mediaDb.getQueueSize(),
-				getPlayOrder()));
+		updateNotifSubtitle(String.valueOf(PlaybackImpl.this.mediaDb.getQueueSize())
+				+ String.valueOf(getPlayOrder()).substring(0, 1));
 	}
 
 	private QueueItem takeNextItemToPlay () {
