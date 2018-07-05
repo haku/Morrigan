@@ -26,7 +26,6 @@ import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagClassification;
 import com.vaguehope.morrigan.model.media.MediaTagType;
-import com.vaguehope.morrigan.transcode.Transcode;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlayItemType;
 import com.vaguehope.morrigan.player.PlaybackOrder;
@@ -36,6 +35,7 @@ import com.vaguehope.morrigan.player.PlayerReader;
 import com.vaguehope.morrigan.server.MlistsServlet.IncludeTags;
 import com.vaguehope.morrigan.server.util.FeedHelper;
 import com.vaguehope.morrigan.server.util.XmlHelper;
+import com.vaguehope.morrigan.transcode.Transcode;
 import com.vaguehope.morrigan.util.StringHelper;
 import com.vaguehope.morrigan.util.TimeHelper;
 
@@ -113,12 +113,22 @@ public class PlayersServlet extends HttpServlet {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private Player getPlayerById (final String playerId) {
+		if (StringHelper.blank(playerId)) return null;
+
 		if (PLAYER_AUTO.equalsIgnoreCase(playerId)) {
 			return PlayerFinder.guessActivePlayer(this.playerListener.getPlayers());
 		}
-		else {
-			return this.playerListener.getPlayer(playerId);
+
+		final Player playerById = this.playerListener.getPlayer(playerId);
+		if (playerById != null) return playerById;
+
+		for (final Player player : this.playerListener.getPlayers()) {
+			if (playerId.equalsIgnoreCase(player.getName())) {
+				return player;
+			}
 		}
+
+		return null;
 	}
 
 	@Override
