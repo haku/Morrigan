@@ -285,4 +285,31 @@ public abstract class AbstractPlayer implements Player {
 	 */
 	protected abstract void loadAndPlay (PlayItem item, File altFile) throws Exception;
 
+	protected PlayItem findNextItemToPlay () {
+		final PlayItem queueItem = this.getQueue().takeFromQueue();
+		if (queueItem != null) return queueItem;
+
+		final PlayItem currentItem = getCurrentItem();
+		final PlaybackOrder pbOrder = getPlaybackOrder();
+
+		if (currentItem != null && currentItem.isComplete()) {
+			final IMediaTrack nextTrack = getOrderResolver().getNextTrack(currentItem.getList(), currentItem.getTrack(), pbOrder);
+			if (nextTrack != null) {
+				return new PlayItem(currentItem.getList(), nextTrack);
+			}
+			LOG.i("OrderResolver.getNextTrack({},{},{}) == null.",
+					currentItem.getList(), currentItem.getTrack(), pbOrder);
+		}
+
+		final IMediaTrackList<? extends IMediaTrack> currentList = getCurrentList();
+		final IMediaTrack nextTrack = getOrderResolver().getNextTrack(currentList, null, pbOrder);
+		if (nextTrack != null) {
+			return new PlayItem(currentList, nextTrack);
+		}
+		LOG.i("OrderResolver.getNextTrack({},{},{}) == null.",
+				currentList, null, pbOrder);
+
+		return null;
+	}
+
 }

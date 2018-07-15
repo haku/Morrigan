@@ -26,7 +26,6 @@ import com.vaguehope.morrigan.player.AbstractPlayer;
 import com.vaguehope.morrigan.player.LocalPlayer;
 import com.vaguehope.morrigan.player.LocalPlayerSupport;
 import com.vaguehope.morrigan.player.PlayItem;
-import com.vaguehope.morrigan.player.PlaybackOrder;
 import com.vaguehope.morrigan.player.PlayerRegister;
 import com.vaguehope.morrigan.util.MnLogger;
 
@@ -132,36 +131,6 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 		}
 
 		return ret;
-	}
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	Track order methods.
-
-	PlayItem getNextItemToPlay () {
-		final PlayItem queueItem = this.getQueue().takeFromQueue();
-		if (queueItem != null) return queueItem;
-
-		final PlayItem currentItem = getCurrentItem();
-		final PlaybackOrder playbackOrder = getPlaybackOrder();
-
-		if (currentItem != null && currentItem.isComplete()) {
-			final IMediaTrack nextTrack = getOrderResolver().getNextTrack(currentItem.getList(), currentItem.getTrack(), playbackOrder);
-			if (nextTrack != null) {
-				return new PlayItem(currentItem.getList(), nextTrack);
-			}
-			LOG.i("OrderResolver.getNextTrack({},{},{}) == null.",
-					currentItem.getList(), currentItem.getTrack(), playbackOrder);
-		}
-
-		final IMediaTrackList<? extends IMediaTrack> currentList = getCurrentList();
-		final IMediaTrack nextTrack = getOrderResolver().getNextTrack(currentList, null, playbackOrder);
-		if (nextTrack != null) {
-			return new PlayItem(currentList, nextTrack);
-		}
-		LOG.i("OrderResolver.getNextTrack({},{},{}) == null.",
-				currentList, null, playbackOrder);
-
-		return null;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -321,7 +290,7 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 
 	@Override
 	public void nextTrack () {
-		final PlayItem nextItemToPlay = getNextItemToPlay();
+		final PlayItem nextItemToPlay = findNextItemToPlay();
 		if (nextItemToPlay != null) {
 //			stopPlaying(); // Is this really needed?
 			loadAndStartPlaying(nextItemToPlay);
@@ -451,7 +420,7 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 			}
 
 			// Play next track?
-			final PlayItem nextItemToPlay = getNextItemToPlay();
+			final PlayItem nextItemToPlay = findNextItemToPlay();
 			if (nextItemToPlay != null) {
 				loadAndStartPlaying(nextItemToPlay);
 			}
