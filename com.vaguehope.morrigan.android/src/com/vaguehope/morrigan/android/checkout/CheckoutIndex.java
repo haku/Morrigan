@@ -7,24 +7,26 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import com.vaguehope.morrigan.android.helper.FileHelper;
-import com.vaguehope.morrigan.android.helper.IoHelper;
-import com.vaguehope.morrigan.android.playback.MediaTag;
-import com.vaguehope.morrigan.android.playback.MediaTagType;
-import com.vaguehope.morrigan.android.C;
-import com.vaguehope.morrigan.android.helper.DialogHelper.Listener;
-import com.vaguehope.morrigan.android.state.Checkout;
 
 import android.content.Context;
 import android.util.JsonReader;
 import android.util.JsonWriter;
 import android.util.Log;
+
+import com.vaguehope.morrigan.android.C;
+import com.vaguehope.morrigan.android.helper.DialogHelper.Listener;
+import com.vaguehope.morrigan.android.helper.FileHelper;
+import com.vaguehope.morrigan.android.helper.IoHelper;
+import com.vaguehope.morrigan.android.playback.MediaTag;
+import com.vaguehope.morrigan.android.playback.MediaTagType;
+import com.vaguehope.morrigan.android.state.Checkout;
 
 public class CheckoutIndex {
 
@@ -112,14 +114,17 @@ public class CheckoutIndex {
 		writer.name("lastplayed").value(itemAndFile.getItem().getLastPlayed());
 
 		writer.name("tags").beginArray();
-		for (final MediaTag tag : itemAndFile.getItem().getTags()) {
-			writer.beginObject();
-			writer.name("t").value(tag.getTag());
-			writer.name("c").value(tag.getCls());
-			writer.name("y").value(tag.getType().getNumber());
-			writer.name("m").value(tag.getModified());
-			writer.name("d").value(tag.isDeleted());
-			writer.endObject();
+		final Collection<MediaTag> itemTags = itemAndFile.getItem().getTags();
+		if (itemTags != null) {
+			for (final MediaTag tag : itemTags) {
+				writer.beginObject();
+				writer.name("t").value(tag.getTag());
+				writer.name("c").value(tag.getCls());
+				writer.name("y").value(tag.getType().getNumber());
+				writer.name("m").value(tag.getModified());
+				writer.name("d").value(tag.isDeleted());
+				writer.endObject();
+			}
 		}
 		writer.endArray();
 
