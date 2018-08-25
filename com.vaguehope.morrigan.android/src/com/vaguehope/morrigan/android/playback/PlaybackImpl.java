@@ -270,6 +270,32 @@ public class PlaybackImpl implements Playbacker {
 		redrawNotifSubtitle();
 	}
 
+	/**
+	 * Linear percentage, 0 to 100.
+	 */
+	private volatile int currentVolume = 100;
+
+	@Override
+	public int getVolume () {
+		return this.currentVolume;
+	}
+
+	@Override
+	public void setVolume (final int percentage) {
+		this.currentVolume = percentage;
+
+		final MediaPlayer mp = this.mediaPlayer;
+		if (mp == null) return;
+
+		final float log1 = (float)(Math.log(101 - percentage) / Math.log(101));
+		final float log2 = 1 - log1;
+		mp.setVolume(log2, log2);
+	}
+
+	private void applyVolume () {
+		setVolume(this.currentVolume);
+	}
+
 	private void saveCurrentItem () {
 		final Long libId = this.currentItem != null && this.currentItem.hasLibraryId()
 				? this.currentItem.getLibraryId()
@@ -374,6 +400,7 @@ public class PlaybackImpl implements Playbacker {
 
 		this.mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 		this.mediaPlayer.setWakeMode(this.context.getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
+		applyVolume();
 		this.isPaused = false;
 	}
 

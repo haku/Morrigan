@@ -32,6 +32,10 @@
 		</item>
 
 		<item
+			android:id="@+id/volume"
+			android:title="Volume"/>
+
+		<item
 			android:id="@+id/preferences"
 			android:icon="@drawable/pref"
 			android:title="Preferences"/>

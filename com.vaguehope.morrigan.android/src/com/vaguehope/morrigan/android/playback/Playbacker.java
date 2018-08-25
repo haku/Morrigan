@@ -9,6 +9,12 @@ public interface Playbacker {
 	PlayOrder getPlayOrder();
 	void setPlayOrder(PlayOrder newOrder);
 
+	/**
+	 * Volume as linear percentage from 0 to 100.
+	 */
+	int getVolume();
+	void setVolume(int percentage);
+
 	void addPlaybackListener (PlaybackWatcher watcher);
 	void removePlaybackListener (PlaybackWatcher watcher);
 

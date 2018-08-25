@@ -3,6 +3,7 @@ package com.vaguehope.morrigan.android.playback;
 import java.lang.ref.WeakReference;
 
 import android.app.ActionBar;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -10,11 +11,18 @@ import android.os.Message;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ColumnTitleStrip;
 import android.support.v4.view.ColumnTitleStrip.ColumnClickListener;
+import android.util.TypedValue;
 import android.support.v4.view.ViewPager;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
+import android.view.View;
 import android.view.Window;
+import android.widget.LinearLayout;
+import android.widget.SeekBar;
+import android.widget.TextView;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.view.ViewGroup.LayoutParams;
 
 import com.vaguehope.morrigan.android.R;
@@ -195,6 +203,9 @@ public class PlaybackActivity extends FragmentActivity {
 			case R.id.queue_clear:
 				askClearQueue();
 				return true;
+			case R.id.volume:
+				showVolumeDialog();
+				return true;
 			case R.id.preferences:
 				startActivity(new Intent(this, MnPreferenceActivity.class));
 				return true;
@@ -227,6 +238,48 @@ public class PlaybackActivity extends FragmentActivity {
 				getMediaDb().clearQueue();
 			}
 		});
+	}
+
+	private void showVolumeDialog() {
+		final int initialVolume = getPlaybacker().getVolume();
+		final int padding = (int) TypedValue.applyDimension(
+				TypedValue.COMPLEX_UNIT_DIP, 20, getResources().getDisplayMetrics());
+
+		final TextView level = new TextView(this);
+		level.setTextSize(TypedValue.COMPLEX_UNIT_SP, 40);
+		level.setPadding(padding, padding, padding, padding);
+		level.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+		level.setGravity(Gravity.CENTER);
+		level.setText(initialVolume + "%");
+
+		final SeekBar bar = new SeekBar(this);
+		bar.setPadding(padding, padding, padding, padding);
+		bar.setMax(100);
+		bar.setProgress(initialVolume);
+		bar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+			@Override
+			public void onProgressChanged (final SeekBar seekBar, final int progress, final boolean fromUser) {
+				if (!fromUser) return;
+				getPlaybacker().setVolume(progress);
+				level.setText(progress + "%");
+			}
+
+			@Override
+			public void onStopTrackingTouch (final SeekBar seekBar) {}
+
+			@Override
+			public void onStartTrackingTouch (final SeekBar seekBar) {}
+		});
+
+		final AlertDialog.Builder bld = new AlertDialog.Builder(this);
+
+		final LinearLayout layout = new LinearLayout(this);
+		layout.setOrientation(LinearLayout.VERTICAL);
+		layout.addView(level);
+		layout.addView(bar);
+		bld.setView(layout);
+
+		bld.create().show();
 	}
 
 	private int progressIndicatorCounter = 0;
