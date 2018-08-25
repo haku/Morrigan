@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.AudioManager;
 import android.os.Binder;
 import android.os.IBinder;
 
@@ -68,7 +69,9 @@ public class MediaService extends Service implements MediaServices {
 	private void registerBroadcastReceiver () {
 		this.receiver = new PlaybackBroadcastReceiver(this);
 		final IntentFilter filter = new IntentFilter();
+		// TODO put this list in PlaybackBroadcastReceiver?
 		filter.addAction(PlaybackCodes.ACTION_PLAYBACK);
+		filter.addAction(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
 		registerReceiver(this.receiver, filter);
 	}
 

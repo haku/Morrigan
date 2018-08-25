@@ -4,6 +4,7 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.os.Bundle;
 
 import com.vaguehope.morrigan.android.helper.LogWrapper;
@@ -30,11 +31,20 @@ public class PlaybackBroadcastReceiver extends BroadcastReceiver {
 
 	@Override
 	public void onReceive (final Context context, final Intent intent) {
-		final Bundle extras = intent.getExtras();
-		if (extras != null) {
-			final int actionCode = extras.getInt(EXTRA_ACTION_CODE);
-			LOG.i("actionCode=%s", actionCode);
-			this.playbackService.onBroadcastAction(actionCode);
+		if (PlaybackCodes.ACTION_PLAYBACK.equals(intent.getAction())) {
+			final Bundle extras = intent.getExtras();
+			if (extras != null) {
+				final int actionCode = extras.getInt(EXTRA_ACTION_CODE);
+				LOG.i("actionCode=%s", actionCode);
+				this.playbackService.onBroadcastAction(actionCode);
+			}
+		}
+		else if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intent.getAction())) {
+			// TODO.
+			LOG.i("TODO: Handle ACTION_AUDIO_BECOMING_NOISY.");
+		}
+		else {
+			LOG.w("Unexpected intent action: %s", intent.getAction());
 		}
 	}
 
