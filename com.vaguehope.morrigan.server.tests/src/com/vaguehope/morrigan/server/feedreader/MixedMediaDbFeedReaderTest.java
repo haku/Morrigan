@@ -45,9 +45,9 @@ public class MixedMediaDbFeedReaderTest {
 		assertEquals("Some Artist - Some Track.ogg", item.getTitle());
 //		assertEquals(7575894L, item.getFileSize());
 		assertEquals("/home/media/music/Some Artist - Some Track.ogg", item.getFilepath());
-		assertEquals("Fri Apr 25 12:00:06 BST 2008", item.getDateAdded().toString());
-		assertEquals("Sat Jan 19 18:19:36 GMT 2008", item.getDateLastModified().toString());
-		assertEquals("Sat Oct 08 08:12:45 BST 2016", item.getDateLastPlayed().toString());
+		assertEquals(1209121206000L, item.getDateAdded().getTime());
+		assertEquals(1200766776000L, item.getDateLastModified().getTime());
+		assertEquals(1475910765439L, item.getDateLastPlayed().getTime());
 		assertEquals("892fde64e2af9ac6390e35b2af05326b", item.getHashcode().toString(16));
 		assertEquals(true, item.isEnabled());
 		assertEquals(false, item.isMissing());
