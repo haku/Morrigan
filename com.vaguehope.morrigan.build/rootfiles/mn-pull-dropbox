@@ -1,6 +1,7 @@
 #!/bin/bash
 set -eu -o pipefail
 shopt -s failglob
+exit_code=0
 
 log() {
   echo $(date +'%Y%m%d-%H%M%S') $@
@@ -54,11 +55,16 @@ for dump_file in "${dump_files[@]}" ; do
 
   if [ $dump_mtime -gt $remote_mtime ] ; then
     log "$dump_name > $remote_name ..."
-    openssl cms -decrypt -inform der \
-      -in "$dump_file" \
-      -recip "$public_key" \
-      -inkey "$private_key" \
-      | gunzip > "$remote_tmp_file"
+    if ! openssl cms -decrypt -inform der \
+          -in "$dump_file" \
+          -recip "$public_key" \
+          -inkey "$private_key" \
+          | gunzip > "$remote_tmp_file" ; then
+      log "Unable to decode: $dump_file"
+      exit_code=1
+      rm "$remote_tmp_file"
+      continue
+    fi
     mv "$remote_tmp_file" "$remote_file"
     updated_remotes+=("${remote_name%.xml}")
   else
@@ -87,3 +93,4 @@ if [ ${#updated_remotes[@]} -gt 0 ] ; then
 fi
 
 log "done."
+exit $exit_code
