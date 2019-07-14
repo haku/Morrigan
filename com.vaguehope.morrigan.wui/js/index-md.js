@@ -562,13 +562,14 @@
 
     var sortColumn = $('#db_sort_column').val();
     var sortOrder = $('#db_sort_order').val();
+    var includeDisabled = $('#db_include_disabled .material-icons').text() === 'deleted';
 
     currentDbMid = mid;
     currentDbQuery = query;
     currentDbResults = null;
     writeSavedSearch();
 
-    MnApi.getQuery(mid, view, query, sortColumn, sortOrder, msgHandler, displayResults);
+    MnApi.getQuery(mid, view, query, sortColumn, sortOrder, includeDisabled, msgHandler, displayResults);
 
     $('#db_title').text('Fetching...');
     $('#db_list').empty();
@@ -583,6 +584,13 @@
     });
     $('#db_sort_column').unbind().change(function(){setDbTabToSearch(mid, view)});
     $('#db_sort_order').unbind().change(function(){setDbTabToSearch(mid, view)});
+    $('#db_include_disabled').unbind().click(function(event){
+      var current_icon = $('#db_include_disabled .material-icons').text();
+      var new_icon = 'deleted';
+      if (current_icon === 'deleted') new_icon = 'delete_outline';
+      $('#db_include_disabled .material-icons').text(new_icon);
+      setDbTabToSearch(mid, view);
+    });
     $('#db_go_tags').unbind().click(function(){setDbTabToTags(mid, view)});
     $('#db_go_albums').unbind().click(function(){setDbTabToAlbums(mid, view)});
     $('#db_sort_options').show();

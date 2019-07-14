@@ -317,13 +317,13 @@ MnApi = {};
     return mlist;
   }
 
-  MnApi.getQuery = function(mid, view, query, sortColumn, sortOrder, msgHandler, onItems) {
+  MnApi.getQuery = function(mid, view, query, sortColumn, sortOrder, includeDisabled, msgHandler, onItems) {
     if (!query || query.length < 1) query = '*';
     var url = 'mlists/' + mid + '/query/' + encodeURIComponent(query) + '?';
     if (view) url += '&view=' + encodeURIComponent(view);
     if (sortColumn) url += "&column=" + sortColumn;
     if (sortOrder) url += "&order=" + sortOrder;
-    url += "&includedisabled=true";
+    if (includeDisabled) url += "&includedisabled=true";
 
     $.ajax({
       type : 'GET',
@@ -331,7 +331,7 @@ MnApi = {};
       url : url,
       dataType : 'xml',
       beforeSend : function() {
-        msgHandler.onInfo('Querying ' + mid + ' view=' + view + ' query=' + query + ' col=' + sortColumn + ' order=' + sortOrder + ' ...');
+        msgHandler.onInfo('Querying ' + mid + ' view=' + view + ' query=' + query + ' col=' + sortColumn + ' order=' + sortOrder + ' disabled=' + includeDisabled + ' ...');
       },
       success : function(xml) {
         var itemsNode = $(xml).find('mlist');
