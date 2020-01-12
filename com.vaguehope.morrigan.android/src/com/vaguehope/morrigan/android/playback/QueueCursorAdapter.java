@@ -50,20 +50,16 @@ public class QueueCursorAdapter extends CursorAdapter {
 	}
 
 	private CharSequence titleForItem (final Cursor cursor) {
-		final long position = this.cursorReader.readPosition(cursor);
 		final String title = this.cursorReader.readTitle(cursor);
 		final long durationMillis = this.cursorReader.readDurationMillis(cursor);
 
 		if (durationMillis > 0) {
-			return String.format("%s %s (%s)",
-					position,
+			return String.format("%s (%s)",
 					title,
 					TimeHelper.formatTimeMiliseconds(durationMillis));
 		}
 
-		return String.format("%s %s",
-				position,
-				title);
+		return title;
 	}
 
 }
