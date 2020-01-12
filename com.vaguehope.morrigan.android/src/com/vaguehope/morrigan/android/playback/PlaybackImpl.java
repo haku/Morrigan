@@ -20,11 +20,13 @@ import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
 import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.Builder;
 import android.widget.RemoteViews;
 
+import com.vaguehope.morrigan.android.C;
 import com.vaguehope.morrigan.android.R;
 import com.vaguehope.morrigan.android.helper.LogWrapper;
 import com.vaguehope.morrigan.android.playback.MediaDb.MediaWatcher;
@@ -483,6 +485,8 @@ public class PlaybackImpl implements Playbacker {
 				@Override
 				public void onCompletion (final MediaPlayer mp) {
 					LOG.i("Playback complete.");
+					// Without this wakelock it might go back to sleep before the message handler processes the message.
+					aquireTempWakeLock(PlaybackImpl.this.context, 1000L);
 					gotoNextItem(); // Go via message dispatched to get correct threading.
 				}
 			});
@@ -539,6 +543,12 @@ public class PlaybackImpl implements Playbacker {
 		else {
 			w.playbackStopped();
 		}
+	}
+
+	private static void aquireTempWakeLock (final Context context, final long durationMillis) {
+		final PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+		final WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, C.TAG);
+		wl.acquire(durationMillis);
 	}
 
 }
