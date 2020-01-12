@@ -3,6 +3,7 @@ package com.vaguehope.morrigan.android.playback;
 public interface Playbacker {
 
 	void playPausePlayback();
+	void pausePlayback();
 	void stopPlayback();
 	void gotoNextItem();
 

@@ -224,6 +224,9 @@ public class PlaybackImpl implements Playbacker {
 			case PlaybackCodes.ACTION_PLAY_PAUSE:
 				playPausePlayback();
 				break;
+			case PlaybackCodes.ACTION_PAUSE:
+				pausePlayback();
+				break;
 			case PlaybackCodes.ACTION_NEXT:
 				gotoNextItem();
 				break;
@@ -234,6 +237,11 @@ public class PlaybackImpl implements Playbacker {
 	@Override
 	public void playPausePlayback () {
 		this.messageHandler.sendEmptyMessage(Msgs.PLAY_PAUSE.ordinal());
+	}
+
+	@Override
+	public void pausePlayback () {
+		this.messageHandler.sendEmptyMessage(Msgs.PAUSE.ordinal());
 	}
 
 	@Override
@@ -334,6 +342,7 @@ public class PlaybackImpl implements Playbacker {
 
 	private enum Msgs {
 		PLAY_PAUSE,
+		PAUSE,
 		STOP,
 		GOTO_NEXT_ITEM,
 		NOTIFY_NEW_WATCHER;
@@ -362,6 +371,9 @@ public class PlaybackImpl implements Playbacker {
 			switch (m) {
 				case PLAY_PAUSE:
 					startPlaybackOrPause();
+					break;
+				case PAUSE:
+					pausePlaybackInternal();
 					break;
 				case STOP:
 					unloadPlayback();
@@ -424,11 +436,7 @@ public class PlaybackImpl implements Playbacker {
 
 	private void startPlaybackOrPause () throws IOException {
 		if (isMediaPlayerPlaying()) {
-			this.mediaPlayer.pause();
-			this.isPaused = true;
-			LOG.i("Playback paused.");
-			updateNotifPauseIcon();
-			this.playbackWatcherDispatcher.playbackPaused();
+			pausePlaybackInternal();
 		}
 		else if (isMediaPlayerPaused()) {
 			this.mediaPlayer.start();
@@ -440,6 +448,16 @@ public class PlaybackImpl implements Playbacker {
 		else {
 			startPlaying(this.currentItem);
 		}
+	}
+
+	private void pausePlaybackInternal () {
+		if (!isMediaPlayerPlaying()) return;
+
+		this.mediaPlayer.pause();
+		this.isPaused = true;
+		LOG.i("Playback paused.");
+		updateNotifPauseIcon();
+		this.playbackWatcherDispatcher.playbackPaused();
 	}
 
 	private void startPlaying (final QueueItem firstTry) throws IOException {

@@ -40,8 +40,8 @@ public class PlaybackBroadcastReceiver extends BroadcastReceiver {
 			}
 		}
 		else if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intent.getAction())) {
-			// TODO.
-			LOG.i("TODO: Handle ACTION_AUDIO_BECOMING_NOISY.");
+			LOG.i("Handling ACTION_AUDIO_BECOMING_NOISY...");
+			this.playbackService.onBroadcastAction(PlaybackCodes.ACTION_PAUSE);
 		}
 		else {
 			LOG.w("Unexpected intent action: %s", intent.getAction());

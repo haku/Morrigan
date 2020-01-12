@@ -10,6 +10,7 @@ public interface PlaybackCodes {
 	int ACTION_SHOW_UI = 101;
 	int ACTION_PLAY_PAUSE = 102;
 	int ACTION_NEXT = 103;
+	int ACTION_PAUSE = 104;
 
 	// TODO do this better.
 	int BROWSE_MEDIA_REQUEST_CODE = 34600;
