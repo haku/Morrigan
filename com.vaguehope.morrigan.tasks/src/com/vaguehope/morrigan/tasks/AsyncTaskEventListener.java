@@ -123,7 +123,17 @@ public class AsyncTaskEventListener implements TaskEventListener, AsyncTask {
 
 	@Override
 	public void logError (final String topic, final String s, final Throwable t) {
-		this.lastErr.set(topic + ": " + s + "\n" + ErrorHelper.getCauseTrace(t));
+		String err = topic + ": " + s;
+		if (t != null) {
+			err += "\n";
+			if (t instanceof RuntimeException) {
+				err += ErrorHelper.getStackTrace(t);
+			}
+			else {
+				err += ErrorHelper.getCauseTrace(t);
+			}
+		}
+		this.lastErr.set(err);
 	}
 
 	@Override
