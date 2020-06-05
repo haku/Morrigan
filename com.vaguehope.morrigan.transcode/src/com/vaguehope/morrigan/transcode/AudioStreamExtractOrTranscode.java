@@ -150,14 +150,25 @@ public class AudioStreamExtractOrTranscode extends TranscodeProfile {
 		}
 	}
 
+	/**
+	 *
+	 * @param fallbackType The default, do lossy transcode if needed.
+	 * @param otherTypes The preferred types, extract existing stream if possible.
+	 */
 	private static MimeType findAudioStreamType (final IMediaItem item, final Transcode transcode, final MimeType fallbackType, final Set<MimeType> otherTypes) throws IOException {
 		final String nameWithoutExtension = cacheFileNameWithoutExtension(item, transcode);
 
-		if (cacheFile(nameWithoutExtension, fallbackType).exists()) return fallbackType;
+		// Check for existing transcode.
+		if (cacheFile(nameWithoutExtension, fallbackType).exists()) {
+			return fallbackType;
+		}
 		for (final MimeType type : otherTypes) {
-			if (cacheFile(nameWithoutExtension, type).exists()) return type;
+			if (cacheFile(nameWithoutExtension, type).exists()) {
+				return type;
+			}
 		}
 
+		// Others should include the fallback, so don't need to search for the fallback.
 		if (otherTypes.size() > 0) {
 			final FfprobeInfo info = Ffprobe.inspect(item.getFile());
 			for (final MimeType mimeType : otherTypes) {

@@ -535,6 +535,7 @@ public class MlistsServlet extends HttpServlet {
 						final String transcode = StringHelper.trimToNull(req.getParameter(PARAM_TRANSCODE));
 						if (transcode != null) {
 							final TranscodeProfile tProfile = Transcode.parse(transcode).profileForItem(mmdb, item);
+							// FIXME file may be out of date!  Do not use if its out of date.
 							final File transcodedFile = tProfile.getCacheFile();
 							if (transcodedFile.exists()) {
 								ServletHelper.returnFile(transcodedFile, resp, tProfile.getTranscodedTitle());
@@ -789,6 +790,7 @@ public class MlistsServlet extends HttpServlet {
 				if (tProfile != null) {
 					title = tProfile.getTranscodedTitle();
 
+					// FIXME file may be out of date!  Do not use if its out of date.
 					final File transcodedFile = tProfile.getCacheFile();
 					fileSize = transcodedFile.exists() ? transcodedFile.length() : 0L;
 					fileHash = transcodedFile.exists() ? ChecksumCache.readHash(transcodedFile) : null;
