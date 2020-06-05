@@ -190,6 +190,7 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMe
 					return new OpResult("Failed to create playback engine instance.", e, true);
 				}
 			}
+			// NOTE playbackEngine may still be null if none could be found.
 
 			try {
 				int dSeconds = 0;
@@ -200,7 +201,7 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMe
 					}
 				}
 
-				if (dSeconds < 1) {
+				if (dSeconds < 1 && this.playbackEngine != null) {
 					dSeconds = this.playbackEngine.readFileDuration(item.getFilepath());
 				}
 
