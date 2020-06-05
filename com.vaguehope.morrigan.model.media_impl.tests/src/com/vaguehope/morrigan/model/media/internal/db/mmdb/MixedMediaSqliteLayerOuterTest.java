@@ -136,13 +136,18 @@ public class MixedMediaSqliteLayerOuterTest {
 		final IMixedMediaItem expectedWithTerm1InTag = mockMediaFileWithTags("watcha " + term1 + " noise");
 		final IMixedMediaItem expectedWithTerm2InTag = mockMediaFileWithTags("foo " + term2 + " bar");
 
-		final List<IMixedMediaItem> actual = runSearch("  " + term1 + " OR " + term2 + " ");
-
-		assertEquals(4, actual.size());
-		getItemByFilepath(actual, expectedWithTerm1InName.getFilepath());
-		getItemByFilepath(actual, expectedWithTerm2InName.getFilepath());
-		getItemByFilepath(actual, expectedWithTerm1InTag.getFilepath());
-		getItemByFilepath(actual, expectedWithTerm2InTag.getFilepath());
+		final String[] queries = new String[] {
+				"  " + term1 + " OR " + term2 + " ",
+				"  " + term1 + " OR OR " + term2 + " ",
+		};
+		for (final String q : queries) {
+			final List<IMixedMediaItem> actual = runSearch(q);
+			assertEquals(4, actual.size());
+			getItemByFilepath(actual, expectedWithTerm1InName.getFilepath());
+			getItemByFilepath(actual, expectedWithTerm2InName.getFilepath());
+			getItemByFilepath(actual, expectedWithTerm1InTag.getFilepath());
+			getItemByFilepath(actual, expectedWithTerm2InTag.getFilepath());
+		}
 	}
 
 	@Test
@@ -385,8 +390,6 @@ public class MixedMediaSqliteLayerOuterTest {
 
 	@Test
 	public void itSearchesUsingMultipleTermsAndBrackets () throws Exception {
-		final String search = "(t=bar OR t=foo) f~some_folder";
-
 		final IMixedMediaItem expected1 = mockMediaFileWithNameFragmentAndTags("some_folder", "foo");
 		final IMixedMediaItem expected2 = mockMediaFileWithNameFragmentAndTags("some_folder", "bar");
 
@@ -398,10 +401,18 @@ public class MixedMediaSqliteLayerOuterTest {
 		assertSingleResult(expected1, runSearch("t=foo f~some_folder"));
 		assertSingleResult(expected2, runSearch("t=bar f~some_folder"));
 
-		final List<IMixedMediaItem> actual = runSearch(search);
-		assertEquals(2, actual.size());
-		getItemByFilepath(actual, expected1.getFilepath());
-		getItemByFilepath(actual, expected2.getFilepath());
+		final String[] queries = new String[] {
+				"(t=bar OR t=foo) f~some_folder",
+				"f~some_folder (t=bar OR t=foo)",
+				"f~some_folder AND (t=bar OR t=foo)",
+				"f~some_folder AND AND (t=bar OR t=foo)",
+		};
+		for (final String q : queries) {
+			final List<IMixedMediaItem> actual = runSearch(q);
+			assertEquals(2, actual.size());
+			getItemByFilepath(actual, expected1.getFilepath());
+			getItemByFilepath(actual, expected2.getFilepath());
+		}
 	}
 
 	@Test

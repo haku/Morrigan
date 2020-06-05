@@ -138,7 +138,8 @@ class SearchParser {
 		return terms;
 	}
 
-	private static void appendWhere (final StringBuilder sql, final MediaType mediaType, final boolean excludeMissing, final boolean excludeDisabled, final List<String> terms) {
+	private static void appendWhere (final StringBuilder sql, final MediaType mediaType, final boolean excludeMissing,
+			final boolean excludeDisabled, final List<String> terms) {
 		if (mediaType == MediaType.UNKNOWN && terms.size() < 1 && !excludeMissing && !excludeDisabled) return;
 
 		sql.append(_SQL_WHERE);
@@ -158,19 +159,29 @@ class SearchParser {
 			int openBrackets = 0;
 			for (int i = 0; i < terms.size(); i++) {
 				final String term = terms.get(i);
+				final String prevTerm = i > 0 ? terms.get(i - 1) : null;
+				final String nextTerm = i < terms.size() - 1 ? terms.get(i + 1) : null;
 
 				if ("OR".equals(term)) {
-					if (i == 0 || i >= terms.size() - 1) continue; // Ignore leading and trailing ORs.
-					if ("(".equals(terms.get(i - 1))) continue; // Ignore OR right after (.
-					if (")".equals(terms.get(i + 1))) continue; // Ignore OR right before ).
+					if (prevTerm == null || nextTerm == null) continue; // Ignore leading and trailing.
+					if ("OR".equals(prevTerm)) continue;
+					if ("AND".equals(prevTerm)) continue;
+					if ("(".equals(prevTerm)) continue;
+					if (")".equals(nextTerm)) continue;
 					sql.append(_SQL_OR);
 					continue;
 				}
-				if ("(".equals(term)) {
-					sql.append(" ( ");
-					openBrackets += 1;
+
+				if ("AND".equals(term)) {
+					if (prevTerm == null || nextTerm == null) continue; // Ignore leading and trailing.
+					if ("OR".equals(prevTerm)) continue;
+					if ("AND".equals(prevTerm)) continue;
+					if ("(".equals(prevTerm)) continue;
+					if (")".equals(nextTerm)) continue;
+					sql.append(_SQL_AND);
 					continue;
 				}
+
 				if (")".equals(term)) {
 					if (openBrackets > 0) {
 						sql.append(" ) ");
@@ -180,14 +191,17 @@ class SearchParser {
 				}
 
 				if (i > 0) {
-					final String prevTerm = terms.get(i - 1);
-					// Not the first term and not following an OR.
-					if (!"OR".equals(prevTerm) && !"(".equals(prevTerm)) {
+					// Not the first term and not following OR or AND.
+					if (!"OR".equals(prevTerm) && !"AND".equals(prevTerm) && !"(".equals(prevTerm)) {
 						sql.append(_SQL_AND);
 					}
 				}
 
-				if (isFileMatchPartial(term)) {
+				if ("(".equals(term)) {
+					sql.append(" ( ");
+					openBrackets += 1;
+				}
+				else if (isFileMatchPartial(term)) {
 					sql.append(_SQL_MEDIAFILES_WHERES_FILE);
 				}
 				else if (isTagMatchPartial(term) || isTagMatchExact(term)) {
@@ -306,6 +320,7 @@ class SearchParser {
 				if (this.mediaType != MediaType.UNKNOWN) ps.setInt(parmIn++, this.mediaType.getN());
 				for (final String term : this.terms) {
 					if ("OR".equals(term)) continue;
+					if ("AND".equals(term)) continue;
 					if ("(".equals(term)) continue;
 					if (")".equals(term)) continue;
 					if (isFileMatchPartial(term) || isTagMatchPartial(term)) {
