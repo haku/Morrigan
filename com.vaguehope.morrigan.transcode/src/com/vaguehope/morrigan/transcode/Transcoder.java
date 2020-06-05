@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -16,6 +17,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.util.DaemonThreadFactory;
 import com.vaguehope.morrigan.util.ExceptionHelper;
 import com.vaguehope.morrigan.util.FileHelper;
@@ -74,7 +76,7 @@ public class Transcoder {
 		});
 	}
 
-	public void transcodeToFile (final TranscodeProfile tProfile) throws IOException {
+	public void transcodeToFile (final TranscodeProfile tProfile) throws IOException, MorriganException {
 		checkAlive();
 		if (tProfile == null) throw new IllegalArgumentException("tProfile can not be null.");
 
@@ -88,9 +90,16 @@ public class Transcoder {
 
 		// Already transcoded?  Use cache.
 		final File outFile = tProfile.getCacheFile();
-		if (outFile.exists() && outFile.lastModified() > inFile.lastModified()) {
-			FileHelper.freshenLastModified(outFile, 5, TimeUnit.DAYS);
-			return;
+		if (outFile.exists()) {
+			final long inFileLastModified = inFile.lastModified();
+			if (outFile.lastModified() > inFileLastModified) {
+				final Date newest = ConfigTag.newest(tProfile.getList(), tProfile.getItem());
+				if (newest == null || newest.getTime() < inFileLastModified) {
+					// Update timestamp so that old transcodes can be GCed.
+					FileHelper.freshenLastModified(outFile, 5, TimeUnit.DAYS);
+					return;
+				}
+			}
 		}
 
 		// Max parallel locking.
@@ -103,50 +112,54 @@ public class Transcoder {
 			if (this.inProgress.compareAndSet(n, n + 1)) break;
 		}
 
-		// Check we have the input file duration.
-		long inFileDurationSeconds = tProfile.getItem().getDuration();
-		if (inFileDurationSeconds < 1) {
-			LOG.w("DB duration missing: {}", tProfile.getItem());
-			final Long inFileDurationMillis = Ffprobe.inspect(inFile).getDurationMillis();
-			if (inFileDurationMillis == null || inFileDurationMillis < 1) throw new IOException("Invalid file duration: " + inFile.getAbsolutePath());
-			inFileDurationSeconds = TimeUnit.MILLISECONDS.toSeconds(inFileDurationMillis);
-		}
-
-		final Long trimEndTimeSeconds = tProfile.getTrimEndTimeSeconds();
-		if (trimEndTimeSeconds != null && trimEndTimeSeconds > 0 && trimEndTimeSeconds < inFileDurationSeconds) {
-			inFileDurationSeconds = trimEndTimeSeconds;
-		}
-
+		// try-finally to ensure inProgress is decremented.
 		try {
-			final File ftmp = File.createTempFile(outFile.getName(), tProfile.getTmpFileExt(), outFile.getParentFile());
+			// Check we have the input file duration.
+			long inFileDurationSeconds = tProfile.getItem().getDuration();
+			if (inFileDurationSeconds < 1) {
+				LOG.w("DB duration missing: {}", tProfile.getItem());
+				final Long inFileDurationMillis = Ffprobe.inspect(inFile).getDurationMillis();
+				if (inFileDurationMillis == null || inFileDurationMillis < 1) throw new IOException("Invalid file duration: " + inFile.getAbsolutePath());
+				inFileDurationSeconds = TimeUnit.MILLISECONDS.toSeconds(inFileDurationMillis);
+			}
+
+			// If the end is trimmed, adjust the expected duration.
+			final Long trimEndTimeSeconds = tProfile.getTrimEndTimeSeconds();
+			if (trimEndTimeSeconds != null && trimEndTimeSeconds > 0 && trimEndTimeSeconds < inFileDurationSeconds) {
+				inFileDurationSeconds = trimEndTimeSeconds;
+			}
+
 			try {
-				runTranscodeCmd(tProfile, ftmp);
+				final File ftmp = File.createTempFile(outFile.getName(), tProfile.getTmpFileExt(), outFile.getParentFile());
+				try {
+					runTranscodeCmd(tProfile, ftmp);
 
-				// Validate transcode output.
-				final Long outFileDurationMillis = Ffprobe.inspect(ftmp).getDurationMillis();
-				if (outFileDurationMillis == null || outFileDurationMillis < 1) {
-					throw new IOException("Transcode resulted in invalid file duration: " + inFile.getAbsolutePath());
-				}
-				final long outFileDurationSeconds = TimeUnit.MILLISECONDS.toSeconds(outFileDurationMillis);
-				final long maxDifferenceSeconds = Math.max(
-						(long) (inFileDurationSeconds * TRANSCODE_DURATION_MAX_DIFFERENCE_RATIO),
-						TRANSCODE_DURATION_MAX_DIFFERENCE_SECONDS);
-				if (Math.abs(inFileDurationSeconds - outFileDurationSeconds) > maxDifferenceSeconds ) {
-					throw new IOException(String.format("Transcode resulted in invalid file duration, in=%ss out=%ss maxDelta=%ss: %s",
-							inFileDurationSeconds, outFileDurationSeconds, maxDifferenceSeconds, inFile.getAbsolutePath()));
-				}
+					// Validate transcode output.
+					final Long outFileDurationMillis = Ffprobe.inspect(ftmp).getDurationMillis();
+					if (outFileDurationMillis == null || outFileDurationMillis < 1) {
+						throw new IOException("Transcode resulted in invalid file duration: " + inFile.getAbsolutePath());
+					}
+					final long outFileDurationSeconds = TimeUnit.MILLISECONDS.toSeconds(outFileDurationMillis);
+					final long maxDifferenceSeconds = Math.max(
+							(long) (inFileDurationSeconds * TRANSCODE_DURATION_MAX_DIFFERENCE_RATIO),
+							TRANSCODE_DURATION_MAX_DIFFERENCE_SECONDS);
+					if (Math.abs(inFileDurationSeconds - outFileDurationSeconds) > maxDifferenceSeconds ) {
+						throw new IOException(String.format("Transcode resulted in invalid file duration, in=%ss out=%ss maxDelta=%ss: %s",
+								inFileDurationSeconds, outFileDurationSeconds, maxDifferenceSeconds, inFile.getAbsolutePath()));
+					}
 
-				FileHelper.rename(ftmp, outFile);
+					FileHelper.rename(ftmp, outFile);
+				}
+				finally {
+					if (ftmp.exists()) ftmp.delete();
+				}
 			}
-			finally {
-				if (ftmp.exists()) ftmp.delete();
+			catch (final Exception e) {
+				LOG.w("Transcode failed.", e);
+				if (e instanceof RuntimeException) throw (RuntimeException) e;
+				if (e instanceof IOException) throw (IOException) e;
+				throw new IOException(e.toString(), e);
 			}
-		}
-		catch (final Exception e) {
-			LOG.w("Transcode failed.", e);
-			if (e instanceof RuntimeException) throw (RuntimeException) e;
-			if (e instanceof IOException) throw (IOException) e;
-			throw new IOException(e.toString(), e);
 		}
 		finally {
 			this.inProgress.decrementAndGet();

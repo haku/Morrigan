@@ -2,20 +2,14 @@ package com.vaguehope.morrigan.transcode;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
-
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
-import com.vaguehope.morrigan.model.media.MediaTag;
-import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.util.ChecksumHelper;
 import com.vaguehope.morrigan.util.MimeType;
 import com.vaguehope.morrigan.util.MnLogger;
-import com.vaguehope.morrigan.util.StringHelper;
-import com.vaguehope.morrigan.util.TimeHelper;
 
 public abstract class TranscodeProfile {
 
@@ -36,6 +30,10 @@ public abstract class TranscodeProfile {
 		this.mimeType = mimeType;
 	}
 
+	public IMediaTrackList<? extends IMediaTrack> getList () {
+		return this.list;
+	}
+
 	public IMediaTrack getItem () {
 		return this.item;
 	}
@@ -48,6 +46,10 @@ public abstract class TranscodeProfile {
 		return this.item.getTitle() + "." + this.mimeType.getExt();
 	}
 
+	/**
+	 * File may not exist or may be out of date.
+	 * Always call transcodeToFile() beforehand to ensure it if fresh.
+	 */
 	public File getCacheFile () {
 		return cacheFile(this.item, this.transcode, this.mimeType);
 	}
@@ -76,36 +78,15 @@ public abstract class TranscodeProfile {
 	 * Stop time in seconds relative to start of file.
 	 */
 	protected Long getTrimEndTimeSeconds () {
-		if (this.list == null) return null;
-
-		final String raw = findSuffesForTagStartingWith("trim_end=");
-		if (StringHelper.blank(raw)) return null;
-
-		final Long trimEnd = TimeHelper.parseDuration(raw);
-		if (trimEnd != null) {
-			return trimEnd;
-		}
-
-		LOG.w("Invalid trim_end: {}", raw);
-		return null;
-	}
-
-	private String findSuffesForTagStartingWith (final String startsWith) {
-		List<MediaTag> tags;
 		try {
-			tags = this.list.getTags(this.item);
+			final ItemConfigTag t = ConfigTag.TRIM_END.read(this.list, this.item);
+			if (t == null) return null;
+			return t.parseAsDuration();
 		}
 		catch (MorriganException e) {
 			LOG.e("Tag read failed", e);
 			return null;
 		}
-
-		for (final MediaTag tag : tags) {
-			if (tag.getType() == MediaTagType.MANUAL && StringHelper.startsWithIgnoreCase(tag.getTag(), startsWith)) {
-				return tag.getTag().substring(startsWith.length());
-			}
-		}
-		return null;
 	}
 
 	/**
