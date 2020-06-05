@@ -24,6 +24,8 @@ public class ItemConfigTag {
 	}
 
 	public Long parseAsDuration () {
+		if (this.mediaTag.isDeleted()) return null;
+
 		final String rawVal = this.mediaTag.getTag().substring(this.configTag.getPrefix().length());
 		if (StringHelper.blank(rawVal)) return null;
 

@@ -14,4 +14,10 @@ public interface MediaTag extends IDbItem {
 	Date getModified();
 	boolean isDeleted();
 
+	/**
+	 * Only returns true if clearly newer.
+	 * If its a draw or unknown, prefers otherTag.
+	 */
+	boolean isNewerThan (MediaTag otherTag);
+
 }

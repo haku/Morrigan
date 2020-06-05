@@ -41,8 +41,7 @@ public class TranscodeTask implements MorriganTask {
 
 				final TranscodeProfile profile = this.transcode.profileForItem(this.db, item);
 				if (profile == null) continue;
-				// FIXME file may be out of date!  Do not use if its out of date.
-				if (profile.getCacheFile().exists()) continue;
+				if (profile.getCacheFileIfFresh() != null) continue;
 				profiles.add(profile);
 			}
 

@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -89,18 +88,14 @@ public class Transcoder {
 		}
 
 		// Already transcoded?  Use cache.
-		final File outFile = tProfile.getCacheFile();
-		if (outFile.exists()) {
-			final long inFileLastModified = inFile.lastModified();
-			if (outFile.lastModified() > inFileLastModified) {
-				final Date newest = ConfigTag.newest(tProfile.getList(), tProfile.getItem());
-				if (newest == null || newest.getTime() < inFileLastModified) {
-					// Update timestamp so that old transcodes can be GCed.
-					FileHelper.freshenLastModified(outFile, 5, TimeUnit.DAYS);
-					return;
-				}
-			}
+		final File freshCacheFile = tProfile.getCacheFileIfFresh();
+		if (freshCacheFile != null) {
+			// Update timestamp so that old transcodes can be GCed.
+			FileHelper.freshenLastModified(freshCacheFile, 5, TimeUnit.DAYS);
+			return;
 		}
+
+		final File outFile = tProfile.getCacheFileEvenIfItDoesNotExist();
 
 		// Max parallel locking.
 		while (true) {

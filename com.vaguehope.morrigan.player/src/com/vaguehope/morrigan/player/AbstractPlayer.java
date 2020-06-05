@@ -256,7 +256,7 @@ public abstract class AbstractPlayer implements Player {
 						final TranscodeProfile tProfile = getTranscode().profileForItem(item.getList(), item.getTrack());
 						if (tProfile != null) {
 							AbstractPlayer.this.transcoder.transcodeToFile(tProfile);
-							altFile = tProfile.getCacheFile();
+							altFile = tProfile.getCacheFileEvenIfItDoesNotExist();  // This should exist because the transcode just ran.
 						}
 
 						loadAndPlay(item, altFile);

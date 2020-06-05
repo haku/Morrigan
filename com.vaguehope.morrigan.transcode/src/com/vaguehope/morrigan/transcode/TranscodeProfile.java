@@ -2,6 +2,7 @@ package com.vaguehope.morrigan.transcode;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItem;
@@ -50,8 +51,28 @@ public abstract class TranscodeProfile {
 	 * File may not exist or may be out of date.
 	 * Always call transcodeToFile() beforehand to ensure it if fresh.
 	 */
-	public File getCacheFile () {
+	public File getCacheFileEvenIfItDoesNotExist () {
 		return cacheFile(this.item, this.transcode, this.mimeType);
+	}
+
+	public File getCacheFileIfFresh () throws MorriganException, IOException {
+		final File cacheFile = getCacheFileEvenIfItDoesNotExist();
+		if (!cacheFile.exists()) return null;
+
+		final File inFile = this.item.getFile();
+		if (inFile == null || !inFile.exists()) throw new IOException("Local file not found: " + inFile.getAbsolutePath());
+
+		final long inFileLastModified = inFile.lastModified();
+		if (cacheFile.lastModified() < inFileLastModified) {
+			return null;
+		}
+
+		final Date newest = ConfigTag.newest(this.list, this.item);
+		if (newest != null && newest.getTime() > cacheFile.lastModified()) {
+			return null;
+		}
+
+		return cacheFile;
 	}
 
 	protected static File cacheFile (final IMediaItem item, final Transcode transcode, final MimeType mimeType) {

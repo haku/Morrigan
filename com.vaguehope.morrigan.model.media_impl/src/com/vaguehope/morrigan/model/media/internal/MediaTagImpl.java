@@ -61,6 +61,21 @@ public class MediaTagImpl implements MediaTag {
 		return this.deleted;
 	}
 
+	@Override
+	public boolean isNewerThan (final MediaTag b) {
+		if (b == null) return true;  //this
+
+		final Date am = getModified();
+		final Date bm = b.getModified();
+
+		if (am == null && bm == null) return false;  //b
+		if (am == null) return false;  //b
+		if (bm == null) return true;  //this
+
+		if (am.getTime() > bm.getTime()) return true;  //this
+		return false;  //b
+	}
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private static final ThreadSafeDateFormatter DATE_FORMATTER = new ThreadSafeDateFormatter("yyyyMMdd-HHmm");

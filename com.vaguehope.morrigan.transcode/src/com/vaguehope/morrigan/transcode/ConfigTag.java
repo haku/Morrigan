@@ -1,6 +1,8 @@
 package com.vaguehope.morrigan.transcode;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
@@ -23,19 +25,34 @@ public enum ConfigTag {
 	}
 
 	public ItemConfigTag read(final IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack item) throws MorriganException {
-		final MediaTag tag = findTagStartingWith(list, item, this.prefix);
-		if (tag == null) return null;
-		return new ItemConfigTag(this, tag);
-	}
+		final List<MediaTag> tags = findTagsStartingWith(list, item, this.prefix);
+		if (tags.size() < 1) return null;
 
-	private MediaTag findTagStartingWith (final IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack item, final String startsWith) throws MorriganException {
-		if (list == null) return null;
-		for (final MediaTag tag : list.getTags(item)) {
-			if (tag.getType() == MediaTagType.MANUAL && StringHelper.startsWithIgnoreCase(tag.getTag(), startsWith)) {
-				return tag;
+		// Look for newest undeleted tag.
+		MediaTag newest = null;
+		for (final MediaTag tag : tags) {
+			if (!tag.isDeleted() && tag.isNewerThan(newest)) newest = tag;
+		}
+
+		// If nothing undeleted, how about newest deleted?
+		if (newest == null) {
+			for (final MediaTag tag : tags) {
+				if (tag.isNewerThan(newest)) newest = tag;
 			}
 		}
-		return null;
+
+		return new ItemConfigTag(this, newest);
+	}
+
+	private List<MediaTag> findTagsStartingWith (final IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack item, final String startsWith) throws MorriganException {
+		if (list == null) return null;
+		final List<MediaTag> ret = new ArrayList<MediaTag>();
+		for (final MediaTag tag : list.getTagsIncludingDeleted(item)) {
+			if (tag.getType() == MediaTagType.MANUAL && StringHelper.startsWithIgnoreCase(tag.getTag(), startsWith)) {
+				ret.add(tag);
+			}
+		}
+		return ret;
 	}
 
 	public static Date newest (final IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack item) throws MorriganException {
