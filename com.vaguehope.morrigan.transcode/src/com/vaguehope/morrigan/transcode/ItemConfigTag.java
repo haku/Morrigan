@@ -9,7 +9,7 @@ import com.vaguehope.morrigan.util.TimeHelper;
 
 public class ItemConfigTag {
 
-	private static final MnLogger LOG = MnLogger.make(TranscodeProfile.class);
+	private static final MnLogger LOG = MnLogger.make(ItemConfigTag.class);
 
 	private final ConfigTag configTag;
 	private final MediaTag mediaTag;
@@ -21,6 +21,10 @@ public class ItemConfigTag {
 
 	public Date getLastModified() {
 		return this.mediaTag.getModified();
+	}
+
+	public boolean isPresent() {
+		return !this.mediaTag.isDeleted();
 	}
 
 	public Long parseAsDuration () {

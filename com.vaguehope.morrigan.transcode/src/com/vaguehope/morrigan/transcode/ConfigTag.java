@@ -24,6 +24,9 @@ public enum ConfigTag {
 		return this.prefix;
 	}
 
+	/**
+	 * Note: Will return an object for a deleted tag.
+	 */
 	public ItemConfigTag read(final IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack item) throws MorriganException {
 		final List<MediaTag> tags = findTagsStartingWith(list, item, this.prefix);
 		if (tags.size() < 1) return null;
@@ -53,6 +56,15 @@ public enum ConfigTag {
 			}
 		}
 		return ret;
+	}
+
+	public static boolean isAnyPresent(final IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack item) throws MorriganException {
+		for (final ConfigTag ct : ConfigTag.values()) {
+			// TODO optimise this to not re-fetch the tags each time?
+			final ItemConfigTag ict = ct.read(list, item);
+			if (ict != null && ict.isPresent()) return true;
+		}
+		return false;
 	}
 
 	public static Date newest (final IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack item) throws MorriganException {
