@@ -125,6 +125,7 @@ class ServerPlayerEventHandler implements PlayerEventListener, LocalPlayerSuppor
 
 	@Override
 	public void onException (final Exception e) {
+		// TODO propagate to the UI!
 		logger.log(Level.WARNING, "asyncThrowable", e);
 	}
 
