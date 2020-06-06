@@ -170,6 +170,9 @@ header .subtitle span {
   line-height: 1.2;
   margin-bottom: 0.5em;
 }
+.popup .title_link {
+  text-decoration: none;
+}
 .popup .stats, .popup .tags {
   margin: 0;
   font-size: 80%;

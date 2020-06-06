@@ -751,6 +751,7 @@
   function showDbItemMenu(item, anchorEl) {
     var menu = $('#db_item_menu');
     $('.title', menu).text(item.title);
+    $('.title_link', menu).attr('href', item.url);
     $('.stats.l0', menu).text(item.startCount + '/' + item.endCount + ' ' + MnApi.formatSeconds(item.duration));
     $('.stats.l1', menu).text(item.dateLastPlayed);
     $('.tags', menu).text(item.tags.join(', '));
