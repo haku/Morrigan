@@ -537,7 +537,7 @@ public class MlistsServlet extends HttpServlet {
 							final TranscodeProfile tProfile = Transcode.parse(transcode).profileForItem(mmdb, item);
 							final File transcodedFile = tProfile.getCacheFileIfFresh();
 							if (transcodedFile != null) {
-								ServletHelper.returnFile(transcodedFile, tProfile.getMimeType().getMimeType(), null, resp);
+								ServletHelper.returnFile(transcodedFile, tProfile.getMimeType().getMimeType(), null, req.getHeader("Range"), resp);
 							}
 							else {
 								ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "HTTP error 400 '" + filepath + "' has not been transcoded desu~");
@@ -548,11 +548,11 @@ public class MlistsServlet extends HttpServlet {
 						final Integer resize = ServletHelper.readParamInteger(req, PARAM_RESIZE);
 						if (resize != null) {
 							final File resizedFile = ImageResizer.resizeFile(file, resize);
-							ServletHelper.returnFile(resizedFile, ImageResizer.FORMAT_TYPE.getMimeType(), null, resp);
+							ServletHelper.returnFile(resizedFile, ImageResizer.FORMAT_TYPE.getMimeType(), null, req.getHeader("Range"), resp);
 							return;
 						}
 
-						ServletHelper.returnFile(file, item.getMimeType(), null, resp);
+						ServletHelper.returnFile(file, item.getMimeType(), null, req.getHeader("Range"), resp);
 					}
 					else {
 						final long lastModified = System.currentTimeMillis() - TimeUnit.HOURS.toMillis(1); // Falsify.

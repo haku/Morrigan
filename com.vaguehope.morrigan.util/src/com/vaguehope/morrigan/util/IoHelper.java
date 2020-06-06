@@ -2,6 +2,7 @@ package com.vaguehope.morrigan.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.Closeable;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -16,6 +17,7 @@ import java.nio.charset.Charset;
 public class IoHelper {
 
 	private static final int BUFFER_SIZE = 1024 * 4;
+	private static byte[] DRAIN_BUFFER;
 
 	public static void closeQuietly (final Closeable c) {
 		if (c == null) return;
@@ -73,13 +75,34 @@ public class IoHelper {
 	}
 
 	public static long drainStream (final InputStream is) throws IOException {
-		final byte[] buffer = new byte[BUFFER_SIZE];
+		if (DRAIN_BUFFER == null) {
+			DRAIN_BUFFER = new byte[BUFFER_SIZE];
+		}
+
 		long total = 0;
 		int read = 0;
-		while ((read = is.read(buffer)) != -1) {
+		while ((read = is.read(DRAIN_BUFFER)) != -1) {
 			total += read;
 		}
 		return total;
+	}
+
+	public static void skipReliably (final InputStream is, final long count) throws IOException {
+		if (count < 1) return;
+
+		if (DRAIN_BUFFER == null) {
+			DRAIN_BUFFER = new byte[BUFFER_SIZE];
+		}
+
+		long unskipped = count;
+		int read = 0;
+		while (unskipped > 0) {
+			read = is.read(DRAIN_BUFFER, 0, (int) Math.min(unskipped, BUFFER_SIZE));
+			if (read < 0) break;
+			unskipped -= read;
+		}
+
+		if (unskipped > 0) throw new EOFException("No more bytes to skip.");
 	}
 
 }

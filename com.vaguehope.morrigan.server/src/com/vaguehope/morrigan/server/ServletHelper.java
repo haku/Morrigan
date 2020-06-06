@@ -37,7 +37,7 @@ public final class ServletHelper {
 	 * Returns true if 304 was returned and no further processing is needed.
 	 */
 	public static boolean checkCanReturn304 (final long lastModified, final HttpServletRequest req, final HttpServletResponse resp) {
-		long time = req.getDateHeader("If-Modified-Since");
+		final long time = req.getDateHeader("If-Modified-Since");
 		if (time < 0) return false;
 		if (time < lastModified) return false;
 
@@ -61,29 +61,47 @@ public final class ServletHelper {
 			response.addHeader("Content-Description", "File Transfer");
 			response.addHeader("Content-Disposition", "attachment; filename=\"" + downloadName + "\"");
 		}
-		response.addHeader("Content-Transfer-Encoding", "binary");
 		response.setDateHeader("Last-Modified", lastModified);
 		//response.addHeader("Cache-Control", "max-age=" + DEFAULT_ASSET_EXPIRY_SECONDS);
 		response.addHeader("Pragma", "public");
 		if (length > 0) response.addHeader("Content-Length", String.valueOf(length));
 	}
 
-	public static void returnFile (final File file, final String contentType, final String downloadName, final HttpServletResponse response) throws IOException {
-		InputStream is = new BufferedInputStream(new FileInputStream(file));
+	public static void returnFile (final File file, final String contentType, final String downloadName, final String rangeHeader, final HttpServletResponse response) throws IOException {
+		final InputStream is = new BufferedInputStream(new FileInputStream(file));
 		try {
-			returnFile(is, file.length(), file.lastModified(), contentType, downloadName, response);
+			returnFile(is, file.length(), file.lastModified(), contentType, downloadName, rangeHeader, response);
 		}
 		finally {
 			is.close();
 		}
 	}
 
-	public static void returnFile (final InputStream is, final long length, final long lastModified, final String contentType, final String downloadName, final HttpServletResponse response) throws IOException {
-		prepForReturnFile(length, lastModified, contentType, downloadName, response);
+	public static void returnFile (final InputStream is, final long length, final long lastModified, final String contentType, final String downloadName, final String rangeHeader, final HttpServletResponse response) throws IOException {
+		long responseLength = length;
+
+		final Long rangeOffset = parseRangeHeader(response, rangeHeader);
+		if (rangeOffset != null) {
+			if (rangeOffset < 0) {
+				return;
+			}
+			if (rangeOffset > 0) {
+				IoHelper.skipReliably(is, rangeOffset);
+				responseLength -= rangeOffset;
+			}
+		}
+
+		prepForReturnFile(responseLength, lastModified, contentType, downloadName, response);
+
+		if (rangeOffset != null) {
+			response.addHeader("Content-Range", String.format("bytes %s-%s/%s", rangeOffset, length - 1, length));
+			response.setStatus(206);
+		}
+
 		OutputStream os = null;
 		try {
 			os = response.getOutputStream();
-			byte[] buffer = new byte[UPLOADBUFFERSIZE];
+			final byte[] buffer = new byte[UPLOADBUFFERSIZE];
 			int bytesRead;
 			while ((bytesRead = is.read(buffer)) != -1) {
 				os.write(buffer, 0, bytesRead);
@@ -91,7 +109,7 @@ public final class ServletHelper {
 			os.flush();
 			response.flushBuffer();
 		}
-		catch (org.eclipse.jetty.io.EofException e) {
+		catch (final org.eclipse.jetty.io.EofException e) {
 			// This happens when the client goes away, its not worth reporting.
 		}
 		finally {
@@ -100,10 +118,46 @@ public final class ServletHelper {
 
 	}
 
+	private static final String RANGE_UNIT_BYTES = "bytes=";
+
+	/**
+	 * Only supports:
+	 * Range: <unit>=<range-start>-
+	 *
+	 * Returns 0 if no header.
+	 * Returns -1 if malformed.
+	 */
+	private static Long parseRangeHeader (final HttpServletResponse response, final String rangeHeader) throws IOException {
+		if (StringHelper.blank(rangeHeader)) {
+			return null;
+		}
+
+		if (!rangeHeader.startsWith(RANGE_UNIT_BYTES)) {
+			error(response, 400, "Unsupported Range header, wrong units.");
+			return -1L;
+		}
+
+		final String val = rangeHeader.substring(RANGE_UNIT_BYTES.length());
+		final int firstDash = val.indexOf('-');
+		if (firstDash < val.length() - 1) {
+			error(response, 400, "Unsupported Range header, not a single range.");
+			return -1L;
+		}
+
+		final String number = val.substring(0, firstDash);
+		try {
+			return Long.valueOf(number);
+		}
+		catch (final NumberFormatException e) {
+			error(response, 400, "Unsupported Range header, not a number.");
+			return -1L;
+		}
+	}
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	public static boolean readParamBoolean (final HttpServletRequest req, final String name, final boolean defRet) {
-		Boolean b = readParamBoolean(req, name);
+		final Boolean b = readParamBoolean(req, name);
 		if (b != null) return b;
 		return defRet;
 	}
