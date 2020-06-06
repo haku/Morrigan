@@ -7,7 +7,7 @@ import java.util.List;
 
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
-import com.vaguehope.morrigan.model.media.IMediaTrackList;
+import com.vaguehope.morrigan.model.media.ItemTags;
 import com.vaguehope.morrigan.util.MimeType;
 import com.vaguehope.morrigan.util.StringHelper;
 
@@ -15,8 +15,9 @@ public class Mp4CompatibleTranscode extends TranscodeProfile {
 
 	private static final MimeType MIME_TYPE = MimeType.MP4;
 
-	protected Mp4CompatibleTranscode (final IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack item, final Transcode transcode) {
-		super(list, item, transcode, MIME_TYPE);
+	protected Mp4CompatibleTranscode (final IMediaTrack item, final ItemTags tags,
+			final Transcode transcode) {
+		super(item, tags, transcode, MIME_TYPE);
 	}
 
 	protected static File cacheFileMp4 (final IMediaItem item, final Transcode transcode) {
@@ -42,6 +43,8 @@ public class Mp4CompatibleTranscode extends TranscodeProfile {
 		cmd.add("+genpts");
 
 		final Long trimEnd = getTrimEndTimeSeconds();
+		final String audioFilter = getAudioFilter();
+
 		if (trimEnd != null) {
 			cmd.add("-ss");
 			cmd.add("0");
@@ -71,7 +74,7 @@ public class Mp4CompatibleTranscode extends TranscodeProfile {
 			cmd.add("23");
 		}
 
-		if (info.getCodecs().contains("aac")) {
+		if (audioFilter == null && info.getCodecs().contains("aac")) {
 			cmd.add("-acodec");
 			cmd.add("copy");
 		}
@@ -85,6 +88,11 @@ public class Mp4CompatibleTranscode extends TranscodeProfile {
 
 		cmd.add("-movflags");
 		cmd.add("+faststart");
+
+		if (audioFilter != null) {
+			cmd.add("-filter:a");
+			cmd.add(audioFilter);
+		}
 
 		if (trimEnd != null) {
 			cmd.add("-to");

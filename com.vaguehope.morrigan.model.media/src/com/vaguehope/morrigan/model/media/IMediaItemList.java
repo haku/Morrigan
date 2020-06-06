@@ -79,8 +79,15 @@ public interface IMediaItemList<T extends IMediaItem> {
 	Map<String, MediaTag> tagSearch (String prefix, int resLimit) throws MorriganException;
 	boolean hasTags (IDbItem item) throws MorriganException;
 	boolean hasTag (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) throws MorriganException;
+
 	List<MediaTag> getTags (IDbItem item) throws MorriganException;
 	List<MediaTag> getTagsIncludingDeleted (IDbItem item) throws MorriganException;
+
+	/**
+	 * A replacement for getTags and getTagsIncludingDeleted that returns a helpful collection object.
+	 */
+	ItemTags readTags (IDbItem item) throws MorriganException;
+
 	void addTag (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) throws MorriganException;
 	void addTag (IDbItem item, String tag, MediaTagType type, String mtc) throws MorriganException;
 	void addTag (IDbItem item, String tag, MediaTagType type, String mtc, Date modified, boolean deleted) throws MorriganException;

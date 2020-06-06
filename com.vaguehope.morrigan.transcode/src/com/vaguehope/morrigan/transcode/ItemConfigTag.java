@@ -27,11 +27,19 @@ public class ItemConfigTag {
 		return !this.mediaTag.isDeleted();
 	}
 
+	public String parseAsString() {
+		if (this.mediaTag.isDeleted()) return null;
+
+		return StringHelper.trimToNull(
+				this.mediaTag.getTag().substring(this.configTag.getPrefix().length()));
+	}
+
 	public Long parseAsDuration () {
 		if (this.mediaTag.isDeleted()) return null;
 
-		final String rawVal = this.mediaTag.getTag().substring(this.configTag.getPrefix().length());
-		if (StringHelper.blank(rawVal)) return null;
+		final String rawVal = StringHelper.trimToNull(
+				this.mediaTag.getTag().substring(this.configTag.getPrefix().length()));
+		if (rawVal == null) return null;
 
 		final Long val = TimeHelper.parseDuration(rawVal);
 		if (val != null) return val;

@@ -25,11 +25,13 @@ import com.vaguehope.morrigan.model.media.IMediaItemDb;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayerChangeListener;
+import com.vaguehope.morrigan.model.media.ItemTags;
 import com.vaguehope.morrigan.model.media.MediaAlbum;
 import com.vaguehope.morrigan.model.media.MediaItemListChangeListener;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagClassification;
 import com.vaguehope.morrigan.model.media.MediaTagType;
+import com.vaguehope.morrigan.model.media.internal.ItemTagsImpl;
 import com.vaguehope.morrigan.model.media.internal.MediaItemList;
 import com.vaguehope.morrigan.model.media.internal.MediaTagClassificationImpl;
 import com.vaguehope.morrigan.util.StringHelper;
@@ -755,6 +757,11 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 		catch (DbException e) {
 			throw new MorriganException(e);
 		}
+	}
+
+	@Override
+	public ItemTags readTags (final IDbItem item) throws MorriganException {
+		return ItemTagsImpl.forItem(this, item);
 	}
 
 	@Override

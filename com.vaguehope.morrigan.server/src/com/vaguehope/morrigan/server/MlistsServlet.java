@@ -36,6 +36,7 @@ import com.vaguehope.morrigan.model.media.IMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMixedMediaItemStorageLayer;
+import com.vaguehope.morrigan.model.media.ItemTags;
 import com.vaguehope.morrigan.model.media.MediaAlbum;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaListReference;
@@ -581,6 +582,7 @@ public class MlistsServlet extends HttpServlet {
 			Integer count = ServletHelper.readParamInteger(req, PARAM_COUNT);
 			if (count == null || count < 1) count = 10;
 			final Map<String, MediaTag> tags = mmdb.tagSearch(term, count);
+			@SuppressWarnings("rawtypes")
 			final Map[] arr = new Map[tags.size()];
 			int i = 0;
 			for (final Entry<String, MediaTag> tag : tags.entrySet()) {
@@ -782,10 +784,13 @@ public class MlistsServlet extends HttpServlet {
 		BigInteger fileHash = originalFileHash;
 		String fileLink = fileLink(mi);
 
+		ItemTags tags = null;  // Could be replaced with a nicer Memoise thingy?
+
 		final Transcode transcode = Transcode.parse(transcodeStr);
 		if (transcode != Transcode.NONE) {
 			if (mi instanceof IMediaTrack) {
-				final TranscodeProfile tProfile = transcode.profileForItem(ml, (IMediaTrack) mi);
+				if (tags == null) tags = ml.readTags(mi);
+				final TranscodeProfile tProfile = transcode.profileForItem((IMediaTrack) mi, tags);
 				if (tProfile != null) {
 					title = tProfile.getTranscodedTitle();
 
@@ -838,22 +843,23 @@ public class MlistsServlet extends HttpServlet {
 			FeedHelper.addElement(dw, "height", pic.getHeight());
 		}
 
-		if (includeTags == IncludeTags.YES_INCLUDING_DELETED) {
-			for (final MediaTag tag : ml.getTagsIncludingDeleted(mi)) {
-				FeedHelper.addElement(dw, "tag", tag.getTag(), new String[][] {
-					{ "t", String.valueOf(tag.getType().getIndex()) },
-					{ "c", tag.getClassification() == null ? "" : tag.getClassification().getClassification() },
-					{ "m", tag.getModified() == null || tag.getModified().getTime() < 1L ? "" : String.valueOf(tag.getModified().getTime()) },
-					{ "d", String.valueOf(tag.isDeleted()) }
-				});
-			}
-		}
-		else if (includeTags == IncludeTags.YES) {
-			for (final MediaTag tag : ml.getTags(mi)) {
-				FeedHelper.addElement(dw, "tag", tag.getTag(), new String[][] {
-					{ "t", String.valueOf(tag.getType().getIndex()) },
-					{ "c", tag.getClassification() == null ? "" : tag.getClassification().getClassification() }
-				});
+		if (includeTags == IncludeTags.YES || includeTags == IncludeTags.YES_INCLUDING_DELETED) {
+			if (tags == null) tags = ml.readTags(mi);
+			for (final MediaTag tag : tags.tagsIncludingDeleted()) {
+				if (tag.isDeleted() && includeTags == IncludeTags.YES_INCLUDING_DELETED) {
+					FeedHelper.addElement(dw, "tag", tag.getTag(), new String[][] {
+						{ "t", String.valueOf(tag.getType().getIndex()) },
+						{ "c", tag.getClassification() == null ? "" : tag.getClassification().getClassification() },
+						{ "m", tag.getModified() == null || tag.getModified().getTime() < 1L ? "" : String.valueOf(tag.getModified().getTime()) },
+						{ "d", String.valueOf(tag.isDeleted()) }
+					});
+				}
+				else {
+					FeedHelper.addElement(dw, "tag", tag.getTag(), new String[][] {
+						{ "t", String.valueOf(tag.getType().getIndex()) },
+						{ "c", tag.getClassification() == null ? "" : tag.getClassification().getClassification() }
+					});
+				}
 			}
 		}
 	}

@@ -13,7 +13,7 @@ import java.util.Set;
 
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
-import com.vaguehope.morrigan.model.media.IMediaTrackList;
+import com.vaguehope.morrigan.model.media.ItemTags;
 import com.vaguehope.morrigan.util.MimeType;
 import com.vaguehope.morrigan.util.StringHelper;
 
@@ -132,17 +132,16 @@ public class AudioStreamExtractOrTranscode extends TranscodeProfile {
 		return codec;
 	}
 
-	public AudioStreamExtractOrTranscode (final IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack item,
-			final Transcode transcode, final MimeType fallbackType, final MimeType... otherTypes) throws IOException {
-		this(list, item, transcode, fallbackType,
-				otherTypes.length > 0
-				? EnumSet.copyOf(Arrays.asList(otherTypes))
-				: EnumSet.noneOf(MimeType.class));
+	public AudioStreamExtractOrTranscode (final IMediaTrack item, final ItemTags tags, final Transcode transcode,
+			final MimeType fallbackType, final MimeType... otherTypes) throws IOException {
+		this(item, tags, transcode, fallbackType, otherTypes.length > 0
+		? EnumSet.copyOf(Arrays.asList(otherTypes))
+		: EnumSet.noneOf(MimeType.class));
 	}
 
-	public AudioStreamExtractOrTranscode (final IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack item,
-			final Transcode transcode, final MimeType fallbackType, final Set<MimeType> otherTypes) throws IOException {
-		super(list, item, transcode, findAudioStreamType(item, transcode, fallbackType, otherTypes));
+	public AudioStreamExtractOrTranscode (final IMediaTrack item, final ItemTags tags, final Transcode transcode,
+			final MimeType fallbackType, final Set<MimeType> otherTypes) throws IOException {
+		super(item, tags, transcode, findAudioStreamType(item, transcode, fallbackType, otherTypes));
 
 		if (!MIMETYPE_TO_CODEC.containsKey(fallbackType)) throw new IllegalArgumentException("Unsupported type: " + fallbackType);
 		for (final MimeType type : otherTypes) {
@@ -202,6 +201,8 @@ public class AudioStreamExtractOrTranscode extends TranscodeProfile {
 		cmd.add("0");
 
 		final Long trimEnd = getTrimEndTimeSeconds();
+		final String audioFilter = getAudioFilter();
+
 		if (trimEnd != null) {
 			cmd.add("-ss");
 			cmd.add("0");
@@ -215,11 +216,16 @@ public class AudioStreamExtractOrTranscode extends TranscodeProfile {
 		final FfprobeInfo info = Ffprobe.inspect(getItem().getFile());
 
 		final Codec codec = codecForMimeType(getMimeType());
-		if (info.getCodecs().contains(codec.getCodec())) {
+		if (audioFilter == null && info.getCodecs().contains(codec.getCodec())) {
 			codec.extract(cmd);
 		}
 		else {
 			codec.transcode(cmd);
+		}
+
+		if (audioFilter != null) {
+			cmd.add("-filter:a");
+			cmd.add(audioFilter);
 		}
 
 		if (trimEnd != null) {
