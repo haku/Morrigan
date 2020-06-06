@@ -11,6 +11,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.vaguehope.morrigan.util.IoHelper;
 import com.vaguehope.morrigan.util.StringHelper;
 
 public final class ServletHelper {
@@ -90,8 +91,11 @@ public final class ServletHelper {
 			os.flush();
 			response.flushBuffer();
 		}
+		catch (org.eclipse.jetty.io.EofException e) {
+			// This happens when the client goes away, its not worth reporting.
+		}
 		finally {
-			if (os != null) os.close();
+			IoHelper.closeQuietly(os);
 		}
 
 	}
