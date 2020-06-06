@@ -45,19 +45,20 @@ public final class ServletHelper {
 		return true;
 	}
 
-	public static void prepForReturnFile (final String name, final long length, final HttpServletResponse response) {
-		prepForReturnFile(name, length, System.currentTimeMillis(), response);
-	}
-
 	/**
 	 * @param name if specified then the client will be hinted that this is a download.
 	 */
-	public static void prepForReturnFile (final String name, final long length, final long lastModified, final HttpServletResponse response) {
+	public static void prepForReturnFile (final long length, final long lastModified, final String contentType, final String downloadName, final HttpServletResponse response) {
 		response.reset();
-		if (name != null) {
+		if (StringHelper.notBlank(contentType)) {
+			response.setContentType(contentType);
+		}
+		else {
 			response.setContentType("application/octet-stream");
+		}
+		if (StringHelper.notBlank(downloadName)) {
 			response.addHeader("Content-Description", "File Transfer");
-			response.addHeader("Content-Disposition", "attachment; filename=\"" + name + "\"");
+			response.addHeader("Content-Disposition", "attachment; filename=\"" + downloadName + "\"");
 		}
 		response.addHeader("Content-Transfer-Encoding", "binary");
 		response.setDateHeader("Last-Modified", lastModified);
@@ -66,26 +67,18 @@ public final class ServletHelper {
 		if (length > 0) response.addHeader("Content-Length", String.valueOf(length));
 	}
 
-	public static void returnFile (final File file, final HttpServletResponse response) throws IOException {
-		returnFile(file, response, true);
-	}
-
-	public static void returnFile (final File file, final HttpServletResponse response, final boolean asDownload) throws IOException {
-		returnFile(file, response, asDownload ? file.getName() : null);
-	}
-
-	public static void returnFile (final File file, final HttpServletResponse response, final String name) throws IOException {
+	public static void returnFile (final File file, final String contentType, final String downloadName, final HttpServletResponse response) throws IOException {
 		InputStream is = new BufferedInputStream(new FileInputStream(file));
 		try {
-			returnFile(is, name, file.length(), file.lastModified(), response);
+			returnFile(is, file.length(), file.lastModified(), contentType, downloadName, response);
 		}
 		finally {
 			is.close();
 		}
 	}
 
-	public static void returnFile (final InputStream is, final String name, final long length, final long lastModified, final HttpServletResponse response) throws IOException {
-		prepForReturnFile(name, length, lastModified, response);
+	public static void returnFile (final InputStream is, final long length, final long lastModified, final String contentType, final String downloadName, final HttpServletResponse response) throws IOException {
+		prepForReturnFile(length, lastModified, contentType, downloadName, response);
 		OutputStream os = null;
 		try {
 			os = response.getOutputStream();

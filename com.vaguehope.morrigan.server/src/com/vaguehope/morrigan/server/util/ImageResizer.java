@@ -16,8 +16,12 @@ import javax.imageio.stream.FileImageOutputStream;
 
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.util.ChecksumHelper;
+import com.vaguehope.morrigan.util.MimeType;
 
 public class ImageResizer {
+
+	public static MimeType FORMAT_TYPE = MimeType.JPG;
+	private static final String FORMAT_NAME = "jpg";
 
 	/**
 	 * 1 = Maximum.
@@ -90,7 +94,7 @@ public class ImageResizer {
 	}
 
 	private static void writeImageToFile (final BufferedImage outImg, final File f) throws IOException {
-		final ImageWriter jpgWriter = ImageIO.getImageWritersByFormatName("jpg").next();
+		final ImageWriter jpgWriter = ImageIO.getImageWritersByFormatName(FORMAT_NAME).next();
 		try {
 			final ImageWriteParam jpegParams = jpgWriter.getDefaultWriteParam();
 			jpegParams.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);

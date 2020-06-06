@@ -528,7 +528,6 @@ public class MlistsServlet extends HttpServlet {
 				final String filepath = URLDecoder.decode(afterPath, "UTF-8");
 				if (mmdb.hasFile(filepath).isKnown()) {
 					final IMixedMediaItem item = mmdb.getByFile(filepath);
-					final boolean asDownload = item.getMediaType() == MediaType.TRACK;
 					final File file = item.getFile();
 					if (file.exists()) {
 						if (ServletHelper.checkCanReturn304(file.lastModified(), req, resp)) return;
@@ -538,7 +537,7 @@ public class MlistsServlet extends HttpServlet {
 							final TranscodeProfile tProfile = Transcode.parse(transcode).profileForItem(mmdb, item);
 							final File transcodedFile = tProfile.getCacheFileIfFresh();
 							if (transcodedFile != null) {
-								ServletHelper.returnFile(transcodedFile, resp, tProfile.getTranscodedTitle());
+								ServletHelper.returnFile(transcodedFile, tProfile.getMimeType().getMimeType(), null, resp);
 							}
 							else {
 								ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "HTTP error 400 '" + filepath + "' has not been transcoded desu~");
@@ -549,17 +548,17 @@ public class MlistsServlet extends HttpServlet {
 						final Integer resize = ServletHelper.readParamInteger(req, PARAM_RESIZE);
 						if (resize != null) {
 							final File resizedFile = ImageResizer.resizeFile(file, resize);
-							ServletHelper.returnFile(resizedFile, resp, asDownload);
+							ServletHelper.returnFile(resizedFile, ImageResizer.FORMAT_TYPE.getMimeType(), null, resp);
 							return;
 						}
 
-						ServletHelper.returnFile(file, resp, asDownload);
+						ServletHelper.returnFile(file, item.getMimeType(), null, resp);
 					}
 					else {
 						final long lastModified = System.currentTimeMillis() - TimeUnit.HOURS.toMillis(1); // Falsify.
 						if (ServletHelper.checkCanReturn304(lastModified, req, resp)) return;
-						final String name = asDownload ? item.getTitle() : null;
-						ServletHelper.prepForReturnFile(name, 0, resp); // TODO pass through length?
+						// TODO pass through length and modified date?
+						ServletHelper.prepForReturnFile(0, System.currentTimeMillis(), item.getMimeType(), null, resp);
 						mmdb.copyItemFile(item, resp.getOutputStream());
 						resp.flushBuffer();
 					}

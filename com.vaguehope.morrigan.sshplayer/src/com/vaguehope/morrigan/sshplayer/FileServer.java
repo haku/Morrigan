@@ -58,7 +58,7 @@ public class FileServer {
 		@Override
 		public void handle (String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 			try {
-				ServletHelper.returnFile(this.file, response);
+				ServletHelper.returnFile(this.file, null, null, response);
 			}
 			catch (IOException e) {
 				// Do not care; its the client's problem.
