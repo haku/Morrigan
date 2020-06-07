@@ -128,12 +128,25 @@ public abstract class AbstractPlayer implements Player {
 		this.listeners.removeEventListener(listener);
 	}
 
+	/**
+	 * Default implementation to be overridden as needed.
+	 */
+	@Override
+	public int getCurrentTrackDurationAsMeasured () {
+		return -1;
+	}
+
 	@Override
 	public final int getCurrentTrackDuration () {
+		final int asMeasured = getCurrentTrackDurationAsMeasured();
+		if (asMeasured > 0) return asMeasured;
+
 		final PlayItem item = getCurrentItem();
 		final IMediaTrack track = item != null && item.hasTrack() ? item.getTrack() : null;
 		final int trackDuration = track != null ? track.getDuration() : -1;
-		return trackDuration > 0 ? trackDuration : getCurrentTrackDurationFromRenderer();
+		if (trackDuration > 0) return trackDuration;
+
+		return getCurrentTrackDurationFromRenderer();
 	}
 
 	@Override

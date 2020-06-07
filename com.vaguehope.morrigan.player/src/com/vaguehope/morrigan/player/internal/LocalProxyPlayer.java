@@ -192,6 +192,13 @@ public class LocalProxyPlayer implements LocalPlayer {
 	}
 
 	@Override
+	public int getCurrentTrackDurationAsMeasured () {
+		final Player p = getRef();
+		if (p == null) return -1;
+		return p.getCurrentTrackDurationAsMeasured();
+	}
+
+	@Override
 	public int getCurrentTrackDurationFromRenderer () {
 		final Player p = getRef();
 		if (p == null) return -1;

@@ -59,12 +59,21 @@ public interface Player {
 
 	/**
 	 * Return -1 if not playing.
+	 * In seconds.
 	 */
 	int getCurrentTrackDurationFromRenderer();
 
 	/**
+	 * This will override all other sources of duration info.
+	 * Return -1 if not known.
+	 * In seconds.
+	 */
+	int getCurrentTrackDurationAsMeasured();
+
+	/**
 	 * Tries to read duration from current item first, falling back to that reported by renderer.
 	 * Returns <0 if not available.
+	 * In seconds.
 	 */
 	int getCurrentTrackDuration();
 
