@@ -844,8 +844,8 @@ public class MlistsServlet extends HttpServlet {
 
 		if (includeTags == IncludeTags.YES || includeTags == IncludeTags.YES_INCLUDING_DELETED) {
 			if (tags == null) tags = ml.readTags(mi);
-			for (final MediaTag tag : tags.tagsIncludingDeleted()) {
-				if (tag.isDeleted() && includeTags == IncludeTags.YES_INCLUDING_DELETED) {
+			if (includeTags == IncludeTags.YES_INCLUDING_DELETED) {
+				for (final MediaTag tag : tags.tagsIncludingDeleted()) {
 					FeedHelper.addElement(dw, "tag", tag.getTag(), new String[][] {
 						{ "t", String.valueOf(tag.getType().getIndex()) },
 						{ "c", tag.getClassification() == null ? "" : tag.getClassification().getClassification() },
@@ -853,11 +853,15 @@ public class MlistsServlet extends HttpServlet {
 						{ "d", String.valueOf(tag.isDeleted()) }
 					});
 				}
-				else {
-					FeedHelper.addElement(dw, "tag", tag.getTag(), new String[][] {
-						{ "t", String.valueOf(tag.getType().getIndex()) },
-						{ "c", tag.getClassification() == null ? "" : tag.getClassification().getClassification() }
-					});
+			}
+			else {
+				for (final MediaTag tag : tags.tagsIncludingDeleted()) {
+					if (!tag.isDeleted()) {
+						FeedHelper.addElement(dw, "tag", tag.getTag(), new String[][] {
+							{ "t", String.valueOf(tag.getType().getIndex()) },
+							{ "c", tag.getClassification() == null ? "" : tag.getClassification().getClassification() }
+						});
+					}
 				}
 			}
 		}
