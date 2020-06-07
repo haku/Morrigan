@@ -52,7 +52,7 @@ public class MlistsServletTest {
 	@Test
 	public void itServesRootList () throws Exception {
 		this.req.requestURI = "/mlists";
-		this.undertest.doGet(this.req, this.resp);
+		this.undertest.service(this.req, this.resp);
 
 		final String expected = IoHelper.readAsString(getClass().getResourceAsStream("/mlists.xml"));
 		assertEquals(expected, this.resp.getOutputAsString());

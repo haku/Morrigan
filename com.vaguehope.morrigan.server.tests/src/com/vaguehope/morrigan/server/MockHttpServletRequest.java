@@ -25,7 +25,13 @@ import javax.servlet.http.Part;
 
 public class MockHttpServletRequest implements HttpServletRequest {
 
+	String method = "GET";
 	String requestURI;
+
+	@Override
+	public String getMethod () {
+		return this.method;
+	}
 
 	@Override
 	public String getRequestURI () {
@@ -256,11 +262,6 @@ public class MockHttpServletRequest implements HttpServletRequest {
 
 	@Override
 	public int getIntHeader (final String arg0) {
-		throw new UnsupportedOperationException("Not implemented.");
-	}
-
-	@Override
-	public String getMethod () {
 		throw new UnsupportedOperationException("Not implemented.");
 	}
 
