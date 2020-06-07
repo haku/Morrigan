@@ -1,6 +1,7 @@
 package com.vaguehope.morrigan.util;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.EOFException;
 import java.io.File;
@@ -72,6 +73,13 @@ public class IoHelper {
 		catch (final FileNotFoundException e) {
 			return null;
 		}
+	}
+
+	public static String readAsString (final InputStream is) throws IOException {
+		final ByteArrayOutputStream os = new ByteArrayOutputStream();
+		copy(is, os);
+		return os.toString("UTF-8");
+
 	}
 
 	public static long drainStream (final InputStream is) throws IOException {

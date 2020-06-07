@@ -1,0 +1,10 @@
+<?xml version="1.0" standalone="yes"?>
+
+<feed xmlns="http://www.w3.org/2005/Atom">
+ <title>Morrigan media lists desu~</title>
+ <link rel="self" type="text/xml" href="/mlists"/>
+ <entry type="local">
+  <title>test</title>
+  <link rel="self" type="text/xml" href="/mlists/LOCALMMDB/test.local.db3"/></entry>
+</feed>
+

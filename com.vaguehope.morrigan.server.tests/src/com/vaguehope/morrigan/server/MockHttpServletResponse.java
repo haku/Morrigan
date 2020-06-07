@@ -12,6 +12,8 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
+import com.vaguehope.morrigan.util.StringHelper;
+
 public class MockHttpServletResponse implements HttpServletResponse {
 
 	String contentType;
@@ -80,6 +82,16 @@ public class MockHttpServletResponse implements HttpServletResponse {
 		this.status = status;
 	}
 
+	@Override
+	public boolean isCommitted () {
+		try {
+			return StringHelper.notBlank(getOutputAsString());
+		}
+		catch (final IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override
@@ -99,11 +111,6 @@ public class MockHttpServletResponse implements HttpServletResponse {
 
 	@Override
 	public Locale getLocale () {
-		throw new UnsupportedOperationException("Not implemented.");
-	}
-
-	@Override
-	public boolean isCommitted () {
 		throw new UnsupportedOperationException("Not implemented.");
 	}
 
