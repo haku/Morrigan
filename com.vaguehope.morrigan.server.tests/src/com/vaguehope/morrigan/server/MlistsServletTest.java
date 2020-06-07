@@ -8,7 +8,6 @@ import java.util.concurrent.Executors;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.internal.MediaFactoryImpl;
 import com.vaguehope.morrigan.model.media.test.TestMixedMediaDb;
@@ -37,7 +36,6 @@ public class MlistsServletTest {
 
 	@Before
 	public void before () throws Exception {
-		this.testDb = new TestMixedMediaDb();
 		this.playerReader = new MockPlayerReader();
 		this.mediaFactory = new MediaFactoryImpl(null);
 		this.executor = Executors.newCachedThreadPool(new DaemonThreadFactory("test"));
@@ -47,6 +45,9 @@ public class MlistsServletTest {
 		this.undertest = new MlistsServlet(this.playerReader, this.mediaFactory, this.asyncActions, this.transcoder);
 		this.req = new MockHttpServletRequest();
 		this.resp = new MockHttpServletResponse();
+
+		this.testDb = new TestMixedMediaDb();
+		this.testDb.addTestTrack();
 	}
 
 	@Test
@@ -60,7 +61,6 @@ public class MlistsServletTest {
 
 	@Test
 	public void itDoesNotIncludeDeletedTagsIfNotRequested () throws Exception {
-		final IMixedMediaItem item = this.testDb.addTestTrack();
 		// TODO
 	}
 
