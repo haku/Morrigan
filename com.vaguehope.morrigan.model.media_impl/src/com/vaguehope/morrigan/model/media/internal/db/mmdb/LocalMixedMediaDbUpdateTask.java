@@ -30,6 +30,7 @@ import com.vaguehope.morrigan.model.media.internal.TrackTagHelper;
 import com.vaguehope.morrigan.model.media.internal.db.LocalDbUpdateTask;
 import com.vaguehope.morrigan.tasks.TaskEventListener;
 import com.vaguehope.morrigan.transcode.Ffprobe;
+import com.vaguehope.morrigan.transcode.FfprobeCache;
 import com.vaguehope.sqlitewrapper.DbException;
 
 public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMediaDb, IMixedMediaItem> {
@@ -195,7 +196,7 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMe
 			try {
 				int dSeconds = 0;
 				if (Ffprobe.isAvailable()) {
-					final Long dMillis = Ffprobe.inspect(item.getFile()).getDurationMillis();
+					final Long dMillis = FfprobeCache.inspect(item.getFile()).getDurationMillis();
 					if (dMillis != null) {
 						dSeconds = (int) TimeUnit.MILLISECONDS.toSeconds(dMillis);
 					}

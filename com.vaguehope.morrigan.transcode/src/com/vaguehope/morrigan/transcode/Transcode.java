@@ -66,7 +66,7 @@ public enum Transcode {
 				// Use existence of cache file to reduce calls to ffprobe.
 				if (hasConfigTags
 						|| Mp4CompatibleTranscode.cacheFileMp4(item, this).exists()
-						|| Ffprobe.inspect(item.getFile()).has10BitColour()) {
+						|| FfprobeCache.inspect(item.getFile()).has10BitColour()) {
 					return new Mp4CompatibleTranscode(item, tags, this);
 				}
 				return null;

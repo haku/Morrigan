@@ -169,7 +169,7 @@ public class AudioStreamExtractOrTranscode extends TranscodeProfile {
 
 		// Others should include the fallback, so don't need to search for the fallback.
 		if (otherTypes.size() > 0) {
-			final FfprobeInfo info = Ffprobe.inspect(item.getFile());
+			final FfprobeInfo info = FfprobeCache.inspect(item.getFile());
 			for (final MimeType mimeType : otherTypes) {
 				final String codec = codecForMimeType(mimeType).getCodec();
 				if (info.getCodecs().contains(codec)) return mimeType;
@@ -213,7 +213,7 @@ public class AudioStreamExtractOrTranscode extends TranscodeProfile {
 
 		cmd.add("-vn");
 
-		final FfprobeInfo info = Ffprobe.inspect(getItem().getFile());
+		final FfprobeInfo info = FfprobeCache.inspect(getItem().getFile());
 
 		final Codec codec = codecForMimeType(getMimeType());
 		if (audioFilter == null && info.getCodecs().contains(codec.getCodec())) {

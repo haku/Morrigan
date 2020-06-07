@@ -26,10 +26,11 @@ public class Ffprobe {
 
 	/**
 	 * Will not return null.
+	 * Hidden so that FfprobeCache is used.
 	 */
-	public static FfprobeInfo inspect (final File inFile) throws IOException {
+	static FfprobeInfo inspect (final File inFile) throws IOException {
 		checkAvailable();
-		final FfprobeParser parser = new FfprobeParser();
+		final FfprobeParser parser = new FfprobeParser(inFile.lastModified());
 		ProcessHelper.runAndWait(new String[] {
 				"ffprobe",
 				"-hide_banner",

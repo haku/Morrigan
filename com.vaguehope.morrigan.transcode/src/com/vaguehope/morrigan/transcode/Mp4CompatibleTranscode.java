@@ -53,7 +53,7 @@ public class Mp4CompatibleTranscode extends TranscodeProfile {
 		cmd.add("-i");
 		cmd.add(getItem().getFile().getAbsolutePath());
 
-		final FfprobeInfo info = Ffprobe.inspect(getItem().getFile());
+		final FfprobeInfo info = FfprobeCache.inspect(getItem().getFile());
 
 		if (info.getCodecs().contains("h264") && !info.has10BitColour()) {
 			cmd.add("-vcodec");

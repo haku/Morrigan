@@ -10,7 +10,7 @@ import com.vaguehope.morrigan.util.Listener;
 import com.vaguehope.morrigan.util.MnLogger;
 import com.vaguehope.morrigan.util.StringHelper;
 
-public class FfprobeParser implements Listener<String> {
+class FfprobeParser implements Listener<String> {
 
 	/**
 	 * 00:03:57.196000000
@@ -19,9 +19,15 @@ public class FfprobeParser implements Listener<String> {
 
 	private static final MnLogger LOG = MnLogger.make(FfprobeParser.class);
 
+	private final long fileLastModified;
+
 	private final Set<String> codecs = new LinkedHashSet<String>();
 	private final Set<String> profiles = new LinkedHashSet<String>();
 	private Long durationMillis = null;
+
+	public FfprobeParser (final long fileLastModified) {
+		this.fileLastModified = fileLastModified;
+	}
 
 	@Override
 	public void onAnswer (final String line) {
@@ -75,7 +81,7 @@ public class FfprobeParser implements Listener<String> {
 	}
 
 	public FfprobeInfo build () {
-		return new FfprobeInfo(this.codecs, this.profiles, this.durationMillis);
+		return new FfprobeInfo(this.fileLastModified, this.codecs, this.profiles, this.durationMillis);
 	}
 
 }

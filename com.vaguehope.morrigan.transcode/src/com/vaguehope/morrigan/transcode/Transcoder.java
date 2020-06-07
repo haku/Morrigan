@@ -113,7 +113,7 @@ public class Transcoder {
 			long inFileDurationSeconds = tProfile.getItem().getDuration();
 			if (inFileDurationSeconds < 1) {
 				LOG.w("DB duration missing: {}", tProfile.getItem());
-				final Long inFileDurationMillis = Ffprobe.inspect(inFile).getDurationMillis();
+				final Long inFileDurationMillis = FfprobeCache.inspect(inFile).getDurationMillis();
 				if (inFileDurationMillis == null || inFileDurationMillis < 1) throw new IOException("Invalid file duration: " + inFile.getAbsolutePath());
 				inFileDurationSeconds = TimeUnit.MILLISECONDS.toSeconds(inFileDurationMillis);
 			}
@@ -130,7 +130,7 @@ public class Transcoder {
 					runTranscodeCmd(tProfile, ftmp);
 
 					// Validate transcode output.
-					final Long outFileDurationMillis = Ffprobe.inspect(ftmp).getDurationMillis();
+					final Long outFileDurationMillis = FfprobeCache.inspect(ftmp).getDurationMillis();
 					if (outFileDurationMillis == null || outFileDurationMillis < 1) {
 						throw new IOException("Transcode resulted in invalid file duration: " + inFile.getAbsolutePath());
 					}
