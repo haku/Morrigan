@@ -413,8 +413,8 @@
     pos = player.position;
     if (!pos || pos < 0) pos = 0;
 
-    if (player.item) dur = player.item.duration;
-    if (!dur || dur <= 0) dur = player.duration;
+    if (player.item) dur = player.duration;
+    if (!dur || dur <= 0) dur = player.item.duration;
     if (!dur || dur < 0) dur = 0;
 
     if (pos > 0) {
