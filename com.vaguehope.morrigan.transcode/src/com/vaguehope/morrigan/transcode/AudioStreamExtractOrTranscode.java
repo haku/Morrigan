@@ -15,9 +15,12 @@ import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.ItemTags;
 import com.vaguehope.morrigan.util.MimeType;
+import com.vaguehope.morrigan.util.MnLogger;
 import com.vaguehope.morrigan.util.StringHelper;
 
 public class AudioStreamExtractOrTranscode extends TranscodeProfile {
+
+	private static final MnLogger LOG = MnLogger.make(AudioStreamExtractOrTranscode.class);
 
 	private static enum Codec {
 		MP3("mp3", MimeType.MP3) {
@@ -221,6 +224,7 @@ public class AudioStreamExtractOrTranscode extends TranscodeProfile {
 		}
 		else {
 			codec.transcode(cmd);
+			LOG.i("Transcoding because: af={} OR {} not in {}.", audioFilter, codec.getCodec(), info.getCodecs());
 		}
 
 		if (audioFilter != null) {

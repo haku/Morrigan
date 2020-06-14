@@ -45,6 +45,7 @@ public enum Transcode {
 			if (COMMON_AUDIO_TYPES_STRINGS.contains(itemMimeTypeLower) && !ConfigTag.isAnyPresent(tags)) {
 				return null;
 			}
+			// TODO support extraction of all common types.
 			return new AudioStreamExtractOrTranscode(item, tags, this, MimeType.MP3, COMMON_AUDIO_TYPES);
 		}
 	},
