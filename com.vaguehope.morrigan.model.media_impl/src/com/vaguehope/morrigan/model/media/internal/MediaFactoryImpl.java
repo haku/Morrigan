@@ -7,12 +7,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
 import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.tag.TagException;
 
+import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.engines.playback.PlaybackEngineFactoryTracker;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DurationData;
@@ -40,22 +42,32 @@ import com.vaguehope.sqlitewrapper.DbException;
 public class MediaFactoryImpl implements MediaFactory {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	LocalMixedMediaDbUpdateTask.Factory localMixedMediaDbUpdateTaskFactory;
+	private final Config config;
+	private final LocalMixedMediaDbUpdateTask.Factory localMixedMediaDbUpdateTaskFactory;
 
-	public MediaFactoryImpl (final PlaybackEngineFactoryTracker playbackEngineFactoryTracker) {
+	public MediaFactoryImpl (final Config config, final PlaybackEngineFactoryTracker playbackEngineFactoryTracker) {
+		this.config = config;
 		this.localMixedMediaDbUpdateTaskFactory = new LocalMixedMediaDbUpdateTask.Factory(playbackEngineFactoryTracker, this);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+	private final Map<MediaListReference, ILocalMixedMediaDb> addedLocals = new ConcurrentHashMap<MediaListReference, ILocalMixedMediaDb>();
+
 	@Override
 	public Collection<MediaListReference> getAllLocalMixedMediaDbs () {
-		return LocalMixedMediaDbHelper.getAllMmdb();
+		final List<MediaListReference> real = LocalMixedMediaDbHelper.getAllMmdb(this.config);
+		if (this.addedLocals.size() < 1) return real;
+
+		final Collection<MediaListReference> ret = new ArrayList<MediaListReference>();
+		ret.addAll(real);
+		ret.addAll(this.addedLocals.keySet());
+		return ret;
 	}
 
 	@Override
 	public ILocalMixedMediaDb createLocalMixedMediaDb (final String name) throws MorriganException {
-		return LocalMixedMediaDbHelper.createMmdb(name);
+		return createLocalMixedMediaDb(name);
 	}
 
 	@Override
@@ -74,6 +86,11 @@ public class MediaFactoryImpl implements MediaFactory {
 	@Override
 	public ILocalMixedMediaDb getLocalMixedMediaDbBySerial (final String serial) throws DbException {
 		return LocalMixedMediaDbFactory.getMainBySerial(serial);
+	}
+
+	@Override
+	public void addLocalMixedMediaDb (final ILocalMixedMediaDb db) {
+		this.addedLocals.put(new MediaListReferenceImpl(MediaListType.LOCALMMDB, db.getListId(), db.getListName()), db);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

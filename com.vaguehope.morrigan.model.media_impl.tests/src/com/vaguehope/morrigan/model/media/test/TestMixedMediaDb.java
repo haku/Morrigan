@@ -18,19 +18,21 @@ import com.vaguehope.sqlitewrapper.DbException;
 
 public class TestMixedMediaDb extends LocalMixedMediaDb {
 
+	private static final String NAME = "testDb";
+
 	private static final Random RND = new Random(System.currentTimeMillis());
 	private static final AtomicInteger newDbCounter = new AtomicInteger(0);
 	private static final AtomicInteger newTrackCounter = new AtomicInteger(0);
 
 	public TestMixedMediaDb () throws DbException, MorriganException {
-		this("testDb");
+		this(NAME);
 	}
 
 	public TestMixedMediaDb (final String name) throws DbException, MorriganException {
 		super(name,
 				new MediaItemDbConfig(name, null),
 				new MixedMediaSqliteLayerOuter(
-						"file:testdb" + newDbCounter.getAndIncrement() + "?mode=memory&cache=shared",
+						"file:" + NAME + newDbCounter.getAndIncrement() + "?mode=memory&cache=shared",
 						true, new MixedMediaItemFactory()));
 		read();
 	}

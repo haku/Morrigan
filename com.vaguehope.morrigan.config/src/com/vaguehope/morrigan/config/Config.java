@@ -6,54 +6,62 @@ import java.io.File;
 public class Config {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private static final String DIR_CONFIG = "/.morrigan";
+	private static final String DIR_CONFIG = ".morrigan";
 
-	public static String getConfigDir () {
-		return System.getProperty("user.home") + DIR_CONFIG;
+	public static File getConfigDir () {
+		return new File(System.getProperty("user.home"), DIR_CONFIG);
+	}
+
+	public static final Config DEFAULT = new Config(getConfigDir());
+
+	private final File configDir;
+
+	public Config (final File configDir) {
+		this.configDir = configDir;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private static final String PL_DIR = "/pl";
+	private static final String PL_DIR = "pl";
 	public static final String PL_FILE_EXT = ".morrigan_pl";
 
-	public static File getPlDir () {
-		File f = new File(getConfigDir() + PL_DIR);
+	public File getPlDir () {
+		File f = new File(this.configDir, PL_DIR);
 		mkdir(f);
 		return f;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private static final String LIB_DIR = "/libs";
+	private static final String LIB_DIR = "libs";
 	public static final String LIB_LOCAL_FILE_EXT = ".local.db3";
 	public static final String LIB_REMOTE_FILE_EXT = ".remote.db3";
 
-	public static File getLibDir () {
-		File f = new File(getConfigDir() + LIB_DIR);
+	public File getLibDir () {
+		File f = new File(this.configDir, LIB_DIR);
 		mkdir(f);
 		return f;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private static final String GALLERY_DIR = "/gals";
+	private static final String GALLERY_DIR = "gals";
 	public static final String GALLERY_LOCAL_FILE_EXT = ".local.db3";
 
-	public static File getGalleryDir () {
-		File f = new File(getConfigDir() + GALLERY_DIR);
+	public File getGalleryDir () {
+		File f = new File(this.configDir, GALLERY_DIR);
 		mkdir(f);
 		return f;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private static final String MMDB_DIR = "/mmdb";
+	private static final String MMDB_DIR = "mmdb";
 	public static final String MMDB_LOCAL_FILE_EXT = ".local.db3";
 	public static final String MMDB_REMOTE_FILE_EXT = ".remote.db3";
 
-	public static File getMmdbDir () {
-		File f = new File(getConfigDir() + MMDB_DIR);
+	public File getMmdbDir () {
+		File f = new File(this.configDir, MMDB_DIR);
 		mkdir(f);
 		return f;
 	}
@@ -96,26 +104,26 @@ public class Config {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private static final String RESIZED_DIR = "/resized";
+	private static final String RESIZED_DIR = "resized";
 
-	public static File getResizedDir () {
-		final File f = new File(getConfigDir() + RESIZED_DIR);
+	public File getResizedDir () {
+		final File f = new File(this.configDir, RESIZED_DIR);
 		mkdir(f);
 		return f;
 	}
 
-	private static final String TRANSCODED_DIR = "/transcoded";
+	private static final String TRANSCODED_DIR = "transcoded";
 
-	public static File getTranscodedDir () {
-		final File f = new File(getConfigDir() + TRANSCODED_DIR);
+	public File getTranscodedDir () {
+		final File f = new File(this.configDir, TRANSCODED_DIR);
 		mkdir(f);
 		return f;
 	}
 
-	private static final String SESSION_DIR = "/sessions";
+	private static final String SESSION_DIR = "sessions";
 
-	public static File getSessionDir () {
-		final File f = new File(getConfigDir() + SESSION_DIR);
+	public File getSessionDir () {
+		final File f = new File(this.configDir, SESSION_DIR);
 		mkdir(f);
 		return f;
 	}

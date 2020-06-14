@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.util.B64Code;
 
+import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.util.httpclient.Http;
 
 public class AuthFilter implements Filter {
@@ -26,9 +27,9 @@ public class AuthFilter implements Filter {
 	private final AuthChecker authChecker;
 	private final AuthMgr authMgr;
 
-	public AuthFilter (final AuthChecker authChecker, final ScheduledExecutorService schEs) {
+	public AuthFilter (final AuthChecker authChecker, final Config config, final ScheduledExecutorService schEs) {
 		this.authChecker = authChecker;
-		this.authMgr = new AuthMgr(schEs);
+		this.authMgr = new AuthMgr(config, schEs);
 	}
 
 	@Override

@@ -73,7 +73,7 @@ public abstract class TranscodeProfile {
 	}
 
 	protected static File cacheFile (final String nameWithoutExtension, final MimeType mimeType) {
-		return new File(Config.getTranscodedDir(), nameWithoutExtension + "." + mimeType.getExt());
+		return new File(Config.DEFAULT.getTranscodedDir(), nameWithoutExtension + "." + mimeType.getExt());
 	}
 
 	protected static String cacheFileNameWithoutExtension (final IMediaItem item, final Transcode transcode) {

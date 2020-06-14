@@ -148,7 +148,7 @@ public class PlayerStateStorage {
 	}
 
 	private static File getFile (final String playerId) {
-		final File dir = new File(new File(Config.getConfigDir()), DIR_NAME);
+		final File dir = new File(Config.getConfigDir(), DIR_NAME);
 		if (!dir.exists()) dir.mkdirs();
 		return new File(dir, playerId);
 	}

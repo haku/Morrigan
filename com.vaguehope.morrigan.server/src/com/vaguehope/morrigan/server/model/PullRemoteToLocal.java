@@ -3,6 +3,7 @@ package com.vaguehope.morrigan.server.model;
 import java.net.URI;
 import java.util.UUID;
 
+import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaFactory;
@@ -17,11 +18,13 @@ public class PullRemoteToLocal implements MorriganTask {
 	private final ILocalMixedMediaDb ldb;
 	private final URI remoteUri;
 	private final MediaFactory mediaFactory;
+	private final Config config;
 
-	public PullRemoteToLocal (final ILocalMixedMediaDb localDb, final URI remoteUri, final MediaFactory mediaFactory) {
+	public PullRemoteToLocal (final ILocalMixedMediaDb localDb, final URI remoteUri, final MediaFactory mediaFactory, final Config config) {
 		this.ldb = localDb;
 		this.remoteUri = remoteUri;
 		this.mediaFactory = mediaFactory;
+		this.config = config;
 	}
 
 	@Override
@@ -41,7 +44,7 @@ public class PullRemoteToLocal implements MorriganTask {
 			final UUID uuid = metadata.getUuid();
 
 			taskEventListener.subTask("Fetching metadata");
-			final String file = RemoteMixedMediaDbHelper.getFullPathToMmdb(uuid.toString());
+			final String file = RemoteMixedMediaDbHelper.getFullPathToMmdb(this.config, uuid.toString());
 			final RemoteHostDetails details = new RemoteHostDetails(this.remoteUri);
 			final IRemoteMixedMediaDb rdb = RemoteMixedMediaDbFactory.getNew(file, details);
 

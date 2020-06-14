@@ -31,7 +31,7 @@ public class CliHosts {
 
 	private static final Logger LOG = Logger.getLogger(CliPlayer.class.getName());
 
-	private final String configDir = Config.getConfigDir() + "/sshp";
+	private final File configDir = new File(Config.getConfigDir(), "sshp");
 	private final AtomicReference<Collection<CliHost>> hosts = new AtomicReference<Collection<CliHost>>(Collections.<CliHost>emptyList());
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -58,13 +58,12 @@ public class CliHosts {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private File[] configFiles () {
-		File dir = new File(this.configDir);
-		if (!dir.exists()) return new File[0];
-		return dir.listFiles(new FileExtFilter(".properties"));
+		if (!this.configDir.exists()) return new File[0];
+		return this.configDir.listFiles(new FileExtFilter(".properties"));
 	}
 
-	private static CliHost readHostFile (File file) throws IOException, NotConfiguredException {
-		PropertiesFile propFile = new PropertiesFile(file.getAbsolutePath());
+	private static CliHost readHostFile (final File file) throws IOException, NotConfiguredException {
+		PropertiesFile propFile = new PropertiesFile(file);
 		String name = propFile.getString(KEY_NAME, null);
 		String host = propFile.getString(KEY_HOST, null);
 		String user = propFile.getString(KEY_USER, null);
@@ -88,7 +87,7 @@ public class CliHosts {
 
 		private static final long serialVersionUID = -9100329407703909774L;
 
-		public NotConfiguredException (String msg) {
+		public NotConfiguredException (final String msg) {
 			super(msg);
 		}
 

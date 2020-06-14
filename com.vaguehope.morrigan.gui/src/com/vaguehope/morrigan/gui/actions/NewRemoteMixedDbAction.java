@@ -10,6 +10,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
 
+import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.gui.Activator;
 import com.vaguehope.morrigan.gui.dialogs.MorriganMsgDlg;
 import com.vaguehope.morrigan.gui.editors.EditorFactory;
@@ -65,7 +66,7 @@ public class NewRemoteMixedDbAction extends Action implements IWorkbenchAction {
 
 		IRemoteMixedMediaDb createdRemoteMmdb;
 		try {
-			createdRemoteMmdb = RemoteMixedMediaDbHelper.createRemoteMmdb(url, pass);
+			createdRemoteMmdb = RemoteMixedMediaDbHelper.createRemoteMmdb(Config.DEFAULT, url, pass);
 		}
 		catch (Exception e) {
 			new MorriganMsgDlg(e).open();

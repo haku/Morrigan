@@ -23,6 +23,7 @@ import org.eclipse.jetty.util.ajax.JSON;
 import org.xml.sax.SAXException;
 
 import com.megginson.sax.DataWriter;
+import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DurationData;
@@ -159,14 +160,17 @@ public class MlistsServlet extends HttpServlet {
 	private final MediaFactory mediaFactory;
 	private final AsyncActions asyncActions;
 	private final Transcoder transcoder;
+	private final Config config;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public MlistsServlet (final PlayerReader playerListener, final MediaFactory mediaFactory, final AsyncActions asyncActions, final Transcoder transcoder) {
+	public MlistsServlet (final PlayerReader playerListener, final MediaFactory mediaFactory,
+			final AsyncActions asyncActions, final Transcoder transcoder, final Config config) {
 		this.playerListener = playerListener;
 		this.mediaFactory = mediaFactory;
 		this.asyncActions = asyncActions;
 		this.transcoder = transcoder;
+		this.config = config;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -235,11 +239,11 @@ public class MlistsServlet extends HttpServlet {
 
 					final IMixedMediaDb mmdb;
 					if (type.equals(MediaListType.LOCALMMDB.toString())) {
-						final String f = LocalMixedMediaDbHelper.getFullPathToMmdb(pathParts[1]);
+						final String f = LocalMixedMediaDbHelper.getFullPathToMmdb(this.config, pathParts[1]);
 						mmdb = this.mediaFactory.getLocalMixedMediaDb(f, filter);
 					}
 					else if (type.equals(MediaListType.REMOTEMMDB.toString())) {
-						final String f = RemoteMixedMediaDbHelper.getFullPathToMmdb(pathParts[1]);
+						final String f = RemoteMixedMediaDbHelper.getFullPathToMmdb(this.config, pathParts[1]);
 						mmdb = RemoteMixedMediaDbFactory.getExisting(f, filter);
 					}
 					else if (type.equals(MediaListType.EXTMMDB.toString())) {
@@ -547,7 +551,7 @@ public class MlistsServlet extends HttpServlet {
 
 						final Integer resize = ServletHelper.readParamInteger(req, PARAM_RESIZE);
 						if (resize != null) {
-							final File resizedFile = ImageResizer.resizeFile(file, resize);
+							final File resizedFile = ImageResizer.resizeFile(file, resize, this.config);
 							ServletHelper.returnFile(resizedFile, ImageResizer.FORMAT_TYPE.getMimeType(), null, req.getHeader("Range"), resp);
 							return;
 						}

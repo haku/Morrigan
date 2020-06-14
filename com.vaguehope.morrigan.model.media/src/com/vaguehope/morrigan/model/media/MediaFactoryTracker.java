@@ -72,6 +72,11 @@ public class MediaFactoryTracker implements MediaFactory {
 	}
 
 	@Override
+	public void addLocalMixedMediaDb (final ILocalMixedMediaDb db) {
+		getService().addLocalMixedMediaDb(db);
+	}
+
+	@Override
 	public ILocalMixedMediaDb getLocalMixedMediaDbTransactional (final ILocalMixedMediaDb lmmdb) throws DbException {
 		return getService().getLocalMixedMediaDbTransactional(lmmdb);
 	}

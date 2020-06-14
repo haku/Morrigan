@@ -6,7 +6,8 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: com.vaguehope.morrigan.osgiconsole.Activator
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: com.vaguehope.morrigan.engines.playback,
+Import-Package: com.vaguehope.morrigan.config,
+ com.vaguehope.morrigan.engines.playback,
  com.vaguehope.morrigan.model.db,
  com.vaguehope.morrigan.model.exceptions,
  com.vaguehope.morrigan.model.factory,

@@ -21,9 +21,8 @@ public final class RemoteMixedMediaDbHelper {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public static String getFullPathToMmdb (final String fileName) {
-		File dir = Config.getMmdbDir();
-		String file = dir.getPath() + File.separator + fileName;
+	public static String getFullPathToMmdb (final Config config, final String fileName) {
+		String file = new File(config.getMmdbDir(), fileName).getAbsolutePath();
 
 		if (!file.toLowerCase().endsWith(Config.MMDB_REMOTE_FILE_EXT)) {
 			file = file.concat(Config.MMDB_REMOTE_FILE_EXT);
@@ -32,12 +31,12 @@ public final class RemoteMixedMediaDbHelper {
 		return file;
 	}
 
-	public static IRemoteMixedMediaDb createRemoteMmdb (final String mmdbUrl, final String pass) throws MorriganException, URISyntaxException {
-		URI uri = new URI(mmdbUrl);
+	public static IRemoteMixedMediaDb createRemoteMmdb (final Config config, final String mmdbUrl, final String pass) throws MorriganException, URISyntaxException {
+		final URI uri = new URI(mmdbUrl);
 		// FIXME better naming?
-		String name = mmdbUrl.substring(mmdbUrl.lastIndexOf("/")+1).replace(Config.MMDB_REMOTE_FILE_EXT, "").replace(Config.MMDB_LOCAL_FILE_EXT, "");
-		String file = getFullPathToMmdb(uri.getHost() + "_" + name);
-		RemoteHostDetails details = new RemoteHostDetails(uri, pass);
+		final String name = mmdbUrl.substring(mmdbUrl.lastIndexOf("/")+1).replace(Config.MMDB_REMOTE_FILE_EXT, "").replace(Config.MMDB_LOCAL_FILE_EXT, "");
+		final String file = getFullPathToMmdb(config, uri.getHost() + "_" + name);
+		final RemoteHostDetails details = new RemoteHostDetails(uri, pass);
 		return RemoteMixedMediaDbFactory.getNew(file, details);
 	}
 
@@ -45,19 +44,19 @@ public final class RemoteMixedMediaDbHelper {
 		return (filePath.toLowerCase().endsWith(Config.MMDB_REMOTE_FILE_EXT));
 	}
 
-	public static List<MediaListReference> getAllRemoteMmdb () {
-		ArrayList<MediaListReference> ret = new ArrayList<MediaListReference>();
+	public static List<MediaListReference> getAllRemoteMmdb (final Config config) {
+		final ArrayList<MediaListReference> ret = new ArrayList<MediaListReference>();
 
-		File dir = Config.getMmdbDir();
-		File [] files = dir.listFiles();
+		final File dir = config.getMmdbDir();
+		final File [] files = dir.listFiles();
 
 		// empty dir?
 		if (files == null || files.length < 1 ) return ret;
 
-		for (File file : files) {
-			String absolutePath = file.getAbsolutePath();
+		for (final File file : files) {
+			final String absolutePath = file.getAbsolutePath();
 			if (isRemoteMmdbFile(absolutePath)) {
-				MediaListReference newItem = new MediaListReferenceImpl(MediaListReference.MediaListType.REMOTEMMDB, absolutePath, getRemoteMmdbTitle(absolutePath));
+				final MediaListReference newItem = new MediaListReferenceImpl(MediaListReference.MediaListType.REMOTEMMDB, absolutePath, getRemoteMmdbTitle(absolutePath));
 				ret.add(newItem);
 			}
 		}

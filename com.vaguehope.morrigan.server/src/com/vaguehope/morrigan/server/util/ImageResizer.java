@@ -30,11 +30,11 @@ public class ImageResizer {
 
 	private static final Object[] LOCK = new Object[0];
 
-	public static File resizeFile (final File inF, final Integer size) throws IOException {
+	public static File resizeFile (final File inF, final Integer size, final Config config) throws IOException {
 		if (!inF.exists()) throw new IllegalArgumentException("File does not exist: " + inF.getAbsolutePath());
 		if (size < 16 || size > 1000) throw new IllegalArgumentException("Invalid size: " + size);
 
-		final File outF = new File(Config.getResizedDir(), ChecksumHelper.md5String(inF.getAbsolutePath()) + "_" + size);
+		final File outF = new File(config.getResizedDir(), ChecksumHelper.md5String(inF.getAbsolutePath()) + "_" + size);
 		if (outF.exists() && outF.lastModified() > inF.lastModified()) return outF;
 
 		synchronized (LOCK) {

@@ -42,6 +42,11 @@ public interface MediaFactory {
 	 */
 	ILocalMixedMediaDb getLocalMixedMediaDbBySerial (String serial) throws DbException;
 
+	/**
+	 * For testing use only.  Can use to add in mock implementations.
+	 */
+	void addLocalMixedMediaDb (final ILocalMixedMediaDb db);
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	/**

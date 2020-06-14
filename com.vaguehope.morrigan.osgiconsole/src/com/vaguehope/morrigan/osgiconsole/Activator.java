@@ -4,6 +4,7 @@ import org.eclipse.osgi.framework.console.CommandProvider;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
+import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.media.MediaFactoryTracker;
 import com.vaguehope.morrigan.player.PlayerReaderTracker;
 import com.vaguehope.morrigan.server.AsyncActions;
@@ -27,7 +28,7 @@ public class Activator implements BundleActivator  {
 		this.asyncTasksRegisterTracker = new AsyncTasksRegisterTracker(context);
 		this.transcoder = new Transcoder("con");
 
-		final AsyncActions asyncActions = new AsyncActions(this.asyncTasksRegisterTracker, this.mediaFactoryTracker);
+		final AsyncActions asyncActions = new AsyncActions(this.asyncTasksRegisterTracker, this.mediaFactoryTracker, Config.DEFAULT);
 		final CliHelper cliHelper = new CliHelper(this.mediaFactoryTracker);
 
 		context.registerService(CommandProvider.class.getName(),

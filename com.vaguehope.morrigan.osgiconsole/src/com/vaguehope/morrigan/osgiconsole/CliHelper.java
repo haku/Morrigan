@@ -6,6 +6,7 @@ import java.net.URISyntaxException;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
@@ -104,7 +105,7 @@ public class CliHelper {
 		List<MediaListReference> matches = new LinkedList<MediaListReference>();
 
 		items.addAll(this.mediaFactory.getAllLocalMixedMediaDbs());
-		items.addAll(RemoteMixedMediaDbHelper.getAllRemoteMmdb());
+		items.addAll(RemoteMixedMediaDbHelper.getAllRemoteMmdb(Config.DEFAULT));
 
 		// First search exact.
 		for (MediaListReference i : items) {

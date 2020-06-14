@@ -12,6 +12,7 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
 import com.vaguehope.morrigan.config.Bundles;
+import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.media.MediaFactoryTracker;
 import com.vaguehope.morrigan.player.PlayerContainer;
 import com.vaguehope.morrigan.player.PlayerReaderTracker;
@@ -57,7 +58,7 @@ public class Activator implements BundleActivator {
 			logger.info("Server player disabled.");
 		}
 
-		final AsyncActions asyncActions = new AsyncActions(this.asyncTasksRegisterTracker, this.mediaFactoryTracker);
+		final AsyncActions asyncActions = new AsyncActions(this.asyncTasksRegisterTracker, this.mediaFactoryTracker, Config.DEFAULT);
 		this.server = new MorriganServer(context, config, this.playerReaderTracker, this.mediaFactoryTracker, this.asyncTasksRegisterTracker, asyncActions, this.transcoder, this.scheduledExecutorService);
 		this.server.start();
 

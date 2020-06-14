@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 import org.eclipse.osgi.framework.console.CommandInterpreter;
 import org.eclipse.osgi.framework.console.CommandProvider;
 
+import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DurationData;
@@ -291,7 +292,7 @@ public class MorriganCommandProvider implements CommandProvider {
 	private void doMediaList (final CommandInterpreter ci) {
 		final List<MediaListReference> items = new LinkedList<MediaListReference>();
 		items.addAll(this.mediaFactory.getAllLocalMixedMediaDbs());
-		items.addAll(RemoteMixedMediaDbHelper.getAllRemoteMmdb());
+		items.addAll(RemoteMixedMediaDbHelper.getAllRemoteMmdb(Config.DEFAULT));
 		for (final MediaListReference i : items) {
 			ci.println(i.getType() + " " + i.getTitle());
 		}
@@ -303,7 +304,7 @@ public class MorriganCommandProvider implements CommandProvider {
 				if (args.size() >= 3) {
 					final String uri = args.get(1);
 					final String pass = args.get(2);
-					final IRemoteMixedMediaDb db = RemoteMixedMediaDbHelper.createRemoteMmdb(uri, pass);
+					final IRemoteMixedMediaDb db = RemoteMixedMediaDbHelper.createRemoteMmdb(Config.DEFAULT, uri, pass);
 					ci.println("Created MMDB '" + db.getListName() + "'.");
 				}
 				else {
@@ -384,7 +385,7 @@ public class MorriganCommandProvider implements CommandProvider {
 			remoteUri = this.cliHelper.argUri(remote);
 		}
 
-		this.asyncTasksRegister.scheduleTask(new PullRemoteToLocal(ldb, remoteUri, this.mediaFactory));
+		this.asyncTasksRegister.scheduleTask(new PullRemoteToLocal(ldb, remoteUri, this.mediaFactory, Config.DEFAULT));
 		ci.println("Pull from " + remote + " scheduled.  Use 'mn st' to track progress.");
 	}
 

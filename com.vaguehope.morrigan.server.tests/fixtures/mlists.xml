@@ -4,7 +4,7 @@
  <title>Morrigan media lists desu~</title>
  <link rel="self" type="text/xml" href="/mlists"/>
  <entry type="local">
-  <title>test</title>
-  <link rel="self" type="text/xml" href="/mlists/LOCALMMDB/test.local.db3"/></entry>
+  <title>testDb</title>
+  <link rel="self" type="text/xml" href="/mlists/LOCALMMDB/file:testDb0?mode=memory&amp;cache=shared"/></entry>
 </feed>
 

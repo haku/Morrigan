@@ -36,8 +36,8 @@ public class AuthMgr {
 		}
 	}
 
-	public AuthMgr (final ScheduledExecutorService schEs) {
-		this.sessionDir = Config.getSessionDir();
+	public AuthMgr (final Config config, final ScheduledExecutorService schEs) {
+		this.sessionDir = config.getSessionDir();
 		schEs.scheduleWithFixedDelay(new Runnable() {
 			@Override
 			public void run () {

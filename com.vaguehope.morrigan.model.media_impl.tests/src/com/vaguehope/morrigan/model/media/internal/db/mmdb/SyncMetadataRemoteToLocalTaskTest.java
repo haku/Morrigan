@@ -4,8 +4,11 @@ import java.math.BigInteger;
 import java.util.Random;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
+import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaTagType;
@@ -19,6 +22,7 @@ import com.vaguehope.morrigan.tasks.TaskResult.TaskOutcome;
 
 public class SyncMetadataRemoteToLocalTaskTest {
 
+	@Rule public TemporaryFolder tmp = new TemporaryFolder();
 	private static final Random RND = new Random(System.currentTimeMillis());
 
 	private TestMixedMediaDb local;
@@ -30,7 +34,8 @@ public class SyncMetadataRemoteToLocalTaskTest {
 	public void before () throws Exception {
 		this.local = new TestMixedMediaDb();
 		this.remote = new TestRemoteDb();
-		final MediaFactory mediaFactory = new MediaFactoryImpl(null);
+		final Config config = new Config(this.tmp.getRoot());
+		final MediaFactory mediaFactory = new MediaFactoryImpl(config, null);
 		this.underTest = new SyncMetadataRemoteToLocalTask(this.local, this.remote, mediaFactory);
 		this.eventListener = new AsyncTaskEventListener();
 		addNoise(this.local);

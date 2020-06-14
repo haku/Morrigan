@@ -15,6 +15,7 @@ import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.osgi.framework.BundleContext;
 
+import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.player.PlayerReader;
@@ -67,12 +68,14 @@ public class MorriganServer {
 //			sslConnector.setPort(8443);
 //			this.server.addConnector(sslConnector);
 
-			final FilterHolder authFilterHolder = new FilterHolder(new AuthFilter(config, schEs));
+			final FilterHolder authFilterHolder = new FilterHolder(new AuthFilter(config, Config.DEFAULT, schEs));
 
 			final WebAppContext warContext = WebAppHelper.getWarBundleAsContext(context, MorriganWui.ID, "/");
 			warContext.addFilter(authFilterHolder, "/*", null);
 			warContext.addServlet(new ServletHolder(new PlayersServlet(playerListener)), PlayersServlet.CONTEXTPATH + "/*");
-			warContext.addServlet(new ServletHolder(new MlistsServlet(playerListener, mediaFactory, asyncActions, transcoder)), MlistsServlet.CONTEXTPATH + "/*");
+			warContext.addServlet(new ServletHolder(
+					new MlistsServlet(playerListener, mediaFactory, asyncActions, transcoder, Config.DEFAULT)),
+					MlistsServlet.CONTEXTPATH + "/*");
 			warContext.addServlet(new ServletHolder(new StatusServlet(asyncTasksRegister)), StatusServlet.CONTEXTPATH + "/*");
 			warContext.addServlet(new ServletHolder(new HostInfoServlet()), HostInfoServlet.CONTEXTPATH + "/*");
 			this.server.setHandler(warContext);

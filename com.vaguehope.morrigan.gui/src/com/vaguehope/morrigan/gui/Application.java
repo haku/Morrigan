@@ -20,28 +20,27 @@ import com.vaguehope.morrigan.config.Config;
  */
 public class Application implements IApplication {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	protected final Logger logger = Logger.getLogger(this.getClass().getName());
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	@Override
-	public Object start (IApplicationContext context) {
+	public Object start (final IApplicationContext context) {
 		Display display = PlatformUI.createDisplay();
 		try {
 			// Set workspace location.
 			Location instanceLoc = Platform.getInstanceLocation();
 			if (!instanceLoc.isSet()) {
-				String configDir = Config.getConfigDir();
 				try {
-					instanceLoc.set(new URL("file", null, configDir), false);
+					instanceLoc.set(new URL("file", null,  Config.getConfigDir().getAbsolutePath()), false);
 				}
 				catch (IOException e) {
 					throw new RuntimeException(e);
 				}
 			}
 			this.logger.info("instanceLoc=" + instanceLoc.getURL().toExternalForm());
-			
+
 			// Run workbench.
 			int returnCode = PlatformUI.createAndRunWorkbench(display, new ApplicationWorkbenchAdvisor());
 			if (returnCode == PlatformUI.RETURN_RESTART) {
@@ -53,7 +52,7 @@ public class Application implements IApplication {
 			display.dispose();
 		}
 	}
-	
+
 	@Override
 	public void stop () {
 		final IWorkbench workbench = PlatformUI.getWorkbench();
@@ -66,6 +65,6 @@ public class Application implements IApplication {
 			}
 		});
 	}
-	
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

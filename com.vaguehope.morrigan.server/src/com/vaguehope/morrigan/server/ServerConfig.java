@@ -1,5 +1,6 @@
 package com.vaguehope.morrigan.server;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,7 +31,7 @@ public class ServerConfig implements AuthChecker {
 
 	protected final Logger logger = Logger.getLogger(this.getClass().getName());
 
-	private final PropertiesFile propFile = new PropertiesFile(Config.getConfigDir() + '/' + SERVER_PROPS);
+	private final PropertiesFile propFile = new PropertiesFile(new File(Config.getConfigDir(), SERVER_PROPS));
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

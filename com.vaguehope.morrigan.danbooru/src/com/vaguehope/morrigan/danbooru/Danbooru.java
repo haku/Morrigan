@@ -1,5 +1,6 @@
 package com.vaguehope.morrigan.danbooru;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Collection;
@@ -19,7 +20,7 @@ public final class Danbooru {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public static String[] getTags (String md5) throws IOException, MorriganException, HttpStreamHandlerException {
+	public static String[] getTags (final String md5) throws IOException, MorriganException, HttpStreamHandlerException {
 		String surl = "http://danbooru.donmai.us/post/index.xml?" + getAuthString() + "tags=md5:" + md5;
 		URL url = new URL(surl);
 		HttpResponse response = HttpClient.doHttpRequest(url);
@@ -46,7 +47,7 @@ public final class Danbooru {
 	 * @throws MorriganException
 	 * @throws HttpStreamHandlerException
 	 */
-	public static Map<String, String[]> getTags (Collection<String> md5s) throws IOException, MorriganException, HttpStreamHandlerException {
+	public static Map<String, String[]> getTags (final Collection<String> md5s) throws IOException, MorriganException, HttpStreamHandlerException {
 		StringBuilder urlString = new StringBuilder();
 		urlString.append("http://danbooru.donmai.us/post/index.xml?" + getAuthString() + "tags=md5:");
 		boolean first = true;
@@ -83,7 +84,7 @@ public final class Danbooru {
 
 	private static String getAuthString () throws IOException {
 		StringBuilder s = new StringBuilder();
-		PropertiesFile propFile = new PropertiesFile(System.getProperty("user.home") + "/.danbooru");
+		PropertiesFile propFile = new PropertiesFile(new File(System.getProperty("user.home"), "/.danbooru"));
 		for (Entry<Object, Object> e : propFile.getAll()) {
 			s.append(e.getKey().toString());
 			s.append("=");
@@ -95,7 +96,7 @@ public final class Danbooru {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public static String substringByTokens (String d, String k0, String k1) {
+	public static String substringByTokens (final String d, final String k0, final String k1) {
 		String ret;
 		int x0;
 		int l;

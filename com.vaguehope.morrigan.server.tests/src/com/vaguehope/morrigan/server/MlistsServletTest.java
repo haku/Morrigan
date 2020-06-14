@@ -6,9 +6,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.junit.Before;
-import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
+import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.internal.MediaFactoryImpl;
 import com.vaguehope.morrigan.model.media.test.TestMixedMediaDb;
@@ -22,7 +24,9 @@ import com.vaguehope.morrigan.util.IoHelper;
 
 public class MlistsServletTest {
 
-	private TestMixedMediaDb testDb;
+	@Rule public TemporaryFolder tmp = new TemporaryFolder();
+
+	private Config config;
 	private PlayerReader playerReader;
 	private MediaFactory mediaFactory;
 	private ExecutorService executor;
@@ -32,26 +36,29 @@ public class MlistsServletTest {
 
 	private MlistsServlet undertest;
 
+	private TestMixedMediaDb testDb;
 	private MockHttpServletRequest req;
 	private MockHttpServletResponse resp;
 
 	@Before
 	public void before () throws Exception {
+		this.config = new Config(this.tmp.getRoot());
 		this.playerReader = new MockPlayerReader();
-		this.mediaFactory = new MediaFactoryImpl(null);
+		this.mediaFactory = new MediaFactoryImpl(this.config, null);
 		this.executor = Executors.newCachedThreadPool(new DaemonThreadFactory("test"));
 		this.asyncTasksRegister = new AsyncTasksRegisterImpl(this.executor);
-		this.asyncActions = new AsyncActions(this.asyncTasksRegister, this.mediaFactory);
+		this.asyncActions = new AsyncActions(this.asyncTasksRegister, this.mediaFactory, this.config);
 		this.transcoder = new Transcoder("test");
-		this.undertest = new MlistsServlet(this.playerReader, this.mediaFactory, this.asyncActions, this.transcoder);
+		this.undertest = new MlistsServlet(this.playerReader, this.mediaFactory, this.asyncActions, this.transcoder, this.config);
+
 		this.req = new MockHttpServletRequest();
 		this.resp = new MockHttpServletResponse();
 
 		this.testDb = new TestMixedMediaDb();
 		this.testDb.addTestTrack();
+		this.mediaFactory.addLocalMixedMediaDb(this.testDb);
 	}
 
-	@Ignore("FIXME need a way to mock out Config.getMmdbDir() or something.")
 	@Test
 	public void itServesRootList () throws Exception {
 		this.req.requestURI = "/mlists";

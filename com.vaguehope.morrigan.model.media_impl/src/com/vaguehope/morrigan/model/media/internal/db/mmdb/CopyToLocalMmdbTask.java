@@ -93,11 +93,9 @@ public class CopyToLocalMmdbTask<T extends IMediaItem> implements MorriganTask {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	// TODO extract this to config?
+	// TODO extract this to Config class?
 	private static File getCheckoutDirectory (final ILocalMixedMediaDb db) {
-		String configDir = Config.getConfigDir();
-
-		File coDir = new File(configDir, "checkout");
+		File coDir = new File(Config.getConfigDir(), "checkout");
 		if (!coDir.exists()) {
 			if (!coDir.mkdir()) {
 				throw new RuntimeException("Failed to mkdir '" + coDir.getAbsolutePath() + "'.");

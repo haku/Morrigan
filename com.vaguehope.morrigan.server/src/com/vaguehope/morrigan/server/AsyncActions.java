@@ -2,6 +2,7 @@ package com.vaguehope.morrigan.server;
 
 import java.net.URI;
 
+import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
@@ -21,10 +22,12 @@ public class AsyncActions {
 
 	private final MediaFactory mediaFactory;
 	private final AsyncTasksRegister asyncTasksRegister;
+	private final Config config;
 
-	public AsyncActions (final AsyncTasksRegister asyncTasksRegister, final MediaFactory mediaFactory) {
+	public AsyncActions (final AsyncTasksRegister asyncTasksRegister, final MediaFactory mediaFactory, final Config config) {
 		this.asyncTasksRegister = asyncTasksRegister;
 		this.mediaFactory = mediaFactory;
+		this.config = config;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -76,7 +79,7 @@ public class AsyncActions {
 	public AsyncTask scheduleMmdbPull (final ILocalMixedMediaDb db, final String remote) throws DbException {
 		final URI remoteUri = db.getRemote(remote);
 		if (remoteUri == null) throw new IllegalArgumentException("Invalid remote name: " + remote);
-		return this.asyncTasksRegister.scheduleTask(new PullRemoteToLocal(db, remoteUri, this.mediaFactory));
+		return this.asyncTasksRegister.scheduleTask(new PullRemoteToLocal(db, remoteUri, this.mediaFactory, this.config));
 	}
 
 }
