@@ -267,12 +267,12 @@ public abstract class MediaItem implements IMediaItem {
 		if (!(aThat instanceof MediaItem)) return false;
 		final MediaItem that = (MediaItem) aThat;
 
-		return Objs.equals(getFilepath(), that.getFilepath());
+		return Objs.equals(getFilepath(), that.getFilepath());  // FIXME what if filepath is null?
 	}
 
 	@Override
 	public int hashCode() {
-		return getFilepath().hashCode();
+		return getFilepath().hashCode();  // FIXME what if filepath is null?
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
