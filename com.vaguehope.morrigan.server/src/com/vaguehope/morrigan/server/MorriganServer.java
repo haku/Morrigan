@@ -72,6 +72,7 @@ public class MorriganServer {
 
 			final WebAppContext warContext = WebAppHelper.getWarBundleAsContext(context, MorriganWui.ID, "/");
 			warContext.addFilter(authFilterHolder, "/*", null);
+			warContext.addServlet(new ServletHolder(new LibraryServlet(context, Config.DEFAULT)), LibraryServlet.CONTEXTPATH + "/*");
 			warContext.addServlet(new ServletHolder(new PlayersServlet(playerListener)), PlayersServlet.CONTEXTPATH + "/*");
 			warContext.addServlet(new ServletHolder(
 					new MlistsServlet(playerListener, mediaFactory, asyncActions, transcoder, Config.DEFAULT)),

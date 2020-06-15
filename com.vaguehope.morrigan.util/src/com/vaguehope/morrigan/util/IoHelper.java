@@ -1,5 +1,7 @@
 package com.vaguehope.morrigan.util;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
@@ -10,10 +12,13 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 
 public class IoHelper {
 
@@ -79,7 +84,22 @@ public class IoHelper {
 		final ByteArrayOutputStream os = new ByteArrayOutputStream();
 		copy(is, os);
 		return os.toString("UTF-8");
+	}
 
+	public static List<String> readAsList (final InputStream is) throws IOException {
+		try {
+			final List<String> ret = new ArrayList<String>();
+			final BufferedReader reader = new BufferedReader(new InputStreamReader(new BufferedInputStream(is)));
+			String line;
+			while ((line = reader.readLine()) != null) {
+				if (StringHelper.blank(line)) continue;
+				ret.add(line);
+			}
+			return ret;
+		}
+		finally {
+			closeQuietly(is);
+		}
 	}
 
 	public static long drainStream (final InputStream is) throws IOException {

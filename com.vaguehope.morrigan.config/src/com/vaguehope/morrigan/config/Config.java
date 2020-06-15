@@ -128,6 +128,14 @@ public class Config {
 		return f;
 	}
 
+	private static final String WEB_LIBRARY_DIR = "weblibs";
+
+	public File getWebLibraryDir () {
+		final File f = new File(this.configDir, WEB_LIBRARY_DIR);
+		mkdir(f);
+		return f;
+	}
+
 	private static void mkdir (final File f) {
 		if (!f.exists()) {
 			if (!f.mkdirs()) {
