@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.servlet.ServletException;
@@ -17,8 +18,14 @@ import org.osgi.framework.BundleContext;
 
 import com.vaguehope.morrigan.config.Bundles;
 import com.vaguehope.morrigan.config.Config;
+import com.vaguehope.morrigan.util.ChecksumHelper;
+import com.vaguehope.morrigan.util.FileHelper;
 import com.vaguehope.morrigan.util.IoHelper;
+import com.vaguehope.morrigan.util.PropertiesFile;
 import com.vaguehope.morrigan.util.StringHelper;
+import com.vaguehope.morrigan.util.httpclient.HttpClient;
+import com.vaguehope.morrigan.util.httpclient.HttpResponse;
+import com.vaguehope.morrigan.util.httpclient.HttpStreamHandlerException;
 import com.vaguehope.morrigan.wui.MorriganWui;
 
 /**
@@ -31,6 +38,8 @@ import com.vaguehope.morrigan.wui.MorriganWui;
 public class LibraryServlet extends HttpServlet {
 
 	public static final String CONTEXTPATH = "/lib";
+
+	private static final String CONTENT_TYPE = "content-type";
 	private static final long serialVersionUID = -225457065525809819L;
 
 	private final File webLibraryDir;
@@ -43,7 +52,6 @@ public class LibraryServlet extends HttpServlet {
 		final URL libraries = wuiBundle.getResource(MorriganWui.LIBRARIES);
 		this.libraries = Collections.unmodifiableSet(new HashSet<String>(IoHelper.readAsList(libraries.openStream())));
 		if (this.libraries.size() < 1) throw new IOException("Failed to load list of web libraries.");
-		System.out.println("Libraries: " + this.libraries);
 	}
 
 	@Override
@@ -58,15 +66,53 @@ public class LibraryServlet extends HttpServlet {
 			return;
 		}
 
-		/*
-		 * TODO
-		 * calculate cache file.
-		 * return it if it exists.
-		 * download file.
-		 * return file.
-		 */
+		// TODO cache in RAM instead of always serving from disc.
 
-		System.out.println("req GET " + uri);
+		final String contentType;
+		final File propFile = propFile(schemelessUri);
+		final File cacheFile = cacheFile(schemelessUri);
+		final PropertiesFile props = new PropertiesFile(propFile);
+		if (!propFile.exists() || !cacheFile.exists()) {
+			try {
+				final File ftmp = File.createTempFile(cacheFile.getName(), ".tmpdl", cacheFile.getParentFile());
+				try {
+					final HttpResponse dlResp = HttpClient.downloadFile(new URL(uri), ftmp);
+					if (dlResp.getCode() != 200) throw new IOException("HTTP " + dlResp.getCode() + " while downloading: " + uri);
+
+					final List<String> contentTypes = dlResp.getHeader(CONTENT_TYPE);
+					if (contentTypes != null && contentTypes.size() > 0) {
+						contentType = contentTypes.get(0);
+					}
+					else {
+						contentType = null;
+					}
+
+					if (contentType != null) {
+						props.writeString(CONTENT_TYPE, contentType);
+					}
+					FileHelper.rename(ftmp, cacheFile);
+				}
+				finally {
+					if (ftmp.exists()) ftmp.delete();
+				}
+			}
+			catch (final HttpStreamHandlerException e) {
+				throw new IOException("Failed to download: " + uri, e);
+			}
+		}
+		else {
+			contentType = props.getString(CONTENT_TYPE, null);
+		}
+
+		ServletHelper.returnFile(cacheFile, contentType, null, req.getHeader("Range"), resp);
+	}
+
+	private File cacheFile (final String name) {
+		return new File(this.webLibraryDir, ChecksumHelper.md5String(name) + ".body");
+	}
+
+	private File propFile (final String name) {
+		return new File(this.webLibraryDir, ChecksumHelper.md5String(name) + ".prop");
 	}
 
 }

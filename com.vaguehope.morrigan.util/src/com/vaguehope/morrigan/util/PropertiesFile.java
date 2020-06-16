@@ -1,9 +1,12 @@
 package com.vaguehope.morrigan.util;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
@@ -43,6 +46,11 @@ public class PropertiesFile {
 		return getProperties().entrySet();
 	}
 
+	public void writeString (final String key, final String value) throws IOException {
+		getProperties().put(key, value);
+		writeProperties();
+	}
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private Properties propCache = null;
@@ -52,21 +60,41 @@ public class PropertiesFile {
 		synchronized (this.propCacheLock) {
 			if (this.propCache == null) {
 				final Properties props = new Properties();
-				FileInputStream fis = null;
+				InputStream fis = null;
 				try {
 					fis = new FileInputStream(this.file);
 					props.load(fis);
 				}
 				catch (final FileNotFoundException e) {
-					return new Properties(); // No file = empty properties.
+					// Do nothing.
 				}
 				finally {
-					if (fis != null) fis.close();
+					IoHelper.closeQuietly(fis);
 				}
 				this.propCache = props;
 			}
 		}
 		return this.propCache;
+	}
+
+	private void writeProperties () throws IOException {
+		synchronized (this.propCacheLock) {
+			if (this.propCache == null) {
+				throw new IllegalStateException("Must read before writing.");
+			}
+
+			final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			this.propCache.store(baos, null);
+
+			final File ftmp = File.createTempFile(this.file.getName(), ".tmp", this.file.getParentFile());
+			try {
+				IoHelper.write(new ByteArrayInputStream(baos.toByteArray()), ftmp);
+				FileHelper.rename(ftmp, this.file);
+			}
+			finally {
+				if (ftmp.exists()) ftmp.delete();
+			}
+		}
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

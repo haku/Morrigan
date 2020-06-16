@@ -36,15 +36,15 @@ public class HttpClient {
 	 * Do a simple GET request.
 	 * @throws HttpStreamHandlerException
 	 */
-	public static HttpResponse doHttpRequest(URL url) throws IOException, HttpStreamHandlerException {
+	public static HttpResponse doHttpRequest(final URL url) throws IOException, HttpStreamHandlerException {
 		return doHttpRequest(url, null, null, null, null, null);
 	}
 
-	public static HttpResponse doHttpRequest(URL url, HttpStreamHandler httpStreamHandler) throws IOException, HttpStreamHandlerException {
+	public static HttpResponse doHttpRequest(final URL url, final HttpStreamHandler httpStreamHandler) throws IOException, HttpStreamHandlerException {
 		return doHttpRequest(url, null, null, null, null, httpStreamHandler);
 	}
 
-	public static HttpResponse doHttpRequest(URL url, Map<String, String> headers, HttpStreamHandler httpStreamHandler) throws IOException, HttpStreamHandlerException {
+	public static HttpResponse doHttpRequest(final URL url, final Map<String, String> headers, final HttpStreamHandler httpStreamHandler) throws IOException, HttpStreamHandlerException {
 		return doHttpRequest(url, null, null, null, headers, httpStreamHandler);
 	}
 
@@ -59,7 +59,9 @@ public class HttpClient {
 	 * @throws IOException
 	 * @throws HttpStreamHandlerException
 	 */
-	public static HttpResponse doHttpRequest(URL url, String httpRequestMethod, String encodedData, String contentType, Map<String, String> headers, HttpStreamHandler httpStreamHandler) throws IOException, HttpStreamHandlerException {
+	public static HttpResponse doHttpRequest(final URL url, final String httpRequestMethod, final String encodedData,
+			final String contentType, final Map<String, String> headers, final HttpStreamHandler httpStreamHandler
+			) throws IOException, HttpStreamHandlerException {
 		logger.finest("doHttpRequest(" + (httpRequestMethod==null ? "GET" : httpRequestMethod) + " " + url + "):");
 
 		StringBuilder sb = null;
@@ -176,10 +178,10 @@ public class HttpClient {
 	 * This will flush the OutputStream.
 	 * This will not close the output stream.
 	 */
-	public static void downloadFile (URL url, final OutputStream os) throws IOException, HttpStreamHandlerException {
+	public static HttpResponse downloadFile (final URL url, final OutputStream os) throws IOException, HttpStreamHandlerException {
 		HttpStreamHandler httpStreamHandler = new HttpStreamHandler () {
 			@Override
-			public void handleStream (InputStream is) throws IOException, HttpStreamHandlerException {
+			public void handleStream (final InputStream is) throws IOException, HttpStreamHandlerException {
 				BufferedInputStream bis = new BufferedInputStream(is);
 				byte[] buffer = new byte[DOWNLOADBUFFERSIZE];
 				int bytesRead;
@@ -189,17 +191,17 @@ public class HttpClient {
 				os.flush();
 			}
 		};
-		doHttpRequest(url, httpStreamHandler);
+		return doHttpRequest(url, httpStreamHandler);
 	}
 
 	/**
 	 * TODO remove HttpStreamHandlerException
 	 */
-	public static void downloadFile (URL url, final File file) throws IOException, HttpStreamHandlerException {
+	public static HttpResponse downloadFile (final URL url, final File file) throws IOException, HttpStreamHandlerException {
 		BufferedOutputStream os = null;
 		try {
 			os = new BufferedOutputStream(new FileOutputStream(file));
-			downloadFile(url, os);
+			return downloadFile(url, os);
 		}
 		finally {
 			if (os != null) os.close();
