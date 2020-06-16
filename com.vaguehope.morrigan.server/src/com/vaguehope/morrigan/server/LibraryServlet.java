@@ -58,7 +58,10 @@ public class LibraryServlet extends HttpServlet {
 	protected void doGet (final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
 		final String requestURI = req.getRequestURI();
 		final String reqPath = requestURI.startsWith(CONTEXTPATH) ? requestURI.substring(CONTEXTPATH.length()) : requestURI;
-		final String schemelessUri = StringHelper.removeStart(reqPath, "/");
+		final String query = req.getQueryString();
+
+		String schemelessUri = StringHelper.removeStart(reqPath, "/");
+		if (query != null) schemelessUri += "?" + query;
 		final String uri = "https://" + schemelessUri;
 
 		if (!this.libraries.contains(uri)) {
