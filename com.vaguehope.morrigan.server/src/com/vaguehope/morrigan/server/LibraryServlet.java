@@ -1,12 +1,20 @@
 package com.vaguehope.morrigan.server;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -21,6 +29,7 @@ import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.util.ChecksumHelper;
 import com.vaguehope.morrigan.util.FileHelper;
 import com.vaguehope.morrigan.util.IoHelper;
+import com.vaguehope.morrigan.util.MnLogger;
 import com.vaguehope.morrigan.util.PropertiesFile;
 import com.vaguehope.morrigan.util.StringHelper;
 import com.vaguehope.morrigan.util.httpclient.HttpClient;
@@ -40,17 +49,31 @@ public class LibraryServlet extends HttpServlet {
 	public static final String CONTEXTPATH = "/lib";
 
 	private static final String CONTENT_TYPE = "content-type";
+
+	private static final MnLogger LOG = MnLogger.make(LibraryServlet.class);
 	private static final long serialVersionUID = -225457065525809819L;
 
 	private final File webLibraryDir;
-	private final Set<String> libraries;
+	private final Set<String> libraries = new ConcurrentSkipListSet<String>();
+
+	/**
+	 * For testing use only.
+	 */
+	String upstreamScheme = "https";
 
 	public LibraryServlet (final BundleContext context, final Config config) throws IOException {
-		this.webLibraryDir = config.getWebLibraryDir();
+		this(readLibraries(context), config);
+	}
 
+	private static Set<String> readLibraries (final BundleContext context) throws IOException {
 		final Bundle wuiBundle = Bundles.findBundle(context, MorriganWui.ID);
-		final URL libraries = wuiBundle.getResource(MorriganWui.LIBRARIES);
-		this.libraries = Collections.unmodifiableSet(new HashSet<String>(IoHelper.readAsList(libraries.openStream())));
+		final URL librariesUrl = wuiBundle.getResource(MorriganWui.LIBRARIES);
+		return new HashSet<String>(IoHelper.readAsList(librariesUrl.openStream()));
+	}
+
+	public LibraryServlet (final Set<String> libraries, final Config config) throws IOException {
+		this.webLibraryDir = config.getWebLibraryDir();
+		this.libraries.addAll(libraries);
 		if (this.libraries.size() < 1) throw new IOException("Failed to load list of web libraries.");
 	}
 
@@ -62,10 +85,12 @@ public class LibraryServlet extends HttpServlet {
 
 		String schemelessUri = StringHelper.removeStart(reqPath, "/");
 		if (query != null) schemelessUri += "?" + query;
-		final String uri = "https://" + schemelessUri;
-
-		if (!this.libraries.contains(uri)) {
-			ServletHelper.error(resp, 404, "Not found: " + uri);
+		final URI uri;
+		try {
+			uri = new URI(this.upstreamScheme + "://" + schemelessUri);
+		}
+		catch (final URISyntaxException e) {
+			ServletHelper.error(resp, 400, "Invalid URI: " + e.toString());
 			return;
 		}
 
@@ -76,10 +101,16 @@ public class LibraryServlet extends HttpServlet {
 		final File cacheFile = cacheFile(schemelessUri);
 		final PropertiesFile props = new PropertiesFile(propFile);
 		if (!propFile.exists() || !cacheFile.exists()) {
+			if (!this.libraries.contains(uri.toString())) {
+				ServletHelper.error(resp, 404, "Not found: " + uri);
+				return;
+			}
+
 			try {
 				final File ftmp = File.createTempFile(cacheFile.getName(), ".tmpdl", cacheFile.getParentFile());
 				try {
-					final HttpResponse dlResp = HttpClient.downloadFile(new URL(uri), ftmp);
+					final ByteArrayOutputStream bodyBuffer = new ByteArrayOutputStream();
+					final HttpResponse dlResp = HttpClient.downloadFile(uri.toURL(), bodyBuffer);
 					if (dlResp.getCode() != 200) throw new IOException("HTTP " + dlResp.getCode() + " while downloading: " + uri);
 
 					final List<String> contentTypes = dlResp.getHeader(CONTENT_TYPE);
@@ -89,6 +120,19 @@ public class LibraryServlet extends HttpServlet {
 					else {
 						contentType = null;
 					}
+
+					if (contentType != null && contentType.toLowerCase(Locale.ENGLISH).contains("css")) {
+						try {
+							final Map<String, String> rewrites = rewriteCss(uri, bodyBuffer);
+							this.libraries.addAll(rewrites.keySet());
+							LOG.i("Dynamically added: {}", rewrites);
+						}
+						catch (final URISyntaxException e) {
+							ServletHelper.error(resp, 500, "Error rewriting URLs.");
+							return;
+						}
+					}
+					IoHelper.write(bodyBuffer, ftmp);
 
 					if (contentType != null) {
 						props.writeString(CONTENT_TYPE, contentType);
@@ -116,6 +160,40 @@ public class LibraryServlet extends HttpServlet {
 
 	private File propFile (final String name) {
 		return new File(this.webLibraryDir, ChecksumHelper.md5String(name) + ".prop");
+	}
+
+	private static final Pattern SCHEME_AND_HOST = Pattern.compile("url\\(\\s*[\"']?([^)\"'\\s]+)[\"']?\\s*\\)", Pattern.CASE_INSENSITIVE);
+
+	static Map<String, String> rewriteCss (final URI parent, final ByteArrayOutputStream buff) throws IOException, URISyntaxException {
+		final String input = buff.toString("UTF-8");
+		final StringBuffer sb = new StringBuffer();
+		final Map<String, String> ret = new HashMap<String, String>();
+
+		final Matcher m = SCHEME_AND_HOST.matcher(input);
+		while (m.find()) {
+			final String match = m.group(1);
+			URI u = new URI(match);
+			if (!u.isAbsolute()) {
+				u = parent.resolve(match);
+			}
+
+			final String replacement = "/lib/" + withoutScheme(u);
+			ret.put(u.toString(), replacement);
+
+			final String replacementCss = "url(" + replacement + ")";
+			m.appendReplacement(sb, replacementCss);
+		}
+		m.appendTail(sb);
+
+		buff.reset();
+		buff.write(sb.toString().getBytes());
+		return ret;
+	}
+
+	public static String withoutScheme (final URI u) throws URISyntaxException {
+		String r = new URI(null, null, u.getHost(), u.getPort(), u.getPath(), u.getQuery(), u.getFragment()).toString();
+		if (r.startsWith("//")) r = r.substring(2);
+		return r;
 	}
 
 }

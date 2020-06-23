@@ -55,6 +55,16 @@ public class IoHelper {
 		}
 	}
 
+	public static void write (final ByteArrayOutputStream baos, final File file) throws IOException {
+		final OutputStream os = new FileOutputStream(file);
+		try {
+			baos.writeTo(os);
+		}
+		finally {
+			closeQuietly(os);
+		}
+	}
+
 	public static void write (final String data, final File file) throws IOException {
 		write(new ByteArrayInputStream(data.getBytes("UTF-8")), file);
 	}

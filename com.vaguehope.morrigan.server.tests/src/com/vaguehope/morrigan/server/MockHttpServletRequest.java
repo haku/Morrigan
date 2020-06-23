@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.DispatcherType;
@@ -27,6 +28,8 @@ public class MockHttpServletRequest implements HttpServletRequest {
 
 	String method = "GET";
 	String requestURI;
+	String queryString;
+	final Map<String, String> headers = new ConcurrentHashMap<String, String>();
 
 	@Override
 	public String getMethod () {
@@ -37,6 +40,17 @@ public class MockHttpServletRequest implements HttpServletRequest {
 	public String getRequestURI () {
 		return this.requestURI;
 	}
+
+	@Override
+	public String getQueryString () {
+		return this.queryString;
+	}
+
+	@Override
+	public String getHeader (final String headerName) {
+		return this.headers.get(headerName);
+	}
+
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -246,11 +260,6 @@ public class MockHttpServletRequest implements HttpServletRequest {
 	}
 
 	@Override
-	public String getHeader (final String arg0) {
-		throw new UnsupportedOperationException("Not implemented.");
-	}
-
-	@Override
 	public Enumeration<String> getHeaderNames () {
 		throw new UnsupportedOperationException("Not implemented.");
 	}
@@ -282,11 +291,6 @@ public class MockHttpServletRequest implements HttpServletRequest {
 
 	@Override
 	public String getPathTranslated () {
-		throw new UnsupportedOperationException("Not implemented.");
-	}
-
-	@Override
-	public String getQueryString () {
 		throw new UnsupportedOperationException("Not implemented.");
 	}
 
