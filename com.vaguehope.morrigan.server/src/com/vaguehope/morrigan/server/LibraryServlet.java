@@ -59,7 +59,7 @@ public class LibraryServlet extends HttpServlet {
 	/**
 	 * For testing use only.
 	 */
-	String upstreamScheme = "https";
+	public String upstreamScheme = "https";
 
 	public LibraryServlet (final BundleContext context, final Config config) throws IOException {
 		this(readLibraries(context), config);
