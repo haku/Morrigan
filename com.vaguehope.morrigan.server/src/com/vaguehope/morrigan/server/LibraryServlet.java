@@ -164,7 +164,10 @@ public class LibraryServlet extends HttpServlet {
 
 	private static final Pattern SCHEME_AND_HOST = Pattern.compile("url\\(\\s*[\"']?([^)\"'\\s]+)[\"']?\\s*\\)", Pattern.CASE_INSENSITIVE);
 
-	static Map<String, String> rewriteCss (final URI parent, final ByteArrayOutputStream buff) throws IOException, URISyntaxException {
+	/**
+	 * Visible for testing.
+	 */
+	public static Map<String, String> rewriteCss (final URI parent, final ByteArrayOutputStream buff) throws IOException, URISyntaxException {
 		final String input = buff.toString("UTF-8");
 		final StringBuffer sb = new StringBuffer();
 		final Map<String, String> ret = new HashMap<String, String>();

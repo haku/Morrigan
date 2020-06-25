@@ -54,7 +54,7 @@ public class MlistsServletTest {
 		this.req = new MockHttpServletRequest();
 		this.resp = new MockHttpServletResponse();
 
-		this.testDb = new TestMixedMediaDb();
+		this.testDb = new TestMixedMediaDb("server-test-db");
 		this.testDb.addTestTrack();
 		this.mediaFactory.addLocalMixedMediaDb(this.testDb);
 	}

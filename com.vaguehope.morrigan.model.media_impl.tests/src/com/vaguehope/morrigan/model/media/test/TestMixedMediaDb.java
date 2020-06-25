@@ -25,14 +25,14 @@ public class TestMixedMediaDb extends LocalMixedMediaDb {
 	private static final AtomicInteger newTrackCounter = new AtomicInteger(0);
 
 	public TestMixedMediaDb () throws DbException, MorriganException {
-		this(NAME);
+		this(NAME + newDbCounter.getAndIncrement());
 	}
 
 	public TestMixedMediaDb (final String name) throws DbException, MorriganException {
 		super(name,
 				new MediaItemDbConfig(name, null),
 				new MixedMediaSqliteLayerOuter(
-						"file:" + NAME + newDbCounter.getAndIncrement() + "?mode=memory&cache=shared",
+						"file:" + name + "?mode=memory&cache=shared",
 						true, new MixedMediaItemFactory()));
 		read();
 	}
