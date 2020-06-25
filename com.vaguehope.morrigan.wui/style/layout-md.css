@@ -90,6 +90,33 @@ header .subtitle span {
    bottom: 0;
 }
 
+footer.maybehide {
+  display: none;
+}
+
+/* Vertical left side footer */
+@media (orientation: landscape) {
+  .mdl-layout__header {
+    position: relative;
+    width: auto;
+    margin-left: 6em;
+  }
+  .mdl-layout__content {
+    margin-left: 6em;
+  }
+  .mdl-mini-footer {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    flex-flow: column;
+  }
+  footer.maybehide {
+    /* Would be nice to have a more direct way to undo 'none'. */
+    display: flex;
+  }
+}
+
 /* List items. */
 .clickable_list a {
   display: block;

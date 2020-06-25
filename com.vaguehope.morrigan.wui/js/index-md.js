@@ -203,7 +203,7 @@
     var enqueueView = $('#mnu_enqueue_view');
 
     $('#fixed_tab_queue').click(function() {
-      footer.show();
+      footer.removeClass('maybehide');
       tags.show();
       stopAfter.show();
       playbackOrder.show();
@@ -215,7 +215,7 @@
     });
 
     $('#fixed_tab_db').click(function() {
-      footer.hide();
+      footer.addClass('maybehide');
       tags.hide();
       stopAfter.hide();
       playbackOrder.hide();
