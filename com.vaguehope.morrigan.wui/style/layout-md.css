@@ -125,7 +125,11 @@ footer.maybehide {
   padding-bottom: 0.3em;
   font-weight: normal;
 }
-.clickable_list a:link, .clickable_list a:visited, .clickable_list a:active, .clickable_list a:hover {
+.clickable_list a:link,
+.clickable_list a:visited,
+.clickable_list a:active,
+.clickable_list a:focus,
+.clickable_list a:hover {
   text-decoration: none;
   color: inherit;
 }
@@ -133,7 +137,8 @@ footer.maybehide {
   text-decoration: line-through;
   color: #aaa;
 }
-.clickable_list .item:hover {
+.clickable_list .item a:focus,
+.clickable_list .item a:hover {
   background: Highlight;
   color: HighlightText;
 }
