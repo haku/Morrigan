@@ -867,7 +867,10 @@
       showToast('Enqueueing selected items at the top...');
     });
 
-    // TODO tags btn.
+    $('.edit_tags', menu).unbind().click(function(event) {
+      hidePopup(menu);
+      showMultiTagEditor(selectedItems);
+    });
 
     showPopup(menu);
   }
@@ -923,7 +926,7 @@
       var search = $('<button class="mdl-button mdl-js-button mdl-js-ripple-effect pri">');
       search.text(tag);
       search.unbind().click(function() {
-        setDbTabToSearch(item.mid, item.view, tag);
+        setDbTabToSearch(item.mid, item.view, 't=' + tag);
         hidePopup(dlg);
         $('#fixed_tab_db span').click();
       });
@@ -938,6 +941,69 @@
             if (newTag.val().length < 1) newTag.val(tag).focus();
           });
         }
+      });
+
+      var row = $('<div class="row">');
+      row.append(search);
+      row.append(remove);
+
+      dlg.append(row);
+    });
+
+    showPopup(dlg);
+  }
+
+  function showMultiTagEditor(selectedItems) {
+    var tags = new Map();  // tag => [items]
+    selectedItems.forEach(function(item, alsoItem, set) {
+      item.tags.forEach(function(tag) {
+        var a = tags.get(tag);
+        if (!a) {
+          a = [];
+          tags.set(tag, a);
+        }
+        a.push(item);
+      });
+    });
+    tags = new Map([...tags.entries()].sort((a, b) => b[1].length - a[1].length));
+
+    var dlg = $('#tag_editor');
+    $('.title', dlg).text('Tags for ' + selectedItems.size + ' Items');
+
+    var newTag = $('#new_tag', dlg);
+    newTag.off('keyup').on('keyup', function(event) {
+      onAutocompleteKeyup(event);
+      if (event.keyCode == 13) {
+        var tag = newTag.val();
+        // TODO
+        console.log('TODO add ' + tag + ' to:', selectedItems);
+      }
+    });
+
+    // They should all have the same mid and view.
+    var firstItem = selectedItems.values().next().value;
+    var mid = firstItem.mid;
+    var view = firstItem.view;
+    tagEditorMid = mid
+
+    $('.row', dlg).remove();
+    tags.forEach(function(items, tag) {
+      var search = $('<button class="mdl-button mdl-js-button mdl-js-ripple-effect pri">');
+      search.text(tag + ' (' + items.length + ')');
+      search.unbind().click(function() {
+        setDbTabToSearch(mid, view, 't=' + tag);
+        hidePopup(dlg);
+        $('#fixed_tab_db span').click();
+      });
+
+      var remove = $('<button class="mdl-button mdl-js-button mdl-js-ripple-effect aux"><i class="material-icons">delete</i></button>');
+      remove.unbind().click(function() {
+        if (!window.confirm("Tag: " + tag + "\n\nRemove?")) {
+          return;
+        }
+
+        // TODO
+        console.log('TODO rm ' + tag + ' from:', items);
       });
 
       var row = $('<div class="row">');
