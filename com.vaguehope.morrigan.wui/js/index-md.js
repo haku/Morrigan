@@ -673,7 +673,7 @@
     var el = $('<li class="item">');
     el.append(a);
 
-    a.unbind().click(function(event) {
+    var onClick = function(event) {
       event.preventDefault();
       if (res.remoteId) {
         setDbTabToSearch(res.mid, res.view, res.remoteId);
@@ -681,7 +681,16 @@
       else {
         showDbItemMenu(res, a);
       }
-    });
+    }
+
+    var onLongClick = function(event) {
+      event.preventDefault();
+      // TODO add multi-selection.
+      console.log('long click', res, event);
+    }
+
+    a.unbind()
+    ClickHelper.setupLongClick(a, onClick, onLongClick);
 
     return el;
   }

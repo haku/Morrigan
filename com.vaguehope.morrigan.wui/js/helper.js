@@ -16,21 +16,24 @@ ClickHelper = {};
     var pressTimer;
     var longClicked = false;
 
-    element.bind('pointerup', function(ev){
+    element.bind('pointerup', function(event){
       clearTimeout(pressTimer);
       return false;
     })
-    .bind('pointerdown', function(ev){
+    .bind('pointerdown', function(event){
       longClicked = false;
       pressTimer = window.setTimeout(function() {
         longClicked = true;
-        onLongClick();
+        onLongClick(event);
       }, LONG_CLICK_MILLIS);
       return false;
     })
-    .click(function(){
-      if (longClicked) return;
-      onClick();
+    .click(function(event){
+      if (longClicked) {
+        event.preventDefault();
+        return;
+      }
+      onClick(event);
     });
   };
 
