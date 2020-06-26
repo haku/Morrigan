@@ -128,9 +128,12 @@
           </button>
         </div>
         <h5 style="margin-bottom: 0;" id="db_title">(db title)</h5>
+        <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored" style="display: none;" id="db_fab">
+          <i class="material-icons">menu_open</i>
+        </button>
         <ol style="margin: 0; list-style: disc; padding-left: 1em;" class="clickable_list" id="db_list">
         </ol>
-        <div style="height: 2em;"></div>
+        <div style="height: 6em;"></div>
       </div>
     </section>
     </main>
@@ -187,6 +190,16 @@
       <button class="mdl-button mdl-js-button mdl-js-ripple-effect left set_enabled"><i class="material-icons">check_circle</i></button>
       <button class="mdl-button mdl-js-button mdl-js-ripple-effect right set_disabled"><i class="material-icons">block</i></button>
     </div>
+  </div>
+
+  <div class="popup" style="display: none;" id="db_selection_menu">
+    <p class="title"></p>
+    <span class="separator"></span>
+    <div class="row">
+      <button class="mdl-button mdl-js-button mdl-js-ripple-effect enqueue pri">Enqueue</button>
+      <button class="mdl-button mdl-js-button mdl-js-ripple-effect enqueue_top aux"><i class="material-icons">vertical_align_top</i></button>
+    </div>
+    <button class="mdl-button mdl-js-button mdl-js-ripple-effect edit_tags">Tags</button>
   </div>
 
   <div class="popup" style="display: none;" id="db_album_menu">

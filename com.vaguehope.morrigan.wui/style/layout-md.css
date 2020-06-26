@@ -117,6 +117,15 @@ footer.maybehide {
   }
 }
 
+/* DBs list */
+#db_fab {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  margin-bottom: 1em;
+  margin-right: 2em;
+}
+
 /* List items. */
 .clickable_list a {
   display: block;

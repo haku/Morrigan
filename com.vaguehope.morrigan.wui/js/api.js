@@ -468,12 +468,19 @@ MnApi = {};
   MnApi.enqueueItems = function(items, view, pid, msgHandler, onComplete) {
     var args = 'playerid=' + pid;
     if (view) args += '&view=' + encodeURIComponent(view);
+    if (items instanceof Set) {
+      items = Array.from(items);
+    }
     actionItem(items, 'queue', args, msgHandler, onComplete);
   };
 
   MnApi.enqueueItemsTop = function(items, view, pid, msgHandler, onComplete) {
     var args = 'playerid=' + pid;
     if (view) args += '&view=' + encodeURIComponent(view);
+    if (items instanceof Set) {
+      items = Array.from(items);
+      items.reverse();  // A bit of a hack... could be odd if track ends mid enqueueing.
+    }
     actionItem(items, 'queue_top', args, msgHandler, onComplete);
   };
 

@@ -657,13 +657,29 @@
 
     var dbList = $('#db_list');
     dbList.empty();
+
     var selectedItems = new Set();
+    var dbFab = $('#db_fab');
+    dbFab.unbind().click(function(event) {
+      event.preventDefault();
+      showSelectionMenu(selectedItems);
+    });
+    var onSelectionChange = function() {
+      console.log('selectedItems', selectedItems.size);
+      if (selectedItems.size > 0) {
+        dbFab.show();
+      }
+      else {
+        dbFab.hide();
+      }
+    };
+
     $.each(results, function(index, result) {
-      dbList.append(makeResultItem(result, selectedItems));
+      dbList.append(makeResultItem(result, selectedItems, onSelectionChange));
     });
   }
 
-  function makeResultItem(res, selectedItems) {
+  function makeResultItem(res, selectedItems, onSelectionChange) {
     var title = res.title;
     if (res.duration > 0) title += ' (' + MnApi.formatSeconds(res.duration) + ')';
 
@@ -683,7 +699,7 @@
         selectedItems.add(r);
         a.addClass('selected');
       }
-      console.log('selectedItems', selectedItems.size);
+      onSelectionChange();
     }
 
     var onClick = function(event) {
@@ -820,6 +836,39 @@
       });
       hidePopup(menu);
     });
+
+    showPopup(menu);
+  }
+
+  function showSelectionMenu(selectedItems) {
+    var menu = $('#db_selection_menu');
+    $('.title', menu).text(selectedItems.size + ' Selected Items');
+
+    var calls = 0;
+    var enqueueCb = function(msg) {
+      console.log(msg);
+      calls += 1;
+      if (calls === 1) {
+        hidePopup(menu);
+      }
+      if (calls === selectedItems.size) {
+        fetchAndDisplayQueue();
+      }
+    }
+
+    $('.enqueue', menu).unbind().click(function(event) {
+      if (!selectedPlayer) return;
+      MnApi.enqueueItems(selectedItems, selectedPlayer.listView, selectedPlayer.pid, msgHandler, enqueueCb);
+      showToast('Enqueueing selected items...');
+    });
+
+    $('.enqueue_top', menu).unbind().click(function(event) {
+      if (!selectedPlayer) return;
+      MnApi.enqueueItemsTop(selectedItems, selectedPlayer.listView, selectedPlayer.pid, msgHandler, enqueueCb);
+      showToast('Enqueueing selected items at the top...');
+    });
+
+    // TODO tags btn.
 
     showPopup(menu);
   }
