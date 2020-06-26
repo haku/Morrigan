@@ -657,12 +657,13 @@
 
     var dbList = $('#db_list');
     dbList.empty();
+    var selectedItems = new Set();
     $.each(results, function(index, result) {
-      dbList.append(makeResultItem(result));
+      dbList.append(makeResultItem(result, selectedItems));
     });
   }
 
-  function makeResultItem(res) {
+  function makeResultItem(res, selectedItems) {
     var title = res.title;
     if (res.duration > 0) title += ' (' + MnApi.formatSeconds(res.duration) + ')';
 
@@ -673,9 +674,24 @@
     var el = $('<li class="item">');
     el.append(a);
 
+    var invertSelection = function(r) {
+      if (selectedItems.has(r)) {
+        selectedItems.delete(r);
+        a.removeClass('selected');
+      }
+      else {
+        selectedItems.add(r);
+        a.addClass('selected');
+      }
+      console.log('selectedItems', selectedItems.size);
+    }
+
     var onClick = function(event) {
       event.preventDefault();
-      if (res.remoteId) {
+      if (selectedItems.size > 0) {
+        invertSelection(res);
+      }
+      else if (res.remoteId) {
         setDbTabToSearch(res.mid, res.view, res.remoteId);
       }
       else {
@@ -685,8 +701,7 @@
 
     var onLongClick = function(event) {
       event.preventDefault();
-      // TODO add multi-selection.
-      console.log('long click', res, event);
+      invertSelection(res);
     }
 
     a.unbind()

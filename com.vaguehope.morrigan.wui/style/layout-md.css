@@ -30,13 +30,13 @@ body {
   color: #aaa;
 }
 .mdl-textfield__label:after {
-  background-color: #B2FF59;
+  background-color: hsl(88, 100%, 67%);
 }
 .mdl-button {
   color: #fff;
 }
 .mdl-slider__background-lower {
-  background: #B2FF59;
+  background: hsl(88, 100%, 67%);
 }
 
 /* Fix snackbar going off screen */
@@ -133,14 +133,26 @@ footer.maybehide {
   text-decoration: none;
   color: inherit;
 }
-.clickable_list a.disabled {
+.clickable_list .item a {
+  border-width: 1px;
+  border-style: solid;
+  border-color: transparent;
+}
+.clickable_list .item a.disabled {
   text-decoration: line-through;
   color: #aaa;
 }
 .clickable_list .item a:focus,
 .clickable_list .item a:hover {
-  background: Highlight;
-  color: HighlightText;
+  border-color: hsl(88, 100%, 67%);
+}
+.clickable_list .item a.selected {
+  background-color: hsl(88, 100%, 67%);
+  color: #000;
+}
+.clickable_list .item a.selected:focus,
+.clickable_list .item a.selected:hover {
+  border-color: hsla(88, 100%, 20%, 1);
 }
 
 #queue_tab_content p {
@@ -222,7 +234,7 @@ footer.maybehide {
   display: block;
   left: 0;
   width: 100%;
-  background-color: #B2FF59;
+  background-color: hsl(88, 100%, 67%);
 }
 .popup > button, .popup > .row {
   display: inline-block;
