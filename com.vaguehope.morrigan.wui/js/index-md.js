@@ -665,7 +665,6 @@
       showSelectionMenu(selectedItems);
     });
     var onSelectionChange = function() {
-      console.log('selectedItems', selectedItems.size);
       if (selectedItems.size > 0) {
         dbFab.show();
       }
