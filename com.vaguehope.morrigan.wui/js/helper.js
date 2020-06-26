@@ -10,7 +10,7 @@ ErrorHelper = {};
 ClickHelper = {};
 (function() {
 
-  var LONG_CLICK_MILLIS = 2000;
+  var LONG_CLICK_MILLIS = 1000;
 
   ClickHelper.setupLongClick = function(element, onClick, onLongClick) {
     var pressTimer;
