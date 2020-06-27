@@ -211,6 +211,8 @@
     var transcode = $('#mnu_transcode');
     var clearQueue = $('#mnu_clear_queue');
     var shuffleQueue = $('#mnu_shuffle_queue');
+    var select = $('#mnu_select');
+    var enqueue = $('#mnu_enqueue');
     var enqueueAll = $('#mnu_enqueue_all');
     var enqueueView = $('#mnu_enqueue_view');
 
@@ -222,8 +224,8 @@
       transcode.show();
       clearQueue.show();
       shuffleQueue.show();
-      enqueueAll.hide();
-      enqueueView.hide();
+      select.hide();
+      enqueue.hide();
     });
 
     $('#fixed_tab_db').click(function() {
@@ -234,14 +236,15 @@
       transcode.hide();
       clearQueue.hide();
       shuffleQueue.hide();
-      enqueueAll.show();
-      enqueueView.show();
+      select.show();
+      enqueue.show();
     });
 
     tags.click(tagsClicked);
     stopAfter.click(stopAfterClicked);
     clearQueue.click(clearQueueClicked);
     shuffleQueue.click(shuffleQueueClicked);
+
     enqueueAll.click(enqueueAllClicked);
     enqueueView.click(enqueueViewClicked);
 
@@ -685,6 +688,7 @@
       event.preventDefault();
       showSelectionMenu(selectedItems);
     });
+
     var onSelectionChange = function() {
       if (selectedItems.size > 0) {
         dbFab.show();
@@ -694,12 +698,45 @@
       }
     };
 
+    var invertSelection = function(item, link) {
+      if (selectedItems.has(item)) {
+        selectedItems.delete(item);
+        link.removeClass('selected');
+      }
+      else {
+        selectedItems.add(item);
+        link.addClass('selected');
+      }
+      onSelectionChange();
+    }
+
+    var itemToRow = new Map();
     $.each(results, function(index, result) {
-      dbList.append(makeResultItem(result, selectedItems, onSelectionChange));
+      var row = makeResultItem(result, selectedItems, invertSelection);
+      dbList.append(row);
+      itemToRow.set(result, row);
+    });
+
+    $('#mnu_select_all').unbind().click(function () {
+      if (!currentDbResults) return;
+
+      $('.item a', dbList).addClass('selected');
+      results.forEach(function(item) {
+        selectedItems.add(item);
+      });
+      onSelectionChange();
+    });
+
+    $('#mnu_select_invert').unbind().click(function () {
+      if (!currentDbResults) return;
+
+      itemToRow.forEach(function(row, item) {
+        invertSelection(item, $('a', row));
+      });
     });
   }
 
-  function makeResultItem(res, selectedItems, onSelectionChange) {
+  function makeResultItem(res, selectedItems, invertSelection) {
     var title = res.title;
     if (res.duration > 0) title += ' (' + MnApi.formatSeconds(res.duration) + ')';
 
@@ -710,22 +747,10 @@
     var el = $('<li class="item">');
     el.append(a);
 
-    var invertSelection = function(r) {
-      if (selectedItems.has(r)) {
-        selectedItems.delete(r);
-        a.removeClass('selected');
-      }
-      else {
-        selectedItems.add(r);
-        a.addClass('selected');
-      }
-      onSelectionChange();
-    }
-
     var onClick = function(event) {
       event.preventDefault();
       if (selectedItems.size > 0) {
-        invertSelection(res);
+        invertSelection(res, a);
       }
       else if (res.remoteId) {
         setDbTabToSearch(res.mid, res.view, res.remoteId);
@@ -737,7 +762,7 @@
 
     var onLongClick = function(event) {
       event.preventDefault();
-      invertSelection(res);
+      invertSelection(res, a);
     }
 
     a.unbind()
