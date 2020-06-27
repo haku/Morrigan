@@ -698,14 +698,14 @@
       }
     };
 
-    var invertSelection = function(item, link) {
+    var invertSelection = function(item, row) {
       if (selectedItems.has(item)) {
         selectedItems.delete(item);
-        link.removeClass('selected');
+        row.removeClass('selected');
       }
       else {
         selectedItems.add(item);
-        link.addClass('selected');
+        row.addClass('selected');
       }
       onSelectionChange();
     }
@@ -720,7 +720,7 @@
     $('#mnu_select_all').unbind().click(function () {
       if (!currentDbResults) return;
 
-      $('.item a', dbList).addClass('selected');
+      $('.item', dbList).addClass('selected');
       results.forEach(function(item) {
         selectedItems.add(item);
       });
@@ -731,7 +731,7 @@
       if (!currentDbResults) return;
 
       itemToRow.forEach(function(row, item) {
-        invertSelection(item, $('a', row));
+        invertSelection(item, row);
       });
     });
   }
@@ -742,33 +742,33 @@
 
     var a = $('<a class="clickable title" href="">');
     a.text(title);
-    if (!res.enabled) a.addClass('disabled');
 
-    var el = $('<li class="item">');
-    el.append(a);
+    var row = $('<li class="item">');
+    if (!res.enabled) row.addClass('disabled');
+    row.append(a);
 
     var onClick = function(event) {
       event.preventDefault();
       if (selectedItems.size > 0) {
-        invertSelection(res, a);
+        invertSelection(res, row);
       }
       else if (res.remoteId) {
         setDbTabToSearch(res.mid, res.view, res.remoteId);
       }
       else {
-        showDbItemMenu(res, a);
+        showDbItemMenu(res, row);
       }
     }
 
     var onLongClick = function(event) {
       event.preventDefault();
-      invertSelection(res, a);
+      invertSelection(res, row);
     }
 
     a.unbind()
     ClickHelper.setupLongClick(a, onClick, onLongClick);
 
-    return el;
+    return row;
   }
 
   function displayTags(tags) {
@@ -827,13 +827,13 @@
 
     a.unbind().click(function(event) {
       event.preventDefault();
-      showDbAlbumMenu(album, a);
+      showDbAlbumMenu(album);
     });
 
     return el;
   }
 
-  function showDbItemMenu(item, anchorEl) {
+  function showDbItemMenu(item, row) {
     var menu = $('#db_item_menu');
     $('.title', menu).text(item.title);
     $('.title_link', menu).attr('href', item.url);
@@ -868,7 +868,7 @@
       MnApi.setEnabled(item, true, msgHandler, function(msg) {
         console.log(msg);
         item.enabled = true;
-        anchorEl.removeClass('disabled');
+        row.removeClass('disabled');
       });
       hidePopup(menu);
     });
@@ -877,7 +877,7 @@
       MnApi.setEnabled(item, false, msgHandler, function(msg) {
         console.log(msg);
         item.enabled = false;
-        anchorEl.addClass('disabled');
+        row.addClass('disabled');
       });
       hidePopup(menu);
     });
@@ -924,7 +924,7 @@
     showPopup(menu);
   }
 
-  function showDbAlbumMenu(album, anchorEl) {
+  function showDbAlbumMenu(album) {
     var menu = $('#db_album_menu');
     $('.title', menu).text(album.title);
     $('.stats', menu).text(album.trackCount + ' tracks');

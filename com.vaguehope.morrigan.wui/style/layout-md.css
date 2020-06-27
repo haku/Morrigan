@@ -1,3 +1,19 @@
+/* Theme colours. */
+/*
+brown:        hsl(16, 25%, 38%)
+green accent: hsl(88, 100%, 67%)
+dark:         hsl(88, 100%, 20%)
+
+purple:      hsl(262, 52%, 47%)
+pink accent: hsl(340, 100%, 63%)
+darker:      hsl(262, 52%, 20%)
+*/
+
+:root {
+  --accent-colour: hsl(340, 100%, 63%);
+  --dark-colour: hsl(262, 52%, 20%);
+}
+
 /* Dark colours. */
 body {
   background-color: #000;
@@ -30,13 +46,13 @@ body {
   color: #aaa;
 }
 .mdl-textfield__label:after {
-  background-color: hsl(88, 100%, 67%);
+  background-color: var(--accent-colour);
 }
 .mdl-button {
   color: #fff;
 }
 .mdl-slider__background-lower {
-  background: hsl(88, 100%, 67%);
+  background: var(--accent-colour);
 }
 
 /* Fix snackbar going off screen */
@@ -90,6 +106,9 @@ header .subtitle span {
    bottom: 0;
 }
 
+footer.mdl-mini-footer {
+  background-color: var(--dark-colour);
+}
 footer.maybehide {
   display: none;
 }
@@ -128,12 +147,14 @@ footer.maybehide {
   border-radius: .5em;
   min-width: 5em;
 
-  background: hsl(88, 100%, 67%);
+  background: var(--accent-colour);
   color: #000;
 }
 #progress .msg {
   margin: 0;
 }
+
+/* Animations. */
 .fadeout {
   animation: fadeOut ease-out 1s;
   animation-fill-mode: both;
@@ -167,26 +188,29 @@ footer.maybehide {
   text-decoration: none;
   color: inherit;
 }
-.clickable_list .item a {
+.clickable_list .item {
   border-width: 1px;
   border-style: solid;
   border-color: transparent;
 }
-.clickable_list .item a.disabled {
+.clickable_list .item.disabled {
   text-decoration: line-through;
   color: #aaa;
 }
-.clickable_list .item a:focus,
-.clickable_list .item a:hover {
-  border-color: hsl(88, 100%, 67%);
+.clickable_list .item:hover {
+  border-color: var(--accent-colour);
 }
-.clickable_list .item a.selected {
-  background-color: hsl(88, 100%, 67%);
+.clickable_list .item.selected {
+  background-color: var(--accent-colour);
+}
+.clickable_list .item.selected:hover {
+  border-color: var(--dark-colour);
+}
+.clickable_list .item.selected a { /*on a to preserve bullet colour*/
   color: #000;
 }
-.clickable_list .item a.selected:focus,
-.clickable_list .item a.selected:hover {
-  border-color: hsla(88, 100%, 20%, 1);
+.clickable_list .item a { /*on a to avoid dead click zones*/
+  padding: 0.4em 0 0.4em 0;
 }
 
 #queue_tab_content p {
@@ -268,7 +292,7 @@ footer.maybehide {
   display: block;
   left: 0;
   width: 100%;
-  background-color: hsl(88, 100%, 67%);
+  background-color: var(--accent-colour);
 }
 .popup > button, .popup > .row {
   display: inline-block;
