@@ -546,6 +546,7 @@
     currentDbMid = null;
     currentDbQuery = null;
     currentDbResults = null;
+    $('#db_fab').hide();
 
     MnApi.getDbs(msgHandler, displayDbs);
     $('#db_title').text('Fetching...');
@@ -591,6 +592,7 @@
     currentDbMid = mid;
     currentDbQuery = query;
     currentDbResults = null;
+    $('#db_fab').hide();
     writeSavedSearch();
 
     MnApi.getQuery(mid, view, query, sortColumn, sortOrder, includeDisabled, msgHandler, displayResults);
@@ -624,6 +626,7 @@
     currentDbMid = mid;
     currentDbQuery = null;
     currentDbResults = null;
+    $('#db_fab').hide();
 
     MnApi.getTags(mid, view, msgHandler, displayTags);
 
@@ -636,6 +639,7 @@
     currentDbMid = mid;
     currentDbQuery = null;
     currentDbResults = null;
+    $('#db_fab').hide();
 
     MnApi.getAlbums(mid, view, msgHandler, displayAlbums);
 
