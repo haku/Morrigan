@@ -10,7 +10,9 @@ darker:      hsl(262, 52%, 20%)
 */
 
 :root {
+  --primary-colour: hsl(262, 52%, 47%);
   --accent-colour: hsl(340, 100%, 63%);
+  --accent-text-colour: #fff;
   --dark-colour: hsl(262, 52%, 20%);
 }
 
@@ -51,6 +53,18 @@ body {
 .mdl-button {
   color: #fff;
 }
+.mdl-slider.is-upgraded::-webkit-slider-thumb,
+.mdl-slider.is-upgraded:active::-webkit-slider-thumb {
+  background-color: var(--accent-colour);
+}
+.mdl-slider.is-upgraded::-moz-range-thumb,
+.mdl-slider.is-upgraded:active::-moz-range-thumb {
+  background-color: var(--accent-colour);
+}
+.mdl-slider.is-upgraded::-ms-thumb,
+.mdl-slider.is-upgraded:active::-ms-thumb {
+  background-color: var(--accent-colour);
+}
 .mdl-slider__background-lower {
   background: var(--accent-colour);
 }
@@ -77,9 +91,9 @@ header .subtitle span {
   margin-right: 0.2em;
 }
 
-/* Undo upcase. */
 .mdl-button, .mdl-layout__tab {
-  text-transform: none;
+  flex-basis: 0;
+  text-transform: none; /* Undo upcase. */
 }
 
 /* Fix infuriating tab panels sharing the same scroll. */
@@ -148,7 +162,7 @@ footer.maybehide {
   min-width: 5em;
 
   background: var(--accent-colour);
-  color: #000;
+  color: var(--accent-text-color);
 }
 #progress .msg {
   margin: 0;
@@ -201,13 +215,7 @@ footer.maybehide {
   border-color: var(--accent-colour);
 }
 .clickable_list .item.selected {
-  background-color: var(--accent-colour);
-}
-.clickable_list .item.selected:hover {
-  border-color: var(--dark-colour);
-}
-.clickable_list .item.selected a { /*on a to preserve bullet colour*/
-  color: #000;
+  background-color: var(--primary-colour);
 }
 .clickable_list .item a { /*on a to avoid dead click zones*/
   padding: 0.4em 0 0.4em 0;
@@ -234,6 +242,8 @@ footer.maybehide {
 .clickable_list .album .cover.nocover {
   width: 6em;
   height: 5em;
+  border: 1px solid;
+  border-color: var(--primary-colour);
 }
 .clickable_list .album .title {
   margin: 0 0.2em 0.2em 0.2em;
@@ -241,8 +251,8 @@ footer.maybehide {
   line-height: 1.3;
 }
 .clickable_list .album:hover {
-  background: Highlight;
-  color: HighlightText;
+  background-color: var(--accent-colour);
+  color: var(--accent-text-colour);
 }
 
 /* pop-up menu. */
