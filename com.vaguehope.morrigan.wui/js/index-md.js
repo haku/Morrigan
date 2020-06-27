@@ -926,58 +926,16 @@
   }
 
   function showTagEditor(item) {
-    var dlg = $('#tag_editor');
-    $('.title', dlg).text(item.title);
-
-    var newTag = $('#new_tag', dlg);
-    newTag.off('keyup').on('keyup', function(event) {
-      onAutocompleteKeyup(event);
-      if (event.keyCode == 13) {
-        var tag = newTag.val();
-        MnApi.addTag(item, tag, msgHandler, function(msg) {
-          console.log(msg);
-          item.tags.unshift(tag);
-          showTagEditor(item); // TODO be less lazy.
-          newTag.val('').focus();
-        });
-      }
-    });
-
-    tagEditorMid = item.mid;
-
-    $('.row', dlg).remove();
-    $.each(item.tags, function(index, tag) {
-      var search = $('<button class="mdl-button mdl-js-button mdl-js-ripple-effect pri">');
-      search.text(tag);
-      search.unbind().click(function() {
-        setDbTabToSearch(item.mid, item.view, 't=' + tag);
-        hidePopup(dlg);
-        $('#fixed_tab_db span').click();
-      });
-
-      var remove = $('<button class="mdl-button mdl-js-button mdl-js-ripple-effect aux"><i class="material-icons">delete</i></button>');
-      remove.unbind().click(function() {
-        if (window.confirm("Tag: " + tag + "\n\nRemove?")) {
-          MnApi.rmTag(item, tag, msgHandler, function(msg) {
-            console.log(msg);
-            item.tags = jQuery.grep(item.tags, function(val){return val != tag});
-            showTagEditor(item); // TODO be less lazy.
-            if (newTag.val().length < 1) newTag.val(tag).focus();
-          });
-        }
-      });
-
-      var row = $('<div class="row">');
-      row.append(search);
-      row.append(remove);
-
-      dlg.append(row);
-    });
-
-    showPopup(dlg);
+    showMultiTagEditor(new Set([item]));
   }
 
   function showMultiTagEditor(selectedItems) {
+    // They should all have the same mid and view.
+    var firstItem = selectedItems.values().next().value;
+    var mid = firstItem.mid;
+    var view = firstItem.view;
+    tagEditorMid = mid
+
     var tags = new Map();  // tag => [items]
     selectedItems.forEach(function(item, alsoItem, set) {
       item.tags.forEach(function(tag) {
@@ -992,7 +950,14 @@
     tags = new Map([...tags.entries()].sort((a, b) => b[1].length - a[1].length));
 
     var dlg = $('#tag_editor');
-    $('.title', dlg).text('Tags for ' + selectedItems.size + ' Items');
+    var title = $('.title', dlg);
+    if (selectedItems.size > 1) {
+      title.text('Tags for ' + selectedItems.size + ' Items');
+    }
+    else {
+      title.text(firstItem.title);
+    }
+
 
     var makeWriteProgressCb = function(total, onComplete) {
       var calls = 0;
@@ -1005,11 +970,20 @@
       }
     }
 
+    var updateRowText = function(searchBtn, tag, items) {
+      if (selectedItems.size > 1) {
+        searchBtn.text(tag + ' (' + items.length + ')');
+      }
+      else {
+        searchBtn.text(tag);
+      }
+    }
+
     var makeTagRow = function(items, tag) {
       var row = $('<div class="row">');
 
       var search = $('<button class="mdl-button mdl-js-button mdl-js-ripple-effect pri">');
-      search.text(tag + ' (' + items.length + ')');
+      updateRowText(search, tag, items);
       search.unbind().click(function() {
         setDbTabToSearch(mid, view, 't=' + tag);
         hidePopup(dlg);
@@ -1033,7 +1007,7 @@
           writeCb(msg);
           item.tags = jQuery.grep(item.tags, function(val){return val != tag});
           items = jQuery.grep(items, function(val) {return val != item});
-          $('.pri', row).text(tag + ' (' + items.length + ')');
+          updateRowText(search, tag, items);
         });
       });
 
@@ -1057,16 +1031,10 @@
           writeCb(msg);
           item.tags.unshift(tag);
           items.push(item);
-          $('.pri', row).text(tag + ' (' + items.length + ')');
+          updateRowText($('.pri', row), tag, items);
         });
       }
     });
-
-    // They should all have the same mid and view.
-    var firstItem = selectedItems.values().next().value;
-    var mid = firstItem.mid;
-    var view = firstItem.view;
-    tagEditorMid = mid
 
     $('.row', dlg).remove();
     tags.forEach(function(items, tag) {
