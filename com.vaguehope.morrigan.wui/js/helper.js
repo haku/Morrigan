@@ -15,12 +15,32 @@ ClickHelper = {};
   ClickHelper.setupLongClick = function(element, onClick, onLongClick) {
     var pressTimer;
     var longClicked = false;
+    var x = -1;
+    var y = -1;
 
-    element.bind('pointerup', function(event){
+    element.bind('contextmenu', function(event){
+      event.preventDefault();
+    })
+    .bind('pointerup', function(event){
+      x = -1;
       clearTimeout(pressTimer);
       return false;
     })
+    .bind('pointermove', function(event){
+      if (x != -1) {
+        if (Math.abs(event.screenX - x) > 5
+          || Math.abs(event.screenY - y) > 5) {
+          clearTimeout(pressTimer);
+          x = -1;
+          return false;
+        }
+      }
+    })
     .bind('pointerdown', function(event){
+      event.preventDefault();
+      x = event.screenX;
+      y = event.screenY;
+
       longClicked = false;
       pressTimer = window.setTimeout(function() {
         longClicked = true;
