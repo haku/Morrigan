@@ -368,7 +368,6 @@
 
 // Player tab.
 
-
   function wirePlayerTab() {
     var sldJ = $('#track_progress');
     var sld = sldJ.get(0);
@@ -995,24 +994,20 @@
     var dlg = $('#tag_editor');
     $('.title', dlg).text('Tags for ' + selectedItems.size + ' Items');
 
-    var newTag = $('#new_tag', dlg);
-    newTag.off('keyup').on('keyup', function(event) {
-      onAutocompleteKeyup(event);
-      if (event.keyCode == 13) {
-        var tag = newTag.val();
-        // TODO
-        console.log('TODO add ' + tag + ' to:', selectedItems);
+    var makeWriteProgressCb = function(total, onComplete) {
+      var calls = 0;
+      showProgress(0, total);
+      return function(msg) {
+        console.log(msg);
+        calls += 1;
+        showProgress(calls, total);
+        if (calls === total) onComplete();
       }
-    });
+    }
 
-    // They should all have the same mid and view.
-    var firstItem = selectedItems.values().next().value;
-    var mid = firstItem.mid;
-    var view = firstItem.view;
-    tagEditorMid = mid
+    var makeTagRow = function(items, tag) {
+      var row = $('<div class="row">');
 
-    $('.row', dlg).remove();
-    tags.forEach(function(items, tag) {
       var search = $('<button class="mdl-button mdl-js-button mdl-js-ripple-effect pri">');
       search.text(tag + ' (' + items.length + ')');
       search.unbind().click(function() {
@@ -1027,14 +1022,55 @@
           return;
         }
 
-        // TODO
-        console.log('TODO rm ' + tag + ' from:', items);
+        var writeCb = makeWriteProgressCb(items.length, function() {
+          row.remove();
+          if (newTag.val().length < 1) {
+            newTag.val(tag).parent().addClass('is-dirty'); // FIXME https://github.com/google/material-design-lite/issues/903;
+            newTag.focus();
+          }
+        });
+        MnApi.rmTag(items, tag, msgHandler, function(msg, item) {
+          writeCb(msg);
+          item.tags = jQuery.grep(item.tags, function(val){return val != tag});
+          items = jQuery.grep(items, function(val) {return val != item});
+          $('.pri', row).text(tag + ' (' + items.length + ')');
+        });
       });
 
-      var row = $('<div class="row">');
       row.append(search);
       row.append(remove);
+      return row;
+    }
 
+    var newTag = $('#new_tag', dlg);
+    newTag.off('keyup').on('keyup', function(event) {
+      onAutocompleteKeyup(event);
+      if (event.keyCode == 13) {
+        var tag = newTag.val();
+        var items = [];
+        var row = makeTagRow(items, tag);
+        $('.row', dlg).first().before(row);  // What if there is an error?
+        var writeCb = makeWriteProgressCb(selectedItems.size, function() {
+          newTag.val('').focus();
+        });
+        MnApi.addTag(selectedItems, tag, msgHandler, function(msg, item) {
+          writeCb(msg);
+          item.tags.unshift(tag);
+          items.push(item);
+          $('.pri', row).text(tag + ' (' + items.length + ')');
+        });
+      }
+    });
+
+    // They should all have the same mid and view.
+    var firstItem = selectedItems.values().next().value;
+    var mid = firstItem.mid;
+    var view = firstItem.view;
+    tagEditorMid = mid
+
+    $('.row', dlg).remove();
+    tags.forEach(function(items, tag) {
+      var row = makeTagRow(items, tag);
       dlg.append(row);
     });
 

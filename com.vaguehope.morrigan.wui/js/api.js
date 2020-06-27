@@ -468,9 +468,6 @@ MnApi = {};
   MnApi.enqueueItems = function(items, view, pid, msgHandler, onComplete) {
     var args = 'playerid=' + pid;
     if (view) args += '&view=' + encodeURIComponent(view);
-    if (items instanceof Set) {
-      items = Array.from(items);
-    }
     actionItem(items, 'queue', args, msgHandler, onComplete);
   };
 
@@ -524,12 +521,20 @@ MnApi = {};
       }
     };
 
+    if (item instanceof Set) {
+      item = Array.from(item);
+    }
     if ($.isArray(item)) {
       var queue = item.slice();
       function f() {
         if (queue.length === 0) return;
+        var i = queue.shift()
         var p = jQuery.extend({}, params);
-        p.url = queue.shift().url;
+        p.url = i.url;
+        p.success = function(text) {
+          msgHandler.onInfo('');
+          onComplete(text, i);
+        }
         $.ajax(p).then(f);
       };
       f();
