@@ -684,13 +684,14 @@
 
     var selectedItems = new Set();
     var dbFab = $('#db_fab');
-    dbFab.unbind().click(function(event) {
+    $('button', dbFab).unbind().click(function(event) {
       event.preventDefault();
       showSelectionMenu(selectedItems);
     });
 
     var onSelectionChange = function() {
       if (selectedItems.size > 0) {
+        dbFab.attr('data-badge', selectedItems.size);
         dbFab.show();
       }
       else {
