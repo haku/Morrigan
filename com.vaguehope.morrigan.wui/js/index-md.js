@@ -997,7 +997,8 @@
         }
 
         var writeCb = makeWriteProgressCb(items.length, function() {
-          row.remove();
+          row.on('animationend', function() {row.remove();});
+          row.addClass('fadeout');
           if (newTag.val().length < 1) {
             newTag.val(tag).parent().addClass('is-dirty'); // FIXME https://github.com/google/material-design-lite/issues/903;
             newTag.focus();
