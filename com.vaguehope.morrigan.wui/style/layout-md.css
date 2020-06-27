@@ -90,10 +90,13 @@ header .subtitle span {
   margin-left: 0.2em;
   margin-right: 0.2em;
 }
-
-.mdl-button, .mdl-layout__tab {
+.mdl-layout__tab {
   flex-basis: 0;
-  text-transform: none; /* Undo upcase. */
+}
+
+/* Undo upcase. */
+.mdl-button, .mdl-layout__tab {
+  text-transform: none;
 }
 
 /* Fix infuriating tab panels sharing the same scroll. */
