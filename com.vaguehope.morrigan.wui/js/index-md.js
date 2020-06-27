@@ -93,6 +93,18 @@
     $('#popup-obfuscator').removeClass('is-visible');
   }
 
+  function showProgress(done, total) {
+    var prg = $('#progress');
+    var msg = $('.msg', prg);
+    msg.text(done + '/' + total);
+    if (done === total) {
+      prg.addClass('fadeout');
+    }
+    else {
+      prg.removeClass('fadeout').show();
+    }
+  }
+
 // Sidebar.
 
   function fetchAndDisplayPlayers() {
@@ -277,16 +289,26 @@
   function enqueueAllClicked() {
     if (!currentDbResults || !selectedPlayer) return;
     var enabledResults = jQuery.grep(currentDbResults, function(item){return item.enabled && item.url});
-    MnApi.enqueueItems(enabledResults, selectedPlayer.listView, selectedPlayer.pid, msgHandler, function(msg) {
+
+    var calls = 0;
+    var enqueueCb = function(msg) {
       console.log(msg);
-    });
-    showToast('Enqueueing items...');
+      calls += 1;
+      showProgress(calls, enabledResults.length);
+      if (calls === enabledResults.length) {
+        fetchAndDisplayQueue();
+      }
+    }
+
+    MnApi.enqueueItems(enabledResults, selectedPlayer.listView, selectedPlayer.pid, msgHandler, enqueueCb);
+    showProgress(0, enabledResults.length);
   }
 
   function enqueueViewClicked() {
     if (!currentDbMid || !currentDbResults || !selectedPlayer) return;
     MnApi.enqueueView(currentDbMid, currentDbQuery, selectedPlayer.pid, msgHandler, function(msg) {
       console.log(msg);
+      fetchAndDisplayQueue();
     });
   }
 
@@ -840,6 +862,8 @@
   }
 
   function showSelectionMenu(selectedItems) {
+    selectedItems = new Set(selectedItems);  // Copy to avoid later midifications.
+
     var menu = $('#db_selection_menu');
     $('.title', menu).text(selectedItems.size + ' Selected Items');
 
@@ -847,6 +871,7 @@
     var enqueueCb = function(msg) {
       console.log(msg);
       calls += 1;
+      showProgress(calls, selectedItems.size);
       if (calls === 1) {
         hidePopup(menu);
       }
@@ -858,13 +883,13 @@
     $('.enqueue', menu).unbind().click(function(event) {
       if (!selectedPlayer) return;
       MnApi.enqueueItems(selectedItems, selectedPlayer.listView, selectedPlayer.pid, msgHandler, enqueueCb);
-      showToast('Enqueueing selected items...');
+      showProgress(0, selectedItems.size);
     });
 
     $('.enqueue_top', menu).unbind().click(function(event) {
       if (!selectedPlayer) return;
       MnApi.enqueueItemsTop(selectedItems, selectedPlayer.listView, selectedPlayer.pid, msgHandler, enqueueCb);
-      showToast('Enqueueing selected items at the top...');
+      showProgress(0, selectedItems.size);
     });
 
     $('.edit_tags', menu).unbind().click(function(event) {

@@ -117,13 +117,38 @@ footer.maybehide {
   }
 }
 
+/* Progress */
+#progress {
+  position: fixed;
+  right: 3em;
+  bottom: 7em;
+  padding: 1em;
+  text-align: center;
+  z-index: 5;
+  border-radius: .5em;
+  min-width: 5em;
+
+  background: hsl(88, 100%, 67%);
+  color: #000;
+}
+#progress .msg {
+  margin: 0;
+}
+.fadeout {
+  animation: fadeOut ease-out 1s;
+  animation-fill-mode: both;
+}
+@keyframes fadeOut {
+    0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
 /* DBs list */
 #db_fab {
   position: fixed;
-  right: 0;
-  bottom: 0;
-  margin-bottom: 1em;
-  margin-right: 2em;
+  font-size: inherit;
+  right: 3em;
+  bottom: 2em;
 }
 
 /* List items. */

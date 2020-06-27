@@ -512,9 +512,9 @@ MnApi = {};
       data : data,
       contentTypeString : 'application/x-www-form-urlencoded',
       dataType : 'text',
-      beforeSend : function() {
-        msgHandler.onInfo(action + '-ing...');
-      },
+      //beforeSend : function() {
+      //  msgHandler.onInfo(action + '-ing...');
+      //},
       success : function(text) {
         msgHandler.onInfo('');
         onComplete(text);
