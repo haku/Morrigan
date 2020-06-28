@@ -205,48 +205,26 @@
 
   function wireTabsAndMenus() {
     var footer = $('#footer');
-    var tags = $('#mnu_tags');
-    var stopAfter = $('#mnu_stop_after');
-    var playbackOrder = $('#mnu_playback_order');
-    var transcode = $('#mnu_transcode');
-    var clearQueue = $('#mnu_clear_queue');
-    var shuffleQueue = $('#mnu_shuffle_queue');
-    var select = $('#mnu_select');
-    var enqueue = $('#mnu_enqueue');
-    var enqueueAll = $('#mnu_enqueue_all');
-    var enqueueView = $('#mnu_enqueue_view');
+    var mnuItemsQueue = $('.mnu_item_queue');
+    var mnuItemsDb = $('.mnu_item_db');
 
     $('#fixed_tab_queue').click(function() {
+      mnuItemsQueue.show();
+      mnuItemsDb.hide();
       footer.removeClass('maybehide');
-      tags.show();
-      stopAfter.show();
-      playbackOrder.show();
-      transcode.show();
-      clearQueue.show();
-      shuffleQueue.show();
-      select.hide();
-      enqueue.hide();
     });
 
     $('#fixed_tab_db').click(function() {
+      mnuItemsQueue.hide();
+      mnuItemsDb.show();
       footer.addClass('maybehide');
-      tags.hide();
-      stopAfter.hide();
-      playbackOrder.hide();
-      transcode.hide();
-      clearQueue.hide();
-      shuffleQueue.hide();
-      select.show();
-      enqueue.show();
     });
 
-    tags.click(tagsClicked);
-    stopAfter.click(stopAfterClicked);
-    clearQueue.click(clearQueueClicked);
-    shuffleQueue.click(shuffleQueueClicked);
-
-    enqueueAll.click(enqueueAllClicked);
-    enqueueView.click(enqueueViewClicked);
+    $('#mnu_tags').click(tagsClicked);
+    $('#mnu_stop_after').click(stopAfterClicked);
+    $('#mnu_clear_queue').click(clearQueueClicked);
+    $('#mnu_shuffle_queue').click(shuffleQueueClicked);
+    $('#mnu_enqueue_view').click(enqueueViewClicked);
 
     $.each(MnApi.PLAYBACK_ORDERS, function(index, order) {
       $('#mnu_playback_order_' + order.id.toLowerCase()).click(function() {
@@ -287,24 +265,6 @@
   function shuffleQueueClicked() {
     if (!selectedPlayer) return;
     MnApi.writeQueueItem(selectedPlayer.pid, null, 'shuffle', msgHandler, displayQueue);
-  }
-
-  function enqueueAllClicked() {
-    if (!currentDbResults || !selectedPlayer) return;
-    var enabledResults = jQuery.grep(currentDbResults, function(item){return item.enabled && item.url});
-
-    var calls = 0;
-    var enqueueCb = function(msg) {
-      console.log(msg);
-      calls += 1;
-      showProgress(calls, enabledResults.length);
-      if (calls === enabledResults.length) {
-        fetchAndDisplayQueue();
-      }
-    }
-
-    MnApi.enqueueItems(enabledResults, selectedPlayer.listView, selectedPlayer.pid, msgHandler, enqueueCb);
-    showProgress(0, enabledResults.length);
   }
 
   function enqueueViewClicked() {
