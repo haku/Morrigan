@@ -223,6 +223,10 @@ footer.maybehide {
 .clickable_list .item a { /*on a to avoid dead click zones*/
   padding: 0.4em 0 0.4em 0;
 }
+.clickable_list .item.bigger a {
+  font-size: 140%;
+  padding: 1em 0 1em 0;
+}
 
 #queue_tab_content p {
   margin: 0;

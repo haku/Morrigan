@@ -626,7 +626,7 @@
     var a = $('<a class="clickable title" href="">');
     a.text(db.title);
 
-    var el = $('<li class="item">');
+    var el = $('<li class="item bigger">');
     el.append(a);
 
     a.unbind().click(function(event) {
