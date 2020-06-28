@@ -1053,11 +1053,22 @@
       if (event.keyCode == 13) {
         var tag = newTag.val();
         var items = [];
+
         var row = makeTagRow(items, tag);
-        $('.row', dlg).first().before(row);  // What if there is an error?
+        // TODO remove row if there is an error.
+        // TODO check for existing row for this tag.
+        var existingTopRow = $('.row', dlg).first();
+        if (existingTopRow.length > 0) {
+          existingTopRow.before(row);
+        }
+        else {
+          dlg.append(row);
+        }
+
         var writeCb = makeWriteProgressCb(selectedItems.size, function() {
           newTag.val('').focus();
         });
+
         MnApi.addTag(selectedItems, tag, msgHandler, function(msg, item) {
           writeCb(msg);
           item.tags.unshift(tag);
