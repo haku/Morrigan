@@ -58,8 +58,14 @@ class SearchParser {
 	private static final String _SQL_MEDIAFILES_WHERES_FILE =
 			" (file LIKE ? ESCAPE ?)";
 
+	private static final String _SQL_MEDIAFILES_WHERES_NOT_FILE =
+			" NOT " + _SQL_MEDIAFILES_WHERES_FILE;
+
 	private static final String _SQL_MEDIAFILES_WHERES_TAG =
 			" (id IN (SELECT mf_id FROM tbl_tags WHERE tag LIKE ? ESCAPE ? AND (deleted IS NULL OR deleted!=1)))";
+
+	private static final String _SQL_MEDIAFILES_WHERES_NOT_TAG =
+			" NOT " + _SQL_MEDIAFILES_WHERES_TAG;
 
 	private static final String _SQL_MEDIAFILES_WHERES_FILEORTAG =
 			" (file LIKE ? ESCAPE ? OR id IN (SELECT mf_id FROM tbl_tags WHERE tag LIKE ? ESCAPE ? AND (deleted IS NULL OR deleted!=1)))";
@@ -204,8 +210,14 @@ class SearchParser {
 				else if (isFileMatchPartial(term)) {
 					sql.append(_SQL_MEDIAFILES_WHERES_FILE);
 				}
+				else if (isFileNotMatchPartial(term)) {
+					sql.append(_SQL_MEDIAFILES_WHERES_NOT_FILE);
+				}
 				else if (isTagMatchPartial(term) || isTagMatchExact(term)) {
 					sql.append(_SQL_MEDIAFILES_WHERES_TAG);
+				}
+				else if (isTagNotMatchPartial(term) || isTagNotMatchExact(term)) {
+					sql.append(_SQL_MEDIAFILES_WHERES_NOT_TAG);
 				}
 				else {
 					sql.append(_SQL_MEDIAFILES_WHERES_FILEORTAG);
@@ -237,12 +249,31 @@ class SearchParser {
 		return term.startsWith("f~") || term.startsWith("F~");
 	}
 
+	protected static boolean isFileNotMatchPartial (final String term) {
+		return term.startsWith("-f~") || term.startsWith("-F~");
+	}
+
 	protected static boolean isTagMatchPartial (final String term) {
 		return term.startsWith("t~") || term.startsWith("T~");
 	}
 
+	protected static boolean isTagNotMatchPartial (final String term) {
+		return term.startsWith("-t~") || term.startsWith("-T~");
+	}
+
 	protected static boolean isTagMatchExact (final String term) {
 		return term.startsWith("t=") || term.startsWith("T=");
+	}
+
+	protected static boolean isTagNotMatchExact (final String term) {
+		return term.startsWith("-t=") || term.startsWith("-T=");
+	}
+
+	protected static String removeMatchOperator (final String term) {
+		int x = term.indexOf('=');
+		if (x < 0) x = term.indexOf('~');
+		if (x < 0) throw new IllegalArgumentException("term does not contain '=' or '~': " + term);
+		return term.substring(x + 1);
 	}
 
 	protected static String anchoredOrWildcardEnds (final String term) {
@@ -323,12 +354,13 @@ class SearchParser {
 					if ("AND".equals(term)) continue;
 					if ("(".equals(term)) continue;
 					if (")".equals(term)) continue;
-					if (isFileMatchPartial(term) || isTagMatchPartial(term)) {
-						ps.setString(parmIn++, anchoredOrWildcardEnds(SqliteHelper.escapeSearch(unquote(term.substring(2)))));
+					if (isFileMatchPartial(term) || isFileNotMatchPartial(term)
+							|| isTagMatchPartial(term) || isTagNotMatchPartial(term)) {
+						ps.setString(parmIn++, anchoredOrWildcardEnds(SqliteHelper.escapeSearch(unquote(removeMatchOperator(term)))));
 						ps.setString(parmIn++, SqliteHelper.SEARCH_ESC);
 					}
-					else if (isTagMatchExact(term)) {
-						ps.setString(parmIn++, SqliteHelper.escapeSearch(unquote(term.substring(2))));
+					else if (isTagMatchExact(term) || isTagNotMatchExact(term)) {
+						ps.setString(parmIn++, SqliteHelper.escapeSearch(unquote(removeMatchOperator(term))));
 						ps.setString(parmIn++, SqliteHelper.SEARCH_ESC);
 					}
 					else {

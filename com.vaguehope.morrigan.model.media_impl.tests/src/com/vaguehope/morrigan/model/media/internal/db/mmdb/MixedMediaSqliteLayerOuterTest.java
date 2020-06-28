@@ -443,6 +443,27 @@ public class MixedMediaSqliteLayerOuterTest {
 		assertSingleResult(expected, runSearch(mediaNameFragment + " OR )"));
 	}
 
+	@Test
+	public void itSearchesForNegativeTagExactMatch () throws Exception {
+		mockMediaFileWithTags("abc", "foobar");
+		final IMixedMediaItem nonMatch = mockMediaFileWithTags("abc", "desu");
+		assertSingleResult(nonMatch, runSearch("t=abc -t=foobar"));
+	}
+
+	@Test
+	public void itSearchesForNegativeTagPartialMatch () throws Exception {
+		mockMediaFileWithTags("abc", "foobar");
+		final IMixedMediaItem nonMatch = mockMediaFileWithTags("abc", "desu");
+		assertSingleResult(nonMatch, runSearch("t=abc -t~foo"));
+	}
+
+	@Test
+	public void itSearchesForNegativeFilePartialMatch () throws Exception {
+		mockMediaFileWithNameFragmentAndTags("foobar", "abc");
+		final IMixedMediaItem nonMatch = mockMediaFileWithTags("abc");
+		assertSingleResult(nonMatch, runSearch("t=abc -f~foo"));
+	}
+
 	private void addNoiseToDb () throws Exception {
 		for (int i = 0; i < 10; i++) {
 			mockMediaFileWithNameContaining(
@@ -496,7 +517,7 @@ public class MixedMediaSqliteLayerOuterTest {
 	}
 
 	private static void assertSingleResult (final IMixedMediaItem expected, final List<IMixedMediaItem> actual) {
-		assertEquals(1, actual.size());
+		assertEquals(String.format("expected=%s actual=%s", expected, actual), 1, actual.size());
 		getItemByFilepath(actual, expected.getFilepath());
 	}
 
