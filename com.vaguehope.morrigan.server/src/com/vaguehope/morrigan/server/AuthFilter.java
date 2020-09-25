@@ -1,6 +1,11 @@
 package com.vaguehope.morrigan.server;
 
 import java.io.IOException;
+import java.net.SocketException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
@@ -18,6 +23,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.util.B64Code;
 
 import com.vaguehope.morrigan.config.Config;
+import com.vaguehope.morrigan.util.NetHelper;
+import com.vaguehope.morrigan.util.StringHelper;
 import com.vaguehope.morrigan.util.httpclient.Http;
 
 public class AuthFilter implements Filter {
@@ -26,10 +33,14 @@ public class AuthFilter implements Filter {
 
 	private final AuthChecker authChecker;
 	private final AuthMgr authMgr;
+	private final Collection<String> ipAddresses;
 
-	public AuthFilter (final AuthChecker authChecker, final Config config, final ScheduledExecutorService schEs) {
+	public AuthFilter (final AuthChecker authChecker, final Config config, final ScheduledExecutorService schEs) throws SocketException {
 		this.authChecker = authChecker;
 		this.authMgr = new AuthMgr(config, schEs);
+
+		this.ipAddresses = Collections.unmodifiableCollection(NetHelper.getIpAddressesAsStrings());
+		logger.info("CORS Origins: " + this.ipAddresses);
 	}
 
 	@Override
@@ -46,6 +57,11 @@ public class AuthFilter implements Filter {
 	public void doFilter (final ServletRequest request, final ServletResponse response, final FilterChain chain) throws IOException, ServletException {
 		final HttpServletRequest req = (HttpServletRequest) request;
 		final HttpServletResponse resp = (HttpServletResponse) response;
+
+		final boolean options = "OPTIONS".equals(req.getMethod());
+		if (!setCorsHeaders(options, req, resp) || options) {
+			return;
+		}
 
 		final Cookie tokenCookie = ServletHelper.findCookie(req, Auth.TOKEN_COOKIE_NAME);
 		if (tokenCookie != null) {
@@ -102,6 +118,42 @@ public class AuthFilter implements Filter {
 		cookie.setMaxAge((int) TimeUnit.MILLISECONDS.toSeconds(Auth.MAX_TOKEN_AGE_MILLIS));
 		cookie.setPath("/");
 		resp.addCookie(cookie);
+	}
+
+	/**
+	 * returns false on error.
+	 */
+	private boolean setCorsHeaders (final boolean strict, final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+		final String origin = req.getHeader("Origin");
+		if (StringHelper.blank(origin)) {
+			if (strict) {
+				ServletHelper.error(resp, 400, "Mising Origin header.");
+				return false;
+			}
+			else {
+				return true;
+			}
+		}
+
+		final String host;
+		try {
+			host = new URI(origin).getHost();
+		}
+		catch (URISyntaxException e) {
+			ServletHelper.error(resp, 400, "Invalid Origin header.");
+			return false;
+		}
+
+		if (!this.ipAddresses.contains(host)) {
+			ServletHelper.error(resp, 401, "Unauthorised: " + host);
+			return false;
+		}
+
+		resp.setHeader("Allow", "HEAD,GET,OPTIONS");
+		resp.setHeader("Access-Control-Allow-Headers", "Authorization");
+		resp.setHeader("Access-Control-Allow-Origin", origin);
+		resp.setHeader("Vary", "Origin");
+		return true;
 	}
 
 }
