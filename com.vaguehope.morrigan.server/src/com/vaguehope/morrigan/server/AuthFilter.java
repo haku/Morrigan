@@ -152,6 +152,7 @@ public class AuthFilter implements Filter {
 		resp.setHeader("Allow", "HEAD,GET,OPTIONS");
 		resp.setHeader("Access-Control-Allow-Headers", "Authorization");
 		resp.setHeader("Access-Control-Allow-Origin", origin);
+		resp.setHeader("Access-Control-Allow-Credentials", "true");
 		resp.setHeader("Vary", "Origin");
 		return true;
 	}
