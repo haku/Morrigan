@@ -145,7 +145,7 @@ public class AuthFilter implements Filter {
 		}
 
 		if (!this.ipAddresses.contains(host)) {
-			ServletHelper.error(resp, 401, "Unauthorised: " + host);
+			ServletHelper.error(resp, 401, "Unauthorised CORS Origin: " + host);
 			return false;
 		}
 
