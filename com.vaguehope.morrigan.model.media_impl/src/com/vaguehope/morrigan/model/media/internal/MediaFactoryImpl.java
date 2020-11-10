@@ -67,7 +67,7 @@ public class MediaFactoryImpl implements MediaFactory {
 
 	@Override
 	public ILocalMixedMediaDb createLocalMixedMediaDb (final String name) throws MorriganException {
-		return createLocalMixedMediaDb(name);
+		return LocalMixedMediaDbHelper.createMmdb(this.config, name);
 	}
 
 	@Override
