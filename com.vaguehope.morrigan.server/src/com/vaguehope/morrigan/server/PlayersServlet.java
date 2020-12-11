@@ -48,6 +48,7 @@ import com.vaguehope.morrigan.util.TimeHelper;
  * POST /players/0 action=playpause
  * POST /players/0 action=next
  * POST /players/0 action=stop
+ * POST /players/0 action=setvolume&volume=69
  * POST /players/0 action=seek&position=123.45
  * POST /players/0 action=playbackorder&order=random
  * POST /players/0 action=transcode&transcode=audio_only
@@ -78,6 +79,7 @@ public class PlayersServlet extends HttpServlet {
 	private static final String CMD_PLAYPAUSE = "playpause";
 	private static final String CMD_NEXT = "next";
 	private static final String CMD_STOP = "stop";
+	private static final String CMD_SETVOLUME = "setvolume";
 	private static final String CMD_SEEK = "seek";
 	private static final String CMD_PLAYBACKORDER = "playbackorder";
 	private static final String CMD_TRANSCODE = "transcode";
@@ -210,6 +212,17 @@ public class PlayersServlet extends HttpServlet {
 		else if (act.equals(CMD_STOP)) {
 			player.stopPlaying();
 			writeResponse(req, resp, player);
+		}
+		else if (act.equals(CMD_SETVOLUME)) {
+			final String volumeRaw = req.getParameter("volume");
+			if (volumeRaw != null && volumeRaw.length() > 0) {
+				final int volume = Integer.parseInt(volumeRaw); // TODO handle ex?
+				player.setVolume(volume);
+				writeResponse(req, resp, player);
+			}
+			else {
+				ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "'volume' parameter not set desu~");
+			}
 		}
 		else if (act.equals(CMD_SEEK)) {
 			final String positionRaw = req.getParameter("position");
@@ -431,6 +444,7 @@ public class PlayersServlet extends HttpServlet {
 
 		final PlayItem currentItem = p.getCurrentItem();
 		final String trackTitle = (currentItem != null && currentItem.hasTrack()) ? currentItem.getTrack().getTitle() : "(empty)";
+		final Integer volume = p.getVoume();
 
 		final long queueVersion = p.getQueue().getVersion();
 		final int queueLength = p.getQueue().getQueueList().size();
@@ -443,6 +457,7 @@ public class PlayersServlet extends HttpServlet {
 		FeedHelper.addElement(dw, "playerid", p.getId());
 		FeedHelper.addElement(dw, "playername", p.getName());
 		FeedHelper.addElement(dw, "playstate", p.getPlayState().getN());
+		if (volume != null) FeedHelper.addElement(dw, "volume", volume);
 		FeedHelper.addElement(dw, "playorderid", p.getPlaybackOrder().name());
 		FeedHelper.addElement(dw, "playordertitle", p.getPlaybackOrder().toString());
 		FeedHelper.addElement(dw, "transcode", p.getTranscode().getSymbolicName());

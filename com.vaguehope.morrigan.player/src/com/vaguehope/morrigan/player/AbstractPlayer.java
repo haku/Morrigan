@@ -46,7 +46,7 @@ public abstract class AbstractPlayer implements Player {
 		this.id = id;
 		this.name = name;
 		this.register = register;
-		this.loadEs = new ThreadPoolExecutor(0, 1, 10L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), new DaemonThreadFactory("pload"));
+		this.loadEs = new ThreadPoolExecutor(0, 1, 10L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), new DaemonThreadFactory("pld"));
 		this.transcoder = new Transcoder(id);
 	}
 
@@ -169,6 +169,16 @@ public abstract class AbstractPlayer implements Player {
 	@Override
 	public PlaybackOrder getPlaybackOrder () {
 		return this.playbackOrder.get();
+	}
+
+	@Override
+	public Integer getVoume () {
+		return null;
+	}
+
+	@Override
+	public void setVolume (final int newVolume) {
+		throw new UnsupportedOperationException("setVolume not implemented.");
 	}
 
 	@Override

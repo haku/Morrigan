@@ -227,6 +227,20 @@ public class LocalProxyPlayer implements LocalPlayer {
 	}
 
 	@Override
+	public Integer getVoume() {
+		final Player p = getRef();
+		if (p == null) return null;
+		return p.getVoume();
+	}
+
+	@Override
+	public void setVolume(final int newVolume) {
+		final Player p = getRef();
+		if (p == null) return;
+		p.setVolume(newVolume);
+	}
+
+	@Override
 	public Transcode getTranscode () {
 		final Player p = getRef();
 		if (p == null) return null;

@@ -87,6 +87,12 @@ public interface Player {
 	void setPlaybackOrder(PlaybackOrder order);
 
 	/**
+	 * Returns null if not implemented.
+	 */
+	Integer getVoume();
+	void setVolume(int newVolume);
+
+	/**
 	 * Can not be null;
 	 */
 	Transcode getTranscode();
