@@ -445,6 +445,7 @@ public class PlayersServlet extends HttpServlet {
 		final PlayItem currentItem = p.getCurrentItem();
 		final String trackTitle = (currentItem != null && currentItem.hasTrack()) ? currentItem.getTrack().getTitle() : "(empty)";
 		final Integer volume = p.getVoume();
+		final Integer volumeMaxValue = p.getVoumeMaxValue();
 
 		final long queueVersion = p.getQueue().getVersion();
 		final int queueLength = p.getQueue().getQueueList().size();
@@ -458,6 +459,7 @@ public class PlayersServlet extends HttpServlet {
 		FeedHelper.addElement(dw, "playername", p.getName());
 		FeedHelper.addElement(dw, "playstate", p.getPlayState().getN());
 		if (volume != null) FeedHelper.addElement(dw, "volume", volume);
+		if (volumeMaxValue != null) FeedHelper.addElement(dw, "volumemaxvalue", volumeMaxValue);
 		FeedHelper.addElement(dw, "playorderid", p.getPlaybackOrder().name());
 		FeedHelper.addElement(dw, "playordertitle", p.getPlaybackOrder().toString());
 		FeedHelper.addElement(dw, "transcode", p.getTranscode().getSymbolicName());

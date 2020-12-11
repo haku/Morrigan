@@ -234,6 +234,13 @@ public class LocalProxyPlayer implements LocalPlayer {
 	}
 
 	@Override
+	public Integer getVoumeMaxValue() {
+		final Player p = getRef();
+		if (p == null) return null;
+		return p.getVoumeMaxValue();
+	}
+
+	@Override
 	public void setVolume(final int newVolume) {
 		final Player p = getRef();
 		if (p == null) return;
