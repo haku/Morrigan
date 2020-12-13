@@ -4,7 +4,7 @@ MnApi = {};
 // --- Players ---
 
   MnApi.getPlayers = function(msgHandler, onPlayers) {
-    $.ajax({
+    return $.ajax({
       type : 'GET',
       cache : false,
       url : 'players',
@@ -30,7 +30,7 @@ MnApi = {};
   }
 
   MnApi.getPlayer = function(pid, msgHandler, onPlayer) {
-    $.ajax({
+    return $.ajax({
       type : 'GET',
       cache : false,
       url : 'players/' + pid,

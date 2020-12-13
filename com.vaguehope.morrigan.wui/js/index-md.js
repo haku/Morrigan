@@ -1,6 +1,6 @@
 (function() {
 
-  var REFRESH_PLAYERS_SECONDS = 5;
+  var REFRESH_PLAYERS_SECONDS = 3;
   var SNACKBAR_SHOW_MILLIS = 10000;
   var HOST_NAME;
 
@@ -39,17 +39,27 @@
     });
   }
 
+  function updatePlayers() {
+    try {
+      fetchAndDisplayPlayers();
+      return fetchAndDisplayPlayer();
+    }
+    catch (e) {
+      console.log('Update failed.', e);
+      return null;
+    }
+  }
+
   function startPoller() {
-    fetchAndDisplayPlayers();
-    setInterval(function() {
-      try {
-        fetchAndDisplayPlayers();
-        fetchAndDisplayPlayer();
-      }
-      catch (e) {
-        console.log('Update failed.', e);
-      }
-    }, REFRESH_PLAYERS_SECONDS * 1000);
+    var p = updatePlayers();
+    if (p) {
+      p.always(function() {
+        setTimeout(startPoller, REFRESH_PLAYERS_SECONDS * 1000);
+      });
+    }
+    else {
+      setTimeout(startPoller, REFRESH_PLAYERS_SECONDS * 1000);
+    }
   }
 
   var shackbarVisible = false;
@@ -374,8 +384,8 @@
   }
 
   function fetchAndDisplayPlayer() {
-    if (!selectedPlayer) return;
-    MnApi.getPlayer(selectedPlayer.pid, msgHandler, displayPlayer);
+    if (!selectedPlayer) return null;
+    return MnApi.getPlayer(selectedPlayer.pid, msgHandler, displayPlayer);
   }
 
   function displayPlayer(player) {
