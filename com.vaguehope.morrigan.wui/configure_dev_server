@@ -1,0 +1,40 @@
+#!/bin/bash
+set -eu
+
+wuidir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+tgt_dir="$wuidir/../com.vaguehope.morrigan.server.product/target"
+srv_dir="$tgt_dir/morriganserver"
+conf="$srv_dir/configuration/config.ini"
+
+if ! [ -e "$tgt_dir" ] ; then
+  echo "Target dir not found: $tgt_dir"
+  exit 1
+fi
+
+if ! [ -e "$srv_dir" ] ; then
+  zip="$tgt_dir/com.vaguehope.morrigan.server.product-1.0.0-SNAPSHOT-linux.gtk.x86_64.zip"
+  if [ -e "$zip" ] ; then
+    pushd "$tgt_dir"
+    unzip "$zip"
+    popd
+  else
+    echo "zip not found: $zip"
+    exit 1
+  fi
+fi
+
+if ! [ -e "$conf" ] ; then
+  echo "Conf not found: $conf"
+  exit 1
+fi
+
+if ! grep -q "$wuidir" "$conf" ; then
+  sed "-i.$(date +'%Y%m%d-%H%M%S').bak" \
+    "/^osgi.bundles=/s#com.vaguehope.morrigan.wui#$wuidir#" \
+    "$conf"
+else
+  echo "$conf already contains $wuidir."
+fi
+
+echo "done."
