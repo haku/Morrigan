@@ -36,6 +36,9 @@ body {
   background-color: var(--fill-bg-colour);
   color: var(--fill-fg-colour);
 }
+.mdl-layout__header-row > * {
+  flex-shrink: unset;
+}
 .mdl-layout__drawer {
   background-color: var(--menu-bg-colour);
   color: var(--menu-fg-colour);
@@ -100,10 +103,16 @@ body {
 header .subtitle {
   display: block;
   font-size: 80%;
+  line-height: 1.1;
 }
 header .subtitle span {
   margin-left: 0.2em;
   margin-right: 0.2em;
+  max-width: 50ex;
+  overflow: hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+  display:inline-block;
 }
 .mdl-layout__tab {
   flex-basis: 0;
