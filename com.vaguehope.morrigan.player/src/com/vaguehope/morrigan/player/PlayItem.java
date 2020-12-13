@@ -80,6 +80,10 @@ public class PlayItem {
 		return this.id;
 	}
 
+	public boolean hasId () {
+		return this.id != Integer.MIN_VALUE;
+	}
+
 	public PlayItem withoutId() {
 		return new PlayItem(this.type, this.list, this.track);
 	}

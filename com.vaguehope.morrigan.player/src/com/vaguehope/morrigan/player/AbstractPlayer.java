@@ -226,8 +226,13 @@ public abstract class AbstractPlayer implements Player {
 
 		PlayItem pi = item;
 		if (!pi.hasTrack()) {
-			// TODO FIXME what if Playback Order is MANUAL?
-			final IMediaTrack track = this.orderHelper.getNextTrack(pi.getList(), null, getPlaybackOrder());
+			PlaybackOrder order = getPlaybackOrder();
+			if (order == PlaybackOrder.MANUAL && pi.hasId()) {
+				// For a queue item we need to find a track, even if in MANUAL mode.
+				order = PlaybackOrder.RANDOM;
+			}
+
+			final IMediaTrack track = this.orderHelper.getNextTrack(pi.getList(), null, order);
 			if (track == null) {
 				System.err.println("Failed to fill in track: " + pi);
 				return;
