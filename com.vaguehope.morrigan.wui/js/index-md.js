@@ -253,6 +253,9 @@
       $('#submnu_transcode').append(li);
     });
 
+    $('#volume_down').click(function() { setRelativeVolume(-5); });
+    $('#volume_up').click(function() { setRelativeVolume(5); });
+
     setupTagAutocomplete($('#db_query'), true, function(){return currentDbMid});
     setupTagAutocomplete($('#new_tag'), false, function(){return tagEditorMid});
   }
@@ -275,6 +278,14 @@
   function shuffleQueueClicked() {
     if (!selectedPlayer) return;
     MnApi.writeQueueItem(selectedPlayer.pid, null, 'shuffle', msgHandler, displayQueue);
+  }
+
+  function setRelativeVolume(offset) {
+    if (!selectedPlayer) return;
+    var newVolume = selectedPlayer.volume + offset;
+    newVolume = Math.min(newVolume, selectedPlayer.volumemaxvalue);
+    newVolume = Math.max(newVolume, 0);
+    MnApi.playerSetVolume(selectedPlayer.pid, newVolume, msgHandler, displayPlayer);
   }
 
   function enqueueViewClicked() {
@@ -431,6 +442,21 @@
     var sld = $('#track_progress').attr('max', sldMax).get(0).MaterialSlider;
     if (sld) sld.change(sldVal);
     $('#track_time').text(sldTxt);
+
+    if (player.volume) {
+      var vol = player.volume;
+      if (player.volumemaxvalue === 100) {
+        vol += '%';
+      }
+      else {
+        vol += '/' + player.volumemaxvalue;
+      }
+      $('#volume_level').text(vol);
+      $('#volume_controls').show();
+    }
+    else {
+      $('#volume_controls').hide();
+    }
 
     if (lastQueuePid !== player.pid || lastQueueVersion !== player.queueVersion) fetchAndDisplayQueue();
   }

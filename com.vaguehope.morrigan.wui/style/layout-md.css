@@ -154,6 +154,19 @@ footer.maybehide {
   display: none;
 }
 
+/* Side Draw */
+.volume-spacer {
+  flex-grow: 1;
+}
+.volume-controls {
+  display: flex;
+  margin-bottom: 2em;
+}
+.volume-level {
+  padding: 1em 0;
+  font-size: 1.5em;
+}
+
 /* Vertical left side footer */
 @media (orientation: landscape) {
   .mdl-layout__header {

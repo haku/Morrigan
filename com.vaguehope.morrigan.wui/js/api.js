@@ -59,6 +59,9 @@ MnApi = {};
     player.stateName = PLAYER_STATE_NAMES[parseInt(player.state, 10)];
     player.stateIcon = PLAYER_STATE_ICONS[parseInt(player.state, 10)];
 
+    player.volume = parseInt(node.find('volume').text(), 10);
+    player.volumemaxvalue = parseInt(node.find('volumemaxvalue').text(), 10);
+
     player.playOrderId = node.find('playorderid').text();
     player.playOrderTitle = node.find('playordertitle').text();
 
@@ -162,6 +165,10 @@ MnApi = {};
 
   MnApi.playerFullscreen = function(pid, monitor, msgHandler, onPlayer) {
     writePlayerState(pid, 'fullscreen&monitor=' + monitor.id, msgHandler, onPlayer);
+  }
+
+  MnApi.playerSetVolume  = function(pid, newVolume, msgHandler, onPlayer) {
+    writePlayerState(pid, 'setvolume&volume=' + newVolume, msgHandler, onPlayer);
   }
 
   function writePlayerState(pid, action, msgHandler, onPlayer) {
