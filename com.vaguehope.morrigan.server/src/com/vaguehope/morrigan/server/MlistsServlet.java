@@ -533,7 +533,7 @@ public class MlistsServlet extends HttpServlet {
 				if (mmdb.hasFile(filepath).isKnown()) {
 					final IMixedMediaItem item = mmdb.getByFile(filepath);
 					final File file = item.getFile();
-					if (file.exists()) {
+					if (file != null && file.exists()) {
 						if (ServletHelper.checkCanReturn304(file.lastModified(), req, resp)) return;
 
 						final String transcode = StringHelper.trimToNull(req.getParameter(PARAM_TRANSCODE));
