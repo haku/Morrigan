@@ -400,8 +400,12 @@
   }
 
   function displayPlayer(player) {
-    if (selectedPlayer.pid === player.pid && player.item) {
-      selectedPlayer = player; // Upgrade to add details.
+    // Keep selectedPlayer up to date.
+    if (selectedPlayer.pid === player.pid) {
+      if (!player.item) {
+        player.item = selectedPlayer.item;
+      }
+      selectedPlayer = player;
     }
 
     $('#player_name').text(player.name + ' (' + HOST_NAME + ')');

@@ -56,8 +56,8 @@ MnApi = {};
     player.name = node.find('playername').text();
     player.title = node.find('title').text();
     player.state = parseInt(node.find('playstate').text(), 10);
-    player.stateName = PLAYER_STATE_NAMES[parseInt(player.state, 10)];
-    player.stateIcon = PLAYER_STATE_ICONS[parseInt(player.state, 10)];
+    player.stateName = PLAYER_STATE_NAMES[player.state];
+    player.stateIcon = PLAYER_STATE_ICONS[player.state];
 
     player.volume = parseInt(node.find('volume').text(), 10);
     player.volumemaxvalue = parseInt(node.find('volumemaxvalue').text(), 10);
