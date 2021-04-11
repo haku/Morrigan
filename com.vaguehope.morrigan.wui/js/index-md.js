@@ -253,8 +253,8 @@
       $('#submnu_transcode').append(li);
     });
 
-    $('#volume_down').click(function() { setRelativeVolume(-5); });
-    $('#volume_up').click(function() { setRelativeVolume(5); });
+    $('#volume_down').click(function() { setRelativeVolume(-3); });
+    $('#volume_up').click(function() { setRelativeVolume(3); });
 
     setupTagAutocomplete($('#db_query'), true, function(){return currentDbMid});
     setupTagAutocomplete($('#new_tag'), false, function(){return tagEditorMid});
