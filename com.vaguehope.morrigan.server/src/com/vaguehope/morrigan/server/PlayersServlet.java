@@ -3,6 +3,7 @@ package com.vaguehope.morrigan.server;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.Collection;
@@ -114,7 +115,7 @@ public class PlayersServlet extends HttpServlet {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private Player getPlayerById (final String playerId) {
+	private Player getPlayerById (final String playerId) throws UnsupportedEncodingException {
 		if (StringHelper.blank(playerId)) return null;
 
 		if (PLAYER_AUTO.equalsIgnoreCase(playerId)) {
@@ -126,6 +127,13 @@ public class PlayersServlet extends HttpServlet {
 
 		for (final Player player : this.playerListener.getPlayers()) {
 			if (playerId.equalsIgnoreCase(player.getName())) {
+				return player;
+			}
+		}
+
+		final String decodeId = URLDecoder.decode(playerId, "UTF-8");
+		for (final Player player : this.playerListener.getPlayers()) {
+			if (decodeId.equalsIgnoreCase(player.getName())) {
 				return player;
 			}
 		}
