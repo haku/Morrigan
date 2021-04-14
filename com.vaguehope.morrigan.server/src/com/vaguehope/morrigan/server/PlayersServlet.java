@@ -225,7 +225,12 @@ public class PlayersServlet extends HttpServlet {
 			final String volumeRaw = req.getParameter("volume");
 			if (volumeRaw != null && volumeRaw.length() > 0) {
 				final int volume = Integer.parseInt(volumeRaw); // TODO handle ex?
-				player.setVolume(volume);
+				if (volumeRaw.startsWith("+") || volumeRaw.startsWith("-")) {
+					player.setVolume(player.getVoume() + volume);
+				}
+				else {
+					player.setVolume(volume);
+				}
 				writeResponse(req, resp, player);
 			}
 			else {
