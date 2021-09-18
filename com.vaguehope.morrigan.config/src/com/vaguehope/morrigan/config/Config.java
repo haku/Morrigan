@@ -66,6 +66,12 @@ public class Config {
 		return f;
 	}
 
+	private static final String SAVED_VIEWS_FILE = "savedviews.json";
+
+	public File getSavedViewsFile () {
+		return new File(this.configDir, SAVED_VIEWS_FILE);
+	}
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private static final String PROP_MEDIA_TYPES = "morrigan.media.types";

@@ -68,6 +68,7 @@ import com.vaguehope.sqlitewrapper.DbException;
  *
  * <pre>
  *  GET /mlists
+ *  GET /mlists/savedviews
  *
  *  GET /mlists/LOCALMMDB/example.local.db3
  *  GET /mlists/LOCALMMDB/example.local.db3/src
@@ -112,6 +113,8 @@ public class MlistsServlet extends HttpServlet {
 
 	public static final String CONTEXTPATH = "/mlists";
 
+	private static final String PATH_SAVED_VIEWS = "/savedviews";
+
 	public static final String PATH_SRC = "src";
 	public static final String PATH_TAGS = "tags";
 	public static final String PATH_ITEMS = "items";
@@ -144,6 +147,8 @@ public class MlistsServlet extends HttpServlet {
 	public static final String CMD_RMTAG = "rmtag";
 	public static final String CMD_SET_ENABLED = "set_enabled";
 	public static final String CMD_TRANSCODE = "transcode";
+
+	private static final String CONTENT_TYPE_JSON = "text/json;charset=utf-8";
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -228,6 +233,9 @@ public class MlistsServlet extends HttpServlet {
 			else {
 				printMlistList(resp);
 			}
+		}
+		else if (PATH_SAVED_VIEWS.equals(reqPath)) {
+			printSavedViews(resp);
 		}
 		else {
 			final String path = reqPath.startsWith(ROOTPATH) ? reqPath.substring(ROOTPATH.length()) : reqPath;
@@ -520,6 +528,16 @@ public class MlistsServlet extends HttpServlet {
 		}
 
 		FeedHelper.endFeed(dw);
+	}
+
+	private void printSavedViews (final HttpServletResponse resp) throws IOException {
+		final File file = this.config.getSavedViewsFile();
+		if (!file.exists()) {
+			resp.setContentType(CONTENT_TYPE_JSON);
+			resp.getWriter().write("[]");
+			return;
+		}
+		ServletHelper.returnFile(file, CONTENT_TYPE_JSON, null, null, resp);
 	}
 
 	private void getToMmdb (final HttpServletRequest req, final HttpServletResponse resp, final IMixedMediaDb mmdb, final String path, final String afterPath) throws IOException, SAXException, MorriganException, DbException {

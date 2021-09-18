@@ -69,6 +69,25 @@ public class MlistsServletTest {
 	}
 
 	@Test
+	public void itServesSavedViewsNoFile () throws Exception {
+		this.req.requestURI = "/mlists/savedviews";
+		this.undertest.service(this.req, this.resp);
+		assertEquals("[]", this.resp.getOutputAsString());
+	}
+
+	@Test
+	public void itServesSavedViewsFile () throws Exception {
+		this.req.requestURI = "/mlists/savedviews";
+
+		final String expected = IoHelper.readAsString(getClass().getResourceAsStream("/savedviews.json"));
+		IoHelper.write(expected, this.tmp.newFile("savedviews.json"));
+
+		this.undertest.service(this.req, this.resp);
+		assertEquals(expected, this.resp.getOutputAsString());
+		assertEquals("text/json;charset=utf-8", this.resp.contentType);
+	}
+
+	@Test
 	public void itDoesNotIncludeDeletedTagsIfNotRequested () throws Exception {
 		// TODO
 	}
