@@ -259,6 +259,24 @@ MnApi = {};
     return item;
   }
 
+// --- Saved Views ---
+
+  MnApi.getSavedViews = function(msgHandler, onSavedViews) {
+    $.ajax({
+      type : 'GET',
+      cache : false,
+      url : '/mlists/savedviews',
+      dataType : 'json',
+      success : function(json) {
+        onSavedViews(json);
+        msgHandler.onInfo('');
+      },
+      error : function(jqXHR, textStatus, errorThrown) {
+        msgHandler.onError('Error fetching saved views ' + pid + ': ' + ErrorHelper.summarise(jqXHR, textStatus, errorThrown));
+      }
+    });
+  }
+
 // --- DBs ---
 
   MnApi.getDbs = function(msgHandler, onDbs) {

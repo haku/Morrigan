@@ -270,6 +270,11 @@ footer.maybehide {
   padding: 0;
 }
 
+.queue_action_buttons {
+  display: flex;
+  justify-content: center;
+}
+
 .clickable_list .album {
   float: left;
   width: 7em;

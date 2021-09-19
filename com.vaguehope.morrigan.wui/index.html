@@ -102,6 +102,13 @@
         <ol style="margin: 0; list-style: disc; padding-left: 1em;" class="clickable_list" id="queue_list">
         </ol>
         <div style="height: 2em;"></div>
+        <div class="queue_action_buttons">
+          <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="queue_add_view">
+            <i class="material-icons">add</i>
+            <label> Add View</label>
+          </button>
+        </div>
+        <div style="height: 2em;"></div>
       </div>
     </section>
     <section class="mdl-layout__tab-panel" id="fixed-tab-db">
@@ -188,6 +195,11 @@
       <button class="mdl-button mdl-js-button mdl-js-ripple-effect right bottom"><i class="material-icons">vertical_align_bottom</i></button>
     </div>
     <button class="mdl-button mdl-js-button mdl-js-ripple-effect remove">Remove</button>
+  </div>
+
+  <div class="popup" style="display: none;" id="queue_add_view_menu">
+    <p class="title">Add View</p>
+    <span class="separator"></span>
   </div>
 
   <div class="popup" style="display: none;" id="db_item_menu">

@@ -20,6 +20,7 @@
     wireTabsAndMenus();
     wirePlayerTab();
     wireFooter();
+    populateQueueAddViewMenu();
   });
 
   function updatePageTitle() {
@@ -253,6 +254,8 @@
       $('#submnu_transcode').append(li);
     });
 
+    $('#queue_add_view').click(queueAddViewClicked);
+
     $('#volume_down').click(function() { setRelativeVolume(-3); });
     $('#volume_up').click(function() { setRelativeVolume(3); });
 
@@ -288,9 +291,40 @@
     MnApi.playerSetVolume(selectedPlayer.pid, newVolume, msgHandler, displayPlayer);
   }
 
+  function populateQueueAddViewMenu() {
+    MnApi.getSavedViews(msgHandler, addSavedViewsToMenu);
+  }
+
+  function addSavedViewsToMenu(savedViews) {
+    var menu = $('#queue_add_view_menu');
+    $.each(savedViews, function(index, item) {
+      var addToQueue = $('<button class="mdl-button mdl-js-button mdl-js-ripple-effect pri">');
+      if (item.name && item.dbmid && item.query) {
+        addToQueue.text(item.name);
+        addToQueue.unbind().click(function() {
+          enqueueView(item.dbmid, item.query);
+          hidePopup(menu);
+        });
+      }
+      else {
+        addToQueue.text('Invalid:' + JSON.stringify(item));
+      }
+      menu.append(addToQueue);
+    });
+  }
+
+  function queueAddViewClicked() {
+    showPopup($('#queue_add_view_menu'));
+  }
+
   function enqueueViewClicked() {
-    if (!currentDbMid || !currentDbResults || !selectedPlayer) return;
-    MnApi.enqueueView(currentDbMid, currentDbQuery, selectedPlayer.pid, msgHandler, function(msg) {
+    if (!currentDbMid || !currentDbResults) return;
+    enqueueView(currentDbMid, currentDbQuery);
+  }
+
+  function enqueueView(dbMid, query) {
+    if (!selectedPlayer) return;
+    MnApi.enqueueView(dbMid, query, selectedPlayer.pid, msgHandler, function(msg) {
       console.log(msg);
       fetchAndDisplayQueue();
     });
