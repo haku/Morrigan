@@ -299,7 +299,7 @@
     var menu = $('#queue_add_view_menu');
     $.each(savedViews, function(index, item) {
       var addToQueue = $('<button class="mdl-button mdl-js-button mdl-js-ripple-effect pri">');
-      if (item.name && item.dbmid && item.query) {
+      if (item.name && item.dbmid && (item.query || item.query === '')) {
         addToQueue.text(item.name);
         addToQueue.unbind().click(function() {
           enqueueView(item.dbmid, item.query);
