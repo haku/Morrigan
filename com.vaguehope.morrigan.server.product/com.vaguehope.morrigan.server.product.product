@@ -8,7 +8,7 @@
 
    <launcherArgs>
       <programArgs>-console</programArgs>
-      <vmArgs>-Declipse.ignoreApp=true -Dosgi.noShutdown=true -Djava.net.preferIPv4Stack=true -Dfile.encoding=UTF-8</vmArgs>
+      <vmArgs>-XX:+PerfDisableSharedMem -XX:-UsePerfData -Declipse.ignoreApp=true -Dosgi.noShutdown=true -Djava.net.preferIPv4Stack=true -Dfile.encoding=UTF-8</vmArgs>
       <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
    </launcherArgs>
 
