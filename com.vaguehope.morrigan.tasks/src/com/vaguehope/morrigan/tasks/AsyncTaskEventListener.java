@@ -137,6 +137,11 @@ public class AsyncTaskEventListener implements TaskEventListener, AsyncTask {
 	}
 
 	@Override
+	public void setName (final String name) {
+		this.taskName.set(name);
+	}
+
+	@Override
 	public void beginTask (final String name, final int totalWork) {
 		this.taskName.set(name);
 		this.progressTotal.set(totalWork);

@@ -23,6 +23,11 @@ public class MultitaskEventListener implements TaskEventListener {
 		this.parent.logError(topic, s, t);
 	}
 
+	@Override
+	public void setName (final String name) {
+		this.parent.setName(name);
+	}
+
 	public void beginTask (final String name) {
 		this.parent.beginTask(name, 100);
 	}
@@ -80,6 +85,11 @@ public class MultitaskEventListener implements TaskEventListener {
 		@Override
 		public void logError (final String topic, final String s, final Throwable t) {
 			this.parent.logError(topic, s, t);
+		}
+
+		@Override
+		public void setName (final String name) {
+			this.parent.subTask(name);
 		}
 
 		@Override

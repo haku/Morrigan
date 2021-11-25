@@ -158,4 +158,15 @@ public enum Transcode {
 		return null;
 	}
 
+	/**
+	 * Does not include first entry.
+	 */
+	public static String[] symbolicNames() {
+		final String[] ret = new String[values().length - 1];
+		for (int i = 0; i < ret.length; i++) {
+			ret[i] = values()[i + 1].getSymbolicName();
+		}
+		return ret;
+	}
+
 }

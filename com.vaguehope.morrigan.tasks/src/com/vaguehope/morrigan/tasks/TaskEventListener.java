@@ -20,6 +20,11 @@ public interface TaskEventListener {
 	void logError (String topic, String s, Throwable t);
 
 	/**
+	 * Set the name if there is a bunch of work to do before beginTask() can be called.
+	 */
+	void setName (String name);
+
+	/**
 	 * Called when actual work of a know size is begun.
 	 * Will only be called once.
 	 */

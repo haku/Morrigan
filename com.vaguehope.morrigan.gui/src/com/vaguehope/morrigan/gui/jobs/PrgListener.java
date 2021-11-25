@@ -35,6 +35,11 @@ public class PrgListener implements TaskEventListener {
 	}
 
 	@Override
+	public void setName (String name) {
+		this.monitor.setTaskName(name);
+	}
+	
+	@Override
 	public void beginTask(String name, int totalWork) {
 		this.monitor.beginTask(name, totalWork);
 	}

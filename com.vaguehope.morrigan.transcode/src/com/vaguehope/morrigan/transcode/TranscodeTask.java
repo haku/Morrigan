@@ -32,6 +32,7 @@ public class TranscodeTask implements MorriganTask {
 	@Override
 	public TaskResult run (final TaskEventListener taskEventListener) {
 		taskEventListener.onStart();
+		taskEventListener.setName(getTitle());
 
 		try {
 			final List<TranscodeProfile> profiles = new ArrayList<TranscodeProfile>();

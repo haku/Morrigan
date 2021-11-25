@@ -85,13 +85,13 @@ public class MorriganCommandProvider implements CommandProvider {
 				"\tmn [player|p] 0 [queue|q] clear\n" +
 				"\tmn [player|p] 0 [pause|stop|next]\n" +
 				"\tmn [player|p] 0 [order|o] [" + StringHelper.join(PlaybackOrder.values(), "|") + "]\n" +
-				"\tmn [player|p] 0 [transcode|t] [" + StringHelper.join(Transcode.values(), "|") + "]\n" +
+				"\tmn [player|p] 0 [transcode|t] [" + StringHelper.join(Transcode.symbolicNames(), "|") + "]\n" +
 				"\tmn play [<q1> [<q2>]]\n" +
 				"\tmn [queue|q] [<q1> [<q2>]|clear]\n" +
 				"\tmn [pause|stop|s|next|n]\n" +
 				"\tmn st\n" +
 				"\tmn st [stop|s] <number>\n" +
-				"\tmn transcode <q1> <profile> <max files>\n" +
+				"\tmn transcode <q1> [<q2>] <profile> <max files>\n" +
 				"\tNOTE 1: <q1> = list, <q2> = item in <q1>.\n" +
 				"\tNOTE 2: Only omit player ID when there is only one player.\n";
 	}
@@ -690,21 +690,43 @@ public class MorriganCommandProvider implements CommandProvider {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private void doTranscode (final CommandInterpreter ci, final List<String> args) throws ArgException, MorriganException {
+	private void doTranscode (final CommandInterpreter ci, final List<String> args) throws ArgException, MorriganException, DbException {
+		// 0    1         2           3
+		// <q1> <profile> <max files>
+		// <q1> <q2>      <profile>   <max files>
+
 		this.cliHelper.checkArgs(args, 3);
+		String q1 = args.get(0);
+		final String q2;
+		final String profile;
+		final String maxFiles;
+		if (args.size() > 3) {
+			q2 = args.get(1);
+			profile = args.get(2);
+			maxFiles = args.get(3);
+		}
+		else {
+			q2 = null;
+			profile = args.get(1);
+			maxFiles = args.get(2);
+		}
 
-		final IMediaTrackList<? extends IMediaTrack> q1 = this.cliHelper.argQ1(args.get(0));
+		ILocalMixedMediaDb db = this.cliHelper.argLocalQ1(q1);
+		if (StringHelper.notBlank(q2)) {
+			db = this.mediaFactory.getLocalMixedMediaDb(db.getDbPath(), q2);
+			db.forceRead();
+		}
 
-		final Transcode tr = Transcode.parseOrNull(args.get(1));
+		final Transcode tr = Transcode.parseOrNull(profile);
 		if (tr == null) {
-			ci.println("Unknown transcode: " + args.get(1));
+			ci.println("Unknown transcode: " + profile);
 			return;
 		}
 
-		final Integer maxNumber = this.cliHelper.argPositiveInt(args.get(2));
+		final Integer maxNumber = this.cliHelper.argPositiveInt(maxFiles);
 
-		this.asyncTasksRegister.scheduleTask(new TranscodeTask(this.transcoder, tr, q1, maxNumber));
-		ci.println(String.format("Transcoding %s to %s scheduled.  Use 'mn st' to track progress.", q1.getListName(), tr));
+		this.asyncTasksRegister.scheduleTask(new TranscodeTask(this.transcoder, tr, db, maxNumber));
+		ci.println(String.format("Transcoding %s to %s scheduled.  Use 'mn st' to track progress.", db.getListName(), tr));
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
