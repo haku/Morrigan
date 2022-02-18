@@ -93,6 +93,15 @@
 			<artifactId>sqlite-jdbc</artifactId>
 			<version>3.36.0.3</version>
 		</dependency>
+
+		<!-- Playback -->
+
+		<dependency>
+			<groupId>uk.co.caprica</groupId>
+			<artifactId>vlcj</artifactId>
+			<version>4.7.0</version>
+		</dependency>
+
 		<!-- Util -->
 
 		<dependency>
