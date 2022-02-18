@@ -11,7 +11,6 @@ TODO
 [ ] com.vaguehope.morrigan.server.boot/
 [ ] com.vaguehope.morrigan.server.tests/
 [ ] com.vaguehope.morrigan.server/
-[ ] com.vaguehope.morrigan.tasks/
 [ ] com.vaguehope.morrigan.transcode/
 [ ] com.vaguehope.morrigan.wui/
 
@@ -19,6 +18,7 @@ DONE
 [x] com.vaguehope.morrigan.config/
 [x] com.vaguehope.morrigan.model.db/
 [x] com.vaguehope.morrigan.model/
+[x] com.vaguehope.morrigan.tasks/
 [x] com.vaguehope.morrigan.util.httpclient/
 [x] com.vaguehope.morrigan.util.tests/
 [x] com.vaguehope.morrigan.util/
