@@ -1,0 +1,48 @@
+TODO
+[ ] com.vaguehope.morrigan.config/
+[ ] com.vaguehope.morrigan.engines/
+[ ] com.vaguehope.morrigan.model.db/
+[ ] com.vaguehope.morrigan.model.media/
+[ ] com.vaguehope.morrigan.model.media_impl.tests/
+[ ] com.vaguehope.morrigan.model.media_impl/
+[ ] com.vaguehope.morrigan.model/
+[ ] com.vaguehope.morrigan.osgiconsole/
+[ ] com.vaguehope.morrigan.playbackimpl.vlc/
+[ ] com.vaguehope.morrigan.player.tests/
+[ ] com.vaguehope.morrigan.player/
+[ ] com.vaguehope.morrigan.scripts/
+[ ] com.vaguehope.morrigan.server.boot/
+[ ] com.vaguehope.morrigan.server.tests/
+[ ] com.vaguehope.morrigan.server/
+[ ] com.vaguehope.morrigan.tasks/
+[ ] com.vaguehope.morrigan.transcode/
+[ ] com.vaguehope.morrigan.wui/
+
+DONE
+[x] com.vaguehope.morrigan.util.httpclient/
+[x] com.vaguehope.morrigan.util.tests/
+[x] com.vaguehope.morrigan.util/
+[x] com.vaguehope.sqlitewrapper/
+
+NO MIGRATION
+[-] com.vaguehope.morrigan.android/
+[-] com.vaguehope.morrigan.art/
+[-] com.vaguehope.morrigan.build/
+[-] com.vaguehope.morrigan.danbooru/
+[-] com.vaguehope.morrigan.gui.feature/
+[-] com.vaguehope.morrigan.gui.product/
+[-] com.vaguehope.morrigan.gui/
+[-] com.vaguehope.morrigan.hotkeyimpl.jintellitype/
+[-] com.vaguehope.morrigan.hotkeyimpl.jxgrabkey/
+[-] com.vaguehope.morrigan.jetty/
+[-] com.vaguehope.morrigan.playbackimpl.dsj/
+[-] com.vaguehope.morrigan.playbackimpl.gs/
+[-] com.vaguehope.morrigan.playbackimpl.jmf/
+[-] com.vaguehope.morrigan.playbackimpl.spi/
+[-] com.vaguehope.morrigan.screen/
+[-] com.vaguehope.morrigan.server.feature/
+[-] com.vaguehope.morrigan.server.product/
+[-] com.vaguehope.morrigan.sshplayer.tests/
+[-] com.vaguehope.morrigan.sshplayer/
+[-] com.vaguehope.morrigan.target/
+[-] com.vaguehope.nemain/
