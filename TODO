@@ -1,6 +1,4 @@
 TODO
-[ ] com.vaguehope.morrigan.model.media_impl.tests/
-[ ] com.vaguehope.morrigan.model.media_impl/
 [ ] com.vaguehope.morrigan.osgiconsole/
 [ ] com.vaguehope.morrigan.player.tests/
 [ ] com.vaguehope.morrigan.player/
@@ -15,6 +13,8 @@ DONE
 [x] com.vaguehope.morrigan.engines/
 [x] com.vaguehope.morrigan.model.db/
 [x] com.vaguehope.morrigan.model.media/
+[x] com.vaguehope.morrigan.model.media_impl.tests/
+[x] com.vaguehope.morrigan.model.media_impl/
 [x] com.vaguehope.morrigan.model/
 [x] com.vaguehope.morrigan.playbackimpl.vlc/
 [x] com.vaguehope.morrigan.tasks/

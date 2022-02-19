@@ -8,6 +8,9 @@ import org.kohsuke.args4j.CmdLineParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.vaguehope.morrigan.config.Config;
+import com.vaguehope.morrigan.model.media.MediaFactory;
+import com.vaguehope.morrigan.model.media.internal.MediaFactoryImpl;
 import com.vaguehope.morrigan.playbackimpl.vlc.VlcEngineFactory;
 import com.vaguehope.morrigan.tasks.AsyncTasksRegister;
 import com.vaguehope.morrigan.tasks.AsyncTasksRegisterImpl;
@@ -50,6 +53,7 @@ public final class Main {
 				Executors.newCachedThreadPool(new DaemonThreadFactory("tsk")));
 
 		final VlcEngineFactory playbackEngineFactory = new VlcEngineFactory();
+		final MediaFactory mediaFactory = new MediaFactoryImpl(Config.DEFAULT, playbackEngineFactory);
 
 		// TODO
 	}
