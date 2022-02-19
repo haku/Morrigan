@@ -5,11 +5,11 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.vaguehope.morrigan.Args;
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.util.PropertiesFile;
 
 public class ServerConfig implements AuthChecker {
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private static final String SERVER_PROPS = "server.properties";
 
@@ -27,15 +27,20 @@ public class ServerConfig implements AuthChecker {
 	private static final String KEY_AUTOSTART = "autostart";
 	private static final String DEFAULT_AUTOSTART = Boolean.FALSE.toString();
 
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
 	protected final Logger logger = Logger.getLogger(this.getClass().getName());
 
 	private final PropertiesFile propFile = new PropertiesFile(new File(Config.getConfigDir(), SERVER_PROPS));
 
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	private final Args args;
+
+	public ServerConfig(final Args args) {
+		this.args = args;
+	}
 
 	public int getServerPort () throws IOException {
+		if (this.args.getHttpPort() > 0) {
+			return this.args.getHttpPort();
+		}
 		return this.propFile.getInt(KEY_PORT, DEFAULT_PORT);
 	}
 
@@ -50,14 +55,17 @@ public class ServerConfig implements AuthChecker {
 	}
 
 	public String getBindIp () throws IOException {
+		if (this.args.getInterface() != null) {
+			return this.args.getInterface();
+		}
 		return this.propFile.getString(KEY_BINDIP, null);
 	}
 
 	public boolean isAutoStart () throws IOException {
 		return Boolean.parseBoolean(this.propFile.getString(KEY_AUTOSTART, DEFAULT_AUTOSTART));
 	}
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//	AuthChecker
+
+	//	AuthChecker
 
 	@Override
 	public boolean verifyAuth (final String passToTest) {
@@ -70,5 +78,4 @@ public class ServerConfig implements AuthChecker {
 		}
 	}
 
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

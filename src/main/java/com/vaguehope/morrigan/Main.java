@@ -26,6 +26,7 @@ import com.vaguehope.morrigan.server.AsyncActions;
 import com.vaguehope.morrigan.server.MorriganServer;
 import com.vaguehope.morrigan.server.ServerConfig;
 import com.vaguehope.morrigan.server.boot.ServerPlayerContainer;
+import com.vaguehope.morrigan.sshui.SshUi;
 import com.vaguehope.morrigan.tasks.AsyncTasksRegister;
 import com.vaguehope.morrigan.tasks.AsyncTasksRegisterImpl;
 import com.vaguehope.morrigan.transcode.Transcoder;
@@ -78,7 +79,12 @@ public final class Main {
 
 		final Transcoder transcoder = new Transcoder("srv");
 
-		final ServerConfig config = new ServerConfig();
+		if (args.getSshPort() > 0) {
+			final SshUi sshUi = new SshUi(args.getSshPort(), playerRegister, mediaFactory, asyncTasksRegister);
+			sshUi.start();
+		}
+
+		final ServerConfig config = new ServerConfig(args);
 		if (config.isServerPlayerEnabled()) {
 			final ExecutorService srvEx = new ThreadPoolExecutor(0, 1, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), new DaemonThreadFactory("srvplayer"));
 			final ServerPlayerContainer playerContainer = new ServerPlayerContainer(srvEx);
