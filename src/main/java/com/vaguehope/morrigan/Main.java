@@ -2,6 +2,9 @@ package com.vaguehope.morrigan;
 
 import java.io.PrintStream;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -12,6 +15,10 @@ import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.internal.MediaFactoryImpl;
 import com.vaguehope.morrigan.playbackimpl.vlc.VlcEngineFactory;
+import com.vaguehope.morrigan.player.PlayerContainer;
+import com.vaguehope.morrigan.player.PlayerRegister;
+import com.vaguehope.morrigan.player.PlayerStateStorage;
+import com.vaguehope.morrigan.player.internal.PlayerRegisterImpl;
 import com.vaguehope.morrigan.tasks.AsyncTasksRegister;
 import com.vaguehope.morrigan.tasks.AsyncTasksRegisterImpl;
 import com.vaguehope.morrigan.util.DaemonThreadFactory;
@@ -55,7 +62,17 @@ public final class Main {
 		final VlcEngineFactory playbackEngineFactory = new VlcEngineFactory();
 		final MediaFactory mediaFactory = new MediaFactoryImpl(Config.DEFAULT, playbackEngineFactory);
 
+		final ScheduledThreadPoolExecutor playerEx = new ScheduledThreadPoolExecutor(1, new DaemonThreadFactory("player"));
+		playerEx.setKeepAliveTime(1, TimeUnit.MINUTES);
+		playerEx.allowCoreThreadTimeOut(true);
+		final PlayerRegister playerRegister = new PlayerRegisterImpl(playbackEngineFactory,
+				new PlayerStateStorage(mediaFactory, playerEx), playerEx);
+
 		// TODO
+	}
+
+	private void fillPlayerContainer (final PlayerContainer container, PlayerRegister playerRegister) {
+		container.setPlayer(playerRegister.makeLocal(container.getPrefix(), container.getName(), container.getLocalPlayerSupport()));
 	}
 
 	private static void help (final CmdLineParser parser, final PrintStream ps) {

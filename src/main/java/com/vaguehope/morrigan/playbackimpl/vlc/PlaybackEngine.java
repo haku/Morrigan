@@ -305,13 +305,5 @@ class PlaybackEngine implements IPlaybackEngine {
 		if (this.m_listener != null) this.m_listener.durationChanged(duration);
 	}
 
-	void callOnKeyPressListener(int keyCode) {
-		if (this.m_listener != null) this.m_listener.onKeyPress(keyCode);
-	}
-
-	void callOnClickListener(int button, int clickCount) {
-		if (this.m_listener != null) this.m_listener.onMouseClick(button, clickCount);
-	}
-
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
