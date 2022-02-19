@@ -1,10 +1,13 @@
 package com.vaguehope.morrigan;
 
 import java.io.PrintStream;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -19,8 +22,13 @@ import com.vaguehope.morrigan.player.PlayerContainer;
 import com.vaguehope.morrigan.player.PlayerRegister;
 import com.vaguehope.morrigan.player.PlayerStateStorage;
 import com.vaguehope.morrigan.player.internal.PlayerRegisterImpl;
+import com.vaguehope.morrigan.server.AsyncActions;
+import com.vaguehope.morrigan.server.MorriganServer;
+import com.vaguehope.morrigan.server.ServerConfig;
+import com.vaguehope.morrigan.server.boot.ServerPlayerContainer;
 import com.vaguehope.morrigan.tasks.AsyncTasksRegister;
 import com.vaguehope.morrigan.tasks.AsyncTasksRegisterImpl;
+import com.vaguehope.morrigan.transcode.Transcoder;
 import com.vaguehope.morrigan.util.DaemonThreadFactory;
 import com.vaguehope.morrigan.util.LogHelper;
 
@@ -68,10 +76,23 @@ public final class Main {
 		final PlayerRegister playerRegister = new PlayerRegisterImpl(playbackEngineFactory,
 				new PlayerStateStorage(mediaFactory, playerEx), playerEx);
 
-		// TODO
+		final Transcoder transcoder = new Transcoder("srv");
+
+		final ServerConfig config = new ServerConfig();
+		if (config.isServerPlayerEnabled()) {
+			final ExecutorService srvEx = new ThreadPoolExecutor(0, 1, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), new DaemonThreadFactory("srvplayer"));
+			final ServerPlayerContainer playerContainer = new ServerPlayerContainer(srvEx);
+			fillPlayerContainer(playerContainer, playerRegister);
+		}
+
+		final AsyncActions asyncActions = new AsyncActions(asyncTasksRegister, mediaFactory, Config.DEFAULT);
+		final ScheduledExecutorService srvSchEx = Executors.newScheduledThreadPool(1, new DaemonThreadFactory("srvsch"));
+		final MorriganServer server = new MorriganServer(config, playerRegister, mediaFactory, asyncTasksRegister, asyncActions, transcoder, srvSchEx);
+		server.start();
+		server.join();  // Block forever.
 	}
 
-	private void fillPlayerContainer (final PlayerContainer container, PlayerRegister playerRegister) {
+	private static void fillPlayerContainer (final PlayerContainer container, final PlayerRegister playerRegister) {
 		container.setPlayer(playerRegister.makeLocal(container.getPrefix(), container.getName(), container.getLocalPlayerSupport()));
 	}
 

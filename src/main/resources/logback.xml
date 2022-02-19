@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<!-- Override with -Dlogback.configurationFile=/home/user/path/logback.xml -->
+	<!-- http://logback.qos.ch/manual/layouts.html -->
+
+	<!-- http://logback.qos.ch/manual/configuration.html#LevelChangePropagator -->
+	<contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator" />
+
+	<appender name="default" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%.-1level%d{MMdd HH:mm:ss.SSS} [%10.10thread] %25.25logger{25} %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<logger name="com.vaguehope" level="INFO" />
+	<logger name="org.fourthline.cling.binding.xml.DeviceDescriptorBinder" level="ERROR" />
+	<logger name="org.fourthline.cling.binding.xml.ServiceDescriptorBinder" level="ERROR" />
+	<logger name="org.fourthline.cling.model.meta.Service" level="ERROR" />
+	<logger name="org.fourthline.cling.protocol.RetrieveRemoteDescriptors" level="ERROR" />
+	<logger name="org.fourthline.cling.transport.spi.StreamClient" level="WARN" />
+	<logger name="org.fourthline.cling.transport.spi.UpnpStream" level="ERROR" />
+
+	<root level="info">
+		<appender-ref ref="default" />
+	</root>
+
+</configuration>

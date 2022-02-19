@@ -1,10 +1,6 @@
 TODO
 [ ] com.vaguehope.morrigan.osgiconsole/
 [ ] com.vaguehope.morrigan.scripts/
-[ ] com.vaguehope.morrigan.server.boot/
-[ ] com.vaguehope.morrigan.server.tests/
-[ ] com.vaguehope.morrigan.server/
-[ ] com.vaguehope.morrigan.wui/
 
 DONE
 [x] com.vaguehope.morrigan.config/
@@ -17,11 +13,15 @@ DONE
 [x] com.vaguehope.morrigan.playbackimpl.vlc/
 [x] com.vaguehope.morrigan.player.tests/
 [x] com.vaguehope.morrigan.player/
+[x] com.vaguehope.morrigan.server.boot/
+[x] com.vaguehope.morrigan.server.tests/
+[x] com.vaguehope.morrigan.server/
 [x] com.vaguehope.morrigan.tasks/
 [x] com.vaguehope.morrigan.transcode/
 [x] com.vaguehope.morrigan.util.httpclient/
 [x] com.vaguehope.morrigan.util.tests/
 [x] com.vaguehope.morrigan.util/
+[x] com.vaguehope.morrigan.wui/
 [x] com.vaguehope.sqlitewrapper/
 
 NO MIGRATION

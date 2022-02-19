@@ -1,0 +1,183 @@
+/* resets. */
+
+body, p, div, span {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+}
+
+/* tabs */
+
+.tabs {
+  padding: 0.2em 1em;
+}
+
+.tabs a {
+  margin: 0.2em 0.5em;
+}
+/* status */
+
+.statusbar {
+  margin: 0.2em;
+}
+
+/* main. */
+
+.player, .mlist {
+  left: 0;
+  right: 0;
+  margin: 0.5em 0.5em 0 0.5em;
+  border-radius: 0.5em;
+  overflow: hidden;
+}
+
+.player .block, .mlist .block {
+  vertical-align: middle;
+  margin: 0.2em;
+}
+
+.player span, .mlist span {
+  margin: 0.2em;
+}
+
+.player .toprow {
+  font-size: 85%;
+}
+
+.player, .mlist {
+  position: relative;
+}
+
+.player .clickable, .mlist .clickable {
+  position: absolute;
+  display: block;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  text-indent: -9999px;
+  z-index: 1000;
+}
+
+.statusbar {
+  text-align: right;
+  font-size: 80%;
+}
+
+.statusbar span {
+  margin: 0.5em;
+}
+
+.queue, .mediaitems {
+  margin: 0 0.5em 0 0.5em;
+}
+
+.queue .header {
+  border-radius: 0.5em 0.5em 0 0;
+  text-align: center;
+  padding: 0.1em;
+}
+
+.queue .item p, .mediaitems .item p {
+  margin: 0.4em;
+  font-size: 80%;
+}
+
+.queue a:link, .queue a:visited, .queue a:active, .queue a:hover,
+.mediaitems a:link, .mediaitems a:visited, .mediaitems a:active, .mediaitems a:hover {
+  text-decoration: none;
+}
+
+.queue .item, .mediaitems .item {
+  border-radius: 0.2em;
+}
+
+/* albums */
+
+.mediaitems .album {
+  float: left;
+  width: 7em;
+  height: 9em;
+  border-radius: 0.2em;
+  overflow: hidden;
+  text-align: center;
+}
+
+.mediaitems .album .cover {
+  max-width: 6em;
+  max-height: 5em;
+  margin: 0.5em 0.5em 0 0.5em;
+}
+
+.mediaitems .album .title {
+  margin: 0 0.2em 0.2em 0.2em;
+  font-size: 80%;
+}
+
+/* tool-bar. */
+
+.toolbar {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.toolbar button {
+  margin: 0.5em;
+  height: 3em;
+  width: 30%;
+}
+
+/* pop-up menu. */
+
+.popup {
+  position: fixed;
+  z-index: 100;
+  top: 10%;
+  left: 50%;
+  width: 16em;
+  margin-left: -8em; /* width/2 */
+  text-align: center;
+  border-radius: 0.5em 0.5em 0 0;
+}
+
+.popup .cover {
+  max-width: 8em;
+  max-height: 7em;
+  margin: 0.5em 0.5em 0 0.5em;
+}
+
+.popup .title {
+  margin: 0.2em;
+}
+
+.popup .stats {
+  margin: 0.2em;
+  font-size: 80%;
+}
+
+.popup button, .popup a, .popup input, .popup select {
+  width: 90%;
+  min-height: 3em;
+  margin: .5em;
+}
+
+.popup .link {
+  vertical-align: middle;
+  line-height: 3em;
+}
+
+.popup input {
+  padding: 0.2em;
+}
+
+/* extra. */
+
+.clearfooter {/* Empty space to make main area scroll above footer. */
+  float: left;
+  clear: both;
+  height: 3em;
+}

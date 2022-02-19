@@ -1,0 +1,28 @@
+.player, .mlist, .queue .header {
+  background: Menu;
+}
+
+.player:hover, .mlist:hover {
+  background: Highlight;
+  color: HighlightText;
+}
+
+.queue a:link, .queue a:visited, .queue a:active, .queue a:hover,
+.mediaitems a:link, .mediaitems a:visited, .mediaitems a:active, .mediaitems a:hover {
+  color: inherit;
+}
+
+.queue .item:hover, .mediaitems .item:hover {
+  background: Highlight;
+  color: HighlightText;
+}
+
+.mediaitems .album:hover {
+  background: Highlight;
+}
+
+.popup {
+  border: 1px solid MenuText;
+  background: Menu;
+  color: MenuText;
+}

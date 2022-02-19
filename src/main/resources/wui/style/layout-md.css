@@ -1,0 +1,421 @@
+/* Theme colours. */
+/*
+brown:        hsl(16, 25%, 38%)
+green accent: hsl(88, 100%, 67%)
+dark:         hsl(88, 100%, 20%)
+
+purple:      hsl(262, 52%, 47%)
+pink accent: hsl(340, 100%, 63%)
+darker:      hsl(262, 52%, 20%)
+*/
+
+:root {
+  --first-bg-colour: hsl(262, 52%, 47%); /*purple*/
+  --first-fg-colour: #fff;
+
+  --accent-bg-colour: hsl(340, 100%, 63%); /*pink*/
+  --accent-fg-colour: #fff;
+
+  --fill-bg-colour: #000;
+  --fill-fg-colour: #fff;
+  --fill-inactive-colour: #aaa;
+
+  --second-bg-colour: hsl(262, 52%, 20%); /*dark purple*/
+  --second-fg-colour: #fff;
+
+  --menu-bg-colour: #222;
+  --menu-fg-colour: #fff;
+  --menu-hover-colour: #000;
+
+  --text-bg-colour: #000;
+  --text-fg-colour: #fff;
+  --label-fg-colour: #aaa;
+}
+
+body {
+  background-color: var(--fill-bg-colour);
+  color: var(--fill-fg-colour);
+}
+.mdl-layout__header-row > * {
+  flex-shrink: unset;
+}
+.mdl-layout__drawer {
+  background-color: var(--menu-bg-colour);
+  color: var(--menu-fg-colour);
+}
+.mdl-layout__drawer .mdl-navigation .mdl-navigation__link {
+  color: var(--menu-fg-colour);
+}
+.mdl-layout__drawer .mdl-navigation .mdl-navigation__link:hover {
+  background-color: var(--menu-hover-colour);
+}
+.mdl-menu__outline {
+  background-color: var(--menu-bg-colour);
+}
+.mdl-menu__item {
+  color: var(--menu-fg-colour);
+}
+.mdl-menu__item:hover {
+  background-color: var(--menu-hover-colour);
+}
+.mdl-textfield__input {
+  background-color: var(--text-bg-colour);
+  border-bottom-color: var(--text-fg-colour);
+}
+.mdl-textfield__label {
+  color: var(--label-fg-colour);
+}
+.mdl-textfield__label:after {
+  background-color: var(--accent-bg-colour);
+}
+.mdl-button {
+  color: var(--first-fg-colour);
+}
+.mdl-slider.is-upgraded::-webkit-slider-thumb,
+.mdl-slider.is-upgraded:active::-webkit-slider-thumb {
+  background-color: var(--accent-bg-colour);
+}
+.mdl-slider.is-upgraded::-moz-range-thumb,
+.mdl-slider.is-upgraded:active::-moz-range-thumb {
+  background-color: var(--accent-bg-colour);
+}
+.mdl-slider.is-upgraded::-ms-thumb,
+.mdl-slider.is-upgraded:active::-ms-thumb {
+  background-color: var(--accent-bg-colour);
+}
+.mdl-slider__background-lower {
+  background-color: var(--accent-bg-colour);
+}
+
+/* Fix snackbar going off screen */
+.mdl-snackbar {
+  margin-right: 0;
+}
+
+/* Side menu item icon position fix. */
+.mdl-layout__drawer .mdl-navigation .mdl-navigation__link {
+  display: flex !important;
+  flex-direction: row;
+  align-items: center;
+}
+
+/* Header */
+header .subtitle {
+  display: block;
+  font-size: 80%;
+  line-height: 1.1;
+}
+header .subtitle span {
+  margin-left: 0.2em;
+  margin-right: 0.2em;
+  max-width: 50ex;
+  overflow: hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+  display:inline-block;
+}
+.mdl-layout__tab {
+  flex-basis: 0;
+}
+
+/* Undo upcase. */
+.mdl-button, .mdl-layout__tab {
+  text-transform: none;
+}
+
+/* Fix infuriating tab panels sharing the same scroll. */
+.mdl-layout__tab-panel {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/* Remove padding around textfields. */
+.mdl-textfield {
+  padding: 0;
+}
+.mdl-textfield__label {
+  top: 0;
+  left: 0;
+  padding-top: 0.2em;
+}
+.mdl-textfield__label:after {
+   bottom: 0;
+}
+
+footer.mdl-mini-footer {
+  background-color: var(--second-bg-colour);
+}
+footer.maybehide {
+  display: none;
+}
+
+/* Side Draw */
+.volume-spacer {
+  flex-grow: 1;
+}
+.volume-controls {
+  display: flex;
+  margin-bottom: 2em;
+}
+.volume-level {
+  padding: 1em 0;
+  font-size: 1.5em;
+}
+
+/* Vertical left side footer */
+@media (orientation: landscape) {
+  .mdl-layout__header {
+    position: relative;
+    width: auto;
+    margin-left: 6em;
+  }
+  .mdl-layout__content {
+    margin-left: 6em;
+  }
+  .mdl-mini-footer {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    flex-flow: column;
+  }
+  footer.maybehide {
+    /* Would be nice to have a more direct way to undo 'none'. */
+    display: flex;
+  }
+}
+
+/* Progress */
+#progress {
+  position: fixed;
+  right: 3em;
+  bottom: 8em;
+  padding: 1em;
+  text-align: center;
+  z-index: 5;
+  border-radius: .5em;
+  min-width: 5em;
+
+  background-color: var(--accent-bg-colour);
+  color: var(--accent-fg-color);
+}
+#progress .msg {
+  margin: 0;
+}
+
+/* Animations. */
+.fadeout {
+  animation: fadeOut ease-out 1s;
+  animation-fill-mode: both;
+}
+@keyframes fadeOut {
+    0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* DBs list */
+#db_fab {
+  position: fixed;
+  font-size: inherit;
+  right: 3em;
+  bottom: 2em;
+}
+
+/* List items. */
+.clickable_list a {
+  display: block;
+  line-height: 1.3em;
+  padding-top: 0.3em;
+  padding-bottom: 0.3em;
+  font-weight: normal;
+}
+.clickable_list a:link,
+.clickable_list a:visited,
+.clickable_list a:active,
+.clickable_list a:focus,
+.clickable_list a:hover {
+  text-decoration: none;
+  color: inherit;
+}
+.clickable_list .item {
+  border-width: 1px;
+  border-style: solid;
+  border-color: transparent;
+}
+.clickable_list .item.disabled {
+  text-decoration: line-through;
+  color: var(--fill-inactive-colour);
+}
+.clickable_list .item:hover {
+  border-color: var(--accent-bg-colour);
+}
+.clickable_list .item.selected {
+  background-color: var(--first-bg-colour);
+}
+.clickable_list .item a { /*on a to avoid dead click zones*/
+  padding: 0.4em 0 0.4em 0;
+}
+.clickable_list .item.bigger a {
+  font-size: 140%;
+  padding: 1em 0 1em 0;
+}
+
+#queue_tab_content p {
+  margin: 0;
+  padding: 0;
+}
+
+.queue_action_buttons {
+  display: flex;
+  justify-content: center;
+}
+
+.clickable_list .album {
+  float: left;
+  width: 7em;
+  height: 9em;
+  border-radius: 0.2em;
+  overflow: hidden;
+  text-align: center;
+}
+.clickable_list .album .cover {
+  max-width: 6em;
+  max-height: 5em;
+  margin: 0.5em 0.5em 0 0.5em;
+}
+.clickable_list .album .cover.nocover {
+  width: 6em;
+  height: 5em;
+  border: 1px solid;
+  border-color: var(--first-bg-colour);
+}
+.clickable_list .album .title {
+  margin: 0 0.2em 0.2em 0.2em;
+  font-size: 80%;
+  line-height: 1.3;
+}
+.clickable_list .album:hover {
+  background-color: var(--accent-bg-colour);
+  color: var(--accent-fg-colour);
+}
+
+/* pop-up menu. */
+.popup {
+  position: fixed;
+  z-index: 100;
+  top: 10%;
+  left: 50%;
+  width: 16em;
+  max-height: 70%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  margin-left: -8em; /* width/2 */
+  padding: 1em;
+  text-align: center;
+
+  background-color: var(--menu-bg-colour);
+}
+.popup.fullwidth {
+  left: 0;
+  right: 0;
+  width: initial;
+  margin: 0;
+}
+.popup .title {
+  margin: 0;
+  line-height: 1.2;
+  margin-bottom: 0.5em;
+}
+.popup .title_link {
+  text-decoration: none;
+}
+.popup .stats, .popup .tags {
+  margin: 0;
+  font-size: 80%;
+  line-height: normal;
+  margin-bottom: 0.5em;
+}
+.popup .separator {
+  display: block;
+  margin: 1em;
+}
+.popup .separator:after {
+  content: '';
+  height: 2px;
+  position: absolute;
+  display: block;
+  left: 0;
+  width: 100%;
+  background-color: var(--accent-bg-colour);
+}
+.popup > button, .popup > .row {
+  display: inline-block;
+  width: 90%;
+  min-height: 3em;
+  margin: 1em .5em;
+}
+.popup > .fullwidth {
+  width: 100%;
+  margin: 0;
+}
+.popup button {
+  line-height: normal;
+  height: inherit;
+  min-height: 36px; /* From MD height. */
+}
+.popup .mdl-textfield {
+  width: 90%;
+  margin: 1em .5em;
+}
+.popup .mdl-slider__container {
+  width: 100%;
+}
+.popup > .row {
+  display: inline-flex;
+  flex-direction: row;
+}
+.popup > .row > * {
+  align-self: center;
+}
+.popup > .row > .pri {
+  flex-grow: 2;
+}
+.popup > .row > .aux {
+  flex-grow: 0;
+}
+.popup > .row > .left,
+.popup > .row > .right {
+  flex-grow: 1;
+}
+#popup-obfuscator {
+  background-color: transparent;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  z-index: 4;
+  visibility: hidden;
+}
+#popup-obfuscator.is-visible {
+  background-color: rgba(0,0,0,.5);
+  visibility: visible;
+}
+
+/* Autocomplete. */
+.ui-autocomplete {
+  z-index: 100;
+  overflow-x: hidden;
+  overflow-y: auto;
+  max-width: 15em;
+  max-height: 20em;
+}
+.ui-autocomplete .ui-menu-item {
+  padding-top: 1em;
+  padding-bottom: 1em;
+}
