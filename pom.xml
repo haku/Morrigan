@@ -13,15 +13,35 @@
 		<java.version>1.8</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+		<antlr.version>4.9.3</antlr.version>
+		<cling.version>2.0.1</cling.version>
 		<jetty.version>9.4.35.v20201120</jetty.version>
 		<junit.version>4.13.2</junit.version>
 		<slf4j.version>1.7.32</slf4j.version>
 		<sshd.version>2.2.0</sshd.version>
+		<teleal.version>1.0.14</teleal.version>
 	</properties>
 
 	<prerequisites>
 		<maven>3.0</maven>
 	</prerequisites>
+
+	<repositories>
+
+		<repository>
+			<id>4thline.org-repo</id>
+			<url>http://4thline.org/m2</url>
+			<layout>default</layout>
+			<releases>
+				<enabled>true</enabled>
+				<checksumPolicy>fail</checksumPolicy>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+
+	</repositories>
 
 	<build>
 		<plugins>
@@ -67,6 +87,21 @@
 				</configuration>
 			</plugin>
 
+			<!-- http://www.antlr.org/api/maven-plugin/latest/antlr4-mojo.html -->
+			<plugin>
+				<groupId>org.antlr</groupId>
+				<artifactId>antlr4-maven-plugin</artifactId>
+				<version>${antlr.version}</version>
+				<executions>
+					<execution>
+						<id>antlr</id>
+						<goals>
+							<goal>antlr4</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
 		</plugins>
 	</build>
 
@@ -109,7 +144,7 @@
 			<artifactId>jaudiotagger</artifactId>
 			<version>2.2.5</version>
 		</dependency>
-		
+
 		<!-- ssh -->
 
 		<dependency>
@@ -134,6 +169,34 @@
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcprov-jdk15on</artifactId>
 			<version>1.57</version>
+		</dependency>
+
+		<!-- DLNA -->
+
+		<dependency>
+			<groupId>org.fourthline.cling</groupId>
+			<artifactId>cling-core</artifactId>
+			<version>${cling.version}</version>
+		</dependency>
+	
+		<dependency>
+			<groupId>org.fourthline.cling</groupId>
+			<artifactId>cling-support</artifactId>
+			<version>${cling.version}</version>
+		</dependency>
+	
+		<dependency>
+			<groupId>org.teleal</groupId>
+			<artifactId>teleal-common</artifactId>
+			<version>${teleal.version}</version>
+		</dependency>
+
+		<!-- Parser Generator -->
+
+		<dependency>
+			<groupId>org.antlr</groupId>
+			<artifactId>antlr4-runtime</artifactId>
+			<version>${antlr.version}</version>
 		</dependency>
 
 		<!-- Util -->

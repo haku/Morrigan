@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vaguehope.morrigan.config.Config;
+import com.vaguehope.morrigan.dlna.DlnaService;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.internal.MediaFactoryImpl;
 import com.vaguehope.morrigan.playbackimpl.vlc.VlcEngineFactory;
@@ -78,14 +79,8 @@ public final class Main {
 				new PlayerStateStorage(mediaFactory, playerEx), playerEx);
 
 		final Transcoder transcoder = new Transcoder("srv");
-
-		if (args.getSshPort() > 0) {
-			final SshUi sshUi = new SshUi(args.getSshPort(), playerRegister, mediaFactory, asyncTasksRegister);
-			sshUi.start();
-		}
-
-		final ServerConfig config = new ServerConfig(args);
-		if (config.isServerPlayerEnabled()) {
+		final ServerConfig serverConfig = new ServerConfig(args);
+		if (serverConfig.isServerPlayerEnabled()) {
 			final ExecutorService srvEx = new ThreadPoolExecutor(0, 1, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), new DaemonThreadFactory("srvplayer"));
 			final ServerPlayerContainer playerContainer = new ServerPlayerContainer(srvEx);
 			fillPlayerContainer(playerContainer, playerRegister);
@@ -93,8 +88,19 @@ public final class Main {
 
 		final AsyncActions asyncActions = new AsyncActions(asyncTasksRegister, mediaFactory, Config.DEFAULT);
 		final ScheduledExecutorService srvSchEx = Executors.newScheduledThreadPool(1, new DaemonThreadFactory("srvsch"));
-		final MorriganServer server = new MorriganServer(config, playerRegister, mediaFactory, asyncTasksRegister, asyncActions, transcoder, srvSchEx);
+		final MorriganServer server = new MorriganServer(serverConfig, playerRegister, mediaFactory, asyncTasksRegister, asyncActions, transcoder, srvSchEx);
 		server.start();
+
+		if (args.getSshPort() > 0) {
+			final SshUi sshUi = new SshUi(args.getSshPort(), playerRegister, mediaFactory, asyncTasksRegister);
+			sshUi.start();
+		}
+
+		if (args.isDlna()) {
+			final DlnaService dlna = new DlnaService(serverConfig, mediaFactory, playerRegister);
+			dlna.start();
+		}
+
 		server.join();  // Block forever.
 	}
 
