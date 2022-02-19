@@ -11,11 +11,11 @@ import org.junit.Test;
 
 public class MetadataTest {
 
-	private VlcFactory factory;
+	private VlcEngineFactory factory;
 
 	@Before
 	public void before() throws Exception {
-		this.factory = new VlcFactory();
+		this.factory = new VlcEngineFactory();
 	}
 
 	@After
@@ -27,7 +27,7 @@ public class MetadataTest {
 	public void itReadsFileDuration() throws Exception {
 		final File file = new File(System.getProperty("user.home") + "/media/testing/test.mp3");
 		if (!file.exists()) throw new FileNotFoundException();
-		final long d = Metadata.getDurationMilliseconds(this.factory.getFactory(), file.getAbsolutePath());
+		final long d = Metadata.getDurationMilliseconds(this.factory.getMediaPlayerFactory(), file.getAbsolutePath());
 		assertTrue(d > 0);
 	}
 

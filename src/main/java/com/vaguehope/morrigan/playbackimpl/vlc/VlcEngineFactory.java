@@ -8,11 +8,14 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.vaguehope.morrigan.engines.playback.IPlaybackEngine;
+import com.vaguehope.morrigan.engines.playback.PlaybackEngineFactory;
+
 import uk.co.caprica.vlcj.factory.MediaPlayerFactory;
 
-public class VlcFactory {
+public class VlcEngineFactory implements PlaybackEngineFactory {
 
-	private static final Logger LOG = LoggerFactory.getLogger(VlcFactory.class);
+	private static final Logger LOG = LoggerFactory.getLogger(VlcEngineFactory.class);
 
 	private final MediaPlayerFactory factory;
 
@@ -24,19 +27,24 @@ public class VlcFactory {
 			"--prefetch-read-size=" + (1024 * 1024),
 	}));
 
-	public VlcFactory() {
+	public VlcEngineFactory() {
 		final List<String> vlcArgs = new ArrayList<>(VLC_ARGS);
 		vlcArgs.add("--quiet");
 		LOG.info("VLC args: {}", vlcArgs);
 		this.factory = new MediaPlayerFactory(vlcArgs);
 	}
 
-	public MediaPlayerFactory getFactory() {
-		return this.factory;
-	}
-
 	public void dispose() {
 		this.factory.release();
+	}
+
+	@Override
+	public IPlaybackEngine newPlaybackEngine() {
+		return new PlaybackEngine(this.factory);
+	}
+
+	MediaPlayerFactory getMediaPlayerFactory() {
+		return this.factory;
 	}
 
 }

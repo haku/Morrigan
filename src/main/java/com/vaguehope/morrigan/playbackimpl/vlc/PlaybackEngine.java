@@ -11,23 +11,24 @@ import com.vaguehope.morrigan.engines.playback.IPlaybackEngine;
 import com.vaguehope.morrigan.engines.playback.IPlaybackStatusListener;
 import com.vaguehope.morrigan.engines.playback.PlaybackException;
 
+import uk.co.caprica.vlcj.factory.MediaPlayerFactory;
 import uk.co.caprica.vlcj.player.base.MediaPlayer;
 import uk.co.caprica.vlcj.player.base.MediaPlayerEventAdapter;
 import uk.co.caprica.vlcj.player.base.MediaPlayerEventListener;
 import uk.co.caprica.vlcj.player.component.AudioPlayerComponent;
 
-public class PlaybackEngine implements IPlaybackEngine {
+class PlaybackEngine implements IPlaybackEngine {
 
 	private final AtomicBoolean atEos = new AtomicBoolean();
 	private final AtomicBoolean stopPlaying = new AtomicBoolean();
 
-	private final VlcFactory vlcFactory;
+	private final MediaPlayerFactory vlcFactory;
 
 	private String m_filepath = null;
 	private IPlaybackStatusListener m_listener = null;
 	private PlayState m_playbackState = PlayState.STOPPED;
 
-	public PlaybackEngine (VlcFactory vlcFactory) {
+	public PlaybackEngine (MediaPlayerFactory vlcFactory) {
 		this.vlcFactory = vlcFactory;
 	}
 
@@ -37,7 +38,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 	@Override
 	public int readFileDuration(final String fpath) throws PlaybackException {
 		try {
-			return (int) TimeUnit.MILLISECONDS.toSeconds(Metadata.getDurationMilliseconds(this.vlcFactory.getFactory(), fpath));
+			return (int) TimeUnit.MILLISECONDS.toSeconds(Metadata.getDurationMilliseconds(this.vlcFactory, fpath));
 		}
 		catch (InterruptedException e) {
 			throw new PlaybackException(e);
@@ -147,7 +148,7 @@ public class PlaybackEngine implements IPlaybackEngine {
 			setStateAndCallListener(PlayState.LOADING);
 			AudioPlayerComponent player = this.playerRef.get();
 			if (player == null) {
-				player = new AudioPlayerComponent(this.vlcFactory.getFactory());
+				player = new AudioPlayerComponent(this.vlcFactory);
 				this.playerRef.set(player);
 				player.mediaPlayer().events().addMediaPlayerEventListener(this.mediaEventListener);
 			}

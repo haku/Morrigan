@@ -8,7 +8,7 @@ import uk.co.caprica.vlcj.media.Media;
 import uk.co.caprica.vlcj.media.MediaEventAdapter;
 import uk.co.caprica.vlcj.media.MediaEventListener;
 
-public class Metadata {
+class Metadata {
 
 	public static long getDurationMilliseconds(final MediaPlayerFactory factory, final String mrl) throws InterruptedException {
 		final Media media = factory.media().newMedia(mrl);

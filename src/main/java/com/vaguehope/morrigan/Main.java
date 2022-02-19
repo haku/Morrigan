@@ -8,9 +8,7 @@ import org.kohsuke.args4j.CmdLineParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vaguehope.morrigan.playbackimpl.vlc.EngineFactory;
-import com.vaguehope.morrigan.playbackimpl.vlc.PlaybackEngine;
-import com.vaguehope.morrigan.playbackimpl.vlc.VlcFactory;
+import com.vaguehope.morrigan.playbackimpl.vlc.VlcEngineFactory;
 import com.vaguehope.morrigan.tasks.AsyncTasksRegister;
 import com.vaguehope.morrigan.tasks.AsyncTasksRegisterImpl;
 import com.vaguehope.morrigan.util.DaemonThreadFactory;
@@ -51,8 +49,7 @@ public final class Main {
 		final AsyncTasksRegister asyncTasksRegister = new AsyncTasksRegisterImpl(
 				Executors.newCachedThreadPool(new DaemonThreadFactory("tsk")));
 
-		final VlcFactory vlcFactory = new VlcFactory();
-		final EngineFactory playbackEngineFactory = new EngineFactory(vlcFactory);
+		final VlcEngineFactory playbackEngineFactory = new VlcEngineFactory();
 
 		// TODO
 	}
