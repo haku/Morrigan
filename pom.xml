@@ -18,7 +18,7 @@
 		<jetty.version>9.4.35.v20201120</jetty.version>
 		<junit.version>4.13.2</junit.version>
 		<slf4j.version>1.7.32</slf4j.version>
-		<sshd.version>2.2.0</sshd.version>
+		<sshd.version>2.7.0</sshd.version>
 		<teleal.version>1.0.14</teleal.version>
 	</properties>
 
