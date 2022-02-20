@@ -18,9 +18,6 @@ public class ServerConfig implements AuthChecker {
 
 	private static final String SERVER_PROPS = "server.properties";  // TODO move to Config class.
 
-	private static final String KEY_PORT = "port";
-	private static final int DEFAULT_PORT = 8080;
-
 	private static final String KEY_PASS = "pass";
 	private static final String DEFAULT_PASS = "Morrigan";
 
@@ -40,13 +37,6 @@ public class ServerConfig implements AuthChecker {
 	public ServerConfig(final Config config, final Args args) {
 		this.propFile = new PropertiesFile(new File(config.getConfigDir(), SERVER_PROPS));
 		this.args = args;
-	}
-
-	public int getServerPort () throws IOException {
-		if (this.args.getHttpPort() > 0) {
-			return this.args.getHttpPort();
-		}
-		return this.propFile.getInt(KEY_PORT, DEFAULT_PORT);
 	}
 
 	public boolean verifyPassword (final String passToTest) throws IOException {

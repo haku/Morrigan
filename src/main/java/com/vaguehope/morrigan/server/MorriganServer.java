@@ -44,13 +44,13 @@ public class MorriganServer {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public MorriganServer (final Config config, final ServerConfig serverConfig,
+	public MorriganServer (final int httpPort, final Config config, final ServerConfig serverConfig,
 			final PlayerReader playerListener, final MediaFactory mediaFactory,
 			final AsyncTasksRegister asyncTasksRegister, final AsyncActions asyncActions,
 			final Transcoder transcoder,
 			final ScheduledExecutorService schEs) throws MorriganException {
 		try {
-			this.serverPort = serverConfig.getServerPort();
+			this.serverPort = httpPort;
 
 			final QueuedThreadPool threadPool = new QueuedThreadPool();
 			threadPool.setName("jty");

@@ -1,6 +1,7 @@
 package com.vaguehope.morrigan;
 
 import java.io.PrintStream;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -83,18 +84,21 @@ public final class Main {
 				config,
 				playerEx);
 
-		final Transcoder transcoder = new Transcoder("srv");
-		final ServerConfig serverConfig = new ServerConfig(config, args);
-		if (serverConfig.isServerPlayerEnabled()) {
-			final ExecutorService srvEx = new ThreadPoolExecutor(0, 1, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), new DaemonThreadFactory("srvplayer"));
-			final ServerPlayerContainer playerContainer = new ServerPlayerContainer(srvEx);
-			fillPlayerContainer(playerContainer, playerRegister);
-		}
-
 		final AsyncActions asyncActions = new AsyncActions(asyncTasksRegister, mediaFactory, config);
 		final ScheduledExecutorService srvSchEx = Executors.newScheduledThreadPool(1, new DaemonThreadFactory("srvsch"));
-		final MorriganServer server = new MorriganServer(config, serverConfig, playerRegister, mediaFactory, asyncTasksRegister, asyncActions, transcoder, srvSchEx);
-		server.start();
+		final Transcoder transcoder = new Transcoder("srv");
+
+		final ServerConfig serverConfig = new ServerConfig(config, args);
+		if (args.getHttpPort() > 0) {
+			if (serverConfig.isServerPlayerEnabled()) {
+				final ExecutorService srvEx = new ThreadPoolExecutor(0, 1, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), new DaemonThreadFactory("srvplayer"));
+				final ServerPlayerContainer playerContainer = new ServerPlayerContainer(srvEx);
+				fillPlayerContainer(playerContainer, playerRegister);
+			}
+
+			final MorriganServer server = new MorriganServer(args.getHttpPort(), config, serverConfig, playerRegister, mediaFactory, asyncTasksRegister, asyncActions, transcoder, srvSchEx);
+			server.start();
+		}
 
 		if (args.getSshPort() > 0) {
 			final SshUi sshUi = new SshUi(args.getSshPort(), config, serverConfig, playerRegister, mediaFactory, asyncTasksRegister);
@@ -106,7 +110,7 @@ public final class Main {
 			dlna.start();
 		}
 
-		server.join();  // Block forever.
+		new CountDownLatch(1).await();  // Block forever.
 	}
 
 	private static void fillPlayerContainer (final PlayerContainer container, final PlayerRegister playerRegister) {
