@@ -82,6 +82,12 @@ public class DlnaService {
 		this.mediaServer.start();
 
 		this.upnpService = new MyUpnpService(new MyUpnpServiceConfiguration());
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+			@Override
+			public void run() {
+				DlnaService.this.upnpService.shutdown();
+			}
+		});
 
 		this.playerHolder = new PlayerHolder(
 				this.playerRegister,
