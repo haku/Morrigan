@@ -13,12 +13,14 @@ import com.vaguehope.morrigan.util.MimeType;
 
 public abstract class TranscodeProfile {
 
+	private final Config config;
 	private final IMediaTrack item;
 	private final ItemTags tags;
 	private final Transcode transcode;
 	private final MimeType mimeType;
 
-	protected TranscodeProfile (final IMediaTrack item, final ItemTags tags, final Transcode transcode, final MimeType mimeType) {
+	protected TranscodeProfile (final Config config, final IMediaTrack item, final ItemTags tags, final Transcode transcode, final MimeType mimeType) {
+		this.config = config;
 		if (item == null) throw new IllegalArgumentException("Item required.");
 		if (transcode == null) throw new IllegalArgumentException("Transcode required.");
 		if (mimeType == null) throw new IllegalArgumentException("MimeType required.");
@@ -45,7 +47,7 @@ public abstract class TranscodeProfile {
 	 * Always call transcodeToFile() beforehand to ensure it if fresh.
 	 */
 	public File getCacheFileEvenIfItDoesNotExist () {
-		return cacheFile(this.item, this.transcode, this.mimeType);
+		return cacheFile(this.config, this.item, this.transcode, this.mimeType);
 	}
 
 	public File getCacheFileIfFresh () throws MorriganException, IOException {
@@ -68,12 +70,12 @@ public abstract class TranscodeProfile {
 		return cacheFile;
 	}
 
-	protected static File cacheFile (final IMediaItem item, final Transcode transcode, final MimeType mimeType) {
-		return cacheFile(cacheFileNameWithoutExtension(item, transcode), mimeType);
+	protected static File cacheFile (final Config config, final IMediaItem item, final Transcode transcode, final MimeType mimeType) {
+		return cacheFile(config, cacheFileNameWithoutExtension(item, transcode), mimeType);
 	}
 
-	protected static File cacheFile (final String nameWithoutExtension, final MimeType mimeType) {
-		return new File(Config.DEFAULT.getTranscodedDir(), nameWithoutExtension + "." + mimeType.getExt());
+	protected static File cacheFile (final Config config, final String nameWithoutExtension, final MimeType mimeType) {
+		return new File(config.getTranscodedDir(), nameWithoutExtension + "." + mimeType.getExt());
 	}
 
 	protected static String cacheFileNameWithoutExtension (final IMediaItem item, final Transcode transcode) {

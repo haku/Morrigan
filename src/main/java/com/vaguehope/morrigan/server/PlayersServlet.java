@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.xml.sax.SAXException;
 
 import com.megginson.sax.DataWriter;
+import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.DurationData;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
@@ -103,11 +104,13 @@ public class PlayersServlet extends HttpServlet {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private final PlayerReader playerListener;
+	private final Config config;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public PlayersServlet (final PlayerReader playerListener) {
+	public PlayersServlet (final PlayerReader playerListener, final Config config) {
 		this.playerListener = playerListener;
+		this.config = config;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -400,7 +403,7 @@ public class PlayersServlet extends HttpServlet {
 		FeedHelper.endFeed(dw);
 	}
 
-	private static void printPlayer (final HttpServletResponse resp, final Player player) throws IOException, SAXException, MorriganException {
+	private void printPlayer (final HttpServletResponse resp, final Player player) throws IOException, SAXException, MorriganException {
 		resp.setContentType("text/xml;charset=utf-8");
 		final DataWriter dw = FeedHelper.startDocument(resp.getWriter(), "player");
 
@@ -420,7 +423,7 @@ public class PlayersServlet extends HttpServlet {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private static void printPlayer (final DataWriter dw, final Player p, final int detailLevel) throws SAXException, MorriganException, IOException {
+	private void printPlayer (final DataWriter dw, final Player p, final int detailLevel) throws SAXException, MorriganException, IOException {
 		if (detailLevel < 0 || detailLevel > 1) throw new IllegalArgumentException("detailLevel must be 0 or 1, not " + detailLevel + ".");
 
 		final String listTitle;
@@ -516,7 +519,7 @@ public class PlayersServlet extends HttpServlet {
 					}
 
 					dw.startElement("track");
-					MlistsServlet.fillInMediaItem(dw, currentList, track, IncludeTags.YES, null);
+					MlistsServlet.fillInMediaItem(dw, currentList, track, IncludeTags.YES, null, this.config);
 					dw.endElement("track");
 				}
 			}

@@ -13,15 +13,18 @@ import java.util.Properties;
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.dlna.util.Quietly;
 
-public enum UserPrefs {
-	INSTANCE;
+public class UserPrefs {
 
-	private static final String PREF_FILE_NAME = "dlna.properties";
+	private static final String PREF_FILE_NAME = "dlna.properties";  // TODO move to Config class.
 
 	private final Properties properties = new Properties();
-	private final File prefsFile = new File(Config.getConfigDir(), PREF_FILE_NAME);
+	private final File prefsFile;
 	private final Object[] lock = new Object[] {};
 	private boolean cached = false;
+
+	private UserPrefs(final Config config) {
+		this.prefsFile = new File(config.getConfigDir(), PREF_FILE_NAME);
+	}
 
 	public void putValue (final String subject, final String object, final int value) throws IOException {
 		putValue(subject, object, String.valueOf(value));
@@ -37,7 +40,7 @@ public enum UserPrefs {
 		try {
 			return Integer.parseInt(raw);
 		}
-		catch (NumberFormatException e) {
+		catch (final NumberFormatException e) {
 			return defaultValue;
 		}
 	}

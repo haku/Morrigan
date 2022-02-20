@@ -7,12 +7,12 @@ import com.vaguehope.morrigan.server.ServerConfig;
 
 public class MnPasswordAuthenticator implements PasswordAuthenticator {
 
-	private final String currentUserName;
 	private final ServerConfig config;
+	private final String currentUserName;
 
-	public MnPasswordAuthenticator () {
+	public MnPasswordAuthenticator (final ServerConfig serverConfig) {
+		this.config = serverConfig;
 		this.currentUserName = System.getProperty("user.name");
-		this.config = new ServerConfig(null);
 	}
 
 	@Override

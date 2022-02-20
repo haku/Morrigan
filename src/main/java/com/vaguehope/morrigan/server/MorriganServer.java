@@ -44,21 +44,21 @@ public class MorriganServer {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public MorriganServer (final ServerConfig config,
+	public MorriganServer (final Config config, final ServerConfig serverConfig,
 			final PlayerReader playerListener, final MediaFactory mediaFactory,
 			final AsyncTasksRegister asyncTasksRegister, final AsyncActions asyncActions,
 			final Transcoder transcoder,
 			final ScheduledExecutorService schEs) throws MorriganException {
 		try {
-			this.serverPort = config.getServerPort();
+			this.serverPort = serverConfig.getServerPort();
 
 			final QueuedThreadPool threadPool = new QueuedThreadPool();
 			threadPool.setName("jty");
 			this.server = new Server(threadPool);
 			this.server.addLifeCycleListener(this.lifeCycleListener);
-			this.server.setHandler(makeContentHandler(config, playerListener, mediaFactory, asyncTasksRegister, asyncActions, transcoder, schEs));
+			this.server.setHandler(makeContentHandler(config, serverConfig, playerListener, mediaFactory, asyncTasksRegister, asyncActions, transcoder, schEs));
 
-			final InetAddress bindAddress = config.getBindAddress("HTTP");
+			final InetAddress bindAddress = serverConfig.getBindAddress("HTTP");
 			if (bindAddress == null) throw new IllegalStateException("Failed to find bind address.");
 			this.server.addConnector(createHttpConnector(this.server, bindAddress.getHostAddress(), this.serverPort));
 		}
@@ -74,16 +74,16 @@ public class MorriganServer {
 		return connector;
 	}
 
-	private static HandlerList makeContentHandler (final ServerConfig config, final PlayerReader playerListener, final MediaFactory mediaFactory, final AsyncTasksRegister asyncTasksRegister, final AsyncActions asyncActions, final Transcoder transcoder, final ScheduledExecutorService schEs) throws IOException {
+	private static HandlerList makeContentHandler (final Config config, final ServerConfig serverConfig, final PlayerReader playerListener, final MediaFactory mediaFactory, final AsyncTasksRegister asyncTasksRegister, final AsyncActions asyncActions, final Transcoder transcoder, final ScheduledExecutorService schEs) throws IOException {
 		final ServletContextHandler context = getWuiContext();
 
-		final FilterHolder authFilterHolder = new FilterHolder(new AuthFilter(config, Config.DEFAULT, schEs));
+		final FilterHolder authFilterHolder = new FilterHolder(new AuthFilter(serverConfig, config, schEs));
 		context.addFilter(authFilterHolder, "/*", null);
 
-		context.addServlet(new ServletHolder(new LibraryServlet(Config.DEFAULT)), LibraryServlet.CONTEXTPATH + "/*");
-		context.addServlet(new ServletHolder(new PlayersServlet(playerListener)), PlayersServlet.CONTEXTPATH + "/*");
+		context.addServlet(new ServletHolder(new LibraryServlet(config)), LibraryServlet.CONTEXTPATH + "/*");
+		context.addServlet(new ServletHolder(new PlayersServlet(playerListener, config)), PlayersServlet.CONTEXTPATH + "/*");
 		context.addServlet(new ServletHolder(
-				new MlistsServlet(playerListener, mediaFactory, asyncActions, transcoder, Config.DEFAULT)),
+				new MlistsServlet(playerListener, mediaFactory, asyncActions, transcoder, config)),
 				MlistsServlet.CONTEXTPATH + "/*");
 		context.addServlet(new ServletHolder(new StatusServlet(asyncTasksRegister)), StatusServlet.CONTEXTPATH + "/*");
 		context.addServlet(new ServletHolder(new HostInfoServlet()), HostInfoServlet.CONTEXTPATH + "/*");

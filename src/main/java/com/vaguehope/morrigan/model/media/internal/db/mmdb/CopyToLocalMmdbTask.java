@@ -26,11 +26,13 @@ public class CopyToLocalMmdbTask<T extends IMediaItem> implements MorriganTask {
 	private final IMediaItemList<T> fromList;
 	private final Collection<T> itemsToCopy;
 	private final ILocalMixedMediaDb toDb;
+	private final Config config;
 
-	public CopyToLocalMmdbTask (final IMediaItemList<T> fromList, final Collection<T> itemsToCopy, final ILocalMixedMediaDb toDb) {
+	public CopyToLocalMmdbTask (final IMediaItemList<T> fromList, final Collection<T> itemsToCopy, final ILocalMixedMediaDb toDb, final Config config) {
 		this.fromList = fromList;
 		this.itemsToCopy = itemsToCopy;
 		this.toDb = toDb;
+		this.config = config;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -48,17 +50,17 @@ public class CopyToLocalMmdbTask<T extends IMediaItem> implements MorriganTask {
 			taskEventListener.onStart();
 			taskEventListener.beginTask("Copying", this.itemsToCopy.size());
 
-			File coDir = getCheckoutDirectory(this.toDb);
+			final File coDir = getCheckoutDirectory(this.toDb);
 
 			/*
 			 * TODO rewrite this using a trans-clone?
 			 */
 
-			for (T item : this.itemsToCopy) {
+			for (final T item : this.itemsToCopy) {
 				taskEventListener.subTask(item.getTitle());
 
-				File coItemDir = getCheckoutItemDirectory(coDir, item);
-				File coFile = this.fromList.copyItemFile(item, coItemDir);
+				final File coItemDir = getCheckoutItemDirectory(coDir, item);
+				final File coFile = this.fromList.copyItemFile(item, coItemDir);
 				if (!coFile.exists()) throw new FileNotFoundException("After fetching '" + item.getRemoteLocation() + "' can't find '" + coFile.getAbsolutePath() + "'.");
 
 				// TODO FIXME re-write remote path with URL we fetched it from?  Perhaps this should be returned from copyItemFile()?
@@ -67,7 +69,7 @@ public class CopyToLocalMmdbTask<T extends IMediaItem> implements MorriganTask {
 				if (this.toDb.getDbLayer().hasFile(coFile).isKnown()) {
 					this.toDb.getDbLayer().removeFile(coFile.getAbsolutePath());
 				}
-				IMixedMediaItem addedItem = this.toDb.addFile(coFile);
+				final IMixedMediaItem addedItem = this.toDb.addFile(coFile);
 				addedItem.setFromMediaItem(item);
 				this.toDb.persistTrackData(addedItem);
 
@@ -83,7 +85,7 @@ public class CopyToLocalMmdbTask<T extends IMediaItem> implements MorriganTask {
 			}
 
 		}
-		catch (Exception e) { // NOSONAR all task errors to be reported by UI.
+		catch (final Exception e) { // NOSONAR all task errors to be reported by UI.
 			ret = new TaskResult(TaskOutcome.FAILED, "Throwable while fetching media.", e);
 		}
 
@@ -94,15 +96,15 @@ public class CopyToLocalMmdbTask<T extends IMediaItem> implements MorriganTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	// TODO extract this to Config class?
-	private static File getCheckoutDirectory (final ILocalMixedMediaDb db) {
-		File coDir = new File(Config.getConfigDir(), "checkout");
+	private File getCheckoutDirectory (final ILocalMixedMediaDb db) {
+		final File coDir = new File(this.config.getConfigDir(), "checkout");
 		if (!coDir.exists()) {
 			if (!coDir.mkdir()) {
 				throw new RuntimeException("Failed to mkdir '" + coDir.getAbsolutePath() + "'.");
 			}
 		}
 
-		File dbCoDir = new File(coDir, db.getListName());
+		final File dbCoDir = new File(coDir, db.getListName());
 		if (!dbCoDir.exists()) {
 			if (!dbCoDir.mkdir()) {
 				throw new RuntimeException("Failed to mkdir '" + dbCoDir.getAbsolutePath() + "'.");
@@ -113,9 +115,9 @@ public class CopyToLocalMmdbTask<T extends IMediaItem> implements MorriganTask {
 	}
 
 	private static File getCheckoutItemDirectory (final File coDir, final IMediaItem item) {
-		String srcPath = item.getRemoteLocation();
+		final String srcPath = item.getRemoteLocation();
 
-		File dir = new File(coDir, ChecksumHelper.md5String(srcPath));
+		final File dir = new File(coDir, ChecksumHelper.md5String(srcPath));
 		if (!dir.exists()) {
 			if (!dir.mkdir()) {
 				throw new RuntimeException("Failed to mkdir '" + dir.getAbsolutePath() + "'.");

@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 
+import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.engines.common.ImplException;
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine;
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
@@ -23,6 +24,7 @@ import com.vaguehope.morrigan.player.LocalPlayer;
 import com.vaguehope.morrigan.player.LocalPlayerSupport;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlayerRegister;
+import com.vaguehope.morrigan.player.PlayerStateStorage;
 import com.vaguehope.morrigan.util.MnLogger;
 
 public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
@@ -37,11 +39,16 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Main.
 
-	public LocalPlayerImpl (final String id, final String name, final LocalPlayerSupport localPlayerSupport,
+	public LocalPlayerImpl(
+			final String id,
+			final String name,
+			final LocalPlayerSupport localPlayerSupport,
 			final PlayerRegister register,
 			final PlaybackEngineFactory playbackEngineFactory,
-			final ExecutorService executorService) {
-		super(id, name, register);
+			final ExecutorService executorService,
+			final PlayerStateStorage playerStateStorage,
+			final Config config) {
+		super(id, name, register, playerStateStorage, config);
 		this.localPlayerSupport = localPlayerSupport;
 		this.playbackEngineFactory = playbackEngineFactory;
 		this.executorService = executorService;

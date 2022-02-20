@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
+import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.engines.playback.PlaybackEngineFactory;
 import com.vaguehope.morrigan.player.LocalPlayer;
 import com.vaguehope.morrigan.player.LocalPlayerSupport;
@@ -31,11 +32,13 @@ public class PlayerRegisterImpl implements PlayerRegister, PlayerReader {
 
 	private final PlaybackEngineFactory playbackEngineFactory;
 	private final PlayerStateStorage stateStorage;
+	private Config config;
 	private final ExecutorService executorService;
 
-	public PlayerRegisterImpl (final PlaybackEngineFactory playbackEngineFactory, final PlayerStateStorage stateStorage, final ExecutorService executorService) {
+	public PlayerRegisterImpl (final PlaybackEngineFactory playbackEngineFactory, final PlayerStateStorage stateStorage, final Config config, final ExecutorService executorService) {
 		this.playbackEngineFactory = playbackEngineFactory;
 		this.stateStorage = stateStorage;
+		this.config = config;
 		this.executorService = executorService;
 	}
 
@@ -115,7 +118,8 @@ public class PlayerRegisterImpl implements PlayerRegister, PlayerReader {
 
 	@Override
 	public LocalPlayer makeLocal (final String prefix, final String name, final LocalPlayerSupport localPlayerSupport) {
-		final LocalPlayerImpl p = new LocalPlayerImpl(nextIndex(prefix), name, localPlayerSupport, this, this.playbackEngineFactory, this.executorService);
+		final LocalPlayerImpl p = new LocalPlayerImpl(nextIndex(prefix), name, localPlayerSupport, this, this.playbackEngineFactory,
+				this.executorService, this.stateStorage, this.config);
 		this.stateStorage.requestReadState(p);
 		this.localPlayerIds.add(p.getId());
 		register(p);

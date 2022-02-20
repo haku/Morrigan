@@ -16,7 +16,7 @@ import com.vaguehope.morrigan.util.PropertiesFile;
 
 public class ServerConfig implements AuthChecker {
 
-	private static final String SERVER_PROPS = "server.properties";
+	private static final String SERVER_PROPS = "server.properties";  // TODO move to Config class.
 
 	private static final String KEY_PORT = "port";
 	private static final int DEFAULT_PORT = 8080;
@@ -34,11 +34,11 @@ public class ServerConfig implements AuthChecker {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ServerConfig.class);
 
-	private final PropertiesFile propFile = new PropertiesFile(new File(Config.getConfigDir(), SERVER_PROPS));
-
+	private final PropertiesFile propFile;
 	private final Args args;
 
-	public ServerConfig(final Args args) {
+	public ServerConfig(final Config config, final Args args) {
+		this.propFile = new PropertiesFile(new File(config.getConfigDir(), SERVER_PROPS));
 		this.args = args;
 	}
 

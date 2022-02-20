@@ -17,6 +17,7 @@ import org.seamless.util.MimeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.dlna.DlnaException;
 import com.vaguehope.morrigan.dlna.MediaFormat;
 import com.vaguehope.morrigan.dlna.UpnpHelper;
@@ -29,6 +30,7 @@ import com.vaguehope.morrigan.model.media.IMediaTrackList;
 import com.vaguehope.morrigan.player.AbstractPlayer;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlayerRegister;
+import com.vaguehope.morrigan.player.PlayerStateStorage;
 import com.vaguehope.morrigan.transcode.FfprobeCache;
 import com.vaguehope.morrigan.util.Objs;
 
@@ -61,9 +63,11 @@ public abstract class AbstractDlnaPlayer extends AbstractPlayer {
 			final MediaServer mediaServer,
 			final MediaFileLocator mediaFileLocator,
 			final ScheduledExecutorService scheduledExecutor,
+			final PlayerStateStorage playerStateStorage,
+			final Config config,
 			final AvTransportActions avTransportActions,
 			final RenderingControlActions renderingControlActions) {
-		super(UpnpHelper.idFromRemoteService(avTransportSvc), avTransportSvc.getDevice().getDetails().getFriendlyName(), register);
+		super(UpnpHelper.idFromRemoteService(avTransportSvc), avTransportSvc.getDevice().getDetails().getFriendlyName(), register, playerStateStorage, config);
 		this.controlPoint = controlPoint;
 		this.avTransportSvc = avTransportSvc;
 

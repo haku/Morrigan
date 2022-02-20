@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.ItemTags;
@@ -120,7 +121,7 @@ public class AudioStreamExtractOrTranscode extends TranscodeProfile {
 
 	private static final Map<MimeType, Codec> MIMETYPE_TO_CODEC;
 	static {
-		final Map<MimeType, Codec> m = new HashMap<MimeType, Codec>();
+		final Map<MimeType, Codec> m = new HashMap<>();
 		for (final Codec c : Codec.values()) {
 			for (final MimeType mt : c.getMimeTypes()) {
 				m.put(mt, c);
@@ -135,16 +136,16 @@ public class AudioStreamExtractOrTranscode extends TranscodeProfile {
 		return codec;
 	}
 
-	public AudioStreamExtractOrTranscode (final IMediaTrack item, final ItemTags tags, final Transcode transcode,
+	public AudioStreamExtractOrTranscode (final Config config, final IMediaTrack item, final ItemTags tags, final Transcode transcode,
 			final MimeType fallbackType, final MimeType... otherTypes) throws IOException {
-		this(item, tags, transcode, fallbackType, otherTypes.length > 0
+		this(config, item, tags, transcode, fallbackType, otherTypes.length > 0
 		? EnumSet.copyOf(Arrays.asList(otherTypes))
 		: EnumSet.noneOf(MimeType.class));
 	}
 
-	public AudioStreamExtractOrTranscode (final IMediaTrack item, final ItemTags tags, final Transcode transcode,
+	public AudioStreamExtractOrTranscode (final Config config, final IMediaTrack item, final ItemTags tags, final Transcode transcode,
 			final MimeType fallbackType, final Set<MimeType> otherTypes) throws IOException {
-		super(item, tags, transcode, findAudioStreamType(item, transcode, fallbackType, otherTypes));
+		super(config, item, tags, transcode, findAudioStreamType(config, item, transcode, fallbackType, otherTypes));
 
 		if (!MIMETYPE_TO_CODEC.containsKey(fallbackType)) throw new IllegalArgumentException("Unsupported type: " + fallbackType);
 		for (final MimeType type : otherTypes) {
@@ -157,15 +158,15 @@ public class AudioStreamExtractOrTranscode extends TranscodeProfile {
 	 * @param fallbackType The default, do lossy transcode if needed.
 	 * @param otherTypes The preferred types, extract existing stream if possible.
 	 */
-	private static MimeType findAudioStreamType (final IMediaItem item, final Transcode transcode, final MimeType fallbackType, final Set<MimeType> otherTypes) throws IOException {
+	private static MimeType findAudioStreamType (final Config config, final IMediaItem item, final Transcode transcode, final MimeType fallbackType, final Set<MimeType> otherTypes) throws IOException {
 		final String nameWithoutExtension = cacheFileNameWithoutExtension(item, transcode);
 
 		// Check for existing transcode.
-		if (cacheFile(nameWithoutExtension, fallbackType).exists()) {
+		if (cacheFile(config, nameWithoutExtension, fallbackType).exists()) {
 			return fallbackType;
 		}
 		for (final MimeType type : otherTypes) {
-			if (cacheFile(nameWithoutExtension, type).exists()) {
+			if (cacheFile(config, nameWithoutExtension, type).exists()) {
 				return type;
 			}
 		}
@@ -189,7 +190,7 @@ public class AudioStreamExtractOrTranscode extends TranscodeProfile {
 			throw new IllegalArgumentException("Output file must end with " + ext + ": " + outputFile.getName());
 		}
 
-		final List<String> cmd = new ArrayList<String>();
+		final List<String> cmd = new ArrayList<>();
 
 		cmd.add("ffmpeg");
 		cmd.add("-hide_banner");

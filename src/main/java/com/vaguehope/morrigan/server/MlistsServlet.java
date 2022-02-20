@@ -439,7 +439,7 @@ public class MlistsServlet extends HttpServlet {
 		else if (action.equals(CMD_TRANSCODE)) {
 			final String transcode = StringHelper.trimToNull(req.getParameter(PARAM_TRANSCODE));
 			if (transcode != null) {
-				final TranscodeProfile tProfile = Transcode.parse(transcode).profileForItem(mmdb, item);
+				final TranscodeProfile tProfile = Transcode.parse(transcode).profileForItem(this.config, mmdb, item);
 				this.transcoder.transcodeToFile(tProfile);
 			}
 			else {
@@ -458,7 +458,7 @@ public class MlistsServlet extends HttpServlet {
 				mmdb.read();
 				resp.setContentType("text/plain");
 				final Collection<IMixedMediaItem> tracks = mmdb.getAlbumItems(MediaType.TRACK, album);
-				final List<PlayItem> trackPlayItems = new ArrayList<PlayItem>();
+				final List<PlayItem> trackPlayItems = new ArrayList<>();
 				for (final IMixedMediaItem track : tracks) {
 					trackPlayItems.add(new PlayItem(mmdb, track));
 				}
@@ -556,7 +556,7 @@ public class MlistsServlet extends HttpServlet {
 
 						final String transcode = StringHelper.trimToNull(req.getParameter(PARAM_TRANSCODE));
 						if (transcode != null) {
-							final TranscodeProfile tProfile = Transcode.parse(transcode).profileForItem(mmdb, item);
+							final TranscodeProfile tProfile = Transcode.parse(transcode).profileForItem(this.config, mmdb, item);
 							final File transcodedFile = tProfile.getCacheFileIfFresh();
 							if (transcodedFile != null) {
 								ServletHelper.returnFile(transcodedFile, tProfile.getMimeType().getMimeType(), null, req.getHeader("Range"), resp);
@@ -607,7 +607,7 @@ public class MlistsServlet extends HttpServlet {
 			final Map[] arr = new Map[tags.size()];
 			int i = 0;
 			for (final Entry<String, MediaTag> tag : tags.entrySet()) {
-				final Map<String, String> m = new HashMap<String, String>(2);
+				final Map<String, String> m = new HashMap<>(2);
 				m.put("label", tag.getKey());
 				m.put("value", tag.getValue().getTag());
 				arr[i++] = m;
@@ -722,13 +722,13 @@ public class MlistsServlet extends HttpServlet {
 		NO, YES, YES_INCLUDING_DELETED;
 	}
 
-	private static void printMlistLong (final HttpServletResponse resp, final IMixedMediaDb ml,
+	private void printMlistLong (final HttpServletResponse resp, final IMixedMediaDb ml,
 			final IncludeSrcs includeSrcs, final IncludeItems includeItems, final IncludeTags includeTags)
 					throws SAXException, MorriganException, DbException, IOException {
 		printMlistLong(resp, ml, includeSrcs, includeItems, includeTags, null, 0, null, null, false, null);
 	}
 
-	private static void printMlistLong (final HttpServletResponse resp, final IMixedMediaDb ml,
+	private void printMlistLong (final HttpServletResponse resp, final IMixedMediaDb ml,
 			final IncludeSrcs includeSrcs, final IncludeItems includeItems, final IncludeTags includeTags,
 			final String queryString, final int maxQueryResults,
 			final IDbColumn[] sortColumns, final SortDirection[] sortDirections, final boolean includeDisabled,
@@ -789,7 +789,7 @@ public class MlistsServlet extends HttpServlet {
 		if (includeItems == IncludeItems.YES) {
 			for (final IMixedMediaItem mi : items) {
 				dw.startElement("entry");
-				fillInMediaItem(dw, ml, mi, includeTags, transcode);
+				fillInMediaItem(dw, ml, mi, includeTags, transcode, this.config);
 				dw.endElement("entry");
 			}
 		}
@@ -798,7 +798,7 @@ public class MlistsServlet extends HttpServlet {
 	}
 
 	static void fillInMediaItem (final DataWriter dw, final IMediaTrackList<? extends IMediaTrack> ml, final IMediaItem mi,
-			final IncludeTags includeTags, final String transcodeStr) throws SAXException, MorriganException, IOException {
+			final IncludeTags includeTags, final String transcodeStr, final Config config) throws SAXException, MorriganException, IOException {
 		String title = mi.getTitle();
 		long fileSize = mi.getFileSize();
 		final BigInteger originalFileHash = mi.getHashcode();
@@ -811,7 +811,7 @@ public class MlistsServlet extends HttpServlet {
 		if (transcode != Transcode.NONE) {
 			if (mi instanceof IMediaTrack) {
 				if (tags == null) tags = ml.readTags(mi);
-				final TranscodeProfile tProfile = transcode.profileForItem((IMediaTrack) mi, tags);
+				final TranscodeProfile tProfile = transcode.profileForItem(config, (IMediaTrack) mi, tags);
 				if (tProfile != null) {
 					title = tProfile.getTranscodedTitle();
 

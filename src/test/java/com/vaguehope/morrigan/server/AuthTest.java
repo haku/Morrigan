@@ -10,7 +10,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import com.vaguehope.morrigan.config.Config;
 
@@ -18,11 +20,15 @@ import com.vaguehope.morrigan.config.Config;
 
 public class AuthTest {
 
+	@Rule public TemporaryFolder tmp = new TemporaryFolder();
+
+	private Config config;
 	private LocalServer server;
 	private ScheduledExecutorService schEs;
 
 	@Before
 	public void before () throws Exception {
+		this.config = new Config(this.tmp.getRoot());
 		this.server = new LocalServer();
 		this.schEs = Executors.newScheduledThreadPool(1);
 		setupMockServer();
@@ -55,7 +61,7 @@ public class AuthTest {
 				return true;
 			}
 		};
-		final AuthFilter authFilter = new AuthFilter(authChecker, Config.DEFAULT, this.schEs);
+		final AuthFilter authFilter = new AuthFilter(authChecker, this.config, this.schEs);
 		final FilterHolder authFilterHolder = new FilterHolder(authFilter);
 		this.server.getContextHandler().addFilter(authFilterHolder, "/*", null);
 	}

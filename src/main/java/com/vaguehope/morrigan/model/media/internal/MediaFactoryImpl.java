@@ -52,14 +52,14 @@ public class MediaFactoryImpl implements MediaFactory {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private final Map<MediaListReference, ILocalMixedMediaDb> addedLocals = new ConcurrentHashMap<MediaListReference, ILocalMixedMediaDb>();
+	private final Map<MediaListReference, ILocalMixedMediaDb> addedLocals = new ConcurrentHashMap<>();
 
 	@Override
 	public Collection<MediaListReference> getAllLocalMixedMediaDbs () {
 		final List<MediaListReference> real = LocalMixedMediaDbHelper.getAllMmdb(this.config);
 		if (this.addedLocals.size() < 1) return real;
 
-		final Collection<MediaListReference> ret = new ArrayList<MediaListReference>();
+		final Collection<MediaListReference> ret = new ArrayList<>();
 		ret.addAll(real);
 		ret.addAll(this.addedLocals.keySet());
 		return ret;
@@ -140,11 +140,11 @@ public class MediaFactoryImpl implements MediaFactory {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private final Map<String, IMixedMediaDb> externalDbs = new ConcurrentSkipListMap<String, IMixedMediaDb>();
+	private final Map<String, IMixedMediaDb> externalDbs = new ConcurrentSkipListMap<>();
 
 	@Override
 	public Collection<MediaListReference> getExternalDbs () {
-		final List<MediaListReference> ret = new ArrayList<MediaListReference>();
+		final List<MediaListReference> ret = new ArrayList<>();
 		for (IMixedMediaDb db : this.externalDbs.values()) {
 			ret.add(new MediaListReferenceImpl(MediaListType.EXTMMDB, db.getListId(), db.getListName()));
 		}
@@ -187,12 +187,12 @@ public class MediaFactoryImpl implements MediaFactory {
 
 	@Override
 	public <T extends IMediaItem> MorriganTask getMediaFileCopyTask (final IMediaItemList<T> mediaItemList, final List<T> mediaSelection, final File targetDirectory) {
-		return new MediaFileCopyTask<T>(mediaItemList, mediaSelection, targetDirectory);
+		return new MediaFileCopyTask<>(mediaItemList, mediaSelection, targetDirectory);
 	}
 
 	@Override
 	public <T extends IMediaItem> MorriganTask getNewCopyToLocalMmdbTask (final IMediaItemList<T> fromList, final Collection<T> itemsToCopy, final ILocalMixedMediaDb toDb) {
-		return new CopyToLocalMmdbTask<T>(fromList, itemsToCopy, toDb);
+		return new CopyToLocalMmdbTask<>(fromList, itemsToCopy, toDb, this.config);
 	}
 
 	@Override

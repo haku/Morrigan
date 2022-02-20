@@ -17,6 +17,7 @@ import org.fourthline.cling.model.types.UDN;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.dlna.UpnpHelper;
 import com.vaguehope.morrigan.dlna.content.MediaFileLocator;
 import com.vaguehope.morrigan.dlna.httpserver.MediaServer;
@@ -34,6 +35,7 @@ public class PlayerHolder {
 	private final MediaServer mediaServer;
 	private final MediaFileLocator mediaFileLocator;
 	private final PlayerStateStorage stateStorage;
+	private final Config config;
 	private final ScheduledExecutorService scheduledExecutor;
 
 	private final AtomicBoolean alive = new AtomicBoolean(true);
@@ -41,16 +43,15 @@ public class PlayerHolder {
 	private final ConcurrentMap<UDN, Set<AbstractDlnaPlayer>> players = new ConcurrentHashMap<>();
 	private final Map<String, PlayerState> backedupPlayerState = new ConcurrentHashMap<>();
 
-
-
 	public PlayerHolder (final PlayerRegister playerRegister, final ControlPoint controlPoint,
 			final MediaServer mediaServer, final MediaFileLocator mediaFileLocator,
-			final PlayerStateStorage playerStateStorage, final ScheduledExecutorService scheduledExecutor) {
+			final PlayerStateStorage playerStateStorage, final Config config, final ScheduledExecutorService scheduledExecutor) {
 		this.playerRegister = playerRegister;
 		this.controlPoint = controlPoint;
 		this.mediaServer = mediaServer;
 		this.mediaFileLocator = mediaFileLocator;
 		this.stateStorage = playerStateStorage;
+		this.config = config;
 		this.scheduledExecutor = scheduledExecutor;
 	}
 
@@ -107,12 +108,12 @@ public class PlayerHolder {
 		if (StringHelper.blank(System.getenv("DLNA_OLD_PLAYER"))) {
 			player = new GoalSeekingDlnaPlayer(this.playerRegister,
 					this.controlPoint, avTransport, this.mediaServer, this.mediaFileLocator,
-					this.scheduledExecutor);
+					this.scheduledExecutor, this.stateStorage, this.config);
 		}
 		else {
 			player = new DlnaPlayer(this.playerRegister,
 					this.controlPoint, avTransport, this.mediaServer, this.mediaFileLocator,
-					this.scheduledExecutor);
+					this.scheduledExecutor, this.stateStorage, this.config);
 		}
 
 		final PlayerState previousState = this.backedupPlayerState.get(UpnpHelper.remoteServiceUid(avTransport));

@@ -29,6 +29,7 @@ import org.fourthline.cling.transport.spi.NetworkAddressFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.dlna.content.MediaFileLocator;
 import com.vaguehope.morrigan.dlna.content.MediaServerDeviceFactory;
 import com.vaguehope.morrigan.dlna.extcd.ContentDirectoryHolder;
@@ -45,6 +46,7 @@ public class DlnaService {
 	private static final int BG_THREADS = 3;
 	private static final Logger LOG = LoggerFactory.getLogger(DlnaService.class);
 
+	private final Config config;
 	private final ServerConfig serverConfig;
 	private final MediaFactory mediaFactory;
 	private final PlayerRegister playerRegister;
@@ -58,7 +60,8 @@ public class DlnaService {
 	private ContentDirectoryHolder contentDirectoryHolder;
 	private ScheduledExecutorService scheduledExecutor;
 
-	public DlnaService(final ServerConfig serverConfig, final MediaFactory mediaFactory, final PlayerRegister playerRegister) throws IOException {
+	public DlnaService(final Config config, final ServerConfig serverConfig, final MediaFactory mediaFactory, final PlayerRegister playerRegister) throws IOException {
+		this.config = config;
 		this.serverConfig = serverConfig;
 		this.mediaFactory = mediaFactory;
 		this.playerRegister = playerRegister;
@@ -85,7 +88,8 @@ public class DlnaService {
 				this.upnpService.getControlPoint(),
 				this.mediaServer,
 				mediaFileLocator,
-				new PlayerStateStorage(this.mediaFactory, this.scheduledExecutor),
+				new PlayerStateStorage(this.mediaFactory, this.scheduledExecutor, this.config),
+				this.config,
 				this.scheduledExecutor);
 
 		this.upnpService.getRegistry().addDevice(new MediaServerDeviceFactory(
@@ -95,7 +99,7 @@ public class DlnaService {
 				mediaFileLocator
 				).getDevice());
 
-		this.contentDirectoryHolder = new ContentDirectoryHolder(this.upnpService.getControlPoint(), this.mediaFactory);
+		this.contentDirectoryHolder = new ContentDirectoryHolder(this.upnpService.getControlPoint(), this.mediaFactory, this.config);
 
 		this.upnpService.getRegistry().addListener(new DeviceWatcher(this.playerHolder, this.contentDirectoryHolder));
 		this.upnpService.getControlPoint().search();

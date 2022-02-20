@@ -33,16 +33,18 @@ public class PlayerStateStorage {
 	private static final String DIR_NAME = "playerstate";
 	private static final Logger LOG = Logger.getLogger(PlayerStateStorage.class.getName());
 
-	private final Map<String, IMixedMediaDb> listCache = new ConcurrentHashMap<String, IMixedMediaDb>();
+	private final Map<String, IMixedMediaDb> listCache = new ConcurrentHashMap<>();
 	private final MediaFactory mf;
 	private final ScheduledExecutorService schEx;
+	private Config config;
 
-	public PlayerStateStorage (final MediaFactory mf, final ScheduledExecutorService schEx) {
+	public PlayerStateStorage (final MediaFactory mf, final ScheduledExecutorService schEx, final Config config) {
 		this.mf = mf;
 		this.schEx = schEx;
+		this.config = config;
 	}
 
-	public static void writeState (final Player player) {
+	public void writeState (final Player player) {
 		try {
 			final File outFile = getFile(player.getId());
 			final File tmpFile = getTmpFile(outFile);
@@ -147,8 +149,8 @@ public class PlayerStateStorage {
 		}
 	}
 
-	private static File getFile (final String playerId) {
-		final File dir = new File(Config.getConfigDir(), DIR_NAME);
+	private File getFile (final String playerId) {
+		final File dir = new File(this.config.getConfigDir(), DIR_NAME);
 		if (!dir.exists()) dir.mkdirs();
 		return new File(dir, playerId);
 	}

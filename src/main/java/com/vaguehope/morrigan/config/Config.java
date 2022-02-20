@@ -1,23 +1,54 @@
 package com.vaguehope.morrigan.config;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.vaguehope.morrigan.Args;
 
 
 public class Config {
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private static final String DIR_CONFIG = ".morrigan";
-
-	public static File getConfigDir () {
-		return new File(System.getProperty("user.home"), DIR_CONFIG);
-	}
-
-	public static final Config DEFAULT = new Config(getConfigDir());
+	private static final Logger LOG = LoggerFactory.getLogger(Config.class);
 
 	private final File configDir;
 
+	public static Config fromArgs(final Args args) throws IOException {
+		final String argsPath = args.getConfigPath();
+		final File dir;
+		if (argsPath != null) {
+			dir = new File(argsPath);
+			checkExistsAndIsDirectory(dir, argsPath);
+		}
+		else {
+			final File home = new File(System.getProperty("user.home"));
+			checkExistsAndIsDirectory(home, argsPath);
+			dir = new File(home, DIR_CONFIG);
+			mkdir(dir);
+		}
+		return new Config(dir);
+	}
+
+	private static void checkExistsAndIsDirectory(final File dir, final String pathForErr) throws FileNotFoundException, IOException {
+		if (!dir.exists()) {
+			throw new FileNotFoundException("Not found: " + pathForErr);
+		}
+		if (!dir.isDirectory()) {
+			throw new IOException("Not a directory: " + pathForErr);
+		}
+	}
+
 	public Config (final File configDir) {
 		this.configDir = configDir;
+		LOG.info("Config directory: {}", configDir.getAbsolutePath());
+	}
+
+	public File getConfigDir() {
+		return this.configDir;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -26,7 +57,7 @@ public class Config {
 	public static final String PL_FILE_EXT = ".morrigan_pl";
 
 	public File getPlDir () {
-		File f = new File(this.configDir, PL_DIR);
+		final File f = new File(this.configDir, PL_DIR);
 		mkdir(f);
 		return f;
 	}
@@ -38,7 +69,7 @@ public class Config {
 	public static final String LIB_REMOTE_FILE_EXT = ".remote.db3";
 
 	public File getLibDir () {
-		File f = new File(this.configDir, LIB_DIR);
+		final File f = new File(this.configDir, LIB_DIR);
 		mkdir(f);
 		return f;
 	}
@@ -49,7 +80,7 @@ public class Config {
 	public static final String GALLERY_LOCAL_FILE_EXT = ".local.db3";
 
 	public File getGalleryDir () {
-		File f = new File(this.configDir, GALLERY_DIR);
+		final File f = new File(this.configDir, GALLERY_DIR);
 		mkdir(f);
 		return f;
 	}
@@ -61,7 +92,7 @@ public class Config {
 	public static final String MMDB_REMOTE_FILE_EXT = ".remote.db3";
 
 	public File getMmdbDir () {
-		File f = new File(this.configDir, MMDB_DIR);
+		final File f = new File(this.configDir, MMDB_DIR);
 		mkdir(f);
 		return f;
 	}
@@ -84,8 +115,8 @@ public class Config {
 	 * @return Array of lower-case strings without dots.  e.g. "mp3", "ogg".
 	 */
 	public static String[] getMediaFileTypes () {
-		String types = System.getProperty(PROP_MEDIA_TYPES, DEFAULT_MEDIA_TYPES);
-		String[] arrTypes = types.split("\\|");
+		final String types = System.getProperty(PROP_MEDIA_TYPES, DEFAULT_MEDIA_TYPES);
+		final String[] arrTypes = types.split("\\|");
 
 		for (int i = 0; i < arrTypes.length; i++) {
 			arrTypes[i] = arrTypes[i].toLowerCase();
@@ -98,8 +129,8 @@ public class Config {
 	 * @return Array of lower-case strings without dots.  e.g. "mp3", "ogg".
 	 */
 	public static String[] getPictureFileTypes () {
-		String types = System.getProperty(PROP_MEDIA_PICTURE_TYPES, DEFAULT_MEDIA_PICTURE_TYPES);
-		String[] arrTypes = types.split("\\|");
+		final String types = System.getProperty(PROP_MEDIA_PICTURE_TYPES, DEFAULT_MEDIA_PICTURE_TYPES);
+		final String[] arrTypes = types.split("\\|");
 
 		for (int i = 0; i < arrTypes.length; i++) {
 			arrTypes[i] = arrTypes[i].toLowerCase();

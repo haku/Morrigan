@@ -66,38 +66,43 @@ public final class Main {
 	}
 
 	private static void run (final Args args) throws Exception { // NOSONAR
+		final Config config = Config.fromArgs(args);
+
 		final AsyncTasksRegister asyncTasksRegister = new AsyncTasksRegisterImpl(
 				Executors.newCachedThreadPool(new DaemonThreadFactory("tsk")));
 
 		final VlcEngineFactory playbackEngineFactory = new VlcEngineFactory();
-		final MediaFactory mediaFactory = new MediaFactoryImpl(Config.DEFAULT, playbackEngineFactory);
+		final MediaFactory mediaFactory = new MediaFactoryImpl(config, playbackEngineFactory);
 
 		final ScheduledThreadPoolExecutor playerEx = new ScheduledThreadPoolExecutor(1, new DaemonThreadFactory("player"));
 		playerEx.setKeepAliveTime(1, TimeUnit.MINUTES);
 		playerEx.allowCoreThreadTimeOut(true);
-		final PlayerRegister playerRegister = new PlayerRegisterImpl(playbackEngineFactory,
-				new PlayerStateStorage(mediaFactory, playerEx), playerEx);
+		final PlayerRegister playerRegister = new PlayerRegisterImpl(
+				playbackEngineFactory,
+				new PlayerStateStorage(mediaFactory, playerEx, config),
+				config,
+				playerEx);
 
 		final Transcoder transcoder = new Transcoder("srv");
-		final ServerConfig serverConfig = new ServerConfig(args);
+		final ServerConfig serverConfig = new ServerConfig(config, args);
 		if (serverConfig.isServerPlayerEnabled()) {
 			final ExecutorService srvEx = new ThreadPoolExecutor(0, 1, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), new DaemonThreadFactory("srvplayer"));
 			final ServerPlayerContainer playerContainer = new ServerPlayerContainer(srvEx);
 			fillPlayerContainer(playerContainer, playerRegister);
 		}
 
-		final AsyncActions asyncActions = new AsyncActions(asyncTasksRegister, mediaFactory, Config.DEFAULT);
+		final AsyncActions asyncActions = new AsyncActions(asyncTasksRegister, mediaFactory, config);
 		final ScheduledExecutorService srvSchEx = Executors.newScheduledThreadPool(1, new DaemonThreadFactory("srvsch"));
-		final MorriganServer server = new MorriganServer(serverConfig, playerRegister, mediaFactory, asyncTasksRegister, asyncActions, transcoder, srvSchEx);
+		final MorriganServer server = new MorriganServer(config, serverConfig, playerRegister, mediaFactory, asyncTasksRegister, asyncActions, transcoder, srvSchEx);
 		server.start();
 
 		if (args.getSshPort() > 0) {
-			final SshUi sshUi = new SshUi(args.getSshPort(), serverConfig, playerRegister, mediaFactory, asyncTasksRegister);
+			final SshUi sshUi = new SshUi(args.getSshPort(), config, serverConfig, playerRegister, mediaFactory, asyncTasksRegister);
 			sshUi.start();
 		}
 
 		if (args.isDlna()) {
-			final DlnaService dlna = new DlnaService(serverConfig, mediaFactory, playerRegister);
+			final DlnaService dlna = new DlnaService(config, serverConfig, mediaFactory, playerRegister);
 			dlna.start();
 		}
 

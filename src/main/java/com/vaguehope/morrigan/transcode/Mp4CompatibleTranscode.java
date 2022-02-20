@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.ItemTags;
@@ -15,13 +16,13 @@ public class Mp4CompatibleTranscode extends TranscodeProfile {
 
 	private static final MimeType MIME_TYPE = MimeType.MP4;
 
-	protected Mp4CompatibleTranscode (final IMediaTrack item, final ItemTags tags,
+	protected Mp4CompatibleTranscode (final Config config, final IMediaTrack item, final ItemTags tags,
 			final Transcode transcode) {
-		super(item, tags, transcode, MIME_TYPE);
+		super(config, item, tags, transcode, MIME_TYPE);
 	}
 
-	protected static File cacheFileMp4 (final IMediaItem item, final Transcode transcode) {
-		return cacheFile(item, transcode, MIME_TYPE);
+	protected static File cacheFileMp4 (final Config config, final IMediaItem item, final Transcode transcode) {
+		return cacheFile(config, item, transcode, MIME_TYPE);
 	}
 
 	@Override
@@ -31,7 +32,7 @@ public class Mp4CompatibleTranscode extends TranscodeProfile {
 			throw new IllegalArgumentException("Output file must end with " + ext + ": " + outputFile.getName());
 		}
 
-		List<String> cmd = new ArrayList<String>();
+		List<String> cmd = new ArrayList<>();
 
 		cmd.add("ffmpeg");
 		cmd.add("-hide_banner");

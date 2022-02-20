@@ -28,12 +28,15 @@ import org.fourthline.cling.support.model.TransportInfo;
 import org.fourthline.cling.support.model.TransportState;
 import org.fourthline.cling.support.model.TransportStatus;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
+import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.dlna.DlnaException;
 import com.vaguehope.morrigan.dlna.MediaFormat;
 import com.vaguehope.morrigan.dlna.content.MediaFileLocator;
@@ -44,9 +47,12 @@ import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.model.media.test.TestMixedMediaDb;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlayerRegister;
+import com.vaguehope.morrigan.player.PlayerStateStorage;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
 public class GoalSeekingDlnaPlayerTest {
+
+	@Rule public TemporaryFolder tmp = new TemporaryFolder();
 
 	private static final String TEST_FILE_1_ID = "123456abcdef";
 	private static final int TEST_FILE_1_SIZE = 5 * 1024 * 1024;
@@ -60,23 +66,27 @@ public class GoalSeekingDlnaPlayerTest {
 	private static final String TEST_FILE_2_URI = "http://10.20.30.40:12345/media/" + TEST_FILE_2_ID;
 	private static final String TEST_COVER_2_URI = "http://10.20.30.40:12345/covers/" + TEST_FILE_2_ID;
 
+	private Config config;
 	private MediaFileLocator mediaFileLocator;
 	private MediaServer mediaServer;
 	private PlayerRegister playerRegister;
+	private PlayerStateStorage playerStateStorage;
 	private ControlPoint controlPoint;
 	private RemoteService avTransportSvc;
 	private AvTransportActions avTransport;
 	private RenderingControlActions renderingControl;
 	private ScheduledExecutorService scheduledExecutor;
-	private final Queue<Runnable> scheduledActions = new ConcurrentLinkedQueue<Runnable>();
+	private final Queue<Runnable> scheduledActions = new ConcurrentLinkedQueue<>();
 	private TestMixedMediaDb testDb;
 	private GoalSeekingDlnaPlayer undertest;
 
 	@Before
 	public void before () throws Exception {
+		this.config = new Config(this.tmp.getRoot());
 		this.mediaFileLocator = mock(MediaFileLocator.class);
 		this.mediaServer = mock(MediaServer.class);
 		this.playerRegister = mock(PlayerRegister.class);
+		this.playerStateStorage = mock(PlayerStateStorage.class);
 		this.controlPoint = mock(ControlPoint.class);
 		this.scheduledExecutor = mock(ScheduledExecutorService.class);
 		doAnswer(new Answer<Void>() {
@@ -93,6 +103,8 @@ public class GoalSeekingDlnaPlayerTest {
 		this.undertest = new GoalSeekingDlnaPlayer(
 				this.playerRegister, this.controlPoint, this.avTransportSvc,
 				this.mediaServer, this.mediaFileLocator, this.scheduledExecutor,
+				this.playerStateStorage,
+				this.config,
 				this.avTransport, this.renderingControl);
 	}
 

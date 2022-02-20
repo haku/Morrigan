@@ -24,13 +24,15 @@ public class ContentDirectoryHolder {
 
 	private final ControlPoint controlPoint;
 	private final MediaFactory mediaFactory;
+	private final Config config;
 
 	private final AtomicBoolean alive = new AtomicBoolean(true);
-	private final Map<String, RemoteService> contentDirectories = new ConcurrentHashMap<String, RemoteService>();
+	private final Map<String, RemoteService> contentDirectories = new ConcurrentHashMap<>();
 
-	public ContentDirectoryHolder (final ControlPoint controlPoint, final MediaFactory mediaFactory) {
+	public ContentDirectoryHolder (final ControlPoint controlPoint, final MediaFactory mediaFactory, final Config config) {
 		this.controlPoint = controlPoint;
 		this.mediaFactory = mediaFactory;
+		this.config = config;
 	}
 
 	private void checkAlive () {
@@ -75,10 +77,10 @@ public class ContentDirectoryHolder {
 		db.dispose();
 	}
 
-	private static final String METADATA_DB_DIR = "dlnametadata";
+	private static final String METADATA_DB_DIR = "dlnametadata";  // TODO move to Config class.
 
-	public static File getMetadataDbPath (final String id) {
-		final File d = new File(Config.getConfigDir(), METADATA_DB_DIR);
+	private File getMetadataDbPath (final String id) {
+		final File d = new File(this.config.getConfigDir(), METADATA_DB_DIR);
 		if (!d.exists() && !d.mkdirs() && !d.exists()) throw new IllegalStateException("Failed to create direactory '" + d.getAbsolutePath() + "'.");
 		return new File(d, id);
 	}

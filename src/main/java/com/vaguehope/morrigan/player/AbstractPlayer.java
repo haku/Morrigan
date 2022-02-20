@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
+import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import com.vaguehope.morrigan.model.Register;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
@@ -28,24 +29,29 @@ public abstract class AbstractPlayer implements Player {
 	private final String id;
 	private final String name;
 	private final Register<Player> register;
+	private final PlayerStateStorage playerStateStorage;
+	private final Config config;
+
 	private final AtomicBoolean alive = new AtomicBoolean(true);
 	private final ExecutorService loadEs;
 	private final PlayerQueue queue = new DefaultPlayerQueue();
 	private final PlayerEventListenerCaller listeners = new PlayerEventListenerCaller();
 
 	private final OrderResolver orderHelper = new OrderResolver();
-	private final AtomicReference<PlaybackOrder> playbackOrder = new AtomicReference<PlaybackOrder>(PlaybackOrder.MANUAL);
+	private final AtomicReference<PlaybackOrder> playbackOrder = new AtomicReference<>(PlaybackOrder.MANUAL);
 
-	private final AtomicReference<Transcode> transcode = new AtomicReference<Transcode>(Transcode.NONE);
+	private final AtomicReference<Transcode> transcode = new AtomicReference<>(Transcode.NONE);
 	private final Transcoder transcoder;
 
 	private volatile boolean stateRestoreAttempted = false;
 	private volatile boolean loadingTrack = false;
 
-	public AbstractPlayer (final String id, final String name, final PlayerRegister register) {
+	public AbstractPlayer (final String id, final String name, final PlayerRegister register, final PlayerStateStorage playerStateStorage, final Config config) {
 		this.id = id;
 		this.name = name;
 		this.register = register;
+		this.playerStateStorage = playerStateStorage;
+		this.config = config;
 		this.loadEs = new ThreadPoolExecutor(0, 1, 10L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), new DaemonThreadFactory("pld"));
 		this.transcoder = new Transcoder(id);
 	}
@@ -88,7 +94,7 @@ public abstract class AbstractPlayer implements Player {
 	 */
 	protected void saveState () {
 		if (this.stateRestoreAttempted) {
-			PlayerStateStorage.writeState(this);
+			this.playerStateStorage.writeState(this);
 		}
 		else {
 			LOG.w("Not saving player state as a restore has not yet been attempted.");
@@ -286,7 +292,7 @@ public abstract class AbstractPlayer implements Player {
 						AbstractPlayer.this.listeners.currentItemChanged(item);
 
 						File altFile = null;
-						final TranscodeProfile tProfile = getTranscode().profileForItem(item.getList(), item.getTrack());
+						final TranscodeProfile tProfile = getTranscode().profileForItem(AbstractPlayer.this.config, item.getList(), item.getTrack());
 						if (tProfile != null) {
 							AbstractPlayer.this.transcoder.transcodeToFile(tProfile);
 							altFile = tProfile.getCacheFileEvenIfItDoesNotExist();  // This should exist because the transcode just ran.

@@ -9,12 +9,14 @@ import org.seamless.util.MimeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.dlna.DlnaException;
 import com.vaguehope.morrigan.dlna.content.MediaFileLocator;
 import com.vaguehope.morrigan.dlna.httpserver.MediaServer;
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlayerRegister;
+import com.vaguehope.morrigan.player.PlayerStateStorage;
 import com.vaguehope.morrigan.util.Objs;
 
 public class DlnaPlayer extends AbstractDlnaPlayer {
@@ -26,11 +28,14 @@ public class DlnaPlayer extends AbstractDlnaPlayer {
 
 	public DlnaPlayer (
 			final PlayerRegister register,
-			final ControlPoint controlPoint, final RemoteService avTransportSvc,
+			final ControlPoint controlPoint,
+			final RemoteService avTransportSvc,
 			final MediaServer mediaServer,
 			final MediaFileLocator mediaFileLocator,
-			final ScheduledExecutorService scheduledExecutor) {
-		super(register, controlPoint, avTransportSvc, mediaServer, mediaFileLocator, scheduledExecutor, null, null);
+			final ScheduledExecutorService scheduledExecutor,
+			final PlayerStateStorage playerStateStorage,
+			final Config config) {
+		super(register, controlPoint, avTransportSvc, mediaServer, mediaFileLocator, scheduledExecutor, playerStateStorage, config, null, null);
 	}
 
 	@Override

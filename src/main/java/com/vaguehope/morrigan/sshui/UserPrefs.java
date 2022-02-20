@@ -15,15 +15,15 @@ import com.vaguehope.morrigan.sshui.util.Quietly;
 
 public class UserPrefs {
 
-	private static final String PREF_FILE_NAME = "sshui.properties";
+	private static final String PREF_FILE_NAME = "sshui.properties";  // TODO move to Config class.
 
 	private final Properties properties = new Properties();
 	private final File prefsFile;
 	private final Object[] lock = new Object[] {};
 	private boolean cached = false;
 
-	public UserPrefs () {
-		this.prefsFile = new File(Config.getConfigDir(), PREF_FILE_NAME);
+	public UserPrefs (final Config config) {
+		this.prefsFile = new File(config.getConfigDir(), PREF_FILE_NAME);
 	}
 
 	public void putValue (final String subject, final String object, final int value) throws IOException {

@@ -18,6 +18,7 @@ import org.seamless.util.MimeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.dlna.DlnaException;
 import com.vaguehope.morrigan.dlna.DlnaResponseException;
 import com.vaguehope.morrigan.dlna.content.MediaFileLocator;
@@ -27,6 +28,7 @@ import com.vaguehope.morrigan.dlna.util.Timestamped;
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlayerRegister;
+import com.vaguehope.morrigan.player.PlayerStateStorage;
 import com.vaguehope.morrigan.util.ErrorHelper;
 import com.vaguehope.morrigan.util.Objs;
 
@@ -60,8 +62,10 @@ public class GoalSeekingDlnaPlayer extends AbstractDlnaPlayer {
 			final RemoteService avTransportSvc,
 			final MediaServer mediaServer,
 			final MediaFileLocator mediaFileLocator,
-			final ScheduledExecutorService scheduledExecutor) {
-		this(register, controlPoint, avTransportSvc, mediaServer, mediaFileLocator, scheduledExecutor, null, null);
+			final ScheduledExecutorService scheduledExecutor,
+			final PlayerStateStorage playerStateStorage,
+			final Config config) {
+		this(register, controlPoint, avTransportSvc, mediaServer, mediaFileLocator, scheduledExecutor, playerStateStorage, config, null, null);
 	}
 
 	public GoalSeekingDlnaPlayer (
@@ -71,9 +75,12 @@ public class GoalSeekingDlnaPlayer extends AbstractDlnaPlayer {
 			final MediaServer mediaServer,
 			final MediaFileLocator mediaFileLocator,
 			final ScheduledExecutorService scheduledExecutor,
+			final PlayerStateStorage playerStateStorage,
+			final Config config,
 			final AvTransportActions avTransportActions,
 			final RenderingControlActions renderingControlActions) {
-		super(register, controlPoint, avTransportSvc, mediaServer, mediaFileLocator, scheduledExecutor, avTransportActions, renderingControlActions);
+		super(register, controlPoint, avTransportSvc, mediaServer, mediaFileLocator, scheduledExecutor, playerStateStorage, config,
+				avTransportActions, renderingControlActions);
 		controlPoint.execute(new AvSubscriber(this, this.avEventListener, avTransportSvc, 600));
 		this.schdFuture = scheduledExecutor.scheduleWithFixedDelay(this.schdRunner, 1, 1, TimeUnit.SECONDS);
 	}
@@ -152,7 +159,7 @@ public class GoalSeekingDlnaPlayer extends AbstractDlnaPlayer {
 	 * Different from goalState because LOADING is not a valid goal and there may be intermediate steps.
 	 */
 	private volatile PlayState stateToReportExternally = null;
-	private final BlockingQueue<Object> eventQueue = new LinkedBlockingQueue<Object>();
+	private final BlockingQueue<Object> eventQueue = new LinkedBlockingQueue<>();
 	/*
 	 * These fields must only be written from the event thread.
 	 */

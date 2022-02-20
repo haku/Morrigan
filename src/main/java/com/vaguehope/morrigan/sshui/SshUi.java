@@ -28,11 +28,12 @@ import com.vaguehope.morrigan.util.DaemonThreadFactory;
 public class SshUi {
 
 	// can be DSA/RSA/EC (http://docs.oracle.com/javase/6/docs/technotes/guides/security/StandardNames.html#KeyPairGenerator)
-	private static final String HOSTKEY_NAME = "hostkey.ser";
+	private static final String HOSTKEY_NAME = "hostkey.ser";  // TODO move to Config class.
 	private static final Duration IDLE_TIMEOUT = Duration.ofDays(1);
 	private static final Logger LOG = LoggerFactory.getLogger(SshUi.class);
 
 	private final int port;
+	private final Config config;
 	private final ServerConfig serverConfig;
 	private final PlayerReader playerReader;
 	private final MediaFactory mediaFactory;
@@ -42,8 +43,9 @@ public class SshUi {
 	private MnCommandFactory mnCommandFactory;
 	private SshServer sshd;
 
-	public SshUi(final int port, final ServerConfig serverConfig, final PlayerReader playerReader, final MediaFactory mediaFactory, final AsyncTasksRegister asyncTasksRegister) {
+	public SshUi(final int port, final Config config, final ServerConfig serverConfig, final PlayerReader playerReader, final MediaFactory mediaFactory, final AsyncTasksRegister asyncTasksRegister) {
 		this.port = port;
+		this.config = config;
 		this.serverConfig = serverConfig;
 		this.playerReader = playerReader;
 		this.mediaFactory = mediaFactory;
@@ -51,7 +53,7 @@ public class SshUi {
 	}
 
 	public void start() throws IOException {
-		final File hostKey = new File(Config.getConfigDir(), HOSTKEY_NAME);
+		final File hostKey = new File(this.config.getConfigDir(), HOSTKEY_NAME);
 		LOG.info("Host key: {}", hostKey.getAbsolutePath());
 
 		this.unreliableEs = new ThreadPoolExecutor(0, 1,
@@ -62,13 +64,13 @@ public class SshUi {
 
 		final MnContext mnContext = new MnContext(
 				this.playerReader, this.mediaFactory, this.asyncTasksRegister,
-				new UserPrefs(), this.unreliableEs);
+				new UserPrefs(this.config), this.unreliableEs);
 		this.mnCommandFactory = new MnCommandFactory(mnContext);
 
 		this.sshd = SshServer.setUpDefaultServer();
 		this.sshd.setKeyPairProvider(new SimpleGeneratorHostKeyProvider(hostKey.toPath()));
 		this.sshd.setShellFactory(this.mnCommandFactory);
-		this.sshd.setPasswordAuthenticator(new MnPasswordAuthenticator());
+		this.sshd.setPasswordAuthenticator(new MnPasswordAuthenticator(this.serverConfig));
 		try {
 			this.sshd.setPublickeyAuthenticator(new UserPublickeyAuthenticator());
 		}
