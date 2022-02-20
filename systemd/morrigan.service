@@ -1,0 +1,22 @@
+[Unit]
+Description=Morrigan
+After=network.target
+
+[Service]
+Environment="PATH=/usr/bin:/bin"
+Type=simple
+User=morrigan
+ExecStart=/usr/bin/java \
+          -XX:+PerfDisableSharedMem \
+          -XX:-UsePerfData \
+          -jar /opt/morrigan/morrigan.jar \
+          --dlna \
+          --http 28080 \
+          --ssh  28022
+Restart=always
+RestartSec=60
+KillSignal=SIGINT
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target
