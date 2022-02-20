@@ -17,7 +17,7 @@
 		<cling.version>2.1.2</cling.version>
 		<jetty.version>9.4.35.v20201120</jetty.version>
 		<junit.version>4.13.2</junit.version>
-		<slf4j.version>1.7.32</slf4j.version>
+		<slf4j.version>1.7.36</slf4j.version>
 		<sshd.version>2.8.0</sshd.version>
 		<teleal.version>1.0.14</teleal.version>
 	</properties>
@@ -165,7 +165,7 @@
 		<dependency>
 			<groupId>uk.co.caprica</groupId>
 			<artifactId>vlcj</artifactId>
-			<version>4.7.0</version>
+			<version>4.7.1</version>
 		</dependency>
 
 		<dependency>
@@ -253,7 +253,7 @@
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
-			<version>1.2.3</version>
+			<version>1.2.10</version>
 		</dependency>
 
 		<dependency>
@@ -287,7 +287,7 @@
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
-			<version>3.12.4</version>
+			<version>4.3.1</version>
 			<scope>test</scope>
 		</dependency>
 
