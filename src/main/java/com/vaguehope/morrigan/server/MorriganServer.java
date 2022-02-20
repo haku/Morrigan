@@ -83,6 +83,7 @@ public class MorriganServer {
 				MlistsServlet.CONTEXTPATH + "/*");
 		context.addServlet(new ServletHolder(new StatusServlet(asyncTasksRegister)), StatusServlet.CONTEXTPATH + "/*");
 		context.addServlet(new ServletHolder(new HostInfoServlet()), HostInfoServlet.CONTEXTPATH + "/*");
+		context.addServlet(new ServletHolder(new LogServlet()), LogServlet.CONTEXTPATH + "/*");
 
 		final HandlerList handlers = new HandlerList();
 		handlers.setHandlers(new Handler[] { context });

@@ -1,18 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 	<!-- Override with -Dlogback.configurationFile=/home/user/path/logback.xml -->
-	<!-- http://logback.qos.ch/manual/layouts.html -->
+	<!-- https://logback.qos.ch/manual/filters.html -->
+	<!-- https://logback.qos.ch/manual/layouts.html -->
 
 	<!-- http://logback.qos.ch/manual/configuration.html#LevelChangePropagator -->
 	<contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator" />
 
-	<appender name="default" class="ch.qos.logback.core.ConsoleAppender">
+	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>WARN</level>
+		</filter>
 		<encoder>
 			<pattern>%.-1level%d{MMdd HH:mm:ss.SSS} [%10.10thread] %25.25logger{25} %msg%n</pattern>
 		</encoder>
 	</appender>
 
+	<appender name="CYCLIC" class="ch.qos.logback.core.read.CyclicBufferAppender">
+		<MaxSize>4096</MaxSize>
+	</appender>
+
 	<logger name="com.vaguehope" level="INFO" />
+
 	<logger name="org.fourthline.cling.binding.xml.DeviceDescriptorBinder" level="ERROR" />
 	<logger name="org.fourthline.cling.binding.xml.ServiceDescriptorBinder" level="ERROR" />
 	<logger name="org.fourthline.cling.model.meta.Service" level="ERROR" />
@@ -20,8 +29,9 @@
 	<logger name="org.fourthline.cling.transport.spi.StreamClient" level="WARN" />
 	<logger name="org.fourthline.cling.transport.spi.UpnpStream" level="ERROR" />
 
-	<root level="info">
-		<appender-ref ref="default" />
+	<root level="INFO">
+		<appender-ref ref="CONSOLE" />
+		<appender-ref ref="CYCLIC" />
 	</root>
 
 </configuration>
