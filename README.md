@@ -8,7 +8,7 @@ Build and Run
 
 ```shell
 $ mvn clean package
-$ java -jar target/morrigan-1-SNAPSHOT-jar-with-dependencies.jar --ssh 14022 --dlna
+$ java -jar target/morrigan-1-SNAPSHOT-jar-with-dependencies.jar --http 28080 --ssh 14022 --dlna
 ```
 
 External Dependences
