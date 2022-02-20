@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.BindException;
 import java.net.InetAddress;
 
+import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
@@ -86,7 +87,7 @@ public class MediaServer {
 		return server;
 	}
 
-	private static ServerConnector createHttpConnector (final Server server, final String hostAddress, final int port) {
+	private static Connector createHttpConnector (final Server server, final String hostAddress, final int port) {
 		final ServerConnector connector = new ServerConnector(server);
 		connector.setHost(hostAddress);
 		connector.setPort(port);

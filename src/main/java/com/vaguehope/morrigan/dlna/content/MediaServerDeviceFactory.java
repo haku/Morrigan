@@ -1,7 +1,6 @@
 package com.vaguehope.morrigan.dlna.content;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 import org.fourthline.cling.binding.annotations.AnnotationLocalServiceBinder;
 import org.fourthline.cling.model.Command;
@@ -21,6 +20,7 @@ import org.fourthline.cling.support.connectionmanager.ConnectionManagerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.vaguehope.morrigan.dlna.DlnaService;
 import com.vaguehope.morrigan.dlna.httpserver.MediaServer;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 
@@ -59,7 +59,7 @@ public class MediaServerDeviceFactory {
 		final DeviceDetails details = new DeviceDetails(METADATA_MODEL_NAME + " (" + hostName + ")",
 				new ManufacturerDetails(METADATA_MANUFACTURER),
 				new ModelDetails(METADATA_MODEL_NAME, METADATA_MODEL_DESCRIPTION, METADATA_MODEL_NUMBER));
-		final Icon icon = createDeviceIcon();
+		final Icon icon = DlnaService.createDeviceIcon();
 
 		final LocalService<ContentDirectoryService> contDirSrv = new AnnotationLocalServiceBinder().read(ContentDirectoryService.class);
 		contDirSrv.setManager(new DefaultServiceManager<ContentDirectoryService>(contDirSrv, ContentDirectoryService.class) {
@@ -102,16 +102,4 @@ public class MediaServerDeviceFactory {
 		return this.localDevice;
 	}
 
-	public static Icon createDeviceIcon () throws IOException {
-		final InputStream res = MediaServerDeviceFactory.class.getResourceAsStream("/icon.png");
-		try {
-			if (res == null) throw new IllegalStateException("Icon not found.");
-			final Icon icon = new Icon("image/png", 48, 48, 8, "icon.png", res);
-			icon.validate();
-			return icon;
-		}
-		finally {
-			if (res != null) res.close();
-		}
-	}
 }

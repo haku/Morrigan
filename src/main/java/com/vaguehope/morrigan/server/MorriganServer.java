@@ -1,6 +1,7 @@
 package com.vaguehope.morrigan.server;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -56,16 +57,19 @@ public class MorriganServer {
 			this.server = new Server(threadPool);
 			this.server.addLifeCycleListener(this.lifeCycleListener);
 			this.server.setHandler(makeContentHandler(config, playerListener, mediaFactory, asyncTasksRegister, asyncActions, transcoder, schEs));
-			this.server.addConnector(createHttpConnector(this.server, this.getServerPort()));
+
+			final InetAddress bindAddress = config.getBindAddress("HTTP");
+			if (bindAddress == null) throw new IllegalStateException("Failed to find bind address.");
+			this.server.addConnector(createHttpConnector(this.server, bindAddress.getHostAddress(), this.serverPort));
 		}
 		catch (final Exception e) {
 			throw new MorriganException("Failed to configure and start server.", e);
 		}
 	}
 
-	private static Connector createHttpConnector (final Server server, final int port) {
+	private static Connector createHttpConnector (final Server server, final String hostAddress, final int port) {
 		final ServerConnector connector = new ServerConnector(server);
-//		connector.setHost(iface);  // TODO
+		connector.setHost(hostAddress);
 		connector.setPort(port);
 		return connector;
 	}
@@ -132,7 +136,7 @@ public class MorriganServer {
 		this.server.join();
 	}
 
-	public int getServerPort () {
+	protected int getServerPort () {
 		return this.serverPort;
 	}
 

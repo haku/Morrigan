@@ -92,7 +92,7 @@ public final class Main {
 		server.start();
 
 		if (args.getSshPort() > 0) {
-			final SshUi sshUi = new SshUi(args.getSshPort(), playerRegister, mediaFactory, asyncTasksRegister);
+			final SshUi sshUi = new SshUi(args.getSshPort(), serverConfig, playerRegister, mediaFactory, asyncTasksRegister);
 			sshUi.start();
 		}
 

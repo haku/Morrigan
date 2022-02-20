@@ -2,6 +2,7 @@ package com.vaguehope.morrigan.sshui;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.security.GeneralSecurityException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -17,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.player.PlayerReader;
+import com.vaguehope.morrigan.server.ServerConfig;
 import com.vaguehope.morrigan.sshui.ssh.MnPasswordAuthenticator;
 import com.vaguehope.morrigan.sshui.ssh.UserPublickeyAuthenticator;
 import com.vaguehope.morrigan.tasks.AsyncTasksRegister;
@@ -30,6 +32,7 @@ public class SshUi {
 	private static final Logger LOG = LoggerFactory.getLogger(SshUi.class);
 
 	private final int port;
+	private final ServerConfig serverConfig;
 	private final PlayerReader playerReader;
 	private final MediaFactory mediaFactory;
 	private final AsyncTasksRegister asyncTasksRegister;
@@ -38,8 +41,9 @@ public class SshUi {
 	private MnCommandFactory mnCommandFactory;
 	private SshServer sshd;
 
-	public SshUi(final int port, final PlayerReader playerReader, final MediaFactory mediaFactory, final AsyncTasksRegister asyncTasksRegister) {
+	public SshUi(final int port, final ServerConfig serverConfig, final PlayerReader playerReader, final MediaFactory mediaFactory, final AsyncTasksRegister asyncTasksRegister) {
 		this.port = port;
+		this.serverConfig = serverConfig;
 		this.playerReader = playerReader;
 		this.mediaFactory = mediaFactory;
 		this.asyncTasksRegister = asyncTasksRegister;
@@ -71,6 +75,10 @@ public class SshUi {
 			throw new IllegalStateException("Failed to load public key.", e);
 		}
 		this.sshd.getProperties().put(FactoryManager.IDLE_TIMEOUT, String.valueOf(IDLE_TIMEOUT));
+
+		final InetAddress bindAddress = this.serverConfig.getBindAddress("SSH");
+		if (bindAddress == null) throw new IllegalStateException("Failed to find bind address.");
+		this.sshd.setHost(bindAddress.getHostAddress());
 
 		this.sshd.setPort(this.port);
 		this.sshd.start();

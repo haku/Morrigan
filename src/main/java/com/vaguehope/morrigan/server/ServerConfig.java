@@ -2,11 +2,16 @@ package com.vaguehope.morrigan.server;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.net.InetAddress;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.vaguehope.morrigan.Args;
 import com.vaguehope.morrigan.config.Config;
+import com.vaguehope.morrigan.util.NetHelper;
+import com.vaguehope.morrigan.util.NetHelper.IfaceAndAddr;
 import com.vaguehope.morrigan.util.PropertiesFile;
 
 public class ServerConfig implements AuthChecker {
@@ -27,7 +32,7 @@ public class ServerConfig implements AuthChecker {
 	private static final String KEY_AUTOSTART = "autostart";
 	private static final String DEFAULT_AUTOSTART = Boolean.FALSE.toString();
 
-	protected final Logger logger = Logger.getLogger(this.getClass().getName());
+	private static final Logger LOG = LoggerFactory.getLogger(ServerConfig.class);
 
 	private final PropertiesFile propFile = new PropertiesFile(new File(Config.getConfigDir(), SERVER_PROPS));
 
@@ -54,11 +59,23 @@ public class ServerConfig implements AuthChecker {
 		return Boolean.parseBoolean(this.propFile.getString(KEY_PLAYER_ENABLED, DEFAULT_PLAYER_ENABLED));
 	}
 
-	public String getBindIp () throws IOException {
-		if (this.args.getInterface() != null) {
-			return this.args.getInterface();
+	public InetAddress getBindAddress(final String whatFor) throws IOException {
+		String strIface = this.args.getInterface();
+		if (strIface == null) {
+			strIface = this.propFile.getString(KEY_BINDIP, null);
 		}
-		return this.propFile.getString(KEY_BINDIP, null);
+
+		final InetAddress ret;
+		if (strIface != null) {
+			ret = InetAddress.getByName(strIface);
+			LOG.info("{} using address: {}", whatFor, ret);
+		}
+		else {
+			final List<IfaceAndAddr> addresses = NetHelper.getIpAddresses();
+			ret = addresses.iterator().next().getAddr();
+			LOG.info("addresses: {}, {} using address: {}", addresses, whatFor, ret);
+		}
+		return ret;
 	}
 
 	public boolean isAutoStart () throws IOException {
@@ -73,7 +90,7 @@ public class ServerConfig implements AuthChecker {
 			return verifyPassword(passToTest);
 		}
 		catch (final IOException e) {
-			this.logger.log(Level.WARNING, "Failed to verify password.", e);
+			LOG.warn("Failed to verify password.", e);
 			return false;
 		}
 	}

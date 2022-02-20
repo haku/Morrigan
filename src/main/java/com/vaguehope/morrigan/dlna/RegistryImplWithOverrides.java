@@ -13,6 +13,7 @@ public class RegistryImplWithOverrides extends RegistryImpl {
 
 	public RegistryImplWithOverrides (final UpnpService upnpService, final Map<String, Resource<?>> pathToResource) {
 		super(upnpService);
+		if (pathToResource == null) throw new NullPointerException();
 		this.pathToResource = pathToResource;
 	}
 

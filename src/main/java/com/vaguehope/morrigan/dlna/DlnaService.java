@@ -1,14 +1,21 @@
 package com.vaguehope.morrigan.dlna;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
+import org.fourthline.cling.DefaultUpnpServiceConfiguration;
 import org.fourthline.cling.UpnpService;
+import org.fourthline.cling.UpnpServiceConfiguration;
 import org.fourthline.cling.UpnpServiceImpl;
 import org.fourthline.cling.model.ValidationException;
 import org.fourthline.cling.model.meta.Icon;
@@ -16,6 +23,9 @@ import org.fourthline.cling.model.resource.IconResource;
 import org.fourthline.cling.model.resource.Resource;
 import org.fourthline.cling.protocol.ProtocolFactory;
 import org.fourthline.cling.registry.Registry;
+import org.fourthline.cling.transport.impl.NetworkAddressFactoryImpl;
+import org.fourthline.cling.transport.spi.InitializationException;
+import org.fourthline.cling.transport.spi.NetworkAddressFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,13 +34,11 @@ import com.vaguehope.morrigan.dlna.content.MediaServerDeviceFactory;
 import com.vaguehope.morrigan.dlna.extcd.ContentDirectoryHolder;
 import com.vaguehope.morrigan.dlna.httpserver.MediaServer;
 import com.vaguehope.morrigan.dlna.players.PlayerHolder;
-import com.vaguehope.morrigan.dlna.util.NetHelper;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.player.PlayerRegister;
 import com.vaguehope.morrigan.player.PlayerStateStorage;
 import com.vaguehope.morrigan.server.ServerConfig;
 import com.vaguehope.morrigan.util.DaemonThreadFactory;
-import com.vaguehope.morrigan.util.StringHelper;
 
 public class DlnaService {
 
@@ -41,30 +49,37 @@ public class DlnaService {
 	private final MediaFactory mediaFactory;
 	private final PlayerRegister playerRegister;
 
+	private final InetAddress bindAddress;
+	private final Map<String, Resource<?>> registryPathToRes = new HashMap<>();
+
 	private MediaServer mediaServer;
 	private PlayerHolder playerHolder;
 	private UpnpService upnpService;
 	private ContentDirectoryHolder contentDirectoryHolder;
 	private ScheduledExecutorService scheduledExecutor;
 
-	public DlnaService(final ServerConfig serverConfig, final MediaFactory mediaFactory, final PlayerRegister playerRegister) {
+	public DlnaService(final ServerConfig serverConfig, final MediaFactory mediaFactory, final PlayerRegister playerRegister) throws IOException {
 		this.serverConfig = serverConfig;
 		this.mediaFactory = mediaFactory;
 		this.playerRegister = playerRegister;
+
+		this.bindAddress = this.serverConfig.getBindAddress("DLNA");
+		if (this.bindAddress == null) throw new IllegalStateException("Failed to find bind address.");
+
+		final Icon icon = createDeviceIcon();
+		final IconResource iconResource = new IconResource(icon.getUri(), icon);
+		this.registryPathToRes.put("/icon.png", iconResource);
 	}
 
 	public void start() throws IOException, ValidationException {
-		final InetAddress bindAddress = findBindAddress();
-		if (bindAddress == null) throw new IllegalStateException("Failed to find bind address.");
-
 		this.scheduledExecutor = Executors.newScheduledThreadPool(BG_THREADS, new DaemonThreadFactory("dlna"));
 
 		final MediaFileLocator mediaFileLocator = new MediaFileLocator(this.mediaFactory);
-
-		this.mediaServer = new MediaServer(mediaFileLocator, bindAddress);
+		this.mediaServer = new MediaServer(mediaFileLocator, this.bindAddress);
 		this.mediaServer.start();
 
-		this.upnpService = makeUpnpServer();
+		this.upnpService = new MyUpnpService(new MyUpnpServiceConfiguration());
+
 		this.playerHolder = new PlayerHolder(
 				this.playerRegister,
 				this.upnpService.getControlPoint(),
@@ -88,34 +103,58 @@ public class DlnaService {
 		LOG.info("DLNA started.");
 	}
 
-	private InetAddress findBindAddress () throws IOException {
-		final InetAddress address;
-		final String cfgBindIp = this.serverConfig.getBindIp();
-		if (StringHelper.notBlank(cfgBindIp)) {
-			address = InetAddress.getByName(cfgBindIp);
-			LOG.info("using address: {}", address);
+	private class MyUpnpService extends UpnpServiceImpl {
+
+		private MyUpnpService(final UpnpServiceConfiguration configuration) {
+			super(configuration);
 		}
-		else {
-			final List<InetAddress> addresses = NetHelper.getIpAddresses();
-			address = addresses.iterator().next();
-			LOG.info("addresses: {} using address: {}", addresses, address);
+
+		@Override
+		protected Registry createRegistry (final ProtocolFactory pf) {
+			return new RegistryImplWithOverrides(this, DlnaService.this.registryPathToRes);
 		}
-		return address;
+
 	}
 
-	private static UpnpService makeUpnpServer () throws IOException {
-		final Map<String, Resource<?>> pathToRes = new HashMap<>();
+	private class MyUpnpServiceConfiguration extends DefaultUpnpServiceConfiguration {
 
-		final Icon icon = MediaServerDeviceFactory.createDeviceIcon();
-		final IconResource iconResource = new IconResource(icon.getUri(), icon);
-		pathToRes.put("/icon.png", iconResource);
+		@Override
+		protected NetworkAddressFactory createNetworkAddressFactory(final int streamListenPort) {
+			return new MyNetworkAddressFactory(streamListenPort);
+		}
 
-		return new UpnpServiceImpl() {
-			@Override
-			protected Registry createRegistry (final ProtocolFactory pf) {
-				return new RegistryImplWithOverrides(this, pathToRes);
-			}
-		};
+		@Override
+		protected ExecutorService createDefaultExecutorService() {
+			return new ThreadPoolExecutor(0, Integer.MAX_VALUE, 30L, TimeUnit.SECONDS,
+					new SynchronousQueue<Runnable>(), new DaemonThreadFactory("upnp"));
+		}
+
+	}
+
+	private class MyNetworkAddressFactory extends NetworkAddressFactoryImpl {
+
+		private MyNetworkAddressFactory(final int streamListenPort) throws InitializationException {
+			super(streamListenPort);
+		}
+
+		@Override
+		protected boolean isUsableAddress(final NetworkInterface iface, final InetAddress address) {
+			return DlnaService.this.bindAddress.equals(address);
+		}
+
+	}
+
+	public static Icon createDeviceIcon () throws IOException {
+		final InputStream res = DlnaService.class.getResourceAsStream("/icon.png");
+		try {
+			if (res == null) throw new IllegalStateException("Icon not found.");
+			final Icon icon = new Icon("image/png", 48, 48, 8, "icon.png", res);
+			icon.validate();
+			return icon;
+		}
+		finally {
+			if (res != null) res.close();
+		}
 	}
 
 }
