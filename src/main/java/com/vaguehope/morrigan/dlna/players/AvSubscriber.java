@@ -50,7 +50,7 @@ public class AvSubscriber extends SubscriptionCallback {
 
 	private void reconnectIfAlive () {
 		if (!this.dlnaPlayer.isDisposed()) {
-			LOG.error("{} TODO: Restablish subscription.", this.dlnaPlayer.getId());
+			LOG.warn("{} TODO: Restablish subscription.", this.dlnaPlayer.getId());
 		}
 	}
 

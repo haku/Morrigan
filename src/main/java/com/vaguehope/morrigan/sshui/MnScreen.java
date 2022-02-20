@@ -105,7 +105,7 @@ public class MnScreen extends SshScreen implements FaceNavigation {
 				removedFace.onClose();
 			}
 			catch (final Exception e) {
-				LOG.error("onClose() failed.", e);
+				LOG.warn("onClose() failed.", e);
 			}
 		}
 		return true;
@@ -119,7 +119,7 @@ public class MnScreen extends SshScreen implements FaceNavigation {
 				this.faces.getLast().onFaceResult(result);
 			}
 			catch (final Exception e) {
-				LOG.error("onFaceResult(" + result + ") failed.", e);
+				LOG.warn("onFaceResult(" + result + ") failed.", e);
 			}
 		}
 		return ret;
@@ -131,7 +131,7 @@ public class MnScreen extends SshScreen implements FaceNavigation {
 			return activeFace().onInput(k, this.gui);
 		}
 		catch (final Exception e) {
-			LOG.error("Unhandled exception while processing user input.", e);
+			LOG.warn("Unhandled exception while processing user input.", e);
 			MessageDialog.showMessageDialog(this.gui, e.getClass().getName(), ErrorHelper.getCauseTrace(e));
 			return true;
 		}

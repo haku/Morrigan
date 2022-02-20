@@ -60,7 +60,7 @@ public abstract class DefaultFace implements Face {
 				c.call();
 			}
 			catch (final Exception e) {
-				LOG.error("Background task failed.", e);
+				LOG.warn("Background task failed.", e);
 			}
 			ret = true;
 		}

@@ -81,7 +81,7 @@ public abstract class SshScreen implements Runnable {
 			}
 		}
 		catch (final Throwable t) { // NOSONAR Report all errors and clean up session.
-			LOG.error("Session error.", t);
+			LOG.warn("Session error.", t);
 			scheduleQuit("session error");
 		}
 		finally {

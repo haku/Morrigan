@@ -3,7 +3,12 @@ package com.vaguehope.morrigan.util;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class DaemonThreadFactory implements ThreadFactory {
+
+	private static final Logger LOG = LoggerFactory.getLogger(DaemonThreadFactory.class);
 
 	private final String prefix;
 	private final LoggingThreadGroup threadGroup;
@@ -33,6 +38,7 @@ public class DaemonThreadFactory implements ThreadFactory {
 		@Override
 		public void uncaughtException (final Thread t, final Throwable e) {
 			e.printStackTrace(System.err);
+			LOG.error("Uncaught exception in thread: " + t, e);
 		}
 
 	}
