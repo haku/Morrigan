@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 
+import org.apache.sshd.common.channel.Channel;
 import org.apache.sshd.server.Environment;
 import org.apache.sshd.server.Signal;
 import org.apache.sshd.server.SignalListener;
@@ -29,7 +30,7 @@ public class SshTerminal extends UnixLikeTerminal implements SignalListener {
 	}
 
 	@Override
-	public void signal (final Signal signal) {
+	public void signal(final Channel channel, final Signal signal) {
 		switch (signal) {
 			case WINCH:
 				notifyResized();

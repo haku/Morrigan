@@ -88,6 +88,7 @@ public abstract class SshScreen implements Runnable {
 			try {
 				this.screen.stopScreen();
 				this.terminal.flush(); // Workaround as stopScreen() does not trigger flush().
+				this.terminal.close();
 			}
 			catch (final IOException e) {
 				LOG.warn("Failed to shutdown session cleanly.", e);

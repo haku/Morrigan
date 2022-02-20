@@ -1,15 +1,17 @@
 package com.vaguehope.morrigan.sshui;
 
+import java.io.IOException;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.sshd.common.Factory;
+import org.apache.sshd.server.channel.ChannelSession;
 import org.apache.sshd.server.command.Command;
+import org.apache.sshd.server.shell.ShellFactory;
 
 import com.vaguehope.morrigan.util.DaemonThreadFactory;
 
-public class MnCommandFactory implements Factory<Command> {
+public class MnCommandFactory implements ShellFactory {
 
 	private static final int MAX_CLIENTS = 10;
 
@@ -30,7 +32,7 @@ public class MnCommandFactory implements Factory<Command> {
 	}
 
 	@Override
-	public Command create () {
+	public Command createShell(ChannelSession channel) throws IOException {
 		return new MnCommand(this.mnContext, this.es);
 	}
 

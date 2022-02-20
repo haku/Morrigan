@@ -30,7 +30,7 @@ public class MnScreen extends SshScreen implements FaceNavigation {
 
 	private static final Logger LOG = LoggerFactory.getLogger(MnScreen.class);
 
-	private final Deque<Face> faces = new LinkedList<Face>();
+	private final Deque<Face> faces = new LinkedList<>();
 	private final MnContext mnContext;
 	private WindowBasedTextGUI gui;
 

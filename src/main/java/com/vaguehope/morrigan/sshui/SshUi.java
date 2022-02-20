@@ -4,12 +4,13 @@ import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.security.GeneralSecurityException;
+import java.time.Duration;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.sshd.common.FactoryManager;
+import org.apache.sshd.core.CoreModuleProperties;
 import org.apache.sshd.server.SshServer;
 import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
 import org.slf4j.Logger;
@@ -28,7 +29,7 @@ public class SshUi {
 
 	// can be DSA/RSA/EC (http://docs.oracle.com/javase/6/docs/technotes/guides/security/StandardNames.html#KeyPairGenerator)
 	private static final String HOSTKEY_NAME = "hostkey.ser";
-	private static final long IDLE_TIMEOUT = 24 * 60 * 60 * 1000L; // A day.
+	private static final Duration IDLE_TIMEOUT = Duration.ofDays(1);
 	private static final Logger LOG = LoggerFactory.getLogger(SshUi.class);
 
 	private final int port;
@@ -74,7 +75,7 @@ public class SshUi {
 		catch (final GeneralSecurityException e) {
 			throw new IllegalStateException("Failed to load public key.", e);
 		}
-		this.sshd.getProperties().put(FactoryManager.IDLE_TIMEOUT, String.valueOf(IDLE_TIMEOUT));
+		CoreModuleProperties.IDLE_TIMEOUT.set(this.sshd, IDLE_TIMEOUT);
 
 		final InetAddress bindAddress = this.serverConfig.getBindAddress("SSH");
 		if (bindAddress == null) throw new IllegalStateException("Failed to find bind address.");

@@ -7,16 +7,15 @@ import java.nio.charset.Charset;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.sshd.server.command.Command;
 import org.apache.sshd.server.Environment;
 import org.apache.sshd.server.ExitCallback;
-import org.apache.sshd.server.SessionAware;
-import org.apache.sshd.server.session.ServerSession;
+import org.apache.sshd.server.channel.ChannelSession;
+import org.apache.sshd.server.command.Command;
 
 import com.googlecode.lanterna.terminal.Terminal;
 import com.vaguehope.morrigan.sshui.term.SshTerminal;
 
-public class MnCommand implements Command, SessionAware {
+public class MnCommand implements Command {
 
 	private static final AtomicInteger COUNTER = new AtomicInteger(0);
 
@@ -53,17 +52,15 @@ public class MnCommand implements Command, SessionAware {
 	}
 
 	@Override
-	public void setSession (final ServerSession session) {/* Unused. */}
-
-	@Override
-	public void start (final Environment env) throws IOException {
+	public void start(final ChannelSession channel, final Environment env) throws IOException {
+		@SuppressWarnings("resource") // Closed in SshScreen.
 		final Terminal terminal = new SshTerminal(this.in, this.out, Charset.forName("UTF8"), env);
 		this.screen = new MnScreen("mnScreen" + COUNTER.getAndIncrement(), this.mnContext, env, terminal, this.callback);
 		this.es.submit(this.screen);
 	}
 
 	@Override
-	public void destroy () {
+	public void destroy(ChannelSession channel) throws Exception {
 		if (this.screen == null) throw new IllegalStateException();
 		this.screen.stopAndJoin("sshd destoyed command");
 	}

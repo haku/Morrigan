@@ -18,7 +18,7 @@
 		<jetty.version>9.4.35.v20201120</jetty.version>
 		<junit.version>4.13.2</junit.version>
 		<slf4j.version>1.7.32</slf4j.version>
-		<sshd.version>2.2.0</sshd.version>
+		<sshd.version>2.8.0</sshd.version>
 		<teleal.version>1.0.14</teleal.version>
 	</properties>
 
@@ -188,7 +188,7 @@
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcprov-jdk15on</artifactId>
-			<version>1.57</version>
+			<version>1.70</version>
 		</dependency>
 
 		<!-- DLNA -->
