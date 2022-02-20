@@ -35,6 +35,9 @@ import com.vaguehope.morrigan.transcode.Transcoder;
 import com.vaguehope.morrigan.util.DaemonThreadFactory;
 import com.vaguehope.morrigan.util.LogHelper;
 
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.ConsoleAppender;
 
 public final class Main {
 
@@ -67,6 +70,13 @@ public final class Main {
 	}
 
 	private static void run (final Args args) throws Exception { // NOSONAR
+		if (args.isVerboseLog()) {
+			final LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
+			final ConsoleAppender<ILoggingEvent> appender = (ConsoleAppender<ILoggingEvent>) context.getLogger(Logger.ROOT_LOGGER_NAME)
+					.getAppender("CONSOLE");
+			appender.clearAllFilters();
+		}
+
 		final Config config = Config.fromArgs(args);
 
 		final AsyncTasksRegister asyncTasksRegister = new AsyncTasksRegisterImpl(
