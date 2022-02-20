@@ -24,7 +24,6 @@ import com.vaguehope.morrigan.dlna.content.MediaServerDeviceFactory;
 import com.vaguehope.morrigan.dlna.extcd.ContentDirectoryHolder;
 import com.vaguehope.morrigan.dlna.httpserver.MediaServer;
 import com.vaguehope.morrigan.dlna.players.PlayerHolder;
-import com.vaguehope.morrigan.dlna.util.LogHelper;
 import com.vaguehope.morrigan.dlna.util.NetHelper;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.player.PlayerRegister;
@@ -55,8 +54,6 @@ public class DlnaService {
 	}
 
 	public void start() throws IOException, ValidationException {
-		LogHelper.setLoggingLevels();  // TODO replace with XML?
-
 		final InetAddress bindAddress = findBindAddress();
 		if (bindAddress == null) throw new IllegalStateException("Failed to find bind address.");
 
