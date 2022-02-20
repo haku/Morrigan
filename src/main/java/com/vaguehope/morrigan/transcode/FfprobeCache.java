@@ -18,7 +18,6 @@ public class FfprobeCache {
 			info = CACHE.get(key);
 		}
 		if (info != null && info.getFileLastModified() == file.lastModified()) {
-			System.out.println("Using cached ffprobe info.");
 			return info;
 		}
 
