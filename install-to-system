@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+set -eu
+
+function yes_or_no {
+  while true; do
+    read -p "$* [y/n]: " yn
+    case $yn in
+      [Yy]*) return 0  ;;
+      [Nn]*) echo "Aborted" ; return  1 ;;
+    esac
+  done
+}
+
+mvn clean package
+
+mkdir -vp /opt/morrigan
+chown -v root:morrigan /opt/morrigan
+chmod -v 770 /opt/morrigan
+
+r=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+cp -v \
+  "$r/target/morrigan-1-SNAPSHOT-jar-with-dependencies.jar" \
+  "/opt/morrigan/morrigan.jar"
+
+unit_src="$r/systemd/morrigan.service"
+unit_etc='/etc/systemd/system/morrigan.service'
+if [ -e "$unit_etc" ] ; then
+  if ! diff "$unit_src" "$unit_etc" ; then
+    yes_or_no "Installed unit file differs, continue?" || exit 1
+  fi
+else
+  cp -v "$unt_src" "$unit_etc"
+fi
+
+systemctl daemon-reload
+systemctl enable  morrigan
+systemctl restart morrigan
+systemctl status  morrigan

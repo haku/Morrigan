@@ -5,11 +5,14 @@ After=network.target
 [Service]
 Environment="PATH=/usr/bin:/bin"
 Type=simple
-User=morrigan
+DynamicUser=yes
+SupplementaryGroups=library
+SupplementaryGroups=morrigan
 ExecStart=/usr/bin/java \
           -XX:+PerfDisableSharedMem \
           -XX:-UsePerfData \
           -jar /opt/morrigan/morrigan.jar \
+          --configpath /opt/morrigan \
           --dlna \
           --http 28080 \
           --ssh  28022
