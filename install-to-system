@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -eu
 
+# assumes:
+# groupadd library
+# groupadd morrigan
+
 function yes_or_no {
   while true; do
     read -p "$* [y/n]: " yn
@@ -11,16 +15,26 @@ function yes_or_no {
   done
 }
 
-mvn clean package
+r="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+jar="$r/target/morrigan-1-SNAPSHOT-jar-with-dependencies.jar"
+if ! [ -e "$jar" ] ; then
+  echo "Not found: $jar"
+  echo 'Maybe try building with: mvn clean package'
+  exit 1
+fi
+echo "Using jar: $jar"
 
-mkdir -vp /opt/morrigan
-chown -v root:morrigan /opt/morrigan
-chmod -v 770 /opt/morrigan
+insdir="/opt/morrigan"
+echo "Install dir: $insdir"
 
-r=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-cp -v \
-  "$r/target/morrigan-1-SNAPSHOT-jar-with-dependencies.jar" \
-  "/opt/morrigan/morrigan.jar"
+mkdir -vp "$insdir"
+cp -v "$jar" "$insdir/morrigan.jar"
+
+homedir="$insdir/home"
+mkdir -vp "$homedir"
+chgrp -v 'morrigan' "$homedir"
+chmod -v 770 "$homedir"
+chmod g+s "$homedir"
 
 unit_src="$r/systemd/morrigan.service"
 unit_etc='/etc/systemd/system/morrigan.service'
@@ -29,7 +43,7 @@ if [ -e "$unit_etc" ] ; then
     yes_or_no "Installed unit file differs, continue?" || exit 1
   fi
 else
-  cp -v "$unt_src" "$unit_etc"
+  cp -v "$unit_src" "$unit_etc"
 fi
 
 systemctl daemon-reload

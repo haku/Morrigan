@@ -6,13 +6,15 @@ After=network.target
 Environment="PATH=/usr/bin:/bin"
 Type=simple
 DynamicUser=yes
+User=morrigan-dynamic
 SupplementaryGroups=library
 SupplementaryGroups=morrigan
+ReadWritePaths=/opt/morrigan/home
 ExecStart=/usr/bin/java \
           -XX:+PerfDisableSharedMem \
           -XX:-UsePerfData \
           -jar /opt/morrigan/morrigan.jar \
-          --configpath /opt/morrigan \
+          --configpath /opt/morrigan/home \
           --dlna \
           --http 28080 \
           --ssh  28022
