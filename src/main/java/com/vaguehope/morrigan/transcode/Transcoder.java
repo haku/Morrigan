@@ -27,6 +27,7 @@ import com.vaguehope.morrigan.util.StringHelper;
 
 public class Transcoder {
 
+	private static final int FRESHEN_TRANSCODES_EVERY_N_DAYS = 30;
 	private static final int SHUTDOWN_TIMEOUT_SECONDS = 5;
 	private static final int ERR_HISTORY_LINES = 100;
 	private static final int MAX_IN_PROGRESS_TRANSCODES = 3;
@@ -91,7 +92,7 @@ public class Transcoder {
 		final File freshCacheFile = tProfile.getCacheFileIfFresh();
 		if (freshCacheFile != null) {
 			// Update timestamp so that old transcodes can be GCed.
-			FileHelper.freshenLastModified(freshCacheFile, 5, TimeUnit.DAYS);
+			FileHelper.freshenLastModified(freshCacheFile, FRESHEN_TRANSCODES_EVERY_N_DAYS, TimeUnit.DAYS);
 			return;
 		}
 
@@ -264,7 +265,7 @@ public class Transcoder {
 
 		@Override
 		public List<String> call () throws Exception {
-			final LinkedList<String> err = new LinkedList<String>();
+			final LinkedList<String> err = new LinkedList<>();
 			try {
 				readErr(err);
 			}
