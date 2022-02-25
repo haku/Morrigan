@@ -16,6 +16,8 @@ External Dependences
 
 The compiled-in player depends on VLC.  On Debian / Ubuntu try `apt install vlc libvlc-dev libvlccore-dev`.  See https://github.com/caprica/vlcj for more.
 
+Transcoding require ffmpeg (and ffprobe) to be installed and on PATH.
+
 Licence
 -------
 
