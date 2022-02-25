@@ -103,8 +103,8 @@ public class AuthFilter implements Filter {
 		chain.doFilter(request, response);
 	}
 
-	private boolean checkUser (@SuppressWarnings("unused") final String user, final String pass) {
-		return this.authChecker.verifyAuth(pass);
+	private boolean checkUser (final String user, final String pass) {
+		return this.authChecker.verifyAuth(user, pass);
 	}
 
 	private static void send401 (final HttpServletResponse resp) throws IOException {

@@ -72,7 +72,7 @@ public class SshUi {
 		this.sshd.setShellFactory(this.mnCommandFactory);
 		this.sshd.setPasswordAuthenticator(new MnPasswordAuthenticator(this.serverConfig));
 		try {
-			this.sshd.setPublickeyAuthenticator(new UserPublickeyAuthenticator());
+			this.sshd.setPublickeyAuthenticator(new UserPublickeyAuthenticator(this.serverConfig));
 		}
 		catch (final GeneralSecurityException e) {
 			throw new IllegalStateException("Failed to load public key.", e);

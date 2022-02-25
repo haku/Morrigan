@@ -21,13 +21,7 @@ public class ServerConfig implements AuthChecker {
 	private static final String KEY_PASS = "pass";
 	private static final String DEFAULT_PASS = "Morrigan";
 
-	private static final String KEY_PLAYER_ENABLED = "player";
-	private static final String DEFAULT_PLAYER_ENABLED = Boolean.TRUE.toString();
-
 	private static final String KEY_BINDIP = "bindip";
-
-	private static final String KEY_AUTOSTART = "autostart";
-	private static final String DEFAULT_AUTOSTART = Boolean.FALSE.toString();
 
 	private static final Logger LOG = LoggerFactory.getLogger(ServerConfig.class);
 
@@ -39,14 +33,14 @@ public class ServerConfig implements AuthChecker {
 		this.args = args;
 	}
 
+	public boolean verifyUsername(String username) {
+		return true;  // Accept all usernames.
+	}
+
 	public boolean verifyPassword (final String passToTest) throws IOException {
 		// TODO use bcrypt.
 		final String pass = this.propFile.getString(KEY_PASS, DEFAULT_PASS);
 		return pass.equals(passToTest);
-	}
-
-	public boolean isServerPlayerEnabled () throws IOException {
-		return Boolean.parseBoolean(this.propFile.getString(KEY_PLAYER_ENABLED, DEFAULT_PLAYER_ENABLED));
 	}
 
 	public InetAddress getBindAddress(final String whatFor) throws IOException {
@@ -68,16 +62,12 @@ public class ServerConfig implements AuthChecker {
 		return ret;
 	}
 
-	public boolean isAutoStart () throws IOException {
-		return Boolean.parseBoolean(this.propFile.getString(KEY_AUTOSTART, DEFAULT_AUTOSTART));
-	}
-
 	//	AuthChecker
 
 	@Override
-	public boolean verifyAuth (final String passToTest) {
+	public boolean verifyAuth(String user, String pass) {
 		try {
-			return verifyPassword(passToTest);
+			return verifyUsername(user) && verifyPassword(pass);
 		}
 		catch (final IOException e) {
 			LOG.warn("Failed to verify password.", e);

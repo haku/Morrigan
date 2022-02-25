@@ -57,7 +57,7 @@ public class AuthTest {
 	public void setupMockServer() throws Exception {
 		final AuthChecker authChecker = new AuthChecker() {
 			@Override
-			public boolean verifyAuth (final String passToTest) {
+			public boolean verifyAuth (final String user, final String pass) {
 				return true;
 			}
 		};

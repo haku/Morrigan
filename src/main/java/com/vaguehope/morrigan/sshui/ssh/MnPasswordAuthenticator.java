@@ -8,16 +8,14 @@ import com.vaguehope.morrigan.server.ServerConfig;
 public class MnPasswordAuthenticator implements PasswordAuthenticator {
 
 	private final ServerConfig config;
-	private final String currentUserName;
 
 	public MnPasswordAuthenticator (final ServerConfig serverConfig) {
 		this.config = serverConfig;
-		this.currentUserName = System.getProperty("user.name");
 	}
 
 	@Override
 	public boolean authenticate (final String username, final String password, final ServerSession session) {
-		return this.currentUserName.equals(username) && this.config.verifyAuth(password);
+		return this.config.verifyAuth(username, password);
 	}
 
 }
