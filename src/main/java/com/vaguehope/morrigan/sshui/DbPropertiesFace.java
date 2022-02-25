@@ -36,19 +36,19 @@ public class DbPropertiesFace extends DefaultFace {
 	private final IMixedMediaDb db;
 
 	private final LastActionMessage lastActionMessage = new LastActionMessage();
-	private final AtomicReference<File> savedInitialDir = new AtomicReference<File>();
+	private final AtomicReference<File> savedInitialDir;
 
 	private List<String> sources;
 	private Object selectedItem;
 	private int queueScrollTop = 0;
 	private int pageSize = 1;
 
-	public DbPropertiesFace (final FaceNavigation navigation, final MnContext mnContext, final IMixedMediaDb db) throws MorriganException {
+	public DbPropertiesFace (final FaceNavigation navigation, final MnContext mnContext, final IMixedMediaDb db, final AtomicReference<File> savedInitialDir) throws MorriganException {
 		super(navigation);
 		this.navigation = navigation;
 		this.mnContext = mnContext;
 		this.db = db;
-		this.savedInitialDir.set(new File(System.getProperty("user.home")));
+		this.savedInitialDir = savedInitialDir;
 		refreshData();
 	}
 
@@ -100,7 +100,8 @@ public class DbPropertiesFace extends DefaultFace {
 						return true;
 					default:
 				}
-			default:
+			//$FALL-THROUGH$
+		default:
 				return super.onInput(k, gui);
 		}
 	}
@@ -152,6 +153,7 @@ public class DbPropertiesFace extends DefaultFace {
 		}
 	}
 
+	// TODO replace with AsyncActions() ?
 	private void rescanSources () {
 		if (this.db instanceof ILocalMixedMediaDb) {
 			final MorriganTask task = this.mnContext.getMediaFactory().getLocalMixedMediaDbUpdateTask((ILocalMixedMediaDb) this.db);

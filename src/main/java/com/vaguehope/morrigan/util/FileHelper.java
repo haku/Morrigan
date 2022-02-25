@@ -38,15 +38,15 @@ public final class FileHelper {
 				dstChannel = new FileOutputStream(dstFile).getChannel();
 
 				try {
-					int maxCount = (chunkSizeMb * 1024 * 1024) - (32 * 1024);
-					long size = srcChannel.size();
+					final int maxCount = (chunkSizeMb * 1024 * 1024) - (32 * 1024);
+					final long size = srcChannel.size();
 					long position = 0;
 					while (position < size) {
 						position += srcChannel.transferTo(position, maxCount, dstChannel);
 					}
 					transferDone = true;
 				}
-				catch (IOException e) {
+				catch (final IOException e) {
 					if (e.getMessage().contains("Insufficient system resources exist to complete the requested service")) {
 						chunkSizeMb--;
 						if (chunkSizeMb <= 0) {
@@ -84,6 +84,14 @@ public final class FileHelper {
 		final long now = System.currentTimeMillis();
 		if (now - f.lastModified() < timeUnit.toMillis(unlessOlderThan)) return;
 		if (!f.setLastModified(now)) throw new IOException("Failed to touch file: " + f.getAbsolutePath());
+	}
+
+	public static File getSomeRootDir() {
+		final File[] roots = File.listRoots();
+		if (roots != null && roots.length > 0) {
+			return roots[0];
+		}
+		return new File("/");
 	}
 
 }

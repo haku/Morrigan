@@ -66,7 +66,7 @@ public class DirDialog extends DialogWindow {
 		setComponent(p);
 
 		setCloseWindowWithEscape(true);
-		setHints(new HashSet<Hint>(Arrays.asList(Hint.CENTERED, Hint.MODAL)));
+		setHints(new HashSet<>(Arrays.asList(Hint.CENTERED, Hint.MODAL)));
 
 		this.lstDirs.setDir(savedInitialDir.get());
 	}
@@ -101,11 +101,16 @@ public class DirDialog extends DialogWindow {
 					return !file.getName().startsWith(".") && file.isDirectory();
 				}
 			});
-			Arrays.sort(items);
-			for (final File item : items) {
-				addItem(item);
+			if (items != null) {
+				Arrays.sort(items);
+				for (final File item : items) {
+					addItem(item);
+				}
+				this.dialog.lblInfo.setText(String.format("%s (%s items)", dir.getAbsolutePath(), items.length));
 			}
-			this.dialog.lblInfo.setText(String.format("%s (%s items)", dir.getAbsolutePath(), items.length));
+			else {
+				this.dialog.lblInfo.setText(String.format("Error reading: %s", dir.getAbsolutePath()));
+			}
 		}
 
 		public File getSelectedDir () {

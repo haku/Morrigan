@@ -28,16 +28,20 @@ import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.server.ServerConfig;
 
 public class UserPublickeyAuthenticator implements PublickeyAuthenticator {
 
+	private static final String KEYS_FILE_NAME = "authorized_keys";  // TODO move to Config class.
 	private static final Logger LOG = LoggerFactory.getLogger(UserPublickeyAuthenticator.class);
 
+	private final Config config;
 	private final ServerConfig serverConfig;
 	private final Set<PublicKey> publicKeys;
 
-	public UserPublickeyAuthenticator (final ServerConfig serverConfig) throws FileNotFoundException, GeneralSecurityException {
+	public UserPublickeyAuthenticator (final Config config, final ServerConfig serverConfig) throws FileNotFoundException, GeneralSecurityException {
+		this.config = config;
 		this.serverConfig = serverConfig;
 		this.publicKeys = parseAuthorizedKeysFile();
 		LOG.info("Found {} public keys.", this.publicKeys.size());
@@ -48,14 +52,10 @@ public class UserPublickeyAuthenticator implements PublickeyAuthenticator {
 		return this.serverConfig.verifyUsername(username) && this.publicKeys.contains(key);
 	}
 
-	private static Set<PublicKey> parseAuthorizedKeysFile () throws FileNotFoundException, GeneralSecurityException {
-		final File mnFile = new File(new File(new File(System.getProperty("user.home")), ".morrigan"), "authorized_keys");
-		final File sshFile = new File(new File(new File(System.getProperty("user.home")), ".ssh"), "authorized_keys");
+	private Set<PublicKey> parseAuthorizedKeysFile () throws FileNotFoundException, GeneralSecurityException {
+		final File mnFile = new File(this.config.getConfigDir(), KEYS_FILE_NAME);
 		if (mnFile.exists()) {
 			return parseAuthorizedKeysFile(mnFile);
-		}
-		else if (sshFile.exists()) {
-			return parseAuthorizedKeysFile(sshFile);
 		}
 		return Collections.emptySet();
 	}

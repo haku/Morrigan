@@ -35,6 +35,7 @@ import com.vaguehope.morrigan.sshui.MenuHelper.VDirection;
 import com.vaguehope.morrigan.sshui.util.LastActionMessage;
 import com.vaguehope.morrigan.sshui.util.TextGuiUtils;
 import com.vaguehope.morrigan.tasks.MorriganTask;
+import com.vaguehope.morrigan.util.FileHelper;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
 public class DbFace extends DefaultFace {
@@ -71,9 +72,9 @@ public class DbFace extends DefaultFace {
 	private final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
 	private final LastActionMessage lastActionMessage = new LastActionMessage();
-	private final AtomicReference<File> savedInitialDir = new AtomicReference<File>();
-	private final Set<IMixedMediaItem> selectedItems = new HashSet<IMixedMediaItem>();
-	private final AtomicReference<String> savedSearchTerm = new AtomicReference<String>();
+	private final AtomicReference<File> savedInitialDir;
+	private final Set<IMixedMediaItem> selectedItems = new HashSet<>();
+	private final AtomicReference<String> savedSearchTerm = new AtomicReference<>();
 
 	private List<IMixedMediaItem> mediaItems;
 	private int selectedItemIndex = -1;
@@ -90,6 +91,7 @@ public class DbFace extends DefaultFace {
 		this.db = db;
 		this.defaultPlayer = defaultPlayer;
 		this.dbHelper = new DbHelper(navigation, mnContext, this.defaultPlayer, this.lastActionMessage, this);
+		this.savedInitialDir = new AtomicReference<>(FileHelper.getSomeRootDir());
 		refreshData();
 	}
 
@@ -186,7 +188,7 @@ public class DbFace extends DefaultFace {
 				menuMoveEnd(VDirection.DOWN);
 				return true;
 			case F6:
-				this.navigation.startFace(new DbPropertiesFace(this.navigation, this.mnContext, this.db));
+				this.navigation.startFace(new DbPropertiesFace(this.navigation, this.mnContext, this.db, this.savedInitialDir));
 				return true;
 			case Enter:
 				playSelection(gui);
@@ -282,7 +284,7 @@ public class DbFace extends DefaultFace {
 
 	private List<IMixedMediaItem> getSelectedItems () {
 		if (this.selectedItems.size() > 0) {
-			final List<IMixedMediaItem> ret = new ArrayList<IMixedMediaItem>();
+			final List<IMixedMediaItem> ret = new ArrayList<>();
 			for (final IMixedMediaItem item : this.mediaItems) {
 				if (this.selectedItems.contains(item)) ret.add(item);
 			}
@@ -347,7 +349,6 @@ public class DbFace extends DefaultFace {
 	}
 
 	private void askExportSelection (final WindowBasedTextGUI gui) {
-		this.savedInitialDir.compareAndSet(null, new File(System.getProperty("user.home")));
 		final List<IMixedMediaItem> items = getSelectedItems();
 		if (items.size() < 1) return;
 		final File dir = DirDialog.show(gui, String.format("Export %s tracks", items.size()), "Export", this.savedInitialDir);
@@ -367,7 +368,7 @@ public class DbFace extends DefaultFace {
 
 	private void askSortColumn (final WindowBasedTextGUI gui) {
 		final List<IDbColumn> cols = this.db.getDbLayer().getMediaTblColumns();
-		final List<Runnable> actions = new ArrayList<Runnable>();
+		final List<Runnable> actions = new ArrayList<>();
 		for (final IDbColumn col : cols) {
 			if (col.getHumanName() != null) {
 				actions.add(new SortColumnAction(this.db, col, SortDirection.ASC));
