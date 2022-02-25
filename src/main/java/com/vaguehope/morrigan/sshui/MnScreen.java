@@ -91,6 +91,7 @@ public class MnScreen extends SshScreen implements FaceNavigation {
 	@Override
 	public void startFace (final Face face) {
 		this.faces.add(face);
+		face.onFocus();
 	}
 
 	@Override
@@ -108,6 +109,7 @@ public class MnScreen extends SshScreen implements FaceNavigation {
 				LOG.warn("onClose() failed.", e);
 			}
 		}
+		activeFace().onFocus();
 		return true;
 	}
 

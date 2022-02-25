@@ -22,6 +22,11 @@ public abstract class DefaultFace implements Face {
 	}
 
 	@Override
+	public void onFocus() {
+		// Do nothing by default.
+	}
+
+	@Override
 	public boolean onInput (final KeyStroke k, final WindowBasedTextGUI gui) throws Exception {
 		switch (k.getKeyType()) {
 			case Escape:

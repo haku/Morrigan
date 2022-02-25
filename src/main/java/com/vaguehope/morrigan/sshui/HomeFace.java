@@ -66,7 +66,6 @@ public class HomeFace extends DefaultFace {
 	private void refreshData () {
 		this.players = asList(this.mnContext.getPlayerReader().getPlayers());
 		this.tasks = this.mnContext.getAsyncTasksRegister().tasks();
-		this.dbs = asList(this.mnContext.getMediaFactory().getAllLocalMixedMediaDbs());
 	}
 
 	private void refreshStaleData () {
@@ -75,6 +74,11 @@ public class HomeFace extends DefaultFace {
 			refreshData();
 			this.lastDataRefresh = now;
 		}
+	}
+
+	@Override
+	public void onFocus() {
+		this.dbs = asList(this.mnContext.getMediaFactory().getAllLocalMixedMediaDbs());
 	}
 
 	@Override
