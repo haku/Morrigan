@@ -17,11 +17,6 @@ public interface Face {
 		 */
 		boolean backOneLevel ();
 
-		/**
-		 * Returns same as backOneLevel().
-		 */
-		boolean backOneLevelWithResult (Object result);
-
 	}
 
 	boolean onInput (KeyStroke k, WindowBasedTextGUI gui) throws Exception;
@@ -29,11 +24,6 @@ public interface Face {
 	boolean processEvents ();
 
 	void writeScreen (Screen scr, TextGraphics tg);
-
-	/**
-	 * Called when face closed with backOneLevelWithResult();
-	 */
-	void onFaceResult (Object result) throws Exception; // NOSONAR throws Exception is part of API.
 
 	/**
 	 * Called once when face is closed.
