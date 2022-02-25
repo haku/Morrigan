@@ -3,13 +3,18 @@ Description=Morrigan
 After=network.target
 
 [Service]
+Environment="HOME=/opt/morrigan/home"
 Environment="PATH=/usr/bin:/bin"
 Type=simple
 DynamicUser=yes
 User=morrigan-dynamic
+SupplementaryGroups=audio
 SupplementaryGroups=library
 SupplementaryGroups=morrigan
+ReadWritePaths=/dev/snd
 ReadWritePaths=/opt/morrigan/home
+ReadWritePaths=/proc/asound
+ReadWritePaths=/sys/class/sound
 ExecStart=/usr/bin/java \
           -XX:+PerfDisableSharedMem \
           -XX:-UsePerfData \
