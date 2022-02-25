@@ -458,7 +458,7 @@ public class DbFace extends DefaultFace {
 
 			// Rest of item title space if selected.
 			if (i == this.selectedItemIndex) {
-				for (int x = 1 + TerminalTextUtils.getColumnWidth(name); x < colRightPlayCount; x++) {
+				for (int x = 1 + TerminalTextUtils.getColumnWidth(name); x < colRightDuration; x++) {
 					tg.setCharacter(x, l, ' ');
 				}
 			}
@@ -484,8 +484,10 @@ public class DbFace extends DefaultFace {
 			}
 
 			// Duration column.
-			final String dur = formatTimeSecondsLeftPadded(item.getDuration());
-			tg.putString(colRightDuration - dur.length(), l, dur);
+			if (item.getDuration() > 0) {
+				final String dur = formatTimeSecondsLeftPadded(item.getDuration());
+				tg.putString(colRightDuration - dur.length(), l, dur);
+			}
 
 			l++;
 		}
