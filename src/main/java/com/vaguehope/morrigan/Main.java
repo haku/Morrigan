@@ -78,34 +78,17 @@ public final class Main {
 		}
 
 		final Config config = Config.fromArgs(args);
-
-		final AsyncTasksRegister asyncTasksRegister = new AsyncTasksRegisterImpl(
-				Executors.newCachedThreadPool(new DaemonThreadFactory("tsk")));
-
+		final AsyncTasksRegister asyncTasksRegister = new AsyncTasksRegisterImpl(Executors.newCachedThreadPool(new DaemonThreadFactory("tsk")));
 		final VlcEngineFactory playbackEngineFactory = new VlcEngineFactory();
 		final MediaFactory mediaFactory = new MediaFactoryImpl(config, playbackEngineFactory);
-
-		final ScheduledThreadPoolExecutor playerEx = new ScheduledThreadPoolExecutor(1, new DaemonThreadFactory("player"));
-		playerEx.setKeepAliveTime(1, TimeUnit.MINUTES);
-		playerEx.allowCoreThreadTimeOut(true);
-		final PlayerRegister playerRegister = new PlayerRegisterImpl(
-				playbackEngineFactory,
-				new PlayerStateStorage(mediaFactory, playerEx, config),
-				config,
-				playerEx);
-
+		final PlayerRegister playerRegister = makePlayerRegister(config, playbackEngineFactory, mediaFactory);
 		final AsyncActions asyncActions = new AsyncActions(asyncTasksRegister, mediaFactory, config);
-		final ScheduledExecutorService srvSchEx = Executors.newScheduledThreadPool(1, new DaemonThreadFactory("srvsch"));
 		final Transcoder transcoder = new Transcoder("srv");
+		makeLocalPlayer(playerRegister);
 
 		final ServerConfig serverConfig = new ServerConfig(config, args);
 		if (args.getHttpPort() > 0) {
-			if (serverConfig.isServerPlayerEnabled()) {
-				final ExecutorService srvEx = new ThreadPoolExecutor(0, 1, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), new DaemonThreadFactory("srvplayer"));
-				final ServerPlayerContainer playerContainer = new ServerPlayerContainer(srvEx);
-				fillPlayerContainer(playerContainer, playerRegister);
-			}
-
+			final ScheduledExecutorService srvSchEx = Executors.newScheduledThreadPool(1, new DaemonThreadFactory("srvsch"));
 			final MorriganServer server = new MorriganServer(args.getHttpPort(), config, serverConfig, playerRegister, mediaFactory, asyncTasksRegister, asyncActions, transcoder, srvSchEx);
 			server.start();
 		}
@@ -121,6 +104,24 @@ public final class Main {
 		}
 
 		new CountDownLatch(1).await();  // Block forever.
+	}
+
+	private static PlayerRegister makePlayerRegister(final Config config, final VlcEngineFactory playbackEngineFactory, final MediaFactory mediaFactory) {
+		final ScheduledThreadPoolExecutor playerEx = new ScheduledThreadPoolExecutor(1, new DaemonThreadFactory("player"));
+		playerEx.setKeepAliveTime(1, TimeUnit.MINUTES);
+		playerEx.allowCoreThreadTimeOut(true);
+		final PlayerRegister playerRegister = new PlayerRegisterImpl(
+				playbackEngineFactory,
+				new PlayerStateStorage(mediaFactory, playerEx, config),
+				config,
+				playerEx);
+		return playerRegister;
+	}
+
+	private static void makeLocalPlayer(final PlayerRegister playerRegister) {
+		final ExecutorService ex = new ThreadPoolExecutor(0, 1, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), new DaemonThreadFactory("lplayer"));
+		final ServerPlayerContainer pc = new ServerPlayerContainer(ex);
+		fillPlayerContainer(pc, playerRegister);
 	}
 
 	private static void fillPlayerContainer (final PlayerContainer container, final PlayerRegister playerRegister) {
