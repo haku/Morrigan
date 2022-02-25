@@ -115,7 +115,7 @@ public class JumpToDialog extends DialogWindow {
 		setComponent(p);
 
 		setCloseWindowWithEscape(true);
-		setHints(new HashSet<Hint>(Arrays.asList(Hint.CENTERED, Hint.MODAL)));
+		setHints(new HashSet<>(Arrays.asList(Hint.CENTERED, Hint.MODAL)));
 
 		setSearchResults(null); // Init msgs.
 		final String term = savedSearchTerm.get();
@@ -166,7 +166,7 @@ public class JumpToDialog extends DialogWindow {
 
 		public SearchRunner (final JumpToDialog dlg) {
 			this.dlg = dlg;
-			this.queue = new LinkedBlockingQueue<Object>(1);
+			this.queue = new LinkedBlockingQueue<>(1);
 		}
 
 		public void requestSearch () {
@@ -400,7 +400,8 @@ public class JumpToDialog extends DialogWindow {
 				case ArrowUp:
 				case ArrowDown:
 					selectedChanged();
-				default:
+				//$FALL-THROUGH$
+			default:
 			}
 
 			if (result == Result.UNHANDLED) {

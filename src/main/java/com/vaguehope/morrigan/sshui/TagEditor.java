@@ -67,7 +67,7 @@ public class TagEditor extends DialogWindow {
 		setComponent(p);
 
 		setCloseWindowWithEscape(true);
-		setHints(new HashSet<Hint>(Arrays.asList(Hint.CENTERED, Hint.MODAL)));
+		setHints(new HashSet<>(Arrays.asList(Hint.CENTERED, Hint.MODAL)));
 
 		this.lstTags.reloadTags();
 	}
@@ -134,7 +134,7 @@ public class TagEditor extends DialogWindow {
 
 			try {
 				final Map<String, MediaTag> searchRes = this.tagEditor.list.tagSearch(input, 20);
-				resetAutocomplete(new ArrayList<MediaTag>(searchRes.values()));
+				resetAutocomplete(new ArrayList<>(searchRes.values()));
 
 				if (searchRes.size() > 0) {
 					final MediaTag tag = searchRes.values().iterator().next();

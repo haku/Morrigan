@@ -13,7 +13,7 @@ import com.googlecode.lanterna.input.KeyType;
 
 public class SshInputMapping implements KeyDecodingProfile {
 
-	private static final List<CharacterPattern> PATTERNS = new ArrayList<CharacterPattern>(
+	private static final List<CharacterPattern> PATTERNS = new ArrayList<>(
 			Arrays.asList(
 					new CharacterPattern[] {
 							new BasicCharacterPattern(new KeyStroke(KeyType.Enter), '\r')

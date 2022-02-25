@@ -41,8 +41,6 @@ import ch.qos.logback.core.ConsoleAppender;
 
 public final class Main {
 
-	private static final Logger LOG = LoggerFactory.getLogger(Main.class);
-
 	private Main () {
 		throw new AssertionError();
 	}

@@ -126,7 +126,8 @@ public class HomeFace extends DefaultFace {
 						return false;
 					default:
 				}
-			default:
+			//$FALL-THROUGH$
+		default:
 				//LOG.info("kind={} c={} a={} char={}", k.getKind(), k.isCtrlPressed(), k.isAltPressed(), String.valueOf((int) k.getCharacter()));
 				return super.onInput(k, gui);
 		}

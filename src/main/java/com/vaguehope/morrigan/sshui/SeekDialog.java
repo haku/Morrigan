@@ -33,7 +33,7 @@ public class SeekDialog extends DialogWindow {
 
 		setComponent(p);
 		setCloseWindowWithEscape(true);
-		setHints(new HashSet<Hint>(Arrays.asList(Hint.CENTERED, Hint.MODAL)));
+		setHints(new HashSet<>(Arrays.asList(Hint.CENTERED, Hint.MODAL)));
 	}
 
 	private enum SeekHop {

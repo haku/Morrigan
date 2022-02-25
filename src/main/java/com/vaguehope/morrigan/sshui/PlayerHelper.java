@@ -21,13 +21,13 @@ public final class PlayerHelper {
 	}
 
 	public static void shuffleAndEnqueue (final IMediaTrackList<? extends IMediaTrack> db, final List<? extends IMediaTrack> tracks, final Player player) {
-		final List<IMediaTrack> shuffeledList = new ArrayList<IMediaTrack>(tracks);
+		final List<IMediaTrack> shuffeledList = new ArrayList<>(tracks);
 		Collections.shuffle(shuffeledList);
 		enqueueAll(db, shuffeledList, player);
 	}
 
 	public static void playAll (final IMediaTrackList<? extends IMediaTrack> db, final List<? extends IMediaTrack> tracks, final Player player) {
-		final List<PlayItem> items = new ArrayList<PlayItem>();
+		final List<PlayItem> items = new ArrayList<>();
 		for (final IMediaTrack track : tracks) {
 			items.add(new PlayItem(db, track));
 		}
@@ -52,8 +52,8 @@ public final class PlayerHelper {
 			return players.iterator().next();
 		}
 		else {
-			final AtomicReference<Player> ret = new AtomicReference<Player>();
-			final List<Runnable> actions = new ArrayList<Runnable>();
+			final AtomicReference<Player> ret = new AtomicReference<>();
+			final List<Runnable> actions = new ArrayList<>();
 			for (final Player player : players) {
 				actions.add(new Runnable() {
 					@Override
