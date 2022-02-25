@@ -21,8 +21,6 @@ public class ServerConfig implements AuthChecker {
 	private static final String KEY_PASS = "pass";
 	private static final String DEFAULT_PASS = "Morrigan";
 
-	private static final String KEY_BINDIP = "bindip";
-
 	private static final Logger LOG = LoggerFactory.getLogger(ServerConfig.class);
 
 	private final PropertiesFile propFile;
@@ -45,10 +43,6 @@ public class ServerConfig implements AuthChecker {
 
 	public InetAddress getBindAddress(final String whatFor) throws IOException {
 		String strIface = this.args.getInterface();
-		if (strIface == null) {
-			strIface = this.propFile.getString(KEY_BINDIP, null);
-		}
-
 		final InetAddress ret;
 		if (strIface != null) {
 			ret = InetAddress.getByName(strIface);
