@@ -458,7 +458,7 @@ public class DbFace extends DefaultFace {
 
 			// Rest of item title space if selected.
 			if (i == this.selectedItemIndex) {
-				for (int x = 1 + TerminalTextUtils.getColumnWidth(name); x < colRightLastPlayed; x++) {
+				for (int x = 1 + TerminalTextUtils.getColumnWidth(name); x < colRightPlayCount; x++) {
 					tg.setCharacter(x, l, ' ');
 				}
 			}
