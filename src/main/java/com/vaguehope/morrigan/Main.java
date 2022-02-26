@@ -77,7 +77,7 @@ public final class Main {
 
 		final Config config = Config.fromArgs(args);
 		final AsyncTasksRegister asyncTasksRegister = new AsyncTasksRegisterImpl(Executors.newCachedThreadPool(new DaemonThreadFactory("tsk")));
-		final VlcEngineFactory playbackEngineFactory = new VlcEngineFactory();
+		final VlcEngineFactory playbackEngineFactory = new VlcEngineFactory(args);
 		final MediaFactory mediaFactory = new MediaFactoryImpl(config, playbackEngineFactory);
 		final PlayerRegister playerRegister = makePlayerRegister(config, playbackEngineFactory, mediaFactory);
 		final AsyncActions asyncActions = new AsyncActions(asyncTasksRegister, mediaFactory, config);

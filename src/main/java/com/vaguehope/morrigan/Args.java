@@ -1,5 +1,7 @@
 package com.vaguehope.morrigan;
 
+import java.util.List;
+
 import org.kohsuke.args4j.Option;
 
 public class Args {
@@ -9,6 +11,7 @@ public class Args {
 	@Option(name = "--http", usage = "Local port to bind HTTP UI to.") private int httpPort = -1;
 	@Option(name = "--interface", usage = "Hostname or IP address of interface to bind to.") private String iface;
 	@Option(name = "--ssh", usage = "Local port to bind SSH UI to.") private int sshPort = -1;
+	@Option(name = "--vlcarg", metaVar = "--foo=bar", usage = "Extra VLC arg, use once for each arg.") private List<String> vlcArgs;
 	@Option(name = "-v", aliases = { "--verbose" }, usage = "print log lines for various events.") private boolean verboseLog = false;
 
 	public String getConfigPath() {
@@ -33,6 +36,10 @@ public class Args {
 
 	public boolean isVerboseLog() {
 		return this.verboseLog;
+	}
+
+	public List<String> getVlcArgs() {
+		return this.vlcArgs;
 	}
 
 }
