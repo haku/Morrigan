@@ -1,6 +1,7 @@
 [Unit]
 Description=Morrigan
 After=network.target
+Before=snapserver.service
 
 [Service]
 Environment="HOME=/opt/morrigan/home"
@@ -11,15 +12,19 @@ User=morrigan-dynamic
 SupplementaryGroups=audio
 SupplementaryGroups=library
 SupplementaryGroups=morrigan
-ReadWritePaths=/dev/snd
 ReadWritePaths=/opt/morrigan/home
-ReadWritePaths=/proc/asound
-ReadWritePaths=/sys/class/sound
+ReadWritePaths=-/dev/snd
+ReadWritePaths=-/proc/asound
+ReadWritePaths=-/sys/class/sound
+RuntimeDirectory=morrigan
+ExecStartPre=mkfifo /run/morrigan/apipe
 ExecStart=/usr/bin/java \
           -XX:+PerfDisableSharedMem \
           -XX:-UsePerfData \
           -jar /opt/morrigan/morrigan.jar \
           --configpath /opt/morrigan/home \
+          --vlcarg "--aout=afile" \
+          --vlcarg "--audiofile-file=/run/morrigan/apipe" \
           --dlna \
           --http 28080 \
           --ssh  28022
@@ -30,3 +35,4 @@ TimeoutStopSec=30
 
 [Install]
 WantedBy=multi-user.target
+WantedBy=snapserver.service
