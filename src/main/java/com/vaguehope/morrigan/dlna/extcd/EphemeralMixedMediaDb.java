@@ -164,6 +164,11 @@ public abstract class EphemeralMixedMediaDb implements IMixedMediaDb {
 // Not supported - but possible to implement.
 
 	@Override
+	public void setHideMissing(boolean v) throws MorriganException {
+		throw new UnsupportedOperationException("Not supported.");
+	}
+
+	@Override
 	public void copyItemFile (final IMixedMediaItem item, final OutputStream os) throws MorriganException {
 		throw new UnsupportedOperationException("Not implemented.");
 	}

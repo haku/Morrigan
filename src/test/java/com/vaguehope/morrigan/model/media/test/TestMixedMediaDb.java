@@ -3,6 +3,7 @@ package com.vaguehope.morrigan.model.media.test;
 import java.io.File;
 import java.math.BigInteger;
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -24,6 +25,10 @@ public class TestMixedMediaDb extends LocalMixedMediaDb {
 	private static final AtomicInteger newDbCounter = new AtomicInteger(0);
 	private static final AtomicInteger newTrackCounter = new AtomicInteger(0);
 
+	public static int getTrackNumber() {
+		return newTrackCounter.getAndIncrement();
+	}
+
 	public TestMixedMediaDb () throws DbException, MorriganException {
 		this(NAME + newDbCounter.getAndIncrement());
 	}
@@ -38,7 +43,7 @@ public class TestMixedMediaDb extends LocalMixedMediaDb {
 	}
 
 	public IMixedMediaItem addTestTrack() throws MorriganException, DbException {
-		final int n = newTrackCounter.getAndIncrement();
+		final int n = getTrackNumber();
 		return addTestTrack(new File(String.format("some_media_file_%s.ext", n)),
 				BigInteger.TEN.add(BigInteger.valueOf(n)));
 	}
@@ -48,7 +53,7 @@ public class TestMixedMediaDb extends LocalMixedMediaDb {
 	}
 
 	public IMixedMediaItem addTestTrack (final BigInteger hashCode) throws MorriganException, DbException {
-		return addTestTrack(new File(String.format("some_media_file_%s.ext", newTrackCounter.getAndIncrement())), hashCode);
+		return addTestTrack(new File(String.format("some_media_file_%s.ext", getTrackNumber())), hashCode);
 	}
 
 	public IMixedMediaItem addTestTrack (final File file, final BigInteger hashCode) throws MorriganException, DbException {
@@ -61,6 +66,17 @@ public class TestMixedMediaDb extends LocalMixedMediaDb {
 		setTrackDateLastPlayed(track, lastPlayed);
 
 		return track;
+	}
+
+	public void printContent(final String prefix) {
+		System.out.println(prefix + ": TestDb " + getListName() + " has " + getCount() + " items:");
+		final List<IMixedMediaItem> items = getMediaItems();
+		for (final IMixedMediaItem i :  items) {
+			System.out.print(i.isMissing() ? "M" : "-");
+			System.out.print(i.isEnabled() ? "-" : "D");
+			System.out.print(" ");
+			System.out.println(i.getFilepath());
+		}
 	}
 
 }

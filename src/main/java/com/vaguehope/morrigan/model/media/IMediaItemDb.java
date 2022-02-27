@@ -49,6 +49,8 @@ public interface IMediaItemDb<S extends IMediaItemStorageLayer<T>, T extends IMe
 	FileExistance hasFile (File file) throws MorriganException, DbException;
 	List<T> addFiles (List<File> files) throws MorriganException, DbException;
 
+	void setHideMissing(final boolean v) throws MorriganException;
+
 	IDbColumn getSort ();
 	SortDirection getSortDirection ();
 	void setSort (IDbColumn sort, SortDirection direction) throws MorriganException;

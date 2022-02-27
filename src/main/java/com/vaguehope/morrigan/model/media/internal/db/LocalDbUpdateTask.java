@@ -26,6 +26,7 @@ import com.vaguehope.morrigan.tasks.TaskEventListener;
 import com.vaguehope.morrigan.tasks.TaskResult;
 import com.vaguehope.morrigan.tasks.TaskResult.TaskOutcome;
 import com.vaguehope.morrigan.util.ChecksumHelper;
+import com.vaguehope.morrigan.util.FileSystem;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
 public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaItemStorageLayer<T>, T>, T extends IMediaItem> implements MorriganTask {
@@ -65,6 +66,14 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 			return this.faital;
 		}
 
+	}
+
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	private FileSystem fileSystem = new FileSystem();
+
+	public void setFileSystem(final FileSystem fileSystem) {
+		this.fileSystem = fileSystem;
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -200,7 +209,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 		if (sources != null) {
 			final Queue<File> dirs = new LinkedList<File>();
 			for (final String source : sources) {
-				dirs.add(new File(source));
+				dirs.add(this.fileSystem.makeFile(source));
 			}
 
 			while (!dirs.isEmpty()) {
@@ -301,7 +310,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 			}
 
 			// Existence test.
-			final File file = new File(mi.getFilepath());
+			final File file = this.fileSystem.makeFile(mi.getFilepath());
 			if (file.exists()) {
 				// If was missing, mark as found.
 				if (mi.isMissing()) {
@@ -412,11 +421,11 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 
 		for (int i = 0; i < tracks.size(); i++) {
 			if (hasHashCode(tracks.get(i))) {
-				final boolean a = new File(tracks.get(i).getFilepath()).exists();
+				final boolean a = this.fileSystem.makeFile(tracks.get(i).getFilepath()).exists();
 				for (int j = i + 1; j < tracks.size(); j++) {
 					if (hasHashCode(tracks.get(j))) {
 						if (tracks.get(i).getHashcode().equals(tracks.get(j).getHashcode())) {
-							final boolean b = new File(tracks.get(j).getFilepath()).exists();
+							final boolean b = this.fileSystem.makeFile(tracks.get(j).getFilepath()).exists();
 							if (a && b) { // Both exist.
 								// TODO prompt to move the newer one?
 								if (!dupicateItems.containsKey(tracks.get(i))) dupicateItems.put(tracks.get(i), ScanOption.KEEP);
@@ -582,7 +591,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 					if (mi.isEnabled()) {
 						taskEventListener.subTask("Reading metadata: " + mi.getTitle());
 
-						final File file = new File(mi.getFilepath());
+						final File file = this.fileSystem.makeFile(mi.getFilepath());
 						if (file.exists()) {
 							final OpResult ret = readTrackMetaData1(this.itemList, mi, file);
 							if (ret != null) {
@@ -647,7 +656,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 			taskEventListener.subTask("Reading more metadata: " + mlt.getTitle());
 
 			try {
-				final File file = new File(mlt.getFilepath());
+				final File file = this.fileSystem.makeFile(mlt.getFilepath());
 				if (file.exists()) {
 					readTrackMetaData2(this.itemList, mlt, file);
 				}
@@ -686,7 +695,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 		if (sources != null) {
 			final Queue<File> dirs = new LinkedList<File>();
 			for (final String source : sources) {
-				dirs.add(new File(source));
+				dirs.add(this.fileSystem.makeFile(source));
 			}
 			while (!dirs.isEmpty()) {
 				if (taskEventListener.isCanceled()) break;
@@ -740,7 +749,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 			for (final MediaAlbum album : this.itemList.getAlbums()) {
 				if (taskEventListener.isCanceled()) break;
 				for (final T item : this.itemList.getAlbumItems(album)) {
-					if (!isDirectoryAnAlbum(new File(item.getFilepath()).getParentFile())) {
+					if (!isDirectoryAnAlbum(this.fileSystem.makeFile(item.getFilepath()).getParentFile())) {
 						this.itemList.removeFromAlbum(album, item);
 					}
 				}
@@ -759,8 +768,8 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 		return null;
 	}
 
-	private static boolean isDirectoryAnAlbum (final File dir) {
-		final File marker = new File(dir, ".album");
+	private boolean isDirectoryAnAlbum (final File dir) {
+		final File marker = this.fileSystem.makeFile(dir, ".album");
 		return marker.exists() && marker.isFile();
 	}
 

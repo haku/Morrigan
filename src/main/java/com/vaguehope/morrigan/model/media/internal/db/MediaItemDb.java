@@ -42,10 +42,6 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 		implements IMediaItemDb<S, T> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public static final boolean HIDEMISSING = true; // TODO link this to GUI?
-
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
 	private final Logger logger = Logger.getLogger(this.getClass().getName());
 
 	private final MediaItemDbConfig config;
@@ -54,6 +50,7 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	private final S dbLayer;
 	private IDbColumn librarySort;
 	private SortDirection librarySortDirection;
+	private boolean hideMissing;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -69,6 +66,7 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 
 		this.librarySort = dbLayer.getDefaultSortColumn();
 		this.librarySortDirection = SortDirection.ASC;
+		this.hideMissing = true;
 
 		if (config.getFilter() != null) {
 			this.searchTerm = config.getFilter();
@@ -224,13 +222,13 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 			allMedia = this.dbLayer.getMedia(
 					new IDbColumn[] { this.librarySort },
 					new SortDirection[] { this.librarySortDirection },
-					HIDEMISSING, this.searchTerm);
+					this.hideMissing, this.searchTerm);
 		}
 		else {
 			allMedia = this.dbLayer.getMedia(
 					new IDbColumn[] { this.librarySort },
 					new SortDirection[] { this.librarySortDirection },
-					HIDEMISSING);
+					this.hideMissing);
 		}
 		long l0 = System.currentTimeMillis() - t0;
 
@@ -300,6 +298,14 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 				false);
 		updateList(copyOfMainList, allList, true);
 		return copyOfMainList;
+	}
+
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	@Override
+	public void setHideMissing(final boolean v) throws MorriganException {
+		this.hideMissing = v;
+		updateRead();
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
