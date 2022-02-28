@@ -16,15 +16,13 @@ ReadWritePaths=/opt/morrigan/home
 ReadWritePaths=-/dev/snd
 ReadWritePaths=-/proc/asound
 ReadWritePaths=-/sys/class/sound
-RuntimeDirectory=morrigan
-ExecStartPre=mkfifo /run/morrigan/apipe
 ExecStart=/usr/bin/java \
           -XX:+PerfDisableSharedMem \
           -XX:-UsePerfData \
           -jar /opt/morrigan/morrigan.jar \
           --configpath /opt/morrigan/home \
-          --vlcarg "--aout=afile" \
-          --vlcarg "--audiofile-file=/run/morrigan/apipe" \
+          --vlcarg "--aout=alsa" \
+          --vlcarg "--alsa-audio-device=hw:0,0,0" \
           --dlna \
           --http 28080 \
           --ssh  28022
