@@ -746,6 +746,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 				}
 			}
 			taskEventListener.subTask("Checking for removed albums");
+			int albumsRemoved = 0;
 			for (final MediaAlbum album : this.itemList.getAlbums()) {
 				if (taskEventListener.isCanceled()) break;
 				for (final T item : this.itemList.getAlbumItems(album)) {
@@ -758,6 +759,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 				}
 				// TODO track prg here.
 			}
+			taskEventListener.subTask("Removed " + albumsRemoved + " albums");
 		}
 		catch (final MorriganException e) {
 			return new TaskResult(TaskOutcome.FAILED, "Failed to update albums.", e);

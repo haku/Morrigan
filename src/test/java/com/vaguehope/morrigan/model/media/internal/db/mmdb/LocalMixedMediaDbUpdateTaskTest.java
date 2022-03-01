@@ -6,18 +6,25 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import com.vaguehope.morrigan.engines.playback.PlaybackEngineFactory;
+import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.test.TestMixedMediaDb;
@@ -43,13 +50,21 @@ public class LocalMixedMediaDbUpdateTaskTest {
 		this.testDb = new TestMixedMediaDb();
 		this.testDb.setHideMissing(false);
 
+		this.mediaFactory = mock(MediaFactory.class);
+		when(this.mediaFactory.getLocalMixedMediaDbTransactional(this.testDb)).thenAnswer(new Answer<ILocalMixedMediaDb>() {
+			@Override
+			public ILocalMixedMediaDb answer(InvocationOnMock invocation) throws Throwable {
+				return new TestMixedMediaDb(LocalMixedMediaDbUpdateTaskTest.this.testDb.getListName(), false);
+			}
+		});
+
 		this.mockFiles = new HashMap<>();
 		this.fileSystem = mock(FileSystem.class);
 		doAnswer(new Answer<File>() {
 			@Override
 			public File answer(final InvocationOnMock i) throws Throwable {
 				final Object p = i.getArgument(0);
-				return LocalMixedMediaDbUpdateTaskTest.this.mockFiles.get(p);
+				return getMockFile(p);
 			}
 		}).when(this.fileSystem).makeFile(anyString());
 		doAnswer(new Answer<File>() {
@@ -59,20 +74,34 @@ public class LocalMixedMediaDbUpdateTaskTest {
 				final String p = i.getArgument(1);
 				final String k = f.getAbsolutePath() + "/" + p;
 				System.out.println("new File(" + f + "," + p + ") = " + k);
-				return LocalMixedMediaDbUpdateTaskTest.this.mockFiles.get(k);
+				return getMockFile(k);
 			}
 		}).when(this.fileSystem).makeFile(any(File.class), anyString());
 
-		this.playbackEngineFactory = mock(PlaybackEngineFactory.class);
-		this.mediaFactory = mock(MediaFactory.class);
 		this.taskEventListener = mock(TaskEventListener.class);
+		doAnswer(new Answer<Void>() {
+			@Override
+			public Void answer(final InvocationOnMock i) throws Throwable {
+				System.out.println("TASK: " + i.getArgument(0));
+				return null;
+			}
+		}).when(this.taskEventListener).subTask(anyString());
+		doAnswer(new Answer<Void>() {
+			@Override
+			public Void answer(final InvocationOnMock i) throws Throwable {
+				System.out.println("LOG:" + i.getArgument(0) + ": " + i.getArgument(1));
+				return null;
+			}
+		}).when(this.taskEventListener).logMsg(anyString(), anyString());
+
+		this.playbackEngineFactory = mock(PlaybackEngineFactory.class);
 		this.undertest = new LocalMixedMediaDbUpdateTask(this.testDb, this.playbackEngineFactory, this.mediaFactory);
 		this.undertest.setFileSystem(this.fileSystem);
 	}
 
 	@Test
 	public void itDoesNotMarkAnExistingFileAsMissing() throws Exception {
-		final File f1 = mockFile(true);
+		final File f1 = mockFile();
 		this.testDb.addTestTrack(f1);
 
 		runUpdateTask();
@@ -81,7 +110,7 @@ public class LocalMixedMediaDbUpdateTaskTest {
 
 	@Test
 	public void itMarksAMissingFileAsMissing() throws Exception {
-		final File f1 = mockFile(true);
+		final File f1 = mockFile();
 		this.testDb.addTestTrack(f1);
 		when(f1.exists()).thenReturn(false);
 
@@ -89,12 +118,36 @@ public class LocalMixedMediaDbUpdateTaskTest {
 		assertHasFile(f1, true, true);
 	}
 
-	// TODO test moved album.
+	@Ignore("repo of: FOREIGN KEY constraint failed")
+	@Test
+	public void itTracksAMovedAlbum() throws Exception {
+		final File sourceDir = mockDir("/dir0/dir1");
+		this.testDb.addSource(sourceDir.getAbsolutePath());
+
+		final File d1 = mockDir(sourceDir, "album1");
+		final File f1 = mockFileInDir(d1, "foo.wav");
+		final File a1 = mockFileInDir(d1, ".album");
+		runUpdateTask();
+		verify(this.taskEventListener).subTask("Found 1 albums");
+
+		when(f1.exists()).thenReturn(false);
+		when(a1.exists()).thenReturn(false);
+
+		final File d2 = mockDir(sourceDir, "album2");
+		final File f2 = mockFileInDir(d2, "bar.wav");
+		final File a2 = mockFileInDir(d2, ".album");
+		this.testDb.addTestTrack(f2);
+		runUpdateTask();
+		verify(this.taskEventListener, times(2)).subTask("Found 1 albums");
+		verify(this.taskEventListener).subTask("Removed 1 albums");
+	}
 
 	private void runUpdateTask() {
 		this.testDb.printContent("Before");
 		final TaskResult result = this.undertest.run(this.taskEventListener);
 		this.testDb.printContent("After");
+
+		if (result.getErrThr() != null) result.getErrThr().printStackTrace();
 		assertEquals("Msg: " + result.getErrMsg() + " Ex: " + result.getErrThr(), TaskOutcome.SUCCESS, result.getOutcome());
 	}
 
@@ -106,16 +159,86 @@ public class LocalMixedMediaDbUpdateTaskTest {
 		assertEquals(enabled, a.isEnabled());
 	}
 
-	private File mockFile(final boolean exists) {
-		final int n = TestMixedMediaDb.getTrackNumber();
-		final String absPath = String.format("/dir0/dir1/dir2/some_media_file_%s.ext", n);
-		final File f = mock(File.class);
-		when(f.isFile()).thenReturn(true);
-		when(f.exists()).thenReturn(exists);
-		when(f.getAbsolutePath()).thenReturn(absPath);
-		when(f.lastModified()).thenReturn(1234567890000L + n);
+	private File mockFile() {
+		final String dirPath = "/dir0/dir1/dir2";
+		final File dir = mockDir(dirPath);
+		return mockFileInDir(dir);
+	}
 
-		this.mockFiles.put(absPath, f);
+	private File mockFileInDir(final File dir) {
+		final int n = TestMixedMediaDb.getTrackNumber();
+		final long mtime = 1234567890000L + n;
+		return mockFileInDir(dir, String.format("/some_media_file_%s.ext", n), mtime);
+	}
+
+	private File mockFileInDir(final File dir, final String fileName) {
+		final int n = TestMixedMediaDb.getTrackNumber();
+		final long mtime = 1234567890000L + n;
+		return mockFileInDir(dir, fileName, mtime);
+	}
+
+	private File mockDir(final String dirPath) {
+		return mockDir(null, dirPath);
+	}
+
+	private File mockDir(final File parent, final String dirPath) {
+		String parentPath = parent != null ? parent.getAbsolutePath() : "";
+		if (parentPath.endsWith("/")) parentPath = parentPath.substring(0, parentPath.length() - 1);
+		final String fullDirPath = parentPath + (dirPath.startsWith("/") ? "" : "/") + dirPath;
+
+		final File d = mock(File.class);
+		when(d.isDirectory()).thenReturn(true);
+		when(d.exists()).thenReturn(true);
+		when(d.canRead()).thenReturn(true);
+		when(d.getName()).thenReturn(fullDirPath.substring(fullDirPath.lastIndexOf("/")));
+		when(d.getAbsolutePath()).thenReturn(fullDirPath);
+		when(d.listFiles()).thenReturn(new File[] {});
+
+		if (parent != null) {
+			when(d.getParentFile()).thenReturn(parent);
+
+			final List<File> dirFiles = new ArrayList<>(Arrays.asList(parent.listFiles()));
+			dirFiles.add(d);
+			when(parent.listFiles()).thenReturn(dirFiles.toArray(new File[dirFiles.size()]));
+		}
+
+		putMockFile(fullDirPath, d);
+		return d;
+	}
+
+	private File mockFileInDir(final File dir, final String fileName, final long mtime) {
+		String dirPath = dir.getAbsolutePath();
+		if (!dirPath.endsWith("/")) dirPath += "/";
+		final String absPath = dirPath + fileName;
+
+		if (this.mockFiles.get(absPath) != null) throw new IllegalStateException("Already mocked: " + absPath);
+
+		final File f = mock(File.class);
+		when(f.getParentFile()).thenReturn(dir);
+		when(f.isFile()).thenReturn(true);
+		when(f.exists()).thenReturn(true);
+		when(f.canRead()).thenReturn(true);
+		when(f.getName()).thenReturn(fileName);
+		when(f.getAbsolutePath()).thenReturn(absPath);
+		when(f.lastModified()).thenReturn(mtime);
+
+		putMockFile(absPath, f);
+
+		final List<File> dirFiles = new ArrayList<>(Arrays.asList(dir.listFiles()));
+		dirFiles.add(f);
+		when(dir.listFiles()).thenReturn(dirFiles.toArray(new File[dirFiles.size()]));
+
+		return f;
+	}
+
+	private void putMockFile(final String absPath, final File f) {
+		final File prev = this.mockFiles.put(absPath, f);
+		if (prev != null) throw new IllegalStateException("Path already mocked: " + absPath);
+	}
+
+	private File getMockFile(final Object p) {
+		final File f = this.mockFiles.get(p);
+		if (f == null) throw new IllegalStateException("Mock file not found: " + p);
 		return f;
 	}
 

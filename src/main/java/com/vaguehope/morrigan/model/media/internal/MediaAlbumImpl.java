@@ -34,4 +34,9 @@ public class MediaAlbumImpl implements MediaAlbum {
 		return this.trackCount;
 	}
 
+	@Override
+	public String toString() {
+		return String.format("MediaAlbum{%s, %s, %s}", this.dbRowId, this.name, this.trackCount);
+	}
+
 }

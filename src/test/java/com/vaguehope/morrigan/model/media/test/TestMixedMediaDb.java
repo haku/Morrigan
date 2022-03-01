@@ -34,11 +34,15 @@ public class TestMixedMediaDb extends LocalMixedMediaDb {
 	}
 
 	public TestMixedMediaDb (final String name) throws DbException, MorriganException {
+		this(name, true);
+	}
+
+	public TestMixedMediaDb (final String name, boolean autoCommit) throws DbException, MorriganException {
 		super(name,
 				new MediaItemDbConfig(name, null),
 				new MixedMediaSqliteLayerOuter(
 						"file:" + name + "?mode=memory&cache=shared",
-						true, new MixedMediaItemFactory()));
+						autoCommit, new MixedMediaItemFactory()));
 		read();
 	}
 
