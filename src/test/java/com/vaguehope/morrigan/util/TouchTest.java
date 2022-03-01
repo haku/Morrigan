@@ -14,7 +14,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-public class FileHelperTest {
+public class TouchTest {
 
 	@Rule public TemporaryFolder tmp = new TemporaryFolder();
 
@@ -28,21 +28,9 @@ public class FileHelperTest {
 		assertTrue(f.setLastModified(lastMod));
 		assertEquals(lastMod, f.lastModified());
 
-		FileHelper.freshenLastModified(f, 10, TimeUnit.HOURS);
+		assertTrue(Touch.touch(f));
 		assertThat(nowMillis() - f.lastModified(), Matchers.lessThan(TimeUnit.SECONDS.toMillis(5)));
 		assertEquals(data, FileUtils.readFileToString(f, Charset.defaultCharset()));
-	}
-
-	@Test
-	public void itDoesNotFreshenNewFile () throws Exception {
-		final File f = this.tmp.newFile("a");
-
-		final long lastMod = nowMillis() - TimeUnit.HOURS.toMillis(9);
-		assertTrue(f.setLastModified(lastMod));
-		assertEquals(lastMod, f.lastModified());
-
-		FileHelper.freshenLastModified(f, 10, TimeUnit.HOURS);
-		assertEquals(lastMod, f.lastModified());
 	}
 
 	/**
@@ -51,4 +39,5 @@ public class FileHelperTest {
 	private static long nowMillis () {
 		return System.currentTimeMillis() / 1000 * 1000;
 	}
+
 }

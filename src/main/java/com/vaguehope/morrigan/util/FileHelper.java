@@ -83,7 +83,10 @@ public final class FileHelper {
 		if (!f.exists()) throw new FileNotFoundException(f.getAbsolutePath());
 		final long now = System.currentTimeMillis();
 		if (now - f.lastModified() < timeUnit.toMillis(unlessOlderThan)) return;
-		if (!f.setLastModified(now)) throw new IOException("Failed to touch file: " + f.getAbsolutePath());
+
+		if (f.setLastModified(now)) return;
+		if (Touch.touch(f)) return;
+		throw new IOException("Failed to touch file: " + f.getAbsolutePath());
 	}
 
 	public static File getSomeRootDir() {
