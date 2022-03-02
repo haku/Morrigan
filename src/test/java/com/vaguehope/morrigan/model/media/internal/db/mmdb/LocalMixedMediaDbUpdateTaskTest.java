@@ -4,13 +4,15 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
+import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -18,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -53,7 +54,7 @@ public class LocalMixedMediaDbUpdateTaskTest {
 		this.mediaFactory = mock(MediaFactory.class);
 		when(this.mediaFactory.getLocalMixedMediaDbTransactional(this.testDb)).thenAnswer(new Answer<ILocalMixedMediaDb>() {
 			@Override
-			public ILocalMixedMediaDb answer(InvocationOnMock invocation) throws Throwable {
+			public ILocalMixedMediaDb answer(final InvocationOnMock invocation) throws Throwable {
 				return new TestMixedMediaDb(LocalMixedMediaDbUpdateTaskTest.this.testDb.getListName(), false);
 			}
 		});
@@ -93,6 +94,13 @@ public class LocalMixedMediaDbUpdateTaskTest {
 				return null;
 			}
 		}).when(this.taskEventListener).logMsg(anyString(), anyString());
+		doAnswer(new Answer<Void>() {
+			@Override
+			public Void answer(final InvocationOnMock i) throws Throwable {
+				System.out.println("ERROR:" + i.getArgument(0) + ": " + i.getArgument(1) + "  " + i.getArgument(2));
+				return null;
+			}
+		}).when(this.taskEventListener).logError(anyString(), anyString(), any(Throwable.class));
 
 		this.playbackEngineFactory = mock(PlaybackEngineFactory.class);
 		this.undertest = new LocalMixedMediaDbUpdateTask(this.testDb, this.playbackEngineFactory, this.mediaFactory);
@@ -118,28 +126,21 @@ public class LocalMixedMediaDbUpdateTaskTest {
 		assertHasFile(f1, true, true);
 	}
 
-	@Ignore("repo of: FOREIGN KEY constraint failed")
 	@Test
-	public void itTracksAMovedAlbum() throws Exception {
+	public void itHandlesRemovingAnAlbumWithMissingItem() throws Exception {
 		final File sourceDir = mockDir("/dir0/dir1");
 		this.testDb.addSource(sourceDir.getAbsolutePath());
 
 		final File d1 = mockDir(sourceDir, "album1");
-		final File f1 = mockFileInDir(d1, "foo.wav");
-		final File a1 = mockFileInDir(d1, ".album");
+		final File f1 = mockFileInDir(d1, "foo.wav", BigInteger.valueOf(2));
+		final File a1 = mockFileInDir(d1, ".album", BigInteger.valueOf(1));
 		runUpdateTask();
 		verify(this.taskEventListener).subTask("Found 1 albums");
 
 		when(f1.exists()).thenReturn(false);
 		when(a1.exists()).thenReturn(false);
-
-		final File d2 = mockDir(sourceDir, "album2");
-		final File f2 = mockFileInDir(d2, "bar.wav");
-		final File a2 = mockFileInDir(d2, ".album");
-		this.testDb.addTestTrack(f2);
 		runUpdateTask();
-		verify(this.taskEventListener, times(2)).subTask("Found 1 albums");
-		verify(this.taskEventListener).subTask("Removed 1 albums");
+		verify(this.taskEventListener).logMsg(anyString(), eq("Removed 1 albums"));
 	}
 
 	private void runUpdateTask() {
@@ -159,22 +160,23 @@ public class LocalMixedMediaDbUpdateTaskTest {
 		assertEquals(enabled, a.isEnabled());
 	}
 
-	private File mockFile() {
+	private File mockFile() throws Exception {
 		final String dirPath = "/dir0/dir1/dir2";
 		final File dir = mockDir(dirPath);
 		return mockFileInDir(dir);
 	}
 
-	private File mockFileInDir(final File dir) {
+	private File mockFileInDir(final File dir) throws Exception {
 		final int n = TestMixedMediaDb.getTrackNumber();
 		final long mtime = 1234567890000L + n;
-		return mockFileInDir(dir, String.format("/some_media_file_%s.ext", n), mtime);
+		BigInteger md5 = BigInteger.valueOf(mtime);
+		return mockFileInDir(dir, String.format("/some_media_file_%s.ext", n), mtime, md5);
 	}
 
-	private File mockFileInDir(final File dir, final String fileName) {
+	private File mockFileInDir(final File dir, final String fileName, final BigInteger md5) throws Exception {
 		final int n = TestMixedMediaDb.getTrackNumber();
 		final long mtime = 1234567890000L + n;
-		return mockFileInDir(dir, fileName, mtime);
+		return mockFileInDir(dir, fileName, mtime, md5);
 	}
 
 	private File mockDir(final String dirPath) {
@@ -206,7 +208,7 @@ public class LocalMixedMediaDbUpdateTaskTest {
 		return d;
 	}
 
-	private File mockFileInDir(final File dir, final String fileName, final long mtime) {
+	private File mockFileInDir(final File dir, final String fileName, final long mtime, final BigInteger md5) throws Exception {
 		String dirPath = dir.getAbsolutePath();
 		if (!dirPath.endsWith("/")) dirPath += "/";
 		final String absPath = dirPath + fileName;
@@ -221,6 +223,8 @@ public class LocalMixedMediaDbUpdateTaskTest {
 		when(f.getName()).thenReturn(fileName);
 		when(f.getAbsolutePath()).thenReturn(absPath);
 		when(f.lastModified()).thenReturn(mtime);
+
+		when(this.fileSystem.generateMd5Checksum(eq(f), any(ByteBuffer.class))).thenReturn(md5);
 
 		putMockFile(absPath, f);
 

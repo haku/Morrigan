@@ -526,8 +526,9 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 
 	private static final String SQL_TBL_ALBUMS_Q_ALL =
 		"SELECT a.id,a.name,count(i.mf_id) AS track_count" +
-		" FROM tbl_albums AS a, tbl_album_items AS i, tbl_mediafiles AS m" +
-		" WHERE a.id=i.album_id AND i.mf_id=m.id AND m.type=" + MediaType.TRACK.getN() +
+		" FROM tbl_albums AS a" +
+		" LEFT OUTER JOIN tbl_album_items AS i ON a.id=i.album_id" +
+		" LEFT OUTER JOIN tbl_mediafiles AS m ON i.mf_id=m.id AND m.type=" + MediaType.TRACK.getN() +
 		" GROUP BY a.id" +
 		" ORDER BY a.name ASC;";
 
@@ -1082,6 +1083,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	}
 
 	private void local_removeAlbum (final MediaAlbum album) throws DbException, SQLException, ClassNotFoundException {
+		// TODO remove missing items.
 		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_ALBUMS_REMOVE);
 		try {
 			ps.setLong(1, album.getDbRowId());
