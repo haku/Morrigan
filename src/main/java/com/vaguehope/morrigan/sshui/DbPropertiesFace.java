@@ -144,7 +144,10 @@ public class DbPropertiesFace extends DefaultFace {
 			if (MessageDialog.showMessageDialog(gui, "Remove Source", source, MessageDialogButton.Yes, MessageDialogButton.No) != MessageDialogButton.Yes) return;
 			this.db.removeSource(source);
 			refreshData();
-			if (i >= this.sources.size()) { // Last item was deleted.
+			if (this.sources.size() < 1) {
+				this.selectedItem = null;
+			}
+			else if (i >= this.sources.size()) { // Last item was deleted.
 				this.selectedItem = this.sources.get(this.sources.size() - 1);
 			}
 			else if (i >= 0) {
