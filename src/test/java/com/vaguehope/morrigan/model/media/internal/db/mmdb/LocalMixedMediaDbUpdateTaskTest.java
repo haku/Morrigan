@@ -4,9 +4,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -28,6 +30,8 @@ import com.vaguehope.morrigan.engines.playback.PlaybackEngineFactory;
 import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.model.media.MediaFactory;
+import com.vaguehope.morrigan.model.media.MediaTagClassification;
+import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.model.media.test.TestMixedMediaDb;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.tasks.TaskEventListener;
@@ -143,6 +147,37 @@ public class LocalMixedMediaDbUpdateTaskTest {
 		verify(this.taskEventListener).logMsg(anyString(), eq("Removed 1 albums"));
 	}
 
+	@Test
+	public void itMergesAMovedAlbumWithTags() throws Exception {
+		final File sourceDir = mockDir("/dir0/dir1");
+		this.testDb.addSource(sourceDir.getAbsolutePath());
+		final File mediaDir1 = mockDir(sourceDir, "media1");
+
+		final File d1 = mockDir(mediaDir1, "album");
+		final File f1 = mockFileInDir(d1, "foo.wav", BigInteger.valueOf(2));
+		final File a1 = mockFileInDir(d1, ".album", BigInteger.valueOf(1));
+		runUpdateTask();
+		verify(this.taskEventListener).subTask("Found 1 albums");
+
+		final IMixedMediaItem i1 = this.testDb.getByFile(f1);
+		this.testDb.addTag(i1, "my tag", MediaTagType.MANUAL, (MediaTagClassification) null);
+		this.testDb.addTag(i1, "auto tag", MediaTagType.AUTOMATIC, "bar");
+		this.testDb.addTag(i1, "auto tag2", MediaTagType.AUTOMATIC, "foo");
+
+		when(f1.exists()).thenReturn(false);
+		when(a1.exists()).thenReturn(false);
+		final File mediaDir2 = mockDir(sourceDir, "media2");
+		final File d2 = mockDir(mediaDir2, "album");
+		final File f2 = mockFileInDir(d2, "foo.wav", BigInteger.valueOf(2));
+		final File a2 = mockFileInDir(d2, ".album", BigInteger.valueOf(1));
+		runUpdateTask();
+		verify(this.taskEventListener, times(2)).subTask("Found 1 albums");
+		verify(this.taskEventListener).logMsg(anyString(), contains("Merged 1 "));
+		final IMixedMediaItem i2 = this.testDb.getByFile(f2);
+		assertEquals("my tag", this.testDb.getTags(i2).get(0).getTag());
+		assertEquals("auto tag", this.testDb.getTags(i2).get(1).getTag());
+	}
+
 	private void runUpdateTask() {
 		this.testDb.printContent("Before");
 		final TaskResult result = this.undertest.run(this.taskEventListener);
@@ -169,7 +204,7 @@ public class LocalMixedMediaDbUpdateTaskTest {
 	private File mockFileInDir(final File dir) throws Exception {
 		final int n = TestMixedMediaDb.getTrackNumber();
 		final long mtime = 1234567890000L + n;
-		BigInteger md5 = BigInteger.valueOf(mtime);
+		final BigInteger md5 = BigInteger.valueOf(mtime);
 		return mockFileInDir(dir, String.format("/some_media_file_%s.ext", n), mtime, md5);
 	}
 
@@ -242,8 +277,10 @@ public class LocalMixedMediaDbUpdateTaskTest {
 
 	private File getMockFile(final Object p) {
 		final File f = this.mockFiles.get(p);
-		if (f == null) throw new IllegalStateException("Mock file not found: " + p);
-		return f;
+		if (f != null) return f;
+
+		System.out.println("File not found: " + p);
+		return mock(File.class);
 	}
 
 }
