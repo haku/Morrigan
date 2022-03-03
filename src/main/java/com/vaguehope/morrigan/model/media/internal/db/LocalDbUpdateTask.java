@@ -471,7 +471,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 		final Q transClone = getTransactional(this.itemList);
 		try {
 			transClone.read(); // FIXME is this needed?
-			count = mergeDuplocates(taskEventListener, transClone, dupicateItems);
+			count = mergeDuplicates(taskEventListener, transClone, dupicateItems);
 		}
 		finally {
 			taskEventListener.logMsg(this.itemList.getListName(), "Committing merges...");
@@ -490,7 +490,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 	/**
 	 * @return Number of items merged.
 	 */
-	private int mergeDuplocates (final TaskEventListener taskEventListener, final Q list, final Map<T, ScanOption> dupicateItems) throws MorriganException {
+	private int mergeDuplicates (final TaskEventListener taskEventListener, final Q list, final Map<T, ScanOption> dupicateItems) throws MorriganException {
 		// Make a list of all the unique hashcodes we know.
 		final Set<BigInteger> hashcodes = new HashSet<>();
 		for (final IMediaItem mi : dupicateItems.keySet()) {
