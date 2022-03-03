@@ -20,7 +20,7 @@ public class AsyncTaskEventListener implements TaskEventListener, AsyncTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private static final AtomicInteger TASK_NUMBER = new AtomicInteger(0);
-	private static final long EXPIRY_AGE = 30 * 60 * 1000L; // 30 minutes.
+	private static final long EXPIRY_AGE_MILLIS = 60 * 60 * 1000L;
 	private static final int ALL_MESSAGES_MAX_LENGTH = 20000;
 	private static final ThreadSafeDateFormatter DATE_FORMATTER = new ThreadSafeDateFormatter("yyyyMMdd-HHmmss");
 	private static final ThreadSafeDateFormatter TIME_FORMATTER = new ThreadSafeDateFormatter("HH:mm");
@@ -59,37 +59,37 @@ public class AsyncTaskEventListener implements TaskEventListener, AsyncTask {
 				.append(TIME_FORMATTER.get().format(new Date(this.startTime.get())))
 				.append(']');
 
-		int P = this.progressTotal.get();
+		final int P = this.progressTotal.get();
 		if (this.lifeCycle.get() == TaskState.RUNNING && P > 0) {
-			int p = this.progressWorked.get();
+			final int p = this.progressWorked.get();
 			s.append(' ').append(String.valueOf(p)).append(" of ").append(String.valueOf(P));
 		}
 
-		String name = this.taskName.get();
+		final String name = this.taskName.get();
 		s.append(' ').append(name != null ? name : "<task>");
 
 		if (this.lifeCycle.get() != TaskState.COMPLETE) {
-			String subName = this.subtaskName.get();
+			final String subName = this.subtaskName.get();
 			if (subName != null) s.append(": ").append(subName);
 		}
 
-		String err = this.lastErr.get();
+		final String err = this.lastErr.get();
 		if (err != null) s.append("\n    Last error: ").append(err);
 
-		String msg = this.lastMsg.get();
+		final String msg = this.lastMsg.get();
 		if (msg != null) s.append("\n    Last message: ").append(msg);
 
-		Future<?> f = this.future.get();
+		final Future<?> f = this.future.get();
 		if (f != null && f.isDone()) {
 			try {
 				f.get(); // Check for Exception.
 			}
-			catch (ExecutionException e) {
+			catch (final ExecutionException e) {
 				s.append("\n    Exection of task failed: \n");
-				Throwable cause = e.getCause(); // ExecutionException should be a wrapper.
+				final Throwable cause = e.getCause(); // ExecutionException should be a wrapper.
 				s.append(ErrorHelper.getStackTrace(cause != null ? cause : e));
 			}
-			catch (InterruptedException e) { /* Should be impossible. */ }
+			catch (final InterruptedException e) { /* Should be impossible. */ }
 		}
 
 		return s.toString();
@@ -110,7 +110,7 @@ public class AsyncTaskEventListener implements TaskEventListener, AsyncTask {
 	public boolean isExpired () {
 		return this.lifeCycle.get() == TaskState.COMPLETE
 				&& (this.endTime.get() > 0
-						&& this.endTime.get() + EXPIRY_AGE < System.currentTimeMillis());
+						&& this.endTime.get() + EXPIRY_AGE_MILLIS < System.currentTimeMillis());
 	}
 
 	@Override
@@ -118,9 +118,19 @@ public class AsyncTaskEventListener implements TaskEventListener, AsyncTask {
 		return Collections.unmodifiableList(this.allMessages);
 	}
 
-	private void addToAllMessages(String msg) {
+	private void addToAllMessages(final String msg) {
 		if (this.allMessages.size() >= ALL_MESSAGES_MAX_LENGTH) return;
-		this.allMessages.add(DATE_FORMATTER.get().format(new Date()) + " " + msg);
+		boolean first = true;
+		for (final String line : msg.split("\\r?\\n")) {
+			if (first) {
+				this.allMessages.add(DATE_FORMATTER.get().format(new Date()) + " " + line);
+				first = false;
+			}
+			else {
+				this.allMessages.add(line);
+			}
+		}
+
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -137,7 +147,7 @@ public class AsyncTaskEventListener implements TaskEventListener, AsyncTask {
 
 	@Override
 	public void logMsg (final String topic, final String s) {
-		String m = topic + ": " + s;
+		final String m = topic + ": " + s;
 		this.lastMsg.set(m);
 		addToAllMessages(m);
 	}
@@ -204,7 +214,7 @@ public class AsyncTaskEventListener implements TaskEventListener, AsyncTask {
 	}
 	@Override
 	public String title () {
-		String name = this.taskName.get();
+		final String name = this.taskName.get();
 		if (StringHelper.notBlank(name)) return name;
 		return "<task>";
 	}
@@ -244,10 +254,10 @@ public class AsyncTaskEventListener implements TaskEventListener, AsyncTask {
 			f.get(); // Check for Exception.
 			return true;
 		}
-		catch (ExecutionException e) {
+		catch (final ExecutionException e) {
 			return false;
 		}
-		catch (InterruptedException e) {
+		catch (final InterruptedException e) {
 			throw new IllegalStateException("Should not be possible to interupt non blocking call.");
 		}
 	}
