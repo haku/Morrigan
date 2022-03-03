@@ -1,6 +1,9 @@
 package com.vaguehope.morrigan.tasks;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -18,29 +21,33 @@ public class AsyncTaskEventListener implements TaskEventListener, AsyncTask {
 
 	private static final AtomicInteger TASK_NUMBER = new AtomicInteger(0);
 	private static final long EXPIRY_AGE = 30 * 60 * 1000L; // 30 minutes.
-	private static final ThreadSafeDateFormatter DATE_FORMATTER = new ThreadSafeDateFormatter("HH:mm");
+	private static final int ALL_MESSAGES_MAX_LENGTH = 10000;
+	private static final ThreadSafeDateFormatter DATE_FORMATTER = new ThreadSafeDateFormatter("yyyyMMdd-HHmm");
+	private static final ThreadSafeDateFormatter TIME_FORMATTER = new ThreadSafeDateFormatter("HH:mm");
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private final int number = TASK_NUMBER.getAndIncrement();
 	private final String id = UUID.randomUUID().toString();
 
-	private final AtomicReference<TaskState> lifeCycle = new AtomicReference<TaskState>(TaskState.UNSTARTED);
+	private final AtomicReference<TaskState> lifeCycle = new AtomicReference<>(TaskState.UNSTARTED);
 
 	private final AtomicInteger progressWorked = new AtomicInteger(0);
 	private final AtomicInteger progressTotal = new AtomicInteger(0);
 	private final AtomicBoolean cancelled = new AtomicBoolean(false);
 
-	private final AtomicReference<String> taskName = new AtomicReference<String>(null);
-	private final AtomicReference<String> subtaskName = new AtomicReference<String>(null);
+	private final AtomicReference<String> taskName = new AtomicReference<>(null);
+	private final AtomicReference<String> subtaskName = new AtomicReference<>(null);
 
-	private final AtomicReference<String> lastMsg = new AtomicReference<String>(null);
-	private final AtomicReference<String> lastErr = new AtomicReference<String>(null);
+	private final AtomicReference<String> lastMsg = new AtomicReference<>(null);
+	private final AtomicReference<String> lastErr = new AtomicReference<>(null);
+
+	private final List<String> allMessages = Collections.synchronizedList(new ArrayList<>());
 
 	private final AtomicLong startTime = new AtomicLong();
 	private final AtomicLong endTime = new AtomicLong();
 
-	private final AtomicReference<Future<?>> future = new AtomicReference<Future<?>>();
+	private final AtomicReference<Future<?>> future = new AtomicReference<>();
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -49,7 +56,7 @@ public class AsyncTaskEventListener implements TaskEventListener, AsyncTask {
 				.append(this.number)
 				.append(" [")
 				.append(this.lifeCycle.get()).append(' ')
-				.append(DATE_FORMATTER.get().format(new Date(this.startTime.get())))
+				.append(TIME_FORMATTER.get().format(new Date(this.startTime.get())))
 				.append(']');
 
 		int P = this.progressTotal.get();
@@ -97,12 +104,23 @@ public class AsyncTaskEventListener implements TaskEventListener, AsyncTask {
 	@Override
 	public void cancel () {
 		this.cancelled.set(true);
+		addToAllMessages("Cancelled.");
 	}
 
 	public boolean isExpired () {
 		return this.lifeCycle.get() == TaskState.COMPLETE
 				&& (this.endTime.get() > 0
 						&& this.endTime.get() + EXPIRY_AGE < System.currentTimeMillis());
+	}
+
+	@Override
+	public List<String> getAllMessages() {
+		return Collections.unmodifiableList(this.allMessages);
+	}
+
+	private void addToAllMessages(String msg) {
+		if (this.allMessages.size() >= ALL_MESSAGES_MAX_LENGTH) return;
+		this.allMessages.add(DATE_FORMATTER.get().format(new Date()) + " " + msg);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -114,11 +132,14 @@ public class AsyncTaskEventListener implements TaskEventListener, AsyncTask {
 			throw new IllegalStateException("Failed to mark task as running; current state=" + this.lifeCycle.get() + ".");
 		}
 		this.startTime.set(System.currentTimeMillis());
+		addToAllMessages("Started.");
 	}
 
 	@Override
 	public void logMsg (final String topic, final String s) {
-		this.lastMsg.set(topic + ": " + s);
+		String m = topic + ": " + s;
+		this.lastMsg.set(m);
+		addToAllMessages(m);
 	}
 
 	@Override
@@ -134,6 +155,7 @@ public class AsyncTaskEventListener implements TaskEventListener, AsyncTask {
 			}
 		}
 		this.lastErr.set(err);
+		addToAllMessages(err);
 	}
 
 	@Override
@@ -145,17 +167,20 @@ public class AsyncTaskEventListener implements TaskEventListener, AsyncTask {
 	public void beginTask (final String name, final int totalWork) {
 		this.taskName.set(name);
 		this.progressTotal.set(totalWork);
+		addToAllMessages("Begin Task: " + name);
 	}
 
 	@Override
 	public void subTask (final String name) {
 		this.subtaskName.set(name);
+		addToAllMessages("Subtask: " + name);
 	}
 
 	@Override
 	public void done () {
 		if (this.lifeCycle.compareAndSet(TaskState.RUNNING, TaskState.COMPLETE)) {
 			this.endTime.set(System.currentTimeMillis());
+			addToAllMessages("Done.");
 		}
 	}
 

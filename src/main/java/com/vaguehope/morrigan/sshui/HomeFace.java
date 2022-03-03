@@ -190,7 +190,7 @@ public class HomeFace extends DefaultFace {
 			this.navigation.startFace(dbFace);
 		}
 		else if (this.selectedItem instanceof AsyncTask) {
-			// Do nothing.
+			this.navigation.startFace(new LogFace(this.navigation, (AsyncTask) this.selectedItem));
 		}
 		else {
 			MessageDialog.showMessageDialog(gui, "TODO", "Enter: " + this.selectedItem);

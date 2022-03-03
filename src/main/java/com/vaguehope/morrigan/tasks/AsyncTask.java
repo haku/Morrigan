@@ -1,5 +1,7 @@
 package com.vaguehope.morrigan.tasks;
 
+import java.util.List;
+
 public interface AsyncTask {
 
 	/**
@@ -29,5 +31,6 @@ public interface AsyncTask {
 	 */
 	Boolean successful();
 	String summary ();
+	List<String> getAllMessages();
 
 }
