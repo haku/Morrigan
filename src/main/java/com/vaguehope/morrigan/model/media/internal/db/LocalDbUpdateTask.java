@@ -290,7 +290,6 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 		if (changedItems.size() > 0) throw new IllegalArgumentException("changedItems list must be empty.");
 
 		final String SUBTASK_TITLE = "Reading file metadata";
-		String subTaskTitle = null;
 		taskEventListener.subTask(SUBTASK_TITLE);
 
 		final long startTime = System.currentTimeMillis();
@@ -303,12 +302,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 		final List<T> allLibraryEntries = this.itemList.getAllDbEntries();
 		for (final T mi : allLibraryEntries) {
 			if (taskEventListener.isCanceled()) break;
-
-			// Update status.
-			if (subTaskTitle != null) {
-				taskEventListener.subTask(SUBTASK_TITLE);
-				subTaskTitle = null;
-			}
+			taskEventListener.subTask(SUBTASK_TITLE + ": " + mi.getTitle());
 
 			// Existence test.
 			final File file = this.fileSystem.makeFile(mi.getFilepath());
@@ -351,8 +345,6 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 				if (fileModified || mi.getHashcode() == null || mi.getHashcode().equals(BigInteger.ZERO)) {
 					BigInteger hash = null;
 
-					subTaskTitle = SUBTASK_TITLE + ": MD5 " + mi.getTitle();
-					taskEventListener.subTask(subTaskTitle);
 					try {
 						hash = this.fileSystem.generateMd5Checksum(file, byteBuffer); // This is slow.
 					}
