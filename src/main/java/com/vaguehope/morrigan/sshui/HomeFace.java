@@ -205,6 +205,7 @@ public class HomeFace extends DefaultFace {
 				.build().showDialog(gui);
 		if (name != null && name.length() > 0) {
 			this.mnContext.getMediaFactory().createLocalMixedMediaDb(name);
+			onFocus();
 			refreshData();
 		}
 	}
