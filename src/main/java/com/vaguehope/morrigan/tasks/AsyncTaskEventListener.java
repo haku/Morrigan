@@ -22,7 +22,7 @@ public class AsyncTaskEventListener implements TaskEventListener, AsyncTask {
 	private static final AtomicInteger TASK_NUMBER = new AtomicInteger(0);
 	private static final long EXPIRY_AGE_MILLIS = 60 * 60 * 1000L;
 	private static final int ALL_MESSAGES_MAX_LENGTH = 20000;
-	private static final ThreadSafeDateFormatter DATE_FORMATTER = new ThreadSafeDateFormatter("yyyyMMdd-HHmmss");
+	private static final ThreadSafeDateFormatter DATE_FORMATTER = new ThreadSafeDateFormatter("MMdd-HHmmss.SSS");
 	private static final ThreadSafeDateFormatter TIME_FORMATTER = new ThreadSafeDateFormatter("HH:mm");
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
