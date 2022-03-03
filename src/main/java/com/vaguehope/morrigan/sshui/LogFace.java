@@ -3,21 +3,26 @@ package com.vaguehope.morrigan.sshui;
 import java.util.List;
 
 import com.googlecode.lanterna.SGR;
+import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
 import com.vaguehope.morrigan.sshui.MenuHelper.VDirection;
+import com.vaguehope.morrigan.sshui.util.TextGuiUtils;
 import com.vaguehope.morrigan.tasks.AsyncTask;
 
 public class LogFace extends DefaultFace {
 
 	private final FaceNavigation navigation;
-	private List<String> messages;
+	private final List<String> messages;
+
+	private final TextGuiUtils textGuiUtils = new TextGuiUtils();
 
 	private Object selectedItem;
-	private int queueScrollTop = 0;
+	private int scrollTop = 0;
 	private int pageSize = 1;
 
 	public LogFace(final FaceNavigation navigation, final AsyncTask task) {
@@ -85,21 +90,22 @@ public class LogFace extends DefaultFace {
 
 	@Override
 	public void writeScreen(final Screen scr, final TextGraphics tg) {
+		final TerminalSize terminalSize = scr.getTerminalSize();
 		int l = 0;
 
-		this.pageSize = scr.getTerminalSize().getRows() - l;
+		this.pageSize = terminalSize.getRows() - l - 1;
 		final int selI = this.messages.indexOf(this.selectedItem);
 		if (selI >= 0) {
-			if (selI - this.queueScrollTop >= this.pageSize) {
-				this.queueScrollTop = selI - this.pageSize + 1;
+			if (selI - this.scrollTop >= this.pageSize) {
+				this.scrollTop = selI - this.pageSize + 1;
 			}
-			else if (selI < this.queueScrollTop) {
-				this.queueScrollTop = selI;
+			else if (selI < this.scrollTop) {
+				this.scrollTop = selI;
 			}
 		}
 
-		for (int i = this.queueScrollTop; i < this.messages.size(); i++) {
-			if (i > this.queueScrollTop + this.pageSize) break;
+		for (int i = this.scrollTop; i < this.messages.size(); i++) {
+			if (i > this.scrollTop + this.pageSize) break;
 			final String item = this.messages.get(i);
 			if (item.equals(this.selectedItem)) {
 				tg.putString(1, l++, String.valueOf(item), SGR.REVERSE);
@@ -108,6 +114,12 @@ public class LogFace extends DefaultFace {
 				tg.putString(1, l++, String.valueOf(item));
 			}
 		}
+
+		final String itemDetailsBar = this.messages.size() + " rows.";
+		this.textGuiUtils.drawTextRowWithBg(tg, terminalSize.getRows() - 1, itemDetailsBar, TextColor.ANSI.WHITE, TextColor.ANSI.BLUE, SGR.BOLD);
+		this.textGuiUtils.drawTextWithBg(tg, terminalSize.getColumns() - 3, terminalSize.getRows() - 1,
+				PrintingThingsHelper.scrollSummary(this.messages.size(), this.pageSize, this.scrollTop),
+				TextColor.ANSI.WHITE, TextColor.ANSI.BLUE, SGR.BOLD);
 	}
 
 }
