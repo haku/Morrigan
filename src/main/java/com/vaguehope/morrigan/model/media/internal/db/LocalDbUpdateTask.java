@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItem;
@@ -274,7 +275,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 		}
 		if (filesAdded > 0) this.itemList.forceRead();
 
-		final long duration = (startTime - System.currentTimeMillis()) / 1000L;
+		final long duration = TimeUnit.MILLISECONDS.toSeconds(startTime - System.currentTimeMillis());
 		taskEventListener.logMsg(this.itemList.getListName(), "Added " + filesAdded + " files in " + duration + " seconds.");
 		this.itemList.getDbLayer().getChangeEventCaller().eventMessage("Added " + filesAdded + " items to " + this.itemList.getListName() + ".");
 
@@ -393,7 +394,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 			}
 		} // End metadata scanning.
 
-		final long duration = (System.currentTimeMillis() - startTime) / 1000L;
+		final long duration = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - startTime);
 		taskEventListener.logMsg(this.itemList.getListName(), "Read file metadata in " + duration + " seconds.");
 		return null;
 	}
@@ -452,7 +453,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 				progress = p;
 			}
 		}
-		final long duration = (System.currentTimeMillis() - startTime) / 1000L;
+		final long duration = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - startTime);
 		taskEventListener.logMsg(this.itemList.getListName(), "Duplicate scan completed in " + duration + " seconds.");
 		return dupicateItems;
 	}
@@ -474,7 +475,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 			count = mergeDuplicates(taskEventListener, transClone, dupicateItems);
 		}
 		finally {
-			taskEventListener.logMsg(this.itemList.getListName(), "Committing " + count + " merges...");
+			taskEventListener.logMsg(this.itemList.getListName(), "Committing " + count + " merges... (" + dupicateItems.size() + " duplicates remain)");
 			try {
 				transClone.commitOrRollback();
 			}
@@ -483,7 +484,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 			}
 		}
 		if (count > 0) this.itemList.forceRead();
-		final long duration = (System.currentTimeMillis() - startTime) / 1000L;
+		final long duration = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - startTime);
 		taskEventListener.logMsg(this.itemList.getListName(), "Merged " + count + " in " + duration + " seconds.");
 	}
 
@@ -496,6 +497,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 		for (final IMediaItem mi : dupicateItems.keySet()) {
 			hashcodes.add(mi.getHashcode());
 		}
+		taskEventListener.logMsg(this.itemList.getListName(), "Found " + hashcodes.size() + " unique hashes.");
 
 		// Resolve each unique hashcode.
 		int countMerges = 0;
@@ -535,8 +537,6 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 	/*
 	 * Find all the entries with this hashcode.
 	 */
-	@SuppressWarnings("static-method")
-	// Eclipse lies.
 	private Map<T, ScanOption> findByHashcode (final Map<T, ScanOption> items, final BigInteger hashcode) {
 		final Map<T, ScanOption> ret = new HashMap<>();
 		for (final Entry<T, ScanOption> i : items.entrySet()) {
@@ -634,7 +634,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 			}
 		}
 
-		final long duration = (System.currentTimeMillis() - startTime) / 1000L;
+		final long duration = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - startTime);
 		taskEventListener.logMsg(this.itemList.getListName(), "Read metadata in " + duration + " seconds.");
 		return null;
 	}
@@ -676,7 +676,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 			}
 		} // End track metadata scanning.
 
-		final long duration = (System.currentTimeMillis() - startTime) / 1000L;
+		final long duration = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - startTime);
 		taskEventListener.logMsg(this.itemList.getListName(), "Read more metadata in " + duration + " seconds.");
 		return null;
 	}
