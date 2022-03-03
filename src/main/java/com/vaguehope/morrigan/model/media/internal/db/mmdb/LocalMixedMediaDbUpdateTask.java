@@ -83,17 +83,17 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMe
 
 	@Override
 	protected Set<String> getItemFileExtensions () throws MorriganException {
-		this.trackExts = new HashSet<String>();
+		this.trackExts = new HashSet<>();
 		for (String a : Config.getMediaFileTypes()) {
 			this.trackExts.add(a);
 		}
 
-		this.pictureExts = new HashSet<String>();
+		this.pictureExts = new HashSet<>();
 		for (String a : Config.getPictureFileTypes()) {
 			this.pictureExts.add(a);
 		}
 
-		Set<String> ret = new HashSet<String>();
+		Set<String> ret = new HashSet<>();
 		ret.addAll(this.trackExts);
 		ret.addAll(this.pictureExts);
 		return Collections.unmodifiableSet(ret);
@@ -122,7 +122,7 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMe
 			}
 		}
 
-		if (list.hasTags(itemToBeRemove)) {
+		if (list.hasTagsIncludingDeleted(itemToBeRemove)) {
 			// TODO FIXME check for duplicate tags.
 			list.moveTags(itemToBeRemove, itemToKeep);
 		}

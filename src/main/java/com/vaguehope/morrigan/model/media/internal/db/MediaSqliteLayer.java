@@ -114,9 +114,9 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	}
 
 	@Override
-	public boolean hasTags (final IDbItem item) throws DbException {
+	public boolean hasTagsIncludingDeleted (final IDbItem item) throws DbException {
 		try {
-			return local_hasTags(item.getDbRowId());
+			return local_hasTagsIncludingDeleted(item.getDbRowId());
 		} catch (Exception e) {
 			throw new DbException(e);
 		}
@@ -483,8 +483,8 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	private static final String SQL_TBL_TAGS_CLEAR =
 		"DELETE FROM tbl_tags WHERE mf_id=?;";
 
-	private static final String SQL_TBL_TAGS_Q_HASANY =
-		"SELECT id FROM tbl_tags WHERE mf_id=? AND (deleted IS NULL OR deleted!=1);";
+	private static final String SQL_TBL_TAGS_Q_HASANY_INCLUDING_DELETED =
+		"SELECT id FROM tbl_tags WHERE mf_id=?;";
 
 	// TODO is there a nice way to merge these two?
 	private static final String SQL_TBL_TAGS_Q_ALL =
@@ -808,8 +808,8 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		}
 	}
 
-	private boolean local_hasTags (final long mf_rowId) throws SQLException, ClassNotFoundException {
-		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_TAGS_Q_HASANY);
+	private boolean local_hasTagsIncludingDeleted (final long mf_rowId) throws SQLException, ClassNotFoundException {
+		PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_TAGS_Q_HASANY_INCLUDING_DELETED);
 		try {
 			ps.setLong(1, mf_rowId);
 			ResultSet rs = ps.executeQuery();

@@ -204,7 +204,7 @@ public abstract class EphemeralMixedMediaDb implements IMixedMediaDb {
 	}
 
 	@Override
-	public boolean hasTags (final IDbItem item) throws MorriganException {
+	public boolean hasTagsIncludingDeleted (final IDbItem item) throws MorriganException {
 		return false;
 	}
 

@@ -291,7 +291,7 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	@Override
 	public List<T> getAllDbEntries () throws DbException {
 		// Now that MediaItem classes are shared via factory, this may no longer be needed.
-		List<T> copyOfMainList = new ArrayList<T>(getMediaItems());
+		List<T> copyOfMainList = new ArrayList<>(getMediaItems());
 		List<T> allList = this.dbLayer.getAllMedia(
 				new IDbColumn[] { this.dbLayer.getDefaultSortColumn() },
 				new SortDirection[] { SortDirection.ASC },
@@ -529,18 +529,16 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 		super.removeItem(track);
 
 		// Remove track.
-		if (this.hasTags(track)) this.dbLayer.clearTags(track); // Track can not be removed if tags attached (foreign key constraint).
+		if (hasTagsIncludingDeleted(track)) {
+			clearTags(track); // Track can not be removed if tags attached (foreign key constraint).
+		}
+
 		int n = this.dbLayer.removeFile(track.getFilepath());
 		if (n != 1) {
 			n = this.dbLayer.removeFile(track);
 			if (n != 1) {
 				throw new MorriganException("Failed to remove entry from DB by ROWID '" + track.getDbRowId() + "' '" + track.getFilepath() + "'.");
 			}
-		}
-
-		// Remove tags.
-		if (hasTags(track)) {
-			clearTags(track);
 		}
 	}
 
@@ -690,7 +688,7 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 
 	@Override
 	public Map<String, URI> getRemotes () throws DbException {
-		final Map<String, URI> ret = new LinkedHashMap<String, URI>();
+		final Map<String, URI> ret = new LinkedHashMap<>();
 		for (final Entry<String, String> prop : this.dbLayer.getProps().entrySet()) {
 			if (prop.getKey().startsWith(REMOTE_PROP_KEY_PREFIX)) try {
 				ret.put(StringHelper.removeStart(prop.getKey(), REMOTE_PROP_KEY_PREFIX), new URI(prop.getValue()));
@@ -726,9 +724,9 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	}
 
 	@Override
-	public boolean hasTags (final IDbItem item) throws MorriganException {
+	public boolean hasTagsIncludingDeleted (final IDbItem item) throws MorriganException {
 		try {
-			return this.dbLayer.hasTags(item);
+			return this.dbLayer.hasTagsIncludingDeleted(item);
 		}
 		catch (DbException e) {
 			throw new MorriganException(e);
@@ -985,7 +983,7 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	 */
 	@Override
 	public List<T> addFiles (final List<File> files) throws MorriganException, DbException {
-		List<T> ret = new ArrayList<T>();
+		List<T> ret = new ArrayList<>();
 		boolean[] res = this.dbLayer.addFiles(files);
 		for (int i = 0; i < files.size(); i++) {
 			if (res[i]) {
@@ -1003,7 +1001,7 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	@Override
 	public void beginBulkUpdate () {
 		if (this._changedItems != null) throw new IllegalArgumentException("beginBulkUpdate() : Build update alredy in progress.");
-		this._changedItems = new ArrayList<T>();
+		this._changedItems = new ArrayList<>();
 	}
 
 	/**

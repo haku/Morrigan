@@ -2,6 +2,7 @@ package com.vaguehope.morrigan.model.media.internal.db.mmdb;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.contains;
@@ -30,6 +31,7 @@ import com.vaguehope.morrigan.engines.playback.PlaybackEngineFactory;
 import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.model.media.MediaFactory;
+import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagClassification;
 import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.model.media.test.TestMixedMediaDb;
@@ -164,6 +166,19 @@ public class LocalMixedMediaDbUpdateTaskTest {
 		this.testDb.addTag(i1, "auto tag", MediaTagType.AUTOMATIC, "bar");
 		this.testDb.addTag(i1, "auto tag2", MediaTagType.AUTOMATIC, "foo");
 
+		this.testDb.addTag(i1, "deleted tag 1", MediaTagType.MANUAL, (MediaTagClassification) null);
+		this.testDb.addTag(i1, "deleted tag 2", MediaTagType.MANUAL, (MediaTagClassification) null);
+		this.testDb.addTag(i1, "deleted tag 3", MediaTagType.MANUAL, (MediaTagClassification) null);
+		final List<MediaTag> tags = this.testDb.getTags(i1);
+		int rmCount = 0;
+		for (final MediaTag t : tags) {
+			if (t.getTag().startsWith("deleted")) {
+				this.testDb.removeTag(t);
+				rmCount += 1;
+			}
+		}
+		assertEquals(3, rmCount);
+
 		when(f1.exists()).thenReturn(false);
 		when(a1.exists()).thenReturn(false);
 		final File mediaDir2 = mockDir(sourceDir, "media2");
@@ -176,6 +191,32 @@ public class LocalMixedMediaDbUpdateTaskTest {
 		final IMixedMediaItem i2 = this.testDb.getByFile(f2);
 		assertEquals("my tag", this.testDb.getTags(i2).get(0).getTag());
 		assertEquals("auto tag", this.testDb.getTags(i2).get(1).getTag());
+	}
+
+	@Test
+	public void itMergesAMovedAlbumWithOnlyDeletedTags() throws Exception {
+		final File sourceDir = mockDir("/dir0/dir1");
+		this.testDb.addSource(sourceDir.getAbsolutePath());
+
+		final File f1 = mockFileInDir(sourceDir, "foo.wav", BigInteger.valueOf(2));
+		runUpdateTask();
+
+		final IMixedMediaItem i1 = this.testDb.getByFile(f1);
+		this.testDb.addTag(i1, "deleted tag 1", MediaTagType.MANUAL, (MediaTagClassification) null);
+		final List<MediaTag> tags = this.testDb.getTags(i1);
+		int rmCount = 0;
+		for (final MediaTag t : tags) {
+			if (t.getTag().startsWith("deleted")) {
+				this.testDb.removeTag(t);
+				rmCount += 1;
+			}
+		}
+		assertEquals(1, rmCount);
+
+		when(f1.exists()).thenReturn(false);
+		final File f2 = mockFileInDir(sourceDir, "bar.wav", BigInteger.valueOf(2));
+		runUpdateTask();
+		verify(this.taskEventListener).logMsg(anyString(), contains("Merged 1 "));
 	}
 
 	private void runUpdateTask() {
