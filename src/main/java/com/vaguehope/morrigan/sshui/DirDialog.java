@@ -69,6 +69,17 @@ public class DirDialog extends DialogWindow {
 		setHints(new HashSet<>(Arrays.asList(Hint.CENTERED, Hint.MODAL)));
 
 		this.lstDirs.setDir(savedInitialDir.get());
+		this.lstDirs.gotoParentDir();
+		setFocusedInteractable(this.lstDirs);
+	}
+
+	@Override
+	public void close() {
+		final File dir = this.lstDirs.getSelectedDir();
+		if (dir != null) {
+			this.savedInitialDir.set(dir);
+		}
+		super.close();
 	}
 
 	public File getResult () {
@@ -77,8 +88,21 @@ public class DirDialog extends DialogWindow {
 
 	protected void acceptResult () {
 		final File file = this.lstDirs.getSelectedDir();
-		this.result = file;
-		close();
+		if (file != null) {
+			this.result = file;
+			close();
+		}
+	}
+
+	@Override
+	public boolean handleInput(KeyStroke key) {
+		switch (key.getKeyType()) {
+		case Backspace:
+			this.lstDirs.gotoParentDir();
+			return true;
+		default:
+			return super.handleInput(key);
+		}
 	}
 
 	private static class DirListBox extends AbstractListBox<File, DirListBox> {
@@ -147,11 +171,12 @@ public class DirDialog extends DialogWindow {
 
 		private void enterSelectedDir () {
 			final File dir = getSelectedDir();
-			setDir(dir);
-			this.dialog.savedInitialDir.set(dir);
+			if (dir != null) {
+				setDir(dir);
+			}
 		}
 
-		private void gotoParentDir () {
+		public void gotoParentDir () {
 			final File parentDir = this.currentDir.getParentFile();
 			if (parentDir == null) return;
 
