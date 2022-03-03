@@ -465,7 +465,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 	 * Duplicates will be removed from the supplied Map if they are merged.
 	 */
 	private void mergeDuplicates (final TaskEventListener taskEventListener, final Map<T, ScanOption> dupicateItems) throws MorriganException, DbException {
-		taskEventListener.subTask("Merging duplicates");
+		taskEventListener.subTask("Merging " + dupicateItems.size() + " duplicates");
 		int count = 0;
 		final long startTime = System.currentTimeMillis();
 		final Q transClone = getTransactional(this.itemList);
@@ -474,7 +474,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 			count = mergeDuplicates(taskEventListener, transClone, dupicateItems);
 		}
 		finally {
-			taskEventListener.logMsg(this.itemList.getListName(), "Committing merges...");
+			taskEventListener.logMsg(this.itemList.getListName(), "Committing " + count + " merges...");
 			try {
 				transClone.commitOrRollback();
 			}
