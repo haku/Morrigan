@@ -7,7 +7,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
-import com.googlecode.lanterna.SGR;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
@@ -23,14 +22,11 @@ import com.vaguehope.morrigan.model.media.MediaListReference;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
-import com.vaguehope.morrigan.sshui.MenuHelper.VDirection;
 import com.vaguehope.morrigan.sshui.util.LastActionMessage;
-import com.vaguehope.morrigan.sshui.util.MenuItem;
 import com.vaguehope.morrigan.sshui.util.MenuItems;
-import com.vaguehope.morrigan.sshui.util.SelectionAndScroll;
 import com.vaguehope.morrigan.tasks.AsyncTask;
 
-public class HomeFace extends DefaultFace {
+public class HomeFace extends MenuFace {
 
 	private static final String HELP_TEXT =
 			"       g\tgo to top of list\n" +
@@ -62,10 +58,6 @@ public class HomeFace extends DefaultFace {
 	private List<Player> players;
 	private List<AsyncTask> tasks;
 	private List<MediaListReference> dbs;
-	private MenuItems menuItems;
-
-	private int terminalBottomRow = 1;  // zero-index terminal height.
-	private SelectionAndScroll selectionAndScroll = new SelectionAndScroll(null, 0);
 
 	public HomeFace (final FaceNavigation actions, final MnContext mnContext) {
 		super(actions);
@@ -74,10 +66,12 @@ public class HomeFace extends DefaultFace {
 		this.dbHelper = new DbHelper(this.navigation, mnContext, null, this.lastActionMessage, null);
 	}
 
-	private void refreshData () {
+	@Override
+	protected MenuItems refreshMenu() {
 		this.players = asList(this.mnContext.getPlayerReader().getPlayers());
 		this.tasks = this.mnContext.getAsyncTasksRegister().tasks();
-		this.menuItems = MenuItems.builder()
+
+		return MenuItems.builder()
 				.addHeading("Players")
 				.addList(this.players, " (no players)", PLAYER_TO_STRING)
 				.addSubmenu(this.lastActionMessage)
@@ -105,33 +99,13 @@ public class HomeFace extends DefaultFace {
 	@Override
 	public boolean onInput (final KeyStroke k, final WindowBasedTextGUI gui) throws Exception {
 		switch (k.getKeyType()) {
-			case ArrowUp:
-				menuMove(-1);
-				return true;
-			case ArrowDown:
-				menuMove(1);
-				return true;
-			case Home:
-				menuMoveEnd(VDirection.UP);
-				return true;
-			case End:
-				menuMoveEnd(VDirection.DOWN);
-				return true;
 			case Enter:
 				menuEnter(gui);
 				return true;
 			case Character:
 				switch (k.getCharacter()) {
-					case 'q':
-						return this.navigation.backOneLevel();
 					case 'h':
 						this.navigation.startFace(new HelpFace(this.navigation, HELP_TEXT));
-						return true;
-					case 'g':
-						menuMoveEnd(VDirection.UP);
-						return true;
-					case 'G':
-						menuMoveEnd(VDirection.DOWN);
 						return true;
 					case ' ':
 						menuClick(gui);
@@ -155,19 +129,8 @@ public class HomeFace extends DefaultFace {
 				}
 			//$FALL-THROUGH$
 		default:
-				//LOG.info("kind={} c={} a={} char={}", k.getKind(), k.isCtrlPressed(), k.isAltPressed(), String.valueOf((int) k.getCharacter()));
 				return super.onInput(k, gui);
 		}
-	}
-
-	private void menuMove (final int distance) {
-		if (this.menuItems == null) return;
-		this.selectionAndScroll = this.menuItems.moveSelection(this.selectionAndScroll, this.terminalBottomRow + 1, distance);
-	}
-
-	private void menuMoveEnd (final VDirection direction) {
-		if (this.menuItems == null) return;
-		this.selectionAndScroll = this.menuItems.moveSelectionToEnd(this.selectionAndScroll, this.terminalBottomRow + 1, direction);
 	}
 
 	private void menuClick (final WindowBasedTextGUI gui) throws DbException, MorriganException {
@@ -209,7 +172,7 @@ public class HomeFace extends DefaultFace {
 		}
 	}
 
-	private void askNewDb (final WindowBasedTextGUI gui) throws MorriganException {
+	private void askNewDb (final WindowBasedTextGUI gui) throws Exception {
 		final String name = new TextInputDialogBuilder()
 				.setTitle("New DB")
 				.setDescription("Enter name:")
@@ -264,29 +227,7 @@ public class HomeFace extends DefaultFace {
 	@Override
 	public void writeScreen (final Screen scr, final TextGraphics tg) {
 		refreshStaleData();
-
-		if (this.menuItems == null) {
-			tg.putString(0, 0, "No menu items.");
-			return;
-		}
-
-		final TerminalSize terminalSize = scr.getTerminalSize();
-		int l = 0;
-
-		this.terminalBottomRow = terminalSize.getRows() - 1;
-		for (int i = this.selectionAndScroll.scrollTop; i < this.menuItems.size(); i++) {
-			if (l > this.terminalBottomRow) break;
-
-			final MenuItem item = this.menuItems.get(i);
-			if (this.selectionAndScroll.selectedItem != null && this.selectionAndScroll.selectedItem.equals(item.getItem())) {
-				tg.putString(0, l, item.toString(), SGR.REVERSE);
-			}
-			else {
-				tg.putString(0, l, item.toString());
-			}
-
-			l++;
-		}
+		super.writeScreen(scr, tg);
 	}
 
 	private void cancelSelectedTask() {

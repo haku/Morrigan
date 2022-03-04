@@ -9,27 +9,21 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.googlecode.lanterna.SGR;
 import com.googlecode.lanterna.TerminalSize;
-import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.gui2.dialogs.TextInputDialogBuilder;
 import com.googlecode.lanterna.input.KeyStroke;
-import com.googlecode.lanterna.screen.Screen;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMixedMediaDb;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
-import com.vaguehope.morrigan.sshui.MenuHelper.VDirection;
 import com.vaguehope.morrigan.sshui.util.LastActionMessage;
-import com.vaguehope.morrigan.sshui.util.MenuItem;
 import com.vaguehope.morrigan.sshui.util.MenuItems;
-import com.vaguehope.morrigan.sshui.util.SelectionAndScroll;
 import com.vaguehope.morrigan.tasks.MorriganTask;
 
-public class DbPropertiesFace extends DefaultFace {
+public class DbPropertiesFace extends MenuFace {
 
 	private static final String HELP_TEXT =
 			"       g\tgo to top of list\n" +
@@ -51,25 +45,25 @@ public class DbPropertiesFace extends DefaultFace {
 
 	private List<String> sources;
 	private List<Entry<String, URI>> remotes;
-	private MenuItems menuItems;
 
-	private int terminalBottomRow = 1;  // zero-index terminal height.
-	private SelectionAndScroll selectionAndScroll = new SelectionAndScroll(null, 0);
-
-	public DbPropertiesFace (final FaceNavigation navigation, final MnContext mnContext, final IMixedMediaDb db, final AtomicReference<File> savedInitialDir) throws MorriganException, DbException {
+	public DbPropertiesFace (final FaceNavigation navigation, final MnContext mnContext, final IMixedMediaDb db, final AtomicReference<File> savedInitialDir) throws Exception {
 		super(navigation);
 		this.navigation = navigation;
 		this.mnContext = mnContext;
 		this.db = db;
 		this.savedInitialDir = savedInitialDir;
+		refreshLists();
+	}
+
+	private void refreshLists() throws MorriganException, DbException {
+		this.sources = this.db.getSources();
+		this.remotes = new ArrayList<>(this.db.getRemotes().entrySet());
 		refreshData();
 	}
 
-	private void refreshData () throws MorriganException, DbException {
-		this.sources = this.db.getSources();
-		this.remotes = new ArrayList<>(this.db.getRemotes().entrySet());
-
-		this.menuItems = MenuItems.builder()
+	@Override
+	protected MenuItems refreshMenu() {
+		return MenuItems.builder()
 				.addHeading(String.format("DB %s:", this.db.getListName()))
 				.addSubmenu(this.lastActionMessage)
 				.addHeading("Sources")
@@ -83,42 +77,16 @@ public class DbPropertiesFace extends DefaultFace {
 	@Override
 	public boolean onInput (final KeyStroke k, final WindowBasedTextGUI gui) throws Exception {
 		switch (k.getKeyType()) {
-			case ArrowUp:
-				menuMove(-1);
-				return true;
-			case ArrowDown:
-				menuMove(1);
-				return true;
-			case PageUp:
-				menuMove(0 - (this.terminalBottomRow - 1));
-				return true;
-			case PageDown:
-				menuMove(this.terminalBottomRow - 1);
-				return true;
-			case Home:
-				menuMoveEnd(VDirection.UP);
-				return true;
-			case End:
-				menuMoveEnd(VDirection.DOWN);
-				return true;
 			case Delete:
 				removeSource(gui);
 				return true;
 			case Character:
 				switch (k.getCharacter()) {
-					case 'q':
-						return this.navigation.backOneLevel();
 					case 'h':
 						this.navigation.startFace(new HelpFace(this.navigation, HELP_TEXT));
 						return true;
-					case 'g':
-						menuMoveEnd(VDirection.UP);
-						return true;
-					case 'G':
-						menuMoveEnd(VDirection.DOWN);
-						return true;
 					case 'r':
-						refreshData();
+						refreshLists();
 						return true;
 					case 'n':
 						askAddSource(gui);
@@ -137,25 +105,15 @@ public class DbPropertiesFace extends DefaultFace {
 		}
 	}
 
-	private void menuMove (final int distance) {
-		if (this.menuItems == null) return;
-		this.selectionAndScroll = this.menuItems.moveSelection(this.selectionAndScroll, this.terminalBottomRow + 1, distance);
-	}
-
-	private void menuMoveEnd (final VDirection direction) {
-		if (this.menuItems == null) return;
-		this.selectionAndScroll = this.menuItems.moveSelectionToEnd(this.selectionAndScroll, this.terminalBottomRow + 1, direction);
-	}
-
-	private void askAddSource (final WindowBasedTextGUI gui) throws MorriganException, DbException {
+	private void askAddSource (final WindowBasedTextGUI gui) throws Exception {
 		final File dir = DirDialog.show(gui, "Add Source", "Add", this.savedInitialDir);
 		if (dir != null) {
 			this.db.addSource(dir.getAbsolutePath());
-			refreshData();
+			refreshLists();
 		}
 	}
 
-	private void askAddRemote (final WindowBasedTextGUI gui) throws MorriganException, DbException {
+	private void askAddRemote (final WindowBasedTextGUI gui) throws Exception {
 		String name = null;
 		URI uri = null;
 
@@ -195,17 +153,17 @@ public class DbPropertiesFace extends DefaultFace {
 		if (uri == null) return;
 
 		this.db.addRemote(name, uri);
-		refreshData();
+		refreshLists();
 	}
 
-	private void removeSource (final WindowBasedTextGUI gui) throws MorriganException, DbException {
+	private void removeSource (final WindowBasedTextGUI gui) throws Exception {
 		if (this.selectionAndScroll.selectedItem == null) return;
 		if (this.selectionAndScroll.selectedItem instanceof String && this.sources != null) {
 			final int i = this.sources.indexOf(this.selectionAndScroll.selectedItem);
 			final String source = (String) this.selectionAndScroll.selectedItem;
 			if (MessageDialog.showMessageDialog(gui, "Remove Source", source, MessageDialogButton.Yes, MessageDialogButton.No) != MessageDialogButton.Yes) return;
 			this.db.removeSource(source);
-			refreshData();
+			refreshLists();
 			fixSelectionAfterDeletion(this.sources, i);
 		}
 		else if (this.selectionAndScroll.selectedItem instanceof Entry && this.remotes != null) {
@@ -215,7 +173,7 @@ public class DbPropertiesFace extends DefaultFace {
 					MessageDialogButton.Yes, MessageDialogButton.No) != MessageDialogButton.Yes)
 				return;
 			this.db.rmRemote(entry.getKey().toString());
-			refreshData();
+			refreshLists();
 			fixSelectionAfterDeletion(this.remotes, i);
 		}
 	}
@@ -246,32 +204,6 @@ public class DbPropertiesFace extends DefaultFace {
 		}
 		else {
 			this.lastActionMessage.setLastActionMessage("Do not know how to refresh: " + this.db);
-		}
-	}
-
-	@Override
-	public void writeScreen (final Screen scr, final TextGraphics tg) {
-		if (this.menuItems == null) {
-			tg.putString(0, 0, "No menu items.");
-			return;
-		}
-
-		final TerminalSize terminalSize = scr.getTerminalSize();
-		int l = 0;
-
-		this.terminalBottomRow = terminalSize.getRows() - 1;
-		for (int i = this.selectionAndScroll.scrollTop; i < this.menuItems.size(); i++) {
-			if (l > this.terminalBottomRow) break;
-
-			final MenuItem item = this.menuItems.get(i);
-			if (this.selectionAndScroll.selectedItem != null && this.selectionAndScroll.selectedItem.equals(item.getItem())) {
-				tg.putString(0, l, item.toString(), SGR.REVERSE);
-			}
-			else {
-				tg.putString(0, l, item.toString());
-			}
-
-			l++;
 		}
 	}
 
