@@ -15,6 +15,7 @@ public class MenuHelperTest {
 		assertEquals(1, MenuHelper.calcScrollTop(10, 0, 10));
 		assertEquals(0, MenuHelper.calcScrollTop(10, 1, 0));
 		assertEquals(1, MenuHelper.calcScrollTop(10, 1, 1));
+		assertEquals(0, MenuHelper.calcScrollTop(3, 1, 0));
 	}
 
 }

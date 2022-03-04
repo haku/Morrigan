@@ -49,48 +49,70 @@ public class MenuItems {
 		if (distance == 0) return prev;
 
 		final int ulimit = size() - 1;
-		int i = indexOf(prev.selectedItem);
-		i = i + distance;
+		int goalSelI = indexOf(prev.selectedItem);
+		goalSelI = goalSelI + distance;
 
-		if (i > ulimit) i = ulimit;
-		if (i < 0) i = 0;
+		if (goalSelI > ulimit) goalSelI = ulimit;
+		if (goalSelI < 0) goalSelI = 0;
 
-		return adjustSelection(prev, visibleRows, distance > 0 ? VDirection.DOWN : VDirection.UP, ulimit, i);
+		int goalRevealI;
+		if (distance > 0) {
+			goalRevealI = prev.scrollTop + visibleRows - 1 + distance;
+			if (goalRevealI > ulimit) goalRevealI = ulimit;
+		}
+		else {
+			goalRevealI = prev.scrollTop + distance;
+		}
+
+		return adjustSelection(prev, visibleRows, distance > 0 ? VDirection.DOWN : VDirection.UP, ulimit, goalSelI, goalRevealI);
 	}
 
 	public SelectionAndScroll moveSelectionToEnd(final SelectionAndScroll prev, final int visibleRows, final VDirection direction) {
 		final int ulimit = size() - 1;
-		return adjustSelection(prev, visibleRows, direction, ulimit, direction == VDirection.DOWN ? ulimit : 0);
+		final int goalSelI = direction == VDirection.DOWN ? ulimit : 0;
+		final int goalTop = direction == VDirection.DOWN ? ulimit : 0;
+		return adjustSelection(prev, visibleRows, direction, ulimit, goalSelI, goalTop);
 	}
 
-	private SelectionAndScroll adjustSelection(final SelectionAndScroll prev, final int visibleRows, final VDirection direction, final int ulimit, int i) {
-		final SubMenuAndIndex s = getSubMenuAndIndex(i);
+	private SelectionAndScroll adjustSelection(
+			final SelectionAndScroll prev,
+			final int visibleRows,
+			final VDirection direction,
+			final int ulimit,
+			final int goalSelI,
+			final int goalRevealI) {
+		final SubMenuAndIndex s = getSubMenuAndIndex(goalSelI);
 		if (s.hasSelectableItem()) return new SelectionAndScroll(s.getItem(), MenuHelper.calcScrollTop(visibleRows, prev.scrollTop, s.overallIndex));
 
 		if (direction == VDirection.DOWN) {
-			if (i < ulimit) {
-				for (int x = i + 1; x <= ulimit; x++) {
+			if (goalSelI < ulimit) {
+				for (int x = goalSelI + 1; x <= ulimit; x++) {
 					final SubMenuAndIndex t = getSubMenuAndIndex(x);
-					if (t.hasSelectableItem()) return new SelectionAndScroll(t.getItem(), MenuHelper.calcScrollTop(visibleRows, prev.scrollTop, t.overallIndex));
+					if (t.hasSelectableItem())
+						return new SelectionAndScroll(t.getItem(), MenuHelper.calcScrollTop(visibleRows, prev.scrollTop, t.overallIndex));
 				}
 			}
-			for (int x = i - 1; x >= 0; x--) {
+			for (int x = goalSelI - 1; x >= 0; x--) {
 				final SubMenuAndIndex t = getSubMenuAndIndex(x);
-				if (t.hasSelectableItem()) return new SelectionAndScroll(t.getItem(), MenuHelper.calcScrollTop(visibleRows, prev.scrollTop, t.overallIndex));
+				if (t.hasSelectableItem())
+					return new SelectionAndScroll(t.getItem(), MenuHelper.calcScrollTop(visibleRows, prev.scrollTop, goalRevealI));
 			}
 		}
 		else {
-			if (i > 0) {
-				for (int x = i - 1; x >= 0; x--) {
+			if (goalSelI > 0) {
+				for (int x = goalSelI - 1; x >= 0; x--) {
 					final SubMenuAndIndex t = getSubMenuAndIndex(x);
-					if (t.hasSelectableItem()) return new SelectionAndScroll(t.getItem(), MenuHelper.calcScrollTop(visibleRows, prev.scrollTop, t.overallIndex));
+					if (t.hasSelectableItem())
+						return new SelectionAndScroll(t.getItem(), MenuHelper.calcScrollTop(visibleRows, prev.scrollTop, t.overallIndex));
 				}
 			}
-			for (int x = i + 1; i <= ulimit; x++) {
+			for (int x = goalSelI + 1; goalSelI <= ulimit; x++) {
 				final SubMenuAndIndex t = getSubMenuAndIndex(x);
-				if (t.hasSelectableItem()) return new SelectionAndScroll(t.getItem(), MenuHelper.calcScrollTop(visibleRows, prev.scrollTop, t.overallIndex));
+				if (t.hasSelectableItem())
+					return new SelectionAndScroll(t.getItem(), MenuHelper.calcScrollTop(visibleRows, prev.scrollTop, goalRevealI));
 			}
 		}
+
 		return prev;
 	}
 
