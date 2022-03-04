@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
+import com.vaguehope.morrigan.sshui.MenuHelper;
 import com.vaguehope.morrigan.sshui.MenuHelper.VDirection;
 
 public class MenuItems {
@@ -44,60 +45,60 @@ public class MenuItems {
 	/**
 	 * Returns newly selected item.
 	 */
-	public Object moveSelection(final Object selectedItem, final int distance) {
-		if (distance == 0) return selectedItem;
+	public SelectionAndScroll moveSelection(final SelectionAndScroll prev, final int visibleRows, final int distance) {
+		if (distance == 0) return prev;
 
 		final int ulimit = size() - 1;
-		int i = indexOf(selectedItem);
+		int i = indexOf(prev.selectedItem);
 		i = i + distance;
 
 		if (i > ulimit) i = ulimit;
 		if (i < 0) i = 0;
 
-		return adjustSelection(selectedItem, distance > 0 ? VDirection.DOWN : VDirection.UP, ulimit, i);
+		return adjustSelection(prev, visibleRows, distance > 0 ? VDirection.DOWN : VDirection.UP, ulimit, i);
 	}
 
-	public Object moveSelectionToEnd(final Object selectedItem, final VDirection direction) {
+	public SelectionAndScroll moveSelectionToEnd(final SelectionAndScroll prev, final int visibleRows, final VDirection direction) {
 		final int ulimit = size() - 1;
-		return adjustSelection(selectedItem, direction, ulimit, direction == VDirection.DOWN ? ulimit : 0);
+		return adjustSelection(prev, visibleRows, direction, ulimit, direction == VDirection.DOWN ? ulimit : 0);
 	}
 
-	private Object adjustSelection(final Object selectedItem, final VDirection direction, final int ulimit, int i) {
+	private SelectionAndScroll adjustSelection(final SelectionAndScroll prev, final int visibleRows, final VDirection direction, final int ulimit, int i) {
 		final SubMenuAndIndex s = getSubMenuAndIndex(i);
-		if (s.hasSelectableItem()) return s.getItem();
+		if (s.hasSelectableItem()) return new SelectionAndScroll(s.getItem(), MenuHelper.calcScrollTop(visibleRows, prev.scrollTop, s.overallIndex));
 
 		if (direction == VDirection.DOWN) {
 			if (i < ulimit) {
 				for (int x = i + 1; x <= ulimit; x++) {
 					final SubMenuAndIndex t = getSubMenuAndIndex(x);
-					if (t.hasSelectableItem()) return t.getItem();
+					if (t.hasSelectableItem()) return new SelectionAndScroll(t.getItem(), MenuHelper.calcScrollTop(visibleRows, prev.scrollTop, t.overallIndex));
 				}
 			}
 			for (int x = i - 1; x >= 0; x--) {
 				final SubMenuAndIndex t = getSubMenuAndIndex(x);
-				if (t.hasSelectableItem()) return t.getItem();
+				if (t.hasSelectableItem()) return new SelectionAndScroll(t.getItem(), MenuHelper.calcScrollTop(visibleRows, prev.scrollTop, t.overallIndex));
 			}
 		}
 		else {
 			if (i > 0) {
 				for (int x = i - 1; x >= 0; x--) {
 					final SubMenuAndIndex t = getSubMenuAndIndex(x);
-					if (t.hasSelectableItem()) return t.getItem();
+					if (t.hasSelectableItem()) return new SelectionAndScroll(t.getItem(), MenuHelper.calcScrollTop(visibleRows, prev.scrollTop, t.overallIndex));
 				}
 			}
 			for (int x = i + 1; i <= ulimit; x++) {
 				final SubMenuAndIndex t = getSubMenuAndIndex(x);
-				if (t.hasSelectableItem()) return t.getItem();
+				if (t.hasSelectableItem()) return new SelectionAndScroll(t.getItem(), MenuHelper.calcScrollTop(visibleRows, prev.scrollTop, t.overallIndex));
 			}
 		}
-		return selectedItem;
+		return prev;
 	}
 
 	private SubMenuAndIndex getSubMenuAndIndex(final int index) {
 		if (index < 0) return null;
 		int x = index;
 		for (final Submenu p : this.parts) {
-			if (x < p.size()) return new SubMenuAndIndex(p, x);
+			if (x < p.size()) return new SubMenuAndIndex(p, x, index);
 			x -= p.size();
 		}
 		return null;
@@ -105,11 +106,13 @@ public class MenuItems {
 
 	private static class SubMenuAndIndex implements MenuItem {
 		public final Submenu submenu;
-		public final int index;
+		public final int subIndex;
+		public final int overallIndex;
 
-		public SubMenuAndIndex(final Submenu submenu, final int index) {
+		public SubMenuAndIndex(final Submenu submenu, final int subIndex, final int overallIndex) {
 			this.submenu = submenu;
-			this.index = index;
+			this.subIndex = subIndex;
+			this.overallIndex = overallIndex;
 		}
 
 		public boolean hasSelectableItem() {
@@ -119,12 +122,12 @@ public class MenuItems {
 
 		@Override
 		public Object getItem() {
-			return this.submenu.get(this.index);
+			return this.submenu.get(this.subIndex);
 		}
 
 		@Override
 		public String toString() {
-			return this.submenu.stringForItem(this.index);
+			return this.submenu.stringForItem(this.subIndex);
 		}
 	}
 

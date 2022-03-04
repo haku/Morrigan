@@ -45,49 +45,49 @@ public class MenuItemsTest {
 
 	@Test
 	public void itMovesSelectionDownTheList() throws Exception {
-		Object selected = null;
+		SelectionAndScroll selected = new SelectionAndScroll(null, 0);
 		final List<String> allGroupsList = allGroupsList();
 
 		for (final String expected : allGroupsList) {
-			selected = this.undertest.moveSelection(selected, 1);
-			assertEquals(expected, selected);
+			selected = this.undertest.moveSelection(selected, 8, 1);
+			assertEquals(expected, selected.selectedItem);
 		}
 
-		selected = this.undertest.moveSelection(selected, 1);
-		assertEquals(allGroupsList.get(allGroupsList.size() - 1), selected);
+		selected = this.undertest.moveSelection(selected, 8, 1);
+		assertEquals(allGroupsList.get(allGroupsList.size() - 1), selected.selectedItem);
 	}
 
 	@Test
 	public void itMovesSelectionUpTheList() throws Exception {
 		final List<String> allGroupsList = allGroupsList();
 		Collections.reverse(allGroupsList);
-		Object selected = allGroupsList.remove(0);
+		SelectionAndScroll selected = new SelectionAndScroll(allGroupsList.remove(0), 0);
 
 		for (final String expected : allGroupsList) {
-			selected = this.undertest.moveSelection(selected, -1);
-			assertEquals(expected, selected);
+			selected = this.undertest.moveSelection(selected, 8, -1);
+			assertEquals(expected, selected.selectedItem);
 		}
 
-		selected = this.undertest.moveSelection(selected, -1);
-		assertEquals(allGroupsList.get(allGroupsList.size() - 1), selected);
+		selected = this.undertest.moveSelection(selected, 8, -1);
+		assertEquals(allGroupsList.get(allGroupsList.size() - 1), selected.selectedItem);
 	}
 
 	@Test
 	public void itMovesSelectToTheFirstItem() throws Exception {
 		final List<String> allGroupsList = allGroupsList();
-		Object selected = allGroupsList.get(allGroupsList.size() - 1);
+		SelectionAndScroll selected = new SelectionAndScroll(allGroupsList.get(allGroupsList.size() - 1), 0);
 
-		selected = this.undertest.moveSelectionToEnd(selected, VDirection.UP);
-		assertEquals(allGroupsList.get(0), selected);
+		selected = this.undertest.moveSelectionToEnd(selected, 8, VDirection.UP);
+		assertEquals(allGroupsList.get(0), selected.selectedItem);
 	}
 
 	@Test
 	public void itMovesSelectToTheLastItem() throws Exception {
 		final List<String> allGroupsList = allGroupsList();
-		Object selected = allGroupsList.get(0);
+		SelectionAndScroll selected = new SelectionAndScroll(allGroupsList.get(0), 0);
 
-		selected = this.undertest.moveSelectionToEnd(selected, VDirection.DOWN);
-		assertEquals(allGroupsList.get(allGroupsList.size() - 1), selected);
+		selected = this.undertest.moveSelectionToEnd(selected, 8, VDirection.DOWN);
+		assertEquals(allGroupsList.get(allGroupsList.size() - 1), selected.selectedItem);
 	}
 
 	private List<String> allGroupsList() {

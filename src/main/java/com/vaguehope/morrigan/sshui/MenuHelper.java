@@ -13,10 +13,6 @@ public final class MenuHelper {
 		throw new AssertionError();
 	}
 
-	public static <T> int moveListSelectionIndex (final int selectedIndex, final VDirection direction, final int distance, final T[] list) {
-		return moveListSelectionIndex(selectedIndex, direction, distance, sizeOf(list));
-	}
-
 	public static int moveListSelectionIndex (final int selectedIndex, final VDirection direction, final int distance, final List<?> list) {
 		return moveListSelectionIndex(selectedIndex, direction, distance, sizeOf(list));
 	}

@@ -23,6 +23,7 @@ import com.vaguehope.morrigan.sshui.MenuHelper.VDirection;
 import com.vaguehope.morrigan.sshui.util.LastActionMessage;
 import com.vaguehope.morrigan.sshui.util.MenuItem;
 import com.vaguehope.morrigan.sshui.util.MenuItems;
+import com.vaguehope.morrigan.sshui.util.SelectionAndScroll;
 import com.vaguehope.morrigan.tasks.MorriganTask;
 
 public class DbPropertiesFace extends DefaultFace {
@@ -49,8 +50,7 @@ public class DbPropertiesFace extends DefaultFace {
 	private MenuItems menuItems;
 
 	private int terminalBottomRow = 1;  // zero-index terminal height.
-	private Object selectedItem;
-	private int scrollTop = 0;
+	private SelectionAndScroll selectionAndScroll = new SelectionAndScroll(null, 0);
 
 	public DbPropertiesFace (final FaceNavigation navigation, final MnContext mnContext, final IMixedMediaDb db, final AtomicReference<File> savedInitialDir) throws MorriganException, DbException {
 		super(navigation);
@@ -132,12 +132,12 @@ public class DbPropertiesFace extends DefaultFace {
 
 	private void menuMove (final int distance) {
 		if (this.menuItems == null) return;
-		this.selectedItem = this.menuItems.moveSelection(this.selectedItem, distance);
+		this.selectionAndScroll = this.menuItems.moveSelection(this.selectionAndScroll, this.terminalBottomRow + 1, distance);
 	}
 
 	private void menuMoveEnd (final VDirection direction) {
 		if (this.menuItems == null) return;
-		this.selectedItem = this.menuItems.moveSelectionToEnd(this.selectedItem, direction);
+		this.selectionAndScroll = this.menuItems.moveSelectionToEnd(this.selectionAndScroll, this.terminalBottomRow + 1, direction);
 	}
 
 	private void askAddSource (final WindowBasedTextGUI gui) throws MorriganException, DbException {
@@ -149,21 +149,21 @@ public class DbPropertiesFace extends DefaultFace {
 	}
 
 	private void removeSource (final WindowBasedTextGUI gui) throws MorriganException, DbException {
-		if (this.selectedItem == null) return;
-		if (this.selectedItem instanceof String && this.sources != null) {
-			final int i = this.sources.indexOf(this.selectedItem);
-			final String source = (String) this.selectedItem;
+		if (this.selectionAndScroll.selectedItem == null) return;
+		if (this.selectionAndScroll.selectedItem instanceof String && this.sources != null) {
+			final int i = this.sources.indexOf(this.selectionAndScroll.selectedItem);
+			final String source = (String) this.selectionAndScroll.selectedItem;
 			if (MessageDialog.showMessageDialog(gui, "Remove Source", source, MessageDialogButton.Yes, MessageDialogButton.No) != MessageDialogButton.Yes) return;
 			this.db.removeSource(source);
 			refreshData();
 			if (this.sources.size() < 1) {
-				this.selectedItem = null;
+				this.selectionAndScroll = this.selectionAndScroll.withSelectedItem(null);
 			}
 			else if (i >= this.sources.size()) { // Last item was deleted.
-				this.selectedItem = this.sources.get(this.sources.size() - 1);
+				this.selectionAndScroll = this.selectionAndScroll.withSelectedItem(this.sources.get(this.sources.size() - 1));
 			}
 			else if (i >= 0) {
-				this.selectedItem = this.sources.get(i);
+				this.selectionAndScroll = this.selectionAndScroll.withSelectedItem(this.sources.get(i));
 			}
 		}
 	}
@@ -196,13 +196,11 @@ public class DbPropertiesFace extends DefaultFace {
 		int l = 0;
 
 		this.terminalBottomRow = terminalSize.getRows() - 1;
-		this.scrollTop = MenuHelper.calcScrollTop(terminalSize.getRows(), this.scrollTop, this.menuItems.indexOf(this.selectedItem));
-
-		for (int i = this.scrollTop; i < this.menuItems.size(); i++) {
+		for (int i = this.selectionAndScroll.scrollTop; i < this.menuItems.size(); i++) {
 			if (l > this.terminalBottomRow) break;
 
 			final MenuItem item = this.menuItems.get(i);
-			if (this.selectedItem != null && this.selectedItem.equals(item.getItem())) {
+			if (this.selectionAndScroll.selectedItem != null && this.selectionAndScroll.selectedItem.equals(item.getItem())) {
 				tg.putString(0, l, item.toString(), SGR.REVERSE);
 			}
 			else {

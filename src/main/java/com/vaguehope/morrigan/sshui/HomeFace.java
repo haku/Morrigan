@@ -27,6 +27,7 @@ import com.vaguehope.morrigan.sshui.MenuHelper.VDirection;
 import com.vaguehope.morrigan.sshui.util.LastActionMessage;
 import com.vaguehope.morrigan.sshui.util.MenuItem;
 import com.vaguehope.morrigan.sshui.util.MenuItems;
+import com.vaguehope.morrigan.sshui.util.SelectionAndScroll;
 import com.vaguehope.morrigan.tasks.AsyncTask;
 
 public class HomeFace extends DefaultFace {
@@ -64,8 +65,7 @@ public class HomeFace extends DefaultFace {
 	private MenuItems menuItems;
 
 	private int terminalBottomRow = 1;  // zero-index terminal height.
-	private Object selectedItem;
-	private int scrollTop = 0;
+	private SelectionAndScroll selectionAndScroll = new SelectionAndScroll(null, 0);
 
 	public HomeFace (final FaceNavigation actions, final MnContext mnContext) {
 		super(actions);
@@ -162,50 +162,50 @@ public class HomeFace extends DefaultFace {
 
 	private void menuMove (final int distance) {
 		if (this.menuItems == null) return;
-		this.selectedItem = this.menuItems.moveSelection(this.selectedItem, distance);
+		this.selectionAndScroll = this.menuItems.moveSelection(this.selectionAndScroll, this.terminalBottomRow + 1, distance);
 	}
 
 	private void menuMoveEnd (final VDirection direction) {
 		if (this.menuItems == null) return;
-		this.selectedItem = this.menuItems.moveSelectionToEnd(this.selectedItem, direction);
+		this.selectionAndScroll = this.menuItems.moveSelectionToEnd(this.selectionAndScroll, this.terminalBottomRow + 1, direction);
 	}
 
 	private void menuClick (final WindowBasedTextGUI gui) throws DbException, MorriganException {
-		if (this.selectedItem == null) return;
-		if (this.selectedItem instanceof Player) {
-			((Player) this.selectedItem).pausePlaying();
+		if (this.selectionAndScroll.selectedItem == null) return;
+		if (this.selectionAndScroll.selectedItem instanceof Player) {
+			((Player) this.selectionAndScroll.selectedItem).pausePlaying();
 		}
-		else if (this.selectedItem instanceof MediaListReference) {
+		else if (this.selectionAndScroll.selectedItem instanceof MediaListReference) {
 			final Player player = getPlayer(gui, "Play DB");
 			if (player != null) {
-				final IMixedMediaDb db = this.dbHelper.resolveReference((MediaListReference) this.selectedItem);
+				final IMixedMediaDb db = this.dbHelper.resolveReference((MediaListReference) this.selectionAndScroll.selectedItem);
 				playPlayItem(new PlayItem(db, null), player);
 			}
 		}
-		else if (this.selectedItem instanceof AsyncTask) {
+		else if (this.selectionAndScroll.selectedItem instanceof AsyncTask) {
 			// Do nothing.
 		}
 		else {
-			MessageDialog.showMessageDialog(gui, "Error", "Unknown type: " + this.selectedItem);
+			MessageDialog.showMessageDialog(gui, "Error", "Unknown type: " + this.selectionAndScroll.selectedItem);
 		}
 	}
 
 	private void menuEnter (final WindowBasedTextGUI gui) throws DbException, MorriganException {
-		if (this.selectedItem == null) return;
-		if (this.selectedItem instanceof Player) {
-			this.navigation.startFace(new PlayerFace(this.navigation, this.mnContext, (Player) this.selectedItem));
+		if (this.selectionAndScroll.selectedItem == null) return;
+		if (this.selectionAndScroll.selectedItem instanceof Player) {
+			this.navigation.startFace(new PlayerFace(this.navigation, this.mnContext, (Player) this.selectionAndScroll.selectedItem));
 		}
-		else if (this.selectedItem instanceof MediaListReference) {
-			final IMixedMediaDb db = this.dbHelper.resolveReference((MediaListReference) this.selectedItem);
+		else if (this.selectionAndScroll.selectedItem instanceof MediaListReference) {
+			final IMixedMediaDb db = this.dbHelper.resolveReference((MediaListReference) this.selectionAndScroll.selectedItem);
 			final DbFace dbFace = new DbFace(this.navigation, this.mnContext, db, null);
 			dbFace.restoreSavedScroll();
 			this.navigation.startFace(dbFace);
 		}
-		else if (this.selectedItem instanceof AsyncTask) {
-			this.navigation.startFace(new LogFace(this.navigation, (AsyncTask) this.selectedItem));
+		else if (this.selectionAndScroll.selectedItem instanceof AsyncTask) {
+			this.navigation.startFace(new LogFace(this.navigation, (AsyncTask) this.selectionAndScroll.selectedItem));
 		}
 		else {
-			MessageDialog.showMessageDialog(gui, "TODO", "Enter: " + this.selectedItem);
+			MessageDialog.showMessageDialog(gui, "TODO", "Enter: " + this.selectionAndScroll.selectedItem);
 		}
 	}
 
@@ -223,24 +223,24 @@ public class HomeFace extends DefaultFace {
 	}
 
 	private void enqueueDb (final WindowBasedTextGUI gui) throws DbException, MorriganException {
-		if (this.selectedItem instanceof MediaListReference) {
+		if (this.selectionAndScroll.selectedItem instanceof MediaListReference) {
 			final Player player = getPlayer(gui, "Enqueue DB");
 			if (player != null) {
-				final IMixedMediaDb db = this.dbHelper.resolveReference((MediaListReference) this.selectedItem);
+				final IMixedMediaDb db = this.dbHelper.resolveReference((MediaListReference) this.selectionAndScroll.selectedItem);
 				enqueuePlayItem(new PlayItem(db, null), player);
 			}
 		}
 	}
 
 	private void askSearch (final WindowBasedTextGUI gui) throws DbException, MorriganException {
-		if (this.selectedItem instanceof Player) {
-			final IMediaTrackList<? extends IMediaTrack> list = ((Player) this.selectedItem).getCurrentList();
+		if (this.selectionAndScroll.selectedItem instanceof Player) {
+			final IMediaTrackList<? extends IMediaTrack> list = ((Player) this.selectionAndScroll.selectedItem).getCurrentList();
 			if (list instanceof IMixedMediaDb) {
 				this.dbHelper.askSearch(gui, (IMixedMediaDb) list, this.savedSearchTerm);
 			}
 		}
-		else if (this.selectedItem instanceof MediaListReference) {
-			final IMixedMediaDb db = this.dbHelper.resolveReference((MediaListReference) this.selectedItem);
+		else if (this.selectionAndScroll.selectedItem instanceof MediaListReference) {
+			final IMixedMediaDb db = this.dbHelper.resolveReference((MediaListReference) this.selectionAndScroll.selectedItem);
 			this.dbHelper.askSearch(gui, db, this.savedSearchTerm);
 		}
 	}
@@ -274,13 +274,11 @@ public class HomeFace extends DefaultFace {
 		int l = 0;
 
 		this.terminalBottomRow = terminalSize.getRows() - 1;
-		this.scrollTop = MenuHelper.calcScrollTop(terminalSize.getRows(), this.scrollTop, this.menuItems.indexOf(this.selectedItem));
-
-		for (int i = this.scrollTop; i < this.menuItems.size(); i++) {
+		for (int i = this.selectionAndScroll.scrollTop; i < this.menuItems.size(); i++) {
 			if (l > this.terminalBottomRow) break;
 
 			final MenuItem item = this.menuItems.get(i);
-			if (this.selectedItem != null && this.selectedItem.equals(item.getItem())) {
+			if (this.selectionAndScroll.selectedItem != null && this.selectionAndScroll.selectedItem.equals(item.getItem())) {
 				tg.putString(0, l, item.toString(), SGR.REVERSE);
 			}
 			else {
@@ -292,9 +290,9 @@ public class HomeFace extends DefaultFace {
 	}
 
 	private void cancelSelectedTask() {
-		if (this.selectedItem == null) return;
-		if (this.selectedItem instanceof AsyncTask) {
-			final AsyncTask task = (AsyncTask) this.selectedItem;
+		if (this.selectionAndScroll.selectedItem == null) return;
+		if (this.selectionAndScroll.selectedItem instanceof AsyncTask) {
+			final AsyncTask task = (AsyncTask) this.selectionAndScroll.selectedItem;
 			task.cancel();
 			this.lastActionMessage.setLastActionMessage(String.format("Cancelled: %s", task.title()));
 		}
