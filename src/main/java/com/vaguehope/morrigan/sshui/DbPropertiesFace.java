@@ -1,7 +1,9 @@
 package com.vaguehope.morrigan.sshui;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
@@ -13,6 +15,7 @@ import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
+import com.googlecode.lanterna.gui2.dialogs.TextInputDialogBuilder;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.screen.Screen;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
@@ -33,6 +36,7 @@ public class DbPropertiesFace extends DefaultFace {
 			"       G\tgo to end of list\n" +
 			"       r\trefresh\n" +
 			"       n\tadd new source\n" +
+			"       m\tadd new remote\n" +
 			"<delete>\tremove source\n" +
 			"       u\trescan sources\n" +
 			"       q\tback a page\n" +
@@ -119,6 +123,9 @@ public class DbPropertiesFace extends DefaultFace {
 					case 'n':
 						askAddSource(gui);
 						return true;
+					case 'm':
+						askAddRemote(gui);
+						return true;
 					case 'u':
 						rescanSources();
 						return true;
@@ -148,6 +155,49 @@ public class DbPropertiesFace extends DefaultFace {
 		}
 	}
 
+	private void askAddRemote (final WindowBasedTextGUI gui) throws MorriganException, DbException {
+		String name = null;
+		URI uri = null;
+
+		while (true) {
+			name = new TextInputDialogBuilder()
+					.setTitle("Local name for Remote")
+					.setDescription("Enter name:")
+					.setTextBoxSize(new TerminalSize(50, 1))
+					.setInitialContent(name != null ? name : "")
+					.build().showDialog(gui);
+			if (name == null) break;
+			if (name.length() > 0) break;
+		}
+		if (name == null) return;
+
+		String uriStr = null;
+		final URI existing = this.db.getRemote(name);
+		if (existing != null) uriStr = existing.toString();
+
+		while (true) {
+			uriStr = new TextInputDialogBuilder()
+					.setTitle("URI for Remote")
+					.setDescription("Enter URI:")
+					.setTextBoxSize(new TerminalSize(70, 1))
+					.setInitialContent(uriStr != null ? uriStr : "")
+					.build().showDialog(gui);
+			if (uriStr == null) break;
+			try {
+				uri = new URI(uriStr);
+				uri.toURL(); // For some actual validation.
+				break;
+			}
+			catch (final IllegalArgumentException e) {}
+			catch (final URISyntaxException e) {}
+			catch (final MalformedURLException e) {}
+		}
+		if (uri == null) return;
+
+		this.db.addRemote(name, uri);
+		refreshData();
+	}
+
 	private void removeSource (final WindowBasedTextGUI gui) throws MorriganException, DbException {
 		if (this.selectionAndScroll.selectedItem == null) return;
 		if (this.selectionAndScroll.selectedItem instanceof String && this.sources != null) {
@@ -156,15 +206,29 @@ public class DbPropertiesFace extends DefaultFace {
 			if (MessageDialog.showMessageDialog(gui, "Remove Source", source, MessageDialogButton.Yes, MessageDialogButton.No) != MessageDialogButton.Yes) return;
 			this.db.removeSource(source);
 			refreshData();
-			if (this.sources.size() < 1) {
-				this.selectionAndScroll = this.selectionAndScroll.withSelectedItem(null);
-			}
-			else if (i >= this.sources.size()) { // Last item was deleted.
-				this.selectionAndScroll = this.selectionAndScroll.withSelectedItem(this.sources.get(this.sources.size() - 1));
-			}
-			else if (i >= 0) {
-				this.selectionAndScroll = this.selectionAndScroll.withSelectedItem(this.sources.get(i));
-			}
+			fixSelectionAfterDeletion(this.sources, i);
+		}
+		else if (this.selectionAndScroll.selectedItem instanceof Entry && this.remotes != null) {
+			final int i = this.remotes.indexOf(this.selectionAndScroll.selectedItem);
+			final Entry<?, ?> entry = (Entry<?, ?>) this.selectionAndScroll.selectedItem;
+			if (MessageDialog.showMessageDialog(gui, "Remove Remote", String.format("%s (%s)", entry.getKey(), entry.getValue()),
+					MessageDialogButton.Yes, MessageDialogButton.No) != MessageDialogButton.Yes)
+				return;
+			this.db.rmRemote(entry.getKey().toString());
+			refreshData();
+			fixSelectionAfterDeletion(this.remotes, i);
+		}
+	}
+
+	private void fixSelectionAfterDeletion(final List<?> list, final int removedIndex) {
+		if (list.size() < 1) {
+			this.selectionAndScroll = this.selectionAndScroll.withSelectedItem(null);
+		}
+		else if (removedIndex >= list.size()) { // Last item was deleted.
+			this.selectionAndScroll = this.selectionAndScroll.withSelectedItem(list.get(list.size() - 1));
+		}
+		else if (removedIndex >= 0) {
+			this.selectionAndScroll = this.selectionAndScroll.withSelectedItem(list.get(removedIndex));
 		}
 	}
 
