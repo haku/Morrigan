@@ -15,6 +15,7 @@ import com.googlecode.lanterna.gui2.GridLayout;
 import com.googlecode.lanterna.gui2.Label;
 import com.googlecode.lanterna.gui2.LinearLayout;
 import com.googlecode.lanterna.gui2.Panel;
+import com.googlecode.lanterna.gui2.TextGUIGraphics;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
 import com.googlecode.lanterna.input.KeyStroke;
@@ -147,6 +148,10 @@ public class DirDialog extends DialogWindow {
 				@Override
 				public int getHotSpotPositionOnLine (final int selectedIndex) {
 					return -1;
+				}
+				@Override
+				public void drawItem(TextGUIGraphics graphics, DirListBox listBox, int index, File item, boolean selected, boolean focused) {
+					super.drawItem(graphics, listBox, index, item, selected, true);
 				}
 				@Override
 				public String getLabel (final DirListBox listBox, final int index, final File item) {
