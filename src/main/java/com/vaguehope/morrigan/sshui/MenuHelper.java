@@ -5,7 +5,7 @@ import java.util.List;
 
 public final class MenuHelper {
 
-	enum VDirection {
+	public enum VDirection {
 		UP, DOWN;
 	}
 
@@ -55,6 +55,27 @@ public final class MenuHelper {
 			if (i >= limit) i = limit - 1;
 		}
 		return listOfListsGet(i, lists);
+	}
+
+	/**
+	 *
+	 * @param topLine how far down the screen the list starts.
+	 * @param scrollTop previous ScrollTop value.
+	 * @param selectedItemIndex item position from the first item in the list.
+	 * @return
+	 */
+	public static int calcScrollTop(final int visibleRows, final int scrollTopIndex, final int selectedItemIndex) {
+		if (selectedItemIndex < 0) {
+			return scrollTopIndex;
+		}
+		final int maxOnScreenIndex = visibleRows - 1;
+		if (selectedItemIndex - scrollTopIndex > maxOnScreenIndex) {
+			return selectedItemIndex - maxOnScreenIndex;
+		}
+		else if (selectedItemIndex < scrollTopIndex) {
+			return selectedItemIndex;
+		}
+		return scrollTopIndex;
 	}
 
 	public static int sumSizes (final List<?>... lists) {

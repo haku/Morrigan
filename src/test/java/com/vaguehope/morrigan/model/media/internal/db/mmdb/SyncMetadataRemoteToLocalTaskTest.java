@@ -66,7 +66,7 @@ public class SyncMetadataRemoteToLocalTaskTest {
 		}
 
 		if (this.eventListener.lastErr().length() > 0) {
-			Assert.fail(this.eventListener.summary());
+			Assert.fail(this.eventListener.fullSummary());
 		}
 	}
 

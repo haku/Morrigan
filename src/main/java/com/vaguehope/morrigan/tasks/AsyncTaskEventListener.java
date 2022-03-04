@@ -51,7 +51,8 @@ public class AsyncTaskEventListener implements TaskEventListener, AsyncTask {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public String summarise () {
+	@Override
+	public String oneLineSummary() {
 		final StringBuilder s = new StringBuilder()
 				.append(this.number)
 				.append(" [")
@@ -72,6 +73,13 @@ public class AsyncTaskEventListener implements TaskEventListener, AsyncTask {
 			final String subName = this.subtaskName.get();
 			if (subName != null) s.append(": ").append(subName);
 		}
+
+		return s.toString();
+	}
+
+	@Override
+	public String fullSummary () {
+		final StringBuilder s = new StringBuilder(oneLineSummary());
 
 		final String err = this.lastErr.get();
 		if (err != null) s.append("\n    Last error: ").append(err);
@@ -260,10 +268,6 @@ public class AsyncTaskEventListener implements TaskEventListener, AsyncTask {
 		catch (final InterruptedException e) {
 			throw new IllegalStateException("Should not be possible to interupt non blocking call.");
 		}
-	}
-	@Override
-	public String summary () {
-		return summarise();
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

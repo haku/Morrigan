@@ -10,7 +10,7 @@ import java.util.concurrent.Future;
 public class AsyncTasksRegisterImpl implements AsyncTasksRegister {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private final Set<AsyncTaskEventListener> listeners = new CopyOnWriteArraySet<AsyncTaskEventListener>();
+	private final Set<AsyncTaskEventListener> listeners = new CopyOnWriteArraySet<>();
 	private final ExecutorService executor;
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -62,7 +62,7 @@ public class AsyncTasksRegisterImpl implements AsyncTasksRegister {
 
 		final StringBuilder s = new StringBuilder();
 		for (final AsyncTaskEventListener l : this.listeners) {
-			s.append(l.summarise()).append('\n');
+			s.append(l.fullSummary()).append('\n');
 		}
 		return s.toString();
 	}
@@ -70,9 +70,9 @@ public class AsyncTasksRegisterImpl implements AsyncTasksRegister {
 	@Override
 	public String[] reportIndiviually () {
 		clean();
-		final List<String> ret = new ArrayList<String>();
+		final List<String> ret = new ArrayList<>();
 		for (final AsyncTaskEventListener l : this.listeners) {
-			ret.add(l.summarise());
+			ret.add(l.fullSummary());
 		}
 		return ret.toArray(new String[ret.size()]);
 	}
@@ -80,7 +80,7 @@ public class AsyncTasksRegisterImpl implements AsyncTasksRegister {
 	@Override
 	public List<AsyncTask> tasks () {
 		clean();
-		final List<AsyncTask> ret = new ArrayList<AsyncTask>();
+		final List<AsyncTask> ret = new ArrayList<>();
 		for (final AsyncTaskEventListener l : this.listeners) {
 			ret.add(l);
 		}

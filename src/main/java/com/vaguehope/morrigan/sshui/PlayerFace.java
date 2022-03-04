@@ -376,15 +376,7 @@ public class PlayerFace extends DefaultFace {
 		tg.putString(0, l++, PrintingThingsHelper.queueSummary(pq));
 
 		this.pageSize = terminalSize.getRows() - l - 1;
-		final int selI = this.queue.indexOf(this.selectedItem);
-		if (selI >= 0) {
-			if (selI - this.queueScrollTop >= this.pageSize) {
-				this.queueScrollTop = selI - this.pageSize + 1;
-			}
-			else if (selI < this.queueScrollTop) {
-				this.queueScrollTop = selI;
-			}
-		}
+		this.queueScrollTop = MenuHelper.calcScrollTop(this.pageSize, this.queueScrollTop, this.queue.indexOf(this.selectedItem));
 
 		for (int i = this.queueScrollTop; i < this.queue.size(); i++) {
 			if (i >= this.queueScrollTop + this.pageSize) break;

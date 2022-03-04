@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 
 import com.googlecode.lanterna.SGR;
 import com.googlecode.lanterna.TerminalSize;
@@ -13,7 +14,6 @@ import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
 import com.googlecode.lanterna.gui2.dialogs.TextInputDialogBuilder;
 import com.googlecode.lanterna.input.KeyStroke;
-import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
@@ -22,10 +22,12 @@ import com.vaguehope.morrigan.model.media.IMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaListReference;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.Player;
+import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.sshui.MenuHelper.VDirection;
 import com.vaguehope.morrigan.sshui.util.LastActionMessage;
+import com.vaguehope.morrigan.sshui.util.MenuItem;
+import com.vaguehope.morrigan.sshui.util.MenuItems;
 import com.vaguehope.morrigan.tasks.AsyncTask;
-import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
 public class HomeFace extends DefaultFace {
 
@@ -42,6 +44,12 @@ public class HomeFace extends DefaultFace {
 
 	private static final long DATA_REFRESH_MILLIS = 500L;
 
+	private static final Function<Player, String> PLAYER_TO_STRING = p -> {
+		if (p.isDisposed()) return " (disposed)";
+		return String.format(" %s %s %s",
+				p.getName(), PrintingThingsHelper.playerStateMsg(p), PrintingThingsHelper.playingItemTitle(p));
+	};
+
 	private final FaceNavigation navigation;
 	private final MnContext mnContext;
 	private final DbHelper dbHelper;
@@ -53,8 +61,11 @@ public class HomeFace extends DefaultFace {
 	private List<Player> players;
 	private List<AsyncTask> tasks;
 	private List<MediaListReference> dbs;
+	private MenuItems menuItems;
+
+	private int terminalBottomRow = 1;  // zero-index terminal height.
 	private Object selectedItem;
-	private final int scrollOffset = 0;
+	private int scrollTop = 0;
 
 	public HomeFace (final FaceNavigation actions, final MnContext mnContext) {
 		super(actions);
@@ -66,6 +77,16 @@ public class HomeFace extends DefaultFace {
 	private void refreshData () {
 		this.players = asList(this.mnContext.getPlayerReader().getPlayers());
 		this.tasks = this.mnContext.getAsyncTasksRegister().tasks();
+		this.menuItems = MenuItems.builder()
+				.addHeading("Players")
+				.addList(this.players, " (no players)", PLAYER_TO_STRING)
+				.addSubmenu(this.lastActionMessage)
+				.addHeading("DBs")
+				.addList(this.dbs, " (no DBs)", d -> " " + d.getTitle())
+				.addHeading("")
+				.addHeading("Background Tasks")
+				.addList(this.tasks, " (no tasks)", t -> " " + t.oneLineSummary())
+				.build();
 	}
 
 	private void refreshStaleData () {
@@ -85,8 +106,10 @@ public class HomeFace extends DefaultFace {
 	public boolean onInput (final KeyStroke k, final WindowBasedTextGUI gui) throws Exception {
 		switch (k.getKeyType()) {
 			case ArrowUp:
+				menuMove(-1);
+				return true;
 			case ArrowDown:
-				menuMove(k, 1);
+				menuMove(1);
 				return true;
 			case Home:
 				menuMoveEnd(VDirection.UP);
@@ -137,25 +160,14 @@ public class HomeFace extends DefaultFace {
 		}
 	}
 
-	private void menuMove (final KeyStroke k, final int distance) {
-		this.selectedItem = MenuHelper.moveListSelection(this.selectedItem,
-				k.getKeyType() == KeyType.ArrowUp ? VDirection.UP : VDirection.DOWN,
-				distance,
-				this.players, this.dbs, this.tasks);
+	private void menuMove (final int distance) {
+		if (this.menuItems == null) return;
+		this.selectedItem = this.menuItems.moveSelection(this.selectedItem, distance);
 	}
 
 	private void menuMoveEnd (final VDirection direction) {
-		switch (direction) {
-			case UP:
-				this.selectedItem = MenuHelper.listOfListsGet(0, this.players, this.dbs, this.tasks);
-				break;
-			case DOWN:
-				this.selectedItem = MenuHelper.listOfListsGet(
-						MenuHelper.sumSizes(this.players, this.dbs, this.tasks) - 1,
-						this.players, this.dbs, this.tasks);
-				break;
-			default:
-		}
+		if (this.menuItems == null) return;
+		this.selectedItem = this.menuItems.moveSelectionToEnd(this.selectedItem, direction);
 	}
 
 	private void menuClick (final WindowBasedTextGUI gui) throws DbException, MorriganException {
@@ -253,76 +265,30 @@ public class HomeFace extends DefaultFace {
 	public void writeScreen (final Screen scr, final TextGraphics tg) {
 		refreshStaleData();
 
-		int l = this.scrollOffset;  // TODO actually adjust this to make scrolling happen.
-		tg.putString(0, l++, "Players");
-		l = printPlayers(tg, l);
+		if (this.menuItems == null) {
+			tg.putString(0, 0, "No menu items.");
+			return;
+		}
 
-		this.lastActionMessage.drawLastActionMessage(tg, l++);
+		final TerminalSize terminalSize = scr.getTerminalSize();
+		int l = 0;
 
-		tg.putString(0, l++, "DBs");
-		l = printDbs(tg, l);
+		this.terminalBottomRow = terminalSize.getRows() - 1;
+		this.scrollTop = MenuHelper.calcScrollTop(terminalSize.getRows(), this.scrollTop, this.menuItems.indexOf(this.selectedItem));
 
-		if (MenuHelper.sizeOf(this.tasks) > 0) {
+		for (int i = this.scrollTop; i < this.menuItems.size(); i++) {
+			if (l > this.terminalBottomRow) break;
+
+			final MenuItem item = this.menuItems.get(i);
+			if (this.selectedItem != null && this.selectedItem.equals(item.getItem())) {
+				tg.putString(0, l, item.toString(), SGR.REVERSE);
+			}
+			else {
+				tg.putString(0, l, item.toString());
+			}
+
 			l++;
-			tg.putString(0, l++, "Background Tasks");
-			l = printTasks(tg, l);
-			l++;
 		}
-	}
-
-	private int printPlayers (final TextGraphics tg, final int initialLine) {
-		int l = initialLine;
-		if (this.players.size() > 0) {
-			for (final Player p : this.players) {
-				if (p.isDisposed()) continue;
-				final String line = String.format("%s %s %s",
-						p.getName(), PrintingThingsHelper.playerStateMsg(p), PrintingThingsHelper.playingItemTitle(p));
-				if (p.equals(this.selectedItem)) {
-					tg.putString(1, l++, line, SGR.REVERSE);
-				}
-				else {
-					tg.putString(1, l++, line);
-				}
-			}
-		}
-		else {
-			tg.putString(1, l++, "(no players)");
-		}
-		return l;
-	}
-
-	private int printTasks (final TextGraphics tg, final int initialLine) {
-		int l = initialLine;
-		for (final AsyncTask task : this.tasks) {
-			final String summmary = task.summary();
-			for (final String line : summmary.split("\\r?\\n")) {
-				if (task.equals(this.selectedItem)) {
-					tg.putString(1, l++, line, SGR.REVERSE);
-				}
-				else {
-					tg.putString(1, l++, line);
-				}
-			}
-		}
-		return l;
-	}
-
-	private int printDbs (final TextGraphics tg, final int initialLine) {
-		int l = initialLine;
-		if (this.dbs.size() > 0) {
-			for (final MediaListReference db : this.dbs) {
-				if (db.equals(this.selectedItem)) {
-					tg.putString(1, l++, db.getTitle(), SGR.REVERSE);
-				}
-				else {
-					tg.putString(1, l++, db.getTitle());
-				}
-			}
-		}
-		else {
-			tg.putString(1, l++, "(no DBs)");
-		}
-		return l;
 	}
 
 	private void cancelSelectedTask() {

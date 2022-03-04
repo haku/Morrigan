@@ -100,7 +100,7 @@ public class StatusServlet extends HttpServlet {
 		FeedHelper.addElement(dw, "progressWorked", t.progressWorked());
 		FeedHelper.addElement(dw, "progressTotal", t.progressTotal());
 		FeedHelper.addElement(dw, "successful", t.successful());
-		FeedHelper.addElement(dw, "summary", t.summary());
+		FeedHelper.addElement(dw, "summary", t.fullSummary());
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -444,7 +444,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		"SELECT value FROM tbl_prop WHERE key=?";
 
 	private static final String SQL_TBL_PROP_Q_GET_ALL =
-			"SELECT key,value FROM tbl_prop";
+			"SELECT key,value FROM tbl_prop ORDER BY key, value";
 
 	private static final String SQL_TBL_PROP_Q_INSERT =
 		"INSERT INTO tbl_prop (key,value) VALUES (?,?)";

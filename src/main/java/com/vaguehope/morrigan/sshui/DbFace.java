@@ -409,14 +409,7 @@ public class DbFace extends DefaultFace {
 		this.lastActionMessage.drawLastActionMessage(tg, l++);
 
 		this.pageSize = terminalSize.getRows() - l - 1;
-		if (this.selectedItemIndex >= 0) {
-			if (this.selectedItemIndex - this.scrollTop >= this.pageSize) {
-				this.scrollTop = this.selectedItemIndex - this.pageSize + 1;
-			}
-			else if (this.selectedItemIndex < this.scrollTop) {
-				this.scrollTop = this.selectedItemIndex;
-			}
-		}
+		this.scrollTop = MenuHelper.calcScrollTop(this.pageSize, this.scrollTop, this.selectedItemIndex);
 
 		final int colRightDuration = terminalSize.getColumns();
 		final int colRightPlayCount = colRightDuration - 8;

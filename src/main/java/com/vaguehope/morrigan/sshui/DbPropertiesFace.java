@@ -1,22 +1,28 @@
 package com.vaguehope.morrigan.sshui;
 
 import java.io.File;
+import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.googlecode.lanterna.SGR;
+import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.input.KeyStroke;
-import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMixedMediaDb;
+import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.sshui.MenuHelper.VDirection;
 import com.vaguehope.morrigan.sshui.util.LastActionMessage;
+import com.vaguehope.morrigan.sshui.util.MenuItem;
+import com.vaguehope.morrigan.sshui.util.MenuItems;
 import com.vaguehope.morrigan.tasks.MorriganTask;
 
 public class DbPropertiesFace extends DefaultFace {
@@ -39,11 +45,14 @@ public class DbPropertiesFace extends DefaultFace {
 	private final AtomicReference<File> savedInitialDir;
 
 	private List<String> sources;
-	private Object selectedItem;
-	private int queueScrollTop = 0;
-	private int pageSize = 1;
+	private List<Entry<String, URI>> remotes;
+	private MenuItems menuItems;
 
-	public DbPropertiesFace (final FaceNavigation navigation, final MnContext mnContext, final IMixedMediaDb db, final AtomicReference<File> savedInitialDir) throws MorriganException {
+	private int terminalBottomRow = 1;  // zero-index terminal height.
+	private Object selectedItem;
+	private int scrollTop = 0;
+
+	public DbPropertiesFace (final FaceNavigation navigation, final MnContext mnContext, final IMixedMediaDb db, final AtomicReference<File> savedInitialDir) throws MorriganException, DbException {
 		super(navigation);
 		this.navigation = navigation;
 		this.mnContext = mnContext;
@@ -52,20 +61,35 @@ public class DbPropertiesFace extends DefaultFace {
 		refreshData();
 	}
 
-	private void refreshData () throws MorriganException {
+	private void refreshData () throws MorriganException, DbException {
 		this.sources = this.db.getSources();
+		this.remotes = new ArrayList<>(this.db.getRemotes().entrySet());
+
+		this.menuItems = MenuItems.builder()
+				.addHeading(String.format("DB %s:", this.db.getListName()))
+				.addSubmenu(this.lastActionMessage)
+				.addHeading("Sources")
+				.addList(this.sources, " (no media directories)", s -> " " + s)
+				.addHeading("")
+				.addHeading("Remotes")
+				.addList(this.remotes, " (no remotes)", r -> " " + r.getKey() + ": " + r.getValue())
+				.build();
 	}
 
 	@Override
 	public boolean onInput (final KeyStroke k, final WindowBasedTextGUI gui) throws Exception {
 		switch (k.getKeyType()) {
 			case ArrowUp:
+				menuMove(-1);
+				return true;
 			case ArrowDown:
-				menuMove(k, 1);
+				menuMove(1);
 				return true;
 			case PageUp:
+				menuMove(0 - (this.terminalBottomRow - 1));
+				return true;
 			case PageDown:
-				menuMove(k, this.pageSize - 1);
+				menuMove(this.terminalBottomRow - 1);
 				return true;
 			case Home:
 				menuMoveEnd(VDirection.UP);
@@ -106,29 +130,17 @@ public class DbPropertiesFace extends DefaultFace {
 		}
 	}
 
-	private void menuMove (final KeyStroke k, final int distance) {
-		this.selectedItem = MenuHelper.moveListSelection(this.selectedItem,
-				k.getKeyType() == KeyType.ArrowUp || k.getKeyType() == KeyType.PageUp
-						? VDirection.UP
-						: VDirection.DOWN,
-				distance,
-				this.sources);
+	private void menuMove (final int distance) {
+		if (this.menuItems == null) return;
+		this.selectedItem = this.menuItems.moveSelection(this.selectedItem, distance);
 	}
 
 	private void menuMoveEnd (final VDirection direction) {
-		if (this.sources == null || this.sources.size() < 1) return;
-		switch (direction) {
-			case UP:
-				this.selectedItem = this.sources.get(0);
-				break;
-			case DOWN:
-				this.selectedItem = this.sources.get(this.sources.size() - 1);
-				break;
-			default:
-		}
+		if (this.menuItems == null) return;
+		this.selectedItem = this.menuItems.moveSelectionToEnd(this.selectedItem, direction);
 	}
 
-	private void askAddSource (final WindowBasedTextGUI gui) throws MorriganException {
+	private void askAddSource (final WindowBasedTextGUI gui) throws MorriganException, DbException {
 		final File dir = DirDialog.show(gui, "Add Source", "Add", this.savedInitialDir);
 		if (dir != null) {
 			this.db.addSource(dir.getAbsolutePath());
@@ -136,7 +148,7 @@ public class DbPropertiesFace extends DefaultFace {
 		}
 	}
 
-	private void removeSource (final WindowBasedTextGUI gui) throws MorriganException {
+	private void removeSource (final WindowBasedTextGUI gui) throws MorriganException, DbException {
 		if (this.selectedItem == null) return;
 		if (this.selectedItem instanceof String && this.sources != null) {
 			final int i = this.sources.indexOf(this.selectedItem);
@@ -175,39 +187,30 @@ public class DbPropertiesFace extends DefaultFace {
 
 	@Override
 	public void writeScreen (final Screen scr, final TextGraphics tg) {
-		if (this.db != null) {
-			writeDbPropsToScreen(scr, tg);
+		if (this.menuItems == null) {
+			tg.putString(0, 0, "No menu items.");
+			return;
 		}
-		else {
-			tg.putString(0, 0, "Unable to show null db.");
-		}
-	}
 
-	private void writeDbPropsToScreen (final Screen scr, final TextGraphics tg) {
+		final TerminalSize terminalSize = scr.getTerminalSize();
 		int l = 0;
-		tg.putString(0, l++, String.format("DB %s:", this.db.getListName()));
-		this.lastActionMessage.drawLastActionMessage(tg, l++);
 
-		this.pageSize = scr.getTerminalSize().getRows() - l;
-		final int selI = this.sources.indexOf(this.selectedItem);
-		if (selI >= 0) {
-			if (selI - this.queueScrollTop >= this.pageSize) {
-				this.queueScrollTop = selI - this.pageSize + 1;
-			}
-			else if (selI < this.queueScrollTop) {
-				this.queueScrollTop = selI;
-			}
-		}
+		this.terminalBottomRow = terminalSize.getRows() - 1;
+		this.scrollTop = MenuHelper.calcScrollTop(terminalSize.getRows(), this.scrollTop, this.menuItems.indexOf(this.selectedItem));
 
-		for (int i = this.queueScrollTop; i < this.sources.size(); i++) {
-			if (i > this.queueScrollTop + this.pageSize) break;
-			final String item = this.sources.get(i);
-			if (item.equals(this.selectedItem)) {
-				tg.putString(1, l++, String.valueOf(item), SGR.REVERSE);
+		for (int i = this.scrollTop; i < this.menuItems.size(); i++) {
+			if (l > this.terminalBottomRow) break;
+
+			final MenuItem item = this.menuItems.get(i);
+			if (this.selectedItem != null && this.selectedItem.equals(item.getItem())) {
+				tg.putString(0, l, item.toString(), SGR.REVERSE);
 			}
 			else {
-				tg.putString(1, l++, String.valueOf(item));
+				tg.putString(0, l, item.toString());
 			}
+
+			l++;
 		}
 	}
+
 }

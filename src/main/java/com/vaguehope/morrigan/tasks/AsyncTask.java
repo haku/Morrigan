@@ -30,7 +30,8 @@ public interface AsyncTask {
 	 * Null for incomplete.
 	 */
 	Boolean successful();
-	String summary ();
+	String oneLineSummary ();
+	String fullSummary ();
 	List<String> getAllMessages();
 
 }
