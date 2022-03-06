@@ -60,8 +60,8 @@ public class TranscodeTask implements MorriganTask {
 				}
 			}
 
-			taskEventListener.done();
 			if (taskEventListener.isCanceled()) return new TaskResult(TaskOutcome.CANCELED);
+			taskEventListener.done();
 			return new TaskResult(TaskOutcome.SUCCESS);
 		}
 		catch (final Exception e) {
