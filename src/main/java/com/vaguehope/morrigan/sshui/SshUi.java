@@ -23,6 +23,7 @@ import com.vaguehope.morrigan.server.ServerConfig;
 import com.vaguehope.morrigan.sshui.ssh.MnPasswordAuthenticator;
 import com.vaguehope.morrigan.sshui.ssh.UserPublickeyAuthenticator;
 import com.vaguehope.morrigan.tasks.AsyncTasksRegister;
+import com.vaguehope.morrigan.transcode.Transcoder;
 import com.vaguehope.morrigan.util.DaemonThreadFactory;
 
 public class SshUi {
@@ -38,18 +39,20 @@ public class SshUi {
 	private final PlayerReader playerReader;
 	private final MediaFactory mediaFactory;
 	private final AsyncTasksRegister asyncTasksRegister;
+	private final Transcoder transcoder;
 
 	private ExecutorService unreliableEs;
 	private MnCommandFactory mnCommandFactory;
 	private SshServer sshd;
 
-	public SshUi(final int port, final Config config, final ServerConfig serverConfig, final PlayerReader playerReader, final MediaFactory mediaFactory, final AsyncTasksRegister asyncTasksRegister) {
+	public SshUi(final int port, final Config config, final ServerConfig serverConfig, final PlayerReader playerReader, final MediaFactory mediaFactory, final AsyncTasksRegister asyncTasksRegister, final Transcoder transcoder) {
 		this.port = port;
 		this.config = config;
 		this.serverConfig = serverConfig;
 		this.playerReader = playerReader;
 		this.mediaFactory = mediaFactory;
 		this.asyncTasksRegister = asyncTasksRegister;
+		this.transcoder = transcoder;
 	}
 
 	public void start() throws IOException {
@@ -63,8 +66,8 @@ public class SshUi {
 				new ThreadPoolExecutor.DiscardOldestPolicy());
 
 		final MnContext mnContext = new MnContext(
-				this.playerReader, this.mediaFactory, this.asyncTasksRegister,
-				new UserPrefs(this.config), this.unreliableEs);
+				this.playerReader, this.mediaFactory, this.asyncTasksRegister, this.transcoder,
+				this.config, new UserPrefs(this.config), this.unreliableEs);
 		this.mnCommandFactory = new MnCommandFactory(mnContext);
 
 		this.sshd = SshServer.setUpDefaultServer();

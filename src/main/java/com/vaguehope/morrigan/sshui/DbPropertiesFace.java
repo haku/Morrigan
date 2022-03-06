@@ -11,6 +11,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
+import com.googlecode.lanterna.gui2.dialogs.ListSelectDialogBuilder;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.gui2.dialogs.TextInputDialogBuilder;
@@ -22,6 +23,8 @@ import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.sshui.util.LastActionMessage;
 import com.vaguehope.morrigan.sshui.util.MenuItems;
 import com.vaguehope.morrigan.tasks.MorriganTask;
+import com.vaguehope.morrigan.transcode.Transcode;
+import com.vaguehope.morrigan.transcode.TranscodeTask;
 
 public class DbPropertiesFace extends MenuFace {
 
@@ -33,6 +36,7 @@ public class DbPropertiesFace extends MenuFace {
 			"       m\tadd new remote\n" +
 			"<delete>\tremove source\n" +
 			"       u\trescan sources\n" +
+			"       t\tpre-run transcodes\n" +
 			"       q\tback a page\n" +
 			"       h\tthis help text";
 
@@ -96,6 +100,9 @@ public class DbPropertiesFace extends MenuFace {
 						return true;
 					case 'u':
 						rescanSources();
+						return true;
+					case 't':
+						prerunTranscodes(gui);
 						return true;
 					default:
 				}
@@ -205,6 +212,36 @@ public class DbPropertiesFace extends MenuFace {
 		else {
 			this.lastActionMessage.setLastActionMessage("Do not know how to refresh: " + this.db);
 		}
+	}
+
+	private void prerunTranscodes(final WindowBasedTextGUI gui) {
+		final Transcode tr = new ListSelectDialogBuilder<Transcode>()
+				.setTitle("Select Transcode Profile")
+				.addListItems(Transcode.values())
+				.build().showDialog(gui);
+		if (tr == null) return;
+
+		Integer number = null;
+		String numberStr = null;
+		while (true) {
+			numberStr = new TextInputDialogBuilder()
+					.setTitle("Maximum number of files to transcode")
+					.setDescription("Number:")
+					.setTextBoxSize(new TerminalSize(40, 1))
+					.setInitialContent(numberStr != null ? numberStr : "")
+					.build().showDialog(gui);
+			if (numberStr == null) break;
+			try {
+				number = Integer.valueOf(numberStr, 10);
+				if (number > 0) break;
+			}
+			catch (final NumberFormatException e) {}
+		}
+		if (number == null) return;
+
+		this.mnContext.getAsyncTasksRegister().scheduleTask(
+				new TranscodeTask(this.mnContext.getTranscoder(), tr, this.db, number, this.mnContext.getConfig()));
+		this.lastActionMessage.setLastActionMessage("Transcode task started.");
 	}
 
 }
