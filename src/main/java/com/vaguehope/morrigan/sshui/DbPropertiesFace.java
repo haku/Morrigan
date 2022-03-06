@@ -214,12 +214,30 @@ public class DbPropertiesFace extends MenuFace {
 		}
 	}
 
-	private void prerunTranscodes(final WindowBasedTextGUI gui) {
+	private void prerunTranscodes(final WindowBasedTextGUI gui) throws DbException {
 		final Transcode tr = new ListSelectDialogBuilder<Transcode>()
 				.setTitle("Select Transcode Profile")
 				.addListItems(Transcode.values())
 				.build().showDialog(gui);
 		if (tr == null) return;
+
+		String filter = null;
+		while (true) {
+			filter = new TextInputDialogBuilder()
+					.setTitle("Filter items to transcode (* for no filter)")
+					.setDescription("Filter:")
+					.setTextBoxSize(new TerminalSize(70, 1))
+					.setInitialContent(filter != null ? filter : "")
+					.build().showDialog(gui);
+			if (filter == null) break;
+			if (filter.length() > 0) break;
+		}
+		if (filter == null) return;
+
+		IMixedMediaDb d = this.db;
+		if (!"*".equals(filter)) {
+			d = this.mnContext.getMediaFactory().getLocalMixedMediaDb(this.db.getDbPath(), filter);
+		}
 
 		Integer number = null;
 		String numberStr = null;
@@ -240,7 +258,7 @@ public class DbPropertiesFace extends MenuFace {
 		if (number == null) return;
 
 		this.mnContext.getAsyncTasksRegister().scheduleTask(
-				new TranscodeTask(this.mnContext.getTranscoder(), tr, this.db, number, this.mnContext.getConfig()));
+				new TranscodeTask(this.mnContext.getTranscoder(), tr, d, number, this.mnContext.getConfig()));
 		this.lastActionMessage.setLastActionMessage("Transcode task started.");
 	}
 
