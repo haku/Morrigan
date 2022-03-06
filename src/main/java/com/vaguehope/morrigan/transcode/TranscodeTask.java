@@ -39,6 +39,7 @@ public class TranscodeTask implements MorriganTask {
 
 		try {
 			final List<TranscodeProfile> profiles = new ArrayList<>();
+			this.db.read();
 			for (final IMediaTrack item : this.db.getMediaItems()) {
 				if (taskEventListener.isCanceled()) break;
 				if (profiles.size() >= this.maxNumber) break;
