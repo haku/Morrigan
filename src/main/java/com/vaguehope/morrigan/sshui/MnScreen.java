@@ -3,7 +3,6 @@ package com.vaguehope.morrigan.sshui;
 import java.io.IOException;
 import java.util.Deque;
 import java.util.LinkedList;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.sshd.server.Environment;
 import org.apache.sshd.server.ExitCallback;
@@ -42,7 +41,7 @@ public class MnScreen extends SshScreen implements FaceNavigation {
 	@Override
 	protected void initScreen (final Screen scr) {
 		scr.setCursorPosition(null);
-		this.gui = new MultiWindowTextGUI(scr,  new DefaultWindowManager(), new SelfBackground(scr));
+		this.gui = new MultiWindowTextGUI(scr, new DefaultWindowManager(), new SelfBackground(scr));
 		this.gui.setTheme(MnTheme.makeTheme());
 		startFace(new HomeFace(this, this.mnContext));
 	}
@@ -50,37 +49,33 @@ public class MnScreen extends SshScreen implements FaceNavigation {
 	private class SelfBackground extends AbstractComponent<SelfBackground> {
 
 		private final Screen scr;
+		private final ComponentRenderer<SelfBackground> renderer = new ComponentRenderer<SelfBackground>() {
+			@Override
+			public TerminalSize getPreferredSize (final SelfBackground component) {
+				return TerminalSize.ONE;
+			}
+
+			@Override
+			public void drawComponent (final TextGUIGraphics graphics, final SelfBackground component) {
+				// This is needed so that UI continues to update behind windows.
+				// We can jump direct to writeScreen() as if no draw was needed this method is not called.
+				writeScreen(SelfBackground.this.scr, graphics);
+				recordTickHappened();
+			}
+		};
 
 		public SelfBackground (final Screen scr) {
 			this.scr = scr;
 		}
 
-		private final long REFRESH_INTERVAL = TimeUnit.MILLISECONDS.toNanos(500);
-		private long lastRedrawNanos = 0L;
-
-		/**
-		 * FIXME this should follow SshScreen.tick().
-		 */
 		@Override
-		public boolean isInvalid () {
-			return System.nanoTime() - this.lastRedrawNanos > this.REFRESH_INTERVAL;
+		public boolean isInvalid() {
+			return super.isInvalid() | isTickNeeded();
 		}
 
 		@Override
 		protected ComponentRenderer<SelfBackground> createDefaultRenderer () {
-			return new ComponentRenderer<SelfBackground>() {
-				@Override
-				public TerminalSize getPreferredSize (final SelfBackground component) {
-					return SelfBackground.this.scr.getTerminalSize();
-				}
-
-				@Override
-				public void drawComponent (final TextGUIGraphics graphics, final SelfBackground component) {
-					SelfBackground.this.lastRedrawNanos = System.nanoTime();
-					graphics.fill(' ');
-					writeScreen(SelfBackground.this.scr, graphics);
-				}
-			};
+			return this.renderer;
 		}
 	}
 

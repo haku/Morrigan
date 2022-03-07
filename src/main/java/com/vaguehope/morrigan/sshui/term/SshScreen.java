@@ -99,24 +99,38 @@ public abstract class SshScreen implements Runnable {
 		}
 	}
 
-	private void tick () throws IOException, InterruptedException {
+	private void tick () throws IOException {
 		final long now = System.nanoTime();
-		if (processEvents() | readInput()) {
-			printScreen(false);
-			this.lastPrint = now;
-		}
-		else if (now - this.lastPrint > PRINT_CYCLE_NANOS) {
-			printScreen(true);
-			this.lastPrint = now;
+		if (isTickNeededOrThrow(now)) {
+			printScreen();
 		}
 		else {
 			Quietly.sleep(10); // FIXME I wish terminal.readInput() used blocking-with-timeout IO.
 		}
 	}
 
+	private boolean isTickNeededOrThrow(final long now) throws IOException {
+		return (processEvents() | readInput()) || now - this.lastPrint > PRINT_CYCLE_NANOS;
+	}
+
+	protected void recordTickHappened() {
+		this.lastPrint = System.nanoTime();
+	}
+
+	protected boolean isTickNeeded() {
+		try {
+			return isTickNeededOrThrow(System.nanoTime());
+		}
+		catch (IOException e) {
+			LOG.warn("Session error.", e);
+			scheduleQuit("session error");
+			return false;
+		}
+	}
+
 	protected abstract boolean processEvents ();
 
-	private boolean readInput () throws IOException, InterruptedException {
+	private boolean readInput () throws IOException {
 		boolean changed = false;
 		KeyStroke k;
 		while ((k = this.terminal.pollInput()) != null) { // Non blocking.
@@ -125,24 +139,18 @@ public abstract class SshScreen implements Runnable {
 		return changed;
 	}
 
-	protected void printScreen (final boolean fullRedraw) throws IOException {
+	protected void printScreen () throws IOException {
 		this.screen.doResizeIfNecessary();
-
-		if (fullRedraw) {
-			this.screen.clear();
-		}
-		else {
-			this.textGraphics.fill(' ');
-		}
-
+		this.textGraphics.fill(' ');
 		writeScreen(this.screen, this.textGraphics);
 		this.screen.refresh();
+		recordTickHappened();
 	}
 
 	/**
 	 * Return true if screen needs redrawing.
 	 */
-	protected abstract boolean onInput (KeyStroke k) throws IOException, InterruptedException;
+	protected abstract boolean onInput (KeyStroke k) throws IOException;
 
 	protected abstract void initScreen (Screen scr);
 
