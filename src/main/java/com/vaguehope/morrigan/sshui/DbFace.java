@@ -103,9 +103,14 @@ public class DbFace extends DefaultFace {
 
 	public void restoreSavedScroll () throws MorriganException {
 		try {
-			this.scrollTop = this.mnContext.getUserPrefs().getIntValue(PREF_SCROLL_INDEX, this.db.getListId(), this.scrollTop);
-			this.selectedItemIndex = this.mnContext.getUserPrefs().getIntValue(PREF_SELECTED_INDEX, this.db.getListId(),
+			final int limit = this.db.getCount() - 1;
+			final int scrollTopToRestore = this.mnContext.getUserPrefs().getIntValue(PREF_SCROLL_INDEX, this.db.getListId(), this.scrollTop);
+			this.scrollTop = Integer.min(limit, scrollTopToRestore);
+
+			final int selectedItemIndexToRestore = this.mnContext.getUserPrefs().getIntValue(PREF_SELECTED_INDEX, this.db.getListId(),
 					this.scrollTop > 0 ? this.scrollTop : this.selectedItemIndex);
+			this.selectedItemIndex = Integer.min(limit, selectedItemIndexToRestore);
+
 			this.saveScrollOnClose = true;
 		}
 		catch (final IOException e) {
