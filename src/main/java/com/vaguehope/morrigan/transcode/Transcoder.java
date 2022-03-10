@@ -34,7 +34,7 @@ public class Transcoder {
 
 	// Allow 5% difference, or 10 seconds, which ever is longer.
 	private static final double TRANSCODE_DURATION_MAX_DIFFERENCE_RATIO = 0.05d;
-	private static final long TRANSCODE_DURATION_MAX_DIFFERENCE_SECONDS = 10;
+	private static final long TRANSCODE_DURATION_MAX_DIFFERENCE_SECONDS = 15;
 
 	private static final MnLogger LOG = MnLogger.make(Transcoder.class);
 
