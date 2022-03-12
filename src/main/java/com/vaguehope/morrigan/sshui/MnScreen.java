@@ -128,11 +128,11 @@ public class MnScreen extends SshScreen implements FaceNavigation {
 
 	@Override
 	public boolean backOneLevel () {
-		if (this.tabsAndFaces.size() > 1) {
-			closeTab();
-			return true;
-		}
 		if (activeTab().size() <= 1) {
+			if (this.tabsAndFaces.size() > 1) {
+				closeTab();
+				return true;
+			}
 			scheduleQuit("user quit");
 			return false;
 		}
