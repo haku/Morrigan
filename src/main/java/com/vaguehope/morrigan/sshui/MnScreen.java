@@ -1,14 +1,17 @@
 package com.vaguehope.morrigan.sshui;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.sshd.server.Environment;
 import org.apache.sshd.server.ExitCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.googlecode.lanterna.SGR;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.gui2.AbstractComponent;
@@ -29,8 +32,10 @@ public class MnScreen extends SshScreen implements FaceNavigation {
 
 	private static final Logger LOG = LoggerFactory.getLogger(MnScreen.class);
 
-	private final Deque<Face> faces = new LinkedList<>();
 	private final MnContext mnContext;
+
+	private final List<Deque<Face>> tabsAndFaces = new ArrayList<>();
+	private int activeTab = 0;
 	private WindowBasedTextGUI gui;
 
 	public MnScreen (final String name, final MnContext mnContext, final Environment env, final Terminal terminal, final ExitCallback callback) throws IOException {
@@ -43,7 +48,7 @@ public class MnScreen extends SshScreen implements FaceNavigation {
 		scr.setCursorPosition(null);
 		this.gui = new MultiWindowTextGUI(scr, new DefaultWindowManager(), new SelfBackground(scr));
 		this.gui.setTheme(MnTheme.makeTheme());
-		startFace(new HomeFace(this, this.mnContext));
+		newTab();
 	}
 
 	private class SelfBackground extends AbstractComponent<SelfBackground> {
@@ -79,23 +84,59 @@ public class MnScreen extends SshScreen implements FaceNavigation {
 		}
 	}
 
+	private void newTab() {
+		this.tabsAndFaces.add(new LinkedList<>());
+		this.activeTab = this.tabsAndFaces.size() - 1;
+		startFace(new HomeFace(this, this.mnContext));
+	}
+
+	private void closeTab() {
+		this.tabsAndFaces.remove(this.activeTab);
+		if (this.activeTab >= this.tabsAndFaces.size()) {
+			this.activeTab = this.tabsAndFaces.size() - 1;
+		}
+	}
+
+	private Deque<Face> activeTab() {
+		return this.tabsAndFaces.get(this.activeTab);
+	}
+
+	private void nextTab() {
+		this.activeTab += 1;
+		if (this.activeTab >= this.tabsAndFaces.size()) {
+			this.activeTab = 0;
+		}
+	}
+
+	private void prevTab() {
+		this.activeTab -= 1;
+		if (this.activeTab < 0) {
+			this.activeTab = this.tabsAndFaces.size() - 1;
+		}
+	}
+
+
 	private Face activeFace () {
-		return this.faces.getLast();
+		return activeTab().getLast();
 	}
 
 	@Override
 	public void startFace (final Face face) {
-		this.faces.add(face);
+		activeTab().add(face);
 		face.onFocus();
 	}
 
 	@Override
 	public boolean backOneLevel () {
-		if (this.faces.size() <= 1) {
+		if (this.tabsAndFaces.size() > 1) {
+			closeTab();
+			return true;
+		}
+		if (activeTab().size() <= 1) {
 			scheduleQuit("user quit");
 			return false;
 		}
-		final Face removedFace = this.faces.removeLast();
+		final Face removedFace = activeTab().removeLast();
 		if (removedFace != null) {
 			try {
 				removedFace.onClose();
@@ -111,6 +152,29 @@ public class MnScreen extends SshScreen implements FaceNavigation {
 	@Override
 	protected boolean onInput (final KeyStroke k) throws IOException {
 		try {
+			switch (k.getKeyType()) {
+			case Tab:
+				if (k.isShiftDown()) {
+					prevTab();
+					return true;
+				}
+				nextTab();
+				return true;
+			case Character:
+				switch (k.getCharacter()) {
+				case 't':
+					if (k.isCtrlDown()) {
+						newTab();
+						return true;
+					}
+					//$FALL-THROUGH$
+				default:
+					break;
+				}
+				//$FALL-THROUGH$
+			default:
+				break;
+			}
 			return activeFace().onInput(k, this.gui);
 		}
 		catch (final Exception e) {
@@ -128,7 +192,24 @@ public class MnScreen extends SshScreen implements FaceNavigation {
 	@Override
 	protected void writeScreen (final Screen scr, final TextGraphics tg) {
 		final TerminalSize ts = scr.getTerminalSize();
-		activeFace().writeScreen(scr, tg, 0, ts.getRows() - 1, ts.getColumns());
+		int top = 0;
+		if (this.tabsAndFaces.size() > 1) {
+			int x = 0;
+			for (int i = 0; i < this.tabsAndFaces.size(); i++) {
+				final String name = "T" + i;  // TODO tab names.
+				if (i == this.activeTab) {
+					tg.enableModifiers(SGR.REVERSE);
+				}
+				else {
+					tg.disableModifiers(SGR.REVERSE);
+				}
+				tg.putString(x, 0, name);
+				x += name.length() + 1;
+			}
+			tg.disableModifiers(SGR.REVERSE);
+			top = 1;
+		}
+		activeFace().writeScreen(scr, tg, top, ts.getRows() - 1, ts.getColumns());
 	}
 
 }
