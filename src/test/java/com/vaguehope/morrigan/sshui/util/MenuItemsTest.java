@@ -96,7 +96,7 @@ public class MenuItemsTest {
 
 	@Test
 	public void itScrollsAllTheWayToTheTopToRevealTheTitle() throws Exception {
-		int visibleRows = 3;
+		final int visibleRows = 3;
 		final List<String> allGroupsList = allGroupsList();
 		SelectionAndScroll sas = new SelectionAndScroll(allGroupsList.get(0), 3);
 
@@ -117,7 +117,7 @@ public class MenuItemsTest {
 	public void itScrollsAllTheWayToTheBottomToRevealTheEmptyList() throws Exception {
 		final int visibleRows = 8;
 		final List<String> allGroupsList = allGroupsList();
-		int topWhereLastItemOffTheScreen = allGroupsList().size() + this.nonSelectableItems - visibleRows - 1;
+		final int topWhereLastItemOffTheScreen = allGroupsList().size() + this.nonSelectableItems - visibleRows - 1;
 		SelectionAndScroll sas = new SelectionAndScroll(allGroupsList.get(allGroupsList.size() - 1), topWhereLastItemOffTheScreen);
 
 		printUndertest("Before Move:", visibleRows, sas);
@@ -146,7 +146,7 @@ public class MenuItemsTest {
 	public void itJumpsAllTheWayToTheBottomToRevealTheEmptyList() throws Exception {
 		final int visibleRows = 8;
 		final List<String> allGroupsList = allGroupsList();
-		int topWhereLastItemOffTheScreen = allGroupsList().size() + this.nonSelectableItems - visibleRows - 1;
+		final int topWhereLastItemOffTheScreen = allGroupsList().size() + this.nonSelectableItems - visibleRows - 1;
 		SelectionAndScroll sas = new SelectionAndScroll(allGroupsList.get(0), 0);
 
 		printUndertest("Before Jump:", visibleRows, sas);
@@ -166,7 +166,7 @@ public class MenuItemsTest {
 		return r;
 	}
 
-	private void printUndertest(String title, final int visibleRows, SelectionAndScroll sas) {
+	private void printUndertest(final String title, final int visibleRows, final SelectionAndScroll sas) {
 		System.out.println();
 		System.out.println(title);
 		int printed = 0;
@@ -176,6 +176,26 @@ public class MenuItemsTest {
 			printed += 1;
 		}
 		assertEquals(visibleRows, printed);
+	}
+
+	@Test
+	public void itDoesNotNpeOnEmpty() throws Exception {
+		final MenuItems m = MenuItems.builder().build();
+		final SelectionAndScroll sas = new SelectionAndScroll(null, 0);
+		m.moveSelection(sas, 8, 1);
+		m.moveSelection(sas, 8, -1);
+		m.moveSelectionToEnd(sas, 8, VDirection.UP);
+		m.moveSelectionToEnd(sas, 8, VDirection.DOWN);
+	}
+
+	@Test
+	public void itDoesNotNpeOnEmptySubList() throws Exception {
+		final MenuItems m = MenuItems.builder().addList(new ArrayList<String>(), "", a->a).build();
+		final SelectionAndScroll sas = new SelectionAndScroll(null, 0);
+		m.moveSelection(sas, 8, 1);
+		m.moveSelection(sas, 8, -1);
+		m.moveSelectionToEnd(sas, 8, VDirection.UP);
+		m.moveSelectionToEnd(sas, 8, VDirection.DOWN);
 	}
 
 }

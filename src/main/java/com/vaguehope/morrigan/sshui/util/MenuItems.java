@@ -82,33 +82,33 @@ public class MenuItems {
 			final int goalSelI,
 			final int goalRevealI) {
 		final SubMenuAndIndex s = getSubMenuAndIndex(goalSelI);
-		if (s.hasSelectableItem()) return new SelectionAndScroll(s.getItem(), MenuHelper.calcScrollTop(visibleRows, prev.scrollTop, s.overallIndex));
+		if (s != null && s.hasSelectableItem()) return new SelectionAndScroll(s.getItem(), MenuHelper.calcScrollTop(visibleRows, prev.scrollTop, s.overallIndex));
 
 		if (direction == VDirection.DOWN) {
 			if (goalSelI < ulimit) {
 				for (int x = goalSelI + 1; x <= ulimit; x++) {
-					final SubMenuAndIndex t = getSubMenuAndIndex(x);
-					if (t.hasSelectableItem())
+					final SubMenuAndIndex t = getSubMenuAndIndex(x); // NPE
+					if (t != null && t.hasSelectableItem())
 						return new SelectionAndScroll(t.getItem(), MenuHelper.calcScrollTop(visibleRows, prev.scrollTop, t.overallIndex));
 				}
 			}
 			for (int x = goalSelI - 1; x >= 0; x--) {
-				final SubMenuAndIndex t = getSubMenuAndIndex(x);
-				if (t.hasSelectableItem())
+				final SubMenuAndIndex t = getSubMenuAndIndex(x); // NPE
+				if (t != null && t.hasSelectableItem())
 					return new SelectionAndScroll(t.getItem(), MenuHelper.calcScrollTop(visibleRows, prev.scrollTop, goalRevealI));
 			}
 		}
 		else {
 			if (goalSelI > 0) {
 				for (int x = goalSelI - 1; x >= 0; x--) {
-					final SubMenuAndIndex t = getSubMenuAndIndex(x);
-					if (t.hasSelectableItem())
+					final SubMenuAndIndex t = getSubMenuAndIndex(x); // NPE
+					if (t != null && t.hasSelectableItem())
 						return new SelectionAndScroll(t.getItem(), MenuHelper.calcScrollTop(visibleRows, prev.scrollTop, t.overallIndex));
 				}
 			}
-			for (int x = goalSelI + 1; goalSelI <= ulimit; x++) {
+			for (int x = goalSelI + 1; x <= ulimit; x++) {
 				final SubMenuAndIndex t = getSubMenuAndIndex(x);
-				if (t.hasSelectableItem())
+				if (t != null && t.hasSelectableItem())
 					return new SelectionAndScroll(t.getItem(), MenuHelper.calcScrollTop(visibleRows, prev.scrollTop, goalRevealI));
 			}
 		}
