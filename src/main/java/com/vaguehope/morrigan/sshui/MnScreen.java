@@ -127,7 +127,8 @@ public class MnScreen extends SshScreen implements FaceNavigation {
 
 	@Override
 	protected void writeScreen (final Screen scr, final TextGraphics tg) {
-		activeFace().writeScreen(scr, tg);
+		final TerminalSize ts = scr.getTerminalSize();
+		activeFace().writeScreen(scr, tg, 0, ts.getRows() - 1, ts.getColumns());
 	}
 
 }

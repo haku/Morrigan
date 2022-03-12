@@ -225,9 +225,9 @@ public class HomeFace extends MenuFace {
 	}
 
 	@Override
-	public void writeScreen (final Screen scr, final TextGraphics tg) {
+	public void writeScreen (final Screen scr, final TextGraphics tg, int top, int bottom, int columns) {
 		refreshStaleData();
-		super.writeScreen(scr, tg);
+		super.writeScreen(scr, tg, top, bottom, columns);
 	}
 
 	private void cancelSelectedTask() {

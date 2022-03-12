@@ -3,7 +3,6 @@ package com.vaguehope.morrigan.sshui;
 import java.util.List;
 
 import com.googlecode.lanterna.SGR;
-import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
@@ -89,11 +88,10 @@ public class LogFace extends DefaultFace {
 	}
 
 	@Override
-	public void writeScreen(final Screen scr, final TextGraphics tg) {
-		final TerminalSize terminalSize = scr.getTerminalSize();
-		int l = 0;
+	public void writeScreen(final Screen scr, final TextGraphics tg, int top, int bottom, int columns) {
+		int l = top;
 
-		this.pageSize = terminalSize.getRows() - l - 1;
+		this.pageSize = bottom - l;
 		final int selI = this.messages.indexOf(this.selectedItem);
 		if (selI >= 0) {
 			if (selI - this.scrollTop >= this.pageSize) {
@@ -116,8 +114,8 @@ public class LogFace extends DefaultFace {
 		}
 
 		final String itemDetailsBar = this.messages.size() + " rows.";
-		this.textGuiUtils.drawTextRowWithBg(tg, terminalSize.getRows() - 1, itemDetailsBar, TextColor.ANSI.WHITE, TextColor.ANSI.BLUE, SGR.BOLD);
-		this.textGuiUtils.drawTextWithBg(tg, terminalSize.getColumns() - 3, terminalSize.getRows() - 1,
+		this.textGuiUtils.drawTextRowWithBg(tg, bottom, itemDetailsBar, TextColor.ANSI.WHITE, TextColor.ANSI.BLUE, SGR.BOLD);
+		this.textGuiUtils.drawTextWithBg(tg, columns - 3, bottom,
 				PrintingThingsHelper.scrollSummary(this.messages.size(), this.pageSize, this.scrollTop),
 				TextColor.ANSI.WHITE, TextColor.ANSI.BLUE, SGR.BOLD);
 	}

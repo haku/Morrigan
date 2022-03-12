@@ -28,7 +28,12 @@ public interface Face {
 
 	boolean processEvents ();
 
-	void writeScreen (Screen scr, TextGraphics tg);
+	/**
+	 *
+	 * @param top first row to write to
+	 * @param bottom bottom row of screen, inclusive,
+	 */
+	void writeScreen (Screen scr, TextGraphics tg, int top, int bottom, int columns);
 
 	/**
 	 * Called once when face is closed.

@@ -13,8 +13,8 @@ public class HelpFace extends DefaultFace {
 	}
 
 	@Override
-	public void writeScreen (final Screen scr, final TextGraphics tg) {
-		int l = 0;
+	public void writeScreen (final Screen scr, final TextGraphics tg, int top, int bottom, int columns) {
+		int l = top;
 		for (final String line : this.helpText.split("\n")) {
 			tg.putString(0, l++, line);
 		}

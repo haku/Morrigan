@@ -13,7 +13,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.googlecode.lanterna.SGR;
-import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TerminalTextUtils;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
@@ -31,12 +30,12 @@ import com.vaguehope.morrigan.model.media.IMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.Player;
+import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.sshui.MenuHelper.VDirection;
 import com.vaguehope.morrigan.sshui.util.LastActionMessage;
 import com.vaguehope.morrigan.sshui.util.TextGuiUtils;
 import com.vaguehope.morrigan.tasks.MorriganTask;
 import com.vaguehope.morrigan.util.FileHelper;
-import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
 public class DbFace extends DefaultFace {
 
@@ -394,18 +393,17 @@ public class DbFace extends DefaultFace {
 	}
 
 	@Override
-	public void writeScreen (final Screen scr, final TextGraphics tg) {
+	public void writeScreen (final Screen scr, final TextGraphics tg, int top, int bottom, int columns) {
 		if (this.db != null) {
-			writeDbToScreen(scr, tg);
+			writeDbToScreen(scr, tg, top, bottom, columns);
 		}
 		else {
 			tg.putString(0, 0, "Unable to show null db.");
 		}
 	}
 
-	private void writeDbToScreen (final Screen scr, final TextGraphics tg) {
-		final TerminalSize terminalSize = scr.getTerminalSize();
-		int l = 0;
+	private void writeDbToScreen (final Screen scr, final TextGraphics tg, int top, int bottom, int columns) {
+		int l = top;
 
 		tg.putString(0, l++, String.format("DB %s: %s   %s",
 				this.db.getListName(),
@@ -413,15 +411,17 @@ public class DbFace extends DefaultFace {
 				PrintingThingsHelper.sortSummary(this.db)));
 		this.lastActionMessage.drawLastActionMessage(tg, l++);
 
-		this.pageSize = terminalSize.getRows() - l - 1;
+		this.pageSize = bottom - l;
 		this.scrollTop = MenuHelper.calcScrollTop(this.pageSize, this.scrollTop, this.selectedItemIndex);
 
-		final int colRightDuration = terminalSize.getColumns();
+		final int colRightDuration = columns;
 		final int colRightPlayCount = colRightDuration - 8;
 		final int colRightLastPlayed = colRightPlayCount - 8;
 
 		for (int i = this.scrollTop; i < this.mediaItems.size(); i++) {
+			if (i < 0) break;
 			if (i >= this.scrollTop + this.pageSize) break;
+			if (i >= this.mediaItems.size()) break;
 
 			final IMixedMediaItem item = this.mediaItems.get(i);
 			final String name = String.valueOf(item);
@@ -491,8 +491,8 @@ public class DbFace extends DefaultFace {
 		}
 		tg.disableModifiers(SGR.REVERSE);
 
-		this.textGuiUtils.drawTextRowWithBg(tg, terminalSize.getRows() - 1, this.itemDetailsBar, TextColor.ANSI.WHITE, TextColor.ANSI.BLUE, SGR.BOLD);
-		this.textGuiUtils.drawTextWithBg(tg, terminalSize.getColumns() - 3, terminalSize.getRows() - 1,
+		this.textGuiUtils.drawTextRowWithBg(tg, bottom, this.itemDetailsBar, TextColor.ANSI.WHITE, TextColor.ANSI.BLUE, SGR.BOLD);
+		this.textGuiUtils.drawTextWithBg(tg, columns - 3, bottom,
 				PrintingThingsHelper.scrollSummary(this.mediaItems.size(), this.pageSize, this.scrollTop),
 				TextColor.ANSI.WHITE, TextColor.ANSI.BLUE, SGR.BOLD);
 	}

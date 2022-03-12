@@ -1,7 +1,6 @@
 package com.vaguehope.morrigan.sshui;
 
 import com.googlecode.lanterna.SGR;
-import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.googlecode.lanterna.input.KeyStroke;
@@ -69,14 +68,14 @@ public abstract class MenuFace extends DefaultFace {
 	}
 
 	@Override
-	public void writeScreen(final Screen scr, final TextGraphics tg) {
+	public void writeScreen(final Screen scr, final TextGraphics tg, int top, int bottom, int columns) {
 		if (this.menuItems == null) {
 			tg.putString(0, 0, "No menu items.");
 			return;
 		}
 
-		int l = 0;
-		this.terminalBottomRow = scr.getTerminalSize().getRows() - 1;
+		int l = top;
+		this.terminalBottomRow = bottom;
 		for (int i = this.selectionAndScroll.scrollTop; i < this.menuItems.size(); i++) {
 			if (l > this.terminalBottomRow) break;
 

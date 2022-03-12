@@ -8,7 +8,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.googlecode.lanterna.SGR;
-import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TerminalTextUtils;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
@@ -356,11 +355,10 @@ public class PlayerFace extends DefaultFace {
 	}
 
 	@Override
-	public void writeScreen (final Screen scr, final TextGraphics tg) {
+	public void writeScreen (final Screen scr, final TextGraphics tg, int top, int bottom, int columns) {
 		refreshStaleData();
 
-		final TerminalSize terminalSize = scr.getTerminalSize();
-		int l = 0;
+		int l = top;
 
 		tg.putString(0, l++, String.format("Player %1.5s: %s   %s   %s.   %s.",
 				this.player.getId(),
@@ -369,13 +367,13 @@ public class PlayerFace extends DefaultFace {
 				PrintingThingsHelper.listTitleAndOrder(this.player),
 				this.player.getTranscode()));
 		tg.putString(1, l++, PrintingThingsHelper.playingItemTitle(this.player));
-		drawPrgBar(tg, l++, terminalSize.getColumns());
+		drawPrgBar(tg, l++, columns);
 		tg.putString(1, l++, this.tagSummary);
 
 		final PlayerQueue pq = this.player.getQueue();
 		tg.putString(0, l++, PrintingThingsHelper.queueSummary(pq));
 
-		this.pageSize = terminalSize.getRows() - l - 1;
+		this.pageSize = bottom - l;
 		this.queueScrollTop = MenuHelper.calcScrollTop(this.pageSize, this.queueScrollTop, this.queue.indexOf(this.selectedItem));
 
 		for (int i = this.queueScrollTop; i < this.queue.size(); i++) {
@@ -396,22 +394,22 @@ public class PlayerFace extends DefaultFace {
 
 			// Rest of item title space if selected.
 			if (iSelected) {
-				for (int x = 1 + TerminalTextUtils.getColumnWidth(name); x < terminalSize.getColumns(); x++) {
+				for (int x = 1 + TerminalTextUtils.getColumnWidth(name); x < columns; x++) {
 					tg.setCharacter(x, l, ' ');
 				}
 			}
 
 			if (item.hasTrack()) {
 				final String dur = TimeHelper.formatTimeSeconds(item.getTrack().getDuration());
-				tg.putString(terminalSize.getColumns() - dur.length(), l, dur);
+				tg.putString(columns - dur.length(), l, dur);
 			}
 
 			l++;
 		}
 		tg.disableModifiers(SGR.REVERSE);
 
-		this.textGuiUtils.drawTextRowWithBg(tg, terminalSize.getRows() - 1, this.itemDetailsBar, TextColor.ANSI.WHITE, TextColor.ANSI.BLUE, SGR.BOLD);
-		this.textGuiUtils.drawTextWithBg(tg, terminalSize.getColumns() - 3, terminalSize.getRows() - 1,
+		this.textGuiUtils.drawTextRowWithBg(tg, bottom, this.itemDetailsBar, TextColor.ANSI.WHITE, TextColor.ANSI.BLUE, SGR.BOLD);
+		this.textGuiUtils.drawTextWithBg(tg, columns - 3, bottom,
 				PrintingThingsHelper.scrollSummary(this.queue.size(), this.pageSize, this.queueScrollTop),
 				TextColor.ANSI.WHITE, TextColor.ANSI.BLUE, SGR.BOLD);
 	}
