@@ -43,7 +43,6 @@ public class PlayerFace extends DefaultFace {
 			"            o\tplayback order\n" +
 			"            e\ttranscode\n" +
 			"            /\tsearch DB\n" +
-			"            r\trefresh playing item's tags\n" +
 			"            T\topen tag editor for playing item\n" +
 			"            g\tgo to top of list\n" +
 			"            G\tgo to end of list\n" +
@@ -57,6 +56,7 @@ public class PlayerFace extends DefaultFace {
 			"            h\tthis help text";
 
 	private static final long DATA_REFRESH_MILLIS = 500L;
+	private static final long DATA_SLOW_REFRESH_MILLIS = 10000L;
 
 	private final FaceNavigation navigation;
 	private final Player player;
@@ -68,6 +68,7 @@ public class PlayerFace extends DefaultFace {
 	private final AtomicReference<String> savedSearchTerm = new AtomicReference<>();
 
 	private long lastDataRefresh = 0;
+	private long lastSlowDataRefresh = 0;
 	private String tagSummary;
 	private PlayItem tagSummaryItem;
 	private List<PlayItem> queue;
@@ -84,26 +85,26 @@ public class PlayerFace extends DefaultFace {
 		this.dbHelper = new DbHelper(navigation, mnContext, player, null, null);
 	}
 
-	private void invalidateData () {
-		this.tagSummaryItem = null;
-		refreshData();
-	}
-
 	private void refreshData () {
-
 		//this.player.isDisposed(); // TODO what if true?
-
 		final PlayItem currentItem = this.player.getCurrentItem();
 		if (this.tagSummaryItem == null || !this.tagSummaryItem.equals(currentItem)) {
 			this.tagSummary = PrintingThingsHelper.summariseTags(this.player);
 			this.tagSummaryItem = currentItem;
 		}
-
 		this.queue = this.player.getQueue().getQueueList();
+	}
+
+	private void refreshSlowData () {
+		this.tagSummaryItem = null;
 	}
 
 	private void refreshStaleData () {
 		final long now = System.nanoTime();
+		if (now - this.lastSlowDataRefresh > TimeUnit.MILLISECONDS.toNanos(DATA_SLOW_REFRESH_MILLIS)) {
+			refreshSlowData();
+			this.lastSlowDataRefresh = now;
+		}
 		if (now - this.lastDataRefresh > TimeUnit.MILLISECONDS.toNanos(DATA_REFRESH_MILLIS)) {
 			refreshData();
 			this.lastDataRefresh = now;
@@ -193,9 +194,6 @@ public class PlayerFace extends DefaultFace {
 						return true;
 					case '/':
 						askSearch(gui);
-						return true;
-					case 'r':
-						invalidateData();
 						return true;
 					case 'T':
 						showEditTagsForPlayingItem(gui);
