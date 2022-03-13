@@ -92,6 +92,11 @@ public class HomeFace extends MenuFace {
 	}
 
 	@Override
+	public String getTitle() {
+		return "Home";
+	}
+
+	@Override
 	public void onFocus() {
 		this.dbs = asList(this.mnContext.getMediaFactory().getAllLocalMixedMediaDbs());
 	}

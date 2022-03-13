@@ -16,6 +16,7 @@ import com.vaguehope.morrigan.tasks.AsyncTask;
 public class LogFace extends DefaultFace {
 
 	private final FaceNavigation navigation;
+	private final AsyncTask task;
 	private final List<String> messages;
 
 	private final TextGuiUtils textGuiUtils = new TextGuiUtils();
@@ -27,7 +28,13 @@ public class LogFace extends DefaultFace {
 	public LogFace(final FaceNavigation navigation, final AsyncTask task) {
 		super(navigation);
 		this.navigation = navigation;
+		this.task = task;
 		this.messages = task.getAllMessages();
+	}
+
+	@Override
+	public String getTitle() {
+		return this.task.title();
 	}
 
 	@Override
@@ -88,7 +95,7 @@ public class LogFace extends DefaultFace {
 	}
 
 	@Override
-	public void writeScreen(final Screen scr, final TextGraphics tg, int top, int bottom, int columns) {
+	public void writeScreen(final Screen scr, final TextGraphics tg, final int top, final int bottom, final int columns) {
 		int l = top;
 
 		this.pageSize = bottom - l;

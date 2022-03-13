@@ -100,6 +100,11 @@ public class DbFace extends DefaultFace {
 		super.onClose();
 	}
 
+	@Override
+	public String getTitle() {
+		return this.db.getListName();
+	}
+
 	public void restoreSavedScroll () throws MorriganException {
 		try {
 			final int limit = this.db.getCount() - 1;

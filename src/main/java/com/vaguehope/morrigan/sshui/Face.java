@@ -19,6 +19,8 @@ public interface Face {
 
 	}
 
+	String getTitle();
+
 	/**
 	 * Called when the face is opened or returned to.
 	 */

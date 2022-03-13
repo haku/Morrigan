@@ -196,13 +196,13 @@ public class MnScreen extends SshScreen implements FaceNavigation {
 		if (this.tabsAndFaces.size() > 1) {
 			int x = 0;
 			for (int i = 0; i < this.tabsAndFaces.size(); i++) {
-				final String name = "T" + i;  // TODO tab names.
 				if (i == this.activeTab) {
 					tg.enableModifiers(SGR.REVERSE);
 				}
 				else {
 					tg.disableModifiers(SGR.REVERSE);
 				}
+				final String name = this.tabsAndFaces.get(i).getLast().getTitle();
 				tg.putString(x, 0, name);
 				x += name.length() + 1;
 			}

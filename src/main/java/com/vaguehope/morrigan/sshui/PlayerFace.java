@@ -129,6 +129,11 @@ public class PlayerFace extends DefaultFace {
 	}
 
 	@Override
+	public String getTitle() {
+		return this.player.getName();
+	}
+
+	@Override
 	public boolean onInput (final KeyStroke k, final WindowBasedTextGUI gui) throws Exception {
 
 		// TODO

@@ -79,6 +79,11 @@ public class DbPropertiesFace extends MenuFace {
 	}
 
 	@Override
+	public String getTitle() {
+		return "Props(" + this.db.getListName() + ")";
+	}
+
+	@Override
 	public boolean onInput (final KeyStroke k, final WindowBasedTextGUI gui) throws Exception {
 		switch (k.getKeyType()) {
 			case Delete:

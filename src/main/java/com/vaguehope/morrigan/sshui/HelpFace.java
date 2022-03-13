@@ -13,6 +13,11 @@ public class HelpFace extends DefaultFace {
 	}
 
 	@Override
+	public String getTitle() {
+		return "Help";
+	}
+
+	@Override
 	public void writeScreen (final Screen scr, final TextGraphics tg, int top, int bottom, int columns) {
 		int l = top;
 		for (final String line : this.helpText.split("\n")) {
