@@ -3,6 +3,7 @@ package com.vaguehope.morrigan.sshui;
 import java.text.DateFormat;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,13 +82,13 @@ public final class PrintingThingsHelper {
 			return String.format("%s/%s %s %s",
 					item.getStartCount(), item.getEndCount(),
 					item.getDateLastPlayed() == null ? "" : dateFormat.format(item.getDateLastPlayed()),
-					PrintingThingsHelper.join(list.getTags(item), ", "));
+					PrintingThingsHelper.join(list.getTags(item), ", ", t -> t.getTag()));
 		}
-		return PrintingThingsHelper.join(list.getTags(item), ", ");
+		return PrintingThingsHelper.join(list.getTags(item), ", ", t -> t.getTag());
 	}
 
 	public static String summariseItemTags (final IMediaTrackList<?> list, final IMediaTrack item) throws MorriganException {
-		return PrintingThingsHelper.join(list.getTags(item), ", ");
+		return PrintingThingsHelper.join(list.getTags(item), ", ", t -> t.getTag());
 	}
 
 	public static String summariseTags (final Player player) {
@@ -97,7 +98,7 @@ public final class PrintingThingsHelper {
 			if (list != null) {
 				try {
 					final List<MediaTag> tags = list.getTags(playItem.getTrack()); // TODO cache this?
-					return join(tags, ", ");
+					return join(tags, ", ", t -> t.getTag());
 				}
 				catch (final MorriganException e) {
 					LOG.warn("Failed to read tags: " + playItem, e);
@@ -147,11 +148,11 @@ public final class PrintingThingsHelper {
 		return String.format("%1$2s%%", (int) (((scrollTop + (pageSize / 2)) / (double) count) * 100));
 	}
 
-	public static String join (final Collection<?> arr, final String sep) {
+	public static <T> String join (final Collection<T> arr, final String sep, Function<T, String> toStr) {
 		final StringBuilder s = new StringBuilder();
-		for (final Object obj : arr) {
+		for (final T obj : arr) {
 			if (s.length() > 0) s.append(sep);
-			s.append(obj.toString());
+			s.append(toStr.apply(obj));
 		}
 		return s.toString();
 	}
