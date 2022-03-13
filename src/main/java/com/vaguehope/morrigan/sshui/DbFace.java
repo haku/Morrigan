@@ -145,30 +145,24 @@ public class DbFace extends DefaultFace {
 	}
 
 	private void updateItemDetailsBar () {
-		if (this.selectedItems.size() > 0) {
-			this.itemDetailsBar = String.format("%s selected.", this.selectedItems.size());
-			this.itemDetailsBarItem = null;
-		}
-		else {
-			final IMixedMediaItem item = getSelectedItem();
-			if (this.itemDetailsBarItem != null && this.itemDetailsBarItem.equals(item)) return;
+		final IMixedMediaItem item = getSelectedItem();
+		if (this.itemDetailsBarItem != null && this.itemDetailsBarItem.equals(item)) return;
 
-			this.mnContext.getUnreliableEs().submit(new Callable<Void>() {
-				@Override
-				public Void call () throws MorriganException {
-					final String tags = PrintingThingsHelper.summariseItemTags(DbFace.this.db, item);
-					scheduleOnUiThread(new Callable<Void>() {
-						@Override
-						public Void call () {
-							DbFace.this.itemDetailsBarItem = item;
-							DbFace.this.itemDetailsBar = tags;
-							return null;
-						}
-					});
-					return null;
-				}
-			});
-		}
+		this.mnContext.getUnreliableEs().submit(new Callable<Void>() {
+			@Override
+			public Void call () throws MorriganException {
+				final String tags = PrintingThingsHelper.summariseItemTags(DbFace.this.db, item);
+				scheduleOnUiThread(new Callable<Void>() {
+					@Override
+					public Void call () {
+						DbFace.this.itemDetailsBarItem = item;
+						DbFace.this.itemDetailsBar = tags;
+						return null;
+					}
+				});
+				return null;
+			}
+		});
 	}
 
 	@Override
@@ -393,7 +387,7 @@ public class DbFace extends DefaultFace {
 	}
 
 	@Override
-	public void writeScreen (final Screen scr, final TextGraphics tg, int top, int bottom, int columns) {
+	public void writeScreen (final Screen scr, final TextGraphics tg, final int top, final int bottom, final int columns) {
 		if (this.db != null) {
 			writeDbToScreen(scr, tg, top, bottom, columns);
 		}
@@ -402,7 +396,7 @@ public class DbFace extends DefaultFace {
 		}
 	}
 
-	private void writeDbToScreen (final Screen scr, final TextGraphics tg, int top, int bottom, int columns) {
+	private void writeDbToScreen (final Screen scr, final TextGraphics tg, final int top, final int bottom, final int columns) {
 		int l = top;
 
 		tg.putString(0, l++, String.format("DB %s: %s   %s",
@@ -492,9 +486,15 @@ public class DbFace extends DefaultFace {
 		tg.disableModifiers(SGR.REVERSE);
 
 		this.textGuiUtils.drawTextRowWithBg(tg, bottom, this.itemDetailsBar, TextColor.ANSI.WHITE, TextColor.ANSI.BLUE, SGR.BOLD);
-		this.textGuiUtils.drawTextWithBg(tg, columns - 3, bottom,
-				PrintingThingsHelper.scrollSummary(this.mediaItems.size(), this.pageSize, this.scrollTop),
-				TextColor.ANSI.WHITE, TextColor.ANSI.BLUE, SGR.BOLD);
+		final String scroll = " " + PrintingThingsHelper.scrollSummary(this.mediaItems.size(), this.pageSize, this.scrollTop);
+		int left = columns - scroll.length();
+		this.textGuiUtils.drawTextWithBg(tg, left, bottom, scroll, TextColor.ANSI.WHITE, TextColor.ANSI.BLUE, SGR.BOLD);
+		if (this.selectedItems.size() > 0) {
+			final String status = String.format(" (%s)", this.selectedItems.size());
+			left -= status.length();
+			this.textGuiUtils.drawTextWithBg(tg, left, bottom, status, TextColor.ANSI.WHITE, TextColor.ANSI.BLUE, SGR.BOLD);
+
+		}
 	}
 
 	private static String formatTimeSecondsLeftPadded (final long seconds) {
