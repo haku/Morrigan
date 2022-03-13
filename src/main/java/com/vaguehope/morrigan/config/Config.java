@@ -3,10 +3,15 @@ package com.vaguehope.morrigan.config;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.Collection;
 
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.vaguehope.morrigan.Args;
 
 
@@ -101,6 +106,13 @@ public class Config {
 
 	public File getSavedViewsFile () {
 		return new File(this.configDir, SAVED_VIEWS_FILE);
+	}
+
+	public Collection<SavedView> getSavedViews() throws IOException {
+		final Gson gson = new Gson();
+		final Type collectionType = new TypeToken<Collection<SavedView>>(){}.getType();
+		final String str = FileUtils.readFileToString(getSavedViewsFile(), "UTF-8");
+		return gson.fromJson(str, collectionType);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
