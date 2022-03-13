@@ -29,16 +29,16 @@ import com.vaguehope.morrigan.transcode.TranscodeTask;
 public class DbPropertiesFace extends MenuFace {
 
 	private static final String HELP_TEXT =
-			"       g\tgo to top of list\n" +
-			"       G\tgo to end of list\n" +
-			"       r\trefresh\n" +
-			"       n\tadd new source\n" +
-			"       m\tadd new remote\n" +
-			"<delete>\tremove source\n" +
-			"       u\trescan sources\n" +
-			"       t\tpre-run transcodes\n" +
-			"       q\tback a page\n" +
-			"       h\tthis help text";
+			"            g\tgo to top of list\n" +
+			"            G\tgo to end of list\n" +
+			"            r\trefresh\n" +
+			"            n\tadd new source\n" +
+			"            m\tadd new remote\n" +
+			"<delete> OR d\tremove source\n" +
+			"            u\trescan sources\n" +
+			"            t\tpre-run transcodes\n" +
+			"            q\tback a page\n" +
+			"            h\tthis help text";
 
 	private final FaceNavigation navigation;
 	private final MnContext mnContext;
@@ -91,6 +91,9 @@ public class DbPropertiesFace extends MenuFace {
 				return true;
 			case Character:
 				switch (k.getCharacter()) {
+					case 'd':
+						removeSource(gui);
+						return true;
 					case 'h':
 						this.navigation.startFace(new HelpFace(this.navigation, HELP_TEXT));
 						return true;

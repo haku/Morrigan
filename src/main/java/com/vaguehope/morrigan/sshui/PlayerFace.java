@@ -35,26 +35,26 @@ import com.vaguehope.morrigan.util.TimeHelper;
 public class PlayerFace extends DefaultFace {
 
 	private static final String HELP_TEXT =
-			" <space>\tplay / pause\n" +
-			"<ctrl>+c\tstop\n" +
-			"       C\tstop after\n" +
-			"       i\tseek\n" +
-			"       n\tnext track\n" +
-			"       o\tplayback order\n" +
-			"       e\ttranscode\n" +
-			"       /\tsearch DB\n" +
-			"       r\trefresh playing item's tags\n" +
-			"       T\topen tag editor for playing item\n" +
-			"       g\tgo to top of list\n" +
-			"       G\tgo to end of list\n" +
-			"<delete>\tremove from queue\n" +
-			"       K\tmove to top of queue\n" +
-			"       k\tmove up in queue\n" +
-			"       j\tmove down in queue\n" +
-			"       J\tmove to bottom of queue\n" +
-			"       t\topen tag editor for queue item\n" +
-			"       q\tback a page\n" +
-			"       h\tthis help text";
+			"      <space>\tplay / pause\n" +
+			"     <ctrl>+c\tstop\n" +
+			"            C\tstop after\n" +
+			"            i\tseek\n" +
+			"            n\tnext track\n" +
+			"            o\tplayback order\n" +
+			"            e\ttranscode\n" +
+			"            /\tsearch DB\n" +
+			"            r\trefresh playing item's tags\n" +
+			"            T\topen tag editor for playing item\n" +
+			"            g\tgo to top of list\n" +
+			"            G\tgo to end of list\n" +
+			"<delete> OR d\tremove from queue\n" +
+			"            K\tmove to top of queue\n" +
+			"            k\tmove up in queue\n" +
+			"            j\tmove down in queue\n" +
+			"            J\tmove to bottom of queue\n" +
+			"            t\topen tag editor for queue item\n" +
+			"            q\tback a page\n" +
+			"            h\tthis help text";
 
 	private static final long DATA_REFRESH_MILLIS = 500L;
 
@@ -159,6 +159,9 @@ public class PlayerFace extends DefaultFace {
 				return true;
 			case Character:
 				switch (k.getCharacter()) {
+					case 'd':
+						deleteQueueItem();
+						return true;
 					case 'q':
 						return this.navigation.backOneLevel();
 					case 'h':
