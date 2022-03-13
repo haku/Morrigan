@@ -107,11 +107,11 @@ public class DbFace extends DefaultFace {
 
 	public void restoreSavedScroll () throws MorriganException {
 		try {
-			final int limit = this.db.getCount() - 1;
-			final int scrollTopToRestore = this.mnContext.getUserPrefs().getIntValue(PREF_SCROLL_INDEX, this.db.getListId(), this.scrollTop);
-			this.scrollTop = Integer.min(limit, scrollTopToRestore);
+			final int limit = Math.max(this.db.getCount() - 1, 0);
+			final int scrollTopToRestore = this.mnContext.getUserPrefs().getIntValue(PREF_SCROLL_INDEX, this.db.getSerial(), this.scrollTop);
+			this.scrollTop = Math.max(Math.min(limit, scrollTopToRestore), 0);
 
-			final int selectedItemIndexToRestore = this.mnContext.getUserPrefs().getIntValue(PREF_SELECTED_INDEX, this.db.getListId(),
+			final int selectedItemIndexToRestore = this.mnContext.getUserPrefs().getIntValue(PREF_SELECTED_INDEX, this.db.getSerial(),
 					this.scrollTop > 0 ? this.scrollTop : this.selectedItemIndex);
 			setSelectedItem(selectedItemIndexToRestore);
 
@@ -125,8 +125,8 @@ public class DbFace extends DefaultFace {
 	private void saveScrollIfRequired () throws MorriganException {
 		if (!this.saveScrollOnClose) return;
 		try {
-			this.mnContext.getUserPrefs().putValue(PREF_SCROLL_INDEX, this.db.getListId(), this.scrollTop);
-			this.mnContext.getUserPrefs().putValue(PREF_SELECTED_INDEX, this.db.getListId(), this.selectedItemIndex);
+			this.mnContext.getUserPrefs().putValue(PREF_SCROLL_INDEX, this.db.getSerial(), this.scrollTop);
+			this.mnContext.getUserPrefs().putValue(PREF_SELECTED_INDEX, this.db.getSerial(), this.selectedItemIndex);
 		}
 		catch (final IOException e) {
 			throw new MorriganException("Failed to save scroll position.", e);
@@ -281,6 +281,7 @@ public class DbFace extends DefaultFace {
 
 	private IMixedMediaItem getSelectedItem () {
 		if (this.selectedItemIndex < 0) return null;
+		if (this.selectedItemIndex >= this.mediaItems.size()) return null;
 		return this.mediaItems.get(this.selectedItemIndex);
 	}
 

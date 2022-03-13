@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -108,11 +110,11 @@ public class Config {
 		return new File(this.configDir, SAVED_VIEWS_FILE);
 	}
 
-	public Collection<SavedView> getSavedViews() throws IOException {
+	public List<SavedView> getSavedViews() throws IOException {
 		final Gson gson = new Gson();
 		final Type collectionType = new TypeToken<Collection<SavedView>>(){}.getType();
 		final String str = FileUtils.readFileToString(getSavedViewsFile(), "UTF-8");
-		return gson.fromJson(str, collectionType);
+		return new ArrayList<>(gson.fromJson(str, collectionType));
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -22,7 +22,7 @@ public abstract class DefaultFace implements Face {
 	}
 
 	@Override
-	public void onFocus() {
+	public void onFocus() throws Exception {
 		// Do nothing by default.
 	}
 

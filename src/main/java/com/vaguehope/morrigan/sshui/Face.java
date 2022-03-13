@@ -24,7 +24,7 @@ public interface Face {
 	/**
 	 * Called when the face is opened or returned to.
 	 */
-	void onFocus();
+	void onFocus() throws Exception;
 
 	boolean onInput (KeyStroke k, WindowBasedTextGUI gui) throws Exception;
 

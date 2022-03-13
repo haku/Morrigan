@@ -14,6 +14,7 @@ import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
 import com.googlecode.lanterna.gui2.dialogs.TextInputDialogBuilder;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.screen.Screen;
+import com.vaguehope.morrigan.config.SavedView;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
@@ -58,6 +59,7 @@ public class HomeFace extends MenuFace {
 	private List<Player> players;
 	private List<AsyncTask> tasks;
 	private List<MediaListReference> dbs;
+	private List<SavedView> savedViews;
 
 	public HomeFace (final FaceNavigation actions, final MnContext mnContext) {
 		super(actions);
@@ -78,6 +80,9 @@ public class HomeFace extends MenuFace {
 				.addHeading("DBs")
 				.addList(this.dbs, " (no DBs)", d -> " " + d.getTitle())
 				.addHeading("")
+				.addHeading("Saved Views")
+				.addList(this.savedViews, " (no saved views)", v -> " " + v.getName())
+				.addHeading("")
 				.addHeading("Background Tasks")
 				.addList(this.tasks, " (no tasks)", t -> " " + t.oneLineSummary())
 				.build();
@@ -97,8 +102,9 @@ public class HomeFace extends MenuFace {
 	}
 
 	@Override
-	public void onFocus() {
+	public void onFocus() throws Exception {
 		this.dbs = asList(this.mnContext.getMediaFactory().getAllLocalMixedMediaDbs());
+		this.savedViews = this.mnContext.getConfig().getSavedViews();
 	}
 
 	@Override
@@ -150,6 +156,9 @@ public class HomeFace extends MenuFace {
 				playPlayItem(new PlayItem(db, null), player);
 			}
 		}
+		else if (this.selectionAndScroll.selectedItem instanceof SavedView) {
+			// Do nothing.
+		}
 		else if (this.selectionAndScroll.selectedItem instanceof AsyncTask) {
 			// Do nothing.
 		}
@@ -165,6 +174,13 @@ public class HomeFace extends MenuFace {
 		}
 		else if (this.selectionAndScroll.selectedItem instanceof MediaListReference) {
 			final IMixedMediaDb db = this.dbHelper.resolveReference((MediaListReference) this.selectionAndScroll.selectedItem);
+			final DbFace dbFace = new DbFace(this.navigation, this.mnContext, db, null);
+			dbFace.restoreSavedScroll();
+			this.navigation.startFace(dbFace);
+		}
+		else if (this.selectionAndScroll.selectedItem instanceof SavedView) {
+			final SavedView sv = (SavedView) this.selectionAndScroll.selectedItem;
+			final IMixedMediaDb db = this.mnContext.getMediaFactory().getMixedMediaDbByMid(sv.getDbmid(), sv.getQuery());
 			final DbFace dbFace = new DbFace(this.navigation, this.mnContext, db, null);
 			dbFace.restoreSavedScroll();
 			this.navigation.startFace(dbFace);

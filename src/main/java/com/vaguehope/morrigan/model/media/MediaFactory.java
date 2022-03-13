@@ -43,6 +43,12 @@ public interface MediaFactory {
 	ILocalMixedMediaDb getLocalMixedMediaDbBySerial (String serial) throws DbException;
 
 	/**
+	 * MID is like:
+	 * LOCALMMDB/test.local.db3
+	 */
+	IMixedMediaDb getMixedMediaDbByMid(String mid, String filter) throws DbException, MorriganException;
+
+	/**
 	 * For testing use only.  Can use to add in mock implementations.
 	 */
 	void addLocalMixedMediaDb (final ILocalMixedMediaDb db);

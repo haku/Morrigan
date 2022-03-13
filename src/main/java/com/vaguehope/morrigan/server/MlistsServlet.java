@@ -41,27 +41,23 @@ import com.vaguehope.morrigan.model.media.ItemTags;
 import com.vaguehope.morrigan.model.media.MediaAlbum;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaListReference;
-import com.vaguehope.morrigan.model.media.MediaListReference.MediaListType;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagClassification;
 import com.vaguehope.morrigan.model.media.MediaTagType;
-import com.vaguehope.morrigan.model.media.internal.db.mmdb.LocalMixedMediaDbHelper;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayerReader;
-import com.vaguehope.morrigan.transcode.Transcode;
-import com.vaguehope.morrigan.transcode.TranscodeProfile;
-import com.vaguehope.morrigan.transcode.Transcoder;
-import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbFactory;
-import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbHelper;
 import com.vaguehope.morrigan.server.util.FeedHelper;
 import com.vaguehope.morrigan.server.util.ImageResizer;
 import com.vaguehope.morrigan.server.util.XmlHelper;
+import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.tasks.AsyncTask;
+import com.vaguehope.morrigan.transcode.Transcode;
+import com.vaguehope.morrigan.transcode.TranscodeProfile;
+import com.vaguehope.morrigan.transcode.Transcoder;
 import com.vaguehope.morrigan.util.ChecksumCache;
 import com.vaguehope.morrigan.util.MnLogger;
 import com.vaguehope.morrigan.util.StringHelper;
-import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
 /**
  * Valid URLs:
@@ -242,26 +238,8 @@ public class MlistsServlet extends HttpServlet {
 			if (path.length() > 0) {
 				final String[] pathParts = path.split("/");
 				if (pathParts.length >= 2) {
-					final String type = pathParts[0];
 					final String filter = StringHelper.trimToNull(req.getParameter(PARAM_VIEW));
-
-					final IMixedMediaDb mmdb;
-					if (type.equals(MediaListType.LOCALMMDB.toString())) {
-						final String f = LocalMixedMediaDbHelper.getFullPathToMmdb(this.config, pathParts[1]);
-						mmdb = this.mediaFactory.getLocalMixedMediaDb(f, filter);
-					}
-					else if (type.equals(MediaListType.REMOTEMMDB.toString())) {
-						final String f = RemoteMixedMediaDbHelper.getFullPathToMmdb(this.config, pathParts[1]);
-						mmdb = RemoteMixedMediaDbFactory.getExisting(f, filter);
-					}
-					else if (type.equals(MediaListType.EXTMMDB.toString())) {
-						mmdb = this.mediaFactory.getExternalDb(pathParts[1]);
-					}
-					else {
-						ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "Unknown type '" + type + "' desu~.");
-						return;
-					}
-
+					final IMixedMediaDb mmdb = this.mediaFactory.getMixedMediaDbByMid(path, filter);
 					final String subPath = pathParts.length >= 3 ? pathParts[2] : null;
 					final String afterSubPath = pathParts.length >= 4 ? pathParts[3] : null;
 					if (verb == Verb.POST) {

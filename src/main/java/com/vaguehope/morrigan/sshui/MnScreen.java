@@ -123,7 +123,16 @@ public class MnScreen extends SshScreen implements FaceNavigation {
 	@Override
 	public void startFace (final Face face) {
 		activeTab().add(face);
-		face.onFocus();
+		callOnFocus(face);
+	}
+
+	private static void callOnFocus(final Face face) {
+		try {
+			face.onFocus();
+		}
+		catch (final Exception e) {
+			LOG.warn("onFocus() failed.", e);
+		}
 	}
 
 	@Override
@@ -145,7 +154,7 @@ public class MnScreen extends SshScreen implements FaceNavigation {
 				LOG.warn("onClose() failed.", e);
 			}
 		}
-		activeFace().onFocus();
+		callOnFocus(activeFace());
 		return true;
 	}
 

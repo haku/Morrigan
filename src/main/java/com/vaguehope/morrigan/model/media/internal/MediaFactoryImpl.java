@@ -36,8 +36,10 @@ import com.vaguehope.morrigan.model.media.internal.db.mmdb.LocalMixedMediaDbUpda
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.MixedMediaSqliteLayerFactory;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.RemoteMixedMediaDbUpdateTask;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.SyncMetadataRemoteToLocalTask;
-import com.vaguehope.morrigan.tasks.MorriganTask;
+import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbFactory;
+import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbHelper;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
+import com.vaguehope.morrigan.tasks.MorriganTask;
 
 public class MediaFactoryImpl implements MediaFactory {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -86,6 +88,28 @@ public class MediaFactoryImpl implements MediaFactory {
 	@Override
 	public ILocalMixedMediaDb getLocalMixedMediaDbBySerial (final String serial) throws DbException {
 		return LocalMixedMediaDbFactory.getMainBySerial(serial);
+	}
+
+	@Override
+	public IMixedMediaDb getMixedMediaDbByMid(final String mid, final String filter) throws DbException, MorriganException {
+		final String[] parts = mid.split("/");
+		if (parts.length < 2) throw new IllegalArgumentException("Invalid MID: " + mid);
+
+		final String type = parts[0];
+		final String name = parts[1];
+
+		if (type.equals(MediaListType.LOCALMMDB.toString())) {
+			final String f = LocalMixedMediaDbHelper.getFullPathToMmdb(this.config, name);
+			return getLocalMixedMediaDb(f, filter);
+		}
+		else if (type.equals(MediaListType.REMOTEMMDB.toString())) {
+			final String f = RemoteMixedMediaDbHelper.getFullPathToMmdb(this.config, name);
+			return RemoteMixedMediaDbFactory.getExisting(f, filter);
+		}
+		else if (type.equals(MediaListType.EXTMMDB.toString())) {
+			return getExternalDb(name);
+		}
+		throw new IllegalArgumentException("Invalid MID: " + mid);
 	}
 
 	@Override
