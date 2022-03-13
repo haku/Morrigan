@@ -20,7 +20,6 @@ import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.googlecode.lanterna.gui2.dialogs.ActionListDialog;
 import com.googlecode.lanterna.gui2.dialogs.ActionListDialogBuilder;
 import com.googlecode.lanterna.input.KeyStroke;
-import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
 import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
@@ -79,6 +78,7 @@ public class DbFace extends DefaultFace {
 	private int selectedItemIndex = -1;
 	private int scrollTop = 0;
 	private int pageSize = 1;
+	private VDirection lastMoveDirection = VDirection.DOWN;
 	private String itemDetailsBar = "";
 	private IMixedMediaItem itemDetailsBarItem;
 	private boolean saveScrollOnClose = false;
@@ -113,7 +113,7 @@ public class DbFace extends DefaultFace {
 
 			final int selectedItemIndexToRestore = this.mnContext.getUserPrefs().getIntValue(PREF_SELECTED_INDEX, this.db.getListId(),
 					this.scrollTop > 0 ? this.scrollTop : this.selectedItemIndex);
-			this.selectedItemIndex = Integer.min(limit, selectedItemIndexToRestore);
+			setSelectedItem(selectedItemIndexToRestore);
 
 			this.saveScrollOnClose = true;
 		}
@@ -177,12 +177,16 @@ public class DbFace extends DefaultFace {
 
 		switch (k.getKeyType()) {
 			case ArrowUp:
+				menuMove(VDirection.UP, 1);
+				return true;
 			case ArrowDown:
-				menuMove(k, 1);
+				menuMove(VDirection.DOWN, 1);
 				return true;
 			case PageUp:
+				menuMove(VDirection.UP, this.pageSize - 1);
+				return true;
 			case PageDown:
-				menuMove(k, this.pageSize - 1);
+				menuMove(VDirection.DOWN, this.pageSize - 1);
 				return true;
 			case Home:
 				menuMoveEnd(VDirection.UP);
@@ -246,28 +250,22 @@ public class DbFace extends DefaultFace {
 		}
 	}
 
-	private void menuMove (final KeyStroke k, final int distance) throws MorriganException {
-		this.selectedItemIndex = MenuHelper.moveListSelectionIndex(this.selectedItemIndex,
-				k.getKeyType() == KeyType.ArrowUp || k.getKeyType() == KeyType.PageUp
-						? VDirection.UP
-						: VDirection.DOWN,
-				distance,
-				this.mediaItems);
-		updateItemDetailsBar();
+	private void menuMove(final VDirection direction, final int distance) {
+		setSelectedItem(MenuHelper.moveListSelectionIndex(this.selectedItemIndex, direction, distance, this.mediaItems));
+		this.lastMoveDirection = direction;
 	}
 
 	private void menuMoveEnd (final VDirection direction) throws MorriganException {
 		if (this.mediaItems == null || this.mediaItems.size() < 1) return;
 		switch (direction) {
 			case UP:
-				this.selectedItemIndex = 0;
+				setSelectedItem(0);
 				break;
 			case DOWN:
-				this.selectedItemIndex = this.mediaItems.size() - 1;
+				setSelectedItem(this.mediaItems.size() - 1);
 				break;
 			default:
 		}
-		updateItemDetailsBar();
 	}
 
 	private void centreSelection () {
@@ -275,8 +273,9 @@ public class DbFace extends DefaultFace {
 		if (t >= 0) this.scrollTop = t;
 	}
 
-	private void setSelectedItem (final int index) throws MorriganException {
-		this.selectedItemIndex = index;
+	private void setSelectedItem (final int index) {
+		this.selectedItemIndex = Math.min(index, this.mediaItems.size() - 1);
+		this.selectedItemIndex = Math.max(this.selectedItemIndex, 0);
 		updateItemDetailsBar();
 	}
 
@@ -315,7 +314,9 @@ public class DbFace extends DefaultFace {
 	private void enqueueSelection (final WindowBasedTextGUI gui) {
 		final List<IMixedMediaItem> items = getSelectedItems();
 		enqueueItems(gui, items);
-		if (items.size() == 1 && items.contains(getSelectedItem())) this.selectedItemIndex += 1;
+		if (items.size() == 1 && items.contains(getSelectedItem())) {
+			menuMove(this.lastMoveDirection, 1);
+		}
 	}
 
 	private void enqueueItems (final WindowBasedTextGUI gui, final List<? extends IMediaTrack> tracks) {
