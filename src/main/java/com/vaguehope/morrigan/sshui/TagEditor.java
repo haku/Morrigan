@@ -213,6 +213,10 @@ public class TagEditor extends DialogWindow {
 				public int getHotSpotPositionOnLine (final int selectedIndex) {
 					return -1;
 				}
+				@Override
+				public String getLabel(TagListBox listBox, int index, MediaTag item) {
+					return item.getTag();
+				}
 			};
 		}
 
