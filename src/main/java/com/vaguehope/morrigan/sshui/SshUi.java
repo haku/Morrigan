@@ -3,7 +3,6 @@ package com.vaguehope.morrigan.sshui;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.security.GeneralSecurityException;
 import java.time.Duration;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -12,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.sshd.core.CoreModuleProperties;
 import org.apache.sshd.server.SshServer;
+import org.apache.sshd.server.config.keys.AuthorizedKeysAuthenticator;
 import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +21,6 @@ import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.player.PlayerReader;
 import com.vaguehope.morrigan.server.ServerConfig;
 import com.vaguehope.morrigan.sshui.ssh.MnPasswordAuthenticator;
-import com.vaguehope.morrigan.sshui.ssh.UserPublickeyAuthenticator;
 import com.vaguehope.morrigan.tasks.AsyncTasksRegister;
 import com.vaguehope.morrigan.transcode.Transcoder;
 import com.vaguehope.morrigan.util.DaemonThreadFactory;
@@ -30,6 +29,7 @@ public class SshUi {
 
 	// can be DSA/RSA/EC (http://docs.oracle.com/javase/6/docs/technotes/guides/security/StandardNames.html#KeyPairGenerator)
 	private static final String HOSTKEY_NAME = "hostkey.ser";  // TODO move to Config class.
+	private static final String KEYS_FILE_NAME = "authorized_keys";
 	private static final Duration IDLE_TIMEOUT = Duration.ofDays(1);
 	private static final Logger LOG = LoggerFactory.getLogger(SshUi.class);
 
@@ -74,12 +74,12 @@ public class SshUi {
 		this.sshd.setKeyPairProvider(new SimpleGeneratorHostKeyProvider(hostKey.toPath()));
 		this.sshd.setShellFactory(this.mnCommandFactory);
 		this.sshd.setPasswordAuthenticator(new MnPasswordAuthenticator(this.serverConfig));
-		try {
-			this.sshd.setPublickeyAuthenticator(new UserPublickeyAuthenticator(this.config, this.serverConfig));
+
+		final File AuthKeyFile = new File(this.config.getConfigDir(), KEYS_FILE_NAME);
+		if (AuthKeyFile.exists()) {
+			this.sshd.setPublickeyAuthenticator(new AuthorizedKeysAuthenticator(AuthKeyFile.toPath()));
 		}
-		catch (final GeneralSecurityException e) {
-			throw new IllegalStateException("Failed to load public key.", e);
-		}
+
 		CoreModuleProperties.IDLE_TIMEOUT.set(this.sshd, IDLE_TIMEOUT);
 
 		final InetAddress bindAddress = this.serverConfig.getBindAddress("SSH");
