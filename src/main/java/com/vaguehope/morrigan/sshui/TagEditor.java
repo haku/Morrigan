@@ -15,6 +15,7 @@ import com.googlecode.lanterna.gui2.Label;
 import com.googlecode.lanterna.gui2.LinearLayout;
 import com.googlecode.lanterna.gui2.Panel;
 import com.googlecode.lanterna.gui2.TextBox;
+import com.googlecode.lanterna.gui2.TextGUIGraphics;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
@@ -74,11 +75,27 @@ public class TagEditor extends DialogWindow {
 
 	private static class AddTagTextBox extends TextBox {
 
+		private static final String HINT_MSG = "Tab to autocomplete";
+
 		private final TagEditor tagEditor;
 
 		public AddTagTextBox (final TerminalSize preferredSize, final TagEditor tagEditor) {
 			super(preferredSize);
 			this.tagEditor = tagEditor;
+		}
+
+		@Override
+		protected TextBoxRenderer createDefaultRenderer() {
+			return new DefaultTextBoxRenderer() {
+				@Override
+				public void drawComponent(final TextGUIGraphics graphics, final TextBox component) {
+					super.drawComponent(graphics, component);
+					if (isFocused() && getLine(0).length() == 0) {
+						graphics.applyThemeStyle(getThemeDefinition().getActive());
+						graphics.putString(graphics.getSize().getColumns() - HINT_MSG.length(), 0, HINT_MSG);
+					}
+				}
+			};
 		}
 
 		@Override
@@ -214,7 +231,7 @@ public class TagEditor extends DialogWindow {
 					return -1;
 				}
 				@Override
-				public String getLabel(TagListBox listBox, int index, MediaTag item) {
+				public String getLabel(final TagListBox listBox, final int index, final MediaTag item) {
 					return item.getTag();
 				}
 			};
