@@ -98,7 +98,7 @@ public class JumpToDialog extends DialogWindow {
 			}
 		}));
 		btnPanel.addComponent(new EmptySpace(new TerminalSize(WIDTH - 58, 1))); // FIXME magic numbers.
-		btnPanel.addComponent(new Button("Open", new Runnable() {
+		btnPanel.addComponent(new Button("Open View", new Runnable() {
 			@Override
 			public void run () {
 				acceptOpenResult();
