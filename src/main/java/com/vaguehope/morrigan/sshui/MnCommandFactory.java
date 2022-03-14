@@ -33,6 +33,7 @@ public class MnCommandFactory implements ShellFactory {
 
 	@Override
 	public Command createShell(ChannelSession channel) throws IOException {
+		// TODO enforce MAX_CLIENTS ?
 		return new MnCommand(this.mnContext, this.es);
 	}
 
