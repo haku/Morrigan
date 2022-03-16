@@ -35,6 +35,7 @@ import com.vaguehope.morrigan.model.media.IMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
+import com.vaguehope.morrigan.util.StringHelper;
 
 public class JumpToDialog extends DialogWindow {
 
@@ -298,7 +299,15 @@ public class JumpToDialog extends DialogWindow {
 
 	protected void acceptOpenResult () {
 		final String text = this.txtSearch.getText();
-		if (text != null && text.length() > 0) setResult(new JumpResult(JumpType.OPEN_VIEW, text));
+		if (text != null && text.length() > 0) {
+			setResult(new JumpResult(JumpType.OPEN_VIEW, text));
+			return;
+		}
+
+		final String dbSearch = this.db.getSearchTerm();
+		if (StringHelper.notBlank(dbSearch)) {
+			setResult(new JumpResult(JumpType.OPEN_VIEW, dbSearch));
+		}
 	}
 
 	protected void acceptRevealResult () {
