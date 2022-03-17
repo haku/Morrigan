@@ -396,8 +396,8 @@ public class PlayerFace extends DefaultFace {
 				PrintingThingsHelper.listTitleAndOrder(this.player),
 				this.player.getTranscode()));
 		tg.putString(1, l++, PrintingThingsHelper.playingItemTitle(this.player));
-		drawPrgBar(tg, l++, columns);
 		tg.putString(1, l++, this.tagSummary);
+		drawPrgBar(tg, l++, columns);
 
 		final PlayerQueue pq = this.player.getQueue();
 		tg.putString(0, l++, PrintingThingsHelper.queueSummary(pq));
