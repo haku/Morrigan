@@ -34,8 +34,9 @@ import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.model.media.internal.ItemTagsImpl;
 import com.vaguehope.morrigan.model.media.internal.MediaItemList;
 import com.vaguehope.morrigan.model.media.internal.MediaTagClassificationImpl;
-import com.vaguehope.morrigan.util.StringHelper;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
+import com.vaguehope.morrigan.util.Objs;
+import com.vaguehope.morrigan.util.StringHelper;
 
 public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends IMediaItem>
 		extends MediaItemList<T>
@@ -60,6 +61,8 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	 */
 	protected MediaItemDb (final String listName, final MediaItemDbConfig config, final S dbLayer) {
 		super(dbLayer.getDbFilePath(), listName);
+
+		if (config == null) throw new IllegalArgumentException("Must not be null: config");
 
 		this.config = config;
 		this.dbLayer = dbLayer;
@@ -95,6 +98,21 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 		super.dispose();
 		this._sortChangeListeners.clear();
 		this.dbLayer.dispose(); // TODO FIXME what if this layer is shared???  Count attached change listeners?
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (obj == null) return false;
+		if (this == obj) return true;
+		if (!(obj instanceof MediaItemDb)) return false;
+		final MediaItemDb<?, ?> that = (MediaItemDb<?, ?>) obj;
+
+		return Objs.equals(this.config, that.config);
+	}
+
+	@Override
+	public int hashCode() {
+		return this.config.hashCode();
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

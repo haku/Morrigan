@@ -96,11 +96,16 @@ public class PlayItem {
 		return pi;
 	}
 
-	@Override
-	public String toString () {
+	public String resolveTitle(IMediaTrackList<? extends IMediaTrack> relativeTo) {
 		if (this.type.isPseudo()) return this.type.toString();
 		if (this.track == null) return this.list.getListName();
+		if (this.list.equals(relativeTo)) return this.track.getTitle();
 		return this.list.getListName() + "/" + this.track.getTitle();
+	}
+
+	@Override
+	public String toString () {
+		return resolveTitle(null);
 	}
 
 	@Override
