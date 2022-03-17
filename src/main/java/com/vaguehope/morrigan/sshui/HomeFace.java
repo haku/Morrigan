@@ -30,6 +30,7 @@ import com.vaguehope.morrigan.tasks.AsyncTask;
 public class HomeFace extends MenuFace {
 
 	private static final String HELP_TEXT =
+			"<ctrl>+t\tnew tab\n" +
 			"       g\tgo to top of list\n" +
 			"       G\tgo to end of list\n" +
 			" <space>\tplay / pause selected player or play DB\n" +
