@@ -389,8 +389,7 @@ public class PlayerFace extends DefaultFace {
 		String volMsg = PrintingThingsHelper.volumeMsg(this.player);
 		if (StringHelper.notBlank(volMsg)) volMsg = "  " + volMsg;
 
-		tg.putString(0, l++, String.format("%1.5s: %s  %s%s  %s.  %s.",
-				this.player.getId(),
+		tg.putString(0, l++, String.format("%s:  %s%s  %s.  %s.",
 				this.player.getName(),
 				PrintingThingsHelper.playerStateMsg(this.player),
 				volMsg,
