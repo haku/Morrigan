@@ -13,6 +13,7 @@ import com.vaguehope.morrigan.model.media.IMediaTrackList;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayerQueue;
+import com.vaguehope.morrigan.player.internal.PlayerSorter;
 
 public final class PlayerHelper {
 
@@ -51,26 +52,28 @@ public final class PlayerHelper {
 		else if (players.size() == 1) {
 			return players.iterator().next();
 		}
-		else {
-			final AtomicReference<Player> ret = new AtomicReference<>();
-			final List<Runnable> actions = new ArrayList<>();
-			for (final Player player : players) {
-				actions.add(new Runnable() {
-					@Override
-					public String toString () {
-						return player.getName();
-					}
 
-					@Override
-					public void run () {
-						ret.set(player);
-					}
-				});
-			}
-			ActionListDialog.showDialog(gui, title, "Select player",
-					actions.toArray(new Runnable[actions.size()]));
-			return ret.get();
+		final List<Player> sorted = new ArrayList<>(players);
+		sorted.sort(PlayerSorter.STATE);
+
+		final AtomicReference<Player> ret = new AtomicReference<>();
+		final List<Runnable> actions = new ArrayList<>();
+		for (final Player player : sorted) {
+			actions.add(new Runnable() {
+				@Override
+				public String toString () {
+					return player.getName() + "  (" + PrintingThingsHelper.playerStateTitle(player) + ")";
+				}
+
+				@Override
+				public void run () {
+					ret.set(player);
+				}
+			});
 		}
+		ActionListDialog.showDialog(gui, title, "Select player",
+				actions.toArray(new Runnable[actions.size()]));
+		return ret.get();
 	}
 
 }

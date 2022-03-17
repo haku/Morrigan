@@ -31,24 +31,7 @@ public final class PrintingThingsHelper {
 
 	public static String playerStateMsg (final Player p) {
 		final StringBuilder msg = new StringBuilder();
-		switch (p.getPlayState()) {
-			case PLAYING:
-				msg.append("Playing");
-				break;
-			case PAUSED:
-				msg.append("Paused");
-				break;
-			case LOADING:
-				msg.append("Loading");
-				break;
-			case STOPPED:
-				msg.append("Stopped");
-				break;
-			default:
-				msg.append("Unknown");
-				break;
-		}
-
+		msg.append(playerStateTitle(p));
 		final long currentPosition = p.getCurrentPosition();
 		if (currentPosition >= 0) {
 			final int currentTrackDuration = p.getCurrentTrackDuration();
@@ -62,6 +45,21 @@ public final class PrintingThingsHelper {
 		msg.append(".");
 
 		return msg.toString();
+	}
+
+	public static String playerStateTitle(final Player p) {
+		switch (p.getPlayState()) {
+			case PLAYING:
+				return "Playing";
+			case PAUSED:
+				return "Paused";
+			case LOADING:
+				return "Loading";
+			case STOPPED:
+				return "Stopped";
+			default:
+				return "Unknown";
+		}
 	}
 
 	public static String volumeMsg(final Player p) {

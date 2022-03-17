@@ -3,16 +3,25 @@ package com.vaguehope.morrigan.engines.playback;
 public interface IPlaybackEngine {
 
 	public enum PlayState {
-		STOPPED(0), PLAYING(1), PAUSED(2), LOADING(3);
+		STOPPED(0, 3),
+		PLAYING(1, 0),
+		PAUSED(2, 2),
+		LOADING(3, 1);
 
 		private final int n;
+		private final int sortPriority;
 
-		private PlayState (final int n) {
+		private PlayState (final int n, final int sortPriority) {
 			this.n = n;
+			this.sortPriority = sortPriority;
 		}
 
 		public int getN() {
 			return this.n;
+		}
+
+		public int getSortPriority() {
+			return this.sortPriority;
 		}
 
 	}
