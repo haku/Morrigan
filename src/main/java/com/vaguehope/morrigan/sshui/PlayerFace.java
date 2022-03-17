@@ -30,6 +30,7 @@ import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.sshui.MenuHelper.VDirection;
 import com.vaguehope.morrigan.sshui.util.TextGuiUtils;
 import com.vaguehope.morrigan.transcode.Transcode;
+import com.vaguehope.morrigan.util.StringHelper;
 import com.vaguehope.morrigan.util.TimeHelper;
 
 public class PlayerFace extends DefaultFace {
@@ -42,6 +43,8 @@ public class PlayerFace extends DefaultFace {
 			"            n\tnext track\n" +
 			"            o\tplayback order\n" +
 			"            e\ttranscode\n" +
+			"       + OR =\tvolume up\n" +
+			"            -\tvolume down\n" +
 			"            /\tsearch DB\n" +
 			"            T\topen tag editor for playing item\n" +
 			"            g\tgo to top of list\n" +
@@ -192,6 +195,13 @@ public class PlayerFace extends DefaultFace {
 					case 'e':
 						askTranscode(gui);
 						return true;
+					case '-':
+						setRelativeVolume(-3);
+						return true;
+					case '+':
+					case '=':
+						setRelativeVolume(3);
+						return true;
 					case '/':
 						askSearch(gui);
 						return true;
@@ -265,6 +275,16 @@ public class PlayerFace extends DefaultFace {
 			i++;
 		}
 		ActionListDialog.showDialog(gui, "Transcode", "Current: " + this.player.getTranscode(), actions);
+	}
+
+	private void setRelativeVolume(final int offset) {
+		final Integer curVol = this.player.getVoume();
+		if (curVol == null) return;
+
+		int newVol = curVol + offset;
+		newVol = Math.min(newVol, this.player.getVoumeMaxValue());
+		newVol = Math.max(newVol, 0);
+		this.player.setVolume(newVol);
 	}
 
 	private void askSearch (final WindowBasedTextGUI gui) throws DbException, MorriganException {
@@ -361,15 +381,19 @@ public class PlayerFace extends DefaultFace {
 	}
 
 	@Override
-	public void writeScreen (final Screen scr, final TextGraphics tg, int top, int bottom, int columns) {
+	public void writeScreen (final Screen scr, final TextGraphics tg, final int top, final int bottom, final int columns) {
 		refreshStaleData();
 
 		int l = top;
 
-		tg.putString(0, l++, String.format("Player %1.5s: %s   %s   %s.   %s.",
+		String volMsg = PrintingThingsHelper.volumeMsg(this.player);
+		if (StringHelper.notBlank(volMsg)) volMsg = "  " + volMsg;
+
+		tg.putString(0, l++, String.format("%1.5s: %s  %s%s  %s.  %s.",
 				this.player.getId(),
 				this.player.getName(),
 				PrintingThingsHelper.playerStateMsg(this.player),
+				volMsg,
 				PrintingThingsHelper.listTitleAndOrder(this.player),
 				this.player.getTranscode()));
 		tg.putString(1, l++, PrintingThingsHelper.playingItemTitle(this.player));

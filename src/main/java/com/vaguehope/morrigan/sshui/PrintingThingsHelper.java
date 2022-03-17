@@ -64,6 +64,22 @@ public final class PrintingThingsHelper {
 		return msg.toString();
 	}
 
+	public static String volumeMsg(final Player p) {
+		final Integer vol = p.getVoume();
+		final Integer maxVol = p.getVoumeMaxValue();
+		if (vol == null) return "";
+
+		String msg = "Vol " + vol;
+		if (maxVol == 100) {
+			msg += "%";
+		}
+		else {
+			msg += "/" + maxVol;
+		}
+		msg += ".";
+		return msg;
+	}
+
 	public static String playingItemTitle (final Player p) {
 		final PlayItem currentItem = p.getCurrentItem();
 		return currentItem != null && currentItem.hasTrack() ? currentItem.getTrack().getTitle() : "";
