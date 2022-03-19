@@ -31,6 +31,8 @@ import com.vaguehope.morrigan.model.media.MediaTagType;
 
 public class TagEditor extends DialogWindow {
 
+	private static final int MAX_AUTOCOMPLETE_RESULTS = 20;
+
 	protected final IMediaTrackList<?> list;
 	protected final IMediaTrack item;
 
@@ -150,7 +152,7 @@ public class TagEditor extends DialogWindow {
 			if (input == null || input.length() < 1) return;
 
 			try {
-				final Map<String, MediaTag> searchRes = this.tagEditor.list.tagSearch(input, 20);
+				final Map<String, MediaTag> searchRes = this.tagEditor.list.tagSearch(input, MAX_AUTOCOMPLETE_RESULTS);
 				resetAutocomplete(new ArrayList<>(searchRes.values()));
 
 				if (searchRes.size() > 0) {

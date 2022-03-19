@@ -1,9 +1,12 @@
 package com.vaguehope.morrigan.sshui;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -35,6 +38,8 @@ import com.vaguehope.morrigan.model.media.IMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
+import com.vaguehope.morrigan.sshui.Autocomplete.MergedResult;
+import com.vaguehope.morrigan.sshui.Autocomplete.PartialQuery;
 import com.vaguehope.morrigan.util.StringHelper;
 
 public class JumpToDialog extends DialogWindow {
@@ -42,6 +47,7 @@ public class JumpToDialog extends DialogWindow {
 	private static final int WIDTH = 70;
 	private static final int HEIGHT = 14;
 	private static final int MAX_RESULTS = 100;
+	private static final int MAX_AUTOCOMPLETE_RESULTS = 20;
 	private static final Logger LOG = LoggerFactory.getLogger(JumpToDialog.class);
 
 	private final IMixedMediaDb db;
@@ -122,7 +128,7 @@ public class JumpToDialog extends DialogWindow {
 		final String term = savedSearchTerm.get();
 		if (term != null) {
 			this.txtSearch.setText(term);
-			requestSearch();
+			requestSearch(new PartialQuery(term, null, -1));
 		}
 	}
 
@@ -142,14 +148,14 @@ public class JumpToDialog extends DialogWindow {
 	/**
 	 * Only call on UI thread.
 	 */
-	protected final void requestSearch () {
+	protected final void requestSearch (final PartialQuery partialQuery) {
 		if (this.searchRunner == null) {
 			this.searchRunner = new SearchRunner(this);
 			final Thread t = new Thread(this.searchRunner, String.format("jtbg-%s", BG_THREAD_NUMBER.getAndIncrement()));
 			t.setDaemon(true);
 			t.start();
 		}
-		this.searchRunner.requestSearch();
+		this.searchRunner.requestSearch(partialQuery);
 	}
 
 	/**
@@ -170,8 +176,8 @@ public class JumpToDialog extends DialogWindow {
 			this.queue = new LinkedBlockingQueue<>(1);
 		}
 
-		public void requestSearch () {
-			this.queue.offer(Boolean.TRUE);
+		public void requestSearch (final PartialQuery partialQuery) {
+			this.queue.offer(partialQuery);
 		}
 
 		public void requestTags (final IMediaTrack item) {
@@ -200,23 +206,48 @@ public class JumpToDialog extends DialogWindow {
 				try {
 					final Object item = this.queue.poll(15, TimeUnit.SECONDS);
 					if (item == null) continue;
-					if (item instanceof IMediaTrack) {
+					if (item instanceof PartialQuery) {
+						final PartialQuery partialQuery = (PartialQuery) item;
+
+						if (partialQuery.activeTerm != null) {
+							String tagQuery = partialQuery.activeTerm;
+							if (tagQuery.startsWith("t=")) tagQuery = tagQuery.substring(2);
+							final Map<String, MediaTag> tags = this.dlg.db.tagSearch(tagQuery, MAX_AUTOCOMPLETE_RESULTS);
+							this.dlg.getTextGUI().getGUIThread().invokeLater(new ShowAutocomplete(this.dlg, partialQuery, tags));
+						}
+
+						final List<? extends IMediaTrack> results = this.dlg.db.simpleSearch(partialQuery.fullText, MAX_RESULTS);
+						this.dlg.getTextGUI().getGUIThread().invokeLater(new SetSearchResults(this.dlg, results));
+					}
+					else if (item instanceof IMediaTrack) {
 						final List<MediaTag> tags = this.dlg.db.getTags((IMediaTrack) item);
 						this.dlg.getTextGUI().getGUIThread().invokeLater(new ShowTags(this.dlg, tags));
 					}
 					else {
-						final List<? extends IMediaTrack> results = doSearch(this.dlg);
-						this.dlg.getTextGUI().getGUIThread().invokeLater(new SetSearchResults(this.dlg, results));
+						LOG.warn("Unknown object on queue: {}", item);
 					}
 				}
 				catch (final InterruptedException e) { /* ignore. */}
 			}
 		}
 
-		private static List<? extends IMediaTrack> doSearch (final JumpToDialog dlg) throws DbException {
-			final String query = dlg.getSearchText();
-			if (query == null || query.length() < 1) return null;
-			return dlg.db.simpleSearch(query, MAX_RESULTS);
+	}
+
+	private static class ShowAutocomplete implements Runnable {
+
+		private final JumpToDialog dlg;
+		private final PartialQuery partialQuery;
+		private final Map<String, MediaTag> tags;
+
+		public ShowAutocomplete(final JumpToDialog dlg, final PartialQuery partialQuery, final Map<String, MediaTag> tags) {
+			this.dlg = dlg;
+			this.partialQuery = partialQuery;
+			this.tags = tags;
+		}
+
+		@Override
+		public void run() {
+			this.dlg.showAutocomplete(this.partialQuery, this.tags);
 		}
 
 	}
@@ -263,6 +294,31 @@ public class JumpToDialog extends DialogWindow {
 		final String text = this.txtSearch.getText();
 		this.savedSearchTerm.set(text);
 		return text;
+	}
+
+	/**
+	 * Call on UI thread.
+	 */
+	protected final void showAutocomplete (final PartialQuery partialQuery, final Map<String, MediaTag> tags) {
+		final List<Runnable> actions = new ArrayList<>();
+		for (final Entry<String, MediaTag> e : tags.entrySet()) {
+			actions.add(new Runnable() {
+				@Override
+				public void run() {
+					final MergedResult mr = Autocomplete.mergeResult(JumpToDialog.this.txtSearch.getText(), partialQuery, e.getValue().getTag());
+					if (mr == null) return;
+					JumpToDialog.this.txtSearch.setText(mr.result);
+					JumpToDialog.this.txtSearch.setCaretPosition(mr.caretPos);
+					requestSearch(new PartialQuery(mr.result, null, -1));
+				}
+
+				@Override
+				public String toString() {
+					return e.getKey();
+				}
+			});
+		}
+		this.txtSearch.showAutocomplete(actions);
 	}
 
 	/**
@@ -334,26 +390,59 @@ public class JumpToDialog extends DialogWindow {
 	private static class SearchTextBox extends TextBox {
 
 		private final JumpToDialog dialog;
+		private AutocompletePopup autocompletePopup;
 
 		public SearchTextBox (final TerminalSize preferredSize, final JumpToDialog dialog) {
 			super(preferredSize);
 			this.dialog = dialog;
+			setTextChangeListener((newText, changedByUserInteraction) -> {
+				if (!changedByUserInteraction) return;
+				onTextChangedByUser(newText);
+			});
+		}
+
+		private void onTextChangedByUser(final String newText) {
+			final PartialQuery partialQuery = Autocomplete.extractPartialSearchTerm(newText, getCaretPosition().getColumn());
+			if (partialQuery.activeTerm == null) closeAutocomplete();
+			this.dialog.requestSearch(partialQuery);
 		}
 
 		@Override
 		public synchronized Result handleKeyStroke (final KeyStroke key) {
+			if (this.autocompletePopup != null && this.autocompletePopup.offerInput(key)) {
+				return Result.HANDLED;
+			}
+
 			switch (key.getKeyType()) {
-				case Enter:
-					this.dialog.acceptEnqueueResult();
+			case Enter:
+				this.dialog.acceptEnqueueResult();
+				return Result.HANDLED;
+			case Character:
+				if (key.isCtrlDown() && key.getCharacter() == 'u') {
+					setText("");
 					return Result.HANDLED;
-				case Character:
-				case Backspace:
-				case Delete:
-					this.dialog.requestSearch();
+				}
 				//$FALL-THROUGH$
 			default:
-					return super.handleKeyStroke(key);
+				return super.handleKeyStroke(key);
 			}
+		}
+
+		@Override
+		protected synchronized void afterLeaveFocus(FocusChangeDirection direction, Interactable nextInFocus) {
+			closeAutocomplete();
+		}
+
+		public void showAutocomplete(final List<Runnable> actions) {
+			closeAutocomplete();
+			if (actions.size() < 1) return;
+			this.autocompletePopup = AutocompletePopup.makeAndShow(this, actions, () -> this.autocompletePopup = null);
+		}
+
+		private void closeAutocomplete() {
+			if (this.autocompletePopup == null) return;
+			this.autocompletePopup.close();
+			this.autocompletePopup = null;
 		}
 
 	}
@@ -378,6 +467,7 @@ public class JumpToDialog extends DialogWindow {
 		}
 
 		public IMediaTrack getSelectedTrack () {
+			if (getItemCount() < 1) return null;
 			return getSelectedItem();
 		}
 
@@ -389,7 +479,7 @@ public class JumpToDialog extends DialogWindow {
 					return -1;
 				}
 				@Override
-				public void drawItem(TextGUIGraphics graphics, MediaItemListBox listBox, int index, IMediaTrack item, boolean selected, boolean focused) {
+				public void drawItem(final TextGUIGraphics graphics, final MediaItemListBox listBox, final int index, final IMediaTrack item, final boolean selected, final boolean focused) {
 					super.drawItem(graphics, listBox, index, item, selected, true);
 				}
 			};
