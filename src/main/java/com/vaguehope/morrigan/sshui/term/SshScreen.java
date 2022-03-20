@@ -101,7 +101,7 @@ public abstract class SshScreen implements Runnable {
 
 	private void tick () throws IOException {
 		final long now = System.nanoTime();
-		if (isTickNeededOrThrow(now)) {
+		if (isTickNeededOrThrow(true, now)) {
 			printScreen();
 		}
 		else {
@@ -109,17 +109,21 @@ public abstract class SshScreen implements Runnable {
 		}
 	}
 
-	private boolean isTickNeededOrThrow(final long now) throws IOException {
-		return (processEvents() | readInput()) || now - this.lastPrint > PRINT_CYCLE_NANOS;
+	private boolean isTickNeededOrThrow(final boolean readInput, final long now) throws IOException {
+		boolean ret = processEvents();
+		if (readInput) {
+			ret = ret | readInput();
+		}
+		return ret || now - this.lastPrint > PRINT_CYCLE_NANOS;
 	}
 
 	protected void recordTickHappened() {
 		this.lastPrint = System.nanoTime();
 	}
 
-	protected boolean isTickNeeded() {
+	protected boolean isTickNeeded(final boolean readInput) {
 		try {
-			return isTickNeededOrThrow(System.nanoTime());
+			return isTickNeededOrThrow(readInput, System.nanoTime());
 		}
 		catch (IOException e) {
 			LOG.warn("Session error.", e);

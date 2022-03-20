@@ -75,7 +75,7 @@ public class MnScreen extends SshScreen implements FaceNavigation {
 
 		@Override
 		public boolean isInvalid() {
-			return super.isInvalid() | isTickNeeded();
+			return super.isInvalid() | isTickNeeded(false);
 		}
 
 		@Override
