@@ -82,7 +82,8 @@ public class JumpToDialog extends DialogWindow {
 		this.lstResults = new MediaItemListBox(new TerminalSize(WIDTH, HEIGHT), this);
 		p.addComponent(this.lstResults);
 
-		this.lblTags = new Label("");
+		this.lblTags = new FixedHeightLabel("", 2);
+		this.lblTags.setLabelWidth(WIDTH);
 		p.addComponent(this.lblTags);
 
 		final Panel btnPanel = new Panel();
@@ -439,7 +440,7 @@ public class JumpToDialog extends DialogWindow {
 		}
 
 		@Override
-		protected synchronized void afterLeaveFocus(FocusChangeDirection direction, Interactable nextInFocus) {
+		protected synchronized void afterLeaveFocus(final FocusChangeDirection direction, final Interactable nextInFocus) {
 			closeAutocomplete();
 		}
 
@@ -530,6 +531,21 @@ public class JumpToDialog extends DialogWindow {
 			this.dialog.requestTags(getSelectedItem());
 		}
 
+	}
+
+	private static class FixedHeightLabel extends Label {
+		private final int height;
+
+		public FixedHeightLabel(final String text, final int height) {
+			super(text);
+			this.height = height;
+			setText(text);  // Force getBounds() to be called AFTER setting height field.
+		}
+
+		@Override
+		protected TerminalSize getBounds(String[] lines, TerminalSize currentBounds) {
+			return super.getBounds(lines, currentBounds).withRows(this.height);
+		}
 	}
 
 	public enum JumpType {
