@@ -18,6 +18,7 @@
 
 	<appender name="CYCLIC" class="ch.qos.logback.core.read.CyclicBufferAppender">
 		<MaxSize>4096</MaxSize>
+		<filter class="com.vaguehope.morrigan.util.AsyncLogFilter" />
 	</appender>
 
 	<logger name="com.vaguehope" level="INFO" />

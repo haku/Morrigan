@@ -3,6 +3,9 @@ package com.vaguehope.morrigan.server;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
+import java.util.Random;
+import java.util.concurrent.CountDownLatch;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -26,9 +29,21 @@ public class LogServletTest {
 	@Test
 	public void itDoesSomething() throws Exception {
 		final String msg = "test message " + System.currentTimeMillis();
-		LOG.info(msg);
+
+		final String threadName = "t" + new Random().nextInt(100000000);
+		final CountDownLatch latch = new CountDownLatch(1);
+		new Thread(threadName) {
+			@Override
+			public void run() {
+				LOG.info(msg);
+				latch.countDown();
+			}
+		}.start();
+		latch.await();
+
 		this.undertest.doGet(this.req, this.resp);
 		assertThat(this.resp.getOutputAsString(), containsString(msg));
+		assertThat(this.resp.getOutputAsString(), containsString(threadName));
 	}
 
 }
