@@ -43,8 +43,8 @@ public class MultitaskEventListener implements TaskEventListener {
 	}
 
 	@Override
-	public void done () {
-		this.parent.done();
+	public void done(final TaskOutcome outcome) {
+		this.parent.done(outcome);
 	}
 
 	@Override
@@ -104,7 +104,7 @@ public class MultitaskEventListener implements TaskEventListener {
 		}
 
 		@Override
-		public void done () {
+		public void done(final TaskOutcome outcome) {
 			// NOOP.
 		}
 

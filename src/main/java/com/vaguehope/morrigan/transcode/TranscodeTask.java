@@ -8,8 +8,8 @@ import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
 import com.vaguehope.morrigan.tasks.MorriganTask;
 import com.vaguehope.morrigan.tasks.TaskEventListener;
+import com.vaguehope.morrigan.tasks.TaskOutcome;
 import com.vaguehope.morrigan.tasks.TaskResult;
-import com.vaguehope.morrigan.tasks.TaskResult.TaskOutcome;
 
 public class TranscodeTask implements MorriganTask {
 
@@ -61,12 +61,13 @@ public class TranscodeTask implements MorriganTask {
 				}
 			}
 
-			if (taskEventListener.isCanceled()) return new TaskResult(TaskOutcome.CANCELED);
-			taskEventListener.done();
+			if (taskEventListener.isCanceled()) {
+				return new TaskResult(TaskOutcome.CANCELLED);
+			}
 			return new TaskResult(TaskOutcome.SUCCESS);
 		}
 		catch (final Exception e) {
-			taskEventListener.done();
+			taskEventListener.done(TaskOutcome.FAILED);
 			return new TaskResult(TaskOutcome.FAILED, "Throwable while transcoding.", e);
 		}
 	}

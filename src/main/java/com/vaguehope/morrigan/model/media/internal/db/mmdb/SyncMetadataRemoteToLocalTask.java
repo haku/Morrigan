@@ -15,8 +15,8 @@ import com.vaguehope.morrigan.model.media.MediaTagClassification;
 import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.tasks.MorriganTask;
 import com.vaguehope.morrigan.tasks.TaskEventListener;
+import com.vaguehope.morrigan.tasks.TaskOutcome;
 import com.vaguehope.morrigan.tasks.TaskResult;
-import com.vaguehope.morrigan.tasks.TaskResult.TaskOutcome;
 import com.vaguehope.morrigan.util.Objs;
 
 public class SyncMetadataRemoteToLocalTask implements MorriganTask {
@@ -84,18 +84,19 @@ public class SyncMetadataRemoteToLocalTask implements MorriganTask {
 
 				if (taskEventListener.isCanceled()) {
 					taskEventListener.logMsg(this.getTitle(), "Sync task was canceled desu~."); // TODO is this quite right?
-					ret = new TaskResult(TaskOutcome.CANCELED);
+					taskEventListener.done(TaskOutcome.CANCELLED);
+					ret = new TaskResult(TaskOutcome.CANCELLED);
 				}
 				else {
 					ret = new TaskResult(TaskOutcome.SUCCESS);
 				}
-				taskEventListener.done();
 			}
 			finally {
 				trans.dispose();
 			}
 		}
 		catch (final Exception e) {
+			taskEventListener.done(TaskOutcome.FAILED);
 			ret = new TaskResult(TaskOutcome.FAILED, "Throwable while sync metadata.", e);
 		}
 

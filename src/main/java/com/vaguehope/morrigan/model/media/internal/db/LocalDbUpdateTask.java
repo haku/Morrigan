@@ -24,8 +24,8 @@ import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.MediaAlbum;
 import com.vaguehope.morrigan.tasks.MorriganTask;
 import com.vaguehope.morrigan.tasks.TaskEventListener;
+import com.vaguehope.morrigan.tasks.TaskOutcome;
 import com.vaguehope.morrigan.tasks.TaskResult;
-import com.vaguehope.morrigan.tasks.TaskResult.TaskOutcome;
 import com.vaguehope.morrigan.util.ChecksumHelper;
 import com.vaguehope.morrigan.util.FileSystem;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
@@ -162,7 +162,8 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 
 				if (taskEventListener.isCanceled()) {
 					taskEventListener.logMsg(this.itemList.getListName(), "Update was canceled desu~.");
-					ret = new TaskResult(TaskOutcome.CANCELED);
+					taskEventListener.done(TaskOutcome.CANCELLED);
+					ret = new TaskResult(TaskOutcome.CANCELLED);
 				}
 				else {
 					ret = new TaskResult(TaskOutcome.SUCCESS);
@@ -170,12 +171,10 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 			}
 		}
 		catch (final Exception e) {
+			taskEventListener.done(TaskOutcome.FAILED);
 			ret = new TaskResult(TaskOutcome.FAILED, "Error while updating.", e);
 		}
-
 		this.setFinished();
-		taskEventListener.done();
-
 		return ret;
 	}
 
@@ -191,7 +190,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 			supportedFormats = getItemFileExtensions();
 		}
 		catch (final MorriganException e) {
-			taskEventListener.done();
+			taskEventListener.done(TaskOutcome.FAILED);
 			return new TaskResult(TaskOutcome.FAILED, "Failed to retrieve list of supported formats.", e);
 		}
 
@@ -200,7 +199,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 			sources = this.itemList.getSources();
 		}
 		catch (final MorriganException e) {
-			taskEventListener.done();
+			taskEventListener.done(TaskOutcome.FAILED);
 			return new TaskResult(TaskOutcome.FAILED, "Failed to retrieve list of media sources.", e);
 		}
 
@@ -683,7 +682,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 			sources = this.itemList.getSources();
 		}
 		catch (final MorriganException e) {
-			taskEventListener.done();
+			taskEventListener.done(TaskOutcome.FAILED);
 			return new TaskResult(TaskOutcome.FAILED, "Failed to retrieve list of media sources.", e);
 		}
 		final List<File> albumDirs = new ArrayList<>();

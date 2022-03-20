@@ -1,5 +1,6 @@
 package com.vaguehope.morrigan.tasks;
 
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -17,7 +18,8 @@ import com.vaguehope.morrigan.util.StringHelper;
 import com.vaguehope.morrigan.util.ThreadSafeDateFormatter;
 
 public class AsyncTaskEventListener implements TaskEventListener, AsyncTask {
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	private static final String MISSING_TITLE = "(no title)";
 
 	private static final AtomicInteger TASK_NUMBER = new AtomicInteger(0);
 	private static final long EXPIRY_AGE_MILLIS = 60 * 60 * 1000L;
@@ -25,12 +27,14 @@ public class AsyncTaskEventListener implements TaskEventListener, AsyncTask {
 	private static final ThreadSafeDateFormatter DATE_FORMATTER = new ThreadSafeDateFormatter("MMdd-HHmmss.SSS");
 	private static final ThreadSafeDateFormatter TIME_FORMATTER = new ThreadSafeDateFormatter("HH:mm");
 
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	private final int number = TASK_NUMBER.getAndIncrement();
+	private final int number;
 	private final String id = UUID.randomUUID().toString();
+	private final Clock clock;
 
 	private final AtomicReference<TaskState> lifeCycle = new AtomicReference<>(TaskState.UNSTARTED);
+	private final AtomicReference<TaskOutcome> outcome = new AtomicReference<>();
+	private final AtomicReference<TaskOutcome> futureOutcome = new AtomicReference<>();
+	private final AtomicBoolean logExceptionFromFuture = new AtomicBoolean();
 
 	private final AtomicInteger progressWorked = new AtomicInteger(0);
 	private final AtomicInteger progressTotal = new AtomicInteger(0);
@@ -49,16 +53,37 @@ public class AsyncTaskEventListener implements TaskEventListener, AsyncTask {
 
 	private final AtomicReference<Future<?>> future = new AtomicReference<>();
 
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public AsyncTaskEventListener() {
+		this(TASK_NUMBER.getAndIncrement(), Clock.systemDefaultZone());
+	}
+
+	protected AsyncTaskEventListener(final int number, final Clock clock) {
+		this.number = number;
+		this.clock = clock;
+	}
 
 	@Override
 	public String oneLineSummary() {
 		final StringBuilder s = new StringBuilder()
 				.append(this.number)
-				.append(" [")
-				.append(this.lifeCycle.get()).append(' ')
-				.append(TIME_FORMATTER.get().format(new Date(this.startTime.get())))
-				.append(']');
+				.append(" [");
+
+		final TaskOutcome fo = getFutureOutcome();
+		if (fo != null && fo != TaskOutcome.SUCCESS) {
+			s.append(fo);
+		}
+		else if (this.lifeCycle.get() == TaskState.COMPLETE) {
+			s.append(this.outcome.get());
+		}
+		else {
+			s.append(this.lifeCycle.get());
+		}
+
+		if (this.startTime.get() > 0) {
+			s.append(' ').append(TIME_FORMATTER.get().format(new Date(this.startTime.get())));
+		}
+
+		s.append(']');
 
 		final int P = this.progressTotal.get();
 		if (this.lifeCycle.get() == TaskState.RUNNING && P > 0) {
@@ -67,7 +92,7 @@ public class AsyncTaskEventListener implements TaskEventListener, AsyncTask {
 		}
 
 		final String name = this.taskName.get();
-		s.append(' ').append(name != null ? name : "<task>");
+		s.append(' ').append(name != null ? name : MISSING_TITLE);
 
 		if (this.lifeCycle.get() != TaskState.COMPLETE) {
 			final String subName = this.subtaskName.get();
@@ -118,7 +143,7 @@ public class AsyncTaskEventListener implements TaskEventListener, AsyncTask {
 	public boolean isExpired () {
 		return this.lifeCycle.get() == TaskState.COMPLETE
 				&& (this.endTime.get() > 0
-						&& this.endTime.get() + EXPIRY_AGE_MILLIS < System.currentTimeMillis());
+						&& this.endTime.get() + EXPIRY_AGE_MILLIS < this.clock.millis());
 	}
 
 	@Override
@@ -131,7 +156,7 @@ public class AsyncTaskEventListener implements TaskEventListener, AsyncTask {
 		boolean first = true;
 		for (final String line : msg.split("\\r?\\n")) {
 			if (first) {
-				this.allMessages.add(DATE_FORMATTER.get().format(new Date()) + " " + line);
+				this.allMessages.add(DATE_FORMATTER.get().format(new Date(this.clock.millis())) + " " + line);
 				first = false;
 			}
 			else {
@@ -149,7 +174,7 @@ public class AsyncTaskEventListener implements TaskEventListener, AsyncTask {
 		if (!this.lifeCycle.compareAndSet(TaskState.UNSTARTED, TaskState.RUNNING)) {
 			throw new IllegalStateException("Failed to mark task as running; current state=" + this.lifeCycle.get() + ".");
 		}
-		this.startTime.set(System.currentTimeMillis());
+		this.startTime.set(this.clock.millis());
 		addToAllMessages("Started.");
 	}
 
@@ -195,9 +220,10 @@ public class AsyncTaskEventListener implements TaskEventListener, AsyncTask {
 	}
 
 	@Override
-	public void done () {
+	public void done(final TaskOutcome taskOutcome) {
 		if (this.lifeCycle.compareAndSet(TaskState.RUNNING, TaskState.COMPLETE)) {
-			this.endTime.set(System.currentTimeMillis());
+			this.endTime.set(this.clock.millis());
+			this.outcome.compareAndSet(null, taskOutcome);
 			addToAllMessages("Done.");
 		}
 	}
@@ -224,7 +250,7 @@ public class AsyncTaskEventListener implements TaskEventListener, AsyncTask {
 	public String title () {
 		final String name = this.taskName.get();
 		if (StringHelper.notBlank(name)) return name;
-		return "<task>";
+		return MISSING_TITLE;
 	}
 	@Override
 	public TaskState state () {
@@ -253,22 +279,46 @@ public class AsyncTaskEventListener implements TaskEventListener, AsyncTask {
 	public int progressTotal () {
 		return this.progressTotal.get();
 	}
+
 	@Override
-	public Boolean successful () {
+	public Boolean successful() {
+		return getFutureOutcome() == TaskOutcome.SUCCESS;
+	}
+
+	private TaskOutcome getFutureOutcome() {
+		final TaskOutcome cached = this.futureOutcome.get();
+		if (cached != null) return cached;
+
+		final TaskOutcome fo = resolveFutureOutcome();
+		if (fo == null) return null;
+
+		if (this.futureOutcome.compareAndSet(null, fo)) {
+			return fo;
+		}
+		return this.futureOutcome.get();
+	}
+
+	private TaskOutcome resolveFutureOutcome() {
 		final Future<?> f = this.future.get();
-		if (f == null || !f.isDone()) return null;
+		if (f == null) return null;
+		if (!f.isDone()) return null;
+		if (f.isCancelled()) return TaskOutcome.CANCELLED;
 
 		try {
 			f.get(); // Check for Exception.
-			return true;
+			return TaskOutcome.SUCCESS;
 		}
 		catch (final ExecutionException e) {
-			return false;
+			if (this.logExceptionFromFuture.compareAndSet(false, true)) {
+				Throwable ex = e;
+				if (e.getCause() != null) ex = e.getCause();
+				logError("Failed", "", ex);
+			}
+			return TaskOutcome.FAILED;
 		}
 		catch (final InterruptedException e) {
 			throw new IllegalStateException("Should not be possible to interupt non blocking call.");
 		}
 	}
 
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

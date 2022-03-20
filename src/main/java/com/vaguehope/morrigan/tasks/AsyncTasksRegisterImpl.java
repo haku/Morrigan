@@ -30,7 +30,7 @@ public class AsyncTasksRegisterImpl implements AsyncTasksRegister {
 			public void run () {
 				final TaskResult result = task.run(taskEventListener);
 				switch (result.getOutcome()) {
-					case CANCELED:
+					case CANCELLED:
 						taskEventListener.logMsg("Result", "cancelled.");
 						break;
 					case FAILED:
@@ -39,7 +39,7 @@ public class AsyncTasksRegisterImpl implements AsyncTasksRegister {
 					case SUCCESS:
 					default:
 				}
-				taskEventListener.done();
+				taskEventListener.done(result.getOutcome());
 			}
 		};
 		final Future<?> future = this.executor.submit(runnable);

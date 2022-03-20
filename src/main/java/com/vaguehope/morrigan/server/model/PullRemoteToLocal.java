@@ -10,8 +10,8 @@ import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.tasks.MorriganTask;
 import com.vaguehope.morrigan.tasks.MultitaskEventListener;
 import com.vaguehope.morrigan.tasks.TaskEventListener;
+import com.vaguehope.morrigan.tasks.TaskOutcome;
 import com.vaguehope.morrigan.tasks.TaskResult;
-import com.vaguehope.morrigan.tasks.TaskResult.TaskOutcome;
 
 public class PullRemoteToLocal implements MorriganTask {
 
@@ -61,7 +61,6 @@ public class PullRemoteToLocal implements MorriganTask {
 				throw new IllegalArgumentException("Failed to get task object from factory method.");
 			}
 
-			taskEventListener.done();
 			return new TaskResult(TaskOutcome.SUCCESS);
 		}
 		catch (final Exception e) {

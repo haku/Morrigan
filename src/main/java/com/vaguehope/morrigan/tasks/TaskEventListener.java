@@ -38,7 +38,7 @@ public interface TaskEventListener {
 	/**
 	 * Called upon cessation of the task, weather erroneous or successful.
 	 */
-	void done ();
+	void done(TaskOutcome outcome);
 
 	/**
 	 * Consuming task will periodically check this method to see if work

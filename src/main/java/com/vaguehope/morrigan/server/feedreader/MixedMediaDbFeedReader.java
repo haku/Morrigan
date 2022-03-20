@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.xml.sax.InputSource;
@@ -25,12 +24,13 @@ import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IRemoteMixedMediaDb;
 import com.vaguehope.morrigan.server.MlistsServlet;
 import com.vaguehope.morrigan.server.model.RemoteMixedMediaDbFactory;
+import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.tasks.TaskEventListener;
+import com.vaguehope.morrigan.tasks.TaskOutcome;
 import com.vaguehope.morrigan.util.httpclient.HttpClient;
 import com.vaguehope.morrigan.util.httpclient.HttpResponse;
 import com.vaguehope.morrigan.util.httpclient.HttpStreamHandler;
 import com.vaguehope.morrigan.util.httpclient.HttpStreamHandlerException;
-import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
 public class MixedMediaDbFeedReader implements HttpStreamHandler {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -76,7 +76,7 @@ public class MixedMediaDbFeedReader implements HttpStreamHandler {
 			throw new MorriganException(e);
 		}
 
-		if (taskEventListener!=null) taskEventListener.done();
+		if (taskEventListener != null) taskEventListener.done(TaskOutcome.SUCCESS);
 	}
 
 	private static void readHttp (final IRemoteMixedMediaDb mmdb, final URI uri, final HttpStreamHandler feedReader) throws DbException, IOException, HttpStreamHandlerException, MalformedURLException, MorriganException {

@@ -11,8 +11,8 @@ import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.tasks.MorriganTask;
 import com.vaguehope.morrigan.tasks.TaskEventListener;
+import com.vaguehope.morrigan.tasks.TaskOutcome;
 import com.vaguehope.morrigan.tasks.TaskResult;
-import com.vaguehope.morrigan.tasks.TaskResult.TaskOutcome;
 import com.vaguehope.morrigan.util.ChecksumHelper;
 
 /**
@@ -78,18 +78,17 @@ public class CopyToLocalMmdbTask<T extends IMediaItem> implements MorriganTask {
 
 			if (taskEventListener.isCanceled()) {
 				taskEventListener.logMsg(this.toDb.getListName(), "Task was canceled desu~.");
-				ret = new TaskResult(TaskOutcome.CANCELED);
+				taskEventListener.done(TaskOutcome.CANCELLED);
+				ret = new TaskResult(TaskOutcome.CANCELLED);
 			}
 			else {
 				ret = new TaskResult(TaskOutcome.SUCCESS);
 			}
-
 		}
 		catch (final Exception e) { // NOSONAR all task errors to be reported by UI.
+			taskEventListener.done(TaskOutcome.FAILED);
 			ret = new TaskResult(TaskOutcome.FAILED, "Throwable while fetching media.", e);
 		}
-
-		taskEventListener.done();
 		return ret;
 	}
 

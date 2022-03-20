@@ -7,8 +7,8 @@ import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemList;
 import com.vaguehope.morrigan.tasks.MorriganTask;
 import com.vaguehope.morrigan.tasks.TaskEventListener;
+import com.vaguehope.morrigan.tasks.TaskOutcome;
 import com.vaguehope.morrigan.tasks.TaskResult;
-import com.vaguehope.morrigan.tasks.TaskResult.TaskOutcome;
 
 public class MediaFileCopyTask<T extends IMediaItem> implements MorriganTask {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -47,17 +47,17 @@ public class MediaFileCopyTask<T extends IMediaItem> implements MorriganTask {
 			}
 
 			if (taskEventListener.isCanceled()) {
-				ret = new TaskResult(TaskOutcome.CANCELED);
+				taskEventListener.done(TaskOutcome.CANCELLED);
+				ret = new TaskResult(TaskOutcome.CANCELLED);
 			}
 			else {
 				ret = new TaskResult(TaskOutcome.SUCCESS);
 			}
 		}
 		catch (final Exception e) {
+			taskEventListener.done(TaskOutcome.FAILED);
 			ret = new TaskResult(TaskOutcome.FAILED, "Failed to copy all files.", e);
 		}
-
-		taskEventListener.done();
 		return ret;
 	}
 

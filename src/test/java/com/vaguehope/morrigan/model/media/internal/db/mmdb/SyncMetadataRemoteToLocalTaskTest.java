@@ -17,8 +17,8 @@ import com.vaguehope.morrigan.model.media.test.Tag;
 import com.vaguehope.morrigan.model.media.test.TestMixedMediaDb;
 import com.vaguehope.morrigan.model.media.test.TestRemoteDb;
 import com.vaguehope.morrigan.tasks.AsyncTaskEventListener;
+import com.vaguehope.morrigan.tasks.TaskOutcome;
 import com.vaguehope.morrigan.tasks.TaskResult;
-import com.vaguehope.morrigan.tasks.TaskResult.TaskOutcome;
 
 public class SyncMetadataRemoteToLocalTaskTest {
 
