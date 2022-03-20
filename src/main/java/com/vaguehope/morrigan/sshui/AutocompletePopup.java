@@ -15,16 +15,25 @@ public class AutocompletePopup extends BasicWindow {
 
 	private static final int MAX_LIST_ROWS = 8;
 
+	@SuppressWarnings("resource")
 	public static AutocompletePopup makeAndShow(final TextBox textBox, final List<Runnable> actions, final Runnable onClose) {
 		final AutocompletePopup ap = new AutocompletePopup(textBox, actions, onClose);
-		ap.setPosition(textBox.toGlobal(new TerminalPosition(0, 1)));
-		((WindowBasedTextGUI) textBox.getTextGUI()).addWindow(ap);
+
+		final TerminalPosition pos = textBox.toGlobal(new TerminalPosition(textBox.getCursorLocation().getColumn() - 1, 1));
+		final WindowBasedTextGUI gui = (WindowBasedTextGUI) textBox.getTextGUI();
+		final int x = Math.min(
+				pos.getColumn(),
+				gui.getScreen().getTerminalSize().getColumns() - ap.getListWidth() - 3);
+		ap.setPosition(pos.withColumn(x));
+
+		gui.addWindow(ap);
 		return ap;
 	}
 
 	private final TextBox textBox;
 	private final ActionListBox list;
 	private final Runnable onClose;
+	private final int listWidth;
 
 	public AutocompletePopup(final TextBox textBox, final List<Runnable> actions, final Runnable onClose) {
 		super();
@@ -46,9 +55,11 @@ public class AutocompletePopup extends BasicWindow {
 			}
 			longest = Math.max(longest, aLen);
 		}
+		this.listWidth = longest;
+
 		this.list = new ActionListBox(textBox.getSize()
 				.withRows(Math.min(actions.size(), MAX_LIST_ROWS))
-				.withColumns(longest));
+				.withColumns(this.listWidth));
 
 		for (final Runnable a : actions) {
 			this.list.addItem(new Runnable() {
@@ -72,6 +83,10 @@ public class AutocompletePopup extends BasicWindow {
 	public void close() {
 		super.close();
 		this.onClose.run();
+	}
+
+	public int getListWidth() {
+		return this.listWidth;
 	}
 
 	public boolean offerInput(final KeyStroke key) {
