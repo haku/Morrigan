@@ -2,6 +2,7 @@ package com.vaguehope.morrigan.model.media.internal.db.mmdb;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -462,6 +463,11 @@ public class MixedMediaSqliteLayerOuterTest {
 		mockMediaFileWithNameFragmentAndTags("foobar", "abc");
 		final IMixedMediaItem nonMatch = mockMediaFileWithTags("abc");
 		assertSingleResult(nonMatch, runSearch("t=abc -f~foo"));
+	}
+
+	@Test
+	public void itDoesNotCrashWithBadQuery() throws Exception {
+		runSearch("t=\"a very long tag that does not fit on the screen properl");
 	}
 
 	private void addNoiseToDb () throws Exception {

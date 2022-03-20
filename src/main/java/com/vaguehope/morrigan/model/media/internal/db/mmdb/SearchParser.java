@@ -4,45 +4,19 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer.SortDirection;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.internal.db.SqliteHelper;
+import com.vaguehope.morrigan.util.QuerySplitter;
+import com.vaguehope.morrigan.util.QuoteRemover;
 
 class SearchParser {
 
 	private static final int MAX_SEARCH_TERMS = 10;
-
-	private static final Pattern SEARCH_TERM_FINDER = Pattern.compile(
-			"("
-			+ "^\\("
-			+ "|"
-			+ "[\\s　]\\("
-			+ "|"
-			+ "\\)$"
-			+ "|"
-			+ "\\)[\\s　]"
-			+ "|"
-			+ "[^\\s　]*\"([^\"\\\\]*(\\\\[^\"])*(\\\\\")?)+\"([^\\s　\\)]|(\\)[^\\s　]))*"
-			+ "|"
-			+ "[^\\s　]*'([^'\\\\]*(\\\\[^'])*(\\\\')?)+'([^\\s　\\)]|(\\)[^\\s　]))*"
-			+ "|"
-			+ "([^\\s　\\)]|(\\)[^\\s　]))+"
-			+ ")");
-
-	private static final Pattern PAIRED_QUOTES_FINDER = Pattern.compile(
-			"([^'\"\\\\]*)"
-			+ "(?:"
-			+ "(\")((?:[^\"\\\\]*(?:\\\\[^\"])*(?:\\\\\")?)+)\""
-			+ "|"
-			+ "(')((?:[^'\\\\]*(?:\\\\[^'])*(?:\\\\')?)+)'"
-			+ ")");
 
 	private static final String _SQL_MEDIAFILES_SELECT =
 			"SELECT id,file,type,md5,added,modified,enabled,enabledmodified,missing,remloc,startcnt,endcnt,lastplay,duration,width,height"
@@ -110,8 +84,7 @@ class SearchParser {
 		if (sorts != null && directions != null && sorts.length != directions.length) throw new IllegalArgumentException("Sorts and directions must be same length.");
 
 		final StringBuilder sql = new StringBuilder(_SQL_MEDIAFILES_SELECT);
-		final List<String> terms = splitTerms(allTerms);
-		//System.out.println(allTerms + " --> " + terms.size() + " terms: " + terms);
+		final List<String> terms = QuerySplitter.split(allTerms, MAX_SEARCH_TERMS);
 		appendWhere(sql, mediaType, excludeMissing, excludeDisabled, terms);
 		if (sorts != null && directions != null && sorts.length > 0 && directions.length > 0) {
 			sql.append(" ORDER BY ");
@@ -125,23 +98,6 @@ class SearchParser {
 		}
 		sql.append(";");
 		return new Search(sql.toString(), mediaType, terms);
-	}
-
-	private static List<String> splitTerms (final String allTerms) {
-		final List<String> terms = new ArrayList<String>();
-		if (allTerms == null) return terms;
-
-		final Matcher m = SEARCH_TERM_FINDER.matcher(allTerms);
-		while (m.find()) {
-			String g = m.group(1);
-			if (g != null) {
-				g = g.trim();
-				if (g.length() > 0) terms.add(g);
-				if (terms.size() >= MAX_SEARCH_TERMS) break;
-			}
-		}
-
-		return terms;
 	}
 
 	private static void appendWhere (final StringBuilder sql, final MediaType mediaType, final boolean excludeMissing,
@@ -293,32 +249,6 @@ class SearchParser {
 		return ret;
 	}
 
-	protected static String unquote (final String term) {
-		final Matcher m = PAIRED_QUOTES_FINDER.matcher(term);
-		final StringBuffer sb = new StringBuffer();
-		while (m.find()) {
-			String quoteType = null;
-			String r = "";
-			for (int i = 1; i <= m.groupCount(); i++) {
-				final String g = m.group(i);
-				if (g == null) continue;
-
-				if (i == 2 || i == 4) {
-					quoteType = g;
-				}
-				else {
-					r += g;
-				}
-			}
-			//System.out.println("q:" + quoteType + " r:" + r);
-			r = r.replace("\\" + quoteType, quoteType);
-			m.appendReplacement(sb, r.replace("\\", "\\\\"));
-		}
-		m.appendTail(sb);
-		//System.out.println(term + " --> " + sb.toString());
-		return sb.toString();
-	}
-
 	public static class Search {
 
 		private final String sql;
@@ -356,15 +286,15 @@ class SearchParser {
 					if (")".equals(term)) continue;
 					if (isFileMatchPartial(term) || isFileNotMatchPartial(term)
 							|| isTagMatchPartial(term) || isTagNotMatchPartial(term)) {
-						ps.setString(parmIn++, anchoredOrWildcardEnds(SqliteHelper.escapeSearch(unquote(removeMatchOperator(term)))));
+						ps.setString(parmIn++, anchoredOrWildcardEnds(SqliteHelper.escapeSearch(QuoteRemover.unquote(removeMatchOperator(term)))));
 						ps.setString(parmIn++, SqliteHelper.SEARCH_ESC);
 					}
 					else if (isTagMatchExact(term) || isTagNotMatchExact(term)) {
-						ps.setString(parmIn++, SqliteHelper.escapeSearch(unquote(removeMatchOperator(term))));
+						ps.setString(parmIn++, SqliteHelper.escapeSearch(QuoteRemover.unquote(removeMatchOperator(term))));
 						ps.setString(parmIn++, SqliteHelper.SEARCH_ESC);
 					}
 					else {
-						final String escapedTerm = SqliteHelper.escapeSearch(unquote(term));
+						final String escapedTerm = SqliteHelper.escapeSearch(QuoteRemover.unquote(term));
 						ps.setString(parmIn++, "%" + escapedTerm + "%");
 						ps.setString(parmIn++, SqliteHelper.SEARCH_ESC);
 						ps.setString(parmIn++, "%" + escapedTerm + "%");
