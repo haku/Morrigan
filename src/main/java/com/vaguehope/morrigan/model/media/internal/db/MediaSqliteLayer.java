@@ -17,6 +17,7 @@ import com.vaguehope.morrigan.model.helper.EqualHelper;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.IMediaItemStorageLayerChangeListener;
+import com.vaguehope.morrigan.model.media.MatchMode;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.MediaAlbum;
 import com.vaguehope.morrigan.model.media.MediaTag;
@@ -105,9 +106,9 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	}
 
 	@Override
-	public Map<String, MediaTag> tagSearch (final String prefix, final int resLimit) throws DbException {
+	public Map<String, MediaTag> tagSearch (final String query, MatchMode mode, final int resLimit) throws DbException {
 		try {
-			return local_tagSearch(prefix, resLimit);
+			return local_tagSearch(query, mode, resLimit);
 		} catch (Exception e) {
 			throw new DbException(e);
 		}
@@ -877,11 +878,22 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		}
 	}
 
-	private Map<String, MediaTag> local_tagSearch (final String prefix, final int resLimit) throws SQLException, ClassNotFoundException, DbException {
+	private Map<String, MediaTag> local_tagSearch (final String query, MatchMode mode, final int resLimit) throws SQLException, ClassNotFoundException, DbException {
+		String likeParam = SqliteHelper.escapeSearch(query) + "%";
+		switch (mode) {
+		case SUBSTRING:
+			likeParam = "%" + likeParam;
+			break;
+		case PREFIX:
+			break;
+		default:
+			throw new IllegalArgumentException("Unknown mode: " + mode);
+		}
+
 		final PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_TAGS_SEARCH);
 		try {
 			ps.setInt(1, MediaTagType.MANUAL.getIndex()); // Force this as including automatic tags makes no sense.
-			ps.setString(2, SqliteHelper.escapeSearch(prefix) + "%");
+			ps.setString(2, likeParam);
 			ps.setString(3, SqliteHelper.SEARCH_ESC);
 			ps.setMaxRows(resLimit);
 			final ResultSet rs = ps.executeQuery();

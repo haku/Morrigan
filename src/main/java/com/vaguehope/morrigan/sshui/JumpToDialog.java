@@ -35,6 +35,7 @@ import com.googlecode.lanterna.input.KeyStroke;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMixedMediaDb;
+import com.vaguehope.morrigan.model.media.MatchMode;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
@@ -211,8 +212,17 @@ public class JumpToDialog extends DialogWindow {
 
 						if (partialQuery.activeTerm != null) {
 							String tagQuery = partialQuery.activeTerm;
-							if (tagQuery.startsWith("t=")) tagQuery = tagQuery.substring(2);
-							final Map<String, MediaTag> tags = this.dlg.db.tagSearch(tagQuery, MAX_AUTOCOMPLETE_RESULTS);
+
+							MatchMode matchMode = MatchMode.PREFIX;
+							if (tagQuery.startsWith("t=")) {
+								tagQuery = tagQuery.substring(2);
+							}
+							else if (tagQuery.startsWith("t~")) {
+								tagQuery = tagQuery.substring(2);
+								matchMode = MatchMode.SUBSTRING;
+							}
+
+							final Map<String, MediaTag> tags = this.dlg.db.tagSearch(tagQuery, matchMode, MAX_AUTOCOMPLETE_RESULTS);
 							this.dlg.getTextGUI().getGUIThread().invokeLater(new ShowAutocomplete(this.dlg, partialQuery, tags));
 						}
 

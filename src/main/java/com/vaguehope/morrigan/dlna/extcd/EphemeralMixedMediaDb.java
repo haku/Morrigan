@@ -26,6 +26,7 @@ import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMixedMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.IMixedMediaStorageLayer;
 import com.vaguehope.morrigan.model.media.ItemTags;
+import com.vaguehope.morrigan.model.media.MatchMode;
 import com.vaguehope.morrigan.model.media.MediaAlbum;
 import com.vaguehope.morrigan.model.media.MediaItemListChangeListener;
 import com.vaguehope.morrigan.model.media.MediaTag;
@@ -199,7 +200,7 @@ public abstract class EphemeralMixedMediaDb implements IMixedMediaDb {
 	}
 
 	@Override
-	public Map<String, MediaTag> tagSearch (final String prefix, final int resLimit) throws MorriganException {
+	public Map<String, MediaTag> tagSearch (final String query, final MatchMode mode, final int resLimit) throws MorriganException {
 		return Collections.emptyMap();
 	}
 

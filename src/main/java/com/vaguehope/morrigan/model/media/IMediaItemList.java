@@ -76,7 +76,7 @@ public interface IMediaItemList<T extends IMediaItem> {
 	void addTagClassification (String classificationName) throws MorriganException;
 	MediaTagClassification getTagClassification (String classificationName) throws MorriganException;
 	List<MediaTag> getTopTags (int countLimit) throws MorriganException;
-	Map<String, MediaTag> tagSearch (String prefix, int resLimit) throws MorriganException;
+	Map<String, MediaTag> tagSearch (String query, MatchMode mode, int resLimit) throws MorriganException;
 	boolean hasTagsIncludingDeleted (IDbItem item) throws MorriganException;
 	boolean hasTag (IDbItem item, String tag, MediaTagType type, MediaTagClassification mtc) throws MorriganException;
 

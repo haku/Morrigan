@@ -26,6 +26,7 @@ import com.googlecode.lanterna.input.KeyType;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
+import com.vaguehope.morrigan.model.media.MatchMode;
 import com.vaguehope.morrigan.model.media.MediaTag;
 import com.vaguehope.morrigan.model.media.MediaTagClassification;
 import com.vaguehope.morrigan.model.media.MediaTagType;
@@ -132,7 +133,7 @@ public class TagEditor extends DialogWindow {
 			final String input = getText();
 			final Map<String, MediaTag> tags;
 			try {
-				tags = this.tagEditor.list.tagSearch(input, MAX_AUTOCOMPLETE_RESULTS);
+				tags = this.tagEditor.list.tagSearch(input, MatchMode.SUBSTRING, MAX_AUTOCOMPLETE_RESULTS);
 			}
 			catch (final MorriganException e) {
 				MessageDialog.showMessageDialog(this.tagEditor.getTextGUI(), "Error searching tags", e.toString());

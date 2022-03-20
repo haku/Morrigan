@@ -38,6 +38,7 @@ import com.vaguehope.morrigan.model.media.IMixedMediaItem;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.IMixedMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.ItemTags;
+import com.vaguehope.morrigan.model.media.MatchMode;
 import com.vaguehope.morrigan.model.media.MediaAlbum;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.MediaListReference;
@@ -580,7 +581,7 @@ public class MlistsServlet extends HttpServlet {
 			final String term = StringHelper.trimToEmpty(req.getParameter(PARAM_TERM));
 			Integer count = ServletHelper.readParamInteger(req, PARAM_COUNT);
 			if (count == null || count < 1) count = 10;
-			final Map<String, MediaTag> tags = mmdb.tagSearch(term, count);
+			final Map<String, MediaTag> tags = mmdb.tagSearch(term, MatchMode.PREFIX, count);
 			@SuppressWarnings("rawtypes")
 			final Map[] arr = new Map[tags.size()];
 			int i = 0;
