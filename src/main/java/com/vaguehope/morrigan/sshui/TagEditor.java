@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.AbstractListBox;
@@ -80,6 +81,7 @@ public class TagEditor extends DialogWindow {
 		private static final String HINT_MSG = "Tab to autocomplete";
 
 		private final TagEditor tagEditor;
+		private AutocompletePopup autocompletePopup;
 
 		public AddTagTextBox (final TerminalSize preferredSize, final TagEditor tagEditor) {
 			super(preferredSize);
@@ -102,13 +104,16 @@ public class TagEditor extends DialogWindow {
 
 		@Override
 		public synchronized Result handleKeyStroke (final KeyStroke key) {
+			if (this.autocompletePopup != null && this.autocompletePopup.offerInput(key)) {
+				return Result.HANDLED;
+			}
+
 			switch (key.getKeyType()) {
 				case Tab:
-					autocomplete();
+					showAutocomplete();
 					return Result.HANDLED;
 				case Enter:
 					addTag();
-					resetAutocomplete(null);
 					return Result.HANDLED;
 				case Character:
 					if (key.isCtrlDown() && key.getCharacter() == 'u') {
@@ -117,9 +122,58 @@ public class TagEditor extends DialogWindow {
 					}
 					//$FALL-THROUGH$
 				default:
-					resetAutocomplete(null);
 					return super.handleKeyStroke(key);
 			}
+		}
+
+		private void showAutocomplete() {
+			closeAutocomplete();
+
+			final String input = getText();
+			final Map<String, MediaTag> tags;
+			try {
+				tags = this.tagEditor.list.tagSearch(input, MAX_AUTOCOMPLETE_RESULTS);
+			}
+			catch (final MorriganException e) {
+				MessageDialog.showMessageDialog(this.tagEditor.getTextGUI(), "Error searching tags", e.toString());
+				return;
+			}
+
+			final List<Runnable> actions = new ArrayList<>();
+			for (final Entry<String, MediaTag> e : tags.entrySet()) {
+				actions.add(new Runnable() {
+					@Override
+					public void run() {
+						final MediaTag tag = e.getValue();
+						setText(tag.getTag());
+						setCaretPosition(tag.getTag().length());
+					}
+
+					@Override
+					public String toString() {
+						return e.getKey();
+					}
+				});
+			}
+
+			if (actions.size() < 1) {
+				actions.add(new Runnable() {
+					@Override
+					public void run() {/* nothing */}
+					@Override
+					public String toString() {
+						return "(no results)";
+					}
+				});
+			}
+
+			this.autocompletePopup = AutocompletePopup.makeAndShow(this, actions, () -> this.autocompletePopup = null);
+		}
+
+		private void closeAutocomplete() {
+			if (this.autocompletePopup == null) return;
+			this.autocompletePopup.close();
+			this.autocompletePopup = null;
 		}
 
 		private void addTag () {
@@ -133,42 +187,6 @@ public class TagEditor extends DialogWindow {
 			catch (final MorriganException e) {
 				MessageDialog.showMessageDialog(this.tagEditor.getTextGUI(), "Error adding tag", e.toString());
 			}
-		}
-
-		private List<MediaTag> suggestions;
-		private int suggestionIndex;
-
-		private void autocomplete () {
-			if (this.suggestions != null && this.suggestions.size() > 0) {
-				this.suggestionIndex += 1;
-				if (this.suggestionIndex >= this.suggestions.size()) this.suggestionIndex = 0;
-				final MediaTag tag = this.suggestions.get(this.suggestionIndex);
-				setText(tag.getTag());
-				setCaretPosition(tag.getTag().length());
-				return;
-			}
-
-			final String input = getText();
-			if (input == null || input.length() < 1) return;
-
-			try {
-				final Map<String, MediaTag> searchRes = this.tagEditor.list.tagSearch(input, MAX_AUTOCOMPLETE_RESULTS);
-				resetAutocomplete(new ArrayList<>(searchRes.values()));
-
-				if (searchRes.size() > 0) {
-					final MediaTag tag = searchRes.values().iterator().next();
-					setText(tag.getTag());
-					setCaretPosition(tag.getTag().length());
-				}
-			}
-			catch (final MorriganException e) {
-				MessageDialog.showMessageDialog(this.tagEditor.getTextGUI(), "Error searching tags", e.toString());
-			}
-		}
-
-		private void resetAutocomplete (final List<MediaTag> items) {
-			this.suggestions = items;
-			this.suggestionIndex = 0;
 		}
 
 	}
