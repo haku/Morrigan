@@ -179,10 +179,14 @@ public class AsyncTaskEventListener implements TaskEventListener, AsyncTask {
 	}
 
 	@Override
+	public void logMsg(String s) {
+		this.lastMsg.set(s);
+		addToAllMessages(s);
+	}
+
+	@Override
 	public void logMsg (final String topic, final String s) {
-		final String m = topic + ": " + s;
-		this.lastMsg.set(m);
-		addToAllMessages(m);
+		logMsg(topic + ": " + s);
 	}
 
 	@Override

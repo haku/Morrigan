@@ -14,6 +14,11 @@ public class MultitaskEventListener implements TaskEventListener {
 	}
 
 	@Override
+	public void logMsg(String s) {
+		this.parent.logMsg(s);
+	}
+
+	@Override
 	public void logMsg (final String topic, final String s) {
 		this.parent.logMsg(topic, s);
 	}
@@ -75,6 +80,11 @@ public class MultitaskEventListener implements TaskEventListener {
 		@Override
 		public void onStart () {
 			// NOOP.
+		}
+
+		@Override
+		public void logMsg(String s) {
+			this.parent.logMsg(s);
 		}
 
 		@Override

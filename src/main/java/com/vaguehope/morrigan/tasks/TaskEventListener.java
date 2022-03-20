@@ -9,6 +9,11 @@ public interface TaskEventListener {
 	void onStart ();
 
 	/**
+	 * If possible, specify a topic as well.
+	 */
+	void logMsg (String s);
+
+	/**
 	 * Report a message to the user.  This will form part of the task's output
 	 * report.
 	 */

@@ -1,5 +1,6 @@
 package com.vaguehope.morrigan.transcode;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +13,8 @@ import com.vaguehope.morrigan.tasks.TaskOutcome;
 import com.vaguehope.morrigan.tasks.TaskResult;
 
 public class TranscodeTask implements MorriganTask {
+
+	private static final int MAX_CONSECUTIVE_FAILURES = 5;
 
 	private final Transcoder transcoder;
 	private final Transcode transcode;
@@ -50,20 +53,40 @@ public class TranscodeTask implements MorriganTask {
 				profiles.add(profile);
 			}
 
+			int totalFailures = 0;
 			if (profiles.size() > 0) {
 				taskEventListener.beginTask(getTitle(), profiles.size());
+				int consecutiveFailures = 0;
 				for (final TranscodeProfile profile : profiles) {
 					if (taskEventListener.isCanceled()) break;
 
-					taskEventListener.subTask(profile.getItem().getTitle());
-					this.transcoder.transcodeToFile(profile);
+					final String topic = profile.getItem().getTitle();
+					taskEventListener.subTask(topic);
+					try {
+						this.transcoder.transcodeToFile(profile);
+						consecutiveFailures = 0;
+					}
+					catch (final IOException e) {
+						taskEventListener.logError(topic, "Transcode failed.", e);
+						totalFailures += 1;
+						consecutiveFailures += 1;
+						if (consecutiveFailures > MAX_CONSECUTIVE_FAILURES) {
+							taskEventListener.logMsg(consecutiveFailures + " consecutive failures, aborting task.");
+							throw e;
+						}
+					}
 					taskEventListener.worked(1);
 				}
+			}
+
+			if (totalFailures > 0) {
+				return new TaskResult(TaskOutcome.FAILED, totalFailures + " transcodes failed.", null);
 			}
 
 			if (taskEventListener.isCanceled()) {
 				return new TaskResult(TaskOutcome.CANCELLED);
 			}
+
 			return new TaskResult(TaskOutcome.SUCCESS);
 		}
 		catch (final Exception e) {
