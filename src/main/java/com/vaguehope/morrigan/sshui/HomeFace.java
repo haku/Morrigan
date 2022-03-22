@@ -45,7 +45,7 @@ public class HomeFace extends MenuFace {
 
 	private static final Function<Player, String> PLAYER_TO_STRING = p -> {
 		if (p.isDisposed()) return " (disposed)";
-		return String.format(" %s %s %s",
+		return String.format(" %s: %s. %s",
 				p.getName(), PrintingThingsHelper.playerStateMsg(p), PrintingThingsHelper.playingItemTitle(p));
 	};
 

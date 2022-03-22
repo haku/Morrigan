@@ -387,17 +387,19 @@ public class PlayerFace extends DefaultFace {
 		int l = top;
 
 		String volMsg = PrintingThingsHelper.volumeMsg(this.player);
-		if (StringHelper.notBlank(volMsg)) volMsg = "  " + volMsg;
+		if (StringHelper.notBlank(volMsg)) volMsg = volMsg + "  ";
 
-		tg.putString(0, l++, String.format("%s:  %s%s  %s.  %s.",
+		tg.putString(0, l++, String.format("%s:  %s%s.  %s.",
 				this.player.getName(),
-				PrintingThingsHelper.playerStateMsg(this.player),
 				volMsg,
 				PrintingThingsHelper.listTitleAndOrder(this.player),
 				this.player.getTranscode()));
 		tg.putString(1, l++, PrintingThingsHelper.playingItemTitle(this.player));
 		tg.putString(1, l++, this.tagSummary);
-		drawPrgBar(tg, l++, columns);
+
+		final String stateMsg = PrintingThingsHelper.playerStateMsg(this.player);
+		tg.putString(1, l, stateMsg);
+		drawPrgBar(tg, stateMsg.length() + 2, l++, columns);
 
 		final PlayerQueue pq = this.player.getQueue();
 		tg.putString(0, l++, PrintingThingsHelper.queueSummary(pq));
@@ -446,14 +448,18 @@ public class PlayerFace extends DefaultFace {
 	private String lastPrgBar = null;
 	private long lastPrg = -1;
 
-	private void drawPrgBar (final TextGraphics tg, final int l, final int screenWidth) {
-		final int barWidth = screenWidth - 2;
+	private void drawPrgBar (final TextGraphics tg, final int leftColumn, final int row, final int screenWidth) {
+		final int barWidth = screenWidth - leftColumn - 1;
+		final long pos = this.player.getCurrentPosition();
 		final int total = this.player.getCurrentTrackDuration();
-		final long prg = total < 1 ? 0 : (long) ((this.player.getCurrentPosition() / (double) total) * barWidth);
+
+		final long prg = total < 1 || pos < 0
+				? -1
+				: (long) ((pos / (double) total) * barWidth);
 
 		if (prg != this.lastPrg || this.lastPrgBar == null || this.lastPrgBar.length() != barWidth) {
 			this.lastPrg = prg;
-			if (prg > 0 && barWidth > 0) {
+			if (prg >= 0 && barWidth > 0) {
 				final StringBuilder b = new StringBuilder(barWidth);
 				b.setLength(barWidth);
 				for (int i = 0; i < barWidth; i++) {
@@ -466,7 +472,7 @@ public class PlayerFace extends DefaultFace {
 			}
 		}
 
-		tg.putString(1, l, this.lastPrgBar);
+		tg.putString(leftColumn, row, this.lastPrgBar);
 	}
 
 }

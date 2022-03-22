@@ -42,7 +42,6 @@ public final class PrintingThingsHelper {
 		}
 
 		if (p instanceof LocalPlayer && ((LocalPlayer) p).isProxy()) msg.append(" @ ").append(p.getName());
-		msg.append(".");
 
 		return msg.toString();
 	}
