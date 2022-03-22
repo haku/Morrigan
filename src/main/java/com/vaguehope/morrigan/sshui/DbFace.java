@@ -18,6 +18,8 @@ import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.googlecode.lanterna.gui2.dialogs.ActionListDialog;
 import com.googlecode.lanterna.gui2.dialogs.ActionListDialogBuilder;
+import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
+import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.screen.Screen;
 import com.vaguehope.morrigan.model.db.IDbColumn;
@@ -229,7 +231,7 @@ public class DbFace extends DefaultFace {
 						toggleSelection();
 						return true;
 					case 'X':
-						emptySelection();
+						askEmptySelection(gui);
 						return true;
 					case 'w':
 						askExportSelection(gui);
@@ -360,7 +362,11 @@ public class DbFace extends DefaultFace {
 		updateItemDetailsBar();
 	}
 
-	private void emptySelection () throws MorriganException {
+	private void askEmptySelection (final WindowBasedTextGUI gui) throws MorriganException {
+		if (MessageDialog.showMessageDialog(gui, "Selected Items", "Unselect all items?",
+				MessageDialogButton.No, MessageDialogButton.Yes) != MessageDialogButton.Yes) {
+			return;
+		}
 		this.selectedItems.clear();
 	}
 
