@@ -50,6 +50,7 @@ public class DbFace extends DefaultFace {
 			"      t\ttag editor\n" +
 			"      v\tselect\n" +
 			"      x\tselect\n" +
+			"      X\tempty selection\n" +
 			"      w\tcopy file(s)\n" +
 			"      d\ttoggle item(s) enabled\n" +
 			"      r\trefresh query\n" +
@@ -227,6 +228,9 @@ public class DbFace extends DefaultFace {
 					case 'x':
 						toggleSelection();
 						return true;
+					case 'X':
+						emptySelection();
+						return true;
 					case 'w':
 						askExportSelection(gui);
 						return true;
@@ -351,6 +355,10 @@ public class DbFace extends DefaultFace {
 		if (item == null) return;
 		if (!this.selectedItems.remove(item)) this.selectedItems.add(item);
 		updateItemDetailsBar();
+	}
+
+	private void emptySelection () throws MorriganException {
+		this.selectedItems.clear();
 	}
 
 	private void askExportSelection (final WindowBasedTextGUI gui) {
