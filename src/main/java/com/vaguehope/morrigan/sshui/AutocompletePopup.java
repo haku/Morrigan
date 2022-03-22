@@ -10,6 +10,7 @@ import com.googlecode.lanterna.gui2.BasicWindow;
 import com.googlecode.lanterna.gui2.TextBox;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.googlecode.lanterna.input.KeyStroke;
+import com.googlecode.lanterna.input.KeyType;
 
 public class AutocompletePopup extends BasicWindow {
 
@@ -98,6 +99,12 @@ public class AutocompletePopup extends BasicWindow {
 		case ArrowDown:
 		case Enter:
 			this.list.handleKeyStroke(key);
+			return true;
+		case Tab:
+			this.list.handleInput(new KeyStroke(KeyType.ArrowDown));
+			return true;
+		case ReverseTab:
+			this.list.handleInput(new KeyStroke(KeyType.ArrowUp));
 			return true;
 		default:
 			return false;
