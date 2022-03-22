@@ -17,6 +17,12 @@ import com.googlecode.lanterna.gui2.table.Table;
 
 public class MnTheme {
 
+	public static final TextColor TABBAR_BACKGROUND = TextColor.ANSI.BLACK;
+	public static final TextColor TABBAR_FOREGROUND = TextColor.ANSI.WHITE;
+
+	public static final TextColor STATUSBAR_BACKGROUND = TextColor.ANSI.BLACK;
+	public static final TextColor STATUSBAR_FOREGROUND = TextColor.ANSI.WHITE;
+
 	public static SimpleTheme makeTheme () {
 		final SGR[] activeStyle = new SGR[] { SGR.REVERSE };
 		final TextColor baseForeground = TextColor.ANSI.DEFAULT;

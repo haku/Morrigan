@@ -500,14 +500,14 @@ public class DbFace extends DefaultFace {
 		}
 		tg.disableModifiers(SGR.REVERSE);
 
-		this.textGuiUtils.drawTextRowWithBg(tg, bottom, this.itemDetailsBar, TextColor.ANSI.WHITE, TextColor.ANSI.BLUE, SGR.BOLD);
+		this.textGuiUtils.drawTextRowWithBg(tg, bottom, this.itemDetailsBar, MnTheme.STATUSBAR_FOREGROUND, MnTheme.STATUSBAR_BACKGROUND);
 		final String scroll = " " + PrintingThingsHelper.scrollSummary(this.mediaItems.size(), this.pageSize, this.scrollTop);
 		int left = columns - scroll.length();
-		this.textGuiUtils.drawTextWithBg(tg, left, bottom, scroll, TextColor.ANSI.WHITE, TextColor.ANSI.BLUE, SGR.BOLD);
+		this.textGuiUtils.drawTextWithBg(tg, left, bottom, scroll, MnTheme.STATUSBAR_FOREGROUND, MnTheme.STATUSBAR_BACKGROUND);
 		if (this.selectedItems.size() > 0) {
 			final String status = String.format(" (%s)", this.selectedItems.size());
 			left -= status.length();
-			this.textGuiUtils.drawTextWithBg(tg, left, bottom, status, TextColor.ANSI.WHITE, TextColor.ANSI.BLUE, SGR.BOLD);
+			this.textGuiUtils.drawTextWithBg(tg, left, bottom, status, MnTheme.STATUSBAR_FOREGROUND, MnTheme.STATUSBAR_BACKGROUND);
 
 		}
 	}

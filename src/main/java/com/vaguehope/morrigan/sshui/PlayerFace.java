@@ -9,7 +9,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import com.googlecode.lanterna.SGR;
 import com.googlecode.lanterna.TerminalTextUtils;
-import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.googlecode.lanterna.gui2.dialogs.ActionListDialog;
@@ -127,7 +126,7 @@ public class PlayerFace extends DefaultFace {
 				this.itemDetailsBar = "(no track selected)";
 			}
 		}
-		else {
+		else if (this.selectedItem != null) {
 			this.itemDetailsBar = "(unknown item type)";
 		}
 	}
@@ -439,10 +438,10 @@ public class PlayerFace extends DefaultFace {
 		}
 		tg.disableModifiers(SGR.REVERSE);
 
-		this.textGuiUtils.drawTextRowWithBg(tg, bottom, this.itemDetailsBar, TextColor.ANSI.WHITE, TextColor.ANSI.BLUE, SGR.BOLD);
+		this.textGuiUtils.drawTextRowWithBg(tg, bottom, this.itemDetailsBar, MnTheme.STATUSBAR_FOREGROUND, MnTheme.STATUSBAR_BACKGROUND);
 		this.textGuiUtils.drawTextWithBg(tg, columns - 3, bottom,
 				PrintingThingsHelper.scrollSummary(this.queue.size(), this.pageSize, this.queueScrollTop),
-				TextColor.ANSI.WHITE, TextColor.ANSI.BLUE, SGR.BOLD);
+				MnTheme.STATUSBAR_FOREGROUND, MnTheme.STATUSBAR_BACKGROUND);
 	}
 
 	private String lastPrgBar = null;

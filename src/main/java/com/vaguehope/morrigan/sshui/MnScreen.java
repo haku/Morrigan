@@ -26,6 +26,7 @@ import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.vaguehope.morrigan.sshui.Face.FaceNavigation;
 import com.vaguehope.morrigan.sshui.term.SshScreen;
+import com.vaguehope.morrigan.sshui.util.TextGuiUtils;
 import com.vaguehope.morrigan.util.ErrorHelper;
 
 public class MnScreen extends SshScreen implements FaceNavigation {
@@ -33,6 +34,7 @@ public class MnScreen extends SshScreen implements FaceNavigation {
 	private static final Logger LOG = LoggerFactory.getLogger(MnScreen.class);
 
 	private final MnContext mnContext;
+	private final TextGuiUtils textGuiUtils = new TextGuiUtils();
 
 	private final List<Deque<Face>> tabsAndFaces = new ArrayList<>();
 	private int activeTab = 0;
@@ -163,11 +165,10 @@ public class MnScreen extends SshScreen implements FaceNavigation {
 		try {
 			switch (k.getKeyType()) {
 			case Tab:
-				if (k.isShiftDown()) {
-					prevTab();
-					return true;
-				}
 				nextTab();
+				return true;
+			case ReverseTab:
+				prevTab();
 				return true;
 			case Character:
 				switch (k.getCharacter()) {
@@ -203,22 +204,28 @@ public class MnScreen extends SshScreen implements FaceNavigation {
 		final TerminalSize ts = scr.getTerminalSize();
 		int top = 0;
 		if (this.tabsAndFaces.size() > 1) {
-			int x = 0;
-			for (int i = 0; i < this.tabsAndFaces.size(); i++) {
-				if (i == this.activeTab) {
-					tg.enableModifiers(SGR.REVERSE);
-				}
-				else {
-					tg.disableModifiers(SGR.REVERSE);
-				}
-				final String name = this.tabsAndFaces.get(i).getLast().getTitle();
-				tg.putString(x, 0, name);
-				x += name.length() + 1;
-			}
-			tg.disableModifiers(SGR.REVERSE);
+			drawTabBar(tg);
 			top = 1;
 		}
 		activeFace().writeScreen(scr, tg, top, ts.getRows() - 1, ts.getColumns());
+	}
+
+	private void drawTabBar(final TextGraphics tg) {
+		this.textGuiUtils.drawTextRowWithBg(tg, 0, "", MnTheme.TABBAR_FOREGROUND, MnTheme.TABBAR_BACKGROUND);
+
+		int x = 1;
+		for (int i = 0; i < this.tabsAndFaces.size(); i++) {
+			final String name = this.tabsAndFaces.get(i).getLast().getTitle();
+			if (i == this.activeTab) {
+				tg.putString(x - 1, 0, " ");
+				tg.putString(x, 0, name, SGR.BOLD, SGR.UNDERLINE);
+				tg.putString(x + name.length(), 0, " ");
+			}
+			else {
+				this.textGuiUtils.drawTextWithBg(tg, x, 0, name, MnTheme.TABBAR_FOREGROUND, MnTheme.TABBAR_BACKGROUND);
+			}
+			x += name.length() + 2;
+		}
 	}
 
 }

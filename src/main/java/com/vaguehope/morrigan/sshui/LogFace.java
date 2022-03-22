@@ -3,7 +3,6 @@ package com.vaguehope.morrigan.sshui;
 import java.util.List;
 
 import com.googlecode.lanterna.SGR;
-import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.googlecode.lanterna.input.KeyStroke;
@@ -121,10 +120,10 @@ public class LogFace extends DefaultFace {
 		}
 
 		final String itemDetailsBar = this.messages.size() + " rows.";
-		this.textGuiUtils.drawTextRowWithBg(tg, bottom, itemDetailsBar, TextColor.ANSI.WHITE, TextColor.ANSI.BLUE, SGR.BOLD);
+		this.textGuiUtils.drawTextRowWithBg(tg, bottom, itemDetailsBar, MnTheme.STATUSBAR_FOREGROUND, MnTheme.STATUSBAR_BACKGROUND);
 		this.textGuiUtils.drawTextWithBg(tg, columns - 3, bottom,
 				PrintingThingsHelper.scrollSummary(this.messages.size(), this.pageSize, this.scrollTop),
-				TextColor.ANSI.WHITE, TextColor.ANSI.BLUE, SGR.BOLD);
+				MnTheme.STATUSBAR_FOREGROUND, MnTheme.STATUSBAR_BACKGROUND);
 	}
 
 }
