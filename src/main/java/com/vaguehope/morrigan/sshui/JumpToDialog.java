@@ -130,6 +130,7 @@ public class JumpToDialog extends DialogWindow {
 		final String term = savedSearchTerm.get();
 		if (term != null) {
 			this.txtSearch.setText(term);
+			this.txtSearch.setCaretPosition(term.length());
 			requestSearch(new PartialQuery(term, null, -1));
 		}
 	}
@@ -137,6 +138,7 @@ public class JumpToDialog extends DialogWindow {
 	@Override
 	public void close () {
 		this.alive = false;
+		this.savedSearchTerm.set(this.txtSearch.getText());
 		super.close();
 	}
 
@@ -299,12 +301,6 @@ public class JumpToDialog extends DialogWindow {
 			}
 			this.dlg.showTags(s.toString());
 		}
-	}
-
-	protected String getSearchText () {
-		final String text = this.txtSearch.getText();
-		this.savedSearchTerm.set(text);
-		return text;
 	}
 
 	/**
@@ -606,8 +602,8 @@ public class JumpToDialog extends DialogWindow {
 
 	}
 
-	public static JumpResult show (final WindowBasedTextGUI owner, final IMixedMediaDb db, final AtomicReference<String> savedSearchTerm) {
-		final JumpToDialog dialog = new JumpToDialog(db, savedSearchTerm);
+	public static JumpResult show (final WindowBasedTextGUI owner, final IMixedMediaDb db, final SessionState sessionState) {
+		final JumpToDialog dialog = new JumpToDialog(db, sessionState.savedSearchTerm(db));
 		dialog.showDialog(owner);
 		return dialog.getResult();
 	}

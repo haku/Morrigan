@@ -36,13 +36,15 @@ public class MnScreen extends SshScreen implements FaceNavigation {
 	private final MnContext mnContext;
 	private final TextGuiUtils textGuiUtils = new TextGuiUtils();
 
+	private WindowBasedTextGUI gui;
+	private final SessionState sessionState;
 	private final List<Deque<Face>> tabsAndFaces = new ArrayList<>();
 	private int activeTab = 0;
-	private WindowBasedTextGUI gui;
 
 	public MnScreen (final String name, final MnContext mnContext, final Environment env, final Terminal terminal, final ExitCallback callback) throws IOException {
 		super(name, env, terminal, callback);
 		this.mnContext = mnContext;
+		this.sessionState = new SessionState();
 	}
 
 	@Override
@@ -89,7 +91,7 @@ public class MnScreen extends SshScreen implements FaceNavigation {
 	private void newTab() {
 		this.tabsAndFaces.add(new LinkedList<>());
 		this.activeTab = this.tabsAndFaces.size() - 1;
-		startFace(new HomeFace(this, this.mnContext));
+		startFace(new HomeFace(this, this.sessionState, this.mnContext));
 	}
 
 	private void closeTab() {

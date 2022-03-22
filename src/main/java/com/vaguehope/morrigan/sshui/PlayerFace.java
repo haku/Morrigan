@@ -5,7 +5,6 @@ import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 
 import com.googlecode.lanterna.SGR;
 import com.googlecode.lanterna.TerminalTextUtils;
@@ -67,8 +66,6 @@ public class PlayerFace extends DefaultFace {
 	private final TextGuiUtils textGuiUtils = new TextGuiUtils();
 	private final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
-	private final AtomicReference<String> savedSearchTerm = new AtomicReference<>();
-
 	private long lastDataRefresh = 0;
 	private long lastSlowDataRefresh = 0;
 	private String tagSummary;
@@ -80,11 +77,11 @@ public class PlayerFace extends DefaultFace {
 	private String itemDetailsBar = "";
 	private Object itemDetailsBarItem;
 
-	public PlayerFace (final FaceNavigation navigation, final MnContext mnContext, final Player player) {
+	public PlayerFace (final FaceNavigation navigation, final MnContext mnContext, final SessionState sessionState, final Player player) {
 		super(navigation);
 		this.navigation = navigation;
 		this.player = player;
-		this.dbHelper = new DbHelper(navigation, mnContext, player, null, null);
+		this.dbHelper = new DbHelper(navigation, mnContext, sessionState, player, null, null);
 	}
 
 	private void refreshData () {
@@ -302,7 +299,7 @@ public class PlayerFace extends DefaultFace {
 	}
 
 	private void askJumpTo (final WindowBasedTextGUI gui, final IMixedMediaDb db) throws DbException, MorriganException {
-		this.dbHelper.askSearch(gui, db, this.savedSearchTerm);
+		this.dbHelper.askSearch(gui, db);
 	}
 
 	private void showEditTagsForPlayingItem (final WindowBasedTextGUI gui) throws MorriganException {

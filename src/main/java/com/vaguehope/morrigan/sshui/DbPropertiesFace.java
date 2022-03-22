@@ -7,7 +7,6 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.concurrent.atomic.AtomicReference;
 
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
@@ -42,20 +41,24 @@ public class DbPropertiesFace extends MenuFace {
 
 	private final FaceNavigation navigation;
 	private final MnContext mnContext;
+	private final SessionState sessionState;
 	private final IMixedMediaDb db;
 
 	private final LastActionMessage lastActionMessage = new LastActionMessage();
-	private final AtomicReference<File> savedInitialDir;
 
 	private List<String> sources;
 	private List<Entry<String, URI>> remotes;
 
-	public DbPropertiesFace (final FaceNavigation navigation, final MnContext mnContext, final IMixedMediaDb db, final AtomicReference<File> savedInitialDir) throws Exception {
+	public DbPropertiesFace(
+			final FaceNavigation navigation,
+			final MnContext mnContext,
+			final SessionState sessionState,
+			final IMixedMediaDb db) throws MorriganException, DbException {
 		super(navigation);
 		this.navigation = navigation;
 		this.mnContext = mnContext;
+		this.sessionState = sessionState;
 		this.db = db;
-		this.savedInitialDir = savedInitialDir;
 		refreshLists();
 	}
 
@@ -121,7 +124,7 @@ public class DbPropertiesFace extends MenuFace {
 	}
 
 	private void askAddSource (final WindowBasedTextGUI gui) throws Exception {
-		final File dir = DirDialog.show(gui, "Add Source", "Add", this.savedInitialDir);
+		final File dir = DirDialog.show(gui, "Add Source", "Add", this.sessionState.initialDir);
 		if (dir != null) {
 			this.db.addSource(dir.getAbsolutePath());
 			refreshLists();

@@ -10,7 +10,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.atomic.AtomicReference;
 
 import com.googlecode.lanterna.SGR;
 import com.googlecode.lanterna.TerminalTextUtils;
@@ -34,7 +33,6 @@ import com.vaguehope.morrigan.sshui.MenuHelper.VDirection;
 import com.vaguehope.morrigan.sshui.util.LastActionMessage;
 import com.vaguehope.morrigan.sshui.util.TextGuiUtils;
 import com.vaguehope.morrigan.tasks.MorriganTask;
-import com.vaguehope.morrigan.util.FileHelper;
 
 public class DbFace extends DefaultFace {
 
@@ -54,7 +52,7 @@ public class DbFace extends DefaultFace {
 			"      w\tcopy file(s)\n" +
 			"      d\ttoggle item(s) enabled\n" +
 			"      r\trefresh query\n" +
-			"     f6\tDB properties\n" +
+			"      p\tDB properties\n" +
 			"      q\tback a page\n" +
 			"      h\tthis help text";
 
@@ -63,6 +61,7 @@ public class DbFace extends DefaultFace {
 
 	private final FaceNavigation navigation;
 	private final MnContext mnContext;
+	private final SessionState sessionState;
 	private final IMixedMediaDb db;
 	private final Player defaultPlayer;
 	private final DbHelper dbHelper;
@@ -71,9 +70,7 @@ public class DbFace extends DefaultFace {
 	private final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
 	private final LastActionMessage lastActionMessage = new LastActionMessage();
-	private final AtomicReference<File> savedInitialDir;
 	private final Set<IMixedMediaItem> selectedItems = new HashSet<>();
-	private final AtomicReference<String> savedSearchTerm = new AtomicReference<>();
 
 	private List<IMixedMediaItem> mediaItems;
 	private int selectedItemIndex = -1;
@@ -84,14 +81,20 @@ public class DbFace extends DefaultFace {
 	private IMixedMediaItem itemDetailsBarItem;
 	private boolean saveScrollOnClose = false;
 
-	public DbFace (final FaceNavigation navigation, final MnContext mnContext, final IMixedMediaDb db, final Player defaultPlayer) throws MorriganException {
+
+	public DbFace(
+			final FaceNavigation navigation,
+			final MnContext mnContext,
+			final SessionState sessionState,
+			final IMixedMediaDb db,
+			final Player defaultPlayer) throws MorriganException {
 		super(navigation);
 		this.navigation = navigation;
 		this.mnContext = mnContext;
+		this.sessionState = sessionState;
 		this.db = db;
 		this.defaultPlayer = defaultPlayer;
-		this.dbHelper = new DbHelper(navigation, mnContext, this.defaultPlayer, this.lastActionMessage, this);
-		this.savedInitialDir = new AtomicReference<>(FileHelper.getSomeRootDir());
+		this.dbHelper = new DbHelper(navigation, mnContext, sessionState, this.defaultPlayer, this.lastActionMessage, this);
 		refreshData();
 	}
 
@@ -195,9 +198,6 @@ public class DbFace extends DefaultFace {
 			case End:
 				menuMoveEnd(VDirection.DOWN);
 				return true;
-			case F6:
-				this.navigation.startFace(new DbPropertiesFace(this.navigation, this.mnContext, this.db, this.savedInitialDir));
-				return true;
 			case Enter:
 				playSelection(gui);
 				return true;
@@ -242,6 +242,9 @@ public class DbFace extends DefaultFace {
 						return true;
 					case '/':
 						askSearch(gui);
+						return true;
+					case 'p':
+						this.navigation.startFace(new DbPropertiesFace(this.navigation, this.mnContext, this.sessionState, this.db));
 						return true;
 					case 'r':
 						refreshData();
@@ -364,7 +367,7 @@ public class DbFace extends DefaultFace {
 	private void askExportSelection (final WindowBasedTextGUI gui) {
 		final List<IMixedMediaItem> items = getSelectedItems();
 		if (items.size() < 1) return;
-		final File dir = DirDialog.show(gui, String.format("Export %s tracks", items.size()), "Export", this.savedInitialDir);
+		final File dir = DirDialog.show(gui, String.format("Export %s tracks", items.size()), "Export", this.sessionState.initialDir);
 		if (dir == null) return;
 		final MorriganTask task = this.mnContext.getMediaFactory().getMediaFileCopyTask(this.db, items, dir);
 		this.mnContext.getAsyncTasksRegister().scheduleTask(task);
@@ -398,7 +401,7 @@ public class DbFace extends DefaultFace {
 	}
 
 	private void askSearch (final WindowBasedTextGUI gui) throws DbException, MorriganException {
-		this.dbHelper.askSearch(gui, this.db, this.savedSearchTerm);
+		this.dbHelper.askSearch(gui, this.db);
 	}
 
 	@Override

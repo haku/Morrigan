@@ -1,7 +1,6 @@
 package com.vaguehope.morrigan.sshui;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
@@ -11,22 +10,24 @@ import com.vaguehope.morrigan.model.media.IMediaTrackList;
 import com.vaguehope.morrigan.model.media.IMixedMediaDb;
 import com.vaguehope.morrigan.model.media.MediaListReference;
 import com.vaguehope.morrigan.player.Player;
+import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.sshui.Face.FaceNavigation;
 import com.vaguehope.morrigan.sshui.JumpToDialog.JumpResult;
 import com.vaguehope.morrigan.sshui.util.LastActionMessage;
-import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
 public class DbHelper {
 
 	private final FaceNavigation navigation;
 	private final MnContext mnContext;
+	private final SessionState sessionState;
 	private final Player defaultPlayer;
 	private final LastActionMessage lastActionMessage;
 	private final DbFace defaultDbFace;
 
-	public DbHelper (final FaceNavigation navigation, final MnContext mnContext, final Player defaultPlayer, final LastActionMessage lastActionMessage, final DbFace defaultDbFace) {
+	public DbHelper (final FaceNavigation navigation, final MnContext mnContext, final SessionState sessionState, final Player defaultPlayer, final LastActionMessage lastActionMessage, final DbFace defaultDbFace) {
 		this.navigation = navigation;
 		this.mnContext = mnContext;
+		this.sessionState = sessionState;
 		this.defaultPlayer = defaultPlayer;
 		this.lastActionMessage = lastActionMessage;
 		this.defaultDbFace = defaultDbFace;
@@ -44,8 +45,8 @@ public class DbHelper {
 		throw new IllegalArgumentException("Unknown DB type: " + ref);
 	}
 
-	public void askSearch (final WindowBasedTextGUI gui, final IMixedMediaDb db, final AtomicReference<String> savedSearchTerm) throws DbException, MorriganException {
-		final JumpResult res = JumpToDialog.show(gui, db, savedSearchTerm);
+	public void askSearch (final WindowBasedTextGUI gui, final IMixedMediaDb db) throws DbException, MorriganException {
+		final JumpResult res = JumpToDialog.show(gui, db, this.sessionState);
 		if (res == null) return;
 		switch (res.getType()) {
 			case ENQUEUE:
@@ -76,7 +77,7 @@ public class DbHelper {
 			this.defaultDbFace.revealItem(track);
 		}
 		else {
-			final DbFace dbFace = new DbFace(this.navigation, this.mnContext, db, this.defaultPlayer);
+			final DbFace dbFace = new DbFace(this.navigation, this.mnContext, this.sessionState, db, this.defaultPlayer);
 			dbFace.revealItem(track);
 			this.navigation.startFace(dbFace);
 		}
@@ -88,7 +89,7 @@ public class DbHelper {
 	}
 
 	private void openFilter (final IMixedMediaDb db, final String searchTerm) throws MorriganException, DbException {
-		this.navigation.startFace(new DbFace(this.navigation, this.mnContext,
+		this.navigation.startFace(new DbFace(this.navigation, this.mnContext, this.sessionState,
 				this.mnContext.getMediaFactory().getLocalMixedMediaDb(db.getDbPath(), searchTerm),
 				this.defaultPlayer));
 	}

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 import com.googlecode.lanterna.TerminalSize;
@@ -37,6 +36,7 @@ public class HomeFace extends MenuFace {
 			"       n\tcreate new DB\n" +
 			"       e\tenqueue DB\n" +
 			"       /\tsearch DB\n" +
+			"       p\tproperties\n" +
 			"<ctrl>+c\tcancel task\n" +
 			"       q\tback a page\n" +
 			"       h\tthis help text";
@@ -50,11 +50,11 @@ public class HomeFace extends MenuFace {
 	};
 
 	private final FaceNavigation navigation;
+	private SessionState sessionState;
 	private final MnContext mnContext;
 	private final DbHelper dbHelper;
 
 	private final LastActionMessage lastActionMessage = new LastActionMessage();
-	private final AtomicReference<String> savedSearchTerm = new AtomicReference<>();
 
 	private long lastDataRefresh = 0;
 	private List<Player> players;
@@ -62,11 +62,12 @@ public class HomeFace extends MenuFace {
 	private List<MediaListReference> dbs;
 	private List<SavedView> savedViews;
 
-	public HomeFace (final FaceNavigation actions, final MnContext mnContext) {
+	public HomeFace (final FaceNavigation actions, SessionState sessionState, final MnContext mnContext) {
 		super(actions);
 		this.navigation = actions;
+		this.sessionState = sessionState;
 		this.mnContext = mnContext;
-		this.dbHelper = new DbHelper(this.navigation, mnContext, null, this.lastActionMessage, null);
+		this.dbHelper = new DbHelper(this.navigation, mnContext, this.sessionState, null, this.lastActionMessage, null);
 	}
 
 	@Override
@@ -131,6 +132,9 @@ public class HomeFace extends MenuFace {
 					case '/':
 						askSearch(gui);
 						return true;
+					case 'p':
+						showProperties(gui);
+						return true;
 					case 'c':
 						if (k.isCtrlDown()) {
 							cancelSelectedTask();
@@ -171,18 +175,18 @@ public class HomeFace extends MenuFace {
 	private void menuEnter (final WindowBasedTextGUI gui) throws DbException, MorriganException {
 		if (this.selectionAndScroll.selectedItem == null) return;
 		if (this.selectionAndScroll.selectedItem instanceof Player) {
-			this.navigation.startFace(new PlayerFace(this.navigation, this.mnContext, (Player) this.selectionAndScroll.selectedItem));
+			this.navigation.startFace(new PlayerFace(this.navigation, this.mnContext, this.sessionState, (Player) this.selectionAndScroll.selectedItem));
 		}
 		else if (this.selectionAndScroll.selectedItem instanceof MediaListReference) {
 			final IMixedMediaDb db = this.dbHelper.resolveReference((MediaListReference) this.selectionAndScroll.selectedItem);
-			final DbFace dbFace = new DbFace(this.navigation, this.mnContext, db, null);
+			final DbFace dbFace = new DbFace(this.navigation, this.mnContext, this.sessionState, db, null);
 			dbFace.restoreSavedScroll();
 			this.navigation.startFace(dbFace);
 		}
 		else if (this.selectionAndScroll.selectedItem instanceof SavedView) {
 			final SavedView sv = (SavedView) this.selectionAndScroll.selectedItem;
 			final IMixedMediaDb db = this.mnContext.getMediaFactory().getMixedMediaDbByMid(sv.getDbmid(), sv.getQuery());
-			final DbFace dbFace = new DbFace(this.navigation, this.mnContext, db, null);
+			final DbFace dbFace = new DbFace(this.navigation, this.mnContext, this.sessionState, db, null);
 			dbFace.restoreSavedScroll();
 			this.navigation.startFace(dbFace);
 		}
@@ -221,12 +225,19 @@ public class HomeFace extends MenuFace {
 		if (this.selectionAndScroll.selectedItem instanceof Player) {
 			final IMediaTrackList<? extends IMediaTrack> list = ((Player) this.selectionAndScroll.selectedItem).getCurrentList();
 			if (list instanceof IMixedMediaDb) {
-				this.dbHelper.askSearch(gui, (IMixedMediaDb) list, this.savedSearchTerm);
+				this.dbHelper.askSearch(gui, (IMixedMediaDb) list);
 			}
 		}
 		else if (this.selectionAndScroll.selectedItem instanceof MediaListReference) {
 			final IMixedMediaDb db = this.dbHelper.resolveReference((MediaListReference) this.selectionAndScroll.selectedItem);
-			this.dbHelper.askSearch(gui, db, this.savedSearchTerm);
+			this.dbHelper.askSearch(gui, db);
+		}
+	}
+
+	private void showProperties (final WindowBasedTextGUI gui) throws DbException, MorriganException {
+		if (this.selectionAndScroll.selectedItem instanceof MediaListReference) {
+			final IMixedMediaDb db = this.dbHelper.resolveReference((MediaListReference) this.selectionAndScroll.selectedItem);
+			this.navigation.startFace(new DbPropertiesFace(this.navigation, this.mnContext, this.sessionState, db));
 		}
 	}
 
