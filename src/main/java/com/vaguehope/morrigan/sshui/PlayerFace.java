@@ -12,6 +12,7 @@ import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.googlecode.lanterna.gui2.dialogs.ActionListDialog;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
+import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
@@ -53,6 +54,7 @@ public class PlayerFace extends DefaultFace {
 			"            j\tmove down in queue\n" +
 			"            J\tmove to bottom of queue\n" +
 			"            t\topen tag editor for queue item\n" +
+			"            s\tshuffle queue\n" +
 			"            q\tback a page\n" +
 			"            h\tthis help text";
 
@@ -225,6 +227,9 @@ public class PlayerFace extends DefaultFace {
 					case 'k':
 						moveQueueItem(VDirection.UP);
 						return true;
+					case 's':
+						askShuffleQueue(gui);
+						return true;
 					default:
 				}
 			//$FALL-THROUGH$
@@ -354,6 +359,14 @@ public class PlayerFace extends DefaultFace {
 		if (this.selectedItem instanceof PlayItem) {
 			this.player.getQueue().moveInQueueEnd(Collections.singletonList((PlayItem) this.selectedItem), direction == VDirection.DOWN);
 		}
+	}
+
+	private void askShuffleQueue(final WindowBasedTextGUI gui) {
+		if (MessageDialog.showMessageDialog(gui, "Shuffle Queue?", "Shuffle Queue?",
+				MessageDialogButton.No, MessageDialogButton.Yes) != MessageDialogButton.Yes) {
+			return;
+		}
+		this.player.getQueue().shuffleQueue();
 	}
 
 	private void deleteQueueItem () {

@@ -233,7 +233,7 @@ public class TagEditor extends DialogWindow {
 		private void askDeleteTag () {
 			final MediaTag tag = getSelectedItem();
 			if (tag == null) return;
-			if (MessageDialog.showMessageDialog(this.tagEditor.getTextGUI(), "Delete Tag", tag.toString(), MessageDialogButton.Yes, MessageDialogButton.No) != MessageDialogButton.Yes) return;
+			if (MessageDialog.showMessageDialog(this.tagEditor.getTextGUI(), "Delete Tag?", tag.toString(), MessageDialogButton.No, MessageDialogButton.Yes) != MessageDialogButton.Yes) return;
 			try {
 				this.tagEditor.list.removeTag(tag);
 				this.tagEditor.txtNewTag.setText(tag.getTag());

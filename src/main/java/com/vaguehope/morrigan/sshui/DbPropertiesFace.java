@@ -179,7 +179,7 @@ public class DbPropertiesFace extends MenuFace {
 		if (this.selectionAndScroll.selectedItem instanceof String && this.sources != null) {
 			final int i = this.sources.indexOf(this.selectionAndScroll.selectedItem);
 			final String source = (String) this.selectionAndScroll.selectedItem;
-			if (MessageDialog.showMessageDialog(gui, "Remove Source", source, MessageDialogButton.Yes, MessageDialogButton.No) != MessageDialogButton.Yes) return;
+			if (MessageDialog.showMessageDialog(gui, "Remove Source", source, MessageDialogButton.No, MessageDialogButton.Yes) != MessageDialogButton.Yes) return;
 			this.db.removeSource(source);
 			refreshLists();
 			fixSelectionAfterDeletion(this.sources, i);
@@ -188,7 +188,7 @@ public class DbPropertiesFace extends MenuFace {
 			final int i = this.remotes.indexOf(this.selectionAndScroll.selectedItem);
 			final Entry<?, ?> entry = (Entry<?, ?>) this.selectionAndScroll.selectedItem;
 			if (MessageDialog.showMessageDialog(gui, "Remove Remote", String.format("%s (%s)", entry.getKey(), entry.getValue()),
-					MessageDialogButton.Yes, MessageDialogButton.No) != MessageDialogButton.Yes)
+					MessageDialogButton.No, MessageDialogButton.Yes) != MessageDialogButton.Yes)
 				return;
 			this.db.rmRemote(entry.getKey().toString());
 			refreshLists();
