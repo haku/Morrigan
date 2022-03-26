@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
-import com.vaguehope.morrigan.model.media.ILocalMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
 import com.vaguehope.morrigan.model.media.IMixedMediaDb;
@@ -34,15 +33,9 @@ public class DbHelper {
 	}
 
 	public IMixedMediaDb resolveReference (final MediaListReference ref) throws DbException, MorriganException {
-		if (ref.getType() == MediaListReference.MediaListType.LOCALMMDB) {
-			final ILocalMixedMediaDb db = this.mnContext.getMediaFactory().getLocalMixedMediaDb(ref.getIdentifier());
-			db.read();
-			return db;
-		}
-
-		// TODO remote DBs.
-
-		throw new IllegalArgumentException("Unknown DB type: " + ref);
+		final IMixedMediaDb db = this.mnContext.getMediaFactory().getMixedMediaDbByRef(ref);
+		db.read();
+		return db;
 	}
 
 	public void askSearch (final WindowBasedTextGUI gui, final IMixedMediaDb db) throws DbException, MorriganException {

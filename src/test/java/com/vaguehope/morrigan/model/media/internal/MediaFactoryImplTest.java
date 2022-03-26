@@ -32,13 +32,13 @@ public class MediaFactoryImplTest {
 	public void itGetsLocalByMid() throws Exception {
 		final ILocalMixedMediaDb db = this.undertest.createLocalMixedMediaDb("test" + RND.nextLong());
 		final MediaListReference ref = this.undertest.getAllLocalMixedMediaDbs().iterator().next();
-		final IMixedMediaDb actual = this.undertest.getMixedMediaDbByMid(ref.getMid(), null);
-		assertEquals(db, actual);
+		assertEquals(db, this.undertest.getMixedMediaDbByMid(ref.getMid(), null));
+		assertEquals(db, this.undertest.getMixedMediaDbByRef(ref));
 
 		final String filter = "some-filter" + RND.nextLong();
 		final ILocalMixedMediaDb dbWithFilter = this.undertest.getLocalMixedMediaDb(db.getDbPath(), filter);
-		final IMixedMediaDb actualWithFilter = this.undertest.getMixedMediaDbByMid(ref.getMid(), filter);
-		assertEquals(dbWithFilter, actualWithFilter);
+		assertEquals(dbWithFilter, this.undertest.getMixedMediaDbByMid(ref.getMid(), filter));
+		assertEquals(dbWithFilter, this.undertest.getMixedMediaDbByRef(ref, filter));
 	}
 
 	@Test
@@ -50,8 +50,8 @@ public class MediaFactoryImplTest {
 		this.undertest.addExternalDb(external);
 
 		final MediaListReference ref = this.undertest.getExternalDbs().iterator().next();
-		final IMixedMediaDb actual = this.undertest.getMixedMediaDbByMid(ref.getMid(), null);
-		assertEquals(external, actual);
+		assertEquals(external, this.undertest.getMixedMediaDbByMid(ref.getMid(), null));
+		assertEquals(external, this.undertest.getMixedMediaDbByRef(ref));
 	}
 
 }

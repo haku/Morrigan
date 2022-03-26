@@ -48,6 +48,9 @@ public interface MediaFactory {
 	 */
 	IMixedMediaDb getMixedMediaDbByMid(String mid, String filter) throws DbException, MorriganException;
 
+	IMixedMediaDb getMixedMediaDbByRef(MediaListReference ref) throws DbException, MorriganException;
+	IMixedMediaDb getMixedMediaDbByRef(MediaListReference ref, String filter) throws DbException, MorriganException;
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	/**

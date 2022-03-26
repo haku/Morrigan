@@ -119,6 +119,16 @@ public class MediaFactoryImpl implements MediaFactory {
 		throw new IllegalArgumentException("Invalid MID: " + mid);
 	}
 
+	@Override
+	public IMixedMediaDb getMixedMediaDbByRef(MediaListReference ref) throws DbException, MorriganException {
+		return getMixedMediaDbByMid(ref.getMid(), null);
+	}
+
+	@Override
+	public IMixedMediaDb getMixedMediaDbByRef(MediaListReference ref, String filter) throws DbException, MorriganException {
+		return getMixedMediaDbByMid(ref.getMid(), filter);
+	}
+
 	/**
 	 * For testing use only.  Can use to add in mock implementations.
 	 */
