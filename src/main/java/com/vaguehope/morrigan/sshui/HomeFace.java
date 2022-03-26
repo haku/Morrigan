@@ -60,6 +60,7 @@ public class HomeFace extends MenuFace {
 	private List<Player> players;
 	private List<AsyncTask> tasks;
 	private List<MediaListReference> dbs;
+	private List<MediaListReference> externalLibs;
 	private List<SavedView> savedViews;
 
 	public HomeFace (final FaceNavigation actions, SessionState sessionState, final MnContext mnContext) {
@@ -81,6 +82,9 @@ public class HomeFace extends MenuFace {
 				.addSubmenu(this.lastActionMessage)
 				.addHeading("DBs")
 				.addList(this.dbs, " (no DBs)", d -> " " + d.getTitle())
+				.addHeading("")
+				.addHeading("External Libraries")
+				.addList(this.externalLibs, " (no external libs)", d -> " " + d.getTitle())
 				.addHeading("")
 				.addHeading("Saved Views")
 				.addList(this.savedViews, " (no saved views)", v -> " " + v.getName())
@@ -106,6 +110,7 @@ public class HomeFace extends MenuFace {
 	@Override
 	public void onFocus() throws Exception {
 		this.dbs = asList(this.mnContext.getMediaFactory().getAllLocalMixedMediaDbs());
+		this.externalLibs = asList(this.mnContext.getMediaFactory().getExternalDbs());
 		this.savedViews = this.mnContext.getConfig().getSavedViews();
 	}
 

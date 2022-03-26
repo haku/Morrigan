@@ -91,6 +91,11 @@ public class DidlItem extends EphemeralItem {
 	}
 
 	@Override
+	public String toString() {
+		return getTitle();
+	}
+
+	@Override
 	public boolean isPlayable () {
 		return this.mediaType == MediaType.TRACK;
 	}
