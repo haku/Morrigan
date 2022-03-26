@@ -61,7 +61,9 @@ public class DidlItem extends EphemeralItem {
 
 	@Override
 	public long getFileSize () {
-		return this.primaryRes.getSize();
+		final Long size = this.primaryRes.getSize();
+		if (size == null) return 0;
+		return size;
 	}
 
 	@Override
@@ -76,8 +78,8 @@ public class DidlItem extends EphemeralItem {
 
 	@Override
 	public String getCoverArtRemoteLocation () {
-		if (this.artRes != null) return this.artRes.getValue();
-		return null;
+		if (this.artRes == null) return null;
+		return this.artRes.getValue();
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
