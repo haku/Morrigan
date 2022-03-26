@@ -483,13 +483,9 @@ public class MlistsServlet extends HttpServlet {
 		FeedHelper.addElement(dw, "title", "Morrigan media lists desu~");
 		FeedHelper.addLink(dw, CONTEXTPATH, "self", "text/xml");
 
-		final Collection<Player> players = this.playerListener.getPlayers();
-
-		// TODO merge 2 loops.
-
 		for (final MediaListReference listRef : this.mediaFactory.getAllLocalMixedMediaDbs()) {
 			FeedHelper.startElement(dw, "entry", new String[][] { { "type", "local" } });
-			printMlistShort(dw, listRef, players);
+			printMlistShort(dw, listRef);
 			dw.endElement("entry");
 		}
 
@@ -502,7 +498,7 @@ public class MlistsServlet extends HttpServlet {
 
 		for (final MediaListReference listRef : this.mediaFactory.getExternalDbs()) {
 			FeedHelper.startElement(dw, "entry", new String[][] { { "type", "ext" } });
-			printMlistShort(dw, listRef, players);
+			printMlistShort(dw, listRef);
 			dw.endElement("entry");
 		}
 
@@ -673,20 +669,9 @@ public class MlistsServlet extends HttpServlet {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private static void printMlistShort (final DataWriter dw, final MediaListReference listRef, final Collection<Player> players) throws SAXException {
-		final String id;
-		if (listRef.getIdentifier().contains("/")) {
-			id = listRef.getIdentifier().substring(listRef.getIdentifier().lastIndexOf("/") + 1);
-		}
-		else {
-			id = listRef.getIdentifier();
-		}
-
+	private static void printMlistShort (final DataWriter dw, final MediaListReference listRef) throws SAXException {
 		FeedHelper.addElement(dw, "title", listRef.getTitle());
-		FeedHelper.addLink(dw, CONTEXTPATH + "/" + listRef.getType().toString() + "/" + id, "self", "text/xml");
-		for (final Player p : players) {
-			FeedHelper.addLink(dw, "/player/" + p.getId() + "/play/" + id, "play", "cmd");
-		}
+		FeedHelper.addLink(dw, CONTEXTPATH + "/" + listRef.getMid(), "self", "text/xml");
 	}
 
 	private enum IncludeSrcs {

@@ -38,6 +38,18 @@ public class MediaListReferenceImpl implements MediaListReference {
 		return this.title;
 	}
 
+	@Override
+	public String getMid() {
+		final String id;
+		if (this.identifier.contains("/")) {
+			id = this.identifier.substring(this.identifier.lastIndexOf("/") + 1);
+		}
+		else {
+			id = this.identifier;
+		}
+		return this.type.toString() + "/" + id;
+	}
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override

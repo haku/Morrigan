@@ -11,7 +11,6 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import com.vaguehope.morrigan.config.Config;
-import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.internal.MediaFactoryImpl;
 import com.vaguehope.morrigan.model.media.test.TestMixedMediaDb;
 import com.vaguehope.morrigan.player.PlayerReader;
@@ -28,7 +27,7 @@ public class MlistsServletTest {
 
 	private Config config;
 	private PlayerReader playerReader;
-	private MediaFactory mediaFactory;
+	private MediaFactoryImpl mediaFactory;
 	private ExecutorService executor;
 	private AsyncTasksRegister asyncTasksRegister;
 	private AsyncActions asyncActions;

@@ -90,6 +90,13 @@ public class MediaFactoryImpl implements MediaFactory {
 		return LocalMixedMediaDbFactory.getMainBySerial(serial);
 	}
 
+	/**
+	 * Examples of MID:
+	 * mid=LOCALMMDB/test.local.db3/query/*
+	 * mid=EXTMMDB/abcdefgh-927d-f5c4-ffff-ijklmnopqrst/query/*
+	 * mid=EXTMMDB/abcdefgh-444c-164e-9d41-ijklmnopqrst/query/id%3D0
+	 * mid=EXTMMDB/abcdefgh-927d-f5c4-ffff-ijklmnopqrst/query/id%3D1fcee07abcdefghiujklmnopqrstuvwxyz810c6e-foo_bar
+	 */
 	@Override
 	public IMixedMediaDb getMixedMediaDbByMid(final String mid, final String filter) throws DbException, MorriganException {
 		final String[] parts = mid.split("/");
@@ -112,7 +119,9 @@ public class MediaFactoryImpl implements MediaFactory {
 		throw new IllegalArgumentException("Invalid MID: " + mid);
 	}
 
-	@Override
+	/**
+	 * For testing use only.  Can use to add in mock implementations.
+	 */
 	public void addLocalMixedMediaDb (final ILocalMixedMediaDb db) {
 		this.addedLocals.put(new MediaListReferenceImpl(MediaListType.LOCALMMDB, db.getListId(), db.getListName()), db);
 	}

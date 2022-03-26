@@ -7,5 +7,6 @@ public interface MediaListReference extends Comparable<MediaListReference> {
 	MediaListType getType ();
 	String getIdentifier ();
 	String getTitle ();
+	String getMid();
 
 }
