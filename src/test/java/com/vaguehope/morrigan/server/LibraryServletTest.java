@@ -118,6 +118,7 @@ public class LibraryServletTest {
 				"  font-style: normal;\n" +
 				"  font-weight: 400;\n" +
 				"  src: url({url}) format('woff2');\n" +
+				"  foo: url(\"data:image/gif;base64,fakedataherethatshouldnotbemodified\");\n" +
 				"}";
 		final String responseFixture = cssFixture.replace("{url}", fontUrl.toString());
 		final String expectedResponse = cssFixture.replace("{url}", fontRewrittenPath);

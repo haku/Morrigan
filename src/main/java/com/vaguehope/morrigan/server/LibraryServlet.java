@@ -180,6 +180,10 @@ public class LibraryServlet extends HttpServlet {
 		while (m.find()) {
 			final String match = m.group(1);
 			URI u = new URI(match);
+
+			// Do not modify data URLs.
+			if (u.getScheme() != null && !u.getScheme().toLowerCase(Locale.ENGLISH).startsWith("http")) continue;
+
 			if (!u.isAbsolute()) {
 				u = parent.resolve(match);
 			}
