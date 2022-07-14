@@ -90,7 +90,7 @@ MnApi = {};
 
     var listHref = node.find('link[rel="list"]').attr('href');
     if (listHref) {
-      player.mid = listHref.replace('/mlists/', '');
+      player.mid = listHref.replace('mlists/', '');
     }
 
     var listView = node.find('listview').text();

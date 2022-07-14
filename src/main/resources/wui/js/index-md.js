@@ -334,7 +334,7 @@
     var source = function(req, resp) {
       $.ajax({
         dataType: "json",
-        url: '/mlists/' + midSup() + '/tags?term=' + encodeURIComponent(req.term),
+        url: 'mlists/' + midSup() + '/tags?term=' + encodeURIComponent(req.term),
         success: function(data) {
           if (!el.data('sent')) {
             if (isSearch) fillInTagSearches(data);
