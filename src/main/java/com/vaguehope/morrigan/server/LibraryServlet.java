@@ -23,11 +23,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.util.ChecksumHelper;
 import com.vaguehope.morrigan.util.FileHelper;
 import com.vaguehope.morrigan.util.IoHelper;
-import com.vaguehope.morrigan.util.MnLogger;
 import com.vaguehope.morrigan.util.PropertiesFile;
 import com.vaguehope.morrigan.util.StringHelper;
 import com.vaguehope.morrigan.util.httpclient.HttpClient;
@@ -49,7 +51,7 @@ public class LibraryServlet extends HttpServlet {
 	private static String LIBRARIES = "wui/libraries.txt";
 	private static final String CONTENT_TYPE = "content-type";
 
-	private static final MnLogger LOG = MnLogger.make(LibraryServlet.class);
+	private static final Logger LOG = LoggerFactory.getLogger(LibraryServlet.class);
 	private static final long serialVersionUID = -225457065525809819L;
 
 	private final File webLibraryDir;
@@ -127,7 +129,7 @@ public class LibraryServlet extends HttpServlet {
 						try {
 							final Map<String, String> rewrites = rewriteCss(uri, bodyBuffer);
 							this.libraries.addAll(rewrites.keySet());
-							LOG.i("Dynamically added: {}", rewrites);
+							LOG.info("Dynamically added: {}", rewrites);
 						}
 						catch (final URISyntaxException e) {
 							ServletHelper.error(resp, 500, "Error rewriting URLs.");
@@ -182,7 +184,7 @@ public class LibraryServlet extends HttpServlet {
 				u = parent.resolve(match);
 			}
 
-			final String replacement = "/lib/" + withoutScheme(u);
+			final String replacement = MorriganServer.REVERSE_PROXY_PREFIX + CONTEXTPATH + "/" + withoutScheme(u);
 			ret.put(u.toString(), replacement);
 
 			final String replacementCss = "url(" + replacement + ")";

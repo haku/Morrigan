@@ -71,13 +71,13 @@ public class LibraryServletTest {
 				"https://fonts.googleapis.com/icon?family=Material+Icons",
 				"http://fonts.gstatic.com/s/materialicons/v52/flUhRq6tzZclQEJ-Vdg-IuiaDsNc.woff2",
 				"http://fonts.gstatic.com/s/materialicons/v52/flUhRq6tzZclQEJ-Vdg-IuiaDsNc.woff2",
-				"/lib/fonts.gstatic.com/s/materialicons/v52/flUhRq6tzZclQEJ-Vdg-IuiaDsNc.woff2");
+				"/mn/lib/fonts.gstatic.com/s/materialicons/v52/flUhRq6tzZclQEJ-Vdg-IuiaDsNc.woff2");
 
 		testUrlRewrite(
 				"https://code.jquery.com/ui/1.11.4/themes/dark-hive/jquery-ui.css",
 				"https://code.jquery.com/ui/1.11.4/themes/dark-hive/images/ui-bg_loop_25_000000_21x21.png",
 				"images/ui-bg_loop_25_000000_21x21.png",
-				"/lib/code.jquery.com/ui/1.11.4/themes/dark-hive/images/ui-bg_loop_25_000000_21x21.png");
+				"/mn/lib/code.jquery.com/ui/1.11.4/themes/dark-hive/images/ui-bg_loop_25_000000_21x21.png");
 	}
 
 	private static void testUrlRewrite (final String cssUrl, final String resourceAbsUrl, final String resourceCssUrl, final String expectedReplacementUrl) throws URISyntaxException, IOException {
@@ -111,7 +111,7 @@ public class LibraryServletTest {
 		startUndertest();
 
 		final URI fontUrl = rewriteHost("http://fonts.gstatic.com/s/materialicons/v52/flUhRq6tzZclQEJ-Vdg-IuiaDsNc.woff2");
-		final String fontRewrittenPath = "/lib/" + LibraryServlet.withoutScheme(fontUrl);
+		final String fontRewrittenPath = "/mn/lib/" + LibraryServlet.withoutScheme(fontUrl);
 
 		final String cssFixture = "@font-face {\n" +
 				"  font-family: 'Material Icons';\n" +
@@ -142,10 +142,13 @@ public class LibraryServletTest {
 		final URI lib = rewriteHost("https://fonts.googleapis.com/icon?family=Material+Icons");
 		this.libraries.add(lib.toString());
 		startUndertest();
-
-		this.req.requestURI = "/mn/lib/" + LibraryServlet.withoutScheme(lib);
 		this.server.getFixtureServlet().addGetFixture(lib, "text/css; charset=utf-8", "@font-face {}");
 
+		this.req.requestURI = "/mn/lib/" + LibraryServlet.withoutScheme(lib);
+		this.undertest.service(this.req, this.resp);
+		assertEquals(200, this.resp.getStatus());
+
+		this.req.requestURI = "/lib/" + LibraryServlet.withoutScheme(lib);
 		this.undertest.service(this.req, this.resp);
 		assertEquals(200, this.resp.getStatus());
 	}

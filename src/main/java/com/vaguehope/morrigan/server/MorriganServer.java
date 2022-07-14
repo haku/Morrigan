@@ -8,8 +8,14 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.concurrent.ScheduledExecutorService;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.eclipse.jetty.rewrite.handler.RewriteHandler;
+import org.eclipse.jetty.rewrite.handler.RewritePatternRule;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.ResourceService;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
@@ -57,7 +63,8 @@ public class MorriganServer {
 			threadPool.setName("jty");
 			this.server = new Server(threadPool);
 			this.server.addLifeCycleListener(this.lifeCycleListener);
-			this.server.setHandler(makeContentHandler(config, serverConfig, playerListener, mediaFactory, asyncTasksRegister, asyncActions, transcoder, schEs));
+			this.server.setHandler(wrapWithRewrites(
+					makeContentHandler(config, serverConfig, playerListener, mediaFactory, asyncTasksRegister, asyncActions, transcoder, schEs)));
 
 			final InetAddress bindAddress = serverConfig.getBindAddress("HTTP");
 			if (bindAddress == null) throw new IllegalStateException("Failed to find bind address.");
@@ -73,6 +80,17 @@ public class MorriganServer {
 		connector.setHost(hostAddress);
 		connector.setPort(port);
 		return connector;
+	}
+
+	protected static RewriteHandler wrapWithRewrites(Handler wrapped) {
+		final RewriteHandler rewrites = new RewriteHandler();
+		rewrites.setRewriteRequestURI(true);
+		rewrites.setRewritePathInfo(true);
+
+		rewrites.addRule(new RewritePatternRule(REVERSE_PROXY_PREFIX + "/*", "/"));
+
+		rewrites.setHandler(wrapped);
+		return rewrites;
 	}
 
 	private static HandlerList makeContentHandler (final Config config, final ServerConfig serverConfig, final PlayerReader playerListener, final MediaFactory mediaFactory, final AsyncTasksRegister asyncTasksRegister, final AsyncActions asyncActions, final Transcoder transcoder, final ScheduledExecutorService schEs) throws IOException {
