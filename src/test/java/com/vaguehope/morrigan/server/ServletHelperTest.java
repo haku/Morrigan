@@ -2,8 +2,12 @@ package com.vaguehope.morrigan.server;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.io.File;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -43,6 +47,22 @@ public class ServletHelperTest {
 		this.resp = new MockHttpServletResponse();
 		this.inputFile = this.tmp.newFile("a");
 		IoHelper.write(FILE_CONTENT, this.inputFile);
+	}
+
+	@Test
+	public void itGetsReqPath() throws Exception {
+		testRepPath("mlists", "/mlists", "");
+		testRepPath("mlists", "/mlists/foo", "/foo");
+		testRepPath("mlists", "/mn/mlists/foo", "/foo");
+		testRepPath("mlists", "mlists", "");
+		testRepPath("mlists", "mlists/foo", "/foo");
+		testRepPath("mlists", "mlists/foo", "/foo");
+	}
+
+	private static void testRepPath(String relativeContextPath, final String input, final String expected) {
+		final HttpServletRequest req = mock(HttpServletRequest.class);
+		when(req.getRequestURI()).thenReturn(input);
+		assertEquals(expected, ServletHelper.getReqPath(req, relativeContextPath));
 	}
 
 	@Test

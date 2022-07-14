@@ -108,7 +108,8 @@ import com.vaguehope.morrigan.util.StringHelper;
 public class MlistsServlet extends HttpServlet {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public static final String CONTEXTPATH = "/mlists";
+	public static final String REL_CONTEXTPATH = "mlists";
+	public static final String CONTEXTPATH = "/" + REL_CONTEXTPATH;
 
 	private static final String PATH_SAVED_VIEWS = "/savedviews";
 
@@ -220,9 +221,7 @@ public class MlistsServlet extends HttpServlet {
 	 * Param action will not be null when verb==POST.
 	 */
 	private void processRequest (final Verb verb, final HttpServletRequest req, final HttpServletResponse resp, final String action) throws IOException, DbException, SAXException, MorriganException {
-		final String requestURI = req.getRequestURI();
-		final String reqPath = requestURI.startsWith(CONTEXTPATH) ? requestURI.substring(CONTEXTPATH.length()) : requestURI;
-
+		final String reqPath = ServletHelper.getReqPath(req, REL_CONTEXTPATH);
 		if (reqPath == null || reqPath.length() < 1 || reqPath.equals(ROOTPATH)) {
 			if (verb == Verb.POST) {
 				postToRoot(resp, action);
@@ -481,7 +480,7 @@ public class MlistsServlet extends HttpServlet {
 		final DataWriter dw = FeedHelper.startFeed(resp.getWriter());
 
 		FeedHelper.addElement(dw, "title", "Morrigan media lists desu~");
-		FeedHelper.addLink(dw, CONTEXTPATH, "self", "text/xml");
+		FeedHelper.addLink(dw, REL_CONTEXTPATH, "self", "text/xml");
 
 		for (final MediaListReference listRef : this.mediaFactory.getAllLocalMixedMediaDbs()) {
 			FeedHelper.startElement(dw, "entry", new String[][] { { "type", "local" } });
@@ -671,7 +670,7 @@ public class MlistsServlet extends HttpServlet {
 
 	private static void printMlistShort (final DataWriter dw, final MediaListReference listRef) throws SAXException {
 		FeedHelper.addElement(dw, "title", listRef.getTitle());
-		FeedHelper.addLink(dw, CONTEXTPATH + "/" + listRef.getMid(), "self", "text/xml");
+		FeedHelper.addLink(dw, REL_CONTEXTPATH + "/" + listRef.getMid(), "self", "text/xml");
 	}
 
 	private enum IncludeSrcs {
@@ -734,7 +733,7 @@ public class MlistsServlet extends HttpServlet {
 			dw.dataElement("sortdirection", ml.getSortDirection().toString());
 		}
 
-		final String pathToSelf = CONTEXTPATH + "/" + ml.getType() + "/" + listFile;
+		final String pathToSelf = REL_CONTEXTPATH + "/" + ml.getType() + "/" + listFile;
 		FeedHelper.addLink(dw, pathToSelf, "self", "text/xml");
 		if (includeItems == IncludeItems.NO) FeedHelper.addLink(dw, pathToSelf + "/" + PATH_ITEMS, PATH_ITEMS, "text/xml");
 		FeedHelper.addLink(dw, pathToSelf + "/" + PATH_ALBUMS, PATH_ALBUMS, "text/xml");

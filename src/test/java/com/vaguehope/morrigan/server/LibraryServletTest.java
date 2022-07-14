@@ -137,6 +137,19 @@ public class LibraryServletTest {
 		assertEquals("mock-font", this.resp2.getOutputAsString());
 	}
 
+	@Test
+	public void itRemovesReverseProxyPrefix() throws Exception {
+		final URI lib = rewriteHost("https://fonts.googleapis.com/icon?family=Material+Icons");
+		this.libraries.add(lib.toString());
+		startUndertest();
+
+		this.req.requestURI = "/mn/lib/" + LibraryServlet.withoutScheme(lib);
+		this.server.getFixtureServlet().addGetFixture(lib, "text/css; charset=utf-8", "@font-face {}");
+
+		this.undertest.service(this.req, this.resp);
+		assertEquals(200, this.resp.getStatus());
+	}
+
 	private URI rewriteHost (final String url) throws URISyntaxException {
 		final URI o = new URI(url);
 		final URI n = this.server.getUri();

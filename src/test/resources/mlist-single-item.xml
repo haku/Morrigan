@@ -9,9 +9,9 @@
  <defaulttype>1</defaulttype>
  <sortcolumn>date added</sortcolumn>
  <sortdirection>ASC</sortdirection>
- <link rel="self" type="text/xml" href="/mlists/LOCALMMDB/library.local.db3"/>
- <link rel="albums" type="text/xml" href="/mlists/LOCALMMDB/library.local.db3/albums"/>
- <link rel="src" type="text/xml" href="/mlists/LOCALMMDB/library.local.db3/src"/>
+ <link rel="self" type="text/xml" href="mlists/LOCALMMDB/library.local.db3"/>
+ <link rel="albums" type="text/xml" href="mlists/LOCALMMDB/library.local.db3/albums"/>
+ <link rel="src" type="text/xml" href="mlists/LOCALMMDB/library.local.db3/src"/>
  <remote>server1-a</remote>
  <remote>server2-b</remote>
  <remote>server3-c</remote>

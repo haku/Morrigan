@@ -27,7 +27,7 @@
     $.ajax({
       type: 'GET',
       cache: false,
-      url: '/hostinfo',
+      url: 'hostinfo',
       dataType: 'xml',
       success: function(xml) {
         var hostName = $(xml).find('hostname').text();

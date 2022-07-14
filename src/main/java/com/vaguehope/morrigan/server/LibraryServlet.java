@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -42,7 +43,8 @@ import com.vaguehope.morrigan.util.httpclient.HttpStreamHandlerException;
  */
 public class LibraryServlet extends HttpServlet {
 
-	public static final String CONTEXTPATH = "/lib";
+	public static final String REL_CONTEXTPATH = "lib";
+	public static final String CONTEXTPATH = "/" + REL_CONTEXTPATH;
 
 	private static String LIBRARIES = "wui/libraries.txt";
 	private static final String CONTENT_TYPE = "content-type";
@@ -67,7 +69,9 @@ public class LibraryServlet extends HttpServlet {
 		if (librariesUrl == null) {
 			throw new FileNotFoundException("path: " + librariesUrl);
 		}
-		return new HashSet<>(IoHelper.readAsList(librariesUrl.openStream()));
+		try (final InputStream s = librariesUrl.openStream()) {
+			return new HashSet<>(IoHelper.readAsList(s));
+		}
 	}
 
 	public LibraryServlet (final Set<String> libraries, final Config config) throws IOException {
@@ -78,8 +82,7 @@ public class LibraryServlet extends HttpServlet {
 
 	@Override
 	protected void doGet (final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
-		final String requestURI = req.getRequestURI();
-		final String reqPath = requestURI.startsWith(CONTEXTPATH) ? requestURI.substring(CONTEXTPATH.length()) : requestURI;
+		final String reqPath = ServletHelper.getReqPath(req, REL_CONTEXTPATH);
 		final String query = req.getQueryString();
 
 		String schemelessUri = StringHelper.removeStart(reqPath, "/");

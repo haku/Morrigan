@@ -24,7 +24,8 @@ import com.vaguehope.morrigan.tasks.AsyncTasksRegister;
 public class StatusServlet extends HttpServlet {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public static final String CONTEXTPATH = "/status";
+	public static final String REL_CONTEXTPATH = "/status";
+	public static final String CONTEXTPATH = "/" + REL_CONTEXTPATH;
 
 	private static final String ROOTPATH = "/";
 	private static final long serialVersionUID = -552170914145385672L;
@@ -41,8 +42,7 @@ public class StatusServlet extends HttpServlet {
 
 	@Override
 	protected void doGet (final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
-		final String requestURI = req.getRequestURI();
-		final String reqPath = requestURI.startsWith(CONTEXTPATH) ? requestURI.substring(CONTEXTPATH.length()) : requestURI;
+		final String reqPath = ServletHelper.getReqPath(req, REL_CONTEXTPATH);
 		try {
 			if (reqPath == null || reqPath.length() < 1 || reqPath.equals(ROOTPATH)) {
 				printTaskStatusList(resp);
@@ -74,7 +74,7 @@ public class StatusServlet extends HttpServlet {
 		resp.setContentType("text/xml;charset=utf-8");
 		final DataWriter dw = FeedHelper.startFeed(resp.getWriter());
 		FeedHelper.addElement(dw, "title", "Morrigan task status desu~");
-		FeedHelper.addLink(dw, CONTEXTPATH, "self", "text/xml");
+		FeedHelper.addLink(dw, REL_CONTEXTPATH, "self", "text/xml");
 		for (final AsyncTask t : this.asyncTasksRegister.tasks()) {
 			dw.startElement("entry");
 			printTask(dw, t);

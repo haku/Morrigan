@@ -33,7 +33,8 @@ import com.vaguehope.morrigan.tasks.AsyncTasksRegister;
 import com.vaguehope.morrigan.transcode.Transcoder;
 
 public class MorriganServer {
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	public static final String REVERSE_PROXY_PREFIX = "/mn";
 
 	private static final Logger LOG = LoggerFactory.getLogger(MorriganServer.class);
 

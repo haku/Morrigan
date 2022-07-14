@@ -28,6 +28,18 @@ public final class ServletHelper {
 		resp.getWriter().println("HTTP Error "+status+": " + msg);
 	}
 
+	public static String getReqPath(final HttpServletRequest req, final String relativeContextPath) {
+		String reqPath = req.getRequestURI();
+		reqPath = StringHelper.removeStart(reqPath, MorriganServer.REVERSE_PROXY_PREFIX);
+		if (reqPath.startsWith(relativeContextPath)) {
+			reqPath = reqPath.substring(relativeContextPath.length());
+		}
+		else if (reqPath.startsWith("/" + relativeContextPath)) {
+			reqPath = reqPath.substring(relativeContextPath.length() + 1);
+		}
+		return reqPath;
+	}
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private static final int UPLOADBUFFERSIZE = 8192;

@@ -2,9 +2,9 @@
 
 <feed xmlns="http://www.w3.org/2005/Atom">
  <title>Morrigan media lists desu~</title>
- <link rel="self" type="text/xml" href="/mlists"/>
+ <link rel="self" type="text/xml" href="mlists"/>
  <entry type="local">
   <title>server-test-db</title>
-  <link rel="self" type="text/xml" href="/mlists/LOCALMMDB/file:server-test-db?mode=memory&amp;cache=shared"/></entry>
+  <link rel="self" type="text/xml" href="mlists/LOCALMMDB/file:server-test-db?mode=memory&amp;cache=shared"/></entry>
 </feed>
 

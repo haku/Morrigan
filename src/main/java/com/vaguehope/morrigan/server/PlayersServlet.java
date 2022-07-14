@@ -71,7 +71,8 @@ import com.vaguehope.morrigan.util.TimeHelper;
 public class PlayersServlet extends HttpServlet {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public static final String CONTEXTPATH = "/players";
+	public static final String REL_CONTEXTPATH = "players";
+	public static final String CONTEXTPATH = "/" + REL_CONTEXTPATH;
 
 	private static final String PLAYER_AUTO = "auto";
 	public static final String PATH_QUEUE = "queue";
@@ -157,9 +158,7 @@ public class PlayersServlet extends HttpServlet {
 	@Override
 	protected void doPost (final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
 		try {
-			final String requestURI = req.getRequestURI();
-			final String reqPath = requestURI.startsWith(CONTEXTPATH) ? requestURI.substring(CONTEXTPATH.length()) : requestURI;
-
+			final String reqPath = ServletHelper.getReqPath(req, REL_CONTEXTPATH);
 			if (reqPath == null || reqPath.length() < 1 || reqPath.equals(ROOTPATH)) { // POST to root.
 				ServletHelper.error(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid POST request desu~");
 			}
@@ -348,9 +347,7 @@ public class PlayersServlet extends HttpServlet {
 	}
 
 	private void writeResponse (final HttpServletRequest req, final HttpServletResponse resp, final Player foundPlayer) throws IOException, SAXException, MorriganException {
-		final String requestURI = req.getRequestURI();
-		final String reqPath = requestURI.startsWith(CONTEXTPATH) ? requestURI.substring(CONTEXTPATH.length()) : requestURI;
-
+		final String reqPath = ServletHelper.getReqPath(req, REL_CONTEXTPATH);
 		if (reqPath == null || reqPath.length() < 1 || reqPath.equals(ROOTPATH)) {
 			printPlayersList(resp);
 		}
@@ -391,7 +388,7 @@ public class PlayersServlet extends HttpServlet {
 		final DataWriter dw = FeedHelper.startFeed(resp.getWriter());
 
 		FeedHelper.addElement(dw, "title", "Morrigan players desu~");
-		FeedHelper.addLink(dw, CONTEXTPATH, "self", "text/xml");
+		FeedHelper.addLink(dw, REL_CONTEXTPATH, "self", "text/xml");
 
 		final Collection<Player> players = this.playerListener.getPlayers();
 		for (final Player p : players) {
@@ -434,7 +431,7 @@ public class PlayersServlet extends HttpServlet {
 		if (currentList != null) {
 			listTitle = currentList.getListName();
 			listId = currentList.getListId();
-			listUrl = MlistsServlet.CONTEXTPATH + "/" + currentList.getType() + "/" + URLEncoder.encode(FeedHelper.filenameFromPath(currentList.getListId()), "UTF-8");
+			listUrl = MlistsServlet.REL_CONTEXTPATH + "/" + currentList.getType() + "/" + URLEncoder.encode(FeedHelper.filenameFromPath(currentList.getListId()), "UTF-8");
 			listView = StringHelper.trimToEmpty(currentList.getSearchTerm());
 		}
 		else {
@@ -454,7 +451,7 @@ public class PlayersServlet extends HttpServlet {
 		final DurationData queueDuration = p.getQueue().getQueueTotalDuration();
 
 		FeedHelper.addElement(dw, "title", "p" + p.getId() + ":" + p.getPlayState().toString() + ":" + trackTitle);
-		final String selfUrl = CONTEXTPATH + "/" + p.getId();
+		final String selfUrl = REL_CONTEXTPATH + "/" + p.getId();
 		FeedHelper.addLink(dw, selfUrl, "self", "text/xml");
 
 		FeedHelper.addElement(dw, "playerid", p.getId());
@@ -527,8 +524,8 @@ public class PlayersServlet extends HttpServlet {
 	}
 
 	private static void printQueue (final DataWriter dw, final Player p) throws SAXException, UnsupportedEncodingException {
-		FeedHelper.addLink(dw, CONTEXTPATH + "/" + p.getId() + "/" + PATH_QUEUE, "self", "text/xml");
-		FeedHelper.addLink(dw, CONTEXTPATH + "/" + p.getId(), "player", "text/xml");
+		FeedHelper.addLink(dw, REL_CONTEXTPATH + "/" + p.getId() + "/" + PATH_QUEUE, "self", "text/xml");
+		FeedHelper.addLink(dw, REL_CONTEXTPATH + "/" + p.getId(), "player", "text/xml");
 
 		FeedHelper.addElement(dw, "queueversion", p.getQueue().getVersion());
 		FeedHelper.addElement(dw, "queuelength", p.getQueue().getQueueList().size());

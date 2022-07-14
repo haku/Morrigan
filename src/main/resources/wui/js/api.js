@@ -265,7 +265,7 @@ MnApi = {};
     $.ajax({
       type : 'GET',
       cache : false,
-      url : '/mlists/savedviews',
+      url : 'mlists/savedviews',
       dataType : 'json',
       success : function(json) {
         onSavedViews(json);
@@ -333,7 +333,7 @@ MnApi = {};
 
   function parseMlistNode(node) {
     var mlist = {};
-    mlist.mid = node.find('link[rel="self"]').attr('href').replace('/mlists/', '');
+    mlist.mid = node.find('link[rel="self"]').attr('href').replace('mlists/', '');
     mlist.type = node.attr('type');
     mlist.title = node.find('title').text();
     mlist.count = parseInt(node.find('count').text(), 10);
@@ -398,7 +398,7 @@ MnApi = {};
     }
     else {
       item.relativeUrl = href;
-      item.url = '/mlists/' + mid + '/items/' + item.relativeUrl;
+      item.url = 'mlists/' + mid + '/items/' + item.relativeUrl;
     }
 
     item.tags = [];
@@ -454,8 +454,8 @@ MnApi = {};
       coverRelativeUrl: node.find('link[rel="cover"]').attr('href'),
     };
 
-    album.url = '/mlists/' + mid + '/albums/' + album.relativeUrl;
-    if (album.coverRelativeUrl) album.coverUrl = '/mlists/' + mid + '/items/' + album.coverRelativeUrl;
+    album.url = 'mlists/' + mid + '/albums/' + album.relativeUrl;
+    if (album.coverRelativeUrl) album.coverUrl = 'mlists/' + mid + '/items/' + album.coverRelativeUrl;
     if (album.coverUrl) album.resizedCoverUrl = album.coverUrl + '?resize=200'; // TODO make param?
 
     return album;
@@ -509,7 +509,7 @@ MnApi = {};
   MnApi.enqueueView = function(mid, view, pid, msgHandler, onComplete) {
     var args = 'playerid=' + pid;
     if (view) args += '&view=' + encodeURIComponent(view);
-    actionItem({url: '/mlists/' + mid}, 'queue', args, msgHandler, onComplete);
+    actionItem({url: 'mlists/' + mid}, 'queue', args, msgHandler, onComplete);
   };
 
   MnApi.addTag = function(item, tag, msgHandler, onComplete) {
