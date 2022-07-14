@@ -25,6 +25,10 @@ public class MorriganServerTest {
 		testRewrite("/mn/", "/");
 		testRewrite("/mn/foo", "/foo");
 		testRewrite("/mn/foo/", "/foo/");
+		testRewrite("/mn/foo/bat", "/foo/bat");
+
+		testRewrite("/mn/mlists/LOCALMMDB/a.local.db3/query/t%3D\"Foo%2FBar Bat\"?&column=date_added&order=desc&_=1657822549184",
+				"/mlists/LOCALMMDB/a.local.db3/query/t%3D\"Foo%2FBar Bat\"?&column=date_added&order=desc&_=1657822549184");
 	}
 
 	private static void testRewrite(final String input, final String expected) throws Exception {
@@ -37,14 +41,9 @@ public class MorriganServerTest {
 		when(baseRequest.getRequestURI()).thenReturn(input);
 		rewrites.handle(input, baseRequest, baseRequest, resp);
 
-		if (input.equals(expected)) {
-			verify(baseRequest, never()).setURIPathQuery(anyString());
-			verify(baseRequest, never()).setPathInfo(anyString());
-		}
-		else {
-			verify(baseRequest).setURIPathQuery(expected);
-			verify(baseRequest).setPathInfo(expected);
-		}
+		verify(wrapped).handle(expected, baseRequest, baseRequest, resp);
+		verify(baseRequest, never()).setURIPathQuery(anyString());
+		verify(baseRequest, never()).setPathInfo(anyString());
 	}
 
 }

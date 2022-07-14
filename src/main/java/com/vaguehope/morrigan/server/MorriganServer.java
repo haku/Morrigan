@@ -8,14 +8,10 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.concurrent.ScheduledExecutorService;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.eclipse.jetty.rewrite.handler.RewriteHandler;
 import org.eclipse.jetty.rewrite.handler.RewritePatternRule;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
-import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.ResourceService;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
@@ -84,8 +80,12 @@ public class MorriganServer {
 
 	protected static RewriteHandler wrapWithRewrites(Handler wrapped) {
 		final RewriteHandler rewrites = new RewriteHandler();
-		rewrites.setRewriteRequestURI(true);
-		rewrites.setRewritePathInfo(true);
+
+		// Do not modify the request object because:
+		// - RuleContainer.apply() messes up the encoding.
+		// - ServletHelper.getReqPath() knows how to remove the prefix.
+		rewrites.setRewriteRequestURI(false);
+		rewrites.setRewritePathInfo(false);
 
 		rewrites.addRule(new RewritePatternRule(REVERSE_PROXY_PREFIX + "/*", "/"));
 
