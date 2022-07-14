@@ -42,7 +42,7 @@ public class ServerConfig implements AuthChecker {
 	}
 
 	public InetAddress getBindAddress(final String whatFor) throws IOException {
-		String strIface = this.args.getInterface();
+		final String strIface = this.args.getInterface();
 		final InetAddress ret;
 		if (strIface != null) {
 			ret = InetAddress.getByName(strIface);
