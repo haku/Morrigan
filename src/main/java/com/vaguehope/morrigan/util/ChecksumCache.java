@@ -34,7 +34,7 @@ public class ChecksumCache {
 		}
 
 		if (hash == null) {
-			hash = ChecksumHelper.generateMd5Checksum(file, BUFFER_FACTRY.get());
+			hash = ChecksumHelper.generateMd5(file, BUFFER_FACTRY.get());
 			IoHelper.write(hash.toString(16), cacheFile);
 		}
 

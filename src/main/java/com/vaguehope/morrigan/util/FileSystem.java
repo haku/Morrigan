@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 
+import com.vaguehope.morrigan.util.ChecksumHelper.Md5AndSha1;
+
 /**
  * To make testing and mocking easier.
  */
@@ -18,8 +20,12 @@ public class FileSystem {
 		return new File(parent, child);
 	}
 
-	public BigInteger generateMd5Checksum(File file, ByteBuffer byteBuffer) throws IOException {
-		return ChecksumHelper.generateMd5Checksum(file, byteBuffer);
+	public BigInteger generateMd5(final File file, final ByteBuffer byteBuffer) throws IOException {
+		return ChecksumHelper.generateMd5(file, byteBuffer);
+	}
+
+	public Md5AndSha1 generateMd5AndSha1(final File file, final ByteBuffer byteBuffer) throws IOException {
+		return ChecksumHelper.generateMd5AndSha1(file, byteBuffer);
 	}
 
 }

@@ -345,7 +345,7 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 					BigInteger hash = null;
 
 					try {
-						hash = this.fileSystem.generateMd5Checksum(file, byteBuffer); // This is slow.
+						hash = this.fileSystem.generateMd5(file, byteBuffer); // This is slow.
 					}
 					catch (final Exception e) {
 						taskEventListener.logError(this.itemList.getListName(), "Error while generating checksum for '" + mi.getFilepath() + ": " + e.getMessage(), e);

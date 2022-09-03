@@ -3,7 +3,6 @@ package com.vaguehope.morrigan.util;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -12,86 +11,102 @@ import java.security.NoSuchAlgorithmException;
 
 public final class ChecksumHelper {
 
-	private ChecksumHelper () {}
+	static final int BUFFERSIZE = 1024 * 64; // 64kb.
 
-	/**
-	 * MessageDigest.getInstance("MD5") can take up to a second,
-	 * so using this to cache it and improve performance.
-	 * Not sure if MessageDigest is thread-safe, so using ThreadLocal
-	 * just in case.
-	 */
-	private static ThreadLocal<MessageDigest> MD_MD5_FACTORY = new ThreadLocal<MessageDigest>() {
+	private ChecksumHelper() {
+	}
+
+	public static ByteBuffer createByteBuffer() {
+		return ByteBuffer.allocateDirect(BUFFERSIZE);
+	}
+
+	public static BigInteger generateMd5(final File file, final ByteBuffer buffer) throws IOException {
+		final MessageDigest md = MD5_FACTORY.get();
+		try (final FileInputStream is = new FileInputStream(file)) {
+			try (final FileChannel fc = is.getChannel()) {
+				while (fc.position() < fc.size()) {
+					buffer.clear();
+					fc.read(buffer);
+					buffer.flip();
+					md.update(buffer);
+				}
+			}
+		}
+		return new BigInteger(1, md.digest());
+	}
+
+	public static class Md5AndSha1 {
+		private final BigInteger md5;
+		private final BigInteger sha1;
+
+		public Md5AndSha1(final BigInteger md5, final BigInteger sha1) {
+			this.md5 = md5;
+			this.sha1 = sha1;
+		}
+
+		public BigInteger getMd5() {
+			return this.md5;
+		}
+
+		public BigInteger getSha1() {
+			return this.sha1;
+		}
+	}
+
+	public static Md5AndSha1 generateMd5AndSha1(final File file, final ByteBuffer buffer) throws IOException {
+		final MessageDigest md5 = MD5_FACTORY.get();
+		final MessageDigest sha1 = SHA1_FACTORY.get();
+		multiMd(file, buffer, md5, sha1);
+		return new Md5AndSha1(new BigInteger(1, md5.digest()), new BigInteger(1, sha1.digest()));
+	}
+
+	private static void multiMd(final File file, final ByteBuffer buffer, final MessageDigest md0, final MessageDigest md1) throws IOException {
+		try (final FileInputStream is = new FileInputStream(file)) {
+			try (final FileChannel fc = is.getChannel()) {
+				while (fc.position() < fc.size()) {
+					buffer.clear();
+					fc.read(buffer);
+					buffer.flip();
+					md0.update(buffer);
+					buffer.rewind();
+					md1.update(buffer);
+				}
+			}
+		}
+	}
+
+	public static String md5String(final String text) {
+		final MessageDigest md = MD5_FACTORY.get();
+		md.update(text.getBytes(), 0, text.length());
+		return new BigInteger(1, md.digest()).toString(16);
+	}
+
+	private static final MdFactory MD5_FACTORY = new MdFactory("MD5");
+	private static final MdFactory SHA1_FACTORY = new MdFactory("SHA1");
+
+	private static class MdFactory extends ThreadLocal<MessageDigest> {
+		private final String algorithm;
+
+		public MdFactory(final String algorithm) {
+			this.algorithm = algorithm;
+		}
+
 		@Override
-		protected MessageDigest initialValue () {
+		protected MessageDigest initialValue() {
 			try {
-				return MessageDigest.getInstance("MD5");
+				return MessageDigest.getInstance(this.algorithm);
 			}
 			catch (final NoSuchAlgorithmException e) {
-				throw new IllegalStateException(e);
+				throw new IllegalStateException("Algorithm not found: " + this.algorithm, e);
 			}
 		}
 
 		@Override
-		public MessageDigest get () {
+		public MessageDigest get() {
 			final MessageDigest md = super.get();
 			md.reset();
 			return md;
 		}
-	};
-
-	private static final int BUFFERSIZE = 1024 * 64; // 64kb.
-
-	private static byte[] createBuffer () {
-		return new byte[BUFFERSIZE];
-	}
-
-	public static BigInteger generateMd5Checksum (final File file) throws IOException {
-		return generateMd5Checksum(file, createBuffer());
-	}
-
-	public static BigInteger generateMd5Checksum (final File file, final byte[] buffer) throws IOException {
-		final InputStream is = new FileInputStream(file);
-		try {
-			final MessageDigest md = MD_MD5_FACTORY.get();
-			int n;
-			do {
-				n = is.read(buffer);
-				if (n > 0) md.update(buffer, 0, n);
-			}
-			while (n != -1);
-			return new BigInteger(1, md.digest());
-		}
-		finally {
-			IoHelper.closeQuietly(is);
-		}
-	}
-
-	public static ByteBuffer createByteBuffer () {
-		return ByteBuffer.allocateDirect(BUFFERSIZE);
-	}
-
-	public static BigInteger generateMd5Checksum (final File file, final ByteBuffer buffer) throws IOException {
-		final FileInputStream is = new FileInputStream(file);
-		try {
-			final MessageDigest md = MD_MD5_FACTORY.get();
-			final FileChannel fc = is.getChannel();
-			while (fc.position() < fc.size()) {
-				buffer.clear();
-				fc.read(buffer);
-				buffer.flip();
-				md.update(buffer);
-			}
-			return new BigInteger(1, md.digest());
-		}
-		finally {
-			IoHelper.closeQuietly(is);
-		}
-	}
-
-	public static String md5String (final String text) {
-		final MessageDigest md = MD_MD5_FACTORY.get();
-		md.update(text.getBytes(), 0, text.length());
-		return new BigInteger(1, md.digest()).toString(16);
 	}
 
 }

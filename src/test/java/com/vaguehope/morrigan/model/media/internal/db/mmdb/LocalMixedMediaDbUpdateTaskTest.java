@@ -299,7 +299,7 @@ public class LocalMixedMediaDbUpdateTaskTest {
 		when(f.getAbsolutePath()).thenReturn(absPath);
 		when(f.lastModified()).thenReturn(mtime);
 
-		when(this.fileSystem.generateMd5Checksum(eq(f), any(ByteBuffer.class))).thenReturn(md5);
+		when(this.fileSystem.generateMd5(eq(f), any(ByteBuffer.class))).thenReturn(md5);
 
 		putMockFile(absPath, f);
 
