@@ -165,7 +165,7 @@ public abstract class EphemeralMixedMediaDb implements IMixedMediaDb {
 // Not supported - but possible to implement.
 
 	@Override
-	public void setHideMissing(boolean v) throws MorriganException {
+	public void setHideMissing(final boolean v) throws MorriganException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 
@@ -358,6 +358,11 @@ public abstract class EphemeralMixedMediaDb implements IMixedMediaDb {
 
 	@Override
 	public void setItemMd5 (final IMixedMediaItem item, final BigInteger md5) throws MorriganException {
+		throw new UnsupportedOperationException("Not supported.");
+	}
+
+	@Override
+	public void setItemSha1(final IMixedMediaItem item, final BigInteger sha1) throws MorriganException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 

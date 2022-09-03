@@ -573,6 +573,17 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	}
 
 	@Override
+	public void setItemSha1 (final T track, final BigInteger sha1) throws MorriganException {
+		super.setItemSha1(track, sha1);
+		try {
+			this.dbLayer.setSha1(track, sha1);
+		}
+		catch (DbException e) {
+			throw new MorriganException(e);
+		}
+	}
+
+	@Override
 	public void setItemDateLastModified (final T track, final Date date) throws MorriganException {
 		super.setItemDateLastModified(track, date);
 		try {
@@ -631,6 +642,7 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	public void persistTrackData (final T track) throws MorriganException {
 		try {
 			this.dbLayer.setMd5(track, track.getMd5());
+			this.dbLayer.setSha1(track, track.getSha1());
 			if (track.getDateAdded() != null) this.dbLayer.setDateAdded(track, track.getDateAdded());
 			if (track.getDateLastModified() != null) this.dbLayer.setDateLastModified(track, track.getDateLastModified());
 			this.dbLayer.setRemoteLocation(track, track.getRemoteLocation());

@@ -21,8 +21,8 @@ import com.vaguehope.morrigan.model.media.IMixedMediaItemStorageLayer;
 import com.vaguehope.morrigan.model.media.MediaAlbum;
 import com.vaguehope.morrigan.model.media.internal.db.MediaSqliteLayer;
 import com.vaguehope.morrigan.model.media.internal.db.SqliteHelper;
-import com.vaguehope.morrigan.util.GeneratedString;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
+import com.vaguehope.morrigan.util.GeneratedString;
 
 public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixedMediaItem> implements IMixedMediaItemStorageLayer {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -49,6 +49,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 		SQL_TBL_MEDIAFILES_COL_FILE,
 		SQL_TBL_MEDIAFILES_COL_TYPE,
 		SQL_TBL_MEDIAFILES_COL_MD5,
+		SQL_TBL_MEDIAFILES_COL_SHA1,
 		SQL_TBL_MEDIAFILES_COL_DADDED,
 		SQL_TBL_MEDIAFILES_COL_DMODIFIED,
 		SQL_TBL_MEDIAFILES_COL_ENABLED,
@@ -90,14 +91,14 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 
 	private static final String _SQL_MEDIAFILES_SELECT =
 		"SELECT"
-		+ " id, file, type, md5, added, modified, enabled, enabledmodified, missing, remloc"
+		+ " id, file, type, md5, sha1, added, modified, enabled, enabledmodified, missing, remloc"
 		+ ",startcnt,endcnt,lastplay,duration"
     	+ ",width,height"
     	+ " FROM tbl_mediafiles";
 
 	private static final String _SQL_MEDIAFILESALBUMS_SELECT = // TODO FIXME is this the same as _SQL_MEDIAFILES_SELECT?
 		"SELECT"
-		+ " distinct m.id AS id,m.type AS type,file,md5,added,modified,enabled,enabledmodified,missing,remloc,startcnt,endcnt,lastplay,duration,width,height"
+		+ " distinct m.id AS id,m.type AS type,file,md5,sha1,added,modified,enabled,enabledmodified,missing,remloc,startcnt,endcnt,lastplay,duration,width,height"
 		+ " FROM tbl_mediafiles AS m";
 
 	private static final String _SQL_WHERE = " WHERE";
@@ -185,6 +186,10 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 	private static final String SQL_TBL_MEDIAFILES_SET_MD5 =
 		"UPDATE tbl_mediafiles SET md5=?" +
 		" WHERE file=?;";
+
+	private static final String SQL_TBL_MEDIAFILES_SET_SHA1 =
+			"UPDATE tbl_mediafiles SET sha1=?" +
+					" WHERE file=?;";
 
 	private static final String SQL_TBL_MEDIAFILES_SETDMODIFIED =
 		"UPDATE tbl_mediafiles SET modified=?" +
@@ -567,6 +572,22 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 		getChangeEventCaller().mediaItemUpdated(item);
 	}
 
+	protected void local_setSha1(final IMediaItem item, final BigInteger sha1) throws SQLException, ClassNotFoundException, DbException {
+		int n;
+		try (final PreparedStatement ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SET_SHA1)) {
+			if (sha1 != null) {
+				ps.setBytes(1, sha1.toByteArray());
+			}
+			else {
+				ps.setNull(1, java.sql.Types.BLOB);
+			}
+			ps.setString(2, item.getFilepath());
+			n = ps.executeUpdate();
+		}
+		if (n < 1) throw new DbException("No update occured for local_setSha1('" + item + "','" + sha1 + "').");
+		getChangeEventCaller().mediaItemUpdated(item);
+	}
+
 	protected void local_setDateLastModified (final IMediaItem item, final Date date) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps;
 		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETDMODIFIED);
@@ -808,6 +829,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 		final int colType;
 		final int colAdded;
 		final int colMd5;
+		final int colSha1;
 		final int colModified;
 		final int colEnabled;
 		final int colEnabledModified;
@@ -826,6 +848,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 			this.colType = rs.findColumn(SQL_TBL_MEDIAFILES_COL_TYPE.getName());
 			this.colAdded = rs.findColumn(SQL_TBL_MEDIAFILES_COL_DADDED.getName());
 			this.colMd5 = rs.findColumn(SQL_TBL_MEDIAFILES_COL_MD5.getName());
+			this.colSha1 = rs.findColumn(SQL_TBL_MEDIAFILES_COL_SHA1.getName());
 			this.colModified = rs.findColumn(SQL_TBL_MEDIAFILES_COL_DMODIFIED.getName());
 			this.colEnabled = rs.findColumn(SQL_TBL_MEDIAFILES_COL_ENABLED.getName());
 			this.colEnabledModified = rs.findColumn(SQL_TBL_MEDIAFILES_COL_ENABLEDMODIFIED.getName());
@@ -869,8 +892,11 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 
 		mi.setDateAdded(SqliteHelper.readDate(rs, indexes.colAdded));
 
-		byte[] bytes = rs.getBytes(indexes.colMd5);
-		mi.setMd5(bytes == null ? null : new BigInteger(bytes));
+		byte[] md5Bytes = rs.getBytes(indexes.colMd5);
+		mi.setMd5(md5Bytes == null ? null : new BigInteger(md5Bytes));
+
+		byte[] sha1Bytes = rs.getBytes(indexes.colSha1);
+		mi.setSha1(sha1Bytes == null ? null : new BigInteger(sha1Bytes));
 
 		mi.setDateLastModified(SqliteHelper.readDate(rs, indexes.colModified));
 		mi.setEnabled(rs.getInt(indexes.colEnabled) != 0, // default to true.

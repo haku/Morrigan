@@ -1,0 +1,3 @@
+2022-09-03
+
+ALTER TABLE tbl_mediafiles ADD COLUMN sha1 BLOB;

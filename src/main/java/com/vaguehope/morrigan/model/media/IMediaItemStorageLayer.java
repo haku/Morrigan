@@ -141,6 +141,7 @@ public interface IMediaItemStorageLayer<T extends IMediaItem> extends IGenericDb
 
 	void setDateAdded(IMediaItem item, Date date) throws DbException;
 	void setMd5(IMediaItem item, BigInteger md5) throws DbException;
+	void setSha1(IMediaItem item, BigInteger sha1) throws DbException;
 	void setDateLastModified(IMediaItem item, Date date) throws DbException;
 	void setEnabled(IMediaItem item, boolean value) throws DbException;
 	void setEnabled(IMediaItem item, boolean value, Date lastModified) throws DbException;

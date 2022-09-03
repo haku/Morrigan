@@ -807,6 +807,7 @@ public class MlistsServlet extends HttpServlet {
 		if (mi.getMimeType() != null) FeedHelper.addElement(dw, "mimetype", mi.getMimeType());
 		if (originalFileMd5 != null && !BigInteger.ZERO.equals(originalFileMd5)) FeedHelper.addElement(dw, "originalhash", originalFileMd5.toString(16));
 		if (fileMd5 != null && !BigInteger.ZERO.equals(fileMd5)) FeedHelper.addElement(dw, "hash", fileMd5.toString(16));
+		if (mi.getSha1() != null && !BigInteger.ZERO.equals(mi.getSha1())) FeedHelper.addElement(dw, "sha1", mi.getSha1().toString(16));
 		FeedHelper.addElement(dw, "enabled", Boolean.toString(mi.isEnabled()), new String[][] {
 			{ "m", mi.enabledLastModified() == null || mi.enabledLastModified().getTime() < 1L ? "" : String.valueOf(mi.enabledLastModified().getTime()) },
 		});

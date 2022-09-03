@@ -58,6 +58,7 @@ public interface IMediaItemList<T extends IMediaItem> {
 
 	void setItemDateAdded (T item, Date date) throws MorriganException;
 	void setItemMd5 (T item, BigInteger md5) throws MorriganException;
+	void setItemSha1 (T item, BigInteger sha1) throws MorriganException;
 	void setItemDateLastModified (T item, Date date) throws MorriganException;
 	void setItemEnabled (T item, boolean value) throws MorriganException;
 	void setItemEnabled (T item, boolean value, Date lastModified) throws MorriganException;

@@ -291,6 +291,16 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	}
 
 	@Override
+	public void setSha1(final IMediaItem item, final BigInteger sha1) throws DbException {
+		try {
+			local_setSha1(item, sha1);
+		}
+		catch (Exception e) {
+			throw new DbException(e);
+		}
+	}
+
+	@Override
 	public void setDateLastModified (final IMediaItem item, final Date date) throws DbException {
 		try {
 			local_setDateLastModified(item, date);

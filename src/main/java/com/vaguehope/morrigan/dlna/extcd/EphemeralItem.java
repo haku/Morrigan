@@ -91,6 +91,11 @@ public abstract class EphemeralItem implements IMixedMediaItem {
 		return BigInteger.ZERO;
 	}
 
+	@Override
+	public BigInteger getSha1() {
+		return BigInteger.ZERO;
+	}
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Unsupported metadata.
 
@@ -144,6 +149,11 @@ public abstract class EphemeralItem implements IMixedMediaItem {
 
 	@Override
 	public boolean setMd5 (final BigInteger md5) {
+		throw new UnsupportedOperationException("Not implemented.");
+	}
+
+	@Override
+	public boolean setSha1(BigInteger sha1) {
 		throw new UnsupportedOperationException("Not implemented.");
 	}
 

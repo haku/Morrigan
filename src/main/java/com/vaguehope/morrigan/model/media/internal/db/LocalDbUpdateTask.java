@@ -27,6 +27,7 @@ import com.vaguehope.morrigan.tasks.TaskEventListener;
 import com.vaguehope.morrigan.tasks.TaskOutcome;
 import com.vaguehope.morrigan.tasks.TaskResult;
 import com.vaguehope.morrigan.util.ChecksumHelper;
+import com.vaguehope.morrigan.util.ChecksumHelper.Md5AndSha1;
 import com.vaguehope.morrigan.util.FileSystem;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 
@@ -341,22 +342,25 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 				}
 
 				// Hash code.
-				if (fileModified || mi.getMd5() == null || mi.getMd5().equals(BigInteger.ZERO)) {
-					BigInteger md5 = null;
+				if (fileModified
+						|| mi.getMd5() == null || mi.getMd5().equals(BigInteger.ZERO)
+						|| mi.getSha1() == null || mi.getSha1().equals(BigInteger.ZERO)) {
+					Md5AndSha1 md5AndSha1 = null;
 
 					try {
-						md5 = this.fileSystem.generateMd5(file, byteBuffer); // This is slow.
+						md5AndSha1 = this.fileSystem.generateMd5AndSha1(file, byteBuffer); // This is slow.
 					}
 					catch (final Exception e) {
-						taskEventListener.logError(this.itemList.getListName(), "Error while generating checksum for '" + mi.getFilepath() + ": " + e.getMessage(), e);
+						taskEventListener.logError(this.itemList.getListName(), "Error while generating MD5/SHA1 for '" + mi.getFilepath() + ": " + e.getMessage(), e);
 					}
 
-					if (md5 != null && !md5.equals(BigInteger.ZERO)) {
+					if (md5AndSha1 != null) {
 						try {
-							this.itemList.setItemMd5(mi, md5);
+							this.itemList.setItemMd5(mi, md5AndSha1.getMd5());
+							this.itemList.setItemSha1(mi, md5AndSha1.getSha1());
 						}
 						catch (final Exception e) {
-							taskEventListener.logError(this.itemList.getListName(), "Error while setting MD5 code for '" + mi.getFilepath() + "' to '" + md5 + "': " + e.getMessage(), e);
+							taskEventListener.logError(this.itemList.getListName(), "Error while setting MD5/SHA1 code for '" + mi.getFilepath() + "' to '" + md5AndSha1 + "': " + e.getMessage(), e);
 						}
 					}
 

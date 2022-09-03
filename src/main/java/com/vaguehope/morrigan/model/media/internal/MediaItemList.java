@@ -269,6 +269,13 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 	}
 
 	@Override
+	public void setItemSha1 (final T track, final BigInteger sha1) throws MorriganException {
+		track.setSha1(sha1);
+		getChangeEventCaller().mediaItemsUpdated(track);
+		setDirtyState(DirtyState.METADATA);
+	}
+
+	@Override
 	public void setItemDateLastModified (final T track, final Date date) throws MorriganException {
 		track.setDateLastModified(date);
 		getChangeEventCaller().mediaItemsUpdated(track);

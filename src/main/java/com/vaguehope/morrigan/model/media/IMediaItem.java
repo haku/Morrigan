@@ -31,6 +31,9 @@ public interface IMediaItem extends IDbItem {
 	BigInteger getMd5();
 	boolean setMd5(BigInteger md5);
 
+	BigInteger getSha1();
+	boolean setSha1(BigInteger sha1);
+
 	Date getDateLastModified();
 	boolean setDateLastModified(Date lastModified);
 

@@ -40,6 +40,8 @@ public final class ChecksumHelper {
 		private final BigInteger sha1;
 
 		public Md5AndSha1(final BigInteger md5, final BigInteger sha1) {
+			if (md5.equals(BigInteger.ZERO)) throw new IllegalArgumentException("MD5 can not be zero.");
+			if (sha1.equals(BigInteger.ZERO)) throw new IllegalArgumentException("SHA1 can not be zero.");
 			this.md5 = md5;
 			this.sha1 = sha1;
 		}
@@ -50,6 +52,11 @@ public final class ChecksumHelper {
 
 		public BigInteger getSha1() {
 			return this.sha1;
+		}
+
+		@Override
+		public String toString() {
+			return String.format("Md5AndSha1{%s, %s}", this.md5.toString(16), this.sha1.toString(16));
 		}
 	}
 

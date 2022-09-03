@@ -18,6 +18,7 @@ public abstract class MediaItem implements IMediaItem {
 //	Constructors.
 
 	private static final BigInteger MD5_DEFAULT = null;
+	private static final BigInteger SHA1_DEFAULT = null;
 	private static final boolean MISSING_DEFAULT = false;
 	private static final boolean ENABLED_DEFAULT = true;
 	private static final int DBROWID_DEFAULT = -1;
@@ -32,6 +33,7 @@ public abstract class MediaItem implements IMediaItem {
 	private String filepath = null;
 	private Date dateAdded = null;
 	private BigInteger md5 = MD5_DEFAULT;
+	private BigInteger sha1 = SHA1_DEFAULT;
 	private Date dateLastModified = null;
 	private boolean enabled = ENABLED_DEFAULT;
 	private Date enabledLastModified = null;
@@ -87,6 +89,19 @@ public abstract class MediaItem implements IMediaItem {
 	public boolean setMd5(final BigInteger newMd5) {
 		if (!EqualHelper.areEqual(this.md5, newMd5)) {
 			this.md5 = newMd5;
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public BigInteger getSha1() {
+		return this.sha1;
+	}
+	@Override
+	public boolean setSha1(final BigInteger newSha1) {
+		if (!EqualHelper.areEqual(this.sha1, newSha1)) {
+			this.sha1 = newSha1;
 			return true;
 		}
 		return false;
@@ -237,6 +252,7 @@ public abstract class MediaItem implements IMediaItem {
 	public void reset () {
 		this.setDateAdded(null);
 		this.setMd5(MD5_DEFAULT);
+		this.setSha1(SHA1_DEFAULT);
 		this.setDateLastModified(null);
 		this.setEnabled(ENABLED_DEFAULT, null);
 		this.setMissing(MISSING_DEFAULT);
@@ -250,6 +266,7 @@ public abstract class MediaItem implements IMediaItem {
     		  this.setFilepathIfNotSet(mi.getFilepath()) // Do not set it if it is already set.
     		| this.setDateAdded(mi.getDateAdded())
     		| this.setMd5(mi.getMd5())
+    		| this.setSha1(mi.getSha1())
     		| this.setDateLastModified(mi.getDateLastModified())
     		| this.setEnabled(mi.isEnabled(), mi.enabledLastModified())
     		| this.setMissing(mi.isMissing())

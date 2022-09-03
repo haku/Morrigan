@@ -31,7 +31,7 @@ public class MixedMediaDbFeedParser extends DefaultHandler {
 
 	MixedMediaDbFeedParser(final IRemoteMixedMediaDb rmmdb, final TaskEventListener taskEventListener) {
 		this.taskEventListener = taskEventListener;
-		this.stack = new Stack<String>();
+		this.stack = new Stack<>();
 		this.rmmdb = rmmdb;
 	}
 
@@ -58,8 +58,8 @@ public class MixedMediaDbFeedParser extends DefaultHandler {
 	private StringBuilder currentText;
 
 	private Date enabledLastModified;
-	private final List<String> tagValues = new ArrayList<String>();
-	private final List<TagAttrs> tagAttrs = new ArrayList<TagAttrs>();
+	private final List<String> tagValues = new ArrayList<>();
+	private final List<TagAttrs> tagAttrs = new ArrayList<>();
 
 	private void clearCurrentItemCache() {
 		this.currentItem = this.rmmdb.getDbLayer().getNewT(null);
@@ -183,6 +183,10 @@ public class MixedMediaDbFeedParser extends DefaultHandler {
 		else if (this.stack.size() == 3 && localName.equals("hash")) {
 			final BigInteger v = new BigInteger(this.currentText.toString().trim(), 16);
 			this.currentItem.setMd5(v);
+		}
+		else if (this.stack.size() == 3 && localName.equals("sha1")) {
+			final BigInteger v = new BigInteger(this.currentText.toString().trim(), 16);
+			this.currentItem.setSha1(v);
 		}
 		else if (this.stack.size() == 3 && localName.equals("enabled")) {
 			final boolean v = Boolean.parseBoolean(this.currentText.toString().trim());

@@ -38,6 +38,7 @@ import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.tasks.TaskEventListener;
 import com.vaguehope.morrigan.tasks.TaskOutcome;
 import com.vaguehope.morrigan.tasks.TaskResult;
+import com.vaguehope.morrigan.util.ChecksumHelper.Md5AndSha1;
 import com.vaguehope.morrigan.util.FileSystem;
 
 public class LocalMixedMediaDbUpdateTaskTest {
@@ -137,8 +138,8 @@ public class LocalMixedMediaDbUpdateTaskTest {
 		this.testDb.addSource(sourceDir.getAbsolutePath());
 
 		final File d1 = mockDir(sourceDir, "album1");
-		final File f1 = mockFileInDir(d1, "foo.wav", BigInteger.valueOf(2));
-		final File a1 = mockFileInDir(d1, ".album", BigInteger.valueOf(1));
+		final File f1 = mockFileInDir(d1, "foo.wav", new Md5AndSha1(BigInteger.valueOf(2), BigInteger.valueOf(22)));
+		final File a1 = mockFileInDir(d1, ".album", new Md5AndSha1(BigInteger.valueOf(1), BigInteger.valueOf(11)));
 		runUpdateTask();
 		verify(this.taskEventListener).subTask("Found 1 albums");
 
@@ -155,8 +156,8 @@ public class LocalMixedMediaDbUpdateTaskTest {
 		final File mediaDir1 = mockDir(sourceDir, "media1");
 
 		final File d1 = mockDir(mediaDir1, "album");
-		final File f1 = mockFileInDir(d1, "foo.wav", BigInteger.valueOf(2));
-		final File a1 = mockFileInDir(d1, ".album", BigInteger.valueOf(1));
+		final File f1 = mockFileInDir(d1, "foo.wav", new Md5AndSha1(BigInteger.valueOf(2), BigInteger.valueOf(22)));
+		final File a1 = mockFileInDir(d1, ".album", new Md5AndSha1(BigInteger.valueOf(1), BigInteger.valueOf(11)));
 		runUpdateTask();
 		verify(this.taskEventListener).subTask("Found 1 albums");
 
@@ -182,8 +183,8 @@ public class LocalMixedMediaDbUpdateTaskTest {
 		when(a1.exists()).thenReturn(false);
 		final File mediaDir2 = mockDir(sourceDir, "media2");
 		final File d2 = mockDir(mediaDir2, "album");
-		final File f2 = mockFileInDir(d2, "foo.wav", BigInteger.valueOf(2));
-		final File a2 = mockFileInDir(d2, ".album", BigInteger.valueOf(1));
+		final File f2 = mockFileInDir(d2, "foo.wav", new Md5AndSha1(BigInteger.valueOf(2), BigInteger.valueOf(22)));
+		final File a2 = mockFileInDir(d2, ".album", new Md5AndSha1(BigInteger.valueOf(1), BigInteger.valueOf(11)));
 		runUpdateTask();
 		verify(this.taskEventListener, times(2)).subTask("Found 1 albums");
 		verify(this.taskEventListener).logMsg(anyString(), contains("Merged 1 "));
@@ -197,7 +198,7 @@ public class LocalMixedMediaDbUpdateTaskTest {
 		final File sourceDir = mockDir("/dir0/dir1");
 		this.testDb.addSource(sourceDir.getAbsolutePath());
 
-		final File f1 = mockFileInDir(sourceDir, "foo.wav", BigInteger.valueOf(2));
+		final File f1 = mockFileInDir(sourceDir, "foo.wav", new Md5AndSha1(BigInteger.valueOf(2), BigInteger.valueOf(22)));
 		runUpdateTask();
 
 		final IMixedMediaItem i1 = this.testDb.getByFile(f1);
@@ -213,7 +214,7 @@ public class LocalMixedMediaDbUpdateTaskTest {
 		assertEquals(1, rmCount);
 
 		when(f1.exists()).thenReturn(false);
-		final File f2 = mockFileInDir(sourceDir, "bar.wav", BigInteger.valueOf(2));
+		final File f2 = mockFileInDir(sourceDir, "bar.wav", new Md5AndSha1(BigInteger.valueOf(2), BigInteger.valueOf(22)));
 		runUpdateTask();
 		verify(this.taskEventListener).logMsg(anyString(), contains("Merged 1 "));
 	}
@@ -243,15 +244,15 @@ public class LocalMixedMediaDbUpdateTaskTest {
 
 	private File mockFileInDir(final File dir) throws Exception {
 		final int n = TestMixedMediaDb.getTrackNumber();
-		final long mtime = 1234567890000L + n;
-		final BigInteger md5 = BigInteger.valueOf(mtime);
-		return mockFileInDir(dir, String.format("/some_media_file_%s.ext", n), mtime, md5);
+		final long mtime = 1234567890000L + (n * 1000);
+		final Md5AndSha1 md5AndSha1 = new Md5AndSha1(BigInteger.valueOf(mtime), BigInteger.valueOf(mtime + 1));
+		return mockFileInDir(dir, String.format("/some_media_file_%s.ext", n), mtime, md5AndSha1);
 	}
 
-	private File mockFileInDir(final File dir, final String fileName, final BigInteger md5) throws Exception {
+	private File mockFileInDir(final File dir, final String fileName, final Md5AndSha1 md5andSha1) throws Exception {
 		final int n = TestMixedMediaDb.getTrackNumber();
 		final long mtime = 1234567890000L + n;
-		return mockFileInDir(dir, fileName, mtime, md5);
+		return mockFileInDir(dir, fileName, mtime, md5andSha1);
 	}
 
 	private File mockDir(final String dirPath) {
@@ -283,7 +284,7 @@ public class LocalMixedMediaDbUpdateTaskTest {
 		return d;
 	}
 
-	private File mockFileInDir(final File dir, final String fileName, final long mtime, final BigInteger md5) throws Exception {
+	private File mockFileInDir(final File dir, final String fileName, final long mtime, final Md5AndSha1 md5andSha1) throws Exception {
 		String dirPath = dir.getAbsolutePath();
 		if (!dirPath.endsWith("/")) dirPath += "/";
 		final String absPath = dirPath + fileName;
@@ -299,7 +300,7 @@ public class LocalMixedMediaDbUpdateTaskTest {
 		when(f.getAbsolutePath()).thenReturn(absPath);
 		when(f.lastModified()).thenReturn(mtime);
 
-		when(this.fileSystem.generateMd5(eq(f), any(ByteBuffer.class))).thenReturn(md5);
+		when(this.fileSystem.generateMd5AndSha1(eq(f), any(ByteBuffer.class))).thenReturn(md5andSha1);
 
 		putMockFile(absPath, f);
 

@@ -49,6 +49,7 @@ public class MixedMediaDbFeedReaderTest {
 		assertEquals(1200766776000L, item.getDateLastModified().getTime());
 		assertEquals(1475910765439L, item.getDateLastPlayed().getTime());
 		assertEquals("892fde64e2af9ac6390e35b2af05326b", item.getMd5().toString(16));
+		assertEquals("8843d7f92416211de9ebb963ff4ce28125932878", item.getSha1().toString(16));
 		assertEquals(true, item.isEnabled());
 		assertEquals(false, item.isMissing());
 		assertEquals(49L, item.getStartCount());

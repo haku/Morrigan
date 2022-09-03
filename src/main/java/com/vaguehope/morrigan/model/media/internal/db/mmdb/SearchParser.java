@@ -19,7 +19,7 @@ class SearchParser {
 	private static final int MAX_SEARCH_TERMS = 10;
 
 	private static final String _SQL_MEDIAFILES_SELECT =
-			"SELECT id,file,type,md5,added,modified,enabled,enabledmodified,missing,remloc,startcnt,endcnt,lastplay,duration,width,height"
+			"SELECT id,file,type,md5,sha1,added,modified,enabled,enabledmodified,missing,remloc,startcnt,endcnt,lastplay,duration,width,height"
 					+ " FROM tbl_mediafiles";
 
 	private static final String _SQL_WHERE = " WHERE";
