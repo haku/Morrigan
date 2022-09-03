@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.SocketException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.ScheduledExecutorService;
@@ -19,8 +21,6 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.eclipse.jetty.util.B64Code;
 
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.util.NetHelper;
@@ -68,7 +68,8 @@ public class AuthFilter implements Filter {
 			switch (this.authMgr.isValidToken(tokenCookie.getValue())) {
 				case REFRESH_REQUEST:
 					setTokenCookie(resp);
-				case FRESH:
+				//$FALL-THROUGH$
+			case FRESH:
 					chain.doFilter(request, response);
 					return;
 				default:
@@ -88,7 +89,7 @@ public class AuthFilter implements Filter {
 
 		// Verify password.
 		authHeader64 = authHeader64.substring(Http.HEADER_AUTHORISATION_PREFIX.length());
-		final String authHeader = B64Code.decode(authHeader64, (String) null);
+		final String authHeader = new String(Base64.getDecoder().decode(authHeader64), StandardCharsets.UTF_8);
 		final int x = authHeader.indexOf(":");
 		final String user = authHeader.substring(0, x);
 		final String pass = authHeader.substring(x + 1);
