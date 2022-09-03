@@ -183,7 +183,7 @@ public class PlayerStateStorage {
 					w.append(item.getTrack().getRemoteId());
 				}
 				w.append("\n");
-				w.append(item.getTrack().getHashcode().toString(16)).append("\n");
+				w.append(item.getTrack().getMd5().toString(16)).append("\n");
 			}
 			else {
 				w.append("\n");
@@ -206,7 +206,7 @@ public class PlayerStateStorage {
 
 		final String listTypeAndSerialOrPseudoType = lines[0];
 		final String trackFilePath = lines[1];
-		final String trackHash = lines[2];
+		final String trackMd5 = lines[2];
 
 		if (StringHelper.blank(listTypeAndSerialOrPseudoType)) return null;
 
@@ -214,7 +214,7 @@ public class PlayerStateStorage {
 		if (type != null) return new PlayItem(type);
 
 		final String listTypeAndSerial = listTypeAndSerialOrPseudoType;
-		if (StringHelper.blank(trackFilePath) && StringHelper.blank(trackHash)) return null;
+		if (StringHelper.blank(trackFilePath) && StringHelper.blank(trackMd5)) return null;
 
 		final MediaListType listType;
 		final String listSerial;
@@ -255,7 +255,7 @@ public class PlayerStateStorage {
 		}
 
 		IMediaTrack track = list.getByFile(trackFilePath);
-		if (track == null) track = list.getByHashcode(new BigInteger(trackHash, 16));
+		if (track == null) track = list.getByMd5(new BigInteger(trackMd5, 16));
 		if (track != null) return new PlayItem(list, track);
 
 		LOG.warning("Unknown track: " + trackFilePath);

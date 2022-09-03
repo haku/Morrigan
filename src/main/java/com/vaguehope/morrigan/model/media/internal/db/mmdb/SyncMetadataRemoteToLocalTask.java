@@ -50,12 +50,12 @@ public class SyncMetadataRemoteToLocalTask implements MorriganTask {
 			final ILocalMixedMediaDb trans = this.mediaFactory.getLocalMixedMediaDbTransactional(this.local);
 			try {
 				trans.read();
-				// FIXME add getByHashcode() to local DB.
+				// FIXME add getByMd5() to local DB.
 				// Build list of all hashed local items.
-				final Map<BigInteger, IMixedMediaItem> localItems = new HashMap<BigInteger, IMixedMediaItem>();
+				final Map<BigInteger, IMixedMediaItem> localItems = new HashMap<>();
 				for (final IMixedMediaItem localItem : trans.getAllDbEntries()) {
-					final BigInteger hashcode = localItem.getHashcode();
-					if (hashcode != null && !BigInteger.ZERO.equals(hashcode)) localItems.put(hashcode, localItem);
+					final BigInteger md5 = localItem.getMd5();
+					if (md5 != null && !BigInteger.ZERO.equals(md5)) localItems.put(md5, localItem);
 				}
 
 				// All remote items.
@@ -67,9 +67,9 @@ public class SyncMetadataRemoteToLocalTask implements MorriganTask {
 
 				// For each remote item, see if there is a local item to update.
 				for (final IMixedMediaItem remoteItem : remoteItems) {
-					final BigInteger hashcode = remoteItem.getHashcode();
-					if (hashcode != null && !BigInteger.ZERO.equals(hashcode)) {
-						final IMixedMediaItem localItem = localItems.get(hashcode);
+					final BigInteger md5 = remoteItem.getMd5();
+					if (md5 != null && !BigInteger.ZERO.equals(md5)) {
+						final IMixedMediaItem localItem = localItems.get(md5);
 						if (localItem != null) {
 							taskEventListener.subTask(localItem.getTitle());
 							syncMediaItems(trans, this.remote, remoteItem, localItem);
@@ -135,7 +135,7 @@ public class SyncMetadataRemoteToLocalTask implements MorriganTask {
 		if (rTags != null && rTags.size() > 0) {
 			// Index local tags.
 			final List<MediaTag> lTagList = ldb.getTagsIncludingDeleted(localItem);
-			final Map<TagKey, MediaTag> lTags = new HashMap<TagKey, MediaTag>(lTagList.size());
+			final Map<TagKey, MediaTag> lTags = new HashMap<>(lTagList.size());
 			for (final MediaTag lTag : lTagList) {
 				lTags.put(new TagKey(lTag), lTag);
 			}

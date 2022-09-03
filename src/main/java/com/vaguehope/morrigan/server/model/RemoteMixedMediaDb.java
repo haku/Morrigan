@@ -317,7 +317,7 @@ public class RemoteMixedMediaDb extends AbstractMixedMediaDb implements IRemoteM
 	}
 
 	@Override
-	public void setItemHashCode(final IMixedMediaItem track, final BigInteger hashcode) throws MorriganException {
+	public void setItemMd5(final IMixedMediaItem track, final BigInteger md5) throws MorriganException {
 		throw new NotImplementedException();
 	}
 

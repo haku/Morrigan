@@ -118,7 +118,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 	private static final String _SQL_MEDIAFILES_WHEREFILEEQ =
 		" file = ?";
 
-	private static final String _SQL_MEDIAFILES_WHEREHASHCODEEQ =
+	private static final String _SQL_MEDIAFILES_WHERE_MD5_EQ =
 		" md5 = ?";
 
 //	-  -  -  -  -  -  -  -  -  -  -  -
@@ -182,7 +182,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 		"UPDATE tbl_mediafiles SET added=?" +
 		" WHERE file=?;";
 
-	private static final String SQL_TBL_MEDIAFILES_SETHASHCODE =
+	private static final String SQL_TBL_MEDIAFILES_SET_MD5 =
 		"UPDATE tbl_mediafiles SET md5=?" +
 		" WHERE file=?;";
 
@@ -355,15 +355,15 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 		throw new IllegalArgumentException("File not found '"+filePath+"' (results count = "+res.size()+").");
 	}
 
-	protected IMixedMediaItem local_getByHashcode (final BigInteger hashcode) throws SQLException, ClassNotFoundException {
+	protected IMixedMediaItem local_getByMd5 (final BigInteger md5) throws SQLException, ClassNotFoundException {
 		PreparedStatement ps;
 		ResultSet rs;
 		List<IMixedMediaItem> res;
 
-		String sql = _SQL_MEDIAFILES_SELECT + _SQL_WHERE + _SQL_MEDIAFILES_WHEREHASHCODEEQ;
+		String sql = _SQL_MEDIAFILES_SELECT + _SQL_WHERE + _SQL_MEDIAFILES_WHERE_MD5_EQ;
 		ps = getDbCon().prepareStatement(sql);
 		try {
-			ps.setBytes(1, hashcode.toByteArray());
+			ps.setBytes(1, md5.toByteArray());
 			ps.setMaxRows(2); // Ask for 2 so we know if there is more than 1.
 
 			rs = ps.executeQuery();
@@ -377,7 +377,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 		}
 
 		if (res.size() == 1) return res.get(0);
-		throw new IllegalArgumentException("File not found '" + hashcode.toString(16) + "' (results count = " + res.size() + ").");
+		throw new IllegalArgumentException("File not found '" + md5.toString(16) + "' (results count = " + res.size() + ").");
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -547,13 +547,13 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 		getChangeEventCaller().mediaItemUpdated(item);
 	}
 
-	protected void local_setHashCode (final IMediaItem item, final BigInteger hashcode) throws SQLException, ClassNotFoundException, DbException {
+	protected void local_setMd5 (final IMediaItem item, final BigInteger md5) throws SQLException, ClassNotFoundException, DbException {
 		PreparedStatement ps;
-		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SETHASHCODE);
+		ps = getDbCon().prepareStatement(SQL_TBL_MEDIAFILES_SET_MD5);
 		int n;
 		try {
-			if (hashcode != null) {
-				ps.setBytes(1, hashcode.toByteArray());
+			if (md5 != null) {
+				ps.setBytes(1, md5.toByteArray());
 			}
 			else {
 				ps.setNull(1, java.sql.Types.BLOB);
@@ -563,7 +563,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 		} finally {
 			ps.close();
 		}
-		if (n < 1) throw new DbException("No update occured for local_setHashCode('" + item + "','" + hashcode + "').");
+		if (n < 1) throw new DbException("No update occured for local_setMd5('" + item + "','" + md5 + "').");
 		getChangeEventCaller().mediaItemUpdated(item);
 	}
 
@@ -870,7 +870,7 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 		mi.setDateAdded(SqliteHelper.readDate(rs, indexes.colAdded));
 
 		byte[] bytes = rs.getBytes(indexes.colMd5);
-		mi.setHashcode(bytes == null ? null : new BigInteger(bytes));
+		mi.setMd5(bytes == null ? null : new BigInteger(bytes));
 
 		mi.setDateLastModified(SqliteHelper.readDate(rs, indexes.colModified));
 		mi.setEnabled(rs.getInt(indexes.colEnabled) != 0, // default to true.

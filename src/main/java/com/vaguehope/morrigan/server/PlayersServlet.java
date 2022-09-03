@@ -498,7 +498,7 @@ public class PlayersServlet extends HttpServlet {
 			if (currentItem != null && currentItem.hasTrack()) {
 				final IMediaTrack track = currentItem.getTrack();
 				FeedHelper.addElement(dw, "trackfilesize", track.getFileSize());
-				if (track.getHashcode() != null) FeedHelper.addElement(dw, "trackhash", track.getHashcode().toString(16));
+				if (track.getMd5() != null) FeedHelper.addElement(dw, "trackhash", track.getMd5().toString(16));
 				FeedHelper.addElement(dw, "trackenabled", Boolean.toString(track.isEnabled()));
 				FeedHelper.addElement(dw, "trackmissing", Boolean.toString(track.isMissing()));
 				FeedHelper.addElement(dw, "trackstartcount", String.valueOf(track.getStartCount()));
@@ -557,7 +557,7 @@ public class PlayersServlet extends HttpServlet {
 				}
 				FeedHelper.addElement(dw, "type", MediaType.TRACK.getN());
 				FeedHelper.addElement(dw, "filesize", mi.getFileSize());
-				if (mi.getHashcode() != null && !BigInteger.ZERO.equals(mi.getHashcode())) FeedHelper.addElement(dw, "hash", mi.getHashcode().toString(16));
+				if (mi.getMd5() != null && !BigInteger.ZERO.equals(mi.getMd5())) FeedHelper.addElement(dw, "hash", mi.getMd5().toString(16));
 				FeedHelper.addElement(dw, "enabled", Boolean.toString(mi.isEnabled()));
 				FeedHelper.addElement(dw, "missing", Boolean.toString(mi.isMissing()));
 				FeedHelper.addElement(dw, "duration", mi.getDuration());

@@ -32,7 +32,7 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 
 	private final String listId;
 	private final String listName;
-	private final List<T> mediaTracks = new CopyOnWriteArrayList<T>();
+	private final List<T> mediaTracks = new CopyOnWriteArrayList<>();
 
 	/**
 	 * listId must be unique. It will be used to identify the matching editor.
@@ -262,8 +262,8 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 	}
 
 	@Override
-	public void setItemHashCode (final T track, final BigInteger hashcode) throws MorriganException {
-		track.setHashcode(hashcode);
+	public void setItemMd5 (final T track, final BigInteger md5) throws MorriganException {
+		track.setMd5(md5);
 		getChangeEventCaller().mediaItemsUpdated(track);
 		setDirtyState(DirtyState.METADATA);
 	}
@@ -350,10 +350,10 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 	 * @return items that were removed from keepList.
 	 */
 	protected static <T extends IMediaItem> List<T> updateList (final List<T> keepList, final List<T> freshList, final boolean updateKeepList) {
-		List<T> finalList = new ArrayList<T>();
+		List<T> finalList = new ArrayList<>();
 
 		// This block takes no time.
-		Map<String, T> keepMap = new HashMap<String, T>(keepList.size());
+		Map<String, T> keepMap = new HashMap<>(keepList.size());
 		for (T e : keepList) {
 			keepMap.put(e.getFilepath(), e);
 		}
@@ -373,8 +373,8 @@ public abstract class MediaItemList<T extends IMediaItem> implements IMediaItemL
 		/*
 		 * Create a new list and populate it with the items removed.
 		 */
-		List<T> removedItems = new ArrayList<T>();
-		keepMap = new HashMap<String, T>(keepList.size());
+		List<T> removedItems = new ArrayList<>();
+		keepMap = new HashMap<>(keepList.size());
 		for (T e : finalList) {
 			keepMap.put(e.getFilepath(), e);
 		}

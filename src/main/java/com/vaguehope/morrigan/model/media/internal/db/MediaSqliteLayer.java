@@ -40,7 +40,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	private final Collection<IMediaItemStorageLayerChangeListener<T>> changeListeners = Collections.synchronizedList(new ArrayList<IMediaItemStorageLayerChangeListener<T>>());
-	private final IMediaItemStorageLayerChangeListener<T> changeCaller = new IMediaItemStorageLayerChangeListenerAdaptor<T>(this.changeListeners);
+	private final IMediaItemStorageLayerChangeListener<T> changeCaller = new IMediaItemStorageLayerChangeListenerAdaptor<>(this.changeListeners);
 
 	@Override
 	public void addChangeListener(final IMediaItemStorageLayerChangeListener<T> listener) {
@@ -577,7 +577,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 
 	@Override
 	protected List<SqlCreateCmd> getTblCreateCmds() {
-		List<SqlCreateCmd> l = new ArrayList<SqlCreateCmd>();
+		List<SqlCreateCmd> l = new ArrayList<>();
 
 		l.add(new SqlCreateCmd(SQL_TBL_PROP_EXISTS, SQL_TBL_PROP_CREATE));
 
@@ -653,7 +653,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		try {
 			final ResultSet rs = ps.executeQuery();
 			try {
-				final Map<String, String> ret = new LinkedHashMap<String, String>();
+				final Map<String, String> ret = new LinkedHashMap<>();
 				while (rs.next()) {
 					ret.put(rs.getString(SQL_TBL_PROP_COL_KEY), rs.getString(SQL_TBL_PROP_COL_VALUE));
 				}
@@ -902,7 +902,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 				while (rs.next()) {
 					final MediaTag mt = local_readTag(rs);
 					final int freq = rs.getInt("freq");
-					if (ret == null) ret = new LinkedHashMap<String, MediaTag>();
+					if (ret == null) ret = new LinkedHashMap<>();
 					ret.put(String.format("%s (%s)", mt.getTag(), freq), mt);
 				}
 				return ret != null ? ret : Collections.<String, MediaTag>emptyMap();
@@ -933,7 +933,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 			List<MediaTag> ret = null;
 			while (rs.next()) {
 				final MediaTag mt = local_readTag(rs);
-				if (ret == null) ret = new ArrayList<MediaTag>();
+				if (ret == null) ret = new ArrayList<>();
 				ret.add(mt);
 			}
 			return ret != null ? ret : Collections.<MediaTag>emptyList();
@@ -1042,7 +1042,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 	private final MediaTagClassificationFactory tagClsFactory = new MediaTagClassificationFactory();
 
 	private List<MediaTagClassification> local_getTagClassification_parseRecordSet (final ResultSet rs) throws SQLException {
-		final List<MediaTagClassification> ret = new ArrayList<MediaTagClassification>();
+		final List<MediaTagClassification> ret = new ArrayList<>();
 		while (rs.next()) {
 			final long rowId = rs.getLong(SQL_TBL_TAGCLS_COL_ROWID);
 			final String clsName = rs.getString(SQL_TBL_TAGCLS_COL_CLS);
@@ -1059,7 +1059,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		try {
 			ResultSet rs = stat.executeQuery(SQL_TBL_ALBUMS_Q_ALL);
 			try {
-				List<MediaAlbum> ret = new ArrayList<MediaAlbum>();
+				List<MediaAlbum> ret = new ArrayList<>();
 				while (rs.next()) {
 					long rowId = rs.getLong(SQL_TBL_ALBUMS_COL_ROWID);
 					String name = rs.getString(SQL_TBL_ALBUMS_COL_NAME);
@@ -1201,7 +1201,7 @@ public abstract class MediaSqliteLayer<T extends IMediaItem> extends GenericSqli
 		try {
 			ResultSet rs = stat.executeQuery(SQL_TBL_SOURCES_Q_ALL);
 			try {
-				ret = new ArrayList<String>();
+				ret = new ArrayList<>();
 				while (rs.next()) {
 					ret.add(rs.getString("path"));
 				}

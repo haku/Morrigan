@@ -436,8 +436,8 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	}
 
 	@Override
-	public T getByHashcode (final BigInteger hashcode) throws DbException {
-		return this.dbLayer.getByHashcode(hashcode);
+	public T getByMd5 (final BigInteger md5) throws DbException {
+		return this.dbLayer.getByMd5(md5);
 	}
 
 	@Override
@@ -562,10 +562,10 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	}
 
 	@Override
-	public void setItemHashCode (final T track, final BigInteger hashcode) throws MorriganException {
-		super.setItemHashCode(track, hashcode);
+	public void setItemMd5 (final T track, final BigInteger md5) throws MorriganException {
+		super.setItemMd5(track, md5);
 		try {
-			this.dbLayer.setHashcode(track, hashcode);
+			this.dbLayer.setMd5(track, md5);
 		}
 		catch (DbException e) {
 			throw new MorriganException(e);
@@ -630,7 +630,7 @@ public abstract class MediaItemDb<S extends IMediaItemStorageLayer<T>, T extends
 	@Override
 	public void persistTrackData (final T track) throws MorriganException {
 		try {
-			this.dbLayer.setHashcode(track, track.getHashcode());
+			this.dbLayer.setMd5(track, track.getMd5());
 			if (track.getDateAdded() != null) this.dbLayer.setDateAdded(track, track.getDateAdded());
 			if (track.getDateLastModified() != null) this.dbLayer.setDateLastModified(track, track.getDateLastModified());
 			this.dbLayer.setRemoteLocation(track, track.getRemoteLocation());

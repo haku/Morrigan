@@ -764,8 +764,8 @@ public class MlistsServlet extends HttpServlet {
 			final IncludeTags includeTags, final String transcodeStr, final Config config) throws SAXException, MorriganException, IOException {
 		String title = mi.getTitle();
 		long fileSize = mi.getFileSize();
-		final BigInteger originalFileHash = mi.getHashcode();
-		BigInteger fileHash = originalFileHash;
+		final BigInteger originalFileMd5 = mi.getMd5();
+		BigInteger fileMd5 = originalFileMd5;
 		String fileLink = fileLink(mi);
 
 		ItemTags tags = null;  // Could be replaced with a nicer Memoise thingy?
@@ -780,7 +780,7 @@ public class MlistsServlet extends HttpServlet {
 
 					final File transcodedFile = tProfile.getCacheFileIfFresh();
 					fileSize = transcodedFile != null ? transcodedFile.length() : 0L;
-					fileHash = transcodedFile != null ? ChecksumCache.readHash(transcodedFile) : null;
+					fileMd5 = transcodedFile != null ? ChecksumCache.readMd5(transcodedFile) : null;
 
 					fileLink += "?" + PARAM_TRANSCODE + "=" + transcode.getSymbolicName();
 				}
@@ -805,8 +805,8 @@ public class MlistsServlet extends HttpServlet {
 			FeedHelper.addElement(dw, "type", ((IMixedMediaItem) mi).getMediaType().getN());
 		}
 		if (mi.getMimeType() != null) FeedHelper.addElement(dw, "mimetype", mi.getMimeType());
-		if (originalFileHash != null && !BigInteger.ZERO.equals(originalFileHash)) FeedHelper.addElement(dw, "originalhash", originalFileHash.toString(16));
-		if (fileHash != null && !BigInteger.ZERO.equals(fileHash)) FeedHelper.addElement(dw, "hash", fileHash.toString(16));
+		if (originalFileMd5 != null && !BigInteger.ZERO.equals(originalFileMd5)) FeedHelper.addElement(dw, "originalhash", originalFileMd5.toString(16));
+		if (fileMd5 != null && !BigInteger.ZERO.equals(fileMd5)) FeedHelper.addElement(dw, "hash", fileMd5.toString(16));
 		FeedHelper.addElement(dw, "enabled", Boolean.toString(mi.isEnabled()), new String[][] {
 			{ "m", mi.enabledLastModified() == null || mi.enabledLastModified().getTime() < 1L ? "" : String.valueOf(mi.enabledLastModified().getTime()) },
 		});

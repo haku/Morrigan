@@ -64,7 +64,7 @@ public class TestMixedMediaDb extends LocalMixedMediaDb {
 		addFile(file);
 		final IMixedMediaItem track = getByFile(file); // Workaround so dbRowId is filled in.
 		setItemMediaType(track, MediaType.TRACK);
-		setItemHashCode(track, hashCode);
+		setItemMd5(track, hashCode);
 
 		final Date lastPlayed = new Date(System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(RND.nextInt(144000)));
 		setTrackDateLastPlayed(track, lastPlayed);

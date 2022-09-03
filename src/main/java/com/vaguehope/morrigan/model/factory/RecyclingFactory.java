@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public abstract class RecyclingFactory<T extends Object, K extends Object, P extends Object, S extends Throwable> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private Map<K, WeakReference<T>> cache = new ConcurrentHashMap<K, WeakReference<T>>();
+	private Map<K, WeakReference<T>> cache = new ConcurrentHashMap<>();
 	private final boolean allowRecycle;
 
 	protected RecyclingFactory (boolean allowReuse) {

@@ -7,7 +7,7 @@ import java.nio.ByteBuffer;
 
 public class ChecksumCache {
 
-	private static final LruCache<String, BigInteger> CACHE = new LruCache<String, BigInteger>(10000);
+	private static final LruCache<String, BigInteger> CACHE = new LruCache<>(10000);
 
 	private static final ThreadLocal<ByteBuffer> BUFFER_FACTRY = new ThreadLocal<ByteBuffer>(){
 		@Override
@@ -18,30 +18,30 @@ public class ChecksumCache {
 		}
 	};
 
-	public static BigInteger readHash (final File file) throws IOException {
+	public static BigInteger readMd5 (final File file) throws IOException {
 		final String key = file.getAbsolutePath();
-		BigInteger hash;
+		BigInteger md5;
 		synchronized (CACHE) {
-			hash = CACHE.get(key);
+			md5 = CACHE.get(key);
 		}
-		if (hash != null) return hash;
+		if (md5 != null) return md5;
 
 		final File cacheFile = new File(file.getAbsolutePath() + ".md5");
-		if (hash == null) {
+		if (md5 == null) {
 			if (cacheFile.exists() && cacheFile.lastModified() > file.lastModified()) {
-				hash = new BigInteger(IoHelper.readAsString(cacheFile), 16);
+				md5 = new BigInteger(IoHelper.readAsString(cacheFile), 16);
 			}
 		}
 
-		if (hash == null) {
-			hash = ChecksumHelper.generateMd5(file, BUFFER_FACTRY.get());
-			IoHelper.write(hash.toString(16), cacheFile);
+		if (md5 == null) {
+			md5 = ChecksumHelper.generateMd5(file, BUFFER_FACTRY.get());
+			IoHelper.write(md5.toString(16), cacheFile);
 		}
 
 		synchronized (CACHE) {
-			CACHE.put(key, hash);
+			CACHE.put(key, md5);
 		}
-		return hash;
+		return md5;
 	}
 
 }

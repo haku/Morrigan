@@ -39,7 +39,7 @@ public interface IMediaItemDb<S extends IMediaItemStorageLayer<T>, T extends IMe
 	List<T> getAllDbEntries () throws DbException;
 	T getByFile (File file) throws DbException;
 	T getByFile (String filepath) throws DbException;
-	T getByHashcode (BigInteger hashcode) throws DbException;
+	T getByMd5 (BigInteger md5) throws DbException;
 
 	/**
 	 * Note: returned item will be missing DB rowId.

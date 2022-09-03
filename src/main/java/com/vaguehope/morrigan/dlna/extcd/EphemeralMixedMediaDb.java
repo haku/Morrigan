@@ -332,7 +332,7 @@ public abstract class EphemeralMixedMediaDb implements IMixedMediaDb {
 	}
 
 	@Override
-	public IMixedMediaItem getByHashcode (final BigInteger hashcode) throws DbException {
+	public IMixedMediaItem getByMd5 (final BigInteger md5) throws DbException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 
@@ -357,7 +357,7 @@ public abstract class EphemeralMixedMediaDb implements IMixedMediaDb {
 	}
 
 	@Override
-	public void setItemHashCode (final IMixedMediaItem item, final BigInteger hashcode) throws MorriganException {
+	public void setItemMd5 (final IMixedMediaItem item, final BigInteger md5) throws MorriganException {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 

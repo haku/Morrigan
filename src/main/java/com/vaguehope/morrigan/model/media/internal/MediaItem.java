@@ -17,7 +17,7 @@ public abstract class MediaItem implements IMediaItem {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //	Constructors.
 
-	private static final BigInteger HASHCODE_DEFAULT = null;
+	private static final BigInteger MD5_DEFAULT = null;
 	private static final boolean MISSING_DEFAULT = false;
 	private static final boolean ENABLED_DEFAULT = true;
 	private static final int DBROWID_DEFAULT = -1;
@@ -31,7 +31,7 @@ public abstract class MediaItem implements IMediaItem {
 
 	private String filepath = null;
 	private Date dateAdded = null;
-	private BigInteger hashcode = HASHCODE_DEFAULT;
+	private BigInteger md5 = MD5_DEFAULT;
 	private Date dateLastModified = null;
 	private boolean enabled = ENABLED_DEFAULT;
 	private Date enabledLastModified = null;
@@ -80,13 +80,13 @@ public abstract class MediaItem implements IMediaItem {
 	}
 
 	@Override
-	public BigInteger getHashcode() {
-		return this.hashcode;
+	public BigInteger getMd5() {
+		return this.md5;
 	}
 	@Override
-	public boolean setHashcode(final BigInteger newHashcode) {
-		if (!EqualHelper.areEqual(this.hashcode, newHashcode)) {
-			this.hashcode = newHashcode;
+	public boolean setMd5(final BigInteger newMd5) {
+		if (!EqualHelper.areEqual(this.md5, newMd5)) {
+			this.md5 = newMd5;
 			return true;
 		}
 		return false;
@@ -236,7 +236,7 @@ public abstract class MediaItem implements IMediaItem {
 	@Override
 	public void reset () {
 		this.setDateAdded(null);
-		this.setHashcode(HASHCODE_DEFAULT);
+		this.setMd5(MD5_DEFAULT);
 		this.setDateLastModified(null);
 		this.setEnabled(ENABLED_DEFAULT, null);
 		this.setMissing(MISSING_DEFAULT);
@@ -249,7 +249,7 @@ public abstract class MediaItem implements IMediaItem {
 		boolean b =
     		  this.setFilepathIfNotSet(mi.getFilepath()) // Do not set it if it is already set.
     		| this.setDateAdded(mi.getDateAdded())
-    		| this.setHashcode(mi.getHashcode())
+    		| this.setMd5(mi.getMd5())
     		| this.setDateLastModified(mi.getDateLastModified())
     		| this.setEnabled(mi.isEnabled(), mi.enabledLastModified())
     		| this.setMissing(mi.isMissing())

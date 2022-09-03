@@ -341,22 +341,22 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 				}
 
 				// Hash code.
-				if (fileModified || mi.getHashcode() == null || mi.getHashcode().equals(BigInteger.ZERO)) {
-					BigInteger hash = null;
+				if (fileModified || mi.getMd5() == null || mi.getMd5().equals(BigInteger.ZERO)) {
+					BigInteger md5 = null;
 
 					try {
-						hash = this.fileSystem.generateMd5(file, byteBuffer); // This is slow.
+						md5 = this.fileSystem.generateMd5(file, byteBuffer); // This is slow.
 					}
 					catch (final Exception e) {
 						taskEventListener.logError(this.itemList.getListName(), "Error while generating checksum for '" + mi.getFilepath() + ": " + e.getMessage(), e);
 					}
 
-					if (hash != null && !hash.equals(BigInteger.ZERO)) {
+					if (md5 != null && !md5.equals(BigInteger.ZERO)) {
 						try {
-							this.itemList.setItemHashCode(mi, hash);
+							this.itemList.setItemMd5(mi, md5);
 						}
 						catch (final Exception e) {
-							taskEventListener.logError(this.itemList.getListName(), "Error while setting hash code for '" + mi.getFilepath() + "' to '" + hash + "': " + e.getMessage(), e);
+							taskEventListener.logError(this.itemList.getListName(), "Error while setting MD5 code for '" + mi.getFilepath() + "' to '" + md5 + "': " + e.getMessage(), e);
 						}
 					}
 
@@ -415,11 +415,11 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 		final long startTime = System.currentTimeMillis();
 
 		for (int i = 0; i < tracks.size(); i++) {
-			if (hasHashCode(tracks.get(i))) {
+			if (hasMd5(tracks.get(i))) {
 				final boolean a = this.fileSystem.makeFile(tracks.get(i).getFilepath()).exists();
 				for (int j = i + 1; j < tracks.size(); j++) {
-					if (hasHashCode(tracks.get(j))) {
-						if (tracks.get(i).getHashcode().equals(tracks.get(j).getHashcode())) {
+					if (hasMd5(tracks.get(j))) {
+						if (tracks.get(i).getMd5().equals(tracks.get(j).getMd5())) {
 							final boolean b = this.fileSystem.makeFile(tracks.get(j).getFilepath()).exists();
 							if (a && b) { // Both exist.
 								// TODO prompt to move the newer one?
@@ -449,8 +449,8 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 		return dupicateItems;
 	}
 
-	private boolean hasHashCode (final T item) {
-		return item.getHashcode() != null && !item.getHashcode().equals(BigInteger.ZERO);
+	private boolean hasMd5 (final T item) {
+		return item.getMd5() != null && !item.getMd5().equals(BigInteger.ZERO);
 	}
 
 	/**
@@ -484,17 +484,17 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 	 */
 	private int mergeDuplicates (final TaskEventListener taskEventListener, final Q list, final Map<T, ScanOption> dupicateItems) throws MorriganException {
 		// Make a list of all the unique hashcodes we know.
-		final Set<BigInteger> hashcodes = new HashSet<>();
+		final Set<BigInteger> md5s = new HashSet<>();
 		for (final IMediaItem mi : dupicateItems.keySet()) {
-			hashcodes.add(mi.getHashcode());
+			md5s.add(mi.getMd5());
 		}
-		taskEventListener.logMsg(this.itemList.getListName(), "Found " + hashcodes.size() + " unique hashes.");
+		taskEventListener.logMsg(this.itemList.getListName(), "Found " + md5s.size() + " unique MD5s.");
 
 		// Resolve each unique hashcode.
 		int countMerges = 0;
-		for (final BigInteger h : hashcodes) {
+		for (final BigInteger h : md5s) {
 			if (taskEventListener.isCanceled()) break;
-			final Map<T, ScanOption> items = findByHashcode(dupicateItems, h);
+			final Map<T, ScanOption> items = findByMd5(dupicateItems, h);
 
 			// If there is only one entry that still exists, merge metadata and remove bad references.
 			// This is the only supported merge case at the moment.
@@ -528,10 +528,10 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 	/*
 	 * Find all the entries with this hashcode.
 	 */
-	private Map<T, ScanOption> findByHashcode (final Map<T, ScanOption> items, final BigInteger hashcode) {
+	private Map<T, ScanOption> findByMd5 (final Map<T, ScanOption> items, final BigInteger md5) {
 		final Map<T, ScanOption> ret = new HashMap<>();
 		for (final Entry<T, ScanOption> i : items.entrySet()) {
-			if (hashcode.equals(i.getKey().getHashcode())) {
+			if (md5.equals(i.getKey().getMd5())) {
 				ret.put(i.getKey(), i.getValue());
 			}
 		}
@@ -540,26 +540,26 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 
 	private void printDuplicates (final TaskEventListener taskEventListener, final Map<T, ScanOption> items) {
 		final List<Entry<T, ScanOption>> dups = new ArrayList<>(items.entrySet());
-		Collections.sort(dups, new HashcodeComparator());
+		Collections.sort(dups, new Md5Comparator());
 
 		taskEventListener.logMsg(this.itemList.getListName(), "Found " + dups.size() + " duplicates:");
 		for (final Entry<T, ScanOption> e : dups) {
-			final BigInteger hashcode = e.getKey().getHashcode();
-			final String hashcodeString = hashcode == null ? "null" : hashcode.toString(16);
-			taskEventListener.logMsg(this.itemList.getListName(), hashcodeString + " : " + e.getValue() + " : " + e.getKey().getTitle());
+			final BigInteger md5 = e.getKey().getMd5();
+			final String md5String = md5 == null ? "null" : md5.toString(16);
+			taskEventListener.logMsg(this.itemList.getListName(), md5String + " : " + e.getValue() + " : " + e.getKey().getTitle());
 		}
 	}
 
-	private final class HashcodeComparator implements Comparator<Entry<T, ScanOption>> {
+	private final class Md5Comparator implements Comparator<Entry<T, ScanOption>> {
 
-		public HashcodeComparator () {}
+		public Md5Comparator () {}
 
 		@Override
 		public int compare (final Entry<T, ScanOption> o1, final Entry<T, ScanOption> o2) {
 			// comp(1234, null) == -1, comp(null, null) == 0, comp(null, 1234) == 1
 
-			final BigInteger h1 = o1.getKey().getHashcode();
-			final BigInteger h2 = o2.getKey().getHashcode();
+			final BigInteger h1 = o1.getKey().getMd5();
+			final BigInteger h2 = o2.getKey().getMd5();
 
 			return h1 == null ? (h2 == null ? 0 : 1) : h1.compareTo(h2);
 		}

@@ -87,7 +87,7 @@ public abstract class EphemeralItem implements IMixedMediaItem {
 	}
 
 	@Override
-	public BigInteger getHashcode () {
+	public BigInteger getMd5 () {
 		return BigInteger.ZERO;
 	}
 
@@ -143,7 +143,7 @@ public abstract class EphemeralItem implements IMixedMediaItem {
 	}
 
 	@Override
-	public boolean setHashcode (final BigInteger hashcode) {
+	public boolean setMd5 (final BigInteger md5) {
 		throw new UnsupportedOperationException("Not implemented.");
 	}
 

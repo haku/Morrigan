@@ -43,11 +43,11 @@ public class MediaFileLocator implements FileLocator {
 	}
 
 	public String mediaItemId (final MediaListReference mlr, final IMixedMediaItem mi) {
-		return String.format("%s/item/%s/%s", mlrRef(mlr), encodeFilepath(mi), mi.getHashcode().toString(16));
+		return String.format("%s/item/%s/%s", mlrRef(mlr), encodeFilepath(mi), mi.getMd5().toString(16));
 	}
 
 	public String mediaItemArtId (final MediaListReference mlr, final IMixedMediaItem mi) {
-		return String.format("%s/item/%s/%s/art", mlrRef(mlr), encodeFilepath(mi), mi.getHashcode().toString(16));
+		return String.format("%s/item/%s/%s/art", mlrRef(mlr), encodeFilepath(mi), mi.getMd5().toString(16));
 	}
 
 	public String albumArtId (final MediaListReference mlr, final MediaAlbum album) {
@@ -87,7 +87,7 @@ public class MediaFileLocator implements FileLocator {
 			if (parts.length < 4) throw new IllegalArgumentException("Need at least 4 parts: " + id);
 
 			final String filepath = decodeString(parts[2]);
-			final IMixedMediaItem item = db.hasFile(filepath).isKnown() ? db.getByFile(filepath) : db.getByHashcode(new BigInteger(parts[3], 16));
+			final IMixedMediaItem item = db.hasFile(filepath).isKnown() ? db.getByFile(filepath) : db.getByMd5(new BigInteger(parts[3], 16));
 
 			if (parts.length == 4) {
 				return new File(item.getFilepath());

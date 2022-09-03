@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public abstract class RecyclingFactory2<T extends Object, K extends Object, S extends Throwable> {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private Map<K, WeakReference<T>> cache = new ConcurrentHashMap<K, WeakReference<T>>();
+	private Map<K, WeakReference<T>> cache = new ConcurrentHashMap<>();
 	private final boolean allowRecycle;
 
 	protected RecyclingFactory2 (boolean allowReuse) {
@@ -51,7 +51,7 @@ public abstract class RecyclingFactory2<T extends Object, K extends Object, S ex
 			// If we found one, but are not allowed to use it, return null.
 			if (ret == null) {
 				ret = makeNewProduct(material);
-				this.cache.put(material, new WeakReference<T>(ret));
+				this.cache.put(material, new WeakReference<>(ret));
 			}
 			else if (!this.allowRecycle) {
 				ret = null;

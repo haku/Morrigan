@@ -113,7 +113,7 @@ public interface IMediaItemStorageLayer<T extends IMediaItem> extends IGenericDb
 	FileExistance hasFile (String filePath) throws DbException;
 	T getByFile (File file) throws DbException;
 	T getByFile (String filePath) throws DbException;
-	T getByHashcode (BigInteger hashcode) throws DbException;
+	T getByMd5 (BigInteger md5) throws DbException;
 	List<T> simpleSearch(String term, int maxResults) throws DbException;
 	List<T> simpleSearch(String term, int maxResults, IDbColumn[] sorts, SortDirection[] directions, boolean includeDisabled) throws DbException;
 
@@ -140,7 +140,7 @@ public interface IMediaItemStorageLayer<T extends IMediaItem> extends IGenericDb
 	int removeFile (IDbItem dbItem) throws DbException;
 
 	void setDateAdded(IMediaItem item, Date date) throws DbException;
-	void setHashcode(IMediaItem item, BigInteger hashcode) throws DbException;
+	void setMd5(IMediaItem item, BigInteger md5) throws DbException;
 	void setDateLastModified(IMediaItem item, Date date) throws DbException;
 	void setEnabled(IMediaItem item, boolean value) throws DbException;
 	void setEnabled(IMediaItem item, boolean value, Date lastModified) throws DbException;

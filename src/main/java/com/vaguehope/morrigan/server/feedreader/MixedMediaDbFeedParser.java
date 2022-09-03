@@ -182,7 +182,7 @@ public class MixedMediaDbFeedParser extends DefaultHandler {
 		}
 		else if (this.stack.size() == 3 && localName.equals("hash")) {
 			final BigInteger v = new BigInteger(this.currentText.toString().trim(), 16);
-			this.currentItem.setHashcode(v);
+			this.currentItem.setMd5(v);
 		}
 		else if (this.stack.size() == 3 && localName.equals("enabled")) {
 			final boolean v = Boolean.parseBoolean(this.currentText.toString().trim());

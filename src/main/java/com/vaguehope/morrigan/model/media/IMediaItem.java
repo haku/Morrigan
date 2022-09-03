@@ -28,8 +28,8 @@ public interface IMediaItem extends IDbItem {
 	Date getDateAdded();
 	boolean setDateAdded(Date dateAdded);
 
-	BigInteger getHashcode();
-	boolean setHashcode(BigInteger hashcode);
+	BigInteger getMd5();
+	boolean setMd5(BigInteger md5);
 
 	Date getDateLastModified();
 	boolean setDateLastModified(Date lastModified);

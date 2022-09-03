@@ -192,9 +192,9 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	}
 
 	@Override
-	public IMixedMediaItem getByHashcode (final BigInteger hashcode) throws DbException {
+	public IMixedMediaItem getByMd5 (final BigInteger md5) throws DbException {
 		try {
-			return local_getByHashcode(hashcode);
+			return local_getByMd5(md5);
 		}
 		catch (Exception e) {
 			throw new DbException(e);
@@ -281,9 +281,9 @@ public class MixedMediaSqliteLayerOuter extends MixedMediaSqliteLayerInner imple
 	}
 
 	@Override
-	public void setHashcode (final IMediaItem item, final BigInteger hashcode) throws DbException {
+	public void setMd5 (final IMediaItem item, final BigInteger md5) throws DbException {
 		try {
-			local_setHashCode(item, hashcode);
+			local_setMd5(item, md5);
 		}
 		catch (Exception e) {
 			throw new DbException(e);
