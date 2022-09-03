@@ -356,8 +356,8 @@ public abstract class LocalDbUpdateTask<Q extends IMediaItemDb<? extends IMediaI
 
 					if (md5AndSha1 != null) {
 						try {
-							this.itemList.setItemMd5(mi, md5AndSha1.getMd5());
-							this.itemList.setItemSha1(mi, md5AndSha1.getSha1());
+							if (!md5AndSha1.getMd5().equals(mi.getMd5())) this.itemList.setItemMd5(mi, md5AndSha1.getMd5());
+							if (!md5AndSha1.getSha1().equals(mi.getSha1())) this.itemList.setItemSha1(mi, md5AndSha1.getSha1());
 						}
 						catch (final Exception e) {
 							taskEventListener.logError(this.itemList.getListName(), "Error while setting MD5/SHA1 code for '" + mi.getFilepath() + "' to '" + md5AndSha1 + "': " + e.getMessage(), e);

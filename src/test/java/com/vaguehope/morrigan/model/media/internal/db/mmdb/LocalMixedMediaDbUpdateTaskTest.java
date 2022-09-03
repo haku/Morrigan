@@ -191,6 +191,8 @@ public class LocalMixedMediaDbUpdateTaskTest {
 		final IMixedMediaItem i2 = this.testDb.getByFile(f2);
 		assertEquals("my tag", this.testDb.getTags(i2).get(0).getTag());
 		assertEquals("auto tag", this.testDb.getTags(i2).get(1).getTag());
+		assertEquals(BigInteger.valueOf(2), i2.getMd5());
+		assertEquals(BigInteger.valueOf(22), i2.getSha1());
 	}
 
 	@Test
