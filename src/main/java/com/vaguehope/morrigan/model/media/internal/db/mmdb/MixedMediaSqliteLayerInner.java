@@ -11,6 +11,9 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.db.IDbItem;
 import com.vaguehope.morrigan.model.media.FileExistance;
@@ -25,7 +28,8 @@ import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.util.GeneratedString;
 
 public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixedMediaItem> implements IMixedMediaItemStorageLayer {
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	private static final Logger LOG = LoggerFactory.getLogger(MixedMediaSqliteLayerInner.class);
 
 	private final MixedMediaItemFactory itemFactory;
 
@@ -266,6 +270,26 @@ public abstract class MixedMediaSqliteLayerInner extends MediaSqliteLayer<IMixed
 //				"CREATE UNIQUE INDEX ..."));
 
 		return l;
+	}
+
+	@Override
+	protected void migrateDb() throws SQLException, ClassNotFoundException {
+		super.migrateDb();
+		addColumnIfMissing(SQL_TBL_MEDIAFILES_COL_SHA1);
+	}
+
+	private void addColumnIfMissing(final IDbColumn column) throws SQLException, ClassNotFoundException {
+		try (final PreparedStatement p = getDbCon().prepareStatement("SELECT name FROM pragma_table_info('tbl_mediafiles') WHERE name=?;")) {
+			p.setString(1, column.getName());
+			try (final ResultSet rs = p.executeQuery()) {
+				if (rs.next()) return;
+			}
+		}
+		LOG.info("Adding column {} to tbl_mediafiles in: {}", column.getName(), getDbFilePath());
+		final String sql = "ALTER TABLE tbl_mediafiles ADD COLUMN " + column.getName() + " " + column.getSqlType();
+		try (final PreparedStatement p = getDbCon().prepareStatement(sql)) {
+			p.execute();
+		}
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

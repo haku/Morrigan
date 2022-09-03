@@ -170,6 +170,11 @@ public abstract class GenericSqliteLayer implements IGenericDbLayer {
 		finally {
 			stmt.close();
 		}
+		migrateDb();
+	}
+
+	protected void migrateDb() throws SQLException, ClassNotFoundException {
+		// Default does nothing.
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
