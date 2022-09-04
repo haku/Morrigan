@@ -3,6 +3,7 @@ package com.vaguehope.morrigan.server;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Type;
 import java.math.BigInteger;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -22,6 +23,13 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.util.ajax.JSON;
 import org.xml.sax.SAXException;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 import com.megginson.sax.DataWriter;
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.db.IDbColumn;
@@ -103,6 +111,8 @@ import com.vaguehope.morrigan.util.StringHelper;
  *  GET /mlists/LOCALMMDB/example.local.db3/query/example?includedisabled=true
  *  GET /mlists/LOCALMMDB/example.local.db3/query/example?column=foo&order=asc
  *  GET /mlists/LOCALMMDB/example.local.db3/query/example?transcode=audio_only
+ *
+ *  GET /mlists/LOCALMMDB/example.local.db3/sha1tags
  * </pre>
  */
 public class MlistsServlet extends HttpServlet {
@@ -113,11 +123,12 @@ public class MlistsServlet extends HttpServlet {
 
 	private static final String PATH_SAVED_VIEWS = "/savedviews";
 
-	public static final String PATH_SRC = "src";
-	public static final String PATH_TAGS = "tags";
+	private static final String PATH_SRC = "src";
+	private static final String PATH_TAGS = "tags";
 	public static final String PATH_ITEMS = "items";
-	public static final String PATH_ALBUMS = "albums";
-	public static final String PATH_QUERY = "query";
+	private static final String PATH_ALBUMS = "albums";
+	private static final String PATH_QUERY = "query";
+	private static final String PATH_SHA1TAGS = "sha1tags";
 
 	static final String PARAM_TERM = "term";
 	private static final String PARAM_COUNT = "count";
@@ -614,8 +625,44 @@ public class MlistsServlet extends HttpServlet {
 			printMlistLong(resp, mmdb, IncludeSrcs.NO, IncludeItems.YES, IncludeTags.YES,
 					query, maxResults, sortColumns, sortDirections, includeDisabled, transcode);
 		}
+		else if (path.equals(PATH_SHA1TAGS)) {
+			// TODO it would be nice to make the gson instance static and reusable, but ATM the type converted wraps the DB.
+			// TODO do not output entries that do not have any tags.
+			final Gson gson = new GsonBuilder()
+					.registerTypeHierarchyAdapter(IMixedMediaItem.class, new Sha1TagsJsonSerializer(mmdb))
+					.create();
+			final Object[] items = mmdb.getMediaItems().stream().filter(i -> i.getSha1() != null).toArray();
+			resp.setContentType(CONTENT_TYPE_JSON);
+			gson.toJson(items, resp.getWriter());
+		}
 		else {
 			ServletHelper.error(resp, HttpServletResponse.SC_NOT_FOUND, "HTTP error 404 unknown path '" + path + "' desu~");
+		}
+	}
+
+	private static class Sha1TagsJsonSerializer implements JsonSerializer<IMixedMediaItem> {
+		private final IMixedMediaDb db;
+
+		public Sha1TagsJsonSerializer(IMixedMediaDb db) {
+			this.db = db;
+		}
+
+		@Override
+		public JsonElement serialize(final IMixedMediaItem i, final Type typeOfSrc, final JsonSerializationContext context) {
+			final JsonObject o = new JsonObject();
+			o.addProperty("sha1", i.getSha1().toString(16));
+			final JsonArray a = new JsonArray();
+			try {
+				for (final MediaTag tag : this.db.getTags(i)) {
+					if (tag.getType() != MediaTagType.MANUAL) continue;
+					a.add(tag.getTag());
+				}
+			}
+			catch (final MorriganException e) {
+				throw new IllegalStateException(e);
+			}
+			o.add("tags", a);
+			return o;
 		}
 	}
 

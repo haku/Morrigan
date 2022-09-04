@@ -49,22 +49,24 @@ public class TestMixedMediaDb extends LocalMixedMediaDb {
 	public IMixedMediaItem addTestTrack() throws MorriganException, DbException {
 		final int n = getTrackNumber();
 		return addTestTrack(new File(String.format("some_media_file_%s.ext", n)),
-				BigInteger.TEN.add(BigInteger.valueOf(n)));
+				BigInteger.TEN.add(BigInteger.valueOf(2 * n)),
+				BigInteger.TEN.add(BigInteger.valueOf((2 * n) + 1)));
 	}
 
 	public IMixedMediaItem addTestTrack (final File file) throws MorriganException, DbException {
-		return addTestTrack(file, new BigInteger(128, RND));
+		return addTestTrack(file, new BigInteger(128, RND), new BigInteger(128, RND));
 	}
 
-	public IMixedMediaItem addTestTrack (final BigInteger hashCode) throws MorriganException, DbException {
-		return addTestTrack(new File(String.format("some_media_file_%s.ext", getTrackNumber())), hashCode);
+	public IMixedMediaItem addTestTrack (final BigInteger md5, final BigInteger sha1) throws MorriganException, DbException {
+		return addTestTrack(new File(String.format("some_media_file_%s.ext", getTrackNumber())), md5, sha1);
 	}
 
-	public IMixedMediaItem addTestTrack (final File file, final BigInteger hashCode) throws MorriganException, DbException {
+	public IMixedMediaItem addTestTrack (final File file, final BigInteger md5, final BigInteger sha1) throws MorriganException, DbException {
 		addFile(file);
 		final IMixedMediaItem track = getByFile(file); // Workaround so dbRowId is filled in.
 		setItemMediaType(track, MediaType.TRACK);
-		setItemMd5(track, hashCode);
+		setItemMd5(track, md5);
+		setItemSha1(track, sha1);
 
 		final Date lastPlayed = new Date(System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(RND.nextInt(144000)));
 		setTrackDateLastPlayed(track, lastPlayed);

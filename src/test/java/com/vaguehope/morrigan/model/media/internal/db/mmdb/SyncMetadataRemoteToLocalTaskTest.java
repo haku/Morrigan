@@ -112,7 +112,7 @@ public class SyncMetadataRemoteToLocalTaskTest {
 
 	private void testTagMerge (final Tag localTag, final Tag remoteTag, final Tag expectedLocalTagAfterMerge) throws Throwable {
 		final IMixedMediaItem lTrack = this.local.addTestTrack();
-		final IMixedMediaItem rTrack = this.remote.addTestTrack(lTrack.getMd5());
+		final IMixedMediaItem rTrack = this.remote.addTestTrack(lTrack.getMd5(), lTrack.getSha1());
 
 		if (localTag != null) localTag.addTo(this.local, lTrack);
 		remoteTag.addTo(this.remote, rTrack);

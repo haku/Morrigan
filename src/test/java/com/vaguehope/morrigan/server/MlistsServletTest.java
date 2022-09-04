@@ -2,6 +2,7 @@ package com.vaguehope.morrigan.server;
 
 import static org.junit.Assert.assertEquals;
 
+import java.math.BigInteger;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -11,6 +12,8 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import com.vaguehope.morrigan.config.Config;
+import com.vaguehope.morrigan.model.media.IMixedMediaItem;
+import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.model.media.internal.MediaFactoryImpl;
 import com.vaguehope.morrigan.model.media.test.TestMixedMediaDb;
 import com.vaguehope.morrigan.player.PlayerReader;
@@ -54,7 +57,6 @@ public class MlistsServletTest {
 		this.resp = new MockHttpServletResponse();
 
 		this.testDb = new TestMixedMediaDb("server-test-db");
-		this.testDb.addTestTrack();
 		this.mediaFactory.addLocalMixedMediaDb(this.testDb);
 	}
 
@@ -94,6 +96,25 @@ public class MlistsServletTest {
 	@Test
 	public void itIncludesDeletedTagsIfRequested () throws Exception {
 		// TODO!
+	}
+
+	@Test
+	public void itServesSha1Tags() throws Exception {
+		final IMixedMediaItem t0 = this.testDb.addTestTrack(BigInteger.ZERO, BigInteger.valueOf(0x1234567890abcdefL));
+		this.testDb.addTag(t0, "foo", MediaTagType.MANUAL, (String) null);
+		this.testDb.addTag(t0, "bar", MediaTagType.MANUAL, (String) null);
+		this.testDb.addTag(t0, "bat", MediaTagType.AUTOMATIC, (String) null);  // Should be ignored.
+
+		// Should be ignored.
+		// TODO this should be filtered.
+//		this.testDb.addTestTrack(BigInteger.ZERO, BigInteger.valueOf(0x1234567123L));  // No tags.
+		this.testDb.addTestTrack(BigInteger.ZERO, null);  // No SHA1.
+
+		this.req.requestURI = "/mlists/LOCALMMDB/server-test-db.local.db3/sha1tags";
+		this.undertest.service(this.req, this.resp);
+
+		assertEquals("[{\"sha1\":\"1234567890abcdef\",\"tags\":[\"bar\",\"foo\"]}]", this.resp.getOutputAsString());
+		assertEquals("text/json;charset=utf-8", this.resp.contentType);
 	}
 
 }

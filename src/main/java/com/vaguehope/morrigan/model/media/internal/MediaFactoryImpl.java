@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
 import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.tag.TagException;
@@ -54,7 +55,7 @@ public class MediaFactoryImpl implements MediaFactory {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	private final Map<MediaListReference, ILocalMixedMediaDb> addedLocals = new ConcurrentHashMap<>();
+	private final Map<String, ILocalMixedMediaDb> addedLocals = new ConcurrentHashMap<>();
 
 	@Override
 	public Collection<MediaListReference> getAllLocalMixedMediaDbs () {
@@ -63,7 +64,9 @@ public class MediaFactoryImpl implements MediaFactory {
 
 		final Collection<MediaListReference> ret = new ArrayList<>();
 		ret.addAll(real);
-		ret.addAll(this.addedLocals.keySet());
+		for (final ILocalMixedMediaDb db : this.addedLocals.values()) {
+			ret.add(new MediaListReferenceImpl(MediaListType.LOCALMMDB, db.getListId(), db.getListName()));
+		}
 		return ret;
 	}
 
@@ -106,6 +109,9 @@ public class MediaFactoryImpl implements MediaFactory {
 		final String name = parts[1];
 
 		if (type.equals(MediaListType.LOCALMMDB.toString())) {
+			final ILocalMixedMediaDb local = this.addedLocals.get(StringUtils.removeEndIgnoreCase(name, Config.MMDB_LOCAL_FILE_EXT));
+			if (local != null) return local;
+
 			final String f = LocalMixedMediaDbHelper.getFullPathToMmdb(this.config, name);
 			return getLocalMixedMediaDb(f, filter);
 		}
@@ -133,7 +139,7 @@ public class MediaFactoryImpl implements MediaFactory {
 	 * For testing use only.  Can use to add in mock implementations.
 	 */
 	public void addLocalMixedMediaDb (final ILocalMixedMediaDb db) {
-		this.addedLocals.put(new MediaListReferenceImpl(MediaListType.LOCALMMDB, db.getListId(), db.getListName()), db);
+		this.addedLocals.put(db.getListName(), db);
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

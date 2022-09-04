@@ -52,6 +52,11 @@ public class MockHttpServletRequest implements HttpServletRequest {
 		return this.headers.get(headerName);
 	}
 
+	@Override
+	public String getParameter (final String name) {
+		return null;  // TODO mock params.
+	}
+
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -117,11 +122,6 @@ public class MockHttpServletRequest implements HttpServletRequest {
 
 	@Override
 	public Enumeration<Locale> getLocales () {
-		throw new UnsupportedOperationException("Not implemented.");
-	}
-
-	@Override
-	public String getParameter (final String arg0) {
 		throw new UnsupportedOperationException("Not implemented.");
 	}
 
