@@ -24,7 +24,7 @@ import com.vaguehope.morrigan.tasks.AsyncTasksRegister;
 public class StatusServlet extends HttpServlet {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public static final String REL_CONTEXTPATH = "/status";
+	public static final String REL_CONTEXTPATH = "status";
 	public static final String CONTEXTPATH = "/" + REL_CONTEXTPATH;
 
 	private static final String ROOTPATH = "/";
