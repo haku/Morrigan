@@ -1,0 +1,150 @@
+#!/usr/bin/env python3
+# vim: expandtab shiftwidth=2 softtabstop=2
+
+# https://docs.python.org/3/library/argparse.html
+# https://docs.python.org/3/library/urllib.request.html
+# https://docs.python.org/3/library/xml.etree.elementtree.html
+
+import argparse
+import sys
+import time
+import urllib.request
+import xml.etree.ElementTree as etree
+
+
+def parseArgs():
+  global ARGS
+  global ACTIONS
+  ACTIONS = {
+      'dumpxml': dumpxml,
+      'listremotes': listremotes,
+      'pullremote': pullremote,
+      'sha1tags': sha1tags,
+      }
+
+  parser = argparse.ArgumentParser(allow_abbrev=False)
+  parser.add_argument(
+      'action',
+      choices=ACTIONS.keys())
+  parser.add_argument(
+      '--url',
+      default='http://localhost:28080',
+      help='Prefix path to Morrigan HTTP endpoint.')
+  parser.add_argument(
+      '--authfile',
+      required=True,
+      help='Path to file containing username:password.')
+  parser.add_argument(
+      '--library',
+      help='Name of the library, e.g. "music".')
+  parser.add_argument(
+      '--remote',
+      help='Name of the remote library, e.g. "music".')
+  ARGS = parser.parse_args()
+  if not ARGS.url.endswith('/'):
+    ARGS.url += '/'
+
+
+def fail(msg):
+  print(msg)
+  sys.exit(1)
+
+
+def getLibPath():
+  lib = ARGS.library
+  if not lib:
+    fail('--library not specified.')
+  # TODO check lib exists in /mlists ?
+  # TODO support other types?
+  return 'mlists/LOCALMMDB/%s.local.db3' % lib
+
+
+def dumpxml():
+  path = getLibPath()
+  path += '/items?includeddeletedtags=true'
+  resp = callMn(path)
+  print(resp.read().decode('utf-8'))
+
+
+def sha1tags():
+  path = getLibPath()
+  path += '/sha1tags'
+  resp = callMn(path)
+  print(resp.read().decode('utf-8'))
+
+
+def listremotes():
+  path = getLibPath()
+  resp = callMn(path)
+  xml = resp.read().decode('utf-8')
+  tree = etree.fromstring(xml)
+  for r in tree.findall('remote'):
+    print(r.text)
+
+
+def pullremote():
+  remote = ARGS.remote
+  if not remote:
+    fail('--remote not specified.')
+  path = getLibPath()
+  data = 'action=pull&remote=%s' % remote
+  resp = callMn(path, data=bytes(data, 'utf-8'))
+  body = resp.read().decode('utf-8')
+  for l in body.splitlines():
+    if l.startswith('id='):
+      taskid = l[3:]
+      break
+  if not taskid:
+    fail('Starting pull did not return a task id:\n%s' % body)
+  waitForTask(taskid)
+
+
+def waitForTask(taskid):
+  print('Waiting for task: %s' % taskid)
+  path = 'status/%s' % taskid
+  while True:
+    resp = callMn(path)
+    xml = resp.read().decode('utf-8')
+    tree = etree.fromstring(xml)
+    state = tree.find('./state')
+    if state is None:
+      fail('Status missing state:\n%s' % xml)
+    elif state.text == 'COMPLETE':
+      success = tree.find('./successful')
+      if success is None:
+        fail('Status missing successful:\n%s' % xml)
+      elif success.text == 'true':
+        print('Success.')
+      else:
+        print('Failed.')
+        print(xml)
+      break
+    else:
+      print('.', end='', flush=True)
+      time.sleep(5)
+
+
+def mkAuthOpener():
+  with open(ARGS.authfile) as f:
+    auth = f.readline().strip()
+  (user, passwd) = auth.split(':')
+  passwd_mgr = urllib.request.HTTPPasswordMgrWithDefaultRealm()
+  passwd_mgr.add_password(None, ARGS.url, user, passwd)
+  auth_handler = urllib.request.HTTPBasicAuthHandler(passwd_mgr)
+  return urllib.request.build_opener(auth_handler)
+
+
+def callMn(path, data=None, headers={}):
+  opener = mkAuthOpener()
+  url = ARGS.url
+  url += path
+  req = urllib.request.Request(
+      url,
+      data=data,
+      headers=headers)
+  return opener.open(req)
+
+
+if __name__ == '__main__':
+  parseArgs()
+  ACTIONS[ARGS.action]()
