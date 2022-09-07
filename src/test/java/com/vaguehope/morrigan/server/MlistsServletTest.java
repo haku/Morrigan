@@ -3,6 +3,7 @@ package com.vaguehope.morrigan.server;
 import static org.junit.Assert.assertEquals;
 
 import java.math.BigInteger;
+import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -101,8 +102,10 @@ public class MlistsServletTest {
 	@Test
 	public void itServesSha1Tags() throws Exception {
 		final IMixedMediaItem t0 = this.testDb.addTestTrack(BigInteger.ZERO, BigInteger.valueOf(0x1234567890abcdefL));
-		this.testDb.addTag(t0, "foo", MediaTagType.MANUAL, (String) null);
-		this.testDb.addTag(t0, "bar", MediaTagType.MANUAL, (String) null);
+		this.testDb.addTag(t0, "foo", MediaTagType.MANUAL, null, new Date(123456789000L), false);
+		this.testDb.addTag(t0, "bar", MediaTagType.MANUAL, null, new Date(987654321000L), false);
+		this.testDb.addTag(t0, "no-mod-date", MediaTagType.MANUAL, null, null, false);  // Because apparently this is still a thing.
+		this.testDb.addTag(t0, "gone", MediaTagType.MANUAL, null, new Date(155666777000L), true);
 		this.testDb.addTag(t0, "bat", MediaTagType.AUTOMATIC, (String) null);  // Should be ignored.
 
 		// Should be ignored.
@@ -113,7 +116,13 @@ public class MlistsServletTest {
 		this.req.requestURI = "/mlists/LOCALMMDB/server-test-db.local.db3/sha1tags";
 		this.undertest.service(this.req, this.resp);
 
-		assertEquals("[{\"sha1\":\"1234567890abcdef\",\"tags\":[\"bar\",\"foo\"]}]", this.resp.getOutputAsString());
+		final String expected = "[{\"sha1\":\"1234567890abcdef\",\"tags\":["
+				+ "{\"tag\":\"bar\",\"mod\":987654321000,\"del\":false},"
+				+ "{\"tag\":\"foo\",\"mod\":123456789000,\"del\":false},"
+				+ "{\"tag\":\"gone\",\"mod\":155666777000,\"del\":true},"
+				+ "{\"tag\":\"no-mod-date\",\"del\":false}"
+				+ "]}]";
+		assertEquals(expected, this.resp.getOutputAsString());
 		assertEquals("text/json;charset=utf-8", this.resp.contentType);
 	}
 

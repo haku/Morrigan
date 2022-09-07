@@ -251,6 +251,7 @@ public class MlistsServlet extends HttpServlet {
 				if (pathParts.length >= 2) {
 					final String filter = StringHelper.trimToNull(req.getParameter(PARAM_VIEW));
 					final IMixedMediaDb mmdb = this.mediaFactory.getMixedMediaDbByMid(path, filter);
+					mmdb.read();
 					final String subPath = pathParts.length >= 3 ? pathParts[2] : null;
 					final String afterSubPath = pathParts.length >= 4 ? pathParts[3] : null;
 					if (verb == Verb.POST) {
@@ -653,9 +654,13 @@ public class MlistsServlet extends HttpServlet {
 			o.addProperty("sha1", i.getSha1().toString(16));
 			final JsonArray a = new JsonArray();
 			try {
-				for (final MediaTag tag : this.db.getTags(i)) {
+				for (final MediaTag tag : this.db.getTagsIncludingDeleted(i)) {
 					if (tag.getType() != MediaTagType.MANUAL) continue;
-					a.add(tag.getTag());
+					final JsonObject t = new JsonObject();
+					t.addProperty("tag", tag.getTag());
+					if (tag.getModified() != null) t.addProperty("mod", tag.getModified().getTime());
+					t.addProperty("del", tag.isDeleted());
+					a.add(t);
 				}
 			}
 			catch (final MorriganException e) {
