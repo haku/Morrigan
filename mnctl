@@ -3,29 +3,29 @@
 
 # https://docs.python.org/3/library/argparse.html
 # https://docs.python.org/3/library/urllib.request.html
-# https://docs.python.org/3/library/xml.etree.elementtree.html
+# https://docs.python.org/3/library/xml.ElementTree.elementtree.html
 
 import argparse
 import sys
 import time
 import urllib.request
-import xml.etree.ElementTree as etree
+from xml.etree import ElementTree
+from typing import Any, Callable, Dict, Optional
 
 
-def parseArgs():
-  global ARGS
-  global ACTIONS
-  ACTIONS = {
-      'dumpxml': dumpxml,
-      'listremotes': listremotes,
-      'pullremote': pullremote,
-      'sha1tags': sha1tags,
-      }
+_COMMANDS: Dict[str, Callable[[argparse.Namespace], None]] = {}
 
+
+def addCommand(func: Any) -> Any:
+  _COMMANDS[func.__name__] = func
+  return func
+
+
+def parseArgs() -> argparse.Namespace:
   parser = argparse.ArgumentParser(allow_abbrev=False)
   parser.add_argument(
       'action',
-      choices=ACTIONS.keys())
+      choices=list(_COMMANDS.keys()))
   parser.add_argument(
       '--url',
       default='http://localhost:28080',
@@ -40,9 +40,13 @@ def parseArgs():
   parser.add_argument(
       '--remote',
       help='Name of the remote library, e.g. "music".')
-  ARGS = parser.parse_args()
-  if not ARGS.url.endswith('/'):
-    ARGS.url += '/'
+
+  args = parser.parse_args()
+
+  if not args.url.endswith('/'):
+    args.url += '/'
+
+  return args
 
 
 def fail(msg):
@@ -50,8 +54,7 @@ def fail(msg):
   sys.exit(1)
 
 
-def getLibPath():
-  lib = ARGS.library
+def getLibPath(lib: str) -> str:
   if not lib:
     fail('--library not specified.')
   # TODO check lib exists in /mlists ?
@@ -59,53 +62,59 @@ def getLibPath():
   return 'mlists/LOCALMMDB/%s.local.db3' % lib
 
 
-def dumpxml():
-  path = getLibPath()
+@addCommand
+def dumpxml(args: argparse.Namespace) -> None:
+  path = getLibPath(args.library)
   path += '/items?includeddeletedtags=true'
-  resp = callMn(path)
+  resp = callMn(args, path)
   print(resp.read().decode('utf-8'))
 
 
-def sha1tags():
-  path = getLibPath()
+@addCommand
+def sha1tags(args: argparse.Namespace) -> None:
+  path = getLibPath(args.library)
   path += '/sha1tags'
-  resp = callMn(path)
+  resp = callMn(args, path)
   print(resp.read().decode('utf-8'))
 
 
-def listremotes():
-  path = getLibPath()
-  resp = callMn(path)
+@addCommand
+def listremotes(args: argparse.Namespace) -> None:
+  path = getLibPath(args.library)
+  resp = callMn(args, path)
   xml = resp.read().decode('utf-8')
-  tree = etree.fromstring(xml)
+  tree = ElementTree.fromstring(xml)
   for r in tree.findall('remote'):
     print(r.text)
 
 
-def pullremote():
-  remote = ARGS.remote
+@addCommand
+def pullremote(args: argparse.Namespace) -> None:
+  remote = args.remote
   if not remote:
     fail('--remote not specified.')
-  path = getLibPath()
+  path = getLibPath(args.library)
   data = 'action=pull&remote=%s' % remote
-  resp = callMn(path, data=bytes(data, 'utf-8'))
+  resp = callMn(args, path, data=bytes(data, 'utf-8'))
   body = resp.read().decode('utf-8')
-  for l in body.splitlines():
-    if l.startswith('id='):
-      taskid = l[3:]
+
+  taskid = None
+  for line in body.splitlines():
+    if line.startswith('id='):
+      taskid = line[3:]
       break
   if not taskid:
     fail('Starting pull did not return a task id:\n%s' % body)
-  waitForTask(taskid)
+  waitForTask(args, taskid)
 
 
-def waitForTask(taskid):
+def waitForTask(args: argparse.Namespace, taskid: str):
   print('Waiting for task: %s' % taskid)
   path = 'status/%s' % taskid
   while True:
-    resp = callMn(path)
+    resp = callMn(args, path)
     xml = resp.read().decode('utf-8')
-    tree = etree.fromstring(xml)
+    tree = ElementTree.fromstring(xml)
     state = tree.find('./state')
     if state is None:
       fail('Status missing state:\n%s' % xml)
@@ -124,27 +133,31 @@ def waitForTask(taskid):
       time.sleep(5)
 
 
-def mkAuthOpener():
-  with open(ARGS.authfile) as f:
+def mkAuthOpener(args: argparse.Namespace):
+  with open(args.authfile) as f:
     auth = f.readline().strip()
   (user, passwd) = auth.split(':')
   passwd_mgr = urllib.request.HTTPPasswordMgrWithDefaultRealm()
-  passwd_mgr.add_password(None, ARGS.url, user, passwd)
+  passwd_mgr.add_password(None, args.url, user, passwd)
   auth_handler = urllib.request.HTTPBasicAuthHandler(passwd_mgr)
   return urllib.request.build_opener(auth_handler)
 
 
-def callMn(path, data=None, headers={}):
-  opener = mkAuthOpener()
-  url = ARGS.url
+def callMn(args: argparse.Namespace, path, data=None, headers=None):
+  opener = mkAuthOpener(args)
+  url = args.url
   url += path
-  req = urllib.request.Request(
-      url,
-      data=data,
-      headers=headers)
+  req = urllib.request.Request(url, data=data, headers=headers or {})
   return opener.open(req)
 
 
+def main() -> None:
+  args = parseArgs()
+  func = _COMMANDS[args.action]
+  if not func:
+    fail('No command ' + args.action)
+  func(args)
+
+
 if __name__ == '__main__':
-  parseArgs()
-  ACTIONS[ARGS.action]()
+  main()
