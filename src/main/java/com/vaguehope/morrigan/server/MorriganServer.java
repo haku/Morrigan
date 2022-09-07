@@ -6,6 +6,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Collection;
 import java.util.concurrent.ScheduledExecutorService;
 
 import org.eclipse.jetty.rewrite.handler.RewriteHandler;
@@ -47,7 +48,10 @@ public class MorriganServer {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public MorriganServer (final int httpPort, final Config config, final ServerConfig serverConfig,
+	public MorriganServer (
+			final int httpPort,
+			final Collection<String> additionalCorsOrigins,
+			final Config config, final ServerConfig serverConfig,
 			final PlayerReader playerListener, final MediaFactory mediaFactory,
 			final AsyncTasksRegister asyncTasksRegister, final AsyncActions asyncActions,
 			final Transcoder transcoder,
@@ -60,7 +64,7 @@ public class MorriganServer {
 			this.server = new Server(threadPool);
 			this.server.addLifeCycleListener(this.lifeCycleListener);
 			this.server.setHandler(wrapWithRewrites(
-					makeContentHandler(config, serverConfig, playerListener, mediaFactory, asyncTasksRegister, asyncActions, transcoder, schEs)));
+					makeContentHandler(additionalCorsOrigins, config, serverConfig, playerListener, mediaFactory, asyncTasksRegister, asyncActions, transcoder, schEs)));
 
 			final InetAddress bindAddress = serverConfig.getBindAddress("HTTP");
 			if (bindAddress == null) throw new IllegalStateException("Failed to find bind address.");
@@ -93,10 +97,10 @@ public class MorriganServer {
 		return rewrites;
 	}
 
-	private static HandlerList makeContentHandler (final Config config, final ServerConfig serverConfig, final PlayerReader playerListener, final MediaFactory mediaFactory, final AsyncTasksRegister asyncTasksRegister, final AsyncActions asyncActions, final Transcoder transcoder, final ScheduledExecutorService schEs) throws IOException {
+	private static HandlerList makeContentHandler (final Collection<String> additionalCorsOrigins, final Config config, final ServerConfig serverConfig, final PlayerReader playerListener, final MediaFactory mediaFactory, final AsyncTasksRegister asyncTasksRegister, final AsyncActions asyncActions, final Transcoder transcoder, final ScheduledExecutorService schEs) throws IOException {
 		final ServletContextHandler context = getWuiContext();
 
-		final FilterHolder authFilterHolder = new FilterHolder(new AuthFilter(serverConfig, config, schEs));
+		final FilterHolder authFilterHolder = new FilterHolder(new AuthFilter(serverConfig, additionalCorsOrigins, config, schEs));
 		context.addFilter(authFilterHolder, "/*", null);
 
 		context.addServlet(new ServletHolder(new LibraryServlet(config)), LibraryServlet.CONTEXTPATH + "/*");

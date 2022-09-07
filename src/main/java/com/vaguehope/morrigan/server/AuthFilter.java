@@ -8,6 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
@@ -35,12 +36,22 @@ public class AuthFilter implements Filter {
 	private final AuthMgr authMgr;
 	private final Collection<String> ipAddresses;
 
-	public AuthFilter (final AuthChecker authChecker, final Config config, final ScheduledExecutorService schEs) throws SocketException {
+	public AuthFilter (
+			final AuthChecker authChecker,
+			final Collection<String> additionalCorsOrigins,
+			final Config config,
+			final ScheduledExecutorService schEs) throws SocketException {
 		this.authChecker = authChecker;
 		this.authMgr = new AuthMgr(config, schEs);
 
-		this.ipAddresses = Collections.unmodifiableCollection(NetHelper.getIpAddressesAsStrings());
+		this.ipAddresses = makeOrigins(additionalCorsOrigins);
 		logger.info("CORS Origins: " + this.ipAddresses);
+	}
+
+	private static Collection<String> makeOrigins(final Collection<String> additionalCorsOrigins) throws SocketException {
+		final List<String> o = NetHelper.getIpAddressesAsStrings();
+		o.addAll(additionalCorsOrigins);
+		return Collections.unmodifiableCollection(o);
 	}
 
 	@Override

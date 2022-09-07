@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Collections;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -61,7 +62,7 @@ public class AuthTest {
 				return true;
 			}
 		};
-		final AuthFilter authFilter = new AuthFilter(authChecker, this.config, this.schEs);
+		final AuthFilter authFilter = new AuthFilter(authChecker, Collections.emptySet(), this.config, this.schEs);
 		final FilterHolder authFilterHolder = new FilterHolder(authFilter);
 		this.server.getContextHandler().addFilter(authFilterHolder, "/*", null);
 	}
