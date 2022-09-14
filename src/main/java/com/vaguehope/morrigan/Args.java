@@ -1,5 +1,6 @@
 package com.vaguehope.morrigan;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.kohsuke.args4j.Option;
@@ -24,6 +25,7 @@ public class Args {
 	}
 
 	public List<String> getOrigins() {
+		if (this.origins == null) return Collections.emptyList();
 		return this.origins;
 	}
 
