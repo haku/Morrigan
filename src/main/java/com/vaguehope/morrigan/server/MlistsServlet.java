@@ -632,7 +632,7 @@ public class MlistsServlet extends HttpServlet {
 			final Gson gson = new GsonBuilder()
 					.registerTypeHierarchyAdapter(IMixedMediaItem.class, new Sha1TagsJsonSerializer(mmdb))
 					.create();
-			final Object[] items = mmdb.getMediaItems().stream().filter(i -> i.getSha1() != null).toArray();
+			final Object[] items = mmdb.getAllDbEntries().stream().filter(i -> i.getSha1() != null).toArray();
 			resp.setContentType(CONTENT_TYPE_JSON);
 			gson.toJson(items, resp.getWriter());
 		}

@@ -14,6 +14,7 @@ import org.junit.rules.TemporaryFolder;
 
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
+import com.vaguehope.morrigan.model.media.IMixedMediaItem.MediaType;
 import com.vaguehope.morrigan.model.media.MediaTagType;
 import com.vaguehope.morrigan.model.media.internal.MediaFactoryImpl;
 import com.vaguehope.morrigan.model.media.test.TestMixedMediaDb;
@@ -101,6 +102,8 @@ public class MlistsServletTest {
 
 	@Test
 	public void itServesSha1Tags() throws Exception {
+		this.testDb.setDefaultMediaType(MediaType.TRACK, true);
+
 		final IMixedMediaItem t0 = this.testDb.addTestTrack(BigInteger.ZERO, BigInteger.valueOf(0x1234567890abcdefL));
 		this.testDb.addTag(t0, "foo", MediaTagType.MANUAL, null, new Date(123456789000L), false);
 		this.testDb.addTag(t0, "bar", MediaTagType.MANUAL, null, new Date(987654321000L), false);
@@ -108,19 +111,30 @@ public class MlistsServletTest {
 		this.testDb.addTag(t0, "gone", MediaTagType.MANUAL, null, new Date(155666777000L), true);
 		this.testDb.addTag(t0, "bat", MediaTagType.AUTOMATIC, (String) null);  // Should be ignored.
 
+		final IMixedMediaItem t1 = this.testDb.addTestTrack(BigInteger.ZERO, BigInteger.valueOf(0x1114567890abcdefL));
+		this.testDb.setItemMediaType(t1, MediaType.PICTURE);
+		this.testDb.addTag(t1, "pic", MediaTagType.MANUAL, null, new Date(155666888000L), false);
+
 		// Should be ignored.
 		// TODO this should be filtered.
 //		this.testDb.addTestTrack(BigInteger.ZERO, BigInteger.valueOf(0x1234567123L));  // No tags.
 		this.testDb.addTestTrack(BigInteger.ZERO, null);  // No SHA1.
 
+		// The force read will query DB, applying DefaultMediaType to getMediaItems().
+		this.testDb.forceRead();
+
 		this.req.requestURI = "/mlists/LOCALMMDB/server-test-db.local.db3/sha1tags";
 		this.undertest.service(this.req, this.resp);
 
-		final String expected = "[{\"sha1\":\"1234567890abcdef\",\"tags\":["
+		final String expected = "["
+				+ "{\"sha1\":\"1234567890abcdef\",\"tags\":["
 				+ "{\"tag\":\"bar\",\"mod\":987654321000,\"del\":false},"
 				+ "{\"tag\":\"foo\",\"mod\":123456789000,\"del\":false},"
 				+ "{\"tag\":\"gone\",\"mod\":155666777000,\"del\":true},"
 				+ "{\"tag\":\"no-mod-date\",\"del\":false}"
+				+ "]},"
+				+ "{\"sha1\":\"1114567890abcdef\",\"tags\":["
+				+ "{\"tag\":\"pic\",\"mod\":155666888000,\"del\":false}"
 				+ "]}]";
 		assertEquals(expected, this.resp.getOutputAsString());
 		assertEquals("text/json;charset=utf-8", this.resp.contentType);
