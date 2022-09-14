@@ -113,6 +113,7 @@ import com.vaguehope.morrigan.util.StringHelper;
  *  GET /mlists/LOCALMMDB/example.local.db3/query/example?transcode=audio_only
  *
  *  GET /mlists/LOCALMMDB/example.local.db3/sha1tags
+ *  GET /mlists/LOCALMMDB/example.local.db3/sha1tags?includeautotags=true
  * </pre>
  */
 public class MlistsServlet extends HttpServlet {
@@ -145,6 +146,7 @@ public class MlistsServlet extends HttpServlet {
 	private static final String PARAM_TRANSCODE = "transcode";
 	private static final String PARAM_ENABLED = "enabled";
 	private static final String PARAM_REMOTE = "remote";
+	private static final String PARAM_INCLUDE_AUTO_TAGS = "includeautotags";
 
 	public static final String CMD_NEWMMDB = "newmmdb";
 	public static final String CMD_SCAN = "scan";
@@ -627,10 +629,11 @@ public class MlistsServlet extends HttpServlet {
 					query, maxResults, sortColumns, sortDirections, includeDisabled, transcode);
 		}
 		else if (path.equals(PATH_SHA1TAGS)) {
+			final boolean includeAutoTags = ServletHelper.readParamBoolean(req, PARAM_INCLUDE_AUTO_TAGS, false);
 			// TODO it would be nice to make the gson instance static and reusable, but ATM the type converted wraps the DB.
 			// TODO do not output entries that do not have any tags.
 			final Gson gson = new GsonBuilder()
-					.registerTypeHierarchyAdapter(IMixedMediaItem.class, new Sha1TagsJsonSerializer(mmdb))
+					.registerTypeHierarchyAdapter(IMixedMediaItem.class, new Sha1TagsJsonSerializer(mmdb, includeAutoTags))
 					.create();
 			final Object[] items = mmdb.getAllDbEntries().stream().filter(i -> i.getSha1() != null).toArray();
 			resp.setContentType(CONTENT_TYPE_JSON);
@@ -643,9 +646,11 @@ public class MlistsServlet extends HttpServlet {
 
 	private static class Sha1TagsJsonSerializer implements JsonSerializer<IMixedMediaItem> {
 		private final IMixedMediaDb db;
+		private final boolean includeAutoTags;
 
-		public Sha1TagsJsonSerializer(IMixedMediaDb db) {
+		public Sha1TagsJsonSerializer(IMixedMediaDb db, boolean includeAutoTags) {
 			this.db = db;
+			this.includeAutoTags = includeAutoTags;
 		}
 
 		@Override
@@ -655,9 +660,10 @@ public class MlistsServlet extends HttpServlet {
 			final JsonArray a = new JsonArray();
 			try {
 				for (final MediaTag tag : this.db.getTagsIncludingDeleted(i)) {
-					if (tag.getType() != MediaTagType.MANUAL) continue;
+					if (this.includeAutoTags == false && tag.getType() != MediaTagType.MANUAL) continue;
 					final JsonObject t = new JsonObject();
 					t.addProperty("tag", tag.getTag());
+					if (tag.getClassification() != null) t.addProperty("cls", tag.getClassification().getClassification());
 					if (tag.getModified() != null) t.addProperty("mod", tag.getModified().getTime());
 					t.addProperty("del", tag.isDeleted());
 					a.add(t);

@@ -31,6 +31,7 @@ public class MockHttpServletRequest implements HttpServletRequest {
 	String requestURI;
 	String queryString;
 	final Map<String, String> headers = new ConcurrentHashMap<>();
+	final Map<String, String> params = new ConcurrentHashMap<>();
 
 	@Override
 	public String getMethod () {
@@ -54,7 +55,7 @@ public class MockHttpServletRequest implements HttpServletRequest {
 
 	@Override
 	public String getParameter (final String name) {
-		return null;  // TODO mock params.
+		return this.params.get(name);
 	}
 
 

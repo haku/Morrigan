@@ -40,6 +40,10 @@ def parseArgs() -> argparse.Namespace:
   parser.add_argument(
       '--remote',
       help='Name of the remote library, e.g. "music".')
+  parser.add_argument(
+      '--includeautotags',
+      action='store_true',
+      help='Will include auto tags in sha1tags output.')
 
   args = parser.parse_args()
 
@@ -74,6 +78,8 @@ def dumpxml(args: argparse.Namespace) -> None:
 def sha1tags(args: argparse.Namespace) -> None:
   path = getLibPath(args.library)
   path += '/sha1tags'
+  if args.includeautotags:
+    path += '?includeautotags=true'
   resp = callMn(args, path)
   print(resp.read().decode('utf-8'))
 

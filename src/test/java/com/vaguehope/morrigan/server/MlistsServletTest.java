@@ -3,6 +3,7 @@ package com.vaguehope.morrigan.server;
 import static org.junit.Assert.assertEquals;
 
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -109,7 +110,7 @@ public class MlistsServletTest {
 		this.testDb.addTag(t0, "bar", MediaTagType.MANUAL, null, new Date(987654321000L), false);
 		this.testDb.addTag(t0, "no-mod-date", MediaTagType.MANUAL, null, null, false);  // Because apparently this is still a thing.
 		this.testDb.addTag(t0, "gone", MediaTagType.MANUAL, null, new Date(155666777000L), true);
-		this.testDb.addTag(t0, "bat", MediaTagType.AUTOMATIC, (String) null);  // Should be ignored.
+		this.testDb.addTag(t0, "bat", MediaTagType.AUTOMATIC, "some class", new Date(155666888000L), false);
 
 		final IMixedMediaItem t1 = this.testDb.addTestTrack(BigInteger.ZERO, BigInteger.valueOf(0x1114567890abcdefL));
 		this.testDb.setItemMediaType(t1, MediaType.PICTURE);
@@ -124,20 +125,25 @@ public class MlistsServletTest {
 		this.testDb.forceRead();
 
 		this.req.requestURI = "/mlists/LOCALMMDB/server-test-db.local.db3/sha1tags";
-		this.undertest.service(this.req, this.resp);
+		for (final boolean includeautotags : Arrays.asList(false, true)) {  // TODO this should be 2 tests but its late.
+			this.req.params.put("includeautotags", includeautotags ? "true" : "");
+			this.resp = new MockHttpServletResponse();  // reset between runs.
+			this.undertest.service(this.req, this.resp);
 
-		final String expected = "["
-				+ "{\"sha1\":\"1234567890abcdef\",\"tags\":["
-				+ "{\"tag\":\"bar\",\"mod\":987654321000,\"del\":false},"
-				+ "{\"tag\":\"foo\",\"mod\":123456789000,\"del\":false},"
-				+ "{\"tag\":\"gone\",\"mod\":155666777000,\"del\":true},"
-				+ "{\"tag\":\"no-mod-date\",\"del\":false}"
-				+ "]},"
-				+ "{\"sha1\":\"1114567890abcdef\",\"tags\":["
-				+ "{\"tag\":\"pic\",\"mod\":155666888000,\"del\":false}"
-				+ "]}]";
-		assertEquals(expected, this.resp.getOutputAsString());
-		assertEquals("text/json;charset=utf-8", this.resp.contentType);
+			final String expected = "["
+					+ "{\"sha1\":\"1234567890abcdef\",\"tags\":["
+					+ "{\"tag\":\"bar\",\"mod\":987654321000,\"del\":false},"
+					+ "{\"tag\":\"foo\",\"mod\":123456789000,\"del\":false},"
+					+ "{\"tag\":\"gone\",\"mod\":155666777000,\"del\":true},"
+					+ "{\"tag\":\"no-mod-date\",\"del\":false}"
+					+ (includeautotags ? ",{\"tag\":\"bat\",\"cls\":\"some class\",\"mod\":155666888000,\"del\":false}" : "")
+					+ "]},"
+					+ "{\"sha1\":\"1114567890abcdef\",\"tags\":["
+					+ "{\"tag\":\"pic\",\"mod\":155666888000,\"del\":false}"
+					+ "]}]";
+			assertEquals(expected, this.resp.getOutputAsString());
+			assertEquals("text/json;charset=utf-8", this.resp.contentType);
+		}
 	}
 
 }
