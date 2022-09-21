@@ -34,6 +34,11 @@ public class ChecksumHelperTest {
 	}
 
 	@Test
+	public void itMd5AMultiByteCharString() throws Exception {
+		assertEquals("3cd573da9d68b6d885172dcca2b000e", ChecksumHelper.md5("【foobar】").toString(16));
+	}
+
+	@Test
 	public void itMd5AFile() throws Exception {
 		final File f = this.tmp.newFile();
 		FileUtils.writeStringToFile(f, "foobar", StandardCharsets.UTF_8);
