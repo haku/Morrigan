@@ -116,7 +116,7 @@ public class CopyToLocalMmdbTask<T extends IMediaItem> implements MorriganTask {
 	private static File getCheckoutItemDirectory (final File coDir, final IMediaItem item) {
 		final String srcPath = item.getRemoteLocation();
 
-		final File dir = new File(coDir, ChecksumHelper.md5String(srcPath));
+		final File dir = new File(coDir, ChecksumHelper.md5(srcPath).toString(16));
 		if (!dir.exists()) {
 			if (!dir.mkdir()) {
 				throw new RuntimeException("Failed to mkdir '" + dir.getAbsolutePath() + "'.");

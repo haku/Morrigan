@@ -159,11 +159,11 @@ public class LibraryServlet extends HttpServlet {
 	}
 
 	private File cacheFile (final String name) {
-		return new File(this.webLibraryDir, ChecksumHelper.md5String(name) + ".body");
+		return new File(this.webLibraryDir, ChecksumHelper.md5(name).toString(16) + ".body");
 	}
 
 	private File propFile (final String name) {
-		return new File(this.webLibraryDir, ChecksumHelper.md5String(name) + ".prop");
+		return new File(this.webLibraryDir, ChecksumHelper.md5(name).toString(16) + ".prop");
 	}
 
 	private static final Pattern SCHEME_AND_HOST = Pattern.compile("url\\(\\s*[\"']?([^)\"'\\s]+)[\"']?\\s*\\)", Pattern.CASE_INSENSITIVE);

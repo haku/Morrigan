@@ -27,9 +27,9 @@ public class ChecksumHelperTest {
 	@Rule public TemporaryFolder tmp = new TemporaryFolder();
 
 	@Test
-	public void itMd5AString () throws Exception {
+	public void itMd5AString() throws Exception {
 		for (int i = 0; i < 5; i++) {
-			assertEquals(FOOBAR_MD5, ChecksumHelper.md5String("foobar"));
+			assertEquals(FOOBAR_MD5, ChecksumHelper.md5("foobar").toString(16));
 		}
 	}
 
@@ -37,7 +37,7 @@ public class ChecksumHelperTest {
 	public void itMd5AFile() throws Exception {
 		final File f = this.tmp.newFile();
 		FileUtils.writeStringToFile(f, "foobar", StandardCharsets.UTF_8);
-		final BigInteger actual = ChecksumHelper.generateMd5(f, ChecksumHelper.createByteBuffer());
+		final BigInteger actual = ChecksumHelper.md5(f, ChecksumHelper.createByteBuffer());
 		assertEquals(FOOBAR_MD5, actual.toString(16));
 	}
 

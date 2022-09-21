@@ -2,10 +2,12 @@ package com.vaguehope.morrigan.util;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -20,19 +22,13 @@ public final class ChecksumHelper {
 		return ByteBuffer.allocateDirect(BUFFERSIZE);
 	}
 
-	public static BigInteger generateMd5(final File file, final ByteBuffer buffer) throws IOException {
+	public static BigInteger md5(final File file, final ByteBuffer buffer) throws IOException {
+		return hashFile(file, buffer, MD5_FACTORY);
+	}
+
+	public static BigInteger md5(final String s) {
 		final MessageDigest md = MD5_FACTORY.get();
-		try (final FileInputStream is = new FileInputStream(file)) {
-			try (final FileChannel fc = is.getChannel()) {
-				while (fc.position() < fc.size()) {
-					buffer.clear();
-					fc.read(buffer);
-					buffer.flip();
-					md.update(buffer);
-				}
-			}
-		}
-		return new BigInteger(1, md.digest());
+		return new BigInteger(1, md.digest(s.getBytes(StandardCharsets.UTF_8)));
 	}
 
 	public static class Md5AndSha1 {
@@ -67,6 +63,25 @@ public final class ChecksumHelper {
 		return new Md5AndSha1(new BigInteger(1, md5.digest()), new BigInteger(1, sha1.digest()));
 	}
 
+	private static BigInteger hashFile(final File file, final ByteBuffer buffer, final ThreadLocal<MessageDigest> mdFactory) throws FileNotFoundException, IOException {
+		final MessageDigest md = mdFactory.get();
+		singleMd(file, buffer, md);
+		return new BigInteger(1, md.digest());
+	}
+
+	private static void singleMd(final File file, final ByteBuffer buffer, final MessageDigest md) throws IOException {
+		try (final FileInputStream is = new FileInputStream(file)) {
+			try (final FileChannel fc = is.getChannel()) {
+				while (fc.position() < fc.size()) {
+					buffer.clear();
+					fc.read(buffer);
+					buffer.flip();
+					md.update(buffer);
+				}
+			}
+		}
+	}
+
 	private static void multiMd(final File file, final ByteBuffer buffer, final MessageDigest md0, final MessageDigest md1) throws IOException {
 		try (final FileInputStream is = new FileInputStream(file)) {
 			try (final FileChannel fc = is.getChannel()) {
@@ -80,12 +95,6 @@ public final class ChecksumHelper {
 				}
 			}
 		}
-	}
-
-	public static String md5String(final String text) {
-		final MessageDigest md = MD5_FACTORY.get();
-		md.update(text.getBytes(), 0, text.length());
-		return new BigInteger(1, md.digest()).toString(16);
 	}
 
 	private static final MdFactory MD5_FACTORY = new MdFactory("MD5");

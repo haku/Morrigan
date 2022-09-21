@@ -80,7 +80,7 @@ public abstract class TranscodeProfile {
 
 	protected static String cacheFileNameWithoutExtension (final IMediaItem item, final Transcode transcode) {
 		// TODO use better hash?
-		return ChecksumHelper.md5String(item.getFile().getAbsolutePath()) + "_" + transcode.getSymbolicName();
+		return ChecksumHelper.md5(item.getFile().getAbsolutePath()).toString(16) + "_" + transcode.getSymbolicName();
 	}
 
 	/**
