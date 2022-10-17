@@ -37,6 +37,7 @@ public class SyncCheckoutsService extends AwakeService {
 
 	public static final String EXTRA_HOST_SYNC = C.PACKAGE_PREFIX + "host_to_sync";
 
+	private static final long MAX_LAST_MODIFIED_SKEW_MILLIS = TimeUnit.SECONDS.toMillis(2);
 	private static final LogWrapper LOG = new LogWrapper("SCS");
 
 	private ConfigDb configDb;
@@ -192,7 +193,12 @@ public class SyncCheckoutsService extends AwakeService {
 			// Comparing file size here does not work because repeat transcodes may produce different sized output,
 			// yet they should be considered equivalent.
 			if (!i.getLocalFile().exists()
-					|| i.getLocalFile().lastModified() < i.getItem().getLastModified()) {
+					|| Math.abs(i.getLocalFile().lastModified() - i.getItem().getLastModified()) > MAX_LAST_MODIFIED_SKEW_MILLIS) {
+				LOG.d("To copy: %s because abs(%s - %s) > %s ms.",
+						i.getItem().getFileName(),
+						i.getLocalFile().exists() ? i.getLocalFile().lastModified() : "null",
+						i.getItem().getLastModified(),
+						MAX_LAST_MODIFIED_SKEW_MILLIS);
 				ret.add(i);
 			}
 		}
