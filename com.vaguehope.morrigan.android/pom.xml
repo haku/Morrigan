@@ -13,6 +13,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.6</java.version>
 		<android.platform>19</android.platform> <!-- android:targetSdkVersion, same as project.properties -->
+		<android-maven.version>3.6.0</android-maven.version>
 	</properties>
 
 	<repositories>
@@ -95,15 +96,12 @@
 					</configuration>
 				</plugin>
 
-				<!-- http://simpligility.github.io/android-maven-plugin/usage.html -->
 				<plugin>
-					<groupId>com.simpligility.maven.plugins</groupId>
+					<groupId>com.jayway.maven.plugins.android.generation2</groupId>
 					<artifactId>android-maven-plugin</artifactId>
-					<version>4.3.0</version>
+					<version>${android-maven.version}</version>
 					<extensions>true</extensions>
 					<configuration>
-						<androidManifestFile>${basedir}/AndroidManifest.xml</androidManifestFile>
-						<resourceDirectory>${project.basedir}/res</resourceDirectory>
 						<sdk>
 							<platform>${android.platform}</platform>
 						</sdk>
@@ -116,7 +114,7 @@
 		<plugins>
 
 			<plugin>
-				<groupId>com.simpligility.maven.plugins</groupId>
+				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
 				<artifactId>android-maven-plugin</artifactId>
 			</plugin>
 
@@ -137,7 +135,7 @@
 			<build>
 				<plugins>
 					<plugin>
-						<groupId>com.simpligility.maven.plugins</groupId>
+						<groupId>com.jayway.maven.plugins.android.generation2</groupId>
 						<artifactId>android-maven-plugin</artifactId>
 						<configuration>
 							<proguard>
