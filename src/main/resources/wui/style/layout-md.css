@@ -147,6 +147,9 @@ header .subtitle span {
    bottom: 0;
 }
 
+body.nofooter footer {
+  display: none;
+}
 footer.mdl-mini-footer {
   background-color: var(--second-bg-colour);
 }
@@ -169,12 +172,12 @@ footer.maybehide {
 
 /* Vertical left side footer */
 @media (orientation: landscape) {
-  .mdl-layout__header {
+  body:not(.nofooter) .mdl-layout__header {
     position: relative;
     width: auto;
     margin-left: 6em;
   }
-  .mdl-layout__content {
+  body:not(.nofooter) .mdl-layout__content {
     margin-left: 6em;
   }
   .mdl-mini-footer {
@@ -184,7 +187,7 @@ footer.maybehide {
     bottom: 0;
     flex-flow: column;
   }
-  footer.maybehide {
+  body:not(.nofooter) footer.maybehide {
     /* Would be nice to have a more direct way to undo 'none'. */
     display: flex;
   }

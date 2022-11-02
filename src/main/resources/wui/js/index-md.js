@@ -183,6 +183,10 @@
 // Footer.
 
   function wireFooter() {
+    if (new URLSearchParams(location.search).has('nofooter')) {
+      $('body').addClass('nofooter');
+    }
+
     $('#footer_search').click(footerSearchClicked);
     ClickHelper.setupLongClick($("#footer_pause"), footerPauseClicked, footerPauseLongClicked);
     $('#footer_next').click(footerNextClicked);
