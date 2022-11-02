@@ -1,5 +1,6 @@
 package com.vaguehope.morrigan;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
@@ -14,6 +15,7 @@ public class Args {
 	@Option(name = "--origin", usage = "Hostname or IP address for CORS origin.") private List<String> origins;
 	@Option(name = "--ssh", usage = "Local port to bind SSH UI to.") private int sshPort = -1;
 	@Option(name = "--vlcarg", metaVar = "--foo=bar", usage = "Extra VLC arg, use once for each arg.") private List<String> vlcArgs;
+	@Option(name = "--webroot", usage = "Override static file location, useful for UI dev.") private String webRoot;
 	@Option(name = "-v", aliases = { "--verbose" }, usage = "print log lines for various events.") private boolean verboseLog = false;
 
 	public String getConfigPath() {
@@ -47,6 +49,25 @@ public class Args {
 
 	public List<String> getVlcArgs() {
 		return this.vlcArgs;
+	}
+
+	public File getWebRoot() throws ArgsException {
+		return checkIsDirOrNull(this.webRoot);
+	}
+
+	private static File checkIsDirOrNull(final String path) throws ArgsException {
+		if (path == null) return null;
+		final File f = new File(path);
+		if (!f.exists()) throw new ArgsException("Not found: " + f.getAbsolutePath());
+		if (!f.isDirectory()) throw new ArgsException("Not directory: " + f.getAbsolutePath());
+		return f;
+	}
+
+	public static class ArgsException extends Exception {
+		private static final long serialVersionUID = 4160594293982918286L;
+		public ArgsException(final String msg) {
+			super(msg);
+		}
 	}
 
 }

@@ -1,5 +1,6 @@
 package com.vaguehope.morrigan.server;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
@@ -51,6 +52,7 @@ public class MorriganServer {
 	public MorriganServer (
 			final int httpPort,
 			final Collection<String> additionalCorsOrigins,
+			final File overrideWebRoot,
 			final Config config, final ServerConfig serverConfig,
 			final PlayerReader playerListener, final MediaFactory mediaFactory,
 			final AsyncTasksRegister asyncTasksRegister, final AsyncActions asyncActions,
@@ -64,7 +66,7 @@ public class MorriganServer {
 			this.server = new Server(threadPool);
 			this.server.addLifeCycleListener(this.lifeCycleListener);
 			this.server.setHandler(wrapWithRewrites(
-					makeContentHandler(additionalCorsOrigins, config, serverConfig, playerListener, mediaFactory, asyncTasksRegister, asyncActions, transcoder, schEs)));
+					makeContentHandler(additionalCorsOrigins, overrideWebRoot, config, serverConfig, playerListener, mediaFactory, asyncTasksRegister, asyncActions, transcoder, schEs)));
 
 			final InetAddress bindAddress = serverConfig.getBindAddress("HTTP");
 			if (bindAddress == null) throw new IllegalStateException("Failed to find bind address.");
@@ -82,7 +84,7 @@ public class MorriganServer {
 		return connector;
 	}
 
-	protected static RewriteHandler wrapWithRewrites(Handler wrapped) {
+	protected static RewriteHandler wrapWithRewrites(final Handler wrapped) {
 		final RewriteHandler rewrites = new RewriteHandler();
 
 		// Do not modify the request object because:
@@ -97,8 +99,8 @@ public class MorriganServer {
 		return rewrites;
 	}
 
-	private static HandlerList makeContentHandler (final Collection<String> additionalCorsOrigins, final Config config, final ServerConfig serverConfig, final PlayerReader playerListener, final MediaFactory mediaFactory, final AsyncTasksRegister asyncTasksRegister, final AsyncActions asyncActions, final Transcoder transcoder, final ScheduledExecutorService schEs) throws IOException {
-		final ServletContextHandler context = getWuiContext();
+	private static HandlerList makeContentHandler (final Collection<String> additionalCorsOrigins, final File overrideWebRoot, final Config config, final ServerConfig serverConfig, final PlayerReader playerListener, final MediaFactory mediaFactory, final AsyncTasksRegister asyncTasksRegister, final AsyncActions asyncActions, final Transcoder transcoder, final ScheduledExecutorService schEs) throws IOException {
+		final ServletContextHandler context = getWuiContext(overrideWebRoot);
 
 		final FilterHolder authFilterHolder = new FilterHolder(new AuthFilter(serverConfig, additionalCorsOrigins, config, schEs));
 		context.addFilter(authFilterHolder, "/*", null);
@@ -117,19 +119,13 @@ public class MorriganServer {
 		return handlers;
 	}
 
-	private static ServletContextHandler getWuiContext() {
-		final URL f = MorriganServer.class.getClassLoader().getResource("wui/index.html");
-		if (f == null) {
-			throw new IllegalStateException("Unable to find wui directory.");
-		}
-
+	private static ServletContextHandler getWuiContext(final File overrideWebRoot) {
 		final Resource rootRes;
-		try {
-			final URI rootUri = URI.create(f.toURI().toASCIIString().replaceFirst("/index.html$", "/"));
-			rootRes = Resource.newResource(rootUri);
+		if (overrideWebRoot != null) {
+			rootRes = Resource.newResource(overrideWebRoot);
 		}
-		catch (final URISyntaxException | MalformedURLException e) {
-			throw new IllegalStateException(e);
+		else {
+			rootRes = classpathRootRes();
 		}
 
 		final ResourceService resourceService = new ResourceService();
@@ -143,6 +139,20 @@ public class MorriganServer {
 		context.setWelcomeFiles(new String[] { "index.html" });
 		context.addServlet(new ServletHolder(new DefaultServlet(resourceService)), "/");
 		return context;
+	}
+
+	private static Resource classpathRootRes() {
+		final URL f = MorriganServer.class.getClassLoader().getResource("wui/index.html");
+		if (f == null) {
+			throw new IllegalStateException("Unable to find wui directory.");
+		}
+		try {
+			final URI rootUri = URI.create(f.toURI().toASCIIString().replaceFirst("/index.html$", "/"));
+			return Resource.newResource(rootUri);
+		}
+		catch (final URISyntaxException | MalformedURLException e) {
+			throw new IllegalStateException(e);
+		}
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

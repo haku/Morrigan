@@ -87,7 +87,11 @@ public final class Main {
 		final ServerConfig serverConfig = new ServerConfig(config, args);
 		if (args.getHttpPort() > 0) {
 			final ScheduledExecutorService srvSchEx = Executors.newScheduledThreadPool(1, new DaemonThreadFactory("srvsch"));
-			final MorriganServer server = new MorriganServer(args.getHttpPort(), args.getOrigins(), config, serverConfig, playerRegister, mediaFactory, asyncTasksRegister, asyncActions, transcoder, srvSchEx);
+			final MorriganServer server = new MorriganServer(
+					args.getHttpPort(),
+					args.getOrigins(),
+					args.getWebRoot(),
+					config, serverConfig, playerRegister, mediaFactory, asyncTasksRegister, asyncActions, transcoder, srvSchEx);
 			server.start();
 		}
 
