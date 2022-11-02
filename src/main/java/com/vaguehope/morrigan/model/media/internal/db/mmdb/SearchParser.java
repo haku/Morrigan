@@ -16,7 +16,7 @@ import com.vaguehope.morrigan.util.QuoteRemover;
 
 class SearchParser {
 
-	private static final int MAX_SEARCH_TERMS = 10;
+	private static final int MAX_SEARCH_TERMS = 20;
 
 	private static final String _SQL_MEDIAFILES_SELECT =
 			"SELECT id,file,type,md5,sha1,added,modified,enabled,enabledmodified,missing,remloc,startcnt,endcnt,lastplay,duration,width,height"
