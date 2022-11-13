@@ -4,10 +4,12 @@ import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.time.Duration;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.apache.sshd.core.CoreModuleProperties;
 import org.apache.sshd.server.SshServer;
@@ -34,6 +36,7 @@ public class SshUi {
 	private static final Logger LOG = LoggerFactory.getLogger(SshUi.class);
 
 	private final int port;
+	private final List<InetAddress> bindAddresses;
 	private final Config config;
 	private final ServerConfig serverConfig;
 	private final PlayerReader playerReader;
@@ -45,8 +48,9 @@ public class SshUi {
 	private MnCommandFactory mnCommandFactory;
 	private SshServer sshd;
 
-	public SshUi(final int port, final Config config, final ServerConfig serverConfig, final PlayerReader playerReader, final MediaFactory mediaFactory, final AsyncTasksRegister asyncTasksRegister, final Transcoder transcoder) {
+	public SshUi(final int port, final List<InetAddress> bindAddresses, final Config config, final ServerConfig serverConfig, final PlayerReader playerReader, final MediaFactory mediaFactory, final AsyncTasksRegister asyncTasksRegister, final Transcoder transcoder) {
 		this.port = port;
+		this.bindAddresses = bindAddresses;
 		this.config = config;
 		this.serverConfig = serverConfig;
 		this.playerReader = playerReader;
@@ -82,13 +86,19 @@ public class SshUi {
 
 		CoreModuleProperties.IDLE_TIMEOUT.set(this.sshd, IDLE_TIMEOUT);
 
-		final InetAddress bindAddress = this.serverConfig.getBindAddress("SSH");
-		if (bindAddress == null) throw new IllegalStateException("Failed to find bind address.");
-		this.sshd.setHost(bindAddress.getHostAddress());
+		if (this.bindAddresses != null) {
+			final String hosts = this.bindAddresses.stream().map(a -> a.getHostAddress()).collect(Collectors.joining(","));
+			this.sshd.setHost(hosts);
+		}
+		else {
+			final InetAddress bindAddress = this.serverConfig.getBindAddress("SSH");
+			if (bindAddress == null) throw new IllegalStateException("Failed to find bind address.");
+			this.sshd.setHost(bindAddress.getHostAddress());
+		}
 
 		this.sshd.setPort(this.port);
 		this.sshd.start();
-		LOG.info("sshUI ready on port {}.", Integer.valueOf(this.sshd.getPort()));
+		LOG.info("sshUI ready on: {}.", this.sshd.getBoundAddresses().stream().map(a -> a.toString()).collect(Collectors.joining(", ")));
 	}
 
 }

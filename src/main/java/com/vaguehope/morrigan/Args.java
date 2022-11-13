@@ -1,6 +1,9 @@
 package com.vaguehope.morrigan;
 
 import java.io.File;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -14,6 +17,7 @@ public class Args {
 	@Option(name = "--interface", usage = "Hostname or IP address of interface to bind to.") private String iface;
 	@Option(name = "--origin", usage = "Hostname or IP address for CORS origin.") private List<String> origins;
 	@Option(name = "--ssh", usage = "Local port to bind SSH UI to.") private int sshPort = -1;
+	@Option(name = "--sshinterface", usage = "Hostname or IP address of interface to bind to, supersedes --interface for ssh.") private List<String> sshIfaces;
 	@Option(name = "--vlcarg", metaVar = "--foo=bar", usage = "Extra VLC arg, use once for each arg.") private List<String> vlcArgs;
 	@Option(name = "--webroot", usage = "Override static file location, useful for UI dev.") private String webRoot;
 	@Option(name = "-v", aliases = { "--verbose" }, usage = "print log lines for various events.") private boolean verboseLog = false;
@@ -24,6 +28,19 @@ public class Args {
 
 	public String getInterface () {
 		return this.iface;
+	}
+
+	/**
+	 * Returns null for no interfaces.
+	 * Never returns an empty list.
+	 */
+	public List<InetAddress> getSshInterfaces() throws UnknownHostException {
+		if (this.sshIfaces == null || this.sshIfaces.size() < 1) return null;
+		final List<InetAddress> ret = new ArrayList<>();
+		for (final String i : this.sshIfaces) {
+			ret.add(InetAddress.getByName(i));
+		}
+		return Collections.unmodifiableList(ret);
 	}
 
 	public List<String> getOrigins() {
