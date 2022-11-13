@@ -151,8 +151,8 @@
         playersList.append(playerElem);
       }
 
-      $('.name', playerElem).text(player.name);
-      $('.material-icons', playerElem).text(player.stateIcon);
+      $('.name', playerElem).updateText(player.name);
+      $('.material-icons', playerElem).updateText(player.stateIcon);
     });
 
     $('.player', playersList).each(function(index, player) {
@@ -446,14 +446,14 @@
       selectedPlayer = player;
     }
 
-    $('#player_name').text(player.name + ' (' + HOST_NAME + ')');
-    $('#queue_tab_icon').text(player.stateIcon);
-    $('#subtitle_list_name').text(player.listTitle);
-    $('#subtitle_playback_order').text(MnApi.playbackOrderFromId(player.playOrderId)['title']);
-    $('#subtitle_transcode').text(player.transcodeTitle);
-    $('#track_title').text(player.trackTitle);
-    $('#track_tags').text(player.tags.length > 0 ? player.tags.join(', ') : '(no tags)');
-    $('#queue_info').text(player.queueLength + ' items, ' + MnApi.formatSeconds(player.queueDuration));
+    $('#player_name').updateText(player.name + ' (' + HOST_NAME + ')');
+    $('#queue_tab_icon').updateText(player.stateIcon);
+    $('#subtitle_list_name').updateText(player.listTitle);
+    $('#subtitle_playback_order').updateText(MnApi.playbackOrderFromId(player.playOrderId)['title']);
+    $('#subtitle_transcode').updateText(player.transcodeTitle);
+    $('#track_title').updateText(player.trackTitle);
+    $('#track_tags').updateText(player.tags.length > 0 ? player.tags.join(', ') : '(no tags)');
+    $('#queue_info').updateText(player.queueLength + ' items, ' + MnApi.formatSeconds(player.queueDuration));
 
     var pos, dur, sldTxt, sldVal, sldMax;
 
@@ -483,7 +483,7 @@
 
     var sld = $('#track_progress').attr('max', sldMax).get(0).MaterialSlider;
     if (sld) sld.change(sldVal);
-    $('#track_time').text(sldTxt);
+    $('#track_time').updateText(sldTxt);
 
     if (player.volume) {
       var vol = player.volume;
@@ -493,7 +493,7 @@
       else {
         vol += '/' + player.volumemaxvalue;
       }
-      $('#volume_level').text(vol);
+      $('#volume_level').updateText(vol);
       $('#volume_controls').show();
     }
     else {
@@ -556,7 +556,7 @@
   function updateQueueItem(item, itemEl) {
     var title = item.title;
     if (item.duration > 0) title += ' (' + MnApi.formatSeconds(item.duration) + ')';
-    $('.title', itemEl).text(title);
+    $('.title', itemEl).updateText(title);
 
     var clickable = $('.clickable', itemEl);
     clickable.unbind().click(function(event) {

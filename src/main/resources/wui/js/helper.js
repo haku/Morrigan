@@ -63,6 +63,11 @@ jQuery.fn.setVisibility = function(visibility) {
   return this.css('visibility', visibility ? 'visible' : 'hidden');
 };
 
+jQuery.fn.updateText = function(text) {
+  if (this.text() === text) return this;
+  return this.text(text);
+};
+
 // Polyfill https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/String/startsWith
 if (!String.prototype.startsWith) {
     String.prototype.startsWith = function(searchString, position){
