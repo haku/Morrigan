@@ -84,15 +84,19 @@ public final class Main {
 		final Transcoder transcoder = new Transcoder("srv");
 		makeLocalPlayer(playerRegister);
 
+		final MorriganServer httpServer;
 		final ServerConfig serverConfig = new ServerConfig(config, args);
 		if (args.getHttpPort() > 0) {
 			final ScheduledExecutorService srvSchEx = Executors.newScheduledThreadPool(1, new DaemonThreadFactory("srvsch"));
-			final MorriganServer server = new MorriganServer(
+			httpServer = new MorriganServer(
 					args.getHttpPort(),
 					args.getOrigins(),
 					args.getWebRoot(),
 					config, serverConfig, playerRegister, mediaFactory, asyncTasksRegister, asyncActions, transcoder, srvSchEx);
-			server.start();
+			httpServer.start();
+		}
+		else {
+			httpServer = null;
 		}
 
 		if (args.getSshPort() > 0) {
@@ -103,6 +107,8 @@ public final class Main {
 		if (args.isDlna()) {
 			final DlnaService dlna = new DlnaService(config, serverConfig, mediaFactory, playerRegister);
 			dlna.start();
+
+			if (httpServer != null) httpServer.enableDlnaCtl(dlna);
 		}
 
 		new CountDownLatch(1).await();  // Block forever.

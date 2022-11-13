@@ -102,6 +102,10 @@ public abstract class AbstractDlnaPlayer extends AbstractPlayer {
 		return this.uid;
 	}
 
+	public RemoteService getRemoteService() {
+		return this.avTransportSvc;
+	}
+
 	@Override
 	protected void onDispose () {
 		LOG.info("Disposed {}: {}.", this.uid, toString());
@@ -286,6 +290,8 @@ public abstract class AbstractDlnaPlayer extends AbstractPlayer {
 				case STOPPED:
 				case NO_MEDIA_PRESENT:
 					return PlayState.STOPPED;
+			default:
+				break;
 			}
 		}
 		return PlayState.STOPPED;

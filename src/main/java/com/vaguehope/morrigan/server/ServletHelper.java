@@ -202,6 +202,21 @@ public final class ServletHelper {
 		}
 	}
 
+	public static String readRequiredParam(final HttpServletRequest req, final HttpServletResponse resp, final String param, final int minLength) throws IOException {
+		final String[] vals = req.getParameterValues(param);
+		if (vals != null && vals.length > 1) {
+			error(resp, HttpServletResponse.SC_BAD_REQUEST, "Param has multiple values: " + param);
+			return null;
+		}
+		final String p = vals != null ? vals[0].trim() : null;
+		if (p == null || p.length() < minLength) {
+			error(resp, HttpServletResponse.SC_BAD_REQUEST, "Param missing: " + param);
+			return null;
+		}
+		return p;
+	}
+
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	public static Cookie findCookie (final HttpServletRequest req, final String name) {

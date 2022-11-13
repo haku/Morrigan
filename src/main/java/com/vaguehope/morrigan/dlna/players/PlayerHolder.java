@@ -1,7 +1,9 @@
 package com.vaguehope.morrigan.dlna.players;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -53,6 +55,14 @@ public class PlayerHolder {
 		this.stateStorage = playerStateStorage;
 		this.config = config;
 		this.scheduledExecutor = scheduledExecutor;
+	}
+
+	public Collection<AbstractDlnaPlayer> getPlayers() {
+		final List<AbstractDlnaPlayer> ret = new ArrayList<>();
+		for (final Set<AbstractDlnaPlayer> sp : this.players.values()) {
+			ret.addAll(sp);
+		}
+		return ret;
 	}
 
 	public void addAvTransport (final RemoteDevice device, final RemoteService avTransport) {

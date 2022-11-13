@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vaguehope.morrigan.config.Config;
+import com.vaguehope.morrigan.dlna.DlnaService;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.player.PlayerReader;
@@ -44,6 +45,7 @@ public class MorriganServer {
 
 	private final Server server;
 	private final int serverPort;
+	private final ServletContextHandler context;
 
 	private Runnable onStopRunnable = null;
 
@@ -65,8 +67,8 @@ public class MorriganServer {
 			threadPool.setName("jty");
 			this.server = new Server(threadPool);
 			this.server.addLifeCycleListener(this.lifeCycleListener);
-			this.server.setHandler(wrapWithRewrites(
-					makeContentHandler(additionalCorsOrigins, overrideWebRoot, config, serverConfig, playerListener, mediaFactory, asyncTasksRegister, asyncActions, transcoder, schEs)));
+			this.context = makeContentHandler(additionalCorsOrigins, overrideWebRoot, config, serverConfig, playerListener, mediaFactory, asyncTasksRegister, asyncActions, transcoder, schEs);
+			this.server.setHandler(wrapWithRewrites(new HandlerList(this.context)));
 
 			final InetAddress bindAddress = serverConfig.getBindAddress("HTTP");
 			if (bindAddress == null) throw new IllegalStateException("Failed to find bind address.");
@@ -99,7 +101,7 @@ public class MorriganServer {
 		return rewrites;
 	}
 
-	private static HandlerList makeContentHandler (final Collection<String> additionalCorsOrigins, final File overrideWebRoot, final Config config, final ServerConfig serverConfig, final PlayerReader playerListener, final MediaFactory mediaFactory, final AsyncTasksRegister asyncTasksRegister, final AsyncActions asyncActions, final Transcoder transcoder, final ScheduledExecutorService schEs) throws IOException {
+	private static ServletContextHandler makeContentHandler (final Collection<String> additionalCorsOrigins, final File overrideWebRoot, final Config config, final ServerConfig serverConfig, final PlayerReader playerListener, final MediaFactory mediaFactory, final AsyncTasksRegister asyncTasksRegister, final AsyncActions asyncActions, final Transcoder transcoder, final ScheduledExecutorService schEs) throws IOException {
 		final ServletContextHandler context = getWuiContext(overrideWebRoot);
 
 		final FilterHolder authFilterHolder = new FilterHolder(new AuthFilter(serverConfig, additionalCorsOrigins, config, schEs));
@@ -114,9 +116,11 @@ public class MorriganServer {
 		context.addServlet(new ServletHolder(new HostInfoServlet()), HostInfoServlet.CONTEXTPATH + "/*");
 		context.addServlet(new ServletHolder(new LogServlet()), LogServlet.CONTEXTPATH + "/*");
 
-		final HandlerList handlers = new HandlerList();
-		handlers.setHandlers(new Handler[] { context });
-		return handlers;
+		return context;
+	}
+
+	public void enableDlnaCtl(final DlnaService dlnaSvs) {
+		this.context.addServlet(new ServletHolder(new DlnaCtlServlet(dlnaSvs)), DlnaCtlServlet.CONTEXTPATH + "/*");
 	}
 
 	private static ServletContextHandler getWuiContext(final File overrideWebRoot) {

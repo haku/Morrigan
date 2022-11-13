@@ -113,6 +113,14 @@ public class DlnaService {
 		LOG.info("DLNA started.");
 	}
 
+	public UpnpService getUpnpService() {
+		return this.upnpService;
+	}
+
+	public PlayerHolder getPlayerHolder() {
+		return this.playerHolder;
+	}
+
 	private class MyUpnpService extends UpnpServiceImpl {
 
 		private MyUpnpService(final UpnpServiceConfiguration configuration) {
