@@ -268,16 +268,6 @@ footer.maybehide {
   padding: 1em 0 1em 0;
 }
 
-#queue_tab_content p {
-  margin: 0;
-  padding: 0;
-}
-
-.queue_action_buttons {
-  display: flex;
-  justify-content: center;
-}
-
 .clickable_list .album {
   float: left;
   width: 7em;
@@ -306,6 +296,20 @@ footer.maybehide {
   background-color: var(--accent-bg-colour);
   color: var(--accent-fg-colour);
 }
+
+/* queue. */
+#queue_tab_content p {
+  margin: 0;
+  padding: 0;
+}
+#track_tags {
+  line-height: 1.3em;
+}
+.queue_action_buttons {
+  display: flex;
+  justify-content: center;
+}
+
 
 /* pop-up menu. */
 .popup {
