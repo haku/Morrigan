@@ -6,4 +6,9 @@
 		android:title="Media Sources"
 		android:summary="Add, update and remove media directories" />
 
+	<header
+		android:fragment="com.vaguehope.morrigan.android.playback.AdvancedPrefFragment"
+		android:title="Advanced"
+		android:summary="For when things go wrong" />
+
 </preference-headers>
