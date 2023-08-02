@@ -30,6 +30,7 @@ import com.vaguehope.morrigan.android.model.MlistItem;
 import com.vaguehope.morrigan.android.model.MlistItemList;
 import com.vaguehope.morrigan.android.model.MlistState;
 import com.vaguehope.morrigan.android.model.ServerReference;
+import com.vaguehope.morrigan.android.playback.RescanLibrariesService;
 import com.vaguehope.morrigan.android.state.Checkout;
 import com.vaguehope.morrigan.android.state.ConfigDb;
 
@@ -59,10 +60,12 @@ public class SyncCheckoutsService extends AwakeService {
 		final int notificationId = (int) (System.currentTimeMillis()); // Probably unique.
 		final Builder notif = makeNotif(notificationId);
 		String result = "Unknown result.";
+		boolean success = false;
 		try {
 			final String hostToSync = i.getExtras() != null ? i.getExtras().getString(EXTRA_HOST_SYNC) : null;
 			doSyncs(notificationId, notif, hostToSync);
 			result = "Finished.";
+			success = true;
 		}
 		catch (final Exception e) {
 			LOG.e("Sync failed.", e);
@@ -70,6 +73,12 @@ public class SyncCheckoutsService extends AwakeService {
 		}
 		finally {
 			updateNotifResult(notificationId, notif, result);
+		}
+
+		if (success) {
+			LOG.i("Autostarting library rescan...");
+			startService(new Intent(this, RescanLibrariesService.class));
+			this.notifMgr.cancel(notificationId);
 		}
 	}
 
