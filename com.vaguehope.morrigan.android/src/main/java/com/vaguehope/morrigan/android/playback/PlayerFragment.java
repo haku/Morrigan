@@ -38,6 +38,7 @@ import com.vaguehope.morrigan.android.R;
 import com.vaguehope.morrigan.android.helper.LogWrapper;
 import com.vaguehope.morrigan.android.helper.Result;
 import com.vaguehope.morrigan.android.helper.StringHelper;
+import com.vaguehope.morrigan.android.helper.TimeHelper;
 import com.vaguehope.morrigan.android.playback.MediaDb.MediaWatcher;
 import com.vaguehope.morrigan.android.playback.MediaDb.MoveAction;
 import com.vaguehope.morrigan.android.playback.MediaDb.QueueEnd;
@@ -325,8 +326,9 @@ public class PlayerFragment extends Fragment {
 
 	private void redrawQueueStatus () {
 		this.txtQueue.setText(String.format(
-				"%s items in queue, %s.",
+				"%s items, %s, %s.",
 				getMediaDb().getQueueSize(),
+				TimeHelper.formatTimeMiliseconds(getMediaDb().getQueueDurationMillis()),
 				getPlaybacker().getPlayOrder()));
 	}
 

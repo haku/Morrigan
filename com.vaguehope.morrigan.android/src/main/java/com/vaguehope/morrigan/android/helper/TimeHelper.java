@@ -20,6 +20,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 public final class TimeHelper {
 
@@ -34,7 +35,7 @@ public final class TimeHelper {
 	}
 
 	public static String formatTimeMiliseconds (final long miliseconds) {
-		return formatTimeSeconds((long) (miliseconds / 1000f));
+		return formatTimeSeconds(TimeUnit.MILLISECONDS.toSeconds(miliseconds));
 	}
 
 	private static ThreadLocal<SimpleDateFormat> ISO_8601_UTC = new ThreadLocal<SimpleDateFormat>() {

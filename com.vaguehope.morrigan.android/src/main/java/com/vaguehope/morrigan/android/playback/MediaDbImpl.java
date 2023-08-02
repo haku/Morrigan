@@ -298,6 +298,11 @@ public class MediaDbImpl implements MediaDb {
 		return DatabaseUtils.queryNumEntries(this.mDb, TBL_QU);
 	}
 
+	@Override
+	public long getQueueDurationMillis () {
+		return DatabaseUtils.longForQuery(this.mDb, "SELECT SUM(" + TBL_QU_DURATION_MILLIS + ") FROM " + TBL_QU, null);
+	}
+
 	private Cursor getQuCursor (final String where, final String[] whereArgs, final String orderBy, final int numberOf) {
 		return this.mDb.query(true, TBL_QU,
 				new String[] {

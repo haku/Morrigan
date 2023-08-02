@@ -14,6 +14,7 @@ public interface MediaDb {
 	void removeFromQueueById(Collection<Long> itemIds);
 
 	long getQueueSize ();
+	long getQueueDurationMillis ();
 	Cursor getQueueCursor();
 	QueueItem getFirstQueueItem();
 	QueueItem getQueueItemById(long rowId);
