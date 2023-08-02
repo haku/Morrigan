@@ -17,11 +17,12 @@
 package com.vaguehope.morrigan.android.model;
 
 public interface MlistReference {
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
+	/**
+	 * Never includes a trailing slash.
+	 */
 	public String getBaseUrl ();
-	
+
 	public ServerReference getServerReference ();
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 }

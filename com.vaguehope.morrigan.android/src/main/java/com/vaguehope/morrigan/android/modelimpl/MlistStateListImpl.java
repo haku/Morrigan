@@ -34,6 +34,7 @@ import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
+import com.vaguehope.morrigan.android.helper.UriHelper;
 import com.vaguehope.morrigan.android.model.Artifact;
 import com.vaguehope.morrigan.android.model.ArtifactList;
 import com.vaguehope.morrigan.android.model.MlistState;
@@ -100,7 +101,7 @@ public class MlistStateListImpl implements MlistStateList, ContentHandler {
 				String hrefVal = attributes.getValue("href");
 				if (hrefVal != null && hrefVal.length() > 0) {
 					this.currentItem.setRelativePath(hrefVal);
-					this.currentItem.setBaseUrl(this.serverReference.getBaseUrl() + hrefVal);
+					this.currentItem.setBaseUrl(UriHelper.joinParts(this.serverReference.getBaseUrl(), hrefVal));
 				}
 			}
 		}

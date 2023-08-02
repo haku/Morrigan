@@ -11,6 +11,7 @@ import org.xml.sax.SAXException;
 import com.vaguehope.morrigan.android.helper.HttpFileDownloadHandler;
 import com.vaguehope.morrigan.android.helper.HttpFileDownloadHandler.DownloadProgressListener;
 import com.vaguehope.morrigan.android.helper.HttpHelper;
+import com.vaguehope.morrigan.android.helper.UriHelper;
 import com.vaguehope.morrigan.android.helper.HttpHelper.HttpStreamHandler;
 import com.vaguehope.morrigan.android.model.MlistItem;
 import com.vaguehope.morrigan.android.model.MlistItemList;
@@ -25,7 +26,11 @@ public class MnApi {
 	private MnApi () {}
 
 	public static MlistItemList fetchDbItems (final ServerReference host, final String dbRelativePath, final String query, final String transcode, final boolean includeDeletedTags) throws IOException {
-		final String url = host.getBaseUrl() + dbRelativePath + C.CONTEXT_MLIST_QUERY + "/" + URLEncoder.encode(query)
+		final String url = UriHelper.joinParts(
+				host.getBaseUrl(),
+				dbRelativePath,
+				C.CONTEXT_MLIST_QUERY,
+				URLEncoder.encode(query))
 				+ "?maxresults=0"
 				+ (transcode != null ? "&transcode=" + transcode : "")
 				+ (includeDeletedTags ? "&includeddeletedtags=true" : "");
@@ -50,7 +55,10 @@ public class MnApi {
 	}
 
 	public static MlistState fetchDbSrcs (final ServerReference host, final String dbRelativePath) throws IOException {
-		final String url = host.getBaseUrl() + dbRelativePath + C.CONTEXT_MLIST_SRC;
+		final String url = UriHelper.joinParts(
+				host.getBaseUrl(),
+				dbRelativePath,
+				C.CONTEXT_MLIST_SRC);
 		try {
 			final AtomicReference<MlistState> res = new AtomicReference<MlistState>();
 			HttpHelper.getUrlContent(url, "GET", null, null,
@@ -73,7 +81,11 @@ public class MnApi {
 
 	public static void postToFile (final ServerReference host, final String dbRelativePath, final MlistItem item,
 			final String action) throws IOException {
-		final String url = host.getBaseUrl() + dbRelativePath + C.CONTEXT_MLIST_ITEMS + "/" + item.getRelativeUrl();
+		final String url = UriHelper.joinParts(
+				host.getBaseUrl(),
+				dbRelativePath,
+				C.CONTEXT_MLIST_ITEMS,
+				item.getRelativeUrl());
 		try {
 			HttpHelper.getUrlContent(url, "POST", "action=" + action, "application/x-www-form-urlencoded", host);
 		}
@@ -84,7 +96,11 @@ public class MnApi {
 
 	public static void downloadFile (final ServerReference host, final String dbRelativePath, final MlistItem item,
 			final File localFile, final DownloadProgressListener progressListener) throws IOException {
-		final String url = host.getBaseUrl() + dbRelativePath + C.CONTEXT_MLIST_ITEMS + "/" + item.getRelativeUrl();
+		final String url = UriHelper.joinParts(
+				host.getBaseUrl(),
+				dbRelativePath,
+				C.CONTEXT_MLIST_ITEMS,
+				item.getRelativeUrl());
 		try {
 			HttpHelper.getUrlContent(url, new HttpFileDownloadHandler(localFile, progressListener), host);
 		}

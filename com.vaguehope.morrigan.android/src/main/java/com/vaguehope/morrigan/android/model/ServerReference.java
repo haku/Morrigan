@@ -8,6 +8,9 @@ public interface ServerReference extends Artifact, HttpCreds, Titleable {
 
 	public String getName ();
 
+	/**
+	 * Never includes a trailing slash.
+	 */
 	public String getBaseUrl ();
 
 	@Override

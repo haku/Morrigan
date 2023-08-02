@@ -20,6 +20,10 @@ public interface PlayerReference extends Artifact {
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	public String getPlayerId ();
+
+	/**
+	 * Never includes a trailing slash.
+	 */
 	public String getBaseUrl ();
 
 	public ServerReference getServerReference ();

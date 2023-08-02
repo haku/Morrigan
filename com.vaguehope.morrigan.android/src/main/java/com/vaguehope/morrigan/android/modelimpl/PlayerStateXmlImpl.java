@@ -38,6 +38,7 @@ import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
+import com.vaguehope.morrigan.android.helper.UriHelper;
 import com.vaguehope.morrigan.android.model.MlistItem;
 import com.vaguehope.morrigan.android.model.PlayState;
 import com.vaguehope.morrigan.android.model.PlayerReference;
@@ -363,7 +364,7 @@ public class PlayerStateXmlImpl implements PlayerState, MlistItem, ContentHandle
 			if (relVal != null && relVal.equals("list")) {
 				String hrefVal = attr.getValue("href");
 				if (hrefVal != null && hrefVal.length() > 0) {
-					this.listUrl = this.playerReference.getServerReference().getBaseUrl() + hrefVal;
+					this.listUrl = UriHelper.joinParts(this.playerReference.getServerReference().getBaseUrl(), hrefVal);
 				}
 			}
 			else if (relVal != null && relVal.equals(TRACKLINKNAME)) {

@@ -18,6 +18,7 @@ package com.vaguehope.morrigan.android.modelimpl;
 
 import com.vaguehope.morrigan.android.C;
 import com.vaguehope.morrigan.android.R;
+import com.vaguehope.morrigan.android.helper.UriHelper;
 import com.vaguehope.morrigan.android.model.ServerReference;
 
 public class ServerReferenceImpl implements ServerReference {
@@ -37,7 +38,7 @@ public class ServerReferenceImpl implements ServerReference {
 	public ServerReferenceImpl (final String dbId, final String name, final String baseUrl, final String pass) {
 		this.dbId = dbId;
 		this.name = name;
-		this.baseUrl = baseUrl;
+		this.baseUrl = UriHelper.ensureNoTrailingSlash(baseUrl);
 		this.pass = pass;
 	}
 

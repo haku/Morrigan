@@ -25,6 +25,7 @@ import android.app.Activity;
 import android.content.Context;
 
 import com.vaguehope.morrigan.android.C;
+import com.vaguehope.morrigan.android.helper.UriHelper;
 import com.vaguehope.morrigan.android.helper.HttpHelper.HttpCreds;
 import com.vaguehope.morrigan.android.model.PlayerStateList;
 import com.vaguehope.morrigan.android.model.PlayerStateListChangeListener;
@@ -65,7 +66,7 @@ public class GetPlayersTask extends AbstractTask<PlayerStateList> {
 
 	@Override
 	protected String getUrl () {
-		return this.serverReference.getBaseUrl().concat(C.CONTEXT_PLAYERS);
+		return UriHelper.joinParts(this.serverReference.getBaseUrl(), C.CONTEXT_PLAYERS);
 	}
 
 	// In background thread:

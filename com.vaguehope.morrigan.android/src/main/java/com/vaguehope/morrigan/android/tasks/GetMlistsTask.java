@@ -25,6 +25,7 @@ import android.app.Activity;
 import android.content.Context;
 
 import com.vaguehope.morrigan.android.C;
+import com.vaguehope.morrigan.android.helper.UriHelper;
 import com.vaguehope.morrigan.android.helper.HttpHelper.HttpCreds;
 import com.vaguehope.morrigan.android.model.MlistStateList;
 import com.vaguehope.morrigan.android.model.MlistStateListChangeListener;
@@ -55,7 +56,7 @@ public class GetMlistsTask extends AbstractTask<MlistStateList> {
 
 	@Override
 	protected String getUrl () {
-		return this.serverReference.getBaseUrl().concat(C.CONTEXT_MLISTS);
+		return UriHelper.joinParts(this.serverReference.getBaseUrl(), C.CONTEXT_MLISTS);
 	}
 
 	@Override

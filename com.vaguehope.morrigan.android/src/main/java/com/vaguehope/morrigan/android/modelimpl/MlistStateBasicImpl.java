@@ -19,6 +19,7 @@ package com.vaguehope.morrigan.android.modelimpl;
 import java.util.List;
 
 import com.vaguehope.morrigan.android.R;
+import com.vaguehope.morrigan.android.helper.UriHelper;
 import com.vaguehope.morrigan.android.model.MlistReference;
 import com.vaguehope.morrigan.android.model.MlistState;
 import com.vaguehope.morrigan.android.model.ServerReference;
@@ -58,7 +59,7 @@ public class MlistStateBasicImpl implements MlistState, MlistReference {
 	}
 
 	public void setBaseUrl(final String baseUrl) {
-		this.baseUrl = baseUrl;
+		this.baseUrl = UriHelper.ensureNoTrailingSlash(baseUrl);
 	}
 
 	@Override

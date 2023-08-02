@@ -16,36 +16,31 @@
 
 package com.vaguehope.morrigan.android.modelimpl;
 
+import com.vaguehope.morrigan.android.helper.UriHelper;
 import com.vaguehope.morrigan.android.model.MlistReference;
 import com.vaguehope.morrigan.android.model.ServerReference;
 
 public class MlistReferenceImpl implements MlistReference {
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	private final String baseUrl;
 	private final ServerReference serverReference;
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
-	public MlistReferenceImpl (String baseUrl, ServerReference serverReference) {
+
+	public MlistReferenceImpl (final String baseUrl, final ServerReference serverReference) {
 		if (baseUrl == null) throw new IllegalArgumentException();
 		if (serverReference == null) throw new IllegalArgumentException();
-		
-		this.baseUrl = baseUrl;
+
+		this.baseUrl = UriHelper.ensureNoTrailingSlash(baseUrl);
 		this.serverReference = serverReference;
 	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	
+
 	@Override
 	public String getBaseUrl() {
 		return this.baseUrl;
 	}
-	
+
 	@Override
 	public ServerReference getServerReference() {
 		return this.serverReference;
 	}
-	
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 }

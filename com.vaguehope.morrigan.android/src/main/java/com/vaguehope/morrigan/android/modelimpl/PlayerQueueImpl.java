@@ -19,7 +19,6 @@ package com.vaguehope.morrigan.android.modelimpl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
-import java.text.ParseException;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -36,6 +35,7 @@ import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
+import com.vaguehope.morrigan.android.helper.UriHelper;
 import com.vaguehope.morrigan.android.model.Artifact;
 import com.vaguehope.morrigan.android.model.ArtifactList;
 import com.vaguehope.morrigan.android.model.PlayerQueue;
@@ -169,7 +169,7 @@ public class PlayerQueueImpl implements PlayerQueue, ContentHandler {
 			else {
 				MlistStateBasicImpl list = new MlistStateBasicImpl();
 				list.setTitle(this.currentTitle);
-				list.setBaseUrl(this.playerReference.getServerReference().getBaseUrl() + this.currentListRelativeUrl);
+				list.setBaseUrl(UriHelper.joinParts(this.playerReference.getServerReference().getBaseUrl(), this.currentListRelativeUrl));
 				list.setId(this.currentId);
 
 				this.artifactList.add(list);

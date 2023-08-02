@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.Map;
 
 import com.vaguehope.morrigan.android.R;
+import com.vaguehope.morrigan.android.helper.UriHelper;
 import com.vaguehope.morrigan.android.model.MlistItem;
 import com.vaguehope.morrigan.android.model.PlayState;
 import com.vaguehope.morrigan.android.model.PlayerReference;
@@ -108,7 +109,7 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference, Mlist
 	}
 
 	public void setBaseUrl (final String baseUrl) {
-		this.baseUrl = baseUrl;
+		this.baseUrl = UriHelper.ensureNoTrailingSlash(baseUrl);
 	}
 
 	@Override
