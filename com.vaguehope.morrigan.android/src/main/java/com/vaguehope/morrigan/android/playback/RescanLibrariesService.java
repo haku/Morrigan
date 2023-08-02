@@ -71,7 +71,13 @@ public class RescanLibrariesService extends MediaBindingAwakeService {
 		}
 		finally {
 			LOG.i("Scan result: %s", result);
-			updateNotifResult(notificationId, notif, result);
+			try {
+				updateNotifResult(notificationId, notif, result);
+				LOG.i("Notification updated.");
+			}
+			catch (final Exception e) {
+				LOG.e("Failed to update notification: ", e);
+			}
 		}
 	}
 
