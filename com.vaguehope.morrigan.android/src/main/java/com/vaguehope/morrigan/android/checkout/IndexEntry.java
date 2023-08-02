@@ -13,6 +13,7 @@ public class IndexEntry {
 	private final String hash;
 	private final long startCount;
 	private final long endCount;
+	private final long timeAdded;
 	private final long lastPlayed;
 	private final List<MediaTag> tags;
 
@@ -22,6 +23,7 @@ public class IndexEntry {
 			final String hash,
 			final long startCount,
 			final long endCount,
+			final long timeAdded,
 			final long lastPlayed,
 			final List<MediaTag> tags) {
 		this.localPath = localPath;
@@ -29,6 +31,7 @@ public class IndexEntry {
 		this.hash = hash;
 		this.startCount = startCount;
 		this.endCount = endCount;
+		this.timeAdded = timeAdded;
 		this.lastPlayed = lastPlayed;
 		this.tags = tags;
 	}
@@ -56,6 +59,13 @@ public class IndexEntry {
 
 	public long getEndCount () {
 		return this.endCount;
+	}
+
+	/**
+	 * Milliseconds since epoch.
+	 */
+	public long getTimeAdded () {
+		return this.timeAdded;
 	}
 
 	/**

@@ -298,6 +298,10 @@ public class PlayerStateXmlImpl implements PlayerState, MlistItem, ContentHandle
 	}
 
 	@Override
+	public long getTimeAdded () {
+		throw new UnsupportedOperationException("Not implemented.");
+	}
+	@Override
 	public long getLastModified () {
 		throw new UnsupportedOperationException("Not implemented.");
 	}

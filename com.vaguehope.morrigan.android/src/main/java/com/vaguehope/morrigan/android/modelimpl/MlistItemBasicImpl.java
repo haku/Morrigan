@@ -33,6 +33,7 @@ public class MlistItemBasicImpl implements MlistItem {
 	private String id;
 	private String relativeUrl;
 	private long fileSize;
+	private long timeAdded;
 	private long lastModified;
 	private long lastPlayed;
 	private BigInteger originalHashCode;
@@ -111,6 +112,14 @@ public class MlistItemBasicImpl implements MlistItem {
 	}
 	public void setFileSize (final long fileSize) {
 		this.fileSize = fileSize;
+	}
+
+	@Override
+	public long getTimeAdded () {
+		return this.timeAdded;
+	}
+	public void setTimeAdded (final long timeAdded) {
+		this.timeAdded = timeAdded;
 	}
 
 	@Override

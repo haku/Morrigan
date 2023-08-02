@@ -608,7 +608,7 @@ public class MediaDbImpl implements MediaDb {
 				while (c.moveToNext());
 				return ret;
 			}
-			return Collections.EMPTY_LIST;
+			return Collections.emptyList();
 		}
 		catch (final JSONException e) {
 			throw new IllegalStateException("Invalid JSON found in DB.", e);
@@ -1096,9 +1096,36 @@ public class MediaDbImpl implements MediaDb {
 				values.clear();
 				values.put(TBL_MF_OHASH, newOriginalHash.toByteArray());
 
-				final int affected = this.mDb.update(TBL_MF, values, TBL_TG_ID + "=?", new String[] { String.valueOf(mfRowId) });
+				final int affected = this.mDb.update(TBL_MF, values, TBL_MF_ID + "=?", new String[] { String.valueOf(mfRowId) });
 				if (affected > 1) throw new IllegalStateException("Updating original hash row with ID " + mfRowId + " affected " + affected + " rows, expected 1.");
 				if (affected < 1) LOG.w("Updating original hash row with ID %s affected %s rows, expected 1.", mfRowId, affected);
+			}
+			this.mDb.setTransactionSuccessful();
+		}
+		finally {
+			this.mDb.endTransaction();
+		}
+	}
+
+	@Override
+	public void updateTimeAdded (final Map<Long, Long> mfRowIdToTimeAdded) {
+		this.mDb.beginTransaction();
+		try {
+			final ContentValues values = new ContentValues();
+
+			for (final Entry<Long, Long> entry : mfRowIdToTimeAdded.entrySet()) {
+				final long mfRowId = entry.getKey();
+				final Long newTimeAdded = entry.getValue();
+
+				if (newTimeAdded <= 0) throw new IllegalArgumentException("New time added must be more than 0: " + newTimeAdded);
+
+				values.clear();
+				values.put(TBL_MF_TIME_ADDED_MILLIS, newTimeAdded);
+
+				final int affected = this.mDb.update(TBL_MF, values,
+						TBL_MF_ID + "=? AND " + TBL_MF_TIME_ADDED_MILLIS + ">?",
+						new String[] { String.valueOf(mfRowId), String.valueOf(newTimeAdded) });
+				if (affected > 1) throw new IllegalStateException("Updating time added row with ID " + mfRowId + " affected " + affected + " rows, expected 1.");
 			}
 			this.mDb.setTransactionSuccessful();
 		}

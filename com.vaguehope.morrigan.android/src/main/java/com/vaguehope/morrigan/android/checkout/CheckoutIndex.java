@@ -111,6 +111,7 @@ public class CheckoutIndex {
 		}
 		writer.name("startcount").value(itemAndFile.getItem().getStartCount());
 		writer.name("endcount").value(itemAndFile.getItem().getEndCount());
+		writer.name("timeadded").value(itemAndFile.getItem().getTimeAdded());
 		writer.name("lastplayed").value(itemAndFile.getItem().getLastPlayed());
 
 		writer.name("tags").beginArray();
@@ -137,6 +138,7 @@ public class CheckoutIndex {
 		String hash = null;
 		long startCount = -1;
 		long endCount = -1;
+		long timeAdded = -1;
 		long lastPlayed = -1;
 		List<MediaTag> tags = new ArrayList<MediaTag>();
 
@@ -158,6 +160,9 @@ public class CheckoutIndex {
 			else if (name.equals("endcount")) {
 				endCount = reader.nextLong();
 			}
+			else if (name.equals("timeadded")) {
+				timeAdded = reader.nextLong();
+			}
 			else if (name.equals("lastplayed")) {
 				lastPlayed = reader.nextLong();
 			}
@@ -170,7 +175,7 @@ public class CheckoutIndex {
 		}
 		reader.endObject();
 
-		return new IndexEntry(path, ohash, hash, startCount, endCount, lastPlayed, tags);
+		return new IndexEntry(path, ohash, hash, startCount, endCount, timeAdded, lastPlayed, tags);
 	}
 
 	private static void readTags (final JsonReader reader, final List<MediaTag> tags) throws IOException {

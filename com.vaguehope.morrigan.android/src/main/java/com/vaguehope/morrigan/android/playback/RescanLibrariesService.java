@@ -365,6 +365,7 @@ public class RescanLibrariesService extends MediaBindingAwakeService {
 		final ConfigDb configDb = new ConfigDb(this);
 
 		final Map<Long, BigInteger> originalHashesToAdd = new HashMap<Long, BigInteger>();
+		final Map<Long, Long> timeAddedToAdd = new HashMap<Long, Long>();
 		final Map<Long, Collection<MediaTag>> tagsToAppend = new HashMap<Long, Collection<MediaTag>>();
 
 		for (final Checkout checkout : configDb.getCheckouts()) {
@@ -375,6 +376,9 @@ public class RescanLibrariesService extends MediaBindingAwakeService {
 					for (final long mfRowId : mfRowIds) {
 						if (entry.getOHash() != null) {
 							originalHashesToAdd.put(mfRowId, entry.getOHash());
+						}
+						if (entry.getTimeAdded() > 0) {
+							timeAddedToAdd.put(mfRowId, entry.getTimeAdded());
 						}
 						if (entry.hasTags()) {
 							tagsToAppend.put(mfRowId, entry.getTags());
@@ -393,11 +397,17 @@ public class RescanLibrariesService extends MediaBindingAwakeService {
 		mediaDb.updateOriginalHashes(originalHashesToAdd);
 		LOG.i("Append original hashes to %s items in %sms.", originalHashesToAdd.size(), System.currentTimeMillis() - startTime1);
 
+		LOG.i("Appending time added to %s items...", timeAddedToAdd.size());
+		updateNotifProgress(notificationId, notif, "Appending time added...");
+		final long startTime2 = System.currentTimeMillis();
+		mediaDb.updateTimeAdded(timeAddedToAdd);
+		LOG.i("Append time added to %s items in %sms.", timeAddedToAdd.size(), System.currentTimeMillis() - startTime2);
+
 		LOG.i("Appending tags to %s items...", tagsToAppend.size());
 		updateNotifProgress(notificationId, notif, "Appending tags...");
-		final long startTime2 = System.currentTimeMillis();
+		final long startTime3 = System.currentTimeMillis();
 		mediaDb.appendTags(tagsToAppend);
-		LOG.i("Append tags to %s items in %sms.", tagsToAppend.size(), System.currentTimeMillis() - startTime2);
+		LOG.i("Append tags to %s items in %sms.", tagsToAppend.size(), System.currentTimeMillis() - startTime3);
 	}
 
 	private static final class IdUri {
