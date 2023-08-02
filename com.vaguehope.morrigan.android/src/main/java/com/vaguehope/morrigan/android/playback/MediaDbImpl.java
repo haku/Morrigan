@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.TimeUnit;
 
 import org.json.JSONException;
 
@@ -1099,6 +1100,32 @@ public class MediaDbImpl implements MediaDb {
 				final int affected = this.mDb.update(TBL_MF, values, TBL_MF_ID + "=?", new String[] { String.valueOf(mfRowId) });
 				if (affected > 1) throw new IllegalStateException("Updating original hash row with ID " + mfRowId + " affected " + affected + " rows, expected 1.");
 				if (affected < 1) LOG.w("Updating original hash row with ID %s affected %s rows, expected 1.", mfRowId, affected);
+			}
+			this.mDb.setTransactionSuccessful();
+		}
+		finally {
+			this.mDb.endTransaction();
+		}
+	}
+
+	@Override
+	public void updateDurationSeconds (final Map<Long, Long> mfRowIdToDurationSeconds) {
+		this.mDb.beginTransaction();
+		try {
+			final ContentValues values = new ContentValues();
+
+			for (final Entry<Long, Long> entry : mfRowIdToDurationSeconds.entrySet()) {
+				final long mfRowId = entry.getKey();
+				final Long durationSeconds = entry.getValue();
+
+				if (durationSeconds <= 0) throw new IllegalArgumentException("New duration must be more than 0: " + durationSeconds);
+
+				values.clear();
+				values.put(TBL_MF_DURATION_MILLIS, TimeUnit.SECONDS.toMillis(durationSeconds));
+
+				final int affected = this.mDb.update(TBL_MF, values, TBL_MF_ID + "=?", new String[] { String.valueOf(mfRowId) });
+				if (affected > 1) throw new IllegalStateException("Updating duration row with ID " + mfRowId + " affected " + affected + " rows, expected 1.");
+				if (affected < 1) LOG.w("Updating duration row with ID %s affected %s rows, expected 1.", mfRowId, affected);
 			}
 			this.mDb.setTransactionSuccessful();
 		}

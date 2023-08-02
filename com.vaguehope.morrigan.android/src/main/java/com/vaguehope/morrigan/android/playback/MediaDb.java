@@ -62,6 +62,7 @@ public interface MediaDb {
 	// Map of rowId to new tags.
 	Map<Long, Collection<MediaTag>> readTags (Collection<Long> mfRowIds);
 	void updateOriginalHashes (Map<Long, BigInteger> mfRowIdToOriginalHash);
+	void updateDurationSeconds (Map<Long, Long> mfRowIdToDurationSeconds);
 	void updateTimeAdded (Map<Long, Long> mfRowIdToTimeAdded);
 	void appendTags (Map<Long, Collection<MediaTag>> mfRowIdToTags);
 

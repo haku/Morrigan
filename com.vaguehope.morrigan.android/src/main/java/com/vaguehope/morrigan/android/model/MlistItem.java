@@ -43,7 +43,7 @@ public interface MlistItem extends Artifact {
 	public boolean isEnabled ();
 	public boolean isMissing ();
 
-	public int getDuration ();
+	public int getDurationSeconds ();
 	public int getStartCount ();
 	public int getEndCount ();
 

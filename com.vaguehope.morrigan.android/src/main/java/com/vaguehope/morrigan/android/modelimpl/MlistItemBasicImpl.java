@@ -171,10 +171,10 @@ public class MlistItemBasicImpl implements MlistItem {
 	}
 
 	@Override
-	public int getDuration() {
+	public int getDurationSeconds() {
 		return this.duration;
 	}
-	public void setDuration(final int duration) {
+	public void setDurationSeconds(final int duration) {
 		this.duration = duration;
 	}
 

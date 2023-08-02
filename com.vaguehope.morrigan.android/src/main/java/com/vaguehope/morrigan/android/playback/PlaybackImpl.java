@@ -211,7 +211,7 @@ public class PlaybackImpl implements Playbacker {
 		}
 
 		if (mediaItem != null) {
-			return new QueueItem(this.context, mediaItem);
+			return new QueueItem(mediaItem);
 		}
 
 		return null;

@@ -34,7 +34,7 @@ public final class TimeHelper {
 	}
 
 	public static String formatTimeMiliseconds (final long miliseconds) {
-		return String.valueOf(miliseconds / 1000f);
+		return formatTimeSeconds((long) (miliseconds / 1000f));
 	}
 
 	private static ThreadLocal<SimpleDateFormat> ISO_8601_UTC = new ThreadLocal<SimpleDateFormat>() {

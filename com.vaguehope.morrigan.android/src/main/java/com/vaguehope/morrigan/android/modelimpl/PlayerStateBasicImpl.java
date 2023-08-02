@@ -370,7 +370,7 @@ public class PlayerStateBasicImpl implements PlayerState, PlayerReference, Mlist
 	}
 
 	@Override
-	public int getDuration () {
+	public int getDurationSeconds () {
 		return getTrackDuration();
 	}
 

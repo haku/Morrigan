@@ -24,6 +24,7 @@ import com.vaguehope.morrigan.android.C;
 import com.vaguehope.morrigan.android.helper.DialogHelper.Listener;
 import com.vaguehope.morrigan.android.helper.FileHelper;
 import com.vaguehope.morrigan.android.helper.IoHelper;
+import com.vaguehope.morrigan.android.model.MlistItem;
 import com.vaguehope.morrigan.android.playback.MediaTag;
 import com.vaguehope.morrigan.android.playback.MediaTagType;
 import com.vaguehope.morrigan.android.state.Checkout;
@@ -103,19 +104,24 @@ public class CheckoutIndex {
 	private static void writeEntry (final JsonWriter writer, final ItemAndFile itemAndFile) throws IOException {
 		writer.beginObject();
 		writer.name("path").value(itemAndFile.getLocalFile().getAbsolutePath());
-		if (itemAndFile.getItem().getOriginalHashCode() != null) {
-			writer.name("ohash").value(itemAndFile.getItem().getOriginalHashCode().toString(16).toLowerCase(Locale.ENGLISH));
+
+		final MlistItem item = itemAndFile.getItem();
+		if (item.getOriginalHashCode() != null) {
+			writer.name("ohash").value(item.getOriginalHashCode().toString(16).toLowerCase(Locale.ENGLISH));
 		}
-		if (itemAndFile.getItem().getHashCode() != null) {
-			writer.name("hash").value(itemAndFile.getItem().getHashCode().toString(16).toLowerCase(Locale.ENGLISH));
+		if (item.getHashCode() != null) {
+			writer.name("hash").value(item.getHashCode().toString(16).toLowerCase(Locale.ENGLISH));
 		}
-		writer.name("startcount").value(itemAndFile.getItem().getStartCount());
-		writer.name("endcount").value(itemAndFile.getItem().getEndCount());
-		writer.name("timeadded").value(itemAndFile.getItem().getTimeAdded());
-		writer.name("lastplayed").value(itemAndFile.getItem().getLastPlayed());
+		if (item.getDurationSeconds() > 0) {
+			writer.name("duration").value(item.getDurationSeconds());
+		}
+		writer.name("startcount").value(item.getStartCount());
+		writer.name("endcount").value(item.getEndCount());
+		writer.name("timeadded").value(item.getTimeAdded());
+		writer.name("lastplayed").value(item.getLastPlayed());
 
 		writer.name("tags").beginArray();
-		final Collection<MediaTag> itemTags = itemAndFile.getItem().getTags();
+		final Collection<MediaTag> itemTags = item.getTags();
 		if (itemTags != null) {
 			for (final MediaTag tag : itemTags) {
 				writer.beginObject();
@@ -136,6 +142,7 @@ public class CheckoutIndex {
 		String path = null;
 		String ohash = null;
 		String hash = null;
+		long durationSeconds = -1;
 		long startCount = -1;
 		long endCount = -1;
 		long timeAdded = -1;
@@ -153,6 +160,9 @@ public class CheckoutIndex {
 			}
 			else if (name.equals("ohash")) {
 				ohash = reader.nextString();
+			}
+			else if (name.equals("duration")) {
+				durationSeconds = reader.nextLong();
 			}
 			else if (name.equals("startcount")) {
 				startCount = reader.nextLong();
@@ -175,7 +185,7 @@ public class CheckoutIndex {
 		}
 		reader.endObject();
 
-		return new IndexEntry(path, ohash, hash, startCount, endCount, timeAdded, lastPlayed, tags);
+		return new IndexEntry(path, ohash, hash, durationSeconds, startCount, endCount, timeAdded, lastPlayed, tags);
 	}
 
 	private static void readTags (final JsonReader reader, final List<MediaTag> tags) throws IOException {

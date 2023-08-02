@@ -184,7 +184,7 @@ public class MlistItemListImpl implements MlistItemList, ContentHandler {
 		}
 		else if (this.stack.size() == 3 && localName.equals(DURATION)) {
 			int v = Integer.parseInt(this.currentText.toString());
-			this.currentItem.setDuration(v);
+			this.currentItem.setDurationSeconds(v);
 		}
 		else if (this.stack.size() == 3 && localName.equals(STARTCOUNT)) {
 			int v = Integer.parseInt(this.currentText.toString());

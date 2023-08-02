@@ -1,5 +1,8 @@
 package com.vaguehope.morrigan.android.playback;
 
+import com.vaguehope.morrigan.android.R;
+import com.vaguehope.morrigan.android.helper.TimeHelper;
+
 import android.content.Context;
 import android.database.Cursor;
 import android.view.LayoutInflater;
@@ -8,8 +11,6 @@ import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.vaguehope.morrigan.android.R;
 
 public class MediaListCursorAdapter extends CursorAdapter {
 
@@ -44,8 +45,21 @@ public class MediaListCursorAdapter extends CursorAdapter {
 	@Override
 	public void bindView (final View view, final Context context, final Cursor cursor) {
 		final RowView rowView = (RowView) view.getTag();
-		rowView.text.setText(this.cursorReader.readTitle(cursor));
+		rowView.text.setText(titleForItem(cursor));
 		rowView.image.setImageResource(R.drawable.circledot);
+	}
+
+	private CharSequence titleForItem (final Cursor cursor) {
+		final String title = this.cursorReader.readTitle(cursor);
+		final long durationMillis = this.cursorReader.readDurationMillis(cursor);
+
+		if (durationMillis > 0) {
+			return String.format("%s (%s)",
+					title,
+					TimeHelper.formatTimeMiliseconds(durationMillis));
+		}
+
+		return title;
 	}
 
 }

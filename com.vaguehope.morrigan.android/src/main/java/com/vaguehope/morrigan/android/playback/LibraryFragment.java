@@ -326,7 +326,7 @@ public class LibraryFragment extends Fragment {
 		for (final Long mediaId : mediaIds) {
 			final MediaItem mediaItem = db.getMediaItem(mediaId);
 			if (mediaItem != null) {
-				queueItems.add(new QueueItem(getActivity(), mediaItem));
+				queueItems.add(new QueueItem(mediaItem));
 			}
 			else {
 				LOG.w("Item %s not found in DB.", mediaId);
@@ -338,7 +338,7 @@ public class LibraryFragment extends Fragment {
 	}
 
 	private void addMediaItemToQueue (final MediaItem mediaItem) {
-		final QueueItem item = new QueueItem(getActivity(), mediaItem);
+		final QueueItem item = new QueueItem(mediaItem);
 		getMediaDb().addToQueue(Collections.singleton(item), QueueEnd.TAIL);
 		LOG.i("Added to queue: %s", item);
 		Toast.makeText(getActivity(), String.format("Enqueued:\n%s", item.getTitle()), Toast.LENGTH_SHORT).show();

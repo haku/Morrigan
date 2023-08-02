@@ -239,7 +239,7 @@ public class MlistActivity extends Activity implements MlistStateChangeListener,
 			header.addView(title);
 
 			TextView counts = new TextView(MlistActivity.this);
-			counts.setText(mlistItem.getStartCount() + "/" + mlistItem.getEndCount() + " " + TimeHelper.formatTimeSeconds(mlistItem.getDuration()));
+			counts.setText(mlistItem.getStartCount() + "/" + mlistItem.getEndCount() + " " + TimeHelper.formatTimeSeconds(mlistItem.getDurationSeconds()));
 			counts.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
 			header.addView(counts);
 

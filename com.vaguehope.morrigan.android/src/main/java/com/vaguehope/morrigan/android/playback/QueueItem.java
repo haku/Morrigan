@@ -39,9 +39,8 @@ public class QueueItem {
 		this.durationMillis = durationMillis;
 	}
 
-	public QueueItem (final Context context, final MediaItem mi) {
-		// TODO could do a much better job here.
-		this(context, mi.getLibraryId(), mi.getUri());
+	public QueueItem (final MediaItem mi) {
+		this(-1, -1, mi.getLibraryId(), mi.getUri(), mi.getTitle(), mi.getSizeBytes(), mi.getDurationMillis());
 	}
 
 	public QueueItem (final Context context, final QueueItemType type) {

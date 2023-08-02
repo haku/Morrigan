@@ -161,7 +161,7 @@ public class PlayerQueueImpl implements PlayerQueue, ContentHandler {
 				item.setHashCode(this.currentHash);
 				item.setEnabled(this.currentEnabled);
 				item.setMissing(this.currentMissing);
-				item.setDuration(this.currentDuration);
+				item.setDurationSeconds(this.currentDuration);
 				item.setStartCount(this.currentStartCount);
 				item.setEndCount(this.currentEndCount);
 				this.artifactList.add(item);

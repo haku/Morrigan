@@ -11,6 +11,7 @@ public class IndexEntry {
 	private final String localPath;
 	private final String ohash;
 	private final String hash;
+	private final long durationSeconds;
 	private final long startCount;
 	private final long endCount;
 	private final long timeAdded;
@@ -21,6 +22,7 @@ public class IndexEntry {
 			final String localPath,
 			final String ohash,
 			final String hash,
+			final long durationSeconds,
 			final long startCount,
 			final long endCount,
 			final long timeAdded,
@@ -29,6 +31,7 @@ public class IndexEntry {
 		this.localPath = localPath;
 		this.ohash = ohash;
 		this.hash = hash;
+		this.durationSeconds = durationSeconds;
 		this.startCount = startCount;
 		this.endCount = endCount;
 		this.timeAdded = timeAdded;
@@ -51,6 +54,10 @@ public class IndexEntry {
 	public BigInteger getHash () {
 		if (this.hash == null) return null;
 		return new BigInteger(this.hash, 16);
+	}
+
+	public long getDurationSeconds () {
+		return this.durationSeconds;
 	}
 
 	public long getStartCount () {

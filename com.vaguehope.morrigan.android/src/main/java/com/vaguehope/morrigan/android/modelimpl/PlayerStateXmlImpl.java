@@ -331,7 +331,7 @@ public class PlayerStateXmlImpl implements PlayerState, MlistItem, ContentHandle
 	}
 
 	@Override
-	public int getDuration () {
+	public int getDurationSeconds () {
 		return getTrackDuration();
 	}
 
