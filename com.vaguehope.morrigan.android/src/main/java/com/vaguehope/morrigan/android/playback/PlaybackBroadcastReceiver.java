@@ -22,11 +22,19 @@ public class PlaybackBroadcastReceiver extends BroadcastReceiver {
 	}
 
 	public static PendingIntent makePendingIntent (final Context context, final int actionCode) {
-		if (actionCode < 1) throw new IllegalArgumentException("actionCode must be positive.");
 		return PendingIntent.getBroadcast(context, actionCode,
-				new Intent(PlaybackCodes.ACTION_PLAYBACK)
-						.putExtra(EXTRA_ACTION_CODE, actionCode),
+				makeActionCodeIntent(actionCode),
 				PendingIntent.FLAG_UPDATE_CURRENT);
+	}
+
+	public static void sendActionIntent (final Context context, final int actionCode) {
+		context.sendBroadcast(makeActionCodeIntent(actionCode));
+	}
+
+	private static Intent makeActionCodeIntent (final int actionCode) {
+		if (actionCode < 1) throw new IllegalArgumentException("actionCode must be positive.");
+		return new Intent(PlaybackCodes.ACTION_PLAYBACK)
+				.putExtra(EXTRA_ACTION_CODE, actionCode);
 	}
 
 	@Override

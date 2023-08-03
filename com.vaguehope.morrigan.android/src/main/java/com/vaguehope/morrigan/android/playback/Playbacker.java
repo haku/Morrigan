@@ -34,4 +34,6 @@ public interface Playbacker {
 		RANDOM,
 	}
 
+	void exitIfIdle();
+
 }

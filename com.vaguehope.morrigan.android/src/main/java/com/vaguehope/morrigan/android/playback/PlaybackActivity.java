@@ -87,6 +87,7 @@ public class PlaybackActivity extends FragmentActivity {
 
 	@Override
 	protected void onDestroy () {
+		getPlaybacker().exitIfIdle();
 		disposeDb();
 		super.onDestroy();
 	}

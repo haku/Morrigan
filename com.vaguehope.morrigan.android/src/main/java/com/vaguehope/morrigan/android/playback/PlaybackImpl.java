@@ -256,6 +256,11 @@ public class PlaybackImpl implements Playbacker {
 		this.messageHandler.sendEmptyMessage(Msgs.GOTO_NEXT_ITEM.ordinal());
 	}
 
+	@Override
+	public void exitIfIdle () {
+		this.messageHandler.sendEmptyMessage(Msgs.EXIT_IF_IDLE.ordinal());
+	}
+
 	private volatile PlayOrder playOrder;
 
 	@Override
@@ -347,7 +352,8 @@ public class PlaybackImpl implements Playbacker {
 		PAUSE,
 		STOP,
 		GOTO_NEXT_ITEM,
-		NOTIFY_NEW_WATCHER;
+		NOTIFY_NEW_WATCHER,
+		EXIT_IF_IDLE;
 		public static final Msgs values[] = values(); // Optimisation to avoid new array every time.
 	}
 
@@ -385,6 +391,9 @@ public class PlaybackImpl implements Playbacker {
 					break;
 				case NOTIFY_NEW_WATCHER:
 					notifyNewWatcher((PlaybackWatcher) msg.obj);
+					break;
+				case EXIT_IF_IDLE:
+					checkIdleAndMaybeExit();
 					break;
 				default:
 			}
@@ -548,6 +557,12 @@ public class PlaybackImpl implements Playbacker {
 
 		updateNotifStopIcon();
 		this.playbackWatcherDispatcher.playbackStopped();
+	}
+
+	private void checkIdleAndMaybeExit () {
+		if (this.mediaPlayer != null) return;
+		LOG.i("Player is idle, exiting as requested.");
+		PlaybackBroadcastReceiver.sendActionIntent(this.context, PlaybackCodes.ACTION_EXIT);
 	}
 
 	private void notifyNewWatcher (final PlaybackWatcher w) {
