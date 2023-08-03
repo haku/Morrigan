@@ -101,6 +101,8 @@ public class PlaybackImpl implements Playbacker {
 				.setContentTitle("Morrigan Player")
 				.setOngoing(true)
 				.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+				.setCategory(NotificationCompat.CATEGORY_TRANSPORT)  // same as https://developer.android.com/reference/android/app/Notification.MediaStyle
+				.setPriority(NotificationCompat.PRIORITY_HIGH)  // attempt to keep it visible on lock screen.
 				.setContent(this.notifRemoteViews);
 
 		showNotif();
