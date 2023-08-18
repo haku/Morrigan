@@ -1017,7 +1017,7 @@ public class MediaDbImpl implements MediaDb {
 		final Cursor c = getMfCursor(
 				TBL_MF_ID + " IN (SELECT " + TBL_MF_ID
 				+ " FROM " + TBL_MF
-				+ " WHERE " + TBL_MF_DBID + "=?"
+				+ " WHERE " + TBL_MF_DBID + "=? AND " + TBL_MF_MISSING + " IS NULL"
 				+ " ORDER BY RANDOM() LIMIT 1)",
 				new String[] { String.valueOf(libraryId) },
 				null, 1);
