@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -30,6 +31,7 @@ import com.vaguehope.morrigan.android.model.MlistItem;
 import com.vaguehope.morrigan.android.model.MlistItemList;
 import com.vaguehope.morrigan.android.model.MlistState;
 import com.vaguehope.morrigan.android.model.ServerReference;
+import com.vaguehope.morrigan.android.playback.MediaTag;
 import com.vaguehope.morrigan.android.playback.RescanLibrariesService;
 import com.vaguehope.morrigan.android.state.Checkout;
 import com.vaguehope.morrigan.android.state.ConfigDb;
@@ -202,8 +204,9 @@ public class SyncCheckoutsService extends AwakeService {
 			// Comparing file size here does not work because repeat transcodes may produce different sized output,
 			// yet they should be considered equivalent.
 			if (!i.getLocalFile().exists()
-					|| Math.abs(i.getLocalFile().lastModified() - i.getItem().getLastModified()) > MAX_LAST_MODIFIED_SKEW_MILLIS) {
-				LOG.d("To copy: %s because abs(%s - %s) > %s ms.",
+					|| Math.abs(i.getLocalFile().lastModified() - i.getItem().getLastModified()) > MAX_LAST_MODIFIED_SKEW_MILLIS
+					|| needsRetranscode(i)) {
+				LOG.d("To copy: %s because abs(%s - %s) > %s ms (or a transcode tag changed).",
 						i.getItem().getFileName(),
 						i.getLocalFile().exists() ? i.getLocalFile().lastModified() : "null",
 						i.getItem().getLastModified(),
@@ -214,10 +217,31 @@ public class SyncCheckoutsService extends AwakeService {
 		return ret;
 	}
 
+	private static boolean needsRetranscode (final ItemAndFile i) {
+		return (newestTranscodeTagLastModified(i.getItem().getTags()) - i.getItem().getLastModified()) > MAX_LAST_MODIFIED_SKEW_MILLIS;
+	}
+
+	private static final String[] TRANSCODE_TAG_PREFIXES = new String[]{
+		"trim_end=", "trim_start=", "af="
+	};
+
+	private static long newestTranscodeTagLastModified (final Collection<MediaTag> tags) {
+		if (tags == null) return 0;
+		long ret = 0;
+		for (final MediaTag t : tags) {
+			for (final String prefix : TRANSCODE_TAG_PREFIXES) {
+				if (t.getTag().startsWith(prefix)) {
+					ret = Math.max(ret, t.getModified());
+				}
+			}
+		}
+		return ret;
+	}
+
 	private int requestTranscodes (final Checkout checkout, final int notificationId, final Builder notif, final ServerReference host, final List<ItemAndFile> toCopy) throws IOException {
 		final List<MlistItem> toTranscode = new ArrayList<MlistItem>();
 		for (final ItemAndFile i : toCopy) {
-			if (i.getItem().getFileSize() < 1) {
+			if (i.getItem().getFileSize() < 1 || needsRetranscode(i)) {
 				toTranscode.add(i.getItem());
 			}
 		}
