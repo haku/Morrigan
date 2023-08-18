@@ -102,7 +102,7 @@ public class PlaybackImpl implements Playbacker {
 				.setOngoing(true)
 				.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
 				.setCategory(NotificationCompat.CATEGORY_TRANSPORT)  // same as https://developer.android.com/reference/android/app/Notification.MediaStyle
-				.setPriority(NotificationCompat.PRIORITY_HIGH)  // attempt to keep it visible on lock screen.
+				.setPriority(NotificationCompat.PRIORITY_MAX)  // attempt to keep it near the top of the list, visible on lock screen.
 				.setContent(this.notifRemoteViews);
 
 		showNotif();
