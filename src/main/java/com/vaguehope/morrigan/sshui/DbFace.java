@@ -97,7 +97,7 @@ public class DbFace extends DefaultFace {
 		this.db = db;
 		this.defaultPlayer = defaultPlayer;
 		this.dbHelper = new DbHelper(navigation, mnContext, sessionState, this.defaultPlayer, this.lastActionMessage, this);
-		refreshData();
+		refreshData(false);
 	}
 
 	@Override
@@ -149,9 +149,14 @@ public class DbFace extends DefaultFace {
 		}
 	}
 
-	private void refreshData () throws MorriganException {
+	private void refreshData (final boolean force) throws MorriganException {
 		if (this.db == null) return;
-		this.db.read();
+		if (force) {
+			this.db.forceRead();
+		}
+		else {
+			this.db.read();
+		}
 		this.mediaItems = this.db.getMediaItems();
 	}
 
@@ -249,7 +254,7 @@ public class DbFace extends DefaultFace {
 						this.navigation.startFace(new DbPropertiesFace(this.navigation, this.mnContext, this.sessionState, this.db));
 						return true;
 					case 'r':
-						refreshData();
+						refreshData(true);
 						return true;
 					default:
 				}
