@@ -179,7 +179,7 @@ public class LibraryFragment extends Fragment {
 		this.txtSearch.setOnEditorActionListener(new OnEditorActionListener() {
 			@Override
 			public boolean onEditorAction (final TextView v, final int actionId, final KeyEvent event) {
-				reloadLibrary();
+				reloadLibrary(false);
 				return true;
 			}
 		});
@@ -232,7 +232,7 @@ public class LibraryFragment extends Fragment {
 				break;
 			case LIBRARY_CHANGED:
 				// TODO check is the selected library that changed?
-				reloadLibrary();
+				reloadLibrary(false);
 				break;
 			default:
 		}
@@ -252,7 +252,7 @@ public class LibraryFragment extends Fragment {
 
 		@Override
 		public boolean onCreateActionMode (final ActionMode mode, final Menu menu) {
-			menu.add("Enqueue Top").setOnMenuItemClickListener(new EnqueueActionListener(
+			menu.add("Enqueue Next").setOnMenuItemClickListener(new EnqueueActionListener(
 					this.selectedIds.values(), QueueEnd.HEAD, mode));
 			menu.add("Enqueue").setOnMenuItemClickListener(new EnqueueActionListener(
 					this.selectedIds.values(), QueueEnd.TAIL, mode));
@@ -352,7 +352,7 @@ public class LibraryFragment extends Fragment {
 		LOG.i("menu reset %s %s", this.currentLibrary, this.allLibraries.size());
 
 		if (this.currentLibrary == null && this.allLibraries.size() > 0) {
-			setCurrentLibrary(this.allLibraries.iterator().next());
+			setCurrentLibrary(this.allLibraries.iterator().next(), false);
 		}
 	}
 
@@ -376,7 +376,7 @@ public class LibraryFragment extends Fragment {
 			item.setOnMenuItemClickListener(new OnMenuItemClickListener() {
 				@Override
 				public boolean onMenuItemClick (final MenuItem item) {
-					setCurrentLibrary(library);
+					setCurrentLibrary(library, true);
 					return true;
 				}
 			});
@@ -388,7 +388,7 @@ public class LibraryFragment extends Fragment {
 			item.setOnMenuItemClickListener(new OnMenuItemClickListener() {
 				@Override
 				public boolean onMenuItemClick (final MenuItem item) {
-					setSortColumn(s);
+					setSortColumn(s, true);
 					return true;
 				}
 			});
@@ -400,7 +400,7 @@ public class LibraryFragment extends Fragment {
 			item.setOnMenuItemClickListener(new OnMenuItemClickListener() {
 				@Override
 				public boolean onMenuItemClick (final MenuItem item) {
-					setSortDirection(s);
+					setSortDirection(s, true);
 					return true;
 				}
 			});
@@ -425,24 +425,24 @@ public class LibraryFragment extends Fragment {
 		}
 	}
 
-	private void setCurrentLibrary (final LibraryMetadata library) {
-		setCurrentLibrary(library, this.currentSortColumn, this.currentSortDirection);
+	private void setCurrentLibrary (final LibraryMetadata library, final boolean resetScroll) {
+		setCurrentLibrary(library, this.currentSortColumn, this.currentSortDirection, resetScroll);
 	}
 
-	protected void setSortColumn (final SortColumn sortColumn) {
-		setCurrentLibrary(this.currentLibrary, sortColumn, this.currentSortDirection);
+	protected void setSortColumn (final SortColumn sortColumn, final boolean resetScroll) {
+		setCurrentLibrary(this.currentLibrary, sortColumn, this.currentSortDirection, resetScroll);
 	}
 
-	protected void setSortDirection (final SortDirection sortDirection) {
-		setCurrentLibrary(this.currentLibrary, this.currentSortColumn, sortDirection);
+	protected void setSortDirection (final SortDirection sortDirection, final boolean resetScroll) {
+		setCurrentLibrary(this.currentLibrary, this.currentSortColumn, sortDirection, resetScroll);
 	}
 
-	private void setCurrentLibrary (final LibraryMetadata library, final SortColumn sortColumn, final SortDirection sortDirection) {
+	private void setCurrentLibrary (final LibraryMetadata library, final SortColumn sortColumn, final SortDirection sortDirection, final boolean resetScroll) {
 		this.currentLibrary = library;
 		this.currentSortColumn = sortColumn;
 		this.currentSortDirection = sortDirection;
 
-		reloadLibrary();
+		reloadLibrary(resetScroll);
 
 		if (library != null) {
 			((PlaybackActivity) getActivity()).getSectionsPagerAdapter().setPageTitle(this.fragmentPosition, library.getName());
@@ -452,8 +452,8 @@ public class LibraryFragment extends Fragment {
 		updateLibraryMenuSelections();
 	}
 
-	private void reloadLibrary () {
-		new LoadLibrary(this, makePendingSearchCursor()).execute(); // TODO OnExecutor?
+	private void reloadLibrary (final boolean resetScroll) {
+		new LoadLibrary(this, makePendingSearchCursor(), resetScroll).execute(); // TODO OnExecutor?
 	}
 
 	private void enqueueAllSearchResults () {
@@ -488,12 +488,15 @@ public class LibraryFragment extends Fragment {
 
 		private final LibraryFragment host;
 		private final PendingSearchCursor pendingSearchCursor;
+		private final boolean resetScroll;
 
 		public LoadLibrary (
 				final LibraryFragment host,
-				final PendingSearchCursor pendingSearchCursor) {
+				final PendingSearchCursor pendingSearchCursor,
+				final boolean resetScroll) {
 			this.host = host;
 			this.pendingSearchCursor = pendingSearchCursor;
+			this.resetScroll = resetScroll;
 		}
 
 		@Override
@@ -519,10 +522,17 @@ public class LibraryFragment extends Fragment {
 		@Override
 		protected void onPostExecute (final Result<Cursor> result) {
 			if (result.isSuccess()) {
-				this.host.saveScrollIfNotSaved();
+				if (!this.resetScroll) this.host.saveScrollIfNotSaved();
 				this.host.getAdapter().changeCursor(result.getData());
 				LOG.d("Refreshed library cursor.");
-				this.host.restoreScroll();
+
+				if (this.resetScroll) {
+					this.host.resetScroll();
+				}
+				else {
+					this.host.restoreScroll();
+				}
+
 				this.host.txtResultsInfo.setText(String.format("%s items.", result.getData().getCount()));
 			}
 			else {
@@ -625,6 +635,11 @@ public class LibraryFragment extends Fragment {
 		this.scrollState.applyTo(this.mediaList);
 		LOG.d("Restored scroll: %s", this.scrollState);
 		this.scrollState = null;
+	}
+
+	private void resetScroll () {
+		this.scrollState = null;
+		this.mediaList.setSelectionFromTop(0, 0);
 	}
 
 }

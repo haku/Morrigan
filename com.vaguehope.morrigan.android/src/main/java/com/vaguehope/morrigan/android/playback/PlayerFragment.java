@@ -431,10 +431,10 @@ public class PlayerFragment extends Fragment {
 			final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
 			final QueueItem item = getMediaDb().getQueueItemById(info.id);
 			menu.setHeaderTitle(item.getTitle());
-			menu.add(Menu.NONE, PlaybackCodes.MENU_MOVE_TOP, Menu.NONE, "Move Top");
+			menu.add(Menu.NONE, PlaybackCodes.MENU_MOVE_TOP, Menu.NONE, "Move Head");
 			menu.add(Menu.NONE, PlaybackCodes.MENU_MOVE_UP, Menu.NONE, "Move Up");
 			menu.add(Menu.NONE, PlaybackCodes.MENU_MOVE_DOWN, Menu.NONE, "Move Down");
-			menu.add(Menu.NONE, PlaybackCodes.MENU_MOVE_BOTTOM, Menu.NONE, "Move Bottom");
+			menu.add(Menu.NONE, PlaybackCodes.MENU_MOVE_BOTTOM, Menu.NONE, "Move Tail");
 		}
 	};
 
