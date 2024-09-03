@@ -383,7 +383,7 @@ public class MlistsServlet extends HttpServlet {
 			}
 		}
 		else if (action.equals(CMD_ADDTAG)) {
-			final String tag = req.getParameter(PARAM_TAG);
+			final String tag = StringHelper.trimToNull(req.getParameter(PARAM_TAG));
 			if (tag != null && tag.length() > 0) {
 				mmdb.addTag(item, tag, MediaTagType.MANUAL, (MediaTagClassification) null);
 				resp.setContentType("text/plain");
