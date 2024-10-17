@@ -1,7 +1,6 @@
 package com.vaguehope.morrigan.player;
 
 import java.util.List;
-import java.util.Map;
 
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
@@ -54,6 +53,7 @@ public interface Player {
 
 	/**
 	 * Return -1 if not playing.
+	 * In seconds.
 	 */
 	long getCurrentPosition();
 
