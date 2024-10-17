@@ -42,6 +42,13 @@ public class PlayerEventListenerCaller implements PlayerEventListener {
 	}
 
 	@Override
+	public void afterSeek() {
+		for (final PlayerEventListener l : this.watchers) {
+			l.afterSeek();
+		}
+	}
+
+	@Override
 	public void playOrderChanged (final PlaybackOrder newPlaybackOrder) {
 		for (final PlayerEventListener l : this.watchers) {
 			l.playOrderChanged(newPlaybackOrder);

@@ -13,6 +13,7 @@ public class Args {
 
 	@Option(name = "--configpath", usage = "Path to config directory, defaults to $HOME/.morrigan") private String configPath;
 	@Option(name = "--dlna", usage = "Enable DLNA.") private boolean dlna;
+	@Option(name = "--dlna-player-control", usage = "Allow players to be controlled remotely via DLNA.") private boolean dlnaPlayerControl;
 	@Option(name = "--http", usage = "Local port to bind HTTP UI to.") private int httpPort = -1;
 	@Option(name = "--interface", usage = "Hostname or IP address of interface to bind to.") private String iface;
 	@Option(name = "--origin", usage = "Hostname or IP address for CORS origin.") private List<String> origins;
@@ -58,6 +59,10 @@ public class Args {
 
 	public boolean isDlna() {
 		return this.dlna;
+	}
+
+	public boolean isDlnaPlayerControl() {
+		return this.dlnaPlayerControl;
 	}
 
 	public boolean isVerboseLog() {

@@ -11,8 +11,6 @@ import org.fourthline.cling.model.meta.DeviceIdentity;
 import org.fourthline.cling.model.meta.Icon;
 import org.fourthline.cling.model.meta.LocalDevice;
 import org.fourthline.cling.model.meta.LocalService;
-import org.fourthline.cling.model.meta.ManufacturerDetails;
-import org.fourthline.cling.model.meta.ModelDetails;
 import org.fourthline.cling.model.types.DeviceType;
 import org.fourthline.cling.model.types.UDADeviceType;
 import org.fourthline.cling.model.types.UDN;
@@ -20,7 +18,7 @@ import org.fourthline.cling.support.connectionmanager.ConnectionManagerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vaguehope.morrigan.dlna.DlnaService;
+import com.vaguehope.morrigan.dlna.UpnpHelper;
 import com.vaguehope.morrigan.dlna.httpserver.MediaServer;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 
@@ -32,12 +30,7 @@ public class MediaServerDeviceFactory {
 
 	private static final String DEVICE_TYPE = "MediaServer";
 	private static final int VERSION = 1;
-
 	private static final String IDENTIFIER_STEM = "Morrigan-MediaServer";
-	static final String METADATA_MODEL_NAME = "Morrigan";
-	private static final String METADATA_MANUFACTURER = "VagueHope";
-	private static final String METADATA_MODEL_DESCRIPTION = "Morrigan MediaServer";
-	private static final String METADATA_MODEL_NUMBER = "v1";
 
 	/**
 	 * Shorter version of org.teleal.cling.model.Constants.MIN_ADVERTISEMENT_AGE_SECONDS.
@@ -52,14 +45,12 @@ public class MediaServerDeviceFactory {
 
 	private final LocalDevice localDevice;
 
-	public MediaServerDeviceFactory (final String hostName, final MediaFactory mediaFactory, final MediaServer mediaServer, final MediaFileLocator mediaFileLocator) throws ValidationException, IOException {
+	public MediaServerDeviceFactory (final MediaFactory mediaFactory, final MediaServer mediaServer, final MediaFileLocator mediaFileLocator) throws ValidationException, IOException {
 		final UDN usi = UDN.uniqueSystemIdentifier(IDENTIFIER_STEM);
 		LOG.info("uniqueSystemIdentifier: {}", usi);
 		final DeviceType type = new UDADeviceType(DEVICE_TYPE, VERSION);
-		final DeviceDetails details = new DeviceDetails(METADATA_MODEL_NAME + " (" + hostName + ")",
-				new ManufacturerDetails(METADATA_MANUFACTURER),
-				new ModelDetails(METADATA_MODEL_NAME, METADATA_MODEL_DESCRIPTION, METADATA_MODEL_NUMBER));
-		final Icon icon = DlnaService.createDeviceIcon();
+		final DeviceDetails details = UpnpHelper.deviceDetails();
+		final Icon icon = UpnpHelper.createDeviceIcon();
 
 		final LocalService<ContentDirectoryService> contDirSrv = new AnnotationLocalServiceBinder().read(ContentDirectoryService.class);
 		contDirSrv.setManager(new DefaultServiceManager<ContentDirectoryService>(contDirSrv, ContentDirectoryService.class) {

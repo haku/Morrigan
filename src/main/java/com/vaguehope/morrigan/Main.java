@@ -105,7 +105,7 @@ public final class Main {
 		}
 
 		if (args.isDlna()) {
-			final DlnaService dlna = new DlnaService(config, serverConfig, mediaFactory, playerRegister);
+			final DlnaService dlna = new DlnaService(args, config, serverConfig, mediaFactory, playerRegister);
 			dlna.start();
 
 			if (httpServer != null) httpServer.enableDlnaCtl(dlna);

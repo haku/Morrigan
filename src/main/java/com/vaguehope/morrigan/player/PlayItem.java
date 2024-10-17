@@ -1,5 +1,7 @@
 package com.vaguehope.morrigan.player;
 
+import java.io.File;
+
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
 import com.vaguehope.morrigan.util.Objs;
@@ -12,6 +14,7 @@ public class PlayItem {
 	private final PlayItemType type;
 	private final IMediaTrackList<? extends IMediaTrack> list;
 	private final IMediaTrack track;
+	private final File altFile;
 	private int id = Integer.MIN_VALUE;
 
 	/**
@@ -22,6 +25,7 @@ public class PlayItem {
 		this.type = PlayItemType.PLAYABLE;
 		this.list = list;
 		this.track = track;
+		this.altFile = null;
 	}
 
 	protected PlayItem (final PlayItemType type) {
@@ -29,12 +33,14 @@ public class PlayItem {
 		this.type = type;
 		this.list = null;
 		this.track = null;
+		this.altFile = null;
 	}
 
-	private PlayItem (final PlayItemType type, final IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack track) {
+	private PlayItem (final PlayItemType type, final IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack track, final File altFile) {
 		this.type = type;
 		this.list = list;
 		this.track = track;
+		this.altFile = altFile;
 	}
 
 	public PlayItemType getType () {
@@ -56,12 +62,20 @@ public class PlayItem {
 		return this.track != null;
 	}
 
+	public boolean hasAltFile () {
+		return this.altFile != null;
+	}
+
 	public IMediaTrackList<? extends IMediaTrack> getList () {
 		return this.list;
 	}
 
 	public IMediaTrack getTrack () {
 		return this.track;
+	}
+
+	public File getAltFile() {
+		return this.altFile;
 	}
 
 	/**
@@ -85,7 +99,7 @@ public class PlayItem {
 	}
 
 	public PlayItem withoutId() {
-		return new PlayItem(this.type, this.list, this.track);
+		return new PlayItem(this.type, this.list, this.track, this.altFile);
 	}
 
 	public PlayItem withTrack(final IMediaTrack newTrack) {
@@ -94,6 +108,12 @@ public class PlayItem {
 		final PlayItem pi = new PlayItem(this.list, newTrack);
 		pi.id = this.id;
 		return pi;
+	}
+
+	public PlayItem withAltFile(final File newAltFile) {
+		if (newAltFile == null) throw new IllegalArgumentException("Missing altFile.");
+		if (this.altFile != null) throw new IllegalArgumentException("Already has altFile: " + this.altFile);
+		return new PlayItem(this.type, this.list, this.track, newAltFile);
 	}
 
 	public String resolveTitle(IMediaTrackList<? extends IMediaTrack> relativeTo) {

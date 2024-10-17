@@ -134,7 +134,7 @@ public class ContentAdaptor {
 		c.setId(ContentGroup.ROOT.getId());
 		c.setParentID("-1");
 		c.setTitle(ContentGroup.ROOT.getHumanName());
-		c.setCreator(MediaServerDeviceFactory.METADATA_MODEL_NAME);
+		c.setCreator(UpnpHelper.METADATA_MODEL_NAME);
 		c.setRestricted(true);
 		c.setSearchable(false); // Root is not searchable.
 		c.setWriteStatus(WriteStatus.NOT_WRITABLE);

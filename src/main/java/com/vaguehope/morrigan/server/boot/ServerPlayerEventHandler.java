@@ -92,6 +92,11 @@ class ServerPlayerEventHandler implements PlayerEventListener, LocalPlayerSuppor
 		outputStatus();
 	}
 
+	@Override
+	public void afterSeek() {
+		// unused.
+	}
+
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	@Override

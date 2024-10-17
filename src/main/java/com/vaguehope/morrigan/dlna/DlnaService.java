@@ -1,7 +1,6 @@
 package com.vaguehope.morrigan.dlna;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.HashMap;
@@ -29,13 +28,18 @@ import org.fourthline.cling.transport.spi.NetworkAddressFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.vaguehope.morrigan.Args;
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.dlna.content.MediaFileLocator;
 import com.vaguehope.morrigan.dlna.content.MediaServerDeviceFactory;
 import com.vaguehope.morrigan.dlna.extcd.ContentDirectoryHolder;
 import com.vaguehope.morrigan.dlna.httpserver.MediaServer;
+import com.vaguehope.morrigan.dlna.players.DlnaPlayingParamsFactory;
+import com.vaguehope.morrigan.dlna.players.PlayerControlBridgeFactory;
 import com.vaguehope.morrigan.dlna.players.PlayerHolder;
 import com.vaguehope.morrigan.model.media.MediaFactory;
+import com.vaguehope.morrigan.player.LocalPlayer;
+import com.vaguehope.morrigan.player.Player;
 import com.vaguehope.morrigan.player.PlayerRegister;
 import com.vaguehope.morrigan.player.PlayerStateStorage;
 import com.vaguehope.morrigan.server.ServerConfig;
@@ -46,6 +50,7 @@ public class DlnaService {
 	private static final int BG_THREADS = 3;
 	private static final Logger LOG = LoggerFactory.getLogger(DlnaService.class);
 
+	private final Args args;
 	private final Config config;
 	private final ServerConfig serverConfig;
 	private final MediaFactory mediaFactory;
@@ -60,7 +65,8 @@ public class DlnaService {
 	private ContentDirectoryHolder contentDirectoryHolder;
 	private ScheduledExecutorService scheduledExecutor;
 
-	public DlnaService(final Config config, final ServerConfig serverConfig, final MediaFactory mediaFactory, final PlayerRegister playerRegister) throws IOException {
+	public DlnaService(final Args args, final Config config, final ServerConfig serverConfig, final MediaFactory mediaFactory, final PlayerRegister playerRegister) throws IOException {
+		this.args = args;
 		this.config = config;
 		this.serverConfig = serverConfig;
 		this.mediaFactory = mediaFactory;
@@ -69,7 +75,7 @@ public class DlnaService {
 		this.bindAddress = this.serverConfig.getBindAddress("DLNA");
 		if (this.bindAddress == null) throw new IllegalStateException("Failed to find bind address.");
 
-		final Icon icon = createDeviceIcon();
+		final Icon icon = UpnpHelper.createDeviceIcon();
 		final IconResource iconResource = new IconResource(icon.getUri(), icon);
 		this.registryPathToRes.put("/icon.png", iconResource);
 	}
@@ -80,6 +86,8 @@ public class DlnaService {
 		final MediaFileLocator mediaFileLocator = new MediaFileLocator(this.mediaFactory);
 		this.mediaServer = new MediaServer(mediaFileLocator, this.bindAddress);
 		this.mediaServer.start();
+
+		final DlnaPlayingParamsFactory dlnaPlayingParamsFactory = new DlnaPlayingParamsFactory(mediaFileLocator, this.mediaServer);
 
 		this.upnpService = new MyUpnpService(new MyUpnpServiceConfiguration());
 		Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -92,20 +100,28 @@ public class DlnaService {
 		this.playerHolder = new PlayerHolder(
 				this.playerRegister,
 				this.upnpService.getControlPoint(),
-				this.mediaServer,
-				mediaFileLocator,
+				dlnaPlayingParamsFactory,
 				new PlayerStateStorage(this.mediaFactory, this.scheduledExecutor, this.config),
 				this.config,
 				this.scheduledExecutor);
 
 		this.upnpService.getRegistry().addDevice(new MediaServerDeviceFactory(
-				InetAddress.getLocalHost().getHostName(),
 				this.mediaFactory,
 				this.mediaServer,
 				mediaFileLocator
 				).getDevice());
 
 		this.contentDirectoryHolder = new ContentDirectoryHolder(this.upnpService.getControlPoint(), this.mediaFactory, this.config);
+
+		if (this.args.isDlnaPlayerControl()) {
+			// TODO replace with event listener inside playerreg to dynamically reg/unreg
+			// which is needed for non-local players (this assumes local players are static).
+			for (final Player p : this.playerRegister.getAll()) {
+				if (!(p instanceof LocalPlayer)) continue;
+				this.upnpService.getRegistry().addDevice(PlayerControlBridgeFactory.makeMediaRendererDevice(p, dlnaPlayingParamsFactory, this.scheduledExecutor));
+				LOG.info("Made DLNA contol proxy for player: " + p);
+			}
+		}
 
 		this.upnpService.getRegistry().addListener(new DeviceWatcher(this.playerHolder, this.contentDirectoryHolder));
 		this.upnpService.getControlPoint().search();
@@ -160,19 +176,6 @@ public class DlnaService {
 			return DlnaService.this.bindAddress.equals(address);
 		}
 
-	}
-
-	public static Icon createDeviceIcon () throws IOException {
-		final InputStream res = DlnaService.class.getResourceAsStream("/icon.png");
-		try {
-			if (res == null) throw new IllegalStateException("Icon not found.");
-			final Icon icon = new Icon("image/png", 48, 48, 8, "icon.png", res);
-			icon.validate();
-			return icon;
-		}
-		finally {
-			if (res != null) res.close();
-		}
 	}
 
 }

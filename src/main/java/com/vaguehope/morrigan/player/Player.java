@@ -122,6 +122,11 @@ public interface Player {
 		void positionChanged(long newPosition, int duration);
 
 		/**
+		 * Called after successful seekTo() invocation.
+		 */
+		void afterSeek();
+
+		/**
 		 * Called when errors occur during play back.
 		 */
 		void onException (Exception e);

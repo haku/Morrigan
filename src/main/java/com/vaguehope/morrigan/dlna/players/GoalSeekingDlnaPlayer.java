@@ -14,15 +14,13 @@ import org.fourthline.cling.support.model.MediaInfo;
 import org.fourthline.cling.support.model.PositionInfo;
 import org.fourthline.cling.support.model.TransportInfo;
 import org.fourthline.cling.support.model.TransportState;
-import org.seamless.util.MimeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.dlna.DlnaException;
 import com.vaguehope.morrigan.dlna.DlnaResponseException;
-import com.vaguehope.morrigan.dlna.content.MediaFileLocator;
-import com.vaguehope.morrigan.dlna.httpserver.MediaServer;
+import com.vaguehope.morrigan.dlna.players.DlnaPlayingParamsFactory.DlnaPlayingParams;
 import com.vaguehope.morrigan.dlna.util.Quietly;
 import com.vaguehope.morrigan.dlna.util.Timestamped;
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
@@ -60,26 +58,24 @@ public class GoalSeekingDlnaPlayer extends AbstractDlnaPlayer {
 			final PlayerRegister register,
 			final ControlPoint controlPoint,
 			final RemoteService avTransportSvc,
-			final MediaServer mediaServer,
-			final MediaFileLocator mediaFileLocator,
+			final DlnaPlayingParamsFactory dlnaPlayingParamsFactory,
 			final ScheduledExecutorService scheduledExecutor,
 			final PlayerStateStorage playerStateStorage,
 			final Config config) {
-		this(register, controlPoint, avTransportSvc, mediaServer, mediaFileLocator, scheduledExecutor, playerStateStorage, config, null, null);
+		this(register, controlPoint, avTransportSvc, dlnaPlayingParamsFactory, scheduledExecutor, playerStateStorage, config, null, null);
 	}
 
 	public GoalSeekingDlnaPlayer (
 			final PlayerRegister register,
 			final ControlPoint controlPoint,
 			final RemoteService avTransportSvc,
-			final MediaServer mediaServer,
-			final MediaFileLocator mediaFileLocator,
+			final DlnaPlayingParamsFactory dlnaPlayingParamsFactory,
 			final ScheduledExecutorService scheduledExecutor,
 			final PlayerStateStorage playerStateStorage,
 			final Config config,
 			final AvTransportActions avTransportActions,
 			final RenderingControlActions renderingControlActions) {
-		super(register, controlPoint, avTransportSvc, mediaServer, mediaFileLocator, scheduledExecutor, playerStateStorage, config,
+		super(register, controlPoint, avTransportSvc, dlnaPlayingParamsFactory, scheduledExecutor, playerStateStorage, config,
 				avTransportActions, renderingControlActions);
 		controlPoint.execute(new AvSubscriber(this, this.avEventListener, avTransportSvc, 600));
 		this.schdFuture = scheduledExecutor.scheduleWithFixedDelay(this.schdRunner, 1, 1, TimeUnit.SECONDS);
@@ -449,6 +445,7 @@ public class GoalSeekingDlnaPlayer extends AbstractDlnaPlayer {
 			this.avTransport.seek(this.goalSeekToSeconds);
 			LOG.info("Set position to {}s.", this.goalSeekToSeconds);
 			this.goalSeekToSeconds = null;
+			getListeners().afterSeek();
 			return renPlayState; // Made a change, so return.
 		}
 
@@ -539,11 +536,12 @@ public class GoalSeekingDlnaPlayer extends AbstractDlnaPlayer {
 
 	// Visible for testing.
 	@Override
-	public void dlnaPlay (final PlayItem item, final String id, final String uri, final MimeType mimeType, final long fileSize, final int durationSeconds, final String coverArtUri) throws DlnaException {
+	public void dlnaPlay (final PlayItem item, final DlnaPlayingParams playingParams) throws DlnaException {
 		setCurrentItem(item);
+		setCurrentPlayingParams(playingParams);
 		saveState();
 
-		this.eventQueue.add(new DlnaToPlay(item, id, uri, mimeType, fileSize, durationSeconds, coverArtUri, this));
+		this.eventQueue.add(new DlnaToPlay(item, playingParams, this));
 		this.eventQueue.add(PlayState.PLAYING);
 		setStateToReportExternally(PlayState.LOADING);
 
@@ -561,7 +559,7 @@ public class GoalSeekingDlnaPlayer extends AbstractDlnaPlayer {
 		}
 		clearRestorePositionState();
 
-		LOG.info("Playback scheduled: {}", id);
+		LOG.info("Playback scheduled: {}", playingParams.id);
 	}
 
 }

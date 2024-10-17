@@ -5,14 +5,12 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.fourthline.cling.controlpoint.ControlPoint;
 import org.fourthline.cling.model.meta.RemoteService;
-import org.seamless.util.MimeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.dlna.DlnaException;
-import com.vaguehope.morrigan.dlna.content.MediaFileLocator;
-import com.vaguehope.morrigan.dlna.httpserver.MediaServer;
+import com.vaguehope.morrigan.dlna.players.DlnaPlayingParamsFactory.DlnaPlayingParams;
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlayerRegister;
@@ -30,12 +28,11 @@ public class DlnaPlayer extends AbstractDlnaPlayer {
 			final PlayerRegister register,
 			final ControlPoint controlPoint,
 			final RemoteService avTransportSvc,
-			final MediaServer mediaServer,
-			final MediaFileLocator mediaFileLocator,
+			final DlnaPlayingParamsFactory dlnaPlayingParamsFactory,
 			final ScheduledExecutorService scheduledExecutor,
 			final PlayerStateStorage playerStateStorage,
 			final Config config) {
-		super(register, controlPoint, avTransportSvc, mediaServer, mediaFileLocator, scheduledExecutor, playerStateStorage, config, null, null);
+		super(register, controlPoint, avTransportSvc, dlnaPlayingParamsFactory, scheduledExecutor, playerStateStorage, config, null, null);
 	}
 
 	@Override
@@ -47,18 +44,19 @@ public class DlnaPlayer extends AbstractDlnaPlayer {
 	}
 
 	@Override
-	protected void dlnaPlay (final PlayItem item, final String id, final String uri, final MimeType mimeType, final long fileSize, final int durationSeconds, final String coverArtUri) throws DlnaException {
-		LOG.info("loading: {}", id);
+	protected void dlnaPlay (final PlayItem item, final DlnaPlayingParams playingParams) throws DlnaException {
+		LOG.info("loading: {}", playingParams.id);
 		stopPlaying();
 
 		// Set these fist so if something goes wrong user can try again.
-		this.currentUri.set(uri);
+		this.currentUri.set(playingParams.uri);
 		setCurrentItem(item);
+		setCurrentPlayingParams(playingParams);
 
-		this.avTransport.setUri(id, uri, item.getTrack().getTitle(), mimeType, fileSize, coverArtUri, durationSeconds);
+		this.avTransport.setUri(playingParams.id, playingParams.uri, playingParams.title, playingParams.mimeType, playingParams.fileSize, playingParams.coverArtUri, playingParams.durationSeconds);
 		this.avTransport.play();
 
-		startWatcher(uri, item);
+		startWatcher(playingParams.uri, item);
 		saveState();
 
 		// Only restore position if for same item.
@@ -149,6 +147,7 @@ public class DlnaPlayer extends AbstractDlnaPlayer {
 		checkAlive();
 		try {
 			this.avTransport.seek((long) (getCurrentTrackDuration() * d));
+			getListeners().afterSeek();
 		}
 		catch (final DlnaException e) {
 			getListeners().onException(e);

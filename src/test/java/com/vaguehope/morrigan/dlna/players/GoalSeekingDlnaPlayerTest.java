@@ -1,6 +1,7 @@
 package com.vaguehope.morrigan.dlna.players;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -32,15 +33,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.InOrder;
-import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.dlna.DlnaException;
 import com.vaguehope.morrigan.dlna.MediaFormat;
-import com.vaguehope.morrigan.dlna.content.MediaFileLocator;
-import com.vaguehope.morrigan.dlna.httpserver.MediaServer;
+import com.vaguehope.morrigan.dlna.players.DlnaPlayingParamsFactory.DlnaPlayingParams;
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMixedMediaItem;
@@ -67,8 +66,7 @@ public class GoalSeekingDlnaPlayerTest {
 	private static final String TEST_COVER_2_URI = "http://10.20.30.40:12345/covers/" + TEST_FILE_2_ID;
 
 	private Config config;
-	private MediaFileLocator mediaFileLocator;
-	private MediaServer mediaServer;
+	private DlnaPlayingParamsFactory dlnaPlayingParamsFactory;
 	private PlayerRegister playerRegister;
 	private PlayerStateStorage playerStateStorage;
 	private ControlPoint controlPoint;
@@ -83,8 +81,7 @@ public class GoalSeekingDlnaPlayerTest {
 	@Before
 	public void before () throws Exception {
 		this.config = new Config(this.tmp.getRoot());
-		this.mediaFileLocator = mock(MediaFileLocator.class);
-		this.mediaServer = mock(MediaServer.class);
+		this.dlnaPlayingParamsFactory = mock(DlnaPlayingParamsFactory.class);
 		this.playerRegister = mock(PlayerRegister.class);
 		this.playerStateStorage = mock(PlayerStateStorage.class);
 		this.controlPoint = mock(ControlPoint.class);
@@ -95,14 +92,14 @@ public class GoalSeekingDlnaPlayerTest {
 				GoalSeekingDlnaPlayerTest.this.scheduledActions.add(inv.getArgument(0, Runnable.class));
 				return null;
 			}
-		}).when(this.scheduledExecutor).execute(Mockito.any(Runnable.class));
+		}).when(this.scheduledExecutor).execute(any(Runnable.class));
 		makeTransportService();
 		this.avTransport = mock(AvTransportActions.class);
 		this.renderingControl = mock(RenderingControlActions.class);
 		this.testDb = new TestMixedMediaDb();
 		this.undertest = new GoalSeekingDlnaPlayer(
 				this.playerRegister, this.controlPoint, this.avTransportSvc,
-				this.mediaServer, this.mediaFileLocator, this.scheduledExecutor,
+				this.dlnaPlayingParamsFactory, this.scheduledExecutor,
 				this.playerStateStorage,
 				this.config,
 				this.avTransport, this.renderingControl);
@@ -130,8 +127,8 @@ public class GoalSeekingDlnaPlayerTest {
 
 		// start playback.
 		final PlayItem item1 = makeItem();
-		this.undertest.dlnaPlay(item1, TEST_FILE_1_ID, TEST_FILE_1_URI, MediaFormat.MP3.toMimeType(),
-				TEST_FILE_1_SIZE, TEST_FILE_1_DURATION, TEST_COVER_1_URI);
+		final DlnaPlayingParams item1Params = new DlnaPlayingParams(TEST_FILE_1_ID, TEST_FILE_1_URI, item1.getTrack().getTitle(), MediaFormat.MP3.toMimeType(), TEST_FILE_1_SIZE, TEST_COVER_1_URI, TEST_FILE_1_DURATION);
+		this.undertest.dlnaPlay(item1, item1Params);
 
 		// verify starts loading.
 		assertEquals(PlayState.LOADING, runEventLoop());
@@ -185,8 +182,8 @@ public class GoalSeekingDlnaPlayerTest {
 
 		// Skip to a new item.
 		final PlayItem item2 = makeItem();
-		this.undertest.dlnaPlay(item2, TEST_FILE_2_ID, TEST_FILE_2_URI, MediaFormat.OGG.toMimeType(),
-				TEST_FILE_2_SIZE, TEST_FILE_2_DURATION, TEST_COVER_2_URI);
+		final DlnaPlayingParams item2Params = new DlnaPlayingParams(TEST_FILE_2_ID, TEST_FILE_2_URI, item2.getTrack().getTitle(), MediaFormat.OGG.toMimeType(), TEST_FILE_2_SIZE, TEST_COVER_2_URI, TEST_FILE_2_DURATION);
+		this.undertest.dlnaPlay(item2, item2Params);
 
 		// verify starts loading.
 		assertEquals(PlayState.LOADING, runEventLoop());

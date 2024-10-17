@@ -1,6 +1,5 @@
 package com.vaguehope.morrigan.dlna.players;
 
-import java.net.URI;
 import java.util.Arrays;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
@@ -19,38 +18,24 @@ import org.fourthline.cling.support.avtransport.callback.Play;
 import org.fourthline.cling.support.avtransport.callback.Seek;
 import org.fourthline.cling.support.avtransport.callback.SetAVTransportURI;
 import org.fourthline.cling.support.avtransport.callback.Stop;
-import org.fourthline.cling.support.contentdirectory.DIDLParser;
-import org.fourthline.cling.support.model.DIDLContent;
-import org.fourthline.cling.support.model.DIDLObject;
 import org.fourthline.cling.support.model.MediaInfo;
 import org.fourthline.cling.support.model.PositionInfo;
-import org.fourthline.cling.support.model.Res;
 import org.fourthline.cling.support.model.TransportAction;
 import org.fourthline.cling.support.model.TransportInfo;
-import org.fourthline.cling.support.model.item.AudioItem;
-import org.fourthline.cling.support.model.item.ImageItem;
-import org.fourthline.cling.support.model.item.Item;
-import org.fourthline.cling.support.model.item.VideoItem;
 import org.seamless.util.MimeType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.vaguehope.morrigan.dlna.DlnaException;
 import com.vaguehope.morrigan.dlna.DlnaResponseException;
-import com.vaguehope.morrigan.dlna.content.ContentGroup;
-import com.vaguehope.morrigan.util.ErrorHelper;
 
 public class AvTransportActions extends AbstractActions {
-
-	private static final Logger LOG = LoggerFactory.getLogger(AvTransportActions.class);
 
 	public AvTransportActions (final ControlPoint controlPoint, final RemoteService avTransportSvc) {
 		super(controlPoint, avTransportSvc);
 	}
 
 	public void setUri (final String id, final String uri, final String title, final MimeType mimeType, final long fileSize, final String coverArtUri, final int durationSeconds) throws DlnaException {
-		final String metadata = metadataFor(id, uri, title, mimeType, fileSize, coverArtUri, durationSeconds);
-		final AtomicReference<Failure> err = new AtomicReference<Failure>();
+		final String metadata = DlnaPlayingParamsFactory.metadataFor(id, uri, title, mimeType, fileSize, coverArtUri, durationSeconds);
+		final AtomicReference<Failure> err = new AtomicReference<>();
 		// SetAVTransportURI() defaults to instanceId=0.
 		final Future<?> f = this.controlPoint.execute(new SetAVTransportURI(this.removeService, uri, metadata) {
 			@Override
@@ -60,36 +45,6 @@ public class AvTransportActions extends AbstractActions {
 		});
 		await(f, "set URI '%s' on transport '%s'.", uri, this.removeService);
 		if (err.get() != null) throw new DlnaResponseException(err.get().msg(), err.get().getResponse());
-	}
-
-	private static String metadataFor (final String id, final String uri, final String title, final MimeType mimeType, final long fileSize, final String coverArtUri, final int durationSeconds) {
-		if (mimeType == null) return null;
-		final Res res = new Res(mimeType, Long.valueOf(fileSize), uri);
-		if (durationSeconds > 0) res.setDuration(ModelUtil.toTimeString(durationSeconds));
-		final Item item;
-		switch (ContentGroup.fromMimeType(mimeType)) {
-			case VIDEO:
-				item = new VideoItem(id, "", title, "", res);
-				break;
-			case IMAGE:
-				item = new ImageItem(id, "", title, "", res);
-				break;
-			case AUDIO:
-				item = new AudioItem(id, "", title, "", res);
-				break;
-			default:
-				return null;
-		}
-		if (coverArtUri != null) item.addProperty(new DIDLObject.Property.UPNP.ALBUM_ART_URI(URI.create(coverArtUri)));
-		final DIDLContent didl = new DIDLContent();
-		didl.addItem(item);
-		try {
-			return new DIDLParser().generate(didl);
-		}
-		catch (final Exception e) {
-			LOG.info("Failed to generate metedata: " + ErrorHelper.getCauseTrace(e));
-			return null;
-		}
 	}
 
 	public void play () throws DlnaException {

@@ -222,8 +222,8 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 	int _currentTrackDuration = -1; // In seconds.
 
 	@Override
-	protected void loadAndPlay (final PlayItem item, final File altFile) throws MorriganException {
-		final File file = altFile != null ? altFile : new File(item.getTrack().getFilepath());
+	protected void loadAndPlay (final PlayItem item) throws MorriganException {
+		final File file = item.hasAltFile() ? item.getAltFile() : new File(item.getTrack().getFilepath());
 
 		// TODO FIXME Might be passed a remote file, but not supported yet.
 		// To check it is a valid local file.
@@ -372,6 +372,7 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 		if (eng!=null) {
 			synchronized (eng) {
 				eng.seekTo(d);
+				getListeners().afterSeek();
 			}
 		}
 	}

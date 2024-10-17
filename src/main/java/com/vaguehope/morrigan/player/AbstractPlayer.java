@@ -97,7 +97,7 @@ public abstract class AbstractPlayer implements Player {
 			this.playerStateStorage.writeState(this);
 		}
 		else {
-			LOG.w("Not saving player state as a restore has not yet been attempted.");
+			LOG.i("Not saving player state as a restore has not yet been attempted.");
 		}
 	}
 
@@ -291,14 +291,16 @@ public abstract class AbstractPlayer implements Player {
 					try {
 						AbstractPlayer.this.listeners.currentItemChanged(item);
 
-						File altFile = null;
+						PlayItem maybeUpdatedItem = item;
+
 						final TranscodeProfile tProfile = getTranscode().profileForItem(AbstractPlayer.this.config, item.getList(), item.getTrack());
 						if (tProfile != null) {
 							AbstractPlayer.this.transcoder.transcodeToFile(tProfile);
-							altFile = tProfile.getCacheFileEvenIfItDoesNotExist();  // This should exist because the transcode just ran.
+							final File altFile = tProfile.getCacheFileEvenIfItDoesNotExist();  // This should exist because the transcode just ran.
+							maybeUpdatedItem = item.withAltFile(altFile);
 						}
 
-						loadAndPlay(item, altFile);
+						loadAndPlay(maybeUpdatedItem);
 					}
 					finally {
 						markLoadingState(false);
@@ -322,7 +324,7 @@ public abstract class AbstractPlayer implements Player {
 	 * Already synchronised.
 	 * PlayItem has been validated.
 	 */
-	protected abstract void loadAndPlay (PlayItem item, File altFile) throws Exception;
+	protected abstract void loadAndPlay (PlayItem item) throws Exception;
 
 	protected PlayItem findNextItemToPlay () {
 		final PlayItem queueItem = this.getQueue().takeFromQueue();

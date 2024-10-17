@@ -1,11 +1,9 @@
 package com.vaguehope.morrigan.dlna.players;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -13,17 +11,13 @@ import org.fourthline.cling.controlpoint.ControlPoint;
 import org.fourthline.cling.model.meta.RemoteService;
 import org.fourthline.cling.support.model.TransportInfo;
 import org.fourthline.cling.support.model.TransportStatus;
-import org.seamless.util.MimeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.dlna.DlnaException;
-import com.vaguehope.morrigan.dlna.MediaFormat;
 import com.vaguehope.morrigan.dlna.UpnpHelper;
-import com.vaguehope.morrigan.dlna.content.MediaFileLocator;
-import com.vaguehope.morrigan.dlna.httpserver.MediaServer;
-import com.vaguehope.morrigan.dlna.util.StringHelper;
+import com.vaguehope.morrigan.dlna.players.DlnaPlayingParamsFactory.DlnaPlayingParams;
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine.PlayState;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
@@ -31,7 +25,6 @@ import com.vaguehope.morrigan.player.AbstractPlayer;
 import com.vaguehope.morrigan.player.PlayItem;
 import com.vaguehope.morrigan.player.PlayerRegister;
 import com.vaguehope.morrigan.player.PlayerStateStorage;
-import com.vaguehope.morrigan.transcode.FfprobeCache;
 import com.vaguehope.morrigan.util.Objs;
 
 public abstract class AbstractDlnaPlayer extends AbstractPlayer {
@@ -44,14 +37,14 @@ public abstract class AbstractDlnaPlayer extends AbstractPlayer {
 	protected final AvTransportActions avTransport;
 	protected final RenderingControlActions renderingControl;
 	protected final ScheduledExecutorService scheduledExecutor;
-	private final MediaServer mediaServer;
-	private final MediaFileLocator mediaFileLocator;
+	private final DlnaPlayingParamsFactory dlnaPlayingParamsFactory;
 
 	private final String uid;
 
 	protected final PlayerEventCache playerEventCache = new PlayerEventCache();
 
 	private final AtomicReference<PlayItem> currentItem = new AtomicReference<>();
+	private final AtomicReference<DlnaPlayingParams> currentPlayingParams = new AtomicReference<>();
 	private final AtomicInteger currentItemDurationSeconds = new AtomicInteger(-1);
 
 	private volatile PlayerState restorePositionState;
@@ -60,8 +53,7 @@ public abstract class AbstractDlnaPlayer extends AbstractPlayer {
 			final PlayerRegister register,
 			final ControlPoint controlPoint,
 			final RemoteService avTransportSvc,
-			final MediaServer mediaServer,
-			final MediaFileLocator mediaFileLocator,
+			final DlnaPlayingParamsFactory dlnaPlayingParamsFactory,
 			final ScheduledExecutorService scheduledExecutor,
 			final PlayerStateStorage playerStateStorage,
 			final Config config,
@@ -91,8 +83,7 @@ public abstract class AbstractDlnaPlayer extends AbstractPlayer {
 			}
 		}
 
-		this.mediaServer = mediaServer;
-		this.mediaFileLocator = mediaFileLocator;
+		this.dlnaPlayingParamsFactory = dlnaPlayingParamsFactory;
 		this.scheduledExecutor = scheduledExecutor;
 		this.uid = UpnpHelper.remoteServiceUid(avTransportSvc);
 		addEventListener(this.playerEventCache);
@@ -133,11 +124,20 @@ public abstract class AbstractDlnaPlayer extends AbstractPlayer {
 		if (!Objs.equals(old, item)) {
 			this.currentItemDurationSeconds.set(-1);
 		}
+		getListeners().currentItemChanged(item);
 	}
 
 	@Override
 	public PlayItem getCurrentItem () {
 		return this.currentItem.get();
+	}
+
+	public void setCurrentPlayingParams(final DlnaPlayingParams playingParams) {
+		this.currentPlayingParams.set(playingParams);
+	}
+
+	public DlnaPlayingParams getCurrentPlayingParams() {
+		return this.currentPlayingParams.get();
 	}
 
 	@Override
@@ -168,73 +168,15 @@ public abstract class AbstractDlnaPlayer extends AbstractPlayer {
 	}
 
 	@Override
-	protected void loadAndPlay (final PlayItem item, final File altFile) throws DlnaException, IOException {
-		final String id;
-		if (altFile != null) {
-			id = this.mediaFileLocator.fileId(altFile);
-		}
-		else if (StringHelper.notBlank(item.getTrack().getRemoteId())) {
-			id = item.getTrack().getRemoteId();
-		}
-		else {
-			id = this.mediaFileLocator.fileId(new File(item.getTrack().getFilepath()));
-		}
-
-		final String uri;
-		final MimeType mimeType;
-		final long fileSize;
-		final int durationSeconds;
-		if (altFile != null) {
-			uri = this.mediaServer.uriForId(id);
-			mimeType = MediaFormat.identify(altFile).toMimeType();
-			fileSize = altFile.length();
-			durationSeconds = readFileDurationSeconds(altFile);
-		}
-		else if (StringHelper.notBlank(item.getTrack().getRemoteLocation())) {
-			uri = item.getTrack().getRemoteLocation();
-			mimeType = MimeType.valueOf(item.getTrack().getMimeType());
-			fileSize = item.getTrack().getFileSize();
-			durationSeconds = item.getTrack().getDuration(); // TODO what if this is not available?
-		}
-		else {
-			uri = this.mediaServer.uriForId(id);
-			final File file = new File(item.getTrack().getFilepath());
-			mimeType = MediaFormat.identify(file).toMimeType();
-			fileSize = file.length();
-			int d = item.getTrack().getDuration();
-			if (d < 1) d = readFileDurationSeconds(file);
-			durationSeconds = d;
-		}
-
-		if (durationSeconds < 1) throw new DlnaException("Can not play track without a known duration.");
-
-		final String coverArtUri;
-		if (StringHelper.notBlank(item.getTrack().getCoverArtRemoteLocation())) {
-			coverArtUri = item.getTrack().getCoverArtRemoteLocation();
-		}
-		else {
-			final File coverArt = item.getTrack().findCoverArt();
-			coverArtUri = coverArt != null ? this.mediaServer.uriForId(this.mediaFileLocator.fileId(coverArt)) : null;
-		}
-
-		dlnaPlay(item, id, uri, mimeType, fileSize, durationSeconds, coverArtUri);
+	protected void loadAndPlay (final PlayItem item) throws DlnaException, IOException {
+		final DlnaPlayingParams playingParams = this.dlnaPlayingParamsFactory.make(item);
+		dlnaPlay(item, playingParams);
 
 		// After dlnaPlay() because it will (likely) call setCurrentItem().
-		this.currentItemDurationSeconds.set(durationSeconds);
+		this.currentItemDurationSeconds.set(playingParams.durationSeconds);
 	}
 
-	/**
-	 * Returns valid duration or throws.
-	 */
-	private static int readFileDurationSeconds (final File altFile) throws IOException {
-		final Long fileDurationMillis = FfprobeCache.inspect(altFile).getDurationMillis();
-		if (fileDurationMillis == null || fileDurationMillis < 1) throw new IOException("Failed to read file duration: " + altFile.getAbsolutePath());
-		LOG.info("Duration {}ms: {}", fileDurationMillis, altFile.getAbsolutePath());
-		final int seconds = (int) TimeUnit.MILLISECONDS.toSeconds(fileDurationMillis);
-		return seconds < 1 ? 1 : seconds; // 0ms < d < 1s gets rounded up to 1s.
-	}
-
-	protected abstract void dlnaPlay (PlayItem item, String id, String uri, MimeType mimeType, long fileSize, int durationSeconds, String coverArtUri) throws DlnaException;
+	protected abstract void dlnaPlay (PlayItem item, DlnaPlayingParams playingParams) throws DlnaException;
 
 	protected abstract boolean shouldBePlaying ();
 
