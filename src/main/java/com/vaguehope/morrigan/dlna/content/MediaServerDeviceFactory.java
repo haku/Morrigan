@@ -18,6 +18,7 @@ import org.fourthline.cling.support.connectionmanager.ConnectionManagerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.vaguehope.morrigan.dlna.SystemId;
 import com.vaguehope.morrigan.dlna.UpnpHelper;
 import com.vaguehope.morrigan.dlna.httpserver.MediaServer;
 import com.vaguehope.morrigan.model.media.MediaFactory;
@@ -45,9 +46,10 @@ public class MediaServerDeviceFactory {
 
 	private final LocalDevice localDevice;
 
-	public MediaServerDeviceFactory (final MediaFactory mediaFactory, final MediaServer mediaServer, final MediaFileLocator mediaFileLocator) throws ValidationException, IOException {
-		final UDN usi = UDN.uniqueSystemIdentifier(IDENTIFIER_STEM);
-		LOG.info("uniqueSystemIdentifier: {}", usi);
+	public MediaServerDeviceFactory (final SystemId systemId, final MediaFactory mediaFactory, final MediaServer mediaServer, final MediaFileLocator mediaFileLocator) throws ValidationException, IOException {
+		final UDN usi = systemId.getUsi(IDENTIFIER_STEM);
+		LOG.info("uniqueSystemIdentifier for {}: {}", DEVICE_TYPE, usi);
+
 		final DeviceType type = new UDADeviceType(DEVICE_TYPE, VERSION);
 		final DeviceDetails details = UpnpHelper.deviceDetails();
 		final Icon icon = UpnpHelper.createDeviceIcon();

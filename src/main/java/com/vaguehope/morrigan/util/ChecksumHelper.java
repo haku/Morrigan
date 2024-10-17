@@ -31,6 +31,11 @@ public final class ChecksumHelper {
 		return new BigInteger(1, md.digest(s.getBytes(StandardCharsets.UTF_8)));
 	}
 
+	public static BigInteger md5(final byte[] a) {
+		final MessageDigest md = MD5_FACTORY.get();
+		return new BigInteger(1, md.digest(a));
+	}
+
 	public static class Md5AndSha1 {
 		private final BigInteger md5;
 		private final BigInteger sha1;

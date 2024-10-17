@@ -23,6 +23,7 @@ import org.fourthline.cling.support.lastchange.LastChangeAwareServiceManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.vaguehope.morrigan.dlna.SystemId;
 import com.vaguehope.morrigan.dlna.UpnpHelper;
 import com.vaguehope.morrigan.player.Player;
 
@@ -47,9 +48,10 @@ public class PlayerControlBridgeFactory {
 
 	private static final Logger LOG = LoggerFactory.getLogger(PlayerControlBridgeFactory.class);
 
-	public static LocalDevice makeMediaRendererDevice (final Player player, final DlnaPlayingParamsFactory dlnaPlayingParamsFactory, final ScheduledExecutorService schEs) throws IOException, ValidationException {
-		final UDN usi = UDN.uniqueSystemIdentifier(IDENTIFIER_STEM);
-		LOG.info("uniqueSystemIdentifier: {}", usi);
+	public static LocalDevice makeMediaRendererDevice (final SystemId systemId, final Player player, final DlnaPlayingParamsFactory dlnaPlayingParamsFactory, final ScheduledExecutorService schEs) throws IOException, ValidationException {
+		final UDN usi = systemId.getUsi(IDENTIFIER_STEM + player.getId());
+		LOG.info("uniqueSystemIdentifier for player {}: {}", player.getId(), usi);
+
 		final DeviceType type = new UDADeviceType(DEVICE_TYPE, VERSION);
 		final DeviceDetails details = UpnpHelper.deviceDetails(player.getName() + " Player");
 		final Icon icon = UpnpHelper.createDeviceIcon();

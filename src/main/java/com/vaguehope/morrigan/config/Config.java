@@ -119,6 +119,14 @@ public class Config {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+	private static final String SYSTEM_ID_FILE = "systemid";
+
+	public File getSystemIdFile () {
+		return new File(this.configDir, SYSTEM_ID_FILE);
+	}
+
+//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 	private static final String PROP_MEDIA_TYPES = "morrigan.media.types";
 	private static final String PROP_MEDIA_PICTURE_TYPES = "morrigan.media.pictures.types";
 

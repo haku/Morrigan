@@ -82,12 +82,12 @@ public class DlnaService {
 	}
 
 	public void start() throws IOException, ValidationException {
+		final SystemId systemId = new SystemId(this.config.getSystemIdFile());
 		this.scheduledExecutor = Executors.newScheduledThreadPool(BG_THREADS, new DaemonThreadFactory("dlna"));
 
 		final MediaFileLocator mediaFileLocator = new MediaFileLocator(this.mediaFactory);
 		this.mediaServer = new MediaServer(mediaFileLocator, this.bindAddress);
 		this.mediaServer.start();
-
 		final DlnaPlayingParamsFactory dlnaPlayingParamsFactory = new DlnaPlayingParamsFactory(mediaFileLocator, this.mediaServer);
 
 		this.upnpService = new MyUpnpService(new MyUpnpServiceConfiguration());
@@ -107,6 +107,7 @@ public class DlnaService {
 				this.scheduledExecutor);
 
 		this.upnpService.getRegistry().addDevice(new MediaServerDeviceFactory(
+				systemId,
 				this.mediaFactory,
 				this.mediaServer,
 				mediaFileLocator
@@ -119,7 +120,7 @@ public class DlnaService {
 			// which is needed for non-local players (this assumes local players are static).
 			for (final Player p : this.playerRegister.getAll()) {
 				if (!(p instanceof LocalPlayer)) continue;
-				final LocalDevice device = PlayerControlBridgeFactory.makeMediaRendererDevice(p, dlnaPlayingParamsFactory, this.scheduledExecutor);
+				final LocalDevice device = PlayerControlBridgeFactory.makeMediaRendererDevice(systemId, p, dlnaPlayingParamsFactory, this.scheduledExecutor);
 				this.upnpService.getRegistry().addDevice(device);
 				p.addOnDisposeListener(() -> this.upnpService.getRegistry().removeDevice(device));
 				LOG.info("Made DLNA contol proxy for player: " + p);
