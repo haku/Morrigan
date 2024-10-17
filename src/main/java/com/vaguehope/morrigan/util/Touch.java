@@ -25,7 +25,7 @@ public class Touch {
 			}
 			catch (final IOException e) {
 				isAvailable = false;
-				LOG.warn("touch command not available: {}", ExceptionHelper.causeTrace(e, " --> "));
+				LOG.warn("touch command not available: {}", ExceptionHelper.causeTrace(e));
 			}
 		}
 		return isAvailable.booleanValue();
