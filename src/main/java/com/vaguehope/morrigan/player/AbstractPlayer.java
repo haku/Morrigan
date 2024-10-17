@@ -2,6 +2,8 @@ package com.vaguehope.morrigan.player;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -33,6 +35,8 @@ public abstract class AbstractPlayer implements Player {
 	private final Config config;
 
 	private final AtomicBoolean alive = new AtomicBoolean(true);
+	private final List<Runnable> onDisposeListener = new ArrayList<>();
+
 	private final ExecutorService loadEs;
 	private final PlayerQueue queue = new DefaultPlayerQueue();
 	private final PlayerEventListenerCaller listeners = new PlayerEventListenerCaller();
@@ -63,10 +67,17 @@ public abstract class AbstractPlayer implements Player {
 				this.register.unregister(this);
 			}
 			finally {
-				saveState();
-				onDispose();
-				this.loadEs.shutdown();
-				this.transcoder.dispose();
+				try {
+					for (final Runnable runnable : this.onDisposeListener) {
+						runnable.run();
+					}
+				}
+				finally {
+					saveState();
+					onDispose();
+					this.loadEs.shutdown();
+					this.transcoder.dispose();
+				}
 			}
 		}
 	}
@@ -79,6 +90,11 @@ public abstract class AbstractPlayer implements Player {
 	@Override
 	public boolean isDisposed () {
 		return !this.alive.get();
+	}
+
+	@Override
+	public void addOnDisposeListener(final Runnable runnable) {
+		this.onDisposeListener.add(runnable);
 	}
 
 	protected void checkAlive () {

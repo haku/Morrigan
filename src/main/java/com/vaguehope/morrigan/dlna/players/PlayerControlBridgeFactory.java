@@ -60,9 +60,6 @@ public class PlayerControlBridgeFactory {
 		connManSrv.setManager(new DefaultServiceManager<>(connManSrv, ConnectionManagerService.class));
 
 		final LocalService<PlayerControlBridgeAVTransportService> avtSrv = binder.read(PlayerControlBridgeAVTransportService.class);
-		final Runnable fireLastChange = () -> ((LastChangeAwareServiceManager<?>) avtSrv.getManager()).fireLastChange();
-		schEs.scheduleWithFixedDelay(fireLastChange, 1, 1, TimeUnit.SECONDS);
-
 		final PlayerControlBridgeAVTransportService avTransportService = new PlayerControlBridgeAVTransportService(
 				new LastChange(new AVTransportLastChangeParser()),
 				player,
@@ -84,6 +81,9 @@ public class PlayerControlBridgeFactory {
 				}
 			}
 		});
+
+		final Runnable fireLastChange = () -> ((LastChangeAwareServiceManager<?>) avtSrv.getManager()).fireLastChange();
+		schEs.scheduleWithFixedDelay(fireLastChange, 1, 1, TimeUnit.SECONDS);
 
 		final LocalDevice device = new LocalDevice(new DeviceIdentity(usi, MIN_ADVERTISEMENT_AGE_SECONDS), type, details, icon, new LocalService[] { avtSrv, connManSrv });
 		return device;

@@ -1,5 +1,6 @@
 package com.vaguehope.morrigan.player.internal;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -25,6 +26,7 @@ public class LocalProxyPlayer implements LocalPlayer {
 	private final String refId;
 	private final String refName;
 	private final AtomicReference<Player> ref = new AtomicReference<>();
+	private final List<Runnable> onDisposeListener = new ArrayList<>();
 	private final LocalPlayerSupport localPlayerSupport;
 
 	public LocalProxyPlayer (final Player player, final LocalPlayerSupport eventHandler) {
@@ -38,7 +40,19 @@ public class LocalProxyPlayer implements LocalPlayer {
 
 	@Override
 	public void dispose () {
-		this.ref.set(null);
+		try {
+			for (final Runnable runnable : this.onDisposeListener) {
+				runnable.run();
+			}
+		}
+		finally {
+			this.ref.set(null);
+		}
+	}
+
+	@Override
+	public void addOnDisposeListener(final Runnable runnable) {
+		this.onDisposeListener.add(runnable);
 	}
 
 	private Player getRef () {

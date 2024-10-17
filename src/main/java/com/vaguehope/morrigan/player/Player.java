@@ -12,6 +12,7 @@ public interface Player {
 
 	void dispose();
 	boolean isDisposed();
+	void addOnDisposeListener(Runnable runnable);
 
 	String getId();
 	String getName();

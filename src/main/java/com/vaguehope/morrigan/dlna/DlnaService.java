@@ -18,6 +18,7 @@ import org.fourthline.cling.UpnpServiceConfiguration;
 import org.fourthline.cling.UpnpServiceImpl;
 import org.fourthline.cling.model.ValidationException;
 import org.fourthline.cling.model.meta.Icon;
+import org.fourthline.cling.model.meta.LocalDevice;
 import org.fourthline.cling.model.resource.IconResource;
 import org.fourthline.cling.model.resource.Resource;
 import org.fourthline.cling.protocol.ProtocolFactory;
@@ -118,7 +119,9 @@ public class DlnaService {
 			// which is needed for non-local players (this assumes local players are static).
 			for (final Player p : this.playerRegister.getAll()) {
 				if (!(p instanceof LocalPlayer)) continue;
-				this.upnpService.getRegistry().addDevice(PlayerControlBridgeFactory.makeMediaRendererDevice(p, dlnaPlayingParamsFactory, this.scheduledExecutor));
+				final LocalDevice device = PlayerControlBridgeFactory.makeMediaRendererDevice(p, dlnaPlayingParamsFactory, this.scheduledExecutor);
+				this.upnpService.getRegistry().addDevice(device);
+				p.addOnDisposeListener(() -> this.upnpService.getRegistry().removeDevice(device));
 				LOG.info("Made DLNA contol proxy for player: " + p);
 			}
 		}
