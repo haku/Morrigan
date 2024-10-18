@@ -5,9 +5,9 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.fourthline.cling.controlpoint.ControlPoint;
-import org.fourthline.cling.model.message.UpnpResponse;
-import org.fourthline.cling.model.meta.RemoteService;
+import org.jupnp.controlpoint.ControlPoint;
+import org.jupnp.model.message.UpnpResponse;
+import org.jupnp.model.meta.RemoteService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

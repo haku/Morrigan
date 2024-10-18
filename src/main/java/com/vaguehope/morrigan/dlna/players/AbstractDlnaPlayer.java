@@ -7,10 +7,10 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.fourthline.cling.controlpoint.ControlPoint;
-import org.fourthline.cling.model.meta.RemoteService;
-import org.fourthline.cling.support.model.TransportInfo;
-import org.fourthline.cling.support.model.TransportStatus;
+import org.jupnp.controlpoint.ControlPoint;
+import org.jupnp.model.meta.RemoteService;
+import org.jupnp.support.model.TransportInfo;
+import org.jupnp.support.model.TransportStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

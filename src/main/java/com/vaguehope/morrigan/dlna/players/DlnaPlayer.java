@@ -3,8 +3,8 @@ package com.vaguehope.morrigan.dlna.players;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.fourthline.cling.controlpoint.ControlPoint;
-import org.fourthline.cling.model.meta.RemoteService;
+import org.jupnp.controlpoint.ControlPoint;
+import org.jupnp.model.meta.RemoteService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,14 +1,14 @@
 package com.vaguehope.morrigan.dlna.players;
 
-import org.fourthline.cling.controlpoint.SubscriptionCallback;
-import org.fourthline.cling.model.gena.CancelReason;
-import org.fourthline.cling.model.gena.GENASubscription;
-import org.fourthline.cling.model.message.UpnpResponse;
-import org.fourthline.cling.model.meta.Service;
-import org.fourthline.cling.support.avtransport.lastchange.AVTransportLastChangeParser;
-import org.fourthline.cling.support.avtransport.lastchange.AVTransportVariable;
-import org.fourthline.cling.support.lastchange.LastChange;
-import org.fourthline.cling.support.model.TransportState;
+import org.jupnp.controlpoint.SubscriptionCallback;
+import org.jupnp.model.gena.CancelReason;
+import org.jupnp.model.gena.GENASubscription;
+import org.jupnp.model.message.UpnpResponse;
+import org.jupnp.model.meta.Service;
+import org.jupnp.support.avtransport.lastchange.AVTransportLastChangeParser;
+import org.jupnp.support.avtransport.lastchange.AVTransportVariable;
+import org.jupnp.support.lastchange.LastChange;
+import org.jupnp.support.model.TransportState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

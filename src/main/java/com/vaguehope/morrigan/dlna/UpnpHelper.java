@@ -7,12 +7,12 @@ import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 
-import org.fourthline.cling.model.meta.DeviceDetails;
-import org.fourthline.cling.model.meta.Icon;
-import org.fourthline.cling.model.meta.ManufacturerDetails;
-import org.fourthline.cling.model.meta.ModelDetails;
-import org.fourthline.cling.model.meta.RemoteDevice;
-import org.fourthline.cling.model.meta.RemoteService;
+import org.jupnp.model.meta.DeviceDetails;
+import org.jupnp.model.meta.Icon;
+import org.jupnp.model.meta.ManufacturerDetails;
+import org.jupnp.model.meta.ModelDetails;
+import org.jupnp.model.meta.RemoteDevice;
+import org.jupnp.model.meta.RemoteService;
 
 public final class UpnpHelper {
 

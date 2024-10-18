@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.seamless.util.MimeType;
+import org.jupnp.util.MimeType;
 
 import com.vaguehope.morrigan.dlna.content.ContentGroup;
 

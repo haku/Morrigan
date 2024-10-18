@@ -6,11 +6,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.fourthline.cling.support.model.MediaInfo;
-import org.fourthline.cling.support.model.PositionInfo;
-import org.fourthline.cling.support.model.TransportInfo;
-import org.fourthline.cling.support.model.TransportState;
-import org.fourthline.cling.support.model.TransportStatus;
+import org.jupnp.support.model.MediaInfo;
+import org.jupnp.support.model.PositionInfo;
+import org.jupnp.support.model.TransportInfo;
+import org.jupnp.support.model.TransportState;
+import org.jupnp.support.model.TransportStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -6,17 +6,17 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.fourthline.cling.controlpoint.ControlPoint;
-import org.fourthline.cling.model.action.ActionInvocation;
-import org.fourthline.cling.model.message.UpnpResponse;
-import org.fourthline.cling.model.meta.RemoteService;
-import org.fourthline.cling.support.contentdirectory.callback.Browse;
-import org.fourthline.cling.support.contentdirectory.callback.Search;
-import org.fourthline.cling.support.model.BrowseFlag;
-import org.fourthline.cling.support.model.DIDLContent;
-import org.fourthline.cling.support.model.Res;
-import org.fourthline.cling.support.model.container.Container;
-import org.fourthline.cling.support.model.item.Item;
+import org.jupnp.controlpoint.ControlPoint;
+import org.jupnp.model.action.ActionInvocation;
+import org.jupnp.model.message.UpnpResponse;
+import org.jupnp.model.meta.RemoteService;
+import org.jupnp.support.contentdirectory.callback.Browse;
+import org.jupnp.support.contentdirectory.callback.Search;
+import org.jupnp.support.model.BrowseFlag;
+import org.jupnp.support.model.DIDLContent;
+import org.jupnp.support.model.Res;
+import org.jupnp.support.model.container.Container;
+import org.jupnp.support.model.item.Item;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

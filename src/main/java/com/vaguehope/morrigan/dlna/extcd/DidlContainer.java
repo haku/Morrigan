@@ -2,7 +2,7 @@ package com.vaguehope.morrigan.dlna.extcd;
 
 import java.util.Date;
 
-import org.fourthline.cling.support.model.container.Container;
+import org.jupnp.support.model.container.Container;
 
 public class DidlContainer extends EphemeralItem {
 

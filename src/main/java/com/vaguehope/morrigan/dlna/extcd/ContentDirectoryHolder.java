@@ -5,9 +5,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.fourthline.cling.controlpoint.ControlPoint;
-import org.fourthline.cling.model.meta.RemoteDevice;
-import org.fourthline.cling.model.meta.RemoteService;
+import org.jupnp.controlpoint.ControlPoint;
+import org.jupnp.model.meta.RemoteDevice;
+import org.jupnp.model.meta.RemoteService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,8 +15,8 @@ import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.media.IMixedMediaDb;
 import com.vaguehope.morrigan.model.media.IMixedMediaStorageLayer;
 import com.vaguehope.morrigan.model.media.MediaFactory;
-import com.vaguehope.morrigan.util.ErrorHelper;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
+import com.vaguehope.morrigan.util.ErrorHelper;
 
 public class ContentDirectoryHolder {
 

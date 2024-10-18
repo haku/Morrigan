@@ -5,16 +5,16 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.concurrent.TimeUnit;
 
-import org.fourthline.cling.model.ModelUtil;
-import org.fourthline.cling.support.contentdirectory.DIDLParser;
-import org.fourthline.cling.support.model.DIDLContent;
-import org.fourthline.cling.support.model.DIDLObject;
-import org.fourthline.cling.support.model.Res;
-import org.fourthline.cling.support.model.item.AudioItem;
-import org.fourthline.cling.support.model.item.ImageItem;
-import org.fourthline.cling.support.model.item.Item;
-import org.fourthline.cling.support.model.item.VideoItem;
-import org.seamless.util.MimeType;
+import org.jupnp.model.ModelUtil;
+import org.jupnp.support.contentdirectory.DIDLParser;
+import org.jupnp.support.model.DIDLContent;
+import org.jupnp.support.model.DIDLObject;
+import org.jupnp.support.model.Res;
+import org.jupnp.support.model.item.AudioItem;
+import org.jupnp.support.model.item.ImageItem;
+import org.jupnp.support.model.item.Item;
+import org.jupnp.support.model.item.VideoItem;
+import org.jupnp.util.MimeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

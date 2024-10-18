@@ -1,6 +1,6 @@
 package com.vaguehope.morrigan.dlna.content;
 
-import org.seamless.util.MimeType;
+import org.jupnp.util.MimeType;
 
 public enum ContentGroup {
 

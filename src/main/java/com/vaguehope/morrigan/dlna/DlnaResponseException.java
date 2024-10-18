@@ -1,6 +1,6 @@
 package com.vaguehope.morrigan.dlna;
 
-import org.fourthline.cling.model.message.UpnpResponse;
+import org.jupnp.model.message.UpnpResponse;
 
 public class DlnaResponseException extends DlnaException {
 

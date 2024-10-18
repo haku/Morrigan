@@ -1,6 +1,6 @@
 package com.vaguehope.morrigan.dlna.players;
 
-import org.fourthline.cling.support.model.TransportState;
+import org.jupnp.support.model.TransportState;
 
 public interface AvEventListener {
 

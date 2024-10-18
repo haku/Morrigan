@@ -10,12 +10,12 @@
 	<name>morrigan</name>
 
 	<properties>
-		<java.version>1.8</java.version>
+		<java.version>11</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<antlr.version>4.13.2</antlr.version>
-		<cling.version>2.1.2</cling.version>
 		<jetty.version>9.4.45.v20220203</jetty.version>
+		<jupnp.version>3.0.2</jupnp.version>
 		<junit.version>4.13.2</junit.version>
 		<slf4j.version>2.0.16</slf4j.version>
 		<sshd.version>2.14.0</sshd.version>
@@ -226,21 +226,27 @@
 		<!-- DLNA -->
 
 		<dependency>
-			<groupId>org.fourthline.cling</groupId>
-			<artifactId>cling-core</artifactId>
-			<version>${cling.version}</version>
+			<groupId>org.jupnp</groupId>
+			<artifactId>org.jupnp</artifactId>
+			<version>${jupnp.version}</version>
 		</dependency>
-	
+
 		<dependency>
-			<groupId>org.fourthline.cling</groupId>
-			<artifactId>cling-support</artifactId>
-			<version>${cling.version}</version>
+			<groupId>org.jupnp</groupId>
+			<artifactId>org.jupnp.support</artifactId>
+			<version>${jupnp.version}</version>
 		</dependency>
-	
+
 		<dependency>
 			<groupId>org.teleal</groupId>
 			<artifactId>teleal-common</artifactId>
 			<version>${teleal.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-client</artifactId>
+			<version>${jetty.version}</version>
 		</dependency>
 
 		<!-- Parser Generator -->
@@ -269,6 +275,12 @@
 			<groupId>com.megginson.sax</groupId>
 			<artifactId>xml-writer</artifactId>
 			<version>0.2</version>
+			<exclusions>
+				<exclusion>
+					<groupId>xml-apis</groupId>
+					<artifactId>xml-apis</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
@@ -337,3 +349,5 @@
 	</dependencies>
 
 </project>
+<!-- vim: noexpandtab softtabstop=0
+-->

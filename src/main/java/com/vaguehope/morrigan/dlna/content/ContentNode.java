@@ -2,8 +2,8 @@ package com.vaguehope.morrigan.dlna.content;
 
 import java.util.concurrent.TimeUnit;
 
-import org.fourthline.cling.support.model.container.Container;
-import org.fourthline.cling.support.model.item.Item;
+import org.jupnp.support.model.container.Container;
+import org.jupnp.support.model.item.Item;
 
 /**
  * Either a Container or an Item.

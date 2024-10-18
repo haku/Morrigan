@@ -2,7 +2,7 @@ package com.vaguehope.morrigan.dlna.players;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.seamless.util.MimeType;
+import org.jupnp.util.MimeType;
 
 import com.vaguehope.morrigan.dlna.players.DlnaPlayingParamsFactory.DlnaPlayingParams;
 import com.vaguehope.morrigan.dlna.util.StringHelper;

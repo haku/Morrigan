@@ -3,9 +3,9 @@ package com.vaguehope.morrigan.dlna.extcd;
 import java.util.List;
 import java.util.UUID;
 
-import org.fourthline.cling.controlpoint.ControlPoint;
-import org.fourthline.cling.model.meta.RemoteDevice;
-import org.fourthline.cling.model.meta.RemoteService;
+import org.jupnp.controlpoint.ControlPoint;
+import org.jupnp.model.meta.RemoteDevice;
+import org.jupnp.model.meta.RemoteService;
 
 import com.vaguehope.morrigan.model.db.IDbColumn;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;

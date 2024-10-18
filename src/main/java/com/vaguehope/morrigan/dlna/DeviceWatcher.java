@@ -1,9 +1,9 @@
 package com.vaguehope.morrigan.dlna;
 
-import org.fourthline.cling.model.meta.RemoteDevice;
-import org.fourthline.cling.model.meta.RemoteService;
-import org.fourthline.cling.registry.DefaultRegistryListener;
-import org.fourthline.cling.registry.Registry;
+import org.jupnp.model.meta.RemoteDevice;
+import org.jupnp.model.meta.RemoteService;
+import org.jupnp.registry.DefaultRegistryListener;
+import org.jupnp.registry.Registry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

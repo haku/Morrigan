@@ -10,15 +10,15 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.fourthline.cling.UpnpService;
-import org.fourthline.cling.binding.xml.DescriptorBindingException;
-import org.fourthline.cling.binding.xml.DeviceDescriptorBinder;
-import org.fourthline.cling.model.ValidationException;
-import org.fourthline.cling.model.meta.DeviceDetails;
-import org.fourthline.cling.model.meta.RemoteDevice;
-import org.fourthline.cling.model.meta.RemoteDeviceIdentity;
-import org.fourthline.cling.model.types.UDN;
-import org.fourthline.cling.protocol.RetrieveRemoteDescriptors;
+import org.jupnp.UpnpService;
+import org.jupnp.binding.xml.DescriptorBindingException;
+import org.jupnp.binding.xml.DeviceDescriptorBinder;
+import org.jupnp.model.ValidationException;
+import org.jupnp.model.meta.DeviceDetails;
+import org.jupnp.model.meta.RemoteDevice;
+import org.jupnp.model.meta.RemoteDeviceIdentity;
+import org.jupnp.model.types.UDN;
+import org.jupnp.protocol.RetrieveRemoteDescriptors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

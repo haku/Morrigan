@@ -3,15 +3,15 @@ package com.vaguehope.morrigan.dlna.players;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.fourthline.cling.controlpoint.ControlPoint;
-import org.fourthline.cling.model.action.ActionInvocation;
-import org.fourthline.cling.model.message.UpnpResponse;
-import org.fourthline.cling.model.meta.RemoteService;
-import org.fourthline.cling.model.meta.StateVariable;
-import org.fourthline.cling.model.meta.StateVariableAllowedValueRange;
-import org.fourthline.cling.model.meta.StateVariableTypeDetails;
-import org.fourthline.cling.support.renderingcontrol.callback.GetVolume;
-import org.fourthline.cling.support.renderingcontrol.callback.SetVolume;
+import org.jupnp.controlpoint.ControlPoint;
+import org.jupnp.model.action.ActionInvocation;
+import org.jupnp.model.message.UpnpResponse;
+import org.jupnp.model.meta.RemoteService;
+import org.jupnp.model.meta.StateVariable;
+import org.jupnp.model.meta.StateVariableAllowedValueRange;
+import org.jupnp.model.meta.StateVariableTypeDetails;
+import org.jupnp.support.renderingcontrol.callback.GetVolume;
+import org.jupnp.support.renderingcontrol.callback.SetVolume;
 
 import com.vaguehope.morrigan.dlna.DlnaException;
 import com.vaguehope.morrigan.dlna.DlnaResponseException;

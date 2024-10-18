@@ -9,8 +9,8 @@ import java.util.function.Supplier;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.fourthline.cling.model.ModelUtil;
-import org.fourthline.cling.model.types.UDN;
+import org.jupnp.model.ModelUtil;
+import org.jupnp.model.types.UDN;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

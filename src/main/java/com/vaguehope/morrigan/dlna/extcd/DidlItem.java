@@ -3,10 +3,10 @@ package com.vaguehope.morrigan.dlna.extcd;
 import java.text.ParseException;
 import java.util.Date;
 
-import org.fourthline.cling.model.ModelUtil;
-import org.fourthline.cling.support.model.DIDLObject;
-import org.fourthline.cling.support.model.Res;
-import org.fourthline.cling.support.model.item.Item;
+import org.jupnp.model.ModelUtil;
+import org.jupnp.support.model.DIDLObject;
+import org.jupnp.support.model.Res;
+import org.jupnp.support.model.item.Item;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
