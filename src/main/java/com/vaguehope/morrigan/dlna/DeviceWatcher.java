@@ -43,6 +43,8 @@ public class DeviceWatcher extends DefaultRegistryListener {
 					device.getIdentity().getMaxAgeSeconds());
 			this.contentDirectoryHolder.addContentDirectory(device, contentDirectory);
 		}
+
+		super.remoteDeviceAdded(registry, device);
 	}
 
 	@Override
@@ -52,6 +54,8 @@ public class DeviceWatcher extends DefaultRegistryListener {
 				device.getIdentity().getUdn());
 		this.playerHolder.removeAvTransport(device);
 		this.contentDirectoryHolder.removeContentDirectory(device);
+
+		super.remoteDeviceRemoved(registry, device);
 	}
 
 }
