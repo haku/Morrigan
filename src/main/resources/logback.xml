@@ -21,7 +21,8 @@
 		<filter class="com.vaguehope.morrigan.util.AsyncLogFilter" />
 	</appender>
 
-	<logger name="com.vaguehope" level="INFO" />
+	<logger name="com" level="INFO" />
+	<logger name="org" level="INFO" />
 
 	<logger name="org.jupnp.protocol.RetrieveRemoteDescriptors" level="ERROR" />
 	<logger name="org.jupnp.transport.impl.ServletUpnpStream" level="WARN" />
