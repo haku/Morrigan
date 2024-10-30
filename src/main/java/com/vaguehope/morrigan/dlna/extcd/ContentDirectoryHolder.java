@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.jupnp.controlpoint.ControlPoint;
+import org.jupnp.UpnpService;
 import org.jupnp.model.meta.RemoteDevice;
 import org.jupnp.model.meta.RemoteService;
 import org.slf4j.Logger;
@@ -22,15 +22,15 @@ public class ContentDirectoryHolder {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ContentDirectoryHolder.class);
 
-	private final ControlPoint controlPoint;
+	private final UpnpService upnpService;
 	private final MediaFactory mediaFactory;
 	private final Config config;
 
 	private final AtomicBoolean alive = new AtomicBoolean(true);
 	private final Map<String, RemoteService> contentDirectories = new ConcurrentHashMap<>();
 
-	public ContentDirectoryHolder (final ControlPoint controlPoint, final MediaFactory mediaFactory, final Config config) {
-		this.controlPoint = controlPoint;
+	public ContentDirectoryHolder (final UpnpService upnpService, final MediaFactory mediaFactory, final Config config) {
+		this.upnpService = upnpService;
 		this.mediaFactory = mediaFactory;
 		this.config = config;
 	}
@@ -54,7 +54,7 @@ public class ContentDirectoryHolder {
 		this.contentDirectories.put(id, contentDirectory);
 		try {
 			final IMixedMediaStorageLayer storage = this.mediaFactory.getStorageLayer(getMetadataDbPath(id).getAbsolutePath());
-			this.mediaFactory.addExternalDb(new ContentDirectoryDb(id, this.controlPoint, device, contentDirectory, storage));
+			this.mediaFactory.addExternalDb(new ContentDirectoryDb(id, this.upnpService.getControlPoint(), device, contentDirectory, storage));
 		}
 		catch (final DbException e) {
 			LOG.warn("Failed to create storage: {}", ErrorHelper.oneLineCauseTrace(e));

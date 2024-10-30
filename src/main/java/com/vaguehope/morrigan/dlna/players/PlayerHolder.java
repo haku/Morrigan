@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.jupnp.controlpoint.ControlPoint;
+import org.jupnp.UpnpService;
 import org.jupnp.model.meta.RemoteDevice;
 import org.jupnp.model.meta.RemoteService;
 import org.jupnp.model.types.UDN;
@@ -31,7 +31,7 @@ public class PlayerHolder {
 	private static final Logger LOG = LoggerFactory.getLogger(PlayerHolder.class);
 
 	private final PlayerRegister playerRegister;
-	private final ControlPoint controlPoint;
+	private final UpnpService upnpService;
 	private final DlnaPlayingParamsFactory dlnaPlayingParamsFactory;
 	private final PlayerStateStorage stateStorage;
 	private final Config config;
@@ -42,11 +42,11 @@ public class PlayerHolder {
 	private final ConcurrentMap<UDN, Set<AbstractDlnaPlayer>> players = new ConcurrentHashMap<>();
 	private final Map<String, PlayerState> backedupPlayerState = new ConcurrentHashMap<>();
 
-	public PlayerHolder (final PlayerRegister playerRegister, final ControlPoint controlPoint,
+	public PlayerHolder (final PlayerRegister playerRegister, final UpnpService upnpService,
 			final DlnaPlayingParamsFactory dlnaPlayingParamsFactory,
 			final PlayerStateStorage playerStateStorage, final Config config, final ScheduledExecutorService scheduledExecutor) {
 		this.playerRegister = playerRegister;
-		this.controlPoint = controlPoint;
+		this.upnpService = upnpService;
 		this.dlnaPlayingParamsFactory = dlnaPlayingParamsFactory;
 		this.stateStorage = playerStateStorage;
 		this.config = config;
@@ -113,12 +113,12 @@ public class PlayerHolder {
 		final AbstractDlnaPlayer player;
 		if (StringHelper.blank(System.getenv("DLNA_OLD_PLAYER"))) {
 			player = new GoalSeekingDlnaPlayer(this.playerRegister,
-					this.controlPoint, avTransport, this.dlnaPlayingParamsFactory,
+					this.upnpService.getControlPoint(), avTransport, this.dlnaPlayingParamsFactory,
 					this.scheduledExecutor, this.stateStorage, this.config);
 		}
 		else {
 			player = new DlnaPlayer(this.playerRegister,
-					this.controlPoint, avTransport, this.dlnaPlayingParamsFactory,
+					this.upnpService.getControlPoint(), avTransport, this.dlnaPlayingParamsFactory,
 					this.scheduledExecutor, this.stateStorage, this.config);
 		}
 

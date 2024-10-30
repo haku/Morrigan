@@ -29,6 +29,7 @@ import org.jupnp.model.resource.IconResource;
 import org.jupnp.model.resource.Resource;
 import org.jupnp.protocol.ProtocolFactory;
 import org.jupnp.registry.Registry;
+import org.jupnp.registry.RegistryListener;
 import org.jupnp.transport.impl.NetworkAddressFactoryImpl;
 import org.jupnp.transport.impl.ServletStreamServerConfigurationImpl;
 import org.jupnp.transport.impl.ServletStreamServerImpl;
@@ -72,7 +73,7 @@ public class DlnaService {
 
 	private MediaServer mediaServer;
 	private PlayerHolder playerHolder;
-	private UpnpService upnpService;
+	private MyUpnpService upnpService;
 	private ContentDirectoryHolder contentDirectoryHolder;
 	private ScheduledExecutorService scheduledExecutor;
 
@@ -101,6 +102,18 @@ public class DlnaService {
 		final DlnaPlayingParamsFactory dlnaPlayingParamsFactory = new DlnaPlayingParamsFactory(mediaFileLocator, this.mediaServer);
 
 		this.upnpService = new MyUpnpService(new MyUpnpServiceConfiguration());
+
+		// watcher needs to be ready BEFORE upnpService starts, otherwise early discovery msgs may be missed.
+		this.playerHolder = new PlayerHolder(
+				this.playerRegister,
+				this.upnpService,
+				dlnaPlayingParamsFactory,
+				new PlayerStateStorage(this.mediaFactory, this.scheduledExecutor, this.config),
+				this.config,
+				this.scheduledExecutor);
+		this.contentDirectoryHolder = new ContentDirectoryHolder(this.upnpService, this.mediaFactory, this.config);
+		this.upnpService.setWatcher(new DeviceWatcher(this.playerHolder, this.contentDirectoryHolder));
+
 		this.upnpService.startup();
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			@Override
@@ -109,22 +122,12 @@ public class DlnaService {
 			}
 		});
 
-		this.playerHolder = new PlayerHolder(
-				this.playerRegister,
-				this.upnpService.getControlPoint(),
-				dlnaPlayingParamsFactory,
-				new PlayerStateStorage(this.mediaFactory, this.scheduledExecutor, this.config),
-				this.config,
-				this.scheduledExecutor);
-
 		this.upnpService.getRegistry().addDevice(new MediaServerDeviceFactory(
 				systemId,
 				this.mediaFactory,
 				this.mediaServer,
 				mediaFileLocator
 				).getDevice());
-
-		this.contentDirectoryHolder = new ContentDirectoryHolder(this.upnpService.getControlPoint(), this.mediaFactory, this.config);
 
 		if (this.args.isDlnaPlayerControl()) {
 			// TODO replace with event listener inside playerreg to dynamically reg/unreg
@@ -138,8 +141,13 @@ public class DlnaService {
 			}
 		}
 
-		this.upnpService.getRegistry().addListener(new DeviceWatcher(this.playerHolder, this.contentDirectoryHolder));
 		this.upnpService.getControlPoint().search();
+
+		// Periodic rescan to catch missed devices.
+		this.scheduledExecutor.scheduleWithFixedDelay(() -> {
+			this.upnpService.getControlPoint().search();
+			if (this.args.isVerboseLog()) LOG.info("Scanning for devices.");
+		}, 1, 3, TimeUnit.MINUTES);
 
 		LOG.info("DLNA started.");
 	}
@@ -154,13 +162,24 @@ public class DlnaService {
 
 	private class MyUpnpService extends UpnpServiceImpl {
 
+		private RegistryListener watcher;
+
 		private MyUpnpService(final UpnpServiceConfiguration configuration) {
 			super(configuration);
 		}
 
+		void setWatcher(RegistryListener watcher) {
+			this.watcher = watcher;
+		}
+
 		@Override
 		protected Registry createRegistry (final ProtocolFactory pf) {
-			return new RegistryImplWithOverrides(this, DlnaService.this.registryPathToRes);
+			if (this.watcher == null) throw new IllegalStateException();
+
+			final RegistryImplWithOverrides r = new RegistryImplWithOverrides(this, DlnaService.this.registryPathToRes);
+			// watcher added here so that it is listening from Before the UPNP service starts so no msgs are missed.
+			r.addListener(this.watcher);
+			return r;
 		}
 
 	}

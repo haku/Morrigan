@@ -23,6 +23,12 @@ public class DeviceWatcher extends DefaultRegistryListener {
 	}
 
 	@Override
+	public void remoteDeviceDiscoveryFailed(Registry registry, RemoteDevice device, Exception e) {
+		LOG.warn("remoteDeviceDiscoveryFailed: {}", device);
+		super.remoteDeviceDiscoveryFailed(registry, device, e);
+	}
+
+	@Override
 	public void remoteDeviceAdded (final Registry registry, final RemoteDevice device) {
 		final RemoteService avTransport = UpnpHelper.findFirstServiceOfType(device, UpnpHelper.SERVICE_AVTRANSPORT);
 		if (avTransport != null) {
