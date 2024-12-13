@@ -40,6 +40,7 @@ public class SyncCheckoutsService extends AwakeService {
 
 	public static final String EXTRA_HOST_SYNC = C.PACKAGE_PREFIX + "host_to_sync";
 
+	private static final int TRANSCODE_TIMEOUT_SECONDS = 300;
 	private static final long MAX_LAST_MODIFIED_SKEW_MILLIS = TimeUnit.SECONDS.toMillis(2);
 	private static final LogWrapper LOG = new LogWrapper("SCS");
 
@@ -183,7 +184,7 @@ public class SyncCheckoutsService extends AwakeService {
 	}
 
 	private static List<? extends MlistItem> fetchListOfItems (final Checkout checkout, final ServerReference host) throws IOException {
-		final MlistItemList itemList = MnApi.fetchDbItems(host, checkout.getDbRelativePath(), checkout.getQuery(), "common_audio_only", true); // TODO unhardcode this.
+		final MlistItemList itemList = MnApi.fetchDbItems(host, checkout.getDbRelativePath(), checkout.getQuery(), "mobile_audio", true); // TODO unhardcode this.
 		return itemList.getMlistItemList();
 	}
 
@@ -250,7 +251,7 @@ public class SyncCheckoutsService extends AwakeService {
 			updateNotifProgress(notificationId, notif, String.format("transcoding %s of %s",
 					transcodedCount, toTranscode.size()),
 					toTranscode.size(), transcodedCount);
-			MnApi.postToFile(host, checkout.getDbRelativePath(), i, "transcode");
+			MnApi.postToFile(host, checkout.getDbRelativePath(), i, "transcode", TRANSCODE_TIMEOUT_SECONDS);
 			transcodedCount += 1;
 		}
 		return transcodedCount;

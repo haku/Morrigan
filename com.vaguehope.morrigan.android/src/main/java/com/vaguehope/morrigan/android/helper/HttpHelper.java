@@ -53,21 +53,29 @@ public class HttpHelper {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public static String getUrlContent (String sUrl, String httpRequestMethod, String encodedData, String contentType, HttpCreds creds) throws IOException {
+	public static String getUrlContent (final String sUrl, final String httpRequestMethod, final String encodedData, final String contentType, final HttpCreds creds) throws IOException {
 		return getUrlContent(sUrl, httpRequestMethod, encodedData, contentType, (HttpStreamHandler<RuntimeException>) null, creds);
 	}
 
-	public static <T extends Exception> String getUrlContent (String sUrl, HttpStreamHandler<T> streamHandler, HttpCreds creds) throws IOException, T {
+	public static String getUrlContent (final String sUrl, final String httpRequestMethod, final String encodedData, final String contentType, final HttpCreds creds, final Integer readTimeoutSeconds) throws IOException {
+		return getUrlContent(sUrl, httpRequestMethod, encodedData, contentType, (HttpStreamHandler<RuntimeException>) null, creds, readTimeoutSeconds);
+	}
+
+	public static <T extends Exception> String getUrlContent (final String sUrl, final HttpStreamHandler<T> streamHandler, final HttpCreds creds) throws IOException, T {
 		return getUrlContent(sUrl, null, null, null, streamHandler, creds);
 	}
 
-	public static <T extends Exception> String getUrlContent (String sUrl, String httpRequestMethod, String encodedData, String contentType, HttpStreamHandler<T> streamHandler, HttpCreds creds) throws IOException, T {
+	public static <T extends Exception> String getUrlContent (final String sUrl, final String httpRequestMethod, final String encodedData, final String contentType, final HttpStreamHandler<T> streamHandler, final HttpCreds creds) throws IOException, T {
+		return getUrlContent(sUrl, httpRequestMethod, encodedData, contentType, streamHandler, creds, null);
+	}
+
+	public static <T extends Exception> String getUrlContent (final String sUrl, final String httpRequestMethod, final String encodedData, final String contentType, final HttpStreamHandler<T> streamHandler, final HttpCreds creds, final Integer readTimeoutSeconds) throws IOException, T {
 		URL url = new URL(sUrl);
 		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 		connection.setUseCaches(false);
 		connection.setRequestMethod(httpRequestMethod != null ? httpRequestMethod : "GET");
 		connection.setConnectTimeout(HTTP_CONNECT_TIMEOUT_SECONDS * 1000);
-		connection.setReadTimeout(HTTP_READ_TIMEOUT_SECONDS * 1000);
+		connection.setReadTimeout((readTimeoutSeconds != null ? readTimeoutSeconds.intValue() : HTTP_READ_TIMEOUT_SECONDS) * 1000);
 		connection.setRequestProperty(HEADER_AUTHORISATION, authHeader(creds));
 
 		if (encodedData != null) {
@@ -112,13 +120,13 @@ public class HttpHelper {
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	public static String authHeader (HttpCreds creds) {
+	public static String authHeader (final HttpCreds creds) {
 		String raw = creds.getUser() + ":" + creds.getPass();
 		String enc = Base64.encodeToString(raw.getBytes(), Base64.NO_WRAP);
 		return "Basic " + enc;
 	}
 
-	public static void buildString (InputStream is, StringBuilder sb) throws IOException {
+	public static void buildString (final InputStream is, final StringBuilder sb) throws IOException {
 		BufferedReader rd = new BufferedReader(new InputStreamReader(is));
 		String line;
 		while ((line = rd.readLine()) != null) {

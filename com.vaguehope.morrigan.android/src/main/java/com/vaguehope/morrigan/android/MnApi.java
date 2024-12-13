@@ -80,14 +80,14 @@ public class MnApi {
 	}
 
 	public static void postToFile (final ServerReference host, final String dbRelativePath, final MlistItem item,
-			final String action) throws IOException {
+			final String action, final Integer timeoutSeconds) throws IOException {
 		final String url = UriHelper.joinParts(
 				host.getBaseUrl(),
 				dbRelativePath,
 				C.CONTEXT_MLIST_ITEMS,
 				item.getRelativeUrl());
 		try {
-			HttpHelper.getUrlContent(url, "POST", "action=" + action, "application/x-www-form-urlencoded", host);
+			HttpHelper.getUrlContent(url, "POST", "action=" + action, "application/x-www-form-urlencoded", host, timeoutSeconds);
 		}
 		catch (final IOException e) {
 			throw new IOException("Failed to POST '" + url + "': " + e.getMessage(), e);
