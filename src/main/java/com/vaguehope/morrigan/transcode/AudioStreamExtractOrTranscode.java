@@ -69,6 +69,12 @@ public class AudioStreamExtractOrTranscode extends TranscodeProfile {
 				cmd.add("5");
 			}
 		},
+		OPUS("opus", MimeType.OPUS) {
+			@Override
+			public void transcode(List<String> cmd) {
+				throw new UnsupportedOperationException();
+			}
+		},
 		FLAC("flac", MimeType.FLAC) {
 			@Override
 			public void extract (final List<String> cmd) {
@@ -184,7 +190,7 @@ public class AudioStreamExtractOrTranscode extends TranscodeProfile {
 
 	@Override
 	public String[] transcodeCmd (final File outputFile) throws IOException {
-		final String ext = "." + getMimeType().getExt();
+		final String ext = "." + getMimeType().getOutputExt();
 		if (!StringHelper.endsWithIgnoreCase(outputFile.getName(), ext)) {
 			throw new IllegalArgumentException("Output file must end with " + ext + ": " + outputFile.getName());
 		}

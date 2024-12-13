@@ -96,13 +96,13 @@ public enum Transcode {
 	};
 
 	protected static final Set<MimeType> COMMON_AUDIO_TYPES = Collections.unmodifiableSet(EnumSet.of(
-			MimeType.MP3, MimeType.M4A, MimeType.OGG, MimeType.OGA, MimeType.FLAC, MimeType.WAV));
+			MimeType.MP3, MimeType.M4A, MimeType.OGG, MimeType.OGA, MimeType.OPUS, MimeType.FLAC, MimeType.WAV));
 	protected static final Set<String> COMMON_AUDIO_TYPES_STRINGS = COMMON_AUDIO_TYPES.stream()
 			.map(m -> m.getMimeType().toLowerCase(Locale.ENGLISH))
 			.collect(Collectors.toSet());
 
 	protected static final Set<MimeType> MOBILE_AUDIO_TYPES = Collections.unmodifiableSet(EnumSet.of(
-			MimeType.MP3, MimeType.M4A, MimeType.OGG, MimeType.OGA));
+			MimeType.MP3, MimeType.M4A, MimeType.OGG, MimeType.OGA, MimeType.OPUS));
 	protected static final Set<String> MOBILE_AUDIO_TYPES_STRINGS = MOBILE_AUDIO_TYPES.stream()
 			.map(m -> m.getMimeType().toLowerCase(Locale.ENGLISH))
 			.collect(Collectors.toSet());

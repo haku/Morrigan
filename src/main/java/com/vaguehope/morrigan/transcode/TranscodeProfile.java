@@ -39,7 +39,7 @@ public abstract class TranscodeProfile {
 	}
 
 	public String getTranscodedTitle () {
-		return this.item.getTitle() + "." + this.mimeType.getExt();
+		return this.item.getTitle() + "." + this.mimeType.getOutputExt();
 	}
 
 	/**
@@ -75,7 +75,7 @@ public abstract class TranscodeProfile {
 	}
 
 	protected static File cacheFile (final TranscodeContext context, final String nameWithoutExtension, final MimeType mimeType) {
-		return new File(context.config.getTranscodedDir(), nameWithoutExtension + "." + mimeType.getExt());
+		return new File(context.config.getTranscodedDir(), nameWithoutExtension + "." + mimeType.getOutputExt());
 	}
 
 	protected static String cacheFileNameWithoutExtension (final IMediaItem item, final Transcode transcode) {
@@ -87,7 +87,7 @@ public abstract class TranscodeProfile {
 	 * Includes leading dot.
 	 */
 	protected String getTmpFileExt () {
-		return "." + this.mimeType.getExt();
+		return "." + this.mimeType.getOutputExt();
 	}
 
 	/**

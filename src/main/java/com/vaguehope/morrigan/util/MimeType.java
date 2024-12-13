@@ -35,6 +35,7 @@ public enum MimeType {
 	MPGA("mpga", "audio/mpeg"),
 	OGA("oga", "audio/ogg"),
 	OGG("ogg", "audio/ogg"),
+	OPUS("opus", "audio/opus", "ogg"),  // technically the file extension should always be .ogg
 	RA("ra", "audio/vnd.rn-realaudio"),
 	WAV("wav", "audio/vnd.wave"),
 	WMA("wma", "audio/x-ms-wma"),
@@ -46,23 +47,33 @@ public enum MimeType {
 
 	private static final Map<String, MimeType> EXT_TO_FORMAT;
 	static {
-		final Map<String, MimeType> t = new ConcurrentHashMap<String, MimeType>(MimeType.values().length);
+		final Map<String, MimeType> t = new ConcurrentHashMap<>(MimeType.values().length);
 		for (MimeType f : MimeType.values()) {
-			t.put(f.ext, f);
+			if (t.put(f.ext, f) != null) throw new IllegalStateException("Duplicate input exts not allow: " + f.ext);
 		}
 		EXT_TO_FORMAT = Collections.unmodifiableMap(t);
 	}
 
 	private final String ext;
 	private final String mimeType;
+	private final String outputExt;
 
 	private MimeType (final String ext, final String mime) {
+		this(ext, mime, ext);  // default to same ext for outputs.
+	}
+
+	private MimeType (final String ext, final String mime, final String outputExt) {
 		this.ext = ext;
 		this.mimeType = mime;
+		this.outputExt = outputExt;
 	}
 
 	public String getExt () {
 		return this.ext;
+	}
+
+	public String getOutputExt() {
+		return this.outputExt;
 	}
 
 	public String getMimeType () {

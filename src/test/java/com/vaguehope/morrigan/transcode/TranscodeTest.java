@@ -40,6 +40,21 @@ public class TranscodeTest {
 		assertEquals(null, Transcode.MOBILE_AUDIO.profileForItem(this.context, this.testDb.addTestTrack(MimeType.M4A), ItemTags.EMPTY));
 		assertEquals(null, Transcode.MOBILE_AUDIO.profileForItem(this.context, this.testDb.addTestTrack(MimeType.OGA), ItemTags.EMPTY));
 		assertEquals(null, Transcode.MOBILE_AUDIO.profileForItem(this.context, this.testDb.addTestTrack(MimeType.OGG), ItemTags.EMPTY));
+		assertEquals(null, Transcode.MOBILE_AUDIO.profileForItem(this.context, this.testDb.addTestTrack(MimeType.OPUS), ItemTags.EMPTY));
+	}
+
+	@Test
+	public void itDoesExtractionIfVideoWithAllowedType() throws Exception {
+		final IMixedMediaItem item = this.testDb.addTestTrack(MimeType.MKV);
+		final HashSet<String> codecs = new HashSet<>();
+		codecs.add("opus");
+		when(this.ffprobeCache.inspect(item.getFile())).thenReturn(new FfprobeInfo(1234567890L, codecs, codecs, 1000L));
+		final TranscodeProfile profile = Transcode.MOBILE_AUDIO.profileForItem(this.context, item, ItemTags.EMPTY);
+		assertEquals(MimeType.OPUS, profile.getMimeType());
+		assertEquals(".ogg", profile.getTmpFileExt());
+
+		final String[] cmd = profile.transcodeCmd(this.tmp.newFile("foo" + profile.getTmpFileExt()));
+		assertThat(Arrays.toString(cmd), containsString(", -vn, -acodec, copy,"));
 	}
 
 	@Test

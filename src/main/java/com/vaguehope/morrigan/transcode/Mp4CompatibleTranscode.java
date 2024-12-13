@@ -26,7 +26,7 @@ public class Mp4CompatibleTranscode extends TranscodeProfile {
 
 	@Override
 	public String[] transcodeCmd (final File outputFile) throws IOException {
-		final String ext = "." + getMimeType().getExt();
+		final String ext = "." + getMimeType().getOutputExt();
 		if (!StringHelper.endsWithIgnoreCase(outputFile.getName(), ext)) {
 			throw new IllegalArgumentException("Output file must end with " + ext + ": " + outputFile.getName());
 		}
