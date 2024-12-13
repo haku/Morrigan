@@ -49,11 +49,10 @@ public class AudioStreamExtractOrTranscode extends TranscodeProfile {
 			@Override
 			public void transcode (final List<String> cmd) {
 				cmd.add("-c:a");
-				cmd.add("libfdk_aac");
+				cmd.add("libfdk_aac");  // https://trac.ffmpeg.org/wiki/Encode/AAC
 
-				// https://trac.ffmpeg.org/wiki/Encode/AAC#fdk_vbr
 				cmd.add("-vbr");
-				cmd.add("5");
+				cmd.add("5");  // https://trac.ffmpeg.org/wiki/Encode/AAC#fdk_vbr
 
 				cmd.add("-movflags");
 				cmd.add("+faststart");
@@ -72,7 +71,7 @@ public class AudioStreamExtractOrTranscode extends TranscodeProfile {
 		OPUS("opus", MimeType.OPUS) {
 			@Override
 			public void transcode(List<String> cmd) {
-				throw new UnsupportedOperationException();
+				throw new UnsupportedOperationException("should never be needed.");
 			}
 		},
 		FLAC("flac", MimeType.FLAC) {
@@ -150,7 +149,7 @@ public class AudioStreamExtractOrTranscode extends TranscodeProfile {
 
 	public AudioStreamExtractOrTranscode (final TranscodeContext context, final IMediaTrack item, final ItemTags tags, final Transcode transcode,
 			final MimeType fallbackType, final Set<MimeType> otherTypes) throws IOException {
-		super(context, item, tags, transcode, findAudioStreamType(context, item, transcode, fallbackType, otherTypes));
+		super(context, item, tags, transcode, findAudioStreamType(context, item, tags, transcode, fallbackType, otherTypes));
 
 		if (!MIMETYPE_TO_CODEC.containsKey(fallbackType)) throw new IllegalArgumentException("Unsupported type: " + fallbackType);
 		for (final MimeType type : otherTypes) {
@@ -163,7 +162,7 @@ public class AudioStreamExtractOrTranscode extends TranscodeProfile {
 	 * @param fallbackType The default, do lossy transcode if needed.
 	 * @param otherTypes The preferred types, extract existing stream if possible.
 	 */
-	private static MimeType findAudioStreamType (final TranscodeContext context, final IMediaItem item, final Transcode transcode, final MimeType fallbackType, final Set<MimeType> otherTypes) throws IOException {
+	private static MimeType findAudioStreamType (final TranscodeContext context, final IMediaItem item, final ItemTags tags, final Transcode transcode, final MimeType fallbackType, final Set<MimeType> otherTypes) throws IOException {
 		final String nameWithoutExtension = cacheFileNameWithoutExtension(item, transcode);
 
 		// Check for existing transcode.
@@ -175,6 +174,9 @@ public class AudioStreamExtractOrTranscode extends TranscodeProfile {
 				return type;
 			}
 		}
+
+		// if filter is used then a transcode to the fallback type will always be needed.
+		if (ConfigTag.AUDIO_FILTER.read(tags) != null) return fallbackType;
 
 		// Others should include the fallback, so don't need to search for the fallback.
 		if (otherTypes.size() > 0) {
