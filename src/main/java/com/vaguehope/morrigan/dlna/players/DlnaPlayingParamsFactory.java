@@ -97,7 +97,7 @@ public class DlnaPlayingParamsFactory {
 	 * Returns valid duration or throws.
 	 */
 	private static int readFileDurationSeconds (final File file) throws IOException {
-		final Long fileDurationMillis = FfprobeCache.inspect(file).getDurationMillis();
+		final Long fileDurationMillis = FfprobeCache.INSTANCE.inspect(file).getDurationMillis();
 		if (fileDurationMillis == null || fileDurationMillis < 1) throw new IOException("Failed to read file duration: " + file.getAbsolutePath());
 		LOG.info("Duration {}ms: {}", fileDurationMillis, file.getAbsolutePath());
 		final int seconds = (int) TimeUnit.MILLISECONDS.toSeconds(fileDurationMillis);

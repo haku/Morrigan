@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.ItemTags;
@@ -136,16 +135,16 @@ public class AudioStreamExtractOrTranscode extends TranscodeProfile {
 		return codec;
 	}
 
-	public AudioStreamExtractOrTranscode (final Config config, final IMediaTrack item, final ItemTags tags, final Transcode transcode,
+	public AudioStreamExtractOrTranscode (final TranscodeContext context, final IMediaTrack item, final ItemTags tags, final Transcode transcode,
 			final MimeType fallbackType, final MimeType... otherTypes) throws IOException {
-		this(config, item, tags, transcode, fallbackType, otherTypes.length > 0
+		this(context, item, tags, transcode, fallbackType, otherTypes.length > 0
 		? EnumSet.copyOf(Arrays.asList(otherTypes))
 		: EnumSet.noneOf(MimeType.class));
 	}
 
-	public AudioStreamExtractOrTranscode (final Config config, final IMediaTrack item, final ItemTags tags, final Transcode transcode,
+	public AudioStreamExtractOrTranscode (final TranscodeContext context, final IMediaTrack item, final ItemTags tags, final Transcode transcode,
 			final MimeType fallbackType, final Set<MimeType> otherTypes) throws IOException {
-		super(config, item, tags, transcode, findAudioStreamType(config, item, transcode, fallbackType, otherTypes));
+		super(context, item, tags, transcode, findAudioStreamType(context, item, transcode, fallbackType, otherTypes));
 
 		if (!MIMETYPE_TO_CODEC.containsKey(fallbackType)) throw new IllegalArgumentException("Unsupported type: " + fallbackType);
 		for (final MimeType type : otherTypes) {
@@ -158,22 +157,22 @@ public class AudioStreamExtractOrTranscode extends TranscodeProfile {
 	 * @param fallbackType The default, do lossy transcode if needed.
 	 * @param otherTypes The preferred types, extract existing stream if possible.
 	 */
-	private static MimeType findAudioStreamType (final Config config, final IMediaItem item, final Transcode transcode, final MimeType fallbackType, final Set<MimeType> otherTypes) throws IOException {
+	private static MimeType findAudioStreamType (final TranscodeContext context, final IMediaItem item, final Transcode transcode, final MimeType fallbackType, final Set<MimeType> otherTypes) throws IOException {
 		final String nameWithoutExtension = cacheFileNameWithoutExtension(item, transcode);
 
 		// Check for existing transcode.
-		if (cacheFile(config, nameWithoutExtension, fallbackType).exists()) {
+		if (cacheFile(context, nameWithoutExtension, fallbackType).exists()) {
 			return fallbackType;
 		}
 		for (final MimeType type : otherTypes) {
-			if (cacheFile(config, nameWithoutExtension, type).exists()) {
+			if (cacheFile(context, nameWithoutExtension, type).exists()) {
 				return type;
 			}
 		}
 
 		// Others should include the fallback, so don't need to search for the fallback.
 		if (otherTypes.size() > 0) {
-			final FfprobeInfo info = FfprobeCache.inspect(item.getFile());
+			final FfprobeInfo info = context.ffprobeCache.inspect(item.getFile());
 			for (final MimeType mimeType : otherTypes) {
 				final String codec = codecForMimeType(mimeType).getCodec();
 				if (info.getCodecs().contains(codec)) return mimeType;
@@ -217,7 +216,7 @@ public class AudioStreamExtractOrTranscode extends TranscodeProfile {
 
 		cmd.add("-vn");
 
-		final FfprobeInfo info = FfprobeCache.inspect(getItem().getFile());
+		final FfprobeInfo info = this.context.ffprobeCache.inspect(getItem().getFile());
 
 		final Codec codec = codecForMimeType(getMimeType());
 		if (audioFilter == null && info.getCodecs().contains(codec.getCodec())) {

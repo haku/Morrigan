@@ -18,6 +18,7 @@ import com.vaguehope.morrigan.model.Register;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
 import com.vaguehope.morrigan.transcode.Transcode;
+import com.vaguehope.morrigan.transcode.TranscodeContext;
 import com.vaguehope.morrigan.transcode.TranscodeProfile;
 import com.vaguehope.morrigan.transcode.Transcoder;
 import com.vaguehope.morrigan.util.DaemonThreadFactory;
@@ -309,7 +310,7 @@ public abstract class AbstractPlayer implements Player {
 
 						PlayItem maybeUpdatedItem = item;
 
-						final TranscodeProfile tProfile = getTranscode().profileForItem(AbstractPlayer.this.config, item.getList(), item.getTrack());
+						final TranscodeProfile tProfile = getTranscode().profileForItem(new TranscodeContext(AbstractPlayer.this.config), item.getList(), item.getTrack());
 						if (tProfile != null) {
 							AbstractPlayer.this.transcoder.transcodeToFile(tProfile);
 							final File altFile = tProfile.getCacheFileEvenIfItDoesNotExist();  // This should exist because the transcode just ran.

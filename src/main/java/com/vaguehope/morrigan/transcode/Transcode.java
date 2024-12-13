@@ -3,11 +3,10 @@ package com.vaguehope.morrigan.transcode;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
@@ -19,48 +18,59 @@ import com.vaguehope.morrigan.util.StringHelper;
 public enum Transcode {
 	NONE("", "No Transcode") {
 		@Override
-		public TranscodeProfile profileForItem (final Config config, final IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack item) throws IOException {
+		public TranscodeProfile profileForItem (final TranscodeContext context, final IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack item) throws IOException {
 			return null;
 		}
 
 		@Override
-		public TranscodeProfile profileForItem (final Config config, final IMediaTrack item, final ItemTags tags) throws IOException {
+		public TranscodeProfile profileForItem (final TranscodeContext context, final IMediaTrack item, final ItemTags tags) throws IOException {
 			return null;
 		}
 	},
 	COMMON_AUDIO_ONLY("common_audio_only", "Common Audio Only") {
 		@Override
-		public TranscodeProfile profileForItem (final Config config, final IMediaTrack item, final ItemTags tags) throws IOException {
+		public TranscodeProfile profileForItem (final TranscodeContext context, final IMediaTrack item, final ItemTags tags) throws IOException {
 			final String itemMimeType = item.getMimeType();
 			final String itemMimeTypeLower = itemMimeType != null ? itemMimeType.toLowerCase(Locale.ENGLISH) : null;
 
 			if (COMMON_AUDIO_TYPES_STRINGS.contains(itemMimeTypeLower) && !ConfigTag.isAnyPresent(tags)) {
 				return null;
 			}
-			// TODO support extraction of all common types.
-			return new AudioStreamExtractOrTranscode(config, item, tags, this, MimeType.MP3, COMMON_AUDIO_TYPES);
+			return new AudioStreamExtractOrTranscode(context, item, tags, this, MimeType.MP3, COMMON_AUDIO_TYPES);
+		}
+	},
+	MOBILE_AUDIO("mobile_audio", "Mobile Audio") {
+		@Override
+		public TranscodeProfile profileForItem (final TranscodeContext context, final IMediaTrack item, final ItemTags tags) throws IOException {
+			final String itemMimeType = item.getMimeType();
+			final String itemMimeTypeLower = itemMimeType != null ? itemMimeType.toLowerCase(Locale.ENGLISH) : null;
+
+			if (MOBILE_AUDIO_TYPES_STRINGS.contains(itemMimeTypeLower) && !ConfigTag.isAnyPresent(tags)) {
+				return null;
+			}
+			return new AudioStreamExtractOrTranscode(context, item, tags, this, MimeType.M4A, MOBILE_AUDIO_TYPES);
 		}
 	},
 	MP3_ONLY("mp3_only", "MP3 Only") {
 		@Override
-		public TranscodeProfile profileForItem (final Config config, final IMediaTrack item, final ItemTags tags) throws IOException {
+		public TranscodeProfile profileForItem (final TranscodeContext context, final IMediaTrack item, final ItemTags tags) throws IOException {
 			if (MimeType.MP3.getMimeType().equalsIgnoreCase(item.getMimeType()) && !ConfigTag.isAnyPresent(tags)) {
 				return null;
 			}
-			return new AudioStreamExtractOrTranscode(config, item, tags, this, MimeType.MP3);
+			return new AudioStreamExtractOrTranscode(context, item, tags, this, MimeType.MP3);
 		}
 	},
 	MP4_COMPATIBLE("mp4_compatible", "MP4 Compatible") {
 		@Override
-		public TranscodeProfile profileForItem (final Config config, final IMediaTrack item, final ItemTags tags) throws IOException {
+		public TranscodeProfile profileForItem (final TranscodeContext context, final IMediaTrack item, final ItemTags tags) throws IOException {
 			final boolean hasConfigTags = ConfigTag.isAnyPresent(tags);
 
 			if (MimeType.MP4.getMimeType().equalsIgnoreCase(item.getMimeType())) {
 				// Use existence of cache file to reduce calls to ffprobe.
 				if (hasConfigTags
-						|| Mp4CompatibleTranscode.cacheFileMp4(config, item, this).exists()
-						|| FfprobeCache.inspect(item.getFile()).has10BitColour()) {
-					return new Mp4CompatibleTranscode(config, item, tags, this);
+						|| Mp4CompatibleTranscode.cacheFileMp4(context, item, this).exists()
+						|| context.ffprobeCache.inspect(item.getFile()).has10BitColour()) {
+					return new Mp4CompatibleTranscode(context, item, tags, this);
 				}
 				return null;
 			}
@@ -72,10 +82,10 @@ public enum Transcode {
 				return null;
 			}
 			else if (StringHelper.startsWithIgnoreCase(item.getMimeType(), "video")) {
-				return new Mp4CompatibleTranscode(config, item, tags, this);
+				return new Mp4CompatibleTranscode(context, item, tags, this);
 			}
 			else if (StringHelper.startsWithIgnoreCase(item.getMimeType(), "audio")) {
-				return new AudioStreamExtractOrTranscode(config, item, tags, this, MimeType.M4A);
+				return new AudioStreamExtractOrTranscode(context, item, tags, this, MimeType.M4A);
 			}
 
 			if (hasConfigTags) {
@@ -87,15 +97,15 @@ public enum Transcode {
 
 	protected static final Set<MimeType> COMMON_AUDIO_TYPES = Collections.unmodifiableSet(EnumSet.of(
 			MimeType.MP3, MimeType.M4A, MimeType.OGG, MimeType.OGA, MimeType.FLAC, MimeType.WAV));
+	protected static final Set<String> COMMON_AUDIO_TYPES_STRINGS = COMMON_AUDIO_TYPES.stream()
+			.map(m -> m.getMimeType().toLowerCase(Locale.ENGLISH))
+			.collect(Collectors.toSet());
 
-	protected static final Set<String> COMMON_AUDIO_TYPES_STRINGS;
-	static {
-		final Set<String> s = new HashSet<>();
-		for (final MimeType mt : COMMON_AUDIO_TYPES) {
-			s.add(mt.getMimeType().toLowerCase(Locale.ENGLISH));
-		}
-		COMMON_AUDIO_TYPES_STRINGS = Collections.unmodifiableSet(s);
-	}
+	protected static final Set<MimeType> MOBILE_AUDIO_TYPES = Collections.unmodifiableSet(EnumSet.of(
+			MimeType.MP3, MimeType.M4A, MimeType.OGG, MimeType.OGA));
+	protected static final Set<String> MOBILE_AUDIO_TYPES_STRINGS = MOBILE_AUDIO_TYPES.stream()
+			.map(m -> m.getMimeType().toLowerCase(Locale.ENGLISH))
+			.collect(Collectors.toSet());
 
 	private static final MnLogger LOG = MnLogger.make(Transcode.class);
 
@@ -116,15 +126,15 @@ public enum Transcode {
 		return this.uiName;
 	}
 
-	public TranscodeProfile profileForItem (final Config config, final IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack item) throws IOException, MorriganException {
-		return profileForItem(config, item, list != null ? list.readTags(item) : ItemTags.EMPTY);
+	public TranscodeProfile profileForItem (final TranscodeContext context, final IMediaTrackList<? extends IMediaTrack> list, final IMediaTrack item) throws IOException, MorriganException {
+		return profileForItem(context, item, list != null ? list.readTags(item) : ItemTags.EMPTY);
 	}
 
 	/**
 	 * Returns null if no transcode is required.
 	 * Ideally should be quite quick as its used to determine if a transcode is needed when building API list responses.
 	 */
-	public abstract TranscodeProfile profileForItem (final Config config, final IMediaTrack item, final ItemTags tags) throws IOException;
+	public abstract TranscodeProfile profileForItem (final TranscodeContext context, final IMediaTrack item, final ItemTags tags) throws IOException;
 
 	/**
 	 * Case-insensitive.

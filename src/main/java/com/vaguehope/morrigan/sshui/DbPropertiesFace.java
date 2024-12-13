@@ -23,6 +23,7 @@ import com.vaguehope.morrigan.sshui.util.LastActionMessage;
 import com.vaguehope.morrigan.sshui.util.MenuItems;
 import com.vaguehope.morrigan.tasks.MorriganTask;
 import com.vaguehope.morrigan.transcode.Transcode;
+import com.vaguehope.morrigan.transcode.TranscodeContext;
 import com.vaguehope.morrigan.transcode.TranscodeTask;
 
 public class DbPropertiesFace extends MenuFace {
@@ -269,7 +270,7 @@ public class DbPropertiesFace extends MenuFace {
 		if (number == null) return;
 
 		this.mnContext.getAsyncTasksRegister().scheduleTask(
-				new TranscodeTask(this.mnContext.getTranscoder(), tr, d, number, this.mnContext.getConfig()));
+				new TranscodeTask(this.mnContext.getTranscoder(), tr, d, number, new TranscodeContext(this.mnContext.getConfig())));
 		this.lastActionMessage.setLastActionMessage("Transcode task started.");
 	}
 

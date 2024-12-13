@@ -3,7 +3,7 @@ package com.vaguehope.morrigan.transcode;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
-import com.vaguehope.morrigan.config.Config;
+
 import com.vaguehope.morrigan.model.exceptions.MorriganException;
 import com.vaguehope.morrigan.model.media.IMediaItem;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
@@ -13,14 +13,14 @@ import com.vaguehope.morrigan.util.MimeType;
 
 public abstract class TranscodeProfile {
 
-	private final Config config;
+	protected final TranscodeContext context;
 	private final IMediaTrack item;
 	private final ItemTags tags;
 	private final Transcode transcode;
 	private final MimeType mimeType;
 
-	protected TranscodeProfile (final Config config, final IMediaTrack item, final ItemTags tags, final Transcode transcode, final MimeType mimeType) {
-		this.config = config;
+	protected TranscodeProfile (final TranscodeContext context, final IMediaTrack item, final ItemTags tags, final Transcode transcode, final MimeType mimeType) {
+		this.context = context;
 		if (item == null) throw new IllegalArgumentException("Item required.");
 		if (transcode == null) throw new IllegalArgumentException("Transcode required.");
 		if (mimeType == null) throw new IllegalArgumentException("MimeType required.");
@@ -47,7 +47,7 @@ public abstract class TranscodeProfile {
 	 * Always call transcodeToFile() beforehand to ensure it if fresh.
 	 */
 	public File getCacheFileEvenIfItDoesNotExist () {
-		return cacheFile(this.config, this.item, this.transcode, this.mimeType);
+		return cacheFile(this.context, this.item, this.transcode, this.mimeType);
 	}
 
 	public File getCacheFileIfFresh () throws MorriganException, IOException {
@@ -70,12 +70,12 @@ public abstract class TranscodeProfile {
 		return cacheFile;
 	}
 
-	protected static File cacheFile (final Config config, final IMediaItem item, final Transcode transcode, final MimeType mimeType) {
-		return cacheFile(config, cacheFileNameWithoutExtension(item, transcode), mimeType);
+	protected static File cacheFile (final TranscodeContext context, final IMediaItem item, final Transcode transcode, final MimeType mimeType) {
+		return cacheFile(context, cacheFileNameWithoutExtension(item, transcode), mimeType);
 	}
 
-	protected static File cacheFile (final Config config, final String nameWithoutExtension, final MimeType mimeType) {
-		return new File(config.getTranscodedDir(), nameWithoutExtension + "." + mimeType.getExt());
+	protected static File cacheFile (final TranscodeContext context, final String nameWithoutExtension, final MimeType mimeType) {
+		return new File(context.config.getTranscodedDir(), nameWithoutExtension + "." + mimeType.getExt());
 	}
 
 	protected static String cacheFileNameWithoutExtension (final IMediaItem item, final Transcode transcode) {

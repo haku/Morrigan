@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.model.media.IMediaTrack;
 import com.vaguehope.morrigan.model.media.IMediaTrackList;
 import com.vaguehope.morrigan.tasks.MorriganTask;
@@ -20,14 +19,14 @@ public class TranscodeTask implements MorriganTask {
 	private final Transcode transcode;
 	private final IMediaTrackList<? extends IMediaTrack> db;
 	private final Integer maxNumber;
-	private final Config config;
+	private final TranscodeContext context;
 
-	public TranscodeTask (final Transcoder transcoder, final Transcode transcode, final IMediaTrackList<? extends IMediaTrack> db, final Integer maxNumber, final Config config) {
+	public TranscodeTask (final Transcoder transcoder, final Transcode transcode, final IMediaTrackList<? extends IMediaTrack> db, final Integer maxNumber, final TranscodeContext context) {
 		this.transcoder = transcoder;
 		this.transcode = transcode;
 		this.db = db;
 		this.maxNumber = maxNumber;
-		this.config = config;
+		this.context = context;
 	}
 
 	@Override
@@ -48,7 +47,7 @@ public class TranscodeTask implements MorriganTask {
 				if (profiles.size() >= this.maxNumber) break;
 				if (!item.isEnabled()) continue;
 
-				final TranscodeProfile profile = this.transcode.profileForItem(this.config, this.db, item);
+				final TranscodeProfile profile = this.transcode.profileForItem(this.context, this.db, item);
 				if (profile == null) continue;
 				if (profile.getCacheFileIfFresh() != null) continue;
 				profiles.add(profile);

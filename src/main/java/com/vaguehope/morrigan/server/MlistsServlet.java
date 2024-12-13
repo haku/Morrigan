@@ -62,6 +62,7 @@ import com.vaguehope.morrigan.server.util.XmlHelper;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
 import com.vaguehope.morrigan.tasks.AsyncTask;
 import com.vaguehope.morrigan.transcode.Transcode;
+import com.vaguehope.morrigan.transcode.TranscodeContext;
 import com.vaguehope.morrigan.transcode.TranscodeProfile;
 import com.vaguehope.morrigan.transcode.Transcoder;
 import com.vaguehope.morrigan.util.ChecksumCache;
@@ -431,7 +432,7 @@ public class MlistsServlet extends HttpServlet {
 		else if (action.equals(CMD_TRANSCODE)) {
 			final String transcode = StringHelper.trimToNull(req.getParameter(PARAM_TRANSCODE));
 			if (transcode != null) {
-				final TranscodeProfile tProfile = Transcode.parse(transcode).profileForItem(this.config, mmdb, item);
+				final TranscodeProfile tProfile = Transcode.parse(transcode).profileForItem(new TranscodeContext(this.config), mmdb, item);
 				this.transcoder.transcodeToFile(tProfile);
 			}
 			else {
@@ -544,7 +545,7 @@ public class MlistsServlet extends HttpServlet {
 
 						final String transcode = StringHelper.trimToNull(req.getParameter(PARAM_TRANSCODE));
 						if (transcode != null) {
-							final TranscodeProfile tProfile = Transcode.parse(transcode).profileForItem(this.config, mmdb, item);
+							final TranscodeProfile tProfile = Transcode.parse(transcode).profileForItem(new TranscodeContext(this.config), mmdb, item);
 							final File transcodedFile = tProfile.getCacheFileIfFresh();
 							if (transcodedFile != null) {
 								ServletHelper.returnFile(transcodedFile, tProfile.getMimeType().getMimeType(), null, req.getHeader("Range"), resp);
@@ -832,7 +833,7 @@ public class MlistsServlet extends HttpServlet {
 		if (transcode != Transcode.NONE) {
 			if (mi instanceof IMediaTrack) {
 				if (tags == null) tags = ml.readTags(mi);
-				final TranscodeProfile tProfile = transcode.profileForItem(config, (IMediaTrack) mi, tags);
+				final TranscodeProfile tProfile = transcode.profileForItem(new TranscodeContext(config), (IMediaTrack) mi, tags);
 				if (tProfile != null) {
 					title = tProfile.getTranscodedTitle();
 

@@ -16,6 +16,7 @@ import com.vaguehope.morrigan.model.media.internal.db.mmdb.LocalMixedMediaDb;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.MixedMediaItemFactory;
 import com.vaguehope.morrigan.model.media.internal.db.mmdb.MixedMediaSqliteLayerOuter;
 import com.vaguehope.morrigan.sqlitewrapper.DbException;
+import com.vaguehope.morrigan.util.MimeType;
 
 public class TestMixedMediaDb extends LocalMixedMediaDb {
 
@@ -47,8 +48,12 @@ public class TestMixedMediaDb extends LocalMixedMediaDb {
 	}
 
 	public IMixedMediaItem addTestTrack() throws MorriganException, DbException {
+		return addTestTrack(MimeType.MP3);
+	}
+
+	public IMixedMediaItem addTestTrack(final MimeType mimeType) throws MorriganException, DbException {
 		final int n = getTrackNumber();
-		return addTestTrack(new File(String.format("some_media_file_%s.ext", n)),
+		return addTestTrack(new File(String.format("some_media_file_%s." + mimeType.getExt(), n)),
 				BigInteger.TEN.add(BigInteger.valueOf(2 * n)),
 				BigInteger.TEN.add(BigInteger.valueOf((2 * n) + 1)));
 	}

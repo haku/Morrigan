@@ -196,7 +196,7 @@ public class LocalMixedMediaDbUpdateTask extends LocalDbUpdateTask<ILocalMixedMe
 			try {
 				int dSeconds = 0;
 				if (Ffprobe.isAvailable()) {
-					final Long dMillis = FfprobeCache.inspect(item.getFile()).getDurationMillis();
+					final Long dMillis = FfprobeCache.INSTANCE.inspect(item.getFile()).getDurationMillis();
 					if (dMillis != null) {
 						dSeconds = (int) TimeUnit.MILLISECONDS.toSeconds(dMillis);
 					}
