@@ -6,6 +6,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -58,7 +59,7 @@ public class TranscodeTest {
 	@Test
 	public void itUsesCorrectTranscodeOutputType() throws Exception {
 		final IMixedMediaItem item = this.testDb.addTestTrack(MimeType.AVI);
-		mockFfprobe(item, null);
+		mockFfprobe(item, null, 1000L);
 		final TranscodeProfile profile = Transcode.COMMON_AUDIO_ONLY.profileForItem(this.context, item, ItemTags.EMPTY);
 		assertEquals(MimeType.M4A, profile.getMimeType());
 		assertEquals(".m4a", profile.getTmpFileExt());
@@ -67,7 +68,7 @@ public class TranscodeTest {
 	@Test
 	public void itDoesExtractionIfVideoWithAllowedType() throws Exception {
 		final IMixedMediaItem item = this.testDb.addTestTrack(MimeType.MKV);
-		mockFfprobe(item, "opus");
+		mockFfprobe(item, "opus", 1000L);
 		final TranscodeProfile profile = Transcode.MOBILE_AUDIO.profileForItem(this.context, item, ItemTags.EMPTY);
 		assertEquals(MimeType.OPUS, profile.getMimeType());
 		assertEquals(".ogg", profile.getTmpFileExt());
@@ -80,7 +81,7 @@ public class TranscodeTest {
 	public void itAlwaysUsesFallbackTypeWhenUsingFilters() throws Exception {
 		final IMixedMediaItem item = this.testDb.addTestTrack(MimeType.MKV);
 		this.testDb.addTag(item, "af=volume=10dB", MediaTagType.MANUAL, "");
-		mockFfprobe(item, "opus");
+		mockFfprobe(item, "opus", 1000L);
 		final TranscodeProfile profile = Transcode.MOBILE_AUDIO.profileForItem(this.context, item, ItemTagsImpl.forItem(this.testDb, item));
 		assertEquals(MimeType.M4A, profile.getMimeType());
 		assertEquals(".m4a", profile.getTmpFileExt());
@@ -92,7 +93,7 @@ public class TranscodeTest {
 	@Test
 	public void itTranscodesFromOtherType() throws Exception {
 		final IMixedMediaItem item = this.testDb.addTestTrack(MimeType.FLAC);
-		mockFfprobe(item, null);
+		mockFfprobe(item, null, 1000L);
 		final TranscodeProfile profile = Transcode.MOBILE_AUDIO.profileForItem(this.context, item, ItemTags.EMPTY);
 		assertEquals(MimeType.M4A, profile.getMimeType());
 		assertEquals(".m4a", profile.getTmpFileExt());
@@ -101,10 +102,30 @@ public class TranscodeTest {
 		assertThat(Arrays.toString(cmd), containsString(", -vn, -c:a, libfdk_aac, -vbr, 5,"));
 	}
 
-	private void mockFfprobe(final IMixedMediaItem item, String codec) throws IOException {
+	@Test
+	public void itTrimsFiles() throws Exception {
+		final IMixedMediaItem item = this.testDb.addTestTrack(this.tmp.newFile("foo.mkv"));
+		this.testDb.addTag(item, "trim_end=3:32", MediaTagType.MANUAL, "");
+		mockFfprobe(item, null, 315000L);
+		final TranscodeProfile profile = Transcode.COMMON_AUDIO_ONLY.profileForItem(this.context, item, ItemTagsImpl.forItem(this.testDb, item));
+
+		final String[] cmd = profile.transcodeCmd(this.tmp.newFile("foo" + profile.getTmpFileExt()));
+		assertThat(Arrays.toString(cmd), containsString(", -ss, 0,"));
+		assertThat(Arrays.toString(cmd), containsString(", -to, 212,"));
+
+		final Transcoder transcoder = new Transcoder("unittest") {
+			@Override
+			protected void runTranscodeCmd(TranscodeProfile tProfile, File outputFile) throws IOException {
+				when(TranscodeTest.this.ffprobeCache.inspect(outputFile)).thenReturn(new FfprobeInfo(0L, Collections.emptySet(), Collections.emptySet(), 212000L));
+			}
+		};
+		transcoder.transcodeToFile(profile);
+	}
+
+	private void mockFfprobe(final IMixedMediaItem item, String codec, Long durationMillis) throws IOException {
 		final HashSet<String> codecs = new HashSet<>();
 		if (codec != null) codecs.add(codec);
-		when(this.ffprobeCache.inspect(item.getFile())).thenReturn(new FfprobeInfo(1234567890L, codecs, Collections.emptySet(), 1000L));
+		when(this.ffprobeCache.inspect(item.getFile())).thenReturn(new FfprobeInfo(1234567890L, codecs, Collections.emptySet(), durationMillis));
 	}
 
 }

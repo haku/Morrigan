@@ -21,9 +21,10 @@ class FfprobeParser implements Listener<String> {
 
 	private final long fileLastModified;
 
-	private final Set<String> codecs = new LinkedHashSet<String>();
-	private final Set<String> profiles = new LinkedHashSet<String>();
-	private Long durationMillis = null;
+	private final Set<String> codecs = new LinkedHashSet<>();
+	private final Set<String> profiles = new LinkedHashSet<>();
+	private Long streamDurationMillis = null;
+	private Long tagDurationMillis = null;
 
 	public FfprobeParser (final long fileLastModified) {
 		this.fileLastModified = fileLastModified;
@@ -45,7 +46,7 @@ class FfprobeParser implements Listener<String> {
 				final String val = StringHelper.removeEndQuotes(parts[1]);
 				if (!"N/A".equalsIgnoreCase(val)) {
 					final long millis = parseDurationStringToMillis(val);
-					if (this.durationMillis == null || millis > this.durationMillis) this.durationMillis = millis;
+					if (this.tagDurationMillis == null || millis > this.tagDurationMillis) this.tagDurationMillis = millis;
 				}
 			}
 			catch (final NumberFormatException e) {
@@ -58,7 +59,7 @@ class FfprobeParser implements Listener<String> {
 				if (!"N/A".equalsIgnoreCase(val)) {
 					final double seconds = Double.parseDouble(val);
 					final long millis = (long) (seconds * 1000d);
-					if (this.durationMillis == null || millis > this.durationMillis) this.durationMillis = millis;
+					if (this.streamDurationMillis == null || millis > this.streamDurationMillis) this.streamDurationMillis = millis;
 				}
 			}
 			catch (final NumberFormatException e) {
@@ -81,7 +82,8 @@ class FfprobeParser implements Listener<String> {
 	}
 
 	public FfprobeInfo build () {
-		return new FfprobeInfo(this.fileLastModified, this.codecs, this.profiles, this.durationMillis);
+		final Long duration = this.streamDurationMillis != null && this.streamDurationMillis > 0 ? this.streamDurationMillis : this.tagDurationMillis;
+		return new FfprobeInfo(this.fileLastModified, this.codecs, this.profiles, duration);
 	}
 
 }

@@ -162,7 +162,7 @@ public class Transcoder {
 		}
 	}
 
-	private void runTranscodeCmd (final TranscodeProfile tProfile, final File outputFile) throws IOException {
+	protected void runTranscodeCmd (final TranscodeProfile tProfile, final File outputFile) throws IOException {
 		LOG.i("{} {} --> {}", tProfile.getClass().getSimpleName(), tProfile.getItem().getMimeType(), tProfile.getMimeType().getMimeType());
 
 		Future<List<String>> errFuture = null;
