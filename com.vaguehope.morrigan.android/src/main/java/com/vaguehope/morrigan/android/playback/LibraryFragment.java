@@ -256,6 +256,7 @@ public class LibraryFragment extends Fragment {
 					this.selectedIds.values(), QueueEnd.HEAD, mode));
 			menu.add("Enqueue").setOnMenuItemClickListener(new EnqueueActionListener(
 					this.selectedIds.values(), QueueEnd.TAIL, mode));
+			menu.add("Select All").setOnMenuItemClickListener(new AllActionListener());
 			return true;
 		}
 
@@ -285,6 +286,21 @@ public class LibraryFragment extends Fragment {
 			mode.setTitle(String.format("%s items", this.selectedIds.size()));
 		}
 	};
+
+	private class AllActionListener implements OnMenuItemClickListener {
+
+		public AllActionListener () {
+		}
+
+		@Override
+		public boolean onMenuItemClick (final MenuItem item) {
+			for (int i = 0; i < LibraryFragment.this.mediaList.getAdapter().getCount(); i++) {
+				LibraryFragment.this.mediaList.setItemChecked(i, true);
+			}
+			return true;
+		}
+
+	}
 
 	private class EnqueueActionListener implements OnMenuItemClickListener {
 
