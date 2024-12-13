@@ -28,15 +28,6 @@ public enum Transcode {
 			return null;
 		}
 	},
-	AUDIO_ONLY("audio_only", "Audio Only") {
-		@Override
-		public TranscodeProfile profileForItem (final Config config, final IMediaTrack item, final ItemTags tags) throws IOException {
-			if (StringHelper.startsWithIgnoreCase(item.getMimeType(), "video") || ConfigTag.isAnyPresent(tags)) {
-				return new AudioStreamExtractOrTranscode(config, item, tags, this, MimeType.MP3, COMMON_AUDIO_TYPES);
-			}
-			return null;
-		}
-	},
 	COMMON_AUDIO_ONLY("common_audio_only", "Common Audio Only") {
 		@Override
 		public TranscodeProfile profileForItem (final Config config, final IMediaTrack item, final ItemTags tags) throws IOException {

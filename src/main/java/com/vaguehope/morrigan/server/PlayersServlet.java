@@ -51,7 +51,7 @@ import com.vaguehope.morrigan.util.TimeHelper;
  * POST /players/0 action=setvolume&volume=69
  * POST /players/0 action=seek&position=123.45
  * POST /players/0 action=playbackorder&order=random
- * POST /players/0 action=transcode&transcode=audio_only
+ * POST /players/0 action=transcode&transcode=some_transcode
  * POST /players/0 action=fullscreen&monitor=0
  * POST /players/0 action=addtag&tag=foo
  *

@@ -89,7 +89,7 @@ import com.vaguehope.morrigan.util.StringHelper;
  *  GET /mlists/LOCALMMDB/example.local.db3/items
  *  GET /mlists/LOCALMMDB/example.local.db3/items?includeddeletedtags=true
  *  GET /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3
- *  GET /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp4?transcode=audio_only
+ *  GET /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp4?transcode=some_transcode
  *  GET /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.jpg?resize=128
  * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 action=play&playerid=0
  * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 action=queue&playerid=0
@@ -98,7 +98,7 @@ import com.vaguehope.morrigan.util.StringHelper;
  * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 action=addtag&tag=foo
  * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 action=rmtag&tag=foo
  * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp3 action=set_enabled&enabled=true
- * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp4?transcode=audio_only action=transcode
+ * POST /mlists/LOCALMMDB/example.local.db3/items/%2Fhome%2Fhaku%2Fmedia%2Fmusic%2Fsong.mp4?transcode=some_transcode action=transcode
  *
  *  GET /mlists/LOCALMMDB/example.local.db3/albums
  *  GET /mlists/LOCALMMDB/example.local.db3/albums/somealbum
@@ -110,7 +110,7 @@ import com.vaguehope.morrigan.util.StringHelper;
  *  GET /mlists/LOCALMMDB/example.local.db3/query/example?maxresults=500
  *  GET /mlists/LOCALMMDB/example.local.db3/query/example?includedisabled=true
  *  GET /mlists/LOCALMMDB/example.local.db3/query/example?column=foo&order=asc
- *  GET /mlists/LOCALMMDB/example.local.db3/query/example?transcode=audio_only
+ *  GET /mlists/LOCALMMDB/example.local.db3/query/example?transcode=some_transcode
  *
  *  GET /mlists/LOCALMMDB/example.local.db3/sha1tags
  *  GET /mlists/LOCALMMDB/example.local.db3/sha1tags?includeautotags=true
