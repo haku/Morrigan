@@ -36,11 +36,28 @@ public class TranscodeTest {
 
 	@Test
 	public void itDoesNotTranscodeIfAlreadyAllowedType() throws Exception {
+		assertEquals(null, Transcode.COMMON_AUDIO_ONLY.profileForItem(this.context, this.testDb.addTestTrack(MimeType.MP3), ItemTags.EMPTY));
+		assertEquals(null, Transcode.COMMON_AUDIO_ONLY.profileForItem(this.context, this.testDb.addTestTrack(MimeType.M4A), ItemTags.EMPTY));
+		assertEquals(null, Transcode.COMMON_AUDIO_ONLY.profileForItem(this.context, this.testDb.addTestTrack(MimeType.OGA), ItemTags.EMPTY));
+		assertEquals(null, Transcode.COMMON_AUDIO_ONLY.profileForItem(this.context, this.testDb.addTestTrack(MimeType.OGG), ItemTags.EMPTY));
+		assertEquals(null, Transcode.COMMON_AUDIO_ONLY.profileForItem(this.context, this.testDb.addTestTrack(MimeType.OPUS), ItemTags.EMPTY));
+		assertEquals(null, Transcode.COMMON_AUDIO_ONLY.profileForItem(this.context, this.testDb.addTestTrack(MimeType.FLAC), ItemTags.EMPTY));
+		assertEquals(null, Transcode.COMMON_AUDIO_ONLY.profileForItem(this.context, this.testDb.addTestTrack(MimeType.WAV), ItemTags.EMPTY));
+
 		assertEquals(null, Transcode.MOBILE_AUDIO.profileForItem(this.context, this.testDb.addTestTrack(MimeType.MP3), ItemTags.EMPTY));
 		assertEquals(null, Transcode.MOBILE_AUDIO.profileForItem(this.context, this.testDb.addTestTrack(MimeType.M4A), ItemTags.EMPTY));
 		assertEquals(null, Transcode.MOBILE_AUDIO.profileForItem(this.context, this.testDb.addTestTrack(MimeType.OGA), ItemTags.EMPTY));
 		assertEquals(null, Transcode.MOBILE_AUDIO.profileForItem(this.context, this.testDb.addTestTrack(MimeType.OGG), ItemTags.EMPTY));
 		assertEquals(null, Transcode.MOBILE_AUDIO.profileForItem(this.context, this.testDb.addTestTrack(MimeType.OPUS), ItemTags.EMPTY));
+	}
+
+	@Test
+	public void itUsesCorrectTranscodeOutputType() throws Exception {
+		final IMixedMediaItem item = this.testDb.addTestTrack(MimeType.AVI);
+		when(this.ffprobeCache.inspect(item.getFile())).thenReturn(new FfprobeInfo(1234567890L, new HashSet<String>(), new HashSet<String>(), 1000L));
+		final TranscodeProfile profile = Transcode.COMMON_AUDIO_ONLY.profileForItem(this.context, item, ItemTags.EMPTY);
+		assertEquals(MimeType.M4A, profile.getMimeType());
+		assertEquals(".m4a", profile.getTmpFileExt());
 	}
 
 	@Test
@@ -63,6 +80,7 @@ public class TranscodeTest {
 		when(this.ffprobeCache.inspect(item.getFile())).thenReturn(new FfprobeInfo(1234567890L, new HashSet<String>(), new HashSet<String>(), 1000L));
 		final TranscodeProfile profile = Transcode.MOBILE_AUDIO.profileForItem(this.context, item, ItemTags.EMPTY);
 		assertEquals(MimeType.M4A, profile.getMimeType());
+		assertEquals(".m4a", profile.getTmpFileExt());
 
 		final String[] cmd = profile.transcodeCmd(this.tmp.newFile("foo" + profile.getTmpFileExt()));
 		assertThat(Arrays.toString(cmd), containsString(", -vn, -c:a, libfdk_aac, -vbr, 5,"));

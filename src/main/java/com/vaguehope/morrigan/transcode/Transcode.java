@@ -36,7 +36,7 @@ public enum Transcode {
 			if (COMMON_AUDIO_TYPES_STRINGS.contains(itemMimeTypeLower) && !ConfigTag.isAnyPresent(tags)) {
 				return null;
 			}
-			return new AudioStreamExtractOrTranscode(context, item, tags, this, MimeType.MP3, COMMON_AUDIO_TYPES);
+			return new AudioStreamExtractOrTranscode(context, item, tags, this, MimeType.M4A, COMMON_AUDIO_TYPES);
 		}
 	},
 	MOBILE_AUDIO("mobile_audio", "Mobile Audio") {
