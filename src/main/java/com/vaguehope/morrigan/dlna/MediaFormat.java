@@ -40,6 +40,7 @@ public enum MediaFormat {
 	MPGA("mpga", "audio/mpeg", ContentGroup.AUDIO),
 	OGA("oga", "audio/ogg", ContentGroup.AUDIO),
 	OGG("ogg", "audio/ogg", ContentGroup.AUDIO),
+	OPUS("opus", "audio/opus", ContentGroup.AUDIO),
 	RA("ra", "audio/vnd.rn-realaudio", ContentGroup.AUDIO),
 	WAV("wav", "audio/vnd.wave", ContentGroup.AUDIO),
 	WMA("wma", "audio/x-ms-wma", ContentGroup.AUDIO),
