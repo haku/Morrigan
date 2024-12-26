@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
@@ -111,9 +112,13 @@ public class Config {
 	}
 
 	public List<SavedView> getSavedViews() throws IOException {
+		final File file = getSavedViewsFile();
+		if (!file.exists()) return Collections.emptyList();
+
+		final String str = FileUtils.readFileToString(file, "UTF-8");
+
 		final Gson gson = new Gson();
 		final Type collectionType = new TypeToken<Collection<SavedView>>(){}.getType();
-		final String str = FileUtils.readFileToString(getSavedViewsFile(), "UTF-8");
 		return new ArrayList<>(gson.fromJson(str, collectionType));
 	}
 
