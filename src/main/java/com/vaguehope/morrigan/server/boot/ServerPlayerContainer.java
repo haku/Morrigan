@@ -10,11 +10,13 @@ import com.vaguehope.morrigan.player.PlayerContainer;
 public class ServerPlayerContainer implements PlayerContainer {
 
 	private final ExecutorService executorService;
+	private final String name;
 
 	private LocalPlayer player;
 	private ServerPlayerEventHandler localPlayerSupport;
 
-	public ServerPlayerContainer (final ExecutorService executorService) {
+	public ServerPlayerContainer (final String name, final ExecutorService executorService) {
+		this.name = name;
 		if (executorService == null) throw new IllegalArgumentException();
 		this.executorService = executorService;
 	}
@@ -32,7 +34,7 @@ public class ServerPlayerContainer implements PlayerContainer {
 
 	@Override
 	public String getName () {
-		return "Server";
+		return this.name;
 	}
 
 	@Override

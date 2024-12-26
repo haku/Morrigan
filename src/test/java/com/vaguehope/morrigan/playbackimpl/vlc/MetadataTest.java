@@ -1,27 +1,23 @@
 package com.vaguehope.morrigan.playbackimpl.vlc;
 
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Collections;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.vaguehope.morrigan.Args;
-
 public class MetadataTest {
 
-	private Args args;
 	private VlcEngineFactory factory;
 
 	@Before
 	public void before() throws Exception {
-		this.args = mock(Args.class);
-		this.factory = new VlcEngineFactory(this.args);
+		this.factory = new VlcEngineFactory(true, Collections.emptyList());
 	}
 
 	@After

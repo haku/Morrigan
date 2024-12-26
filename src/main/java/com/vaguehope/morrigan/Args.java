@@ -11,6 +11,8 @@ import org.kohsuke.args4j.Option;
 
 public class Args {
 
+	private List<ServerPlayerArgs> serverPlayers = new ArrayList<>();
+
 	@Option(name = "--configpath", usage = "Path to config directory, defaults to $HOME/.morrigan") private String configPath;
 	@Option(name = "--dlna", usage = "Enable DLNA.") private boolean dlna;
 	@Option(name = "--dlna-player-control", usage = "Allow players to be controlled remotely via DLNA.") private boolean dlnaPlayerControl;
@@ -19,9 +21,19 @@ public class Args {
 	@Option(name = "--origin", usage = "Hostname or IP address for CORS origin.") private List<String> origins;
 	@Option(name = "--ssh", usage = "Local port to bind SSH UI to.") private int sshPort = -1;
 	@Option(name = "--sshinterface", usage = "Hostname or IP address of interface to bind to, supersedes --interface for ssh.") private List<String> sshIfaces;
-	@Option(name = "--vlcarg", metaVar = "--foo=bar", usage = "Extra VLC arg, use once for each arg.") private List<String> vlcArgs;
 	@Option(name = "--webroot", usage = "Override static file location, useful for UI dev.") private String webRoot;
 	@Option(name = "-v", aliases = { "--verbose" }, usage = "print log lines for various events.") private boolean verboseLog = false;
+
+	@Option(name = "--player", metaVar = "--player=name", usage = "Add named server player instance.")
+	private void addServerPlayer(final String name) {
+		this.serverPlayers.add(new ServerPlayerArgs(name));
+	}
+
+	@Option(name = "--vlcarg", metaVar = "--foo=bar", usage = "Extra VLC arg, use once for each arg, only applies to --player to left of this arg.")
+	private void addVlcArg(final String arg) {
+		checkServerPlayerExists();
+		this.serverPlayers.get(this.serverPlayers.size() - 1).addVlcArg(arg);
+	}
 
 	public String getConfigPath() {
 		return this.configPath;
@@ -65,12 +77,19 @@ public class Args {
 		return this.dlnaPlayerControl;
 	}
 
-	public boolean isVerboseLog() {
-		return this.verboseLog;
+	public List<ServerPlayerArgs> getServerPlayers() {
+		checkServerPlayerExists();
+		return this.serverPlayers;
 	}
 
-	public List<String> getVlcArgs() {
-		return this.vlcArgs;
+	private void checkServerPlayerExists() {
+		if (this.serverPlayers.size() < 1) {
+			this.serverPlayers.add(new ServerPlayerArgs("Server"));
+		}
+	}
+
+	public boolean isVerboseLog() {
+		return this.verboseLog;
 	}
 
 	public File getWebRoot() throws ArgsException {
@@ -83,6 +102,27 @@ public class Args {
 		if (!f.exists()) throw new ArgsException("Not found: " + f.getAbsolutePath());
 		if (!f.isDirectory()) throw new ArgsException("Not directory: " + f.getAbsolutePath());
 		return f;
+	}
+
+	public static class ServerPlayerArgs {
+		private final String name;
+		private final List<String> vlcArgs = new ArrayList<>();
+
+		public ServerPlayerArgs(final String name) {
+			this.name = name;
+		}
+
+		public void addVlcArg(final String arg) {
+			this.vlcArgs.add(arg);
+		}
+
+		public String getName() {
+			return this.name;
+		}
+
+		public List<String> getVlcArgs() {
+			return this.vlcArgs;
+		}
 	}
 
 	public static class ArgsException extends Exception {

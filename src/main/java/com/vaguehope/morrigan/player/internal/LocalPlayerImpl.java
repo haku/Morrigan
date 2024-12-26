@@ -213,6 +213,10 @@ public class LocalPlayerImpl extends AbstractPlayer implements LocalPlayer {
 			eng.unloadFile();
 			eng.finalise();
 		}
+
+		if (this.playbackEngineFactory != null) {
+			this.playbackEngineFactory.dispose();
+		}
 	}
 
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

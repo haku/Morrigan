@@ -1,6 +1,7 @@
 package com.vaguehope.morrigan;
 
 import java.io.PrintStream;
+import java.util.Collections;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -15,12 +16,12 @@ import org.kohsuke.args4j.CmdLineParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.vaguehope.morrigan.Args.ServerPlayerArgs;
 import com.vaguehope.morrigan.config.Config;
 import com.vaguehope.morrigan.dlna.DlnaService;
 import com.vaguehope.morrigan.model.media.MediaFactory;
 import com.vaguehope.morrigan.model.media.internal.MediaFactoryImpl;
 import com.vaguehope.morrigan.playbackimpl.vlc.VlcEngineFactory;
-import com.vaguehope.morrigan.player.PlayerContainer;
 import com.vaguehope.morrigan.player.PlayerRegister;
 import com.vaguehope.morrigan.player.PlayerStateStorage;
 import com.vaguehope.morrigan.player.internal.PlayerRegisterImpl;
@@ -40,6 +41,8 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.ConsoleAppender;
 
 public final class Main {
+
+	private static final Logger LOG = LoggerFactory.getLogger(Main.class);
 
 	private Main () {
 		throw new AssertionError();
@@ -77,12 +80,12 @@ public final class Main {
 
 		final Config config = Config.fromArgs(args);
 		final AsyncTasksRegister asyncTasksRegister = new AsyncTasksRegisterImpl(Executors.newCachedThreadPool(new DaemonThreadFactory("tsk")));
-		final VlcEngineFactory playbackEngineFactory = new VlcEngineFactory(args);
-		final MediaFactory mediaFactory = new MediaFactoryImpl(config, playbackEngineFactory);
-		final PlayerRegister playerRegister = makePlayerRegister(config, playbackEngineFactory, mediaFactory);
+		final VlcEngineFactory infoPlaybackEngineFactory = new VlcEngineFactory(args.isVerboseLog(), Collections.emptyList());
+		final MediaFactory mediaFactory = new MediaFactoryImpl(config, infoPlaybackEngineFactory);
+		final PlayerRegister playerRegister = makePlayerRegister(config, mediaFactory);
 		final AsyncActions asyncActions = new AsyncActions(asyncTasksRegister, mediaFactory, config);
 		final Transcoder transcoder = new Transcoder("srv");
-		makeLocalPlayer(playerRegister);
+		makeLocalPlayers(args, playerRegister);
 
 		final MorriganServer httpServer;
 		final ServerConfig serverConfig = new ServerConfig(config, args);
@@ -114,26 +117,26 @@ public final class Main {
 		new CountDownLatch(1).await();  // Block forever.
 	}
 
-	private static PlayerRegister makePlayerRegister(final Config config, final VlcEngineFactory playbackEngineFactory, final MediaFactory mediaFactory) {
+	private static PlayerRegister makePlayerRegister(final Config config, final MediaFactory mediaFactory) {
 		final ScheduledThreadPoolExecutor playerEx = new ScheduledThreadPoolExecutor(1, new DaemonThreadFactory("player"));
 		playerEx.setKeepAliveTime(1, TimeUnit.MINUTES);
 		playerEx.allowCoreThreadTimeOut(true);
 		final PlayerRegister playerRegister = new PlayerRegisterImpl(
-				playbackEngineFactory,
 				new PlayerStateStorage(mediaFactory, playerEx, config),
 				config,
 				playerEx);
 		return playerRegister;
 	}
 
-	private static void makeLocalPlayer(final PlayerRegister playerRegister) {
-		final ExecutorService ex = new ThreadPoolExecutor(0, 1, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), new DaemonThreadFactory("lplayer"));
-		final ServerPlayerContainer pc = new ServerPlayerContainer(ex);
-		fillPlayerContainer(pc, playerRegister);
-	}
+	private static void makeLocalPlayers(final Args args, final PlayerRegister playerRegister) {
+		final ExecutorService ex = new ThreadPoolExecutor(0, 1, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), new DaemonThreadFactory("lplayer"));
 
-	private static void fillPlayerContainer (final PlayerContainer container, final PlayerRegister playerRegister) {
-		container.setPlayer(playerRegister.makeLocal(container.getPrefix(), container.getName(), container.getLocalPlayerSupport()));
+		for (final ServerPlayerArgs a : args.getServerPlayers()) {
+			LOG.info("Making local player '{}' with vlc args: {}", a.getName(), a.getVlcArgs());
+			final ServerPlayerContainer pc = new ServerPlayerContainer(a.getName(), ex);
+			final VlcEngineFactory engineFactory = new VlcEngineFactory(args.isVerboseLog(), a.getVlcArgs());
+			pc.setPlayer(playerRegister.makeLocal(pc.getPrefix(), pc.getName(), engineFactory, pc.getLocalPlayerSupport()));
+		}
 	}
 
 	private static void help (final CmdLineParser parser, final PrintStream ps) {

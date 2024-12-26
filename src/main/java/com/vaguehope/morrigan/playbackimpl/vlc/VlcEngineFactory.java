@@ -8,7 +8,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vaguehope.morrigan.Args;
 import com.vaguehope.morrigan.engines.playback.IPlaybackEngine;
 import com.vaguehope.morrigan.engines.playback.PlaybackEngineFactory;
 
@@ -28,15 +27,15 @@ public class VlcEngineFactory implements PlaybackEngineFactory {
 			"--prefetch-read-size=" + (1024 * 1024),
 	}));
 
-	public VlcEngineFactory(final Args args) {
+	public VlcEngineFactory(final boolean verbose, final List<String> extraVlcArgs) {
 		final List<String> vlcArgs = new ArrayList<>(VLC_ARGS);
 
-		if (!args.isVerboseLog()) {
+		if (!verbose) {
 			vlcArgs.add("--quiet");
 		}
 
-		if (args.getVlcArgs() != null) {
-			for (final String arg : args.getVlcArgs()) {
+		if (extraVlcArgs != null) {
+			for (final String arg : extraVlcArgs) {
 				vlcArgs.add(arg);
 			}
 		}
@@ -45,6 +44,7 @@ public class VlcEngineFactory implements PlaybackEngineFactory {
 		this.factory = new MediaPlayerFactory(vlcArgs);
 	}
 
+	@Override
 	public void dispose() {
 		this.factory.release();
 	}

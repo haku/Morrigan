@@ -30,13 +30,11 @@ public class PlayerRegisterImpl implements PlayerRegister, PlayerReader {
 	private final ConcurrentMap<String, Player> all = new ConcurrentHashMap<>();
 	private final Set<String> localPlayerIds = Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>());
 
-	private final PlaybackEngineFactory playbackEngineFactory;
 	private final PlayerStateStorage stateStorage;
 	private Config config;
 	private final ExecutorService executorService;
 
-	public PlayerRegisterImpl (final PlaybackEngineFactory playbackEngineFactory, final PlayerStateStorage stateStorage, final Config config, final ExecutorService executorService) {
-		this.playbackEngineFactory = playbackEngineFactory;
+	public PlayerRegisterImpl (final PlayerStateStorage stateStorage, final Config config, final ExecutorService executorService) {
 		this.stateStorage = stateStorage;
 		this.config = config;
 		this.executorService = executorService;
@@ -112,14 +110,16 @@ public class PlayerRegisterImpl implements PlayerRegister, PlayerReader {
 	}
 
 	@Override
-	public LocalPlayer makeLocal (final String name, final LocalPlayerSupport localPlayerSupport) {
-		return makeLocal("", name, localPlayerSupport);
-	}
-
-	@Override
-	public LocalPlayer makeLocal (final String prefix, final String name, final LocalPlayerSupport localPlayerSupport) {
-		final LocalPlayerImpl p = new LocalPlayerImpl(nextIndex(prefix), name, localPlayerSupport, this, this.playbackEngineFactory,
-				this.executorService, this.stateStorage, this.config);
+	public LocalPlayer makeLocal (final String prefix, final String name, PlaybackEngineFactory playbackEngineFactory, final LocalPlayerSupport localPlayerSupport) {
+		final LocalPlayerImpl p = new LocalPlayerImpl(
+				nextIndex(prefix),
+				name,
+				localPlayerSupport,
+				this,
+				playbackEngineFactory,
+				this.executorService,
+				this.stateStorage,
+				this.config);
 		this.stateStorage.requestReadState(p);
 		this.localPlayerIds.add(p.getId());
 		register(p);
